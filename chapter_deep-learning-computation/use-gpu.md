@@ -136,21 +136,23 @@ Also, `gpu:0` and `gpu` are equivalent.
 
 ```{.python .input}
 %%tab mxnet
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
-
 
 
 ```
 
 ```{.python .input}
 %%tab pytorch
+from d2l import torch as d2l
 import torch
 ```
 
 ```{.python .input}
 %%tab tensorflow
+from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 

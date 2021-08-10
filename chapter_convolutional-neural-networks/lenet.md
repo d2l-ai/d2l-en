@@ -110,7 +110,7 @@ from torch import nn
 ```{.python .input}
 %%tab mxnet, pytorch
 
-class LeNet(d2l.Classification):  #@save
+class LeNet(d2l.Classification):
     def __init__(self, lr=0.1):
         super().__init__()
         self.save_hyperparameters()
