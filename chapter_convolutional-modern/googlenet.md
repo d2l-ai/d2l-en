@@ -142,11 +142,11 @@ class GoogleNet(d2l.Classification):
     def b1(self):
         if tab.selected('mxnet'):
             net = nn.Sequential()
-            net.add(nn.Conv2D(64, kernel_size=7, strides=2, padding=3, 
+            net.add(nn.Conv2D(64, kernel_size=7, strides=2, padding=3,
                               activation='relu'),
                     nn.MaxPool2D(pool_size=3, strides=2, padding=1))
             return net
-        if tab.selected('pytorch'):            
+        if tab.selected('pytorch'):
             return nn.Sequential(
                 nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
                 nn.ReLU(), nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
@@ -262,11 +262,11 @@ def b5(self):
         net.add(Inception(256, (160, 320), (32, 128), 128),
                 Inception(384, (192, 384), (48, 128), 128),
                 nn.GlobalAvgPool2D())
-        return net        
+        return net
     if tab.selected('pytorch'):
         return nn.Sequential(Inception(832, 256, (160, 320), (32, 128), 128),
                              Inception(832, 384, (192, 384), (48, 128), 128),
-                             nn.AdaptiveAvgPool2d((1,1)), nn.Flatten())        
+                             nn.AdaptiveAvgPool2d((1,1)), nn.Flatten())
 ```
 
 ```{.python .input}
@@ -281,7 +281,7 @@ def __init__(self, num_classes=10, lr=0.1):
                      nn.Dense(num_classes))
         self.net.initialize(init.Xavier())
     if tab.selected('pytorch'):
-        self.net = nn.Sequential(self.b1(), self.b2(), self.b3(), self.b4(), 
+        self.net = nn.Sequential(self.b1(), self.b2(), self.b3(), self.b4(),
                                  self.b5(), nn.Linear(1024, num_classes))
 
 ```
@@ -345,8 +345,4 @@ trainer.fit(model, data)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/82)
-:end_tab:
-
-:begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/316)
 :end_tab:

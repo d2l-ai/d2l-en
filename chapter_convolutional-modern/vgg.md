@@ -49,7 +49,7 @@ and $2 \times 2$ maximum pooling with stride of 2
 In the code below, we define a function called `vgg_block`
 to implement one VGG block.
 
-:begin_tab:`mxnet,tensorflow`
+:begin_tab:`mxnet`
 The function takes two arguments
 corresponding to the number of convolutional layers `num_convs`
 and the number of output channels `num_channels`.
@@ -126,13 +126,13 @@ class VGG(d2l.Classification):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
-            self.net = nn.Sequential()    
+            self.net = nn.Sequential()
             for (num_convs, num_channels) in arch:
                 self.net.add(vgg_block(num_convs, num_channels))
             self.net.add(nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
                          nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
                          nn.Dense(10))
-            self.net.initialize(init.Xavier())            
+            self.net.initialize(init.Xavier())
         if tab.selected('pytorch'):
             conv_blks = []
             in_channels = 1
@@ -205,8 +205,4 @@ trainer.fit(model, data)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/78)
-:end_tab:
-
-:begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/277)
 :end_tab:

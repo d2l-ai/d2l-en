@@ -117,7 +117,7 @@ class LeNet(d2l.Classification):
         if tab.selected('mxnet'):
             self.net = nn.Sequential()
             self.net.add(
-                nn.Conv2D(channels=6, kernel_size=5, padding=2, 
+                nn.Conv2D(channels=6, kernel_size=5, padding=2,
                           activation='sigmoid'),
                 nn.AvgPool2D(pool_size=2, strides=2),
                 nn.Conv2D(channels=16, kernel_size=5, activation='sigmoid'),
@@ -252,8 +252,4 @@ trainer.fit(model, data)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/74)
-:end_tab:
-
-:begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/275)
 :end_tab:

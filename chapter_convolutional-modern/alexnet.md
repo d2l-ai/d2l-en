@@ -318,7 +318,7 @@ class AlexNet(d2l.Classification):
                 nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
                 nn.Dense(10))
             self.net.initialize(init.Xavier())
-        if tab.selected('pytorch'):            
+        if tab.selected('pytorch'):
             self.net = nn.Sequential(
                 nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=1), nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2),
@@ -397,8 +397,4 @@ trainer.fit(model, data)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/76)
-:end_tab:
-
-:begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/276)
 :end_tab:

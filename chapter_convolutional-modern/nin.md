@@ -118,7 +118,7 @@ class NiN(d2l.Classification):
                 nn.GlobalAvgPool2D(),
                 nn.Flatten())
             self.net.initialize(init.Xavier())
-        if tab.selected('pytorch'):            
+        if tab.selected('pytorch'):
             self.net = nn.Sequential(
                 nin_block(1, 96, kernel_size=11, strides=4, padding=0),
                 nn.MaxPool2d(3, stride=2),
@@ -180,8 +180,4 @@ trainer.fit(model, data)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/80)
-:end_tab:
-
-:begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/332)
 :end_tab:

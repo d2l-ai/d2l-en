@@ -18,14 +18,14 @@ That is, for all $f \in \mathcal{F}$ there exists some set of parameters (e.g., 
 Let's assume that $f^*$ is the "truth" function that we really would like to find.
 If it is in $\mathcal{F}$, we are in good shape but typically we will not be quite so lucky.
 Instead, we will try to find some $f^*_\mathcal{F}$ which is our best bet within $\mathcal{F}$.
-For instance, 
+For instance,
 given a dataset with features $\mathbf{X}$
 and labels $\mathbf{y}$,
 we might try finding it by solving the following optimization problem:
 
 $$f^*_\mathcal{F} \stackrel{\mathrm{def}}{=} \mathop{\mathrm{argmin}}_f L(\mathbf{X}, \mathbf{y}, f) \text{ subject to } f \in \mathcal{F}.$$
 
-It is only reasonable to assume that if we design a different and more powerful architecture $\mathcal{F}'$ we should arrive at a better outcome. In other words, we would expect that $f^*_{\mathcal{F}'}$ is "better" than $f^*_{\mathcal{F}}$. However, if $\mathcal{F} \not\subseteq \mathcal{F}'$ there is no guarantee that this should even happen. In fact, $f^*_{\mathcal{F}'}$ might well be worse. 
+It is only reasonable to assume that if we design a different and more powerful architecture $\mathcal{F}'$ we should arrive at a better outcome. In other words, we would expect that $f^*_{\mathcal{F}'}$ is "better" than $f^*_{\mathcal{F}}$. However, if $\mathcal{F} \not\subseteq \mathcal{F}'$ there is no guarantee that this should even happen. In fact, $f^*_{\mathcal{F}'}$ might well be worse.
 As illustrated by :numref:`fig_functionclasses`,
 for non-nested function classes, a larger function class does not always move closer to the "truth" function $f^*$. For instance,
 on the left of :numref:`fig_functionclasses`,
@@ -42,13 +42,13 @@ we can avoid the aforementioned issue from the non-nested function classes.
 Thus,
 only if larger function classes contain the smaller ones are we guaranteed that increasing them strictly increases the expressive power of the network.
 For deep neural networks,
-if we can 
+if we can
 train the newly-added layer into an identity function $f(\mathbf{x}) = \mathbf{x}$, the new model will be as effective as the original model. As the new model may get a better solution to fit the training dataset, the added layer might make it easier to reduce training errors.
 
-This is the question that He et al. considered when working on very deep computer vision models :cite:`He.Zhang.Ren.ea.2016`. 
-At the heart of their proposed *residual network* (*ResNet*) is the idea that every additional layer should 
+This is the question that He et al. considered when working on very deep computer vision models :cite:`He.Zhang.Ren.ea.2016`.
+At the heart of their proposed *residual network* (*ResNet*) is the idea that every additional layer should
 more easily
-contain the identity function as one of its elements. 
+contain the identity function as one of its elements.
 These considerations are rather profound but they led to a surprisingly simple
 solution, a *residual block*.
 With it, ResNet won the ImageNet Large Scale Visual Recognition Challenge in 2015. The design had a profound influence on how to
@@ -61,7 +61,7 @@ build deep neural networks.
 Let's focus on a local part of a neural network, as depicted in :numref:`fig_residual_block`. Denote the input by $\mathbf{x}$.
 We assume that the desired underlying mapping we want to obtain by learning is $f(\mathbf{x})$, to be used as the input to the activation function on the top.
 On the left of :numref:`fig_residual_block`,
-the portion within the dotted-line box 
+the portion within the dotted-line box
 must directly learn the mapping $f(\mathbf{x})$.
 On the right,
 the portion within the dotted-line box
@@ -76,10 +76,10 @@ upper weight layer (e.g., fully connected layer and convolutional layer)
 within the dotted-line box
 to zero.
 The right figure in :numref:`fig_residual_block` illustrates the  *residual block* of ResNet,
-where the solid line carrying the layer input 
+where the solid line carrying the layer input
 $\mathbf{x}$ to the addition operator
 is called a *residual connection* (or *shortcut connection*).
-With residual blocks, inputs can 
+With residual blocks, inputs can
 forward propagate faster through the residual connections across layers.
 
 ![A regular block (left) and a residual block (right).](../img/residual-block.svg)
@@ -195,8 +195,8 @@ class ResNet(d2l.Classification):
             net.add(nn.Conv2D(64, kernel_size=7, strides=2, padding=3),
                     nn.BatchNorm(), nn.Activation('relu'),
                     nn.MaxPool2D(pool_size=3, strides=2, padding=1))
-            return net            
-        if tab.selected('pytorch'):            
+            return net
+        if tab.selected('pytorch'):
             return nn.Sequential(
                 nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
                 nn.BatchNorm2d(64), nn.ReLU(),
@@ -204,7 +204,7 @@ class ResNet(d2l.Classification):
 ```
 
 GoogLeNet uses four modules made up of Inception blocks.
-However, ResNet uses four modules made up of residual blocks, each of which uses several residual blocks with the same number of output channels. 
+However, ResNet uses four modules made up of residual blocks, each of which uses several residual blocks with the same number of output channels.
 The number of channels in the first module is the same as the number of input channels. Since a maximum pooling layer with a stride of 2 has already been used, it is not necessary to reduce the height and width. In the first residual block for each of the subsequent modules, the number of channels is doubled compared with that of the previous module, and the height and width are halved.
 
 Now, we implement this module. Note that special processing has been performed on the first module.
@@ -225,7 +225,7 @@ def block(self, num_residuals, num_channels, first_block=False):
 ```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(ResNet)
-def block(self, num_residuals, input_channels, num_channels, 
+def block(self, num_residuals, input_channels, num_channels,
           first_block=False):
     blk = []
     for i in range(num_residuals):
@@ -274,12 +274,12 @@ Before training ResNet, let's [**observe how the input shape changes across diff
 class ResNet18(ResNet):
     def __init__(self, num_classes=10, lr=0.1):
         if tab.selected('mxnet'):
-            super().__init__(((2, 64), (2, 128), (2, 256), (2, 512)), 
+            super().__init__(((2, 64), (2, 128), (2, 256), (2, 512)),
                            num_classes, lr)
         if tab.selected('pytorch'):
-            super().__init__(((2, 64, 64), (2, 64, 128), (2, 128, 256), (2, 256, 512)), 
+            super().__init__(((2, 64, 64), (2, 64, 128), (2, 128, 256), (2, 256, 512)),
                            num_classes, lr)
-model = ResNet18()    
+model = ResNet18()
 X = d2l.randn(1, 1, 224, 224)
 for layer in model.net:
     X = layer(X)
@@ -326,8 +326,4 @@ trainer.fit(model, data)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/86)
-:end_tab:
-
-:begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/333)
 :end_tab:

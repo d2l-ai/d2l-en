@@ -337,7 +337,7 @@ def fit_epoch(self):
     self.model.training = True
     for batch in self.train_dataloader:            
         with tf.GradientTape() as tape:
-            loss = model.training_step(self.prepare_batch(batch))
+            loss = self.model.training_step(self.prepare_batch(batch))
         grads = tape.gradient(loss, self.model.trainable_variables)
         self.optim.apply_gradients(zip(grads, self.model.trainable_variables))
         self.train_batch_idx += 1
