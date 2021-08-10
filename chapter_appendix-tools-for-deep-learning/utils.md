@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Utility Functions and Classes
 :label:`sec_utils`
 
@@ -5,6 +10,7 @@
 This section contains the implementations of utility functions and classes used in this book.
 
 ```{.python .input}
+%%tab mxnet
 import inspect
 import collections
 from d2l import mxnet as d2l
@@ -15,7 +21,7 @@ npx.set_np()
 ```
 
 ```{.python .input  n=1}
-#@tab pytorch
+%%tab pytorch
 import inspect
 import collections
 from d2l import torch as d2l
@@ -23,17 +29,18 @@ from IPython import display
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 import inspect
 from IPython import display
 import collections
 from d2l import tensorflow as d2l
+import tensorflow as tf
 ```
 
 hyper parameters
 
 ```{.python .input}
-#@tab all
+%%tab all
 @d2l.add_to_class(d2l.HyperParameters)  #@save
 def save_hyperparameters(self, ignore=[]):
     """Save function arguments into class attributes."""
@@ -48,7 +55,7 @@ def save_hyperparameters(self, ignore=[]):
 progress bar
 
 ```{.python .input  n=22}
-#@tab all
+%%tab all
 @d2l.add_to_class(d2l.ProgressBoard)  #@save
 def draw(self, x, y, label, every_n=1):
     Point = collections.namedtuple('Point', ['x', 'y'])
@@ -93,22 +100,12 @@ def draw(self, x, y, label, every_n=1):
 
 ```
 
-```{.python .input}
-import numpy as np 
-#@tab all
-board = d2l.ProgressBoard()
-board.xlabel = 'x'
-for x in np.arange(0, 10, 0.05):
-    board.draw(x, np.sin(x), 'sin', every_n=10)
-    board.draw(x, np.cos(x), 'cos', every_n=20)
-```
-
 trainer
 
 a bunch of functions that will be deprecated
 
 ```{.python .input}
-#@tab mxnet
+%%tab mxnet
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a Gluon data iterator."""
     dataset = gluon.data.ArrayDataset(*data_arrays)
@@ -193,7 +190,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data iterator."""
@@ -297,7 +294,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a TensorFlow data iterator."""
@@ -383,7 +380,7 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, device):
 ```
 
 ```{.python .input}
-#@tab mxnet, tensorflow
+%%tab mxnet, tensorflow
 def evaluate_accuracy(net, data_iter):  #@save
     """Compute the accuracy for a model on a dataset."""
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
@@ -393,7 +390,7 @@ def evaluate_accuracy(net, data_iter):  #@save
 ```
 
 ```{.python .input}
-#@tab all
+%%tab all
 
 def linreg(X, w, b):  #@save
     """The linear regression model."""
@@ -493,7 +490,7 @@ def accuracy(y_hat, y):  #@save
 ```
 
 ```{.python .input}
-#@tab all
+%%tab all
 
 %%tab all
 import os
@@ -543,7 +540,7 @@ def extract(filename, folder=None):  #@save
 ```
 
 ```{.python .input}
-#@tab all
+%%tab all
 
 def download_extract(name, folder=None):  #@save
     """Download and extract a zip/tar file."""
@@ -563,7 +560,7 @@ def download_extract(name, folder=None):  #@save
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 
 def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
@@ -577,7 +574,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
 ```
 
 ```{.python .input}
-#@tab mxnet, tensorflow
+%%tab mxnet, tensorflow
 def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
