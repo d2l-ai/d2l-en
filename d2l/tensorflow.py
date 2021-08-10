@@ -2,6 +2,9 @@ USE_MXNET = False
 USE_PYTORCH = False
 USE_TENSORFLOW = True
 
+DATA_HUB = dict()
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
+
 import collections
 import hashlib
 import inspect
@@ -158,10 +161,10 @@ class ProgressBoard(d2l.HyperParameters):
     def __init__(self, xlabel=None, ylabel=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear',
                  ls=['-', '--', '-.', ':'], colors=['C0', 'C1', 'C2', 'C3'],
-                 fig=None, axes=None, figsize=(3.5, 2.5)):
+                 fig=None, axes=None, figsize=(3.5, 2.5), display=True):
         self.save_hyperparameters()
 
-    def draw(self, points, every_n=1):
+    def draw(self, x, y, label, every_n=1):
         raise NotImplemented
 
 
@@ -171,32 +174,54 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         super().__init__()
         self.board = ProgressBoard()
         self.training = None
+
+    def loss(self, y_hat, y):
+        raise NotImplementedError
         
-    def call(self, inputs, training=None):
+    def forward(self, X):
+        assert hasattr(self, 'net'), 'No neural network is defined'
+        return self.net(X)
+    
+    def call(self, X, training=None):
         if training is not None:
             self.training = training
-        return self.forward(inputs)
-    
-    def training_step(self, batch):
-        raise NotImplementedError
+        return self.forward(X)
 
-    def validaton_step(self, batch):
-        pass
+    def training_step(self, batch):
+        X, y = batch
+        l = self.loss(self(X), y)
+        # Draw progress
+        assert hasattr(self, 'trainer'), 'trainer is not inited'
+        num_train = self.trainer.num_train_batches
+        self.board.xlabel = 'epoch'
+        self.board.draw(self.trainer.train_batch_idx / num_train, l, 
+                        'train_loss', every_n=num_train // 5)
+        return l
+
+    def validation_step(self, batch):
+        X, y = batch
+        l = self.loss(self(X), y)
+        # Draw progress
+        self.board.draw(self.trainer.epoch+1, l, 'val_loss', 
+                        every_n=self.trainer.num_val_batches)
 
     def configure_optimizers(self):
-        raise NotImplementedError        
+        raise NotImplementedError
 
 
 # Defined in file: ./chapter_linear-networks/api.md
 class DataModule(d2l.HyperParameters):
-    def __init__(self, root='../data', num_workers=4):
+    def __init__(self, root='../data'):
         self.save_hyperparameters()
 
-    def train_dataloader(self):
+    def get_dataloader(self, train):
         raise NotImplementedError
+        
+    def train_dataloader(self):
+        return self.get_dataloader(train=True)
 
     def val_dataloader(self):
-        pass
+        return self.get_dataloader(train=False)
 
 
 # Defined in file: ./chapter_linear-networks/api.md
@@ -208,40 +233,85 @@ class Trainer(d2l.HyperParameters):
         self.train_dataloader = data.train_dataloader()
         self.val_dataloader = data.val_dataloader()
         self.num_train_batches = len(self.train_dataloader)
-        self.num_val_batches = (len(self.val_dataloader)  
+        self.num_val_batches = (len(self.val_dataloader)
                                 if self.val_dataloader is not None else 0)
-        
+
     def reset_counters(self):
         self.epoch = 0
         self.train_batch_idx = 0
-        self.val_batch_idx = 0        
-        
-    def fit(self, model, data_module):
+        self.val_batch_idx = 0
+
+    def fit(self, model, data):
         raise NotImplementedError
 
 
 # Defined in file: ./chapter_linear-networks/synthetic-regression-data.md
 class SyntheticRegressionData(d2l.DataModule):
-    def __init__(self, w, b, noise=0.01, num_examples=1000, batch_size=8):
+    def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000, 
+                 batch_size=32):
         super().__init__()
         self.save_hyperparameters()
-        self.X = tf.random.normal((num_examples, w.shape[0]))
-        y = d2l.matmul(self.X, tf.reshape(w, (-1, 1))) + b
-        self.y = y + tf.random.normal(y.shape, 0, noise)
+        n = num_train + num_val
+        self.X = tf.random.normal((n, w.shape[0]))
+        noise = tf.random.normal((n, 1)) * noise            
+        self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 
 
 # Defined in file: ./chapter_linear-networks/synthetic-regression-data.md
+@d2l.add_to_class(d2l.DataModule)
+def get_tensorloader(self, tensors, train, indices=slice(0,None)):
+    tensors = tuple(a[indices] for a in tensors)
+    shuffle_buffer = tensors[0].shape[0] if train else 1
+    return tf.data.Dataset.from_tensor_slices(tensors).shuffle(
+        buffer_size=shuffle_buffer).batch(self.batch_size)
+
 @d2l.add_to_class(SyntheticRegressionData)
-def train_dataloader(self):
-    return tf.data.Dataset.from_tensor_slices(
-        (self.X, self.y)).shuffle(buffer_size=1000).batch(self.batch_size)
+def get_dataloader(self, train):
+    i = slice(0, self.num_train) if train else slice(self.num_train, None)
+    return self.get_tensorloader((self.X, self.y), train, i)
+        
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def mse(y_hat, y):
-    """Squared loss."""
-    loss = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
-    return d2l.reduce_mean(loss)
+class LinearRegressionScratch(d2l.Module):
+    def __init__(self, num_inputs, lr, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        w = tf.random.normal((num_inputs, 1)) * sigma
+        b = tf.zeros(1)
+        self.w = tf.Variable(w, trainable=True)
+        self.b = tf.Variable(b, trainable=True)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+@d2l.add_to_class(LinearRegressionScratch)
+def forward(self, X):
+    """The linear regression model."""
+    return d2l.matmul(X, self.w) + self.b
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+@d2l.add_to_class(LinearRegressionScratch)
+def loss(self, y_hat, y):
+    l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+    return d2l.reduce_mean(l)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+class SGD(d2l.HyperParameters):
+    def __init__(self, lr):
+        """Minibatch stochastic gradient descent."""
+        self.save_hyperparameters()
+    
+    def apply_gradients(self, grads_and_vars):
+        for grad, param in grads_and_vars:
+            param.assign_sub(self.lr * grad)        
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+@d2l.add_to_class(LinearRegressionScratch)
+def configure_optimizers(self):
+    return SGD(self.lr)
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -282,6 +352,43 @@ class LinearRegression(d2l.Module):
         self.net = tf.keras.layers.Dense(1)
 
 
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+@d2l.add_to_class(LinearRegression)
+def forward(self, X):
+    """The linear regression model."""
+    return self.net(X)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+@d2l.add_to_class(LinearRegression)
+def loss(self, y_hat, y):
+    fn = tf.keras.losses.MeanSquaredError()
+    return fn(y, y_hat)
+
+@d2l.add_to_class(LinearRegression)
+def training_step(self, batch):
+    X, y = batch
+    l = self.loss(self(X), y)
+    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
+    self.board.xlabel = 'epoch'
+    self.board.yscale = 'log'
+    self.board.draw(epoch, l, 'train_loss', every_n=10)
+    return l
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+@d2l.add_to_class(LinearRegression)
+def configure_optimizers(self):
+    return tf.keras.optimizers.SGD(self.lr)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+@d2l.add_to_class(LinearRegression)
+def get_w_b(self):
+    return (self.get_weights()[0], self.get_weights()[1])
+
+
+
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 class FashionMNIST(d2l.DataModule):
     def __init__(self, batch_size=64, resize=(28, 28)):
@@ -301,21 +408,14 @@ def text_labels(self, indices):
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 @d2l.add_to_class(FashionMNIST)
-def process(self, data, shuffle):
+def get_dataloader(self, train):
+    data = self.train if train else self.val
     process = lambda X, y: (tf.expand_dims(X, axis=3) / 255,
                             tf.cast(y, dtype='int32'))
     resize_fn = lambda X, y: (tf.image.resize_with_pad(X, *self.resize), y)
-    dataloader = tf.data.Dataset.from_tensor_slices(
-        process(*data)).batch(self.batch_size).map(resize_fn)
-    return dataloader if not shuffle else dataloader.shuffle(len(data[0]))
-    
-@d2l.add_to_class(FashionMNIST)
-def train_dataloader(self):
-    return self.process(self.train, shuffle=True)
-
-@d2l.add_to_class(FashionMNIST)
-def val_dataloader(self):
-    return self.process(self.train, shuffle=False)
+    shuffle_buf = len(data[0]) if train else 1
+    return tf.data.Dataset.from_tensor_slices(process(*data)).batch(
+        self.batch_size).map(resize_fn).shuffle(shuffle_buf)
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
@@ -333,32 +433,22 @@ def visualize(self, batch, nrows=1, ncols=8, labels=[]):
     d2l.show_images(X, nrows, ncols, titles=labels)
 
 
+
 # Defined in file: ./chapter_linear-networks/classification.md
 class Classification(d2l.Module):
-    def __init__(self):
-        super().__init__()
+    def validation_step(self, batch):
+        X, y = batch
+        y_hat = self(X)
+        for k, v in (('val_loss', self.loss(y_hat, y)),
+                     ('val_acc', self.accuracy(y_hat, y))):
+            self.board.draw(self.trainer.epoch+1, v, k,
+                            every_n=self.trainer.num_val_batches)    
 
 
 # Defined in file: ./chapter_linear-networks/classification.md
-@d2l.add_to_class(Classification)
-def training_step(self, batch):
-    X, y = batch
-    l = self.loss(self(X), y)
-    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
-    self.board.xlabel = 'epoch'
-    self.board.draw(epoch, l, 'train_loss', every_n=50)
-    return l
-
-
-# Defined in file: ./chapter_linear-networks/classification.md
-@d2l.add_to_class(Classification)
-def validation_step(self, batch):
-    X, y = batch
-    y_hat = self(X)
-    for k, v in (('val_loss', self.loss(y_hat, y)),
-                 ('val_acc', self.accuracy(y_hat, y))):
-        self.board.draw(self.trainer.epoch+1, v, k,
-                        every_n=self.trainer.num_val_batches)
+@d2l.add_to_class(d2l.Module)
+def configure_optimizers(self):
+    return tf.keras.optimizers.SGD(self.lr)
 
 
 # Defined in file: ./chapter_linear-networks/classification.md
@@ -371,80 +461,11 @@ def accuracy(self, y_hat, y):
     return d2l.reduce_mean(d2l.astype(cmp, d2l.float32))
 
 
-# Defined in file: ./chapter_linear-networks/classification.md
-@d2l.add_to_class(Classification)
-def configure_optimizers(self):
-    return tf.keras.optimizers.SGD(self.lr)
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
-def evaluate_loss(net, data_iter, loss):
-    """Evaluate the loss of a model on the given dataset."""
-    metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
-    for X, y in data_iter:
-        l = loss(net(X), y)
-        metric.add(d2l.reduce_sum(l), d2l.size(l))
-    return metric[0] / metric[1]
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB = dict()
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download(name, cache_dir=os.path.join('..', 'data')):
-    """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}."
-    url, sha1_hash = DATA_HUB[name]
-    os.makedirs(cache_dir, exist_ok=True)
-    fname = os.path.join(cache_dir, url.split('/')[-1])
-    if os.path.exists(fname):
-        sha1 = hashlib.sha1()
-        with open(fname, 'rb') as f:
-            while True:
-                data = f.read(1048576)
-                if not data:
-                    break
-                sha1.update(data)
-        if sha1.hexdigest() == sha1_hash:
-            return fname  # Hit cache
-    print(f'Downloading {fname} from {url}...')
-    r = requests.get(url, stream=True, verify=True)
-    with open(fname, 'wb') as f:
-        f.write(r.content)
-    return fname
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download_extract(name, folder=None):
-    """Download and extract a zip/tar file."""
-    fname = download(name)
-    base_dir = os.path.dirname(fname)
-    data_dir, ext = os.path.splitext(fname)
-    if ext == '.zip':
-        fp = zipfile.ZipFile(fname, 'r')
-    elif ext in ('.tar', '.gz'):
-        fp = tarfile.open(fname, 'r')
-    else:
-        assert False, 'Only zip/tar files can be extracted.'
-    fp.extractall(base_dir)
-    return os.path.join(base_dir, folder) if folder else data_dir
-
-def download_all():
-    """Download all files in the DATA_HUB."""
-    for name in DATA_HUB:
-        download(name)
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_train'] = (
-    DATA_URL + 'kaggle_house_pred_train.csv',
-    '585e9cc93e70b39160e7921475f9bcd7d31219ce')
-
-DATA_HUB['kaggle_house_test'] = (
-    DATA_URL + 'kaggle_house_pred_test.csv',
-    'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
+# Defined in file: ./chapter_linear-networks/softmax-regression-concise.md
+@d2l.add_to_class(d2l.Classification)
+def loss(self, y_hat, y):
+    l = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    return l(y, y_hat)
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
@@ -1495,14 +1516,14 @@ def save_hyperparameters(self, ignore=[]):
 @d2l.add_to_class(d2l.ProgressBoard)
 def draw(self, x, y, label, every_n=1):
     Point = collections.namedtuple('Point', ['x', 'y'])
-    if not hasattr(self, 'points'):
-        self.points = collections.OrderedDict()
-        self.lines = collections.OrderedDict()
-    if label not in self.points:
-        self.points[label] = []
-        self.lines[label] = []    
-    points = self.points[label]
-    line = self.lines[label]
+    if not hasattr(self, 'raw_points'):
+        self.raw_points = collections.OrderedDict()
+        self.data = collections.OrderedDict()
+    if label not in self.raw_points:
+        self.raw_points[label] = []
+        self.data[label] = []    
+    points = self.raw_points[label]
+    line = self.data[label]
     points.append(Point(x, y))
     if len(points) != every_n:
         return    
@@ -1510,11 +1531,13 @@ def draw(self, x, y, label, every_n=1):
     line.append(Point(mean([p.x for p in points]), 
                       mean([p.y for p in points])))
     points.clear()
+    if not self.display: 
+        return
     d2l.use_svg_display()
     if self.fig is None:
         self.fig = d2l.plt.figure(figsize=self.figsize)
     plt_lines, labels = [], []
-    for (k, v), ls, color in zip(self.lines.items(), self.ls, self.colors):        
+    for (k, v), ls, color in zip(self.data.items(), self.ls, self.colors):        
         plt_lines.append(d2l.plt.plot([p.x for p in v], [p.y for p in v], 
                                       linestyle=ls, color=color)[0])
         labels.append(k)        
@@ -1524,6 +1547,8 @@ def draw(self, x, y, label, every_n=1):
     if not self.xlabel: self.xlabel = self.x    
     axes.set_xlabel(self.xlabel)
     axes.set_ylabel(self.ylabel)
+    axes.set_xscale(self.xscale)
+    axes.set_yscale(self.yscale)
     axes.legend(plt_lines, labels)    
     display.display(self.fig)
     display.clear_output(wait=True)
@@ -1675,6 +1700,74 @@ def accuracy(y_hat, y):
     return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
 
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+def download(url, folder='../data', sha1_hash=None):
+    if not url.startswith('http'):
+        # back compatability
+        url, sha1_hash = DATA_HUB[url]
+
+    os.makedirs(folder, exist_ok=True)
+    fname = os.path.join(folder, url.split('/')[-1])
+    # check if hit cache
+    if os.path.exists(fname) and sha1_hash:
+        sha1 = hashlib.sha1()
+        with open(fname, 'rb') as f:
+            while True:
+                data = f.read(1048576)
+                if not data:
+                    break
+                sha1.update(data)
+        if sha1.hexdigest() == sha1_hash:
+            return fname
+    # download
+    print(f'Downloading {fname} from {url}...')
+    r = requests.get(url, stream=True, verify=True)
+    with open(fname, 'wb') as f:
+        f.write(r.content)
+    return fname
+
+def extract(filename, folder=None):
+    """Download and extract a zip/tar file."""
+    base_dir = os.path.dirname(filename)
+    _, ext = os.path.splitext(fname)
+    assert ext in ('.zip', '.tar', '.gz'), 'Only support zip/tar files.'
+    if ext == '.zip':
+        fp = zipfile.ZipFile(filename, 'r')
+    else:
+        fp = tarfile.open(filename, 'r')
+    if folder is None:
+        folder = base_dir
+    fp.extractall(folder)
+    
+
+
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+def download_extract(name, folder=None):
+    """Download and extract a zip/tar file."""
+    fname = download(name)
+    base_dir = os.path.dirname(fname)
+    data_dir, ext = os.path.splitext(fname)
+    if ext == '.zip':
+        fp = zipfile.ZipFile(fname, 'r')
+    elif ext in ('.tar', '.gz'):
+        fp = tarfile.open(fname, 'r')
+    else:
+        assert False, 'Only zip/tar files can be extracted.'
+    fp.extractall(base_dir)
+    return os.path.join(base_dir, folder) if folder else data_dir
+
+
+
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+def evaluate_loss(net, data_iter, loss):
+    """Evaluate the loss of a model on the given dataset."""
+    metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
+    for X, y in data_iter:
+        l = loss(net(X), y)
+        metric.add(d2l.reduce_sum(l), d2l.size(l))
+    return metric[0] / metric[1]
+
+
 # Alias defined in config.ini
 size = lambda a: tf.size(a).numpy()
 
@@ -1705,5 +1798,6 @@ concat = tf.concat
 stack = tf.stack
 abs = tf.abs
 eye = tf.eye
+log = tf.math.log
 numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 

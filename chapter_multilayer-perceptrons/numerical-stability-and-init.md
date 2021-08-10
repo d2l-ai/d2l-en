@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Numerical Stability and Initialization
 :label:`sec_numerical_stability`
 
@@ -86,6 +91,7 @@ Let's take a closer look at the sigmoid
 to see why it can cause vanishing gradients.
 
 ```{.python .input}
+%%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
@@ -101,7 +107,7 @@ d2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
 import torch
@@ -115,7 +121,7 @@ d2l.plot(x.detach().numpy(), [y.detach().numpy(), x.grad.numpy()],
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -157,6 +163,7 @@ of a deep network, we have no chance of getting
 a gradient descent optimizer to converge.
 
 ```{.python .input}
+%%tab mxnet
 M = np.random.normal(size=(4, 4))
 print('a single matrix', M)
 for i in range(100):
@@ -166,17 +173,17 @@ print('after multiplying 100 matrices', M)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 M = torch.normal(0, 1, size=(4,4))
 print('a single matrix \n',M)
 for i in range(100):
-    M = torch.mm(M,torch.normal(0, 1, size=(4, 4)))
+    M = M @ torch.normal(0, 1, size=(4, 4))
 
 print('after multiplying 100 matrices\n', M)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 M = tf.random.normal((4, 4))
 print('a single matrix \n', M)
 for i in range(100):

@@ -1,3 +1,8 @@
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Implementation of Softmax Regression from Scratch
 :label:`sec_softmax_scratch`
 
@@ -8,19 +13,20 @@ you ought to know the gory details of
 how to implement it yourself.
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, gluon
 npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
@@ -43,7 +49,7 @@ rather than collapsing out the dimension that we summed over.
 This will result in a two-dimensional tensor with shape (1, 3).
 
 ```{.python .input}
-#@tab all
+%%tab all
 X = d2l.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
 d2l.reduce_sum(X, 0, keepdims=True), d2l.reduce_sum(X, 1, keepdims=True)
 ```
@@ -69,7 +75,7 @@ where a related equation models the distribution
 over an ensemble of particles.
 
 ```{.python .input}
-#@tab all
+%%tab all
 def softmax(X):
     X_exp = d2l.exp(X)
     partition = d2l.reduce_sum(X_exp, 1, keepdims=True)
@@ -82,14 +88,14 @@ Moreover, each row sums up to 1,**]
 as is required for a probability.
 
 ```{.python .input}
-#@tab mxnet
+%%tab mxnet
 X = d2l.rand(2, 5)
 X_prob = softmax(X)
 X_prob, d2l.reduce_sum(X_prob, 1)
 ```
 
 ```{.python .input}
-#@tab tensorflow, pytorch
+%%tab tensorflow, pytorch
 X = d2l.rand((2, 5))
 X_prob = softmax(X)
 X_prob, d2l.reduce_sum(X_prob, 1)
@@ -118,7 +124,7 @@ As with linear regression, we will initialize our weights `W`
 with Gaussian noise and our biases to take the initial value 0.
 
 ```{.python .input}
-#@tab mxnet
+%%tab mxnet
 class SoftmaxRegressionScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, lr, sigma=0.01):
         super().__init__()
@@ -127,13 +133,13 @@ class SoftmaxRegressionScratch(d2l.Classification):
         self.b = np.zeros(num_outputs)
         self.W.attach_grad()
         self.b.attach_grad()
-        
+
     def collect_params(self):
         return [self.W, self.b]
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 class SoftmaxRegressionScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, lr, sigma=0.01):
         super().__init__()
@@ -141,13 +147,13 @@ class SoftmaxRegressionScratch(d2l.Classification):
         self.W = torch.normal(0, sigma, size=(num_inputs, num_outputs),
                               requires_grad=True)
         self.b = torch.zeros(num_outputs, requires_grad=True)
-        
+
     def parameters(self):
         return [self.W, self.b]
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 class SoftmaxRegressionScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, lr, sigma=0.01):
         super().__init__()
@@ -164,7 +170,7 @@ into a vector using the `reshape` function
 before passing the data through our model.
 
 ```{.python .input}
-#@tab all
+%%tab all
 @d2l.add_to_class(SoftmaxRegressionScratch)
 def forward(self, X):
     return softmax(d2l.matmul(d2l.reshape(X, (-1, self.W.shape[0])), self.W) + self.b)
@@ -192,14 +198,14 @@ we pick the probability of the first class in the first example
 and the probability of the third class in the second example.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab mxnet, pytorch
 y = d2l.tensor([0, 2])
 y_hat = d2l.tensor([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
 y_hat[[0, 1], y]
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 y_hat = tf.constant([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
 y = tf.constant([0, 2])
 tf.boolean_mask(y_hat, tf.one_hot(y, depth=y_hat.shape[-1]))
@@ -208,7 +214,7 @@ tf.boolean_mask(y_hat, tf.one_hot(y, depth=y_hat.shape[-1]))
 Now we can (**implement the cross-entropy loss function**) efficiently with just one line of code.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab mxnet, pytorch
 def cross_entropy(y_hat, y):
     return - d2l.reduce_mean(d2l.log(y_hat[range(len(y_hat)), y]))
 
@@ -216,7 +222,7 @@ cross_entropy(y_hat, y)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 def cross_entropy(y_hat, y):
     return - tf.reduce_mean(tf.math.log(tf.boolean_mask(
         y_hat, tf.one_hot(y, depth=y_hat.shape[-1]))))
@@ -225,7 +231,7 @@ cross_entropy(y_hat, y)
 ```
 
 ```{.python .input}
-#@tab all
+%%tab all
 @d2l.add_to_class(SoftmaxRegressionScratch)
 def loss(self, y_hat, y):
     return cross_entropy(y_hat, y)
@@ -241,7 +247,7 @@ By changing their values, we may be able
 to increase the classification accuracy of the model.
 
 ```{.python .input}
-#@tab all
+%%tab all
 data = d2l.FashionMNIST(batch_size=256)
 model = SoftmaxRegressionScratch(num_inputs=784, num_outputs=10, lr=0.1)
 trainer = d2l.Trainer(max_epochs=10)
@@ -254,21 +260,20 @@ Now that training is complete,
 our model is ready to [**classify some images.**]
 
 ```{.python .input}
-#@tab all
+%%tab all
 X, y = next(iter(data.val_dataloader()))
 preds = d2l.argmax(model(X), axis=1)
 preds.shape
 ```
 
-We are more interested the images we predict wrong. We visualize them by 
+We are more interested the images we predict wrong. We visualize them by
 comparing their actual labels
 (first line of text output)
 and the predictions from the model
 (second line of text output).
 
 ```{.python .input}
-#@tab all
-
+%%tab all
 wrong = d2l.astype(preds, y.dtype) != y
 X, y, preds = X[wrong], y[wrong], preds[wrong]
 labels = [a+'\n'+b for a, b in zip(
