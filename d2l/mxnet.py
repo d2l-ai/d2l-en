@@ -220,8 +220,9 @@ class DataModule(d2l.HyperParameters):
 
 # Defined in file: ./chapter_linear-networks/api.md
 class Trainer(d2l.HyperParameters):
-    def __init__(self, max_epochs):
+    def __init__(self, max_epochs, num_gpus=0):
         self.save_hyperparameters()
+        assert num_gpus == 0, 'Not support GPUs yet'
 
     def prepare_data(self, data):
         self.train_dataloader = data.train_dataloader()
@@ -230,12 +231,22 @@ class Trainer(d2l.HyperParameters):
         self.num_val_batches = (len(self.val_dataloader)
                                 if self.val_dataloader is not None else 0)
 
-    def reset_counters(self):
+    def prepare_model(self, model):
+        model.trainer = self
+        model.board.xlim = [0, self.max_epochs]
+        self.model = model
+
+    def fit(self, model, data):
+        self.prepare_data(data)
+        self.prepare_model(model)
+        self.optim = model.configure_optimizers()
         self.epoch = 0
         self.train_batch_idx = 0
         self.val_batch_idx = 0
+        for self.epoch in range(self.max_epochs):
+            self.fit_epoch()
 
-    def fit(self, model, data):
+    def fit_epoch(self):
         raise NotImplementedError
 
 
@@ -308,29 +319,23 @@ def configure_optimizers(self):
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 @d2l.add_to_class(d2l.Trainer)
-def fit(self, model, data):
-    model.trainer = self
-    self.prepare_data(data)
-    self.reset_counters()
-    model.board.xlim = [0, self.max_epochs]
-    optim = model.configure_optimizers()
-    for self.epoch in range(self.max_epochs):
-        self.fit_epoch(model, optim)
+def prepare_batch(self, batch):
+    return batch
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 @d2l.add_to_class(d2l.Trainer)
-def fit_epoch(self, model, optim):
+def fit_epoch(self):
     for batch in self.train_dataloader:
         with autograd.record():
-            loss = model.training_step(batch)
+            loss = self.model.training_step(self.prepare_batch(batch))
         loss.backward()
-        optim.step(1)
+        self.optim.step(1)
         self.train_batch_idx += 1
     if self.val_dataloader is None:
         return
-    for batch in self.val_dataloader:
-        model.validation_step(batch)
+    for batch in self.val_dataloader:        
+        self.model.validation_step(self.prepare_batch(batch))
         self.val_batch_idx += 1
 
 
@@ -462,15 +467,49 @@ def loss(self, y_hat, y):
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def cpu():
+    return npx.cpu()
+def gpu(i=0):
+    return npx.gpu(i)
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def num_gpus():
+    return npx.num_gpus()
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
-    return npx.gpu(i) if npx.num_gpus() >= i + 1 else npx.cpu()
+    if num_gpus() >= i + 1:
+        return gpu(i)
+    return cpu()
 
 def try_all_gpus():
-    """Return all available GPUs, or [cpu()] if no GPU exists."""
-    devices = [npx.gpu(i) for i in range(npx.num_gpus())]
-    return devices if devices else [npx.cpu()]
+    """Return all available GPUs, or [cpu(),] if no GPU exists."""
+    return [gpu(i) for i in range(num_gpus())]
 
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+@d2l.add_to_class(d2l.Trainer)
+def __init__(self, max_epochs, num_gpus=0):
+    self.save_hyperparameters()
+    self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
+    
+@d2l.add_to_class(d2l.Trainer)
+def prepare_batch(self, batch):
+    if self.gpus:
+        batch = [d2l.to(a, self.gpus[0]) for a in batch]
+    return batch
+    
+@d2l.add_to_class(d2l.Trainer)
+def prepare_model(self, model):
+    model.trainer = self
+    model.board.xlim = [0, self.max_epochs]
+    if self.gpus:
+        model.collect_params().reset_ctx(self.gpus[0])
+    self.model = model
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
@@ -485,53 +524,21 @@ def corr2d(X, K):
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def evaluate_accuracy_gpu(net, data_iter, device=None):
-    """Compute the accuracy for a model on a dataset using a GPU."""
-    if not device:  # Query the first device where the first parameter is on
-        device = list(net.collect_params().values())[0].list_ctx()[0]
-    # No. of correct predictions, no. of predictions
-    metric = d2l.Accumulator(2)
-    for X, y in data_iter:
-        X, y = X.as_in_ctx(device), y.as_in_ctx(device)
-        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
-    return metric[0] / metric[1]
-
-
-# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
-    """Train a model with a GPU (defined in Chapter 6)."""
-    net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
-    loss = gluon.loss.SoftmaxCrossEntropyLoss()
-    trainer = gluon.Trainer(net.collect_params(),
-                            'sgd', {'learning_rate': lr})
-    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
-                            legend=['train loss', 'train acc', 'test acc'])
-    timer, num_batches = d2l.Timer(), len(train_iter)
-    for epoch in range(num_epochs):
-        # Sum of training loss, sum of training accuracy, no. of examples
-        metric = d2l.Accumulator(3)
-        for i, (X, y) in enumerate(train_iter):
-            timer.start()
-            # Here is the major difference from `d2l.train_epoch_ch3`
-            X, y = X.as_in_ctx(device), y.as_in_ctx(device)
-            with autograd.record():
-                y_hat = net(X)
-                l = loss(y_hat, y)
-            l.backward()
-            trainer.step(X.shape[0])
-            metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])
-            timer.stop()
-            train_l = metric[0] / metric[2]
-            train_acc = metric[1] / metric[2]
-            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
-                animator.add(epoch + (i + 1) / num_batches,
-                             (train_l, train_acc, None))
-        test_acc = evaluate_accuracy_gpu(net, test_iter)
-        animator.add(epoch + 1, (None, None, test_acc))
-    print(f'loss {train_l:.3f}, train acc {train_acc:.3f}, '
-          f'test acc {test_acc:.3f}')
-    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(device)}')
+class LeNet(d2l.Classification):
+    def __init__(self, lr=0.1):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential()
+        self.net.add(
+            nn.Conv2D(channels=6, kernel_size=5, padding=2, 
+                      activation='sigmoid'),
+            nn.AvgPool2D(pool_size=2, strides=2),
+            nn.Conv2D(channels=16, kernel_size=5, activation='sigmoid'),
+            nn.AvgPool2D(pool_size=2, strides=2),
+            nn.Dense(120, activation='sigmoid'),
+            nn.Dense(84, activation='sigmoid'),
+            nn.Dense(10))
+        self.net.initialize(init.Xavier())
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
@@ -2984,6 +2991,52 @@ def load_data_fashion_mnist(batch_size, resize=None):
                                   num_workers=get_dataloader_workers()),
             gluon.data.DataLoader(mnist_test, batch_size, shuffle=False,
                                   num_workers=get_dataloader_workers()))
+
+def evaluate_accuracy_gpu(net, data_iter, device=None):
+    """Compute the accuracy for a model on a dataset using a GPU."""
+    if not device:  # Query the first device where the first parameter is on
+        device = list(net.collect_params().values())[0].list_ctx()[0]
+    # No. of correct predictions, no. of predictions
+    metric = d2l.Accumulator(2)
+    for X, y in data_iter:
+        X, y = X.as_in_ctx(device), y.as_in_ctx(device)
+        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
+    return metric[0] / metric[1]
+
+def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
+    """Train a model with a GPU (defined in Chapter 6)."""
+    net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
+    loss = gluon.loss.SoftmaxCrossEntropyLoss()
+    trainer = gluon.Trainer(net.collect_params(),
+                            'sgd', {'learning_rate': lr})
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
+                            legend=['train loss', 'train acc', 'test acc'])
+    timer, num_batches = d2l.Timer(), len(train_iter)
+    for epoch in range(num_epochs):
+        # Sum of training loss, sum of training accuracy, no. of examples
+        metric = d2l.Accumulator(3)
+        for i, (X, y) in enumerate(train_iter):
+            timer.start()
+            # Here is the major difference from `d2l.train_epoch_ch3`
+            X, y = X.as_in_ctx(device), y.as_in_ctx(device)
+            with autograd.record():
+                y_hat = net(X)
+                l = loss(y_hat, y)
+            l.backward()
+            trainer.step(X.shape[0])
+            metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])
+            timer.stop()
+            train_l = metric[0] / metric[2]
+            train_acc = metric[1] / metric[2]
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches,
+                             (train_l, train_acc, None))
+        test_acc = evaluate_accuracy_gpu(net, test_iter)
+        animator.add(epoch + 1, (None, None, test_acc))
+    print(f'loss {train_l:.3f}, train acc {train_acc:.3f}, '
+          f'test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(device)}')
 
 
 # Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md

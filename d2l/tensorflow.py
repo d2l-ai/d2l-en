@@ -226,8 +226,9 @@ class DataModule(d2l.HyperParameters):
 
 # Defined in file: ./chapter_linear-networks/api.md
 class Trainer(d2l.HyperParameters):
-    def __init__(self, max_epochs):
+    def __init__(self, max_epochs, num_gpus=0):
         self.save_hyperparameters()
+        assert num_gpus == 0, 'Not support GPUs yet'
 
     def prepare_data(self, data):
         self.train_dataloader = data.train_dataloader()
@@ -236,12 +237,22 @@ class Trainer(d2l.HyperParameters):
         self.num_val_batches = (len(self.val_dataloader)
                                 if self.val_dataloader is not None else 0)
 
-    def reset_counters(self):
+    def prepare_model(self, model):
+        model.trainer = self
+        model.board.xlim = [0, self.max_epochs]
+        self.model = model
+
+    def fit(self, model, data):
+        self.prepare_data(data)
+        self.prepare_model(model)
+        self.optim = model.configure_optimizers()
         self.epoch = 0
         self.train_batch_idx = 0
         self.val_batch_idx = 0
+        for self.epoch in range(self.max_epochs):
+            self.fit_epoch()
 
-    def fit(self, model, data):
+    def fit_epoch(self):
         raise NotImplementedError
 
 
@@ -316,31 +327,26 @@ def configure_optimizers(self):
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 @d2l.add_to_class(d2l.Trainer)
-def fit(self, model, data):
-    model.trainer = self
-    self.prepare_data(data)
-    self.reset_counters()
-    model.board.xlim = [0, self.max_epochs]
-    optim = model.configure_optimizers()
-    for self.epoch in range(self.max_epochs):
-        self.fit_epoch(model, optim)
+def prepare_batch(self, batch):
+    return batch
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 @d2l.add_to_class(d2l.Trainer)
-def fit_epoch(self, model, optim):
-    model.training = True
+def fit_epoch(self):
+    self.model.training = True
     for batch in self.train_dataloader:            
         with tf.GradientTape() as tape:
-            loss = model.training_step(batch)
-        grads = tape.gradient(loss, model.trainable_variables)
-        optim.apply_gradients(zip(grads, model.trainable_variables))
+            loss = model.training_step(self.prepare_batch(batch))
+        grads = tape.gradient(loss, self.model.trainable_variables)
+        self.optim.apply_gradients(zip(grads, self.model.trainable_variables))
         self.train_batch_idx += 1
     if self.val_dataloader is None:
         return
-    model.training = False
+    self.model.training = False
     for batch in self.val_dataloader:
-        model.validation_step(batch)
+        self.prepare_batch(batch)
+        self.model.validation_step(self.batch)
         self.val_batch_idx += 1
 
 
@@ -469,17 +475,30 @@ def loss(self, y_hat, y):
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def cpu():
+    return tf.device('/CPU:0')
+
+def gpu(i=0):
+    return tf.device(f'/GPU:{i}')
+
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def num_gpus():
+    return len(tf.config.experimental.list_physical_devices('GPU'))
+
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
-    if len(tf.config.experimental.list_physical_devices('GPU')) >= i + 1:
-        return tf.device(f'/GPU:{i}')
-    return tf.device('/CPU:0')
+    if num_gpus() >= i + 1:
+        return gpu(i)
+    return cpu()
 
 def try_all_gpus():
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
-    num_gpus = len(tf.config.experimental.list_physical_devices('GPU'))
-    devices = [tf.device(f'/GPU:{i}') for i in range(num_gpus)]
-    return devices if devices else [tf.device('/CPU:0')]
+    return [gpu(i) for i in range(num_gpus())]
 
 
 
@@ -493,51 +512,6 @@ def corr2d(X, K):
             Y[i, j].assign(tf.reduce_sum(
                 X[i: i + h, j: j + w] * K))
     return Y
-
-
-# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-class TrainCallback(tf.keras.callbacks.Callback):
-    """A callback to visiualize the training progress."""
-    def __init__(self, net, train_iter, test_iter, num_epochs, device_name):
-        self.timer = d2l.Timer()
-        self.animator = d2l.Animator(
-            xlabel='epoch', xlim=[1, num_epochs], legend=[
-                'train loss', 'train acc', 'test acc'])
-        self.net = net
-        self.train_iter = train_iter
-        self.test_iter = test_iter
-        self.num_epochs = num_epochs
-        self.device_name = device_name
-    def on_epoch_begin(self, epoch, logs=None):
-        self.timer.start()
-    def on_epoch_end(self, epoch, logs):
-        self.timer.stop()
-        test_acc = self.net.evaluate(
-            self.test_iter, verbose=0, return_dict=True)['accuracy']
-        metrics = (logs['loss'], logs['accuracy'], test_acc)
-        self.animator.add(epoch + 1, metrics)
-        if epoch == self.num_epochs - 1:
-            batch_size = next(iter(self.train_iter))[0].shape[0]
-            num_examples = batch_size * tf.data.experimental.cardinality(
-                self.train_iter).numpy()
-            print(f'loss {metrics[0]:.3f}, train acc {metrics[1]:.3f}, '
-                  f'test acc {metrics[2]:.3f}')
-            print(f'{num_examples / self.timer.avg():.1f} examples/sec on '
-                  f'{str(self.device_name)}')
-
-def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, device):
-    """Train a model with a GPU (defined in Chapter 6)."""
-    device_name = device._device_name
-    strategy = tf.distribute.OneDeviceStrategy(device_name)
-    with strategy.scope():
-        optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
-        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-        net = net_fn()
-        net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-    callback = TrainCallback(net, train_iter, test_iter, num_epochs,
-                             device_name)
-    net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])
-    return net
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
@@ -1594,6 +1568,49 @@ def load_data_fashion_mnist(batch_size, resize=None):
             batch_size).shuffle(len(mnist_train[0])).map(resize_fn),
         tf.data.Dataset.from_tensor_slices(process(*mnist_test)).batch(
             batch_size).map(resize_fn))
+
+class TrainCallback(tf.keras.callbacks.Callback):
+    """A callback to visiualize the training progress."""
+    def __init__(self, net, train_iter, test_iter, num_epochs, device_name):
+        self.timer = d2l.Timer()
+        self.animator = d2l.Animator(
+            xlabel='epoch', xlim=[1, num_epochs], legend=[
+                'train loss', 'train acc', 'test acc'])
+        self.net = net
+        self.train_iter = train_iter
+        self.test_iter = test_iter
+        self.num_epochs = num_epochs
+        self.device_name = device_name
+    def on_epoch_begin(self, epoch, logs=None):
+        self.timer.start()
+    def on_epoch_end(self, epoch, logs):
+        self.timer.stop()
+        test_acc = self.net.evaluate(
+            self.test_iter, verbose=0, return_dict=True)['accuracy']
+        metrics = (logs['loss'], logs['accuracy'], test_acc)
+        self.animator.add(epoch + 1, metrics)
+        if epoch == self.num_epochs - 1:
+            batch_size = next(iter(self.train_iter))[0].shape[0]
+            num_examples = batch_size * tf.data.experimental.cardinality(
+                self.train_iter).numpy()
+            print(f'loss {metrics[0]:.3f}, train acc {metrics[1]:.3f}, '
+                  f'test acc {metrics[2]:.3f}')
+            print(f'{num_examples / self.timer.avg():.1f} examples/sec on '
+                  f'{str(self.device_name)}')
+
+def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, device):
+    """Train a model with a GPU (defined in Chapter 6)."""
+    device_name = device._device_name
+    strategy = tf.distribute.OneDeviceStrategy(device_name)
+    with strategy.scope():
+        optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        net = net_fn()
+        net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    callback = TrainCallback(net, train_iter, test_iter, num_epochs,
+                             device_name)
+    net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])
+    return net
 
 
 # Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md

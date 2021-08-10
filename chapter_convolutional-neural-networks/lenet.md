@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Convolutional Neural Networks (LeNet)
 :label:`sec_lenet`
 
@@ -88,58 +93,49 @@ We need only to instantiate a `Sequential` block
 and chain together the appropriate layers.
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
-
-net = nn.Sequential()
-net.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='sigmoid'),
-        nn.AvgPool2D(pool_size=2, strides=2),
-        nn.Conv2D(channels=16, kernel_size=5, activation='sigmoid'),
-        nn.AvgPool2D(pool_size=2, strides=2),
-        # `Dense` will transform an input of the shape (batch size, number of
-        # channels, height, width) into an input of the shape (batch size,
-        # number of channels * height * width) automatically by default
-        nn.Dense(120, activation='sigmoid'),
-        nn.Dense(84, activation='sigmoid'),
-        nn.Dense(10))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
-
-net = nn.Sequential(
-    nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size=2, stride=2),
-    nn.Conv2d(6, 16, kernel_size=5), nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size=2, stride=2),
-    nn.Flatten(),
-    nn.Linear(16 * 5 * 5, 120), nn.Sigmoid(),
-    nn.Linear(120, 84), nn.Sigmoid(),
-    nn.Linear(84, 10))
 ```
 
 ```{.python .input}
-#@tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
+%%tab mxnet, pytorch
 
-def net():
-    return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid',
-                               padding='same'),
-        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
-        tf.keras.layers.Conv2D(filters=16, kernel_size=5,
-                               activation='sigmoid'),
-        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(120, activation='sigmoid'),
-        tf.keras.layers.Dense(84, activation='sigmoid'),
-        tf.keras.layers.Dense(10)])
+class LeNet(d2l.Classification):  #@save
+    def __init__(self, lr=0.1):
+        super().__init__()
+        self.save_hyperparameters()
+        if tab.selected('mxnet'):
+            self.net = nn.Sequential()
+            self.net.add(
+                nn.Conv2D(channels=6, kernel_size=5, padding=2, 
+                          activation='sigmoid'),
+                nn.AvgPool2D(pool_size=2, strides=2),
+                nn.Conv2D(channels=16, kernel_size=5, activation='sigmoid'),
+                nn.AvgPool2D(pool_size=2, strides=2),
+                nn.Dense(120, activation='sigmoid'),
+                nn.Dense(84, activation='sigmoid'),
+                nn.Dense(10))
+            self.net.initialize(init.Xavier())
+        if tab.selected('pytorch'):
+            self.net = nn.Sequential(
+                nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.Sigmoid(),
+                nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Conv2d(6, 16, kernel_size=5), nn.Sigmoid(),
+                nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Flatten(),
+                nn.Linear(16 * 5 * 5, 120), nn.Sigmoid(),
+                nn.Linear(120, 84), nn.Sigmoid(),
+                nn.Linear(84, 10))
 ```
 
 We took a small liberty with the original model,
@@ -158,27 +154,12 @@ what we expect from :numref:`img_lenet_vert`.
 :label:`img_lenet_vert`
 
 ```{.python .input}
-X = np.random.uniform(size=(1, 1, 28, 28))
-net.initialize()
-for layer in net:
+%%tab all
+model = LeNet()
+X = d2l.randn(1, 1, 28, 28)
+for layer in model.net:
     X = layer(X)
-    print(layer.name, 'output shape:\t', X.shape)
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.rand(size=(1, 1, 28, 28), dtype=torch.float32)
-for layer in net:
-    X = layer(X)
-    print(layer.__class__.__name__,'output shape: \t',X.shape)
-```
-
-```{.python .input}
-#@tab tensorflow
-X = tf.random.uniform((1, 28, 28, 1))
-for layer in net().layers:
-    X = layer(X)
-    print(layer.__class__.__name__, 'output shape: \t', X.shape)
+    print(layer.__class__.__name__, 'output shape:\t', X.shape)
 ```
 
 Note that the height and width of the representation
@@ -205,12 +186,6 @@ matches the number of classes.
 Now that we have implemented the model,
 let's [**run an experiment to see how LeNet fares on Fashion-MNIST**].
 
-```{.python .input}
-#@tab all
-batch_size = 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
-```
-
 While CNNs have fewer parameters,
 they can still be more expensive to compute
 than similarly deep MLPs
@@ -219,49 +194,7 @@ multiplications.
 If you have access to a GPU, this might be a good time
 to put it into action to speed up training.
 
-:begin_tab:`mxnet, pytorch`
-For evaluation, we need to [**make a slight modification
-to the `evaluate_accuracy` function**] that we described
-in :numref:`sec_softmax_scratch`.
-Since the full dataset is in the main memory,
-we need to copy it to the GPU memory before the model uses GPU to compute with the dataset.
-:end_tab:
 
-```{.python .input}
-def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
-    """Compute the accuracy for a model on a dataset using a GPU."""
-    if not device:  # Query the first device where the first parameter is on
-        device = list(net.collect_params().values())[0].list_ctx()[0]
-    # No. of correct predictions, no. of predictions
-    metric = d2l.Accumulator(2)
-    for X, y in data_iter:
-        X, y = X.as_in_ctx(device), y.as_in_ctx(device)
-        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
-    return metric[0] / metric[1]
-```
-
-```{.python .input}
-#@tab pytorch
-def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
-    """Compute the accuracy for a model on a dataset using a GPU."""
-    if isinstance(net, nn.Module):
-        net.eval()  # Set the model to evaluation mode
-        if not device:
-            device = next(iter(net.parameters())).device
-    # No. of correct predictions, no. of predictions
-    metric = d2l.Accumulator(2)
-
-    with torch.no_grad():
-        for X, y in data_iter:
-            if isinstance(X, list):
-                # Required for BERT Fine-tuning (to be covered later)
-                X = [x.to(device) for x in X]
-            else:
-                X = X.to(device)
-            y = y.to(device)
-            metric.add(d2l.accuracy(net(X), y), d2l.size(y))
-    return metric[0] / metric[1]
-```
 
 We also need to [**update our training function to deal with GPUs.**]
 Unlike the `train_epoch_ch3` defined in :numref:`sec_softmax_scratch`,
@@ -282,141 +215,14 @@ and we minimize it via minibatch stochastic gradient descent.
 Since each epoch takes tens of seconds to run,
 we visualize the training loss more frequently.
 
-```{.python .input}
-#@save
-def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
-    """Train a model with a GPU (defined in Chapter 6)."""
-    net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
-    loss = gluon.loss.SoftmaxCrossEntropyLoss()
-    trainer = gluon.Trainer(net.collect_params(),
-                            'sgd', {'learning_rate': lr})
-    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
-                            legend=['train loss', 'train acc', 'test acc'])
-    timer, num_batches = d2l.Timer(), len(train_iter)
-    for epoch in range(num_epochs):
-        # Sum of training loss, sum of training accuracy, no. of examples
-        metric = d2l.Accumulator(3)
-        for i, (X, y) in enumerate(train_iter):
-            timer.start()
-            # Here is the major difference from `d2l.train_epoch_ch3`
-            X, y = X.as_in_ctx(device), y.as_in_ctx(device)
-            with autograd.record():
-                y_hat = net(X)
-                l = loss(y_hat, y)
-            l.backward()
-            trainer.step(X.shape[0])
-            metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])
-            timer.stop()
-            train_l = metric[0] / metric[2]
-            train_acc = metric[1] / metric[2]
-            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
-                animator.add(epoch + (i + 1) / num_batches,
-                             (train_l, train_acc, None))
-        test_acc = evaluate_accuracy_gpu(net, test_iter)
-        animator.add(epoch + 1, (None, None, test_acc))
-    print(f'loss {train_l:.3f}, train acc {train_acc:.3f}, '
-          f'test acc {test_acc:.3f}')
-    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(device)}')
-```
-
-```{.python .input}
-#@tab pytorch
-#@save
-def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
-    """Train a model with a GPU (defined in Chapter 6)."""
-    def init_weights(m):
-        if type(m) == nn.Linear or type(m) == nn.Conv2d:
-            nn.init.xavier_uniform_(m.weight)
-    net.apply(init_weights)
-    print('training on', device)
-    net.to(device)
-    optimizer = torch.optim.SGD(net.parameters(), lr=lr)
-    loss = nn.CrossEntropyLoss()
-    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
-                            legend=['train loss', 'train acc', 'test acc'])
-    timer, num_batches = d2l.Timer(), len(train_iter)
-    for epoch in range(num_epochs):
-        # Sum of training loss, sum of training accuracy, no. of examples
-        metric = d2l.Accumulator(3)
-        net.train()
-        for i, (X, y) in enumerate(train_iter):
-            timer.start()
-            optimizer.zero_grad()
-            X, y = X.to(device), y.to(device)
-            y_hat = net(X)
-            l = loss(y_hat, y)
-            l.backward()
-            optimizer.step()
-            with torch.no_grad():
-                metric.add(l * X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])
-            timer.stop()
-            train_l = metric[0] / metric[2]
-            train_acc = metric[1] / metric[2]
-            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
-                animator.add(epoch + (i + 1) / num_batches,
-                             (train_l, train_acc, None))
-        test_acc = evaluate_accuracy_gpu(net, test_iter)
-        animator.add(epoch + 1, (None, None, test_acc))
-    print(f'loss {train_l:.3f}, train acc {train_acc:.3f}, '
-          f'test acc {test_acc:.3f}')
-    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(device)}')
-```
-
-```{.python .input}
-#@tab tensorflow
-class TrainCallback(tf.keras.callbacks.Callback):  #@save
-    """A callback to visiualize the training progress."""
-    def __init__(self, net, train_iter, test_iter, num_epochs, device_name):
-        self.timer = d2l.Timer()
-        self.animator = d2l.Animator(
-            xlabel='epoch', xlim=[1, num_epochs], legend=[
-                'train loss', 'train acc', 'test acc'])
-        self.net = net
-        self.train_iter = train_iter
-        self.test_iter = test_iter
-        self.num_epochs = num_epochs
-        self.device_name = device_name
-    def on_epoch_begin(self, epoch, logs=None):
-        self.timer.start()
-    def on_epoch_end(self, epoch, logs):
-        self.timer.stop()
-        test_acc = self.net.evaluate(
-            self.test_iter, verbose=0, return_dict=True)['accuracy']
-        metrics = (logs['loss'], logs['accuracy'], test_acc)
-        self.animator.add(epoch + 1, metrics)
-        if epoch == self.num_epochs - 1:
-            batch_size = next(iter(self.train_iter))[0].shape[0]
-            num_examples = batch_size * tf.data.experimental.cardinality(
-                self.train_iter).numpy()
-            print(f'loss {metrics[0]:.3f}, train acc {metrics[1]:.3f}, '
-                  f'test acc {metrics[2]:.3f}')
-            print(f'{num_examples / self.timer.avg():.1f} examples/sec on '
-                  f'{str(self.device_name)}')
-
-#@save
-def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, device):
-    """Train a model with a GPU (defined in Chapter 6)."""
-    device_name = device._device_name
-    strategy = tf.distribute.OneDeviceStrategy(device_name)
-    with strategy.scope():
-        optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
-        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-        net = net_fn()
-        net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-    callback = TrainCallback(net, train_iter, test_iter, num_epochs,
-                             device_name)
-    net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])
-    return net
-```
-
 [**Now let's train and evaluate the LeNet-5 model.**]
 
 ```{.python .input}
-#@tab all
-lr, num_epochs = 0.9, 10
-train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
+%%tab all
+model = LeNet(lr=0.9)
+trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
+data = d2l.FashionMNIST(batch_size=256)
+trainer.fit(model, data)
 ```
 
 ## Summary

@@ -202,20 +202,6 @@ we are ready to [**implement the main training loop.**]
 It is crucial that you understand this code well
 since it the archetype of almost all training loops in deep learning.
 
-In the `fit` method, we first get the training dataloader and validation dataloader from the argument `data`, reset all counters to 0, and obtain the optimizer. Then we train the model by `max_epochs` epochs.
-
-```{.python .input  n=11}
-%%tab all
-@d2l.add_to_class(d2l.Trainer)  #@save
-def fit(self, model, data):
-    model.trainer = self
-    self.prepare_data(data)
-    self.reset_counters()
-    model.board.xlim = [0, self.max_epochs]
-    optim = model.configure_optimizers()
-    for self.epoch in range(self.max_epochs):
-        self.fit_epoch(model, optim)
-```
 
 In each *epoch*,
 we will iterate through the entire training dataset, passing once
@@ -234,60 +220,68 @@ to update the model parameters. In summary, we will execute the following loop:
  
 Recall that the synthetic regression dataset we generated in :numref:`sec_synthetic_data` doesn't provide a validation dataset. In most cases, however, we will use a validation dataset to measure our model quality. Here we pass the validation dataloader once in each epoch to measure the model performance.
 
+```{.python .input  n=11}
+%%tab all    
+@d2l.add_to_class(d2l.Trainer)  #@save
+def prepare_batch(self, batch):
+    return batch
+```
+
 ```{.python .input  n=12}
 %%tab pytorch
 @d2l.add_to_class(d2l.Trainer)  #@save
-def fit_epoch(self, model, optim):
-    model.train()        
-    for batch in self.train_dataloader:
-        loss = model.training_step(batch)
-        optim.zero_grad()
+def fit_epoch(self):
+    self.model.train()        
+    for batch in self.train_dataloader:        
+        loss = self.model.training_step(self.prepare_batch(batch))
+        self.optim.zero_grad()
         with torch.no_grad():
             loss.backward()
-            optim.step()
+            self.optim.step()
         self.train_batch_idx += 1
     if self.val_dataloader is None:
         return
-    model.eval()
+    self.model.eval()
     for batch in self.val_dataloader:
-        with torch.no_grad():
-            model.validation_step(batch)
+        with torch.no_grad():            
+            self.model.validation_step(self.prepare_batch(batch))
         self.val_batch_idx += 1
 ```
 
 ```{.python .input  n=13}
 %%tab mxnet
 @d2l.add_to_class(d2l.Trainer)  #@save
-def fit_epoch(self, model, optim):
+def fit_epoch(self):
     for batch in self.train_dataloader:
         with autograd.record():
-            loss = model.training_step(batch)
+            loss = self.model.training_step(self.prepare_batch(batch))
         loss.backward()
-        optim.step(1)
+        self.optim.step(1)
         self.train_batch_idx += 1
     if self.val_dataloader is None:
         return
-    for batch in self.val_dataloader:
-        model.validation_step(batch)
+    for batch in self.val_dataloader:        
+        self.model.validation_step(self.prepare_batch(batch))
         self.val_batch_idx += 1
 ```
 
 ```{.python .input  n=14}
 %%tab tensorflow
 @d2l.add_to_class(d2l.Trainer)  #@save
-def fit_epoch(self, model, optim):
-    model.training = True
+def fit_epoch(self):
+    self.model.training = True
     for batch in self.train_dataloader:            
         with tf.GradientTape() as tape:
-            loss = model.training_step(batch)
-        grads = tape.gradient(loss, model.trainable_variables)
-        optim.apply_gradients(zip(grads, model.trainable_variables))
+            loss = model.training_step(self.prepare_batch(batch))
+        grads = tape.gradient(loss, self.model.trainable_variables)
+        self.optim.apply_gradients(zip(grads, self.model.trainable_variables))
         self.train_batch_idx += 1
     if self.val_dataloader is None:
         return
-    model.training = False
+    self.model.training = False
     for batch in self.val_dataloader:
-        model.validation_step(batch)
+        self.prepare_batch(batch)
+        self.model.validation_step(self.batch)
         self.val_batch_idx += 1
 ```
 

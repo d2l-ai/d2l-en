@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # GPUs
 :label:`sec_use_gpu`
 
@@ -24,7 +29,7 @@ the `nvidia-smi` command can be used
 to (**view the graphics card information**).
 
 ```{.python .input}
-#@tab all
+%%tab all
 !nvidia-smi
 ```
 
@@ -130,90 +135,75 @@ Also, `gpu:0` and `gpu` are equivalent.
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
-npx.cpu(), npx.gpu(), npx.gpu(1)
+
+
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 import torch
-from torch import nn
-
-torch.device('cpu'), torch.device('cuda'), torch.device('cuda:1')
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 import tensorflow as tf
+```
 
-tf.device('/CPU:0'), tf.device('/GPU:0'), tf.device('/GPU:1')
+```{.python .input}
+%%tab all
+def cpu():  #@save
+    if tab.selected('mxnet'):
+        return npx.cpu()
+    if tab.selected('pytorch'):
+        return torch.device('cpu')
+    if tab.selected('tensorflow'):
+        return tf.device('/CPU:0')
+
+def gpu(i=0):  #@save
+    if tab.selected('mxnet'):
+        return npx.gpu(i)
+    if tab.selected('pytorch'):
+        return torch.device(f'cuda:{i}')
+    if tab.selected('tensorflow'):
+        return tf.device(f'/GPU:{i}')
+
+cpu(), gpu(), gpu(1)
 ```
 
 We can (**query the number of available GPUs.**)
 
 ```{.python .input}
-npx.num_gpus()
-```
-
-```{.python .input}
-#@tab pytorch
-torch.cuda.device_count()
-```
-
-```{.python .input}
-#@tab tensorflow
-len(tf.config.experimental.list_physical_devices('GPU'))
+%%tab all
+def num_gpus():  #@save
+    if tab.selected('mxnet'):
+        return npx.num_gpus()
+    if tab.selected('pytorch'):
+        return torch.cuda.device_count()
+    if tab.selected('tensorflow'):
+        return len(tf.config.experimental.list_physical_devices('GPU'))
+    
+num_gpus()
 ```
 
 Now we [**define two convenient functions that allow us
 to run code even if the requested GPUs do not exist.**]
 
 ```{.python .input}
+%%tab all
 def try_gpu(i=0):  #@save
     """Return gpu(i) if exists, otherwise return cpu()."""
-    return npx.gpu(i) if npx.num_gpus() >= i + 1 else npx.cpu()
-
-def try_all_gpus():  #@save
-    """Return all available GPUs, or [cpu()] if no GPU exists."""
-    devices = [npx.gpu(i) for i in range(npx.num_gpus())]
-    return devices if devices else [npx.cpu()]
-
-try_gpu(), try_gpu(10), try_all_gpus()
-```
-
-```{.python .input}
-#@tab pytorch
-def try_gpu(i=0):  #@save
-    """Return gpu(i) if exists, otherwise return cpu()."""
-    if torch.cuda.device_count() >= i + 1:
-        return torch.device(f'cuda:{i}')
-    return torch.device('cpu')
+    if num_gpus() >= i + 1:
+        return gpu(i)
+    return cpu()
 
 def try_all_gpus():  #@save
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
-    devices = [torch.device(f'cuda:{i}')
-             for i in range(torch.cuda.device_count())]
-    return devices if devices else [torch.device('cpu')]
-
-try_gpu(), try_gpu(10), try_all_gpus()
-```
-
-```{.python .input}
-#@tab tensorflow
-def try_gpu(i=0):  #@save
-    """Return gpu(i) if exists, otherwise return cpu()."""
-    if len(tf.config.experimental.list_physical_devices('GPU')) >= i + 1:
-        return tf.device(f'/GPU:{i}')
-    return tf.device('/CPU:0')
-
-def try_all_gpus():  #@save
-    """Return all available GPUs, or [cpu(),] if no GPU exists."""
-    num_gpus = len(tf.config.experimental.list_physical_devices('GPU'))
-    devices = [tf.device(f'/GPU:{i}') for i in range(num_gpus)]
-    return devices if devices else [tf.device('/CPU:0')]
+    return [gpu(i) for i in range(num_gpus())]
 
 try_gpu(), try_gpu(10), try_all_gpus()
 ```
@@ -224,18 +214,19 @@ By default, tensors are created on the CPU.
 We can [**query the device where the tensor is located.**]
 
 ```{.python .input}
+%%tab mxnet
 x = np.array([1, 2, 3])
 x.ctx
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 x = torch.tensor([1, 2, 3])
 x.device
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 x = tf.constant([1, 2, 3])
 x.device
 ```
@@ -259,18 +250,19 @@ We can use the `nvidia-smi` command to view GPU memory usage.
 In general, we need to make sure that we do not create data that exceeds the GPU memory limit.
 
 ```{.python .input}
+%%tab mxnet
 X = np.ones((2, 3), ctx=try_gpu())
 X
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 X = torch.ones(2, 3, device=try_gpu())
 X
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 with try_gpu():
     X = tf.ones((2, 3))
 X
@@ -279,18 +271,19 @@ X
 Assuming that you have at least two GPUs, the following code will (**create a random tensor on the second GPU.**)
 
 ```{.python .input}
+%%tab mxnet
 Y = np.random.uniform(size=(2, 3), ctx=try_gpu(1))
 Y
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 Y = torch.rand(2, 3, device=try_gpu(1))
 Y
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 with try_gpu(1):
     Y = tf.random.uniform((2, 3))
 Y
@@ -314,20 +307,21 @@ we need to move `X` there before we can add the two.
 :label:`fig_copyto`
 
 ```{.python .input}
+%%tab mxnet
 Z = X.copyto(try_gpu(1))
 print(X)
 print(Z)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 Z = X.cuda(1)
 print(X)
 print(Z)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 with try_gpu(1):
     Z = X
 print(X)
@@ -339,7 +333,7 @@ Now that [**the data is on the same GPU
 we can add them up.**]
 
 ```{.python .input}
-#@tab all
+%%tab all
 Y + Z
 ```
 
@@ -372,16 +366,17 @@ It will return `Z` instead of making a copy and allocating new memory.
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 Z.as_in_ctx(try_gpu(1)) is Z
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 Z.cuda(1) is Z
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 with try_gpu(1):
     Z2 = Z
 Z2 is Z
@@ -429,19 +424,20 @@ Similarly, a neural network model can specify devices.
 The following code puts the model parameters on the GPU.
 
 ```{.python .input}
+%%tab mxnet
 net = nn.Sequential()
 net.add(nn.Dense(1))
 net.initialize(ctx=try_gpu())
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 net = nn.Sequential(nn.Linear(3, 1))
 net = net.to(device=try_gpu())
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 strategy = tf.distribute.MirroredStrategy()
 with strategy.scope():
     net = tf.keras.models.Sequential([
@@ -455,24 +451,52 @@ simply since they will become somewhat more computationally intensive.
 When the input is a tensor on the GPU, the model will calculate the result on the same GPU.
 
 ```{.python .input}
-#@tab all
+%%tab all
 net(X)
 ```
 
 Let's (**confirm that the model parameters are stored on the same GPU.**)
 
 ```{.python .input}
+%%tab mxnet
 net[0].weight.data().ctx
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 net[0].weight.data.device
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 net.layers[0].weights[0].device, net.layers[0].weights[1].device
+```
+
+Let the trainer to support GPU.
+
+```{.python .input}
+%%tab mxnet, pytorch
+@d2l.add_to_class(d2l.Trainer)  #@save
+def __init__(self, max_epochs, num_gpus=0):
+    self.save_hyperparameters()
+    self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
+    
+@d2l.add_to_class(d2l.Trainer)  #@save
+def prepare_batch(self, batch):
+    if self.gpus:
+        batch = [d2l.to(a, self.gpus[0]) for a in batch]
+    return batch
+    
+@d2l.add_to_class(d2l.Trainer)  #@save
+def prepare_model(self, model):
+    model.trainer = self
+    model.board.xlim = [0, self.max_epochs]
+    if self.gpus:
+        if tab.selected('mxnet'):
+            model.collect_params().reset_ctx(self.gpus[0])
+        if tab.selected('pytorch'):
+            model.net.to(self.gpus[0])
+    self.model = model
 ```
 
 In short, as long as all data and parameters are on the same device, we can learn models efficiently. In the following chapters we will see several such examples.
