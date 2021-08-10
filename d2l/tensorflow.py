@@ -514,31 +514,6 @@ def corr2d(X, K):
     return Y
 
 
-# Defined in file: ./chapter_convolutional-modern/resnet.md
-class Residual(tf.keras.Model):
-    """The Residual block of ResNet."""
-    def __init__(self, num_channels, use_1x1conv=False, strides=1):
-        super().__init__()
-        self.conv1 = tf.keras.layers.Conv2D(
-            num_channels, padding='same', kernel_size=3, strides=strides)
-        self.conv2 = tf.keras.layers.Conv2D(
-            num_channels, kernel_size=3, padding='same')
-        self.conv3 = None
-        if use_1x1conv:
-            self.conv3 = tf.keras.layers.Conv2D(
-                num_channels, kernel_size=1, strides=strides)
-        self.bn1 = tf.keras.layers.BatchNormalization()
-        self.bn2 = tf.keras.layers.BatchNormalization()
-
-    def call(self, X):
-        Y = tf.keras.activations.relu(self.bn1(self.conv1(X)))
-        Y = self.bn2(self.conv2(Y))
-        if self.conv3 is not None:
-            X = self.conv3(X)
-        Y += X
-        return tf.keras.activations.relu(Y)
-
-
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
                                 '090b5e7e70c295757f55df93cb0a180b9691891a')

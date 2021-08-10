@@ -536,22 +536,6 @@ def corr2d(X, K):
     return Y
 
 
-# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-class LeNet(d2l.Classification):
-    def __init__(self, lr=0.1):
-        super().__init__()
-        self.save_hyperparameters()
-        self.net = nn.Sequential(
-            nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.Sigmoid(),
-            nn.AvgPool2d(kernel_size=2, stride=2),
-            nn.Conv2d(6, 16, kernel_size=5), nn.Sigmoid(),
-            nn.AvgPool2d(kernel_size=2, stride=2),
-            nn.Flatten(),
-            nn.Linear(16 * 5 * 5, 120), nn.Sigmoid(),
-            nn.Linear(120, 84), nn.Sigmoid(),
-            nn.Linear(84, 10))
-
-
 # Defined in file: ./chapter_convolutional-modern/resnet.md
 class Residual(nn.Module):
     """The Residual block of ResNet."""
