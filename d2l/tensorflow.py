@@ -344,9 +344,8 @@ def fit_epoch(self):
     if self.val_dataloader is None:
         return
     self.model.training = False
-    for batch in self.val_dataloader:
-        self.prepare_batch(batch)
-        self.model.validation_step(self.batch)
+    for batch in self.val_dataloader:        
+        self.model.validation_step(self.prepare_batch(batch))
         self.val_batch_idx += 1
 
 

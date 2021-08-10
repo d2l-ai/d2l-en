@@ -270,7 +270,7 @@ By configuring different numbers of channels and residual blocks in the module, 
 Before training ResNet, let's [**observe how the input shape changes across different modules in ResNet**]. As in all the previous architectures, the resolution decreases while the number of channels increases up until the point where a global average pooling layer aggregates all features.
 
 ```{.python .input}
-#@tab all
+%%tab all
 class ResNet18(ResNet):
     def __init__(self, num_classes=10, lr=0.1):
         if tab.selected('mxnet'):
@@ -291,7 +291,7 @@ for layer in model.net:
 We train ResNet on the Fashion-MNIST dataset, just like before.
 
 ```{.python .input}
-#@tab all
+%%tab all
 model = ResNet18(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))

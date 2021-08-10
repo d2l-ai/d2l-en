@@ -149,7 +149,7 @@ As before we use Fashion-MNIST to train the model.
 NiN's training is similar to that for AlexNet and VGG.
 
 ```{.python .input}
-#@tab all
+%%tab all
 model = NiN(lr=0.1)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
