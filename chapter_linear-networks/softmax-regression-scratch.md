@@ -11,7 +11,7 @@ softmax regression is similarly fundamental and
 you ought to know the gory details of
 how to implement it yourself. We limit ourselves to defining the 
 softmax-specific aspects and reuse many of the other parts we built 
-for regression, such as the training loop. 
+for regression, such as the training loop.
 
 ```{.python .input}
 %%tab mxnet
@@ -178,7 +178,7 @@ To see this in action we [**create sample data `y_hat`
 with 2 examples of predicted probabilities over 3 classes and their corresponding labels `y`.**]
 The correct labels are $1$ and $2$ respectively. 
 [**Using `y` as the indices of the probabilities in `y_hat`,**]
-we can pick out terms efficiently. 
+we can pick out terms efficiently.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -194,7 +194,7 @@ y = tf.constant([0, 2])
 tf.boolean_mask(y_hat, tf.one_hot(y, depth=y_hat.shape[-1]))
 ```
 
-Now we can (**implement the cross-entropy loss function**) by averaging over the logarithms of the selected probabilities. 
+Now we can (**implement the cross-entropy loss function**) by averaging over the logarithms of the selected probabilities.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -298,7 +298,3 @@ introduce nonlinear models, but before we do so, we need more practice in operat
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/225)
 :end_tab:
-
-```{.python .input}
-
-```
