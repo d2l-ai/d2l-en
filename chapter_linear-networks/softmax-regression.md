@@ -381,27 +381,6 @@ in two ways: (i) as maximizing the likelihood of the observed data;
 and (ii) as minimizing our surprisal (and thus the number of bits)
 required to communicate the labels. 
 
-
-## The Cost of Fully Connected Layers
-:label:`subsec_parameterization-cost-fc-layers`
-
-As we will see in subsequent chapters,
-fully connected layers are ubiquitous in deep learning.
-However, as the name suggests,
-fully connected layers are *fully* connected
-with potentially many learnable parameters.
-Specifically,
-for any fully connected layer
-with $d$ inputs and $q$ outputs,
-the parameterization cost is $\mathcal{O}(dq)$,
-which can be prohibitively high in practice.
-Fortunately,
-this cost
-of transforming $d$ inputs into $q$ outputs
-can be reduced to $\mathcal{O}(\frac{dq}{n})$,
-where the hyperparameter $n$ can be flexibly specified
-by us to balance between parameter saving and model effectiveness in real-world applications :cite:`Zhang.Tay.Zhang.ea.2021`.
-
 ## Summary and Discussion
 
 In this section we encountered the first nontrivial loss function, allowing us to 
@@ -464,3 +443,7 @@ the item with the largest score is the most likely one to be chosen :cite:`bradl
     1. What happens if we let the temperature converge to $\infty$?
 
 [Discussions](https://discuss.d2l.ai/t/46)
+
+```{.python .input}
+
+```

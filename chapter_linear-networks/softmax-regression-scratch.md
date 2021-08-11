@@ -3,7 +3,7 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Implementation of Softmax Regression from Scratch
+# Softmax Regression Implementation from Scratch
 :label:`sec_softmax_scratch`
 
 Just as we implemented linear regression from scratch, we believe that
