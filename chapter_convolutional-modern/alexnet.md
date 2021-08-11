@@ -298,6 +298,12 @@ from torch import nn
 ```
 
 ```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
 %%tab all
 class AlexNet(d2l.Classification):
     def __init__(self, lr=0.1):
@@ -331,15 +337,45 @@ class AlexNet(d2l.Classification):
                 nn.Linear(6400, 4096), nn.ReLU(), nn.Dropout(p=0.5),
                 nn.Linear(4096, 4096), nn.ReLU(),nn.Dropout(p=0.5),
                 nn.Linear(4096, 10))
+        if tab.selected('tensorflow'):
+            self.net = tf.keras.models.Sequential([
+                tf.keras.layers.Conv2D(filters=96, kernel_size=11, strides=4,
+                                       activation='relu'),
+                tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+                tf.keras.layers.Conv2D(filters=256, kernel_size=5, padding='same',
+                                       activation='relu'),
+                tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+                tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same',
+                                       activation='relu'),
+                tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same',
+                                       activation='relu'),
+                tf.keras.layers.Conv2D(filters=256, kernel_size=3, padding='same',
+                                       activation='relu'),
+                tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+                tf.keras.layers.Flatten(),
+                tf.keras.layers.Dense(4096, activation='relu'),
+                tf.keras.layers.Dropout(0.5),
+                tf.keras.layers.Dense(4096, activation='relu'),
+                tf.keras.layers.Dropout(0.5),
+                tf.keras.layers.Dense(10)])
 ```
 
 We [**construct a single-channel data example**] with both height and width of 224 (**to observe the output shape of each layer**). It matches the AlexNet architecture in :numref:`fig_alexnet`.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet
 model = AlexNet()
 X = d2l.randn(1, 1, 224, 224)
 for layer in model.net:
+    X = layer(X)
+    print(layer.__class__.__name__,'output shape:\t',X.shape)
+```
+
+```{.python .input}
+%%tab tensorflow
+model = AlexNet()
+X = d2l.normal((1, 224, 224, 1))
+for layer in model.net.layers:
     X = layer(X)
     print(layer.__class__.__name__,'output shape:\t',X.shape)
 ```
@@ -364,11 +400,20 @@ and much slower training due to the deeper and wider network,
 the higher image resolution, and the more costly convolutions.
 
 ```{.python .input}
-%%tab all
+%%tab pytoch, mxnet
 model = AlexNet(lr=0.01)
+data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
+trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
+trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
-trainer.fit(model, data)
+with d2l.try_gpu():
+    model = AlexNet(lr=0.01)
+    trainer.fit(model, data)
 ```
 
 ## Summary
@@ -398,3 +443,9 @@ trainer.fit(model, data)
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/76)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/276)
+:end_tab:
+
+

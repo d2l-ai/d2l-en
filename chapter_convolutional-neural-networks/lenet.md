@@ -291,3 +291,8 @@ with d2l.try_gpu():
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/74)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/275)
+:end_tab:
+
