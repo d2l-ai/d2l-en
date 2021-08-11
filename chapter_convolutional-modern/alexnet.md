@@ -400,7 +400,7 @@ and much slower training due to the deeper and wider network,
 the higher image resolution, and the more costly convolutions.
 
 ```{.python .input}
-%%tab pytoch, mxnet
+%%tab pytorch, mxnet
 model = AlexNet(lr=0.01)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
