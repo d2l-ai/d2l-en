@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Network in Network (NiN)
 :label:`sec_nin`
 
@@ -46,8 +51,9 @@ The subsequent window shapes are fixed to $1 \times 1$.
 :label:`fig_nin`
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
-from mxnet import np, npx
+from mxnet import np, npx, init
 from mxnet.gluon import nn
 npx.set_np()
 
@@ -61,7 +67,7 @@ def nin_block(num_channels, kernel_size, strides, padding):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
@@ -72,21 +78,6 @@ def nin_block(in_channels, out_channels, kernel_size, strides, padding):
         nn.ReLU(),
         nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU(),
         nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU())
-```
-
-```{.python .input}
-#@tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-
-def nin_block(num_channels, kernel_size, strides, padding):
-    return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(num_channels, kernel_size, strides=strides,
-                               padding=padding, activation='relu'),
-        tf.keras.layers.Conv2D(num_channels, kernel_size=1,
-                               activation='relu'),
-        tf.keras.layers.Conv2D(num_channels, kernel_size=1,
-                               activation='relu')])
 ```
 
 ## [**NiN Model**]
@@ -108,85 +99,46 @@ However, in practice, this design sometimes requires
 increased model training time.
 
 ```{.python .input}
-net = nn.Sequential()
-net.add(nin_block(96, kernel_size=11, strides=4, padding=0),
-        nn.MaxPool2D(pool_size=3, strides=2),
-        nin_block(256, kernel_size=5, strides=1, padding=2),
-        nn.MaxPool2D(pool_size=3, strides=2),
-        nin_block(384, kernel_size=3, strides=1, padding=1),
-        nn.MaxPool2D(pool_size=3, strides=2),
-        nn.Dropout(0.5),
-        # There are 10 label classes
-        nin_block(10, kernel_size=3, strides=1, padding=1),
-        # The global average pooling layer automatically sets the window shape
-        # to the height and width of the input
-        nn.GlobalAvgPool2D(),
-        # Transform the four-dimensional output into two-dimensional output
-        # with a shape of (batch size, 10)
-        nn.Flatten())
-```
-
-```{.python .input}
-#@tab pytorch
-net = nn.Sequential(
-    nin_block(1, 96, kernel_size=11, strides=4, padding=0),
-    nn.MaxPool2d(3, stride=2),
-    nin_block(96, 256, kernel_size=5, strides=1, padding=2),
-    nn.MaxPool2d(3, stride=2),
-    nin_block(256, 384, kernel_size=3, strides=1, padding=1),
-    nn.MaxPool2d(3, stride=2),
-    nn.Dropout(0.5),
-    # There are 10 label classes
-    nin_block(384, 10, kernel_size=3, strides=1, padding=1),
-    nn.AdaptiveAvgPool2d((1, 1)),
-    # Transform the four-dimensional output into two-dimensional output with a
-    # shape of (batch size, 10)
-    nn.Flatten())
-```
-
-```{.python .input}
-#@tab tensorflow
-def net():
-    return tf.keras.models.Sequential([
-        nin_block(96, kernel_size=11, strides=4, padding='valid'),
-        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
-        nin_block(256, kernel_size=5, strides=1, padding='same'),
-        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
-        nin_block(384, kernel_size=3, strides=1, padding='same'),
-        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
-        tf.keras.layers.Dropout(0.5),
-        # There are 10 label classes
-        nin_block(10, kernel_size=3, strides=1, padding='same'),
-        tf.keras.layers.GlobalAveragePooling2D(),
-        tf.keras.layers.Reshape((1, 1, 10)),
-        # Transform the four-dimensional output into two-dimensional output
-        # with a shape of (batch size, 10)
-        tf.keras.layers.Flatten(),
-        ])
+%%tab all
+class NiN(d2l.Classification):
+    def __init__(self, num_classes=10, lr=0.1):
+        super().__init__()
+        self.save_hyperparameters()
+        if tab.selected('mxnet'):
+            self.net = nn.Sequential()
+            self.net.add(
+                nin_block(96, kernel_size=11, strides=4, padding=0),
+                nn.MaxPool2D(pool_size=3, strides=2),
+                nin_block(256, kernel_size=5, strides=1, padding=2),
+                nn.MaxPool2D(pool_size=3, strides=2),
+                nin_block(384, kernel_size=3, strides=1, padding=1),
+                nn.MaxPool2D(pool_size=3, strides=2),
+                nn.Dropout(0.5),
+                nin_block(num_classes, kernel_size=3, strides=1, padding=1),
+                nn.GlobalAvgPool2D(),
+                nn.Flatten())
+            self.net.initialize(init.Xavier())
+        if tab.selected('pytorch'):
+            self.net = nn.Sequential(
+                nin_block(1, 96, kernel_size=11, strides=4, padding=0),
+                nn.MaxPool2d(3, stride=2),
+                nin_block(96, 256, kernel_size=5, strides=1, padding=2),
+                nn.MaxPool2d(3, stride=2),
+                nin_block(256, 384, kernel_size=3, strides=1, padding=1),
+                nn.MaxPool2d(3, stride=2),
+                nn.Dropout(0.5),
+                nin_block(384, num_classes, kernel_size=3, strides=1, padding=1),
+                nn.AdaptiveAvgPool2d((1, 1)),
+                nn.Flatten())
 ```
 
 We create a data example to see [**the output shape of each block**].
 
 ```{.python .input}
-X = np.random.uniform(size=(1, 1, 224, 224))
-net.initialize()
-for layer in net:
-    X = layer(X)
-    print(layer.name, 'output shape:\t', X.shape)
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.rand(size=(1, 1, 224, 224))
-for layer in net:
-    X = layer(X)
-    print(layer.__class__.__name__,'output shape:\t', X.shape)
-```
-
-```{.python .input}
-#@tab tensorflow
-X = tf.random.uniform((1, 224, 224, 1))
-for layer in net().layers:
+%%tab all
+model = NiN()
+X = d2l.randn(1, 1, 224, 224)
+for layer in model.net:
     X = layer(X)
     print(layer.__class__.__name__,'output shape:\t', X.shape)
 ```
@@ -197,10 +149,11 @@ As before we use Fashion-MNIST to train the model.
 NiN's training is similar to that for AlexNet and VGG.
 
 ```{.python .input}
-#@tab all
-lr, num_epochs, batch_size = 0.1, 10, 128
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
+%%tab all
+model = NiN(lr=0.1)
+trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
+data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
+trainer.fit(model, data)
 ```
 
 ## Summary
@@ -227,8 +180,4 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/80)
-:end_tab:
-
-:begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/332)
 :end_tab:

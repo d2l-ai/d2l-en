@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Utility Functions and Classes
 :label:`sec_utils`
 
@@ -5,6 +10,7 @@
 This section contains the implementations of utility functions and classes used in this book.
 
 ```{.python .input}
+%%tab mxnet
 import inspect
 import collections
 from d2l import mxnet as d2l
@@ -15,7 +21,7 @@ npx.set_np()
 ```
 
 ```{.python .input  n=1}
-#@tab pytorch
+%%tab pytorch
 import inspect
 import collections
 from d2l import torch as d2l
@@ -23,17 +29,18 @@ from IPython import display
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 import inspect
 from IPython import display
 import collections
 from d2l import tensorflow as d2l
+import tensorflow as tf
 ```
 
 hyper parameters
 
 ```{.python .input}
-#@tab all
+%%tab all
 @d2l.add_to_class(d2l.HyperParameters)  #@save
 def save_hyperparameters(self, ignore=[]):
     """Save function arguments into class attributes."""
@@ -48,7 +55,7 @@ def save_hyperparameters(self, ignore=[]):
 progress bar
 
 ```{.python .input  n=22}
-#@tab all
+%%tab all
 @d2l.add_to_class(d2l.ProgressBoard)  #@save
 def draw(self, x, y, label, every_n=1):
     Point = collections.namedtuple('Point', ['x', 'y'])
@@ -93,22 +100,12 @@ def draw(self, x, y, label, every_n=1):
 
 ```
 
-```{.python .input}
-import numpy as np 
-#@tab all
-board = d2l.ProgressBoard()
-board.xlabel = 'x'
-for x in np.arange(0, 10, 0.05):
-    board.draw(x, np.sin(x), 'sin', every_n=10)
-    board.draw(x, np.cos(x), 'cos', every_n=20)
-```
-
 trainer
 
 a bunch of functions that will be deprecated
 
 ```{.python .input}
-#@tab mxnet
+%%tab mxnet
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a Gluon data iterator."""
     dataset = gluon.data.ArrayDataset(*data_arrays)
@@ -143,10 +140,57 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
                                   num_workers=get_dataloader_workers()),
             gluon.data.DataLoader(mnist_test, batch_size, shuffle=False,
                                   num_workers=get_dataloader_workers()))
+
+def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
+    """Compute the accuracy for a model on a dataset using a GPU."""
+    if not device:  # Query the first device where the first parameter is on
+        device = list(net.collect_params().values())[0].list_ctx()[0]
+    # No. of correct predictions, no. of predictions
+    metric = d2l.Accumulator(2)
+    for X, y in data_iter:
+        X, y = X.as_in_ctx(device), y.as_in_ctx(device)
+        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
+    return metric[0] / metric[1]
+
+#@save
+def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
+    """Train a model with a GPU (defined in Chapter 6)."""
+    net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
+    loss = gluon.loss.SoftmaxCrossEntropyLoss()
+    trainer = gluon.Trainer(net.collect_params(),
+                            'sgd', {'learning_rate': lr})
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
+                            legend=['train loss', 'train acc', 'test acc'])
+    timer, num_batches = d2l.Timer(), len(train_iter)
+    for epoch in range(num_epochs):
+        # Sum of training loss, sum of training accuracy, no. of examples
+        metric = d2l.Accumulator(3)
+        for i, (X, y) in enumerate(train_iter):
+            timer.start()
+            # Here is the major difference from `d2l.train_epoch_ch3`
+            X, y = X.as_in_ctx(device), y.as_in_ctx(device)
+            with autograd.record():
+                y_hat = net(X)
+                l = loss(y_hat, y)
+            l.backward()
+            trainer.step(X.shape[0])
+            metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])
+            timer.stop()
+            train_l = metric[0] / metric[2]
+            train_acc = metric[1] / metric[2]
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches,
+                             (train_l, train_acc, None))
+        test_acc = evaluate_accuracy_gpu(net, test_iter)
+        animator.add(epoch + 1, (None, None, test_acc))
+    print(f'loss {train_l:.3f}, train acc {train_acc:.3f}, '
+          f'test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(device)}')
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data iterator."""
@@ -185,10 +229,72 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
                             num_workers=get_dataloader_workers()),
             data.DataLoader(mnist_test, batch_size, shuffle=False,
                             num_workers=get_dataloader_workers()))
+
+def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
+    """Compute the accuracy for a model on a dataset using a GPU."""
+    if isinstance(net, nn.Module):
+        net.eval()  # Set the model to evaluation mode
+        if not device:
+            device = next(iter(net.parameters())).device
+    # No. of correct predictions, no. of predictions
+    metric = d2l.Accumulator(2)
+
+    with torch.no_grad():
+        for X, y in data_iter:
+            if isinstance(X, list):
+                # Required for BERT Fine-tuning (to be covered later)
+                X = [x.to(device) for x in X]
+            else:
+                X = X.to(device)
+            y = y.to(device)
+            metric.add(d2l.accuracy(net(X), y), d2l.size(y))
+    return metric[0] / metric[1]
+
+
+#@save
+def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
+    """Train a model with a GPU (defined in Chapter 6)."""
+    def init_weights(m):
+        if type(m) == nn.Linear or type(m) == nn.Conv2d:
+            nn.init.xavier_uniform_(m.weight)
+    net.apply(init_weights)
+    print('training on', device)
+    net.to(device)
+    optimizer = torch.optim.SGD(net.parameters(), lr=lr)
+    loss = nn.CrossEntropyLoss()
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
+                            legend=['train loss', 'train acc', 'test acc'])
+    timer, num_batches = d2l.Timer(), len(train_iter)
+    for epoch in range(num_epochs):
+        # Sum of training loss, sum of training accuracy, no. of examples
+        metric = d2l.Accumulator(3)
+        net.train()
+        for i, (X, y) in enumerate(train_iter):
+            timer.start()
+            optimizer.zero_grad()
+            X, y = X.to(device), y.to(device)
+            y_hat = net(X)
+            l = loss(y_hat, y)
+            l.backward()
+            optimizer.step()
+            with torch.no_grad():
+                metric.add(l * X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])
+            timer.stop()
+            train_l = metric[0] / metric[2]
+            train_acc = metric[1] / metric[2]
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches,
+                             (train_l, train_acc, None))
+        test_acc = evaluate_accuracy_gpu(net, test_iter)
+        animator.add(epoch + 1, (None, None, test_acc))
+    print(f'loss {train_l:.3f}, train acc {train_acc:.3f}, '
+          f'test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(device)}')
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a TensorFlow data iterator."""
@@ -227,10 +333,54 @@ def load_data_fashion_mnist(batch_size, resize=None):   #@save
             batch_size).shuffle(len(mnist_train[0])).map(resize_fn),
         tf.data.Dataset.from_tensor_slices(process(*mnist_test)).batch(
             batch_size).map(resize_fn))
+
+class TrainCallback(tf.keras.callbacks.Callback):  #@save
+    """A callback to visiualize the training progress."""
+    def __init__(self, net, train_iter, test_iter, num_epochs, device_name):
+        self.timer = d2l.Timer()
+        self.animator = d2l.Animator(
+            xlabel='epoch', xlim=[1, num_epochs], legend=[
+                'train loss', 'train acc', 'test acc'])
+        self.net = net
+        self.train_iter = train_iter
+        self.test_iter = test_iter
+        self.num_epochs = num_epochs
+        self.device_name = device_name
+    def on_epoch_begin(self, epoch, logs=None):
+        self.timer.start()
+    def on_epoch_end(self, epoch, logs):
+        self.timer.stop()
+        test_acc = self.net.evaluate(
+            self.test_iter, verbose=0, return_dict=True)['accuracy']
+        metrics = (logs['loss'], logs['accuracy'], test_acc)
+        self.animator.add(epoch + 1, metrics)
+        if epoch == self.num_epochs - 1:
+            batch_size = next(iter(self.train_iter))[0].shape[0]
+            num_examples = batch_size * tf.data.experimental.cardinality(
+                self.train_iter).numpy()
+            print(f'loss {metrics[0]:.3f}, train acc {metrics[1]:.3f}, '
+                  f'test acc {metrics[2]:.3f}')
+            print(f'{num_examples / self.timer.avg():.1f} examples/sec on '
+                  f'{str(self.device_name)}')
+
+#@save
+def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, device):
+    """Train a model with a GPU (defined in Chapter 6)."""
+    device_name = device._device_name
+    strategy = tf.distribute.OneDeviceStrategy(device_name)
+    with strategy.scope():
+        optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        net = net_fn()
+        net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    callback = TrainCallback(net, train_iter, test_iter, num_epochs,
+                             device_name)
+    net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])
+    return net
 ```
 
 ```{.python .input}
-#@tab mxnet, tensorflow
+%%tab mxnet, tensorflow
 def evaluate_accuracy(net, data_iter):  #@save
     """Compute the accuracy for a model on a dataset."""
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
@@ -240,7 +390,7 @@ def evaluate_accuracy(net, data_iter):  #@save
 ```
 
 ```{.python .input}
-#@tab all
+%%tab all
 
 def linreg(X, w, b):  #@save
     """The linear regression model."""
@@ -340,7 +490,7 @@ def accuracy(y_hat, y):  #@save
 ```
 
 ```{.python .input}
-#@tab all
+%%tab all
 
 %%tab all
 import os
@@ -390,7 +540,7 @@ def extract(filename, folder=None):  #@save
 ```
 
 ```{.python .input}
-#@tab all
+%%tab all
 
 def download_extract(name, folder=None):  #@save
     """Download and extract a zip/tar file."""
@@ -410,7 +560,7 @@ def download_extract(name, folder=None):  #@save
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 
 def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
@@ -424,7 +574,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
 ```
 
 ```{.python .input}
-#@tab mxnet, tensorflow
+%%tab mxnet, tensorflow
 def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
