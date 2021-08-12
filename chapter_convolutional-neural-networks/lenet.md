@@ -176,7 +176,7 @@ what we expect from :numref:`img_lenet_vert`.
 ```{.python .input  n=6}
 %%tab mxnet, pytorch
 model = LeNet()
-X = d2l.normal(1, 1, 28, 28)
+X = d2l.randn(1, 1, 28, 28)
 for layer in model.net:
     X = layer(X)
     print(layer.__class__.__name__, 'output shape:\t', X.shape)
