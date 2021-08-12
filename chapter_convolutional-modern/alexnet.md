@@ -409,7 +409,7 @@ trainer.fit(model, data)
 
 ```{.python .input}
 %%tab tensorflow
-trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
+trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
 with d2l.try_gpu():
     model = AlexNet(lr=0.01)
