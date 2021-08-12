@@ -1,6 +1,23 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
+```{.json .output n=1}
+[
+ {
+  "data": {
+   "application/vnd.jupyter.widget-view+json": {
+    "model_id": "b239d03f49ee4f85b2012ef26c442b2a",
+    "version_major": 2,
+    "version_minor": 0
+   },
+   "text/plain": "interactive(children=(Dropdown(description='tab', index=2, options=('mxnet', 'pytorch', 'tensorflow'), value='\u2026"
+  },
+  "metadata": {},
+  "output_type": "display_data"
+ }
+]
 ```
 
 # Networks Using Blocks (VGG)
@@ -94,6 +111,31 @@ def vgg_block(num_convs, in_channels, out_channels):
     return nn.Sequential(*layers)
 ```
 
+```{.python .input  n=2}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+
+def vgg_block(num_convs, num_channels):
+    blk = tf.keras.models.Sequential()
+    for _ in range(num_convs):
+        blk.add(
+            tf.keras.layers.Conv2D(num_channels, kernel_size=3,
+                                   padding='same', activation='relu'))
+    blk.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2))
+    return blk
+```
+
+```{.json .output n=2}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "2021-08-12 05:05:24.421479: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1\n"
+ }
+]
+```
+
 ## [**VGG Network**]
 
 Like AlexNet and LeNet,
@@ -119,7 +161,7 @@ The fully connected part of the VGG network is identical to that covered in Alex
 
 The following code implements VGG-11. This is a simple matter of executing a for-loop over `conv_arch`.
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab all
 class VGG(d2l.Classification):
     def __init__(self, arch, lr=0.1):
@@ -144,6 +186,18 @@ class VGG(d2l.Classification):
                 nn.Linear(out_channels * 7 * 7, 4096), nn.ReLU(), nn.Dropout(0.5),
                 nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
                 nn.Linear(4096, 10))
+        if tab.selected('tensorflow'):
+            self.net = tf.keras.models.Sequential()
+            for (num_convs, num_channels) in arch:
+                self.net.add(vgg_block(num_convs, num_channels))
+            self.net.add(
+                tf.keras.models.Sequential([
+                tf.keras.layers.Flatten(),
+                tf.keras.layers.Dense(4096, activation='relu'),
+                tf.keras.layers.Dropout(0.5),
+                tf.keras.layers.Dense(4096, activation='relu'),
+                tf.keras.layers.Dropout(0.5),
+                tf.keras.layers.Dense(10)]))
 ```
 
 The original VGG network had 5 convolutional blocks,
@@ -155,13 +209,47 @@ until that number reaches 512.
 Since this network uses 8 convolutional layers
 and 3 fully connected layers, it is often called VGG-11.
 
-```{.python .input}
-%%tab all
+```{.python .input  n=6}
+%%tab pytorch, mxnet
 vgg_11 = VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512)))
 X = d2l.randn(1, 1, 224, 224)
 for blk in vgg_11.net:
     X = blk(X)
     print(blk.__class__.__name__,'output shape:\t',X.shape)
+```
+
+```{.json .output n=6}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"tensorflow\" cell."
+ }
+]
+```
+
+```{.python .input  n=7}
+%%tab tensorflow
+vgg_11 = VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512)))
+X = d2l.normal((1, 224, 224, 1))
+for blk in vgg_11.net.layers:
+    X = blk(X)
+    print(blk.__class__.__name__,'output shape:\t',X.shape)
+```
+
+```{.json .output n=7}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "2021-08-12 05:07:24.163387: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudnn.so.7\n2021-08-12 05:07:26.409099: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcublas.so.10\n"
+ },
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "Sequential output shape:\t (1, 112, 112, 64)\nSequential output shape:\t (1, 56, 56, 128)\nSequential output shape:\t (1, 28, 28, 256)\nSequential output shape:\t (1, 14, 14, 512)\nSequential output shape:\t (1, 7, 7, 512)\nSequential output shape:\t (1, 10)\n"
+ }
+]
 ```
 
 As you can see, we halve height and width at each block,
@@ -179,11 +267,20 @@ Apart from using a slightly larger learning rate,
 the [**model training**] process is similar to that of AlexNet in :numref:`sec_alexnet`.
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
 model = VGG(arch=((1, 16), (1, 32), (2, 64), (2, 128), (2, 128)), lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
 trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab tensorflow
+trainer = d2l.Trainer(max_epochs=10)
+data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
+with d2l.try_gpu():
+    model = VGG(arch=((1, 16), (1, 32), (2, 64), (2, 128), (2, 128)), lr=0.05)
+    trainer.fit(model, data)
 ```
 
 ## Summary
