@@ -346,25 +346,17 @@ class ResNet18(ResNet):
                            num_classes, lr)
         if tab.selected('pytorch'):
             super().__init__(((2, 64, 64), (2, 64, 128), (2, 128, 256), (2, 256, 512)),
-                           num_classes, lr)        
-model = ResNet18()
-
+                           num_classes, lr)
 ```
 
 ```{.python .input}
 %%tab pytorch, mxnet
-X = d2l.randn(1, 1, 224, 224)
-for layer in model.net:
-    X = layer(X)
-    print(layer.__class__.__name__,'output shape:\t', X.shape)
+ResNet18().layer_summary((1, 1, 224, 224))
 ```
 
 ```{.python .input}
 %%tab tensorflow
-X = d2l.normal((1, 1, 224, 224))
-for layer in model.net.layers:
-    X = layer(X)
-    print(layer.__class__.__name__,'output shape:\t', X.shape)
+ResNet18().layer_summary((1, 224, 224, 1))
 ```
 
 ## [**Training**]
@@ -380,7 +372,7 @@ trainer.fit(model, data)
 ```
 
 ```{.python .input}
-%%tensorflow
+%%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 with d2l.try_gpu():

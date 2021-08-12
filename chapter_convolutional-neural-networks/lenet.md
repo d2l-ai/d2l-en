@@ -175,20 +175,28 @@ what we expect from :numref:`img_lenet_vert`.
 
 ```{.python .input  n=6}
 %%tab mxnet, pytorch
+@d2l.add_to_class(d2l.Classification)  #@save
+def layer_summary(self, X_shape):
+    X = d2l.randn(*X_shape)
+    for layer in self.net:
+        X = layer(X)
+        print(layer.__class__.__name__, 'output shape:\t', X.shape)
+    
 model = LeNet()
-X = d2l.randn(1, 1, 28, 28)
-for layer in model.net:
-    X = layer(X)
-    print(layer.__class__.__name__, 'output shape:\t', X.shape)
+model.layer_summary((1, 1, 28, 28))
 ```
 
 ```{.python .input}
 %%tab tensorflow
+@d2l.add_to_class(d2l.Classification)  #@save
+def layer_summary(self, X_shape):
+    X = d2l.normal(X_shape)
+    for layer in self.net.layers:
+        X = layer(X)
+        print(layer.__class__.__name__, 'output shape:\t', X.shape)
+
 model = LeNet()
-X = d2l.normal((1, 28, 28, 1))
-for layer in model.net.layers:
-    X = layer(X)
-    print(layer.__class__.__name__, 'output shape:\t', X.shape)
+model.layer_summary((1, 28, 28, 1))
 ```
 
 Note that the height and width of the representation
@@ -295,4 +303,3 @@ with d2l.try_gpu():
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/275)
 :end_tab:
-

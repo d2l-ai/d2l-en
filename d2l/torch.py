@@ -536,6 +536,16 @@ def corr2d(X, K):
     return Y
 
 
+# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
+@d2l.add_to_class(d2l.Classification)
+def layer_summary(self, X_shape):
+    X = d2l.randn(*X_shape)
+    for layer in self.net:
+        X = layer(X)
+        print(layer.__class__.__name__, 'output shape:\t', X.shape)
+    
+
+
 # Defined in file: ./chapter_convolutional-modern/resnet.md
 class Residual(nn.Module):
     """The Residual block of ResNet."""
@@ -805,7 +815,8 @@ d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
 def read_data_nmt():
     """Load the English-French dataset."""
     data_dir = d2l.download_extract('fra-eng')
-    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
+    with open(os.path.join(data_dir, 'fra.txt'), 'r',
+              encoding='utf-8') as f:
         return f.read()
 
 

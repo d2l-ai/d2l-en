@@ -356,19 +356,12 @@ between the various modules are demonstrated below.
 
 ```{.python .input}
 %%tab mxnet, pytorch
-model = GoogleNet()
-X = d2l.randn(1, 1, 96, 96)
-for layer in model.net:
-    X = layer(X)
-    print(layer.__class__.__name__,'output shape:\t', X.shape)
+model = GoogleNet().layer_summary((1, 1, 224, 224))
 ```
 
 ```{.python .input}
-model = GoogleNet()
-X = d2l.normal((1, 96, 96, 1))
-for layer in model.net.layers:
-    X = layer(X)
-    print(layer.__class__.__name__,'output shape:\t', X.shape)
+%%tab tensorflow
+model = GoogleNet().layer_summary((1, 224, 224, 1))
 ```
 
 ## [**Training**]

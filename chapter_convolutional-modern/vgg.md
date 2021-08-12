@@ -184,20 +184,12 @@ and 3 fully connected layers, it is often called VGG-11.
 
 ```{.python .input}
 %%tab pytorch, mxnet
-vgg_11 = VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512)))
-X = d2l.randn(1, 1, 224, 224)
-for blk in vgg_11.net:
-    X = blk(X)
-    print(blk.__class__.__name__,'output shape:\t',X.shape)
+VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary((1, 1, 224, 224))
 ```
 
 ```{.python .input}
 %%tab tensorflow
-vgg_11 = VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512)))
-X = d2l.normal((1, 224, 224, 1))
-for blk in vgg_11.net.layers:
-    X = blk(X)
-    print(blk.__class__.__name__,'output shape:\t',X.shape)
+VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary((1, 224, 224, 1))
 ```
 
 As you can see, we halve height and width at each block,

@@ -364,20 +364,12 @@ We [**construct a single-channel data example**] with both height and width of 2
 
 ```{.python .input}
 %%tab pytorch, mxnet
-model = AlexNet()
-X = d2l.randn(1, 1, 224, 224)
-for layer in model.net:
-    X = layer(X)
-    print(layer.__class__.__name__,'output shape:\t',X.shape)
+AlexNet().layer_summary((1, 1, 224, 224))
 ```
 
 ```{.python .input}
 %%tab tensorflow
-model = AlexNet()
-X = d2l.normal((1, 224, 224, 1))
-for layer in model.net.layers:
-    X = layer(X)
-    print(layer.__class__.__name__,'output shape:\t',X.shape)
+AlexNet().layer_summary((1, 224, 224, 1))
 ```
 
 ## Training
@@ -447,5 +439,3 @@ with d2l.try_gpu():
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/276)
 :end_tab:
-
-
