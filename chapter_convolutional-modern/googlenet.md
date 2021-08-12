@@ -111,6 +111,33 @@ class Inception(nn.Module):
         return torch.cat((p1, p2, p3, p4), dim=1)
 ```
 
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+
+class Inception(tf.keras.Model):
+    # `c1`--`c4` are the number of output channels for each path
+    def __init__(self, c1, c2, c3, c4):
+        super().__init__()
+        self.p1_1 = tf.keras.layers.Conv2D(c1, 1, activation='relu')
+        self.p2_1 = tf.keras.layers.Conv2D(c2[0], 1, activation='relu')
+        self.p2_2 = tf.keras.layers.Conv2D(c2[1], 3, padding='same',
+                                           activation='relu')
+        self.p3_1 = tf.keras.layers.Conv2D(c3[0], 1, activation='relu')
+        self.p3_2 = tf.keras.layers.Conv2D(c3[1], 5, padding='same',
+                                           activation='relu')
+        self.p4_1 = tf.keras.layers.MaxPool2D(3, 1, padding='same')
+        self.p4_2 = tf.keras.layers.Conv2D(c4, 1, activation='relu')
+
+    def call(self, x):
+        p1 = self.p1_1(x)
+        p2 = self.p2_2(self.p2_1(x))
+        p3 = self.p3_2(self.p3_1(x))
+        p4 = self.p4_2(self.p4_1(x))
+        return tf.keras.layers.Concatenate()([p1, p2, p3, p4])
+```
+
 To gain some intuition for why this network works so well,
 consider the combination of the filters.
 They explore the image in a variety of filter sizes.
@@ -150,6 +177,12 @@ class GoogleNet(d2l.Classification):
             return nn.Sequential(
                 nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
                 nn.ReLU(), nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+        if tab.selected('tensorflow'):
+            return tf.keras.models.Sequential([
+                tf.keras.layers.Conv2D(64, 7, strides=2, padding='same',
+                                       activation='relu'),
+                tf.keras.layers.MaxPool2D(pool_size=3, strides=2, 
+                                          padding='same')])
 ```
 
 The second module uses two convolutional layers:
@@ -171,6 +204,11 @@ def b2(self):
             nn.Conv2d(64, 64, kernel_size=1), nn.ReLU(),
             nn.Conv2d(64, 192, kernel_size=3, padding=1), nn.ReLU(),
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+    if tab.selected('tensorflow'):
+        return tf.keras.Sequential([
+            tf.keras.layers.Conv2D(64, 1, activation='relu'),
+            tf.keras.layers.Conv2D(192, 3, padding='same', activation='relu'),
+            tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
 The third module connects two complete Inception blocks in series.
@@ -201,6 +239,11 @@ def b3(self):
         return nn.Sequential(Inception(192, 64, (96, 128), (16, 32), 32),
                              Inception(256, 128, (128, 192), (32, 96), 64),
                              nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+    if tab.selected('tensorflow'):
+        return tf.keras.models.Sequential([
+            Inception(64, (96, 128), (16, 32), 32),
+            Inception(128, (128, 192), (32, 96), 64),
+            tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
 The fourth module is more complicated.
@@ -239,6 +282,14 @@ def b4(self):
                              Inception(512, 112, (144, 288), (32, 64), 64),
                              Inception(528, 256, (160, 320), (32, 128), 128),
                              nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+    if tab.selected('tensorflow'):
+        return tf.keras.Sequential([
+            Inception(192, (96, 208), (16, 48), 64),
+            Inception(160, (112, 224), (24, 64), 64),
+            Inception(128, (128, 256), (24, 64), 64),
+            Inception(112, (144, 288), (32, 64), 64),
+            Inception(256, (160, 320), (32, 128), 128),
+            tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
 The fifth module has two Inception blocks with $256+320+128+128=832$
@@ -267,6 +318,12 @@ def b5(self):
         return nn.Sequential(Inception(832, 256, (160, 320), (32, 128), 128),
                              Inception(832, 384, (192, 384), (48, 128), 128),
                              nn.AdaptiveAvgPool2d((1,1)), nn.Flatten())
+    if tab.selected('tensorflow'):
+        return tf.keras.Sequential([
+            Inception(256, (160, 320), (32, 128), 128),
+            Inception(384, (192, 384), (48, 128), 128),
+            tf.keras.layers.GlobalAvgPool2D(),
+            tf.keras.layers.Flatten()])
 ```
 
 ```{.python .input}
@@ -283,7 +340,10 @@ def __init__(self, num_classes=10, lr=0.1):
     if tab.selected('pytorch'):
         self.net = nn.Sequential(self.b1(), self.b2(), self.b3(), self.b4(),
                                  self.b5(), nn.Linear(1024, num_classes))
-
+    if tab.selected('tensorflow'):
+        self.net = tf.keras.Sequential([
+            self.b1(), self.b2(), self.b3(), self.b4(), self.b5(), 
+            tf.keras.layers.Dense(10)])
 ```
 
 The GoogLeNet model is computationally complex,
@@ -295,10 +355,18 @@ The changes in the shape of the output
 between the various modules are demonstrated below.
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
 model = GoogleNet()
 X = d2l.randn(1, 1, 96, 96)
 for layer in model.net:
+    X = layer(X)
+    print(layer.__class__.__name__,'output shape:\t', X.shape)
+```
+
+```{.python .input}
+model = GoogleNet()
+X = d2l.normal((1, 96, 96, 1))
+for layer in model.net.layers:
     X = layer(X)
     print(layer.__class__.__name__,'output shape:\t', X.shape)
 ```
@@ -310,11 +378,20 @@ As before, we train our model using the Fashion-MNIST dataset.
  before invoking the training procedure.
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
 model = GoogleNet(lr=0.1)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab tensorflow
+trainer = d2l.Trainer(max_epochs=10)
+data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
+with d2l.try_gpu():
+    model = GoogleNet(lr=0.1)
+    trainer.fit(model, data)
 ```
 
 ## Summary
@@ -345,4 +422,8 @@ trainer.fit(model, data)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/82)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/316)
 :end_tab:
