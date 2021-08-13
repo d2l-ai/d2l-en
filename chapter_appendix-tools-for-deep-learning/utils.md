@@ -492,7 +492,6 @@ def accuracy(y_hat, y):  #@save
 ```{.python .input}
 %%tab all
 
-%%tab all
 import os
 import requests
 import zipfile
@@ -556,6 +555,11 @@ def download_extract(name, folder=None):  #@save
     fp.extractall(base_dir)
     return os.path.join(base_dir, folder) if folder else data_dir
 
+
+def tokenize(lines, token='word'):  #@save
+    """Split text lines into word or character tokens."""
+    assert token in ('word', 'char'), 'Unknown token type: ' + token
+    return [line.split() if token == 'word' else list(line) for line in lines]
 
 ```
 

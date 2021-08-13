@@ -558,22 +558,21 @@ class Residual(nn.Block):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
-                                '090b5e7e70c295757f55df93cb0a180b9691891a')
-
-def read_time_machine():
-    """Load The Time Machine dataset into a list of text lines."""
-    with open(d2l.download('time_machine'), 'r') as f:
-        lines = f.readlines()
-    return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() for line in lines]
+class TimeMachine(d2l.DataModule):
+    def load(self):
+        fname = d2l.download(d2l.DATA_URL+'timemachine.txt', self.root, 
+                             '090b5e7e70c295757f55df93cb0a180b9691891a')
+        with open(fname) as f:
+            lines = f.readlines()
+            return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() 
+                    for line in lines]
 
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def tokenize(lines, token='word'):
-    """Split text lines into word or character tokens."""
-    assert token in ('word', 'char'), 'Unknown token type: ' + token
-    return [line.split() if token == 'word' else list(line) for line in lines]
+@d2l.add_to_class(TimeMachine)
+def tokenize(self, lines):
+    return [list(line) for line in lines]
 
 
 
@@ -613,38 +612,55 @@ class Vocab:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def load_corpus_time_machine(max_tokens=None):
-    """Return token indices and the vocabulary of the time machine dataset."""
-    lines = read_time_machine()
-    tokens = tokenize(lines, 'char')
-    vocab = Vocab(tokens)
-    corpus = [vocab[token] for line in tokens for token in line]
-    if max_tokens and max_tokens > 0:
-        corpus = corpus[:max_tokens]
-    return corpus, vocab
+@d2l.add_to_class(TimeMachine)
+def prepare_data(self):
+    tokens = self.tokenize(self.load())
+    self.vocab = Vocab(tokens)
+    self.corpus = [self.vocab[token] for line in tokens for token in line]
 
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-class SeqDataLoader:
-    """The sequence data iterator generating minibatches of subsequences."""
-    def __init__(self, corpus, batch_size, num_steps):
-        self.corpus, self.b, self.n = corpus, batch_size, num_steps
+@d2l.add_to_class(d2l.TimeMachine)
+def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
+    super(d2l.TimeMachine, self).__init__()
+    self.save_hyperparameters()
+    self.prepare_data()
 
+
+# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
+class LMDataLoader(d2l.HyperParameters):
+    def __init__(self, corpus, batch_size, num_steps, train):
+        self.save_hyperparameters()
+        self.num_batches = (len(corpus) - 1 - (num_steps if train else 0)
+                           ) // (self.num_steps * self.batch_size)
+    def __len__(self):
+        return self.num_batches
+    
     def __iter__(self):
-        # Randomly drop the first d tokens.
-        corpus = self.corpus[random.randint(0, self.n - 1):]
+        # Randomly drop the first d tokens for training.
+        corpus = (self.corpus[random.randint(0, self.num_steps - 1):] 
+                  if train else self.corpus)
         # No. of subsequences. Subtract 1 to account for labels.
-        m = (len(corpus)-1) // self.n
+        m = (len(corpus)-1) // self.num_steps
         # The starting indices for input sequences.
-        initial_indices = list(range(0, m*self.n, self.n))
-        random.shuffle(initial_indices)
-        for i in range(0, m // self.b):
+        initial_indices = list(range(0, m*self.num_steps, self.num_steps))
+        if train:
+            random.shuffle(initial_indices)        
+        for i in range(0, self.num_batches):
             # The randomized starting indices for this minibatch.
-            batch_indicies = initial_indices[i*self.b : (i+1) * self.b]
-            X = [corpus[j : j+self.n] for j in batch_indicies]
-            Y = [corpus[j+1 : j+1+self.n] for j in batch_indicies]
+            batch_indicies = initial_indices[
+                i*self.batch_size : (i+1) * self.batch_size]
+            X = [corpus[j : j+self.num_steps] for j in batch_indicies]
+            Y = [corpus[j+1 : j+1+self.num_steps] for j in batch_indicies]
             yield d2l.tensor(X), d2l.tensor(Y)
+
+
+@d2l.add_to_class(d2l.TimeMachine)
+def get_dataloader(self, train):
+    corpus = (self.corpus[:num_train] if train else 
+              self.corpus[num_train:num_train+num_val])
+    return LMDataLoader(corpus, self.batch_size, self.num_steps, train)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
@@ -3192,6 +3208,11 @@ def download_extract(name, folder=None):
     fp.extractall(base_dir)
     return os.path.join(base_dir, folder) if folder else data_dir
 
+
+def tokenize(lines, token='word'):
+    """Split text lines into word or character tokens."""
+    assert token in ('word', 'char'), 'Unknown token type: ' + token
+    return [line.split() if token == 'word' else list(line) for line in lines]
 
 
 # Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
