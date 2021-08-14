@@ -152,6 +152,35 @@ class Residual(nn.Module):  #@save
         return F.relu(Y)
 ```
 
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+
+class Residual(tf.keras.Model):  #@save
+    """The Residual block of ResNet."""
+    def __init__(self, num_channels, use_1x1conv=False, strides=1):
+        super().__init__()
+        self.conv1 = tf.keras.layers.Conv2D(num_channels, padding='same',
+                                            kernel_size=3, strides=strides)
+        self.conv2 = tf.keras.layers.Conv2D(num_channels, kernel_size=3,
+                                            padding='same')
+        self.conv3 = None
+        if use_1x1conv:
+            self.conv3 = tf.keras.layers.Conv2D(num_channels, kernel_size=1,
+                                                strides=strides)
+        self.bn1 = tf.keras.layers.BatchNormalization()
+        self.bn2 = tf.keras.layers.BatchNormalization()
+
+    def call(self, X):
+        Y = tf.keras.activations.relu(self.bn1(self.conv1(X)))
+        Y = self.bn2(self.conv2(Y))
+        if self.conv3 is not None:
+            X = self.conv3(X)
+        Y += X
+        return tf.keras.activations.relu(Y)
+```
+
 This code generates two types of networks: one where we add the input to the output before applying the ReLU nonlinearity whenever `use_1x1conv=False`, and one where we adjust channels and resolution by means of a $1 \times 1$ convolution before adding. :numref:`fig_resnet_block` illustrates this:
 
 ![ResNet block with and without $1 \times 1$ convolution.](../img/resnet-block.svg)
@@ -160,7 +189,7 @@ This code generates two types of networks: one where we add the input to the out
 Now let's look at [**a situation where the input and output are of the same shape**].
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
 if tab.selected('mxnet'):
     blk = Residual(3)
     blk.initialize()
@@ -168,6 +197,14 @@ if tab.selected('pytorch'):
     blk = Residual(3, 3)
 X = d2l.randn(4, 3, 6, 6)
 blk(X).shape
+```
+
+```{.python .input}
+%%tab tensorflow
+blk = Residual(3)
+X = d2l.normal((4, 6, 6, 3))
+Y = blk(X)
+Y.shape
 ```
 
 We also have the option to [**halve the output height and width while increasing the number of output channels**].
@@ -179,6 +216,8 @@ if tab.selected('mxnet'):
     blk.initialize()
 if tab.selected('pytorch'):
     blk = Residual(3, 6, use_1x1conv=True, strides=2)
+if tab.selected('tensorflow'):
+    blk = Residual(6, use_1x1conv=True, strides=2)
 blk(X).shape
 ```
 
@@ -201,6 +240,14 @@ class ResNet(d2l.Classification):
                 nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
                 nn.BatchNorm2d(64), nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+        if tab.selected('tensorflow'):
+            return tf.keras.models.Sequential([
+                tf.keras.layers.Conv2D(64, kernel_size=7, strides=2, 
+                                       padding='same'),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Activation('relu'),
+                tf.keras.layers.MaxPool2D(pool_size=3, strides=2, 
+                                          padding='same')])
 ```
 
 GoogLeNet uses four modules made up of Inception blocks.
@@ -237,6 +284,19 @@ def block(self, num_residuals, input_channels, num_channels,
     return nn.Sequential(*blk)
 ```
 
+```{.python .input}
+%%tab tensorflow
+@d2l.add_to_class(ResNet)
+def block(self, num_residuals, num_channels, first_block=False):
+    blk = tf.keras.models.Sequential()
+    for i in range(num_residuals):
+        if i == 0 and not first_block:
+            blk.add(Residual(num_channels, use_1x1conv=True, strides=2))
+        else:
+            blk.add(Residual(num_channels))
+    return blk
+```
+
 Then, we add all the modules to ResNet. Here, two residual blocks are used for each module. Finally, just like GoogLeNet, we add a global average pooling layer, followed by the fully connected layer output.
 
 ```{.python .input}
@@ -259,6 +319,14 @@ def __init__(self, arch, num_classes=10, lr=0.1):
         self.net.add_module('last', nn.Sequential(
             nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(),
             nn.Linear(arch[-1][-1], num_classes)))
+    if tab.selected('tensorflow'):
+        self.net = tf.keras.models.Sequential(self.b1())
+        for i, b in enumerate(arch):
+            self.net.add(self.block(*b, first_block=(i==0)))
+        self.net.add(tf.keras.models.Sequential([
+            tf.keras.layers.GlobalAvgPool2D(),
+            tf.keras.layers.Dense(units=num_classes)]))
+
 ```
 
 There are 4 convolutional layers in each module (excluding the $1\times 1$ convolutional layer). Together with the first $7\times 7$ convolutional layer and the final fully connected layer, there are 18 layers in total. Therefore, this model is commonly known as ResNet-18.
@@ -273,17 +341,22 @@ Before training ResNet, let's [**observe how the input shape changes across diff
 %%tab all
 class ResNet18(ResNet):
     def __init__(self, num_classes=10, lr=0.1):
-        if tab.selected('mxnet'):
+        if tab.selected(['mxnet', 'tensorflow']):
             super().__init__(((2, 64), (2, 128), (2, 256), (2, 512)),
                            num_classes, lr)
         if tab.selected('pytorch'):
             super().__init__(((2, 64, 64), (2, 64, 128), (2, 128, 256), (2, 256, 512)),
                            num_classes, lr)
-model = ResNet18()
-X = d2l.randn(1, 1, 224, 224)
-for layer in model.net:
-    X = layer(X)
-    print(layer.__class__.__name__,'output shape:\t', X.shape)
+```
+
+```{.python .input}
+%%tab pytorch, mxnet
+ResNet18().layer_summary((1, 1, 224, 224))
+```
+
+```{.python .input}
+%%tab tensorflow
+ResNet18().layer_summary((1, 224, 224, 1))
 ```
 
 ## [**Training**]
@@ -291,11 +364,20 @@ for layer in model.net:
 We train ResNet on the Fashion-MNIST dataset, just like before.
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
 model = ResNet18(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab tensorflow
+trainer = d2l.Trainer(max_epochs=10)
+data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
+with d2l.try_gpu():
+    model = ResNet18(lr=0.05)
+    trainer.fit(model, data)
 ```
 
 ## Summary
