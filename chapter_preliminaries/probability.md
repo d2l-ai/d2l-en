@@ -230,7 +230,7 @@ Consider a random variable $X$ whose value is in the sample space $\mathcal{S} =
 
 By $P(X = a)$, we make a distinction between the random variable $X$ and the values (e.g., $a$) that $X$ can take.
 However, such pedantry results in a cumbersome notation and we omit it unless necessary.
-On one hand, we can just denote $P(X)$ as the *distribution* over the random variable $X$:
+On the one hand, we can just denote $P(X)$ as the *distribution* over the random variable $X$:
 the distribution tells us the probability that $X$ takes any value.
 On the other hand,
 we can simply write $P(a)$ to denote the probability that a random variable takes the value $a$.

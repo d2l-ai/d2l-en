@@ -415,7 +415,7 @@ def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
 
 Now we can label the class and offset for each anchor box. Suppose that an anchor box $A$ is assigned
 a ground-truth bounding box $B$. 
-On one hand,
+On the one hand,
 the class of the anchor box $A$ will be
 labeled as that of $B$.
 On the other hand,
