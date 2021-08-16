@@ -16,7 +16,7 @@ even simple models by today's standards achieve classification accuracy over 95%
 making it unsuitable for distinguishing between stronger models and weaker ones. Even more so, the dataset allows for *very* high levels of accuracy, not typically seen in many classification problems. This skewed algorithmic development towards specific families of algorithms that can take advantage of clean datasets, such as active set methods and boundary-seeking active set algorithms.
 Today, MNIST serves as more of sanity checks than as a benchmark. ImageNet :cite:`deng2009imagenet` poses a much 
 more relevant challenge. Unfortunately, ImageNet is too large for many of the examples and illustrations in this book, as it would take too long to train to make the examples interactive. As a substitute we will focus our discussion in the coming sections on the qualitatively similar, but much smaller Fashion-MNIST
-dataset :cite:`Xiao.Rasul.Vollgraf.2017`, which was released in 2017.
+dataset :cite:`Xiao.Rasul.Vollgraf.2017`, which was released in 2017. It constains images of 10 categories of clothing at 28x28 pixels resolution. 
 
 ```{.python .input}
 %%tab mxnet
@@ -52,9 +52,9 @@ import tensorflow as tf
 d2l.use_svg_display()
 ```
 
-## Reading the Dataset
+## Loading the Dataset
 
-We can [**download and read the Fashion-MNIST dataset into memory via the built-in functions in the framework.**]
+Since it is such a frequently used dataset, all major frameworks provide preprocessed versions of it. We can [**download and load the Fashion-MNIST dataset into memory using built-in framework functions.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -94,10 +94,10 @@ class FashionMNIST(d2l.DataModule):  #@save
 ```
 
 Fashion-MNIST consists of images from 10 categories, each represented
-by 6000 images in the training dataset and by 1000 in the test dataset.
-A *test dataset* (or *test set*) is used for evaluating  model performance and not for training.
+by 6,000 images in the training dataset and by 1,000 in the test dataset.
+A *test dataset* is used for evaluating model performance (it must not be used for training).
 Consequently the training set and the test set
-contain 60000 and 10000 images, respectively.
+contain 60,000 and 10,000 images, respectively.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -111,10 +111,8 @@ data = FashionMNIST(resize=(32,32))
 len(data.train[0]), len(data.val[0])
 ```
 
-The height and width of each input image are both 28 pixels.
-Note that the dataset consists of grayscale images, whose number of channels is 1.
-For brevity, throughout this book
-we store the shape of any image with height $h$ width $w$ pixels as $h \times w$ or ($h$, $w$).
+The images are grayscale and $28 \times 28$ pixels in resolution. This is similar to the original MNIST dataset which consisted of (binary) black and white images. Note, though, that most modern image data which has 3 channels (red, green, blue) and hyperspectral images which can have in excess of 100 channels (the HyMap sensor has 126 channels).
+By convention we store image as a $c \times h \times w$ tensor, where $c$ is the number of color channels, $h$ is the height and $w$ is the width.
 
 ```{.python .input}
 %%tab all
@@ -123,9 +121,8 @@ data.train[0][0].shape
 
 [~~Two utility functions to visualize the dataset~~]
 
-The images in Fashion-MNIST are associated with the following categories:
-t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag, and ankle boot.
-The following function converts between numeric label indices and their names in text.
+The categories of Fashion-MNIST have human-understandable names. 
+The following convenience function converts between numeric labels and their names.
 
 ```{.python .input}
 %%tab all
@@ -142,7 +139,7 @@ def text_labels(self, indices):
 To make our life easier when reading from the training and test sets,
 we use the built-in data iterator rather than creating one from scratch.
 Recall that at each iteration, a data iterator
-[**reads a minibatch of data with size `batch_size` each time.**]
+[**reads a minibatch of data with size `batch_size`.**]
 We also randomly shuffle the examples for the training data iterator.
 
 ```{.python .input}
@@ -176,13 +173,15 @@ def get_dataloader(self, train):
         self.batch_size).map(resize_fn).shuffle(shuffle_buf)
 ```
 
+To see how this works, let's load a minibatch of images by invoking the newly-added `train_dataloader` method. It contains 64 images. 
+
 ```{.python .input}
 %%tab all
 X, y = next(iter(data.train_dataloader()))
 print(X.shape, X.dtype, y.shape, y.dtype)
 ```
 
-Let's look at the time it takes to read the training data.
+Let's look at the time it takes to read the images. Even though it's a built-in loader, it isn't blazingly fast. Nonetheless, this is sufficient since processing images with a deep network takes quite a bit longer. Hence it's good enough that training a network won't be IO constrained. 
 
 ```{.python .input}
 %%tab all
@@ -192,9 +191,9 @@ for X, y in data.train_dataloader():
 f'{time.time() - tic:.2f} sec'
 ```
 
-## Visualize
+## Visualization
 
-We can now create a function to visualize these examples.
+We'll be using the Fashion MNIST dataset quite frequently. A convenience function `show_images` can be used to visualize the images and the associated labels. Details of its implementation are deferred to the appendix. 
 
 ```{.python .input}
 %%tab all
@@ -203,7 +202,8 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     raise NotImplementedError
 ```
 
-Here are [**the images and their corresponding labels**] (in text)
+Let's put it to good use. In general, it is a good idea to visualize and inspect data that you're training on. 
+Humans are very good at spotting unusual aspects and as such, visualization serves as an additional safeguard against mistakes and errors in the design of experiments. Here are [**the images and their corresponding labels**] (in text)
 for the first few examples in the training dataset.
 
 ```{.python .input}
@@ -226,15 +226,15 @@ We are now ready to work with the Fashion-MNIST dataset in the sections that fol
 
 ## Summary
 
-* Fashion-MNIST is an apparel classification dataset consisting of images representing 10 categories. We will use this dataset in subsequent sections and chapters to evaluate various classification algorithms.
-* We store the shape of any image with height $h$ width $w$ pixels as $h \times w$ or ($h$, $w$).
-* Data iterators are a key component for efficient performance. Rely on well-implemented data iterators that exploit high-performance computing to avoid slowing down your training loop.
+We now have a slightly more realistic dataset to use for classification. Fashion-MNIST is an apparel classification dataset consisting of images representing 10 categories. We will use this dataset in subsequent sections and chapters to evaluate various network designs, from a simple linear model to advanced residual networks. As we commonly do with images, we read them as a tensor of size (minibatch, channels, height, width) dimensions. For now, we only have one channel as the images are grayscale (the visualization above use a false color palette for improved visibility). 
+
+Lastly, data iterators are a key component for efficient performance. For instance, we might use GPUs for efficient image decompression, video transcoding or other preprocessing. Whenever possible, you should rely on well-implemented data iterators that exploit high-performance computing to avoid slowing down your training loop.
 
 
 ## Exercises
 
 1. Does reducing the `batch_size` (for instance, to 1) affect the reading performance?
-1. The data iterator performance is important. Do you think the current implementation is fast enough? Explore various options to improve it.
+1. The data iterator performance is important. Do you think the current implementation is fast enough? Explore various options to improve it. Use a system profiler to find out where the bottlenecks are.
 1. Check out the framework's online API documentation. Which other datasets are available?
 
 :begin_tab:`mxnet`
@@ -248,3 +248,7 @@ We are now ready to work with the Fashion-MNIST dataset in the sections that fol
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/224)
 :end_tab:
+
+```{.python .input}
+
+```
