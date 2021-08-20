@@ -163,6 +163,7 @@ let's import a few packages.
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.numpy.random import multinomial
+import random
 npx.set_np()
 ```
 
@@ -170,7 +171,8 @@ npx.set_np()
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
-import torch, random, numpy as np
+import random
+import torch
 from torch.distributions.multinomial import Multinomial
 ```
 
@@ -178,7 +180,8 @@ from torch.distributions.multinomial import Multinomial
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
-import tensorflow as tf, random, numpy as np
+import random
+import tensorflow as tf
 from tensorflow_probability import distributions as tfd
 ```
 
