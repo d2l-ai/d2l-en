@@ -411,7 +411,7 @@ but $\mathcal{B}$ did.
 
 
 A *probability* function maps events 
-onto real values ${P: A \subseteq S \rightarrow [0,1]$,
+onto real values ${P: \mathcal{A} \subseteq \mathcal{S} \rightarrow [0,1]}$,
 The probability of an event $\mathcal{A}$ 
 in the given sample space $\mathcal{S}$,
 denoted $P(\mathcal{A})$,
@@ -425,14 +425,14 @@ These axioms of probability theory,
 proposed by :cite:`kolmogorov1933sulla`,
 can be applied to rapidly derive a number of important consequences.
 For instance, it follows immediately
-that the probability of any event $A$
-*or* its complement $A'$ occurring is 1 
-(because $A \cup A' = S$).
+that the probability of any event $\mathcal{A}$
+*or* its complement $\mathcal{A}'$ occurring is 1 
+(because $\mathcal{A} \cup \mathcal{A}' = \mathcal{S}$).
 We can also prove that $P(\emptyset) = 0$
-because $1 = P(S \cup S') = P(S \cup \emptyset) = P(S) + P(\emptyset) = 1 = P(\emptyset)$.
-Consequently, the probability of any event $A$
-*and* its complement $A'$ occurring simultaneously 
-is $P(A \cap A') = 0$.
+because $1 = P(\mathcal{S} \cup \mathcal{S}') = P(\mathcal{S} \cup \emptyset) = P(\mathcal{S}) + P(\emptyset) = 1 = P(\emptyset)$.
+Consequently, the probability of any event $\mathcal{A}$
+*and* its complement $\mathcal{A}'$ occurring simultaneously 
+is $P(\mathcal{A} \cap \mathcal{A}') = 0$.
 Informally, this tells us that impossible events
 have zero probability of occurring. 
  
