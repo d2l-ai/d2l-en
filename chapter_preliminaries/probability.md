@@ -1,45 +1,164 @@
-# Probability
+# Probability and Statistics Primer
 :label:`sec_prob`
 
-In some form or another, machine learning is all about making predictions.
-We might want to predict the *probability* of a patient suffering a heart attack in the next year, given their clinical history. In anomaly detection, we might want to assess how *likely* a set of readings from an airplane's jet engine would be, were it operating normally. In reinforcement learning, we want an agent to act intelligently in an environment. This means we need to think about the probability of getting a high reward under each of the available actions. And when we build recommender systems we also need to think about probability. For example, say *hypothetically* that we worked for a large online bookseller. We might want to estimate the probability that a particular user would buy a particular book. For this we need to use the language of probability.
-Entire courses, majors, theses, careers, and even departments, are devoted to probability. So naturally, our goal in this section is not to teach the whole subject. Instead we hope to get you off the ground, to teach you just enough that you can start building your first deep learning models, and to give you enough of a flavor for the subject that you can begin to explore it on your own if you wish.
+One way or another, 
+machine learning is all about uncertainty.
+In supervised learning, we want to predict 
+something *unknown* (the *target*)
+given something *known* (the *features*). 
+Depending on our objective, 
+we might attempt to predict 
+the most *likely* value of the target.
+Or we might predict the value with the smallest
+*expected* distance from the target.
+An sometimes we wish not only
+to predict a specific value
+but to *quantify our uncertainty*.
+For example, given some features 
+describing a patient,
+we might want to know *how likely* they are
+to suffer a heart attack in the next year. 
+In unsupervised learning, 
+we often care about uncertainty. 
+To determine whether a set of measurements are anomalous,
+it helps to know how likely one is 
+to observe values in a population of interest.
+Moreover, in reinforcement learning, 
+we wish to develop agents
+that act intelligently in various environments.
+This requires reasoning about 
+how an environment might be expected to change
+and what rewards one might expect to encounter
+in response to each of the available actions. 
 
-We have already invoked probabilities in previous sections without articulating what precisely they are or giving a concrete example. Let's get more serious now by considering the first case: distinguishing cats and dogs based on photographs. This might sound simple but it is actually a formidable challenge. To start with, the difficulty of the problem may depend on the resolution of the image.
+*Probability* is the mathematical field
+concerned with reasoning under uncertainty.
+Given a probabilistic model of some process, 
+we can reason about the likelihood of various events.
+The use of probabilities to describe 
+the frequencies of repeatable events 
+(like coin tosses)
+is fairly uncontroversial. 
+In fact, *frequentist* scholars adhere 
+to an interpretation of probability
+that applies *only* to such repeatable events.
+By contrast *Bayesian* scholars 
+use the language of probability more broadly 
+to formalize our reasoning under uncertainty.
+Bayesian probability is characterized 
+by two unique features:
+(i) assigning degrees of belief 
+to non-repeatable events;
+e.g., what is the *probability* 
+that the moon is made out of cheese?;
+and (ii) subjectivity---while Bayesian
+probability provides unambiguous rules
+for how one should update their beliefs 
+in light of new evidence,
+it allows for different individuals 
+to start off with different *prior* beliefs.
+*Statistics* helps us to reason backwards,
+starting off with collection and organization of data
+and backing out to what inferences 
+we might draw about the process 
+that generated the data.
+Whenever we analyze a dataset, hunting for patterns
+that we hope might characterize a broader population,
+we are employing statistical thinking.
+Entire courses, majors, theses, careers, departments,
+companies, and institutions have been devoted 
+to the study of probability and statistics. 
+While section only scratches the surface,
+we will provide the foundation
+that you need to begin building models.
 
-![Images of varying resolutions ($10 \times 10$, $20 \times 20$, $40 \times 40$, $80 \times 80$, and $160 \times 160$ pixels).](../img/cat-dog-pixels.png)
-:width:`300px`
-:label:`fig_cat_dog`
 
-As shown in :numref:`fig_cat_dog`,
-while it is easy for humans to recognize cats and dogs at the resolution of $160 \times 160$ pixels,
-it becomes challenging at $40 \times 40$ pixels and next to impossible at $10 \times 10$ pixels. In
-other words, our ability to tell cats and dogs apart at a large distance (and thus low resolution) might approach uninformed guessing. Probability gives us a
-formal way of reasoning about our level of certainty.
-If we are completely sure
-that the image depicts a cat, we say that the *probability* that the corresponding label $y$ is "cat", denoted $P(y=$ "cat"$)$ equals $1$.
-If we had no evidence to suggest that $y =$ "cat" or that $y =$ "dog", then we might say that the two possibilities were equally
-*likely* expressing this as $P(y=$ "cat"$) = P(y=$ "dog"$) = 0.5$. If we were reasonably
-confident, but not sure that the image depicted a cat, we might assign a
-probability $0.5  < P(y=$ "cat"$) < 1$.
 
-Now consider the second case: given some weather monitoring data, we want to predict the probability that it will rain in Taipei tomorrow. If it is summertime, the rain might come with probability 0.5.
+## A Simple Example: Tossing Coins
 
-In both cases, we have some value of interest. And in both cases we are uncertain about the outcome.
-But there is a key difference between the two cases. In this first case, the image is in fact either a dog or a cat, and we just do not know which. In the second case, the outcome may actually be a random event, if you believe in such things (and most physicists do). So probability is a flexible language for reasoning about our level of certainty, and it can be applied effectively in a broad set of contexts.
+Imagine that we plan to toss a coin
+and want to quantify how likely
+we are to see heads (vs tails).
+If the coin is *fair*, 
+then both outcomes 
+(heads and tails), 
+are equally likely.
+Moreover if we plan to toss the coin $n$ times
+then the fraction of heads 
+that we *expect* to see
+should exactly match
+the *expected* fraction of tails.
+One intuitive way to see this
+is by symmetry:
+for every possible outcome
+with $n_h$ heads and $n_t = (n - n_h)$ tails,
+there is an equally likely outcome
+with $n_t$ heads and $n_h$ tails.
+Note that this is only possible 
+if on average we expect to see
+$1/2$ of tosses come up heads 
+and $1/2$ come up tails.
+Of course, if you conduct this experiment 
+many times with $n=1000000$ tosses each,
+you might never see a trial
+where $n_h = n_t$ exactly.
 
-## Basics
 
-Say that we cast a die and want to know what the chance is of seeing a 1 rather than another digit. If the die is fair, all the six outcomes $\{1, \ldots, 6\}$ are equally likely to occur, and thus we would see a $1$ in one out of six cases. Formally we state that $1$ occurs with probability $\frac{1}{6}$.
+Formally, the quantity *1/2* is called a *probability*
+and here it captures the certainty with which 
+any given toss will come up heads.
+Probabilities assign scores between $0$ and $1$
+to outcomes of interest, called *events*.
+Here the event of interest is $\textrm{heads}$
+and we denote the corresponding probability $P(\textrm{heads})$.
+A probability of *1* indicates absolute certainty 
+(imagine a trick coin where both sides were heads)
+and a probability of $0$ indicates impossibility
+(e.g., if both sides were tails). 
+The frequencies $n_h/n$ and $n_h/t$ are not probabilities
+but rather *statistics*.
+Probabilities are *theoretical* quantities 
+that underly the data generating process.
+Here, the probability $1/2$ 
+is a property of the coin itself.
+By contrast, statistics are *empirical* quantities
+that are computed as functions of the observed data.
+Our interests in probabilistic and statistical quantities
+are intextricably intertwined.
+We often design special statistics called *estimators*
+that, given a dataset, produce *estimates* 
+of model parameters like probabilities.
+Moreover, when those estimators satisfy 
+a nice property called *consistency*,
+our estimates will converge 
+to the corresponding probability.
+In turn, these inferred probabilities
+tell about the likely statistical properties
+of data from the same population
+that we might encounter in the future.
 
-For a real die that we receive from a factory, we might not know those proportions and we would need to check whether it is tainted. The only way to investigate the die is by casting it many times and recording the outcomes. For each cast of the die, we will observe a value in $\{1, \ldots, 6\}$. Given these outcomes, we want to investigate the probability of observing each outcome.
+Suppose that we stumbled upon a real coin
+for which we did not know 
+the true $P(\textrm{heads})$.
+To investigate this quantity 
+with statistical methods,
+we need to (i) collect some data;
+and (ii) design an estimator.
+Data acquisition here is easy;
+we can toss the coin many times
+and record all of the outcomes.
+Formally, drawing realizations 
+from some underlying random process 
+is called *sampling*.
+As you might have guessed, 
+one natural estimator 
+is the fraction between
+the number of observed *heads*
+by the total number of tosses.
+Before simulating this study
+let's import a few packages.
 
-One natural approach for each value is to take the
-individual count for that value and to divide it by the total number of tosses.
-This gives us an *estimate* of the probability of a given *event*. The *law of
-large numbers* tell us that as the number of tosses grows this estimate will draw closer and closer to the true underlying probability. Before going into the details of what is going here, let's try it out. As always, we start by importing the necessary packages.
-
-```{.python .input}
+```{.python .input  n=28}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -47,119 +166,175 @@ from mxnet.numpy.random import multinomial
 npx.set_np()
 ```
 
-```{.python .input  n=10}
+```{.python .input  n=35}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
-import torch
+import torch, random, numpy as np
 from torch.distributions.multinomial import Multinomial
-import numpy as np
-```
-
-```{.python .input}
-#@tab tensorflow
-%matplotlib inline
-from d2l import tensorflow as d2l
-import tensorflow as tf
-from tensorflow_probability import distributions as tfd
-import numpy as np
-```
-
-Next, we want to be able to cast the die. In statistics we call this process
-of drawing examples from probability distributions *sampling*.
-The distribution
-that assigns probabilities to a number of discrete choices is called the
-*multinomial distribution*. We will give a more formal definition of
-*distribution* later, but at a high level, think of it as just an assignment of
-probabilities to events.
-
-To draw a single sample, we simply supply it with a vector of probabilities.
-The output is another vector of the same length:
-its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
-
-```{.python .input}
-fair_probs = [1.0 / 6] * 6
-multinomial(1, fair_probs)
-```
-
-```{.python .input  n=2}
-#@tab pytorch
-fair_probs = torch.ones([6]) / 6
-Multinomial(1, fair_probs).sample()
-```
-
-```{.python .input}
-#@tab tensorflow
-fair_probs = tf.ones(6) / 6
-tfd.Multinomial(1, fair_probs).sample()
-```
-
-Each time you run the sampler you will receive a new random value that will likely
-differ from the previous one. To assess the fairness of the die, we often need to
-draw many samples from the same distribution. The code below draws 10 samples and 
-tallies up the counts.
-
-```{.python .input}
-multinomial(10, fair_probs)
 ```
 
 ```{.python .input  n=3}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf, random, numpy as np
+from tensorflow_probability import distributions as tfd
+```
+
+Now, suppose that the coin was in fact fair,
+i.e., $P(\textrm{heads}) = .5$.
+To simulate tosses of a fair coin,
+we can invoke any random number generator.
+Some easy ways to draw samples 
+of an event with probability $.5$.
+For example Python's `random.random`
+yields numbers in the interval $[0,1]$
+where the probability of lying 
+in any sub-interval $[a, b] \subset [0,1]$
+is equal to $b-a$.
+Thus we can get out `0` and `1` with probability `.5` each
+by testing whether the returned float is greater than `.5`
+
+```{.python .input  n=36}
+num_tosses = 100
+heads = sum([random.random() > .5 for _ in range(100)])
+tails = num_tosses - heads
+print("heads, tails: ", [heads, tails])
+```
+
+More generally, we can simulate multiple draws 
+from any variable with a finite number 
+of possible outcomes
+(like the toss of a coin or roll of a die)
+by calling the multinomial function, 
+setting the first argument 
+to the number of draws
+and the second as a list of probabilities
+associated with each of the possible outcomes.
+To simulate ten tosses of a fair coin, 
+we assign probability vector `[.5,.5]`,
+interpreting index `0` as heads
+and index `1` as tails.
+The function returns a vector 
+with length equal to the number 
+of possible outcomes (here, `2`),
+where the first component tells us 
+the number of occurences of heads
+and the second component tells us 
+the number of occurences of tails.
+
+```{.python .input}
+fair_probs = [.5, .5] 
+multinomial(100, fair_probs)
+```
+
+```{.python .input  n=37}
 #@tab pytorch
-Multinomial(10, fair_probs).sample()
+fair_probs = torch.tensor([.5, .5])
+Multinomial(100, fair_probs).sample()
 ```
 
 ```{.python .input}
 #@tab tensorflow
-tfd.Multinomial(10, fair_probs).sample()
+fair_probs = tf.ones(2) / 2
+tfd.Multinomial(100, fair_probs).sample()
 ```
 
-Even though we drew the samples from a fair dice, the numbers don't look particularly even
-at all. This is due to the fact that we only drew a small number of samples. Let's see what
-happens when we draw 1000 rolls. For better intuition we calculate the relative frequency (count/total count) as the estimate of the true probability.
+Each time you run this sampling process,
+you will receive a new random value 
+that may differ from the previous outcome. 
+Dividing by the number of tosses
+gives us the *frequency* 
+of each outcome in our data.
+note that these frequencies,
+like the probabilities 
+that they are intended 
+to estimate sum to $1$.
 
 ```{.python .input}
-counts = multinomial(1000, fair_probs).astype(np.float32)
-counts / 1000
+multinomial(100, fair_probs) / 100
 ```
 
-```{.python .input  n=4}
+```{.python .input  n=38}
 #@tab pytorch
-counts = Multinomial(1000, fair_probs).sample()
-counts / 1000  # Relative frequency as the estimate
+Multinomial(100, fair_probs).sample() / 100
 ```
 
 ```{.python .input}
 #@tab tensorflow
-counts = tfd.Multinomial(1000, fair_probs).sample()
-counts / 1000
+tfd.Multinomial(100, fair_probs).sample() / 100
 ```
 
-Because we generated the data from a fair die, we know that each outcome has true probability $\frac{1}{6} \approx 0.167$. In this light the above estimates look quite reasonable. Let's get some more intuition as to what the typical behavior is by studying the curve as a function of sample size.
+Here, even though our simulated coin is fair 
+(we set the probabilities `[.5,.5]` ourselves),
+the counts of heads and tails are not identical.
+That's because we only drew a finite number of samples.
+If we didn't implement the simulation ourselves,
+and only saw the outcome, 
+how would we know if the coin were slightly unfair
+or if the deviation from $1/2$ was 
+just an artifact of the small sample size?
+Let's see what happens when we simulate `10000` tosses.
 
 ```{.python .input}
-counts = multinomial(1, fair_probs, size=5000)
+counts = multinomial(10000, fair_probs).astype(np.float32)
+counts / 10000
+```
+
+```{.python .input  n=39}
+#@tab pytorch
+counts = Multinomial(10000, fair_probs).sample()
+counts / 10000  # Relative frequency as the estimate
+```
+
+```{.python .input}
+#@tab tensorflow
+counts = tfd.Multinomial(10000, fair_probs).sample()
+counts / 10000
+```
+
+While these estimates are still slightly off,
+they are much closer to the underlying probabilities.
+In general, for averages of repeated events (like coin tosses),
+as the number of repetitions grows, 
+our estimates are guaranteed to converge
+to the true underlying probabilities. 
+The mathematical proof of this phenomenon
+is called the *law of large numbers*
+and the Central Limit Theorem
+tell us that in many situations,
+as the sample size $n$ grows,
+these errors should go down 
+at a rate of $(1/\sqrt{n})$.
+Let's get some more intuition by studying 
+how our estimate evolves as we grow
+the number of tosses from `1` to `10000`.
+
+```{.python .input}
+counts = multinomial(1, fair_probs, size=10000)
 cum_counts = counts.astype(np.float32).cumsum(axis=0)
 estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 
 d2l.set_figsize((6, 4.5))
-for i in range(6):
-    d2l.plt.plot(estimates[:, i], label=("P(die=" + str(i + 1) + ")"))
+d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
+d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
 d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Samples')
 d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
 ```
 
-```{.python .input  n=13}
+```{.python .input  n=43}
 #@tab pytorch
-counts = Multinomial(1, fair_probs).sample((5000,))
+counts = Multinomial(1, fair_probs).sample((10000,))
 cum_counts = counts.cumsum(dim=0)
 estimates = cum_counts / cum_counts.sum(dim=1, keepdims=True)
 estimates = estimates.numpy()
 
 d2l.set_figsize((6, 4.5))
-for i in range(6):
-    d2l.plt.plot(estimates[:, i], label=("P(die=" + str(i + 1) + ")"))
+d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
+d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
 d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Samples')
 d2l.plt.gca().set_ylabel('Estimated probability')
@@ -168,137 +343,412 @@ d2l.plt.legend();
 
 ```{.python .input  n=7}
 #@tab tensorflow
-counts = tfd.Multinomial(1, fair_probs).sample(5000)
+counts = tfd.Multinomial(1, fair_probs).sample(10000)
 cum_counts = tf.cumsum(counts, axis=0)
 estimates = cum_counts / tf.reduce_sum(cum_counts, axis=1, keepdims=True)
 estimates = estimates.numpy()
 
 d2l.set_figsize((6, 4.5))
-for i in range(6):
-    d2l.plt.plot(estimates[:, i], label=("P(die=" + str(i + 1) + ")"))
+d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
+d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
 d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Samples')
 d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
 ```
 
-Each solid curve corresponds to one of the six values of the die and gives our estimated probability that the die turns up that value as assessed after each group of experiments.
+Each solid curve corresponds to one of the two values of the coin 
+and gives our estimated probability that the coin turns up that value 
+after each group of experiments.
 The dashed black line gives the true underlying probability.
-As we get more data by conducting more experiments, the $6$ solid curves converge towards the true probability, but how quickly does this happen? The Central Limit Theorem suggests that this occurs at the rate of $1/\sqrt{n}$, i.e., the deviation between truth and estimate decreases by a fixed multiple of $1/\sqrt{n}$, where $n$ is the number of samples that we've drawn. For a more detailed discussion, see e.g. :cite:`wasserman2013all`. Let's try this out in practice, using the random samples we drew before. We plot the deviation from $\frac{1}{6}$ and scale it by $\sqrt{n}$. If our theory is correct, we should see straight lines.
+As we get more data by conducting more experiments, 
+the curves converge towards the true probability.
+You might already begin to see the shape 
+of some of the more advanced questions
+that preoccupy statisticians:
+How quickly does this convergence happen?
+If we had already tested many coins
+manufactured at the same plant, 
+how might we incorporate this information?
 
-```{.python .input  n=14}
-deviation = (estimates - (1/6.0)) * (np.arange(1,5001)**0.5).reshape((5000,1))
-d2l.set_figsize((6, 4.5))
-for i in range(6):
-    d2l.plt.plot(deviation[:, i], label=(str(i + 1)))
-d2l.plt.axhline(y=0, color='black', linestyle='dashed')
-d2l.plt.gca().set_xlabel('Samples')
-d2l.plt.gca().set_ylabel('Scaled deviation')
-d2l.plt.legend();
-```
+##  A More Formal Treatment
 
-While the lines aren't quite straight, they are very much of bounded range, even acros a large number of samples. Going into more details is significantly beyond the scope of this book but it should give you an intuition of both the power of statistical tools (the range kind-of works) and also their limitation (each individual curve doesn't look too straight at all). 
+We've already gotten pretty far: posing 
+a probabilistic model,
+generating synthetic data,
+running a statistical estimator,
+empirically assessing convergence,
+and reporting error metrics. 
+However, to go much further,
+we will need to be more precise.
 
-##  Axioms and Tools
 
-Statisticans have their own formal tools and language to refer to random events. Since much of machine learning is about such events we need to understand at least the basics. The definitions below will allow us to be more precise about what we mean by a sample, an event, a distribution or a density. 
+When dealing with randomness, 
+we denote the set of possible outcomes $S$
+and call it the *sample space* or *outcome space*.
+Here, each element is a distinct possible *outcome*.
+In the case of rolling a single coin,
+$\mathcal{S} = \{\mathrm{heads}, \mathrm{tails}\}$.
+For a single die, $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$.
+When flipping two coins, we have four possible outcomes:
+$\{\mathrm{(heads, heads), (heads, tails), (tails, heads), and (tails, tails)}\}$.
+*Events* are subsets of the sample space.
+For instance, the event "the first coin toss comes up heads"
+corresponds to the set $\{\mathrm{(heads, heads), (heads, tails)}\}$.
+Whenever the outcome $z$ of a random experiment satisfies
+$z \in \mathcal{A}$, then event $\mathcal{A}$ has occurred.
+For a single roll of a die, we could define the events 
+"seeing a $5$" ($\mathcal{A} = \{5\}$) 
+and "seeing an odd number"  ($\mathcal{B} = \{1, 3, 5\}$).
+In this case, if the die came up `5`,
+we would say that both $A$ and $B$ occurred.
+On the other hand, if $z = 3$, 
+then $\mathcal{A}$ did not occur 
+but $\mathcal{B}$ did.
 
-###  Probability
 
-When dealing with the rolls of a die,
-we call the set $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$ the *sample space* or *outcome space*, where each element is an *outcome*.
-An *event* is a set of outcomes from a given sample space.
-For instance, "seeing a $5$" ($\mathcal{A} = \{5\}$) and "seeing an odd number" ($\mathcal{B} = \{1, 3, 5\}$) are both valid events of rolling a die. 
-Note that if the outcome $z$ of a random experiment satisfies $z \in \mathcal{A}$,
-then event $\mathcal{A}$ has occurred.
-That is to say, if $z = 3$, then $\mathcal{A}$ did not occur but $\mathcal{B}$ occurred, since $z$ is odd but not $5$. 
+A *probability* function maps events 
+onto real values ${P: A \subseteq S \rightarrow [0,1]$,
+The probability of an event $\mathcal{A}$ 
+in the given sample space $\mathcal{S}$,
+denoted $P(\mathcal{A})$,
+satisfies the following properties:
 
-Formally, *probability* can be thought of as a function that maps a set to a real value.
-The probability of an event $\mathcal{A}$ in the given sample space $\mathcal{S}$,
-denoted by $P(\mathcal{A})$, satisfies the following properties:
-
-* For any event $\mathcal{A}$, its probability is never negative, i.e., $P(\mathcal{A}) \geq 0$;
+* The probability of any event $\mathcal{A}$ is a non-negative real number, i.e., $P(\mathcal{A}) \geq 0$;
 * The probability of the entire sample space is $1$, i.e., $P(\mathcal{S}) = 1$;
-* For any countable sequence of events $\mathcal{A}_1, \mathcal{A}_2, \ldots$ that are *mutually exclusive* ($\mathcal{A}_i \cap \mathcal{A}_j = \emptyset$ for all $i \neq j$), the probability that any one of them happens equals the sum of their individual probabilities, i.e., $P(\bigcup_{i=1}^{\infty} \mathcal{A}_i) = \sum_{i=1}^{\infty} P(\mathcal{A}_i)$.
+* For any countable sequence of events $\mathcal{A}_1, \mathcal{A}_2, \ldots$ that are *mutually exclusive* ($\mathcal{A}_i \cap \mathcal{A}_j = \emptyset$ for all $i \neq j$), the probability that any of them happens is equal to the sum of their individual probabilities, i.e., $P(\bigcup_{i=1}^{\infty} \mathcal{A}_i) = \sum_{i=1}^{\infty} P(\mathcal{A}_i)$.
 
-:cite:`kolmogorov1933sulla` proposed the above as the three axioms of probability theory. They are quite useful. For instance, let $\mathcal{A}$ be the entire sample space and let $\mathcal{A}' = \emptyset$. Then it follows immediately from $1 \geq P(\mathcal{A}) + P(\mathcal{A}')$ that $P(\emptyset) = 0$. In plain English---impossible events have zero probability of occurring. 
+These axioms of probability theory,
+proposed by :cite:`kolmogorov1933sulla`,
+can be applied to rapidly derive a number of important consequences.
+For instance, it follows immediately
+that the probability of any event $A$
+*or* its complement $A'$ occurring is 1 
+(because $A \cup A' = S$).
+We can also prove that $P(\emptyset) = 0$
+because $1 = P(S \cup S') = P(S \cup \emptyset) = P(S) + P(\emptyset) = 1 = P(\emptyset)$.
+Consequently, the probability of any event $A$
+*and* its complement $A'$ occurring simultaneously 
+is $P(A \cap A') = 0$.
+Informally, this tells us that impossible events
+have zero probability of occurring. 
+ 
+
 
 ### Random Variables
 
-In our experiment of casting a die, we introduced the notion of a *random variable*. A random variable can be pretty much any quantity. It can take on a value among a set of (possibly many) possibilities.
-Consider a random variable $X$ whose value is in the sample space $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$ of rolling a die. We can denote the event "seeing a $5$" as $\mathcal{A} := \{X = 5\}$ or $X = 5$, and its probability as $P(\{X = 5\})$ or $P(X = 5)$.
+When we spoke about events like the roll of a die
+coming up odds or the first coin toss coming up heads,
+we were invoking the idea of a *random variable*.
+Formally, random variables are mappings
+from an underlying sample space 
+to a set of (possibly many) values.
+You might wonder how a random variable 
+is different from the sample space,
+since both are collections of outcomes. 
+Importantly, random variables can be much coarser 
+than the raw sample space.
+We can define a binary random variable like "greater than .5"
+even when the underlying sample space is infinite,
+e.g., the line segment between $0$ and $1$.
+Additionally, multiple random variables
+can share the same underlying sample space.
+For example "whether my home alarm goes off"
+and "whether my house was burglarized"
+are both binary random variables 
+that we share an underlying sample space. 
+Consequently, knowing the value taken by one random variable 
+can tell us something about the likely value of another random variable.
+Knowing that the alarm went off, 
+we might suspect that the house was likely burglarized.
 
-By $P(X = a)$, we make a distinction between the random variable $X$ and the values (e.g., $a$) that $X$ can take.
-However, such pedantry results in a cumbersome notation and we omit it unless necessary.
-On one hand, we can just denote $P(X)$ as the *distribution* over the random variable $X$:
-the distribution tells us the probability that $X$ takes any value.
-On the other hand,
-we can simply write $P(a)$ to denote the probability that a random variable takes the value $a$.
-Since an event in probability theory is a set of outcomes from the sample space,
-we can specify a range of values for a random variable to take.
-For example, $P(1 \leq X \leq 3)$ denotes the probability of the event $\{1 \leq X \leq 3\}$.
-By definition it is also the probability that the random variable $X$ can take a value from $\{1, 2, 3\}$.
 
-Note that there is a subtle difference between *discrete* random variables, like the sides of a die, and *continuous* ones, like the weight and the height of a person. There is little point in asking whether two people have *exactly* the same height. If we take precise enough measurements you will find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no point in asking about the probability
-that someone is 1.801392782910287192 meters tall. Given the world population of 8 billion humans the probability is virtually 0. It makes more sense in this case to ask whether someone's height falls into a given interval, say between 1.79 and 1.81 meters. In these cases we quantify the likelihood that we see a value as a *density*. The height of exactly 1.80 meters has no probability, but nonzero density. In fact, the probability is then given by the *integral* over the density in the interval of $[1.79, 1.81]$ meters. 
-For more details on continuous random variables see :numref:`sec_random_variables`. 
+Every value taken by a random variable corresponds 
+to a subset of the underlying sample space.
+Thus the occurrence where the random variable $X$
+takes value $v$, denoted by $X=v$, is an *event*
+and $P(X=v)$ denotes its probability.
+Sometimes this notation can get clunky,
+and we can abuse notation when the context is clear.
+For example, we might use *P(X)* to refer broadly
+to the *distribution* of X, i.e., 
+the function that tells us the probability
+that $X$ takes any given value. 
+Other times we write expressions 
+like $P(X,Y) = P(X) P(Y)$,
+as a shorthand to express a statement 
+that is true for all of the values
+that the random variables X and Y can take, i.e.,
+for all $i,j$ $P(X=i \textrm{ and } Y=j) = P(X=i)P(Y=j)$.
+Other times, we abuse notation by writing
+$P(v)$ when the random variable is clear from the context. 
+Just as the values taken by random variables
+correspond to subsets of the samples space,
+and thus are events, 
+coarser groupings of these values 
+are, in turn, unions of the corresponding 
+subsets and thus are also events. 
+For example, $P(X \in [1, 3])$ denotes the probability of the event $\{1 \leq X \leq 3\}$.
+
+
+Note that there is a subtle difference 
+between *discrete*-valued random variables,
+like flips of a coin or tosses of a die, 
+and *continuous*-valued ones,
+like the weight and the height of a person
+sampled at random from the population.
+In this case we seldom really care about 
+someone's exact height. 
+Moreover, if we took precise enough measurements,
+we would find that no two people on the planet 
+have the exact same height. 
+In fact, with fine enough measurements, 
+you would never have the same height 
+when you wake up and when you go to sleep. 
+There's little point in asking about 
+the exact probability that someone 
+is 1.801392782910287192 meters tall. 
+Instead, we typically care more about being able to say
+whether someone's height falls into a given interval, 
+say between 1.79 and 1.81 meters. 
+In these cases we work with probability *densities*. 
+The height of exactly 1.80 meters 
+has no probability, but nonzero density. 
+To get out the probability assigned to an interval,
+we must take an *integral* of the density 
+over that interval. 
+For more details on continuous random variables,
+see :numref:`sec_random_variables`. 
+
+
 
 ## Multiple Random Variables
 
-Frequently we will want to consider more than one random variable at a time.
-For instance, we may want to model the relationship between diseases and symptoms. Given diseases, say (flu, COVID-19) and symptoms, say (cough, sneezing, fever), combinations of the two such as (flu, fever) may or may not occur in a patient. Our goal might be to estimate their relationships for better medical care. 
+You might have noticed that we couldn't eve
+make it past the last section without
+making statements involving interactions 
+among multiple random variables
+(recall $P(X,Y) = P(X) P(Y)$).
+Most of machine learning 
+is concerned with such relationships.
+Here, the sample space would be 
+the population of interest,
+say customers who transact with a business,
+photographs on the internet,
+or proteins known to biologists.
+Each random variable would represent 
+the (unknown) value of a different attribute. 
+Whenever we sample an individual from the population,
+we observe a realization of each of the random variables.
+Because the values taken by random variables 
+correspond to subsets of the sample space 
+that could be overlapping, partially overlapping, 
+or entirely disjoint,
+knowing the value taken by one random variable
+can cause us to update our beliefs 
+about what values of another random variable are likely.
 
-As a more complicated example, images contain millions of pixels, thus millions of random variables. And in many cases images will come with a
-label, identifying objects in the image. We can also think of the label as another
-random variable. We can even think of all the metadata such as location, time, aperture, focal length, ISO, focus distance, and camera type as random variables.
-All of these are random variables that occur jointly. When we deal with multiple random variables, there are several quantities of interest.
+If a patient walks into a hospital 
+and we observe that they 
+are having trouble breathing
+and have lost their sense of smell,
+then we believe that they are more likely
+to have COVID than we might 
+if they had no trouble breathing
+and a perfectly ordinary sense of smell.
 
-Given values $a$ and $b$, we may ask what the *joint probability* is that both values occur simultaneously, i.e. $P(A = a, B = b)$. This lets us determine, for instance whether $a$ implies $b$ or vice versa or whether they are related at all. Note that for any values $a$ and $b$ we have that $P(A=a, B=b) \leq P(A=a)$ and $P(A=a, B=b) \leq P(B = b)$. 
-This has to be the case, since for $A=a$ and $B=b$ to happen, $A=a$ has to happen *and* $B=b$ also has to happen. Thus, the intersection of $\{A=a\}$ and $\{B=b\}$ cannot be more likely than $\{A=a\}$ or $\{B=b\}$ individually.
 
-Due to the above inequality we know that $0 \leq \frac{P(A=a, B=b)}{P(A=a)} \leq 1$. We call this ratio the *conditional probability* and denote it by $P(B=b|A=a)$: it is the probability of $B=b$, provided that
-$A=a$ holds. Conditional probabilities behave just like unconditional ones, as long as we leave the conditioning unchanged. For instance, for disjoint events $\mathcal{B}$ and $\mathcal{B}'$ we have that 
-$P(\mathcal{B} \cup \mathcal{B}'|A = a) = P(\mathcal{B}|A = a) + P(\mathcal{B}'|A = a)$. Note that for convenience one typically writes $P(A, B)$ and $P(A|B)$ whenever the specific value is less important. 
+When working with multiple random variables,
+we can construct events corresponding 
+to every combination of values 
+that the variables can jointly take.
+The probability function that assigns
+probabilities to each of these combinations
+(e.g. $A=a$ AND $B=b$),
+is called the *joint probability* function
+and simply returns the probability assigned 
+to the intersection of the corresponding subsets
+of the sample space. 
+The *joint probability* assigned to the event 
+where random variables A and B 
+take values $a$ and $b$, respectively,
+is denoted $P(A = a, B = b)$,
+where the comma indicates "AND". 
+Note that for any values $a$ and $b$,
+$P(A=a, B=b) \leq P(A=a)$ 
+and $P(A=a, B=b) \leq P(B = b)$,
+since for $A=a$ and $B=b$ to happen,
+$A=a$ has to happen *and* $B=b$ also has to happen.
+Interestingly, the joint probability
+tells us all that we can know about these
+random variables in a probabilistic sense,
+and can be used to derive many other
+useful quantities, including recovering the 
+individual distributions $P(A)$ and $P(B)$.
+To recover P(A=a) we simply sum up 
+P(A=a, B=v) over all values $v$ 
+that the random variable B can take:
+$P(A=a) = \sum_v P(A=a, B=v)$.
 
-Using the definition of conditional probabilities, we can derive one of the most useful and celebrated equations in statistics: *Bayes' Rule*.
-By construction, we have that $P(A, B) = P(B|A) P(A)$ and $P(A, B) = P(A|B) P(B)$. Combining both equations yields 
+
+The ratio $\frac{P(A=a, B=b)}{P(A=a)} \leq 1$.
+turns out to be extremely important.
+It is called the *conditional probability*,
+and is denoted via the "|" symbol,
+$P(A=a|B=b) = P(A=a,B=b)/P(A=a)$
+and it tells us the new probability
+associated with the event $B=b$,
+once we condition on the fact $A=a$ took place.
+We can think of this conditional probability
+as restricting attention only to the subset
+of the sample space associated with $A=a$
+and then renormalizing so that
+all probabilities sum to 1.
+Conditional probabilities 
+are in fact probabilities
+and thus respect all of the axioms,
+so long as we condition all terms 
+on the same event and thus 
+restrict attention to the same sample space. 
+For instance, for disjoint events 
+$\mathcal{B}$ and $\mathcal{B}'$, we have that 
+$P(\mathcal{B} \cup \mathcal{B}'|A = a) = P(\mathcal{B}|A = a) + P(\mathcal{B}'|A = a)$. 
+
+
+Using the definition of conditional probabilities, 
+we can derive the famous result called *Bayes' Rule*.
+By construction, we have that $P(A, B) = P(B|A) P(A)$ 
+and $P(A, B) = P(A|B) P(B)$. 
+Combining both equations yields 
 $P(B|A) P(A) = P(A|B) P(B)$ and hence 
 
 $$P(A|B) = \frac{P(B|A) P(A)}{P(B)}.$$
 
-This simple equation has rather profound implications as it allows us to reverse the order of conditioning. For instance, given the prevalence of symptoms for a given disease, the overall prevalence of diseases and of symptoms respectively, it allows us to infer the probability of a disease, given the manifestation of certain symptoms. This is  what a physician would do when diagnosing a patient. 
-
-In some cases we might not have direct access to $P(B)$, such as the prevalence of symptoms. In this case a simplified version of Bayes' rule comes in handy:
+This simple equation has profound implications because
+it allows us to reverse the order of conditioning.
+If we know how to estimate $P(B|A)$, $P(A)$, and $P(B)$,
+then we can estimate $P(A|B)$. 
+We often find it easier to estimate one term directly 
+but not the other and Bayes rule can come to the rescue here.
+For instance, if we know the prevalence of symptoms for a given disease,
+and the overall prevalences of the disease and symptoms, respectively,
+we can determine how likely someone is to have the disease based on their symptoms.
+In some cases we might not have direct access to $P(B)$, 
+such as the prevalence of symptoms. 
+In this case a simplified version of Bayes' rule comes in handy:
 
 $$P(A|B) \propto P(B|A) P(A)$$
 
-Since we know that $P(A|B)$ must be normalized to $1$, i.e., $\sum_a P(A=a|B) = 1$, we can use it to compute
+Since we know that $P(A|B)$ must be normalized to $1$, i.e., $\sum_a P(A=a|B) = 1$,
+we can use it to compute
 
 $$P(A|B) = \frac{P(B|A) P(A)}{\sum_b P(B=b|A) P(A)}.$$
 
-In statistics $P(A)$ is typically referred as a *prior*, $P(B|A)$ as the likelihood of $B$ occurring, given $A$, and $P(A|B)$ as the *posterior* probability of $A$, given $B$, in short, *the posterior*. The above equation states that an unnormalized posterior can be normalized easily. This has many useful applications. For instance, in a speech recognition model $A$ might be the text and $B$ might be the audio file. There we can compute the (normalized) posterior probability for a specific string by summing over all possible strings and looking at their relative weight. 
+In Bayesian statistics, we think of an observer 
+as possessing some (subjective) prior beliefs
+about the plausibility of the available hypotheses 
+encoded in the *prior* P(H),
+and a *likelihood function* that says how likely 
+one is to observe any value of the collected evidence 
+for each of the hypotheses in the class $P(E|H)$.
+Bayes rule is then interpreted as telling us
+how to update the initial *prior* P(H)
+in light of the available evidence E
+to produce *posterior* beliefs 
+$P(H|E) = \frac{P(E|H) P(H)}{P(E)}$.
+Informally, this can be stated as 
+"posterior equals prior times likelihood, divided by the evidence".
+Now, because the evidence $P(E)$ is the same for all hypotheses,
+we can get away with using the simplified form
+and simply normalize over the hypotheses.
 
-Note that $\sum_b P(b=B|A) = 1$ also allows us to *marginalize* over random variables. That is, we can drop variables from a joint distribution such as $P(A, B)$. After all, we have that 
 
-$$\sum_b P(A, B=b) = P(A) \sum_b P(b = B|A) = P(A).$$
 
-Another important property to check for is whether random variables are independent. The latter means that the value of $A$ doesn't affect $B$ and vice versa. As such we have that $P(A|B) = P(A)$ and thus $P(A,B) = P(A|B) P(B) = P(A) P(B)$. Statisticians typically write this as $A \perp B$. Independence is a useful property. For instance, two successive rolls of a dice are independent (unless the dealer is cheating). Conversely, we call random variables dependent whenever $P(A,B) \neq P(A) P(B)$. Dependence allows us to draw meaningful statistical conclusions. For instance, medical diagnosis only works because symptoms are dependent on the diseases. 
 
-Lastly, there's *conditional* independence and dependence. Two random variables $A$ and $B$ are *conditionally independent* given another random variable $C$
-if and only if $P(A, B|C) = P(A|C)P(B|C)$. For instance, while the choices of two people to bring an umbrella might be highly dependent on each other, they might be independent, given the weather report of the day. After all, it is reasonable to assume that both will make their own independent decision as to whether to bring an umbrella, given the forecast. A concise notation for independence is $A \perp B | C$.
+Independence is another fundamentally important concept
+that you forms the backbone of 
+many important ideas in statistics.
+In short, two variables are *indepependent*
+if conditioning on the value of $A$ does not
+cause any change to the probability distribution
+associated with $B$ and vice versa.
+More formally, independence, denoted $A \perp B$, 
+requires that $P(A|B) = P(A)$ and, consequently, 
+that $P(A,B) = P(A|B) P(B) = P(A) P(B)$.
+Independence is often an appropriate assumption.
+For example, if the random variable A 
+represents the outcome from tossing one fair coin 
+and the random variable B 
+represents the outcome from tossing another,
+then knowing whether A came up heads
+should not influence the probability
+of B coming up heads.
+
+
+Independence is especially when it holds among the successive 
+draws of our data from some underlying distribution 
+(allowing us to make strong statistical conclusions)
+or when it holds among various variables in our data,
+allowing us to work with simpler models
+that encode this independence structure.
+On the other hand, estimating the dependencies 
+among random variables is often the very aim of learning.
+We care to estimate the probability of disease given symptoms
+specifically because we believe 
+that diseases and symptoms are *not* independent. 
+
+
+Note that because conditional probabilities are fully functioning probabilities,
+independence and dependence are properties that also apply there. 
+Two random variables $A$ and $B$ are conditionally independent 
+given a third variable $C$ if and only if $P(A, B|C) = P(A|C)P(B|C)$.
+Interestingly, two variables can be independent in general
+but become dependent when conditioning on a third. 
+This often occurs when the two random variables $A$ and $B$
+correspond to causes of some third variable $C$.
+For example, broken bones and lung cancer might be independent 
+in the general population but if we condition on being in the hospital
+then we might find that broken bones are negatively correlated with lung cancer. 
+That's because the broken bone *explains away* why some person is in the hospital
+and thus lowers the probability that they have lung cancer. 
+
+
+And conversely, two dependent random variables 
+can become independent upon conditioning on a third. 
+This often happens when two otherwise unrelated events
+have a common cause. 
+Shoe size and reading level are highly correlated 
+among elementary school students,
+but this correlation disappears if we condition on age. 
+
+
 
 ## An Example
 :label:`subsec_probability_hiv_app`
 
-Let's put our skills to the test. Assume that a doctor administers an HIV test to a patient. This test is fairly accurate and it fails only with 1% probability if the patient is healthy but reporting him as diseased. Moreover,
-it never fails to detect HIV if the patient actually has it. We use $D_1 \in \{0, 1\}$ to indicate the diagnosis ($0$ if negative and $1$ if positive) and $H \in \{0, 1\}$ to denote the HIV status.
+Let us put our skills to the test. 
+Assume that a doctor administers an HIV test to a patient. 
+This test is fairly accurate and it fails only with 1% probability 
+if the patient is healthy but reporting him as diseased. 
+Moreover, it never fails to detect HIV if the patient actually has it. 
+We use $D_1 \in \{0, 1\}$ to indicate the diagnosis 
+($0$ if negative and $1$ if positive)
+and $H \in \{0, 1\}$ to denote the HIV status.
 
 | Conditional probability | $H=1$ | $H=0$ |
 |:------------------------|------:|------:|
 | $P(D_1 = 1 | H)$        |     1 |  0.01 |
 | $P(D_1 = 0 | H)$        |     0 |  0.99 |
 
-Note that the column sums are all 1 (but the row sums don't), since they are conditional probabilities. Let's compute the probability of the patient having HIV if the test comes back positive, i.e., $P(H = 1|D_1 = 1)$. Intuitively this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' theorem, we need to apply marginalization and the multiplication rule to determine
+Note that the column sums are all 1 (but the row sums don't), 
+since they are conditional probabilities.
+Let's compute the probability of the patient having HIV 
+if the test comes back positive, i.e., $P(H = 1|D_1 = 1)$. 
+Intuitively this is going to depend on how common the disease is,
+since it affects the number of false alarms. 
+Assume that the population is fairly healthy, e.g., $P(H=1) = 0.0015$. 
+To apply Bayes' theorem, we need to apply marginalization
+and the multiplication rule to determine
 
 $$\begin{aligned}
 P(D_1 = 1) 
@@ -312,12 +762,15 @@ This leads us to
 
 $$P(H = 1|D_1 = 1) = \frac{P(D_1=1|H=1) P(H=1)}{P(D_1=1)} = 0.1306.$$
 
-In other words, there is only a 13.06% chance that the patient
-actually has HIV, despite using a very accurate test.
+In other words, there is only a 13.06% chance 
+that the patient actually has HIV, 
+despite using a very accurate test.
 As we can see, probability can be counterintuitive.
-What should a patient do upon receiving such terrifying news? Likely, the patient
-would ask the physician to administer another test to get clarity. The second
-test has different characteristics and it is not as good as the first one.
+What should a patient do upon receiving such terrifying news?
+Likely, the patient would ask the physician 
+to administer another test to get clarity. 
+The second test has different characteristics
+and it is not as good as the first one.
 
 | Conditional probability | $H=1$ | $H=0$ |
 |:------------------------|------:|------:|
@@ -325,7 +778,7 @@ test has different characteristics and it is not as good as the first one.
 | $P(D_2 = 0|H)$          |  0.02 |  0.97 |
 
 Unfortunately, the second test comes back positive, too.
-Let's calculate the requisite probabilities to invoke Bayes' theorem
+Let us calculate the requisite probabilities to invoke Bayes' theorem
 by assuming conditional independence:
 
 $$\begin{aligned}
@@ -338,7 +791,8 @@ P(D_1 = 1, D_2 = 1|H = 1)
 \end{aligned}
 $$
 
-Now we can apply marginalization to obtain the probability that both tests come back positive:
+Now we can apply marginalization to obtain the probability 
+that both tests come back positive:
 
 $$\begin{aligned}
 P(D_1 = 1, D_2 = 1) 
@@ -354,36 +808,101 @@ $$P(H = 1| D_1 = 1, D_2 = 1)
 = \frac{P(D_1 = 1, D_2 = 1|H=1) P(H=1)}{P(D_1 = 1, D_2 = 1)}
 = 0.8307.$$
 
-That is, the second test allowed us to gain much higher confidence that not all is well. Despite the second test being considerably less accurate than the first one, it still significantly improved our estimate. The assumption of boths tests being conditional independent of each other was crucial for our ability to generate a more accurate estimate. Take the extreme case where we run the same test twice. In this situation we would expect the same outcome in both times, hence no additional insight is gained from running the same test again. 
-The astute reader might have noticed that the diagnosis behaved like a classifier hiding in plain sight where our ability to decide whether a patient is healthy increases as we obtain more features (test outcomes). We will pick up this idea in :ref:`sec_naive_bayes` where we will inroduce Naive Bayes Classifiers, using the approximation that all features occur independently. 
+That is, the second test allowed us to gain much higher confidence that not all is well.
+Despite the second test being considerably less accurate than the first one, 
+it still significantly improved our estimate. 
+The assumption of boths tests being conditional independent of each other 
+was crucial for our ability to generate a more accurate estimate.
+Take the extreme case where we run the same test twice. 
+In this situation we would expect the same outcome in both times, 
+hence no additional insight is gained from running the same test again. 
+The astute reader might have noticed that the diagnosis behaved 
+like a classifier hiding in plain sight 
+where our ability to decide whether a patient is healthy 
+increases as we obtain more features (test outcomes). 
+We will pick up this idea in :ref:`sec_naive_bayes`,
+where we will inroduce Naive Bayes Classifiers, 
+using the approximation that all features occur independently. 
+
 
 ## Expectations
 
-Quite often probabilities *per se* are insufficient to provide us with the relevant insight to make decisions. For instance, when we want to decide whether to make an investment we should assess the expected return and the risk profile. For instance, with 50% probability the investment might fail, with 40% probability it might return twice the investment and with 10% it might return 10 times the money invested. To calculate the expected return we sum over all returns multiplied by the probability that they will occur. This yields $0.5 \cdot 0 + 0.4 \cdot 2 + 0.1 \cdot 10 = 1.8$. Hence the expected return is 1.8 times the initial investment. 
+Often, making decisions requires not just looking 
+at the probabilities assigned to individual events
+but composing them together into useful aggregates
+that can provide us with guidance.
+For example, when random variables take continuous scalar values,
+we often care about knowing what value to expect *on average*.
+This quantity is formally called an *expectation*.
+If we are making investments, the first quantity of interest
+might be the return we can expect, 
+averaging over all the possible outcomes
+(and weighting by the apropriate probabilities).
+For instance, say that with 50% probability, 
+an investment might fail altogether,
+with 40% probability it might provide a 2x return,
+and with 10% probability it might provide a 10x return 10x.
+To calculate the expected return,
+we sum over all returns, multiplying each
+by the probability that they will occur. 
+This yields the expectation $0.5 \cdot 0 + 0.4 \cdot 2 + 0.1 \cdot 10 = 1.8$. 
+Hence the expected return is 1.8 times the initial investment. 
 
-In general, the *expectation* (or average) of the random variable $X$ is defined as
+In general, the *expectation* (or average)
+of the random variable $X$ is defined as
 
 $$E[X] = E_{x \sim P}[x] = \sum_{x} x P(X = x).$$
 
-Likewise, for densities we obtain $E[X] = \int x dp(x)$. Rather than $x$ we are 
-often interested in the expected value of a function $f$ under the distribution. In this case we arrive at 
+Likewise, for densities we obtain $E[X] = \int x dp(x)$. 
+Rather than $x$ we are often interested in the expected value 
+of a function $f$ under the distribution. 
+In this case we arrive at 
 
 $$E_{x \sim P}[f(x)] = \sum_x f(x) P(x) \text{ and } E_{x \sim P}[f(x)] = \int f(x) dp(x)$$
 
-for discrete probabilities and densities respectively. Returning to the investment example from above, $f$ might be the happiness associated with the return. Assuming that the happiness for a total loss is $-1$, and for returns of 1, 2, and 10 is 1, 2 and 4 respectively, we can see that the expected happiness of investing is $0.5 \cdot (-1) + 0.4 \cdot 2 + 0.1 \cdot 4 = 0.7$. As such, we would be well advised to keep the money in the bank. 
+for discrete probabilities and densities, respectively. 
+Returning to the investment example from above, 
+$f$ might be the happiness associated with the return. 
+Assuming that the happiness for a total loss is $-1$,
+and for returns of 1, 2, and 10 is 1, 2 and 4, respectively, 
+we can see that the expected happiness of investing 
+is $0.5 \cdot (-1) + 0.4 \cdot 2 + 0.1 \cdot 4 = 0.7$. 
+As such, we would be well advised to keep the money in the bank. 
 
-For financial decisions we might also want to measure how *risky* an investment is. But how should we quantify it? One option is to look at how far the actual returns deviate from their expected value. Alas, in expectation the deviations all vanish. A better strategy is to square the deviations. This penalizes larger deviations more. This quantity is called the variance of a random variable:
+For financial decisions we might also want to measure how *risky* an investment is. 
+But how should we quantify it? 
+One option is to look at how far the actual returns deviate 
+from their expected value.
+Alas, in expectation the deviations all vanish. 
+A better strategy is to square the deviations. 
+This penalizes larger deviations more. 
+This quantity is called the variance of a random variable:
 
 $$\mathrm{Var}[X] = E\left[(X - E[X])^2\right] = E[X^2] - E[X]^2.$$
 
-Its square root is called the *standard deviation*. Here the equality follows by expanding $(X - E[X])^2 = X^2 - 2 X E[X] + E[X]^2$ and taking expectations for each term. Lastly, the variance of a function of a random variable is defined analogously as 
+Its square root is called the *standard deviation*. 
+Here the equality follows by expanding $(X - E[X])^2 = X^2 - 2 X E[X] + E[X]^2$ 
+and taking expectations for each term. 
+Lastly, the variance of a function of a random variable is defined analogously as 
 
 $$\mathrm{Var}_{x \sim P}[f(x)] = E_{x \sim P}[f^2(x)] - E_{x \sim P}[f(x)]^2.$$ 
 
-Returning to our investment example we can now compute the variance of the investment. It is given by 
-$0.5 \cdot 0 + 0.4 \cdot 2^2 + 0.1 \cdot 10^2 - 1.8^2 = 8.36$. For all intents and purposes this is a risky investment. Note that by mathematical convention mean and variance are often referenced as $\mu$ and $\sigma^2$. This is particularly common whenever we use it to parametrize a Gaussian distribution. For more information about the latter see e.g., :ref:`sec_distributions`.
+Returning to our investment example we can now compute the variance of the investment. 
+It is given by 
+$0.5 \cdot 0 + 0.4 \cdot 2^2 + 0.1 \cdot 10^2 - 1.8^2 = 8.36$. 
+For all intents and purposes this is a risky investment. 
+Note that by mathematical convention mean and variance are often referenced as $\mu$ and $\sigma^2$.
+This is particularly common whenever we use it 
+to parametrize a Gaussian distribution. 
+For more information about the latter, 
+see e.g., :ref:`sec_distributions`.
 
-In the same way as we introduced expectations and variance for *scalar* random variables, we can do so for vector-valued ones. Expectations are easy, since we can apply them element-wise. For instance, $\mathbf{\mu} := E_{\mathbf{x} \sim P}[\mathbf{x}]$ has coordinates $\mu_i = E_{\mathbf{x} \sim P}[x_i]$. Covariances are more complicated. We resolve the problem by taking expectations of the *outer product* of the difference between random variables and their mean. 
+In the same way as we introduced expectations and variance for *scalar* random variables, 
+we can do so for vector-valued ones. 
+Expectations are easy, since we can apply them element-wise. 
+For instance, $\mathbf{\mu} := E_{\mathbf{x} \sim P}[\mathbf{x}]$ has coordinates $\mu_i = E_{\mathbf{x} \sim P}[x_i]$. Covariances are more complicated. 
+We resolve the problem by taking expectations of the *outer product* 
+of the difference between random variables and their mean. 
 
 $$\Sigma := \mathrm{Cov}_{\mathbf{x} \sim P}[\mathbf{x}] = E_{\mathbf{x} \sim P}\left[(\mathbf{x} - \mathbf{\mu}) (\mathbf{x} - \mathbf{\mu})^\top\right]$$
 
@@ -395,7 +914,14 @@ As such, $\Sigma$ allows us to compute the variance for any linear function of $
 
 ## Summary and Discussion
 
-In this section we saw that probability can be used to encode uncertainty associated with the problem itself and also with the model. These aspects are known as aleatoric and epistemic uncertainty respectively. See e.g., :cite:`der2009aleatory` for a review on this aspect of [Uncertainty Quantification](https://en.wikipedia.org/wiki/Uncertainty_quantification). While epistemic uncertainty can be addressed by observing more data, such progress is impossible in the aleatoric case. After all, no matter how long we watch someone tossing a coin, we will never be more or less than 50% certain that we'll see heads. 
+In this section, we saw that probability can be used 
+to encode uncertainty associated with the problem itself and also with the model. 
+These aspects are known as aleatoric and epistemic uncertainty respectively. 
+See e.g., :cite:`der2009aleatory` for a review on this aspect of [Uncertainty Quantification](https://en.wikipedia.org/wiki/Uncertainty_quantification). 
+While epistemic uncertainty can be addressed by observing more data, 
+such progress is impossible in the aleatoric case. 
+After all, no matter how long we watch someone tossing a coin, 
+we will never be more or less than 50% certain that we'll see heads. 
 
 On the topic of estimation we saw that sampling from a probability distribution provides us with information to determine the distribution to some extent. That said, the rate at which this is possible can be quite slow. In particular we saw that the rate of $1/\sqrt{n}$ is a good quantifier of the amount of uncertainty left after we observe $n$ observations. This means that by going from 10 to 1000 observations (usually a very achievable task) we see a tenfold reduction of uncertainty, whereas the next 1000 observations help comparatively little, offering only a 1.41 times reduction. This is a persistent feature of machine learning: while there are often easy gains, it takes a very large amount of data, and often with it an enormous amount of computation to make even further gains. For an empirical review of this fact for large scale language models see :cite:`revels2016forward`. 
 
