@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -107,8 +107,14 @@ import torch
 from torch import nn
 ```
 
-```{.python .input}
-%%tab mxnet, pytorch
+```{.python .input  n=2}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+```
+
+```{.python .input  n=7}
+%%tab all
 
 class LeNet(d2l.Classification):
     def __init__(self, lr=0.1):
@@ -136,6 +142,20 @@ class LeNet(d2l.Classification):
                 nn.Linear(16 * 5 * 5, 120), nn.Sigmoid(),
                 nn.Linear(120, 84), nn.Sigmoid(),
                 nn.Linear(84, 10))
+            
+        if tab.selected('tensorflow'):
+            self.net = tf.keras.models.Sequential([
+                tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid',
+                                       padding='same'),
+                tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+                tf.keras.layers.Conv2D(filters=16, kernel_size=5,
+                                       activation='sigmoid'),
+                tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+                tf.keras.layers.Flatten(),
+                tf.keras.layers.Dense(120, activation='sigmoid'),
+                tf.keras.layers.Dense(84, activation='sigmoid'),
+                tf.keras.layers.Dense(10)])
+
 ```
 
 We took a small liberty with the original model,
@@ -153,13 +173,30 @@ what we expect from :numref:`img_lenet_vert`.
 ![Compressed notation for LeNet-5.](../img/lenet-vert.svg)
 :label:`img_lenet_vert`
 
-```{.python .input}
-%%tab all
+```{.python .input  n=6}
+%%tab mxnet, pytorch
+@d2l.add_to_class(d2l.Classification)  #@save
+def layer_summary(self, X_shape):
+    X = d2l.randn(*X_shape)
+    for layer in self.net:
+        X = layer(X)
+        print(layer.__class__.__name__, 'output shape:\t', X.shape)
+    
 model = LeNet()
-X = d2l.randn(1, 1, 28, 28)
-for layer in model.net:
-    X = layer(X)
-    print(layer.__class__.__name__, 'output shape:\t', X.shape)
+model.layer_summary((1, 1, 28, 28))
+```
+
+```{.python .input}
+%%tab tensorflow
+@d2l.add_to_class(d2l.Classification)  #@save
+def layer_summary(self, X_shape):
+    X = d2l.normal(X_shape)
+    for layer in self.net.layers:
+        X = layer(X)
+        print(layer.__class__.__name__, 'output shape:\t', X.shape)
+
+model = LeNet()
+model.layer_summary((1, 28, 28, 1))
 ```
 
 Note that the height and width of the representation
@@ -218,11 +255,20 @@ we visualize the training loss more frequently.
 [**Now let's train and evaluate the LeNet-5 model.**]
 
 ```{.python .input}
-%%tab all
-model = LeNet(lr=0.9)
+%%tab pytorch, mxnet
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=256)
+model = LeNet(lr=0.9)
 trainer.fit(model, data)
+```
+
+```{.python .input  n=9}
+%%tab tensorflow
+trainer = d2l.Trainer(max_epochs=10)
+data = d2l.FashionMNIST(batch_size=256)
+with d2l.try_gpu():
+    model = LeNet(lr=0.9)
+    trainer.fit(model, data)
 ```
 
 ## Summary
@@ -252,4 +298,8 @@ trainer.fit(model, data)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/74)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/275)
 :end_tab:

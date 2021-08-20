@@ -3,7 +3,7 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Implementation of Multilayer Perceptrons from Scratch
+# Multilayer Perceptron Implementation from Scratch
 :label:`sec_mlp_scratch`
 
 Now that we have characterized
@@ -66,7 +66,7 @@ class MLPScratch(d2l.Classification):
         self._params = [self.W1, self.b1, self.W2, self.b2]
         for param in self._params:
             param.attach_grad()
-            
+
     def collect_params(self):
         return self._params
 ```
@@ -124,7 +124,7 @@ def relu(X):
 ```
 
 ```{.python .input}
-%%tab tensorflow 
+%%tab tensorflow
 def relu(X):
     return tf.math.maximum(X, 0)
 ```
@@ -139,7 +139,7 @@ with just a few lines of code.
 
 ```{.python .input}
 %%tab all
-@d2l.add_to_class(MLPScratch)    
+@d2l.add_to_class(MLPScratch)
 def forward(self, X):
     X = d2l.reshape(X, (-1, self.num_inputs))
     H = relu(d2l.matmul(X, self.W1) + self.b1)

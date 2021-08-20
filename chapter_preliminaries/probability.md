@@ -471,24 +471,20 @@ and $P(X=v)$ denotes its probability.
 Sometimes this notation can get clunky,
 and we can abuse notation when the context is clear.
 For example, we might use *P(X)* to refer broadly
-to the *distribution* of X, i.e., 
+to the *distribution* of $X$, i.e., 
 the function that tells us the probability
 that $X$ takes any given value. 
 Other times we write expressions 
 like $P(X,Y) = P(X) P(Y)$,
 as a shorthand to express a statement 
 that is true for all of the values
-that the random variables X and Y can take, i.e.,
+that the random variables $X$ and $Y$ can take, i.e.,
 for all $i,j$ $P(X=i \textrm{ and } Y=j) = P(X=i)P(Y=j)$.
 Other times, we abuse notation by writing
 $P(v)$ when the random variable is clear from the context. 
-Just as the values taken by random variables
-correspond to subsets of the samples space,
-and thus are events, 
-coarser groupings of these values 
-are, in turn, unions of the corresponding 
-subsets and thus are also events. 
-For example, $P(X \in [1, 3])$ denotes the probability of the event $\{1 \leq X \leq 3\}$.
+Since an event in probability theory is a set of outcomes from the sample space,
+we can specify a range of values for a random variable to take.
+For example, $P(1 \leq X \leq 3)$ denotes the probability of the event $\{1 \leq X \leq 3\}$.
 
 
 Note that there is a subtle difference 

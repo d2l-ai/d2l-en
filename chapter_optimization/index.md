@@ -6,7 +6,7 @@ They were the tools that allowed us to continue updating model parameters and to
 
 To do well, however, some deeper knowledge is required.
 Optimization algorithms are important for deep learning.
-On one hand, training a complex deep learning model can take hours, days, or even weeks.
+On the one hand, training a complex deep learning model can take hours, days, or even weeks.
 The performance of the optimization algorithm directly affects the model's training efficiency.
 On the other hand, understanding the principles of different optimization algorithms and the role of their hyperparameters
 will enable us to tune the hyperparameters in a targeted manner to improve the performance of deep learning models.

@@ -1,4 +1,4 @@
-# Implementation of Recurrent Neural Networks from Scratch
+# Recurrent Neural Network Implementation from Scratch
 :label:`sec_rnn_scratch`
 
 In this section we will implement an RNN
@@ -155,7 +155,7 @@ def get_params(vocab_size, num_hiddens, device):
 #@tab tensorflow
 def get_params(vocab_size, num_hiddens):
     num_inputs = num_outputs = vocab_size
-    
+
     def normal(shape):
         return d2l.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32)
 

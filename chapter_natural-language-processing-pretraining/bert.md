@@ -34,7 +34,7 @@ ELMo is a function that assigns a representation to each word from the input seq
 Specifically, ELMo combines all the intermediate layer representations from pretrained bidirectional LSTM as the output representation.
 Then the ELMo representation will be added to a downstream task's existing supervised model
 as additional features, such as by concatenating ELMo representation and the original representation (e.g., GloVe) of tokens in the existing model.
-On one hand,
+On the one hand,
 all the weights in the pretrained bidirectional LSTM model are frozen after ELMo representations are added.
 On the other hand,
 the existing supervised model is specifically customized for a given task.
