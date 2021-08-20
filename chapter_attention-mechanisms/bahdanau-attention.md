@@ -154,14 +154,14 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
 
     def init_state(self, enc_outputs, enc_valid_lens, *args):
         # Shape of `outputs`: (`num_steps`, `batch_size`, `num_hiddens`).
-        # Shape of `hidden_state`: (`num_layers`, `batch_size`,
+        # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`,
         # `num_hiddens`)
         outputs, hidden_state = enc_outputs
         return (outputs.swapaxes(0, 1), hidden_state, enc_valid_lens)
 
     def forward(self, X, state):
         # Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`).
-        # Shape of `hidden_state`: (`num_layers`, `batch_size`,
+        # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`,
         # `num_hiddens`)
         enc_outputs, hidden_state, enc_valid_lens = state
         # Shape of the output `X`: (`num_steps`, `batch_size`, `embed_size`)
@@ -259,13 +259,15 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
 
     def init_state(self, enc_outputs, enc_valid_lens, *args):
         # Shape of `outputs`: (`batch_size`, `num_steps`, `num_hiddens`).
-        # Shape of `hidden_state`: (`num_layers`, `batch_size`, `num_hiddens`)
+        # Length of list `hidden_state` is `num_layers`, where the shape of 
+        # its element is (`batch_size`, `num_hiddens`)
         outputs, hidden_state = enc_outputs
         return (outputs, hidden_state, enc_valid_lens)
 
     def call(self, X, state, **kwargs):
         # Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`).
-        # Shape of `hidden_state`: (`num_layers`, `batch_size`, `num_hiddens`)
+        # Length of list `hidden_state` is `num_layers`, where the shape of 
+        # its element is (`batch_size`, `num_hiddens`)
         enc_outputs, hidden_state, enc_valid_lens = state
         # Shape of the output `X`: (`num_steps`, `batch_size`, `embed_size`)
         X = self.embedding(X) # Input `X` has shape: (`batch_size`, `num_steps`)
