@@ -10,21 +10,50 @@ Such a model
 will be trained on H. G. Wells' *The Time Machine*.
 As before, we start by reading the dataset first, which is introduced in :numref:`sec_language_model`.
 
-```{.python .input  n=1}
+```{.python .input  n=2}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-```{.python .input  n=2}
+```{.json .output n=2}
+[
+ {
+  "data": {
+   "application/vnd.jupyter.widget-view+json": {
+    "model_id": "4a201b6ce9154672b642b6b3b967d20d",
+    "version_major": 2,
+    "version_minor": 0
+   },
+   "text/plain": "interactive(children=(Dropdown(description='tab', index=1, options=('mxnet', 'pytorch', 'tensorflow'), value='\u2026"
+  },
+  "metadata": {},
+  "output_type": "display_data"
+ }
+]
+```
+
+```{.python .input  n=3}
 %%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
 from mxnet import autograd, gluon, np, npx
 npx.set_np()
+
+data = d2l.TimeMachine(batch_size=32, num_steps=35)
 ```
 
-```{.python .input  n=3}
+```{.json .output n=3}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
+ }
+]
+```
+
+```{.python .input  n=4}
 %%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -32,19 +61,28 @@ import math
 import torch
 from torch import nn
 from torch.nn import functional as F
+
+data = d2l.TimeMachine(batch_size=32, num_steps=35)
 ```
 
-```{.python .input  n=4}
+```{.python .input  n=5}
 %%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 import math
 import tensorflow as tf
+
+data = d2l.TimeMachine(batch_size=32, num_steps=35)
 ```
 
-```{.python .input  n=5}
-%%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=35)
+```{.json .output n=5}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
+ }
+]
 ```
 
 ## [**One-Hot Encoding**]
@@ -66,14 +104,47 @@ This vector is the one-hot vector of the original token. The one-hot vectors wit
 npx.one_hot(np.array([0, 2]), len(data.vocab))
 ```
 
+```{.json .output n=6}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
+ }
+]
+```
+
 ```{.python .input  n=7}
 %%tab pytorch
 F.one_hot(torch.tensor([0, 2]), len(data.vocab))
 ```
 
+```{.json .output n=7}
+[
+ {
+  "data": {
+   "text/plain": "tensor([[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\n         0, 0, 0, 0],\n        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\n         0, 0, 0, 0]])"
+  },
+  "execution_count": 7,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 ```{.python .input  n=8}
 %%tab tensorflow
 tf.one_hot(tf.constant([0, 2]), len(data.vocab))
+```
+
+```{.json .output n=8}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
+ }
+]
 ```
 
 (**The shape of the minibatch**) that we sample each time (**is (batch size, number of time steps).
@@ -93,10 +164,33 @@ X = d2l.reshape(d2l.arange(10), (2, 5))
 npx.one_hot(X.T, len(data.vocab)).shape
 ```
 
+```{.json .output n=9}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
+ }
+]
+```
+
 ```{.python .input  n=10}
 %%tab pytorch
 X = d2l.reshape(d2l.arange(10), (2, 5))
 F.one_hot(X.T, len(data.vocab)).shape
+```
+
+```{.json .output n=10}
+[
+ {
+  "data": {
+   "text/plain": "torch.Size([5, 2, 28])"
+  },
+  "execution_count": 10,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ```{.python .input  n=11}
@@ -105,21 +199,29 @@ X = d2l.reshape(d2l.arange(10), (2, 5))
 tf.one_hot(tf.transpose(X), len(data.vocab)).shape
 ```
 
+```{.json .output n=11}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
+ }
+]
+```
+
 ## RNN Model
 
-Next, we [**initialize the model parameters for
-the RNN model**].
+Next, we define the model class.
 The number of hidden units `num_hiddens` is a tunable hyperparameter.
 When training language models,
 the inputs and outputs are from the same vocabulary.
-Hence, they have the same dimension,
-which is equal to the vocabulary size.
+The dataset is relatively small, we will train with hundreds of epochs, so we choose to plot for every 10 epochs.  
 
 ```{.python .input  n=12}
 %%tab mxnet
 class RNNScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
-        super().__init__(plot_train_per_epoch=0.5, plot_train_per_epoch=0.5)
+        super().__init__(plot_train_per_epoch=0.1, plot_train_per_epoch=0.1)
         self.save_hyperparameters()
         self.init_params()
         if tab.selected('mxnet'):
@@ -130,21 +232,40 @@ class RNNScratch(d2l.Classification):
                 param.requires_grad_(True)        
 ```
 
-```{.python .input  n=13}
+```{.json .output n=12}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
+ }
+]
+```
+
+```{.python .input  n=16}
 %%tab pytorch
 class RNNScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
-        super().__init__(plot_train_per_epoch=0.5, plot_valid_per_epoch=0.5)
+        super().__init__(plot_train_per_epoch=0.1, plot_valid_per_epoch=0.1)
         self.save_hyperparameters()
         self.init_params()
-        for param in self._params:
-            param.requires_grad_(True)
-            
-    def parameters(self):
-        return self._params
+
+    def init_params(self):
+        # Hidden layer parameters
+        self.W_xh = nn.Parameter(d2l.randn(
+            self.num_inputs, self.num_hiddens) * self.sigma)
+        self.W_hh = nn.Parameter(
+            d2l.rand(self.num_hiddens, self.num_hiddens) * self.sigma)
+        self.b_h = nn.Parameter(d2l.zeros(self.num_hiddens))
+        # Output layer parameters
+        self.W_hq = nn.Parameter(d2l.randn(
+            self.num_hiddens, self.num_outputs) * self.sigma)
+        self.b_q = nn.Parameter(d2l.zeros(self.num_outputs))
 ```
 
-```{.python .input  n=14}
+We initialize all learnable parameters. 
+
+```{.python .input  n=17}
 %%tab mxnet
 @d2l.add_to_class(RNNScratch):
 def init_params(self)
@@ -159,21 +280,17 @@ def init_params(self)
 
 ```
 
-```{.python .input  n=15}
-%%tab pytorch
-@d2l.add_to_class(RNNScratch)
-def init_params(self):
-    # Hidden layer parameters
-    self.W_xh = d2l.randn(self.num_inputs, self.num_hiddens) * self.sigma
-    self.W_hh = d2l.rand(self.num_hiddens, self.num_hiddens) * self.sigma
-    self.b_h = d2l.zeros(self.num_hiddens)
-    # Output layer parameters
-    self.W_hq = d2l.randn(self.num_hiddens, self.num_outputs) * self.sigma
-    self.b_q = d2l.zeros(self.num_outputs)
-    self._params = [self.W_xh, self.W_hh, self.b_h, self.W_hq, self.b_q]
+```{.json .output n=17}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
+ }
+]
 ```
 
-```{.python .input  n=16}
+```{.python .input  n=18}
 %%tab tensorflow
 def get_params(vocab_size, num_hiddens):
     num_inputs = num_outputs = vocab_size
@@ -192,6 +309,16 @@ def get_params(vocab_size, num_hiddens):
     return params
 ```
 
+```{.json .output n=18}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
+ }
+]
+```
+
 To define an RNN model,
 we first need [**an `init_rnn_state` function
 to return the hidden state at initialization.**]
@@ -199,17 +326,27 @@ It returns a tensor filled with 0 and with a shape of (batch size, number of hid
 Using tuples makes it easier to handle situations where the hidden state contains multiple variables,
 which we will encounter in later sections.
 
-```{.python .input  n=17}
+```{.python .input  n=19}
 %%tab mxnet, pytorch
 @d2l.add_to_class(RNNScratch)
 def init_state(self, batch_size):
     return (d2l.zeros((batch_size, self.num_hiddens)), )
 ```
 
-```{.python .input  n=18}
+```{.python .input  n=20}
 %%tab tensorflow
 def init_rnn_state(batch_size, num_hiddens):
     return (d2l.zeros((batch_size, num_hiddens)), )
+```
+
+```{.json .output n=20}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
+ }
+]
 ```
 
 [**The following `rnn` function defines how to compute the hidden state and output
@@ -226,7 +363,7 @@ described in :numref:`sec_mlp`, the
 mean value of the $\tanh$ function is 0, when the elements are uniformly
 distributed over the real numbers.
 
-```{.python .input  n=19}
+```{.python .input  n=21}
 %%tab mxnet, pytorch
 @d2l.add_to_class(RNNScratch)
 def forward(self, X, state=None):
@@ -248,7 +385,7 @@ def forward(self, X, state=None):
     return d2l.concat(outputs, 0), (H,)
 ```
 
-```{.python .input  n=20}
+```{.python .input  n=22}
 %%tab all
 @d2l.add_to_class(RNNScratch)
 def loss(self, outputs, Y):
