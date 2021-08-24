@@ -108,7 +108,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
     def has_one_axis(X):  # True if `X` (tensor or list) has 1 axis
         return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
                 and not hasattr(X[0], "__len__"))
-    
+
     if has_one_axis(X): X = [X]
     if Y is None:
         X, Y = [[]] * len(X), X
@@ -116,7 +116,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
         Y = [Y]
     if len(X) != len(Y):
         X = X * len(Y)
-        
+
     set_figsize(figsize)
     if axes is None: axes = d2l.plt.gca()
     axes.cla()
@@ -182,16 +182,17 @@ class ProgressBoard(d2l.HyperParameters):
 
 # Defined in file: ./chapter_linear-networks/api.md
 class Module(d2l.nn_Module, d2l.HyperParameters):
-    def __init__(self):
+    def __init__(self, plot_train_per_epoch=5, plot_valid_per_epoch=1):
         super().__init__()
+        self.save_hyperparameters()
         self.board = ProgressBoard()
     def loss(self, y_hat, y):
         raise NotImplementedError
-        
+
     def forward(self, X):
         assert hasattr(self, 'net'), 'No neural network is defined'
         return self.net(X)
-    
+
     def training_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
@@ -199,16 +200,18 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         assert hasattr(self, 'trainer'), 'trainer is not inited'
         num_train = self.trainer.num_train_batches
         self.board.xlabel = 'epoch'
-        self.board.draw(self.trainer.train_batch_idx / num_train, l, 
-                        'train_loss', every_n=num_train // 5)
+        self.board.draw(self.trainer.train_batch_idx / num_train, l,
+                        'train_loss', every_n=int(
+                            num_train / self.plot_train_per_epoch))
         return l
 
     def validation_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
         # Draw progress
-        self.board.draw(self.trainer.epoch+1, l, 'val_loss', 
-                        every_n=self.trainer.num_val_batches)
+        self.board.draw(self.trainer.epoch+1, l, 'val_loss',
+                        every_n=int(self.trainer.num_val_batches /
+                                    self.plot_valid_per_epoch))
 
     def configure_optimizers(self):
         raise NotImplementedError
@@ -218,10 +221,10 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
 class DataModule(d2l.HyperParameters):
     def __init__(self, root='../data', num_workers=4):
         self.save_hyperparameters()
-        
+
     def get_dataloader(self, train):
         raise NotImplementedError
-        
+
     def train_dataloader(self):
         return self.get_dataloader(train=True)
 
@@ -231,7 +234,7 @@ class DataModule(d2l.HyperParameters):
 
 # Defined in file: ./chapter_linear-networks/api.md
 class Trainer(d2l.HyperParameters):
-    def __init__(self, max_epochs, num_gpus=0):
+    def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'Not support GPUs yet'
 
@@ -261,9 +264,10 @@ class Trainer(d2l.HyperParameters):
         raise NotImplementedError
 
 
+
 # Defined in file: ./chapter_linear-networks/synthetic-regression-data.md
 class SyntheticRegressionData(d2l.DataModule):
-    def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000, 
+    def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
                  batch_size=32):
         super().__init__()
         self.save_hyperparameters()
@@ -283,7 +287,7 @@ def get_tensorloader(self, tensors, train, indices=slice(0,None)):
 def get_dataloader(self, train):
     i = slice(0, self.num_train) if train else slice(self.num_train, None)
     return self.get_tensorloader((self.X, self.y), train, i)
-        
+
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -340,19 +344,21 @@ def prepare_batch(self, batch):
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 @d2l.add_to_class(d2l.Trainer)
 def fit_epoch(self):
-    self.model.train()        
-    for batch in self.train_dataloader:        
+    self.model.train()
+    for batch in self.train_dataloader:
         loss = self.model.training_step(self.prepare_batch(batch))
         self.optim.zero_grad()
         with torch.no_grad():
             loss.backward()
+            if self.gradient_clip_val > 0:
+                self.clip_gradients(self.gradient_clip_val, self.model)
             self.optim.step()
         self.train_batch_idx += 1
     if self.val_dataloader is None:
         return
     self.model.eval()
     for batch in self.val_dataloader:
-        with torch.no_grad():            
+        with torch.no_grad():
             self.model.validation_step(self.prepare_batch(batch))
         self.val_batch_idx += 1
 
@@ -453,7 +459,7 @@ class Classification(d2l.Module):
         for k, v in (('val_loss', self.loss(y_hat, y)),
                      ('val_acc', self.accuracy(y_hat, y))):
             self.board.draw(self.trainer.epoch+1, v, k,
-                            every_n=self.trainer.num_val_batches)    
+                            every_n=self.trainer.num_val_batches)
 
 
 # Defined in file: ./chapter_linear-networks/classification.md
@@ -506,22 +512,22 @@ def try_all_gpus():
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 @d2l.add_to_class(d2l.Trainer)
-def __init__(self, max_epochs, num_gpus=0):
+def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
     self.save_hyperparameters()
     self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
-    
+
 @d2l.add_to_class(d2l.Trainer)
 def prepare_batch(self, batch):
     if self.gpus:
         batch = [d2l.to(a, self.gpus[0]) for a in batch]
     return batch
-    
+
 @d2l.add_to_class(d2l.Trainer)
 def prepare_model(self, model):
     model.trainer = self
     model.board.xlim = [0, self.max_epochs]
     if self.gpus:
-        model.net.to(self.gpus[0])
+        model.to(self.gpus[0])
     self.model = model
 
 
@@ -543,7 +549,7 @@ def layer_summary(self, X_shape):
     for layer in self.net:
         X = layer(X)
         print(layer.__class__.__name__, 'output shape:\t', X.shape)
-    
+
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
@@ -576,11 +582,11 @@ class Residual(nn.Module):
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 class TimeMachine(d2l.DataModule):
     def load(self):
-        fname = d2l.download(d2l.DATA_URL+'timemachine.txt', self.root, 
+        fname = d2l.download(d2l.DATA_URL+'timemachine.txt', self.root,
                              '090b5e7e70c295757f55df93cb0a180b9691891a')
         with open(fname) as f:
             lines = f.readlines()
-            return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() 
+            return [re.sub('[^A-Za-z]+', ' ', line).strip().lower()
                     for line in lines]
 
 
@@ -621,7 +627,7 @@ class Vocab:
         if not isinstance(indices, (list, tuple)):
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
-    
+
     @property
     def unk(self):  # Index for the unknown token
         return self.token_to_idx['<unk>']
@@ -652,17 +658,17 @@ class LMDataLoader(d2l.HyperParameters):
                            ) // (self.num_steps * self.batch_size)
     def __len__(self):
         return self.num_batches
-    
+
     def __iter__(self):
         # Randomly drop the first d tokens for training.
-        corpus = (self.corpus[random.randint(0, self.num_steps - 1):] 
-                  if train else self.corpus)
+        corpus = (self.corpus[random.randint(0, self.num_steps - 1):]
+                  if self.train else self.corpus)
         # No. of subsequences. Subtract 1 to account for labels.
         m = (len(corpus)-1) // self.num_steps
         # The starting indices for input sequences.
         initial_indices = list(range(0, m*self.num_steps, self.num_steps))
-        if train:
-            random.shuffle(initial_indices)        
+        if self.train:
+            random.shuffle(initial_indices)
         for i in range(0, self.num_batches):
             # The randomized starting indices for this minibatch.
             batch_indicies = initial_indices[
@@ -674,63 +680,19 @@ class LMDataLoader(d2l.HyperParameters):
 
 @d2l.add_to_class(d2l.TimeMachine)
 def get_dataloader(self, train):
-    corpus = (self.corpus[:num_train] if train else 
-              self.corpus[num_train:num_train+num_val])
+    corpus = (self.corpus[: self.num_train] if train else
+              self.corpus[self.num_train : self.num_train+self.num_val])
     return LMDataLoader(corpus, self.batch_size, self.num_steps, train)
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def load_data_time_machine(batch_size, num_steps, max_tokens=10000):
-    """Return the iterator and the vocabulary of the time machine dataset."""
-    corpus, vocab = d2l.load_corpus_time_machine(max_tokens)
-    data_iter = SeqDataLoader(corpus, batch_size, num_steps)
-    return data_iter, vocab
-
-
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-class RNNModelScratch:
-    """An RNN Model implemented from scratch."""
-    def __init__(self, vocab_size, num_hiddens, device,
-                 get_params, init_state, forward_fn):
-        self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
-        self.params = get_params(vocab_size, num_hiddens, device)
-        self.init_state, self.forward_fn = init_state, forward_fn
-
-    def __call__(self, X, state):
-        X = F.one_hot(X.T, self.vocab_size).type(torch.float32)
-        return self.forward_fn(X, state, self.params)
-
-    def begin_state(self, batch_size, device):
-        return self.init_state(batch_size, self.num_hiddens, device)
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_preds, net, vocab, device):
-    """Generate new characters following the `prefix`."""
-    state = net.begin_state(batch_size=1, device=device)
-    outputs = [vocab[prefix[0]]]
-    get_input = lambda: d2l.reshape(d2l.tensor(
-        [outputs[-1]], device=device), (1, 1))
-    for y in prefix[1:]:  # Warm-up period
-        _, state = net(get_input(), state)
-        outputs.append(vocab[y])
-    for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = net(get_input(), state)
-        outputs.append(int(y.argmax(dim=1).reshape(1)))
-    return ''.join([vocab.idx_to_token[i] for i in outputs])
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def grad_clipping(net, theta):
-    """Clip the gradient."""
-    if isinstance(net, nn.Module):
-        params = [p for p in net.parameters() if p.requires_grad]
-    else:
-        params = net.params
+@d2l.add_to_class(d2l.Trainer)
+def clip_gradients(self, grad_clip_val, model):
+    params = [p for p in model.parameters() if p.requires_grad]
     norm = torch.sqrt(sum(torch.sum((p.grad ** 2)) for p in params))
-    if norm > theta:
+    if norm > grad_clip_val:
         for param in params:
-            param.grad[:] *= theta / norm
+            param.grad[:] *= grad_clip_val / norm
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
@@ -779,6 +741,22 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device):
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def predict_ch8(prefix, num_preds, net, vocab, device):
+    """Generate new characters following the `prefix`."""
+    state = net.begin_state(batch_size=1, device=device)
+    outputs = [vocab[prefix[0]]]
+    get_input = lambda: d2l.reshape(d2l.tensor(
+        [outputs[-1]], device=device), (1, 1))
+    for y in prefix[1:]:  # Warm-up period
+        _, state = net(get_input(), state)
+        outputs.append(vocab[y])
+    for _ in range(num_preds):  # Predict `num_preds` steps
+        y, state = net(get_input(), state)
+        outputs.append(int(y.argmax(dim=1).reshape(1)))
+    return ''.join([vocab.idx_to_token[i] for i in outputs])
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-concise.md
@@ -1573,7 +1551,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
 
 
 # Defined in file: ./chapter_computer-vision/fine-tuning.md
-d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL + 'hotdog.zip', 
+d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL + 'hotdog.zip',
                          'fba480ffa8aa7e0febbb511d181409f899b9baa5')
 
 
@@ -2112,7 +2090,7 @@ def get_centers_and_contexts(corpus, max_window_size):
 class RandomGenerator:
     """Randomly draw among {1, ..., n} according to n sampling weights."""
     def __init__(self, sampling_weights):
-        # Exclude 
+        # Exclude
         self.population = list(range(1, len(sampling_weights) + 1))
         self.sampling_weights = sampling_weights
         self.candidates = []
@@ -2609,7 +2587,7 @@ def read_snli(data_dir, is_train):
     """Read the SNLI dataset into premises, hypotheses, and labels."""
     def extract_text(s):
         # Remove information that will not be used by us
-        s = re.sub('\\(', '', s) 
+        s = re.sub('\\(', '', s)
         s = re.sub('\\)', '', s)
         # Substitute two or more consecutive whitespace with space
         s = re.sub('\\s{2,}', ' ', s)
@@ -2696,7 +2674,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     # Do not need to compute gradient for `net_G`, detach it from
     # computing gradients.
     fake_Y = net_D(fake_X.detach())
-    loss_D = (loss(real_Y, ones.reshape(real_Y.shape)) + 
+    loss_D = (loss(real_Y, ones.reshape(real_Y.shape)) +
               loss(fake_Y, zeros.reshape(fake_Y.shape))) / 2
     loss_D.backward()
     trainer_D.step()
@@ -2746,35 +2724,35 @@ def draw(self, x, y, label, every_n=1):
         self.data = collections.OrderedDict()
     if label not in self.raw_points:
         self.raw_points[label] = []
-        self.data[label] = []    
+        self.data[label] = []
     points = self.raw_points[label]
     line = self.data[label]
     points.append(Point(x, y))
     if len(points) != every_n:
-        return    
+        return
     mean = lambda x: sum(x) / len(x)
-    line.append(Point(mean([p.x for p in points]), 
+    line.append(Point(mean([p.x for p in points]),
                       mean([p.y for p in points])))
     points.clear()
-    if not self.display: 
+    if not self.display:
         return
     d2l.use_svg_display()
     if self.fig is None:
         self.fig = d2l.plt.figure(figsize=self.figsize)
     plt_lines, labels = [], []
-    for (k, v), ls, color in zip(self.data.items(), self.ls, self.colors):        
-        plt_lines.append(d2l.plt.plot([p.x for p in v], [p.y for p in v], 
+    for (k, v), ls, color in zip(self.data.items(), self.ls, self.colors):
+        plt_lines.append(d2l.plt.plot([p.x for p in v], [p.y for p in v],
                                       linestyle=ls, color=color)[0])
-        labels.append(k)        
+        labels.append(k)
     axes = self.axes if self.axes else d2l.plt.gca()
     if self.xlim: axes.set_xlim(self.xlim)
     if self.ylim: axes.set_ylim(self.ylim)
-    if not self.xlabel: self.xlabel = self.x    
+    if not self.xlabel: self.xlabel = self.x
     axes.set_xlabel(self.xlabel)
     axes.set_ylabel(self.ylabel)
     axes.set_xscale(self.xscale)
     axes.set_yscale(self.yscale)
-    axes.legend(plt_lines, labels)    
+    axes.legend(plt_lines, labels)
     display.display(self.fig)
     display.clear_output(wait=True)
 
@@ -2953,7 +2931,7 @@ class Animator:
         self.config_axes()
         display.display(self.fig)
         display.clear_output(wait=True)
-        
+
 class Accumulator:
     """For accumulating sums over `n` variables."""
     def __init__(self, n):
@@ -2966,9 +2944,9 @@ class Accumulator:
         self.data = [0.0] * len(self.data)
 
     def __getitem__(self, idx):
-        return self.data[idx]        
-    
-    
+        return self.data[idx]
+
+
 def accuracy(y_hat, y):
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
@@ -3015,7 +2993,7 @@ def extract(filename, folder=None):
     if folder is None:
         folder = base_dir
     fp.extractall(folder)
-    
+
 
 
 # Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
@@ -3050,6 +3028,19 @@ def evaluate_loss(net, data_iter, loss):
         l = loss(out, y)
         metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
+
+
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+def grad_clipping(net, theta):
+    """Clip the gradient."""
+    if isinstance(net, nn.Module):
+        params = [p for p in net.parameters() if p.requires_grad]
+    else:
+        params = net.params
+    norm = torch.sqrt(sum(torch.sum((p.grad ** 2)) for p in params))
+    if norm > theta:
+        for param in params:
+            param.grad[:] *= theta / norm
 
 
 # Alias defined in config.ini
@@ -3087,4 +3078,3 @@ argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
 astype = lambda x, *args, **kwargs: x.type(*args, **kwargs)
 transpose = lambda x, *args, **kwargs: x.t(*args, **kwargs)
 reduce_mean = lambda x, *args, **kwargs: x.mean(*args, **kwargs)
-

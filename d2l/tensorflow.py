@@ -170,8 +170,9 @@ class ProgressBoard(d2l.HyperParameters):
 
 # Defined in file: ./chapter_linear-networks/api.md
 class Module(d2l.nn_Module, d2l.HyperParameters):
-    def __init__(self):
+    def __init__(self, plot_train_per_epoch=5, plot_valid_per_epoch=1):
         super().__init__()
+        self.save_hyperparameters()
         self.board = ProgressBoard()
         self.training = None
 
@@ -195,7 +196,8 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         num_train = self.trainer.num_train_batches
         self.board.xlabel = 'epoch'
         self.board.draw(self.trainer.train_batch_idx / num_train, l, 
-                        'train_loss', every_n=num_train // 5)
+                        'train_loss', every_n=int(
+                            num_train / self.plot_train_per_epoch))
         return l
 
     def validation_step(self, batch):
@@ -203,7 +205,8 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         l = self.loss(self(X), y)
         # Draw progress
         self.board.draw(self.trainer.epoch+1, l, 'val_loss', 
-                        every_n=self.trainer.num_val_batches)
+                        every_n=int(self.trainer.num_val_batches /
+                                    self.plot_valid_per_epoch))
 
     def configure_optimizers(self):
         raise NotImplementedError
@@ -226,7 +229,7 @@ class DataModule(d2l.HyperParameters):
 
 # Defined in file: ./chapter_linear-networks/api.md
 class Trainer(d2l.HyperParameters):
-    def __init__(self, max_epochs, num_gpus=0):
+    def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'Not support GPUs yet'
 
@@ -254,6 +257,7 @@ class Trainer(d2l.HyperParameters):
 
     def fit_epoch(self):
         raise NotImplementedError
+        
 
 
 # Defined in file: ./chapter_linear-networks/synthetic-regression-data.md
@@ -339,6 +343,8 @@ def fit_epoch(self):
         with tf.GradientTape() as tape:
             loss = self.model.training_step(self.prepare_batch(batch))
         grads = tape.gradient(loss, self.model.trainable_variables)
+        if self.gradient_clip_val > 0:
+            grads = self.clip_gradients(self.gradient_clip_val, grads)
         self.optim.apply_gradients(zip(grads, self.model.trainable_variables))
         self.train_batch_idx += 1
     if self.val_dataloader is None:
@@ -631,12 +637,12 @@ class LMDataLoader(d2l.HyperParameters):
     def __iter__(self):
         # Randomly drop the first d tokens for training.
         corpus = (self.corpus[random.randint(0, self.num_steps - 1):] 
-                  if train else self.corpus)
+                  if self.train else self.corpus)
         # No. of subsequences. Subtract 1 to account for labels.
         m = (len(corpus)-1) // self.num_steps
         # The starting indices for input sequences.
         initial_indices = list(range(0, m*self.num_steps, self.num_steps))
-        if train:
+        if self.train:
             random.shuffle(initial_indices)        
         for i in range(0, self.num_batches):
             # The randomized starting indices for this minibatch.
@@ -649,71 +655,25 @@ class LMDataLoader(d2l.HyperParameters):
 
 @d2l.add_to_class(d2l.TimeMachine)
 def get_dataloader(self, train):
-    corpus = (self.corpus[:num_train] if train else 
-              self.corpus[num_train:num_train+num_val])
+    corpus = (self.corpus[: self.num_train] if train else 
+              self.corpus[self.num_train : self.num_train+self.num_val])
     return LMDataLoader(corpus, self.batch_size, self.num_steps, train)
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def load_data_time_machine(batch_size, num_steps, max_tokens=10000):
-    """Return the iterator and the vocabulary of the time machine dataset."""
-    corpus, vocab = d2l.load_corpus_time_machine(max_tokens)
-    data_iter = SeqDataLoader(corpus, batch_size, num_steps)
-    return data_iter, vocab
-
-
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-class RNNModelScratch:
-    """An RNN Model implemented from scratch."""
-    def __init__(self, vocab_size, num_hiddens,
-                 init_state, forward_fn, get_params):
-        self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
-        self.init_state, self.forward_fn = init_state, forward_fn
-        self.trainable_variables = get_params(vocab_size, num_hiddens)
-
-    def __call__(self, X, state):
-        X = tf.one_hot(tf.transpose(X), self.vocab_size)
-        X = tf.cast(X, tf.float32)
-        return self.forward_fn(X, state, self.trainable_variables)
-
-    def begin_state(self, batch_size, *args, **kwargs):
-        return self.init_state(batch_size, self.num_hiddens)
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_preds, net, vocab):
-    """Generate new characters following the `prefix`."""
-    state = net.begin_state(batch_size=1, dtype=tf.float32)
-    outputs = [vocab[prefix[0]]]
-    get_input = lambda: d2l.reshape(d2l.tensor([outputs[-1]]), (1, 1)).numpy()
-    for y in prefix[1:]:  # Warm-up period
-        _, state = net(get_input(), state)
-        outputs.append(vocab[y])
-    for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = net(get_input(), state)
-        outputs.append(int(y.numpy().argmax(axis=1).reshape(1)))
-    return ''.join([vocab.idx_to_token[i] for i in outputs])
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def grad_clipping(grads, theta):
-    """Clip the gradient."""
-    theta = tf.constant(theta, dtype=tf.float32)
-    new_grad = []
-    for grad in grads:
-        if isinstance(grad, tf.IndexedSlices):
-            new_grad.append(tf.convert_to_tensor(grad))
-        else:
-            new_grad.append(grad)
+@d2l.add_to_class(d2l.Trainer)
+def clip_gradients(self, grad_clip_val, grads):
+    grad_clip_val = tf.constant(grad_clip_val, dtype=tf.float32)
+    new_grads = [tf.convert_to_tensor(grad) for grad in grads
+                 if isinstance(grad, tf.IndexedSlices) else grad]
     norm = tf.math.sqrt(sum((tf.reduce_sum(grad ** 2)).numpy()
                         for grad in new_grad))
     norm = tf.cast(norm, tf.float32)
-    if tf.greater(norm, theta):
-        for i, grad in enumerate(new_grad):
-            new_grad[i] = grad * theta / norm
-    else:
-        new_grad = new_grad
-    return new_grad
+    if tf.greater(norm, grad_clip_val):
+        for i, grad in enumerate(new_grads):
+            new_grads[i] = grad * grad_clip_val / norm
+        return new_grads
+    return grads
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
@@ -757,6 +717,21 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, strategy):
     device = d2l.try_gpu()._device_name
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def predict_ch8(prefix, num_preds, net, vocab):
+    """Generate new characters following the `prefix`."""
+    state = net.begin_state(batch_size=1, dtype=tf.float32)
+    outputs = [vocab[prefix[0]]]
+    get_input = lambda: d2l.reshape(d2l.tensor([outputs[-1]]), (1, 1)).numpy()
+    for y in prefix[1:]:  # Warm-up period
+        _, state = net(get_input(), state)
+        outputs.append(vocab[y])
+    for _ in range(num_preds):  # Predict `num_preds` steps
+        y, state = net(get_input(), state)
+        outputs.append(int(y.numpy().argmax(axis=1).reshape(1)))
+    return ''.join([vocab.idx_to_token[i] for i in outputs])
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-concise.md
@@ -1814,6 +1789,27 @@ def evaluate_loss(net, data_iter, loss):
         l = loss(net(X), y)
         metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
+
+
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+def grad_clipping(grads, theta):
+    """Clip the gradient."""
+    theta = tf.constant(theta, dtype=tf.float32)
+    new_grad = []
+    for grad in grads:
+        if isinstance(grad, tf.IndexedSlices):
+            new_grad.append(tf.convert_to_tensor(grad))
+        else:
+            new_grad.append(grad)
+    norm = tf.math.sqrt(sum((tf.reduce_sum(grad ** 2)).numpy()
+                        for grad in new_grad))
+    norm = tf.cast(norm, tf.float32)
+    if tf.greater(norm, theta):
+        for i, grad in enumerate(new_grad):
+            new_grad[i] = grad * theta / norm
+    else:
+        new_grad = new_grad
+    return new_grad
 
 
 # Alias defined in config.ini

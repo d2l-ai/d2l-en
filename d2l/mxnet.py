@@ -171,8 +171,9 @@ class ProgressBoard(d2l.HyperParameters):
 
 # Defined in file: ./chapter_linear-networks/api.md
 class Module(d2l.nn_Module, d2l.HyperParameters):
-    def __init__(self):
+    def __init__(self, plot_train_per_epoch=5, plot_valid_per_epoch=1):
         super().__init__()
+        self.save_hyperparameters()
         self.board = ProgressBoard()
     def loss(self, y_hat, y):
         raise NotImplementedError
@@ -189,7 +190,8 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         num_train = self.trainer.num_train_batches
         self.board.xlabel = 'epoch'
         self.board.draw(self.trainer.train_batch_idx / num_train, l, 
-                        'train_loss', every_n=num_train // 5)
+                        'train_loss', every_n=int(
+                            num_train / self.plot_train_per_epoch))
         return l
 
     def validation_step(self, batch):
@@ -197,7 +199,8 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         l = self.loss(self(X), y)
         # Draw progress
         self.board.draw(self.trainer.epoch+1, l, 'val_loss', 
-                        every_n=self.trainer.num_val_batches)
+                        every_n=int(self.trainer.num_val_batches /
+                                    self.plot_valid_per_epoch))
 
     def configure_optimizers(self):
         raise NotImplementedError
@@ -220,7 +223,7 @@ class DataModule(d2l.HyperParameters):
 
 # Defined in file: ./chapter_linear-networks/api.md
 class Trainer(d2l.HyperParameters):
-    def __init__(self, max_epochs, num_gpus=0):
+    def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'Not support GPUs yet'
 
@@ -248,6 +251,7 @@ class Trainer(d2l.HyperParameters):
 
     def fit_epoch(self):
         raise NotImplementedError
+        
 
 
 # Defined in file: ./chapter_linear-networks/synthetic-regression-data.md
@@ -330,6 +334,8 @@ def fit_epoch(self):
         with autograd.record():
             loss = self.model.training_step(self.prepare_batch(batch))
         loss.backward()
+        if self.gradient_clip_val > 0:
+            self.clip_gradients(self.gradient_clip_val, self.model)
         self.optim.step(1)
         self.train_batch_idx += 1
     if self.val_dataloader is None:
@@ -493,7 +499,7 @@ def try_all_gpus():
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 @d2l.add_to_class(d2l.Trainer)
-def __init__(self, max_epochs, num_gpus=0):
+def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
     self.save_hyperparameters()
     self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
     
@@ -640,12 +646,12 @@ class LMDataLoader(d2l.HyperParameters):
     def __iter__(self):
         # Randomly drop the first d tokens for training.
         corpus = (self.corpus[random.randint(0, self.num_steps - 1):] 
-                  if train else self.corpus)
+                  if self.train else self.corpus)
         # No. of subsequences. Subtract 1 to account for labels.
         m = (len(corpus)-1) // self.num_steps
         # The starting indices for input sequences.
         initial_indices = list(range(0, m*self.num_steps, self.num_steps))
-        if train:
+        if self.train:
             random.shuffle(initial_indices)        
         for i in range(0, self.num_batches):
             # The randomized starting indices for this minibatch.
@@ -658,63 +664,21 @@ class LMDataLoader(d2l.HyperParameters):
 
 @d2l.add_to_class(d2l.TimeMachine)
 def get_dataloader(self, train):
-    corpus = (self.corpus[:num_train] if train else 
-              self.corpus[num_train:num_train+num_val])
+    corpus = (self.corpus[: self.num_train] if train else 
+              self.corpus[self.num_train : self.num_train+self.num_val])
     return LMDataLoader(corpus, self.batch_size, self.num_steps, train)
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def load_data_time_machine(batch_size, num_steps, max_tokens=10000):
-    """Return the iterator and the vocabulary of the time machine dataset."""
-    corpus, vocab = d2l.load_corpus_time_machine(max_tokens)
-    data_iter = SeqDataLoader(corpus, batch_size, num_steps)
-    return data_iter, vocab
-
-
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-class RNNModelScratch:
-    """An RNN Model implemented from scratch."""
-    def __init__(self, vocab_size, num_hiddens, device, get_params,
-                 init_state, forward_fn):
-        self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
-        self.params = get_params(vocab_size, num_hiddens, device)
-        self.init_state, self.forward_fn = init_state, forward_fn
-
-    def __call__(self, X, state):
-        X = npx.one_hot(X.T, self.vocab_size)
-        return self.forward_fn(X, state, self.params)
-
-    def begin_state(self, batch_size, ctx):
-        return self.init_state(batch_size, self.num_hiddens, ctx)
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_preds, net, vocab, device):
-    """Generate new characters following the `prefix`."""
-    state = net.begin_state(batch_size=1, ctx=device)
-    outputs = [vocab[prefix[0]]]
-    get_input = lambda: d2l.reshape(
-        d2l.tensor([outputs[-1]], ctx=device), (1, 1))
-    for y in prefix[1:]:  # Warm-up period
-        _, state = net(get_input(), state)
-        outputs.append(vocab[y])
-    for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = net(get_input(), state)
-        outputs.append(int(y.argmax(axis=1).reshape(1)))
-    return ''.join([vocab.idx_to_token[i] for i in outputs])
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def grad_clipping(net, theta):
-    """Clip the gradient."""
-    if isinstance(net, gluon.Block):
-        params = [p.data() for p in net.collect_params().values()]
-    else:
-        params = net.params
+@d2l.add_to_class(d2l.Trainer)
+def clip_gradients(self, grad_clip_val, model):
+    params = model.collect_params()
+    if not isinstance(params, (list, tuple)):
+        params = [p.data() for p in params.values()]    
     norm = math.sqrt(sum((p.grad ** 2).sum() for p in params))
-    if norm > theta:
+    if norm > grad_clip_val:
         for param in params:
-            param.grad[:] *= theta / norm
+            param.grad[:] *= grad_clip_val / norm
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
@@ -761,6 +725,22 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device):
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def predict_ch8(prefix, num_preds, net, vocab, device):
+    """Generate new characters following the `prefix`."""
+    state = net.begin_state(batch_size=1, ctx=device)
+    outputs = [vocab[prefix[0]]]
+    get_input = lambda: d2l.reshape(
+        d2l.tensor([outputs[-1]], ctx=device), (1, 1))
+    for y in prefix[1:]:  # Warm-up period
+        _, state = net(get_input(), state)
+        outputs.append(vocab[y])
+    for _ in range(num_preds):  # Predict `num_preds` steps
+        y, state = net(get_input(), state)
+        outputs.append(int(y.argmax(axis=1).reshape(1)))
+    return ''.join([vocab.idx_to_token[i] for i in outputs])
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-concise.md
@@ -3046,6 +3026,17 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
           f'test acc {test_acc:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
           f'on {str(device)}')
+    
+def grad_clipping(net, theta):
+    """Clip the gradient."""
+    if isinstance(net, gluon.Block):
+        params = [p.data() for p in net.collect_params().values()]
+    else:
+        params = net.params
+    norm = math.sqrt(sum((p.grad ** 2).sum() for p in params))
+    if norm > theta:
+        for param in params:
+            param.grad[:] *= theta / norm
 
 
 # Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md

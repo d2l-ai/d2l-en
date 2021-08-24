@@ -187,6 +187,17 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
           f'test acc {test_acc:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
           f'on {str(device)}')
+    
+def grad_clipping(net, theta):  #@save
+    """Clip the gradient."""
+    if isinstance(net, gluon.Block):
+        params = [p.data() for p in net.collect_params().values()]
+    else:
+        params = net.params
+    norm = math.sqrt(sum((p.grad ** 2).sum() for p in params))
+    if norm > theta:
+        for param in params:
+            param.grad[:] *= theta / norm
 ```
 
 ```{.python .input}
@@ -586,4 +597,40 @@ def evaluate_loss(net, data_iter, loss):  #@save
         l = loss(net(X), y)
         metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
+```
+
+```{.python .input}
+#@tab pytorch
+def grad_clipping(net, theta):  #@save
+    """Clip the gradient."""
+    if isinstance(net, nn.Module):
+        params = [p for p in net.parameters() if p.requires_grad]
+    else:
+        params = net.params
+    norm = torch.sqrt(sum(torch.sum((p.grad ** 2)) for p in params))
+    if norm > theta:
+        for param in params:
+            param.grad[:] *= theta / norm
+```
+
+```{.python .input}
+#@tab tensorflow
+def grad_clipping(grads, theta):  #@save
+    """Clip the gradient."""
+    theta = tf.constant(theta, dtype=tf.float32)
+    new_grad = []
+    for grad in grads:
+        if isinstance(grad, tf.IndexedSlices):
+            new_grad.append(tf.convert_to_tensor(grad))
+        else:
+            new_grad.append(grad)
+    norm = tf.math.sqrt(sum((tf.reduce_sum(grad ** 2)).numpy()
+                        for grad in new_grad))
+    norm = tf.cast(norm, tf.float32)
+    if tf.greater(norm, theta):
+        for i, grad in enumerate(new_grad):
+            new_grad[i] = grad * theta / norm
+    else:
+        new_grad = new_grad
+    return new_grad
 ```

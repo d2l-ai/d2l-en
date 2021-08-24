@@ -132,8 +132,9 @@ Sometimes we put the code to compute the outputs into a separate `forward` metho
 ```{.python .input}
 %%tab all
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
-    def __init__(self):
+    def __init__(self, plot_train_per_epoch=5, plot_valid_per_epoch=1):
         super().__init__()
+        self.save_hyperparameters()
         self.board = ProgressBoard()
         if tab.selected('tensorflow'):
             self.training = None
@@ -159,7 +160,8 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
         num_train = self.trainer.num_train_batches
         self.board.xlabel = 'epoch'
         self.board.draw(self.trainer.train_batch_idx / num_train, l, 
-                        'train_loss', every_n=num_train // 5)
+                        'train_loss', every_n=int(
+                            num_train / self.plot_train_per_epoch))
         return l
 
     def validation_step(self, batch):
@@ -167,7 +169,8 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
         l = self.loss(self(X), y)
         # Draw progress
         self.board.draw(self.trainer.epoch+1, l, 'val_loss', 
-                        every_n=self.trainer.num_val_batches)
+                        every_n=int(self.trainer.num_val_batches /
+                                    self.plot_valid_per_epoch))
 
     def configure_optimizers(self):
         raise NotImplementedError
@@ -221,7 +224,7 @@ The `Trainer` class trains the learnable parameters in the `Module` class with d
 ```{.python .input}
 %%tab all
 class Trainer(d2l.HyperParameters):  #@save
-    def __init__(self, max_epochs, num_gpus=0):
+    def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'Not support GPUs yet'
 
@@ -249,6 +252,7 @@ class Trainer(d2l.HyperParameters):  #@save
 
     def fit_epoch(self):
         raise NotImplementedError
+        
 ```
 
 ## Summary
