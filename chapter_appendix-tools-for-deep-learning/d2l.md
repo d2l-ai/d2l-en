@@ -72,11 +72,22 @@ The implementations of the following members of the `d2l` package and sections w
 .. autoclass:: Trainer
    :members: 
 
+.. autoclass:: SGD
+   :members: 
+
 ```
 
 ## Utilities
 
 ```eval_rst 
+
+.. autofunction:: add_to_class
+
+.. autofunction:: cpu
+
+.. autofunction:: gpu
+
+.. autofunction:: num_gpus
 
 .. autoclass:: ProgressBoard
    :members: 
