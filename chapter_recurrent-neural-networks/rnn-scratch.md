@@ -121,9 +121,13 @@ class RNNScratch(d2l.Classification):  #@save
         super().__init__(plot_train_per_epoch=0.1, plot_valid_per_epoch=0.1)
         self.save_hyperparameters()
         self.init_params()
-        for param in getattr(self, '_params', []):
+        for param in self.get_scratch_params():
             param.attach_grad()
         
+    def get_scratch_params(self):
+        return [getattr(self, attr) for attr in dir(self) 
+                if isinstance(getattr(self, attr), np.ndarray)]
+    
     def init_params(self):
         # Hidden layer parameters
         self.W_xh = d2l.randn(self.num_inputs, self.num_hiddens) * self.sigma
@@ -132,12 +136,10 @@ class RNNScratch(d2l.Classification):  #@save
         # Output layer parameters
         self.W_hq = d2l.randn(self.num_hiddens, self.num_outputs) * self.sigma
         self.b_q = d2l.zeros(self.num_outputs)
-        self._params = [self.W_xh, self.W_hh, self.b_h, self.W_hq, self.b_q]
         
     def collect_params(self):
-        if hasattr(self, '_params'):
-            return self._params
-        return super().collect_params()
+        params = super().collect_params()
+        return params if len(params.keys()) else self.get_scratch_params()
 ```
 
 ```{.python .input  n=13}
@@ -231,8 +233,12 @@ def forward(self, X, state=None):
                      d2l.matmul(H, self.W_hh) + self.b_h)
         Y = d2l.matmul(H, self.W_hq) + self.b_q
         outputs.append(Y)
-    # Return shape (batch_size x num_steps, num_outputs)
-    return d2l.concat(outputs, 0), (H,)
+    # Return shape (num_steps, batch_size, num_outputs)
+    return d2l.stack(outputs, 0), (H,)
+```
+
+```{.python .input}
+Y.shape
 ```
 
 ```{.python .input  n=20}
@@ -240,12 +246,14 @@ def forward(self, X, state=None):
 @d2l.add_to_class(RNNScratch)  #@save
 def loss(self, outputs, Y):
     y_hat, _ = outputs
-    return super(RNNScratch, self).loss(y_hat, d2l.reshape(d2l.transpose(Y), -1))
+    return super(RNNScratch, self).loss(
+        d2l.reshape(y_hat, (-1, self.num_outputs)), d2l.reshape(d2l.transpose(Y), -1))
 
 @d2l.add_to_class(RNNScratch)  #@save
-def accuracy(self, outputs, y):
+def accuracy(self, outputs, Y):
     y_hat, _ = outputs    
-    return super(RNNScratch, self).accuracy(y_hat, d2l.reshape(d2l.transpose(Y), (-1,1)))
+    return super(RNNScratch, self).accuracy(
+        d2l.reshape(y_hat, (-1, self.num_outputs)), d2l.reshape(d2l.transpose(Y), (-1,1)))
 ```
 
 With all the needed functions being defined,
@@ -363,6 +371,11 @@ model = RNNScratch(num_inputs=len(data.vocab),
                    num_outputs=len(data.vocab), num_hiddens=32, lr=1)
 trainer = d2l.Trainer(max_epochs=500, gradient_clip_val=1)
 trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab all
+print('perplexity:', math.exp(model.board.data['val_loss'][-1].y))
 ```
 
 ## Training
