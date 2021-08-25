@@ -152,25 +152,32 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
                 self.training = training
             return self.forward(X)
 
+    def plot(self, key, value, train):
+        """Plot a point in animation."""
+        assert hasattr(self, 'trainer'), 'trainer is not inited'
+        self.board.xlabel = 'epoch'
+        if train:
+            x = self.trainer.train_batch_idx / \
+                self.trainer.num_train_batches
+            n = self.trainer.num_train_batches / \
+                self.plot_train_per_epoch
+        else:
+            x = self.trainer.epoch + 1
+            n = self.trainer.num_val_batches / \
+                self.plot_valid_per_epoch
+        self.board.draw(x, value, ('train_' if train else 'val_') + key, 
+                        every_n=int(n))
+
     def training_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
-        # Draw progress
-        assert hasattr(self, 'trainer'), 'trainer is not inited'
-        num_train = self.trainer.num_train_batches
-        self.board.xlabel = 'epoch'
-        self.board.draw(self.trainer.train_batch_idx / num_train, l, 
-                        'train_loss', every_n=int(
-                            num_train / self.plot_train_per_epoch))
+        self.plot('loss', l, train=True)
         return l
 
     def validation_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
-        # Draw progress
-        self.board.draw(self.trainer.epoch+1, l, 'val_loss', 
-                        every_n=int(self.trainer.num_val_batches /
-                                    self.plot_valid_per_epoch))
+        self.plot('loss', l, train=False)
 
     def configure_optimizers(self):
         raise NotImplementedError

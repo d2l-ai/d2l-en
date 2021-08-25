@@ -38,10 +38,8 @@ class Classification(d2l.Module):  #@save
     def validation_step(self, batch):
         X, y = batch
         y_hat = self(X)
-        for k, v in (('val_loss', self.loss(y_hat, y)),
-                     ('val_acc', self.accuracy(y_hat, y))):
-            self.board.draw(self.trainer.epoch+1, v, k,
-                            every_n=self.trainer.num_val_batches)    
+        self.plot('loss', self.loss(y_hat, y), train=False)
+        self.plot('acc', self.accuracy(y_hat, y), train=False)
 ```
 
 Again, we use minibatch SGD as the optimizer.
