@@ -154,7 +154,7 @@ class HyperParameters:
         frame = inspect.currentframe().f_back
         _, _, _, local_vars = inspect.getargvalues(frame)
         self.hparams = {k:v for k, v in local_vars.items()
-                        if k not in set(ignore+['self'])}
+                        if k not in set(ignore+['self']) and not k.startswith('_')}
         for k, v in self.hparams.items():
             setattr(self, k, v)
 
@@ -224,25 +224,32 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         assert hasattr(self, 'net'), 'No neural network is defined'
         return self.net(X)
 
+    def plot(self, key, value, train):
+        """Plot a point in animation."""
+        assert hasattr(self, 'trainer'), 'trainer is not inited'
+        self.board.xlabel = 'epoch'
+        if train:
+            x = self.trainer.train_batch_idx / \
+                self.trainer.num_train_batches
+            n = self.trainer.num_train_batches / \
+                self.plot_train_per_epoch
+        else:
+            x = self.trainer.epoch + 1
+            n = self.trainer.num_val_batches / \
+                self.plot_valid_per_epoch
+        self.board.draw(x, value, ('train_' if train else 'val_') + key,
+                        every_n=int(n))
+
     def training_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
-        # Draw progress
-        assert hasattr(self, 'trainer'), 'trainer is not inited'
-        num_train = self.trainer.num_train_batches
-        self.board.xlabel = 'epoch'
-        self.board.draw(self.trainer.train_batch_idx / num_train, l,
-                        'train_loss', every_n=int(
-                            num_train / self.plot_train_per_epoch))
+        self.plot('loss', l, train=True)
         return l
 
     def validation_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
-        # Draw progress
-        self.board.draw(self.trainer.epoch+1, l, 'val_loss',
-                        every_n=int(self.trainer.num_val_batches /
-                                    self.plot_valid_per_epoch))
+        self.plot('loss', l, train=False)
 
     def configure_optimizers(self):
         raise NotImplementedError
@@ -423,16 +430,6 @@ class LinearRegression(d2l.Module):
         fn = gluon.loss.L2Loss()
         return fn(y_hat, y).mean()
 
-    def training_step(self, batch):
-        """Defined in :numref:`sec_linear_concise`"""
-        X, y = batch
-        l = self.loss(self(X), y)
-        epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
-        self.board.xlabel = 'epoch'
-        self.board.yscale = 'log'
-        self.board.draw(epoch, l, 'train_loss', every_n=10)
-        return l
-
     def configure_optimizers(self):
         """Defined in :numref:`sec_linear_concise`"""
         return gluon.Trainer(self.collect_params(),
@@ -486,10 +483,8 @@ class Classification(d2l.Module):
     def validation_step(self, batch):
         X, y = batch
         y_hat = self(X)
-        for k, v in (('val_loss', self.loss(y_hat, y)),
-                     ('val_acc', self.accuracy(y_hat, y))):
-            self.board.draw(self.trainer.epoch+1, v, k,
-                            every_n=self.trainer.num_val_batches)
+        self.plot('loss', self.loss(y_hat, y), train=False)
+        self.plot('acc', self.accuracy(y_hat, y), train=False)
 
     def accuracy(self, y_hat, y):
         """Compute the number of correct predictions.
@@ -665,89 +660,78 @@ def get_dataloader(self, train):
               self.corpus[self.num_train : self.num_train+self.num_val])
     return LMDataLoader(corpus, self.batch_size, self.num_steps, train)
 
-def train_epoch_ch8(net, train_iter, loss, updater, device):
-    """Train a model within one epoch (defined in Chapter 8).
+class RNNScratch(d2l.Classification):
+    """Defined in :numref:`sec_rnn_scratch`"""
+    def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
+        super().__init__(plot_train_per_epoch=0.1, plot_valid_per_epoch=0.1)
+        self.save_hyperparameters()
+        self.init_params()
+        for param in self.get_scratch_params():
+            param.attach_grad()
 
-    Defined in :numref:`sec_rnn_scratch`"""
-    timer = d2l.Timer()
-    metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
-    for X, Y in train_iter:
-        # With random sampling, initialize state for each iteration
-        state = net.begin_state(batch_size=X.shape[0], ctx=device)
-        y = Y.T.reshape(-1)
-        X, y = X.as_in_ctx(device), y.as_in_ctx(device)
-        with autograd.record():
-            y_hat, state = net(X, state)
-            l = loss(y_hat, y).mean()
-        l.backward()
-        grad_clipping(net, 1)
-        updater(batch_size=1)  # Since the `mean` function has been invoked
-        metric.add(l * d2l.size(y), d2l.size(y))
-    return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
+    def get_scratch_params(self):
+        return [getattr(self, attr) for attr in dir(self)
+                if isinstance(getattr(self, attr), np.ndarray)]
 
-def train_ch8(net, train_iter, vocab, lr, num_epochs, device):
-    """Train a model (defined in Chapter 8).
+    def init_params(self):
+        # Hidden layer parameters
+        self.W_xh = d2l.randn(self.num_inputs, self.num_hiddens) * self.sigma
+        self.W_hh = d2l.randn(self.num_hiddens, self.num_hiddens) * self.sigma
+        self.b_h = d2l.zeros(self.num_hiddens)
+        # Output layer parameters
+        self.W_hq = d2l.randn(self.num_hiddens, self.num_outputs) * self.sigma
+        self.b_q = d2l.zeros(self.num_outputs)
 
-    Defined in :numref:`sec_rnn_scratch`"""
-    loss = gluon.loss.SoftmaxCrossEntropyLoss()
-    animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[10, num_epochs])
-    # Initialize
-    if isinstance(net, gluon.Block):
-        net.initialize(ctx=device, force_reinit=True,
-                         init=init.Normal(0.01))
-        trainer = gluon.Trainer(net.collect_params(),
-                                'sgd', {'learning_rate': lr})
-        updater = lambda batch_size: trainer.step(batch_size)
-    else:
-        updater = lambda batch_size: d2l.sgd(net.params, lr, batch_size)
-    predict = lambda prefix: predict_ch8(prefix, 50, net, vocab, device)
-    # Train and predict
-    for epoch in range(num_epochs):
-        ppl, speed = train_epoch_ch8(
-            net, train_iter, loss, updater, device)
-        if (epoch + 1) % 10 == 0:
-            animator.add(epoch + 1, [ppl])
-    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
-    print(predict('time traveller'))
+    def collect_params(self):
+        params = super().collect_params()
+        return params if len(params.keys()) else self.get_scratch_params()
 
-def predict_ch8(prefix, num_preds, net, vocab, device):
-    """Generate new characters following the `prefix`.
+    def init_state(self, X):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        return (d2l.zeros((X.shape[0], self.num_hiddens)), )
 
-    Defined in :numref:`sec_rnn_scratch`"""
-    state = net.begin_state(batch_size=1, ctx=device)
-    outputs = [vocab[prefix[0]]]
-    get_input = lambda: d2l.reshape(
-        d2l.tensor([outputs[-1]], ctx=device), (1, 1))
-    for y in prefix[1:]:  # Warm-up period
-        _, state = net(get_input(), state)
-        outputs.append(vocab[y])
-    for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = net(get_input(), state)
-        outputs.append(int(y.argmax(axis=1).reshape(1)))
-    return ''.join([vocab.idx_to_token[i] for i in outputs])
+    def forward(self, X, state=None):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        if state is None:
+            state = self.init_state(X)
+        # Shape of X: (batch_size, num_steps)
+        # Shape of embs: (num_steps, batch_size, num_inputs)
+        embs = npx.one_hot(X.T, self.num_inputs)
+        H, = state
+        outputs = []
+        for emb in embs:
+            H = d2l.tanh(d2l.matmul(emb, self.W_xh) +
+                         d2l.matmul(H, self.W_hh) + self.b_h)
+            Y = d2l.matmul(H, self.W_hq) + self.b_q
+            outputs.append(Y)
+        # Return shape (num_steps, batch_size, num_outputs)
+        return d2l.stack(outputs, 0), (H,)
 
-class RNNModel(nn.Block):
-    """The RNN model.
+    def loss(self, outputs, Y):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        y_hat, _ = outputs
+        return super(RNNScratch, self).loss(
+            d2l.reshape(y_hat, (-1, self.num_outputs)), d2l.reshape(d2l.transpose(Y), -1))
+    
 
-    Defined in :numref:`sec_rnn-concise`"""
-    def __init__(self, rnn_layer, vocab_size, **kwargs):
-        super(RNNModel, self).__init__(**kwargs)
-        self.rnn = rnn_layer
-        self.vocab_size = vocab_size
-        self.dense = nn.Dense(vocab_size)
+    def accuracy(self, outputs, Y):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        y_hat, _ = outputs
+        return super(RNNScratch, self).accuracy(
+            d2l.reshape(y_hat, (-1, self.num_outputs)), d2l.reshape(d2l.transpose(Y), (-1,1)))
 
-    def forward(self, inputs, state):
-        X = npx.one_hot(inputs.T, self.vocab_size)
-        Y, state = self.rnn(X, state)
-        # The fully connected layer will first change the shape of `Y` to
-        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
-        # (`num_steps` * `batch_size`, `vocab_size`).
-        output = self.dense(Y.reshape(-1, Y.shape[-1]))
-        return output, state
-
-    def begin_state(self, *args, **kwargs):
-        return self.rnn.begin_state(*args, **kwargs)
+    def predict(self, prefix, num_preds, vocab):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        get_input = lambda x: d2l.tensor([[x]])
+        outputs = [vocab[prefix[0]]]
+        state = self.init_state(get_input(outputs[-1]))
+        for y in prefix[1:]:  # Warm-up period
+            _, state = self(get_input(outputs[-1]), state)
+            outputs.append(vocab[y])
+        for _ in range(num_preds):  # Predict `num_preds` steps
+            y, state = self(get_input(outputs[-1]), state)
+            outputs.append(int(d2l.reshape(d2l.argmax(y, axis=1), 1)))
+        return ''.join([vocab.idx_to_token[i] for i in outputs])
 
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')

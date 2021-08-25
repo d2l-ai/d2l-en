@@ -1,7 +1,3 @@
-USE_MXNET = False
-USE_PYTORCH = True
-USE_TENSORFLOW = False
-
 DATA_HUB = dict()
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
@@ -165,7 +161,7 @@ class HyperParameters:
         frame = inspect.currentframe().f_back
         _, _, _, local_vars = inspect.getargvalues(frame)
         self.hparams = {k:v for k, v in local_vars.items()
-                        if k not in set(ignore+['self'])}
+                        if k not in set(ignore+['self']) and not k.startswith('_')}
         for k, v in self.hparams.items():
             setattr(self, k, v)
 
@@ -235,25 +231,32 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         assert hasattr(self, 'net'), 'No neural network is defined'
         return self.net(X)
 
+    def plot(self, key, value, train):
+        """Plot a point in animation."""
+        assert hasattr(self, 'trainer'), 'trainer is not inited'
+        self.board.xlabel = 'epoch'
+        if train:
+            x = self.trainer.train_batch_idx / \
+                self.trainer.num_train_batches
+            n = self.trainer.num_train_batches / \
+                self.plot_train_per_epoch
+        else:
+            x = self.trainer.epoch + 1
+            n = self.trainer.num_val_batches / \
+                self.plot_valid_per_epoch
+        self.board.draw(x, value, ('train_' if train else 'val_') + key,
+                        every_n=int(n))
+
     def training_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
-        # Draw progress
-        assert hasattr(self, 'trainer'), 'trainer is not inited'
-        num_train = self.trainer.num_train_batches
-        self.board.xlabel = 'epoch'
-        self.board.draw(self.trainer.train_batch_idx / num_train, l,
-                        'train_loss', every_n=int(
-                            num_train / self.plot_train_per_epoch))
+        self.plot('loss', l, train=True)
         return l
 
     def validation_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
-        # Draw progress
-        self.board.draw(self.trainer.epoch+1, l, 'val_loss',
-                        every_n=int(self.trainer.num_val_batches /
-                                    self.plot_valid_per_epoch))
+        self.plot('loss', l, train=False)
 
     def configure_optimizers(self):
         raise NotImplementedError
@@ -435,16 +438,6 @@ class LinearRegression(d2l.Module):
         fn = nn.MSELoss()
         return fn(y_hat, y)
 
-    def training_step(self, batch):
-        """Defined in :numref:`sec_linear_concise`"""
-        X, y = batch
-        l = self.loss(self(X), y)
-        epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
-        self.board.xlabel = 'epoch'
-        self.board.yscale = 'log'
-        self.board.draw(epoch, l, 'train_loss', every_n=10)
-        return l
-
     def configure_optimizers(self):
         """Defined in :numref:`sec_linear_concise`"""
         return torch.optim.SGD(self.parameters(), self.lr)
@@ -497,10 +490,8 @@ class Classification(d2l.Module):
     def validation_step(self, batch):
         X, y = batch
         y_hat = self(X)
-        for k, v in (('val_loss', self.loss(y_hat, y)),
-                     ('val_acc', self.accuracy(y_hat, y))):
-            self.board.draw(self.trainer.epoch+1, v, k,
-                            every_n=self.trainer.num_val_batches)
+        self.plot('loss', self.loss(y_hat, y), train=False)
+        self.plot('acc', self.accuracy(y_hat, y), train=False)
 
     def accuracy(self, y_hat, y):
         """Compute the number of correct predictions.
@@ -679,69 +670,71 @@ def get_dataloader(self, train):
               self.corpus[self.num_train : self.num_train+self.num_val])
     return LMDataLoader(corpus, self.batch_size, self.num_steps, train)
 
-def train_epoch_ch8(net, train_iter, loss, updater, device):
-    """Train a net within one epoch (defined in Chapter 8).
+class RNNScratch(d2l.Classification):
+    """Defined in :numref:`sec_rnn_scratch`"""
+    def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
+        super().__init__(plot_train_per_epoch=0.1, plot_valid_per_epoch=0.1)
+        self.save_hyperparameters()
+        self.init_params()
 
-    Defined in :numref:`sec_rnn_scratch`"""
-    timer = d2l.Timer()
-    metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
-    for X, Y in train_iter:
-        # With random sampling, initialize state for each iteration
-        state = net.begin_state(batch_size=X.shape[0], device=device)
-        y = Y.T.reshape(-1)
-        X, y = X.to(device), y.to(device)
-        y_hat, state = net(X, state)
-        l = loss(y_hat, y.long()).mean()
-        if isinstance(updater, torch.optim.Optimizer):
-            updater.zero_grad()
-            l.backward()
-            grad_clipping(net, 1)
-            updater.step()
-        else:
-            l.backward()
-            grad_clipping(net, 1)
-            # Since the `mean` function has been invoked
-            updater(batch_size=1)
-        metric.add(l * d2l.size(y), d2l.size(y))
-    return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
+    def init_params(self):
+        # Hidden layer parameters
+        self.W_xh = nn.Parameter(d2l.randn(
+            self.num_inputs, self.num_hiddens) * self.sigma)
+        self.W_hh = nn.Parameter(
+            d2l.rand(self.num_hiddens, self.num_hiddens) * self.sigma)
+        self.b_h = nn.Parameter(d2l.zeros(self.num_hiddens))
+        # Output layer parameters
+        self.W_hq = nn.Parameter(d2l.randn(
+            self.num_hiddens, self.num_outputs) * self.sigma)
+        self.b_q = nn.Parameter(d2l.zeros(self.num_outputs))
 
-def train_ch8(net, train_iter, vocab, lr, num_epochs, device):
-    """Train a model (defined in Chapter 8).
+    def init_state(self, X):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        return (d2l.zeros((X.shape[0], self.num_hiddens)), )
 
-    Defined in :numref:`sec_rnn_scratch`"""
-    loss = nn.CrossEntropyLoss()
-    animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[10, num_epochs])
-    # Initialize
-    if isinstance(net, nn.Module):
-        updater = torch.optim.SGD(net.parameters(), lr)
-    else:
-        updater = lambda batch_size: d2l.sgd(net.params, lr, batch_size)
-    predict = lambda prefix: predict_ch8(prefix, 50, net, vocab, device)
-    # Train and predict
-    for epoch in range(num_epochs):
-        ppl, speed = train_epoch_ch8(
-            net, train_iter, loss, updater, device)
-        if (epoch + 1) % 10 == 0:
-            animator.add(epoch + 1, [ppl])
-    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
-    print(predict('time traveller'))
+    def forward(self, X, state=None):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        if state is None:
+            state = self.init_state(X)
+        # Shape of X: (batch_size, num_steps)
+        # Shape of embs: (num_steps, batch_size, num_inputs)
+        embs = F.one_hot(X.T, self.num_inputs).type(torch.float32)
+        H, = state
+        outputs = []
+        for emb in embs:
+            H = d2l.tanh(d2l.matmul(emb, self.W_xh) +
+                         d2l.matmul(H, self.W_hh) + self.b_h)
+            Y = d2l.matmul(H, self.W_hq) + self.b_q
+            outputs.append(Y)
+        # Return shape (num_steps, batch_size, num_outputs)
+        return d2l.stack(outputs, 0), (H,)
 
-def predict_ch8(prefix, num_preds, net, vocab, device):
-    """Generate new characters following the `prefix`.
+    def loss(self, outputs, Y):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        y_hat, _ = outputs
+        return super(RNNScratch, self).loss(
+            d2l.reshape(y_hat, (-1, self.num_outputs)), d2l.reshape(d2l.transpose(Y), -1))
+    
 
-    Defined in :numref:`sec_rnn_scratch`"""
-    state = net.begin_state(batch_size=1, device=device)
-    outputs = [vocab[prefix[0]]]
-    get_input = lambda: d2l.reshape(d2l.tensor(
-        [outputs[-1]], device=device), (1, 1))
-    for y in prefix[1:]:  # Warm-up period
-        _, state = net(get_input(), state)
-        outputs.append(vocab[y])
-    for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = net(get_input(), state)
-        outputs.append(int(y.argmax(dim=1).reshape(1)))
-    return ''.join([vocab.idx_to_token[i] for i in outputs])
+    def accuracy(self, outputs, Y):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        y_hat, _ = outputs
+        return super(RNNScratch, self).accuracy(
+            d2l.reshape(y_hat, (-1, self.num_outputs)), d2l.reshape(d2l.transpose(Y), (-1,1)))
+
+    def predict(self, prefix, num_preds, vocab):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        get_input = lambda x: d2l.tensor([[x]])
+        outputs = [vocab[prefix[0]]]
+        state = self.init_state(get_input(outputs[-1]))
+        for y in prefix[1:]:  # Warm-up period
+            _, state = self(get_input(outputs[-1]), state)
+            outputs.append(vocab[y])
+        for _ in range(num_preds):  # Predict `num_preds` steps
+            y, state = self(get_input(outputs[-1]), state)
+            outputs.append(int(d2l.reshape(d2l.argmax(y, axis=1), 1)))
+        return ''.join([vocab.idx_to_token[i] for i in outputs])
 
 class RNNModel(nn.Module):
     """The RNN model.
