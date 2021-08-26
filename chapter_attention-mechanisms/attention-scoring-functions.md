@@ -471,7 +471,7 @@ class DotProductAttention(nn.Module):
     # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)
     def forward(self, queries, keys, values, valid_lens=None):
         d = queries.shape[-1]
-        # Set `transpose_b=True` to swap the last two dimensions of `keys`
+        # Swap the last two dimensions of `keys` with `keys.transpose(1,2)`
         scores = torch.bmm(queries, keys.transpose(1,2)) / math.sqrt(d)
         self.attention_weights = masked_softmax(scores, valid_lens)
         return torch.bmm(self.dropout(self.attention_weights), values)

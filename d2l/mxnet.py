@@ -149,7 +149,7 @@ class HyperParameters:
 
     def save_hyperparameters(self, ignore=[]):
         """Save function arguments into class attributes.
-    
+
         Defined in :numref:`sec_utils`"""
         frame = inspect.currentframe().f_back
         _, _, _, local_vars = inspect.getargvalues(frame)
@@ -221,7 +221,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         raise NotImplementedError
 
     def forward(self, X):
-        assert hasattr(self, 'net'), 'No neural network is defined'
+        assert hasattr(self, 'net'), 'Neural network is defined'
         return self.net(X)
 
     def plot(self, key, value, train):
@@ -271,7 +271,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
             if isinstance(a, d2l.Module):
                 params.extend(a.get_scratch_params())
         return params
-    
+
 
     def parameters(self):
         """Defined in :numref:`sec_classification`"""
@@ -301,7 +301,7 @@ class Trainer(d2l.HyperParameters):
     """Defined in :numref:`sec_d2l_apis`"""
     def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
-        assert num_gpus == 0, 'Not support GPUs yet'
+        assert num_gpus == 0, 'No GPU support yet'
 
     def prepare_data(self, data):
         self.train_dataloader = data.train_dataloader()
@@ -352,14 +352,14 @@ class Trainer(d2l.HyperParameters):
         """Defined in :numref:`sec_use_gpu`"""
         self.save_hyperparameters()
         self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
-    
+
 
     def prepare_batch(self, batch):
         """Defined in :numref:`sec_use_gpu`"""
         if self.gpus:
             batch = [d2l.to(a, self.gpus[0]) for a in batch]
         return batch
-    
+
 
     def prepare_model(self, model):
         """Defined in :numref:`sec_use_gpu`"""
@@ -405,7 +405,7 @@ class LinearRegressionScratch(d2l.Module):
 
     def forward(self, X):
         """The linear regression model.
-    
+
         Defined in :numref:`sec_linear_scratch`"""
         return d2l.matmul(X, self.w) + self.b
 
@@ -438,7 +438,7 @@ class LinearRegression(d2l.Module):
 
     def forward(self, X):
         """The linear regression model.
-    
+
         Defined in :numref:`sec_linear_concise`"""
         return self.net(X)
 
@@ -470,7 +470,7 @@ class FashionMNIST(d2l.DataModule):
 
     def text_labels(self, indices):
         """Return text labels.
-    
+
         Defined in :numref:`sec_fashion_mnist`"""
         labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
@@ -505,7 +505,7 @@ class Classification(d2l.Module):
 
     def accuracy(self, y_hat, y):
         """Compute the number of correct predictions.
-    
+
         Defined in :numref:`sec_classification`"""
         if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
             y_hat = d2l.argmax(y_hat, axis=1)
@@ -723,7 +723,7 @@ class RNNLMScratch(d2l.Classification):
         embs = npx.one_hot(X.T, self.rnn.num_inputs)
         hiddens, state = self.rnn(embs, state)
         return self.output_forward(hiddens), state
-    
+
 
     def output_forward(self, hiddens):
         """Defined in :numref:`sec_rnn_scratch`"""
@@ -735,7 +735,7 @@ class RNNLMScratch(d2l.Classification):
         return super(RNNLMScratch, self).loss(
             d2l.reshape(Y_hat, (-1, self.num_outputs)),
             d2l.reshape(d2l.transpose(Y), -1))
-    
+
 
     def accuracy(self, outputs, Y):
         """Defined in :numref:`sec_rnn_scratch`"""
