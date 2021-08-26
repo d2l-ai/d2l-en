@@ -47,7 +47,7 @@ def save_hyperparameters(self, ignore=[]):
     frame = inspect.currentframe().f_back
     _, _, _, local_vars = inspect.getargvalues(frame)
     self.hparams = {k:v for k, v in local_vars.items()
-                    if k not in set(ignore+['self'])}
+                    if k not in set(ignore+['self']) and not k.startswith('_')}
     for k, v in self.hparams.items():
         setattr(self, k, v)
 ```
@@ -187,6 +187,17 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
           f'test acc {test_acc:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
           f'on {str(device)}')
+    
+def grad_clipping(net, theta):  #@save
+    """Clip the gradient."""
+    if isinstance(net, gluon.Block):
+        params = [p.data() for p in net.collect_params().values()]
+    else:
+        params = net.params
+    norm = math.sqrt(sum((p.grad ** 2).sum() for p in params))
+    if norm > theta:
+        for param in params:
+            param.grad[:] *= theta / norm
 ```
 
 ```{.python .input}
@@ -492,7 +503,6 @@ def accuracy(y_hat, y):  #@save
 ```{.python .input}
 %%tab all
 
-%%tab all
 import os
 import requests
 import zipfile
@@ -557,6 +567,11 @@ def download_extract(name, folder=None):  #@save
     return os.path.join(base_dir, folder) if folder else data_dir
 
 
+def tokenize(lines, token='word'):  #@save
+    """Split text lines into word or character tokens."""
+    assert token in ('word', 'char'), 'Unknown token type: ' + token
+    return [line.split() if token == 'word' else list(line) for line in lines]
+
 ```
 
 ```{.python .input}
@@ -585,22 +600,37 @@ def evaluate_loss(net, data_iter, loss):  #@save
 ```
 
 ```{.python .input}
-%%tab all
-def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):  #@save
-    """Plot the histogram for list length pairs."""
-    d2l.set_figsize()
-    _, _, patches = d2l.plt.hist(
-        [[len(l) for l in xlist], [len(l) for l in ylist]])
-    d2l.plt.xlabel(xlabel)
-    d2l.plt.ylabel(ylabel)
-    for patch in patches[1].patches:
-        patch.set_hatch('/')
-    d2l.plt.legend(legend)
+#@tab pytorch
+def grad_clipping(net, theta):  #@save
+    """Clip the gradient."""
+    if isinstance(net, nn.Module):
+        params = [p for p in net.parameters() if p.requires_grad]
+    else:
+        params = net.params
+    norm = torch.sqrt(sum(torch.sum((p.grad ** 2)) for p in params))
+    if norm > theta:
+        for param in params:
+            param.grad[:] *= theta / norm
+```
 
-def truncate_pad(line, num_steps, padding_token):
-    """Truncate or pad sequences."""
-    if len(line) > num_steps:
-        return line[:num_steps]  # Truncate
-    return line + [padding_token] * (num_steps - len(line))  # Pad
-
+```{.python .input}
+#@tab tensorflow
+def grad_clipping(grads, theta):  #@save
+    """Clip the gradient."""
+    theta = tf.constant(theta, dtype=tf.float32)
+    new_grad = []
+    for grad in grads:
+        if isinstance(grad, tf.IndexedSlices):
+            new_grad.append(tf.convert_to_tensor(grad))
+        else:
+            new_grad.append(grad)
+    norm = tf.math.sqrt(sum((tf.reduce_sum(grad ** 2)).numpy()
+                        for grad in new_grad))
+    norm = tf.cast(norm, tf.float32)
+    if tf.greater(norm, theta):
+        for i, grad in enumerate(new_grad):
+            new_grad[i] = grad * theta / norm
+    else:
+        new_grad = new_grad
+    return new_grad
 ```

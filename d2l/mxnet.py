@@ -154,7 +154,7 @@ class HyperParameters:
         frame = inspect.currentframe().f_back
         _, _, _, local_vars = inspect.getargvalues(frame)
         self.hparams = {k:v for k, v in local_vars.items()
-                        if k not in set(ignore+['self'])}
+                        if k not in set(ignore+['self']) and not k.startswith('_')}
         for k, v in self.hparams.items():
             setattr(self, k, v)
 
@@ -213,8 +213,9 @@ class ProgressBoard(d2l.HyperParameters):
 
 class Module(d2l.nn_Module, d2l.HyperParameters):
     """Defined in :numref:`sec_d2l_apis`"""
-    def __init__(self):
+    def __init__(self, plot_train_per_epoch=5, plot_valid_per_epoch=1):
         super().__init__()
+        self.save_hyperparameters()
         self.board = ProgressBoard()
     def loss(self, y_hat, y):
         raise NotImplementedError
@@ -223,33 +224,59 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         assert hasattr(self, 'net'), 'Neural network is defined'
         return self.net(X)
 
+    def plot(self, key, value, train):
+        """Plot a point in animation."""
+        assert hasattr(self, 'trainer'), 'trainer is not inited'
+        self.board.xlabel = 'epoch'
+        if train:
+            x = self.trainer.train_batch_idx / \
+                self.trainer.num_train_batches
+            n = self.trainer.num_train_batches / \
+                self.plot_train_per_epoch
+        else:
+            x = self.trainer.epoch + 1
+            n = self.trainer.num_val_batches / \
+                self.plot_valid_per_epoch
+        self.board.draw(x, value, ('train_' if train else 'val_') + key,
+                        every_n=int(n))
+
     def training_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
-        # Draw progress
-        assert hasattr(self, 'trainer'), 'Optimizer is defined'
-        num_train = self.trainer.num_train_batches
-        self.board.xlabel = 'epoch'
-        self.board.draw(self.trainer.train_batch_idx / num_train, l,
-                        'train_loss', every_n=num_train // 5)
+        self.plot('loss', l, train=True)
         return l
 
     def validation_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
-        # Draw progress
-        self.board.draw(self.trainer.epoch+1, l, 'val_loss',
-                        every_n=self.trainer.num_val_batches)
+        self.plot('loss', l, train=False)
 
     def configure_optimizers(self):
         raise NotImplementedError
 
     def configure_optimizers(self):
         """Defined in :numref:`sec_classification`"""
-        params = self.collect_params()
-        if isinstance(params, (tuple, list)):
+        params = self.parameters()
+        if isinstance(params, list):
             return d2l.SGD(params, self.lr)
         return gluon.Trainer(params,  'sgd', {'learning_rate': self.lr})
+
+    def get_scratch_params(self):
+        """Defined in :numref:`sec_classification`"""
+        params = []
+        for attr in dir(self):
+            a = getattr(self, attr)
+            if isinstance(a, np.ndarray):
+                params.append(a)
+            if isinstance(a, d2l.Module):
+                params.extend(a.get_scratch_params())
+        return params
+    
+
+    def parameters(self):
+        """Defined in :numref:`sec_classification`"""
+        params = self.collect_params()
+        return params if len(params.keys()) else self.get_scratch_params()
 
 class DataModule(d2l.HyperParameters):
     """Defined in :numref:`sec_d2l_apis`"""
@@ -272,7 +299,7 @@ class DataModule(d2l.HyperParameters):
 
 class Trainer(d2l.HyperParameters):
     """Defined in :numref:`sec_d2l_apis`"""
-    def __init__(self, max_epochs, num_gpus=0):
+    def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'No GPU support yet'
 
@@ -311,6 +338,8 @@ class Trainer(d2l.HyperParameters):
             with autograd.record():
                 loss = self.model.training_step(self.prepare_batch(batch))
             loss.backward()
+            if self.gradient_clip_val > 0:
+                self.clip_gradients(self.gradient_clip_val, self.model)
             self.optim.step(1)
             self.train_batch_idx += 1
         if self.val_dataloader is None:
@@ -319,7 +348,7 @@ class Trainer(d2l.HyperParameters):
             self.model.validation_step(self.prepare_batch(batch))
             self.val_batch_idx += 1
 
-    def __init__(self, max_epochs, num_gpus=0):
+    def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         """Defined in :numref:`sec_use_gpu`"""
         self.save_hyperparameters()
         self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
@@ -339,6 +368,16 @@ class Trainer(d2l.HyperParameters):
         if self.gpus:
             model.collect_params().reset_ctx(self.gpus[0])
         self.model = model
+
+    def clip_gradients(self, grad_clip_val, model):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        params = model.parameters()
+        if not isinstance(params, list):
+            params = [p.data() for p in params.values()]
+        norm = math.sqrt(sum((p.grad ** 2).sum() for p in params))
+        if norm > grad_clip_val:
+            for param in params:
+                param.grad[:] *= grad_clip_val / norm
 
 class SyntheticRegressionData(d2l.DataModule):
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
@@ -408,16 +447,6 @@ class LinearRegression(d2l.Module):
         fn = gluon.loss.L2Loss()
         return fn(y_hat, y).mean()
 
-    def training_step(self, batch):
-        """Defined in :numref:`sec_linear_concise`"""
-        X, y = batch
-        l = self.loss(self(X), y)
-        epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
-        self.board.xlabel = 'epoch'
-        self.board.yscale = 'log'
-        self.board.draw(epoch, l, 'train_loss', every_n=10)
-        return l
-
     def configure_optimizers(self):
         """Defined in :numref:`sec_linear_concise`"""
         return gluon.Trainer(self.collect_params(),
@@ -471,10 +500,8 @@ class Classification(d2l.Module):
     def validation_step(self, batch):
         X, y = batch
         y_hat = self(X)
-        for k, v in (('val_loss', self.loss(y_hat, y)),
-                     ('val_acc', self.accuracy(y_hat, y))):
-            self.board.draw(self.trainer.epoch+1, v, k,
-                            every_n=self.trainer.num_val_batches)
+        self.plot('loss', self.loss(y_hat, y), train=False)
+        self.plot('acc', self.accuracy(y_hat, y), train=False)
 
     def accuracy(self, y_hat, y):
         """Compute the number of correct predictions.
@@ -555,23 +582,31 @@ class Residual(nn.Block):
             X = self.conv3(X)
         return npx.relu(Y + X)
 
-d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
-                                '090b5e7e70c295757f55df93cb0a180b9691891a')
+class TimeMachine(d2l.DataModule):
+    """Defined in :numref:`sec_text_preprocessing`"""
+    def load(self):
+        fname = d2l.download(d2l.DATA_URL+'timemachine.txt', self.root,
+                             '090b5e7e70c295757f55df93cb0a180b9691891a')
+        with open(fname) as f:
+            lines = f.readlines()
+            return [re.sub('[^A-Za-z]+', ' ', line).strip().lower()
+                    for line in lines]
 
-def read_time_machine():
-    """Load The Time Machine dataset into a list of text lines.
+    def tokenize(self, lines):
+        """Defined in :numref:`sec_text_preprocessing`"""
+        return [list(line) for line in lines]
 
-    Defined in :numref:`sec_text_preprocessing`"""
-    with open(d2l.download('time_machine'), 'r') as f:
-        lines = f.readlines()
-    return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() for line in lines]
+    def prepare_data(self):
+        """Defined in :numref:`sec_text_preprocessing`"""
+        tokens = self.tokenize(self.load())
+        self.vocab = Vocab(tokens)
+        self.corpus = [self.vocab[token] for line in tokens for token in line]
 
-def tokenize(lines, token='word'):
-    """Split text lines into word or character tokens.
-
-    Defined in :numref:`sec_text_preprocessing`"""
-    assert token in ('word', 'char'), 'Unknown token type: ' + token
-    return [line.split() if token == 'word' else list(line) for line in lines]
+    def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
+        """Defined in :numref:`sec_language_model`"""
+        super(d2l.TimeMachine, self).__init__()
+        self.save_hyperparameters()
+        self.prepare_data()
 
 class Vocab:
     """Vocabulary for text."""
@@ -607,159 +642,176 @@ class Vocab:
     def unk(self):  # Index for the unknown token
         return self.token_to_idx['<unk>']
 
-def load_corpus_time_machine(max_tokens=None):
-    """Return token indices and the vocabulary of the time machine dataset.
-
-    Defined in :numref:`sec_text_preprocessing`"""
-    lines = read_time_machine()
-    tokens = tokenize(lines, 'char')
-    vocab = Vocab(tokens)
-    corpus = [vocab[token] for line in tokens for token in line]
-    if max_tokens and max_tokens > 0:
-        corpus = corpus[:max_tokens]
-    return corpus, vocab
-
-class SeqDataLoader:
-    """The sequence data iterator generating minibatches of subsequences."""
-    def __init__(self, corpus, batch_size, num_steps):
-        """Defined in :numref:`sec_language_model`"""
-        self.corpus, self.b, self.n = corpus, batch_size, num_steps
+class LMDataLoader(d2l.HyperParameters):
+    """Defined in :numref:`sec_language_model`"""
+    def __init__(self, corpus, batch_size, num_steps, train):
+        self.save_hyperparameters()
+        self.num_batches = (len(corpus) - 1 - (num_steps if train else 0)
+                           ) // (self.num_steps * self.batch_size)
+    def __len__(self):
+        return self.num_batches
 
     def __iter__(self):
-        # Randomly drop the first d tokens.
-        corpus = self.corpus[random.randint(0, self.n - 1):]
+        # Randomly drop the first d tokens for training.
+        corpus = (self.corpus[random.randint(0, self.num_steps - 1):]
+                  if self.train else self.corpus)
         # No. of subsequences. Subtract 1 to account for labels.
-        m = (len(corpus)-1) // self.n
+        m = (len(corpus)-1) // self.num_steps
         # The starting indices for input sequences.
-        initial_indices = list(range(0, m*self.n, self.n))
-        random.shuffle(initial_indices)
-        for i in range(0, m // self.b):
+        initial_indices = list(range(0, m*self.num_steps, self.num_steps))
+        if self.train:
+            random.shuffle(initial_indices)
+        for i in range(0, self.num_batches):
             # The randomized starting indices for this minibatch.
-            batch_indicies = initial_indices[i*self.b : (i+1) * self.b]
-            X = [corpus[j : j+self.n] for j in batch_indicies]
-            Y = [corpus[j+1 : j+1+self.n] for j in batch_indicies]
+            batch_indicies = initial_indices[
+                i*self.batch_size : (i+1) * self.batch_size]
+            X = [corpus[j : j+self.num_steps] for j in batch_indicies]
+            Y = [corpus[j+1 : j+1+self.num_steps] for j in batch_indicies]
             yield d2l.tensor(X), d2l.tensor(Y)
 
-def load_data_time_machine(batch_size, num_steps, max_tokens=10000):
-    """Return the iterator and the vocabulary of the time machine dataset.
 
-    Defined in :numref:`sec_language_model`"""
-    corpus, vocab = d2l.load_corpus_time_machine(max_tokens)
-    data_iter = SeqDataLoader(corpus, batch_size, num_steps)
-    return data_iter, vocab
+@d2l.add_to_class(d2l.TimeMachine)
+def get_dataloader(self, train):
+    """Defined in :numref:`sec_language_model`"""
+    corpus = (self.corpus[: self.num_train] if train else
+              self.corpus[self.num_train : self.num_train+self.num_val])
+    return LMDataLoader(corpus, self.batch_size, self.num_steps, train)
 
-class RNNModelScratch:
-    """An RNN Model implemented from scratch."""
-    def __init__(self, vocab_size, num_hiddens, device, get_params,
-                 init_state, forward_fn):
+class RNNScratch(d2l.Module):
+    """Defined in :numref:`sec_rnn_scratch`"""
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        self.W_xh = d2l.randn(num_inputs, num_hiddens) * sigma
+        self.W_hh = d2l.randn(num_hiddens, num_hiddens) * sigma
+        self.b_h = d2l.zeros(num_hiddens)
+
+    def init_state(self, batch_size):
         """Defined in :numref:`sec_rnn_scratch`"""
-        self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
-        self.params = get_params(vocab_size, num_hiddens, device)
-        self.init_state, self.forward_fn = init_state, forward_fn
-
-    def __call__(self, X, state):
-        X = npx.one_hot(X.T, self.vocab_size)
-        return self.forward_fn(X, state, self.params)
-
-    def begin_state(self, batch_size, ctx):
-        return self.init_state(batch_size, self.num_hiddens, ctx)
-
-def predict_ch8(prefix, num_preds, net, vocab, device):
-    """Generate new characters following the `prefix`.
-
-    Defined in :numref:`sec_rnn_scratch`"""
-    state = net.begin_state(batch_size=1, ctx=device)
-    outputs = [vocab[prefix[0]]]
-    get_input = lambda: d2l.reshape(
-        d2l.tensor([outputs[-1]], ctx=device), (1, 1))
-    for y in prefix[1:]:  # Warm-up period
-        _, state = net(get_input(), state)
-        outputs.append(vocab[y])
-    for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = net(get_input(), state)
-        outputs.append(int(y.argmax(axis=1).reshape(1)))
-    return ''.join([vocab.idx_to_token[i] for i in outputs])
-
-def grad_clipping(net, theta):
-    """Clip the gradient.
-
-    Defined in :numref:`sec_rnn_scratch`"""
-    if isinstance(net, gluon.Block):
-        params = [p.data() for p in net.collect_params().values()]
-    else:
-        params = net.params
-    norm = math.sqrt(sum((p.grad ** 2).sum() for p in params))
-    if norm > theta:
-        for param in params:
-            param.grad[:] *= theta / norm
-
-def train_epoch_ch8(net, train_iter, loss, updater, device):
-    """Train a model within one epoch (defined in Chapter 8).
-
-    Defined in :numref:`sec_rnn_scratch`"""
-    timer = d2l.Timer()
-    metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
-    for X, Y in train_iter:
-        # With random sampling, initialize state for each iteration
-        state = net.begin_state(batch_size=X.shape[0], ctx=device)
-        y = Y.T.reshape(-1)
-        X, y = X.as_in_ctx(device), y.as_in_ctx(device)
-        with autograd.record():
-            y_hat, state = net(X, state)
-            l = loss(y_hat, y).mean()
-        l.backward()
-        grad_clipping(net, 1)
-        updater(batch_size=1)  # Since the `mean` function has been invoked
-        metric.add(l * d2l.size(y), d2l.size(y))
-    return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
-
-def train_ch8(net, train_iter, vocab, lr, num_epochs, device):
-    """Train a model (defined in Chapter 8).
-
-    Defined in :numref:`sec_rnn_scratch`"""
-    loss = gluon.loss.SoftmaxCrossEntropyLoss()
-    animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[10, num_epochs])
-    # Initialize
-    if isinstance(net, gluon.Block):
-        net.initialize(ctx=device, force_reinit=True,
-                         init=init.Normal(0.01))
-        trainer = gluon.Trainer(net.collect_params(),
-                                'sgd', {'learning_rate': lr})
-        updater = lambda batch_size: trainer.step(batch_size)
-    else:
-        updater = lambda batch_size: d2l.sgd(net.params, lr, batch_size)
-    predict = lambda prefix: predict_ch8(prefix, 50, net, vocab, device)
-    # Train and predict
-    for epoch in range(num_epochs):
-        ppl, speed = train_epoch_ch8(
-            net, train_iter, loss, updater, device)
-        if (epoch + 1) % 10 == 0:
-            animator.add(epoch + 1, [ppl])
-    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
-    print(predict('time traveller'))
-
-class RNNModel(nn.Block):
-    """The RNN model.
-
-    Defined in :numref:`sec_rnn-concise`"""
-    def __init__(self, rnn_layer, vocab_size, **kwargs):
-        super(RNNModel, self).__init__(**kwargs)
-        self.rnn = rnn_layer
-        self.vocab_size = vocab_size
-        self.dense = nn.Dense(vocab_size)
+        return (d2l.zeros((batch_size, self.num_hiddens)), )
 
     def forward(self, inputs, state):
-        X = npx.one_hot(inputs.T, self.vocab_size)
-        Y, state = self.rnn(X, state)
-        # The fully connected layer will first change the shape of `Y` to
-        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
-        # (`num_steps` * `batch_size`, `vocab_size`).
-        output = self.dense(Y.reshape(-1, Y.shape[-1]))
-        return output, state
+        """Defined in :numref:`sec_rnn_scratch`"""
+        # Shape of inputs: (num_steps, batch_size, num_inputs)
+        # Shape of H: (batch_size, num_hiddens)
+        H, = state
+        outputs = []
+        for X in inputs:
+            H = d2l.tanh(d2l.matmul(X, self.W_xh) +
+                         d2l.matmul(H, self.W_hh) + self.b_h)
+            outputs.append(H)
+        return outputs, (H, )
 
-    def begin_state(self, *args, **kwargs):
-        return self.rnn.begin_state(*args, **kwargs)
+class RNNLMScratch(d2l.Classification):
+    """Defined in :numref:`sec_rnn_scratch`"""
+    def __init__(self, rnn, num_outputs, lr):
+        super().__init__(plot_train_per_epoch=0.1, plot_valid_per_epoch=0.1)
+        self.save_hyperparameters()
+        self.init_params()
+
+    def init_params(self):
+        self.W_hq = d2l.randn(
+            self.rnn.num_hiddens, self.num_outputs) * self.rnn.sigma
+        self.b_q = d2l.zeros(self.num_outputs)
+        for param in self.get_scratch_params():
+            param.attach_grad()
+
+    def forward(self, X, state=None):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        if state is None: state = self.rnn.init_state(X.shape[0])
+        # embeddings shape: (num_steps, batch_size, num_inputs)
+        embs = npx.one_hot(X.T, self.rnn.num_inputs)
+        hiddens, state = self.rnn(embs, state)
+        return self.output_forward(hiddens), state
+    
+
+    def output_forward(self, hiddens):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        return d2l.stack([d2l.matmul(H, self.W_hq) + self.b_q for H in hiddens], 0)
+
+    def loss(self, outputs, Y):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        Y_hat, _ = outputs
+        return super(RNNLMScratch, self).loss(
+            d2l.reshape(Y_hat, (-1, self.num_outputs)),
+            d2l.reshape(d2l.transpose(Y), -1))
+    
+
+    def accuracy(self, outputs, Y):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        Y_hat, _ = outputs
+        return super(RNNLMScratch, self).accuracy(
+            d2l.reshape(Y_hat, (-1, self.num_outputs)),
+            d2l.reshape(d2l.transpose(Y), (-1,1)))
+
+    def predict(self, prefix, num_preds, vocab):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        state, outputs = None, [vocab[prefix[0]]]
+        for i in range(len(prefix) + num_preds - 1):
+            X = d2l.tensor([[outputs[-1]]])
+            Y, state = self(X, state)
+            if i < len(prefix) - 1: # Warm-up period
+                outputs.append(vocab[prefix[i]])
+            else:  # Predict `num_preds` steps
+                outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
+        return ''.join([vocab.idx_to_token[i] for i in outputs])
+
+class RNN(d2l.Module):
+    """Defined in :numref:`sec_rnn-concise`"""
+    def __init__(self, num_inputs, num_hiddens):
+        super().__init__()
+        self.save_hyperparameters()
+        self.rnn = rnn.RNN(num_hiddens)
+
+    def forward(self, inputs, state):
+        return self.rnn(inputs, state)
+
+    def init_state(self, batch_size):
+        return self.rnn.begin_state(batch_size)
+
+class RNNLM(d2l.RNNLMScratch):
+    """Defined in :numref:`sec_rnn-concise`"""
+    def init_params(self):
+        self.linear = nn.Dense(self.num_outputs, flatten=False)
+        self.initialize()
+    def output_forward(self, hiddens):
+        return self.linear(hiddens)
+
+class GRUScratch(d2l.Module):
+    """Defined in :numref:`sec_gru`"""
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+
+        init_weight = lambda *shape: d2l.randn(*shape) * sigma
+        triple = lambda: (init_weight(num_inputs, num_hiddens),
+                          init_weight(num_hiddens, num_hiddens),
+                          d2l.zeros(num_hiddens))
+        self.W_xz, self.W_hz, self.b_z = triple()  # Update gate
+        self.W_xr, self.W_hr, self.b_r = triple()  # Reset gate
+        self.W_xh, self.W_hh, self.b_h = triple()  # Candidate hidden state
+
+    def init_state(self, batch_size):
+        return (d2l.zeros((batch_size, self.num_hiddens)), )
+
+class LSTMScratch(d2l.Module):
+    """Defined in :numref:`sec_lstm`"""
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+
+        init_weight = lambda *shape: d2l.randn(*shape) * sigma
+        triple = lambda: (init_weight(num_inputs, num_hiddens),
+                          init_weight(num_hiddens, num_hiddens),
+                          d2l.zeros(num_hiddens))
+        self.W_xi, self.W_hi, self.b_i = triple()  # Input gate
+        self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
+        self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
+        self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell
+
+    def init_state(self, batch_size):
+        return (d2l.zeros((batch_size, self.num_hiddens)),
+                d2l.zeros((batch_size, self.num_hiddens)))
 
 class TranslationFraEng(d2l.DataModule):
     """Defined in :numref:`sec_machine_translation`"""
@@ -2918,6 +2970,19 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
           f'on {str(device)}')
 
+def grad_clipping(net, theta):
+    """Clip the gradient.
+
+    Defined in :numref:`sec_utils`"""
+    if isinstance(net, gluon.Block):
+        params = [p.data() for p in net.collect_params().values()]
+    else:
+        params = net.params
+    norm = math.sqrt(sum((p.grad ** 2).sum() for p in params))
+    if norm > theta:
+        for param in params:
+            param.grad[:] *= theta / norm
+
 def evaluate_accuracy(net, data_iter):
     """Compute the accuracy for a model on a dataset.
 
@@ -3089,6 +3154,14 @@ def download_extract(name, folder=None):
     fp.extractall(base_dir)
     return os.path.join(base_dir, folder) if folder else data_dir
 
+
+def tokenize(lines, token='word'):
+    """Split text lines into word or character tokens.
+
+    Defined in :numref:`sec_utils`"""
+    assert token in ('word', 'char'), 'Unknown token type: ' + token
+    return [line.split() if token == 'word' else list(line) for line in lines]
+
 def evaluate_loss(net, data_iter, loss):
     """Evaluate the loss of a model on the given dataset.
 
@@ -3101,6 +3174,7 @@ def evaluate_loss(net, data_iter, loss):
 size = lambda a: a.size
 transpose = lambda a: a.T
 nn_Module = nn.Block
+sigmoid = npx.sigmoid
 
 ones = np.ones
 zeros = np.zeros

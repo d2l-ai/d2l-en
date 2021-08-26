@@ -30,7 +30,7 @@ from IPython import display
 
 ## The `Classification` Class
 
-We define the `Classification` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exact correct if the last batch contains fewer examples, but we ignore this minor difference to keep the code simple. 
+We define the `Classification` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exact correct if the last batch contains fewer examples, but we ignore this minor difference to keep the code simple.
 
 ```{.python .input}
 %%tab all
@@ -38,20 +38,18 @@ class Classification(d2l.Module):  #@save
     def validation_step(self, batch):
         X, y = batch
         y_hat = self(X)
-        for k, v in (('val_loss', self.loss(y_hat, y)),
-                     ('val_acc', self.accuracy(y_hat, y))):
-            self.board.draw(self.trainer.epoch+1, v, k,
-                            every_n=self.trainer.num_val_batches)    
+        self.plot('loss', self.loss(y_hat, y), train=False)
+        self.plot('acc', self.accuracy(y_hat, y), train=False)
 ```
 
-By default we use a Stochastic Gradient Descent optimizer, operating on minibatches, just as we did in the context of linear regression. 
+By default we use a Stochastic Gradient Descent optimizer, operating on minibatches, just as we did in the context of linear regression.
 
 ```{.python .input}
 %%tab mxnet
 @d2l.add_to_class(d2l.Module)  #@save
 def configure_optimizers(self):
-    params = self.collect_params()
-    if isinstance(params, (tuple, list)):
+    params = self.parameters()
+    if isinstance(params, list):
         return d2l.SGD(params, self.lr)
     return gluon.Trainer(params,  'sgd', {'learning_rate': self.lr})
 ```
@@ -83,7 +81,7 @@ but at the end of the day it has to choose one among the classes.
 When predictions are consistent with the label class `y`, they are correct.
 The classification accuracy is the fraction of all predictions that are correct.
 Although it can be difficult to optimize accuracy directly (it is not differentiable),
-it is often the performance measure that we care about the most. It is often *the* 
+it is often the performance measure that we care about the most. It is often *the*
 relevant quantity in benchmarks. As such, we will nearly always report it when training classifiers.
 
 Accuracy is computed as follows:
@@ -107,17 +105,37 @@ def accuracy(self, y_hat, y):
     return d2l.reduce_mean(d2l.astype(cmp, d2l.float32))
 ```
 
-## Summary and Discussion
+```{.python .input}
+%%tab mxnet
 
-Classification is a sufficiently frequently used problem type that it warrants its own convenience functions. Note that there is a difference between (classification) accuracy that we want to minimize and the logistic loss function that we are actually minimizing. Fortunately, our specific choice of loss function ensures that minimizing it will also lead to maximum accuracy. This is the case since the maximum likelihood estimator is consistent. It follows as a special case of the Cramer-Rao bound :cite:`cramer1946mathematical,radhakrishna1945information`. For more work on consistency see also :cite:`zhang2004statistical`. 
+@d2l.add_to_class(d2l.Module)  #@save
+def get_scratch_params(self):
+    params = []
+    for attr in dir(self):
+        a = getattr(self, attr)
+        if isinstance(a, np.ndarray):
+            params.append(a)
+        if isinstance(a, d2l.Module):
+            params.extend(a.get_scratch_params())
+    return params
 
-More generally, though, the decision of which category to pick is far from trivial. For instance, when deciding where to assign an e-mail to, mistaking a "Primary" e-mail for a "Social" e-mail might be undesirable but far less disastrous than moving it to the spam folder (and later automatically deleting it). As such, we will tend to err on the side of caution with regard to assigning any e-mail to the "Spam" folder, rather than picking the most likely category. 
+@d2l.add_to_class(d2l.Module)  #@save
+def parameters(self):
+    params = self.collect_params()
+    return params if len(params.keys()) else self.get_scratch_params()
+```
+
+## Summary
+
+Classification is a sufficiently frequently used problem type that it warrants its own convenience functions. Note that there is a difference between (classification) accuracy that we want to minimize and the logistic loss function that we are actually minimizing. Fortunately, our specific choice of loss function ensures that minimizing it will also lead to maximum accuracy. This is the case since the maximum likelihood estimator is consistent. It follows as a special case of the Cramer-Rao bound :cite:`cramer1946mathematical,radhakrishna1945information`. For more work on consistency see also :cite:`zhang2004statistical`.
+
+More generally, though, the decision of which category to pick is far from trivial. For instance, when deciding where to assign an e-mail to, mistaking a "Primary" e-mail for a "Social" e-mail might be undesirable but far less disastrous than moving it to the spam folder (and later automatically deleting it). As such, we will tend to err on the side of caution with regard to assigning any e-mail to the "Spam" folder, rather than picking the most likely category.
 
 ## Exercises
 
-1. Denote by $L_v$ the validation loss, and let $L_v^q$ be its quick and dirty estimate computed by the loss function averaging in this section. Lastly, denote by $l_v^b$ the loss on the last minibatch. Express $L_v$ in terms of $L_v^q$, $l_v^b$, and the sample and minibatch sizes. 
+1. Denote by $L_v$ the validation loss, and let $L_v^q$ be its quick and dirty estimate computed by the loss function averaging in this section. Lastly, denote by $l_v^b$ the loss on the last minibatch. Express $L_v$ in terms of $L_v^q$, $l_v^b$, and the sample and minibatch sizes.
 1. Show that the quick and dirty estimate $L_v^q$ is unbiased. That is, show that $E[L_v] = E[L_v^q]$. Why would you still want to use $L_v$ instead?
-1. Given a multiclass classification loss, denoting by $l(y,y')$ the penalty of estimating $y'$ when we see $y$ and given a probabilty $p(y|x)$, formulate the rule for an optimal selection of $y'$. Hint: express the expected loss, using $l$ and $p(y|x)$. 
+1. Given a multiclass classification loss, denoting by $l(y,y')$ the penalty of estimating $y'$ when we see $y$ and given a probabilty $p(y|x)$, formulate the rule for an optimal selection of $y'$. Hint: express the expected loss, using $l$ and $p(y|x)$.
 
 ```{.python .input}
 

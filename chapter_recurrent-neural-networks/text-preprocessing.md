@@ -1,3 +1,8 @@
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Text Preprocessing
 :label:`sec_text_preprocessing`
 
@@ -14,21 +19,22 @@ for converting raw text into
 sequences of numerical values
 that our models can ingest.
 
-```{.python .input}
+```{.python .input  n=2}
+%%tab mxnet
 import collections
 from d2l import mxnet as d2l
 import re
 ```
 
-```{.python .input}
-#@tab pytorch
+```{.python .input  n=3}
+%%tab pytorch
 import collections
 from d2l import torch as d2l
 import re
 ```
 
-```{.python .input}
-#@tab tensorflow
+```{.python .input  n=4}
+%%tab tensorflow
 import collections
 from d2l import tensorflow as d2l
 import re
@@ -45,19 +51,19 @@ The following function
 where each line is represented as a string.
 For simplicity, we ignore punctuation and capitalization.
 
-```{.python .input}
-#@tab all
-#@save
-d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
-                                '090b5e7e70c295757f55df93cb0a180b9691891a')
+```{.python .input  n=5}
+%%tab all
+class TimeMachine(d2l.DataModule): #@save
+    def load(self):
+        fname = d2l.download(d2l.DATA_URL+'timemachine.txt', self.root, 
+                             '090b5e7e70c295757f55df93cb0a180b9691891a')
+        with open(fname) as f:
+            lines = f.readlines()
+            return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() 
+                    for line in lines]
 
-def read_time_machine():  #@save
-    """Load The Time Machine dataset into a list of text lines."""
-    with open(d2l.download('time_machine'), 'r') as f:
-        lines = f.readlines()
-    return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() for line in lines]
-
-lines = read_time_machine()
+data = TimeMachine()
+lines = data.load()
 print(f'# text lines: {len(lines)}')
 print(lines[0])
 print(lines[10])
@@ -75,16 +81,15 @@ and what constitutes a token
 is a design choice.
 Below, we tokenize our lines into words.
 
-```{.python .input}
-#@tab all
-def tokenize(lines, token='word'):  #@save
-    """Split text lines into word or character tokens."""
-    assert token in ('word', 'char'), 'Unknown token type: ' + token
-    return [line.split() if token == 'word' else list(line) for line in lines]
+```{.python .input  n=6}
+%%tab all
+@d2l.add_to_class(TimeMachine)  #@save
+def tokenize(self, lines):
+    return [list(line) for line in lines]
 
-tokens = tokenize(lines)
+tokens = data.tokenize(lines)
 for i in range(7, 10):
-    print(f'line {i+1}: {tokens[i]}')
+    print(f'line {i+1}: {tokens[i][:12]}')
 ```
 
 ## Vocabulary
@@ -103,8 +108,8 @@ In the future,
 we may supplement the vocabulary
 with a list of reserved tokens.
 
-```{.python .input}
-#@tab all
+```{.python .input  n=7}
+%%tab all
 class Vocab:  #@save
     """Vocabulary for text."""
     def __init__(self, tokens=[], min_freq=0, reserved_tokens=[]):
@@ -146,8 +151,8 @@ Note that we have not lost any information
 and can easily convert our dataset 
 back to its original (string) representation.
 
-```{.python .input}
-#@tab all
+```{.python .input  n=8}
+%%tab all
 vocab = Vocab(tokens)
 indicies = vocab[tokens[0]]
 print('indices:', indicies)
@@ -161,20 +166,16 @@ The modifications we did here are:
 (i) we tokenize text into characters, not words, to simplify the training in later sections;
 (ii) `corpus` is a single list, not a list of token lists, since each text line in *The Time Machine* dataset is not necessarily a sentence or a paragraph.
 
-```{.python .input}
-#@tab all
-def load_corpus_time_machine(max_tokens=None):  #@save
-    """Return token indices and the vocabulary of the time machine dataset."""
-    lines = read_time_machine()
-    tokens = tokenize(lines, 'char')
-    vocab = Vocab(tokens)
-    corpus = [vocab[token] for line in tokens for token in line]
-    if max_tokens and max_tokens > 0:
-        corpus = corpus[:max_tokens]
-    return corpus, vocab
+```{.python .input  n=9}
+%%tab all
+@d2l.add_to_class(TimeMachine)  #@save
+def prepare_data(self):
+    tokens = self.tokenize(self.load())
+    self.vocab = Vocab(tokens)
+    self.corpus = [self.vocab[token] for line in tokens for token in line]
 
-corpus, vocab = load_corpus_time_machine()
-len(corpus), len(vocab)
+data.prepare_data()
+len(data.corpus), len(data.vocab)
 ```
 
 ## Summary

@@ -131,34 +131,40 @@ Multiplying `X` by `W_xh`, and `H` by `W_hh`, respectively, and then adding thes
 we obtain a matrix of shape (3, 4).
 
 ```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+```
+
+```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
 ```{.python .input}
-#@tab mxnet, pytorch
-X, W_xh = d2l.normal(0, 1, (3, 1)), d2l.normal(0, 1, (1, 4))
-H, W_hh = d2l.normal(0, 1, (3, 4)), d2l.normal(0, 1, (4, 4))
+%%tab mxnet, pytorch
+X, W_xh = d2l.randn(3, 1), d2l.randn(1, 4)
+H, W_hh = d2l.randn(3, 4), d2l.randn(4, 4)
 d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
 ```
 
 ```{.python .input}
-#@tab tensorflow
-X, W_xh = d2l.normal((3, 1), 0, 1), d2l.normal((1, 4), 0, 1)
-H, W_hh = d2l.normal((3, 4), 0, 1), d2l.normal((4, 4), 0, 1)
+%%tab tensorflow
+X, W_xh = d2l.normal((3, 1)), d2l.normal((1, 4))
+H, W_hh = d2l.normal((3, 4)), d2l.normal((4, 4))
 d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
 ```
 
@@ -175,7 +181,7 @@ we obtain the same output matrix of shape (3, 4)
 as above.
 
 ```{.python .input}
-#@tab all
+%%tab all
 d2l.matmul(d2l.concat((X, H), 1), d2l.concat((W_xh, W_hh), 0))
 ```
 

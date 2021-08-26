@@ -177,41 +177,94 @@ Despite reasonable perplexity, it only generates gibberish even after many itera
 We include the code below as a cautionary example against using them in the wrong context.
 
 ```{.python .input}
-from d2l import mxnet as d2l
-from mxnet import npx
-from mxnet.gluon import rnn
-npx.set_np()
-
-# Load data
-batch_size, num_steps, device = 32, 35, d2l.try_gpu()
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
-# Define the bidirectional LSTM model by setting `bidirectional=True`
-vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
-lstm_layer = rnn.LSTM(num_hiddens, num_layers, bidirectional=True)
-model = d2l.RNNModel(lstm_layer, len(vocab))
-# Train the model
-num_epochs, lr = 500, 2
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import npx, np
+from mxnet.gluon import rnn
+npx.set_np()
+```
+
+```{.python .input}
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
+```
 
-# Load data
-batch_size, num_steps, device = 32, 35, d2l.try_gpu()
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
-# Define the bidirectional LSTM model by setting `bidirectional=True`
-vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
-num_inputs = vocab_size
-lstm_layer = nn.LSTM(num_inputs, num_hiddens, num_layers, bidirectional=True)
-model = d2l.RNNModel(lstm_layer, len(vocab))
-model = model.to(device)
-# Train the model
-num_epochs, lr = 500, 2
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
+```{.python .input}
+%%tab all
+class BiRNNScratch(d2l.Module):
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        self.f_rnn = d2l.RNNScratch(num_inputs, num_hiddens, sigma)
+        self.b_rnn = d2l.RNNScratch(num_inputs, num_hiddens, sigma)
+        self.num_hiddens *= 2  # The output dimension will be doubled
+        
+    def init_state(self, batch_size):
+        return [self.f_rnn.init_state(batch_size), 
+                self.b_rnn.init_state(batch_size)]
+```
+
+```{.python .input}
+%%tab all
+@d2l.add_to_class(BiRNNScratch)
+def forward(self, inputs, state):
+    f_outputs, state[0] = self.f_rnn(inputs, state[0])
+    b_outputs, state[1] = self.b_rnn(reversed(inputs), state[1])
+    outputs = [d2l.concat((f, b), -1) for f, b in zip(f_outputs, b_outputs)]
+    return outputs, state
+```
+
+```{.python .input}
+%%tab all
+data = d2l.TimeMachine(batch_size=32, num_steps=35)
+birnn = BiRNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
+model = d2l.RNNLMScratch(birnn, num_outputs=len(data.vocab), lr=1)
+trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
+# trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab all
+model.predict('time traveller', 10, data.vocab)
+```
+
+## Concise Implementation
+
+```{.python .input}
+%%tab mxnet, pytorch
+class BiGRU(d2l.RNN):
+    def __init__(self, num_inputs, num_hiddens):
+        d2l.Module.__init__(self)
+        self.save_hyperparameters()
+        if tab.selected('mxnet'):
+            self.rnn = rnn.GRU(num_hiddens, bidirectional=True)
+        if tab.selected('pytorch'):
+            self.rnn = nn.GRU(num_inputs, num_hiddens, bidirectional=True)
+        self.num_hiddens *= 2
+        
+    if tab.selected('pytorch'):
+        def init_state(self, batch_size):
+            return d2l.zeros((2, batch_size, self.num_hiddens//2))
+```
+
+```{.python .input}
+%%tab mxnet, pytorch
+gru = BiGRU(num_inputs=len(data.vocab), num_hiddens=32)
+model = d2l.RNNLM(gru, num_outputs=len(data.vocab), lr=1)
+trainer.fit(model, data)
 ```
 
 The output is clearly unsatisfactory for the reasons described above.

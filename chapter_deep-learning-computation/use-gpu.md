@@ -480,7 +480,7 @@ Let the trainer to support GPU.
 ```{.python .input}
 %%tab mxnet, pytorch
 @d2l.add_to_class(d2l.Trainer)  #@save
-def __init__(self, max_epochs, num_gpus=0):
+def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
     self.save_hyperparameters()
     self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
     
@@ -498,7 +498,7 @@ def prepare_model(self, model):
         if tab.selected('mxnet'):
             model.collect_params().reset_ctx(self.gpus[0])
         if tab.selected('pytorch'):
-            model.net.to(self.gpus[0])
+            model.to(self.gpus[0])
     self.model = model
 ```
 

@@ -170,16 +170,6 @@ def loss(self, y_hat, y):
     if tab.selected('tensorflow'):
         fn = tf.keras.losses.MeanSquaredError()
         return fn(y, y_hat)
-
-@d2l.add_to_class(LinearRegression)  #@save
-def training_step(self, batch):
-    X, y = batch
-    l = self.loss(self(X), y)
-    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
-    self.board.xlabel = 'epoch'
-    self.board.yscale = 'log'
-    self.board.draw(epoch, l, 'train_loss', every_n=10)
-    return l
 ```
 
 ## Optimization Algorithm
