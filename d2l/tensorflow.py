@@ -144,7 +144,7 @@ class HyperParameters:
 
     def save_hyperparameters(self, ignore=[]):
         """Save function arguments into class attributes.
-
+    
         Defined in :numref:`sec_utils`"""
         frame = inspect.currentframe().f_back
         _, _, _, local_vars = inspect.getargvalues(frame)
@@ -279,7 +279,7 @@ class DataModule(d2l.HyperParameters):
         shuffle_buffer = tensors[0].shape[0] if train else 1
         return tf.data.Dataset.from_tensor_slices(tensors).shuffle(
             buffer_size=shuffle_buffer).batch(self.batch_size)
-
+    
 
 class Trainer(d2l.HyperParameters):
     """Defined in :numref:`sec_d2l_apis`"""
@@ -373,7 +373,7 @@ class LinearRegressionScratch(d2l.Module):
 
     def forward(self, X):
         """The linear regression model.
-
+    
         Defined in :numref:`sec_linear_scratch`"""
         return d2l.matmul(X, self.w) + self.b
 
@@ -405,7 +405,7 @@ class LinearRegression(d2l.Module):
 
     def forward(self, X):
         """The linear regression model.
-
+    
         Defined in :numref:`sec_linear_concise`"""
         return self.net(X)
 
@@ -431,7 +431,7 @@ class FashionMNIST(d2l.DataModule):
 
     def text_labels(self, indices):
         """Return text labels.
-
+    
         Defined in :numref:`sec_fashion_mnist`"""
         labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
@@ -470,7 +470,7 @@ class Classification(d2l.Module):
 
     def accuracy(self, y_hat, y):
         """Compute the number of correct predictions.
-
+    
         Defined in :numref:`sec_classification`"""
         if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
             y_hat = d2l.argmax(y_hat, axis=1)
@@ -689,7 +689,7 @@ class RNNLMScratch(d2l.Classification):
         embs = tf.one_hot(tf.transpose(X), self.rnn.num_inputs)
         hiddens, state = self.rnn(embs, state)
         return self.output_forward(hiddens), state
-
+    
 
     def output_forward(self, hiddens):
         """Defined in :numref:`sec_rnn_scratch`"""
@@ -701,7 +701,7 @@ class RNNLMScratch(d2l.Classification):
         return super(RNNLMScratch, self).loss(
             d2l.reshape(Y_hat, (-1, self.num_outputs)),
             d2l.reshape(d2l.transpose(Y), -1))
-
+    
 
     def accuracy(self, outputs, Y):
         """Defined in :numref:`sec_rnn_scratch`"""
