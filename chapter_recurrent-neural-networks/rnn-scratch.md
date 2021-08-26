@@ -167,20 +167,20 @@ time step by time step.
 
 ```{.python .input  n=9}
 %%tab mxnet
-X = d2l.reshape(d2l.arange(10), (2, 5))
-npx.one_hot(X.T, 5).shape
+X = d2l.reshape(d2l.arange(6), (2, 3))
+npx.one_hot(X.T, 8).shape
 ```
 
 ```{.python .input  n=10}
 %%tab pytorch
-X = d2l.reshape(d2l.arange(10), (2, 5))
-F.one_hot(X.T, 5).shape
+X = d2l.reshape(d2l.arange(6), (2, 3))
+F.one_hot(X.T, 8).shape
 ```
 
 ```{.python .input  n=11}
 %%tab tensorflow
-X = d2l.reshape(d2l.arange(10), (2, 5))
-tf.one_hot(tf.transpose(X), 5).shape
+X = d2l.reshape(d2l.arange(6), (2, 3))
+tf.one_hot(tf.transpose(X), 8).shape
 ```
 
 ## RNN LM

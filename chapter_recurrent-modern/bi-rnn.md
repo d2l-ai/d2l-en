@@ -254,6 +254,10 @@ class BiGRU(d2l.RNN):
         if tab.selected('pytorch'):
             self.rnn = nn.GRU(num_inputs, num_hiddens, bidirectional=True)
         self.num_hiddens *= 2
+        
+    if tab.selected('pytorch'):
+        def init_state(self, batch_size):
+            return d2l.zeros((2, batch_size, self.num_hiddens//2))
 ```
 
 ```{.python .input}

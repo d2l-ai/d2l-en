@@ -170,7 +170,7 @@ We train a linear model.
 if tab.selected('mxnet', 'tensorflow'):
     model = d2l.LinearRegression(lr=0.01)
 if tab.selected('pytorch'):
-    model = d2l.LinearRegression(p, lr=0.01)
+    model = d2l.LinearRegression(data.tau, lr=0.01)
 trainer = d2l.Trainer(max_epochs=5)
 trainer.fit(model, data)
 ```
@@ -182,7 +182,7 @@ namely the *one-step-ahead prediction*.
 
 ```{.python .input}
 %%tab all
-onestep_preds = model(data.features)
+onestep_preds = d2l.numpy(model(data.features))
 d2l.plot(data.time[data.tau:], [data.labels, onestep_preds], 'time', 'x', 
          legend=['labels', '1-step preds'], figsize=(6, 3))
 ```
@@ -215,6 +215,7 @@ multistep_preds[:] = data.x
 for i in range(data.num_train + data.tau, data.T):
     multistep_preds[i] = model(
         d2l.reshape(multistep_preds[i - data.tau: i], (1, -1)))
+multistep_preds = d2l.numpy(multistep_preds)    
 ```
 
 ```{.python .input}
@@ -259,9 +260,9 @@ def k_step_pred(k):
 %%tab all
 steps = (1, 4, 16, 64)
 preds = k_step_pred(steps[-1])
-d2l.plot(data.time[data.tau + steps[-1] - 1:], [preds[k-1] for k in steps], 
-         'time', 'x', legend=[f'{k}-step preds' for k in steps], 
-         figsize=(6, 3))
+d2l.plot(data.time[data.tau + steps[-1] - 1:], 
+         [d2l.numpy(preds[k-1]) for k in steps], 'time', 'x', 
+         legend=[f'{k}-step preds' for k in steps], figsize=(6, 3))
 ```
 
 This clearly illustrates how the quality of the prediction changes as we try to predict further into the future.
