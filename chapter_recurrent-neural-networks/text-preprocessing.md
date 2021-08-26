@@ -3,23 +3,6 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-```{.json .output n=1}
-[
- {
-  "data": {
-   "application/vnd.jupyter.widget-view+json": {
-    "model_id": "89dc8081d5be4cd199eaab3df1eff094",
-    "version_major": 2,
-    "version_minor": 0
-   },
-   "text/plain": "interactive(children=(Dropdown(description='tab', options=('mxnet', 'pytorch', 'tensorflow'), value='mxnet'), \u2026"
-  },
-  "metadata": {},
-  "output_type": "display_data"
- }
-]
-```
-
 # Text Preprocessing
 :label:`sec_text_preprocessing`
 
@@ -50,31 +33,11 @@ from d2l import torch as d2l
 import re
 ```
 
-```{.json .output n=3}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"mxnet\" cell."
- }
-]
-```
-
 ```{.python .input  n=4}
 %%tab tensorflow
 import collections
 from d2l import tensorflow as d2l
 import re
-```
-
-```{.json .output n=4}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"mxnet\" cell."
- }
-]
 ```
 
 ## Reading the Dataset
@@ -106,16 +69,6 @@ print(lines[0])
 print(lines[10])
 ```
 
-```{.json .output n=5}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "# text lines: 3221\nthe time machine by h g wells\ntwinkled and his usually pale face was flushed and animated the\n"
- }
-]
-```
-
 ## Tokenization
 
 The following `tokenize` function
@@ -137,16 +90,6 @@ def tokenize(self, lines):
 tokens = data.tokenize(lines)
 for i in range(7, 10):
     print(f'line {i+1}: {tokens[i][:12]}')
-```
-
-```{.json .output n=6}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "line 8: []\nline 9: ['t', 'h', 'e', ' ', 't', 'i', 'm', 'e', ' ', 't', 'r', 'a']\nline 10: ['w', 'a', 's', ' ', 'e', 'x', 'p', 'o', 'u', 'n', 'd', 'i']\n"
- }
-]
 ```
 
 ## Vocabulary
@@ -216,16 +159,6 @@ print('indices:', indicies)
 print('words:', vocab.to_tokens(indicies))
 ```
 
-```{.json .output n=8}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "indices: [21, 9, 6, 0, 21, 10, 14, 6, 0, 14, 2, 4, 9, 10, 15, 6, 0, 3, 26, 0, 9, 0, 8, 0, 24, 6, 13, 13, 20]\nwords: ['t', 'h', 'e', ' ', 't', 'i', 'm', 'e', ' ', 'm', 'a', 'c', 'h', 'i', 'n', 'e', ' ', 'b', 'y', ' ', 'h', ' ', 'g', ' ', 'w', 'e', 'l', 'l', 's']\n"
- }
-]
-```
-
 ## Putting All Things Together
 
 Using the above functions, we [**package everything into the `load_corpus_time_machine` function**], which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of *The Time Machine* corpus.
@@ -243,19 +176,6 @@ def prepare_data(self):
 
 data.prepare_data()
 len(data.corpus), len(data.vocab)
-```
-
-```{.json .output n=9}
-[
- {
-  "data": {
-   "text/plain": "(170580, 28)"
-  },
-  "execution_count": 9,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Summary
