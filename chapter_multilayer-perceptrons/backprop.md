@@ -246,7 +246,7 @@ These are then used for backpropagation
 where the compute order on the graph is reversed.
 
 Take the aforementioned simple network as an example to illustrate.
-On one hand,
+On the one hand,
 computing the regularization term :eqref:`eq_forward-s`
 during forward propagation
 depends on the current values of model parameters $\mathbf{W}^{(1)}$ and $\mathbf{W}^{(2)}$.

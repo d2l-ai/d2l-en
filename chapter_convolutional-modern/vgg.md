@@ -94,6 +94,21 @@ def vgg_block(num_convs, in_channels, out_channels):
     return nn.Sequential(*layers)
 ```
 
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+
+def vgg_block(num_convs, num_channels):
+    blk = tf.keras.models.Sequential()
+    for _ in range(num_convs):
+        blk.add(
+            tf.keras.layers.Conv2D(num_channels, kernel_size=3,
+                                   padding='same', activation='relu'))
+    blk.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2))
+    return blk
+```
+
 ## [**VGG Network**]
 
 Like AlexNet and LeNet,
@@ -144,6 +159,18 @@ class VGG(d2l.Classification):
                 nn.Linear(out_channels * 7 * 7, 4096), nn.ReLU(), nn.Dropout(0.5),
                 nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
                 nn.Linear(4096, 10))
+        if tab.selected('tensorflow'):
+            self.net = tf.keras.models.Sequential()
+            for (num_convs, num_channels) in arch:
+                self.net.add(vgg_block(num_convs, num_channels))
+            self.net.add(
+                tf.keras.models.Sequential([
+                tf.keras.layers.Flatten(),
+                tf.keras.layers.Dense(4096, activation='relu'),
+                tf.keras.layers.Dropout(0.5),
+                tf.keras.layers.Dense(4096, activation='relu'),
+                tf.keras.layers.Dropout(0.5),
+                tf.keras.layers.Dense(10)]))
 ```
 
 The original VGG network had 5 convolutional blocks,
@@ -156,12 +183,13 @@ Since this network uses 8 convolutional layers
 and 3 fully connected layers, it is often called VGG-11.
 
 ```{.python .input}
-%%tab all
-vgg_11 = VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512)))
-X = d2l.randn(1, 1, 224, 224)
-for blk in vgg_11.net:
-    X = blk(X)
-    print(blk.__class__.__name__,'output shape:\t',X.shape)
+%%tab pytorch, mxnet
+VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary((1, 1, 224, 224))
+```
+
+```{.python .input}
+%%tab tensorflow
+VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary((1, 224, 224, 1))
 ```
 
 As you can see, we halve height and width at each block,
@@ -179,11 +207,20 @@ Apart from using a slightly larger learning rate,
 the [**model training**] process is similar to that of AlexNet in :numref:`sec_alexnet`.
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
 model = VGG(arch=((1, 16), (1, 32), (2, 64), (2, 128), (2, 128)), lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
 trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab tensorflow
+trainer = d2l.Trainer(max_epochs=10)
+data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
+with d2l.try_gpu():
+    model = VGG(arch=((1, 16), (1, 32), (2, 64), (2, 128), (2, 128)), lr=0.05)
+    trainer.fit(model, data)
 ```
 
 ## Summary
@@ -205,4 +242,8 @@ trainer.fit(model, data)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/78)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/277)
 :end_tab:

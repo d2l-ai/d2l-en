@@ -123,7 +123,7 @@ Though being commonly used
 for measuring the distance
 between probability distributions,
 the cross-entropy loss function may not be a good choice here. 
-On one hand, as we mentioned in :numref:`sec_approx_train`, 
+On the one hand, as we mentioned in :numref:`sec_approx_train`, 
 the cost of properly normalizing $q_{ij}$
 results in the sum over the entire vocabulary,
 which can be computationally expensive.

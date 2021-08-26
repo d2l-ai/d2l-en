@@ -163,6 +163,7 @@ let's import a few packages.
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.numpy.random import multinomial
+import random
 npx.set_np()
 ```
 
@@ -170,7 +171,8 @@ npx.set_np()
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
-import torch, random, numpy as np
+import random
+import torch
 from torch.distributions.multinomial import Multinomial
 ```
 
@@ -178,7 +180,8 @@ from torch.distributions.multinomial import Multinomial
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
-import tensorflow as tf, random, numpy as np
+import random
+import tensorflow as tf
 from tensorflow_probability import distributions as tfd
 ```
 
@@ -408,7 +411,7 @@ but $\mathcal{B}$ did.
 
 
 A *probability* function maps events 
-onto real values ${P: A \subseteq S \rightarrow [0,1]$,
+onto real values ${P: \mathcal{A} \subseteq \mathcal{S} \rightarrow [0,1]}$,
 The probability of an event $\mathcal{A}$ 
 in the given sample space $\mathcal{S}$,
 denoted $P(\mathcal{A})$,
@@ -422,14 +425,14 @@ These axioms of probability theory,
 proposed by :cite:`kolmogorov1933sulla`,
 can be applied to rapidly derive a number of important consequences.
 For instance, it follows immediately
-that the probability of any event $A$
-*or* its complement $A'$ occurring is 1 
-(because $A \cup A' = S$).
+that the probability of any event $\mathcal{A}$
+*or* its complement $\mathcal{A}'$ occurring is 1 
+(because $\mathcal{A} \cup \mathcal{A}' = \mathcal{S}$).
 We can also prove that $P(\emptyset) = 0$
-because $1 = P(S \cup S') = P(S \cup \emptyset) = P(S) + P(\emptyset) = 1 = P(\emptyset)$.
-Consequently, the probability of any event $A$
-*and* its complement $A'$ occurring simultaneously 
-is $P(A \cap A') = 0$.
+because $1 = P(\mathcal{S} \cup \mathcal{S}') = P(\mathcal{S} \cup \emptyset) = P(\mathcal{S}) + P(\emptyset) = 1 = P(\emptyset)$.
+Consequently, the probability of any event $\mathcal{A}$
+*and* its complement $\mathcal{A}'$ occurring simultaneously 
+is $P(\mathcal{A} \cap \mathcal{A}') = 0$.
 Informally, this tells us that impossible events
 have zero probability of occurring. 
  
@@ -471,24 +474,20 @@ and $P(X=v)$ denotes its probability.
 Sometimes this notation can get clunky,
 and we can abuse notation when the context is clear.
 For example, we might use *P(X)* to refer broadly
-to the *distribution* of X, i.e., 
+to the *distribution* of $X$, i.e., 
 the function that tells us the probability
 that $X$ takes any given value. 
 Other times we write expressions 
 like $P(X,Y) = P(X) P(Y)$,
 as a shorthand to express a statement 
 that is true for all of the values
-that the random variables X and Y can take, i.e.,
+that the random variables $X$ and $Y$ can take, i.e.,
 for all $i,j$ $P(X=i \textrm{ and } Y=j) = P(X=i)P(Y=j)$.
 Other times, we abuse notation by writing
 $P(v)$ when the random variable is clear from the context. 
-Just as the values taken by random variables
-correspond to subsets of the samples space,
-and thus are events, 
-coarser groupings of these values 
-are, in turn, unions of the corresponding 
-subsets and thus are also events. 
-For example, $P(X \in [1, 3])$ denotes the probability of the event $\{1 \leq X \leq 3\}$.
+Since an event in probability theory is a set of outcomes from the sample space,
+we can specify a range of values for a random variable to take.
+For example, $P(1 \leq X \leq 3)$ denotes the probability of the event $\{1 \leq X \leq 3\}$.
 
 
 Note that there is a subtle difference 
