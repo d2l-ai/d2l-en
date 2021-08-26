@@ -8,33 +8,31 @@ using functions provided by high-level APIs
 of a deep learning framework.
 We begin as before by reading *The Time Machine* dataset.
 
-```{.python .input}
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+```
+
+```{.python .input  n=2}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn, rnn
 npx.set_np()
-
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-```{.python .input}
-#@tab pytorch
+```{.python .input  n=3}
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 from torch.nn import functional as F
-
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-```{.python .input}
-#@tab tensorflow
+```{.python .input  n=4}
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 ## [**Defining the Model**]
@@ -45,250 +43,85 @@ In fact, we have not even discussed yet what it means to have multiple layers---
 For now, suffice it to say that multiple layers simply amount to the output of one layer of RNN being used as the input for the next layer of RNN.
 
 ```{.python .input}
-num_hiddens = 256
-rnn_layer = rnn.RNN(num_hiddens)
-rnn_layer.initialize()
-```
-
-```{.python .input}
-#@tab pytorch
-num_hiddens = 256
-rnn_layer = nn.RNN(len(vocab), num_hiddens)
-```
-
-```{.python .input}
-#@tab tensorflow
-num_hiddens = 256
-rnn_cell = tf.keras.layers.SimpleRNNCell(num_hiddens,
-    kernel_initializer='glorot_uniform')
-rnn_layer = tf.keras.layers.RNN(rnn_cell, time_major=True,
-    return_sequences=True, return_state=True)
-```
-
-:begin_tab:`mxnet`
-Initializing the hidden state is straightforward.
-We invoke the member function `begin_state`.
-This returns a list (`state`)
-that contains
-an initial hidden state
-for each example in the minibatch,
-whose shape is
-(number of hidden layers, batch size, number of hidden units).
-For some models
-to be introduced later
-(e.g., long short-term memory),
-such a list also
-contains other information.
-:end_tab:
-
-:begin_tab:`pytorch`
-We (**use a tensor to initialize the hidden state**),
-whose shape is
-(number of hidden layers, batch size, number of hidden units).
-:end_tab:
-
-```{.python .input}
-state = rnn_layer.begin_state(batch_size=batch_size)
-len(state), state[0].shape
-```
-
-```{.python .input}
-#@tab pytorch
-state = torch.zeros((1, batch_size, num_hiddens))
-state.shape
-```
-
-```{.python .input}
-#@tab tensorflow
-state = rnn_cell.get_initial_state(batch_size=batch_size, dtype=tf.float32)
-state.shape
-```
-
-[**With a hidden state and an input,
-we can compute the output with
-the updated hidden state.**]
-It should be emphasized that
-the "output" (`Y`) of `rnn_layer`
-does *not* involve computation of output layers:
-it refers to
-the hidden state at *each* time step,
-and they can be used as the input
-to the subsequent output layer.
-
-:begin_tab:`mxnet`
-Besides,
-the updated hidden state (`state_new`) returned by `rnn_layer`
-refers to the hidden state
-at the *last* time step of the minibatch.
-It can be used to initialize the
-hidden state for the next minibatch within an epoch
-in sequential partitioning.
-For multiple hidden layers,
-the hidden state of each layer will be stored
-in this variable (`state_new`).
-For some models
-to be introduced later
-(e.g., long short-term memory),
-this variable also
-contains other information.
-:end_tab:
-
-```{.python .input}
-X = np.random.uniform(size=(num_steps, batch_size, len(vocab)))
-Y, state_new = rnn_layer(X, state)
-Y.shape, len(state_new), state_new[0].shape
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.rand(size=(num_steps, batch_size, len(vocab)))
-Y, state_new = rnn_layer(X, state)
-Y.shape, state_new.shape
-```
-
-```{.python .input}
-#@tab tensorflow
-X = tf.random.uniform((num_steps, batch_size, len(vocab)))
-Y, state_new = rnn_layer(X, state)
-Y.shape, len(state_new), state_new[0].shape
-```
-
-Similar to :numref:`sec_rnn_scratch`,
-[**we define an `RNNModel` class
-for a complete RNN model.**]
-Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer.
-
-```{.python .input}
-#@save
-class RNNModel(nn.Block):
-    """The RNN model."""
-    def __init__(self, rnn_layer, vocab_size, **kwargs):
-        super(RNNModel, self).__init__(**kwargs)
-        self.rnn = rnn_layer
-        self.vocab_size = vocab_size
-        self.dense = nn.Dense(vocab_size)
-
+%%tab mxnet
+class RNN(d2l.Module):  #@save
+    def __init__(self, num_inputs, num_hiddens):
+        super().__init__()
+        self.save_hyperparameters()        
+        self.rnn = rnn.RNN(num_hiddens)
+        
     def forward(self, inputs, state):
-        X = npx.one_hot(inputs.T, self.vocab_size)
-        Y, state = self.rnn(X, state)
-        # The fully connected layer will first change the shape of `Y` to
-        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
-        # (`num_steps` * `batch_size`, `vocab_size`).
-        output = self.dense(Y.reshape(-1, Y.shape[-1]))
-        return output, state
-
-    def begin_state(self, *args, **kwargs):
-        return self.rnn.begin_state(*args, **kwargs)
+        return self.rnn(inputs, state)
+    
+    def init_state(self, batch_size):
+        return self.rnn.begin_state(batch_size)
 ```
 
 ```{.python .input}
-#@tab pytorch
-#@save
-class RNNModel(nn.Module):
-    """The RNN model."""
-    def __init__(self, rnn_layer, vocab_size, **kwargs):
-        super(RNNModel, self).__init__(**kwargs)
-        self.rnn = rnn_layer
-        self.vocab_size = vocab_size
-        self.num_hiddens = self.rnn.hidden_size
-        # If the RNN is bidirectional (to be introduced later),
-        # `num_directions` should be 2, else it should be 1.
-        if not self.rnn.bidirectional:
-            self.num_directions = 1
-            self.linear = nn.Linear(self.num_hiddens, self.vocab_size)
-        else:
-            self.num_directions = 2
-            self.linear = nn.Linear(self.num_hiddens * 2, self.vocab_size)
-
+%%tab pytorch
+class RNN(d2l.Module):  #@save
+    def __init__(self, num_inputs, num_hiddens):
+        super().__init__()
+        self.save_hyperparameters()
+        self.rnn = nn.RNN(num_inputs, num_hiddens)
+        
     def forward(self, inputs, state):
-        X = F.one_hot(inputs.T.long(), self.vocab_size)
-        X = X.to(torch.float32)
-        Y, state = self.rnn(X, state)
-        # The fully connected layer will first change the shape of `Y` to
-        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
-        # (`num_steps` * `batch_size`, `vocab_size`).
-        output = self.linear(Y.reshape((-1, Y.shape[-1])))
-        return output, state
-
-    def begin_state(self, device, batch_size=1):
-        if not isinstance(self.rnn, nn.LSTM):
-            # `nn.GRU` takes a tensor as hidden state
-            return  torch.zeros((self.num_directions * self.rnn.num_layers,
-                                 batch_size, self.num_hiddens),
-                                device=device)
-        else:
-            # `nn.LSTM` takes a tuple of hidden states
-            return (torch.zeros((
-                self.num_directions * self.rnn.num_layers,
-                batch_size, self.num_hiddens), device=device),
-                    torch.zeros((
-                        self.num_directions * self.rnn.num_layers,
-                        batch_size, self.num_hiddens), device=device))
+        return self.rnn(inputs, state)
+    
+    def init_state(self, batch_size): 
+        return torch.zeros((1, batch_size, self.num_hiddens))        
 ```
 
 ```{.python .input}
-#@tab tensorflow
-#@save
-class RNNModel(tf.keras.layers.Layer):
-    def __init__(self, rnn_layer, vocab_size, **kwargs):
-        super(RNNModel, self).__init__(**kwargs)
-        self.rnn = rnn_layer
-        self.vocab_size = vocab_size
-        self.dense = tf.keras.layers.Dense(vocab_size)
+%%tab tensorflow
+class RNN(d2l.Module):  #@save
+    def __init__(self, num_inputs, num_hiddens):
+        super().__init__()
+        self.save_hyperparameters()        
+        rnn_cell = tf.keras.layers.SimpleRNNCell(num_hiddens)
+        self.rnn = tf.keras.layers.RNN(rnn_cell, time_major=True, 
+                                       return_sequences=True, return_state=True)
+        
+    def forward(self, inputs, state):
+        outputs, *state = self.rnn(inputs, state)
+        return outputs, state
+    
+    def init_state(self, batch_size):
+        return self.rnn.cell.get_initial_state(
+                batch_size=batch_size, dtype=d2l.float32)
+   
+```
 
-    def call(self, inputs, state):
-        X = tf.one_hot(tf.transpose(inputs), self.vocab_size)
-        # Later RNN like `tf.keras.layers.LSTMCell` return more than two values
-        Y, *state = self.rnn(X, state)
-        output = self.dense(tf.reshape(Y, (-1, Y.shape[-1])))
-        return output, state
+```{.python .input}
+%%tab all
+class RNNLM(d2l.RNNLMScratch):  #@save
+    def init_params(self):
+        if tab.selected('mxnet'):
+            self.linear = nn.Dense(self.num_outputs, flatten=False)
+            self.initialize()
+        if tab.selected('pytorch'):
+            self.linear = nn.Linear(self.rnn.num_hiddens, self.num_outputs)
+        if tab.selected('tensorflow'):
+            self.linear = tf.keras.layers.Dense(self.num_outputs)
+        
+    def output_forward(self, hiddens):
+        return self.linear(hiddens)
+```
 
-    def begin_state(self, *args, **kwargs):
-        return self.rnn.cell.get_initial_state(*args, **kwargs)
+```{.python .input  n=1}
+%%tab all
+data = d2l.TimeMachine(batch_size=32, num_steps=35)
+rnn_layer = RNN(num_inputs=len(data.vocab), num_hiddens=32)
+model = RNNLM(rnn_layer, num_outputs=len(data.vocab), lr=1)
+trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
+trainer.fit(model, data)
 ```
 
 ## Training and Predicting
 
 Before training the model, let's [**make a prediction with the a model that has random weights.**]
 
-```{.python .input}
-device = d2l.try_gpu()
-net = RNNModel(rnn_layer, len(vocab))
-net.initialize(force_reinit=True, ctx=device)
-d2l.predict_ch8('time traveller', 10, net, vocab, device)
-```
-
-```{.python .input}
-#@tab pytorch
-device = d2l.try_gpu()
-net = RNNModel(rnn_layer, vocab_size=len(vocab))
-net = net.to(device)
-d2l.predict_ch8('time traveller', 10, net, vocab, device)
-```
-
-```{.python .input}
-#@tab tensorflow
-device_name = d2l.try_gpu()._device_name
-strategy = tf.distribute.OneDeviceStrategy(device_name)
-with strategy.scope():
-    net = RNNModel(rnn_layer, vocab_size=len(vocab))
-
-d2l.predict_ch8('time traveller', 10, net, vocab)
-```
-
 As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn_scratch` and [**train our model with high-level APIs**].
-
-```{.python .input}
-#@tab mxnet,pytorch
-num_epochs, lr = 500, 1.5
-d2l.train_ch8(net, train_iter, vocab, lr, num_epochs, device)
-```
-
-```{.python .input}
-#@tab tensorflow
-num_epochs, lr = 500, 1.5
-d2l.train_ch8(net, train_iter, vocab, lr, num_epochs, strategy)
-```
 
 Compared with the last section, this model achieves comparable perplexity,
 albeit within a shorter period of time, due to the code being more optimized by

@@ -238,4 +238,3 @@ this encoder-decoder architecture.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3864)
 :end_tab:
-

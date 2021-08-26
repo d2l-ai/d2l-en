@@ -30,30 +30,31 @@ processes a minibatch of sequences with predefined length
 at a time.
 Now the question is how to [**read minibatches of input sequences and label sequences at random.**]
 
-```{.python .input}
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
+```{.python .input  n=2}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 import random
 npx.set_np()
 ```
 
-```{.python .input  n=2}
-#@tab pytorch
+```{.python .input  n=3}
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 import random
 ```
 
-```{.python .input}
-#@tab tensorflow
+```{.python .input  n=4}
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 import random
-```
-
-```{.python .input  n=3}
-#@tab all
-corpus, vocab = d2l.load_corpus_time_machine()
 ```
 
 ## Partitioning Sequences
@@ -103,27 +104,49 @@ The following data loader randomly generates a minibatch from the dataset each t
 The argument `batch_size` specifies the number of subsequence examples (`self.b`) in each minibatch
 and `num_steps` is the subsequence length in tokens (`self.n`).
 
-```{.python .input}
-#@tab all
-class SeqDataLoader:  #@save
-    """The sequence data iterator generating minibatches of subsequences."""
-    def __init__(self, corpus, batch_size, num_steps):
-        self.corpus, self.b, self.n = corpus, batch_size, num_steps
+```{.python .input  n=5}
+%%tab all
+@d2l.add_to_class(d2l.TimeMachine)  #@save
+def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
+    super(d2l.TimeMachine, self).__init__()
+    self.save_hyperparameters()
+    self.prepare_data()
+```
 
+```{.python .input  n=10}
+%%tab all
+class LMDataLoader(d2l.HyperParameters):  #@save
+    def __init__(self, corpus, batch_size, num_steps, train):
+        self.save_hyperparameters()
+        self.num_batches = (len(corpus) - 1 - (num_steps if train else 0)
+                           ) // (self.num_steps * self.batch_size)
+    def __len__(self):
+        return self.num_batches
+    
     def __iter__(self):
-        # Randomly drop the first d tokens.
-        corpus = self.corpus[random.randint(0, self.n - 1):]
+        # Randomly drop the first d tokens for training.
+        corpus = (self.corpus[random.randint(0, self.num_steps - 1):] 
+                  if self.train else self.corpus)
         # No. of subsequences. Subtract 1 to account for labels.
-        m = (len(corpus)-1) // self.n
+        m = (len(corpus)-1) // self.num_steps
         # The starting indices for input sequences.
-        initial_indices = list(range(0, m*self.n, self.n))
-        random.shuffle(initial_indices)
-        for i in range(0, m // self.b):
+        initial_indices = list(range(0, m*self.num_steps, self.num_steps))
+        if self.train:
+            random.shuffle(initial_indices)        
+        for i in range(0, self.num_batches):
             # The randomized starting indices for this minibatch.
-            batch_indicies = initial_indices[i*self.b : (i+1) * self.b]
-            X = [corpus[j : j+self.n] for j in batch_indicies]
-            Y = [corpus[j+1 : j+1+self.n] for j in batch_indicies]
+            batch_indicies = initial_indices[
+                i*self.batch_size : (i+1) * self.batch_size]
+            X = [corpus[j : j+self.num_steps] for j in batch_indicies]
+            Y = [corpus[j+1 : j+1+self.num_steps] for j in batch_indicies]
             yield d2l.tensor(X), d2l.tensor(Y)
+
+
+@d2l.add_to_class(d2l.TimeMachine)  #@save
+def get_dataloader(self, train):
+    corpus = (self.corpus[: self.num_train] if train else 
+              self.corpus[self.num_train : self.num_train+self.num_val])
+    return LMDataLoader(corpus, self.batch_size, self.num_steps, train)
 ```
 
 Let's [**manually generate a sequence from 0 to 34.**]
@@ -132,21 +155,12 @@ the batch size and numbers of time steps are 3 and 5,
 respectively.
 This means that we can generate $\lfloor (35 - 1) / 5 \rfloor= 6$ feature-label subsequence pairs. With a minibatch size of 3, we only get 2 minibatches.
 
-```{.python .input}
-#@tab all
-for X, Y in SeqDataLoader(list(range(35)), batch_size=3, num_steps=5):
-    print('X: ', X, '\nY:', Y)
-```
-
-[**Last, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary**], so we can use it similarly as other other functions with the `load_data` prefix, such as `d2l.load_data_fashion_mnist` defined in :numref:`sec_fashion_mnist`.
-
-```{.python .input}
-#@tab all
-def load_data_time_machine(batch_size, num_steps, max_tokens=10000):  #@save
-    """Return the iterator and the vocabulary of the time machine dataset."""
-    corpus, vocab = d2l.load_corpus_time_machine(max_tokens)
-    data_iter = SeqDataLoader(corpus, batch_size, num_steps)
-    return data_iter, vocab
+```{.python .input  n=16}
+%%tab all
+data = d2l.TimeMachine(batch_size=2, num_steps=10)
+for X, Y in data.train_dataloader():
+    print('X:', X, '\nY:', Y)
+    break
 ```
 
 ## Summary

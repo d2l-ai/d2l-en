@@ -237,6 +237,8 @@ def fit_epoch(self):
         self.optim.zero_grad()
         with torch.no_grad():
             loss.backward()
+            if self.gradient_clip_val > 0:
+                self.clip_gradients(self.gradient_clip_val, self.model)
             self.optim.step()
         self.train_batch_idx += 1
     if self.val_dataloader is None:
@@ -256,6 +258,8 @@ def fit_epoch(self):
         with autograd.record():
             loss = self.model.training_step(self.prepare_batch(batch))
         loss.backward()
+        if self.gradient_clip_val > 0:
+            self.clip_gradients(self.gradient_clip_val, self.model)
         self.optim.step(1)
         self.train_batch_idx += 1
     if self.val_dataloader is None:
@@ -274,6 +278,8 @@ def fit_epoch(self):
         with tf.GradientTape() as tape:
             loss = self.model.training_step(self.prepare_batch(batch))
         grads = tape.gradient(loss, self.model.trainable_variables)
+        if self.gradient_clip_val > 0:
+            grads = self.clip_gradients(self.gradient_clip_val, grads)
         self.optim.apply_gradients(zip(grads, self.model.trainable_variables))
         self.train_batch_idx += 1
     if self.val_dataloader is None:

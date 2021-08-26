@@ -6,14 +6,14 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # The D2L APIs
 :label:`sec_d2l_apis`
 
-Linear regression is one of the simplest machine learning models. Training it, 
-however, uses many of the same components as other models in this book require. 
-Therefore, before diving into the details it is worth reviewing some of the 
-functionality of the D2L library used throughout this book. This will greatly 
-streamline the presentation and you might even want to use it in your projects. 
+Linear regression is one of the simplest machine learning models. Training it,
+however, uses many of the same components as other models in this book require.
+Therefore, before diving into the details it is worth reviewing some of the
+functionality of the D2L library used throughout this book. This will greatly
+streamline the presentation and you might even want to use it in your projects.
 
-At its core we have three classes: `Module` contains models, losses and optimization methods; `DataModule` provides data loaders for training and validation. Both classes are combined using the `Trainer` class. It allows us to 
-train models on a variety of hardware platforms. Most code in this book adapts `Module` and `DataModule`. We will touch upon the `Trainer` class only when we discuss GPUs, CPUs, parallel training and optimization algorithms. 
+At its core we have three classes: `Module` contains models, losses and optimization methods; `DataModule` provides data loaders for training and validation. Both classes are combined using the `Trainer` class. It allows us to
+train models on a variety of hardware platforms. Most code in this book adapts `Module` and `DataModule`. We will touch upon the `Trainer` class only when we discuss GPUs, CPUs, parallel training and optimization algorithms.
 
 ```{.python .input}
 %%tab mxnet
@@ -42,8 +42,8 @@ import tensorflow as tf
 
 ## Utilities
 
-We need a few utilities to simplify object oriented programming in notebooks. One of the challenges is that class definitions tend to be fairly long blocks of code. Notebook readability demands short code fragments, interspersed with explanations, a requirement incompatible with the style of programming common for Python libraries. The first 
-utility function allows us to register functions as methods in a class *after* the class has been created. In fact, we can do so *even after* we've created instances of the class! It allows us to split the implementation of a class into multiple code blocks. 
+We need a few utilities to simplify object oriented programming in notebooks. One of the challenges is that class definitions tend to be fairly long blocks of code. Notebook readability demands short code fragments, interspersed with explanations, a requirement incompatible with the style of programming common for Python libraries. The first
+utility function allows us to register functions as methods in a class *after* the class has been created. In fact, we can do so *even after* we've created instances of the class! It allows us to split the implementation of a class into multiple code blocks.
 
 ```{.python .input}
 %%tab all
@@ -75,7 +75,7 @@ def do(self):
 a.do()
 ```
 
-The second one is a utility class that saves all arguments in a class's `__init__` method as class attributes. This allows us to extend constructor call signatures implicitly without additional code. 
+The second one is a utility class that saves all arguments in a class's `__init__` method as class attributes. This allows us to extend constructor call signatures implicitly without additional code.
 
 ```{.python .input}
 %%tab all
@@ -97,7 +97,7 @@ class B(d2l.HyperParameters):  # call the one saved in d2l with code implementat
 B(a=1, b=2, c=3);
 ```
 
-The last utility allows us to plot experiment progress interactively while it is going on. In deference to the much more powerful (and complex) [Tensorboard](https://www.tensorflow.org/tensorboard) we name it `ProgressBoard`. The  implementation is deferred to :numref:`sec_utils`. For now, let's simply see it in action. 
+The last utility allows us to plot experiment progress interactively while it is going on. In deference to the much more powerful (and complex) [Tensorboard](https://www.tensorflow.org/tensorboard) we name it `ProgressBoard`. The  implementation is deferred to :numref:`sec_utils`. For now, let's simply see it in action.
 
 The `draw` function plots a point `(x, y)` in the figure, with `label` specific the legend. The optional `every_n` smooths the line by only showing $1/n$ points in the figure. Their values are averaged from the $n$ neighbor points in the original figure.
 
@@ -133,42 +133,52 @@ Sometimes we put the code to compute the outputs into a separate `forward` metho
 ```{.python .input}
 %%tab all
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
-    def __init__(self):
+    def __init__(self, plot_train_per_epoch=5, plot_valid_per_epoch=1):
         super().__init__()
+        self.save_hyperparameters()
         self.board = ProgressBoard()
         if tab.selected('tensorflow'):
             self.training = None
 
     def loss(self, y_hat, y):
         raise NotImplementedError
-        
+
     def forward(self, X):
         assert hasattr(self, 'net'), 'Neural network is defined'
         return self.net(X)
-    
+
     if tab.selected('tensorflow'):
-        def call(self, X, training=None):
+        def call(self, X, *args, training=None):
             if training is not None:
                 self.training = training
-            return self.forward(X)
+            return self.forward(X, *args)
+
+    def plot(self, key, value, train):
+        """Plot a point in animation."""
+        assert hasattr(self, 'trainer'), 'trainer is not inited'
+        self.board.xlabel = 'epoch'
+        if train:
+            x = self.trainer.train_batch_idx / \
+                self.trainer.num_train_batches
+            n = self.trainer.num_train_batches / \
+                self.plot_train_per_epoch
+        else:
+            x = self.trainer.epoch + 1
+            n = self.trainer.num_val_batches / \
+                self.plot_valid_per_epoch
+        self.board.draw(x, value, ('train_' if train else 'val_') + key,
+                        every_n=int(n))
 
     def training_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
-        # Draw progress
-        assert hasattr(self, 'trainer'), 'Optimizer is defined'
-        num_train = self.trainer.num_train_batches
-        self.board.xlabel = 'epoch'
-        self.board.draw(self.trainer.train_batch_idx / num_train, l, 
-                        'train_loss', every_n=num_train // 5)
+        self.plot('loss', l, train=True)
         return l
 
     def validation_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
-        # Draw progress
-        self.board.draw(self.trainer.epoch+1, l, 'val_loss', 
-                        every_n=self.trainer.num_val_batches)
+        self.plot('loss', l, train=False)
 
     def configure_optimizers(self):
         raise NotImplementedError
@@ -199,14 +209,14 @@ class DataModule(d2l.HyperParameters):  #@save
     if tab.selected('mxnet', 'pytorch'):
         def __init__(self, root='../data', num_workers=4):
             self.save_hyperparameters()
-            
+
     if tab.selected('tensorflow'):
         def __init__(self, root='../data'):
             self.save_hyperparameters()
 
     def get_dataloader(self, train):
         raise NotImplementedError
-        
+
     def train_dataloader(self):
         return self.get_dataloader(train=True)
 
@@ -221,7 +231,7 @@ The `Trainer` class trains the learnable parameters (aka weights) in the `Module
 ```{.python .input}
 %%tab all
 class Trainer(d2l.HyperParameters):  #@save
-    def __init__(self, max_epochs, num_gpus=0):
+    def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'No GPU support yet'
 
@@ -249,11 +259,12 @@ class Trainer(d2l.HyperParameters):  #@save
 
     def fit_epoch(self):
         raise NotImplementedError
+
 ```
 
 ## Summary
 
-The classes provided by the D2L API function as a lightweight toolkit that make structured modeling for deep learning easy. In particular, it makes it easy to reuse many components between projects without changing much at all. For instance, we can replace just the optimizer, just the model, just the dataset, etc.; This degree of modularity pays dividends throughout the book in terms of conciseness and simplicity (this is why we added it) and it can do the same for your own projects. We strongly recommend that you look at the implementation in detail once you have gained some more familiarity with deep learning modeling. 
+The classes provided by the D2L API function as a lightweight toolkit that make structured modeling for deep learning easy. In particular, it makes it easy to reuse many components between projects without changing much at all. For instance, we can replace just the optimizer, just the model, just the dataset, etc.; This degree of modularity pays dividends throughout the book in terms of conciseness and simplicity (this is why we added it) and it can do the same for your own projects. We strongly recommend that you look at the implementation in detail once you have gained some more familiarity with deep learning modeling.
 
 ```{.python .input}
 
