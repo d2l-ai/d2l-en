@@ -527,7 +527,7 @@ def download(url, folder='../data', sha1_hash=None):  #@save
 def extract(filename, folder=None):  #@save
     """Download and extract a zip/tar file."""
     base_dir = os.path.dirname(filename)
-    _, ext = os.path.splitext(fname)
+    _, ext = os.path.splitext(filename)
     assert ext in ('.zip', '.tar', '.gz'), 'Only support zip/tar files.'
     if ext == '.zip':
         fp = zipfile.ZipFile(filename, 'r')

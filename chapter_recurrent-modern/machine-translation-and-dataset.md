@@ -58,25 +58,68 @@ we show how to
 load the preprocessed data
 into minibatches for training.
 
-```{.python .input}
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+```
+
+```{.json .output n=1}
+[
+ {
+  "data": {
+   "application/vnd.jupyter.widget-view+json": {
+    "model_id": "5b0ff805f64c406b9fdb4a02167e2c12",
+    "version_major": 2,
+    "version_minor": 0
+   },
+   "text/plain": "interactive(children=(Dropdown(description='tab', index=1, options=('mxnet', 'pytorch', 'tensorflow'), value='\u2026"
+  },
+  "metadata": {},
+  "output_type": "display_data"
+ }
+]
+```
+
+```{.python .input  n=2}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 import os
 npx.set_np()
 ```
 
-```{.python .input}
-#@tab pytorch
+```{.json .output n=2}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
+ }
+]
+```
+
+```{.python .input  n=3}
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 import os
 ```
 
-```{.python .input}
-#@tab tensorflow
+```{.python .input  n=4}
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 import os
+```
+
+```{.json .output n=4}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
+ }
+]
 ```
 
 ## [**Downloading and Preprocessing the Dataset**]
@@ -95,6 +138,54 @@ where English is translated into French,
 English is the *source language*
 and French is the *target language*.
 
+```{.python .input  n=12}
+import zipfile
+def extract(filename, folder=None):
+    """Download and extract a zip/tar file.
+
+    Defined in :numref:`sec_utils`"""
+    base_dir = os.path.dirname(filename)
+    print(base_dir)
+    _, ext = os.path.splitext(filename)
+    assert ext in ('.zip', '.tar', '.gz'), 'Only support zip/tar files.'
+    if ext == '.zip':
+        fp = zipfile.ZipFile(filename, 'r')
+    else:
+        fp = tarfile.open(filename, 'r')
+    if folder is None:
+        folder = base_dir
+    print(fp.extractall(folder))
+    
+```
+
+```{.python .input  n=15}
+class MTFraEng(d2l.DataModule):  #@save
+    def __init__(self, batch_size=32):
+        super().__init__()
+        self.save_hyperparameters()
+        d2l.extract(d2l.download(
+            d2l.DATA_URL+'fra-eng.zip', self.root, 
+            '94646ad1522d915e7b0f9296181140edcf86a4f5'))
+        with open(self.root + '/fra-eng/fra.txt', encoding='utf-8') as f:
+            self.raw_text = f.read()
+            
+data = MTFraEng()        
+data.raw_text[:10]
+```
+
+```{.json .output n=15}
+[
+ {
+  "data": {
+   "text/plain": "'Go.\\tVa !\\nH'"
+  },
+  "execution_count": 15,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 ```{.python .input}
 #@tab all
 #@save
@@ -106,7 +197,7 @@ def read_data_nmt():
     """Load the English-French dataset."""
     data_dir = d2l.download_extract('fra-eng')
     with open(os.path.join(data_dir, 'fra.txt'), 'r',
-              encoding='utf-8') as f:
+              
         return f.read()
 
 raw_text = read_data_nmt()

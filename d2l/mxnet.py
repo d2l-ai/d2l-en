@@ -137,9 +137,7 @@ class Timer:
         return np.array(self.times).cumsum().tolist()
 
 def add_to_class(Class):
-    """Register a function as a class method.
-
-    Defined in :numref:`sec_d2l_apis`"""
+    """Defined in :numref:`sec_d2l_apis`"""
     def wrapper(obj):
         setattr(Class, obj.__name__, obj)
     return wrapper
@@ -762,6 +760,16 @@ class RNNModel(nn.Block):
 
     def begin_state(self, *args, **kwargs):
         return self.rnn.begin_state(*args, **kwargs)
+
+class TranslationFraEng(d2l.DataModule):
+    """Defined in :numref:`sec_machine_translation`"""
+    def __init__(self, batch_size=32):
+        super().__init__()
+        self.save_hyperparameters()
+        data_dir = d2l.extract(d2l.download(
+            d2l.DATA_URL+'fra-eng.zip', self.root,
+            '94646ad1522d915e7b0f9296181140edcf86a4f5'))
+        print(data_dir)
 
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
@@ -3055,7 +3063,7 @@ def extract(filename, folder=None):
 
     Defined in :numref:`sec_utils`"""
     base_dir = os.path.dirname(filename)
-    _, ext = os.path.splitext(fname)
+    _, ext = os.path.splitext(filename)
     assert ext in ('.zip', '.tar', '.gz'), 'Only support zip/tar files.'
     if ext == '.zip':
         fp = zipfile.ZipFile(filename, 'r')
