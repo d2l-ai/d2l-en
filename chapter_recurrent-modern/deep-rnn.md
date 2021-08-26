@@ -70,7 +70,7 @@ the hidden state computation in
 with that from a GRU or an LSTM.
 
 
-## Concise Implementation
+## Implementation from Scratch
 
 Fortunately many of the logistical details required to implement multiple layers of an RNN are readily available in high-level APIs.
 To keep things simple we only illustrate the implementation using such built-in functionalities.
@@ -80,31 +80,29 @@ In fact, the only difference is that we specify the number of layers explicitly 
 As usual, we begin by loading the dataset.
 
 ```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+```
+
+```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import npx
 from mxnet.gluon import rnn
 npx.set_np()
-
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
-
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 The architectural decisions such as choosing hyperparameters are very similar to those of :numref:`sec_lstm`.
@@ -113,50 +111,68 @@ The number of hidden units is still 256.
 The only difference is that we now (**select a nontrivial number of hidden layers by specifying the value of `num_layers`.**)
 
 ```{.python .input}
-vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
-device = d2l.try_gpu()
-lstm_layer = rnn.LSTM(num_hiddens, num_layers)
-model = d2l.RNNModel(lstm_layer, len(vocab))
+%%tab all
+class StackedRNNScratch(d2l.Module):
+    def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):        
+        super().__init__()
+        self.save_hyperparameters()
+        self.rnns = [d2l.RNNScratch(num_inputs if i==0 else num_hiddens, 
+                                    num_hiddens, sigma) 
+                     for i in range(num_layers)]        
+    
+    def init_state(self, batch_size):
+        return [rnn.init_state(batch_size) for rnn in self.rnns]
 ```
 
 ```{.python .input}
-#@tab pytorch
-vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
-num_inputs = vocab_size
-device = d2l.try_gpu()
-lstm_layer = nn.LSTM(num_inputs, num_hiddens, num_layers)
-model = d2l.RNNModel(lstm_layer, len(vocab))
-model = model.to(device)
+%%tab all
+@d2l.add_to_class(StackedRNNScratch)
+def forward(self, inputs, state):
+    outputs = inputs
+    for i in range(self.num_layers):
+        outputs, state[i] = self.rnns[i](outputs, state[i])
+    return outputs, state
 ```
 
 ```{.python .input}
-#@tab tensorflow
-vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
-num_inputs = vocab_size
-device_name = d2l.try_gpu()._device_name
-strategy = tf.distribute.OneDeviceStrategy(device_name)
-rnn_cells = [tf.keras.layers.LSTMCell(num_hiddens) for _ in range(num_layers)]
-stacked_lstm = tf.keras.layers.StackedRNNCells(rnn_cells)
-lstm_layer = tf.keras.layers.RNN(stacked_lstm, time_major=True,
-                                 return_sequences=True, return_state=True)
-with strategy.scope():
-    model = d2l.RNNModel(lstm_layer, len(vocab))
+%%tab all
+data = d2l.TimeMachine(batch_size=32, num_steps=35)
+rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
+                              num_hiddens=32, num_layers=2)
+model = d2l.RNNLMScratch(rnn_block, num_outputs=len(data.vocab), lr=1)
+trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
+trainer.fit(model, data)
 ```
 
-## [**Training**] and Prediction
-
-Since now we instantiate two layers with the LSTM model, this rather more complex architecture slows down training considerably.
+## Concise Implementation
 
 ```{.python .input}
-#@tab mxnet, pytorch
-num_epochs, lr = 500, 2
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
+%%tab all
+class StackedGRU(d2l.RNN):
+    def __init__(self, num_inputs, num_hiddens, num_layers):
+        d2l.Module.__init__(self)
+        self.save_hyperparameters()
+        if tab.selected('mxnet'):
+            self.rnn = rnn.GRU(num_hiddens, num_layers)
+        if tab.selected('pytorch'):
+            self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers)
+        if tab.selected('tensorflow'):
+            gru_cells = [tf.keras.layers.GRUCell(num_hiddens) 
+                         for _ in range(num_layers)]
+            self.rnn = tf.keras.layers.RNN(
+                tf.keras.layers.StackedRNNCells(gru_cells), time_major=True, 
+                return_sequences=True, return_state=True)
+
+    if tab.selected('pytorch'):
+        def init_state(self, batch_size):
+            return d2l.zeros((self.num_layers, batch_size, self.num_hiddens))
 ```
 
 ```{.python .input}
-#@tab tensorflow
-num_epochs, lr = 500, 2
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
+%%tab all
+gru = StackedGRU(num_inputs=len(data.vocab), num_hiddens=32, num_layers=2)
+model = d2l.RNNLM(gru, num_outputs=len(data.vocab), lr=1)
+trainer.fit(model, data)
 ```
 
 ## Summary
@@ -183,4 +199,3 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3862)
 :end_tab:
-

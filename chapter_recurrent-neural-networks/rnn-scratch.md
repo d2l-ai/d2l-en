@@ -22,8 +22,6 @@ from d2l import mxnet as d2l
 import math
 from mxnet import autograd, gluon, np, npx
 npx.set_np()
-
-data = d2l.TimeMachine(batch_size=32, num_steps=35)
 ```
 
 ```{.python .input  n=3}
@@ -34,8 +32,6 @@ import math
 import torch
 from torch import nn
 from torch.nn import functional as F
-
-data = d2l.TimeMachine(batch_size=32, num_steps=35)
 ```
 
 ```{.python .input  n=4}
@@ -44,8 +40,89 @@ data = d2l.TimeMachine(batch_size=32, num_steps=35)
 from d2l import tensorflow as d2l
 import math
 import tensorflow as tf
+```
 
-data = d2l.TimeMachine(batch_size=32, num_steps=35)
+## RNN Model
+
+Next, we define the model class.
+The number of hidden units `num_hiddens` is a tunable hyperparameter.
+When training language models,
+the inputs and outputs are from the same vocabulary.
+The dataset is relatively small, we will train with hundreds of epochs, so we choose to plot for every 10 epochs.
+
+```{.python .input}
+%%tab all
+class RNNScratch(d2l.Module):  #@save
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        if tab.selected('mxnet'):
+            self.W_xh = d2l.randn(num_inputs, num_hiddens) * sigma
+            self.W_hh = d2l.randn(num_hiddens, num_hiddens) * sigma
+            self.b_h = d2l.zeros(num_hiddens)
+        if tab.selected('pytorch'):
+            self.W_xh = nn.Parameter(d2l.randn(num_inputs, num_hiddens) * sigma)
+            self.W_hh = nn.Parameter(d2l.rand(num_hiddens, num_hiddens) * sigma)
+            self.b_h = nn.Parameter(d2l.zeros(num_hiddens))
+        if tab.selected('tensorflow'):
+            self.W_xh = tf.Variable(d2l.normal(
+                (num_inputs, num_hiddens)) * sigma)
+            self.W_hh = tf.Variable(d2l.normal(
+                (num_hiddens, num_hiddens)) * sigma)
+            self.b_h = tf.Variable(d2l.zeros(num_hiddens))        
+```
+
+To define an RNN model,
+we first need [**an `init_rnn_state` function
+to return the hidden state at initialization.**]
+It returns a tensor filled with 0 and with a shape of (batch size, number of hidden units).
+Using tuples makes it easier to handle situations where the hidden state contains multiple variables,
+which we will encounter in later sections.
+
+```{.python .input}
+%%tab all
+@d2l.add_to_class(RNNScratch)  #@save
+def init_state(self, batch_size):
+    return (d2l.zeros((batch_size, self.num_hiddens)), )
+```
+
+```{.python .input}
+%%tab all
+@d2l.add_to_class(RNNScratch)  #@save
+def forward(self, inputs, state):
+    # Shape of inputs: (num_steps, batch_size, num_inputs)
+    # Shape of H: (batch_size, num_hiddens)
+    H, = state
+    outputs = []
+    for X in inputs:
+        H = d2l.tanh(d2l.matmul(X, self.W_xh) + 
+                     d2l.matmul(H, self.W_hh) + self.b_h)
+        outputs.append(H)
+    return outputs, (H, )
+```
+
+[**The following `rnn` function defines how to compute the hidden state and output
+at a time step.**]
+Note that
+the RNN model
+loops through the outermost dimension of `inputs`
+so that it updates hidden states `H` of a minibatch,
+time step by time step.
+Besides,
+the activation function here uses the $\tanh$ function.
+As
+described in :numref:`sec_mlp`, the
+mean value of the $\tanh$ function is 0, when the elements are uniformly
+distributed over the real numbers.
+
+```{.python .input}
+batch_size, num_inputs, num_hiddens, num_steps = 2, 16, 32, 100
+rnn = RNNScratch(num_inputs, num_hiddens)
+X = d2l.zeros((num_steps, batch_size, num_inputs))
+state = rnn.init_state(batch_size)
+outputs, new_state = rnn(X, state)
+print('#outputs =', len(outputs), '; output[0].shape =', outputs[0].shape)
+print('#state =', len(new_state), '; state[0].shape =', new_state[0].shape)
 ```
 
 ## [**One-Hot Encoding**]
@@ -64,17 +141,17 @@ This vector is the one-hot vector of the original token. The one-hot vectors wit
 
 ```{.python .input  n=6}
 %%tab mxnet
-npx.one_hot(np.array([0, 2]), len(data.vocab))
+npx.one_hot(np.array([0, 2]), 5)
 ```
 
 ```{.python .input  n=7}
 %%tab pytorch
-F.one_hot(torch.tensor([0, 2]), len(data.vocab))
+F.one_hot(torch.tensor([0, 2]), 5)
 ```
 
 ```{.python .input  n=8}
 %%tab tensorflow
-tf.one_hot(tf.constant([0, 2]), len(data.vocab))
+tf.one_hot(tf.constant([0, 2]), 5)
 ```
 
 (**The shape of the minibatch**) that we sample each time (**is (batch size, number of time steps).
@@ -91,184 +168,89 @@ time step by time step.
 ```{.python .input  n=9}
 %%tab mxnet
 X = d2l.reshape(d2l.arange(10), (2, 5))
-npx.one_hot(X.T, len(data.vocab)).shape
+npx.one_hot(X.T, 5).shape
 ```
 
 ```{.python .input  n=10}
 %%tab pytorch
 X = d2l.reshape(d2l.arange(10), (2, 5))
-F.one_hot(X.T, len(data.vocab)).shape
+F.one_hot(X.T, 5).shape
 ```
 
 ```{.python .input  n=11}
 %%tab tensorflow
 X = d2l.reshape(d2l.arange(10), (2, 5))
-tf.one_hot(tf.transpose(X), len(data.vocab)).shape
+tf.one_hot(tf.transpose(X), 5).shape
 ```
 
-## RNN Model
+## RNN LM
 
-Next, we define the model class.
-The number of hidden units `num_hiddens` is a tunable hyperparameter.
-When training language models,
-the inputs and outputs are from the same vocabulary.
-The dataset is relatively small, we will train with hundreds of epochs, so we choose to plot for every 10 epochs.  
-
-```{.python .input  n=12}
-%%tab mxnet
-class RNNScratch(d2l.Classification):  #@save
-    def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
+```{.python .input}
+%%tab all
+class RNNLMScratch(d2l.Classification):  #@save
+    def __init__(self, rnn, num_outputs, lr):
         super().__init__(plot_train_per_epoch=0.1, plot_valid_per_epoch=0.1)
         self.save_hyperparameters()
         self.init_params()
-        for param in self.get_scratch_params():
-            param.attach_grad()
         
-    def get_scratch_params(self):
-        return [getattr(self, attr) for attr in dir(self) 
-                if isinstance(getattr(self, attr), np.ndarray)]
-    
     def init_params(self):
-        # Hidden layer parameters
-        self.W_xh = d2l.randn(self.num_inputs, self.num_hiddens) * self.sigma
-        self.W_hh = d2l.randn(self.num_hiddens, self.num_hiddens) * self.sigma
-        self.b_h = d2l.zeros(self.num_hiddens)
-        # Output layer parameters
-        self.W_hq = d2l.randn(self.num_hiddens, self.num_outputs) * self.sigma
-        self.b_q = d2l.zeros(self.num_outputs)
-        
-    def collect_params(self):
-        params = super().collect_params()
-        return params if len(params.keys()) else self.get_scratch_params()
-```
-
-```{.python .input  n=13}
-%%tab pytorch
-class RNNScratch(d2l.Classification):  #@save
-    def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
-        super().__init__(plot_train_per_epoch=0.1, plot_valid_per_epoch=0.1)
-        self.save_hyperparameters()
-        self.init_params()
-
-    def init_params(self):
-        # Hidden layer parameters
-        self.W_xh = nn.Parameter(d2l.randn(
-            self.num_inputs, self.num_hiddens) * self.sigma)
-        self.W_hh = nn.Parameter(
-            d2l.rand(self.num_hiddens, self.num_hiddens) * self.sigma)
-        self.b_h = nn.Parameter(d2l.zeros(self.num_hiddens))
-        # Output layer parameters
-        self.W_hq = nn.Parameter(d2l.randn(
-            self.num_hiddens, self.num_outputs) * self.sigma)
-        self.b_q = nn.Parameter(d2l.zeros(self.num_outputs))        
+        if tab.selected('mxnet'):
+            self.W_hq = d2l.randn(
+                self.rnn.num_hiddens, self.num_outputs) * self.rnn.sigma
+            self.b_q = d2l.zeros(self.num_outputs)        
+            for param in self.get_scratch_params():
+                param.attach_grad()
+        if tab.selected('pytorch'):
+            self.W_hq = nn.Parameter(d2l.randn(
+                self.rnn.num_hiddens, self.num_outputs) * self.rnn.sigma)
+            self.b_q = nn.Parameter(d2l.zeros(self.num_outputs)) 
+        if tab.selected('tensorflow'):
+            self.W_hq = tf.Variable(d2l.normal(
+                (self.rnn.num_hiddens, self.num_outputs)) * self.rnn.sigma)
+            self.b_q = tf.Variable(d2l.zeros(self.num_outputs))            
 ```
 
 ```{.python .input}
-%%tab tensorflow
-class RNNScratch(d2l.Classification):  #@save
-    def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
-        super().__init__(plot_train_per_epoch=0.1, plot_valid_per_epoch=0.1)
-        self.save_hyperparameters()
-        self.init_params()
-        
-    def init_params(self):
-        # Hidden layer parameters
-        self.W_xh = tf.Variable(d2l.normal(
-            (self.num_inputs, self.num_hiddens)) * self.sigma)
-        self.W_hh = tf.Variable(d2l.normal(
-            (self.num_hiddens, self.num_hiddens)) * self.sigma)
-        self.b_h = tf.Variable(d2l.zeros(self.num_hiddens))
-        # Output layer parameters
-        self.W_hq = tf.Variable(
-            d2l.normal((self.num_hiddens, self.num_outputs))  * self.sigma)
-        self.b_q = tf.Variable(d2l.zeros(self.num_outputs))
-```
-
-To define an RNN model,
-we first need [**an `init_rnn_state` function
-to return the hidden state at initialization.**]
-It returns a tensor filled with 0 and with a shape of (batch size, number of hidden units).
-Using tuples makes it easier to handle situations where the hidden state contains multiple variables,
-which we will encounter in later sections.
-
-```{.python .input  n=17}
 %%tab all
-@d2l.add_to_class(RNNScratch)  #@save
-def init_state(self, X):
-    return (d2l.zeros((X.shape[0], self.num_hiddens)), )
-```
-
-[**The following `rnn` function defines how to compute the hidden state and output
-at a time step.**]
-Note that
-the RNN model
-loops through the outermost dimension of `inputs`
-so that it updates hidden states `H` of a minibatch,
-time step by time step.
-Besides,
-the activation function here uses the $\tanh$ function.
-As
-described in :numref:`sec_mlp`, the
-mean value of the $\tanh$ function is 0, when the elements are uniformly
-distributed over the real numbers.
-
-```{.python .input  n=19}
-%%tab all
-@d2l.add_to_class(RNNScratch)  #@save
+@d2l.add_to_class(RNNLMScratch)  #@save
 def forward(self, X, state=None):
-    if state is None:
-        state = self.init_state(X)
-    # Shape of X: (batch_size, num_steps)
-    # Shape of embs: (num_steps, batch_size, num_inputs)
+    if state is None: state = self.rnn.init_state(X.shape[0])   
+    # embeddings shape: (num_steps, batch_size, num_inputs)    
     if tab.selected('pytorch'):
-        embs = F.one_hot(X.T, self.num_inputs).type(torch.float32)
+        embs = F.one_hot(X.T, self.rnn.num_inputs).type(torch.float32)
     if tab.selected('mxnet'):
-        embs = npx.one_hot(X.T, self.num_inputs)
+        embs = npx.one_hot(X.T, self.rnn.num_inputs)
     if tab.selected('tensorflow'):
-        embs = tf.one_hot(tf.transpose(X), self.num_inputs)
-    H, = state
-    outputs = []
-    for emb in embs:        
-        H = d2l.tanh(d2l.matmul(emb, self.W_xh) + 
-                     d2l.matmul(H, self.W_hh) + self.b_h)
-        Y = d2l.matmul(H, self.W_hq) + self.b_q
-        outputs.append(Y)
-    # Return shape (num_steps, batch_size, num_outputs)
-    return d2l.stack(outputs, 0), (H,)
-```
+        embs = tf.one_hot(tf.transpose(X), self.rnn.num_inputs)
+    hiddens, state = self.rnn(embs, state)
+    return self.output_forward(hiddens), state
 
-```{.python .input}
-Y.shape
+@d2l.add_to_class(RNNLMScratch)  #@save
+def output_forward(self, hiddens):
+    return d2l.stack([d2l.matmul(H, self.W_hq) + self.b_q for H in hiddens], 0)
 ```
 
 ```{.python .input  n=20}
 %%tab all
-@d2l.add_to_class(RNNScratch)  #@save
+@d2l.add_to_class(RNNLMScratch)  #@save
 def loss(self, outputs, Y):
-    y_hat, _ = outputs
-    return super(RNNScratch, self).loss(
-        d2l.reshape(y_hat, (-1, self.num_outputs)), d2l.reshape(d2l.transpose(Y), -1))
+    Y_hat, _ = outputs
+    return super(RNNLMScratch, self).loss(
+        d2l.reshape(Y_hat, (-1, self.num_outputs)), 
+        d2l.reshape(d2l.transpose(Y), -1))
 
-@d2l.add_to_class(RNNScratch)  #@save
+@d2l.add_to_class(RNNLMScratch)  #@save
 def accuracy(self, outputs, Y):
-    y_hat, _ = outputs    
-    return super(RNNScratch, self).accuracy(
-        d2l.reshape(y_hat, (-1, self.num_outputs)), d2l.reshape(d2l.transpose(Y), (-1,1)))
+    Y_hat, _ = outputs    
+    return super(RNNLMScratch, self).accuracy(
+        d2l.reshape(Y_hat, (-1, self.num_outputs)), 
+        d2l.reshape(d2l.transpose(Y), (-1,1)))
 ```
 
 With all the needed functions being defined,
 next we [**create a class to wrap these functions and store parameters**] for an RNN model implemented from scratch.
 
 Let's [**check whether the outputs have the correct shapes**], e.g., to ensure that the dimensionality of the hidden state remains unchanged.
-
-```{.python .input  n=22}
-%%tab all
-model = RNNScratch(num_inputs=len(data.vocab), 
-                   num_outputs=len(data.vocab), num_hiddens=32, lr=1)
-X, Y = next(iter(data.train_dataloader()))
-Y_hat, new_state = model(X)
-Y_hat.shape, len(new_state), new_state[0].shape
-```
 
 We can see that the output shape is (number of time steps $\times$ batch size, vocabulary size), while the hidden state shape remains the same, i.e., (batch size, number of hidden units).
 
@@ -329,8 +311,8 @@ Also note that we compute the gradient norm over all the model parameters.
 %%tab mxnet
 @d2l.add_to_class(d2l.Trainer)  #@save
 def clip_gradients(self, grad_clip_val, model):
-    params = model.collect_params()
-    if not isinstance(params, (list, tuple)):
+    params = model.parameters()
+    if not isinstance(params, list):
         params = [p.data() for p in params.values()]    
     norm = math.sqrt(sum((p.grad ** 2).sum() for p in params))
     if norm > grad_clip_val:
@@ -367,9 +349,10 @@ def clip_gradients(self, grad_clip_val, grads):
 
 ```{.python .input  n=26}
 %%tab all
-model = RNNScratch(num_inputs=len(data.vocab), 
-                   num_outputs=len(data.vocab), num_hiddens=32, lr=1)
-trainer = d2l.Trainer(max_epochs=500, gradient_clip_val=1)
+data = d2l.TimeMachine(batch_size=32, num_steps=35)
+rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
+model = RNNLMScratch(rnn, num_outputs=len(data.vocab), lr=1)
+trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -414,17 +397,16 @@ So we generate the predicted characters and emit them.
 
 ```{.python .input}
 %%tab all
-@d2l.add_to_class(RNNScratch)  #@save
+@d2l.add_to_class(RNNLMScratch)  #@save
 def predict(self, prefix, num_preds, vocab):
-    get_input = lambda x: d2l.tensor([[x]])
-    outputs = [vocab[prefix[0]]]
-    state = self.init_state(get_input(outputs[-1]))
-    for y in prefix[1:]:  # Warm-up period
-        _, state = self(get_input(outputs[-1]), state)
-        outputs.append(vocab[y])
-    for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = self(get_input(outputs[-1]), state)
-        outputs.append(int(d2l.reshape(d2l.argmax(y, axis=1), 1)))
+    state, outputs = None, [vocab[prefix[0]]]
+    for i in range(len(prefix) + num_preds - 1):
+        X = d2l.tensor([[outputs[-1]]])
+        Y, state = self(X, state)
+        if i < len(prefix) - 1: # Warm-up period
+            outputs.append(vocab[prefix[i]])
+        else:  # Predict `num_preds` steps
+            outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))    
     return ''.join([vocab.idx_to_token[i] for i in outputs])
     
 ```

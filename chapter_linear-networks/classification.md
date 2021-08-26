@@ -48,8 +48,8 @@ Again, we use minibatch SGD as the optimizer.
 %%tab mxnet
 @d2l.add_to_class(d2l.Module)  #@save
 def configure_optimizers(self):
-    params = self.collect_params()
-    if isinstance(params, (tuple, list)):
+    params = self.parameters()
+    if isinstance(params, list):
         return d2l.SGD(params, self.lr)
     return gluon.Trainer(params,  'sgd', {'learning_rate': self.lr})
 ```
@@ -103,6 +103,26 @@ def accuracy(self, y_hat, y):
         y_hat = d2l.argmax(y_hat, axis=1)
     cmp = d2l.astype(y_hat, y.dtype) == y
     return d2l.reduce_mean(d2l.astype(cmp, d2l.float32))
+```
+
+```{.python .input}
+%%tab mxnet
+
+@d2l.add_to_class(d2l.Module)  #@save
+def get_scratch_params(self):
+    params = []
+    for attr in dir(self):
+        a = getattr(self, attr)
+        if isinstance(a, np.ndarray):
+            params.append(a)
+        if isinstance(a, d2l.Module):
+            params.extend(a.get_scratch_params())
+    return params
+
+@d2l.add_to_class(d2l.Module)  #@save
+def parameters(self):
+    params = self.collect_params()
+    return params if len(params.keys()) else self.get_scratch_params()
 ```
 
 ## Summary

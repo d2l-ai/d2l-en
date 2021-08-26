@@ -221,10 +221,10 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         assert hasattr(self, 'net'), 'No neural network is defined'
         return self.net(X)
 
-    def call(self, X, training=None):
+    def call(self, X, *args, training=None):
         if training is not None:
             self.training = training
-        return self.forward(X)
+        return self.forward(X, *args)
 
     def plot(self, key, value, train):
         """Plot a point in animation."""
@@ -643,71 +643,147 @@ def get_dataloader(self, train):
               self.corpus[self.num_train : self.num_train+self.num_val])
     return LMDataLoader(corpus, self.batch_size, self.num_steps, train)
 
-class RNNScratch(d2l.Classification):
+class RNNScratch(d2l.Module):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        self.W_xh = tf.Variable(d2l.normal(
+            (num_inputs, num_hiddens)) * sigma)
+        self.W_hh = tf.Variable(d2l.normal(
+            (num_hiddens, num_hiddens)) * sigma)
+        self.b_h = tf.Variable(d2l.zeros(num_hiddens))
+
+    def init_state(self, batch_size):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        return (d2l.zeros((batch_size, self.num_hiddens)), )
+
+    def forward(self, inputs, state):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        # Shape of inputs: (num_steps, batch_size, num_inputs)
+        # Shape of H: (batch_size, num_hiddens)
+        H, = state
+        outputs = []
+        for X in inputs:
+            H = d2l.tanh(d2l.matmul(X, self.W_xh) +
+                         d2l.matmul(H, self.W_hh) + self.b_h)
+            outputs.append(H)
+        return outputs, (H, )
+
+class RNNLMScratch(d2l.Classification):
+    """Defined in :numref:`sec_rnn_scratch`"""
+    def __init__(self, rnn, num_outputs, lr):
         super().__init__(plot_train_per_epoch=0.1, plot_valid_per_epoch=0.1)
         self.save_hyperparameters()
         self.init_params()
 
     def init_params(self):
-        # Hidden layer parameters
-        self.W_xh = tf.Variable(d2l.normal(
-            (self.num_inputs, self.num_hiddens)) * self.sigma)
-        self.W_hh = tf.Variable(d2l.normal(
-            (self.num_hiddens, self.num_hiddens)) * self.sigma)
-        self.b_h = tf.Variable(d2l.zeros(self.num_hiddens))
-        # Output layer parameters
-        self.W_hq = tf.Variable(
-            d2l.normal((self.num_hiddens, self.num_outputs))  * self.sigma)
+        self.W_hq = tf.Variable(d2l.normal(
+            (self.rnn.num_hiddens, self.num_outputs)) * self.rnn.sigma)
         self.b_q = tf.Variable(d2l.zeros(self.num_outputs))
-
-    def init_state(self, X):
-        """Defined in :numref:`sec_rnn_scratch`"""
-        return (d2l.zeros((X.shape[0], self.num_hiddens)), )
 
     def forward(self, X, state=None):
         """Defined in :numref:`sec_rnn_scratch`"""
-        if state is None:
-            state = self.init_state(X)
-        # Shape of X: (batch_size, num_steps)
-        # Shape of embs: (num_steps, batch_size, num_inputs)
-        embs = tf.one_hot(tf.transpose(X), self.num_inputs)
-        H, = state
-        outputs = []
-        for emb in embs:
-            H = d2l.tanh(d2l.matmul(emb, self.W_xh) +
-                         d2l.matmul(H, self.W_hh) + self.b_h)
-            Y = d2l.matmul(H, self.W_hq) + self.b_q
-            outputs.append(Y)
-        # Return shape (num_steps, batch_size, num_outputs)
-        return d2l.stack(outputs, 0), (H,)
+        if state is None: state = self.rnn.init_state(X.shape[0])
+        # embeddings shape: (num_steps, batch_size, num_inputs)
+        embs = tf.one_hot(tf.transpose(X), self.rnn.num_inputs)
+        hiddens, state = self.rnn(embs, state)
+        return self.output_forward(hiddens), state
+    
+
+    def output_forward(self, hiddens):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        return d2l.stack([d2l.matmul(H, self.W_hq) + self.b_q for H in hiddens], 0)
 
     def loss(self, outputs, Y):
         """Defined in :numref:`sec_rnn_scratch`"""
-        y_hat, _ = outputs
-        return super(RNNScratch, self).loss(
-            d2l.reshape(y_hat, (-1, self.num_outputs)), d2l.reshape(d2l.transpose(Y), -1))
+        Y_hat, _ = outputs
+        return super(RNNLMScratch, self).loss(
+            d2l.reshape(Y_hat, (-1, self.num_outputs)),
+            d2l.reshape(d2l.transpose(Y), -1))
     
 
     def accuracy(self, outputs, Y):
         """Defined in :numref:`sec_rnn_scratch`"""
-        y_hat, _ = outputs
-        return super(RNNScratch, self).accuracy(
-            d2l.reshape(y_hat, (-1, self.num_outputs)), d2l.reshape(d2l.transpose(Y), (-1,1)))
+        Y_hat, _ = outputs
+        return super(RNNLMScratch, self).accuracy(
+            d2l.reshape(Y_hat, (-1, self.num_outputs)),
+            d2l.reshape(d2l.transpose(Y), (-1,1)))
 
     def predict(self, prefix, num_preds, vocab):
         """Defined in :numref:`sec_rnn_scratch`"""
-        get_input = lambda x: d2l.tensor([[x]])
-        outputs = [vocab[prefix[0]]]
-        state = self.init_state(get_input(outputs[-1]))
-        for y in prefix[1:]:  # Warm-up period
-            _, state = self(get_input(outputs[-1]), state)
-            outputs.append(vocab[y])
-        for _ in range(num_preds):  # Predict `num_preds` steps
-            y, state = self(get_input(outputs[-1]), state)
-            outputs.append(int(d2l.reshape(d2l.argmax(y, axis=1), 1)))
+        state, outputs = None, [vocab[prefix[0]]]
+        for i in range(len(prefix) + num_preds - 1):
+            X = d2l.tensor([[outputs[-1]]])
+            Y, state = self(X, state)
+            if i < len(prefix) - 1: # Warm-up period
+                outputs.append(vocab[prefix[i]])
+            else:  # Predict `num_preds` steps
+                outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
         return ''.join([vocab.idx_to_token[i] for i in outputs])
+
+class RNN(d2l.Module):
+    """Defined in :numref:`sec_rnn-concise`"""
+    def __init__(self, num_inputs, num_hiddens):
+        super().__init__()
+        self.save_hyperparameters()
+        rnn_cell = tf.keras.layers.SimpleRNNCell(num_hiddens)
+        self.rnn = tf.keras.layers.RNN(rnn_cell, time_major=True,
+                                       return_sequences=True, return_state=True)
+
+    def forward(self, inputs, state):
+        outputs, *state = self.rnn(inputs, state)
+        return outputs, state
+
+    def init_state(self, batch_size):
+        return self.rnn.cell.get_initial_state(
+                batch_size=batch_size, dtype=d2l.float32)
+
+class RNNLM(d2l.RNNLMScratch):
+    """Defined in :numref:`sec_rnn-concise`"""
+    def init_params(self):
+        self.linear = tf.keras.layers.Dense(self.num_outputs)
+
+    def output_forward(self, hiddens):
+        return self.linear(hiddens)
+
+class GRUScratch(d2l.Module):
+    """Defined in :numref:`sec_gru`"""
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+
+        init_weight = lambda *shape: tf.Variable(d2l.normal(shape) * sigma)
+        triple = lambda: (init_weight(num_inputs, num_hiddens),
+                          init_weight(num_hiddens, num_hiddens),
+                          tf.Variable(d2l.zeros(num_hiddens)))
+
+        self.W_xz, self.W_hz, self.b_z = triple()  # Update gate
+        self.W_xr, self.W_hr, self.b_r = triple()  # Reset gate
+        self.W_xh, self.W_hh, self.b_h = triple()  # Candidate hidden state
+
+    def init_state(self, batch_size):
+        return (d2l.zeros((batch_size, self.num_hiddens)), )
+
+class LSTMScratch(d2l.Module):
+    """Defined in :numref:`sec_lstm`"""
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+
+        init_weight = lambda *shape: tf.Variable(d2l.normal(shape) * sigma)
+        triple = lambda: (init_weight(num_inputs, num_hiddens),
+                          init_weight(num_hiddens, num_hiddens),
+                          tf.Variable(d2l.zeros(num_hiddens)))
+
+        self.W_xi, self.W_hi, self.b_i = triple()  # Input gate
+        self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
+        self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
+        self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell
+
+    def init_state(self, batch_size):
+        return (d2l.zeros((batch_size, self.num_hiddens)),
+                d2l.zeros((batch_size, self.num_hiddens)))
 
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
@@ -1751,5 +1827,6 @@ stack = tf.stack
 abs = tf.abs
 eye = tf.eye
 log = tf.math.log
+sigmoid = tf.sigmoid
 numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 

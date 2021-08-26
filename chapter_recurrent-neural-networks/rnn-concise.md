@@ -44,76 +44,77 @@ For now, suffice it to say that multiple layers simply amount to the output of o
 
 ```{.python .input}
 %%tab mxnet
-class RNN(d2l.RNNScratch):
-    def init_params(self):
-        self.rnn = rnn.RNN(self.num_hiddens)
-        self.linear = nn.Dense(self.num_outputs, flatten=False)
-        self.initialize()
+class RNN(d2l.Module):  #@save
+    def __init__(self, num_inputs, num_hiddens):
+        super().__init__()
+        self.save_hyperparameters()        
+        self.rnn = rnn.RNN(num_hiddens)
         
-    def forward(self, X, state=None):
-        if state is None: state = self.init_state(X)
-        embs = npx.one_hot(X.T, self.num_inputs)        
-        Y, state = self.rnn(embs, state)
-        return self.linear(Y), state
-
-    def init_state(self, X):        
-        return [d2l.to(s, X.context) 
-                for s in self.rnn.begin_state(batch_size=X.shape[0])]
+    def forward(self, inputs, state):
+        return self.rnn(inputs, state)
+    
+    def init_state(self, batch_size):
+        return self.rnn.begin_state(batch_size)
 ```
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab pytorch
-class RNN(d2l.RNNScratch):
-    def init_params(self):
-        self.rnn =  nn.RNN(self.num_inputs, self.num_hiddens)
-        self.linear = nn.Linear(self.num_hiddens, self.num_outputs)
-
-    def forward(self, X, state=None):
-        if state is None: state = self.init_state(X)
-        embs = F.one_hot(X.T, self.num_inputs).type(torch.float32)
-        Y, state = self.rnn(embs, state)        
-        return self.linear(Y), state
-
-    def init_state(self, X):
-        return torch.zeros((1, X.shape[0], self.num_hiddens)).to(X.device)
+class RNN(d2l.Module):  #@save
+    def __init__(self, num_inputs, num_hiddens):
+        super().__init__()
+        self.save_hyperparameters()
+        self.rnn = nn.RNN(num_inputs, num_hiddens)
+        
+    def forward(self, inputs, state):
+        return self.rnn(inputs, state)
+    
+    def init_state(self, batch_size): 
+        return torch.zeros((1, batch_size, self.num_hiddens))        
 ```
 
 ```{.python .input}
 %%tab tensorflow
-class RNN(d2l.RNNScratch):
-    def init_params(self):
-        rnn_cell = tf.keras.layers.SimpleRNNCell(self.num_hiddens)
+class RNN(d2l.Module):  #@save
+    def __init__(self, num_inputs, num_hiddens):
+        super().__init__()
+        self.save_hyperparameters()        
+        rnn_cell = tf.keras.layers.SimpleRNNCell(num_hiddens)
         self.rnn = tf.keras.layers.RNN(rnn_cell, time_major=True, 
                                        return_sequences=True, return_state=True)
-        self.linear = tf.keras.layers.Dense(self.num_outputs)
-
-    def forward(self, X, state=None):
-        if state is None: state = self.init_state(X)
-        X = tf.one_hot(tf.transpose(X), self.num_inputs)        
-        Y, *state = self.rnn(X, state)
-        return self.linear(Y), state
-
-    def init_state(self, X):
+        
+    def forward(self, inputs, state):
+        outputs, *state = self.rnn(inputs, state)
+        return outputs, state
+    
+    def init_state(self, batch_size):
         return self.rnn.cell.get_initial_state(
-            batch_size=X.shape[0], dtype=d2l.float32)
+                batch_size=batch_size, dtype=d2l.float32)
+   
+```
+
+```{.python .input}
+%%tab all
+class RNNLM(d2l.RNNLMScratch):  #@save
+    def init_params(self):
+        if tab.selected('mxnet'):
+            self.linear = nn.Dense(self.num_outputs, flatten=False)
+            self.initialize()
+        if tab.selected('pytorch'):
+            self.linear = nn.Linear(self.rnn.num_hiddens, self.num_outputs)
+        if tab.selected('tensorflow'):
+            self.linear = tf.keras.layers.Dense(self.num_outputs)
+        
+    def output_forward(self, hiddens):
+        return self.linear(hiddens)
 ```
 
 ```{.python .input  n=1}
 %%tab all
 data = d2l.TimeMachine(batch_size=32, num_steps=35)
-model = RNN(num_inputs=len(data.vocab), num_outputs=len(data.vocab), num_hiddens=32, lr=1)
-trainer = d2l.Trainer(max_epochs=500, gradient_clip_val=1)
+rnn_layer = RNN(num_inputs=len(data.vocab), num_hiddens=32)
+model = RNNLM(rnn_layer, num_outputs=len(data.vocab), lr=1)
+trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
 trainer.fit(model, data)
-```
-
-```{.json .output n=1}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "UsageError: Cell magic `%%tab` not found.\n"
- }
-]
 ```
 
 ## Training and Predicting

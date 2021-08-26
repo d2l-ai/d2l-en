@@ -163,33 +163,30 @@ In summary, GRUs have the following two distinguishing features:
 
 To gain a better understanding of the GRU model, let's implement it from scratch. We begin by reading *The Time Machine* dataset that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below.
 
-```{.python .input}
+```{.python .input  n=5}
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+```
+
+```{.python .input  n=6}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import rnn
 npx.set_np()
-
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-```{.python .input}
-#@tab pytorch
+```{.python .input  n=7}
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
-
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-```{.python .input}
-#@tab tensorflow
+```{.python .input  n=8}
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
-
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 ### (**Initializing Model Parameters**)
@@ -201,149 +198,59 @@ We instantiate all weights and biases relating to the update gate, the reset gat
 and the output layer.
 
 ```{.python .input}
-def get_params(vocab_size, num_hiddens, device):
-    num_inputs = num_outputs = vocab_size
-
-    def normal(shape):
-        return np.random.normal(scale=0.01, size=shape, ctx=device)
-
-    def three():
-        return (normal((num_inputs, num_hiddens)),
-                normal((num_hiddens, num_hiddens)),
-                np.zeros(num_hiddens, ctx=device))
-
-    W_xz, W_hz, b_z = three()  # Update gate parameters
-    W_xr, W_hr, b_r = three()  # Reset gate parameters
-    W_xh, W_hh, b_h = three()  # Candidate hidden state parameters
-    # Output layer parameters
-    W_hq = normal((num_hiddens, num_outputs))
-    b_q = np.zeros(num_outputs, ctx=device)
-    # Attach gradients
-    params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]
-    for param in params:
-        param.attach_grad()
-    return params
-```
-
-```{.python .input}
-#@tab pytorch
-def get_params(vocab_size, num_hiddens, device):
-    num_inputs = num_outputs = vocab_size
-
-    def normal(shape):
-        return torch.randn(size=shape, device=device)*0.01
-
-    def three():
-        return (normal((num_inputs, num_hiddens)),
-                normal((num_hiddens, num_hiddens)),
-                d2l.zeros(num_hiddens, device=device))
-
-    W_xz, W_hz, b_z = three()  # Update gate parameters
-    W_xr, W_hr, b_r = three()  # Reset gate parameters
-    W_xh, W_hh, b_h = three()  # Candidate hidden state parameters
-    # Output layer parameters
-    W_hq = normal((num_hiddens, num_outputs))
-    b_q = d2l.zeros(num_outputs, device=device)
-    # Attach gradients
-    params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]
-    for param in params:
-        param.requires_grad_(True)
-    return params
-```
-
-```{.python .input}
-#@tab tensorflow
-def get_params(vocab_size, num_hiddens):
-    num_inputs = num_outputs = vocab_size
-
-    def normal(shape):
-        return d2l.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32)
-
-    def three():
-        return (tf.Variable(normal((num_inputs, num_hiddens)), dtype=tf.float32),
-                tf.Variable(normal((num_hiddens, num_hiddens)), dtype=tf.float32),
-                tf.Variable(d2l.zeros(num_hiddens), dtype=tf.float32))
-
-    W_xz, W_hz, b_z = three()  # Update gate parameters
-    W_xr, W_hr, b_r = three()  # Reset gate parameters
-    W_xh, W_hh, b_h = three()  # Candidate hidden state parameters
-    # Output layer parameters
-    W_hq = tf.Variable(normal((num_hiddens, num_outputs)), dtype=tf.float32)
-    b_q = tf.Variable(d2l.zeros(num_outputs), dtype=tf.float32)
-    params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]
-    return params
+%%tab all
+class GRUScratch(d2l.Module):  #@save
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        
+        if tab.selected('mxnet'):
+            init_weight = lambda *shape: d2l.randn(*shape) * sigma
+            triple = lambda: (init_weight(num_inputs, num_hiddens),
+                              init_weight(num_hiddens, num_hiddens),
+                              d2l.zeros(num_hiddens))            
+        if tab.selected('pytorch'):
+            init_weight = lambda *shape: nn.Parameter(d2l.randn(*shape) * sigma)
+            triple = lambda: (init_weight(num_inputs, num_hiddens),
+                              init_weight(num_hiddens, num_hiddens),
+                              nn.Parameter(d2l.zeros(num_hiddens)))
+        if tab.selected('tensorflow'):
+            init_weight = lambda *shape: tf.Variable(d2l.normal(shape) * sigma)
+            triple = lambda: (init_weight(num_inputs, num_hiddens),
+                              init_weight(num_hiddens, num_hiddens),
+                              tf.Variable(d2l.zeros(num_hiddens)))            
+            
+        self.W_xz, self.W_hz, self.b_z = triple()  # Update gate
+        self.W_xr, self.W_hr, self.b_r = triple()  # Reset gate
+        self.W_xh, self.W_hh, self.b_h = triple()  # Candidate hidden state
+        
+    def init_state(self, batch_size):
+        return (d2l.zeros((batch_size, self.num_hiddens)), )        
 ```
 
 ### Defining the Model
 
 Now we will define [**the hidden state initialization function**] `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn_scratch`, this function returns a tensor with a shape (batch size, number of hidden units) whose values are all zeros.
 
-```{.python .input}
-def init_gru_state(batch_size, num_hiddens, device):
-    return (np.zeros(shape=(batch_size, num_hiddens), ctx=device), )
-```
-
-```{.python .input}
-#@tab pytorch
-def init_gru_state(batch_size, num_hiddens, device):
-    return (torch.zeros((batch_size, num_hiddens), device=device), )
-```
-
-```{.python .input}
-#@tab tensorflow
-def init_gru_state(batch_size, num_hiddens):
-    return (d2l.zeros((batch_size, num_hiddens)), )
-```
-
 Now we are ready to [**define the GRU model**].
 Its structure is the same as that of the basic RNN cell, except that the update equations are more complex.
 
 ```{.python .input}
-def gru(inputs, state, params):
-    W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params
+%%tab all
+@d2l.add_to_class(GRUScratch)
+def forward(self, inputs, state):
     H, = state
     outputs = []
     for X in inputs:
-        Z = npx.sigmoid(np.dot(X, W_xz) + np.dot(H, W_hz) + b_z)
-        R = npx.sigmoid(np.dot(X, W_xr) + np.dot(H, W_hr) + b_r)
-        H_tilda = np.tanh(np.dot(X, W_xh) + np.dot(R * H, W_hh) + b_h)
+        Z = d2l.sigmoid(d2l.matmul(X, self.W_xz) + 
+                        d2l.matmul(H, self.W_hz) + self.b_z)
+        R = d2l.sigmoid(d2l.matmul(X, self.W_xr) + 
+                        d2l.matmul(H, self.W_hr) + self.b_r)
+        H_tilda = d2l.tanh(d2l.matmul(X, self.W_xh) + 
+                           d2l.matmul(R * H, self.W_hh) + self.b_h)
         H = Z * H + (1 - Z) * H_tilda
-        Y = np.dot(H, W_hq) + b_q
-        outputs.append(Y)
-    return np.concatenate(outputs, axis=0), (H,)
-```
-
-```{.python .input}
-#@tab pytorch
-def gru(inputs, state, params):
-    W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params
-    H, = state
-    outputs = []
-    for X in inputs:
-        Z = torch.sigmoid((X @ W_xz) + (H @ W_hz) + b_z)
-        R = torch.sigmoid((X @ W_xr) + (H @ W_hr) + b_r)
-        H_tilda = torch.tanh((X @ W_xh) + ((R * H) @ W_hh) + b_h)
-        H = Z * H + (1 - Z) * H_tilda
-        Y = H @ W_hq + b_q
-        outputs.append(Y)
-    return torch.cat(outputs, dim=0), (H,)
-```
-
-```{.python .input}
-#@tab tensorflow
-def gru(inputs, state, params):
-    W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params
-    H, = state
-    outputs = []
-    for X in inputs:
-        X = tf.reshape(X,[-1,W_xh.shape[0]])
-        Z = tf.sigmoid(tf.matmul(X, W_xz) + tf.matmul(H, W_hz) + b_z)
-        R = tf.sigmoid(tf.matmul(X, W_xr) + tf.matmul(H, W_hr) + b_r)
-        H_tilda = tf.tanh(tf.matmul(X, W_xh) + tf.matmul(R * H, W_hh) + b_h)
-        H = Z * H + (1 - Z) * H_tilda
-        Y = tf.matmul(H, W_hq) + b_q
-        outputs.append(Y)
-    return tf.concat(outputs, axis=0), (H,)
+        outputs.append(H)
+    return outputs, (H, )
 ```
 
 ### Training and Predicting
@@ -355,26 +262,12 @@ and the predicted sequence following
 the provided prefix "time traveller".
 
 ```{.python .input}
-#@tab mxnet, pytorch
-vocab_size, num_hiddens, device = len(vocab), 256, d2l.try_gpu()
-num_epochs, lr = 500, 2
-model = d2l.RNNModelScratch(len(vocab), num_hiddens, device, get_params,
-                            init_gru_state, gru)
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
-```
-
-```{.python .input}
-#@tab tensorflow
-vocab_size, num_hiddens = len(vocab), 256
-device_name = d2l.try_gpu()._device_name
-# Define the training strategy
-strategy = tf.distribute.OneDeviceStrategy(device_name)
-num_epochs, lr = 500, 2
-with strategy.scope():
-    model = d2l.RNNModelScratch(
-        len(vocab), num_hiddens, init_gru_state, gru, get_params)
-
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
+%%tab all
+data = d2l.TimeMachine(batch_size=32, num_steps=35)
+gru = GRUScratch(num_inputs=len(data.vocab), num_hiddens=32)
+model = d2l.RNNLMScratch(gru, num_outputs=len(data.vocab), lr=1)
+trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
+trainer.fit(model, data)
 ```
 
 ## [**Concise Implementation**]
@@ -386,33 +279,28 @@ This encapsulates all the configuration detail that we made explicit above.
 The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out before.
 
 ```{.python .input}
-gru_layer = rnn.GRU(num_hiddens)
-model = d2l.RNNModel(gru_layer, len(vocab))
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
+%%tab all
+class GRU(d2l.RNN):
+    def __init__(self, num_inputs, num_hiddens):
+        d2l.Module.__init__(self)
+        self.save_hyperparameters()
+        if tab.selected('mxnet'):
+            self.rnn = rnn.RNN(num_hiddens)
+        if tab.selected('pytorch'):
+            self.rnn = nn.GRU(num_inputs, num_hiddens)
+        if tab.selected('tensorflow'):
+            gru_cell = tf.keras.layers.GRUCell(num_hiddens)
+            self.rnn = tf.keras.layers.RNN(
+                gru_cell, time_major=True, return_sequences=True, 
+                return_state=True)
+
 ```
 
 ```{.python .input}
-#@tab pytorch
-num_inputs = vocab_size
-gru_layer = nn.GRU(num_inputs, num_hiddens)
-model = d2l.RNNModel(gru_layer, len(vocab))
-model = model.to(device)
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
-```
-
-```{.python .input}
-#@tab tensorflow
-gru_cell = tf.keras.layers.GRUCell(num_hiddens,
-    kernel_initializer='glorot_uniform')
-gru_layer = tf.keras.layers.RNN(gru_cell, time_major=True,
-    return_sequences=True, return_state=True)
-
-device_name = d2l.try_gpu()._device_name
-strategy = tf.distribute.OneDeviceStrategy(device_name)
-with strategy.scope():
-    model = d2l.RNNModel(gru_layer, vocab_size=len(vocab))
-
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
+%%tab all
+gru = GRU(num_inputs=len(data.vocab), num_hiddens=32)
+model = d2l.RNNLM(gru, num_outputs=len(data.vocab), lr=1)
+trainer.fit(model, data)
 ```
 
 ## Summary
@@ -441,4 +329,3 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3860)
 :end_tab:
-
