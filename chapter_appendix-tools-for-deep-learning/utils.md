@@ -583,3 +583,24 @@ def evaluate_loss(net, data_iter, loss):  #@save
         metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
 ```
+
+```{.python .input}
+%%tab all
+def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):  #@save
+    """Plot the histogram for list length pairs."""
+    d2l.set_figsize()
+    _, _, patches = d2l.plt.hist(
+        [[len(l) for l in xlist], [len(l) for l in ylist]])
+    d2l.plt.xlabel(xlabel)
+    d2l.plt.ylabel(ylabel)
+    for patch in patches[1].patches:
+        patch.set_hatch('/')
+    d2l.plt.legend(legend)
+
+def truncate_pad(line, num_steps, padding_token):
+    """Truncate or pad sequences."""
+    if len(line) > num_steps:
+        return line[:num_steps]  # Truncate
+    return line + [padding_token] * (num_steps - len(line))  # Pad
+
+```
