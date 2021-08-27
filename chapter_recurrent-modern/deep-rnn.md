@@ -167,7 +167,7 @@ class StackedGRU(d2l.RNN):
 ```
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
 gru = StackedGRU(num_inputs=len(data.vocab), num_hiddens=32, num_layers=2)
 model = d2l.RNNLM(gru, num_outputs=len(data.vocab), lr=1)
 trainer.fit(model, data)
