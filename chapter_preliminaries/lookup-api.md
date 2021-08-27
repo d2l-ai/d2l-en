@@ -3,13 +3,13 @@
 While we cannot possibly introduce every single MXNet function and class 
 (and the information might become outdated quickly), 
 the [API documentation](https://mxnet.apache.org/versions/1.8.0/api) 
-and additional [tutorials](https://mxnet.apache.org/versions/1.5.0/tutorials/index.html) and examples 
+and additional [tutorials](https://mxnet.apache.org/versions/1.8.0/api/python/docs/tutorials/) and examples 
 provide such documentation. 
 This section provides some guidance for how to explore the MXNet API.
 :end_tab:
 
 :begin_tab:`pytorch`
-While we cannot possibly introduce every single Pytorch function and class 
+While we cannot possibly introduce every single PyTorch function and class 
 (and the information might become outdated quickly), 
 the [API documentation](https://pytorch.org/docs/stable/index.html) and additional [tutorials](https://pytorch.org/tutorials/beginner/basics/intro.html) and examples 
 provide such documentation.
@@ -17,7 +17,7 @@ This section provides some guidance for how to explore the PyTorch API.
 :end_tab:
 
 :begin_tab:`tensorflow`
-While we cannot possibly introduce every single Tensorflow function and class 
+While we cannot possibly introduce every single TensorFlow function and class 
 (and the information might become outdated quickly), 
 the [API documentation](https://www.tensorflow.org/api_docs) and additional [tutorials](https://www.tensorflow.org/tutorials) and examples 
 provide such documentation. 
