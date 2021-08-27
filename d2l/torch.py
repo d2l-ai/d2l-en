@@ -679,21 +679,14 @@ class RNNScratch(d2l.Module):
         self.W_hh = nn.Parameter(d2l.rand(num_hiddens, num_hiddens) * sigma)
         self.b_h = nn.Parameter(d2l.zeros(num_hiddens))
 
-    def init_state(self, batch_size):
+    def forward(self, inputs, H=None):
         """Defined in :numref:`sec_rnn_scratch`"""
-        return (d2l.zeros((batch_size, self.num_hiddens)), )
-
-    def forward(self, inputs, state):
-        """Defined in :numref:`sec_rnn_scratch`"""
-        # Shape of inputs: (num_steps, batch_size, num_inputs)
-        # Shape of H: (batch_size, num_hiddens)
-        H, = state
         outputs = []
-        for X in inputs:
-            H = d2l.tanh(d2l.matmul(X, self.W_xh) +
-                         d2l.matmul(H, self.W_hh) + self.b_h)
+        for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs)
+            H = d2l.tanh(d2l.matmul(X, self.W_xh) + (
+                d2l.matmul(H, self.W_hh) if H is not None else 0) + self.b_h)
             outputs.append(H)
-        return outputs, (H, )
+        return outputs, H
 
 class RNNLMScratch(d2l.Classification):
     """Defined in :numref:`sec_rnn_scratch`"""
@@ -709,10 +702,9 @@ class RNNLMScratch(d2l.Classification):
 
     def forward(self, X, state=None):
         """Defined in :numref:`sec_rnn_scratch`"""
-        if state is None: state = self.rnn.init_state(X.shape[0])
         # embeddings shape: (num_steps, batch_size, num_inputs)
         embs = F.one_hot(X.T, self.rnn.num_inputs).type(torch.float32)
-        hiddens, state = self.rnn(embs, state)
+        hiddens, state = self.rnn(embs)
         return self.output_forward(hiddens), state
     
 
@@ -754,11 +746,8 @@ class RNN(d2l.Module):
         self.save_hyperparameters()
         self.rnn = nn.RNN(num_inputs, num_hiddens)
 
-    def forward(self, inputs, state):
-        return self.rnn(inputs, state)
-
-    def init_state(self, batch_size):
-        return torch.zeros((1, batch_size, self.num_hiddens))
+    def forward(self, inputs, H=None):
+        return self.rnn(inputs, H)
 
 class RNNLM(d2l.RNNLMScratch):
     """Defined in :numref:`sec_rnn-concise`"""
@@ -766,23 +755,6 @@ class RNNLM(d2l.RNNLMScratch):
         self.linear = nn.Linear(self.rnn.num_hiddens, self.num_outputs)
     def output_forward(self, hiddens):
         return self.linear(hiddens)
-
-class GRUScratch(d2l.Module):
-    """Defined in :numref:`sec_gru`"""
-    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
-        super().__init__()
-        self.save_hyperparameters()
-
-        init_weight = lambda *shape: nn.Parameter(d2l.randn(*shape) * sigma)
-        triple = lambda: (init_weight(num_inputs, num_hiddens),
-                          init_weight(num_hiddens, num_hiddens),
-                          nn.Parameter(d2l.zeros(num_hiddens)))
-        self.W_xz, self.W_hz, self.b_z = triple()  # Update gate
-        self.W_xr, self.W_hr, self.b_r = triple()  # Reset gate
-        self.W_xh, self.W_hh, self.b_h = triple()  # Candidate hidden state
-
-    def init_state(self, batch_size):
-        return (d2l.zeros((batch_size, self.num_hiddens)), )
 
 class LSTMScratch(d2l.Module):
     """Defined in :numref:`sec_lstm`"""
@@ -798,10 +770,6 @@ class LSTMScratch(d2l.Module):
         self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
         self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
         self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell
-
-    def init_state(self, batch_size):
-        return (d2l.zeros((batch_size, self.num_hiddens)),
-                d2l.zeros((batch_size, self.num_hiddens)))
 
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
@@ -2965,7 +2933,9 @@ def grad_clipping(net, theta):
             param.grad[:] *= theta / norm# Alias defined in config.ini
 nn_Module = nn.Module
 
+ones_like = torch.ones_like
 ones = torch.ones
+zeros_like = torch.zeros_like
 zeros = torch.zeros
 tensor = torch.tensor
 arange = torch.arange

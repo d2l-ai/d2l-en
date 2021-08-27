@@ -118,20 +118,18 @@ class StackedRNNScratch(d2l.Module):
         self.save_hyperparameters()
         self.rnns = [d2l.RNNScratch(num_inputs if i==0 else num_hiddens, 
                                     num_hiddens, sigma) 
-                     for i in range(num_layers)]        
-    
-    def init_state(self, batch_size):
-        return [rnn.init_state(batch_size) for rnn in self.rnns]
+                     for i in range(num_layers)]
 ```
 
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(StackedRNNScratch)
-def forward(self, inputs, state):
+def forward(self, inputs, Hs=None):
     outputs = inputs
+    if Hs is None: Hs = [None] * len(inputs)
     for i in range(self.num_layers):
-        outputs, state[i] = self.rnns[i](outputs, state[i])
-    return outputs, state
+        outputs, Hs[i] = self.rnns[i](outputs, Hs[i])
+    return outputs, Hs
 ```
 
 ```{.python .input}
@@ -160,7 +158,7 @@ class StackedGRU(d2l.RNN):
             gru_cells = [tf.keras.layers.GRUCell(num_hiddens) 
                          for _ in range(num_layers)]
             self.rnn = tf.keras.layers.RNN(
-                tf.keras.layers.StackedRNNCells(gru_cells), time_major=True, 
+                tf.keras.layers.StackedRNNCells(gru_cells), 
                 return_sequences=True, return_state=True)
 
     if tab.selected('pytorch'):

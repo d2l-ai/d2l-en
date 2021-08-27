@@ -211,20 +211,17 @@ class BiRNNScratch(d2l.Module):
         self.f_rnn = d2l.RNNScratch(num_inputs, num_hiddens, sigma)
         self.b_rnn = d2l.RNNScratch(num_inputs, num_hiddens, sigma)
         self.num_hiddens *= 2  # The output dimension will be doubled
-        
-    def init_state(self, batch_size):
-        return [self.f_rnn.init_state(batch_size), 
-                self.b_rnn.init_state(batch_size)]
 ```
 
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(BiRNNScratch)
-def forward(self, inputs, state):
-    f_outputs, state[0] = self.f_rnn(inputs, state[0])
-    b_outputs, state[1] = self.b_rnn(reversed(inputs), state[1])
+def forward(self, inputs, Hs=(None, None)):
+    f_H, b_H = Hs
+    f_outputs, f_H = self.f_rnn(inputs, f_H)
+    b_outputs, b_H = self.b_rnn(reversed(inputs), b_H)
     outputs = [d2l.concat((f, b), -1) for f, b in zip(f_outputs, b_outputs)]
-    return outputs, state
+    return outputs, (f_H, b_H)
 ```
 
 ```{.python .input}
@@ -233,7 +230,7 @@ data = d2l.TimeMachine(batch_size=32, num_steps=35)
 birnn = BiRNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
 model = d2l.RNNLMScratch(birnn, num_outputs=len(data.vocab), lr=1)
 trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
-# trainer.fit(model, data)
+trainer.fit(model, data)
 ```
 
 ```{.python .input}
@@ -254,10 +251,6 @@ class BiGRU(d2l.RNN):
         if tab.selected('pytorch'):
             self.rnn = nn.GRU(num_inputs, num_hiddens, bidirectional=True)
         self.num_hiddens *= 2
-        
-    if tab.selected('pytorch'):
-        def init_state(self, batch_size):
-            return d2l.zeros((2, batch_size, self.num_hiddens//2))
 ```
 
 ```{.python .input}

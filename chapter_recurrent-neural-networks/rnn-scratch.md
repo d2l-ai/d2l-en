@@ -82,23 +82,13 @@ which we will encounter in later sections.
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(RNNScratch)  #@save
-def init_state(self, batch_size):
-    return (d2l.zeros((batch_size, self.num_hiddens)), )
-```
-
-```{.python .input}
-%%tab all
-@d2l.add_to_class(RNNScratch)  #@save
-def forward(self, inputs, state):
-    # Shape of inputs: (num_steps, batch_size, num_inputs)
-    # Shape of H: (batch_size, num_hiddens)
-    H, = state
+def forward(self, inputs, H=None):    
     outputs = []
-    for X in inputs:
-        H = d2l.tanh(d2l.matmul(X, self.W_xh) + 
-                     d2l.matmul(H, self.W_hh) + self.b_h)
+    for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs)        
+        H = d2l.tanh(d2l.matmul(X, self.W_xh) + (
+            d2l.matmul(H, self.W_hh) if H is not None else 0) + self.b_h)
         outputs.append(H)
-    return outputs, (H, )
+    return outputs, H
 ```
 
 [**The following `rnn` function defines how to compute the hidden state and output
@@ -119,10 +109,9 @@ distributed over the real numbers.
 batch_size, num_inputs, num_hiddens, num_steps = 2, 16, 32, 100
 rnn = RNNScratch(num_inputs, num_hiddens)
 X = d2l.zeros((num_steps, batch_size, num_inputs))
-state = rnn.init_state(batch_size)
-outputs, new_state = rnn(X, state)
-print('#outputs =', len(outputs), '; output[0].shape =', outputs[0].shape)
-print('#state =', len(new_state), '; state[0].shape =', new_state[0].shape)
+outputs, H = rnn(X)
+print('# of outputs =', len(outputs), '; output[0].shape =', outputs[0].shape)
+print('H shape =', H.shape)
 ```
 
 ## [**One-Hot Encoding**]
@@ -214,7 +203,6 @@ class RNNLMScratch(d2l.Classification):  #@save
 %%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
 def forward(self, X, state=None):
-    if state is None: state = self.rnn.init_state(X.shape[0])   
     # embeddings shape: (num_steps, batch_size, num_inputs)    
     if tab.selected('pytorch'):
         embs = F.one_hot(X.T, self.rnn.num_inputs).type(torch.float32)
@@ -222,7 +210,7 @@ def forward(self, X, state=None):
         embs = npx.one_hot(X.T, self.rnn.num_inputs)
     if tab.selected('tensorflow'):
         embs = tf.one_hot(tf.transpose(X), self.rnn.num_inputs)
-    hiddens, state = self.rnn(embs, state)
+    hiddens, state = self.rnn(embs)
     return self.output_forward(hiddens), state
 
 @d2l.add_to_class(RNNLMScratch)  #@save
