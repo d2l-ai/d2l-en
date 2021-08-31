@@ -137,7 +137,6 @@ from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import rnn
 npx.set_np()
-
 ```
 
 ```{.python .input}
@@ -186,10 +185,6 @@ class LSTMScratch(d2l.Module):  #@save
         self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate 
         self.W_xo, self.W_ho, self.b_o = triple()  # Output gate 
         self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell 
-        
-    def init_state(self, batch_size):
-        return (d2l.zeros((batch_size, self.num_hiddens)), 
-                d2l.zeros((batch_size, self.num_hiddens)))        
 ```
 
 [**The actual model**] is defined just like what we discussed before: providing three gates and an auxiliary memory cell. Note that only the hidden state is passed to the output layer. The memory cell $\mathbf{C}_t$ does not directly participate in the output computation.
@@ -197,12 +192,13 @@ class LSTMScratch(d2l.Module):  #@save
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(LSTMScratch)
-def forward(self, inputs, state):
-    (H, C) = state
-    outputs = []
+def forward(self, inputs, H_C=(None, None)):
+    (H, C), outputs = H_C, []
     for X in inputs:
-        I = d2l.sigmoid(d2l.matmul(X, self.W_xi) + 
-                        d2l.matmul(H, self.W_hi) + self.b_i)
+        I = d2l.sigmoid(d2l.matmul(X, self.W_xi) + (
+            d2l.matmul(H, self.W_hi) if H is not None else 0) + self.b_i)
+        if H is None:
+            H, C = d2l.zeros_like(I), d2l.zeros_like(I)
         F = d2l.sigmoid(d2l.matmul(X, self.W_xf) + 
                         d2l.matmul(H, self.W_hf) + self.b_f)
         O = d2l.sigmoid(d2l.matmul(X, self.W_xo) + 
@@ -246,15 +242,19 @@ class LSTM(d2l.RNN):
             self.rnn = nn.LSTM(num_inputs, num_hiddens)
         if tab.selected('tensorflow'):
             lstm_cell = tf.keras.layers.LSTMCell(num_hiddens)
-            self.rnn = tf.keras.layers.RNN(
-                lstm_cell, time_major=True, return_sequences=True, 
+            self.rnn = tf.keras.layers.LSTM(
+                num_hiddens, return_sequences=True, 
                 return_state=True)
-    
             
-    if tab.selected('pytorch'):
-        def init_state(self, batch_size): 
-            return (d2l.zeros((1, batch_size, self.num_hiddens)),
-                    d2l.zeros((1, batch_size, self.num_hiddens)))
+    def forward(self, inputs, H_C=None):
+        if tab.selected('mxnet'):
+            if H_C is None: H_C = self.rnn.begin_state(inputs.shape[1])
+            return self.rnn(inputs, H_C)    
+        if tab.selected('pytorch'):
+            return self.rnn(inputs, H_C)
+        if tab.selected('tensorflow'):
+            outputs, *H_C = self.rnn(inputs, H_C)
+            return outputs, H_C
 ```
 
 ```{.python .input}
