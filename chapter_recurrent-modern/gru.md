@@ -199,7 +199,7 @@ and the output layer.
 
 ```{.python .input}
 %%tab all
-class GRUScratch(d2l.Module):  #@save
+class GRUScratch(d2l.Module):
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -222,10 +222,7 @@ class GRUScratch(d2l.Module):  #@save
             
         self.W_xz, self.W_hz, self.b_z = triple()  # Update gate
         self.W_xr, self.W_hr, self.b_r = triple()  # Reset gate
-        self.W_xh, self.W_hh, self.b_h = triple()  # Candidate hidden state
-        
-    def init_state(self, batch_size):
-        return (d2l.zeros((batch_size, self.num_hiddens)), )        
+        self.W_xh, self.W_hh, self.b_h = triple()  # Candidate hidden state        
 ```
 
 ### Defining the Model
@@ -238,12 +235,13 @@ Its structure is the same as that of the basic RNN cell, except that the update 
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(GRUScratch)
-def forward(self, inputs, state):
-    H, = state
+def forward(self, inputs, H=None):
+    matmul_H = lambda A, B: d2l.matmul(A, B) if H is not None else 0
     outputs = []
     for X in inputs:
-        Z = d2l.sigmoid(d2l.matmul(X, self.W_xz) + 
-                        d2l.matmul(H, self.W_hz) + self.b_z)
+        Z = d2l.sigmoid(d2l.matmul(X, self.W_xz) + (
+            d2l.matmul(H, self.W_hz) if H is not None else 0) + self.b_z)
+        if H is None: H = d2l.zeros_like(Z)
         R = d2l.sigmoid(d2l.matmul(X, self.W_xr) + 
                         d2l.matmul(H, self.W_hr) + self.b_r)
         H_tilda = d2l.tanh(d2l.matmul(X, self.W_xh) + 
@@ -289,11 +287,8 @@ class GRU(d2l.RNN):
         if tab.selected('pytorch'):
             self.rnn = nn.GRU(num_inputs, num_hiddens)
         if tab.selected('tensorflow'):
-            gru_cell = tf.keras.layers.GRUCell(num_hiddens)
-            self.rnn = tf.keras.layers.RNN(
-                gru_cell, time_major=True, return_sequences=True, 
-                return_state=True)
-
+            self.rnn = tf.keras.layers.GRU(num_hiddens, return_sequences=True, 
+                                           return_state=True)
 ```
 
 ```{.python .input}

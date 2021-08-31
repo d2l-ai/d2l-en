@@ -8,7 +8,7 @@ using functions provided by high-level APIs
 of a deep learning framework.
 We begin as before by reading *The Time Machine* dataset.
 
-```{.python .input  n=1}
+```{.python .input  n=40}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
@@ -29,7 +29,7 @@ from torch import nn
 from torch.nn import functional as F
 ```
 
-```{.python .input  n=4}
+```{.python .input  n=41}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -50,11 +50,10 @@ class RNN(d2l.Module):  #@save
         self.save_hyperparameters()        
         self.rnn = rnn.RNN(num_hiddens)
         
-    def forward(self, inputs, state):
-        return self.rnn(inputs, state)
-    
-    def init_state(self, batch_size):
-        return self.rnn.begin_state(batch_size)
+    def forward(self, inputs, H=None):
+        if H is None: H, = self.rnn.begin_state(inputs.shape[1])
+        outputs, (H, ) = self.rnn(inputs, (H, ))
+        return outputs, H
 ```
 
 ```{.python .input}
@@ -65,11 +64,8 @@ class RNN(d2l.Module):  #@save
         self.save_hyperparameters()
         self.rnn = nn.RNN(num_inputs, num_hiddens)
         
-    def forward(self, inputs, state):
-        return self.rnn(inputs, state)
-    
-    def init_state(self, batch_size): 
-        return torch.zeros((1, batch_size, self.num_hiddens))        
+    def forward(self, inputs, H=None):
+        return self.rnn(inputs, H)
 ```
 
 ```{.python .input}
@@ -77,19 +73,14 @@ class RNN(d2l.Module):  #@save
 class RNN(d2l.Module):  #@save
     def __init__(self, num_inputs, num_hiddens):
         super().__init__()
-        self.save_hyperparameters()        
-        rnn_cell = tf.keras.layers.SimpleRNNCell(num_hiddens)
-        self.rnn = tf.keras.layers.RNN(rnn_cell, time_major=True, 
+        self.save_hyperparameters()            
+        self.rnn = tf.keras.layers.SimpleRNN(num_hiddens, 
                                        return_sequences=True, return_state=True)
         
-    def forward(self, inputs, state):
-        outputs, *state = self.rnn(inputs, state)
-        return outputs, state
+    def forward(self, inputs, H=None):
+        outputs, H = self.rnn(inputs, H)
+        return outputs, H
     
-    def init_state(self, batch_size):
-        return self.rnn.cell.get_initial_state(
-                batch_size=batch_size, dtype=d2l.float32)
-   
 ```
 
 ```{.python .input}
@@ -115,6 +106,11 @@ rnn_layer = RNN(num_inputs=len(data.vocab), num_hiddens=32)
 model = RNNLM(rnn_layer, num_outputs=len(data.vocab), lr=1)
 trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
 trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab all
+model.predict('time traveller', 10, data.vocab)
 ```
 
 ## Training and Predicting
