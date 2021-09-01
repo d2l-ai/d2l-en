@@ -425,7 +425,7 @@ However, the sigmoid has mostly been replaced
 by the simpler and more easily trainable ReLU
 for most use in hidden layers. Much of this has to do 
 with the fact that the sigmoid poses challenges for optimization
-:cite:`lecun1998efficient` since its gradient vanishes for large positive \emph{and} negative arguments. 
+:cite:`lecun1998efficient` since its gradient vanishes for large positive *and* negative arguments. 
 This can lead to plateaus that are difficult to escape from. 
 Nonetheless sigmoids are important. In later chapters (e.g., :numref:`sec_lstm`) on recurrent neural networks,
 we will describe architectures that leverage sigmoid units
