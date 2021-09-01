@@ -2815,6 +2815,7 @@ stack = torch.stack
 abs = torch.abs
 eye = torch.eye
 sigmoid = torch.sigmoid
+batch_matmul = torch.bmm
 numpy = lambda x, *args, **kwargs: x.detach().numpy(*args, **kwargs)
 size = lambda x, *args, **kwargs: x.numel(*args, **kwargs)
 reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
@@ -2826,4 +2827,5 @@ transpose = lambda x, *args, **kwargs: x.t(*args, **kwargs)
 reduce_mean = lambda x, *args, **kwargs: x.mean(*args, **kwargs)
 expand_dims = lambda x, *args, **kwargs: x.unsqueeze(*args, **kwargs)
 swapaxes = lambda x, *args, **kwargs: x.swapaxes(*args, **kwargs)
+repeat = lambda x, *args, **kwargs: x.repeat(*args, **kwargs)
 

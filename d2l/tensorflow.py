@@ -1673,5 +1673,7 @@ eye = tf.eye
 log = tf.math.log
 sigmoid = tf.sigmoid
 expand_dims = tf.expand_dims
+repeat = tf.repeat
+batch_matmul = tf.matmul
 numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 

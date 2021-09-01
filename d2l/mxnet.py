@@ -3033,6 +3033,7 @@ size = lambda a: a.size
 transpose = lambda a: a.T
 nn_Module = nn.Block
 sigmoid = npx.sigmoid
+batch_matmul = npx.batch_dot
 
 ones_like = np.ones_like
 ones = np.ones
@@ -3069,4 +3070,5 @@ argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
 astype = lambda x, *args, **kwargs: x.astype(*args, **kwargs)
 reduce_mean = lambda x, *args, **kwargs: x.mean(*args, **kwargs)
 swapaxes = lambda x, *args, **kwargs: x.swapaxes(*args, **kwargs)
+repeat = lambda x, *args, **kwargs: x.repeat(*args, **kwargs)
 
