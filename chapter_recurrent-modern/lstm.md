@@ -217,7 +217,7 @@ Let's train an LSTM as same as what we did in :numref:`sec_gru`, by instantiatin
 
 ```{.python .input}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=35)
+data = d2l.TimeMachine(batch_size=32, num_steps=16)
 lstm = LSTMScratch(num_inputs=len(data.vocab), num_hiddens=32)
 model = d2l.RNNLMScratch(lstm, vocab_size=len(data.vocab), lr=1)
 trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)

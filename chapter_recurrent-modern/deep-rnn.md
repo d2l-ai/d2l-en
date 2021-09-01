@@ -134,7 +134,7 @@ def forward(self, inputs, Hs=None):
 
 ```{.python .input}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=35)
+data = d2l.TimeMachine(batch_size=32, num_steps=16)
 rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
                               num_hiddens=32, num_layers=2)
 model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=1)

@@ -103,7 +103,7 @@ class RNNLM(d2l.RNNLMScratch):  #@save
 
 ```{.python .input  n=1}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=35)
+data = d2l.TimeMachine(batch_size=32, num_steps=16)
 if tab.selected('pytorch'):
     rnn_layer = RNN(num_inputs=len(data.vocab), num_hiddens=32)
 if tab.selected('mxnet', 'tensorflow'):

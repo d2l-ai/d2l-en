@@ -261,7 +261,7 @@ the provided prefix "time traveller".
 
 ```{.python .input}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=35)
+data = d2l.TimeMachine(batch_size=32, num_steps=16)
 gru = GRUScratch(num_inputs=len(data.vocab), num_hiddens=32)
 model = d2l.RNNLMScratch(gru, vocab_size=len(data.vocab), lr=1)
 trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)

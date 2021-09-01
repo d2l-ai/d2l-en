@@ -25,7 +25,6 @@ In the end, we describe the gradient calculation method for RNNs to explore prob
 :maxdepth: 2
 
 sequence
-text-preprocessing
 language-models-and-dataset
 rnn
 rnn-scratch
