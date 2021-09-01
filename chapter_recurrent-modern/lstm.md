@@ -272,7 +272,10 @@ class LSTM(d2l.RNN):
 
 ```{.python .input}
 %%tab all
-lstm = LSTM(num_inputs=len(data.vocab), num_hiddens=32)
+if tab.selected('pytorch'):
+    lstm = LSTM(num_inputs=len(data.vocab), num_hiddens=32)
+if tab.selected('mxnet', 'tensorflow'):
+    lstm = LSTM(num_hiddens=32)
 model = d2l.RNNLM(lstm, vocab_size=len(data.vocab), lr=1)
 trainer.fit(model, data)
 ```

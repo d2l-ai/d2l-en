@@ -133,7 +133,7 @@ Sometimes we put the code to compute the outputs into a separate `forward` metho
 ```{.python .input}
 %%tab all
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
-    def __init__(self, plot_train_per_epoch=5, plot_valid_per_epoch=1):
+    def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
         super().__init__()
         self.save_hyperparameters()
         self.board = ProgressBoard()

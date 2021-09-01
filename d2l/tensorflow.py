@@ -208,7 +208,7 @@ class ProgressBoard(d2l.HyperParameters):
 
 class Module(d2l.nn_Module, d2l.HyperParameters):
     """Defined in :numref:`sec_d2l_apis`"""
-    def __init__(self, plot_train_per_epoch=5, plot_valid_per_epoch=1):
+    def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
         super().__init__()
         self.save_hyperparameters()
         self.board = ProgressBoard()
