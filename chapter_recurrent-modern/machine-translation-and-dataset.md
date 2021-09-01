@@ -104,16 +104,16 @@ and French is the *target language*.
 ```{.python .input  n=5}
 %%tab all
 class MTFraEng(d2l.DataModule):  #@save
-    def download(self):
+    def _download(self):
         d2l.extract(d2l.download(
             d2l.DATA_URL+'fra-eng.zip', self.root, 
             '94646ad1522d915e7b0f9296181140edcf86a4f5'))
         with open(self.root + '/fra-eng/fra.txt', encoding='utf-8') as f:
-            self.raw_text = f.read()
+            return f.read()
             
 data = MTFraEng() 
-data.download()
-data.raw_text[:60]
+raw_text = data._download()
+raw_text[:60]
 ```
 
 After downloading the dataset,
@@ -127,17 +127,17 @@ and insert space between words and punctuation marks.
 ```{.python .input  n=6}
 %%tab all
 @d2l.add_to_class(MTFraEng)  #@save
-def preprocess(self):
+def _preprocess(self, text):
     # Replace non-breaking space with space
-    text = self.raw_text.replace('\u202f', ' ').replace('\xa0', ' ')
+    text = text.replace('\u202f', ' ').replace('\xa0', ' ')
     # Insert space between words and punctuation marks
     no_space = lambda char, prev_char: char in ',.!?' and prev_char != ' '
     out = [' ' + char if i > 0 and no_space(char, text[i - 1]) else char
            for i, char in enumerate(text.lower())]
-    self.text = ''.join(out)
+    return ''.join(out)
 
-data.preprocess()
-data.text[:60]
+text = data._preprocess(raw_text)
+text[:60]
 ```
 
 ## [**Tokenization**]
@@ -157,31 +157,33 @@ Specifically,
 `source[i]` is a list of tokens from the
 $i^\mathrm{th}$ text sequence in the source language (English here) and `target[i]` is that in the target language (French here).
 
-```{.python .input  n=17}
+```{.python .input  n=7}
 %%tab all
 @d2l.add_to_class(MTFraEng)  #@save
-def tokenize(self, max_examples=None):
-    self.src, self.tgt = [], []
-    for i, line in enumerate(self.text.split('\n')):
+def _tokenize(self, text, max_examples=None):
+    src, tgt = [], []
+    for i, line in enumerate(text.split('\n')):
         if max_examples and i > max_examples: break
         parts = line.split('\t')
         if len(parts) == 2:
-            self.src.append(parts[0].split(' '))
-            self.tgt.append(parts[1].split(' '))
+            # Skip empty tokens
+            src.append([t for t in f'{parts[0]} <eos>'.split(' ') if t])
+            tgt.append([t for t in f'<bos> {parts[1]} <eos>'.split(' ') if t])
+    return src, tgt
 
-data.tokenize()        
-data.src[:4], data.tgt[:4]
+src, tgt = data._tokenize(text)
+src[:4], tgt[:4]
 ```
 
 Let's [**plot the histogram of the number of tokens per text sequence.**]
 In this simple English-French dataset,
 most of the text sequences have fewer than 20 tokens.
 
-```{.python .input  n=18}
+```{.python .input  n=8}
 %%tab all
 d2l.set_figsize((4.5, 2.5))
-_, _, patches = d2l.plt.hist([[len(l) for l in data.src], 
-                              [len(l) for l in data.tgt]])
+_, _, patches = d2l.plt.hist([[len(l) for l in src], 
+                              [len(l) for l in tgt]])
 d2l.plt.xlabel('# tokens per sequence'), d2l.plt.ylabel('count')
 d2l.plt.xlim([0, 20])
 for patch in patches[1].patches: patch.set_hatch('-')
@@ -237,18 +239,6 @@ This information will be needed by
 some models that
 we will cover later.
 
-```{.python .input  n=9}
-%%tab all
-@d2l.add_to_class(MTFraEng)  #@save
-def fix_length(self, sequences, num_steps):
-    def truncate_or_pad(seq):
-        if len(seq) > num_steps - 1: seq = seq[:num_steps-1]
-        return seq + ['<eos>'] + ['<pad>'] * (num_steps - len(seq) - 1)
-    valid_len = d2l.tensor([len(seq) + 1 for seq in sequences])
-    fixed_seq = [truncate_or_pad(seq) for seq in sequences]
-    return fixed_seq, valid_len
-```
-
 ## [**Vocabulary**]
 
 Since the machine translation dataset
@@ -270,57 +260,73 @@ and for marking the beginning ("&lt;bos&gt;") or end ("&lt;eos&gt;") of sequence
 Such special tokens are commonly used in
 natural language processing tasks.
 
-```{.python .input  n=10}
-%%tab all
-@d2l.add_to_class(MTFraEng)  #@save
-def build_array(self, num_steps):
-    def build(sequences):
-        sequences, valid_len = self.fix_length(sequences, num_steps)
-        vocab = d2l.Vocab(sequences, min_freq=2)
-        array = d2l.tensor([vocab[seq] for seq in sequences])
-        return array, valid_len, vocab    
-    self.src_array, self.src_len, self.src_vocab = build(self.src)
-    self.tgt_array, self.tgt_len, self.tgt_vocab = build(self.tgt)
-    
-```
-
 ## [**Putting All Things Together**]
 
 Finally, we define the `load_data_nmt` function
 to return the data iterator, together with
 the vocabularies for both the source language and the target language.
 
-```{.python .input  n=11}
+```{.python .input  n=9}
 %%tab all
 @d2l.add_to_class(MTFraEng)  #@save
 def __init__(self, batch_size, num_steps, num_train=1000, num_val=1000):
     super(MTFraEng, self).__init__()
     self.save_hyperparameters()
-    self.download()
-    self.preprocess()
-    self.tokenize(num_train + num_val)
-    self.build_array(num_steps)
+    self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
+        self._download())
+    
+@d2l.add_to_class(MTFraEng)  #@save
+def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
+    def _build_one(sentences, vocab):
+        pad_or_trim = lambda s, n: (
+            s[:n] if len(s) > n else s + ['<pad>'] * (n - len(s)))
+        sentences = [pad_or_trim(seq, self.num_steps) for seq in sentences]
+        if vocab is None: vocab = d2l.Vocab(sentences, min_freq=2)
+        array = d2l.tensor([vocab[sent] for sent in sentences])
+        return array, vocab
+    src, tgt = self._tokenize(self._preprocess(raw_text), 
+                              self.num_train + self.num_val)
+    src_array, src_vocab = _build_one(src, src_vocab)
+    tgt_array, tgt_vocab = _build_one(tgt, tgt_vocab)
+    return (src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab, tgt_vocab
+
+```
+
+```{.python .input  n=10}
+%%tab all
+@d2l.add_to_class(MTFraEng)  #@save
+def get_dataloader(self, train):
+    idx = slice(0, self.num_train) if train else slice(self.num_train, None)
+    return self.get_tensorloader(self.arrays, train, idx)
+```
+
+Let's [**read the first minibatch from the English-French dataset.**]
+
+```{.python .input  n=11}
+%%tab all
+data = MTFraEng(batch_size=3, num_steps=6)
+src, tgt, label = next(iter(data.train_dataloader()))
+print('source:', d2l.astype(src, d2l.int32))
+print('target:', d2l.astype(tgt, d2l.int32))
+print('label:', d2l.astype(label, d2l.int32))
 ```
 
 ```{.python .input  n=12}
 %%tab all
 @d2l.add_to_class(MTFraEng)  #@save
-def get_dataloader(self, train):
-    idx = slice(0, self.num_train) if train else slice(self.num_train, None)
-    arrays = [self.src_array, self.src_len, self.tgt_array, self.tgt_len]
-    return self.get_tensorloader(arrays, train, idx)
+def build(self, src_sentences, tgt_sentences):
+    raw_text = '\n'.join([src+'\t'+tgt for src, tgt in zip(
+        src_sentences, tgt_sentences)])
+    arrays, _, _ = self._build_arrays(
+        raw_text, self.src_vocab, self.tgt_vocab)
+    return arrays
 ```
 
-Let's [**read the first minibatch from the English-French dataset.**]
-
-```{.python .input  n=16}
+```{.python .input  n=14}
 %%tab all
-data = MTFraEng(batch_size=3, num_steps=8)
-batch = next(iter(data.train_dataloader()))
-print('X:', d2l.astype(batch[0], d2l.int32))
-print('valid lengths for X:', batch[1])
-print('Y:', d2l.astype(batch[2], d2l.int32))
-print('valid lengths for Y:', batch[3])
+src, tgt, _ = data.build(['hi .'], ['salut .'])
+print('source:', data.src_vocab.to_tokens(d2l.astype(src[0], d2l.int32)))
+print('target:', data.tgt_vocab.to_tokens(d2l.astype(tgt[0], d2l.int32)))
 ```
 
 ## Summary

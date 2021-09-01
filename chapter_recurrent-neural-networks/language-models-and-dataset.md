@@ -30,12 +30,12 @@ processes a minibatch of sequences with predefined length
 at a time.
 Now the question is how to [**read minibatches of input sequences and label sequences at random.**]
 
-```{.python .input  n=1}
+```{.python .input  n=3}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-```{.python .input  n=2}
+```{.python .input  n=4}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -43,14 +43,14 @@ import random
 npx.set_np()
 ```
 
-```{.python .input  n=3}
+```{.python .input  n=5}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 import random
 ```
 
-```{.python .input  n=4}
+```{.python .input  n=6}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -90,8 +90,20 @@ is $\mathbf x_{t+1}$ with length $n$.
 ![Obtaining 5 pairs of input sequences and label sequences from partitioned length-5 subsequences.](../img/lang-model-data.svg) 
 :label:`fig_lang_model_data`
 
-:numref:`fig_lang_model_data` shows an example of obtaining 5 pairs of input sequences and label sequences with $n=5$ and $d=2$. 
+:numref:`fig_lang_model_data` shows an example of obtaining 5 pairs of input sequences and label sequences with $n=5$ and $d=2$.
 
+```{.python .input  n=1}
+%%tab all
+@d2l.add_to_class(d2l.TimeMachine)  #@save
+def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
+    super(d2l.TimeMachine, self).__init__()
+    self.save_hyperparameters()
+    corpus, self.vocab = self.build(self._download())
+    array = d2l.tensor([corpus[i:i+num_steps+1] 
+                        for i in range(0, len(corpus)-num_steps-1)])
+    self.X, self.Y = array[:,:-1], array[:,1:]
+
+```
 
 ## [**Random Sampling**]
 
@@ -104,49 +116,14 @@ The following data loader randomly generates a minibatch from the dataset each t
 The argument `batch_size` specifies the number of subsequence examples (`self.b`) in each minibatch
 and `num_steps` is the subsequence length in tokens (`self.n`).
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab all
-@d2l.add_to_class(d2l.TimeMachine)  #@save
-def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
-    super(d2l.TimeMachine, self).__init__()
-    self.save_hyperparameters()
-    self.prepare_data()
-```
-
-```{.python .input  n=10}
-%%tab all
-class LMDataLoader(d2l.HyperParameters):  #@save
-    def __init__(self, corpus, batch_size, num_steps, train):
-        self.save_hyperparameters()
-        self.num_batches = (len(corpus) - 1 - (num_steps if train else 0)
-                           ) // (self.num_steps * self.batch_size)
-    def __len__(self):
-        return self.num_batches
-    
-    def __iter__(self):
-        # Randomly drop the first d tokens for training.
-        corpus = (self.corpus[random.randint(0, self.num_steps - 1):] 
-                  if self.train else self.corpus)
-        # No. of subsequences. Subtract 1 to account for labels.
-        m = (len(corpus)-1) // self.num_steps
-        # The starting indices for input sequences.
-        initial_indices = list(range(0, m*self.num_steps, self.num_steps))
-        if self.train:
-            random.shuffle(initial_indices)        
-        for i in range(0, self.num_batches):
-            # The randomized starting indices for this minibatch.
-            batch_indicies = initial_indices[
-                i*self.batch_size : (i+1) * self.batch_size]
-            X = [corpus[j : j+self.num_steps] for j in batch_indicies]
-            Y = [corpus[j+1 : j+1+self.num_steps] for j in batch_indicies]
-            yield d2l.tensor(X), d2l.tensor(Y)
-
-
 @d2l.add_to_class(d2l.TimeMachine)  #@save
 def get_dataloader(self, train):
-    corpus = (self.corpus[: self.num_train] if train else 
-              self.corpus[self.num_train : self.num_train+self.num_val])
-    return LMDataLoader(corpus, self.batch_size, self.num_steps, train)
+    idx = slice(0, self.num_train) if train else slice(
+        self.num_train, self.num_train+self.num_val)
+    return self.get_tensorloader([self.X, self.Y], train, idx)
+
 ```
 
 Let's [**manually generate a sequence from 0 to 34.**]

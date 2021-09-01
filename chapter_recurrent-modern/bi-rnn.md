@@ -228,8 +228,8 @@ def forward(self, inputs, Hs=(None, None)):
 %%tab all
 data = d2l.TimeMachine(batch_size=32, num_steps=35)
 birnn = BiRNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
-model = d2l.RNNLMScratch(birnn, num_outputs=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
+model = d2l.RNNLMScratch(birnn, vocab_size=len(data.vocab), lr=1)
+trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -256,7 +256,7 @@ class BiGRU(d2l.RNN):
 ```{.python .input}
 %%tab mxnet, pytorch
 gru = BiGRU(num_inputs=len(data.vocab), num_hiddens=32)
-model = d2l.RNNLM(gru, num_outputs=len(data.vocab), lr=1)
+model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=1)
 trainer.fit(model, data)
 ```
 

@@ -219,8 +219,8 @@ Let's train an LSTM as same as what we did in :numref:`sec_gru`, by instantiatin
 %%tab all
 data = d2l.TimeMachine(batch_size=32, num_steps=35)
 lstm = LSTMScratch(num_inputs=len(data.vocab), num_hiddens=32)
-model = d2l.RNNLMScratch(lstm, num_outputs=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
+model = d2l.RNNLMScratch(lstm, vocab_size=len(data.vocab), lr=1)
+trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -231,36 +231,49 @@ we can directly instantiate an `LSTM` model.
 This encapsulates all the configuration details that we made explicit above. The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out in detail before.
 
 ```{.python .input}
-%%tab all
+%%tab mxnet
+class LSTM(d2l.RNN):
+    def __init__(self, num_hiddens):
+        d2l.Module.__init__(self)
+        self.save_hyperparameters()        
+        self.rnn = rnn.LSTM(num_hiddens)    
+            
+    def forward(self, inputs, H_C=None):
+        if H_C is None: H_C = self.rnn.begin_state(inputs.shape[1])
+        return self.rnn(inputs, H_C)    
+```
+
+```{.python .input}
+%%tab pytorch
 class LSTM(d2l.RNN):
     def __init__(self, num_inputs, num_hiddens):
         d2l.Module.__init__(self)
         self.save_hyperparameters()        
-        if tab.selected('mxnet'):
-            self.rnn = rnn.LSTM(num_hiddens)
-        if tab.selected('pytorch'):
-            self.rnn = nn.LSTM(num_inputs, num_hiddens)
-        if tab.selected('tensorflow'):
-            lstm_cell = tf.keras.layers.LSTMCell(num_hiddens)
-            self.rnn = tf.keras.layers.LSTM(
-                num_hiddens, return_sequences=True, 
-                return_state=True)
+        self.rnn = nn.LSTM(num_inputs, num_hiddens)        
             
     def forward(self, inputs, H_C=None):
-        if tab.selected('mxnet'):
-            if H_C is None: H_C = self.rnn.begin_state(inputs.shape[1])
-            return self.rnn(inputs, H_C)    
-        if tab.selected('pytorch'):
-            return self.rnn(inputs, H_C)
-        if tab.selected('tensorflow'):
-            outputs, *H_C = self.rnn(inputs, H_C)
-            return outputs, H_C
+        return self.rnn(inputs, H_C)        
+```
+
+```{.python .input}
+%%tab tensorflow
+class LSTM(d2l.RNN):
+    def __init__(self, num_inputs, num_hiddens):
+        d2l.Module.__init__(self)
+        self.save_hyperparameters()        
+        self.rnn = tf.keras.layers.LSTM(
+                num_hiddens, return_sequences=True, 
+                return_state=True, time_major=True)
+            
+    def forward(self, inputs, H_C=None):
+        outputs, *H_C = self.rnn(inputs, H_C)
+        return outputs, H_C
 ```
 
 ```{.python .input}
 %%tab all
 lstm = LSTM(num_inputs=len(data.vocab), num_hiddens=32)
-model = d2l.RNNLM(lstm, num_outputs=len(data.vocab), lr=1)
+model = d2l.RNNLM(lstm, vocab_size=len(data.vocab), lr=1)
 trainer.fit(model, data)
 ```
 

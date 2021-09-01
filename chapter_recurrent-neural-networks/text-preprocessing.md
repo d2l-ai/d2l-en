@@ -54,19 +54,27 @@ For simplicity, we ignore punctuation and capitalization.
 ```{.python .input  n=5}
 %%tab all
 class TimeMachine(d2l.DataModule): #@save
-    def load(self):
+    def _download(self):
         fname = d2l.download(d2l.DATA_URL+'timemachine.txt', self.root, 
                              '090b5e7e70c295757f55df93cb0a180b9691891a')
         with open(fname) as f:
-            lines = f.readlines()
-            return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() 
-                    for line in lines]
+            return f.read()
 
 data = TimeMachine()
-lines = data.load()
-print(f'# text lines: {len(lines)}')
-print(lines[0])
-print(lines[10])
+raw_text = data._download()
+raw_text[:60]
+```
+
+## Preprocessing
+
+```{.python .input}
+%%tab all
+@d2l.add_to_class(TimeMachine)  #@save
+def _preprocess(self, text):
+    return re.sub('[^A-Za-z]+', ' ', text).lower()
+
+text = data._preprocess(raw_text)
+text[:60]
 ```
 
 ## Tokenization
@@ -84,12 +92,11 @@ Below, we tokenize our lines into words.
 ```{.python .input  n=6}
 %%tab all
 @d2l.add_to_class(TimeMachine)  #@save
-def tokenize(self, lines):
-    return [list(line) for line in lines]
+def _tokenize(self, text):
+    return list(text)
 
-tokens = data.tokenize(lines)
-for i in range(7, 10):
-    print(f'line {i+1}: {tokens[i][:12]}')
+tokens = data._tokenize(text)
+','.join(tokens[:30])
 ```
 
 ## Vocabulary
@@ -135,9 +142,9 @@ class Vocab:  #@save
         return [self.__getitem__(token) for token in tokens]
 
     def to_tokens(self, indices):
-        if not isinstance(indices, (list, tuple)):
-            return self.idx_to_token[indices]
-        return [self.idx_to_token[index] for index in indices]
+        if hasattr(indices, '__len__') and len(indices) > 1:
+            return [self.idx_to_token[int(index)] for index in indices]
+        return self.idx_to_token[indices]        
     
     @property
     def unk(self):  # Index for the unknown token
@@ -169,13 +176,14 @@ The modifications we did here are:
 ```{.python .input  n=9}
 %%tab all
 @d2l.add_to_class(TimeMachine)  #@save
-def prepare_data(self):
-    tokens = self.tokenize(self.load())
-    self.vocab = Vocab(tokens)
-    self.corpus = [self.vocab[token] for line in tokens for token in line]
+def build(self, raw_text, vocab=None):    
+    tokens = self._tokenize(self._preprocess(raw_text))
+    if vocab is None: vocab = Vocab(tokens)
+    corpus = [vocab[token] for token in tokens]
+    return corpus, vocab
 
-data.prepare_data()
-len(data.corpus), len(data.vocab)
+corpus, vocab = data.build(raw_text)
+len(corpus), len(vocab)
 ```
 
 ## Summary

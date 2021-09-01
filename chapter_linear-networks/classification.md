@@ -36,10 +36,9 @@ We define the `Classification` class below. In the `validation_step` we report b
 %%tab all
 class Classification(d2l.Module):  #@save
     def validation_step(self, batch):
-        X, y = batch
-        y_hat = self(X)
-        self.plot('loss', self.loss(y_hat, y), train=False)
-        self.plot('acc', self.accuracy(y_hat, y), train=False)
+        Y_hat = self(*batch[:-1])
+        self.plot('loss', self.loss(Y_hat, batch[-1]), train=False)
+        self.plot('acc', self.accuracy(Y_hat, batch[-1]), train=False)
 ```
 
 By default we use a Stochastic Gradient Descent optimizer, operating on minibatches, just as we did in the context of linear regression.
@@ -97,12 +96,12 @@ Taking the sum yields the number of correct predictions.
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(Classification)  #@save
-def accuracy(self, y_hat, y):
+def accuracy(self, Y_hat, Y, averaged=True):
     """Compute the number of correct predictions."""
-    if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = d2l.argmax(y_hat, axis=1)
-    cmp = d2l.astype(y_hat, y.dtype) == y
-    return d2l.reduce_mean(d2l.astype(cmp, d2l.float32))
+    Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+    preds = d2l.astype(d2l.argmax(Y_hat, axis=1), Y.dtype)
+    compare = d2l.astype(preds == d2l.reshape(Y, -1), d2l.float32)
+    return d2l.reduce_mean(compare) if averaged else compare
 ```
 
 ```{.python .input}

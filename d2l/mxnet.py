@@ -241,14 +241,12 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
                         every_n=int(n))
 
     def training_step(self, batch):
-        X, y = batch
-        l = self.loss(self(X), y)
+        l = self.loss(self(*batch[:-1]), batch[-1])
         self.plot('loss', l, train=True)
         return l
 
     def validation_step(self, batch):
-        X, y = batch
-        l = self.loss(self(X), y)
+        l = self.loss(self(*batch[:-1]), batch[-1])
         self.plot('loss', l, train=False)
 
     def configure_optimizers(self):
@@ -498,24 +496,26 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
 class Classification(d2l.Module):
     """Defined in :numref:`sec_classification`"""
     def validation_step(self, batch):
-        X, y = batch
-        y_hat = self(X)
-        self.plot('loss', self.loss(y_hat, y), train=False)
-        self.plot('acc', self.accuracy(y_hat, y), train=False)
+        Y_hat = self(*batch[:-1])
+        self.plot('loss', self.loss(Y_hat, batch[-1]), train=False)
+        self.plot('acc', self.accuracy(Y_hat, batch[-1]), train=False)
 
-    def accuracy(self, y_hat, y):
+    def accuracy(self, Y_hat, Y, averaged=True):
         """Compute the number of correct predictions.
     
         Defined in :numref:`sec_classification`"""
-        if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-            y_hat = d2l.argmax(y_hat, axis=1)
-        cmp = d2l.astype(y_hat, y.dtype) == y
-        return d2l.reduce_mean(d2l.astype(cmp, d2l.float32))
+        Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+        preds = d2l.astype(d2l.argmax(Y_hat, axis=1), Y.dtype)
+        compare = d2l.astype(preds == d2l.reshape(Y, -1), d2l.float32)
+        return d2l.reduce_mean(compare) if averaged else compare
 
-    def loss(self, y_hat, y):
+    def loss(self, Y_hat, Y, averaged=True):
         """Defined in :numref:`sec_softmax_concise`"""
-        l = gluon.loss.SoftmaxCrossEntropyLoss()
-        return l(y_hat, y).mean()
+        Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+        Y = d2l.reshape(Y, (-1,))
+        fn = gluon.loss.SoftmaxCrossEntropyLoss()
+        l = fn(Y_hat, Y)
+        return l.mean() if averaged else l
 
     def layer_summary(self, X_shape):
         """Defined in :numref:`sec_lenet`"""
@@ -584,29 +584,41 @@ class Residual(nn.Block):
 
 class TimeMachine(d2l.DataModule):
     """Defined in :numref:`sec_text_preprocessing`"""
-    def load(self):
+    def _download(self):
         fname = d2l.download(d2l.DATA_URL+'timemachine.txt', self.root,
                              '090b5e7e70c295757f55df93cb0a180b9691891a')
         with open(fname) as f:
-            lines = f.readlines()
-            return [re.sub('[^A-Za-z]+', ' ', line).strip().lower()
-                    for line in lines]
+            return f.read()
 
-    def tokenize(self, lines):
+    def _preprocess(self, text):
         """Defined in :numref:`sec_text_preprocessing`"""
-        return [list(line) for line in lines]
+        return re.sub('[^A-Za-z]+', ' ', text).lower()
 
-    def prepare_data(self):
+    def _tokenize(self, text):
         """Defined in :numref:`sec_text_preprocessing`"""
-        tokens = self.tokenize(self.load())
-        self.vocab = Vocab(tokens)
-        self.corpus = [self.vocab[token] for line in tokens for token in line]
+        return list(text)
+
+    def build(self, raw_text, vocab=None):
+        """Defined in :numref:`sec_text_preprocessing`"""
+        tokens = self._tokenize(self._preprocess(raw_text))
+        if vocab is None: vocab = Vocab(tokens)
+        corpus = [vocab[token] for token in tokens]
+        return corpus, vocab
 
     def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
         """Defined in :numref:`sec_language_model`"""
         super(d2l.TimeMachine, self).__init__()
         self.save_hyperparameters()
-        self.prepare_data()
+        corpus, self.vocab = self.build(self._download())
+        array = d2l.tensor([corpus[i:i+num_steps+1]
+                            for i in range(0, len(corpus)-num_steps-1)])
+        self.X, self.Y = array[:,:-1], array[:,1:]
+
+    def get_dataloader(self, train):
+        """Defined in :numref:`sec_language_model`"""
+        idx = slice(0, self.num_train) if train else slice(
+            self.num_train, self.num_train+self.num_val)
+        return self.get_tensorloader([self.X, self.Y], train, idx)
 
 class Vocab:
     """Vocabulary for text."""
@@ -634,48 +646,13 @@ class Vocab:
         return [self.__getitem__(token) for token in tokens]
 
     def to_tokens(self, indices):
-        if not isinstance(indices, (list, tuple)):
-            return self.idx_to_token[indices]
-        return [self.idx_to_token[index] for index in indices]
+        if hasattr(indices, '__len__') and len(indices) > 1:
+            return [self.idx_to_token[int(index)] for index in indices]
+        return self.idx_to_token[indices]
 
     @property
     def unk(self):  # Index for the unknown token
         return self.token_to_idx['<unk>']
-
-class LMDataLoader(d2l.HyperParameters):
-    """Defined in :numref:`sec_language_model`"""
-    def __init__(self, corpus, batch_size, num_steps, train):
-        self.save_hyperparameters()
-        self.num_batches = (len(corpus) - 1 - (num_steps if train else 0)
-                           ) // (self.num_steps * self.batch_size)
-    def __len__(self):
-        return self.num_batches
-
-    def __iter__(self):
-        # Randomly drop the first d tokens for training.
-        corpus = (self.corpus[random.randint(0, self.num_steps - 1):]
-                  if self.train else self.corpus)
-        # No. of subsequences. Subtract 1 to account for labels.
-        m = (len(corpus)-1) // self.num_steps
-        # The starting indices for input sequences.
-        initial_indices = list(range(0, m*self.num_steps, self.num_steps))
-        if self.train:
-            random.shuffle(initial_indices)
-        for i in range(0, self.num_batches):
-            # The randomized starting indices for this minibatch.
-            batch_indicies = initial_indices[
-                i*self.batch_size : (i+1) * self.batch_size]
-            X = [corpus[j : j+self.num_steps] for j in batch_indicies]
-            Y = [corpus[j+1 : j+1+self.num_steps] for j in batch_indicies]
-            yield d2l.tensor(X), d2l.tensor(Y)
-
-
-@d2l.add_to_class(d2l.TimeMachine)
-def get_dataloader(self, train):
-    """Defined in :numref:`sec_language_model`"""
-    corpus = (self.corpus[: self.num_train] if train else
-              self.corpus[self.num_train : self.num_train+self.num_val])
-    return LMDataLoader(corpus, self.batch_size, self.num_steps, train)
 
 class RNNScratch(d2l.Module):
     """Defined in :numref:`sec_rnn_scratch`"""
@@ -695,62 +672,63 @@ class RNNScratch(d2l.Module):
             outputs.append(H)
         return outputs, H
 
+def check_len(a, n):
+    """Defined in :numref:`sec_rnn_scratch`"""
+    assert len(a) == n, f'list\'s len {len(a)} != expected length {n}'
+
+def check_shape(a, shape):
+    """Defined in :numref:`sec_rnn_scratch`"""
+    assert a.shape == shape, \
+            f'tensor\'s shape {a.shape} != expected shape {shape}'
+
 class RNNLMScratch(d2l.Classification):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, rnn, num_outputs, lr):
-        super().__init__(plot_train_per_epoch=0.1, plot_valid_per_epoch=0.1)
+    def __init__(self, rnn, vocab_size, lr=0.01):
+        super().__init__()
         self.save_hyperparameters()
         self.init_params()
 
     def init_params(self):
         self.W_hq = d2l.randn(
-            self.rnn.num_hiddens, self.num_outputs) * self.rnn.sigma
-        self.b_q = d2l.zeros(self.num_outputs)
+            self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma
+        self.b_q = d2l.zeros(self.vocab_size)
         for param in self.get_scratch_params():
             param.attach_grad()
 
-    def forward(self, X, state=None):
+    def one_hot(self, X):
         """Defined in :numref:`sec_rnn_scratch`"""
-        # embeddings shape: (num_steps, batch_size, num_inputs)
-        embs = npx.one_hot(X.T, self.rnn.num_inputs)
-        hiddens, state = self.rnn(embs)
-        return self.output_forward(hiddens), state
+        # output shape: (num_steps, batch_size, vocab_size)
+        return npx.one_hot(X.T, self.vocab_size)
+
+    def forward(self, X):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        embs = self.one_hot(X)
+        hiddens, _ = self.rnn(embs)
+        return self.output_layer(hiddens)
     
 
-    def output_forward(self, hiddens):
+    def output_layer(self, hiddens):
         """Defined in :numref:`sec_rnn_scratch`"""
-        return d2l.stack([d2l.matmul(H, self.W_hq) + self.b_q for H in hiddens], 0)
-
-    def loss(self, outputs, Y):
-        """Defined in :numref:`sec_rnn_scratch`"""
-        Y_hat, _ = outputs
-        return super(RNNLMScratch, self).loss(
-            d2l.reshape(Y_hat, (-1, self.num_outputs)),
-            d2l.reshape(d2l.transpose(Y), -1))
-    
-
-    def accuracy(self, outputs, Y):
-        """Defined in :numref:`sec_rnn_scratch`"""
-        Y_hat, _ = outputs
-        return super(RNNLMScratch, self).accuracy(
-            d2l.reshape(Y_hat, (-1, self.num_outputs)),
-            d2l.reshape(d2l.transpose(Y), (-1,1)))
+        outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in hiddens]
+        return d2l.stack(outputs, 1)
 
     def predict(self, prefix, num_preds, vocab):
         """Defined in :numref:`sec_rnn_scratch`"""
         state, outputs = None, [vocab[prefix[0]]]
         for i in range(len(prefix) + num_preds - 1):
             X = d2l.tensor([[outputs[-1]]])
-            Y, state = self(X, state)
+            embs = self.one_hot(X)
+            hiddens, state = self.rnn(embs, state)
             if i < len(prefix) - 1: # Warm-up period
                 outputs.append(vocab[prefix[i]])
             else:  # Predict `num_preds` steps
+                Y = self.output_layer(hiddens)
                 outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
         return ''.join([vocab.idx_to_token[i] for i in outputs])
 
 class RNN(d2l.Module):
     """Defined in :numref:`sec_rnn-concise`"""
-    def __init__(self, num_inputs, num_hiddens):
+    def __init__(self, num_hiddens):
         super().__init__()
         self.save_hyperparameters()
         self.rnn = rnn.RNN(num_hiddens)
@@ -763,10 +741,10 @@ class RNN(d2l.Module):
 class RNNLM(d2l.RNNLMScratch):
     """Defined in :numref:`sec_rnn-concise`"""
     def init_params(self):
-        self.linear = nn.Dense(self.num_outputs, flatten=False)
+        self.linear = nn.Dense(self.vocab_size, flatten=False)
         self.initialize()
-    def output_forward(self, hiddens):
-        return self.linear(hiddens)
+    def output_layer(self, hiddens):
+        return d2l.swapaxes(self.linear(hiddens), 0, 1)
 
 class LSTMScratch(d2l.Module):
     """Defined in :numref:`sec_lstm`"""
@@ -783,72 +761,79 @@ class LSTMScratch(d2l.Module):
         self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
         self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell
 
-    def init_state(self, batch_size):
-        return (d2l.zeros((batch_size, self.num_hiddens)),
-                d2l.zeros((batch_size, self.num_hiddens)))
+class GRU(d2l.RNN):
+    """Defined in :numref:`sec_deep_rnn`"""
+    def __init__(self, num_hiddens, num_layers, dropout=0):
+        d2l.Module.__init__(self)
+        self.save_hyperparameters()
+        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
 
 class MTFraEng(d2l.DataModule):
     """Defined in :numref:`sec_machine_translation`"""
-    def download(self):
+    def _download(self):
         d2l.extract(d2l.download(
             d2l.DATA_URL+'fra-eng.zip', self.root,
             '94646ad1522d915e7b0f9296181140edcf86a4f5'))
         with open(self.root + '/fra-eng/fra.txt', encoding='utf-8') as f:
-            self.raw_text = f.read()
+            return f.read()
 
-    def preprocess(self):
+    def _preprocess(self, text):
         """Defined in :numref:`sec_machine_translation`"""
         # Replace non-breaking space with space
-        text = self.raw_text.replace('\u202f', ' ').replace('\xa0', ' ')
+        text = text.replace('\u202f', ' ').replace('\xa0', ' ')
         # Insert space between words and punctuation marks
         no_space = lambda char, prev_char: char in ',.!?' and prev_char != ' '
         out = [' ' + char if i > 0 and no_space(char, text[i - 1]) else char
                for i, char in enumerate(text.lower())]
-        self.text = ''.join(out)
+        return ''.join(out)
 
-    def tokenize(self, max_examples=None):
+    def _tokenize(self, text, max_examples=None):
         """Defined in :numref:`sec_machine_translation`"""
-        self.src, self.tgt = [], []
-        for i, line in enumerate(self.text.split('\n')):
+        src, tgt = [], []
+        for i, line in enumerate(text.split('\n')):
             if max_examples and i > max_examples: break
             parts = line.split('\t')
             if len(parts) == 2:
-                self.src.append(parts[0].split(' '))
-                self.tgt.append(parts[1].split(' '))
-
-    def fix_length(self, sequences, num_steps):
-        """Defined in :numref:`sec_machine_translation`"""
-        def truncate_or_pad(seq):
-            if len(seq) > num_steps - 1: seq = seq[:num_steps-1]
-            return seq + ['<eos>'] + ['<pad>'] * (num_steps - len(seq) - 1)
-        valid_len = d2l.tensor([len(seq) + 1 for seq in sequences])
-        fixed_seq = [truncate_or_pad(seq) for seq in sequences]
-        return fixed_seq, valid_len
-
-    def build_array(self, num_steps):
-        """Defined in :numref:`sec_machine_translation`"""
-        def build(sequences):
-            sequences, valid_len = self.fix_length(sequences, num_steps)
-            vocab = d2l.Vocab(sequences, min_freq=2)
-            array = d2l.tensor([vocab[seq] for seq in sequences])
-            return array, valid_len, vocab
-        self.src_array, self.src_len, self.src_vocab = build(self.src)
-        self.tgt_array, self.tgt_len, self.tgt_vocab = build(self.tgt)
+                # Skip empty tokens
+                src.append([t for t in f'{parts[0]} <eos>'.split(' ') if t])
+                tgt.append([t for t in f'<bos> {parts[1]} <eos>'.split(' ') if t])
+        return src, tgt
 
     def __init__(self, batch_size, num_steps, num_train=1000, num_val=1000):
         """Defined in :numref:`sec_machine_translation`"""
         super(MTFraEng, self).__init__()
         self.save_hyperparameters()
-        self.download()
-        self.preprocess()
-        self.tokenize(num_train + num_val)
-        self.build_array(num_steps)
+        self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
+            self._download())
+    
+
+    def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
+        """Defined in :numref:`sec_machine_translation`"""
+        def _build_one(sentences, vocab):
+            pad_or_trim = lambda s, n: (
+                s[:n] if len(s) > n else s + ['<pad>'] * (n - len(s)))
+            sentences = [pad_or_trim(seq, self.num_steps) for seq in sentences]
+            if vocab is None: vocab = d2l.Vocab(sentences, min_freq=2)
+            array = d2l.tensor([vocab[sent] for sent in sentences])
+            return array, vocab
+        src, tgt = self._tokenize(self._preprocess(raw_text),
+                                  self.num_train + self.num_val)
+        src_array, src_vocab = _build_one(src, src_vocab)
+        tgt_array, tgt_vocab = _build_one(tgt, tgt_vocab)
+        return (src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab, tgt_vocab
 
     def get_dataloader(self, train):
         """Defined in :numref:`sec_machine_translation`"""
         idx = slice(0, self.num_train) if train else slice(self.num_train, None)
-        arrays = [self.src_array, self.src_len, self.tgt_array, self.tgt_len]
-        return self.get_tensorloader(arrays, train, idx)
+        return self.get_tensorloader(self.arrays, train, idx)
+
+    def build(self, src_sentences, tgt_sentences):
+        """Defined in :numref:`sec_machine_translation`"""
+        raw_text = '\n'.join([src+'\t'+tgt for src, tgt in zip(
+            src_sentences, tgt_sentences)])
+        arrays, _, _ = self._build_arrays(
+            raw_text, self.src_vocab, self.tgt_vocab)
+        return arrays
 
 class Encoder(nn.Block):
     """The base encoder interface for the encoder-decoder architecture."""
@@ -885,104 +870,44 @@ class EncoderDecoder(nn.Block):
         dec_state = self.decoder.init_state(enc_outputs, *args)
         return self.decoder(dec_X, dec_state)
 
-class Seq2SeqEncoder(d2l.Encoder):
+class Seq2SeqEncoder(d2l.Module):
     """The RNN encoder for sequence to sequence learning.
 
     Defined in :numref:`sec_seq2seq`"""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqEncoder, self).__init__(**kwargs)
-        # Embedding layer
+                 dropout=0):
+        super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
-
-    def forward(self, X, *args):
-        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
-        X = self.embedding(X)
-        # In RNN models, the first axis corresponds to time steps
-        X = X.swapaxes(0, 1)
-        state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
-        output, state = self.rnn(X, state)
-        # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
-        # `state[0]` shape: (`num_layers`, `batch_size`, `num_hiddens`)
+        self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
+        self.initialize()
+    def forward(self, X):
+        # X shape: (batch_size, num_steps)
+        embs = self.embedding(d2l.transpose(X))
+        # embs shape: (num_steps, batch_size, embed_size)
+        output, state = self.rnn(embs)
+        # output shape: (num_steps, batch_size, num_hiddens)
+        # state shape: (num_layers, batch_size, num_hiddens)
         return output, state
 
-class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
-    """The softmax cross-entropy loss with masks.
+class Seq2Seq(d2l.Classification):
+    """Defined in :numref:`sec_seq2seq_decoder`"""
+    def __init__(self, encoder, decoder, tgt_pad, lr):
+        super().__init__()
+        self.save_hyperparameters()
 
-    Defined in :numref:`sec_seq2seq_decoder`"""
-    # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
-    # `label` shape: (`batch_size`, `num_steps`)
-    # `valid_len` shape: (`batch_size`,)
-    def forward(self, pred, label, valid_len):
-        # `weights` shape: (`batch_size`, `num_steps`, 1)
-        weights = np.expand_dims(np.ones_like(label), axis=-1)
-        weights = npx.sequence_mask(weights, valid_len, True, axis=1)
-        return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
+    def forward(self, src, tgt):
+        return self.decoder(tgt, self.encoder(src)[1])[0]
 
-def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
-    """Train a model for sequence to sequence.
-
-    Defined in :numref:`sec_seq2seq_decoder`"""
-    net.initialize(init.Xavier(), force_reinit=True, ctx=device)
-    trainer = gluon.Trainer(net.collect_params(), 'adam',
-                            {'learning_rate': lr})
-    loss = MaskedSoftmaxCELoss()
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[10, num_epochs])
-    for epoch in range(num_epochs):
-        timer = d2l.Timer()
-        metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
-        for batch in data_iter:
-            X, X_valid_len, Y, Y_valid_len = [
-                x.as_in_ctx(device) for x in batch]
-            bos = np.array(
-                [tgt_vocab['<bos>']] * Y.shape[0], ctx=device).reshape(-1, 1)
-            dec_input = d2l.concat([bos, Y[:, :-1]], 1)  # Teacher forcing
-            with autograd.record():
-                Y_hat, _ = net(X, dec_input, X_valid_len)
-                l = loss(Y_hat, Y, Y_valid_len)
-            l.backward()
-            d2l.grad_clipping(net, 1)
-            num_tokens = Y_valid_len.sum()
-            trainer.step(num_tokens)
-            metric.add(l.sum(), num_tokens)
-        if (epoch + 1) % 10 == 0:
-            animator.add(epoch + 1, (metric[0] / metric[1],))
-    print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
-          f'tokens/sec on {str(device)}')
-
-def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
-                    device, save_attention_weights=False):
-    """Predict for sequence to sequence.
-
-    Defined in :numref:`sec_seq2seq_training`"""
-    src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
-        src_vocab['<eos>']]
-    enc_valid_len = np.array([len(src_tokens)], ctx=device)
-    src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
-    # Add the batch axis
-    enc_X = np.expand_dims(np.array(src_tokens, ctx=device), axis=0)
-    enc_outputs = net.encoder(enc_X, enc_valid_len)
-    dec_state = net.decoder.init_state(enc_outputs, enc_valid_len)
-    # Add the batch axis
-    dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=device), axis=0)
-    output_seq, attention_weight_seq = [], []
-    for _ in range(num_steps):
-        Y, dec_state = net.decoder(dec_X, dec_state)
-        # We use the token with the highest prediction likelihood as the input
-        # of the decoder at the next time step
-        dec_X = Y.argmax(axis=2)
-        pred = dec_X.squeeze(axis=0).astype('int32').item()
-        # Save attention weights (to be covered later)
-        if save_attention_weights:
-            attention_weight_seq.append(net.decoder.attention_weights)
-        # Once the end-of-sequence token is predicted, the generation of the
-        # output sequence is complete
-        if pred == tgt_vocab['<eos>']:
-            break
-        output_seq.append(pred)
-    return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq
+    def predict_step(self, batch):
+        """Defined in :numref:`sec_seq2seq_training`"""
+        src, tgt, _ = batch
+        enc_state = self.encoder(src)[1]
+        dec_state = None
+        outputs = [d2l.expand_dims(tgt[:,0], 1), ]
+        for _ in range(tgt.shape[1]):
+            Y, dec_state = self.decoder(outputs[-1], enc_state, dec_state)
+            outputs.append(d2l.argmax(Y, 2))
+        return d2l.concat(outputs[1:], 1)
 
 def bleu(pred_seq, label_seq, k):
     """Compute the BLEU.
@@ -1191,20 +1116,16 @@ class PositionalEncoding(nn.Block):
         X = X + self.P[:, :X.shape[1], :].as_in_ctx(X.ctx)
         return self.dropout(X)
 
-class PositionWiseFFN(nn.Block):
-    """Positionwise feed-forward network.
+class PositionWiseFFN(d2l.Module):
+    """Defined in :numref:`sec_transformer`"""
+    def __init__(self, num_hiddens, num_outputs):
+        super().__init__()
+        self.net = nn.Sequential()
+        self.net.add(nn.Dense(num_hiddens, activation='relu', flatten=False),
+                     nn.Dense(num_outputs, flatten=False))
+        self.net.initialize()
 
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
-        super(PositionWiseFFN, self).__init__(**kwargs)
-        self.dense1 = nn.Dense(ffn_num_hiddens, flatten=False,
-                               activation='relu')
-        self.dense2 = nn.Dense(ffn_num_outputs, flatten=False)
-
-    def forward(self, X):
-        return self.dense2(self.dense1(X))
-
-class AddNorm(nn.Block):
+class TransformerAddNorm(nn.Block):
     """Residual connection followed by layer normalization.
 
     Defined in :numref:`sec_transformer`"""
@@ -1216,7 +1137,7 @@ class AddNorm(nn.Block):
     def forward(self, X, Y):
         return self.ln(self.dropout(Y) + X)
 
-class EncoderBlock(nn.Block):
+class TransformerEncoderBlock(nn.Block):
     """Transformer encoder block.
 
     Defined in :numref:`sec_transformer`"""
@@ -3130,9 +3051,11 @@ log = np.log
 tensor = np.array
 normal = np.random.normal
 randn = np.random.randn
+expand_dims = np.expand_dims
 rand = np.random.rand
 matmul = np.dot
 int32 = np.int32
+int64 = np.int64
 float32 = np.float32
 concat = np.concatenate
 stack = np.stack
@@ -3145,4 +3068,5 @@ reduce_sum = lambda x, *args, **kwargs: x.sum(*args, **kwargs)
 argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
 astype = lambda x, *args, **kwargs: x.astype(*args, **kwargs)
 reduce_mean = lambda x, *args, **kwargs: x.mean(*args, **kwargs)
+swapaxes = lambda x, *args, **kwargs: x.swapaxes(*args, **kwargs)
 
