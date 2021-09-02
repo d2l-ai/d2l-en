@@ -27,6 +27,7 @@ npx.set_np()
 from d2l import torch as d2l
 import torch
 from torch import nn
+from torch.nn import functional as F
 ```
 
 ```{.python .input}
@@ -53,20 +54,7 @@ We use a flatten layer to convert the 4-D tensor `X` to 2-D by keeping the first
 :end_tab:
 
 ```{.python .input}
-%%tab pytorch
-class SoftmaxRegression(d2l.Classification):
-    def __init__(self, num_inputs, num_outputs, lr):
-        super().__init__()
-        self.save_hyperparameters()
-        self.net = nn.Sequential(nn.Flatten(),
-                                 nn.Linear(num_inputs, num_outputs))
-
-    def forward(self, X):
-        return self.net(X)
-```
-
-```{.python .input}
-%%tab mxnet, tensorflow
+%%tab all
 class SoftmaxRegression(d2l.Classification):
     def __init__(self, num_outputs, lr):
         super().__init__()
@@ -74,6 +62,9 @@ class SoftmaxRegression(d2l.Classification):
         if tab.selected('mxnet'):
             self.net = nn.Dense(num_outputs)
             self.net.initialize()
+        if tab.selected('pytorch'):
+            self.net = nn.Sequential(nn.Flatten(),
+                                     nn.LazyLinear(num_outputs))            
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential()
             self.net.add(tf.keras.layers.Flatten())
@@ -140,29 +131,21 @@ we just
 all at once inside the cross-entropy loss function,**]
 which does smart things like the ["LogSumExp trick"](https://en.wikipedia.org/wiki/LogSumExp).
 
-```{.python .input}
-%%tab mxnet
+```{.python .input  n=3}
+%%tab all
 @d2l.add_to_class(d2l.Classification)  #@save
-def loss(self, y_hat, y):
-    l = gluon.loss.SoftmaxCrossEntropyLoss()
-    return l(y_hat, y).mean()
-```
-
-```{.python .input}
-%%tab pytorch
-@d2l.add_to_class(d2l.Classification)  #@save
-def loss(self, y_hat, y):
-    l = nn.CrossEntropyLoss()
-    return l(y_hat, y)
-```
-
-```{.python .input}
-%%tab tensorflow
-@d2l.add_to_class(d2l.Classification)  #@save
-def loss(self, y_hat, y):
-    l = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-    return l(y, y_hat)
-
+def loss(self, Y_hat, Y, averaged=True):
+    Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+    Y = d2l.reshape(Y, (-1,))
+    if tab.selected('mxnet'):
+        fn = gluon.loss.SoftmaxCrossEntropyLoss()
+        l = fn(Y_hat, Y)
+        return l.mean() if averaged else l
+    if tab.selected('pytorch'):
+        return F.cross_entropy(Y_hat, Y, reduction='mean' if averaged else 'none')
+    if tab.selected('tensorflow'):
+        fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        return fn(Y, Y_hat)
 ```
 
 ## Training
@@ -170,18 +153,9 @@ def loss(self, y_hat, y):
 Next we train our model. As before, we use Fashion MNIST images, flattened to 784 dimensional feature vectors.
 
 ```{.python .input}
-%%tab pytorch
-model = SoftmaxRegression(num_inputs=784, num_outputs=10, lr=0.1)
-```
-
-```{.python .input}
-%%tab mxnet, tensorflow
-model = SoftmaxRegression(num_outputs=10, lr=0.1)
-```
-
-```{.python .input}
 %%tab all
 data = d2l.FashionMNIST(batch_size=256)
+model = SoftmaxRegression(num_outputs=10, lr=0.1)
 trainer = d2l.Trainer(max_epochs=10)
 trainer.fit(model, data)
 ```
@@ -218,7 +192,3 @@ FP32 single precision, BFLOAT16 (good for compressed representations), FP16 (ver
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/260)
 :end_tab:
-
-```{.python .input}
-
-```

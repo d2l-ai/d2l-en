@@ -134,42 +134,58 @@ def forward(self, inputs, Hs=None):
 
 ```{.python .input}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=35)
+data = d2l.TimeMachine(batch_size=32, num_steps=16)
 rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
                               num_hiddens=32, num_layers=2)
-model = d2l.RNNLMScratch(rnn_block, num_outputs=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
+model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=1)
+trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
 ## Concise Implementation
 
 ```{.python .input}
-%%tab all
-class StackedGRU(d2l.RNN):
-    def __init__(self, num_inputs, num_hiddens, num_layers):
+%%tab mxnet
+class GRU(d2l.RNN):  #@save
+    def __init__(self, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
-        if tab.selected('mxnet'):
-            self.rnn = rnn.GRU(num_hiddens, num_layers)
-        if tab.selected('pytorch'):
-            self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers)
-        if tab.selected('tensorflow'):
-            gru_cells = [tf.keras.layers.GRUCell(num_hiddens) 
-                         for _ in range(num_layers)]
-            self.rnn = tf.keras.layers.RNN(
-                tf.keras.layers.StackedRNNCells(gru_cells), 
-                return_sequences=True, return_state=True)
-
-    if tab.selected('pytorch'):
-        def init_state(self, batch_size):
-            return d2l.zeros((self.num_layers, batch_size, self.num_hiddens))
+        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)        
 ```
 
 ```{.python .input}
-%%tab mxnet, pytorch
-gru = StackedGRU(num_inputs=len(data.vocab), num_hiddens=32, num_layers=2)
-model = d2l.RNNLM(gru, num_outputs=len(data.vocab), lr=1)
+%%tab tensorflow
+class GRU(d2l.RNN):  #@save
+    def __init__(self, num_hiddens, num_layers, dropout=0):
+        d2l.Module.__init__(self)
+        self.save_hyperparameters()
+        gru_cells = [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout) 
+                     for _ in range(num_layers)]            
+        self.rnn = tf.keras.layers.RNN(gru_cells, return_sequences=True, 
+                                       return_state=True, time_major=True)
+        
+    def forward(self, X, state=None):
+        outputs, *state = self.rnn(X, state)
+        return outputs, state
+
+```
+
+```{.python .input}
+%%tab pytorch
+class GRU(d2l.RNN):  #@save
+    def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0):
+        d2l.Module.__init__(self)
+        self.save_hyperparameters()
+        self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers, dropout=dropout)        
+```
+
+```{.python .input}
+%%tab all
+if tab.selected('mxnet', 'tensorflow'):
+    gru = GRU(num_hiddens=32, num_layers=2)
+if tab.selected('pytorch'):
+    gru = GRU(num_inputs=len(data.vocab), num_hiddens=32, num_layers=2)
+model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=1)
 trainer.fit(model, data)
 ```
 

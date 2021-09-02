@@ -216,8 +216,8 @@ class BiRNNScratch(d2l.Module):
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(BiRNNScratch)
-def forward(self, inputs, Hs=(None, None)):
-    f_H, b_H = Hs
+def forward(self, inputs, Hs=None):
+    f_H, b_H = Hs if Hs is not None else (None, None)
     f_outputs, f_H = self.f_rnn(inputs, f_H)
     b_outputs, b_H = self.b_rnn(reversed(inputs), b_H)
     outputs = [d2l.concat((f, b), -1) for f, b in zip(f_outputs, b_outputs)]
@@ -226,10 +226,10 @@ def forward(self, inputs, Hs=(None, None)):
 
 ```{.python .input}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=35)
+data = d2l.TimeMachine(batch_size=32, num_steps=16)
 birnn = BiRNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
-model = d2l.RNNLMScratch(birnn, num_outputs=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
+model = d2l.RNNLMScratch(birnn, vocab_size=len(data.vocab), lr=1)
+trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -256,7 +256,7 @@ class BiGRU(d2l.RNN):
 ```{.python .input}
 %%tab mxnet, pytorch
 gru = BiGRU(num_inputs=len(data.vocab), num_hiddens=32)
-model = d2l.RNNLM(gru, num_outputs=len(data.vocab), lr=1)
+model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=1)
 trainer.fit(model, data)
 ```
 
