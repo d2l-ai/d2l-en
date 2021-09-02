@@ -870,6 +870,17 @@ class Seq2Seq(d2l.Classification):
     def forward(self, src, tgt):
         return self.decoder(tgt, self.encoder(src)[1])[0]
 
+    def predict_step(self, batch):
+        """Defined in :numref:`sec_seq2seq_training`"""
+        src, tgt, _ = batch
+        enc_state = self.encoder(src)[1]
+        dec_state = None
+        outputs = [d2l.expand_dims(tgt[:,0], 1), ]
+        for _ in range(tgt.shape[1]):
+            Y, dec_state = self.decoder(outputs[-1], enc_state, dec_state)
+            outputs.append(d2l.argmax(Y, 2))
+        return d2l.concat(outputs[1:], 1)
+
 def bleu(pred_seq, label_seq, k):
     """Compute the BLEU.
 

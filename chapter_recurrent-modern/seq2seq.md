@@ -476,6 +476,7 @@ strategies for sequence generation in
 :numref:`sec_beam-search`.
 
 ```{.python .input  n=14}
+%%tab all
 @d2l.add_to_class(Seq2Seq)  #@save
 def predict_step(self, batch):
     src, tgt, _ = batch
@@ -489,6 +490,7 @@ def predict_step(self, batch):
 ```
 
 ```{.python .input  n=15}
+%%tab all
 batch = data.build(["hi !"], [""])
 data.tgt_vocab.to_tokens(model.predict_step(batch)[0])
 ```
