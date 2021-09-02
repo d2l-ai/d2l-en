@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -10,21 +10,21 @@ Now that we have characterized
 multilayer perceptrons (MLPs) mathematically,
 let's try to implement one ourselves.
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -53,7 +53,7 @@ one weight matrix and one bias vector.
 As always, we allocate memory
 for the gradients of the loss with respect to these parameters.
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab mxnet
 class MLPScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
@@ -63,33 +63,26 @@ class MLPScratch(d2l.Classification):
         self.b1 = np.zeros(num_hiddens)
         self.W2 = np.random.randn(num_hiddens, num_outputs) * sigma
         self.b2 = np.zeros(num_outputs)
-        self._params = [self.W1, self.b1, self.W2, self.b2]
-        for param in self._params:
+        for param in self.get_scratch_params():
             param.attach_grad()
-
-    def collect_params(self):
-        return self._params
 ```
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab pytorch
 class MLPScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.W1 = torch.randn(num_inputs, num_hiddens) * sigma
-        self.b1 = torch.zeros(num_hiddens)
-        self.W2 = torch.randn(num_hiddens, num_outputs) * sigma
-        self.b2 = torch.zeros(num_outputs)
-        self._params = [self.W1, self.b1, self.W2, self.b2]
-        for param in self._params:
-            param.requires_grad_()
-
+        self.W1 = nn.Parameters(torch.randn(num_inputs, num_hiddens) * sigma)
+        self.b1 = nn.Parameters(torch.zeros(num_hiddens))
+        self.W2 = nn.Parameters(torch.randn(num_hiddens, num_outputs) * sigma)
+        self.b2 = nn.Parameters(torch.zeros(num_outputs))
+        
     def parameters(self):
         return self._params
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab tensorflow
 class MLPScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
@@ -110,20 +103,20 @@ we will [**implement the ReLU activation**] ourselves
 using the maximum function rather than
 invoking the built-in `relu` function directly.
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab mxnet
 def relu(X):
     return np.maximum(X, 0)
 ```
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab pytorch
 def relu(X):
     a = torch.zeros_like(X)
     return torch.max(X, a)
 ```
 
-```{.python .input}
+```{.python .input  n=10}
 %%tab tensorflow
 def relu(X):
     return tf.math.maximum(X, 0)
@@ -137,7 +130,7 @@ a flat vector of length  `num_inputs`.
 Finally, we (**implement our model**)
 with just a few lines of code.
 
-```{.python .input}
+```{.python .input  n=11}
 %%tab all
 @d2l.add_to_class(MLPScratch)
 def forward(self, X):
@@ -151,7 +144,7 @@ def forward(self, X):
 Fortunately, [**the training loop for MLPs
 is exactly the same as for softmax regression.**]
 
-```{.python .input}
+```{.python .input  n=12}
 %%tab all
 model = MLPScratch(num_inputs=784, num_outputs=10, num_hiddens=256, lr=0.1)
 data = d2l.FashionMNIST(batch_size=256)
