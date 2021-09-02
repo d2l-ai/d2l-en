@@ -258,7 +258,7 @@ class LSTM(d2l.RNN):
 ```{.python .input}
 %%tab tensorflow
 class LSTM(d2l.RNN):
-    def __init__(self, num_inputs, num_hiddens):
+    def __init__(self, num_hiddens):
         d2l.Module.__init__(self)
         self.save_hyperparameters()        
         self.rnn = tf.keras.layers.LSTM(
