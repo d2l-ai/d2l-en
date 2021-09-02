@@ -73,13 +73,10 @@ class MLPScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.W1 = nn.Parameters(torch.randn(num_inputs, num_hiddens) * sigma)
-        self.b1 = nn.Parameters(torch.zeros(num_hiddens))
-        self.W2 = nn.Parameters(torch.randn(num_hiddens, num_outputs) * sigma)
-        self.b2 = nn.Parameters(torch.zeros(num_outputs))
-        
-    def parameters(self):
-        return self._params
+        self.W1 = nn.Parameter(torch.randn(num_inputs, num_hiddens) * sigma)
+        self.b1 = nn.Parameter(torch.zeros(num_hiddens))
+        self.W2 = nn.Parameter(torch.randn(num_hiddens, num_outputs) * sigma)
+        self.b2 = nn.Parameter(torch.zeros(num_outputs))
 ```
 
 ```{.python .input  n=7}
