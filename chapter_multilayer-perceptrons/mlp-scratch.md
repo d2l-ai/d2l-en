@@ -7,12 +7,13 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 :label:`sec_mlp_scratch`
 
 Multilayer Perceptrons are not much more complex to implement than simple linear models. The key conceptual 
-difference is that we now concatenate multiple layers. Let's begin again by implementing such a network from scratch. 
+difference is that we now concatenate multiple layers. Let's begin again by implementing such a network from scratch.
 
 ```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
-from mxnet import gluon, np, npx
+from mxnet import np, npx
+from mxnet.gluon import nn
 npx.set_np()
 ```
 
@@ -123,7 +124,7 @@ Since we are disregarding spatial structure,
 we `reshape` each two-dimensional image into
 a flat vector of length  `num_inputs`.
 Finally, we (**implement our model**)
-with just a few lines of code. Since we use the framework built-in autograd this is all that it takes. 
+with just a few lines of code. Since we use the framework built-in autograd this is all that it takes.
 
 ```{.python .input  n=11}
 %%tab all
@@ -137,7 +138,7 @@ def forward(self, X):
 ### Training
 
 Fortunately, [**the training loop for MLPs
-is exactly the same as for softmax regression.**] We define the model, data, trainer and finally invoke the `fit` function on model and data. 
+is exactly the same as for softmax regression.**] We define the model, data, trainer and finally invoke the `fit` function on model and data.
 
 ```{.python .input  n=12}
 %%tab all
