@@ -116,6 +116,7 @@ mean value of the $\tanh$ function is 0, when the elements are uniformly
 distributed over the real numbers.
 
 ```{.python .input}
+%%tab all
 batch_size, num_inputs, num_hiddens, num_steps = 2, 16, 32, 100
 rnn = RNNScratch(num_inputs, num_hiddens)
 X = d2l.ones((num_steps, batch_size, num_inputs))
@@ -228,17 +229,12 @@ Let's [**check whether the outputs have the correct shapes**], e.g., to ensure t
 
 We can see that the output shape is (number of time steps $\times$ batch size, vocabulary size), while the hidden state shape remains the same, i.e., (batch size, number of hidden units).
 
-
 ```{.python .input}
 %%tab all
 model = RNNLMScratch(rnn, num_inputs)
 outputs = model(d2l.ones((batch_size, num_steps), dtype=d2l.int64))
 d2l.check_shape(outputs, (batch_size, num_steps, num_inputs))
 ```
-
-
-
-
 
 ## [**Gradient Clipping**]
 

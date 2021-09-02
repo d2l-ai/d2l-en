@@ -43,7 +43,6 @@ from torch.nn import functional as F
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
-tf.random.set_seed(seed=1322)
 ```
 
 ## [**Generating the Dataset**]
@@ -86,7 +85,6 @@ class SinData(d2l.DataModule):
     
 n = 50    
 data = SinData(n, batch_size=10)
-
 ```
 
 The following function plots all the training examples (represented by circles),
@@ -95,7 +93,7 @@ the ground-truth data generation function `f` without the noise term (labeled by
 ```{.python .input  n=36}
 %%tab all
 def plot_kernel_reg(y_hat):
-    d2l.plot(data.x_val, [data.y_val, y_hat], 'x', 'y', legend=['Truth', 'Pred'],
+    d2l.plot(data.x_val, [data.y_val, d2l.numpy(y_hat)], 'x', 'y', legend=['Truth', 'Pred'],
              xlim=[0, 5], ylim=[-1, 5])
     d2l.plt.plot(data.x_train, data.y_train, 'o', alpha=0.5);
 ```
@@ -276,6 +274,7 @@ based on the [**parametric attention pooling**] in
 :eqref:`eq_nadaraya-watson-gaussian-para`.
 
 ```{.python .input  n=53}
+%%tab all
 class NWKernelRegression(d2l.Module):
     def __init__(self, keys, values, lr):
         super().__init__()
