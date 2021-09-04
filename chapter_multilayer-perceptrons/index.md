@@ -26,8 +26,8 @@ scalability, and efficiency of our models to subsequent chapters.
 
 mlp
 mlp-scratch
+model-selection
 underfit-overfit
-polynomial
 weight-decay
 dropout
 backprop
