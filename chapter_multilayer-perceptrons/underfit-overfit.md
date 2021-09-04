@@ -1,9 +1,9 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Model Selection, Underfitting, and Overfitting
+# Model Selection
 :label:`sec_model_selection`
 
 As machine learning scientists,
@@ -41,39 +41,41 @@ the fundamental problem of machine learning.
 
 The danger is that when we train models,
 we access just a small sample of data.
-The largest public image datasets contain
-roughly one million images.
-More often, we must learn from only thousands
-or tens of thousands of data examples.
-In a large hospital system, we might access
-hundreds of thousands of medical records.
+The largest *labeled* public image datasets, such as Imagenet :cite:`deng2009imagenet` contain
+roughly one million images. Unlabeled image collections such as the Flickr YFC100M dataset can be significantly larger, containing 100 million images :cite:`thomee2016yfcc100m`. While both numbers seem large, they are tiny compared to the space of all possible images that one could take at, say, 1 Megapixel resolution. 
+Worse still, we frequently must learn from only hundreds of examples. For instance, 
+a hospital might only have data of 100 occurrences of an infrequent disease. 
 When working with finite samples, we run the risk
 that we might discover apparent associations
 that turn out not to hold up when we collect more data.
 
 The phenomenon of fitting our training data
-more closely than we fit the underlying distribution is called *overfitting*, and the techniques used to combat overfitting are called *regularization*.
-In the previous sections, you might have observed
-this effect while experimenting with the Fashion-MNIST dataset.
-If you altered the model structure or the hyperparameters during the experiment, you might have noticed that with enough neurons, layers, and training epochs, the model can eventually reach perfect accuracy on the training set, even as the accuracy on test data deteriorates.
+more closely than we fit the underlying distribution is called *overfitting*, and the techniques used to combat overfitting are called *regularization*. While the following is no substitute for a proper introduction to statistical learning theory :cite:`Vapnik98,boucheron2005theory`, it should at least make you aware of some of the phenomena that arise in learning. Overfitting is really quite prevalent. In the previous sections, you might have observed
+overfitting while experimenting with the Fashion-MNIST dataset.
+If you altered the model structure or the hyperparameters during the experiment, you might have noticed that with enough neurons, layers, and training epochs, the model can eventually reach perfect accuracy on the training set, while the accuracy on test data deteriorates. 
 
 
 ## Training Error and Generalization Error
 
 In order to discuss this phenomenon more formally,
 we need to differentiate between training error and generalization error.
-The *training error* is the error of our model
+The *training error* $R_\mathrm{emp}$ is the error of our model
 as calculated on the training dataset,
-while *generalization error* is the expectation of our model's error
+while *generalization error* $R$ is the expectation of our model's error
 were we to apply it to an infinite stream of additional data examples
-drawn from the same underlying data distribution as our original sample.
+drawn from the same underlying data distribution as our original sample. 
+They are defined as follows:
 
-Problematically, we can never calculate the generalization error exactly.
+$$R_\mathrm{emp}[\mathbf{X}, \mathbf{Y}, f] = \frac{1}{m} \sum_{i=1}^m l(\mathbf{x}_i, \mathbf{y}_i, f(\mathbf{x}_i))
+\text{ and }
+R[p, f] = E_{(\mathbf{x}, \mathbf{y}) \sim p} [l(\mathbf{x}, \mathbf{y}, f(\mathbf{x}))]$$
+
+Problematically, we can never calculate the generalization error $R$ exactly.
 That is because the stream of infinite data is an imaginary object.
 In practice, we must *estimate* the generalization error
-by applying our model to an independent test set
-constituted of a random selection of data examples
-that were withheld from our training set.
+by applying our model to an independent test set 
+constituted of a random selection of examples $\mathbf{X}'$ and labels $\mathbf{Y}'$
+that were withheld from our training set. This yields $R_\mathrm{emp}[\mathbf{X}', \mathbf{Y}', f]$.
 
 The following three thought experiments
 will help illustrate this situation better.
@@ -88,10 +90,12 @@ This requires the student to memorize many things.
 She might even remember the answers for past exams perfectly.
 Another student might prepare by trying to understand
 the reasons for giving certain answers.
-In most cases, the latter student will do much better.
+While this tends to work well for drivers license exams, 
+it has poor outcomes when the set of exam questions is more 
+varied and drawn from a larger, possibly infinite pool. 
 
 Likewise, consider a model that simply uses a lookup table to answer questions. If the set of allowable inputs is discrete and reasonably small, then perhaps after viewing *many* training examples, this approach would perform well. Still this model has no ability to do better than random guessing when faced with examples that it has never seen before.
-In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ grayscale values, then there are $256^{784}$ possible images. That means that there are far more low-resolution grayscale thumbnail-sized images than there are atoms in the universe. Even if we could encounter such data, we could never afford to store the lookup table.
+In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ grayscale values, then there are $256^{784} \approx 10^{1888}$ possible images. That means that there are far more low-resolution grayscale thumbnail-sized images than the approximately $10^{82}$ atoms in the universe. Even if we could encounter such data, we could never afford to store the lookup table. This explosion in the number of required samples is closely related to the curse of dimensionality where simple problems become rather difficult once the data is high dimensional :cite:`friedman1997bias`. 
 
 Last, consider the problem of trying
 to classify the outcomes of coin tosses (class 0: heads, class 1: tails)
@@ -120,22 +124,21 @@ Since generalization is the fundamental problem in machine learning,
 you might not be surprised to learn
 that many mathematicians and theorists have dedicated their lives
 to developing formal theories to describe this phenomenon.
-In their [eponymous theorem](https://en.wikipedia.org/wiki/Glivenko%E2%80%93Cantelli_theorem), Glivenko and Cantelli
-derived the rate at which the training error
-converges to the generalization error.
-In a series of seminal papers, [Vapnik and Chervonenkis](https://en.wikipedia.org/wiki/Vapnik%E2%80%93Chervonenkis_theory)
-extended this theory to more general classes of functions.
+In their [epoynmous theorem](https://en.wikipedia.org/wiki/Glivenko%E2%80%93Cantelli_theorem) Glivenko and Cantelli derived the rate at which the training error
+converges to the generalization error :cite:`Glivenko33,Cantelli33`. 
+In a series of seminal papers, Vapnik and Chervonenkis
+extended this theory to more general classes of functions 
+:cite:`VapChe64,VapChe68,VapChe71,VapChe74b,VapChe81,VapChe91`.
 This work laid the foundations of statistical learning theory.
 
-
-In the standard supervised learning setting, which we have addressed up until now and will stick with throughout most of this book,
+In the standard supervised learning setting, which we have addressed 
+up until now and will stick with throughout most of this book,
 we assume that both the training data and the test data
 are drawn *independently* from *identical* distributions.
-This is commonly called the *i.i.d. assumption*,
-which means that the process that samples our data has no memory.
-In other words,
-the second example drawn and the third drawn
-are no more correlated than the second and the two-millionth sample drawn.
+This is commonly called the *IID assumption*. It means that 
+all samples are drawn from the same distribution. It also means that, 
+knowing all $n-1$ samples makes it no easier for us to predict the $n$-th sample 
+than it is to predict the first one. 
 
 Being a good machine learning scientist requires thinking critically,
 and already you should be poking holes in this assumption,
@@ -143,20 +146,22 @@ coming up with common cases where the assumption fails.
 What if we train a mortality risk predictor
 on data collected from patients at UCSF Medical Center,
 and apply it on patients at Massachusetts General Hospital?
-These distributions are simply not identical.
+These distributions are simply not identical. This is a well-studied 
+problem in statistics :cite:`rosenbaum1983central`.
 Moreover, draws might be correlated in time.
 What if we are classifying the topics of Tweets?
 The news cycle would create temporal dependencies
-in the topics being discussed, violating any assumptions of independence.
+in the topics being discussed, violating any assumptions of independence. 
 
-Sometimes we can get away with minor violations of the i.i.d. assumption
+Sometimes we can get away with minor violations of the IID assumption
 and our models will continue to work remarkably well.
 After all, nearly every real-world application
-involves at least some minor violation of the i.i.d. assumption,
+involves at least some minor violation of the IID assumption,
 and yet we have many useful tools for
 various applications such as
 face recognition,
-speech recognition, and language translation.
+speech recognition, and language translation. :cite:`yu1994rates` provides 
+a quantitative handle on this behavior. 
 
 Other violations are sure to cause trouble.
 Imagine, for example, if we try to train
@@ -168,12 +173,12 @@ This is unlikely to work well since college students
 tend to look considerably different from the elderly.
 
 In subsequent chapters, we will discuss problems
-arising from violations of the i.i.d. assumption.
-For now, even taking the i.i.d. assumption for granted,
+arising from violations of the IID assumption.
+For now, even taking the IID assumption for granted,
 understanding generalization is a formidable problem.
 Moreover, elucidating the precise theoretical foundations
 that might explain why deep neural networks generalize as well as they do
-continues to vex the greatest minds in learning theory.
+continues to vex the greatest minds in learning theory :cite:`frankle2018lottery,bartlett2021deep,nagarajan2019uniform,kawaguchi2017generalization`.
 
 When we train our models, we attempt to search for a function
 that fits the training data as well as possible.
@@ -183,7 +188,7 @@ then it might perform *too well* without producing a model
 that generalizes well to unseen data.
 This is precisely what we want to avoid or at least control.
 Many of the techniques in deep learning are heuristics and tricks
-aimed at guarding against overfitting.
+aimed at guarding against overfitting (:numref:`sec_weight_decay`, :numref:`sec_dropout`, :numref:`sec_batch_norm`).
 
 ### Model Complexity
 
@@ -193,12 +198,14 @@ When we work with more complex models and fewer examples,
 we expect the training error to go down but the generalization gap to grow.
 What precisely constitutes model complexity is a complex matter.
 Many factors govern whether a model will generalize well.
-For example a model with more parameters might be considered more complex.
-A model whose parameters can take a wider range of values
+For example a model with more parameters might be considered more complex in general. 
+Note, though, that this is not necessarily true. For instance, kernel methods operate in spaces with infinite numbers of parameters, yet they exhibit very well-controlled model complexity :cite:`scholkopf2002learning`. 
+Instead, a better way to think about this is that a 
+model whose parameters can take a wider range of values
 might be more complex.
 Often with neural networks, we think of a model
 that takes more training iterations as more complex,
-and one subject to *early stopping* (fewer training iterations) as less complex.
+and one subject to *early stopping* (fewer training iterations) as less complex :cite:`prechelt1998early`.
 
 It can be difficult to compare the complexity among members
 of substantially different model classes
@@ -208,7 +215,7 @@ a model that can readily explain arbitrary facts
 is what statisticians view as complex,
 whereas one that has only a limited expressive power
 but still manages to explain the data well
-is probably closer to the truth.
+is probably closer to the truth :cite:`vapnik1994measuring`.
 In philosophy, this is closely related to Popper's
 criterion of falsifiability
 of a scientific theory: a theory is good if it fits data
@@ -216,16 +223,16 @@ and if there are specific tests that can be used to disprove it.
 This is important since all statistical estimation is
 *post hoc*,
 i.e., we estimate after we observe the facts,
-hence vulnerable to the associated fallacy.
+hence vulnerable to the associated fallacy :cite:`corfield2009falsificationism`.
 For now, we will put the philosophy aside and stick to more tangible issues.
 
 In this section, to give you some intuition,
 we will focus on a few factors that tend
 to influence the generalizability of a model class:
 
-1. The number of tunable parameters. When the number of tunable parameters, sometimes called the *degrees of freedom*, is large, models tend to be more susceptible to overfitting.
-1. The values taken by the parameters. When weights can take a wider range of values, models can be more susceptible to overfitting.
-1. The number of training examples. It is trivially easy to overfit a dataset containing only one or two examples even if your model is simple. But overfitting a dataset with millions of examples requires an extremely flexible model.
+1. The number of tunable parameters. When the number of tunable parameters, sometimes called the *degrees of freedom*, is large, models tend to be more susceptible to overfitting :cite:`murata1994network`.
+1. The values taken by the parameters. When weights can take a wider range of values, models can be more susceptible to overfitting :cite:`krogh1992simple`.
+1. The number of training examples. It is trivially easy to overfit a dataset containing only one or two examples even if your model is simple. But overfitting a dataset with millions of examples requires an extremely flexible model :cite:`henighan2020scaling`.
 
 ## Model Selection
 
@@ -244,7 +251,8 @@ we may wish to compare models with
 different numbers of hidden layers,
 different numbers of hidden units,
 and various choices of the activation functions
-applied to each hidden layer.
+applied to each hidden layer. For a particularly elegant 
+strategy to accomplish this for computer vision see :cite:`radosavovic2020designing`. 
 In order to determine the best among our candidate models,
 we will typically employ a validation dataset.
 
@@ -259,7 +267,9 @@ Then we would be in serious trouble.
 If we overfit our training data,
 there is always the evaluation on test data to keep us honest.
 But if we overfit the test data, how would we ever know?
-
+See e.g. :cite:`ong2005learning` for an example how 
+this can lead to absurd results even for models where the complexity 
+can be tightly controlled. 
 
 Thus, we should never rely on the test data for model selection.
 And yet we cannot rely solely on the training data
@@ -273,18 +283,21 @@ While ideally we would only touch the test data once,
 to assess the very best model or to compare
 a small number of models to each other,
 real-world test data is seldom discarded after just one use.
-We can seldom afford a new test set for each round of experiments.
+We can seldom afford a new test set for each round of experiments. 
+In fact, recycling benchmark data for decades can have a significant impact on the 
+development of algorithms, e.g. for [image classification](https://paperswithcode.com/sota/image-classification-on-imagenet) and [optical character recognition](https://paperswithcode.com/sota/image-classification-on-mnist).
 
-The common practice to address this problem
+The common practice to address the problem of `training on the test set`
 is to split our data three ways,
-incorporating a *validation dataset* (or *validation set*)
+incorporating a *validation set*
 in addition to the training and test datasets.
 The result is a murky practice where the boundaries
 between validation and test data are worryingly ambiguous.
 Unless explicitly stated otherwise, in the experiments in this book
 we are really working with what should rightly be called
 training data and validation data, with no true test sets.
-Therefore, the accuracy reported in each experiment of the book is really the validation accuracy and not a true test set accuracy.
+Therefore, the accuracy reported in each experiment of the book is really 
+the validation accuracy and not a true test set accuracy.
 
 ### $K$-Fold Cross-Validation
 
@@ -310,11 +323,12 @@ but there is a little gap between them.
 If the model is unable to reduce the training error,
 that could mean that our model is too simple
 (i.e., insufficiently expressive)
-to capture the pattern that we are trying to model.
+to capture the pattern that we are trying to model. 
 Moreover, since the *generalization gap*
 between our training and validation errors is small,
 we have reason to believe that we could get away with a more complex model.
-This phenomenon is known as *underfitting*.
+This phenomenon is known as *underfitting* (note, though, that it could also 
+mean that the problem is simply very difficult). 
 
 On the other hand, as we discussed above,
 we want to watch out for the cases
@@ -369,16 +383,25 @@ and underfitting vs. overfitting in :numref:`fig_capacity_vs_error`.
 ![Influence of model complexity on underfitting and overfitting](../img/capacity-vs-error.svg)
 :label:`fig_capacity_vs_error`
 
+Much of the intuition of this arises from Statistical Learning Theory. One of the guarantees it 
+provides :cite:`Vapnik98` is that the gap between empirical risk and expected risk is bounded by 
+
+$$\Pr\left(R[p, f] - R_\mathrm{emp}[\mathbf{X}, \mathbf{Y}, f] < \epsilon\right) \geq 1-\delta
+\ \text{for}\ \epsilon \geq c \sqrt{(\mathrm{VC} - \log \delta)/n}.$$
+
+Here $\delta > 0$ is the probability that the bound is violated and $\mathrm{VC}$ is the Vapnik-Chervonenkis (VC)
+dimension of the set of functions that we want to fit. For instance, for polynomials of degree $d$ the VC dimension is $d+1$. Lastly, $c > 0$ is a constant that depends only on the scale of the loss that can be incurred. In short, this shows that our bound becomes increasingly loose as we pick more complex models and that the number of free parameters should not increase more rapidly than the dataset size $n$ increases. See :cite:`boucheron2005theory` for a detailed discussion and for much more advanced ways of measuring function complexity. 
+
 ### Dataset Size
 
-The other big consideration to bear in mind is the dataset size.
+As the above bound already indicates, the other big consideration to bear in mind is the dataset size.
 Fixing our model, the fewer samples we have in the training dataset,
 the more likely (and more severely) we are to encounter overfitting.
 As we increase the amount of training data,
 the generalization error typically decreases.
 Moreover, in general, more data never hurts.
-For a fixed task and data distribution,
-there is typically a relationship between model complexity and dataset size.
+For a fixed task and data distribution, model complexity should not 
+increase more rapidly than the amount of data does. 
 Given more data, we might profitably attempt to fit a more complex model.
 Absent sufficient data, simpler models may be more difficult to beat.
 For many tasks, deep learning only outperforms linear models
@@ -388,162 +411,22 @@ owes to the current abundance of massive datasets
 due to Internet companies, cheap storage, connected devices,
 and the broad digitization of the economy.
 
-## Polynomial Regression
-
-We can now (**explore these concepts interactively
-by fitting polynomials to data.**)
-
-```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import gluon, np, npx
-from mxnet.gluon import nn
-import math
-npx.set_np()
-```
-
-```{.python .input}
-%%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-import math
-```
-
-```{.python .input}
-%%tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-import math
-```
-
-### Generating the Dataset
-
-First we need data. Given $x$, we will [**use the following cubic polynomial to generate the labels**] on training and test data:
-
-(**$$y = 5 + 1.2x - 3.4\frac{x^2}{2!} + 5.6 \frac{x^3}{3!} + \epsilon \text{ where }
-\epsilon \sim \mathcal{N}(0, 0.1^2).$$**)
-
-The noise term $\epsilon$ obeys a normal distribution
-with a mean of 0 and a standard deviation of 0.1.
-For optimization, we typically want to avoid
-very large values of gradients or losses.
-This is why the *features*
-are rescaled from $x^i$ to $\frac{x^i}{i!}$.
-It allows us to avoid very large values for large exponents $i$.
-We will synthesize 100 samples each for the training set and test set.
-
-```{.python .input}
-%%tab all
-class Data(d2l.DataModule):
-    def __init__(self, num_train, num_val, num_inputs, batch_size):
-        self.save_hyperparameters()        
-        p, n = max(3, self.num_inputs), num_train + num_val
-        w = d2l.tensor([1.2, -3.4, 5.6] + [0]*(p-3))
-        if tab.selected('mxnet') or tab.selected('pytorch'):
-            x = d2l.randn(n, 1)
-            noise = d2l.randn(n, 1) * 0.1
-        if tab.selected('tensorflow'):
-            x = d2l.normal((n, 1))
-            noise = d2l.normal((n, 1)) * 0.1
-        X = d2l.concat([x ** (i+1) / math.gamma(i+2) for i in range(p)], 1)
-        self.y = d2l.matmul(X, d2l.reshape(w, (-1, 1))) + noise
-        self.X = X[:,:num_inputs]
-        
-    def get_dataloader(self, train):
-        i = slice(0, self.num_train) if train else slice(self.num_train, None)
-        return self.get_tensorloader([self.X, self.y], train, i)
-```
-
-Again, monomials stored in `poly_features`
-are rescaled by the gamma function,
-where $\Gamma(n)=(n-1)!$.
-[**Take a look at the first 2 samples**] from the generated dataset.
-The value 1 is technically a feature,
-namely the constant feature corresponding to the bias.
-
-### [**Third-Order Polynomial Function Fitting (Normal)**]
-
-We will begin by first using a third-order polynomial function, which is the same order as that of the data generation function.
-The results show that this model's training and test losses can be both effectively reduced.
-The learned model parameters are also close
-to the true values $w = [1.2, -3.4, 5.6], b=5$.
-
-```{.python .input}
-%%tab all
-def train(p):
-    if tab.selected('mxnet') or tab.selected('tensorflow'):
-        model = d2l.LinearRegression(lr=0.01)
-    if tab.selected('pytorch'):
-        model = d2l.LinearRegression(p, lr=0.01)
-    model.board.ylim = [1, 1e2]
-    data = Data(200, 200, p, 20)
-    trainer = d2l.Trainer(max_epochs=10)
-    trainer.fit(model, data)
-    print(model.get_w_b())
-    
-train(p=3)
-```
-
-### [**Linear Function Fitting (Underfitting)**]
-
-Let's take another look at linear function fitting.
-After the decline in early epochs,
-it becomes difficult to further decrease
-this model's training loss.
-After the last epoch iteration has been completed,
-the training loss is still high.
-When used to fit nonlinear patterns
-(like the third-order polynomial function here)
-linear models are liable to underfit.
-
-```{.python .input}
-%%tab all
-train(p=1)
-```
-
-### [**Higher-Order Polynomial Function Fitting  (Overfitting)**]
-
-Now let's try to train the model
-using a polynomial of too high degree.
-Here, there is insufficient data to learn that
-the higher-degree coefficients should have values close to zero.
-As a result, our overly-complex model
-is so susceptible that it is being influenced
-by noise in the training data.
-Though the training loss can be effectively reduced,
-the test loss is still much higher.
-It shows that
-the complex model overfits the data.
-
-```{.python .input}
-%%tab all
-train(p=10)
-```
-
-In the subsequent sections, we will continue
-to discuss overfitting problems
-and methods for dealing with them,
-such as weight decay and dropout.
-
 
 ## Summary
 
-* Since the generalization error cannot be estimated based on the training error, simply minimizing the training error will not necessarily mean a reduction in the generalization error. Machine learning models need to be careful to safeguard against overfitting so as to minimize the generalization error.
-* A validation set can be used for model selection, provided that it is not used too liberally.
-* Underfitting means that a model is not able to reduce the training error. When training error is much lower than validation error, there is overfitting.
-* We should choose an appropriately complex model and avoid using insufficient training samples.
+This section explored some of the theoretical underpinnings of machine learning. Making these work for modern deep learning is still very much a work in progress. Simply minimizing the training error will not necessarily mean a reduction in the generalization error. Machine learning models need to be careful to safeguard against overfitting so as to minimize the generalization error. Nonetheless, we provided some basic intuition how to control the generalization error. For instance, we can to resort to validation sets or statistical bounds. 
 
+A few rules of thumb: 1) A validation set can be used for model selection, provided that it is not used too liberally. 2) A more complex model requires more data, where the amount of data should scale up at least as rapidly as the model complexity. 3) More parameters can mean more complex models, but there are ways where this need not be the case, e.g. by controlling the magnitude. 4) More data makes everything better. As long as the data is drawn from the same distribution. 5) Check your assumptions. 
 
 ## Exercises
 
-1. Can you solve the polynomial regression problem exactly? Hint: use linear algebra.
-1. Consider model selection for polynomials:
-    1. Plot the training loss vs. model complexity (degree of the polynomial). What do you observe? What degree of polynomial do you need to reduce the training loss to 0?
-    1. Plot the test loss in this case.
-    1. Generate the same plot as a function of the amount of data.
-1. What happens if you drop the normalization ($1/i!$) of the polynomial features $x^i$? Can you fix this in some other way?
-1. Can you ever expect to see zero generalization error?
+1. Can you solve the problem of polynomial regression exactly? 
+1. Give at least five examples where dependent random variables make treating the problem as IID data inadvisable. 
+1. Can you ever expect to see zero training error? Under which circumstances would you see zero generalization error?
+1. Why is $k$-fold crossvalidation very expensive to compute?
+1. Why is the $k$-fold crossvalidation error estimate biased? 
+1. The VC dimension is defined as the maximum number of points that can be classified with arbitrary labels $\{\pm 1\}$ by a function of a class of functions. Why might this not be a good idea to measure how complex the class of functions is? Hint: what about the magnitude of the functions?
+1. Your manager gives you a difficult dataset on which your current algorithm doesn't perform so well. How would you justify to him that you need more data? Hint: you cannot increase the data but you can decrease it. 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/96)
@@ -556,3 +439,7 @@ such as weight decay and dropout.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/234)
 :end_tab:
+
+```{.python .input}
+
+```
