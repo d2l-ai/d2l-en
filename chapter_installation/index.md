@@ -142,7 +142,7 @@ pip install -U d2l
 ```
 
 
-Once you have completed these installation steps, we can the Jupyter notebook server by running:
+Once you have completed these installation steps, we can start the Jupyter notebook server by running:
 
 ```bash
 jupyter notebook
