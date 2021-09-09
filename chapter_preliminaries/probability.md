@@ -158,7 +158,7 @@ by the total number of tosses.
 Before simulating this study
 let's import a few packages.
 
-```{.python .input  n=28}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -167,7 +167,7 @@ import random
 npx.set_np()
 ```
 
-```{.python .input  n=35}
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -176,7 +176,7 @@ import torch
 from torch.distributions.multinomial import Multinomial
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -190,18 +190,19 @@ i.e., $P(\textrm{heads}) = .5$.
 To simulate tosses of a fair coin,
 we can invoke any random number generator.
 Some easy ways to draw samples 
-of an event with probability $.5$.
+of an event with probability $0.5$.
 For example Python's `random.random`
 yields numbers in the interval $[0,1]$
 where the probability of lying 
 in any sub-interval $[a, b] \subset [0,1]$
 is equal to $b-a$.
-Thus we can get out `0` and `1` with probability `.5` each
-by testing whether the returned float is greater than `.5`
+Thus we can get out `0` and `1` with probability `0.5` each
+by testing whether the returned float is greater than `0.5`
 
-```{.python .input  n=36}
+```{.python .input}
+#@tab all
 num_tosses = 100
-heads = sum([random.random() > .5 for _ in range(100)])
+heads = sum([random.random() > 0.5 for _ in range(100)])
 tails = num_tosses - heads
 print("heads, tails: ", [heads, tails])
 ```
@@ -216,7 +217,7 @@ to the number of draws
 and the second as a list of probabilities
 associated with each of the possible outcomes.
 To simulate ten tosses of a fair coin, 
-we assign probability vector `[.5,.5]`,
+we assign probability vector `[0.5,0.5]`,
 interpreting index `0` as heads
 and index `1` as tails.
 The function returns a vector 
@@ -228,13 +229,13 @@ and the second component tells us
 the number of occurences of tails.
 
 ```{.python .input}
-fair_probs = [.5, .5] 
+fair_probs = [0.5, 0.5] 
 multinomial(100, fair_probs)
 ```
 
-```{.python .input  n=37}
+```{.python .input}
 #@tab pytorch
-fair_probs = torch.tensor([.5, .5])
+fair_probs = torch.tensor([0.5, 0.5])
 Multinomial(100, fair_probs).sample()
 ```
 
@@ -259,7 +260,7 @@ to estimate sum to $1$.
 multinomial(100, fair_probs) / 100
 ```
 
-```{.python .input  n=38}
+```{.python .input}
 #@tab pytorch
 Multinomial(100, fair_probs).sample() / 100
 ```
@@ -270,7 +271,7 @@ tfd.Multinomial(100, fair_probs).sample() / 100
 ```
 
 Here, even though our simulated coin is fair 
-(we set the probabilities `[.5,.5]` ourselves),
+(we set the probabilities `[0.5,0.5]` ourselves),
 the counts of heads and tails are not identical.
 That's because we only drew a finite number of samples.
 If we didn't implement the simulation ourselves,
@@ -285,7 +286,7 @@ counts = multinomial(10000, fair_probs).astype(np.float32)
 counts / 10000
 ```
 
-```{.python .input  n=39}
+```{.python .input}
 #@tab pytorch
 counts = Multinomial(10000, fair_probs).sample()
 counts / 10000  # Relative frequency as the estimate
@@ -328,7 +329,7 @@ d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
 ```
 
-```{.python .input  n=43}
+```{.python .input}
 #@tab pytorch
 counts = Multinomial(1, fair_probs).sample((10000,))
 cum_counts = counts.cumsum(dim=0)
@@ -344,7 +345,7 @@ d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 #@tab tensorflow
 counts = tfd.Multinomial(1, fair_probs).sample(10000)
 cum_counts = tf.cumsum(counts, axis=0)
@@ -451,7 +452,7 @@ is different from the sample space,
 since both are collections of outcomes. 
 Importantly, random variables can be much coarser 
 than the raw sample space.
-We can define a binary random variable like "greater than .5"
+We can define a binary random variable like "greater than 0.5"
 even when the underlying sample space is infinite,
 e.g., the line segment between $0$ and $1$.
 Additionally, multiple random variables
