@@ -224,9 +224,9 @@ The function returns a vector
 with length equal to the number 
 of possible outcomes (here, `2`),
 where the first component tells us 
-the number of occurences of heads
+the number of occurrences of heads
 and the second component tells us 
-the number of occurences of tails.
+the number of occurrences of tails.
 
 ```{.python .input}
 fair_probs = [0.5, 0.5] 
@@ -289,7 +289,7 @@ counts / 10000
 ```{.python .input}
 #@tab pytorch
 counts = Multinomial(10000, fair_probs).sample()
-counts / 10000  # Relative frequency as the estimate
+counts / 10000
 ```
 
 ```{.python .input}
@@ -320,7 +320,7 @@ counts = multinomial(1, fair_probs, size=10000)
 cum_counts = counts.astype(np.float32).cumsum(axis=0)
 estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 
-d2l.set_figsize((6, 4.5))
+d2l.set_figsize((4.5, 3.5))
 d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
 d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
 d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
@@ -336,10 +336,10 @@ cum_counts = counts.cumsum(dim=0)
 estimates = cum_counts / cum_counts.sum(dim=1, keepdims=True)
 estimates = estimates.numpy()
 
-d2l.set_figsize((6, 4.5))
+d2l.set_figsize((4.5, 3.5))
 d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
 d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
-d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.axhline(y=0.5, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Samples')
 d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
@@ -352,7 +352,7 @@ cum_counts = tf.cumsum(counts, axis=0)
 estimates = cum_counts / tf.reduce_sum(cum_counts, axis=1, keepdims=True)
 estimates = estimates.numpy()
 
-d2l.set_figsize((6, 4.5))
+d2l.set_figsize((4.5, 3.5))
 d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
 d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
 d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
