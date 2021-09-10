@@ -517,8 +517,7 @@ has no probability, but nonzero density.
 To get out the probability assigned to an interval,
 we must take an *integral* of the density 
 over that interval. 
-For more details on continuous random variables,
-see :numref:`sec_random_variables`. 
+
 
 
 
@@ -934,8 +933,6 @@ Note that by mathematical convention mean and variance
 are often referenced as $\mu$ and $\sigma^2$.
 This is particularly common whenever we use it 
 to parametrize a Gaussian distribution. 
-For more information about the latter, 
-see e.g., :ref:`sec_distributions`.
 
 In the same way as we introduced expectations 
 and variance for *scalar* random variables, 
