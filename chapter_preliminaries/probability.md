@@ -568,7 +568,7 @@ and simply returns the probability assigned
 to the intersection of the corresponding subsets
 of the sample space. 
 The *joint probability* assigned to the event 
-where random variables A and B 
+where random variables $A$ and $B$ 
 take values $a$ and $b$, respectively,
 is denoted $P(A = a, B = b)$,
 where the comma indicates "AND". 
@@ -583,13 +583,13 @@ random variables in a probabilistic sense,
 and can be used to derive many other
 useful quantities, including recovering the 
 individual distributions $P(A)$ and $P(B)$.
-To recover P(A=a) we simply sum up 
-P(A=a, B=v) over all values $v$ 
-that the random variable B can take:
+To recover $P(A=a) $we simply sum up 
+$P(A=a, B=v)$ over all values $v$ 
+that the random variable $B$ can take:
 $P(A=a) = \sum_v P(A=a, B=v)$.
 
 
-The ratio $\frac{P(A=a, B=b)}{P(A=a)} \leq 1$.
+The ratio $\frac{P(A=a, B=b)}{P(A=a)} \leq 1$
 turns out to be extremely important.
 It is called the *conditional probability*,
 and is denoted via the "|" symbol,
