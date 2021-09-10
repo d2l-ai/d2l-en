@@ -439,7 +439,7 @@ have zero probability of occurring.
  
 
 
-### Random Variables
+## Random Variables
 
 When we spoke about events like the roll of a die
 coming up odds or the first coin toss coming up heads,
