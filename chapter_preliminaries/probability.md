@@ -551,7 +551,7 @@ and we observe that they
 are having trouble breathing
 and have lost their sense of smell,
 then we believe that they are more likely
-to have COVID than we might 
+to have COVID-19 than we might 
 if they had no trouble breathing
 and a perfectly ordinary sense of smell.
 
@@ -646,13 +646,13 @@ $$P(A|B) = \frac{P(B|A) P(A)}{\sum_b P(B=b|A) P(A)}.$$
 In Bayesian statistics, we think of an observer 
 as possessing some (subjective) prior beliefs
 about the plausibility of the available hypotheses 
-encoded in the *prior* P(H),
+encoded in the *prior* $P(H)$,
 and a *likelihood function* that says how likely 
 one is to observe any value of the collected evidence 
 for each of the hypotheses in the class $P(E|H)$.
 Bayes' theorem is then interpreted as telling us
-how to update the initial *prior* P(H)
-in light of the available evidence E
+how to update the initial *prior* $P(H)$
+in light of the available evidence $E$
 to produce *posterior* beliefs 
 $P(H|E) = \frac{P(E|H) P(H)}{P(E)}$.
 Informally, this can be stated as 
@@ -660,6 +660,10 @@ Informally, this can be stated as
 Now, because the evidence $P(E)$ is the same for all hypotheses,
 we can get away with using the simplified form
 and simply normalize over the hypotheses.
+
+Note that $\sum_a P(A=a|B) = 1$ also allows us to *marginalize* over random variables. That is, we can drop variables from a joint distribution such as $P(A, B)$. After all, we have that 
+
+$$\sum_a P(A=a, B) = P(B) \sum_a P(A = a|B) = P(B).$$
 
 Independence is another fundamentally important concept
 that you forms the backbone of 
@@ -672,13 +676,13 @@ More formally, independence, denoted $A \perp B$,
 requires that $P(A|B) = P(A)$ and, consequently, 
 that $P(A,B) = P(A|B) P(B) = P(A) P(B)$.
 Independence is often an appropriate assumption.
-For example, if the random variable A 
+For example, if the random variable $A$ 
 represents the outcome from tossing one fair coin 
-and the random variable B 
+and the random variable $B$ 
 represents the outcome from tossing another,
-then knowing whether A came up heads
+then knowing whether $A$ came up heads
 should not influence the probability
-of B coming up heads.
+of $B$ coming up heads.
 
 
 Independence is especially when it holds among the successive 
@@ -722,7 +726,7 @@ but this correlation disappears if we condition on age.
 ## An Example
 :label:`subsec_probability_hiv_app`
 
-Let us put our skills to the test. 
+Let's put our skills to the test. 
 Assume that a doctor administers an HIV test to a patient. 
 This test is fairly accurate and it fails only with 1% probability 
 if the patient is healthy but reporting him as diseased. 
@@ -744,7 +748,7 @@ Intuitively this is going to depend on how common the disease is,
 since it affects the number of false alarms. 
 Assume that the population is fairly healthy, e.g., $P(H=1) = 0.0015$. 
 To apply Bayes' theorem, we need to apply marginalization
-and the multiplication rule to determine
+to determine
 
 $$\begin{aligned}
 P(D_1 = 1) 
@@ -807,7 +811,7 @@ $$P(H = 1| D_1 = 1, D_2 = 1)
 That is, the second test allowed us to gain much higher confidence that not all is well.
 Despite the second test being considerably less accurate than the first one, 
 it still significantly improved our estimate. 
-The assumption of boths tests being conditional independent of each other 
+The assumption of both tests being conditional independent of each other 
 was crucial for our ability to generate a more accurate estimate.
 Take the extreme case where we run the same test twice. 
 In this situation we would expect the same outcome in both times, 
@@ -816,7 +820,7 @@ The astute reader might have noticed that the diagnosis behaved
 like a classifier hiding in plain sight 
 where our ability to decide whether a patient is healthy 
 increases as we obtain more features (test outcomes). 
-We will pick up this idea in :ref:`sec_naive_bayes`,
+We will pick up this idea in :numref:`sec_naive_bayes`,
 where we will introduce naive Bayes classifiers, 
 using the approximation that all features occur independently. 
 
