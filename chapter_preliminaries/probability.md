@@ -636,7 +636,7 @@ In some cases we might not have direct access to $P(B)$,
 such as the prevalence of symptoms. 
 In this case a simplified version of Bayes' theorem comes in handy:
 
-$$P(A|B) \propto P(B|A) P(A)$$
+$$P(A|B) \propto P(B|A) P(A).$$
 
 Since we know that $P(A|B)$ must be normalized to $1$, i.e., $\sum_a P(A=a|B) = 1$,
 we can use it to compute
@@ -780,10 +780,10 @@ by assuming conditional independence:
 $$\begin{aligned}
 P(D_1 = 1, D_2 = 1|H = 0) 
 & = P(D_1 = 1|H = 0) P(D_2 = 1|H = 0)  
-=& 0.0003 \\
+=& 0.0003, \\
 P(D_1 = 1, D_2 = 1|H = 1) 
 & = P(D_1 = 1|H = 1) P(D_2 = 1|H = 1)  
-=& 0.98
+=& 0.98.
 \end{aligned}
 $$
 
@@ -794,7 +794,7 @@ $$\begin{aligned}
 P(D_1 = 1, D_2 = 1) 
 =& P(D_1 = 1, D_2 = 1, H = 0) + P(D_1 = 1, D_2 = 1, H = 1)  \\
 =& P(D_1 = 1, D_2 = 1| H = 0)P(H=0) + P(D_1 = 1, D_2 = 1|H = 1)P(H=1)\\
-=& 0.00176955
+=& 0.00176955.
 \end{aligned}
 $$
 
@@ -944,14 +944,14 @@ Covariances are more complicated.
 We resolve the problem by taking expectations of the *outer product* 
 of the difference between random variables and their mean. 
 
-$$\Sigma := \mathrm{Cov}_{\mathbf{x} \sim P}[\mathbf{x}] = E_{\mathbf{x} \sim P}\left[(\mathbf{x} - \mathbf{\mu}) (\mathbf{x} - \mathbf{\mu})^\top\right]$$
+$$\Sigma := \mathrm{Cov}_{\mathbf{x} \sim P}[\mathbf{x}] = E_{\mathbf{x} \sim P}\left[(\mathbf{x} - \mathbf{\mu}) (\mathbf{x} - \mathbf{\mu})^\top\right].$$
 
 This matrix $\Sigma$ is referred to as the covariance matrix. 
 An easy way to see its effect is to consider some vector $\mathbf{v}$ 
 of the same size as $\mathbf{x}$. 
 It follows that 
 
-$$\mathbf{v}^\top \Sigma \mathbf{v} = E_{\mathbf{x} \sim P}\left[\mathbf{v}^\top(\mathbf{x} - \mathbf{\mu}) (\mathbf{x} - \mathbf{\mu})^\top \mathbf{v}\right] = \mathrm{Var}_{x \sim P}[\mathbf{v}^\top \mathbf{x}]$$
+$$\mathbf{v}^\top \Sigma \mathbf{v} = E_{\mathbf{x} \sim P}\left[\mathbf{v}^\top(\mathbf{x} - \mathbf{\mu}) (\mathbf{x} - \mathbf{\mu})^\top \mathbf{v}\right] = \mathrm{Var}_{x \sim P}[\mathbf{v}^\top \mathbf{x}].$$
 
 As such, $\Sigma$ allows us to compute the variance 
 for any linear function of $\mathbf{x}$
