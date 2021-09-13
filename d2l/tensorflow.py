@@ -239,7 +239,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
             x = self.trainer.epoch + 1
             n = self.trainer.num_val_batches / \
                 self.plot_valid_per_epoch
-        self.board.draw(x, value, ('train_' if train else 'val_') + key,
+        self.board.draw(x, d2l.numpy(value), ('train_' if train else 'val_') + key,
                         every_n=int(n))
 
     def training_step(self, batch):
@@ -1086,13 +1086,18 @@ class PositionalEncoding(tf.keras.layers.Layer):
         X = X + self.P[:, :X.shape[1], :]
         return self.dropout(X, **kwargs)
 
-class PositionWiseFFN(d2l.Module):
-    """Defined in :numref:`sec_transformer`"""
-    def __init__(self, num_hiddens, num_outputs):
-        super().__init__()
-        self.net = tf.keras.models.Sequential([
-            tf.keras.layers.Dense(num_hiddens, activation='relu'),
-            tf.keras.layers.Dense(num_outputs)])
+class PositionWiseFFN(tf.keras.layers.Layer):
+    """Positionwise feed-forward network.
+
+    Defined in :numref:`sec_transformer`"""
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
+        super().__init__(*kwargs)
+        self.dense1 = tf.keras.layers.Dense(ffn_num_hiddens)
+        self.relu = tf.keras.layers.ReLU()
+        self.dense2 = tf.keras.layers.Dense(ffn_num_outputs)
+
+    def call(self, X):
+        return self.dense2(self.relu(self.dense1(X)))
 
 class AddNorm(tf.keras.layers.Layer):
     """Residual connection followed by layer normalization.
