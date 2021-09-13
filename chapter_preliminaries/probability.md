@@ -778,7 +778,7 @@ and it is not as good as the first one.
 | $P(D_2 = 0|H)$          |  0.02 |  0.97 |
 
 Unfortunately, the second test comes back positive, too.
-Let us calculate the requisite probabilities to invoke Bayes' theorem
+Let's calculate the requisite probabilities to invoke Bayes' theorem
 by assuming conditional independence:
 
 $$\begin{aligned}
@@ -819,10 +819,7 @@ hence no additional insight is gained from running the same test again.
 The astute reader might have noticed that the diagnosis behaved 
 like a classifier hiding in plain sight 
 where our ability to decide whether a patient is healthy 
-increases as we obtain more features (test outcomes). 
-We will pick up this idea in :numref:`sec_naive_bayes`,
-where we will introduce naive Bayes classifiers, 
-using the approximation that all features occur independently. 
+increases as we obtain more features (test outcomes).
 
 
 ## Expectations
