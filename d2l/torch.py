@@ -244,7 +244,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
             x = self.trainer.epoch + 1
             n = self.trainer.num_val_batches / \
                 self.plot_valid_per_epoch
-        self.board.draw(x, value, ('train_' if train else 'val_') + key,
+        self.board.draw(x, d2l.numpy(value), ('train_' if train else 'val_') + key,
                         every_n=int(n))
 
     def training_step(self, batch):
@@ -1100,26 +1100,33 @@ class PositionalEncoding(nn.Module):
         X = X + self.P[:, :X.shape[1], :].to(X.device)
         return self.dropout(X)
 
-class PositionWiseFFN(d2l.Module):
-    """Defined in :numref:`sec_transformer`"""
-    def __init__(self, num_hiddens, num_outputs):
-        super().__init__()
-        self.net = nn.Sequential(nn.LazyLinear(num_hiddens), nn.ReLU(),
-                                 nn.LazyLinear(num_outputs))
+class PositionWiseFFN(nn.Module):
+    """Positionwise feed-forward network.
 
-class TransformerAddNorm(d2l.Module):
+    Defined in :numref:`sec_transformer`"""
+    def __init__(self, ffn_num_input, ffn_num_hiddens, ffn_num_outputs,
+                 **kwargs):
+        super(PositionWiseFFN, self).__init__(**kwargs)
+        self.dense1 = nn.Linear(ffn_num_input, ffn_num_hiddens)
+        self.relu = nn.ReLU()
+        self.dense2 = nn.Linear(ffn_num_hiddens, ffn_num_outputs)
+
+    def forward(self, X):
+        return self.dense2(self.relu(self.dense1(X)))
+
+class AddNorm(nn.Module):
     """Residual connection followed by layer normalization.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, num_hiddens, dropout):
-        super().__init__()
+    def __init__(self, normalized_shape, dropout, **kwargs):
+        super(AddNorm, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
-        self.ln = nn.LayerNorm(num_hiddens)
+        self.ln = nn.LayerNorm(normalized_shape)
 
     def forward(self, X, Y):
         return self.ln(self.dropout(Y) + X)
 
-class TransformerEncoderBlock(d2l.Module):
+class EncoderBlock(nn.Module):
     """Transformer encoder block.
 
     Defined in :numref:`sec_transformer`"""

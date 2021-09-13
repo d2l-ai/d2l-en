@@ -237,7 +237,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
             x = self.trainer.epoch + 1
             n = self.trainer.num_val_batches / \
                 self.plot_valid_per_epoch
-        self.board.draw(x, value, ('train_' if train else 'val_') + key,
+        self.board.draw(x, d2l.numpy(value), ('train_' if train else 'val_') + key,
                         every_n=int(n))
 
     def training_step(self, batch):
@@ -1116,16 +1116,20 @@ class PositionalEncoding(nn.Block):
         X = X + self.P[:, :X.shape[1], :].as_in_ctx(X.ctx)
         return self.dropout(X)
 
-class PositionWiseFFN(d2l.Module):
-    """Defined in :numref:`sec_transformer`"""
-    def __init__(self, num_hiddens, num_outputs):
-        super().__init__()
-        self.net = nn.Sequential()
-        self.net.add(nn.Dense(num_hiddens, activation='relu', flatten=False),
-                     nn.Dense(num_outputs, flatten=False))
-        self.net.initialize()
+class PositionWiseFFN(nn.Block):
+    """Positionwise feed-forward network.
 
-class TransformerAddNorm(nn.Block):
+    Defined in :numref:`sec_transformer`"""
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
+        super(PositionWiseFFN, self).__init__(**kwargs)
+        self.dense1 = nn.Dense(ffn_num_hiddens, flatten=False,
+                               activation='relu')
+        self.dense2 = nn.Dense(ffn_num_outputs, flatten=False)
+
+    def forward(self, X):
+        return self.dense2(self.dense1(X))
+
+class AddNorm(nn.Block):
     """Residual connection followed by layer normalization.
 
     Defined in :numref:`sec_transformer`"""
@@ -1137,7 +1141,7 @@ class TransformerAddNorm(nn.Block):
     def forward(self, X, Y):
         return self.ln(self.dropout(Y) + X)
 
-class TransformerEncoderBlock(nn.Block):
+class EncoderBlock(nn.Block):
     """Transformer encoder block.
 
     Defined in :numref:`sec_transformer`"""
