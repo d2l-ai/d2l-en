@@ -614,7 +614,7 @@ $P(\mathcal{B} \cup \mathcal{B}'|A = a) = P(\mathcal{B}|A = a) + P(\mathcal{B}'|
 
 
 Using the definition of conditional probabilities, 
-we can derive the famous result called *Bayes' Rule*.
+we can derive the famous result called *Bayes' theorem*.
 By construction, we have that $P(A, B) = P(B|A) P(A)$ 
 and $P(A, B) = P(A|B) P(B)$. 
 Combining both equations yields 
@@ -627,14 +627,14 @@ it allows us to reverse the order of conditioning.
 If we know how to estimate $P(B|A)$, $P(A)$, and $P(B)$,
 then we can estimate $P(A|B)$. 
 We often find it easier to estimate one term directly 
-but not the other and Bayes rule can come to the rescue here.
+but not the other and Bayes' theorem can come to the rescue here.
 For instance, if we know the prevalence of symptoms for a given disease,
 and the overall prevalences of the disease and symptoms, respectively,
 we can determine how likely someone is 
 to have the disease based on their symptoms.
 In some cases we might not have direct access to $P(B)$, 
 such as the prevalence of symptoms. 
-In this case a simplified version of Bayes' rule comes in handy:
+In this case a simplified version of Bayes' theorem comes in handy:
 
 $$P(A|B) \propto P(B|A) P(A)$$
 
@@ -650,7 +650,7 @@ encoded in the *prior* P(H),
 and a *likelihood function* that says how likely 
 one is to observe any value of the collected evidence 
 for each of the hypotheses in the class $P(E|H)$.
-Bayes rule is then interpreted as telling us
+Bayes' theorem is then interpreted as telling us
 how to update the initial *prior* P(H)
 in light of the available evidence E
 to produce *posterior* beliefs 
@@ -817,7 +817,7 @@ like a classifier hiding in plain sight
 where our ability to decide whether a patient is healthy 
 increases as we obtain more features (test outcomes). 
 We will pick up this idea in :ref:`sec_naive_bayes`,
-where we will inroduce Naive Bayes Classifiers, 
+where we will introduce naive Bayes classifiers, 
 using the approximation that all features occur independently. 
 
 
@@ -1012,7 +1012,7 @@ For an empirical review of this fact for large scale language models see :cite:`
 
 We also sharpened our language and tools for statistical modeling. 
 In the process of that we learned about conditional probabilities 
-and about one of the most important equations in statistics---Bayes' rule. 
+and about one of the most important equations in statistics---Bayes' theorem. 
 It is an effective tool for decoupling information conveyed by data 
 through a likelihood term $P(B|A)$ that addresses 
 how well observations $B$ match a choice of parameters $A$,
