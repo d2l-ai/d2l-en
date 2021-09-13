@@ -854,12 +854,12 @@ of the random variable $X$ is defined as
 
 $$E[X] = E_{x \sim P}[x] = \sum_{x} x P(X = x).$$
 
-Likewise, for densities we obtain $E[X] = \int x dp(x)$. 
+Likewise, for densities we obtain $E[X] = \int x \;dp(x)$. 
 Sometimes we are interested in the expected value
 of some function of $x$.
 We can calculate these expectations as
 
-$$E_{x \sim P}[f(x)] = \sum_x f(x) P(x) \text{ and } E_{x \sim P}[f(x)] = \int f(x) dp(x)$$
+$$E_{x \sim P}[f(x)] = \sum_x f(x) P(x) \text{ and } E_{x \sim P}[f(x)] = \int f(x) \;dp(x)$$
 
 for discrete probabilities and densities, respectively. 
 Returning to the investment example from above, 
