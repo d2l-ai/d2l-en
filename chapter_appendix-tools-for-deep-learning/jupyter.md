@@ -3,7 +3,7 @@
 
 This section describes how to edit and run the code
 in each section of this book
-using Jupyter Notebooks. Make sure you have
+using the Jupyter Notebook. Make sure you have
 installed Jupyter and downloaded the
 code as described in
 :ref:`chap_installation`.
@@ -98,7 +98,7 @@ jupyter notebook --NotebookApp.contents_manager_class='notedown.NotedownContents
 ```
 
 
-You may also turn on the notedown plugin by default whenever you run Jupyter Notebooks.
+You may also turn on the notedown plugin by default whenever you run the Jupyter Notebook.
 First, generate a Jupyter Notebook configuration file (if it has already been generated, you can skip this step).
 
 ```
@@ -115,9 +115,9 @@ c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager'
 
 After that, you only need to run the `jupyter notebook` command to turn on the notedown plugin by default.
 
-### Running the Jupyter Notebook on a Remote Server
+### Running Jupyter Notebooks on a Remote Server
 
-Sometimes, you may want to run Jupyter Notebooks on a remote server and access it through a browser on your local computer. If Linux or MacOS is installed on your local machine (Windows can also support this function through third-party software such as PuTTY), you can use port forwarding:
+Sometimes, you may want to run Jupyter notebooks on a remote server and access it through a browser on your local computer. If Linux or MacOS is installed on your local machine (Windows can also support this function through third-party software such as PuTTY), you can use port forwarding:
 
 ```
 ssh myserver -L 8888:localhost:8888
@@ -125,11 +125,12 @@ ssh myserver -L 8888:localhost:8888
 
 
 The above string `myserver` is the address of the remote server.
-Then we can use http://localhost:8888 to access the remote server `myserver` that runs Jupyter Notebooks. We will detail on how to run Jupyter Notebooks on AWS instances in the next section.
+Then we can use http://localhost:8888 to access the remote server `myserver` that runs Jupyter notebooks. We will detail on how to run Jupyter notebooks on AWS instances
+later in this appendix.
 
 ### Timing
 
-We can use the `ExecuteTime` plugin to time the execution of each code cell in Jupyter Notebooks.
+We can use the `ExecuteTime` plugin to time the execution of each code cell in Jupyter notebooks.
 Use the following commands to install the plugin:
 
 ```
@@ -141,14 +142,14 @@ jupyter nbextension enable execute_time/ExecuteTime
 
 ## Summary
 
-* Using Jupyter Notebooks, we can edit, run, and contribute to each section of the book.
-* We can run Jupyter Notebooks in remote servers using port forwarding.
+* Using the Jupyter Notebook tool, we can edit, run, and contribute to each section of the book.
+* We can run Jupyter notebooks on remote servers using port forwarding.
 
 
 ## Exercises
 
-1. Edit and run the code in this book locally.
-1. Edit and run the code in this book *remotely* via port forwarding.
+1. Edit and run the code in this book with the Jupyter Notebook on your local machine.
+1. Edit and run the code in this book with the Jupyter Notebook *remotely* via port forwarding.
 1. Measure running time of operations $\mathbf{A}^\top \mathbf{B}$ vs. $\mathbf{A} \mathbf{B}$ for two square matrices in $\mathbb{R}^{1024 \times 1024}$. Which one is faster?
 
 
