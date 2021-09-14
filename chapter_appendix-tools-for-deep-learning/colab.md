@@ -1,32 +1,40 @@
 # Using Google Colab
 :label:`sec_colab`
 
-We introduced how to run this book on AWS in :numref:`sec_sagemaker` and :numref:`sec_aws`. Another option is running this book on [Google Colab](https://colab.research.google.com/), which provides free GPU if you have a Google account.
+We introduced how to run this book on AWS in :numref:`sec_sagemaker` and :numref:`sec_aws`. Another option is running this book on [Google Colab](https://colab.research.google.com/)
+if you have a Google account.
 
-To run a section on Colab, you can simply click the `Colab` button to the right of the title of that section, such as in :numref:`fig_colab`. 
+To run the code of a section on Colab, simply click the `Colab` button as shown in :numref:`fig_colab`. 
 
-![Open a section on Colab](../img/colab.png)
+![Run the code of a section on Colab](../img/colab.png)
 :width:`300px`
 :label:`fig_colab`
 
 
-When it is the first time you execute a code cell, you will receive a warning message as shown in :numref:`fig_colab2`. You may click "RUN ANYWAY" to ignore it.
+If it is your first time to run a code cell,
+you will receive a warning message as shown in :numref:`fig_colab2`.
+Just click "RUN ANYWAY" to ignore it.
 
-![The warning message for running a section on Colab](../img/colab-2.png)
+![Ignore the warning message by clicking "RUN ANYWAY".](../img/colab-2.png)
 :width:`300px`
 :label:`fig_colab2`
 
-Next, Colab will connect you to an instance to run this notebook. Specifically, if GPU is needed, such as when invoking the `d2l.try_gpu()` function, we will request Colab to connect to a GPU instance automatically.
+Next, Colab will connect you to an instance to run the code of this section.
+Specifically, if a GPU is needed, 
+Colab will be automatically requested 
+for connecting to a GPU instance.
 
 
 ## Summary
 
-* You can use Google Colab to run each section of this book with GPUs.
+* You can use Google Colab to run each section's code in this book.
+* Colab will be requested to connect to a GPU instance if a GPU is needed in any section of this book.
 
 
 ## Exercises
 
-1. Try to edit and run the code in this book using Google Colab.
+1. Open any section of this book using Google Colab.
+1. Edit and run any section that requires a GPU using Google Colab.
 
 
 [Discussions](https://discuss.d2l.ai/t/424)
