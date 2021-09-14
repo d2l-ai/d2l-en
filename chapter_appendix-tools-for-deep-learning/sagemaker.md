@@ -96,27 +96,36 @@ First, you need to open a terminal as shown in :numref:`fig_sagemaker-terminal`.
 You may want to commit your local changes before pulling the updates. Alternatively, you can simply ignore all your local changes with the following commands in the terminal.
 
 :begin_tab:`mxnet`
+
 ```bash
 cd SageMaker/d2l-en-sagemaker/
 git reset --hard
 git pull
 ```
+
+
 :end_tab:
 
 :begin_tab:`pytorch`
+
 ```bash
 cd SageMaker/d2l-pytorch-sagemaker/
 git reset --hard
 git pull
 ```
+
+
 :end_tab:
 
 :begin_tab:`tensorflow`
+
 ```bash
 cd SageMaker/d2l-tensorflow-sagemaker/
 git reset --hard
 git pull
 ```
+
+
 :end_tab:
 
 ## Summary

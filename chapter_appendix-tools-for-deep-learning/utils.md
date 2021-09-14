@@ -37,7 +37,7 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-hyper parameters
+Hyperparameters.
 
 ```{.python .input}
 %%tab all
@@ -52,7 +52,7 @@ def save_hyperparameters(self, ignore=[]):
         setattr(self, k, v)
 ```
 
-progress bar
+Progress bar.
 
 ```{.python .input  n=22}
 %%tab all
@@ -95,14 +95,11 @@ def draw(self, x, y, label, every_n=1):
     axes.legend(plt_lines, labels)    
     display.display(self.fig)
     display.clear_output(wait=True)
-
-
-
 ```
 
-trainer
+Trainer
 
-a bunch of functions that will be deprecated
+A bunch of functions that will be deprecated:
 
 ```{.python .input}
 %%tab mxnet
@@ -658,4 +655,3 @@ def truncate_pad(line, num_steps, padding_token):
         return line[:num_steps]  # Truncate
     return line + [padding_token] * (num_steps - len(line))  # Pad
 ```
-
