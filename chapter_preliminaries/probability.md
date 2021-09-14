@@ -1039,23 +1039,25 @@ It tells us that draws from a distribution lie
 with at least 50% probability within a $2 \sigma$ interval of the expectation. 
 
 
+
+
 ## Exercises
 
 1. Give an example where observing more data can reduce the amount of uncertainty about the outcome to an arbitrarily low level. 
 1. Give an example where observing more data will only reduce the amount of uncertainty up to a point and then no further. Explain why this is the case and where you expect this point to occur.
-1. We empirically demonstrated convergence to the mean for the roll of a dice. Calculate the variance of the estimate of the probability that we see $1$ after drawing $n$ samples. 
+1. We empirically demonstrated convergence to the mean for the toss of a coin. Calculate the variance of the estimate of the probability that we see a head after drawing $n$ samples. 
     1. How does the variance scale with the number of observations? 
-    1. Use Chebyshev's Inequality to bound the deviation from the expectation. 
-    1. How does it relate to the Central Limit Theorem?
-1. Assume that we draw $n$ samples $x_i$ from a probability distribution with zero mean and unit variance. Compute the averages $z_m := m^{-1} \sum_{i=1}^m x_i$. Can we apply Chebyshev's Inequality for every $z_m$ independently? Why not?
-1. Given two events with probability $P(\mathcal{A})$ and $P(\mathcal{B})$, compute upper and lower bounds on $P(\mathcal{A} \cup \mathcal{B})$ and $P(\mathcal{A} \cap \mathcal{B})$. Hint: graph the situation using a [Venn Diagram](https://en.wikipedia.org/wiki/Venn_diagram).
-1. Assume that we have a sequence of random variables, say $A$, $B$, and $C$, where $B$ only depends on $A$, and $C$ only depends on $B$, can you simplify the joint probability $P(A, B, C)$? Hint: this is a [Markov Chain](https://en.wikipedia.org/wiki/Markov_chain).
-1. In :numref:`subsec_probability_hiv_app`, assume that the outcomes of the two tests are not independent. In particular assume that each test on its own has a false positive rate of 10% and a false negative rate of 1%. That is, assume that $P(D =1|H=0) = 0.1$ and that $P(D = 0|H=1) = 0.01$. Moreover, assume that for $H = 1$ (infected) the test outcomes are conditionally independent, i.e.; that $P(D_1, D_2|H=1) = P(D_1|H=1) P(D_2|H=1)$ but that for healthy patients the outcomes are coupled via $P(D_1 = D_2 = 1|H=0) = 0.02$. 
+    1. Use Chebyshev's inequality to bound the deviation from the expectation. 
+    1. How does it relate to the central limit theorem?
+1. Assume that we draw $n$ samples $x_i$ from a probability distribution with zero mean and unit variance. Compute the averages $z_m \stackrel{\mathrm{def}}{=} m^{-1} \sum_{i=1}^m x_i$. Can we apply Chebyshev's inequality for every $z_m$ independently? Why not?
+1. Given two events with probability $P(\mathcal{A})$ and $P(\mathcal{B})$, compute upper and lower bounds on $P(\mathcal{A} \cup \mathcal{B})$ and $P(\mathcal{A} \cap \mathcal{B})$. Hint: graph the situation using a [Venn diagram](https://en.wikipedia.org/wiki/Venn_diagram).
+1. Assume that we have a sequence of random variables, say $A$, $B$, and $C$, where $B$ only depends on $A$, and $C$ only depends on $B$, can you simplify the joint probability $P(A, B, C)$? Hint: this is a [Markov chain](https://en.wikipedia.org/wiki/Markov_chain).
+1. In :numref:`subsec_probability_hiv_app`, assume that the outcomes of the two tests are not independent. In particular assume that either test on its own has a false positive rate of 10% and a false negative rate of 1%. That is, assume that $P(D =1|H=0) = 0.1$ and that $P(D = 0|H=1) = 0.01$. Moreover, assume that for $H = 1$ (infected) the test outcomes are conditionally independent, i.e., that $P(D_1, D_2|H=1) = P(D_1|H=1) P(D_2|H=1)$ but that for healthy patients the outcomes are coupled via $P(D_1 = D_2 = 1|H=0) = 0.02$. 
     1. Work out the joint probability table for $D_1$ and $D_2$, given $H=0$ based on the information you have so far.
     1. Derive the probability of the patient being positive ($H=1$) after one test returns positive. You can assume the same baseline probability $P(H=1) = 0.0015$ as before. 
     1. Derive the probability of the patient being positive ($H=1$) after both tests return positive.
-1. Assume that you are an asset manager for an investment bank and you have a choice of stocks $s_i$ to invest in. Your portfolio needs to add up to $1$ with weights $\alpha_i$ for each stock. The stocks have an average return $\mathbf{\mu} = E_{s \sim P}[\mathbf{s}]$ and covariance $\Sigma = \mathrm{Cov}_{\mathbf{s} \sim P}[\mathbf{s}]$.
-    1. Compute the expected return for a given portfolio $\alpha$.
+1. Assume that you are an asset manager for an investment bank and you have a choice of stocks $s_i$ to invest in. Your portfolio needs to add up to $1$ with weights $\alpha_i$ for each stock. The stocks have an average return $\boldsymbol{\mu} = E_{\mathbf{s} \sim P}[\mathbf{s}]$ and covariance $\boldsymbol{\Sigma} = \mathrm{Cov}_{\mathbf{s} \sim P}[\mathbf{s}]$.
+    1. Compute the expected return for a given portfolio $\boldsymbol{\alpha}$.
     1. If you wanted to maximize the return of the portfolio, how should you choose your investment?
     1. Compute the *variance* of the portfolio. 
     1. Formulate an optimization problem of maximizing the return while keeping the variance constrained to an upper bound. This is the Nobel-Prize winning [Markovitz portfolio](https://en.wikipedia.org/wiki/Markowitz_model) :cite:`mangram2013simplified`. To solve it you will need a quadratic programming solver, something way beyond the scope of this book.
