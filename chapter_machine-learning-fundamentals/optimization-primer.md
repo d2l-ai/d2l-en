@@ -1,0 +1,3 @@
+# Optimization Primer
+
+TODO

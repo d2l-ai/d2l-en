@@ -31,7 +31,7 @@ techniques and their implementations,
 we rely on some basic mathematics and computational graphs.
 To start, we focus our exposition on
 a one-hidden-layer MLP
-with weight decay ($\ell_2$ regularization).
+with weight decay ($\ell_2$ regularization, to be described in subsequent chapters).
 
 ## Forward Propagation
 
@@ -79,7 +79,8 @@ for a single data example,
 
 $$L = l(\mathbf{o}, y).$$
 
-According to the definition of $\ell_2$ regularization,
+According to the definition of $\ell_2$ regularization
+that we will introduce later,
 given the hyperparameter $\lambda$,
 the regularization term is
 

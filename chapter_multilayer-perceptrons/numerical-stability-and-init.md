@@ -230,14 +230,15 @@ the network's expressive power.
 The hidden layer would behave
 as if it had only a single unit.
 Note that while minibatch stochastic gradient descent would not break this symmetry,
-dropout regularization would!
+dropout regularization (to be introduced later) would!
 
 
 ## Parameter Initialization
 
 One way of addressing---or at least mitigating---the
 issues raised above is through careful initialization.
-Additional care during optimization
+As we will see later,
+additional care during optimization
 and suitable regularization can further enhance stability.
 
 
