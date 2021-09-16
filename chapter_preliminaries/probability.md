@@ -1,17 +1,17 @@
-# Probability and Statistics Primer
+# Probability and Statistics
 :label:`sec_prob`
 
 One way or another, 
 machine learning is all about uncertainty.
 In supervised learning, we want to predict 
-something *unknown* (the *target*)
-given something *known* (the *features*). 
+something unknown (the *target*)
+given something known (the *features*). 
 Depending on our objective, 
 we might attempt to predict 
-the most *likely* value of the target.
+the most likely value of the target.
 Or we might predict the value with the smallest
-*expected* distance from the target.
-An sometimes we wish not only
+expected distance from the target.
+And sometimes we wish not only
 to predict a specific value
 but to *quantify our uncertainty*.
 For example, given some features 
@@ -48,7 +48,7 @@ to formalize our reasoning under uncertainty.
 Bayesian probability is characterized 
 by two unique features:
 (i) assigning degrees of belief 
-to non-repeatable events;
+to non-repeatable events,
 e.g., what is the *probability* 
 that the moon is made out of cheese?;
 and (ii) subjectivity---while Bayesian
@@ -65,10 +65,10 @@ that generated the data.
 Whenever we analyze a dataset, hunting for patterns
 that we hope might characterize a broader population,
 we are employing statistical thinking.
-Entire courses, majors, theses, careers, departments,
+Most courses, majors, theses, careers, departments,
 companies, and institutions have been devoted 
 to the study of probability and statistics. 
-While section only scratches the surface,
+While this section only scratches the surface,
 we will provide the foundation
 that you need to begin building models.
 
@@ -78,7 +78,7 @@ that you need to begin building models.
 
 Imagine that we plan to toss a coin
 and want to quantify how likely
-we are to see heads (vs tails).
+we are to see heads (vs. tails).
 If the coin is *fair*, 
 then both outcomes 
 (heads and tails), 
@@ -104,7 +104,7 @@ you might never see a trial
 where $n_h = n_t$ exactly.
 
 
-Formally, the quantity *1/2* is called a *probability*
+Formally, the quantity $1/2$ is called a *probability*
 and here it captures the certainty with which 
 any given toss will come up heads.
 Probabilities assign scores between $0$ and $1$
@@ -460,7 +460,7 @@ can share the same underlying sample space.
 For example "whether my home alarm goes off"
 and "whether my house was burglarized"
 are both binary random variables 
-that we share an underlying sample space. 
+that share an underlying sample space. 
 Consequently, knowing the value taken by one random variable 
 can tell us something about the likely value of another random variable.
 Knowing that the alarm went off, 
@@ -474,7 +474,7 @@ takes value $v$, denoted by $X=v$, is an *event*
 and $P(X=v)$ denotes its probability.
 Sometimes this notation can get clunky,
 and we can abuse notation when the context is clear.
-For example, we might use *P(X)* to refer broadly
+For example, we might use $P(X)$ to refer broadly
 to the *distribution* of $X$, i.e., 
 the function that tells us the probability
 that $X$ takes any given value. 
@@ -483,7 +483,7 @@ like $P(X,Y) = P(X) P(Y)$,
 as a shorthand to express a statement 
 that is true for all of the values
 that the random variables $X$ and $Y$ can take, i.e.,
-for all $i,j$ $P(X=i \textrm{ and } Y=j) = P(X=i)P(Y=j)$.
+for all $i,j$ it holds that $P(X=i \textrm{ and } Y=j) = P(X=i)P(Y=j)$.
 Other times, we abuse notation by writing
 $P(v)$ when the random variable is clear from the context. 
 Since an event in probability theory is a set of outcomes from the sample space,
@@ -492,9 +492,9 @@ For example, $P(1 \leq X \leq 3)$ denotes the probability of the event $\{1 \leq
 
 
 Note that there is a subtle difference 
-between *discrete*-valued random variables,
+between *discrete* random variables,
 like flips of a coin or tosses of a die, 
-and *continuous*-valued ones,
+and *continuous* ones,
 like the weight and the height of a person
 sampled at random from the population.
 In this case we seldom really care about 
@@ -523,7 +523,7 @@ over that interval.
 
 ## Multiple Random Variables
 
-You might have noticed that we couldn't eve
+You might have noticed that we couldn't even
 make it past the last section without
 making statements involving interactions 
 among multiple random variables
@@ -562,7 +562,7 @@ to every combination of values
 that the variables can jointly take.
 The probability function that assigns
 probabilities to each of these combinations
-(e.g. $A=a$ AND $B=b$),
+(e.g. $A=a$ and $B=b$)
 is called the *joint probability* function
 and simply returns the probability assigned 
 to the intersection of the corresponding subsets
@@ -571,8 +571,9 @@ The *joint probability* assigned to the event
 where random variables $A$ and $B$ 
 take values $a$ and $b$, respectively,
 is denoted $P(A = a, B = b)$,
-where the comma indicates "AND". 
+where the comma indicates "and". 
 Note that for any values $a$ and $b$,
+it holds that
 $P(A=a, B=b) \leq P(A=a)$ 
 and $P(A=a, B=b) \leq P(B = b)$,
 since for $A=a$ and $B=b$ to happen,
@@ -658,15 +659,14 @@ $P(H|E) = \frac{P(E|H) P(H)}{P(E)}$.
 Informally, this can be stated as 
 "posterior equals prior times likelihood, divided by the evidence".
 Now, because the evidence $P(E)$ is the same for all hypotheses,
-we can get away with using the simplified form
-and simply normalize over the hypotheses.
+we can get away with simply normalizing over the hypotheses.
 
 Note that $\sum_a P(A=a|B) = 1$ also allows us to *marginalize* over random variables. That is, we can drop variables from a joint distribution such as $P(A, B)$. After all, we have that 
 
 $$\sum_a P(A=a, B) = P(B) \sum_a P(A = a|B) = P(B).$$
 
 Independence is another fundamentally important concept
-that you forms the backbone of 
+that forms the backbone of 
 many important ideas in statistics.
 In short, two variables are *independent*
 if conditioning on the value of $A$ does not
@@ -685,7 +685,7 @@ should not influence the probability
 of $B$ coming up heads.
 
 
-Independence is especially when it holds among the successive 
+Independence is especially useful when it holds among the successive 
 draws of our data from some underlying distribution 
 (allowing us to make strong statistical conclusions)
 or when it holds among various variables in our data,
@@ -698,9 +698,9 @@ specifically because we believe
 that diseases and symptoms are *not* independent. 
 
 
-Note that because conditional probabilities are fully functioning probabilities,
-independence and dependence are properties that also apply there. 
-Two random variables $A$ and $B$ are conditionally independent 
+Note that because conditional probabilities are proper probabilities,
+the concepts of independence and dependence also apply to them. 
+Two random variables $A$ and $B$ are *conditionally independent* 
 given a third variable $C$ if and only if $P(A, B|C) = P(A|C)P(B|C)$.
 Interestingly, two variables can be independent in general
 but become dependent when conditioning on a third. 
@@ -838,15 +838,14 @@ averaging over all the possible outcomes
 (and weighting by the appropriate probabilities).
 For instance, say that with 50% probability, 
 an investment might fail altogether,
-with 40% probability it might provide a 2x return,
-and with 10% probability it might provide a 10x return 10x.
+with 40% probability it might provide a 2$\times$ return,
+and with 10% probability it might provide a 10$\times$ return 10$\times$.
 To calculate the expected return,
 we sum over all returns, multiplying each
 by the probability that they will occur. 
 This yields the expectation 
 $0.5 \cdot 0 + 0.4 \cdot 2 + 0.1 \cdot 10 = 1.8$. 
-Hence the expected return is 80%
-(1.8 times the initial investment).
+Hence the expected return is 1.8$\times$.
 
 
 In general, the *expectation* (or average)
@@ -880,7 +879,7 @@ Reasoning like this motivates the cliché
 that "the utility of money is logarithmic".
 
 
-If  the utility associated with a total loss were $-1$,
+If  the utility associated with a total loss were -1,
 and the utilities associated with returns of 1, 2, and 10 
 were 1, 2 and 4, respectively, 
 then the expected happiness of investing 
@@ -904,7 +903,7 @@ and thus $E[X - E[X]] = E[X] - E[E[X]] = 0$.
 However, we can look at the expectation 
 of any non-negative function of this difference.
 The *variance* of a random variable is calculated by looking 
-at the expected value of the *squared* deviations.
+at the expected value of the *squared* deviations:
 
 $$\mathrm{Var}[X] = E\left[(X - E[X])^2\right] = E[X^2] - E[X]^2.$$
 
@@ -938,29 +937,29 @@ to parametrize a Gaussian distribution.
 In the same way as we introduced expectations 
 and variance for *scalar* random variables, 
 we can do so for vector-valued ones. 
-Expectations are easy, since we can apply them element-wise. 
-For instance, $\mathbf{\mu} := E_{\mathbf{x} \sim P}[\mathbf{x}]$ 
+Expectations are easy, since we can apply them elementwise. 
+For instance, $\boldsymbol{\mu} \stackrel{\mathrm{def}}{=} E_{\mathbf{x} \sim P}[\mathbf{x}]$ 
 has coordinates $\mu_i = E_{\mathbf{x} \sim P}[x_i]$.
 Covariances are more complicated. 
 We resolve the problem by taking expectations of the *outer product* 
 of the difference between random variables and their mean. 
 
-$$\Sigma := \mathrm{Cov}_{\mathbf{x} \sim P}[\mathbf{x}] = E_{\mathbf{x} \sim P}\left[(\mathbf{x} - \mathbf{\mu}) (\mathbf{x} - \mathbf{\mu})^\top\right].$$
+$$\boldsymbol{\Sigma} \stackrel{\mathrm{def}}{=} \mathrm{Cov}_{\mathbf{x} \sim P}[\mathbf{x}] = E_{\mathbf{x} \sim P}\left[(\mathbf{x} - \boldsymbol{\mu}) (\mathbf{x} - \boldsymbol{\mu})^\top\right].$$
 
-This matrix $\Sigma$ is referred to as the covariance matrix. 
+This matrix $\boldsymbol{\Sigma}$ is referred to as the covariance matrix. 
 An easy way to see its effect is to consider some vector $\mathbf{v}$ 
 of the same size as $\mathbf{x}$. 
 It follows that 
 
-$$\mathbf{v}^\top \Sigma \mathbf{v} = E_{\mathbf{x} \sim P}\left[\mathbf{v}^\top(\mathbf{x} - \mathbf{\mu}) (\mathbf{x} - \mathbf{\mu})^\top \mathbf{v}\right] = \mathrm{Var}_{x \sim P}[\mathbf{v}^\top \mathbf{x}].$$
+$$\mathbf{v}^\top \boldsymbol{\Sigma} \mathbf{v} = E_{\mathbf{x} \sim P}\left[\mathbf{v}^\top(\mathbf{x} - \boldsymbol{\mu}) (\mathbf{x} - \boldsymbol{\mu})^\top \mathbf{v}\right] = \mathrm{Var}_{x \sim P}[\mathbf{v}^\top \mathbf{x}].$$
 
-As such, $\Sigma$ allows us to compute the variance 
+As such, $\boldsymbol{\Sigma}$ allows us to compute the variance 
 for any linear function of $\mathbf{x}$
 by a simple matrix multiplication. 
 The off-diagonal elements tell us how correlated coordinates are:
 a value of 0 means no correlation, 
-whereas a large positive value 
-means that they are strongly correlated. 
+where a larger positive value 
+means that they are more strongly correlated. 
 
 
 
@@ -975,7 +974,7 @@ is even from the same distribution as the training data.
 By *aleatoric uncertainty*, we denote that uncertainty 
 that is intrinsic to the problem, 
 and due to genuine randomness 
-unaccounted for by the observed variables, 
+unaccounted for by the observed variables.
 By *epistemic uncertainty*, we denote uncertainty
 over a model's parameters, the sort of uncertainty
 that we can hope to reduce by collecting more data.
@@ -989,7 +988,7 @@ No matter how long we watch someone tossing a fair coin,
 we will never be more or less than 50% certain 
 that the next toss will come up heads.
 These terms owe to literature in mechanical modeling,
-(see e.g., :cite:`der2009aleatory` for a review on this aspect of [Uncertainty Quantification](https://en.wikipedia.org/wiki/Uncertainty_quantification)).
+(see e.g., :cite:`der2009aleatory` for a review on this aspect of [uncertainty quantification](https://en.wikipedia.org/wiki/Uncertainty_quantification)).
 It's worth noting that these terms constitute a slight abuse of language.
 The term *epistemic* refers to anything concerning *knowledge*
 and thus in the philosophical sense, all uncertainty is epistemic.
@@ -1031,12 +1030,14 @@ While there are many more than just linear and quadratic
 expectations for a probability distribution, 
 these two already provide a good deal of knowledge 
 about the possible behavior of the distribution. 
-For instance, [Chebyshev's Inequality](https://en.wikipedia.org/wiki/Chebyshev%27s_inequality)
+For instance, [Chebyshev's inequality](https://en.wikipedia.org/wiki/Chebyshev%27s_inequality)
 states that $P(|X - \mu| \geq k \sigma) \leq 1/k^2$, 
-where $\mu$ is the expectation, $\sigma^2$ is the variance of the distribution 
+where $\mu$ is the expectation, $\sigma^2$ is the variance of the distribution,
 and $k > 1$ is a confidence parameter of our choosing. 
 It tells us that draws from a distribution lie 
-with at least 50% probability within a $2 \sigma$ interval of the expectation. 
+with at least 50% probability 
+within a $[-\sqrt{2} \sigma, \sqrt{2} \sigma]$
+interval centered on the expectation.
 
 
 
