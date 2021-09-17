@@ -1,4 +1,4 @@
-# Deep Learning Computation
+# Builders' Guide
 :label:`chap_computation`
 
 Alongside giant datasets and powerful hardware,
