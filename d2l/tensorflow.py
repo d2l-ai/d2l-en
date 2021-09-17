@@ -144,7 +144,7 @@ class HyperParameters:
 
     def save_hyperparameters(self, ignore=[]):
         """Save function arguments into class attributes.
-
+    
         Defined in :numref:`sec_utils`"""
         frame = inspect.currentframe().f_back
         _, _, _, local_vars = inspect.getargvalues(frame)
@@ -277,7 +277,7 @@ class DataModule(d2l.HyperParameters):
         shuffle_buffer = tensors[0].shape[0] if train else 1
         return tf.data.Dataset.from_tensor_slices(tensors).shuffle(
             buffer_size=shuffle_buffer).batch(self.batch_size)
-
+    
 
 class Trainer(d2l.HyperParameters):
     """Defined in :numref:`sec_d2l_apis`"""
@@ -370,7 +370,7 @@ class LinearRegressionScratch(d2l.Module):
 
     def forward(self, X):
         """The linear regression model.
-
+    
         Defined in :numref:`sec_linear_scratch`"""
         return d2l.matmul(X, self.w) + self.b
 
@@ -402,7 +402,7 @@ class LinearRegression(d2l.Module):
 
     def forward(self, X):
         """The linear regression model.
-
+    
         Defined in :numref:`sec_linear_concise`"""
         return self.net(X)
 
@@ -428,7 +428,7 @@ class FashionMNIST(d2l.DataModule):
 
     def text_labels(self, indices):
         """Return text labels.
-
+    
         Defined in :numref:`sec_fashion_mnist`"""
         labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
@@ -466,7 +466,7 @@ class Classification(d2l.Module):
 
     def accuracy(self, Y_hat, Y, averaged=True):
         """Compute the number of correct predictions.
-
+    
         Defined in :numref:`sec_classification`"""
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         preds = d2l.astype(d2l.argmax(Y_hat, axis=1), Y.dtype)
@@ -669,7 +669,7 @@ class RNNLMScratch(d2l.Classification):
         embs = self.one_hot(X)
         hiddens, _ = self.rnn(embs)
         return self.output_layer(hiddens)
-
+    
 
     def output_layer(self, hiddens):
         """Defined in :numref:`sec_rnn_scratch`"""
@@ -777,7 +777,7 @@ class MTFraEng(d2l.DataModule):
         self.save_hyperparameters()
         self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
             self._download())
-
+    
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
         """Defined in :numref:`sec_machine_translation`"""
@@ -1693,266 +1693,3 @@ repeat = tf.repeat
 batch_matmul = tf.matmul
 numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
-                           '94646ad1522d915e7b0f9296181140edcf86a4f5')
-
-
-def read_data_nmt():
-    """Load the English-French dataset."""
-    data_dir = d2l.download_extract('fra-eng')
-    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
-        return f.read()
-
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def preprocess_nmt(text):
-    """Preprocess the English-French dataset."""
-    def no_space(char, prev_char):
-        return char in set(',.!?') and prev_char != ' '
-
-    # Replace non-breaking space with space, and convert uppercase letters to
-    # lowercase ones
-    text = text.replace('\u202f', ' ').replace('\xa0', ' ').lower()
-    # Insert space between words and punctuation marks
-    out = [
-        ' ' + char if i > 0 and no_space(char, text[i - 1]) else char
-        for i, char in enumerate(text)]
-    return ''.join(out)
-
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def tokenize_nmt(text, num_examples=None):
-    """Tokenize the English-French dataset."""
-    source, target = [], []
-    for i, line in enumerate(text.split('\n')):
-        if num_examples and i > num_examples:
-            break
-        parts = line.split('\t')
-        if len(parts) == 2:
-            source.append(parts[0].split(' '))
-            target.append(parts[1].split(' '))
-    return source, target
-
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
-    """Plot the histogram for list length pairs."""
-    d2l.set_figsize()
-    _, _, patches = d2l.plt.hist([[len(l) for l in xlist],
-                                  [len(l) for l in ylist]])
-    d2l.plt.xlabel(xlabel)
-    d2l.plt.ylabel(ylabel)
-    for patch in patches[1].patches:
-        patch.set_hatch('/')
-    d2l.plt.legend(legend)
-
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def truncate_pad(line, num_steps, padding_token):
-    """Truncate or pad sequences."""
-    if len(line) > num_steps:
-        return line[:num_steps]  # Truncate
-    return line + [padding_token] * (num_steps - len(line))  # Pad
-
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def build_array_nmt(lines, vocab, num_steps):
-    """Transform text sequences of machine translation into minibatches."""
-    lines = [vocab[l] for l in lines]
-    lines = [l + [vocab['<eos>']] for l in lines]
-    array = d2l.tensor([
-        truncate_pad(l, num_steps, vocab['<pad>']) for l in lines])
-    valid_len = d2l.reduce_sum(d2l.astype(array != vocab['<pad>'], d2l.int32),
-                               1)
-    return array, valid_len
-
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def load_data_nmt(batch_size, num_steps, num_examples=600):
-    """Return the iterator and the vocabularies of the translation dataset."""
-    text = preprocess_nmt(read_data_nmt())
-    source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=2,
-                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    tgt_vocab = d2l.Vocab(target, min_freq=2,
-                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    src_array, src_valid_len = build_array_nmt(source, src_vocab, num_steps)
-    tgt_array, tgt_valid_len = build_array_nmt(target, tgt_vocab, num_steps)
-    data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
-    data_iter = d2l.load_array(data_arrays, batch_size)
-    return data_iter, src_vocab, tgt_vocab
-
-# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
-class Encoder(tf.keras.layers.Layer):
-    """The base encoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Encoder, self).__init__(**kwargs)
-
-    def call(self, X, *args, **kwargs):
-        raise NotImplementedError
-
-
-# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
-class Decoder(tf.keras.layers.Layer):
-    """The base decoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Decoder, self).__init__(**kwargs)
-
-    def init_state(self, enc_outputs, *args):
-        raise NotImplementedError
-
-    def call(self, X, state, **kwargs):
-        raise NotImplementedError
-
-
-# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
-class EncoderDecoder(tf.keras.Model):
-    """The base class for the encoder-decoder architecture."""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoder, self).__init__(**kwargs)
-        self.encoder = encoder
-        self.decoder = decoder
-
-    def call(self, enc_X, dec_X, *args, **kwargs):
-        enc_outputs = self.encoder(enc_X, *args, **kwargs)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state, **kwargs)
-
-
-# Defined in file: ./chapter_recurrent-modern/seq2seq.md
-class Seq2SeqEncoder(d2l.Encoder):
-    """The RNN encoder for sequence to sequence learning."""
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super().__init__(*kwargs)
-        # Embedding layer
-        self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
-        self.rnn = tf.keras.layers.RNN(
-            tf.keras.layers.StackedRNNCells([
-                tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)
-                for _ in range(num_layers)]), return_sequences=True,
-            return_state=True)
-
-    def call(self, X, *args, **kwargs):
-        # The input `X` shape: (`batch_size`, `num_steps`)
-        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
-        X = self.embedding(X)
-        output = self.rnn(X, **kwargs)
-        state = output[1:]
-        return output[0], state
-
-
-# Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def sequence_mask(X, valid_len, value=0):
-    """Mask irrelevant entries in sequences."""
-    maxlen = X.shape[1]
-    mask = tf.range(start=0, limit=maxlen,
-                    dtype=tf.float32)[None, :] < tf.cast(
-                        valid_len[:, None], dtype=tf.float32)
-
-    if len(X.shape) == 3:
-        return tf.where(tf.expand_dims(mask, axis=-1), X, value)
-    else:
-        return tf.where(mask, X, value)
-
-
-# Defined in file: ./chapter_recurrent-modern/seq2seq.md
-class MaskedSoftmaxCELoss(tf.keras.losses.Loss):
-    """The softmax cross-entropy loss with masks."""
-    def __init__(self, valid_len):
-        super().__init__(reduction='none')
-        self.valid_len = valid_len
-
-    # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
-    # `label` shape: (`batch_size`, `num_steps`)
-    # `valid_len` shape: (`batch_size`,)
-    def call(self, label, pred):
-        weights = tf.ones_like(label, dtype=tf.float32)
-        weights = sequence_mask(weights, self.valid_len)
-        label_one_hot = tf.one_hot(label, depth=pred.shape[-1])
-        unweighted_loss = tf.keras.losses.CategoricalCrossentropy(
-            from_logits=True, reduction='none')(label_one_hot, pred)
-        weighted_loss = tf.reduce_mean((unweighted_loss * weights), axis=1)
-        return weighted_loss
-
-
-# Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
-    """Train a model for sequence to sequence."""
-    optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
-    animator = d2l.Animator(xlabel="epoch", ylabel="loss",
-                            xlim=[10, num_epochs])
-    for epoch in range(num_epochs):
-        timer = d2l.Timer()
-        metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
-        for batch in data_iter:
-            X, X_valid_len, Y, Y_valid_len = [x for x in batch]
-            bos = tf.reshape(tf.constant([tgt_vocab['<bos>']] * Y.shape[0]),
-                             shape=(-1, 1))
-            dec_input = tf.concat([bos, Y[:, :-1]], 1)  # Teacher forcing
-            with tf.GradientTape() as tape:
-                Y_hat, _ = net(X, dec_input, X_valid_len, training=True)
-                l = MaskedSoftmaxCELoss(Y_valid_len)(Y, Y_hat)
-            gradients = tape.gradient(l, net.trainable_variables)
-            gradients = d2l.grad_clipping(gradients, 1)
-            optimizer.apply_gradients(zip(gradients, net.trainable_variables))
-            num_tokens = tf.reduce_sum(Y_valid_len).numpy()
-            metric.add(tf.reduce_sum(l), num_tokens)
-        if (epoch + 1) % 10 == 0:
-            animator.add(epoch + 1, (metric[0] / metric[1],))
-    print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
-          f'tokens/sec on {str(device)}')
-
-
-# Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
-                    save_attention_weights=False):
-    """Predict for sequence to sequence."""
-    src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
-        src_vocab['<eos>']]
-    enc_valid_len = tf.constant([len(src_tokens)])
-    src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
-    # Add the batch axis
-    enc_X = tf.expand_dims(src_tokens, axis=0)
-    enc_outputs = net.encoder(enc_X, enc_valid_len, training=False)
-    dec_state = net.decoder.init_state(enc_outputs, enc_valid_len)
-    # Add the batch axis
-    dec_X = tf.expand_dims(tf.constant([tgt_vocab['<bos>']]), axis=0)
-    output_seq, attention_weight_seq = [], []
-    for _ in range(num_steps):
-        Y, dec_state = net.decoder(dec_X, dec_state, training=False)
-        # We use the token with the highest prediction likelihood as the input
-        # of the decoder at the next time step
-        dec_X = tf.argmax(Y, axis=2)
-        pred = tf.squeeze(dec_X, axis=0)
-        # Save attention weights
-        if save_attention_weights:
-            attention_weight_seq.append(net.decoder.attention_weights)
-        # Once the end-of-sequence token is predicted, the generation of the
-        # output sequence is complete
-        if pred == tgt_vocab['<eos>']:
-            break
-        output_seq.append(pred.numpy())
-    return ' '.join(
-        tgt_vocab.to_tokens(
-            tf.reshape(output_seq,
-                       shape=-1).numpy().tolist())), attention_weight_seq
-
-
-# Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def bleu(pred_seq, label_seq, k):
-    """Compute the BLEU."""
-    pred_tokens, label_tokens = pred_seq.split(' '), label_seq.split(' ')
-    len_pred, len_label = len(pred_tokens), len(label_tokens)
-    score = math.exp(min(0, 1 - len_label / len_pred))
-    for n in range(1, k + 1):
-        num_matches, label_subs = 0, collections.defaultdict(int)
-        for i in range(len_label - n + 1):
-            label_subs[''.join(label_tokens[i:i + n])] += 1
-        for i in range(len_pred - n + 1):
-            if label_subs[''.join(pred_tokens[i:i + n])] > 0:
-                num_matches += 1
-                label_subs[''.join(pred_tokens[i:i + n])] -= 1
-        score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
-    return score
