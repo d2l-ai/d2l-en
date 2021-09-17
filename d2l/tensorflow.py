@@ -1692,36 +1692,3 @@ expand_dims = tf.expand_dims
 repeat = tf.repeat
 batch_matmul = tf.matmul
 numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
-
-# Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def sequence_mask(X, valid_len, value=0):
-    """Mask irrelevant entries in sequences."""
-    maxlen = X.shape[1]
-    mask = tf.range(start=0, limit=maxlen,
-                    dtype=tf.float32)[None, :] < tf.cast(
-                        valid_len[:, None], dtype=tf.float32)
-
-    if len(X.shape) == 3:
-        return tf.where(tf.expand_dims(mask, axis=-1), X, value)
-    else:
-        return tf.where(mask, X, value)
-
-
-# Defined in file: ./chapter_recurrent-modern/seq2seq.md
-class MaskedSoftmaxCELoss(tf.keras.losses.Loss):
-    """The softmax cross-entropy loss with masks."""
-    def __init__(self, valid_len):
-        super().__init__(reduction='none')
-        self.valid_len = valid_len
-
-    # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
-    # `label` shape: (`batch_size`, `num_steps`)
-    # `valid_len` shape: (`batch_size`,)
-    def call(self, label, pred):
-        weights = tf.ones_like(label, dtype=tf.float32)
-        weights = sequence_mask(weights, self.valid_len)
-        label_one_hot = tf.one_hot(label, depth=pred.shape[-1])
-        unweighted_loss = tf.keras.losses.CategoricalCrossentropy(
-            from_logits=True, reduction='none')(label_one_hot, pred)
-        weighted_loss = tf.reduce_mean((unweighted_loss * weights), axis=1)
-        return weighted_loss
