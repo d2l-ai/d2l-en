@@ -2846,17 +2846,3 @@ reduce_mean = lambda x, *args, **kwargs: x.mean(*args, **kwargs)
 expand_dims = lambda x, *args, **kwargs: x.unsqueeze(*args, **kwargs)
 swapaxes = lambda x, *args, **kwargs: x.swapaxes(*args, **kwargs)
 repeat = lambda x, *args, **kwargs: x.repeat(*args, **kwargs)
-
-def load_data_nmt(batch_size, num_steps, num_examples=600):
-    """Return the iterator and the vocabularies of the translation dataset."""
-    text = preprocess_nmt(read_data_nmt())
-    source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=2,
-                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    tgt_vocab = d2l.Vocab(target, min_freq=2,
-                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    src_array, src_valid_len = build_array_nmt(source, src_vocab, num_steps)
-    tgt_array, tgt_valid_len = build_array_nmt(target, tgt_vocab, num_steps)
-    data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
-    data_iter = d2l.load_array(data_arrays, batch_size)
-    return data_iter, src_vocab, tgt_vocab
