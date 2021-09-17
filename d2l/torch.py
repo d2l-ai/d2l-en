@@ -156,7 +156,7 @@ class HyperParameters:
 
     def save_hyperparameters(self, ignore=[]):
         """Save function arguments into class attributes.
-    
+
         Defined in :numref:`sec_utils`"""
         frame = inspect.currentframe().f_back
         _, _, _, local_vars = inspect.getargvalues(frame)
@@ -341,14 +341,14 @@ class Trainer(d2l.HyperParameters):
         """Defined in :numref:`sec_use_gpu`"""
         self.save_hyperparameters()
         self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
-    
+
 
     def prepare_batch(self, batch):
         """Defined in :numref:`sec_use_gpu`"""
         if self.gpus:
             batch = [d2l.to(a, self.gpus[0]) for a in batch]
         return batch
-    
+
 
     def prepare_model(self, model):
         """Defined in :numref:`sec_use_gpu`"""
@@ -390,7 +390,7 @@ class LinearRegressionScratch(d2l.Module):
 
     def forward(self, X):
         """The linear regression model.
-    
+
         Defined in :numref:`sec_linear_scratch`"""
         return d2l.matmul(X, self.w) + self.b
 
@@ -427,7 +427,7 @@ class LinearRegression(d2l.Module):
 
     def forward(self, X):
         """The linear regression model.
-    
+
         Defined in :numref:`sec_linear_concise`"""
         return self.net(X)
 
@@ -458,7 +458,7 @@ class FashionMNIST(d2l.DataModule):
 
     def text_labels(self, indices):
         """Return text labels.
-    
+
         Defined in :numref:`sec_fashion_mnist`"""
         labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
@@ -492,7 +492,7 @@ class Classification(d2l.Module):
 
     def accuracy(self, Y_hat, Y, averaged=True):
         """Compute the number of correct predictions.
-    
+
         Defined in :numref:`sec_classification`"""
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         preds = d2l.astype(d2l.argmax(Y_hat, axis=1), Y.dtype)
@@ -694,7 +694,7 @@ class RNNLMScratch(d2l.Classification):
         embs = self.one_hot(X)
         hiddens, _ = self.rnn(embs)
         return self.output_layer(hiddens)
-    
+
 
     def output_layer(self, hiddens):
         """Defined in :numref:`sec_rnn_scratch`"""
@@ -791,7 +791,7 @@ class MTFraEng(d2l.DataModule):
         self.save_hyperparameters()
         self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
             self._download())
-    
+
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
         """Defined in :numref:`sec_machine_translation`"""
@@ -2847,3 +2847,28 @@ expand_dims = lambda x, *args, **kwargs: x.unsqueeze(*args, **kwargs)
 swapaxes = lambda x, *args, **kwargs: x.swapaxes(*args, **kwargs)
 repeat = lambda x, *args, **kwargs: x.repeat(*args, **kwargs)
 
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+def sequence_mask(X, valid_len, value=0):
+    """Mask irrelevant entries in sequences."""
+    maxlen = X.size(1)
+    mask = torch.arange((maxlen), dtype=torch.float32,
+                        device=X.device)[None, :] < valid_len[:, None]
+    X[~mask] = value
+    return X
+
+
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
+    """The softmax cross-entropy loss with masks."""
+
+    # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
+    # `label` shape: (`batch_size`, `num_steps`)
+    # `valid_len` shape: (`batch_size`,)
+    def forward(self, pred, label, valid_len):
+        weights = torch.ones_like(label)
+        weights = sequence_mask(weights, valid_len)
+        self.reduction = 'none'
+        unweighted_loss = super(MaskedSoftmaxCELoss,
+                                self).forward(pred.permute(0, 2, 1), label)
+        weighted_loss = (unweighted_loss * weights).mean(dim=1)
+        return weighted_loss

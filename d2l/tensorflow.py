@@ -144,7 +144,7 @@ class HyperParameters:
 
     def save_hyperparameters(self, ignore=[]):
         """Save function arguments into class attributes.
-    
+
         Defined in :numref:`sec_utils`"""
         frame = inspect.currentframe().f_back
         _, _, _, local_vars = inspect.getargvalues(frame)
@@ -277,7 +277,7 @@ class DataModule(d2l.HyperParameters):
         shuffle_buffer = tensors[0].shape[0] if train else 1
         return tf.data.Dataset.from_tensor_slices(tensors).shuffle(
             buffer_size=shuffle_buffer).batch(self.batch_size)
-    
+
 
 class Trainer(d2l.HyperParameters):
     """Defined in :numref:`sec_d2l_apis`"""
@@ -370,7 +370,7 @@ class LinearRegressionScratch(d2l.Module):
 
     def forward(self, X):
         """The linear regression model.
-    
+
         Defined in :numref:`sec_linear_scratch`"""
         return d2l.matmul(X, self.w) + self.b
 
@@ -402,7 +402,7 @@ class LinearRegression(d2l.Module):
 
     def forward(self, X):
         """The linear regression model.
-    
+
         Defined in :numref:`sec_linear_concise`"""
         return self.net(X)
 
@@ -428,7 +428,7 @@ class FashionMNIST(d2l.DataModule):
 
     def text_labels(self, indices):
         """Return text labels.
-    
+
         Defined in :numref:`sec_fashion_mnist`"""
         labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
@@ -466,7 +466,7 @@ class Classification(d2l.Module):
 
     def accuracy(self, Y_hat, Y, averaged=True):
         """Compute the number of correct predictions.
-    
+
         Defined in :numref:`sec_classification`"""
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         preds = d2l.astype(d2l.argmax(Y_hat, axis=1), Y.dtype)
@@ -669,7 +669,7 @@ class RNNLMScratch(d2l.Classification):
         embs = self.one_hot(X)
         hiddens, _ = self.rnn(embs)
         return self.output_layer(hiddens)
-    
+
 
     def output_layer(self, hiddens):
         """Defined in :numref:`sec_rnn_scratch`"""
@@ -777,7 +777,7 @@ class MTFraEng(d2l.DataModule):
         self.save_hyperparameters()
         self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
             self._download())
-    
+
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
         """Defined in :numref:`sec_machine_translation`"""
@@ -1693,3 +1693,35 @@ repeat = tf.repeat
 batch_matmul = tf.matmul
 numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+def sequence_mask(X, valid_len, value=0):
+    """Mask irrelevant entries in sequences."""
+    maxlen = X.shape[1]
+    mask = tf.range(start=0, limit=maxlen,
+                    dtype=tf.float32)[None, :] < tf.cast(
+                        valid_len[:, None], dtype=tf.float32)
+
+    if len(X.shape) == 3:
+        return tf.where(tf.expand_dims(mask, axis=-1), X, value)
+    else:
+        return tf.where(mask, X, value)
+
+
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+class MaskedSoftmaxCELoss(tf.keras.losses.Loss):
+    """The softmax cross-entropy loss with masks."""
+    def __init__(self, valid_len):
+        super().__init__(reduction='none')
+        self.valid_len = valid_len
+
+    # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
+    # `label` shape: (`batch_size`, `num_steps`)
+    # `valid_len` shape: (`batch_size`,)
+    def call(self, label, pred):
+        weights = tf.ones_like(label, dtype=tf.float32)
+        weights = sequence_mask(weights, self.valid_len)
+        label_one_hot = tf.one_hot(label, depth=pred.shape[-1])
+        unweighted_loss = tf.keras.losses.CategoricalCrossentropy(
+            from_logits=True, reduction='none')(label_one_hot, pred)
+        weighted_loss = tf.reduce_mean((unweighted_loss * weights), axis=1)
+        return weighted_loss
