@@ -242,3 +242,7 @@ print(segment_BPE(tokens, symbols))
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/386)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/4587)
+:end_tab:
