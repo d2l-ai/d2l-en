@@ -1,11 +1,11 @@
 # Using AWS EC2 Instances
 :label:`sec_aws`
 
-In this section, we will show you how to install all libraries on a raw Linux machine. Remember that in :numref:`sec_sagemaker` we discussed how to use Amazon SageMaker, while building an instance by yourself costs less on AWS. The walkthrough includes a number of steps:
+In this section, we will show you how to install all libraries on a raw Linux machine. Recall that in :numref:`sec_sagemaker` we discussed how to use Amazon SageMaker, while building an instance by yourself costs less on AWS. The walkthrough includes three steps:
 
 1. Request for a GPU Linux instance from AWS EC2.
-1. Optionally: install CUDA or use an AMI with CUDA preinstalled.
-1. Set up the corresponding MXNet GPU version.
+1. Install CUDA (or use an Amazon Machine Image with CUDA preinstalled).
+1. Install the deep learning framework and other libraries for running the code of the book.
 
 This process applies to other instances (and other clouds), too, albeit with some minor modifications. Before going forward, you need to create an AWS account, see :numref:`sec_sagemaker` for more details.
 
@@ -29,30 +29,38 @@ Select a nearby data center to reduce latency, e.g., "Oregon" (marked by the red
 you can select a nearby Asia Pacific region, such as Seoul or Tokyo. Please note
 that some data centers may not have GPU instances.
 
+
 ### Increasing Limits
+
 Before choosing an instance, check if there are quantity
 restrictions by clicking the "Limits" label in the bar on the left as shown in
-:numref:`fig_ec2`. :numref:`fig_limits` shows an example of such a
+:numref:`fig_ec2`. 
+:numref:`fig_limits` shows an example of such a
 limitation. The account currently cannot open "p2.xlarge" instance per region. If
 you need to open one or more instances, click on the "Request limit increase" link to
-apply for a higher instance quota. Generally, it takes one business day to
+apply for a higher instance quota.
+Generally, it takes one business day to
 process an application.
 
 ![Instance quantity restrictions.](../img/limits.png)
 :width:`700px`
 :label:`fig_limits`
 
-### Launching Instance
+
+### Launching an Instance
+
 Next, click the "Launch Instance" button marked by the red box in :numref:`fig_ec2` to launch your instance.
 
-We begin by selecting a suitable AMI (AWS Machine Image). Enter "Ubuntu" in the search box (marked by the red box in :numref:`fig_ubuntu`).
+We begin by selecting a suitable Amazon Machine Image (AMI). Enter "Ubuntu" in the search box (marked by the red box in :numref:`fig_ubuntu`).
 
 
-![Choose an operating system.](../img/ubuntu-new.png)
+![Choose an AMI.](../img/ubuntu-new.png)
 :width:`700px`
 :label:`fig_ubuntu`
 
-EC2 provides many different instance configurations to choose from. This can sometimes feel overwhelming to a beginner. Here's a table of suitable machines:
+EC2 provides many different instance configurations to choose from. This can sometimes feel overwhelming to a beginner. :numref:`tab_ec2` lists different suitable machines.
+
+:Different EC2 instance types
 
 | Name | GPU         | Notes                         |
 |------|-------------|-------------------------------|
@@ -61,20 +69,23 @@ EC2 provides many different instance configurations to choose from. This can som
 | g3   | Maxwell M60 | good trade-off                |
 | p3   | Volta V100  | high performance for FP16     |
 | g4   | Turing T4   | inference optimized FP16/INT8 |
+:label:`tab_ec2`
 
-All the above servers come in multiple flavors indicating the number of GPUs used. For example, a p2.xlarge has 1 GPU and a p2.16xlarge has 16 GPUs and more memory. For more details, see the [AWS EC2 documentation](https://aws.amazon.com/ec2/instance-types/) or a [summary page](https://www.ec2instances.info). For the purpose of illustration, a p2.xlarge will suffice (marked in red box of :numref:`fig_p2x`).
-
-**Note:** you must use a GPU enabled instance with suitable drivers and a version of MXNet that is GPU enabled. Otherwise you will not see any benefit from using GPUs.
+All these servers come in multiple flavors indicating the number of GPUs used. For example, a p2.xlarge has 1 GPU and a p2.16xlarge has 16 GPUs and more memory. For more details, see the [AWS EC2 documentation](https://aws.amazon.com/ec2/instance-types/) or a [summary page](https://www.ec2instances.info). For the purpose of illustration, a p2.xlarge will suffice (marked in the red box of :numref:`fig_p2x`).
 
 ![Choose an instance.](../img/p2x.png)
 :width:`700px`
 :label:`fig_p2x`
 
-So far, we have finished the first two of seven steps for launching an EC2 instance, as shown on the top of :numref:`fig_disk`. In this example, we keep the default configurations for the steps "3. Configure Instance", "5. Add Tags", and "6. Configure Security Group". Tap on "4. Add Storage" and increase the default hard disk size to 64 GB (marked in red box of :numref:`fig_disk`). Note that CUDA by itself already takes up 4 GB.
+Note that you should use a GPU-enabled instance with suitable drivers and a GPU-enabled deep learning framework. Otherwise you will not see any benefit from using GPUs.
 
-![Modify instance hard disk size.](../img/disk.png)
+So far, we have finished the first two of seven steps for launching an EC2 instance, as shown on the top of :numref:`fig_disk`. In this example, we keep the default configurations for the steps "3. Configure Instance", "5. Add Tags", and "6. Configure Security Group". Tap on "4. Add Storage" and increase the default hard disk size to 64 GB (marked in the red box of :numref:`fig_disk`). Note that CUDA by itself already takes up 4 GB.
+
+![Modify the hard disk size.](../img/disk.png)
 :width:`700px`
 :label:`fig_disk`
+
+
 
 Finally, go to "7. Review" and click "Launch" to launch the configured
 instance. The system will now prompt you to select the key pair used to access
@@ -100,14 +111,15 @@ instance ID shown in :numref:`fig_launching` to view the status of this instance
 
 As shown in :numref:`fig_connect`, after the instance state turns green, right-click the instance and select `Connect` to view the instance access method.
 
-![View instance access and startup method.](../img/connect.png)
+![View instance access method.](../img/connect.png)
 :width:`700px`
 :label:`fig_connect`
 
-If this is a new key, it must not be publicly viewable for SSH to work. Go to the folder where you store `D2L_key.pem` (e.g., the Downloads folder) and make sure that the key is not publicly viewable.
+If this is a new key, it must not be publicly viewable for SSH to work. Go to the folder where you store `D2L_key.pem` and 
+execute the following command 
+to make the key not publicly viewable:
 
 ```bash
-cd /Downloads  ## if D2L_key.pem is stored in Downloads folder
 chmod 400 D2L_key.pem
 ```
 
