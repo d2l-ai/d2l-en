@@ -195,6 +195,7 @@ curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 cd tensorflow
 ```
+:end_tab:
 
 
 Now we can start the Jupyter Notebook server by running:
