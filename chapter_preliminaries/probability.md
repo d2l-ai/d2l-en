@@ -111,11 +111,11 @@ Probabilities assign scores between $0$ and $1$
 to outcomes of interest, called *events*.
 Here the event of interest is $\textrm{heads}$
 and we denote the corresponding probability $P(\textrm{heads})$.
-A probability of *1* indicates absolute certainty 
+A probability of $1$ indicates absolute certainty 
 (imagine a trick coin where both sides were heads)
 and a probability of $0$ indicates impossibility
 (e.g., if both sides were tails). 
-The frequencies $n_h/n$ and $n_h/t$ are not probabilities
+The frequencies $n_h/n$ and $n_t/n$ are not probabilities
 but rather *statistics*.
 Probabilities are *theoretical* quantities 
 that underly the data generating process.
@@ -124,7 +124,7 @@ is a property of the coin itself.
 By contrast, statistics are *empirical* quantities
 that are computed as functions of the observed data.
 Our interests in probabilistic and statistical quantities
-are intextricably intertwined.
+are inextricably intertwined.
 We often design special statistics called *estimators*
 that, given a dataset, produce *estimates* 
 of model parameters like probabilities.
@@ -155,8 +155,6 @@ one natural estimator
 is the fraction between
 the number of observed *heads*
 by the total number of tosses.
-Before simulating this study
-let's import a few packages.
 
 ```{.python .input}
 %matplotlib inline
@@ -186,7 +184,7 @@ from tensorflow_probability import distributions as tfd
 ```
 
 Now, suppose that the coin was in fact fair,
-i.e., $P(\textrm{heads}) = .5$.
+i.e., $P(\textrm{heads}) = 0.5$.
 To simulate tosses of a fair coin,
 we can invoke any random number generator.
 Some easy ways to draw samples 
@@ -217,12 +215,12 @@ to the number of draws
 and the second as a list of probabilities
 associated with each of the possible outcomes.
 To simulate ten tosses of a fair coin, 
-we assign probability vector `[0.5,0.5]`,
-interpreting index `0` as heads
-and index `1` as tails.
+we assign probability vector `[0.5, 0.5]`,
+interpreting index 0 as heads
+and index 1 as tails.
 The function returns a vector 
 with length equal to the number 
-of possible outcomes (here, `2`),
+of possible outcomes (here, 2),
 where the first component tells us 
 the number of occurrences of heads
 and the second component tells us 
@@ -251,10 +249,10 @@ that may differ from the previous outcome.
 Dividing by the number of tosses
 gives us the *frequency* 
 of each outcome in our data.
-note that these frequencies,
+Note that these frequencies,
 like the probabilities 
 that they are intended 
-to estimate sum to $1$.
+to estimate, sum to $1$.
 
 ```{.python .input}
 multinomial(100, fair_probs) / 100
@@ -271,13 +269,13 @@ tfd.Multinomial(100, fair_probs).sample() / 100
 ```
 
 Here, even though our simulated coin is fair 
-(we set the probabilities `[0.5,0.5]` ourselves),
-the counts of heads and tails are not identical.
+(we set the probabilities `[0.5, 0.5]` ourselves),
+the counts of heads and tails may not be identical.
 That's because we only drew a finite number of samples.
 If we didn't implement the simulation ourselves,
 and only saw the outcome, 
 how would we know if the coin were slightly unfair
-or if the deviation from $1/2$ was 
+or if the possible deviation from $1/2$ was 
 just an artifact of the small sample size?
 Let's see what happens when we simulate `10000` tosses.
 
@@ -298,16 +296,14 @@ counts = tfd.Multinomial(10000, fair_probs).sample()
 counts / 10000
 ```
 
-While these estimates are still slightly off,
-they are much closer to the underlying probabilities.
 In general, for averages of repeated events (like coin tosses),
 as the number of repetitions grows, 
 our estimates are guaranteed to converge
 to the true underlying probabilities. 
 The mathematical proof of this phenomenon
 is called the *law of large numbers*
-and the Central Limit Theorem
-tell us that in many situations,
+and the *central limit theorem*
+tells us that in many situations,
 as the sample size $n$ grows,
 these errors should go down 
 at a rate of $(1/\sqrt{n})$.
@@ -323,7 +319,7 @@ estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 d2l.set_figsize((4.5, 3.5))
 d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
 d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
-d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.axhline(y=0.5, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Samples')
 d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
@@ -355,7 +351,7 @@ estimates = estimates.numpy()
 d2l.set_figsize((4.5, 3.5))
 d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
 d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
-d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.axhline(y=0.5, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Samples')
 d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
@@ -382,23 +378,23 @@ a probabilistic model,
 generating synthetic data,
 running a statistical estimator,
 empirically assessing convergence,
-and reporting error metrics. 
+and reporting error metrics (checking the deviation). 
 However, to go much further,
 we will need to be more precise.
 
 
 When dealing with randomness, 
-we denote the set of possible outcomes $S$
+we denote the set of possible outcomes $\mathcal{S}$
 and call it the *sample space* or *outcome space*.
 Here, each element is a distinct possible *outcome*.
 In the case of rolling a single coin,
-$\mathcal{S} = \{\mathrm{heads}, \mathrm{tails}\}$.
+$\mathcal{S} = \{\textrm{heads}, \textrm{tails}\}$.
 For a single die, $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$.
 When flipping two coins, we have four possible outcomes:
-$\{\mathrm{(heads, heads), (heads, tails), (tails, heads), and (tails, tails)}\}$.
+$\{(\textrm{heads}, \textrm{heads}), (\textrm{heads}, \textrm{tails}), (\textrm{tails}, \textrm{heads}),  (\textrm{tails}, \textrm{tails})\}$.
 *Events* are subsets of the sample space.
 For instance, the event "the first coin toss comes up heads"
-corresponds to the set $\{\mathrm{(heads, heads), (heads, tails)}\}$.
+corresponds to the set $\{(\textrm{heads}, \textrm{heads}), (\textrm{heads}, \textrm{tails})\}$.
 Whenever the outcome $z$ of a random experiment satisfies
 $z \in \mathcal{A}$, then event $\mathcal{A}$ has occurred.
 For a single roll of a die, we could define the events 
@@ -412,7 +408,7 @@ but $\mathcal{B}$ did.
 
 
 A *probability* function maps events 
-onto real values ${P: \mathcal{A} \subseteq \mathcal{S} \rightarrow [0,1]}$,
+onto real values ${P: \mathcal{A} \subseteq \mathcal{S} \rightarrow [0,1]}$.
 The probability of an event $\mathcal{A}$ 
 in the given sample space $\mathcal{S}$,
 denoted $P(\mathcal{A})$,
@@ -430,7 +426,7 @@ that the probability of any event $\mathcal{A}$
 *or* its complement $\mathcal{A}'$ occurring is 1 
 (because $\mathcal{A} \cup \mathcal{A}' = \mathcal{S}$).
 We can also prove that $P(\emptyset) = 0$
-because $1 = P(\mathcal{S} \cup \mathcal{S}') = P(\mathcal{S} \cup \emptyset) = P(\mathcal{S}) + P(\emptyset) = 1 = P(\emptyset)$.
+because $1 = P(\mathcal{S} \cup \mathcal{S}') = P(\mathcal{S} \cup \emptyset) = P(\mathcal{S}) + P(\emptyset) = 1 + P(\emptyset)$.
 Consequently, the probability of any event $\mathcal{A}$
 *and* its complement $\mathcal{A}'$ occurring simultaneously 
 is $P(\mathcal{A} \cap \mathcal{A}') = 0$.
@@ -594,8 +590,8 @@ The ratio $\frac{P(A=a, B=b)}{P(A=a)} \leq 1$
 turns out to be extremely important.
 It is called the *conditional probability*,
 and is denoted via the "|" symbol,
-$P(A=a|B=b) = P(A=a,B=b)/P(A=a)$
-and it tells us the new probability
+$P(B=b|A=a) = P(A=a,B=b)/P(A=a)$.
+It tells us the new probability
 associated with the event $B=b$,
 once we condition on the fact $A=a$ took place.
 We can think of this conditional probability
@@ -885,7 +881,7 @@ were 1, 2 and 4, respectively,
 then the expected happiness of investing 
 would be $0.5 \cdot (-1) + 0.4 \cdot 2 + 0.1 \cdot 4 = 0.7$
 (an expected loss of utility of 30%). 
-In indeed this were your utility function, 
+If indeed this were your utility function, 
 you might be best off keeping the money in the bank. 
 
 For financial decisions, 
@@ -1000,7 +996,8 @@ the parameters of the data generating distribution.
 That said, the rate at which this is possible can be quite slow. 
 In our coin tossing example (and many others) 
 we can do no better than to design estimators
-that converge at a rate of $1/\sqrt{n}$. 
+that converge at a rate of $1/\sqrt{n}$,
+where $n$ is the sample size (e.g., the number of tosses). 
 This means that by going from 10 to 1000 observations (usually a very achievable task) 
 we see a tenfold reduction of uncertainty, 
 whereas the next 1000 observations help comparatively little, 
