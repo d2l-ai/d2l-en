@@ -4,7 +4,7 @@
 In this section, we will show you how to install all libraries on a raw Linux machine. Recall that in :numref:`sec_sagemaker` we discussed how to use Amazon SageMaker, while building an instance by yourself costs less on AWS. The walkthrough includes three steps:
 
 1. Request for a GPU Linux instance from AWS EC2.
-1. Install CUDA (or use an Amazon Machine Image with CUDA preinstalled).
+1. Install CUDA (or use an Amazon Machine Image with preinstalled CUDA).
 1. Install the deep learning framework and other libraries for running the code of the book.
 
 This process applies to other instances (and other clouds), too, albeit with some minor modifications. Before going forward, you need to create an AWS account, see :numref:`sec_sagemaker` for more details.
@@ -150,17 +150,16 @@ sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
 
 
-Here we download CUDA 10.1. Visit NVIDIA's [official repository](https://developer.nvidia.com/cuda-downloads) to find the download link of CUDA 10.1 as shown in :numref:`fig_cuda`.
+Here we download CUDA 10.1. Visit NVIDIA's [official repository](https://developer.nvidia.com/cuda-toolkit-archive) to find the download link as shown in :numref:`fig_cuda`.
 
 ![Find the CUDA 10.1 download address.](../img/cuda101.png)
 :width:`500px`
 :label:`fig_cuda`
 
-Copy the instructions and paste them into the terminal to install
-CUDA 10.1.
+Copy the instructions and paste them onto the terminal to install CUDA 10.1.
 
 ```bash
-## Paste the copied link from CUDA website
+# The link and file name are subject to changes
 wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
 sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
 wget http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda-repo-ubuntu1804-10-1-local-10.1.243-418.87.00_1.0-1_amd64.deb
@@ -171,7 +170,7 @@ sudo apt-get -y install cuda
 ```
 
 
-After installing the program, run the following command to view the GPUs.
+After installing the program, run the following command to view the GPUs:
 
 ```bash
 nvidia-smi
@@ -185,103 +184,64 @@ echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda/lib64" >> ~/.ba
 ```
 
 
-## Installing MXNet and Downloading the D2L Notebooks
+## Installing Libraries for Running the Code
 
-First, to simplify the installation, you need to install [Miniconda](https://conda.io/en/latest/miniconda.html) for Linux. The download link and file name are subject to changes, so please go the Miniconda website and click "Copy Link Address" as shown in :numref:`fig_miniconda`.
+To run the code of this book,
+just follow steps in :ref:`chap_installation`
+for Linux users on the EC2 instance
+and use the following tips 
+for working on a remote Linux server:
 
-![Download Miniconda.](../img/miniconda.png)
-:width:`700px`
-:label:`fig_miniconda`
-
-```bash
-# The link and file name are subject to changes
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-sh Miniconda3-latest-Linux-x86_64.sh -b
-```
+* To download the bash script on the Miniconda installation page, right click the download link and select "Copy Link Address", then execute `wget [copied link address]`.
+* After running `~/miniconda3/bin/conda init`, you may execute `source ~/.bashrc` instead of closing and reopening your current shell.
 
 
-After the Miniconda installation, run the following command to activate CUDA and conda.
+## Running the Jupyter Notebook remotely
 
-```bash
-~/miniconda3/bin/conda init
-source ~/.bashrc
-```
-
-
-Next, download the code for this book.
-
-```bash
-sudo apt-get install unzip
-mkdir d2l-en && cd d2l-en
-curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
-unzip d2l-en.zip && rm d2l-en.zip
-```
-
-
-Then create the conda `d2l` environment and enter `y` to proceed with the installation.
-
-```bash
-conda create --name d2l -y
-```
-
-
-After creating the `d2l` environment, activate it and install `pip`.
-
-```bash
-conda activate d2l
-conda install python=3.7 pip -y
-```
-
-
-Finally, install MXNet and the `d2l` package. The postfix `cu101` means that this is the CUDA 10.1 variant. For different versions, say only CUDA 10.0, you would want to choose `cu100` instead.
-
-```bash
-pip install mxnet-cu101==1.7.0
-pip install git+https://github.com/d2l-ai/d2l-en
-
-```
-
-
-You can quickly test whether everything went well as follows:
-
-```
-$ python
->>> from mxnet import np, npx
->>> np.zeros((1024, 1024), ctx=npx.gpu())
-```
-
-
-## Running Jupyter
-
-To run Jupyter remotely you need to use SSH port forwarding. After all, the server in the cloud does not have a monitor or keyboard. For this, log into your server from your desktop (or laptop) as follows.
+To run the Jupyter Notebook remotely you need to use SSH port forwarding. After all, the server in the cloud does not have a monitor or keyboard. For this, log into your server from your desktop (or laptop) as follows:
 
 ```
 # This command must be run in the local command line
 ssh -i "/path/to/key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com -L 8889:localhost:8888
+```
+
+
+Next, go to the location 
+of the downloaded code of this book
+on the EC2 instance,
+then run:
+
+```
 conda activate d2l
 jupyter notebook
 ```
 
 
-:numref:`fig_jupyter` shows the possible output after you run Jupyter Notebook. The last row is the URL for port 8888.
+:numref:`fig_jupyter` shows the possible output after you run the Jupyter Notebook. The last row is the URL for port 8888.
 
-![Output after running Jupyter Notebook. The last row is the URL for port 8888.](../img/jupyter.png)
+![Output after running the Jupyter Notebook. The last row is the URL for port 8888.](../img/jupyter.png)
 :width:`700px`
 :label:`fig_jupyter`
 
-Since you used port forwarding to port 8889 you will need to replace the port number and use the secret as given by Jupyter when opening the URL in your local browser.
+Since you used port forwarding to port 8889,
+copy the last row in the red box of :numref:`fig_jupyter`,
+replace "8888" with "8889" in the URL,
+and open it in your local browser.
 
 
 ## Closing Unused Instances
 
-As cloud services are billed by the time of use, you should close instances that are not being used. Note that there are alternatives: "stopping" an instance means that you will be able to start it again. This is akin to switching off the power for your regular server. However, stopped instances will still be billed a small amount for the hard disk space retained. "Terminate" deletes all data associated with it. This includes the disk, hence you cannot start it again. Only do this if you know that you will not need it in the future.
+As cloud services are billed by the time of use, you should close instances that are not being used. Note that there are alternatives:
+
+* "Stopping" an instance means that you will be able to start it again. This is akin to switching off the power for your regular server. However, stopped instances will still be billed a small amount for the hard disk space retained. 
+* "Terminating" an instance will delete all data associated with it. This includes the disk, hence you cannot start it again. Only do this if you know that you will not need it in the future.
 
 If you want to use the instance as a template for many more instances,
 right-click on the example in :numref:`fig_connect` and select "Image" $\rightarrow$
 "Create" to create an image of the instance. Once this is complete, select
 "Instance State" $\rightarrow$ "Terminate" to terminate the instance. The next
-time you want to use this instance, you can follow the steps for creating and
-running an EC2 instance described in this section to create an instance based on
+time you want to use this instance, you can follow the steps in this section 
+to create an instance based on
 the saved image. The only difference is that, in "1. Choose AMI" shown in
 :numref:`fig_ubuntu`, you must use the "My AMIs" option on the left to select your saved
 image. The created instance will retain the information stored on the image hard
@@ -291,13 +251,14 @@ environments.
 
 ## Summary
 
-* You can launch and stop instances on demand without having to buy and build your own computer.
-* You need to install suitable GPU drivers before you can use them.
+* We can launch and stop instances on demand without having to buy and build our own computer.
+* We need to install CUDA before using the GPU-enabled deep learning framework.
+* We can use port forwarding to run the Jupyter Notebook on a remote server.
 
 
 ## Exercises
 
-1. The cloud offers convenience, but it does not come cheap. Find out how to launch [spot instances](https://aws.amazon.com/ec2/spot/) to see how to reduce prices.
+1. The cloud offers convenience, but it does not come cheap. Find out how to launch [spot instances](https://aws.amazon.com/ec2/spot/) to see how to reduce costs.
 1. Experiment with different GPU servers. How fast are they?
 1. Experiment with multi-GPU servers. How well can you scale things up?
 
