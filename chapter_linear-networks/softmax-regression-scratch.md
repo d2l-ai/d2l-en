@@ -6,12 +6,15 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Softmax Regression Implementation from Scratch
 :label:`sec_softmax_scratch`
 
-Just as we implemented linear regression from scratch, we believe that
-softmax regression is similarly fundamental and
+Because softmax regression is so fundamental,
+we believe that, 
+just as we built a linear regression model from scratch,
 you ought to know the gory details of
-how to implement it yourself. We limit ourselves to defining the 
-softmax-specific aspects and reuse many of the other parts we built 
-for regression, such as the training loop.
+how to implement it yourself. 
+Here, we limit ourselves to defining the 
+softmax-specific aspects and reuse 
+many of the other components from our regression section,
+including the training loop.
 
 ```{.python .input}
 %%tab mxnet
@@ -34,9 +37,12 @@ import tensorflow as tf
 
 ## The Softmax
 
-Let's begin with the most important part, the mapping from scalars to probabilities. 
-For a refresher, recall the operation of the sum operator along specific dimensions in a tensor,
-as discussed in :numref:`subseq_lin-alg-reduction` and :numref:`subseq_lin-alg-non-reduction`.
+Let's begin with the most important part, 
+the mapping from scalars to probabilities. 
+For a refresher, recall the operation of the sum operator 
+along specific dimensions in a tensor,
+as discussed in :numref:`subseq_lin-alg-reduction`
+and :numref:`subseq_lin-alg-non-reduction`.
 [**Given a matrix `X` we can sum over all elements (by default) or only
 over elements in the same axis.**]
 The `axis` variable lets us compute row and column sums:
@@ -49,7 +55,8 @@ d2l.reduce_sum(X, 0, keepdims=True), d2l.reduce_sum(X, 1, keepdims=True)
 
 Computing the softmax requires three steps: 
 (i) exponentiation of each term; 
-(ii) a sum over each row to compute the normalization constant for each example;
+(ii) a sum over each row to compute 
+the normalization constant for each example;
 (iii) division of each row by its normalization constant,
 ensuring that the result sums to 1.
 

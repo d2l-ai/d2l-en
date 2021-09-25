@@ -6,16 +6,20 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Concise Implementation of Linear Regression
 :label:`sec_linear_concise`
 
-Deep Learning has witnessed a Cambrian Explosion of sorts over the past decade.
-The sheer number of techniques, applications and algorithms by far surpasses the
-progress of previous decades. This is due to a fortuitous combination of multiple
-factors, not the least due to the ease of implementation offered by a number
-of open source deep learning frameworks. Caffe, DistBelief and Theano arguably represent the
-first generation of such models :cite:`jia2014caffe,dean2012large,bergstra2010theano` that
-widespread adoption. In contrast to earlier (seminal) work such as SN2 (Simulateur Neuristique)
+Deep Learning has undergone a Cambrian Explosion of sorts over the past decade,
+with a rapid proliferation of new techniques, applications, and algorithms. 
+This is due to a fortuitous combination of multiple factors,
+one of which is the powerful free tools
+offered by a number of open source deep learning frameworks. 
+Caffe, DistBelief and Theano arguably represent the
+first generation of such models :cite:`jia2014caffe,dean2012large,bergstra2010theano` 
+that found widespread adoption. 
+In contrast to earlier (seminal) work such as SN2 (Simulateur Neuristique)
 which provided a Lisp-like programming experience
-:cite:`bottou1989cun` modern frameworks offer automatic differentiation and the convenience
-of Python. Frameworks allow us to automate and modularize
+:cite:`bottou1989cun` modern frameworks 
+offer automatic differentiation
+and the convenience of Python. 
+Frameworks allow us to automate and modularize
 the repetitive work of implementing gradient-based learning algorithms.
 
 In :numref:`sec_linear_scratch`, we relied only on
@@ -67,12 +71,16 @@ Doing it once or twice is rewarding and instructive,
 but you would be a lousy web developer
 if you spent a month reinventing the wheel.
 
-For standard operations, we can [**use a framework's predefined layers,**]
+For standard operations, 
+we can [**use a framework's predefined layers,**]
 which allow us to focus
 on the layers used to construct the model
 rather than worrying about their implementation.
-Recall the architecture of a single-layer network as described in :numref:`fig_single_neuron`.
-The layer is called *fully connected*, since each of its inputs is connected to each of its outputs
+Recall the architecture of a single-layer network 
+as described in :numref:`fig_single_neuron`.
+The layer is called *fully connected*, 
+since each of its inputs is connected 
+to each of its outputs
 by means of a matrix-vector multiplication.
 
 :begin_tab:`mxnet`
@@ -92,18 +100,25 @@ We will describe how this works in more detail later.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the fully connected layer is defined in the `Linear` class. Note that we passed two arguments into `nn.Linear`. The first one specifies the input feature dimension, which is 2, and the second one is the output feature dimension, which is a single scalar and therefore 1.
+In PyTorch, the fully connected layer is defined in the `Linear` class. 
+Note that we passed two arguments into `nn.Linear`. 
+The first specifies the input feature dimension (2), 
+and the second specifies the output dimension (1).
 :end_tab:
 
 :begin_tab:`tensorflow`
-In Keras, the fully connected layer is defined in the `Dense` class. Since we only want to generate a single scalar output, we set that number to 1. It is worth noting that, for convenience,
+In Keras, the fully connected layer is defined in the `Dense` class. 
+Since we only want to generate a single scalar output, 
+we set that number to 1. 
+It is worth noting that, for convenience,
 Keras does not require us to specify
 the input shape for each layer.
 We don't need to tell Keras
 how many inputs go into this linear layer.
 When we first try to pass data through our model,
 e.g., when we execute `net(X)` later,
-Keras will automatically infer the number of inputs to each layer.
+Keras will automatically infer 
+the number of inputs to each layer.
 We will describe how this works in more detail later.
 :end_tab:
 
@@ -142,14 +157,18 @@ def forward(self, X):
 ## Loss Function
 
 :begin_tab:`mxnet`
-The `loss` module defines many useful loss functions. For speed and convenience
-we forgo implementing our own and choose the built-in `loss.L2Loss` instead. $L_2$ loss is a bit
-of a misnomer, albeit a pervasive one in deep learning, since we are simply computing the mean squared error, i.e., the squared distance between estimates and labels. It has very little to do with the space of Lebesque-measurable functions, denoted by $L_2$ in mathematics. Not that it returns the loss value for each example, we use `mean` to get the averaged loss value in a minibatch.
+The `loss` module defines many useful loss functions. 
+For speed and convenience, we forgo implementing our own 
+and choose the built-in `loss.L2Loss` instead. 
+Because the `loss` that it returns is 
+the squared error for each example, 
+we use `mean`to average the loss across over the minibatch.
 :end_tab:
 
 :begin_tab:`pytorch`
 [**The `MSELoss` class computes the mean squared error.**]
-By default it returns the average loss over examples. It is faster (and easier to use) than implementing our own.
+By default, `MSELoss` returns the average loss over examples. 
+It is faster (and easier to use) than implementing our own.
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -179,9 +198,12 @@ Minibatch SGD is a standard tool
 for optimizing neural networks
 and thus Gluon supports it alongside a number of
 variations on this algorithm through its `Trainer` class.
-Note that Gluon's `Trainer` class stands for the optimization algorithm,
-while the `Trainer` class we created in :numref:`sec_d2l_apis` contains the training function,
-i.e., repeatedly call the optimizer to update the model parameters.
+Note that Gluon's `Trainer` class stands 
+for the optimization algorithm,
+while the `Trainer` class we created in :numref:`sec_d2l_apis` 
+contains the training function,
+i.e., repeatedly call the optimizer
+to update the model parameters.
 When we instantiate `Trainer`,
 we specify the parameters to optimize over,
 obtainable from our model `net` via `net.collect_params()`,
@@ -234,8 +256,10 @@ Once we start working with much more complex models,
 the advantages of the high-level API will grow considerably.
 Now that we have all the basic pieces in place,
 [**the training loop itself is the same
-to the one we obtained by implementing everything from scratch.**]
-So we just call the `fit` method defined :numref:`sec_linear_scratch` to train our model.
+as the one we implemented from scratch.**]
+So we just call the `fit` method 
+(defined in :numref:`sec_linear_scratch`) 
+to train our model.
 
 ```{.python .input}
 %%tab all
@@ -248,14 +272,17 @@ trainer = d2l.Trainer(max_epochs=3)
 trainer.fit(model, data)
 ```
 
-Below, we [**compare the model parameters learned by training on finite data
-and the actual parameters**] that generated our dataset.
+Below, we 
+[**compare the model parameters learned
+by training on finite data
+and the actual parameters**]
+that generated our dataset.
 To access parameters,
 we first access the layer that we need from `net`
 and then access its weights and bias.
-As in our implementation from-scratch,
-note that our estimated parameters are
-close to their true counterparts.
+As in our implementation from scratch,
+note that our estimated parameters 
+are close to their true counterparts.
 
 ```{.python .input}
 %%tab all
@@ -275,21 +302,55 @@ print(f'error in estimating b: {data.b - b}')
 
 ## Summary
 
-This section contains the first 'modern' implementation of a deep network that we encounter. By modern, we
-mean an implementation that uses many of the conveniences afforded by a modern deep learning framework, such as Gluon, JAX, Keras, PyTorch, or Tensorflow :cite:`abadi2016tensorflow,paszke2019pytorch,frostig2018compiling,chen2015mxnet`. More to the point, we used framework-defaults for loading data, defining a layer, a loss function, an optimizer and a training loop. Whenever the framework provides all necessary features, this is the recommended way to proceed, since these components are typically heavily optimized. At the same time, we urge you not to forget that these modules *can* be implemented directly. This matters particularly for researchers at the bleeding edge of model development where not all components for a new model will not exist already in the researcher's Lego toolkit.
+This section contains the first 'modern' implementation of a deep network,
+taking advantage of the conveniences afforded 
+by modern deep learning frameworks,
+such as Gluon, JAX, Keras, PyTorch, and Tensorflow :cite:`abadi2016tensorflow,paszke2019pytorch,frostig2018compiling,chen2015mxnet`. 
+We used framework defaults for loading data, defining a layer, 
+a loss function, an optimizer and a training loop. 
+Whenever the framework provides all necessary features,
+it's generally a good idea to use them,
+since the library implementations of these components 
+tend to be heavily optimized for performance
+and properly tested for reliability.
+At the same time, try not to forget 
+that these modules *can* be implemented directly.
+This is especially important for aspiring researchers
+who wish to live on the bleeding edge of model development,
+where you will be inventing new components 
+that cannot possibly exist in any current library.
 
 :begin_tab:`mxnet`
-In Gluon, the `data` module provides tools for data processing, the `nn` module defines a large number of neural network layers, and the `loss` module defines many common loss functions. Moreover, the `initializer` gives access
-to many choices for parameter initialization. Conveniently for the user,
-dimensionality and storage are automatically inferred. A consequence of this lazy initialization is that you must not attempt to access parameters before they have been instantiated (and initialized).
+In Gluon, the `data` module provides tools for data processing, 
+the `nn` module defines a large number of neural network layers, 
+and the `loss` module defines many common loss functions. 
+Moreover, the `initializer` gives access 
+to many choices for parameter initialization. 
+Conveniently for the user,
+dimensionality and storage are automatically inferred. 
+A consequence of this lazy initialization is that 
+you must not attempt to access parameters 
+before they have been instantiated (and initialized).
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the `data` module provides tools for data processing, the `nn` module defines a large number of neural network layers and common loss functions. We can initialize the parameters by replacing their values with methods ending with `_`. Note that we need to specify the input dimensions of the network. While this is trivial for now, it can have significant knock-on effects when we want to design complex networks with many layers. Careful considerations of how to parametrize these networks is needed to allow portability.
+In PyTorch, the `data` module provides tools for data processing, 
+the `nn` module defines a large number of neural network layers and common loss functions.
+We can initialize the parameters by replacing their values 
+with methods ending with `_`. 
+Note that we need to specify the input dimensions of the network. 
+While this is trivial for now, it can have significant knock-on effects 
+when we want to design complex networks with many layers. 
+Careful considerations of how to parametrize these networks 
+is needed to allow portability.
 :end_tab:
 
 :begin_tab:`tensorflow`
-In TensorFlow, the `data` module provides tools for data processing, the `keras` module defines a large number of neural network layers and common loss functions. Moreover, the `initializers` module provides various methods for model parameter initialization. Dimensionality and storage for networks are automatically inferred (but be careful not to attempt to access parameters before they have been initialized).
+In TensorFlow, the `data` module provides tools for data processing, 
+the `keras` module defines a large number of neural network layers and common loss functions. 
+Moreover, the `initializers` module provides various methods for model parameter initialization. 
+Dimensionality and storage for networks are automatically inferred 
+(but be careful not to attempt to access parameters before they have been initialized).
 :end_tab:
 
 ## Exercises

@@ -7,12 +7,9 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 :label:`sec_softmax_concise`
 
 
-
-Just as high-level APIs
-of deep learning frameworks
-made it much easier to implement linear regression
-in :numref:`sec_linear_concise`,
-we will find them equally convenient for implementing classification.
+Just as deep learning framework make it a snap to implement linear regression
+(see :numref:`sec_linear_concise`),
+they are equally convenient for implementing softmax regression.
 
 ```{.python .input}
 %%tab mxnet
@@ -38,19 +35,26 @@ import tensorflow as tf
 
 ## Defining the Model
 
-As we did in :numref:`sec_linear_concise`, we construct the fully-connected layer using the built-in layer. The built-in `__call__` method then invokes `forward` whenever we need to apply the network to some inputs.
+As in :numref:`sec_linear_concise`, we construct 
+the fully connected layer using the built-in layer. 
+The built-in `__call__` method then invokes `forward` 
+whenever we need to apply the network to some inputs.
 
 :begin_tab:`mxnet`
-Even though the input `X` is a 4-D tensor, the built-in `Dense` layer will automatically convert `X` into a 2-D tensor by keeping the first dimension size unchanged.
+Even though the input `X` is a 4-D tensor, 
+the built-in `Dense` layer will automatically convert `X` 
+into a 2-D tensor by keeping the first dimension size unchanged.
 :end_tab:
 
 :begin_tab:`pytorch`
-We use a flatten layer to convert the 4-D tensor `X` to 2-D by keeping the first dimension size unchanged.
+We use a flatten layer to convert the 4-D tensor `X` to 2-D 
+by keeping the first dimension size unchanged.
 
 :end_tab:
 
 :begin_tab:`tensorflow`
-We use a flatten layer to convert the 4-D tensor `X` to 2-D by keeping the first dimension size unchanged.
+We use a flatten layer to convert the 4-D tensor `X` to 2-D 
+by keeping the first dimension size unchanged.
 :end_tab:
 
 ```{.python .input}
@@ -79,8 +83,8 @@ class SoftmaxRegression(d2l.Classification):
 
 In the previous section we calculated our model's output
 and applied the cross-entropy loss. While this is perfectly 
-reasonable mathematically, is is risky computationally, due to 
-numerical underflow and overflow in the exponentiation. 
+reasonable mathematically, is is risky computationally, 
+due to numerical underflow and overflow in the exponentiation. 
 
 Recall that the softmax function computes probabilities via
 $\hat y_j = \frac{\exp(o_j)}{\sum_k \exp(o_k)}$. 
@@ -100,11 +104,15 @@ $$
 \frac{\exp(o_j - \bar{o})}{\sum_k \exp (o_k - \bar{o})}.
 $$
 
-By construction we know that $o_j - \bar{o} \leq 0$ for all $j$. As such, for a $q$-class 
-classification problem, the denominator is contained in the interval $[1, q]$. Moreover, the 
-numerator never exceeds $1$, thus preventing numerical overflow. Numerical underflow only 
-occurs when $\exp(o_j - \bar{o})$ numerically evaluates as $0$. Nonetheless, a few steps down 
-the road we might find ourselves in trouble when we want to compute $\log \hat{h}_j$ as $\log 0$. 
+By construction, we know that $o_j - \bar{o} \leq 0$ for all $j$. 
+As such, for a $q$-class classification problem, 
+the denominator is contained in the interval $[1, q]$. 
+Moreover, the numerator never exceeds $1$, 
+thus preventing numerical overflow. 
+Numerical underflow only occurs when $\exp(o_j - \bar{o})$ numerically evaluates as $0$. 
+Nonetheless, a few steps down the road 
+we might find ourselves in trouble 
+when we want to compute $\log \hat{h}_j$ as $\log 0$. 
 In particular, in backpropagation,
 we might find ourselves faced with a screenful
 of the dreaded `NaN` results.
