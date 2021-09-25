@@ -22,10 +22,9 @@ If you would like to change the code, we recommend you to use the Jupyter Notebo
 Some sections may support multiple framework implementations.
 If you add a new code block not for the default implementation, which is MXNet, please use `#@tab` to mark this block on the beginning line. For example, `#@tab pytorch` for a PyTorch code block, `#@tab tensorflow` for a TensorFlow code block, or `#@tab all` a shared code block for all implementations. You may refer to the [`d2lbook`](http://book.d2l.ai/user/code_tabs.html) package for more information.
 
-
 ## Submitting Major Changes
 
-We suggest you to use the standard `git` process to submit a major change. In a nutshell the process works as described in :numref:`fig_contribute`.
+We suggest you to use the standard Git process to submit a major change. In a nutshell the process works as described in :numref:`fig_contribute`.
 
 ![Contributing to the book.](../img/contribute.svg)
 :label:`fig_contribute`
@@ -45,9 +44,9 @@ Enter the [address](https://github.com/d2l-ai/d2l-en/) of the book's code reposi
 :label:`fig_git_fork`
 
 
-Now, the code repository of this book will be forked (i.e., copied) to your username, such as `astonzhang/d2l-en` shown at the upper-left of the screenshot :numref:`fig_git_forked`.
+Now, the code repository of this book will be forked (i.e., copied) to your username, such as `astonzhang/d2l-en` shown at the upper-left of :numref:`fig_git_forked`.
 
-![Fork the code repository.](../img/git-forked.png)
+![The forked code repository.](../img/git-forked.png)
 :width:`700px`
 :label:`fig_git_forked`
 
@@ -55,7 +54,7 @@ Now, the code repository of this book will be forked (i.e., copied) to your user
 
 To clone the repository (i.e., to make a local copy) we need to get its repository address. The green button in :numref:`fig_git_clone` displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :ref:`chap_installation` to get started. The main difference is that you are now downloading *your own fork* of the repository.
 
-![Git clone.](../img/git-clone.png)
+![Cloning the repository.](../img/git-clone.png)
 :width:`700px`
 :label:`fig_git_clone`
 
@@ -65,10 +64,10 @@ git clone https://github.com/your_github_username/d2l-en.git
 ```
 
 
-### Editing the Book and Push
+### Editing and Pushing
 
-Now it is time to edit the book. It is best to edit the notebooks in Jupyter following instructions in :numref:`sec_jupyter`. Make the changes and check that they are OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix_tools/how-to-contribute.md`.
-You can then check which files you have changed:
+Now it is time to edit the book. It is best to edit it in the Jupyter Notebook following instructions in :numref:`sec_jupyter`. Make the changes and check that they are OK. Assume that we have modified a typo in the file `~/d2l-en/chapter_appendix_tools/how-to-contribute.md`.
+You can then check which files you have changed.
 
 At this point Git will prompt that the `chapter_appendix_tools/how-to-contribute.md` file has been modified.
 
@@ -96,38 +95,35 @@ git push
 
 The changed code will then be in your personal fork of the repository. To request the addition of your change, you have to create a pull request for the official repository of the book.
 
-### Pull Request
+### Submitting Pull Requests
 
 As shown in :numref:`fig_git_newpr`, go to your fork of the repository on GitHub and select "New pull request". This will open up a screen that shows you the changes between your edits and what is current in the main repository of the book.
 
-![Pull Request.](../img/git-newpr.png)
+![New pull request.](../img/git-newpr.png)
 :width:`700px`
 :label:`fig_git_newpr`
 
 
-### Submitting Pull Request
+Finally, submit a pull request by clicking the button as shown in :numref:`fig_git_createpr`. Make sure to describe the changes you have made in the pull request.
+This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you will get some feedback on the changes. Once you have incorporated them, you are good to go.
 
-Finally, submit a pull request by clicking the button as shown in :numref:`fig_git_createpr`. Make sure to describe the changes you have made in the pull request. This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you will get some feedback on the changes. Once you have incorporated them, you are good to go.
-
-![Create Pull Request.](../img/git-createpr.png)
+![Create pull request.](../img/git-createpr.png)
 :width:`700px`
 :label:`fig_git_createpr`
 
-Your pull request will appear among the list of requests in the main repository. We will make every effort to process it quickly.
 
 ## Summary
 
 * You can use GitHub to contribute to this book.
 * You can edit the file on GitHub directly for minor changes.
-* For a major change, please fork the repository, edit things locally and only contribute back once you are ready.
+* For a major change, please fork the repository, edit things locally, and only contribute back once you are ready.
 * Pull requests are how contributions are being bundled up. Try not to submit huge pull requests since this makes them hard to understand and incorporate. Better send several smaller ones.
 
 
 ## Exercises
 
-1. Star and fork the `d2l-en` repository.
-1. Find some code that needs improvement and submit a pull request.
-1. Find a reference that we missed and submit a pull request.
+1. Star and fork the `d2l-ai/d2l-en` repository.
+1. If you spot anything that needs improvement (e.g., missing a reference), submit a pull request. 
 1. It is usually a better practice to create a pull request using a new branch. Learn how to do it with [Git branching](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell).
 
 [Discussions](https://discuss.d2l.ai/t/426)
