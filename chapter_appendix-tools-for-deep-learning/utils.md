@@ -16,6 +16,7 @@ import collections
 from d2l import mxnet as d2l
 from IPython import display
 from mxnet import autograd, gluon, np, npx
+from mxnet.gluon import nn
 import random
 npx.set_np()
 ```
@@ -26,6 +27,7 @@ import inspect
 import collections
 from d2l import torch as d2l
 from IPython import display
+from torch import nn
 ```
 
 ```{.python .input}
@@ -597,7 +599,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 def grad_clipping(net, theta):  #@save
     """Clip the gradient."""
     if isinstance(net, nn.Module):
@@ -611,7 +613,7 @@ def grad_clipping(net, theta):  #@save
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 def grad_clipping(grads, theta):  #@save
     """Clip the gradient."""
     theta = tf.constant(theta, dtype=tf.float32)
@@ -635,7 +637,7 @@ def grad_clipping(grads, theta):  #@save
 More for the attention chapter.
 
 ```{.python .input}
-#@tab all
+%%tab all
 #@save
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
@@ -739,6 +741,7 @@ def bleu(pred_seq, label_seq, k):  #@save
 ```
 
 ```{.python .input}
+%%tab mxnet
 #@save
 class Seq2SeqEncoderOld(d2l.Encoder):
     """The RNN encoder for sequence to sequence learning."""
@@ -836,7 +839,7 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 #@save
 class Seq2SeqEncoderOld(d2l.Encoder):
     """The RNN encoder for sequence to sequence learning."""
@@ -959,7 +962,7 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 #@save
 class Seq2SeqEncoderOld(d2l.Encoder):
     """The RNN encoder for sequence to sequence learning."""
