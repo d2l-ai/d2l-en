@@ -15,7 +15,7 @@ import inspect
 import collections
 from d2l import mxnet as d2l
 from IPython import display
-from mxnet import autograd, np, npx
+from mxnet import autograd, gluon, np, npx
 import random
 npx.set_np()
 ```
