@@ -301,7 +301,7 @@ using a minibatch of 4 sequence inputs
 of 7 time steps.
 
 ```{.python .input}
-encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
+encoder = d2l.Seq2SeqEncoderOld(vocab_size=10, embed_size=8, num_hiddens=16,
                              num_layers=2)
 encoder.initialize()
 decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, num_hiddens=16,
@@ -315,7 +315,7 @@ output.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 
 ```{.python .input}
 #@tab pytorch
-encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
+encoder = d2l.Seq2SeqEncoderOld(vocab_size=10, embed_size=8, num_hiddens=16,
                              num_layers=2)
 encoder.eval()
 decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, num_hiddens=16,
@@ -329,7 +329,7 @@ output.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 
 ```{.python .input}
 #@tab tensorflow
-encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
+encoder = d2l.Seq2SeqEncoderOld(vocab_size=10, embed_size=8, num_hiddens=16,
                              num_layers=2)
 decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, num_hiddens=16,
                                   num_layers=2)
@@ -357,7 +357,7 @@ batch_size, num_steps = 64, 10
 lr, num_epochs, device = 0.005, 250, d2l.try_gpu()
 
 train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
-encoder = d2l.Seq2SeqEncoder(
+encoder = d2l.Seq2SeqEncoderOld(
     len(src_vocab), embed_size, num_hiddens, num_layers, dropout)
 decoder = Seq2SeqAttentionDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
