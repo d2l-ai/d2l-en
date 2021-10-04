@@ -23,7 +23,6 @@ image-classification-dataset
 classification
 softmax-regression-scratch
 softmax-regression-concise
-generalization-classification
 ```
 
 ```

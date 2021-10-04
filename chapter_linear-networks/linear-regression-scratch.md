@@ -379,7 +379,7 @@ However, in machine learning,
 we are often less concerned
 with recovering true underlying parameters,
 and more concerned with parameters 
-that lead to highly accurate prediction :cite:`vapnik1992principles`.
+that lead to highly accurate prediction :cite:`Vapnik.1992`.
 Fortunately, even on difficult optimization problems,
 stochastic gradient descent can often find remarkably good solutions,
 owing partly to the fact that, for deep networks,

@@ -6,20 +6,19 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Concise Implementation of Linear Regression
 :label:`sec_linear_concise`
 
-Deep Learning has undergone a Cambrian Explosion of sorts over the past decade,
-with a rapid proliferation of new techniques, applications, and algorithms. 
 This is due to a fortuitous combination of multiple factors,
 one of which is the powerful free tools
 offered by a number of open source deep learning frameworks. 
 Caffe, DistBelief and Theano arguably represent the
-first generation of such models :cite:`jia2014caffe,dean2012large,bergstra2010theano` 
+first generation of such models :cite:`Jia.Shelhamer.Donahue.ea.2014,Dean.Corrado.Monga.ea.2012,Bergstra.Breuleux.Bastien.ea.2010`
 that found widespread adoption. 
-In contrast to earlier (seminal) work such as SN2 (Simulateur Neuristique)
-which provided a Lisp-like programming experience
-:cite:`bottou1989cun` modern frameworks 
-offer automatic differentiation
+In contrast to earlier (seminal) works like 
+SN2 (Simulateur Neuristique) :cite:`Bottou.Le-Cun.1988`,
+which provided a Lisp-like programming experience, 
+modern frameworks offer automatic differentiation
 and the convenience of Python. 
 Frameworks allow us to automate and modularize
+>>>>>>> first wave of massive reorg
 the repetitive work of implementing gradient-based learning algorithms.
 
 In :numref:`sec_linear_scratch`, we relied only on
@@ -306,7 +305,8 @@ This section contains the first
 implementation of a deep network (in this book)
 to tap into the conveniences afforded 
 by modern deep learning frameworks,
-such as Gluon, JAX, Keras, PyTorch, and Tensorflow :cite:`abadi2016tensorflow,paszke2019pytorch,frostig2018compiling,chen2015mxnet`. 
+such as Gluon, JAX, Keras, PyTorch, and Tensorflow
+:cite:`Abadi.Barham.Chen.ea    .2016,Paszke.Gross.Massa.ea.2019,Frostig.Johnson.Leary.2018,Chen.Li.Li.ea.2015`.
 We used framework defaults for loading data, defining a layer, 
 a loss function, an optimizer and a training loop. 
 Whenever the framework provides all necessary features,

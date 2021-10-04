@@ -40,8 +40,9 @@ Let's begin with the most important part,
 the mapping from scalars to probabilities. 
 For a refresher, recall the operation of the sum operator 
 along specific dimensions in a tensor,
-as discussed in :numref:`subseq_lin-alg-reduction`
-and :numref:`subseq_lin-alg-non-reduction`.
+as discussed in :numref:`subsec_lin-alg-reduction` 
+and :numref:`subsec_lin-alg-non-reduction`.
+
 [**Given a matrix `X` we can sum over all elements (by default) or only
 over elements in the same axis.**]
 The `axis` variable lets us compute row and column sums:

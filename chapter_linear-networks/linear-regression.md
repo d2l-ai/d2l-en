@@ -222,12 +222,12 @@ $$\begin{aligned}
     \mathbf{X}^\top \mathbf{y} = \mathbf{X}^\top \mathbf{X} \mathbf{w}
 \end{aligned}$$
 
-Solving for $\mathbf{w}$ provides us with 
-the optimal solution for the optimization problem.
-Note that this only exists if the matrix 
-$\mathbf X^\top \mathbf X$ is invertible,
-i.e., if the design matrix covers 
-a sufficiently rich space :cite:`golub1996matrix`.
+Solving for $\mathbf{w}$ provides us with the optimal solution 
+for the optimization problem. 
+Note that this solution will only be unique
+when the matrix $\mathbf X^\top \mathbf X$ is invertible, 
+i.e., when the columns of the design matrix 
+are linearly independent :cite:`Golub.Van-Loan.1996`.
 
 $$\mathbf{w}^* = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf{y}.$$
 
@@ -259,7 +259,7 @@ which is an average of the losses computed
 on every single example in the dataset.
 In practice, this can be extremely slow:
 we must pass over the entire dataset before making a single update,
-even if the update steps might be very powerful :cite:`liu1989limited`.
+even if the update steps might be very powerful :cite:`Liu.Nocedal.1989`.
 Even worse, if there is a lot of redundancy in the training data,
 the benefit of a full update is even lower.
 
@@ -295,9 +295,10 @@ In its most basic form, in each iteration $t$,
 we first randomly sample a minibatch $\mathcal{B}_t$
 consisting of a fixed number $|\mathcal{B}|$ of training examples.
 We then compute the derivative (gradient) of the average loss
-on the minibatch with regard to the model parameters.
-Finally, we multiply the gradient by a predetermined small positive value $\eta$,
-referred to as the *learning rate*,
+on the minibatch with respect to the model parameters.
+Finally, we multiply the gradient 
+by a predetermined small positive value $\eta$,
+called the *learning rate*,
 and subtract the resulting term from the current parameter values.
 We can express the update as follows:
 
@@ -319,7 +320,7 @@ Frequently minibatch size and learning rate are user-defined.
 Such tunable parameters that are not updated
 in the training loop are called *hyperparameters*.
 They can be tuned automatically by a number of techniques, such as Bayesian Optimization
-:cite:`frazier2018tutorial`. In the end, the quality of the solution is
+:cite:`Frazier.2018`. In the end, the quality of the solution is
 typically assessed on a separate *validation dataset* (or *validation set*).
 
 After training for some predetermined number of iterations
@@ -345,7 +346,7 @@ that leads to accurate predictions (and thus low loss).
 In practice, deep learning practitioners 
 seldom struggle to find parameters
 that minimize the loss *on training sets* 
-:cite:`izmailov2018averaging,frankle2018lottery`.
+:cite:`Izmailov.Podoprikhin.Garipov.ea.2018,Frankle.Carbin.2018`.
 The more formidable task is to find parameters
 that that lead to accurate predictions on previously unseen data
 a challenge called *generalization*.
@@ -696,7 +697,7 @@ and ultimately, evaluation on previously unseen data.
     1. Show that the additive Gaussian noise assumption is not appropriate. Hint: can we have negative prices? What about fluctuations?
     1. Why would regression to the logarithm of the price be much better, i.e., $y = \log \mathrm{price}$?
     1. What do you need to worry about when dealing with pennystock, i.e., stock with very low prices? Hint: can you trade at all possible prices? Why is this a bigger problem for cheap stock?
-    1. For more information review the celebrated Black-Scholes model for option pricing :cite:`black1973pricing`.
+    1. For more information review the celebrated Black-Scholes model for option pricing :cite:`Black.Scholes.1973`.
 1. Suppose we want to use regression to estimate the *number* of apples sold in a grocery store.
     1. What are the problems with a Gaussian additive noise model? Hint: you are selling apples, not oil.
     1. The [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution) captures distributions over counts. It is given by $p(k|\lambda) = \lambda^k e^{-\lambda}/k!$. Here $\lambda$ is the rate function and $k$ is the number of events you see. Prove that $\lambda$ is the expected value of counts $k$.
