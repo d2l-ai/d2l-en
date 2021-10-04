@@ -7,15 +7,16 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 :label:`sec_weight_decay`
 
 Now that we have characterized the problem of overfitting,
-we can introduce some standard techniques for regularizing models.
+we can introduce our first *regularization* technique.
 Recall that we can always mitigate overfitting
-by going out and collecting more training data.
-That can be costly, time consuming,
+by collecting more training data.
+However, that can be costly, time consuming,
 or entirely out of our control,
 making it impossible in the short run.
 For now, we can assume that we already have
 as much high-quality data as our resources permit
-and focus on regularization techniques.
+and focus the tools at our disposal
+even when the dataset is taken as a given.
 
 Recall that in our
 polynomial regression example
@@ -421,7 +422,7 @@ of applying weight decay on all layers of a deep network.
 
 ## Summary
 
-* Regularization is a common method for dealing with overfitting. It adds a penalty term to the loss function on the training set to reduce the complexity of the learned model.
+* Regularization is a common method for dealing with overfitting. Classical regularization techniques add a penalty term to the loss function (when training) to reduce the complexity of the learned model.
 * One particular choice for keeping the model simple is weight decay using an $\ell_2$ penalty. This leads to weight decay in the update steps of the learning algorithm.
 * The weight decay functionality is provided in optimizers from deep learning frameworks.
 * Different sets of parameters can have different update behaviors within the same training loop.
