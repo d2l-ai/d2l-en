@@ -274,7 +274,8 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
     def parameters(self):
         """Defined in :numref:`sec_classification`"""
         params = self.collect_params()
-        return params if len(params) else self.get_scratch_params()
+        return params if isinstance(params, gluon.parameter.ParameterDict) and len(
+            params.keys()) else self.get_scratch_params()
 
 class DataModule(d2l.HyperParameters):
     """Defined in :numref:`sec_d2l_apis`"""
