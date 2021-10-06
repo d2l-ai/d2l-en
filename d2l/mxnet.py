@@ -237,9 +237,8 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
             x = self.trainer.epoch + 1
             n = self.trainer.num_val_batches / \
                 self.plot_valid_per_epoch
-        self.board.draw(x, d2l.numpy(value), ('train_' if train else 'val_') + key,
-                        every_n=int(n))
-
+        self.board.draw(x, d2l.numpy(value), (
+            'train_' if train else 'val_') + key,every_n=int(n))
     def training_step(self, batch):
         l = self.loss(self(*batch[:-1]), batch[-1])
         self.plot('loss', l, train=True)
