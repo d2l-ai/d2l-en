@@ -311,7 +311,7 @@ via trial and error,
 tweaking the code in small ways and observing the results.
 Ideally, an elegant mathematical theory might tell us
 precisely how to tweak our code to achieve a desired result.
-However, today deep learning practitioners today
+However, deep learning practitioners today
 must often tread where no cogent theory 
 can provide firm guidance. 
 Despite our best attempts, formal explanations 
