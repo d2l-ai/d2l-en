@@ -18,6 +18,7 @@ import pandas as pd
 import requests
 from IPython import display
 from matplotlib import pyplot as plt
+import matplotlib_inline.backend_inline
 
 import numpy as np
 import torch
