@@ -504,7 +504,3 @@ In terms of convolutions themselves, they can be used for many purposes such as 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/271)
 :end_tab:
-
-```{.python .input}
-
-```
