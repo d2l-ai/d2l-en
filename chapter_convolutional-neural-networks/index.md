@@ -4,7 +4,7 @@
 Image data is represented as a two-dimensional grid of pixels, be it
 monochromatic or in color. Accordingly each pixel corresponds to one
 or multiple numerical values respectively. So far we ignored this rich
-structure and treated them as vectors of numbers by _flattening_ the
+structure and treated them as vectors of numbers by *flattening* the
 images, irrespective of the spatial relation between pixels. This
 deeply unsatisfying approach was necessary in order to feed the
 resulting one-dimensional vectors through a fully connected MLP.
