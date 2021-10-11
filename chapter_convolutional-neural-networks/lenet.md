@@ -8,16 +8,13 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 We now have all the ingredients required to assemble
 a fully-functional CNN.
-In our earlier encounter with image data,
-we applied
-a softmax regression model (:numref:`sec_softmax_scratch`)
-and
-an MLP model (:numref:`sec_mlp_scratch`)
+In our earlier encounter with image data, we applied
+a linear model with softmax regression (:numref:`sec_softmax_scratch`)
+and an MLP (:numref:`sec_mlp_scratch`)
 to pictures of clothing in the Fashion-MNIST dataset.
-To make such data amenable to softmax regression and MLPs,
-we first flattened each image from a $28\times28$ matrix
+To make such data amenable we first flattened each image from a $28\times28$ matrix
 into a fixed-length $784$-dimensional vector,
-and thereafter processed them with fully connected layers.
+and thereafter processed them in fully connected layers.
 Now that we have a handle on convolutional layers,
 we can retain the spatial structure in our images.
 As an additional benefit of replacing fully connected layers with convolutional layers,
@@ -31,17 +28,16 @@ then a researcher at AT&T Bell Labs,
 for the purpose of recognizing handwritten digits in images :cite:`LeCun.Bottou.Bengio.ea.1998`.
 This work represented the culmination
 of a decade of research developing the technology.
-In 1989, LeCun published the first study to successfully
-train CNNs via backpropagation.
-
+In 1989, LeCun's team published the first study to successfully
+train CNNs via backpropagation :cite:`lecun1989backpropagation`.
 
 At the time LeNet achieved outstanding results
 matching the performance of support vector machines,
-then a dominant approach in supervised learning.
+then a dominant approach in supervised learning, achieving an error rate of less than 1% per digit.
 LeNet was eventually adapted to recognize digits
 for processing deposits in ATM machines.
 To this day, some ATMs still run the code
-that Yann and his colleague Leon Bottou wrote in the 1990s!
+that Yann LeCun and his colleague Leon Bottou wrote in the 1990s!
 
 
 ## LeNet
@@ -49,7 +45,7 @@ that Yann and his colleague Leon Bottou wrote in the 1990s!
 At a high level, (**LeNet (LeNet-5) consists of two parts:
 (i) a convolutional encoder consisting of two convolutional layers; and
 (ii) a dense block consisting of three fully connected layers**);
-The architecture is summarized in :numref:`img_lenet`.
+The architecture is summarized in :numref:`img_lenet`. 
 
 ![Data flow in LeNet. The input is a handwritten digit, the output a probability over 10 possible outcomes.](../img/lenet.svg)
 :label:`img_lenet`
@@ -58,7 +54,7 @@ The basic units in each convolutional block
 are a convolutional layer, a sigmoid activation function,
 and a subsequent average pooling operation.
 Note that while ReLUs and max-pooling work better,
-these discoveries had not yet been made in the 1990s.
+these discoveries had not yet been made at the time.
 Each convolutional layer uses a $5\times 5$ kernel
 and a sigmoid activation function.
 These layers map spatially arranged inputs
@@ -158,12 +154,13 @@ class LeNet(d2l.Classification):
 
 ```
 
-We took a small liberty with the original model,
-removing the Gaussian activation in the final layer.
-Other than that, this network matches
+We take some liberty in the reproduction of LeNet insofar as we replace the Gaussian activation layer by 
+a softmax layer. This greatly simplifies the implementation, not the least due to the
+fact that the Gaussian decoder is rarely used nowadays. Other than that, this network matches
 the original LeNet-5 architecture.
 
-By passing a single-channel (black and white)
+Let's see what happens inside the network. By passing a 
+single-channel (black and white)
 $28 \times 28$ image through the network
 and printing the output shape at each layer,
 we can [**inspect the model**] to make sure
@@ -204,7 +201,12 @@ at each layer throughout the convolutional block
 is reduced (compared with the previous layer).
 The first convolutional layer uses 2 pixels of padding
 to compensate for the reduction in height and width
-that would otherwise result from using a $5 \times 5$ kernel.
+that would otherwise result from using a $5 \times 5$ kernel. 
+As an aside, the image size of $28 \times 28$ pixels in the original 
+MNIST OCR dataset is a result of *trimming* 2 pixel rows (and columns) from the 
+original scans that measured $32 \times 32$ pixels. This was done primarily to 
+save space (a 30% reduction) at a time when Megabytes mattered. 
+
 In contrast, the second convolutional layer forgoes padding,
 and thus the height and width are both reduced by 4 pixels.
 As we go up the stack of layers,
@@ -215,7 +217,6 @@ However, each pooling layer halves the height and width.
 Finally, each fully connected layer reduces dimensionality,
 finally emitting an output whose dimension
 matches the number of classes.
-
 
 
 ## Training
@@ -229,28 +230,14 @@ than similarly deep MLPs
 because each parameter participates in many more
 multiplications.
 If you have access to a GPU, this might be a good time
-to put it into action to speed up training.
+to put it into action to speed up training. 
 
-
-
-We also need to [**update our training function to deal with GPUs.**]
-Unlike the `train_epoch_ch3` defined in :numref:`sec_softmax_scratch`,
-we now need to move each minibatch of data
-to our designated device (hopefully, the GPU)
-prior to making the forward and backward propagations.
-
-The training function `train_ch6` is also similar
-to `train_ch3` defined in :numref:`sec_softmax_scratch`.
-Since we will be implementing networks with many layers
-going forward, we will rely primarily on high-level APIs.
-The following training function assumes a model created from high-level APIs
-as input and is optimized accordingly.
-We initialize the model parameters
-on the device indicated by the `device` argument, using Xavier initialization as introduced in :numref:`subsec_xavier`.
+The `d2l.Trainer` method takes care of all details. 
+By default, it initializes the model parameters on the 
+available devices, using Xavier initialization as 
+introduced in :numref:`subsec_xavier`.
 Just as with MLPs, our loss function is cross-entropy,
 and we minimize it via minibatch stochastic gradient descent.
-Since each epoch takes tens of seconds to run,
-we visualize the training loss more frequently.
 
 [**Now let's train and evaluate the LeNet-5 model.**]
 
@@ -273,24 +260,24 @@ with d2l.try_gpu():
 
 ## Summary
 
-* A CNN is a network that employs convolutional layers.
-* In a CNN, we interleave convolutions, nonlinearities, and (often) pooling operations.
-* In a CNN, convolutional layers are typically arranged so that they gradually decrease the spatial resolution of the representations, while increasing the number of channels.
-* In traditional CNNs, the representations encoded by the convolutional blocks are processed by one or more fully connected layers prior to emitting output.
-* LeNet was arguably the first successful deployment of such a network.
+In this chapter we made significant progress. We moved from the MLPs of the 1980s to the CNNs of the 1990s and early 2000s. The architectures proposed, e.g., in the form of LeNet5 remain meaningful, even to this day. It is worth comparing the error rates on FashionMNIST achievable with LeNet5 both to the very best possible with MLPs (:numref:`sec_mlp_scratch`) and those with significantly more advanced architectures such as ResNet (:numref:`sec_resnet`). LetNet is much more similar to the latter than to the former. One of the primary differences, as we shall see, is that greater amounts of computation afforded significantly more complex architectures. 
+
+A second difference is the relative ease with which we were able to implement LeNet. What used to be an engineering challenge worth months of C++ and assembly code, engineering to improve SN, an early Lisp based deep learning tool, :cite:`bottou-lecun-88`, and finally experimentation with models can now be accomplished in minutes. It is this incredible productivity boost that has democratized deep learning model development tremendously. In the next chapter we will follow down this rabbit to hole to see where it takes us.
 
 ## Exercises
 
-1. Replace the average pooling with maximum pooling. What happens?
-1. Try to construct a more complex network based on LeNet to improve its accuracy.
+1. Let's modernize LeNet. Implement and test the following changes:
+    1. Replace the average pooling with maximum pooling. 
+    1. Replace the softmax layer with ReLu.
+1. Try to change the size of the LeNet style network to improve its accuracy in addition to max-pooling and Relu.
     1. Adjust the convolution window size.
     1. Adjust the number of output channels.
-    1. Adjust the activation function (e.g., ReLU).
     1. Adjust the number of convolution layers.
     1. Adjust the number of fully connected layers.
     1. Adjust the learning rates and other training details (e.g., initialization and number of epochs.)
 1. Try out the improved network on the original MNIST dataset.
 1. Display the activations of the first and second layer of LeNet for different inputs (e.g., sweaters and coats).
+1. What happens to the activations when you feed significantly different images into the network (e.g., cats, cars, or even random noise)?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/73)
@@ -303,3 +290,7 @@ with d2l.try_gpu():
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/275)
 :end_tab:
+
+```{.python .input}
+
+```
