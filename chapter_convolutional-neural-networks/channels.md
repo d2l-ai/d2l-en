@@ -296,7 +296,3 @@ Note, though, that this flexibility comes at a price. Given an image of size $(h
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/273)
 :end_tab:
-
-```{.python .input}
-
-```
