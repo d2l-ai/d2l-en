@@ -151,7 +151,7 @@ centered around $(i, j)$ and weighted by $[\mathsf{V}]_{i, j, a, b}$. Before we 
 ### Translation Invariance
 
 Now let's invoke the first principle
-established above: translation invariance.
+established above: translation invariance :cite:`zhang1988shift`.
 This implies that a shift in the input $\mathbf{X}$
 should simply lead to a shift in the hidden representation $\mathbf{H}$.
 This is only possible if $\mathsf{V}$ and $\mathbf{U}$ do not actually depend on $(i, j)$. As such
@@ -166,7 +166,7 @@ We are effectively weighting pixels at $(i+a, j+b)$
 in the vicinity of location $(i, j)$ with coefficients $[\mathbf{V}]_{a, b}$
 to obtain the value $[\mathbf{H}]_{i, j}$.
 Note that $[\mathbf{V}]_{a, b}$ needs many fewer coefficients than $[\mathsf{V}]_{i, j, a, b}$ since it
-no longer depends on the location within the image. Consequently, the number of parameters required is no longer $10^{12}$ but a much more reasonable $4 \cdot 10^6$: we still have the dependency on $a, b \in (-1000, 1000)$. In short, we have made significant progress. 
+no longer depends on the location within the image. Consequently, the number of parameters required is no longer $10^{12}$ but a much more reasonable $4 \cdot 10^6$: we still have the dependency on $a, b \in (-1000, 1000)$. In short, we have made significant progress. TDNNs (time-delay neural networks) are some of the first examples to exploit this idea :cite:`waibel1989phoneme`.
 
 ###  Locality
 
@@ -313,7 +313,7 @@ We turn to these issues in the remainder of the chapter.
 
 ## Summary and Discussion
 
-In this section we derived the structure of Convolutional Neural Networks from first principles. While it is unclear whether this is what led to the invention of CNNs in :cite:`lecun1995comparison`, it is satisfying to know that they are the *right* choice when applying reasonable principles to how image processing and computer vision algorithms should operate, at least at lower levels. In particular, translation invariance in images implies that all patches of an image will be treated in the same manner. Locality means that only a small neighborhood of pixels will be used to compute the corresponding hidden representations.
+In this section we derived the structure of Convolutional Neural Networks from first principles. While it is unclear whether this is what led to the invention of CNNs, it is satisfying to know that they are the *right* choice when applying reasonable principles to how image processing and computer vision algorithms should operate, at least at lower levels. In particular, translation invariance in images implies that all patches of an image will be treated in the same manner. Locality means that only a small neighborhood of pixels will be used to compute the corresponding hidden representations. Some of the earliest references to CNNs are in the form of the Neocognitron :cite:`fukushima1982neocognitron`. 
 
 A second principle that we encountered in our reasoning is how to reduce the number of parameters in a function class without limiting its expressive power, at least, whenever certain assumptions on the model hold. We saw a dramatic reduction of complexity as a result of this restriction, turning computationally and statistically infeasible problems into tractable models. 
 
