@@ -23,11 +23,15 @@ Now, given our objective function $f$, hyperparameter optimization aims to find 
 
 ## Metrics 
 
-- validation performance
-- cross validation performance
-- 
+Most common way to estimate the validation performance is to compute the loss on a hold out validation set. We cannot use the training loss to optimize the hyperparameters since this would lead to overfitting, for example, if we optimize regularization parameters.
+In case of small datasets we often do not have access to a sufficient large validation dataset. In this case we can apply $k$ fold cross validation and use the average validation loss across all folds as metric to optimize. However, at least in the standard form of HPO, this makes the optimization process $k$ times slower.
+
+In practice, hyperparameter configuratons $\mathbf{x}$ come with different costs $c: \mathcal{X} \rightarrow \mathbf{R}$, such as wall-clock time. For example, if we optimize the number of units of neural networks, larger networks are more expensive to train the smaller networks. Usually, we are not so much interested in how often we have to evaluate $f$, but rather try to find $\mathbf{x}_{\star}$ as quickly as possible.
 
 
+## Constraint Optimization
+
+In many scenarios we are not just interested in finding $\mathbf{x}_{\star}$, but a hyperparameter configuration that additionally full fills certain constraints. More formally, we seek to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x}) s.t c_1(\mathbf{x}) > 0, ...,c_m(\mathbf{x}) > 0 $. Typical constrains could be, for example, the memory consumption of $\mathbf{x}$ or fairness constraints.
 
 ## Search Spaces
 
@@ -58,12 +62,4 @@ search_space = {
 
 
 ## Summary
-
-
-
-- What is the problem? Why is it useful?
-- Fixing concepts: search space, types of hyperparameters, dmetrics
-- Concepts of sequential HPO (i.e., BO): Could also be done further down
-- Early stopping and multi-fidelity in a nutshell: Could also be done further down
-- Mention AutoGluon (but details more below). But if this needs to be installed, this has to be detailed here. It would be easiest if AutoGluon is installed already by default in the D2L setup
 
