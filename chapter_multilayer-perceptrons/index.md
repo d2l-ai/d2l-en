@@ -16,7 +16,6 @@ be ready to
 discuss issues relating to numerical stability and parameter initialization
 that are key to successfully training deep networks.
 
-
 ```toc
 :maxdepth: 2
 
@@ -24,5 +23,8 @@ mlp
 mlp-implementation
 backprop
 numerical-stability-and-init
+generalization-deep
+dropout
+kaggle-house-price
 ```
 
