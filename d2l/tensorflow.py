@@ -619,7 +619,7 @@ class Vocab:
 
 class RNNScratch(d2l.Module):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01, device=None):
         super().__init__()
         self.save_hyperparameters()
         self.W_xh = tf.Variable(d2l.normal(
@@ -648,7 +648,7 @@ def check_shape(a, shape):
 
 class RNNLMScratch(d2l.Classification):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, rnn, vocab_size, lr=0.01):
+    def __init__(self, rnn, vocab_size, lr=0.01, device=None):
         super().__init__()
         self.save_hyperparameters()
         self.init_params()
@@ -675,13 +675,13 @@ class RNNLMScratch(d2l.Classification):
         outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in hiddens]
         return d2l.stack(outputs, 1)
 
-    def predict(self, prefix, num_preds, vocab):
+    def predict(self, prefix, num_preds, vocab, device=None):
         """Defined in :numref:`sec_rnn_scratch`"""
-        state, outputs = None, [vocab[prefix[0]]]
+        outputs = [vocab[prefix[0]]]
         for i in range(len(prefix) + num_preds - 1):
             X = d2l.tensor([[outputs[-1]]])
             embs = self.one_hot(X)
-            hiddens, state = self.rnn(embs, state)
+            hiddens, _ = self.rnn(embs)
             if i < len(prefix) - 1: # Warm-up period
                 outputs.append(vocab[prefix[i]])
             else:  # Predict `num_preds` steps
@@ -694,8 +694,9 @@ class RNN(d2l.Module):
     def __init__(self, num_hiddens):
         super().__init__()
         self.save_hyperparameters()
-        self.rnn = tf.keras.layers.SimpleRNN(num_hiddens, return_sequences=True,
-                                             return_state=True, time_major=True)
+        self.rnn = tf.keras.layers.SimpleRNN(
+            num_hiddens, return_sequences=True, return_state=True,
+            time_major=True)
 
     def forward(self, inputs, H=None):
         outputs, H = self.rnn(inputs, H)
