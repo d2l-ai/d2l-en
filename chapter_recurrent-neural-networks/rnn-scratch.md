@@ -344,8 +344,13 @@ a deep learning framework.
 %%tab all
 data = d2l.TimeMachine(batch_size=32, num_steps=16)
 rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
-model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1)
+if tab.selected('mxnet', 'pytorch'):
+    model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1)
+    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1, num_gpus=1)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1)
+    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -376,23 +381,27 @@ So we generate the predicted characters and emit them.
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
-def predict(self, prefix, num_preds, vocab):
-    state, outputs = None, [vocab[prefix[0]]]
+def predict(self, prefix, num_preds, vocab, device):
+    outputs = [vocab[prefix[0]]]
     for i in range(len(prefix) + num_preds - 1):
-        X = d2l.tensor([[outputs[-1]]])        
+        X = d2l.tensor([[outputs[-1]]], device=device)        
         embs = self.one_hot(X)
-        hiddens, state = self.rnn(embs, state)
+        hiddens, _ = self.rnn(embs)
         if i < len(prefix) - 1: # Warm-up period
             outputs.append(vocab[prefix[i]])
         else:  # Predict `num_preds` steps
             Y = self.output_layer(hiddens)
             outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))    
     return ''.join([vocab.idx_to_token[i] for i in outputs])
-    
 ```
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
+model.predict('time traveller', 10, data.vocab, d2l.try_gpu())
+```
+
+```{.python .input}
+%%tab tensorflow
 model.predict('time traveller', 10, data.vocab)
 ```
 

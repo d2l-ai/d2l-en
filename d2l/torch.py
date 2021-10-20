@@ -702,13 +702,13 @@ class RNNLMScratch(d2l.Classification):
         outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in hiddens]
         return d2l.stack(outputs, 1)
 
-    def predict(self, prefix, num_preds, vocab):
+    def predict(self, prefix, num_preds, vocab, device):
         """Defined in :numref:`sec_rnn_scratch`"""
-        state, outputs = None, [vocab[prefix[0]]]
+        outputs = [vocab[prefix[0]]]
         for i in range(len(prefix) + num_preds - 1):
-            X = d2l.tensor([[outputs[-1]]])
+            X = d2l.tensor([[outputs[-1]]], device=device)
             embs = self.one_hot(X)
-            hiddens, state = self.rnn(embs, state)
+            hiddens, _ = self.rnn(embs)
             if i < len(prefix) - 1: # Warm-up period
                 outputs.append(vocab[prefix[i]])
             else:  # Predict `num_preds` steps

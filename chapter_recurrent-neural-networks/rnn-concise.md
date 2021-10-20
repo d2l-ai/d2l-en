@@ -112,7 +112,6 @@ if tab.selected('mxnet', 'pytorch'):
     model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
     trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
-    device_name = d2l.try_gpu()._device_name
     with d2l.try_gpu():
         model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
     trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1)
@@ -120,7 +119,12 @@ trainer.fit(model, data)
 ```
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
+model.predict('time traveller', 10, data.vocab, d2l.try_gpu())
+```
+
+```{.python .input}
+%%tab tensorflow
 model.predict('time traveller', 10, data.vocab)
 ```
 
