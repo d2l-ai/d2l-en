@@ -688,6 +688,14 @@ class RNNLMScratch(d2l.Classification):
                       device=self.device) * self.rnn.sigma)
         self.b_q = nn.Parameter(
             d2l.zeros(self.vocab_size, device=self.device))
+    def training_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('ppl', d2l.exp(l), train=True)
+        return l
+
+    def validation_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('ppl', d2l.exp(l), train=False)
 
     def one_hot(self, X):
         """Defined in :numref:`sec_rnn_scratch`"""
@@ -713,7 +721,7 @@ class RNNLMScratch(d2l.Classification):
             X = d2l.tensor([[outputs[-1]]], device=device)
             embs = self.one_hot(X)
             hiddens, _ = self.rnn(embs)
-            if i < len(prefix) - 1: # Warm-up period
+            if i < len(prefix) - 1:  # Warm-up period
                 outputs.append(vocab[prefix[i]])
             else:  # Predict `num_preds` steps
                 Y = self.output_layer(hiddens)

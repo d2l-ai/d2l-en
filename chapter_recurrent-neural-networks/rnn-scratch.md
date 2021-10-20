@@ -155,7 +155,16 @@ class RNNLMScratch(d2l.Classification):  #@save
         if tab.selected('tensorflow'):
             self.W_hq = tf.Variable(d2l.normal(
                 (self.rnn.num_hiddens, self.vocab_size)) * self.rnn.sigma)
-            self.b_q = tf.Variable(d2l.zeros(self.vocab_size))            
+            self.b_q = tf.Variable(d2l.zeros(self.vocab_size))
+        
+    def training_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('ppl', d2l.exp(l), train=True)
+        return l
+        
+    def validation_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('ppl', d2l.exp(l), train=False)
 ```
 
 ### [**One-Hot Encoding**]
@@ -362,11 +371,6 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-```{.python .input}
-%%tab all
-print('perplexity:', math.exp(model.board.data['val_loss'][-1].y))
-```
-
 ## Prediction
 
 Let's [**first define the prediction function
@@ -400,11 +404,11 @@ def predict(self, prefix, num_preds, vocab, device=None):
             X = d2l.tensor([[outputs[-1]]])
         embs = self.one_hot(X)
         hiddens, _ = self.rnn(embs)
-        if i < len(prefix) - 1: # Warm-up period
+        if i < len(prefix) - 1:  # Warm-up period
             outputs.append(vocab[prefix[i]])
         else:  # Predict `num_preds` steps
             Y = self.output_layer(hiddens)
-            outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))    
+            outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 

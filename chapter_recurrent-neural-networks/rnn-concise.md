@@ -105,17 +105,26 @@ class RNNLM(d2l.RNNLMScratch):  #@save
 
 ```{.python .input  n=1}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=16)
+
+lr=1
+num_hiddens=128
+batch_size=64
+num_steps=35
+max_epochs=100
+
+
+
+data = d2l.TimeMachine(batch_size=batch_size, num_steps=num_steps)
 if tab.selected('mxnet'):
     rnn_layer = RNN(num_hiddens=32, device=d2l.try_gpu())
 if tab.selected('pytorch'):
-    rnn_layer = RNN(num_inputs=len(data.vocab), num_hiddens=32)
+    rnn_layer = RNN(num_inputs=len(data.vocab), num_hiddens=num_hiddens)
 if tab.selected('tensorflow'):
     rnn_layer = RNN(num_hiddens=32)
 if tab.selected('mxnet', 'pytorch'):
-    model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1,
+    model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=lr,
                   device=d2l.try_gpu())
-    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1, num_gpus=1)
+    trainer = d2l.Trainer(max_epochs=max_epochs, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
         model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
