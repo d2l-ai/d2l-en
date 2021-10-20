@@ -475,7 +475,7 @@ net[0].weight.data.device
 net.layers[0].weights[0].device, net.layers[0].weights[1].device
 ```
 
-Let the trainer to support GPU.
+Let the trainer support GPU.
 
 ```{.python .input}
 %%tab mxnet, pytorch
