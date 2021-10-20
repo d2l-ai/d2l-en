@@ -107,9 +107,15 @@ data = d2l.TimeMachine(batch_size=32, num_steps=16)
 if tab.selected('pytorch'):
     rnn_layer = RNN(num_inputs=len(data.vocab), num_hiddens=32)
 if tab.selected('mxnet', 'tensorflow'):
-    rnn_layer = RNN(num_hiddens=32)    
-model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1)
+    rnn_layer = RNN(num_hiddens=32)
+if tab.selected('mxnet', 'pytorch'):
+    model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
+    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1, num_gpus=1)
+if tab.selected('tensorflow'):
+    device_name = d2l.try_gpu()._device_name
+    with d2l.try_gpu():
+        model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
+    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
