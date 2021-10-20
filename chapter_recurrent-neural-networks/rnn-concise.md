@@ -90,7 +90,7 @@ class RNNLM(d2l.RNNLMScratch):  #@save
     def init_params(self):
         if tab.selected('mxnet'):
             self.linear = nn.Dense(self.vocab_size, flatten=False)
-            self.initialize(force_reinit=True, ctx=self.device)
+            self.initialize(ctx=self.device)
         if tab.selected('pytorch'):
             self.linear = nn.Linear(self.rnn.num_hiddens, self.vocab_size)
         if tab.selected('tensorflow'):

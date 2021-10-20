@@ -744,7 +744,7 @@ class RNNLM(d2l.RNNLMScratch):
     """Defined in :numref:`sec_rnn-concise`"""
     def init_params(self):
         self.linear = nn.Dense(self.vocab_size, flatten=False)
-        self.initialize(force_reinit=True, ctx=self.device)
+        self.initialize(ctx=self.device)
     def output_layer(self, hiddens):
         return d2l.swapaxes(self.linear(hiddens), 0, 1)
 
