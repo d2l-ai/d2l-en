@@ -54,7 +54,7 @@ identically for each $\mathbf{x}$:
 
 For convenience we assume that $\epsilon$ is drawn from a normal distribution with mean $\mu= 0$ 
 and standard deviation $\sigma = 0.01$.
-We add the code to the `__init__` method of a subclass of `DataModule`. It's good practice to allow setting any additional hyperparameters. We accomplish this with `save_hyperparameters()`. The `batch_size` will be determined later on. 
+We add the code to the `__init__` method of a subclass of `DataModule`. It's good practice to allow setting any additional hyperparameters. We accomplish this with `save_hyperparameters()`. The `batch_size` will be determined later on.
 
 ```{.python .input}
 %%tab all
@@ -75,14 +75,14 @@ class SyntheticRegressionData(d2l.DataModule):  #@save
 
 We set the true parameters to 
 $\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$ to generate the data. Later this can be used
-to check the fidelity of any estimates. 
+to check the fidelity of any estimates.
 
 ```{.python .input}
 %%tab all
 data = SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 ```
 
-[**Each row in `features` consists of a vector in $\mathbb{R}^2$ and each row in `labels` is a scalar.**] Let's have a look at the first entry. 
+[**Each row in `features` consists of a vector in $\mathbb{R}^2$ and each row in `labels` is a scalar.**] Let's have a look at the first entry.
 
 ```{.python .input}
 %%tab all
@@ -98,7 +98,7 @@ It (**takes a batch size, a matrix of features,
 and a vector of labels and generates minibatches of size `batch_size`.**)
 As such, each minibatch consists of a tuple of features and labels. Note that we need to be 
 mindful of whether we're in training or validation mode: in the former, we will want to read the data
-in random order, whereas for the latter, being able to read data in a pre-defined order may be quite important for debugging purposes. 
+in random order, whereas for the latter, being able to read data in a pre-defined order may be quite important for debugging purposes.
 
 ```{.python .input}
 %%tab all
@@ -149,19 +149,22 @@ generated/processed on the fly. Next let's try to implement the same function us
 ## Concise Implementation of the Data Loader
 
 Rather than writing our own iterator,
-we can [**call the existing API in a framework to load data.**] As before, need a dataset with features `X` and labels `y`. Beyond that, we set `batch_size` in the built-in data loader and let it take care of shuffling examples  efficiently.
+we can [**call the existing API in a framework to load data.**] As before, we need a dataset with features `X` and labels `y`. Beyond that, we set `batch_size` in the built-in data loader and let it take care of shuffling examples  efficiently.
 
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(d2l.DataModule)  #@save
-def get_tensorloader(self, tensors, train, indices=slice(0,None)):
+def get_tensorloader(self, tensors, train, indices=slice(0, None)):
     tensors = tuple(a[indices] for a in tensors)
     if tab.selected('mxnet'):
         dataset = gluon.data.ArrayDataset(*tensors)
         return gluon.data.DataLoader(dataset, self.batch_size, shuffle=train)
+
     if tab.selected('pytorch'):
         dataset = torch.utils.data.TensorDataset(*tensors)
-        return torch.utils.data.DataLoader(dataset, self.batch_size, shuffle=train)
+        return torch.utils.data.DataLoader(dataset, self.batch_size,
+                                           shuffle=train)
+
     if tab.selected('tensorflow'):
         shuffle_buffer = tensors[0].shape[0] if train else 1
         return tf.data.Dataset.from_tensor_slices(tensors).shuffle(
@@ -171,10 +174,9 @@ def get_tensorloader(self, tensors, train, indices=slice(0,None)):
 def get_dataloader(self, train):
     i = slice(0, self.num_train) if train else slice(self.num_train, None)
     return self.get_tensorloader((self.X, self.y), train, i)
-        
 ```
 
-The new data loader behaves just as the previous one, except that it is more efficient and has some added functionality. 
+The new data loader behaves just as the previous one, except that it is more efficient and has some added functionality.
 
 ```{.python .input  n=4}
 %%tab all
@@ -204,7 +206,3 @@ As for the model itself, the two-dimensional linear model is about as simple a m
     1. How would you shuffle the data if data is held on disk? Your task is to design an *efficient* algorithm that does not require too many random reads or writes. Hint: [Pseudorandom Permutation Generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) allow you to design a reshuffle without the need to store the permutation table explicitly :cite:`naor1999construction`. 
 1. Implement a data generator that produces new data on the fly, every time the iterator is called. 
 1. How would you design a random data generator that generates *the same* data each time it's called?
-
-```{.python .input}
-
-```
