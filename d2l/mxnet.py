@@ -656,12 +656,13 @@ class Vocab:
 
 class RNNScratch(d2l.Module):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01, device=None):
         super().__init__()
         self.save_hyperparameters()
-        self.W_xh = d2l.randn(num_inputs, num_hiddens) * sigma
-        self.W_hh = d2l.randn(num_hiddens, num_hiddens) * sigma
-        self.b_h = d2l.zeros(num_hiddens)
+        self.W_xh = d2l.randn(num_inputs, num_hiddens, ctx=device) * sigma
+        self.W_hh = d2l.randn(
+            num_hiddens, num_hiddens, ctx=device) * sigma
+        self.b_h = d2l.zeros(num_hiddens, ctx=device)
 
     def forward(self, inputs, H=None):
         """Defined in :numref:`sec_rnn_scratch`"""
@@ -683,15 +684,15 @@ def check_shape(a, shape):
 
 class RNNLMScratch(d2l.Classification):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, rnn, vocab_size, lr=0.01):
+    def __init__(self, rnn, vocab_size, lr=0.01, device=None):
         super().__init__()
         self.save_hyperparameters()
         self.init_params()
 
     def init_params(self):
-        self.W_hq = d2l.randn(
-            self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma
-        self.b_q = d2l.zeros(self.vocab_size)
+        self.W_hq = d2l.randn(self.rnn.num_hiddens, self.vocab_size,
+                              ctx=self.device) * self.rnn.sigma
+        self.b_q = d2l.zeros(self.vocab_size, ctx=self.device)
         for param in self.get_scratch_params():
             param.attach_grad()
 
@@ -712,11 +713,11 @@ class RNNLMScratch(d2l.Classification):
         outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in hiddens]
         return d2l.stack(outputs, 1)
 
-    def predict(self, prefix, num_preds, vocab, device):
+    def predict(self, prefix, num_preds, vocab, device=None):
         """Defined in :numref:`sec_rnn_scratch`"""
         outputs = [vocab[prefix[0]]]
         for i in range(len(prefix) + num_preds - 1):
-            X = d2l.tensor([[outputs[-1]]], device=device)
+            X = d2l.tensor([[outputs[-1]]], ctx=device)
             embs = self.one_hot(X)
             hiddens, _ = self.rnn(embs)
             if i < len(prefix) - 1: # Warm-up period
@@ -728,13 +729,14 @@ class RNNLMScratch(d2l.Classification):
 
 class RNN(d2l.Module):
     """Defined in :numref:`sec_rnn-concise`"""
-    def __init__(self, num_hiddens):
+    def __init__(self, num_hiddens, device):
         super().__init__()
         self.save_hyperparameters()
         self.rnn = rnn.RNN(num_hiddens)
 
     def forward(self, inputs, H=None):
-        if H is None: H, = self.rnn.begin_state(inputs.shape[1])
+        if H is None:
+            H, = self.rnn.begin_state(inputs.shape[1], ctx=self.device)
         outputs, (H, ) = self.rnn(inputs, (H, ))
         return outputs, H
 
@@ -742,7 +744,7 @@ class RNNLM(d2l.RNNLMScratch):
     """Defined in :numref:`sec_rnn-concise`"""
     def init_params(self):
         self.linear = nn.Dense(self.vocab_size, flatten=False)
-        self.initialize()
+        self.initialize(force_reinit=True, ctx=self.device)
     def output_layer(self, hiddens):
         return d2l.swapaxes(self.linear(hiddens), 0, 1)
 

@@ -648,12 +648,14 @@ class Vocab:
 
 class RNNScratch(d2l.Module):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01, device=None):
         super().__init__()
         self.save_hyperparameters()
-        self.W_xh = nn.Parameter(d2l.randn(num_inputs, num_hiddens) * sigma)
-        self.W_hh = nn.Parameter(d2l.rand(num_hiddens, num_hiddens) * sigma)
-        self.b_h = nn.Parameter(d2l.zeros(num_hiddens))
+        self.W_xh = nn.Parameter(
+            d2l.randn(num_inputs, num_hiddens, device=device) * sigma)
+        self.W_hh = nn.Parameter(
+            d2l.rand(num_hiddens, num_hiddens, device=device) * sigma)
+        self.b_h = nn.Parameter(d2l.zeros(num_hiddens, device=device))
 
     def forward(self, inputs, H=None):
         """Defined in :numref:`sec_rnn_scratch`"""
@@ -675,15 +677,17 @@ def check_shape(a, shape):
 
 class RNNLMScratch(d2l.Classification):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, rnn, vocab_size, lr=0.01):
+    def __init__(self, rnn, vocab_size, lr=0.01, device=None):
         super().__init__()
         self.save_hyperparameters()
         self.init_params()
 
     def init_params(self):
-        self.W_hq = nn.Parameter(d2l.randn(
-            self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma)
-        self.b_q = nn.Parameter(d2l.zeros(self.vocab_size))
+        self.W_hq = nn.Parameter(
+            d2l.randn(self.rnn.num_hiddens, self.vocab_size,
+                      device=self.device) * self.rnn.sigma)
+        self.b_q = nn.Parameter(
+            d2l.zeros(self.vocab_size, device=self.device))
 
     def one_hot(self, X):
         """Defined in :numref:`sec_rnn_scratch`"""
@@ -702,7 +706,7 @@ class RNNLMScratch(d2l.Classification):
         outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in hiddens]
         return d2l.stack(outputs, 1)
 
-    def predict(self, prefix, num_preds, vocab, device):
+    def predict(self, prefix, num_preds, vocab, device=None):
         """Defined in :numref:`sec_rnn_scratch`"""
         outputs = [vocab[prefix[0]]]
         for i in range(len(prefix) + num_preds - 1):
