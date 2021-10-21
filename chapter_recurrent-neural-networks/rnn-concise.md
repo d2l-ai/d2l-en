@@ -45,13 +45,14 @@ For now, suffice it to say that multiple layers simply amount to the output of o
 ```{.python .input}
 %%tab mxnet
 class RNN(d2l.Module):  #@save
-    def __init__(self, num_hiddens):
+    def __init__(self, num_hiddens, device):
         super().__init__()
         self.save_hyperparameters()        
         self.rnn = rnn.RNN(num_hiddens)
         
     def forward(self, inputs, H=None):
-        if H is None: H, = self.rnn.begin_state(inputs.shape[1])
+        if H is None:
+            H, = self.rnn.begin_state(inputs.shape[1], ctx=self.device)
         outputs, (H, ) = self.rnn(inputs, (H, ))
         return outputs, H
 ```
@@ -74,8 +75,9 @@ class RNN(d2l.Module):  #@save
     def __init__(self, num_hiddens):
         super().__init__()
         self.save_hyperparameters()            
-        self.rnn = tf.keras.layers.SimpleRNN(num_hiddens, return_sequences=True, 
-                                             return_state=True, time_major=True)
+        self.rnn = tf.keras.layers.SimpleRNN(
+            num_hiddens, return_sequences=True, return_state=True,
+            time_major=True)
         
     def forward(self, inputs, H=None):
         outputs, H = self.rnn(inputs, H)
@@ -88,7 +90,7 @@ class RNNLM(d2l.RNNLMScratch):  #@save
     def init_params(self):
         if tab.selected('mxnet'):
             self.linear = nn.Dense(self.vocab_size, flatten=False)
-            self.initialize()
+            self.initialize(ctx=self.device)
         if tab.selected('pytorch'):
             self.linear = nn.Linear(self.rnn.num_hiddens, self.vocab_size)
         if tab.selected('tensorflow'):
@@ -104,17 +106,30 @@ class RNNLM(d2l.RNNLMScratch):  #@save
 ```{.python .input  n=1}
 %%tab all
 data = d2l.TimeMachine(batch_size=32, num_steps=16)
+if tab.selected('mxnet'):
+    rnn_layer = RNN(num_hiddens=32, device=d2l.try_gpu())
 if tab.selected('pytorch'):
     rnn_layer = RNN(num_inputs=len(data.vocab), num_hiddens=32)
-if tab.selected('mxnet', 'tensorflow'):
-    rnn_layer = RNN(num_hiddens=32)    
-model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1)
+if tab.selected('tensorflow'):
+    rnn_layer = RNN(num_hiddens=32)
+if tab.selected('mxnet', 'pytorch'):
+    model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1,
+                  device=d2l.try_gpu())
+    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1, num_gpus=1)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
+    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
+model.predict('time traveller', 10, data.vocab, d2l.try_gpu())
+```
+
+```{.python .input}
+%%tab tensorflow
 model.predict('time traveller', 10, data.vocab)
 ```
 

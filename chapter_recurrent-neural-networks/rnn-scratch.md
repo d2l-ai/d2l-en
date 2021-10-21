@@ -53,17 +53,20 @@ The dataset is relatively small, we will train with hundreds of epochs, so we ch
 ```{.python .input}
 %%tab all
 class RNNScratch(d2l.Module):  #@save
-    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01, device=None):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
-            self.W_xh = d2l.randn(num_inputs, num_hiddens) * sigma
-            self.W_hh = d2l.randn(num_hiddens, num_hiddens) * sigma
-            self.b_h = d2l.zeros(num_hiddens)
+            self.W_xh = d2l.randn(num_inputs, num_hiddens, ctx=device) * sigma
+            self.W_hh = d2l.randn(
+                num_hiddens, num_hiddens, ctx=device) * sigma
+            self.b_h = d2l.zeros(num_hiddens, ctx=device)
         if tab.selected('pytorch'):
-            self.W_xh = nn.Parameter(d2l.randn(num_inputs, num_hiddens) * sigma)
-            self.W_hh = nn.Parameter(d2l.rand(num_hiddens, num_hiddens) * sigma)
-            self.b_h = nn.Parameter(d2l.zeros(num_hiddens))
+            self.W_xh = nn.Parameter(
+                d2l.randn(num_inputs, num_hiddens, device=device) * sigma)
+            self.W_hh = nn.Parameter(
+                d2l.rand(num_hiddens, num_hiddens, device=device) * sigma)
+            self.b_h = nn.Parameter(d2l.zeros(num_hiddens, device=device))
         if tab.selected('tensorflow'):
             self.W_xh = tf.Variable(d2l.normal(
                 (num_inputs, num_hiddens)) * sigma)
@@ -131,26 +134,37 @@ d2l.check_shape(H, (batch_size, num_hiddens))
 ```{.python .input}
 %%tab all
 class RNNLMScratch(d2l.Classification):  #@save
-    def __init__(self, rnn, vocab_size, lr=0.01):
+    def __init__(self, rnn, vocab_size, lr=0.01, device=None):
         super().__init__()
         self.save_hyperparameters()
         self.init_params()
         
     def init_params(self):
         if tab.selected('mxnet'):
-            self.W_hq = d2l.randn(
-                self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma
-            self.b_q = d2l.zeros(self.vocab_size)        
+            self.W_hq = d2l.randn(self.rnn.num_hiddens, self.vocab_size,
+                                  ctx=self.device) * self.rnn.sigma
+            self.b_q = d2l.zeros(self.vocab_size, ctx=self.device)        
             for param in self.get_scratch_params():
                 param.attach_grad()
         if tab.selected('pytorch'):
-            self.W_hq = nn.Parameter(d2l.randn(
-                self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma)
-            self.b_q = nn.Parameter(d2l.zeros(self.vocab_size)) 
+            self.W_hq = nn.Parameter(
+                d2l.randn(self.rnn.num_hiddens, self.vocab_size,
+                          device=self.device) * self.rnn.sigma)
+            self.b_q = nn.Parameter(
+                d2l.zeros(self.vocab_size, device=self.device)) 
         if tab.selected('tensorflow'):
             self.W_hq = tf.Variable(d2l.normal(
                 (self.rnn.num_hiddens, self.vocab_size)) * self.rnn.sigma)
-            self.b_q = tf.Variable(d2l.zeros(self.vocab_size))            
+            self.b_q = tf.Variable(d2l.zeros(self.vocab_size))
+        
+    def training_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('ppl', d2l.exp(l), train=True)
+        return l
+        
+    def validation_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('ppl', d2l.exp(l), train=False)
 ```
 
 ### [**One-Hot Encoding**]
@@ -198,10 +212,10 @@ time step by time step.
 @d2l.add_to_class(RNNLMScratch)  #@save
 def one_hot(self, X):    
     # output shape: (num_steps, batch_size, vocab_size)    
-    if tab.selected('pytorch'):
-        return F.one_hot(X.T, self.vocab_size).type(torch.float32)
     if tab.selected('mxnet'):
         return npx.one_hot(X.T, self.vocab_size)
+    if tab.selected('pytorch'):
+        return F.one_hot(X.T, self.vocab_size).type(torch.float32)
     if tab.selected('tensorflow'):
         return tf.one_hot(tf.transpose(X), self.vocab_size)
 ```
@@ -343,15 +357,18 @@ a deep learning framework.
 ```{.python .input  n=26}
 %%tab all
 data = d2l.TimeMachine(batch_size=32, num_steps=16)
-rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
-model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1)
+if tab.selected('mxnet', 'pytorch'):
+    rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32,
+                     device=d2l.try_gpu())
+    model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1,
+                         device=d2l.try_gpu())
+    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1, num_gpus=1)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
+        model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1)
+    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1)
 trainer.fit(model, data)
-```
-
-```{.python .input}
-%%tab all
-print('perplexity:', math.exp(model.board.data['val_loss'][-1].y))
 ```
 
 ## Prediction
@@ -376,23 +393,32 @@ So we generate the predicted characters and emit them.
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
-def predict(self, prefix, num_preds, vocab):
-    state, outputs = None, [vocab[prefix[0]]]
+def predict(self, prefix, num_preds, vocab, device=None):
+    outputs = [vocab[prefix[0]]]
     for i in range(len(prefix) + num_preds - 1):
-        X = d2l.tensor([[outputs[-1]]])        
+        if tab.selected('mxnet'):
+            X = d2l.tensor([[outputs[-1]]], ctx=device)
+        if tab.selected('pytorch'):
+            X = d2l.tensor([[outputs[-1]]], device=device)
+        if tab.selected('tensorflow'):
+            X = d2l.tensor([[outputs[-1]]])
         embs = self.one_hot(X)
-        hiddens, state = self.rnn(embs, state)
-        if i < len(prefix) - 1: # Warm-up period
+        hiddens, _ = self.rnn(embs)
+        if i < len(prefix) - 1:  # Warm-up period
             outputs.append(vocab[prefix[i]])
         else:  # Predict `num_preds` steps
             Y = self.output_layer(hiddens)
-            outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))    
+            outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
-    
 ```
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
+model.predict('time traveller', 10, data.vocab, d2l.try_gpu())
+```
+
+```{.python .input}
+%%tab tensorflow
 model.predict('time traveller', 10, data.vocab)
 ```
 
