@@ -775,7 +775,7 @@ class LSTMScratch(d2l.Module):
 
 class GRU(d2l.RNN):
     """Defined in :numref:`sec_deep_rnn`"""
-    def __init__(self, num_hiddens, num_layers, dropout=0):
+    def __init__(self, num_hiddens, num_layers, dropout=0, device=None):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)

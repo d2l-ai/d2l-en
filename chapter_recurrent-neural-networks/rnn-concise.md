@@ -105,13 +105,13 @@ class RNNLM(d2l.RNNLMScratch):  #@save
 
 ```{.python .input  n=1}
 %%tab all
-data = d2l.TimeMachine(batch_size=1024, num_steps=64)
+data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet'):
-    rnn_layer = RNN(num_hiddens=16, device=d2l.try_gpu())
+    rnn_layer = RNN(num_hiddens=32, device=d2l.try_gpu())
 if tab.selected('pytorch'):
-    rnn_layer = RNN(num_inputs=len(data.vocab), num_hiddens=16)
+    rnn_layer = RNN(num_inputs=len(data.vocab), num_hiddens=32)
 if tab.selected('tensorflow'):
-    rnn_layer = RNN(num_hiddens=16)
+    rnn_layer = RNN(num_hiddens=32)
 if tab.selected('mxnet', 'pytorch'):
     model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1,
                   device=d2l.try_gpu())
@@ -121,10 +121,6 @@ if tab.selected('tensorflow'):
         model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
 trainer.fit(model, data)
-```
-
-```{.python .input}
-print('perplexity:', model.board.data['val_ppl'][-1].y)
 ```
 
 ```{.python .input}

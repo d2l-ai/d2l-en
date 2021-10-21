@@ -360,16 +360,16 @@ a deep learning framework.
 
 ```{.python .input  n=26}
 %%tab all
-data = d2l.TimeMachine(batch_size=1024, num_steps=64)
+data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet', 'pytorch'):
-    rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=16,
+    rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32,
                      device=d2l.try_gpu())
     model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1,
                          device=d2l.try_gpu())
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
-        rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=16)
+        rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
         model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1)
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
 trainer.fit(model, data)
@@ -414,10 +414,6 @@ def predict(self, prefix, num_preds, vocab, device=None):
             Y = self.output_layer(rnn_outputs)
             outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
-```
-
-```{.python .input}
-print('perplexity:', model.board.data['val_ppl'][-1].y)
 ```
 
 ```{.python .input}
