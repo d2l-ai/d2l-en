@@ -192,8 +192,9 @@ class LSTMScratch(d2l.Module):  #@save
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(LSTMScratch)
-def forward(self, inputs, H_C=(None, None)):
-    (H, C), outputs = H_C, []
+def forward(self, inputs, H_C=None):
+    H, C = None, None if H_C is None else H_C
+    outputs = []
     for X in inputs:
         I = d2l.sigmoid(d2l.matmul(X, self.W_xi) + (
             d2l.matmul(H, self.W_hi) if H is not None else 0) + self.b_i)

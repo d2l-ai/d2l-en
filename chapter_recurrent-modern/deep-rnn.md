@@ -213,3 +213,4 @@ trainer.fit(model, data)
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3862)
 :end_tab:
+
