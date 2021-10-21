@@ -243,7 +243,7 @@ model.predict('time traveller', 10, data.vocab)
 ```{.python .input}
 %%tab mxnet, pytorch
 class BiGRU(d2l.RNN):
-    def __init__(self, num_inputs, num_hiddens):
+    def __init__(self, num_inputs, num_hiddens, device=None):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
         if tab.selected('mxnet'):
@@ -286,4 +286,3 @@ in :numref:`sec_sentiment_rnn`.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1059)
 :end_tab:
-

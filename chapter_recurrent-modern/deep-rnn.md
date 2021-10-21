@@ -147,7 +147,7 @@ trainer.fit(model, data)
 ```{.python .input}
 %%tab mxnet
 class GRU(d2l.RNN):  #@save
-    def __init__(self, num_hiddens, num_layers, dropout=0):
+    def __init__(self, num_hiddens, num_layers, dropout=0, device=None):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)        
@@ -156,7 +156,7 @@ class GRU(d2l.RNN):  #@save
 ```{.python .input}
 %%tab tensorflow
 class GRU(d2l.RNN):  #@save
-    def __init__(self, num_hiddens, num_layers, dropout=0):
+    def __init__(self, num_hiddens, num_layers, dropout=0, device=None):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
         gru_cells = [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout) 
@@ -173,7 +173,7 @@ class GRU(d2l.RNN):  #@save
 ```{.python .input}
 %%tab pytorch
 class GRU(d2l.RNN):  #@save
-    def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0):
+    def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0, device=None):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
         self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers, dropout=dropout)        
@@ -213,4 +213,3 @@ trainer.fit(model, data)
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/3862)
 :end_tab:
-
