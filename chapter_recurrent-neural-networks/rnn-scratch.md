@@ -95,13 +95,17 @@ def check_shape(a, shape):  #@save
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(RNNScratch)  #@save
-def forward(self, inputs, H=None):    
+def forward(self, inputs, state=None):
+    if state is not None:
+        state, = state
+        if tab.selected('tensorflow'):
+            state = d2l.reshape(state, (-1, self.W_hh.shape[0]))
     outputs = []
-    for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs)        
-        H = d2l.tanh(d2l.matmul(X, self.W_xh) + (
-            d2l.matmul(H, self.W_hh) if H is not None else 0) + self.b_h)
-        outputs.append(H)
-    return outputs, H
+    for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs) 
+        state = d2l.tanh(d2l.matmul(X, self.W_xh) + (
+            d2l.matmul(state, self.W_hh) if state is not None else 0) + self.b_h)
+        outputs.append(state)
+    return outputs, state
 ```
 
 [**The following `rnn` function defines how to compute the hidden state and output
@@ -225,14 +229,14 @@ def one_hot(self, X):
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
-def forward(self, X):
+def forward(self, X, state=None):
     embs = self.one_hot(X)
-    hiddens, _ = self.rnn(embs)
-    return self.output_layer(hiddens)
+    rnn_outputs, _ = self.rnn(embs, state)
+    return self.output_layer(rnn_outputs)
 
 @d2l.add_to_class(RNNLMScratch)  #@save
-def output_layer(self, hiddens):
-    outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in hiddens]
+def output_layer(self, rnn_outputs):
+    outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in rnn_outputs]
     return d2l.stack(outputs, 1)
 ```
 
@@ -394,7 +398,7 @@ So we generate the predicted characters and emit them.
 %%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
 def predict(self, prefix, num_preds, vocab, device=None):
-    outputs = [vocab[prefix[0]]]
+    state, outputs = None, [vocab[prefix[0]]]
     for i in range(len(prefix) + num_preds - 1):
         if tab.selected('mxnet'):
             X = d2l.tensor([[outputs[-1]]], ctx=device)
@@ -403,23 +407,23 @@ def predict(self, prefix, num_preds, vocab, device=None):
         if tab.selected('tensorflow'):
             X = d2l.tensor([[outputs[-1]]])
         embs = self.one_hot(X)
-        hiddens, _ = self.rnn(embs)
+        rnn_outputs, state = self.rnn(embs, state)
         if i < len(prefix) - 1:  # Warm-up period
-            outputs.append(vocab[prefix[i]])
+            outputs.append(vocab[prefix[i + 1]])
         else:  # Predict `num_preds` steps
-            Y = self.output_layer(hiddens)
+            Y = self.output_layer(rnn_outputs)
             outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
 ```{.python .input}
 %%tab mxnet, pytorch
-model.predict('time traveller', 10, data.vocab, d2l.try_gpu())
+model.predict('time traveller', 50, data.vocab, d2l.try_gpu())
 ```
 
 ```{.python .input}
 %%tab tensorflow
-model.predict('time traveller', 10, data.vocab)
+model.predict('time traveller', 50, data.vocab)
 ```
 
 Now we can test the `predict_ch8` function.

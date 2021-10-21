@@ -657,14 +657,16 @@ class RNNScratch(d2l.Module):
             d2l.rand(num_hiddens, num_hiddens, device=device) * sigma)
         self.b_h = nn.Parameter(d2l.zeros(num_hiddens, device=device))
 
-    def forward(self, inputs, H=None):
+    def forward(self, inputs, state=None):
         """Defined in :numref:`sec_rnn_scratch`"""
+        if state is not None:
+            state, = state
         outputs = []
         for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs)
-            H = d2l.tanh(d2l.matmul(X, self.W_xh) + (
-                d2l.matmul(H, self.W_hh) if H is not None else 0) + self.b_h)
-            outputs.append(H)
-        return outputs, H
+            state = d2l.tanh(d2l.matmul(X, self.W_xh) + (
+                d2l.matmul(state, self.W_hh) if state is not None else 0) + self.b_h)
+            outputs.append(state)
+        return outputs, state
 
 def check_len(a, n):
     """Defined in :numref:`sec_rnn_scratch`"""
@@ -702,29 +704,29 @@ class RNNLMScratch(d2l.Classification):
         # output shape: (num_steps, batch_size, vocab_size)
         return F.one_hot(X.T, self.vocab_size).type(torch.float32)
 
-    def forward(self, X):
+    def forward(self, X, state=None):
         """Defined in :numref:`sec_rnn_scratch`"""
         embs = self.one_hot(X)
-        hiddens, _ = self.rnn(embs)
-        return self.output_layer(hiddens)
+        rnn_outputs, _ = self.rnn(embs, state)
+        return self.output_layer(rnn_outputs)
     
 
-    def output_layer(self, hiddens):
+    def output_layer(self, rnn_outputs):
         """Defined in :numref:`sec_rnn_scratch`"""
-        outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in hiddens]
+        outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in rnn_outputs]
         return d2l.stack(outputs, 1)
 
     def predict(self, prefix, num_preds, vocab, device=None):
         """Defined in :numref:`sec_rnn_scratch`"""
-        outputs = [vocab[prefix[0]]]
+        state, outputs = None, [vocab[prefix[0]]]
         for i in range(len(prefix) + num_preds - 1):
             X = d2l.tensor([[outputs[-1]]], device=device)
             embs = self.one_hot(X)
-            hiddens, _ = self.rnn(embs)
+            rnn_outputs, state = self.rnn(embs, state)
             if i < len(prefix) - 1:  # Warm-up period
-                outputs.append(vocab[prefix[i]])
+                outputs.append(vocab[prefix[i + 1]])
             else:  # Predict `num_preds` steps
-                Y = self.output_layer(hiddens)
+                Y = self.output_layer(rnn_outputs)
                 outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
         return ''.join([vocab.idx_to_token[i] for i in outputs])
 
