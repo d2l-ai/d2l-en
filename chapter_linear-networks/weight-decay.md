@@ -18,16 +18,15 @@ as much high-quality data as our resources permit
 and focus the tools at our disposal
 even when the dataset is taken as a given.
 
-Recall that in our
-polynomial regression example
+Recall that in our polynomial regression example
 (:numref:`sec_model_selection`)
 we could limit our model's capacity
-simply by tweaking the degree
+by tweaking the degree
 of the fitted polynomial.
 Indeed, limiting the number of features
 is a popular technique to mitigate overfitting.
 However, simply tossing aside features
-can be too blunt an instrument for the job.
+can be too blunt an instrument.
 Sticking with the polynomial regression
 example, consider what might happen
 with high-dimensional inputs.
@@ -50,32 +49,35 @@ for adjusting function complexity.
 
 ## Norms and Weight Decay
 
-We have described
-both the $\ell_2$ norm and the $\ell_1$ norm,
-which are special cases of the more general $\ell_p$ norm
-in :numref:`subsec_lin-algebra-norms`.
-(***Weight decay* (commonly called $\ell_2$ regularization),
-might be the most widely-used technique
-for regularizing parametric machine learning models.**)
+(**Rather than directly manipulating the number of parameters,
+*weight decay*, operates by restricting the values 
+that the parameters can take.**)
+More commonly called $\ell_2$ regularization
+outside of deep learning circles,
+weight decay might be the most widely used technique
+for regularizing parametric machine learning models.
 The technique is motivated by the basic intuition
 that among all functions $f$,
 the function $f = 0$
 (assigning the value $0$ to all inputs)
 is in some sense the *simplest*,
 and that we can measure the complexity
-of a function by its distance from zero.
+of a function by the distance of its parameters from zero.
 But how precisely should we measure
 the distance between a function and zero?
-There is no single right answer.
+There's no single right answer.
 In fact, entire branches of mathematics,
 including parts of functional analysis
 and the theory of Banach spaces,
-are devoted to answering this issue.
+are devoted to addressing such issues.
 
 One simple interpretation might be
 to measure the complexity of a linear function
 $f(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}$
 by some norm of its weight vector, e.g., $\| \mathbf{w} \|^2$.
+Recall that we introduced the $\ell_2$ norm and $\ell_1$ norms,
+which are special cases of the more general $\ell_p$ norm
+in :numref:`subsec_lin-algebra-norms`.
 The most common method for ensuring a small weight vector
 is to add its norm as a penalty term
 to the problem of minimizing the loss.
@@ -89,7 +91,7 @@ on minimizing the weight norm $\| \mathbf{w} \|^2$
 vs. minimizing the training error.
 That is exactly what we want.
 To illustrate things in code,
-let's revive our previous example
+we revive our previous example
 from :numref:`sec_linear_regression` for linear regression.
 There, our loss was given by
 
@@ -121,7 +123,8 @@ We do this for computational convenience.
 By squaring the $\ell_2$ norm, we remove the square root,
 leaving the sum of squares of
 each component of the weight vector.
-This makes the derivative of the penalty easy to compute: the sum of derivatives equals the derivative of the sum.
+This makes the derivative of the penalty easy to compute: 
+the sum of derivatives equals the derivative of the sum.
 
 
 Moreover, you might ask why we work with the $\ell_2$ norm
@@ -131,9 +134,8 @@ popular throughout statistics.
 While $\ell_2$-regularized linear models constitute
 the classic *ridge regression* algorithm,
 $\ell_1$-regularized linear regression
-is a similarly fundamental model in statistics, which is popularly known as *lasso regression*.
-
-
+is a similarly fundamental method in statistics, 
+popularly known as *lasso regression*.
 One reason to work with the $\ell_2$ norm
 is that it places an outsize penalty
 on large components of the weight vector.
@@ -143,10 +145,13 @@ across a larger number of features.
 In practice, this might make them more robust
 to measurement error in a single variable.
 By contrast, $\ell_1$ penalties lead to models
-that concentrate weights on a small set of features by clearing the other weights to zero.
-This is called *feature selection*,
+that concentrate weights on a small set of features
+by clearing the other weights to zero.
+This gives us an effective method for *feature selection*,
 which may be desirable for other reasons.
-
+For example, if our model only relies on a few features,
+then we may not need to collect, store, or transmit data
+for the other (dropped) features. 
 
 Using the same notation in :eqref:`eq_linreg_batch_update`,
 the minibatch stochastic gradient descent updates
@@ -181,8 +186,7 @@ of a network's output layer.
 
 ## High-Dimensional Linear Regression
 
-We can illustrate the benefits of
-weight decay
+We can illustrate the benefits of weight decay 
 through a simple synthetic example.
 
 ```{.python .input}
@@ -214,11 +218,14 @@ First, we [**generate some data as before**]
 (**$$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where }
 \epsilon \sim \mathcal{N}(0, 0.01^2).$$**)
 
-We choose our label to be a linear function of our inputs,
-corrupted by Gaussian noise with zero mean and standard deviation 0.01.
-To make the effects of overfitting pronounced,
-we can increase the dimensionality of our problem to $d = 200$
-and work with a small training set containing only 20 examples.
+In this synthetic dataset, our label is given 
+by an underlying linear function of our inputs,
+corrupted by Gaussian noise 
+with zero mean and standard deviation 0.01.
+For illustrative purposes, 
+we can make the effects of overfitting pronounced,
+by increasing the dimensionality of our problem to $d = 200$
+and working with a small training set with only 20 examples.
 
 ```{.python .input}
 %%tab all
@@ -242,8 +249,8 @@ class Data(d2l.DataModule):
 
 ## Implementation from Scratch
 
-In the following, we will implement weight decay from scratch,
-simply by adding the squared $\ell_2$ penalty
+Now, let's try implementing weight decay from scratch.
+We just need to add the squared $\ell_2$ penalty
 to the original target function.
 
 ### (**Defining $\ell_2$ Norm Penalty**)
@@ -340,7 +347,8 @@ In the following code, we specify
 the weight decay hyperparameter directly
 through `weight_decay` when instantiating our optimizer.
 By default, PyTorch decays both
-weights and biases simultaneously. Here we only set `weight_decay` for
+weights and biases simultaneously.
+Here, we only set `weight_decay` for
 the weight, so the bias parameter $b$ will not decay.
 :end_tab:
 
@@ -391,10 +399,11 @@ class WeightDecay(d2l.LinearRegression):
 
 [**The plots look identical to those when
 we implemented weight decay from scratch**].
-However, they run appreciably faster
-and are easier to implement,
-a benefit that will become more
-pronounced for larger problems.
+However, this version runs faster
+and is easier to implement,
+benefits that will become more
+pronounced as you address larger problems
+and this work becomes more routine.
 
 ```{.python .input}
 %%tab all
@@ -417,8 +426,9 @@ allows one to apply tools introduced
 for linear functions in a nonlinear context.
 Unfortunately, RKHS-based algorithms
 tend to scale poorly to large, high-dimensional data.
-In this book we will default to the simple heuristic
-of applying weight decay on all layers of a deep network.
+In this book we will often adopt the common heuristic
+whereby weight decay is applied
+to all layers of a deep network.
 
 ## Summary
 
