@@ -360,18 +360,18 @@ a deep learning framework.
 
 ```{.python .input  n=26}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=16)
+data = d2l.TimeMachine(batch_size=1024, num_steps=64)
 if tab.selected('mxnet', 'pytorch'):
-    rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32,
+    rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=16,
                      device=d2l.try_gpu())
     model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1,
                          device=d2l.try_gpu())
-    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1, num_gpus=1)
+    trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
-        rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
+        rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=16)
         model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1)
-    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1)
+    trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -417,13 +417,17 @@ def predict(self, prefix, num_preds, vocab, device=None):
 ```
 
 ```{.python .input}
+print('perplexity:', model.board.data['val_ppl'][-1].y)
+```
+
+```{.python .input}
 %%tab mxnet, pytorch
-model.predict('time traveller', 50, data.vocab, d2l.try_gpu())
+model.predict('it is only another way of', 20, data.vocab, d2l.try_gpu())
 ```
 
 ```{.python .input}
 %%tab tensorflow
-model.predict('time traveller', 50, data.vocab)
+model.predict('it is only another way of', 20, data.vocab)
 ```
 
 Now we can test the `predict_ch8` function.
