@@ -53,20 +53,20 @@ The dataset is relatively small, we will train with hundreds of epochs, so we ch
 ```{.python .input}
 %%tab all
 class RNNScratch(d2l.Module):  #@save
-    def __init__(self, num_inputs, num_hiddens, sigma=0.01, device=None):
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
-            self.W_xh = d2l.randn(num_inputs, num_hiddens, ctx=device) * sigma
+            self.W_xh = d2l.randn(num_inputs, num_hiddens) * sigma
             self.W_hh = d2l.randn(
-                num_hiddens, num_hiddens, ctx=device) * sigma
-            self.b_h = d2l.zeros(num_hiddens, ctx=device)
+                num_hiddens, num_hiddens) * sigma
+            self.b_h = d2l.zeros(num_hiddens)
         if tab.selected('pytorch'):
             self.W_xh = nn.Parameter(
-                d2l.randn(num_inputs, num_hiddens, device=device) * sigma)
+                d2l.randn(num_inputs, num_hiddens) * sigma)
             self.W_hh = nn.Parameter(
-                d2l.rand(num_hiddens, num_hiddens, device=device) * sigma)
-            self.b_h = nn.Parameter(d2l.zeros(num_hiddens, device=device))
+                d2l.rand(num_hiddens, num_hiddens) * sigma)
+            self.b_h = nn.Parameter(d2l.zeros(num_hiddens))
         if tab.selected('tensorflow'):
             self.W_xh = tf.Variable(d2l.normal(
                 (num_inputs, num_hiddens)) * sigma)
@@ -138,24 +138,23 @@ d2l.check_shape(H, (batch_size, num_hiddens))
 ```{.python .input}
 %%tab all
 class RNNLMScratch(d2l.Classification):  #@save
-    def __init__(self, rnn, vocab_size, lr=0.01, device=None):
+    def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
         self.save_hyperparameters()
         self.init_params()
         
     def init_params(self):
         if tab.selected('mxnet'):
-            self.W_hq = d2l.randn(self.rnn.num_hiddens, self.vocab_size,
-                                  ctx=self.device) * self.rnn.sigma
-            self.b_q = d2l.zeros(self.vocab_size, ctx=self.device)        
+            self.W_hq = d2l.randn(
+                self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma
+            self.b_q = d2l.zeros(self.vocab_size)        
             for param in self.get_scratch_params():
                 param.attach_grad()
         if tab.selected('pytorch'):
             self.W_hq = nn.Parameter(
-                d2l.randn(self.rnn.num_hiddens, self.vocab_size,
-                          device=self.device) * self.rnn.sigma)
-            self.b_q = nn.Parameter(
-                d2l.zeros(self.vocab_size, device=self.device)) 
+                d2l.randn(
+                    self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma)
+            self.b_q = nn.Parameter(d2l.zeros(self.vocab_size)) 
         if tab.selected('tensorflow'):
             self.W_hq = tf.Variable(d2l.normal(
                 (self.rnn.num_hiddens, self.vocab_size)) * self.rnn.sigma)
@@ -362,10 +361,8 @@ a deep learning framework.
 %%tab all
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet', 'pytorch'):
-    rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32,
-                     device=d2l.try_gpu())
-    model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1,
-                         device=d2l.try_gpu())
+    rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
+    model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1)
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
