@@ -8,43 +8,42 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 LeNet, AlexNet, and VGG all share a common design pattern:
 extract features exploiting *spatial* structure
-via a sequence of convolution and pooling layers
-and then post-process the representations via fully connected layers.
+via a sequence of convolutions and pooling layers
+and post-process the representations via fully connected layers.
 The improvements upon LeNet by AlexNet and VGG mainly lie
 in how these later networks widen and deepen these two modules.
-Alternatively, one could imagine using fully connected layers
-earlier in the process.
-However, a careless use of dense layers might give up the
-spatial structure of the representation entirely,
-*network in network* (*NiN*) blocks offer an alternative.
-They were proposed based on a very simple insight:
-to use an MLP on the channels for each pixel separately :cite:`Lin.Chen.Yan.2013`.
+
+This design poses a number of challenges: firstly, the fully connected layers at the end 
+of the architecture consume tremendous numbers of parameters. For instance, even a simple 
+model such as VGG-11 requires a monstrous $25,088 \times 4096$ matrix, occupying almost 
+400MB of RAM. This is a significant impediment to speedy computation, in particular on 
+mobile and embedded devices. Secondly, it is equally impossible to add fully-connected layers 
+earlier in the network to increase the degree of nonlinearity: doing so would destroy the 
+spatial structure and require potentially even more memory. 
+
+The *network in network* (*NiN*) blocks of :cite:`Lin.Chen.Yan.2013` offer an alternative, 
+capable of solving both problems in one simple strategy: 
+They were proposed based on a very simple insight: a) use $1 \times 1$ convolutions to add 
+local nonlinearities across the channel activations and b) use global average pooling to integrate 
+across all locations in the last representation layer. Note that global average pooling would not 
+be effective, were it not for the added nonlinearities. Let's dive into this in detail.
 
 
 ## (**NiN Blocks**)
 
-Recall that the inputs and outputs of convolutional layers
+Recall :numref:`subsec_1x1`. In it we discussed that the inputs and outputs of convolutional layers
 consist of four-dimensional tensors with axes
 corresponding to the example, channel, height, and width.
 Also recall that the inputs and outputs of fully connected layers
 are typically two-dimensional tensors corresponding to the example and feature.
 The idea behind NiN is to apply a fully connected layer
-at each pixel location (for each height and  width).
-If we tie the weights across each spatial location,
-we could think of this as a $1\times 1$ convolutional layer
-(as described in :numref:`sec_channels`)
-or as a fully connected layer acting independently on each pixel location.
-Another way to view this is to think of each element in the spatial dimension
-(height and width) as equivalent to an example
-and a channel as equivalent to a feature.
+at each pixel location (for each height and width).
+The resulting $1 \times 1$ convolution can be thought as 
+a fully connected layer acting independently on each pixel location.
 
-:numref:`fig_nin` illustrates the main structural differences
-between VGG and NiN, and their blocks.
-The NiN block consists of one convolutional layer
-followed by two $1\times 1$ convolutional layers that act as
-per-pixel fully connected layers with ReLU activations.
-The convolution window shape of the first layer is typically set by the user.
-The subsequent window shapes are fixed to $1 \times 1$.
+:numref:`fig_nin` illustrates the main structural 
+differences between VGG and NiN, and their blocks.
+Note both the difference in the NiN blocks (the initial convolution is followed by $1 \times 1$ convolutions, whereas VGG retains $3 \times 3$ convolutions) and in the end where we no longer require a giant fully-connected layer. 
 
 ![Comparing architectures of VGG and NiN, and their blocks.](../img/nin.svg)
 :width:`600px`
@@ -82,21 +81,16 @@ def nin_block(in_channels, out_channels, kernel_size, strides, padding):
 
 ## [**NiN Model**]
 
-The original NiN network was proposed shortly after AlexNet
-and clearly draws some inspiration.
-NiN uses convolutional layers with window shapes
-of $11\times 11$, $5\times 5$, and $3\times 3$,
-and the corresponding numbers of output channels are the same as in AlexNet. Each NiN block is followed by a maximum pooling layer
+NiN uses the same initial convolution sizes as AlexNet (it was proposed shortly thereafter).
+The kernel sizes are $11\times 11$, $5\times 5$, and $3\times 3$, respectively,
+and the numbers of output channels match those of AlexNet. Each NiN block is followed by a maximum pooling layer
 with a stride of 2 and a window shape of $3\times 3$.
 
-One significant difference between NiN and AlexNet
+The second significant difference between NiN and AlexNet and VGG respectively 
 is that NiN avoids fully connected layers altogether.
-Instead, NiN uses an NiN block with a number of output channels equal to the number of label classes, followed by a *global* average pooling layer,
+Instead, NiN uses a NiN block with a number of output channels equal to the number of label classes, followed by a *global* average pooling layer,
 yielding a vector of logits.
-One advantage of NiN's design is that it significantly
-reduces the number of required model parameters.
-However, in practice, this design sometimes requires
-increased model training time.
+This design significantly reduces the number of required model parameters, albeit at the expense of a potential increase in training time. 
 
 ```{.python .input}
 %%tab all
@@ -158,21 +152,19 @@ trainer.fit(model, data)
 
 ## Summary
 
-* NiN uses blocks consisting of a convolutional layer and multiple $1\times 1$ convolutional layers. This can be used within the convolutional stack to allow for more per-pixel nonlinearity.
-* NiN removes the fully connected layers and replaces them with global average pooling (i.e., summing over all locations) after reducing the number of channels to the desired number of outputs (e.g., 10 for Fashion-MNIST).
-* Removing the fully connected layers reduces overfitting. NiN has dramatically fewer parameters.
-* The NiN design influenced many subsequent CNN designs.
+NiN has dramatically fewer parameters than AlexNet and VGG. This stems from the fact that it needs no giant fully connected layers and fewer convolutions with wide kernels. Instead, it uses local $1 \times 1$ convolutions and global average pooling. These design choices influenced many subsequent CNN designs. 
 
 ## Exercises
 
-1. Tune the hyperparameters to improve the classification accuracy.
-1. Why are there two $1\times 1$ convolutional layers in the NiN block? Remove one of them, and then observe and analyze the experimental phenomena.
+1. Why are there two $1\times 1$ convolutional layers per NiN block? What happens if you add one? What happens if you reduce this to one? 
+1. What happens if you replace the global average pooling by a fully connected layer (speed, accuracy, number of parameters)?
 1. Calculate the resource usage for NiN.
     1. What is the number of parameters?
     1. What is the amount of computation?
     1. What is the amount of memory needed during training?
     1. What is the amount of memory needed during prediction?
 1. What are possible problems with reducing the $384 \times 5 \times 5$ representation to a $10 \times 5 \times 5$ representation in one step?
+1. Use the structural design decisions in VGG that led to VGG-11, VGG-16 and VGG-19 to design a family of NiN-like networks. 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/79)
@@ -181,3 +173,7 @@ trainer.fit(model, data)
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/80)
 :end_tab:
+
+```{.python .input}
+
+```

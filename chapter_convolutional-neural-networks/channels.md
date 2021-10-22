@@ -176,6 +176,7 @@ corr2d_multi_in_out(X, K)
 ```
 
 ## $1\times 1$ Convolutional Layer
+:label:`subsec_1x1`
 
 At first, a [**$1 \times 1$ convolution**], i.e., $k_h = k_w = 1$,
 does not seem to make much sense.
