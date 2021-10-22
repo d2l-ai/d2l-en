@@ -276,6 +276,17 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         return params if isinstance(params, gluon.parameter.ParameterDict) and len(
             params.keys()) else self.get_scratch_params()
 
+    def set_scratch_params_device(self, device):
+        """Defined in :numref:`sec_use_gpu`"""
+        for attr in dir(self):
+            a = getattr(self, attr)
+            if isinstance(a, np.ndarray):
+                with autograd.record():
+                    setattr(self, attr, a.as_in_ctx(device))
+                getattr(self, attr).attach_grad()
+            if isinstance(a, d2l.Module):
+                a.set_scratch_params_device(device)
+
 class DataModule(d2l.HyperParameters):
     """Defined in :numref:`sec_d2l_apis`"""
     def __init__(self, root='../data', num_workers=4):
@@ -365,6 +376,7 @@ class Trainer(d2l.HyperParameters):
         model.board.xlim = [0, self.max_epochs]
         if self.gpus:
             model.collect_params().reset_ctx(self.gpus[0])
+            model.set_scratch_params_device(self.gpus[0])
         self.model = model
 
     def clip_gradients(self, grad_clip_val, model):
@@ -656,13 +668,13 @@ class Vocab:
 
 class RNNScratch(d2l.Module):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, num_inputs, num_hiddens, sigma=0.01, device=None):
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.W_xh = d2l.randn(num_inputs, num_hiddens, ctx=device) * sigma
+        self.W_xh = d2l.randn(num_inputs, num_hiddens) * sigma
         self.W_hh = d2l.randn(
-            num_hiddens, num_hiddens, ctx=device) * sigma
-        self.b_h = d2l.zeros(num_hiddens, ctx=device)
+            num_hiddens, num_hiddens) * sigma
+        self.b_h = d2l.zeros(num_hiddens)
 
     def forward(self, inputs, state=None):
         """Defined in :numref:`sec_rnn_scratch`"""
@@ -686,15 +698,15 @@ def check_shape(a, shape):
 
 class RNNLMScratch(d2l.Classification):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, rnn, vocab_size, lr=0.01, device=None):
+    def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
         self.save_hyperparameters()
         self.init_params()
 
     def init_params(self):
-        self.W_hq = d2l.randn(self.rnn.num_hiddens, self.vocab_size,
-                              ctx=self.device) * self.rnn.sigma
-        self.b_q = d2l.zeros(self.vocab_size, ctx=self.device)
+        self.W_hq = d2l.randn(
+            self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma
+        self.b_q = d2l.zeros(self.vocab_size)
         for param in self.get_scratch_params():
             param.attach_grad()
     def training_step(self, batch):

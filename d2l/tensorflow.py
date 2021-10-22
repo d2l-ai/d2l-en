@@ -619,7 +619,7 @@ class Vocab:
 
 class RNNScratch(d2l.Module):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, num_inputs, num_hiddens, sigma=0.01, device=None):
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
         self.W_xh = tf.Variable(d2l.normal(
@@ -651,7 +651,7 @@ def check_shape(a, shape):
 
 class RNNLMScratch(d2l.Classification):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, rnn, vocab_size, lr=0.01, device=None):
+    def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
         self.save_hyperparameters()
         self.init_params()
