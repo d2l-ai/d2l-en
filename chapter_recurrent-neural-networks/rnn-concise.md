@@ -45,14 +45,14 @@ For now, suffice it to say that multiple layers simply amount to the output of o
 ```{.python .input}
 %%tab mxnet
 class RNN(d2l.Module):  #@save
-    def __init__(self, num_hiddens, device):
+    def __init__(self, num_hiddens):
         super().__init__()
         self.save_hyperparameters()        
         self.rnn = rnn.RNN(num_hiddens)
         
     def forward(self, inputs, H=None):
         if H is None:
-            H, = self.rnn.begin_state(inputs.shape[1], ctx=self.device)
+            H, = self.rnn.begin_state(inputs.shape[1], ctx=inputs.ctx)
         outputs, (H, ) = self.rnn(inputs, (H, ))
         return outputs, H
 ```
@@ -90,7 +90,7 @@ class RNNLM(d2l.RNNLMScratch):  #@save
     def init_params(self):
         if tab.selected('mxnet'):
             self.linear = nn.Dense(self.vocab_size, flatten=False)
-            self.initialize(ctx=self.device)
+            self.initialize()
         if tab.selected('pytorch'):
             self.linear = nn.Linear(self.rnn.num_hiddens, self.vocab_size)
         if tab.selected('tensorflow'):
@@ -107,19 +107,18 @@ class RNNLM(d2l.RNNLMScratch):  #@save
 %%tab all
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet'):
-    rnn_layer = RNN(num_hiddens=32, device=d2l.try_gpu())
+    rnn_layer = RNN(num_hiddens=32)
 if tab.selected('pytorch'):
     rnn_layer = RNN(num_inputs=len(data.vocab), num_hiddens=32)
 if tab.selected('tensorflow'):
     rnn_layer = RNN(num_hiddens=32)
 if tab.selected('mxnet', 'pytorch'):
-    model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1,
-                  device=d2l.try_gpu())
+    model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
         model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
-    trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
+    trainer = d2l.Trainer(max_epochs=1, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 

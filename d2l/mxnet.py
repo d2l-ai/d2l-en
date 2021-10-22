@@ -751,14 +751,14 @@ class RNNLMScratch(d2l.Classification):
 
 class RNN(d2l.Module):
     """Defined in :numref:`sec_rnn-concise`"""
-    def __init__(self, num_hiddens, device):
+    def __init__(self, num_hiddens):
         super().__init__()
         self.save_hyperparameters()
         self.rnn = rnn.RNN(num_hiddens)
 
     def forward(self, inputs, H=None):
         if H is None:
-            H, = self.rnn.begin_state(inputs.shape[1], ctx=self.device)
+            H, = self.rnn.begin_state(inputs.shape[1], ctx=inputs.ctx)
         outputs, (H, ) = self.rnn(inputs, (H, ))
         return outputs, H
 
@@ -766,7 +766,7 @@ class RNNLM(d2l.RNNLMScratch):
     """Defined in :numref:`sec_rnn-concise`"""
     def init_params(self):
         self.linear = nn.Dense(self.vocab_size, flatten=False)
-        self.initialize(ctx=self.device)
+        self.initialize()
     def output_layer(self, hiddens):
         return d2l.swapaxes(self.linear(hiddens), 0, 1)
 
@@ -787,7 +787,7 @@ class LSTMScratch(d2l.Module):
 
 class GRU(d2l.RNN):
     """Defined in :numref:`sec_deep_rnn`"""
-    def __init__(self, num_hiddens, num_layers, dropout=0, device=None):
+    def __init__(self, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
