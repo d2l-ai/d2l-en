@@ -230,12 +230,12 @@ data = d2l.TimeMachine(batch_size=32, num_steps=16)
 if tab.selected('mxnet', 'pytorch'):
     birnn = BiRNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
     model = d2l.RNNLMScratch(birnn, vocab_size=len(data.vocab), lr=1)
-    trainer = d2l.Trainer(max_epochs=1, gradient_clip_val=1, num_gpus=1)
+    trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
         birnn = BiRNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
         model = d2l.RNNLMScratch(birnn, vocab_size=len(data.vocab), lr=1)
-    trainer = d2l.Trainer(max_epochs=1, gradient_clip_val=1)
+    trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 

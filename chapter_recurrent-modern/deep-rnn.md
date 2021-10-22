@@ -139,13 +139,13 @@ if tab.selected('mxnet', 'pytorch'):
     rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
                                   num_hiddens=32, num_layers=2)
     model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=1)
-    trainer = d2l.Trainer(max_epochs=1, gradient_clip_val=1, num_gpus=1)
+    trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
         rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
                                   num_hiddens=32, num_layers=2)
         model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=1)
-    trainer = d2l.Trainer(max_epochs=1, gradient_clip_val=1)
+    trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
