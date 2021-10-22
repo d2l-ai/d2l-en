@@ -118,6 +118,7 @@ def vgg_block(num_convs, num_channels):
 ```
 
 ## [**VGG Network**]
+:label:`subsec_vgg-network`
 
 Like AlexNet and LeNet, 
 the VGG Network can be partitioned into two parts:
@@ -265,7 +266,3 @@ Very recently ParNet :cite:`goyal2021non` demonstrated that it is possible to ac
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/277)
 :end_tab:
-
-```{.python .input}
-
-```
