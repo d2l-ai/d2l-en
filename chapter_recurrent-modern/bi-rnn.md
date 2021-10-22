@@ -227,15 +227,16 @@ def forward(self, inputs, Hs=None):
 ```{.python .input}
 %%tab all
 data = d2l.TimeMachine(batch_size=32, num_steps=16)
-birnn = BiRNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
-model = d2l.RNNLMScratch(birnn, vocab_size=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
+if tab.selected('mxnet', 'pytorch'):
+    birnn = BiRNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
+    model = d2l.RNNLMScratch(birnn, vocab_size=len(data.vocab), lr=1)
+    trainer = d2l.Trainer(max_epochs=1, gradient_clip_val=1, num_gpus=1)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        birnn = BiRNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
+        model = d2l.RNNLMScratch(birnn, vocab_size=len(data.vocab), lr=1)
+    trainer = d2l.Trainer(max_epochs=1, gradient_clip_val=1)
 trainer.fit(model, data)
-```
-
-```{.python .input}
-%%tab all
-model.predict('time traveller', 10, data.vocab)
 ```
 
 ## Concise Implementation
@@ -256,8 +257,22 @@ class BiGRU(d2l.RNN):
 ```{.python .input}
 %%tab mxnet, pytorch
 gru = BiGRU(num_inputs=len(data.vocab), num_hiddens=32)
-model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=1)
+if tab.selected('mxnet', 'pytorch'):
+    model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=1)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=1)
 trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab mxnet, pytorch
+model.predict('it is only another way of', 20, data.vocab, d2l.try_gpu())
+```
+
+```{.python .input}
+%%tab tensorflow
+model.predict('it is only another way of', 20, data.vocab)
 ```
 
 The output is clearly unsatisfactory for the reasons described above.
