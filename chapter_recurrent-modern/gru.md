@@ -279,7 +279,7 @@ The code is significantly faster as it uses compiled operators rather than Pytho
 ```{.python .input}
 %%tab all
 class GRU(d2l.RNN):
-    def __init__(self, num_inputs, num_hiddens, device=None):
+    def __init__(self, num_inputs, num_hiddens):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
         if tab.selected('mxnet'):

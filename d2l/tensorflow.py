@@ -619,7 +619,7 @@ class Vocab:
 
 class RNNScratch(d2l.Module):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, num_inputs, num_hiddens, sigma=0.01, device=None):
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
         self.W_xh = tf.Variable(d2l.normal(
@@ -651,7 +651,7 @@ def check_shape(a, shape):
 
 class RNNLMScratch(d2l.Classification):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, rnn, vocab_size, lr=0.01, device=None):
+    def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
         self.save_hyperparameters()
         self.init_params()
@@ -740,7 +740,7 @@ class LSTMScratch(d2l.Module):
 
 class GRU(d2l.RNN):
     """Defined in :numref:`sec_deep_rnn`"""
-    def __init__(self, num_hiddens, num_layers, dropout=0, device=None):
+    def __init__(self, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
         gru_cells = [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)

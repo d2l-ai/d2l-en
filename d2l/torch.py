@@ -648,14 +648,14 @@ class Vocab:
 
 class RNNScratch(d2l.Module):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, num_inputs, num_hiddens, sigma=0.01, device=None):
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
         self.W_xh = nn.Parameter(
-            d2l.randn(num_inputs, num_hiddens, device=device) * sigma)
+            d2l.randn(num_inputs, num_hiddens) * sigma)
         self.W_hh = nn.Parameter(
-            d2l.rand(num_hiddens, num_hiddens, device=device) * sigma)
-        self.b_h = nn.Parameter(d2l.zeros(num_hiddens, device=device))
+            d2l.rand(num_hiddens, num_hiddens) * sigma)
+        self.b_h = nn.Parameter(d2l.zeros(num_hiddens))
 
     def forward(self, inputs, state=None):
         """Defined in :numref:`sec_rnn_scratch`"""
@@ -679,17 +679,16 @@ def check_shape(a, shape):
 
 class RNNLMScratch(d2l.Classification):
     """Defined in :numref:`sec_rnn_scratch`"""
-    def __init__(self, rnn, vocab_size, lr=0.01, device=None):
+    def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
         self.save_hyperparameters()
         self.init_params()
 
     def init_params(self):
         self.W_hq = nn.Parameter(
-            d2l.randn(self.rnn.num_hiddens, self.vocab_size,
-                      device=self.device) * self.rnn.sigma)
-        self.b_q = nn.Parameter(
-            d2l.zeros(self.vocab_size, device=self.device))
+            d2l.randn(
+                self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma)
+        self.b_q = nn.Parameter(d2l.zeros(self.vocab_size))
     def training_step(self, batch):
         l = self.loss(self(*batch[:-1]), batch[-1])
         self.plot('ppl', d2l.exp(l), train=True)
@@ -764,7 +763,7 @@ class LSTMScratch(d2l.Module):
 
 class GRU(d2l.RNN):
     """Defined in :numref:`sec_deep_rnn`"""
-    def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0, device=None):
+    def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
         self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers, dropout=dropout)
