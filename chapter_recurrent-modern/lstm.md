@@ -219,9 +219,15 @@ Let's train an LSTM as same as what we did in :numref:`sec_gru`, by instantiatin
 ```{.python .input}
 %%tab all
 data = d2l.TimeMachine(batch_size=32, num_steps=16)
-lstm = LSTMScratch(num_inputs=len(data.vocab), num_hiddens=32)
-model = d2l.RNNLMScratch(lstm, vocab_size=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
+if tab.selected('mxnet', 'pytorch'):
+    lstm = LSTMScratch(num_inputs=len(data.vocab), num_hiddens=32)
+    model = d2l.RNNLMScratch(lstm, vocab_size=len(data.vocab), lr=1)
+    trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1, num_gpus=1)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        lstm = LSTMScratch(num_inputs=len(data.vocab), num_hiddens=32)
+        model = d2l.RNNLMScratch(lstm, vocab_size=len(data.vocab), lr=1)
+    trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -240,7 +246,8 @@ class LSTM(d2l.RNN):
         self.rnn = rnn.LSTM(num_hiddens)    
             
     def forward(self, inputs, H_C=None):
-        if H_C is None: H_C = self.rnn.begin_state(inputs.shape[1])
+        if H_C is None: H_C = self.rnn.begin_state(
+            inputs.shape[1], ctx=inputs.ctx)
         return self.rnn(inputs, H_C)    
 ```
 
@@ -277,8 +284,22 @@ if tab.selected('pytorch'):
     lstm = LSTM(num_inputs=len(data.vocab), num_hiddens=32)
 if tab.selected('mxnet', 'tensorflow'):
     lstm = LSTM(num_hiddens=32)
-model = d2l.RNNLM(lstm, vocab_size=len(data.vocab), lr=1)
+if tab.selected('mxnet', 'pytorch'):
+    model = d2l.RNNLM(lstm, vocab_size=len(data.vocab), lr=1)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        model = d2l.RNNLM(lstm, vocab_size=len(data.vocab), lr=1)
 trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab mxnet, pytorch
+model.predict('it is only another way of', 20, data.vocab, d2l.try_gpu())
+```
+
+```{.python .input}
+%%tab tensorflow
+model.predict('it is only another way of', 20, data.vocab)
 ```
 
 LSTMs are the prototypical latent variable autoregressive model with nontrivial state control.
