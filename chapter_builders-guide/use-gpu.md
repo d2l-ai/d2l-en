@@ -489,6 +489,9 @@ def set_scratch_params_device(self, device):
             getattr(self, attr).attach_grad()
         if isinstance(a, d2l.Module):
             a.set_scratch_params_device(device)
+        if isinstance(a, list):
+            for elem in a:
+                elem.set_scratch_params_device(device)
 ```
 
 ```{.python .input}

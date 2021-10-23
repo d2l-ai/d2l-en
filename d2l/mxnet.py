@@ -286,6 +286,9 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
                 getattr(self, attr).attach_grad()
             if isinstance(a, d2l.Module):
                 a.set_scratch_params_device(device)
+            if isinstance(a, list):
+                for elem in a:
+                    elem.set_scratch_params_device(device)
 
 class DataModule(d2l.HyperParameters):
     """Defined in :numref:`sec_d2l_apis`"""

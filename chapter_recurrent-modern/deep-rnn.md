@@ -88,7 +88,7 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import npx
-from mxnet.gluon import rnn
+from mxnet.gluon import nn, rnn
 npx.set_np()
 ```
 
