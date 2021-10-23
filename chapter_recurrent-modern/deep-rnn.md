@@ -111,7 +111,7 @@ The number of hidden units is still 256.
 The only difference is that we now (**select a nontrivial number of hidden layers by specifying the value of `num_layers`.**)
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, tensorflow
 class StackedRNNScratch(d2l.Module):
     def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):        
         super().__init__()
@@ -119,6 +119,17 @@ class StackedRNNScratch(d2l.Module):
         self.rnns = [d2l.RNNScratch(num_inputs if i==0 else num_hiddens, 
                                     num_hiddens, sigma) 
                      for i in range(num_layers)]
+```
+
+```{.python .input}
+%%tab pytorch
+class StackedRNNScratch(d2l.Module):
+    def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):        
+        super().__init__()
+        self.save_hyperparameters()
+        self.rnns = nn.Sequential(*[d2l.RNNScratch(
+            num_inputs if i==0 else num_hiddens, num_hiddens, sigma)
+                                    for i in range(num_layers)])
 ```
 
 ```{.python .input}
