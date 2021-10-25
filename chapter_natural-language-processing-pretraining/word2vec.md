@@ -175,7 +175,7 @@ the conditional probability of generating the center word "loves" based on the c
 $$P(\textrm{"loves"}\mid\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}).$$
 
 ![The continuous bag of words model considers the conditional probability of generating the center word given its surrounding context words.](../img/cbow.svg)
-:eqlabel:`fig_cbow`
+:label:`fig_cbow`
 
 
 Since there are multiple context words
