@@ -445,7 +445,7 @@ a + X, (a * X).shape
 ```
 
 ## Reduction
-:label:`subseq_lin-alg-reduction`
+:label:`subsec_lin-alg-reduction`
 
 Often, we wish to calculate [**the sum of a tensor's elements.**]
 To express the sum of the elements in a vector $\mathbf{x}$ of length $n$,
@@ -585,7 +585,7 @@ tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 ```
 
 ## Non-Reduction Sum
-:label:`subseq_lin-alg-non-reduction`
+:label:`subsec_lin-alg-non-reduction`
 
 Sometimes it can be useful to [**keep the number of axes unchanged**]
 when invoking the function for calculating the sum or mean. 
