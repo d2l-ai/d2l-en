@@ -251,7 +251,7 @@ $$
 In this way, we can develop the entire theory of integration leveraging ideas from differential calculus freely.  Every integration rule derives from this one fact.
 
 ## Change of Variables
-:label:`integral_example`
+:label:`subsec_integral_example`
 
 Just as with differentiation, there are a number of rules which make the computation of integrals more tractable.  In fact, every rule of differential calculus (like the product rule, sum rule, and chain rule) has a corresponding rule for integral calculus (integration by parts, linearity of integration, and the change of variables formula respectively).  In this section, we will dive into what is arguably the most important from the list: the change of variables formula.
 
@@ -517,7 +517,7 @@ $$
 \int _ 0^\infty \int _ 0 ^ {2\pi} re^{-r^{2}} \;d\theta\;dr = 2\pi\int _ 0^\infty re^{-r^{2}} \;dr = \pi,
 $$
 
-where the final equality follows by the same computation that we used in section :numref:`integral_example`.
+where the final equality follows by the same computation that we used in section :numref:`subsec_integral_example`.
 
 We will meet this integral again when we study continuous random variables in :numref:`sec_random_variables`.
 
