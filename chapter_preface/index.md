@@ -260,7 +260,7 @@ including regression and classification;
 linear models and multilayer perceptrons;
 and overfitting and regularization.
 
-* The next five chapters focus on modern deep learning techniques.
+* The next six chapters focus on modern deep learning techniques.
 :numref:`chap_computation` describes 
 the key computational components 
 of deep learning systems
