@@ -270,11 +270,6 @@ trainer.fit(model, data)
 model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 
-```{.python .input}
-%%tab tensorflow
-model.predict('it has', 20, data.vocab)
-```
-
 The output is clearly unsatisfactory for the reasons described above.
 For a
 discussion of more effective uses of bidirectional RNNs, please see the sentiment
