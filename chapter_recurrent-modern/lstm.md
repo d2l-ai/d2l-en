@@ -218,16 +218,16 @@ Let's train an LSTM as same as what we did in :numref:`sec_gru`, by instantiatin
 
 ```{.python .input}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=16)
+data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet', 'pytorch'):
     lstm = LSTMScratch(num_inputs=len(data.vocab), num_hiddens=32)
-    model = d2l.RNNLMScratch(lstm, vocab_size=len(data.vocab), lr=1)
-    trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1, num_gpus=1)
+    model = d2l.RNNLMScratch(lstm, vocab_size=len(data.vocab), lr=4)
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
         lstm = LSTMScratch(num_inputs=len(data.vocab), num_hiddens=32)
-        model = d2l.RNNLMScratch(lstm, vocab_size=len(data.vocab), lr=1)
-    trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
+        model = d2l.RNNLMScratch(lstm, vocab_size=len(data.vocab), lr=4)
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -285,21 +285,21 @@ if tab.selected('pytorch'):
 if tab.selected('mxnet', 'tensorflow'):
     lstm = LSTM(num_hiddens=32)
 if tab.selected('mxnet', 'pytorch'):
-    model = d2l.RNNLM(lstm, vocab_size=len(data.vocab), lr=1)
+    model = d2l.RNNLM(lstm, vocab_size=len(data.vocab), lr=4)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
-        model = d2l.RNNLM(lstm, vocab_size=len(data.vocab), lr=1)
+        model = d2l.RNNLM(lstm, vocab_size=len(data.vocab), lr=4)
 trainer.fit(model, data)
 ```
 
 ```{.python .input}
 %%tab mxnet, pytorch
-model.predict('it is only another way of', 20, data.vocab, d2l.try_gpu())
+model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 
 ```{.python .input}
 %%tab tensorflow
-model.predict('it is only another way of', 20, data.vocab)
+model.predict('it has', 20, data.vocab)
 ```
 
 LSTMs are the prototypical latent variable autoregressive model with nontrivial state control.
