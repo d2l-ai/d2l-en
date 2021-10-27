@@ -1,4 +1,4 @@
-# Layers and Blocks
+# Layers and Modules
 :label:`sec_model_construction`
 
 When we first introduced neural networks,
@@ -60,32 +60,32 @@ are now ubiquitous in other domains,
 including natural language processing and speech.
 
 To implement these complex networks,
-we introduce the concept of a neural network *block*.
-A block could describe a single layer,
+we introduce the concept of a neural network *module*.
+A module could describe a single layer,
 a component consisting of multiple layers,
 or the entire model itself!
-One benefit of working with the block abstraction
+One benefit of working with the module abstraction
 is that they can be combined into larger artifacts,
-often recursively. This is illustrated in :numref:`fig_blocks`. By defining code to generate blocks
+often recursively. This is illustrated in :numref:`fig_blocks`. By defining code to generate modules
 of arbitrary complexity on demand,
 we can write surprisingly compact code
 and still implement complex neural networks.
 
-![Multiple layers are combined into blocks, forming repeating patterns of larger models.](../img/blocks.svg)
+![Multiple layers are combined into modules, forming repeating patterns of larger models.](../img/blocks.svg)
 :label:`fig_blocks`
 
 
-From a programing standpoint, a block is represented by a *class*.
+From a programing standpoint, a module is represented by a *class*.
 Any subclass of it must define a forward propagation function
 that transforms its input into output
 and must store any necessary parameters.
-Note that some blocks do not require any parameters at all.
-Finally a block must possess a backpropagation function,
+Note that some modules do not require any parameters at all.
+Finally a module must possess a backpropagation function,
 for purposes of calculating gradients.
 Fortunately, due to some behind-the-scenes magic
 supplied by the auto differentiation
 (introduced in :numref:`sec_autograd`)
-when defining our own block,
+when defining our own module,
 we only need to worry about parameters
 and the forward propagation function.
 
@@ -98,7 +98,13 @@ with 256 units and ReLU activation,
 followed by a fully connected output layer
 with 10 units (no activation function).
 
-```{.python .input}
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
+```{.python .input  n=2}
+%%tab mxnet
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -109,11 +115,11 @@ net.add(nn.Dense(10))
 net.initialize()
 
 X = np.random.uniform(size=(2, 20))
-net(X)
+net(X).shape
 ```
 
-```{.python .input}
-#@tab pytorch
+```{.python .input  n=3}
+%%tab pytorch
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -121,11 +127,11 @@ from torch.nn import functional as F
 net = nn.Sequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
 
 X = torch.rand(2, 20)
-net(X)
+net(X).shape
 ```
 
-```{.python .input}
-#@tab tensorflow
+```{.python .input  n=4}
+%%tab tensorflow
 import tensorflow as tf
 
 net = tf.keras.models.Sequential([
@@ -134,7 +140,7 @@ net = tf.keras.models.Sequential([
 ])
 
 X = tf.random.uniform((2, 20))
-net(X)
+net(X).shape
 ```
 
 :begin_tab:`mxnet`
@@ -145,7 +151,7 @@ Next, we repeatedly call its `add` function,
 appending layers in the order
 that they should be executed.
 In short, `nn.Sequential` defines a special kind of `Block`,
-the class that presents a block in Gluon.
+the class that presents a module in Gluon.
 It maintains an ordered list of constituent `Block`s.
 The `add` function simply facilitates
 the addition of each successive `Block` to the list.
@@ -166,12 +172,12 @@ In this example, we constructed
 our model by instantiating an `nn.Sequential`, with layers in the order
 that they should be executed passed as arguments.
 In short, (**`nn.Sequential` defines a special kind of `Module`**),
-the class that presents a block in PyTorch.
+the class that presents a module in PyTorch.
 It maintains an ordered list of constituent `Module`s.
 Note that each of the two fully connected layers is an instance of the `Linear` class
 which is itself a subclass of `Module`.
 The forward propagation (`forward`) function is also remarkably simple:
-it chains each block in the list together,
+it chains each module in the list together,
 passing the output of each as the input to the next.
 Note that until now, we have been invoking our models
 via the construction `net(X)` to obtain their outputs.
@@ -183,30 +189,29 @@ In this example, we constructed
 our model by instantiating an `keras.models.Sequential`, with layers in the order
 that they should be executed passed as arguments.
 In short, `Sequential` defines a special kind of `keras.Model`,
-the class that presents a block in Keras.
+the class that presents a module in Keras.
 It maintains an ordered list of constituent `Model`s.
 Note that each of the two fully connected layers is an instance of the `Dense` class
 which is itself a subclass of `Model`.
 The forward propagation (`call`) function is also remarkably simple:
-it chains each block in the list together,
+it chains each module in the list together,
 passing the output of each as the input to the next.
 Note that until now, we have been invoking our models
 via the construction `net(X)` to obtain their outputs.
 This is actually just shorthand for `net.call(X)`,
 a slick Python trick achieved via
-the Block class's `__call__` function.
+the module class's `__call__` function.
 :end_tab:
 
-## [**A Custom Block**]
+## [**A Custom Module**]
 
 Perhaps the easiest way to develop intuition
-about how a block works
+about how a module works
 is to implement one ourselves.
-Before we implement our own custom block,
+Before we implement our own custom module,
 we briefly summarize the basic functionality
-that each block must provide:
+that each module must provide:
 
-:begin_tab:`mxnet, tensorflow`
 
 1. Ingest input data as arguments to its forward propagation function.
 1. Generate an output by having the forward propagation function return a value. Note that the output may have a different shape from the input. For example, the first fully connected layer in our model above ingests an input of arbitrary dimension but returns an output of dimension 256.
@@ -215,41 +220,25 @@ that each block must provide:
    to execute the forward propagation computation.
 1. Initialize model parameters as needed.
 
-:end_tab:
-
-:begin_tab:`pytorch`
-
-1. Ingest input data as arguments to its forward propagation function.
-1. Generate an output by having the forward propagation function return a value. Note that the output may have a different shape from the input. For example, the first fully connected layer in our model above ingests an input of dimension 20 but returns an output of dimension 256.
-1. Calculate the gradient of its output with respect to its input, which can be accessed via its backpropagation function. Typically this happens automatically.
-1. Store and provide access to those parameters necessary
-   to execute the forward propagation computation.
-1. Initialize model parameters as needed.
-
-:end_tab:
-
 
 In the following snippet,
-we code up a block from scratch
+we code up a module from scratch
 corresponding to an MLP
 with one hidden layer with 256 hidden units,
 and a 10-dimensional output layer.
-Note that the `MLP` class below inherits the class that represents a block.
+Note that the `MLP` class below inherits the class that represents a module.
 We will heavily rely on the parent class's functions,
 supplying only our own constructor (the `__init__` function in Python) and the forward propagation function.
 
-```{.python .input}
+```{.python .input  n=5}
+%%tab mxnet
 class MLP(nn.Block):
-    # Declare a layer with model parameters. Here, we declare two
-    # fully connected layers
     def __init__(self, **kwargs):
-        # Call the constructor of the `MLP` parent class `Block` to perform
-        # the necessary initialization. In this way, other function arguments
-        # can also be specified during class instantiation, such as the model
-        # parameters, `params` (to be described later)
+        # Call the constructor of the `MLP` parent class `nn.Block` to perform
+        # the necessary initialization.
         super().__init__(**kwargs)
-        self.hidden = nn.Dense(256, activation='relu')  # Hidden layer
-        self.out = nn.Dense(10)  # Output layer
+        self.hidden = nn.Dense(256, activation='relu')
+        self.out = nn.Dense(10)
 
     # Define the forward propagation of the model, that is, how to return the
     # required model output based on the input `X`
@@ -257,42 +246,31 @@ class MLP(nn.Block):
         return self.out(self.hidden(X))
 ```
 
-```{.python .input}
-#@tab pytorch
+```{.python .input  n=6}
+%%tab pytorch
 class MLP(nn.Module):
-    # Declare a layer with model parameters. Here, we declare two fully
-    # connected layers
     def __init__(self):
-        # Call the constructor of the `MLP` parent class `Module` to perform
-        # the necessary initialization. In this way, other function arguments
-        # can also be specified during class instantiation, such as the model
-        # parameters, `params` (to be described later)
+        # Call the constructor of the parent class `nn.Module` to perform
+        # the necessary initialization.
         super().__init__()
-        self.hidden = nn.Linear(20, 256)  # Hidden layer
-        self.out = nn.Linear(256, 10)  # Output layer
+        self.hidden = nn.Linear(20, 256)
+        self.out = nn.Linear(256, 10)
 
     # Define the forward propagation of the model, that is, how to return the
     # required model output based on the input `X`
     def forward(self, X):
-        # Note here we use the funtional version of ReLU defined in the
-        # nn.functional module.
         return self.out(F.relu(self.hidden(X)))
 ```
 
-```{.python .input}
-#@tab tensorflow
+```{.python .input  n=7}
+%%tab tensorflow
 class MLP(tf.keras.Model):
-    # Declare a layer with model parameters. Here, we declare two fully
-    # connected layers
     def __init__(self):
-        # Call the constructor of the `MLP` parent class `Model` to perform
-        # the necessary initialization. In this way, other function arguments
-        # can also be specified during class instantiation, such as the model
-        # parameters, `params` (to be described later)
+        # Call the constructor of the parent class `tf.keras.Model` to perform
+        # the necessary initialization. I
         super().__init__()
-        # Hidden layer
         self.hidden = tf.keras.layers.Dense(units=256, activation=tf.nn.relu)
-        self.out = tf.keras.layers.Dense(units=10)  # Output layer
+        self.out = tf.keras.layers.Dense(units=10)
 
     # Define the forward propagation of the model, that is, how to return the
     # required model output based on the input `X`
@@ -322,35 +300,30 @@ First, our customized `__init__` function
 invokes the parent class's `__init__` function
 via `super().__init__()`
 sparing us the pain of restating
-boilerplate code applicable to most blocks.
+boilerplate code applicable to most modules.
 We then instantiate our two fully connected layers,
 assigning them to `self.hidden` and `self.out`.
-Note that unless we implement a new operator,
+Note that unless we implement a new layer,
 we need not worry about the backpropagation function
 or parameter initialization.
 The system will generate these functions automatically.
 Let's try this out.
 
-```{.python .input}
+```{.python .input  n=8}
+%%tab mxnet
 net = MLP()
 net.initialize()
-net(X)
+net(X).shape
 ```
 
-```{.python .input}
-#@tab pytorch
+```{.python .input  n=9}
+%%tab tensorflow, pytorch
 net = MLP()
-net(X)
+net(X).shape
 ```
 
-```{.python .input}
-#@tab tensorflow
-net = MLP()
-net(X)
-```
-
-A key virtue of the block abstraction is its versatility.
-We can subclass a block to create layers
+A key virtue of the module abstraction is its versatility.
+We can subclass a module to create layers
 (such as the fully connected layer class),
 entire models (such as the `MLP` class above),
 or various components of intermediate complexity.
@@ -360,21 +333,22 @@ such as when addressing
 convolutional neural networks.
 
 
-## [**The Sequential Block**]
+## [**The Sequential Module**]
 
 We can now take a closer look
 at how the `Sequential` class works.
 Recall that `Sequential` was designed
-to daisy-chain other blocks together.
+to daisy-chain other modules together.
 To build our own simplified `MySequential`,
 we just need to define two key function:
-1. A function to append blocks one by one to a list.
-2. A forward propagation function to pass an input through the chain of blocks, in the same order as they were appended.
+1. A function to append modules one by one to a list.
+2. A forward propagation function to pass an input through the chain of modules, in the same order as they were appended.
 
 The following `MySequential` class delivers the same
 functionality of the default `Sequential` class.
 
-```{.python .input}
+```{.python .input  n=10}
+%%tab mxnet
 class MySequential(nn.Block):
     def add(self, block):
         # Here, `block` is an instance of a `Block` subclass, and we assume 
@@ -392,35 +366,26 @@ class MySequential(nn.Block):
         return X
 ```
 
-```{.python .input}
-#@tab pytorch
+```{.python .input  n=11}
+%%tab pytorch
 class MySequential(nn.Module):
     def __init__(self, *args):
         super().__init__()
         for idx, module in enumerate(args):
-            # Here, `module` is an instance of a `Module` subclass. We save it
-            # in the member variable `_modules` of the `Module` class, and its
-            # type is OrderedDict
-            self._modules[str(idx)] = module
+            self.add_module(str(idx), module)
 
     def forward(self, X):
-        # OrderedDict guarantees that members will be traversed in the order
-        # they were added
-        for block in self._modules.values():
-            X = block(X)
+        for module in self.children():            
+            X = module(X)
         return X
 ```
 
-```{.python .input}
-#@tab tensorflow
+```{.python .input  n=12}
+%%tab tensorflow
 class MySequential(tf.keras.Model):
     def __init__(self, *args):
         super().__init__()
-        self.modules = []
-        for block in args:
-            # Here, `block` is an instance of a `tf.keras.layers.Layer`
-            # subclass
-            self.modules.append(block)
+        self.modules = args
 
     def call(self, X):
         for module in self.modules:
@@ -444,44 +409,38 @@ parameters also need to be initialized.
 
 :begin_tab:`pytorch`
 In the `__init__` method, we add every module
-to the ordered dictionary `_modules` one by one.
-You might wonder why every `Module`
-possesses a `_modules` attribute
-and why we used it rather than just
-define a Python list ourselves.
-In short the chief advantage of `_modules`
-is that during our module's parameter initialization,
-the system knows to look inside the `_modules`
-dictionary to find sub-modules whose
-parameters also need to be initialized.
+by calling the `add_modules` method. These modules can be accessed by the `children` method later.
+The convenience of using these methods is that the system knows the added modules,
+it will properly initialize each module's parameters.
 :end_tab:
 
 When our `MySequential`'s forward propagation function is invoked,
-each added block is executed
+each added module is executed
 in the order in which they were added.
 We can now reimplement an MLP
 using our `MySequential` class.
 
-```{.python .input}
+```{.python .input  n=13}
+%%tab mxnet
 net = MySequential()
 net.add(nn.Dense(256, activation='relu'))
 net.add(nn.Dense(10))
 net.initialize()
-net(X)
+net(X).shape
 ```
 
-```{.python .input}
-#@tab pytorch
+```{.python .input  n=14}
+%%tab pytorch
 net = MySequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
-net(X)
+net(X).shape
 ```
 
-```{.python .input}
-#@tab tensorflow
+```{.python .input  n=15}
+%%tab tensorflow
 net = MySequential(
     tf.keras.layers.Dense(units=256, activation=tf.nn.relu),
     tf.keras.layers.Dense(10))
-net(X)
+net(X).shape
 ```
 
 Note that this use of `MySequential`
@@ -521,7 +480,8 @@ and $c$ is some specified constant
 that is not updated during optimization.
 So we implement a `FixedHiddenMLP` class as follows.
 
-```{.python .input}
+```{.python .input  n=16}
+%%tab mxnet
 class FixedHiddenMLP(nn.Block):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -546,20 +506,18 @@ class FixedHiddenMLP(nn.Block):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 class FixedHiddenMLP(nn.Module):
     def __init__(self):
         super().__init__()
         # Random weight parameters that will not compute gradients and
         # therefore keep constant during training
-        self.rand_weight = torch.rand((20, 20), requires_grad=False)
+        self.rand_weight = torch.rand((20, 20))
         self.linear = nn.Linear(20, 20)
 
     def forward(self, X):
-        X = self.linear(X)
-        # Use the created constant parameters, as well as the `relu` and `mm`
-        # functions
-        X = F.relu(torch.mm(X, self.rand_weight) + 1)
+        X = self.linear(X)        
+        X = F.relu(X @ self.rand_weight + 1)
         # Reuse the fully connected layer. This is equivalent to sharing
         # parameters with two fully connected layers
         X = self.linear(X)
@@ -570,7 +528,7 @@ class FixedHiddenMLP(nn.Module):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 class FixedHiddenMLP(tf.keras.Model):
     def __init__(self):
         super().__init__()
@@ -619,23 +577,20 @@ arbitrary code into the flow of your
 neural network computations.
 
 ```{.python .input}
+%%tab all
 net = FixedHiddenMLP()
-net.initialize()
-net(X)
-```
-
-```{.python .input}
-#@tab pytorch, tensorflow
-net = FixedHiddenMLP()
+if tab.selected('mxnet'):
+    net.initialize()
 net(X)
 ```
 
 We can [**mix and match various
-ways of assembling blocks together.**]
-In the following example, we nest blocks
+ways of assembling modules together.**]
+In the following example, we nest modules
 in some creative ways.
 
 ```{.python .input}
+%%tab mxnet
 class NestMLP(nn.Block):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -654,7 +609,7 @@ chimera(X)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 class NestMLP(nn.Module):
     def __init__(self):
         super().__init__()
@@ -670,7 +625,7 @@ chimera(X)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 class NestMLP(tf.keras.Model):
     def __init__(self):
         super().__init__()
@@ -689,9 +644,11 @@ chimera.add(FixedHiddenMLP())
 chimera(X)
 ```
 
+<!--
+Need to be more specific. 
+
 ## Efficiency
 
-:begin_tab:`mxnet`
 The avid reader might start to worry
 about the efficiency of some of these operations.
 After all, we have lots of dictionary lookups,
@@ -707,7 +664,7 @@ The best way to speed up Python is by avoiding it altogether.
 
 One way that Gluon does this is by allowing for
 *hybridization*, which will be described later.
-Here, the Python interpreter executes a block
+Here, the Python interpreter executes a module
 the first time it is invoked.
 The Gluon runtime records what is happening
 and the next time around it short-circuits calls to Python.
@@ -717,52 +674,23 @@ leads down different branches on different passes through the net.
 We recommend that the interested reader checks out
 the hybridization section (:numref:`sec_hybridize`)
 to learn about compilation after finishing the current chapter.
-:end_tab:
-
-:begin_tab:`pytorch`
-The avid reader might start to worry
-about the efficiency of some of these operations.
-After all, we have lots of dictionary lookups,
-code execution, and lots of other Pythonic things
-taking place in what is supposed to be
-a high-performance deep learning library.
-The problems of Python's [global interpreter lock](https://wiki.python.org/moin/GlobalInterpreterLock) are well known. 
-In the context of deep learning,
-we may worry that our extremely fast GPU(s)
-might have to wait until a puny CPU
-runs Python code before it gets another job to run.
-:end_tab:
-
-:begin_tab:`tensorflow`
-The avid reader might start to worry
-about the efficiency of some of these operations.
-After all, we have lots of dictionary lookups,
-code execution, and lots of other Pythonic things
-taking place in what is supposed to be
-a high-performance deep learning library.
-The problems of Python's [global interpreter lock](https://wiki.python.org/moin/GlobalInterpreterLock) are well known. 
-In the context of deep learning,
-we may worry that our extremely fast GPU(s)
-might have to wait until a puny CPU
-runs Python code before it gets another job to run.
-The best way to speed up Python is by avoiding it altogether.
-:end_tab:
+-->
 
 ## Summary
 
-* Layers are blocks.
-* Many layers can comprise a block.
-* Many blocks can comprise a block.
-* A block can contain code.
-* Blocks take care of lots of housekeeping, including parameter initialization and backpropagation.
-* Sequential concatenations of layers and blocks are handled by the `Sequential` block.
+* Layers are modules.
+* Many layers can comprise a module.
+* Many modules can comprise a module.
+* A module can contain code.
+* Modules take care of lots of housekeeping, including parameter initialization and backpropagation.
+* Sequential concatenations of layers and modules are handled by the `Sequential` module.
 
 
 ## Exercises
 
-1. What kinds of problems will occur if you change `MySequential` to store blocks in a Python list?
-1. Implement a block that takes two blocks as an argument, say `net1` and `net2` and returns the concatenated output of both networks in the forward propagation. This is also called a parallel block.
-1. Assume that you want to concatenate multiple instances of the same network. Implement a factory function that generates multiple instances of the same block and build a larger network from it.
+1. What kinds of problems will occur if you change `MySequential` to store modules in a Python list?
+1. Implement a module that takes two modules as an argument, say `net1` and `net2` and returns the concatenated output of both networks in the forward propagation. This is also called a parallel module.
+1. Assume that you want to concatenate multiple instances of the same network. Implement a factory function that generates multiple instances of the same module and build a larger network from it.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/54)

@@ -140,8 +140,6 @@ from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
-
-
 ```
 
 ```{.python .input}

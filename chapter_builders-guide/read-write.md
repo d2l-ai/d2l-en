@@ -23,6 +23,12 @@ Both functions require that we supply a name,
 and `save` requires as input the variable to be saved.
 
 ```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
+```{.python .input}
+%%tab mxnet
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -32,7 +38,7 @@ npx.save('x-file', x)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -42,7 +48,7 @@ torch.save(x, 'x-file')
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 import tensorflow as tf
 import numpy as np
 
@@ -53,18 +59,19 @@ np.save('x-file.npy', x)
 We can now read the data from the stored file back into memory.
 
 ```{.python .input}
+%%tab mxnet
 x2 = npx.load('x-file')
 x2
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 x2 = torch.load('x-file')
 x2
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 x2 = np.load('x-file.npy', allow_pickle=True)
 x2
 ```
@@ -72,6 +79,7 @@ x2
 We can [**store a list of tensors and read them back into memory.**]
 
 ```{.python .input}
+%%tab mxnet
 y = np.zeros(4)
 npx.save('x-files', [x, y])
 x2, y2 = npx.load('x-files')
@@ -79,7 +87,7 @@ x2, y2 = npx.load('x-files')
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 y = torch.zeros(4)
 torch.save([x, y],'x-files')
 x2, y2 = torch.load('x-files')
@@ -87,7 +95,7 @@ x2, y2 = torch.load('x-files')
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 y = tf.zeros(4)
 np.save('xy-files.npy', [x, y])
 x2, y2 = np.load('xy-files.npy', allow_pickle=True)
@@ -100,6 +108,7 @@ This is convenient when we want
 to read or write all the weights in a model.
 
 ```{.python .input}
+%%tab mxnet
 mydict = {'x': x, 'y': y}
 npx.save('mydict', mydict)
 mydict2 = npx.load('mydict')
@@ -107,7 +116,7 @@ mydict2
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 mydict = {'x': x, 'y': y}
 torch.save(mydict, 'mydict')
 mydict2 = torch.load('mydict')
@@ -115,7 +124,7 @@ mydict2
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 mydict = {'x': x, 'y': y}
 np.save('mydict.npy', mydict)
 mydict2 = np.load('mydict.npy', allow_pickle=True)
@@ -143,6 +152,7 @@ and then load the parameters from disk.
 (**Let's start with our familiar MLP.**)
 
 ```{.python .input}
+%%tab mxnet
 class MLP(nn.Block):
     def __init__(self, **kwargs):
         super(MLP, self).__init__(**kwargs)
@@ -159,7 +169,7 @@ Y = net(X)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 class MLP(nn.Module):
     def __init__(self):
         super().__init__()
@@ -175,7 +185,7 @@ Y = net(X)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 class MLP(tf.keras.Model):
     def __init__(self):
         super().__init__()
@@ -196,16 +206,17 @@ Y = net(X)
 Next, we [**store the parameters of the model as a file**] with the name "mlp.params".
 
 ```{.python .input}
+%%tab mxnet
 net.save_parameters('mlp.params')
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 torch.save(net.state_dict(), 'mlp.params')
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 net.save_weights('mlp.params')
 ```
 
@@ -215,19 +226,20 @@ Instead of randomly initializing the model parameters,
 we [**read the parameters stored in the file directly**].
 
 ```{.python .input}
+%%tab mxnet
 clone = MLP()
 clone.load_parameters('mlp.params')
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 clone = MLP()
 clone.load_state_dict(torch.load('mlp.params'))
 clone.eval()
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 clone = MLP()
 clone.load_weights('mlp.params')
 ```
@@ -237,18 +249,7 @@ the computational result of the same input `X` should be the same.
 Let's verify this.
 
 ```{.python .input}
-Y_clone = clone(X)
-Y_clone == Y
-```
-
-```{.python .input}
-#@tab pytorch
-Y_clone = clone(X)
-Y_clone == Y
-```
-
-```{.python .input}
-#@tab tensorflow
+%%tab all
 Y_clone = clone(X)
 Y_clone == Y
 ```
