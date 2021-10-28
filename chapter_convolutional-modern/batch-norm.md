@@ -213,6 +213,12 @@ Recall that dropout also exhibits this characteristic.
 Below, we implement a batch normalization layer with tensors from scratch.
 
 ```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
+```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, init
 from mxnet.gluon import nn
@@ -250,7 +256,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
@@ -287,7 +293,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 
@@ -323,6 +329,7 @@ thus we need to specify the number of features throughout.
 Do not worry, the high-level batch normalization APIs in the deep learning framework will care of this for us and we will demonstrate that later.
 
 ```{.python .input}
+%%tab mxnet
 class BatchNorm(nn.Block):
     # `num_features`: the number of outputs for a fully connected layer
     # or the number of output channels for a convolutional layer. `num_dims`:
@@ -355,7 +362,7 @@ class BatchNorm(nn.Block):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 class BatchNorm(nn.Module):
     # `num_features`: the number of outputs for a fully connected layer
     # or the number of output channels for a convolutional layer. `num_dims`:
@@ -388,7 +395,7 @@ class BatchNorm(nn.Module):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 class BatchNorm(tf.keras.layers.Layer):
     def __init__(self, **kwargs):
         super(BatchNorm, self).__init__(**kwargs)
@@ -447,6 +454,7 @@ after the convolutional layers or fully connected layers
 but before the corresponding activation functions.
 
 ```{.python .input}
+%%tab mxnet
 net = nn.Sequential()
 net.add(nn.Conv2D(6, kernel_size=5),
         BatchNorm(6, num_dims=4),
@@ -466,7 +474,7 @@ net.add(nn.Conv2D(6, kernel_size=5),
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 net = nn.Sequential(
     nn.Conv2d(1, 6, kernel_size=5), BatchNorm(6, num_dims=4), nn.Sigmoid(),
     nn.AvgPool2d(kernel_size=2, stride=2),
@@ -478,7 +486,7 @@ net = nn.Sequential(
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 # Recall that this has to be a function that will be passed to `d2l.train_ch6`
 # so that model building or compiling need to be within `strategy.scope()` in
 # order to utilize the CPU/GPU devices that we have
@@ -509,14 +517,14 @@ This code is virtually identical to that when we first trained LeNet (:numref:`s
 The main difference is the larger learning rate.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab mxnet, pytorch
 lr, num_epochs, batch_size = 1.0, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 lr, num_epochs, batch_size = 1.0, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
@@ -527,16 +535,17 @@ and the shift parameter `beta`**] learned
 from the first batch normalization layer.
 
 ```{.python .input}
+%%tab mxnet
 net[1].gamma.data().reshape(-1,), net[1].beta.data().reshape(-1,)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 net[1].gamma.reshape((-1,)), net[1].beta.reshape((-1,))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.reshape(net.layers[1].gamma, (-1,)), tf.reshape(net.layers[1].beta, (-1,))
 ```
 
@@ -549,6 +558,7 @@ The code looks virtually identical
 to our implementation above.
 
 ```{.python .input}
+%%tab mxnet
 net = nn.Sequential()
 net.add(nn.Conv2D(6, kernel_size=5),
         nn.BatchNorm(),
@@ -568,7 +578,7 @@ net.add(nn.Conv2D(6, kernel_size=5),
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 net = nn.Sequential(
     nn.Conv2d(1, 6, kernel_size=5), nn.BatchNorm2d(6), nn.Sigmoid(),
     nn.AvgPool2d(kernel_size=2, stride=2),
@@ -580,7 +590,7 @@ net = nn.Sequential(
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 def net():
     return tf.keras.models.Sequential([
         tf.keras.layers.Conv2D(filters=6, kernel_size=5,
@@ -609,7 +619,7 @@ because its code has been compiled to C++ or CUDA
 while our custom implementation must be interpreted by Python.
 
 ```{.python .input}
-#@tab all
+%%tab all
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 ```
 
