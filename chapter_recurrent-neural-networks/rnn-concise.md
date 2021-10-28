@@ -122,12 +122,12 @@ trainer.fit(model, data)
 
 ```{.python .input}
 %%tab mxnet, pytorch
-model.predict('it is only another way of', 20, data.vocab, d2l.try_gpu())
+model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 
 ```{.python .input}
 %%tab tensorflow
-model.predict('it is only another way of', 20, data.vocab)
+model.predict('it has', 20, data.vocab)
 ```
 
 ## Training and Predicting

@@ -145,18 +145,18 @@ def forward(self, inputs, Hs=None):
 
 ```{.python .input}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=16)
+data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet', 'pytorch'):
     rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
                                   num_hiddens=32, num_layers=2)
-    model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=1)
-    trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1, num_gpus=1)
+    model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=2)
+    trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
         rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
                                   num_hiddens=32, num_layers=2)
-        model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=1)
-    trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
+        model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=2)
+    trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -204,21 +204,21 @@ if tab.selected('mxnet', 'tensorflow'):
 if tab.selected('pytorch'):
     gru = GRU(num_inputs=len(data.vocab), num_hiddens=32, num_layers=2)
 if tab.selected('mxnet', 'pytorch'):
-    model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=1)
+    model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=2)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
-        model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=1)
+        model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=2)
 trainer.fit(model, data)
 ```
 
 ```{.python .input}
 %%tab mxnet, pytorch
-model.predict('it is only another way of', 20, data.vocab, d2l.try_gpu())
+model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 
 ```{.python .input}
 %%tab tensorflow
-model.predict('it is only another way of', 20, data.vocab)
+model.predict('it has', 20, data.vocab)
 ```
 
 ## Summary
