@@ -96,7 +96,6 @@ We are barely scratching the surface of it.
 After reviewing many different statistical tools,
 let's try this out in practice.
 
-
 ```{.python .input  n=6}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
@@ -128,7 +127,6 @@ import tensorflow as tf
 
 We begin by generating some data.
 To keep things simple we (**generate our sequence data by using a sine function with some additive noise for time steps $1, 2, \ldots, 1000$.**)
-
 
 ```{.python .input  n=10}
 %%tab all
