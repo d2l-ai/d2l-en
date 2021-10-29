@@ -575,7 +575,7 @@ class Residual(nn.Module):
         return F.relu(Y)
 
 class TimeMachine(d2l.DataModule):
-    """Defined in :numref:`sec_language_model`"""
+    """Defined in :numref:`sec_text-sequence`"""
     def _download(self):
         fname = d2l.download(d2l.DATA_URL+'timemachine.txt', self.root,
                              '090b5e7e70c295757f55df93cb0a180b9691891a')
@@ -583,23 +583,23 @@ class TimeMachine(d2l.DataModule):
             return f.read()
 
     def _preprocess(self, text):
-        """Defined in :numref:`sec_language_model`"""
+        """Defined in :numref:`sec_text-sequence`"""
         return re.sub('[^A-Za-z]+', ' ', text).lower()
 
     def _tokenize(self, text):
-        """Defined in :numref:`sec_language_model`"""
+        """Defined in :numref:`sec_text-sequence`"""
         return list(text)
 
     def build(self, raw_text, vocab=None):
-        """Defined in :numref:`sec_language_model`"""
+        """Defined in :numref:`sec_text-sequence`"""
         tokens = self._tokenize(self._preprocess(raw_text))
         if vocab is None: vocab = Vocab(tokens)
         corpus = [vocab[token] for token in tokens]
         return corpus, vocab
 
     def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
-        """Defined in :numref:`sec_language_model`"""
-        super(TimeMachine, self).__init__()
+        """Defined in :numref:`sec_language-model`"""
+        super(d2l.TimeMachine, self).__init__()
         self.save_hyperparameters()
         corpus, self.vocab = self.build(self._download())
         array = d2l.tensor([corpus[i:i+num_steps+1]
@@ -607,7 +607,7 @@ class TimeMachine(d2l.DataModule):
         self.X, self.Y = array[:,:-1], array[:,1:]
 
     def get_dataloader(self, train):
-        """Defined in :numref:`sec_language_model`"""
+        """Defined in :numref:`sec_language-model`"""
         idx = slice(0, self.num_train) if train else slice(
             self.num_train, self.num_train+self.num_val)
         return self.get_tensorloader([self.X, self.Y], train, idx)
@@ -615,7 +615,7 @@ class TimeMachine(d2l.DataModule):
 class Vocab:
     """Vocabulary for text."""
     def __init__(self, tokens=[], min_freq=0, reserved_tokens=[]):
-        """Defined in :numref:`sec_language_model`"""
+        """Defined in :numref:`sec_text-sequence`"""
         # Flatten a 2D list if needed
         if tokens and isinstance(tokens[0], list):
             tokens = [token for line in tokens for token in line]
@@ -645,6 +645,14 @@ class Vocab:
     @property
     def unk(self):  # Index for the unknown token
         return self.token_to_idx['<unk>']
+
+def load_data_time_machine(batch_size, num_steps, max_tokens=10000):
+    """Return the iterator and the vocabulary of the time machine dataset.
+
+    Defined in :numref:`sec_language-model`"""
+    corpus, vocab = d2l.load_corpus_time_machine(max_tokens)
+    data_iter = SeqDataLoader(corpus, batch_size, num_steps)
+    return data_iter, vocab
 
 class RNNScratch(d2l.Module):
     """Defined in :numref:`sec_rnn_scratch`"""
