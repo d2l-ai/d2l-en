@@ -617,14 +617,6 @@ class Vocab:
     def unk(self):  # Index for the unknown token
         return self.token_to_idx['<unk>']
 
-def load_data_time_machine(batch_size, num_steps, max_tokens=10000):
-    """Return the iterator and the vocabulary of the time machine dataset.
-
-    Defined in :numref:`sec_language-model`"""
-    corpus, vocab = d2l.load_corpus_time_machine(max_tokens)
-    data_iter = SeqDataLoader(corpus, batch_size, num_steps)
-    return data_iter, vocab
-
 class RNNScratch(d2l.Module):
     """Defined in :numref:`sec_rnn_scratch`"""
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):

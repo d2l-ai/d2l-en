@@ -37,30 +37,21 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 ```{.python .input}
 %%tab mxnet
-import collections
-import re
 from d2l import mxnet as d2l
-from mxnet import np, npx
-import random
+from mxnet import npx
 npx.set_np()
 ```
 
 ```{.python .input  n=2}
 %%tab pytorch
-import collections
-import re
 from d2l import torch as d2l
 import torch
-import random
 ```
 
 ```{.python .input}
 %%tab tensorflow
-import collections
-import re
 from d2l import tensorflow as d2l
 import tensorflow as tf
-import random
 ```
 
 ## Partitioning Sequences
@@ -142,17 +133,6 @@ data = d2l.TimeMachine(batch_size=2, num_steps=10)
 for X, Y in data.train_dataloader():
     print('X:', X, '\nY:', Y)
     break
-```
-
-[**Last, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary**], so we can use it similarly as other other functions with the `load_data` prefix, such as `d2l.load_data_fashion_mnist` defined in :numref:`sec_fashion_mnist`.
-
-```{.python .input}
-#@tab all
-def load_data_time_machine(batch_size, num_steps, max_tokens=10000):  #@save
-    """Return the iterator and the vocabulary of the time machine dataset."""
-    corpus, vocab = d2l.load_corpus_time_machine(max_tokens)
-    data_iter = SeqDataLoader(corpus, batch_size, num_steps)
-    return data_iter, vocab
 ```
 
 ## Summary
