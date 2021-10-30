@@ -19,7 +19,7 @@ the basic knowledge of natural language processing.
 We used one-hot vectors to represent words (characters are words) in :numref:`sec_rnn_scratch`.
 Suppose that the number of different words in the dictionary (the dictionary size) is $N$,
 and each word corresponds to
-a different integer (index) from $0$ to $N−1$.
+a different integer (index) from $0$ to $N-1$.
 To obtain the one-hot vector representation
 for any word with index $i$,
 we create a length-$N$ vector with all 0s
