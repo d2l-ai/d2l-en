@@ -65,12 +65,22 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       d2lbook build pdf --tab pytorch
       """
-      
+
+      sh label:"Build ePub", script:"""set -ex
+      conda activate ${ENV_NAME}
+      d2lbook build epub
+      """
+
+      sh label:"Build Pytorch ePub", script:"""set -ex
+      conda activate ${ENV_NAME}
+      d2lbook build epub --tab pytorch
+      """
+
       if (env.BRANCH_NAME == 'release') {
         sh label:"Release", script:"""set -ex
         conda activate ${ENV_NAME}
         d2lbook build pkg
-        d2lbook deploy html pdf pkg colab sagemaker slides --s3 s3://en.d2l.ai/
+        d2lbook deploy html pdf epub pkg colab sagemaker slides --s3 s3://en.d2l.ai/
         """
 
         sh label:"Release d2l", script:"""set -ex
@@ -82,7 +92,7 @@ stage("Build and Publish") {
       } else {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
-        d2lbook deploy html pdf slides --s3 s3://preview.d2l.ai/${JOB_NAME}/
+        d2lbook deploy html pdf epub slides --s3 s3://preview.d2l.ai/${JOB_NAME}/
         """
         if (env.BRANCH_NAME.startsWith("PR-")) {
             pullRequest.comment("Job ${JOB_NAME}/${BUILD_NUMBER} is complete. \nCheck the results at http://preview.d2l.ai/${JOB_NAME}/")
