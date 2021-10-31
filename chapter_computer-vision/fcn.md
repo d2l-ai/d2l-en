@@ -171,7 +171,7 @@ of the upsampled output image.
 In order to calculate the pixel of the output image
 at coordinate $(x, y)$, 
 first map $(x, y)$ to coordinate $(x', y')$ on the input image, for example, according to the ratio of the input size to the output size. 
-Note that the mapped $x′$ and $y′$ are real numbers. 
+Note that the mapped $x'$ and $y'$ are real numbers. 
 Then, find the four pixels closest to coordinate
 $(x', y')$ on the input image. 
 Finally, the pixel of the output image at coordinate $(x, y)$ is calculated based on these four closest pixels

@@ -180,7 +180,7 @@ For the following discussion, we always use $(X, Y)$ as a pair of random variabl
 
 Similar to entropy of a single random variable :eqref:`eq_ent_def`, we define the *joint entropy* $H(X, Y)$ of a pair random variables $(X, Y)$ as
 
-$$H(X, Y) = −E_{(x, y) \sim P} [\log p_{X, Y}(x, y)]. $$
+$$H(X, Y) = -E_{(x, y) \sim P} [\log p_{X, Y}(x, y)]. $$
 :eqlabel:`eq_joint_ent_def`
 
 Precisely, on the one hand, if $(X, Y)$ is a pair of discrete random variables, then
@@ -304,7 +304,7 @@ Given the previous setting of random variables $(X, Y)$, you may wonder: "Now th
 Rather than diving straight into the formal definition, let's practice our intuition by first trying to derive an expression for the mutual information entirely based on terms we have constructed before.  We wish to find the information shared between two random variables.  One way we could try to do this is to start with all the information contained in both $X$ and $Y$ together, and then we take off the parts that are not shared.  The information contained in both $X$ and $Y$ together is written as $H(X, Y)$.  We want to subtract from this the information contained in $X$ but not in $Y$, and the information contained in $Y$ but not in $X$.  As we saw in the previous section, this is given by $H(X \mid Y)$ and $H(Y \mid X)$ respectively.  Thus, we have that the mutual information should be
 
 $$
-I(X, Y) = H(X, Y) - H(Y \mid X) − H(X \mid Y).
+I(X, Y) = H(X, Y) - H(Y \mid X) - H(X \mid Y).
 $$
 
 Indeed, this is a valid definition for the mutual information.  If we expand out the definitions of these terms and combine them, a little algebra shows that this is the same as
@@ -315,9 +315,9 @@ $$I(X, Y) = E_{x} E_{y} \left\{ p_{X, Y}(x, y) \log\frac{p_{X, Y}(x, y)}{p_X(x) 
 
 We can summarize all of these relationships in image :numref:`fig_mutual_information`.  It is an excellent test of intuition to see why the following statements are all also equivalent to $I(X, Y)$.
 
-* $H(X) − H(X \mid Y)$
-* $H(Y) − H(Y \mid X)$
-* $H(X) + H(Y) − H(X, Y)$
+* $H(X) - H(X \mid Y)$
+* $H(Y) - H(Y \mid X)$
+* $H(X) + H(Y) - H(X, Y)$
 
 ![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual-information.svg)
 :label:`fig_mutual_information`
