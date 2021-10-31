@@ -120,7 +120,7 @@ class Vocab:  #@save
         # Count token frequencies
         counter = collections.Counter(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[1],
-                                  reverse=True)
+                                  reverse=True)        
         # The list of unique tokens
         self.idx_to_token = list(sorted(set(['<unk>'] + reserved_tokens + [
             token for token, freq in self.token_freqs if freq >= min_freq])))
@@ -178,6 +178,46 @@ def build(self, raw_text, vocab=None):
 
 corpus, vocab = data.build(raw_text)
 len(corpus), len(vocab)
+```
+
+## Natural Language Statistics
+
+```{.python .input}
+%%tab all
+words = text.split()
+vocab = Vocab(words)
+vocab.token_freqs[:10]
+```
+
+```{.python .input}
+%%tab all
+freqs = [freq for token, freq in vocab.token_freqs]
+d2l.plot(freqs, xlabel='token: x', ylabel='frequency: n(x)',
+         xscale='log', yscale='log')
+```
+
+```{.python .input}
+%%tab all
+bigram_tokens = ['--'.join(pair) for pair in zip(words[:-1], words[1:])]
+bigram_vocab = Vocab(bigram_tokens)
+bigram_vocab.token_freqs[:10]
+```
+
+```{.python .input}
+%%tab all
+trigram_tokens = ['--'.join(triple) for triple in zip(
+    words[:-2], words[1:-1], words[2:])]
+trigram_vocab = d2l.Vocab(trigram_tokens)
+trigram_vocab.token_freqs[:10]
+```
+
+```{.python .input}
+%%tab all
+bigram_freqs = [freq for token, freq in bigram_vocab.token_freqs]
+trigram_freqs = [freq for token, freq in trigram_vocab.token_freqs]
+d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token: x',
+         ylabel='frequency: n(x)', xscale='log', yscale='log',
+         legend=['unigram', 'bigram', 'trigram'])
 ```
 
 ## Summary
