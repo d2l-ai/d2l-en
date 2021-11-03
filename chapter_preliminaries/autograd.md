@@ -28,14 +28,14 @@ While autograd libraries become
 hot concerns over the past decade,
 they have a long history. 
 In fact the earliest references to autograd
-date back over half of a century :cite:`wengert1964simple`.
+date back over half of a century :cite:`Wengert.1964`.
 The core ideas behind modern backpropagation
-date to a PhD thesis from 1980 :cite:`speelpenning1980compiling`
-and were further developed in the late 1980s :cite:`griewank1989automatic`.
+date to a PhD thesis from 1980 :cite:`Speelpenning.1980`
+and were further developed in the late 1980s :cite:`Griewank.1989`.
 While backpropagation has become the default method 
 for computing gradients, it's not the only option. 
 For instance, the Julia programming language employs 
-forward propagation :cite:`revels2016forward`. 
+forward propagation :cite:`Revels.Lubin.Papamarkou.2016`. 
 Before exploring methods, 
 let's first master the autograd package.
 

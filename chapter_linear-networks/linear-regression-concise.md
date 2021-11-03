@@ -11,7 +11,7 @@ The sheer number of techniques, applications and algorithms by far surpasses the
 progress of previous decades. This is due to a fortuitous combination of multiple
 factors, not the least due to the ease of implementation offered by a number
 of open source deep learning frameworks. Caffe, DistBelief and Theano arguably represent the
-first generation of such models :cite:`jia2014caffe,dean2012large,bergstra2010theano` that
+first generation of such models :cite:`Jia.Shelhamer.Donahue.ea.2014,Dean.Corrado.Monga.ea.2012,Bergstra.Breuleux.Bastien.ea.2010` that
 widespread adoption. In contrast to earlier (seminal) work such as SN2 (Simulateur Neuristique)
 which provided a Lisp-like programming experience
 :cite:`bottou1989cun` modern frameworks offer automatic differentiation and the convenience
@@ -276,7 +276,7 @@ print(f'error in estimating b: {data.b - b}')
 ## Summary
 
 This section contains the first 'modern' implementation of a deep network that we encounter. By modern, we
-mean an implementation that uses many of the conveniences afforded by a modern deep learning framework, such as Gluon, JAX, Keras, PyTorch, or Tensorflow :cite:`abadi2016tensorflow,paszke2019pytorch,frostig2018compiling,chen2015mxnet`. More to the point, we used framework-defaults for loading data, defining a layer, a loss function, an optimizer and a training loop. Whenever the framework provides all necessary features, this is the recommended way to proceed, since these components are typically heavily optimized. At the same time, we urge you not to forget that these modules *can* be implemented directly. This matters particularly for researchers at the bleeding edge of model development where not all components for a new model will not exist already in the researcher's Lego toolkit.
+mean an implementation that uses many of the conveniences afforded by a modern deep learning framework, such as Gluon, JAX, Keras, PyTorch, or Tensorflow :cite:`Abadi.Barham.Chen.ea.2016,Paszke.Gross.Massa.ea.2019,Frostig.Johnson.Leary.2018,Chen.Li.Li.ea.2015`. More to the point, we used framework-defaults for loading data, defining a layer, a loss function, an optimizer and a training loop. Whenever the framework provides all necessary features, this is the recommended way to proceed, since these components are typically heavily optimized. At the same time, we urge you not to forget that these modules *can* be implemented directly. This matters particularly for researchers at the bleeding edge of model development where not all components for a new model will not exist already in the researcher's Lego toolkit.
 
 :begin_tab:`mxnet`
 In Gluon, the `data` module provides tools for data processing, the `nn` module defines a large number of neural network layers, and the `loss` module defines many common loss functions. Moreover, the `initializer` gives access

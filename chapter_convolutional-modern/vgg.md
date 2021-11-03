@@ -15,7 +15,7 @@ commonly used to design deep networks.
 Progress in this field mirrors that of VLSI (Very Large Scale Integration) 
 in chip design
 where engineers moved from placing transistors
-to logical elements to logic blocks :cite:`mead1980introduction`.
+to logical elements to logic blocks :cite:`Mead.1980`.
 Similarly, the design of neural network architectures
 has grown progressively more abstract,
 with researchers moving from thinking in terms of
@@ -237,7 +237,7 @@ with d2l.try_gpu():
 
 One might argue that VGG is the first truly modern convolutional neural network. While AlexNet introduced many of the components of what make deep learning effective at scale, it is VGG that arguably introduced key properties such as blocks of multiple convolutions and a preference for deep and narrow networks. It is also the first network that is actually an entire family of similarly parametrized models, giving the practitioner ample trade-off between complexity and speed. This is also the place where modern DL frameworks shine. It is no longer necessary to generate XML config files to specify a network but rather, to assmple said networks through simple Python code. 
 
-Very recently ParNet :cite:`goyal2021non` demonstrated that it is possible to achieve competitive performance using a much more shallow architecture through a large number of parallel computations. This is an exciting development and there's hope that it will influence architecture designs in the future. For the remainder of the chapter, though, we will follow the path of scientific progress over the past decade. 
+Very recently ParNet :cite:`Goyal.Bochkovskiy.Deng.ea.2021` demonstrated that it is possible to achieve competitive performance using a much more shallow architecture through a large number of parallel computations. This is an exciting development and there's hope that it will influence architecture designs in the future. For the remainder of the chapter, though, we will follow the path of scientific progress over the past decade. 
 
 ## Exercises
 

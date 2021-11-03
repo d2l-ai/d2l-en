@@ -41,8 +41,8 @@ the fundamental problem of machine learning.
 
 The danger is that when we train models,
 we access just a small sample of data.
-The largest *labeled* public image datasets, such as Imagenet :cite:`deng2009imagenet` contain
-roughly one million images. Unlabeled image collections such as the Flickr YFC100M dataset can be significantly larger, containing 100 million images :cite:`thomee2016yfcc100m`. While both numbers seem large, they are tiny compared to the space of all possible images that one could take at, say, 1 Megapixel resolution. 
+The largest *labeled* public image datasets, such as Imagenet :cite:`Deng.Dong.Socher.ea.2009` contain
+roughly one million images. Unlabeled image collections such as the Flickr YFC100M dataset can be significantly larger, containing 100 million images :cite:`Thomee.Shamma.Friedland.ea.2016`. While both numbers seem large, they are tiny compared to the space of all possible images that one could take at, say, 1 Megapixel resolution. 
 Worse still, we frequently must learn from only hundreds of examples. For instance, 
 a hospital might only have data of 100 occurrences of an infrequent disease. 
 When working with finite samples, we run the risk
@@ -50,7 +50,7 @@ that we might discover apparent associations
 that turn out not to hold up when we collect more data.
 
 The phenomenon of fitting our training data
-more closely than we fit the underlying distribution is called *overfitting*, and the techniques used to combat overfitting are called *regularization*. While the following is no substitute for a proper introduction to statistical learning theory :cite:`Vapnik98,boucheron2005theory`, it should at least make you aware of some of the phenomena that arise in learning. Overfitting is really quite prevalent. In the previous sections, you might have observed
+more closely than we fit the underlying distribution is called *overfitting*, and the techniques used to combat overfitting are called *regularization*. While the following is no substitute for a proper introduction to statistical learning theory :cite:`Vapnik.1998,Boucheron.Bousquet.Lugosi.2005`, it should at least make you aware of some of the phenomena that arise in learning. Overfitting is really quite prevalent. In the previous sections, you might have observed
 overfitting while experimenting with the Fashion-MNIST dataset.
 If you altered the model structure or the hyperparameters during the experiment, you might have noticed that with enough neurons, layers, and training epochs, the model can eventually reach perfect accuracy on the training set, while the accuracy on test data deteriorates. 
 
@@ -95,7 +95,7 @@ it has poor outcomes when the set of exam questions is more
 varied and drawn from a larger, possibly infinite pool. 
 
 Likewise, consider a model that simply uses a lookup table to answer questions. If the set of allowable inputs is discrete and reasonably small, then perhaps after viewing *many* training examples, this approach would perform well. Still this model has no ability to do better than random guessing when faced with examples that it has never seen before.
-In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ grayscale values, then there are $256^{784} \approx 10^{1888}$ possible images. That means that there are far more low-resolution grayscale thumbnail-sized images than the approximately $10^{82}$ atoms in the universe. Even if we could encounter such data, we could never afford to store the lookup table. This explosion in the number of required samples is closely related to the curse of dimensionality where simple problems become rather difficult once the data is high dimensional :cite:`friedman1997bias`. 
+In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ grayscale values, then there are $256^{784} \approx 10^{1888}$ possible images. That means that there are far more low-resolution grayscale thumbnail-sized images than the approximately $10^{82}$ atoms in the universe. Even if we could encounter such data, we could never afford to store the lookup table. This explosion in the number of required samples is closely related to the curse of dimensionality where simple problems become rather difficult once the data is high dimensional :cite:`Friedman.1997`. 
 
 Last, consider the problem of trying
 to classify the outcomes of coin tosses (class 0: heads, class 1: tails)
@@ -125,10 +125,10 @@ you might not be surprised to learn
 that many mathematicians and theorists have dedicated their lives
 to developing formal theories to describe this phenomenon.
 In their [epoynmous theorem](https://en.wikipedia.org/wiki/Glivenko%E2%80%93Cantelli_theorem) Glivenko and Cantelli derived the rate at which the training error
-converges to the generalization error :cite:`Glivenko33,Cantelli33`. 
+converges to the generalization error :cite:`Glivenko.1933,Cantelli.1933`. 
 In a series of seminal papers, Vapnik and Chervonenkis
 extended this theory to more general classes of functions 
-:cite:`VapChe64,VapChe68,VapChe71,VapChe74b,VapChe81,VapChe91`.
+:cite:`Vapnik.Chervonenkis.1964,Vapnik.Chervonenkis.1968,apnik.Chervonenkis.1971,Vapnik.Chervonenkis.1974b,Vapnik.Chervonenkis.1981,Vapnik.Chervonenkis.1991`.
 This work laid the foundations of statistical learning theory.
 
 In the standard supervised learning setting, which we have addressed 
@@ -147,7 +147,7 @@ What if we train a mortality risk predictor
 on data collected from patients at UCSF Medical Center,
 and apply it on patients at Massachusetts General Hospital?
 These distributions are simply not identical. This is a well-studied 
-problem in statistics :cite:`rosenbaum1983central`.
+problem in statistics :cite:`Rosenbaum.Rubin.1983`.
 Moreover, draws might be correlated in time.
 What if we are classifying the topics of Tweets?
 The news cycle would create temporal dependencies
@@ -160,7 +160,7 @@ involves at least some minor violation of the IID assumption,
 and yet we have many useful tools for
 various applications such as
 face recognition,
-speech recognition, and language translation. :cite:`yu1994rates` provides 
+speech recognition, and language translation. :cite:`Yu.1994` provides 
 a quantitative handle on this behavior. 
 
 Other violations are sure to cause trouble.
@@ -178,7 +178,7 @@ For now, even taking the IID assumption for granted,
 understanding generalization is a formidable problem.
 Moreover, elucidating the precise theoretical foundations
 that might explain why deep neural networks generalize as well as they do
-continues to vex the greatest minds in learning theory :cite:`frankle2018lottery,bartlett2021deep,nagarajan2019uniform,kawaguchi2017generalization`.
+continues to vex the greatest minds in learning theory :cite:`Frankle.Carbin.2018,Bartlett.Montanari.Rakhlin.2021,Nagarajan.Kolter.2019,Kawaguchi.Kaelbling.Bengio.2017`.
 
 When we train our models, we attempt to search for a function
 that fits the training data as well as possible.
@@ -199,13 +199,13 @@ we expect the training error to go down but the generalization gap to grow.
 What precisely constitutes model complexity is a complex matter.
 Many factors govern whether a model will generalize well.
 For example a model with more parameters might be considered more complex in general. 
-Note, though, that this is not necessarily true. For instance, kernel methods operate in spaces with infinite numbers of parameters, yet they exhibit very well-controlled model complexity :cite:`scholkopf2002learning`. 
+Note, though, that this is not necessarily true. For instance, kernel methods operate in spaces with infinite numbers of parameters, yet they exhibit very well-controlled model complexity :cite:`Scholkopf.Smola.2002`. 
 Instead, a better way to think about this is that a 
 model whose parameters can take a wider range of values
 might be more complex.
 Often with neural networks, we think of a model
 that takes more training iterations as more complex,
-and one subject to *early stopping* (fewer training iterations) as less complex :cite:`prechelt1998early`.
+and one subject to *early stopping* (fewer training iterations) as less complex :cite:`Prechelt.1998`.
 
 It can be difficult to compare the complexity among members
 of substantially different model classes
@@ -215,7 +215,7 @@ a model that can readily explain arbitrary facts
 is what statisticians view as complex,
 whereas one that has only a limited expressive power
 but still manages to explain the data well
-is probably closer to the truth :cite:`vapnik1994measuring`.
+is probably closer to the truth :cite:`Vapnik.Levin.Le-Cun.1994`.
 In philosophy, this is closely related to Popper's
 criterion of falsifiability
 of a scientific theory: a theory is good if it fits data
@@ -223,16 +223,16 @@ and if there are specific tests that can be used to disprove it.
 This is important since all statistical estimation is
 *post hoc*,
 i.e., we estimate after we observe the facts,
-hence vulnerable to the associated fallacy :cite:`corfield2009falsificationism`.
+hence vulnerable to the associated fallacy :cite:`Corfield.Scholkopf.Vapnik.2009`.
 For now, we will put the philosophy aside and stick to more tangible issues.
 
 In this section, to give you some intuition,
 we will focus on a few factors that tend
 to influence the generalizability of a model class:
 
-1. The number of tunable parameters. When the number of tunable parameters, sometimes called the *degrees of freedom*, is large, models tend to be more susceptible to overfitting :cite:`murata1994network`.
-1. The values taken by the parameters. When weights can take a wider range of values, models can be more susceptible to overfitting :cite:`krogh1992simple`.
-1. The number of training examples. It is trivially easy to overfit a dataset containing only one or two examples even if your model is simple. But overfitting a dataset with millions of examples requires an extremely flexible model :cite:`henighan2020scaling`.
+1. The number of tunable parameters. When the number of tunable parameters, sometimes called the *degrees of freedom*, is large, models tend to be more susceptible to overfitting :cite:`Murata.Yoshizawa.Amari.1994`.
+1. The values taken by the parameters. When weights can take a wider range of values, models can be more susceptible to overfitting :cite:`Krogh.Hertz.1992`.
+1. The number of training examples. It is trivially easy to overfit a dataset containing only one or two examples even if your model is simple. But overfitting a dataset with millions of examples requires an extremely flexible model :cite:`Henighan.Kaplan.Katz.ea.2020`.
 
 ## Model Selection
 
@@ -252,7 +252,7 @@ different numbers of hidden layers,
 different numbers of hidden units,
 and various choices of the activation functions
 applied to each hidden layer. For a particularly elegant 
-strategy to accomplish this for computer vision see :cite:`radosavovic2020designing`. 
+strategy to accomplish this for computer vision see :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`. 
 In order to determine the best among our candidate models,
 we will typically employ a validation dataset.
 
@@ -267,7 +267,7 @@ Then we would be in serious trouble.
 If we overfit our training data,
 there is always the evaluation on test data to keep us honest.
 But if we overfit the test data, how would we ever know?
-See e.g. :cite:`ong2005learning` for an example how 
+See e.g. :cite:`Ong.Smola.Williamson.ea.2005` for an example how 
 this can lead to absurd results even for models where the complexity 
 can be tightly controlled. 
 
@@ -384,13 +384,13 @@ and underfitting vs. overfitting in :numref:`fig_capacity_vs_error`.
 :label:`fig_capacity_vs_error`
 
 Much of the intuition of this arises from Statistical Learning Theory. One of the guarantees it 
-provides :cite:`Vapnik98` is that the gap between empirical risk and expected risk is bounded by 
+provides :cite:`Vapnik.1998` is that the gap between empirical risk and expected risk is bounded by 
 
 $$\Pr\left(R[p, f] - R_\mathrm{emp}[\mathbf{X}, \mathbf{Y}, f] < \epsilon\right) \geq 1-\delta
 \ \text{for}\ \epsilon \geq c \sqrt{(\mathrm{VC} - \log \delta)/n}.$$
 
 Here $\delta > 0$ is the probability that the bound is violated and $\mathrm{VC}$ is the Vapnik-Chervonenkis (VC)
-dimension of the set of functions that we want to fit. For instance, for polynomials of degree $d$ the VC dimension is $d+1$. Lastly, $c > 0$ is a constant that depends only on the scale of the loss that can be incurred. In short, this shows that our bound becomes increasingly loose as we pick more complex models and that the number of free parameters should not increase more rapidly than the dataset size $n$ increases. See :cite:`boucheron2005theory` for a detailed discussion and for much more advanced ways of measuring function complexity. 
+dimension of the set of functions that we want to fit. For instance, for polynomials of degree $d$ the VC dimension is $d+1$. Lastly, $c > 0$ is a constant that depends only on the scale of the loss that can be incurred. In short, this shows that our bound becomes increasingly loose as we pick more complex models and that the number of free parameters should not increase more rapidly than the dataset size $n$ increases. See :cite:`Boucheron.Bousquet.Lugosi.2005` for a detailed discussion and for much more advanced ways of measuring function complexity. 
 
 ### Dataset Size
 

@@ -127,7 +127,7 @@ def parameters(self):
 
 ## Summary
 
-Classification is a sufficiently frequently used problem type that it warrants its own convenience functions. Note that there is a difference between (classification) accuracy that we want to minimize and the logistic loss function that we are actually minimizing. Fortunately, our specific choice of loss function ensures that minimizing it will also lead to maximum accuracy. This is the case since the maximum likelihood estimator is consistent. It follows as a special case of the Cramer-Rao bound :cite:`cramer1946mathematical,radhakrishna1945information`. For more work on consistency see also :cite:`zhang2004statistical`.
+Classification is a sufficiently frequently used problem type that it warrants its own convenience functions. Note that there is a difference between (classification) accuracy that we want to minimize and the logistic loss function that we are actually minimizing. Fortunately, our specific choice of loss function ensures that minimizing it will also lead to maximum accuracy. This is the case since the maximum likelihood estimator is consistent. It follows as a special case of the Cramer-Rao bound :cite:`Cramer.1946,Radhakrishna-Rao.1945`. For more work on consistency see also :cite:`Zhang.2004`.
 
 More generally, though, the decision of which category to pick is far from trivial. For instance, when deciding where to assign an e-mail to, mistaking a "Primary" e-mail for a "Social" e-mail might be undesirable but far less disastrous than moving it to the spam folder (and later automatically deleting it). As such, we will tend to err on the side of caution with regard to assigning any e-mail to the "Spam" folder, rather than picking the most likely category.
 

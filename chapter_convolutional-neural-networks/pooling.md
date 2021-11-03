@@ -59,9 +59,9 @@ downsampling an image. Rather than just taking the value of every second (or thi
 pixel for the lower resolution image, we can average over adjacent pixels to obtain 
 an image with better signal to noise ratio since we are combining the information 
 from multiple adjacent pixels. *Maximum pooling* was introduced in 
-:cite:`riesenhuber1999hierarchical` in the context of cognitive neuroscience to describe 
+:cite:`Riesenhuber.Poggio.1999` in the context of cognitive neuroscience to describe 
 how information aggregation might be aggregated hierarchically for the purpose 
-of object recognition, and an earlier version in speech recognition :cite:`yamaguchi1990neural`. In almost all cases, max-pooling, as it is also referred to, 
+of object recognition, and an earlier version in speech recognition :cite:`Yamaguchi.Sakamoto.Akabane.ea.1990`. In almost all cases, max-pooling, as it is also referred to, 
 is preferable. 
 
 In both cases, as with the cross-correlation operator,
@@ -327,7 +327,7 @@ output vertically yields the same output as the other implementations.
 
 Pooling is an exceedingly simple operation. It does exactly what its name indicates, aggregate results over a window of values. All convolution semantics, such as strides and padding apply in the same way as they did previously. Note that pooling is indifferent to channels, i.e., it leaves the number of channels unchanged and it applies to each channel separately. Lastly, of the two popular pooling choices, max-pooling is preferable to average pooling, as it confers some degree of invariance to output. A popular choice is to pick a pooling window size of $2 \times 2$ to quarter the spatial resolution of output. 
 
-Note that there are many more ways of reducing resultion beyond pooling. For instance, in stochastic pooling :cite:`zeiler2013stochastic` and fractional max-pooling :cite:`graham2014fractional` aggregation is combined with randomization. This can slightly improve the accuracy in some cases. Lastly, as we will see later with the attention mechanism, there are more refined ways of aggregating over outputs, e.g., by using the alignment between a query and representation vectors. 
+Note that there are many more ways of reducing resultion beyond pooling. For instance, in stochastic pooling :cite:`Zeiler.Fergus.2013` and fractional max-pooling :cite:`Graham.2014` aggregation is combined with randomization. This can slightly improve the accuracy in some cases. Lastly, as we will see later with the attention mechanism, there are more refined ways of aggregating over outputs, e.g., by using the alignment between a query and representation vectors. 
 
 
 ## Exercises

@@ -29,7 +29,7 @@ for the purpose of recognizing handwritten digits in images :cite:`LeCun.Bottou.
 This work represented the culmination
 of a decade of research developing the technology.
 In 1989, LeCun's team published the first study to successfully
-train CNNs via backpropagation :cite:`lecun1989backpropagation`.
+train CNNs via backpropagation :cite:`LeCun.Boser.Denker.ea.1989`.
 
 At the time LeNet achieved outstanding results
 matching the performance of support vector machines,
@@ -262,7 +262,7 @@ with d2l.try_gpu():
 
 In this chapter we made significant progress. We moved from the MLPs of the 1980s to the CNNs of the 1990s and early 2000s. The architectures proposed, e.g., in the form of LeNet5 remain meaningful, even to this day. It is worth comparing the error rates on FashionMNIST achievable with LeNet5 both to the very best possible with MLPs (:numref:`sec_mlp_scratch`) and those with significantly more advanced architectures such as ResNet (:numref:`sec_resnet`). LetNet is much more similar to the latter than to the former. One of the primary differences, as we shall see, is that greater amounts of computation afforded significantly more complex architectures. 
 
-A second difference is the relative ease with which we were able to implement LeNet. What used to be an engineering challenge worth months of C++ and assembly code, engineering to improve SN, an early Lisp based deep learning tool, :cite:`bottou-lecun-88`, and finally experimentation with models can now be accomplished in minutes. It is this incredible productivity boost that has democratized deep learning model development tremendously. In the next chapter we will follow down this rabbit to hole to see where it takes us.
+A second difference is the relative ease with which we were able to implement LeNet. What used to be an engineering challenge worth months of C++ and assembly code, engineering to improve SN, an early Lisp based deep learning tool, :cite:`Bottou.Le-Cun.1988`, and finally experimentation with models can now be accomplished in minutes. It is this incredible productivity boost that has democratized deep learning model development tremendously. In the next chapter we will follow down this rabbit to hole to see where it takes us.
 
 ## Exercises
 
