@@ -1,6 +1,11 @@
 # Language Model
 :label:`sec_language-model`
 
+@TODO(@astonzhang)
+Recall "Third, many  n-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models." from last section.
+
+
+
 In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, where these tokens can be viewed as a sequence of discrete observations, such as words or characters. Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$.
 The goal of *language models*
 is to estimate the joint probability of the whole sequence:
