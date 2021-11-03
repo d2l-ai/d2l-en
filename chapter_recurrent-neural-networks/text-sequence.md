@@ -182,12 +182,20 @@ len(corpus), len(vocab)
 
 ## Natural Language Statistics
 
+Let us see how this works on real data.
+We construct a vocabulary based on the time machine dataset and print the top 10 most frequent words.
+
 ```{.python .input}
 %%tab all
 words = text.split()
 vocab = Vocab(words)
 vocab.token_freqs[:10]
 ```
+
+As we can see, (**the most popular words are**) actually quite boring to look at.
+They are often referred to as (***stop words***) and thus filtered out.
+Nonetheless, they still carry meaning and we will still use them.
+Besides, it is quite clear that the word frequency decays rather rapidly. The $10^{\mathrm{th}}$ most frequent word is less than $1/5$ as common as the most popular one. To get a better idea, we [**plot the figure of the word frequency**].
 
 ```{.python .input}
 %%tab all
@@ -196,12 +204,31 @@ d2l.plot(freqs, xlabel='token: x', ylabel='frequency: n(x)',
          xscale='log', yscale='log')
 ```
 
+We are on to something quite fundamental here: the word frequency decays rapidly in a well-defined way.
+After dealing with the first few words as exceptions, all the remaining words roughly follow a straight line on a log-log plot. This means that words satisfy *Zipf's law*,
+which states that the frequency $n_i$ of the $i^\mathrm{th}$ most frequent word
+is:
+
+$$n_i \propto \frac{1}{i^\alpha},$$
+:eqlabel:`eq_zipf_law`
+
+which is equivalent to
+
+$$\log n_i = -\alpha \log i + c,$$
+
+where $\alpha$ is the exponent that characterizes the distribution and $c$ is a constant.
+This should already give us pause if we want to model words by counting statistics and smoothing.
+After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But [**what about the other word combinations, such as bigrams, trigrams**], and beyond?
+Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
+
 ```{.python .input}
 %%tab all
 bigram_tokens = ['--'.join(pair) for pair in zip(words[:-1], words[1:])]
 bigram_vocab = Vocab(bigram_tokens)
 bigram_vocab.token_freqs[:10]
 ```
+
+One thing is notable here. Out of the ten most frequent word pairs, nine are composed of both stop words and only one is relevant to the actual book---"the time". Furthermore, let us see whether the trigram frequency behaves in the same manner.
 
 ```{.python .input}
 %%tab all
@@ -210,6 +237,9 @@ trigram_tokens = ['--'.join(triple) for triple in zip(
 trigram_vocab = d2l.Vocab(trigram_tokens)
 trigram_vocab.token_freqs[:10]
 ```
+
+Last, let us [**visualize the token frequency**] among these three models: unigrams, bigrams, and trigrams.
+
 
 ```{.python .input}
 %%tab all
@@ -220,9 +250,16 @@ d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token: x',
          legend=['unigram', 'bigram', 'trigram'])
 ```
 
+This figure is quite exciting for a number of reasons. First, beyond unigram words, sequences of words also appear to be following Zipf's law, albeit with a smaller exponent $\alpha$ in :eqref:`eq_zipf_law`, depending on the sequence length.
+Second, the number of distinct $n$-grams is not that large. This gives us hope that there is quite a lot of structure in language.
+Third, many $n$-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.
+
 ## Summary
 
 * Language models estimate the joint probability of a text sequence.
+* $n$-grams provide a convenient model for dealing with long sequences by truncating the dependence.
+* Zipf's law governs the word distribution for not only unigrams but also the other $n$-grams.
+* There is a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via Laplace smoothing.
 * To train language models, we can randomly sample pairs of input sequences and label sequences in minibatches.
 * Text is an important form of sequence data.
 * To preprocess text, we usually split text into tokens, build a vocabulary to map token strings into numerical indices, and convert text data into token indices for  models to manipulate.
@@ -237,6 +274,9 @@ d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token: x',
     1. Does it really lead to a perfectly uniform distribution over the sequences on the document?
     1. What would you have to do to make things even more uniform? 
 1. If we want a sequence example to be a complete sentence, what kind of problem does this introduce in minibatch sampling? How can we fix the problem?
+1. Suppose there are $100,000$ words in the training dataset. How much word frequency and multi-word adjacent frequency does a four-gram need to store?
+1. Estimate the exponent of Zipf's law for unigrams, bigrams, and trigrams.
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/117)
