@@ -1,12 +1,34 @@
 # Text Sequences
 :label:`sec_text-sequence`
 
-```{.python .input  n=3}
+We have reviewed and evaluated
+statistical tools
+and prediction challenges
+for sequence data.
+Such data can take many forms.
+Specifically,
+as we will focus on
+in many chapters of the book,
+text is one of the most popular examples of sequence data.
+For example,
+an article can be simply viewed as a sequence of words, or even a sequence of characters.
+To facilitate our future experiments
+with sequence data,
+we will dedicate this section
+to explain common preprocessing steps for text.
+Usually, these steps are:
+
+1. Load text as strings into memory.
+1. Split strings into tokens (e.g., words and characters).
+1. Build a table of vocabulary to map the split tokens to numerical indices.
+1. Convert text into sequences of numerical indices so they can be manipulated by models easily.
+
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-```{.python .input  n=4}
+```{.python .input  n=2}
 %%tab mxnet
 import collections
 import re
@@ -16,7 +38,7 @@ import random
 npx.set_np()
 ```
 
-```{.python .input  n=5}
+```{.python .input  n=3}
 %%tab pytorch
 import collections
 import re
@@ -25,7 +47,7 @@ import torch
 import random
 ```
 
-```{.python .input  n=6}
+```{.python .input  n=4}
 %%tab tensorflow
 import collections
 import re
@@ -38,18 +60,15 @@ import random
 
 To get started, we load text 
 from H. G. Wells' [*The Time Machine*](http://www.gutenberg.org/ebooks/35).
-This book contains just over 30000 words,
-so we can load them into memory.
+This is a fairly small corpus of just over 30000 words, but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words.
 The following function 
-(**reads the lines of text into a list**),
-where each line is represented as a string.
-For simplicity, we ignore punctuation and capitalization.
+(**reads the raw text into a string**).
 
 ```{.python .input  n=5}
 %%tab all
 class TimeMachine(d2l.DataModule): #@save
     def _download(self):
-        fname = d2l.download(d2l.DATA_URL+'timemachine.txt', self.root, 
+        fname = d2l.download(d2l.DATA_URL + 'timemachine.txt', self.root, 
                              '090b5e7e70c295757f55df93cb0a180b9691891a')
         with open(fname) as f:
             return f.read()
@@ -61,7 +80,9 @@ raw_text[:60]
 
 ## Preprocessing
 
-```{.python .input}
+For simplicity, we ignore punctuation and capitalization when preprocessing the raw text.
+
+```{.python .input  n=6}
 %%tab all
 @d2l.add_to_class(TimeMachine)  #@save
 def _preprocess(self, text):
@@ -73,17 +94,18 @@ text[:60]
 
 ## Tokenization
 
-The following `tokenize` function
-takes a list (`lines`) as input,
-where each element is a line of text.
-[**We then split each line into a list of tokens**].
+
 *Tokens* are the atomic (indivisible) units of text
 and what constitutes a token 
 (e.g., characters or words)
 is a design choice.
-Below, we tokenize our lines into words.
+Although originated from natural language processing,
+the concept of tokens is also getting popular in
+computer vision, 
+such as for referring to image patches :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
+Below, we tokenize our preprocessed text into characters.
 
-```{.python .input  n=6}
+```{.python .input  n=7}
 %%tab all
 @d2l.add_to_class(TimeMachine)  #@save
 def _tokenize(self, text):
@@ -97,19 +119,19 @@ tokens = data._tokenize(text)
 
 While these tokens are still strings,
 our models require numerical inputs.
-[**To this end, we will need a class
+[**Thus, we will need a class
 to construct a *vocabulary*
 that assigns a unique index 
-to each distinct token value.**]
-First, we count the occurrences 
-of each element of the vocabulary,
-lumping the rarest ones all together
-into a special value "&lt;unk&gt;" (unknown token).
+to each distinct token.**]
+To this end,
+we first count the unique tokens in all the documents from the training set, namely a *corpus*,
+and then assign a numerical index to each unique token.
+Rarely appeared tokens are often removed to reduce the complexity. Any token that does not exist in the corpus or has been removed is mapped into a special unknown token "&lt;unk&gt;". 
 In the future,
 we may supplement the vocabulary
 with a list of reserved tokens.
 
-```{.python .input  n=7}
+```{.python .input  n=8}
 %%tab all
 class Vocab:  #@save
     """Vocabulary for text."""
@@ -146,28 +168,28 @@ class Vocab:  #@save
 ```
 
 We can now [**construct the vocabulary**] for our dataset, 
-using it to convert each text line 
-from a list of tokens into a list of indices.
+using it to convert a text sequence
+into a list of numerical indices.
 Note that we have not lost any information
 and can easily convert our dataset 
 back to its original (string) representation.
 
-```{.python .input  n=8}
+```{.python .input  n=9}
 %%tab all
 vocab = Vocab(tokens)
-indicies = vocab[tokens[0]]
+indicies = vocab[tokens[:10]]
 print('indices:', indicies)
 print('words:', vocab.to_tokens(indicies))
 ```
 
 ## Putting All Things Together
 
-Using the above functions, we [**package everything into the `load_corpus_time_machine` function**], which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of *The Time Machine* corpus.
+Using the above functions, we [**package everything into the following `build` method of the `TimeMachine` class**], which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of *The Time Machine* corpus.
 The modifications we did here are:
 (i) we tokenize text into characters, not words, to simplify the training in later sections;
-(ii) `corpus` is a single list, not a list of token lists, since each text line in *The Time Machine* dataset is not necessarily a sentence or a paragraph.
+(ii) `corpus` is a single list, not a list of token lists, since each text line in *The Time Machine* dataset is not necessarily a sentence or paragraph.
 
-```{.python .input  n=9}
+```{.python .input  n=10}
 %%tab all
 @d2l.add_to_class(TimeMachine)  #@save
 def build(self, raw_text, vocab=None):    
@@ -185,7 +207,7 @@ len(corpus), len(vocab)
 Let us see how this works on real data.
 We construct a vocabulary based on the time machine dataset and print the top 10 most frequent words.
 
-```{.python .input}
+```{.python .input  n=11}
 %%tab all
 words = text.split()
 vocab = Vocab(words)
@@ -197,7 +219,7 @@ They are often referred to as (***stop words***) and thus filtered out.
 Nonetheless, they still carry meaning and we will still use them.
 Besides, it is quite clear that the word frequency decays rather rapidly. The $10^{\mathrm{th}}$ most frequent word is less than $1/5$ as common as the most popular one. To get a better idea, we [**plot the figure of the word frequency**].
 
-```{.python .input}
+```{.python .input  n=12}
 %%tab all
 freqs = [freq for token, freq in vocab.token_freqs]
 d2l.plot(freqs, xlabel='token: x', ylabel='frequency: n(x)',
@@ -221,7 +243,7 @@ This should already give us pause if we want to model words by counting statisti
 After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But [**what about the other word combinations, such as bigrams, trigrams**], and beyond?
 Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
 
-```{.python .input}
+```{.python .input  n=13}
 %%tab all
 bigram_tokens = ['--'.join(pair) for pair in zip(words[:-1], words[1:])]
 bigram_vocab = Vocab(bigram_tokens)
@@ -230,7 +252,7 @@ bigram_vocab.token_freqs[:10]
 
 One thing is notable here. Out of the ten most frequent word pairs, nine are composed of both stop words and only one is relevant to the actual book---"the time". Furthermore, let us see whether the trigram frequency behaves in the same manner.
 
-```{.python .input}
+```{.python .input  n=14}
 %%tab all
 trigram_tokens = ['--'.join(triple) for triple in zip(
     words[:-2], words[1:-1], words[2:])]
@@ -240,8 +262,7 @@ trigram_vocab.token_freqs[:10]
 
 Last, let us [**visualize the token frequency**] among these three models: unigrams, bigrams, and trigrams.
 
-
-```{.python .input}
+```{.python .input  n=15}
 %%tab all
 bigram_freqs = [freq for token, freq in bigram_vocab.token_freqs]
 trigram_freqs = [freq for token, freq in trigram_vocab.token_freqs]
