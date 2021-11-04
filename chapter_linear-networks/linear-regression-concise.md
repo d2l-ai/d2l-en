@@ -12,9 +12,9 @@ progress of previous decades. This is due to a fortuitous combination of multipl
 factors, not the least due to the ease of implementation offered by a number
 of open source deep learning frameworks. Caffe, DistBelief and Theano arguably represent the
 first generation of such models :cite:`Jia.Shelhamer.Donahue.ea.2014,Dean.Corrado.Monga.ea.2012,Bergstra.Breuleux.Bastien.ea.2010` that
-widespread adoption. In contrast to earlier (seminal) work such as SN2 (Simulateur Neuristique)
+widespread adoption. In contrast to earlier (seminal) work such as SN (Simulateur Neuristique)
 which provided a Lisp-like programming experience
-:cite:`bottou1989cun` modern frameworks offer automatic differentiation and the convenience
+:cite:`Bottou.Le-Cun.1988` modern frameworks offer automatic differentiation and the convenience
 of Python. Frameworks allow us to automate and modularize
 the repetitive work of implementing gradient-based learning algorithms.
 

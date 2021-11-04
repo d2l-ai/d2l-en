@@ -128,7 +128,7 @@ In their [epoynmous theorem](https://en.wikipedia.org/wiki/Glivenko%E2%80%93Cant
 converges to the generalization error :cite:`Glivenko.1933,Cantelli.1933`.
 In a series of seminal papers, Vapnik and Chervonenkis
 extended this theory to more general classes of functions
-:cite:`Vapnik.Chervonenkis.1964,Vapnik.Chervonenkis.1968,Vapnik.Chervonenkis.1971,Vapnik.Chervonenkis.1974b,Vapnik.Chervonenkis.1981,Vapnik.Chervonenkis.1991`.
+:cite:`Vapnik.Chervonenkis.1964,Vapnik.Chervonenkis.1968,Vapnik.Chervonenkis.1971,Vapnik.Chervonenkis.1981,Vapnik.Chervonenkis.1991,Vapnik.Chervonenkis.1974*1`.
 This work laid the foundations of statistical learning theory.
 
 In the standard supervised learning setting, which we have addressed
