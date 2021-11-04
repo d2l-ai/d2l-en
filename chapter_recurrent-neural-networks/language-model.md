@@ -2,8 +2,6 @@
 :label:`sec_language-model`
 
 
-
-
 In :numref:`sec_text-sequence`, we see how to map text sequences into tokens, where these tokens can be viewed as a sequence of discrete observations, such as words or characters. Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$.
 The goal of *language models*
 is to estimate the joint probability of the whole sequence:
@@ -26,12 +24,11 @@ Likewise, in a document summarization algorithm
 it is worthwhile knowing that "dog bites man" is much more frequent than "man bites dog", or that "I want to eat grandma" is a rather disturbing statement, whereas "I want to eat, grandma" is much more benign.
 
 
-## Learning a Language Model
+## Learning Language Models
 
 The obvious question is how we should model a document, or even a sequence of tokens. 
 Suppose that we tokenize text data at the word level.
-We can take recourse to the analysis we applied to sequence models in :numref:`sec_sequence`.
-Let us start by applying basic probability rules:
+Let's start by applying basic probability rules:
 
 $$P(x_1, x_2, \ldots, x_T) = \prod_{t=1}^T P(x_t  \mid  x_1, \ldots, x_{t-1}).$$
 
@@ -40,11 +37,31 @@ the probability of a text sequence containing four words would be given as:
 
 $$P(\text{deep}, \text{learning}, \text{is}, \text{fun}) =  P(\text{deep}) P(\text{learning}  \mid  \text{deep}) P(\text{is}  \mid  \text{deep}, \text{learning}) P(\text{fun}  \mid  \text{deep}, \text{learning}, \text{is}).$$
 
+### Markov Models and $n$-grams
+
+Among those sequence model analysis in :numref:`sec_sequence`,
+let's apply Markov models to language modeling.
+A distribution over sequences satisfies the Markov property of first order if $P(x_{t+1} \mid x_t, \ldots, x_1) = P(x_{t+1} \mid x_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
+
+$$
+\begin{aligned}
+P(x_1, x_2, x_3, x_4) &=  P(x_1) P(x_2) P(x_3) P(x_4),\\
+P(x_1, x_2, x_3, x_4) &=  P(x_1) P(x_2  \mid  x_1) P(x_3  \mid  x_2) P(x_4  \mid  x_3),\\
+P(x_1, x_2, x_3, x_4) &=  P(x_1) P(x_2  \mid  x_1) P(x_3  \mid  x_1, x_2) P(x_4  \mid  x_2, x_3).
+\end{aligned}
+$$
+
+The probability formulae that involve one, two, and three variables are typically referred to as *unigram*, *bigram*, and *trigram* models, respectively. 
 In order to compute the language model, we need to calculate the
 probability of words and the conditional probability of a word given
 the previous few words.
-Such probabilities are essentially
+Note that
+such probabilities are
 language model parameters.
+
+
+
+### Word Frequency
 
 Here, we
 assume that the training dataset is a large text corpus, such as all
@@ -65,14 +82,18 @@ $$\hat{P}(\text{learning} \mid \text{deep}) = \frac{n(\text{deep, learning})}{n(
 
 where $n(x)$ and $n(x, x')$ are the number of occurrences of singletons
 and consecutive word pairs, respectively.
-Unfortunately, estimating the
+Unfortunately, 
+estimating the
 probability of a word pair is somewhat more difficult, since the
-occurrences of "deep learning" are a lot less frequent. In
-particular, for some unusual word combinations it may be tricky to
+occurrences of "deep learning" are a lot less frequent. 
+In particular, for some unusual word combinations it may be tricky to
 find enough occurrences to get accurate estimates.
-Things take a turn for the worse for three-word combinations and beyond.
+As suggested by the empirical results in :numref:`subsec_natural-lang-stat`,
+things take a turn for the worse for three-word combinations and beyond.
 There will be many plausible three-word combinations that we likely will not see in our dataset.
 Unless we provide some solution to assign such word combinations nonzero count, we will not be able to use them in a language model. If the dataset is small or if the words are very rare, we might not find even a single one of them.
+
+### Laplace Smoothing
 
 A common strategy is to perform some form of *Laplace smoothing*.
 The solution is to
@@ -98,8 +119,13 @@ other techniques can accomplish :cite:`Wood.Gasthaus.Archambeau.ea.2011`.
 
 
 Unfortunately, models like this get unwieldy rather quickly
-for the following reasons. First, we need to store all counts.
-Second, this entirely ignores the meaning of the words. For
+for the following reasons. 
+First, 
+as discussed in :numref:`subsec_natural-lang-stat`,
+many $n$-grams occur very rarely, 
+making Laplace smoothing rather unsuitable for language modeling.
+Second, we need to store all counts.
+Third, this entirely ignores the meaning of the words. For
 instance, "cat" and "feline" should occur in related contexts.
 It is quite difficult to adjust such models to additional contexts,
 whereas, deep learning based language models are well suited to
@@ -108,30 +134,8 @@ Last, long word
 sequences are almost certain to be novel, hence a model that simply
 counts the frequency of previously seen word sequences is bound to perform poorly there.
 
-## Markov Models and $n$-grams
-
-Before we discuss solutions involving deep learning, we need some more terminology and concepts. Recall our discussion of Markov Models in :numref:`sec_sequence`.
-Let us apply this to language modeling. A distribution over sequences satisfies the Markov property of first order if $P(x_{t+1} \mid x_t, \ldots, x_1) = P(x_{t+1} \mid x_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
-
-$$
-\begin{aligned}
-P(x_1, x_2, x_3, x_4) &=  P(x_1) P(x_2) P(x_3) P(x_4),\\
-P(x_1, x_2, x_3, x_4) &=  P(x_1) P(x_2  \mid  x_1) P(x_3  \mid  x_2) P(x_4  \mid  x_3),\\
-P(x_1, x_2, x_3, x_4) &=  P(x_1) P(x_2  \mid  x_1) P(x_3  \mid  x_1, x_2) P(x_4  \mid  x_2, x_3).
-\end{aligned}
-$$
-
-The probability formulae that involve one, two, and three variables are typically referred to as *unigram*, *bigram*, and *trigram* models, respectively. In the following, we will learn how to design better models.
-
-
-@TODO(@astonzhang)
-Recall "Third, many  n-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models." from last section.
-
-
-
-
-
-In the rest of the chapter, we focus on  using neural networks for language modeling
+Therefore, we focus on  using neural networks for language modeling
+in the rest of the chapter,
 based on *The Time Machine* dataset.
 Before introducing the model,
 let's assume that it
@@ -139,25 +143,25 @@ processes a minibatch of sequences with predefined length
 at a time.
 Now the question is how to [**read minibatches of input sequences and label sequences at random.**]
 
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 ```
 
-```{.python .input  n=2}
+```{.python .input  n=3}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -189,16 +193,16 @@ Each subsequence will be used as an input sequence into the language model.
 
 
 For language modeling,
-the target is to predict the next token based on what tokens we have seen so far, hence the labels are the original sequence, shifted by one token.
-The label sequence for any input sequence $\mathbf x_t$
+the goal is to predict the next token based on what tokens we have seen so far, hence the targets (labels) are the original sequence, shifted by one token.
+The target sequence for any input sequence $\mathbf x_t$
 is $\mathbf x_{t+1}$ with length $n$.
 
-![Obtaining 5 pairs of input sequences and label sequences from partitioned length-5 subsequences.](../img/lang-model-data.svg) 
+![Obtaining 5 pairs of input sequences and target sequences from partitioned length-5 subsequences.](../img/lang-model-data.svg) 
 :label:`fig_lang_model_data`
 
-:numref:`fig_lang_model_data` shows an example of obtaining 5 pairs of input sequences and label sequences with $n=5$ and $d=2$.
+:numref:`fig_lang_model_data` shows an example of obtaining 5 pairs of input sequences and target sequences with $n=5$ and $d=2$.
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab all
 @d2l.add_to_class(d2l.TimeMachine)  #@save
 def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
@@ -215,28 +219,28 @@ def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
 
 To train language models,
 we will randomly sample 
-pairs of input sequences and label sequences
+pairs of input sequences and target sequences
 in minibatches.
 The following data loader randomly generates a minibatch from the dataset each time.
 The argument `batch_size` specifies the number of subsequence examples (`self.b`) in each minibatch
 and `num_steps` is the subsequence length in tokens (`self.n`).
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab all
 @d2l.add_to_class(d2l.TimeMachine)  #@save
 def get_dataloader(self, train):
     idx = slice(0, self.num_train) if train else slice(
-        self.num_train, self.num_train+self.num_val)
+        self.num_train, self.num_train + self.num_val)
     return self.get_tensorloader([self.X, self.Y], train, idx)
 ```
 
-Let's [**manually generate a sequence from 0 to 34.**]
-We assume that
-the batch size and numbers of time steps are 3 and 5,
-respectively.
-This means that we can generate $\lfloor (35 - 1) / 5 \rfloor= 6$ feature-label subsequence pairs. With a minibatch size of 3, we only get 2 minibatches.
+As we can see in the following, 
+a minibatch of target sequences
+can be obtained 
+by shifting the input sequences
+by one token.
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab all
 data = d2l.TimeMachine(batch_size=2, num_steps=10)
 for X, Y in data.train_dataloader():
@@ -247,11 +251,14 @@ for X, Y in data.train_dataloader():
 ## Summary
 
 * Language models estimate the joint probability of a text sequence.
-* To train language models, we can randomly sample pairs of input sequences and label sequences in minibatches.
+* $n$-grams provide a convenient model for dealing with long sequences by truncating the dependence.
+* There is a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via Laplace smoothing.
+* To train language models, we can randomly sample pairs of input sequences and target sequences in minibatches.
 
 
 ## Exercises
 
+1. Suppose there are $100,000$ words in the training dataset. How much word frequency and multi-word adjacent frequency does a four-gram need to store?
 1. How would you model a dialogue?
 1. What other methods can you think of for reading long sequence data?
 1. Consider our method for discarding a uniformly random number of the first few tokens at the beginning of each epoch.

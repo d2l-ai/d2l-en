@@ -203,6 +203,7 @@ len(corpus), len(vocab)
 ```
 
 ## Natural Language Statistics
+:label:`subsec_natural-lang-stat`
 
 
 Using the real corpus and the `Vocab` class

@@ -632,7 +632,7 @@ class TimeMachine(d2l.DataModule):
     def get_dataloader(self, train):
         """Defined in :numref:`sec_language-model`"""
         idx = slice(0, self.num_train) if train else slice(
-            self.num_train, self.num_train+self.num_val)
+            self.num_train, self.num_train + self.num_val)
         return self.get_tensorloader([self.X, self.Y], train, idx)
 
 class Vocab:
