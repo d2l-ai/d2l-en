@@ -1,12 +1,10 @@
 # Language Model
 :label:`sec_language-model`
 
-@TODO(@astonzhang)
-Recall "Third, many  n-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models." from last section.
 
 
 
-In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, where these tokens can be viewed as a sequence of discrete observations, such as words or characters. Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$.
+In :numref:`sec_text-sequence`, we see how to map text sequences into tokens, where these tokens can be viewed as a sequence of discrete observations, such as words or characters. Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$.
 The goal of *language models*
 is to estimate the joint probability of the whole sequence:
 
@@ -26,6 +24,112 @@ This can cause ambiguity in speech recognition,
 which is easily resolved through a language model that rejects the second translation as outlandish.
 Likewise, in a document summarization algorithm
 it is worthwhile knowing that "dog bites man" is much more frequent than "man bites dog", or that "I want to eat grandma" is a rather disturbing statement, whereas "I want to eat, grandma" is much more benign.
+
+
+## Learning a Language Model
+
+The obvious question is how we should model a document, or even a sequence of tokens. 
+Suppose that we tokenize text data at the word level.
+We can take recourse to the analysis we applied to sequence models in :numref:`sec_sequence`.
+Let us start by applying basic probability rules:
+
+$$P(x_1, x_2, \ldots, x_T) = \prod_{t=1}^T P(x_t  \mid  x_1, \ldots, x_{t-1}).$$
+
+For example, 
+the probability of a text sequence containing four words would be given as:
+
+$$P(\text{deep}, \text{learning}, \text{is}, \text{fun}) =  P(\text{deep}) P(\text{learning}  \mid  \text{deep}) P(\text{is}  \mid  \text{deep}, \text{learning}) P(\text{fun}  \mid  \text{deep}, \text{learning}, \text{is}).$$
+
+In order to compute the language model, we need to calculate the
+probability of words and the conditional probability of a word given
+the previous few words.
+Such probabilities are essentially
+language model parameters.
+
+Here, we
+assume that the training dataset is a large text corpus, such as all
+Wikipedia entries, [Project Gutenberg](https://en.wikipedia.org/wiki/Project_Gutenberg),
+and all text posted on the
+Web.
+The probability of words can be calculated from the relative word
+frequency of a given word in the training dataset.
+For example, the estimate $\hat{P}(\text{deep})$ can be calculated as the
+probability of any sentence starting with the word "deep". A
+slightly less accurate approach would be to count all occurrences of
+the word "deep" and divide it by the total number of words in
+the corpus.
+This works fairly well, particularly for frequent
+words. Moving on, we could attempt to estimate
+
+$$\hat{P}(\text{learning} \mid \text{deep}) = \frac{n(\text{deep, learning})}{n(\text{deep})},$$
+
+where $n(x)$ and $n(x, x')$ are the number of occurrences of singletons
+and consecutive word pairs, respectively.
+Unfortunately, estimating the
+probability of a word pair is somewhat more difficult, since the
+occurrences of "deep learning" are a lot less frequent. In
+particular, for some unusual word combinations it may be tricky to
+find enough occurrences to get accurate estimates.
+Things take a turn for the worse for three-word combinations and beyond.
+There will be many plausible three-word combinations that we likely will not see in our dataset.
+Unless we provide some solution to assign such word combinations nonzero count, we will not be able to use them in a language model. If the dataset is small or if the words are very rare, we might not find even a single one of them.
+
+A common strategy is to perform some form of *Laplace smoothing*.
+The solution is to
+add a small constant to all counts. 
+Denote by $n$ the total number of words in
+the training set
+and $m$ the number of unique words.
+This solution helps with singletons, e.g., via
+
+$$\begin{aligned}
+	\hat{P}(x) & = \frac{n(x) + \epsilon_1/m}{n + \epsilon_1}, \\
+	\hat{P}(x' \mid x) & = \frac{n(x, x') + \epsilon_2 \hat{P}(x')}{n(x) + \epsilon_2}, \\
+	\hat{P}(x'' \mid x,x') & = \frac{n(x, x',x'') + \epsilon_3 \hat{P}(x'')}{n(x, x') + \epsilon_3}.
+\end{aligned}$$
+
+Here $\epsilon_1,\epsilon_2$, and $\epsilon_3$ are hyperparameters.
+Take $\epsilon_1$ as an example:
+when $\epsilon_1 = 0$, no smoothing is applied;
+when $\epsilon_1$ approaches positive infinity,
+$\hat{P}(x)$ approaches the uniform probability $1/m$. 
+The above is a rather primitive variant of what
+other techniques can accomplish :cite:`Wood.Gasthaus.Archambeau.ea.2011`.
+
+
+Unfortunately, models like this get unwieldy rather quickly
+for the following reasons. First, we need to store all counts.
+Second, this entirely ignores the meaning of the words. For
+instance, "cat" and "feline" should occur in related contexts.
+It is quite difficult to adjust such models to additional contexts,
+whereas, deep learning based language models are well suited to
+take this into account.
+Last, long word
+sequences are almost certain to be novel, hence a model that simply
+counts the frequency of previously seen word sequences is bound to perform poorly there.
+
+## Markov Models and $n$-grams
+
+Before we discuss solutions involving deep learning, we need some more terminology and concepts. Recall our discussion of Markov Models in :numref:`sec_sequence`.
+Let us apply this to language modeling. A distribution over sequences satisfies the Markov property of first order if $P(x_{t+1} \mid x_t, \ldots, x_1) = P(x_{t+1} \mid x_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
+
+$$
+\begin{aligned}
+P(x_1, x_2, x_3, x_4) &=  P(x_1) P(x_2) P(x_3) P(x_4),\\
+P(x_1, x_2, x_3, x_4) &=  P(x_1) P(x_2  \mid  x_1) P(x_3  \mid  x_2) P(x_4  \mid  x_3),\\
+P(x_1, x_2, x_3, x_4) &=  P(x_1) P(x_2  \mid  x_1) P(x_3  \mid  x_1, x_2) P(x_4  \mid  x_2, x_3).
+\end{aligned}
+$$
+
+The probability formulae that involve one, two, and three variables are typically referred to as *unigram*, *bigram*, and *trigram* models, respectively. In the following, we will learn how to design better models.
+
+
+@TODO(@astonzhang)
+Recall "Third, many  n-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models." from last section.
+
+
+
+
 
 In the rest of the chapter, we focus on  using neural networks for language modeling
 based on *The Time Machine* dataset.
