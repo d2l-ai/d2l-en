@@ -376,7 +376,7 @@ trainer.fit(model, data)
 
 ## Prediction
 
-Let's [**first define the prediction function
+We need to [**define the prediction function
 to generate new characters following
 the user-provided `prefix`**],
 which is a string containing several characters.
@@ -415,6 +415,9 @@ def predict(self, prefix, num_preds, vocab, device=None):
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
+In the following, we specify the prefix 
+and have it generate 20 additional characters.
+
 ```{.python .input}
 %%tab mxnet, pytorch
 model.predict('it has', 20, data.vocab, d2l.try_gpu())
@@ -424,11 +427,6 @@ model.predict('it has', 20, data.vocab, d2l.try_gpu())
 %%tab tensorflow
 model.predict('it has', 20, data.vocab)
 ```
-
-Now we can test the `predict_ch8` function.
-We specify the prefix as `time traveller ` and have it generate 10 additional characters.
-Given that we have not trained the network,
-it will generate nonsensical predictions.
 
 While implementing the above RNN model from scratch is instructive, it is not convenient.
 In the next section we will see how to improve the RNN model,
@@ -440,13 +438,13 @@ and make it run faster.
 
 * We can train an RNN-based character-level language model to generate text following the user-provided text prefix.
 * A simple RNN language model consists of input encoding, RNN modeling, and output generation.
-* We iterate over sequential data with random sampling, where we re-initialize the RNN hidden state for each iteration.
-* A warm-up period allows a model to update itself (e.g., obtain a better hidden state than its initialized value) before making any prediction.
 * Gradient clipping prevents gradient explosion, but it cannot fix vanishing gradients.
+* A warm-up period allows a model to update itself (e.g., obtain a better hidden state than its initialized value) before making any prediction.
 
 
 ## Exercises
 
+1. Does the implemented language model predict the next token based on all the past tokens up to the very first token in *The Time Machine*? Which hyperparameter controls the length of history used for prediction?
 1. Show that one-hot encoding is equivalent to picking a different embedding for each object.
 1. Adjust the hyperparameters (e.g., number of epochs, number of hidden units, number of time steps in a minibatch, and learning rate) to improve the perplexity.
     * How low can you go?
