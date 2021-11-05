@@ -50,7 +50,6 @@ we begin by defining the class for the RNN model
 with its model parameters only.
 The number of hidden units `num_hiddens` is a tunable hyperparameter.
 
-
 ```{.python .input  n=5}
 %%tab all
 class RNNScratch(d2l.Module):  #@save
