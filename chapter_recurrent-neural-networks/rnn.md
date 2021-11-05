@@ -212,53 +212,7 @@ $\mathbf{O}_3$, is determined by the text sequence "m", "a", and "c". Since the 
 In practice, each token is represented by a $d$-dimensional vector, and we use a batch size $n>1$. Therefore, the input $\mathbf X_t$ at time step $t$ will be a $n\times d$ matrix, which is identical to what we discussed in :numref:`subsec_rnn_w_hidden_states`.
 
 
-## Perplexity
-:label:`subsec_perplexity`
 
-Last, let's discuss about how to measure the language model quality, which will be used to evaluate our RNN-based models in the subsequent sections.
-One way is to check how surprising the text is.
-A good language model is able to predict with
-high-accuracy tokens that what we will see next.
-Consider the following continuations of the phrase "It is raining", as proposed by different language models:
-
-1. "It is raining outside"
-1. "It is raining banana tree"
-1. "It is raining piouw;kcj pwepoiut"
-
-In terms of quality, example 1 is clearly the best. The words are sensible and logically coherent.
-While it might not quite accurately reflect which word follows semantically ("in San Francisco" and "in winter" would have been perfectly reasonable extensions), the model is able to capture which kind of word follows.
-Example 2 is considerably worse by producing a nonsensical extension. Nonetheless, at least the model has learned how to spell words and some degree of correlation between words. Last, example 3 indicates a poorly trained model that does not fit data properly.
-
-We might measure the quality of the model by computing  the likelihood of the sequence.
-Unfortunately this is a number that is hard to understand and difficult to compare.
-After all, shorter sequences are much more likely to occur than the longer ones,
-hence evaluating the model on Tolstoy's magnum opus
-*War and Peace* will inevitably produce a much smaller likelihood than, say, on Saint-Exupery's novella *The Little Prince*. What is missing is the equivalent of an average.
-
-Information theory comes handy here.
-We have defined entropy, surprisal, and cross-entropy
-when we introduced the softmax regression
-(:numref:`subsec_info_theory_basics`).
-If we want to compress text, we can ask about
-predicting the next token given the current set of tokens.
-A better language model should allow us to predict the next token more accurately.
-Thus, it should allow us to spend fewer bits in compressing the sequence.
-So we can measure it by the cross-entropy loss averaged
-over all the $n$ tokens of a sequence:
-
-$$\frac{1}{n} \sum_{t=1}^n -\log P(x_t \mid x_{t-1}, \ldots, x_1),$$
-:eqlabel:`eq_avg_ce_for_lm`
-
-where $P$ is given by a language model and $x_t$ is the actual token observed at time step $t$ from the sequence.
-This makes the performance on documents of different lengths comparable. For historical reasons, scientists in natural language processing prefer to use a quantity called *perplexity*. In a nutshell, it is the exponential of :eqref:`eq_avg_ce_for_lm`:
-
-$$\exp\left(-\frac{1}{n} \sum_{t=1}^n \log P(x_t \mid x_{t-1}, \ldots, x_1)\right).$$
-
-Perplexity can be best understood as the harmonic mean of the number of real choices that we have when deciding which token to pick next. Let's look at a number of cases:
-
-* In the best case scenario, the model always perfectly estimates the probability of the target token as 1. In this case the perplexity of the model is 1.
-* In the worst case scenario, the model always predicts the probability of the target token as 0. In this situation, the perplexity is positive infinity.
-* At the baseline, the model predicts a uniform distribution over all the available tokens of the vocabulary. In this case, the perplexity equals the number of unique tokens of the vocabulary. In fact, if we were to store the sequence without any compression, this would be the best we could do to encode it. Hence, this provides a nontrivial upper bound that any useful model must beat.
 
 In the following sections, we will implement RNNs
 for character-level language models and use perplexity

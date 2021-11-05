@@ -569,7 +569,7 @@ class TimeMachine(d2l.DataModule):
         return corpus, vocab
 
     def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
-        """Defined in :numref:`sec_language-model`"""
+        """Defined in :numref:`subsec_perplexity`"""
         super(d2l.TimeMachine, self).__init__()
         self.save_hyperparameters()
         corpus, self.vocab = self.build(self._download())
@@ -578,7 +578,7 @@ class TimeMachine(d2l.DataModule):
         self.X, self.Y = array[:,:-1], array[:,1:]
 
     def get_dataloader(self, train):
-        """Defined in :numref:`sec_language-model`"""
+        """Defined in :numref:`subsec_partitioning-seqs`"""
         idx = slice(0, self.num_train) if train else slice(
             self.num_train, self.num_train + self.num_val)
         return self.get_tensorloader([self.X, self.Y], train, idx)
