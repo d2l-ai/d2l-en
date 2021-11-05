@@ -312,7 +312,7 @@ Informally, the ReLU function retains only positive
 elements and discards all negative elements
 by setting the corresponding activations to 0.
 To gain some intuition, we can plot the function.
-As you can see, the activation function is piecewise linear. 
+As you can see, the activation function is piecewise linear.
 
 ```{.python .input}
 %%tab mxnet
@@ -603,7 +603,3 @@ in many cases.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/226)
 :end_tab:
-
-```{.python .input}
-
-```
