@@ -37,10 +37,26 @@ import tensorflow as tf
 
 ## [**Defining the Model**]
 
-High-level APIs provide implementations of recurrent neural networks.
-We construct the recurrent neural network layer `rnn_layer` with a single hidden layer and 256 hidden units.
-In fact, we have not even discussed yet what it means to have multiple layers---this will happen in :numref:`sec_deep_rnn`.
-For now, suffice it to say that multiple layers simply amount to the output of one layer of RNN being used as the input for the next layer of RNN.
+We define the following class
+using the RNN implemented
+by high-level APIs.
+
+
+:begin_tab:`mxnet`
+Specifically, to initialize the hidden state,
+we invoke the member method `begin_state`.
+This returns a list
+that contains
+an initial hidden state
+for each example in the minibatch,
+whose shape is
+(number of hidden layers, batch size, number of hidden units).
+For some models
+to be introduced later
+(e.g., long short-term memory),
+such a list also
+contains other information.
+:end_tab:
 
 ```{.python .input}
 %%tab mxnet
@@ -84,6 +100,10 @@ class RNN(d2l.Module):  #@save
         return outputs, H
 ```
 
+Inheriting from the `RNNLMScratch` class in :numref:`sec_rnn-scratch`, 
+the following `RNNLM` class defines a complete RNN-based language model.
+Note that we need to create a separate fully connected output layer.
+
 ```{.python .input}
 %%tab all
 class RNNLM(d2l.RNNLMScratch):  #@save
@@ -103,22 +123,39 @@ class RNNLM(d2l.RNNLMScratch):  #@save
             return d2l.transpose(self.linear(hiddens), (1, 0, 2))
 ```
 
-```{.python .input  n=1}
+## Training and Predicting
+
+Before training the model, let's [**make a prediction with the a model that has random weights.**]
+Given that we have not trained the network, it will generate nonsensical predictions.
+
+```{.python .input}
 %%tab all
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet', 'tensorflow'):
-    rnn_layer = RNN(num_hiddens=32)
+    rnn = RNN(num_hiddens=32)
 if tab.selected('pytorch'):
-    rnn_layer = RNN(num_inputs=len(data.vocab), num_hiddens=32)
+    rnn = RNN(num_inputs=len(data.vocab), num_hiddens=32)
+model = RNNLM(rnn, vocab_size=len(data.vocab), lr=1)
+model.predict('it has', 20, data.vocab)
+```
+
+As is quite obvious, this model does not work at all. Next, we [**train our model with high-level APIs**].
+
+```{.python .input  n=1}
+%%tab all
 if tab.selected('mxnet', 'pytorch'):
-    model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
-        model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
-    trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
+        trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
+
+Compared with :numref:`sec_rnn-scratch`,
+this model achieves comparable perplexity,
+albeit within a shorter period of time, due to the code being more optimized by
+high-level APIs of the deep learning framework.
+We can also generate predicted tokens following the specified prefix string.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -130,27 +167,14 @@ model.predict('it has', 20, data.vocab, d2l.try_gpu())
 model.predict('it has', 20, data.vocab)
 ```
 
-## Training and Predicting
-
-Before training the model, let's [**make a prediction with the a model that has random weights.**]
-
-As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn-scratch` and [**train our model with high-level APIs**].
-
-Compared with the last section, this model achieves comparable perplexity,
-albeit within a shorter period of time, due to the code being more optimized by
-high-level APIs of the deep learning framework.
-
-
 ## Summary
 
-* High-level APIs of the deep learning framework provides an implementation of the RNN layer.
-* The RNN layer of high-level APIs returns an output and an updated hidden state, where the output does not involve output layer computation.
+* High-level APIs of the deep learning framework provides an implementation of RNNs.
 * Using high-level APIs leads to faster RNN training than using its implementation from scratch.
 
 ## Exercises
 
 1. Can you make the RNN model overfit using the high-level APIs?
-1. What happens if you increase the number of hidden layers in the RNN model? Can you make the model work?
 1. Implement the autoregressive model of :numref:`sec_sequence` using an RNN.
 
 :begin_tab:`mxnet`
