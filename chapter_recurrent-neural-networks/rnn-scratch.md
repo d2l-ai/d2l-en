@@ -142,6 +142,7 @@ where an RNN implemented from scratch
 is passed via the `rnn` argument
 of the `__init__` method.
 When training language models, the inputs and outputs are from the same vocabulary. Hence, they have the same dimension, which is equal to the vocabulary size.
+Note that we use perplexity to evaluate the model. As discussed in :numref:`subsec_perplexity`, this ensures that sequences of different length are comparable.
 
 ```{.python .input}
 %%tab all
@@ -232,15 +233,20 @@ def one_hot(self, X):
         return tf.one_hot(tf.transpose(X), self.vocab_size)
 ```
 
-### Forward Computation
+### Transforming RNN Outputs
+
+The language model
+uses a fully connected output layer
+to transform RNN outputs 
+into token predictions at each time step.
 
 ```{.python .input}
+%%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
 def output_layer(self, rnn_outputs):
     outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in rnn_outputs]
     return d2l.stack(outputs, 1)
 
-%%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
 def forward(self, X, state=None):
     embs = self.one_hot(X)
@@ -248,12 +254,7 @@ def forward(self, X, state=None):
     return self.output_layer(rnn_outputs)
 ```
 
-With all the needed functions being defined,
-next we [**create a class to wrap these functions and store parameters**] for an RNN model implemented from scratch.
-
-Let's [**check whether the outputs have the correct shapes**], e.g., to ensure that the dimensionality of the hidden state remains unchanged.
-
-We can see that the output shape is (number of time steps $\times$ batch size, vocabulary size), while the hidden state shape remains the same, i.e., (batch size, number of hidden units).
+Let's [**check whether the forward computation outputs have the correct shape.**]
 
 ```{.python .input}
 %%tab all
@@ -309,7 +310,7 @@ bestows a certain degree of robustness to the model. Gradient clipping provides
 a quick fix to the gradient exploding. While it does not entirely solve the problem, it is one of the many techniques to alleviate it.
 
 Below we define a function to clip the gradients of
-a model that is implemented from scratch or a model constructed by the high-level APIs.
+a model.
 Also note that we compute the gradient norm over all the model parameters.
 
 ```{.python .input  n=43}
@@ -358,7 +359,6 @@ let's [**define a function to train the model in one epoch**]. It differs from h
 
 1. We iterate over sequential data with random sampling, where we re-initialize the hidden state for each iteration.
 1. We clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process.
-1. We use perplexity to evaluate the model. As discussed in :numref:`subsec_perplexity`, this ensures that sequences of different length are comparable.
 
 Same as the `train_epoch_ch3` function in :numref:`sec_softmax_scratch`,
 `updater` is a general function
