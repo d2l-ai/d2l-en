@@ -7,8 +7,8 @@ necessity, incomplete, thanks to the plethora of exciting new designs
 being added. Their importance derives from the fact that not only can
 they be used directly for vision tasks, but they also serve as basic
 feature generators for more advanced tasks such as tracking
-:cite:`bytetrack.2021`, segmentation :cite:`long2015fully`, object
-detection :cite:`redmon2018yolov3`, or style transformation
+:cite:`Zhang.Sun.Jiang.ea.2021`, segmentation :cite:`Long.Shelhamer.Darrell.2015`, object
+detection :cite:`Redmon.Farhadi.2018`, or style transformation
 :cite:`Gatys.Ecker.Bethge.2016`.  In this chapter, most sections
 correspond to a significant CNN architecture that was at some point
 (or currently) the base model upon which many research projects and
@@ -29,10 +29,10 @@ parallel concatenations :cite:`Szegedy.Liu.Jia.ea.2015`; residual
 networks (ResNet) :cite:`He.Zhang.Ren.ea.2016`, which remain some of
 the most popular off-the-shelf architectures in computer vision;
 MobileNet, which uses network learning to achieve high accuracy in
-resource-constrained settings :cite:`howard2019searching`, and the
+resource-constrained settings :cite:`Howard.Sandler.Chu.ea.2019`, and the
 structured network search strategy leading to RegNetX/Y
-:cite:`radosavovic2020designing`. In addition to that, we cover key
-advances such as ResNeXt :cite:`xie2017aggregated` which partitions
+:cite:`Radosavovic.Kosaraju.Girshick.ea.2020`. In addition to that, we cover key
+advances such as ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017` which partitions
 channels for significant computational savings, DenseNet
 :cite:`Huang.Liu.Van-Der-Maaten.ea.2017` for a generalization of the
 residual architecture, and the Squeeze-and-excitation networks to

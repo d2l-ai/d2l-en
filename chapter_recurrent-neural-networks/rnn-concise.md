@@ -106,12 +106,10 @@ class RNNLM(d2l.RNNLMScratch):  #@save
 ```{.python .input  n=1}
 %%tab all
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
-if tab.selected('mxnet'):
+if tab.selected('mxnet', 'tensorflow'):
     rnn_layer = RNN(num_hiddens=32)
 if tab.selected('pytorch'):
     rnn_layer = RNN(num_inputs=len(data.vocab), num_hiddens=32)
-if tab.selected('tensorflow'):
-    rnn_layer = RNN(num_hiddens=32)
 if tab.selected('mxnet', 'pytorch'):
     model = RNNLM(rnn_layer, vocab_size=len(data.vocab), lr=1)
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
@@ -124,12 +122,12 @@ trainer.fit(model, data)
 
 ```{.python .input}
 %%tab mxnet, pytorch
-model.predict('it is only another way of', 20, data.vocab, d2l.try_gpu())
+model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 
 ```{.python .input}
 %%tab tensorflow
-model.predict('it is only another way of', 20, data.vocab)
+model.predict('it has', 20, data.vocab)
 ```
 
 ## Training and Predicting
@@ -166,3 +164,4 @@ high-level APIs of the deep learning framework.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/2211)
 :end_tab:
+

@@ -109,15 +109,15 @@ to jointly learn both a representation via hidden layers
 and a linear predictor that acts upon that representation.
 
 This problem of nonlinearity has been studied for at least a 
-century :cite:`fisher1928statistical`. For instance, decision trees
+century :cite:`Fisher.1928`. For instance, decision trees
 in their most basic form use a sequence of binary decisions to 
 decide upon class membership :cite:`quinlan1994c4`. Likewise, kernel 
 methods have been used for many decades to model nonlinear dependencies 
-:cite:`aronszajn1950theory`. This has found its way e.g. into 
-nonparametric spline models :cite:`wahba1990spline` and kernel methods
-:cite:`scholkopf2002learning`. It is also something that the brain solves 
+:cite:`Aronszajn.1950`. This has found its way e.g. into 
+nonparametric spline models :cite:`Wahba.1990` and kernel methods
+:cite:`Scholkopf.Smola.2002`. It is also something that the brain solves 
 quite naturally. After all, neurons feed into other neurons which, 
-in turn, again feed into other neurons :cite:`ramonycajal1894nouvelles`. 
+in turn, again feed into other neurons :cite:`Cajal.Azoulay.1894`. 
 Consequently we have a sequence of relatively simple transformations. 
 
 ### Incorporating Hidden Layers
@@ -202,7 +202,7 @@ we need one more key ingredient: a
 nonlinear *activation function* $\sigma$
 to be applied to each hidden unit
 following the affine transformation. For instance, a popular
-choice is the ReLu (Rectified Linear Unit) activation function :cite:`nair2010rectified`
+choice is the ReLu (Rectified Linear Unit) activation function :cite:`Nair.Hinton.2010`
 $\sigma(x) = \mathrm{max}(0, x)$ operating on its arguments element-wise. 
 The outputs of activation functions $\sigma(\cdot)$
 are called *activations*.
@@ -237,7 +237,7 @@ one atop another, yielding ever more expressive models.
 
 We know that the brain is capable of very sophisticated statistical analysis. As such, 
 it is worth asking, just *how powerful* a Deep Network could be. This question
-has been answered multiple times, e.g. in :cite:`cybenko1989approximation` in the context 
+has been answered multiple times, e.g. in :cite:`Cybenko.1989` in the context 
 of multilayer perceptrons, and in :cite:`Michelli86` in the context of Reproducing Kernel 
 Hilbert Spaces in a way that could be seen as RBF networks with a single hidden layer. 
 These (and related results) suggest that even with a single-hidden-layer network,
@@ -258,7 +258,7 @@ does not mean that you should try
 to solve all of your problems
 with single-hidden-layer networks. In fact, in this case kernel methods 
 are way more effective, since they are capable of solving the problem 
-*exactly* even in infinite dimensional spaces :cite:`KimWah71,SchHerSmo01`. 
+*exactly* even in infinite dimensional spaces :cite:`Kimeldorf.Wahba.1971,Scholkopf.Herbrich.Smola.2001`. 
 In fact, we can approximate many functions
 much more compactly by using deeper (vs. wider) networks :cite:`Simonyan.Zisserman.2014`.
 We will touch upon more rigorous arguments in subsequent chapters.
@@ -300,7 +300,7 @@ import tensorflow as tf
 
 The most popular choice,
 due to both simplicity of implementation and
-its good performance on a variety of predictive tasks :cite:`nair2010rectified`,
+its good performance on a variety of predictive tasks :cite:`Nair.Hinton.2010`,
 is the *rectified linear unit* (*ReLU*).
 [**ReLU provides a very simple nonlinear transformation**].
 Given an element $x$, the function is defined
@@ -351,7 +351,7 @@ say that it's nondifferentiable on a set of measure zero).
 There is an old adage that if subtle boundary conditions matter,
 we are probably doing (*real*) mathematics, not engineering.
 That conventional wisdom may apply here, or at least, the fact that 
-we are not performing constrained optimization :cite:`Mangasarian65,Rockafellar70`. 
+we are not performing constrained optimization :cite:`Mangasarian.1965,Rockafellar.1970`. 
 We plot the derivative of the ReLU function plotted below.
 
 ```{.python .input}
@@ -408,7 +408,7 @@ which either *fire* or *do not fire*.
 Thus the pioneers of this field,
 going all the way back to McCulloch and Pitts,
 the inventors of the artificial neuron,
-focused on thresholding units :cite:`McCPit43`.
+focused on thresholding units :cite:`McCulloch.Pitts.1943`.
 A thresholding activation takes value 0
 when its input is below some threshold
 and value 1 when the input exceeds the threshold.
@@ -425,7 +425,7 @@ However, the sigmoid has mostly been replaced
 by the simpler and more easily trainable ReLU
 for most use in hidden layers. Much of this has to do 
 with the fact that the sigmoid poses challenges for optimization
-:cite:`lecun1998efficient` since its gradient vanishes for large positive *and* negative arguments. 
+:cite:`LeCun.Bottou.Orr.ea.1998` since its gradient vanishes for large positive *and* negative arguments. 
 This can lead to plateaus that are difficult to escape from. 
 Nonetheless sigmoids are important. In later chapters (e.g., :numref:`sec_lstm`) on recurrent neural networks,
 we will describe architectures that leverage sigmoid units
@@ -498,7 +498,7 @@ transforming them into elements on the interval (**between -1 and 1**):
 $$\operatorname{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
 We plot the tanh function below.  
-Note that as the input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to that of the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system :cite:`kalman1992tanh`.
+Note that as the input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to that of the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system :cite:`Kalman.Kwasny.1992`.
 
 ```{.python .input}
 %%tab mxnet
@@ -574,7 +574,7 @@ that this was one of the key innovations that helped the resurgence
 of Deep Learning over the past decade. Note, though, that research in 
 activation functions has not stopped. For instance, the Swish activation 
 function $\sigma(x) = x \operatorname{sigmoid}(\beta x)$ as proposed in
-:cite:`ramachandran2017searching` can yield better accuracy 
+:cite:`Ramachandran.Zoph.Le.2017` can yield better accuracy 
 in many cases.
 
 ## Exercises

@@ -9,7 +9,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 Although CNNs were well known
 in the computer vision and machine learning communities
-following the introduction of LeNet :cite:`lecun1995comparison`,
+following the introduction of LeNet :cite:`LeCun.Jackel.Bottou.ea.1995`,
 they did not immediately dominate the field.
 Although LeNet achieved good results on early small datasets,
 the performance and feasibility of training CNNs
@@ -17,16 +17,16 @@ on larger, more realistic datasets had yet to be established.
 In fact, for much of the intervening time between the early 1990s
 and the watershed results of 2012 :cite:`Krizhevsky.Sutskever.Hinton.2012`,
 neural networks were often surpassed by other machine learning methods,
-such as kernel methods :cite:`scholkopf2002learning`, ensemble methods :cite:`freund1996experiments`, 
-and structued estimation :cite:`koller2004max`.
+such as kernel methods :cite:`Scholkopf.Smola.2002`, ensemble methods :cite:`Freund.Schapire.ea.1996`, 
+and structued estimation :cite:`Taskar.Guestrin.Koller.2004`.
 
 For computer vision, this comparison is perhaps not fair.
 That is although the inputs to convolutional networks
 consist of raw or lightly-processed (e.g., by centering) pixel values, practitioners would never feed raw pixels into traditional models.
 Instead, typical computer vision pipelines
-consisted of manually engineering feature extraction pipelines, such as SIFT :cite:`Lowe.2004`, SURF :cite:`Bay.Tuytelaars.Van-Gool.2006`, and bags of visual words :cite:`sivic2003video`.
+consisted of manually engineering feature extraction pipelines, such as SIFT :cite:`Lowe.2004`, SURF :cite:`Bay.Tuytelaars.Van-Gool.2006`, and bags of visual words :cite:`Sivic.Zisserman.2003`.
 Rather than *learn the features*, the features were *crafted*.
-Most of the progress came from having more clever ideas for features and deep insight into geometry :cite:`hartleyzisserman2000`. The learning algorithm was often considered an afterthought.
+Most of the progress came from having more clever ideas for features and deep insight into geometry :cite:`Hartley.Zisserman.2000`. The learning algorithm was often considered an afterthought.
 
 Although some neural network accelerators were available in the 1990s,
 they were not yet sufficiently powerful to make
@@ -38,7 +38,7 @@ Moreover, datasets were still relatively small: OCR on 60,000 low-resolution ima
 Added to these obstacles, key tricks for training neural networks
 including parameter initialization heuristics :cite:`Glorot.Bengio.2010`,
 clever variants of stochastic gradient descent :cite:`Kingma.Ba.2014`,
-non-squashing activation functions :cite:`nair2010rectified`,
+non-squashing activation functions :cite:`Nair.Hinton.2010`,
 and effective regularization techniques :cite:`Srivastava.Hinton.Krizhevsky.ea.2014` were still missing.
 
 Thus, rather than training *end-to-end* (pixel to classification) systems,
@@ -51,13 +51,13 @@ classical pipelines looked more like this:
 
 If you spoke to machine learning researchers,
 they believed that machine learning was both important and beautiful.
-Elegant theories proved the properties of various classifiers :cite:`boucheron2005theory` and convex 
+Elegant theories proved the properties of various classifiers :cite:`Boucheron.Bousquet.Lugosi.2005` and convex 
 optimization :cite:`Boyd.Vandenberghe.2004` had become the mainstay for obtaining them. 
 The field of machine learning was thriving, rigorous, and eminently useful. However, 
 if you spoke to a computer vision researcher,
 you would hear a very different story.
 The dirty truth of image recognition, they would tell you,
-is that features, geometry :cite:`hartleyzisserman2000` and engineering, 
+is that features, geometry :cite:`Hartley.Zisserman.2000` and engineering, 
 rather than novel learning algorithms, drove progress.
 Computer vision researchers justifiably believed
 that a slightly bigger or cleaner dataset
@@ -125,10 +125,10 @@ Numerous papers addressed the UCI collection of datasets,
 many of which contained only hundreds or (a few) thousands of images
 captured in low resolution and often with an artificially clean background.
 
-In 2009, the ImageNet dataset was released :cite:`deng2009imagenet`,
+In 2009, the ImageNet dataset was released :cite:`Deng.Dong.Socher.ea.2009`,
 challenging researchers to learn models from 1 million examples,
 1000 each from 1000 distinct categories of objects. The categories themselves 
-were based on the most popular noun nodes in WordNet :cite:`miller1995wordnet`. 
+were based on the most popular noun nodes in WordNet :cite:`Miller.1995`. 
 The ImageNet team used Google Image Search to prefilter large candidate sets
 for each category and employed
 the Amazon Mechanical Turk crowdsourcing pipeline
@@ -136,7 +136,7 @@ to confirm for each image whether it belonged to the associated category.
 This scale was unprecedented, exceeding others by over an order of magnitude 
 (e.g., CIFAR-100 has 60,000 images). Another aspect was that the images were at 
 fairly high resolution of $224 \times 224$ pixels, unlike the 80 million sized 
-TinyImages dataset :cite:`torralba2008`, consisting of $32 \times 32$ pixel thumbnails. 
+TinyImages dataset :cite:`Torralba.Fergus.Freeman.2008`, consisting of $32 \times 32$ pixel thumbnails. 
 This allowed for the formation of higher-level features. 
 The associated competition, dubbed the ImageNet Large Scale Visual Recognition 
 Challenge [(ILSVRC)](https://www.image-net.org/challenges/LSVRC/)
@@ -163,7 +163,7 @@ matrix-vector products, which are needed for many computer graphics tasks.
 Fortunately, the math is strikingly similar
 to that required to calculate convolutional layers.
 Around that time, NVIDIA and ATI had begun optimizing GPUs
-for general computing operations :cite:`fernando2004gpu`,
+for general computing operations :cite:`Fernando.2004`,
 going as far as to market them as *general-purpose GPUs* (GPGPU).
 
 To provide some intuition, consider the cores of a modern microprocessor
@@ -223,7 +223,7 @@ the first couple years of the deep learning boom.
 
 AlexNet, which employed an 8-layer CNN,
 won the ImageNet Large Scale Visual Recognition Challenge 2012
-by a large margin :cite:`ILSVRCanalysis_ICCV2013`.
+by a large margin :cite:`Russakovsky.Deng.Huang.ea.2013`.
 This network showed, for the first time,
 that the features obtained by learning can transcend manually-designed features, breaking the previous paradigm in computer vision.
 
@@ -283,7 +283,7 @@ To augment the data even further, the training loop of AlexNet
 added a great deal of image augmentation,
 such as flipping, clipping, and color changes.
 This makes the model more robust and the larger sample size effectively reduces overfitting.
-We will discuss data augmentation in greater detail in :numref:`sec_image_augmentation`. See also :cite:`buslaev2020albumentations` for an in-depth review of such preprocessing steps.
+We will discuss data augmentation in greater detail in :numref:`sec_image_augmentation`. See also :cite:`Buslaev.Iglovikov.Khvedchenya.ea.2020` for an in-depth review of such preprocessing steps.
 
 ```{.python .input}
 %%tab mxnet
@@ -416,7 +416,7 @@ with d2l.try_gpu():
 
 AlexNet's structure bears a striking resemblance to LeNet, with a number of critical improvements, both for accuracy (Dropout) and for ease of training (ReLu). What is equally striking is the amount of progress that has been made in terms of DL tooling. What was several months of work in 2012 can now be accomplished in a dozen lines of code using any modern framework. 
 
-Reviewing the architecture, we see that AlexNet has an Achilles heel when it comes to efficiency: the last two hidden layers require matrices of size $6400 \times 4096$ and $4096 \times 4096$ respectively. This corresponds to 164 MB of memory and 81 MFlops of computation, both of which are a nontrivial outlay, especially on smaller devices, such as mobile phones. This is one of the reasons why AlexNet has been surpassed by much more effective architectures that we will cover in the following sections. Nonetheless, it is a key step from shallow to deep networks that are used nowadays. Although it seems that there are only a few more lines in AlexNet's implementation than in LeNet, it took the academic community many years to embrace this conceptual change and take advantage of its excellent experimental results. This was also due to the lack of efficient computational tools. At the time neither DistBelief :cite:`dean2012large` nor Caffe :cite:`jia2014caffe` existed, and Theano :cite:`bergstra2010theano` still lacked many distinguishing features. It is only the the availability of TensorFlow :cite:`abadi2016tensorflow` that changed this situation dramatically. 
+Reviewing the architecture, we see that AlexNet has an Achilles heel when it comes to efficiency: the last two hidden layers require matrices of size $6400 \times 4096$ and $4096 \times 4096$ respectively. This corresponds to 164 MB of memory and 81 MFlops of computation, both of which are a nontrivial outlay, especially on smaller devices, such as mobile phones. This is one of the reasons why AlexNet has been surpassed by much more effective architectures that we will cover in the following sections. Nonetheless, it is a key step from shallow to deep networks that are used nowadays. Although it seems that there are only a few more lines in AlexNet's implementation than in LeNet, it took the academic community many years to embrace this conceptual change and take advantage of its excellent experimental results. This was also due to the lack of efficient computational tools. At the time neither DistBelief :cite:`Dean.Corrado.Monga.ea.2012` nor Caffe :cite:`Jia.Shelhamer.Donahue.ea.2014` existed, and Theano :cite:`Bergstra.Breuleux.Bastien.ea.2010` still lacked many distinguishing features. It is only the the availability of TensorFlow :cite:`Abadi.Barham.Chen.ea.2016` that changed this situation dramatically. 
 
 ## Exercises
 

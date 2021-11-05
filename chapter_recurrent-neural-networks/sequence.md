@@ -61,6 +61,7 @@ $$P(x_1, \ldots, x_T) = \prod_{t=1}^T P(x_t \mid x_{t-1}, \ldots, x_1).$$
 Note that the above considerations still hold if we deal with discrete objects, such as words, rather than continuous numbers. The only difference is that in such a situation we need to use a classifier rather than a regression model to estimate $P(x_t \mid  x_{t-1}, \ldots, x_1)$.
 
 ### Markov Models
+:label:`subsec_markov-models`
 
 Recall the approximation that in an autoregressive model we use only $x_{t-1}, \ldots, x_{t-\tau}$ instead of $x_{t-1}, \ldots, x_1$ to estimate $x_t$. Whenever this approximation is accurate we say that the sequence satisfies a *Markov condition*. In particular, if $\tau = 1$, we have a *first-order Markov model* and $P(x)$ is given by
 
@@ -93,10 +94,8 @@ We are barely scratching the surface of it.
 
 ## Training
 
-After reviewing so many statistical tools,
+After reviewing many different statistical tools,
 let's try this out in practice.
-We begin by generating some data.
-To keep things simple we (**generate our sequence data by using a sine function with some additive noise for time steps $1, 2, \ldots, 1000$.**)
 
 ```{.python .input  n=6}
 %load_ext d2lbook.tab
@@ -127,6 +126,9 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+We begin by generating some data.
+To keep things simple we (**generate our sequence data by using a sine function with some additive noise for time steps $1, 2, \ldots, 1000$.**)
+
 ```{.python .input  n=10}
 %%tab all
 class Data(d2l.DataModule):
@@ -151,19 +153,21 @@ to keep things simple, we drop them for now.
 The resulting dataset contains $T - \tau$ examples,
 where each input to the model
 has sequence length $\tau$.
+We (**create a data iterator on the first 600 examples**),
+covering a period of the sine function.
 
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(Data)
 def get_dataloader(self, train):
-    features = [self.x[i : self.T - self.tau + i] for i in range(self.tau)]
+    features = [self.x[i : self.T-self.tau+i] for i in range(self.tau)]
     self.features = d2l.stack(features, 1)
     self.labels = d2l.reshape(self.x[self.tau:], (-1, 1))
     i = slice(0, self.num_train) if train else slice(self.num_train, None)
     return self.get_tensorloader([self.features, self.labels], train, i)
 ```
 
-We train a linear model.
+The model to train is simple: just linear regression.
 
 ```{.python .input}
 %%tab all
@@ -214,7 +218,7 @@ multistep_preds = d2l.zeros(data.T)
 multistep_preds[:] = data.x
 for i in range(data.num_train + data.tau, data.T):
     multistep_preds[i] = model(
-        d2l.reshape(multistep_preds[i - data.tau: i], (1, -1)))
+        d2l.reshape(multistep_preds[i-data.tau : i], (1, -1)))
 multistep_preds = d2l.numpy(multistep_preds)    
 ```
 
@@ -224,7 +228,7 @@ multistep_preds = tf.Variable(d2l.zeros(data.T))
 multistep_preds[:].assign(data.x)
 for i in range(data.num_train + data.tau, data.T):
     multistep_preds[i].assign(d2l.reshape(model(
-        d2l.reshape(multistep_preds[i - data.tau: i], (1, -1))), ()))
+        d2l.reshape(multistep_preds[i-data.tau : i], (1, -1))), ()))
 ```
 
 ```{.python .input}
@@ -248,10 +252,10 @@ by computing predictions on the entire sequence for $k = 1, 4, 16, 64$.
 def k_step_pred(k):
     features = []
     for i in range(data.tau):
-        features.append(data.x[i : i + data.T - data.tau - k + 1])
-    # the `i + tau`-th element stores the `i + 1`-step-ahead predictions
+        features.append(data.x[i : i+data.T-data.tau-k+1])
+    # The (i+tau)-th element stores the (i+1)-step-ahead predictions
     for i in range(k):
-        preds = model(d2l.stack(features[i : i + data.tau], 1))
+        preds = model(d2l.stack(features[i : i+data.tau], 1))
         features.append(d2l.reshape(preds, -1))
     return features[data.tau:]
 ```
@@ -260,7 +264,7 @@ def k_step_pred(k):
 %%tab all
 steps = (1, 4, 16, 64)
 preds = k_step_pred(steps[-1])
-d2l.plot(data.time[data.tau + steps[-1] - 1:], 
+d2l.plot(data.time[data.tau+steps[-1]-1:], 
          [d2l.numpy(preds[k-1]) for k in steps], 'time', 'x', 
          legend=[f'{k}-step preds' for k in steps], figsize=(6, 3))
 ```
@@ -281,7 +285,7 @@ While the 4-step-ahead predictions still look good, anything beyond that is almo
     1. Incorporate more than the past 4 observations? How many do you really need?
     1. How many past observations would you need if there was no noise? Hint: you can write $\sin$ and $\cos$ as a differential equation.
     1. Can you incorporate older observations while keeping the total number of features constant? Does this improve accuracy? Why?
-    1. Change the neural network architecture and evaluate the performance. In particular, training with more epochs and observe the results.
+    1. Change the neural network architecture and evaluate the performance. You may train the new model with more epochs. What do you observe?
 1. An investor wants to find a good security to buy. He looks at past returns to decide which one is likely to do well. What could possibly go wrong with this strategy?
 1. Does causality also apply to text? To which extent?
 1. Give an example for when a latent autoregressive model might be needed to capture the dynamic of the data.

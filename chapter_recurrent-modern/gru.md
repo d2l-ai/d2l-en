@@ -261,10 +261,16 @@ the provided prefix "time traveller".
 
 ```{.python .input}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=16)
-gru = GRUScratch(num_inputs=len(data.vocab), num_hiddens=32)
-model = d2l.RNNLMScratch(gru, vocab_size=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
+data = d2l.TimeMachine(batch_size=1024, num_steps=32)
+if tab.selected('mxnet', 'pytorch'):
+    gru = GRUScratch(num_inputs=len(data.vocab), num_hiddens=32)
+    model = d2l.RNNLMScratch(gru, vocab_size=len(data.vocab), lr=4)
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        gru = GRUScratch(num_inputs=len(data.vocab), num_hiddens=32)
+        model = d2l.RNNLMScratch(gru, vocab_size=len(data.vocab), lr=4)
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -294,8 +300,22 @@ class GRU(d2l.RNN):
 ```{.python .input}
 %%tab all
 gru = GRU(num_inputs=len(data.vocab), num_hiddens=32)
-model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=1)
+if tab.selected('mxnet', 'pytorch'):
+    model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=4)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=4)
 trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab mxnet, pytorch
+model.predict('it has', 20, data.vocab, d2l.try_gpu())
+```
+
+```{.python .input}
+%%tab tensorflow
+model.predict('it has', 20, data.vocab)
 ```
 
 ## Summary

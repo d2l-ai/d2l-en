@@ -415,12 +415,12 @@ def predict(self, prefix, num_preds, vocab, device=None):
 
 ```{.python .input}
 %%tab mxnet, pytorch
-model.predict('it is only another way of', 20, data.vocab, d2l.try_gpu())
+model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 
 ```{.python .input}
 %%tab tensorflow
-model.predict('it is only another way of', 20, data.vocab)
+model.predict('it has', 20, data.vocab)
 ```
 
 Now we can test the `predict_ch8` function.
@@ -467,3 +467,4 @@ and make it run faster.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1052)
 :end_tab:
+

@@ -458,18 +458,18 @@ needs a larger receptive field
 to detect input features over a broader area,
 we can build a deeper network.
 
-Receptive fields derive their name from neurophysiology. In a series of experiments :cite:`hubel1959receptive,hubel1962receptive,hubel1968receptive` on a range of animals 
+Receptive fields derive their name from neurophysiology. In a series of experiments :cite:`Hubel.Wiesel.1959,Hubel.Wiesel.1962,Hubel.Wiesel.1968` on a range of animals 
 and different stimuli, Hubel and Wiesel explored the response of what is called the visual 
 cortex on said stimuli. By and large they found that lower levels respond to edges and related 
-shapes. Later on, :cite:`field1987relations` illustrated this effect on natural 
+shapes. Later on, :cite:`Field.1987` illustrated this effect on natural 
 images with, what can only be called, convolutional kernels. 
 We reprint a key figure in :numref:`field_visual` to illustrate the striking similarities. 
 
-![Image and caption taken from :cite:`field1987relations`: An example of coding with six different channels. (Left) Examples of the six types of sensor associated with each channel. (Right) Convolution of the image in (Middle) with the six sensors shown in (Left). The response of the individual sensors is determined by sampling these filtered images at a distance proportional to the size of the sensor (shown with dots). This diagram shows the response of only the even symmetric sensors.](../img/field-visual.png)
+![Image and caption taken from :cite:`Field.1987`: An example of coding with six different channels. (Left) Examples of the six types of sensor associated with each channel. (Right) Convolution of the image in (Middle) with the six sensors shown in (Left). The response of the individual sensors is determined by sampling these filtered images at a distance proportional to the size of the sensor (shown with dots). This diagram shows the response of only the even symmetric sensors.](../img/field-visual.png)
 :label:`field_visual`
 
 As it turns out, this relation even holds for the features computed by deeper layers of networks trained on image classification tasks, as demonstrated e.g., 
-in :cite:`kuzovkin2018activations`. Suffice it to say, convolutions have proven to be an incredibly powerful tool for computer vision, both in biology and in code. As such, it is not surprising (in hindsight) that they heralded the recent success in Deep Learning. 
+in :cite:`Kuzovkin.Vicente.Petton.ea.2018`. Suffice it to say, convolutions have proven to be an incredibly powerful tool for computer vision, both in biology and in code. As such, it is not surprising (in hindsight) that they heralded the recent success in Deep Learning. 
 
 ## Summary
 

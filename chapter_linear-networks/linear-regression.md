@@ -19,7 +19,7 @@ where the goal is to predict membership among a set of categories.
 
 *Linear regression* may be both the simplest
 and most popular among the standard tools to regression.
-Dating back to the dawn of the 19th century :cite:`legendre1805memoire,gauss1809theoria`,
+Dating back to the dawn of the 19th century :cite:`Legendre.1805,Gauss.1809`,
 linear regression flows from a few simple assumptions.
 First, we assume that the relationship between the features $\mathbf{x}$ and the targets $y$ is linear,
 i.e., that $y$ can be expressed as a weighted sum
@@ -193,7 +193,7 @@ $$\begin{aligned}
     \mathbf{X}^\top \mathbf{y} = \mathbf{X}^\top \mathbf{X} \mathbf{w}
 \end{aligned}$$
 
-Solving for $\mathbf{w}$ provides us with the optimal solution for the optimization problem. Note that this only exists if the matrix $\mathbf X^\top \mathbf X$ is invertible, i.e., if the design matrix covers a sufficiently rich space :cite:`golub1996matrix`.
+Solving for $\mathbf{w}$ provides us with the optimal solution for the optimization problem. Note that this only exists if the matrix $\mathbf X^\top \mathbf X$ is invertible, i.e., if the design matrix covers a sufficiently rich space :cite:`Golub.Van-Loan.1996`.
 
 $$\mathbf{w}^* = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf{y}.$$
 
@@ -225,14 +225,14 @@ which is an average of the losses computed
 on every single example in the dataset.
 In practice, this can be extremely slow:
 we must pass over the entire dataset before making a single update,
-even if the update steps might be very powerful :cite:`liu1989limited`.
+even if the update steps might be very powerful :cite:`Liu.Nocedal.1989`.
 Even worse, if there is a lot of redundancy in the training data,
 the benefit of a full update is even lower.
 
 The other extreme is to consider only a single example at a time and to take
 update steps based on one observation at a time. The resulting algorithm,
 *Stochastic Gradient Descent* (SGD) can be an effective
-strategy :cite:`bottou2010large`, even for large datasets. Unfortunately, SGD
+strategy :cite:`Bottou.2010`, even for large datasets. Unfortunately, SGD
 has drawbacks, both computational and statistical. One problem arises from the
 fact that processors are a lot faster
 multiplying and adding numbers than they are at moving data from main memory to
@@ -244,7 +244,7 @@ the layers, such as Batch Normalization which is described in :ref:`sec_batch_no
 only work well when we have access to more than one observation at a time.
 
 The solution to both problems is to pick an intermediate strategy: rather than taking a
-full batch or only a single sample at a time we take a *minibatch* of observations :cite:`li2014efficient`. The
+full batch or only a single sample at a time we take a *minibatch* of observations :cite:`Li.Zhang.Chen.ea.2014`. The
 specific choice of the size of said minibatch depends on many factors, such as the amount
 of memory, the number of accelerators, the choice of layers, and the total dataset size.
 Despite all of that, a number between 32 and 256, preferably a multiple of a large power
@@ -276,7 +276,7 @@ $|\mathcal{B}|$. Frequently minibatch size and learning rate are user-defined.
 Such tunable parameters that are not updated
 in the training loop are called *hyperparameters*.
 They can be tuned automatically by a number of techniques, such as Bayesian Optimization
-:cite:`frazier2018tutorial`. In the end, the quality of the solution is
+:cite:`Frazier.2018`. In the end, the quality of the solution is
 typically assessed on a separate *validation dataset* (or *validation set*).
 
 After training for some predetermined number of iterations
@@ -296,7 +296,7 @@ However, for most deep networks,
 the loss surfaces contain many minima.
 Fortunately, for reasons that are not yet fully understood,
 deep learning practitioners seldom struggle to find parameters
-that minimize the loss *on training sets* :cite:`izmailov2018averaging,frankle2018lottery`.
+that minimize the loss *on training sets* :cite:`Izmailov.Podoprikhin.Garipov.ea.2018,Frankle.Carbin.2018`.
 The more formidable task is to find parameters
 that will achieve low loss on data
 that we have not seen before,
@@ -604,7 +604,7 @@ This section covered a significant amount of material ranging from our first mod
     1. Show that the additive Gaussian noise assumption is not appropriate. Hint: can we have negative prices? What about fluctuations?
     1. Why would regression to the logarithm of the price be much better, i.e., $y = \log \mathrm{price}$?
     1. What do you need to worry about when dealing with pennystock, i.e., stock with very low prices? Hint: can you trade at all possible prices? Why is this a bigger problem for cheap stock?
-    1. For more information review the celebrated Black-Scholes model for option pricing :cite:`black1973pricing`.
+    1. For more information review the celebrated Black-Scholes model for option pricing :cite:`Black.Scholes.1973`.
 1. Suppose we want to use regression to estimate the *number* of apples sold in a grocery store.
     1. What are the problems with a Gaussian additive noise model? Hint: you are selling apples, not oil.
     1. The [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution) captures distributions over counts. It is given by $p(k|\lambda) = \lambda^k e^{-\lambda}/k!$. Here $\lambda$ is the rate function and $k$ is the number of events you see. Prove that $\lambda$ is the expected value of counts $k$.

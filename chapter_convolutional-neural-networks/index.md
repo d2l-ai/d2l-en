@@ -18,14 +18,14 @@ are typically related to each other, to build efficient models for
 learning from image data.
 
 This chapter introduces *convolutional neural networks* (CNNs)
-:cite:`lecun1995comparison`, a powerful family of neural networks that
+:cite:`LeCun.Jackel.Bottou.ea.1995`, a powerful family of neural networks that
 are designed for precisely this purpose.  CNN-based architectures are
 now ubiquitous in the field of computer vision, and have become so
 dominant that hardly anyone today would develop a commercial
 application or enter a competition related to image recognition,
 object detection, or semantic segmentation, without building off of
 this approach. For instance, on the Imagnet collection
-:cite:`deng2009imagenet` it was only the use of Convolutional Neural
+:cite:`Deng.Dong.Socher.ea.2009` it was only the use of Convolutional Neural
 Networks, in short Convnets that provided significant performance
 improvements :cite:`Krizhevsky.Sutskever.Hinton.2012`.
 
@@ -35,14 +35,14 @@ experimental tinkering.  In addition to their sample efficiency in
 achieving accurate models, CNNs tend to be computationally efficient,
 both because they require fewer parameters than fully connected
 architectures and because convolutions are easy to parallelize across
-GPU cores :cite:`chetlur2014cudnn`.  Consequently, practitioners often
+GPU cores :cite:`Chetlur.Woolley.Vandermersch.ea.2014`.  Consequently, practitioners often
 apply CNNs whenever possible, and increasingly they have emerged as
 credible competitors even on tasks with a one-dimensional sequence
-structure, such as audio :cite:`abdel2014convolutional`, text
-:cite:`kalchbrenner2014convolutional`, and time series analysis
-:cite:`lecun1995convolutional`, where recurrent neural networks are
+structure, such as audio :cite:`Abdel-Hamid.Mohamed.Jiang.ea.2014`, text
+:cite:`Kalchbrenner.Grefenstette.Blunsom.2014`, and time series analysis
+:cite:`LeCun.Bengio.ea.1995`, where recurrent neural networks are
 conventionally used.  Some clever adaptations of CNNs have also
-brought them to bear on graph-structured data :cite:`kipf2016semi` and
+brought them to bear on graph-structured data :cite:`Kipf.Welling.2016` and
 in recommender systems.
 
 First, we will dive more deeply into the motivation for convolutional

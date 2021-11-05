@@ -341,7 +341,7 @@ relatively arbitrary parameters in terms of the number of channels chosen.
 This work was done before scientists started using automatic tools to 
 optimize network designs. Later on we will see what can be achieved by 
 a much more automatic approach network design 
-:cite:`howard2019searching,radosavovic2020designing`. 
+:cite:`Howard.Sandler.Chu.ea.2019,Radosavovic.Kosaraju.Girshick.ea.2020`. 
 
 For now the only modification we will carry out is to 
 [**reduce the input height and width from 224 to 96 

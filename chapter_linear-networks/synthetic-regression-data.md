@@ -201,7 +201,7 @@ As for the model itself, the two-dimensional linear model is about as simple a m
 1. What will happen if the number of examples cannot be divided by the batch size. How to change this behavior by specifying a different argument by using framework's API.
 1. What if we want to generate a huge dataset, where both the size of the parameter vector `w` and the number of examples `num_examples` are large? 
     1. What happens if we cannot hold all data in memory?
-    1. How would you shuffle the data if data is held on disk? Your task is to design an *efficient* algorithm that does not require too many random reads or writes. Hint: [Pseudorandom Permutation Generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) allow you to design a reshuffle without the need to store the permutation table explicitly :cite:`naor1999construction`. 
+    1. How would you shuffle the data if data is held on disk? Your task is to design an *efficient* algorithm that does not require too many random reads or writes. Hint: [Pseudorandom Permutation Generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) allow you to design a reshuffle without the need to store the permutation table explicitly :cite:`Naor.Reingold.1999`. 
 1. Implement a data generator that produces new data on the fly, every time the iterator is called. 
 1. How would you design a random data generator that generates *the same* data each time it's called?
 
