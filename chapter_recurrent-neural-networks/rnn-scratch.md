@@ -354,17 +354,10 @@ def clip_gradients(self, grad_clip_val, grads):
 
 ## Training
 
-Before training the model,
-let's [**define a function to train the model in one epoch**]. It differs from how we train the model of :numref:`sec_softmax_scratch` in three places:
-
-1. We iterate over sequential data with random sampling, where we re-initialize the hidden state for each iteration.
-1. We clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process.
-
-Same as the `train_epoch_ch3` function in :numref:`sec_softmax_scratch`,
-`updater` is a general function
-to update the model parameters.
-It can be either the `d2l.sgd` function implemented from scratch or the built-in optimization function in
-a deep learning framework.
+Using *The Time Machine* dataset (`data`),
+we train a character-level language model (`model`)
+based on the RNN (`rnn`) implemented from scratch.
+Note that we clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process.
 
 ```{.python .input  n=26}
 %%tab all
