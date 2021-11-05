@@ -164,4 +164,3 @@ high-level APIs of the deep learning framework.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/2211)
 :end_tab:
-

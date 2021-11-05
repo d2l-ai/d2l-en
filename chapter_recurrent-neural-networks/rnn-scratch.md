@@ -8,7 +8,8 @@ according to our descriptions
 in :numref:`sec_rnn`.
 Such a model
 will be trained on H. G. Wells' *The Time Machine*.
-As before, we start by reading the dataset first, which is introduced in :numref:`sec_language-model`.
+As before, we start by reading the dataset first, which is introduced in :numref:`sec_text-sequence`.
+
 
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
@@ -44,13 +45,13 @@ import tensorflow as tf
 
 ## RNN Model
 
-Next, we define the model class.
+Following the descriptions in
+:numref:`subsec_rnn_w_hidden_states`,
+we begin by defining the class for the RNN model
+with its model parameters only.
 The number of hidden units `num_hiddens` is a tunable hyperparameter.
-When training language models,
-the inputs and outputs are from the same vocabulary.
-The dataset is relatively small, we will train with hundreds of epochs, so we choose to plot for every 10 epochs.
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab all
 class RNNScratch(d2l.Module):  #@save
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
@@ -75,24 +76,20 @@ class RNNScratch(d2l.Module):  #@save
             self.b_h = tf.Variable(d2l.zeros(num_hiddens))        
 ```
 
-To define an RNN model,
-we first need [**an `init_rnn_state` function
-to return the hidden state at initialization.**]
-It returns a tensor filled with 0 and with a shape of (batch size, number of hidden units).
-Using tuples makes it easier to handle situations where the hidden state contains multiple variables,
-which we will encounter in later sections.
+[**The following `forward` method defines how to compute the output and hidden state at a time step.**]
+Note that
+the RNN model
+loops through the outermost dimension of `inputs`
+so that it updates hidden state of a minibatch,
+time step by time step.
+Besides,
+the activation function here uses the $\tanh$ function.
+As
+described in :numref:`sec_mlp`, the
+mean value of the $\tanh$ function is 0, when the elements are uniformly
+distributed over the real numbers.
 
-```{.python .input}
-%%tab all
-def check_len(a, n):  #@save
-    assert len(a) == n, f'list\'s len {len(a)} != expected length {n}'
-    
-def check_shape(a, shape):  #@save
-    assert a.shape == shape, \
-            f'tensor\'s shape {a.shape} != expected shape {shape}'
-```
-
-```{.python .input}
+```{.python .input  n=6}
 %%tab all
 @d2l.add_to_class(RNNScratch)  #@save
 def forward(self, inputs, state=None):
@@ -103,39 +100,46 @@ def forward(self, inputs, state=None):
     outputs = []
     for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs) 
         state = d2l.tanh(d2l.matmul(X, self.W_xh) + (
-            d2l.matmul(state, self.W_hh) if state is not None else 0) + self.b_h)
+            d2l.matmul(state, self.W_hh) if state is not None else 0)
+                         + self.b_h)
         outputs.append(state)
     return outputs, state
 ```
 
-[**The following `rnn` function defines how to compute the hidden state and output
-at a time step.**]
-Note that
-the RNN model
-loops through the outermost dimension of `inputs`
-so that it updates hidden states `H` of a minibatch,
-time step by time step.
-Besides,
-the activation function here uses the $\tanh$ function.
-As
-described in :numref:`sec_mlp`, the
-mean value of the $\tanh$ function is 0, when the elements are uniformly
-distributed over the real numbers.
+For example, we can feed a minibatch of input sequences
+into an RNN model as follows.
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab all
 batch_size, num_inputs, num_hiddens, num_steps = 2, 16, 32, 100
 rnn = RNNScratch(num_inputs, num_hiddens)
 X = d2l.ones((num_steps, batch_size, num_inputs))
-outputs, H = rnn(X)
+outputs, state = rnn(X)
+```
+
+Let's check whether the RNN model
+produces results of the correct shapes,
+e.g., to ensure that the dimensionality of the hidden state remains unchanged.
+
+```{.python .input  n=8}
+%%tab all
+def check_len(a, n):  #@save
+    assert len(a) == n, f'list\'s len {len(a)} != expected length {n}'
+    
+def check_shape(a, shape):  #@save
+    assert a.shape == shape, \
+            f'tensor\'s shape {a.shape} != expected shape {shape}'
+
 d2l.check_len(outputs, num_steps)
 d2l.check_shape(outputs[0], (batch_size, num_hiddens))
-d2l.check_shape(H, (batch_size, num_hiddens))
+d2l.check_shape(state, (batch_size, num_hiddens))
 ```
 
 ## RNN LM
 
-```{.python .input}
+When training language models, the inputs and outputs are from the same vocabulary. Hence, they have the same dimension, which is equal to the vocabulary size.
+
+```{.python .input  n=9}
 %%tab all
 class RNNLMScratch(d2l.Classification):  #@save
     def __init__(self, rnn, vocab_size, lr=0.01):
@@ -184,17 +188,17 @@ In a nutshell, we map each index to a different unit vector: assume that the num
 If the index of a token is the integer $i$, then we create a vector of all 0s with a length of $N$ and set the element at position $i$ to 1.
 This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
 
-```{.python .input  n=6}
+```{.python .input  n=10}
 %%tab mxnet
 npx.one_hot(np.array([0, 2]), 5)
 ```
 
-```{.python .input  n=7}
+```{.python .input  n=11}
 %%tab pytorch
 F.one_hot(torch.tensor([0, 2]), 5)
 ```
 
-```{.python .input  n=8}
+```{.python .input  n=12}
 %%tab tensorflow
 tf.one_hot(tf.constant([0, 2]), 5)
 ```
@@ -210,7 +214,7 @@ loop through the outermost dimension
 for updating hidden states of a minibatch,
 time step by time step.
 
-```{.python .input}
+```{.python .input  n=13}
 %%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
 def one_hot(self, X):    
@@ -225,7 +229,7 @@ def one_hot(self, X):
 
 ### Forward
 
-```{.python .input}
+```{.python .input  n=14}
 %%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
 def forward(self, X, state=None):
@@ -246,7 +250,7 @@ Let's [**check whether the outputs have the correct shapes**], e.g., to ensure t
 
 We can see that the output shape is (number of time steps $\times$ batch size, vocabulary size), while the hidden state shape remains the same, i.e., (batch size, number of hidden units).
 
-```{.python .input}
+```{.python .input  n=15}
 %%tab all
 model = RNNLMScratch(rnn, num_inputs)
 outputs = model(d2l.ones((batch_size, num_steps), dtype=d2l.int64))
@@ -303,7 +307,7 @@ Below we define a function to clip the gradients of
 a model that is implemented from scratch or a model constructed by the high-level APIs.
 Also note that we compute the gradient norm over all the model parameters.
 
-```{.python .input  n=43}
+```{.python .input  n=16}
 %%tab mxnet
 @d2l.add_to_class(d2l.Trainer)  #@save
 def clip_gradients(self, grad_clip_val, model):
@@ -316,7 +320,7 @@ def clip_gradients(self, grad_clip_val, model):
             param.grad[:] *= grad_clip_val / norm
 ```
 
-```{.python .input  n=44}
+```{.python .input  n=17}
 %%tab pytorch
 @d2l.add_to_class(d2l.Trainer)  #@save
 def clip_gradients(self, grad_clip_val, model):
@@ -327,7 +331,7 @@ def clip_gradients(self, grad_clip_val, model):
             param.grad[:] *= grad_clip_val / norm
 ```
 
-```{.python .input}
+```{.python .input  n=18}
 %%tab tensorflow
 @d2l.add_to_class(d2l.Trainer)  #@save
 def clip_gradients(self, grad_clip_val, grads):
@@ -357,7 +361,7 @@ to update the model parameters.
 It can be either the `d2l.sgd` function implemented from scratch or the built-in optimization function in
 a deep learning framework.
 
-```{.python .input  n=26}
+```{.python .input  n=19}
 %%tab all
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet', 'pytorch'):
@@ -391,7 +395,7 @@ the hidden state is generally better than
 its initialized value at the beginning.
 So we generate the predicted characters and emit them.
 
-```{.python .input}
+```{.python .input  n=20}
 %%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
 def predict(self, prefix, num_preds, vocab, device=None):
@@ -413,12 +417,12 @@ def predict(self, prefix, num_preds, vocab, device=None):
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
-```{.python .input}
+```{.python .input  n=21}
 %%tab mxnet, pytorch
 model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 
-```{.python .input}
+```{.python .input  n=22}
 %%tab tensorflow
 model.predict('it has', 20, data.vocab)
 ```
