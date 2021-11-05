@@ -90,7 +90,7 @@ of the hidden layer and the output layer, respectively.
 Hence, we have a chain of values $\{\ldots, (x_{t-1}, h_{t-1}, o_{t-1}), (x_{t}, h_{t}, o_t), \ldots\}$ that depend on each other via recurrent computation.
 The forward propagation is fairly straightforward.
 All we need is to loop through the $(x_t, h_t, o_t)$ triples one time step at a time.
-The discrepancy between output $o_t$ and the desired label $y_t$ is then evaluated by an objective function
+The discrepancy between output $o_t$ and the desired target $y_t$ is then evaluated by an objective function
 across all the $T$ time steps
 as
 
@@ -228,7 +228,7 @@ activation function
 in the hidden layer
 uses the identity mapping ($\phi(x)=x$).
 For time step $t$,
-let the single example input and the label be
+let the single example input and the target be
 $\mathbf{x}_t \in \mathbb{R}^d$ and $y_t$, respectively. 
 The hidden state $\mathbf{h}_t \in \mathbb{R}^h$ 
 and the output $\mathbf{o}_t \in \mathbb{R}^q$

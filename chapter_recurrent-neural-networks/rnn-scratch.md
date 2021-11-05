@@ -8,7 +8,7 @@ according to our descriptions
 in :numref:`sec_rnn`.
 Such a model
 will be trained on H. G. Wells' *The Time Machine*.
-As before, we start by reading the dataset first, which is introduced in :numref:`sec_language_model`.
+As before, we start by reading the dataset first, which is introduced in :numref:`sec_language-model`.
 
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
@@ -467,4 +467,3 @@ and make it run faster.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1052)
 :end_tab:
-
