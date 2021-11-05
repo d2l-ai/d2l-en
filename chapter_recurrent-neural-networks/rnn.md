@@ -2,7 +2,7 @@
 :label:`sec_rnn`
 
 
-In :numref:`sec_language_model` we introduced $n$-gram models, where the conditional probability of word $x_t$ at time step $t$ only depends on the $n-1$ previous words.
+In :numref:`sec_language-model` we introduced $n$-gram models, where the conditional probability of word $x_t$ at time step $t$ only depends on the $n-1$ previous words.
 If we want to incorporate the possible effect of words earlier than time step $t-(n-1)$ on $x_t$,
 we need to increase $n$.
 However, the number of model parameters would also increase exponentially with it, as we need to store $|\mathcal{V}|^n$ numbers for a vocabulary set $\mathcal{V}$.
@@ -187,7 +187,7 @@ d2l.matmul(d2l.concat((X, H), 1), d2l.concat((W_xh, W_hh), 0))
 
 ## RNN-based Character-Level Language Models
 
-Recall that for language modeling in :numref:`sec_language_model`,
+Recall that for language modeling in :numref:`sec_language-model`,
 we aim to predict the next token based on
 the current and past tokens,
 thus we shift the original sequence by one token
