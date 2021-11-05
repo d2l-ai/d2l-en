@@ -130,102 +130,42 @@ we define matrices `X`, `W_xh`, `H`, and `W_hh`, whose shapes are (3, 1), (1, 4)
 Multiplying `X` by `W_xh`, and `H` by `W_hh`, respectively, and then adding these two multiplications,
 we obtain a matrix of shape (3, 4).
 
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-```{.json .output n=1}
-[
- {
-  "data": {
-   "application/vnd.jupyter.widget-view+json": {
-    "model_id": "95049736592d4a919785149b3669c3d3",
-    "version_major": 2,
-    "version_minor": 0
-   },
-   "text/plain": "interactive(children=(Dropdown(description='tab', index=1, options=('mxnet', 'pytorch', 'tensorflow'), value='\u2026"
-  },
-  "metadata": {},
-  "output_type": "display_data"
- }
-]
-```
-
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 ```
 
-```{.json .output n=2}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
- }
-]
-```
-
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-```{.json .output n=4}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
- }
-]
-```
-
-```{.python .input  n=5}
+```{.python .input}
 %%tab mxnet, pytorch
 X, W_xh = d2l.randn(3, 1), d2l.randn(1, 4)
 H, W_hh = d2l.randn(3, 4), d2l.randn(4, 4)
 d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
 ```
 
-```{.json .output n=5}
-[
- {
-  "data": {
-   "text/plain": "tensor([[-0.1941,  1.4439, -2.3141,  0.2965],\n        [-0.2646,  0.6551,  1.7918,  1.9887],\n        [-1.7881,  1.0364, -1.5112, -0.9184]])"
-  },
-  "execution_count": 5,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
-```{.python .input  n=6}
+```{.python .input}
 %%tab tensorflow
 X, W_xh = d2l.normal((3, 1)), d2l.normal((1, 4))
 H, W_hh = d2l.normal((3, 4)), d2l.normal((4, 4))
 d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
-```
-
-```{.json .output n=6}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"pytorch\" cell."
- }
-]
 ```
 
 Now we concatenate the matrices `X` and `H`
@@ -240,22 +180,9 @@ Multiplying these two concatenated matrices,
 we obtain the same output matrix of shape (3, 4)
 as above.
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab all
 d2l.matmul(d2l.concat((X, H), 1), d2l.concat((W_xh, W_hh), 0))
-```
-
-```{.json .output n=7}
-[
- {
-  "data": {
-   "text/plain": "tensor([[-0.1941,  1.4439, -2.3141,  0.2965],\n        [-0.2646,  0.6551,  1.7918,  1.9887],\n        [-1.7881,  1.0364, -1.5112, -0.9184]])"
-  },
-  "execution_count": 7,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## RNN-based Character-Level Language Models
