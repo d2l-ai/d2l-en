@@ -212,6 +212,6 @@ accuracy versus computational cost.
 
 1. Can we treat exhaustive search as a special type of beam search? Why or why not?
 1. Apply beam search in the machine translation problem in :numref:`sec_seq2seq`. How does the beam size affect the translation results and the prediction speed?
-1. We used language modeling for generating text following  user-provided prefixes in :numref:`sec_rnn_scratch`. Which kind of search strategy does it use? Can you improve it?
+1. We used language modeling for generating text following  user-provided prefixes in :numref:`sec_rnn-scratch`. Which kind of search strategy does it use? Can you improve it?
 
 [Discussions](https://discuss.d2l.ai/t/338)

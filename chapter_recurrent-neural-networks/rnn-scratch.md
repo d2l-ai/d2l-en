@@ -1,5 +1,5 @@
 # Recurrent Neural Network Implementation from Scratch
-:label:`sec_rnn_scratch`
+:label:`sec_rnn-scratch`
 
 In this section we will implement an RNN
 from scratch

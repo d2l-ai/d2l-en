@@ -1,7 +1,7 @@
 # Concise Implementation of Recurrent Neural Networks
 :label:`sec_rnn-concise`
 
-While :numref:`sec_rnn_scratch` was instructive to see how RNNs are implemented,
+While :numref:`sec_rnn-scratch` was instructive to see how RNNs are implemented,
 this is not convenient or fast.
 This section will show how to implement the same language model more efficiently
 using functions provided by high-level APIs
@@ -134,7 +134,7 @@ model.predict('it has', 20, data.vocab)
 
 Before training the model, let's [**make a prediction with the a model that has random weights.**]
 
-As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn_scratch` and [**train our model with high-level APIs**].
+As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn-scratch` and [**train our model with high-level APIs**].
 
 Compared with the last section, this model achieves comparable perplexity,
 albeit within a shorter period of time, due to the code being more optimized by

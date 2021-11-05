@@ -6,7 +6,7 @@ So far we have repeatedly alluded to things like
 *vanishing gradients*,
 and the need to
 *detach the gradient* for RNNs.
-For instance, in :numref:`sec_rnn_scratch`
+For instance, in :numref:`sec_rnn-scratch`
 we invoked the `detach` function on the sequence.
 None of this was really fully
 explained, in the interest of being able to build a model quickly and
@@ -16,7 +16,7 @@ we will delve a bit more deeply
 into the details of backpropagation for sequence models and why (and how) the mathematics works.
 
 We encountered some of the effects of gradient explosion when we first
-implemented RNNs (:numref:`sec_rnn_scratch`).
+implemented RNNs (:numref:`sec_rnn-scratch`).
 In
 particular,
 if you solved the exercises,
@@ -164,7 +164,7 @@ we can truncate the sum in
 :eqref:`eq_bptt_partial_ht_wh_gen`
 after $\tau$ steps. 
 This is what we have been discussing so far,
-such as when we detached the gradients in :numref:`sec_rnn_scratch`. 
+such as when we detached the gradients in :numref:`sec_rnn-scratch`. 
 This leads to an *approximation* of the true gradient, simply by terminating the sum at 
 $\partial h_{t-\tau}/\partial w_h$. 
 In practice this works quite well. It is what is commonly referred to as truncated backpropgation through time :cite:`Jaeger.2002`.
