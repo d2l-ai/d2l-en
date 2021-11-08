@@ -145,7 +145,7 @@ while the test error is expressed as an integral.
 
 $$R_\mathrm{emp}[\mathbf{X}, \mathbf{Y}, f] = \frac{1}{m} \sum_{i=1}^m l(\mathbf{x}_i, \mathbf{y}_i, f(\mathbf{x}_i))
 \text{ and }
-R[p, f] = E_{(\mathbf{x}, \mathbf{y}) \sim p} [l(\mathbf{x}, \mathbf{y}, f(\mathbf{x}))] = 
+R[p, f] = E_{(\mathbf{x}, \mathbf{y}) \sim P} [l(\mathbf{x}, \mathbf{y}, f(\mathbf{x}))] = 
 \int_{((\mathbf{x}, \mathbf{y}))} l(\mathbf{x}, \mathbf{y}, f(\mathbf{x})) p(\mathbf{x}, \mathbf{y})$$
 
 Problematically, we can never calculate 

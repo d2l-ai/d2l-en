@@ -2,144 +2,587 @@
 
 :label:`chap_classification_generalization`
 
-In 
-
-[TODO CLEAN UP]
-
-[GOALS]
-
-Add bits about estimating the error rate using holdout data,
-how fast the estimate converges, aysmptotic binomial confidence interval, finite sample guarantee via Hoeffdings 
 
 
+So far, we have focused on how to tackle multiclass classification problems
+by training (linear) neural networks with multiple outputs and softmax activations.
+Interpreting our model's outputs as probabilistic predictions,
+we motivated and derived the cross entropy loss function, 
+which calculates the negative log likelihood 
+that our model (for a fixed set of parameters)
+assigns to the assigns to the actual labels.
+And finally, we put these tools into practice 
+by fitting our model to the training set.
+However, as always, our goal is to learn *general patterns*.
+as assessed empirically on previously unseen data (the test set).
+High accuracy on the training set means nothing.
+Whenever each of our inputs is unique
+(and indeed this is true for most high-dimensional datasets),
+we can attain perfect accuracy on the training set
+by just memorizing the dataset on the first training epoch,
+and subsequently looking up the label whenever we see a new image. 
+And yet, memorizing the exact labels 
+associated with the exact training examples
+does not tell us how to classify new examples.
+Absent further guidance, we might have to fall back
+on random guessing whenever we encounter new examples.
+
+A number of burning questions demand immediate attention:
+1. How many test examples do we need to precisely estimate
+   the accuracy of our classifiers on theunderlying population?
+1. What happens if we keep evaluating models on the same test repeatedly? 
+1. Why should we expect that fitting our linear models to the training set
+   should fare any better than our naive memorization scheme?
+
+
+While :ref:`sec_generalization_basics` introduced 
+the basics of overfitting and generalization 
+in the context of linear regression,
+this chapter will go a little deeper,
+introducing some of the foundational ideas
+of statistical learning theory.
+It turns out that we often can guarantee generalization *a priori*:
+for many models,
+and for any desired upper bound 
+on the generalization gap $\epsilon$, 
+we can often determine some required number of samples $n$
+such that if our training set contains at least $n$
+samples, then our empirical error will lie
+within $\epsilon$ of the true error,
+*for any data generating distribution*.
+Unfortunately, it also turns out 
+that these sorts of guarantees,
+while profound intellectual building block,
+are of limited practical utility 
+to the deep learning practitioner. 
+In short, these guarantees suggest 
+that ensuring generalization 
+of deep neural networks *a priori* 
+an absurd number of examples (perhaps trillions or more),
+even when we find in practice 
+that deep neural networks tend generalize 
+remarkably well with far fewer examples (thousands). 
+Thus deep learning practitioners often forego
+a priori guarantees altogether,
+relying instead on employing methods 
+that appear to have generalized well
+on similar problems in the past,
+and certifying generalization *post hoc*
+through empirical evaluations.
+When we get to chapter :numref:`chap_perceptrons`,
+we will revisit generalization 
+and provide a light introduction 
+to the vast scientific literature 
+that has sprung in attempts
+to explain why deep neural networks generalize in practice. 
 
 
 
-[OLD BITS MOVED OVER FROM LINEAR]
 
-Fortunately, our specific choice of loss function ensures that minimizing it will also lead to maximum accuracy. This is the case since the maximum likelihood estimator is consistent. It follows as a special case of the Cramer-Rao bound :cite:`cramer1946mathematical,radhakrishna1945information`. For more work on consistency see also :cite:`zhang2004statistical`.
+## The Test Set 
+
+Since we have already begun to rely on test sets 
+as the gold standard method
+for assessing generalization error,
+let's get started by discussing 
+the properties of such error estimates.
+Let's focus on a fixed classifier $f$,
+without worrying about how it was obtained.
+Moreover suppose that we possess 
+a fresh dataset of examples $D = {(\mathbf{x}_i,y_i)}_{i=1}^m$
+that were not used to train the classifier $f$.
+The *empirical error* of our classifier $f$ on $D$
+is simply the fraction of instances
+for which the prediction $f(\mathbf{x}_i)$
+disagrees with the true label $y_i$,
+and is given by the following expression:
+
+$$\epsilon_D(f) = \frac{1}{m}\sum_{i=1}^m \mathbf{1}(f(\mathbf{x}_i) \neq y_i)$$
+
+By contrast, the *population error*
+is the *expected* fraction 
+of examples in the underlying population
+(some distribution $P(X,Y)$  charachterized
+by probability density function $p(\mathbf{x},y)$
+for which our classifier disagrees
+with the true label:
+
+$$\epsilon =  E_{(\mathbf{x}, \mathbf{y}) \sim P} \mathbf{1}(f(\mathbf{x}) \neq y) = 
+\int_{((\mathbf{x}, \mathbf{y}))} \mathbf{1}(f(\mathbf{x}) \neq y) p(\mathbf{x}, \mathbf{y})$$
+
+While $\epsilon$ is the quantity that we actually care about,
+we cannot observe it directly any more than we can directly 
+observe the average height in a population. 
+However, because our test set $D$ 
+is statistically representative 
+of the underlying population,
+we can view $\epsilon_D(f)$ as a statistical
+estimator of the population error $\epsilon(f)$.
+Moreover because our quantity of interest $\epsilon(f)$
+is an expectation (of the random variable $\mathbf{1}(f(X) \neq Y)$)
+and the corresponding estimator $\epsilon_D(f)$ 
+is the sample mean, calculated on realizations
+of that same random variable,
+this is simply the classic problem of mean estimation,
+which you may recall from (:numref:`sec_prob`).
+
+You may recall that a classical result from probility theory
+called the central limit theorem guarantees 
+that whenever we possess $n$ random samples $a_1, ..., a_n$
+drawn from any distribution with mean $\mu$ and standard deviation $\sigma$,
+as the number of samples $n$ approaches infinity,
+the sample average $\hat{mu}$ is approximately
+tends towards a normal distribution centered
+at the true mean and with standard deviation $\sigma/\sqrt{n}$.
+Already this tells us something important:
+as the number of examples grows large,
+our test error $\epsilon_D(f)$ 
+should approach the true error $\epsilon(f)$
+at $O(1/\sqrt(n)$ rates. 
+Thus, to estimate our test error twice as precisely,
+we must collect four times as large a test set. 
+To reduce our test error by a factor of one hundred,
+we must collect ten thousand times as large a test set. 
+In general, such $O(1/\sqrt(n)$ rates 
+are often the best we can hope for in statistics.
+
+Now that we know something about asymptotic rate
+at which our test errro $\epsilon_D(f)$ converges to the true error $\epsilon(f)$,
+we can zoom in on some important details. 
+Recall that the random variable of interest
+$\mathbf{1}(f(\mathbf{x}) \neq y)$
+can only take values $0$ and $1$ 
+and thus is a Bernoulli random variable,
+characetized by a parameter
+indicating the probability that it takes value $1$.
+Here, $1$ means that our classifier made an error,
+so the parameter of our random variable
+is actually the true error rate $\epsilon(f)$.
+The variance $\sigma^2$ of a Bernoulli 
+depends on its parameter (here, $\epsilon(f)$) 
+according to the expression $\epsilon(f)(1-\epsilon(f))$.
+While $\epsilon(f)$ is initially unknown,
+we know that it cannot be greater than $1$.
+A little investigation of this function 
+reveals that our variance is highest 
+when the true error rate is close to $.5$
+and can be far lower when it is 
+close to $0$ or close to $1$. 
+This tells us that the asyptotic standard deviation
+of our estimate $\epsilon_D(f)$ of the error $\epsilon(f)$
+(over the choice of the $m$ test samples)
+cannot be any greater than $\sqrt{.25/n}$.
+
+If we ignore the fact that this rate characterizes
+behavior as the test set size appraoches infinity
+rather than when we possess finite samples,
+this tells us that if we want our test error $\epsilon_D(f)$ 
+to approximate the population error $\epsilon(f)$
+such that one standard deviation corresponds 
+to an interval of $\pm .01$,
+then we should collect roughly 2500 samples.
+If we want to fit two standard deviations 
+in that rane and thus be 95% 
+that $\epsilon_D(f) \in \epsilon(f) \pm .01$,
+then we will need 10000 samples! 
+
+This turns out to be the size of the test sets 
+for many popular benchmarks in machine learning. 
+You might be surprised to find out that thousands
+of applied deep learning papers get published every year
+making a big deal out of error rate improvements of $.01$ or less. 
+Of course, when the error rates are much closer to $0$,
+then an improvement of $.01$ can indeed be a big deal.
+
+
+One pesky feature of our analysis thus far 
+is that it really only tells us about asymptotics,
+i.e., how the relationship between $\epsilon_D$ and $\epsilon$
+evolves as our sample size goes to infinity. 
+Fortunately, because our random variable is bounded,
+we can obtain valid finite sample bounds 
+by applying an inequality due to Hoeffding (1963).
+
+$$P(\epsilon_D(f) - \epsilon(f) \geq t) < \exp\left( - 2m t^2 \right)$$
+
+Solving for the smallest dataset size 
+that would allow us to conclude 
+with 95% confidence that the distance $t$
+between our estimate $\epsilon_D(f)$
+and the true error rate $\epsilon(f)$
+does not exceed $.01$,
+you will find that roughly $15000$ examples are required
+as compared to the $10000$ examples suggested 
+by the asymptotic analysis above. 
+If you go deeper into statistics 
+you will find that this trend holds generally. 
+Guarantees that hold even in finite samples 
+are typically slightly more conservative.
+Note that in the scheme of things,
+these numbers are not so far apart,
+reflecting the general usefulness 
+of asymptotic analysis for giving 
+us ballpark figures even if not 
+guarantees we can take to court. 
+
+
+## Test Set Reuse
+In some sense, you are now set up to succeed 
+at conducting empirical machine learning research. 
+Nearly all practical models are developed 
+and validated based on test set performance 
+and you are now a master of the test set. 
+For any fixed classifier $f$,
+you know to evaluate its test error $\epsilon_D(f)$,
+and know precisely what can (and can't) 
+be said about its population error $\epsilon(f)$.
+
+So let's say that you take this knowledge 
+and prepare to train your first model $f_1$.
+Knowing just how confident you need to be 
+in the performance of your classifier's error rate
+you apply our analysis above to determine 
+an approperiate number of examples 
+to set aside for the test set. 
+Moreover, let's assume that you took the lessons from 
+:numref:`sec_generalization_basics` to heart
+and made sure to preserve the sanctity of the test set
+by conducting all of your preliminary analysis,
+hyperparameter tuning, and even selection
+among multiple competing model architectures
+on a validation set. 
+Finally you evaluate your model $f_1$ 
+on the test set and report an unbiased 
+estimate of the population error 
+with an associated confidence interval. 
+
+So far everything seems to be going well.
+However, that night you wake up at 3am
+with a brilliant idea for a new modeling approach.
+The next day, you code up your new model,
+tune its hyperparameters on the validation set 
+and not only are you getting your new model $f_2$ to work
+but it's error rate appears to be much lower than $f_1$'s. 
+However, the thrill of discovery suddenly fades
+as you prepare for the final evaluation. 
+You don't have a test set!
+
+Even though the original test set $D$
+is still sitting on your server,
+you now face two formidable problems.
+First, when you collected your test,
+you determined the required level of precision
+under the assumption that you were evaluating
+a single classifier $f$. 
+However, if you get into the business
+of evaluating multiple classifiers $f_1, ..., f_k$
+on the same test set, 
+you must consider the problem of false discovery.
+Before, you might have been 95% sure 
+that $\epsilon_D(f) \in \epsilon(f) \pm .01$
+for a single classifier $f$ 
+and thus the probability of a misleading result
+was a mere 5%.
+With $k$ classifiers in the mix,
+it can be hard to guarantee 
+that there is not even one among them
+whose test set performance is misleading. 
+With 20 classifiers under consideration,
+you might have no power at all 
+to rule out the possibility 
+that at least one among them 
+received a misleading score.
+This problem relates to multiple hypothesis testing,
+which despite a vast literature in statistics,
+remains a persistent problem plaguing scientific research. 
+
+
+If that's not enough to worry you,
+there's a special reason to distrust
+the results that you get on subsequent evaluations. 
+Recall that our analysis of test set performance
+rested on the assumption that the classifer
+was chosen absent any contact with the test set
+and thus we could view the test set 
+as drawn randomly from the underlying population.
+Here, not only are you testing multiple functions,
+the subsequent function $f_2$ was chosen 
+after you observed the test set performance of $f_1$.
+Once information from the test set has leaked to the modeler,
+it can never be a true test set again in the strictest sense.
+This problem is called *adaptive overfitting* and has recently emerged 
+as a topic of intense interest to learning theorists and statisticans
+:cite:`dwork2015preserving`. 
+Fortunately, while it is possible 
+to leak all information out of a holdout set,
+and the theoretical worst case scenarios are bleak,
+these analyses may be too conservative. 
+In practice, take care to create real test sets,
+to consult them as infrequently as possible,
+to account for multiple hypothesis testing
+when reporting confidenceintervals,
+and to dial up your vigilance more aggressively 
+when the stakes are high and your dataset size is low. 
+When running a series of benchmark challenges,
+it's often good practice to maintain
+several test sets so that after each round,
+the old test set can be demoted to a validation set.
 
 
 
 
-loss function that we are actually minimizing. Fortunately, our specific choice of loss function ensures that minimizing it will also lead to maximum accuracy. This is the case since the maximum likelihood estimator is consistent. It follows as a special case of the Cramer-Rao bound :cite:`cramer1946mathematical,radhakrishna1945information`. For more work on consistency see also :cite:`zhang2004statistical`.
 
-More generally, though, the decision of which category to pick is far from trivial. For instance, when deciding where to assign an e-mail to, mistaking a "Primary" e-mail for a "Social" e-mail might be undesirable but far less disastrous than moving it to the spam folder (and later automatically deleting it). As such, we will tend to err on the side of caution with regard to assigning any e-mail to the "Spam" folder, rather than picking the most likely category.
-
+## Statistical Learning Theory
 
 
+At once, *test sets are all that we really have*, 
+and yet this fact seems strangely unsatsifying.
+First, we seldom possess a *true test set*---unless 
+we are the ones creating the dataset,
+someone else has probably already evaluated 
+their own classifier on our ostensible "test set".
+And even when we get first dibs,
+we soon find ourselves frustrate, wishing we could
+evaluate our subsequent modeling attempts
+without the gnawing feeling 
+that we cannot trust our numbers.
+Moreover, even a true test set can only tell us *post hoc* 
+whether a classifier has in fact generalized to the population,
+not whether we have any reason to expect *a priori*
+that it should generalize. 
+
+With these misgivings in mind, 
+you might now be sufficiently primed 
+to see the appeal of statistical learning theory,
+the mathematical subfield of machine learning
+whose practitioners aim to elucidate the
+fundamental principles that explain 
+why/when models trained on empirical data
+can/will generalize to unseen data.
+One of the primary aims for several decades
+of statistical learning researchers 
+has been to bound the generalization gap,
+relating the properties of the model class,
+the number of samples in the dataset.
 
 
-%
-% Move to classification generalization
-% 
+Learning theorists aim to bound the difference
+between the *empirical error* $\epsilon_S(f_S)$
+of a learned classifier $f_S$,
+both trained and evaluated 
+on the training set $S$,
+and the true error $\epsilon(f_S)$
+of that same classifier on the underlying population.
+This might look similar to the evaluation problem
+that we just addressed but there's a major difference.
+Before the classifier $f$ was fixed
+and we only needed a dataset 
+for evaluative purposes. 
+And indeed classifier fixed *a priori* generalizes.
+Its error on a (previously unseen) dataset
+is an unbiased estimate of the population error. 
+But what can we say when a classifier 
+is trained and evaluated on the same dataset?
+Can we ever be confident that the training error
+will be close to the testing error?
 
 
-### Statistical Learning Theory
+Suppose that our learned classifier $f_S$ must be chosen 
+among some pre-specified set of functions $\cal{F}$.
+Recall from our discussion of test sets
+that while it's easy to estimate 
+the error of a single classifier,
+things get hairy when we begin 
+to consider collections of classifiers. 
+Even if the emprirical error 
+of any one (fixed) classifier 
+will be close to its true error 
+with high probability,
+once we consider a collection of classifiers,
+we need to worry about the possibility
+that *just one* classifier in the set
+will receive a badly misestimated error.
+The worry is that if just one classifier
+in our collection receives 
+a misleadingly low error
+then we might pick it 
+and thereby grossly underestimate 
+the population error. 
+Moreover, even for linear models,
+because their paramters are continuously valued,
+we are typically choosing among 
+an infinite class of functions $|\cal{F}| = \infty$.
 
-Because generalization is such a fundamental problem,
-generations of theorists have dedicated careers 
-to developing formal theories 
-that explain when we should expect models to generalize.
-In their [epoynmous theorem](https://en.wikipedia.org/wiki/Glivenko%E2%80%93Cantelli_theorem) 
-Glivenko and Cantelli derived the rate
-at which the training error converges 
-to the generalization error :cite:`Glivenko33,Cantelli33`. 
-In a series of seminal papers, Vapnik and Chervonenkis
-extended this theory to more general classes of functions 
+
+One ambitious solution to the problem
+is to develop analytic tools 
+for proving uniform convergence, i.e.,
+that with high probability, 
+the empirical error rates for every classifier in the class $f\in\cal{F}$
+will *simultaneously* converge to their true error rates.
+In other words, we seek a theoretical principle
+that would allow us to state that
+with probability at least $1-\delta$ 
+(for some small $\delta$)
+no classifier's error rate $\epsilon{f}$
+(among all classifiers in thre class $\cal{F}$)
+will be misestimated by more 
+than some some small amount $\alpha$.
+Clearly, we cannot make such statements
+for all model classes $\cal{F}$.
+Recall the class of memorization machines
+that always achieve empirical error $0$
+but never outperform random guessing
+on the underlying population.
+
+In a sense the class of memorizers is too flexible. 
+No such uniform convergence result could possibly hold.
+On the other hand, a fixed classsifier is useless---it 
+generalizes perfectly, but fits neither 
+the traning data not the test data. 
+The central question of learning
+has thus historically been framed as a tradeoff 
+between more flexible (higher variance) model classes 
+that better fit the training data but risk overfitting,
+versus more rigid (higher bias) model classes
+that generalize well but risk underfitting. 
+A central question in learning theory
+has been to develop the appropriate
+mathematical analysis to quantify
+where a model sits along this spectrum,
+and to provide the associated guarantees. 
+
+In a series of seminal papers,
+Vapnik and Chervonenkis extended 
+the theory on the convergence 
+of relative frequencies
+to more general classes of functions 
 :cite:`VapChe64,VapChe68,VapChe71,VapChe74b,VapChe81,VapChe91`.
-However 
+One of the key contributions of this line of work
+is the Vapnik-Chervonenkis (VC) dimension,
+which measures (one notion of) 
+the complexity (flexibility) of a model class.
+Moreover, one of their key results bounds
+the difference of between the empirical error 
+and the population error as a function 
+of the VC dimension and the number of samples. 
 
+$$\Pr\left(R[p, f] - R_\mathrm{emp}[\mathbf{X}, \mathbf{Y}, f] < \alpha\right) \geq 1-\delta
+\ \text{for}\ \alpha \geq c \sqrt{(\mathrm{VC} - \log \delta)/n}.$$
 
-
-
-%
-%
-%
-
-
-
-Being a good machine learning scientist requires thinking critically,
-and already you should be poking holes in this assumption,
-coming up with common cases where the assumption fails.
-What if we train a mortality risk predictor
-on data collected from patients at UCSF Medical Center,
-and apply it on patients at Massachusetts General Hospital?
-These distributions are simply not identical. This is a well-studied 
-problem in statistics :cite:`rosenbaum1983central`.
-Moreover, draws might be correlated in time.
-What if we are classifying the topics of Tweets?
-The news cycle would create temporal dependencies
-in the topics being discussed, violating any assumptions of independence. 
-
-Sometimes we can get away with minor violations of the IID assumption
-and our models will continue to work remarkably well.
-After all, nearly every real-world application
-involves at least some minor violation of the IID assumption,
-and yet we have many useful tools for
-various applications such as
-face recognition,
-speech recognition, and language translation. :cite:`yu1994rates` provides 
-a quantitative handle on this behavior. 
-
-Other violations are sure to cause trouble.
-Imagine, for example, if we try to train
-a face recognition system by training it
-exclusively on university students
-and then want to deploy it as a tool
-for monitoring geriatrics in a nursing home population.
-This is unlikely to work well since college students
-tend to look considerably different from the elderly.
-
-In subsequent chapters, we will discuss problems
-arising from violations of the IID assumption.
-For now, even taking the IID assumption for granted,
-understanding generalization is a formidable problem.
-Moreover, elucidating the precise theoretical foundations
-that might explain why deep neural networks generalize as well as they do
-continues to vex the greatest minds in learning theory :cite:`frankle2018lottery,bartlett2021deep,nagarajan2019uniform,kawaguchi2017generalization`.
-
-
-
-When we train our models, we attempt to search for a function
-that fits the training data as well as possible.
-If the function is so flexible that it can catch on to spurious patterns
-just as easily as to true associations,
-then it might perform *too well* without producing a model
-that generalizes well to unseen data.
-This is precisely what we want to avoid or at least control.
-Many of the techniques in deep learning are heuristics and tricks
-aimed at guarding against overfitting (:numref:`sec_weight_decay`, :numref:`sec_dropout`, :numref:`sec_batch_norm`).
-
-
-
-
-
-
-
-Often with neural networks, we think of a model
-that takes more training iterations as more complex,
-and one subject to *early stopping* (fewer training iterations) as less complex :cite:`prechelt1998early`.
-
-
-
-Much of the intuition of this arises from Statistical Learning Theory. 
-One of the guarantees it provides :cite:`Vapnik98` 
-is that the gap between empirical risk and expected risk is bounded by 
-
-$$\Pr\left(R[p, f] - R_\mathrm{emp}[\mathbf{X}, \mathbf{Y}, f] < \epsilon\right) \geq 1-\delta
-\ \text{for}\ \epsilon \geq c \sqrt{(\mathrm{VC} - \log \delta)/n}.$$
-
-Here $\delta > 0$ is the probability that the bound is violated 
-and $\mathrm{VC}$ is the Vapnik-Chervonenkis (VC)
-dimension of the set of functions that we want to fit. 
-For instance, for polynomials of degree $d$ the VC dimension is $d+1$. 
+Here $\delta > 0$ is the probability that the bound is violated,
+$\alpha$ is the upper bound on the generalization gap,
+and $n$ is the dataset size. 
 Lastly, $c > 0$ is a constant that depends 
 only on the scale of the loss that can be incurred. 
-In short, this shows that our bound becomes increasingly loose 
-as we pick more complex models 
-and that the number of free parameters 
-should not increase more rapidly 
-than the dataset size $n$ increases. 
-See :cite:`boucheron2005theory` for a detailed discussion,
-including several advanced ways of measuring function complexity.
+One use of the bound might be to plug in desired
+values of $\delta$ and $\alpha$ 
+to determine how many samples to collect. 
+The VC dimension quantifies the largest 
+number of data points for which we can assign
+any arbitrary (binary) labeling 
+and for each find some model $f$ in the class
+that agrees with that labeling.
+For example, linear models on $d$-dimensional inputs
+have VC dimension $d+1$.
+It's easy to see that a line can assign
+any possible labeling to three points in two dimensions,
+but not to four. 
+Unfortunately, the theory tends to be 
+overly pessimistic for more complex models
+and obtaining this guarantee typicaly requres 
+far more examples than are actually required
+to acheive the desired error rate. 
+Note also that fixing the model class and $\delta$,
+our error rate again decays 
+with the ususal $O(1/\sqrt{n})$ rates. 
+It seems unlikely that we could do better in terms of $n$.
+However, as we vary the model class,
+VC dimension can present 
+a pessimistic picture 
+of the generalization gap.
+
+
+
+## Summary
+
+The most staightforward way to evaluate a model 
+is to consult a test set comprised of previously unseen data. 
+Test set evaluations provide an unbiased estimate of the true error
+and converge at desired $O/\sqrt{n}$ rates as as the test set grows.
+We can provide approximate confidence intervals 
+based on exact asymptotic distributions
+or valid finite sample confidence intervals 
+based on (more conservative) finite sample guarantees. 
+Indeed test set evaluation is the bedrock 
+of modern machine learning research.
+However, test sets are seldom true test sets
+(used by multiple researchers again and again).
+Once the same test set is used 
+to evaluate multiple models,
+controlling for false discovery can be difficult.
+This can cause huge problems in theory.
+In practice, the significance of the problem
+depends on the size of the holdout sets in question
+and whether they are merely being used to choose hyperparameters 
+or if they are leaking information more directly. 
+Nevertheless, it's good practice to curate real test sets (or multiple)
+and to be as conservative as possible about how often they are used. 
+
+
+Hoping to provide a more satisfying solution,
+statistical leanring theorists have developed methods
+for guaranteeing uniform convergence over a model class.
+If indeed every model's empirical error 
+converges to its true error simultaneously,
+then we are free to choose the model that performs 
+best, minizing the training error,
+knowing that it too will perform similalry well
+on the holdout data. 
+Crucially, any such result must depend 
+on some property of the model class. 
+Vladimir Vapnik and Alexey Chernovenkis 
+introduced the VC dimension, 
+presenting uniform convergence results 
+that hold for all models in a VC class.
+The training error for all models in the class
+are (simultanesouly) guaranteed 
+to be close to their true errors,
+and guarantee grows tighter 
+and $O(1/\sqrt{n})$ rates.
+Following the revolutionary discovery of VC dimension, 
+numerous alternative complexity measures have been proposed,
+each facillitating an analagous generalization guarantee.
+See :cite:`boucheron2005theory` for a detailed discussion
+of several advanced ways of measuring function complexity.
+Unfortunately, while these complexity measures
+have become braodly useful tools in statistical theory,
+they turn out to be powerless 
+(as straightforwardly applied)
+for explaining why deep neural networks generalize. 
+Deep neural networks often have millions of parameters (or more),
+and can easily assign random labels to large collections of points.
+Nevertheless, they generalize well on practical problems
+and, surprisingly, they often generalize better,
+when they are larger and deeper, 
+despite incurring larger VC dimensions. 
+In the next chapter, we will revisit generalization
+in the context of deep learning. 
+
+## Exercises
+
+1. If we wish to estimate the error of a fixed model $f$
+   to within $.0001$ with probability greater than 99.9%,
+   how many samples do we need?
+1. Suppose that somebody else possesses a labeled test set 
+   and only makes available the unlabeled inputs $\{\mathbf{x}_i\}$. 
+   Now suppose that you can only access the test set labels
+   by running a model $f$ (no restrictions placed on the model class) 
+   on each of the unlabeled inputs
+   and receiving the corresponding error $\epsilon_D(f)$.
+   How many models would you need to evaluate 
+   before you leaked the entire test set 
+   and thus could appear to have error $0$,
+   regardless of your true error?
+1. What is the VC dimension of the class of 5th order polynomials? 
+1. What is the VC dimension of axis-aligned rectangles on 2D data?
