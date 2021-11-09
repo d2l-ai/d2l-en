@@ -1,7 +1,5 @@
 # Overview of Hyperparameter Optimization
 
-
-
 While weight parameters of a neural network model are automatically determined during training, e.g. by stochastic gradient descent, **hyperparameters** cannot be learned in this way. Without a different form of automation, the user has to set them manually by trial and error, in what amounts to a time-consuming and difficult part of machine learning workflows. For example, to train a neural networks with stochastic gradient descent we need to choose a learning rate and a batch size. Broadly, we distinguish between hyperparameters that control the learning process (e.g., learning rate, batch size, optimizer choice) and hyperparameters that define model shape and capacity (e.g., type of activation function, number of units per layer). The choice of hyperparameters in general directly affects the final performance of our machine learning algorithm. For example, previous work beat the performance of advanced state-of-the-art models by optimizing the hyperparameter of much simpler models (TODO: add ref). 
 
 The need to manually tune the training process of a deep neural network constitutes a significant gap towards the promise of end to end learning and artificial intelligence. If we are willing to spend sufficient computational resources, our methods should be able to configure themselves. Hyperparameter optimization aims to automatically find a performant hyperparameter configuration of any machine learning method. The main idea is to cast the search for the right hyperparameters as an optimization problem, to maximize the validation performance of the algorithm.
@@ -35,7 +33,7 @@ In many scenarios we are not just interested in finding $\mathbf{x}_{\star}$, bu
 
 Before we can optimize our machine learning algorithm, we first need to define for each hyperparameter the type, e.g float, integer, categorical and the domain with all possible values. This leads to our search space $\mathcal{X}$.
 
-Below we show an typical search space for a neural network. Important for the search space definition is to first determine if a hyperparameter changes on a logarithmic or a linear scale. Learning rates for example typically live on a logarithmic scale, wheras, for example, momentum are usually on a linear scale. For continuous parameters we usually define a uniform distribution, to not induce any bias.
+Below we show an typical search space for a neural network. Important for the search space definition is to first determine if a hyperparameter changes on a logarithmic or a linear scale. Learning rates for example typically live on a logarithmic scale, whereas, for example, momentum are usually on a linear scale. For continuous parameters we mostly define a uniform distribution, to not induce any bias.
 
 TODO: Maybe we should show this example in the next section when we introduce the CNN example?
 
