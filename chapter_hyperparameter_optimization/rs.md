@@ -1,12 +1,12 @@
 # Random Search
 
-The first method we will look at is called random search. The idea is to first define a probability distribution for each hyperparameter individually. We then iteratively sample hyperparameter configurations from these probability distributions. Compared to grid search, random search does not suffer from the curse of dimensionality.
+The first method we will look at is called random search. The idea is to first define a probability distribution for each hyperparameter individually. We then iteratively sample hyperparameter configurations from these probability distributions. Compared to grid search, which evaluate a user defined grid of hyperparameter configurations, random search does not suffer from the curse of dimensionality.
 
-If we use proability distribution that assign non-zero probability to each point in the search space, random search will  asympototically converge to the global optimum. However, it does not maintain a history of the previous observed potins, such as model-based approaches that we will describe in later chapters, which renders it less sample efficient in practice.
+If we use probability distributions that assign non-zero probability to each point in the search space, random search will asymptotically converge to the global optimum. However, it does not maintain a history of the previous observed points, such as model-based approaches that we will describe in later chapters, which renders it less sample efficient in practice.
 
 ## Sampling Configurations from the Search Space
 
-First, we implement a method that allows us to sample random configurations from our search space. Each hyperparameter will sampled independently from the other hyperparameters.
+First, we implement a method that allows us to sample random configurations from our search space. Each hyperparameter will be sampled independently from the other hyperparameters.
 
 ```{.python .input  n=4}
 import scipy.stats as stats
@@ -30,6 +30,7 @@ Now, we can implement the main optimization loop of random search, that iterates
 
 ```{.python .input  n=4}
 def train_and_validate(config):
+    # TODO: this function will be defined in the previous section
     return 0.1
 
 num_iterations = 100
