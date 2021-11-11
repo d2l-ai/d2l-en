@@ -185,8 +185,6 @@ Perplexity can be best understood as the harmonic mean of the number of real cho
 * In the worst case scenario, the model always predicts the probability of the target token as 0. In this situation, the perplexity is positive infinity.
 * At the baseline, the model predicts a uniform distribution over all the available tokens of the vocabulary. In this case, the perplexity equals the number of unique tokens of the vocabulary. In fact, if we were to store the sequence without any compression, this would be the best we could do to encode it. Hence, this provides a nontrivial upper bound that any useful model must beat.
 
-
-
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
