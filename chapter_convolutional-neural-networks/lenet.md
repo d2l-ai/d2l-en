@@ -88,7 +88,7 @@ is remarkably simple.
 We need only to instantiate a `Sequential` block
 and chain together the appropriate layers.
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
@@ -96,20 +96,20 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```{.python .input  n=2}
+```{.python .input  n=4}
 %%tab tensorflow
 import tensorflow as tf
 from d2l import tensorflow as d2l
 ```
 
-```{.python .input  n=7}
+```{.python .input  n=5}
 %%tab all
 
 class LeNet(d2l.Classification):
@@ -183,7 +183,7 @@ model = LeNet()
 model.layer_summary((1, 1, 28, 28))
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab tensorflow
 @d2l.add_to_class(d2l.Classification)  #@save
 def layer_summary(self, X_shape):
@@ -241,7 +241,7 @@ and we minimize it via minibatch stochastic gradient descent.
 
 [**Now let's train and evaluate the LeNet-5 model.**]
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab pytorch, mxnet
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=256)
@@ -290,7 +290,3 @@ A second difference is the relative ease with which we were able to implement Le
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/275)
 :end_tab:
-
-```{.python .input}
-
-```
