@@ -267,8 +267,7 @@ In this sense, it is very similar to what we saw in regression,
 where the gradient was the difference
 between the observation $y$ and estimate $\hat{y}$.
 This is not coincidence.
-In any exponential family (see the
-[online appendix on distributions](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/distributions.html)) model,
+In any exponential family model,
 the gradients of the log-likelihood are given by precisely this term.
 This fact makes computing gradients easy in practice.
 
@@ -443,7 +442,3 @@ the item with the largest score is the most likely one to be chosen :cite:`Bradl
     1. What happens if we let the temperature converge to $\infty$?
 
 [Discussions](https://discuss.d2l.ai/t/46)
-
-```{.python .input}
-
-```

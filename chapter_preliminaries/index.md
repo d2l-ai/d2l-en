@@ -22,8 +22,6 @@ in the official documentation when you get stuck.
 In short, this chapter provides a rapid introduction 
 to the basics that you will need to follow 
 *most* of the technical content in this book.
-For a deeper dive, check out 
-the [online appendix on mathematics](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/index.html).
 
 ```toc
 :maxdepth: 2

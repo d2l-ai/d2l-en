@@ -229,7 +229,7 @@ model.predict('it has', 20, data.vocab)
 
 ## Exercises
 
-1. Try to implement a two-layer RNN from scratch using the single layer implementation we discussed in :numref:`sec_rnn_scratch`.
+1. Try to implement a two-layer RNN from scratch using the single layer implementation we discussed in :numref:`sec_rnn-scratch`.
 2. Replace the LSTM by a GRU and compare the accuracy and training speed.
 3. Increase the training data to include multiple books. How low can you go on the perplexity scale?
 4. Would you want to combine sources of different authors when modeling text? Why is this a good idea? What could go wrong?

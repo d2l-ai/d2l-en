@@ -161,7 +161,7 @@ In summary, GRUs have the following two distinguishing features:
 
 ## Implementation from Scratch
 
-To gain a better understanding of the GRU model, let's implement it from scratch. We begin by reading *The Time Machine* dataset that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below.
+To gain a better understanding of the GRU model, let's implement it from scratch. We begin by reading *The Time Machine* dataset that we used in :numref:`sec_rnn-scratch`. The code for reading the dataset is given below.
 
 ```{.python .input  n=5}
 %load_ext d2lbook.tab
@@ -227,7 +227,7 @@ class GRUScratch(d2l.Module):
 
 ### Defining the Model
 
-Now we will define [**the hidden state initialization function**] `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn_scratch`, this function returns a tensor with a shape (batch size, number of hidden units) whose values are all zeros.
+Now we will define [**the hidden state initialization function**] `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn-scratch`, this function returns a tensor with a shape (batch size, number of hidden units) whose values are all zeros.
 
 Now we are ready to [**define the GRU model**].
 Its structure is the same as that of the basic RNN cell, except that the update equations are more complex.
@@ -253,7 +253,7 @@ def forward(self, inputs, H=None):
 
 ### Training and Predicting
 
-[**Training**] and prediction work in exactly the same manner as in :numref:`sec_rnn_scratch`.
+[**Training**] and prediction work in exactly the same manner as in :numref:`sec_rnn-scratch`.
 After training,
 we print out the perplexity on the training set
 and the predicted sequence following

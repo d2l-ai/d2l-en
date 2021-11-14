@@ -598,7 +598,7 @@ class TimeMachine(d2l.DataModule):
         return corpus, vocab
 
     def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
-        """Defined in :numref:`sec_language-model`"""
+        """Defined in :numref:`subsec_perplexity`"""
         super(d2l.TimeMachine, self).__init__()
         self.save_hyperparameters()
         corpus, self.vocab = self.build(self._download())
@@ -607,7 +607,7 @@ class TimeMachine(d2l.DataModule):
         self.X, self.Y = array[:,:-1], array[:,1:]
 
     def get_dataloader(self, train):
-        """Defined in :numref:`sec_language-model`"""
+        """Defined in :numref:`subsec_partitioning-seqs`"""
         idx = slice(0, self.num_train) if train else slice(
             self.num_train, self.num_train + self.num_val)
         return self.get_tensorloader([self.X, self.Y], train, idx)
@@ -664,7 +664,8 @@ class RNNScratch(d2l.Module):
         outputs = []
         for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs)
             state = d2l.tanh(d2l.matmul(X, self.W_xh) + (
-                d2l.matmul(state, self.W_hh) if state is not None else 0) + self.b_h)
+                d2l.matmul(state, self.W_hh) if state is not None else 0)
+                             + self.b_h)
             outputs.append(state)
         return outputs, state
 
@@ -700,20 +701,20 @@ class RNNLMScratch(d2l.Classification):
 
     def one_hot(self, X):
         """Defined in :numref:`sec_rnn_scratch`"""
-        # output shape: (num_steps, batch_size, vocab_size)
+        # Output shape: (num_steps, batch_size, vocab_size)
         return F.one_hot(X.T, self.vocab_size).type(torch.float32)
+
+    def output_layer(self, rnn_outputs):
+        """Defined in :numref:`sec_rnn_scratch`"""
+        outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in rnn_outputs]
+        return d2l.stack(outputs, 1)
+    
 
     def forward(self, X, state=None):
         """Defined in :numref:`sec_rnn_scratch`"""
         embs = self.one_hot(X)
         rnn_outputs, _ = self.rnn(embs, state)
         return self.output_layer(rnn_outputs)
-    
-
-    def output_layer(self, rnn_outputs):
-        """Defined in :numref:`sec_rnn_scratch`"""
-        outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in rnn_outputs]
-        return d2l.stack(outputs, 1)
 
     def predict(self, prefix, num_preds, vocab, device=None):
         """Defined in :numref:`sec_rnn_scratch`"""

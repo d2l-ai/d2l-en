@@ -133,15 +133,57 @@ take this into account.
 Last, long word
 sequences are almost certain to be novel, hence a model that simply
 counts the frequency of previously seen word sequences is bound to perform poorly there.
+Therefore, we focus on using neural networks for language modeling
+in the rest of the chapter.
 
-Therefore, we focus on  using neural networks for language modeling
-in the rest of the chapter,
-based on *The Time Machine* dataset.
-Before introducing the model,
-let's assume that it
-processes a minibatch of sequences with predefined length
-at a time.
-Now the question is how to [**read minibatches of input sequences and label sequences at random.**]
+
+## Perplexity
+:label:`subsec_perplexity`
+
+Next, let's discuss about how to measure the language model quality, which will be used to evaluate our models in the subsequent sections.
+One way is to check how surprising the text is.
+A good language model is able to predict with
+high-accuracy tokens that what we will see next.
+Consider the following continuations of the phrase "It is raining", as proposed by different language models:
+
+1. "It is raining outside"
+1. "It is raining banana tree"
+1. "It is raining piouw;kcj pwepoiut"
+
+In terms of quality, example 1 is clearly the best. The words are sensible and logically coherent.
+While it might not quite accurately reflect which word follows semantically ("in San Francisco" and "in winter" would have been perfectly reasonable extensions), the model is able to capture which kind of word follows.
+Example 2 is considerably worse by producing a nonsensical extension. Nonetheless, at least the model has learned how to spell words and some degree of correlation between words. Last, example 3 indicates a poorly trained model that does not fit data properly.
+
+We might measure the quality of the model by computing  the likelihood of the sequence.
+Unfortunately this is a number that is hard to understand and difficult to compare.
+After all, shorter sequences are much more likely to occur than the longer ones,
+hence evaluating the model on Tolstoy's magnum opus
+*War and Peace* will inevitably produce a much smaller likelihood than, say, on Saint-Exupery's novella *The Little Prince*. What is missing is the equivalent of an average.
+
+Information theory comes handy here.
+We have defined entropy, surprisal, and cross-entropy
+when we introduced the softmax regression
+(:numref:`subsec_info_theory_basics`).
+If we want to compress text, we can ask about
+predicting the next token given the current set of tokens.
+A better language model should allow us to predict the next token more accurately.
+Thus, it should allow us to spend fewer bits in compressing the sequence.
+So we can measure it by the cross-entropy loss averaged
+over all the $n$ tokens of a sequence:
+
+$$\frac{1}{n} \sum_{t=1}^n -\log P(x_t \mid x_{t-1}, \ldots, x_1),$$
+:eqlabel:`eq_avg_ce_for_lm`
+
+where $P$ is given by a language model and $x_t$ is the actual token observed at time step $t$ from the sequence.
+This makes the performance on documents of different lengths comparable. For historical reasons, scientists in natural language processing prefer to use a quantity called *perplexity*. In a nutshell, it is the exponential of :eqref:`eq_avg_ce_for_lm`:
+
+$$\exp\left(-\frac{1}{n} \sum_{t=1}^n \log P(x_t \mid x_{t-1}, \ldots, x_1)\right).$$
+
+Perplexity can be best understood as the harmonic mean of the number of real choices that we have when deciding which token to pick next. Let's look at a number of cases:
+
+* In the best case scenario, the model always perfectly estimates the probability of the target token as 1. In this case the perplexity of the model is 1.
+* In the worst case scenario, the model always predicts the probability of the target token as 0. In this situation, the perplexity is positive infinity.
+* At the baseline, the model predicts a uniform distribution over all the available tokens of the vocabulary. In this case, the perplexity equals the number of unique tokens of the vocabulary. In fact, if we were to store the sequence without any compression, this would be the best we could do to encode it. Hence, this provides a nontrivial upper bound that any useful model must beat.
 
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
@@ -168,8 +210,21 @@ import tensorflow as tf
 ```
 
 ## Partitioning Sequences
+:label:`subsec_partitioning-seqs`
 
-Now the dataset takes the form of a sequence of $T$ token indices in `corpus`.
+We will design language models using neural networks
+and use perplexity to evaluate 
+how good the model is at 
+predicting the next token given the current set of tokens
+in text sequences.
+Before introducing the model,
+let's assume that it
+processes a minibatch of sequences with predefined length
+at a time.
+Now the question is how to [**read minibatches of input sequences and target sequences at random**].
+
+
+Suppose that the dataset takes the form of a sequence of $T$ token indices in `corpus`.
 We will
 partition it
 into subsequences, where each subsequence has $n$ tokens (time steps).
@@ -213,9 +268,6 @@ def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
                         for i in range(0, len(corpus)-num_steps-1)])
     self.X, self.Y = array[:,:-1], array[:,1:]
 ```
-
-## [**Random Sampling**]
-
 
 To train language models,
 we will randomly sample 

@@ -16,7 +16,7 @@ the basic knowledge of natural language processing.
 
 ## One-Hot Vectors Are a Bad Choice
 
-We used one-hot vectors to represent words (characters are words) in :numref:`sec_rnn_scratch`.
+We used one-hot vectors to represent words (characters are words) in :numref:`sec_rnn-scratch`.
 Suppose that the number of different words in the dictionary (the dictionary size) is $N$,
 and each word corresponds to
 a different integer (index) from $0$ to $N-1$.

@@ -123,7 +123,7 @@ Whenever the output gate approximates 1 we effectively pass all memory informati
 ## Implementation from Scratch
 
 Now let's implement an LSTM from scratch.
-As same as the experiments in :numref:`sec_rnn_scratch`,
+As same as the experiments in :numref:`sec_rnn-scratch`,
 we first load *The Time Machine* dataset.
 
 ```{.python .input}
@@ -214,7 +214,7 @@ def forward(self, inputs, H_C=None):
 
 ### [**Training**] and Prediction
 
-Let's train an LSTM as same as what we did in :numref:`sec_gru`, by instantiating the `RNNModelScratch` class as introduced in :numref:`sec_rnn_scratch`.
+Let's train an LSTM as same as what we did in :numref:`sec_gru`, by instantiating the `RNNModelScratch` class as introduced in :numref:`sec_rnn-scratch`.
 
 ```{.python .input}
 %%tab all
