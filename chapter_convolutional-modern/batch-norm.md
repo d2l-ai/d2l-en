@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -343,7 +343,7 @@ Also note that for the sake of convenience
 we did not worry about automatically inferring the input shape here,
 thus we need to specify the number of features throughout.
 By now all modern deep learning frameworks offer automatic detection of size and shape in the 
-high-level batch normalization APIs (in practice we will use this instead). 
+high-level batch normalization APIs (in practice we will use this instead).
 
 ```{.python .input}
 %%tab mxnet
@@ -475,19 +475,15 @@ but before the corresponding activation functions.
 ```{.python .input}
 %%tab mxnet
 net = nn.Sequential()
-net.add(nn.Conv2D(6, kernel_size=5),
-        BatchNorm(6, num_dims=4),
+net.add(nn.Conv2D(6, kernel_size=5), BatchNorm(6, num_dims=4),
         nn.Activation('sigmoid'),
         nn.AvgPool2D(pool_size=2, strides=2),
-        nn.Conv2D(16, kernel_size=5),
-        BatchNorm(16, num_dims=4),
+        nn.Conv2D(16, kernel_size=5), BatchNorm(16, num_dims=4),
         nn.Activation('sigmoid'),
         nn.AvgPool2D(pool_size=2, strides=2),
-        nn.Dense(120),
-        BatchNorm(120, num_dims=2),
+        nn.Dense(120), BatchNorm(120, num_dims=2),
         nn.Activation('sigmoid'),
-        nn.Dense(84),
-        BatchNorm(84, num_dims=2),
+        nn.Dense(84), BatchNorm(84, num_dims=2),
         nn.Activation('sigmoid'),
         nn.Dense(10))
 ```
