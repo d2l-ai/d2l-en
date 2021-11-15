@@ -1,4 +1,4 @@
-# Language Model
+# Language Models
 :label:`sec_language-model`
 
 
