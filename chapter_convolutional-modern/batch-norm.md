@@ -343,7 +343,7 @@ Also note that for the sake of convenience
 we did not worry about automatically inferring the input shape here,
 thus we need to specify the number of features throughout.
 By now all modern deep learning frameworks offer automatic detection of size and shape in the 
-high-level batch normalization APIs (in practice we will use this instead). 
+high-level batch normalization APIs (in practice we will use this instead).
 
 ```{.python .input}
 %%tab mxnet
@@ -495,13 +495,13 @@ net.add(nn.Conv2D(6, kernel_size=5),
 ```{.python .input}
 %%tab pytorch
 net = nn.Sequential(
-    nn.LazyConv2d(6, kernel_size=5), BatchNorm(6, num_dims=4), nn.Sigmoid(),
+    nn.Conv2d(1, 6, kernel_size=5), BatchNorm(6, num_dims=4), nn.Sigmoid(),
     nn.AvgPool2d(kernel_size=2, stride=2),
-    nn.LazyConv2d(16, kernel_size=5), BatchNorm(16, num_dims=4), nn.Sigmoid(),
+    nn.Conv2d(6, 16, kernel_size=5), BatchNorm(16, num_dims=4), nn.Sigmoid(),
     nn.AvgPool2d(kernel_size=2, stride=2), nn.Flatten(),
-    nn.LazyLinear(120), BatchNorm(120, num_dims=2), nn.Sigmoid(),
-    nn.LazyLinear(84), BatchNorm(84, num_dims=2), nn.Sigmoid(),
-    nn.LazyLinear(10))
+    nn.Linear(16*4*4, 120), BatchNorm(120, num_dims=2), nn.Sigmoid(),
+    nn.Linear(120, 84), BatchNorm(84, num_dims=2), nn.Sigmoid(),
+    nn.Linear(84, 10))
 ```
 
 ```{.python .input}
@@ -591,13 +591,13 @@ net.add(nn.Conv2D(6, kernel_size=5), nn.BatchNorm(), nn.Activation('sigmoid'),
 ```{.python .input}
 %%tab pytorch
 net = nn.Sequential(
-    nn.LazyConv2d(6, kernel_size=5), nn.LazyBatchNorm2d(), nn.Sigmoid(),
+    nn.Conv2d(1, 6, kernel_size=5), nn.BatchNorm2d(6), nn.Sigmoid(),
     nn.AvgPool2d(kernel_size=2, stride=2),
-    nn.LazyConv2d(16, kernel_size=5), nn.LazyBatchNorm2d(), nn.Sigmoid(),
+    nn.Conv2d(6, 16, kernel_size=5), nn.BatchNorm2d(16), nn.Sigmoid(),
     nn.AvgPool2d(kernel_size=2, stride=2), nn.Flatten(),
-    nn.LazyLinear(120), nn.LazyBatchNorm1d(), nn.Sigmoid(),
-    nn.LazyLinear(84), nn.LazyBatchNorm1d(), nn.Sigmoid(),
-    nn.LazyLinear(10))
+    nn.Linear(256, 120), nn.BatchNorm1d(120), nn.Sigmoid(),
+    nn.Linear(120, 84), nn.BatchNorm1d(84), nn.Sigmoid(),
+    nn.Linear(84, 10))
 ```
 
 ```{.python .input}
@@ -742,7 +742,3 @@ On a more practical note, there are a number of aspects worth remembering about 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/330)
 :end_tab:
-
-```{.python .input}
-
-```
