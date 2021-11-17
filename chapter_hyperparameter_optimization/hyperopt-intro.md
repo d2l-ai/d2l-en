@@ -262,7 +262,7 @@ search_space = {
 }
 ```
 
-## How to Evaluate Hyperparameter Optimization Methods?
+## How can we evaluate hyperparameter optimization methods?
 
 In the next section we will look at different hyperparameter optimization methods. To understand their difference better, we will described here how we can evaluate them. In practice, we usually run the hyperparameter optimization once and use the best found hyperparameters to train our final model. However, since the most hyperparameter optimization method come with an intrinsic randomness, we have to run them multiple times with a different seed for the random number generator and average the results to assess their performance.
 
