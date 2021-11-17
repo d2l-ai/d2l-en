@@ -1,16 +1,16 @@
 # What is Hyperparameter Optimization?
 
 
-While weight parameters of a neural network model are automatically determined during training, e.g. by stochastic gradient descent, **hyperparameters** cannot be learned in this way. Without a different form of automation, the user has to set them manually by trial and error, in what amounts to a time-consuming and difficult part of machine learning workflows. For example, to train a neural networks with stochastic gradient descent we need to choose a learning rate and a batch size. Broadly, we distinguish between hyperparameters that control the learning process (e.g., learning rate, batch size, optimizer choice) and hyperparameters that define model shape and capacity (e.g., type of activation function, number of units per layer). The choice of hyperparameters in general directly affects the final performance of our machine learning algorithm. For example, previous work beat the performance of advanced state-of-the-art models by optimizing the hyperparameter of much simpler models :cite:`snoek-nips12a`. 
+While weight parameters of a neural network model are automatically determined during training, e.g. by stochastic gradient descent, **hyperparameters** cannot be learned in this way. Without a different form of automation, the user has to set them manually by trial and error, in what amounts to a time-consuming and difficult part of machine learning workflows. We distinguish between hyperparameters that control the learning process (e.g., learning rate, batch size, momentum, optimizer choice) and hyperparameters that define model shape and capacity (e.g., type of activation function, number of units per layer). The choice of hyperparameters in general directly affects the final performance of our machine learning algorithm. For example, previous work beat the performance of advanced state-of-the-art models by optimizing the hyperparameter of much simpler models :cite:`snoek-nips12a`. 
 
-Hence, hyperparameters play a critical role in machine learning as they do not only determine the generalization capabilities of trained models, but they may actually determine what constitutes the state-of-the-art. Indeed, results reported in an empirical study might look very differently for another choice of 
+Hyperparameters play a critical role in machine learning. Not only do they determine the generalization capabilities of trained models, they can even be critical for what constitutes the state-of-the-art. Indeed, results reported in an empirical study might look very differently for another choice of 
 hyperparameters and so would be the conclusions drawn. Unfortunately, it is not uncommon that published results do not report the specific hyperparameters that were used to run experiments, for instance, to demonstrate that a proposed method  is superior to previously published ones, and are thus not reproducible, putting in 
 question what actually is the state-of-the-art in machine learning today :cite:`haibe-kains:2020:transparency`.
 
-The need to manually tune the training process of a deep neural network constitutes a significant gap towards the promise of end to end learning and artificial intelligence. If we are willing to spend sufficient computational resources, our methods should be able to configure themselves. Hyperparameter optimization aims to automatically find a performant hyperparameter configuration of any machine learning method. The main idea is to cast the search for the right hyperparameters as an optimization problem, to maximize the validation performance of the algorithm.
+The need to manually tune the training process and structure of a deep neural network constitutes a significant gap towards the promise of end to end learning and artificial intelligence. If we are willing to spend sufficient computational resources, our methods should be able to configure themselves. Hyperparameter optimization aims to automatically find a performant hyperparameter configuration of any machine learning method. The main idea is to cast the search for the right hyperparameters as an optimization problem, to maximize the validation performance of the algorithm.
 
 
-In this chapter, we provide an overview of the basics of hyperparameter optimization and look at several state-of-the-art methods from the literature. As a running example, we will show how to automatically tune the hyperparameters of a convolutional neural network. Any successful HPO method needs to provide solutions for two decision-making primitives, **scheduling** and **search**, and we will highlight the most prominent current solutions for either. Scheduling amounts to decisions of how much resources to spend on a hyperparameter configuration, e.g. when to stop, pause, or resume training, while search is about which configurations to evaluate in the first place. A specific focus in this chapter will lie on model-based approaches to search, which in practice are often more sample efficient than their random-search based counterparts. Since hyperparameter optimization requires us to train and validate several machine learning models, we will also see how we can distribute these methods. To avoid distracting boiler-plate code, we will use the Python framework **SageMaker Tune**, providing us with an simple interface for distributed hyperparameter optimization.
+In this chapter, we provide an overview of the basics of hyperparameter optimization and look at several state-of-the-art methods from the literature. As a running example, we will show how to automatically tune hyperparameters of a convolutional neural network. Any successful HPO method needs to provide solutions for two decision-making primitives, **scheduling** and **search**, and we will highlight the most prominent current solutions for either. Scheduling amounts to decisions of how much resources to spend on a hyperparameter configuration, e.g. when to stop, pause, or resume training, while search is about which configurations to evaluate in the first place. A specific focus in this chapter will lie on model-based approaches to search, which in practice are often more sample efficient than their random-search based counterparts. Since hyperparameter optimization requires us to train and validate several machine learning models, we will also see how we can distribute these methods. To avoid distracting boiler-plate code, we will use the Python framework **Syne Tune**, providing us with an simple interface for distributed hyperparameter optimization.
 
 ```{.python .input  n=1}
 !pip install torch
@@ -27,13 +27,12 @@ In this chapter, we provide an overview of the basics of hyperparameter optimiza
 ]
 ```
 
-## Introduction SageMakerTune
+## Introduction to Syne Tune
 
-To avoid implementing boiler plate code to parallelize HPO across different python process, we use sagemaker-tune. 
-You can install it via
+Syne Tune can be installed as follows.
 
 ```{.python .input  n=23}
-!git clone git@github.com:awslabs/sagemaker-tune.git sagemaker_tune
+!git clone git@github.com:awslabs/syne-tune.git syne_tune
 ```
 
 ```{.json .output n=23}
@@ -47,7 +46,7 @@ You can install it via
 ```
 
 ```{.python .input  n=13}
-!cd ~/sagemaker-tune
+!cd syne-tune
 !ls
 ```
 
@@ -62,7 +61,7 @@ You can install it via
 ```
 
 ```{.python .input  n=24}
-!pip install -e ./sagemaker_tune[extra]
+!pip install -e .[extra]
 ```
 
 ```{.json .output n=24}
@@ -80,7 +79,16 @@ You can install it via
 
 The performance of our machine learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from our hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation performance. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning algorithm, which can take a long time. We will see below how much cheaper surrogates can help with the optimization of $f$. Training is stochastic in general (e.g., weights are randomly initialized), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
 
-Now, given our objective function $f$, hyperparameter optimization aims to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. Note that $f$ models the validation performance after training, and there is no efficient way to compute gradients with respect to $\mathbf{x}$. While there is recent work to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here.
+Now, given our objective function $f$, hyperparameter optimization aims to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. Since $f$ is the validation performance after training, there is no efficient way to compute gradients with respect to $\mathbf{x}$. While there is recent work to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here.
+
+Here is code for the training problem we will use as running example in this chapter. We train a variant of ResNet18 on a part of the CIFAR10 training dataset, using the remainder as validation set,
+the error on which we will minimize. The training loss is augmented by weight decay regularization, and we use SGD optimization with momentum.
+While modern HPO methods really only shine on larger and more difficult problems than this one, its small size and simplicity makes it
+feasible for a tutorial.
+
+MS: Is training set size 100 what we want here?
+
+MS: Should make epochs part of config as well.
 
 ```{.python .input  n=4}
 import os
@@ -216,43 +224,53 @@ def objective(config, epochs=3, path='./'):
     return validation_error
 ```
 
+Note how `objective` is parameterized by the hyperparameter configuration `config`,
+consisting of `batch_size`, `learning_rate`, `momentum`, `weight_decay`, and it returns the
+validation error after training for `epochs` epochs.
+
+
 ## Which metrics are important?
 
+
+MS: I think this is good for now, but we may want to check whether some basics here are already well explained in
+early chapters, and if so, just refer to them.
 
 ### Objective Function
 
 Arguably the most common way to estimate the validation performance of a machine learning algorithm is to compute its error (e.g classification error) on a hold out validation set. We cannot use the training loss to optimize the hyperparameters, as this would lead to overfitting. Unfortunately, in case of small datasets we often do not have access to a sufficient large validation dataset. In this case we can apply $k$-fold cross validation and use the average validation loss across all folds as metric to optimize. However, at least in the standard form of HPO, this makes the optimization process $k$ times slower. 
 
-We can generalize the definition of HPO above, to not optimize a single objective $f$ but multiple $f_0, ... f_k$. For example, we might not only interested in optimize the validation performance but also the cost or the latency of the model. However, this means we will not have a single $\mathbf{x}$ anymore that optimizes all objective functions at the same time. Instead we aim to find the Pareto front of configurations that dominate all other points in at least on of the objectives.
+We can generalize the definition of HPO in order to deal with multiple objectives $f_0, ... f_k$ at the same time. For example, we might not only interested in optimize the validation performance, but also the cost or the latency of the model. However, this means we will not have a single $\mathbf{x}$ anymore that optimizes all objective functions at the same time.
+We can resolve this situation by optimizing one of the objectives, subject to constraints formulated in terms of the others. In our example,
+we could minimize validation error, subject to a bound on latency dictated by service level agreements. More ambitiously, we can aim
+to sample the Pareto front of such configurations not strictly dominated by any other points.
 
-![Pareto front of two objective](img/pareto_front.png)
+![Pareto front of two objectives](img/pareto_front.png)
 :width:`400px`
 :label:`pareto_front`
 
 
 ### Cost
 
-Furthermore, in practice, hyperparameter configuratons $\mathbf{x}$ come with different costs $c: \mathcal{X} \rightarrow \mathbf{R}$, such as wall-clock time. For example, if we optimize the number of units of neural networks, larger networks are more expensive to train the smaller networks. Usually, we are not so much interested in how often we have to evaluate $f$, but rather try to find $\mathbf{x}_{\star}$ as quickly as possible. Some HPO algortihms explicitly model this cost and take it into account for the decision making.
+Another relevant metric is the cost of evaluating $f(\mathbf{x})$ at a configuration $\mathbf{x}$. Different to validation error or prediction latency,
+this metric is not a function of the final trained model, but a measure of training wall-clock time. For example, if we tune the number of layers or units per layer, larger networks are slower
+to train than smaller ones. In our runnning example, training time does not depend on `learning_rate`, `momentum`, `weight_decay`, but does depend in general on `batch_size`, due to how GPUs
+work. Counting cost in terms of wall-clock time is more relevant in practice than counting the number of evaluations. Some HPO algorithms explicitly model training cost and take it into
+account for making decisions.
 
 ### Constraints
+
+MS: Could be mentioned together with multi-objective.
 
 In many scenarios we are not just interested in finding $\mathbf{x}_{\star}$, but a hyperparameter configuration that additionally full fills certain constraints. More formally, we seek to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$ s.t $c_1(\mathbf{x}) > 0, ..., c_m(\mathbf{x}) > 0$. Typical constraints could be, for example, the memory consumption of $\mathbf{x}$ or fairness constraints.
 
 ## Search Spaces
 
-Before we can optimize our machine learning algorithm, we first need to define for each hyperparameter the type, e.g float, integer, categorical and the domain with all possible values. This leads to our search space $\mathbf{x} \in \mathcal{X}$.
-
-In general, the structure of the search space $\mathcal{X}$ can be complex and it can be quite different from $\mathbb{R}^d$. Some hyperparameters can encode choices (e.g., type of activation function used in a neural network) or depend on other hyperparameters (e.g., the number of units of the $l$-th layer of a neural network is 
-only relevant if the network has at least $l+1$ layers). Hence, hyperparameter optimization consists in determining a small set of good hyperparameters to search 
-over and probing the underlying machine learning algorithm at these values in the hope that 
-one of them will be close to the best hyperparameters $\mathbf{x}_*$. 
-
-
-
-Below we show an typical search space for the hyperparameter of a neural network. Important for the search space definition is to first determine if a hyperparameter changes on a logarithmic or a linear scale. Learning rates for example typically live on a logarithmic scale, whereas, for example, momentum are usually on a linear scale. For continuous parameters we mostly define a uniform distribution, to not induce any bias.
+Along with the objective function $f(\mathbf{x})$, we also need to define the feasible set $\mathcal{X}$ to optimize over, the *search space* or *configuration space*.
+In this chapter, we restrict ourselves to search spaces which decompose as product over the individual hyperparameters. Each
+hyperparameter. Here is an example search space for our running example:
 
 ```{.python .input  n=31}
-from sagemaker_tune.sagemaker_tune.search_space import loguniform, uniform, randint
+from syne_tune.syne_tune.search_space import loguniform, uniform, randint
 
 search_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
@@ -261,6 +279,32 @@ search_space = {
    "batch_size": randint(8, 128)
 }
 ```
+
+Each parameter has a data type, such as `float` (for `learning_rate`, `momentum`, `weight_decay`) or `int` (for `batch_size`), as well as a closed bounded range
+(lower and upper bounds). Some positive parameters (such as `learning_rate` or `weight_decay`) are best represented on a logarithmic scale
+(optimal values can differ by orders of magnitude), while others (like `momentum`) come with linear scale. As suggested by the
+naming in Syne Tune, another way to define hyperparameter types is as bounded distributions, often uniform or loguniform.
+Methods driven by random search sample independent values from these distributions for every search decision.
+
+One important data type missing from our running example is `categorical`. For example, we could extend it by
+`activation` of type `categorical(['ReLU', 'LeakyReLU', 'Softplus'])`, in order to specify the
+non-linear activation functions. This data type is for finite parameters, whose values have no ordering or distance
+relations with each other.
+
+It is tempting to try and "simplify" an HPO problem by turning numerical into categorical parameters. For example, why not specify
+`batch_size` as `categorical([8, 32, 128])`. However, not only does this constitute another "choice by hand" we originally wanted to avoid,
+for most competitive HPO methods, it either does not matter or makes things worse. Uniform random sampling just as effectively covers a
+bounded range than a finite set. As we will see, many model-based HPO methods relax `int` to `float` and use
+one-hot encoding for `categorical`, so turning `int` or `float` into `categorical` increases the dimension of the encoding
+space. If you still insist on finite ranges for `float` variables, Syne Tune provides the `finrange` and `logfinrange` types.
+
+HIER!
+
+In general, the structure of the search space $\mathcal{X}$ can be complex and it can be quite different from $\mathbb{R}^d$. Some hyperparameters can encode choices (e.g., type of activation function used in a neural network) or depend on other hyperparameters (e.g., the number of units of the $l$-th layer of a neural network is 
+only relevant if the network has at least $l+1$ layers). Hence, hyperparameter optimization consists in determining a small set of good hyperparameters to search 
+over and probing the underlying machine learning algorithm at these values in the hope that 
+one of them will be close to the best hyperparameters $\mathbf{x}_*$. 
+
 
 ## How can we evaluate hyperparameter optimization methods?
 
