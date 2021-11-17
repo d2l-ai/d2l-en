@@ -147,7 +147,6 @@ In the example above every neural network will be trained for the same amount of
 :width:`400px`
 :label:`img_samples_lc`
 
-
 ## Successive Halving
 
 One simple extension to random search is successive halving which iterative terminated the evaluation of poorly performing configurations. Let us define the minimum amount of resource $r_{min}$ , for example number of epochs, that we spend for each hyperparameter configurations. Given a set of $N$ randomly sampled hyperparameters configurations and a halving constant $eta$, successive halving starts with evaluating all $N$ configuration with $r_{min}$ amount of resources. It then sorts all configuration based on the their observed performances, and only continues the evaluation of the top $\frac{N}{\eta}$ for $\eta * r_{min}$ amount of resources.
@@ -177,6 +176,12 @@ def successive_halving(n, r, s, eta):
         idx = np.argsort(val_losses)[:(n_configs // eta)]
         X = [X[i] for i in idx]
 ```
+
+<!-- ![Learning curves of random hyperparameter configurations](../../img/samples_lc.pdf) -->
+![Learning curves based on successive halving](img/sh.jpeg)
+:width:`400px`
+:label:`img_samples_sh`
+
 
 ## Hyperband
 
@@ -209,6 +214,10 @@ def hyperband(max_iter=100, eta=3, iters=20):
 
 ```
 
+![Learning curves based on Hyperband](img/hyperband.jpeg)
+:width:`400px`
+:label:`img_samples_hb`
+
 ## Synchronous Hyperband
 
 
@@ -235,7 +244,7 @@ scheduler = HyperbandScheduler(
     metric=metric,
     random_seed=random_seed)
 
-stop_criterion = StoppingCriterion(max_wallclock_time=30, min_metric_value={"mean_loss": -6.0})
+stop_criterion = StoppingCriterion(max_wallclock_time=30)
 tuner = Tuner(
     backend=backend,
     scheduler=scheduler,
