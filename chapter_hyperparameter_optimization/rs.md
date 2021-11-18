@@ -62,7 +62,6 @@ To avoid implementing a distributed framework that allows for parallel HPO from 
 
 For SyneTune we have to provide a training script, that gets as input arguments the hyperparameter. Additionally, we have to report the performance after each epoch back via the report() function. The training loop is the same as in our previous example
 
-
 ```python
 from argparse import ArgumentParser
 from sagemaker_tune.report import Reporter
@@ -84,6 +83,7 @@ if __name__ == '__main__':
         # Feed the score back to Sagemaker Tune.
         report(epoch=epoch, accuracy=accuracy)
 ```
+
 
 ### Asynchronous Scheduler
 
@@ -140,16 +140,18 @@ tuning_experiment.plot()
 
 ## Early Stopping Hyperparameter Configurations
 
-In the example above every neural network will be trained for the same amount of epochs. However, there is a high correlation between a hyperparameter configuration's performance after a few epochs and its final performance (see Figure :numref:`img_samples_lc`). We can free up compute resources by early stopping the evaluation of poorly performing configuration and allocating more resources to promising configurations. This will eventually speed up the optimization process, since we have a higher throughput of configurations that we can try.
+In the example above every neural network will be trained for the same amount of epochs. However, there is a high correlation between a hyperparameter configuration's performance after a few epochs and its final performance (see Figure :numref:`img_samples_lc`). We can see that after a few epochs we are already able to visually distinguish between the well performing and the poorly performing configurations. However, the correlation is not perfect and we might still require the full amount of epochs to identify the best performing configuration.
 
-![Learning curves of random hyperparameter configurations](../../img/samples_lc.pdf)
+<!-- ![Learning curves of random hyperparameter configurations](../../img/samples_lc.pdf) -->
 ![Learning curves of random hyperparameter configurations](img/samples_lc.png)
 :width:`400px`
 :label:`img_samples_lc`
 
+Based on this observation, we can free up compute resources by early stopping the evaluation of poorly performing configuration and allocating more resources to more promising configurations. This will eventually speed up the optimization process, since we have a higher throughput of configurations that we can try. More formally, we expand our definition in Section :ref:`sec_definition_hpo`, such that our objective function $f(\mathbf{x}, r)$ gets an additional input $r \in [r_{min}, r_{max}]$ that specifies the amount of resource that we are willing to spend for the evaluation of $\mathbf{x}$. We assume that both, the correlation to $f(\mathbf{x}) = f(\mathbf{x})$ as well as the computational cost $c(\mathbf{x}, r)$ increases with $r$. Typically $r$ represents the number of epochs for training the neural network. But also other resources are possible, such as the training dataset size or the number of cross-validation folds.  
+
 ## Successive Halving
 
-One simple extension to random search is successive halving which iterative terminated the evaluation of poorly performing configurations. Let us define the minimum amount of resource $r_{min}$ , for example number of epochs, that we spend for each hyperparameter configurations. Given a set of $N$ randomly sampled hyperparameters configurations and a halving constant $eta$, successive halving starts with evaluating all $N$ configuration with $r_{min}$ amount of resources. It then sorts all configuration based on the their observed performances, and only continues the evaluation of the top $\frac{N}{\eta}$ for $\eta * r_{min}$ amount of resources.
+One simple extension to random search is successive halving which iteratively terminates the evaluation of poorly performing configurations. Given a set of $N$ randomly sampled hyperparameters configurations and a halving constant $\eta \in \mathbb{Z}_+$ and $\eta \geq 2$, where, due to simplicitly we assume that $\frac{r_{max}}{r_{min}} = \eta^K$, with $K \in \mathbb{Z}$. Successive halving starts with evaluating all $N$ configuration with $r_{min}$ amount of resources. It then sorts all configuration based on the their observed performances, and only continues the evaluation of the top $\frac{N}{\eta}$ for $\eta r_{min}$ amount of resources. Each decision points is called a rung, and the full set of rungs is given by $\mathcal{R} \in \{r_{min} \eta^k | k=0, ..., K  \}$. This step is iterated until we reach $r_{max}$.
 
 ```{.python .input  n=4}
 def successive_halving(n, r, s, eta):
@@ -186,9 +188,10 @@ def successive_halving(n, r, s, eta):
 ## Hyperband
 
 
-While successive halving can substantially speed up random search, its performance mostly hinges on $r_{min}$. If set $r_{min}$ too small we might miss configurations that would achieve top performance if given more time. However, a too large  $r_{min}$ will allocated too many resource to poorly performing configurations.
+While successive halving can substantially speed up random search, its performance mostly hinges on $r_{min}$. If we set $r_{min}$ too small we might miss configurations that would achieve a top performance with more resources. However, a too large $r_{min}$ will allocated too many resource to poorly performing configurations.
 
-Instead of using a fixed $r_{min}$, Hyperband runs successive halving iteratively as a subroutine by blancing the number of configurations and $r_{min}$ such that each iteration consumes roughly the same amount of resources.
+Instead of using a fixed $r_{min}$, Hyperband runs successive halving iteratively as a subroutine by blancing the number of configurations $N$ and $r_{min}$, such that each round of succesive halving, called a bracket, consumes roughly the same amount of resources.
+Note that, the last bracket uses $r_{min} = r_{max}$, which means that we effectively perform random search. 
 
 ```{.python .input  n=4}
 def hyperband(max_iter=100, eta=3, iters=20):
