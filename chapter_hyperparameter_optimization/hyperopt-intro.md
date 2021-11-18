@@ -75,7 +75,7 @@ Syne Tune can be installed as follows.
 ```
 
 ## How do we define Hyperparameter Optimization?
-
+:label:`sec_definition_hpo`
 
 The performance of our machine learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from our hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation performance. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning algorithm, which can take a long time. We will see below how much cheaper surrogates can help with the optimization of $f$. Training is stochastic in general (e.g., weights are randomly initialized), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
 
@@ -86,7 +86,7 @@ the error on which we will minimize. The training loss is augmented by weight de
 While modern HPO methods really only shine on larger and more difficult problems than this one, its small size and simplicity makes it
 feasible for a tutorial.
 
-MS: Is training set size 100 what we want here?
+MS: Is training set size 100 what we want here? AK: No it's just for debugging
 
 MS: Should make epochs part of config as well.
 
@@ -329,7 +329,3 @@ scheduling techniques (e.g., synchronous versus asynchronous; early stopping ver
 time of the HPO method itself, which for some model-based techniques can be significant.
 
 ## Summary
-
-```{.python .input}
-
-```
