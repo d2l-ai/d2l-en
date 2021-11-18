@@ -244,6 +244,8 @@ We can resolve this situation by optimizing one of the objectives, subject to co
 we could minimize validation error, subject to a bound on latency dictated by service level agreements. More ambitiously, we can aim
 to sample the Pareto front of such configurations not strictly dominated by any other points.
 
+MS: Is this data from the example above? Fine if not, but eventually should be consistent.
+
 ![Pareto front of two objectives](img/pareto_front.png)
 :width:`400px`
 :label:`pareto_front`
@@ -253,7 +255,7 @@ to sample the Pareto front of such configurations not strictly dominated by any 
 
 Another relevant metric is the cost of evaluating $f(\mathbf{x})$ at a configuration $\mathbf{x}$. Different to validation error or prediction latency,
 this metric is not a function of the final trained model, but a measure of training wall-clock time. For example, if we tune the number of layers or units per layer, larger networks are slower
-to train than smaller ones. In our runnning example, training time does not depend on `learning_rate`, `momentum`, `weight_decay`, but does depend in general on `batch_size`, due to how GPUs
+to train than smaller ones. In our runnning example, training time does not depend on `learning_rate`, `momentum`, `weight_decay`, but varies in general on `batch_size`, due to how GPUs
 work. Counting cost in terms of wall-clock time is more relevant in practice than counting the number of evaluations. Some HPO algorithms explicitly model training cost and take it into
 account for making decisions.
 
@@ -266,8 +268,8 @@ In many scenarios we are not just interested in finding $\mathbf{x}_{\star}$, bu
 ## Search Spaces
 
 Along with the objective function $f(\mathbf{x})$, we also need to define the feasible set $\mathcal{X}$ to optimize over, the *search space* or *configuration space*.
-In this chapter, we restrict ourselves to search spaces which decompose as product over the individual hyperparameters. Each
-hyperparameter. Here is an example search space for our running example:
+In this chapter, we restrict ourselves to search spaces which decompose as product over the individual hyperparameters.
+Here is a possible search space for our running example:
 
 ```{.python .input  n=31}
 from syne_tune.syne_tune.search_space import loguniform, uniform, randint
@@ -283,7 +285,7 @@ search_space = {
 Each parameter has a data type, such as `float` (for `learning_rate`, `momentum`, `weight_decay`) or `int` (for `batch_size`), as well as a closed bounded range
 (lower and upper bounds). Some positive parameters (such as `learning_rate` or `weight_decay`) are best represented on a logarithmic scale
 (optimal values can differ by orders of magnitude), while others (like `momentum`) come with linear scale. As suggested by the
-naming in Syne Tune, another way to define hyperparameter types is as bounded distributions, often uniform or loguniform.
+naming in Syne Tune, another way to define hyperparameter types is as bounded distributions, typically uniform or loguniform.
 Methods driven by random search sample independent values from these distributions for every search decision.
 
 One important data type missing from our running example is `categorical`. For example, we could extend it by
@@ -292,25 +294,39 @@ non-linear activation functions. This data type is for finite parameters, whose 
 relations with each other.
 
 It is tempting to try and "simplify" an HPO problem by turning numerical into categorical parameters. For example, why not specify
-`batch_size` as `categorical([8, 32, 128])`. However, not only does this constitute another "choice by hand" we originally wanted to avoid,
+`batch_size` as `categorical([8, 32, 128])`, i.e. 3 instead of 121 possible values? However, not only does this constitute another "choice by hand" we want to avoid,
 for most competitive HPO methods, it either does not matter or makes things worse. Uniform random sampling just as effectively covers a
 bounded range than a finite set. As we will see, many model-based HPO methods relax `int` to `float` and use
 one-hot encoding for `categorical`, so turning `int` or `float` into `categorical` increases the dimension of the encoding
 space. If you still insist on finite ranges for `float` variables, Syne Tune provides the `finrange` and `logfinrange` types.
 
-HIER!
-
-In general, the structure of the search space $\mathcal{X}$ can be complex and it can be quite different from $\mathbb{R}^d$. Some hyperparameters can encode choices (e.g., type of activation function used in a neural network) or depend on other hyperparameters (e.g., the number of units of the $l$-th layer of a neural network is 
-only relevant if the network has at least $l+1$ layers). Hence, hyperparameter optimization consists in determining a small set of good hyperparameters to search 
+In general, the structure of the search space $\mathcal{X}$ can be complex and it can be quite different from $\mathbb{R}^d$. Some hyperparameters are integers (like `batch_size`) or
+discrete choices (like the hypothetical `activation` above). Beyond the scope of this chapter, some hyperparameters may
+depend on the value of others. For example, if we try to tune both the number of layers and widths per layer for a multi-layer perceptron,
+the width of the $l$-th layer is relevant only if the network has at least $l+1$ layers. Hence, hyperparameter optimization consists in determining a small set of good hyperparameters to search
 over and probing the underlying machine learning algorithm at these values in the hope that 
 one of them will be close to the best hyperparameters $\mathbf{x}_*$. 
 
 
 ## How can we evaluate hyperparameter optimization methods?
 
-In the next section we will look at different hyperparameter optimization methods. To understand their difference better, we will described here how we can evaluate them. In practice, we usually run the hyperparameter optimization once and use the best found hyperparameters to train our final model. However, since the most hyperparameter optimization method come with an intrinsic randomness, we have to run them multiple times with a different seed for the random number generator and average the results to assess their performance.
+In the next section we will look at different hyperparameter optimization methods.
+Just as with training algorithms or model architectures, it is important to understand how to best
+best compare different HPO techniques. First, each HPO experiment depends on substantial sources of randomness,
+from the seed for random configuration choices and non-convex optimization of surrogate models to random
+effects in each training run (such as random weight initialization). When comparing different methods, it is
+therefore crucial to run each experiment several times and present average or quantile statistics.
 
-Key requirement for any hyperparameter optimization methods is not just to return a well peforming configuration, but to find it as quickly as possible. Therefor, we will look at the anytime performance of an algorithm. We define the anytime performance as the validation performance of the best found configuration, i.e incumbent, at the current time step. Furthermore, we usually care less about the number of function evaluations, but rather the time (i.e wall-clock time) we have to wait until our optimizer returns a hyperparameter configuration. Hence, we will compare hyperparameter optimization algorithms by plotting the anytime performance over wall-clock time. 
+The key requirement for an HPO method is that it finds well performing configurations as rapidly as possible, given the
+allocated compute budget. At least in the current practice, HPO is used as part of an iterative data
+acquisition and model building process overseen by human experts. The faster each individual decision is taken,
+the faster the overall job is done, or the more high level alternatives can be considered.
+
+Therefore, we will score an HPO algorithm by its anytime performance, defined as the validation performance of the best found
+configuration at the current wall-clock time step. Compared to the practice of plotting best validation performance against number of
+criterion function evaluations, this metric is not only more relevant in practice, but also allows to compare different
+scheduling techniques (e.g., synchronous versus asynchronous; early stopping versus full training). It also captures the decision making
+time of the HPO method itself, which for some model-based techniques can be significant.
 
 ## Summary
 
