@@ -1,15 +1,21 @@
 # Random Search
 
-The first method we will look at is called random search. The idea is to first define a probability distribution for each hyperparameter individually. We then iteratively sample hyperparameter configurations from these probability distributions. Compared to grid search, which evaluate a user defined grid of hyperparameter configurations, random search does not suffer from the curse of dimensionality.
+The first method we will look at is called random search. Recall from Section :ref:`sec_intro_search_spaces`
+that each hyperparameter is defined via a uniform or loguniform distribution over its
+feasible range or value set. We then iteratively sample hyperparameter configurations from these probability
+distributions. Compared to grid search, which evaluate a user defined grid of hyperparameter configurations, random search does not suffer from the curse of dimensionality.
 
-If we use probability distributions that assign non-zero probability to each point in the search space, random search will asymptotically converge to the global optimum. However, it does not maintain a history of the previous observed points, such as model-based approaches that we will describe in later chapters, which renders it less sample efficient in practice.
+When run for long enough, random search asymptotically converges to the global optimum. However, it does not make use of the data of previously proposed
+configurations and their function values. We will see further below that well-designed model-based algorithms, by maintaining and
+using a representation of such past data, can be more sample efficient in practice, in that they tend to reach certain performance
+levels with fewer function evaluations.
 
 ## Sampling Configurations from the Search Space
 
-First, we implement a method that allows us to sample random configurations from our search space. Each hyperparameter will be sampled independently from the other hyperparameters.
+While random search is implemented in Syne Tune, let us code it up from scratch. First, we implement a method that allows us to sample random configurations from our search space. Each hyperparameter will be sampled independently from the other hyperparameters.
 
 ```{.python .input  n=1}
-def sample(search_space):
+def sample_config(search_space):
     config = {}
     for hyperparameter in search_space:
         config[hyperparameter] = search_space[hyperparameter].sample()
@@ -18,7 +24,7 @@ def sample(search_space):
 
 ## The Random Search Loop
 
-Now, we can implement the main optimization loop of random search, that iterates until we reach the final number of iterations specified by the users. In each iteration, we first sample a hyperparameter configuration from the subroutine that we implemented above and then train and validate the model with the new candidate. We also maintain the current incumbent, i.e the best configuration we have found so far. This will be the configuration we will later return as the final configuration.
+Now, we can implement the main optimization loop of random search, that iterates until we reach the final number of iterations specified by the user. In each iteration, we first sample a hyperparameter configuration from the subroutine that we implemented above and then train and validate the model with the new candidate. We also maintain the current incumbent, i.e the best configuration we have found so far. This will be the configuration we will later return as the final configuration.
 
 ```{.python .input  n=4}
 num_iterations = 10
@@ -28,7 +34,7 @@ incumbent_error = None
 incumbent_trajectory = []
 
 for i in range(num_iterations):
-    config = sample(search_space)
+    config = sample_config(search_space)
     validation_error = objective(config)
     
     # bookkeeping
@@ -37,6 +43,9 @@ for i in range(num_iterations):
         incumbent_error = validation_error
     incumbent_trajectory.append(incumbent_error)
 ```
+
+MS: We should consistently show the any-time performance as function of wall-clock time. In the script
+above, we can just measure the time.
 
 Now we can plot the optimization trajectory of the incumbent to get the anytime performance of random search:
 
@@ -57,17 +66,22 @@ plt.plot(incumbent_trajectory);
 
 ## Asynchronous Random Search with SyneTune
 
-We can speed up the optimization process by parallelizing the evaluation of hyperparameter configurations across a set of workers. Since random search is stateless it can be trivially parallelized and thereby achieves a perfect linear scaling with the number of workers. Also, compared to model-based approaches which we will discuss in the next Section, we do not have to synchronize our workers but can asynchronously sample a new configuration once a worker becomes available.
+We can speed up the optimization process by parallelizing the evaluation of hyperparameter configurations across a set of workers. Since random search is stateless it can be trivially parallelized and thereby achieves a perfect linear scaling with the number of workers. Also, compared to certain approaches discussed in the next Section, we do not have to synchronize our workers but can asynchronously sample a new configuration once a worker becomes available.
 
-To avoid implementing a distributed framework that allows for parallel HPO from scratch, we will utilize SyneTune to run asynchronous random search on  our neural network example.
+As there is little to learn from implementing a distributed evaluation framework from scratch, we will use Syne Tune in order to run asynchronous random search on  our neural network example.
 
 ### Prepare Training Script
 
-For SyneTune we have to provide a training script, that gets as input arguments the hyperparameter. Additionally, we have to report the performance after each epoch back via the report() function. The training loop is the same as in our previous example
+For Syne Tune we have to provide a training script, that gets as input arguments the hyperparameter. Additionally, we have to report the performance after each epoch back via the report() function. The training loop is the same as in our previous example
+
+MS: This needs to be fixed. The script above only returns validation accuracy after all epochs.
+That would be OK at this point, you don't have to report after every epoch. Maybe it is nice for learning
+reasons to first use such a script, and only later change it to report after every epoch, and finally (maybe)
+even to introduce checkpointing? We'd make the training script successively more "complex".
 
 ```python
 from argparse import ArgumentParser
-from sagemaker_tune.report import Reporter
+from syne_tune.report import Reporter
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -103,14 +117,14 @@ metric = "accuracy"
 Next define the backend that we want to use. The option we will use is the local backend which parallelizes the HPO across multiple python process on a single instance. Alternatively, we can select the Sagemaker backend, which spans for each hyperparameter configuration a sagemaker instance.
 
 ```{.python .input  n=7}
-from sagemaker_tune.backend.local_backend import LocalBackend
+from syne_tune.backend.local_backend import LocalBackend
 backend = LocalBackend(entry_point=str(entry_point))
 ```
 
 Next we define how we want to schedule hyperparameter configurations. For random search we will use a simple FIFO scheduler.
 
 ```{.python .input  n=4}
-from sagemaker_tune.optimizer.schedulers.fifo import FIFOScheduler
+from syne_tune.optimizer.schedulers.fifo import FIFOScheduler
 
 scheduler = FIFOScheduler(
     config_space,
@@ -230,7 +244,7 @@ def hyperband(max_iter=100, eta=3, iters=20):
 ## Asynchronous Hyperband
 
 ```{.python .input  n=4}
-from sagemaker_tune.optimizer.schedulers.hyperband import HyperbandScheduler
+from syne_tune.optimizer.schedulers.hyperband import HyperbandScheduler
 
 entry_point = "train_script.py"
 mode = "min"
