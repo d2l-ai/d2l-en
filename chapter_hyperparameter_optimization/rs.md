@@ -14,7 +14,6 @@ def sample(search_space):
     for hyperparameter in search_space:
         config[hyperparameter] = search_space[hyperparameter].sample()
     return config
-
 ```
 
 ## The Random Search Loop
@@ -25,18 +24,18 @@ Now, we can implement the main optimization loop of random search, that iterates
 num_iterations = 10
 
 incumbent = None
-incumbent_performance = None
+incumbent_error = None
 incumbent_trajectory = []
 
 for i in range(num_iterations):
     config = sample(search_space)
-    performance = objective(config)
+    validation_error = objective(config)
     
     # bookkeeping
-    if incumbent is None or incumbent_performance < performance:
+    if incumbent is None or incumbent_error > validation_error:
         incumbent = config
-        incumbent_performance = performance
-    incumbent_trajectory.append(incumbent_performance)
+        incumbent_error = validation_error
+    incumbent_trajectory.append(incumbent_error)
 ```
 
 Now we can plot the optimization trajectory of the incumbent to get the anytime performance of random search:
@@ -51,6 +50,10 @@ display.set_matplotlib_formats('svg')
 plt.plot(incumbent_trajectory);
 
 ```
+
+![Anytime performance random search](img/anytime_performance_rs.png)
+:width:`400px`
+:label:`anytime_performance_rs`
 
 ## Asynchronous Random Search with SyneTune
 
@@ -191,7 +194,12 @@ def successive_halving(n, r, s, eta):
 While successive halving can substantially speed up random search, its performance mostly hinges on $r_{min}$. If we set $r_{min}$ too small we might miss configurations that would achieve a top performance with more resources. However, a too large $r_{min}$ will allocated too many resource to poorly performing configurations.
 
 Instead of using a fixed $r_{min}$, Hyperband runs successive halving iteratively as a subroutine by blancing the number of configurations $N$ and $r_{min}$, such that each round of succesive halving, called a bracket, consumes roughly the same amount of resources.
-Note that, the last bracket uses $r_{min} = r_{max}$, which means that we effectively perform random search. 
+Note that, the last bracket uses $r_{min} = r_{max}$, which means that we effectively perform random search. One can in effect show that, in the worst case, Hyperband is only a constant worse than random search.
+
+![Learning curves based on Hyperband](img/hyperband.jpeg)
+:width:`400px`
+:label:`img_samples_hb`
+
 
 ```{.python .input  n=4}
 def hyperband(max_iter=100, eta=3, iters=20):
@@ -217,16 +225,9 @@ def hyperband(max_iter=100, eta=3, iters=20):
 
 ```
 
-![Learning curves based on Hyperband](img/hyperband.jpeg)
-:width:`400px`
-:label:`img_samples_hb`
-
 ## Synchronous Hyperband
 
-
 ## Asynchronous Hyperband
-
-As
 
 ```{.python .input  n=4}
 from sagemaker_tune.optimizer.schedulers.hyperband import HyperbandScheduler
