@@ -161,7 +161,7 @@ In summary, GRUs have the following two distinguishing features:
 
 ## Implementation from Scratch
 
-To gain a better understanding of the GRU model, let's implement it from scratch. We begin by reading *The Time Machine* dataset that we used in :numref:`sec_rnn-scratch`. The code for reading the dataset is given below.
+To gain a better understanding of the GRU model, let's implement it from scratch.
 
 ```{.python .input  n=5}
 %load_ext d2lbook.tab
@@ -191,11 +191,10 @@ import tensorflow as tf
 
 ### (**Initializing Model Parameters**)
 
-The next step is to initialize the model parameters.
+The first step is to initialize the model parameters.
 We draw the weights from a Gaussian distribution
-with standard deviation to be 0.01 and set the bias to 0. The hyperparameter `num_hiddens` defines the number of hidden units.
-We instantiate all weights and biases relating to the update gate, the reset gate, the candidate hidden state,
-and the output layer.
+with standard deviation to be `sigma` and set the bias to 0. The hyperparameter `num_hiddens` defines the number of hidden units.
+We instantiate all weights and biases relating to the update gate, the reset gate, and the candidate hidden state.
 
 ```{.python .input}
 %%tab all
@@ -227,9 +226,7 @@ class GRUScratch(d2l.Module):
 
 ### Defining the Model
 
-Now we will define [**the hidden state initialization function**] `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn-scratch`, this function returns a tensor with a shape (batch size, number of hidden units) whose values are all zeros.
-
-Now we are ready to [**define the GRU model**].
+Now we are ready to [**define the GRU forward computation**].
 Its structure is the same as that of the basic RNN cell, except that the update equations are more complex.
 
 ```{.python .input}
@@ -251,13 +248,10 @@ def forward(self, inputs, H=None):
     return outputs, (H, )
 ```
 
-### Training and Predicting
+### Training
 
-[**Training**] and prediction work in exactly the same manner as in :numref:`sec_rnn-scratch`.
-After training,
-we print out the perplexity on the training set
-and the predicted sequence following
-the provided prefix "time traveller".
+[**Training**] a language model on *The Time Machine* dataset
+works in exactly the same manner as in :numref:`sec_rnn-scratch`.
 
 ```{.python .input}
 %%tab all
@@ -280,7 +274,6 @@ In high-level APIs,
 we can directly
 instantiate a GPU model.
 This encapsulates all the configuration detail that we made explicit above.
-The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out before.
 
 ```{.python .input}
 %%tab all
@@ -289,13 +282,15 @@ class GRU(d2l.RNN):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
         if tab.selected('mxnet'):
-            self.rnn = rnn.RNN(num_hiddens)
+            self.rnn = rnn.GRU(num_hiddens)
         if tab.selected('pytorch'):
             self.rnn = nn.GRU(num_inputs, num_hiddens)
         if tab.selected('tensorflow'):
             self.rnn = tf.keras.layers.GRU(num_hiddens, return_sequences=True, 
                                            return_state=True)
 ```
+
+The code is significantly faster in training as it uses compiled operators rather than Python for many details that we spelled out before.
 
 ```{.python .input}
 %%tab all
@@ -307,6 +302,11 @@ if tab.selected('tensorflow'):
         model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=4)
 trainer.fit(model, data)
 ```
+
+After training,
+we print out the perplexity on the training set
+and the predicted sequence following
+the provided prefix.
 
 ```{.python .input}
 %%tab mxnet, pytorch
