@@ -32,6 +32,12 @@ In this chapter, we provide an overview of the basics of hyperparameter optimiza
 ]
 ```
 
+```{.python .input}
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
 ```{.python .input  n=16}
 # TODO: can we import this from the d2l package?
 
@@ -197,6 +203,23 @@ the width of the $l$-th layer is relevant only if the network has at least $l+1$
 over and probing the underlying machine learning algorithm at these values in the hope that 
 one of them will be close to the best hyperparameters $\mathbf{x}_*$. 
 
+## Searcher
+
+```{.python .input  n=45}
+class Searcher(d2l.HyperParameters): #@save
+    def sample_configuration():
+        raise NotImplementedError
+```
+
+## Scheduler
+
+```{.python .input  n=26}
+class FIFOScheduler(d2l.HyperParameters):
+    def __init__(searcher):
+        self.save_hyperparameters()
+    def suggest():
+        return self.searcher.sample_configuration()
+```
 
 ## How can we evaluate hyperparameter optimization methods?
 
@@ -218,6 +241,51 @@ criterion function evaluations, this metric is not only more relevant in practic
 scheduling techniques (e.g., synchronous versus asynchronous; early stopping versus full training). It also captures the decision making
 time of the HPO method itself, which for some model-based techniques can be significant.
 
+```{.python .input  n=42}
+class Tuner(d2l.HyperParameters): #@save
+    def __init__(scheduler, objective):
+        self.save_hyperparameters()
+        
+        # for bookeeping
+        self.incumbent = None
+        self.incumbent_error = None
+        self.incumbent_trajectory = []
+        self.cumulative_runtime = []
+        self.current_time = 0
+```
+
+```{.python .input  n=43}
+@d2l.add_to_class(Tuner)
+def bookkeeping(self, config, error, runtime):
+
+    if self.incumbent is None or self.incumbent_error > error:
+        self.incumbent = config
+        self.incumbent_error = error
+        
+    self.incumbent_trajectory.append(self.incumbent_error)
+    
+    self.current_time =+ cost
+    self.cumulative_runtime(self.current_time)
+```
+
+```{.python .input  n=44}
+@d2l.add_to_class(Tuner)
+def run(self, num_iterations):
+    for i in range(num_iterations):
+        start_time = time.time()
+        config = self.scheduler.suggest()
+        
+        error = self.objective(config)
+        
+        runtime = time.time() - start_time
+        
+        self.bookeeping(config, error, runtime)
+```
+
 ## Summary
 
 ## Exercise
+
+```{.python .input}
+
+```

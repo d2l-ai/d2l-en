@@ -15,11 +15,70 @@ levels with fewer function evaluations.
 While random search is implemented in Syne Tune, let us code it up from scratch. First, we implement a method that allows us to sample random configurations from our search space. Each hyperparameter will be sampled independently from the other hyperparameters.
 
 ```{.python .input  n=1}
-def sample_config(search_space):
+# def sample_config(search_space):
+#     config = {}
+#     for hyperparameter in search_space:
+#         config[hyperparameter] = search_space[hyperparameter].sample()
+#     return config
+```
+
+```{.python .input  n=4}
+class RandomSearcher(Seacher):
+    def __init__(search_space):
+        self.save_hyperparameters()
+```
+
+```{.json .output n=4}
+[
+ {
+  "ename": "NameError",
+  "evalue": "name 'Seacher' is not defined",
+  "output_type": "error",
+  "traceback": [
+   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+   "\u001b[0;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+   "\u001b[0;32m/var/folders/ld/vzcn3j2d7yg493b1c6m0ypprdqgxkm/T/ipykernel_70199/4079580290.py\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0;32mclass\u001b[0m \u001b[0mRandomSearcher\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mSeacher\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      2\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0m__init__\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0msearch_space\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m         \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msave_hyperparameters\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;31mNameError\u001b[0m: name 'Seacher' is not defined"
+  ]
+ }
+]
+```
+
+```{.python .input  n=3}
+from d2l import torch as d2l
+
+@d2l.add_to_class(RandomSearcher)
+def sample_configuration(self):
     config = {}
-    for hyperparameter in search_space:
-        config[hyperparameter] = search_space[hyperparameter].sample()
+    for hyperparameter in self.search_space:
+        config[hyperparameter] = self.search_space[hyperparameter].sample()
     return config
+```
+
+```{.json .output n=3}
+[
+ {
+  "ename": "ModuleNotFoundError",
+  "evalue": "No module named 'd2l'",
+  "output_type": "error",
+  "traceback": [
+   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+   "\u001b[0;31mModuleNotFoundError\u001b[0m                       Traceback (most recent call last)",
+   "\u001b[0;32m/var/folders/ld/vzcn3j2d7yg493b1c6m0ypprdqgxkm/T/ipykernel_70199/3708494335.py\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0;32mfrom\u001b[0m \u001b[0md2l\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mtorch\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      2\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0;34m@\u001b[0m\u001b[0md2l\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0madd_to_class\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mRandomSearcher\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0;32mdef\u001b[0m \u001b[0msample_configuration\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m     \u001b[0mconfig\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;34m{\u001b[0m\u001b[0;34m}\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;31mModuleNotFoundError\u001b[0m: No module named 'd2l'"
+  ]
+ }
+]
+```
+
+searcher = RandomSearcher(search_space)
+scheduler = FIFOScheduler(searcher)
+tuner = Tuner(scheduler, objective)
+tuner.run()
+
+```{.python .input}
+board = d2l.ProgressBoard(xlabel='time', ylabel='error')
+board.draw(tuner.runtime, tuner.incumbent_error, 'random search', every_n=1)
 ```
 
 ## The Random Search Loop
@@ -27,21 +86,19 @@ def sample_config(search_space):
 Now, we can implement the main optimization loop of random search, that iterates until we reach the final number of iterations specified by the user. In each iteration, we first sample a hyperparameter configuration from the subroutine that we implemented above and then train and validate the model with the new candidate. We also maintain the current incumbent, i.e the best configuration we have found so far. This will be the configuration we will later return as the final configuration.
 
 ```{.python .input  n=4}
-num_iterations = 10
+# TODO: can we use progress bar here
 
-incumbent = None
-incumbent_error = None
-incumbent_trajectory = []
+def random_search(objective, num_iterations=10):
 
-for i in range(num_iterations):
-    config = sample_config(search_space)
-    validation_error = objective(config)
-    
-    # bookkeeping
-    if incumbent is None or incumbent_error > validation_error:
-        incumbent = config
-        incumbent_error = validation_error
-    incumbent_trajectory.append(incumbent_error)
+
+
+    for i in range(num_iterations):
+        config = sample_config(search_space)
+        validation_error = objective(config)
+
+
+        
+    return incumbent, incumbent_trajectory
 ```
 
 MS: We should consistently show the any-time performance as function of wall-clock time. In the script
@@ -164,36 +221,85 @@ In the example above every neural network will be trained for the same amount of
 :width:`400px`
 :label:`img_samples_lc`
 
-Based on this observation, we can free up compute resources by early stopping the evaluation of poorly performing configuration and allocating more resources to more promising configurations. This will eventually speed up the optimization process, since we have a higher throughput of configurations that we can try. More formally, we expand our definition in Section :ref:`sec_definition_hpo`, such that our objective function $f(\mathbf{x}, r)$ gets an additional input $r \in [r_{min}, r_{max}]$ that specifies the amount of resource that we are willing to spend for the evaluation of $\mathbf{x}$. We assume that both, the correlation to $f(\mathbf{x}) = f(\mathbf{x})$ as well as the computational cost $c(\mathbf{x}, r)$ increases with $r$. Typically $r$ represents the number of epochs for training the neural network. But also other resources are possible, such as the training dataset size or the number of cross-validation folds.  
+Based on this observation, we can free up compute resources by early stopping the evaluation of poorly performing configuration and allocating more resources to more promising configurations. This will eventually speed up the optimization process, since we have a higher throughput of configurations that we can try. More formally, we expand our definition in Section :ref:`sec_definition_hpo`, such that our objective function $f(\mathbf{x}, r)$ gets an additional input $r \in [r_{min}, r_{max}]$ that specifies the amount of resource that we are willing to spend for the evaluation of $\mathbf{x}$. We assume that both, the correlation to $f(\mathbf{x}) = f(\mathbf{x})$ as well as the computational cost $c(\mathbf{x}, r)$ increases with $r$. Typically $r$ represents the number of epochs for training the neural network. But also other resources are possible, such as the training dataset size or the number of cross-validation folds.
+
+```{.python .input}
+def objective(config, r = 10):
+    batch_size = config['batch_size']
+    lr = config['learning_rate']
+    momentum = config['momentum']
+    dropout = config['dropout']
+
+    model = AlexNet(lr=lr, momentum=momentum, dropout=dropout)
+    trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=0)
+    data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
+    
+    for i in range(r)
+        trainer.fit_epoch()
+        
+        # TODO: checkpoint
+        
+    # TODO: get validation error
+        
+    return validation_error
+```
+
+```{.python .input  n=1}
+# TODO: implement checkpointing functionality
+```
 
 ## Successive Halving
 
 One simple extension to random search is successive halving which iteratively terminates the evaluation of poorly performing configurations. Given a set of $N$ randomly sampled hyperparameters configurations and a halving constant $\eta \in \mathbb{Z}_+$ and $\eta \geq 2$, where, due to simplicitly we assume that $\frac{r_{max}}{r_{min}} = \eta^K$, with $K \in \mathbb{Z}$. Successive halving starts with evaluating all $N$ configuration with $r_{min}$ amount of resources. It then sorts all configuration based on the their observed performances, and only continues the evaluation of the top $\frac{N}{\eta}$ for $\eta r_{min}$ amount of resources. Each decision points is called a rung, and the full set of rungs is given by $\mathcal{R} \in \{r_{min} \eta^k | k=0, ..., K  \}$. This step is iterated until we reach $r_{max}$.
 
+```{.python .input}
+class SuccessiveHalving(d2l.HyperParameters):
+    def __init__(searcher, eta, r_min, s=1):
+       
+        self.save_hyperparameters()
+        
+        self.all_configs = [self.searcher.sample_configuration() for i in range(n)] 
+        
+        self.errors = []
+        
+    def suggest():
+        
+        
+        r = int(self.r_min * self.eta ** ( i ))
+        
+        
+        return config, r
+        
+        
+    def on_trial_report(results)
+        
+```
+
 ```{.python .input  n=4}
-def successive_halving(n, r, s, eta):
-    """
-    Run one iteration of successive halving
-    :param n: initial number of hyperparameter configurations
-    :param r: initial number of iterations 
-    :param s: defines the tradeoff between r and n
-    """
-    X = [ sample(search_space) for i in range(n)] 
+# TODO: can we use progress bar here
+# def successive_halving(n, r, s, eta):
+#     """
+#     Run one iteration of successive halving
+#     :param n: initial number of hyperparameter configurations
+#     :param r: initial number of iterations 
+#     :param s: defines the tradeoff between r and n
+#     """
+#     X = [ sample(search_space) for i in range(n)] 
     
-    for i in range(s+1):
-        val_losses = []
-        # compute the number of configs n_i and epochs r_i
-        n_configs = len(X)
+#     for i in range(s+1):
+#         val_losses = []
+#         # compute the number of configs n_i and epochs r_i
+#         n_configs = len(X)
         
-        n_iterations = int(r * eta ** ( i ))
+#         n_iterations = int(r * eta ** ( i ))
         
         
-        # run all n_i configuration for r_i epochs 
-        val_losses = [objective(xi, epochs=n_iterations) for xi in X]
+#         # run all n_i configuration for r_i epochs 
+#         val_losses = [objective(xi, r=n_iterations) for xi in X]
             
-        # keep only the best n_i/eta configurations
-        idx = np.argsort(val_losses)[:(n_configs // eta)]
-        X = [X[i] for i in idx]
+#         # keep only the best n_i/eta configurations
+#         idx = np.argsort(val_losses)[:(n_configs // eta)]
+#         X = [X[i] for i in idx]
 ```
 
 <!-- ![Learning curves of random hyperparameter configurations](../../img/samples_lc.pdf) -->
@@ -213,7 +319,6 @@ Note that, the last bracket uses $r_{min} = r_{max}$, which means that we effect
 ![Learning curves based on Hyperband](img/hyperband.jpeg)
 :width:`400px`
 :label:`img_samples_hb`
-
 
 ```{.python .input  n=4}
 def hyperband(max_iter=100, eta=3, iters=20):
