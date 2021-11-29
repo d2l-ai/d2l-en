@@ -425,7 +425,7 @@ d2l.show_heatmaps(
 #@tab tensorflow
 # Plus one to include the end-of-sequence token
 d2l.show_heatmaps(attention_weights[:, :, :, :len(engs[-1].split()) + 1],
-                  xlabel='Key posistions', ylabel='Query posistions')
+                  xlabel='Key positions', ylabel='Query positions')
 ```
 
 ## Summary
