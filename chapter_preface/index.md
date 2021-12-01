@@ -20,7 +20,7 @@ that we focus on in this book---were
 generally regarded as outmoded.
 
 
-In just the past five years, deep learning has taken the world by surprise,
+In just the past few years, deep learning has taken the world by surprise,
 driving rapid progress in such diverse fields 
 as computer vision, natural language processing, 
 automatic speech recognition, reinforcement learning, 
