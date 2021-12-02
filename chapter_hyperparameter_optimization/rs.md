@@ -1,3 +1,9 @@
+```{.python .input  n=1}
+# the pypi version seems outdated, load the latest github version directly
+import sys
+sys.path.append('/Users/kleiaaro/git/d2l-en/')
+```
+
 # Random Search
 
 The first method we will look at is called random search. Recall from Section :ref:`sec_intro_search_spaces`
@@ -14,7 +20,7 @@ levels with fewer function evaluations.
 
 While random search is implemented in Syne Tune, let us code it up from scratch. First, we implement a method that allows us to sample random configurations from our search space. Each hyperparameter will be sampled independently from the other hyperparameters.
 
-```{.python .input  n=1}
+```{.python .input  n=2}
 # def sample_config(search_space):
 #     config = {}
 #     for hyperparameter in search_space:
@@ -22,23 +28,26 @@ While random search is implemented in Syne Tune, let us code it up from scratch.
 #     return config
 ```
 
-```{.python .input  n=4}
-class RandomSearcher(Seacher):
-    def __init__(search_space):
-        self.save_hyperparameters()
+```{.python .input  n=6}
+from d2l import torch as d2l
+
+# class RandomSearcher(d2l.Searcher):
+#     def __init__(search_space):
+#         self.save_hyperparameters()
 ```
 
-```{.json .output n=4}
+```{.json .output n=6}
 [
  {
-  "ename": "NameError",
-  "evalue": "name 'Seacher' is not defined",
+  "ename": "AttributeError",
+  "evalue": "partially initialized module 'd2l.torch' has no attribute 'try_all_gpus' (most likely due to a circular import)",
   "output_type": "error",
   "traceback": [
    "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
-   "\u001b[0;31mNameError\u001b[0m                                 Traceback (most recent call last)",
-   "\u001b[0;32m/var/folders/ld/vzcn3j2d7yg493b1c6m0ypprdqgxkm/T/ipykernel_70199/4079580290.py\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0;32mclass\u001b[0m \u001b[0mRandomSearcher\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mSeacher\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      2\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0m__init__\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0msearch_space\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m         \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msave_hyperparameters\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;31mNameError\u001b[0m: name 'Seacher' is not defined"
+   "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
+   "\u001b[0;32m/var/folders/ld/vzcn3j2d7yg493b1c6m0ypprdqgxkm/T/ipykernel_13686/275787194.py\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0;32mfrom\u001b[0m \u001b[0md2l\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mtorch\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      2\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0;31m# class RandomSearcher(d2l.Searcher):\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0;31m#     def __init__(search_space):\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m \u001b[0;31m#         self.save_hyperparameters()\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;32m~/git/d2l-en/d2l/torch.py\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m    614\u001b[0m \u001b[0;31m# Defined in file: ./chapter_computer-vision/image-augmentation.md\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    615\u001b[0m def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,\n\u001b[0;32m--> 616\u001b[0;31m                devices=d2l.try_all_gpus()):\n\u001b[0m\u001b[1;32m    617\u001b[0m     \u001b[0;34m\"\"\"Train a model with mutiple GPUs (defined in Chapter 13).\"\"\"\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    618\u001b[0m     \u001b[0mtimer\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mnum_batches\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mTimer\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mlen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtrain_iter\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;31mAttributeError\u001b[0m: partially initialized module 'd2l.torch' has no attribute 'try_all_gpus' (most likely due to a circular import)"
   ]
  }
 ]
@@ -234,7 +243,7 @@ def objective(config, r = 10):
     trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=0)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     
-    for i in range(r)
+    for i in range(r):
         trainer.fit_epoch()
         
         # TODO: checkpoint
@@ -252,7 +261,7 @@ def objective(config, r = 10):
 
 One simple extension to random search is successive halving which iteratively terminates the evaluation of poorly performing configurations. Given a set of $N$ randomly sampled hyperparameters configurations and a halving constant $\eta \in \mathbb{Z}_+$ and $\eta \geq 2$, where, due to simplicitly we assume that $\frac{r_{max}}{r_{min}} = \eta^K$, with $K \in \mathbb{Z}$. Successive halving starts with evaluating all $N$ configuration with $r_{min}$ amount of resources. It then sorts all configuration based on the their observed performances, and only continues the evaluation of the top $\frac{N}{\eta}$ for $\eta r_{min}$ amount of resources. Each decision points is called a rung, and the full set of rungs is given by $\mathcal{R} \in \{r_{min} \eta^k | k=0, ..., K  \}$. This step is iterated until we reach $r_{max}$.
 
-```{.python .input}
+```{.python .input  n=4}
 class SuccessiveHalving(d2l.HyperParameters):
     def __init__(searcher, eta, r_min, s=1):
        
@@ -270,8 +279,6 @@ class SuccessiveHalving(d2l.HyperParameters):
         
         return config, r
         
-        
-    def on_trial_report(results)
         
 ```
 
