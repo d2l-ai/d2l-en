@@ -111,7 +111,7 @@ The number of hidden units is still 256.
 The only difference is that we now (**select a nontrivial number of hidden layers by specifying the value of `num_layers`.**)
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, tensorflow
 class StackedRNNScratch(d2l.Module):
     def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):        
         super().__init__()
@@ -119,6 +119,17 @@ class StackedRNNScratch(d2l.Module):
         self.rnns = [d2l.RNNScratch(num_inputs if i==0 else num_hiddens, 
                                     num_hiddens, sigma) 
                      for i in range(num_layers)]
+```
+
+```{.python .input}
+%%tab pytorch
+class StackedRNNScratch(d2l.Module):
+    def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):        
+        super().__init__()
+        self.save_hyperparameters()
+        self.rnns = nn.Sequential(*[d2l.RNNScratch(
+            num_inputs if i==0 else num_hiddens, num_hiddens, sigma)
+                                    for i in range(num_layers)])
 ```
 
 ```{.python .input}
@@ -134,11 +145,18 @@ def forward(self, inputs, Hs=None):
 
 ```{.python .input}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=16)
-rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
-                              num_hiddens=32, num_layers=2)
-model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
+data = d2l.TimeMachine(batch_size=1024, num_steps=32)
+if tab.selected('mxnet', 'pytorch'):
+    rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
+                                  num_hiddens=32, num_layers=2)
+    model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=2)
+    trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
+                                  num_hiddens=32, num_layers=2)
+        model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=2)
+    trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -185,8 +203,22 @@ if tab.selected('mxnet', 'tensorflow'):
     gru = GRU(num_hiddens=32, num_layers=2)
 if tab.selected('pytorch'):
     gru = GRU(num_inputs=len(data.vocab), num_hiddens=32, num_layers=2)
-model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=1)
+if tab.selected('mxnet', 'pytorch'):
+    model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=2)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=2)
 trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab mxnet, pytorch
+model.predict('it has', 20, data.vocab, d2l.try_gpu())
+```
+
+```{.python .input}
+%%tab tensorflow
+model.predict('it has', 20, data.vocab)
 ```
 
 ## Summary
@@ -197,7 +229,7 @@ trainer.fit(model, data)
 
 ## Exercises
 
-1. Try to implement a two-layer RNN from scratch using the single layer implementation we discussed in :numref:`sec_rnn_scratch`.
+1. Try to implement a two-layer RNN from scratch using the single layer implementation we discussed in :numref:`sec_rnn-scratch`.
 2. Replace the LSTM by a GRU and compare the accuracy and training speed.
 3. Increase the training data to include multiple books. How low can you go on the perplexity scale?
 4. Would you want to combine sources of different authors when modeling text? Why is this a good idea? What could go wrong?

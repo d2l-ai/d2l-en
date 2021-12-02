@@ -106,7 +106,7 @@ We denote vectors by bold lowercase letters,
 
 Vectors are implemented as $1^{\mathrm{st}}$-order tensors.
 In general, such tensors can have arbitrary lengths,
-subject to memory limitations. Caution: in Python, like in most programming languages, vector indices start at $0$, also known as *zero-based indexing*, whereas in linear algebra subscripts begin at $1$ (one-based indexing). 
+subject to memory limitations. Caution: in Python, like in most programming languages, vector indices start at $0$, also known as *zero-based indexing*, whereas in linear algebra subscripts begin at $1$ (one-based indexing).
 
 ```{.python .input}
 x = np.arange(3)
@@ -445,7 +445,7 @@ a + X, (a * X).shape
 ```
 
 ## Reduction
-:label:`subseq_lin-alg-reduction`
+:label:`subsec_lin-alg-reduction`
 
 Often, we wish to calculate [**the sum of a tensor's elements.**]
 To express the sum of the elements in a vector $\mathbf{x}$ of length $n$,
@@ -585,7 +585,7 @@ tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 ```
 
 ## Non-Reduction Sum
-:label:`subseq_lin-alg-non-reduction`
+:label:`subsec_lin-alg-non-reduction`
 
 Sometimes it can be useful to [**keep the number of axes unchanged**]
 when invoking the function for calculating the sum or mean. 
@@ -1063,8 +1063,7 @@ we wrap up this section here.
 If you are eager to learn more linear algebra,
 there are many excellent books and online resources.
 For a more advanced crash course, consider checking out
-:cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008` 
-or our [online appendix on linear algebra](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/geometry-linear-algebraic-ops.html).
+:cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008`.
 
 To recap:
 

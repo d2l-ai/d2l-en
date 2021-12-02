@@ -1454,7 +1454,7 @@ over the past decade.
   At the same time, small batches limit the efficiency of GPUs.
   Hence, training on 1024 GPUs with a minibatch size of,
   say 32 images per batch amounts to an aggregate minibatch
-  of about 32000 images. Recent work, first by Li :cite:`Li.2017`,
+  of about 32000 images. Recent work, first by :cite:`Li.2017`,
   and subsequently by :cite:`You.Gitman.Ginsburg.2017`
   and :cite:`Jia.Song.He.ea.2018` pushed the size up to 64000 observations,
   reducing training time for the ResNet-50 model on the ImageNet dataset to less than 7 minutes.

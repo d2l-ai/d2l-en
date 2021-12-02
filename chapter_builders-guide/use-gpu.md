@@ -140,8 +140,6 @@ from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
-
-
 ```
 
 ```{.python .input}
@@ -478,6 +476,23 @@ net.layers[0].weights[0].device, net.layers[0].weights[1].device
 Let the trainer to support GPU.
 
 ```{.python .input}
+%%tab mxnet
+@d2l.add_to_class(d2l.Module)  #@save
+def set_scratch_params_device(self, device):
+    for attr in dir(self):
+        a = getattr(self, attr)
+        if isinstance(a, np.ndarray):
+            with autograd.record():
+                setattr(self, attr, a.as_in_ctx(device))
+            getattr(self, attr).attach_grad()
+        if isinstance(a, d2l.Module):
+            a.set_scratch_params_device(device)
+        if isinstance(a, list):
+            for elem in a:
+                elem.set_scratch_params_device(device)
+```
+
+```{.python .input}
 %%tab mxnet, pytorch
 @d2l.add_to_class(d2l.Trainer)  #@save
 def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
@@ -497,6 +512,7 @@ def prepare_model(self, model):
     if self.gpus:
         if tab.selected('mxnet'):
             model.collect_params().reset_ctx(self.gpus[0])
+            model.set_scratch_params_device(self.gpus[0])
         if tab.selected('pytorch'):
             model.to(self.gpus[0])
     self.model = model

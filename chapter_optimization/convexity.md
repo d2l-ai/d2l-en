@@ -321,7 +321,7 @@ In general, adding penalties is a good way of ensuring approximate constraint sa
 
 ### Projections
 
-An alternative strategy for satisfying constraints is projections. Again, we encountered them before, e.g., when dealing with gradient clipping in :numref:`sec_rnn_scratch`. There we ensured that a gradient has length bounded by $\theta$ via
+An alternative strategy for satisfying constraints is projections. Again, we encountered them before, e.g., when dealing with gradient clipping in :numref:`sec_rnn-scratch`. There we ensured that a gradient has length bounded by $\theta$ via
 
 $$\mathbf{g} \leftarrow \mathbf{g} \cdot \mathrm{min}(1, \theta/\|\mathbf{g}\|).$$
 

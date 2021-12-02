@@ -121,12 +121,13 @@ def get_scratch_params(self):
 @d2l.add_to_class(d2l.Module)  #@save
 def parameters(self):
     params = self.collect_params()
-    return params if len(params.keys()) else self.get_scratch_params()
+    return params if isinstance(params, gluon.parameter.ParameterDict) and len(
+        params.keys()) else self.get_scratch_params()
 ```
 
 ## Summary
 
-Classification is a sufficiently frequently used problem type that it warrants its own convenience functions. Note that there is a difference between (classification) accuracy that we want to minimize and the logistic loss function that we are actually minimizing. Fortunately, our specific choice of loss function ensures that minimizing it will also lead to maximum accuracy. This is the case since the maximum likelihood estimator is consistent. It follows as a special case of the Cramer-Rao bound :cite:`cramer1946mathematical,radhakrishna1945information`. For more work on consistency see also :cite:`zhang2004statistical`.
+Classification is a sufficiently frequently used problem type that it warrants its own convenience functions. Note that there is a difference between (classification) accuracy that we want to minimize and the logistic loss function that we are actually minimizing. Fortunately, our specific choice of loss function ensures that minimizing it will also lead to maximum accuracy. This is the case since the maximum likelihood estimator is consistent. It follows as a special case of the Cramer-Rao bound :cite:`Cramer.1946,Radhakrishna-Rao.1945`. For more work on consistency see also :cite:`Zhang.2004`.
 
 More generally, though, the decision of which category to pick is far from trivial. For instance, when deciding where to assign an e-mail to, mistaking a "Primary" e-mail for a "Social" e-mail might be undesirable but far less disastrous than moving it to the spam folder (and later automatically deleting it). As such, we will tend to err on the side of caution with regard to assigning any e-mail to the "Spam" folder, rather than picking the most likely category.
 
@@ -135,4 +136,3 @@ More generally, though, the decision of which category to pick is far from trivi
 1. Denote by $L_v$ the validation loss, and let $L_v^q$ be its quick and dirty estimate computed by the loss function averaging in this section. Lastly, denote by $l_v^b$ the loss on the last minibatch. Express $L_v$ in terms of $L_v^q$, $l_v^b$, and the sample and minibatch sizes.
 1. Show that the quick and dirty estimate $L_v^q$ is unbiased. That is, show that $E[L_v] = E[L_v^q]$. Why would you still want to use $L_v$ instead?
 1. Given a multiclass classification loss, denoting by $l(y,y')$ the penalty of estimating $y'$ when we see $y$ and given a probabilty $p(y|x)$, formulate the rule for an optimal selection of $y'$. Hint: express the expected loss, using $l$ and $p(y|x)$.
-

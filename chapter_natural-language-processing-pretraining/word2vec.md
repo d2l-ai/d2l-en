@@ -16,10 +16,10 @@ the basic knowledge of natural language processing.
 
 ## One-Hot Vectors Are a Bad Choice
 
-We used one-hot vectors to represent words (characters are words) in :numref:`sec_rnn_scratch`.
+We used one-hot vectors to represent words (characters are words) in :numref:`sec_rnn-scratch`.
 Suppose that the number of different words in the dictionary (the dictionary size) is $N$,
 and each word corresponds to
-a different integer (index) from $0$ to $N−1$.
+a different integer (index) from $0$ to $N-1$.
 To obtain the one-hot vector representation
 for any word with index $i$,
 we create a length-$N$ vector with all 0s
@@ -175,7 +175,7 @@ the conditional probability of generating the center word "loves" based on the c
 $$P(\textrm{"loves"}\mid\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}).$$
 
 ![The continuous bag of words model considers the conditional probability of generating the center word given its surrounding context words.](../img/cbow.svg)
-:eqlabel:`fig_cbow`
+:label:`fig_cbow`
 
 
 Since there are multiple context words

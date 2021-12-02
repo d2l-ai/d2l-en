@@ -44,6 +44,7 @@ the advanced modeling chapters that follow rely heavily on these techniques.
 
 model-construction
 parameters
+init-param
 deferred-init
 custom-layer
 read-write

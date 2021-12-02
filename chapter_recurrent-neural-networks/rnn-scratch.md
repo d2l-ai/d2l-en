@@ -1,5 +1,5 @@
 # Recurrent Neural Network Implementation from Scratch
-:label:`sec_rnn_scratch`
+:label:`sec_rnn-scratch`
 
 In this section we will implement an RNN
 from scratch
@@ -8,7 +8,7 @@ according to our descriptions
 in :numref:`sec_rnn`.
 Such a model
 will be trained on H. G. Wells' *The Time Machine*.
-As before, we start by reading the dataset first, which is introduced in :numref:`sec_language_model`.
+As before, we start by reading the dataset first, which is introduced in :numref:`sec_text-sequence`.
 
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
@@ -44,13 +44,13 @@ import tensorflow as tf
 
 ## RNN Model
 
-Next, we define the model class.
+Following the descriptions in
+:numref:`subsec_rnn_w_hidden_states`,
+we begin by defining the class for the RNN model
+with its model parameters only.
 The number of hidden units `num_hiddens` is a tunable hyperparameter.
-When training language models,
-the inputs and outputs are from the same vocabulary.
-The dataset is relatively small, we will train with hundreds of epochs, so we choose to plot for every 10 epochs.
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab all
 class RNNScratch(d2l.Module):  #@save
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
@@ -58,11 +58,14 @@ class RNNScratch(d2l.Module):  #@save
         self.save_hyperparameters()
         if tab.selected('mxnet'):
             self.W_xh = d2l.randn(num_inputs, num_hiddens) * sigma
-            self.W_hh = d2l.randn(num_hiddens, num_hiddens) * sigma
+            self.W_hh = d2l.randn(
+                num_hiddens, num_hiddens) * sigma
             self.b_h = d2l.zeros(num_hiddens)
         if tab.selected('pytorch'):
-            self.W_xh = nn.Parameter(d2l.randn(num_inputs, num_hiddens) * sigma)
-            self.W_hh = nn.Parameter(d2l.rand(num_hiddens, num_hiddens) * sigma)
+            self.W_xh = nn.Parameter(
+                d2l.randn(num_inputs, num_hiddens) * sigma)
+            self.W_hh = nn.Parameter(
+                d2l.rand(num_hiddens, num_hiddens) * sigma)
             self.b_h = nn.Parameter(d2l.zeros(num_hiddens))
         if tab.selected('tensorflow'):
             self.W_xh = tf.Variable(d2l.normal(
@@ -72,41 +75,11 @@ class RNNScratch(d2l.Module):  #@save
             self.b_h = tf.Variable(d2l.zeros(num_hiddens))        
 ```
 
-To define an RNN model,
-we first need [**an `init_rnn_state` function
-to return the hidden state at initialization.**]
-It returns a tensor filled with 0 and with a shape of (batch size, number of hidden units).
-Using tuples makes it easier to handle situations where the hidden state contains multiple variables,
-which we will encounter in later sections.
-
-```{.python .input}
-%%tab all
-def check_len(a, n):  #@save
-    assert len(a) == n, f'list\'s len {len(a)} != expected length {n}'
-    
-def check_shape(a, shape):  #@save
-    assert a.shape == shape, \
-            f'tensor\'s shape {a.shape} != expected shape {shape}'
-```
-
-```{.python .input}
-%%tab all
-@d2l.add_to_class(RNNScratch)  #@save
-def forward(self, inputs, H=None):    
-    outputs = []
-    for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs)        
-        H = d2l.tanh(d2l.matmul(X, self.W_xh) + (
-            d2l.matmul(H, self.W_hh) if H is not None else 0) + self.b_h)
-        outputs.append(H)
-    return outputs, H
-```
-
-[**The following `rnn` function defines how to compute the hidden state and output
-at a time step.**]
+[**The following `forward` method defines how to compute the output and hidden state at a time step.**]
 Note that
 the RNN model
 loops through the outermost dimension of `inputs`
-so that it updates hidden states `H` of a minibatch,
+so that it updates hidden state of a minibatch,
 time step by time step.
 Besides,
 the activation function here uses the $\tanh$ function.
@@ -117,16 +90,59 @@ distributed over the real numbers.
 
 ```{.python .input}
 %%tab all
+@d2l.add_to_class(RNNScratch)  #@save
+def forward(self, inputs, state=None):
+    if state is not None:
+        state, = state
+        if tab.selected('tensorflow'):
+            state = d2l.reshape(state, (-1, self.W_hh.shape[0]))
+    outputs = []
+    for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs) 
+        state = d2l.tanh(d2l.matmul(X, self.W_xh) + (
+            d2l.matmul(state, self.W_hh) if state is not None else 0)
+                         + self.b_h)
+        outputs.append(state)
+    return outputs, state
+```
+
+For example, we can feed a minibatch of input sequences
+into an RNN model as follows.
+
+```{.python .input}
+%%tab all
 batch_size, num_inputs, num_hiddens, num_steps = 2, 16, 32, 100
 rnn = RNNScratch(num_inputs, num_hiddens)
 X = d2l.ones((num_steps, batch_size, num_inputs))
-outputs, H = rnn(X)
-d2l.check_len(outputs, num_steps)
-d2l.check_shape(outputs[0], (batch_size, num_hiddens))
-d2l.check_shape(H, (batch_size, num_hiddens))
+outputs, state = rnn(X)
 ```
 
-## RNN LM
+Let's check whether the RNN model
+produces results of the correct shapes,
+e.g., to ensure that the dimensionality of the hidden state remains unchanged.
+
+```{.python .input}
+%%tab all
+def check_len(a, n):  #@save
+    assert len(a) == n, f'list\'s len {len(a)} != expected length {n}'
+    
+def check_shape(a, shape):  #@save
+    assert a.shape == shape, \
+            f'tensor\'s shape {a.shape} != expected shape {shape}'
+
+d2l.check_len(outputs, num_steps)
+d2l.check_shape(outputs[0], (batch_size, num_hiddens))
+d2l.check_shape(state, (batch_size, num_hiddens))
+```
+
+## RNN-based Language Model
+
+The following `RNNLMScratch` class defines 
+an RNN-based language model,
+where an RNN implemented from scratch
+is passed via the `rnn` argument
+of the `__init__` method.
+When training language models, the inputs and outputs are from the same vocabulary. Hence, they have the same dimension, which is equal to the vocabulary size.
+Note that we use perplexity to evaluate the model. As discussed in :numref:`subsec_perplexity`, this ensures that sequences of different length are comparable.
 
 ```{.python .input}
 %%tab all
@@ -144,18 +160,28 @@ class RNNLMScratch(d2l.Classification):  #@save
             for param in self.get_scratch_params():
                 param.attach_grad()
         if tab.selected('pytorch'):
-            self.W_hq = nn.Parameter(d2l.randn(
-                self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma)
+            self.W_hq = nn.Parameter(
+                d2l.randn(
+                    self.rnn.num_hiddens, self.vocab_size) * self.rnn.sigma)
             self.b_q = nn.Parameter(d2l.zeros(self.vocab_size)) 
         if tab.selected('tensorflow'):
             self.W_hq = tf.Variable(d2l.normal(
                 (self.rnn.num_hiddens, self.vocab_size)) * self.rnn.sigma)
-            self.b_q = tf.Variable(d2l.zeros(self.vocab_size))            
+            self.b_q = tf.Variable(d2l.zeros(self.vocab_size))
+        
+    def training_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('ppl', d2l.exp(l), train=True)
+        return l
+        
+    def validation_step(self, batch):
+        l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('ppl', d2l.exp(l), train=False)
 ```
 
 ### [**One-Hot Encoding**]
 
-Recall that each token is represented as a numerical index in `train_iter`.
+Recall that each token is represented as a numerical index in the vocabulary.
 Feeding these indices directly to a neural network might make it hard to
 learn.
 We often represent each token as a more expressive feature vector.
@@ -172,18 +198,18 @@ This vector is the one-hot vector of the original token. The one-hot vectors wit
 npx.one_hot(np.array([0, 2]), 5)
 ```
 
-```{.python .input  n=7}
+```{.python .input  n=11}
 %%tab pytorch
 F.one_hot(torch.tensor([0, 2]), 5)
 ```
 
-```{.python .input  n=8}
+```{.python .input  n=12}
 %%tab tensorflow
 tf.one_hot(tf.constant([0, 2]), 5)
 ```
 
 (**The shape of the minibatch**) that we sample each time (**is (batch size, number of time steps).
-The `one_hot` function transforms such a minibatch into a three-dimensional tensor with the last dimension equals to the vocabulary size (`len(vocab)`).**)
+The `one_hot` method transforms such a minibatch into a three-dimensional tensor with the last dimension equals to the vocabulary size (`len(vocab)`).**)
 We often transpose the input so that we will obtain an
 output of shape
 (number of time steps, batch size, vocabulary size).
@@ -191,43 +217,44 @@ This will allow us
 to more conveniently
 loop through the outermost dimension
 for updating hidden states of a minibatch,
-time step by time step.
+time step by time step
+(e.g., in the above `forward` method).
 
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
 def one_hot(self, X):    
-    # output shape: (num_steps, batch_size, vocab_size)    
-    if tab.selected('pytorch'):
-        return F.one_hot(X.T, self.vocab_size).type(torch.float32)
+    # Output shape: (num_steps, batch_size, vocab_size)    
     if tab.selected('mxnet'):
         return npx.one_hot(X.T, self.vocab_size)
+    if tab.selected('pytorch'):
+        return F.one_hot(X.T, self.vocab_size).type(torch.float32)
     if tab.selected('tensorflow'):
         return tf.one_hot(tf.transpose(X), self.vocab_size)
 ```
 
-### Forward
+### Transforming RNN Outputs
+
+The language model
+uses a fully connected output layer
+to transform RNN outputs 
+into token predictions at each time step.
 
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
-def forward(self, X):
-    embs = self.one_hot(X)
-    hiddens, _ = self.rnn(embs)
-    return self.output_layer(hiddens)
+def output_layer(self, rnn_outputs):
+    outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in rnn_outputs]
+    return d2l.stack(outputs, 1)
 
 @d2l.add_to_class(RNNLMScratch)  #@save
-def output_layer(self, hiddens):
-    outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in hiddens]
-    return d2l.stack(outputs, 1)
+def forward(self, X, state=None):
+    embs = self.one_hot(X)
+    rnn_outputs, _ = self.rnn(embs, state)
+    return self.output_layer(rnn_outputs)
 ```
 
-With all the needed functions being defined,
-next we [**create a class to wrap these functions and store parameters**] for an RNN model implemented from scratch.
-
-Let's [**check whether the outputs have the correct shapes**], e.g., to ensure that the dimensionality of the hidden state remains unchanged.
-
-We can see that the output shape is (number of time steps $\times$ batch size, vocabulary size), while the hidden state shape remains the same, i.e., (batch size, number of hidden units).
+Let's [**check whether the forward computation outputs have the correct shape.**]
 
 ```{.python .input}
 %%tab all
@@ -283,7 +310,7 @@ bestows a certain degree of robustness to the model. Gradient clipping provides
 a quick fix to the gradient exploding. While it does not entirely solve the problem, it is one of the many techniques to alleviate it.
 
 Below we define a function to clip the gradients of
-a model that is implemented from scratch or a model constructed by the high-level APIs.
+a model.
 Also note that we compute the gradient norm over all the model parameters.
 
 ```{.python .input  n=43}
@@ -299,7 +326,7 @@ def clip_gradients(self, grad_clip_val, model):
             param.grad[:] *= grad_clip_val / norm
 ```
 
-```{.python .input  n=44}
+```{.python .input  n=17}
 %%tab pytorch
 @d2l.add_to_class(d2l.Trainer)  #@save
 def clip_gradients(self, grad_clip_val, model):
@@ -327,36 +354,29 @@ def clip_gradients(self, grad_clip_val, grads):
 
 ## Training
 
-Before training the model,
-let's [**define a function to train the model in one epoch**]. It differs from how we train the model of :numref:`sec_softmax_scratch` in three places:
-
-1. We iterate over sequential data with random sampling, where we re-initialize the hidden state for each iteration.
-1. We clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process.
-1. We use perplexity to evaluate the model. As discussed in :numref:`subsec_perplexity`, this ensures that sequences of different length are comparable.
-
-Same as the `train_epoch_ch3` function in :numref:`sec_softmax_scratch`,
-`updater` is a general function
-to update the model parameters.
-It can be either the `d2l.sgd` function implemented from scratch or the built-in optimization function in
-a deep learning framework.
+Using *The Time Machine* dataset (`data`),
+we train a character-level language model (`model`)
+based on the RNN (`rnn`) implemented from scratch.
+Note that we clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process.
 
 ```{.python .input  n=26}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=16)
-rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
-model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1)
+data = d2l.TimeMachine(batch_size=1024, num_steps=32)
+if tab.selected('mxnet', 'pytorch'):
+    rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
+    model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1)
+    trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
+        model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1)
+    trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
 trainer.fit(model, data)
-```
-
-```{.python .input}
-%%tab all
-print('perplexity:', math.exp(model.board.data['val_loss'][-1].y))
 ```
 
 ## Prediction
 
-Let's [**first define the prediction function
+We need to [**define the prediction function
 to generate new characters following
 the user-provided `prefix`**],
 which is a string containing several characters.
@@ -376,30 +396,37 @@ So we generate the predicted characters and emit them.
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
-def predict(self, prefix, num_preds, vocab):
+def predict(self, prefix, num_preds, vocab, device=None):
     state, outputs = None, [vocab[prefix[0]]]
     for i in range(len(prefix) + num_preds - 1):
-        X = d2l.tensor([[outputs[-1]]])        
+        if tab.selected('mxnet'):
+            X = d2l.tensor([[outputs[-1]]], ctx=device)
+        if tab.selected('pytorch'):
+            X = d2l.tensor([[outputs[-1]]], device=device)
+        if tab.selected('tensorflow'):
+            X = d2l.tensor([[outputs[-1]]])
         embs = self.one_hot(X)
-        hiddens, state = self.rnn(embs, state)
-        if i < len(prefix) - 1: # Warm-up period
-            outputs.append(vocab[prefix[i]])
+        rnn_outputs, state = self.rnn(embs, state)
+        if i < len(prefix) - 1:  # Warm-up period
+            outputs.append(vocab[prefix[i + 1]])
         else:  # Predict `num_preds` steps
-            Y = self.output_layer(hiddens)
-            outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))    
+            Y = self.output_layer(rnn_outputs)
+            outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
-    
 ```
+
+In the following, we specify the prefix 
+and have it generate 20 additional characters.
 
 ```{.python .input}
-%%tab all
-model.predict('time traveller', 10, data.vocab)
+%%tab mxnet, pytorch
+model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 
-Now we can test the `predict_ch8` function.
-We specify the prefix as `time traveller ` and have it generate 10 additional characters.
-Given that we have not trained the network,
-it will generate nonsensical predictions.
+```{.python .input  n=22}
+%%tab tensorflow
+model.predict('it has', 20, data.vocab)
+```
 
 While implementing the above RNN model from scratch is instructive, it is not convenient.
 In the next section we will see how to improve the RNN model,
@@ -411,13 +438,13 @@ and make it run faster.
 
 * We can train an RNN-based character-level language model to generate text following the user-provided text prefix.
 * A simple RNN language model consists of input encoding, RNN modeling, and output generation.
-* We iterate over sequential data with random sampling, where we re-initialize the RNN hidden state for each iteration.
-* A warm-up period allows a model to update itself (e.g., obtain a better hidden state than its initialized value) before making any prediction.
 * Gradient clipping prevents gradient explosion, but it cannot fix vanishing gradients.
+* A warm-up period allows a model to update itself (e.g., obtain a better hidden state than its initialized value) before making any prediction.
 
 
 ## Exercises
 
+1. Does the implemented language model predict the next token based on all the past tokens up to the very first token in *The Time Machine*? Which hyperparameter controls the length of history used for prediction?
 1. Show that one-hot encoding is equivalent to picking a different embedding for each object.
 1. Adjust the hyperparameters (e.g., number of epochs, number of hidden units, number of time steps in a minibatch, and learning rate) to improve the perplexity.
     * How low can you go?

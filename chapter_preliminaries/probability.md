@@ -419,7 +419,7 @@ satisfies the following properties:
 * For any countable sequence of events $\mathcal{A}_1, \mathcal{A}_2, \ldots$ that are *mutually exclusive* ($\mathcal{A}_i \cap \mathcal{A}_j = \emptyset$ for all $i \neq j$), the probability that any of them happens is equal to the sum of their individual probabilities, i.e., $P(\bigcup_{i=1}^{\infty} \mathcal{A}_i) = \sum_{i=1}^{\infty} P(\mathcal{A}_i)$.
 
 These axioms of probability theory,
-proposed by :cite:`kolmogorov1933sulla`,
+proposed by :cite:`Kolmogorov.1933`,
 can be applied to rapidly derive a number of important consequences.
 For instance, it follows immediately
 that the probability of any event $\mathcal{A}$
@@ -984,7 +984,7 @@ No matter how long we watch someone tossing a fair coin,
 we will never be more or less than 50% certain 
 that the next toss will come up heads.
 These terms owe to literature in mechanical modeling,
-(see e.g., :cite:`der2009aleatory` for a review on this aspect of [uncertainty quantification](https://en.wikipedia.org/wiki/Uncertainty_quantification)).
+(see e.g., :cite:`Der-Kiureghian.Ditlevsen.2009` for a review on this aspect of [uncertainty quantification](https://en.wikipedia.org/wiki/Uncertainty_quantification)).
 It's worth noting that these terms constitute a slight abuse of language.
 The term *epistemic* refers to anything concerning *knowledge*
 and thus in the philosophical sense, all uncertainty is epistemic.
@@ -1005,7 +1005,7 @@ offering only a 1.41 times reduction.
 This is a persistent feature of machine learning: 
 while there are often easy gains, it takes a very large amount of data, 
 and often with it an enormous amount of computation to make even further gains. 
-For an empirical review of this fact for large scale language models see :cite:`revels2016forward`. 
+For an empirical review of this fact for large scale language models see :cite:`Revels.Lubin.Papamarkou.2016`. 
 
 We also sharpened our language and tools for statistical modeling. 
 In the process of that we learned about conditional probabilities 
@@ -1058,7 +1058,7 @@ interval centered on the expectation.
     1. Compute the expected return for a given portfolio $\boldsymbol{\alpha}$.
     1. If you wanted to maximize the return of the portfolio, how should you choose your investment?
     1. Compute the *variance* of the portfolio. 
-    1. Formulate an optimization problem of maximizing the return while keeping the variance constrained to an upper bound. This is the Nobel-Prize winning [Markovitz portfolio](https://en.wikipedia.org/wiki/Markowitz_model) :cite:`mangram2013simplified`. To solve it you will need a quadratic programming solver, something way beyond the scope of this book.
+    1. Formulate an optimization problem of maximizing the return while keeping the variance constrained to an upper bound. This is the Nobel-Prize winning [Markovitz portfolio](https://en.wikipedia.org/wiki/Markowitz_model) :cite:`Mangram.2013`. To solve it you will need a quadratic programming solver, something way beyond the scope of this book.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/36)

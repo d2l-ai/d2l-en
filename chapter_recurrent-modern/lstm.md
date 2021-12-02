@@ -44,7 +44,7 @@ Just like in GRUs,
 the data feeding into the LSTM gates are
 the input at the current time step and
 the hidden state of the previous time step,
-as illustrated in :numref:`lstm_0`.
+as illustrated in :numref:`fig_lstm_0`.
 They are processed by
 three fully connected layers with a sigmoid activation function to compute the values of
 the input, forget. and output gates.
@@ -52,7 +52,7 @@ As a result, values of the three gates
 are in the range of $(0, 1)$.
 
 ![Computing the input gate, the forget gate, and the output gate in an LSTM model.](../img/lstm-0.svg)
-:label:`lstm_0`
+:label:`fig_lstm_0`
 
 Mathematically,
 suppose that there are $h$ hidden units, the batch size is $n$, and the number of inputs is $d$.
@@ -77,10 +77,10 @@ $$\tilde{\mathbf{C}}_t = \text{tanh}(\mathbf{X}_t \mathbf{W}_{xc} + \mathbf{H}_{
 
 where $\mathbf{W}_{xc} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hc} \in \mathbb{R}^{h \times h}$ are weight parameters and $\mathbf{b}_c \in \mathbb{R}^{1 \times h}$ is a bias parameter.
 
-A quick illustration of the candidate memory cell is shown in :numref:`lstm_1`.
+A quick illustration of the candidate memory cell is shown in :numref:`fig_lstm_1`.
 
 ![Computing the candidate memory cell in an LSTM model.](../img/lstm-1.svg)
-:label:`lstm_1`
+:label:`fig_lstm_1`
 
 ### Memory Cell
 
@@ -94,11 +94,11 @@ If the forget gate is always approximately 1 and the input gate is always approx
 This design is introduced to alleviate the vanishing gradient problem and to better capture
 long range dependencies within sequences.
 
-We thus arrive at the flow diagram in :numref:`lstm_2`.
+We thus arrive at the flow diagram in :numref:`fig_lstm_2`.
 
 ![Computing the memory cell in an LSTM model.](../img/lstm-2.svg)
 
-:label:`lstm_2`
+:label:`fig_lstm_2`
 
 
 ### Hidden State
@@ -113,17 +113,17 @@ Whenever the output gate approximates 1 we effectively pass all memory informati
 
 
 
-:numref:`lstm_3` has a graphical illustration of the data flow.
+:numref:`fig_lstm_3` has a graphical illustration of the data flow.
 
 ![Computing the hidden state in an LSTM model.](../img/lstm-3.svg)
-:label:`lstm_3`
+:label:`fig_lstm_3`
 
 
 
 ## Implementation from Scratch
 
 Now let's implement an LSTM from scratch.
-As same as the experiments in :numref:`sec_rnn_scratch`,
+As same as the experiments in :numref:`sec_rnn-scratch`,
 we first load *The Time Machine* dataset.
 
 ```{.python .input}
@@ -192,8 +192,9 @@ class LSTMScratch(d2l.Module):  #@save
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(LSTMScratch)
-def forward(self, inputs, H_C=(None, None)):
-    (H, C), outputs = H_C, []
+def forward(self, inputs, H_C=None):
+    H, C = None, None if H_C is None else H_C
+    outputs = []
     for X in inputs:
         I = d2l.sigmoid(d2l.matmul(X, self.W_xi) + (
             d2l.matmul(H, self.W_hi) if H is not None else 0) + self.b_i)
@@ -213,14 +214,20 @@ def forward(self, inputs, H_C=(None, None)):
 
 ### [**Training**] and Prediction
 
-Let's train an LSTM as same as what we did in :numref:`sec_gru`, by instantiating the `RNNModelScratch` class as introduced in :numref:`sec_rnn_scratch`.
+Let's train an LSTM as same as what we did in :numref:`sec_gru`, by instantiating the `RNNModelScratch` class as introduced in :numref:`sec_rnn-scratch`.
 
 ```{.python .input}
 %%tab all
-data = d2l.TimeMachine(batch_size=32, num_steps=16)
-lstm = LSTMScratch(num_inputs=len(data.vocab), num_hiddens=32)
-model = d2l.RNNLMScratch(lstm, vocab_size=len(data.vocab), lr=1)
-trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
+data = d2l.TimeMachine(batch_size=1024, num_steps=32)
+if tab.selected('mxnet', 'pytorch'):
+    lstm = LSTMScratch(num_inputs=len(data.vocab), num_hiddens=32)
+    model = d2l.RNNLMScratch(lstm, vocab_size=len(data.vocab), lr=4)
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        lstm = LSTMScratch(num_inputs=len(data.vocab), num_hiddens=32)
+        model = d2l.RNNLMScratch(lstm, vocab_size=len(data.vocab), lr=4)
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -239,7 +246,8 @@ class LSTM(d2l.RNN):
         self.rnn = rnn.LSTM(num_hiddens)    
             
     def forward(self, inputs, H_C=None):
-        if H_C is None: H_C = self.rnn.begin_state(inputs.shape[1])
+        if H_C is None: H_C = self.rnn.begin_state(
+            inputs.shape[1], ctx=inputs.ctx)
         return self.rnn(inputs, H_C)    
 ```
 
@@ -276,8 +284,22 @@ if tab.selected('pytorch'):
     lstm = LSTM(num_inputs=len(data.vocab), num_hiddens=32)
 if tab.selected('mxnet', 'tensorflow'):
     lstm = LSTM(num_hiddens=32)
-model = d2l.RNNLM(lstm, vocab_size=len(data.vocab), lr=1)
+if tab.selected('mxnet', 'pytorch'):
+    model = d2l.RNNLM(lstm, vocab_size=len(data.vocab), lr=4)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        model = d2l.RNNLM(lstm, vocab_size=len(data.vocab), lr=4)
 trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab mxnet, pytorch
+model.predict('it has', 20, data.vocab, d2l.try_gpu())
+```
+
+```{.python .input}
+%%tab tensorflow
+model.predict('it has', 20, data.vocab)
 ```
 
 LSTMs are the prototypical latent variable autoregressive model with nontrivial state control.

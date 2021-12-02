@@ -25,7 +25,6 @@ such as in areas of language, vision, speech, and reinforcement learning.
 
 ## Model
 
-
 As an instance of the encoder-decoder
 architecture,
 the overall architecture of
