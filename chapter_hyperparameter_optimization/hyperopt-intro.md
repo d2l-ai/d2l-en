@@ -1,11 +1,33 @@
-```{.python .input  n=1}
+```{.python .input  n=2}
 # the pypi version seems outdated, load the latest github version directly
-import sys
-sys.path.append('/Users/kleiaaro/git/d2l-en/')
+# import sys
+# sys.path.append('/Users/kleiaaro/git/d2l-en/')
+```
+
+```{.python .input  n=3}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
+```{.json .output n=3}
+[
+ {
+  "data": {
+   "application/vnd.jupyter.widget-view+json": {
+    "model_id": "2c9229b75170424b80eb948ad6eda73f",
+    "version_major": 2,
+    "version_minor": 0
+   },
+   "text/plain": "interactive(children=(Dropdown(description='tab', options=('mxnet', 'pytorch', 'tensorflow'), value=None), Out\u2026"
+  },
+  "metadata": {},
+  "output_type": "display_data"
+ }
+]
 ```
 
 # What is Hyperparameter Optimization?
-
+:label:`sec_what_is_hpo`
 
 While weight parameters of a neural network model are automatically determined during training, e.g. by stochastic gradient descent, **hyperparameters** cannot be learned in this way. Without a different form of automation, the user has to set them manually by trial and error, in what amounts to a time-consuming and difficult part of machine learning workflows. We distinguish between hyperparameters that control the learning process (e.g., learning rate, batch size, momentum, optimizer choice) and hyperparameters that define model shape and capacity (e.g., type of activation function, number of units per layer). The choice of hyperparameters in general directly affects the final performance of our machine learning algorithm. For example, previous work beat the performance of advanced state-of-the-art models by optimizing the hyperparameter of much simpler models :cite:`snoek-nips12a`. 
 
@@ -18,34 +40,17 @@ The need to manually tune the training process and structure of a deep neural ne
 
 In this chapter, we provide an overview of the basics of hyperparameter optimization and look at several state-of-the-art methods from the literature. As a running example, we will show how to automatically tune hyperparameters of a convolutional neural network. Any successful HPO method needs to provide solutions for two decision-making primitives, **scheduling** and **search**, and we will highlight the most prominent current solutions for either. Scheduling amounts to decisions of how much resources to spend on a hyperparameter configuration, e.g. when to stop, pause, or resume training, while search is about which configurations to evaluate in the first place. A specific focus in this chapter will lie on model-based approaches to search, which in practice are often more sample efficient than their random-search based counterparts. Since hyperparameter optimization requires us to train and validate several machine learning models, we will also see how we can distribute these methods. To avoid distracting boiler-plate code, we will use the Python framework **Syne Tune**, providing us with an simple interface for distributed hyperparameter optimization. You can install it via:
 
-```{.python .input  n=2}
+```{.python .input  n=4}
 #!pip install syne-tune
 ```
 
-```{.python .input  n=3}
+```{.python .input  n=5}
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```{.json .output n=3}
-[
- {
-  "ename": "AttributeError",
-  "evalue": "partially initialized module 'd2l.torch' has no attribute 'try_all_gpus' (most likely due to a circular import)",
-  "output_type": "error",
-  "traceback": [
-   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
-   "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
-   "\u001b[0;32m/var/folders/ld/vzcn3j2d7yg493b1c6m0ypprdqgxkm/T/ipykernel_14258/4221617668.py\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0;32mfrom\u001b[0m \u001b[0md2l\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mtorch\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      2\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mtorch\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0;32mfrom\u001b[0m \u001b[0mtorch\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mnn\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;32m~/git/d2l-en/d2l/torch.py\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m    614\u001b[0m \u001b[0;31m# Defined in file: ./chapter_computer-vision/image-augmentation.md\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    615\u001b[0m def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,\n\u001b[0;32m--> 616\u001b[0;31m                devices=d2l.try_all_gpus()):\n\u001b[0m\u001b[1;32m    617\u001b[0m     \u001b[0;34m\"\"\"Train a model with mutiple GPUs (defined in Chapter 13).\"\"\"\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    618\u001b[0m     \u001b[0mtimer\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mnum_batches\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mTimer\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mlen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtrain_iter\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;31mAttributeError\u001b[0m: partially initialized module 'd2l.torch' has no attribute 'try_all_gpus' (most likely due to a circular import)"
-  ]
- }
-]
-```
-
-```{.python .input  n=66}
+```{.python .input  n=6}
 # TODO: can we import this from the d2l package?
 
 from d2l import torch as d2l
@@ -80,22 +85,33 @@ Note how `objective` is parameterized by the hyperparameter configuration `confi
 consisting of `batch_size`, `learning_rate`, `momentum`, `weight_decay`, and it returns the
 validation error after training for `epochs` epochs.
 
-
-```{.python .input  n=67}
+```{.python .input  n=7}
+%%tab pytorch, mxnet, tensorflow
 def objective(x, max_epochs = 10): #@save
     batch_size = x['batch_size']
     lr = x['learning_rate']
     momentum = x['momentum']
     dropout = x['dropout']
-
-    model = AlexNet(lr=lr, momentum=momentum, dropout=dropout)
-    trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=0)
-    data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
-    trainer.fit(model=model, data=data)
+    validation_error = 0.1
+    return validation_error
+#     model = AlexNet(lr=lr, momentum=momentum, dropout=dropout)
+#     trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=0)
+#     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
+#     trainer.fit(model=model, data=data)
     
     # TODO: get validation error
-        
-    return validation_error
+
+
+```
+
+```{.json .output n=7}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
 ```
 
 Now, given our objective function $f$, hyperparameter optimization aims to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. Since $f$ is the validation performance after training, there is no efficient way to compute gradients with respect to $\mathbf{x}$. While there is recent work to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here.
@@ -115,7 +131,7 @@ We can resolve this situation by optimizing one of the objectives, subject to co
 we could minimize validation error, subject to a bound on latency dictated by service level agreements. More ambitiously, we can aim
 to sample the Pareto front of such configurations not strictly dominated by any other points.
 
-```{.python .input  n=51}
+```{.python .input  n=8}
 def multi_objective(config, max_epochs = 10):
     batch_size = config['batch_size']
     lr = config['learning_rate']
@@ -145,7 +161,7 @@ to train than smaller ones. In our runnning example, training time does not depe
 work. Counting cost in terms of wall-clock time is more relevant in practice than counting the number of evaluations. Some HPO algorithms explicitly model training cost and take it into
 account for making decisions.
 
-```{.python .input  n=52}
+```{.python .input  n=9}
 import time
 
 def objective_function_with_cost(config, max_epochs=10):
@@ -167,13 +183,13 @@ Along with the objective function $f(\mathbf{x})$, we also need to define the fe
 In this chapter, we restrict ourselves to search spaces which decompose as product over the individual hyperparameters.
 Here is a possible search space for our running example:
 
-```{.python .input  n=54}
+```{.python .input  n=10}
 from syne_tune.search_space import loguniform, uniform, randint
 
 search_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
    "momentum": uniform(0.0, 0.99),
-   "weight_decay": loguniform(1e-9, 1e-2),
+   "dropout": uniform(0, 0.99),
    "batch_size": randint(8, 128)
 }
 ```
@@ -205,20 +221,46 @@ one of them will be close to the best hyperparameters $\mathbf{x}_*$.
 
 ## Searcher
 
-```{.python .input  n=68}
+```{.python .input  n=11}
+%%tab pytorch, mxnet, tensorflow
+
 class Searcher(d2l.HyperParameters): #@save
     def sample_configuration():
         raise NotImplementedError
 ```
 
+```{.json .output n=11}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
+```
+
 ## Scheduler
 
-```{.python .input  n=56}
+```{.python .input  n=18}
+%%tab pytorch, mxnet, tensorflow
 class FIFOScheduler(d2l.HyperParameters): #@save
-    def __init__(searcher):
+    def __init__(self, searcher):
         self.save_hyperparameters()
-    def suggest():
+    def suggest(self):
         return self.searcher.sample_configuration()
+    
+    def update(self, config, error):
+        pass
+```
+
+```{.json .output n=18}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
 ```
 
 ## How can we evaluate hyperparameter optimization methods?
@@ -241,9 +283,10 @@ criterion function evaluations, this metric is not only more relevant in practic
 scheduling techniques (e.g., synchronous versus asynchronous; early stopping versus full training). It also captures the decision making
 time of the HPO method itself, which for some model-based techniques can be significant.
 
-```{.python .input  n=57}
+```{.python .input  n=13}
+%%tab pytorch, mxnet, tensorflow
 class Tuner(d2l.HyperParameters): #@save
-    def __init__(scheduler, objective):
+    def __init__(self, scheduler, objective):
         self.save_hyperparameters()
         
         # for bookeeping
@@ -254,22 +297,45 @@ class Tuner(d2l.HyperParameters): #@save
         self.current_time = 0
 ```
 
-```{.python .input  n=59}
-@d2l.add_to_class(Tuner)
-def bookkeeping(self, config, error, runtime):
+```{.json .output n=13}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
+```
 
+```{.python .input  n=17}
+%%tab pytorch, mxnet, tensorflow
+
+@d2l.add_to_class(Tuner) #@save
+def bookkeeping(self, config, error, runtime): 
     if self.incumbent is None or self.incumbent_error > error:
         self.incumbent = config
         self.incumbent_error = error
         
     self.incumbent_trajectory.append(self.incumbent_error)
     
-    self.current_time =+ cost
-    self.cumulative_runtime(self.current_time)
+    self.current_time =+ runtime
+    self.cumulative_runtime.append(self.current_time)
 ```
 
-```{.python .input  n=58}
-@d2l.add_to_class(Tuner)
+```{.json .output n=17}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
+```
+
+```{.python .input  n=19}
+%%tab pytorch, mxnet, tensorflow
+
+@d2l.add_to_class(Tuner) #@save
 def run(self, num_iterations):
     for i in range(num_iterations):
         start_time = time.time()
@@ -277,9 +343,21 @@ def run(self, num_iterations):
         
         error = self.objective(config)
         
+        self.scheduler.update(config, error)
+        
         runtime = time.time() - start_time
         
-        self.bookeeping(config, error, runtime)
+        self.bookkeeping(config, error, runtime)
+```
+
+```{.json .output n=19}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
 ```
 
 ## Summary
