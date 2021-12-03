@@ -106,7 +106,7 @@ the mean value of the corresponding column**].
 
 ```{.python .input}
 #@tab all
-inputs = inputs.fillna(inputs.mean())
+inputs['NumRooms'] = inputs['NumRooms'].fillna(inputs['NumRooms'].mean())
 print(inputs)
 ```
 
