@@ -193,6 +193,12 @@ from tensorflow_probability import distributions as tfd
 %%tab jax
 %matplotlib inline
 from d2l import jax as d2l
+<<<<<<< HEAD
+=======
+import jax.numpy as np
+import jax
+import numpy as onp
+>>>>>>> Revert probability.md changes
 import random
 import jax
 import jax.numpy as jnp
