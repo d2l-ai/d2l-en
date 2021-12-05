@@ -87,6 +87,17 @@ y = tf.constant(2.0)
 x + y, x * y, x / y, x**y
 ```
 
+```{.python .input}
+#@tab jax
+import jax
+import jax.numpy as jnp
+
+x = jnp.array(3.0)
+y = jnp.array(2.0)
+
+x + y, x * y, x / y, x**y
+```
+
 ## Vectors
 
 For our purposes, [**you can think of vectors
@@ -373,6 +384,12 @@ torch.arange(24).reshape(2, 3, 4)
 tf.reshape(tf.range(24), (2, 3, 4))
 ```
 
+```{.python .input}
+#@tab jax
+X = jnp.arange(24).reshape(2, 3, 4)
+X
+```
+
 ## Basic Properties of Tensor Arithmetic
 
 Scalars, vectors, matrices, 
@@ -458,6 +475,13 @@ a + X, (a * X).shape
 %%tab tensorflow
 a = 2
 X = tf.reshape(tf.range(24), (2, 3, 4))
+a + X, (a * X).shape
+```
+
+```{.python .input}
+#@tab jax
+a = 2
+X = jnp.arange(24).reshape(2, 3, 4)
 a + X, (a * X).shape
 ```
 
@@ -671,6 +695,11 @@ A.cumsum(axis=0)
 tf.cumsum(A, axis=0)
 ```
 
+```{.python .input}
+#@tab jax
+A.cumsum(axis=0)
+```
+
 ## Dot Products
 
 So far, we have only performed elementwise operations, sums, and averages. 
@@ -719,6 +748,11 @@ torch.sum(x * y)
 ```{.python .input}
 %%tab tensorflow
 tf.reduce_sum(x * y)
+```
+
+```{.python .input}
+#@tab jax
+jnp.sum(x * y)
 ```
 
 Dot products are useful in a wide range of contexts.
@@ -834,6 +868,11 @@ A.shape, x.shape, torch.mv(A, x), A@x
 ```{.python .input}
 %%tab tensorflow
 A.shape, x.shape, tf.linalg.matvec(A, x)
+```
+
+```{.python .input}
+#@tab jax
+A.shape, x.shape, jnp.matmul(A, x)
 ```
 
 ## Matrix-Matrix Multiplication

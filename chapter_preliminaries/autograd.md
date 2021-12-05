@@ -252,6 +252,13 @@ with tf.GradientTape() as t:
 t.gradient(y, x)  # Overwritten by the newly calculated gradient
 ```
 
+```{.python .input}
+#@tab jax
+y = lambda x: x.sum()
+dy_dx = grad(y)
+dy_dx(x)
+```
+
 ## Backward for Non-Scalar Variables
 
 When `y` is a vector, 
@@ -334,6 +341,16 @@ x.grad
 with tf.GradientTape() as t:
     y = x * x
 t.gradient(y, x)  # Same as `y = tf.reduce_sum(x * x)`
+```
+
+```{.python .input}
+#@tab jax
+y = lambda x: x * x
+
+# jax.grad works on a scalar output function
+# jax.vmap vectorizes this operation so that jax.grad works for vector outputs
+grad_fn = vmap(grad(y))
+grad_fn(x)
 ```
 
 ## Detaching Computation

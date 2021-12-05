@@ -104,6 +104,11 @@ torch.ones(4)
 tf.ones(4)
 ```
 
+```{.python .input}
+#@tab jax
+jax.numpy.ones(4)
+```
+
 In the Jupyter notebook, we can use `?` to display the document in another
 window. For example, `list?` will create content
 that is almost identical to `help(list)`,

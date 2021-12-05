@@ -78,6 +78,12 @@ import torch
 import tensorflow as tf
 ```
 
+```{.python .input}
+#@tab jax
+import jax
+import jax.numpy as jnp # implements the NumPy API with JAX primitives
+```
+
 [**A tensor represents a (possibly multi-dimensional) array of numerical values.**]
 With one axis, a tensor is called a *vector*.
 With two axes, a tensor is called a *matrix*.
@@ -208,7 +214,7 @@ are laid out one row at a time and thus
 `x[3] == X[0, 3]`.
 
 ```{.python .input}
-%%tab mxnet, pytorch
+#@tab mxnet, pytorch, jax
 X = x.reshape(3, 4)
 X
 ```
@@ -477,6 +483,11 @@ y = tf.constant([2.0, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y
 ```
 
+```{.python .input}
+#@tab jax
+jnp.exp(x)
+```
+
 In addition to elementwise computations,
 we can also perform linear algebra operations,
 such as dot products and matrix multiplications.
@@ -531,7 +542,7 @@ X == Y
 [**Summing all the elements in the tensor**] yields a tensor with only one element.
 
 ```{.python .input}
-%%tab mxnet, pytorch
+#@tab mxnet, pytorch, jax
 X.sum()
 ```
 
@@ -779,6 +790,12 @@ a, a.item(), float(a), int(a)
 ```{.python .input}
 %%tab tensorflow
 a = tf.constant([3.5]).numpy()
+a, a.item(), float(a), int(a)
+```
+
+```{.python .input}
+#@tab jax
+a = jnp.array([3.5])
 a, a.item(), float(a), int(a)
 ```
 

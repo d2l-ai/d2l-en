@@ -5,7 +5,6 @@
 
 import collections
 import hashlib
-import inspect
 import math
 import os
 import random
@@ -20,13 +19,13 @@ import pandas as pd
 import requests
 from IPython import display
 from matplotlib import pyplot as plt
-from matplotlib_inline import backend_inline
 
 d2l = sys.modules[__name__]
 
 import jax
 import jax.numpy as jnp
 import numpy as np
+from jax import grad, random, vmap
 
 def use_svg_display():
     """Use the svg format to display a plot in Jupyter.
