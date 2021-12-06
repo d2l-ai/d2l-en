@@ -332,7 +332,7 @@ class Trainer(d2l.HyperParameters):
             self.val_batch_idx += 1
 
     def clip_gradients(self, grad_clip_val, grads):
-        """Defined in :numref:`sec_rnn_scratch`"""
+        """Defined in :numref:`sec_rnn-scratch`"""
         grad_clip_val = tf.constant(grad_clip_val, dtype=tf.float32)
         new_grads = [tf.convert_to_tensor(grad) if isinstance(
             grad, tf.IndexedSlices) else grad for grad in grads]
@@ -618,7 +618,7 @@ class Vocab:
         return self.token_to_idx['<unk>']
 
 class RNNScratch(d2l.Module):
-    """Defined in :numref:`sec_rnn_scratch`"""
+    """Defined in :numref:`sec_rnn-scratch`"""
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -629,7 +629,7 @@ class RNNScratch(d2l.Module):
         self.b_h = tf.Variable(d2l.zeros(num_hiddens))
 
     def forward(self, inputs, state=None):
-        """Defined in :numref:`sec_rnn_scratch`"""
+        """Defined in :numref:`sec_rnn-scratch`"""
         if state is not None:
             state, = state
             state = d2l.reshape(state, (-1, self.W_hh.shape[0]))
@@ -642,16 +642,16 @@ class RNNScratch(d2l.Module):
         return outputs, state
 
 def check_len(a, n):
-    """Defined in :numref:`sec_rnn_scratch`"""
+    """Defined in :numref:`sec_rnn-scratch`"""
     assert len(a) == n, f'list\'s len {len(a)} != expected length {n}'
 
 def check_shape(a, shape):
-    """Defined in :numref:`sec_rnn_scratch`"""
+    """Defined in :numref:`sec_rnn-scratch`"""
     assert a.shape == shape, \
             f'tensor\'s shape {a.shape} != expected shape {shape}'
 
 class RNNLMScratch(d2l.Classification):
-    """Defined in :numref:`sec_rnn_scratch`"""
+    """Defined in :numref:`sec_rnn-scratch`"""
     def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -672,24 +672,24 @@ class RNNLMScratch(d2l.Classification):
         self.plot('ppl', d2l.exp(l), train=False)
 
     def one_hot(self, X):
-        """Defined in :numref:`sec_rnn_scratch`"""
+        """Defined in :numref:`sec_rnn-scratch`"""
         # Output shape: (num_steps, batch_size, vocab_size)
         return tf.one_hot(tf.transpose(X), self.vocab_size)
 
     def output_layer(self, rnn_outputs):
-        """Defined in :numref:`sec_rnn_scratch`"""
+        """Defined in :numref:`sec_rnn-scratch`"""
         outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in rnn_outputs]
         return d2l.stack(outputs, 1)
     
 
     def forward(self, X, state=None):
-        """Defined in :numref:`sec_rnn_scratch`"""
+        """Defined in :numref:`sec_rnn-scratch`"""
         embs = self.one_hot(X)
         rnn_outputs, _ = self.rnn(embs, state)
         return self.output_layer(rnn_outputs)
 
     def predict(self, prefix, num_preds, vocab, device=None):
-        """Defined in :numref:`sec_rnn_scratch`"""
+        """Defined in :numref:`sec_rnn-scratch`"""
         state, outputs = None, [vocab[prefix[0]]]
         for i in range(len(prefix) + num_preds - 1):
             X = d2l.tensor([[outputs[-1]]])
