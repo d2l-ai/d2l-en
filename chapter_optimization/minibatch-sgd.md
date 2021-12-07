@@ -471,7 +471,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
 
     optimizer = trainer_fn(net.parameters(), **hyperparams)
 
-    loss = nn.MSELoss()
+    loss = nn.MSELoss(reduction='none')
     # Note: L2 Loss = 1/2 * MSE Loss. PyTorch has MSE Loss which is slightly
     # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
     # value to get L2Loss in PyTorch
@@ -483,14 +483,14 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
             optimizer.zero_grad()
             out = net(X)
             y = y.reshape(out.shape)
-            l = loss(out, y)/2
-            l.backward()
+            l = loss(out, y) / 2
+            l.mean().backward()
             optimizer.step()
             n += X.shape[0]
             if n % 200 == 0:
                 timer.stop()
                 animator.add(n/X.shape[0]/len(data_iter),
-                             (d2l.evaluate_loss(net, data_iter, loss)/2,))
+                             (d2l.evaluate_loss(net, data_iter, loss) / 2,))
                 timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 ```

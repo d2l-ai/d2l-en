@@ -1468,18 +1468,17 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter, feature_dim,
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
+    """Defined in :numref:`sec_minibatches`"""
     # Initialization
     net = nn.Sequential(nn.Linear(5, 1))
-
     def init_weights(m):
         if type(m) == nn.Linear:
             torch.nn.init.normal_(m.weight, std=0.01)
-
     net.apply(init_weights)
 
     optimizer = trainer_fn(net.parameters(), **hyperparams)
 
-    loss = nn.MSELoss()
+    loss = nn.MSELoss(reduction='none')
     # Note: L2 Loss = 1/2 * MSE Loss. PyTorch has MSE Loss which is slightly
     # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
     # value to get L2Loss in PyTorch
@@ -1492,7 +1491,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
             out = net(X)
             y = y.reshape(out.shape)
             l = loss(out, y) / 2
-            l.backward()
+            l.mean().backward()
             optimizer.step()
             n += X.shape[0]
             if n % 200 == 0:
