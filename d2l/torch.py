@@ -257,7 +257,9 @@ class Accumulator:
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_epoch_ch3(net, train_iter, loss, updater):
-    """The training loop defined in Chapter 3."""
+    """The training loop defined in Chapter 3.
+
+    Defined in :numref:`sec_softmax_scratch`"""
     # Set the model to training mode
     if isinstance(net, torch.nn.Module):
         net.train()
@@ -266,18 +268,18 @@ def train_epoch_ch3(net, train_iter, loss, updater):
     for X, y in train_iter:
         # Compute gradients and update parameters
         y_hat = net(X)
-        l = loss(y_hat, y)
         if isinstance(updater, torch.optim.Optimizer):
             # Using PyTorch in-built optimizer & loss criterion
+            l = loss(y_hat, y) / 2  # L2 Loss = 1/2 * MSE Loss
             updater.zero_grad()
-            l.backward()
+            l.sum().backward()
             updater.step()
-            metric.add(float(l) * len(y), accuracy(y_hat, y), y.numel())
         else:
             # Using custom built optimizer & loss criterion
+            l = loss(y_hat, y)
             l.sum().backward()
             updater(X.shape[0])
-            metric.add(float(l.sum()), accuracy(y_hat, y), y.numel())
+        metric.add(float(l.sum()), accuracy(y_hat, y), y.numel())
     # Return training loss and training accuracy
     return metric[0] / metric[2], metric[1] / metric[2]
 
