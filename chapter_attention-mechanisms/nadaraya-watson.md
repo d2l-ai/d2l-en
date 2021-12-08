@@ -495,9 +495,7 @@ animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, 5])
 
 for epoch in range(5):
     trainer.zero_grad()
-    # Note: L2 Loss = 1/2 * MSE Loss. PyTorch has MSE Loss which is slightly
-    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
-    l = loss(net(x_train, keys, values), y_train) / 2
+    l = loss(net(x_train, keys, values), y_train)
     l.sum().backward()
     trainer.step()
     print(f'epoch {epoch + 1}, loss {float(l.sum()):.6f}')
