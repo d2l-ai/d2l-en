@@ -1387,35 +1387,31 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter, feature_dim,
 
     for _ in range(num_epochs):
         for X, y in data_iter:
-            with tf.GradientTape() as g:
-                l = tf.math.reduce_mean(loss(net(X), y))
+          with tf.GradientTape() as g:
+            l = tf.math.reduce_mean(loss(net(X), y))
 
-            dw, db = g.gradient(l, [w, b])
-            trainer_fn([w, b], [dw, db], states, hyperparams)
-            n += X.shape[0]
-            if n % 200 == 0:
-                timer.stop()
-                p = n / X.shape[0]
-                q = p / tf.data.experimental.cardinality(data_iter).numpy()
-                r = (d2l.evaluate_loss(net, data_iter, loss),)
-                animator.add(q, r)
-                timer.start()
+          dw, db = g.gradient(l, [w, b])
+          trainer_fn([w, b], [dw, db], states, hyperparams)
+          n += X.shape[0]
+          if n % 200 == 0:
+              timer.stop()
+              p = n/X.shape[0]
+              q = p/tf.data.experimental.cardinality(data_iter).numpy()
+              r = (d2l.evaluate_loss(net, data_iter, loss),)
+              animator.add(q, r)
+              timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 
-
-# Defined in file: ./chapter_optimization/minibatch-sgd.md
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
+    """Defined in :numref:`sec_minibatches`"""
     # Initialization
     net = tf.keras.Sequential()
-    net.add(
-        tf.keras.layers.Dense(
-            1, kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
+    net.add(tf.keras.layers.Dense(1,
+            kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
     optimizer = trainer_fn(**hyperparams)
+    # Note: `MeanSquaredError` computes squared error without the 1/2 factor
     loss = tf.keras.losses.MeanSquaredError()
-    # Note: L2 Loss = 1/2 * MSE Loss. TensorFlow has MSE Loss which is
-    # slightly different from MXNet's L2Loss by a factor of 2. Hence we halve
-    # the loss value to get L2Loss in TensorFlow
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()
@@ -1423,16 +1419,16 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
         for X, y in data_iter:
             with tf.GradientTape() as g:
                 out = net(X)
-                l = loss(y, out) / 2
+                l = loss(y, out)
                 params = net.trainable_variables
                 grads = g.gradient(l, params)
             optimizer.apply_gradients(zip(grads, params))
             n += X.shape[0]
             if n % 200 == 0:
                 timer.stop()
-                p = n / X.shape[0]
-                q = p / tf.data.experimental.cardinality(data_iter).numpy()
-                r = (d2l.evaluate_loss(net, data_iter, loss) / 2,)
+                p = n/X.shape[0]
+                q = p/tf.data.experimental.cardinality(data_iter).numpy()
+                r = (d2l.evaluate_loss(net, data_iter, loss),)
                 animator.add(q, r)
                 timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
