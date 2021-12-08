@@ -523,8 +523,7 @@ yuntai, Yuanxiang Zhu, amarazov, pasricha, Ben Greenawald, Shivam Upadhyay, Quan
 Parthe Pandit, Ishan Kumar, HomunculusK, Lane Schwartz, varadgunjal, Jason Wiener, Armin Gholampoor,
 Shreshtha13, eigen-arnav, Hyeonggyu Kim, EmilyOng, Bálint Mucsányi, Chase DuBois.
 
-We thank Amazon Web Services, especially Swami Sivasubramanian,
-Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. 
+We thank Amazon Web Services, especially Swami Sivasubramanian, Peter DeSantis, Adam Selipsky and Andrew Jassy for their generous support in writing this book. 
 Without the available time, resources, discussions with colleagues, 
 and continuous encouragement, this book would not have happened.
 

@@ -525,7 +525,7 @@ def train(train_features, test_features, train_labels, test_labels,
 #@tab pytorch
 def train(train_features, test_features, train_labels, test_labels,
           num_epochs=400):
-    loss = nn.MSELoss()
+    loss = nn.MSELoss(reduction='none')
     input_shape = train_features.shape[-1]
     # Switch off the bias since we already catered for it in the polynomial
     # features
@@ -535,7 +535,7 @@ def train(train_features, test_features, train_labels, test_labels,
                                 batch_size)
     test_iter = d2l.load_array((test_features, test_labels.reshape(-1,1)),
                                batch_size, is_train=False)
-    trainer = torch.optim.SGD(net.parameters(), lr=0.01)
+    trainer = torch.optim.SGD(net.parameters(), lr=0.001)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
                             xlim=[1, num_epochs], ylim=[1e-3, 1e2],
                             legend=['train', 'test'])

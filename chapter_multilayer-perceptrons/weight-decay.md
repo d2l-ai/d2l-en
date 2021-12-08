@@ -453,7 +453,7 @@ def train_concise(wd):
     net = nn.Sequential(nn.Linear(num_inputs, 1))
     for param in net.parameters():
         param.data.normal_()
-    loss = nn.MSELoss()
+    loss = nn.MSELoss(reduction='none')
     num_epochs, lr = 100, 0.003
     # The bias parameter has not decayed
     trainer = torch.optim.SGD([
@@ -465,7 +465,7 @@ def train_concise(wd):
         for X, y in train_iter:
             trainer.zero_grad()
             l = loss(net(X), y)
-            l.backward()
+            l.sum().backward()
             trainer.step()
         if (epoch + 1) % 5 == 0:
             animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
