@@ -268,15 +268,14 @@ def train_epoch_ch3(net, train_iter, loss, updater):
     for X, y in train_iter:
         # Compute gradients and update parameters
         y_hat = net(X)
+        l = loss(y_hat, y)
         if isinstance(updater, torch.optim.Optimizer):
             # Using PyTorch in-built optimizer & loss criterion
-            l = loss(y_hat, y) / 2  # L2 Loss = 1/2 * MSE Loss
             updater.zero_grad()
             l.sum().backward()
             updater.step()
         else:
             # Using custom built optimizer & loss criterion
-            l = loss(y_hat, y)
             l.sum().backward()
             updater(X.shape[0])
         metric.add(float(l.sum()), accuracy(y_hat, y), y.numel())
