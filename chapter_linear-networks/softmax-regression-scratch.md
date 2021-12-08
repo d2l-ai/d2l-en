@@ -404,15 +404,13 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
         if isinstance(updater, torch.optim.Optimizer):
             # Using PyTorch in-built optimizer & loss criterion
             updater.zero_grad()
-            l.backward()
+            l.sum().backward()
             updater.step()
-            metric.add(float(l) * len(y), accuracy(y_hat, y),
-                       y.numel())
         else:
             # Using custom built optimizer & loss criterion
             l.sum().backward()
             updater(X.shape[0])
-            metric.add(float(l.sum()), accuracy(y_hat, y), y.numel())
+        metric.add(float(l.sum()), accuracy(y_hat, y), y.numel())
     # Return training loss and training accuracy
     return metric[0] / metric[2], metric[1] / metric[2]
 ```

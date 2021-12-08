@@ -202,8 +202,8 @@ def get_net():
     net.apply(init_weights)
     return net
 
-# Square loss
-loss = nn.MSELoss()
+# Note: `MSELoss` computes squared error without the 1/2 factor
+loss = nn.MSELoss(reduction='none')
 ```
 
 ```{.python .input}
@@ -214,10 +214,7 @@ def get_net():
                               tf.keras.layers.Dense(1)])
     return net
 
-# Least mean squares loss
-# Note: L2 Loss = 1/2 * MSE Loss. TensorFlow has MSE Loss that is slightly
-# different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
-# value to get L2Loss in TF
+# Note: `MeanSquaredError` computes squared error without the 1/2 factor
 loss = tf.keras.losses.MeanSquaredError()
 ```
 
@@ -250,7 +247,7 @@ def train(net, train_iter, loss, epochs, lr):
         for X, y in train_iter:
             trainer.zero_grad()
             l = loss(net(X), y)
-            l.backward()
+            l.sum().backward()
             trainer.step()
         print(f'epoch {epoch + 1}, '
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
@@ -267,7 +264,7 @@ def train(net, train_iter, loss, epochs, lr):
         for X, y in train_iter:
             with tf.GradientTape() as g:
                 out = net(X)
-                l = loss(y, out) / 2
+                l = loss(y, out)
                 params = net.trainable_variables
                 grads = g.gradient(l, params)
             trainer.apply_gradients(zip(grads, params))
