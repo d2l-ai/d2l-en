@@ -512,7 +512,7 @@ animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, 5])
 
 for epoch in range(5):
     with tf.GradientTape() as t:
-        loss = loss_object(y_train, net(x_train, keys, values))/2 * len(y_train) # To be consistent with d2l book
+        loss = loss_object(y_train, net(x_train, keys, values)) * len(y_train)
     grads = t.gradient(loss, net.trainable_variables)
     optimizer.apply_gradients(zip(grads, net.trainable_variables))
     print(f'epoch {epoch + 1}, loss {float(loss):.6f}')
