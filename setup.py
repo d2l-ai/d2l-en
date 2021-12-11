@@ -6,7 +6,8 @@ requirements = [
     'numpy',
     'matplotlib',
     'requests',
-    'pandas'
+    'pandas',
+    'gym'
 ]
 
 setup(
