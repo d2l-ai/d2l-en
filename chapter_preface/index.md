@@ -466,7 +466,7 @@ we happily recommend some other terrific resources:
 Linear Analysis by Bela Bollobas :cite:`Bollobas.1999`
 covers linear algebra and functional analysis in great depth.
 All of Statistics :cite:`Wasserman.2013` 
-provides a marvellous introduction to statistics.
+provides a marvelous introduction to statistics.
 Joe Blitzstein's [books](https://www.amazon.com/Introduction-Probability-Chapman-Statistical-Science/dp/1138369918) 
 and [courses](https://projects.iq.harvard.edu/stat110/home) 
 on probability and inference are pedagogical gems.
