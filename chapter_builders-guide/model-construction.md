@@ -75,7 +75,7 @@ and still implement complex neural networks.
 :label:`fig_blocks`
 
 
-From a programing standpoint, a module is represented by a *class*.
+From a programming standpoint, a module is represented by a *class*.
 Any subclass of it must define a forward propagation function
 that transforms its input into output
 and must store any necessary parameters.
