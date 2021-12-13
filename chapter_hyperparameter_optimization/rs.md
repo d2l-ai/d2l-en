@@ -32,18 +32,6 @@ configurations and their function values. We will see further below that well-de
 using a representation of such past data, can be more sample efficient in practice, in that they tend to reach certain performance
 levels with fewer function evaluations.
 
-## Sampling Configurations from the Search Space
-
-While random search is implemented in Syne Tune, let us code it up from scratch. First, we implement a method that allows us to sample random configurations from our search space. Each hyperparameter will be sampled independently from the other hyperparameters.
-
-```{.python .input  n=49}
-# def sample_config(search_space):
-#     config = {}
-#     for hyperparameter in search_space:
-#         config[hyperparameter] = search_space[hyperparameter].sample()
-#     return config
-```
-
 ```{.python .input  n=2}
 from d2l import torch as d2l
 
@@ -51,6 +39,10 @@ class RandomSearcher(d2l.Searcher):
     def __init__(self, search_space):
         self.save_hyperparameters()
 ```
+
+## Sampling Configurations from the Search Space
+
+While random search is implemented in Syne Tune, let us code it up from scratch. First, we implement a method that allows us to sample random configurations from our search space. Each hyperparameter will be sampled independently from the other hyperparameters.
 
 ```{.python .input  n=3}
 from d2l import torch as d2l
@@ -63,29 +55,28 @@ def sample_configuration(self):
     return config
 ```
 
-searcher = RandomSearcher(search_space)
-scheduler = FIFOScheduler(searcher)
-tuner = Tuner(scheduler, objective)
-tuner.run()
+## The Random Search Loop
+
+Now, we can implement the main optimization loop of random search, that iterates until we reach the final number of iterations specified by the user. In each iteration, we first sample a hyperparameter configuration from the subroutine that we implemented above and then train and validate the model with the new candidate. We also maintain the current incumbent, i.e the best configuration we have found so far. This will be the configuration we will later return as the final configuration.
 
 ```{.python .input  n=4}
 from syne_tune.search_space import loguniform, uniform, randint
 
 search_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
-   "momentum": uniform(0.0, 0.99),
-   "dropout": uniform(0, 0.99),
    "batch_size": randint(8, 128)
 }
+
 searcher = RandomSearcher(search_space)
 scheduler = d2l.FIFOScheduler(searcher)
 t = d2l.Tuner(scheduler, d2l.objective)
-
 ```
 
 ```{.python .input  n=5}
 t.run(10)
 ```
+
+Now we can plot the optimization trajectory of the incumbent to get the anytime performance of random search:
 
 ```{.python .input  n=6}
 board = d2l.ProgressBoard(xlabel='time', ylabel='error')
@@ -107,42 +98,6 @@ for time_step in range(len(t.incumbent_trajectory)):
   "output_type": "display_data"
  }
 ]
-```
-
-## The Random Search Loop
-
-Now, we can implement the main optimization loop of random search, that iterates until we reach the final number of iterations specified by the user. In each iteration, we first sample a hyperparameter configuration from the subroutine that we implemented above and then train and validate the model with the new candidate. We also maintain the current incumbent, i.e the best configuration we have found so far. This will be the configuration we will later return as the final configuration.
-
-```{.python .input  n=4}
-# TODO: can we use progress bar here
-
-def random_search(objective, num_iterations=10):
-
-
-
-    for i in range(num_iterations):
-        config = sample_config(search_space)
-        validation_error = objective(config)
-
-
-        
-    return incumbent, incumbent_trajectory
-```
-
-MS: We should consistently show the any-time performance as function of wall-clock time. In the script
-above, we can just measure the time.
-
-Now we can plot the optimization trajectory of the incumbent to get the anytime performance of random search:
-
-```{.python .input  n=4}
-%matplotlib inline
-from IPython import display
-from matplotlib import pyplot as plt
-
-display.set_matplotlib_formats('svg')
-
-plt.plot(incumbent_trajectory);
-
 ```
 
 ![Anytime performance random search](img/anytime_performance_rs.png)
@@ -251,26 +206,20 @@ In the example above every neural network will be trained for the same amount of
 
 Based on this observation, we can free up compute resources by early stopping the evaluation of poorly performing configuration and allocating more resources to more promising configurations. This will eventually speed up the optimization process, since we have a higher throughput of configurations that we can try. More formally, we expand our definition in Section :ref:`sec_definition_hpo`, such that our objective function $f(\mathbf{x}, r)$ gets an additional input $r \in [r_{min}, r_{max}]$ that specifies the amount of resource that we are willing to spend for the evaluation of $\mathbf{x}$. We assume that both, the correlation to $f(\mathbf{x}) = f(\mathbf{x})$ as well as the computational cost $c(\mathbf{x}, r)$ increases with $r$. Typically $r$ represents the number of epochs for training the neural network. But also other resources are possible, such as the training dataset size or the number of cross-validation folds.
 
-```{.python .input  n=39}
-def objective_multi_fidelity(config):
+```{.python .input  n=2}
+def multi_fidelity_objective(config):
     batch_size = config['batch_size']
     lr = config['learning_rate']
-    momentum = config['momentum']
-    dropout = config['dropout']
-    r = config['resource']
-    validation_error = r + np.random.randn()
-    return validation_error
-#     model = AlexNet(lr=lr, momentum=momentum, dropout=dropout)
-#     trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=0)
-#     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
+    resource = config['resource']
+    model = AlexNet(lr=lr, momentum=momentum, dropout=dropout)
+    trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=0)
+    data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     
-#     for i in range(r):
-#         trainer.fit_epoch()
+    for i in range(r):
+        trainer.fit_epoch()
         
-        # TODO: checkpoint
-        
-    # TODO: get validation error
-
+    validation_error = trainer.evaluate()
+    return validation_error
 ```
 
 ```{.python .input  n=1}
@@ -280,21 +229,6 @@ def objective_multi_fidelity(config):
 ## Successive Halving
 
 One simple extension to random search is successive halving which iteratively terminates the evaluation of poorly performing configurations. Given a set of $N$ randomly sampled hyperparameters configurations and a halving constant $\eta \in \mathbb{Z}_+$ and $\eta \geq 2$, where, due to simplicitly we assume that $\frac{r_{max}}{r_{min}} = \eta^K$, with $K \in \mathbb{Z}$. Successive halving starts with evaluating all $N$ configuration with $r_{min}$ amount of resources. It then sorts all configuration based on the their observed performances, and only continues the evaluation of the top $\frac{N}{\eta}$ for $\eta r_{min}$ amount of resources. Each decision points is called a rung, and the full set of rungs is given by $\mathcal{R} \in \{r_{min} \eta^k | k=0, ..., K  \}$. This step is iterated until we reach $r_{max}$.
-
-```{.python .input}
-# import time
-# @d2l.add_to_class(d2l.Tuner)
-# def run(self, num_iterations):
-#     for i in range(num_iterations):
-#         start_time = time.time()
-#         config = self.scheduler.suggest()
-        
-#         error = self.objective(config, resource)
-        
-#         runtime = time.time() - start_time
-        
-#         self.bookkeeping(config, error, runtime)
-```
 
 ```{.python .input  n=40}
 import numpy as np
