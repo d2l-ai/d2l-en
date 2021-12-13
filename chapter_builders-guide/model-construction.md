@@ -340,7 +340,7 @@ at how the `Sequential` class works.
 Recall that `Sequential` was designed
 to daisy-chain other modules together.
 To build our own simplified `MySequential`,
-we just need to define two key function:
+we just need to define two key functions:
 1. A function to append modules one by one to a list.
 2. A forward propagation function to pass an input through the chain of modules, in the same order as they were appended.
 
