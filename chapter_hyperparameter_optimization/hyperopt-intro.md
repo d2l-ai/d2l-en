@@ -3,23 +3,6 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-```{.json .output n=3}
-[
- {
-  "data": {
-   "application/vnd.jupyter.widget-view+json": {
-    "model_id": "2c9229b75170424b80eb948ad6eda73f",
-    "version_major": 2,
-    "version_minor": 0
-   },
-   "text/plain": "interactive(children=(Dropdown(description='tab', options=('mxnet', 'pytorch', 'tensorflow'), value=None), Out\u2026"
-  },
-  "metadata": {},
-  "output_type": "display_data"
- }
-]
-```
-
 # What is Hyperparameter Optimization?
 :label:`sec_what_is_hpo`
 
@@ -41,11 +24,7 @@ In this chapter, we provide an overview of the basics of hyperparameter optimiza
 ## How do we define Hyperparameter Optimization?
 :label:`sec_definition_hpo`
 
-The performance of our machine learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from our hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation performance. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning algorithm, which can take a long time. We will see below how much cheaper surrogates can help with the optimization of $f$. Training is stochastic in general (e.g., weights are randomly initialized), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
-
-Below we define our `objective` which is parameterized by the hyperparameter configuration `config`,
-consisting of `batch_size`, `learning_rate`, `momentum` and `dropout`. It returns the
-validation error after training our neural network form Chapter  :numref:`sec_alexnet` for `epochs` epochs.
+The performance of our machine learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from our hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation performance. This means for every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning algorithm, which can take a long time. We will see later how much cheaper approximations can help with the optimization of $f$. Training is stochastic in general (e.g., weights are randomly initialized), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
 
 ```{.python .input  n=5}
 from d2l import torch as d2l
@@ -53,28 +32,40 @@ import torch
 from torch import nn
 ```
 
+To validate our model, we will add an evaluate function to our Trainer class that computes the error on the validation dataset
+
+```{.python .input}
+# %%tab pytorch, mxnet, tensorflow
+
+@d2l.add_to_class(d2l.Trainer) #@save
+def evaluate(self):
+    self.model.eval()
+    error = 0
+    for batch in self.val_dataloader:
+        with torch.no_grad():
+            x, y = self.prepare_batch(batch)
+            y_hat = self.model(x)
+            l = self.model.loss(y_hat, y)
+        error += l
+        self.val_batch_idx += 1
+    return error / self.val_batch_idx
+```
+
+Below we define our `objective` to be optimized which is parameterized by the hyperparameter configuration `config`,
+consisting of `batch_size` and the `learning_rate`. It returns the
+validation error after training our neural network form Chapter  :numref:`sec_alexnet` for `epochs` epochs.
+
 ```{.python .input  n=7}
 %%tab pytorch, mxnet, tensorflow
 def objective(config, max_epochs = 10): #@save
     batch_size = config['batch_size']
     lr = config['learning_rate']
-    momentum = config['momentum']
-    dropout = config['dropout']
-    model = d2l.AlexNet(lr=lr, momentum=momentum, dropout=dropout)
+    model = d2l.AlexNet(lr=lr)
     trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=0)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     trainer.fit(model=model, data=data)
+    validation_error = trainer.evaluate()
     return validation_error    
-```
-
-```{.json .output n=7}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"None\" cell."
- }
-]
 ```
 
 Now, given our objective function $f$, hyperparameter optimization aims to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. Since $f$ is the validation performance after training, there is no efficient way to compute gradients with respect to $\mathbf{x}$. While there is recent work to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here.
@@ -92,15 +83,13 @@ from syne_tune.search_space import loguniform, uniform, randint
 
 search_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
-   "momentum": uniform(0.0, 0.99),
-   "dropout": uniform(0, 0.99),
    "batch_size": randint(8, 128)
 }
 ```
 
-Each parameter has a data type, such as `float` (for `learning_rate`, `momentum`, `weight_decay`) or `int` (for `batch_size`), as well as a closed bounded range
+Each parameter has a data type, such as `float` (for `learning_rate`) or `int` (for `batch_size`), as well as a closed bounded range
 (lower and upper bounds). Some positive parameters (such as `learning_rate`) are best represented on a logarithmic scale
-(optimal values can differ by orders of magnitude), while others (like `momentum`) come with linear scale. As suggested by the
+(optimal values can differ by orders of magnitude), while others (such as  `batch size`) come with linear scale. As suggested by the
 naming in Syne Tune, another way to define hyperparameter types is as bounded distributions, typically uniform or loguniform.
 Methods driven by random search sample independent values from these distributions for every search decision.
 
@@ -139,22 +128,21 @@ We can generalize the definition of HPO in order to deal with multiple objective
 def multi_objective(config, max_epochs = 10):
     batch_size = config['batch_size']
     lr = config['learning_rate']
-    momentum = config['momentum']
-    dropout = config['dropout']
 
-    model = AlexNet(lr=lr, momentum=momentum, dropout=dropout)
+    model = AlexNet(lr=lr)
     trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=0)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     trainer.fit(model=model, data=data)
             
     num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    validation_error = trainer.evaluate()
 
     return validation_error, num_params
 ```
 
 However, this means we will not have a single $\mathbf{x}$ anymore that optimizes all objective functions at the same time. We can see this in the figure below: Each points marked in red represents a hyperparameter configuration that dominates all other sampled configurations in one of the objectives. This set of points is called the Parteto set.
 
-TODO: this figure will be replaces by something that matches the code above
+TODO: this figure will be replaces by something that matches the code above. The message of the plot is not changing though.
 
 ![Pareto front of two objectives](img/pareto_front.png)
 :width:`400px`
@@ -162,9 +150,8 @@ TODO: this figure will be replaces by something that matches the code above
 
 ### Cost
 
-Another relevant metric is the cost of evaluating $f(\mathbf{x})$ at a configuration $\mathbf{x}$. Different to validation error or prediction latency, this metric is not a function of the final trained model, but a measure of training wall-clock time. For example, if we tune the number of layers or units per layer, larger networks are slower
-to train than smaller ones. In our runnning example, training time does not depend on `learning_rate`, `momentum`, `dropout`, but varies in general on `batch_size`, due to how GPUs
-work. Counting cost in terms of wall-clock time is more relevant in practice than counting the number of evaluations. Some HPO algorithms explicitly model training cost and take it into
+Another relevant metric is the cost of evaluating $f(\mathbf{x})$ at a configuration $\mathbf{x}$. Different to, for example, the validation error, this metric is not a function of the final trained model, but a measure of training wall-clock time. For example, if we tune the number of layers or units per layer, larger networks are slower
+to train than smaller ones, but potentially lead to a lower validation error. In our runnning example, training time does not depend on the `learning_rate` but varies in general with the `batch_size`. Counting cost in terms of wall-clock time is more relevant in practice than counting the number of evaluations. Some HPO algorithms explicitly model training cost and take it into
 account for making decisions.
 
 ```{.python .input  n=9}
@@ -182,11 +169,14 @@ In many scenarios we are not just interested in finding $\mathbf{x}_{\star}$, bu
 
 ## Components of Hyperparameter Optimization Methods
 
+Most HPO methods, and all that we will consider in this chapter, need to continusously a) sample new configurations and b) allocate resources for the next evaluation. 
+Below we will define two base classes for these two tasks that all HPO methods in this chapter will implement. The first class Searcher provides functionality to sample new hyperparameter configurations. The second class Scheduler schedules the next configuration that we will evaluate and the amount of resources, in terms of epochs, for the evaluation.
+
 ### Searcher
 
-The searcher samples the next configuration that should be evaluated in the following iteraton. Below we define an abstract class for searchers, which provides a new candidate configuration through the `sample_configuration` method. Model-based approaches, that we will discuss later, require the observed performance of a configuration to train the model. We can implement this through the `update` function, which gets as input the configuration, its observed validation error and potential additional information for the model. 
+Below we define a base class for searchers, which provides a new candidate configuration through the `sample_configuration` method. Model-based approaches, that we will discuss later, require the observed performance of a configuration to train the model. We can pass information back to the searcher through the `update` function, which gets as input the configuration, its observed validation error and potential additional information for the model. 
 
-```{.python .input  n=2}
+```{.python .input  n=11}
 %%tab pytorch, mxnet, tensorflow
 
 class Searcher(d2l.HyperParameters): #@save
@@ -198,21 +188,11 @@ class Searcher(d2l.HyperParameters): #@save
         
 ```
 
-```{.json .output n=2}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "UsageError: Cell magic `%%tab` not found.\n"
- }
-]
-```
-
 ### Scheduler
 
-Given a candidate configuration, our optimizer now needs to decide how and when it will evaluate this configuration. As we are going to set in the next sections, this scheduling decision becomes more important for algorithms that make parallelize the evaluation of configurations across a set of workers or adapt the resources of the evaluation.
+Everytime resources become available, our optimizer needs to decide how and when it will evaluate this configuration. As we are going to see in the next sections, this scheduling decision becomes more important for algorithms that parallelize the evaluation of configurations across a set of workers or adapt the resources of the evaluation.
 
-The second component that our optimizer needs to implement is the scheduler. Similar to the searcher, our scheduler has two main functions: `suggest` provides us with the next configuration we want to evaluate. Here we implement a basic FIFO scheduling strategy that first queries the searcher and than immediately schedules its evaluation. However, as we will see in the next section, more complex scheduling mechanism are possible that also control the amount of resource that we are willing to spend for the evaluation.
+The second component that our optimizer therefor needs to implement is the scheduler. Similar to the searcher, our scheduler has two main functions: `suggest` provides us with the next configuration we want to evaluate. Here we implement a basic FIFO scheduling strategy that first queries the searcher and than immediately schedules its evaluation. However, as we will see in the next section, more complex scheduling mechanism are possible that also control the amount of resource that we are willing to spend for the evaluation.
 Additionally, we also have another `update` function, that potentially updates the internal state of the scheduler and forwards the observation to the searcher. 
 
 ```{.python .input  n=18}
@@ -229,20 +209,10 @@ class FIFOScheduler(d2l.HyperParameters): #@save
         pass
 ```
 
-```{.json .output n=18}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"None\" cell."
- }
-]
-```
-
 ## How can we evaluate hyperparameter optimization methods?
 
 In the next sections we will analyse and compare different hyperparameter optimization methods. All optimzers that we will look at are iterative algorithms, where in each iteration we first sample a new hyperparameter configuration, evaluate the objective function with this configuration and then update all internal states.
-The following module is a generic wrapper that, provided with a scheduler and a searcher, helps us to run our optimizers. 
+The following module is a generic wrapper that, provided with a scheduler and a searcher, helps us to run our optimization algorithm. 
 
 ```{.python .input  n=13}
 %%tab pytorch, mxnet, tensorflow
@@ -256,16 +226,6 @@ class Tuner(d2l.HyperParameters): #@save
         self.incumbent_trajectory = []
         self.cumulative_runtime = []
         self.current_time = 0
-```
-
-```{.json .output n=13}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"None\" cell."
- }
-]
 ```
 
 ```{.python .input  n=19}
@@ -284,16 +244,6 @@ def run(self, num_iterations):
         runtime = time.time() - start_time
         
         self.bookkeeping(config, error, runtime)
-```
-
-```{.json .output n=19}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"None\" cell."
- }
-]
 ```
 
 Just as with training algorithms or model architectures, it is important to understand how to best
@@ -328,16 +278,6 @@ def bookkeeping(self, config, error, runtime):
     
     self.current_time =+ runtime
     self.cumulative_runtime.append(self.current_time)
-```
-
-```{.json .output n=17}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"None\" cell."
- }
-]
 ```
 
 ## Summary

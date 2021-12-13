@@ -308,7 +308,7 @@ import tensorflow as tf
 
 ```{.python .input}
 %%tab all
-class AlexNet(d2l.Classification):
+class AlexNet(d2l.Classification):#@save
     def __init__(self, lr=0.1):
         super().__init__()
         self.save_hyperparameters()
@@ -445,7 +445,3 @@ Reviewing the architecture, we see that AlexNet has an Achilles heel when it com
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/276)
 :end_tab:
-
-```{.python .input}
-
-```
