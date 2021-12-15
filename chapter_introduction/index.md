@@ -1047,7 +1047,7 @@ The fields concerned with *causality* and *probabilistic graphical models* addre
 * Another important and exciting recent development in unsupervised learning
 is the advent of *generative adversarial networks*.
 These give us a procedural way to synthesize data,
-even complicated structured data like images and audio.
+even complicated unstructured data like images and audio.
 The underlying statistical mechanisms are tests
 to check whether real and fake data are the same.
 
