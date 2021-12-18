@@ -1047,7 +1047,7 @@ The fields concerned with *causality* and *probabilistic graphical models* addre
 * Another important and exciting recent development in unsupervised learning
 is the advent of *generative adversarial networks*.
 These give us a procedural way to synthesize data,
-even complicated structured data like images and audio.
+even complicated unstructured data like images and audio.
 The underlying statistical mechanisms are tests
 to check whether real and fake data are the same.
 
@@ -1160,7 +1160,7 @@ Finally, the agent receives a reward from the environment.
 This process is illustrated in :numref:`fig_rl-environment`.
 The agent then receives a subsequent observation,
 and chooses a subsequent action, and so on.
-The behavior of an reinforcement learning agent is governed by a policy.
+The behavior of a reinforcement learning agent is governed by a policy.
 In short, a *policy* is just a function that maps
 from observations of the environment to actions.
 The goal of reinforcement learning is to produce a good policy.

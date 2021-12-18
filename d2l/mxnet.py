@@ -383,7 +383,7 @@ class Trainer(d2l.HyperParameters):
         self.model = model
 
     def clip_gradients(self, grad_clip_val, model):
-        """Defined in :numref:`sec_rnn_scratch`"""
+        """Defined in :numref:`sec_rnn-scratch`"""
         params = model.parameters()
         if not isinstance(params, list):
             params = [p.data() for p in params.values()]
@@ -670,7 +670,7 @@ class Vocab:
         return self.token_to_idx['<unk>']
 
 class RNNScratch(d2l.Module):
-    """Defined in :numref:`sec_rnn_scratch`"""
+    """Defined in :numref:`sec_rnn-scratch`"""
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -680,7 +680,7 @@ class RNNScratch(d2l.Module):
         self.b_h = d2l.zeros(num_hiddens)
 
     def forward(self, inputs, state=None):
-        """Defined in :numref:`sec_rnn_scratch`"""
+        """Defined in :numref:`sec_rnn-scratch`"""
         if state is not None:
             state, = state
         outputs = []
@@ -692,16 +692,16 @@ class RNNScratch(d2l.Module):
         return outputs, state
 
 def check_len(a, n):
-    """Defined in :numref:`sec_rnn_scratch`"""
+    """Defined in :numref:`sec_rnn-scratch`"""
     assert len(a) == n, f'list\'s len {len(a)} != expected length {n}'
 
 def check_shape(a, shape):
-    """Defined in :numref:`sec_rnn_scratch`"""
+    """Defined in :numref:`sec_rnn-scratch`"""
     assert a.shape == shape, \
             f'tensor\'s shape {a.shape} != expected shape {shape}'
 
 class RNNLMScratch(d2l.Classification):
-    """Defined in :numref:`sec_rnn_scratch`"""
+    """Defined in :numref:`sec_rnn-scratch`"""
     def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -723,24 +723,24 @@ class RNNLMScratch(d2l.Classification):
         self.plot('ppl', d2l.exp(l), train=False)
 
     def one_hot(self, X):
-        """Defined in :numref:`sec_rnn_scratch`"""
+        """Defined in :numref:`sec_rnn-scratch`"""
         # Output shape: (num_steps, batch_size, vocab_size)
         return npx.one_hot(X.T, self.vocab_size)
 
     def output_layer(self, rnn_outputs):
-        """Defined in :numref:`sec_rnn_scratch`"""
+        """Defined in :numref:`sec_rnn-scratch`"""
         outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in rnn_outputs]
         return d2l.stack(outputs, 1)
     
 
     def forward(self, X, state=None):
-        """Defined in :numref:`sec_rnn_scratch`"""
+        """Defined in :numref:`sec_rnn-scratch`"""
         embs = self.one_hot(X)
         rnn_outputs, _ = self.rnn(embs, state)
         return self.output_layer(rnn_outputs)
 
     def predict(self, prefix, num_preds, vocab, device=None):
-        """Defined in :numref:`sec_rnn_scratch`"""
+        """Defined in :numref:`sec_rnn-scratch`"""
         state, outputs = None, [vocab[prefix[0]]]
         for i in range(len(prefix) + num_preds - 1):
             X = d2l.tensor([[outputs[-1]]], ctx=device)
@@ -947,11 +947,11 @@ def bleu(pred_seq, label_seq, k):
     for n in range(1, k + 1):
         num_matches, label_subs = 0, collections.defaultdict(int)
         for i in range(len_label - n + 1):
-            label_subs[''.join(label_tokens[i: i + n])] += 1
+            label_subs[' '.join(label_tokens[i: i + n])] += 1
         for i in range(len_pred - n + 1):
-            if label_subs[''.join(pred_tokens[i: i + n])] > 0:
+            if label_subs[' '.join(pred_tokens[i: i + n])] > 0:
                 num_matches += 1
-                label_subs[''.join(pred_tokens[i: i + n])] -= 1
+                label_subs[' '.join(pred_tokens[i: i + n])] -= 1
         score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
     return score
 
@@ -2222,7 +2222,7 @@ def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
                 masked_token = tokens[mlm_pred_position]
             # 10% of the time: replace the word with a random word
             else:
-                masked_token = random.randint(0, len(vocab) - 1)
+                masked_token = random.choice(vocab.idx_to_token)
         mlm_input_tokens[mlm_pred_position] = masked_token
         pred_positions_and_labels.append(
             (mlm_pred_position, tokens[mlm_pred_position]))
