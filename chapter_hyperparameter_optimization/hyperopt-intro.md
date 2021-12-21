@@ -13,17 +13,16 @@ hyperparameters and so would be the conclusions drawn. Unfortunately, it is not 
 
 The current need to manually tune the training process and structure of a deep neural network constitutes a significant gap towards the promise of end to end learning and artificial intelligence. If we are willing to spend sufficient computational resources, our methods should be able to configure themselves. Hyperparameter optimization aims to automatically find a performant configuration of any machine learning method. The main idea is to cast the search for the right hyperparameters as an optimization problem, to maximize the validation performance of the algorithm.
 
-
 In this chapter, we provide an overview of the basics of hyperparameter optimization and look at several state-of-the-art methods from the literature. As a running example, we will show how to automatically tune hyperparameters of a convolutional neural network. Any successful HPO method needs to provide solutions for two decision-making primitives, **scheduling** and **search**, and we will highlight the most prominent current solutions for either. Scheduling amounts to decisions of how much resources to spend on a hyperparameter configuration, e.g. when to stop, pause, or resume training, while search is about which configurations to evaluate in the first place. A specific focus in this chapter will lie on model-based approaches to search, which in practice are often more sample efficient than their random-search based counterparts. Since hyperparameter optimization requires us to train and validate several machine learning models, we will also see how we can distribute these methods. To avoid distracting boiler-plate code, we will use the Python framework **Syne Tune**, providing us with an simple interface for distributed hyperparameter optimization. You can install it via:
 
 ```{.python .input  n=4}
 !pip install syne-tune
 ```
 
-## How do we define Hyperparameter Optimization?
+## Ingredients to Hyperparameter Optimization
 :label:`sec_definition_hpo`
 
-The performance of our machine learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from our hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation performance. This means for every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning algorithm, which can take a long time. We will see later how much cheaper approximations can help with the optimization of $f$. Training is stochastic in general (e.g., weights are randomly initialized), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
+The performance of our machine learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from our hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation performance. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning algorithm, which can take a long time. We will see later how much cheaper approximations can help with the optimization of $f$. Training is stochastic in general (e.g., weights are randomly initialized), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
 
 ```{.python .input  n=5}
 from d2l import torch as d2l
@@ -31,7 +30,9 @@ import torch
 from torch import nn
 ```
 
-To validate our model, we will add an evaluate function to our Trainer class that computes the error on the validation dataset
+As a running example, we will train the model from Chapter :numref:`sec_alexnet`
+on the FashionMNIST dataset. As we would like to optimize the validation error,
+we need to add a method computing this metric.
 
 ```{.python .input}
 # %%tab pytorch, mxnet, tensorflow
@@ -50,9 +51,9 @@ def evaluate(self):
     return error / self.val_batch_idx
 ```
 
-Below we define our `objective` to be optimized which is parameterized by the hyperparameter configuration `config`,
-consisting of `batch_size` and the `learning_rate`. It returns the
-validation error after training our neural network form Chapter  :numref:`sec_alexnet` for `epochs` epochs.
+We optimize validation error with respect to the hyperparameter configuration `config`,
+consisting of `batch_size` and `learning_rate`. For each evaluation, we train our model
+for `max_epochs` epochs, then compute and return its validation error:
 
 ```{.python .input  n=7}
 %%tab pytorch, mxnet, tensorflow
@@ -67,7 +68,8 @@ def objective(config, max_epochs = 10): #@save
     return validation_error    
 ```
 
-Now, given our objective function $f$, hyperparameter optimization aims to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. Since $f$ is the validation performance after training, there is no efficient way to compute gradients with respect to $\mathbf{x}$. While there is recent work to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here.
+Given our criterion $f(\mathbf{x})$ in terms of `objective(config)`, where $\mathbf{x}$
+corresponds to `config`, we would like to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. Since $f$ is the validation performance after training, there is no efficient way to compute gradients with respect to $\mathbf{x}$. While there is recent work to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here.
 
 
 ### Search Spaces
@@ -88,8 +90,8 @@ search_space = {
 
 Each parameter has a data type, such as `float` (for `learning_rate`) or `int` (for `batch_size`), as well as a closed bounded range
 (lower and upper bounds). Some positive parameters (such as `learning_rate`) are best represented on a logarithmic scale
-(optimal values can differ by orders of magnitude), while others (such as  `batch size`) come with linear scale. As suggested by the
-naming in Syne Tune, another way to define hyperparameter types is as bounded distributions, typically uniform or loguniform.
+(optimal values can differ by orders of magnitude), while others (such as  `batch size`) come with linear scale.
+Another way to define hyperparameter types is as bounded distributions, typically uniform or loguniform.
 Methods driven by random search sample independent values from these distributions for every search decision.
 
 One important data type missing from our running example is `categorical`. For example, we could extend it by
@@ -111,69 +113,24 @@ the width of the $l$-th layer is relevant only if the network has at least $l+1$
 over and probing the underlying machine learning algorithm at these values in the hope that 
 one of them will be close to the best hyperparameters $\mathbf{x}_*$. 
 
-## Which metrics are important?
 
+## API of Hyperparameter Optimization
+:label:`sec_api_hpo`
 
-MS: I think this is good for now, but we may want to check whether some basics here are already well explained in
-early chapters, and if so, just refer to them.
-
-### Objective Function
-
-Arguably the most common way to estimate the validation performance of a machine learning algorithm is to compute its error (e.g classification error) on a hold out validation set. We cannot use the training loss to optimize the hyperparameters, as this would lead to overfitting. Unfortunately, in case of small datasets we often do not have access to a sufficient large validation dataset. In this case we can apply $k$-fold cross validation and use the average validation loss across all folds as metric to optimize. However, at least in the standard form of HPO, this makes the optimization process $k$ times slower. 
-
-We can generalize the definition of HPO in order to deal with multiple objectives $f_0, ... f_k$ at the same time. For example, we might not only be interested in optimize the validation performance, but also, for example, the number of parameters:
-
-```{.python .input  n=8}
-def multi_objective(config, max_epochs = 10):
-    batch_size = config['batch_size']
-    lr = config['learning_rate']
-
-    model = AlexNet(lr=lr)
-    trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=0)
-    data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
-    trainer.fit(model=model, data=data)
-            
-    num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    validation_error = trainer.evaluate()
-
-    return validation_error, num_params
-```
-
-However, this means we will not have a single $\mathbf{x}$ anymore that optimizes all objective functions at the same time. We can see this in the figure below: Each points marked in red represents a hyperparameter configuration that dominates all other sampled configurations in one of the objectives. This set of points is called the Parteto set.
-
-TODO: this figure will be replaces by something that matches the code above. The message of the plot is not changing though.
-
-![Pareto front of two objectives](img/pareto_front.png)
-:width:`400px`
-:label:`pareto_front`
-
-### Cost
-
-Another relevant metric is the cost of evaluating $f(\mathbf{x})$ at a configuration $\mathbf{x}$. Different to, for example, the validation error, this metric is not a function of the final trained model, but a measure of training wall-clock time. For example, if we tune the number of layers or units per layer, larger networks are slower
-to train than smaller ones, but potentially lead to a lower validation error. In our runnning example, training time does not depend on the `learning_rate` but varies in general with the `batch_size`. Counting cost in terms of wall-clock time is more relevant in practice than counting the number of evaluations. Some HPO algorithms explicitly model training cost and take it into
-account for making decisions.
-
-```{.python .input  n=9}
-import time
-
-def objective_function_with_cost(config, max_epochs=10):
-    start_time = time.time()
-    validation_error = objective(config, max_epochs)
-    return validation_error, time.time() - start_time
-```
-
-### Constraints
-
-In many scenarios we are not just interested in finding $\mathbf{x}_{\star}$, but a hyperparameter configuration that additionally full fills certain constraints. More formally, we seek to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$ s.t $c_1(\mathbf{x}) > 0, ..., c_m(\mathbf{x}) > 0$. Typical constraints could be, for example, the memory consumption of $\mathbf{x}$ or fairness constraints.
-
-## Components of Hyperparameter Optimization Methods
-
-Most HPO methods, and all that we will consider in this chapter, need to continusously a) sample new configurations and b) allocate resources for the next evaluation. 
-Below we will define two base classes for these two tasks that all HPO methods in this chapter will implement. The first class Searcher provides functionality to sample new hyperparameter configurations. The second class Scheduler schedules the next configuration that we will evaluate and the amount of resources, in terms of epochs, for the evaluation.
+Before we dive into details, let us get the basic code structure in place. All HPO
+methods considered here need to implement two decision making primitives. First, they
+need to sample new configurations to be trained and evaluated, given that resources
+are available, which often involves some kind of search over the configuration space.
+Once a configuration is marked for execution, we will refer to it as a
+**trial**. Second, they need to schedule trials, which means deciding when to stop,
+pause or resume them. We map these to two classes, `Searcher` and `Scheduler`.
 
 ### Searcher
 
-Below we define a base class for searchers, which provides a new candidate configuration through the `sample_configuration` method. Model-based approaches, that we will discuss later, require the observed performance of a configuration to train the model. We can pass information back to the searcher through the `update` function, which gets as input the configuration, its observed validation error and potential additional information for the model. 
+Below we define a base class for searchers, which provides a new candidate
+configuration through the `sample_configuration` method. Many algorithms will make
+these decisions based on observed performances of previously run trials. Such an
+observation can be passed via the `update` method.
 
 ```{.python .input  n=11}
 %%tab pytorch, mxnet, tensorflow
@@ -187,7 +144,14 @@ class Searcher(d2l.HyperParameters): #@save
         
 ```
 
+We will mostly be interested in asynchronous methods in this chapter, for which
+`searcher.sample_configuration` is called whenever some resource for training
+becomes available, and the `searcher.update` callback is invoked whenever an
+evaluation produces a new metric value.
+
 ### Scheduler
+
+MS: `update` needs to be able to return something?!
 
 Everytime resources become available, our optimizer needs to decide how and when it will evaluate this configuration. As we are going to see in the next sections, this scheduling decision becomes more important for algorithms that parallelize the evaluation of configurations across a set of workers or adapt the resources of the evaluation.
 
