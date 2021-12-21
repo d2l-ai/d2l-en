@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="480pt" height="122pt" viewBox="0 0 480 122" version="1.1" style="background-color:white">
+<rect width="480pt" height="122pt" fill="white"/>
+
 <g id="surface1">
 <path style="fill-rule:nonzero;fill:rgb(39.215088%,74.902344%,100%);fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 343 960.5 L 395 903 L 469 914.5 L 480 986 L 379 1021 Z M 343 960.5 " transform="matrix(1,0,0,1,-178,-900)"/>
 <path style="fill-rule:nonzero;fill:rgb(69.804382%,85.098267%,100%);fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 291.960938 932.769531 C 289.238281 927.667969 285.726562 922.875 281.425781 918.574219 C 257.996094 895.140625 220.003906 895.140625 196.574219 918.574219 C 173.140625 942.003906 173.140625 979.996094 196.574219 1003.425781 C 220.003906 1026.859375 257.996094 1026.859375 281.425781 1003.425781 C 285.726562 999.125 289.238281 994.332031 291.960938 989.230469 L 235.5 961 Z M 291.960938 932.769531 " transform="matrix(1,0,0,1,-178,-900)"/>

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="572pt" height="220pt" viewBox="0 0 572 220" version="1.1" style="background-color:white">
+<rect width="572pt" height="220pt" fill="white"/>
+
 <g id="surface1">
 <path style="fill:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 350.269531 182.550781 C 353.636719 185.921875 353.636719 191.382812 350.269531 194.753906 C 346.902344 198.121094 341.4375 198.121094 338.070312 194.753906 C 334.699219 191.382812 334.699219 185.921875 338.070312 182.550781 C 341.4375 179.183594 346.902344 179.183594 350.269531 182.550781 " transform="matrix(1,0,0,1,-326,-37)"/>
 <path style="fill:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 386.046875 182.550781 C 389.414062 185.921875 389.414062 191.382812 386.046875 194.753906 C 382.675781 198.121094 377.214844 198.121094 373.84375 194.753906 C 370.476562 191.382812 370.476562 185.921875 373.84375 182.550781 C 377.214844 179.183594 382.675781 179.183594 386.046875 182.550781 " transform="matrix(1,0,0,1,-326,-37)"/>

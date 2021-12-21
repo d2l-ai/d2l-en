@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="255px" height="195px" viewBox="0 0 255 195" version="1.1" style="background-color:white">
+<rect width="255px" height="195px" fill="white"/>
+
 <g id="surface1">
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(0%,0%,0%);fill-opacity:1;" d="M 152.058594 47.808594 L 149.011719 41.625 L 147.984375 41.625 L 144.9375 47.808594 L 146.082031 47.808594 L 148.484375 42.914062 L 148.511719 42.914062 L 150.914062 47.808594 Z M 152.058594 47.808594 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 161.2 167.5 L 284.977083 167.5 " transform="matrix(1.875,0,0,1.875,-292.5,-163.125)"/>
