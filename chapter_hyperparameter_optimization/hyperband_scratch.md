@@ -25,7 +25,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 Most neural network models are pretty expensive to train even for a single
 hyperparameter configuration. In order to converge, we need to train for
 a substantial number of epochs. Without a massively parallel compute budget,
-random search will often be too slow ot be of real use in practice. What can
+random search will often be too slow to be of real use in practice. What can
 we do?
 
 If a configuration is a poor choice, do we really have to wait for many epochs
@@ -35,7 +35,7 @@ algorithms based on this **early stopping** idea.
 
 ## Early Stopping Hyperparameter Configurations
 
-In the example above every neural network will be trained for the same number
+In the example above every neural network is trained for the same number
 `max_epochs` of epochs. If we are lucky, we have a high correlation between
 validation errors after a few epochs and at the end (after `max_epochs` epochs).
 In Figure :numref:`img_samples_lc`, we see that after a few epochs we are already
@@ -56,7 +56,7 @@ below. The basic  idea is to start with $N$ trials, each for a randomly chosen
 configuration, and train each of them for only $r_{min}$ epochs (e.g., $r_{min} = 1$). We then
 discard a fraction of the worst performing trials and train the remaining ones
 for longer. Iterating this process, less and less trials run for longer and
-longer, until at least one reaches `max_epochs` epochs.
+longer, until at least one trial reaches `max_epochs` epochs.
 
 More formally, specify a minimum budget $r_{min}$ and a halving constant
 $\eta\in\{2, 3, \dots\}$. For simplicity, assume that $r_{max} = r_{min} \eta^K$,
@@ -77,7 +77,7 @@ repeated in an outer loop until the total experiment budget is spent.
 When implementing successive halving from scratch, we will take a shortcut.
 Recall that our `objective` code allows to specify the number of epochs
 to be trained as `max_epochs`, and we will make use of this, by feeding in
-$r_{min}$, $r_{min}\eta$, for this argument. In particular, if trial is chosen
+$r_{min}$, $r_{min}\eta$, for this argument. In particular, if a trial is chosen
 to continue after $r_{min}$ or $r_{min}\eta$ epochs, its training to the next
 level is started from scratch. In **Syne Tune**, trials are checkpointed whenever
 the scheduler decides to pause them, so training can continue from a checkpoint.
@@ -104,9 +104,10 @@ class SuccessiveHalvingScheduler(d2l.HyperParameters):
         self.searcher.update(config, error, additional_info=info)
     
     def get_top_n_configurations(self, rung_level, n):
-        l = self.rungs[rung_level]
-        errors = [li[1] for li in l]
-        configs = [li[0] for li in l]
+        rung = self.rungs[rung_level]
+        if not rung:
+            return []
+        configs, errors = zip(*rung)
         
         indices = [np.argsort(errors)[i] for i in range(n)]
         return [configs[i] for i in indices]
@@ -255,7 +256,8 @@ class HyperbandScheduler(d2l.HyperParameters):
         self.save_hyperparameters()
         self.current_bracket = 0
         self.brackets = []
-        self.successive_halving = SuccessiveHalvingScheduler(searcher, eta, r_min, r_max)
+        self.successive_halving = SuccessiveHalvingScheduler(
+            searcher, eta, r_min, r_max)
         
     def suggest(self):
         # check if we finished the current bracket
