@@ -86,7 +86,7 @@ searcher = RandomSearcher(search_space)
 scheduler = d2l.FIFOScheduler(searcher=searcher)
 tuner = d2l.Tuner(scheduler=scheduler, objective=d2l.objective)
 
-tuner.run(num_iterations=10)
+tuner.run(max_wallclock_time=600)
 ```
 
 Now we can plot the optimization trajectory of the incumbent to get the any-time

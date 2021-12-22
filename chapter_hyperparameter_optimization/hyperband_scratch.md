@@ -71,7 +71,8 @@ trials are trained for $r_{min}\eta$ epochs (next rung level), and the process
 is repeated. In each round, a $1 / \eta$ fraction of trials
 survives and finds it budget to be multiplied by $\eta$. With this particular
 choice of $N$, only a single trial will be trained to the full budget of
-`max_epochs` epochs.
+`max_epochs` epochs. Finally, such traversals over all rung levels are
+repeated in an outer loop until the total experiment budget is spent.
 
 When implementing successive halving from scratch, we will take a shortcut.
 Recall that our `objective` code allows to specify the number of epochs
@@ -154,7 +155,7 @@ Let us see how this is doing on our example.
 searcher = RandomSearcher(search_space)
 scheduler = SuccessiveHalvingScheduler(searcher=searcher, eta=2, r_min=1, r_max=16)
 tuner = d2l.Tuner(scheduler=scheduler, objective=objective_with_resource)
-tuner.run(num_iterations=31)
+tuner.run(max_wallclock_time=600)
 ```
 
 ```{.python .input  n=85}
@@ -217,16 +218,33 @@ for r in scheduler.rungs:
 
 ## Synchronous Hyperband
 
-HIER!
+While successive halving can greatly improve upon random search, the choice of $r_{min}$
+can be critical for good performance. If $r_{min}$ is too small, validation errors at the
+lowest rung may be determined more by initial random weights than by the hyperparameters,
+and even the best configurations may be filtered out at random. If $r_{min}$ is too large,
+the benefits of early stopping may be greatly diminished.
 
-While successive halving can substantially speed up random search, its performance mostly hinges on $r_{min}$. If we set $r_{min}$ too small we might miss configurations that would achieve a top performance with more resources. However, a too large $r_{min}$ will allocated too many resource to poorly performing configurations.
-
-Instead of using a fixed $r_{min}$, Hyperband runs successive halving iteratively as a subroutine by blancing the number of configurations $N$ and $r_{min}$, such that each round of succesive halving, called a bracket, consumes roughly the same amount of resources.
-Note that, the last bracket uses $r_{min} = r_{max}$, which means that we effectively perform random search. One can in effect show that, in the worst case, Hyperband is only a constant worse than random search.
+Hyperband is an extension of successive halving (SH) which eliminates the risk of choosing
+$r_{min}$ too small. Recall that SH defines $K + 1$ rung levels $\mathcal{R} =
+\{ r_{min}, r_{min}\eta, \dots, r_{max} \}$. Hyperband runs SH as a subroutine, based on
+*brackets* $\mathcal{R}_b = \{ r_{min}\eta^b, r_{min}\eta^{b+1},\dots, r_{max}\}$, $b=0,
+\dots, K$. Each bracket comes with an initial number $N_b$ of trials, which are chosen at
+random and trained for $r_{min}\eta^b$ epochs. The $N_b$ are chosen such that the total
+resources (i.e., number of epochs trained) in each bracket are about the same. Now,
+Hyperband runs SH on the brackets in a round robin fashion. On bracket $b=0$, we have SH
+with the original choice $r_{min}$, while on bracket $b=K$, we run standard random
+search, since the only rung level is $r_{max}$.
 
 ![Learning curves based on Hyperband](img/hyperband.jpeg)
 :width:`400px`
 :label:`img_samples_hb`
+
+Here is code for synchronous Hyperband scheduling.
+
+MS: There is something wrong in this code. The number $N_b$ of trials in the
+lowest rung needs to be set depending on the bracket, and that is not done
+here. I think `SuccessiveHalvingScheduler` needs some argument for that, which
+could be None and set by default, but for Hyperband, you need to pass it.
 
 ```{.python .input  n=76}
 import numpy as np
@@ -234,7 +252,6 @@ import copy
 
 class HyperbandScheduler(d2l.HyperParameters):
     def __init__(self, searcher, eta, r_min, r_max):
-       
         self.save_hyperparameters()
         self.current_bracket = 0
         self.brackets = []
@@ -266,11 +283,13 @@ class HyperbandScheduler(d2l.HyperParameters):
         self.successive_halving.update(config, error)
 ```
 
+Let us see how this is doing.
+
 ```{.python .input  n=77}
 searcher = RandomSearcher(search_space)
 scheduler = HyperbandScheduler(searcher=searcher, eta=2, r_min=1, r_max=16)
-t = d2l.Tuner(scheduler, objective_multi_fidelity)
-t.run(31 * 5)
+tuner = d2l.Tuner(scheduler=scheduler, objective=objective_with_resource)
+tuner.run(max_wallclock_time=600)
 ```
 
 ```{.json .output n=77}
@@ -375,42 +394,8 @@ for bracket in scheduler.brackets:
 
 ```
 
-## Synchronous Hyperband
-
-## Asynchronous Hyperband
-
-```{.python .input  n=4}
-from syne_tune.optimizer.schedulers.hyperband import HyperbandScheduler
-
-entry_point = "train_script.py"
-mode = "min"
-metric = "mean_loss"
-
-backend = LocalBackend(entry_point=str(entry_point))
-
-scheduler = HyperbandScheduler(
-    config_space,
-    searcher=searcher,
-    search_options=search_options,
-    max_t=max_steps,
-    resource_attr='epoch',
-    mode=mode,
-    metric=metric,
-    random_seed=random_seed)
-
-stop_criterion = StoppingCriterion(max_wallclock_time=30)
-tuner = Tuner(
-    backend=backend,
-    scheduler=scheduler,
-    stop_criterion=stop_criterion,
-    n_workers=n_workers,
-)
-
-tuner.run()
-```
 
 ## Summary
 
 
-
-## Excercise
+## Exercises
