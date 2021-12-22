@@ -163,7 +163,9 @@ tuner = Tuner(
 tuner.run()
 ```
 
-The logs of all evaluated hyperparameter configuratons are stored for further analysis. At any time during the tuning job, we can easily get the results obtained so far and plotting the incumbent trajectory
+The logs of all evaluated hyperparameter configuratons are stored for further
+analysis. At any time during the tuning job, we can easily get the results
+obtained so far and plotting the incumbent trajectory.
 
 ```{.python .input}
 from syne_tune.experiments import load_experiment
@@ -171,6 +173,10 @@ from syne_tune.experiments import load_experiment
 tuning_experiment = load_experiment(tuner.name)
 tuning_experiment.plot()
 ```
+
+MS: Following our recommendation above, should we not present results averaged
+over many runs? We could say these are easy to obtain with Syne Tune, without
+going into details.
 
 ## Summary
 
