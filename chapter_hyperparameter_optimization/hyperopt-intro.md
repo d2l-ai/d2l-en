@@ -138,7 +138,7 @@ class Searcher(d2l.HyperParameters): #@save
     def sample_configuration():
         raise NotImplementedError
     
-    def update(self, config, error, additional_info=dict()):
+    def update(self, config, error, additional_info=None):
         pass
         
 ```
@@ -174,9 +174,9 @@ class FIFOScheduler(d2l.HyperParameters): #@save
         
     def suggest(self):
         return self.searcher.sample_configuration()
-    
-    def update(self, config, error, info=dict()):
-        searcher.update(config, error, info)
+
+    def update(self, config, error, info=None):
+        searcher.update(config, error, additional_info=info)
         pass
 ```
 

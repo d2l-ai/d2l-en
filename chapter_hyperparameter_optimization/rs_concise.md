@@ -86,6 +86,8 @@ if __name__ == '__main__':
     report(accuracy=accuracy)
 ```
 
+MS: We suddenly have momentum here. If so, we should also have it above
+
 ## Asynchronous Scheduler
 
 First, we define the number of workers that evaluate trials concurrently. Since
@@ -100,6 +102,12 @@ max_wallclock_time = 600
 entry_point = "train_script.py"
 mode = "max"
 metric = "accuracy"
+
+search_space = {
+   "learning_rate": loguniform(1e-5, 1e-1),
+   "momentum" : ???,
+   "batch_size": randint(8, 128)
+}
 ```
 
 In this example, we use 4 workers, allow the experiment to run for 600 seconds (or
@@ -124,7 +132,7 @@ we will use the `FIFOScheduler`, which is similar in behaviour to our code above
 from syne_tune.optimizer.schedulers.fifo import FIFOScheduler
 
 scheduler = FIFOScheduler(
-    config_space,
+    search_space,
     searcher='random',
     metric=metric,
     mode=mode)
@@ -151,6 +159,7 @@ The logs of all evaluated hyperparameter configuratons are stored for further an
 
 ```{.python .input}
 from syne_tune.experiments import load_experiment
+
 tuning_experiment = load_experiment(tuner.name)
 tuning_experiment.plot()
 ```
