@@ -62,10 +62,11 @@ def evaluate(self):
         self.val_batch_idx += 1
     return error / self.val_batch_idx
 
-def objective(config, max_epochs = 10): #@save
+def objective(config): #@save
     batch_size = config['batch_size']
     learning_rate = config['learning_rate']
     momentum = config['momentum']
+    max_epochs = config['max_epochs']
     model = d2l.AlexNet(lr=learning_rate, momentum=momentum)
     trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=0)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
@@ -75,6 +76,7 @@ def objective(config, max_epochs = 10): #@save
 
 if __name__ == '__main__':
     parser = ArgumentParser()
+    parser.add_argument('--max_epochs', type=float)
     parser.add_argument('--learning_rate', type=float)
     parser.add_argument('--momentum', type=float)
     parser.add_argument('--batch_size', type=float)
@@ -82,8 +84,8 @@ if __name__ == '__main__':
     args, _ = parser.parse_known_args()
     report = Reporter()
 
-    accuracy = objective(vars(args))
-    report(accuracy=accuracy)
+    validation_error = objective(vars(args))
+    report(validation_error=validation_error)
 ```
 
 MS: We suddenly have momentum here. If so, we should also have it above
@@ -99,20 +101,26 @@ to our training script.
 ```{.python .input  n=6}
 n_workers = 4
 max_wallclock_time = 600
+max_epochs = 16
+
 entry_point = "train_script.py"
-mode = "max"
-metric = "accuracy"
+mode = "min"
+metric = "validation_error"
 
 search_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
    "momentum" : ???,
-   "batch_size": randint(8, 128)
+   "batch_size": randint(8, 128),
+   "max_epochs": max_epochs,
 }
 ```
 
 In this example, we use 4 workers, allow the experiment to run for 600 seconds (or
-10 minutes), and specify that `accuracy` should be maximized. Namely, `metric` needs
-to correspond to the argument name passed to the `report` callback.
+10 minutes), and specify that `validation_error` should be minimized. Namely, `metric` needs
+to correspond to the argument name passed to the `report` callback. We also reuse
+the search space from our example. Note that in **Syne Tune**, the search space
+dictionary can also be used to pass constant attributes to the training script.
+We make use of this feature in order to pass `max_epochs`.
 
 Next, we need to specify the back-end for job executions. The simplest choice in Syne
 Tune is the local back-end, which runs on the given instance and executes parallel jobs

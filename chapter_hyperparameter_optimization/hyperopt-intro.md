@@ -57,7 +57,7 @@ for `max_epochs` epochs, then compute and return its validation error:
 
 ```{.python .input  n=7}
 %%tab pytorch, mxnet, tensorflow
-def objective(config, max_epochs = 10): #@save
+def objective(config, max_epochs=16): #@save
     batch_size = config['batch_size']
     learning_rate = config['learning_rate']
     model = d2l.AlexNet(lr=learning_rate)
@@ -121,8 +121,9 @@ methods considered here need to implement two decision making primitives. First,
 need to sample new configurations to be trained and evaluated, given that resources
 are available, which often involves some kind of search over the configuration space.
 Once a configuration is marked for execution, we will refer to it as a
-**trial**. Second, they need to schedule trials, which means deciding when to stop,
-pause or resume them. We map these to two classes, `Searcher` and `Scheduler`.
+**trial**. Second, they need to schedule trials, which means deciding for how long to
+run them, or when to stop, pause or resume them. We map these to two classes,
+`Searcher` and `Scheduler`.
 
 ### Searcher
 
@@ -150,11 +151,11 @@ evaluation produces a new metric value.
 
 ### Scheduler
 
-MS: Is this API also supposed to cover early stopping and pause and resume? If so,
-we need to say that `update` can return a status flag for what to do (continue, stop,
-pause). Also, `suggest` needs to be able to resume a trial instead of starting a
-new one. If we do not cover pause and resume, we don't need that double role of
-`suggest`, and `update` can return (continue, stop).
+MS: This API does not support stopping a trial as result of a call to `update`.
+I see this is not needed to implement synchronous SH and HB, so it's probably
+OK. But it runs a bit contrary to saying that scheduling is about stopping a
+trial. If we want that, we'd have to allow `update` to return a flag for
+(continue, stop).
 
 Beyond sampling configurations for new trials, we also need to decide how long to
 run a trial for, or whether to stop it early. In practice, all these decisions are
@@ -163,8 +164,8 @@ done by the `Scheduler`, who delegates the choice of new configurations to a
 becomes available. Apart from invoking `sample_configuration` of a searcher, it
 may also decide upon parameters like `max_epochs` (i.e., how long to train the
 model for). The `update` method is called whenever a trial produces a new
-metric value. TODO: Return continue/stop? The most basic scheduler just relays
-queries and updates to its searcher and does not add any scheduling decisions.
+metric value. The most basic scheduler just relays queries and updates to its
+searcher and does not add any scheduling decisions.
 
 ```{.python .input  n=18}
 %%tab pytorch, mxnet, tensorflow
