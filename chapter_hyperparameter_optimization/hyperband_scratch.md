@@ -88,7 +88,7 @@ However, for our simple implementation, training from scratch will suffice.
 ```{.python .input  n=40}
 import numpy as np
 
-class SuccessiveHalvingScheduler(d2l.HyperParameters):
+class SuccessiveHalvingScheduler(d2l.Scheduler):
     def __init__(self, searcher, eta, r_min, r_max):
         self.save_hyperparameters()
         
@@ -153,7 +153,7 @@ def objective_with_resource(config):
 Let us see how this is doing on our example.
 
 ```{.python .input  n=84}
-searcher = RandomSearcher(search_space)
+searcher = d2l.RandomSearcher(search_space)
 scheduler = SuccessiveHalvingScheduler(searcher=searcher, eta=2, r_min=1, r_max=16)
 tuner = d2l.Tuner(scheduler=scheduler, objective=objective_with_resource)
 tuner.run(max_wallclock_time=600)
@@ -228,7 +228,7 @@ the benefits of early stopping may be greatly diminished.
 Hyperband is an extension of successive halving (SH) which eliminates the risk of choosing
 $r_{min}$ too small. Recall that SH defines $K + 1$ rung levels $\mathcal{R} =
 \{ r_{min}, r_{min}\eta, \dots, r_{max} \}$. Hyperband runs SH as a subroutine, based on
-*brackets* $\mathcal{R}_b = \{ r_{min}\eta^b, r_{min}\eta^{b+1},\dots, r_{max}\}$, $b=0,
+brackets $\mathcal{R}_b = \{ r_{min}\eta^b, r_{min}\eta^{b+1},\dots, r_{max}\}$, $b=0,
 \dots, K$. Each bracket comes with an initial number $N_b$ of trials, which are chosen at
 random and trained for $r_{min}\eta^b$ epochs. The $N_b$ are chosen such that the total
 resources (i.e., number of epochs trained) in each bracket are about the same. Now,
@@ -251,7 +251,7 @@ could be None and set by default, but for Hyperband, you need to pass it.
 import numpy as np
 import copy
 
-class HyperbandScheduler(d2l.HyperParameters):
+class HyperbandScheduler(d2l.Scheduler):
     def __init__(self, searcher, eta, r_min, r_max):
         self.save_hyperparameters()
         self.current_bracket = 0
@@ -281,14 +281,14 @@ class HyperbandScheduler(d2l.HyperParameters):
 
         return self.successive_halving.suggest()
         
-    def update(self, config, error):
-        self.successive_halving.update(config, error)
+    def update(self, config, error, info=None):
+        self.successive_halving.update(config, error, info=info)
 ```
 
 Let us see how this is doing.
 
 ```{.python .input  n=77}
-searcher = RandomSearcher(search_space)
+searcher = d2l.RandomSearcher(search_space)
 scheduler = HyperbandScheduler(searcher=searcher, eta=2, r_min=1, r_max=16)
 tuner = d2l.Tuner(scheduler=scheduler, objective=objective_with_resource)
 tuner.run(max_wallclock_time=600)

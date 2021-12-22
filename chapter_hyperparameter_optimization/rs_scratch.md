@@ -35,11 +35,11 @@ is the searcher.
 ```{.python .input  n=2}
 from d2l import torch as d2l
 
-class RandomSearcher(d2l.Searcher):
+class RandomSearcher(d2l.Searcher): #@save
     def __init__(self, search_space):
         self.save_hyperparameters()
 
-@d2l.add_to_class(RandomSearcher)
+@d2l.add_to_class(RandomSearcher) #@save
 def sample_configuration(self):
     return {
         name: domain.sample()

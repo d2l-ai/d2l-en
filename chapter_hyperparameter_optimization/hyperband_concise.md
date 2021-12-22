@@ -65,7 +65,7 @@ from torch import nn
 
 from syne_tune.report import Reporter
 
-@d2l.add_to_class(d2l.Trainer) #@save
+@d2l.add_to_class(d2l.Trainer)
 def evaluate(self):
     self.model.eval()
     error = 0
@@ -78,7 +78,7 @@ def evaluate(self):
         self.val_batch_idx += 1
     return error / self.val_batch_idx
 
-def objective(config): #@save
+def objective(config):
     batch_size = config['batch_size']
     learning_rate = config['learning_rate']
     momentum = config['momentum']
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_epochs', type=int)
     parser.add_argument('--learning_rate', type=float)
     parser.add_argument('--momentum', type=float)
-    parser.add_argument('--batch_size', type=float)
+    parser.add_argument('--batch_size', type=int)
 
     args, _ = parser.parse_known_args()
 

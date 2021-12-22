@@ -57,6 +57,7 @@ for `max_epochs` epochs, then compute and return its validation error:
 
 ```{.python .input  n=7}
 %%tab pytorch, mxnet, tensorflow
+
 def objective(config, max_epochs=16): #@save
     batch_size = config['batch_size']
     learning_rate = config['learning_rate']
@@ -99,7 +100,7 @@ non-linear activation functions. This data type is for finite parameters, whose 
 relations with each other.
 
 It is tempting to try and "simplify" an HPO problem by turning numerical into categorical parameters. For example, why not specify
-`batch_size` as `categorical([8, 32, 128])`, i.e. 3 instead of 121 possible values? However, not only does this constitute another "choice by hand" we want to avoid,
+`batch_size` as `categorical([8, 32, 64, 128])`, i.e. 4 instead of 121 possible values? However, not only does this constitute another "choice by hand" we want to avoid,
 for most competitive HPO methods, it either does not matter or makes things worse. Uniform random sampling just as effectively covers a
 bounded range than a finite set. As we will see, many model-based HPO methods relax `int` to `float` and use
 one-hot encoding for `categorical`, so turning `int` or `float` into `categorical` increases the dimension of the encoding
@@ -169,7 +170,16 @@ searcher and does not add any scheduling decisions.
 
 ```{.python .input  n=18}
 %%tab pytorch, mxnet, tensorflow
-class FIFOScheduler(d2l.HyperParameters): #@save
+
+class Scheduler(d2l.HyperParameters): #@save
+    def suggest(self):
+        raise NotImplementedError
+    
+    def update(self, config, error, info=None):
+        raise NotImplementedError
+
+    
+class FIFOScheduler(Scheduler): #@save
     def __init__(self, searcher):
         self.save_hyperparameters()
         
@@ -178,7 +188,6 @@ class FIFOScheduler(d2l.HyperParameters): #@save
 
     def update(self, config, error, info=None):
         searcher.update(config, error, additional_info=info)
-        pass
 ```
 
 ### Tuner
@@ -190,6 +199,7 @@ be used for distributed HPO.
 
 ```{.python .input  n=13}
 %%tab pytorch, mxnet, tensorflow
+
 class Tuner(d2l.HyperParameters): #@save
     def __init__(self, scheduler, objective):
         self.save_hyperparameters()
