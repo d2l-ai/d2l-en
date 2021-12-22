@@ -28,13 +28,12 @@ as in random search above, we would like to use parallel training, making
 efficient use of multiple cores or multiple GPUs. In other words, training jobs
 should be executed in parallel, and asynchronously.
 
-Second, and even more important, the algorithms developed above also synchronize
-their decision making. Namely, each rung has an a priori fixed number of slots.
+Second, and more important, the algorithms developed above also synchronize
+their decision making. Each rung has an a priori fixed number of slots.
 For example, the lowest rung in SH, at $r_{min}$, has size $N = \eta^K$. Now,
-all these slots have to be populated with trials trained for $r_{min}$ epochs,
-before *any* of them can continue towards the next rung. An obvious question to
-ask is whether we really need to evaluate all $N$ trials before we have a good
-idea about the best and the worst ones.
+*all* these slots have to be populated with trials trained for $r_{min}$ epochs,
+before *any* of them can continue towards the next rung. Do we really need to
+evaluate all $N$ trials before we can identify the best and the worst ones?
 
 At least for tuning of neural networks, synchronous SH and Hyperband can often be
 improved dramatically by adopting asynchronous decision making. This is done
@@ -45,7 +44,7 @@ a rung level, *based on the data available until then*.
 
 Our basic `Tuner` implementation neither caters for distributed scheduling, nor
 for stopping, pausing, or resuming trials. In this section, we will use
-**Syne Tune**.
+**Syne Tune** once more.
 
 ## Prepare Training Script
 
@@ -120,7 +119,9 @@ from syne_tune.backend.local_backend import LocalBackend
 
 n_workers = 4
 max_wallclock_time = 600
-entry_point = "train_script.py"
+max_epochs = 16
+
+entry_point = "train_script_report_eachepoch.py"
 mode = "min"
 metric = "validation_error"
 resource_attr = "epoch"
@@ -129,18 +130,17 @@ max_resource_attr = "max_epochs"
 search_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
    "momentum" : ???,
-   "batch_size": randint(8, 128)
+   "batch_size": randint(8, 128),
+   max_resource_attr: max_epochs,
 }
 
 backend = LocalBackend(entry_point=entry_point)
 ```
 
 At this point, we choose the `HyperbandScheduler` provided by **Syne Tune**, which
-implements several variants of ASHA and and extension to multiple brackets called
+implements several variants of ASHA and an extension to multiple brackets called
 asynchronous Hyperband (note that **Syne Tune** also implements synchronous
 Hyperband as `SynchronousHyperbandScheduler`, but we will not use this here).
-
-HIER!!!
 
 ```{.python .input  n=4}
 from syne_tune.optimizer.schedulers.hyperband import HyperbandScheduler
@@ -149,12 +149,17 @@ scheduler = HyperbandScheduler(
     search_space,
     searcher='random',
     metric=metric,
-    mode=mode)
+    mode=mode,
+    resource_attr=resource_attr,
+    max_resource_attr=max_resource_attr,
+    grace_period=1,
+    reduction_factor=2)
 ```
 
-Syne Tune also features a `Tuner`, where the main experiment loop and book-keeping is
-centralized, and interactions between scheduler and back-end are mediated. We can now
-run our distributed HPO experiment.
+Here, `metric` and `resource_attr` specify the key names used with the `report`
+callback, and `max_resource_attr` allows to infer $r_{max}$ from `search_space`.
+Moreover, `grace_period` provides $r_{min}$, and `reduction_factor` is $\eta$.
+The remainder is the same as for asynchronous random search.
 
 ```{.python .input  n=4}
 stop_criterion = StoppingCriterion(max_wallclock_time=max_wallclock_time)
@@ -169,7 +174,7 @@ tuner = Tuner(
 tuner.run()
 ```
 
-The logs of all evaluated hyperparameter configuratons are stored for further analysis. At any time during the tuning job, we can easily get the results obtained so far and plotting the incumbent trajectory
+After the experiment has finished, we can retrieve and plot results.
 
 ```{.python .input}
 from syne_tune.experiments import load_experiment
@@ -177,6 +182,10 @@ from syne_tune.experiments import load_experiment
 tuning_experiment = load_experiment(tuner.name)
 tuning_experiment.plot()
 ```
+
+MS: Following our recommendation above, should we not present results averaged
+over many runs? We could say these are easy to obtain with Syne Tune, without
+going into details.
 
 ## Summary
 
