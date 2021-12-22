@@ -205,8 +205,8 @@ class Tuner(d2l.HyperParameters): #@save
 %%tab pytorch, mxnet, tensorflow
 
 @d2l.add_to_class(Tuner) #@save
-def run(self, num_iterations):
-    for i in range(num_iterations):
+def run(self, max_wallclock_time):
+    while self.current_time < max_wallclock_time:
         start_time = time.time()
         config = self.scheduler.suggest()
         
@@ -215,7 +215,6 @@ def run(self, num_iterations):
         self.scheduler.update(config, error)
         
         runtime = time.time() - start_time
-        
         self.bookkeeping(config, error, runtime)
 
 @d2l.add_to_class(Tuner) #@save
