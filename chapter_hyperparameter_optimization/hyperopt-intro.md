@@ -59,8 +59,8 @@ for `max_epochs` epochs, then compute and return its validation error:
 %%tab pytorch, mxnet, tensorflow
 def objective(config, max_epochs = 10): #@save
     batch_size = config['batch_size']
-    lr = config['learning_rate']
-    model = d2l.AlexNet(lr=lr)
+    learning_rate = config['learning_rate']
+    model = d2l.AlexNet(lr=learning_rate)
     trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=0)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     trainer.fit(model=model, data=data)
@@ -76,7 +76,6 @@ corresponds to `config`, we would like to find $\mathbf{x}_{\star} \in argmin_{\
 :label:`sec_intro_search_spaces`
 
 Along with the objective function $f(\mathbf{x})$, we also need to define the feasible set $\mathcal{X}$ to optimize over, the *search space* or *configuration space*.
-In this chapter, we restrict ourselves to search spaces which decompose as product over the individual hyperparameters.
 Here is a possible search space for our running example:
 
 ```{.python .input  n=10}
@@ -94,7 +93,7 @@ Each parameter has a data type, such as `float` (for `learning_rate`) or `int` (
 Another way to define hyperparameter types is as bounded distributions, typically uniform or loguniform.
 Methods driven by random search sample independent values from these distributions for every search decision.
 
-One important data type missing from our running example is `categorical`. For example, we could extend it by
+One data type missing from our running example is `categorical`. For example, we could extend it by
 `activation` of type `categorical(['ReLU', 'LeakyReLU', 'Softplus'])`, in order to specify the
 non-linear activation functions. This data type is for finite parameters, whose values have no ordering or distance
 relations with each other.
@@ -171,7 +170,6 @@ queries and updates to its searcher and does not add any scheduling decisions.
 %%tab pytorch, mxnet, tensorflow
 class FIFOScheduler(d2l.HyperParameters): #@save
     def __init__(self, searcher):
-        self.searcher = searcher
         self.save_hyperparameters()
         
     def suggest(self):
@@ -181,6 +179,73 @@ class FIFOScheduler(d2l.HyperParameters): #@save
         searcher.update(config, error, info)
         pass
 ```
+
+### Tuner
+
+Finally, we need a component running the experiment and doing some book-keeping
+of results. The following code does that for sequential execution (one training
+job after the next) and will serve as basic example, while **Syne Tune** will
+be used for distributed HPO.
+
+```{.python .input  n=13}
+%%tab pytorch, mxnet, tensorflow
+class Tuner(d2l.HyperParameters): #@save
+    def __init__(self, scheduler, objective):
+        self.save_hyperparameters()
+        
+        # for bookeeping
+        self.incumbent = None
+        self.incumbent_error = None
+        self.incumbent_trajectory = []
+        self.cumulative_runtime = []
+        self.current_time = 0
+```
+
+```{.python .input  n=19}
+%%tab pytorch, mxnet, tensorflow
+
+@d2l.add_to_class(Tuner) #@save
+def run(self, num_iterations):
+    for i in range(num_iterations):
+        start_time = time.time()
+        config = self.scheduler.suggest()
+        
+        error = self.objective(config)
+        
+        self.scheduler.update(config, error)
+        
+        runtime = time.time() - start_time
+        
+        self.bookkeeping(config, error, runtime)
+
+@d2l.add_to_class(Tuner) #@save
+def bookkeeping(self, config, error, runtime): 
+    if self.incumbent is None or self.incumbent_error > error:
+        self.incumbent = config
+        self.incumbent_error = error
+        
+    self.incumbent_trajectory.append(self.incumbent_error)
+    
+    self.current_time += runtime
+    self.cumulative_runtime.append(self.current_time)
+```
+
+With any HPO method, we are mostly interested in the best performing
+configuration (called **incumbent**) and its error after a given 
+wall-clock time. This is why we track `runtime` per iteration, which includes
+both the time to run an evaluation (call of `self.objective`) and the time to
+make a decision (call of `self.scheduler.suggest`). In the sequel, we will plot
+`cumulative_runtime` against `incumbent_trajectory` in  order to visualize the
+**any-time performance** of the HPO method defined in  terms of `scheduler`
+(and `searcher`).
+
+Just as with training algorithms or model architectures, it is important to understand how to best
+compare different HPO techniques. Each run of an HPO experiment depends on substantial sources of randomness,
+from the seed for random configuration choices and non-convex optimization of surrogate models to random
+effects in each training run (such as random weight initialization or mini-batch ordering). When comparing 
+different methods, it is  therefore crucial to run each experiment several times and present average or
+quantile statistics.
+
 
 ## Summary
 
