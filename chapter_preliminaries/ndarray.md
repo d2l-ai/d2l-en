@@ -71,19 +71,52 @@ import tensorflow as tf
 ```
 
 [**A tensor represents a (possibly multi-dimensional) array of numerical values.**]
-With one axis, a tensor corresponds (in math) to a *vector*.
-With two axes, a tensor corresponds to a *matrix*.
-Tensors with more than two axes do not have special
-mathematical names.
+With one axis, a tensor is called a *vector*.
+With two axes, a tensor is called a *matrix*.
+With $k > 2$ axes, we drop the specialized names
+and just refer to the object as a $k^\mathrm{th}$ *order tensor*.
 
-To start, we can use `arange` to create a row vector `x`
-containing the first 12 integers starting with 0,
-though they are created as floats by default.
-Each of the values in a tensor is called an *element* of the tensor.
-For instance, there are 12 elements in the tensor `x`.
-Unless otherwise specified, a new tensor
-will be stored in main memory and designated for CPU-based computation.
+:begin_tab:`mxnet`
+MXNet provides a variety of functions 
+for creating new tensors 
+prepopulated with values. 
+For example, by invoking `arange(n)`,
+we can create a vector of evenly spaced values,
+starting at 0 (included) 
+and ending at `n` (not included).
+By default, the interval size is $1$.
+Unless otherwise specified, 
+new tensors are stored in main memory 
+and designated for CPU-based computation.
+:end_tab:
 
+:begin_tab:`pytorch`
+PyTorch provides a variety of functions 
+for creating new tensors 
+prepopulated with values. 
+For example, by invoking `arange(n)`,
+we can create a vector of evenly spaced values,
+starting at 0 (included) 
+and ending at `n` (not included).
+By default, the interval size is $1$.
+Unless otherwise specified, 
+new tensors are stored in main memory 
+and designated for CPU-based computation.
+:end_tab:
+
+:begin_tab:`tensorflow`
+TensorFlow provides a variety of functions 
+for creating new tensors 
+prepopulated with values. 
+For example, by invoking `range(n)`,
+we can create a vector of evenly spaced values,
+starting at 0 (included) 
+and ending at `n` (not included).
+By default, the interval size is $1$.
+Unless otherwise specified, 
+new tensors are stored in main memory 
+and designated for CPU-based computation.
+:end_tab:
 
 ```{.python .input}
 x = np.arange(12)
@@ -92,13 +125,13 @@ x
 
 ```{.python .input}
 #@tab pytorch
-x = torch.arange(12)
+x = torch.arange(12, dtype=torch.float32)
 x
 ```
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.range(12)
+x = tf.range(12, dtype=tf.float32)
 x
 ```
 
