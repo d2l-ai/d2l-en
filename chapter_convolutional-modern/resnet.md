@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -319,6 +319,7 @@ def __init__(self, arch, num_classes=10, lr=0.1):
         self.net.add_module('last', nn.Sequential(
             nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(),
             nn.Linear(arch[-1][-1], num_classes)))
+        self.net.apply(d2l.init_cnn_weights)
     if tab.selected('tensorflow'):
         self.net = tf.keras.models.Sequential(self.b1())
         for i, b in enumerate(arch):
@@ -326,7 +327,6 @@ def __init__(self, arch, num_classes=10, lr=0.1):
         self.net.add(tf.keras.models.Sequential([
             tf.keras.layers.GlobalAvgPool2D(),
             tf.keras.layers.Dense(units=num_classes)]))
-
 ```
 
 There are 4 convolutional layers in each module (excluding the $1\times 1$ convolutional layer). Together with the first $7\times 7$ convolutional layer and the final fully connected layer, there are 18 layers in total. Therefore, this model is commonly known as ResNet-18.

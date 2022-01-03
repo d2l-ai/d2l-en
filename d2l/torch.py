@@ -1780,7 +1780,7 @@ class VOCSegDataset(torch.utils.data.Dataset):
         print('read ' + str(len(self.features)) + ' examples')
 
     def normalize_image(self, img):
-        return self.transform(img.float()/255)
+        return self.transform(img.float() / 255)
 
     def filter(self, imgs):
         return [img for img in imgs if (
@@ -2581,6 +2581,14 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):
             y = y.to(device)
             metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
+
+
+def init_cnn_weights(m):
+    """Initialize weights for CNN.
+
+    Defined in :numref:`sec_utils`"""
+    if type(m) == nn.Linear or type(m) == nn.Conv2d:
+        nn.init.xavier_uniform_(m.weight)
 
 
 def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
