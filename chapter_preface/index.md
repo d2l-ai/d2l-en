@@ -524,7 +524,7 @@ yuntai, Yuanxiang Zhu, amarazov, pasricha, Ben Greenawald, Shivam Upadhyay, Quan
 Parthe Pandit, Ishan Kumar, HomunculusK, Lane Schwartz, varadgunjal, Jason Wiener, Armin Gholampoor,
 Shreshtha13, eigen-arnav, Hyeonggyu Kim, EmilyOng, Bálint Mucsányi, Chase DuBois, Juntian Tao,
 gopalakrishna-r, Wenxiang Xu, Lifu Huang, filevich, quake2005, nils-werner, Yiming Li, Marsel Khisamutdinov,
-Francesco "Fuma" Fumagalli, Peilin Sun.
+Francesco "Fuma" Fumagalli, Peilin Sun, VincentGurgul.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian, Peter DeSantis, Adam Selipsky,
 and Andrew Jassy for their generous support in writing this book. 
