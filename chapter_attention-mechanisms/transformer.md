@@ -872,7 +872,7 @@ class TransformerDecoder(d2l.AttentionDecoder):
 #@tab tensorflow
 class TransformerDecoder(d2l.AttentionDecoder):
     def __init__(self, vocab_size, key_size, query_size, value_size,
-                 num_hiddens, norm_shape, ffn_num_hidens, num_heads, num_layers, dropout, **kwargs):
+                 num_hiddens, norm_shape, ffn_num_hiddens, num_heads, num_layers, dropout, **kwargs):
         super().__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.num_layers = num_layers
