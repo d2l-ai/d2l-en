@@ -2583,12 +2583,12 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):
     return metric[0] / metric[1]
 
 
-def init_cnn_weights(m):
-    """Initialize weights for CNN.
+def init_cnn_weights(layer):
+    """Initialize weights for CNNs.
 
     Defined in :numref:`sec_utils`"""
-    if type(m) == nn.Linear or type(m) == nn.Conv2d:
-        nn.init.xavier_uniform_(m.weight)
+    if type(layer) == nn.Linear or type(layer) == nn.Conv2d:
+        nn.init.xavier_uniform_(layer.weight)
 
 
 def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):

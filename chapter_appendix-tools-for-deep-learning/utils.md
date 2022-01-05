@@ -262,10 +262,10 @@ def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
 
 
 #@save
-def init_cnn_weights(m):
-    """Initialize weights for CNN."""
-    if type(m) == nn.Linear or type(m) == nn.Conv2d:
-        nn.init.xavier_uniform_(m.weight)
+def init_cnn_weights(layer):
+    """Initialize weights for CNNs."""
+    if type(layer) == nn.Linear or type(layer) == nn.Conv2d:
+        nn.init.xavier_uniform_(layer.weight)
 
 
 #@save
