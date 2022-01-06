@@ -27,7 +27,7 @@ $$
 
 The value $p$ essentially encodes what happens with the first few digits, and the $10^{-k}$ handles the rest.
 
-Notice that if we know the position accurate to $k=4$ digits after the decimal. that means we know the value falls within the interval say $[(1.99995,2.00005]$ which is an interval of length $2.00005-1.99995 = 10^{-4}$.  Thus, if we call the length of this interval $\epsilon$, we can say
+Notice that if we know the position accurate to $k=4$ digits after the decimal. that means we know the value falls within the interval say $[1.99995,2.00005]$ which is an interval of length $2.00005-1.99995 = 10^{-4}$.  Thus, if we call the length of this interval $\epsilon$, we can say
 
 $$
 P(\text{distance is in an}\; \epsilon\text{-sized interval around}\; 2 ) \approx \epsilon \cdot p.
