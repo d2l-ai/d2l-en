@@ -254,7 +254,7 @@ A reasonable thing to try is to look at $\left|X-\mu_X\right|$, and indeed this 
 
 In particular, they look at $(X-\mu_X)^2.$  If we look at the typical size of this quantity by taking the mean, we arrive at the variance
 
-$$\sigma_X^2 = \mathrm{Var}(X) = E\left[(X-\mu_X)^2\right] = E[X^2] - \mu_X^2.$$
+$$\sigma_X^2 = \mathrm{Var}(X) = E\left[(X-\mu_X)^2\right] = E[X^2] - \mu_X^2E[( X^2-2\mu_XX + \mu_X^2)] = E[ X^2] - 2\mu_XE[X] + E[\mu_X^2] = E[X^2] - \mu_X^2.$$
 :eqlabel:`eq_var_def`
 
 The last equality in :eqref:`eq_var_def` holds by expanding out the definition in the middle, and applying the properties of expectation.
