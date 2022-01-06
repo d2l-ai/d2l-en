@@ -1,6 +1,23 @@
-```{.python .input  n=3}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
+```{.json .output n=1}
+[
+ {
+  "data": {
+   "application/vnd.jupyter.widget-view+json": {
+    "model_id": "cb2addeb39c842a7bcbad0de2e416207",
+    "version_major": 2,
+    "version_minor": 0
+   },
+   "text/plain": "interactive(children=(Dropdown(description='tab', options=('mxnet', 'pytorch', 'tensorflow'), value=None), Out\u2026"
+  },
+  "metadata": {},
+  "output_type": "display_data"
+ }
+]
 ```
 
 # What is Hyperparameter Optimization?
@@ -15,8 +32,18 @@ The current need to manually tune the training process and structure of a deep n
 
 In this chapter, we provide an overview of the basics of hyperparameter optimization and look at several state-of-the-art methods from the literature. As a running example, we will show how to automatically tune hyperparameters of a convolutional neural network. Any successful HPO method needs to provide solutions for two decision-making primitives, **scheduling** and **search**, and we will highlight the most prominent current solutions for either. Scheduling amounts to decisions of how much resources to spend on a hyperparameter configuration, e.g. when to stop, pause, or resume training, while search is about which configurations to evaluate in the first place. A specific focus in this chapter will lie on model-based approaches to search, which in practice are often more sample efficient than their random-search based counterparts. Since hyperparameter optimization requires us to train and validate several machine learning models, we will also see how we can distribute these methods. To avoid distracting boiler-plate code, we will use the Python framework **Syne Tune**, providing us with an simple interface for distributed hyperparameter optimization. You can install it via:
 
-```{.python .input  n=4}
+```{.python .input  n=2}
 !pip install syne-tune
+```
+
+```{.json .output n=2}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "Requirement already satisfied: syne-tune in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (0.11)\nRequirement already satisfied: pytest in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (6.2.5)\nRequirement already satisfied: dill in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (0.3.4)\nRequirement already satisfied: PyYaml in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (5.4.1)\nRequirement already satisfied: typing-extensions in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (4.0.1)\nRequirement already satisfied: boto3 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (1.20.18)\nRequirement already satisfied: ujson in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (4.3.0)\nRequirement already satisfied: pandas in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (1.3.4)\nRequirement already satisfied: sagemaker>=2.32.0 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (2.70.0)\nRequirement already satisfied: attrs in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (21.2.0)\nRequirement already satisfied: importlib-metadata>=1.4.0 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (4.8.2)\nRequirement already satisfied: packaging>=20.0 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (21.3)\nRequirement already satisfied: pathos in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (0.2.8)\nRequirement already satisfied: smdebug-rulesconfig==1.0.1 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (1.0.1)\nRequirement already satisfied: google-pasta in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (0.2.0)\nRequirement already satisfied: numpy>=1.9.0 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (1.18.5)\nRequirement already satisfied: protobuf>=3.1 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (3.19.1)\nRequirement already satisfied: protobuf3-to-dict>=0.1.5 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (0.1.5)\nRequirement already satisfied: jmespath<1.0.0,>=0.7.1 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from boto3->syne-tune) (0.10.0)\nRequirement already satisfied: botocore<1.24.0,>=1.23.18 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from boto3->syne-tune) (1.23.18)\nRequirement already satisfied: s3transfer<0.6.0,>=0.5.0 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from boto3->syne-tune) (0.5.0)\nRequirement already satisfied: python-dateutil<3.0.0,>=2.1 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from botocore<1.24.0,>=1.23.18->boto3->syne-tune) (2.8.2)\nRequirement already satisfied: urllib3<1.27,>=1.25.4 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from botocore<1.24.0,>=1.23.18->boto3->syne-tune) (1.26.7)\nRequirement already satisfied: zipp>=0.5 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from importlib-metadata>=1.4.0->sagemaker>=2.32.0->syne-tune) (3.6.0)\nRequirement already satisfied: pyparsing!=3.0.5,>=2.0.2 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from packaging>=20.0->sagemaker>=2.32.0->syne-tune) (3.0.6)\nRequirement already satisfied: six in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from protobuf3-to-dict>=0.1.5->sagemaker>=2.32.0->syne-tune) (1.16.0)\nRequirement already satisfied: pytz>=2017.3 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pandas->syne-tune) (2021.3)\nRequirement already satisfied: multiprocess>=0.70.12 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pathos->sagemaker>=2.32.0->syne-tune) (0.70.12.2)\nRequirement already satisfied: ppft>=1.6.6.4 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pathos->sagemaker>=2.32.0->syne-tune) (1.6.6.4)\nRequirement already satisfied: pox>=0.3.0 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pathos->sagemaker>=2.32.0->syne-tune) (0.3.0)\nRequirement already satisfied: py>=1.8.2 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pytest->syne-tune) (1.11.0)\nRequirement already satisfied: toml in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pytest->syne-tune) (0.10.2)\nRequirement already satisfied: pluggy<2.0,>=0.12 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pytest->syne-tune) (1.0.0)\nRequirement already satisfied: iniconfig in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pytest->syne-tune) (1.1.1)\n"
+ }
+]
 ```
 
 ## Ingredients to Hyperparameter Optimization
@@ -24,18 +51,16 @@ In this chapter, we provide an overview of the basics of hyperparameter optimiza
 
 The performance of our machine learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from our hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation performance. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning algorithm, which can take a long time. We will see later how much cheaper approximations can help with the optimization of $f$. Training is stochastic in general (e.g., weights are randomly initialized), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
 
-```{.python .input  n=5}
-from d2l import torch as d2l
-import torch
-from torch import nn
-```
-
 As a running example, we will train the model from Chapter :numref:`sec_alexnet`
 on the FashionMNIST dataset. As we would like to optimize the validation error,
 we need to add a method computing this metric.
 
-```{.python .input}
+```{.python .input  n=3}
 # %%tab pytorch, mxnet, tensorflow
+
+from d2l import torch as d2l
+import torch
+from torch import nn
 
 @d2l.add_to_class(d2l.Trainer) #@save
 def evaluate(self):
@@ -55,7 +80,7 @@ We optimize validation error with respect to the hyperparameter configuration `c
 consisting of `batch_size` and `learning_rate`. For each evaluation, we train our model
 for `max_epochs` epochs, then compute and return its validation error:
 
-```{.python .input  n=7}
+```{.python .input  n=4}
 %%tab pytorch, mxnet, tensorflow
 
 def objective(config, max_epochs=16): #@save
@@ -69,6 +94,16 @@ def objective(config, max_epochs=16): #@save
     return validation_error    
 ```
 
+```{.json .output n=4}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
+```
+
 Given our criterion $f(\mathbf{x})$ in terms of `objective(config)`, where $\mathbf{x}$
 corresponds to `config`, we would like to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. Since $f$ is the validation performance after training, there is no efficient way to compute gradients with respect to $\mathbf{x}$. While there is recent work to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here.
 
@@ -79,13 +114,13 @@ corresponds to `config`, we would like to find $\mathbf{x}_{\star} \in argmin_{\
 Along with the objective function $f(\mathbf{x})$, we also need to define the feasible set $\mathcal{X}$ to optimize over, the *search space* or *configuration space*.
 Here is a possible search space for our running example:
 
-```{.python .input  n=10}
+```{.python .input  n=1}
 from syne_tune.search_space import loguniform, uniform, randint
 
 search_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
    "batch_size": randint(8, 128)
-}
+} 
 ```
 
 Each parameter has a data type, such as `float` (for `learning_rate`) or `int` (for `batch_size`), as well as a closed bounded range
@@ -113,8 +148,7 @@ the width of the $l$-th layer is relevant only if the network has at least $l+1$
 over and probing the underlying machine learning algorithm at these values in the hope that 
 one of them will be close to the best hyperparameters $\mathbf{x}_*$. 
 
-
-## API of Hyperparameter Optimization
+## An API for Hyperparameter Optimization
 :label:`sec_api_hpo`
 
 Before we dive into details, let us get the basic code structure in place. All HPO
@@ -133,7 +167,7 @@ configuration through the `sample_configuration` method. Many algorithms will ma
 these decisions based on observed performances of previously run trials. Such an
 observation can be passed via the `update` method.
 
-```{.python .input  n=11}
+```{.python .input  n=6}
 %%tab pytorch, mxnet, tensorflow
 
 class Searcher(d2l.HyperParameters): #@save
@@ -143,6 +177,16 @@ class Searcher(d2l.HyperParameters): #@save
     def update(self, config, error, additional_info=None):
         pass
         
+```
+
+```{.json .output n=6}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
 ```
 
 We will mostly be interested in asynchronous methods in this chapter, for which
@@ -157,6 +201,7 @@ I see this is not needed to implement synchronous SH and HB, so it's probably
 OK. But it runs a bit contrary to saying that scheduling is about stopping a
 trial. If we want that, we'd have to allow `update` to return a flag for
 (continue, stop).
+AK: We would only need this for ASHA stopping not for ASHA promotion right? If so I would leave it, to avoid making it overly complicated.
 
 Beyond sampling configurations for new trials, we also need to decide how long to
 run a trial for, or whether to stop it early. In practice, all these decisions are
@@ -165,10 +210,9 @@ done by the `Scheduler`, who delegates the choice of new configurations to a
 becomes available. Apart from invoking `sample_configuration` of a searcher, it
 may also decide upon parameters like `max_epochs` (i.e., how long to train the
 model for). The `update` method is called whenever a trial produces a new
-metric value. The most basic scheduler just relays queries and updates to its
-searcher and does not add any scheduling decisions.
+metric value.
 
-```{.python .input  n=18}
+```{.python .input  n=9}
 %%tab pytorch, mxnet, tensorflow
 
 class Scheduler(d2l.HyperParameters): #@save
@@ -177,9 +221,22 @@ class Scheduler(d2l.HyperParameters): #@save
     
     def update(self, config, error, info=None):
         raise NotImplementedError
+```
 
-    
-class FIFOScheduler(Scheduler): #@save
+```{.json .output n=9}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
+```
+
+Below we define a basic first-in first-out scheduler which simply schedules a new configuration once resources become available.
+
+```{.python .input  n=11}
+class FIFOScheduler(d2l.Scheduler): #@save
     def __init__(self, searcher):
         self.save_hyperparameters()
         
@@ -192,12 +249,11 @@ class FIFOScheduler(Scheduler): #@save
 
 ### Tuner
 
-Finally, we need a component running the experiment and doing some book-keeping
-of results. The following code does that for sequential execution (one training
-job after the next) and will serve as basic example, while **Syne Tune** will
-be used for distributed HPO.
+Finally, we need a component running the optimizer and doing some book-keeping
+of the results. The following code does that for sequential execution (one training
+job after the next) and will serve as basic example. We will later use **Syne Tune** for more sophisticated distributed HPO cases.
 
-```{.python .input  n=13}
+```{.python .input  n=12}
 %%tab pytorch, mxnet, tensorflow
 
 class Tuner(d2l.HyperParameters): #@save
@@ -210,23 +266,41 @@ class Tuner(d2l.HyperParameters): #@save
         self.incumbent_trajectory = []
         self.cumulative_runtime = []
         self.current_time = 0
+        
+    def run(self, max_wallclock_time):
+        while self.current_time < max_wallclock_time:
+            start_time = time.time()
+            config = self.scheduler.suggest()
+        
+            error = self.objective(config)
+        
+            self.scheduler.update(config, error)
+        
+            runtime = time.time() - start_time
+            self.bookkeeping(config, error, runtime)        
 ```
 
-```{.python .input  n=19}
-%%tab pytorch, mxnet, tensorflow
+```{.json .output n=12}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
+```
 
-@d2l.add_to_class(Tuner) #@save
-def run(self, max_wallclock_time):
-    while self.current_time < max_wallclock_time:
-        start_time = time.time()
-        config = self.scheduler.suggest()
-        
-        error = self.objective(config)
-        
-        self.scheduler.update(config, error)
-        
-        runtime = time.time() - start_time
-        self.bookkeeping(config, error, runtime)
+With any HPO method, we are mostly interested in the best performing
+configuration (called **incumbent**) and its error after a given 
+wall-clock time. This is why we track `runtime` per iteration, which includes
+both the time to run an evaluation (call of `self.objective`) and the time to
+make a decision (call of `self.scheduler.suggest`). In the sequel, we will plot
+`cumulative_runtime` against `incumbent_trajectory` in  order to visualize the
+**any-time performance** of the HPO method defined in  terms of `scheduler`
+(and `searcher`).
+
+```{.python .input  n=1}
+%%tab pytorch, mxnet, tensorflow
 
 @d2l.add_to_class(Tuner) #@save
 def bookkeeping(self, config, error, runtime): 
@@ -239,15 +313,6 @@ def bookkeeping(self, config, error, runtime):
     self.current_time += runtime
     self.cumulative_runtime.append(self.current_time)
 ```
-
-With any HPO method, we are mostly interested in the best performing
-configuration (called **incumbent**) and its error after a given 
-wall-clock time. This is why we track `runtime` per iteration, which includes
-both the time to run an evaluation (call of `self.objective`) and the time to
-make a decision (call of `self.scheduler.suggest`). In the sequel, we will plot
-`cumulative_runtime` against `incumbent_trajectory` in  order to visualize the
-**any-time performance** of the HPO method defined in  terms of `scheduler`
-(and `searcher`).
 
 Just as with training algorithms or model architectures, it is important to understand how to best
 compare different HPO techniques. Each run of an HPO experiment depends on substantial sources of randomness,
