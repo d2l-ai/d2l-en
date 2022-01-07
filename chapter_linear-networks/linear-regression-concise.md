@@ -208,7 +208,6 @@ obtainable from our model `net` via `net.collect_params()`,
 the optimization algorithm we wish to use (`sgd`),
 and a dictionary of hyperparameters
 required by our optimization algorithm.
-
 :end_tab:
 
 :begin_tab:`pytorch`
