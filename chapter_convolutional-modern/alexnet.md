@@ -340,6 +340,7 @@ class AlexNet(d2l.Classification):
                 nn.Linear(6400, 4096), nn.ReLU(), nn.Dropout(p=0.5),
                 nn.Linear(4096, 4096), nn.ReLU(),nn.Dropout(p=0.5),
                 nn.Linear(4096, 10))
+            self.net.apply(d2l.init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
                 tf.keras.layers.Conv2D(filters=96, kernel_size=11, strides=4,
@@ -445,7 +446,3 @@ Reviewing the architecture, we see that AlexNet has an Achilles heel when it com
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/276)
 :end_tab:
-
-```{.python .input}
-
-```
