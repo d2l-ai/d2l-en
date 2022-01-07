@@ -26,4 +26,3 @@ softmax-regression-concise
 generalization-classification
 ```
 
-```
