@@ -87,7 +87,7 @@ def objective(config, max_epochs=16): #@save
     batch_size = config['batch_size']
     learning_rate = config['learning_rate']
     model = d2l.AlexNet(lr=learning_rate)
-    trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=0)
+    trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=1)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     trainer.fit(model=model, data=data)
     validation_error = trainer.evaluate()
@@ -236,6 +236,8 @@ class Scheduler(d2l.HyperParameters): #@save
 Below we define a basic first-in first-out scheduler which simply schedules a new configuration once resources become available.
 
 ```{.python .input  n=11}
+%%tab pytorch, mxnet, tensorflow
+
 class FIFOScheduler(d2l.Scheduler): #@save
     def __init__(self, searcher):
         self.save_hyperparameters()

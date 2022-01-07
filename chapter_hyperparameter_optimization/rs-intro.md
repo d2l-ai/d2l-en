@@ -82,6 +82,8 @@ configuration. The code below makes us of `d2l.objective`, `d2l.FIFOScheduler`, 
 `RandomSearcher` we just obtained.
 
 ```{.python .input  n=4}
+from d2l import torch as d2l
+
 from syne_tune.search_space import loguniform, randint
 
 search_space = {
@@ -89,7 +91,7 @@ search_space = {
    "batch_size": randint(8, 128)
 }
 
-searcher = RandomSearcher(search_space)
+searcher = d2l.RandomSearcher(search_space)
 scheduler = d2l.FIFOScheduler(searcher=searcher)
 tuner = d2l.Tuner(scheduler=scheduler, objective=d2l.objective)
 

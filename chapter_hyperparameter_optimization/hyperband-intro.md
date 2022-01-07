@@ -52,6 +52,7 @@ Based on this observation, we can free up compute resources by early stopping th
 
 ```{.python .input  n=5}
 from syne_tune.search_space import loguniform, uniform, randint
+from d2l import torch as d2l
 
 search_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
