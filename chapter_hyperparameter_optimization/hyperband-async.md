@@ -65,41 +65,26 @@ from torch import nn
 
 from syne_tune.report import Reporter
 
-@d2l.add_to_class(d2l.Trainer)
-def evaluate(self):
-    self.model.eval()
-    error = 0
-    for batch in self.val_dataloader:
-        with torch.no_grad():
-            x, y = self.prepare_batch(batch)
-            y_hat = self.model(x)
-            l = self.model.loss(y_hat, y)
-        error += l
-        self.val_batch_idx += 1
-    return error / self.val_batch_idx
-
 def objective(config):
     batch_size = config['batch_size']
     learning_rate = config['learning_rate']
-    momentum = config['momentum']
     max_epochs = config['max_epochs']
-    model = d2l.AlexNet(lr=learning_rate, momentum=momentum)
-    trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=0)
+    model = d2l.AlexNet(lr=learning_rate)
+    trainer = d2l.Trainer(max_epochs=1, num_gpus=1)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     report = Reporter()
 
     for epoch in range(1, max_epochs + 1):
-        trainer.fit_epoch(model=model, data=data)
+        trainer.fit(model=model, data=data)
         validation_error = trainer.evaluate()
         report(epoch=epoch, validation_error=validation_error)
 
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('--max_epochs', type=int)
-    parser.add_argument('--learning_rate', type=float)
-    parser.add_argument('--momentum', type=float)
-    parser.add_argument('--batch_size', type=int)
+    parser.add_argument('--max_epochs', type=int, default=16)
+    parser.add_argument('--learning_rate', type=float, default=1e-3)
+    parser.add_argument('--batch_size', type=int, default=16)
 
     args, _ = parser.parse_known_args()
 
@@ -129,7 +114,6 @@ max_resource_attr = "max_epochs"
 
 search_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
-   "momentum" : ???,
    "batch_size": randint(8, 128),
    max_resource_attr: max_epochs,
 }
