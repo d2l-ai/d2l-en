@@ -18,7 +18,6 @@ which provided a Lisp-like programming experience,
 modern frameworks offer automatic differentiation
 and the convenience of Python. 
 Frameworks allow us to automate and modularize
->>>>>>> first wave of massive reorg
 the repetitive work of implementing gradient-based learning algorithms.
 
 In :numref:`sec_linear_scratch`, we relied only on

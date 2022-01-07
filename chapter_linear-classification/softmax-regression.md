@@ -86,27 +86,18 @@ where the integers represent
 $\{\text{dog}, \text{cat}, \text{chicken}\}$ respectively.
 This is a great way of *storing* such information on a computer.
 If the categories had some natural ordering among them,
-<<<<<<< HEAD:chapter_linear-networks/softmax-regression.md
-say if we were trying to predict $\{\text{baby}, \text{toddler}, \text{adolescent}, \text{young adult}, \text{adult}, \text{geriatric}\}$,
-then it might even make sense to cast this as an [ordinal regression](https://en.wikipedia.org/wiki/Ordinal_regression) problem 
-and keep the labels in this format. See :cite:`Moon.Smola.Chang.ea.2010` for an
-overview of different types of ranking loss functions and :cite:`Beutel.Murray.Faloutsos.ea.2014` for a Bayesian approach that addresses responses with more than one mode. 
-
-In general, classification problems do not come with natural orderings among the classes.
-=======
 say if we were trying to predict 
 $\{\text{baby}, \text{toddler}, \text{adolescent}, \text{young adult}, \text{adult}, \text{geriatric}\}$,
 then it might even make sense to cast this as 
 an [ordinal regression](https://en.wikipedia.org/wiki/Ordinal_regression) problem 
 and keep the labels in this format. 
-See :cite:`moon2010intervalrank` for an overview 
+See :cite:`Moon.Smola.Chang.ea.2010` for an overview 
 of different types of ranking loss functions 
-and :cite:`beutel2014cobafi` for a Bayesian approach 
+and :cite:`Beutel.Murray.Faloutsos.ea.2014` for a Bayesian approach 
 that addresses responses with more than one mode. 
 
 In general, classification problems do not come 
 with natural orderings among the classes.
->>>>>>> first wave of massive reorg:chapter_linear-classification/softmax-regression.md
 Fortunately, statisticians long ago invented a simple way
 to represent categorical data: the *one-hot encoding*.
 A one-hot encoding is a vector 
@@ -192,20 +183,13 @@ There are many ways we might to accomplish this goal.
 For instance, we could assume that the outputs 
 $\mathbf{o}$ are corrupted versions of $\mathbf{y}$,
 where the corruption occurs by means of adding noise $\mathbf{\epsilon}$ 
-<<<<<<< HEAD:chapter_linear-networks/softmax-regression.md
-drawn from a normal distribution. In other words, $\mathbf{y} = \mathbf{o} + \mathbf{\epsilon}$ where $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$. This 
-is the so-called [probit model](https://en.wikipedia.org/wiki/Probit_model), 
-first introduced by :cite:`Fechner.1860`. While appealing, it doesn't
-work quite as well or lead to a particularly nice optimization problem, 
-=======
 drawn from a normal distribution.
 In other words, $\mathbf{y} = \mathbf{o} + \mathbf{\epsilon}$,
 where $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$. 
 This is the so-called [probit model](https://en.wikipedia.org/wiki/Probit_model), 
-first introduced by :cite:`fechner1860elemente`. 
+first introduced by :cite:`Fechner.1860`. 
 While appealing, it doesn't work quite as well 
-or lead to a particularly nice optimization problem, 
->>>>>>> first wave of massive reorg:chapter_linear-classification/softmax-regression.md
+or lead to a particularly nice optimization problem,
 when compared to the softmax. 
 
 Another way to accomplish this goal 
@@ -235,21 +219,9 @@ $$
 \operatorname*{argmax}_j \hat y_j = \operatorname*{argmax}_j o_j.
 $$
 
-<<<<<<< HEAD:chapter_linear-networks/softmax-regression.md
-The idea of a softmax dates back to Gibbs, who adapted ideas from physics 
-:cite:`Gibbs.1902`. Dating even further back, Boltzmann, the father of
-modern thermodynamics, used this trick
-to model a distribution over energy states in gas molecules. In 
-particular, he discovered that the prevalence of a state of energy in a 
-thermodynamic ensemble, such as the molecules in a gas, is proportional to 
-$\exp(-E/kT)$. Here $E$ is the energy of a state, $T$ is the temperature and 
-$k$ is the Boltzmann constant. When statisticians talk about increasing or decreasing
-the 'temperature' of a statistical system, they refer to changing $T$ in order to favor
-lower or higher energy states. Following Gibbs' idea, energy equates to error. 
-Energy-based models :cite:`Ranzato.Boureau.Chopra.ea.2007` use this point of view when describing 
-=======
+
 The idea of a softmax dates back to Gibbs,
-who adapted ideas from physics :cite:`gibbs1902elementary`. 
+who adapted ideas from physics :cite:`Gibbs.1902`. 
 Dating even further back, Boltzmann, 
 the father of modern thermodynamics, 
 used this trick to model a distribution 
@@ -265,9 +237,8 @@ the 'temperature' of a statistical system,
 they refer to changing $T$ 
 in order to favor lower or higher energy states. 
 Following Gibbs' idea, energy equates to error. 
-Energy-based models :cite:`ranzato2007unified` 
+Energy-based models :cite:`Ranzato.Boureau.Chopra.ea.2007` 
 use this point of view when describing 
->>>>>>> first wave of massive reorg:chapter_linear-classification/softmax-regression.md
 problems in Deep Learning. 
 
 ## Loss Function
@@ -373,15 +344,8 @@ to what we saw in regression,
 where the gradient was the difference
 between the observation $y$ and estimate $\hat{y}$.
 This is not coincidence.
-<<<<<<< HEAD:chapter_linear-networks/softmax-regression.md
 In any exponential family model,
 the gradients of the log-likelihood are given by precisely this term.
-=======
-In any exponential family (see the
-[online appendix on distributions](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/distributions.html)) model,
-the gradients of the log-likelihood 
-are given by precisely this term.
->>>>>>> first wave of massive reorg:chapter_linear-classification/softmax-regression.md
 This fact makes computing gradients easy in practice.
 
 Now consider the case where we observe not just a single outcome
@@ -533,18 +497,8 @@ Specifically, for any fully connected layer with $d$ inputs and $q$ outputs,
 the parameterization and computational cost is $\mathcal{O}(dq)$, 
 which can be prohibitively high in practice.
 Fortunately, this cost of transforming $d$ inputs into $q$ outputs
-<<<<<<< HEAD:chapter_linear-networks/softmax-regression.md
-can be reduced through approximation and compression. For instance Deep Fried Convnets :cite:`Yang.Moczulski.Denil.ea.2015` uses a combination of permutations, Fourier transforms and scaling 
-to reduce the cost from quadratic to log-linear. Similar techniques work for more advanced 
-structural matrix approximations :cite:`sindhwani2015structured`. Lastly, we can use 
-quaternion-like decompositions to reduce the cost to $\mathcal{O}(\frac{dq}{n})$, again if
-we are willing to trade off a small amount of accuracy for computational and storage cost
-:cite:`Zhang.Tay.Zhang.ea.2021` based on a compression factor $n$. This is an active area of research. What makes it challenging is that we do not necessarily strive for the most 
-compact representation or the smallest number of floating point operations but rather for the 
-solution that can be executed most efficiently on modern GPUs. 
-=======
 can be reduced through approximation and compression. 
-For instance Deep Fried Convnets :cite:`yang2015deep` 
+For instance Deep Fried Convnets :cite:`Yang.Moczulski.Denil.ea.2015` 
 uses a combination of permutations, 
 Fourier transforms, and scaling 
 to reduce the cost from quadratic to log-linear. 
@@ -562,7 +516,6 @@ for the most compact representation
 or the smallest number of floating point operations 
 but rather for the solution 
 that can be executed most efficiently on modern GPUs. 
->>>>>>> first wave of massive reorg:chapter_linear-classification/softmax-regression.md
 
 ## Exercises
 
