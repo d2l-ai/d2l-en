@@ -272,9 +272,9 @@ def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):
 ```{.python .input}
 #@tab pytorch
 def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):
-    def init_weights(m):
-        if type(m) == nn.Embedding:
-            nn.init.xavier_uniform_(m.weight)
+    def init_weights(layer):
+        if type(layer) == nn.Embedding:
+            nn.init.xavier_uniform_(layer.weight)
     net.apply(init_weights)
     net = net.to(device)
     optimizer = torch.optim.Adam(net.parameters(), lr=lr)

@@ -86,7 +86,9 @@ hopefully the following code snippet will convince you
 that implementing such models with modern deep learning frameworks
 is remarkably simple.
 We need only to instantiate a `Sequential` block
-and chain together the appropriate layers.
+and chain together the appropriate layers,
+using Xavier initialization as 
+introduced in :numref:`subsec_xavier`.
 
 ```{.python .input}
 %%tab mxnet
@@ -110,8 +112,15 @@ from d2l import tensorflow as d2l
 ```
 
 ```{.python .input}
-%%tab all
+%%tab pytorch
+def init_cnn_weights(layer):  #@save
+    """Initialize weights for CNNs."""
+    if type(layer) == nn.Linear or type(layer) == nn.Conv2d:
+        nn.init.xavier_uniform_(layer.weight)
+```
 
+```{.python .input}
+%%tab all
 class LeNet(d2l.Classification):
     def __init__(self, lr=0.1):
         super().__init__()
@@ -138,11 +147,11 @@ class LeNet(d2l.Classification):
                 nn.Linear(16 * 5 * 5, 120), nn.Sigmoid(),
                 nn.Linear(120, 84), nn.Sigmoid(),
                 nn.Linear(84, 10))
-            self.net.apply(d2l.init_cnn_weights)
+            self.net.apply(init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
-                tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid',
-                                       padding='same'),
+                tf.keras.layers.Conv2D(filters=6, kernel_size=5,
+                                       activation='sigmoid', padding='same'),
                 tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
                 tf.keras.layers.Conv2D(filters=16, kernel_size=5,
                                        activation='sigmoid'),
@@ -233,8 +242,7 @@ to put it into action to speed up training.
 
 The `d2l.Trainer` method takes care of all details. 
 By default, it initializes the model parameters on the 
-available devices, using Xavier initialization as 
-introduced in :numref:`subsec_xavier`.
+available devices.
 Just as with MLPs, our loss function is cross-entropy,
 and we minimize it via minibatch stochastic gradient descent.
 
