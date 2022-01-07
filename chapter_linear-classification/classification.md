@@ -95,7 +95,7 @@ Taking the sum yields the number of correct predictions.
 
 ```{.python .input}
 %%tab all
-@d2l.add_to_class(Classification)  #@save
+@d2l.add_to_class(Classifier)  #@save
 def accuracy(self, Y_hat, Y, averaged=True):
     """Compute the number of correct predictions."""
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))

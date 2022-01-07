@@ -361,7 +361,7 @@ the layers in the above RNN encoder-decoder model are illustrated in :numref:`fi
 
 ```{.python .input  n=9}
 %%tab all
-class Seq2Seq(d2l.Classification):  #@save
+class Seq2Seq(d2l.Classifier):  #@save
     def __init__(self, encoder, decoder, tgt_pad, lr):
         super().__init__()
         self.save_hyperparameters()    

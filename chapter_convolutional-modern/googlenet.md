@@ -154,7 +154,7 @@ The first module uses a 64-channel $7\times 7$ convolutional layer.
 
 ```{.python .input}
 %%tab all
-class GoogleNet(d2l.Classification):
+class GoogleNet(d2l.Classifier):
     def b1(self):
         if tab.selected('mxnet'):
             net = nn.Sequential()

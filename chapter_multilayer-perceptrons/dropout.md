@@ -297,7 +297,7 @@ We ensure that dropout is only active during training.
 
 ```{.python .input}
 %%tab mxnet
-class DropoutMLPScratch(d2l.Classification):
+class DropoutMLPScratch(d2l.Classifier):
     def __init__(self, num_outputs, num_hiddens_1, num_hiddens_2,
                  dropout_1, dropout_2, lr):
         super().__init__()
@@ -319,7 +319,7 @@ class DropoutMLPScratch(d2l.Classification):
 
 ```{.python .input}
 %%tab pytorch
-class DropoutMLPScratch(d2l.Classification):
+class DropoutMLPScratch(d2l.Classifier):
     def __init__(self, num_inputs, num_outputs, num_hiddens_1, num_hiddens_2,
                  dropout_1, dropout_2, lr):
         super().__init__()
@@ -341,7 +341,7 @@ class DropoutMLPScratch(d2l.Classification):
 
 ```{.python .input}
 %%tab tensorflow
-class DropoutMLPScratch(d2l.Classification):
+class DropoutMLPScratch(d2l.Classifier):
     def __init__(self, num_outputs, num_hiddens_1, num_hiddens_2,
                  dropout_1, dropout_2, lr):
         super().__init__()
@@ -393,7 +393,7 @@ the `Dropout` layer simply passes the data through during testing.
 
 ```{.python .input}
 %%tab mxnet
-class DropoutMLP(d2l.Classification):
+class DropoutMLP(d2l.Classifier):
     def __init__(self, num_outputs, num_hiddens_1, num_hiddens_2,
                  dropout_1, dropout_2, lr):
         super().__init__()
@@ -409,7 +409,7 @@ class DropoutMLP(d2l.Classification):
 
 ```{.python .input}
 %%tab pytorch
-class DropoutMLP(d2l.Classification):
+class DropoutMLP(d2l.Classifier):
     def __init__(self, num_inputs, num_outputs, num_hiddens_1, num_hiddens_2,
                  dropout_1, dropout_2, lr):
         super().__init__()
@@ -424,7 +424,7 @@ class DropoutMLP(d2l.Classification):
 
 ```{.python .input}
 %%tab tensorflow
-class DropoutMLP(d2l.Classification):
+class DropoutMLP(d2l.Classifier):
     def __init__(self, num_outputs, num_hiddens_1, num_hiddens_2,
                  dropout_1, dropout_2, lr):
         super().__init__()
