@@ -14,7 +14,6 @@ the parameterization of the output layer,
 and the choice of loss function will adapt
 to suit the classification setting.
 
-```{.python .input}
 ```toc
 :maxdepth: 2
 

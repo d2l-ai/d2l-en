@@ -7,9 +7,9 @@ for which the inputs connect directly to the outputs.
 This will prove important for a few reasons.
 First, we get distracted by complicated architectures,
 we can focus cover the basics of neural network training,
-including parameterizing the output layer, handling data, 
+including parameterizing the output layer, handling data,
 specifying a loss function, and training the model.
-Second, this class of shallow networks happens 
+Second, this class of shallow networks happens
 to comprise the set of linear models,
 which subsumes many classical methods for statistical prediction,
 including linear and logistic regression.
@@ -25,9 +25,9 @@ by developing linear neural networks for classification.
 :maxdepth: 2
 
 linear-regression
+api
 synthetic-regression-data
 linear-regression-scratch
-api
 linear-regression-concise
 generalization
 ```
