@@ -146,7 +146,7 @@ a specific manifestation. To build a specific network we simply iterate over `co
 
 ```{.python .input}
 %%tab all
-class VGG(d2l.Classification):
+class VGG(d2l.Classifier):
     def __init__(self, arch, lr=0.1):
         super().__init__()
         self.save_hyperparameters()

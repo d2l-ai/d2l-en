@@ -227,7 +227,7 @@ The first two layers of ResNet are the same as those of the GoogLeNet we describ
 
 ```{.python .input}
 %%tab all
-class ResNet(d2l.Classification):
+class ResNet(d2l.Classifier):
     def b1(self):
         if tab.selected('mxnet'):
             net = nn.Sequential()

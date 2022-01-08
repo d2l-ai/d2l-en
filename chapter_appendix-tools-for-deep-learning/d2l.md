@@ -48,7 +48,7 @@ The implementations of the following members of the `d2l` package and sections w
 .. autoclass:: LinearRegression
    :members:    
 
-.. autoclass:: Classification
+.. autoclass:: Classifier
    :members:
 
 ```
