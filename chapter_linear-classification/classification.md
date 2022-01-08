@@ -28,9 +28,9 @@ import tensorflow as tf
 from IPython import display
 ```
 
-## The `Classification` Class
+## The `Classifier` Class
 
-We define the `Classification` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exact correct if the last batch contains fewer examples, but we ignore this minor difference to keep the code simple.
+We define the `Classifier` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exact correct if the last batch contains fewer examples, but we ignore this minor difference to keep the code simple.
 
 ```{.python .input}
 %%tab all
@@ -127,9 +127,8 @@ def parameters(self):
 
 ## Summary
 
-Classification is a sufficiently frequently used problem type that it warrants its own convenience functions. Note that there is a difference between (classification) accuracy that we want to minimize and the logistic loss function that we are actually minimizing. Fortunately, our specific choice of loss function ensures that minimizing it will also lead to maximum accuracy. This is the case since the maximum likelihood estimator is consistent. It follows as a special case of the Cramer-Rao bound :cite:`Cramer.1946,Radhakrishna-Rao.1945`. For more work on consistency see also :cite:`Zhang.2004`.
+Classification is a sufficiently common problem that it warrants its own convenience functions. Of central importance in classification is the *accuracy* of the classifier. Note that while we often care primarily about accuracy, we train classifiers to optimize a variety of other objectives for statistical and computational reasons. However, regardless of which loss function was minimized during training, it's useful to have a convenience method for assessing the accuracy of our classifier empirically. 
 
-More generally, though, the decision of which category to pick is far from trivial. For instance, when deciding where to assign an e-mail to, mistaking a "Primary" e-mail for a "Social" e-mail might be undesirable but far less disastrous than moving it to the spam folder (and later automatically deleting it). As such, we will tend to err on the side of caution with regard to assigning any e-mail to the "Spam" folder, rather than picking the most likely category.
 
 ## Exercises
 

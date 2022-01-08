@@ -8,11 +8,10 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 
 
-Just as high-level APIs
-of deep learning frameworks
-made it much easier to implement linear regression
-in :numref:`sec_linear_concise`,
-we will find them equally convenient for implementing classification.
+Just as high-level deep learning frameworks
+made it easier to implement linear regression
+(see :numref:`sec_linear_concise`),
+they are similarly convenient here.
 
 ```{.python .input}
 %%tab mxnet
@@ -38,19 +37,28 @@ import tensorflow as tf
 
 ## Defining the Model
 
-As we did in :numref:`sec_linear_concise`, we construct the fully connected layer using the built-in layer. The built-in `__call__` method then invokes `forward` whenever we need to apply the network to some inputs.
+As in :numref:`sec_linear_concise`, 
+we construct our fully connected layer 
+using the built-in layer. 
+The built-in `__call__` method then invokes `forward` 
+whenever we need to apply the network to some inputs.
 
 :begin_tab:`mxnet`
-Even though the input `X` is a 4-D tensor, the built-in `Dense` layer will automatically convert `X` into a 2-D tensor by keeping the first dimension size unchanged.
+Even though the input `X` is a 4th order tensor, 
+the built-in `Dense` layer 
+will automatically convert `X` into a 2nd order tensor 
+by keeping the dimensionality along the first axis unchanged.
 :end_tab:
 
 :begin_tab:`pytorch`
-We use a flatten layer to convert the 4-D tensor `X` to 2-D by keeping the first dimension size unchanged.
+We use a flatten layer to convert the 4th order tensor `X` to 2nd order 
+by keeping the dimensionality along the first axis unchanged.
 
 :end_tab:
 
 :begin_tab:`tensorflow`
-We use a flatten layer to convert the 4-D tensor `X` to 2-D by keeping the first dimension size unchanged.
+We use a flatten layer to convert the 4th order tensor `X` 
+by keeping the dimension along the first axis unchanged.
 :end_tab:
 
 ```{.python .input}

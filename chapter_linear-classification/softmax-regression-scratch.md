@@ -6,12 +6,14 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Softmax Regression Implementation from Scratch
 :label:`sec_softmax_scratch`
 
-Just as we implemented linear regression from scratch, we believe that
-softmax regression is similarly fundamental and
-you ought to know the gory details of
-how to implement it yourself. We limit ourselves to defining the 
-softmax-specific aspects and reuse many of the other parts we built 
-for regression, such as the training loop.
+Because softmax regression is so fundamental, 
+we believe that you ought to know 
+how to implement it yourself. 
+Here, we limit ourselves to defining the 
+softmax-specific aspects of the model
+and reuse the other components 
+from our regression section,
+including the training loop.
 
 ```{.python .input}
 %%tab mxnet
@@ -34,9 +36,13 @@ import tensorflow as tf
 
 ## The Softmax
 
-Let's begin with the most important part, the mapping from scalars to probabilities. 
-For a refresher, recall the operation of the sum operator along specific dimensions in a tensor,
-as discussed in :numref:`subsec_lin-alg-reduction` and :numref:`subsec_lin-alg-non-reduction`.
+Let's begin with the most important part, 
+the mapping from scalars to probabilities. 
+For a refresher, recall the operation of the sum operator 
+along specific dimensions in a tensor,
+as discussed in :numref:`subsec_lin-alg-reduction` 
+and :numref:`subsec_lin-alg-non-reduction`.
+
 [**Given a matrix `X` we can sum over all elements (by default) or only
 over elements in the same axis.**]
 The `axis` variable lets us compute row and column sums:
@@ -57,9 +63,11 @@ ensuring that the result sums to 1.
 $$\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(\mathbf{X}_{ij})}{\sum_k \exp(\mathbf{X}_{ik})}.$$
 **)
 
-The (logarithm of the) denominator is also called the (log) *partition function*. It was 
-introduced in [statistical physics](https://en.wikipedia.org/wiki/Partition_function_(statistical_mechanics))
-to sum over all possible states in a thermodynamic ensemble. The implementation is quite straightforward:
+The (logarithm of the) denominator 
+is called the (log) *partition function*.
+It was introduced in [statistical physics](https://en.wikipedia.org/wiki/Partition_function_(statistical_mechanics))
+to sum over all possible states in a thermodynamic ensemble.
+The implementation is straightforward:
 
 ```{.python .input}
 %%tab all
@@ -69,8 +77,8 @@ def softmax(X):
     return X_exp / partition  # The broadcasting mechanism is applied here
 ```
 
-For any input `X`
-[**we turn each element into a non-negative number.
+For any input `X`, [**we turn each element 
+into a non-negative number.
 Each row sums up to 1,**]
 as is required for a probability. Caution: the code above is *not* robust against very large or very small arguments. While this is sufficient to illustrate what is happening, you should *not* use this code verbatim for any serious purpose. Deep Learning frameworks have such protections built-in and we will be using the built-in softmax going forward.
 
@@ -90,23 +98,32 @@ X_prob, d2l.reduce_sum(X_prob, 1)
 
 ## The Model
 
-Now we have everything to implement [**the softmax regression model.**]
-As in our linear regression example, each instance will be represented by a 
-fixed-length vector. Since the raw data here consists of $28 \times 28$ pixel 
-images, [**we flatten each image,
+We now have everything that we need
+to implement [**the softmax regression model.**]
+As in our linear regression example, 
+each instance will be represented 
+by a fixed-length vector. 
+Since the raw data here consists 
+of $28 \times 28$ pixel images, 
+[**we flatten each image,
 treating them as vectors of length 784.**]
-In the future, we will talk about more sophisticated strategies
-for exploiting the spatial structure, 
-but for now we treat each pixel location as just another feature.
+In later chapters, we will introduce 
+convolutional neural networks,
+which exploit the spatial structure
+in a more satisfying way.
 
-In softmax regression,
-we have as many outputs as there are classes.
+
+In softmax regression, 
+the number of outputs from our network
+should be equal to the number of classes.
 (**Since our dataset has 10 classes,
 our network has an output dimension of 10.**)
 Consequently, our weights constitute a $784 \times 10$ matrix
 plus a $1 \times 10$ dimensional row vector for the biases. 
-As with linear regression, we initialize the weights `W`
-with Gaussian noise. The biases to take the initial value 0.
+As with linear regression, 
+we initialize the weights `W`
+with Gaussian noise. 
+The biases are initialized as zeros.
 
 ```{.python .input}
 %%tab mxnet
@@ -149,9 +166,11 @@ class SoftmaxRegressionScratch(d2l.Classification):
         self.b = tf.Variable(self.b)
 ```
 
-The code below defines how the input is mapped to the output through the network.
+The code below defines how the network 
+maps each input to an output.
 Note that we flatten each $28 \times 28$ pixel image in the batch
-into a vector using the `reshape` function before passing the data through our model.
+into a vector using the `reshape` function 
+before passing the data through our model.
 
 ```{.python .input}
 %%tab all
@@ -163,10 +182,12 @@ def forward(self, X):
 ## The Cross-Entropy Loss 
 
 Next we need to implement the cross-entropy loss function 
-of :numref:`sec_softmax`. 
+(introduced in :numref:`sec_softmax`). 
 This may be the most common loss function
-in all of deep learning. At the moment,
-classification problems far outnumber regression problems.
+in all of deep learning.
+At the moment, applications of deep learning
+easily cast classification problems 
+far outnumber those better treated as regression problems.
 
 Recall that cross-entropy takes the negative log-likelihood
 of the predicted probability assigned to the true label.
@@ -223,10 +244,19 @@ def loss(self, y_hat, y):
 ## Training
 
 We reuse the `fit` method defined in :numref:`sec_linear_scratch` to [**train the model with 10 epochs.**]
-Note that both the number of epochs (`max_epochs`), the minibatch size (`batch_size`)
-and learning rate (`lr`) are adjustable hyperparameters.
-By changing their values, we may be able
-to increase the accuracy of the model.
+Note that both the number of epochs (`max_epochs`), 
+the minibatch size (`batch_size`),
+and learning rate (`lr`) 
+are adjustable hyperparameters.
+That means that while these values are not 
+learned during our primary training loop,
+they still influence the performance
+of our model, bot vis-a-vis training
+and generalization performance. 
+In practice you will want to choose these values
+based on the *validation* split of the data 
+and then to ultimately evaluate your final model 
+on the *test* split.
 
 ```{.python .input}
 %%tab all
@@ -265,9 +295,14 @@ data.visualize([X, y], labels=labels)
 
 ## Summary
 
-By now we are starting to get some experience with solving linear regression and classification problems. With it, 
-we have reached what would arguably be the state of the art of 1960-1970s of statistical modeling. We are able to solve basic problems efficiently, albeit not quite so well and not quite so elegantly. The next chapter will 
-introduce nonlinear models, but before we do so, we need more practice in operating deep learing frameworks efficiently. 
+By now we are starting to get some experience 
+with solving linear regression 
+and classification problems. 
+With it, we have reached what would arguably be 
+the state of the art of 1960-1970s of statistical modeling.
+In the next section, we'll show you how leverage 
+deep learning frameworks to implement this model
+much more efficiently.
 
 ## Exercises
 
