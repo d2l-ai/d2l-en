@@ -484,7 +484,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     Defined in :numref:`sec_fashion_mnist`"""
     raise NotImplementedError
 
-class Classifier(d2l.Module):
+class Classification(d2l.Module):
     """Defined in :numref:`sec_classification`"""
     def validation_step(self, batch):
         Y_hat = self(*batch[:-1])
@@ -685,7 +685,7 @@ def check_shape(a, shape):
     assert a.shape == shape, \
             f'tensor\'s shape {a.shape} != expected shape {shape}'
 
-class RNNLMScratch(d2l.Classifier):
+class RNNLMScratch(d2l.Classification):
     """Defined in :numref:`sec_rnn-scratch`"""
     def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
@@ -896,7 +896,7 @@ class Seq2SeqEncoder(d2l.Module):
         # state shape: (num_layers, batch_size, num_hiddens)
         return output, state
 
-class Seq2Seq(d2l.Classifier):
+class Seq2Seq(d2l.Classification):
     """Defined in :numref:`sec_seq2seq_decoder`"""
     def __init__(self, encoder, decoder, tgt_pad, lr):
         super().__init__()

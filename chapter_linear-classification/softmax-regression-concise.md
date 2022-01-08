@@ -63,7 +63,7 @@ by keeping the dimension along the first axis unchanged.
 
 ```{.python .input}
 %%tab all
-class SoftmaxRegression(d2l.Classifier):
+class SoftmaxRegression(d2l.Classification):
     def __init__(self, num_outputs, lr):
         super().__init__()
         self.save_hyperparameters()
@@ -141,7 +141,7 @@ which does smart things like the ["LogSumExp trick"](https://en.wikipedia.org/wi
 
 ```{.python .input  n=3}
 %%tab all
-@d2l.add_to_class(d2l.Classifier)  #@save
+@d2l.add_to_class(d2l.Classification)  #@save
 def loss(self, Y_hat, Y, averaged=True):
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     Y = d2l.reshape(Y, (-1,))

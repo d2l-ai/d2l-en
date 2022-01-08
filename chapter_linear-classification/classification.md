@@ -34,7 +34,7 @@ We define the `Classifier` class below. In the `validation_step` we report both 
 
 ```{.python .input}
 %%tab all
-class Classifier(d2l.Module):  #@save
+class Classification(d2l.Module):  #@save
     def validation_step(self, batch):
         Y_hat = self(*batch[:-1])
         self.plot('loss', self.loss(Y_hat, batch[-1]), train=False)
@@ -95,7 +95,7 @@ Taking the sum yields the number of correct predictions.
 
 ```{.python .input}
 %%tab all
-@d2l.add_to_class(Classifier)  #@save
+@d2l.add_to_class(Classification)  #@save
 def accuracy(self, Y_hat, Y, averaged=True):
     """Compute the number of correct predictions."""
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))

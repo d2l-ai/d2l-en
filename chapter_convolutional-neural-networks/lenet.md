@@ -121,7 +121,7 @@ def init_cnn_weights(layer):  #@save
 
 ```{.python .input}
 %%tab all
-class LeNet(d2l.Classifier):
+class LeNet(d2l.Classification):
     def __init__(self, lr=0.1):
         super().__init__()
         self.save_hyperparameters()
@@ -180,7 +180,7 @@ what we expect from :numref:`img_lenet_vert`.
 
 ```{.python .input}
 %%tab mxnet, pytorch
-@d2l.add_to_class(d2l.Classifier)  #@save
+@d2l.add_to_class(d2l.Classification)  #@save
 def layer_summary(self, X_shape):
     X = d2l.randn(*X_shape)
     for layer in self.net:
@@ -193,7 +193,7 @@ model.layer_summary((1, 1, 28, 28))
 
 ```{.python .input}
 %%tab tensorflow
-@d2l.add_to_class(d2l.Classifier)  #@save
+@d2l.add_to_class(d2l.Classification)  #@save
 def layer_summary(self, X_shape):
     X = d2l.normal(X_shape)
     for layer in self.net.layers:

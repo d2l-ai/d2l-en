@@ -308,7 +308,7 @@ import tensorflow as tf
 
 ```{.python .input}
 %%tab all
-class AlexNet(d2l.Classifier):
+class AlexNet(d2l.Classification):
     def __init__(self, lr=0.1):
         super().__init__()
         self.save_hyperparameters()

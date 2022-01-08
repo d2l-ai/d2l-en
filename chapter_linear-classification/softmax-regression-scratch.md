@@ -127,7 +127,7 @@ The biases are initialized as zeros.
 
 ```{.python .input}
 %%tab mxnet
-class SoftmaxRegressionScratch(d2l.Classifier):
+class SoftmaxRegressionScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -142,7 +142,7 @@ class SoftmaxRegressionScratch(d2l.Classifier):
 
 ```{.python .input}
 %%tab pytorch
-class SoftmaxRegressionScratch(d2l.Classifier):
+class SoftmaxRegressionScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -156,7 +156,7 @@ class SoftmaxRegressionScratch(d2l.Classifier):
 
 ```{.python .input}
 %%tab tensorflow
-class SoftmaxRegressionScratch(d2l.Classifier):
+class SoftmaxRegressionScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()

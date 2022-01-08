@@ -57,7 +57,7 @@ for the gradients of the loss with respect to these parameters.
 
 ```{.python .input  n=5}
 %%tab mxnet
-class MLPScratch(d2l.Classifier):
+class MLPScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -71,7 +71,7 @@ class MLPScratch(d2l.Classifier):
 
 ```{.python .input  n=6}
 %%tab pytorch
-class MLPScratch(d2l.Classifier):
+class MLPScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -83,7 +83,7 @@ class MLPScratch(d2l.Classifier):
 
 ```{.python .input  n=7}
 %%tab tensorflow
-class MLPScratch(d2l.Classifier):
+class MLPScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -164,7 +164,7 @@ the second is the output layer.
 
 ```{.python .input}
 %%tab mxnet
-class MLP(d2l.Classifier):
+class MLP(d2l.Classification):
     def __init__(self, num_outputs, num_hiddens, lr):
         super().__init__()
         self.save_hyperparameters()
@@ -176,7 +176,7 @@ class MLP(d2l.Classifier):
 
 ```{.python .input}
 %%tab pytorch
-class MLP(d2l.Classifier):
+class MLP(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr):
         super().__init__()
         self.save_hyperparameters()
@@ -188,7 +188,7 @@ class MLP(d2l.Classifier):
 
 ```{.python .input}
 %%tab tensorflow
-class MLP(d2l.Classifier):
+class MLP(d2l.Classification):
     def __init__(self, num_outputs, num_hiddens, lr):
         super().__init__()
         self.save_hyperparameters()
