@@ -46,7 +46,19 @@ the full amount of epochs to identify the best performing configuration.
 :width:`400px`
 :label:`img_samples_lc`
 
-Based on this observation, we can free up compute resources by early stopping the evaluation of poorly performing configuration and allocate resources to more promising configurations. This will eventually speed up the optimization process, since we have a higher throughput of configurations that we can try. More formally, we expand our definition in Section :ref:sec_definition_hpo, such that our objective function $f(\mathbf{x}, r)$ gets an additional input $r \in [r_{min}, r_{max}]$ that specifies the amount of resource that we are willing to spend for the evaluation of $\mathbf{x}$. We assume that both, the correlation to $f(\mathbf{x}) = f(\mathbf{x})$ as well as the computational cost $c(\mathbf{x}, r)$ increases with $r$. Typically $r$ represents the number of epochs for training the neural network. But also other resources are possible, such as the training dataset size or the number of cross-validation folds.
+Based on this observation, we can free up compute resources by early stopping
+the evaluation of poorly performing configuration and allocate resources to
+more promising configurations. This will eventually speed up the optimization
+process, since we have a higher throughput of configurations that we can try.
+More formally, we expand our definition in Section :ref:sec_definition_hpo,
+such that our objective function $f(\mathbf{x}, r)$ gets an additional input
+$r \in [r_{min}, r_{max}]$ that specifies the amount of resource that we are
+willing to spend for the evaluation of $\mathbf{x}$. We assume that both the
+correlation to $f(\mathbf{x}) = f(\mathbf{x}, r_{max})$ and the computational
+cost $c(\mathbf{x}, r)$ increases with $r$ (the latter should be affine linear
+in $r$). Typically, $r$ represents the number of epochs for training the neural
+network. But also other resources are possible, such as the training dataset
+size or the number of cross-validation folds.
 
 ```{.python .input  n=5}
 from syne_tune.search_space import loguniform, uniform, randint
@@ -100,9 +112,13 @@ import numpy as np
 from d2l import torch as d2l
 
 class SuccessiveHalvingScheduler(d2l.Scheduler):
-    def __init__(self, searcher, eta, r_min, r_max):
+    def __init__(
+            self, searcher, eta, r_min, r_max, bottom_rung_size=None):
         self.save_hyperparameters()
-        
+
+        if bottom_rung_size is None:
+            # Default choice for successive halving
+            self.bottom_rung_size = r_max
         x = r_max / r_min
         K = int(np.log(x) / np.log(eta))
         self.rung_levels = [r_min * eta ** k for k in range(K + 1)]
@@ -122,16 +138,21 @@ class SuccessiveHalvingScheduler(d2l.Scheduler):
         
         indices = [np.argsort(errors)[i] for i in range(n)]
         return [configs[i] for i in indices]
-        
+
+    def _rung_level_size(self, rung_index):
+        return self.bottom_rung_size // (self.eta ** rung_index)
+
     def find_rung_level(self):
         for i, r in enumerate(self.rung_levels):
-            if len(self.rungs[r]) < (self.r_max / (self.eta ** i)):
+            rung_size = self._rung_level_size(i)
+            if len(self.rungs[r]) < rung_size:
                 return r
     
     def find_promotable_configuration(self, rung_level):
         previous_rung_level = rung_level // self.eta
-        n = int(self.r_max / (self.eta ** self.rung_levels.index(rung_level)))
-        top_configs_on_previous_rung_level = self.get_top_n_configurations(previous_rung_level, n)
+        n = self._rung_level_size(self.rung_levels.index(rung_level))
+        top_configs_on_previous_rung_level = self.get_top_n_configurations(
+            previous_rung_level, n)
         for config in top_configs_on_previous_rung_level:
              if config not in self.rungs[rung_level]:
                 return config
@@ -139,12 +160,14 @@ class SuccessiveHalvingScheduler(d2l.Scheduler):
     def suggest(self):
         # If we do not have enough configurations on the smallest rung_level we sample
         # a random configuration
-        n = self.r_max # TODO: right now we assume r_max / r_min = eta ** K
+        n = self._rung_level_size(0)
         if len(self.rungs[self.r_min]) < n:
             config = searcher.sample_configuration()
+            # Run this config until r_min only
             config['resource'] = self.r_min
             return config
         else:
+            # Lowest rung level not yet complete:
             r = self.find_rung_level()
             # check which configuration we should promote to the next rung level
             config = self.find_promotable_configuration(r)        
@@ -231,6 +254,8 @@ lowest rung needs to be set depending on the bracket, and that is not done
 here. I think `SuccessiveHalvingScheduler` needs some argument for that, which
 could be None and set by default, but for Hyperband, you need to pass it.*
 
+*MS: I implemented what I think is a fix, but please do check this!*
+
 ```{.python .input  n=8}
 import numpy as np
 import copy
@@ -240,9 +265,21 @@ class HyperbandScheduler(d2l.Scheduler):
         self.save_hyperparameters()
         self.current_bracket = 0
         self.brackets = []
-        self.successive_halving = SuccessiveHalvingScheduler(
-            searcher, eta, r_min, r_max)
-        
+        self.s_max = int(np.ceil(
+            (np.log(r_max) - np.log(r_min)) / np.log(eta)))
+        self.successive_halving = self._create_successive_halving()
+
+    def _create_successive_halving(self):
+        # Determine size of bottom rung
+        r_num_m1 = self.s_max - self.current_bracket
+        pre_fact = (self.s_max + 1) / (r_num_m1 + 1)
+        bottom_rung_size = int(np.ceil(
+            pre_fact * self.eta ** r_num_m1))
+        r_min = self.r_min * self.eta ** self.current_bracket
+        return SuccessiveHalvingScheduler(
+            searcher=self.searcher, eta=self.eta, r_min=r_min,
+            r_max=self.r_max, bottom_rung_size=bottom_rung_size)
+  
     def suggest(self):
         # check if we finished the current bracket
         r_max = self.successive_halving.r_max
@@ -258,10 +295,7 @@ class HyperbandScheduler(d2l.Scheduler):
             print(r_min)
             # start a new bracket with a higher r_min
             self.brackets.append(copy.deepcopy(self.successive_halving.rungs))
-            self.successive_halving = SuccessiveHalvingScheduler(self.searcher,
-                                                                 self.eta,
-                                                                 r_min,
-                                                                 self.r_max)
+            self.successive_halving = self._create_successive_halving()
 
         return self.successive_halving.suggest()
         
