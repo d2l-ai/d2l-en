@@ -23,10 +23,10 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # What is Hyperparameter Optimization?
 :label:`sec_what_is_hpo`
 
-While weight parameters of a neural network model are automatically determined during training, e.g. by stochastic gradient descent, **hyperparameters** cannot be learned in this way. Without a different form of automation, the user has to set them manually by trial and error, in what amounts to a time-consuming and difficult part of machine learning workflows. We distinguish between hyperparameters that control the learning process (e.g., learning rate, batch size, momentum, optimizer choice) and hyperparameters that define model shape and capacity (e.g., type of activation function, number of units per layer). The choice of hyperparameters directly affects the final performance of our machine learning algorithm. For example, previous work beat the performance of advanced state-of-the-art models by optimizing the hyperparameter of much simpler models :cite:`snoek-nips12a`. 
+While weight parameters of a neural network model are automatically determined during training, e.g. by stochastic gradient descent, **hyperparameters** cannot easily be learned in this way. Without a different form of automation, the user has to set them manually by trial and error, in what amounts to a time-consuming and difficult part of machine learning workflows. We distinguish between hyperparameters that control the learning process (e.g., learning rate, batch size, momentum, optimizer choice) and hyperparameters that define model shape and capacity (e.g., type of activation function, number of units per layer). The choice of hyperparameters directly affects the final performance of our machine learning algorithm. For example, previous work beat the performance of advanced state-of-the-art models by optimizing the hyperparameter of much simpler models :cite:`snoek-nips12a`. 
 
-Hyperparameters play a critical role in machine learning. Not only do they determine the generalization capabilities of trained models, they can even be critical for what constitutes the state-of-the-art. Indeed, results reported in an empirical study might look very differently for another choice of 
-hyperparameters and so would be the conclusions drawn. Unfortunately, it is not uncommon that publications do not report the specific hyperparameters that were used in experiments, for instance, to demonstrate that a proposed method  is superior to previously published ones. Such studies are not reproducible, and their impact on the state-of-the-art in machine learning should be questioned :cite:`haibe-kains:2020:transparency`.
+Hyperparameters play an important role in machine learning. Not only do they determine the generalization capabilities of trained models, they can even be critical for what constitutes the state-of-the-art. Indeed, results reported in an empirical study might look very differently for another choice of 
+hyperparameters and so would be the conclusions drawn. Unfortunately, it is not uncommon that publications do not report the specific hyperparameters that were used in experiments, for instance, to demonstrate that a proposed method is superior to previously published ones. Such studies are not reproducible, and their impact on the state-of-the-art in machine learning should be questioned :cite:`haibe-kains:2020:transparency`.
 
 The current need to manually tune the training process and structure of a deep neural network constitutes a significant gap towards the promise of end to end learning and artificial intelligence. If we are willing to spend sufficient computational resources, our methods should be able to configure themselves. Hyperparameter optimization aims to automatically find a performant configuration of any machine learning method. The main idea is to cast the search for the right hyperparameters as an optimization problem, to maximize the validation performance of the algorithm.
 
@@ -36,20 +36,10 @@ In this chapter, we provide an overview of the basics of hyperparameter optimiza
 !pip install syne-tune
 ```
 
-```{.json .output n=2}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Requirement already satisfied: syne-tune in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (0.11)\nRequirement already satisfied: pytest in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (6.2.5)\nRequirement already satisfied: dill in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (0.3.4)\nRequirement already satisfied: PyYaml in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (5.4.1)\nRequirement already satisfied: typing-extensions in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (4.0.1)\nRequirement already satisfied: boto3 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (1.20.18)\nRequirement already satisfied: ujson in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (4.3.0)\nRequirement already satisfied: pandas in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (1.3.4)\nRequirement already satisfied: sagemaker>=2.32.0 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from syne-tune) (2.70.0)\nRequirement already satisfied: attrs in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (21.2.0)\nRequirement already satisfied: importlib-metadata>=1.4.0 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (4.8.2)\nRequirement already satisfied: packaging>=20.0 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (21.3)\nRequirement already satisfied: pathos in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (0.2.8)\nRequirement already satisfied: smdebug-rulesconfig==1.0.1 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (1.0.1)\nRequirement already satisfied: google-pasta in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (0.2.0)\nRequirement already satisfied: numpy>=1.9.0 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (1.18.5)\nRequirement already satisfied: protobuf>=3.1 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (3.19.1)\nRequirement already satisfied: protobuf3-to-dict>=0.1.5 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from sagemaker>=2.32.0->syne-tune) (0.1.5)\nRequirement already satisfied: jmespath<1.0.0,>=0.7.1 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from boto3->syne-tune) (0.10.0)\nRequirement already satisfied: botocore<1.24.0,>=1.23.18 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from boto3->syne-tune) (1.23.18)\nRequirement already satisfied: s3transfer<0.6.0,>=0.5.0 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from boto3->syne-tune) (0.5.0)\nRequirement already satisfied: python-dateutil<3.0.0,>=2.1 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from botocore<1.24.0,>=1.23.18->boto3->syne-tune) (2.8.2)\nRequirement already satisfied: urllib3<1.27,>=1.25.4 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from botocore<1.24.0,>=1.23.18->boto3->syne-tune) (1.26.7)\nRequirement already satisfied: zipp>=0.5 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from importlib-metadata>=1.4.0->sagemaker>=2.32.0->syne-tune) (3.6.0)\nRequirement already satisfied: pyparsing!=3.0.5,>=2.0.2 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from packaging>=20.0->sagemaker>=2.32.0->syne-tune) (3.0.6)\nRequirement already satisfied: six in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from protobuf3-to-dict>=0.1.5->sagemaker>=2.32.0->syne-tune) (1.16.0)\nRequirement already satisfied: pytz>=2017.3 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pandas->syne-tune) (2021.3)\nRequirement already satisfied: multiprocess>=0.70.12 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pathos->sagemaker>=2.32.0->syne-tune) (0.70.12.2)\nRequirement already satisfied: ppft>=1.6.6.4 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pathos->sagemaker>=2.32.0->syne-tune) (1.6.6.4)\nRequirement already satisfied: pox>=0.3.0 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pathos->sagemaker>=2.32.0->syne-tune) (0.3.0)\nRequirement already satisfied: py>=1.8.2 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pytest->syne-tune) (1.11.0)\nRequirement already satisfied: toml in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pytest->syne-tune) (0.10.2)\nRequirement already satisfied: pluggy<2.0,>=0.12 in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pytest->syne-tune) (1.0.0)\nRequirement already satisfied: iniconfig in /Users/kleiaaro/opt/anaconda3/envs/d2l/lib/python3.8/site-packages (from pytest->syne-tune) (1.1.1)\n"
- }
-]
-```
-
-## Ingredients to Hyperparameter Optimization
+## Ingredients for Hyperparameter Optimization
 :label:`sec_definition_hpo`
 
-The performance of our machine learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from our hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation performance. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning algorithm, which can take a long time. We will see later how much cheaper approximations can help with the optimization of $f$. Training is stochastic in general (e.g., weights are randomly initialized), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
+The performance of our machine learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from our hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation performance. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning algorithm, which can take a long time. We will see later how much cheaper approximations can help with the optimization of $f$. Training is stochastic in general (e.g., weights are randomly initialized, mini-batches are randomly sampled), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
 
 As a running example, we will train the model from Chapter :numref:`sec_alexnet`
 on the FashionMNIST dataset. As we would like to optimize the validation error,
@@ -105,7 +95,7 @@ def objective(config, max_epochs=16): #@save
 ```
 
 Given our criterion $f(\mathbf{x})$ in terms of `objective(config)`, where $\mathbf{x}$
-corresponds to `config`, we would like to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. Since $f$ is the validation performance after training, there is no efficient way to compute gradients with respect to $\mathbf{x}$. While there is recent work to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here.
+corresponds to `config`, we would like to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. Since $f$ is the validation performance after training, there is no efficient way to compute gradients with respect to $\mathbf{x}$. While there is recent work :cite:`maclaurin-icml15`,`franceschi-icml17a` to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here.
 
 
 ### Search Spaces
@@ -196,12 +186,12 @@ evaluation produces a new metric value.
 
 ### Scheduler
 
-MS: This API does not support stopping a trial as result of a call to `update`.
+*MS: This API does not support stopping a trial as result of a call to `update`.
 I see this is not needed to implement synchronous SH and HB, so it's probably
 OK. But it runs a bit contrary to saying that scheduling is about stopping a
 trial. If we want that, we'd have to allow `update` to return a flag for
 (continue, stop).
-AK: We would only need this for ASHA stopping not for ASHA promotion right? If so I would leave it, to avoid making it overly complicated.
+AK: We would only need this for ASHA stopping not for ASHA promotion right? If so I would leave it, to avoid making it overly complicated.*
 
 Beyond sampling configurations for new trials, we also need to decide how long to
 run a trial for, or whether to stop it early. In practice, all these decisions are
@@ -233,7 +223,9 @@ class Scheduler(d2l.HyperParameters): #@save
 ]
 ```
 
-Below we define a basic first-in first-out scheduler which simply schedules a new configuration once resources become available.
+Below we define a basic first-in first-out scheduler which simply schedules the next configuration once resources become available.
+
+*AK: I know we use FIFOScheduler in SyneTune but I am not sure if it's the right name, since we do not have a fifo queue*
 
 ```{.python .input  n=11}
 %%tab pytorch, mxnet, tensorflow
@@ -252,8 +244,8 @@ class FIFOScheduler(d2l.Scheduler): #@save
 ### Tuner
 
 Finally, we need a component running the optimizer and doing some book-keeping
-of the results. The following code does that for sequential execution (one training
-job after the next) and will serve as basic example. We will later use **Syne Tune** for more sophisticated distributed HPO cases.
+of the results. The following code implements a sequential execution of the HPO process (one training
+job after the next) and will serve as a basic example. We will later use **Syne Tune** for more sophisticated distributed HPO cases.
 
 ```{.python .input  n=12}
 %%tab pytorch, mxnet, tensorflow

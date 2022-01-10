@@ -37,7 +37,7 @@ evaluate all $N$ trials before we can identify the best and the worst ones?
 
 At least for tuning of neural networks, synchronous SH and Hyperband can often be
 improved dramatically by adopting asynchronous decision making. This is done
-in *asynchronous successive halving (ASHA)*. TODO: REFERENCE? Roughly speaking,
+in *asynchronous successive halving (ASHA)* :cite:`li-arxiv18`. Roughly speaking,
 ASHA employs the same rung levels and the same rule to decide between stop and
 continue than synchronous SH, but the decision is made whenever a trial reaches
 a rung level, *based on the data available until then*.
@@ -167,9 +167,9 @@ tuning_experiment = load_experiment(tuner.name)
 tuning_experiment.plot()
 ```
 
-MS: Following our recommendation above, should we not present results averaged
+*MS: Following our recommendation above, should we not present results averaged
 over many runs? We could say these are easy to obtain with Syne Tune, without
-going into details.
+going into details.*
 
 ## Summary
 
