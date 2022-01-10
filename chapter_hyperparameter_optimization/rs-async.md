@@ -23,7 +23,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Asynchronously Parallel Random Search
 
 In random search, each new configuration is chosen independent of all others, and
-in particular without exploiting observations from any prior evaluation. We can trivally parallize random search by running trials in parallel, either by using multiple GPUs on the same instance, or even
+in particular without exploiting observations from any prior evaluation. We can trivally parallize random search by running trials in parallel, either by using multiple GPUs on the same instance, or across
 multiple instances. Random search exhibits a linear speed-up, in that a certain
 performance is reached K times faster if K trials can be run in parallel. Also,
 there is no need to synchronize job executions: random search is best run
@@ -36,7 +36,7 @@ scheduling, and we will use **Syne Tune** for that.
 
 Syne Tune requires the code for training and evaluation to be given as a script,
 where the hyperparameters are passed as input arguments, and the validation metric
-is reported via a callback function. Here is our example from above, which we
+is reported back via a callback function `report`. Here is our example from above, which we
 store as `train_script.py`.
 
 ```{.python .input}
@@ -65,7 +65,7 @@ if __name__ == '__main__':
 ## Asynchronous Scheduler
 
 First, we define the number of workers that evaluate trials concurrently. Since
-we will use the local back-end of Syne Tune, we need to make sure to choose an
+we will use the local back-end (i.e each trial is run in a separat python process on the same instance) of Syne Tune, we need to make sure to choose an
 instance on which (at least) this number of training processes can run in
 parallel. We also need to select a stopping criterion for our experiment and point
 to our training script.
@@ -145,9 +145,9 @@ tuning_experiment = load_experiment(tuner.name)
 tuning_experiment.plot()
 ```
 
-MS: Following our recommendation above, should we not present results averaged
+*MS: Following our recommendation above, should we not present results averaged
 over many runs? We could say these are easy to obtain with Syne Tune, without
-going into details.
+going into details.*
 
 ## Summary
 
