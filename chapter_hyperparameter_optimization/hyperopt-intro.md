@@ -120,12 +120,12 @@ Another way to define hyperparameter types is as bounded distributions, typicall
 Methods driven by random search sample independent values from these distributions for every search decision.
 
 One data type missing from our running example is `categorical`. For example, we could extend it by
-`activation` of type `categorical(['ReLU', 'LeakyReLU', 'Softplus'])`, in order to specify the
+`"activation": choice(['ReLU', 'LeakyReLU', 'Softplus'])`, in order to specify the
 non-linear activation functions. This data type is for finite parameters, whose values have no ordering or distance
 relations with each other.
 
 It is tempting to try and "simplify" an HPO problem by turning numerical into categorical parameters. For example, why not specify
-`batch_size` as `categorical([8, 32, 64, 128])`, i.e. 4 instead of 121 possible values? However, not only does this constitute another "choice by hand" we want to avoid,
+`batch_size` as `choice([8, 32, 64, 128])`, i.e. 4 instead of 121 possible values? However, not only does this constitute another "choice by hand" we want to avoid,
 for most competitive HPO methods, it either does not matter or makes things worse. Uniform random sampling just as effectively covers a
 bounded range than a finite set. As we will see, many model-based HPO methods relax `int` to `float` and use
 one-hot encoding for `categorical`, so turning `int` or `float` into `categorical` increases the dimension of the encoding
@@ -191,7 +191,9 @@ I see this is not needed to implement synchronous SH and HB, so it's probably
 OK. But it runs a bit contrary to saying that scheduling is about stopping a
 trial. If we want that, we'd have to allow `update` to return a flag for
 (continue, stop).
-AK: We would only need this for ASHA stopping not for ASHA promotion right? If so I would leave it, to avoid making it overly complicated.*
+AK: We would only need this for ASHA stopping not for ASHA promotion right?
+If so I would leave it, to avoid making it overly complicated.
+MS: OK, we should not overdo this "from scratch" anyway.*
 
 Beyond sampling configurations for new trials, we also need to decide how long to
 run a trial for, or whether to stop it early. In practice, all these decisions are
@@ -225,7 +227,9 @@ class Scheduler(d2l.HyperParameters): #@save
 
 Below we define a basic first-in first-out scheduler which simply schedules the next configuration once resources become available.
 
-*AK: I know we use FIFOScheduler in SyneTune but I am not sure if it's the right name, since we do not have a fifo queue*
+*AK: I know we use FIFOScheduler in SyneTune but I am not sure if it's the
+right name, since we do not have a fifo queue.
+MS: That name is from Ray Tune.*
 
 ```{.python .input  n=11}
 %%tab pytorch, mxnet, tensorflow
