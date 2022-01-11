@@ -17,6 +17,15 @@ import os
 import pandas as pd
 ```
 
+```{.python .input}
+#@tab pytorch
+import os
+import pandas as pd
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
 Then, we download the MovieLens 100k dataset and load the interactions as `DataFrame`.
 
 ```{.python .input  n=2}
