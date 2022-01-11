@@ -282,18 +282,15 @@ class HyperbandScheduler(d2l.Scheduler):
   
     def suggest(self):
         # check if we finished the current bracket
-        r_max = self.successive_halving.r_max
         r_min = self.successive_halving.r_min
-        if len(self.successive_halving.rungs[r_max]) == r_min:
+        if len(self.successive_halving.rungs[self.r_max]) == r_min:
             self.current_bracket += 1
-            
-            r_min = self.r_min * self.eta ** self.current_bracket
-            
+            r_min *= self.eta
             if r_min > self.r_max:
                 r_min = self.r_min
                 self.current_bracket = 0
             print(r_min)
-            # start a new bracket with a higher r_min
+            # start a new bracket for r_min
             self.brackets.append(copy.deepcopy(self.successive_halving.rungs))
             self.successive_halving = self._create_successive_halving()
 
