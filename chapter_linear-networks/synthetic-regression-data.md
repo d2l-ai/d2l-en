@@ -167,21 +167,23 @@ Next let's try to implement the same function using built-in iterators.
 
 Rather than writing our own iterator,
 we can [**call the existing API in a framework to load data.**]
-As before, need a dataset with features `X` and labels `y`. 
+As before, we need a dataset with features `X` and labels `y`. 
 Beyond that, we set `batch_size` in the built-in data loader 
 and let it take care of shuffling examples  efficiently.
 
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(d2l.DataModule)  #@save
-def get_tensorloader(self, tensors, train, indices=slice(0,None)):
+def get_tensorloader(self, tensors, train, indices=slice(0, None)):
     tensors = tuple(a[indices] for a in tensors)
     if tab.selected('mxnet'):
         dataset = gluon.data.ArrayDataset(*tensors)
-        return gluon.data.DataLoader(dataset, self.batch_size, shuffle=train)
+        return gluon.data.DataLoader(dataset, self.batch_size,
+                                     shuffle=train)
     if tab.selected('pytorch'):
         dataset = torch.utils.data.TensorDataset(*tensors)
-        return torch.utils.data.DataLoader(dataset, self.batch_size, shuffle=train)
+        return torch.utils.data.DataLoader(dataset, self.batch_size,
+                                           shuffle=train)
     if tab.selected('tensorflow'):
         shuffle_buffer = tensors[0].shape[0] if train else 1
         return tf.data.Dataset.from_tensor_slices(tensors).shuffle(

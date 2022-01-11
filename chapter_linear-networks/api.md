@@ -99,7 +99,7 @@ B(a=1, b=2, c=3);
 
 The last utility allows us to plot experiment progress interactively while it is going on. In deference to the much more powerful (and complex) [Tensorboard](https://www.tensorflow.org/tensorboard) we name it `ProgressBoard`. The  implementation is deferred to :numref:`sec_utils`. For now, let's simply see it in action.
 
-The `draw` function plots a point `(x, y)` in the figure, with `label` specific the legend. The optional `every_n` smooths the line by only showing $1/n$ points in the figure. Their values are averaged from the $n$ neighbor points in the original figure.
+The `draw` function plots a point `(x, y)` in the figure, with `label` specified in the legend. The optional `every_n` smooths the line by only showing $1/n$ points in the figure. Their values are averaged from the $n$ neighbor points in the original figure.
 
 ```{.python .input}
 %%tab all
@@ -115,7 +115,7 @@ class ProgressBoard(d2l.HyperParameters):  #@save
         raise NotImplemented
 ```
 
-The following example, we draw `sin` and `cos` with a different smoothness. If you run this code block, you will see the lines grow in an animation.
+In the following example, we draw `sin` and `cos` with a different smoothness. If you run this code block, you will see the lines grow in an animation.
 
 ```{.python .input}
 %%tab all
@@ -155,7 +155,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 
     def plot(self, key, value, train):
         """Plot a point in animation."""
-        assert hasattr(self, 'trainer'), 'trainer is not inited'
+        assert hasattr(self, 'trainer'), 'Trainer is not inited'
         self.board.xlabel = 'epoch'
         if train:
             x = self.trainer.train_batch_idx / \
@@ -168,7 +168,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
                 self.plot_valid_per_epoch
         if tab.selected('mxnet', 'tensorflow'):
             self.board.draw(x, d2l.numpy(value), (
-                'train_' if train else 'val_') + key,every_n=int(n))
+                'train_' if train else 'val_') + key, every_n=int(n))
         if tab.selected('pytorch'):
             self.board.draw(x, d2l.numpy(d2l.to(value, d2l.cpu())),
                             ('train_' if train else 'val_') + key,
@@ -188,17 +188,17 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 ```
 
 :begin_tab:`mxnet`
-You may notice that `Module` is a subclass of `nn.Block`, the base class of a neural network in Gluon.
+You may notice that `Module` is a subclass of `nn.Block`, the base class of neural networks in Gluon.
 It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this function by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Block` in :numref:`sec_model_construction`.
 :end_tab:
 
 :begin_tab:`pytorch`
-You may notice that `Module` is a subclass of `nn.Module`, the base class of neural network in PyTorch.
-It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this function by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Block` in :numref:`sec_model_construction`.
+You may notice that `Module` is a subclass of `nn.Module`, the base class of neural networks in PyTorch.
+It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this function by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Module` in :numref:`sec_model_construction`.
 :end_tab:
 
 :begin_tab:`tensorflow`
-You may notice that `Module` is a subclass of `tf.keras.Model`, the base class of neural network in TensorFlow.
+You may notice that `Module` is a subclass of `tf.keras.Model`, the base class of neural networks in TensorFlow.
 It provides convenient features to handle neural networks. For example, it invokes the `call` method in the built-in `__call__` method. Here we redirect `call` to the `forward` function, saving its arguments as a class attribute. We do this to make our code more similar to other framework implementations.
 :end_tab:
 
@@ -229,7 +229,7 @@ class DataModule(d2l.HyperParameters):  #@save
 
 ## Training
 
-The `Trainer` class trains the learnable parameters (aka weights) in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterates over the data `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
+The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterates over the data `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
 
 ```{.python .input}
 %%tab all
@@ -267,4 +267,4 @@ class Trainer(d2l.HyperParameters):  #@save
 
 ## Summary
 
-The classes provided by the D2L API function as a lightweight toolkit that make structured modeling for deep learning easy. In particular, it makes it easy to reuse many components between projects without changing much at all. For instance, we can replace just the optimizer, just the model, just the dataset, etc.; This degree of modularity pays dividends throughout the book in terms of conciseness and simplicity (this is why we added it) and it can do the same for your own projects. We strongly recommend that you look at the implementation in detail once you have gained some more familiarity with deep learning modeling.
+The classes provided by the D2L API function as a lightweight toolkit that makes structured modeling for deep learning easy. In particular, it facilitates reusing many components between projects without changing much at all. For instance, we can replace just the optimizer, just the model, just the dataset, etc.; This degree of modularity pays dividends throughout the book in terms of conciseness and simplicity (this is why we added it) and it can do the same for your own projects. We strongly recommend that you look at the implementation in detail once you have gained some more familiarity with deep learning modeling.

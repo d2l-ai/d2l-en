@@ -166,7 +166,7 @@ It accepts a `batch_size` argument that can be ignored.
 We define our `SGD` class to have a similar API 
 as the built-in SGD optimizer.
 We update the parameters in the `step` method.
-The `zero_grad` method set all gradients to 0,
+The `zero_grad` method sets all gradients to 0,
 which must be run before a backward step. 
 :end_tab:
 
