@@ -228,7 +228,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
 
     def plot(self, key, value, train):
         """Plot a point in animation."""
-        assert hasattr(self, 'trainer'), 'trainer is not inited'
+        assert hasattr(self, 'trainer'), 'Trainer is not inited'
         self.board.xlabel = 'epoch'
         if train:
             x = self.trainer.train_batch_idx / \
@@ -240,7 +240,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
             n = self.trainer.num_val_batches / \
                 self.plot_valid_per_epoch
         self.board.draw(x, d2l.numpy(value), (
-            'train_' if train else 'val_') + key,every_n=int(n))
+            'train_' if train else 'val_') + key, every_n=int(n))
     def training_step(self, batch):
         l = self.loss(self(*batch[:-1]), batch[-1])
         self.plot('loss', l, train=True)
@@ -271,7 +271,7 @@ class DataModule(d2l.HyperParameters):
     def val_dataloader(self):
         return self.get_dataloader(train=False)
 
-    def get_tensorloader(self, tensors, train, indices=slice(0,None)):
+    def get_tensorloader(self, tensors, train, indices=slice(0, None)):
         tensors = tuple(a[indices] for a in tensors)
         shuffle_buffer = tensors[0].shape[0] if train else 1
         return tf.data.Dataset.from_tensor_slices(tensors).shuffle(

@@ -233,7 +233,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
 
     def plot(self, key, value, train):
         """Plot a point in animation."""
-        assert hasattr(self, 'trainer'), 'trainer is not inited'
+        assert hasattr(self, 'trainer'), 'Trainer is not inited'
         self.board.xlabel = 'epoch'
         if train:
             x = self.trainer.train_batch_idx / \
@@ -278,10 +278,11 @@ class DataModule(d2l.HyperParameters):
     def val_dataloader(self):
         return self.get_dataloader(train=False)
 
-    def get_tensorloader(self, tensors, train, indices=slice(0,None)):
+    def get_tensorloader(self, tensors, train, indices=slice(0, None)):
         tensors = tuple(a[indices] for a in tensors)
         dataset = torch.utils.data.TensorDataset(*tensors)
-        return torch.utils.data.DataLoader(dataset, self.batch_size, shuffle=train)
+        return torch.utils.data.DataLoader(dataset, self.batch_size,
+                                           shuffle=train)
 
 class Trainer(d2l.HyperParameters):
     """Defined in :numref:`sec_d2l_apis`"""
