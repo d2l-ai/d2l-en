@@ -90,11 +90,11 @@ The second significant difference between NiN and AlexNet and VGG respectively
 is that NiN avoids fully connected layers altogether.
 Instead, NiN uses a NiN block with a number of output channels equal to the number of label classes, followed by a *global* average pooling layer,
 yielding a vector of logits.
-This design significantly reduces the number of required model parameters, albeit at the expense of a potential increase in training time. 
+This design significantly reduces the number of required model parameters, albeit at the expense of a potential increase in training time.
 
 ```{.python .input}
 %%tab all
-class NiN(d2l.Classification):
+class NiN(d2l.Classifier):
     def __init__(self, num_classes=10, lr=0.1):
         super().__init__()
         self.save_hyperparameters()
@@ -124,6 +124,7 @@ class NiN(d2l.Classification):
                 nin_block(384, num_classes, kernel_size=3, strides=1, padding=1),
                 nn.AdaptiveAvgPool2d((1, 1)),
                 nn.Flatten())
+            self.net.apply(d2l.init_cnn_weights)
 ```
 
 We create a data example to see [**the output shape of each block**].
@@ -164,7 +165,7 @@ NiN has dramatically fewer parameters than AlexNet and VGG. This stems from the 
     1. What is the amount of memory needed during training?
     1. What is the amount of memory needed during prediction?
 1. What are possible problems with reducing the $384 \times 5 \times 5$ representation to a $10 \times 5 \times 5$ representation in one step?
-1. Use the structural design decisions in VGG that led to VGG-11, VGG-16 and VGG-19 to design a family of NiN-like networks. 
+1. Use the structural design decisions in VGG that led to VGG-11, VGG-16 and VGG-19 to design a family of NiN-like networks.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/79)
@@ -173,7 +174,3 @@ NiN has dramatically fewer parameters than AlexNet and VGG. This stems from the 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/80)
 :end_tab:
-
-```{.python .input}
-
-```

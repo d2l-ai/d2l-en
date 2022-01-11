@@ -475,9 +475,9 @@ def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     # Initialization
     net = nn.Sequential(nn.Linear(5, 1))
-    def init_weights(m):
-        if type(m) == nn.Linear:
-            torch.nn.init.normal_(m.weight, std=0.01)
+    def init_weights(layer):
+        if type(layer) == nn.Linear:
+            torch.nn.init.normal_(layer.weight, std=0.01)
     net.apply(init_weights)
 
     optimizer = trainer_fn(net.parameters(), **hyperparams)

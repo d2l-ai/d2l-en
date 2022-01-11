@@ -6,20 +6,30 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Linear Regression Implementation from Scratch
 :label:`sec_linear_scratch`
 
-Now we can begin to work through a hands-on implementation of linear regression in code. 
-In this section, (**we will implement the entire method from scratch,
-including the model,
-the loss function, the minibatch stochastic gradient descent optimizer, and the training function.**)
-While modern deep learning frameworks can automate nearly all of this work,
+We're now ready to work through 
+a fully functioning implementation 
+of linear regression. 
+In this section, 
+(**we will implement the entire method from scratch,
+including (i) the model; (ii) loss function;
+(iii) a minibatch stochastic gradient descent optimizer;
+and (iv) the training function 
+that stitches all of these pieces together.**)
+Finally, we will run our synthetic data generator
+from the previous section and apply our model
+on the resulting dataset. 
+While modern deep learning frameworks 
+can automate nearly all of this work,
 implementing things from scratch is the only way
 to make sure that you really know what you are doing.
 Moreover, when it comes time to customize models,
 defining our own layers or loss functions,
 understanding how things work under the hood will prove handy.
-In this section, we will rely only on tensors and automatic differentiation.
+In this section, we will rely only 
+on tensors and automatic differentiation.
 Later on, we will introduce a more concise implementation,
-taking advantage of bells and whistles of deep learning frameworks while retaining
-the structure of what follows below.
+taking advantage of bells and whistles of deep learning frameworks 
+while retaining the structure of what follows below.
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -50,7 +60,9 @@ import tensorflow as tf
 In the following we initialize weights by drawing
 random numbers from a normal distribution with mean 0
 and a standard deviation of 0.01. 
-The magic number 0.01 often works well in practice, but you can definitely specify a different value through the argument `sigma`.
+The magic number 0.01 often works well in practice, 
+but you can specify a different value 
+through the argument `sigma`.
 Moreover we set the bias to 0.
 
 ```{.python .input  n=5}
@@ -74,17 +86,15 @@ class LinearRegressionScratch(d2l.Module):  #@save
             self.b = tf.Variable(b, trainable=True)
 ```
 
-After initializing our parameters,
-our next task is to update them until
-they fit the data sufficiently well.
-
 Next, we must [**define our model,
 relating its inputs and parameters to its outputs.**]
 For our linear model we simply take the matrix-vector product
-of the input features $\mathbf{X}$ and the model weights $\mathbf{w}$,
+of the input features $\mathbf{X}$ 
+and the model weights $\mathbf{w}$,
 and add the offset $b$ to each example.
 $\mathbf{Xw}$ is a vector and $b$ is a scalar.
-Due to the broadcasting mechanism of :numref:`subsec_broadcasting`,
+Due to the broadcasting mechanism 
+(see :numref:`subsec_broadcasting`),
 when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
@@ -107,7 +117,8 @@ In the implementation, we need to transform the true value `y`
 into the predicted value's shape `y_hat`.
 The result returned by the following function
 will also have the same shape as `y_hat`. 
-We also return the averaged loss value among all examples in the minibatch.
+We also return the averaged loss value
+among all examples in the minibatch.
 
 ```{.python .input  n=7}
 %%tab all
@@ -121,31 +132,49 @@ def loss(self, y_hat, y):
 
 As discussed in :numref:`sec_linear_regression`,
 linear regression has a closed-form solution.
-However, our goal here is to illustrate how to
-use minibatch SGD. Hence we will take this opportunity
+However, our goal here is to illustrate 
+how to train more general neural networsk,
+and that requires that we teach you 
+how to use minibatch SGD.
+Hence we will take this opportunity
 to introduce your first working example of SGD.
-At each step, using a minibatch randomly drawn from our dataset,
-we estimate the gradient of the loss with respect to the parameters.
+At each step, using a minibatch 
+randomly drawn from our dataset,
+we estimate the gradient of the loss
+with respect to the parameters.
 Next, we update the parameters
 in the direction that may reduce the loss.
 
-The following code applies the update, given a set of parameters, a learning rate `lr`.
-Since our loss is computed as an average over the minibatch, we don't need to adjust the 
-learning rate against the batch size. 
-In later chapters we will investigate how learning rates should be adjusted
-for very large minibatches as they arise in distributed large scale learning.
+The following code applies the update, 
+given a set of parameters, a learning rate `lr`.
+Since our loss is computed as an average over the minibatch, 
+we don't need to adjust the learning rate against the batch size. 
+In later chapters we will investigate 
+how learning rates should be adjusted
+for very large minibatches as they arise 
+in distributed large scale learning.
 For now, though, we can ignore this dependency.
 
 :begin_tab:`mxnet`
-We define our `SGD` class to have a similar API as the built-in SGD optimizer. We update the parameters in the `step` method. It accepts a `batch_size` argument that can be ignored.
+We define our `SGD` class to have a similar API
+as the built-in SGD optimizer.
+We update the parameters in the `step` method.
+It accepts a `batch_size` argument that can be ignored.
 :end_tab:
 
 :begin_tab:`pytorch`
-We define our `SGD` class to have a similar API as the built-in SGD optimizer. We update the parameters in the `step` method. The `zero_grad` method set all gradients to 0, which must be run before a backward step. 
+We define our `SGD` class to have a similar API 
+as the built-in SGD optimizer.
+We update the parameters in the `step` method.
+The `zero_grad` method set all gradients to 0,
+which must be run before a backward step. 
 :end_tab:
 
 :begin_tab:`tensorflow`
-We define our `SGD` class to have a similar API as the built-in SGD optimizer. We update the parameters in the `apply_gradients` method. It accepts a list of parameter and gradient pairs. 
+We define our `SGD` class to have a similar API
+as the built-in SGD optimizer.
+We update the parameters in the `apply_gradients` method.
+It accepts a list of parameter and gradient pairs. 
 :end_tab:
 
 ```{.python .input  n=8}
@@ -183,7 +212,7 @@ class SGD(d2l.HyperParameters):  #@save
             param.assign_sub(self.lr * grad)        
 ```
 
-Then we let the `configure_optimizers` method return an instance of the `SGD` class.
+We next define the `configure_optimizers` method, which returns an instance of the `SGD` class.
 
 ```{.python .input  n=10}
 %%tab all
@@ -197,28 +226,38 @@ def configure_optimizers(self):
 
 ## Training
 
-Now that we have all of the parts in place (parameters, loss function, model, and optimizer),
+Now that we have all of the parts in place
+(parameters, loss function, model, and optimizer),
 we are ready to [**implement the main training loop.**]
 It is crucial that you understand this code well
-since it the archetype of almost all training loops in deep learning.
-
-
-In each *epoch*,
-we will iterate through the entire training dataset, passing once
-through every example
-(assuming that the number of examples is divisible by the batch size). 
-
+you will employ similar training loops
+for every other deep learning model
+covered in this book.
+In each *epoch*, we iterate through 
+the entire training dataset, 
+passing once through every example
+(assuming that the number of examples 
+is divisible by the batch size). 
 In each iteration, we grab a minibatch of training examples,
-and compute its loss through the model's `training_step` method. Next we compute the gradients with respect to each parameter. 
+and compute its loss through the model's `training_step` method. 
+Next, we compute the gradients with respect to each parameter. 
 Finally, we will call the optimization algorithm
-to update the model parameters. In summary, we will execute the following loop:
+to update the model parameters. 
+In summary, we will execute the following loop:
 
 * Initialize parameters $(\mathbf{w}, b)$
 * Repeat until done
     * Compute gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} l(\mathbf{x}^{(i)}, y^{(i)}, \mathbf{w}, b)$
     * Update parameters $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
  
-Recall that the synthetic regression dataset we generated in :numref:`sec_synthetic_data` doesn't provide a validation dataset. In most cases, however, we will use a validation dataset to measure our model quality. Here we pass the validation dataloader once in each epoch to measure the model performance.
+Recall that the synthetic regression dataset 
+that we generated in :numref:`sec_synthetic_data` 
+does not provide a validation dataset. 
+In most cases, however, 
+we will use a validation dataset 
+to measure our model quality. 
+Here we pass the validation dataloader 
+once in each epoch to measure the model performance.
 
 ```{.python .input  n=11}
 %%tab all    
@@ -290,11 +329,21 @@ def fit_epoch(self):
         self.val_batch_idx += 1
 ```
 
-Now we are ready to train the model. We first construct a synthetic dataset, and then model 
-with a learning rate `lr=0.03`. Next we fit the model with `max_epochs=3`. Both  the number of epochs and the learning rate are hyperparameters.
+We are almost ready to train the model,
+but first we need some data to train on.
+Here we use the SyntheticRegressionData function 
+and pass in some ground truth parameters.
+Then, we train our model with 
+the learning rate `lr=0.03` 
+and set `max_epochs=3`. 
+Note that in general, both the number of epochs 
+and the learning rate are hyperparameters.
 In general, setting hyperparameters is tricky
-and requires some adjustment for different problems and
-network architectures. We elide these details for now but revise them
+and we will usually want to use a 3-way split,
+one set for training, 
+a second for hyperparameter seclection,
+and the third reserved for the final evaluation.
+We elide these details for now but revise them
 later in :numref:`chap_optimization`.
 
 ```{.python .input  n=15}
@@ -318,23 +367,44 @@ print(f'error in estimating w: {data.w - d2l.reshape(model.w, data.w.shape)}')
 print(f'error in estimating b: {data.b - model.b}')
 ```
 
-Note that we should not take it for granted
-that we are able to recover the parameters perfectly.
-However, in machine learning, we are typically less concerned
+We should not take the ability to exactly recover 
+the ground truth parameters for granted.
+In general, for deep models unique solutions
+for the parameters do not exist,
+and even for linear models,
+exactly recovering the parameters
+is only possible when no feature 
+is linearly dependent on the others.
+However, in machine learning, 
+we are often less concerned
 with recovering true underlying parameters,
-and more concerned with parameters that lead to highly accurate prediction :cite:`Vapnik.1992`.
+and more concerned with parameters 
+that lead to highly accurate prediction :cite:`Vapnik.1992`.
 Fortunately, even on difficult optimization problems,
 stochastic gradient descent can often find remarkably good solutions,
 owing partly to the fact that, for deep networks,
 there exist many configurations of the parameters
-that lead to highly accurate prediction. Likewise, the stochastic nature of
-optimization ensures that are less likely to get 'stuck' in shallow local minima.
+that lead to highly accurate prediction.
 
 
 ## Summary
 
-In this section we took a significant step forward towards designing deep learning systems by implementing
-the the canonical structure of a training loop. In this process we built a data loader, a model, a loss function, an optimization procedure and a visualization and monitoring tool. We did this by composing a Python object that contains all relevant parts for training a model. While none of what we implemented is efficient, it is still sufficient to solve a small toy problem quickly. In the next sections we will see how to do this a) more concisely and b) more efficiently such that we can use the GPUs in our computer to their full extent. Once we are comfortable with that, we graduate to more advanced network architectures, specific datasets, and optimizers in the subsequent chapters.
+In this section, we took a significant step 
+towards designing deep learning systems 
+by implementing a fully functional 
+neural network model and training loop.
+In this process, we built a data loader, 
+a model, a loss function, an optimization procedure,
+and a visualization and monitoring tool. 
+We did this by composing a Python object 
+that contains all relevant components for training a model. 
+While this is not yet a professional grade implementation
+it is perfectly functional and code like this 
+could already help you to solve small problems quickly.
+In the next sections, we will see how to do this
+both *more concisely* (avoiding boilerplate code)
+and *more efficiently* (use our GPUs to their full potential).
+
 
 
 ## Exercises

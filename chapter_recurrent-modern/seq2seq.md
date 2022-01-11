@@ -361,7 +361,7 @@ the layers in the above RNN encoder-decoder model are illustrated in :numref:`fi
 
 ```{.python .input  n=9}
 %%tab all
-class Seq2Seq(d2l.Classification):  #@save
+class Seq2Seq(d2l.Classifier):  #@save
     def __init__(self, encoder, decoder, tgt_pad, lr):
         super().__init__()
         self.save_hyperparameters()    
@@ -562,11 +562,11 @@ def bleu(pred_seq, label_seq, k):  #@save
     for n in range(1, k + 1):
         num_matches, label_subs = 0, collections.defaultdict(int)
         for i in range(len_label - n + 1):
-            label_subs[''.join(label_tokens[i: i + n])] += 1
+            label_subs[' '.join(label_tokens[i: i + n])] += 1
         for i in range(len_pred - n + 1):
-            if label_subs[''.join(pred_tokens[i: i + n])] > 0:
+            if label_subs[' '.join(pred_tokens[i: i + n])] > 0:
                 num_matches += 1
-                label_subs[''.join(pred_tokens[i: i + n])] -= 1
+                label_subs[' '.join(pred_tokens[i: i + n])] -= 1
         score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
     return score
 ```

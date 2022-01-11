@@ -439,7 +439,3 @@ A few rules of thumb: 1) A validation set can be used for model selection, provi
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/234)
 :end_tab:
-
-```{.python .input}
-
-```

@@ -154,7 +154,7 @@ The first module uses a 64-channel $7\times 7$ convolutional layer.
 
 ```{.python .input}
 %%tab all
-class GoogleNet(d2l.Classification):
+class GoogleNet(d2l.Classifier):
     def b1(self):
         if tab.selected('mxnet'):
             net = nn.Sequential()
@@ -176,7 +176,7 @@ class GoogleNet(d2l.Classification):
 
 The second module uses two convolutional layers:
 first, a 64-channel $1\times 1$ convolutional layer,
-followed by a $3\times 3$ convolutional layer that triples the number of channels. This corresponds to the second path in the Inception block and concludes the design of the stem. At this point we have 192 channels. 
+followed by a $3\times 3$ convolutional layer that triples the number of channels. This corresponds to the second path in the Inception block and concludes the design of the stem. At this point we have 192 channels.
 
 ```{.python .input}
 %%tab all
@@ -213,7 +213,7 @@ is increased to $128+192+96+64=480$, yielding a ratio of $128:192:96:64 = 4:6:3:
 we need to rduce the number of intermediat dimensions in the second and third channel. A 
 scale of $\frac{1}{2}$ and $\frac{1}{8}$ respectively suffices, yielding $128$ and $32$ channels 
 respenctively. This captured by the `Inception(64, (96, 128), (16, 32), 32)` and 
-`Inception(128, (128, 192), (32, 96), 64)` block constructors. 
+`Inception(128, (128, 192), (32, 96), 64)` block constructors.
 
 ```{.python .input}
 %%tab all
@@ -330,6 +330,7 @@ def __init__(self, num_classes=10, lr=0.1):
     if tab.selected('pytorch'):
         self.net = nn.Sequential(self.b1(), self.b2(), self.b3(), self.b4(),
                                  self.b5(), nn.Linear(1024, num_classes))
+        self.net.apply(d2l.init_cnn_weights)
     if tab.selected('tensorflow'):
         self.net = tf.keras.Sequential([
             self.b1(), self.b2(), self.b3(), self.b4(), self.b5(), 
@@ -412,7 +413,7 @@ Over the following sections we will encounter a number of design choices (residu
 1. Compare the model parameter sizes of AlexNet, VGG, and NiN with GoogLeNet. How do the latter two network 
    architectures significantly reduce the model parameter size?
 1. Compare the amount of computation needed in GooLeNet to AlexNet. How does this affect the design of an accelerator
-   chip, e.g. in terms of memory size, amount of computation, the benefit of specialized operations, etc.? 
+   chip, e.g. in terms of memory size, amount of computation, the benefit of specialized operations, etc.?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/81)
@@ -425,7 +426,3 @@ Over the following sections we will encounter a number of design choices (residu
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/316)
 :end_tab:
-
-```{.python .input}
-
-```

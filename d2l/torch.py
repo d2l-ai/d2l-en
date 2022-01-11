@@ -484,7 +484,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     Defined in :numref:`sec_fashion_mnist`"""
     raise NotImplementedError
 
-class Classification(d2l.Module):
+class Classifier(d2l.Module):
     """Defined in :numref:`sec_classification`"""
     def validation_step(self, batch):
         Y_hat = self(*batch[:-1])
@@ -548,6 +548,13 @@ def corr2d(X, K):
         for j in range(Y.shape[1]):
             Y[i, j] = d2l.reduce_sum((X[i: i + h, j: j + w] * K))
     return Y
+
+def init_cnn_weights(layer):
+    """Initialize weights for CNNs.
+
+    Defined in :numref:`sec_lenet`"""
+    if type(layer) == nn.Linear or type(layer) == nn.Conv2d:
+        nn.init.xavier_uniform_(layer.weight)
 
 class Residual(nn.Module):
     """The Residual block of ResNet."""
@@ -678,7 +685,7 @@ def check_shape(a, shape):
     assert a.shape == shape, \
             f'tensor\'s shape {a.shape} != expected shape {shape}'
 
-class RNNLMScratch(d2l.Classification):
+class RNNLMScratch(d2l.Classifier):
     """Defined in :numref:`sec_rnn-scratch`"""
     def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
@@ -889,7 +896,7 @@ class Seq2SeqEncoder(d2l.Module):
         # state shape: (num_layers, batch_size, num_hiddens)
         return output, state
 
-class Seq2Seq(d2l.Classification):
+class Seq2Seq(d2l.Classifier):
     """Defined in :numref:`sec_seq2seq_decoder`"""
     def __init__(self, encoder, decoder, tgt_pad, lr):
         super().__init__()
@@ -919,11 +926,11 @@ def bleu(pred_seq, label_seq, k):
     for n in range(1, k + 1):
         num_matches, label_subs = 0, collections.defaultdict(int)
         for i in range(len_label - n + 1):
-            label_subs[''.join(label_tokens[i: i + n])] += 1
+            label_subs[' '.join(label_tokens[i: i + n])] += 1
         for i in range(len_pred - n + 1):
-            if label_subs[''.join(pred_tokens[i: i + n])] > 0:
+            if label_subs[' '.join(pred_tokens[i: i + n])] > 0:
                 num_matches += 1
-                label_subs[''.join(pred_tokens[i: i + n])] -= 1
+                label_subs[' '.join(pred_tokens[i: i + n])] -= 1
         score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
     return score
 
@@ -1265,9 +1272,9 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     """Defined in :numref:`sec_minibatches`"""
     # Initialization
     net = nn.Sequential(nn.Linear(5, 1))
-    def init_weights(m):
-        if type(m) == nn.Linear:
-            torch.nn.init.normal_(m.weight, std=0.01)
+    def init_weights(layer):
+        if type(layer) == nn.Linear:
+            torch.nn.init.normal_(layer.weight, std=0.01)
     net.apply(init_weights)
 
     optimizer = trainer_fn(net.parameters(), **hyperparams)
