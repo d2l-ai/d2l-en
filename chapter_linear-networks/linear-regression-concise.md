@@ -164,13 +164,13 @@ we use `mean`to average the loss across over the minibatch.
 :end_tab:
 
 :begin_tab:`pytorch`
-[**The `MSELoss` class computes the mean squared error.**]
+[**The `MSELoss` class computes the mean squared error (without the $1/2$ factor in :eqref:`eq_mse`).**]
 By default, `MSELoss` returns the average loss over examples.
 It is faster (and easier to use) than implementing our own.
 :end_tab:
 
 :begin_tab:`tensorflow`
-The `MeanSquaredError` class computes the mean squared error.
+The `MeanSquaredError` class computes the mean squared error (without the $1/2$ factor in :eqref:`eq_mse`).
 By default it returns the average loss over examples.
 :end_tab:
 

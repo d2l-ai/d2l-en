@@ -165,6 +165,7 @@ and the corresponding true label is $y^{(i)}$,
 the squared error is given by:
 
 $$l^{(i)}(\mathbf{w}, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2.$$
+:eqlabel:`eq_mse`
 
 The constant $\frac{1}{2}$ makes no real difference
 but proves to be notationally convenient,
