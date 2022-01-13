@@ -96,7 +96,7 @@ Note that this step
 may need extra inputs such as 
 the valid length of the input,
 which was explained
-in :numref:`subsec_mt_data_loading`.
+in :numref:`sec_machine_translation`.
 To generate a variable-length sequence token by token,
 every time the decoder
 may map an input (e.g., the generated token at the previous time step)

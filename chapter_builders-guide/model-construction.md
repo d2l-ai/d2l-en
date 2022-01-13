@@ -91,7 +91,7 @@ and the forward propagation function.
 
 [**To begin, we revisit the code
 that we used to implement MLPs**]
-(:numref:`sec_mlp_concise`).
+(:numref:`sec_mlp`).
 The following code generates a network
 with one fully connected hidden layer
 with 256 units and ReLU activation,
@@ -446,7 +446,7 @@ net(X).shape
 Note that this use of `MySequential`
 is identical to the code we previously wrote
 for the `Sequential` class
-(as described in :numref:`sec_mlp_concise`).
+(as described in :numref:`sec_mlp`).
 
 
 ## [**Executing Code in the Forward Propagation Function**]

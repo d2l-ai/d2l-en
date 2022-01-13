@@ -304,7 +304,7 @@ masked language modeling and next sentence prediction.
 ### [**Masked Language Modeling**]
 :label:`subsec_mlm`
 
-As illustrated in :numref:`sec_language_model`,
+As illustrated in :numref:`sec_language-model`,
 a language model predicts a token using the context on its left.
 To encode context bidirectionally for representing each token,
 BERT randomly masks tokens and uses tokens from the bidirectional context to

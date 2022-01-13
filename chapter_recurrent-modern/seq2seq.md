@@ -58,7 +58,7 @@ is also fed into the decoder as
 part of the inputs
 at every time step as shown in :numref:`fig_seq2seq`.
 Similar to the training of language models in
-:numref:`sec_language_model`,
+:numref:`sec_language-model`,
 we can allow the labels to be the original output sequence,
 shifted by one token:
 "&lt;bos&gt;", "Ils", "regardent", "." $\rightarrow$
