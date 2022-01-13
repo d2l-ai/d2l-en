@@ -30,12 +30,8 @@ scalability, and efficiency of our models to subsequent chapters.
 ```toc
 :maxdepth: 2
 
-optimization-primer
 model-selection
 underfit-overfit
-weight-decay
-dropout
 environment
-kaggle-house-price
 ```
 

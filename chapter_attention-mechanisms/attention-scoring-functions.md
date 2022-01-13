@@ -45,7 +45,7 @@ The attention pooling $f$
 is instantiated as a weighted sum of the values:
 
 $$f(\mathbf{q}, (\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)) = \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$
-:eqlabel:`eq_attn-pooling`
+:eqlabel:`eq_attn-pooling-def`
 
 where
 the attention weight (scalar) for the query $\mathbf{q}$
