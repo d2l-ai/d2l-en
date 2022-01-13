@@ -251,7 +251,7 @@ In summary, we will execute the following loop:
     * Update parameters $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
  
 Recall that the synthetic regression dataset 
-that we generated in :numref:`sec_synthetic_data` 
+that we generated in :numref:``sec_synthetic-regression-data`` 
 does not provide a validation dataset. 
 In most cases, however, 
 we will use a validation dataset 

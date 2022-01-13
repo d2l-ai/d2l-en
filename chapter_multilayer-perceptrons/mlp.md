@@ -111,7 +111,7 @@ and a linear predictor that acts upon that representation.
 This problem of nonlinearity has been studied for at least a 
 century :cite:`Fisher.1928`. For instance, decision trees
 in their most basic form use a sequence of binary decisions to 
-decide upon class membership :cite:`quinlan1994c4`. Likewise, kernel 
+decide upon class membership :cite:`quinlan2014c4`. Likewise, kernel 
 methods have been used for many decades to model nonlinear dependencies 
 :cite:`Aronszajn.1950`. This has found its way e.g. into 
 nonparametric spline models :cite:`Wahba.1990` and kernel methods
@@ -238,7 +238,7 @@ one atop another, yielding ever more expressive models.
 We know that the brain is capable of very sophisticated statistical analysis. As such, 
 it is worth asking, just *how powerful* a Deep Network could be. This question
 has been answered multiple times, e.g. in :cite:`Cybenko.1989` in the context 
-of multilayer perceptrons, and in :cite:`Michelli86` in the context of Reproducing Kernel 
+of multilayer perceptrons, and in :cite:`micchelli1984interpolation` in the context of Reproducing Kernel 
 Hilbert Spaces in a way that could be seen as RBF networks with a single hidden layer. 
 These (and related results) suggest that even with a single-hidden-layer network,
 given enough nodes (possibly absurdly many),

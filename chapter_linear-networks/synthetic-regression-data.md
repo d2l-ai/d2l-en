@@ -4,7 +4,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
 # Synthetic Regression Data
-:label:`synthetic_data`
+:label:`sec_synthetic-regression-data`
 
 
 Machine learning is all about extracting information from data.

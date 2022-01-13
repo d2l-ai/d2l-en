@@ -59,7 +59,7 @@ of a far grander question
 that engulfs all of science:
 when are we ever justified
 in making the leap from particular observations
-to more general statements :cite:`Popper.1959`.
+to more general statements :cite:`popper2005logic`.
 
 
 In real life, we must fit out models
