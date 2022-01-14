@@ -465,7 +465,7 @@ def train_concise(wd):
         for X, y in train_iter:
             trainer.zero_grad()
             l = loss(net(X), y)
-            l.sum().backward()
+            l.mean().backward()
             trainer.step()
         if (epoch + 1) % 5 == 0:
             animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
