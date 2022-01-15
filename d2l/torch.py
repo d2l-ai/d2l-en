@@ -293,7 +293,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):
         if isinstance(updater, torch.optim.Optimizer):
             # Using PyTorch in-built optimizer & loss criterion
             updater.zero_grad()
-            l.sum().backward()
+            l.mean().backward()
             updater.step()
         else:
             # Using custom built optimizer & loss criterion
