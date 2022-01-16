@@ -111,7 +111,7 @@ To be specific, if $X$ is discrete, $$H(X) = - \sum_i p_i \log p_i \text{, where
 
 Otherwise, if $X$ is continuous, we also refer entropy as *differential entropy*
 
-$$H(X) = - \int_x p(x) \log p(x) \; dx.$$
+$$H(X) = - \int_{-\infty}^{\infty} p(x) \log p(x) \; dx.$$
 
 We can define entropy as below.
 
