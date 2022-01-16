@@ -305,6 +305,7 @@ class DataModule(d2l.HyperParameters):
         return self.get_dataloader(train=False)
 
     def get_tensorloader(self, tensors, train, indices=slice(0, None)):
+        """Defined in :numref:`sec_synthetic-regression-data`"""
         tensors = tuple(a[indices] for a in tensors)
         dataset = gluon.data.ArrayDataset(*tensors)
         return gluon.data.DataLoader(dataset, self.batch_size,
@@ -394,6 +395,7 @@ class Trainer(d2l.HyperParameters):
                 param.grad[:] *= grad_clip_val / norm
 
 class SyntheticRegressionData(d2l.DataModule):
+    """Defined in :numref:`sec_synthetic-regression-data`"""
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
                  batch_size=32):
         super().__init__()
@@ -404,6 +406,7 @@ class SyntheticRegressionData(d2l.DataModule):
         self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 
     def get_dataloader(self, train):
+        """Defined in :numref:`sec_synthetic-regression-data`"""
         i = slice(0, self.num_train) if train else slice(self.num_train, None)
         return self.get_tensorloader((self.X, self.y), train, i)
 

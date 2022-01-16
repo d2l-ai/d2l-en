@@ -279,6 +279,7 @@ class DataModule(d2l.HyperParameters):
         return self.get_dataloader(train=False)
 
     def get_tensorloader(self, tensors, train, indices=slice(0, None)):
+        """Defined in :numref:`sec_synthetic-regression-data`"""
         tensors = tuple(a[indices] for a in tensors)
         dataset = torch.utils.data.TensorDataset(*tensors)
         return torch.utils.data.DataLoader(dataset, self.batch_size,
@@ -369,6 +370,7 @@ class Trainer(d2l.HyperParameters):
                 param.grad[:] *= grad_clip_val / norm
 
 class SyntheticRegressionData(d2l.DataModule):
+    """Defined in :numref:`sec_synthetic-regression-data`"""
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
                  batch_size=32):
         super().__init__()
@@ -379,6 +381,7 @@ class SyntheticRegressionData(d2l.DataModule):
         self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 
     def get_dataloader(self, train):
+        """Defined in :numref:`sec_synthetic-regression-data`"""
         i = slice(0, self.num_train) if train else slice(self.num_train, None)
         return self.get_tensorloader((self.X, self.y), train, i)
 
@@ -1279,8 +1282,6 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     net.apply(init_weights)
 
     optimizer = trainer_fn(net.parameters(), **hyperparams)
-
-    # Note: `MSELoss` computes squared error without the 1/2 factor
     loss = nn.MSELoss(reduction='none')
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
@@ -1296,8 +1297,9 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
             n += X.shape[0]
             if n % 200 == 0:
                 timer.stop()
+                # `MSELoss` computes squared error without the 1/2 factor
                 animator.add(n/X.shape[0]/len(data_iter),
-                             (d2l.evaluate_loss(net, data_iter, loss),))
+                             (d2l.evaluate_loss(net, data_iter, loss) / 2,))
                 timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 
