@@ -470,8 +470,6 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     net.apply(init_weights)
 
     optimizer = trainer_fn(net.parameters(), **hyperparams)
-
-    # Note: `MSELoss` computes squared error without the 1/2 factor
     loss = nn.MSELoss(reduction='none')
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
@@ -487,8 +485,9 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
             n += X.shape[0]
             if n % 200 == 0:
                 timer.stop()
+                # `MSELoss` computes squared error without the 1/2 factor
                 animator.add(n/X.shape[0]/len(data_iter),
-                             (d2l.evaluate_loss(net, data_iter, loss),))
+                             (d2l.evaluate_loss(net, data_iter, loss) / 2,))
                 timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 ```
@@ -502,7 +501,6 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
     net.add(tf.keras.layers.Dense(1,
             kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
     optimizer = trainer_fn(**hyperparams)
-    # Note: `MeanSquaredError` computes squared error without the 1/2 factor
     loss = tf.keras.losses.MeanSquaredError()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
@@ -520,7 +518,9 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
                 timer.stop()
                 p = n/X.shape[0]
                 q = p/tf.data.experimental.cardinality(data_iter).numpy()
-                r = (d2l.evaluate_loss(net, data_iter, loss),)
+                # `MeanSquaredError` computes squared error without the 1/2
+                # factor
+                r = (d2l.evaluate_loss(net, data_iter, loss) / 2,)
                 animator.add(q, r)
                 timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
@@ -537,7 +537,7 @@ train_concise_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 #@tab pytorch
 data_iter, _ = get_data_ch11(10)
 trainer = torch.optim.SGD
-train_concise_ch11(trainer, {'lr': 0.05}, data_iter)
+train_concise_ch11(trainer, {'lr': 0.01}, data_iter)
 ```
 
 ```{.python .input}
