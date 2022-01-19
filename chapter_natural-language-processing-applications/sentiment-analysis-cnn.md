@@ -66,7 +66,7 @@ Bear in mind that it is just a special case
 of a two-dimensional convolution
 based on the cross-correlation operation.
 
-![One-dimensional cross-correlation operation. The shaded portions are the first output element as well as input and kernel tensor elements used for the output computation: $0\times1+1\times2=2$.](../img/conv1d.svg)
+![One-dimensional cross-correlation operation. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times1+1\times2=2$.](../img/conv1d.svg)
 :label:`fig_conv1d`
 
 As shown in :numref:`fig_conv1d`,
@@ -115,7 +115,7 @@ summing the results over all the channels
 to produce the one-dimensional output tensor.
 :numref:`fig_conv1d_channel` shows a one-dimensional cross-correlation operation with 3 input channels.
 
-![One-dimensional cross-correlation operation with 3 input channels. The shaded portions are the first output element as well as input and kernel tensor elements used for the output computation: $0\times1+1\times2+1\times3+2\times4+2\times(-1)+3\times(-3)=2$.](../img/conv1d-channel.svg)
+![One-dimensional cross-correlation operation with 3 input channels. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times1+1\times2+1\times3+2\times4+2\times(-1)+3\times(-3)=2$.](../img/conv1d-channel.svg)
 :label:`fig_conv1d_channel`
 
 
@@ -155,7 +155,7 @@ where the height of the convolution kernel
 has to be the same as that of the input tensor.
 
 
-![Two-dimensional cross-correlation operation with a single input channel. The shaded portions are the first output element as well as input and kernel tensor elements used for the output computation: $2\times(-1)+3\times(-3)+1\times3+2\times4+0\times1+1\times2=2$.](../img/conv1d-2d.svg)
+![Two-dimensional cross-correlation operation with a single input channel. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $2\times(-1)+3\times(-3)+1\times3+2\times4+0\times1+1\times2=2$.](../img/conv1d-2d.svg)
 :label:`fig_conv1d_2d`
 
 Both the outputs in :numref:`fig_conv1d` and :numref:`fig_conv1d_channel` have only one channel.

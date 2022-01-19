@@ -31,7 +31,7 @@ and ELMo (Embeddings from Language Models) :cite:`Peters.Neumann.Iyyer.ea.2018`.
 
 For example, by taking the entire sequence as input,
 ELMo is a function that assigns a representation to each word from the input sequence.
-Specifically, ELMo combines all the intermediate layer representations from pretrained bidirectional LSTM as output representation.
+Specifically, ELMo combines all the intermediate layer representations from pretrained bidirectional LSTM as the output representation.
 Then the ELMo representation will be added to a downstream task's existing supervised model
 as additional features, such as by concatenating ELMo representation and the original representation (e.g., GloVe) of tokens in the existing model.
 On the one hand,

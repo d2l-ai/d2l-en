@@ -59,7 +59,7 @@ to those
 of the input image via
 the transposed convolution introduced in :numref:`sec_transposed_conv`. 
 As a result,
-the model output has the same height and width as input image,
+the model output has the same height and width as the input image,
 where the output channel contains the predicted classes
 for the input pixel at the same spatial position.
 

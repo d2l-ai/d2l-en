@@ -183,7 +183,7 @@ As a result, we get six candidates output sequences: (i) $A$; (ii) $C$; (iii) $A
 
 In the end, we obtain the set of final candidate output sequences based on these six sequences (e.g., discard portions including and after “&lt;eos&gt;”).
 Then
-we choose the sequence with the highest of the following score as output sequence:
+we choose the sequence with the highest of the following score as the output sequence:
 
 $$ \frac{1}{L^\alpha} \log P(y_1, \ldots, y_{L}\mid \mathbf{c}) = \frac{1}{L^\alpha} \sum_{t'=1}^L \log P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),$$
 :eqlabel:`eq_beam-search-score`

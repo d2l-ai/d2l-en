@@ -79,7 +79,7 @@ As an example,
 how transposed convolution with a $2\times 2$ kernel is computed for a $2\times 2$ input tensor.
 
 
-![Transposed convolution with a $2\times 2$ kernel. The shaded portions are a portion of an intermediate tensor as well as input and kernel tensor elements used for the  computation.](../img/trans_conv.svg)
+![Transposed convolution with a $2\times 2$ kernel. The shaded portions are a portion of an intermediate tensor as well as the input and kernel tensor elements used for the  computation.](../img/trans_conv.svg)
 :label:`fig_trans_conv`
 
 
@@ -168,7 +168,7 @@ of intermediate tensors, hence the output tensor
 in :numref:`fig_trans_conv_stride2`.
 
 
-![Transposed convolution with a $2\times 2$ kernel with stride of 2. The shaded portions are a portion of an intermediate tensor as well as input and kernel tensor elements used for the  computation.](../img/trans_conv_stride2.svg)
+![Transposed convolution with a $2\times 2$ kernel with stride of 2. The shaded portions are a portion of an intermediate tensor as well as the input and kernel tensor elements used for the  computation.](../img/trans_conv_stride2.svg)
 :label:`fig_trans_conv_stride2`
 
 

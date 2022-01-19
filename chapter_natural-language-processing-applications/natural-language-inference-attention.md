@@ -429,7 +429,7 @@ predict_snli(net, vocab, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
 * The decomposable attention model consists of three steps for predicting the logical relationships between premises and hypotheses: attending, comparing, and aggregating.
 * With attention mechanisms, we can align tokens in one text sequence to every token in the other, and vice versa. Such alignment is soft using weighted average, where ideally large weights are associated with the tokens to be aligned.
 * The decomposition trick leads to a more desirable linear complexity than quadratic complexity when computing attention weights.
-* We can use pretrained word vectors as input representation for downstream natural language processing task such as natural language inference.
+* We can use pretrained word vectors as the input representation for downstream natural language processing task such as natural language inference.
 
 
 ## Exercises
