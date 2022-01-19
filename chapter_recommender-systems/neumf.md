@@ -180,8 +180,8 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             for v in values:
                 input_data.append(gluon.utils.split_and_load(v, devices))
             with autograd.record():
-                p_pos = [net(*t) for t in zip(*input_data[0:-1])]
-                p_neg = [net(*t) for t in zip(*input_data[0:-2],
+                p_pos = [net(*t) for t in zip(*input_data[:-1])]
+                p_neg = [net(*t) for t in zip(*input_data[:-2],
                                               input_data[-1])]
                 ls = [loss(p, n) for p, n in zip(p_pos, p_neg)]
             [l.backward(retain_graph=False) for l in ls]

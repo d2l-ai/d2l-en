@@ -202,7 +202,7 @@ The first 32 training images in the CIFAR-10 dataset are shown below.
 
 ```{.python .input}
 d2l.show_images(gluon.data.vision.CIFAR10(
-    train=True)[0:32][0], 4, 8, scale=0.8);
+    train=True)[:32][0], 4, 8, scale=0.8);
 ```
 
 ```{.python .input}

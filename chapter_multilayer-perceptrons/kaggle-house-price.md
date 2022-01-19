@@ -194,7 +194,7 @@ as well as the label (SalePrice)**] from the first four examples.
 
 ```{.python .input  n=10}
 %%tab all
-print(data.raw_train.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
+print(data.raw_train.iloc[:4, [0, 1, 2, 3, -3, -2, -1]])
 ```
 
 We can see that in each example, the first feature is the ID.

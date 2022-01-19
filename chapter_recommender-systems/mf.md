@@ -112,7 +112,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
             values = values if isinstance(values, list) else [values]
             for v in values:
                 input_data.append(gluon.utils.split_and_load(v, devices))
-            train_feat = input_data[0:-1] if len(values) > 1 else input_data
+            train_feat = input_data[:-1] if len(values) > 1 else input_data
             train_label = input_data[-1]
             with autograd.record():
                 preds = [net(*t) for t in zip(*train_feat)]

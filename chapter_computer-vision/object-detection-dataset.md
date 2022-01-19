@@ -213,17 +213,17 @@ Of course, this is just a simple artificial dataset.
 In practice, real-world datasets are usually much more complicated.
 
 ```{.python .input}
-imgs = (batch[0][0:10].transpose(0, 2, 3, 1)) / 255
+imgs = (batch[0][:10].transpose(0, 2, 3, 1)) / 255
 axes = d2l.show_images(imgs, 2, 5, scale=2)
-for ax, label in zip(axes, batch[1][0:10]):
+for ax, label in zip(axes, batch[1][:10]):
     d2l.show_bboxes(ax, [label[0][1:5] * edge_size], colors=['w'])
 ```
 
 ```{.python .input}
 #@tab pytorch
-imgs = (batch[0][0:10].permute(0, 2, 3, 1)) / 255
+imgs = (batch[0][:10].permute(0, 2, 3, 1)) / 255
 axes = d2l.show_images(imgs, 2, 5, scale=2)
-for ax, label in zip(axes, batch[1][0:10]):
+for ax, label in zip(axes, batch[1][:10]):
     d2l.show_bboxes(ax, [label[0][1:5] * edge_size], colors=['w'])
 ```
 
