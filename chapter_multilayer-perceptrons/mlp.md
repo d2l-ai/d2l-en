@@ -238,7 +238,7 @@ one atop another, yielding ever more expressive models.
 We know that the brain is capable of very sophisticated statistical analysis. As such, 
 it is worth asking, just *how powerful* a Deep Network could be. This question
 has been answered multiple times, e.g. in :cite:`Cybenko.1989` in the context 
-of multilayer perceptrons, and in :cite:`micchelli1984interpolation` in the context of Reproducing Kernel 
+of MLPs, and in :cite:`micchelli1984interpolation` in the context of Reproducing Kernel 
 Hilbert Spaces in a way that could be seen as RBF networks with a single hidden layer. 
 These (and related results) suggest that even with a single-hidden-layer network,
 given enough nodes (possibly absurdly many),
