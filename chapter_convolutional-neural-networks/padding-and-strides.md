@@ -311,7 +311,3 @@ So far all padding that we discussed simply extended images with zeros. This has
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/272)
 :end_tab:
-
-```{.python .input}
-
-```

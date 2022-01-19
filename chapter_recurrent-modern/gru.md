@@ -120,7 +120,7 @@ elementwise multiplication of
 $\mathbf{R}_t$ and $\mathbf{H}_{t-1}$
 in :eqref:`gru_tilde_H`.
 Whenever the entries in the reset gate $\mathbf{R}_t$ are close to 1, we recover a vanilla RNN such as in :eqref:`rnn_h_with_state`.
-For all entries of the reset gate $\mathbf{R}_t$ that are close to 0, the candidate hidden state is the result of an MLP with $\mathbf{X}_t$ as the input. Any pre-existing hidden state is thus *reset* to defaults.
+For all entries of the reset gate $\mathbf{R}_t$ that are close to 0, the candidate hidden state is the result of an MLP with $\mathbf{X}_t$ as input. Any pre-existing hidden state is thus *reset* to defaults.
 
 :numref:`fig_gru_2` illustrates the computational flow after applying the reset gate.
 

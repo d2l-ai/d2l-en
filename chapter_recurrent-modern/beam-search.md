@@ -52,7 +52,7 @@ with the highest conditional probability from $\mathcal{Y}$, i.e.,
 
 $$y_{t'} = \operatorname*{argmax}_{y \in \mathcal{Y}} P(y \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),$$
 
-as the output. 
+as output. 
 Once "&lt;eos&gt;" is outputted or the output sequence has reached its maximum length $T'$, the output sequence is completed.
 
 So what can go wrong with greedy search?

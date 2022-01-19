@@ -19,7 +19,7 @@ for machine translation
 Following the design principle
 of the encoder-decoder architecture,
 the RNN encoder can
-take a variable-length sequence as the input and transforms it into a fixed-shape hidden state.
+take a variable-length sequence as input and transforms it into a fixed-shape hidden state.
 In other words,
 information of the input (source) sequence
 is *encoded* in the hidden state of the RNN encoder.

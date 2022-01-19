@@ -71,7 +71,7 @@ in this subsection.
 
 In this simplified model,
 we denote $h_t$ as the hidden state,
-$x_t$ as the input, and $o_t$ as the output
+$x_t$ as input, and $o_t$ as output
 at time step $t$.
 Recall our discussions in
 :numref:`subsec_rnn_w_hidden_states`

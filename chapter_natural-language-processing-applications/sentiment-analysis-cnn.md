@@ -191,7 +191,7 @@ Using the one-dimensional convolution
 and max-over-time pooling,
 the textCNN model
 takes individual pretrained token representations
-as the input,
+as input,
 then obtains and transforms sequence representations
 for the downstream application.
 

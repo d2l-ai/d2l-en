@@ -129,7 +129,7 @@ class BiRNN(nn.Module):
         # 2 * no. of hidden units)
         outputs, _ = self.encoder(embeddings)
         # Concatenate the hidden states of the initial time step and final
-        # time step to use as the input of the fully connected layer. Its
+        # time step to use as input of the fully connected layer. Its
         # shape is (batch size, 4 * no. of hidden units)
         encoding = torch.cat((outputs[0], outputs[-1]), dim=1)
         # Concatenate the hidden states at the initial and final time steps as

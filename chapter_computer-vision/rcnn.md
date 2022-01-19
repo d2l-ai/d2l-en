@@ -107,7 +107,7 @@ of subwindows,
 where the shape of each subwindow is approximately 
 $(h/h_2) \times (w/w_2)$.
 In practice,
-the height and width of any subwindow shall be rounded up, and the largest element shall be used as the output of the subwindow.
+the height and width of any subwindow shall be rounded up, and the largest element shall be used as output of the subwindow.
 Therefore, the region of interest pooling layer can extract features of the same shape 
 even when regions of interest have different shapes.
 

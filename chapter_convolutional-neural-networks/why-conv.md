@@ -294,7 +294,7 @@ Putting everything together we have:
 $$[\mathsf{H}]_{i,j,d} = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c [\mathsf{V}]_{a, b, c, d} [\mathsf{X}]_{i+a, j+b, c}$$
 :eqlabel:`eq_conv-layer-channels`
 
-Here $d$ indexes the output channels in the hidden representations $\mathsf{H}$. The subsequent convolutional layer will go on to take a third-order tensor, $\mathsf{H}$, as the input.
+Here $d$ indexes the output channels in the hidden representations $\mathsf{H}$. The subsequent convolutional layer will go on to take a third-order tensor, $\mathsf{H}$, as input.
 Being more general,
 :eqref:`eq_conv-layer-channels` is
 the definition of a convolutional layer for multiple channels, where $\mathsf{V}$ is a kernel or filter of the layer.
