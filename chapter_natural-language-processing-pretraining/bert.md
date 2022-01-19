@@ -29,9 +29,9 @@ include TagLM (language-model-augmented sequence tagger) :cite:`Peters.Ammar.Bha
 CoVe (Context Vectors) :cite:`McCann.Bradbury.Xiong.ea.2017`,
 and ELMo (Embeddings from Language Models) :cite:`Peters.Neumann.Iyyer.ea.2018`.
 
-For example, by taking the entire sequence as the input,
+For example, by taking the entire sequence as input,
 ELMo is a function that assigns a representation to each word from the input sequence.
-Specifically, ELMo combines all the intermediate layer representations from pretrained bidirectional LSTM as the output representation.
+Specifically, ELMo combines all the intermediate layer representations from pretrained bidirectional LSTM as output representation.
 Then the ELMo representation will be added to a downstream task's existing supervised model
 as additional features, such as by concatenating ELMo representation and the original representation (e.g., GloVe) of tokens in the existing model.
 On the one hand,
@@ -129,7 +129,7 @@ from torch import nn
 :label:`subsec_bert_input_rep`
 
 In natural language processing,
-some tasks (e.g., sentiment analysis) take single text as the input,
+some tasks (e.g., sentiment analysis) take single text as input,
 while in some other tasks (e.g., natural language inference),
 the input is a pair of text sequences.
 The BERT input sequence unambiguously represents both single text and text pairs.
@@ -152,7 +152,7 @@ are added to the token embeddings of the first sequence and the second sequence,
 For single text inputs, only $\mathbf{e}_A$ is used.
 
 The following `get_tokens_and_segments` takes either one sentence or two sentences
-as the input, then returns tokens of the BERT input sequence
+as input, then returns tokens of the BERT input sequence
 and their corresponding segment IDs.
 
 ```{.python .input}
@@ -448,7 +448,7 @@ in the BERT input sequence.
 Due to self-attention in the transformer encoder,
 the BERT representation of the special token “&lt;cls&gt;”
 encodes both the two sentences from the input.
-Hence, the output layer (`self.output`) of the MLP classifier takes `X` as the input,
+Hence, the output layer (`self.output`) of the MLP classifier takes `X` as input,
 where `X` is the output of the MLP hidden layer whose input is the encoded “&lt;cls&gt;” token.
 
 ```{.python .input}

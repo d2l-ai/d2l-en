@@ -27,7 +27,7 @@ at convolution kernels with multiple input and multiple output channels.
 
 When the input data contains multiple channels,
 we need to construct a convolution kernel
-with the same number of input channels as the input data,
+with the same number of input channels as input data,
 so that it can perform cross-correlation with the input data.
 Assuming that the number of channels for the input data is $c_i$,
 the number of input channels of the convolution kernel also needs to be $c_i$. If our convolution kernel's window shape is $k_h\times k_w$,
@@ -51,7 +51,7 @@ a multi-input-channel convolution kernel.
 :numref:`fig_conv_multi_in` provides an example 
 of a two-dimensional cross-correlation with two input channels.
 The shaded portions are the first output element
-as well as the input and kernel tensor elements used for the output computation:
+as well as input and kernel tensor elements used for the output computation:
 $(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$.
 
 ![Cross-correlation computation with 2 input channels.](../img/conv-multi-in.svg)

@@ -159,7 +159,7 @@ Note that each layer is an instance of the `Dense` class
 which is itself a subclass of `Block`.
 The forward propagation (`forward`) function is also remarkably simple:
 it chains each `Block` in the list together,
-passing the output of each as the input to the next.
+passing the output of each as input to the next.
 Note that until now, we have been invoking our models
 via the construction `net(X)` to obtain their outputs.
 This is actually just shorthand for `net.forward(X)`,
@@ -178,7 +178,7 @@ Note that each of the two fully connected layers is an instance of the `Linear` 
 which is itself a subclass of `Module`.
 The forward propagation (`forward`) function is also remarkably simple:
 it chains each module in the list together,
-passing the output of each as the input to the next.
+passing the output of each as input to the next.
 Note that until now, we have been invoking our models
 via the construction `net(X)` to obtain their outputs.
 This is actually just shorthand for `net.__call__(X)`.
@@ -195,7 +195,7 @@ Note that each of the two fully connected layers is an instance of the `Dense` c
 which is itself a subclass of `Model`.
 The forward propagation (`call`) function is also remarkably simple:
 it chains each module in the list together,
-passing the output of each as the input to the next.
+passing the output of each as input to the next.
 Note that until now, we have been invoking our models
 via the construction `net(X)` to obtain their outputs.
 This is actually just shorthand for `net.call(X)`,
@@ -279,7 +279,7 @@ class MLP(tf.keras.Model):
 ```
 
 Let's first focus on the forward propagation function.
-Note that it takes `X` as the input,
+Note that it takes `X` as input,
 calculates the hidden representation
 with the activation function applied,
 and outputs its logits.

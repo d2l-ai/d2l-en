@@ -301,7 +301,7 @@ def get_net(devices):
 
 Before [**calculating the loss**],
 we first obtain the input of the pretrained model's output layer, i.e., the extracted feature.
-Then we use this feature as the input for our small custom output network to calculate the loss.
+Then we use this feature as input for our small custom output network to calculate the loss.
 
 ```{.python .input}
 loss = gluon.loss.SoftmaxCrossEntropyLoss()

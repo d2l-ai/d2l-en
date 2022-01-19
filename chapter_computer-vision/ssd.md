@@ -819,7 +819,7 @@ output = predict(X)
 Finally, we [**display
 all the predicted bounding boxes with 
 confidence 0.9 or above**]
-as the output.
+as output.
 
 ```{.python .input}
 def display(img, output, threshold):

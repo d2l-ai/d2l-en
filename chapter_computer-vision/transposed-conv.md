@@ -79,7 +79,7 @@ As an example,
 how transposed convolution with a $2\times 2$ kernel is computed for a $2\times 2$ input tensor.
 
 
-![Transposed convolution with a $2\times 2$ kernel. The shaded portions are a portion of an intermediate tensor as well as the input and kernel tensor elements used for the  computation.](../img/trans_conv.svg)
+![Transposed convolution with a $2\times 2$ kernel. The shaded portions are a portion of an intermediate tensor as well as input and kernel tensor elements used for the  computation.](../img/trans_conv.svg)
 :label:`fig_trans_conv`
 
 
@@ -168,7 +168,7 @@ of intermediate tensors, hence the output tensor
 in :numref:`fig_trans_conv_stride2`.
 
 
-![Transposed convolution with a $2\times 2$ kernel with stride of 2. The shaded portions are a portion of an intermediate tensor as well as the input and kernel tensor elements used for the  computation.](../img/trans_conv_stride2.svg)
+![Transposed convolution with a $2\times 2$ kernel with stride of 2. The shaded portions are a portion of an intermediate tensor as well as input and kernel tensor elements used for the  computation.](../img/trans_conv_stride2.svg)
 :label:`fig_trans_conv_stride2`
 
 
@@ -277,7 +277,7 @@ matrix multiplications.
 In the following example,
 we take the $2 \times 2$ output `Y` from the above
 regular convolution
-as the input to the transposed convolution.
+as input to the transposed convolution.
 To implement this operation by multiplying matrices,
 we only need to transpose the weight matrix `W`
 with the new shape $(9, 4)$.

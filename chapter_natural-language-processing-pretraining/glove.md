@@ -181,7 +181,7 @@ the context word vector of any word are mathematically equivalent in the GloVe m
 However in practice, owing to different initialization values,
 the same word may still get different values
 in these two vectors after training:
-GloVe sums them up as the output vector.
+GloVe sums them up as output vector.
 
 
 

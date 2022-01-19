@@ -74,7 +74,7 @@ value of the input subtensor in the window,
 depending on whether max or average pooling is employed.
 
 
-![Maximum pooling with a pooling window shape of $2\times 2$. The shaded portions are the first output element as well as the input tensor elements used for the output computation: $\max(0, 1, 3, 4)=4$.](../img/pooling.svg)
+![Maximum pooling with a pooling window shape of $2\times 2$. The shaded portions are the first output element as well as input tensor elements used for the output computation: $\max(0, 1, 3, 4)=4$.](../img/pooling.svg)
 :label:`fig_pooling`
 
 The output tensor in :numref:`fig_pooling`  has a height of 2 and a width of 2.
@@ -90,7 +90,7 @@ $$
 More generally, we can define a $p \times q$ pooling layer by aggregating over 
 a region of said size. Returning to the problem of edge detection, 
 we use the output of the convolutional layer
-as the input for $2\times 2$ maximum pooling.
+as input for $2\times 2$ maximum pooling.
 Denote by `X` the input of the convolutional layer input and `Y` the pooling layer output. 
 Regardless of whether or not the values of `X[i, j]`, `X[i, j + 1]`, 
 `X[i+1, j]` and `X[i+1, j + 1]` are different,

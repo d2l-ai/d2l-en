@@ -498,7 +498,7 @@ transforming them into elements on the interval (**between -1 and 1**):
 $$\operatorname{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
 We plot the tanh function below.  
-Note that as the input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to that of the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system :cite:`Kalman.Kwasny.1992`.
+Note that as input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to that of the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system :cite:`Kalman.Kwasny.1992`.
 
 ```{.python .input}
 %%tab mxnet
@@ -527,7 +527,7 @@ It is plotted below.
 As the input nears 0,
 the derivative of the tanh function approaches a maximum of 1.
 And as we saw with the sigmoid function,
-as the input moves away from 0 in either direction,
+as input moves away from 0 in either direction,
 the derivative of the tanh function approaches 0.
 
 ```{.python .input}

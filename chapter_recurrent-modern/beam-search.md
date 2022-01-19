@@ -52,7 +52,7 @@ with the highest conditional probability from $\mathcal{Y}$, i.e.,
 
 $$y_{t'} = \operatorname*{argmax}_{y \in \mathcal{Y}} P(y \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),$$
 
-as the output. 
+as output. 
 Once "&lt;eos&gt;" is outputted or the output sequence has reached its maximum length $T'$, the output sequence is completed.
 
 So what can go wrong with greedy search?
@@ -183,7 +183,7 @@ As a result, we get six candidates output sequences: (i) $A$; (ii) $C$; (iii) $A
 
 In the end, we obtain the set of final candidate output sequences based on these six sequences (e.g., discard portions including and after “&lt;eos&gt;”).
 Then
-we choose the sequence with the highest of the following score as the output sequence:
+we choose the sequence with the highest of the following score as output sequence:
 
 $$ \frac{1}{L^\alpha} \log P(y_1, \ldots, y_{L}\mid \mathbf{c}) = \frac{1}{L^\alpha} \sum_{t'=1}^L \log P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),$$
 :eqlabel:`eq_beam-search-score`

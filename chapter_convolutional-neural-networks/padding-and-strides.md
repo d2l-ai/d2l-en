@@ -55,7 +55,7 @@ Typically, we set the values of the extra pixels to zero.
 In :numref:`img_conv_pad`, we pad a $3 \times 3$ input,
 increasing its size to $5 \times 5$.
 The corresponding output then increases to a $4 \times 4$ matrix.
-The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times0+0\times1+0\times2+0\times3=0$.
+The shaded portions are the first output element as well as input and kernel tensor elements used for the output computation: $0\times0+0\times1+0\times2+0\times3=0$.
 
 ![Two-dimensional cross-correlation with padding.](../img/conv-pad.svg)
 :label:`img_conv_pad`
@@ -96,7 +96,7 @@ For any two-dimensional tensor `X`,
 when the kernel's size is odd
 and the number of padding rows and columns
 on all sides are the same,
-producing an output with the same height and width as the input,
+producing an output with the same height and width as input,
 we know that the output `Y[i, j]` is calculated
 by cross-correlation of the input and convolution kernel
 with the window centered on `X[i, j]`.
@@ -215,7 +215,7 @@ So far, we have used strides of 1, both for height and width.
 Sometimes, we may want to use a larger stride.
 :numref:`img_conv_stride` shows a two-dimensional cross-correlation operation
 with a stride of 3 vertically and 2 horizontally.
-The shaded portions are the output elements as well as the input and kernel tensor elements used for the output computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$.
+The shaded portions are the output elements as well as input and kernel tensor elements used for the output computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$.
 We can see that when the second element of the first column is generated,
 the convolution window slides down three rows.
 The convolution window slides two columns to the right
@@ -283,7 +283,7 @@ comp_conv2d(conv2d, X).shape
 
 ## Summary and Discussion
 
-Padding can increase the height and width of the output. This is often used to give the output the same height and width as the input to avoid undesirable shrinkage of the output. Moreover, it ensures that all pixels are used equally frequently. Typically we pick symmetric padding on both sides of the input height and width. In this case we refer to $(p_h, p_w)$ padding. Most commonly we set $p_h = p_w$, in which case we simply state that we choose padding $p$. 
+Padding can increase the height and width of the output. This is often used to give the output the same height and width as input to avoid undesirable shrinkage of the output. Moreover, it ensures that all pixels are used equally frequently. Typically we pick symmetric padding on both sides of the input height and width. In this case we refer to $(p_h, p_w)$ padding. Most commonly we set $p_h = p_w$, in which case we simply state that we choose padding $p$. 
 
 A similar convention applies to strides. When horizontal stride $s_h$ and vertical stride $s_w$ match, we simply talk about stride $s$. The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input for $n > 1$. By default, the padding is 0 and the stride is 1. 
 
