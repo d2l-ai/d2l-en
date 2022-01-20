@@ -23,7 +23,7 @@ using the conditional probability of reaching a state $s'$ given that the robot 
 The different components above together form a Markov decision process (MDP)
 $$\text{MDP}: (\mathcal{S}, \mathcal{A}, T, r).$$
 
-Let's now consider the situation when the robot starts at a particular state $s_0 \in S$ and continues taking actions to result in a trajectory
+Let's now consider the situation when the robot starts at a particular state $s_0 \in \mathcal{S}$ and continues taking actions to result in a trajectory
 $$\tau = (s_0, a_0, r_0, s_1, a_1, r_1, s_2, a_2, r_2, \ldots).$$
 
 At each time step $t$ the robot is at a state $s_t$ and takes an action $a_t$ which results in a reward $r_t = r(s_t, a_t)$. The *return* of a trajectory is the total reward obtained by the robot along such a trajectory
@@ -31,7 +31,7 @@ $$R(\tau) = r_0 + r_1 + r_2 + \cdots.$$
 
 The goal in reinforcement learning is to find a trajectory that has the largest *return*.
 
-Think of the situation when the robot continues to travel in the gridworld without ever reaching goal location. The sequence of states and actions in a trajectory can be infinitely long in this case and the *return* of any such infinitely long trajectory will be infinite. In order to keep the reinforcement learning formulation meaningful even for such trajectories, we introduce the notion of a discount factor $\gamma < 1$. We write the discounted *return* as
+Think of the situation when the robot continues to travel in the gridworld without ever reaching the goal location. The sequence of states and actions in a trajectory can be infinitely long in this case and the *return* of any such infinitely long trajectory will be infinite. In order to keep the reinforcement learning formulation meaningful even for such trajectories, we introduce the notion of a discount factor $\gamma < 1$. We write the discounted *return* as
 $$R(\tau) = r_0 + \gamma r_1 + \gamma^2 r_2 + \cdots = \sum_{t=0}^\infty \gamma^t r_t.$$
 
 Note that if $\gamma$ is very small, the rewards earned by the robot in the far future, say $t = 1000$, are heavily discounted by the factor $\gamma^{1000}$. This encourages the robot to select short trajectories that achieve its goal, namely that of going to the green house in the gridwold example (see :numref:`fig_mdp`). For large values of the discount factor, say $\gamma = 0.99$, the robot is encouraged to *explore* and then find the best trajectory to go to the goal location instead of simply *rushing out* of the current location.
