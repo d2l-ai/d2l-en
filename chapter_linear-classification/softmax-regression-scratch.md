@@ -6,12 +6,12 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Softmax Regression Implementation from Scratch
 :label:`sec_softmax_scratch`
 
-Because softmax regression is so fundamental, 
-we believe that you ought to know 
-how to implement it yourself. 
-Here, we limit ourselves to defining the 
+Because softmax regression is so fundamental,
+we believe that you ought to know
+how to implement it yourself.
+Here, we limit ourselves to defining the
 softmax-specific aspects of the model
-and reuse the other components 
+and reuse the other components
 from our regression section,
 including the training loop.
 
@@ -36,11 +36,11 @@ import tensorflow as tf
 
 ## The Softmax
 
-Let's begin with the most important part, 
-the mapping from scalars to probabilities. 
-For a refresher, recall the operation of the sum operator 
+Let's begin with the most important part,
+the mapping from scalars to probabilities.
+For a refresher, recall the operation of the sum operator
 along specific dimensions in a tensor,
-as discussed in :numref:`subsec_lin-alg-reduction` 
+as discussed in :numref:`subsec_lin-alg-reduction`
 and :numref:`subsec_lin-alg-non-reduction`.
 
 [**Given a matrix `X` we can sum over all elements (by default) or only
@@ -53,8 +53,8 @@ X = d2l.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
 d2l.reduce_sum(X, 0, keepdims=True), d2l.reduce_sum(X, 1, keepdims=True)
 ```
 
-Computing the softmax requires three steps: 
-(i) exponentiation of each term; 
+Computing the softmax requires three steps:
+(i) exponentiation of each term;
 (ii) a sum over each row to compute the normalization constant for each example;
 (iii) division of each row by its normalization constant,
 ensuring that the result sums to 1.
@@ -63,7 +63,7 @@ ensuring that the result sums to 1.
 $$\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(\mathbf{X}_{ij})}{\sum_k \exp(\mathbf{X}_{ik})}.$$
 **)
 
-The (logarithm of the) denominator 
+The (logarithm of the) denominator
 is called the (log) *partition function*.
 It was introduced in [statistical physics](https://en.wikipedia.org/wiki/Partition_function_(statistical_mechanics))
 to sum over all possible states in a thermodynamic ensemble.
@@ -77,7 +77,7 @@ def softmax(X):
     return X_exp / partition  # The broadcasting mechanism is applied here
 ```
 
-For any input `X`, [**we turn each element 
+For any input `X`, [**we turn each element
 into a non-negative number.
 Each row sums up to 1,**]
 as is required for a probability. Caution: the code above is *not* robust against very large or very small arguments. While this is sufficient to illustrate what is happening, you should *not* use this code verbatim for any serious purpose. Deep Learning frameworks have such protections built-in and we will be using the built-in softmax going forward.
@@ -100,29 +100,29 @@ X_prob, d2l.reduce_sum(X_prob, 1)
 
 We now have everything that we need
 to implement [**the softmax regression model.**]
-As in our linear regression example, 
-each instance will be represented 
-by a fixed-length vector. 
-Since the raw data here consists 
-of $28 \times 28$ pixel images, 
+As in our linear regression example,
+each instance will be represented
+by a fixed-length vector.
+Since the raw data here consists
+of $28 \times 28$ pixel images,
 [**we flatten each image,
 treating them as vectors of length 784.**]
-In later chapters, we will introduce 
+In later chapters, we will introduce
 convolutional neural networks,
 which exploit the spatial structure
 in a more satisfying way.
 
 
-In softmax regression, 
+In softmax regression,
 the number of outputs from our network
 should be equal to the number of classes.
 (**Since our dataset has 10 classes,
 our network has an output dimension of 10.**)
 Consequently, our weights constitute a $784 \times 10$ matrix
-plus a $1 \times 10$ dimensional row vector for the biases. 
-As with linear regression, 
+plus a $1 \times 10$ dimensional row vector for the biases.
+As with linear regression,
 we initialize the weights `W`
-with Gaussian noise. 
+with Gaussian noise.
 The biases are initialized as zeros.
 
 ```{.python .input}
@@ -166,10 +166,10 @@ class SoftmaxRegressionScratch(d2l.Classifier):
         self.b = tf.Variable(self.b)
 ```
 
-The code below defines how the network 
+The code below defines how the network
 maps each input to an output.
 Note that we flatten each $28 \times 28$ pixel image in the batch
-into a vector using the `reshape` function 
+into a vector using the `reshape` function
 before passing the data through our model.
 
 ```{.python .input}
@@ -179,25 +179,25 @@ def forward(self, X):
     return softmax(d2l.matmul(d2l.reshape(X, (-1, self.W.shape[0])), self.W) + self.b)
 ```
 
-## The Cross-Entropy Loss 
+## The Cross-Entropy Loss
 
-Next we need to implement the cross-entropy loss function 
-(introduced in :numref:`sec_softmax`). 
+Next we need to implement the cross-entropy loss function
+(introduced in :numref:`sec_softmax`).
 This may be the most common loss function
 in all of deep learning.
 At the moment, applications of deep learning
-easily cast classification problems 
+easily cast classification problems
 far outnumber those better treated as regression problems.
 
 Recall that cross-entropy takes the negative log-likelihood
 of the predicted probability assigned to the true label.
-For efficiency we avoid Python for-loops and use indexing instead. 
-In particular, the one-hot encoding in $\mathbf{y}$ 
-allows us to select the matching terms in $\hat{\mathbf{y}}$. 
+For efficiency we avoid Python for-loops and use indexing instead.
+In particular, the one-hot encoding in $\mathbf{y}$
+allows us to select the matching terms in $\hat{\mathbf{y}}$.
 
 To see this in action we [**create sample data `y_hat`
 with 2 examples of predicted probabilities over 3 classes and their corresponding labels `y`.**]
-The correct labels are $1$ and $2$ respectively. 
+The correct labels are $1$ and $2$ respectively.
 [**Using `y` as the indices of the probabilities in `y_hat`,**]
 we can pick out terms efficiently.
 
@@ -244,18 +244,18 @@ def loss(self, y_hat, y):
 ## Training
 
 We reuse the `fit` method defined in :numref:`sec_linear_scratch` to [**train the model with 10 epochs.**]
-Note that both the number of epochs (`max_epochs`), 
+Note that both the number of epochs (`max_epochs`),
 the minibatch size (`batch_size`),
-and learning rate (`lr`) 
+and learning rate (`lr`)
 are adjustable hyperparameters.
-That means that while these values are not 
+That means that while these values are not
 learned during our primary training loop,
 they still influence the performance
 of our model, bot vis-a-vis training
-and generalization performance. 
+and generalization performance.
 In practice you will want to choose these values
-based on the *validation* split of the data 
-and then to ultimately evaluate your final model 
+based on the *validation* split of the data
+and then to ultimately evaluate your final model
 on the *test* split.
 
 ```{.python .input}
@@ -295,24 +295,24 @@ data.visualize([X, y], labels=labels)
 
 ## Summary
 
-By now we are starting to get some experience 
-with solving linear regression 
-and classification problems. 
-With it, we have reached what would arguably be 
+By now we are starting to get some experience
+with solving linear regression
+and classification problems.
+With it, we have reached what would arguably be
 the state of the art of 1960-1970s of statistical modeling.
-In the next section, we'll show you how leverage 
+In the next section, we'll show you how leverage
 deep learning frameworks to implement this model
 much more efficiently.
 
 ## Exercises
 
-1. In this section, we directly implemented the softmax function based on the mathematical definition of the softmax operation. As discussed in :ref:`sec_softmax` this can cause numerical instabilities. 
+1. In this section, we directly implemented the softmax function based on the mathematical definition of the softmax operation. As discussed in :numref:`sec_softmax` this can cause numerical instabilities.
     1. Test whether `softmax` still works correctly if an input has a value of $100$?
     1. Test whether `softmax` still works correctly if the largest of all inputs is smaller than $-100$?
     1. Implement a fix by looking at the value relative to the largest entry in the argument.
-1. Implement a `cross_entropy` function that follows the definition of the cross-entropy loss function $\sum_i y_i \log \hat{y}_i$. 
+1. Implement a `cross_entropy` function that follows the definition of the cross-entropy loss function $\sum_i y_i \log \hat{y}_i$.
     1. Try it out in the code example above.
-    1. Why do you think it runs more slowly? 
+    1. Why do you think it runs more slowly?
     1. Should you use it? In which cases would it make sense?
     1. What do you need to be careful of? Hint: consider the domain of the logarithm.
 1. Is it always a good idea to return the most likely label? For example, would you do this for medical diagnosis? How would you try to address this?
