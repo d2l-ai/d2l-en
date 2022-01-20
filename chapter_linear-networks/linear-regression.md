@@ -38,7 +38,7 @@ for tackling regression problems.
 Dating back to the dawn of the 19th century :cite:`Legendre.1805,Gauss.1809`,
 linear regression flows from a few simple assumptions.
 First, we assume that the relationship
-between the features $\mathbf{x}$ and the targets $y$
+between features $\mathbf{x}$ and target $y$
 is approximately linear,
 i.e., that the conditional mean $E[Y|X=\mathbf{x}]$
 can be expressed as a weighted sum
@@ -52,9 +52,9 @@ Typically, we will use $n$ to denote
 the number of examples in our dataset.
 We use superscripts to enumerate samples and targets,
 and subscripts to index coordinates.
+More concretely,
 $\mathbf{x}^{(i)}$ denotes the $i$-th sample
 and $x_j^{(i)}$ denotes its $j$-th coordinate.
-
 
 ### Model
 :label:`subsec_linear_model`
@@ -148,7 +148,6 @@ we will need two more things:
 (i) a quality measure for some given model;
 and (ii) a procedure for updating the model to improve its quality.
 
-
 ### Loss Function
 
 Naturally, fitting our model to the data requires
@@ -162,7 +161,7 @@ and perfect predictions incur a loss of 0.
 For regression problems, the most common loss function is squared error.
 When our prediction for an example $i$ is $\hat{y}^{(i)}$
 and the corresponding true label is $y^{(i)}$,
-the squared error is given by:
+the *squared error* is given by:
 
 $$l^{(i)}(\mathbf{w}, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2.$$
 :eqlabel:`eq_mse`
@@ -188,7 +187,7 @@ While it encourages the model to avoid large errors
 it can also lead to excessive sensitivity to anomalous data).
 To measure the quality of a model on the entire dataset of $n$ examples,
 we simply average (or equivalently, sum)
-the losses on the training set.
+the losses on the training set:
 
 $$L(\mathbf{w}, b) =\frac{1}{n}\sum_{i=1}^n l^{(i)}(\mathbf{w}, b) =\frac{1}{n} \sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
@@ -197,7 +196,6 @@ that minimize the total loss across all training examples:
 
 $$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).$$
 
-
 ### Analytic Solution
 
 Unlike most of the models that we will cover,
@@ -205,8 +203,8 @@ linear regression presents us with
 a surprisingly easy optimization problem.
 In particular, we can find the optimal parameters
 (as assessed on the training data)
-analytically by applying a simple formula as follows:
-Fist, we can subsume the bias $b$ into the parameter $\mathbf{w}$
+analytically by applying a simple formula as follows.
+First, we can subsume the bias $b$ into the parameter $\mathbf{w}$
 by appending a column to the design matrix consisting of all ones.
 Then our prediction problem is to minimize $\|\mathbf{y} - \mathbf{X}\mathbf{w}\|^2$.
 So long as the design matrix $\mathbf{X}$ has full rank
@@ -220,17 +218,21 @@ $$\begin{aligned}
     \partial_{\mathbf{w}} \|\mathbf{y} - \mathbf{X}\mathbf{w}\|^2 =
     2 \mathbf{X}^\top (\mathbf{X} \mathbf{w} - \mathbf{y}) = 0
     \text{ and hence }
-    \mathbf{X}^\top \mathbf{y} = \mathbf{X}^\top \mathbf{X} \mathbf{w}
+    \mathbf{X}^\top \mathbf{y} = \mathbf{X}^\top \mathbf{X} \mathbf{w}.
 \end{aligned}$$
 
 Solving for $\mathbf{w}$ provides us with the optimal solution
 for the optimization problem.
-Note that this solution will only be unique
+Note that this solution 
+
+$$\mathbf{w}^* = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf{y}$$
+
+will only be unique
 when the matrix $\mathbf X^\top \mathbf X$ is invertible,
 i.e., when the columns of the design matrix
 are linearly independent :cite:`Golub.Van-Loan.1996`.
 
-$$\mathbf{w}^* = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf{y}.$$
+
 
 While simple problems like linear regression
 may admit analytic solutions,
@@ -239,7 +241,7 @@ Although analytic solutions allow for nice mathematical analysis,
 the requirement of an analytic solution is so restrictive
 that it would exclude almost all exciting aspects of deep learning.
 
-### Stochastic Gradient Descent
+### Minibatch Stochastic Gradient Descent
 
 Fortunately, even in cases where we cannot solve the models analytically,
 we can still often train models effectively in practice.
@@ -266,7 +268,7 @@ the benefit of a full update is even lower.
 
 The other extreme is to consider only a single example at a time and to take
 update steps based on one observation at a time.
-The resulting algorithm, *Stochastic Gradient Descent* (SGD)
+The resulting algorithm, *stochastic gradient descent* (SGD)
 can be an effective strategy :cite:`Bottou.2010`, even for large datasets.
 Unfortunately, SGD has drawbacks, both computational and statistical.
 One problem arises from the fact that processors are a lot faster
@@ -278,19 +280,19 @@ than a corresponding number of vector-vector operations.
 This means that it can take a lot longer to process
 one sample at a time compared to a full batch.
 A second problem is that some of the layers,
-such as Batch Normalization which is described in :ref:`sec_batch_norm`,
+such as batch normalization (to be described in :numref:`sec_batch_norm`),
 only work well when we have access
 to more than one observation at a time.
 
 The solution to both problems is to pick an intermediate strategy:
 rather than taking a full batch or only a single sample at a time,
 we take a *minibatch* of observations :cite:`Li.Zhang.Chen.ea.2014`.
-The specific choice of the size of said minibatch depends on many factors,
+The specific choice of the size of the said minibatch depends on many factors,
 such as the amount of memory, the number of accelerators,
 the choice of layers, and the total dataset size.
 Despite all of that, a number between 32 and 256,
 preferably a multiple of a large power of $2$, is a good start.
-This leads us to *minibatch stochastic gradient descent*:
+This leads us to *minibatch stochastic gradient descent*.
 
 In its most basic form, in each iteration $t$,
 we first randomly sample a minibatch $\mathcal{B}_t$
@@ -312,7 +314,7 @@ updating the parameters in the direction of the negative gradient.
 For quadratic losses and affine transformations,
 this has a closed-form expansion:
 
-$$\begin{aligned} \mathbf{w} & \leftarrow \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) && = \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)\\ b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \partial_b l^{(i)}(\mathbf{w}, b)  && = b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right). \end{aligned}$$
+$$\begin{aligned} \mathbf{w} & \leftarrow \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) && = \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)\\ b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \partial_b l^{(i)}(\mathbf{w}, b) &&  = b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right). \end{aligned}$$
 :eqlabel:`eq_linreg_batch_update`
 
 Since we pick a minibatch $\mathcal{B}$
@@ -320,7 +322,7 @@ we need to normalize by its size $|\mathcal{B}|$.
 Frequently minibatch size and learning rate are user-defined.
 Such tunable parameters that are not updated
 in the training loop are called *hyperparameters*.
-They can be tuned automatically by a number of techniques, such as Bayesian Optimization
+They can be tuned automatically by a number of techniques, such as Bayesian optimization
 :cite:`Frazier.2018`. In the end, the quality of the solution is
 typically assessed on a separate *validation dataset* (or *validation set*).
 
@@ -340,7 +342,7 @@ Linear regression happens to be a learning problem
 with a global minimum
 (whenever $\mathbf{X}$ is full rank, or equivalently,
 whenever $\mathbf{X}^\top \mathbf{X}$ is invertible).
-However, the lost surfaces for deep networks contain many minima.
+However, the lost surfaces for deep networks contain many saddle points and minima.
 Fortunately, we typically don't care about finding
 an exact set of parameters but merely any set of parameters
 that leads to accurate predictions (and thus low loss).
@@ -349,10 +351,9 @@ seldom struggle to find parameters
 that minimize the loss *on training sets*
 :cite:`Izmailov.Podoprikhin.Garipov.ea.2018,Frankle.Carbin.2018`.
 The more formidable task is to find parameters
-that that lead to accurate predictions on previously unseen data
+that lead to accurate predictions on previously unseen data,
 a challenge called *generalization*.
 We return to these topics throughout the book.
-
 
 ### Predictions
 
@@ -370,6 +371,8 @@ If anything, in the statistics literature
 and this overloading of terminology creates unnecessary confusion
 when deep learning practitioners talk to statisticians.
 In the following we will stick to *prediction* whenever possible.
+
+
 
 
 ## Vectorization for Speed
