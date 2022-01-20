@@ -23,8 +23,8 @@ using the conditional probability of reaching a state $s'$ given that the robot 
 The different components above together form a Markov decision process (MDP)
 $$\text{MDP}: (\mathcal{S}, \mathcal{A}, T, r).$$
 
-Let us now consider the situation when the robot starts at a particular state $s_0 \in S$ continues taking actions to result in a trajectory
-$$\tau = (s_0, a_0, r_0, s_1, a_1, r_1, s_2, a_2, r_2, \ldots);$$
+Let's now consider the situation when the robot starts at a particular state $s_0 \in S$ and continues taking actions to result in a trajectory
+$$\tau = (s_0, a_0, r_0, s_1, a_1, r_1, s_2, a_2, r_2, \ldots).$$
 
 At each time step $t$ the robot is at a state $s_t$ and takes an action $a_t$ which results in a reward $r_t = r(s_t, a_t)$. The *return* of a trajectory is the total reward obtained by the robot along such a trajectory
 $$R(\tau) = r_0 + r_1 + r_2 + \cdots.$$
