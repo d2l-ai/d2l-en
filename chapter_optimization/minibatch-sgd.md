@@ -39,9 +39,9 @@ Beyond computational efficiency, the overhead introduced by Python and by the de
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
+import time
 npx.set_np()
 
-timer = d2l.Timer()
 A = np.zeros((256, 256))
 B = np.random.normal(0, 1, (256, 256))
 C = np.random.normal(0, 1, (256, 256))
@@ -51,11 +51,11 @@ C = np.random.normal(0, 1, (256, 256))
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
+import numpy as np
+import time
 import torch
 from torch import nn
-import numpy as np
 
-timer = d2l.Timer()
 A = torch.zeros(256, 256)
 B = torch.randn(256, 256)
 C = torch.randn(256, 256)
@@ -65,13 +65,47 @@ C = torch.randn(256, 256)
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
+import time
 
-timer = d2l.Timer()
 A = tf.Variable(d2l.zeros((256, 256)))
 B = tf.Variable(d2l.normal([256, 256], 0, 1))
 C = tf.Variable(d2l.normal([256, 256], 0, 1))
+```
+
+Since we will benchmark the running time frequently in the rest of the book, let's define a timer.
+
+```{.python .input}
+#@tab all
+class Timer:  #@save
+    """Record multiple running times."""
+    def __init__(self):
+        self.times = []
+        self.start()
+
+    def start(self):
+        """Start the timer."""
+        self.tik = time.time()
+
+    def stop(self):
+        """Stop the timer and record the time in a list."""
+        self.times.append(time.time() - self.tik)
+        return self.times[-1]
+
+    def avg(self):
+        """Return the average time."""
+        return sum(self.times) / len(self.times)
+
+    def sum(self):
+        """Return the sum of time."""
+        return sum(self.times)
+
+    def cumsum(self):
+        """Return the accumulated time."""
+        return np.array(self.times).cumsum().tolist()
+    
+timer = Timer()
 ```
 
 Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
@@ -581,7 +615,6 @@ train_concise_ch11(trainer, {'learning_rate': 0.05}, data_iter)
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1068)
 :end_tab:
-
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1069)

@@ -103,34 +103,6 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
         axes.plot(x,y,fmt) if len(x) else axes.plot(y,fmt)
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 
-class Timer:
-    """Record multiple running times."""
-    def __init__(self):
-        """Defined in :numref:`subsec_normal_distribution_and_squared_loss`"""
-        self.times = []
-        self.start()
-
-    def start(self):
-        """Start the timer."""
-        self.tik = time.time()
-
-    def stop(self):
-        """Stop the timer and record the time in a list."""
-        self.times.append(time.time() - self.tik)
-        return self.times[-1]
-
-    def avg(self):
-        """Return the average time."""
-        return sum(self.times) / len(self.times)
-
-    def sum(self):
-        """Return the sum of time."""
-        return sum(self.times)
-
-    def cumsum(self):
-        """Return the accumulated time."""
-        return np.array(self.times).cumsum().tolist()
-
 def add_to_class(Class):
     """Defined in :numref:`sec_d2l_apis`"""
     def wrapper(obj):
@@ -1204,6 +1176,34 @@ def show_trace_2d(f, results):
     d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
     d2l.plt.xlabel('x1')
     d2l.plt.ylabel('x2')
+
+class Timer:
+    """Record multiple running times."""
+    def __init__(self):
+        """Defined in :numref:`sec_minibatch_sgd`"""
+        self.times = []
+        self.start()
+
+    def start(self):
+        """Start the timer."""
+        self.tik = time.time()
+
+    def stop(self):
+        """Stop the timer and record the time in a list."""
+        self.times.append(time.time() - self.tik)
+        return self.times[-1]
+
+    def avg(self):
+        """Return the average time."""
+        return sum(self.times) / len(self.times)
+
+    def sum(self):
+        """Return the sum of time."""
+        return sum(self.times)
+
+    def cumsum(self):
+        """Return the accumulated time."""
+        return np.array(self.times).cumsum().tolist()
 
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
                            '76e5be1548fd8222e5074cf0faae75edff8cf93f')
