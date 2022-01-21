@@ -47,8 +47,7 @@ which is quite different from our transition function that simply depends upon $
 
 ## Summary
 * The reinforcement learning problem is typically modeled using MDPs.
-* A Markov decision process (DMP) is defined by a tuple of four entities $(\mathcal{S}, \mathcal{A}, T, r)$ where  
-$\mathcal{S}$ is the state space, $\mathcal{A}$ is the action space, $T$ encodes transition probabilities of the MDP, $r$ is the immediate reward obtained by taking action $a$ in state $s$.
+* A Markov decision process (MDP) is defined by a tuple of four entities $(\mathcal{S}, \mathcal{A}, T, r)$ where $\mathcal{S}$ is the state space, $\mathcal{A}$ is the action space, $T$ encodes transition probabilities of the MDP, $r$ is the immediate reward obtained by taking action $a$ in state $s$.
 
 
 ## Exercises
