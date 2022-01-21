@@ -3,10 +3,14 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# The D2L APIs
+# D2L APIs
 :label:`sec_d2l_apis`
 
-Linear regression is one of the simplest machine learning models. Training it,
+We have described 
+the data, the model, the loss function,
+and the optimization algorithm
+when introducing linear regression,
+one of the simplest machine learning models. Training it,
 however, uses many of the same components as other models in this book require.
 Therefore, before diving into the details it is worth reviewing some of the
 functionality of the D2L library used throughout this book. This will greatly

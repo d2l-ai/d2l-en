@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Linear Regression
 :label:`sec_linear_regression`
 
-Regression problems pop up whenever we want to predict a numerical value.
+*Regression* problems pop up whenever we want to predict a numerical value.
 Common examples include predicting prices (of homes, stocks, etc.),
 predicting the length of stay (for patients in the hospital),
 forecasting demand (for retail sales), among countless others.
