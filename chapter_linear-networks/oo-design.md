@@ -3,21 +3,48 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# D2L APIs
-:label:`sec_d2l_apis`
+# Object-Oriented Design for Implementation
+:label:`sec_oo-design`
 
-We have described 
+In our introduction to linear regression,
+we walked through various components
+including
 the data, the model, the loss function,
-and the optimization algorithm
-when introducing linear regression,
-one of the simplest machine learning models. Training it,
+and the optimization algorithm.
+Indeed,
+linear regression is
+one of the simplest machine learning models.
+Training it,
 however, uses many of the same components as other models in this book require.
-Therefore, before diving into the details it is worth reviewing some of the
-functionality of the D2L library used throughout this book. This will greatly
+Therefore, 
+before diving into the implementation details
+it is worth 
+designing some of the APIs
+used throughout this book. 
+Treating components in deep learning
+as objects,
+we can start by
+defining classes for these objects
+and their interactions.
+This object-oriented design
+for implementation
+will greatly
 streamline the presentation and you might even want to use it in your projects.
 
-At its core we have three classes: `Module` contains models, losses and optimization methods; `DataModule` provides data loaders for training and validation. Both classes are combined using the `Trainer` class. It allows us to
-train models on a variety of hardware platforms. Most code in this book adapts `Module` and `DataModule`. We will touch upon the `Trainer` class only when we discuss GPUs, CPUs, parallel training and optimization algorithms.
+
+On a high level,
+we wish to define three classes: 
+(i) `Module` contains models, losses, and optimization methods; 
+(ii) `DataModule` provides data loaders for training and validation; 
+(iii) both classes are combined using the `Trainer` class, which allows us to
+train models on a variety of hardware platforms. 
+Most code in this book adapts `Module` and `DataModule`. We will touch upon the `Trainer` class only when we discuss GPUs, CPUs, parallel training, and optimization algorithms.
+
+
+
+
+
+
 
 ```{.python .input}
 %%tab mxnet
@@ -271,4 +298,6 @@ class Trainer(d2l.HyperParameters):  #@save
 
 ## Summary
 
-The classes provided by the D2L API function as a lightweight toolkit that makes structured modeling for deep learning easy. In particular, it facilitates reusing many components between projects without changing much at all. For instance, we can replace just the optimizer, just the model, just the dataset, etc.; This degree of modularity pays dividends throughout the book in terms of conciseness and simplicity (this is why we added it) and it can do the same for your own projects. We strongly recommend that you look at the implementation in detail once you have gained some more familiarity with deep learning modeling.
+The classes above can be considered as a lightweight toolkit that makes structured modeling for deep learning easy. In particular, it facilitates reusing many components between projects without changing much at all. For instance, we can replace just the optimizer, just the model, just the dataset, etc.; 
+Thanks to object-oriented design,
+this degree of modularity pays dividends throughout the book in terms of conciseness and simplicity (this is why we added it) and it can do the same for your own projects. We strongly recommend that you look at the implementation in detail once you have gained some more familiarity with deep learning modeling.

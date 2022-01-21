@@ -109,14 +109,14 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 
 def add_to_class(Class):
-    """Defined in :numref:`sec_d2l_apis`"""
+    """Defined in :numref:`sec_oo-design`"""
     def wrapper(obj):
         setattr(Class, obj.__name__, obj)
     return wrapper
 
 class HyperParameters:
     def save_hyperparameters(self, ignore=[]):
-        """Defined in :numref:`sec_d2l_apis`"""
+        """Defined in :numref:`sec_oo-design`"""
         raise NotImplemented
 
     def save_hyperparameters(self, ignore=[]):
@@ -133,7 +133,7 @@ class HyperParameters:
 class ProgressBoard(d2l.HyperParameters):
     """Plot data points in animation.
 
-    Defined in :numref:`sec_d2l_apis`"""
+    Defined in :numref:`sec_oo-design`"""
     def __init__(self, xlabel=None, ylabel=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear',
                  ls=['-', '--', '-.', ':'], colors=['C0', 'C1', 'C2', 'C3'],
@@ -184,7 +184,7 @@ class ProgressBoard(d2l.HyperParameters):
         display.clear_output(wait=True)
 
 class Module(d2l.nn_Module, d2l.HyperParameters):
-    """Defined in :numref:`sec_d2l_apis`"""
+    """Defined in :numref:`sec_oo-design`"""
     def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
         super().__init__()
         self.save_hyperparameters()
@@ -263,7 +263,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
                     elem.set_scratch_params_device(device)
 
 class DataModule(d2l.HyperParameters):
-    """Defined in :numref:`sec_d2l_apis`"""
+    """Defined in :numref:`sec_oo-design`"""
     def __init__(self, root='../data', num_workers=4):
         self.save_hyperparameters()
 
@@ -284,7 +284,7 @@ class DataModule(d2l.HyperParameters):
                                      shuffle=train)
 
 class Trainer(d2l.HyperParameters):
-    """Defined in :numref:`sec_d2l_apis`"""
+    """Defined in :numref:`sec_oo-design`"""
     def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'No GPU support yet'

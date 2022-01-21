@@ -198,7 +198,7 @@ and thus Gluon supports it alongside a number of
 variations on this algorithm through its `Trainer` class.
 Note that Gluon's `Trainer` class stands
 for the optimization algorithm,
-while the `Trainer` class we created in :numref:`sec_d2l_apis`
+while the `Trainer` class we created in :numref:`sec_oo-design`
 contains the training function,
 i.e., repeatedly call the optimizer
 to update the model parameters.

@@ -25,7 +25,7 @@ by developing linear neural networks for classification.
 :maxdepth: 2
 
 linear-regression
-api
+oo-design
 synthetic-regression-data
 linear-regression-scratch
 linear-regression-concise
