@@ -245,3 +245,16 @@ We will put this to good use in the next section.
     1. How would you shuffle the data if data is held on disk? Your task is to design an *efficient* algorithm that does not require too many random reads or writes. Hint: [Pseudorandom Permutation Generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) allow you to design a reshuffle without the need to store the permutation table explicitly :cite:`Naor.Reingold.1999`. 
 1. Implement a data generator that produces new data on the fly, every time the iterator is called. 
 1. How would you design a random data generator that generates *the same* data each time it's called?
+
+
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/6662)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/6663)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/6664)
+:end_tab:
