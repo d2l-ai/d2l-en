@@ -5,7 +5,7 @@ So far we encountered two types of data: tabular data and image data.
 For the latter we designed specialized layers to take advantage of the regularity in them.
 In other words, if we were to permute the pixels in an image, it would be much more difficult to reason about its content of something that would look much like the background of a test pattern in the times of analog TV.
 
-Most importantly, so far we tacitly assumed that our data are all drawn from some distribution,
+Most importantly, so far we tacitly assumed that our data is all drawn from some distribution,
 and all the examples are independently and identically distributed (i.i.d.).
 Unfortunately, this is not true for most data. For instance, the words in this paragraph are written in sequence, and it would be quite difficult to decipher its meaning if they were permuted randomly.
 Likewise, image frames in a video, the audio signal in a conversation, and the browsing behavior on a website, all follow sequential order.
@@ -25,8 +25,8 @@ In the end, we describe the gradient calculation method for RNNs to explore prob
 :maxdepth: 2
 
 sequence
-text-preprocessing
-language-models-and-dataset
+text-sequence
+language-model
 rnn
 rnn-scratch
 rnn-concise

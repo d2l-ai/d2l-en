@@ -2,7 +2,7 @@
 
 ## In General
 
-* Be clear, engaging, pragmatic, and consistent
+* Be precise, clear, engaging, pragmatic, and consistent
 
 ## Text
 

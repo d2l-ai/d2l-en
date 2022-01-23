@@ -1,7 +1,7 @@
 # Densely Connected Networks (DenseNet)
 
 ResNet significantly changed the view of how to parametrize the functions in deep networks. *DenseNet* (dense convolutional network) is to some extent the logical extension of this :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
-To understand how to arrive at it, let us take a small detour to mathematics.
+To understand how to arrive at it, let's take a small detour to mathematics.
 
 
 ## From ResNet to DenseNet
@@ -42,7 +42,7 @@ rather than adding terms, we concatenate them. The name DenseNet arises from the
 The main components that compose a DenseNet are *dense blocks* and *transition layers*. The former define how the inputs and outputs are concatenated, while the latter control the number of channels so that it is not too large.
 
 
-## Dense Blocks
+## [**Dense Blocks**]
 
 DenseNet uses the modified "batch normalization, activation, and convolution"
 structure of ResNet (see the exercise in :numref:`sec_resnet`).
@@ -152,7 +152,7 @@ class DenseBlock(tf.keras.layers.Layer):
 ```
 
 In the following example,
-we define a `DenseBlock` instance with 2 convolution blocks of 10 output channels.
+we [**define a `DenseBlock` instance**] with 2 convolution blocks of 10 output channels.
 When using an input with 3 channels, we will get an output with  $3+2\times 10=23$ channels. The number of convolution block channels controls the growth in the number of output channels relative to the number of input channels. This is also referred to as the *growth rate*.
 
 ```{.python .input}
@@ -179,7 +179,7 @@ Y = blk(X)
 Y.shape
 ```
 
-## Transition Layers
+## [**Transition Layers**]
 
 Since each dense block will increase the number of channels, adding too many of them will lead to an excessively complex model. A *transition layer* is used to control the complexity of the model. It reduces the number of channels by using the $1\times 1$ convolutional layer and halves the height and width of the average pooling layer with a stride of 2, further reducing the complexity of the model.
 
@@ -218,7 +218,7 @@ class TransitionBlock(tf.keras.layers.Layer):
         return self.avg_pool(x)
 ```
 
-Apply a transition layer with 10 channels to the output of the dense block in the previous example.  This reduces the number of output channels to 10, and halves the height and width.
+[**Apply a transition layer**] with 10 channels to the output of the dense block in the previous example.  This reduces the number of output channels to 10, and halves the height and width.
 
 ```{.python .input}
 blk = transition_block(10)
@@ -238,7 +238,7 @@ blk = TransitionBlock(10)
 blk(Y).shape
 ```
 
-## DenseNet Model
+## [**DenseNet Model**]
 
 Next, we will construct a DenseNet model. DenseNet first uses the same single convolutional layer and maximum pooling layer as in ResNet.
 
@@ -326,7 +326,7 @@ def block_2():
     return net
 ```
 
-Similar to ResNet, a global pooling layer and a fully-connected layer are connected at the end to produce the output.
+Similar to ResNet, a global pooling layer and a fully connected layer are connected at the end to produce the output.
 
 ```{.python .input}
 net.add(nn.BatchNorm(),
@@ -340,7 +340,7 @@ net.add(nn.BatchNorm(),
 net = nn.Sequential(
     b1, *blks,
     nn.BatchNorm2d(num_channels), nn.ReLU(),
-    nn.AdaptiveMaxPool2d((1, 1)),
+    nn.AdaptiveAvgPool2d((1, 1)),
     nn.Flatten(),
     nn.Linear(num_channels, 10))
 ```
@@ -357,7 +357,7 @@ def net():
     return net
 ```
 
-## Training
+## [**Training**]
 
 Since we are using a deeper network here, in this section, we will reduce the input height and width from 224 to 96 to simplify the computation.
 

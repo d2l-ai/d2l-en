@@ -51,7 +51,7 @@ import tensorflow as tf
 ```
 
 To illustrate the aforementioned different goals,
-let us consider 
+let's consider 
 the empirical risk and the risk. 
 As described
 in :numref:`subsec_empirical-risk-and-risk`,
@@ -105,7 +105,7 @@ all fall into this
 category.
 
 There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points, and vanishing gradients. 
-Let us have a look at them.
+Let's have a look at them.
 
 
 ### Local Minima
@@ -167,8 +167,7 @@ d2l.plt.ylabel('y');
 ```
 
 We assume that the input of a function is a $k$-dimensional vector and its
-output is a scalar, so its Hessian matrix will have $k$ eigenvalues
-(refer to the [online appendix on eigendecompositions](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/eigendecomposition.html)).
+output is a scalar, so its Hessian matrix will have $k$ eigenvalues.
 The solution of the
 function could be a local minimum, a local maximum, or a saddle point at a
 position where the function gradient is zero:
@@ -182,7 +181,7 @@ For high-dimensional problems the likelihood that at least *some* of the eigenva
 ### Vanishing Gradients
 
 Probably the most insidious problem to encounter is the vanishing gradient.
-Recall our commonly-used activation functions and their derivatives in :numref:`subsec:activation-functions`.
+Recall our commonly-used activation functions and their derivatives in :numref:`subsec_activation-functions`.
 For instance, assume that we want to minimize the function $f(x) = \tanh(x)$ and we happen to get started at $x = 4$. As we can see, the gradient of $f$ is close to nil.
 More specifically, $f'(x) = 1 - \tanh^2(x)$ and thus $f'(4) = 0.0013$.
 Consequently, optimization will get stuck for a long time before we make progress. This turns out to be one of the reasons that training deep learning models was quite tricky prior to the introduction of the ReLU activation function.

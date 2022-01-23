@@ -1,7 +1,7 @@
 # Naive Bayes
 :label:`sec_naive_bayes`
 
-Throughout the previous sections, we learned about the theory of probability and random variables.  To put this theory to work, let us introduce the *naive Bayes* classifier.  This uses nothing but probabilistic fundamentals to allow us to perform classification of digits.
+Throughout the previous sections, we learned about the theory of probability and random variables.  To put this theory to work, let's introduce the *naive Bayes* classifier.  This uses nothing but probabilistic fundamentals to allow us to perform classification of digits.
 
 Learning is all about making assumptions. If we want to classify a new data example that we have never seen before we have to make some assumptions about which data examples are similar to each other. The naive Bayes classifier, a popular and remarkably clear algorithm, assumes all features are independent from each other to simplify the computation. In this section, we will apply this model to recognize characters in images.
 
@@ -54,8 +54,10 @@ mnist_test = gluon.data.vision.MNIST(train=False, transform=transform)
 
 ```{.python .input}
 #@tab pytorch
-data_transform = torchvision.transforms.Compose(
-    [torchvision.transforms.ToTensor()])
+data_transform = torchvision.transforms.Compose([
+    torchvision.transforms.ToTensor(),
+    lambda x: torch.floor(x * 255 / 128).squeeze(dim=0)
+])
 
 mnist_train = torchvision.datasets.MNIST(
     root='./temp', train=True, transform=data_transform, download=True)
@@ -67,6 +69,16 @@ mnist_test = torchvision.datasets.MNIST(
 #@tab tensorflow
 ((train_images, train_labels), (
     test_images, test_labels)) = tf.keras.datasets.mnist.load_data()
+
+# Original pixel values of MNIST range from 0-255 (as the digits are stored as
+# uint8). For this section, pixel values that are greater than 128 (in the
+# original image) are converted to 1 and values that are less than 128 are
+# converted to 0. See section 18.9.2 and 18.9.3 for why
+train_images = tf.floor(tf.constant(train_images / 128, dtype = tf.float32))
+test_images = tf.floor(tf.constant(test_images / 128, dtype = tf.float32))
+
+train_labels = tf.constant(train_labels, dtype = tf.int32)
+test_labels = tf.constant(test_labels, dtype = tf.int32)
 ```
 
 We can access a particular example, which contains the image and the corresponding label.
@@ -85,7 +97,7 @@ image.shape, label
 ```{.python .input}
 #@tab tensorflow
 image, label = train_images[2], train_labels[2]
-image.shape, label
+image.shape, label.numpy()
 ```
 
 Our example, stored here in the variable `image`, corresponds to an image with a height and width of $28$ pixels.
@@ -108,7 +120,7 @@ label, type(label)
 
 ```{.python .input}
 #@tab tensorflow
-label, type(label)
+label.numpy(), label.dtype
 ```
 
 We can also access multiple examples at the same time.
@@ -120,20 +132,19 @@ images.shape, labels.shape
 
 ```{.python .input}
 #@tab pytorch
-images = torch.stack([mnist_train[i][0] for i in range(10,38)], 
-                     dim=1).squeeze(0)
-labels = torch.tensor([mnist_train[i][1] for i in range(10,38)])
+images = torch.stack([mnist_train[i][0] for i in range(10, 38)], dim=0)
+labels = torch.tensor([mnist_train[i][1] for i in range(10, 38)])
 images.shape, labels.shape
 ```
 
 ```{.python .input}
 #@tab tensorflow
 images = tf.stack([train_images[i] for i in range(10, 38)], axis=0)
-labels = tf.constant([train_labels[i] for i in range(10, 38)])
+labels = tf.constant([train_labels[i].numpy() for i in range(10, 38)])
 images.shape, labels.shape
 ```
 
-Let us visualize these examples.
+Let's visualize these examples.
 
 ```{.python .input}
 #@tab all
@@ -154,23 +165,33 @@ Moreover, where is the learning? If we need to see every single possible example
 
 ## The Naive Bayes Classifier
 
-Fortunately, by making some assumptions about conditional independence, we can introduce some inductive bias and build a model capable of generalizing from a comparatively modest selection of training examples. To begin, let us use Bayes theorem, to express the classifier as
+Fortunately, by making some assumptions about conditional independence, we can introduce some inductive bias and build a model capable of generalizing from a comparatively modest selection of training examples. To begin, let's use Bayes theorem, to express the classifier as
 
 $$\hat{y} = \mathrm{argmax}_y \> p(y  \mid  \mathbf{x}) = \mathrm{argmax}_y \> \frac{p( \mathbf{x}  \mid  y) p(y)}{p(\mathbf{x})}.$$
 
 Note that the denominator is the normalizing term $p(\mathbf{x})$ which does not depend on the value of the label $y$. As a result, we only need to worry about comparing the numerator across different values of $y$. Even if calculating the denominator turned out to be intractable, we could get away with ignoring it, so long as we could evaluate the numerator. Fortunately, even if we wanted to recover the normalizing constant, we could.  We can always recover the normalization term since $\sum_y p(y  \mid  \mathbf{x}) = 1$.
 
-Now, let us focus on $p( \mathbf{x}  \mid  y)$. Using the chain rule of probability, we can express the term $p( \mathbf{x}  \mid  y)$ as
+Now, let's focus on $p( \mathbf{x}  \mid  y)$. Using the chain rule of probability, we can express the term $p( \mathbf{x}  \mid  y)$ as
 
 $$p(x_1  \mid y) \cdot p(x_2  \mid  x_1, y) \cdot ... \cdot p( x_d  \mid  x_1, ..., x_{d-1}, y).$$
 
 By itself, this expression does not get us any further. We still must estimate roughly $2^d$ parameters. However, if we assume that *the features are conditionally independent of each other, given the label*, then suddenly we are in much better shape, as this term simplifies to $\prod_i p(x_i  \mid  y)$, giving us the predictor
 
-$$ \hat{y} = \mathrm{argmax}_y \> \prod_{i=1}^d p(x_i  \mid  y) p(y).$$
+$$\hat{y} = \mathrm{argmax}_y \> \prod_{i=1}^d p(x_i  \mid  y) p(y).$$
 
-If we can estimate $\prod_i p(x_i=1  \mid  y)$ for every $i$ and $y$, and save its value in $P_{xy}[i, y]$, here $P_{xy}$ is a $d\times n$ matrix with $n$ being the number of classes and $y\in\{1, \ldots, n\}$. In addition, we estimate $p(y)$ for every $y$ and save it in $P_y[y]$, with $P_y$ a $n$-length vector. Then for any new example $\mathbf x$, we could compute
+If we can estimate $p(x_i=1  \mid  y)$ for every $i$ and $y$, and save its value in $P_{xy}[i, y]$, here $P_{xy}$ is a $d\times n$ matrix with $n$ being the number of classes and $y\in\{1, \ldots, n\}$, then we can also use this to estimate $p(x_i = 0 \mid y)$, i.e.,
 
-$$ \hat{y} = \mathrm{argmax}_y \> \prod_{i=1}^d P_{xy}[x_i, y]P_y[y],$$
+$$ 
+p(x_i = t_i \mid y) = 
+\begin{cases}
+    P_{xy}[i, y] & \text{for } t_i=1 ;\\
+    1 - P_{xy}[i, y] & \text{for } t_i = 0 .
+\end{cases}
+$$
+
+In addition, we estimate $p(y)$ for every $y$ and save it in $P_y[y]$, with $P_y$ a $n$-length vector. Then, for any new example $\mathbf t = (t_1, t_2, \ldots, t_d)$, we could compute
+
+$$\begin{aligned}\hat{y} &= \mathrm{argmax}_ y \ p(y)\prod_{i=1}^d   p(x_t = t_i \mid y) \\ &= \mathrm{argmax}_y \ P_y[y]\prod_{i=1}^d \ P_{xy}[i, y]^{t_i}\, \left(1 - P_{xy}[i, y]\right)^{1-t_i}\end{aligned}$$
 :eqlabel:`eq_naive_bayes_estimation`
 
 for any $y$. So our assumption of conditional independence has taken the complexity of our model from an exponential dependence on the number of features $\mathcal{O}(2^dn)$ to a linear dependence, which is $\mathcal{O}(dn)$.
@@ -192,8 +213,7 @@ P_y
 
 ```{.python .input}
 #@tab pytorch
-X = torch.stack([mnist_train[i][0] for i in range(len(mnist_train))], 
-                dim=1).squeeze(0)
+X = torch.stack([mnist_train[i][0] for i in range(len(mnist_train))], dim=0)
 Y = torch.tensor([mnist_train[i][1] for i in range(len(mnist_train))])
 
 n_y = torch.zeros(10)
@@ -205,8 +225,8 @@ P_y
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.stack([train_images[i] for i in range(len(train_images))], axis=0)
-Y = tf.constant([train_labels[i] for i in range(len(train_labels))])
+X = train_images
+Y = train_labels
 
 n_y = tf.Variable(tf.zeros(10))
 for y in range(10):
@@ -282,11 +302,11 @@ def bayes_pred(x):
     p_xy = tf.math.reduce_prod(tf.reshape(p_xy, (10, -1)), axis=1)  # p(x|y)
     return p_xy * P_y
 
-image, label = tf.cast(train_images[0], tf.float32), train_labels[0]
+image, label = train_images[0], train_labels[0]
 bayes_pred(image)
 ```
 
-This went horribly wrong! To find out why, let us look at the per pixel probabilities. They are typically numbers between $0.001$ and $1$. We are multiplying $784$ of them. At this point it is worth mentioning that we are calculating these numbers on a computer, hence with a fixed range for the exponent. What happens is that we experience *numerical underflow*, i.e., multiplying all the small numbers leads to something even smaller until it is rounded down to zero.  We discussed this as a theoretical issue in :numref:`sec_maximum_likelihood`, but we see the phenomena clearly here in practice.
+This went horribly wrong! To find out why, let's look at the per pixel probabilities. They are typically numbers between $0.001$ and $1$. We are multiplying $784$ of them. At this point it is worth mentioning that we are calculating these numbers on a computer, hence with a fixed range for the exponent. What happens is that we experience *numerical underflow*, i.e., multiplying all the small numbers leads to something even smaller until it is rounded down to zero.  We discussed this as a theoretical issue in :numref:`sec_maximum_likelihood`, but we see the phenomena clearly here in practice.
 
 As discussed in that section, we fix this by use the fact that $\log a b = \log a + \log b$, i.e., we switch to summing logarithms.
 Even if both $a$ and $b$ are small numbers, the logarithm values should be in a proper range.
@@ -313,7 +333,7 @@ print('logarithm is normal:', 784*tf.math.log(a).numpy())
 
 Since the logarithm is an increasing function, we can rewrite :eqref:`eq_naive_bayes_estimation` as
 
-$$ \hat{y} = \mathrm{argmax}_y \> \sum_{i=1}^d \log P_{xy}[x_i, y] + \log P_y[y].$$
+$$ \hat{y} = \mathrm{argmax}_y \ \log P_y[y] + \sum_{i=1}^d \Big[t_i\log P_{xy}[x_i, y] + (1-t_i) \log (1 - P_{xy}[x_i, y]) \Big].$$
 
 We can implement the following stable version:
 
@@ -351,7 +371,6 @@ py
 ```{.python .input}
 #@tab tensorflow
 log_P_xy = tf.math.log(P_xy)
-# TODO: Look into why this returns infs
 log_P_xy_neg = tf.math.log(1 - P_xy)
 log_P_y = tf.math.log(P_y)
 
@@ -368,8 +387,8 @@ py
 We may now check if the prediction is correct.
 
 ```{.python .input}
-# Convert label which is a scalar tensor of int32 dtype
-# to a Python scalar integer for comparison
+# Convert label which is a scalar tensor of int32 dtype to a Python scalar
+# integer for comparison
 py.argmax(axis=0) == int(label)
 ```
 
@@ -380,7 +399,7 @@ py.argmax(dim=0) == label
 
 ```{.python .input}
 #@tab tensorflow
-tf.argmax(py, axis=0) == label
+tf.argmax(py, axis=0, output_type = tf.int32) == label
 ```
 
 If we now predict a few validation examples, we can see the Bayes
@@ -401,8 +420,8 @@ def predict(X):
     return [bayes_pred_stable(x).argmax(dim=0).type(torch.int32).item() 
             for x in X]
 
-X = torch.stack([mnist_train[i][0] for i in range(10,38)], dim=1).squeeze(0)
-y = torch.tensor([mnist_train[i][1] for i in range(10,38)])
+X = torch.stack([mnist_test[i][0] for i in range(18)], dim=0)
+y = torch.tensor([mnist_test[i][1] for i in range(18)])
 preds = predict(X)
 d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
@@ -410,18 +429,17 @@ d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```{.python .input}
 #@tab tensorflow
 def predict(X):
-    return [tf.cast(tf.argmax(bayes_pred_stable(x), axis=0), tf.int32).numpy()
+    return [tf.argmax(
+        bayes_pred_stable(x), axis=0, output_type = tf.int32).numpy()
             for x in X]
 
-X = tf.stack(
-    [tf.cast(train_images[i], tf.float32) for i in range(10, 38)], axis=0)
-y = tf.constant([train_labels[i] for i in range(10, 38)])
+X = tf.stack([train_images[i] for i in range(10, 38)], axis=0)
+y = tf.constant([train_labels[i].numpy() for i in range(10, 38)])
 preds = predict(X)
-# TODO: The preds are not correct due to issues with bayes_pred_stable()
 d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
 
-Finally, let us compute the overall accuracy of the classifier.
+Finally, let's compute the overall accuracy of the classifier.
 
 ```{.python .input}
 X, y = mnist_test[:]
@@ -431,21 +449,19 @@ float((preds == y).sum()) / len(y)  # Validation accuracy
 
 ```{.python .input}
 #@tab pytorch
-X = torch.stack([mnist_train[i][0] for i in range(len(mnist_test))], 
-                dim=1).squeeze(0)
-y = torch.tensor([mnist_train[i][1] for i in range(len(mnist_test))])
+X = torch.stack([mnist_test[i][0] for i in range(len(mnist_test))], dim=0)
+y = torch.tensor([mnist_test[i][1] for i in range(len(mnist_test))])
 preds = torch.tensor(predict(X), dtype=torch.int32)
 float((preds == y).sum()) / len(y)  # Validation accuracy
 ```
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.stack([tf.cast(train_images[i], tf.float32) for i in range(
-    len(test_images))], axis=0)
-y = tf.constant([train_labels[i] for i in range(len(test_images))])
+X = test_images
+y = test_labels
 preds = tf.constant(predict(X), dtype=tf.int32)
-# TODO: The accuracy is not correct due to issues with bayes_pred_stable()
-tf.reduce_sum(tf.cast(preds == y, tf.float32)) / len(y)  # Validation accuracy
+# Validation accuracy
+tf.reduce_sum(tf.cast(preds == y, tf.float32)).numpy() / len(y)
 ```
 
 Modern deep networks achieve error rates of less than $0.01$. The relatively poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier.
@@ -459,7 +475,6 @@ Modern deep networks achieve error rates of less than $0.01$. The relatively poo
 1. Consider the dataset $[[0,0], [0,1], [1,0], [1,1]]$ with labels given by the XOR of the two elements $[0,1,1,0]$.  What are the probabilities for a Naive Bayes classifier built on this dataset.  Does it successfully classify our points?  If not, what assumptions are violated?
 1. Suppose that we did not use Laplace smoothing when estimating probabilities and a data example arrived at testing time which contained a value never observed in training.  What would the model output?
 1. The naive Bayes classifier is a specific example of a Bayesian network, where the dependence of random variables are encoded with a graph structure.  While the full theory is beyond the scope of this section (see :cite:`Koller.Friedman.2009` for full details), explain why allowing explicit dependence between the two input variables in the XOR model allows for the creation of a successful classifier.
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/418)

@@ -41,7 +41,7 @@ $$
 We say that $\mathbf{v}$ is an eigenvector for $A$ and $\lambda$ is an eigenvalue.
 
 ## Finding Eigenvalues
-Let us figure out how to find them. By subtracting off the $\lambda \mathbf{v}$ from both sides,
+Let's figure out how to find them. By subtracting off the $\lambda \mathbf{v}$ from both sides,
 and then factoring out the vector,
 we see the above is equivalent to:
 
@@ -58,7 +58,7 @@ $\mathbf{A}\mathbf{v} = \lambda \mathbf{v}$
 to find the associated *eigenvector(s)*.
 
 ### An Example
-Let us see this with a more challenging matrix
+Let's see this with a more challenging matrix
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -125,7 +125,7 @@ However, the vectors computed are parallel
 to the ones we found by hand with the same eigenvalues.
 
 ## Decomposing Matrices
-Let us continue the previous example one step further.  Let
+Let's continue the previous example one step further.  Let
 
 $$
 \mathbf{W} = \begin{bmatrix}
@@ -247,7 +247,7 @@ Let $\mathcal{D}_i$ represent the disc in the complex plane
 with center $a_{ii}$ radius $r_i$.
 Then, every eigenvalue of $\mathbf{A}$ is contained in one of the $\mathcal{D}_i$.
 
-This can be a bit to unpack, so let us look at an example.  
+This can be a bit to unpack, so let's look at an example.  
 Consider the matrix:
 
 $$
@@ -320,7 +320,7 @@ it is good to get any intuitive grasp we can.
 ## A Useful Application: The Growth of Iterated Maps
 
 Now that we understand what eigenvectors are in principle,
-let us see how they can be used to provide a deep understanding 
+let's see how they can be used to provide a deep understanding 
 of a problem central to neural network behavior: proper weight initialization. 
 
 ### Eigenvectors as Long Term Behavior
@@ -340,7 +340,7 @@ $$
 $$
 
 When these models are initialized, $A$ is taken to be 
-a random matrix with Gaussian entries, so let us make one of those. 
+a random matrix with Gaussian entries, so let's make one of those. 
 To be concrete, we start with a mean zero, variance one Gaussian distributed $5 \times 5$ matrix.
 
 ```{.python .input}
@@ -371,7 +371,7 @@ A
 For simplicity in our toy model, 
 we will assume that the data vector we feed in $\mathbf{v}_{in}$ 
 is a random five dimensional Gaussian vector.
-Let us think about what we want to have happen.
+Let's think about what we want to have happen.
 For context, lets think of a generic ML problem,
 where we are trying to turn input data, like an image, into a prediction, 
 like the probability the image is a picture of a cat.
@@ -389,7 +389,7 @@ and the output will not depend on the input. This is also clearly not right eith
 We need to walk the narrow line between growth and decay 
 to make sure that our output changes depending on our input, but not much!
 
-Let us see what happens when we repeatedly multiply our matrix $\mathbf{A}$ 
+Let's see what happens when we repeatedly multiply our matrix $\mathbf{A}$ 
 against a random input vector, and keep track of the norm.
 
 ```{.python .input}
@@ -472,13 +472,13 @@ but the stretching factor is stable.
 We have seen that eigenvectors and eigenvalues correspond 
 to the amount something is stretched, 
 but that was for specific vectors, and specific stretches.
-Let us take a look at what they are for $\mathbf{A}$.
+Let's take a look at what they are for $\mathbf{A}$.
 A bit of a caveat here: it turns out that to see them all,
 we will need to go to complex numbers.
 You can think of these as stretches and rotations.
 By taking the norm of the complex number
 (square root of the sums of squares of real and imaginary parts)
-we can measure that stretching factor. Let us also sort them.
+we can measure that stretching factor. Let's also sort them.
 
 ```{.python .input}
 # Compute the eigenvalues
@@ -547,7 +547,7 @@ that we do not want a random vector to be stretched or squished at all,
 we would like random vectors to stay about the same size throughout the entire process.
 To do so, we now rescale our matrix by this principle eigenvalue 
 so that the largest eigenvalue is instead now just one.
-Let us see what happens in this case.
+Let's see what happens in this case.
 
 ```{.python .input}
 # Rescale the matrix `A`
@@ -627,10 +627,10 @@ for i in range(1, 100):
 d2l.plot(tf.range(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
-## Conclusions
+## Discussion
 
 We now see exactly what we hoped for!
-After normalizing the matrices by the principle eigenvalue,
+After normalizing the matrices by the principal eigenvalue,
 we see that the random data does not explode as before,
 but rather eventually equilibrates to a specific value.
 It would be nice to be able to do these things from first principles,

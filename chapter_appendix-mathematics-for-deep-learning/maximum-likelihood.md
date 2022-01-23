@@ -28,7 +28,7 @@ As a matter of common terminology, the probability of the data given the paramet
 
 ### A Concrete Example
 
-Let us see how this works in a concrete example.  Suppose that we have a single parameter $\theta$ representing the probability that a coin flip is heads.  Then the probability of getting a tails is $1-\theta$, and so if our observed data $X$ is a sequence with $n_H$ heads and $n_T$ tails, we can use the fact that independent probabilities multiply to see that 
+Let's see how this works in a concrete example.  Suppose that we have a single parameter $\theta$ representing the probability that a coin flip is heads.  Then the probability of getting a tails is $1-\theta$, and so if our observed data $X$ is a sequence with $n_H$ heads and $n_T$ tails, we can use the fact that independent probabilities multiply to see that 
 
 $$
 P(X \mid \theta) = \theta^{n_H}(1-\theta)^{n_T}.
@@ -80,7 +80,7 @@ p = theta**9 * (1 - theta)**4.
 d2l.plot(theta, p, 'theta', 'likelihood')
 ```
 
-This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the function is flat.  Thus, we could find the maximum likelihood estimate :eqref:`eq_max_like` by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
+This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the gradient of the function is flat.  Thus, we could find the maximum likelihood estimate :eqref:`eq_max_like` by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
 
 $$
 \begin{aligned}
@@ -95,9 +95,9 @@ This has three solutions: $0$, $1$ and $9/13$.  The first two are clearly minima
 
 ## Numerical Optimization and the Negative Log-Likelihood
 
-The previous example is nice, but what if we have billions of parameters and data examples.
+The previous example is nice, but what if we have billions of parameters and data examples?
 
-First notice that, if we make the assumption that all the data examples are independent, we can no longer practically consider the likelihood itself as it is a product of many probabilities.  Indeed, each probability is in $[0,1]$, say typically of value about $1/2$, and the product of $(1/2)^{1000000000}$ is far below machine precision.  We cannot work with that directly.  
+First, notice that if we make the assumption that all the data examples are independent, we can no longer practically consider the likelihood itself as it is a product of many probabilities.  Indeed, each probability is in $[0,1]$, say typically of value about $1/2$, and the product of $(1/2)^{1000000000}$ is far below machine precision.  We cannot work with that directly.  
 
 However, recall that the logarithm turns products to sums, in which case 
 
@@ -186,11 +186,11 @@ for iter in range(10):
 theta, n_H / (n_H + n_T)
 ```
 
-Numerical convenience is only one reason people like to use negative log-likelihoods.  Indeed, there are a several reasons that it can be preferable.
+Numerical convenience is not the only reason why people like to use negative log-likelihoods. There are several other reasons why it is preferable.
 
 
 
-The second reason we consider the log-likelihood is the simplified application of calculus rules.  As discussed above, due to independence assumptions, most probabilities we encounter in machine learning are products of individual probabilities.
+The second reason we consider the log-likelihood is the simplified application of calculus rules. As discussed above, due to independence assumptions, most probabilities we encounter in machine learning are products of individual probabilities.
 
 $$
 P(X\mid\boldsymbol{\theta}) = p(x_1\mid\boldsymbol{\theta})\cdot p(x_2\mid\boldsymbol{\theta})\cdots p(x_n\mid\boldsymbol{\theta}).
@@ -207,7 +207,7 @@ $$
 \end{aligned}
 $$
 
-This requires $n(n-1)$ multiplications, along with $(n-1)$ additions, so it is total of quadratic time in the inputs!  Sufficient cleverness in grouping terms will reduce this to linear time, but it requires some thought.  For the negative log-likelihood we have instead
+This requires $n(n-1)$ multiplications, along with $(n-1)$ additions, so it is proportional to quadratic time in the inputs!  Sufficient cleverness in grouping terms will reduce this to linear time, but it requires some thought.  For the negative log-likelihood we have instead
 
 $$
 -\log\left(P(X\mid\boldsymbol{\theta})\right) = -\log(P(x_1\mid\boldsymbol{\theta})) - \log(P(x_2\mid\boldsymbol{\theta})) \cdots - \log(P(x_n\mid\boldsymbol{\theta})),
@@ -243,7 +243,7 @@ The question becomes, "Why is this OK?"  After all, the reason we introduced den
 
 Indeed, this is the case, and understanding why we can shift to densities is an exercise in tracing what happens to the epsilons.
 
-Let us first re-define our goal.  Suppose that for continuous random variables we no longer want to compute the probability of getting exactly the right value, but instead matching to within some range $\epsilon$.  For simplicity, we assume our data is repeated observations $x_1, \ldots, x_N$ of identically distributed random variables $X_1, \ldots, X_N$.  As we have seen previously, this can be written as
+Let's first re-define our goal.  Suppose that for continuous random variables we no longer want to compute the probability of getting exactly the right value, but instead matching to within some range $\epsilon$.  For simplicity, we assume our data is repeated observations $x_1, \ldots, x_N$ of identically distributed random variables $X_1, \ldots, X_N$.  As we have seen previously, this can be written as
 
 $$
 \begin{aligned}

@@ -3,12 +3,12 @@
 
 The universe is overflowing with information. Information provides a common language across disciplinary rifts: from Shakespeare's Sonnet to researchers' paper on Cornell ArXiv, from Van Gogh's printing Starry Night to Beethoven's music Symphony No. 5, from the first programming language Plankalkül to the state-of-the-art machine learning algorithms. Everything must follow the rules of information theory, no matter the format. With information theory, we can measure and compare how much information is present in different signals. In this section, we will investigate the fundamental concepts of information theory and applications of information theory in machine learning.
 
-Before we get started, let us outline the relationship between machine learning and information theory. Machine learning aims to extract interesting signals from data and make critical predictions.  On the other hand, information theory studies encoding, decoding, transmitting, and manipulating information. As a result, information theory provides fundamental language for discussing the information processing in machine learned systems. For example, many machine learning applications use the cross entropy loss as described in :numref:`sec_softmax`.  This loss can be directly derived from information theoretic considerations.
+Before we get started, let's outline the relationship between machine learning and information theory. Machine learning aims to extract interesting signals from data and make critical predictions.  On the other hand, information theory studies encoding, decoding, transmitting, and manipulating information. As a result, information theory provides fundamental language for discussing the information processing in machine learned systems. For example, many machine learning applications use the cross-entropy loss as described in :numref:`sec_softmax`.  This loss can be directly derived from information theoretic considerations.
 
 
 ## Information
 
-Let us start with the "soul" of information theory: information. *Information* can be encoded in anything with a particular sequence of one or more encoding formats. Suppose that we task ourselves with trying to define a notion of information.  What could be our starting point?
+Let's start with the "soul" of information theory: information. *Information* can be encoded in anything with a particular sequence of one or more encoding formats. Suppose that we task ourselves with trying to define a notion of information.  What could be our starting point?
 
 Consider the following thought experiment.  We have a friend with a deck of cards.  They will shuffle the deck, flip over some cards, and tell us statements about the cards.  We will try to assess the information content of each statement.
 
@@ -18,7 +18,7 @@ Next, they flip over a card and say, "I see a heart."  This provides us some inf
 
 Next, they flip over a card and say, "This is the $3$ of spades."  This is more information.  Indeed there were $52$ equally likely possible outcomes, and our friend told us which one it was.  This should be a medium amount of information.
 
-Let us take this to the logical extreme.  Suppose that finally they flip over every card from the deck and read off the entire sequence of the shuffled deck.  There are $52!$ different orders to the deck, again all equally likely, so we need a lot of information to know which one it is.
+Let's take this to the logical extreme.  Suppose that finally they flip over every card from the deck and read off the entire sequence of the shuffled deck.  There are $52!$ different orders to the deck, again all equally likely, so we need a lot of information to know which one it is.
 
 Any notion of information we develop must conform to this intuition.  Indeed, in the next sections we will learn how to compute that these events have $0\text{ bits}$, $2\text{ bits}$, $~5.7\text{ bits}$, and $~225.6\text{ bits}$ of information respectively.
 
@@ -31,7 +31,7 @@ In 1948, Claude E. Shannon published *A Mathematical Theory of Communication* :c
 
 Since information embodies the abstract possibility of an event, how do we map the possibility to the number of bits? Shannon introduced the terminology *bit* as the unit of information, which was originally created by John Tukey. So what is a "bit" and why do we use it to measure information? Historically, an antique transmitter can only send or receive two types of code: $0$ and $1$.  Indeed, binary encoding is still in common use on all modern digital computers. In this way, any information is encoded by a series of $0$ and $1$. And hence, a series of binary digits of length $n$ contains $n$ bits of information.
 
-Now, suppose that for any series of codes, each $0$ or $1$ occurs with a probability of $\frac{1}{2}$. Hence, an event $X$ with a series of codes of length $n$, occurs with a probability of $\frac{1}{2^n}$. At the same time, as we mentioned before, this series contains $n$ bits of information. So, can we generalize to a math function which can transfer the probability $p$ to the number of bits? Shannon gave the answer by defining *self-information*
+Now, suppose that for any series of codes, each $0$ or $1$ occurs with a probability of $\frac{1}{2}$. Hence, an event $X$ with a series of codes of length $n$, occurs with a probability of $\frac{1}{2^n}$. At the same time, as we mentioned before, this series contains $n$ bits of information. So, can we generalize to a mathematical function which can transfer the probability $p$ to the number of bits? Shannon gave the answer by defining *self-information*
 
 $$I(X) = - \log_2 (p),$$
 
@@ -39,7 +39,7 @@ as the *bits* of information we have received for this event $X$. Note that we w
 
 $$I(\text{"0010"}) = - \log (p(\text{"0010"})) = - \log \left( \frac{1}{2^4} \right) = 4 \text{ bits}.$$
 
-We can calculate self information as shown below. Before that, let us first import all the necessary packages in this section.
+We can calculate self information as shown below. Before that, let's first import all the necessary packages in this section.
 
 ```{.python .input}
 from mxnet import np
@@ -92,7 +92,7 @@ As self-information only measures the information of a single discrete event, we
 
 ### Motivating Entropy
 
-Let us try to get specific about what we want.  This will be an informal statement of what are known as the *axioms of Shannon entropy*.  It will turn out that the following collection of common-sense statements force us to a unique definition of information.  A formal version of these axioms, along with several others may be found in :cite:`Csiszar.2008`.
+Let's try to get specific about what we want.  This will be an informal statement of what are known as the *axioms of Shannon entropy*.  It will turn out that the following collection of common-sense statements force us to a unique definition of information.  A formal version of these axioms, along with several others may be found in :cite:`Csiszar.2008`.
 
 1.  The information we gain by observing a random variable does not depend on what we call the elements, or the presence of additional elements which have probability zero.
 2.  The information we gain by observing two random variables is no more than the sum of the information we gain by observing them separately.  If they are independent, then it is exactly the sum.
@@ -118,7 +118,7 @@ We can define entropy as below.
 ```{.python .input}
 def entropy(p):
     entropy = - p * np.log2(p)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(entropy.as_nd_ndarray())
     return out
 
@@ -129,7 +129,7 @@ entropy(np.array([0.1, 0.5, 0.1, 0.3]))
 #@tab pytorch
 def entropy(p):
     entropy = - p * torch.log2(p)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(entropy)
     return out
 
@@ -162,7 +162,7 @@ $$H(S) = \sum_i {p_i \cdot I(s_i)} = - \sum_i {p_i \cdot \log p_i}.$$
 
 By the above examples and interpretations, we can derive the following properties of entropy :eqref:`eq_ent_def`. Here, we refer to $X$ as an event and $P$ as the probability distribution of $X$.
 
-* Entropy is non-negative, i.e., $H(X) \geq 0, \forall X$.
+* $H(X) \geq 0$ for all discrete $X$ (entropy can be negative for continuous $X$).
 
 * If $X \sim P$ with a p.d.f. or a p.m.f. $p(x)$, and we try to estimate $P$ by a new probability distribution $Q$ with a p.d.f. or a p.m.f. $q(x)$, then $$H(X) = - E_{x \sim P} [\log p(x)] \leq  - E_{x \sim P} [\log q(x)], \text{ with equality if and only if } P = Q.$$  Alternatively, $H(X)$ gives a lower bound of the average number of bits needed to encode symbols drawn from $P$.
 
@@ -180,7 +180,7 @@ For the following discussion, we always use $(X, Y)$ as a pair of random variabl
 
 Similar to entropy of a single random variable :eqref:`eq_ent_def`, we define the *joint entropy* $H(X, Y)$ of a pair random variables $(X, Y)$ as
 
-$$H(X, Y) = −E_{(x, y) \sim P} [\log p_{X, Y}(x, y)]. $$
+$$H(X, Y) = -E_{(x, y) \sim P} [\log p_{X, Y}(x, y)]. $$
 :eqlabel:`eq_joint_ent_def`
 
 Precisely, on the one hand, if $(X, Y)$ is a pair of discrete random variables, then
@@ -197,12 +197,12 @@ $$
 H(X), H(Y) \le H(X, Y) \le H(X) + H(Y).
 $$
 
-Let us implement joint entropy from scratch.
+Let's implement joint entropy from scratch.
 
 ```{.python .input}
 def joint_entropy(p_xy):
     joint_ent = -p_xy * np.log2(p_xy)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(joint_ent.as_nd_ndarray())
     return out
 
@@ -213,7 +213,7 @@ joint_entropy(np.array([[0.1, 0.5], [0.1, 0.3]]))
 #@tab pytorch
 def joint_entropy(p_xy):
     joint_ent = -p_xy * torch.log2(p_xy)
-    # nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(joint_ent)
     return out
 
@@ -224,7 +224,7 @@ joint_entropy(torch.tensor([[0.1, 0.5], [0.1, 0.3]]))
 #@tab tensorflow
 def joint_entropy(p_xy):
     joint_ent = -p_xy * log2(p_xy)
-    # nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(joint_ent)
     return out
 
@@ -236,7 +236,7 @@ Notice that this is the same *code* as before, but now we interpret it different
 
 ### Conditional Entropy
 
-The joint entropy defined above the amount of information contained in a pair of random variables.  This is useful, but oftentimes it is not what we care about.  Consider the setting of machine learning.  Let us take $X$ to be the random variable (or vector of random variables) that describes the pixel values of an image, and $Y$ to be the random variable which is the class label.  $X$ should contain substantial information---a natural image is a complex thing.  However, the information contained in $Y$ once the image has been show should be low.  Indeed, the image of a digit should already contain the information about what digit it is unless the digit is illegible.  Thus, to continue to extend our vocabulary of information theory, we need to be able to reason about the information content in a random variable conditional on another.
+The joint entropy defined above the amount of information contained in a pair of random variables.  This is useful, but oftentimes it is not what we care about.  Consider the setting of machine learning.  Let's take $X$ to be the random variable (or vector of random variables) that describes the pixel values of an image, and $Y$ to be the random variable which is the class label.  $X$ should contain substantial information---a natural image is a complex thing.  However, the information contained in $Y$ once the image has been show should be low.  Indeed, the image of a digit should already contain the information about what digit it is unless the digit is illegible.  Thus, to continue to extend our vocabulary of information theory, we need to be able to reason about the information content in a random variable conditional on another.
 
 In the probability theory, we saw the definition of the *conditional probability* to measure the relationship between variables. We now want to analogously define the *conditional entropy* $H(Y \mid X)$.  We can write this as
 
@@ -258,13 +258,13 @@ $$H(Y \mid X) = H(X, Y) - H(X).$$
 
 This has an intuitive interpretation: the information in $Y$ given $X$ ($H(Y \mid X)$) is the same as the information in both $X$ and $Y$ together ($H(X, Y)$) minus the information already contained in $X$.  This gives us the information in $Y$ which is not also represented in $X$.
 
-Now, let us implement conditional entropy :eqref:`eq_cond_ent_def` from scratch.
+Now, let's implement conditional entropy :eqref:`eq_cond_ent_def` from scratch.
 
 ```{.python .input}
 def conditional_entropy(p_xy, p_x):
     p_y_given_x = p_xy/p_x
     cond_ent = -p_xy * np.log2(p_y_given_x)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(cond_ent.as_nd_ndarray())
     return out
 
@@ -276,7 +276,7 @@ conditional_entropy(np.array([[0.1, 0.5], [0.2, 0.3]]), np.array([0.2, 0.8]))
 def conditional_entropy(p_xy, p_x):
     p_y_given_x = p_xy/p_x
     cond_ent = -p_xy * torch.log2(p_y_given_x)
-    # nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(cond_ent)
     return out
 
@@ -289,7 +289,7 @@ conditional_entropy(torch.tensor([[0.1, 0.5], [0.2, 0.3]]),
 def conditional_entropy(p_xy, p_x):
     p_y_given_x = p_xy/p_x
     cond_ent = -p_xy * log2(p_y_given_x)
-    # nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(cond_ent)
     return out
 
@@ -301,10 +301,10 @@ conditional_entropy(tf.constant([[0.1, 0.5], [0.2, 0.3]]),
 
 Given the previous setting of random variables $(X, Y)$, you may wonder: "Now that we know how much information is contained in $Y$ but not in $X$, can we similarly ask how much information is shared between $X$ and $Y$?" The answer will be the *mutual information* of $(X, Y)$, which we will write as $I(X, Y)$.
 
-Rather than diving straight into the formal definition, let us practice our intuition by first trying to derive an expression for the mutual information entirely based on terms we have constructed before.  We wish to find the information shared between two random variables.  One way we could try to do this is to start with all the information contained in both $X$ and $Y$ together, and then we take off the parts that are not shared.  The information contained in both $X$ and $Y$ together is written as $H(X, Y)$.  We want to subtract from this the information contained in $X$ but not in $Y$, and the information contained in $Y$ but not in $X$.  As we saw in the previous section, this is given by $H(X \mid Y)$ and $H(Y \mid X)$ respectively.  Thus, we have that the mutual information should be
+Rather than diving straight into the formal definition, let's practice our intuition by first trying to derive an expression for the mutual information entirely based on terms we have constructed before.  We wish to find the information shared between two random variables.  One way we could try to do this is to start with all the information contained in both $X$ and $Y$ together, and then we take off the parts that are not shared.  The information contained in both $X$ and $Y$ together is written as $H(X, Y)$.  We want to subtract from this the information contained in $X$ but not in $Y$, and the information contained in $Y$ but not in $X$.  As we saw in the previous section, this is given by $H(X \mid Y)$ and $H(Y \mid X)$ respectively.  Thus, we have that the mutual information should be
 
 $$
-I(X, Y) = H(X, Y) - H(Y \mid X) − H(X \mid Y).
+I(X, Y) = H(X, Y) - H(Y \mid X) - H(X \mid Y).
 $$
 
 Indeed, this is a valid definition for the mutual information.  If we expand out the definitions of these terms and combine them, a little algebra shows that this is the same as
@@ -315,9 +315,9 @@ $$I(X, Y) = E_{x} E_{y} \left\{ p_{X, Y}(x, y) \log\frac{p_{X, Y}(x, y)}{p_X(x) 
 
 We can summarize all of these relationships in image :numref:`fig_mutual_information`.  It is an excellent test of intuition to see why the following statements are all also equivalent to $I(X, Y)$.
 
-* $H(X) − H(X \mid Y)$
-* $H(Y) − H(Y \mid X)$
-* $H(X) + H(Y) − H(X, Y)$
+* $H(X) - H(X \mid Y)$
+* $H(Y) - H(Y \mid X)$
+* $H(X) + H(Y) - H(X, Y)$
 
 ![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual-information.svg)
 :label:`fig_mutual_information`
@@ -325,13 +325,13 @@ We can summarize all of these relationships in image :numref:`fig_mutual_informa
 
 In many ways we can think of the mutual information :eqref:`eq_mut_ent_def` as principled extension of correlation coefficient we saw in :numref:`sec_random_variables`.  This allows us to ask not only for linear relationships between variables, but for the maximum information shared between the two random variables of any kind.
 
-Now, let us implement mutual information from scratch.
+Now, let's implement mutual information from scratch.
 
 ```{.python .input}
 def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
     mutual = p_xy * np.log2(p)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(mutual.as_nd_ndarray())
     return out
 
@@ -344,7 +344,7 @@ mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]),
 def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
     mutual = p_xy * torch.log2(p)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(mutual)
     return out
 
@@ -357,7 +357,7 @@ mutual_information(torch.tensor([[0.1, 0.5], [0.1, 0.3]]),
 def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
     mutual = p_xy * log2(p)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(mutual)
     return out
 
@@ -406,7 +406,7 @@ $$D_{\mathrm{KL}}(P\|Q) = E_{x \sim P} \left[ \log \frac{p(x)}{q(x)} \right].$$
 
 As with the pointwise mutual information :eqref:`eq_pmi_def`, we can again provide an interpretation of the logarithmic term:  $-\log \frac{q(x)}{p(x)} = -\log(q(x)) - (-\log(p(x)))$ will be large and positive if we see $x$ far more often under $P$ than we would expect for $Q$, and large and negative if we see the outcome far less than expected.  In this way, we can interpret it as our *relative* surprise at observing the outcome compared to how surprised we would be observing it from our reference distribution.
 
-Let us implement the KL divergence from Scratch.
+Let's implement the KL divergence from Scratch.
 
 ```{.python .input}
 def kl_divergence(p, q):
@@ -433,7 +433,7 @@ def kl_divergence(p, q):
 
 ### KL Divergence Properties
 
-Let us take a look at some properties of the KL divergence :eqref:`eq_kl_def`.
+Let's take a look at some properties of the KL divergence :eqref:`eq_kl_def`.
 
 * KL divergence is non-symmetric, i.e., there are $P,Q$ such that $$D_{\mathrm{KL}}(P\|Q) \neq D_{\mathrm{KL}}(Q\|P).$$
 * KL divergence is non-negative, i.e., $$D_{\mathrm{KL}}(P\|Q) \geq 0.$$ Note that the equality holds only when $P = Q$.
@@ -448,9 +448,9 @@ Let us take a look at some properties of the KL divergence :eqref:`eq_kl_def`.
 
 ### Example
 
-Let us go through a toy example to see the non-symmetry explicitly.
+Let's go through a toy example to see the non-symmetry explicitly.
 
-First, let us generate and sort three tensors of length $10,000$: an objective tensor $p$ which follows a normal distribution $N(0, 1)$, and two candidate tensors $q_1$ and $q_2$ which follow normal distributions $N(-1, 1)$ and $N(1, 1)$ respectively.
+First, let's generate and sort three tensors of length $10,000$: an objective tensor $p$ which follows a normal distribution $N(0, 1)$, and two candidate tensors $q_1$ and $q_2$ which follow normal distributions $N(-1, 1)$ and $N(1, 1)$ respectively.
 
 ```{.python .input}
 random.seed(1)
@@ -512,7 +512,7 @@ differ_percentage = abs(kl_q2p - kl_pq2) / ((kl_q2p + kl_pq2) / 2) * 100
 kl_q2p, differ_percentage
 ```
 
-## Cross Entropy
+## Cross-Entropy
 
 If you are curious about applications of information theory in deep learning, here is a quick example. We define the true distribution $P$ with probability distribution $p(x)$, and the estimated distribution $Q$ with probability distribution $q(x)$, and we will use them in the rest of this section.
 
@@ -526,14 +526,14 @@ l(\theta) &= \log L(\theta) \\
 \end{aligned}
 $$
 
-Maximizing the log-likelihood function $l(\theta)$ is identical to minimizing $- l(\theta)$, and hence we can find the best $\theta$ from here. To generalize the above loss to any distributions, we also called $-l(\theta)$ the *cross entropy loss* $\mathrm{CE}(y, \hat{y})$, where $y$ follows the true distribution $P$ and $\hat{y}$ follows the estimated distribution $Q$.
+Maximizing the log-likelihood function $l(\theta)$ is identical to minimizing $- l(\theta)$, and hence we can find the best $\theta$ from here. To generalize the above loss to any distributions, we also called $-l(\theta)$ the *cross-entropy loss* $\mathrm{CE}(y, \hat{y})$, where $y$ follows the true distribution $P$ and $\hat{y}$ follows the estimated distribution $Q$.
 
 This was all derived by working from the maximum likelihood point of view.  However, if we look closely we can see that terms like $\log(\pi_i)$ have entered into our computation which is a solid indication that we can understand the expression from an information theoretic point of view.
 
 
 ### Formal Definition
 
-Like KL divergence, for a random variable $X$, we can also measure the divergence between the estimating distribution $Q$ and the true distribution $P$ via *cross entropy*,
+Like KL divergence, for a random variable $X$, we can also measure the divergence between the estimating distribution $Q$ and the true distribution $P$ via *cross-entropy*,
 
 $$\mathrm{CE}(P, Q) = - E_{x \sim P} [\log(q(x))].$$
 :eqlabel:`eq_ce_def`
@@ -543,7 +543,7 @@ By using properties of entropy discussed above, we can also interpret it as the 
 $$\mathrm{CE} (P, Q) = H(P) + D_{\mathrm{KL}}(P\|Q).$$
 
 
-We can implement the cross entropy loss as below.
+We can implement the cross-entropy loss as below.
 
 ```{.python .input}
 def cross_entropy(y_hat, y):
@@ -561,11 +561,13 @@ def cross_entropy(y_hat, y):
 ```{.python .input}
 #@tab tensorflow
 def cross_entropy(y_hat, y):
-    ce = -tf.math.log(y_hat[:, :len(y)])
-    return tf.reduce_mean(ce)
+    # `tf.gather_nd` is used to select specific indices of a tensor.
+    ce = -tf.math.log(tf.gather_nd(y_hat, indices = [[i, j] for i, j in zip(
+        range(len(y_hat)), y)]))
+    return tf.reduce_mean(ce).numpy()
 ```
 
-Now define two tensors for the labels and predictions, and calculate the cross entropy loss of them.
+Now define two tensors for the labels and predictions, and calculate the cross-entropy loss of them.
 
 ```{.python .input}
 labels = np.array([0, 2])
@@ -592,19 +594,19 @@ cross_entropy(preds, labels)
 
 ### Properties
 
-As alluded in the beginning of this section, cross entropy :eqref:`eq_ce_def` can be used to define a loss function in the optimization problem. It turns out that the following are equivalent:
+As alluded in the beginning of this section, cross-entropy :eqref:`eq_ce_def` can be used to define a loss function in the optimization problem. It turns out that the following are equivalent:
 
 1. Maximizing predictive probability of $Q$ for distribution $P$, (i.e., $E_{x
 \sim P} [\log (q(x))]$);
-1. Minimizing cross entropy $\mathrm{CE} (P, Q)$;
+1. Minimizing cross-entropy $\mathrm{CE} (P, Q)$;
 1. Minimizing the KL divergence $D_{\mathrm{KL}}(P\|Q)$.
 
-The definition of cross entropy indirectly proves the equivalent relationship between objective 2 and objective 3, as long as the entropy of true data $H(P)$ is constant.
+The definition of cross-entropy indirectly proves the equivalent relationship between objective 2 and objective 3, as long as the entropy of true data $H(P)$ is constant.
 
 
-### Cross Entropy as An Objective Function of Multi-class Classification
+### Cross-Entropy as An Objective Function of Multi-class Classification
 
-If we dive deep into the classification objective function with cross entropy loss $\mathrm{CE}$, we will find minimizing $\mathrm{CE}$ is equivalent to maximizing the log-likelihood function $L$.
+If we dive deep into the classification objective function with cross-entropy loss $\mathrm{CE}$, we will find minimizing $\mathrm{CE}$ is equivalent to maximizing the log-likelihood function $L$.
 
 To begin with, suppose that we are given a dataset with $n$ examples, and it can be classified into $k$-classes. For each data example $i$, we represent any $k$-class label $\mathbf{y}_i = (y_{i1}, \ldots, y_{ik})$ by *one-hot encoding*. To be specific, if the  example $i$ belongs to class $j$, then we set the $j$-th entry to $1$, and all other components to $0$, i.e.,
 
@@ -615,14 +617,14 @@ For instance, if a multi-class classification problem contains three classes $A$
 
 Assume that our neural network is parameterized by $\theta$. For true label vectors $\mathbf{y}_i$ and predictions $$\hat{\mathbf{y}}_i= p_{\theta}(\mathbf{y}_i \mid \mathbf{x}_i) = \sum_{j=1}^k y_{ij} p_{\theta} (y_{ij}  \mid  \mathbf{x}_i).$$
 
-Hence, the *cross entropy loss* would be
+Hence, the *cross-entropy loss* would be
 
 $$
 \mathrm{CE}(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_{i=1}^n \mathbf{y}_i \log \hat{\mathbf{y}}_i
  = - \sum_{i=1}^n \sum_{j=1}^k y_{ij} \log{p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)}.\\
 $$
 
-On the other side, we can also approach the problem through maximum likelihood estimation. To begin with, let us quickly introduce a $k$-class multinoulli distribution. It is an extension of the Bernoulli distribution from binary class to multi-class. If a random variable $\mathbf{z} = (z_{1}, \ldots, z_{k})$ follows a $k$-class *multinoulli distribution* with probabilities $\mathbf{p} =$ ($p_{1}, \ldots, p_{k}$), i.e., $$p(\mathbf{z}) = p(z_1, \ldots, z_k) = \mathrm{Multi} (p_1, \ldots, p_k), \text{ where } \sum_{i=1}^k p_i = 1,$$ then the joint probability mass function(p.m.f.) of $\mathbf{z}$ is
+On the other side, we can also approach the problem through maximum likelihood estimation. To begin with, let's quickly introduce a $k$-class multinoulli distribution. It is an extension of the Bernoulli distribution from binary class to multi-class. If a random variable $\mathbf{z} = (z_{1}, \ldots, z_{k})$ follows a $k$-class *multinoulli distribution* with probabilities $\mathbf{p} =$ ($p_{1}, \ldots, p_{k}$), i.e., $$p(\mathbf{z}) = p(z_1, \ldots, z_k) = \mathrm{Multi} (p_1, \ldots, p_k), \text{ where } \sum_{i=1}^k p_i = 1,$$ then the joint probability mass function(p.m.f.) of $\mathbf{z}$ is
 $$\mathbf{p}^\mathbf{z} = \prod_{j=1}^k p_{j}^{z_{j}}.$$
 
 
@@ -642,7 +644,7 @@ $$
 Since in maximum likelihood estimation, we maximizing the objective function $l(\theta)$ by having $\pi_{j} = p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)$. Therefore, for any multi-class classification, maximizing the above log-likelihood function $l(\theta)$ is equivalent to minimizing the CE loss $\mathrm{CE}(y, \hat{y})$.
 
 
-To test the above proof, let us apply the built-in measure `NegativeLogLikelihood`. Using the same `labels` and `preds` as in the earlier example, we will get the same numerical loss as the previous example up to the 5 decimal place.
+To test the above proof, let's apply the built-in measure `NegativeLogLikelihood`. Using the same `labels` and `preds` as in the earlier example, we will get the same numerical loss as the previous example up to the 5 decimal place.
 
 ```{.python .input}
 nll_loss = NegativeLogLikelihood()
@@ -652,8 +654,8 @@ nll_loss.get()
 
 ```{.python .input}
 #@tab pytorch
-# Implementation of CrossEntropy loss in pytorch combines nn.LogSoftmax() and
-# nn.NLLLoss()
+# Implementation of cross-entropy loss in PyTorch combines `nn.LogSoftmax()`
+# and `nn.NLLLoss()`
 nll_loss = NLLLoss()
 loss = nll_loss(torch.log(preds), labels)
 loss
@@ -662,12 +664,14 @@ loss
 ```{.python .input}
 #@tab tensorflow
 def nll_loss(y_hat, y):
-    # Convert labels to binary class matrix.
-    y = tf.keras.utils.to_categorical(y, num_classes=3)
-    # Since tf.keras.losses.binary_crossentropy returns the mean
-    # over the last axis, we calculate the sum here.
-    return tf.reduce_sum(
-        tf.keras.losses.binary_crossentropy(y, y_hat, from_logits=True))
+    # Convert labels to one-hot vectors.
+    y = tf.keras.utils.to_categorical(y, num_classes= y_hat.shape[1])
+    # We will not calculate negative log-likelihood from the definition.
+    # Rather, we will follow a circular argument. Because NLL is same as
+    # `cross_entropy`, if we calculate cross_entropy that would give us NLL
+    cross_entropy = tf.keras.losses.CategoricalCrossentropy(
+        from_logits = True, reduction = tf.keras.losses.Reduction.NONE)
+    return tf.reduce_mean(cross_entropy(y, y_hat)).numpy()
 
 loss = nll_loss(tf.math.log(preds), labels)
 loss
@@ -678,20 +682,19 @@ loss
 * Information theory is a field of study about encoding, decoding, transmitting, and manipulating information.
 * Entropy is the unit to measure how much information is presented in different signals.
 * KL divergence can also measure the divergence between two distributions.
-* Cross Entropy can be viewed as an objective function of multi-class classification. Minimizing cross entropy loss is equivalent to maximizing the log-likelihood function.
+* Cross-entropy can be viewed as an objective function of multi-class classification. Minimizing cross-entropy loss is equivalent to maximizing the log-likelihood function.
 
 
 ## Exercises
 
 1. Verify that the card examples from the first section indeed have the claimed entropy.
 1. Show that the KL divergence $D(p\|q)$ is nonnegative for all distributions $p$ and $q$. Hint: use Jensen's inequality, i.e., use the fact that $-\log x$ is a convex function.
-1. Let us compute the entropy from a few data sources:
+1. Let's compute the entropy from a few data sources:
     * Assume that you are watching the output generated by a monkey at a typewriter. The monkey presses any of the $44$ keys of the typewriter at random (you can assume that it has not discovered any special keys or the shift key yet). How many bits of randomness per character do you observe?
-    * Being unhappy with the monkey, you replaced it by a drunk typesetter. It is able to generate words, albeit not coherently. Instead, it picks a random word out of a vocabulary of $2,000$ words. Let us assume that the average length of a word is $4.5$ letters in English. How many bits of randomness per character do you observe now?
+    * Being unhappy with the monkey, you replaced it by a drunk typesetter. It is able to generate words, albeit not coherently. Instead, it picks a random word out of a vocabulary of $2,000$ words. Let's assume that the average length of a word is $4.5$ letters in English. How many bits of randomness per character do you observe now?
     * Still being unhappy with the result, you replace the typesetter by a high quality language model. The language model can currently obtain a perplexity as low as $15$ points per word. The character *perplexity* of a language model is defined as the inverse of the geometric mean of a set of probabilities, each probability is corresponding to a character in the word. To be specific, if the length of a given word is $l$, then  $\mathrm{PPL}(\text{word}) = \left[\prod_i p(\text{character}_i)\right]^{ -\frac{1}{l}} = \exp \left[ - \frac{1}{l} \sum_i{\log p(\text{character}_i)} \right].$  Assume that the test word has 4.5 letters, how many bits of randomness per character do you observe now?
 1. Explain intuitively why $I(X, Y) = H(X) - H(X|Y)$.  Then, show this is true by expressing both sides as an expectation with respect to the joint distribution.
 1. What is the KL Divergence between the two Gaussian distributions $\mathcal{N}(\mu_1, \sigma_1^2)$ and $\mathcal{N}(\mu_2, \sigma_2^2)$?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/420)

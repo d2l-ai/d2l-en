@@ -47,6 +47,7 @@ stage("Build and Publish") {
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
       ./static/cache.sh restore _build/eval_tensorflow/data
       export TF_CPP_MIN_LOG_LEVEL=3
+      export TF_FORCE_GPU_ALLOW_GROWTH=true
       d2lbook build eval --tab tensorflow
       ./static/cache.sh store _build/eval_tensorflow/data
       """
@@ -69,16 +70,31 @@ stage("Build and Publish") {
       d2lbook build pdf
       """
 
-      sh label:"Build Package", script:"""set -ex
+      sh label:"Build Pytorch PDF", script:"""set -ex
       conda activate ${ENV_NAME}
-      d2lbook build pkg
+      d2lbook build pdf --tab pytorch
       """
+      
+      if (env.BRANCH_NAME == 'release') {
+        sh label:"Release", script:"""set -ex
+        conda activate ${ENV_NAME}
+        d2lbook build pkg
+        d2lbook deploy html pdf pkg colab sagemaker slides --s3 s3://${LANG}.d2l.ai/
+        """
 
-      if (env.BRANCH_NAME == 'jax') {
+        sh label:"Release d2l", script:"""set -ex
+        conda activate ${ENV_NAME}
+        pip install setuptools wheel twine
+        python setup.py bdist_wheel
+        """
+      } else {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
-        d2lbook deploy html pdf pkg --s3 s3://preview.d2l.ai/${JOB_NAME}/
-      """
+        d2lbook deploy html pdf --s3 s3://preview.d2l.ai/${JOB_NAME}/
+        """
+        if (env.BRANCH_NAME.startsWith("PR-")) {
+            pullRequest.comment("Job ${JOB_NAME}/${BUILD_NUMBER} is complete. \nCheck the results at http://preview.d2l.ai/${JOB_NAME}/")
+        }
       }
     }
   }

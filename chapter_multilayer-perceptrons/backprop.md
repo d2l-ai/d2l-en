@@ -31,7 +31,7 @@ techniques and their implementations,
 we rely on some basic mathematics and computational graphs.
 To start, we focus our exposition on
 a one-hidden-layer MLP
-with weight decay ($L_2$ regularization).
+with weight decay ($\ell_2$ regularization, to be described in subsequent chapters).
 
 ## Forward Propagation
 
@@ -46,7 +46,7 @@ of funk virtuoso James Brown,
 you must "pay the cost to be the boss".
 
 
-For the sake of simplicity, let us assume
+For the sake of simplicity, let's assume
 that the input example is $\mathbf{x}\in \mathbb{R}^d$
 and that our hidden layer does not include a bias term.
 Here the intermediate variable is:
@@ -62,7 +62,7 @@ we obtain our hidden activation vector of length $h$,
 
 $$\mathbf{h}= \phi (\mathbf{z}).$$
 
-The hidden variable $\mathbf{h}$
+The hidden layer output $\mathbf{h}$
 is also an intermediate variable.
 Assuming that the parameters of the output layer
 only possess a weight of
@@ -79,7 +79,8 @@ for a single data example,
 
 $$L = l(\mathbf{o}, y).$$
 
-According to the definition of $L_2$ regularization,
+According to the definition of $\ell_2$ regularization
+that we will introduce later,
 given the hyperparameter $\lambda$,
 the regularization term is
 
@@ -87,7 +88,7 @@ $$s = \frac{\lambda}{2} \left(\|\mathbf{W}^{(1)}\|_F^2 + \|\mathbf{W}^{(2)}\|_F^
 :eqlabel:`eq_forward-s`
 
 where the Frobenius norm of the matrix
-is simply the $L_2$ norm applied
+is simply the $\ell_2$ norm applied
 after flattening the matrix into a vector.
 Finally, the model's regularized loss
 on a given data example is:
@@ -200,7 +201,7 @@ $$\frac{\partial J}{\partial \mathbf{W}^{(2)}}= \text{prod}\left(\frac{\partial 
 To obtain the gradient with respect to $\mathbf{W}^{(1)}$
 we need to continue backpropagation
 along the output layer to the hidden layer.
-The gradient with respect to the hidden layer's outputs
+The gradient with respect to the hidden layer output
 $\partial J/\partial \mathbf{h} \in \mathbb{R}^h$ is given by
 
 
@@ -246,7 +247,7 @@ These are then used for backpropagation
 where the compute order on the graph is reversed.
 
 Take the aforementioned simple network as an example to illustrate.
-On one hand,
+On the one hand,
 computing the regularization term :eqref:`eq_forward-s`
 during forward propagation
 depends on the current values of model parameters $\mathbf{W}^{(1)}$ and $\mathbf{W}^{(2)}$.
@@ -254,7 +255,7 @@ They are given by the optimization algorithm according to backpropagation in the
 On the other hand,
 the gradient calculation for the parameter
 :eqref:`eq_backprop-J-h` during backpropagation
-depends on the current value of the hidden variable $\mathbf{h}$,
+depends on the current value of the hidden layer output $\mathbf{h}$,
 which is given by forward propagation.
 
 

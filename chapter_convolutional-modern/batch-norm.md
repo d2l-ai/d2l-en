@@ -1,30 +1,37 @@
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Batch Normalization
 :label:`sec_batch_norm`
 
 Training deep neural networks is difficult.
-And getting them to converge in a reasonable amount of time can be tricky.
+Getting them to converge in a reasonable amount of time can be tricky.
 In this section, we describe *batch normalization*, a popular and effective technique
 that consistently accelerates the convergence of deep networks :cite:`Ioffe.Szegedy.2015`.
 Together with residual blocks---covered later in :numref:`sec_resnet`---batch normalization
-has made it possible for practitioners
-to routinely train networks with over 100 layers.
-
-
+has made it possible for practitioners to routinely train networks with over 100 layers.
+A secondary (serendipitous) benefit of Batch Normalization is its inherent regularization. 
 
 ## Training Deep Networks
 
-To motivate batch normalization, let us review
-a few practical challenges that arise
-when training machine learning models and neural networks in particular.
-
-First, choices regarding data preprocessing often make an enormous difference in the final results.
+When working with data, we often preprocess before training. 
+Choices regarding data preprocessing often make an enormous difference in the final results.
 Recall our application of MLPs to predicting house prices (:numref:`sec_kaggle_house`).
 Our first step when working with real data
-was to standardize our input features
-to each have a mean of zero and variance of one.
+was to standardize our input features to have 
+zero mean $\mathbf{\mu} = 0$ and unit variance $\mathbf{\Sigma} = \mathbf{1}$ across multiple observations :cite:`friedman1987exploratory`.
+At a mimimum, one frequently rescales it such that the diagonal is unity, i.e., $\Sigma_{ii} = 1$. 
+Yet another strategy is to rescale vectors to unit length, possibly zero mean *per observation*. 
+This can work well e.g., for spatial sensor data. These preprocessing techniques and many more are 
+beneficial to keep the estimation problem well controlled. See e.g., the articles in :cite:`guyon2008feature` for a review of feature selection and extraction techniques.
+
 Intuitively, this standardization plays nicely with our optimizers
-because it puts the parameters *a priori* at a similar scale.
-   
+since it puts the parameters *a priori* at a similar scale.
+As such, it is only natural to ask whether a corresponding normalization step *inside* a deep network
+might not be beneficial. While this isn't quite the reasoning that led to the invention of Batch Normalization :cite:`Ioffe.Szegedy.2015`, it is a useful way of understanding it and its cousin, Layer Normalization :cite:`Ba.Kiros.Hinton.2016` within a unified framework. 
+
 Second, for a typical MLP or CNN, as we train,
 the variables (e.g., affine transformation outputs in MLP)
 in intermediate layers 
@@ -34,34 +41,38 @@ and over time due to our updates to the model parameters.
 The inventors of batch normalization postulated informally
 that this drift in the distribution of such variables could hamper the convergence of the network.
 Intuitively, we might conjecture that if one
-layer has variable values that are 100 times that of another layer,
-this might necessitate compensatory adjustments in the learning rates.
+layer has variable activations that are 100 times that of another layer,
+this might necessitate compensatory adjustments in the learning rates. Adaptive solvers 
+such as AdaGrad :cite:`Duchi.Hazan.Singer.2011`, Adam :cite:`Kingma.Ba.2014` or Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018` aim to address this from the viewpoint of optimization. 
+The alternative is to prevent the problem from occurring, simply by adaptive normalization.
    
-Third, deeper networks are complex and easily capable of overfitting.
-This means that regularization becomes more critical.
+Third, deeper networks are complex and tend to be more easily capable of overfitting.
+This means that regularization becomes more critical. A common technique for regularization is noise 
+injection. This has been known for a long time, e.g., with regard to noise injection for the 
+inputs :cite:`Bishop.1995`. It also forms the basis of dropout :numref:`sec_dropout`. As it turns out, quite serendipitously, batch normalization conveys all three benefits: preprocessing, numerical stability and regularization. 
 
-Batch normalization is applied to individual layers
-(optionally, to all of them) and works as follows:
+Batch normalization is applied to individual layers, or optionally, to all of them:
 In each training iteration,
 we first normalize the inputs (of batch normalization)
 by subtracting their mean and
 dividing by their standard deviation,
 where both are estimated based on the statistics of the current minibatch.
-Next, we apply a scale coefficient and a scale offset.
-It is precisely due to this *normalization* based on *batch* statistics
+Next, we apply a scale coefficient and an offset to recover the lost degrees 
+of freedom. It is precisely due to this *normalization* based on *batch* statistics
 that *batch normalization* derives its name.
 
 Note that if we tried to apply batch normalization with minibatches of size 1,
 we would not be able to learn anything.
 That is because after subtracting the means,
-each hidden unit would take value 0!
+each hidden unit would take value 0.
 As you might guess, since we are devoting a whole section to batch normalization,
 with large enough minibatches, the approach proves effective and stable.
 One takeaway here is that when applying batch normalization,
-the choice of batch size may be
-even more significant than without batch normalization.
+the choice of batch size is
+even more significant than without batch normalization, or at least, 
+suitable calibration is needed as we might adjust it.
 
-Formally, denoting by $\mathbf{x} \in \mathcal{B}$ an input to batch normalization ($\mathrm{BN}$)
+Formally, denote by $\mathbf{x} \in \mathcal{B}$ an input to batch normalization ($\mathrm{BN}$)
 that is from a minibatch $\mathcal{B}$,
 batch normalization transforms $\mathbf{x}$
 according to the following expression:
@@ -74,33 +85,30 @@ $\hat{\boldsymbol{\mu}}_\mathcal{B}$ is the  sample mean
 and $\hat{\boldsymbol{\sigma}}_\mathcal{B}$ is the sample standard deviation of the minibatch $\mathcal{B}$.
 After applying standardization,
 the resulting minibatch
-has zero mean and unit variance.
-Because the choice of unit variance
-(vs. some other magic number) is an arbitrary choice,
-we commonly include elementwise
+has zero mean and unit variance. 
+The choice of unit variance
+(vs. some other magic number) is an arbitrary choice. We recover this degree of freedom
+by including an elementwise
 *scale parameter* $\boldsymbol{\gamma}$ and *shift parameter* $\boldsymbol{\beta}$
-that have the same shape as $\mathbf{x}$.
-Note that $\boldsymbol{\gamma}$ and $\boldsymbol{\beta}$ are
- parameters that need to be learned jointly with the other model parameters.
+that have the same shape as $\mathbf{x}$. Both are parameters that 
+need to be learned as part of model training.
 
 Consequently, the variable magnitudes
 for intermediate layers cannot diverge during training
 because batch normalization actively centers and rescales them back
 to a given mean and size (via $\hat{\boldsymbol{\mu}}_\mathcal{B}$ and ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$).
-One piece of practitioner's intuition or wisdom
-is that batch normalization seems to allow for more aggressive learning rates.
-
-
+Practical experience confirms that, as alluded when discussing feature rescaling, batch normalization seems to allow for more aggressive learning rates.
 Formally, 
 we calculate $\hat{\boldsymbol{\mu}}_\mathcal{B}$ and ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$ in :eqref:`eq_batchnorm` as follows:
 
-$$\begin{aligned} \hat{\boldsymbol{\mu}}_\mathcal{B} &= \frac{1}{|\mathcal{B}|} \sum_{\mathbf{x} \in \mathcal{B}} \mathbf{x},\\
-\hat{\boldsymbol{\sigma}}_\mathcal{B}^2 &= \frac{1}{|\mathcal{B}|} \sum_{\mathbf{x} \in \mathcal{B}} (\mathbf{x} - \hat{\boldsymbol{\mu}}_{\mathcal{B}})^2 + \epsilon.\end{aligned}$$
+$$\hat{\boldsymbol{\mu}}_\mathcal{B} = \frac{1}{|\mathcal{B}|} \sum_{\mathbf{x} \in \mathcal{B}} \mathbf{x}
+\text{ and }
+\hat{\boldsymbol{\sigma}}_\mathcal{B}^2 = \frac{1}{|\mathcal{B}|} \sum_{\mathbf{x} \in \mathcal{B}} (\mathbf{x} - \hat{\boldsymbol{\mu}}_{\mathcal{B}})^2 + \epsilon.$$
 
 Note that we add a small constant $\epsilon > 0$
 to the variance estimate
 to ensure that we never attempt division by zero,
-even in cases where the empirical variance estimate might vanish.
+even in cases where the empirical variance estimate might be very small or even vanish, leading to a division by zero.
 The estimates $\hat{\boldsymbol{\mu}}_\mathcal{B}$ and ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$ counteract the scaling issue
 by using noisy estimates of mean and variance.
 You might think that this noisiness should be a problem.
@@ -111,11 +119,14 @@ For reasons that are not yet well-characterized theoretically,
 various sources of noise in optimization
 often lead to faster training and less overfitting:
 this variation appears to act as a form of regularization.
-In some preliminary research,
 :cite:`Teye.Azizpour.Smith.2018` and :cite:`Luo.Wang.Shao.ea.2018`
 relate the properties of batch normalization to Bayesian priors and penalties respectively.
 In particular, this sheds some light on the puzzle
-of why batch normalization works best for moderate minibatches sizes in the $50 \sim 100$ range.
+of why batch normalization works best for moderate minibatches sizes in the $50 \sim 100$ range. 
+This particular size of minibatch seems to inject just the 'right amount' of noise per layer: a 
+larger minibatch regularizes less due to the more stable estimates, whereas tiny minibatches 
+destroy useful signal due to high variance. Exploring this direction further, considering alternative types 
+of preprocessing and filtering may yet lead to other effective types of regularization. 
 
 Fixing a trained model, you might think
 that we would prefer using the entire dataset
@@ -134,32 +145,33 @@ Indeed this is standard practice for
 models employing batch normalization
 and thus batch normalization layers function differently
 in *training mode* (normalizing by minibatch statistics)
-and in *prediction mode* (normalizing by dataset statistics).
-
-We are now ready to take a look at how batch normalization works in practice.
+and in *prediction mode* (normalizing by dataset statistics). 
+In this form they closely resemble the behavior of dropout regularization of :numref:`sec_dropout` 
+where noise is only injected during training. 
 
 
 ## Batch Normalization Layers
 
-Batch normalization implementations for fully-connected layers
+We are now ready to take a look at how batch normalization works in practice.
+Batch normalization implementations for fully connected layers
 and convolutional layers are slightly different.
-We discuss both cases below.
-Recall that one key differences between batch normalization and other layers
-is that because batch normalization operates on a full minibatch at a time,
+One key differences between batch normalization and other layers
+is that because batch normalization operates on a full minibatch at a time. As such,
 we cannot just ignore the batch dimension
 as we did before when introducing other layers.
 
-### Fully-Connected Layers
+### Fully Connected Layers
 
-When applying batch normalization to fully-connected layers,
-the original paper inserts batch normalization after the affine transformation
-and before the nonlinear activation function (later applications may insert batch normalization right after activation functions) :cite:`Ioffe.Szegedy.2015`.
-Denoting the input to the fully-connected layer by $\mathbf{x}$,
+When applying batch normalization to fully connected layers,
+the original paper inserted batch normalization after the affine transformation
+and before the nonlinear activation function. Later applications experimented with 
+inserting batch normalization right after activation functions :cite:`Ioffe.Szegedy.2015`.
+Denoting the input to the fully connected layer by $\mathbf{x}$,
 the affine transformation
 by $\mathbf{W}\mathbf{x} + \mathbf{b}$ (with the weight parameter $\mathbf{W}$ and the bias parameter $\mathbf{b}$),
 and the activation function by $\phi$,
 we can express the computation of a batch-normalization-enabled,
-fully-connected layer output $\mathbf{h}$ as follows:
+fully connected layer output $\mathbf{h}$ as follows:
 
 $$\mathbf{h} = \phi(\mathrm{BN}(\mathbf{W}\mathbf{x} + \mathbf{b}) ).$$
 
@@ -171,12 +183,12 @@ on which the transformation is applied.
 
 Similarly, with convolutional layers,
 we can apply batch normalization after the convolution
-and before the nonlinear activation function.
-When the convolution has multiple output channels,
-we need to carry out batch normalization
-for *each* of the outputs of these channels,
-and each channel has its own scale and shift parameters,
-both of which are scalars.
+and before the nonlinear activation function. The key difference to batch norms 
+in fully-connected layers is that we apply the operation on a per-channel basis 
+*across all locations*. This is compatible with our assumption of translation 
+invariance that led to convolutions: we assumed that the specific location of a pattern 
+within an image was not critical for the purpose of understanding.
+
 Assume that our minibatches contain $m$ examples
 and that for each channel,
 the output of the convolution has height $p$ and width $q$.
@@ -188,7 +200,16 @@ and consequently
 apply the same mean and variance
 within a given channel
 to normalize the value at each spatial location.
+Each channel has its own scale and shift parameters,
+both of which are scalars.
 
+Note that in the context of convolutions the batch norm is well-defined even for 
+minibatches of size 1: after all, we have all the locations across an image to average. Consequently, 
+mean and variance are well defined, even if it's just within a single observation. This consideration 
+led :cite:`Ba.Kiros.Hinton.2016` to introduce the notion of the *Layer Norm*. It works just like 
+a batch norm, just that it is applied one image at a time. There are cases where layer norms improve the 
+accuracy of a model. We skip further details and recommend the interested reader to consult the 
+original paper. 
 
 ### Batch Normalization During Prediction
 
@@ -208,11 +229,12 @@ and then fix them at prediction time.
 Consequently, batch normalization behaves differently during training and at test time.
 Recall that dropout also exhibits this characteristic.
 
-## Implementation from Scratch
+## (**Implementation from Scratch**)
 
-Below, we implement a batch normalization layer with tensors from scratch.
+To see how batch norms work in practice, we implement one from scratch below.
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, init
 from mxnet.gluon import nn
@@ -228,7 +250,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     else:
         assert len(X.shape) in (2, 4)
         if len(X.shape) == 2:
-            # When using a fully-connected layer, calculate the mean and
+            # When using a fully connected layer, calculate the mean and
             # variance on the feature dimension
             mean = X.mean(axis=0)
             var = ((X - mean) ** 2).mean(axis=0)
@@ -250,7 +272,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
@@ -265,7 +287,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     else:
         assert len(X.shape) in (2, 4)
         if len(X.shape) == 2:
-            # When using a fully-connected layer, calculate the mean and
+            # When using a fully connected layer, calculate the mean and
             # variance on the feature dimension
             mean = X.mean(dim=0)
             var = ((X - mean) ** 2).mean(dim=0)
@@ -287,7 +309,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 
@@ -300,7 +322,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps):
     return Y
 ```
 
-We can now create a proper `BatchNorm` layer.
+We can now [**create a proper `BatchNorm` layer.**]
 Our layer will maintain proper parameters
 for scale `gamma` and shift `beta`,
 both of which will be updated in the course of training.
@@ -320,13 +342,15 @@ This pattern enables a clean separation of mathematics from boilerplate code.
 Also note that for the sake of convenience
 we did not worry about automatically inferring the input shape here,
 thus we need to specify the number of features throughout.
-Do not worry, the high-level batch normalization APIs in the deep learning framework will care of this for us and we will demonstrate that later.
+By now all modern deep learning frameworks offer automatic detection of size and shape in the 
+high-level batch normalization APIs (in practice we will use this instead).
 
 ```{.python .input}
+%%tab mxnet
 class BatchNorm(nn.Block):
-    # `num_features`: the number of outputs for a fully-connected layer
+    # `num_features`: the number of outputs for a fully connected layer
     # or the number of output channels for a convolutional layer. `num_dims`:
-    # 2 for a fully-connected layer and 4 for a convolutional layer
+    # 2 for a fully connected layer and 4 for a convolutional layer
     def __init__(self, num_features, num_dims, **kwargs):
         super().__init__(**kwargs)
         if num_dims == 2:
@@ -355,11 +379,11 @@ class BatchNorm(nn.Block):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 class BatchNorm(nn.Module):
-    # `num_features`: the number of outputs for a fully-connected layer
+    # `num_features`: the number of outputs for a fully connected layer
     # or the number of output channels for a convolutional layer. `num_dims`:
-    # 2 for a fully-connected layer and 4 for a convolutional layer
+    # 2 for a fully connected layer and 4 for a convolutional layer
     def __init__(self, num_features, num_dims):
         super().__init__()
         if num_dims == 2:
@@ -388,7 +412,7 @@ class BatchNorm(nn.Module):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 class BatchNorm(tf.keras.layers.Layer):
     def __init__(self, **kwargs):
         super(BatchNorm, self).__init__(**kwargs)
@@ -438,24 +462,27 @@ class BatchNorm(tf.keras.layers.Layer):
         return output
 ```
 
-## Applying Batch Normalization in LeNet
+Note that we used the variable `momentum` to govern the aggregation over past mean and variance estimates. This is somewhat of a misnomer as it has nothing whatsoever to do with the *momentum* term of optimization in :numref:`sec_momentum`. Nonetheless, it is the commonly adopted name for this term and in deference to API naming convention we use the same variable name in our code, too.
+
+## [**Applying Batch Normalization in LeNet**]
 
 To see how to apply `BatchNorm` in context,
 below we apply it to a traditional LeNet model (:numref:`sec_lenet`).
 Recall that batch normalization is applied
-after the convolutional layers or fully-connected layers
+after the convolutional layers or fully connected layers
 but before the corresponding activation functions.
 
 ```{.python .input}
+%%tab mxnet
 net = nn.Sequential()
 net.add(nn.Conv2D(6, kernel_size=5),
         BatchNorm(6, num_dims=4),
         nn.Activation('sigmoid'),
-        nn.MaxPool2D(pool_size=2, strides=2),
+        nn.AvgPool2D(pool_size=2, strides=2),
         nn.Conv2D(16, kernel_size=5),
         BatchNorm(16, num_dims=4),
         nn.Activation('sigmoid'),
-        nn.MaxPool2D(pool_size=2, strides=2),
+        nn.AvgPool2D(pool_size=2, strides=2),
         nn.Dense(120),
         BatchNorm(120, num_dims=2),
         nn.Activation('sigmoid'),
@@ -466,19 +493,19 @@ net.add(nn.Conv2D(6, kernel_size=5),
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 net = nn.Sequential(
     nn.Conv2d(1, 6, kernel_size=5), BatchNorm(6, num_dims=4), nn.Sigmoid(),
-    nn.MaxPool2d(kernel_size=2, stride=2),
+    nn.AvgPool2d(kernel_size=2, stride=2),
     nn.Conv2d(6, 16, kernel_size=5), BatchNorm(16, num_dims=4), nn.Sigmoid(),
-    nn.MaxPool2d(kernel_size=2, stride=2), nn.Flatten(),
+    nn.AvgPool2d(kernel_size=2, stride=2), nn.Flatten(),
     nn.Linear(16*4*4, 120), BatchNorm(120, num_dims=2), nn.Sigmoid(),
     nn.Linear(120, 84), BatchNorm(84, num_dims=2), nn.Sigmoid(),
     nn.Linear(84, 10))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 # Recall that this has to be a function that will be passed to `d2l.train_ch6`
 # so that model building or compiling need to be within `strategy.scope()` in
 # order to utilize the CPU/GPU devices that we have
@@ -488,11 +515,11 @@ def net():
                                input_shape=(28, 28, 1)),
         BatchNorm(),
         tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
         tf.keras.layers.Conv2D(filters=16, kernel_size=5),
         BatchNorm(),
         tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(120),
         BatchNorm(),
@@ -504,94 +531,88 @@ def net():
     )
 ```
 
-As before, we will train our network on the Fashion-MNIST dataset.
+As before, we will [**train our network on the Fashion-MNIST dataset**].
 This code is virtually identical to that when we first trained LeNet (:numref:`sec_lenet`).
-The main difference is the considerably larger learning rate.
+The main difference is the larger learning rate.
 
 ```{.python .input}
-#@tab mxnet, pytorch
-lr, num_epochs, batch_size = 1.0, 10, 256
+%%tab mxnet, pytorch
+lr, num_epochs, batch_size = 0.5, 20, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 ```
 
 ```{.python .input}
-#@tab tensorflow
-lr, num_epochs, batch_size = 1.0, 10, 256
+%%tab tensorflow
+lr, num_epochs, batch_size = 0.5, 20, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 ```
 
-Let us have a look at the scale parameter `gamma`
-and the shift parameter `beta` learned
+Let's [**have a look at the scale parameter `gamma`
+and the shift parameter `beta`**] learned
 from the first batch normalization layer.
 
 ```{.python .input}
+%%tab mxnet
 net[1].gamma.data().reshape(-1,), net[1].beta.data().reshape(-1,)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 net[1].gamma.reshape((-1,)), net[1].beta.reshape((-1,))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.reshape(net.layers[1].gamma, (-1,)), tf.reshape(net.layers[1].beta, (-1,))
 ```
 
-## Concise Implementation
+## [**Concise Implementation**]
 
 Compared with the `BatchNorm` class,
 which we just defined ourselves,
 we can use the `BatchNorm` class defined in high-level APIs from the deep learning framework directly.
 The code looks virtually identical
-to the application our implementation above.
+to our implementation above, except that we no longer need to provide additional parameters for it to get the dimensions right.
 
 ```{.python .input}
+%%tab mxnet
 net = nn.Sequential()
-net.add(nn.Conv2D(6, kernel_size=5),
-        nn.BatchNorm(),
-        nn.Activation('sigmoid'),
-        nn.MaxPool2D(pool_size=2, strides=2),
-        nn.Conv2D(16, kernel_size=5),
-        nn.BatchNorm(),
-        nn.Activation('sigmoid'),
-        nn.MaxPool2D(pool_size=2, strides=2),
-        nn.Dense(120),
-        nn.BatchNorm(),
-        nn.Activation('sigmoid'),
-        nn.Dense(84),
-        nn.BatchNorm(),
-        nn.Activation('sigmoid'),
+net.add(nn.Conv2D(6, kernel_size=5), nn.BatchNorm(), nn.Activation('sigmoid'),
+        nn.AvgPool2D(pool_size=2, strides=2),
+        nn.Conv2D(16, kernel_size=5), nn.BatchNorm(), nn.Activation('sigmoid'),
+        nn.AvgPool2D(pool_size=2, strides=2),
+        nn.Dense(120), nn.BatchNorm(), nn.Activation('sigmoid'),
+        nn.Dense(84), nn.BatchNorm(), nn.Activation('sigmoid'),
         nn.Dense(10))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 net = nn.Sequential(
     nn.Conv2d(1, 6, kernel_size=5), nn.BatchNorm2d(6), nn.Sigmoid(),
-    nn.MaxPool2d(kernel_size=2, stride=2),
+    nn.AvgPool2d(kernel_size=2, stride=2),
     nn.Conv2d(6, 16, kernel_size=5), nn.BatchNorm2d(16), nn.Sigmoid(),
-    nn.MaxPool2d(kernel_size=2, stride=2), nn.Flatten(),
+    nn.AvgPool2d(kernel_size=2, stride=2), nn.Flatten(),
     nn.Linear(256, 120), nn.BatchNorm1d(120), nn.Sigmoid(),
     nn.Linear(120, 84), nn.BatchNorm1d(84), nn.Sigmoid(),
     nn.Linear(84, 10))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 def net():
     return tf.keras.models.Sequential([
         tf.keras.layers.Conv2D(filters=6, kernel_size=5,
                                input_shape=(28, 28, 1)),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
         tf.keras.layers.Conv2D(filters=16, kernel_size=5),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(120),
         tf.keras.layers.BatchNormalization(),
@@ -603,20 +624,20 @@ def net():
     ])
 ```
 
-Below, we use the same hyperparameters to train our model.
+Below, we [**use the same hyperparameters to train our model.**]
 Note that as usual, the high-level API variant runs much faster
 because its code has been compiled to C++ or CUDA
 while our custom implementation must be interpreted by Python.
 
 ```{.python .input}
-#@tab all
+%%tab all
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 ```
 
-## Controversy
+## Discussion
 
 Intuitively, batch normalization is thought
-to make the optimization landscape smoother.
+to make the optimization landscape smoother. 
 However, we must be careful to distinguish between
 speculative intuitions and true explanations
 for the phenomena that we observe when training deep models.
@@ -625,7 +646,7 @@ deep neural networks (MLPs and conventional CNNs)
 generalize well in the first place.
 Even with dropout and weight decay,
 they remain so flexible that their ability to generalize to unseen data
-cannot be explained via conventional learning-theoretic generalization guarantees.
+likely needs significantly more refined learning-theoretic generalization guarantees.
 
 In the original paper proposing batch normalization,
 the authors, in addition to introducing a powerful and useful tool,
@@ -677,27 +698,38 @@ owes to its broad recognizability to the target audience.
 Batch normalization has proven an indispensable method,
 applied in nearly all deployed image classifiers,
 earning the paper that introduced the technique
-tens of thousands of citations.
+tens of thousands of citations. We conjecture, though, that the guiding principles 
+of regularization through noise injection, acceleration through rescaling and lastly preprocessing
+may well lead to further inventions of layers and techniques in the future. 
 
-
-## Summary
-
-* During model training, batch normalization continuously adjusts the intermediate output of the neural network by utilizing the mean and standard deviation of the minibatch, so that the values of the intermediate output in each layer throughout the neural network are more stable.
-* The batch normalization methods for fully-connected layers and convolutional layers are slightly different.
-* Like a dropout layer, batch normalization layers have different computation results in training mode and prediction mode.
-* Batch normalization has many beneficial side effects, primarily that of regularization. On the other hand, the original motivation of reducing internal covariate shift seems not to be a valid explanation.
+On a more practical note, there are a number of aspects worth remembering about Batch Norms: 
+* During model training, batch normalization continuously adjusts the intermediate output of 
+  the network by utilizing the mean and standard deviation of the minibatch, so that the 
+  values of the intermediate output in each layer throughout the neural network are more stable.
+* Batch norms for fully connected layers and convolutional layers are slightly different. In fact, 
+  for convolutional layers, Layer Norms can sometimes be used as an alternative. 
+* Like a dropout layer, batch normalization layers have different behaviors 
+  in training mode and prediction mode.
+* Batch norms are useful for regularization and improving convergence in optimization. On the other hand, 
+  the original motivation of reducing internal covariate shift seems not to be a valid explanation.
 
 ## Exercises
 
-1. Can we remove the bias parameter from the fully-connected layer or the convolutional layer before the batch normalization? Why?
+1. Can we remove the bias parameter from the fully connected layer or the convolutional layer before the batch normalization? Why?
 1. Compare the learning rates for LeNet with and without batch normalization.
     1. Plot the increase in training and test accuracy.
-    1. How large can you make the learning rate?
+    1. How large can you make the learning rate before the optimization fails in both cases?
 1. Do we need batch normalization in every layer? Experiment with it?
-1. Can you replace dropout by batch normalization? How does the behavior change?
+1. Implement a 'lite' version of batch normalization that only removes the mean, or alternatively one that 
+   only removes the variance. How does it behave?
 1. Fix the parameters `beta` and `gamma`, and observe and analyze the results.
-1. Review the online documentation for `BatchNorm` from the high-level APIs to see the other applications for batch normalization.
-1. Research ideas: think of other normalization transforms that you can apply? Can you apply the probability integral transform? How about a full rank covariance estimate?
+1. Can you replace dropout by batch normalization? How does the behavior change?
+1. Review the online documentation for `BatchNorm` from the high-level APIs to see 
+   some other use cases for it. 
+1. Research ideas: think of other normalization transforms that you can apply? 
+    1. Can you apply the probability integral transform? 
+    1. Can you use a full rank covariance estimate? Why not?
+    1. Does a sparsification compression act as a regularizer?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/83)
