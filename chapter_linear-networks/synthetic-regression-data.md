@@ -45,7 +45,7 @@ import random
 ## Generating the Dataset
 
 For this example, we will work low-dimensional
-to make visualizations easy.
+for succinctness.
 The following code snippet generates 1000 examples
 with 2-dimensional features drawn 
 from a standard normal distribution.
@@ -56,7 +56,7 @@ a *ground truth* linear function,
 corrupted them via additive noise $\epsilon$, 
 drawn independently and identically for each example:
 
-(**$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon$$**)
+(**$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon.$$**)
 
 For convenience we assume that $\epsilon$ is drawn 
 from a normal distribution with mean $\mu= 0$ 
@@ -104,9 +104,9 @@ Training machine learning models often requires multiple passes over a dataset,
 grabbing one minibatch of examples at a time. 
 This data is then used to update the model. 
 To illustrate how this works, we 
-[**define the `train_dataloader` function.**] 
+[**implement the `get_dataloader` method.**] 
 It (**takes a batch size, a matrix of features,
-and a vector of labels and generates minibatches of size `batch_size`.**)
+and a vector of labels, and generates minibatches of size `batch_size`.**)
 As such, each minibatch consists of a tuple of features and labels. 
 Note that we need to be mindful of whether we're in training or validation mode: 
 in the former, we will want to read the data in random order, 
@@ -125,15 +125,15 @@ def get_dataloader(self, train):
         indices = list(range(self.num_train, self.num_train+self.num_val))
     for i in range(0, len(indices), self.batch_size):
         if tab.selected('mxnet') or tab.selected('pytorch'):
-            batch_indices = d2l.tensor(indices[i: i + self.batch_size])
+            batch_indices = d2l.tensor(indices[i: i+self.batch_size])
             yield self.X[batch_indices], self.y[batch_indices]
         if tab.selected('tensorflow'):
             j = tf.constant(indices[i : i+self.batch_size])
-            yield tf.gather(self.X, j), tf.gather(self.y, j)            
+            yield tf.gather(self.X, j), tf.gather(self.y, j)
 ```
 
 To build some intuition, let's inspect the first minibatch of
-data. Each minibatch of features provides us both with its size and the dimensionality of input features.
+data. Each minibatch of features provides us with both its size and the dimensionality of input features.
 Likewise, our minibatch of labels will have a matching shape given by `batch_size`.
 
 ```{.python .input}
@@ -144,7 +144,7 @@ print('X shape:', X.shape, '\ny shape:', y.shape)
 
 While seemingly innocuous, the invocation 
 of `iter(data.train_dataloader())` 
-illustrates the power of Python's object oriented design. 
+illustrates the power of Python's object-oriented design. 
 Note that we added a method to the `SyntheticRegressionData` class
 *after* creating the `data` object. 
 Nonetheless, the object benefits from 
@@ -160,7 +160,7 @@ The built-in iterators implemented in a deep learning framework
 are considerably more efficient and they can deal
 with sources such as data stored in files, 
 data received via a stream, 
-or data generated/processed on the fly. 
+and data generated or processed on the fly. 
 Next let's try to implement the same function using built-in iterators.
 
 ## Concise Implementation of the Data Loader
@@ -193,7 +193,6 @@ def get_tensorloader(self, tensors, train, indices=slice(0, None)):
 def get_dataloader(self, train):
     i = slice(0, self.num_train) if train else slice(self.num_train, None)
     return self.get_tensorloader((self.X, self.y), train, i)
-        
 ```
 
 The new data loader behaves just as the previous one, except that it is more efficient and has some added functionality.
@@ -239,10 +238,10 @@ We will put this to good use in the next section.
 
 ## Exercises
 
-1. What will happen if the number of examples cannot be divided by the batch size. How to change this behavior by specifying a different argument by using framework's API.
+1. What will happen if the number of examples cannot be divided by the batch size. How to change this behavior by specifying a different argument by using framework's API?
 1. What if we want to generate a huge dataset, where both the size of the parameter vector `w` and the number of examples `num_examples` are large? 
     1. What happens if we cannot hold all data in memory?
-    1. How would you shuffle the data if data is held on disk? Your task is to design an *efficient* algorithm that does not require too many random reads or writes. Hint: [Pseudorandom Permutation Generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) allow you to design a reshuffle without the need to store the permutation table explicitly :cite:`Naor.Reingold.1999`. 
+    1. How would you shuffle the data if data is held on disk? Your task is to design an *efficient* algorithm that does not require too many random reads or writes. Hint: [pseudorandom permutation generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) allow you to design a reshuffle without the need to store the permutation table explicitly :cite:`Naor.Reingold.1999`. 
 1. Implement a data generator that produces new data on the fly, every time the iterator is called. 
 1. How would you design a random data generator that generates *the same* data each time it's called?
 
