@@ -190,8 +190,8 @@ from d2l import jax as d2l
 import jax.numpy as np
 import jax
 import numpy as onp
+import random
 ```
-
 
 Now, suppose that the coin was in fact fair,
 i.e., $P(\textrm{heads}) = 0.5$.
