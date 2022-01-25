@@ -452,6 +452,7 @@ can be both implicit and counterintuitive
 (e.g., larger architectures with more parameters
 generalizing better).
 We leave you with a few rules of thumb:
+
 1. Use validation sets (or $K$*-fold cross-validation*) for model selection;
 1. More complex models often require more data;
 1. relevant notions of complexity include both the number of parameters and the range of values that they are allowed to take;
