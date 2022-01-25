@@ -1,11 +1,16 @@
 # Introduction
 :label:`chap_introduction`
 
-Until recently, nearly every computer program that we interact with daily
-was coded by software developers from first principles.
-Say that we wanted to write an application to manage an e-commerce platform.
-After huddling around a whiteboard for a few hours to ponder the problem,
-we would come up with the broad strokes of a working solution that might probably look something like this:
+Until recently, nearly every computer program 
+that you might interact with on an ordinary day
+was coded up as a rigid set of rules 
+specifying precisely how it should behave.
+Say that we wanted to write an application 
+to manage an e-commerce platform.
+After huddling around a whiteboard
+for a few hours to ponder the problem,
+we might settle on the broad strokes 
+of a working solution, for example:
 (i) users interact with the application through an interface
 running in a web browser or mobile application;
 (ii) our application interacts with a commercial-grade database engine
@@ -13,60 +18,88 @@ to keep track of each user's state and maintain records
 of historical transactions; 
 and (iii) at the heart of our application,
 the *business logic* (you might say, the *brains*) of our application
-spells out in methodical detail the appropriate action
-that our program should take in every conceivable circumstance.
+spells out in methodical a set of rules that map every 
+conceivable circumstance to the corresponding action
+that our program should take. 
 
 To build the brains of our application,
-we would have to step through every possible corner case
-that we anticipate encountering, devising appropriate rules.
-Each time a customer clicks to add an item to their shopping cart,
-we add an entry to the shopping cart database table,
-associating that user's ID with the requested product's ID.
-While few developers ever get it completely right the first time
+we might enumerate all the common events
+that our program should handle.
+For example, whenever a customer clicks 
+to add an item to their shopping cart,
+our program should add an entry 
+to the shopping cart database table,
+associating that user's ID 
+with the requested product's ID.
+We might then attempt to step through 
+every possible corner case,
+testing the appropriateness of our rules
+and making any necessary modifications.
+What happens if a user 
+initiates a purchase with an empty cart? 
+While few developers ever get it 
+completely right the first time
 (it might take some test runs to work out the kinks),
-for the most part, we could write such a program from first principles
-and confidently launch it 
+for the most part, we can write such programs 
+and confidently launch them 
 *before* ever seeing a real customer.
-Our ability to design automated systems from first principles
+Our ability to manually design automated systems
 that drive functioning products and systems, 
 often in novel situations,
 is a remarkable cognitive feat.
-And when you are able to devise solutions that work $100\%$ of the time,
-you should not be using machine learning.
+And when you are able to devise solutions 
+that work $100\%$ of the time,
+you typically should not be 
+worrying about machine learning.
 
-Fortunately for the growing community of machine learning scientists,
+Fortunately for the growing community 
+of machine learning scientists,
 many tasks that we would like to automate
 do not bend so easily to human ingenuity.
-Imagine huddling around the whiteboard with the smartest minds you know,
-but this time you are tackling one of the following problems:
+Imagine huddling around the whiteboard 
+with the smartest minds you know,
+but this time you are tackling 
+one of the following problems:
 
 * Write a program that predicts tomorrow's weather given geographic information, satellite images, and a trailing window of past weather.
-* Write a program that takes in a question, expressed in free-form text, and  answers it correctly.
-* Write a program that given an image can identify all the people it contains,  drawing outlines around each.
-* Write a program that presents users with products that they are likely to   enjoy but unlikely, in the natural course of browsing, to encounter.
+* Write a program that takes in a factoid question, expressed in free-form text, and  answers it correctly.
+* Write a program that, given an image, identifies all of people depicted in it and draws outlines around each.
+* Write a program that presents users with products that they are likely to enjoy but unlikely, in the natural course of browsing, to encounter.
 
-In each of these cases, even elite programmers
-are incapable of coding up solutions from scratch.
-The reasons for this can vary. Sometimes the program
-that we are looking for follows a pattern that changes over time,
-and we need our programs to adapt.
-In other cases, the relationship (say between pixels,
+For these problems,
+even elite programmers would struggle
+to code up solutions from scratch.
+The reasons can vary. 
+Sometimes the program that we are looking for 
+follows a pattern that changes over time,
+so there is no fixed right answer! 
+In such cases, any successful solution 
+must adapt gracefully to a changing world. 
+At other times, the relationship (say between pixels,
 and abstract categories) may be too complicated,
 requiring thousands or millions of computations
-that are beyond our conscious understanding
-even if our eyes manage the task effortlessly.
-*Machine learning* is the study of powerful
-techniques that can learn from experience.
-As an machine learning algorithm accumulates more experience,
-typically in the form of observational data or
-interactions with an environment, its performance improves.
+and following unknown principles. 
+As in image recognition, 
+the steps to perform a task
+often lie beyond our conscious understanding,
+even when our subconscious cognitive processes 
+can execute the task with ease. 
+
+
+*Machine learning* is the study of algorithms
+that can learn from experience.
+As a machine learning algorithm accumulates more experience,
+typically in the form of observational data 
+or interactions with an environment, 
+its performance improves.
 Contrast this with our deterministic e-commerce platform,
-which performs according to the same business logic,
+which follows the same business logic,
 no matter how much experience accrues,
 until the developers themselves learn and decide
 that it is time to update the software.
-In this book, we will teach you the fundamentals of machine learning,
-and focus in particular on *deep learning*, 
+In this book, we will teach you 
+the fundamentals of machine learning,
+focusing in particular on *deep learning*, 
 a powerful set of techniques
 driving innovations in areas as diverse as computer vision,
 natural language processing, healthcare, and genomics.
@@ -261,7 +294,7 @@ given a standard set of features such as
 age, vital signs, and diagnoses.
 
 When every example is characterized by the same number of numerical values,
-we say that the data consist of fixed-length vectors
+we say that the data consists of fixed-length vectors
 and we describe the constant length of the vectors
 as the *dimensionality* of the data.
 As you might imagine, fixed-length can be a convenient property.
@@ -276,7 +309,7 @@ to all show up with the same resolution or shape.
 For images, we might consider cropping them all to a standard size,
 but that strategy only gets us so far.
 We risk losing information in the cropped out portions.
-Moreover, text data resist fixed-length representations even more stubbornly.
+Moreover, text data resists fixed-length representations even more stubbornly.
 Consider the customer reviews left on e-commerce sites
 such as Amazon, IMDB, and TripAdvisor.
 Some are short: "it stinks!". 
@@ -296,7 +329,7 @@ but are no better than traditional approaches.
 
 Finally, it is not enough to have lots of data and to process it cleverly.
 We need the *right* data. 
-If the data are full of mistakes,
+If the data is full of mistakes,
 or if the chosen features are not predictive
 of the target quantity of interest, 
 learning is going to fail.
@@ -311,8 +344,8 @@ are unrepresented in the training data.
 Imagine applying a skin cancer recognition system in the wild
 that had never seen black skin before.
 Failure can also occur when the data
-do not merely under-represent some groups
-but reflect societal prejudices.
+does not merely under-represent some groups
+but reflects societal prejudices.
 For example, 
 if past hiring decisions are used to train a predictive model
 that will be used to screen resumes,
@@ -806,7 +839,7 @@ e.g., for retail products, music, and news recommendation.
 
 In some cases, customers provide explicit feedback communicating
 how much they liked a particular product
-(e.g., the product ratings and reviews on Amazon, IMDb, and GoodReads).
+(e.g., the product ratings and reviews on Amazon, IMDb, and Goodreads).
 In some other cases, they provide implicit feedback,
 e.g., by skipping titles on a playlist,
 which might indicate dissatisfaction but might just indicate
@@ -956,8 +989,7 @@ real-world knowledge and the prior state of the conversation
 across long temporal distances.
 These are active areas of research.
 
-
-### Unsupervised learning
+### Unsupervised and Self-Supervised Learning
 
 All the examples so far were related to supervised learning,
 i.e., situations where we feed the model a giant dataset
@@ -1011,19 +1043,44 @@ For instance, if we have demographic data
 about house prices, pollution, crime, location,
 education, and salaries, can we discover
 how they are related simply based on empirical data?
-The fields concerned with *causality* and
-*probabilistic graphical models* address this problem.
+The fields concerned with *causality* and *probabilistic graphical models* address this problem.
 * Another important and exciting recent development in unsupervised learning
 is the advent of *generative adversarial networks*.
 These give us a procedural way to synthesize data,
-even complicated structured data like images and audio.
+even complicated unstructured data like images and audio.
 The underlying statistical mechanisms are tests
 to check whether real and fake data are the same.
+
+As a form of unsupervised learning,
+*self-supervised learning*
+leverages unlabeled data 
+to provide supervision in training,
+such as by
+predicting some withheld part of the data
+using other parts.
+For text,
+we can train models 
+to "fill in the blanks"
+by predicting randomly masked words
+using their surrounding words (contexts)
+in big corpora without any labeling effort :cite:`Devlin.Chang.Lee.ea.2018`!
+For images,
+we may train models
+to tell the relative position
+between two cropped regions
+of the same image :cite:`Doersch.Gupta.Efros.2015`.
+In these two examples of self-supervised learning,
+training models to predict
+possible words and relative positions
+are both classification tasks
+(from supervised learning).
+
+
 
 ### Interacting with an Environment
 
 So far, we have not discussed where data actually
-come from,
+comes from,
 or what actually happens when a machine learning model generates an output.
 That is because supervised learning and unsupervised learning
 do not address these issues in a very sophisticated way.
@@ -1103,7 +1160,7 @@ Finally, the agent receives a reward from the environment.
 This process is illustrated in :numref:`fig_rl-environment`.
 The agent then receives a subsequent observation,
 and chooses a subsequent action, and so on.
-The behavior of an reinforcement learning agent is governed by a policy.
+The behavior of a reinforcement learning agent is governed by a policy.
 In short, a *policy* is just a function that maps
 from observations of the environment to actions.
 The goal of reinforcement learning is to produce a good policy.
@@ -1397,7 +1454,7 @@ over the past decade.
   At the same time, small batches limit the efficiency of GPUs.
   Hence, training on 1024 GPUs with a minibatch size of,
   say 32 images per batch amounts to an aggregate minibatch
-  of about 32000 images. Recent work, first by Li :cite:`Li.2017`,
+  of about 32000 images. Recent work, first by :cite:`Li.2017`,
   and subsequently by :cite:`You.Gitman.Ginsburg.2017`
   and :cite:`Jia.Song.He.ea.2018` pushed the size up to 64000 observations,
   reducing training time for the ResNet-50 model on the ImageNet dataset to less than 7 minutes.
@@ -1604,11 +1661,11 @@ natural language processing, medical informatics, and other application areas,
 offering a unified set of tools for tackling diverse problems.
 
 Beyond end-to-end training, 
-we are experiencing a transition from parametric statistical descriptions to fully nonparametric models. When data are scarce, one needs to rely on simplifying assumptions about reality in order to obtain useful models. When data are abundant, this can be replaced by nonparametric models that fit reality more accurately. To some extent, this mirrors the progress that physics experienced in the middle of the previous century with the availability of computers. Rather than solving parametric approximations of how electrons behave by hand, one can now resort to numerical simulations of the associated partial differential equations. This has led to much more accurate models, albeit often at the expense of explainability.
+we are experiencing a transition from parametric statistical descriptions to fully nonparametric models. When data is scarce, one needs to rely on simplifying assumptions about reality in order to obtain useful models. When data is abundant, this can be replaced by nonparametric models that fit reality more accurately. To some extent, this mirrors the progress that physics experienced in the middle of the previous century with the availability of computers. Rather than solving parametric approximations of how electrons behave by hand, one can now resort to numerical simulations of the associated partial differential equations. This has led to much more accurate models, albeit often at the expense of explainability.
 
 Another difference to previous work is the acceptance of suboptimal solutions, dealing with nonconvex nonlinear optimization problems, and the willingness to try things before proving them. This newfound empiricism in dealing with statistical problems, combined with a rapid influx of talent has led to rapid progress of practical algorithms, albeit in many cases at the expense of modifying and re-inventing tools that existed for decades.
 
-In the end, the deep learning community prides itself of sharing tools across academic and corporate boundaries, releasing many excellent libraries, statistical models, and trained networks as open source.
+In the end, the deep learning community prides itself on sharing tools across academic and corporate boundaries, releasing many excellent libraries, statistical models, and trained networks as open source.
 It is in this spirit that the notebooks forming this book are freely available for distribution and use. We have worked hard to lower the barriers of access for everyone to learn about deep learning and we hope that our readers will benefit from this.
 
 

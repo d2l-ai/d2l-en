@@ -6,7 +6,7 @@ So far we have repeatedly alluded to things like
 *vanishing gradients*,
 and the need to
 *detach the gradient* for RNNs.
-For instance, in :numref:`sec_rnn_scratch`
+For instance, in :numref:`sec_rnn-scratch`
 we invoked the `detach` function on the sequence.
 None of this was really fully
 explained, in the interest of being able to build a model quickly and
@@ -16,7 +16,7 @@ we will delve a bit more deeply
 into the details of backpropagation for sequence models and why (and how) the mathematics works.
 
 We encountered some of the effects of gradient explosion when we first
-implemented RNNs (:numref:`sec_rnn_scratch`).
+implemented RNNs (:numref:`sec_rnn-scratch`).
 In
 particular,
 if you solved the exercises,
@@ -71,7 +71,7 @@ in this subsection.
 
 In this simplified model,
 we denote $h_t$ as the hidden state,
-$x_t$ as the input, and $o_t$ as the output
+$x_t$ as input, and $o_t$ as output
 at time step $t$.
 Recall our discussions in
 :numref:`subsec_rnn_w_hidden_states`
@@ -90,7 +90,7 @@ of the hidden layer and the output layer, respectively.
 Hence, we have a chain of values $\{\ldots, (x_{t-1}, h_{t-1}, o_{t-1}), (x_{t}, h_{t}, o_t), \ldots\}$ that depend on each other via recurrent computation.
 The forward propagation is fairly straightforward.
 All we need is to loop through the $(x_t, h_t, o_t)$ triples one time step at a time.
-The discrepancy between output $o_t$ and the desired label $y_t$ is then evaluated by an objective function
+The discrepancy between output $o_t$ and the desired target $y_t$ is then evaluated by an objective function
 across all the $T$ time steps
 as
 
@@ -100,7 +100,7 @@ $$L(x_1, \ldots, x_T, y_1, \ldots, y_T, w_h, w_o) = \frac{1}{T}\sum_{t=1}^T l(y_
 
 For backpropagation, matters are a bit trickier, especially when we compute the gradients with regard to the parameters $w_h$ of the objective function $L$. To be specific, by the chain rule,
 
-$$\begin{aligned}\frac{\partial L}{\partial w_h}  & = \frac{1}{T}\sum_{t=1}^T \frac{\partial l(y_t, o_t)}{\partial w_h}  \\& = \frac{1}{T}\sum_{t=1}^T \frac{\partial l(y_t, o_t)}{\partial o_t} \frac{\partial g(h_t, w_h)}{\partial h_t}  \frac{\partial h_t}{\partial w_h}.\end{aligned}$$
+$$\begin{aligned}\frac{\partial L}{\partial w_h}  & = \frac{1}{T}\sum_{t=1}^T \frac{\partial l(y_t, o_t)}{\partial w_h}  \\& = \frac{1}{T}\sum_{t=1}^T \frac{\partial l(y_t, o_t)}{\partial o_t} \frac{\partial g(h_t, w_o)}{\partial h_t}  \frac{\partial h_t}{\partial w_h}.\end{aligned}$$
 :eqlabel:`eq_bptt_partial_L_wh`
 
 The first and the second factors of the
@@ -143,7 +143,7 @@ with
 $$\frac{\partial h_t}{\partial w_h}=\frac{\partial f(x_{t},h_{t-1},w_h)}{\partial w_h}+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t} \frac{\partial f(x_{j},h_{j-1},w_h)}{\partial h_{j-1}} \right) \frac{\partial f(x_{i},h_{i-1},w_h)}{\partial w_h}.$$
 :eqlabel:`eq_bptt_partial_ht_wh_gen`
 
-While we can use the chain rule to compute $\partial h_t/\partial w_h$ recursively, this chain can get very long whenever $t$ is large. Let us discuss a number of strategies for dealing with this problem.
+While we can use the chain rule to compute $\partial h_t/\partial w_h$ recursively, this chain can get very long whenever $t$ is large. Let's discuss a number of strategies for dealing with this problem.
 
 ### Full Computation ### 
 
@@ -164,7 +164,7 @@ we can truncate the sum in
 :eqref:`eq_bptt_partial_ht_wh_gen`
 after $\tau$ steps. 
 This is what we have been discussing so far,
-such as when we detached the gradients in :numref:`sec_rnn_scratch`. 
+such as when we detached the gradients in :numref:`sec_rnn-scratch`. 
 This leads to an *approximation* of the true gradient, simply by terminating the sum at 
 $\partial h_{t-\tau}/\partial w_h$. 
 In practice this works quite well. It is what is commonly referred to as truncated backpropgation through time :cite:`Jaeger.2002`.
@@ -213,7 +213,7 @@ Third, we actually *want* models that have only a short range of interactions. H
 ## Backpropagation Through Time in Detail
 
 After discussing the general principle,
-let us discuss backpropagation through time in detail.
+let's discuss backpropagation through time in detail.
 Different from the analysis in
 :numref:`subsec_bptt_analysis`,
 in the following
@@ -228,7 +228,7 @@ activation function
 in the hidden layer
 uses the identity mapping ($\phi(x)=x$).
 For time step $t$,
-let the single example input and the label be
+let the single example input and the target be
 $\mathbf{x}_t \in \mathbb{R}^d$ and $y_t$, respectively. 
 The hidden state $\mathbf{h}_t \in \mathbb{R}^h$ 
 and the output $\mathbf{o}_t \in \mathbb{R}^q$

@@ -8,11 +8,10 @@ The implementations of the following members of the `d2l` package and sections w
 
 ```eval_rst
 
-.. automodule:: d2l.mxnet
-   :members:
-   :imported-members:
+.. currentmodule:: d2l.mxnet
 
 ```
+
 
 :end_tab:
 
@@ -20,23 +19,87 @@ The implementations of the following members of the `d2l` package and sections w
 
 ```eval_rst
 
-.. automodule:: d2l.torch
-   :members:
-   :imported-members:
+.. currentmodule:: d2l.torch
 
 ```
-
-:end_tab:
 
 
 :begin_tab:`tensorflow`
 
 ```eval_rst
 
-.. automodule:: d2l.tensorflow
-   :members:
-   :imported-members:
+.. currentmodule:: d2l.torch
 
 ```
 
+
 :end_tab:
+
+## Models
+
+```eval_rst 
+
+.. autoclass:: Module
+   :members: 
+
+.. autoclass:: LinearRegressionScratch
+   :members:
+
+.. autoclass:: LinearRegression
+   :members:    
+
+.. autoclass:: Classifier
+   :members:
+
+```
+
+
+## Data
+
+```eval_rst 
+
+.. autoclass:: DataModule
+   :members: 
+
+.. autoclass:: SyntheticRegressionData
+   :members: 
+
+.. autoclass:: FashionMNIST
+   :members: 
+
+```
+
+
+## Trainer
+
+```eval_rst 
+
+.. autoclass:: Trainer
+   :members: 
+
+.. autoclass:: SGD
+   :members: 
+
+```
+
+
+## Utilities
+
+```eval_rst 
+
+.. autofunction:: add_to_class
+
+.. autofunction:: cpu
+
+.. autofunction:: gpu
+
+.. autofunction:: num_gpus
+
+.. autoclass:: ProgressBoard
+   :members: 
+
+.. autoclass:: HyperParameters
+   :members:    
+
+```
+

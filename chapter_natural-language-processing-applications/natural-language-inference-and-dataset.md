@@ -48,7 +48,7 @@ To study this problem, we will begin by investigating a popular natural language
 
 ## The Stanford Natural Language Inference (SNLI) Dataset
 
-Stanford Natural Language Inference (SNLI) Corpus is a collection of over $500,000$ labeled English sentence pairs :cite:`Bowman.Angeli.Potts.ea.2015`.
+[**Stanford Natural Language Inference (SNLI) Corpus**] is a collection of over 500000 labeled English sentence pairs :cite:`Bowman.Angeli.Potts.ea.2015`.
 We download and store the extracted SNLI dataset in the path `../data/snli_1.0`.
 
 ```{.python .input}
@@ -83,7 +83,7 @@ d2l.DATA_HUB['SNLI'] = (
 data_dir = d2l.download_extract('SNLI')
 ```
 
-### Reading the Dataset
+### [**Reading the Dataset**]
 
 The original SNLI dataset contains much richer information than what we really need in our experiments. Thus, we define a function `read_snli` to only extract part of the dataset, then return lists of premises, hypotheses, and their labels.
 
@@ -110,7 +110,7 @@ def read_snli(data_dir, is_train):
     return premises, hypotheses, labels
 ```
 
-Now let us print the first $3$ pairs of premise and hypothesis, as well as their labels ("0", "1", and "2" correspond to "entailment", "contradiction", and "neutral", respectively ).
+Now let's [**print the first 3 pairs**] of premise and hypothesis, as well as their labels ("0", "1", and "2" correspond to "entailment", "contradiction", and "neutral", respectively ).
 
 ```{.python .input}
 #@tab all
@@ -121,10 +121,10 @@ for x0, x1, y in zip(train_data[0][:3], train_data[1][:3], train_data[2][:3]):
     print('label:', y)
 ```
 
-The training set has about $550,000$ pairs,
-and the testing set has about $10,000$ pairs.
+The training set has about 550000 pairs,
+and the testing set has about 10000 pairs.
 The following shows that 
-the three labels "entailment", "contradiction", and "neutral" are balanced in 
+the three [**labels "entailment", "contradiction", and "neutral" are balanced**] in 
 both the training set and the testing set.
 
 ```{.python .input}
@@ -134,7 +134,7 @@ for data in [train_data, test_data]:
     print([[row for row in data[2]].count(i) for i in range(3)])
 ```
 
-### Defining a Class for Loading the Dataset
+### [**Defining a Class for Loading the Dataset**]
 
 Below we define a class for loading the SNLI dataset by inheriting from the `Dataset` class in Gluon. The argument `num_steps` in the class constructor specifies the length of a text sequence so that each minibatch of sequences will have the same shape. 
 In other words,
@@ -202,7 +202,7 @@ class SNLIDataset(torch.utils.data.Dataset):
         return len(self.premises)
 ```
 
-### Putting All Things Together
+### [**Putting All Things Together**]
 
 Now we can invoke the `read_snli` function and the `SNLIDataset` class to download the SNLI dataset and return `DataLoader` instances for both training and testing sets, together with the vocabulary of the training set.
 It is noteworthy that we must use the vocabulary constructed from the training set
@@ -246,7 +246,7 @@ def load_data_snli(batch_size, num_steps=50):
     return train_iter, test_iter, train_set.vocab
 ```
 
-Here we set the batch size to $128$ and sequence length to $50$,
+Here we set the batch size to 128 and sequence length to 50,
 and invoke the `load_data_snli` function to get the data iterators and vocabulary.
 Then we print the vocabulary size.
 
@@ -258,7 +258,7 @@ len(vocab)
 
 Now we print the shape of the first minibatch.
 Contrary to sentiment analysis,
-we have $2$ inputs `X[0]` and `X[1]` representing pairs of premises and hypotheses.
+we have two inputs `X[0]` and `X[1]` representing pairs of premises and hypotheses.
 
 ```{.python .input}
 #@tab all

@@ -1,3 +1,8 @@
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Predicting House Prices on Kaggle
 :label:`sec_kaggle_house`
 
@@ -9,7 +14,7 @@ we are ready to put all this knowledge into practice
 by participating in a Kaggle competition.
 The house price prediction competition
 is a great place to start.
-The data are fairly generic and do not exhibit exotic structure
+The data is fairly generic and do not exhibit exotic structure
 that might require specialized models (as audio or video might).
 This dataset, collected by Bart de Cock in 2011 :cite:`De-Cock.2011`,
 covers house prices in Ames, IA from the period of 2006--2010.
@@ -24,90 +29,21 @@ you will gain some intuitions that will guide you
 in your career as a data scientist.
 
 
-## Downloading and Caching Datasets
+## Downloading Data
 
 Throughout the book, we will train and test models
 on various downloaded datasets.
-Here, we implement several utility functions
-to facilitate data downloading.
-First, we maintain a dictionary `DATA_HUB`
-that maps a string (the *name* of the dataset)
-to a tuple containing both the URL to locate the dataset
-and the SHA-1 key that verifies the integrity of the file.
-All such datasets are hosted at the site
-whose address is `DATA_URL`.
+Here, we (**implement two utility functions**). The first one downloads a file into local,
+and the second one extract a zip or a tar file. Again, we deferred their implementations into :numref:`sec_utils`.
 
-```{.python .input}
-#@tab all
-import os
-import requests
-import zipfile
-import tarfile
-import hashlib
+```{.python .input  n=2}
+%%tab all
 
-#@save
-DATA_HUB = dict()
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
-```
+def download(url, folder, sha1_hash=None):
+    """Download a file to folder, return the local filepath"""
 
-The following `download` function downloads a dataset,
-caching it in a local directory (`../data` by default)
-and returns the name of the downloaded file.
-If a file corresponding to this dataset
-already exists in the cache directory
-and its SHA-1 matches the one stored in `DATA_HUB`,
-our code will use the cached file to avoid
-clogging up your internet with redundant downloads.
-
-```{.python .input}
-#@tab all
-def download(name, cache_dir=os.path.join('..', 'data')):  #@save
-    """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}."
-    url, sha1_hash = DATA_HUB[name]
-    os.makedirs(cache_dir, exist_ok=True)
-    fname = os.path.join(cache_dir, url.split('/')[-1])
-    if os.path.exists(fname):
-        sha1 = hashlib.sha1()
-        with open(fname, 'rb') as f:
-            while True:
-                data = f.read(1048576)
-                if not data:
-                    break
-                sha1.update(data)
-        if sha1.hexdigest() == sha1_hash:
-            return fname  # Hit cache
-    print(f'Downloading {fname} from {url}...')
-    r = requests.get(url, stream=True, verify=True)
-    with open(fname, 'wb') as f:
-        f.write(r.content)
-    return fname
-```
-
-We also implement two additional utility functions:
-one is to download and extract a zip or tar file
-and the other to download all the datasets used in this book from `DATA_HUB` into the cache directory.
-
-```{.python .input}
-#@tab all
-def download_extract(name, folder=None):  #@save
-    """Download and extract a zip/tar file."""
-    fname = download(name)
-    base_dir = os.path.dirname(fname)
-    data_dir, ext = os.path.splitext(fname)
-    if ext == '.zip':
-        fp = zipfile.ZipFile(fname, 'r')
-    elif ext in ('.tar', '.gz'):
-        fp = tarfile.open(fname, 'r')
-    else:
-        assert False, 'Only zip/tar files can be extracted.'
-    fp.extractall(base_dir)
-    return os.path.join(base_dir, folder) if folder else data_dir
-
-def download_all():  #@save
-    """Download all files in the DATA_HUB."""
-    for name in DATA_HUB:
-        download(name)
+def extract(filename, folder):
+    """Extract a zip/tar file into folder."""
 ```
 
 ## Kaggle
@@ -160,7 +96,7 @@ is represented by an integer,
 the roof type by discrete categorical assignments,
 and other features by floating point numbers.
 And here is where reality complicates things:
-for some examples, some data are altogether missing
+for some examples, some data is altogether missing
 with the missing value marked simply as "na".
 The price of each house is included
 for the training set only
@@ -174,17 +110,17 @@ in :numref:`fig_house_pricing`
 has links to download the data.
 
 
-To get started, we will read in and process the data
-using `pandas`, which we have introduced in :numref:`sec_pandas`.
+To get started, we will [**read in and process the data
+using `pandas`**], which we have introduced in :numref:`sec_pandas`.
 So, you will want to make sure that you have `pandas` installed
 before proceeding further.
 Fortunately, if you are reading in Jupyter,
 we can install pandas without even leaving the notebook.
 
-```{.python .input}
+```{.python .input  n=14}
+%%tab mxnet
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
-
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import gluon, autograd, init, np, npx
@@ -193,8 +129,8 @@ import pandas as pd
 npx.set_np()
 ```
 
-```{.python .input}
-#@tab pytorch
+```{.python .input  n=4}
+%%tab pytorch
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
 
@@ -207,7 +143,7 @@ import numpy as np
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
 
@@ -222,66 +158,61 @@ For convenience, we can download and cache
 the Kaggle housing dataset
 using the script we defined above.
 
-```{.python .input}
-#@tab all
-DATA_HUB['kaggle_house_train'] = (  #@save
-    DATA_URL + 'kaggle_house_pred_train.csv',
-    '585e9cc93e70b39160e7921475f9bcd7d31219ce')
+```{.python .input  n=30}
+%%tab all
 
-DATA_HUB['kaggle_house_test'] = (  #@save
-    DATA_URL + 'kaggle_house_pred_test.csv',
-    'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
-```
-
-We use `pandas` to load the two csv files containing training and test data respectively.
-
-```{.python .input}
-#@tab all
-train_data = pd.read_csv(download('kaggle_house_train'))
-test_data = pd.read_csv(download('kaggle_house_test'))
+class KaggleHouse(d2l.DataModule):
+    def __init__(self, batch_size, train=None, val=None):
+        super().__init__()
+        self.save_hyperparameters()
+        if self.train is None:
+            self.raw_train = pd.read_csv(d2l.download(
+                d2l.DATA_URL + 'kaggle_house_pred_train.csv', self.root,
+                sha1_hash='585e9cc93e70b39160e7921475f9bcd7d31219ce'))
+            self.raw_val = pd.read_csv(d2l.download(
+                d2l.DATA_URL + 'kaggle_house_pred_test.csv', self.root,
+                sha1_hash='fa19780a7b011d9b009e8bff8e99922a8ee2eb90'))
 ```
 
 The training dataset includes 1460 examples,
-80 features, and 1 label, while the test data
+80 features, and 1 label, while the validation data
 contains 1459 examples and 80 features.
 
-```{.python .input}
-#@tab all
-print(train_data.shape)
-print(test_data.shape)
+```{.python .input  n=31}
+%%tab all
+data = KaggleHouse(batch_size=64)
+print(data.raw_train.shape)
+print(data.raw_val.shape)
 ```
 
-Let us take a look at the first four and last two features
-as well as the label (SalePrice) from the first four examples.
+## Data Preprocessing
 
-```{.python .input}
-#@tab all
-print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
+
+
+Let's [**take a look at the first four and last two features
+as well as the label (SalePrice)**] from the first four examples.
+
+```{.python .input  n=10}
+%%tab all
+print(data.raw_train.iloc[:4, [0, 1, 2, 3, -3, -2, -1]])
 ```
 
 We can see that in each example, the first feature is the ID.
 This helps the model identify each training example.
 While this is convenient, it does not carry
 any information for prediction purposes.
-Hence, we remove it from the dataset
+Hence, we can remove it from the dataset
 before feeding the data into the model.
-
-```{.python .input}
-#@tab all
-all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
-```
-
-## Data Preprocessing
 
 As stated above, we have a wide variety of data types.
 We will need to preprocess the data before we can start modeling.
-Let us start with the numerical features.
+Let's start with the numerical features.
 First, we apply a heuristic,
-replacing all missing values
-by the corresponding feature's mean.
+[**replacing all missing values
+by the corresponding feature's mean.**]
 Then, to put all features on a common scale,
-we *standardize* the data by
-rescaling features to zero mean and unit variance:
+we (***standardize* the data by
+rescaling features to zero mean and unit variance**):
 
 $$x \leftarrow \frac{x - \mu}{\sigma},$$
 
@@ -298,21 +229,9 @@ which features will be relevant,
 we do not want to penalize coefficients
 assigned to one feature more than on any other.
 
-```{.python .input}
-#@tab all
-# If test data were inaccessible, mean and standard deviation could be 
-# calculated from training data
-numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
-all_features[numeric_features] = all_features[numeric_features].apply(
-    lambda x: (x - x.mean()) / (x.std()))
-# After standardizing the data all means vanish, hence we can set missing
-# values to 0
-all_features[numeric_features] = all_features[numeric_features].fillna(0)
-```
-
-Next we deal with discrete values.
+[**Next we deal with discrete values.**]
 This includes features such as "MSZoning".
-We replace them by a one-hot encoding
+(**We replace them by a one-hot encoding**)
 in the same way that we previously transformed
 multiclass labels into vectors (see :numref:`subsec_classification-problem`).
 For instance, "MSZoning" assumes the values "RL" and "RM".
@@ -324,81 +243,61 @@ if the original value of "MSZoning" is "RL",
 then "MSZoning_RL" is 1 and "MSZoning_RM" is 0.
 The `pandas` package does this automatically for us.
 
-```{.python .input}
-#@tab all
-# `Dummy_na=True` considers "na" (missing value) as a valid feature value, and
-# creates an indicator feature for it
-all_features = pd.get_dummies(all_features, dummy_na=True)
-all_features.shape
+```{.python .input  n=32}
+%%tab all
+@d2l.add_to_class(KaggleHouse)
+def preprocess(self):
+    # Remove the id and label columns
+    label = 'SalePrice'
+    features = pd.concat(
+        (self.raw_train.drop(columns=['Id', label]),
+         self.raw_val.drop(columns=['Id'])))
+    # Standardize numerical columns
+    numeric_features = features.dtypes[features.dtypes != 'object'].index
+    features[numeric_features] = features[numeric_features].apply(
+        lambda x: (x - x.mean()) / (x.std()))
+    # Replace NAN numerical features by 0
+    features[numeric_features] = features[numeric_features].fillna(0)
+    # Replace discrete features by one-hot encoding.
+    features = pd.get_dummies(features, dummy_na=True)
+    # Save preprocessed features
+    self.train = features[:self.raw_train.shape[0]].copy()
+    self.train[label] = self.raw_train[label]
+    self.val = features[self.raw_train.shape[0]:].copy()
 ```
 
 You can see that this conversion increases
 the number of features from 79 to 331.
-Finally, via the `values` attribute,
-we can extract the NumPy format from the `pandas` format
-and convert it into the tensor
-representation for training.
 
-```{.python .input}
-#@tab all
-n_train = train_data.shape[0]
-train_features = d2l.tensor(all_features[:n_train].values, dtype=d2l.float32)
-test_features = d2l.tensor(all_features[n_train:].values, dtype=d2l.float32)
-train_labels = d2l.tensor(
-    train_data.SalePrice.values.reshape(-1, 1), dtype=d2l.float32)
+```{.python .input  n=33}
+%%tab all
+data.preprocess()
+data.train.shape
 ```
 
-## Training
+```{.python .input  n=60}
+%%tab all
 
-To get started we train a linear model with squared loss.
-Not surprisingly, our linear model will not lead
-to a competition-winning submission
-but it provides a sanity check to see whether
-there is meaningful information in the data.
-If we cannot do better than random guessing here,
-then there might be a good chance
-that we have a data processing bug.
-And if things work, the linear model will serve as a baseline
-giving us some intuition about how close the simple model
-gets to the best reported models, giving us a sense
-of how much gain we should expect from fancier models.
-
-```{.python .input}
-loss = gluon.loss.L2Loss()
-
-def get_net():
-    net = nn.Sequential()
-    net.add(nn.Dense(1))
-    net.initialize()
-    return net
+@d2l.add_to_class(KaggleHouse)
+def get_dataloader(self, train):
+    label = 'SalePrice'
+    data = self.train if train else self.val
+    if label not in data: return
+    get_tensor = lambda x: d2l.tensor(x.values, dtype=d2l.float32)
+    tensors = (get_tensor(data.drop(columns=[label])),  # X
+               d2l.reshape(d2l.log(get_tensor(data[label])), (-1, 1))) # Y
+    return self.get_tensorloader(tensors, train)
 ```
 
-```{.python .input}
-#@tab pytorch
-loss = nn.MSELoss()
-in_features = train_features.shape[1]
+## Defining Model
 
-def get_net():
-    net = nn.Sequential(nn.Linear(in_features,1))
-    return net
-```
-
-```{.python .input}
-#@tab tensorflow
-loss = tf.keras.losses.MeanSquaredError()
-
-def get_net():
-    net = tf.keras.models.Sequential()
-    net.add(tf.keras.layers.Dense(
-        1, kernel_regularizer=tf.keras.regularizers.l2(weight_decay)))
-    return net
-```
+To get started we train a linear model with squared loss. Not surprisingly, our linear model will not lead to a competition-winning submission but it provides a sanity check to see whether there is meaningful information in the data. If we cannot do better than random guessing here, then there might be a good chance that we have a data processing bug. And if things work, the linear model will serve as a baseline giving us some intuition about how close the simple model gets to the best reported models, giving us a sense of how much gain we should expect from fancier models.
 
 With house prices, as with stock prices,
 we care about relative quantities
 more than absolute quantities.
-Thus we tend to care more about
-the relative error $\frac{y - \hat{y}}{y}$
+Thus [**we tend to care more about
+the relative error $\frac{y - \hat{y}}{y}$**]
 than about the absolute error $y - \hat{y}$.
 For instance, if our prediction is off by USD 100,000
 when estimating the price of a house in Rural Ohio,
@@ -409,8 +308,8 @@ in Los Altos Hills, California,
 this might represent a stunningly accurate prediction
 (there, the median house price exceeds 4 million USD).
 
-One way to address this problem is to
-measure the discrepancy in the logarithm of the price estimates.
+(**One way to address this problem is to
+measure the discrepancy in the logarithm of the price estimates.**)
 In fact, this is also the official error measure
 used by the competition to evaluate the quality of submissions.
 After all, a small value $\delta$ for $|\log y - \log \hat{y}| \leq \delta$
@@ -419,112 +318,9 @@ This leads to the following root-mean-squared-error between the logarithm of the
 
 $$\sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}.$$
 
-```{.python .input}
-def log_rmse(net, features, labels):
-    # To further stabilize the value when the logarithm is taken, set the
-    # value less than 1 as 1
-    clipped_preds = np.clip(net(features), 1, float('inf'))
-    return np.sqrt(2 * loss(np.log(clipped_preds), np.log(labels)).mean())
-```
-
-```{.python .input}
-#@tab pytorch
-def log_rmse(net, features, labels):
-    # To further stabilize the value when the logarithm is taken, set the
-    # value less than 1 as 1
-    clipped_preds = torch.clamp(net(features), 1, float('inf'))
-    rmse = torch.sqrt(loss(torch.log(clipped_preds),
-                           torch.log(labels)))
-    return rmse.item()
-```
-
-```{.python .input}
-#@tab tensorflow
-def log_rmse(y_true, y_pred):
-    # To further stabilize the value when the logarithm is taken, set the
-    # value less than 1 as 1
-    clipped_preds = tf.clip_by_value(y_pred, 1, float('inf'))
-    return tf.sqrt(tf.reduce_mean(loss(
-        tf.math.log(y_true), tf.math.log(clipped_preds))))
-```
-
-Unlike in previous sections, our training functions
-will rely on the Adam optimizer
-(we will describe it in greater detail later).
-The main appeal of this optimizer is that,
-despite doing no better (and sometimes worse)
-given unlimited resources for hyperparameter optimization,
-people tend to find that it is significantly less sensitive
-to the initial learning rate.
-
-```{.python .input}
-def train(net, train_features, train_labels, test_features, test_labels,
-          num_epochs, learning_rate, weight_decay, batch_size):
-    train_ls, test_ls = [], []
-    train_iter = d2l.load_array((train_features, train_labels), batch_size)
-    # The Adam optimization algorithm is used here
-    trainer = gluon.Trainer(net.collect_params(), 'adam', {
-        'learning_rate': learning_rate, 'wd': weight_decay})
-    for epoch in range(num_epochs):
-        for X, y in train_iter:
-            with autograd.record():
-                l = loss(net(X), y)
-            l.backward()
-            trainer.step(batch_size)
-        train_ls.append(log_rmse(net, train_features, train_labels))
-        if test_labels is not None:
-            test_ls.append(log_rmse(net, test_features, test_labels))
-    return train_ls, test_ls
-```
-
-```{.python .input}
-#@tab pytorch
-def train(net, train_features, train_labels, test_features, test_labels,
-          num_epochs, learning_rate, weight_decay, batch_size):
-    train_ls, test_ls = [], []
-    train_iter = d2l.load_array((train_features, train_labels), batch_size)
-    # The Adam optimization algorithm is used here
-    optimizer = torch.optim.Adam(net.parameters(),
-                                 lr = learning_rate,
-                                 weight_decay = weight_decay)
-    for epoch in range(num_epochs):
-        for X, y in train_iter:
-            optimizer.zero_grad()
-            l = loss(net(X), y)
-            l.backward()
-            optimizer.step()
-        train_ls.append(log_rmse(net, train_features, train_labels))
-        if test_labels is not None:
-            test_ls.append(log_rmse(net, test_features, test_labels))
-    return train_ls, test_ls
-```
-
-```{.python .input}
-#@tab tensorflow
-def train(net, train_features, train_labels, test_features, test_labels,
-          num_epochs, learning_rate, weight_decay, batch_size):
-    train_ls, test_ls = [], []
-    train_iter = d2l.load_array((train_features, train_labels), batch_size)
-    # The Adam optimization algorithm is used here
-    optimizer = tf.keras.optimizers.Adam(learning_rate)
-    net.compile(loss=loss, optimizer=optimizer)
-    for epoch in range(num_epochs):
-        for X, y in train_iter:
-            with tf.GradientTape() as tape:
-                y_hat = net(X)
-                l = loss(y, y_hat)
-            params = net.trainable_variables
-            grads = tape.gradient(l, params)
-            optimizer.apply_gradients(zip(grads, params))
-        train_ls.append(log_rmse(train_labels, net(train_features)))
-        if test_labels is not None:
-            test_ls.append(log_rmse(test_labels, net(test_features)))
-    return train_ls, test_ls
-```
-
 ## $K$-Fold Cross-Validation
 
-You might recall that we introduced $K$-fold cross-validation
+You might recall that we introduced [**$K$-fold cross-validation**]
 in the section where we discussed how to deal
 with model selection (:numref:`sec_model_selection`).
 We will put this to good use to select the model design
@@ -541,49 +337,39 @@ But this added complexity might obfuscate our code unnecessarily
 so we can safely omit it here owing to the simplicity of our problem.
 
 ```{.python .input}
-#@tab all
-def get_k_fold_data(k, i, X, y):
-    assert k > 1
-    fold_size = X.shape[0] // k
-    X_train, y_train = None, None
+%%tab all
+def k_fold_data(data, k):
+    rets = []
+    fold_size = data.train.shape[0] // k
     for j in range(k):
-        idx = slice(j * fold_size, (j + 1) * fold_size)
-        X_part, y_part = X[idx, :], y[idx]
-        if j == i:
-            X_valid, y_valid = X_part, y_part
-        elif X_train is None:
-            X_train, y_train = X_part, y_part
-        else:
-            X_train = d2l.concat([X_train, X_part], 0)
-            y_train = d2l.concat([y_train, y_part], 0)
-    return X_train, y_train, X_valid, y_valid
+        idx = range(j * fold_size, (j+1) * fold_size)
+        rets.append(KaggleHouse(data.batch_size, data.train.drop(index=idx),  
+                                data.train.loc[idx]))    
+    return rets
 ```
 
-The training and verification error averages are returned
+[**The training and verification error averages are returned**]
 when we train $K$ times in the $K$-fold cross-validation.
 
 ```{.python .input}
-#@tab all
-def k_fold(k, X_train, y_train, num_epochs, learning_rate, weight_decay,
-           batch_size):
-    train_l_sum, valid_l_sum = 0, 0
-    for i in range(k):
-        data = get_k_fold_data(k, i, X_train, y_train)
-        net = get_net()
-        train_ls, valid_ls = train(net, *data, num_epochs, learning_rate,
-                                   weight_decay, batch_size)
-        train_l_sum += train_ls[-1]
-        valid_l_sum += valid_ls[-1]
-        if i == 0:
-            d2l.plot(list(range(1, num_epochs + 1)), [train_ls, valid_ls],
-                     xlabel='epoch', ylabel='rmse', xlim=[1, num_epochs],
-                     legend=['train', 'valid'], yscale='log')
-        print(f'fold {i + 1}, train log rmse {float(train_ls[-1]):f}, '
-              f'valid log rmse {float(valid_ls[-1]):f}')
-    return train_l_sum / k, valid_l_sum / k
+%%tab all
+def k_fold(trainer, data, k, lr):
+    val_loss, models = [], []
+    for i, data_fold in enumerate(k_fold_data(data, k)):
+        if tab.selected('pytorch'):
+            model = d2l.LinearRegression(data.train.shape[1]-1, lr)
+        if tab.selected(['mxnet', 'tensorflow']):
+            model = d2l.LinearRegression(lr)
+        if i != 0: model.board.display = False
+        trainer.fit(model, data_fold)
+        val_loss.append(float(model.board.data['val_loss'][-1].y))
+        models.append(model)
+    print(f'average validation log rmse = {sum(val_loss)/len(val_loss)}')
+    return models
+    
 ```
 
-## Model Selection
+## [**Model Selection**]
 
 In this example, we pick an untuned set of hyperparameters
 and leave it up to the reader to improve the model.
@@ -598,12 +384,9 @@ we might just get lucky and find that our validation
 performance is no longer representative of the true error.
 
 ```{.python .input}
-#@tab all
-k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
-train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
-                          weight_decay, batch_size)
-print(f'{k}-fold validation: avg train log rmse: {float(train_l):f}, '
-      f'avg valid log rmse: {float(valid_l):f}')
+%%tab all
+trainer = d2l.Trainer(max_epochs=10)
+models = k_fold(trainer, data, k=5, lr=0.01)
 ```
 
 Notice that sometimes the number of training errors
@@ -616,7 +399,7 @@ Less overfitting might indicate that our data can support a more powerful model.
 Massive overfitting might suggest that we can gain
 by incorporating regularization techniques.
 
-##  Submitting Predictions on Kaggle
+##  [**Submitting Predictions on Kaggle**]
 
 Now that we know what a good choice of hyperparameters should be,
 we might as well use all the data to train on it
@@ -628,21 +411,9 @@ Saving the predictions in a csv file
 will simplify uploading the results to Kaggle.
 
 ```{.python .input}
-#@tab all
-def train_and_pred(train_features, test_feature, train_labels, test_data,
-                   num_epochs, lr, weight_decay, batch_size):
-    net = get_net()
-    train_ls, _ = train(net, train_features, train_labels, None, None,
-                        num_epochs, lr, weight_decay, batch_size)
-    d2l.plot(np.arange(1, num_epochs + 1), [train_ls], xlabel='epoch',
-             ylabel='log rmse', xlim=[1, num_epochs], yscale='log')
-    print(f'train log rmse {float(train_ls[-1]):f}')
-    # Apply the network to the test set
-    preds = d2l.numpy(net(test_features))
-    # Reformat it to export to Kaggle
-    test_data['SalePrice'] = pd.Series(preds.reshape(1, -1)[0])
-    submission = pd.concat([test_data['Id'], test_data['SalePrice']], axis=1)
-    submission.to_csv('submission.csv', index=False)
+%%tab all
+preds = [model(d2l.tensor(data.val.values, dtype=d2l.float32)) for model in models]
+ensemble_preds = d2l.reduce_mean(d2l.exp(d2l.concat(preds, 1)), 1)
 ```
 
 One nice sanity check is to see
@@ -652,9 +423,9 @@ If they do, it is time to upload them to Kaggle.
 The following code will generate a file called `submission.csv`.
 
 ```{.python .input}
-#@tab all
-train_and_pred(train_features, test_features, train_labels, test_data,
-               num_epochs, lr, weight_decay, batch_size)
+%%tab all
+submission = pd.DataFrame({'Id':data.raw_val.Id, 'SalePrice':d2l.numpy(ensemble_preds)})
+submission.to_csv('submission.csv', index=False)
 ```
 
 Next, as demonstrated in :numref:`fig_kaggle_submit2`,
@@ -674,7 +445,7 @@ The steps are quite simple:
 
 ## Summary
 
-* Real data often contain a mix of different data types and need to be preprocessed.
+* Real data often contains a mix of different data types and need to be preprocessed.
 * Rescaling real-valued data to zero mean and unit variance is a good default. So is replacing missing values with their mean.
 * Transforming categorical features into indicator features allows us to treat them like one-hot vectors.
 * We can use $K$-fold cross-validation to select the model and adjust the hyperparameters.

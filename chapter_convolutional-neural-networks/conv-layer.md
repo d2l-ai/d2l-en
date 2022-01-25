@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Convolutions for Images
 :label:`sec_conv_layer`
 
@@ -16,9 +21,9 @@ are more accurately described as cross-correlations.
 Based on our descriptions of convolutional layers in :numref:`sec_why-conv`,
 in such a layer, an input tensor
 and a kernel tensor are combined
-to produce an output tensor through a cross-correlation operation.
+to produce an output tensor through a (**cross-correlation operation.**)
 
-Let us ignore channels for now and see how this works
+Let's ignore channels for now and see how this works
 with two-dimensional data and hidden representations.
 In :numref:`fig_correlation`,
 the input is a two-dimensional tensor
@@ -34,7 +39,7 @@ is given by the height and width of the kernel
 
 In the two-dimensional cross-correlation operation,
 we begin with the convolution window positioned
-at the top-left corner of the input tensor
+at the upper-left corner of the input tensor
 and slide it across the input tensor,
 both from left to right and top to bottom.
 When the convolution window slides to a certain position,
@@ -62,7 +67,7 @@ we can only properly compute the cross-correlation
 for locations where the kernel fits wholly within the image,
 the output size is given by the input size $n_h \times n_w$
 minus the size of the convolution kernel $k_h \times k_w$
-via 
+via
 
 $$(n_h-k_h+1) \times (n_w-k_w+1).$$
 
@@ -76,6 +81,7 @@ which accepts an input tensor `X` and a kernel tensor `K`
 and returns an output tensor `Y`.
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
 from mxnet.gluon import nn
@@ -83,14 +89,14 @@ npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab mxnet, pytorch
 def corr2d(X, K):  #@save
     """Compute 2D cross-correlation."""
     h, w = K.shape
@@ -102,7 +108,7 @@ def corr2d(X, K):  #@save
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 
@@ -119,11 +125,11 @@ def corr2d(X, K):  #@save
 
 We can construct the input tensor `X` and the kernel tensor `K`
 from :numref:`fig_correlation`
-to validate the output of the above implementation
+to [**validate the output of the above implementation**]
 of the two-dimensional cross-correlation operation.
 
 ```{.python .input}
-#@tab all
+%%tab all
 X = d2l.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])
 K = d2l.tensor([[0.0, 1.0], [2.0, 3.0]])
 corr2d(X, K)
@@ -137,9 +143,9 @@ The two parameters of a convolutional layer
 are the kernel and the scalar bias.
 When training models based on convolutional layers,
 we typically initialize the kernels randomly,
-just as we would with a fully-connected layer.
+just as we would with a fully connected layer.
 
-We are now ready to implement a two-dimensional convolutional layer
+We are now ready to [**implement a two-dimensional convolutional layer**]
 based on the `corr2d` function defined above.
 In the `__init__` constructor function,
 we declare `weight` and `bias` as the two model parameters.
@@ -147,6 +153,7 @@ The forward propagation function
 calls the `corr2d` function and adds the bias.
 
 ```{.python .input}
+%%tab mxnet
 class Conv2D(nn.Block):
     def __init__(self, kernel_size, **kwargs):
         super().__init__(**kwargs)
@@ -158,7 +165,7 @@ class Conv2D(nn.Block):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 class Conv2D(nn.Module):
     def __init__(self, kernel_size):
         super().__init__()
@@ -170,7 +177,7 @@ class Conv2D(nn.Module):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 class Conv2D(tf.keras.layers.Layer):
     def __init__(self):
         super().__init__()
@@ -192,26 +199,26 @@ or a $h \times w$ convolution kernel,
 the height and width of the convolution kernel are $h$ and $w$, respectively.
 We also refer to
 a convolutional layer with a $h \times w$
-convolution kernel simply as a $h \times w$ convolutional layer. 
+convolution kernel simply as a $h \times w$ convolutional layer.
 
 
 ## Object Edge Detection in Images
 
-Let us take a moment to parse a simple application of a convolutional layer:
-detecting the edge of an object in an image
+Let's take a moment to parse [**a simple application of a convolutional layer:
+detecting the edge of an object in an image**]
 by finding the location of the pixel change.
 First, we construct an "image" of $6\times 8$ pixels.
 The middle four columns are black (0) and the rest are white (1).
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab mxnet, pytorch
 X = d2l.ones((6, 8))
 X[:, 2:6] = 0
 X
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 X = tf.Variable(tf.ones((6, 8)))
 X[:, 2:6].assign(tf.zeros(X[:, 2:6].shape))
 X
@@ -222,28 +229,30 @@ When we perform the cross-correlation operation with the input,
 if the horizontally adjacent elements are the same,
 the output is 0. Otherwise, the output is non-zero.
 
+Note that this kernel is special case of a finite difference operator. At location $(i,j)$ it computes $\mathbf{X}_{ij} - X_{(i+1),j}$, i.e., it computes the difference between the values of horizontally adjacent pixels. This is a discrete approximation of the first derivative in the horizontal direction. After all, for a function $f(i,j)$ its derivative $-\partial_i f(i,j) = \lim_{\epsilon \to 0} \frac{f(i,j) - f(i+\epsilon,j)}{\epsilon}$. Let's see how this works in practice.
+
 ```{.python .input}
-#@tab all
+%%tab all
 K = d2l.tensor([[1.0, -1.0]])
 ```
 
 We are ready to perform the cross-correlation operation
 with arguments `X` (our input) and `K` (our kernel).
-As you can see, we detect 1 for the edge from white to black
-and -1 for the edge from black to white.
+As you can see, [**we detect 1 for the edge from white to black
+and -1 for the edge from black to white.**]
 All other outputs take value 0.
 
 ```{.python .input}
-#@tab all
+%%tab all
 Y = corr2d(X, K)
 Y
 ```
 
 We can now apply the kernel to the transposed image.
-As expected, it vanishes. The kernel `K` only detects vertical edges.
+As expected, it vanishes. [**The kernel `K` only detects vertical edges.**]
 
 ```{.python .input}
-#@tab all
+%%tab all
 corr2d(d2l.transpose(X), K)
 ```
 
@@ -256,7 +265,7 @@ and consider successive layers of convolutions,
 it might be impossible to specify
 precisely what each filter should be doing manually.
 
-Now let us see whether we can learn the kernel that generated `Y` from `X`
+Now let's see whether we can [**learn the kernel that generated `Y` from `X`**]
 by looking at the input--output pairs only.
 We first construct a convolutional layer
 and initialize its kernel as a random tensor.
@@ -270,6 +279,7 @@ for two-dimensional convolutional layers
 and ignore the bias.
 
 ```{.python .input}
+%%tab mxnet
 # Construct a two-dimensional convolutional layer with 1 output channel and a
 # kernel of shape (1, 2). For the sake of simplicity, we ignore the bias here
 conv2d = nn.Conv2D(1, kernel_size=(1, 2), use_bias=False)
@@ -280,6 +290,7 @@ conv2d.initialize()
 # size (number of examples in the batch) and the number of channels are both 1
 X = X.reshape(1, 1, 6, 8)
 Y = Y.reshape(1, 1, 6, 7)
+lr = 3e-2  # Learning rate
 
 for i in range(10):
     with autograd.record():
@@ -287,22 +298,23 @@ for i in range(10):
         l = (Y_hat - Y) ** 2
     l.backward()
     # Update the kernel
-    conv2d.weight.data()[:] -= 3e-2 * conv2d.weight.grad()
+    conv2d.weight.data()[:] -= lr * conv2d.weight.grad()
     if (i + 1) % 2 == 0:
-        print(f'batch {i + 1}, loss {float(l.sum()):.3f}')
+        print(f'epoch {i + 1}, loss {float(l.sum()):.3f}')
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 # Construct a two-dimensional convolutional layer with 1 output channel and a
 # kernel of shape (1, 2). For the sake of simplicity, we ignore the bias here
 conv2d = nn.Conv2d(1,1, kernel_size=(1, 2), bias=False)
 
 # The two-dimensional convolutional layer uses four-dimensional input and
-# output in the format of (example channel, height, width), where the batch
+# output in the format of (example, channel, height, width), where the batch
 # size (number of examples in the batch) and the number of channels are both 1
 X = X.reshape((1, 1, 6, 8))
 Y = Y.reshape((1, 1, 6, 7))
+lr = 3e-2  # Learning rate
 
 for i in range(10):
     Y_hat = conv2d(X)
@@ -310,22 +322,23 @@ for i in range(10):
     conv2d.zero_grad()
     l.sum().backward()
     # Update the kernel
-    conv2d.weight.data[:] -= 3e-2 * conv2d.weight.grad
+    conv2d.weight.data[:] -= lr * conv2d.weight.grad
     if (i + 1) % 2 == 0:
-        print(f'batch {i + 1}, loss {l.sum():.3f}')
+        print(f'epoch {i + 1}, loss {l.sum():.3f}')
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 # Construct a two-dimensional convolutional layer with 1 output channel and a
 # kernel of shape (1, 2). For the sake of simplicity, we ignore the bias here
 conv2d = tf.keras.layers.Conv2D(1, (1, 2), use_bias=False)
 
 # The two-dimensional convolutional layer uses four-dimensional input and
-# output in the format of (example channel, height, width), where the batch
+# output in the format of (example, height, width, channel), where the batch
 # size (number of examples in the batch) and the number of channels are both 1
 X = tf.reshape(X, (1, 6, 8, 1))
 Y = tf.reshape(Y, (1, 6, 7, 1))
+lr = 3e-2  # Learning rate
 
 Y_hat = conv2d(X)
 for i in range(10):
@@ -334,27 +347,28 @@ for i in range(10):
         Y_hat = conv2d(X)
         l = (abs(Y_hat - Y)) ** 2
         # Update the kernel
-        update = tf.multiply(3e-2, g.gradient(l, conv2d.weights[0]))
+        update = tf.multiply(lr, g.gradient(l, conv2d.weights[0]))
         weights = conv2d.get_weights()
         weights[0] = conv2d.weights[0] - update
         conv2d.set_weights(weights)
         if (i + 1) % 2 == 0:
-            print(f'batch {i + 1}, loss {tf.reduce_sum(l):.3f}')
+            print(f'epoch {i + 1}, loss {tf.reduce_sum(l):.3f}')
 ```
 
-Note that the error has dropped to a small value after 10 iterations. Now we will take a look at the kernel tensor we learned.
+Note that the error has dropped to a small value after 10 iterations. Now we will [**take a look at the kernel tensor we learned.**]
 
 ```{.python .input}
+%%tab mxnet
 d2l.reshape(conv2d.weight.data(), (1, 2))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 d2l.reshape(conv2d.weight.data, (1, 2))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 d2l.reshape(conv2d.get_weights()[0], (1, 2))
 ```
 
@@ -365,8 +379,8 @@ to the kernel tensor `K` we defined earlier.
 
 Recall our observation from :numref:`sec_why-conv` of the correspondence
 between the cross-correlation and convolution operations.
-Here let us continue to consider two-dimensional convolutional layers.
-What if such layers 
+Here let's continue to consider two-dimensional convolutional layers.
+What if such layers
 perform strict convolution operations
 as defined in :eqref:`eq_2d-conv-discrete`
 instead of cross-correlations?
@@ -380,10 +394,10 @@ either the strict convolution operations
 or the cross-correlation operations.
 
 To illustrate this, suppose that a convolutional layer performs *cross-correlation* and learns the kernel in :numref:`fig_correlation`, which is denoted as the matrix $\mathbf{K}$ here.
-Assuming that other conditions remain unchanged, 
+Assuming that other conditions remain unchanged,
 when this layer performs strict *convolution* instead,
 the learned kernel $\mathbf{K}'$ will be the same as $\mathbf{K}$
-after $\mathbf{K}'$ is 
+after $\mathbf{K}'$ is
 flipped both horizontally and vertically.
 That is to say,
 when the convolutional layer
@@ -421,12 +435,12 @@ during the forward propagation.
 Note that the receptive field
 may be larger than the actual size of the input.
 
-Let us continue to use :numref:`fig_correlation` to explain the receptive field.
+Let's continue to use :numref:`fig_correlation` to explain the receptive field.
 Given the $2 \times 2$ convolution kernel,
 the receptive field of the shaded output element (of value $19$)
 is
 the four elements in the shaded portion of the input.
-Now let us denote the $2 \times 2$
+Now let's denote the $2 \times 2$
 output as $\mathbf{Y}$
 and consider a deeper CNN
 with an additional $2 \times 2$ convolutional layer that takes $\mathbf{Y}$
@@ -438,23 +452,30 @@ on $\mathbf{Y}$ includes all the four elements of $\mathbf{Y}$,
 while
 the receptive field
 on the input includes all the nine input elements.
-Thus, 
+Thus,
 when any element in a feature map
 needs a larger receptive field
 to detect input features over a broader area,
 we can build a deeper network.
 
+Receptive fields derive their name from neurophysiology. In a series of experiments :cite:`Hubel.Wiesel.1959,Hubel.Wiesel.1962,Hubel.Wiesel.1968` on a range of animals 
+and different stimuli, Hubel and Wiesel explored the response of what is called the visual 
+cortex on said stimuli. By and large they found that lower levels respond to edges and related 
+shapes. Later on, :cite:`Field.1987` illustrated this effect on natural 
+images with, what can only be called, convolutional kernels. 
+We reprint a key figure in :numref:`field_visual` to illustrate the striking similarities. 
 
+![Image and caption taken from :cite:`Field.1987`: An example of coding with six different channels. (Left) Examples of the six types of sensor associated with each channel. (Right) Convolution of the image in (Middle) with the six sensors shown in (Left). The response of the individual sensors is determined by sampling these filtered images at a distance proportional to the size of the sensor (shown with dots). This diagram shows the response of only the even symmetric sensors.](../img/field-visual.png)
+:label:`field_visual`
 
+As it turns out, this relation even holds for the features computed by deeper layers of networks trained on image classification tasks, as demonstrated e.g., 
+in :cite:`Kuzovkin.Vicente.Petton.ea.2018`. Suffice it to say, convolutions have proven to be an incredibly powerful tool for computer vision, both in biology and in code. As such, it is not surprising (in hindsight) that they heralded the recent success in Deep Learning. 
 
 ## Summary
 
-* The core computation of a two-dimensional convolutional layer is a two-dimensional cross-correlation operation. In its simplest form, this performs a cross-correlation operation on the two-dimensional input data and the kernel, and then adds a bias.
-* We can design a kernel to detect edges in images.
-* We can learn the kernel's parameters from data.
-* With kernels learned from data, the outputs of convolutional layers remain unaffected regardless of such layers' performed operations (either strict convolution or cross-correlation).
-* When any element in a feature map needs a larger receptive field to detect broader features on the input, a deeper network can be considered.
+The core computation required for a convolutional layer is a cross-correlation operation. We saw that a simple nested for-loop is all that is required to compute its value. If we have multiple input and multiple output channels, we are  performing a matrix-matrix operation between channels. As can be seen, the computation is straightforward and, most importantly, highly *local*. This affords significant hardware optimization and many recent results in computer vision are only possible due to that. After all, it means that chip designers can invest into fast computation rather than memory, when it comes to optimizing for convolutions. While this may not lead to optimal designs for other applications, it opens the door to ubiquitous and affordable computer vision. 
 
+In terms of convolutions themselves, they can be used for many purposes such as to detect edges and lines, to blur images, or to sharpen them. Most importantly, it is not necessary that the statistician (or engineer) invent suitable filters. Instead, we can simply *learn* them from data. This replaces feature engineering heuristics by evidence-based statistics. Lastly, and quite delightfully, these filters are not just advantageous for building deep networks but they also correspond to receptive fields and feature-maps in the brain. This gives us confidence that we're on the right track. 
 
 ## Exercises
 
@@ -462,12 +483,15 @@ we can build a deeper network.
     1. What happens if you apply the kernel `K` in this section to it?
     1. What happens if you transpose `X`?
     1. What happens if you transpose `K`?
+1. Design some kernels manually.
+    1. Given a directional vector $\mathbf{v} = (v_1, v_2)$, derive an edge-detection kernel that detects 
+       edges orthogonal to $\mathbf{v}$, i.e., edges in the direction $(v_2, -v_1)$. 
+    1. Derive a finite difference operator for the second derivative. What is the minimum 
+       size of the convolutional kernel associate with it? Which structures in images respond most strongly to it?
+    1. How would you design a blur kernel? Why might you want to use such a kernel?
+    1. What is hte minimum size of a kernel to obtain a derivative of order $d$?
 1. When you try to automatically find the gradient for the `Conv2D` class we created, what kind of error message do you see?
 1. How do you represent a cross-correlation operation as a matrix multiplication by changing the input and kernel tensors?
-1. Design some kernels manually.
-    1. What is the form of a kernel for the second derivative?
-    1. What is the kernel for an integral?
-    1. What is the minimum size of a kernel to obtain a derivative of degree $d$?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/65)

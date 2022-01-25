@@ -23,8 +23,9 @@ chapter_notation/index
 chapter_introduction/index
 chapter_preliminaries/index
 chapter_linear-networks/index
+chapter_linear-classification/index
 chapter_multilayer-perceptrons/index
-chapter_deep-learning-computation/index
+chapter_builders-guide/index
 chapter_convolutional-neural-networks/index
 chapter_convolutional-modern/index
 chapter_recurrent-neural-networks/index

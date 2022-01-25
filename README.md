@@ -6,7 +6,7 @@
 
 [![Build Status](http://ci.d2l.ai/job/d2l-en/job/master/badge/icon)](http://ci.d2l.ai/job/d2l-en/job/master/)
 
-[Book website](https://d2l.ai/) | [STAT 157 Course at UC Berkeley, Spring 2019](http://courses.d2l.ai/berkeley-stat-157/index.html) | Latest version: v0.16.1
+[Book website](https://d2l.ai/) | [STAT 157 Course at UC Berkeley](http://courses.d2l.ai/berkeley-stat-157/index.html)
 
 <h5 align="center"><i>The best way to understand deep learning is learning by doing.</i></h5>
 
@@ -34,6 +34,8 @@ Our goal is to offer a resource that could
 
 ## Cool Papers Using D2L
 
+1. [**Descending through a Crowded Valley--Benchmarking Deep Learning Optimizers**](https://arxiv.org/pdf/2007.01547.pdf). R. Schmidt, F. Schneider, P. Hennig. *International Conference on Machine Learning, 2021*
+
 1. [**Universal Average-Case Optimality of Polyak Momentum**](https://arxiv.org/pdf/2002.04664.pdf). D. Scieur, F. Pedregosan. *International Conference on Machine Learning, 2020*
 
 1. [**2D Digital Image Correlation and Region-Based Convolutional Neural Network in Monitoring and Evaluation of Surface Cracks in Concrete Structural Elements**](https://www.mdpi.com/1996-1944/13/16/3527/pdf). M. Słoński, M. Tekieli. *Materials, 2020*
@@ -42,11 +44,9 @@ Our goal is to offer a resource that could
 
 1. [**Detecting Human Driver Inattentive and Aggressive Driving Behavior Using Deep Learning: Recent Advances, Requirements and Open Challenges**](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9107077). M. Alkinani, W. Khan, Q. Arshad. *IEEE Access, 2020*
 
-1. [**Diagnosing Parkinson by Using Deep Autoencoder Neural Network**](https://link.springer.com/chapter/10.1007/978-981-15-6325-6_5). U. Kose, O. Deperlioglu, J. Alzubi, B. Patrut. *Deep Learning for Medical Decision Support Systems, 2020*
-
 <details><summary>more</summary>
 
-1. [**Descending through a Crowded Valley--Benchmarking Deep Learning Optimizers**](https://arxiv.org/pdf/2007.01547.pdf). R. Schmidt, F. Schneider, P. Hennig.
+1. [**Diagnosing Parkinson by Using Deep Autoencoder Neural Network**](https://link.springer.com/chapter/10.1007/978-981-15-6325-6_5). U. Kose, O. Deperlioglu, J. Alzubi, B. Patrut. *Deep Learning for Medical Decision Support Systems, 2020*
 
 1. [**Deep Learning Architectures for Medical Diagnosis**](https://link.springer.com/chapter/10.1007/978-981-15-6325-6_2). U. Kose, O. Deperlioglu, J. Alzubi, B. Patrut. *Deep Learning for Medical Decision Support Systems, 2020*
 
@@ -62,11 +62,11 @@ Our goal is to offer a resource that could
 If you find this book useful, please star (★) this repository or cite this book using the following bibtex entry:
 
 ```
-@book{zhang2020dive,
+@article{zhang2021dive,
     title={Dive into Deep Learning},
-    author={Aston Zhang and Zachary C. Lipton and Mu Li and Alexander J. Smola},
-    note={\url{https://d2l.ai}},
-    year={2020}
+    author={Zhang, Aston and Lipton, Zachary C. and Li, Mu and Smola, Alexander J.},
+    journal={arXiv preprint arXiv:2106.11342},
+    year={2021}
 }
 ```
 
@@ -87,7 +87,7 @@ If you find this book useful, please star (★) this repository or cite this boo
 
 This open source book has benefited from pedagogical suggestions, typo corrections, and other improvements from community contributors. Your help is valuable for making the book better for everyone.
 
-**Dear [D2L contributors](https://github.com/d2l-ai/d2l-en/graphs/contributors), please email your GitHub ID and name to d2lbook.en AT gmail DOT com so your name will appear on the [acknowledgments](https://d2l.ai/chapter_preface/index.html#Acknowledgments). Thanks.**
+**Dear [D2L contributors](https://github.com/d2l-ai/d2l-en/graphs/contributors), please email your GitHub ID and name to d2lbook.en AT gmail DOT com so your name will appear on the [acknowledgments](https://d2l.ai/chapter_preface/index.html#acknowledgments). Thanks.**
 
 
 ## License Summary
@@ -97,3 +97,4 @@ This open source book is made available under the Creative Commons Attribution-S
 The sample and reference code within this open source book is made available under a modified MIT license. See the [LICENSE-SAMPLECODE](LICENSE-SAMPLECODE) file.
 
 [Chinese version](https://github.com/d2l-ai/d2l-zh) | [Discuss and report issues](https://discuss.d2l.ai/) | [Code of conduct](CODE_OF_CONDUCT.md) | [Other Information](INFO.md)
+

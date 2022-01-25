@@ -1,7 +1,14 @@
 # Computational Performance
 :label:`chap_performance`
 
-In deep learning, datasets are usually large and model computation is complex. Therefore, we are always very concerned about computing performance. This chapter will focus on the important factors that affect computing performance: imperative programming, symbolic programming, asynchronous programing, automatic parallel computation, and multi-GPU computation. By studying this chapter, you should be able to further improve the computing performance of the models that have been implemented in the previous chapters, for example, by reducing the model training time without affecting the accuracy of the model.
+In deep learning, 
+datasets and models are usually large,
+which involves heavy computation.
+Therefore, computational performance matters a lot.
+This chapter will focus on the major factors that affect computational performance:
+imperative programming, symbolic programming, asynchronous computing, automatic parallelism, and multi-GPU computation.
+By studying this chapter, you may further improve computational performance of those models implemented in the previous chapters,
+for example, by reducing training time without affecting accuracy.
 
 ```toc
 :maxdepth: 2
@@ -14,3 +21,4 @@ multiple-gpus
 multiple-gpus-concise
 parameterserver
 ```
+

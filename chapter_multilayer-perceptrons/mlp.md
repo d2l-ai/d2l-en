@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Multilayer Perceptrons
 :label:`sec_mlp`
 
@@ -5,8 +10,8 @@ In :numref:`chap_linear`, we introduced
 softmax regression (:numref:`sec_softmax`),
 implementing the algorithm from scratch
 (:numref:`sec_softmax_scratch`) and using high-level APIs
-(:numref:`sec_softmax_concise`),
-and training classifiers to recognize
+(:numref:`sec_softmax_concise`). This allowed us to 
+train classifiers capable of recognizing
 10 categories of clothing from low-resolution images.
 Along the way, we learned how to wrangle data,
 coerce our outputs into a valid probability distribution,
@@ -21,24 +26,24 @@ with which this book is primarily concerned.
 
 ## Hidden Layers
 
-We have described the affine transformation in
-:numref:`subsec_linear_model`,
-which is a linear transformation added by a bias.
+We described affine transformations in
+:numref:`subsec_linear_model` as 
+linear transformations with added bias.
 To begin, recall the model architecture
 corresponding to our softmax regression example,
 illustrated in  :numref:`fig_softmaxreg`.
-This model mapped our inputs directly to our outputs
+This model maps inputs directly to outputs
 via a single affine transformation,
 followed by a softmax operation.
 If our labels truly were related
-to our input data by an affine transformation,
+to the input data by a simple affine transformation,
 then this approach would be sufficient.
-But linearity in affine transformations is a *strong* assumption.
+But linearity (in affine transformations) is a *strong* assumption.
 
-### Linear Models May Go Wrong
+### Limitations of Linear Models
 
 For example, linearity implies the *weaker*
-assumption of *monotonicity*:
+assumption of *monotonicity*, i.e.,
 that any increase in our feature must
 either always cause an increase in our model's output
 (if the corresponding weight is positive),
@@ -47,33 +52,32 @@ or always cause a decrease in our model's output
 Sometimes that makes sense.
 For example, if we were trying to predict
 whether an individual will repay a loan,
-we might reasonably imagine that holding all else equal,
+we might reasonably assume that all other things being equal, 
 an applicant with a higher income
 would always be more likely to repay
 than one with a lower income.
 While monotonic, this relationship likely
 is not linearly associated with the probability of
-repayment. An increase in income from 0 to 50 thousand
+repayment. An increase in income from \\$0 to \\$50,000
 likely corresponds to a bigger increase
 in likelihood of repayment
-than an increase from 1 million to 1.05 million.
-One way to handle this might be to preprocess
-our data such that linearity becomes more plausible,
-say, by using the logarithm of income as our feature.
-
+than an increase from \\$1 million to \\$1.05 million.
+One way to handle this might be to post-process our outcome 
+such that linearity becomes more plausible,
+by using the logistic map (and thus the logarithm of the probability of outcome). 
 
 Note that we can easily come up with examples
 that violate monotonicity.
-Say for example that we want to predict probability
-of death based on body temperature.
+Say for example that we want to predict health as a function 
+of body temperature. 
 For individuals with a body temperature
 above 37°C (98.6°F),
 higher temperatures indicate greater risk.
 However, for individuals with body temperatures
-below 37° C, higher temperatures indicate lower risk!
-In this case too, we might resolve the problem
-with some clever preprocessing.
-Namely, we might use the distance from 37°C as our feature.
+below 37°C, lower temperatures indicate greater risk!
+Again, we might resolve the problem
+with some clever preprocessing, such as using the distance from 37°C 
+as a feature.
 
 
 But what about classifying images of cats and dogs?
@@ -88,12 +92,11 @@ the brightness of individual pixels.
 This approach is doomed to fail in a world
 where inverting an image preserves the category.
 
-
 And yet despite the apparent absurdity of linearity here,
 as compared with our previous examples,
 it is less obvious that we could address the problem
 with a simple preprocessing fix.
-That is because the significance of any pixel
+That is, because the significance of any pixel
 depends in complex ways on its context
 (the values of the surrounding pixels).
 While there might exist a representation of our data
@@ -105,14 +108,24 @@ With deep neural networks, we used observational data
 to jointly learn both a representation via hidden layers
 and a linear predictor that acts upon that representation.
 
+This problem of nonlinearity has been studied for at least a 
+century :cite:`Fisher.1928`. For instance, decision trees
+in their most basic form use a sequence of binary decisions to 
+decide upon class membership :cite:`quinlan2014c4`. Likewise, kernel 
+methods have been used for many decades to model nonlinear dependencies 
+:cite:`Aronszajn.1950`. This has found its way e.g. into 
+nonparametric spline models :cite:`Wahba.1990` and kernel methods
+:cite:`Scholkopf.Smola.2002`. It is also something that the brain solves 
+quite naturally. After all, neurons feed into other neurons which, 
+in turn, again feed into other neurons :cite:`Cajal.Azoulay.1894`. 
+Consequently we have a sequence of relatively simple transformations. 
 
 ### Incorporating Hidden Layers
 
-We can overcome these limitations of linear models
-and handle a more general class of functions
+We can overcome the limitations of linear models
 by incorporating one or more hidden layers.
 The easiest way to do this is to stack
-many fully-connected layers on top of each other.
+many fully connected layers on top of each other.
 Each layer feeds into the layer above it,
 until we generate outputs.
 We can think of the first $L-1$ layers
@@ -120,8 +133,7 @@ as our representation and the final layer
 as our linear predictor.
 This architecture is commonly called
 a *multilayer perceptron*,
-often abbreviated as *MLP*.
-Below, we depict an MLP diagrammatically (:numref:`fig_mlp`).
+often abbreviated as *MLP* (:numref:`fig_mlp`).
 
 ![An MLP with a hidden layer of 5 hidden units. ](../img/mlp.svg)
 :label:`fig_mlp`
@@ -133,33 +145,24 @@ producing outputs with this network
 requires implementing the computations
 for both the hidden and output layers;
 thus, the number of layers in this MLP is 2.
-Note that these layers are both fully connected.
+Note that both layers are fully connected.
 Every input influences every neuron in the hidden layer,
 and each of these in turn influences
-every neuron in the output layer.
-However, as suggested by :numref:`subsec_parameterization-cost-fc-layers`,
-the parameterization cost of MLPs
-with fully-connected layers
-can be prohibitively high,
-which may motivate
-tradeoff between parameter saving and model effectiveness even without changing the input or output size :cite:`Zhang.Tay.Zhang.ea.2021`.
-
-
+every neuron in the output layer. Alas, we are not quite
+done yet. 
 
 ### From Linear to Nonlinear
 
-
-As before, by the matrix $\mathbf{X} \in \mathbb{R}^{n \times d}$,
-we denote a minibatch of $n$ examples where each example has $d$ inputs (features).
+As before, we denote by the matrix $\mathbf{X} \in \mathbb{R}^{n \times d}$
+a minibatch of $n$ examples where each example has $d$ inputs (features).
 For a one-hidden-layer MLP whose hidden layer has $h$ hidden units,
-denote by $\mathbf{H} \in \mathbb{R}^{n \times h}$
+we denote by $\mathbf{H} \in \mathbb{R}^{n \times h}$
 the outputs of the hidden layer, which are
 *hidden representations*.
-In mathematics or code, $\mathbf{H}$ is also known as a *hidden-layer variable* or a *hidden variable*.
 Since the hidden and output layers are both fully connected,
 we have hidden-layer weights $\mathbf{W}^{(1)} \in \mathbb{R}^{d \times h}$ and biases $\mathbf{b}^{(1)} \in \mathbb{R}^{1 \times h}$
 and output-layer weights $\mathbf{W}^{(2)} \in \mathbb{R}^{h \times q}$ and biases $\mathbf{b}^{(2)} \in \mathbb{R}^{1 \times q}$.
-Formally, we calculate the outputs $\mathbf{O} \in \mathbb{R}^{n \times q}$
+This allows us to calculate the outputs $\mathbf{O} \in \mathbb{R}^{n \times q}$
 of the one-hidden-layer MLP as follows:
 
 $$
@@ -168,8 +171,6 @@ $$
     \mathbf{O} & = \mathbf{H}\mathbf{W}^{(2)} + \mathbf{b}^{(2)}.
 \end{aligned}
 $$
-
-
 
 Note that after adding the hidden layer,
 our model now requires us to track and update
@@ -188,10 +189,7 @@ is itself an affine function.
 Moreover, our linear model was already
 capable of representing any affine function.
 
-
-We can view the equivalence formally
-by proving that for any values of the weights,
-we can just collapse out the hidden layer,
+To see this formally we can just collapse out the hidden layer in the above definition,
 yielding an equivalent single-layer model with parameters
 $\mathbf{W} = \mathbf{W}^{(1)}\mathbf{W}^{(2)}$ and $\mathbf{b} = \mathbf{b}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)}$:
 
@@ -199,18 +197,17 @@ $$
 \mathbf{O} = (\mathbf{X} \mathbf{W}^{(1)} + \mathbf{b}^{(1)})\mathbf{W}^{(2)} + \mathbf{b}^{(2)} = \mathbf{X} \mathbf{W}^{(1)}\mathbf{W}^{(2)} + \mathbf{b}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)} = \mathbf{X} \mathbf{W} + \mathbf{b}.
 $$
 
-
 In order to realize the potential of multilayer architectures,
 we need one more key ingredient: a
 nonlinear *activation function* $\sigma$
 to be applied to each hidden unit
-following the affine transformation.
-The outputs of activation functions
-(e.g., $\sigma(\cdot)$)
+following the affine transformation. For instance, a popular
+choice is the ReLu (Rectified Linear Unit) activation function :cite:`Nair.Hinton.2010`
+$\sigma(x) = \mathrm{max}(0, x)$ operating on its arguments element-wise. 
+The outputs of activation functions $\sigma(\cdot)$
 are called *activations*.
 In general, with activation functions in place,
 it is no longer possible to collapse our MLP into a linear model:
-
 
 $$
 \begin{aligned}
@@ -221,18 +218,14 @@ $$
 
 Since each row in $\mathbf{X}$ corresponds to an example in the minibatch,
 with some abuse of notation, we define the nonlinearity
-$\sigma$ to apply to its inputs in a rowwise fashion,
+$\sigma$ to apply to its inputs in a row-wise fashion,
 i.e., one example at a time.
-Note that we used the notation for softmax
-in the same way to denote a rowwise operation in :numref:`subsec_softmax_vectorization`.
-Often, as in this section, the activation functions
-that we apply to hidden layers are not merely rowwise,
-but elementwise.
-That means that after computing the linear portion of the layer,
+Note that we used the same notation for softmax
+when we denoted a row-wise operation in :numref:`subsec_softmax_vectorization`.
+Quite frequently the activation functions we use apply not merely row-wise but 
+element-wise. That means that after computing the linear portion of the layer,
 we can calculate each activation
 without looking at the values taken by the other hidden units.
-This is true for most activation functions.
-
 
 To build more general MLPs, we can continue stacking
 such hidden layers,
@@ -242,19 +235,16 @@ one atop another, yielding ever more expressive models.
 
 ### Universal Approximators
 
-MLPs can capture complex interactions
-among our inputs via their hidden neurons,
-which depend on the values of each of the inputs.
-We can easily design hidden nodes
-to perform arbitrary computation,
-for instance, basic logic operations on a pair of inputs.
-Moreover, for certain choices of the activation function,
-it is widely known that MLPs are universal approximators.
-Even with a single-hidden-layer network,
+We know that the brain is capable of very sophisticated statistical analysis. As such, 
+it is worth asking, just *how powerful* a Deep Network could be. This question
+has been answered multiple times, e.g. in :cite:`Cybenko.1989` in the context 
+of MLPs, and in :cite:`micchelli1984interpolation` in the context of Reproducing Kernel 
+Hilbert Spaces in a way that could be seen as RBF networks with a single hidden layer. 
+These (and related results) suggest that even with a single-hidden-layer network,
 given enough nodes (possibly absurdly many),
 and the right set of weights,
-we can model any function,
-though actually learning that function is the hard part.
+we can model any function.
+Actually learning that function is the hard part, though.
 You might think of your neural network
 as being a bit like the C programming language.
 The language, like any other modern language,
@@ -266,12 +256,26 @@ Moreover, just because a single-hidden-layer network
 *can* learn any function
 does not mean that you should try
 to solve all of your problems
-with single-hidden-layer networks.
+with single-hidden-layer networks. In fact, in this case kernel methods 
+are way more effective, since they are capable of solving the problem 
+*exactly* even in infinite dimensional spaces :cite:`Kimeldorf.Wahba.1971,Scholkopf.Herbrich.Smola.2001`. 
 In fact, we can approximate many functions
-much more compactly by using deeper (vs. wider) networks.
+much more compactly by using deeper (vs. wider) networks :cite:`Simonyan.Zisserman.2014`.
 We will touch upon more rigorous arguments in subsequent chapters.
 
+
+## Activation Functions
+:label:`subsec_activation-functions`
+
+Activation functions decide whether a neuron should be activated or not by
+calculating the weighted sum and further adding bias with it.
+They are differentiable operators to transform input signals to outputs,
+while most of them add non-linearity.
+Because activation functions are fundamental to deep learning,
+(**let's briefly survey some common activation functions**).
+
 ```{.python .input}
+%%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
@@ -279,36 +283,26 @@ npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
 import torch
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## Activation Functions
-:label:`subsec:activation-functions`
-
-Activation functions decide whether a neuron should be activated or not by
-calculating the weighted sum and further adding bias with it.
-They are differentiable operators to transform input signals to outputs,
-while most of them add non-linearity.
-Because activation functions are fundamental to deep learning,
-let us briefly survey some common activation functions.
-
 ### ReLU Function
 
 The most popular choice,
 due to both simplicity of implementation and
-its good performance on a variety of predictive tasks,
+its good performance on a variety of predictive tasks :cite:`Nair.Hinton.2010`,
 is the *rectified linear unit* (*ReLU*).
-ReLU provides a very simple nonlinear transformation.
+[**ReLU provides a very simple nonlinear transformation**].
 Given an element $x$, the function is defined
 as the maximum of that element and $0$:
 
@@ -321,6 +315,7 @@ To gain some intuition, we can plot the function.
 As you can see, the activation function is piecewise linear.
 
 ```{.python .input}
+%%tab mxnet
 x = np.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
@@ -329,14 +324,14 @@ d2l.plot(x, y, 'x', 'relu(x)', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 x = torch.arange(-8.0, 8.0, 0.1, requires_grad=True)
 y = torch.relu(x)
 d2l.plot(x.detach(), y.detach(), 'x', 'relu(x)', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 x = tf.Variable(tf.range(-8.0, 8.0, 0.1), dtype=tf.float32)
 y = tf.nn.relu(x)
 d2l.plot(x.numpy(), y.numpy(), 'x', 'relu(x)', figsize=(5, 2.5))
@@ -351,25 +346,28 @@ when the input takes value precisely equal to 0.
 In these cases, we default to the left-hand-side
 derivative and say that the derivative is 0 when the input is 0.
 We can get away with this because
-the input may never actually be zero.
+the input may never actually be zero (mathematicians would 
+say that it's nondifferentiable on a set of measure zero).
 There is an old adage that if subtle boundary conditions matter,
 we are probably doing (*real*) mathematics, not engineering.
-That conventional wisdom may apply here.
+That conventional wisdom may apply here, or at least, the fact that 
+we are not performing constrained optimization :cite:`Mangasarian.1965,Rockafellar.1970`. 
 We plot the derivative of the ReLU function plotted below.
 
 ```{.python .input}
+%%tab mxnet
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of relu', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 y.backward(torch.ones_like(x), retain_graph=True)
 d2l.plot(x.detach(), x.grad, 'x', 'grad of relu', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 with tf.GradientTape() as t:
     y = tf.nn.relu(x)
 d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of relu',
@@ -394,9 +392,9 @@ $$\operatorname{pReLU}(x) = \max(0, x) + \alpha \min(0, x).$$
 
 ### Sigmoid Function
 
-The *sigmoid function* transforms its inputs,
+[**The *sigmoid function* transforms its inputs**],
 for which values lie in the domain $\mathbb{R}$,
-to outputs that lie on the interval (0, 1).
+(**to outputs that lie on the interval (0, 1).**)
 For that reason, the sigmoid is
 often called a *squashing function*:
 it squashes any input in the range (-inf, inf)
@@ -410,11 +408,10 @@ which either *fire* or *do not fire*.
 Thus the pioneers of this field,
 going all the way back to McCulloch and Pitts,
 the inventors of the artificial neuron,
-focused on thresholding units.
+focused on thresholding units :cite:`McCulloch.Pitts.1943`.
 A thresholding activation takes value 0
 when its input is below some threshold
 and value 1 when the input exceeds the threshold.
-
 
 When attention shifted to gradient based learning,
 the sigmoid function was a natural choice
@@ -423,12 +420,14 @@ approximation to a thresholding unit.
 Sigmoids are still widely used as
 activation functions on the output units,
 when we want to interpret the outputs as probabilities
-for binary classification problems
-(you can think of the sigmoid as a special case of the softmax).
+for binary classification problems: you can think of the sigmoid as a special case of the softmax.
 However, the sigmoid has mostly been replaced
 by the simpler and more easily trainable ReLU
-for most use in hidden layers.
-In later chapters on recurrent neural networks,
+for most use in hidden layers. Much of this has to do 
+with the fact that the sigmoid poses challenges for optimization
+:cite:`LeCun.Bottou.Orr.ea.1998` since its gradient vanishes for large positive *and* negative arguments. 
+This can lead to plateaus that are difficult to escape from. 
+Nonetheless sigmoids are important. In later chapters (e.g., :numref:`sec_lstm`) on recurrent neural networks,
 we will describe architectures that leverage sigmoid units
 to control the flow of information across time.
 
@@ -438,19 +437,20 @@ the sigmoid function approaches
 a linear transformation.
 
 ```{.python .input}
+%%tab mxnet
 with autograd.record():
     y = npx.sigmoid(x)
 d2l.plot(x, y, 'x', 'sigmoid(x)', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 y = torch.sigmoid(x)
 d2l.plot(x.detach(), y.detach(), 'x', 'sigmoid(x)', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 y = tf.nn.sigmoid(x)
 d2l.plot(x.numpy(), y.numpy(), 'x', 'sigmoid(x)', figsize=(5, 2.5))
 ```
@@ -468,12 +468,13 @@ As the input diverges from 0 in either direction,
 the derivative approaches 0.
 
 ```{.python .input}
+%%tab mxnet
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of sigmoid', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 # Clear out previous gradients
 x.grad.data.zero_()
 y.backward(torch.ones_like(x),retain_graph=True)
@@ -481,7 +482,7 @@ d2l.plot(x.detach(), x.grad, 'x', 'grad of sigmoid', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 with tf.GradientTape() as t:
     y = tf.nn.sigmoid(x)
 d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of sigmoid',
@@ -490,29 +491,30 @@ d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of sigmoid',
 
 ### Tanh Function
 
-Like the sigmoid function, the tanh (hyperbolic tangent)
-function also squashes its inputs,
-transforming them into elements on the interval between -1 and 1:
+Like the sigmoid function, [**the tanh (hyperbolic tangent)
+function also squashes its inputs**],
+transforming them into elements on the interval (**between -1 and 1**):
 
 $$\operatorname{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
-We plot the tanh function below.
-Note that as the input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to that of the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system.
+We plot the tanh function below.  
+Note that as input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to that of the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system :cite:`Kalman.Kwasny.1992`.
 
 ```{.python .input}
+%%tab mxnet
 with autograd.record():
     y = np.tanh(x)
 d2l.plot(x, y, 'x', 'tanh(x)', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 y = torch.tanh(x)
 d2l.plot(x.detach(), y.detach(), 'x', 'tanh(x)', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 y = tf.nn.tanh(x)
 d2l.plot(x.numpy(), y.numpy(), 'x', 'tanh(x)', figsize=(5, 2.5))
 ```
@@ -521,20 +523,21 @@ The derivative of the tanh function is:
 
 $$\frac{d}{dx} \operatorname{tanh}(x) = 1 - \operatorname{tanh}^2(x).$$
 
-The derivative of tanh function is plotted below.
+It is plotted below.
 As the input nears 0,
 the derivative of the tanh function approaches a maximum of 1.
 And as we saw with the sigmoid function,
-as the input moves away from 0 in either direction,
+as input moves away from 0 in either direction,
 the derivative of the tanh function approaches 0.
 
 ```{.python .input}
+%%tab mxnet
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of tanh', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 # Clear out previous gradients.
 x.grad.data.zero_()
 y.backward(torch.ones_like(x),retain_graph=True)
@@ -542,14 +545,16 @@ d2l.plot(x.detach(), x.grad, 'x', 'grad of tanh', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 with tf.GradientTape() as t:
     y = tf.nn.tanh(x)
 d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of tanh',
          figsize=(5, 2.5))
 ```
 
-In summary, we now know how to incorporate nonlinearities
+## Summary
+
+We now know how to incorporate nonlinearities
 to build expressive multilayer neural network architectures.
 As a side note, your knowledge already
 puts you in command of a similar toolkit
@@ -560,21 +565,32 @@ because you can leverage powerful
 open-source deep learning frameworks
 to build models rapidly, using only a few lines of code.
 Previously, training these networks
-required researchers to code up
-thousands of lines of C and Fortran.
+required researchers to code up layers and derivatives
+explicitly in C, Fortran, or even Lisp (in the case of LeNet). 
 
-## Summary
-
-* MLP adds one or multiple fully-connected hidden layers between the output and input layers and transforms the output of the hidden layer via an activation function.
-* Commonly-used activation functions include the ReLU function, the sigmoid function, and the tanh function.
-
+A secondary benefit is that ReLU is significantly more amenable to
+optimization than the sigmoid or the tanh function. One could argue 
+that this was one of the key innovations that helped the resurgence
+of Deep Learning over the past decade. Note, though, that research in 
+activation functions has not stopped. For instance, the Swish activation 
+function $\sigma(x) = x \operatorname{sigmoid}(\beta x)$ as proposed in
+:cite:`Ramachandran.Zoph.Le.2017` can yield better accuracy 
+in many cases.
 
 ## Exercises
 
+1. Show that adding layers to a *linear* deep network, i.e. a network without 
+   nonlinearity $\sigma$ can never increase the expressive power of the network. 
+   Give an example where it actively reduces it. 
 1. Compute the derivative of the pReLU activation function.
-1. Show that an MLP using only ReLU (or pReLU) constructs a continuous piecewise linear function.
-1. Show that $\operatorname{tanh}(x) + 1 = 2 \operatorname{sigmoid}(2x)$.
-1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems do you expect this to cause?
+1. Compute the derivative of the Swish activation function $x \operatorname{sigmoid}(\beta x)$. 
+1. Show that an MLP using only ReLU (or pReLU) constructs a 
+   continuous piecewise linear function.
+1. Sigmoid and tanh are very similar. 
+    1. Show that $\operatorname{tanh}(x) + 1 = 2 \operatorname{sigmoid}(2x)$.
+    1. Prove that the function classes parametrized by both nonlinearities are identical. Hint: affine layers have bias terms, too.
+1. Assume that we have a nonlinearity that applies to one minibatch at a time, such as the Batch Normalization :cite:`Ioffe.Szegedy.2015`. What kinds of problems do you expect this to cause?
+1. Provide an example where the gradients vanish for the sigmoid activation function. 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/90)

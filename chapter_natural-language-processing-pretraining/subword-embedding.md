@@ -1,30 +1,87 @@
 # Subword Embedding
 :label:`sec_fasttext`
 
-English words usually have internal structures and formation methods. For example, we can deduce the relationship between "dog", "dogs", and "dogcatcher" by their spelling. All these words have the same root, "dog", but they use different suffixes to change the meaning of the word. Moreover, this association can be extended to other words. For example, the relationship between "dog" and "dogs" is just like the relationship between "cat" and "cats". The relationship between "boy" and "boyfriend" is just like the relationship between "girl" and "girlfriend". This characteristic is not unique to English. In French and Spanish, a lot of verbs can have more than 40 different forms depending on the context. In Finnish, a noun may have more than 15 forms. In fact, morphology, which is an important branch of linguistics, studies the internal structure and formation of words.
+In English,
+words such as
+"helps", "helped", and "helping" are 
+inflected forms of the same word "help".
+The relationship 
+between "dog" and "dogs"
+is the same as 
+that between "cat" and "cats",
+and 
+the relationship 
+between "boy" and "boyfriend"
+is the same as 
+that between "girl" and "girlfriend".
+In other languages
+such as French and Spanish,
+many verbs have over 40 inflected forms,
+while in Finnish,
+a noun may have up to 15 cases.
+In linguistics,
+morphology studies word formation and word relationships.
+However,
+the internal structure of words
+was neither explored in word2vec
+nor in GloVe.
+
+## The fastText Model
+
+Recall how words are represented in word2vec.
+In both the skip-gram model
+and the continuous bag-of-words model,
+different inflected forms of the same word
+are directly represented by different vectors
+without shared parameters.
+To use morphological information,
+the *fastText* model
+proposed a *subword embedding* approach,
+where a subword is a character $n$-gram :cite:`Bojanowski.Grave.Joulin.ea.2017`.
+Instead of learning word-level vector representations,
+fastText can be considered as
+the subword-level skip-gram,
+where each *center word* is represented by the sum of 
+its subword vectors.
+
+Let's illustrate how to obtain 
+subwords for each center word in fastText
+using the word "where".
+First, add special characters “&lt;” and “&gt;” 
+at the beginning and end of the word to distinguish prefixes and suffixes from other subwords. 
+Then, extract character $n$-grams from the word.
+For example, when $n=3$,
+we obtain all subwords of length 3: "&lt;wh", "whe", "her", "ere", "re&gt;", and the special subword "&lt;where&gt;".
 
 
-## fastText
+In fastText, for any word $w$,
+denote by $\mathcal{G}_w$
+the union of all its subwords of length between 3 and 6
+and its special subword.
+The vocabulary 
+is the union of the subwords of all words.
+Letting $\mathbf{z}_g$
+be the vector of subword $g$ in the dictionary,
+the vector $\mathbf{v}_w$ for 
+word $w$ as a center word
+in the skip-gram model
+is the sum of its subword vectors:
 
-In word2vec, we did not directly use morphology information.  In both the
-skip-gram model and continuous bag-of-words model, we use different vectors to
-represent words with different forms. For example, "dog" and "dogs" are
-represented by two different vectors, while the relationship between these two
-vectors is not directly represented in the model. In view of this, fastText :cite:`Bojanowski.Grave.Joulin.ea.2017`
-proposes the method of subword embedding, thereby attempting to introduce
-morphological information in the skip-gram model in word2vec.
+$$\mathbf{v}_w = \sum_{g\in\mathcal{G}_w} \mathbf{z}_g.$$
 
-In fastText, each central word is represented as a collection of subwords. Below we use the word "where" as an example to understand how subwords are formed. First, we add the special characters “&lt;” and “&gt;” at the beginning and end of the word to distinguish the subwords used as prefixes and suffixes. Then, we treat the word as a sequence of characters to extract the $n$-grams. For example, when $n=3$, we can get all subwords with a length of $3$:
+The rest of fastText is the same as the skip-gram model. Compared with the skip-gram model, 
+the vocabulary in fastText is larger,
+resulting in more model parameters. 
+Besides, 
+to calculate the representation of a word,
+all its subword vectors
+have to be summed,
+leading to higher computational complexity.
+However,
+thanks to shared parameters from subwords among words with similar structures,
+rare words and even out-of-vocabulary words
+may obtain better vector representations in fastText.
 
-$$\textrm{"<wh"}, \ \textrm{"whe"}, \ \textrm{"her"}, \ \textrm{"ere"}, \ \textrm{"re>"},$$
-
-and the special subword $\textrm{"<where>"}$.
-
-In fastText, for a word $w$, we record the union of all its subwords with length of $3$ to $6$ and special subwords as $\mathcal{G}_w$. Thus, the dictionary is the union of the collection of subwords of all words. Assume the vector of the subword $g$ in the dictionary is $\mathbf{z}_g$. Then, the central word vector $\mathbf{u}_w$ for the word $w$ in the skip-gram model can be expressed as
-
-$$\mathbf{u}_w = \sum_{g\in\mathcal{G}_w} \mathbf{z}_g.$$
-
-The rest of the fastText process is consistent with the skip-gram model, so it is not repeated here. As we can see, compared with the skip-gram model, the dictionary in fastText is larger, resulting in more model parameters. Also, the vector of one word requires the summation of all subword vectors, which results in higher computation complexity. However, we can obtain better vectors for more uncommon complex words, even words not existing in the dictionary, by looking at other words with similar structures.
 
 
 ## Byte Pair Encoding
@@ -37,7 +94,7 @@ called *byte pair encoding* (BPE) to extract subwords :cite:`Sennrich.Haddow.Bir
 
 Byte pair encoding performs a statistical analysis of the training dataset to discover common symbols within a word,
 such as consecutive characters of arbitrary length.
-Starting from symbols of length $1$,
+Starting from symbols of length 1,
 byte pair encoding iteratively merges the most frequent pair of consecutive symbols to produce new longer symbols.
 Note that for efficiency, pairs crossing word boundaries are not considered.
 In the end, we can use such symbols as subwords to segment words.
@@ -73,7 +130,7 @@ for token, freq in raw_token_freqs.items():
 token_freqs
 ```
 
-We define the following `get_max_freq_pair` function that 
+We define the following `get_max_freq_pair` function that
 returns the most frequent pair of consecutive symbols within a word,
 where words come from keys of the input dictionary `token_freqs`.
 
@@ -169,20 +226,23 @@ print(segment_BPE(tokens, symbols))
 
 ## Summary
 
-* FastText proposes a subword embedding method. Based on the skip-gram model in word2vec, it represents the central word vector as the sum of the subword vectors of the word.
-* Subword embedding utilizes the principles of morphology, which usually improves the quality of representations of uncommon words.
+* The fastText model proposes a subword embedding approach. Based on the skip-gram model in word2vec, it represents a center word as the sum of its subword vectors.
 * Byte pair encoding performs a statistical analysis of the training dataset to discover common symbols within a word. As a greedy approach, byte pair encoding iteratively merges the most frequent pair of consecutive symbols.
-
+* Subword embedding may improve the quality of representations of rare words and out-of-dictionary words.
 
 ## Exercises
 
-1. When there are too many subwords (for example, 6 words in English result in about $3\times 10^8$ combinations), what problems arise? Can you think of any methods to solve them? Hint: Refer to the end of section 3.2 of the fastText paper :cite:`Bojanowski.Grave.Joulin.ea.2017`.
-1. How can you design a subword embedding model based on the continuous bag-of-words model?
+1. As an example, there are about $3\times 10^8$ possible  $6$-grams in English. What is the issue when there are too many subwords? How to address the issue? Hint: refer to the end of Section 3.2 of the fastText paper :cite:`Bojanowski.Grave.Joulin.ea.2017`.
+1. How to design a subword embedding model based on the continuous bag-of-words model?
 1. To get a vocabulary of size $m$, how many merging operations are needed when the initial symbol vocabulary size is $n$?
-1. How can we extend the idea of byte pair encoding to extract phrases?
+1. How to extend the idea of byte pair encoding to extract phrases?
 
 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/386)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/4587)
 :end_tab:

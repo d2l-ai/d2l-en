@@ -3,7 +3,7 @@
 
 In deep learning,
 we often use CNNs or RNNs to encode a sequence.
-Now with attention mechanisms.
+Now with attention mechanisms,
 imagine that we feed a sequence of tokens
 into attention pooling
 so that
@@ -36,7 +36,14 @@ import torch
 from torch import nn
 ```
 
-## Self-Attention
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import numpy as np
+import tensorflow as tf
+```
+
+## [**Self-Attention**]
 
 Given a sequence of input tokens
 $\mathbf{x}_1, \ldots, \mathbf{x}_n$ where any $\mathbf{x}_i \in \mathbb{R}^d$ ($1 \leq i \leq n$),
@@ -48,7 +55,7 @@ where
 $$\mathbf{y}_i = f(\mathbf{x}_i, (\mathbf{x}_1, \mathbf{x}_1), \ldots, (\mathbf{x}_n, \mathbf{x}_n)) \in \mathbb{R}^d$$
 
 according to the definition of attention pooling $f$ in
-:eqref:`eq_attn-pooling`.
+:eqref:`eq_attn-pooling-def`.
 Using multi-head attention,
 the following code snippet
 computes the self-attention of a tensor
@@ -70,16 +77,30 @@ attention.eval()
 ```
 
 ```{.python .input}
-#@tab all
+#@tab tensorflow
+num_hiddens, num_heads = 100, 5
+attention = d2l.MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
+                                   num_hiddens, num_heads, 0.5)
+```
+
+```{.python .input}
+#@tab mxnet, pytorch
 batch_size, num_queries, valid_lens = 2, 4, d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
 attention(X, X, X, valid_lens).shape
 ```
 
+```{.python .input}
+#@tab tensorflow
+batch_size, num_queries, valid_lens = 2, 4, tf.constant([3, 2])
+X = tf.ones((batch_size, num_queries, num_hiddens))
+attention(X, X, X, valid_lens, training=False).shape
+```
+
 ## Comparing CNNs, RNNs, and Self-Attention
 :label:`subsec_cnn-rnn-self-attention`
 
-Let us
+Let's
 compare architectures for mapping
 a sequence of $n$ tokens
 to another sequence of equal length,
@@ -157,7 +178,7 @@ makes self-attention prohibitively slow for very long sequences.
 
 
 
-## Positional Encoding
+## [**Positional Encoding**]
 :label:`subsec_positional-encoding`
 
 
@@ -194,11 +215,12 @@ At first glance,
 this trigonometric-function
 design looks weird.
 Before explanations of this design,
-let us first implement it in the following `PositionalEncoding` class.
+let's first implement it in the following `PositionalEncoding` class.
 
 ```{.python .input}
 #@save
 class PositionalEncoding(nn.Block):
+    """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
@@ -218,6 +240,7 @@ class PositionalEncoding(nn.Block):
 #@tab pytorch
 #@save
 class PositionalEncoding(nn.Module):
+    """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
@@ -234,9 +257,30 @@ class PositionalEncoding(nn.Module):
         return self.dropout(X)
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@save
+class PositionalEncoding(tf.keras.layers.Layer):
+    """Positional encoding."""
+    def __init__(self, num_hiddens, dropout, max_len=1000):
+        super().__init__()
+        self.dropout = tf.keras.layers.Dropout(dropout)
+        # Create a long enough `P`
+        self.P = np.zeros((1, max_len, num_hiddens))
+        X = np.arange(max_len, dtype=np.float32).reshape(
+            -1,1)/np.power(10000, np.arange(
+            0, num_hiddens, 2, dtype=np.float32) / num_hiddens)
+        self.P[:, :, 0::2] = np.sin(X)
+        self.P[:, :, 1::2] = np.cos(X)
+        
+    def call(self, X, **kwargs):
+        X = X + self.P[:, :X.shape[1], :]
+        return self.dropout(X, **kwargs)
+```
+
 In the positional embedding matrix $\mathbf{P}$,
-rows correspond to positions within a sequence
-and columns represent different positional encoding dimensions.
+[**rows correspond to positions within a sequence
+and columns represent different positional encoding dimensions**].
 In the example below,
 we can see that
 the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$
@@ -269,11 +313,21 @@ d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
          figsize=(6, 2.5), legend=["Col %d" % d for d in d2l.arange(6, 10)])
 ```
 
+```{.python .input}
+#@tab tensorflow
+encoding_dim, num_steps = 32, 60
+pos_encoding = PositionalEncoding(encoding_dim, 0)
+X = pos_encoding(tf.zeros((1, num_steps, encoding_dim)), training=False)
+P = pos_encoding.P[:, :X.shape[1], :]
+d2l.plot(np.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
+         figsize=(6, 2.5), legend=["Col %d" % d for d in np.arange(6, 10)])
+```
+
 ### Absolute Positional Information
 
 To see how the monotonically decreased frequency
 along the encoding dimension relates to absolute positional information,
-let us print out the binary representations of $0, 1, \ldots, 7$.
+let's print out [**the binary representations**] of $0, 1, \ldots, 7$.
 As we can see,
 the lowest bit, the second-lowest bit, and the third-lowest bit alternate on every number, every two numbers, and every four numbers, respectively.
 
@@ -287,8 +341,8 @@ In binary representations,
 a higher bit has a lower frequency than a lower bit.
 Similarly,
 as demonstrated in the heat map below,
-the positional encoding decreases
-frequencies along the encoding dimension
+[**the positional encoding decreases
+frequencies along the encoding dimension**]
 by using trigonometric functions.
 Since the outputs are float numbers,
 such continuous representations
@@ -304,6 +358,13 @@ d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
 ```{.python .input}
 #@tab pytorch
 P = P[0, :, :].unsqueeze(0).unsqueeze(0)
+d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
+                  ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
+```
+
+```{.python .input}
+#@tab tensorflow
+P = tf.expand_dims(tf.expand_dims(P[0, :, :], axis=0), axis=0)
 d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
                   ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
 ```
@@ -359,4 +420,8 @@ where the $2\times 2$ projection matrix does not depend on any position index $i
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1652)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/3870)
 :end_tab:
