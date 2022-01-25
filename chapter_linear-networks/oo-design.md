@@ -67,6 +67,7 @@ import tensorflow as tf
 ```
 
 ## Utilities
+:label:`oo-design-utilities`
 
 We need a few utilities to simplify object-oriented programming in Jupyter notebooks. One of the challenges is that class definitions tend to be fairly long blocks of code. Notebook readability demands short code fragments, interspersed with explanations, a requirement incompatible with the style of programming common for Python libraries. The first
 utility function allows us to register functions as methods in a class *after* the class has been created. In fact, we can do so *even after* we've created instances of the class! It allows us to split the implementation of a class into multiple code blocks.
@@ -153,6 +154,7 @@ for x in np.arange(0, 10, 0.1):
 ```
 
 ## Models
+:label:`oo-design-models`
 
 The `Module` class  is the base class of all models we will implement. At a minimum we need to define three methods. The `__init__` method stores the learnable parameters, the `training_step` method accepts a data batch to return the loss value, the `configure_optimizers` method returns the optimization method, or a list of them, that is used to update the learnable parameters. Optionally we can define `validation_step` to report the evaluation measures.
 Sometimes we put the code to compute the output into a separate `forward` method to make it more reusable.
@@ -230,6 +232,7 @@ It provides convenient features to handle neural networks. For example, it invok
 :end_tab:
 
 ##  Data
+:label:`oo-design-data`
 
 The `DataModule` class is the base class for data. Quite frequently the `__init__` method is used to prepare the data. This includes downloading and preprocessing if needed. The `train_dataloader` returns the data loader for the training dataset. A data loader is a (Python) generator that yields a data batch each time it is used. This batch is then fed into the `training_step` method of `Module` to compute the loss. There is an optional `val_dataloader` to return the validation dataset loader. It behaves in the same manner, except that it yields data batches for the `validation_step` method in `Module`.
 
@@ -255,6 +258,7 @@ class DataModule(d2l.HyperParameters):  #@save
 ```
 
 ## Training
+:label:`oo-design-training`
 
 The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
 
@@ -302,7 +306,7 @@ such as via `@add_to_class`,
 in the rest of the book.
 Moreover,
 these fully implemented classes
-are saved in the [`d2l` library](https://github.com/d2l-ai/d2l-en/tree/master/d2l),
+are saved in the [d2l library](https://github.com/d2l-ai/d2l-en/tree/master/d2l),
 a *lightweight toolkit* that makes structured modeling for deep learning easy. 
 In particular, it facilitates reusing many components between projects without changing much at all. For instance, we can replace just the optimizer, just the model, just the dataset, etc.;
 this degree of modularity pays dividends throughout the book in terms of conciseness and simplicity (this is why we added it) and it can do the same for your own projects. 
@@ -310,7 +314,7 @@ this degree of modularity pays dividends throughout the book in terms of concise
 
 ## Exercises
 
-1. Locate full implementations of the above classes that are saved in the [`d2l` library](https://github.com/d2l-ai/d2l-en/tree/master/d2l). We strongly recommend that you look at the implementation in detail once you have gained some more familiarity with deep learning modeling.
+1. Locate full implementations of the above classes that are saved in the [d2l library](https://github.com/d2l-ai/d2l-en/tree/master/d2l). We strongly recommend that you look at the implementation in detail once you have gained some more familiarity with deep learning modeling.
 1. Remove the `save_hyperparameters` statement in the `B` class. Can you still print `self.a` and `self.b`? Optional: if you have dived into the full implementation of the `HyperParameters` class, can you explain why?
 
 

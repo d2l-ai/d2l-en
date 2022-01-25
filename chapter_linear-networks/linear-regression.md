@@ -149,6 +149,7 @@ we will need two more things:
 and (ii) a procedure for updating the model to improve its quality.
 
 ### Loss Function
+:label:`subsec_linear-regression-loss-function`
 
 Naturally, fitting our model to the data requires
 that we agree on some measure of *fitness*

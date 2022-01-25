@@ -11,12 +11,13 @@ a fully functioning implementation
 of linear regression. 
 In this section, 
 (**we will implement the entire method from scratch,
-including (i) the model; (ii) loss function;
+including (i) the model; (ii) the loss function;
 (iii) a minibatch stochastic gradient descent optimizer;
 and (iv) the training function 
 that stitches all of these pieces together.**)
 Finally, we will run our synthetic data generator
-from the previous section and apply our model
+from :numref:`sec_synthetic-regression-data`
+and apply our model
 on the resulting dataset. 
 While modern deep learning frameworks 
 can automate nearly all of this work,
@@ -64,6 +65,8 @@ The magic number 0.01 often works well in practice,
 but you can specify a different value 
 through the argument `sigma`.
 Moreover we set the bias to 0.
+Note that for object-oriented design
+we add the code to the `__init__` method of a subclass of `d2l.Module` (introduced in :numref:`oo-design-models`). 
 
 ```{.python .input  n=5}
 %%tab all
@@ -87,7 +90,7 @@ class LinearRegressionScratch(d2l.Module):  #@save
 ```
 
 Next, we must [**define our model,
-relating its inputs and parameters to its outputs.**]
+relating its input and parameters to its output.**]
 For our linear model we simply take the matrix-vector product
 of the input features $\mathbf{X}$ 
 and the model weights $\mathbf{w}$,
@@ -97,6 +100,9 @@ Due to the broadcasting mechanism
 (see :numref:`subsec_broadcasting`),
 when we add a vector and a scalar,
 the scalar is added to each component of the vector.
+The resulting `forward` function 
+is registered as a method in the `LinearRegressionScratch` class
+via `add_to_class` (introduced in :numref:`oo-design-utilities`).
 
 ```{.python .input  n=6}
 %%tab all
@@ -112,7 +118,7 @@ Since [**updating our model requires taking
 the gradient of our loss function,**]
 we ought to (**define the loss function first.**)
 Here we use the squared loss function
-of :numref:`sec_linear_regression`.
+in :numref:`subsec_linear-regression-loss-function`.
 In the implementation, we need to transform the true value `y`
 into the predicted value's shape `y_hat`.
 The result returned by the following function
@@ -133,7 +139,7 @@ def loss(self, y_hat, y):
 As discussed in :numref:`sec_linear_regression`,
 linear regression has a closed-form solution.
 However, our goal here is to illustrate 
-how to train more general neural networsk,
+how to train more general neural networks,
 and that requires that we teach you 
 how to use minibatch SGD.
 Hence we will take this opportunity
@@ -153,25 +159,34 @@ In later chapters we will investigate
 how learning rates should be adjusted
 for very large minibatches as they arise 
 in distributed large scale learning.
-For now, though, we can ignore this dependency.
+For now, we can ignore this dependency.
+
+ 
+
 
 :begin_tab:`mxnet`
-We define our `SGD` class to have a similar API
+We define our `SGD` class, 
+a subclass of `d2l.HyperParameters` (introduced in :numref:`oo-design-utilities`),
+to have a similar API
 as the built-in SGD optimizer.
 We update the parameters in the `step` method.
 It accepts a `batch_size` argument that can be ignored.
 :end_tab:
 
 :begin_tab:`pytorch`
-We define our `SGD` class to have a similar API 
+We define our `SGD` class,
+a subclass of `d2l.HyperParameters` (introduced in :numref:`oo-design-utilities`),
+to have a similar API 
 as the built-in SGD optimizer.
 We update the parameters in the `step` method.
 The `zero_grad` method sets all gradients to 0,
-which must be run before a backward step. 
+which must be run before a backpropagation step. 
 :end_tab:
 
 :begin_tab:`tensorflow`
-We define our `SGD` class to have a similar API
+We define our `SGD` class,
+a subclass of `d2l.HyperParameters` (introduced in :numref:`oo-design-utilities`),
+to have a similar API
 as the built-in SGD optimizer.
 We update the parameters in the `apply_gradients` method.
 It accepts a list of parameter and gradient pairs. 
@@ -230,7 +245,7 @@ Now that we have all of the parts in place
 (parameters, loss function, model, and optimizer),
 we are ready to [**implement the main training loop.**]
 It is crucial that you understand this code well
-you will employ similar training loops
+since you will employ similar training loops
 for every other deep learning model
 covered in this book.
 In each *epoch*, we iterate through 
@@ -258,6 +273,10 @@ we will use a validation dataset
 to measure our model quality. 
 Here we pass the validation dataloader 
 once in each epoch to measure the model performance.
+Following our object-oriented design,
+the `prepare_batch` and `fit_epoch` functions
+are registered as methods of the `d2l.Trainer` class
+(introduced in :numref:`oo-design-training`).
 
 ```{.python .input  n=11}
 %%tab all    
@@ -331,8 +350,8 @@ def fit_epoch(self):
 
 We are almost ready to train the model,
 but first we need some data to train on.
-Here we use the SyntheticRegressionData function 
-and pass in some ground truth parameters.
+Here we use the `SyntheticRegressionData` class 
+and pass in some ground-truth parameters.
 Then, we train our model with 
 the learning rate `lr=0.03` 
 and set `max_epochs=3`. 
@@ -343,8 +362,8 @@ and we will usually want to use a 3-way split,
 one set for training, 
 a second for hyperparameter seclection,
 and the third reserved for the final evaluation.
-We elide these details for now but revise them
-later in :numref:`chap_optimization`.
+We elide these details for now but will revise them
+later.
 
 ```{.python .input  n=15}
 %%tab all
@@ -368,7 +387,7 @@ print(f'error in estimating b: {data.b - model.b}')
 ```
 
 We should not take the ability to exactly recover 
-the ground truth parameters for granted.
+the ground-truth parameters for granted.
 In general, for deep models unique solutions
 for the parameters do not exist,
 and even for linear models,
@@ -398,7 +417,7 @@ a model, a loss function, an optimization procedure,
 and a visualization and monitoring tool. 
 We did this by composing a Python object 
 that contains all relevant components for training a model. 
-While this is not yet a professional grade implementation
+While this is not yet a professional-grade implementation
 it is perfectly functional and code like this 
 could already help you to solve small problems quickly.
 In the next sections, we will see how to do this
@@ -412,17 +431,17 @@ and *more efficiently* (use our GPUs to their full potential).
 1. What would happen if we were to initialize the weights to zero. Would the algorithm still work? What if we
    initialized the parameters with variance $1,000$ rather than $0.01$?
 1. Assume that you are [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up
-   with a model for resistors that relates voltage and current. Can you use automatic
+   with a model for resistors that relate voltage and current. Can you use automatic
    differentiation to learn the parameters of your model?
 1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object
    using spectral energy density? For reference, the spectral density $B$ of radiation emanating from a black body is
    $B(\lambda, T) = \frac{2 hc^2}{\lambda^5} \cdot \left(\exp \frac{h c}{\lambda k T} - 1\right)^{-1}$. Here
-   $\lambda$ is the wavelength, $T$ the temperature, $c$ the speed of light, $h$ Planck's quantum, and $k$ the
+   $\lambda$ is the wavelength, $T$ is the temperature, $c$ is the speed of light, $h$ is Planck's quantum, and $k$ is the
    Boltzmann constant. You measure the energy for different wavelengths $\lambda$ and you now need to fit the spectral
    density curve to Planck's law.
 1. What are the problems you might encounter if you wanted to compute the second derivatives of the loss? How would
    you fix them?
-1. Why is the `reshape` function needed in the `squared_loss` function?
+1. Why is the `reshape` method needed in the `loss` function?
 1. Experiment using different learning rates to find out how quickly the loss function value drops. Can you reduce the
    error by increasing the number of epochs of training?
 1. If the number of examples cannot be divided by the batch size, what happens to `data_iter` at the end of an epoch?
