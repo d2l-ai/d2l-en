@@ -66,7 +66,7 @@ but you can specify a different value
 through the argument `sigma`.
 Moreover we set the bias to 0.
 Note that for object-oriented design
-we add the code to the `__init__` method of a subclass of `d2l.Module` (introduced in :numref:`oo-design-models`). 
+we add the code to the `__init__` method of a subclass of `d2l.Module` (introduced in :numref:`oo-design-models`).
 
 ```{.python .input  n=5}
 %%tab all
@@ -118,7 +118,7 @@ Since [**updating our model requires taking
 the gradient of our loss function,**]
 we ought to (**define the loss function first.**)
 Here we use the squared loss function
-in :numref:`subsec_linear-regression-loss-function`.
+in :eqref:`eq_mse`.
 In the implementation, we need to transform the true value `y`
 into the predicted value's shape `y_hat`.
 The result returned by the following function
