@@ -150,7 +150,7 @@ To begin with, we need two more helper functions. The first uses an update funct
 #@tab all
 def train_2d(trainer, steps=20, f_grad=None):  #@save
     """Optimize a 2D objective function with a customized trainer."""
-    # `s1` and `s2` are internal state variables that will be used later
+    # `s1` and `s2` are internal state variables that will be used in Momentum, adagrad, RMSProp
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
     for i in range(steps):
