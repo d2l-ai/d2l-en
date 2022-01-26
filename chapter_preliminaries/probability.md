@@ -854,7 +854,7 @@ Sometimes we are interested in the expected value
 of some function of $x$.
 We can calculate these expectations as
 
-$$E_{x \sim P}[f(x)] = \sum_x f(x) P(x) \text{ and } E_{x \sim P}[f(x)] = \int f(x) \;dp(x)$$
+$$E_{x \sim P}[f(x)] = \sum_x f(x) P(x) \text{ and } E_{x \sim P}[f(x)] = \int f(x) p(x) \;dx$$
 
 for discrete probabilities and densities, respectively. 
 Returning to the investment example from above, 
