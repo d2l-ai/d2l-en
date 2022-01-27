@@ -123,7 +123,7 @@ but first we need to understand the IID case,
 where $P(\cdot) = Q(\cdot)$.
 
 To begin with, we need to differentiate between
-the *training error* $R_\mathrm{emp}$,
+the *training error* $R_\text{emp}$,
 which is a *statistic*
 calculated on the training dataset,
 and the *generalization error* $R$,
@@ -135,7 +135,7 @@ to an infinite stream of additional data examples
 drawn from the same underlying data distribution.
 Formally the training error is expressed as a *sum* (with the same notation in :numref:`sec_linear_regression`):
 
-$$R_\mathrm{emp}[\mathbf{X}, \mathbf{Y}, f] = \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}^{(i)}, \mathbf{y}^{(i)}, f(\mathbf{x}^{(i)})),$$
+$$R_\text{emp}[\mathbf{X}, \mathbf{Y}, f] = \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}^{(i)}, \mathbf{y}^{(i)}, f(\mathbf{x}^{(i)})),$$
 
 
 while the generalization error is expressed as an integral:
@@ -174,8 +174,6 @@ The central question of generalization
 is then when should we expect our training error
 to be close to the population error
 (and thus the generalization error).
-
-
 
 ### Model Complexity
 
@@ -256,10 +254,10 @@ while they generalize well in practice,
 they too powerful to allow us to conclude
 much on the basis of training error alone.
 In these cases we must rely more heavily
-on our hold out data to certify generalization
+on our holdout data to certify generalization
 after the fact.
-
-
+Error on the holdout data, i.e., validation set,
+is called the *validation error*.
 
 ## Underfitting or Overfitting?
 
@@ -272,10 +270,10 @@ If the model is unable to reduce the training error,
 that could mean that our model is too simple
 (i.e., insufficiently expressive)
 to capture the pattern that we are trying to model.
-Moreover, since the *generalization gap* (R_emp - R)
+Moreover, since the *generalization gap* ($R_\text{emp} - R$)
 between our training and generalization errors is small,
 we have reason to believe that we could get away with a more complex model.
-This phenomenon is known as *underfitting*
+This phenomenon is known as *underfitting*.
 
 On the other hand, as we discussed above,
 we want to watch out for the cases
@@ -289,24 +287,22 @@ Ultimately, we usually care about
 driving the generalization error lower,
 and only care about the gap insofar
 as it becomes an obstacle to that end.
-Note that if the training error is $0$,
+Note that if the training error is zero,
 then the generalization gap is precisely equal to the generalization error
 and we can make progress only by reducing the gap.
-
-
 
 ### Polynomial Curve Fitting
 
 To illustrate some classical intuition
 about overfitting and model complexity,
 consider the following:
-Given training data consisting of a single feature $x$
+given training data consisting of a single feature $x$
 and a corresponding real-valued label $y$,
 we try to find the polynomial of degree $d$
 
 $$\hat{y}= \sum_{i=0}^d x^i w_i$$
 
-to estimate the labels $y$.
+to estimate the label $y$.
 This is just a linear regression problem
 where our features are given by the powers of $x$,
 the model's weights are given by $w_i$,
@@ -328,7 +324,7 @@ each have a distinct value of $x$,
 a polynomial function with degree
 equal to the number of data examples
 can fit the training set perfectly.
-We visualize the relationship between polynomial degree
+We visualize the relationship between polynomial degree (model complexity)
 and underfitting vs. overfitting in :numref:`fig_capacity_vs_error`.
 
 ![Influence of model complexity on underfitting and overfitting](../img/capacity-vs-error.svg)
@@ -362,9 +358,6 @@ owes considerably to the abundance of massive datasets
 arising from Internet companies, cheap storage,
 connected devices, and the broad digitization of the economy.
 
-
-
-
 ## Model Selection
 
 Typically, we select our final model,
@@ -372,7 +365,7 @@ only after evaluating multiple models
 that differ in various ways
 (different architectures, training objectives,
 selected features, data preprocessing,
-learning rates, etc).
+learning rates, etc.).
 Choosing among many models is aptly
 called *model selection*.
 
@@ -384,7 +377,7 @@ Then we would be in serious trouble.
 If we overfit our training data,
 there is always the evaluation on test data to keep us honest.
 But if we overfit the test data, how would we ever know?
-See e.g. :cite:`ong2005learning` for an example how
+See :cite:`ong2005learning` for an example how
 this can lead to absurd results even for models where the complexity
 can be tightly controlled.
 
@@ -398,16 +391,16 @@ on the very data that we use to train the model.
 In practical applications, the picture gets muddier.
 While ideally we would only touch the test data once,
 to assess the very best model or to compare
-a small number of models to each other,
+a small number of models with each other,
 real-world test data is seldom discarded after just one use.
 We can seldom afford a new test set for each round of experiments.
 In fact, recycling benchmark data for decades
 can have a significant impact on the
 development of algorithms,
-e.g. for [image classification](https://paperswithcode.com/sota/image-classification-on-imagenet)
+e.g., for [image classification](https://paperswithcode.com/sota/image-classification-on-imagenet)
 and [optical character recognition](https://paperswithcode.com/sota/image-classification-on-mnist).
 
-The common practice to address the problem of `training on the test set`
+The common practice to address the problem of *training on the test set*
 is to split our data three ways,
 incorporating a *validation set*
 in addition to the training and test datasets.
@@ -450,7 +443,7 @@ We leave you with a few rules of thumb:
 
 1. Use validation sets (or $K$*-fold cross-validation*) for model selection;
 1. More complex models often require more data;
-1. relevant notions of complexity include both the number of parameters and the range of values that they are allowed to take;
+1. Relevant notions of complexity include both the number of parameters and the range of values that they are allowed to take;
 1. Keeping all else equal, more data almost always leads to better generalization;
 1. This entire talk of generalization is all predicated on the IID assumption. If we relax this assumption, allowing for distributions to shift between the train and testing periods, then we cannot say anything about generalization absent a further (perhaps milder) assumption.
 
@@ -460,8 +453,8 @@ We leave you with a few rules of thumb:
 1. When can you solve the problem of polynomial regression exactly?
 1. Give at least five examples where dependent random variables make treating the problem as IID data inadvisable.
 1. Can you ever expect to see zero training error? Under which circumstances would you see zero generalization error?
-1. Why is $k$-fold crossvalidation very expensive to compute?
-1. Why is the $k$-fold crossvalidation error estimate biased?
+1. Why is $K$-fold cross-validation very expensive to compute?
+1. Why is the $K$-fold cross-validation error estimate biased?
 1. The VC dimension is defined as the maximum number of points that can be classified with arbitrary labels $\{\pm 1\}$ by a function of a class of functions. Why might this not be a good idea to measure how complex the class of functions is? Hint: what about the magnitude of the functions?
 1. Your manager gives you a difficult dataset on which your current algorithm doesn't perform so well. How would you justify to him that you need more data? Hint: you cannot increase the data but you can decrease it.
 
