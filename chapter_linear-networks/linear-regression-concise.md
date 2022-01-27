@@ -40,7 +40,7 @@ the linear regression model**) from :numref:`sec_linear_scratch`
 ```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
-from mxnet import autograd, gluon, np, npx
+from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 ```
@@ -135,9 +135,10 @@ class LinearRegression(d2l.Module):  #@save
         self.save_hyperparameters()
         if tab.selected('mxnet'):
             self.net = nn.Dense(1)
-            self.net.initialize()
+            self.net.initialize(init.Normal(sigma=0.01))
         if tab.selected('tensorflow'):
-            self.net = tf.keras.layers.Dense(1)
+            initializer = tf.initializers.RandomNormal(stddev=0.01)
+            self.net = tf.keras.layers.Dense(1, kernel_initializer=initializer)
 ```
 
 ```{.python .input  n=2}
@@ -147,6 +148,8 @@ class LinearRegression(d2l.Module):  #@save
         super().__init__()
         self.save_hyperparameters()
         self.net = nn.Linear(num_inputs, 1)
+        self.net.weight.data.normal_(0, 0.01)
+        self.net.bias.data.fill_(0)
 ```
 
 In the `forward` method, we just invoke the built-in `__call__` function of the predefined layers to compute the outputs.

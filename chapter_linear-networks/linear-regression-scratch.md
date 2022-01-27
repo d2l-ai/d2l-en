@@ -75,15 +75,15 @@ class LinearRegressionScratch(d2l.Module):  #@save
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
-            self.w = d2l.randn(num_inputs, 1) * sigma
+            self.w = d2l.normal(0, sigma, (num_inputs, 1))
             self.b = d2l.zeros(1)
             self.w.attach_grad()
             self.b.attach_grad()
         if tab.selected('pytorch'):
-            self.w = d2l.randn(num_inputs, 1, requires_grad=True)
+            self.w = d2l.normal(0, sigma, (num_inputs, 1), requires_grad=True)
             self.b = d2l.zeros(1, requires_grad=True)
         if tab.selected('tensorflow'):
-            w = tf.random.normal((num_inputs, 1)) * sigma
+            w = tf.random.normal((num_inputs, 1), mean=0, stddev=0.01)
             b = tf.zeros(1)
             self.w = tf.Variable(w, trainable=True)
             self.b = tf.Variable(b, trainable=True)

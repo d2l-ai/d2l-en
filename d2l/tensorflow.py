@@ -337,7 +337,7 @@ class LinearRegressionScratch(d2l.Module):
     def __init__(self, num_inputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        w = tf.random.normal((num_inputs, 1)) * sigma
+        w = tf.random.normal((num_inputs, 1), mean=0, stddev=0.01)
         b = tf.zeros(1)
         self.w = tf.Variable(w, trainable=True)
         self.b = tf.Variable(b, trainable=True)
@@ -372,7 +372,8 @@ class LinearRegression(d2l.Module):
     def __init__(self, lr):
         super().__init__()
         self.save_hyperparameters()
-        self.net = tf.keras.layers.Dense(1)
+        initializer = tf.initializers.RandomNormal(stddev=0.01)
+        self.net = tf.keras.layers.Dense(1, kernel_initializer=initializer)
 
     def forward(self, X):
         """The linear regression model.

@@ -387,7 +387,7 @@ class LinearRegressionScratch(d2l.Module):
     def __init__(self, num_inputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.w = d2l.randn(num_inputs, 1) * sigma
+        self.w = d2l.normal(0, sigma, (num_inputs, 1))
         self.b = d2l.zeros(1)
         self.w.attach_grad()
         self.b.attach_grad()
@@ -423,7 +423,7 @@ class LinearRegression(d2l.Module):
         super().__init__()
         self.save_hyperparameters()
         self.net = nn.Dense(1)
-        self.net.initialize()
+        self.net.initialize(init.Normal(sigma=0.01))
 
     def forward(self, X):
         """The linear regression model.

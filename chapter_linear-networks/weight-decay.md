@@ -288,8 +288,8 @@ data = Data(num_train=20, num_val=100, num_inputs=200, batch_size=5)
 trainer = d2l.Trainer(max_epochs=10)
 
 def train_scratch(lambd):    
-    model = WeightDecayScratch(num_inputs=200, lambd=lambd, lr=0.003)
-    model.board.ylim = [1e-3, 1]
+    model = WeightDecayScratch(num_inputs=200, lambd=lambd, lr=0.01)
+    model.board.yscale='log'
     trainer.fit(model, data)
     print('L2 norm of w:', float(l2_penalty(model.w)))
 ```
@@ -300,7 +300,7 @@ We now run this code with `lambd = 0`,
 disabling weight decay.
 Note that we overfit badly,
 decreasing the training error but not the
-test error---a textbook case of overfitting.
+validation error---a textbook case of overfitting.
 
 ```{.python .input  n=9}
 %%tab all
@@ -311,7 +311,7 @@ train_scratch(0)
 
 Below, we run with substantial weight decay.
 Note that the training error increases
-but the test error decreases.
+but the validation error decreases.
 This is precisely the effect
 we expect from regularization.
 
@@ -402,7 +402,7 @@ class WeightDecay(d2l.LinearRegression):
         return super().loss(y_hat, y) + self.net.losses
 ```
 
-[**The plots look identical to those when
+[**The plot looks similar to that when
 we implemented weight decay from scratch**].
 However, this version runs faster
 and is easier to implement,
@@ -413,11 +413,11 @@ and this work becomes more routine.
 ```{.python .input  n=14}
 %%tab all
 if tab.selected('mxnet') or tab.selected('tensorflow'):    
-    model = WeightDecay(wd=3, lr=0.003)
+    model = WeightDecay(wd=3, lr=0.01)
 if tab.selected('pytorch'):
-    model = WeightDecay(num_inputs=200, wd=3, lr=0.003)
-    
-model.board.ylim = [1e-3, 1]
+    model = WeightDecay(num_inputs=200, wd=3, lr=0.01)
+
+model.board.yscale='log'
 trainer.fit(model, data)
 print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0]))) 
 ```
