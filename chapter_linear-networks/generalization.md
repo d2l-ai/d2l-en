@@ -292,6 +292,7 @@ then the generalization gap is precisely equal to the generalization error
 and we can make progress only by reducing the gap.
 
 ### Polynomial Curve Fitting
+:label:`subsec_polynomial-curve-fitting`
 
 To illustrate some classical intuition
 about overfitting and model complexity,
