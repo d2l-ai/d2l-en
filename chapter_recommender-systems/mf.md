@@ -129,7 +129,7 @@ class RMSELoss(nn.Module):
 
 # convert tuple to tensor based on https://discuss.pytorch.org/t/convert-a-tuple-into-tensor/82964/3
 def tuple_to_tensor(tuple_tensors):
-    return torch.stack(tuple_tensors, dim=1)
+    return torch.stack(tuple_tensors, dim=0)
     
 def evaluator(net, test_iter, devices):
     rmse = RMSELoss()  # Get the RMSE
