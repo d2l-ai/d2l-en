@@ -124,12 +124,15 @@ class RMSELoss(nn.Module):
         self.eps = eps
         
     def forward(self, yhat, y):
-        total = 0
-        for yh, yg in zip(yhat, y):
-            total += self.mse(yh, yg) + self.eps
-        loss = torch.sqrt(total)
+        yhat = yhat.reshape(-1, 1)
+        y = y.reshape(-1, 1)
+        loss = torch.sqrt(self.mse(yhat, y) + self.eps)
         return loss
 
+# convert tuple to tensor based on https://discuss.pytorch.org/t/convert-a-tuple-into-tensor/82964/3
+def tuple_of_tensors_to_tensor(tuple_of_tensors):
+    return  torch.stack(list(tuple_of_tensors), dim=0)
+    
 def evaluator(net, test_iter, devices):
     rmse = RMSELoss()  # Get the RMSE
     rmse_list = []
@@ -138,7 +141,7 @@ def evaluator(net, test_iter, devices):
         i = nn.parallel.scatter(items, devices)
         r_ui = nn.parallel.scatter(ratings, devices)
         r_hat = [net(u, i) for u, i in zip(u, i)]
-        rmse_list.append(rmse(r_ui, r_hat))
+        rmse_list.append(rmse(tuple_of_tensors_to_tensor(r_ui), tuple_of_tensors_to_tensor(r_hat)))
     return float(torch.mean(torch.tensor(rmse_list)))
 ```
 
