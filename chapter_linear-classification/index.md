@@ -6,13 +6,13 @@ you are ready to apply these skills to broader kinds of tasks.
 Even as we pivot towards classification,
 most of the plumbing remains the same:
 loading the data, passing it through the model,
-generating out put, calculating the loss,
+generating output, calculating the loss,
 taking gradients with respect to weights,
 and updating the model.
 However, the precise form of the targets,
 the parameterization of the output layer,
 and the choice of loss function will adapt
-to suit the classification setting.
+to suit the *classification* setting.
 
 ```toc
 :maxdepth: 2
