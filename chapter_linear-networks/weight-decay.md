@@ -369,11 +369,12 @@ class WeightDecay(d2l.LinearRegression):
     def __init__(self, wd, lr):
         super().__init__(lr)
         self.save_hyperparameters()
+        self.wd = wd
         
     def configure_optimizers(self):
         self.collect_params('.*bias').setattr('wd_mult', 0)
         return gluon.Trainer(self.collect_params(),
-                             'sgd', {'learning_rate': self.lr})
+                             'sgd', {'learning_rate': self.lr,'wd': self.wd})
 ```
 
 ```{.python .input  n=12}
@@ -412,14 +413,16 @@ and this work becomes more routine.
 
 ```{.python .input  n=14}
 %%tab all
-if tab.selected('mxnet') or tab.selected('tensorflow'):    
+if tab.selected('mxnet'):
     model = WeightDecay(wd=3, lr=0.01)
+if tab.selected('tensorflow'):
+    model = WeightDecay(wd=0.3, lr=0.01)
 if tab.selected('pytorch'):
     model = WeightDecay(num_inputs=200, wd=3, lr=0.01)
 
 model.board.yscale='log'
 trainer.fit(model, data)
-print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0]))) 
+print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0])))
 ```
 
 So far, we only touched upon one notion of
