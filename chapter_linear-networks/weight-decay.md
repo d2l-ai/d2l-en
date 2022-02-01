@@ -180,8 +180,8 @@ constrain $\mathbf{w}$ more considerably.
 Whether we include a corresponding bias penalty $b^2$ 
 can vary across implementations, 
 and may vary across layers of a neural network.
-Often, we do not regularize the bias term
-of a network's output layer.
+Often, we do not regularize the bias term.
+
 
 ## High-Dimensional Linear Regression
 
@@ -280,7 +280,7 @@ class WeightDecayScratch(d2l.LinearRegressionScratch):
         return super().loss(y_hat, y) + self.lambd * l2_penalty(self.w)        
 ```
 
-The following code fits our model on the training set with 20 examples and evaluates it on the validation set with 100 examples. 
+The following code fits our model on the training set with 20 examples and evaluates it on the validation set with 100 examples.
 
 ```{.python .input  n=8}
 %%tab all
@@ -359,7 +359,7 @@ the weight, so the bias parameter $b$ will not decay.
 
 :begin_tab:`tensorflow`
 In the following code, we create an $\ell_2$ regularizer with
-the weight decay hyperparameter `wd` and apply it to the layer
+the weight decay hyperparameter `wd` and apply it to the layer's weights
 through the `kernel_regularizer` argument.
 :end_tab:
 
