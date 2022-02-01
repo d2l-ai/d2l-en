@@ -8,20 +8,20 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 You may have noticed that the implementations from scratch and the concise implementation using framework functionality were quite similar in the case of regression. The same is true for classification. Since a great many models in this book deal with classification, it is worth adding some functionality to support this setting specifically. This section provides a base class for classification models to simplify future code.
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, gluon
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -32,7 +32,7 @@ from IPython import display
 
 We define the `Classifier` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exactly correct if the last batch contains fewer examples, but we ignore this minor difference to keep the code simple.
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab all
 class Classifier(d2l.Module):  #@save
     def validation_step(self, batch):
@@ -41,26 +41,26 @@ class Classifier(d2l.Module):  #@save
         self.plot('acc', self.accuracy(Y_hat, batch[-1]), train=False)
 ```
 
-By default we use a Stochastic Gradient Descent optimizer, operating on minibatches, just as we did in the context of linear regression.
+By default we use a stochastic gradient descent optimizer, operating on minibatches, just as we did in the context of linear regression.
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab mxnet
 @d2l.add_to_class(d2l.Module)  #@save
 def configure_optimizers(self):
     params = self.parameters()
     if isinstance(params, list):
         return d2l.SGD(params, self.lr)
-    return gluon.Trainer(params,  'sgd', {'learning_rate': self.lr})
+    return gluon.Trainer(params, 'sgd', {'learning_rate': self.lr})
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab pytorch
 @d2l.add_to_class(d2l.Module)  #@save
 def configure_optimizers(self):
     return torch.optim.SGD(self.parameters(), lr=self.lr)
 ```
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab tensorflow
 @d2l.add_to_class(d2l.Module)  #@save
 def configure_optimizers(self):
@@ -83,7 +83,7 @@ Although it can be difficult to optimize accuracy directly (it is not differenti
 it is often the performance measure that we care about the most. It is often *the*
 relevant quantity in benchmarks. As such, we will nearly always report it when training classifiers.
 
-Accuracy is computed as follows:
+Accuracy is computed as follows.
 First, if `y_hat` is a matrix,
 we assume that the second dimension stores prediction scores for each class.
 We use `argmax` to obtain the predicted class by the index for the largest entry in each row.
@@ -93,7 +93,7 @@ we convert `y_hat`'s data type to match that of `y`.
 The result is a tensor containing entries of 0 (false) and 1 (true).
 Taking the sum yields the number of correct predictions.
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab all
 @d2l.add_to_class(Classifier)  #@save
 def accuracy(self, Y_hat, Y, averaged=True):
@@ -104,7 +104,7 @@ def accuracy(self, Y_hat, Y, averaged=True):
     return d2l.reduce_mean(compare) if averaged else compare
 ```
 
-```{.python .input}
+```{.python .input  n=10}
 %%tab mxnet
 
 @d2l.add_to_class(d2l.Module)  #@save
@@ -135,3 +135,15 @@ Classification is a sufficiently common problem that it warrants its own conveni
 1. Denote by $L_v$ the validation loss, and let $L_v^q$ be its quick and dirty estimate computed by the loss function averaging in this section. Lastly, denote by $l_v^b$ the loss on the last minibatch. Express $L_v$ in terms of $L_v^q$, $l_v^b$, and the sample and minibatch sizes.
 1. Show that the quick and dirty estimate $L_v^q$ is unbiased. That is, show that $E[L_v] = E[L_v^q]$. Why would you still want to use $L_v$ instead?
 1. Given a multiclass classification loss, denoting by $l(y,y')$ the penalty of estimating $y'$ when we see $y$ and given a probabilty $p(y|x)$, formulate the rule for an optimal selection of $y'$. Hint: express the expected loss, using $l$ and $p(y|x)$.
+
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/6808)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/6809)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/6810)
+:end_tab:
