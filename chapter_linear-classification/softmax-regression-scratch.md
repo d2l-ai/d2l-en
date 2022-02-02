@@ -258,7 +258,7 @@ based on the *validation* split of the data
 and then to ultimately evaluate your final model
 on the *test* split.
 As discussed in :numref:`subsec_generalization-model-selection`,
-we treat the test data of Fashion-MNIST
+we will treat the test data of Fashion-MNIST
 as the validation set, thus
 reporting validation loss and validation accuracy
 on this split.

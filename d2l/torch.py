@@ -482,7 +482,8 @@ class Classifier(d2l.Module):
         """Defined in :numref:`sec_softmax_concise`"""
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         Y = d2l.reshape(Y, (-1,))
-        return F.cross_entropy(Y_hat, Y, reduction='mean' if averaged else 'none')
+        return F.cross_entropy(
+            Y_hat, Y, reduction='mean' if averaged else 'none')
 
     def layer_summary(self, X_shape):
         """Defined in :numref:`sec_lenet`"""
