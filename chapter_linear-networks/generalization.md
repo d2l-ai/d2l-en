@@ -360,6 +360,7 @@ arising from Internet companies, cheap storage,
 connected devices, and the broad digitization of the economy.
 
 ## Model Selection
+:label:`subsec_generalization-model-selection`
 
 Typically, we select our final model,
 only after evaluating multiple models

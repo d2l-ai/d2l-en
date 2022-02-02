@@ -12,7 +12,7 @@ how to implement it yourself.
 Here, we limit ourselves to defining the
 softmax-specific aspects of the model
 and reuse the other components
-from our regression section,
+from our linear regression section,
 including the training loop.
 
 ```{.python .input}
@@ -36,13 +36,12 @@ import tensorflow as tf
 
 ## The Softmax
 
-Let's begin with the most important part,
+Let's begin with the most important part:
 the mapping from scalars to probabilities.
 For a refresher, recall the operation of the sum operator
 along specific dimensions in a tensor,
 as discussed in :numref:`subsec_lin-alg-reduction`
 and :numref:`subsec_lin-alg-non-reduction`.
-
 [**Given a matrix `X` we can sum over all elements (by default) or only
 over elements in the same axis.**]
 The `axis` variable lets us compute row and column sums:
@@ -80,7 +79,7 @@ def softmax(X):
 For any input `X`, [**we turn each element
 into a non-negative number.
 Each row sums up to 1,**]
-as is required for a probability. Caution: the code above is *not* robust against very large or very small arguments. While this is sufficient to illustrate what is happening, you should *not* use this code verbatim for any serious purpose. Deep Learning frameworks have such protections built-in and we will be using the built-in softmax going forward.
+as is required for a probability. Caution: the code above is *not* robust against very large or very small arguments. While this is sufficient to illustrate what is happening, you should *not* use this code verbatim for any serious purpose. Deep learning frameworks have such protections built-in and we will be using the built-in softmax going forward.
 
 ```{.python .input}
 %%tab mxnet
@@ -169,20 +168,21 @@ class SoftmaxRegressionScratch(d2l.Classifier):
 The code below defines how the network
 maps each input to an output.
 Note that we flatten each $28 \times 28$ pixel image in the batch
-into a vector using the `reshape` function
+into a vector using `reshape`
 before passing the data through our model.
 
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(SoftmaxRegressionScratch)
 def forward(self, X):
-    return softmax(d2l.matmul(d2l.reshape(X, (-1, self.W.shape[0])), self.W) + self.b)
+    return softmax(d2l.matmul(d2l.reshape(
+        X, (-1, self.W.shape[0])), self.W) + self.b)
 ```
 
 ## The Cross-Entropy Loss
 
 Next we need to implement the cross-entropy loss function
-(introduced in :numref:`sec_softmax`).
+(introduced in :numref:`subsec_softmax-regression-loss-func`).
 This may be the most common loss function
 in all of deep learning.
 At the moment, applications of deep learning
@@ -257,6 +257,11 @@ In practice you will want to choose these values
 based on the *validation* split of the data
 and then to ultimately evaluate your final model
 on the *test* split.
+As discussed in :numref:`subsec_generalization-model-selection`,
+we treat the test data of Fashion-MNIST
+as the validation set, thus
+reporting validation loss and validation accuracy
+on this split.
 
 ```{.python .input}
 %%tab all
@@ -278,10 +283,10 @@ preds = d2l.argmax(model(X), axis=1)
 preds.shape
 ```
 
-We are more interested in the images we label incorrectly. We visualize them by
+We are more interested in the images we label *incorrectly*. We visualize them by
 comparing their actual labels
 (first line of text output)
-to the predictions from the model
+with the predictions from the model
 (second line of text output).
 
 ```{.python .input}
@@ -300,7 +305,7 @@ with solving linear regression
 and classification problems.
 With it, we have reached what would arguably be
 the state of the art of 1960-1970s of statistical modeling.
-In the next section, we'll show you how leverage
+In the next section, we'll show you how to leverage
 deep learning frameworks to implement this model
 much more efficiently.
 
@@ -318,8 +323,8 @@ much more efficiently.
 1. Is it always a good idea to return the most likely label? For example, would you do this for medical diagnosis? How would you try to address this?
 1. Assume that we want to use softmax regression to predict the next word based on some features. What are some problems that might arise from a large vocabulary?
 1. Experiment with the hyperparameters of the code above. In particular:
-    1. Plot how the test error changes as you change the learning rate?
-    1. Do the test and training error change as you change the minibatch size? How large / small do you need to go before you see an effect?
+    1. Plot how the validation loss changes as you change the learning rate.
+    1. Do the validation and training loss change as you change the minibatch size? How large or small do you need to go before you see an effect?
 
 
 :begin_tab:`mxnet`

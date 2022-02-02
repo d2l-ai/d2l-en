@@ -425,7 +425,7 @@ class LinearRegression(d2l.Module):
 
 class FashionMNIST(d2l.DataModule):
     """Defined in :numref:`sec_fashion_mnist`"""
-    def __init__(self, batch_size=64, resize=(28,28)):
+    def __init__(self, batch_size=64, resize=(28, 28)):
         super().__init__()
         self.save_hyperparameters()
         trans = transforms.Compose([transforms.Resize(resize),
