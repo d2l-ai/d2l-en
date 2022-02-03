@@ -101,6 +101,8 @@ that have been found (empirically)
 to yield improved generalization
 on tasks of practical interest.
 
+
+
 ## Training Error and Generalization Error
 
 
@@ -135,27 +137,27 @@ to an infinite stream of additional data examples
 drawn from the same underlying data distribution.
 Formally the training error is expressed as a *sum* (with the same notation in :numref:`sec_linear_regression`):
 
-$$R_\text{emp}[\mathbf{X}, \mathbf{Y}, f] = \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}^{(i)}, \mathbf{y}^{(i)}, f(\mathbf{x}^{(i)})),$$
+$$R_\text{emp}[\mathbf{X}, \mathbf{y}, f] = \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}^{(i)}, y^{(i)}, f(\mathbf{x}^{(i)})),$$
 
 
 while the generalization error is expressed as an integral:
 
-$$R[p, f] = E_{(\mathbf{x}, \mathbf{y}) \sim P} [l(\mathbf{x}, \mathbf{y}, f(\mathbf{x}))] =
-\int l(\mathbf{x}, \mathbf{y}, f(\mathbf{x})) p(\mathbf{x}, \mathbf{y}) \;d(\mathbf{x}, \mathbf{y})$$
+$$R[p, f] = E_{(\mathbf{x}, y) \sim P} [l(\mathbf{x}, y, f(\mathbf{x}))] =
+\int \int l(\mathbf{x}, y, f(\mathbf{x})) p(\mathbf{x}, y) \;d\mathbf{x} dy.$$
 
 Problematically, we can never calculate
 the generalization error $R$ exactly.
 Nobody ever tells us the precise form
-of the density function $p(\mathbf{x}, \mathbf{y})$.
+of the density function $p(\mathbf{x}, y)$.
 Moreover, we cannot sample an infinite stream of data points.
 Thus, in practice, we must *estimate* the generalization error
 by applying our model to an independent test set
 constituted of a random selection of examples
-$\mathbf{X}'$ and labels $\mathbf{Y}'$
+$\mathbf{X}'$ and labels $\mathbf{y}'$
 that were withheld from our training set.
 This consists of applying the same formula
 as for calculating the empirical training error
-but to a test set $\mathbf{X}', \mathbf{Y}'$.
+but to a test set $\mathbf{X}', \mathbf{y}'$.
 
 
 Crucially, when we evaluate our classifier on the test set,

@@ -23,5 +23,6 @@ classification
 softmax-regression-scratch
 softmax-regression-concise
 generalization-classification
+environment-and-distribution-shift
 ```
 

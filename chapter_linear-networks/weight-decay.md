@@ -52,7 +52,8 @@ for adjusting function complexity.
 *weight decay*, operates by restricting the values 
 that the parameters can take.**)
 More commonly called $\ell_2$ regularization
-outside of deep learning circles,
+outside of deep learning circles
+when optimized by minibatch stochastic gradient descent,
 weight decay might be the most widely used technique
 for regularizing parametric machine learning models.
 The technique is motivated by the basic intuition
@@ -157,11 +158,9 @@ Using the same notation in :eqref:`eq_linreg_batch_update`,
 the minibatch stochastic gradient descent updates
 for $\ell_2$-regularized regression follow:
 
-$$
-\begin{aligned}
+$$\begin{aligned}
 \mathbf{w} & \leftarrow \left(1- \eta\lambda \right) \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right).
-\end{aligned}
-$$
+\end{aligned}$$
 
 As before, we update $\mathbf{w}$ based on the amount
 by which our estimate differs from the observation.
@@ -181,6 +180,12 @@ Whether we include a corresponding bias penalty $b^2$
 can vary across implementations, 
 and may vary across layers of a neural network.
 Often, we do not regularize the bias term.
+Besides,
+although $\ell_2$ regularization may not be equivalent to weight decay for other optimization algorithms,
+the idea of regularization through
+shrinking the size of weights
+still holds true.
+
 
 
 ## High-Dimensional Linear Regression
@@ -249,8 +254,10 @@ class Data(d2l.DataModule):
 ## Implementation from Scratch
 
 Now, let's try implementing weight decay from scratch.
-We just need to add the squared $\ell_2$ penalty
-to the original target function.
+Since minibatch stochastic gradient descent
+is our optimizer,
+we just need to add the squared $\ell_2$ penalty
+to the original loss function.
 
 ### (**Defining $\ell_2$ Norm Penalty**)
 
@@ -442,7 +449,7 @@ to all layers of a deep network.
 ## Summary
 
 * Regularization is a common method for dealing with overfitting. Classical regularization techniques add a penalty term to the loss function (when training) to reduce the complexity of the learned model.
-* One particular choice for keeping the model simple is weight decay using an $\ell_2$ penalty. This leads to weight decay in the update steps of the learning algorithm.
+* One particular choice for keeping the model simple is using an $\ell_2$ penalty. This leads to weight decay in the update steps of the minibatch stochastic gradient descent algorithm.
 * The weight decay functionality is provided in optimizers from deep learning frameworks.
 * Different sets of parameters can have different update behaviors within the same training loop.
 
