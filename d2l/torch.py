@@ -425,7 +425,7 @@ class LinearRegression(d2l.Module):
 
 class FashionMNIST(d2l.DataModule):
     """Defined in :numref:`sec_fashion_mnist`"""
-    def __init__(self, batch_size=64, resize=(28,28)):
+    def __init__(self, batch_size=64, resize=(28, 28)):
         super().__init__()
         self.save_hyperparameters()
         trans = transforms.Compose([transforms.Resize(resize),
@@ -482,7 +482,8 @@ class Classifier(d2l.Module):
         """Defined in :numref:`sec_softmax_concise`"""
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         Y = d2l.reshape(Y, (-1,))
-        return F.cross_entropy(Y_hat, Y, reduction='mean' if averaged else 'none')
+        return F.cross_entropy(
+            Y_hat, Y, reduction='mean' if averaged else 'none')
 
     def layer_summary(self, X_shape):
         """Defined in :numref:`sec_lenet`"""

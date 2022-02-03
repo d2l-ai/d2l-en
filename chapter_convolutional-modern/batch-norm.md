@@ -717,7 +717,7 @@ On a more practical note, there are a number of aspects worth remembering about 
 
 1. Can we remove the bias parameter from the fully connected layer or the convolutional layer before the batch normalization? Why?
 1. Compare the learning rates for LeNet with and without batch normalization.
-    1. Plot the increase in training and test accuracy.
+    1. Plot the increase in validation accuracy.
     1. How large can you make the learning rate before the optimization fails in both cases?
 1. Do we need batch normalization in every layer? Experiment with it?
 1. Implement a 'lite' version of batch normalization that only removes the mean, or alternatively one that 

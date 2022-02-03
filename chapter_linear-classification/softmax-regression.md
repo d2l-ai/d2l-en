@@ -262,6 +262,7 @@ since this can cause numerical overflow or underflow.
 Deep learning frameworks take care of this automatically.
 
 ## Loss Function
+:label:`subsec_softmax-regression-loss-func`
 
 Now that we have a mapping from features $\mathbf{x}$
 to probabilities $\mathbf{\hat{y}}$,

@@ -228,7 +228,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         params = self.parameters()
         if isinstance(params, list):
             return d2l.SGD(params, self.lr)
-        return gluon.Trainer(params,  'sgd', {'learning_rate': self.lr})
+        return gluon.Trainer(params, 'sgd', {'learning_rate': self.lr})
 
     def get_scratch_params(self):
         """Defined in :numref:`sec_classification`"""
