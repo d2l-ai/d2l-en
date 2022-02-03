@@ -399,7 +399,7 @@ class WeightDecay(d2l.LinearRegression):
         self.save_hyperparameters()
         self.net = tf.keras.layers.Dense(
             1, kernel_regularizer=tf.keras.regularizers.l2(wd),
-            kernel_initializer=tf.keras.initializers.RandomNormal(0.0, 0.01)
+            kernel_initializer=tf.keras.initializers.RandomNormal(0, 0.01)
         )
         
     def loss(self, y_hat, y):
