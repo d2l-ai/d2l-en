@@ -214,7 +214,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
             train_label = [x.float() for x in input_data[-1]]
             preds = [net(*t).float() for t in zip(*train_feat)]
             ls = [loss(p, s) for p, s in zip(preds, train_label)]
-            [l.backward() for l in ls]
+            [l.mean().backward() for l in ls]
             l += sum([l for l in ls]).mean() / len(devices)
             trainer.step()
             metric.add(l, values[0].shape[0], values[0].numel())
@@ -253,7 +253,7 @@ num_users, num_items, train_iter, test_iter = d2l.split_and_load_ml100k(
     test_ratio=0.1, batch_size=512)
 net = MF(30, num_users, num_items)
 lr, num_epochs, wd = 0.002, 20, 1e-5
-loss = nn.MSELoss()
+loss = nn.MSELoss('none')
 trainer = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=wd)
 train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                     devices, evaluator)
