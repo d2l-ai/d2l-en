@@ -185,7 +185,9 @@ Often, we want to share parameters across multiple layers.
 Let's see how to do this elegantly.
 In the following we allocate a dense layer
 and then use its parameters specifically
-to set those of another layer.
+to set those of another layer. 
+Note that since parameters were lazily initialized,
+we need to run the forward `net(X)` before accessing the parameters.
 
 ```{.python .input}
 %%tab mxnet
