@@ -320,17 +320,17 @@ class DropoutMLPScratch(d2l.Classifier):
 ```{.python .input}
 %%tab pytorch
 class DropoutMLPScratch(d2l.Classifier):
-    def __init__(self, num_inputs, num_outputs, num_hiddens_1, num_hiddens_2,
+    def __init__(self, num_outputs, num_hiddens_1, num_hiddens_2,
                  dropout_1, dropout_2, lr):
         super().__init__()
         self.save_hyperparameters()
-        self.lin1 = nn.Linear(num_inputs, num_hiddens_1)
-        self.lin2 = nn.Linear(num_hiddens_1, num_hiddens_2)
-        self.lin3 = nn.Linear(num_hiddens_2, num_outputs)
+        self.lin1 = nn.LazyLinear(num_hiddens_1)
+        self.lin2 = nn.LazyLinear(num_hiddens_2)
+        self.lin3 = nn.LazyLinear(num_outputs)
         self.relu = nn.ReLU()
 
     def forward(self, X):
-        H1 = self.relu(self.lin1(X.reshape((-1, self.num_inputs))))
+        H1 = self.relu(self.lin1(X.reshape((X.shape[0], -1))))
         if self.training:  
             H1 = dropout_layer(H1, self.dropout_1)
         H2 = self.relu(self.lin2(H1))
@@ -366,12 +366,8 @@ This is similar to the training and testing of MLPs described previously.
 
 ```{.python .input}
 %%tab all
-if tab.selected(['mxnet', 'tensorflow']):
-    hparams = {'num_outputs':10, 'num_hiddens_1':256, 'num_hiddens_2':256, 
-               'dropout_1':0.5, 'dropout_2':0.5, 'lr':0.1}
-if tab.selected(['pytorch']):
-    hparams = {'num_inputs':784, 'num_outputs':10, 'num_hiddens_1':256, 
-               'num_hiddens_2':256, 'dropout_1':0.5, 'dropout_2':0.5, 'lr':0.1}
+hparams = {'num_outputs':10, 'num_hiddens_1':256, 'num_hiddens_2':256, 
+           'dropout_1':0.5, 'dropout_2':0.5, 'lr':0.1}
 model = DropoutMLPScratch(**hparams)
 data = d2l.FashionMNIST(batch_size=256)
 trainer = d2l.Trainer(max_epochs=10)
@@ -410,16 +406,14 @@ class DropoutMLP(d2l.Classifier):
 ```{.python .input}
 %%tab pytorch
 class DropoutMLP(d2l.Classifier):
-    def __init__(self, num_inputs, num_outputs, num_hiddens_1, num_hiddens_2,
+    def __init__(self, num_outputs, num_hiddens_1, num_hiddens_2,
                  dropout_1, dropout_2, lr):
         super().__init__()
         self.save_hyperparameters()
         self.net = nn.Sequential(
-            nn.Flatten(), nn.Linear(num_inputs, num_hiddens_1), nn.ReLU(), 
-            nn.Dropout(dropout_1),
-            nn.Linear(num_hiddens_1, num_hiddens_2), nn.ReLU(), 
-            nn.Dropout(dropout_2),
-            nn.Linear(num_hiddens_2, num_outputs))
+            nn.Flatten(), nn.LazyLinear(num_hiddens_1), nn.ReLU(), 
+            nn.Dropout(dropout_1), nn.LazyLinear(num_hiddens_2), nn.ReLU(), 
+            nn.Dropout(dropout_2), nn.LazyLinear(num_outputs))
 ```
 
 ```{.python .input}
