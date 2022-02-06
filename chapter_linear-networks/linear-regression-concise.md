@@ -264,10 +264,7 @@ to train our model.
 
 ```{.python .input}
 %%tab all
-#if tab.selected('mxnet') or tab.selected('tensorflow'):
 model = LinearRegression(lr=0.03)
-#if tab.selected('pytorch'):
-#    model = LinearRegression(2, lr=0.03)
 data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 trainer = d2l.Trainer(max_epochs=3)
 trainer.fit(model, data)
