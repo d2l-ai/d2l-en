@@ -173,8 +173,8 @@ Y = net(X)
 class MLP(nn.Module):
     def __init__(self):
         super().__init__()
-        self.hidden = nn.Linear(20, 256)
-        self.output = nn.Linear(256, 10)
+        self.hidden = nn.LazyLinear(256)
+        self.output = nn.LazyLinear(10)
 
     def forward(self, x):
         return self.output(F.relu(self.hidden(x)))
