@@ -105,10 +105,10 @@ We will describe how this works in more detail later.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the fully connected layer is defined in the `Linear` class.
-Note that we passed two arguments into `nn.Linear`.
-The first specifies the input feature dimension (`num_inputs`),
-and the second specifies the output dimension (1).
+In PyTorch, the fully connected layer is defined in two classes: `Linear` and `LazyLinear`. 
+The later was introduced since version 1.8.0, that allows to only specify
+the output dimension. While the `Linear` class requires to pass the input feature
+dimension as the input. For simplicity, we use `LazyLinaer` through this book. 
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -128,7 +128,7 @@ We will describe how this works in more detail later.
 :end_tab:
 
 ```{.python .input}
-%%tab mxnet, tensorflow
+%%tab all
 class LinearRegression(d2l.Module):  #@save
     def __init__(self, lr):
         super().__init__()
@@ -139,17 +139,10 @@ class LinearRegression(d2l.Module):  #@save
         if tab.selected('tensorflow'):
             initializer = tf.initializers.RandomNormal(stddev=0.01)
             self.net = tf.keras.layers.Dense(1, kernel_initializer=initializer)
-```
-
-```{.python .input  n=2}
-%%tab pytorch
-class LinearRegression(d2l.Module):  #@save
-    def __init__(self, num_inputs, lr):
-        super().__init__()
-        self.save_hyperparameters()
-        self.net = nn.Linear(num_inputs, 1)
-        self.net.weight.data.normal_(0, 0.01)
-        self.net.bias.data.fill_(0)
+        if tab.selected('pytorch'):
+            self.net = nn.LazyLinear(1)
+            self.net.weight.data.normal_(0, 0.01)
+            self.net.bias.data.fill_(0)
 ```
 
 In the `forward` method, we just invoke the built-in `__call__` function of the predefined layers to compute the outputs.
@@ -271,10 +264,10 @@ to train our model.
 
 ```{.python .input}
 %%tab all
-if tab.selected('mxnet') or tab.selected('tensorflow'):
-    model = LinearRegression(lr=0.03)
-if tab.selected('pytorch'):
-    model = LinearRegression(2, lr=0.03)
+#if tab.selected('mxnet') or tab.selected('tensorflow'):
+model = LinearRegression(lr=0.03)
+#if tab.selected('pytorch'):
+#    model = LinearRegression(2, lr=0.03)
 data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 trainer = d2l.Trainer(max_epochs=3)
 trainer.fit(model, data)
