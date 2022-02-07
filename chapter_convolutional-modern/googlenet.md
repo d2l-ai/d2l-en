@@ -352,12 +352,12 @@ changes in the shape of the output between the various modules.
 
 ```{.python .input}
 %%tab mxnet, pytorch
-model = GoogleNet().layer_summary((1, 1, 224, 224))
+model = GoogleNet().layer_summary((1, 1, 96, 96))
 ```
 
 ```{.python .input}
 %%tab tensorflow
-model = GoogleNet().layer_summary((1, 224, 224, 1))
+model = GoogleNet().layer_summary((1, 96, 96, 1))
 ```
 
 ## [**Training**]
