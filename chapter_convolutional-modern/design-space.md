@@ -119,7 +119,7 @@ class RegNet32(AnyNet):
 ```
 
 ```{.python .input  n=8}
-RegNet32().layer_summary((1, 1, 224, 224))
+RegNet32().layer_summary((1, 1, 96, 96))
 ```
 
 ## Training
