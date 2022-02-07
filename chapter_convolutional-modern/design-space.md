@@ -36,15 +36,10 @@ class GroupConvBottleneckResidual(nn.Module):
         
     def forward(self, X):
         Y = F.relu(self.bn1(self.conv1(X)))
-        print(X.shape, Y.shape)
         Y = F.relu(self.bn2(self.conv2(Y)))
-        print(X.shape, Y.shape)
         Y = self.bn3(self.conv3(Y))
-        print(X.shape, Y.shape)
         if self.conv4:
             X = self.bn4(self.conv4(X))
-        print(X.shape, Y.shape)
-            
         Y += X
         return F.relu(Y)
 ```
@@ -60,7 +55,7 @@ blk(X).shape
 We also have the option to halve the output height and width while increasing the number of output channels.
 
 ```{.python .input  n=3}
-blk = Residual(3, 6, use_1x1conv=True, strides=2)
+blk = GroupConvBottleneckResidual(32, 32, 16, 1, use_1x1conv=True, strides=2)
 blk(X).shape
 ```
 
