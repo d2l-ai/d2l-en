@@ -11,7 +11,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-class GroupConvBottleneckResidual(nn.Module):
+class GroupConvBotResidual(nn.Module):
     """The bottleneck residual block with group convolution."""
     def __init__(self, input_channels, num_channels, group_width, bot_mul,
                  use_1x1conv=False, strides=1):
@@ -47,74 +47,79 @@ class GroupConvBottleneckResidual(nn.Module):
 Now let's look at a situation where the input and output are of the same shape.
 
 ```{.python .input  n=2}
-blk = GroupConvBottleneckResidual(32, 32, 16, 1)
-X = d2l.randn(4, 32, 224, 224)
+blk = GroupConvBotResidual(32, 32, 16, 1)
+X = d2l.randn(4, 32, 96, 96)
 blk(X).shape
 ```
 
 We also have the option to halve the output height and width while increasing the number of output channels.
 
 ```{.python .input  n=3}
-blk = GroupConvBottleneckResidual(32, 32, 16, 1, use_1x1conv=True, strides=2)
+blk = GroupConvBotResidual(32, 32, 16, 1, use_1x1conv=True, strides=2)
 blk(X).shape
 ```
 
-## [**RegNet Model**]
+## RegNet
 
 Now, we implement this module. Note that special processing has been performed on the first module.
 
 ```{.python .input  n=4}
-class RegNet(d2l.Classifier):
-    def b1(self):
+class AnyNet(d2l.Classifier):
+    def stem(self, input_channels, num_channels):
         return nn.Sequential(
-            nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
-            nn.BatchNorm2d(64), nn.ReLU(),
-            nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+            nn.Conv2d(input_channels, num_channels, kernel_size=3, stride=2,
+                      padding=1),
+            nn.BatchNorm2d(num_channels), nn.ReLU())
 ```
 
 other block
 
 ```{.python .input  n=5}
-@d2l.add_to_class(RegNet)
-def block(self, num_residuals, input_channels, num_channels,
-          first_block=False):
+@d2l.add_to_class(AnyNet)
+def stage(self, depth, input_channels, num_channels, group_width, bot_mul):
     blk = []
-    for i in range(num_residuals):
-        if i == 0 and not first_block:
-            blk.append(Residual(input_channels, num_channels,
-                                use_1x1conv=True, strides=2))
+    for i in range(depth):
+        if i == 0:
+            blk.append(GroupConvBotResidual(
+                input_channels, num_channels, group_width, bot_mul,
+                use_1x1conv=True, strides=2))
         else:
-            blk.append(Residual(num_channels, num_channels))
+            blk.append(GroupConvBotResidual(
+                num_channels, num_channels, group_width, bot_mul))
     return nn.Sequential(*blk)
 ```
 
 Then, we add all the modules to RegNet.
 
 ```{.python .input  n=6}
-@d2l.add_to_class(RegNet)
-def __init__(self, arch, num_classes=10, lr=0.1):
-    super(RegNet, self).__init__()
+@d2l.add_to_class(AnyNet)
+def __init__(self, arch, stem_channels, num_classes=10, lr=0.1):
+    super(AnyNet, self).__init__()
     self.save_hyperparameters()
-    self.net = nn.Sequential(self.b1())
-    for i, b in enumerate(arch):
-        self.net.add_module(f'b{i+2}', self.block(*b, first_block=(i==0)))
-    self.net.add_module('last', nn.Sequential(
+    self.net = nn.Sequential(self.stem(1, stem_channels))
+    for i, s in enumerate(arch):
+        self.net.add_module(f'stage{i+1}', self.stage(*s))
+    self.net.add_module('head', nn.Sequential(
         nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(),
-        nn.Linear(arch[-1][-1], num_classes)))
+        nn.Linear(arch[-1][2], num_classes)))
     self.net.apply(d2l.init_cnn_weights)
 ```
 
 Before training RegNet, let's observe how the input shape changes across different modules in ResNet.
 
 ```{.python .input  n=7}
-class RegNet23(RegNet):
+class RegNet32(AnyNet):
     def __init__(self, num_classes=10, lr=0.1):
-        super().__init__(((2, 64, 64), (2, 64, 128), (2, 128, 256), (2, 256, 512)),
-                       num_classes, lr)
+        stem_channels, group_width, bot_mul = 32, 16, 1
+        depths, channels = [4, 6], [32, 80]
+        super().__init__(
+            ((depths[0], stem_channels, channels[0], group_width, bot_mul),
+             (depths[1], channels[0], channels[1], group_width, bot_mul)),
+            stem_channels, num_classes, lr)
 ```
 
 ```{.python .input  n=8}
-RegNet23().layer_summary((1, 1, 224, 224))
+RegNet32().layer_summary((1, 1, 224, 224))
 ```
 
 ## Training
@@ -122,7 +127,7 @@ RegNet23().layer_summary((1, 1, 224, 224))
 We train RegNet on the Fashion-MNIST dataset, just like before.
 
 ```{.python .input  n=9}
-model = RegNet23(lr=0.05)
+model = RegNet32(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 trainer.fit(model, data)
