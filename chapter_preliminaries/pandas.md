@@ -144,6 +144,14 @@ X, y = tf.constant(inputs.values), tf.constant(targets.values)
 X, y
 ```
 
+```{.python .input}
+#@tab jax
+import jax.numpy as jnp
+
+X, y = jnp.array(inputs.values), jnp.array(targets.values)
+X, y
+```
+
 ## Discussion
 
 You now know how to partition data columns, 
@@ -186,7 +194,7 @@ what problems you may need to address.
 1. Try out indexing and selecting data columns by name rather than by column number. The pandas documentation on [indexing](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html) has further details on how to do this.
 1. How large a dataset do you think you could load this way? What might be the limitations? Hint: consider the time to read the data, representation, processing, and memory footprint. Try this out on your laptop. What changes if you try it out on a server? 
 1. How would you deal with data that has a very large number of categories? What if the category labels are all unique? Should you include the latter?
-1. What alternatives to pandas can you think of? How about [loading NumPy tensors from a file](https://numpy.org/doc/stable/reference/generated/numpy.load.html)? Check out [Pillow](https://python-pillow.org/), the Python Imaging Library. 
+1. What alternatives to pandas can you think of? How about [loading NumPy tensors from a file](https://numpy.org/doc/stable/reference/generated/numpy.load.html)? Check out [Pillow](https://python-pillow.org/), the Python Imaging Library.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/28)

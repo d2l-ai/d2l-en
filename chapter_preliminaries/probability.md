@@ -194,11 +194,17 @@ from tensorflow_probability import distributions as tfd
 %matplotlib inline
 from d2l import jax as d2l
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import jax.numpy as np
 import jax
 import numpy as onp
 >>>>>>> Revert probability.md changes
+=======
+import jax.numpy as jnp
+import jax
+import numpy as np
+>>>>>>> update port to latest commit
 import random
 import jax
 import jax.numpy as jnp
@@ -267,10 +273,16 @@ tfd.Multinomial(100, fair_probs).sample()
 ```
 
 ```{.python .input}
+<<<<<<< HEAD
 %%tab jax
 fair_probs = np.ones(2) / 2
 # jax doesn't have multinomial, use numpy
 np.random.multinomial(100, fair_probs)
+=======
+#@tab jax
+fair_probs = [1.0 / 6] * 6
+np.random.multinomial(1, fair_probs) # jax.random does have multinomial distribution implemented
+>>>>>>> update port to latest commit
 ```
 
 Each time you run this sampling process,
@@ -300,8 +312,13 @@ tfd.Multinomial(100, fair_probs).sample() / 100
 ```
 
 ```{.python .input}
+<<<<<<< HEAD
 %%tab jax
 np.random.multinomial(100, fair_probs) / 100
+=======
+#@tab jax
+np.random.multinomial(10, fair_probs)
+>>>>>>> update port to latest commit
 ```
 
 Here, even though our simulated coin is fair 
@@ -334,9 +351,15 @@ counts / 10000
 ```
 
 ```{.python .input}
+<<<<<<< HEAD
 %%tab jax
 counts = np.random.multinomial(10000, fair_probs).astype(np.float32)
 counts / 10000
+=======
+#@tab jax
+counts = np.random.multinomial(1000, fair_probs).astype(np.float32)
+counts / 1000
+>>>>>>> update port to latest commit
 ```
 
 In general, for averages of repeated events (like coin tosses),
@@ -395,6 +418,25 @@ d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
 ```
 
+<<<<<<< HEAD
+=======
+```{.python .input}
+#@tab jax
+counts = np.random.multinomial(10, fair_probs, size=500)
+cum_counts = counts.astype(np.float32).cumsum(axis=0)
+estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
+
+d2l.set_figsize((6, 4.5))
+for i in range(6):
+    d2l.plt.plot(estimates[:, i],
+                 label=("P(die=" + str(i + 1) + ")"))
+d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.gca().set_xlabel('Groups of experiments')
+d2l.plt.gca().set_ylabel('Estimated probability')
+d2l.plt.legend();
+```
+
+>>>>>>> update port to latest commit
 Each solid curve corresponds to one of the two values of the coin 
 and gives our estimated probability that the coin turns up that value 
 after each group of experiments.

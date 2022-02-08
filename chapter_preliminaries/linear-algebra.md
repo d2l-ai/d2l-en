@@ -89,7 +89,6 @@ x + y, x * y, x / y, x**y
 
 ```{.python .input}
 #@tab jax
-import jax
 import jax.numpy as jnp
 
 x = jnp.array(3.0)
@@ -140,6 +139,12 @@ x
 ```{.python .input}
 %%tab tensorflow
 x = tf.range(3)
+x
+```
+
+```{.python .input}
+#@tab jax
+x = jnp.arange(3)
 x
 ```
 
@@ -268,6 +273,12 @@ A = tf.reshape(tf.range(6), (3, 2))
 A
 ```
 
+```{.python .input}
+#@tab jax
+A = jnp.arange(6).reshape(3, 2)
+A
+```
+
 Sometimes, we want to flip the axes.
 When we exchange a matrix's rows and columns,
 the result is called its *transpose*.
@@ -325,6 +336,12 @@ A == A.T
 %%tab tensorflow
 A = tf.constant([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
 A == tf.transpose(A)
+```
+
+```{.python .input}
+#@tab jax
+A = jnp.array([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
+A == A.T
 ```
 
 Matrices are useful for representing datasets. 
@@ -386,8 +403,7 @@ tf.reshape(tf.range(24), (2, 3, 4))
 
 ```{.python .input}
 #@tab jax
-X = jnp.arange(24).reshape(2, 3, 4)
-X
+jnp.arange(24).reshape(2, 3, 4)
 ```
 
 ## Basic Properties of Tensor Arithmetic
@@ -417,6 +433,13 @@ A, A + B
 %%tab tensorflow
 A = tf.reshape(tf.range(6, dtype=tf.float32), (2, 3))
 B = A  # No cloning of `A` to `B` by allocating new memory
+A, A + B
+```
+
+```{.python .input}
+#@tab jax
+A = jnp.arange(6, dtype=jnp.float32).reshape(2, 3)
+B = A
 A, A + B
 ```
 
@@ -508,6 +531,12 @@ x, x.sum()
 %%tab tensorflow
 x = tf.range(3, dtype=tf.float32)
 x, tf.reduce_sum(x)
+```
+
+```{.python .input}
+#@tab jax
+x = jnp.arange(3, dtype=jnp.float32)
+x, x.sum()
 ```
 
 To express [**sums over the elements of tensors of arbitrary shape**],
@@ -695,11 +724,6 @@ A.cumsum(axis=0)
 tf.cumsum(A, axis=0)
 ```
 
-```{.python .input}
-#@tab jax
-A.cumsum(axis=0)
-```
-
 ## Dot Products
 
 So far, we have only performed elementwise operations, sums, and averages. 
@@ -730,6 +754,12 @@ x, y, torch.dot(x, y)
 %%tab tensorflow
 y = tf.ones(3, dtype=tf.float32)
 x, y, tf.tensordot(x, y, axes=1)
+```
+
+```{.python .input}
+#@tab jax
+y = jnp.ones(3, dtype = jnp.float32)
+x, y, jnp.dot(x, y)
 ```
 
 Equivalently, (**we can calculate the dot product of two vectors 
@@ -971,6 +1001,12 @@ B = tf.ones((3, 4), tf.float32)
 tf.matmul(A, B)
 ```
 
+```{.python .input}
+#@tab jax
+B = jnp.ones((3, 4))
+jnp.matmul(A, B)
+```
+
 The term *matrix-matrix multiplication* is 
 often simplified to *matrix multiplication*,
 and should not be confused with the Hadamard product.
@@ -1027,6 +1063,12 @@ u = tf.constant([3.0, -4.0])
 tf.norm(u)
 ```
 
+```{.python .input}
+#@tab jax
+u = jnp.array([3.0, -4.0])
+jnp.linalg.norm(u)
+```
+
 [**The $\ell_1$ norm**] is also popular 
 and the associated metric is called the Manhattan distance. 
 By definition, the $\ell_1$ norm sums 
@@ -1052,6 +1094,11 @@ torch.abs(u).sum()
 ```{.python .input}
 %%tab tensorflow
 tf.reduce_sum(tf.abs(u))
+```
+
+```{.python .input}
+#@tab jax
+jnp.linalg.norm(u, ord=1) # same as jnp.abs(u).sum()
 ```
 
 Both the $\ell_2$ and $\ell_1$ norms are special cases
@@ -1091,6 +1138,11 @@ torch.norm(torch.ones((4, 9)))
 ```{.python .input}
 %%tab tensorflow
 tf.norm(tf.ones((4, 9)))
+```
+
+```{.python .input}
+#@tab jax
+jnp.linalg.norm(jnp.ones((4, 9)))
 ```
 
 While we do not want to get too far ahead of ourselves,

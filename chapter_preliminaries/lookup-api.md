@@ -4,6 +4,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
 # Documentation
+
 :begin_tab:`mxnet`
 While we cannot possibly introduce every single MXNet function and class 
 (and the information might become outdated quickly), 
@@ -29,7 +30,6 @@ provide such documentation.
 This section provides some guidance for how to explore the TensorFlow API.
 :end_tab:
 
-
 ## Functions and Classes in a Module
 
 In order to know which functions and classes can be called in a module,
@@ -52,6 +52,12 @@ print(dir(torch.distributions))
 %%tab tensorflow
 import tensorflow as tf
 print(dir(tf.random))
+```
+
+```{.python .input}
+#@tab jax
+import jax
+print(dir(jax.random))
 ```
 
 Generally, we can ignore functions that start and end with `__` (special objects in Python) 
@@ -81,6 +87,11 @@ help(torch.ones)
 ```{.python .input}
 %%tab tensorflow
 help(tf.ones)
+```
+
+```{.python .input}
+#@tab jax
+help(jax.numpy.ones)
 ```
 
 From the documentation, we can see that the `ones` function 

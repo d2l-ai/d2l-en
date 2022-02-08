@@ -78,6 +78,14 @@ x = tf.range(4, dtype=tf.float32)
 x
 ```
 
+```{.python .input}
+#@tab jax
+import jax.numpy as jnp
+
+x = jnp.arange(4.0)
+x
+```
+
 [**Before we calculate the gradient
 of $y$ with respect to $\mathbf{x}$,
 we need a place to store it.**]
@@ -137,6 +145,12 @@ with tf.GradientTape() as t:
 y
 ```
 
+```{.python .input}
+#@tab jax
+y = lambda x: 2 * jnp.dot(x, x)
+y(x)
+```
+
 :begin_tab:`mxnet`
 [**We can now take the gradient of `y`
 with respect to `x`**] by calling 
@@ -177,6 +191,13 @@ x_grad = t.gradient(y, x)
 x_grad
 ```
 
+```{.python .input}
+#@tab jax
+from jax import grad
+x_grad = grad(y)(x) # the `grad` transform returns Python function that computes the gradient of the original function
+x_grad
+```
+
 (**We already know that the gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$
 with respect to $\mathbf{x}$ should be $4\mathbf{x}$.**)
 We can now verify that the automatic gradient computation
@@ -202,7 +223,7 @@ x_grad == 4 * x
 another function of `x`
 and take its gradient.**] 
 Note that MXNet resets the gradient buffer 
-whenever we record a new gradient. 
+whenever we record a new gradient.
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -226,7 +247,7 @@ we can call `x.grad.zero()` as follows:
 another function of `x`
 and take its gradient.**]
 Note that TensorFlow resets the gradient buffer 
-whenever we record a new gradient. 
+whenever we record a new gradient.
 :end_tab:
 
 ```{.python .input}
@@ -255,8 +276,7 @@ t.gradient(y, x)  # Overwritten by the newly calculated gradient
 ```{.python .input}
 #@tab jax
 y = lambda x: x.sum()
-dy_dx = grad(y)
-dy_dx(x)
+grad(y)(x)
 ```
 
 ## Backward for Non-Scalar Variables
@@ -291,7 +311,7 @@ by summing before computing a gradient.
 In other words, rather than returning the Jacobian 
 $\partial_{\mathbf{x}} \mathbf{y}$,
 it returns the gradient of the sum
-$\partial_{\mathbf{x}} \sum_i y_i$. 
+$\partial_{\mathbf{x}} \sum_i y_i$.
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -309,7 +329,7 @@ This next part may be confusing,
 but for reasons that will become clear later, 
 this argument (representing $\mathbf{v}$) is named `gradient`. 
 For a more detailed description, see Yang Zhang's 
-[Medium post](https://zhang-yang.medium.com/the-gradient-argument-in-pytorchs-backward-function-explained-by-examples-68f266950c29). 
+[Medium post](https://zhang-yang.medium.com/the-gradient-argument-in-pytorchs-backward-function-explained-by-examples-68f266950c29).
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -317,7 +337,7 @@ By default, TensorFlow returns the gradient of the sum.
 In other words, rather than returning 
 the Jacobian $\partial_{\mathbf{x}} \mathbf{y}$,
 it returns the gradient of the sum
-$\partial_{\mathbf{x}} \sum_i y_i$. 
+$\partial_{\mathbf{x}} \sum_i y_i$.
 :end_tab:
 
 ```{.python .input}
@@ -346,11 +366,7 @@ t.gradient(y, x)  # Same as `y = tf.reduce_sum(x * x)`
 ```{.python .input}
 #@tab jax
 y = lambda x: x * x
-
-# jax.grad works on a scalar output function
-# jax.vmap vectorizes this operation so that jax.grad works for vector outputs
-grad_fn = vmap(grad(y))
-grad_fn(x)
+grad(lambda x: y(x).sum())(x) # `grad` is only defined for scalar output functions
 ```
 
 ## Detaching Computation
@@ -412,6 +428,17 @@ x_grad = t.gradient(z, x)
 x_grad == u
 ```
 
+```{.python .input}
+#@tab jax
+import jax
+
+y = lambda x: x * x
+u = jax.lax.stop_gradient(y(x)) # `jax.lax` primitives are Python wrappers around XLA operations
+z = lambda x: u * x
+
+grad(lambda x: z(x).sum())(x) == y(x)
+```
+
 Note that while this procedure
 detaches `y`'s ancestors
 from the graph leading to `z`, 
@@ -435,6 +462,11 @@ x.grad == 2 * x
 ```{.python .input}
 %%tab tensorflow
 t.gradient(y, x) == 2 * x
+```
+
+```{.python .input}
+#@tab jax
+grad(lambda x: y(x).sum())(x) == 2 * x
 ```
 
 ## Gradients and Python Control Flow
@@ -493,6 +525,19 @@ def f(a):
     return c
 ```
 
+```{.python .input}
+#@tab jax
+def f(a):
+    b = a * 2
+    while jnp.linalg.norm(b) < 1000:
+        b = b * 2
+    if b.sum() > 0:
+        c = b
+    else:
+        c = 100 * b
+    return c
+```
+
 Below, we call this function, passing in a random value as input.
 Since the input is a random variable, 
 we do not know what form 
@@ -527,6 +572,14 @@ d_grad = t.gradient(d, a)
 d_grad
 ```
 
+```{.python .input}
+#@tab jax
+from jax import random
+a = random.normal(random.PRNGKey(1), ())
+d = f(a)
+d_grad = grad(f)(a)
+```
+
 Even though our function `f` is a bit 
 contrived for demonstration purposes,
 its dependence on the input is quite simple: 
@@ -548,6 +601,11 @@ a.grad == d / a
 
 ```{.python .input}
 %%tab tensorflow
+d_grad == d / a
+```
+
+```{.python .input}
+#@tab jax
 d_grad == d / a
 ```
 
