@@ -1780,7 +1780,7 @@ class VOCSegDataset(torch.utils.data.Dataset):
         print('read ' + str(len(self.features)) + ' examples')
 
     def normalize_image(self, img):
-        return self.transform(img.float()/255)
+        return self.transform(img.float() / 255)
 
     def filter(self, imgs):
         return [img for img in imgs if (
@@ -3083,28 +3083,31 @@ def FrozenLake():
                 DOWN which corresponds to action index 1.
                 RIGHT which corresponds to action index 2.
                 UP which corresponds to action index 3.
+            Above text/description is copied from https://gym.openai.com/envs/FrozenLake-v0/
 
     '''
     env = gym.make('FrozenLake-v1', is_slippery=False)
-    einfo = {}
-    einfo['desc'] = env.desc   # 2D array specifying what each grid item means
-    einfo['num_states']     = env.nS # number of observations/states or obs/state dim
-    einfo['num_actions']    = env.nA # number of actions or action dim
-    # define indices for (transition probability, nextstate, reward, done) tuple
-    einfo['trans_prob_idx'] = 0 #index in transition probability
-    einfo['nextstate_idx']  = 1
-    einfo['reward_idx']     = 2
-    einfo['done_idx']       = 3
 
-    # einfo['T'] is dict that contains (transition probability (pr), nextstate, reward, done) index by [s][a]
-    # where s specifies state index and a specifies an action index.
-    einfo['T']   = {
-                     s : {a :
-                            [pnrd for pnrd in pnrds] for (a, pnrds) in others.items() # pnrds: p, nextstate, reward, done
-                         }
-                        for (s, others) in env.P.items()
-                    }
-    return env, einfo
+    env_info = {}
+    env_info['desc'] = env.desc  # 2D array specifying what each grid item means
+    env_info['num_states']     = env.nS # number of observations/states or obs/state dim
+    env_info['num_actions']    = env.nA # number of actions or action dim
+    # define indices for (transition probability, nextstate, reward, done) tuple
+    env_info['trans_prob_idx'] = 0 # index of transition probability entry
+    env_info['nextstate_idx']  = 1 # index of next state entry
+    env_info['reward_idx']     = 2 # index of reward entry
+    env_info['done_idx']       = 3 # index of done entry
+    env_info['mdp'] = {}
+
+    for (s, others) in env.P.items():
+        # others(s) = {a0: [ (p(s'|s,a0), s', reward, done),...], a1:[...], ...}
+
+        for (a, pxrds) in others.items():
+            # pxrds is [(p1,next1,r1,d1),(p2,next2,r2,d2),..].
+            # e.g. [(0.3, 0, 0, False), (0.3, 0, 0, False), (0.3, 4, 1, False)]
+            env_info['mdp'][(s,a)] = pxrds
+
+    return env_info
 
 def make_env(name =''):
     """Defined in :numref:`sec_code_rl`"""
@@ -3119,51 +3122,67 @@ def make_env(name =''):
     else:
         raise ValueError("%s env is not supported in this Notebook")
 
-def show_value_function_progress(env, V_K, pi_K):
+def show_value_function_progress(env_desc, V, pi):
     """Defined in :numref:`sec_code_rl`"""
     '''
-     This function shows how value functions and policy changes through times.
-     V_k:  [V(0), ..., V(K-1)]
-     pi_K: [pi(0), ..., pi_K(K-1)]
-     In both K V_k and pi_K, K idicates number of iterations.
+     This function visualizes how value and policy changes over time.
+     V:  [num_iters, num_states]
+     pi: [num_iters, num_states]
     '''
-    num_subplt_rows = len(V_K)//3 + 1
-    idx = 1
-    fig = plt.figure(figsize=(15,15))
-    for (V, pi) in zip(V_K, pi_K):
+    num_iters = V.shape[0]
+    fig, ax = plt.subplots(figsize=(15, 15))
 
-        #plt.figure(figsize=(4,4))
-        plt.subplot(num_subplt_rows, 4, idx)
-        plt.imshow(V.reshape(4,4), cmap='gray', interpolation='nearest', clim=(0,1))
+    for k in range(V.shape[0]):
+        plt.subplot(4, 4, k + 1)
+        plt.imshow(V[k].reshape(4,4), cmap="bone")
         ax = plt.gca()
-        ax.set_facecolor('xkcd:salmon')
-        ax.set_facecolor((1.0, 0.47, 0.02))
+        ax.set_xticks(np.arange(0, 5)-.5, minor=True)
+        ax.set_yticks(np.arange(0, 5)-.5, minor=True)
+        ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
+        ax.tick_params(which="minor", bottom=False, left=False)
+        ax.set_xticks([])
+        ax.set_yticks([])
 
-        ax.set_xticks(np.arange(5)-.5)
-        ax.set_yticks(np.arange(5)-.5)
-        ax.set_xticklabels([])
-        ax.set_yticklabels([])
-        # we are showing 4x4 grid for now
-        Y, X = np.mgrid[0:4, 0:4]
-        a2uv = {0: (-1, 0), 1:(0, -1), 2:(1,0), 3:(-1, 0)}
-        Pi = pi.reshape(4,4)
+        # LEFT action: 0.
+        # DOWN action: 1.
+        # RIGHT action: 2.
+        # UP action: 3.
+        action2dxdy = {0: (-.25, 0),
+                       1: (0, .25),
+                       2: (0.25,0),
+                       3: (-.25, 0)
+                      }
 
         for y in range(4):
             for x in range(4):
-                a = Pi[y, x]
-                u, v = a2uv[a]
+                action = pi[k].reshape(4,4)[y, x]
+                dx, dy = action2dxdy[action]
 
-                plt.text(x, y, str(env.desc[y,x].item().decode()),
-                             color='g', size=15,  verticalalignment='center',
-                             horizontalalignment='center', fontweight='bold')
-                if env.desc[y,x].item().decode() != 'G' and env.desc[y,x].item().decode() != 'H':
-                    plt.arrow(x, y,u*.3, -v*.3, color='r', head_width=0.2, head_length=0.1)
+                if env_desc[y,x].decode() == 'H':
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="y",
+                         size=20, fontweight='bold')
 
-        plt.grid(color='w', lw=2, ls='-')
-        plt.title("K = %s " % (idx));
-        idx += 1
+                elif env_desc[y,x].decode() == 'G':
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="w",
+                         size=20, fontweight='bold')
 
-    plt.show()
+                else:
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="g",
+                         size=15, fontweight='bold')
+
+                # no arrow for cells with G and H labels
+                if env_desc[y,x].decode() != 'G' and env_desc[y,x].decode() != 'H':
+                    ax.arrow(x, y, dx, dy, color='r', head_width=0.2, head_length=0.15)
+
+        ax.set_title("Step = "  + str(k + 1), fontsize=20)
+
+    fig.tight_layout()
+    plt.show()# Alias defined in config.ini
+
+
 
 
 nn_Module = nn.Module
