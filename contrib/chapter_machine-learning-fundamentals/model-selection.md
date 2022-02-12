@@ -378,10 +378,10 @@ In fact, whenever the data examples each have a distinct value of $x$,
 a polynomial function with degree equal to the number of data examples
 can fit the training set perfectly.
 We visualize the relationship between polynomial degree
-and underfitting vs. overfitting in :numref:`fig_capacity_vs_error`.
+and underfitting vs. overfitting in :numref:`fig_capacity_error`.
 
 ![Influence of model complexity on underfitting and overfitting](../img/capacity-vs-error.svg)
-:label:`fig_capacity_vs_error`
+:label:`fig_capacity_error`
 
 Much of the intuition of this arises from Statistical Learning Theory. One of the guarantees it
 provides :cite:`Vapnik.1998` is that the gap between empirical risk and expected risk is bounded by
@@ -439,7 +439,3 @@ A few rules of thumb: 1) A validation set can be used for model selection, provi
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/234)
 :end_tab:
-
-```{.python .input}
-
-```

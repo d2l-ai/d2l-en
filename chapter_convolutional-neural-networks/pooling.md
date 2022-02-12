@@ -90,7 +90,7 @@ $$
 More generally, we can define a $p \times q$ pooling layer by aggregating over 
 a region of said size. Returning to the problem of edge detection, 
 we use the output of the convolutional layer
-as the input for $2\times 2$ maximum pooling.
+as input for $2\times 2$ maximum pooling.
 Denote by `X` the input of the convolutional layer input and `Y` the pooling layer output. 
 Regardless of whether or not the values of `X[i, j]`, `X[i, j + 1]`, 
 `X[i+1, j]` and `X[i+1, j + 1]` are different,

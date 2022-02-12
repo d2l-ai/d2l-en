@@ -8,11 +8,10 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 
 
-Just as high-level APIs
-of deep learning frameworks
-made it much easier to implement linear regression
-in :numref:`sec_linear_concise`,
-we will find them equally convenient for implementing classification.
+Just as high-level deep learning frameworks
+made it easier to implement linear regression
+(see :numref:`sec_linear_concise`),
+they are similarly convenient here.
 
 ```{.python .input}
 %%tab mxnet
@@ -38,24 +37,33 @@ import tensorflow as tf
 
 ## Defining the Model
 
-As we did in :numref:`sec_linear_concise`, we construct the fully connected layer using the built-in layer. The built-in `__call__` method then invokes `forward` whenever we need to apply the network to some inputs.
+As in :numref:`sec_linear_concise`, 
+we construct our fully connected layer 
+using the built-in layer. 
+The built-in `__call__` method then invokes `forward` 
+whenever we need to apply the network to some input.
 
 :begin_tab:`mxnet`
-Even though the input `X` is a 4-D tensor, the built-in `Dense` layer will automatically convert `X` into a 2-D tensor by keeping the first dimension size unchanged.
+Even though the input `X` is a 4th order tensor, 
+the built-in `Dense` layer 
+will automatically convert `X` into a 2nd order tensor 
+by keeping the dimensionality along the first axis unchanged.
 :end_tab:
 
 :begin_tab:`pytorch`
-We use a flatten layer to convert the 4-D tensor `X` to 2-D by keeping the first dimension size unchanged.
+We use a `Flatten` layer to convert the 4th order tensor `X` to 2nd order 
+by keeping the dimensionality along the first axis unchanged.
 
 :end_tab:
 
 :begin_tab:`tensorflow`
-We use a flatten layer to convert the 4-D tensor `X` to 2-D by keeping the first dimension size unchanged.
+We use a `Flatten` layer to convert the 4th order tensor `X` 
+by keeping the dimension along the first axis unchanged.
 :end_tab:
 
 ```{.python .input}
 %%tab all
-class SoftmaxRegression(d2l.Classification):
+class SoftmaxRegression(d2l.Classifier):
     def __init__(self, num_outputs, lr):
         super().__init__()
         self.save_hyperparameters()
@@ -77,7 +85,7 @@ class SoftmaxRegression(d2l.Classification):
 ## Softmax Revisited
 :label:`subsec_softmax-implementation-revisited`
 
-In the previous section we calculated our model's output
+In :numref:`sec_softmax_scratch` we calculated our model's output
 and applied the cross-entropy loss. While this is perfectly
 reasonable mathematically, is is risky computationally, due to
 numerical underflow and overflow in the exponentiation.
@@ -91,8 +99,8 @@ if all arguments are very negative, we will get *underflow*.
 For instance, single precision floating point numbers approximately
 cover the range of $10^{-38}$ to $10^{38}$. As such, if the largest term in $\mathbf{o}$
 lies outside the interval $[-90, 90]$, the result will not be stable.
-A solution to this problem is to subtract $\bar{o} := \max_k o_k$ from
-all entries.
+A solution to this problem is to subtract $\bar{o} \stackrel{\mathrm{def}}{=} \max_k o_k$ from
+all entries:
 
 $$
 \hat y_j = \frac{\exp o_j}{\sum_k \exp o_k} =
@@ -104,10 +112,10 @@ By construction we know that $o_j - \bar{o} \leq 0$ for all $j$. As such, for a 
 classification problem, the denominator is contained in the interval $[1, q]$. Moreover, the
 numerator never exceeds $1$, thus preventing numerical overflow. Numerical underflow only
 occurs when $\exp(o_j - \bar{o})$ numerically evaluates as $0$. Nonetheless, a few steps down
-the road we might find ourselves in trouble when we want to compute $\log \hat{h}_j$ as $\log 0$.
+the road we might find ourselves in trouble when we want to compute $\log \hat{y}_j$ as $\log 0$.
 In particular, in backpropagation,
 we might find ourselves faced with a screenful
-of the dreaded `NaN` results.
+of the dreaded `NaN` (Not a Number) results.
 
 Fortunately, we are saved by the fact that
 even though we are computing exponential functions,
@@ -119,7 +127,7 @@ we can escape the numerical stability issues altogether. We have:
 $$
 \log \hat{y}_j =
 \log \frac{\exp(o_j - \bar{o})}{\sum_k \exp (o_k - \bar{o})} =
-o_j - \bar{o} - \log \sum_k \exp (o_k - \bar{o})
+o_j - \bar{o} - \log \sum_k \exp (o_k - \bar{o}).
 $$
 
 This avoids both overflow and underflow.
@@ -133,7 +141,7 @@ which does smart things like the ["LogSumExp trick"](https://en.wikipedia.org/wi
 
 ```{.python .input  n=3}
 %%tab all
-@d2l.add_to_class(d2l.Classification)  #@save
+@d2l.add_to_class(d2l.Classifier)  #@save
 def loss(self, Y_hat, Y, averaged=True):
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     Y = d2l.reshape(Y, (-1,))
@@ -142,7 +150,8 @@ def loss(self, Y_hat, Y, averaged=True):
         l = fn(Y_hat, Y)
         return l.mean() if averaged else l
     if tab.selected('pytorch'):
-        return F.cross_entropy(Y_hat, Y, reduction='mean' if averaged else 'none')
+        return F.cross_entropy(
+            Y_hat, Y, reduction='mean' if averaged else 'none')
     if tab.selected('tensorflow'):
         fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         return fn(Y, Y_hat)
@@ -150,7 +159,7 @@ def loss(self, Y_hat, Y, averaged=True):
 
 ## Training
 
-Next we train our model. As before, we use Fashion MNIST images, flattened to 784 dimensional feature vectors.
+Next we train our model. As before, we use Fashion-MNIST images, flattened to 784-dimensional feature vectors.
 
 ```{.python .input}
 %%tab all
@@ -178,7 +187,7 @@ As such, we strongly urge you to review *both* the bare bones and the elegant ve
 1. Deep learning uses many different number formats, including FP64 double precision (used extremely rarely),
 FP32 single precision, BFLOAT16 (good for compressed representations), FP16 (very unstable), TF32 (a new format from NVIDIA), and INT8. Compute the smallest and largest argument of the exponential function for which the result does not lead to a numerical underflow or overflow.
 1. INT8 is a very limited format with nonzero numbers from $1$ to $255$. How could you extend its dynamic range without using more bits? Do standard multiplication and addition still work?
-1. Increase the number of epochs for training. Why might the test accuracy decrease after a while? How could we fix this?
+1. Increase the number of epochs for training. Why might the validation accuracy decrease after a while? How could we fix this?
 1. What happens as you increase the learning rate? Compare the loss curves for several learning rates. Which one works better? When?
 
 :begin_tab:`mxnet`

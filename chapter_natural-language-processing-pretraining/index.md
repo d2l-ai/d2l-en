@@ -7,7 +7,7 @@ Out of this basic need of the human condition, a vast amount of written text has
 Given rich text in social media, chat apps, emails, product reviews, news articles,  research papers, and books, it becomes vital to enable computers to understand them to offer assistance or make decisions based on human languages.
 
 *Natural language processing* studies interactions between computers and humans using natural languages.
-In practice, it is very common to use natural language processing techniques to process and analyze text (human natural language) data, such as language models in :numref:`sec_language_model` and machine translation models in :numref:`sec_machine_translation`.
+In practice, it is very common to use natural language processing techniques to process and analyze text (human natural language) data, such as language models in :numref:`sec_language-model` and machine translation models in :numref:`sec_machine_translation`.
 
 To understand text, we can begin by learning
 its representations.

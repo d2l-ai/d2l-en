@@ -19,7 +19,7 @@ for machine translation
 Following the design principle
 of the encoder-decoder architecture,
 the RNN encoder can
-take a variable-length sequence as the input and transforms it into a fixed-shape hidden state.
+take a variable-length sequence as input and transforms it into a fixed-shape hidden state.
 In other words,
 information of the input (source) sequence
 is *encoded* in the hidden state of the RNN encoder.
@@ -58,7 +58,7 @@ is also fed into the decoder as
 part of the inputs
 at every time step as shown in :numref:`fig_seq2seq`.
 Similar to the training of language models in
-:numref:`sec_language_model`,
+:numref:`sec_language-model`,
 we can allow the labels to be the original output sequence,
 shifted by one token:
 "&lt;bos&gt;", "Ils", "regardent", "." $\rightarrow$
@@ -361,7 +361,7 @@ the layers in the above RNN encoder-decoder model are illustrated in :numref:`fi
 
 ```{.python .input  n=9}
 %%tab all
-class Seq2Seq(d2l.Classification):  #@save
+class Seq2Seq(d2l.Classifier):  #@save
     def __init__(self, encoder, decoder, tgt_pad, lr):
         super().__init__()
         self.save_hyperparameters()    

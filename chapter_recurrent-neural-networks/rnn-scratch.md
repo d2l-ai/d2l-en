@@ -146,7 +146,7 @@ Note that we use perplexity to evaluate the model. As discussed in :numref:`subs
 
 ```{.python .input}
 %%tab all
-class RNNLMScratch(d2l.Classification):  #@save
+class RNNLMScratch(d2l.Classifier):  #@save
     def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
         self.save_hyperparameters()

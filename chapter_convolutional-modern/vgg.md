@@ -146,7 +146,7 @@ a specific manifestation. To build a specific network we simply iterate over `co
 
 ```{.python .input}
 %%tab all
-class VGG(d2l.Classification):
+class VGG(d2l.Classifier):
     def __init__(self, arch, lr=0.1):
         super().__init__()
         self.save_hyperparameters()
@@ -169,6 +169,7 @@ class VGG(d2l.Classification):
                 nn.Linear(out_channels * 7 * 7, 4096), nn.ReLU(), nn.Dropout(0.5),
                 nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
                 nn.Linear(4096, 10))
+            self.net.apply(d2l.init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential()
             for (num_convs, num_channels) in arch:

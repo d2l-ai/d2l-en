@@ -191,7 +191,7 @@ Using the one-dimensional convolution
 and max-over-time pooling,
 the textCNN model
 takes individual pretrained token representations
-as the input,
+as input,
 then obtains and transforms sequence representations
 for the downstream application.
 
@@ -335,9 +335,9 @@ embed_size, kernel_sizes, nums_channels = 100, [3, 4, 5], [100, 100, 100]
 devices = d2l.try_all_gpus()
 net = TextCNN(len(vocab), embed_size, kernel_sizes, nums_channels)
 
-def init_weights(m):
-    if type(m) in (nn.Linear, nn.Conv1d):
-        nn.init.xavier_uniform_(m.weight)
+def init_weights(layer):
+    if type(layer) in (nn.Linear, nn.Conv1d):
+        nn.init.xavier_uniform_(layer.weight)
 
 net.apply(init_weights);
 ```

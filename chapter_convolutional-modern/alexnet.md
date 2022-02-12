@@ -308,7 +308,7 @@ import tensorflow as tf
 
 ```{.python .input}
 %%tab all
-class AlexNet(d2l.Classification):
+class AlexNet(d2l.Classifier):
     def __init__(self, lr=0.1):
         super().__init__()
         self.save_hyperparameters()
@@ -340,6 +340,7 @@ class AlexNet(d2l.Classification):
                 nn.Linear(6400, 4096), nn.ReLU(), nn.Dropout(p=0.5),
                 nn.Linear(4096, 4096), nn.ReLU(),nn.Dropout(p=0.5),
                 nn.Linear(4096, 10))
+            self.net.apply(d2l.init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
                 tf.keras.layers.Conv2D(filters=96, kernel_size=11, strides=4,
@@ -414,7 +415,7 @@ with d2l.try_gpu():
 
 ## Discussion
 
-AlexNet's structure bears a striking resemblance to LeNet, with a number of critical improvements, both for accuracy (Dropout) and for ease of training (ReLu). What is equally striking is the amount of progress that has been made in terms of DL tooling. What was several months of work in 2012 can now be accomplished in a dozen lines of code using any modern framework. 
+AlexNet's structure bears a striking resemblance to LeNet, with a number of critical improvements, both for accuracy (Dropout) and for ease of training (ReLU). What is equally striking is the amount of progress that has been made in terms of DL tooling. What was several months of work in 2012 can now be accomplished in a dozen lines of code using any modern framework. 
 
 Reviewing the architecture, we see that AlexNet has an Achilles heel when it comes to efficiency: the last two hidden layers require matrices of size $6400 \times 4096$ and $4096 \times 4096$ respectively. This corresponds to 164 MB of memory and 81 MFlops of computation, both of which are a nontrivial outlay, especially on smaller devices, such as mobile phones. This is one of the reasons why AlexNet has been surpassed by much more effective architectures that we will cover in the following sections. Nonetheless, it is a key step from shallow to deep networks that are used nowadays. Although it seems that there are only a few more lines in AlexNet's implementation than in LeNet, it took the academic community many years to embrace this conceptual change and take advantage of its excellent experimental results. This was also due to the lack of efficient computational tools. At the time neither DistBelief :cite:`Dean.Corrado.Monga.ea.2012` nor Caffe :cite:`Jia.Shelhamer.Donahue.ea.2014` existed, and Theano :cite:`Bergstra.Breuleux.Bastien.ea.2010` still lacked many distinguishing features. It is only the the availability of TensorFlow :cite:`Abadi.Barham.Chen.ea.2016` that changed this situation dramatically. 
 
@@ -445,7 +446,3 @@ Reviewing the architecture, we see that AlexNet has an Achilles heel when it com
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/276)
 :end_tab:
-
-```{.python .input}
-
-```

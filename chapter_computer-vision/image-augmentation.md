@@ -202,7 +202,7 @@ The first 32 training images in the CIFAR-10 dataset are shown below.
 
 ```{.python .input}
 d2l.show_images(gluon.data.vision.CIFAR10(
-    train=True)[0:32][0], 4, 8, scale=0.8);
+    train=True)[:32][0], 4, 8, scale=0.8);
 ```
 
 ```{.python .input}
@@ -409,12 +409,7 @@ def train_with_data_aug(train_augs, test_augs, net, lr=0.001):
 ```{.python .input}
 #@tab pytorch
 batch_size, devices, net = 256, d2l.try_all_gpus(), d2l.resnet18(10, 3)
-
-def init_weights(m):
-    if type(m) in [nn.Linear, nn.Conv2d]:
-        nn.init.xavier_uniform_(m.weight)
-
-net.apply(init_weights)
+net.apply(d2l.init_cnn_weights)
 
 def train_with_data_aug(train_augs, test_augs, net, lr=0.001):
     train_iter = load_cifar10(True, train_augs, batch_size)

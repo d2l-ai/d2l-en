@@ -40,7 +40,7 @@ $$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h).$$
 
 In :eqref:`rnn_h_without_state`, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$, the bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer.
 Thus, broadcasting (see :numref:`subsec_broadcasting`) is applied during the summation.
-Next, the hidden layer output $\mathbf{H}$ is used as the input of the output layer. The output layer is given by
+Next, the hidden layer output $\mathbf{H}$ is used as input of the output layer. The output layer is given by
 
 $$\mathbf{O} = \mathbf{H} \mathbf{W}_{hq} + \mathbf{b}_q,$$
 

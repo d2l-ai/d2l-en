@@ -140,7 +140,7 @@ At each decoding time step,
 the decoder final-layer hidden state at the previous time step is used as the query of the attention.
 As a result, both the attention output
 and the input embedding are concatenated
-as the input of the RNN decoder.
+as input of the RNN decoder.
 
 ```{.python .input}
 class Seq2SeqAttentionDecoder(AttentionDecoder):

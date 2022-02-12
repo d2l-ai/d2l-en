@@ -26,9 +26,7 @@ of distinguishing cats from dogs.
 Say that we do a thorough job in data collection,
 collecting an annotated dataset of one-megapixel photographs.
 This means that each input to the network has one million dimensions.
-According to our discussions of parameterization cost
-of fully connected layers in :numref:`subsec_parameterization-cost-fc-layers`,
-even an aggressive reduction to one thousand hidden dimensions
+Even an aggressive reduction to one thousand hidden dimensions
 would require a fully connected layer
 characterized by $10^6 \times 10^3 = 10^9$ parameters.
 Unless we have lots of GPUs, a talent
@@ -296,7 +294,7 @@ Putting everything together we have:
 $$[\mathsf{H}]_{i,j,d} = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c [\mathsf{V}]_{a, b, c, d} [\mathsf{X}]_{i+a, j+b, c}$$
 :eqlabel:`eq_conv-layer-channels`
 
-Here $d$ indexes the output channels in the hidden representations $\mathsf{H}$. The subsequent convolutional layer will go on to take a third-order tensor, $\mathsf{H}$, as the input.
+Here $d$ indexes the output channels in the hidden representations $\mathsf{H}$. The subsequent convolutional layer will go on to take a third-order tensor, $\mathsf{H}$, as input.
 Being more general,
 :eqref:`eq_conv-layer-channels` is
 the definition of a convolutional layer for multiple channels, where $\mathsf{V}$ is a kernel or filter of the layer.

@@ -42,7 +42,7 @@ the translation model and the language model.
 Emphasizing end-to-end learning,
 this book will focus on neural machine translation methods.
 Different from our language model problem
-in :numref:`sec_language_model`
+in :numref:`sec_language-model`
 whose corpus is in one single language,
 machine translation datasets
 are composed of pairs of text sequences
@@ -143,7 +143,7 @@ text[:60]
 ## [**Tokenization**]
 
 Different from character-level tokenization
-in :numref:`sec_language_model`,
+in :numref:`sec_language-model`,
 for machine translation
 we prefer word-level tokenization here
 (state-of-the-art models may use more advanced tokenization techniques).
@@ -198,7 +198,7 @@ either a segment of one sentence
 or a span over multiple sentences,
 (**has a fixed length.**)
 This was specified by the `num_steps`
-(number of time steps or tokens) argument in :numref:`sec_language_model`.
+(number of time steps or tokens) argument in :numref:`sec_language-model`.
 In machine translation, each example is
 a pair of source and target text sequences,
 where each text sequence may have different lengths.

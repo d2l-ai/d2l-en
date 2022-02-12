@@ -385,7 +385,7 @@ an extremely popular open-source framework
 that has been enthusiastically embraced 
 by the deep learning research community.
 All of the code in this book has passed tests 
-under the latest stable verion of PyTorch.
+under the latest stable version of PyTorch.
 However, due to the rapid development of deep learning,
 some code *in the print edition* 
 may not work properly in future versions of PyTorch.
@@ -401,7 +401,7 @@ Here is how we import modules from PyTorch.
 Most of the code in this book is based on TensorFlow,
 an open-source framework for deep learning
 that is widely adopted in industry
-and popular among reserchers.
+and popular among researchers.
 All of the code in this book has passed tests 
 under the latest stable version TensorFlow.
 However, due to the rapid development of deep learning, 
@@ -523,9 +523,12 @@ jake221, jonbally, zyhazwraith, Brian Pulfer, Nick Tomasino, Lefan Zhang, Hongsh
 yuntai, Yuanxiang Zhu, amarazov, pasricha, Ben Greenawald, Shivam Upadhyay, Quanshangze Du, Biswajit Sahoo,
 Parthe Pandit, Ishan Kumar, HomunculusK, Lane Schwartz, varadgunjal, Jason Wiener, Armin Gholampoor,
 Shreshtha13, eigen-arnav, Hyeonggyu Kim, EmilyOng, Bálint Mucsányi, Chase DuBois, Juntian Tao,
-gopalakrishna-r, Wenxiang Xu, Lifu Huang, filevich, quake2005, nils-werner, Yiming Li, Marsel Khisamutdinov.
+gopalakrishna-r, Wenxiang Xu, Lifu Huang, filevich, quake2005, nils-werner, Yiming Li, Marsel Khisamutdinov,
+Francesco "Fuma" Fumagalli, Peilin Sun, Vincent Gurgul, qingfengtommy, Janmey Shukla, Mo Shan,
+kaansancak.
 
-We thank Amazon Web Services, especially Swami Sivasubramanian, Peter DeSantis, Adam Selipsky and Andrew Jassy for their generous support in writing this book. 
+We thank Amazon Web Services, especially Swami Sivasubramanian, Peter DeSantis, Adam Selipsky,
+and Andrew Jassy for their generous support in writing this book. 
 Without the available time, resources, discussions with colleagues, 
 and continuous encouragement, this book would not have happened.
 

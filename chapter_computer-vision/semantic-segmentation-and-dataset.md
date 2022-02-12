@@ -133,14 +133,14 @@ In the label images, white and black represent borders and  background, respecti
 
 ```{.python .input}
 n = 5
-imgs = train_features[0:n] + train_labels[0:n]
+imgs = train_features[:n] + train_labels[:n]
 d2l.show_images(imgs, 2, n);
 ```
 
 ```{.python .input}
 #@tab pytorch
 n = 5
-imgs = train_features[0:n] + train_labels[0:n]
+imgs = train_features[:n] + train_labels[:n]
 imgs = [img.permute(1,2,0) for img in imgs]
 d2l.show_images(imgs, 2, n);
 ```

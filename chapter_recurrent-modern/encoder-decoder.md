@@ -10,7 +10,7 @@ both variable-length sequences.
 To handle this type of inputs and outputs,
 we can design an architecture with two major components.
 The first component is an *encoder*:
-it takes a variable-length sequence as the input and transforms it into a state with a fixed shape.
+it takes a variable-length sequence as input and transforms it into a state with a fixed shape.
 The second component is a *decoder*:
 it maps the encoded state of a fixed shape
 to a variable-length sequence.
@@ -28,7 +28,7 @@ this encoder-decoder architecture
 first encodes the variable-length input into a state,
 then decodes the state 
 to generate the translated sequence token by token
-as the output:
+as output:
 "Ils", "regardent", ".".
 Since the encoder-decoder architecture
 forms the basis
@@ -41,7 +41,7 @@ into an interface that will be implemented later.
 
 In the encoder interface,
 we just specify that
-the encoder takes variable-length sequences as the input `X`.
+the encoder takes variable-length sequences as input `X`.
 The implementation will be provided 
 by any model that inherits this base `Encoder` class.
 
@@ -96,7 +96,7 @@ Note that this step
 may need extra inputs such as 
 the valid length of the input,
 which was explained
-in :numref:`subsec_mt_data_loading`.
+in :numref:`sec_machine_translation`.
 To generate a variable-length sequence token by token,
 every time the decoder
 may map an input (e.g., the generated token at the previous time step)
@@ -218,7 +218,7 @@ this encoder-decoder architecture.
 ## Summary
 
 * The encoder-decoder architecture can handle inputs and outputs that are both variable-length sequences, thus is suitable for sequence transduction problems such as machine translation.
-* The encoder takes a variable-length sequence as the input and transforms it into a state with a fixed shape.
+* The encoder takes a variable-length sequence as input and transforms it into a state with a fixed shape.
 * The decoder maps the encoded state of a fixed shape to a variable-length sequence.
 
 

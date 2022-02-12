@@ -360,7 +360,7 @@ X_var
 If we want [**to assign multiple elements the same value,
 we apply the indexing on the left-hand side 
 of the assignment operation.**]
-For instance, `[0:2, :]` accesses 
+For instance, `[:2, :]`  accesses 
 the first and second rows,
 where `:` takes all the elements along axis 1 (column).
 While we discussed indexing for matrices,
@@ -369,14 +369,14 @@ and for tensors of more than 2 dimensions.
 
 ```{.python .input}
 #@tab mxnet, pytorch
-X[0:2, :] = 12
+X[:2, :] = 12
 X
 ```
 
 ```{.python .input}
 #@tab tensorflow
 X_var = tf.Variable(X)
-X_var[0:2, :].assign(tf.ones(X_var[0:2,:].shape, dtype=tf.float32) * 12)
+X_var[:2, :].assign(tf.ones(X_var[:2,:].shape, dtype=tf.float32) * 12)
 X_var
 ```
 

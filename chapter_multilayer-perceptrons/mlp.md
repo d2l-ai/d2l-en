@@ -111,7 +111,7 @@ and a linear predictor that acts upon that representation.
 This problem of nonlinearity has been studied for at least a 
 century :cite:`Fisher.1928`. For instance, decision trees
 in their most basic form use a sequence of binary decisions to 
-decide upon class membership :cite:`quinlan1994c4`. Likewise, kernel 
+decide upon class membership :cite:`quinlan2014c4`. Likewise, kernel 
 methods have been used for many decades to model nonlinear dependencies 
 :cite:`Aronszajn.1950`. This has found its way e.g. into 
 nonparametric spline models :cite:`Wahba.1990` and kernel methods
@@ -238,7 +238,7 @@ one atop another, yielding ever more expressive models.
 We know that the brain is capable of very sophisticated statistical analysis. As such, 
 it is worth asking, just *how powerful* a Deep Network could be. This question
 has been answered multiple times, e.g. in :cite:`Cybenko.1989` in the context 
-of multilayer perceptrons, and in :cite:`Michelli86` in the context of Reproducing Kernel 
+of MLPs, and in :cite:`micchelli1984interpolation` in the context of Reproducing Kernel 
 Hilbert Spaces in a way that could be seen as RBF networks with a single hidden layer. 
 These (and related results) suggest that even with a single-hidden-layer network,
 given enough nodes (possibly absurdly many),
@@ -498,7 +498,7 @@ transforming them into elements on the interval (**between -1 and 1**):
 $$\operatorname{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
 We plot the tanh function below.  
-Note that as the input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to that of the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system :cite:`Kalman.Kwasny.1992`.
+Note that as input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to that of the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system :cite:`Kalman.Kwasny.1992`.
 
 ```{.python .input}
 %%tab mxnet
@@ -527,7 +527,7 @@ It is plotted below.
 As the input nears 0,
 the derivative of the tanh function approaches a maximum of 1.
 And as we saw with the sigmoid function,
-as the input moves away from 0 in either direction,
+as input moves away from 0 in either direction,
 the derivative of the tanh function approaches 0.
 
 ```{.python .input}

@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -59,7 +59,7 @@ build deep neural networks.
 ## (**Residual Blocks**)
 
 Let's focus on a local part of a neural network, as depicted in :numref:`fig_residual_block`. Denote the input by $\mathbf{x}$.
-We assume that the desired underlying mapping we want to obtain by learning is $f(\mathbf{x})$, to be used as the input to the activation function on the top.
+We assume that the desired underlying mapping we want to obtain by learning is $f(\mathbf{x})$, to be used as input to the activation function on the top.
 On the left of :numref:`fig_residual_block`,
 the portion within the dotted-line box
 must directly learn the mapping $f(\mathbf{x})$.
@@ -227,7 +227,7 @@ The first two layers of ResNet are the same as those of the GoogLeNet we describ
 
 ```{.python .input}
 %%tab all
-class ResNet(d2l.Classification):
+class ResNet(d2l.Classifier):
     def b1(self):
         if tab.selected('mxnet'):
             net = nn.Sequential()
@@ -319,6 +319,7 @@ def __init__(self, arch, num_classes=10, lr=0.1):
         self.net.add_module('last', nn.Sequential(
             nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(),
             nn.Linear(arch[-1][-1], num_classes)))
+        self.net.apply(d2l.init_cnn_weights)
     if tab.selected('tensorflow'):
         self.net = tf.keras.models.Sequential(self.b1())
         for i, b in enumerate(arch):
@@ -326,7 +327,6 @@ def __init__(self, arch, num_classes=10, lr=0.1):
         self.net.add(tf.keras.models.Sequential([
             tf.keras.layers.GlobalAvgPool2D(),
             tf.keras.layers.Dense(units=num_classes)]))
-
 ```
 
 There are 4 convolutional layers in each module (excluding the $1\times 1$ convolutional layer). Together with the first $7\times 7$ convolutional layer and the final fully connected layer, there are 18 layers in total. Therefore, this model is commonly known as ResNet-18.
@@ -351,12 +351,12 @@ class ResNet18(ResNet):
 
 ```{.python .input}
 %%tab pytorch, mxnet
-ResNet18().layer_summary((1, 1, 224, 224))
+ResNet18().layer_summary((1, 1, 96, 96))
 ```
 
 ```{.python .input}
 %%tab tensorflow
-ResNet18().layer_summary((1, 224, 224, 1))
+ResNet18().layer_summary((1, 96, 96, 1))
 ```
 
 ## [**Training**]

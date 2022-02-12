@@ -819,7 +819,7 @@ output = predict(X)
 Finally, we [**display
 all the predicted bounding boxes with 
 confidence 0.9 or above**]
-as the output.
+as output.
 
 ```{.python .input}
 def display(img, output, threshold):
@@ -829,7 +829,7 @@ def display(img, output, threshold):
         score = float(row[1])
         if score < threshold:
             continue
-        h, w = img.shape[0:2]
+        h, w = img.shape[:2]
         bbox = [row[2:6] * np.array((w, h, w, h), ctx=row.ctx)]
         d2l.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')
 
@@ -845,7 +845,7 @@ def display(img, output, threshold):
         score = float(row[1])
         if score < threshold:
             continue
-        h, w = img.shape[0:2]
+        h, w = img.shape[:2]
         bbox = [row[2:6] * torch.tensor((w, h, w, h), device=row.device)]
         d2l.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')
 

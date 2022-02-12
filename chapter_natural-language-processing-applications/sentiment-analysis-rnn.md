@@ -129,7 +129,7 @@ class BiRNN(nn.Module):
         # 2 * no. of hidden units)
         outputs, _ = self.encoder(embeddings)
         # Concatenate the hidden states of the initial time step and final
-        # time step to use as the input of the fully connected layer. Its
+        # time step to use as input of the fully connected layer. Its
         # shape is (batch size, 4 * no. of hidden units)
         encoding = torch.cat((outputs[0], outputs[-1]), dim=1)
         # Concatenate the hidden states at the initial and final time steps as
@@ -153,13 +153,13 @@ net.initialize(init.Xavier(), ctx=devices)
 
 ```{.python .input}
 #@tab pytorch
-def init_weights(m):
-    if type(m) == nn.Linear:
-        nn.init.xavier_uniform_(m.weight)
-    if type(m) == nn.LSTM:
-        for param in m._flat_weights_names:
+def init_weights(layer):
+    if type(layer) == nn.Linear:
+        nn.init.xavier_uniform_(layer.weight)
+    if type(layer) == nn.LSTM:
+        for param in layer._flat_weights_names:
             if "weight" in param:
-                nn.init.xavier_uniform_(m._parameters[param])
+                nn.init.xavier_uniform_(layer._parameters[param])
 net.apply(init_weights);
 ```
 

@@ -96,7 +96,7 @@ def mlp(num_inputs, num_hiddens, flatten):
 ```
 
 It should be highlighted that, in :eqref:`eq_nli_e`
-$f$ takes inputs $\mathbf{a}_i$ and $\mathbf{b}_j$ separately rather than takes a pair of them together as the input.
+$f$ takes inputs $\mathbf{a}_i$ and $\mathbf{b}_j$ separately rather than takes a pair of them together as input.
 This *decomposition* trick leads to only $m + n$ applications (linear complexity) of $f$ rather than $mn$ applications
 (quadratic complexity).
 
