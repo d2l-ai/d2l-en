@@ -7,7 +7,7 @@ stage("Build and Publish") {
   def TARGET_BRANCH = env.CHANGE_TARGET ? env.CHANGE_TARGET : env.BRANCH_NAME
   // such as d2l-en-master
   def TASK = REPO_NAME + '-' + TARGET_BRANCH
-  node {
+  node('d2l-slave') {
     ws("workspace/${TASK}") {
       checkout scm
       // conda environment
@@ -16,7 +16,6 @@ stage("Build and Publish") {
       sh label: "Build Environment", script: """set -ex
       conda env update -n ${ENV_NAME} -f static/build.yml
       conda activate ${ENV_NAME}
-      pip uninstall -y d2lbook
       pip install git+https://github.com/d2l-ai/d2l-book
       pip list
       nvidia-smi
