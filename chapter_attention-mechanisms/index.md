@@ -26,7 +26,7 @@ explaining how attention is deployed in a visual scene.
 Inspired by the attention cues in this framework,
 we will design models
 that leverage such attention cues.
-Notably, the Nadaraya-Waston kernel regression
+Notably, the Nadaraya-Watson kernel regression
 in 1964 is a simple demonstration of machine learning with *attention mechanisms*.
 
 Next, we will go on to introduce attention functions

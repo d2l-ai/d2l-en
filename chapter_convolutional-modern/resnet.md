@@ -351,12 +351,12 @@ class ResNet18(ResNet):
 
 ```{.python .input}
 %%tab pytorch, mxnet
-ResNet18().layer_summary((1, 1, 224, 224))
+ResNet18().layer_summary((1, 1, 96, 96))
 ```
 
 ```{.python .input}
 %%tab tensorflow
-ResNet18().layer_summary((1, 224, 224, 1))
+ResNet18().layer_summary((1, 96, 96, 1))
 ```
 
 ## [**Training**]
