@@ -178,9 +178,9 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 
     if tab.selected('tensorflow'):
         def call(self, X, *args, **kwargs):
-        if kwargs and "training" in kwargs:
-            self.training = kwargs['training']
-        return self.forward(X, *args)
+            if kwargs and "training" in kwargs:
+                self.training = kwargs['training']
+            return self.forward(X, *args)
 
     def plot(self, key, value, train):
         """Plot a point in animation."""
