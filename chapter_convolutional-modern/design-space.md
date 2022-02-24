@@ -7,6 +7,7 @@
 
 ```{.python .input  n=1}
 from d2l import torch as d2l
+import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as F
