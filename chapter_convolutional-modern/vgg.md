@@ -48,8 +48,15 @@ The key idea by Simonyan and Zisserman was to use *multiple* convolutions in bet
 via max-pooling in the form of a block. They were primarily interested in whether deep or 
 wide networks perform better. For instance, the successive application of two $3 \times 3$ convolutions
 touches the same pixels as a single $5 \times 5$ convolution does. At the same time, the latter uses approximately 
-as many parameters ($25 \cdot c^2$) as three $3 \times 3$ comvolutions do ($3 \cdot 9 \cdot c^2$). 
-In a rather detailed analysis they showed that deep and narrow networks significantly outperform their shallow counterparts. This set deep learning on a quest for ever deeper networks with over 100 layers for typical applications. 
+as many parameters ($25 \cdot c^2$) as three $3 \times 3$ convolutions do ($3 \cdot 9 \cdot c^2$). 
+In a rather detailed analysis they showed that deep and narrow networks significantly outperform their shallow counterparts. This set deep learning on a quest for ever deeper networks with over 100 layers for typical applications.
+While
+stacking $3 \times 3$ convolutions
+has been a gold standard in later deep networks,
+implementations of such operations
+have also been efficient on GPUs :cite:`lavin2016fast`. 
+
+
 
 Back to VGG: a VGG block consists of a *sequence* of convolutions with $3\times3$ kernels with padding of 1 
 (keeping height and width) followed by a $2 \times 2$ max-pooling layer with stride of 2

@@ -4,7 +4,9 @@ tab.interact_select(['mxnet', 'pytorch'])
 ```
 
 # Designing Convolution Network Architectures
-:label:`sec_design-space`
+:label:`sec_cnn-design`
+
+
 
 
 
