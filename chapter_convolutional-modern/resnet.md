@@ -81,6 +81,12 @@ $\mathbf{x}$ to the addition operator
 is called a *residual connection* (or *shortcut connection*).
 With residual blocks, inputs can
 forward propagate faster through the residual connections across layers.
+In fact,
+the residual block
+can be thought of as
+a special case of the multi-branch Inception block:
+it has two branches
+one of which is the identity mapping.
 
 ![A regular block (left) and a residual block (right).](../img/residual-block.svg)
 :label:`fig_residual_block`

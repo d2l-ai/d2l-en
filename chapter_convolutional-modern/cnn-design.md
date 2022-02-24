@@ -6,11 +6,60 @@ tab.interact_select(['mxnet', 'pytorch'])
 # Designing Convolution Network Architectures
 :label:`sec_cnn-design`
 
+The 2010s have witnessed shift
+from *feature engineering* to *network engineering*
+in computer vision.
+Since AlexNet (:numref:`sec_alexnet`)
+beat conventional computer vision models on ImageNet,
+constructing very deep networks
+by stacking the same blocks,
+especially $3 \times 3$ convolutions
+with efficient implementations on GPUs,
+has been popularized by VGG networks (:numref:`sec_vgg`).
+The network in network (:numref:`sec_nin`)
+adds local nonlinearities via $1 \times 1$ convolutions
+and uses global average pooling
+to aggregate information
+across all locations.
+GoogLeNet (:numref:`sec_googlenet`) 
+is a multi-branch network that
+combines the advantages from the
+VGG network
+and the network in network,
+where its Inception block
+adopts the strategy of
+parallel transformations and concatenations.
+ResNets (:numref:`sec_resnet`)
+stack residual blocks,
+which are two-branch subnetworks
+using identity mapping in one branch.
+DenseNets (:numref:`sec_densenet`)
+generalizes the residual architectures.
+Other notable architectures 
+include
+MobileNets, which use network learning to achieve high accuracy in
+resource-constrained settings :cite:`Howard.Sandler.Chu.ea.2019`,
+the squeeze-and-excitation networks that
+allow for efficient information transfer between channels
+:cite:`Hu.Shen.Sun.2018`,
+and EfficientNets :cite:`tan2019efficientnet`
+that scale up networks via neural architecture search.
 
 
 
 
-## Bottleneck Residual Blocks with Group Convolution
+
+to search for better cnn:
+1. manual (convnext)
+1. nas
+1. design space design
+
+
+
+
+## ResNeXt Blocks with Group Convolutions
+
+Bottleneck Residual Blocks with Group Convolution
 
 ```{.python .input}
 %%tab mxnet
@@ -115,7 +164,7 @@ if tab.selected('pytorch'):
 blk(X).shape
 ```
 
-## RegNet
+## AnyNet
 
 Now, we implement this module. Note that special processing has been performed on the first module.
 
@@ -197,6 +246,13 @@ def __init__(self, arch, stem_channels, num_classes=10, lr=0.1):
             nn.Linear(arch[-1][2], num_classes)))
         self.net.apply(d2l.init_cnn_weights)
 ```
+
+## RegNet
+
+* Design choice in AnyNet
+* Design principles for RegNet
+
+
 
 Before training RegNet, let's observe how the input shape changes across different modules in ResNet.
 
