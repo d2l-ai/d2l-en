@@ -62,6 +62,6 @@ googlenet
 batch-norm
 resnet
 densenet
-design-space
+cnn-design
 ```
 
