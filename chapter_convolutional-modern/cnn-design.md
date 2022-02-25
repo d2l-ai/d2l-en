@@ -13,8 +13,7 @@ Since AlexNet (:numref:`sec_alexnet`)
 beat conventional computer vision models on ImageNet,
 constructing very deep networks
 by stacking the same blocks,
-especially $3 \times 3$ convolutions
-with efficient implementations on GPUs,
+especially $3 \times 3$ convolutions,
 has been popularized by VGG networks (:numref:`sec_vgg`).
 The network in network (:numref:`sec_nin`)
 adds local nonlinearities via $1 \times 1$ convolutions
@@ -37,7 +36,7 @@ DenseNets (:numref:`sec_densenet`)
 generalizes the residual architectures.
 Other notable architectures 
 include
-MobileNets, which use network learning to achieve high accuracy in
+MobileNets that use network learning to achieve high accuracy in
 resource-constrained settings :cite:`Howard.Sandler.Chu.ea.2019`,
 the squeeze-and-excitation networks that
 allow for efficient information transfer between channels
@@ -45,14 +44,29 @@ allow for efficient information transfer between channels
 and EfficientNets :cite:`tan2019efficientnet`
 that scale up networks via neural architecture search.
 
+*Neural architecture search* (NAS) :cite:`zoph2016neural,liu2018darts`
+is the process of automating neural network architectures.
+Given a fixed search space,
+NAS uses a search strategy
+to automatically select
+an architecture within the search space
+based on the returned performance estimation.
+The outcome of NAS
+is a single network instance.
+Instead of focusing on designing such individual instances,
+an alternative approach
+is to *design network design spaces*
+that characterize populations of networks :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`.
+This method 
+combines the strength of manual design and NAS.
+Through semi-automatic procedures (like in NAS),
+designing network design spaces
+explores the structure aspect of network design
+that leads to simple, regular networks *RegNets*
+from the discovered design principles (like in manual design).
 
-
-
-
-to search for better cnn:
-1. manual (convnext)
-1. nas
-1. design space design
+In this section,
+we XXX
 
 
 
