@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch'])
 # Designing Convolution Network Architectures
 :label:`sec_cnn-design`
 
-The 2010s have witnessed shift
+The last decade has witnessed shift
 from *feature engineering* to *network engineering*
 in computer vision.
 Since AlexNet (:numref:`sec_alexnet`)
@@ -63,15 +63,16 @@ combines the strength of manual design and NAS.
 Through semi-automatic procedures (like in NAS),
 designing network design spaces
 explores the structure aspect of network design
-from the initial *AnyNet* design space,
-until the discovery of design principles (like in manual design)
+from the initial *AnyNet* design space.
+It then proceeds to discover design principles (like in manual design)
 that lead to simple and regular networks: *RegNets*.
-
-
-The initial AnyNet design space
-starts with networks with
+Before shedding light on these design principles,
+we need to define 
+the initial AnyNet design space. 
+It starts with networks with
 standard, fixed network blocks:
 ResNeXt blocks with group convolutions.
+
 
 
 ## ResNeXt Blocks with Group Convolutions
