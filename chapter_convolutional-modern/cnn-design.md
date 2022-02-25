@@ -75,7 +75,13 @@ ResNeXt blocks with group convolutions.
 
 
 
-## ResNeXt Blocks with Group Convolutions
+## ResNeXt Blocks
+
+
+![Equivalent ResNeXt blocks.](../img/resnext-block.svg)
+:label:`fig_resnext_block`
+
+
 
 Bottleneck Residual Blocks with Group Convolution
 
