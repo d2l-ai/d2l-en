@@ -38,13 +38,13 @@ Other notable architectures
 include
 MobileNets that use network learning to achieve high accuracy in
 resource-constrained settings :cite:`Howard.Sandler.Chu.ea.2019`,
-the squeeze-and-excitation networks that
+the Squeeze-and-Excitation Networks (SENets) that
 allow for efficient information transfer between channels
 :cite:`Hu.Shen.Sun.2018`,
 and EfficientNets :cite:`tan2019efficientnet`
 that scale up networks via neural architecture search.
 
-*Neural architecture search* (NAS) :cite:`zoph2016neural,liu2018darts`
+Specifically, *neural architecture search* (NAS) :cite:`zoph2016neural,liu2018darts`
 is the process of automating neural network architectures.
 Given a fixed search space,
 NAS uses a search strategy
@@ -53,6 +53,7 @@ an architecture within the search space
 based on the returned performance estimation.
 The outcome of NAS
 is a single network instance.
+
 Instead of focusing on designing such individual instances,
 an alternative approach
 is to *design network design spaces*
@@ -62,13 +63,15 @@ combines the strength of manual design and NAS.
 Through semi-automatic procedures (like in NAS),
 designing network design spaces
 explores the structure aspect of network design
-that leads to simple, regular networks *RegNets*
-from the discovered design principles (like in manual design).
-
-In this section,
-we XXX
+from the initial *AnyNet* design space,
+until the discovery of design principles (like in manual design)
+that lead to simple and regular networks: *RegNets*.
 
 
+The initial AnyNet design space
+starts with networks with
+standard, fixed network blocks:
+ResNeXt blocks with group convolutions.
 
 
 ## ResNeXt Blocks with Group Convolutions
@@ -265,7 +268,7 @@ def __init__(self, arch, stem_channels, num_classes=10, lr=0.1):
 
 * Design choice in AnyNet
 * Design principles for RegNet
-
+* AnyNet -> RegNet
 
 
 Before training RegNet, let's observe how the input shape changes across different modules in ResNet.
