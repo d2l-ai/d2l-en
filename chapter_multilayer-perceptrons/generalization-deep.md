@@ -180,8 +180,8 @@ the learner simply memorizes the dataset.
 Then, at prediction time,
 when confronted with a new point $\mathbf{x}$,
 the learner looks up the $k$ nearest neighbors
-(the $k$ points $mathrf{x_i}'$ that minimize
-some distance $d(\mathrf{x}, \mathrf{x_i'})$).
+(the $k$ points $mathbf{x}_i'$ that minimize
+some distance $d(\mathbf{x}, \mathbf{x}_i')$).
 When $k=1$, this is algorithm is called 1-nearest neighbors,
 and the algorithm will always achieve a training error of zero.
 That however, does not mean that the algorithm will not generalize.
@@ -341,7 +341,7 @@ many of hard fast-held intuitions.
 Functionally, neural networks look like parametric models.
 But thinking of them as nonparametric models
 can sometimes be a more reliable source of intuition.
-Because it's often the case that all deep networks under consideration  
+Because it's often the case that all deep networks under consideration
 are capable of fitting all of the training labels,
 nearly all gains must come by mitigating overfitting
 (closing the *generalization gap*).
