@@ -6,78 +6,6 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Dropout
 :label:`sec_dropout`
 
-In :numref:`sec_weight_decay`,
-we introduced the classical approach
-to regularizing statistical models
-by penalizing the $\ell_2$ norm of the weights.
-In probabilistic terms, we could justify this technique
-by arguing that we have assumed a prior belief
-that weights take values from
-a Gaussian distribution with mean zero.
-More intuitively, we might argue
-that we encouraged the model to spread out its weights
-among many features rather than depending too much
-on a small number of potentially spurious associations.
-
-## Overfitting Revisited
-
-Faced with more features than examples,
-linear models tend to overfit.
-But given more examples than features,
-we can generally count on linear models not to overfit.
-Unfortunately, the reliability with which
-linear models generalize comes at a cost.
-Naively applied, linear models do not take
-into account interactions among features.
-For every feature, a linear model must assign
-either a positive or a negative weight, ignoring context.
-
-In traditional texts, this fundamental tension
-between generalizability and flexibility
-is described as the *bias-variance tradeoff*.
-Linear models have high bias: they can only represent a small class of functions.
-However, these models have low variance: they give similar results
-across different random samples of the data.
-
-Deep neural networks inhabit the opposite
-end of the bias-variance spectrum.
-Unlike linear models, neural networks
-are not confined to looking at each feature individually.
-They can learn interactions among groups of features.
-For example, they might infer that
-“Nigeria” and “Western Union” appearing
-together in an email indicates spam
-but that separately they do not.
-
-Even when we have far more examples than features,
-deep neural networks are capable of overfitting.
-In 2017, a group of researchers demonstrated
-the extreme flexibility of neural networks
-by training deep nets on randomly-labeled images.
-Despite the absence of any true pattern
-linking the inputs to the outputs,
-they found that the neural network optimized by stochastic gradient descent
-could label every image in the training set perfectly.
-Consider what this means.
-If the labels are assigned uniformly
-at random and there are 10 classes,
-then no classifier can do better
-than 10% accuracy on holdout data.
-The generalization gap here is a whopping 90%.
-If our models are so expressive that they
-can overfit this badly, then when should
-we expect them not to overfit?
-
-The mathematical foundations for
-the puzzling generalization properties
-of deep networks remain open research questions,
-and we encourage the theoretically-oriented
-reader to dig deeper into the topic.
-For now, we turn to the investigation of
-practical tools that tend to
-empirically improve the generalization of deep nets.
-
-## Robustness through Perturbations
 
 Let's think briefly about what we
 expect from a good predictive model.
@@ -113,13 +41,6 @@ to perturbations in the input.
 Then, in 2014, Srivastava et al. :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`
 developed a clever idea for how to apply Bishop's idea
 to the internal layers of a network, too.
-Namely, they proposed to inject noise
-into each layer of the network
-before calculating the subsequent layer during training.
-They realized that when training
-a deep network with many layers,
-injecting noise enforces smoothness just on the input-output mapping.
-
 Their idea, called *dropout*, involves
 injecting noise while computing
 each internal layer during forward propagation,
@@ -145,12 +66,16 @@ calling this condition *co-adaptation*.
 Dropout, they claim, breaks up co-adaptation
 just as sexual reproduction is argued to
 break up co-adapted genes.
+While the explanatory of this theory is certainly up for debate,
+the Dropout technique itself has proved enduring,
+and various forms of dropout are implemented
+in most deep learning libraries. 
 
-The key challenge then is how to inject this noise.
+
+The key challenge is how to inject this noise.
 One idea is to inject the noise in an *unbiased* manner
 so that the expected value of each layer---while fixing
 the others---equals to the value it would have taken absent noise.
-
 In Bishop's work, he added Gaussian noise
 to the inputs to a linear model.
 At each training iteration, he added noise
@@ -160,7 +85,8 @@ yielding a perturbed point $\mathbf{x}' = \mathbf{x} + \epsilon$.
 In expectation, $E[\mathbf{x}'] = \mathbf{x}$.
 
 In standard dropout regularization,
-one debiases each layer by normalizing
+one zeros out some fraction of the nodes in each layer
+and then *debiases* each layer by normalizing
 by the fraction of nodes that were retained (not dropped out).
 In other words,
 with *dropout probability* $p$,
