@@ -24,6 +24,7 @@ mlp-implementation
 backprop
 numerical-stability-and-init
 dropout
+generalization-deep
 kaggle-house-price
 ```
 
