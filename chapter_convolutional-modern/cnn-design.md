@@ -27,7 +27,7 @@ VGG network
 and the network in network,
 where its Inception block
 adopts the strategy of
-parallel transformations and concatenations.
+concatenated parallel transformations.
 ResNets (:numref:`sec_resnet`)
 stack residual blocks,
 which are two-branch subnetworks
@@ -71,19 +71,48 @@ we need to define
 the initial AnyNet design space. 
 It starts with networks with
 standard, fixed network blocks:
-ResNeXt blocks with group convolutions.
-
-
+ResNeXt blocks.
 
 ## ResNeXt Blocks
 
+ResNeXt blocks extend the residual block design
+by adding
+concatenated parallel transformations
+:cite:`Xie.Girshick.Dollar.ea.2017`.
+Different from those transformations
+in multi-branch Inception blocks,
+ResNeXt adopts the same transformations in all branches,
+thus minimizing manual design efforts in each branch.
 
-![Equivalent ResNeXt blocks.](../img/resnext-block.svg)
+![The ResNeXt block. It is a bottleneck ($b < c$) residual block with group convolution ($g$ groups).](../img/resnext-block.svg)
 :label:`fig_resnext_block`
 
-
-
-Bottleneck Residual Blocks with Group Convolution
+The left dotted box of
+:numref:`fig_resnext_block`
+shows the added concatenated parallel transformation
+strategy in ResNeXt.
+An input with $c$ channels
+is first split into $g$ groups
+with $g$ $1 \times 1$ convolutions
+followed by $3 \times 3$ convolutions,
+all with $b/g$ output channels.
+Concatenating these $g$ outputs
+results in $b$ output channels,
+which are usually "bottlenecked" ($b < c$)
+inside the dashed box.
+The bottlenecked output
+will restore its $c$ channels
+with the final $1 \times 1$ convolution
+right before the residual connection.
+Notably,
+the left dotted box can be simplified 
+as the right dotted box in :numref:`fig_resnext_block`,
+where we only need to specify 
+that the $3 \times 3$ convolution is a *group convolution*
+with $g$ groups.
+The group convolution dates back 
+to the idea of distributing the AlexNet
+model over two GPUs :cite:`Krizhevsky.Sutskever.Hinton.2012`.
 
 ```{.python .input}
 %%tab mxnet
@@ -92,8 +121,8 @@ from mxnet import np, npx, init
 from mxnet.gluon import nn
 npx.set_np()
 
-class GroupConvBotResidual(nn.Block):
-    """The bottleneck residual block with group convolution."""
+class ResNeXtBlock(nn.Block):
+    """The ResNeXt block."""
     def __init__(self, num_channels, group_width, bot_mul,
                  use_1x1conv=False, strides=1, **kwargs):
         super().__init__(**kwargs)
@@ -131,8 +160,8 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-class GroupConvBotResidual(nn.Module):
-    """The bottleneck residual block with group convolution."""
+class ResNeXtBlock(nn.Module):
+    """The ResNeXt block."""
     def __init__(self, input_channels, num_channels, group_width, bot_mul,
                  use_1x1conv=False, strides=1):
         super().__init__()
@@ -168,10 +197,10 @@ Now let's look at a situation where the input and output are of the same shape.
 ```{.python .input  n=2}
 %%tab all
 if tab.selected('mxnet'):
-    blk = GroupConvBotResidual(32, 16, 1)
+    blk = ResNeXtBlock(32, 16, 1)
     blk.initialize()
 if tab.selected('pytorch'):
-    blk = GroupConvBotResidual(32, 32, 16, 1)
+    blk = ResNeXtBlock(32, 32, 16, 1)
 X = d2l.randn(4, 32, 96, 96)
 blk(X).shape
 ```
@@ -181,12 +210,22 @@ We also have the option to halve the output height and width while increasing th
 ```{.python .input  n=3}
 %%tab all
 if tab.selected('mxnet'):
-    blk = GroupConvBotResidual(32, 16, 1, use_1x1conv=True, strides=2)
+    blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
     blk.initialize()
 if tab.selected('pytorch'):
-    blk = GroupConvBotResidual(32, 32, 16, 1, use_1x1conv=True, strides=2)
+    blk = ResNeXtBlock(32, 32, 16, 1, use_1x1conv=True, strides=2)
 blk(X).shape
 ```
+
+A key advantage of the ResNeXt design
+is that increasing groups
+leads to sparser connections (lower computational complexity) within the block,
+thus enabling an increase of network width
+to achieve a better tradeoff between
+FLOPs (floating-point operations in number of multiply-adds) and accuracy.
+Thus, ResNeXt-ification
+is appealing in convolution network design :cite:`liu2022convnet`
+and we will use it to construct the AnyNet design space.
 
 ## AnyNet
 
@@ -221,11 +260,11 @@ def stage(self, depth, num_channels, group_width, bot_mul):
     net = nn.Sequential()
     for i in range(depth):
         if i == 0:
-            net.add(GroupConvBotResidual(
+            net.add(ResNeXtBlock(
                 num_channels, group_width, bot_mul, use_1x1conv=True,
                 strides=2))
         else:
-            net.add(GroupConvBotResidual(
+            net.add(ResNeXtBlock(
                 num_channels, num_channels, group_width, bot_mul))
     return net
 ```
@@ -237,11 +276,11 @@ def stage(self, depth, input_channels, num_channels, group_width, bot_mul):
     blk = []
     for i in range(depth):
         if i == 0:
-            blk.append(GroupConvBotResidual(
+            blk.append(ResNeXtBlock(
                 input_channels, num_channels, group_width, bot_mul,
                 use_1x1conv=True, strides=2))
         else:
-            blk.append(GroupConvBotResidual(
+            blk.append(ResNeXtBlock(
                 num_channels, num_channels, group_width, bot_mul))
     return nn.Sequential(*blk)
 ```
