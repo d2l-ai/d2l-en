@@ -57,6 +57,7 @@ build deep neural networks.
 
 
 ## (**Residual Blocks**)
+:label:`subsec_residual-blks`
 
 Let's focus on a local part of a neural network, as depicted in :numref:`fig_residual_block`. Denote the input by $\mathbf{x}$.
 We assume that the desired underlying mapping we want to obtain by learning is $f(\mathbf{x})$, to be used as input to the activation function on the top.
