@@ -28,7 +28,7 @@ The implementations of the following members of the `d2l` package and sections w
 
 ```eval_rst
 
-.. currentmodule:: d2l.torch
+.. currentmodule:: d2l.tensorflow
 
 ```
 
