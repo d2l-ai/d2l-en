@@ -421,7 +421,7 @@ w = (ave_1 - ave_0).T
 predictions = X_test.reshape(2000, -1) @ (w.flatten()) > -1500000
 
 # Accuracy
-torch.mean(predictions.type(y_test.dtype) == y_test, dtype=torch.float64)
+torch.mean((predictions.type(y_test.dtype) == y_test).float(), dtype=torch.float64)
 ```
 
 ```{.python .input}
