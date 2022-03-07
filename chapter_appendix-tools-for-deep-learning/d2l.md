@@ -10,7 +10,6 @@ The implementations of the following members of the `d2l` package and sections w
 
 .. automodule:: d2l.mxnet
    :members:
-   :imported-members:
 
 ```
 
@@ -22,7 +21,6 @@ The implementations of the following members of the `d2l` package and sections w
 
 .. automodule:: d2l.torch
    :members:
-   :imported-members:
 
 ```
 
@@ -35,7 +33,6 @@ The implementations of the following members of the `d2l` package and sections w
 
 .. automodule:: d2l.tensorflow
    :members:
-   :imported-members:
 
 ```
 
