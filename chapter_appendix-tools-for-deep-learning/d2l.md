@@ -12,8 +12,8 @@ The implementations of the following members of the `d2l` package and sections w
 
 ```
 
-
 :end_tab:
+
 
 :begin_tab:`pytorch`
 
@@ -22,6 +22,8 @@ The implementations of the following members of the `d2l` package and sections w
 .. currentmodule:: d2l.torch
 
 ```
+
+:end_tab:
 
 
 :begin_tab:`tensorflow`
@@ -32,8 +34,8 @@ The implementations of the following members of the `d2l` package and sections w
 
 ```
 
-
 :end_tab:
+
 
 ## Models
 
