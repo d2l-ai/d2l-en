@@ -342,7 +342,7 @@ rather than writing costly for-loops in Python.**)
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
-from mxnet import np
+import numpy as np
 import time
 ```
 
