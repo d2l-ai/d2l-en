@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch'])
 ```
@@ -129,7 +129,7 @@ with a $1 \times 1$ convolution (`conv4`),
 where setting `use_1x1conv=True, strides=2`
 halves the output height and width.
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx, init
@@ -168,7 +168,7 @@ class ResNeXtBlock(nn.Block):
         return npx.relu(Y + X)
 ```
 
-```{.python .input  n=1}
+```{.python .input  n=3}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -209,7 +209,7 @@ class ResNeXtBlock(nn.Module):
 
 In the following case (`use_1x1conv=False, strides=1`), the input and output are of the same shape.
 
-```{.python .input  n=2}
+```{.python .input  n=4}
 %%tab all
 if tab.selected('mxnet'):
     blk = ResNeXtBlock(32, 16, 1)
@@ -223,7 +223,7 @@ blk(X).shape
 Alternatively, setting `use_1x1conv=True, strides=2`
 halves the output height and width.
 
-```{.python .input  n=3}
+```{.python .input  n=5}
 %%tab all
 if tab.selected('mxnet'):
     blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
@@ -249,7 +249,10 @@ will be based on the ResNeXt block.
 
 Now, we implement this module. Note that special processing has been performed on the first module.
 
-```{.python .input  n=4}
+![The AnyNet design space. Critical design choices include depth $d_i$ and the number of output channels $w_i$ for any stage $i$.](../img/anynet.svg)
+:label:`fig_anynet`
+
+```{.python .input  n=6}
 %%tab mxnet
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
@@ -259,7 +262,7 @@ class AnyNet(d2l.Classifier):
         return net
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab pytorch
 class AnyNet(d2l.Classifier):
     def stem(self, input_channels, num_channels):
@@ -271,7 +274,7 @@ class AnyNet(d2l.Classifier):
 
 other block
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab mxnet
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, num_channels, group_width, bot_mul):
@@ -287,7 +290,7 @@ def stage(self, depth, num_channels, group_width, bot_mul):
     return net
 ```
 
-```{.python .input  n=5}
+```{.python .input  n=9}
 %%tab pytorch
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, input_channels, num_channels, group_width, bot_mul):
@@ -305,7 +308,7 @@ def stage(self, depth, input_channels, num_channels, group_width, bot_mul):
 
 Then, we add all the modules to RegNet.
 
-```{.python .input  n=6}
+```{.python .input  n=10}
 %%tab all
 @d2l.add_to_class(AnyNet)
 def __init__(self, arch, stem_channels, num_classes=10, lr=0.1):
@@ -337,7 +340,7 @@ def __init__(self, arch, stem_channels, num_classes=10, lr=0.1):
 
 Before training RegNet, let's observe how the input shape changes across different modules in ResNet.
 
-```{.python .input  n=7}
+```{.python .input  n=11}
 %%tab all
 class RegNet32(AnyNet):
     def __init__(self, num_classes=10, lr=0.1):
@@ -355,7 +358,7 @@ class RegNet32(AnyNet):
                 stem_channels, num_classes, lr)
 ```
 
-```{.python .input  n=8}
+```{.python .input  n=12}
 %%tab all
 RegNet32().layer_summary((1, 1, 96, 96))
 ```
@@ -364,7 +367,7 @@ RegNet32().layer_summary((1, 1, 96, 96))
 
 We train RegNet on the Fashion-MNIST dataset, just like before.
 
-```{.python .input  n=9}
+```{.python .input  n=13}
 %%tab all
 model = RegNet32(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
