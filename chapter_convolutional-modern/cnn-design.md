@@ -116,10 +116,10 @@ to the idea of distributing the AlexNet
 model over two GPUs :cite:`Krizhevsky.Sutskever.Hinton.2012`.
 
 The following implementation of the `ResNeXtBlock` class
-treats `group_width` ($b/g$ in :numref:`fig_resnext_block`) as an argument
+treats `groups` ($b/g$ in :numref:`fig_resnext_block`) as an argument
 so that given `bot_channels` ($b$ in :numref:`fig_resnext_block`) bottleneck channels,
 the $3 \times 3$ group convolution will
-have `bot_channels//group_width` groups.
+have `bot_channels//groups` groups.
 Similar to
 the residual block implementation in
 :numref:`subsec_residual-blks`,
@@ -138,7 +138,7 @@ npx.set_np()
 
 class ResNeXtBlock(nn.Block):
     """The ResNeXt block."""
-    def __init__(self, num_channels, group_width, bot_mul,
+    def __init__(self, num_channels, groups, bot_mul,
                  use_1x1conv=False, strides=1, **kwargs):
         super().__init__(**kwargs)
         bot_channels = int(round(num_channels * bot_mul))
@@ -146,7 +146,7 @@ class ResNeXtBlock(nn.Block):
                                strides=1)
         self.conv2 = nn.Conv2D(bot_channels, kernel_size=3, padding=1,
                                strides=strides,
-                               groups=bot_channels//group_width)
+                               groups=bot_channels//groups)
         self.conv3 = nn.Conv2D(num_channels, kernel_size=1, padding=0,
                                strides=1)
         self.bn1 = nn.BatchNorm()
@@ -177,7 +177,7 @@ from torch.nn import functional as F
 
 class ResNeXtBlock(nn.Module):
     """The ResNeXt block."""
-    def __init__(self, input_channels, num_channels, group_width, bot_mul,
+    def __init__(self, input_channels, num_channels, groups, bot_mul,
                  use_1x1conv=False, strides=1):
         super().__init__()
         bot_channels = int(round(num_channels * bot_mul))
@@ -185,7 +185,7 @@ class ResNeXtBlock(nn.Module):
                                stride=1)
         self.conv2 = nn.Conv2d(bot_channels, bot_channels, kernel_size=3,
                                stride=strides, padding=1,
-                               groups=bot_channels//group_width)
+                               groups=bot_channels//groups)
         self.conv3 = nn.Conv2d(bot_channels, num_channels, kernel_size=1,
                                stride=1)
         self.bn1 = nn.BatchNorm2d(bot_channels)
@@ -247,10 +247,41 @@ will be based on the ResNeXt block.
 
 ## AnyNet
 
-Now, we implement this module. Note that special processing has been performed on the first module.
 
-![The AnyNet design space. Critical design choices include depth $d_i$ and the number of output channels $w_i$ for any stage $i$.](../img/anynet.svg)
+The initial design space is called *AnyNet*,
+a relatively unconstrained design space,
+where we can focus on 
+exploring network structure
+assuming standard, fixed blocks such as ResNeXt.
+Specifically,
+the network structure
+includes
+elements
+such as the number of blocks
+and the number of output channels
+in each stage,
+and bottleneck ratios and number of groups in 
+each ResNeXt block.
+
+
+
+![The AnyNet design space. Besides the number of groups and bottleneck ratio in each block, design choices include depth $d_i$ and the number of output channels $w_i$ for any stage $i$.](../img/anynet.svg)
 :label:`fig_anynet`
+
+The AnyNet design space
+is shown in :numref:`fig_anynet`.
+
+* describe anynet component in fig
+* highlight design choices
+
+
+
+
+
+
+
+
+Now, we implement this module. Note that special processing has been performed on the first module.
 
 ```{.python .input  n=6}
 %%tab mxnet
@@ -277,32 +308,32 @@ other block
 ```{.python .input  n=8}
 %%tab mxnet
 @d2l.add_to_class(AnyNet)
-def stage(self, depth, num_channels, group_width, bot_mul):
+def stage(self, depth, num_channels, groups, bot_mul):
     net = nn.Sequential()
     for i in range(depth):
         if i == 0:
             net.add(ResNeXtBlock(
-                num_channels, group_width, bot_mul, use_1x1conv=True,
+                num_channels, groups, bot_mul, use_1x1conv=True,
                 strides=2))
         else:
             net.add(ResNeXtBlock(
-                num_channels, num_channels, group_width, bot_mul))
+                num_channels, num_channels, groups, bot_mul))
     return net
 ```
 
 ```{.python .input  n=9}
 %%tab pytorch
 @d2l.add_to_class(AnyNet)
-def stage(self, depth, input_channels, num_channels, group_width, bot_mul):
+def stage(self, depth, input_channels, num_channels, groups, bot_mul):
     blk = []
     for i in range(depth):
         if i == 0:
             blk.append(ResNeXtBlock(
-                input_channels, num_channels, group_width, bot_mul,
+                input_channels, num_channels, groups, bot_mul,
                 use_1x1conv=True, strides=2))
         else:
             blk.append(ResNeXtBlock(
-                num_channels, num_channels, group_width, bot_mul))
+                num_channels, num_channels, groups, bot_mul))
     return nn.Sequential(*blk)
 ```
 
@@ -333,8 +364,8 @@ def __init__(self, arch, stem_channels, num_classes=10, lr=0.1):
 
 ## RegNet
 
-* Design choice in AnyNet
-* Design principles for RegNet
+* Recall Design choice in AnyNet
+* Design principles for RegNet (and how to get there)
 * AnyNet -> RegNet
 
 
@@ -344,17 +375,17 @@ Before training RegNet, let's observe how the input shape changes across differe
 %%tab all
 class RegNet32(AnyNet):
     def __init__(self, num_classes=10, lr=0.1):
-        stem_channels, group_width, bot_mul = 32, 16, 1
+        stem_channels, groups, bot_mul = 32, 16, 1
         depths, channels = [4, 6], [32, 80]
         if tab.selected(['mxnet']):
             super().__init__(
-                ((depths[0], channels[0], group_width, bot_mul),
-                 (depths[1], channels[1], group_width, bot_mul)),
+                ((depths[0], channels[0], groups, bot_mul),
+                 (depths[1], channels[1], groups, bot_mul)),
                 stem_channels, num_classes, lr)
         if tab.selected(['pytorch']):
             super().__init__(
-                ((depths[0], stem_channels, channels[0], group_width, bot_mul),
-                 (depths[1], channels[0], channels[1], group_width, bot_mul)),
+                ((depths[0], stem_channels, channels[0], groups, bot_mul),
+                 (depths[1], channels[0], channels[1], groups, bot_mul)),
                 stem_channels, num_classes, lr)
 ```
 
@@ -374,6 +405,10 @@ trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 trainer.fit(model, data)
 ```
+
+## ViT and ConvNext
+
+
 
 ## Summary
 
