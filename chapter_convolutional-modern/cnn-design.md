@@ -244,9 +244,7 @@ is appealing in convolution network design :cite:`liu2022convnet`
 and the following AnyNet design space
 will be based on the ResNeXt block.
 
-
 ## AnyNet
-
 
 The initial design space is called *AnyNet*,
 a relatively unconstrained design space,
@@ -260,28 +258,58 @@ elements
 such as the number of blocks
 and the number of output channels
 in each stage,
-and bottleneck ratios and number of groups in 
+and the number of groups (group width) and bottleneck ratio
+within 
 each ResNeXt block.
 
 
 
-![The AnyNet design space. Besides the number of groups and bottleneck ratio in each block, design choices include depth $d_i$ and the number of output channels $w_i$ for any stage $i$.](../img/anynet.svg)
+![The AnyNet design space. Besides the number of groups and bottleneck ratio within each block, design choices include depth $d_i$ and the number of output channels $w_i$ for any stage $i$.](../img/anynet.svg)
 :label:`fig_anynet`
 
 The AnyNet design space
 is shown in :numref:`fig_anynet`.
+This network
+begins with a *stem*,
+followed by a *body* with $n$ stages of transformation,
+and a final *head*.
+More concretely,
+the network stem
+is a $3 \times 3$ convolution with stride 2
+that halves the height and width of an input image.
+The network head
+is a global average pooling followed
+by a fully connected layer to predict 
+the output classes.
+Note that
+the network stem and head
+are kept fixed and simple,
+so that the design focus in
+on the network body that is central
+to performance.
+Specifically,
+the network body 
+consists of $n$ stages of transformation
+($n$ is given, such as $4$ in the AnyNet paper :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`),
+where stage $i$ 
+consists of $d_i$ ResNeXt blocks
+with $w_i$ output channels,
+and progressively
+halves resolution via the first block
+(setting `use_1x1conv=True, strides=2` in `ResNeXtBlock` above).
 
-* describe anynet component in fig
-* highlight design choices
+Overall,
+despite of the straightforward network structure,
+there is a vast number of
+possible networks in the AnyNet design space.
+For any stage $i$
+the design choices include depth $d_i$,
+block width $w_i$,
+and the number of groups $g_i$ and bottleneck ratio $b_i$ within each block.
 
 
-
-
-
-
-
-
-Now, we implement this module. Note that special processing has been performed on the first module.
+To implement AnyNet,
+we first define its network stem.
 
 ```{.python .input  n=6}
 %%tab mxnet
@@ -303,7 +331,9 @@ class AnyNet(d2l.Classifier):
             nn.BatchNorm2d(num_channels), nn.ReLU())
 ```
 
-other block
+Each stage consists of `depth` ResNeXt blocks,
+where `num_channels` specifies the block width.
+Note that the first block halves input resolution.
 
 ```{.python .input  n=8}
 %%tab mxnet
@@ -313,8 +343,7 @@ def stage(self, depth, num_channels, groups, bot_mul):
     for i in range(depth):
         if i == 0:
             net.add(ResNeXtBlock(
-                num_channels, groups, bot_mul, use_1x1conv=True,
-                strides=2))
+                num_channels, groups, bot_mul, use_1x1conv=True, strides=2))
         else:
             net.add(ResNeXtBlock(
                 num_channels, num_channels, groups, bot_mul))
@@ -337,7 +366,8 @@ def stage(self, depth, input_channels, num_channels, groups, bot_mul):
     return nn.Sequential(*blk)
 ```
 
-Then, we add all the modules to RegNet.
+Putting network stem, body, and head together,
+we complete the implementation of AnyNet.
 
 ```{.python .input  n=10}
 %%tab all
