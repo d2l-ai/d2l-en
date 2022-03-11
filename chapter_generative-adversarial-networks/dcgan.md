@@ -594,7 +594,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
         loss_D, loss_G = metric[0] / metric[2], metric[1] / metric[2]
         animator.add(epoch, (loss_D, loss_G))
     print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '
-          f'{metric[2] / timer.stop():.1f} examples/sec on {str(device)}')
+          f'{metric[2] / timer.stop():.1f} examples/sec on {str(device._device_name)}')
 ```
 
 We train the model with a small number of epochs just for demonstration.
