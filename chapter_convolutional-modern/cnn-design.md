@@ -297,15 +297,11 @@ with $w_i$ output channels,
 and progressively
 halves resolution via the first block
 (setting `use_1x1conv=True, strides=2` in `ResNeXtBlock` above).
-
 Overall,
 despite of the straightforward network structure,
 there is a vast number of
-possible networks in the AnyNet design space.
-For any stage $i$
-the design choices include depth $d_i$,
-block width $w_i$,
-and the number of groups $g_i$ and bottleneck ratio $b_i$ within each block.
+possible networks (e.g., by varying $d_i$ and $w_i$) in the AnyNet design space.
+
 
 
 To implement AnyNet,
@@ -394,12 +390,47 @@ def __init__(self, arch, stem_channels, num_classes=10, lr=0.1):
 
 ## RegNet
 
-* Recall Design choice in AnyNet
-* Design principles for RegNet (and how to get there)
-* AnyNet -> RegNet
+For any stage $i$ of AnyNet,
+the design choices are depth $d_i$,
+block width $w_i$,
+and the number of groups $g_i$ and bottleneck ratio $b_i$ within each block.
+The designing network design spaces
+process starts
+from relatively unconstrained
+network structure characterized
+by ($d_i$, $w_i$, $g_i$, $b_i$)
+in the initial AnyNet design space.
+Then this process
+progressively samples models
+from the input design space
+to evaluate the error distribution :cite:`radosavovic2019network`
+as a quality indicator
+to output a more constrained
+design space with simpler models that have
+better quality.
+As a result,
+this human-in-the-loop methodology
+leads to the *RegNet* design space
+consisting of simple, regular networks
+following easy-to-interpret design principles:
 
+* Share the bottle network ratio $b_i = b$ for all stages $i$;
+* Share the number of groups $g_i = g$ for all stages $i$;
+* Increase network width across stages: $w_{i} \leq w_{i+1}$;
+* Increase network depth across stages: $d_{i} \leq d_{i+1}$.
 
-Before training RegNet, let's observe how the input shape changes across different modules in ResNet.
+The original RegNet paper :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`
+investigated various architectures,
+such as RegNetX using ResNeXt blocks
+and RegNetY that additionally uses operators from SENets :cite:`Hu.Shen.Sun.2018`.
+In the following, 
+we implement a 32-layer RegNetX variant
+characterized by 
+
+* $b_i = 1;$
+* $g_i = 16;$
+* $w_1 = 32, w_2=80;$
+* $d_1 = 4, d_2=6.$
 
 ```{.python .input  n=11}
 %%tab all
@@ -419,6 +450,8 @@ class RegNet32(AnyNet):
                 stem_channels, num_classes, lr)
 ```
 
+We can see that each RegNet stage halves resolution and increases output channels.
+
 ```{.python .input  n=12}
 %%tab all
 RegNet32().layer_summary((1, 1, 96, 96))
@@ -426,7 +459,7 @@ RegNet32().layer_summary((1, 1, 96, 96))
 
 ## Training
 
-We train RegNet on the Fashion-MNIST dataset, just like before.
+Training the 32-layer RegNet on the Fashion-MNIST dataset is just like before.
 
 ```{.python .input  n=13}
 %%tab all
