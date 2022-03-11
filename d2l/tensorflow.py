@@ -14,12 +14,13 @@ import tarfile
 import time
 import zipfile
 from collections import defaultdict
+
+import numpy as np
 import pandas as pd
 import requests
 from IPython import display
 from matplotlib import pyplot as plt
 
-import numpy as np
 import tensorflow as tf
 
 d2l = sys.modules[__name__]
@@ -43,6 +44,7 @@ import tarfile
 import time
 import zipfile
 from collections import defaultdict
+
 import pandas as pd
 import requests
 from IPython import display
@@ -51,7 +53,9 @@ from matplotlib import pyplot as plt
 d2l = sys.modules[__name__]
 
 import numpy as np
+
 import tensorflow as tf
+
 
 def use_svg_display():
     """Use the svg format to display a plot in Jupyter.
@@ -464,15 +468,16 @@ class Classifier(d2l.Module):
 
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
-    return tf.device('/CPU:0')
+    return tf.config.get_visible_devices("CPU")
 
 def gpu(i=0):
     """Defined in :numref:`sec_use_gpu`"""
-    return tf.device(f'/GPU:{i}')
+    visible_devices = tf.config.get_visible_devices("GPU")
+    return visible_devices[i]
 
 def num_gpus():
     """Defined in :numref:`sec_use_gpu`"""
-    return len(tf.config.experimental.list_physical_devices('GPU'))
+    return len(tf.config.get_visible_devices('GPU'))
 
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu().
