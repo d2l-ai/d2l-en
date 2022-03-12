@@ -240,7 +240,7 @@ thus enabling an increase of network width
 to achieve a better tradeoff between
 FLOPs (floating-point operations in number of multiply-adds) and accuracy.
 Thus, ResNeXt-ification
-is appealing in convolution network design :cite:`liu2022convnet`
+is appealing in convolution network design 
 and the following AnyNet design space
 will be based on the ResNeXt block.
 
@@ -290,7 +290,7 @@ to performance.
 Specifically,
 the network body 
 consists of $n$ stages of transformation
-($n$ is given, such as $4$ in the AnyNet paper :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`),
+($n$ is given),
 where stage $i$ 
 consists of $d_i$ ResNeXt blocks
 with $w_i$ output channels,
@@ -469,23 +469,61 @@ data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 trainer.fit(model, data)
 ```
 
-## ViT and ConvNext
+## Discussions and Summary
 
-
-
-## Summary
-
+With desirable properties like locality and translation invariance (:numref:`sec_why-conv`)
+for vision,
+CNNs have been the dominant architectures in this area.
+Recently,
+transformers (to be covered in :numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training`
+and MLPs :cite:`tolstikhin2021mlp`
+have also sparked research beyond 
+the well-established CNN architectures for vision.
+Specifically,
+although lacking of the aforementioned
+inductive biases inherent to CNNs,
+vision transformers
+attained state-of-the-art performance
+in large-scale image classification in early 2020s,
+showing that
+*large-scale training trumps inductive biases*
+:cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
+However,
+quadratic complexity
+of self-attention 
+makes the transformer architecture
+less suitable for higher-resolution images.
+To address this issue,
+hierarchical vision transformers (Swin transformers)
+introduce shifted windows to 
+achieve state-of-the-art performance
+in a broader range of vision tasks beyond image classification :cite:`liu2021swin`.
+Inspired
+by the superior scaling behavior of
+transformers with multi-head self-attention (to be covered in :numref:`sec_multihead-attention` and :numref:`sec_self-attention-and-positional-encoding`),
+the process of gradually 
+improving from a standard ResNet architecture
+toward the design of a vision transformer
+leads to a family of CNN models called ConvNeXts 
+that compete favorably with hierarchical vision transformers :cite:`liu2022convnet`.
+We refer the interested readers
+to CNN design discussions 
+in the ConvNeXt paper :cite:`liu2022convnet`.
 
 
 
 ## Exercises
 
+* Increase the number of stages to 4. Can you design a deeper RegNet that performs better?
+* De-ResNeXt-ify RegNet by replacing the ResNeXt block with the ResNet block. How does your new model perform?
+* Implement multiple instances of a "VioNet" family by *violating* the design principles of RegNet. How do they perform? Which of ($d_i$, $w_i$, $g_i$, $b_i$) is the most important factor?
+
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/)
+[Discussions](https://discuss.d2l.ai/t/7462)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/)
+[Discussions](https://discuss.d2l.ai/t/7463)
 :end_tab:
