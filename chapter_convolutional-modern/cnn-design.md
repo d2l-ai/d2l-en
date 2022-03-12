@@ -247,7 +247,7 @@ is appealing in convolution network design
 and the following AnyNet design space
 will be based on the ResNeXt block.
 
-## AnyNet
+## The AnyNet Design Space
 
 The initial design space is called *AnyNet*,
 a relatively unconstrained design space,
@@ -391,7 +391,7 @@ def __init__(self, arch, stem_channels, num_classes=10, lr=0.1):
         self.net.apply(d2l.init_cnn_weights)
 ```
 
-## RegNet
+## The RegNet Design Space
 
 For any stage $i$ of AnyNet,
 the design choices are depth $d_i$,
