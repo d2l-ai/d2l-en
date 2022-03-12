@@ -33,7 +33,7 @@ stack residual blocks,
 which are two-branch subnetworks
 using identity mapping in one branch.
 DenseNets (:numref:`sec_densenet`)
-generalizes the residual architectures.
+generalize the residual architectures.
 Other notable architectures 
 include
 MobileNets that use network learning to achieve high accuracy in
@@ -73,18 +73,20 @@ It starts with networks with
 standard, fixed network blocks:
 ResNeXt blocks.
 
+
+
 ## ResNeXt Blocks
 
 ResNeXt blocks extend the residual block design (:numref:`subsec_residual-blks`)
 by adding
 concatenated parallel transformations
 :cite:`Xie.Girshick.Dollar.ea.2017`.
-Different from various transformations
+Different from a variety of transformations
 in multi-branch Inception blocks,
 ResNeXt adopts the same transformation in all branches,
 thus minimizing manual design efforts in each branch.
 
-![The ResNeXt block. It is a bottleneck ($b < c$) residual block with group convolution ($g$ groups).](../img/resnext-block.svg)
+![The ResNeXt block. It is a bottleneck (when $b < c$) residual block with group convolution ($g$ groups).](../img/resnext-block.svg)
 :label:`fig_resnext_block`
 
 The left dotted box in
@@ -104,16 +106,17 @@ inside the dashed box.
 This output
 will restore the original $c$ channels of the input
 via the final $1 \times 1$ convolution
-right before summing with the residual connection.
+right before sum with the residual connection.
 Notably,
 the left dotted box is equivalent to 
 the much *simplified* right dotted box in :numref:`fig_resnext_block`,
 where we only need to specify 
 that the $3 \times 3$ convolution is a *group convolution*
 with $g$ groups.
-The group convolution dates back 
+In fact,
+the group convolution dates back 
 to the idea of distributing the AlexNet
-model over two GPUs :cite:`Krizhevsky.Sutskever.Hinton.2012`.
+model over two GPUs due to limited GPU memory at that time :cite:`Krizhevsky.Sutskever.Hinton.2012`.
 
 The following implementation of the `ResNeXtBlock` class
 treats `groups` ($b/g$ in :numref:`fig_resnext_block`) as an argument
@@ -127,7 +130,7 @@ the residual connection
 is generalized
 with a $1 \times 1$ convolution (`conv4`),
 where setting `use_1x1conv=True, strides=2`
-halves the output height and width.
+halves the input height and width.
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -280,7 +283,7 @@ that halves the height and width of an input image.
 The network head
 is a global average pooling followed
 by a fully connected layer to predict 
-the output classes.
+the output class.
 Note that
 the network stem and head
 are kept fixed and simple,
@@ -295,7 +298,7 @@ where stage $i$
 consists of $d_i$ ResNeXt blocks
 with $w_i$ output channels,
 and progressively
-halves resolution via the first block
+halves height and width via the first block
 (setting `use_1x1conv=True, strides=2` in `ResNeXtBlock` above).
 Overall,
 despite of the straightforward network structure,
@@ -329,7 +332,7 @@ class AnyNet(d2l.Classifier):
 
 Each stage consists of `depth` ResNeXt blocks,
 where `num_channels` specifies the block width.
-Note that the first block halves input resolution.
+Note that the first block halves the height and width of input images.
 
 ```{.python .input  n=8}
 %%tab mxnet
@@ -362,7 +365,7 @@ def stage(self, depth, input_channels, num_channels, groups, bot_mul):
     return nn.Sequential(*blk)
 ```
 
-Putting network stem, body, and head together,
+Putting the network stem, body, and head together,
 we complete the implementation of AnyNet.
 
 ```{.python .input  n=10}
@@ -450,7 +453,7 @@ class RegNet32(AnyNet):
                 stem_channels, num_classes, lr)
 ```
 
-We can see that each RegNet stage halves resolution and increases output channels.
+We can see that each RegNet stage progressively reduces resolution and increases output channels.
 
 ```{.python .input  n=12}
 %%tab all
@@ -515,7 +518,7 @@ in the ConvNeXt paper :cite:`liu2022convnet`.
 ## Exercises
 
 * Increase the number of stages to 4. Can you design a deeper RegNet that performs better?
-* De-ResNeXt-ify RegNet by replacing the ResNeXt block with the ResNet block. How does your new model perform?
+* De-ResNeXt-ify RegNets by replacing the ResNeXt block with the ResNet block. How does your new model perform?
 * Implement multiple instances of a "VioNet" family by *violating* the design principles of RegNet. How do they perform? Which of ($d_i$, $w_i$, $g_i$, $b_i$) is the most important factor?
 
 
