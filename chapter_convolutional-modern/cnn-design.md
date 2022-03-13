@@ -489,11 +489,15 @@ vision transformers
 attained state-of-the-art performance
 in large-scale image classification in early 2020s,
 showing that
-*large-scale training trumps inductive biases*
+*scalability trumps inductive biases*
 :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
+In other words,
+it is often possible to
+train large transformers 
+to outperform large CNNs on large datasets.
 However,
 quadratic complexity
-of self-attention 
+of self-attention (to be covered in :numref:`sec_self-attention-and-positional-encoding`)
 makes the transformer architecture
 less suitable for higher-resolution images.
 To address this issue,
@@ -503,7 +507,7 @@ achieve state-of-the-art performance
 in a broader range of vision tasks beyond image classification :cite:`liu2021swin`.
 Inspired
 by the superior scaling behavior of
-transformers with multi-head self-attention (to be covered in :numref:`sec_multihead-attention` and :numref:`sec_self-attention-and-positional-encoding`),
+transformers with multi-head self-attention (to be covered in :numref:`sec_multihead-attention`),
 the process of gradually 
 improving from a standard ResNet architecture
 toward the design of a vision transformer
