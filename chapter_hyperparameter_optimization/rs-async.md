@@ -22,13 +22,13 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 # Asynchronously Parallel Random Search
 
-In random search, each new configuration is chosen independent of all others, and
+In random search, each new configuration is chosen independent of all the others, and
 in particular without exploiting observations from any prior evaluation. We can
 easily parallelize random search by running trials concurrently, either by using multiple GPUs on the same instance, or across
 multiple instances. Random search exhibits a linear speed-up, in that a certain
-performance is reached K times faster if K trials can be run in parallel. Also,
+performance is reached $K$ times faster if $K$ trials can be run in parallel. Also,
 there is no need to synchronize job executions: random search is best run
-asynchronously distributed.
+asynchronously distributed.*CA: needs to be explained*
 
 Unfortunately, our basic `Tuner` implementation does not cater for distributed
 scheduling, and we will use **Syne Tune** for that.
@@ -65,8 +65,7 @@ if __name__ == '__main__':
 
 ## Asynchronous Scheduler
 
-First, we define the number of workers that evaluate trials concurrently. Since
-we will use the local back-end (i.e each trial is run in a separat python process on the same instance) of Syne Tune, we need to make sure to choose an
+First, we define the number of workers that evaluate trials concurrently. We will use the local back-end of Syne Tune, where each trial is run in a separate python process on the same instance. Hence, we need to make sure to choose an
 instance on which (at least) this number of training processes can run in
 parallel. We also need to select a stopping criterion for our experiment and point
 to our training script.
