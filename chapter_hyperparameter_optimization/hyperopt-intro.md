@@ -28,9 +28,9 @@ hyperparameters and so would be the conclusions drawn. Unfortunately, it is not 
 
 Consider the weight parameters of a deep neural network. They are automatically determined during training, e.g. by stochastic gradient descent. The **hyperparameters** of the neural network, however, cannot be learned in this way in general as there training error might not be differentiable with respect to them. Without a different form of automation, the user has to set them manually by trial-and-error, in what amounts to a time-consuming and difficult part of machine learning workflows. We distinguish between hyperparameters that control the learning algorithm (e.g., learning rate, batch size, momentum, optimizer choice) and hyperparameters that define model shape and capacity (e.g., type of activation function, number of units per layer). The choice of hyperparameters will directly affect the performance of our neural network once trained. For example, previous work beat the performance of advanced state-of-the-art machine leanrning models by optimizing the hyperparameter of much simpler ones :cite:`snoek-nips12a`. 
 
-The current need to manually tune the optimization algorithm and the structure of a deep neural network constitutes a significant gap towards the promise of end-to-end learning and artificial intelligence. If we are willing to spend sufficient computational resources, algorithms could be used to configure our learning algorithms. Hyperparameter optimization algorithms are designed to tackle this problem. The main idea is to cast the search for the right hyperparameter configuration as a global optimization problem, to minimize the validation loss
+The current need to manually tune the optimization algorithm and the structure of a deep neural network constitutes a significant gap towards the promise of end-to-end learning and artificial intelligence. If we are willing to spend sufficient computational resources, algorithms could be used to configure our learning algorithms. Hyperparameter optimization algorithms are designed to tackle this problem. The main idea is to cast the search for the right hyperparameter configuration as a global optimization problem to minimize the validation error.
 
-In this chapter, we provide an overview of the basics of hyperparameter optimization and look at several state-of-the-art methods from the literature. As a running example, we will show how to automatically tune hyperparameters of a convolutional neural network. Any successful HPO method needs to provide solutions for two decision-making primitives, **scheduling** and **search**, and we will highlight the most prominent current solutions for either. Scheduling amounts to decisions of how much resources to spend on a hyperparameter configuration, e.g. when to stop, pause, or resume training, while search is about which configurations to evaluate in the first place. A specific focus in this chapter will lie on model-based approaches to search, which in practice are more sample efficient than their random search-based counterparts. Since hyperparameter optimization requires us to train and validate several neural networks, we will also see how we can distribute these methods. To avoid distracting boiler-plate code, we will use the Python framework **Syne Tune**, providing us with an simple interface for distributed hyperparameter optimization. You can install it via:
+In this chapter, we provide an overview of the basics of hyperparameter optimization (HPO) and look at several state-of-the-art methods from the literature. As a running example, we will show how to automatically tune hyperparameters of a convolutional neural network. Any successful HPO method needs to provide solutions for two decision-making primitives, **scheduling** and **search**, and we will highlight the most prominent current solutions for either. Scheduling amounts to decisions of how much resources to spend on a hyperparameter configuration, e.g. when to stop, pause, or resume training, while search is about which configurations to evaluate in the first place. A specific focus in this chapter will lie on model-based approaches to search, which in practice are more sample efficient than their random search-based counterparts. Since hyperparameter optimization requires us to train and validate several neural networks, we will also see how we can distribute these methods. To avoid distracting boiler-plate code, we will use the Python framework **Syne Tune**, providing us with an simple interface for distributed hyperparameter optimization. You can install it via:
 
 ```{.python .input  n=2}
 !pip install syne-tune
@@ -39,7 +39,7 @@ In this chapter, we provide an overview of the basics of hyperparameter optimiza
 ## Ingredients for Hyperparameter Optimization
 :label:`sec_definition_hpo`
 
-The performance of our machine learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from our hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation performance. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning algorithm, which can take a long time. We will see later how much cheaper approximations can help with the optimization of $f$. Training is stochastic in general (e.g., weights are randomly initialized, mini-batches are randomly sampled), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
+The performance of a learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from our hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation error. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning model, which can take a long time. We will see later how much cheaper approximations can help with the optimization of $f$. Training is stochastic in general (e.g., weights are randomly initialized, mini-batches are randomly sampled), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
 
 As a running example, we will train the model from Chapter :numref:`sec_alexnet`
 on the FashionMNIST dataset. As we would like to optimize the validation error,
@@ -95,14 +95,13 @@ def objective(config, max_epochs=16): #@save
 ```
 
 Given our criterion $f(\mathbf{x})$ in terms of `objective(config)`, where $\mathbf{x}$
-corresponds to `config`, we would like to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. Since $f$ is the validation performance after training, there is no efficient way to compute gradients with respect to $\mathbf{x}$. While there is recent work :cite:`maclaurin-icml15`,`franceschi-icml17a` to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here.
+corresponds to `config`, we would like to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. Since $f$ is the validation error after training, there is no efficient way to compute gradients with respect to $\mathbf{x}$. While there is recent work :cite:`maclaurin-icml15`,`franceschi-icml17a` to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here.
 
 
 ### Search Spaces
 :label:`sec_intro_search_spaces`
 
-Along with the objective function $f(\mathbf{x})$, we also need to define the feasible set $\mathcal{X}$ to optimize over, the *search space* or *configuration space*.
-Here is a possible search space for our running example:
+Along with the objective function $f(\mathbf{x})$, we also need to define the feasible set $\mathcal{X}$ to optimize over, the *search space* or *configuration space*. Here is a possible search space for our running example:
 
 ```{.python .input  n=1}
 from syne_tune.search_space import loguniform, uniform, randint
@@ -114,14 +113,14 @@ search_space = {
 ```
 
 Each parameter has a data type, such as `float` (for `learning_rate`) or `int` (for `batch_size`), as well as a closed bounded range
-(lower and upper bounds). Some positive parameters (such as `learning_rate`) are best represented on a logarithmic scale
-(optimal values can differ by orders of magnitude), while others (such as  `batch size`) come with linear scale.
+(i.e., lower and upper bounds). Some positive parameters, such as `learning_rate`, are best represented on a logarithmic scale
+as optimal values can differ by several orders of magnitude, while others, such as  `batch size`, come with linear scale.
 Another way to define hyperparameter types is as bounded distributions, typically uniform or loguniform.
-Methods driven by random search sample independent values from these distributions for every search decision.
+Methods driven by random search sample independent values from these distributions for every search decision. *CA: search decision has not been defined. Should we get rid of this last sentence?*
 
 One data type missing from our running example is `categorical`. For example, we could extend it by
 `"activation": choice(['ReLU', 'LeakyReLU', 'Softplus'])`, in order to specify the
-non-linear activation functions. This data type is for finite parameters, whose values have no ordering or distance
+non-linear activation functions. This data type is for discrete parameters, whose values have no ordering or distance
 relations with each other.
 
 It is tempting to try and "simplify" an HPO problem by turning numerical into categorical parameters. For example, why not specify
@@ -135,7 +134,7 @@ In general, the structure of the search space $\mathcal{X}$ can be complex and i
 discrete choices (like the hypothetical `activation` above). Beyond the scope of this chapter, some hyperparameters may
 depend on the value of others. For example, if we try to tune both the number of layers and widths per layer for a multi-layer perceptron,
 the width of the $l$-th layer is relevant only if the network has at least $l+1$ layers. Hence, hyperparameter optimization consists in determining a small set of good hyperparameters to search
-over and probing the underlying machine learning algorithm at these values in the hope that 
+over and probing the performance of the trained machine learning model at these values in the hope that 
 one of them will be close to the best hyperparameters $\mathbf{x}_*$. 
 
 ## An API for Hyperparameter Optimization
@@ -143,7 +142,7 @@ one of them will be close to the best hyperparameters $\mathbf{x}_*$.
 
 Before we dive into details, let us get the basic code structure in place. All HPO
 methods considered here need to implement two decision making primitives. First, they
-need to sample new configurations to be trained and evaluated, given that resources
+need to sample new configurations to be trained on and evaluated, given that resources
 are available, which often involves some kind of search over the configuration space.
 Once a configuration is marked for execution, we will refer to it as a
 **trial**. Second, they need to schedule trials, which means deciding for how long to
@@ -182,7 +181,7 @@ class Searcher(d2l.HyperParameters): #@save
 We will mostly be interested in asynchronous methods in this chapter, for which
 `searcher.sample_configuration` is called whenever some resource for training
 becomes available, and the `searcher.update` callback is invoked whenever an
-evaluation produces a new metric value.
+evaluation produces a new metric value.*CA: can we say a few words to motivate asynchronous?*
 
 ### Scheduler
 
@@ -289,7 +288,7 @@ class Tuner(d2l.HyperParameters): #@save
 ```
 
 With any HPO method, we are mostly interested in the best performing
-configuration (called **incumbent**) and its error after a given 
+configuration (called **incumbent**) and its validation error after a given 
 wall-clock time. This is why we track `runtime` per iteration, which includes
 both the time to run an evaluation (call of `self.objective`) and the time to
 make a decision (call of `self.scheduler.suggest`). In the sequel, we will plot
@@ -313,11 +312,11 @@ def bookkeeping(self, config, error, runtime):
 ```
 
 Just as with training algorithms or model architectures, it is important to understand how to best
-compare different HPO techniques. Each run of an HPO experiment depends on substantial sources of randomness,
+compare different HPO methods. Each run of an HPO experiment depends on several sources of randomness,
 from the seed for random configuration choices and non-convex optimization of surrogate models to random
 effects in each training run (such as random weight initialization or mini-batch ordering). When comparing 
 different methods, it is  therefore crucial to run each experiment several times and present average or
-quantile statistics.
+quantile statistics.*CA: surrogate model has not been defined or introduced. In other words, it is not clear what we talk about here. Also, should we be more precise than quantile statistica and mention median?*
 
 
 ## Summary
