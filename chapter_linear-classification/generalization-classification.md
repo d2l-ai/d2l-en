@@ -51,21 +51,22 @@ samples, then our empirical error will lie
 within $\epsilon$ of the true error,
 *for any data generating distribution*.
 Unfortunately, it also turns out
-that these sorts of guarantees,
-while profound intellectual building block,
-are of limited practical utility
+that while these sorts of guarantees provide
+a profound set of intellectual building blocks,
+they are of limited practical utility
 to the deep learning practitioner.
 In short, these guarantees suggest
 that ensuring generalization
 of deep neural networks *a priori*
-an absurd number of examples (perhaps trillions or more),
-even when we find in practice
-that deep neural networks tend to generalize
+requires an absurd number of examples 
+(perhaps trillions or more),
+even when we find that on the tasks we care about
+that deep neural networks typically to generalize
 remarkably well with far fewer examples (thousands).
 Thus deep learning practitioners often forgo
 a priori guarantees altogether,
-relying instead on employing methods
-that appear to have generalized well
+instead employing methods on the basis 
+that they have generalized well
 on similar problems in the past,
 and certifying generalization *post hoc*
 through empirical evaluations.
