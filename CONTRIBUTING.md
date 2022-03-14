@@ -22,7 +22,8 @@ We look forward to receiving your pull requests for:
 
 ## How to contribute
 
-To contribute, send us a pull request. For small changes, such as fixing a typo or adding a link, you can use the [GitHub Edit Button](https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files). For larger changes:
+To contribute, start by reading [contributing section](https://d2l.ai/chapter_appendix-tools-for-deep-learning/contributing.html) and eventually
+send us a pull request. For small changes, such as fixing a typo or adding a link, you can use the [GitHub Edit Button](https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files). For larger changes:
 
 1. [Fork the repository](https://help.github.com/articles/fork-a-repo/).
 2. In your fork, make your change in a new branch (e.g., by [`git branch`](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)) that's based on this repo's **master** branch.
@@ -73,19 +74,24 @@ git clone https://github.com/<UserName>/d2l-en.git
 (you may refer to our [Miniconda Installaton](https://d2l.ai/chapter_installation/index.html#installing-miniconda) section in the book).
 
 * Install the required packages after activating the environment.
-What are the required packages? This depends on the framework you wish to edit. See below
+What are the required packages? This depends on the framework you wish to edit. Note that master and release branches may have different
+versions of a framework. For more details, you may refer to our [installation section](https://d2l.ai/chapter_installation/index.html).
+See example installation below:
 
 ```bash
 conda activate d2l
 
 # PyTorch
-pip install torch==1.8.1 torchvision==0.9.1
+pip install torch==<version> torchvision==<version>
+# pip install torch==1.11.0 torchvision==0.12.0
 
 # MXNet
-pip install mxnet==1.7.0.post1
+pip install mxnet==<version>
+# pip install mxnet==1.7.0
 
 # Tensorflow
-pip install tensorflow tensorflow-probability
+pip install tensorflow==<version> tensorflow-probability==<version>
+# pip install tensorflow==2.8.0 tensorflow-probability==0.16.0
 ```
 
 Development of the book is powered by the
