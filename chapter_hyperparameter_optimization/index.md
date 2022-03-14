@@ -9,6 +9,8 @@ Hyperparameter optimization provides a systematic approach to this problem, by c
 
 In this chapter, we will first introduce the basics of hyperparameter optimization. We will also present some recent advancements that improve the overall efficiency of hyperparameter optimization by exploiting cheap-to-evaluate proxies of the original objective function. At the end of this chapter, you should be able to apply state-of-the-art hyperparameter opimtization techniques to optimize the hyperparameter of your own machine learning algorithm.
 
+*CA: it is not clear to me how the text above relates to the intro later*
+
 ```toc
 :maxdepth: 2
 
