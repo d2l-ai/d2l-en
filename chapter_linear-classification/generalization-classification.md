@@ -374,11 +374,11 @@ and the true error $\epsilon(f_\mathcal{S})$
 of that same classifier on the underlying population.
 This might look similar to the evaluation problem
 that we just addressed but there's a major difference.
-Before the classifier $f$ was fixed
+Before, the classifier $f$ was fixed
 and we only needed a dataset
 for evaluative purposes.
-And indeed classifier fixed *a priori* generalizes.
-Its error on a (previously unseen) dataset
+And indeed, any fixed classifier does generalize:
+its error on a (previously unseen) dataset
 is an unbiased estimate of the population error.
 But what can we say when a classifier
 is trained and evaluated on the same dataset?
@@ -548,8 +548,8 @@ that hold for all models in a VC class.
 The training errors for all models in the class
 are (simultaneously) guaranteed
 to be close to their true errors,
-and guarantee grows tighter
-and $\mathcal{O}(1/\sqrt{n})$ rates.
+and guaranteed to grow closer
+at $\mathcal{O}(1/\sqrt{n})$ rates.
 Following the revolutionary discovery of VC dimension,
 numerous alternative complexity measures have been proposed,
 each facilitating an analogous generalization guarantee.
