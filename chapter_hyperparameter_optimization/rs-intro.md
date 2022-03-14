@@ -23,9 +23,9 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Random Search
 
 The first method we will look at is called **random search** :cite:`bergstra-jmlr12a`. To implement random search, we pair the simple
-`FIFOScheduler` with a searcher that samples configurations for new trials uniformly at random. Recall from Section
+`FIFOScheduler` with a searcher that samples configurations for new trials uniformly at random from the search space. Recall from Section
 :ref:`sec_intro_search_spaces` that each hyperparameter is defined via a uniform
-or loguniform distribution over its feasible range or value set. Whenever a new
+or log-uniform distribution over its feasible range or value set. Whenever a new
 configuration is to be suggested, it is drawn from these distributions.
 
 ```{.python .input  n=1}
@@ -72,9 +72,9 @@ samples `learning_rate` from `loguniform(1e-5, 1e-1)` and `batch_size` from
 ## The Random Search Loop
 
 Now, we can implement the main optimization loop of random search, that iterates
-until we reach the final number of iterations specified by the user. In each
+until we reach the final number of iterations specified by the user.*CA: technically this is not an optimization loop* In each
 iteration, we first sample a hyperparameter configuration from the subroutine
-that we implemented above and then train and validate the model with the new
+that we implemented above and then train and validate the model for the new
 candidate. We also maintain the current incumbent, i.e the best configuration we
 have found so far. This will be the configuration we will later return as the final
 configuration. The code below makes us of `d2l.objective`, `d2l.FIFOScheduler`, and

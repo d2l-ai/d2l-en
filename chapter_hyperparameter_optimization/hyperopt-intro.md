@@ -318,6 +318,8 @@ effects in each training run (such as random weight initialization or mini-batch
 different methods, it is  therefore crucial to run each experiment several times and present average or
 quantile statistics.*CA: surrogate model has not been defined or introduced. In other words, it is not clear what we talk about here. Also, should we be more precise than quantile statistica and mention median?*
 
+*CA: we should make the link with the upcoming sections and say which methods will be discussed*
+
 
 ## Summary
 
