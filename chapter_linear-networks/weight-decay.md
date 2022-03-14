@@ -242,9 +242,9 @@ class Data(d2l.DataModule):
             noise = d2l.randn(n, 1) * 0.01
         if tab.selected('tensorflow'):
             self.X = d2l.normal((n, num_inputs))
-            noise = d2l.normal((n, 1)) * 0.1
+            noise = d2l.normal((n, 1)) * 0.01
         w, b = d2l.ones((num_inputs, 1)) * 0.01, 0.05
-        self.y = d2l.matmul(self.X, w) + b
+        self.y = d2l.matmul(self.X, w) + b + noise
 
     def get_dataloader(self, train):
         i = slice(0, self.num_train) if train else slice(self.num_train, None)
@@ -376,11 +376,13 @@ class WeightDecay(d2l.LinearRegression):
     def __init__(self, wd, lr):
         super().__init__(lr)
         self.save_hyperparameters()
+        self.wd = wd
         
     def configure_optimizers(self):
         self.collect_params('.*bias').setattr('wd_mult', 0)
         return gluon.Trainer(self.collect_params(),
-                             'sgd', {'learning_rate': self.lr})
+                             'sgd', 
+                             {'learning_rate': self.lr, 'wd': self.wd})
 ```
 
 ```{.python .input  n=12}
@@ -389,11 +391,11 @@ class WeightDecay(d2l.LinearRegression):
     def __init__(self, num_inputs, wd, lr):
         super().__init__(num_inputs, lr)
         self.save_hyperparameters()
-        
+        self.wd = wd
+    
     def configure_optimizers(self):
-        return torch.optim.SGD([
-            {"params":self.net.weight,'weight_decay': self.wd},
-            {"params":self.net.bias}], lr=self.lr)
+        return torch.optim.SGD(self.net.parameters(), 
+                               lr=self.lr, weight_decay=self.wd)
 ```
 
 ```{.python .input  n=13}
@@ -403,7 +405,9 @@ class WeightDecay(d2l.LinearRegression):
         super().__init__(lr)
         self.save_hyperparameters()
         self.net = tf.keras.layers.Dense(
-            1, kernel_regularizer=tf.keras.regularizers.l2(wd))
+            1, kernel_regularizer=tf.keras.regularizers.l2(wd),
+            kernel_initializer=tf.keras.initializers.RandomNormal(0, 0.01)
+        )
         
     def loss(self, y_hat, y):
         return super().loss(y_hat, y) + self.net.losses
@@ -426,7 +430,7 @@ if tab.selected('pytorch'):
 
 model.board.yscale='log'
 trainer.fit(model, data)
-print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0]))) 
+print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0])))
 ```
 
 So far, we only touched upon one notion of

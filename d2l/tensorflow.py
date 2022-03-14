@@ -192,7 +192,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
     def forward(self, X):
         assert hasattr(self, 'net'), 'Neural network is defined'
         return self.net(X)
-
+      
     def call(self, X, *args, **kwargs):
         if kwargs and "training" in kwargs:
             self.training = kwargs['training']
