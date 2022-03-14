@@ -22,25 +22,25 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 # Asynchronous Successive Halving
 
-Our basic implementations of successive halving (SH) and Hyperband have a number of
-shortcomings, especially when it comes to tuning neural network models. First,
+Our basic implementations of SH and Hyperband have a number of
+shortcomings, especially when it comes to tuning deep neural networks. First,
 as in random search above, we would like to use parallel training, making
 efficient use of multiple cores or multiple GPUs. In other words, training jobs
-should be executed in parallel, and asynchronously.
+should be executed in parallel and asynchronously.
 
-Second, and more important, the algorithms developed above also synchronize
-their decision making. Each rung has an a priori fixed number of slots.
+Second, and more importantly, the algorithms developed above synchronize
+their decision-making. Each rung has an a priori fixed number of slots.
 For example, the lowest rung in SH, at $r_{min}$, has size $N = \eta^K$. Now,
 *all* these slots have to be populated with trials trained for $r_{min}$ epochs,
 before *any* of them can continue towards the next rung. Do we really need to
 evaluate all $N$ trials before we can identify the best and the worst ones?
 
-At least for tuning of neural networks, synchronous SH and Hyperband can often be
+At least for tuning neural networks, synchronous SH and Hyperband can often be
 improved dramatically by adopting asynchronous decision making. This is done
-in *asynchronous successive halving (ASHA)* :cite:`li-arxiv18`. Roughly speaking,
-ASHA employs the same rung levels and the same rule to decide between stop and
-continue than synchronous SH, but the decision is made whenever a trial reaches
-a rung level, *based on the data available until then*.
+in *asynchronous successive halving* (ASHA) :cite:`li-arxiv18`. Roughly speaking,
+ASHA employs the same rung levels and the same rule to decide whether to stop or to
+continue as synchronous SH, but the decision is made whenever a trial reaches
+a rung level based on the data available until then.
 
 Our basic `Tuner` implementation neither caters for distributed scheduling, nor
 for stopping, pausing, or resuming trials. In this section, we will use
@@ -49,7 +49,7 @@ for stopping, pausing, or resuming trials. In this section, we will use
 ## Prepare Training Script
 
 First, we will need to change our training script. The variant of ASHA we are
-interested in here, implements scheduling by early stopping. Namely, a trial
+interested in implements scheduling by early-stopping. Namely, a trial
 evaluation is started with a fixed `max_epochs` parameter, but the scheduler
 may terminate the training job early. To this end, we cannot report the
 validation error at the end, but need to do that after every epoch. This needs
@@ -97,7 +97,7 @@ both the value and the epoch number to the `report` callback.
 ## Asynchronous Scheduler
 
 With our new training script in place, the code for running ASHA is a simple
-variation of what we did for asynchronous random search above.
+variation of what we did for asynchronous random search.
 
 ```{.python .input  n=6}
 from syne_tune.backend.local_backend import LocalBackend
@@ -124,7 +124,7 @@ backend = LocalBackend(entry_point=entry_point)
 At this point, we choose the `HyperbandScheduler` provided by **Syne Tune**, which
 implements several variants of ASHA and an extension to multiple brackets called
 asynchronous Hyperband (note that **Syne Tune** also implements synchronous
-Hyperband as `SynchronousHyperbandScheduler`, but we will not use this here).
+Hyperband as `SynchronousHyperbandScheduler`, but we will not use this here).*CA: if we mention that there are several variants of ASHA, then we should discuss them -- why do we actually need to say that there are several variants; can we not just talk about one?*
 
 ```{.python .input  n=4}
 from syne_tune.optimizer.schedulers.hyperband import HyperbandScheduler
