@@ -109,9 +109,12 @@ $$\epsilon(f) =  E_{(\mathbf{x}, y) \sim P} \mathbf{1}(f(\mathbf{x}) \neq y) =
 \int\int \mathbf{1}(f(\mathbf{x}) \neq y) p(\mathbf{x}, y) \;d\mathbf{x} dy.$$
 
 While $\epsilon(f)$ is the quantity that we actually care about,
-we cannot observe it directly any more than we can directly
-observe the average height in a population.
-However, because our test set $\mathcal{D}$
+we cannot observe it directly,
+just as we cannot directly
+observe the average height in a large population
+without measuring every single person.
+We can only estimate this quantity based on samples.
+Because our test set $\mathcal{D}$
 is statistically representative
 of the underlying population,
 we can view $\epsilon_\mathcal{D}(f)$ as a statistical
@@ -119,15 +122,12 @@ estimator of the population error $\epsilon(f)$.
 Moreover, because our quantity of interest $\epsilon(f)$
 is an expectation (of the random variable $\mathbf{1}(f(X) \neq Y)$)
 and the corresponding estimator $\epsilon_\mathcal{D}(f)$
-is the sample mean, calculated on realizations
-of that same random variable,
-this is simply the classic problem of mean estimation,
+is the sample average, 
+estimating the popullation error 
+is simply the classic problem of mean estimation,
 which you may recall from :numref:`sec_prob`.
 
-
-
-
-You may recall that a classical result from probability theory
+An important classical result from probability theory
 called the *central limit theorem* guarantees
 that whenever we possess $n$ random samples $a_1, ..., a_n$
 drawn from any distribution with mean $\mu$ and standard deviation $\sigma$,
@@ -135,7 +135,7 @@ as the number of samples $n$ approaches infinity,
 the sample average $\hat{\mu}$ approximately
 tends towards a normal distribution centered
 at the true mean and with standard deviation $\sigma/\sqrt{n}$.
-Already this tells us something important:
+Already, this tells us something important:
 as the number of examples grows large,
 our test error $\epsilon_\mathcal{D}(f)$
 should approach the true error $\epsilon(f)$
