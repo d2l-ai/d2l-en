@@ -23,22 +23,21 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Multi-fidelity Hyperparameter Optimization
 
 Most neural network models are pretty expensive to train even for a single
-hyperparameter configuration. In order to converge, we need to train for
+hyperparameter configuration. *CA: Can we give an example?* In order to converge, we need to train for
 a substantial number of epochs. Without a massively parallel compute budget,
-random search will often be too slow to be of real use in practice. What can
-we do?
+random search will often be too slow to be of real use in practice for modest to large size neural networks trained on massive data sets.
 
-If a configuration is a poor choice, do we really have to wait for many epochs
-until we know? Why not just evaluate configurations after a few epochs only,
-and stop the worst ones early? In this section, we will develop some competitive
+The question that springs to mind is the following: do we really have to wait for many epochs
+until we know if the configuration is a good one? Indeed, we could just evaluate configurations after a few epochs only,
+and stop the worst ones early. In this section, we will develop some competitive
 algorithms based on this **early stopping** idea.
 
 ## Early Stopping Hyperparameter Configurations
 
 In the Figure we depict the learning curves of neural networks with different hyperparameter configuration trained for the same number
 `max_epochs` of epochs. We can see that after a few epochs we are already
-able to visually distinguish between the well performing and the poorly performing
-configurations. However, the correlation is not perfect, and we might still require
+able to visually distinguish between the well-performing and the poorly performing
+ones. However, the ordering is not perfect, and we might still require
 the full amount of epochs to identify the best performing configuration.
 
 <!-- ![Learning curves of random hyperparameter configurations](../../img/samples_lc.pdf) -->
@@ -47,9 +46,10 @@ the full amount of epochs to identify the best performing configuration.
 :label:`img_samples_lc`
 
 Based on this observation, we can free up compute resources by early stopping
-the evaluation of poorly performing configuration and allocate resources to
-more promising configurations. This will eventually speed up the optimization
+the evaluation of poorly performing configurations and allocate the resources to
+more promising ones. This will eventually speed up the optimization
 process, since we have a higher throughput of configurations that we can try.
+
 More formally, we expand our definition in Section :ref:sec_definition_hpo,
 such that our objective function $f(\mathbf{x}, r)$ gets an additional input
 $r \in [r_{min}, r_{max}]$ that specifies the amount of resource that we are
@@ -78,13 +78,13 @@ def objective_with_resource(config):
 ## Successive Halving
 
 One of the simplest ways to combine random search with early stopping is
-**successive halving** :cite:`jamieson-aistats16`,`karnin-icml13`. The basic idea is to start with $N$ trials, each for a randomly chosen
+**successive halving** (SH) :cite:`jamieson-aistats16`,`karnin-icml13`. The basic idea is to start with $N$ trials, each for a randomly chosen
 configuration, and train each of them for only $r_{min}$ epochs (e.g., $r_{min} = 1$). We then
 discard a fraction of the worst performing trials and train the remaining ones
 for longer. Iterating this process, less and less trials run for longer and
 longer, until at least one trial reaches `max_epochs` epochs.
 
-More formally, specify a minimum budget $r_{min}$ and a halving constant
+Consider a minimum budget $r_{min}$ and a halving constant
 $\eta\in\{2, 3, \dots\}$. For simplicity, assume that $r_{max} = r_{min} \eta^K$,
 where $r_{max}$ is equal to `max_epochs`. Moreover, set $N = \eta^K$. Let us
 define *rung levels* $\mathcal{R} = \{ r_{min}, r_{min}\eta, r_{min}\eta^2,
@@ -100,7 +100,7 @@ choice of $N$, only a single trial will be trained to the full budget of
 `max_epochs` epochs. Finally, such traversals over all rung levels are
 repeated in an outer loop until the total experiment budget is spent.
 
-When implementing successive halving from scratch, we will take a shortcut.
+When implementing SH from scratch, we will take a shortcut.
 Recall that our `objective` code allows to specify the number of epochs
 to be trained as `max_epochs`, and we will make use of this, by feeding in
 $r_{min}$, $r_{min}\eta$, for this argument. In particular, if a trial is chosen
@@ -226,13 +226,13 @@ for r in scheduler.rungs:
 
 ## Hyperband
 
-While successive halving can greatly improve upon random search, the choice of $r_{min}$
-can be critical for good performance. If $r_{min}$ is too small, validation errors at the
+While SH can greatly improve upon random search, the choice of $r_{min}$
+can have a large impact on the performance. If $r_{min}$ is too small, validation errors at the
 lowest rung may be determined more by initial random weights than by the hyperparameters,
 and even the best configurations may be filtered out at random. If $r_{min}$ is too large on the other hand,
 the benefits of early stopping may be greatly diminished.
 
-Hyperband :cite:`li-iclr17` is an extension of successive halving (SH) which mitigates the risk of setting
+Hyperband :cite:`li-iclr17` is an extension of SH that mitigates the risk of setting
 $r_{min}$ too small. Recall that SH defines $K + 1$ rung levels $\mathcal{R} =
 \{ r_{min}, r_{min}\eta, \dots, r_{max} \}$. Hyperband runs SH as a subroutine, based on
 brackets $\mathcal{R}_b = \{ r_{min}\eta^b, r_{min}\eta^{b+1},\dots, r_{max}\}$, $b=0,
