@@ -629,7 +629,7 @@ will simplify uploading the results to Kaggle.
 
 ```{.python .input}
 #@tab all
-def train_and_pred(train_features, test_feature, train_labels, test_data,
+def train_and_pred(train_features, test_features, train_labels, test_data,
                    num_epochs, lr, weight_decay, batch_size):
     net = get_net()
     train_ls, _ = train(net, train_features, train_labels, None, None,
