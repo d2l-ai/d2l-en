@@ -88,13 +88,15 @@ pip install torch==<version> torchvision==<version>
 # MXNet
 pip install mxnet==<version>
 # pip install mxnet==1.7.0
+# or for gpu
+# pip install mxnet-cu102==1.7.0
 
 # Tensorflow
 pip install tensorflow==<version> tensorflow-probability==<version>
 # pip install tensorflow==2.8.0 tensorflow-probability==0.16.0
 ```
 
-Development of the book is powered by the
+Compilation of the book is powered by the
 [`d2lbook`](https://github.com/d2l-ai/d2l-book) package.
 Simply run `pip install git+https://github.com/d2l-ai/d2l-book` in the
 d2l conda environment to install the package.
@@ -119,7 +121,7 @@ When adding a code cell from a specific framework, one needs to specify
 the framework by commenting the following on top of a cell: `#@tab tensorflow`
 for example. If the code tab is exactly the same for all frameworks then
 use `#@tab all`. This information is required by the `d2lbook` package to
-build the website, pdf etc. We recommend looking at some of the notebooks
+build the website, pdf, etc. We recommend looking at some of the notebooks
 for reference.
 
 
