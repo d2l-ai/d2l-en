@@ -413,6 +413,7 @@ where the $2\times 2$ projection matrix does not depend on any position index $i
 
 1. Suppose that we design a deep architecture to represent a sequence by stacking self-attention layers with positional encoding. What could be issues?
 1. Can you design a learnable positional encoding method?
+1. Can we assign different learned embeddings according to different offsets between queries and keys that are compared in self-attention? Hint: you may refer to relative position embeddings :cite:`shaw2018self,huang2018music`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/1651)

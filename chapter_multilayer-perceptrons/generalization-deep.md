@@ -154,7 +154,7 @@ or Rademacher complexity of a hypothesis class
 cannot explain why neural networks generalize.
 
 
-# Inspiration from Non-Parametrics
+## Inspiration from Non-Parametrics
 
 Approaching deep learning for the first time,
 it's tempting to think of them as parametric models.
@@ -365,4 +365,4 @@ despite the concerted efforts of many brilliant researchers.
 1. What important factor seems to differentiate cases when early stopping leads to big improvements in generalization?
 1. Beyond generalization, describe another benefit of early stopping.
 
-[Discussions]()
+[Discussions](https://discuss.d2l.ai/t/7473)

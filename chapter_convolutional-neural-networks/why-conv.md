@@ -338,7 +338,3 @@ generating hyperspectral images instead. They report data on many different wave
    Can you use it to accelerate convolutions? 
 
 [Discussions](https://discuss.d2l.ai/t/64)
-
-```{.python .input  n=1}
-i = 3
-```

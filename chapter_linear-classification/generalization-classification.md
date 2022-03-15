@@ -51,21 +51,22 @@ samples, then our empirical error will lie
 within $\epsilon$ of the true error,
 *for any data generating distribution*.
 Unfortunately, it also turns out
-that these sorts of guarantees,
-while profound intellectual building block,
-are of limited practical utility
+that while these sorts of guarantees provide
+a profound set of intellectual building blocks,
+they are of limited practical utility
 to the deep learning practitioner.
 In short, these guarantees suggest
 that ensuring generalization
 of deep neural networks *a priori*
-an absurd number of examples (perhaps trillions or more),
-even when we find in practice
-that deep neural networks tend to generalize
+requires an absurd number of examples 
+(perhaps trillions or more),
+even when we find that on the tasks we care about
+that deep neural networks typically to generalize
 remarkably well with far fewer examples (thousands).
 Thus deep learning practitioners often forgo
 a priori guarantees altogether,
-relying instead on employing methods
-that appear to have generalized well
+instead employing methods on the basis 
+that they have generalized well
 on similar problems in the past,
 and certifying generalization *post hoc*
 through empirical evaluations.
@@ -108,9 +109,12 @@ $$\epsilon(f) =  E_{(\mathbf{x}, y) \sim P} \mathbf{1}(f(\mathbf{x}) \neq y) =
 \int\int \mathbf{1}(f(\mathbf{x}) \neq y) p(\mathbf{x}, y) \;d\mathbf{x} dy.$$
 
 While $\epsilon(f)$ is the quantity that we actually care about,
-we cannot observe it directly any more than we can directly
-observe the average height in a population.
-However, because our test set $\mathcal{D}$
+we cannot observe it directly,
+just as we cannot directly
+observe the average height in a large population
+without measuring every single person.
+We can only estimate this quantity based on samples.
+Because our test set $\mathcal{D}$
 is statistically representative
 of the underlying population,
 we can view $\epsilon_\mathcal{D}(f)$ as a statistical
@@ -118,15 +122,12 @@ estimator of the population error $\epsilon(f)$.
 Moreover, because our quantity of interest $\epsilon(f)$
 is an expectation (of the random variable $\mathbf{1}(f(X) \neq Y)$)
 and the corresponding estimator $\epsilon_\mathcal{D}(f)$
-is the sample mean, calculated on realizations
-of that same random variable,
-this is simply the classic problem of mean estimation,
+is the sample average, 
+estimating the popullation error 
+is simply the classic problem of mean estimation,
 which you may recall from :numref:`sec_prob`.
 
-
-
-
-You may recall that a classical result from probability theory
+An important classical result from probability theory
 called the *central limit theorem* guarantees
 that whenever we possess $n$ random samples $a_1, ..., a_n$
 drawn from any distribution with mean $\mu$ and standard deviation $\sigma$,
@@ -134,7 +135,7 @@ as the number of samples $n$ approaches infinity,
 the sample average $\hat{\mu}$ approximately
 tends towards a normal distribution centered
 at the true mean and with standard deviation $\sigma/\sqrt{n}$.
-Already this tells us something important:
+Already, this tells us something important:
 as the number of examples grows large,
 our test error $\epsilon_\mathcal{D}(f)$
 should approach the true error $\epsilon(f)$
@@ -373,11 +374,11 @@ and the true error $\epsilon(f_\mathcal{S})$
 of that same classifier on the underlying population.
 This might look similar to the evaluation problem
 that we just addressed but there's a major difference.
-Before the classifier $f$ was fixed
+Before, the classifier $f$ was fixed
 and we only needed a dataset
 for evaluative purposes.
-And indeed classifier fixed *a priori* generalizes.
-Its error on a (previously unseen) dataset
+And indeed, any fixed classifier does generalize:
+its error on a (previously unseen) dataset
 is an unbiased estimate of the population error.
 But what can we say when a classifier
 is trained and evaluated on the same dataset?
@@ -547,8 +548,8 @@ that hold for all models in a VC class.
 The training errors for all models in the class
 are (simultaneously) guaranteed
 to be close to their true errors,
-and guarantee grows tighter
-and $\mathcal{O}(1/\sqrt{n})$ rates.
+and guaranteed to grow closer
+at $\mathcal{O}(1/\sqrt{n})$ rates.
 Following the revolutionary discovery of VC dimension,
 numerous alternative complexity measures have been proposed,
 each facilitating an analogous generalization guarantee.

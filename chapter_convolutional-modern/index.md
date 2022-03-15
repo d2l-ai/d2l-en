@@ -28,16 +28,13 @@ convolves whole neural networks patch-wise over inputs
 parallel concatenations :cite:`Szegedy.Liu.Jia.ea.2015`; residual
 networks (ResNet) :cite:`He.Zhang.Ren.ea.2016`, which remain some of
 the most popular off-the-shelf architectures in computer vision;
-MobileNet, which uses network learning to achieve high accuracy in
-resource-constrained settings :cite:`Howard.Sandler.Chu.ea.2019`, and the
+and the
 structured network search strategy leading to RegNetX/Y
 :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`. In addition to that, we cover key
 advances such as ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017` which partitions
-channels for significant computational savings, DenseNet
+channels for significant computational savings and DenseNet
 :cite:`Huang.Liu.Van-Der-Maaten.ea.2017` for a generalization of the
-residual architecture, and the Squeeze-and-excitation networks to
-allow for efficient information transfer between channels
-:cite:`Hu.Shen.Sun.2018`.
+residual architecture.
 
 While the idea of *deep* neural networks is quite simple (stack
 together a bunch of layers), performance can vary wildly across
@@ -62,5 +59,6 @@ googlenet
 batch-norm
 resnet
 densenet
+cnn-design
 ```
 
