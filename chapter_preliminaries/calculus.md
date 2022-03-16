@@ -92,7 +92,7 @@ Let's develop some intuition with an example.
 ```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
-from IPython import display
+import matplotlib_inline.backend_inline
 from mxnet import np, npx
 npx.set_np()
 
@@ -104,7 +104,7 @@ def f(x):
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
-from IPython import display
+import matplotlib_inline.backend_inline
 import numpy as np
 
 def f(x):
@@ -115,7 +115,7 @@ def f(x):
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
-from IPython import display
+import matplotlib_inline.backend_inline
 import numpy as np
 
 def f(x):
@@ -182,7 +182,7 @@ e.g., via `d2l.use_svg_display()`.
 #@tab all
 def use_svg_display():  #@save
     """Use the svg format to display a plot in Jupyter."""
-    display.set_matplotlib_formats('svg')
+    matplotlib_inline.backend_inline.set_matplotlib_formats('svg')
 ```
 
 Conveniently, we can set figure sizes with `set_figsize`. 
