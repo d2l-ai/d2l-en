@@ -678,7 +678,7 @@ However, TensorFlow provides the `tf.function` decorator
 to wrap computation inside of a TensorFlow graph 
 that gets compiled and optimized before running.
 This allows TensorFlow to prune unused values, 
-and to re-use prior allocations that are no longer needed. 
+and to reuse prior allocations that are no longer needed. 
 This minimizes the memory overhead of TensorFlow computations.
 :end_tab:
 
@@ -694,7 +694,7 @@ id(X) == before
 @tf.function
 def computation(X, Y):
     Z = tf.zeros_like(Y)  # This unused value will be pruned out
-    A = X + Y  # Allocations will be re-used when no longer needed
+    A = X + Y  # Allocations will be reused when no longer needed
     B = A + Y
     C = B + Y
     return C + Y

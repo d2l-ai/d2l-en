@@ -521,9 +521,9 @@ in the ConvNeXt paper :cite:`liu2022convnet`.
 
 ## Exercises
 
-* Increase the number of stages to 4. Can you design a deeper RegNet that performs better?
-* De-ResNeXt-ify RegNets by replacing the ResNeXt block with the ResNet block. How does your new model perform?
-* Implement multiple instances of a "VioNet" family by *violating* the design principles of RegNet. How do they perform? Which of ($d_i$, $w_i$, $g_i$, $b_i$) is the most important factor?
+1. Increase the number of stages to 4. Can you design a deeper RegNet that performs better?
+1. De-ResNeXt-ify RegNets by replacing the ResNeXt block with the ResNet block. How does your new model perform?
+1. Implement multiple instances of a "VioNet" family by *violating* the design principles of RegNet. How do they perform? Which of ($d_i$, $w_i$, $g_i$, $b_i$) is the most important factor?
 
 
 
