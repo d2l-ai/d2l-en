@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Automatic Differentiation
 :label:`sec_autograd`
 
@@ -49,6 +54,7 @@ with respect to the column vector $\mathbf{x}$.**)
 To start, we assign `x` an initial value.
 
 ```{.python .input  n=1}
+%%tab mxnet
 from mxnet import autograd, np, npx
 npx.set_np()
 
@@ -57,7 +63,7 @@ x
 ```
 
 ```{.python .input  n=7}
-#@tab pytorch
+%%tab pytorch
 import torch
 
 x = torch.arange(4.0)
@@ -65,7 +71,7 @@ x
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 import tensorflow as tf
 
 x = tf.range(4, dtype=tf.float32)
@@ -88,6 +94,7 @@ is vector-valued and has
 the same shape as $\mathbf{x}$.
 
 ```{.python .input  n=8}
+%%tab mxnet
 # We allocate memory for a tensor's gradient by invoking `attach_grad`
 x.attach_grad()
 # After we calculate a gradient taken with respect to `x`, we will be able to
@@ -96,19 +103,20 @@ x.grad
 ```
 
 ```{.python .input  n=9}
-#@tab pytorch
+%%tab pytorch
 x.requires_grad_(True)  # Better create `x = torch.arange(4.0, requires_grad=True)`
 x.grad                  # The default value is None
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 x = tf.Variable(x)
 ```
 
 (**We now calculate our function of `x` and assign the result to `y`.**)
 
 ```{.python .input  n=10}
+%%tab mxnet
 # Our code is inside an `autograd.record` scope to build the computational graph
 with autograd.record():
     y = 2 * np.dot(x, x)
@@ -116,13 +124,13 @@ y
 ```
 
 ```{.python .input  n=11}
-#@tab pytorch
+%%tab pytorch
 y = 2 * torch.dot(x, x)
 y
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 # Record all computations onto a tape
 with tf.GradientTape() as t:
     y = 2 * tf.tensordot(x, x, axes=1)
@@ -152,18 +160,19 @@ the `gradient` function.
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 y.backward()
 x.grad
 ```
 
 ```{.python .input  n=12}
-#@tab pytorch
+%%tab pytorch
 y.backward()
 x.grad
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 x_grad = t.gradient(y, x)
 x_grad
 ```
@@ -174,16 +183,17 @@ We can now verify that the automatic gradient computation
 and the expected result are identical.
 
 ```{.python .input  n=13}
+%%tab mxnet
 x.grad == 4 * x
 ```
 
 ```{.python .input  n=14}
-#@tab pytorch
+%%tab pytorch
 x.grad == 4 * x
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 x_grad == 4 * x
 ```
 
@@ -220,6 +230,7 @@ whenever we record a new gradient.
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 with autograd.record():
     y = x.sum()
 y.backward()
@@ -227,7 +238,7 @@ x.grad  # Overwritten by the newly calculated gradient
 ```
 
 ```{.python .input  n=20}
-#@tab pytorch
+%%tab pytorch
 x.grad.zero_()  # Reset the gradient
 y = x.sum()
 y.backward()
@@ -235,7 +246,7 @@ x.grad
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 with tf.GradientTape() as t:
     y = tf.reduce_sum(x)
 t.gradient(y, x)  # Overwritten by the newly calculated gradient
@@ -303,6 +314,7 @@ $\partial_{\mathbf{x}} \sum_i y_i$.
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 with autograd.record():
     y = x * x  
 y.backward()
@@ -310,7 +322,7 @@ x.grad  # Equals the gradient of y = sum(x * x)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 x.grad.zero_()
 y = x * x
 y.backward(gradient=torch.ones(len(y)))  # Faster: y.sum().backward()
@@ -318,7 +330,7 @@ x.grad
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 with tf.GradientTape() as t:
     y = x * x
 t.gradient(y, x)  # Same as `y = tf.reduce_sum(x * x)`
@@ -350,6 +362,7 @@ will yield the result `x`,
 expected since `z = x * x * x`).
 
 ```{.python .input}
+%%tab mxnet
 with autograd.record():
     y = x * x
     u = y.detach()
@@ -359,7 +372,7 @@ x.grad == u
 ```
 
 ```{.python .input  n=21}
-#@tab pytorch
+%%tab pytorch
 x.grad.zero_()
 y = x * x
 u = y.detach()
@@ -370,7 +383,7 @@ x.grad == u
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 # Set `persistent=True` to preserve the compute graph. 
 # This lets us run `t.gradient` more than once
 with tf.GradientTape(persistent=True) as t:
@@ -390,19 +403,20 @@ persists and thus we can calculate
 the gradient of `y` with respect to `x`.
 
 ```{.python .input}
+%%tab mxnet
 y.backward()
 x.grad == 2 * x
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 x.grad.zero_()
 y.sum().backward()
 x.grad == 2 * x
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 t.gradient(y, x) == 2 * x
 ```
 
@@ -424,6 +438,7 @@ and the evaluation of the `if` statement
 both depend on the value of the input `a`.
 
 ```{.python .input}
+%%tab mxnet
 def f(a):
     b = a * 2
     while np.linalg.norm(b) < 1000:
@@ -436,7 +451,7 @@ def f(a):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 def f(a):
     b = a * 2
     while b.norm() < 1000:
@@ -449,7 +464,7 @@ def f(a):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 def f(a):
     b = a * 2
     while tf.norm(b) < 1000:
@@ -471,6 +486,7 @@ a specific computational graph
 and can subsequently run `backward`.
 
 ```{.python .input}
+%%tab mxnet
 a = np.random.normal()
 a.attach_grad()
 with autograd.record():
@@ -479,14 +495,14 @@ d.backward()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 a = torch.randn(size=(), requires_grad=True)
 d = f(a)
 d.backward()
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 a = tf.Variable(tf.random.normal(shape=()))
 with tf.GradientTape() as t:
     d = f(a)
@@ -504,16 +520,17 @@ and, moreover, `f(a) / a` needs to match
 the gradient of `f(a)` with respect to `a`.
 
 ```{.python .input}
+%%tab mxnet
 a.grad == d / a
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 a.grad == d / a
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 d_grad == d / a
 ```
 

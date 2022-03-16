@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Linear Algebra
 :label:`sec_linear-algebra`
 
@@ -52,6 +57,7 @@ and perform the familiar addition, multiplication,
 division, and exponentiation operations.
 
 ```{.python .input}
+%%tab mxnet
 from mxnet import np, npx
 npx.set_np()
 
@@ -62,7 +68,7 @@ x + y, x * y, x / y, x ** y
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 import torch
 
 x = torch.tensor(3.0)
@@ -72,7 +78,7 @@ x + y, x * y, x / y, x**y
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 import tensorflow as tf
 
 x = tf.constant(3.0)
@@ -109,18 +115,19 @@ In general, such tensors can have arbitrary lengths,
 subject to memory limitations. Caution: in Python, like in most programming languages, vector indices start at $0$, also known as *zero-based indexing*, whereas in linear algebra subscripts begin at $1$ (one-based indexing).
 
 ```{.python .input}
+%%tab mxnet
 x = np.arange(3)
 x
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 x = torch.arange(3)
 x
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 x = tf.range(3)
 x
 ```
@@ -140,16 +147,17 @@ and *row vectors* whose elements are stacked horizontally.
 Recall that [**we access a tensor's elements via indexing.**]
 
 ```{.python .input}
+%%tab mxnet
 x[2]
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 x[2]
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 x[2]
 ```
 
@@ -160,16 +168,17 @@ Formally, we call $n$ the *dimensionality* of the vector.
 accessible via Python's built-in `len` function.
 
 ```{.python .input}
+%%tab mxnet
 len(x)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 len(x)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 len(x)
 ```
 
@@ -178,16 +187,17 @@ The shape is a tuple that indicates a tensor's length along each axis.
 (**Tensors with just one axis have shapes with just one element.**)
 
 ```{.python .input}
+%%tab mxnet
 x.shape
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 x.shape
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 x.shape
 ```
 
@@ -230,18 +240,19 @@ into an $m \times n$ matrix**]
 by passing the desired shape to `reshape`:
 
 ```{.python .input}
+%%tab mxnet
 A = np.arange(6).reshape(3, 2)
 A
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A = torch.arange(6).reshape(3, 2)
 A
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 A = tf.reshape(tf.range(6), (3, 2))
 A
 ```
@@ -268,16 +279,17 @@ $$
 In code, we can access any (**matrix's transpose**) as follows:
 
 ```{.python .input}
+%%tab mxnet
 A.T
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A.T
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.transpose(A)
 ```
 
@@ -287,18 +299,19 @@ $\mathbf{A} = \mathbf{A}^\top$.**]
 The following matrix is symmetric:
 
 ```{.python .input}
+%%tab mxnet
 A = np.array([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
 A == A.T
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A = torch.tensor([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
 A == A.T
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 A = tf.constant([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
 A == tf.transpose(A)
 ```
@@ -346,16 +359,17 @@ to vectors and matrices,
 by growing the number of shape components.
 
 ```{.python .input}
+%%tab mxnet
 np.arange(24).reshape(2, 3, 4)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 torch.arange(24).reshape(2, 3, 4)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.reshape(tf.range(24), (2, 3, 4))
 ```
 
@@ -369,20 +383,21 @@ produce outputs that have the
 same shape as their operands.
 
 ```{.python .input}
+%%tab mxnet
 A = np.arange(6).reshape(2, 3)
 B = A.copy()  # Assign a copy of `A` to `B` by allocating new memory
 A, A + B
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A = torch.arange(6, dtype=torch.float32).reshape(2, 3)
 B = A.clone()  # Assign a copy of `A` to `B` by allocating new memory
 A, A + B
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 A = tf.reshape(tf.range(6, dtype=tf.float32), (2, 3))
 B = A  # No cloning of `A` to `B` by allocating new memory
 A, A + B
@@ -407,16 +422,17 @@ $$
 $$
 
 ```{.python .input}
+%%tab mxnet
 A * B
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A * B
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 A * B
 ```
 
@@ -425,20 +441,21 @@ with the same shape as the original tensor.
 Here, each element of the tensor is added to (or multiplied by) the scalar.
 
 ```{.python .input}
+%%tab mxnet
 a = 2
 X = np.arange(24).reshape(2, 3, 4)
 a + X, (a * X).shape
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 a = 2
 X = torch.arange(24).reshape(2, 3, 4)
 a + X, (a * X).shape
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 a = 2
 X = tf.reshape(tf.range(24), (2, 3, 4))
 a + X, (a * X).shape
@@ -452,18 +469,19 @@ To express the sum of the elements in a vector $\mathbf{x}$ of length $n$,
 we write $\sum_{i=1}^n x_i$. There's a simple function for it:
 
 ```{.python .input}
+%%tab mxnet
 x = np.arange(3)
 x, x.sum()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 x = torch.arange(3, dtype=torch.float32)
 x, x.sum()
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 x = tf.range(3, dtype=tf.float32)
 x, tf.reduce_sum(x)
 ```
@@ -475,16 +493,17 @@ of an $m \times n$ matrix $\mathbf{A}$
 could be written $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
 
 ```{.python .input}
+%%tab mxnet
 A.shape, A.sum()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A.shape, A.sum()
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 A.shape, tf.reduce_sum(A)
 ```
 
@@ -500,32 +519,34 @@ to generate the output vector,
 this axis is missing from the shape of the output.
 
 ```{.python .input}
+%%tab mxnet
 A.shape, A.sum(axis=0).shape
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A.shape, A.sum(axis=0).shape
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 A.shape, tf.reduce_sum(A, axis=0).shape
 ```
 
 Specifying `axis=1` will reduce the column dimension (axis 1) by summing up elements of all the columns.
 
 ```{.python .input}
+%%tab mxnet
 A.shape, A.sum(axis=1).shape
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A.shape, A.sum(axis=1).shape
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 A.shape, tf.reduce_sum(A, axis=1).shape
 ```
 
@@ -533,16 +554,17 @@ Reducing a matrix along both rows and columns via summation
 is equivalent to summing up all the elements of the matrix.
 
 ```{.python .input}
+%%tab mxnet
 A.sum(axis=[0, 1]) == A.sum() # Same as `A.sum()`
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A.sum(axis=[0, 1]) == A.sum() # Same as `A.sum()`
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.reduce_sum(A, axis=[0, 1]), tf.reduce_sum(A) # Same as `tf.reduce_sum(A)`
 ```
 
@@ -554,16 +576,17 @@ it gets a dedicated library function
 that works analogously to `sum`.
 
 ```{.python .input}
+%%tab mxnet
 A.mean(), A.sum() / A.size
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A.mean(), A.sum() / A.numel()
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.reduce_mean(A), tf.reduce_sum(A) / tf.size(A).numpy()
 ```
 
@@ -571,16 +594,17 @@ Likewise, the function for calculating the mean
 can also reduce a tensor along specific axes.
 
 ```{.python .input}
+%%tab mxnet
 A.mean(axis=0), A.sum(axis=0) / A.shape[0]
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A.mean(axis=0), A.sum(axis=0) / A.shape[0]
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 ```
 
@@ -592,18 +616,19 @@ when invoking the function for calculating the sum or mean.
 This matters when we want to use the broadcast mechanism.
 
 ```{.python .input}
+%%tab mxnet
 sum_A = A.sum(axis=1, keepdims=True)
 sum_A, sum_A.shape
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 sum_A = A.sum(axis=1, keepdims=True)
 sum_A, sum_A.shape
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 sum_A = tf.reduce_sum(A, axis=1, keepdims=True)
 sum_A, sum_A.shape
 ```
@@ -613,16 +638,17 @@ we can (**divide `A` by `sum_A` with broadcasting**)
 to create a matrix where each row sums up to $1$.
 
 ```{.python .input}
+%%tab mxnet
 A / sum_A
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A / sum_A
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 A / sum_A
 ```
 
@@ -631,16 +657,17 @@ say `axis=0` (row by row), we can call the `cumsum` function.
 By design, this function does not reduce the input tensor along any axis.
 
 ```{.python .input}
+%%tab mxnet
 A.cumsum(axis=0)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A.cumsum(axis=0)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.cumsum(A, axis=0)
 ```
 
@@ -659,18 +686,19 @@ $\mathbf{x}^\top \mathbf{y} = \sum_{i=1}^{d} x_i y_i$.
 [~~The *dot product* of two vectors is a sum over the products of the elements at the same position~~]
 
 ```{.python .input}
+%%tab mxnet
 y = np.ones(3)
 x, y, np.dot(x, y)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 y = torch.ones(3, dtype = torch.float32)
 x, y, torch.dot(x, y)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 y = tf.ones(3, dtype=tf.float32)
 x, y, tf.tensordot(x, y, axes=1)
 ```
@@ -679,16 +707,17 @@ Equivalently, (**we can calculate the dot product of two vectors
 by performing an elementwise multiplication followed by a sum:**)
 
 ```{.python .input}
+%%tab mxnet
 np.sum(x * y)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 torch.sum(x * y)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.reduce_sum(x * y)
 ```
 
@@ -793,16 +822,17 @@ must be the same as the dimension of `x` (its length).
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 A.shape, x.shape, np.dot(A, x)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A.shape, x.shape, torch.mv(A, x), A@x
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 A.shape, x.shape, tf.linalg.matvec(A, x)
 ```
 
@@ -885,18 +915,19 @@ and `B` is a matrix with 3 rows and 4 columns.
 After multiplication, we obtain a matrix with 2 rows and 4 columns.
 
 ```{.python .input}
+%%tab mxnet
 B = np.ones(shape=(3, 4))
 np.dot(A, B)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 B = torch.ones(3, 4)
 torch.mm(A, B), A@B
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 B = tf.ones((3, 4), tf.float32)
 tf.matmul(A, B)
 ```
@@ -940,18 +971,19 @@ Formally, this is called [**the $\ell_2$ *norm***] and expressed as
 The method `norm` calculates the $\ell_2$ norm.
 
 ```{.python .input}
+%%tab mxnet
 u = np.array([3, -4])
 np.linalg.norm(u)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 u = torch.tensor([3.0, -4.0])
 torch.norm(u)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 u = tf.constant([3.0, -4.0])
 tf.norm(u)
 ```
@@ -969,16 +1001,17 @@ we compose the absolute value
 with the sum operation.
 
 ```{.python .input}
+%%tab mxnet
 np.abs(u).sum()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 torch.abs(u).sum()
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.reduce_sum(tf.abs(u))
 ```
 
@@ -1007,16 +1040,17 @@ Invoking the following function will calculate
 the Frobenius norm of a matrix.
 
 ```{.python .input}
+%%tab mxnet
 np.linalg.norm(np.ones((4, 9)))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 torch.norm(torch.ones((4, 9)))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.norm(tf.ones((4, 9)))
 ```
 
