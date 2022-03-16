@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Multilayer Perceptrons
 :label:`sec_mlp`
 
-In :numref:`chap_linear`, we introduced
+In :numref:`chap_classification`, we introduced
 softmax regression (:numref:`sec_softmax`),
 implementing the algorithm from scratch
 (:numref:`sec_softmax_scratch`) and using high-level APIs
@@ -38,7 +38,7 @@ followed by a softmax operation.
 If our labels truly were related
 to the input data by a simple affine transformation,
 then this approach would be sufficient.
-But linearity (in affine transformations) is a *strong* assumption.
+However, linearity (in affine transformations) is a *strong* assumption.
 
 ### Limitations of Linear Models
 
@@ -113,11 +113,11 @@ century :cite:`Fisher.1928`. For instance, decision trees
 in their most basic form use a sequence of binary decisions to 
 decide upon class membership :cite:`quinlan2014c4`. Likewise, kernel 
 methods have been used for many decades to model nonlinear dependencies 
-:cite:`Aronszajn.1950`. This has found its way e.g. into 
+:cite:`Aronszajn.1950`. This has found its way, e.g., into 
 nonparametric spline models :cite:`Wahba.1990` and kernel methods
 :cite:`Scholkopf.Smola.2002`. It is also something that the brain solves 
 quite naturally. After all, neurons feed into other neurons which, 
-in turn, again feed into other neurons :cite:`Cajal.Azoulay.1894`. 
+in turn, feed into other neurons again :cite:`Cajal.Azoulay.1894`. 
 Consequently we have a sequence of relatively simple transformations. 
 
 ### Incorporating Hidden Layers
@@ -202,7 +202,7 @@ we need one more key ingredient: a
 nonlinear *activation function* $\sigma$
 to be applied to each hidden unit
 following the affine transformation. For instance, a popular
-choice is the ReLu (Rectified Linear Unit) activation function :cite:`Nair.Hinton.2010`
+choice is the ReLU (Rectified Linear Unit) activation function :cite:`Nair.Hinton.2010`
 $\sigma(x) = \mathrm{max}(0, x)$ operating on its arguments element-wise. 
 The outputs of activation functions $\sigma(\cdot)$
 are called *activations*.
@@ -236,10 +236,10 @@ one atop another, yielding ever more expressive models.
 ### Universal Approximators
 
 We know that the brain is capable of very sophisticated statistical analysis. As such, 
-it is worth asking, just *how powerful* a Deep Network could be. This question
-has been answered multiple times, e.g. in :cite:`Cybenko.1989` in the context 
-of MLPs, and in :cite:`micchelli1984interpolation` in the context of Reproducing Kernel 
-Hilbert Spaces in a way that could be seen as RBF networks with a single hidden layer. 
+it is worth asking, just *how powerful* a deep network could be. This question
+has been answered multiple times, e.g., in :cite:`Cybenko.1989` in the context 
+of MLPs, and in :cite:`micchelli1984interpolation` in the context of reproducing kernel 
+Hilbert spaces in a way that could be seen as radial basis function (RBF) networks with a single hidden layer. 
 These (and related results) suggest that even with a single-hidden-layer network,
 given enough nodes (possibly absurdly many),
 and the right set of weights,
@@ -300,8 +300,8 @@ import tensorflow as tf
 
 The most popular choice,
 due to both simplicity of implementation and
-its good performance on a variety of predictive tasks :cite:`Nair.Hinton.2010`,
-is the *rectified linear unit* (*ReLU*).
+its good performance on a variety of predictive tasks,
+is the *rectified linear unit* (*ReLU*) :cite:`Nair.Hinton.2010`.
 [**ReLU provides a very simple nonlinear transformation**].
 Given an element $x$, the function is defined
 as the maximum of that element and $0$:
@@ -497,8 +497,7 @@ transforming them into elements on the interval (**between -1 and 1**):
 
 $$\operatorname{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
-We plot the tanh function below.  
-Note that as input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to that of the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system :cite:`Kalman.Kwasny.1992`.
+We plot the tanh function below. Note that as input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to that of the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system :cite:`Kalman.Kwasny.1992`.
 
 ```{.python .input}
 %%tab mxnet
@@ -571,7 +570,7 @@ explicitly in C, Fortran, or even Lisp (in the case of LeNet).
 A secondary benefit is that ReLU is significantly more amenable to
 optimization than the sigmoid or the tanh function. One could argue 
 that this was one of the key innovations that helped the resurgence
-of Deep Learning over the past decade. Note, though, that research in 
+of deep learning over the past decade. Note, though, that research in 
 activation functions has not stopped. For instance, the Swish activation 
 function $\sigma(x) = x \operatorname{sigmoid}(\beta x)$ as proposed in
 :cite:`Ramachandran.Zoph.Le.2017` can yield better accuracy 
@@ -579,7 +578,7 @@ in many cases.
 
 ## Exercises
 
-1. Show that adding layers to a *linear* deep network, i.e. a network without 
+1. Show that adding layers to a *linear* deep network, i.e., a network without 
    nonlinearity $\sigma$ can never increase the expressive power of the network. 
    Give an example where it actively reduces it. 
 1. Compute the derivative of the pReLU activation function.
@@ -589,7 +588,7 @@ in many cases.
 1. Sigmoid and tanh are very similar. 
     1. Show that $\operatorname{tanh}(x) + 1 = 2 \operatorname{sigmoid}(2x)$.
     1. Prove that the function classes parametrized by both nonlinearities are identical. Hint: affine layers have bias terms, too.
-1. Assume that we have a nonlinearity that applies to one minibatch at a time, such as the Batch Normalization :cite:`Ioffe.Szegedy.2015`. What kinds of problems do you expect this to cause?
+1. Assume that we have a nonlinearity that applies to one minibatch at a time, such as the batch normalization :cite:`Ioffe.Szegedy.2015`. What kinds of problems do you expect this to cause?
 1. Provide an example where the gradients vanish for the sigmoid activation function. 
 
 :begin_tab:`mxnet`

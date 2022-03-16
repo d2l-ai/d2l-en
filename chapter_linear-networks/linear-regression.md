@@ -78,6 +78,7 @@ Even though we will never see any newly-built homes with precisely zero area,
 we still need the bias because it allows us
 to express all linear functions of our features
 (versus restricting us to lines that pass through the origin).
+Strictly speaking, :eqref:`eq_price-area` is an *affine transformation* of input features, which is characterized by a *linear transformation* of features via weighted sum, combined with a *translation* via the added bias.
 Given a dataset, our goal is to choose
 the weights $\mathbf{w}$ and the bias $b$
 that, on average, make our model's predictions
