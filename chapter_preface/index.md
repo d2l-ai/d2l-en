@@ -346,6 +346,7 @@ from collections import defaultdict
 from IPython import display
 import math
 from matplotlib import pyplot as plt
+from matplotlib_inline import backend_inline
 import os
 import pandas as pd
 import random
