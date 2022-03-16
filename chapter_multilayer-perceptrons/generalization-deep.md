@@ -1,7 +1,7 @@
 # Generalization in Deep Learning
 
 
-In chapters :label:`chap_linear` and :label:`chap_classification`,
+In :numref:`chap_linear` and :numref:`chap_classification`,
 we tackled regression and classification problems
 by fitting linear models to training data.
 In both cases, we provided practical algorithms
@@ -92,8 +92,8 @@ requiring that we either shrink the number of features,
 the number of nonzero parameters learned,
 or the size of the parameters as quantified.
 Recall the plot of complexity vs loss
-(Figure :label:`fig_capacity_vs_error`)
-from Section :label:`sec_generalization_basics`.
+(:numref:`fig_capacity_vs_error`)
+from :numref:`sec_generalization_basics`.
 
 ![Influence of model complexity on underfitting and overfitting](../img/capacity-vs-error.svg)
 :label:`fig_capacity_vs_error`
@@ -104,7 +104,7 @@ First, for classification problems,
 our models are typically expressive enough
 to perfectly fit every training example,
 even in datasets consisting of millions
-:cite:`Zhang.Bengio.Hardt.ea.2021`.
+:cite:`zhang2021understanding`.
 In the classical picture, we might think
 that this setting lies on the far right extreme
 of the model complexity axis,
@@ -233,7 +233,7 @@ for understanding the behavior of over-parameterized deep networks.
 
 While deep neural networks are capable of fitting arbitrary labels,
 even when labels are assigned incorrectly or randomly
-(:cite:`Zhang.Bengio.Hardt.ea.2021`),
+(:cite:`zhang2021understanding`),
 this ability only emerges over many iterations of training.
 A new line of work (:cite:`Rolnick.Veit.Belongie.Shavit.2017`)
 has revealed that in the setting of label noise,
@@ -277,10 +277,10 @@ Training models until they interpolate noisy data is typically a bad idea.
 
 ## Classical Regularization Methods for Deep Nets
 
-In Chapter :label:`chap_linear`, we described
+In :numref:`chap_linear`, we described
 several  classical regularization techniques
 for constraining the complexity of our models.
-In particular, Section :label:`sec_weight_decay`
+In particular, Section :numref:`sec_weight_decay`
 introduced a method called weight decay,
 that consists of adding a regularization term to the loss function
 to penalize large values of the weights.
@@ -298,7 +298,7 @@ However, researchers have noted
 that typical strengths of L2 Regularization
 are insufficient to prevent the networks
 from interpolating the data
-(:cite:`Zhang.Bengio.Hardt.ea.2021`)
+(:cite:`zhang2021understanding`)
 and thus the benefits if interpreted
 as regularization might only make sense
 in combination with the early stopping criteria.
