@@ -78,7 +78,7 @@ let us experiment with an example.
 ```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
-from IPython import display
+from matplotlib_inline import backend_inline
 from mxnet import np, npx
 npx.set_np()
 
@@ -90,7 +90,7 @@ def f(x):
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
-from IPython import display
+from matplotlib_inline import backend_inline
 import numpy as np
 
 def f(x):
@@ -101,7 +101,7 @@ def f(x):
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
-from IPython import display
+from matplotlib_inline import backend_inline
 import numpy as np
 
 def f(x):
@@ -180,7 +180,7 @@ so later they can be directly invoked (e.g., `d2l.use_svg_display()`) without be
 #@tab all
 def use_svg_display():  #@save
     """Use the svg format to display a plot in Jupyter."""
-    display.set_matplotlib_formats('svg')
+    backend_inline.set_matplotlib_formats('svg')
 ```
 
 We define the `set_figsize` function to specify the figure sizes. Note that here we directly use `d2l.plt` since the import statement `from matplotlib import pyplot as plt` has been marked for being saved in the `d2l` package in the preface.
