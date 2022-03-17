@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Data Manipulation
 :label:`sec_ndarray`
 
@@ -58,17 +63,18 @@ often assign the alias `tf`.
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 from mxnet import np, npx
 npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 import torch
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 import tensorflow as tf
 ```
 
@@ -121,18 +127,19 @@ and designated for CPU-based computation.
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 x = np.arange(12)
 x
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 x = torch.arange(12, dtype=torch.float32)
 x
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 x = tf.range(12, dtype=tf.float32)
 x
 ```
@@ -162,16 +169,17 @@ in a tensor via the `size` function.
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 x.size
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 x.numel()
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.size(x)
 ```
 
@@ -183,7 +191,7 @@ the `shape` contains just a single element
 and is identical to the size.
 
 ```{.python .input}
-#@tab all
+%%tab all
 x.shape
 ```
 
@@ -200,13 +208,13 @@ are laid out one row at a time and thus
 `x[3] == X[0, 3]`.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab mxnet, pytorch
 X = x.reshape(3, 4)
 X
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 X = tf.reshape(x, (3, 4))
 X
 ```
@@ -230,16 +238,17 @@ initialized to contain all zeros or ones.
 and a shape of (2, 3, 4) via the `zeros` function.
 
 ```{.python .input}
+%%tab mxnet
 np.zeros((2, 3, 4))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 torch.zeros((2, 3, 4))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.zeros((2, 3, 4))
 ```
 
@@ -247,16 +256,17 @@ Similarly, we can create a tensor
 with all ones by invoking `ones`.
 
 ```{.python .input}
+%%tab mxnet
 np.ones((2, 3, 4))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 torch.ones((2, 3, 4))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.ones((2, 3, 4))
 ```
 
@@ -271,16 +281,17 @@ a standard Gaussian (normal) distribution
 with mean 0 and standard deviation 1.
 
 ```{.python .input}
+%%tab mxnet
 np.random.normal(0, 1, size=(3, 4))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 torch.randn(3, 4)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.random.normal(shape=[3, 4])
 ```
 
@@ -293,16 +304,17 @@ where the outermost list corresponds to axis 0,
 and the inner list to axis 1.
 
 ```{.python .input}
+%%tab mxnet
 np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 torch.tensor([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.constant([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```
 
@@ -326,7 +338,7 @@ Thus, in the following code,
 selects the second and third rows**].
 
 ```{.python .input}
-#@tab all
+%%tab all
 X[-1], X[1:3]
 ```
 
@@ -345,13 +357,13 @@ Beyond assigning a value to the entire `Variable`, we can write elements of a
 :end_tab:
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab mxnet, pytorch
 X[1, 2] = 17
 X
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 X_var = tf.Variable(X)
 X_var[1, 2].assign(9)
 X_var
@@ -368,13 +380,13 @@ this also works for vectors
 and for tensors of more than 2 dimensions.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab mxnet, pytorch
 X[:2, :] = 12
 X
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 X_var = tf.Variable(X)
 X_var[:2, :].assign(tf.ones(X_var[:2,:].shape, dtype=tf.float32) * 12)
 X_var
@@ -407,16 +419,17 @@ Most standard operators can be applied elementwise
 including unary operators like $e^x$.
 
 ```{.python .input}
+%%tab mxnet
 np.exp(x)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 torch.exp(x)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.exp(x)
 ```
 
@@ -444,20 +457,21 @@ have all been *lifted* to elementwise operations
 for identically-shaped tensors of arbitrary shape.
 
 ```{.python .input}
+%%tab mxnet
 x = np.array([1, 2, 4, 8])
 y = np.array([2, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 x = torch.tensor([1.0, 2, 4, 8])
 y = torch.tensor([2, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 x = tf.constant([1.0, 2, 4, 8])
 y = tf.constant([2.0, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y
@@ -482,20 +496,21 @@ while the second output's axis-1 length ($8$)
 is the sum of the two input tensors' axis-1 lengths ($4 + 4$).
 
 ```{.python .input}
+%%tab mxnet
 X = np.arange(12).reshape(3, 4)
 Y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 np.concatenate([X, Y], axis=0), np.concatenate([X, Y], axis=1)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 X = torch.arange(12, dtype=torch.float32).reshape((3,4))
 Y = torch.tensor([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 torch.cat((X, Y), dim=0), torch.cat((X, Y), dim=1)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 X = tf.reshape(tf.range(12, dtype=tf.float32), (3, 4))
 Y = tf.constant([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 tf.concat([X, Y], axis=0), tf.concat([X, Y], axis=1)
@@ -509,19 +524,19 @@ then the corresponding entry in the result takes value `1`,
 otherwise it takes value `0`.
 
 ```{.python .input}
-#@tab all
+%%tab all
 X == Y
 ```
 
 [**Summing all the elements in the tensor**] yields a tensor with only one element.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab mxnet, pytorch
 X.sum()
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.reduce_sum(X)
 ```
 
@@ -545,20 +560,21 @@ the two tensors have the same shape;
 on the resulting arrays.
 
 ```{.python .input}
+%%tab mxnet
 a = np.arange(3).reshape(3, 1)
 b = np.arange(2).reshape(1, 2)
 a, b
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 a = torch.arange(3).reshape((3, 1))
 b = torch.arange(2).reshape((1, 2))
 a, b
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 a = tf.reshape(tf.range(3), (3, 1))
 b = tf.reshape(tf.range(2), (1, 2))
 a, b
@@ -573,7 +589,7 @@ and matrix `b` along the rows
 before adding them elementwise.
 
 ```{.python .input}
-#@tab all
+%%tab all
 a + b
 ```
 
@@ -594,7 +610,7 @@ allocating new memory for the result
 and then points `Y` to this new location in memory.
 
 ```{.python .input}
-#@tab all
+%%tab all
 before = id(Y)
 Y = Y + X
 id(Y) == before
@@ -637,6 +653,7 @@ to have the same shape as `Y`.
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 Z = np.zeros_like(Y)
 print('id(Z):', id(Z))
 Z[:] = X + Y
@@ -644,7 +661,7 @@ print('id(Z):', id(Z))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 Z = torch.zeros_like(Y)
 print('id(Z):', id(Z))
 Z[:] = X + Y
@@ -652,7 +669,7 @@ print('id(Z):', id(Z))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 Z = tf.Variable(tf.zeros_like(Y))
 print('id(Z):', id(Z))
 Z.assign(X + Y)
@@ -683,14 +700,14 @@ This minimizes the memory overhead of TensorFlow computations.
 :end_tab:
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab mxnet, pytorch
 before = id(X)
 X += Y
 id(X) == before
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 @tf.function
 def computation(X, Y):
     Z = tf.zeros_like(Y)  # This unused value will be pruned out
@@ -724,20 +741,21 @@ will also change the other.
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 A = X.asnumpy()
 B = np.array(A)
 type(A), type(B)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 A = X.numpy()
 B = torch.from_numpy(A)
 type(A), type(B)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 A = X.numpy()
 B = tf.constant(A)
 type(A), type(B)
@@ -747,18 +765,19 @@ To (**convert a size-1 tensor to a Python scalar**),
 we can invoke the `item` function or Python's built-in functions.
 
 ```{.python .input}
+%%tab mxnet
 a = np.array([3.5])
 a, a.item(), float(a), int(a)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 a = torch.tensor([3.5])
 a, a.item(), float(a), int(a)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 a = tf.constant([3.5]).numpy()
 a, a.item(), float(a), int(a)
 ```

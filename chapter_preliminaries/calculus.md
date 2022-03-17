@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Calculus
 :label:`sec_calculus`
 
@@ -90,6 +95,7 @@ Let's develop some intuition with an example.
 (**Define $u = f(x) = 3x^2-4x$.**)
 
 ```{.python .input}
+%%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from matplotlib_inline import backend_inline
@@ -101,7 +107,7 @@ def f(x):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
 from matplotlib_inline import backend_inline
@@ -112,7 +118,7 @@ def f(x):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 from matplotlib_inline import backend_inline
@@ -129,7 +135,7 @@ the rigor of a mathematical proof,
 we will soon see that indeed $f'(1) = 2$.
 
 ```{.python .input}
-#@tab all
+%%tab all
 for h in 10.0**np.arange(-1, -6, -1):
     print(f'h={h:.5f}, numerical limit={(f(1+h)-f(1))/h:.5f}')
 ```
@@ -179,7 +185,7 @@ without repeating the code,
 e.g., via `d2l.use_svg_display()`.
 
 ```{.python .input}
-#@tab all
+%%tab all
 def use_svg_display():  #@save
     """Use the svg format to display a plot in Jupyter."""
     backend_inline.set_matplotlib_formats('svg')
@@ -190,7 +196,7 @@ Since the import statement `from matplotlib import pyplot as plt`
 was marked via `#@save` in the `d2l` package, we can call `d2l.plt`.
 
 ```{.python .input}
-#@tab all
+%%tab all
 def set_figsize(figsize=(3.5, 2.5)):  #@save
     """Set the figure size for matplotlib."""
     use_svg_display()
@@ -202,7 +208,7 @@ with properties, including labels, ranges,
 and scales.
 
 ```{.python .input}
-#@tab all
+%%tab all
 #@save
 def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     """Set the axes for matplotlib."""
@@ -220,7 +226,7 @@ Much of the code here is just ensuring
 that the sizes and shapes of inputs match.
 
 ```{.python .input}
-#@tab all
+%%tab all
 #@save
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
          ylim=None, xscale='linear', yscale='linear',
@@ -251,7 +257,7 @@ Now we can [**plot the function $u = f(x)$ and its tangent line $y = 2x - 3$ at 
 where the coefficient $2$ is the slope of the tangent line.
 
 ```{.python .input}
-#@tab all
+%%tab all
 x = np.arange(0, 3, 0.1)
 plot(x, [f(x), 2 * x - 3], 'x', 'f(x)', legend=['f(x)', 'Tangent line (x=1)'])
 ```
