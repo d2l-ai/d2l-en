@@ -53,7 +53,7 @@ and a body of intuitions and folk knowledge
 that provide guidance for deciding
 which techniques to apply in which situations.
 
-The TL;DR of the present moment is that the theory of deep Learning
+The TL;DR of the present moment is that the theory of deep learning
 has produced promising lines of attack and scattered fascinating results,
 but still appears far from a comprehensive account
 of both (i) why we are able to optimize neural networks
@@ -91,12 +91,9 @@ the interpretation is that our models are too complex,
 requiring that we either shrink the number of features,
 the number of nonzero parameters learned,
 or the size of the parameters as quantified.
-Recall the plot of complexity vs loss
+Recall the plot of model complexity vs loss
 (:numref:`fig_capacity_vs_error`)
 from :numref:`sec_generalization_basics`.
-
-![Influence of model complexity on underfitting and overfitting](../img/capacity-vs-error.svg)
-:label:`fig_capacity_vs_error`
 
 
 However deep learning complicates this picture in counterintuitive ways.
@@ -116,7 +113,7 @@ the set of values that our parameters might take.
 But that's where things start to get weird.
 
 Strangely, for many deep learning tasks
-(e.g., image recognition, text classification, etc)
+(e.g., image recognition and text classification)
 we are typically choosing among model architectures,
 all of which can achieve arbitrarily low training loss
 (and zero training error).
@@ -135,10 +132,10 @@ can be non-monotonic,
 with greater complexity hurting at first
 but subsequently helping in a so-called "double-descent" pattern
 :cite:`Nakkiran.Kaplun.Bansal.ea.2021`.
-**Thus the deep learning practitioner possesses a bag of tricks,
+Thus the deep learning practitioner possesses a bag of tricks,
 some of which seemingly restrict the model in some fashion
-and others which seemingly make it even more expressive,
-and all of which, in some sense, are applied to mitigate overfitting.**
+and others that seemingly make it even more expressive,
+and all of which, in some sense, are applied to mitigate overfitting.
 
 Complicating things even further,
 while the guarantees provided by classical learning theory
@@ -147,14 +144,13 @@ they appear powerless to explain why it is
 that deep neural networks generalize in the first place.
 Because deep neural networks are capable of fitting
 arbitrary labels even for large datasets,
-and despite the use of familiar methods like L2 regularization,
+and despite the use of familiar methods like $\ell_2$ regularization,
 traditional complexity-based generalization bounds,
 e.g., those based on the VC dimension
 or Rademacher complexity of a hypothesis class
 cannot explain why neural networks generalize.
 
-
-## Inspiration from Non-Parametrics
+## Inspiration from Nonparametrics
 
 Approaching deep learning for the first time,
 it's tempting to think of them as parametric models.
@@ -166,21 +162,21 @@ with counterintuitive changes of perspective,
 and surprising isomorphisms seemingly different problems.
 While neural networks, clearly *have* parameters,
 in some ways, it can be more fruitful
-to think of them as behaving like non-parametric models.
-So what precisely makes a model non-parametric?
+to think of them as behaving like nonparametric models.
+So what precisely makes a model nonparametric?
 While the name covers a diverse set of approaches,
-one common theme is that non-parametric methods
+one common theme is that nonparametric methods
 tend to have a level of complexity that grows
 as the amount of available data grows.
 
 Perhaps the simplest example of a nonparametric model
-is the $k$-nearest neighbor algorithm.
+is the $k$-nearest neighbor algorithm (we will cover more nonparametric models later, such as in :numref:`sec_nadaraya-watson`).
 Here, at training time,
 the learner simply memorizes the dataset.
 Then, at prediction time,
 when confronted with a new point $\mathbf{x}$,
 the learner looks up the $k$ nearest neighbors
-(the $k$ points $mathbf{x}_i'$ that minimize
+(the $k$ points $\mathbf{x}_i'$ that minimize
 some distance $d(\mathbf{x}, \mathbf{x}_i')$).
 When $k=1$, this is algorithm is called 1-nearest neighbors,
 and the algorithm will always achieve a training error of zero.
@@ -189,11 +185,10 @@ In fact, it turns out that under some mild conditions,
 the 1-nearest neighbor algorithm is consistent
 (eventually converging to the optimal predictor).
 
-<!-- picture of 1 nearest neighbor -->
 
 Note that 1 nearest neighbor requires that we specify
 some distance function $d$, or equivalently,
-that we specify some vecture-valued basis function $\phi(\mathbf{x})$
+that we specify some vector-valued basis function $\phi(\mathbf{x})$
 for featurizing our data.
 For any choice of the distance metric,
 we will achieve 0 training error
@@ -218,11 +213,11 @@ and nonparametric methods, notably kernel methods.
 In particular, :cite:`Jacot.Grabriel.Hongler.2018`
 demonstrated that in the limit, as multilayer perceptrons
 with randomly initialized weights grow infinitely wide,
-they become equivalent to (non-parametric) kernel methods
+they become equivalent to (nonparametric) kernel methods
 for a specific choice of the kernel function
 (essentially, a distance function),
-which they call the Neural Tangent Kernel (NTK).
-While current NTK models may not fully explain
+which they call the neural tangent kernel.
+While current neural tangent kernel models may not fully explain
 the behavior of modern deep networks,
 their success as an analytical tool
 underscores the usefulness of nonparametric modeling
@@ -242,7 +237,7 @@ and only subsequently to interpolate the mislabeled data.
 Moreover, it's been established that this phenomenon
 translates directly into a guarantee on generalization:
 whenever a model has fitted the cleanly labeled data
-but not randomly labeled examples including in the training set,
+but not randomly labeled examples included in the training set,
 it has in fact generalized (:cite:`Garg.Balakrishnan.Kolter.Lipton.2021`).
 
 Together these findings help to motivate *early stopping*,
@@ -250,7 +245,7 @@ a classic technique for regularizing deep neural networks.
 Here, rather than directly constraining the values of the weights,
 one constrains the number of epochs of training.
 The most common way to determine the stopping criteria
-is to monitor validation error throughout throughout training
+is to monitor validation error throughout training
 (typically by checking once after each epoch)
 and to cut off training when the validation error
 has not decreased by more than some small amount $\epsilon$
@@ -275,18 +270,18 @@ early stopping is crucial.
 Training models until they interpolate noisy data is typically a bad idea.
 
 
-## Classical Regularization Methods for Deep Nets
+## Classical Regularization Methods for Deep Networks
 
 In :numref:`chap_linear`, we described
 several  classical regularization techniques
 for constraining the complexity of our models.
-In particular, Section :numref:`sec_weight_decay`
+In particular, :numref:`sec_weight_decay`
 introduced a method called weight decay,
-that consists of adding a regularization term to the loss function
+which consists of adding a regularization term to the loss function
 to penalize large values of the weights.
 Depending on which weight norm is penalized
-this technique is known either as ridge regularization (for L2 penalty)
-or lasso regularization (for an L1 penalty).
+this technique is known either as ridge regularization (for $\ell_2$ penalty)
+or lasso regularization (for an $\ell_1$ penalty).
 In the classical analysis of these regularizers,
 they are considered to restrict the values
 that the weights can take sufficiently
@@ -295,7 +290,7 @@ to prevent the model from fitting arbitrary labels.
 In deep learning implementations,
 weight decay remains a popular tool.
 However, researchers have noted
-that typical strengths of L2 Regularization
+that typical strengths of $\ell_2$ regularization
 are insufficient to prevent the networks
 from interpolating the data
 (:cite:`zhang2021understanding`)
@@ -322,7 +317,7 @@ on techniques first popularized
 in classical regularization contexts,
 such as adding noise to model inputs.
 In the next section we will introduce
-the famous Dropout technique
+the famous dropout technique
 (invented by :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`),
 which has become a mainstay of deep learning,
 even as the theoretical basis for its efficacy

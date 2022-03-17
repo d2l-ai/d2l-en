@@ -60,14 +60,14 @@ offers intuition through a surprising
 analogy to sexual reproduction.
 The authors argue that neural network overfitting
 is characterized by a state in which
-each layer relies on a specifc
+each layer relies on a specific
 pattern of activations in the previous layer,
 calling this condition *co-adaptation*.
-Dropout, they claim, breaks up co-adaptation
+dropout, they claim, breaks up co-adaptation
 just as sexual reproduction is argued to
 break up co-adapted genes.
 While the explanatory of this theory is certainly up for debate,
-the Dropout technique itself has proved enduring,
+the dropout technique itself has proved enduring,
 and various forms of dropout are implemented
 in most deep learning libraries. 
 
