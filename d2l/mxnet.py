@@ -22,7 +22,6 @@ import pandas as pd
 import requests
 from IPython import display
 from matplotlib import pyplot as plt
-import matplotlib_inline.backend_inline
 
 from mxnet import autograd, context, gluon, image, init, np, npx
 from mxnet.gluon import nn, rnn
