@@ -22,16 +22,14 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 # Asynchronously Parallel Random Search
 
-In random search, each new configuration is chosen independent of all the others, and
-in particular without exploiting observations from any prior evaluation. We can
+For random search, each new configuration is chosen independent of all the others, and
+in particular without exploiting observations from any prior evaluation. This means we can
 easily parallelize random search by running trials concurrently, either by using multiple GPUs on the same instance, or across
 multiple instances. Random search exhibits a linear speed-up, in that a certain
 performance is reached $K$ times faster if $K$ trials can be run in parallel. Also,
-there is no need to synchronize job executions: random search is best run
-asynchronously distributed.*CA: needs to be explained*
+there is no need to synchronize job executions. Instead we can immediately sample a new configuration once an evaluation finished, without waiting on pending configurations. This is called asynchronous scheduling.
 
-Unfortunately, our basic `Tuner` implementation does not cater for distributed
-scheduling, and we will use **Syne Tune** for that.
+Instead of implementing the complex machinery of distributed job execution, we will use **Syne Tune** which provides us with a simple interface for asynchronous HPO.
 
 ## Prepare Training Script
 
