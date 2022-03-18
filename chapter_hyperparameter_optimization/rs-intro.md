@@ -71,8 +71,8 @@ samples `learning_rate` from `loguniform(1e-5, 1e-1)` and `batch_size` from
 
 ## The Random Search Loop
 
-Now, we can implement the main optimization loop of random search, that iterates
-until we reach the final number of iterations specified by the user.*CA: technically this is not an optimization loop* In each
+Now, we can implement the main loop of random search, that iterates
+until we reach the final number of iterations specified by the user.In each
 iteration, we first sample a hyperparameter configuration from the subroutine
 that we implemented above and then train and validate the model for the new
 candidate. We also maintain the current incumbent, i.e the best configuration we

@@ -26,7 +26,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 Hyperparameters play an important role in deep learning, and machine learning in general. Not only do they determine the generalization capabilities of trained models, they can even be critical for what constitutes the state-of-the-art. Indeed, results reported in an empirical study might look very differently for another choice of 
 hyperparameters and so would be the conclusions drawn. Unfortunately, it is not uncommon that publications do not report the specific hyperparameters that were used in experiments, for instance, to demonstrate that a proposed method is superior to previously published ones. Such studies are not reproducible, and their impact on the state-of-the-art in machine learning should be questioned :cite:`haibe-kains:2020:transparency`.
 
-Consider the weight parameters of a deep neural network. They are automatically determined during training, e.g. by stochastic gradient descent. The **hyperparameters** of the neural network, however, cannot be learned in this way in general as there training error might not be differentiable with respect to them. Without a different form of automation, the user has to set them manually by trial-and-error, in what amounts to a time-consuming and difficult part of machine learning workflows. We distinguish between hyperparameters that control the learning algorithm (e.g., learning rate, batch size, momentum, optimizer choice) and hyperparameters that define model shape and capacity (e.g., type of activation function, number of units per layer). The choice of hyperparameters will directly affect the performance of our neural network once trained. For example, previous work beat the performance of advanced state-of-the-art machine leanrning models by optimizing the hyperparameter of much simpler ones :cite:`snoek-nips12a`. 
+Consider the weight parameters of a deep neural network. They are automatically determined during training, e.g. by stochastic gradient descent. The **hyperparameters** of the neural network, however, cannot be learned in this way in general as their training error might not be differentiable with respect to them. Without a different form of automation, the user has to set them manually by trial-and-error, in what amounts to a time-consuming and difficult part of machine learning workflows. We distinguish between hyperparameters that control the learning algorithm (e.g., learning rate, batch size, momentum, optimizer choice) and hyperparameters that define model shape and capacity (e.g., type of activation function, number of units per layer). The choice of hyperparameters will directly affect the performance of our neural network once trained. For example, previous work beat the performance of advanced state-of-the-art machine leanrning models by optimizing the hyperparameter of much simpler ones :cite:`snoek-nips12a`. 
 
 The current need to manually tune the optimization algorithm and the structure of a deep neural network constitutes a significant gap towards the promise of end-to-end learning and artificial intelligence. If we are willing to spend sufficient computational resources, algorithms could be used to configure our learning algorithms. Hyperparameter optimization algorithms are designed to tackle this problem. The main idea is to cast the search for the right hyperparameter configuration as a global optimization problem to minimize the validation error.
 
@@ -116,7 +116,6 @@ Each parameter has a data type, such as `float` (for `learning_rate`) or `int` (
 (i.e., lower and upper bounds). Some positive parameters, such as `learning_rate`, are best represented on a logarithmic scale
 as optimal values can differ by several orders of magnitude, while others, such as  `batch size`, come with linear scale.
 Another way to define hyperparameter types is as bounded distributions, typically uniform or loguniform.
-Methods driven by random search sample independent values from these distributions for every search decision. *CA: search decision has not been defined. Should we get rid of this last sentence?*
 
 One data type missing from our running example is `categorical`. For example, we could extend it by
 `"activation": choice(['ReLU', 'LeakyReLU', 'Softplus'])`, in order to specify the
@@ -178,21 +177,7 @@ class Searcher(d2l.HyperParameters): #@save
 ]
 ```
 
-We will mostly be interested in asynchronous methods in this chapter, for which
-`searcher.sample_configuration` is called whenever some resource for training
-becomes available, and the `searcher.update` callback is invoked whenever an
-evaluation produces a new metric value.*CA: can we say a few words to motivate asynchronous?*
-
 ### Scheduler
-
-*MS: This API does not support stopping a trial as result of a call to `update`.
-I see this is not needed to implement synchronous SH and HB, so it's probably
-OK. But it runs a bit contrary to saying that scheduling is about stopping a
-trial. If we want that, we'd have to allow `update` to return a flag for
-(continue, stop).
-AK: We would only need this for ASHA stopping not for ASHA promotion right?
-If so I would leave it, to avoid making it overly complicated.
-MS: OK, we should not overdo this "from scratch" anyway.*
 
 Beyond sampling configurations for new trials, we also need to decide how long to
 run a trial for, or whether to stop it early. In practice, all these decisions are
@@ -225,10 +210,6 @@ class Scheduler(d2l.HyperParameters): #@save
 ```
 
 Below we define a basic first-in first-out scheduler which simply schedules the next configuration once resources become available.
-
-*AK: I know we use FIFOScheduler in SyneTune but I am not sure if it's the
-right name, since we do not have a fifo queue.
-MS: That name is from Ray Tune.*
 
 ```{.python .input  n=11}
 %%tab pytorch, mxnet, tensorflow
@@ -287,6 +268,8 @@ class Tuner(d2l.HyperParameters): #@save
 ]
 ```
 
+## Evaluating Hyperparameter Optimization Methods
+
 With any HPO method, we are mostly interested in the best performing
 configuration (called **incumbent**) and its validation error after a given 
 wall-clock time. This is why we track `runtime` per iteration, which includes
@@ -294,7 +277,7 @@ both the time to run an evaluation (call of `self.objective`) and the time to
 make a decision (call of `self.scheduler.suggest`). In the sequel, we will plot
 `cumulative_runtime` against `incumbent_trajectory` in  order to visualize the
 **any-time performance** of the HPO method defined in  terms of `scheduler`
-(and `searcher`).
+(and `searcher`). This allows us to quantify not only how well the configuration found by an optimizer works, but also how quickly an optimizers is able to find it.
 
 ```{.python .input  n=1}
 %%tab pytorch, mxnet, tensorflow
@@ -312,13 +295,8 @@ def bookkeeping(self, config, error, runtime):
 ```
 
 Just as with training algorithms or model architectures, it is important to understand how to best
-compare different HPO methods. Each run of an HPO experiment depends on several sources of randomness,
-from the seed for random configuration choices and non-convex optimization of surrogate models to random
-effects in each training run (such as random weight initialization or mini-batch ordering). When comparing 
-different methods, it is  therefore crucial to run each experiment several times and present average or
-quantile statistics.*CA: surrogate model has not been defined or introduced. In other words, it is not clear what we talk about here. Also, should we be more precise than quantile statistica and mention median?*
-
-*CA: we should make the link with the upcoming sections and say which methods will be discussed*
+compare different HPO methods. Each run of an HPO experiment depends on mostly two sources of randomness,
+the random effects in each training run (such as random weight initialization or mini-batch ordering) and, as we are going to see in the next sections, the intrinsic randomness of the HPO method itself. Hence, when comparing different methods, it is crucial to run each experiment several times and present statistics, such as mean or median, across a population of multiple repetitions of an optimizer based on different seeds of the random number generator.
 
 
 ## Summary
