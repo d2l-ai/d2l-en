@@ -244,26 +244,35 @@ Suppose that the first minibatch contains $n$ matrices $\mathbf{X}_1, \ldots, \m
 results in
 $n$ matrices $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$ of shape $a\times c$. Therefore, [**given two tensors of shape ($n$, $a$, $b$) and ($n$, $b$, $c$), the shape of their batch matrix multiplication output is ($n$, $a$, $c$).**]
 
+```{.python .input}
 %%tab all
 X = d2l.ones((2, 1, 4))
 Y = d2l.ones((2, 4, 6))
 d2l.check_shape(d2l.batch_matmul(X, Y), (2, 1, 6))
+```
 
 In the context of attention mechanisms, we can [**use minibatch matrix multiplication to compute weighted averages of values in a minibatch.**]
 
+```{.python .input}
+%%tab mxnet
 weights = d2l.ones((2, 10)) * 0.1
 values = d2l.reshape(d2l.arange(20), (2, 10))
 npx.batch_dot(np.expand_dims(weights, 1), np.expand_dims(values, -1)).shape
+```
 
-#@tab pytorch
+```{.python .input}
+%%tab pytorch
 weights = d2l.ones((2, 10)) * 0.1
 values = d2l.reshape(d2l.arange(20.0), (2, 10))
 torch.bmm(weights.unsqueeze(1), values.unsqueeze(-1))
+```
 
-#@tab tensorflow
+```{.python .input}
+%%tab tensorflow
 weights = tf.ones((2, 10)) * 0.1
 values = tf.reshape(tf.range(20.0), shape = (2, 10))
 tf.matmul(tf.expand_dims(weights, axis=1), tf.expand_dims(values, axis=-1)).numpy()
+```
 
 ### Defining the Model
 
