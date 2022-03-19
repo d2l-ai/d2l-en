@@ -5,30 +5,10 @@ USE_TENSORFLOW = False
 DATA_HUB = dict()
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
-import collections
-import hashlib
-import inspect
-import math
-import os
-import random
-import re
-import shutil
-import sys
-import tarfile
-import time
-import zipfile
-from collections import defaultdict
-import pandas as pd
-import requests
-from IPython import display
-from matplotlib import pyplot as plt
-import matplotlib_inline.backend_inline
-
 from mxnet import autograd, context, gluon, image, init, np, npx
 from mxnet.gluon import nn, rnn
 from mxnet.gluon.data.vision import transforms
 
-d2l = sys.modules[__name__]
 nn_Module = nn.Block
 
 #################   WARNING   ################
@@ -123,7 +103,7 @@ class HyperParameters:
 
     def save_hyperparameters(self, ignore=[]):
         """Save function arguments into class attributes.
-    
+
         Defined in :numref:`sec_utils`"""
         frame = inspect.currentframe().f_back
         _, _, _, local_vars = inspect.getargvalues(frame)
@@ -242,7 +222,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
             if isinstance(a, d2l.Module):
                 params.extend(a.get_scratch_params())
         return params
-    
+
 
     def parameters(self):
         """Defined in :numref:`sec_classification`"""
@@ -340,14 +320,14 @@ class Trainer(d2l.HyperParameters):
         """Defined in :numref:`sec_use_gpu`"""
         self.save_hyperparameters()
         self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
-    
+
 
     def prepare_batch(self, batch):
         """Defined in :numref:`sec_use_gpu`"""
         if self.gpus:
             batch = [d2l.to(a, self.gpus[0]) for a in batch]
         return batch
-    
+
 
     def prepare_model(self, model):
         """Defined in :numref:`sec_use_gpu`"""
@@ -396,7 +376,7 @@ class LinearRegressionScratch(d2l.Module):
 
     def forward(self, X):
         """The linear regression model.
-    
+
         Defined in :numref:`sec_linear_scratch`"""
         return d2l.matmul(X, self.w) + self.b
 
@@ -429,7 +409,7 @@ class LinearRegression(d2l.Module):
 
     def forward(self, X):
         """The linear regression model.
-    
+
         Defined in :numref:`sec_linear_concise`"""
         return self.net(X)
 
@@ -461,7 +441,7 @@ class FashionMNIST(d2l.DataModule):
 
     def text_labels(self, indices):
         """Return text labels.
-    
+
         Defined in :numref:`sec_fashion_mnist`"""
         labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
@@ -495,7 +475,7 @@ class Classifier(d2l.Module):
 
     def accuracy(self, Y_hat, Y, averaged=True):
         """Compute the number of correct predictions.
-    
+
         Defined in :numref:`sec_classification`"""
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         preds = d2l.astype(d2l.argmax(Y_hat, axis=1), Y.dtype)
@@ -709,7 +689,7 @@ class RNNLMScratch(d2l.Classifier):
         """Defined in :numref:`sec_rnn-scratch`"""
         outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in rnn_outputs]
         return d2l.stack(outputs, 1)
-    
+
 
     def forward(self, X, state=None):
         """Defined in :numref:`sec_rnn-scratch`"""
@@ -811,7 +791,7 @@ class MTFraEng(d2l.DataModule):
         self.save_hyperparameters()
         self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
             self._download())
-    
+
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
         """Defined in :numref:`sec_machine_translation`"""
