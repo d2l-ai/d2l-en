@@ -131,7 +131,7 @@ in the depth or width of the networks)
 can be non-monotonic,
 with greater complexity hurting at first
 but subsequently helping in a so-called "double-descent" pattern
-:cite:`Nakkiran.Kaplun.Bansal.ea.2021`.
+:cite:`nakkiran2021deep`.
 Thus the deep learning practitioner possesses a bag of tricks,
 some of which seemingly restrict the model in some fashion
 and others that seemingly make it even more expressive,
@@ -208,7 +208,7 @@ possessing many more parameters than are needed to fit the training data,
 they tend to *interpolate* the training data (fitting it perfectly)
 and thus behave, in some ways, more like nonparametric models.
 More recent theoretical research has established
-deep connection between large neural networks  
+deep connection between large neural networks
 and nonparametric methods, notably kernel methods.
 In particular, :cite:`Jacot.Grabriel.Hongler.2018`
 demonstrated that in the limit, as multilayer perceptrons
@@ -353,7 +353,7 @@ despite the concerted efforts of many brilliant researchers.
 
 
 ## Exercises
-                                     
+
 1. In what sense do traditional complexity-based measures fail to account for generalization of deep neural networks?
 1. Why might *early stopping* be considered a regularization technique?
 1. How do researchers typically determine the stopping criteria?
