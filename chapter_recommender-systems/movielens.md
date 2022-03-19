@@ -22,7 +22,7 @@ Then, we download the MovieLens 100k dataset and load the interactions as `DataF
 ```{.python .input  n=2}
 #@save
 d2l.DATA_HUB['ml-100k'] = (
-    'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
+    'https://files.grouplens.org/datasets/movielens/ml-100k.zip',
     'cd4dcac4241c8a4ad7badc7ca635da8a69dddb83')
 
 #@save
