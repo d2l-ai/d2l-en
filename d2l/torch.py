@@ -1,34 +1,7 @@
 DATA_HUB = dict()
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
-import collections
-import hashlib
-import inspect
-import math
-import os
-import random
-import re
-import shutil
-import sys
-import tarfile
-import time
-import zipfile
-from collections import defaultdict
-import pandas as pd
-import requests
-from IPython import display
-from matplotlib import pyplot as plt
 
-import numpy as np
-import torch
-import torchvision
-from PIL import Image
-from torch import nn
-from torch.nn import functional as F
-from torch.utils import data
-from torchvision import transforms
-
-d2l = sys.modules[__name__]
 nn_Module = nn.Module
 
 #################   WARNING   ################
