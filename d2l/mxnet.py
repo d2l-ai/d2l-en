@@ -5,6 +5,10 @@ USE_TENSORFLOW = False
 DATA_HUB = dict()
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
+from mxnet import autograd, context, gluon, image, init, np, npx
+from mxnet.gluon import nn, rnn
+from mxnet.gluon.data.vision import transforms
+
 nn_Module = nn.Block
 
 #################   WARNING   ################
