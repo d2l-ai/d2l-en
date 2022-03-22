@@ -4,7 +4,7 @@ import d2l
 requirements = [
     'jupyter',
     'numpy',
-    'matplotlib==3.4',
+    'matplotlib',
     'requests',
     'pandas',
     'gym'
