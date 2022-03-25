@@ -1,28 +1,9 @@
 DATA_HUB = dict()
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
-import collections
-import hashlib
-import inspect
-import math
-import os
-import random
-import re
-import shutil
-import sys
-import tarfile
-import time
-import zipfile
-from collections import defaultdict
-import pandas as pd
-import requests
-from IPython import display
-from matplotlib import pyplot as plt
-
 import numpy as np
 import tensorflow as tf
 
-d2l = sys.modules[__name__]
 nn_Module = tf.keras.Model
 
 #################   WARNING   ################
@@ -46,6 +27,7 @@ import pandas as pd
 import requests
 from IPython import display
 from matplotlib import pyplot as plt
+from matplotlib_inline import backend_inline
 
 d2l = sys.modules[__name__]
 
@@ -56,7 +38,7 @@ def use_svg_display():
     """Use the svg format to display a plot in Jupyter.
 
     Defined in :numref:`sec_calculus`"""
-    display.set_matplotlib_formats('svg')
+    backend_inline.set_matplotlib_formats('svg')
 
 def set_figsize(figsize=(3.5, 2.5)):
     """Set the figure size for matplotlib.

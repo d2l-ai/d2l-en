@@ -352,7 +352,7 @@ z = np.exp(- x**2 - y**2)
 
 # Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
-ax.plot_wireframe(x, y, z)
+ax.plot_wireframe(x.asnumpy(), y.asnumpy(), z.asnumpy())
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
 d2l.plt.xticks([-2, -1, 0, 1, 2])

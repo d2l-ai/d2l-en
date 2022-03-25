@@ -553,8 +553,10 @@ w = np.exp(-1)*(-1 - (x + 1) + (x + 1)**2 + y**2)
 
 # Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
-ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
-ax.plot_wireframe(x, y, w, **{'rstride': 10, 'cstride': 10}, color='purple')
+ax.plot_wireframe(x.asnumpy(), y.asnumpy(), z.asnumpy(),
+                  **{'rstride': 10, 'cstride': 10})
+ax.plot_wireframe(x.asnumpy(), y.asnumpy(), w.asnumpy(),
+                  **{'rstride': 10, 'cstride': 10}, color='purple')
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
 d2l.set_figsize()
