@@ -70,14 +70,6 @@ the hidden state computation in
 with that from a GRU or an LSTM.
 
 
-## Implementation from Scratch
-
-Fortunately many of the logistical details required to implement multiple layers of an RNN are readily available in high-level APIs.
-To keep things simple we only illustrate the implementation using such built-in functionalities.
-Let's take an LSTM model as an example.
-The code is very similar to the one we used previously in :numref:`sec_lstm`.
-In fact, the only difference is that we specify the number of layers explicitly rather than picking the default of a single layer.
-As usual, we begin by loading the dataset.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -105,10 +97,11 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-The architectural decisions such as choosing hyperparameters are very similar to those of :numref:`sec_lstm`.
-We pick the same number of inputs and outputs as we have distinct tokens, i.e., `vocab_size`.
-The number of hidden units is still 256.
-The only difference is that we now (**select a nontrivial number of hidden layers by specifying the value of `num_layers`.**)
+## Implementation from Scratch
+
+To implement a multi-layer RNN from scratch,
+we can treat each layer as an `RNNScratch` instance
+with its own learnable parameterization.
 
 ```{.python .input}
 %%tab mxnet, tensorflow
@@ -132,6 +125,10 @@ class StackedRNNScratch(d2l.Module):
                                     for i in range(num_layers)])
 ```
 
+The multi-layer forward computation
+simply performs forward computation
+layer by layer.
+
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(StackedRNNScratch)
@@ -142,6 +139,10 @@ def forward(self, inputs, Hs=None):
         outputs, Hs[i] = self.rnns[i](outputs, Hs[i])
     return outputs, Hs
 ```
+
+As an example, we train a deep GRU model on
+*The Time Machine* dataset (same as in :numref:`sec_rnn-scratch`).
+To keep things simple we set the number of layers to 2.
 
 ```{.python .input}
 %%tab all
@@ -162,6 +163,11 @@ trainer.fit(model, data)
 
 ## Concise Implementation
 
+Fortunately many of the logistical details required to implement multiple layers of an RNN are readily available in high-level APIs.
+Our concise implementation will use such built-in functionalities.
+The code generalizes the one we used previously in :numref:`sec_gru`,
+allowing specification of the number of layers explicitly rather than picking the default of a single layer.
+
 ```{.python .input}
 %%tab mxnet
 class GRU(d2l.RNN):  #@save
@@ -169,6 +175,16 @@ class GRU(d2l.RNN):  #@save
         d2l.Module.__init__(self)
         self.save_hyperparameters()
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)        
+```
+
+```{.python .input}
+%%tab pytorch
+class GRU(d2l.RNN):  #@save
+    def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0):
+        d2l.Module.__init__(self)
+        self.save_hyperparameters()
+        self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers,
+                          dropout=dropout)        
 ```
 
 ```{.python .input}
@@ -185,17 +201,12 @@ class GRU(d2l.RNN):  #@save
     def forward(self, X, state=None):
         outputs, *state = self.rnn(X, state)
         return outputs, state
-
 ```
 
-```{.python .input}
-%%tab pytorch
-class GRU(d2l.RNN):  #@save
-    def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0):
-        d2l.Module.__init__(self)
-        self.save_hyperparameters()
-        self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers, dropout=dropout)        
-```
+The architectural decisions such as choosing hyperparameters are very similar to those of :numref:`sec_gru`.
+We pick the same number of inputs and outputs as we have distinct tokens, i.e., `vocab_size`.
+The number of hidden units is still 32.
+The only difference is that we now (**select a nontrivial number of hidden layers by specifying the value of `num_layers`.**)
 
 ```{.python .input}
 %%tab all
@@ -229,10 +240,9 @@ model.predict('it has', 20, data.vocab)
 
 ## Exercises
 
-1. Try to implement a two-layer RNN from scratch using the single layer implementation we discussed in :numref:`sec_rnn-scratch`.
-2. Replace the LSTM by a GRU and compare the accuracy and training speed.
-3. Increase the training data to include multiple books. How low can you go on the perplexity scale?
-4. Would you want to combine sources of different authors when modeling text? Why is this a good idea? What could go wrong?
+1. Replace the GRU by an LSTM and compare the accuracy and training speed.
+1. Increase the training data to include multiple books. How low can you go on the perplexity scale?
+1. Would you want to combine sources of different authors when modeling text? Why is this a good idea? What could go wrong?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/340)
