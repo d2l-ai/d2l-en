@@ -156,8 +156,6 @@ import tensorflow as tf
 
 Next we need to define and initialize the model parameters. As previously, the hyperparameter `num_hiddens` defines the number of hidden units. We initialize weights following a Gaussian distribution with 0.01 standard deviation, and we set the biases to 0.
 
-In [**the initialization function**], the hidden state of the LSTM needs to return an *additional* memory cell with a value of 0 and a shape of (batch size, number of hidden units). Hence we get the following state initialization.
-
 ```{.python .input}
 %%tab all
 class LSTMScratch(d2l.Module):  #@save
@@ -214,7 +212,7 @@ def forward(self, inputs, H_C=None):
 
 ### [**Training**] and Prediction
 
-Let's train an LSTM as same as what we did in :numref:`sec_gru`, by instantiating the `RNNModelScratch` class as introduced in :numref:`sec_rnn-scratch`.
+Let's train an LSTM as same as what we did in :numref:`sec_gru`, by instantiating the `RNNLMScratch` class as introduced in :numref:`sec_rnn-scratch`.
 
 ```{.python .input}
 %%tab all
