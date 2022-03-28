@@ -69,8 +69,6 @@ the hidden state computation in
 :eqref:`eq_deep_rnn_H`
 with that from a GRU or an LSTM.
 
-
-
 ```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')

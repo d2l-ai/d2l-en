@@ -169,12 +169,7 @@ to encode text sequences.
 
 
 
-## (**Training a Bidirectional RNN for a Wrong Application**)
 
-If we were to ignore all advice regarding the fact that bidirectional RNNs use past and future data and simply apply it to language models,
-we will get estimates with acceptable perplexity. Nonetheless, the ability of the model to predict future tokens is severely compromised as the experiment below illustrates.
-Despite reasonable perplexity, it only generates gibberish even after many iterations.
-We include the code below as a cautionary example against using them in the wrong context.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -202,6 +197,17 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+## (**Training a Bidirectional RNN for a Wrong Application**)
+
+If we were to ignore all advice regarding the fact that bidirectional RNNs use past and future data and simply apply it to language models, we will get estimates with acceptable perplexity. Nonetheless, the ability of the model to predict future tokens is severely compromised as the experiment below illustrates. Despite reasonable perplexity, it only generates gibberish even after many iterations. We include the code below as a cautionary example against using them in the wrong context.
+
+
+### Implementation from Scratch
+
+To implement a bidirectional RNN from scratch, we can 
+include two unidirectional `RNNScratch` instances
+with separate learnable parameterization.
+
 ```{.python .input}
 %%tab all
 class BiRNNScratch(d2l.Module):
@@ -213,6 +219,10 @@ class BiRNNScratch(d2l.Module):
         self.num_hiddens *= 2  # The output dimension will be doubled
 ```
 
+States of forward and backward RNNs
+are updated separately,
+while outputs of these two RNNs are concatenated.
+
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(BiRNNScratch)
@@ -223,6 +233,9 @@ def forward(self, inputs, Hs=None):
     outputs = [d2l.concat((f, b), -1) for f, b in zip(f_outputs, b_outputs)]
     return outputs, (f_H, b_H)
 ```
+
+The training procedure is the same
+as in :numref:`sec_rnn-scratch`.
 
 ```{.python .input}
 %%tab all
@@ -239,7 +252,11 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-## Concise Implementation
+### Concise Implementation
+
+Using the high-level APIs,
+we can implement bidirectional RNNs more concisely.
+Here we take a GRU model as an example.
 
 ```{.python .input}
 %%tab mxnet, pytorch

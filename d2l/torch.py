@@ -735,7 +735,8 @@ class GRU(d2l.RNN):
     def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
-        self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers, dropout=dropout)
+        self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers,
+                          dropout=dropout)
 
 class MTFraEng(d2l.DataModule):
     """Defined in :numref:`sec_machine_translation`"""
