@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+```
+
 #  Sequence to Sequence Learning
 :label:`sec_seq2seq`
 
@@ -71,11 +76,6 @@ in greater detail.
 We will train this model for machine translation
 on the English-French dataset as introduced in
 :numref:`sec_machine_translation`.
-
-```{.python .input  n=1}
-%load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
-```
 
 ```{.python .input  n=18}
 %%tab mxnet

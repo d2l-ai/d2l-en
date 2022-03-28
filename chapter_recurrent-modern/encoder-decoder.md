@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+```
+
 # Encoder-Decoder Architecture
 :label:`sec_encoder-decoder`
 
@@ -46,6 +51,7 @@ The implementation will be provided
 by any model that inherits this base `Encoder` class.
 
 ```{.python .input}
+%%tab mxnet
 from mxnet.gluon import nn
 
 #@save
@@ -59,7 +65,7 @@ class Encoder(nn.Block):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from torch import nn
 
 #@save
@@ -73,7 +79,7 @@ class Encoder(nn.Module):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 import tensorflow as tf
 
 #@save
@@ -104,6 +110,7 @@ and the encoded state
 into an output token at the current time step.
 
 ```{.python .input}
+%%tab mxnet
 #@save
 class Decoder(nn.Block):
     """The base decoder interface for the encoder-decoder architecture."""
@@ -118,7 +125,7 @@ class Decoder(nn.Block):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 #@save
 class Decoder(nn.Module):
     """The base decoder interface for the encoder-decoder architecture."""
@@ -133,7 +140,7 @@ class Decoder(nn.Module):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 #@save
 class Decoder(tf.keras.layers.Layer):
     """The base decoder interface for the encoder-decoder architecture."""
@@ -160,6 +167,7 @@ and this state
 will be further used by the decoder as one of its input.
 
 ```{.python .input}
+%%tab mxnet
 #@save
 class EncoderDecoder(nn.Block):
     """The base class for the encoder-decoder architecture."""
@@ -175,7 +183,7 @@ class EncoderDecoder(nn.Block):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 #@save
 class EncoderDecoder(nn.Module):
     """The base class for the encoder-decoder architecture."""
@@ -191,7 +199,7 @@ class EncoderDecoder(nn.Module):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 #@save
 class EncoderDecoder(tf.keras.Model):
     """The base class for the encoder-decoder architecture."""

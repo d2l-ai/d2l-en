@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+```
+
 # Machine Translation and the Dataset
 :label:`sec_machine_translation`
 
@@ -57,11 +62,6 @@ In the following,
 we show how to
 load the preprocessed data
 into minibatches for training.
-
-```{.python .input  n=1}
-%load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
-```
 
 ```{.python .input  n=2}
 %%tab mxnet
