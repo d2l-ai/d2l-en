@@ -57,13 +57,13 @@ Here we generate an artificial dataset according to the following nonlinear func
 $$y_i = 2\sin(x_i) + x_i^{0.8} + \epsilon,$$
 
 where $\epsilon$ obeys a normal distribution with zero mean and standard deviation 0.5.
-Both 50 training examples and 50 testing examples
+Both 50 training examples and 50 validation examples
 are generated.
 To better visualize the pattern of attention later, the training inputs are sorted.
 
 ```{.python .input  n=35}
 %%tab all
-class SinData(d2l.DataModule):
+class NonlinearData(d2l.DataModule):
     def __init__(self, n, batch_size):        
         self.save_hyperparameters()
         f = lambda x: 2 * d2l.sin(x) + x**0.8
@@ -84,7 +84,7 @@ class SinData(d2l.DataModule):
         return self.get_tensorloader(arrays, train)    
     
 n = 50    
-data = SinData(n, batch_size=10)
+data = NonlinearData(n, batch_size=10)
 ```
 
 The following function plots all the training examples (represented by circles),
@@ -197,7 +197,7 @@ plot_kernel_reg(y_hat)
 ```
 
 Now let's take a look at the [**attention weights**].
-Here testing inputs are queries while training inputs are keys.
+Here validation inputs are queries while training inputs are keys.
 Since both inputs are sorted,
 we can see that the closer the query-key pair is,
 the higher attention weight is in the attention pooling.
@@ -206,7 +206,7 @@ the higher attention weight is in the attention pooling.
 %%tab all
 d2l.show_heatmaps([[attention_weights]],
                   xlabel='Sorted training inputs',
-                  ylabel='Sorted testing inputs')
+                  ylabel='Sorted validation inputs')
 ```
 
 ## **Parametric Attention Pooling**
@@ -317,7 +317,8 @@ class NWKernelRegression(d2l.Module):
 In the following, we [**transform the training dataset
 to keys and values**] to train the attention model.
 In the parametric attention pooling,
-any training input takes key-value pairs from all the training examples except for itself to predict its output.
+for simplicity
+any training input just takes key-value pairs from all the training examples to predict its output.
 
 ```{.python .input  n=54}
 %%tab all
@@ -327,6 +328,8 @@ trainer = d2l.Trainer(max_epochs=5)
 trainer.fit(model, data)
 ```
 
+Trying to fit the training dataset with noise, the predicted line is less smooth than its nonparametric counterpart that was plotted earlier.
+
 ```{.python .input  n=51}
 %%tab all
 plot_kernel_reg(model.forward(data.x_val))
@@ -334,13 +337,13 @@ plot_kernel_reg(model.forward(data.x_val))
 
 Comparing with nonparametric attention pooling,
 [**the region with large attention weights becomes sharper**]
-in the learnable and parametric setting.
+in the parametric setting.
 
 ```{.python .input}
 %%tab all
 d2l.show_heatmaps([[model.attention_weights]],
                   xlabel='Sorted training inputs',
-                  ylabel='Sorted testing inputs')
+                  ylabel='Sorted validation inputs')
 ```
 
 ## Summary

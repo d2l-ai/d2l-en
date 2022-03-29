@@ -204,9 +204,9 @@ If we were to ignore all advice regarding the fact that bidirectional RNNs use p
 
 ### Implementation from Scratch
 
-To implement a bidirectional RNN from scratch, we can 
+To implement a bidirectional RNN from scratch, we can
 include two unidirectional `RNNScratch` instances
-with separate learnable parameterization.
+with separate learnable parameters.
 
 ```{.python .input}
 %%tab all

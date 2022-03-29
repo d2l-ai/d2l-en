@@ -99,23 +99,23 @@ import tensorflow as tf
 
 To implement a multi-layer RNN from scratch,
 we can treat each layer as an `RNNScratch` instance
-with its own learnable parameterization.
+with its own learnable parameters.
 
 ```{.python .input}
 %%tab mxnet, tensorflow
 class StackedRNNScratch(d2l.Module):
-    def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):        
+    def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.rnns = [d2l.RNNScratch(num_inputs if i==0 else num_hiddens, 
-                                    num_hiddens, sigma) 
+        self.rnns = [d2l.RNNScratch(num_inputs if i==0 else num_hiddens,
+                                    num_hiddens, sigma)
                      for i in range(num_layers)]
 ```
 
 ```{.python .input}
 %%tab pytorch
 class StackedRNNScratch(d2l.Module):
-    def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):        
+    def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
         self.rnns = nn.Sequential(*[d2l.RNNScratch(
@@ -146,13 +146,13 @@ To keep things simple we set the number of layers to 2.
 %%tab all
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet', 'pytorch'):
-    rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
+    rnn_block = StackedRNNScratch(num_inputs=len(data.vocab),
                                   num_hiddens=32, num_layers=2)
     model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=2)
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
-        rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
+        rnn_block = StackedRNNScratch(num_inputs=len(data.vocab),
                                   num_hiddens=32, num_layers=2)
         model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=2)
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
@@ -172,7 +172,7 @@ class GRU(d2l.RNN):  #@save
     def __init__(self, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
-        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)        
+        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
 ```
 
 ```{.python .input}
@@ -182,7 +182,7 @@ class GRU(d2l.RNN):  #@save
         d2l.Module.__init__(self)
         self.save_hyperparameters()
         self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers,
-                          dropout=dropout)        
+                          dropout=dropout)
 ```
 
 ```{.python .input}
@@ -191,11 +191,11 @@ class GRU(d2l.RNN):  #@save
     def __init__(self, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
-        gru_cells = [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout) 
-                     for _ in range(num_layers)]            
-        self.rnn = tf.keras.layers.RNN(gru_cells, return_sequences=True, 
+        gru_cells = [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)
+                     for _ in range(num_layers)]
+        self.rnn = tf.keras.layers.RNN(gru_cells, return_sequences=True,
                                        return_state=True, time_major=True)
-        
+
     def forward(self, X, state=None):
         outputs, *state = self.rnn(X, state)
         return outputs, state
