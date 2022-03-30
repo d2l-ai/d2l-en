@@ -16,15 +16,14 @@ stage("Build and Publish") {
       sh label: "Build Environment", script: """set -ex
       conda env update -n ${ENV_NAME} -f static/build.yml
       conda activate ${ENV_NAME}
-      pip install git+https://github.com/d2l-ai/d2l-book
-      # Temporary jinja2 fix for https://github.com/d2l-ai/d2l-book/issues/46
-      pip install --upgrade jinja2==3.0
+      pip install git+https://github.com/d2l-ai/d2l-book@unpin_nbformat
       pip list
       nvidia-smi
       """
 
       sh label: "Sanity Check", script: """set -ex
       conda activate ${ENV_NAME}
+      d2lbook clear
       d2lbook build outputcheck tabcheck
       """
 
