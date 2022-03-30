@@ -784,40 +784,41 @@ class MTFraEng(d2l.DataModule):
 
 class Encoder(tf.keras.layers.Layer):
     """The base encoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Encoder, self).__init__(**kwargs)
+    def __init__(self):
+        super(Encoder, self).__init__()
 
-    def call(self, X, *args, **kwargs):
+    def call(self, X):
         raise NotImplementedError
 
 class Decoder(tf.keras.layers.Layer):
     """The base decoder interface for the encoder-decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
-    def __init__(self, **kwargs):
-        super(Decoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
-    def init_state(self, enc_outputs, *args):
+    def init_state(self, enc_outputs):
         raise NotImplementedError
 
-    def call(self, X, state, **kwargs):
+    def call(self, X, state):
         raise NotImplementedError
 
-class EncoderDecoder(tf.keras.Model):
+class EncoderDecoder(d2l.Classifier):
     """The base class for the encoder-decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoder, self).__init__(**kwargs)
+    def __init__(self, encoder, decoder):
+        super().__init__()
         self.encoder = encoder
         self.decoder = decoder
 
-    def call(self, enc_X, dec_X, *args, **kwargs):
-        enc_outputs = self.encoder(enc_X, *args, **kwargs)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state, **kwargs)
+    def call(self, enc_X, dec_X):
+        enc_outputs = self.encoder(enc_X)
+        dec_state = self.decoder.init_state(enc_outputs)
+        # Return decoder output only
+        return self.decoder(dec_X, dec_state)[0]
 
-class Seq2SeqEncoder(d2l.Module):
+class Seq2SeqEncoder(d2l.Encoder):
     """The RNN encoder for sequence to sequence learning.
 
     Defined in :numref:`sec_seq2seq`"""
@@ -827,7 +828,7 @@ class Seq2SeqEncoder(d2l.Module):
         self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
 
-    def forward(self, X):
+    def call(self, X):
         # X shape: (batch_size, num_steps)
         embs = self.embedding(d2l.transpose(X))
         # embs shape: (num_steps, batch_size, embed_size)
@@ -836,14 +837,11 @@ class Seq2SeqEncoder(d2l.Module):
         # state shape: (num_layers, batch_size, num_hiddens)
         return output, state
 
-class Seq2Seq(d2l.Classifier):
+class Seq2Seq(d2l.EncoderDecoder):
     """Defined in :numref:`sec_seq2seq_decoder`"""
     def __init__(self, encoder, decoder, tgt_pad, lr):
-        super().__init__()
+        super().__init__(encoder, decoder)
         self.save_hyperparameters()
-
-    def forward(self, src, tgt):
-        return self.decoder(tgt, self.encoder(src)[1])[0]
 
     def predict_step(self, batch):
         """Defined in :numref:`sec_seq2seq_training`"""
@@ -963,7 +961,45 @@ class DotProductAttention(tf.keras.layers.Layer):
         self.attention_weights = masked_softmax(scores, valid_lens)
         return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)
 
-class AttentionDecoder(d2l.Decoder):
+class EncoderOld(tf.keras.layers.Layer):
+    """The base encoder interface for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_seq2seq_attention`"""
+    def __init__(self, **kwargs):
+        super(EncoderOld, self).__init__(**kwargs)
+
+    def call(self, X, *args, **kwargs):
+        raise NotImplementedError
+
+
+class DecoderOld(tf.keras.layers.Layer):
+    """The base decoder interface for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_seq2seq_attention`"""
+    def __init__(self, **kwargs):
+        super(DecoderOld, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def call(self, X, state, **kwargs):
+        raise NotImplementedError
+
+class EncoderDecoderOld(tf.keras.Model):
+    """The base class for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_seq2seq_attention`"""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoderOld, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def call(self, enc_X, dec_X, *args, **kwargs):
+        enc_outputs = self.encoder(enc_X, *args, **kwargs)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state, **kwargs)
+
+class AttentionDecoder(d2l.DecoderOld):
     """The base attention-based decoder interface.
 
     Defined in :numref:`sec_seq2seq_attention`"""
@@ -1103,7 +1139,7 @@ class EncoderBlock(tf.keras.layers.Layer):
         Y = self.addnorm1(X, self.attention(X, X, X, valid_lens, **kwargs), **kwargs)
         return self.addnorm2(Y, self.ffn(Y), **kwargs)
 
-class TransformerEncoder(d2l.Encoder):
+class TransformerEncoder(d2l.EncoderOld):
     """Transformer encoder.
 
     Defined in :numref:`sec_transformer`"""
@@ -1766,7 +1802,7 @@ def bleu(pred_seq, label_seq, k):
         score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
     return score
 
-class Seq2SeqEncoderOld(d2l.Encoder):
+class Seq2SeqEncoderOld(d2l.EncoderOld):
     """The RNN encoder for sequence to sequence learning.
 
     Defined in :numref:`sec_utils`"""

@@ -467,7 +467,7 @@ to rescale before summing up the input embedding and the positional encoding.
 ```{.python .input}
 %%tab mxnet
 #@save
-class TransformerEncoder(d2l.Encoder):
+class TransformerEncoder(d2l.EncoderOld):
     """Transformer encoder."""
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
                  num_heads, num_layers, dropout, use_bias=False, **kwargs):
@@ -497,7 +497,7 @@ class TransformerEncoder(d2l.Encoder):
 ```{.python .input}
 %%tab pytorch
 #@save
-class TransformerEncoder(d2l.Encoder):
+class TransformerEncoder(d2l.EncoderOld):
     """Transformer encoder."""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
@@ -529,7 +529,7 @@ class TransformerEncoder(d2l.Encoder):
 ```{.python .input}
 %%tab tensorflow
 #@save
-class TransformerEncoder(d2l.Encoder):
+class TransformerEncoder(d2l.EncoderOld):
     """Transformer encoder."""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
@@ -944,7 +944,7 @@ encoder = TransformerEncoder(
 decoder = TransformerDecoder(
     len(tgt_vocab), num_hiddens, ffn_num_hiddens, num_heads, num_layers,
     dropout)
-net = d2l.EncoderDecoder(encoder, decoder)
+net = d2l.EncoderDecoderOld(encoder, decoder)
 d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
@@ -966,7 +966,7 @@ decoder = TransformerDecoder(
     len(tgt_vocab), key_size, query_size, value_size, num_hiddens,
     norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
     num_layers, dropout)
-net = d2l.EncoderDecoder(encoder, decoder)
+net = d2l.EncoderDecoderOld(encoder, decoder)
 d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
@@ -985,7 +985,7 @@ encoder = TransformerEncoder(
 decoder = TransformerDecoder(
     len(tgt_vocab), key_size, query_size, value_size, num_hiddens, norm_shape,
     ffn_num_hiddens, num_heads, num_layers, dropout)
-net = d2l.EncoderDecoder(encoder, decoder)
+net = d2l.EncoderDecoderOld(encoder, decoder)
 d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 

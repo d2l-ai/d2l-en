@@ -111,6 +111,121 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+## TO REMOVE LATER
+
+```{.python .input}
+%%tab mxnet
+#@save
+class EncoderOld(nn.Block):
+    """The base encoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(EncoderOld, self).__init__(**kwargs)
+
+    def forward(self, X, *args):
+        raise NotImplementedError
+        
+        
+#@save
+class DecoderOld(nn.Block):
+    """The base decoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(DecoderOld, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def forward(self, X, state):
+        raise NotImplementedError
+
+#@save
+class EncoderDecoderOld(nn.Block):
+    """The base class for the encoder-decoder architecture."""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoderOld, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def forward(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state)
+```
+
+```{.python .input}
+%%tab pytorch
+#@save
+class EncoderOld(nn.Module):
+    """The base encoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(EncoderOld, self).__init__(**kwargs)
+
+    def forward(self, X, *args):
+        raise NotImplementedError
+        
+#@save
+class DecoderOld(nn.Module):
+    """The base decoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(DecoderOld, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def forward(self, X, state):
+        raise NotImplementedError
+        
+#@save
+class EncoderDecoderOld(nn.Module):
+    """The base class for the encoder-decoder architecture."""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoderOld, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def forward(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state)
+```
+
+```{.python .input}
+%%tab tensorflow
+#@save
+class EncoderOld(tf.keras.layers.Layer):
+    """The base encoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(EncoderOld, self).__init__(**kwargs)
+
+    def call(self, X, *args, **kwargs):
+        raise NotImplementedError
+        
+        
+#@save
+class DecoderOld(tf.keras.layers.Layer):
+    """The base decoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(DecoderOld, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def call(self, X, state, **kwargs):
+        raise NotImplementedError
+        
+#@save
+class EncoderDecoderOld(tf.keras.Model):
+    """The base class for the encoder-decoder architecture."""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoderOld, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def call(self, enc_X, dec_X, *args, **kwargs):
+        enc_outputs = self.encoder(enc_X, *args, **kwargs)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state, **kwargs)
+```
+
 ## Defining the Decoder with Attention
 
 To implement the RNN encoder-decoder
@@ -124,7 +239,7 @@ decoders with attention mechanisms**].
 ```{.python .input}
 %%tab all
 #@save
-class AttentionDecoder(d2l.Decoder):
+class AttentionDecoder(d2l.DecoderOld):
     """The base attention-based decoder interface."""
     def __init__(self, **kwargs):
         super(AttentionDecoder, self).__init__(**kwargs)

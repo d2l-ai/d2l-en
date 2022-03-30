@@ -160,29 +160,59 @@ here we choose a multilayer GRU to
 implement the encoder.
 
 ```{.python .input  n=24}
-%%tab all
-class Seq2SeqEncoder(d2l.Module):  #@save
+%%tab mxnet
+class Seq2SeqEncoder(d2l.Encoder):  #@save
     """The RNN encoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0):
         super().__init__()
-        if tab.selected('mxnet'):
-            self.embedding = nn.Embedding(vocab_size, embed_size)
-            self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
-            self.initialize()
-        if tab.selected('pytorch'):
-            self.embedding = nn.Embedding(vocab_size, embed_size)
-            self.rnn = d2l.GRU(embed_size, num_hiddens, num_layers, dropout)
-        if tab.selected('tensorflow'):
-            self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
-            self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
+        self.initialize()
             
     def forward(self, X):
         # X shape: (batch_size, num_steps)
-        if tab.selected('pytorch'):
-            embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int64))
-        if tab.selected('mxnet', 'tensorflow'):
-            embs = self.embedding(d2l.transpose(X))
+        embs = self.embedding(d2l.transpose(X))
+        # embs shape: (num_steps, batch_size, embed_size)    
+        output, state = self.rnn(embs)
+        # output shape: (num_steps, batch_size, num_hiddens)
+        # state shape: (num_layers, batch_size, num_hiddens)
+        return output, state
+```
+
+```{.python .input}
+%%tab pytorch
+class Seq2SeqEncoder(d2l.Encoder):  #@save
+    """The RNN encoder for sequence to sequence learning."""
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.rnn = d2l.GRU(embed_size, num_hiddens, num_layers, dropout)
+            
+    def forward(self, X):
+        # X shape: (batch_size, num_steps)
+        embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int64))
+        # embs shape: (num_steps, batch_size, embed_size)    
+        output, state = self.rnn(embs)
+        # output shape: (num_steps, batch_size, num_hiddens)
+        # state shape: (num_layers, batch_size, num_hiddens)
+        return output, state
+```
+
+```{.python .input}
+%%tab tensorflow
+class Seq2SeqEncoder(d2l.Encoder):  #@save
+    """The RNN encoder for sequence to sequence learning."""
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0):
+        super().__init__()
+        self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
+        self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
+            
+    def call(self, X):
+        # X shape: (batch_size, num_steps)
+        embs = self.embedding(d2l.transpose(X))
         # embs shape: (num_steps, batch_size, embed_size)    
         output, state = self.rnn(embs)
         # output shape: (num_steps, batch_size, num_hiddens)
@@ -278,55 +308,96 @@ a fully connected layer is used to transform
 the hidden state at the final layer of the RNN decoder.
 
 ```{.python .input  n=7}
-%%tab all
-class Seq2SeqDecoder(d2l.Module):
+%%tab mxnet
+class Seq2SeqDecoder(d2l.Decoder):
     """The RNN decoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0):
         super(Seq2SeqDecoder, self).__init__()
-        if tab.selected('mxnet'):
-            self.embedding = nn.Embedding(vocab_size, embed_size)
-            self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
-            self.dense = nn.Dense(vocab_size, flatten=False)
-            self.initialize()
-        if tab.selected('pytorch'):
-            self.embedding = nn.Embedding(vocab_size, embed_size)
-            self.rnn = d2l.GRU(embed_size + num_hiddens, num_hiddens, num_layers, dropout)
-            self.dense = nn.Linear(num_hiddens, vocab_size)
-        if tab.selected('tensorflow'):
-            self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
-            self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
-            self.dense = tf.keras.layers.Dense(vocab_size)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
+        self.dense = nn.Dense(vocab_size, flatten=False)
+        self.initialize()
+            
+    def init_state(self, enc_outputs):
+        return enc_outputs[1] 
 
     def forward(self, X, enc_state, state=None):
         # X shape: (batch_size, num_steps)
         # embs shape: (num_steps, batch_size, embed_size)
-        if tab.selected('pytorch'):
-            embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int32))
-            # context shape: (batch_size, num_hiddens)
-            context = enc_state[-1]            
-            # broadcast to (num_steps, batch_size, num_hiddens)
-            context = context.repeat(embs.shape[0], 1, 1)            
-        if tab.selected('mxnet'):
-            embs = self.embedding(d2l.transpose(X))
-            # context shape: (batch_size, num_hiddens)
-            context = enc_state[-1]
-            # broadcast to (num_steps, batch_size, num_hiddens)
-            context = np.tile(context, (embs.shape[0], 1, 1))            
-        if tab.selected('tensorflow'):
-            embs = self.embedding(d2l.transpose(X))
-            # context shape: (batch_size, num_hiddens)
-            context = enc_state[-1]
-            # broadcast to (num_steps, batch_size, num_hiddens)
-            context = tf.tile(tf.expand_dims(context, 0), (embs.shape[0], 1, 1))
-        # concat at the feature dimension
+        embs = self.embedding(d2l.transpose(X))
+        # context shape: (batch_size, num_hiddens)
+        context = enc_state[-1]
+        # Broadcast context to (num_steps, batch_size, num_hiddens)
+        context = np.tile(context, (embs.shape[0], 1, 1))
+        # Concat at the feature dimension
         embs_and_context = d2l.concat((embs, context), -1)
         outputs, state = self.rnn(embs_and_context, state)
-        if tab.selected('mxnet', 'pytorch'):        
-            outputs = d2l.swapaxes(self.dense(outputs), 0, 1)
-        if tab.selected('tensorflow'):        
-            outputs = d2l.transpose(self.dense(outputs), (1, 0, 2))
-        # outputs shape: (num_steps, batch_size, vocab_size)
+        outputs = d2l.swapaxes(self.dense(outputs), 0, 1)
+        # outputs shape: (batch_size, num_steps, vocab_size)
+        # state shape: (num_layers, batch_size, num_hiddens)
+        return outputs, state
+```
+
+```{.python .input}
+%%tab pytorch
+class Seq2SeqDecoder(d2l.Decoder):
+    """The RNN decoder for sequence to sequence learning."""
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0):
+        super(Seq2SeqDecoder, self).__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.rnn = d2l.GRU(embed_size+num_hiddens, num_hiddens,
+                           num_layers, dropout)
+        self.dense = nn.Linear(num_hiddens, vocab_size)
+            
+    def init_state(self, enc_outputs):
+        return enc_outputs[1] 
+
+    def forward(self, X, enc_state, state=None):
+        # X shape: (batch_size, num_steps)
+        # embs shape: (num_steps, batch_size, embed_size)
+        embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int32))
+        # context shape: (batch_size, num_hiddens)
+        context = enc_state[-1]            
+        # Broadcast context to (num_steps, batch_size, num_hiddens)
+        context = context.repeat(embs.shape[0], 1, 1)            
+        # Concat at the feature dimension
+        embs_and_context = d2l.concat((embs, context), -1)
+        outputs, state = self.rnn(embs_and_context, state)
+        outputs = d2l.swapaxes(self.dense(outputs), 0, 1)
+        # outputs shape: (batch_size, num_steps, vocab_size)
+        # state shape: (num_layers, batch_size, num_hiddens)
+        return outputs, state
+```
+
+```{.python .input}
+%%tab tensorflow
+class Seq2SeqDecoder(d2l.Decoder):
+    """The RNN decoder for sequence to sequence learning."""
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0):
+        super(Seq2SeqDecoder, self).__init__()
+        self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
+        self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
+        self.dense = tf.keras.layers.Dense(vocab_size)
+            
+    def init_state(self, enc_outputs):
+        return enc_outputs[1] 
+
+    def call(self, X, enc_state, state=None):
+        # X shape: (batch_size, num_steps)
+        # embs shape: (num_steps, batch_size, embed_size)
+        embs = self.embedding(d2l.transpose(X))
+        # context shape: (batch_size, num_hiddens)
+        context = enc_state[-1]
+        # Broadcast context to (num_steps, batch_size, num_hiddens)
+        context = tf.tile(tf.expand_dims(context, 0), (embs.shape[0], 1, 1))
+        # Concat at the feature dimension
+        embs_and_context = d2l.concat((embs, context), -1)
+        outputs, state = self.rnn(embs_and_context, state)
+        outputs = d2l.transpose(self.dense(outputs), (1, 0, 2))
+        # outputs shape: (batch_size, num_steps, vocab_size)
         # state shape: (num_layers, batch_size, num_hiddens)
         return outputs, state
 ```
@@ -361,13 +432,10 @@ the layers in the above RNN encoder-decoder model are illustrated in :numref:`fi
 
 ```{.python .input  n=9}
 %%tab all
-class Seq2Seq(d2l.Classifier):  #@save
+class Seq2Seq(d2l.EncoderDecoder):  #@save
     def __init__(self, encoder, decoder, tgt_pad, lr):
-        super().__init__()
-        self.save_hyperparameters()    
-        
-    def forward(self, src, tgt):
-        return self.decoder(tgt, self.encoder(src)[1])[0]
+        super().__init__(encoder, decoder)
+        self.save_hyperparameters()
 ```
 
 ## Loss Function
@@ -429,7 +497,7 @@ as the current input to the decoder.
 %%tab all
 @d2l.add_to_class(Seq2Seq)
 def accuracy(self, X, Y):
-    acc = super(Seq2Seq, self).accuracy(X, Y, averaged=False)    
+    acc = super(Seq2Seq, self).accuracy(X, Y, averaged=False)
     mask = d2l.astype(d2l.reshape(Y, -1) != self.tgt_pad, d2l.float32)
     return d2l.reduce_sum(acc * mask) / d2l.reduce_sum(mask)
 ```

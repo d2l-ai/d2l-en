@@ -811,40 +811,41 @@ class MTFraEng(d2l.DataModule):
 
 class Encoder(nn.Module):
     """The base encoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Encoder, self).__init__(**kwargs)
+    def __init__(self):
+        super(Encoder, self).__init__()
 
-    def forward(self, X, *args):
+    def forward(self, X):
         raise NotImplementedError
 
 class Decoder(nn.Module):
     """The base decoder interface for the encoder-decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
-    def __init__(self, **kwargs):
-        super(Decoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
-    def init_state(self, enc_outputs, *args):
+    def init_state(self, enc_outputs):
         raise NotImplementedError
 
     def forward(self, X, state):
         raise NotImplementedError
 
-class EncoderDecoder(nn.Module):
+class EncoderDecoder(d2l.Classifier):
     """The base class for the encoder-decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoder, self).__init__(**kwargs)
+    def __init__(self, encoder, decoder):
+        super().__init__()
         self.encoder = encoder
         self.decoder = decoder
 
-    def forward(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state)
+    def forward(self, enc_X, dec_X):
+        enc_outputs = self.encoder(enc_X)
+        dec_state = self.decoder.init_state(enc_outputs)
+        # Return decoder output only
+        return self.decoder(dec_X, dec_state)[0]
 
-class Seq2SeqEncoder(d2l.Module):
+class Seq2SeqEncoder(d2l.Encoder):
     """The RNN encoder for sequence to sequence learning.
 
     Defined in :numref:`sec_seq2seq`"""
@@ -853,6 +854,7 @@ class Seq2SeqEncoder(d2l.Module):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(embed_size, num_hiddens, num_layers, dropout)
+
     def forward(self, X):
         # X shape: (batch_size, num_steps)
         embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int64))
@@ -862,14 +864,11 @@ class Seq2SeqEncoder(d2l.Module):
         # state shape: (num_layers, batch_size, num_hiddens)
         return output, state
 
-class Seq2Seq(d2l.Classifier):
+class Seq2Seq(d2l.EncoderDecoder):
     """Defined in :numref:`sec_seq2seq_decoder`"""
     def __init__(self, encoder, decoder, tgt_pad, lr):
-        super().__init__()
+        super().__init__(encoder, decoder)
         self.save_hyperparameters()
-
-    def forward(self, src, tgt):
-        return self.decoder(tgt, self.encoder(src)[1])[0]
 
     def predict_step(self, batch):
         """Defined in :numref:`sec_seq2seq_training`"""
@@ -987,7 +986,44 @@ class DotProductAttention(nn.Module):
         self.attention_weights = masked_softmax(scores, valid_lens)
         return torch.bmm(self.dropout(self.attention_weights), values)
 
-class AttentionDecoder(d2l.Decoder):
+class EncoderOld(nn.Module):
+    """The base encoder interface for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_seq2seq_attention`"""
+    def __init__(self, **kwargs):
+        super(EncoderOld, self).__init__(**kwargs)
+
+    def forward(self, X, *args):
+        raise NotImplementedError
+
+class DecoderOld(nn.Module):
+    """The base decoder interface for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_seq2seq_attention`"""
+    def __init__(self, **kwargs):
+        super(DecoderOld, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def forward(self, X, state):
+        raise NotImplementedError
+
+class EncoderDecoderOld(nn.Module):
+    """The base class for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_seq2seq_attention`"""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoderOld, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def forward(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state)
+
+class AttentionDecoder(d2l.DecoderOld):
     """The base attention-based decoder interface.
 
     Defined in :numref:`sec_seq2seq_attention`"""
@@ -1134,7 +1170,7 @@ class EncoderBlock(nn.Module):
         Y = self.addnorm1(X, self.attention(X, X, X, valid_lens))
         return self.addnorm2(Y, self.ffn(Y))
 
-class TransformerEncoder(d2l.Encoder):
+class TransformerEncoder(d2l.EncoderOld):
     """Transformer encoder.
 
     Defined in :numref:`sec_transformer`"""
@@ -2927,7 +2963,7 @@ def bleu(pred_seq, label_seq, k):
         score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
     return score
 
-class Seq2SeqEncoderOld(d2l.Encoder):
+class Seq2SeqEncoderOld(d2l.EncoderOld):
     """The RNN encoder for sequence to sequence learning.
 
     Defined in :numref:`sec_utils`"""
