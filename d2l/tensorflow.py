@@ -739,10 +739,10 @@ class MTFraEng(d2l.DataModule):
             if len(parts) == 2:
                 # Skip empty tokens
                 src.append([t for t in f'{parts[0]} <eos>'.split(' ') if t])
-                tgt.append([t for t in f'<bos> {parts[1]} <eos>'.split(' ') if t])
+                tgt.append([t for t in f'{parts[1]} <eos>'.split(' ') if t])
         return src, tgt
 
-    def __init__(self, batch_size, num_steps, num_train=1000, num_val=1000):
+    def __init__(self, batch_size, num_steps=9, num_train=900, num_val=100):
         """Defined in :numref:`sec_machine_translation`"""
         super(MTFraEng, self).__init__()
         self.save_hyperparameters()
@@ -752,18 +752,22 @@ class MTFraEng(d2l.DataModule):
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
         """Defined in :numref:`sec_machine_translation`"""
-        def _build_one(sentences, vocab):
-            pad_or_trim = lambda s, n: (
-                s[:n] if len(s) > n else s + ['<pad>'] * (n - len(s)))
-            sentences = [pad_or_trim(seq, self.num_steps) for seq in sentences]
-            if vocab is None: vocab = d2l.Vocab(sentences, min_freq=2)
-            array = d2l.tensor([vocab[sent] for sent in sentences])
+        def _build_array(sentences, vocab, is_tgt=False):
+            pad_or_trim = lambda seq, t: (
+                seq[:t] if len(seq) > t else seq + ['<pad>'] * (t - len(seq)))
+            sentences = [pad_or_trim(s, self.num_steps) for s in sentences]
+            if is_tgt:
+                sentences = [['<bos>'] + s for s in sentences]
+            if vocab is None:
+                vocab = d2l.Vocab(sentences, min_freq=2)
+            array = d2l.tensor([vocab[s] for s in sentences])
             return array, vocab
         src, tgt = self._tokenize(self._preprocess(raw_text),
                                   self.num_train + self.num_val)
-        src_array, src_vocab = _build_one(src, src_vocab)
-        tgt_array, tgt_vocab = _build_one(tgt, tgt_vocab)
-        return (src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab, tgt_vocab
+        src_array, src_vocab = _build_array(src, src_vocab)
+        tgt_array, tgt_vocab = _build_array(tgt, tgt_vocab, True)
+        return ((src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab,
+                tgt_vocab)
 
     def get_dataloader(self, train):
         """Defined in :numref:`sec_machine_translation`"""

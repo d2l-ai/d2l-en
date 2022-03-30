@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
@@ -210,7 +210,7 @@ of shape
 ```{.python .input  n=25}
 %%tab all
 vocab_size, embed_size, num_hiddens, num_layers = 10, 8, 16, 2
-batch_size, num_steps = 4, 7
+batch_size, num_steps = 4, 9
 
 encoder = Seq2SeqEncoder(vocab_size, embed_size, num_hiddens, num_layers)
 X = d2l.zeros((batch_size, num_steps))
@@ -436,7 +436,7 @@ def accuracy(self, X, Y):
 
 ```{.python .input  n=13}
 %%tab all
-data = d2l.MTFraEng(batch_size=64, num_steps=10) 
+data = d2l.MTFraEng(batch_size=64) 
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.1
 encoder = Seq2SeqEncoder(
     len(data.src_vocab), embed_size, num_hiddens, num_layers, dropout)

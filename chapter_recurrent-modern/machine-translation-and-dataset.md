@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
@@ -113,7 +113,7 @@ class MTFraEng(d2l.DataModule):  #@save
             
 data = MTFraEng() 
 raw_text = data._download()
-raw_text[:60]
+print(raw_text[:75])
 ```
 
 After downloading the dataset,
@@ -137,7 +137,7 @@ def _preprocess(self, text):
     return ''.join(out)
 
 text = data._preprocess(raw_text)
-text[:60]
+print(text[:80])
 ```
 
 ## [**Tokenization**]
@@ -168,11 +168,11 @@ def _tokenize(self, text, max_examples=None):
         if len(parts) == 2:
             # Skip empty tokens
             src.append([t for t in f'{parts[0]} <eos>'.split(' ') if t])
-            tgt.append([t for t in f'<bos> {parts[1]} <eos>'.split(' ') if t])
+            tgt.append([t for t in f'{parts[1]} <eos>'.split(' ') if t])
     return src, tgt
 
 src, tgt = data._tokenize(text)
-src[:4], tgt[:4]
+src[:6], tgt[:6]
 ```
 
 Let's [**plot the histogram of the number of tokens per text sequence.**]
@@ -185,8 +185,9 @@ d2l.set_figsize((4.5, 2.5))
 _, _, patches = d2l.plt.hist([[len(l) for l in src], 
                               [len(l) for l in tgt]])
 d2l.plt.xlabel('# tokens per sequence'), d2l.plt.ylabel('count')
-d2l.plt.xlim([0, 20])
-for patch in patches[1].patches: patch.set_hatch('-')
+d2l.plt.xlim([0, 30])
+for patch in patches[1].patches:
+    patch.set_hatch('-')
 _ = d2l.plt.legend(['source', 'target'])
 ```
 
@@ -269,7 +270,7 @@ the vocabularies for both the source language and the target language.
 ```{.python .input  n=9}
 %%tab all
 @d2l.add_to_class(MTFraEng)  #@save
-def __init__(self, batch_size, num_steps, num_train=1000, num_val=1000):
+def __init__(self, batch_size, num_steps=9, num_train=900, num_val=100):
     super(MTFraEng, self).__init__()
     self.save_hyperparameters()
     self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
@@ -277,19 +278,22 @@ def __init__(self, batch_size, num_steps, num_train=1000, num_val=1000):
     
 @d2l.add_to_class(MTFraEng)  #@save
 def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
-    def _build_one(sentences, vocab):
-        pad_or_trim = lambda s, n: (
-            s[:n] if len(s) > n else s + ['<pad>'] * (n - len(s)))
-        sentences = [pad_or_trim(seq, self.num_steps) for seq in sentences]
-        if vocab is None: vocab = d2l.Vocab(sentences, min_freq=2)
-        array = d2l.tensor([vocab[sent] for sent in sentences])
+    def _build_array(sentences, vocab, is_tgt=False):
+        pad_or_trim = lambda seq, t: (
+            seq[:t] if len(seq) > t else seq + ['<pad>'] * (t - len(seq)))
+        sentences = [pad_or_trim(s, self.num_steps) for s in sentences]
+        if is_tgt:
+            sentences = [['<bos>'] + s for s in sentences]
+        if vocab is None:
+            vocab = d2l.Vocab(sentences, min_freq=2)
+        array = d2l.tensor([vocab[s] for s in sentences])
         return array, vocab
     src, tgt = self._tokenize(self._preprocess(raw_text), 
-                              self.num_train + self.num_val)
-    src_array, src_vocab = _build_one(src, src_vocab)
-    tgt_array, tgt_vocab = _build_one(tgt, tgt_vocab)
-    return (src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab, tgt_vocab
-
+                              self.num_train + self.num_val)   
+    src_array, src_vocab = _build_array(src, src_vocab)
+    tgt_array, tgt_vocab = _build_array(tgt, tgt_vocab, True)
+    return ((src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab,
+            tgt_vocab)
 ```
 
 ```{.python .input  n=10}
@@ -304,7 +308,7 @@ Let's [**read the first minibatch from the English-French dataset.**]
 
 ```{.python .input  n=11}
 %%tab all
-data = MTFraEng(batch_size=3, num_steps=6)
+data = MTFraEng(batch_size=3)
 src, tgt, label = next(iter(data.train_dataloader()))
 print('source:', d2l.astype(src, d2l.int32))
 print('target:', d2l.astype(tgt, d2l.int32))
@@ -322,7 +326,7 @@ def build(self, src_sentences, tgt_sentences):
     return arrays
 ```
 
-```{.python .input  n=14}
+```{.python .input  n=13}
 %%tab all
 src, tgt, _ = data.build(['hi .'], ['salut .'])
 print('source:', data.src_vocab.to_tokens(d2l.astype(src[0], d2l.int32)))
