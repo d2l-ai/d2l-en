@@ -52,6 +52,7 @@ by any model that inherits this base `Encoder` class.
 
 ```{.python .input}
 %%tab mxnet
+from d2l import mxnet as d2l
 from mxnet.gluon import nn
 
 #@save
@@ -66,6 +67,7 @@ class Encoder(nn.Block):
 
 ```{.python .input}
 %%tab pytorch
+from d2l import torch as d2l
 from torch import nn
 
 #@save
@@ -80,6 +82,7 @@ class Encoder(nn.Module):
 
 ```{.python .input}
 %%tab tensorflow
+from d2l import tensorflow as d2l
 import tensorflow as tf
 
 #@save
