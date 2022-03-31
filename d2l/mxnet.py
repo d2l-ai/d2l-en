@@ -785,7 +785,7 @@ class MTFraEng(d2l.DataModule):
                 tgt.append([t for t in f'{parts[1]} <eos>'.split(' ') if t])
         return src, tgt
 
-    def __init__(self, batch_size, num_steps=9, num_train=600, num_val=128):
+    def __init__(self, batch_size, num_steps=9, num_train=512, num_val=128):
         """Defined in :numref:`sec_machine_translation`"""
         super(MTFraEng, self).__init__()
         self.save_hyperparameters()
@@ -899,11 +899,11 @@ class Seq2Seq(d2l.EncoderDecoder):
         """Defined in :numref:`sec_seq2seq_training`"""
         batch = [d2l.to(a, device) for a in batch]
         src, tgt, _ = batch
-        enc_state = self.encoder(src)[1]
-        dec_state = None
+        enc_outputs = self.encoder(src)
+        dec_state = self.decoder.init_state(enc_outputs)
         outputs = [d2l.expand_dims(tgt[:,0], 1), ]
         for _ in range(num_steps):
-            Y, dec_state = self.decoder(outputs[-1], enc_state, dec_state)
+            Y, dec_state = self.decoder(outputs[-1], enc_outputs[1], dec_state)
             outputs.append(d2l.argmax(Y, 2))
         return d2l.concat(outputs[1:], 1)
 

@@ -518,15 +518,15 @@ def accuracy(self, X, Y):
 ```{.python .input  n=13}
 %%tab all
 data = d2l.MTFraEng(batch_size=128) 
-embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.5
+embed_size, num_hiddens, num_layers, dropout = 256, 256, 2, 0.2
 if tab.selected('mxnet', 'pytorch'):
     encoder = Seq2SeqEncoder(
         len(data.src_vocab), embed_size, num_hiddens, num_layers, dropout)
     decoder = Seq2SeqDecoder(
         len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
     model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
-                    lr=0.005)
-    trainer = d2l.Trainer(max_epochs=120, gradient_clip_val=1, num_gpus=1)
+                    lr=0.001)
+    trainer = d2l.Trainer(max_epochs=75, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
         encoder = Seq2SeqEncoder(
@@ -534,8 +534,8 @@ if tab.selected('tensorflow'):
         decoder = Seq2SeqDecoder(
             len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
         model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
-                        lr=0.005)
-    trainer = d2l.Trainer(max_epochs=120, gradient_clip_val=1)
+                        lr=0.001)
+    trainer = d2l.Trainer(max_epochs=75, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -574,11 +574,11 @@ def predict_step(self, batch, device=None, num_steps=9):
     if tab.selected('mxnet', 'pytorch'):
         batch = [d2l.to(a, device) for a in batch]
     src, tgt, _ = batch
-    enc_state = self.encoder(src)[1]
-    dec_state = None
+    enc_outputs = self.encoder(src)
+    dec_state = self.decoder.init_state(enc_outputs)
     outputs = [d2l.expand_dims(tgt[:,0], 1), ]
     for _ in range(num_steps):
-        Y, dec_state = self.decoder(outputs[-1], enc_state, dec_state)
+        Y, dec_state = self.decoder(outputs[-1], enc_outputs[1], dec_state)
         outputs.append(d2l.argmax(Y, 2))
     return d2l.concat(outputs[1:], 1)
 ```
@@ -673,7 +673,8 @@ preds = model.predict_step(batch, d2l.try_gpu())
 for en, fr, p in zip(engs, fras, preds):
     translation = []
     for token in data.tgt_vocab.to_tokens(p):
-        if token == '<eos>': break
+        if token == '<eos>':
+            break
         translation.append(token)        
     print(f'{en} => {translation}, bleu,'
           f'{bleu(" ".join(translation), fr, k=2):.3f}')  

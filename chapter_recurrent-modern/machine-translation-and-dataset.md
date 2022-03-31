@@ -270,7 +270,7 @@ the vocabularies for both the source language and the target language.
 ```{.python .input  n=9}
 %%tab all
 @d2l.add_to_class(MTFraEng)  #@save
-def __init__(self, batch_size, num_steps=9, num_train=600, num_val=128):
+def __init__(self, batch_size, num_steps=9, num_train=512, num_val=128):
     super(MTFraEng, self).__init__()
     self.save_hyperparameters()
     self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
@@ -289,7 +289,7 @@ def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
         array = d2l.tensor([vocab[s] for s in sentences])
         return array, vocab
     src, tgt = self._tokenize(self._preprocess(raw_text), 
-                              self.num_train + self.num_val)   
+                              self.num_train + self.num_val)
     src_array, src_vocab = _build_array(src, src_vocab)
     tgt_array, tgt_vocab = _build_array(tgt, tgt_vocab, True)
     return ((src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab,
