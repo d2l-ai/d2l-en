@@ -270,7 +270,7 @@ the vocabularies for both the source language and the target language.
 ```{.python .input  n=9}
 %%tab all
 @d2l.add_to_class(MTFraEng)  #@save
-def __init__(self, batch_size, num_steps=9, num_train=900, num_val=100):
+def __init__(self, batch_size, num_steps=9, num_train=600, num_val=128):
     super(MTFraEng, self).__init__()
     self.save_hyperparameters()
     self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(

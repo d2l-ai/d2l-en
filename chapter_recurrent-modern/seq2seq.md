@@ -436,6 +436,19 @@ class Seq2Seq(d2l.EncoderDecoder):  #@save
     def __init__(self, encoder, decoder, tgt_pad, lr):
         super().__init__(encoder, decoder)
         self.save_hyperparameters()
+        
+    def validation_step(self, batch):
+        Y_hat = self(*batch[:-1])
+        self.plot('loss', self.loss(Y_hat, batch[-1]), train=False)
+        
+    def configure_optimizers(self):
+        if tab.selected('mxnet'):
+            return gluon.Trainer(self.parameters(), 'adam',
+                                 {'learning_rate': self.lr})
+        if tab.selected('pytorch'):
+            return torch.optim.Adam(self.parameters(), lr=self.lr)
+        if tab.selected('tensorflow'):
+            return tf.keras.optimizers.Adam(learning_rate=self.lr)
 ```
 
 ## Loss Function
@@ -504,14 +517,15 @@ def accuracy(self, X, Y):
 
 ```{.python .input  n=13}
 %%tab all
-data = d2l.MTFraEng(batch_size=64) 
-embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.1
+data = d2l.MTFraEng(batch_size=128) 
+embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.5
 encoder = Seq2SeqEncoder(
     len(data.src_vocab), embed_size, num_hiddens, num_layers, dropout)
 decoder = Seq2SeqDecoder(
     len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'], lr=0.005)
-trainer = d2l.Trainer(max_epochs=5, gradient_clip_val=1)
+trainer = d2l.Trainer(max_epochs=120, gradient_clip_val=1)
+
 trainer.fit(model, data)
 ```
 
@@ -546,21 +560,15 @@ strategies for sequence generation in
 ```{.python .input  n=14}
 %%tab all
 @d2l.add_to_class(Seq2Seq)  #@save
-def predict_step(self, batch):
+def predict_step(self, batch, num_steps=9):
     src, tgt, _ = batch
     enc_state = self.encoder(src)[1]
     dec_state = None
     outputs = [d2l.expand_dims(tgt[:,0], 1), ]
-    for _ in range(tgt.shape[1]):
+    for _ in range(num_steps):
         Y, dec_state = self.decoder(outputs[-1], enc_state, dec_state)
         outputs.append(d2l.argmax(Y, 2))
     return d2l.concat(outputs[1:], 1)
-```
-
-```{.python .input  n=15}
-%%tab all
-batch = data.build(["hi !"], [""])
-data.tgt_vocab.to_tokens(model.predict_step(batch)[0])
 ```
 
 ## Evaluation of Predicted Sequences
@@ -655,7 +663,8 @@ for en, fr, p in zip(engs, fras, preds):
     for token in data.tgt_vocab.to_tokens(p):
         if token == '<eos>': break
         translation.append(token)        
-    print(f'{en} => {translation}')#, bleu {bleu(" ".join(translation), fr, k=2):.3f}')  
+    print(f'{en} => {translation}, bleu,'
+          f'{bleu(" ".join(translation), fr, k=2):.3f}')  
 ```
 
 ## Summary
