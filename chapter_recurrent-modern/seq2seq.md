@@ -519,13 +519,23 @@ def accuracy(self, X, Y):
 %%tab all
 data = d2l.MTFraEng(batch_size=128) 
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.5
-encoder = Seq2SeqEncoder(
-    len(data.src_vocab), embed_size, num_hiddens, num_layers, dropout)
-decoder = Seq2SeqDecoder(
-    len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
-model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'], lr=0.005)
-trainer = d2l.Trainer(max_epochs=120, gradient_clip_val=1)
-
+if tab.selected('mxnet', 'pytorch'):
+    encoder = Seq2SeqEncoder(
+        len(data.src_vocab), embed_size, num_hiddens, num_layers, dropout)
+    decoder = Seq2SeqDecoder(
+        len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
+    model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
+                    lr=0.005)
+    trainer = d2l.Trainer(max_epochs=120, gradient_clip_val=1, num_gpus=1)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        encoder = Seq2SeqEncoder(
+            len(data.src_vocab), embed_size, num_hiddens, num_layers, dropout)
+        decoder = Seq2SeqDecoder(
+            len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
+        model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
+                        lr=0.005)
+    trainer = d2l.Trainer(max_epochs=120, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -560,7 +570,9 @@ strategies for sequence generation in
 ```{.python .input  n=14}
 %%tab all
 @d2l.add_to_class(Seq2Seq)  #@save
-def predict_step(self, batch, num_steps=9):
+def predict_step(self, batch, device=None, num_steps=9):
+    if tab.selected('mxnet', 'pytorch'):
+        batch = [d2l.to(a, device) for a in batch]
     src, tgt, _ = batch
     enc_state = self.encoder(src)[1]
     dec_state = None
@@ -657,7 +669,7 @@ and compute the BLEU of the results.
 engs = ['go .', 'i lost .', 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
 batch = data.build(engs, fras)
-preds = model.predict_step(batch)
+preds = model.predict_step(batch, d2l.try_gpu())
 for en, fr, p in zip(engs, fras, preds):
     translation = []
     for token in data.tgt_vocab.to_tokens(p):

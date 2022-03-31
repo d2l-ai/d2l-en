@@ -850,7 +850,7 @@ class Seq2Seq(d2l.EncoderDecoder):
     def configure_optimizers(self):
         return tf.keras.optimizers.Adam(learning_rate=self.lr)
 
-    def predict_step(self, batch, num_steps=9):
+    def predict_step(self, batch, device=None, num_steps=9):
         """Defined in :numref:`sec_seq2seq_training`"""
         src, tgt, _ = batch
         enc_state = self.encoder(src)[1]

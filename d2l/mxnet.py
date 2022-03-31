@@ -895,8 +895,9 @@ class Seq2Seq(d2l.EncoderDecoder):
         return gluon.Trainer(self.parameters(), 'adam',
                              {'learning_rate': self.lr})
 
-    def predict_step(self, batch, num_steps=9):
+    def predict_step(self, batch, device=None, num_steps=9):
         """Defined in :numref:`sec_seq2seq_training`"""
+        batch = [d2l.to(a, device) for a in batch]
         src, tgt, _ = batch
         enc_state = self.encoder(src)[1]
         dec_state = None

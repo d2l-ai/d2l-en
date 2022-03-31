@@ -877,8 +877,9 @@ class Seq2Seq(d2l.EncoderDecoder):
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.lr)
 
-    def predict_step(self, batch, num_steps=9):
+    def predict_step(self, batch, device=None, num_steps=9):
         """Defined in :numref:`sec_seq2seq_training`"""
+        batch = [d2l.to(a, device) for a in batch]
         src, tgt, _ = batch
         enc_state = self.encoder(src)[1]
         dec_state = None
