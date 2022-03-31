@@ -743,7 +743,7 @@ def bleu(pred_seq, label_seq, k):  #@save
 ```{.python .input}
 %%tab mxnet
 #@save
-class Seq2SeqEncoderOld(d2l.Encoder):
+class Seq2SeqEncoderOld(d2l.EncoderOld):
     """The RNN encoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -841,7 +841,7 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
 ```{.python .input}
 %%tab pytorch
 #@save
-class Seq2SeqEncoderOld(d2l.Encoder):
+class Seq2SeqEncoderOld(d2l.EncoderOld):
     """The RNN encoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -964,7 +964,7 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
 ```{.python .input}
 %%tab tensorflow
 #@save
-class Seq2SeqEncoderOld(d2l.Encoder):
+class Seq2SeqEncoderOld(d2l.EncoderOld):
     """The RNN encoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers, dropout=0, **kwargs): 
         super().__init__(*kwargs)

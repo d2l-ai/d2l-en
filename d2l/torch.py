@@ -766,10 +766,10 @@ class MTFraEng(d2l.DataModule):
             if len(parts) == 2:
                 # Skip empty tokens
                 src.append([t for t in f'{parts[0]} <eos>'.split(' ') if t])
-                tgt.append([t for t in f'<bos> {parts[1]} <eos>'.split(' ') if t])
+                tgt.append([t for t in f'{parts[1]} <eos>'.split(' ') if t])
         return src, tgt
 
-    def __init__(self, batch_size, num_steps, num_train=1000, num_val=1000):
+    def __init__(self, batch_size, num_steps=9, num_train=600, num_val=128):
         """Defined in :numref:`sec_machine_translation`"""
         super(MTFraEng, self).__init__()
         self.save_hyperparameters()
@@ -779,18 +779,22 @@ class MTFraEng(d2l.DataModule):
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
         """Defined in :numref:`sec_machine_translation`"""
-        def _build_one(sentences, vocab):
-            pad_or_trim = lambda s, n: (
-                s[:n] if len(s) > n else s + ['<pad>'] * (n - len(s)))
-            sentences = [pad_or_trim(seq, self.num_steps) for seq in sentences]
-            if vocab is None: vocab = d2l.Vocab(sentences, min_freq=2)
-            array = d2l.tensor([vocab[sent] for sent in sentences])
+        def _build_array(sentences, vocab, is_tgt=False):
+            pad_or_trim = lambda seq, t: (
+                seq[:t] if len(seq) > t else seq + ['<pad>'] * (t - len(seq)))
+            sentences = [pad_or_trim(s, self.num_steps) for s in sentences]
+            if is_tgt:
+                sentences = [['<bos>'] + s for s in sentences]
+            if vocab is None:
+                vocab = d2l.Vocab(sentences, min_freq=2)
+            array = d2l.tensor([vocab[s] for s in sentences])
             return array, vocab
         src, tgt = self._tokenize(self._preprocess(raw_text),
                                   self.num_train + self.num_val)
-        src_array, src_vocab = _build_one(src, src_vocab)
-        tgt_array, tgt_vocab = _build_one(tgt, tgt_vocab)
-        return (src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab, tgt_vocab
+        src_array, src_vocab = _build_array(src, src_vocab)
+        tgt_array, tgt_vocab = _build_array(tgt, tgt_vocab, True)
+        return ((src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab,
+                tgt_vocab)
 
     def get_dataloader(self, train):
         """Defined in :numref:`sec_machine_translation`"""
@@ -807,40 +811,41 @@ class MTFraEng(d2l.DataModule):
 
 class Encoder(nn.Module):
     """The base encoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Encoder, self).__init__(**kwargs)
+    def __init__(self):
+        super(Encoder, self).__init__()
 
-    def forward(self, X, *args):
+    def forward(self, X):
         raise NotImplementedError
 
 class Decoder(nn.Module):
     """The base decoder interface for the encoder-decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
-    def __init__(self, **kwargs):
-        super(Decoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
-    def init_state(self, enc_outputs, *args):
+    def init_state(self, enc_outputs):
         raise NotImplementedError
 
     def forward(self, X, state):
         raise NotImplementedError
 
-class EncoderDecoder(nn.Module):
+class EncoderDecoder(d2l.Classifier):
     """The base class for the encoder-decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoder, self).__init__(**kwargs)
+    def __init__(self, encoder, decoder):
+        super().__init__()
         self.encoder = encoder
         self.decoder = decoder
 
-    def forward(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state)
+    def forward(self, enc_X, dec_X):
+        enc_outputs = self.encoder(enc_X)
+        dec_state = self.decoder.init_state(enc_outputs)
+        # Return decoder output only
+        return self.decoder(dec_X, dec_state)[0]
 
-class Seq2SeqEncoder(d2l.Module):
+class Seq2SeqEncoder(d2l.Encoder):
     """The RNN encoder for sequence to sequence learning.
 
     Defined in :numref:`sec_seq2seq`"""
@@ -849,6 +854,7 @@ class Seq2SeqEncoder(d2l.Module):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(embed_size, num_hiddens, num_layers, dropout)
+
     def forward(self, X):
         # X shape: (batch_size, num_steps)
         embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int64))
@@ -858,22 +864,26 @@ class Seq2SeqEncoder(d2l.Module):
         # state shape: (num_layers, batch_size, num_hiddens)
         return output, state
 
-class Seq2Seq(d2l.Classifier):
+class Seq2Seq(d2l.EncoderDecoder):
     """Defined in :numref:`sec_seq2seq_decoder`"""
     def __init__(self, encoder, decoder, tgt_pad, lr):
-        super().__init__()
+        super().__init__(encoder, decoder)
         self.save_hyperparameters()
 
-    def forward(self, src, tgt):
-        return self.decoder(tgt, self.encoder(src)[1])[0]
+    def validation_step(self, batch):
+        Y_hat = self(*batch[:-1])
+        self.plot('loss', self.loss(Y_hat, batch[-1]), train=False)
 
-    def predict_step(self, batch):
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters(), lr=self.lr)
+
+    def predict_step(self, batch, num_steps=9):
         """Defined in :numref:`sec_seq2seq_training`"""
         src, tgt, _ = batch
         enc_state = self.encoder(src)[1]
         dec_state = None
         outputs = [d2l.expand_dims(tgt[:,0], 1), ]
-        for _ in range(tgt.shape[1]):
+        for _ in range(num_steps):
             Y, dec_state = self.decoder(outputs[-1], enc_state, dec_state)
             outputs.append(d2l.argmax(Y, 2))
         return d2l.concat(outputs[1:], 1)
@@ -983,7 +993,44 @@ class DotProductAttention(nn.Module):
         self.attention_weights = masked_softmax(scores, valid_lens)
         return torch.bmm(self.dropout(self.attention_weights), values)
 
-class AttentionDecoder(d2l.Decoder):
+class EncoderOld(nn.Module):
+    """The base encoder interface for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_seq2seq_attention`"""
+    def __init__(self, **kwargs):
+        super(EncoderOld, self).__init__(**kwargs)
+
+    def forward(self, X, *args):
+        raise NotImplementedError
+
+class DecoderOld(nn.Module):
+    """The base decoder interface for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_seq2seq_attention`"""
+    def __init__(self, **kwargs):
+        super(DecoderOld, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def forward(self, X, state):
+        raise NotImplementedError
+
+class EncoderDecoderOld(nn.Module):
+    """The base class for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_seq2seq_attention`"""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoderOld, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def forward(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state)
+
+class AttentionDecoder(d2l.DecoderOld):
     """The base attention-based decoder interface.
 
     Defined in :numref:`sec_seq2seq_attention`"""
@@ -1130,7 +1177,7 @@ class EncoderBlock(nn.Module):
         Y = self.addnorm1(X, self.attention(X, X, X, valid_lens))
         return self.addnorm2(Y, self.ffn(Y))
 
-class TransformerEncoder(d2l.Encoder):
+class TransformerEncoder(d2l.EncoderOld):
     """Transformer encoder.
 
     Defined in :numref:`sec_transformer`"""
@@ -2923,7 +2970,7 @@ def bleu(pred_seq, label_seq, k):
         score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
     return score
 
-class Seq2SeqEncoderOld(d2l.Encoder):
+class Seq2SeqEncoderOld(d2l.EncoderOld):
     """The RNN encoder for sequence to sequence learning.
 
     Defined in :numref:`sec_utils`"""
