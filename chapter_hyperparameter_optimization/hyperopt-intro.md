@@ -24,7 +24,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 :label:`sec_what_is_hpo`
 
 Hyperparameters play an important role in deep learning, and machine learning in general. Not only do they determine the generalization capabilities of trained models, they can even be critical for what constitutes the state-of-the-art. Indeed, results reported in an empirical study might look very differently for another choice of 
-hyperparameters and so would be the conclusions drawn. Unfortunately, it is not uncommon that publications do not report the specific hyperparameters that were used in experiments, for instance, to demonstrate that a proposed method is superior to previously published ones. Such studies are not reproducible, and their impact on the state-of-the-art in machine learning should be questioned :cite:`haibe-kains:2020:transparency`.
+hyperparameters and so would be the conclusions drawn.
 
 Consider the weight parameters of a deep neural network. They are automatically determined during training, e.g. by stochastic gradient descent. The **hyperparameters** of the neural network, however, cannot be learned in this way in general as their training error might not be differentiable with respect to them. Without a different form of automation, the user has to set them manually by trial-and-error, in what amounts to a time-consuming and difficult part of machine learning workflows. We distinguish between hyperparameters that control the learning algorithm (e.g., learning rate, batch size, momentum, optimizer choice) and hyperparameters that define model shape and capacity (e.g., type of activation function, number of units per layer). The choice of hyperparameters will directly affect the performance of our neural network once trained. For example, previous work beat the performance of advanced state-of-the-art machine leanrning models by optimizing the hyperparameter of much simpler ones :cite:`snoek-nips12a`. 
 
@@ -46,21 +46,21 @@ on the FashionMNIST dataset. As we would like to optimize the validation error,
 we need to add a method computing this metric.
 
 ```{.python .input  n=3}
-# %%tab pytorch, mxnet, tensorflow
+%%tab all
 
 from d2l import torch as d2l
 import torch
 from torch import nn
 
 @d2l.add_to_class(d2l.Trainer) #@save
-def evaluate(self):
-    self.model.eval()
+def validate(self, model):
+    model.eval()
     error = 0
     for batch in self.val_dataloader:
         with torch.no_grad():
             x, y = self.prepare_batch(batch)
             y_hat = self.model(x)
-            l = self.model.loss(y_hat, y)
+            l = model.loss(y_hat, y)
         error += l
         self.val_batch_idx += 1
     return error / self.val_batch_idx
@@ -71,16 +71,16 @@ consisting of `batch_size` and `learning_rate`. For each evaluation, we train ou
 for `max_epochs` epochs, then compute and return its validation error:
 
 ```{.python .input  n=4}
-%%tab pytorch, mxnet, tensorflow
+%%tab all
 
-def objective(config, max_epochs=16): #@save
+def train_and_validate_alex_net(config, max_epochs=16): #@save
     batch_size = config['batch_size']
     learning_rate = config['learning_rate']
     model = d2l.AlexNet(lr=learning_rate)
     trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=1)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     trainer.fit(model=model, data=data)
-    validation_error = trainer.evaluate()
+    validation_error = trainer.evaluate(model=model)
     return validation_error    
 ```
 
@@ -94,7 +94,7 @@ def objective(config, max_epochs=16): #@save
 ]
 ```
 
-Given our criterion $f(\mathbf{x})$ in terms of `objective(config)`, where $\mathbf{x}$
+Given our criterion $f(\mathbf{x})$ in terms of `train_and_validate_alex_net(config)`, where $\mathbf{x}$
 corresponds to `config`, we would like to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. Since $f$ is the validation error after training, there is no efficient way to compute gradients with respect to $\mathbf{x}$. While there is recent work :cite:`maclaurin-icml15`,`franceschi-icml17a` to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here.
 
 
@@ -104,7 +104,7 @@ corresponds to `config`, we would like to find $\mathbf{x}_{\star} \in argmin_{\
 Along with the objective function $f(\mathbf{x})$, we also need to define the feasible set $\mathcal{X}$ to optimize over, the *search space* or *configuration space*. Here is a possible search space for our running example:
 
 ```{.python .input  n=1}
-from syne_tune.search_space import loguniform, uniform, randint
+from syne_tune.search_space import loguniform, uniform
 
 search_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
@@ -156,9 +156,9 @@ these decisions based on observed performances of previously run trials. Such an
 observation can be passed via the `update` method.
 
 ```{.python .input  n=6}
-%%tab pytorch, mxnet, tensorflow
+%%tab all
 
-class Searcher(d2l.HyperParameters): #@save
+class HPOSearcher(d2l.HyperParameters): #@save
     def sample_configuration():
         raise NotImplementedError
     
@@ -189,7 +189,7 @@ model for). The `update` method is called whenever a trial produces a new
 metric value.
 
 ```{.python .input  n=9}
-%%tab pytorch, mxnet, tensorflow
+%%tab all
 
 class Scheduler(d2l.HyperParameters): #@save
     def suggest(self):
@@ -212,7 +212,7 @@ class Scheduler(d2l.HyperParameters): #@save
 Below we define a basic first-in first-out scheduler which simply schedules the next configuration once resources become available.
 
 ```{.python .input  n=11}
-%%tab pytorch, mxnet, tensorflow
+%%tab all
 
 class FIFOScheduler(d2l.Scheduler): #@save
     def __init__(self, searcher):
@@ -232,9 +232,9 @@ of the results. The following code implements a sequential execution of the HPO 
 job after the next) and will serve as a basic example. We will later use **Syne Tune** for more sophisticated distributed HPO cases.
 
 ```{.python .input  n=12}
-%%tab pytorch, mxnet, tensorflow
+%%tab all
 
-class Tuner(d2l.HyperParameters): #@save
+class HPOTuner(d2l.HyperParameters): #@save
     def __init__(self, scheduler, objective):
         self.save_hyperparameters()
         
@@ -280,9 +280,9 @@ make a decision (call of `self.scheduler.suggest`). In the sequel, we will plot
 (and `searcher`). This allows us to quantify not only how well the configuration found by an optimizer works, but also how quickly an optimizers is able to find it.
 
 ```{.python .input  n=1}
-%%tab pytorch, mxnet, tensorflow
+%%tab all
 
-@d2l.add_to_class(Tuner) #@save
+@d2l.add_to_class(HPOTuner) #@save
 def bookkeeping(self, config, error, runtime): 
     if self.incumbent is None or self.incumbent_error > error:
         self.incumbent = config
