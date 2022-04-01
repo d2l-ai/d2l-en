@@ -3,23 +3,6 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-```{.json .output n=1}
-[
- {
-  "data": {
-   "application/vnd.jupyter.widget-view+json": {
-    "model_id": "bb3d30caf87a431c930ba42d6b2106b5",
-    "version_major": 2,
-    "version_minor": 0
-   },
-   "text/plain": "interactive(children=(Dropdown(description='tab', index=1, options=('mxnet', 'pytorch', 'tensorflow'), value='\u2026"
-  },
-  "metadata": {},
-  "output_type": "display_data"
- }
-]
-```
-
 # Encoder-Decoder Architecture
 :label:`sec_encoder-decoder`
 
