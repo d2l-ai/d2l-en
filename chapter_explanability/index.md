@@ -1,4 +1,4 @@
-# Model Explanability : Practices and Perils
+# Model Explanability: Practices and Perils
 
 :label:`chap_xdl`
 
@@ -8,6 +8,3 @@
 overview
 ```
 
-```{.python .input}
-
-```
