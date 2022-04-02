@@ -870,7 +870,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
-        self.initialize()
+        self.initialize(init.Xavier())
 
     def forward(self, X):
         # X shape: (batch_size, num_steps)

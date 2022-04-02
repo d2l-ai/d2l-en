@@ -168,7 +168,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
-        self.initialize()
+        self.initialize(init.Xavier())
             
     def forward(self, X):
         # X shape: (batch_size, num_steps)
@@ -182,6 +182,15 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
 
 ```{.python .input}
 %%tab pytorch
+def init_seq2seq_weights(layer):  #@save
+    """Initialize weights for Seq2Seq."""
+    if type(layer) == nn.Linear:
+         nn.init.xavier_uniform_(layer.weight)
+    if type(layer) == nn.GRU:
+        for param in layer._flat_weights_names:
+            if "weight" in param:
+                nn.init.xavier_uniform_(layer._parameters[param])
+
 class Seq2SeqEncoder(d2l.Encoder):  #@save
     """The RNN encoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
@@ -189,6 +198,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(embed_size, num_hiddens, num_layers, dropout)
+        self.apply(init_seq2seq_weights)
             
     def forward(self, X):
         # X shape: (batch_size, num_steps)
@@ -317,7 +327,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
         self.dense = nn.Dense(vocab_size, flatten=False)
-        self.initialize()
+        self.initialize(init.Xavier())
             
     def init_state(self, enc_outputs):
         return enc_outputs[1] 
@@ -350,6 +360,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         self.rnn = d2l.GRU(embed_size+num_hiddens, num_hiddens,
                            num_layers, dropout)
         self.dense = nn.Linear(num_hiddens, vocab_size)
+        self.apply(init_seq2seq_weights)
             
     def init_state(self, enc_outputs):
         return enc_outputs[1] 
