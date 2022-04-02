@@ -19,7 +19,7 @@ Before delving into actual approaches for explainability,  it is worthwhile to k
 Explanations come in various forms. It can not only be simple formats such as numerical feature importance values, saliency maps, readable sentences, graphs, and bar plots, but also be a bunch of representative instances or a simple model which can be used to approximate an opaque model.
 
 ### Inherently interpretable models vs. post-hoc explanations
-While some conventional machine learning models:cite:`Bishop.2006` such as linear regression, logistic regression, naive Bayes classifier, k-nearest neighbors, decision trees, decision set, and generalized additive models (GAMs):cite:`Hastie.Tibshirani.2017` are inherently explainable, most black box models (e.g., deep neural networks, random forests:cite:`Breiman.2001`, support vector machines:cite:`Scholkopf.Smola.2002`, XGBoost:cite:`Chen.Guestrin.2016`, etc) which are often demonstrated to be more effective in many real-world applications are not. In recent years, a variety of approaches are proposed to enhance the explainability of black box models. 
+While some conventional machine learning models :cite:`Bishop.2006` such as linear regression, logistic regression, naive Bayes classifier, k-nearest neighbors, decision trees, decision set, and generalized additive models (GAMs) :cite:`Hastie.Tibshirani.2017` are inherently explainable, most black box models (e.g., deep neural networks, random forests :cite:`Breiman.2001`, support vector machines :cite:`Scholkopf.Smola.2002`, XGBoost :cite:`Chen.Guestrin.2016`, etc) which are often demonstrated to be more effective in many real-world applications are not. In recent years, a variety of approaches are proposed to enhance the explainability of black box models. 
 
 ### Global explanations vs. local explanations
 Pertaining the scope of explanations, we can classify explanations into global explanations and local explanations. Global explanation methods describe the average behavior of a black box model. A typical global explanation method is the global feature importance plot which displays how much impact each feature has on average for model predictions. On the contrary, local explanation methods are centered around the prediction of each instance and focus on explaining how a certain prediction is obtained for an individual instance. For instance, we will know which pixels make an image to be classified as a bird via local explanation methods for image classifiers.
@@ -28,10 +28,10 @@ Pertaining the scope of explanations, we can classify explanations into global e
 Based on the applicability of explanation methods, we have model agnostic explanation methods and model specific explanation methods. The former is more flexible and can be applied to any black box model regardless of its structure while the latter is limited to specific model classes.
 
 
-## Desired properties of eplanations 
+## Desired properties of explanations 
 There is no standard evaluation measures on explainability but the following dimensions, which might be difficult to quantify rigorously, can be considered as guiding intuitions when developing or evaluating explanation methods:
 
-* Fidelity (or Faithfulness) : How well does the explanation model capture the black box models. For instance, if we use a surrogate model to mimic a black box model, we can check if it can give the same outputs as the original model.
+* Fidelity (or Faithfulness) : How well does the explanation model capture the black box models. For instance, if we use a surrogate model to mimic a black box model, we can check if it can give the same outputs as the original model. We can also measure the fidelity by checking whether the prediction changes if the supposedly important features are flipped.
 * Comprehensibility: To what extent the explanations are humanly comprehensible. Explanations should be aligned to the target user's vocabulary. An  explanation which is comprehensible to machine learning engineers or domain experts does not necessarily be understandable to common users.
 * Stability: The extent to which the explanations are similar for similar inputs. The explanations on two similar inputs shall not differ to one another drastically.
 * Transparency: It is the opposite of opaque or black-boxes. Transparency can be measured by asking: how were the data collected and processed and how does the model work? In particular, we can check whether the each part of the model (i.e., input, parameter, and calculation) the error surface are understandable :cite:`Lipton.2018`.
@@ -54,5 +54,5 @@ We will lay out this chapter by first introducing global explanation methods (e.
 
 * Model explainability is essential to the usability of black box models.
 * Explanation methods can be model-agnostic or model-specific.
-* Explanations can be on the entire model as well as instance level.
+* Explanations can be on the entire model as well as at instance level.
 * Perils and pitfalls exist in explanation methods.
