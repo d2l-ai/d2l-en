@@ -845,6 +845,17 @@ class EncoderDecoder(d2l.Classifier):
         # Return decoder output only
         return self.decoder(dec_X, dec_state)[0]
 
+def init_seq2seq_weights(layer):
+    """Initialize weights for Seq2Seq.
+
+    Defined in :numref:`sec_seq2seq`"""
+    if type(layer) == nn.Linear:
+         nn.init.xavier_uniform_(layer.weight)
+    if type(layer) == nn.GRU:
+        for param in layer._flat_weights_names:
+            if "weight" in param:
+                nn.init.xavier_uniform_(layer._parameters[param])
+
 class Seq2SeqEncoder(d2l.Encoder):
     """The RNN encoder for sequence to sequence learning.
 
@@ -854,6 +865,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(embed_size, num_hiddens, num_layers, dropout)
+        self.apply(init_seq2seq_weights)
 
     def forward(self, X):
         # X shape: (batch_size, num_steps)
