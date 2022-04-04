@@ -2625,7 +2625,7 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):
     return metric[0] / metric[1]
 
 
-def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
+def train_ch6(net, train_iter, test_iter, num_epochs, lr, device, opt='SGD'):
     """Train a model with a GPU (defined in Chapter 6).
 
     Defined in :numref:`sec_utils`"""
@@ -2635,7 +2635,10 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
     net.apply(init_weights)
     print('training on', device)
     net.to(device)
-    optimizer = torch.optim.SGD(net.parameters(), lr=lr)
+    if opt=='Adam':
+        optimizer = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=1e-6)
+    else:
+        optimizer = torch.optim.SGD(net.parameters(), lr=lr)
     loss = nn.CrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
