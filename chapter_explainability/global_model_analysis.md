@@ -1,4 +1,4 @@
-# Global model analysis
+# Global Model Analysis
 
 In many cases, we want to vet the model's overall behavior instead of that on a particular instance. For example, we may be concerned about the error distributions and are keen to dig out the impact of a feature and a learnable component (e.g., weights, networks, regularizers, etc.) on the model's decision process. This section will introduce two typical global model analysis approaches, including error analysis and ablation study, which enable us to understand the entire model in depth.
 
