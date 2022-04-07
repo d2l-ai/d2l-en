@@ -167,10 +167,6 @@ In :numref:`sec_bert` and :numref:`sec_sentiment_rnn`,
 we will introduce how to use bidirectional RNNs
 to encode text sequences.
 
-
-
-
-
 ```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
