@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xl="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="294.5 645.25 453.98 194.75" width="453.98" height="194.75">
+  <defs>
+    <font-face font-family="PingFang SC" font-size="9" panose-1="2 11 4 0 0 0 0 0 0 0" units-per-em="1000" underline-position="-150" underline-thickness="58" slope="0" x-height="600" cap-height="860" ascent="1060.0021" descent="-340.0007" font-weight="400">
+      <font-face-src>
+        <font-face-name name="PingFangSC-Regular"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Arial" font-size="9" panose-1="2 11 6 4 2 2 2 2 2 4" units-per-em="1000" underline-position="-105.95703" underline-thickness="73.24219" slope="0" x-height="518.5547" cap-height="716.3086" ascent="905.2734" descent="-211.91406" font-weight="400">
+      <font-face-src>
+        <font-face-name name="ArialMT"/>
+      </font-face-src>
+    </font-face>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-5 -3 6 6" markerWidth="6" markerHeight="6" color="black">
+      <g>
+        <path d="M -4 0 L 0 0 M 0 1.5 L -4 0 L 0 -1.5" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <font-face font-family="PingFang SC" font-size="12" panose-1="2 11 8 0 0 0 0 0 0 0" units-per-em="1000" underline-position="-150" underline-thickness="80" slope="0" x-height="600" cap-height="860" ascent="1060.0021" descent="-340.0007" font-weight="600">
+      <font-face-src>
+        <font-face-name name="PingFangSC-Semibold"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <metadata> Produced by OmniGraffle 7.19.4\n2022-04-07 20:07:15 +0000</metadata>
+  <g id="Canvas_2" stroke-opacity="1" stroke-dasharray="none" fill="none" fill-opacity="1" stroke="none">
+    <title>Canvas 2</title>
+    <g id="Canvas_2_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_25">
+        <ellipse cx="398" cy="758.5" rx="103.000164583895" ry="65.5001246626111" fill="white"/>
+        <path d="M 470.8319 712.1845 C 511.0561 737.76385 511.0561 779.2361 470.8319 804.8154 C 430.60795 830.3949 365.39205 830.3949 325.1681 804.8154 C 284.9439 779.2361 284.9439 737.76385 325.1681 712.1845 C 365.39205 686.6051 430.60795 686.6051 470.8319 712.1845" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+      </g>
+      <g id="Graphic_65">
+        <rect x="507" y="764.5" width="81" height="75" fill="white"/>
+        <path d="M 507 764.5 L 588 764.5 L 588 839.5 L 507 839.5 Z" stroke="black" stroke-linecap="round" stroke-linejoin="bevel" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+      </g>
+      <g id="Graphic_2">
+        <rect x="493" y="663.25" width="49.663" height="34.5" fill="#b2d9ff"/>
+        <rect x="493" y="663.25" width="49.663" height="34.5" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(498 667.5)" fill="black">
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="9.494999" y="10">Input </tspan>
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="10.565999" y="23">data</tspan>
+        </text>
+      </g>
+      <g id="Graphic_3">
+        <rect x="409.16712" y="747" width="72.512" height="34.5" fill="#b2d9ff"/>
+        <rect x="409.16712" y="747" width="72.512" height="34.5" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(414.16712 752.6028)" fill="black">
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="9.5075" y="10">Black-box </tspan>
+          <tspan font-family="Arial" font-size="9" font-weight="400" fill="black" x="16.749653" y="21">models</tspan>
+        </text>
+      </g>
+      <g id="Graphic_4">
+        <rect x="315" y="750.25" width="72.512" height="34.5" fill="#66bfff"/>
+        <rect x="315" y="750.25" width="72.512" height="34.5" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(320 754.5)" fill="black">
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="6.9560005" y="10">Explanation </tspan>
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="13.265" y="23">methods</tspan>
+        </text>
+      </g>
+      <g id="Graphic_5">
+        <rect x="514.5" y="769.5" width="67.3315" height="29" fill="#b2d9ff"/>
+        <rect x="514.5" y="769.5" width="67.3315" height="29" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(519.5 777.5)" fill="black">
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="5.2117505" y="10">Predictions</tspan>
+        </text>
+      </g>
+      <g id="Line_8">
+        <line x1="464.19585" y1="742.5368" x2="502.91754" y2="697.75" marker-start="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_9">
+        <line x1="389.5136" y1="747.5186" x2="493" y2="693.4691" marker-start="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_11">
+        <line x1="508.7061" y1="776.41475" x2="481.6791" y2="771.2194" marker-start="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_13">
+        <line x1="393.4085" y1="766.0452" x2="409.16712" y2="765.5013" marker-start="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_18">
+        <rect x="514.5014" y="807" width="67.3315" height="29" fill="#66bfff"/>
+        <rect x="514.5014" y="807" width="67.3315" height="29" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(519.5014 815)" fill="black">
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="2.0932505" y="10">Explanations</tspan>
+        </text>
+      </g>
+      <g id="Line_19">
+        <line x1="508.81145" y1="810.7073" x2="387.512" y2="777.4427" marker-start="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_21">
+        <rect x="661.4126" y="663.25" width="49.663" height="34.5" fill="white"/>
+        <rect x="661.4126" y="663.25" width="49.663" height="34.5" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Group_37">
+        <g id="Graphic_47">
+          <ellipse cx="681.87425" cy="749.5" rx="24.8315272625376" ry="24.5000268985831" fill="white"/>
+          <ellipse cx="681.87425" cy="749.5" rx="24.8315272625376" ry="24.5000268985831" stroke="black" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+        </g>
+        <g id="Graphic_46">
+          <path d="M 662.61744 751.999 C 662.61744 756.8255 666.2863 761.2784 672.24585 763.69165 C 678.2054 766.1049 685.5431 766.1049 691.50265 763.69165 C 697.4622 761.2784 701.1311 756.8255 701.1311 751.999" stroke="black" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1.63"/>
+        </g>
+        <g id="Graphic_44">
+          <line x1="665.15025" y1="750.4984" x2="660.0846" y2="753.4997" fill="white"/>
+          <line x1="665.15025" y1="750.4984" x2="660.0846" y2="753.4997" stroke="black" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+        </g>
+        <g id="Graphic_43">
+          <line x1="698.59825" y1="750.4984" x2="703.6639" y2="753.4997" fill="white"/>
+          <line x1="698.59825" y1="750.4984" x2="703.6639" y2="753.4997" stroke="black" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+        </g>
+        <g id="Graphic_42">
+          <ellipse cx="670.7249" cy="742.4992" rx="1.52029758750228" ry="4.0000043916053" fill="white"/>
+          <ellipse cx="670.7249" cy="742.4992" rx="1.52029758750228" ry="4.0000043916053" stroke="black" stroke-linecap="butt" stroke-linejoin="round" stroke-width="4.9"/>
+        </g>
+        <g id="Graphic_41">
+          <ellipse cx="693.0236" cy="742.4992" rx="1.52029758750222" ry="4.0000043916053" fill="white"/>
+          <ellipse cx="693.0236" cy="742.4992" rx="1.52029758750222" ry="4.0000043916053" stroke="black" stroke-linecap="butt" stroke-linejoin="round" stroke-width="4.9"/>
+        </g>
+      </g>
+      <g id="Graphic_48">
+        <path d="M 649.9881 663.25 L 686.2468 645.75 L 722.5001 663.25 Z" fill="black"/>
+        <path d="M 649.9881 663.25 L 686.2468 645.75 L 722.5001 663.25 Z" stroke="black" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_49">
+        <rect x="680.2943" y="680.25" width="11.8995" height="17.5" fill="black"/>
+        <rect x="680.2943" y="680.25" width="11.8995" height="17.5" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_70">
+        <line x1="653.2856" y1="760.6696" x2="588" y2="786.1767" marker-start="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_71">
+        <line x1="548.1015" y1="693.2322" x2="659.0258" y2="739.8895" marker-start="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_75">
+        <line x1="683.42285" y1="725.0474" x2="685.1516" y2="697.75" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_76">
+        <text transform="translate(353.76 706)" fill="black">
+          <tspan font-family="PingFang SC" font-size="12" font-weight="600" fill="black" x="20428104e-20" y="13">Bank</tspan>
+        </text>
+      </g>
+      <g id="Graphic_78">
+        <text transform="translate(569.9295 676)" fill="black">
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="5.094" y="10">Apply for </tspan>
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="0" y="23">a mortgage</tspan>
+        </text>
+      </g>
+      <g id="Graphic_79">
+        <text transform="translate(599 780)" fill="black">
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="1.6410381" y="10">Your application is rejected </tspan>
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="4.822538" y="23">because your credit score </tspan>
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="19.245038" y="36">is not high enough.</tspan>
+        </text>
+      </g>
+      <g id="Graphic_80">
+        <text transform="translate(692 706)" fill="black">
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="0" y="10">Buy a house</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>
