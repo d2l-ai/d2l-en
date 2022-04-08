@@ -798,12 +798,12 @@ class MTFraEng(d2l.DataModule):
                 tgt_vocab)
 
     def get_dataloader(self, train):
-        """Defined in :numref:`sec_machine_translation`"""
+        """Defined in :numref:`subsec_loading-seq-fixed-len`"""
         idx = slice(0, self.num_train) if train else slice(self.num_train, None)
         return self.get_tensorloader(self.arrays, train, idx)
 
     def build(self, src_sentences, tgt_sentences):
-        """Defined in :numref:`sec_machine_translation`"""
+        """Defined in :numref:`subsec_loading-seq-fixed-len`"""
         raw_text = '\n'.join([src + '\t' + tgt for src, tgt in zip(
             src_sentences, tgt_sentences)])
         arrays, _, _ = self._build_arrays(
@@ -901,6 +901,7 @@ class Seq2Seq(d2l.EncoderDecoder):
         self.plot('loss', self.loss(Y_hat, batch[-1]), train=False)
 
     def configure_optimizers(self):
+        # Adam optimizer is used here
         return torch.optim.Adam(self.parameters(), lr=self.lr)
 
     def predict_step(self, batch, device=None, num_steps=9):

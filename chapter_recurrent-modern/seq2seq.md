@@ -62,12 +62,39 @@ the final hidden state of the encoder
 is also fed into the decoder as
 part of the inputs
 at every time step as shown in :numref:`fig_seq2seq`.
-Similar to the training of language models in
-:numref:`sec_language-model`,
-we can allow the labels to be the original output sequence,
+
+
+## Teacher Forcing
+
+While the encoder input
+is just tokens from the source sequence,
+the decoder input and output
+are not so straightforward
+in encoder-decoder training.
+A common approach is *teacher forcing*,
+where the original target sequence (token labels)
+is fed into the decoder as input.
+More concretely,
+the special beginning-of-sequence token
+and the original target sequence excluding the final token 
+are concatenated as
+input to the decoder,
+while the decoder output (labels for training) is
+the original target sequence,
 shifted by one token:
 "&lt;bos&gt;", "Ils", "regardent", "." $\rightarrow$
-"Ils", "regardent", ".", "&lt;eos&gt;".
+"Ils", "regardent", ".", "&lt;eos&gt;" (:numref:`fig_seq2seq`).
+
+Our implementation in
+:numref:`subsec_loading-seq-fixed-len`
+prepared training data for teacher forcing,
+where shifting tokens for self-supervised learning
+is similar to the training of language models in
+:numref:`sec_language-model`.
+An alternative approach is
+to feed the *predicted* token
+from the previous time step
+as the current input to the decoder.
 
 
 In the following,
@@ -239,10 +266,10 @@ we instantiate a two-layer GRU encoder
 whose number of hidden units is 16.
 Given
 a minibatch of sequence inputs `X`
-(batch size: 4, number of time steps: 7),
+(batch size: 4, number of time steps: 9),
 the hidden states of the last layer
 at all the time steps
-(`output` return by the encoder's recurrent layers)
+(`outputs` return by the encoder's recurrent layers)
 are a tensor
 of shape
 (number of time steps, batch size, number of hidden units).
@@ -257,11 +284,6 @@ X = d2l.zeros((batch_size, num_steps))
 outputs, state = encoder(X)
 
 d2l.check_shape(outputs, (num_steps, batch_size, num_hiddens))
-if tab.selected('mxnet', 'pytorch'):
-    d2l.check_shape(state, (num_layers, batch_size, num_hiddens))
-if tab.selected('tensorflow'):
-    d2l.check_len(state, num_layers)
-    d2l.check_shape(state[0], (batch_size, num_hiddens))
 ```
 
 Since a GRU is employed here,
@@ -269,8 +291,14 @@ the shape of the multilayer hidden states
 at the final time step
 is
 (number of hidden layers, batch size, number of hidden units).
-If an LSTM is used,
-memory cell information will also be contained in `state`.
+
+```{.python .input}
+if tab.selected('mxnet', 'pytorch'):
+    d2l.check_shape(state, (num_layers, batch_size, num_hiddens))
+if tab.selected('tensorflow'):
+    d2l.check_len(state, num_layers)
+    d2l.check_shape(state[0], (batch_size, num_hiddens))
+```
 
 ## [**Decoder**]
 :label:`sec_seq2seq_decoder`
@@ -421,7 +449,8 @@ where the last dimension of the tensor stores the predicted token distribution.
 ```{.python .input  n=8}
 %%tab all
 decoder = Seq2SeqDecoder(vocab_size, embed_size, num_hiddens, num_layers)
-outputs, state = decoder(X, encoder(X)[1])
+state = decoder.init_state(encoder(X))
+outputs, state = decoder(X, state)
 
 d2l.check_shape(outputs, (batch_size, num_steps, vocab_size))
 if tab.selected('mxnet', 'pytorch'):
@@ -439,7 +468,14 @@ the layers in the above RNN encoder-decoder model are illustrated in :numref:`fi
 
 
 
-## Seq2seq model
+## Encoder-Decoder for Sequence to Sequence Learning
+
+
+Based on the architecture described
+in :numref:`sec_encoder-decoder`,
+the RNN encoder-decoder
+model for sequence to sequence learning just puts 
+the RNN encoder and the RNN decoder together. 
 
 ```{.python .input  n=9}
 %%tab all
@@ -453,6 +489,7 @@ class Seq2Seq(d2l.EncoderDecoder):  #@save
         self.plot('loss', self.loss(Y_hat, batch[-1]), train=False)
         
     def configure_optimizers(self):
+        # Adam optimizer is used here
         if tab.selected('mxnet'):
             return gluon.Trainer(self.parameters(), 'adam',
                                  {'learning_rate': self.lr})
@@ -462,7 +499,7 @@ class Seq2Seq(d2l.EncoderDecoder):  #@save
             return tf.keras.optimizers.Adam(learning_rate=self.lr)
 ```
 
-## Loss Function
+## Loss Function with Masking
 
 At each time step, the decoder
 predicts a probability distribution for the output tokens.
@@ -478,21 +515,12 @@ in minibatches of the same shape.
 However,
 prediction of padding tokens
 should be excluded from loss calculations.
-
 To this end,
-we can use the following
-`sequence_mask` function
-to [**mask irrelevant entries with zero values**]
-so later
+we can 
+[**mask irrelevant entries with zero values**]
+so that
 multiplication of any irrelevant prediction
 with zero equals to zero.
-For example,
-if the valid length of two sequences
-excluding padding tokens
-are one and two, respectively,
-the remaining entries after
-the first one
-and the first two entries are cleared to zeros.
 
 ```{.python .input  n=10}
 %%tab all
@@ -506,25 +534,8 @@ def loss(self, Y_hat, Y):
 ## [**Training**]
 :label:`sec_seq2seq_training`
 
-In the following training loop,
-we concatenate the special beginning-of-sequence token
-and the original output sequence excluding the final token as
-the input to the decoder, as shown in :numref:`fig_seq2seq`.
-This is called *teacher forcing* because
-the original output sequence (token labels) is fed into the decoder.
-Alternatively,
-we could also feed the *predicted* token
-from the previous time step
-as the current input to the decoder.
-
-```{.python .input  n=11}
-%%tab all
-@d2l.add_to_class(Seq2Seq)
-def accuracy(self, X, Y):
-    acc = super(Seq2Seq, self).accuracy(X, Y, averaged=False)
-    mask = d2l.astype(d2l.reshape(Y, -1) != self.tgt_pad, d2l.float32)
-    return d2l.reduce_sum(acc * mask) / d2l.reduce_sum(mask)
-```
+Now we can [**create and train an RNN encoder-decoder model**]
+for sequence to sequence learning on the machine translation dataset.
 
 ```{.python .input  n=13}
 %%tab all
@@ -549,10 +560,6 @@ if tab.selected('tensorflow'):
     trainer = d2l.Trainer(max_epochs=75, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
-
-Now we can [**create and train an RNN encoder-decoder model**]
-for sequence to sequence learning on the machine translation dataset.
-
 
 ## [**Prediction**]
 
@@ -694,9 +701,9 @@ for en, fr, p in zip(engs, fras, preds):
 ## Summary
 
 * Following the design of the encoder-decoder architecture, we can use two RNNs to design a model for sequence to sequence learning.
+* In encoder-decoder training, the teacher forcing approach feeds original output sequences (in contrast to predictions) into the decoder.
 * When implementing the encoder and the decoder, we can use multilayer RNNs.
 * We can use masks to filter out irrelevant computations, such as when calculating the loss.
-* In encoder-decoder training, the teacher forcing approach feeds original output sequences (in contrast to predictions) into the decoder.
 * BLEU is a popular measure for evaluating output sequences by matching $n$-grams between the predicted sequence and the label sequence.
 
 

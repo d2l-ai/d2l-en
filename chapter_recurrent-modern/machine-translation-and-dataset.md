@@ -209,6 +209,7 @@ show_list_len_pair_hist(['source', 'target'], '# tokens per sequence',
 ```
 
 ## Loading Sequences of Fixed Length
+:label:`subsec_loading-seq-fixed-len`
 
 Recall that in language modeling
 [**each sequence example**],
