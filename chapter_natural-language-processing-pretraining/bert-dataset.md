@@ -134,8 +134,8 @@ the token indices where predictions take place and labels for these predictions.
 #@save
 def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
                         vocab):
-    # Make a new copy of tokens and replace some of them by '<mask>' or random tokens.
-    # The modified tokens can be used as an input of a masked language model.
+    # For the input of a masked language model, make a new copy of tokens and
+    # replace some of them by '<mask>' or random tokens
     mlm_input_tokens = [token for token in tokens]
     pred_positions_and_labels = []
     # Shuffle for getting 15% random tokens for prediction in the masked

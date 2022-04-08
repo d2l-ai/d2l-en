@@ -2270,8 +2270,8 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
 def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
                         vocab):
     """Defined in :numref:`sec_bert-dataset`"""
-    # Make a new copy of tokens for the input of a masked language model,
-    # where the input may contain replaced '<mask>' or random tokens
+    # For the input of a masked language model, make a new copy of tokens and
+    # replace some of them by '<mask>' or random tokens
     mlm_input_tokens = [token for token in tokens]
     pred_positions_and_labels = []
     # Shuffle for getting 15% random tokens for prediction in the masked
