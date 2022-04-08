@@ -147,15 +147,26 @@ in :numref:`sec_language-model`,
 for machine translation
 we prefer word-level tokenization here
 (state-of-the-art models may use more advanced tokenization techniques).
-The following `tokenize_nmt` function
-tokenizes the the first `num_examples` text sequence pairs,
+The following `_tokenize` method
+tokenizes the the first `max_examples` text sequence pairs,
 where
 each token is either a word or a punctuation mark.
-This function returns
-two lists of token lists: `source` and `target`.
+We append the special “&lt;eos&gt;” token
+to the end of every sequence to indicate the
+end of the sequence.
+When a model is predicting
+by
+generating a sequence token after token,
+the generation
+of the “&lt;eos&gt;” token
+can suggest that
+the output sequence is complete.
+In the end,
+the method below returns
+two lists of token lists: `src` and `tgt`.
 Specifically,
-`source[i]` is a list of tokens from the
-$i^\mathrm{th}$ text sequence in the source language (English here) and `target[i]` is that in the target language (French here).
+`src[i]` is a list of tokens from the
+$i^\mathrm{th}$ text sequence in the source language (English here) and `tgt[i]` is that in the target language (French here).
 
 ```{.python .input  n=7}
 %%tab all
@@ -181,17 +192,23 @@ most of the text sequences have fewer than 20 tokens.
 
 ```{.python .input  n=8}
 %%tab all
-d2l.set_figsize((4.5, 2.5))
-_, _, patches = d2l.plt.hist([[len(l) for l in src], 
-                              [len(l) for l in tgt]])
-d2l.plt.xlabel('# tokens per sequence'), d2l.plt.ylabel('count')
-d2l.plt.xlim([0, 30])
-for patch in patches[1].patches:
-    patch.set_hatch('-')
-_ = d2l.plt.legend(['source', 'target'])
+#@save
+def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
+    """Plot the histogram for list length pairs."""
+    d2l.set_figsize()
+    _, _, patches = d2l.plt.hist(
+        [[len(l) for l in xlist], [len(l) for l in ylist]])
+    d2l.plt.xlabel(xlabel)
+    d2l.plt.ylabel(ylabel)
+    for patch in patches[1].patches:
+        patch.set_hatch('/')
+    d2l.plt.legend(legend)
+
+show_list_len_pair_hist(['source', 'target'], '# tokens per sequence',
+                        'count', src, tgt);
 ```
 
-## Fixed Length Examples
+## Loading Sequences of Fixed Length
 
 Recall that in language modeling
 [**each sequence example**],
@@ -221,26 +238,7 @@ every text sequence
 will have the same length
 to be loaded in minibatches of the same shape.
 
-Now we define a function to [**transform
-text sequences into minibatches for training.**]
-We append the special “&lt;eos&gt;” token
-to the end of every sequence to indicate the
-end of the sequence.
-When a model is predicting
-by
-generating a sequence token after token,
-the generation
-of the “&lt;eos&gt;” token
-can suggest that
-the output sequence is complete.
-Besides,
-we also record the length
-of each text sequence excluding the padding tokens.
-This information will be needed by
-some models that
-we will cover later.
 
-## [**Vocabulary**]
 
 Since the machine translation dataset
 consists of pairs of languages,
@@ -254,18 +252,17 @@ To alleviate this,
 here we treat infrequent tokens
 that appear less than 2 times
 as the same unknown ("&lt;unk&gt;") token.
-Besides that,
-we specify additional special tokens
-such as for padding ("&lt;pad&gt;") sequences to the same length in minibatches,
-and for marking the beginning ("&lt;bos&gt;") or end ("&lt;eos&gt;") of sequences.
-Such special tokens are commonly used in
-natural language processing tasks.
-
-## [**Putting All Things Together**]
-
-Finally, we define the `load_data_nmt` function
-to return the data iterator, together with
-the vocabularies for both the source language and the target language.
+As we will explain 
+later (:numref:`fig_seq2seq`),
+when training with target sequences,
+the decoder output
+can be the same decoder input, shifted
+by one token;
+and
+the special beginning-of-sequence
+"&lt;bos&gt;" token
+will be used as the first input token
+for predicting the target sequence (:numref:`fig_seq2seq_predict`).
 
 ```{.python .input  n=9}
 %%tab all
@@ -275,7 +272,8 @@ def __init__(self, batch_size, num_steps=9, num_train=512, num_val=128):
     self.save_hyperparameters()
     self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
         self._download())
-    
+
+
 @d2l.add_to_class(MTFraEng)  #@save
 def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
     def _build_array(sentences, vocab, is_tgt=False):
@@ -296,6 +294,11 @@ def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
             tgt_vocab)
 ```
 
+## [**Reading the Dataset**]
+
+Finally, we define the `get_dataloader` method
+to return the data iterator.
+
 ```{.python .input  n=10}
 %%tab all
 @d2l.add_to_class(MTFraEng)  #@save
@@ -311,15 +314,19 @@ Let's [**read the first minibatch from the English-French dataset.**]
 data = MTFraEng(batch_size=3)
 src, tgt, label = next(iter(data.train_dataloader()))
 print('source:', d2l.astype(src, d2l.int32))
-print('target:', d2l.astype(tgt, d2l.int32))
-print('label:', d2l.astype(label, d2l.int32))
+print('decoder input:', d2l.astype(tgt, d2l.int32))
+print('decoder output:', d2l.astype(label, d2l.int32))
 ```
+
+Below we show a pair of source and target sequences
+that are processed by the above `_build_arrays` method
+(in the string format).
 
 ```{.python .input  n=12}
 %%tab all
 @d2l.add_to_class(MTFraEng)  #@save
 def build(self, src_sentences, tgt_sentences):
-    raw_text = '\n'.join([src+'\t'+tgt for src, tgt in zip(
+    raw_text = '\n'.join([src + '\t' + tgt for src, tgt in zip(
         src_sentences, tgt_sentences)])
     arrays, _, _ = self._build_arrays(
         raw_text, self.src_vocab, self.tgt_vocab)
@@ -342,7 +349,7 @@ print('target:', data.tgt_vocab.to_tokens(d2l.astype(tgt[0], d2l.int32)))
 
 ## Exercises
 
-1. Try different values of the `num_examples` argument in the `load_data_nmt` function. How does this affect the vocabulary sizes of the source language and the target language?
+1. Try different values of the `max_examples` argument in the `_tokenize` method. How does this affect the vocabulary sizes of the source language and the target language?
 1. Text in some languages such as Chinese and Japanese does not have word boundary indicators (e.g., space). Is word-level tokenization still a good idea for such cases? Why or why not?
 
 :begin_tab:`mxnet`

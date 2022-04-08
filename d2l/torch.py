@@ -776,6 +776,7 @@ class MTFraEng(d2l.DataModule):
         self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
             self._download())
     
+    
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
         """Defined in :numref:`sec_machine_translation`"""
@@ -803,11 +804,24 @@ class MTFraEng(d2l.DataModule):
 
     def build(self, src_sentences, tgt_sentences):
         """Defined in :numref:`sec_machine_translation`"""
-        raw_text = '\n'.join([src+'\t'+tgt for src, tgt in zip(
+        raw_text = '\n'.join([src + '\t' + tgt for src, tgt in zip(
             src_sentences, tgt_sentences)])
         arrays, _, _ = self._build_arrays(
             raw_text, self.src_vocab, self.tgt_vocab)
         return arrays
+
+def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
+    """Plot the histogram for list length pairs.
+
+    Defined in :numref:`sec_machine_translation`"""
+    d2l.set_figsize()
+    _, _, patches = d2l.plt.hist(
+        [[len(l) for l in xlist], [len(l) for l in ylist]])
+    d2l.plt.xlabel(xlabel)
+    d2l.plt.ylabel(ylabel)
+    for patch in patches[1].patches:
+        patch.set_hatch('/')
+    d2l.plt.legend(legend)
 
 class Encoder(nn.Module):
     """The base encoder interface for the encoder-decoder architecture."""
@@ -2914,18 +2928,6 @@ def tokenize_nmt(text, num_examples=None):
             target.append(parts[1].split(' '))
     return source, target
 
-def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
-    """Plot the histogram for list length pairs.
-
-    Defined in :numref:`sec_utils`"""
-    d2l.set_figsize()
-    _, _, patches = d2l.plt.hist(
-        [[len(l) for l in xlist], [len(l) for l in ylist]])
-    d2l.plt.xlabel(xlabel)
-    d2l.plt.ylabel(ylabel)
-    for patch in patches[1].patches:
-        patch.set_hatch('/')
-    d2l.plt.legend(legend)
 
 def truncate_pad(line, num_steps, padding_token):
     """Truncate or pad sequences.
