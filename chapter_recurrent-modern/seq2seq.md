@@ -197,7 +197,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
         self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
         self.initialize(init.Xavier())
             
-    def forward(self, X):
+    def forward(self, X, *args):
         # X shape: (batch_size, num_steps)
         embs = self.embedding(d2l.transpose(X))
         # embs shape: (num_steps, batch_size, embed_size)    
@@ -227,7 +227,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
         self.rnn = d2l.GRU(embed_size, num_hiddens, num_layers, dropout)
         self.apply(init_seq2seq_weights)
             
-    def forward(self, X):
+    def forward(self, X, *args):
         # X shape: (batch_size, num_steps)
         embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int64))
         # embs shape: (num_steps, batch_size, embed_size)    
@@ -247,7 +247,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
         self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
             
-    def call(self, X):
+    def call(self, X, *args):
         # X shape: (batch_size, num_steps)
         embs = self.embedding(d2l.transpose(X))
         # embs shape: (num_steps, batch_size, embed_size)    
@@ -357,7 +357,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         self.dense = nn.Dense(vocab_size, flatten=False)
         self.initialize(init.Xavier())
             
-    def init_state(self, enc_outputs):
+    def init_state(self, enc_outputs, *args):
         return enc_outputs[1] 
 
     def forward(self, X, enc_state, state=None):
@@ -390,7 +390,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         self.dense = nn.Linear(num_hiddens, vocab_size)
         self.apply(init_seq2seq_weights)
             
-    def init_state(self, enc_outputs):
+    def init_state(self, enc_outputs, *args):
         return enc_outputs[1] 
 
     def forward(self, X, enc_state, state=None):
@@ -421,7 +421,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
         self.dense = tf.keras.layers.Dense(vocab_size)
             
-    def init_state(self, enc_outputs):
+    def init_state(self, enc_outputs, *args):
         return enc_outputs[1] 
 
     def call(self, X, enc_state, state=None):
@@ -475,7 +475,7 @@ Based on the architecture described
 in :numref:`sec_encoder-decoder`,
 the RNN encoder-decoder
 model for sequence to sequence learning just puts 
-the RNN encoder and the RNN decoder together. 
+the RNN encoder and the RNN decoder together.
 
 ```{.python .input  n=9}
 %%tab all
@@ -591,7 +591,7 @@ strategies for sequence generation in
 def predict_step(self, batch, device=None, num_steps=9):
     if tab.selected('mxnet', 'pytorch'):
         batch = [d2l.to(a, device) for a in batch]
-    src, tgt, _ = batch
+    src, tgt, _, _ = batch
     enc_outputs = self.encoder(src)
     dec_state = self.decoder.init_state(enc_outputs)
     outputs = [d2l.expand_dims(tgt[:,0], 1), ]

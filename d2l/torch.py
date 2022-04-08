@@ -789,13 +789,15 @@ class MTFraEng(d2l.DataModule):
             if vocab is None:
                 vocab = d2l.Vocab(sentences, min_freq=2)
             array = d2l.tensor([vocab[s] for s in sentences])
-            return array, vocab
+            valid_len = d2l.reduce_sum(
+                d2l.astype(array != vocab['<pad>'], d2l.int32), 1)
+            return array, vocab, valid_len
         src, tgt = self._tokenize(self._preprocess(raw_text),
                                   self.num_train + self.num_val)
-        src_array, src_vocab = _build_array(src, src_vocab)
-        tgt_array, tgt_vocab = _build_array(tgt, tgt_vocab, True)
-        return ((src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab,
-                tgt_vocab)
+        src_array, src_vocab, src_valid_len = _build_array(src, src_vocab)
+        tgt_array, tgt_vocab, _ = _build_array(tgt, tgt_vocab, True)
+        return ((src_array, tgt_array[:,:-1], src_valid_len, tgt_array[:,1:]),
+                src_vocab, tgt_vocab)
 
     def get_dataloader(self, train):
         """Defined in :numref:`subsec_loading-seq-fixed-len`"""
@@ -828,7 +830,8 @@ class Encoder(nn.Module):
     def __init__(self):
         super(Encoder, self).__init__()
 
-    def forward(self, X):
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def forward(self, X, *args):
         raise NotImplementedError
 
 class Decoder(nn.Module):
@@ -838,7 +841,8 @@ class Decoder(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def init_state(self, enc_outputs):
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def init_state(self, enc_outputs, *args):
         raise NotImplementedError
 
     def forward(self, X, state):
@@ -853,9 +857,9 @@ class EncoderDecoder(d2l.Classifier):
         self.encoder = encoder
         self.decoder = decoder
 
-    def forward(self, enc_X, dec_X):
-        enc_outputs = self.encoder(enc_X)
-        dec_state = self.decoder.init_state(enc_outputs)
+    def forward(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
         # Return decoder output only
         return self.decoder(dec_X, dec_state)[0]
 
@@ -881,7 +885,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         self.rnn = d2l.GRU(embed_size, num_hiddens, num_layers, dropout)
         self.apply(init_seq2seq_weights)
 
-    def forward(self, X):
+    def forward(self, X, *args):
         # X shape: (batch_size, num_steps)
         embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int64))
         # embs shape: (num_steps, batch_size, embed_size)
@@ -907,7 +911,7 @@ class Seq2Seq(d2l.EncoderDecoder):
     def predict_step(self, batch, device=None, num_steps=9):
         """Defined in :numref:`sec_seq2seq_training`"""
         batch = [d2l.to(a, device) for a in batch]
-        src, tgt, _ = batch
+        src, tgt, _, _ = batch
         enc_outputs = self.encoder(src)
         dec_state = self.decoder.init_state(enc_outputs)
         outputs = [d2l.expand_dims(tgt[:,0], 1), ]
