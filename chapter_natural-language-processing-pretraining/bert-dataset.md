@@ -134,8 +134,8 @@ the token indices where predictions take place and labels for these predictions.
 #@save
 def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
                         vocab):
-    # Make a new copy of tokens for the input of a masked language model,
-    # where the input may contain replaced '<mask>' or random tokens
+    # Make a new copy of tokens and replace some of them by '<mask>' or random tokens.
+    # The modified tokens can be used as an input of a masked language model.
     mlm_input_tokens = [token for token in tokens]
     pred_positions_and_labels = []
     # Shuffle for getting 15% random tokens for prediction in the masked
@@ -196,7 +196,7 @@ def _get_mlm_data_from_tokens(tokens, vocab):
 Now we are almost ready to customize a `Dataset` class for pretraining BERT.
 Before that, 
 we still need to define a helper function `_pad_bert_inputs`
-to [**append the special “&lt;mask&gt;” tokens to the inputs.**]
+to [**append the special “&lt;pad&gt;” tokens to the inputs.**]
 Its argument `examples` contain the outputs from the helper functions `_get_nsp_data_from_paragraph` and `_get_mlm_data_from_tokens` for the two pretraining tasks.
 
 ```{.python .input}
