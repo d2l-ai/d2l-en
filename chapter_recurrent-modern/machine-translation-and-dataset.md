@@ -238,7 +238,8 @@ In this way,
 every text sequence
 will have the same length
 to be loaded in minibatches of the same shape.
-
+Besides, we also record length of the source sequence excluding padding tokens.
+This information will be needed by some models that we will cover later.
 
 
 Since the machine translation dataset
@@ -256,9 +257,9 @@ as the same unknown ("&lt;unk&gt;") token.
 As we will explain 
 later (:numref:`fig_seq2seq`),
 when training with target sequences,
-the decoder output
-can be the same decoder input, shifted
-by one token;
+the decoder output (label tokens)
+can be the same decoder input (target tokens),
+shifted by one token;
 and
 the special beginning-of-sequence
 "&lt;bos&gt;" token
@@ -286,13 +287,15 @@ def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
         if vocab is None:
             vocab = d2l.Vocab(sentences, min_freq=2)
         array = d2l.tensor([vocab[s] for s in sentences])
-        return array, vocab
+        valid_len = d2l.reduce_sum(
+            d2l.astype(array != vocab['<pad>'], d2l.int32), 1)
+        return array, vocab, valid_len
     src, tgt = self._tokenize(self._preprocess(raw_text), 
                               self.num_train + self.num_val)
-    src_array, src_vocab = _build_array(src, src_vocab)
-    tgt_array, tgt_vocab = _build_array(tgt, tgt_vocab, True)
-    return ((src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab,
-            tgt_vocab)
+    src_array, src_vocab, src_valid_len = _build_array(src, src_vocab)
+    tgt_array, tgt_vocab, _ = _build_array(tgt, tgt_vocab, True)
+    return ((src_array, tgt_array[:,:-1], src_valid_len, tgt_array[:,1:]),
+            src_vocab, tgt_vocab)
 ```
 
 ## [**Reading the Dataset**]
@@ -313,10 +316,11 @@ Let's [**read the first minibatch from the English-French dataset.**]
 ```{.python .input  n=11}
 %%tab all
 data = MTFraEng(batch_size=3)
-src, tgt, label = next(iter(data.train_dataloader()))
+src, tgt, src_valid_len, label = next(iter(data.train_dataloader()))
 print('source:', d2l.astype(src, d2l.int32))
 print('decoder input:', d2l.astype(tgt, d2l.int32))
-print('decoder output:', d2l.astype(label, d2l.int32))
+print('source len excluding pad:', d2l.astype(src_valid_len, d2l.int32))
+print('label:', d2l.astype(label, d2l.int32))
 ```
 
 Below we show a pair of source and target sequences
@@ -336,7 +340,7 @@ def build(self, src_sentences, tgt_sentences):
 
 ```{.python .input  n=13}
 %%tab all
-src, tgt, _ = data.build(['hi .'], ['salut .'])
+src, tgt, _,  _ = data.build(['hi .'], ['salut .'])
 print('source:', data.src_vocab.to_tokens(d2l.astype(src[0], d2l.int32)))
 print('target:', data.tgt_vocab.to_tokens(d2l.astype(tgt[0], d2l.int32)))
 ```

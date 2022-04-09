@@ -61,7 +61,8 @@ class Encoder(nn.Block):
     def __init__(self):
         super(Encoder, self).__init__()
 
-    def forward(self, X):
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def forward(self, X, *args):
         raise NotImplementedError
 ```
 
@@ -76,7 +77,8 @@ class Encoder(nn.Module):
     def __init__(self):
         super(Encoder, self).__init__()
 
-    def forward(self, X):
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def forward(self, X, *args):
         raise NotImplementedError
 ```
 
@@ -91,7 +93,8 @@ class Encoder(tf.keras.layers.Layer):
     def __init__(self):
         super(Encoder, self).__init__()
 
-    def call(self, X):
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def call(self, X, *args):
         raise NotImplementedError
 ```
 
@@ -120,7 +123,8 @@ class Decoder(nn.Block):
     def __init__(self):
         super().__init__()
 
-    def init_state(self, enc_outputs):
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def init_state(self, enc_outputs, *args):
         raise NotImplementedError
 
     def forward(self, X, state):
@@ -135,7 +139,8 @@ class Decoder(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def init_state(self, enc_outputs):
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def init_state(self, enc_outputs, *args):
         raise NotImplementedError
 
     def forward(self, X, state):
@@ -150,7 +155,8 @@ class Decoder(tf.keras.layers.Layer):
     def __init__(self):
         super().__init__()
 
-    def init_state(self, enc_outputs):
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def init_state(self, enc_outputs, *args):
         raise NotImplementedError
 
     def call(self, X, state):
@@ -179,9 +185,9 @@ class EncoderDecoder(d2l.Classifier):
         self.encoder = encoder
         self.decoder = decoder
 
-    def forward(self, enc_X, dec_X):
-        enc_outputs = self.encoder(enc_X)
-        dec_state = self.decoder.init_state(enc_outputs)
+    def forward(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
         # Return decoder output only
         return self.decoder(dec_X, dec_state)[0]
 ```
@@ -196,9 +202,9 @@ class EncoderDecoder(d2l.Classifier):
         self.encoder = encoder
         self.decoder = decoder
 
-    def call(self, enc_X, dec_X):
-        enc_outputs = self.encoder(enc_X)
-        dec_state = self.decoder.init_state(enc_outputs)
+    def call(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
         # Return decoder output only
         return self.decoder(dec_X, dec_state)[0]
 ```
