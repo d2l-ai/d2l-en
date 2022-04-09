@@ -444,7 +444,7 @@ def load_data_voc(batch_size, crop_size):
 ## Summary
 
 * Semantic segmentation recognizes and understands what are in an image in pixel level by dividing the image into regions belonging to different semantic classes.
-* On of the most important semantic segmentation dataset is Pascal VOC2012.
+* One of the most important semantic segmentation dataset is Pascal VOC2012.
 * In semantic segmentation, since the input image and  label correspond one-to-one on the pixel, the input image is randomly cropped to a fixed shape rather than rescaled.
 
 
