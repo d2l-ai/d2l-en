@@ -293,6 +293,7 @@ is
 (number of hidden layers, batch size, number of hidden units).
 
 ```{.python .input}
+%%tab all
 if tab.selected('mxnet', 'pytorch'):
     d2l.check_shape(state, (num_layers, batch_size, num_hiddens))
 if tab.selected('tensorflow'):
@@ -360,7 +361,7 @@ class Seq2SeqDecoder(d2l.Decoder):
     def init_state(self, enc_outputs, *args):
         return enc_outputs[1] 
 
-    def forward(self, X, enc_state, state=None):
+    def forward(self, X, enc_state):
         # X shape: (batch_size, num_steps)
         # embs shape: (num_steps, batch_size, embed_size)
         embs = self.embedding(d2l.transpose(X))
@@ -370,7 +371,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         context = np.tile(context, (embs.shape[0], 1, 1))
         # Concat at the feature dimension
         embs_and_context = d2l.concat((embs, context), -1)
-        outputs, state = self.rnn(embs_and_context, state)
+        outputs, state = self.rnn(embs_and_context, enc_state)
         outputs = d2l.swapaxes(self.dense(outputs), 0, 1)
         # outputs shape: (batch_size, num_steps, vocab_size)
         # state shape: (num_layers, batch_size, num_hiddens)
@@ -393,7 +394,7 @@ class Seq2SeqDecoder(d2l.Decoder):
     def init_state(self, enc_outputs, *args):
         return enc_outputs[1] 
 
-    def forward(self, X, enc_state, state=None):
+    def forward(self, X, enc_state):
         # X shape: (batch_size, num_steps)
         # embs shape: (num_steps, batch_size, embed_size)
         embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int32))
@@ -403,7 +404,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         context = context.repeat(embs.shape[0], 1, 1)            
         # Concat at the feature dimension
         embs_and_context = d2l.concat((embs, context), -1)
-        outputs, state = self.rnn(embs_and_context, state)
+        outputs, state = self.rnn(embs_and_context, enc_state)
         outputs = d2l.swapaxes(self.dense(outputs), 0, 1)
         # outputs shape: (batch_size, num_steps, vocab_size)
         # state shape: (num_layers, batch_size, num_hiddens)
@@ -424,7 +425,7 @@ class Seq2SeqDecoder(d2l.Decoder):
     def init_state(self, enc_outputs, *args):
         return enc_outputs[1] 
 
-    def call(self, X, enc_state, state=None):
+    def call(self, X, enc_state):
         # X shape: (batch_size, num_steps)
         # embs shape: (num_steps, batch_size, embed_size)
         embs = self.embedding(d2l.transpose(X))
@@ -434,7 +435,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         context = tf.tile(tf.expand_dims(context, 0), (embs.shape[0], 1, 1))
         # Concat at the feature dimension
         embs_and_context = d2l.concat((embs, context), -1)
-        outputs, state = self.rnn(embs_and_context, state)
+        outputs, state = self.rnn(embs_and_context, enc_state)
         outputs = d2l.transpose(self.dense(outputs), (1, 0, 2))
         # outputs shape: (batch_size, num_steps, vocab_size)
         # state shape: (num_layers, batch_size, num_hiddens)
@@ -587,18 +588,22 @@ strategies for sequence generation in
 
 ```{.python .input  n=14}
 %%tab all
-@d2l.add_to_class(Seq2Seq)  #@save
-def predict_step(self, batch, device=None, num_steps=9):
+@d2l.add_to_class(d2l.EncoderDecoder)  #@save
+def predict_step(self, batch, device, num_steps,
+                 save_attention_weights=False):
     if tab.selected('mxnet', 'pytorch'):
         batch = [d2l.to(a, device) for a in batch]
-    src, tgt, _, _ = batch
+    src, tgt, src_valid_len, _ = batch
     enc_outputs = self.encoder(src)
-    dec_state = self.decoder.init_state(enc_outputs)
-    outputs = [d2l.expand_dims(tgt[:,0], 1), ]
+    dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
+    outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
     for _ in range(num_steps):
-        Y, dec_state = self.decoder(outputs[-1], enc_outputs[1], dec_state)
+        Y, dec_state = self.decoder(outputs[-1], dec_state)
         outputs.append(d2l.argmax(Y, 2))
-    return d2l.concat(outputs[1:], 1)
+        # Save attention weights (to be covered later)
+        if save_attention_weights:
+            attention_weights.append(self.decoder.attention_weights)
+    return d2l.concat(outputs[1:], 1), attention_weights
 ```
 
 ## Evaluation of Predicted Sequences
@@ -687,7 +692,7 @@ and compute the BLEU of the results.
 engs = ['go .', 'i lost .', 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
 batch = data.build(engs, fras)
-preds = model.predict_step(batch, d2l.try_gpu())
+preds, _ = model.predict_step(batch, d2l.try_gpu(), data.num_steps)
 for en, fr, p in zip(engs, fras, preds):
     translation = []
     for token in data.tgt_vocab.to_tokens(p):

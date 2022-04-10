@@ -836,6 +836,21 @@ class EncoderDecoder(d2l.Classifier):
         # Return decoder output only
         return self.decoder(dec_X, dec_state)[0]
 
+    def predict_step(self, batch, device, num_steps,
+                     save_attention_weights=False):
+        """Defined in :numref:`sec_seq2seq_training`"""
+        src, tgt, src_valid_len, _ = batch
+        enc_outputs = self.encoder(src)
+        dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
+        outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
+        for _ in range(num_steps):
+            Y, dec_state = self.decoder(outputs[-1], dec_state)
+            outputs.append(d2l.argmax(Y, 2))
+            # Save attention weights (to be covered later)
+            if save_attention_weights:
+                attention_weights.append(self.decoder.attention_weights)
+        return d2l.concat(outputs[1:], 1), attention_weights
+
 class Seq2SeqEncoder(d2l.Encoder):
     """The RNN encoder for sequence to sequence learning.
 
@@ -868,17 +883,6 @@ class Seq2Seq(d2l.EncoderDecoder):
     def configure_optimizers(self):
         # Adam optimizer is used here
         return tf.keras.optimizers.Adam(learning_rate=self.lr)
-
-    def predict_step(self, batch, device=None, num_steps=9):
-        """Defined in :numref:`sec_seq2seq_training`"""
-        src, tgt, _, _ = batch
-        enc_outputs = self.encoder(src)
-        dec_state = self.decoder.init_state(enc_outputs)
-        outputs = [d2l.expand_dims(tgt[:,0], 1), ]
-        for _ in range(num_steps):
-            Y, dec_state = self.decoder(outputs[-1], enc_outputs[1], dec_state)
-            outputs.append(d2l.argmax(Y, 2))
-        return d2l.concat(outputs[1:], 1)
 
 def bleu(pred_seq, label_seq, k):
     """Compute the BLEU.
@@ -922,7 +926,7 @@ def masked_softmax(X, valid_lens):
     """Perform softmax operation by masking elements on the last axis.
 
     Defined in :numref:`sec_attention-scoring-functions`"""
-    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    # X: 3D tensor, valid_lens: 1D or 2D tensor
     def _sequence_mask(X, valid_len, value=0):
         maxlen = X.shape[1]
         mask = tf.range(start=0, limit=maxlen, dtype=tf.float32)[
@@ -961,19 +965,18 @@ class AdditiveAttention(tf.keras.layers.Layer):
 
     def call(self, queries, keys, values, valid_lens, **kwargs):
         queries, keys = self.W_q(queries), self.W_k(keys)
-        # After dimension expansion, shape of `queries`: (`batch_size`, no. of
-        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,
-        # no. of key-value pairs, `num_hiddens`). Sum them up with
-        # broadcasting
+        # After dimension expansion, shape of queries: (batch_size, no. of
+        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1, no. of
+        # key-value pairs, num_hiddens). Sum them up with broadcasting
         features = tf.expand_dims(queries, axis=2) + tf.expand_dims(
             keys, axis=1)
         features = tf.nn.tanh(features)
-        # There is only one output of `self.w_v`, so we remove the last
-        # one-dimensional entry from the shape. Shape of `scores`:
-        # (`batch_size`, no. of queries, no. of key-value pairs)
+        # There is only one output of self.w_v, so we remove the last
+        # one-dimensional entry from the shape. Shape of scores: (batch_size,
+        # no. of queries, no. of key-value pairs)
         scores = tf.squeeze(self.w_v(features), axis=-1)
         self.attention_weights = masked_softmax(scores, valid_lens)
-        # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+        # Shape of values: (batch_size, no. of key-value pairs, value
         # dimension)
         return tf.matmul(self.dropout(
             self.attention_weights, **kwargs), values)
@@ -986,11 +989,10 @@ class DotProductAttention(tf.keras.layers.Layer):
         super().__init__(**kwargs)
         self.dropout = tf.keras.layers.Dropout(dropout)
 
-    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
-    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
-    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
-    # dimension)
-    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)
+    # Shape of queries: (batch_size, no. of queries, d)
+    # Shape of keys: (batch_size, no. of key-value pairs, d)
+    # Shape of values: (batch_size, no. of key-value pairs, value dimension)
+    # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
     def call(self, queries, keys, values, valid_lens, **kwargs):
         d = queries.shape[-1]
         scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
@@ -998,45 +1000,7 @@ class DotProductAttention(tf.keras.layers.Layer):
         self.attention_weights = masked_softmax(scores, valid_lens)
         return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)
 
-class EncoderOld(tf.keras.layers.Layer):
-    """The base encoder interface for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_seq2seq_attention`"""
-    def __init__(self, **kwargs):
-        super(EncoderOld, self).__init__(**kwargs)
-
-    def call(self, X, *args, **kwargs):
-        raise NotImplementedError
-
-
-class DecoderOld(tf.keras.layers.Layer):
-    """The base decoder interface for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_seq2seq_attention`"""
-    def __init__(self, **kwargs):
-        super(DecoderOld, self).__init__(**kwargs)
-
-    def init_state(self, enc_outputs, *args):
-        raise NotImplementedError
-
-    def call(self, X, state, **kwargs):
-        raise NotImplementedError
-
-class EncoderDecoderOld(tf.keras.Model):
-    """The base class for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_seq2seq_attention`"""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoderOld, self).__init__(**kwargs)
-        self.encoder = encoder
-        self.decoder = decoder
-
-    def call(self, enc_X, dec_X, *args, **kwargs):
-        enc_outputs = self.encoder(enc_X, *args, **kwargs)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state, **kwargs)
-
-class AttentionDecoder(d2l.DecoderOld):
+class AttentionDecoder(d2l.Decoder):
     """The base attention-based decoder interface.
 
     Defined in :numref:`sec_seq2seq_attention`"""
@@ -1133,6 +1097,44 @@ class PositionalEncoding(tf.keras.layers.Layer):
     def call(self, X, **kwargs):
         X = X + self.P[:, :X.shape[1], :]
         return self.dropout(X, **kwargs)
+
+class EncoderOld(tf.keras.layers.Layer):
+    """The base encoder interface for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_transformer`"""
+    def __init__(self, **kwargs):
+        super(EncoderOld, self).__init__(**kwargs)
+
+    def call(self, X, *args, **kwargs):
+        raise NotImplementedError
+
+
+class DecoderOld(tf.keras.layers.Layer):
+    """The base decoder interface for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_transformer`"""
+    def __init__(self, **kwargs):
+        super(DecoderOld, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def call(self, X, state, **kwargs):
+        raise NotImplementedError
+
+class EncoderDecoderOld(tf.keras.Model):
+    """The base class for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_transformer`"""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoderOld, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def call(self, enc_X, dec_X, *args, **kwargs):
+        enc_outputs = self.encoder(enc_X, *args, **kwargs)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state, **kwargs)
 
 class PositionWiseFFN(tf.keras.layers.Layer):
     """Positionwise feed-forward network.
