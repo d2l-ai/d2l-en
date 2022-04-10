@@ -963,6 +963,13 @@ def masked_softmax(X, valid_lens):
 
     Defined in :numref:`sec_attention-scoring-functions`"""
     # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    def _sequence_mask(X, valid_len, value=0):
+        maxlen = X.size(1)
+        mask = torch.arange((maxlen), dtype=torch.float32,
+                            device=X.device)[None, :] < valid_len[:, None]
+        X[~mask] = value
+        return X
+
     if valid_lens is None:
         return nn.functional.softmax(X, dim=-1)
     else:
@@ -973,8 +980,7 @@ def masked_softmax(X, valid_lens):
             valid_lens = valid_lens.reshape(-1)
         # On the last axis, replace masked elements with a very large negative
         # value, whose exponentiation outputs 0
-        X = d2l.sequence_mask(X.reshape(-1, shape[-1]), valid_lens,
-                              value=-1e6)
+        X = _sequence_mask(X.reshape(-1, shape[-1]), valid_lens, value=-1e6)
         return nn.functional.softmax(X.reshape(shape), dim=-1)
 
 class AdditiveAttention(nn.Module):
@@ -3069,15 +3075,6 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
           f'tokens/sec on {str(device)}')
 
-def sequence_mask(X, valid_len, value=0):
-    """Mask irrelevant entries in sequences.
-
-    Defined in :numref:`sec_utils`"""
-    maxlen = X.size(1)
-    mask = torch.arange((maxlen), dtype=torch.float32,
-                        device=X.device)[None, :] < valid_len[:, None]
-    X[~mask] = value
-    return X
 
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device, save_attention_weights=False):

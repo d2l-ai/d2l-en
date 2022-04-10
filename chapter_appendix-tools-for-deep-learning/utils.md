@@ -905,14 +905,6 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
           f'tokens/sec on {str(device)}')
     
-#@save
-def sequence_mask(X, valid_len, value=0):
-    """Mask irrelevant entries in sequences."""
-    maxlen = X.size(1)
-    mask = torch.arange((maxlen), dtype=torch.float32,
-                        device=X.device)[None, :] < valid_len[:, None]
-    X[~mask] = value
-    return X
 
 #@save
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
@@ -1017,18 +1009,6 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
             animator.add(epoch + 1, (metric[0] / metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
           f'tokens/sec on {str(device._device_name)}')
-    
-#@save
-def sequence_mask(X, valid_len, value=0):
-    """Mask irrelevant entries in sequences."""
-    maxlen = X.shape[1]
-    mask = tf.range(start=0, limit=maxlen, dtype=tf.float32)[
-        None, :] < tf.cast(valid_len[:, None], dtype=tf.float32)
-    
-    if len(X.shape) == 3:
-        return tf.where(tf.expand_dims(mask, axis=-1), X, value)
-    else:
-        return tf.where(mask, X, value)
     
 #@save
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
