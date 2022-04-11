@@ -231,7 +231,7 @@ let's first implement it in the following `PositionalEncoding` class.
 class PositionalEncoding(nn.Block):
     """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
-        super(PositionalEncoding, self).__init__()
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
         # Create a long enough P
         self.P = d2l.zeros((1, max_len, num_hiddens))
@@ -251,7 +251,7 @@ class PositionalEncoding(nn.Block):
 class PositionalEncoding(nn.Module):
     """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
-        super(PositionalEncoding, self).__init__()
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
         # Create a long enough P
         self.P = d2l.zeros((1, max_len, num_hiddens))

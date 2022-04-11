@@ -1055,7 +1055,6 @@ class MultiHeadAttention(d2l.Module):
     def __init__(self, num_hiddens, num_heads, dropout, use_bias=False,
                  **kwargs):
         super().__init__()
-        self.save_hyperparameters()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
         self.W_q = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
@@ -1116,7 +1115,7 @@ class PositionalEncoding(nn.Block):
 
     Defined in :numref:`sec_self-attention-and-positional-encoding`"""
     def __init__(self, num_hiddens, dropout, max_len=1000):
-        super(PositionalEncoding, self).__init__()
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
         # Create a long enough P
         self.P = d2l.zeros((1, max_len, num_hiddens))

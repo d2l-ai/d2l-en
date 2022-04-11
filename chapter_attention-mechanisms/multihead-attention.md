@@ -132,7 +132,6 @@ class MultiHeadAttention(d2l.Module):
     def __init__(self, num_hiddens, num_heads, dropout, use_bias=False,
                  **kwargs):
         super().__init__()
-        self.save_hyperparameters()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
         self.W_q = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
@@ -173,7 +172,6 @@ class MultiHeadAttention(d2l.Module):
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  num_heads, dropout, bias=False, **kwargs):
         super().__init__()
-        self.save_hyperparameters()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
         self.W_q = nn.Linear(query_size, num_hiddens, bias=bias)
@@ -215,7 +213,6 @@ class MultiHeadAttention(d2l.Module):
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  num_heads, dropout, bias=False, **kwargs):
         super().__init__()
-        self.save_hyperparameters()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
         self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
@@ -249,10 +246,10 @@ class MultiHeadAttention(d2l.Module):
 ```
 
 To allow for [**parallel computation of multiple heads**],
-the above `MultiHeadAttention` class uses two transposition functions as defined below.
+the above `MultiHeadAttention` class uses two transposition methods as defined below.
 Specifically,
-the `transpose_output` function reverses the operation
-of the `transpose_qkv` function.
+the `transpose_output` method reverses the operation
+of the `transpose_qkv` method.
 
 ```{.python .input}
 %%tab mxnet

@@ -1,6 +1,23 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+```
+
+```{.json .output n=1}
+[
+ {
+  "data": {
+   "application/vnd.jupyter.widget-view+json": {
+    "model_id": "a93d02ae07484826a854f73d2628ac04",
+    "version_major": 2,
+    "version_minor": 0
+   },
+   "text/plain": "interactive(children=(Dropdown(description='tab', index=1, options=('mxnet', 'pytorch', 'tensorflow'), value='\u2026"
+  },
+  "metadata": {},
+  "output_type": "display_data"
+ }
+]
 ```
 
 # Transformer

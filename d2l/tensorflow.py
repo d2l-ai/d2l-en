@@ -1018,7 +1018,6 @@ class MultiHeadAttention(d2l.Module):
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  num_heads, dropout, bias=False, **kwargs):
         super().__init__()
-        self.save_hyperparameters()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
         self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
