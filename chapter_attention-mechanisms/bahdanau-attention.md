@@ -319,8 +319,6 @@ if tab.selected('mxnet'):
     state = decoder.init_state(encoder(X), None)
     output, state = decoder(X, state)
 if tab.selected('pytorch'):
-    encoder.eval()
-    decoder.eval()
     X = d2l.zeros((batch_size, num_steps), dtype=torch.long)
     state = decoder.init_state(encoder(X), None)
     output, state = decoder(X, state)

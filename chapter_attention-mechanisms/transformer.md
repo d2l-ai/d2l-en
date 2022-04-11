@@ -112,7 +112,7 @@ we will implement the rest of the transformer model.
 %%tab mxnet
 from d2l import mxnet as d2l
 import math
-from mxnet import autograd, np, npx
+from mxnet import autograd, init, np, npx
 from mxnet.gluon import nn
 import pandas as pd
 npx.set_np()
@@ -585,11 +585,11 @@ to rescale before summing up the input embedding and the positional encoding.
 ```{.python .input}
 %%tab mxnet
 #@save
-class TransformerEncoder(d2l.EncoderOld):
+class TransformerEncoder(d2l.Encoder):
     """Transformer encoder."""
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
-                 num_heads, num_layers, dropout, use_bias=False, **kwargs):
-        super(TransformerEncoder, self).__init__(**kwargs)
+                 num_heads, num_layers, dropout, use_bias=False):
+        super().__init__()
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
@@ -598,8 +598,9 @@ class TransformerEncoder(d2l.EncoderOld):
             self.blks.add(
                 EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout,
                              use_bias))
+        self.initialize(init.Xavier())
 
-    def forward(self, X, valid_lens, *args):
+    def forward(self, X, valid_lens):
         # Since positional encoding values are between -1 and 1, the embedding
         # values are multiplied by the square root of the embedding dimension
         # to rescale before they are summed up
@@ -615,12 +616,12 @@ class TransformerEncoder(d2l.EncoderOld):
 ```{.python .input}
 %%tab pytorch
 #@save
-class TransformerEncoder(d2l.EncoderOld):
+class TransformerEncoder(d2l.Encoder):
     """Transformer encoder."""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
-                 num_heads, num_layers, dropout, use_bias=False, **kwargs):
-        super(TransformerEncoder, self).__init__(**kwargs)
+                 num_heads, num_layers, dropout, use_bias=False):
+        super().__init__()
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
@@ -630,8 +631,9 @@ class TransformerEncoder(d2l.EncoderOld):
                 EncoderBlock(key_size, query_size, value_size, num_hiddens,
                              norm_shape, ffn_num_input, ffn_num_hiddens,
                              num_heads, dropout, use_bias))
+        self.apply(d2l.init_seq2seq_weights)
 
-    def forward(self, X, valid_lens, *args):
+    def forward(self, X, valid_lens):
         # Since positional encoding values are between -1 and 1, the embedding
         # values are multiplied by the square root of the embedding dimension
         # to rescale before they are summed up
@@ -647,12 +649,12 @@ class TransformerEncoder(d2l.EncoderOld):
 ```{.python .input}
 %%tab tensorflow
 #@save
-class TransformerEncoder(d2l.EncoderOld):
+class TransformerEncoder(d2l.Encoder):
     """Transformer encoder."""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, bias=False, **kwargs):
-        super().__init__(**kwargs)
+                 num_layers, dropout, bias=False):
+        super().__init__()
         self.num_hiddens = num_hiddens
         self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
@@ -682,22 +684,23 @@ is (batch size, number of time steps, `num_hiddens`).
 ```{.python .input}
 %%tab mxnet
 encoder = TransformerEncoder(200, 24, 48, 8, 2, 0.5)
-encoder.initialize()
-encoder(np.ones((2, 100)), valid_lens).shape
+#encoder.initialize()
+d2l.check_shape(encoder(np.ones((2, 100)), valid_lens), (2, 100, 24))
 ```
 
 ```{.python .input}
 %%tab pytorch
 encoder = TransformerEncoder(
     200, 24, 24, 24, 24, [100, 24], 24, 48, 8, 2, 0.5)
-encoder.eval()
-encoder(d2l.ones((2, 100), dtype=torch.long), valid_lens).shape
+d2l.check_shape(encoder(d2l.ones((2, 100), dtype=torch.long), valid_lens),
+                (2, 100, 24))
 ```
 
 ```{.python .input}
 %%tab tensorflow
 encoder = TransformerEncoder(200, 24, 24, 24, 24, [1, 2], 48, 8, 2, 0.5)
-encoder(tf.ones((2, 100)), valid_lens, training=False).shape
+d2l.check_shape(encoder(tf.ones((2, 100)), valid_lens, training=False),
+                (2, 100, 24))
 ```
 
 ## Decoder
@@ -948,6 +951,7 @@ class TransformerDecoder(d2l.AttentionDecoder):
                 DecoderBlock(num_hiddens, ffn_num_hiddens, num_heads,
                              dropout, i))
         self.dense = nn.Dense(vocab_size, flatten=False)
+        self.initialize(init.Xavier())
 
     def init_state(self, enc_outputs, enc_valid_lens, *args):
         return [enc_outputs, enc_valid_lens, [None] * self.num_layers]
@@ -988,6 +992,7 @@ class TransformerDecoder(d2l.AttentionDecoder):
                              norm_shape, ffn_num_input, ffn_num_hiddens,
                              num_heads, dropout, i))
         self.dense = nn.Linear(num_hiddens, vocab_size)
+        self.apply(d2l.init_seq2seq_weights)
 
     def init_state(self, enc_outputs, enc_valid_lens, *args):
         return [enc_outputs, enc_valid_lens, [None] * self.num_layers]

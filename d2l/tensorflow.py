@@ -1174,14 +1174,14 @@ class EncoderBlock(tf.keras.layers.Layer):
                           **kwargs)
         return self.addnorm2(Y, self.ffn(Y), **kwargs)
 
-class TransformerEncoder(d2l.EncoderOld):
+class TransformerEncoder(d2l.Encoder):
     """Transformer encoder.
 
     Defined in :numref:`sec_transformer`"""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, bias=False, **kwargs):
-        super().__init__(**kwargs)
+                 num_layers, dropout, bias=False):
+        super().__init__()
         self.num_hiddens = num_hiddens
         self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
