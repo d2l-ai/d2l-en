@@ -830,6 +830,15 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
 ```{.python .input}
 %%tab pytorch
 #@save
+def sequence_mask(X, valid_len, value=0):
+    """Mask irrelevant entries in sequences."""
+    maxlen = X.size(1)
+    mask = torch.arange((maxlen), dtype=torch.float32,
+                        device=X.device)[None, :] < valid_len[:, None]
+    X[~mask] = value
+    return X
+
+#@save
 class Seq2SeqEncoderOld(d2l.EncoderOld):
     """The RNN encoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
@@ -944,6 +953,18 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
 
 ```{.python .input}
 %%tab tensorflow
+#@save
+def sequence_mask(X, valid_len, value=0):
+    """Mask irrelevant entries in sequences."""
+    maxlen = X.shape[1]
+    mask = tf.range(start=0, limit=maxlen, dtype=tf.float32)[
+        None, :] < tf.cast(valid_len[:, None], dtype=tf.float32)
+    
+    if len(X.shape) == 3:
+        return tf.where(tf.expand_dims(mask, axis=-1), X, value)
+    else:
+        return tf.where(mask, X, value)
+
 #@save
 class Seq2SeqEncoderOld(d2l.EncoderOld):
     """The RNN encoder for sequence to sequence learning."""
