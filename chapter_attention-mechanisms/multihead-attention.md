@@ -127,11 +127,12 @@ $p_o$ is specified via the argument `num_hiddens`.
 ```{.python .input}
 %%tab mxnet
 #@save
-class MultiHeadAttention(nn.Block):
+class MultiHeadAttention(d2l.Module):
     """Multi-head attention."""
     def __init__(self, num_hiddens, num_heads, dropout, use_bias=False,
                  **kwargs):
-        super(MultiHeadAttention, self).__init__(**kwargs)
+        super().__init__()
+        self.save_hyperparameters()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
         self.W_q = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
@@ -146,9 +147,9 @@ class MultiHeadAttention(nn.Block):
         # After transposing, shape of output queries, keys, or values:
         # (batch_size * num_heads, no. of queries or key-value pairs,
         # num_hiddens / num_heads)
-        queries = transpose_qkv(self.W_q(queries), self.num_heads)
-        keys = transpose_qkv(self.W_k(keys), self.num_heads)
-        values = transpose_qkv(self.W_v(values), self.num_heads)
+        queries = self.transpose_qkv(self.W_q(queries))
+        keys = self.transpose_qkv(self.W_k(keys))
+        values = self.transpose_qkv(self.W_v(values))
 
         if valid_lens is not None:
             # On axis 0, copy the first item (scalar or vector) for num_heads
@@ -160,18 +161,19 @@ class MultiHeadAttention(nn.Block):
         output = self.attention(queries, keys, values, valid_lens)
         
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
-        output_concat = transpose_output(output, self.num_heads)
+        output_concat = self.transpose_output(output)
         return self.W_o(output_concat)
 ```
 
 ```{.python .input}
 %%tab pytorch
 #@save
-class MultiHeadAttention(nn.Module):
+class MultiHeadAttention(d2l.Module):
     """Multi-head attention."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  num_heads, dropout, bias=False, **kwargs):
-        super(MultiHeadAttention, self).__init__(**kwargs)
+        super().__init__()
+        self.save_hyperparameters()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
         self.W_q = nn.Linear(query_size, num_hiddens, bias=bias)
@@ -186,9 +188,9 @@ class MultiHeadAttention(nn.Module):
         # After transposing, shape of output queries, keys, or values:
         # (batch_size * num_heads, no. of queries or key-value pairs,
         # num_hiddens / num_heads)
-        queries = transpose_qkv(self.W_q(queries), self.num_heads)
-        keys = transpose_qkv(self.W_k(keys), self.num_heads)
-        values = transpose_qkv(self.W_v(values), self.num_heads)
+        queries = self.transpose_qkv(self.W_q(queries))
+        keys = self.transpose_qkv(self.W_k(keys))
+        values = self.transpose_qkv(self.W_v(values))
 
         if valid_lens is not None:
             # On axis 0, copy the first item (scalar or vector) for num_heads
@@ -201,18 +203,19 @@ class MultiHeadAttention(nn.Module):
         output = self.attention(queries, keys, values, valid_lens)
 
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
-        output_concat = transpose_output(output, self.num_heads)
+        output_concat = self.transpose_output(output)
         return self.W_o(output_concat)
 ```
 
 ```{.python .input}
 %%tab tensorflow
 #@save
-class MultiHeadAttention(tf.keras.layers.Layer):
+class MultiHeadAttention(d2l.Module):
     """Multi-head attention."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  num_heads, dropout, bias=False, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
+        self.save_hyperparameters()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
         self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
@@ -227,9 +230,9 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         # After transposing, shape of output queries, keys, or values:
         # (batch_size * num_heads, no. of queries or key-value pairs,
         # num_hiddens / num_heads)
-        queries = transpose_qkv(self.W_q(queries), self.num_heads)
-        keys = transpose_qkv(self.W_k(keys), self.num_heads)
-        values = transpose_qkv(self.W_v(values), self.num_heads)
+        queries = self.transpose_qkv(self.W_q(queries))
+        keys = self.transpose_qkv(self.W_k(keys))
+        values = self.transpose_qkv(self.W_v(values))
         
         if valid_lens is not None:
             # On axis 0, copy the first item (scalar or vector) for num_heads
@@ -241,7 +244,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         output = self.attention(queries, keys, values, valid_lens, **kwargs)
         
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
-        output_concat = transpose_output(output, self.num_heads)
+        output_concat = self.transpose_output(output)
         return self.W_o(output_concat)
 ```
 
@@ -253,13 +256,13 @@ of the `transpose_qkv` function.
 
 ```{.python .input}
 %%tab mxnet
-#@save
-def transpose_qkv(X, num_heads):
+@d2l.add_to_class(MultiHeadAttention)  #@save
+def transpose_qkv(self, X):
     """Transposition for parallel computation of multiple attention heads."""
     # Shape of input X: (batch_size, no. of queries or key-value pairs,
     # num_hiddens). Shape of output X: (batch_size, no. of queries or
     # key-value pairs, num_heads, num_hiddens / num_heads)
-    X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
+    X = X.reshape(X.shape[0], X.shape[1], self.num_heads, -1)
     # Shape of output X: (batch_size, num_heads, no. of queries or key-value
     # pairs, num_hiddens / num_heads)
     X = X.transpose(0, 2, 1, 3)
@@ -267,23 +270,23 @@ def transpose_qkv(X, num_heads):
     # pairs, num_hiddens / num_heads)
     return X.reshape(-1, X.shape[2], X.shape[3])
 
-#@save
-def transpose_output(X, num_heads):
+@d2l.add_to_class(MultiHeadAttention)  #@save
+def transpose_output(self, X):
     """Reverse the operation of transpose_qkv."""
-    X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
+    X = X.reshape(-1, self.num_heads, X.shape[1], X.shape[2])
     X = X.transpose(0, 2, 1, 3)
     return X.reshape(X.shape[0], X.shape[1], -1)
 ```
 
 ```{.python .input}
 %%tab pytorch
-#@save
-def transpose_qkv(X, num_heads):
+@d2l.add_to_class(MultiHeadAttention)  #@save
+def transpose_qkv(self, X):
     """Transposition for parallel computation of multiple attention heads."""
     # Shape of input X: (batch_size, no. of queries or key-value pairs,
     # num_hiddens). Shape of output X: (batch_size, no. of queries or
     # key-value pairs, num_heads, num_hiddens / num_heads)
-    X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
+    X = X.reshape(X.shape[0], X.shape[1], self.num_heads, -1)
     # Shape of output X: (batch_size, num_heads, no. of queries or key-value
     # pairs, num_hiddens / num_heads)
     X = X.permute(0, 2, 1, 3)
@@ -291,23 +294,23 @@ def transpose_qkv(X, num_heads):
     # pairs, num_hiddens / num_heads)
     return X.reshape(-1, X.shape[2], X.shape[3])
 
-#@save
-def transpose_output(X, num_heads):
+@d2l.add_to_class(MultiHeadAttention)  #@save
+def transpose_output(self, X):
     """Reverse the operation of transpose_qkv."""
-    X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
+    X = X.reshape(-1, self.num_heads, X.shape[1], X.shape[2])
     X = X.permute(0, 2, 1, 3)
     return X.reshape(X.shape[0], X.shape[1], -1)
 ```
 
 ```{.python .input}
 %%tab tensorflow
-#@save
-def transpose_qkv(X, num_heads):
+@d2l.add_to_class(MultiHeadAttention)  #@save
+def transpose_qkv(self, X):
     """Transposition for parallel computation of multiple attention heads."""
     # Shape of input X: (batch_size, no. of queries or key-value pairs,
     # num_hiddens). Shape of output X: (batch_size, no. of queries or
     # key-value pairs, num_heads, num_hiddens / num_heads)
-    X = tf.reshape(X, shape=(X.shape[0], X.shape[1], num_heads, -1))
+    X = tf.reshape(X, shape=(X.shape[0], X.shape[1], self.num_heads, -1))
     # Shape of output X: (batch_size, num_heads, no. of queries or key-value
     # pairs, num_hiddens / num_heads)
     X = tf.transpose(X, perm=(0, 2, 1, 3))
@@ -315,10 +318,10 @@ def transpose_qkv(X, num_heads):
     # pairs, num_hiddens / num_heads)
     return tf.reshape(X, shape=(-1, X.shape[2], X.shape[3]))
 
-#@save
-def transpose_output(X, num_heads):
+@d2l.add_to_class(MultiHeadAttention)  #@save
+def transpose_output(self, X):
     """Reverse the operation of transpose_qkv."""
-    X = tf.reshape(X, shape=(-1, num_heads, X.shape[1], X.shape[2]))
+    X = tf.reshape(X, shape=(-1, self.num_heads, X.shape[1], X.shape[2]))
     X = tf.transpose(X, perm=(0, 2, 1, 3))
     return tf.reshape(X, shape=(X.shape[0], X.shape[1], -1))
 ```
@@ -341,7 +344,6 @@ attention.initialize()
 num_hiddens, num_heads = 100, 5
 attention = MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
                                num_hiddens, num_heads, 0.5)
-attention.eval()
 ```
 
 ```{.python .input}
@@ -356,7 +358,8 @@ attention = MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
 batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
 Y = d2l.ones((batch_size, num_kvpairs, num_hiddens))
-attention(X, Y, Y, valid_lens).shape
+d2l.check_shape(attention(X, Y, Y, valid_lens),
+                (batch_size, num_queries, num_hiddens))
 ```
 
 ```{.python .input}
@@ -364,7 +367,8 @@ attention(X, Y, Y, valid_lens).shape
 batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, d2l.tensor([3, 2])
 X = tf.ones((batch_size, num_queries, num_hiddens))
 Y = tf.ones((batch_size, num_kvpairs, num_hiddens))
-attention(X, Y, Y, valid_lens, training=False).shape
+d2l.check_shape(attention(X, Y, Y, valid_lens, training=False),
+                (batch_size, num_queries, num_hiddens))
 ```
 
 ## Summary

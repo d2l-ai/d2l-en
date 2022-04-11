@@ -315,8 +315,6 @@ encoder = d2l.Seq2SeqEncoder(vocab_size, embed_size, num_hiddens, num_layers)
 decoder = Seq2SeqAttentionDecoder(vocab_size, embed_size, num_hiddens,
                                   num_layers)
 if tab.selected('mxnet'):
-    encoder.initialize(force_reinit=True)
-    decoder.initialize(force_reinit=True)
     X = d2l.zeros((batch_size, num_steps))
     state = decoder.init_state(encoder(X), None)
     output, state = decoder(X, state)
@@ -342,9 +340,6 @@ here we specify hyperparemeters,
 instantiate
 an encoder and a decoder with Bahdanau attention,
 and train this model for machine translation.
-Due to the newly added attention mechanism,
-this training is much slower than
-that in :numref:`sec_seq2seq_training` without attention mechanisms.
 
 ```{.python .input}
 %%tab all

@@ -1011,13 +1011,14 @@ class AttentionDecoder(d2l.Decoder):
     def attention_weights(self):
         raise NotImplementedError
 
-class MultiHeadAttention(tf.keras.layers.Layer):
+class MultiHeadAttention(d2l.Module):
     """Multi-head attention.
 
     Defined in :numref:`sec_multihead-attention`"""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  num_heads, dropout, bias=False, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
+        self.save_hyperparameters()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
         self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
@@ -1032,9 +1033,9 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         # After transposing, shape of output queries, keys, or values:
         # (batch_size * num_heads, no. of queries or key-value pairs,
         # num_hiddens / num_heads)
-        queries = transpose_qkv(self.W_q(queries), self.num_heads)
-        keys = transpose_qkv(self.W_k(keys), self.num_heads)
-        values = transpose_qkv(self.W_v(values), self.num_heads)
+        queries = self.transpose_qkv(self.W_q(queries))
+        keys = self.transpose_qkv(self.W_k(keys))
+        values = self.transpose_qkv(self.W_v(values))
 
         if valid_lens is not None:
             # On axis 0, copy the first item (scalar or vector) for num_heads
@@ -1046,31 +1047,32 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         output = self.attention(queries, keys, values, valid_lens, **kwargs)
 
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
-        output_concat = transpose_output(output, self.num_heads)
+        output_concat = self.transpose_output(output)
         return self.W_o(output_concat)
 
-def transpose_qkv(X, num_heads):
-    """Transposition for parallel computation of multiple attention heads.
+    def transpose_qkv(self, X):
+        """Transposition for parallel computation of multiple attention heads.
+    
+        Defined in :numref:`sec_multihead-attention`"""
+        # Shape of input X: (batch_size, no. of queries or key-value pairs,
+        # num_hiddens). Shape of output X: (batch_size, no. of queries or
+        # key-value pairs, num_heads, num_hiddens / num_heads)
+        X = tf.reshape(X, shape=(X.shape[0], X.shape[1], self.num_heads, -1))
+        # Shape of output X: (batch_size, num_heads, no. of queries or key-value
+        # pairs, num_hiddens / num_heads)
+        X = tf.transpose(X, perm=(0, 2, 1, 3))
+        # Shape of output: (batch_size * num_heads, no. of queries or key-value
+        # pairs, num_hiddens / num_heads)
+        return tf.reshape(X, shape=(-1, X.shape[2], X.shape[3]))
+    
 
-    Defined in :numref:`sec_multihead-attention`"""
-    # Shape of input X: (batch_size, no. of queries or key-value pairs,
-    # num_hiddens). Shape of output X: (batch_size, no. of queries or
-    # key-value pairs, num_heads, num_hiddens / num_heads)
-    X = tf.reshape(X, shape=(X.shape[0], X.shape[1], num_heads, -1))
-    # Shape of output X: (batch_size, num_heads, no. of queries or key-value
-    # pairs, num_hiddens / num_heads)
-    X = tf.transpose(X, perm=(0, 2, 1, 3))
-    # Shape of output: (batch_size * num_heads, no. of queries or key-value
-    # pairs, num_hiddens / num_heads)
-    return tf.reshape(X, shape=(-1, X.shape[2], X.shape[3]))
-
-def transpose_output(X, num_heads):
-    """Reverse the operation of transpose_qkv.
-
-    Defined in :numref:`sec_multihead-attention`"""
-    X = tf.reshape(X, shape=(-1, num_heads, X.shape[1], X.shape[2]))
-    X = tf.transpose(X, perm=(0, 2, 1, 3))
-    return tf.reshape(X, shape=(X.shape[0], X.shape[1], -1))
+    def transpose_output(self, X):
+        """Reverse the operation of transpose_qkv.
+    
+        Defined in :numref:`sec_multihead-attention`"""
+        X = tf.reshape(X, shape=(-1, self.num_heads, X.shape[1], X.shape[2]))
+        X = tf.transpose(X, perm=(0, 2, 1, 3))
+        return tf.reshape(X, shape=(X.shape[0], X.shape[1], -1))
 
 class PositionalEncoding(tf.keras.layers.Layer):
     """Positional encoding.
