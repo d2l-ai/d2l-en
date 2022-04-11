@@ -1194,8 +1194,8 @@ class EncoderBlock(nn.Module):
     Defined in :numref:`sec_transformer`"""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
-                 dropout, use_bias=False, **kwargs):
-        super(EncoderBlock, self).__init__(**kwargs)
+                 dropout, use_bias=False):
+        super().__init__()
         self.attention = d2l.MultiHeadAttention(
             key_size, query_size, value_size, num_hiddens, num_heads, dropout,
             use_bias)

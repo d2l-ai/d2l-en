@@ -1196,8 +1196,8 @@ class EncoderBlock(nn.Block):
 
     Defined in :numref:`sec_transformer`"""
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
-                 use_bias=False, **kwargs):
-        super(EncoderBlock, self).__init__(**kwargs)
+                 use_bias=False):
+        super().__init__()
         self.attention = d2l.MultiHeadAttention(
             num_hiddens, num_heads, dropout, use_bias)
         self.addnorm1 = AddNorm(dropout)

@@ -1160,9 +1160,8 @@ class EncoderBlock(tf.keras.layers.Layer):
 
     Defined in :numref:`sec_transformer`"""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False,
-                 **kwargs):
-        super().__init__(**kwargs)
+                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False):
+        super().__init__()
         self.attention = d2l.MultiHeadAttention(
             key_size, query_size, value_size, num_hiddens, num_heads, dropout,
             bias)

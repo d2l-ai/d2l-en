@@ -487,8 +487,8 @@ around both sublayers.
 class EncoderBlock(nn.Block):
     """Transformer encoder block."""
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
-                 use_bias=False, **kwargs):
-        super(EncoderBlock, self).__init__(**kwargs)
+                 use_bias=False):
+        super().__init__()
         self.attention = d2l.MultiHeadAttention(
             num_hiddens, num_heads, dropout, use_bias)
         self.addnorm1 = AddNorm(dropout)
@@ -507,8 +507,8 @@ class EncoderBlock(nn.Module):
     """Transformer encoder block."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
-                 dropout, use_bias=False, **kwargs):
-        super(EncoderBlock, self).__init__(**kwargs)
+                 dropout, use_bias=False):
+        super().__init__()
         self.attention = d2l.MultiHeadAttention(
             key_size, query_size, value_size, num_hiddens, num_heads, dropout,
             use_bias)
@@ -528,9 +528,8 @@ class EncoderBlock(nn.Module):
 class EncoderBlock(tf.keras.layers.Layer):
     """Transformer encoder block."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False,
-                 **kwargs):
-        super().__init__(**kwargs)
+                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False):
+        super().__init__()
         self.attention = d2l.MultiHeadAttention(
             key_size, query_size, value_size, num_hiddens, num_heads, dropout,
             bias)
@@ -554,7 +553,7 @@ X = d2l.ones((2, 100, 24))
 valid_lens = d2l.tensor([3, 2])
 encoder_blk = EncoderBlock(24, 48, 8, 0.5)
 encoder_blk.initialize()
-encoder_blk(X, valid_lens).shape
+d2l.check_shape(encoder_blk(X, valid_lens), X.shape)
 ```
 
 ```{.python .input}
@@ -563,7 +562,7 @@ X = d2l.ones((2, 100, 24))
 valid_lens = d2l.tensor([3, 2])
 encoder_blk = EncoderBlock(24, 24, 24, 24, [100, 24], 24, 48, 8, 0.5)
 encoder_blk.eval()
-encoder_blk(X, valid_lens).shape
+d2l.check_shape(encoder_blk(X, valid_lens), X.shape)
 ```
 
 ```{.python .input}
@@ -572,7 +571,7 @@ X = tf.ones((2, 100, 24))
 valid_lens = tf.constant([3, 2])
 norm_shape = [i for i in range(len(X.shape))][1:]
 encoder_blk = EncoderBlock(24, 24, 24, 24, norm_shape, 48, 8, 0.5)
-encoder_blk(X, valid_lens, training=False).shape
+d2l.check_shape(encoder_blk(X, valid_lens, training=False), X.shape)
 ```
 
 In the following [**transformer encoder**] implementation,
