@@ -1040,11 +1040,11 @@ class TransformerDecoder(d2l.AttentionDecoder):
         for i, blk in enumerate(self.blks):
             X, state = blk(X, state, **kwargs)
             # Decoder self-attention weights
-            (self._attention_weights[0][i] =
-             blk.attention1.attention.attention_weights)
+            self._attention_weights[0][i] = (
+                blk.attention1.attention.attention_weights)
             # Encoder-decoder attention weights
-            (self._attention_weights[1][i] =
-             blk.attention2.attention.attention_weights)
+            self._attention_weights[1][i] = (
+                blk.attention2.attention.attention_weights)
         return self.dense(X), state
     
     @property
