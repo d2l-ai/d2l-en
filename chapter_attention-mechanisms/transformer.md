@@ -135,6 +135,121 @@ import pandas as pd
 import tensorflow as tf
 ```
 
+## TO REMOVE LATER
+
+```{.python .input}
+%%tab mxnet
+#@save
+class EncoderOld(nn.Block):
+    """The base encoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(EncoderOld, self).__init__(**kwargs)
+
+    def forward(self, X, *args):
+        raise NotImplementedError
+        
+        
+#@save
+class DecoderOld(nn.Block):
+    """The base decoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(DecoderOld, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def forward(self, X, state):
+        raise NotImplementedError
+
+#@save
+class EncoderDecoderOld(nn.Block):
+    """The base class for the encoder-decoder architecture."""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoderOld, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def forward(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state)
+```
+
+```{.python .input}
+%%tab pytorch
+#@save
+class EncoderOld(nn.Module):
+    """The base encoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(EncoderOld, self).__init__(**kwargs)
+
+    def forward(self, X, *args):
+        raise NotImplementedError
+        
+#@save
+class DecoderOld(nn.Module):
+    """The base decoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(DecoderOld, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def forward(self, X, state):
+        raise NotImplementedError
+        
+#@save
+class EncoderDecoderOld(nn.Module):
+    """The base class for the encoder-decoder architecture."""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoderOld, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def forward(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state)
+```
+
+```{.python .input}
+%%tab tensorflow
+#@save
+class EncoderOld(tf.keras.layers.Layer):
+    """The base encoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(EncoderOld, self).__init__(**kwargs)
+
+    def call(self, X, *args, **kwargs):
+        raise NotImplementedError
+        
+        
+#@save
+class DecoderOld(tf.keras.layers.Layer):
+    """The base decoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(DecoderOld, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def call(self, X, state, **kwargs):
+        raise NotImplementedError
+        
+#@save
+class EncoderDecoderOld(tf.keras.Model):
+    """The base class for the encoder-decoder architecture."""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoderOld, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def call(self, enc_X, dec_X, *args, **kwargs):
+        enc_outputs = self.encoder(enc_X, *args, **kwargs)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state, **kwargs)
+```
+
 ## [**Positionwise Feed-Forward Networks**]
 
 The positionwise feed-forward network
@@ -262,7 +377,7 @@ ln.initialize()
 bn = nn.BatchNorm()
 bn.initialize()
 X = d2l.tensor([[1, 2], [2, 3]])
-# Compute mean and variance from `X` in the training mode
+# Compute mean and variance from X in the training mode
 with autograd.record():
     print('layer norm:', ln(X), '\nbatch norm:', bn(X))
 ```
@@ -272,7 +387,7 @@ with autograd.record():
 ln = nn.LayerNorm(2)
 bn = nn.BatchNorm1d(2)
 X = d2l.tensor([[1, 2], [2, 3]], dtype=torch.float32)
-# Compute mean and variance from `X` in the training mode
+# Compute mean and variance from X in the training mode
 print('layer norm:', ln(X), '\nbatch norm:', bn(X))
 ```
 
@@ -343,14 +458,16 @@ add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
 
 ```{.python .input}
 %%tab pytorch
-add_norm = AddNorm([3, 4], 0.5) # Normalized_shape is input.size()[1:]
+# Normalized_shape is input.size()[1:]
+add_norm = AddNorm([3, 4], 0.5)
 add_norm.eval()
 add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
 ```
 
 ```{.python .input}
 %%tab tensorflow
-add_norm = AddNorm([1, 2], 0.5) # Normalized_shape is: [i for i in range(len(input.shape))][1:]
+# Normalized_shape is: [i for i in range(len(input.shape))][1:]
+add_norm = AddNorm([1, 2], 0.5)
 add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)), training=False).shape
 ```
 
@@ -412,16 +529,19 @@ class EncoderBlock(nn.Module):
 class EncoderBlock(tf.keras.layers.Layer):
     """Transformer encoder block."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False, **kwargs):
+                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False,
+                 **kwargs):
         super().__init__(**kwargs)
-        self.attention = d2l.MultiHeadAttention(key_size, query_size, value_size, num_hiddens,
-                                                num_heads, dropout, bias)
+        self.attention = d2l.MultiHeadAttention(
+            key_size, query_size, value_size, num_hiddens, num_heads, dropout,
+            bias)
         self.addnorm1 = AddNorm(norm_shape, dropout)
         self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(norm_shape, dropout)
         
     def call(self, X, valid_lens, **kwargs):
-        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens, **kwargs), **kwargs)
+        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens, **kwargs),
+                          **kwargs)
         return self.addnorm2(Y, self.ffn(Y), **kwargs)
 ```
 
@@ -625,7 +745,7 @@ up to the query position.
 ```{.python .input}
 %%tab mxnet
 class DecoderBlock(nn.Block):
-    # The `i`-th block in the decoder
+    # The i-th block in the decoder
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads,
                  dropout, i, **kwargs):
         super(DecoderBlock, self).__init__(**kwargs)
@@ -642,10 +762,10 @@ class DecoderBlock(nn.Block):
     def forward(self, X, state):
         enc_outputs, enc_valid_lens = state[0], state[1]
         # During training, all the tokens of any output sequence are processed
-        # at the same time, so `state[2][self.i]` is `None` as initialized.
-        # When decoding any output sequence token by token during prediction,
-        # `state[2][self.i]` contains representations of the decoded output at
-        # the `i`-th block up to the current time step
+        # at the same time, so state[2][self.i] is None as initialized. When
+        # decoding any output sequence token by token during prediction,
+        # state[2][self.i] contains representations of the decoded output at
+        # the i-th block up to the current time step
         if state[2][self.i] is None:
             key_values = X
         else:
@@ -654,8 +774,8 @@ class DecoderBlock(nn.Block):
 
         if autograd.is_training():
             batch_size, num_steps, _ = X.shape
-            # Shape of `dec_valid_lens`: (`batch_size`, `num_steps`), where
-            # every row is [1, 2, ..., `num_steps`]
+            # Shape of dec_valid_lens: (batch_size, num_steps), where every
+            # row is [1, 2, ..., num_steps]
             dec_valid_lens = np.tile(np.arange(1, num_steps + 1, ctx=X.ctx),
                                      (batch_size, 1))
         else:
@@ -664,8 +784,8 @@ class DecoderBlock(nn.Block):
         # Self-attention
         X2 = self.attention1(X, key_values, key_values, dec_valid_lens)
         Y = self.addnorm1(X, X2)
-        # Encoder-decoder attention. Shape of `enc_outputs`:
-        # (`batch_size`, `num_steps`, `num_hiddens`)
+        # Encoder-decoder attention. Shape of enc_outputs:
+        # (batch_size, num_steps, num_hiddens)
         Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens)
         Z = self.addnorm2(Y, Y2)
         return self.addnorm3(Z, self.ffn(Z)), state
@@ -674,7 +794,7 @@ class DecoderBlock(nn.Block):
 ```{.python .input}
 %%tab pytorch
 class DecoderBlock(nn.Module):
-    # The `i`-th block in the decoder
+    # The i-th block in the decoder
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
                  dropout, i, **kwargs):
@@ -693,10 +813,10 @@ class DecoderBlock(nn.Module):
     def forward(self, X, state):
         enc_outputs, enc_valid_lens = state[0], state[1]
         # During training, all the tokens of any output sequence are processed
-        # at the same time, so `state[2][self.i]` is `None` as initialized.
-        # When decoding any output sequence token by token during prediction,
-        # `state[2][self.i]` contains representations of the decoded output at
-        # the `i`-th block up to the current time step
+        # at the same time, so state[2][self.i] is None as initialized. When
+        # decoding any output sequence token by token during prediction,
+        # state[2][self.i] contains representations of the decoded output at
+        # the i-th block up to the current time step
         if state[2][self.i] is None:
             key_values = X
         else:
@@ -704,8 +824,8 @@ class DecoderBlock(nn.Module):
         state[2][self.i] = key_values
         if self.training:
             batch_size, num_steps, _ = X.shape
-            # Shape of `dec_valid_lens`: (`batch_size`, `num_steps`), where
-            # every row is [1, 2, ..., `num_steps`]
+            # Shape of dec_valid_lens: (batch_size, num_steps), where every
+            # row is [1, 2, ..., num_steps]
             dec_valid_lens = torch.arange(
                 1, num_steps + 1, device=X.device).repeat(batch_size, 1)
         else:
@@ -714,8 +834,8 @@ class DecoderBlock(nn.Module):
         # Self-attention
         X2 = self.attention1(X, key_values, key_values, dec_valid_lens)
         Y = self.addnorm1(X, X2)
-        # Encoder-decoder attention. Shape of `enc_outputs`:
-        # (`batch_size`, `num_steps`, `num_hiddens`)
+        # Encoder-decoder attention. Shape of enc_outputs:
+        # (batch_size, num_steps, num_hiddens)
         Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens)
         Z = self.addnorm2(Y, Y2)
         return self.addnorm3(Z, self.ffn(Z)), state
@@ -724,14 +844,16 @@ class DecoderBlock(nn.Module):
 ```{.python .input}
 %%tab tensorflow
 class DecoderBlock(tf.keras.layers.Layer):
-    # The `i`-th block in the decoder
+    # The i-th block in the decoder
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_hiddens, num_heads, dropout, i, **kwargs):
         super().__init__(**kwargs)
         self.i = i
-        self.attention1 = d2l.MultiHeadAttention(key_size, query_size, value_size, num_hiddens, num_heads, dropout)
+        self.attention1 = d2l.MultiHeadAttention(
+            key_size, query_size, value_size, num_hiddens, num_heads, dropout)
         self.addnorm1 = AddNorm(norm_shape, dropout)
-        self.attention2 = d2l.MultiHeadAttention(key_size, query_size, value_size, num_hiddens, num_heads, dropout)
+        self.attention2 = d2l.MultiHeadAttention(
+            key_size, query_size, value_size, num_hiddens, num_heads, dropout)
         self.addnorm2 = AddNorm(norm_shape, dropout)
         self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm3 = AddNorm(norm_shape, dropout)
@@ -739,10 +861,10 @@ class DecoderBlock(tf.keras.layers.Layer):
     def call(self, X, state, **kwargs):
         enc_outputs, enc_valid_lens = state[0], state[1]
         # During training, all the tokens of any output sequence are processed
-        # at the same time, so `state[2][self.i]` is `None` as initialized.
-        # When decoding any output sequence token by token during prediction,
-        # `state[2][self.i]` contains representations of the decoded output at
-        # the `i`-th block up to the current time step
+        # at the same time, so state[2][self.i] is None as initialized. When
+        # decoding any output sequence token by token during prediction,
+        # state[2][self.i] contains representations of the decoded output at
+        # the i-th block up to the current time step
         if state[2][self.i] is None:
             key_values = X
         else:
@@ -750,19 +872,23 @@ class DecoderBlock(tf.keras.layers.Layer):
         state[2][self.i] = key_values
         if kwargs["training"]:
             batch_size, num_steps, _ = X.shape
-            # Shape of `dec_valid_lens`: (`batch_size`, `num_steps`), where
-            # every row is [1, 2, ..., `num_steps`]
-            dec_valid_lens = tf.repeat(tf.reshape(tf.range(1, num_steps + 1),
-                                                 shape=(-1, num_steps)), repeats=batch_size, axis=0)
+            # Shape of dec_valid_lens: (batch_size, num_steps), where every
+            # row is [1, 2, ..., num_steps]
+            dec_valid_lens = tf.repeat(
+                tf.reshape(tf.range(1, num_steps + 1),
+                           shape=(-1, num_steps)), repeats=batch_size, axis=0)
 
         else:
             dec_valid_lens = None
             
         # Self-attention
-        X2 = self.attention1(X, key_values, key_values, dec_valid_lens, **kwargs)
+        X2 = self.attention1(X, key_values, key_values, dec_valid_lens,
+                             **kwargs)
         Y = self.addnorm1(X, X2, **kwargs)
-        # Encoder-decoder attention. Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`)
-        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens, **kwargs)
+        # Encoder-decoder attention. Shape of enc_outputs:
+        # (batch_size, num_steps, num_hiddens)
+        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens,
+                             **kwargs)
         Z = self.addnorm2(Y, Y2, **kwargs)
         return self.addnorm3(Z, self.ffn(Z), **kwargs), state
 ```
@@ -890,28 +1016,35 @@ class TransformerDecoder(d2l.AttentionDecoder):
 %%tab tensorflow
 class TransformerDecoder(d2l.AttentionDecoder):
     def __init__(self, vocab_size, key_size, query_size, value_size,
-                 num_hiddens, norm_shape, ffn_num_hiddens, num_heads, num_layers, dropout, **kwargs):
+                 num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
+                 num_layers, dropout, **kwargs):
         super().__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.num_layers = num_layers
         self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
-        self.blks = [DecoderBlock(key_size, query_size, value_size, num_hiddens, norm_shape,
-                                  ffn_num_hiddens, num_heads, dropout, i) for i in range(num_layers)]
+        self.blks = [DecoderBlock(
+            key_size, query_size, value_size, num_hiddens, norm_shape,
+            ffn_num_hiddens, num_heads, dropout, i)
+                     for i in range(num_layers)]
         self.dense = tf.keras.layers.Dense(vocab_size)
         
     def init_state(self, enc_outputs, enc_valid_lens, *args):
         return [enc_outputs, enc_valid_lens, [None] * self.num_layers]
     
     def call(self, X, state, **kwargs):
-        X = self.pos_encoding(self.embedding(X) * tf.math.sqrt(tf.cast(self.num_hiddens, dtype=tf.float32)), **kwargs)
-        self._attention_weights = [[None] * len(self.blks) for _ in range(2)]  # 2 Attention layers in decoder
+        X = self.pos_encoding(self.embedding(X) * tf.math.sqrt(
+            tf.cast(self.num_hiddens, dtype=tf.float32)), **kwargs)
+        # 2 attention layers in decoder
+        self._attention_weights = [[None] * len(self.blks) for _ in range(2)] 
         for i, blk in enumerate(self.blks):
             X, state = blk(X, state, **kwargs)
             # Decoder self-attention weights
-            self._attention_weights[0][i] = blk.attention1.attention.attention_weights
+            (self._attention_weights[0][i] =
+             blk.attention1.attention.attention_weights)
             # Encoder-decoder attention weights
-            self._attention_weights[1][i] = blk.attention2.attention.attention_weights
+            (self._attention_weights[1][i] =
+             blk.attention2.attention.attention_weights)
         return self.dense(X), state
     
     @property
