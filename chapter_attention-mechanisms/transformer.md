@@ -748,8 +748,8 @@ up to the query position.
 class DecoderBlock(nn.Block):
     # The i-th block in the decoder
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads,
-                 dropout, i, **kwargs):
-        super(DecoderBlock, self).__init__(**kwargs)
+                 dropout, i):
+        super().__init__()
         self.i = i
         self.attention1 = d2l.MultiHeadAttention(num_hiddens, num_heads,
                                                  dropout)
@@ -781,7 +781,6 @@ class DecoderBlock(nn.Block):
                                      (batch_size, 1))
         else:
             dec_valid_lens = None
-
         # Self-attention
         X2 = self.attention1(X, key_values, key_values, dec_valid_lens)
         Y = self.addnorm1(X, X2)
@@ -798,8 +797,8 @@ class DecoderBlock(nn.Module):
     # The i-th block in the decoder
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
-                 dropout, i, **kwargs):
-        super(DecoderBlock, self).__init__(**kwargs)
+                 dropout, i):
+        super().__init__()
         self.i = i
         self.attention1 = d2l.MultiHeadAttention(
             key_size, query_size, value_size, num_hiddens, num_heads, dropout)
@@ -831,7 +830,6 @@ class DecoderBlock(nn.Module):
                 1, num_steps + 1, device=X.device).repeat(batch_size, 1)
         else:
             dec_valid_lens = None
-
         # Self-attention
         X2 = self.attention1(X, key_values, key_values, dec_valid_lens)
         Y = self.addnorm1(X, X2)
@@ -847,8 +845,8 @@ class DecoderBlock(nn.Module):
 class DecoderBlock(tf.keras.layers.Layer):
     # The i-th block in the decoder
     def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_hiddens, num_heads, dropout, i, **kwargs):
-        super().__init__(**kwargs)
+                 norm_shape, ffn_num_hiddens, num_heads, dropout, i):
+        super().__init__()
         self.i = i
         self.attention1 = d2l.MultiHeadAttention(
             key_size, query_size, value_size, num_hiddens, num_heads, dropout)
@@ -878,10 +876,8 @@ class DecoderBlock(tf.keras.layers.Layer):
             dec_valid_lens = tf.repeat(
                 tf.reshape(tf.range(1, num_steps + 1),
                            shape=(-1, num_steps)), repeats=batch_size, axis=0)
-
         else:
             dec_valid_lens = None
-            
         # Self-attention
         X2 = self.attention1(X, key_values, key_values, dec_valid_lens,
                              **kwargs)
@@ -906,16 +902,15 @@ decoder_blk = DecoderBlock(24, 48, 8, 0.5, 0)
 decoder_blk.initialize()
 X = np.ones((2, 100, 24))
 state = [encoder_blk(X, valid_lens), valid_lens, [None]]
-decoder_blk(X, state)[0].shape
+d2l.check_shape(decoder_blk(X, state)[0], X.shape)
 ```
 
 ```{.python .input}
 %%tab pytorch
 decoder_blk = DecoderBlock(24, 24, 24, 24, [100, 24], 24, 48, 8, 0.5, 0)
-decoder_blk.eval()
 X = d2l.ones((2, 100, 24))
 state = [encoder_blk(X, valid_lens), valid_lens, [None]]
-decoder_blk(X, state)[0].shape
+d2l.check_shape(decoder_blk(X, state)[0], X.shape)
 ```
 
 ```{.python .input}
@@ -923,7 +918,7 @@ decoder_blk(X, state)[0].shape
 decoder_blk = DecoderBlock(24, 24, 24, 24, [1, 2], 48, 8, 0.5, 0)
 X = tf.ones((2, 100, 24))
 state = [encoder_blk(X, valid_lens), valid_lens, [None]]
-decoder_blk(X, state, training=False)[0].shape
+d2l.check_shape(decoder_blk(X, state, training=False)[0], X.shape)
 ```
 
 Now we [**construct the entire transformer decoder**]
@@ -939,8 +934,8 @@ are stored for later visualization.
 %%tab mxnet
 class TransformerDecoder(d2l.AttentionDecoder):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
-                 num_heads, num_layers, dropout, **kwargs):
-        super(TransformerDecoder, self).__init__(**kwargs)
+                 num_heads, num_layers, dropout):
+        super().__init__()
         self.num_hiddens = num_hiddens
         self.num_layers = num_layers
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
@@ -953,7 +948,7 @@ class TransformerDecoder(d2l.AttentionDecoder):
         self.dense = nn.Dense(vocab_size, flatten=False)
         self.initialize(init.Xavier())
 
-    def init_state(self, enc_outputs, enc_valid_lens, *args):
+    def init_state(self, enc_outputs, enc_valid_lens):
         return [enc_outputs, enc_valid_lens, [None] * self.num_layers]
 
     def forward(self, X, state):
@@ -979,8 +974,8 @@ class TransformerDecoder(d2l.AttentionDecoder):
 class TransformerDecoder(d2l.AttentionDecoder):
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
-                 num_heads, num_layers, dropout, **kwargs):
-        super(TransformerDecoder, self).__init__(**kwargs)
+                 num_heads, num_layers, dropout):
+        super().__init__()
         self.num_hiddens = num_hiddens
         self.num_layers = num_layers
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
@@ -994,7 +989,7 @@ class TransformerDecoder(d2l.AttentionDecoder):
         self.dense = nn.Linear(num_hiddens, vocab_size)
         self.apply(d2l.init_seq2seq_weights)
 
-    def init_state(self, enc_outputs, enc_valid_lens, *args):
+    def init_state(self, enc_outputs, enc_valid_lens):
         return [enc_outputs, enc_valid_lens, [None] * self.num_layers]
 
     def forward(self, X, state):
@@ -1020,8 +1015,8 @@ class TransformerDecoder(d2l.AttentionDecoder):
 class TransformerDecoder(d2l.AttentionDecoder):
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, **kwargs):
-        super().__init__(**kwargs)
+                 num_layers, dropout):
+        super().__init__()
         self.num_hiddens = num_hiddens
         self.num_layers = num_layers
         self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)
@@ -1032,7 +1027,7 @@ class TransformerDecoder(d2l.AttentionDecoder):
                      for i in range(num_layers)]
         self.dense = tf.keras.layers.Dense(vocab_size)
         
-    def init_state(self, enc_outputs, enc_valid_lens, *args):
+    def init_state(self, enc_outputs, enc_valid_lens):
         return [enc_outputs, enc_valid_lens, [None] * self.num_layers]
     
     def call(self, X, state, **kwargs):
