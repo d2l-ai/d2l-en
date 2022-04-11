@@ -840,7 +840,7 @@ class EncoderDecoder(d2l.Classifier):
                      save_attention_weights=False):
         """Defined in :numref:`sec_seq2seq_training`"""
         src, tgt, src_valid_len, _ = batch
-        enc_outputs = self.encoder(src)
+        enc_outputs = self.encoder(src, src_valid_len)
         dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
         outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
         for _ in range(num_steps):
@@ -1091,44 +1091,6 @@ class PositionalEncoding(tf.keras.layers.Layer):
     def call(self, X, **kwargs):
         X = X + self.P[:, :X.shape[1], :]
         return self.dropout(X, **kwargs)
-
-class EncoderOld(tf.keras.layers.Layer):
-    """The base encoder interface for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, **kwargs):
-        super(EncoderOld, self).__init__(**kwargs)
-
-    def call(self, X, *args, **kwargs):
-        raise NotImplementedError
-
-
-class DecoderOld(tf.keras.layers.Layer):
-    """The base decoder interface for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, **kwargs):
-        super(DecoderOld, self).__init__(**kwargs)
-
-    def init_state(self, enc_outputs, *args):
-        raise NotImplementedError
-
-    def call(self, X, state, **kwargs):
-        raise NotImplementedError
-
-class EncoderDecoderOld(tf.keras.Model):
-    """The base class for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoderOld, self).__init__(**kwargs)
-        self.encoder = encoder
-        self.decoder = decoder
-
-    def call(self, enc_X, dec_X, *args, **kwargs):
-        enc_outputs = self.encoder(enc_X, *args, **kwargs)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state, **kwargs)
 
 class PositionWiseFFN(tf.keras.layers.Layer):
     """Positionwise feed-forward network.

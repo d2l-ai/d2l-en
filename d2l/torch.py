@@ -868,7 +868,7 @@ class EncoderDecoder(d2l.Classifier):
         """Defined in :numref:`sec_seq2seq_training`"""
         batch = [d2l.to(a, device) for a in batch]
         src, tgt, src_valid_len, _ = batch
-        enc_outputs = self.encoder(src)
+        enc_outputs = self.encoder(src, src_valid_len)
         dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
         outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
         for _ in range(num_steps):
@@ -1125,43 +1125,6 @@ class PositionalEncoding(nn.Module):
     def forward(self, X):
         X = X + self.P[:, :X.shape[1], :].to(X.device)
         return self.dropout(X)
-
-class EncoderOld(nn.Module):
-    """The base encoder interface for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, **kwargs):
-        super(EncoderOld, self).__init__(**kwargs)
-
-    def forward(self, X, *args):
-        raise NotImplementedError
-
-class DecoderOld(nn.Module):
-    """The base decoder interface for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, **kwargs):
-        super(DecoderOld, self).__init__(**kwargs)
-
-    def init_state(self, enc_outputs, *args):
-        raise NotImplementedError
-
-    def forward(self, X, state):
-        raise NotImplementedError
-
-class EncoderDecoderOld(nn.Module):
-    """The base class for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoderOld, self).__init__(**kwargs)
-        self.encoder = encoder
-        self.decoder = decoder
-
-    def forward(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state)
 
 class PositionWiseFFN(nn.Module):
     """Positionwise feed-forward network.

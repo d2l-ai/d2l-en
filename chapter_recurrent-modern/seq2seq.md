@@ -594,7 +594,7 @@ def predict_step(self, batch, device, num_steps,
     if tab.selected('mxnet', 'pytorch'):
         batch = [d2l.to(a, device) for a in batch]
     src, tgt, src_valid_len, _ = batch
-    enc_outputs = self.encoder(src)
+    enc_outputs = self.encoder(src, src_valid_len)
     dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
     outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
     for _ in range(num_steps):
