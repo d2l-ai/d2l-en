@@ -1026,26 +1026,26 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         self.W_o = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
 
     def call(self, queries, keys, values, valid_lens, **kwargs):
-        # Shape of `queries`, `keys`, or `values`:
-        # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`)
-        # Shape of `valid_lens`:
-        # (`batch_size`,) or (`batch_size`, no. of queries)
-        # After transposing, shape of output `queries`, `keys`, or `values`:
-        # (`batch_size` * `num_heads`, no. of queries or key-value pairs,
-        # `num_hiddens` / `num_heads`)
+        # Shape of queries, keys, or values:
+        # (batch_size, no. of queries or key-value pairs, num_hiddens)
+        # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
+        # After transposing, shape of output queries, keys, or values:
+        # (batch_size * num_heads, no. of queries or key-value pairs,
+        # num_hiddens / num_heads)
         queries = transpose_qkv(self.W_q(queries), self.num_heads)
         keys = transpose_qkv(self.W_k(keys), self.num_heads)
         values = transpose_qkv(self.W_v(values), self.num_heads)
 
         if valid_lens is not None:
-            # On axis 0, copy the first item (scalar or vector) for
-            # `num_heads` times, then copy the next item, and so on
+            # On axis 0, copy the first item (scalar or vector) for num_heads
+            # times, then copy the next item, and so on
             valid_lens = tf.repeat(valid_lens, repeats=self.num_heads, axis=0)
 
-        # Shape of `output`: (`batch_size` * `num_heads`, no. of queries, `num_hiddens` / `num_heads`)
+        # Shape of output: (batch_size * num_heads, no. of queries,
+        # num_hiddens / num_heads)
         output = self.attention(queries, keys, values, valid_lens, **kwargs)
 
-        # Shape of `output_concat`: (`batch_size`, no. of queries, `num_hiddens`)
+        # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
 
@@ -1053,26 +1053,19 @@ def transpose_qkv(X, num_heads):
     """Transposition for parallel computation of multiple attention heads.
 
     Defined in :numref:`sec_multihead-attention`"""
-    # Shape of input `X`:
-    # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`).
-    # Shape of output `X`:
-    # (`batch_size`, no. of queries or key-value pairs, `num_heads`,
-    # `num_hiddens` / `num_heads`)
+    # Shape of input X: (batch_size, no. of queries or key-value pairs,
+    # num_hiddens). Shape of output X: (batch_size, no. of queries or
+    # key-value pairs, num_heads, num_hiddens / num_heads)
     X = tf.reshape(X, shape=(X.shape[0], X.shape[1], num_heads, -1))
-
-    # Shape of output `X`:
-    # (`batch_size`, `num_heads`, no. of queries or key-value pairs,
-    # `num_hiddens` / `num_heads`)
+    # Shape of output X: (batch_size, num_heads, no. of queries or key-value
+    # pairs, num_hiddens / num_heads)
     X = tf.transpose(X, perm=(0, 2, 1, 3))
-
-    # Shape of `output`:
-    # (`batch_size` * `num_heads`, no. of queries or key-value pairs,
-    # `num_hiddens` / `num_heads`)
+    # Shape of output: (batch_size * num_heads, no. of queries or key-value
+    # pairs, num_hiddens / num_heads)
     return tf.reshape(X, shape=(-1, X.shape[2], X.shape[3]))
 
-
 def transpose_output(X, num_heads):
-    """Reverse the operation of `transpose_qkv`.
+    """Reverse the operation of transpose_qkv.
 
     Defined in :numref:`sec_multihead-attention`"""
     X = tf.reshape(X, shape=(-1, num_heads, X.shape[1], X.shape[2]))
@@ -1086,7 +1079,7 @@ class PositionalEncoding(tf.keras.layers.Layer):
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
-        # Create a long enough `P`
+        # Create a long enough P
         self.P = np.zeros((1, max_len, num_hiddens))
         X = np.arange(max_len, dtype=np.float32).reshape(
             -1,1)/np.power(10000, np.arange(
@@ -1166,16 +1159,19 @@ class EncoderBlock(tf.keras.layers.Layer):
 
     Defined in :numref:`sec_transformer`"""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False, **kwargs):
+                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False,
+                 **kwargs):
         super().__init__(**kwargs)
-        self.attention = d2l.MultiHeadAttention(key_size, query_size, value_size, num_hiddens,
-                                                num_heads, dropout, bias)
+        self.attention = d2l.MultiHeadAttention(
+            key_size, query_size, value_size, num_hiddens, num_heads, dropout,
+            bias)
         self.addnorm1 = AddNorm(norm_shape, dropout)
         self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(norm_shape, dropout)
 
     def call(self, X, valid_lens, **kwargs):
-        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens, **kwargs), **kwargs)
+        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens, **kwargs),
+                          **kwargs)
         return self.addnorm2(Y, self.ffn(Y), **kwargs)
 
 class TransformerEncoder(d2l.EncoderOld):
