@@ -1,23 +1,6 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
-```
-
-```{.json .output n=1}
-[
- {
-  "data": {
-   "application/vnd.jupyter.widget-view+json": {
-    "model_id": "a93d02ae07484826a854f73d2628ac04",
-    "version_major": 2,
-    "version_minor": 0
-   },
-   "text/plain": "interactive(children=(Dropdown(description='tab', index=1, options=('mxnet', 'pytorch', 'tensorflow'), value='\u2026"
-  },
-  "metadata": {},
-  "output_type": "display_data"
- }
-]
 ```
 
 # Transformer
@@ -286,8 +269,8 @@ an output tensor of shape
 #@save
 class PositionWiseFFN(nn.Block):
     """Positionwise feed-forward network."""
-    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
-        super(PositionWiseFFN, self).__init__(**kwargs)
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs):
+        super().__init__()
         self.dense1 = nn.Dense(ffn_num_hiddens, flatten=False,
                                activation='relu')
         self.dense2 = nn.Dense(ffn_num_outputs, flatten=False)
@@ -301,9 +284,8 @@ class PositionWiseFFN(nn.Block):
 #@save
 class PositionWiseFFN(nn.Module):
     """Positionwise feed-forward network."""
-    def __init__(self, ffn_num_input, ffn_num_hiddens, ffn_num_outputs,
-                 **kwargs):
-        super(PositionWiseFFN, self).__init__(**kwargs)
+    def __init__(self, ffn_num_input, ffn_num_hiddens, ffn_num_outputs):
+        super().__init__()
         self.dense1 = nn.Linear(ffn_num_input, ffn_num_hiddens)
         self.relu = nn.ReLU()
         self.dense2 = nn.Linear(ffn_num_hiddens, ffn_num_outputs)
@@ -317,8 +299,8 @@ class PositionWiseFFN(nn.Module):
 #@save
 class PositionWiseFFN(tf.keras.layers.Layer):
     """Positionwise feed-forward network."""
-    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
-        super().__init__(*kwargs)
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs):
+        super().__init__()
         self.dense1 = tf.keras.layers.Dense(ffn_num_hiddens)
         self.relu = tf.keras.layers.ReLU()
         self.dense2 = tf.keras.layers.Dense(ffn_num_outputs)
@@ -425,8 +407,8 @@ Dropout is also applied for regularization.
 #@save
 class AddNorm(nn.Block):
     """Residual connection followed by layer normalization."""
-    def __init__(self, dropout, **kwargs):
-        super(AddNorm, self).__init__(**kwargs)
+    def __init__(self, dropout):
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
         self.ln = nn.LayerNorm()
 
@@ -439,8 +421,8 @@ class AddNorm(nn.Block):
 #@save
 class AddNorm(nn.Module):
     """Residual connection followed by layer normalization."""
-    def __init__(self, normalized_shape, dropout, **kwargs):
-        super(AddNorm, self).__init__(**kwargs)
+    def __init__(self, normalized_shape, dropout):
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
         self.ln = nn.LayerNorm(normalized_shape)
 
@@ -453,8 +435,8 @@ class AddNorm(nn.Module):
 #@save
 class AddNorm(tf.keras.layers.Layer):
     """Residual connection followed by layer normalization."""
-    def __init__(self, normalized_shape, dropout, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, normalized_shape, dropout):
+        super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
         self.ln = tf.keras.layers.LayerNormalization(normalized_shape)
         
@@ -470,22 +452,22 @@ so that [**the output tensor also has the same shape after the addition operatio
 %%tab mxnet
 add_norm = AddNorm(0.5)
 add_norm.initialize()
-add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
+d2l.check_shape(add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))), (2, 3, 4))
 ```
 
 ```{.python .input}
 %%tab pytorch
 # Normalized_shape is input.size()[1:]
 add_norm = AddNorm([3, 4], 0.5)
-add_norm.eval()
-add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
+d2l.check_shape(add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))), (2, 3, 4))
 ```
 
 ```{.python .input}
 %%tab tensorflow
 # Normalized_shape is: [i for i in range(len(input.shape))][1:]
 add_norm = AddNorm([1, 2], 0.5)
-add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)), training=False).shape
+d2l.check_shape(add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)),
+                         training=False), (2, 3, 4))
 ```
 
 ## Encoder

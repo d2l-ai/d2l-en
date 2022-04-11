@@ -1134,8 +1134,8 @@ class PositionWiseFFN(tf.keras.layers.Layer):
     """Positionwise feed-forward network.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
-        super().__init__(*kwargs)
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs):
+        super().__init__()
         self.dense1 = tf.keras.layers.Dense(ffn_num_hiddens)
         self.relu = tf.keras.layers.ReLU()
         self.dense2 = tf.keras.layers.Dense(ffn_num_outputs)
@@ -1147,8 +1147,8 @@ class AddNorm(tf.keras.layers.Layer):
     """Residual connection followed by layer normalization.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, normalized_shape, dropout, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, normalized_shape, dropout):
+        super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
         self.ln = tf.keras.layers.LayerNormalization(normalized_shape)
 
