@@ -976,7 +976,7 @@ if tab.selected('pytorch'):
 if tab.selected('mxnet', 'pytorch'):
     model = d2l.Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
                         lr=0.001)
-    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
+    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
         encoder = TransformerEncoder(
@@ -987,7 +987,7 @@ if tab.selected('tensorflow'):
             norm_shape, ffn_num_hiddens, num_heads, num_layers, dropout)
         model = d2l.Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
                             lr=0.001)
-    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1)
+    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 

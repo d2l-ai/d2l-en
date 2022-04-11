@@ -2963,28 +2963,6 @@ def sequence_mask(X, valid_len, value=0):
     X[~mask] = value
     return X
 
-class Seq2SeqEncoderOld(d2l.EncoderOld):
-    """The RNN encoder for sequence to sequence learning.
-
-    Defined in :numref:`sec_utils`"""
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqEncoderOld, self).__init__(**kwargs)
-        # Embedding layer
-        self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = nn.GRU(embed_size, num_hiddens, num_layers,
-                          dropout=dropout)
-
-    def forward(self, X, *args):
-        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
-        X = self.embedding(X)
-        # In RNN models, the first axis corresponds to time steps
-        X = X.permute(1, 0, 2)
-        # When state is not mentioned, it defaults to zeros
-        output, state = self.rnn(X)
-        # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
-        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`)
-        return output, state
 
 class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
     """The softmax cross-entropy loss with masks.

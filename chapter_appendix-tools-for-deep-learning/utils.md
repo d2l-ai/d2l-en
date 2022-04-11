@@ -731,26 +731,6 @@ def bleu(pred_seq, label_seq, k):  #@save
 
 ```{.python .input}
 %%tab mxnet
-#@save
-class Seq2SeqEncoderOld(d2l.EncoderOld):
-    """The RNN encoder for sequence to sequence learning."""
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqEncoderOld, self).__init__(**kwargs)
-        # Embedding layer
-        self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
-
-    def forward(self, X, *args):
-        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
-        X = self.embedding(X)
-        # In RNN models, the first axis corresponds to time steps
-        X = X.swapaxes(0, 1)
-        state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
-        output, state = self.rnn(X, state)
-        # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
-        # `state[0]` shape: (`num_layers`, `batch_size`, `num_hiddens`)
-        return output, state
     
 #@save
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
@@ -838,27 +818,6 @@ def sequence_mask(X, valid_len, value=0):
     X[~mask] = value
     return X
 
-#@save
-class Seq2SeqEncoderOld(d2l.EncoderOld):
-    """The RNN encoder for sequence to sequence learning."""
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqEncoderOld, self).__init__(**kwargs)
-        # Embedding layer
-        self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = nn.GRU(embed_size, num_hiddens, num_layers,
-                          dropout=dropout)
-
-    def forward(self, X, *args):
-        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
-        X = self.embedding(X)
-        # In RNN models, the first axis corresponds to time steps
-        X = X.permute(1, 0, 2)
-        # When state is not mentioned, it defaults to zeros
-        output, state = self.rnn(X)
-        # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
-        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`)
-        return output, state
     
 #@save
 class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
@@ -965,25 +924,6 @@ def sequence_mask(X, valid_len, value=0):
     else:
         return tf.where(mask, X, value)
 
-#@save
-class Seq2SeqEncoderOld(d2l.EncoderOld):
-    """The RNN encoder for sequence to sequence learning."""
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers, dropout=0, **kwargs): 
-        super().__init__(*kwargs)
-        # Embedding layer
-        self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
-        self.rnn = tf.keras.layers.RNN(tf.keras.layers.StackedRNNCells(
-            [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)
-             for _ in range(num_layers)]), return_sequences=True,
-                                       return_state=True)
-    
-    def call(self, X, *args, **kwargs):
-        # The input `X` shape: (`batch_size`, `num_steps`)
-        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
-        X = self.embedding(X)
-        output = self.rnn(X, **kwargs)
-        state = output[1:]
-        return output[0], state
     
 #@save
 class MaskedSoftmaxCELoss(tf.keras.losses.Loss):
