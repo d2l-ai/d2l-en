@@ -569,7 +569,6 @@ is (batch size, number of time steps, `num_hiddens`).
 ```{.python .input}
 %%tab mxnet
 encoder = TransformerEncoder(200, 24, 48, 8, 2, 0.5)
-#encoder.initialize()
 d2l.check_shape(encoder(np.ones((2, 100)), valid_lens), (2, 100, 24))
 ```
 

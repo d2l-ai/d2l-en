@@ -387,8 +387,10 @@ for en, fr, p in zip(engs, fras, preds):
 ```{.python .input}
 %%tab all
 attention_weights = d2l.reshape(
-    d2l.concat([step[0][0][0] for step in dec_attention_weights], 0),
+    # Index -1 refers to the last English sentence
+    d2l.concat([step[0][-1][0] for step in dec_attention_weights], 0),
     (1, 1, -1, data.num_steps))
+attention_weights.shape
 ```
 
 By [**visualizing the attention weights**]
