@@ -844,7 +844,7 @@ def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
 class Encoder(nn.Block):
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self):
-        super(Encoder, self).__init__()
+        super().__init__()
 
     # Later there can be additional arguments (e.g., length excluding padding)
     def forward(self, X, *args):
@@ -884,7 +884,7 @@ class EncoderDecoder(d2l.Classifier):
         """Defined in :numref:`sec_seq2seq_training`"""
         batch = [d2l.to(a, device) for a in batch]
         src, tgt, src_valid_len, _ = batch
-        enc_outputs = self.encoder(src)
+        enc_outputs = self.encoder(src, src_valid_len)
         dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
         outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
         for _ in range(num_steps):
@@ -1041,20 +1041,20 @@ class AttentionDecoder(d2l.Decoder):
     """The base attention-based decoder interface.
 
     Defined in :numref:`sec_seq2seq_attention`"""
-    def __init__(self, **kwargs):
-        super(AttentionDecoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
     @property
     def attention_weights(self):
         raise NotImplementedError
 
-class MultiHeadAttention(nn.Block):
+class MultiHeadAttention(d2l.Module):
     """Multi-head attention.
 
     Defined in :numref:`sec_multihead-attention`"""
     def __init__(self, num_hiddens, num_heads, dropout, use_bias=False,
                  **kwargs):
-        super(MultiHeadAttention, self).__init__(**kwargs)
+        super().__init__()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
         self.W_q = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
@@ -1069,9 +1069,9 @@ class MultiHeadAttention(nn.Block):
         # After transposing, shape of output queries, keys, or values:
         # (batch_size * num_heads, no. of queries or key-value pairs,
         # num_hiddens / num_heads)
-        queries = transpose_qkv(self.W_q(queries), self.num_heads)
-        keys = transpose_qkv(self.W_k(keys), self.num_heads)
-        values = transpose_qkv(self.W_v(values), self.num_heads)
+        queries = self.transpose_qkv(self.W_q(queries))
+        keys = self.transpose_qkv(self.W_k(keys))
+        values = self.transpose_qkv(self.W_v(values))
 
         if valid_lens is not None:
             # On axis 0, copy the first item (scalar or vector) for num_heads
@@ -1083,38 +1083,39 @@ class MultiHeadAttention(nn.Block):
         output = self.attention(queries, keys, values, valid_lens)
 
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
-        output_concat = transpose_output(output, self.num_heads)
+        output_concat = self.transpose_output(output)
         return self.W_o(output_concat)
 
-def transpose_qkv(X, num_heads):
-    """Transposition for parallel computation of multiple attention heads.
+    def transpose_qkv(self, X):
+        """Transposition for parallel computation of multiple attention heads.
+    
+        Defined in :numref:`sec_multihead-attention`"""
+        # Shape of input X: (batch_size, no. of queries or key-value pairs,
+        # num_hiddens). Shape of output X: (batch_size, no. of queries or
+        # key-value pairs, num_heads, num_hiddens / num_heads)
+        X = X.reshape(X.shape[0], X.shape[1], self.num_heads, -1)
+        # Shape of output X: (batch_size, num_heads, no. of queries or key-value
+        # pairs, num_hiddens / num_heads)
+        X = X.transpose(0, 2, 1, 3)
+        # Shape of output: (batch_size * num_heads, no. of queries or key-value
+        # pairs, num_hiddens / num_heads)
+        return X.reshape(-1, X.shape[2], X.shape[3])
+    
 
-    Defined in :numref:`sec_multihead-attention`"""
-    # Shape of input X: (batch_size, no. of queries or key-value pairs,
-    # num_hiddens). Shape of output X: (batch_size, no. of queries or
-    # key-value pairs, num_heads, num_hiddens / num_heads)
-    X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
-    # Shape of output X: (batch_size, num_heads, no. of queries or key-value
-    # pairs, num_hiddens / num_heads)
-    X = X.transpose(0, 2, 1, 3)
-    # Shape of output: (batch_size * num_heads, no. of queries or key-value
-    # pairs, num_hiddens / num_heads)
-    return X.reshape(-1, X.shape[2], X.shape[3])
-
-def transpose_output(X, num_heads):
-    """Reverse the operation of transpose_qkv.
-
-    Defined in :numref:`sec_multihead-attention`"""
-    X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
-    X = X.transpose(0, 2, 1, 3)
-    return X.reshape(X.shape[0], X.shape[1], -1)
+    def transpose_output(self, X):
+        """Reverse the operation of transpose_qkv.
+    
+        Defined in :numref:`sec_multihead-attention`"""
+        X = X.reshape(-1, self.num_heads, X.shape[1], X.shape[2])
+        X = X.transpose(0, 2, 1, 3)
+        return X.reshape(X.shape[0], X.shape[1], -1)
 
 class PositionalEncoding(nn.Block):
     """Positional encoding.
 
     Defined in :numref:`sec_self-attention-and-positional-encoding`"""
     def __init__(self, num_hiddens, dropout, max_len=1000):
-        super(PositionalEncoding, self).__init__()
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
         # Create a long enough P
         self.P = d2l.zeros((1, max_len, num_hiddens))
@@ -1127,50 +1128,12 @@ class PositionalEncoding(nn.Block):
         X = X + self.P[:, :X.shape[1], :].as_in_ctx(X.ctx)
         return self.dropout(X)
 
-class EncoderOld(nn.Block):
-    """The base encoder interface for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, **kwargs):
-        super(EncoderOld, self).__init__(**kwargs)
-
-    def forward(self, X, *args):
-        raise NotImplementedError
-
-
-class DecoderOld(nn.Block):
-    """The base decoder interface for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, **kwargs):
-        super(DecoderOld, self).__init__(**kwargs)
-
-    def init_state(self, enc_outputs, *args):
-        raise NotImplementedError
-
-    def forward(self, X, state):
-        raise NotImplementedError
-
-class EncoderDecoderOld(nn.Block):
-    """The base class for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoderOld, self).__init__(**kwargs)
-        self.encoder = encoder
-        self.decoder = decoder
-
-    def forward(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state)
-
 class PositionWiseFFN(nn.Block):
     """Positionwise feed-forward network.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
-        super(PositionWiseFFN, self).__init__(**kwargs)
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs):
+        super().__init__()
         self.dense1 = nn.Dense(ffn_num_hiddens, flatten=False,
                                activation='relu')
         self.dense2 = nn.Dense(ffn_num_outputs, flatten=False)
@@ -1182,8 +1145,8 @@ class AddNorm(nn.Block):
     """Residual connection followed by layer normalization.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, dropout, **kwargs):
-        super(AddNorm, self).__init__(**kwargs)
+    def __init__(self, dropout):
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
         self.ln = nn.LayerNorm()
 
@@ -1195,8 +1158,8 @@ class EncoderBlock(nn.Block):
 
     Defined in :numref:`sec_transformer`"""
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
-                 use_bias=False, **kwargs):
-        super(EncoderBlock, self).__init__(**kwargs)
+                 use_bias=False):
+        super().__init__()
         self.attention = d2l.MultiHeadAttention(
             num_hiddens, num_heads, dropout, use_bias)
         self.addnorm1 = AddNorm(dropout)
@@ -1207,13 +1170,13 @@ class EncoderBlock(nn.Block):
         Y = self.addnorm1(X, self.attention(X, X, X, valid_lens))
         return self.addnorm2(Y, self.ffn(Y))
 
-class TransformerEncoder(d2l.EncoderOld):
+class TransformerEncoder(d2l.Encoder):
     """Transformer encoder.
 
     Defined in :numref:`sec_transformer`"""
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
-                 num_heads, num_layers, dropout, use_bias=False, **kwargs):
-        super(TransformerEncoder, self).__init__(**kwargs)
+                 num_heads, num_layers, dropout, use_bias=False):
+        super().__init__()
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
@@ -1222,8 +1185,9 @@ class TransformerEncoder(d2l.EncoderOld):
             self.blks.add(
                 EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout,
                              use_bias))
+        self.initialize()
 
-    def forward(self, X, valid_lens, *args):
+    def forward(self, X, valid_lens):
         # Since positional encoding values are between -1 and 1, the embedding
         # values are multiplied by the square root of the embedding dimension
         # to rescale before they are summed up
@@ -3207,28 +3171,6 @@ def bleu(pred_seq, label_seq, k):
                 label_subs[''.join(pred_tokens[i: i + n])] -= 1
         score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
     return score
-
-class Seq2SeqEncoderOld(d2l.EncoderOld):
-    """The RNN encoder for sequence to sequence learning.
-
-    Defined in :numref:`sec_utils`"""
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqEncoderOld, self).__init__(**kwargs)
-        # Embedding layer
-        self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
-
-    def forward(self, X, *args):
-        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
-        X = self.embedding(X)
-        # In RNN models, the first axis corresponds to time steps
-        X = X.swapaxes(0, 1)
-        state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
-        output, state = self.rnn(X, state)
-        # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
-        # `state[0]` shape: (`num_layers`, `batch_size`, `num_hiddens`)
-        return output, state
 
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     """The softmax cross-entropy loss with masks.

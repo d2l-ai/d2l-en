@@ -80,7 +80,6 @@ attention.initialize()
 num_hiddens, num_heads = 100, 5
 attention = d2l.MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
                                    num_hiddens, num_heads, 0.5)
-attention.eval()
 ```
 
 ```{.python .input}
@@ -94,14 +93,16 @@ attention = d2l.MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
 %%tab mxnet, pytorch
 batch_size, num_queries, valid_lens = 2, 4, d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
-attention(X, X, X, valid_lens).shape
+d2l.check_shape(attention(X, X, X, valid_lens),
+                (batch_size, num_queries, num_hiddens))
 ```
 
 ```{.python .input}
 %%tab tensorflow
 batch_size, num_queries, valid_lens = 2, 4, tf.constant([3, 2])
 X = tf.ones((batch_size, num_queries, num_hiddens))
-attention(X, X, X, valid_lens, training=False).shape
+d2l.check_shape(attention(X, X, X, valid_lens, training=False),
+                (batch_size, num_queries, num_hiddens))
 ```
 
 ## Comparing CNNs, RNNs, and Self-Attention
@@ -230,7 +231,7 @@ let's first implement it in the following `PositionalEncoding` class.
 class PositionalEncoding(nn.Block):
     """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
-        super(PositionalEncoding, self).__init__()
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
         # Create a long enough P
         self.P = d2l.zeros((1, max_len, num_hiddens))
@@ -250,7 +251,7 @@ class PositionalEncoding(nn.Block):
 class PositionalEncoding(nn.Module):
     """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
-        super(PositionalEncoding, self).__init__()
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
         # Create a long enough P
         self.P = d2l.zeros((1, max_len, num_hiddens))
@@ -315,7 +316,6 @@ d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
 %%tab pytorch
 encoding_dim, num_steps = 32, 60
 pos_encoding = PositionalEncoding(encoding_dim, 0)
-pos_encoding.eval()
 X = pos_encoding(d2l.zeros((1, num_steps, encoding_dim)))
 P = pos_encoding.P[:, :X.shape[1], :]
 d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',

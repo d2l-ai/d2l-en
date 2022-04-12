@@ -126,8 +126,8 @@ decoders with attention mechanisms**].
 #@save
 class AttentionDecoder(d2l.Decoder):
     """The base attention-based decoder interface."""
-    def __init__(self, **kwargs):
-        super(AttentionDecoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
     @property
     def attention_weights(self):
@@ -152,8 +152,8 @@ as input of the RNN decoder.
 %%tab mxnet
 class Seq2SeqAttentionDecoder(AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
+                 dropout=0):
+        super().__init__()
         self.attention = d2l.AdditiveAttention(num_hiddens, dropout)
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
@@ -201,8 +201,8 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
 %%tab pytorch
 class Seq2SeqAttentionDecoder(AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
+                 dropout=0):
+        super().__init__()
         self.attention = d2l.AdditiveAttention(
             num_hiddens, num_hiddens, num_hiddens, dropout)
         self.embedding = nn.Embedding(vocab_size, embed_size)
@@ -252,15 +252,15 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
 %%tab tensorflow
 class Seq2SeqAttentionDecoder(AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super().__init__(**kwargs)
+                 dropout=0):
+        super().__init__()
         self.attention = d2l.AdditiveAttention(num_hiddens, num_hiddens,
                                                num_hiddens, dropout)
         self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
         self.rnn = tf.keras.layers.RNN(tf.keras.layers.StackedRNNCells(
             [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)
-             for _ in range(num_layers)]),
-                                      return_sequences=True, return_state=True)
+             for _ in range(num_layers)]), return_sequences=True,
+                                       return_state=True)
         self.dense = tf.keras.layers.Dense(vocab_size)
 
     def init_state(self, enc_outputs, enc_valid_lens):
@@ -315,14 +315,10 @@ encoder = d2l.Seq2SeqEncoder(vocab_size, embed_size, num_hiddens, num_layers)
 decoder = Seq2SeqAttentionDecoder(vocab_size, embed_size, num_hiddens,
                                   num_layers)
 if tab.selected('mxnet'):
-    encoder.initialize(force_reinit=True)
-    decoder.initialize(force_reinit=True)
     X = d2l.zeros((batch_size, num_steps))
     state = decoder.init_state(encoder(X), None)
     output, state = decoder(X, state)
 if tab.selected('pytorch'):
-    encoder.eval()
-    decoder.eval()
     X = d2l.zeros((batch_size, num_steps), dtype=torch.long)
     state = decoder.init_state(encoder(X), None)
     output, state = decoder(X, state)
@@ -342,9 +338,6 @@ here we specify hyperparemeters,
 instantiate
 an encoder and a decoder with Bahdanau attention,
 and train this model for machine translation.
-Due to the newly added attention mechanism,
-this training is much slower than
-that in :numref:`sec_seq2seq_training` without attention mechanisms.
 
 ```{.python .input}
 %%tab all
@@ -378,9 +371,8 @@ into French and compute their BLEU scores.
 %%tab all
 engs = ['go .', 'i lost .', 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
-batch = data.build(engs, fras)
-preds, dec_attention_weights = model.predict_step(
-    batch, d2l.try_gpu(), data.num_steps, True)
+preds, _ = model.predict_step(
+    data.build(engs, fras), d2l.try_gpu(), data.num_steps, True)
 for en, fr, p in zip(engs, fras, preds):
     translation = []
     for token in data.tgt_vocab.to_tokens(p):
@@ -391,13 +383,6 @@ for en, fr, p in zip(engs, fras, preds):
           f'{d2l.bleu(" ".join(translation), fr, k=2):.3f}')  
 ```
 
-```{.python .input}
-%%tab all
-attention_weights = d2l.reshape(
-    d2l.concat([step[0][0][0] for step in dec_attention_weights], 0),
-    (1, 1, -1, data.num_steps))
-```
-
 By [**visualizing the attention weights**]
 when translating the last English sentence,
 we can see that each query assigns non-uniform weights
@@ -405,6 +390,15 @@ over key-value pairs.
 It shows that at each decoding step,
 different parts of the input sequences
 are selectively aggregated in the attention pooling.
+
+```{.python .input}
+%%tab all
+_, dec_attention_weights = model.predict_step(
+    data.build([engs[-1]], [fras[-1]]), d2l.try_gpu(), data.num_steps, True)
+attention_weights = d2l.reshape(
+    d2l.concat([step[0][0][0] for step in dec_attention_weights], 0),
+    (1, 1, -1, data.num_steps))
+```
 
 ```{.python .input}
 %%tab mxnet

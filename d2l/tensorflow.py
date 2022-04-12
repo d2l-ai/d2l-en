@@ -801,7 +801,7 @@ def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
 class Encoder(tf.keras.layers.Layer):
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self):
-        super(Encoder, self).__init__()
+        super().__init__()
 
     # Later there can be additional arguments (e.g., length excluding padding)
     def call(self, X, *args):
@@ -840,7 +840,7 @@ class EncoderDecoder(d2l.Classifier):
                      save_attention_weights=False):
         """Defined in :numref:`sec_seq2seq_training`"""
         src, tgt, src_valid_len, _ = batch
-        enc_outputs = self.encoder(src)
+        enc_outputs = self.encoder(src, src_valid_len)
         dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
         outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
         for _ in range(num_steps):
@@ -1004,20 +1004,20 @@ class AttentionDecoder(d2l.Decoder):
     """The base attention-based decoder interface.
 
     Defined in :numref:`sec_seq2seq_attention`"""
-    def __init__(self, **kwargs):
-        super(AttentionDecoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
     @property
     def attention_weights(self):
         raise NotImplementedError
 
-class MultiHeadAttention(tf.keras.layers.Layer):
+class MultiHeadAttention(d2l.Module):
     """Multi-head attention.
 
     Defined in :numref:`sec_multihead-attention`"""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  num_heads, dropout, bias=False, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
         self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
@@ -1032,9 +1032,9 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         # After transposing, shape of output queries, keys, or values:
         # (batch_size * num_heads, no. of queries or key-value pairs,
         # num_hiddens / num_heads)
-        queries = transpose_qkv(self.W_q(queries), self.num_heads)
-        keys = transpose_qkv(self.W_k(keys), self.num_heads)
-        values = transpose_qkv(self.W_v(values), self.num_heads)
+        queries = self.transpose_qkv(self.W_q(queries))
+        keys = self.transpose_qkv(self.W_k(keys))
+        values = self.transpose_qkv(self.W_v(values))
 
         if valid_lens is not None:
             # On axis 0, copy the first item (scalar or vector) for num_heads
@@ -1046,31 +1046,32 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         output = self.attention(queries, keys, values, valid_lens, **kwargs)
 
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
-        output_concat = transpose_output(output, self.num_heads)
+        output_concat = self.transpose_output(output)
         return self.W_o(output_concat)
 
-def transpose_qkv(X, num_heads):
-    """Transposition for parallel computation of multiple attention heads.
+    def transpose_qkv(self, X):
+        """Transposition for parallel computation of multiple attention heads.
+    
+        Defined in :numref:`sec_multihead-attention`"""
+        # Shape of input X: (batch_size, no. of queries or key-value pairs,
+        # num_hiddens). Shape of output X: (batch_size, no. of queries or
+        # key-value pairs, num_heads, num_hiddens / num_heads)
+        X = tf.reshape(X, shape=(X.shape[0], X.shape[1], self.num_heads, -1))
+        # Shape of output X: (batch_size, num_heads, no. of queries or key-value
+        # pairs, num_hiddens / num_heads)
+        X = tf.transpose(X, perm=(0, 2, 1, 3))
+        # Shape of output: (batch_size * num_heads, no. of queries or key-value
+        # pairs, num_hiddens / num_heads)
+        return tf.reshape(X, shape=(-1, X.shape[2], X.shape[3]))
+    
 
-    Defined in :numref:`sec_multihead-attention`"""
-    # Shape of input X: (batch_size, no. of queries or key-value pairs,
-    # num_hiddens). Shape of output X: (batch_size, no. of queries or
-    # key-value pairs, num_heads, num_hiddens / num_heads)
-    X = tf.reshape(X, shape=(X.shape[0], X.shape[1], num_heads, -1))
-    # Shape of output X: (batch_size, num_heads, no. of queries or key-value
-    # pairs, num_hiddens / num_heads)
-    X = tf.transpose(X, perm=(0, 2, 1, 3))
-    # Shape of output: (batch_size * num_heads, no. of queries or key-value
-    # pairs, num_hiddens / num_heads)
-    return tf.reshape(X, shape=(-1, X.shape[2], X.shape[3]))
-
-def transpose_output(X, num_heads):
-    """Reverse the operation of transpose_qkv.
-
-    Defined in :numref:`sec_multihead-attention`"""
-    X = tf.reshape(X, shape=(-1, num_heads, X.shape[1], X.shape[2]))
-    X = tf.transpose(X, perm=(0, 2, 1, 3))
-    return tf.reshape(X, shape=(X.shape[0], X.shape[1], -1))
+    def transpose_output(self, X):
+        """Reverse the operation of transpose_qkv.
+    
+        Defined in :numref:`sec_multihead-attention`"""
+        X = tf.reshape(X, shape=(-1, self.num_heads, X.shape[1], X.shape[2]))
+        X = tf.transpose(X, perm=(0, 2, 1, 3))
+        return tf.reshape(X, shape=(X.shape[0], X.shape[1], -1))
 
 class PositionalEncoding(tf.keras.layers.Layer):
     """Positional encoding.
@@ -1091,50 +1092,12 @@ class PositionalEncoding(tf.keras.layers.Layer):
         X = X + self.P[:, :X.shape[1], :]
         return self.dropout(X, **kwargs)
 
-class EncoderOld(tf.keras.layers.Layer):
-    """The base encoder interface for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, **kwargs):
-        super(EncoderOld, self).__init__(**kwargs)
-
-    def call(self, X, *args, **kwargs):
-        raise NotImplementedError
-
-
-class DecoderOld(tf.keras.layers.Layer):
-    """The base decoder interface for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, **kwargs):
-        super(DecoderOld, self).__init__(**kwargs)
-
-    def init_state(self, enc_outputs, *args):
-        raise NotImplementedError
-
-    def call(self, X, state, **kwargs):
-        raise NotImplementedError
-
-class EncoderDecoderOld(tf.keras.Model):
-    """The base class for the encoder-decoder architecture.
-
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoderOld, self).__init__(**kwargs)
-        self.encoder = encoder
-        self.decoder = decoder
-
-    def call(self, enc_X, dec_X, *args, **kwargs):
-        enc_outputs = self.encoder(enc_X, *args, **kwargs)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state, **kwargs)
-
 class PositionWiseFFN(tf.keras.layers.Layer):
     """Positionwise feed-forward network.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
-        super().__init__(*kwargs)
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs):
+        super().__init__()
         self.dense1 = tf.keras.layers.Dense(ffn_num_hiddens)
         self.relu = tf.keras.layers.ReLU()
         self.dense2 = tf.keras.layers.Dense(ffn_num_outputs)
@@ -1146,8 +1109,8 @@ class AddNorm(tf.keras.layers.Layer):
     """Residual connection followed by layer normalization.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, normalized_shape, dropout, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, normalized_shape, dropout):
+        super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
         self.ln = tf.keras.layers.LayerNormalization(normalized_shape)
 
@@ -1159,9 +1122,8 @@ class EncoderBlock(tf.keras.layers.Layer):
 
     Defined in :numref:`sec_transformer`"""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False,
-                 **kwargs):
-        super().__init__(**kwargs)
+                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False):
+        super().__init__()
         self.attention = d2l.MultiHeadAttention(
             key_size, query_size, value_size, num_hiddens, num_heads, dropout,
             bias)
@@ -1174,14 +1136,14 @@ class EncoderBlock(tf.keras.layers.Layer):
                           **kwargs)
         return self.addnorm2(Y, self.ffn(Y), **kwargs)
 
-class TransformerEncoder(d2l.EncoderOld):
+class TransformerEncoder(d2l.Encoder):
     """Transformer encoder.
 
     Defined in :numref:`sec_transformer`"""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, bias=False, **kwargs):
-        super().__init__(**kwargs)
+                 num_layers, dropout, bias=False):
+        super().__init__()
         self.num_hiddens = num_hiddens
         self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
@@ -1838,26 +1800,6 @@ def sequence_mask(X, valid_len, value=0):
     else:
         return tf.where(mask, X, value)
 
-class Seq2SeqEncoderOld(d2l.EncoderOld):
-    """The RNN encoder for sequence to sequence learning.
-
-    Defined in :numref:`sec_utils`"""
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers, dropout=0, **kwargs):
-        super().__init__(*kwargs)
-        # Embedding layer
-        self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
-        self.rnn = tf.keras.layers.RNN(tf.keras.layers.StackedRNNCells(
-            [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)
-             for _ in range(num_layers)]), return_sequences=True,
-                                       return_state=True)
-
-    def call(self, X, *args, **kwargs):
-        # The input `X` shape: (`batch_size`, `num_steps`)
-        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
-        X = self.embedding(X)
-        output = self.rnn(X, **kwargs)
-        state = output[1:]
-        return output[0], state
 
 class MaskedSoftmaxCELoss(tf.keras.losses.Loss):
     """The softmax cross-entropy loss with masks.
