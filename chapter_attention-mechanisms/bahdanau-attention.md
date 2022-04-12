@@ -259,8 +259,8 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
         self.rnn = tf.keras.layers.RNN(tf.keras.layers.StackedRNNCells(
             [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)
-             for _ in range(num_layers)]),
-                                      return_sequences=True, return_state=True)
+             for _ in range(num_layers)]), return_sequences=True,
+                                       return_state=True)
         self.dense = tf.keras.layers.Dense(vocab_size)
 
     def init_state(self, enc_outputs, enc_valid_lens):
@@ -371,9 +371,8 @@ into French and compute their BLEU scores.
 %%tab all
 engs = ['go .', 'i lost .', 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
-batch = data.build(engs, fras)
-preds, dec_attention_weights = model.predict_step(
-    batch, d2l.try_gpu(), data.num_steps, True)
+preds, _ = model.predict_step(
+    data.build(engs, fras), d2l.try_gpu(), data.num_steps, True)
 for en, fr, p in zip(engs, fras, preds):
     translation = []
     for token in data.tgt_vocab.to_tokens(p):
@@ -384,15 +383,6 @@ for en, fr, p in zip(engs, fras, preds):
           f'{d2l.bleu(" ".join(translation), fr, k=2):.3f}')  
 ```
 
-```{.python .input}
-%%tab all
-attention_weights = d2l.reshape(
-    # Index -1 refers to the last English sentence
-    d2l.concat([step[0][-1][0] for step in dec_attention_weights], 0),
-    (1, 1, -1, data.num_steps))
-attention_weights.shape
-```
-
 By [**visualizing the attention weights**]
 when translating the last English sentence,
 we can see that each query assigns non-uniform weights
@@ -400,6 +390,15 @@ over key-value pairs.
 It shows that at each decoding step,
 different parts of the input sequences
 are selectively aggregated in the attention pooling.
+
+```{.python .input}
+%%tab all
+_, dec_attention_weights = model.predict_step(
+    data.build([engs[-1]], [fras[-1]]), d2l.try_gpu(), data.num_steps, True)
+attention_weights = d2l.reshape(
+    d2l.concat([step[0][0][0] for step in dec_attention_weights], 0),
+    (1, 1, -1, data.num_steps))
+```
 
 ```{.python .input}
 %%tab mxnet

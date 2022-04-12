@@ -352,7 +352,7 @@ class Seq2SeqDecoder(d2l.Decoder):
     """The RNN decoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0):
-        super(Seq2SeqDecoder, self).__init__()
+        super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
         self.dense = nn.Dense(vocab_size, flatten=False)
@@ -384,7 +384,7 @@ class Seq2SeqDecoder(d2l.Decoder):
     """The RNN decoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0):
-        super(Seq2SeqDecoder, self).__init__()
+        super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(embed_size+num_hiddens, num_hiddens,
                            num_layers, dropout)
@@ -417,7 +417,7 @@ class Seq2SeqDecoder(d2l.Decoder):
     """The RNN decoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0):
-        super(Seq2SeqDecoder, self).__init__()
+        super().__init__()
         self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
         self.dense = tf.keras.layers.Dense(vocab_size)
@@ -549,7 +549,7 @@ if tab.selected('mxnet', 'pytorch'):
         len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
     model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
                     lr=0.001)
-    trainer = d2l.Trainer(max_epochs=75, gradient_clip_val=1, num_gpus=1)
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
         encoder = Seq2SeqEncoder(
@@ -558,7 +558,7 @@ if tab.selected('tensorflow'):
             len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
         model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
                         lr=0.001)
-    trainer = d2l.Trainer(max_epochs=75, gradient_clip_val=1)
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -691,8 +691,8 @@ and compute the BLEU of the results.
 %%tab all
 engs = ['go .', 'i lost .', 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
-batch = data.build(engs, fras)
-preds, _ = model.predict_step(batch, d2l.try_gpu(), data.num_steps)
+preds, _ = model.predict_step(
+    data.build(engs, fras), d2l.try_gpu(), data.num_steps)
 for en, fr, p in zip(engs, fras, preds):
     translation = []
     for token in data.tgt_vocab.to_tokens(p):

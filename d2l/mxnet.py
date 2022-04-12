@@ -1185,7 +1185,7 @@ class TransformerEncoder(d2l.Encoder):
             self.blks.add(
                 EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout,
                              use_bias))
-        self.initialize(init.Xavier())
+        self.initialize()
 
     def forward(self, X, valid_lens):
         # Since positional encoding values are between -1 and 1, the embedding

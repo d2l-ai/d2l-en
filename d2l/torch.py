@@ -1188,7 +1188,6 @@ class TransformerEncoder(d2l.Encoder):
                 EncoderBlock(key_size, query_size, value_size, num_hiddens,
                              norm_shape, ffn_num_input, ffn_num_hiddens,
                              num_heads, dropout, use_bias))
-        self.apply(d2l.init_seq2seq_weights)
 
     def forward(self, X, valid_lens):
         # Since positional encoding values are between -1 and 1, the embedding

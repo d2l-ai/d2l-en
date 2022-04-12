@@ -483,7 +483,7 @@ class TransformerEncoder(d2l.Encoder):
             self.blks.add(
                 EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout,
                              use_bias))
-        self.initialize(init.Xavier())
+        self.initialize()
 
     def forward(self, X, valid_lens):
         # Since positional encoding values are between -1 and 1, the embedding
@@ -516,7 +516,6 @@ class TransformerEncoder(d2l.Encoder):
                 EncoderBlock(key_size, query_size, value_size, num_hiddens,
                              norm_shape, ffn_num_input, ffn_num_hiddens,
                              num_heads, dropout, use_bias))
-        self.apply(d2l.init_seq2seq_weights)
 
     def forward(self, X, valid_lens):
         # Since positional encoding values are between -1 and 1, the embedding
@@ -631,8 +630,7 @@ up to the query position.
 %%tab mxnet
 class DecoderBlock(nn.Block):
     # The i-th block in the decoder
-    def __init__(self, num_hiddens, ffn_num_hiddens, num_heads,
-                 dropout, i):
+    def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout, i):
         super().__init__()
         self.i = i
         self.attention1 = d2l.MultiHeadAttention(num_hiddens, num_heads,
@@ -817,8 +815,8 @@ are stored for later visualization.
 ```{.python .input}
 %%tab mxnet
 class TransformerDecoder(d2l.AttentionDecoder):
-    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
-                 num_heads, num_layers, dropout):
+    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
+                 num_layers, dropout):
         super().__init__()
         self.num_hiddens = num_hiddens
         self.num_layers = num_layers
@@ -830,7 +828,7 @@ class TransformerDecoder(d2l.AttentionDecoder):
                 DecoderBlock(num_hiddens, ffn_num_hiddens, num_heads,
                              dropout, i))
         self.dense = nn.Dense(vocab_size, flatten=False)
-        self.initialize(init.Xavier())
+        self.initialize()
 
     def init_state(self, enc_outputs, enc_valid_lens):
         return [enc_outputs, enc_valid_lens, [None] * self.num_layers]
@@ -871,7 +869,6 @@ class TransformerDecoder(d2l.AttentionDecoder):
                              norm_shape, ffn_num_input, ffn_num_hiddens,
                              num_heads, dropout, i))
         self.dense = nn.Linear(num_hiddens, vocab_size)
-        self.apply(d2l.init_seq2seq_weights)
 
     def init_state(self, enc_outputs, enc_valid_lens):
         return [enc_outputs, enc_valid_lens, [None] * self.num_layers]
@@ -948,13 +945,13 @@ for sequence to sequence learning on the English-French machine translation data
 ```{.python .input}
 %%tab all
 data = d2l.MTFraEng(batch_size=128) 
-num_hiddens, num_layers, dropout = 128, 2, 0.2
+num_hiddens, num_layers, dropout = 256, 2, 0.2
 ffn_num_hiddens, num_heads = 64, 4
 if tab.selected('pytorch'):
-    key_size, query_size, value_size = 128, 128, 128
-    ffn_num_input, norm_shape = 128, [128]
+    key_size, query_size, value_size = 256, 256, 256
+    ffn_num_input, norm_shape = 256, [256]
 if tab.selected('tensorflow'):
-    key_size, query_size, value_size = 128, 128, 128
+    key_size, query_size, value_size = 256, 256, 256
     norm_shape = [2]
 if tab.selected('mxnet'):
     encoder = TransformerEncoder(
@@ -975,7 +972,7 @@ if tab.selected('pytorch'):
 if tab.selected('mxnet', 'pytorch'):
     model = d2l.Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
                         lr=0.001)
-    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1, num_gpus=1)
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
         encoder = TransformerEncoder(
@@ -986,7 +983,7 @@ if tab.selected('tensorflow'):
             norm_shape, ffn_num_hiddens, num_heads, num_layers, dropout)
         model = d2l.Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
                             lr=0.001)
-    trainer = d2l.Trainer(max_epochs=10, gradient_clip_val=1)
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
@@ -998,17 +995,16 @@ to [**translate a few English sentences**] into French and compute their BLEU sc
 %%tab all
 engs = ['go .', 'i lost .', 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
-batch = data.build(engs, fras)
-preds, dec_attention_weights = model.predict_step(
-    batch, d2l.try_gpu(), data.num_steps, True)
+preds, _ = model.predict_step(
+    data.build(engs, fras), d2l.try_gpu(), data.num_steps, True)
 for en, fr, p in zip(engs, fras, preds):
     translation = []
     for token in data.tgt_vocab.to_tokens(p):
         if token == '<eos>':
             break
-        translation.append(token)        
+        translation.append(token)
     print(f'{en} => {translation}, bleu,'
-          f'{d2l.bleu(" ".join(translation), fr, k=2):.3f}')  
+          f'{d2l.bleu(" ".join(translation), fr, k=2):.3f}')
 ```
 
 Let's [**visualize the transformer attention weights**] when translating the last English sentence into French.
@@ -1017,10 +1013,13 @@ is (number of encoder layers, number of attention heads, `num_steps` or number o
 
 ```{.python .input}
 %%tab all
+_, dec_attention_weights = model.predict_step(
+    data.build([engs[-1]], [fras[-1]]), d2l.try_gpu(), data.num_steps, True)
 enc_attention_weights = d2l.reshape(
     d2l.concat(model.encoder.attention_weights, 0),
     (num_layers, num_heads, -1, data.num_steps))
-enc_attention_weights.shape
+d2l.check_shape(enc_attention_weights,
+                (num_layers, num_heads, data.num_steps, data.num_steps))
 ```
 
 In the encoder self-attention,
@@ -1058,7 +1057,8 @@ the decoder self-attention weights
 and the encoder-decoder attention weights
 both have the same queries:
 the beginning-of-sequence token followed by
-the output tokens.
+the output tokens and possibly 
+end-of-sequence tokens.
 
 ```{.python .input}
 %%tab mxnet
@@ -1071,7 +1071,6 @@ dec_attention_weights = d2l.reshape(dec_attention_weights_filled, (
     -1, 2, num_layers, num_heads, data.num_steps))
 dec_self_attention_weights, dec_inter_attention_weights = \
     dec_attention_weights.transpose(1, 2, 3, 0, 4)
-dec_self_attention_weights.shape, dec_inter_attention_weights.shape
 ```
 
 ```{.python .input}
@@ -1085,7 +1084,6 @@ dec_attention_weights = d2l.reshape(dec_attention_weights_filled, (
     -1, 2, num_layers, num_heads, data.num_steps))
 dec_self_attention_weights, dec_inter_attention_weights = \
     dec_attention_weights.permute(1, 2, 3, 0, 4)
-dec_self_attention_weights.shape, dec_inter_attention_weights.shape
 ```
 
 ```{.python .input}
@@ -1100,7 +1098,14 @@ dec_attention_weights = tf.reshape(dec_attention_weights_filled, shape=(
     -1, 2, num_layers, num_heads, data.num_steps))
 dec_self_attention_weights, dec_inter_attention_weights = tf.transpose(
     dec_attention_weights, perm=(1, 2, 3, 0, 4))
-print(dec_self_attention_weights.shape, dec_inter_attention_weights.shape)
+```
+
+```{.python .input}
+%%tab all
+d2l.check_shape(dec_self_attention_weights,
+                (num_layers, num_heads, data.num_steps, data.num_steps))
+d2l.check_shape(dec_inter_attention_weights,
+                (num_layers, num_heads, data.num_steps, data.num_steps))
 ```
 
 Due to the auto-regressive property of the decoder self-attention,
@@ -1108,9 +1113,8 @@ no query attends to key-value pairs after the query position.
 
 ```{.python .input}
 %%tab all
-# Plus one to include the beginning-of-sequence token
 d2l.show_heatmaps(
-    dec_self_attention_weights[:, :, :, :len(translation) + 1],
+    dec_self_attention_weights[:, :, :, :],
     xlabel='Key positions', ylabel='Query positions',
     titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))
 ```
