@@ -126,8 +126,8 @@ decoders with attention mechanisms**].
 #@save
 class AttentionDecoder(d2l.Decoder):
     """The base attention-based decoder interface."""
-    def __init__(self, **kwargs):
-        super(AttentionDecoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
     @property
     def attention_weights(self):
@@ -152,8 +152,8 @@ as input of the RNN decoder.
 %%tab mxnet
 class Seq2SeqAttentionDecoder(AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
+                 dropout=0):
+        super().__init__()
         self.attention = d2l.AdditiveAttention(num_hiddens, dropout)
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
@@ -201,8 +201,8 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
 %%tab pytorch
 class Seq2SeqAttentionDecoder(AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
+                 dropout=0):
+        super().__init__()
         self.attention = d2l.AdditiveAttention(
             num_hiddens, num_hiddens, num_hiddens, dropout)
         self.embedding = nn.Embedding(vocab_size, embed_size)
@@ -252,8 +252,8 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
 %%tab tensorflow
 class Seq2SeqAttentionDecoder(AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super().__init__(**kwargs)
+                 dropout=0):
+        super().__init__()
         self.attention = d2l.AdditiveAttention(num_hiddens, num_hiddens,
                                                num_hiddens, dropout)
         self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)

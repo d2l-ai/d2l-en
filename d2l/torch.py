@@ -828,7 +828,7 @@ def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
 class Encoder(nn.Module):
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self):
-        super(Encoder, self).__init__()
+        super().__init__()
 
     # Later there can be additional arguments (e.g., length excluding padding)
     def forward(self, X, *args):
@@ -1037,8 +1037,8 @@ class AttentionDecoder(d2l.Decoder):
     """The base attention-based decoder interface.
 
     Defined in :numref:`sec_seq2seq_attention`"""
-    def __init__(self, **kwargs):
-        super(AttentionDecoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
     @property
     def attention_weights(self):

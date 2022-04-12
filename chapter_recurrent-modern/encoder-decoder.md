@@ -59,7 +59,7 @@ from mxnet.gluon import nn
 class Encoder(nn.Block):
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self):
-        super(Encoder, self).__init__()
+        super().__init__()
 
     # Later there can be additional arguments (e.g., length excluding padding)
     def forward(self, X, *args):
@@ -75,7 +75,7 @@ from torch import nn
 class Encoder(nn.Module):
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self):
-        super(Encoder, self).__init__()
+        super().__init__()
 
     # Later there can be additional arguments (e.g., length excluding padding)
     def forward(self, X, *args):
@@ -91,7 +91,7 @@ import tensorflow as tf
 class Encoder(tf.keras.layers.Layer):
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self):
-        super(Encoder, self).__init__()
+        super().__init__()
 
     # Later there can be additional arguments (e.g., length excluding padding)
     def call(self, X, *args):
