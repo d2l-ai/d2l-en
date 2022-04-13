@@ -106,7 +106,7 @@ At this point, attempts to access `net[0].weight.data()`
 would trigger a runtime error stating that the network
 must be initialized before the parameters can be accessed.
 Now let's see what happens when we attempt to initialize
-parameters via the `initialize` function.
+parameters via the `initialize` method.
 :end_tab:
 
 :begin_tab:`tensorflow`
