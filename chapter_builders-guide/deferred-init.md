@@ -83,7 +83,6 @@ We confirm by attempting to access the parameters below.
 
 ```{.python .input}
 %%tab mxnet
-net.initialize()
 print(net.collect_params)
 print(net.collect_params())
 ```
@@ -117,6 +116,7 @@ have not been initialized yet.
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 net.initialize()
 net.collect_params()
 ```
@@ -183,6 +183,10 @@ the framework can finally initialize the parameters.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/280)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/8092)
 :end_tab:
 
 :begin_tab:`tensorflow`

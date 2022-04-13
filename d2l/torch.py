@@ -510,12 +510,12 @@ def corr2d(X, K):
             Y[i, j] = d2l.reduce_sum((X[i: i + h, j: j + w] * K))
     return Y
 
-def init_cnn_weights(layer):
+def init_cnn_weights(module):
     """Initialize weights for CNNs.
 
     Defined in :numref:`sec_lenet`"""
-    if type(layer) == nn.Linear or type(layer) == nn.Conv2d:
-        nn.init.xavier_uniform_(layer.weight)
+    if type(module) == nn.Linear or type(module) == nn.Conv2d:
+        nn.init.xavier_uniform_(module.weight)
 
 class Residual(nn.Module):
     """The Residual block of ResNet."""
@@ -879,16 +879,16 @@ class EncoderDecoder(d2l.Classifier):
                 attention_weights.append(self.decoder.attention_weights)
         return d2l.concat(outputs[1:], 1), attention_weights
 
-def init_seq2seq_weights(layer):
+def init_seq2seq_weights(module):
     """Initialize weights for Seq2Seq.
 
     Defined in :numref:`sec_seq2seq`"""
-    if type(layer) == nn.Linear:
+    if type(module) == nn.Linear:
          nn.init.xavier_uniform_(layer.weight)
-    if type(layer) == nn.GRU:
+    if type(module) == nn.GRU:
         for param in layer._flat_weights_names:
             if "weight" in param:
-                nn.init.xavier_uniform_(layer._parameters[param])
+                nn.init.xavier_uniform_(module._parameters[param])
 
 class Seq2SeqEncoder(d2l.Encoder):
     """The RNN encoder for sequence to sequence learning.
@@ -1303,9 +1303,9 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     """Defined in :numref:`sec_minibatches`"""
     # Initialization
     net = nn.Sequential(nn.Linear(5, 1))
-    def init_weights(layer):
-        if type(layer) == nn.Linear:
-            torch.nn.init.normal_(layer.weight, std=0.01)
+    def init_weights(module):
+        if type(module) == nn.Linear:
+            torch.nn.init.normal_(module.weight, std=0.01)
     net.apply(init_weights)
 
     optimizer = trainer_fn(net.parameters(), **hyperparams)

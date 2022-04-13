@@ -335,9 +335,9 @@ embed_size, kernel_sizes, nums_channels = 100, [3, 4, 5], [100, 100, 100]
 devices = d2l.try_all_gpus()
 net = TextCNN(len(vocab), embed_size, kernel_sizes, nums_channels)
 
-def init_weights(layer):
-    if type(layer) in (nn.Linear, nn.Conv1d):
-        nn.init.xavier_uniform_(layer.weight)
+def init_weights(module):
+    if type(module) in (nn.Linear, nn.Conv1d):
+        nn.init.xavier_uniform_(module.weight)
 
 net.apply(init_weights);
 ```

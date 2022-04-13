@@ -27,7 +27,6 @@ of declaring and manipulating parameters.
 In this section, we cover the following:
 
 * Accessing parameters for debugging, diagnostics, and visualizations.
-* Parameter initialization.
 * Sharing parameters across different model components.
 
 (**We start by focusing on an MLP with one hidden layer.**)
@@ -162,7 +161,7 @@ The situation can grow especially unwieldy
 when we work with more complex modules (e.g., nested modules),
 since we would need to recurse
 through the entire tree to extract
-each sub-module's parameters. Below we demonstrate accessing all layers.
+each sub-module's parameters. Below we demonstrate accessing the parameters of all layers.
 
 ```{.python .input}
 %%tab mxnet
@@ -186,8 +185,8 @@ Let's see how to do this elegantly.
 In the following we allocate a dense layer
 and then use its parameters specifically
 to set those of another layer. 
-Note that since parameters were lazily initialized,
-we need to run the forward `net(X)` before accessing the parameters.
+Here we need to run the forward propagation
+`net(X)` before accessing the parameters.
 
 ```{.python .input}
 %%tab mxnet
@@ -262,12 +261,12 @@ during backpropagation.
 
 ## Summary
 
-* We have several ways to access, initialize, and tie model parameters.
+We have several ways to access and tie model parameters.
 
 
 ## Exercises
 
-1. Use the `FancyMLP` model defined in :numref:`sec_model_construction` and access the parameters of the various layers.
+1. Use the `NestMLP` model defined in :numref:`sec_model_construction` and access the parameters of the various layers.
 1. Construct an MLP containing a shared parameter layer and train it. During the training process, observe the model parameters and gradients of each layer.
 1. Why is sharing parameters a good idea?
 

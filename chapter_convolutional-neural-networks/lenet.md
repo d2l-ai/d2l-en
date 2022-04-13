@@ -113,10 +113,10 @@ from d2l import tensorflow as d2l
 
 ```{.python .input}
 %%tab pytorch
-def init_cnn_weights(layer):  #@save
+def init_cnn_weights(module):  #@save
     """Initialize weights for CNNs."""
-    if type(layer) == nn.Linear or type(layer) == nn.Conv2d:
-        nn.init.xavier_uniform_(layer.weight)
+    if type(module) == nn.Linear or type(module) == nn.Conv2d:
+        nn.init.xavier_uniform_(module.weight)
 ```
 
 ```{.python .input}

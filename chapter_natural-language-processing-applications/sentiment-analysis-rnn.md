@@ -153,13 +153,13 @@ net.initialize(init.Xavier(), ctx=devices)
 
 ```{.python .input}
 #@tab pytorch
-def init_weights(layer):
-    if type(layer) == nn.Linear:
-        nn.init.xavier_uniform_(layer.weight)
-    if type(layer) == nn.LSTM:
-        for param in layer._flat_weights_names:
+def init_weights(module):
+    if type(module) == nn.Linear:
+        nn.init.xavier_uniform_(module.weight)
+    if type(module) == nn.LSTM:
+        for param in module._flat_weights_names:
             if "weight" in param:
-                nn.init.xavier_uniform_(layer._parameters[param])
+                nn.init.xavier_uniform_(module._parameters[param])
 net.apply(init_weights);
 ```
 

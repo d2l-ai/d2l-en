@@ -209,14 +209,14 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
 
 ```{.python .input}
 %%tab pytorch
-def init_seq2seq_weights(layer):  #@save
+def init_seq2seq_weights(module):  #@save
     """Initialize weights for Seq2Seq."""
-    if type(layer) == nn.Linear:
+    if type(module) == nn.Linear:
          nn.init.xavier_uniform_(layer.weight)
-    if type(layer) == nn.GRU:
+    if type(module) == nn.GRU:
         for param in layer._flat_weights_names:
             if "weight" in param:
-                nn.init.xavier_uniform_(layer._parameters[param])
+                nn.init.xavier_uniform_(module._parameters[param])
 
 class Seq2SeqEncoder(d2l.Encoder):  #@save
     """The RNN encoder for sequence to sequence learning."""

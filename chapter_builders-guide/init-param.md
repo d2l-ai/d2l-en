@@ -1,6 +1,6 @@
 # Parameter Initialization
 
-We know how to access the parameters,
+Now that we know how to access the parameters,
 let's look at how to initialize them properly.
 We discussed the need for proper initialization in :numref:`sec_numerical_stability`.
 The deep learning framework provides default random initializations to its layers.
@@ -8,12 +8,31 @@ However, we often want to initialize our weights
 according to various other protocols. The framework provides most commonly
 used protocols, and also allows to create a custom initializer.
 
-```{.python .input}
+:begin_tab:`mxnet`
+By default, MXNet initializes weight parameters by randomly drawing from a uniform distribution $U(-0.07, 0.07)$,
+clearing bias parameters to zero.
+MXNet's `init` module provides a variety
+of preset initialization methods.
+:end_tab:
+
+:begin_tab:`pytorch`
+By default, PyTorch initializes weight and bias matrices
+uniformly by drawing from a range that is computed according to the input and output dimension.
+PyTorch's `nn.init` module provides a variety
+of preset initialization methods.
+:end_tab:
+
+:begin_tab:`tensorflow`
+By default, Keras initializes weight matrices uniformly by drawing from a range that is computed according to the input and output dimension, and the bias parameters are all set to zero.
+TensorFlow provides a variety of initialization methods both in the root module and the `keras.initializers` module.
+:end_tab:
+
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from mxnet import init, np, npx
 from mxnet.gluon import nn
@@ -28,7 +47,7 @@ X = np.random.uniform(size=(2, 4))
 net(X).shape
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 import torch
 from torch import nn
@@ -38,7 +57,7 @@ X = torch.rand(size=(2, 4))
 net(X).shape
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab tensorflow
 import tensorflow as tf
 
@@ -59,7 +78,7 @@ The code below initializes all weight parameters
 as Gaussian random variables
 with standard deviation 0.01, while bias parameters cleared to zero.
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab mxnet
 # Here `force_reinit` ensures that parameters are freshly initialized even if
 # they were already initialized previously
@@ -67,17 +86,17 @@ net.initialize(init=init.Normal(sigma=0.01), force_reinit=True)
 net[0].weight.data()[0]
 ```
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab pytorch
-def init_normal(m):
-    if type(m) == nn.LazyLinear:
-        nn.init.normal_(m.weight, mean=0, std=0.01)
-        nn.init.zeros_(m.bias)
+def init_normal(module):
+    if type(module) == nn.LazyLinear:
+        nn.init.normal_(module.weight, mean=0, std=0.01)
+        nn.init.zeros_(module.bias)
 net.apply(init_normal)
 net[0].weight.data[0], net[0].bias.data[0]
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab tensorflow
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
@@ -94,23 +113,23 @@ net.weights[0], net.weights[1]
 We can also initialize all the parameters
 to a given constant value (say, 1).
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab mxnet
 net.initialize(init=init.Constant(1), force_reinit=True)
 net[0].weight.data()[0]
 ```
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab pytorch
-def init_constant(m):
-    if type(m) == nn.LazyLinear:
-        nn.init.constant_(m.weight, 1)
-        nn.init.zeros_(m.bias)
+def init_constant(module):
+    if type(module) == nn.LazyLinear:
+        nn.init.constant_(module.weight, 1)
+        nn.init.zeros_(module.bias)
 net.apply(init_constant)
 net[0].weight.data[0], net[0].bias.data[0]
 ```
 
-```{.python .input}
+```{.python .input  n=10}
 %%tab tensorflow
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
@@ -131,7 +150,7 @@ with the Xavier initializer
 and initialize the second layer
 to a constant value of 42.
 
-```{.python .input}
+```{.python .input  n=11}
 %%tab mxnet
 net[0].weight.initialize(init=init.Xavier(), force_reinit=True)
 net[1].initialize(init=init.Constant(42), force_reinit=True)
@@ -139,14 +158,14 @@ print(net[0].weight.data()[0])
 print(net[1].weight.data())
 ```
 
-```{.python .input}
+```{.python .input  n=12}
 %%tab pytorch
-def xavier(m):
-    if type(m) == nn.LazyLinear:
-        nn.init.xavier_uniform_(m.weight)
-def init_42(m):
-    if type(m) == nn.LazyLinear:
-        nn.init.constant_(m.weight, 42)
+def xavier(module):
+    if type(module) == nn.LazyLinear:
+        nn.init.xavier_uniform_(module.weight)
+def init_42(module):
+    if type(module) == nn.LazyLinear:
+        nn.init.constant_(module.weight, 42)
 
 net[0].apply(xavier)
 net[2].apply(init_42)
@@ -154,7 +173,7 @@ print(net[0].weight.data[0])
 print(net[2].weight.data)
 ```
 
-```{.python .input}
+```{.python .input  n=13}
 %%tab tensorflow
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
@@ -204,7 +223,7 @@ Here we define a subclass of `Initializer` and implement the `__call__`
 function that return a desired tensor given the shape and data type.
 :end_tab:
 
-```{.python .input}
+```{.python .input  n=14}
 %%tab mxnet
 class MyInit(init.Initializer):
     def _init_weight(self, name, data):
@@ -216,20 +235,20 @@ net.initialize(MyInit(), force_reinit=True)
 net[0].weight.data()[:2]
 ```
 
-```{.python .input}
+```{.python .input  n=15}
 %%tab pytorch
-def my_init(m):
-    if type(m) == nn.LazyLinear:
+def my_init(module):
+    if type(module) == nn.LazyLinear:
         print("Init", *[(name, param.shape)
-                        for name, param in m.named_parameters()][0])
-        nn.init.uniform_(m.weight, -10, 10)
-        m.weight.data *= m.weight.data.abs() >= 5
+                        for name, param in module.named_parameters()][0])
+        nn.init.uniform_(module.weight, -10, 10)
+        module.weight.data *= module.weight.data.abs() >= 5
 
 net.apply(my_init)
 net[0].weight[:2]
 ```
 
-```{.python .input}
+```{.python .input  n=16}
 %%tab tensorflow
 class MyInit(tf.keras.initializers.Initializer):
     def __call__(self, shape, dtype=None):
@@ -254,21 +273,21 @@ print(net.layers[1].weights[0])
 Note that we always have the option
 of setting parameters directly.
 
-```{.python .input}
+```{.python .input  n=17}
 %%tab mxnet
 net[0].weight.data()[:] += 1
 net[0].weight.data()[0, 0] = 42
 net[0].weight.data()[0]
 ```
 
-```{.python .input}
+```{.python .input  n=18}
 %%tab pytorch
 net[0].weight.data[:] += 1
 net[0].weight.data[0, 0] = 42
 net[0].weight.data[0]
 ```
 
-```{.python .input}
+```{.python .input  n=19}
 %%tab tensorflow
 net.layers[1].weights[0][:].assign(net.layers[1].weights[0] + 1)
 net.layers[1].weights[0][0, 0].assign(42)
@@ -277,8 +296,20 @@ net.layers[1].weights[0]
 
 ## Summary
 
-* We can use custom initialization.
+We can initialize parameters using built-in and custom initializers.
 
 ## Exercises
 
-1. Look at the initialization module document to explore different initializers.
+Look up the online documentation for more built-in initializers.
+
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/8089)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/8090)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/8091)
+:end_tab:

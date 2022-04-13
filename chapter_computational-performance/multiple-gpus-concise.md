@@ -202,9 +202,9 @@ def train(num_gpus, batch_size, lr):
 def train(net, num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     devices = [d2l.try_gpu(i) for i in range(num_gpus)]
-    def init_weights(layer):
-        if type(layer) in [nn.Linear, nn.Conv2d]:
-            nn.init.normal_(layer.weight, std=0.01)
+    def init_weights(module):
+        if type(module) in [nn.Linear, nn.Conv2d]:
+            nn.init.normal_(module.weight, std=0.01)
     net.apply(init_weights)
     # Set the model on multiple GPUs
     net = nn.DataParallel(net, device_ids=devices)
