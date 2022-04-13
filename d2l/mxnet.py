@@ -3001,14 +3001,15 @@ def accuracy(y_hat, y):
     return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
 def download(url, folder='../data', sha1_hash=None):
-    """Defined in :numref:`sec_utils`"""
-    if not url.startswith('http'):
-        # back compatability
-        url, sha1_hash = DATA_HUB[url]
+    """Download a file to folder and return the local filepath.
 
+    Defined in :numref:`sec_utils`"""
+    if not url.startswith('http'):
+        # For back compatability
+        url, sha1_hash = DATA_HUB[url]
     os.makedirs(folder, exist_ok=True)
     fname = os.path.join(folder, url.split('/')[-1])
-    # check if hit cache
+    # Check if hit cache
     if os.path.exists(fname) and sha1_hash:
         sha1 = hashlib.sha1()
         with open(fname, 'rb') as f:
@@ -3019,7 +3020,7 @@ def download(url, folder='../data', sha1_hash=None):
                 sha1.update(data)
         if sha1.hexdigest() == sha1_hash:
             return fname
-    # download
+    # Download
     print(f'Downloading {fname} from {url}...')
     r = requests.get(url, stream=True, verify=True)
     with open(fname, 'wb') as f:
@@ -3027,7 +3028,7 @@ def download(url, folder='../data', sha1_hash=None):
     return fname
 
 def extract(filename, folder=None):
-    """Download and extract a zip/tar file.
+    """Extract a zip/tar file into folder.
 
     Defined in :numref:`sec_utils`"""
     base_dir = os.path.dirname(filename)

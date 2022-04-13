@@ -12,10 +12,10 @@ However, to apply deep learning in the wild
 we must extract messy data 
 stored in arbitrary formats,
 and preprocess it to suit our needs.
-Fortunately, the [*pandas* library](https://pandas.pydata.org/) 
+Fortunately, the *pandas* [library](https://pandas.pydata.org/) 
 can do much of the heavy lifting.
 This section, while no substitute 
-for a proper [*pandas* tutorial](https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html),
+for a proper *pandas* [tutorial](https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html),
 will give you a crash course
 on some of the most common routines.
 

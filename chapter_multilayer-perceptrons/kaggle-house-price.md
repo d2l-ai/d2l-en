@@ -33,14 +33,15 @@ in your career as a data scientist.
 
 Throughout the book, we will train and test models
 on various downloaded datasets.
-Here, we (**implement two utility functions**). The first one downloads a file into local,
-and the second one extract a zip or a tar file. Again, we deferred their implementations into :numref:`sec_utils`.
+Here, we (**implement two utility functions**)
+to download files and extract zip or tar files.
+Again, we defer their implementations into :numref:`sec_utils`.
 
 ```{.python .input  n=2}
 %%tab all
 
 def download(url, folder, sha1_hash=None):
-    """Download a file to folder, return the local filepath"""
+    """Download a file to folder and return the local filepath."""
 
 def extract(filename, folder):
     """Extract a zip/tar file into folder."""
@@ -109,18 +110,8 @@ The "Data" tab on the competition tab
 in :numref:`fig_house_pricing`
 has links to download the data.
 
-
-To get started, we will [**read in and process the data
-using `pandas`**], which we have introduced in :numref:`sec_pandas`.
-So, you will want to make sure that you have `pandas` installed
-before proceeding further.
-Fortunately, if you are reading in Jupyter,
-we can install pandas without even leaving the notebook.
-
 ```{.python .input  n=14}
 %%tab mxnet
-# If pandas is not installed, please uncomment the following line:
-# !pip install pandas
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import gluon, autograd, init, np, npx
@@ -131,9 +122,6 @@ npx.set_np()
 
 ```{.python .input  n=4}
 %%tab pytorch
-# If pandas is not installed, please uncomment the following line:
-# !pip install pandas
-
 %matplotlib inline
 from d2l import torch as d2l
 import torch
@@ -144,9 +132,6 @@ import numpy as np
 
 ```{.python .input}
 %%tab tensorflow
-# If pandas is not installed, please uncomment the following line:
-# !pip install pandas
-
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -154,13 +139,14 @@ import pandas as pd
 import numpy as np
 ```
 
+To get started, we will [**read in and process the data
+using `pandas`**], which we have introduced in :numref:`sec_pandas`.
 For convenience, we can download and cache
-the Kaggle housing dataset
-using the script we defined above.
+the Kaggle housing dataset.
+If a file corresponding to this dataset already exists in the cache directory and its SHA-1 matches `sha1_hash`, our code will use the cached file to avoid clogging up your internet with redundant downloads.
 
 ```{.python .input  n=30}
 %%tab all
-
 class KaggleHouse(d2l.DataModule):
     def __init__(self, batch_size, train=None, val=None):
         super().__init__()
@@ -187,8 +173,6 @@ print(data.raw_val.shape)
 
 ## Data Preprocessing
 
-
-
 Let's [**take a look at the first four and last two features
 as well as the label (SalePrice)**] from the first four examples.
 
@@ -201,11 +185,12 @@ We can see that in each example, the first feature is the ID.
 This helps the model identify each training example.
 While this is convenient, it does not carry
 any information for prediction purposes.
-Hence, we can remove it from the dataset
+Hence, we will remove it from the dataset
 before feeding the data into the model.
+Besides, given a wide variety of data types,
+we will need to preprocess the data before we can start modeling.
 
-As stated above, we have a wide variety of data types.
-We will need to preprocess the data before we can start modeling.
+
 Let's start with the numerical features.
 First, we apply a heuristic,
 [**replacing all missing values
@@ -247,7 +232,7 @@ The `pandas` package does this automatically for us.
 %%tab all
 @d2l.add_to_class(KaggleHouse)
 def preprocess(self):
-    # Remove the id and label columns
+    # Remove the ID and label columns
     label = 'SalePrice'
     features = pd.concat(
         (self.raw_train.drop(columns=['Id', label]),
@@ -267,7 +252,7 @@ def preprocess(self):
 ```
 
 You can see that this conversion increases
-the number of features from 79 to 331.
+the number of features from 79 to 331 (excluding ID and label columns).
 
 ```{.python .input  n=33}
 %%tab all
@@ -275,23 +260,9 @@ data.preprocess()
 data.train.shape
 ```
 
-```{.python .input  n=60}
-%%tab all
+## Error Measure
 
-@d2l.add_to_class(KaggleHouse)
-def get_dataloader(self, train):
-    label = 'SalePrice'
-    data = self.train if train else self.val
-    if label not in data: return
-    get_tensor = lambda x: d2l.tensor(x.values, dtype=d2l.float32)
-    tensors = (get_tensor(data.drop(columns=[label])),  # X
-               d2l.reshape(d2l.log(get_tensor(data[label])), (-1, 1))) # Y
-    return self.get_tensorloader(tensors, train)
-```
-
-## Defining Model
-
-To get started we train a linear model with squared loss. Not surprisingly, our linear model will not lead to a competition-winning submission but it provides a sanity check to see whether there is meaningful information in the data. If we cannot do better than random guessing here, then there might be a good chance that we have a data processing bug. And if things work, the linear model will serve as a baseline giving us some intuition about how close the simple model gets to the best reported models, giving us a sense of how much gain we should expect from fancier models.
+To get started we will train a linear model with squared loss. Not surprisingly, our linear model will not lead to a competition-winning submission but it provides a sanity check to see whether there is meaningful information in the data. If we cannot do better than random guessing here, then there might be a good chance that we have a data processing bug. And if things work, the linear model will serve as a baseline giving us some intuition about how close the simple model gets to the best reported models, giving us a sense of how much gain we should expect from fancier models.
 
 With house prices, as with stock prices,
 we care about relative quantities
@@ -318,11 +289,25 @@ This leads to the following root-mean-squared-error between the logarithm of the
 
 $$\sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}.$$
 
+```{.python .input  n=60}
+%%tab all
+@d2l.add_to_class(KaggleHouse)
+def get_dataloader(self, train):
+    label = 'SalePrice'
+    data = self.train if train else self.val
+    if label not in data: return
+    get_tensor = lambda x: d2l.tensor(x.values, dtype=d2l.float32)
+    # Logarithm of prices 
+    tensors = (get_tensor(data.drop(columns=[label])),  # X
+               d2l.reshape(d2l.log(get_tensor(data[label])), (-1, 1)))  # Y
+    return self.get_tensorloader(tensors, train)
+```
+
 ## $K$-Fold Cross-Validation
 
-You might recall that we introduced [**$K$-fold cross-validation**]
-in the section where we discussed how to deal
-with model selection (:numref:`sec_model_selection`).
+You might recall that we introduced [**cross-validation**]
+in :numref:`subsec_generalization-model-selection`, where we discussed how to deal
+with model selection.
 We will put this to good use to select the model design
 and to adjust the hyperparameters.
 We first need a function that returns
@@ -348,7 +333,7 @@ def k_fold_data(data, k):
     return rets
 ```
 
-[**The training and verification error averages are returned**]
+[**The average validation error is returned**]
 when we train $K$ times in the $K$-fold cross-validation.
 
 ```{.python .input}
@@ -364,9 +349,8 @@ def k_fold(trainer, data, k, lr):
         trainer.fit(model, data_fold)
         val_loss.append(float(model.board.data['val_loss'][-1].y))
         models.append(model)
-    print(f'average validation log rmse = {sum(val_loss)/len(val_loss)}')
+    print(f'average validation log mse = {sum(val_loss)/len(val_loss)}')
     return models
-    
 ```
 
 ## [**Model Selection**]
@@ -402,29 +386,22 @@ by incorporating regularization techniques.
 ##  [**Submitting Predictions on Kaggle**]
 
 Now that we know what a good choice of hyperparameters should be,
-we might as well use all the data to train on it
-(rather than just $1-1/K$ of the data
-that are used in the cross-validation slices).
-The model that we obtain in this way
-can then be applied to the test set.
+we might 
+calculate the average predictions 
+on the test set
+by all the $K$ models.
 Saving the predictions in a csv file
 will simplify uploading the results to Kaggle.
-
-```{.python .input}
-%%tab all
-preds = [model(d2l.tensor(data.val.values, dtype=d2l.float32)) for model in models]
-ensemble_preds = d2l.reduce_mean(d2l.exp(d2l.concat(preds, 1)), 1)
-```
-
-One nice sanity check is to see
-whether the predictions on the test set
-resemble those of the $K$-fold cross-validation process.
-If they do, it is time to upload them to Kaggle.
 The following code will generate a file called `submission.csv`.
 
 ```{.python .input}
 %%tab all
-submission = pd.DataFrame({'Id':data.raw_val.Id, 'SalePrice':d2l.numpy(ensemble_preds)})
+preds = [model(d2l.tensor(data.val.values, dtype=d2l.float32))
+         for model in models]
+# Taking exponentiation of predictions in the logarithm scale
+ensemble_preds = d2l.reduce_mean(d2l.exp(d2l.concat(preds, 1)), 1)
+submission = pd.DataFrame({'Id':data.raw_val.Id,
+                           'SalePrice':d2l.numpy(ensemble_preds)})
 submission.to_csv('submission.csv', index=False)
 ```
 
@@ -455,7 +432,6 @@ The steps are quite simple:
 ## Exercises
 
 1. Submit your predictions for this section to Kaggle. How good are your predictions?
-1. Can you improve your model by minimizing the logarithm of prices directly? What happens if you try to predict the logarithm of the price rather than the price?
 1. Is it always a good idea to replace missing values by their mean? Hint: can you construct a situation where the values are not missing at random?
 1. Improve the score on Kaggle by tuning the hyperparameters through $K$-fold cross-validation.
 1. Improve the score by improving the model (e.g., layers, weight decay, and dropout).
