@@ -139,14 +139,15 @@ class LeNet(d2l.Classifier):
             self.net.initialize(init.Xavier())
         if tab.selected('pytorch'):
             self.net = nn.Sequential(
-                nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.Sigmoid(),
+                nn.LazyConv2d(6, kernel_size=5, padding=2), nn.Sigmoid(),
                 nn.AvgPool2d(kernel_size=2, stride=2),
-                nn.Conv2d(6, 16, kernel_size=5), nn.Sigmoid(),
+                nn.LazyConv2d(16, kernel_size=5), nn.Sigmoid(),
                 nn.AvgPool2d(kernel_size=2, stride=2),
                 nn.Flatten(),
-                nn.Linear(16 * 5 * 5, 120), nn.Sigmoid(),
-                nn.Linear(120, 84), nn.Sigmoid(),
-                nn.Linear(84, 10))
+                nn.LazyLinear(120), nn.Sigmoid(),
+                nn.LazyLinear(84), nn.Sigmoid(),
+                nn.LazyLinear(10))
+            self.net(torch.zeros(1,1,28,28))
             self.net.apply(init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
