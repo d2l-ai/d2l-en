@@ -372,7 +372,7 @@ into French and compute their BLEU scores.
 engs = ['go .', 'i lost .', 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
 preds, _ = model.predict_step(
-    data.build(engs, fras), d2l.try_gpu(), data.num_steps, True)
+    data.build(engs, fras), d2l.try_gpu(), data.num_steps)
 for en, fr, p in zip(engs, fras, preds):
     translation = []
     for token in data.tgt_vocab.to_tokens(p):
