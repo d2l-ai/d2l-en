@@ -151,7 +151,7 @@ Next, we repeatedly call its `add` function,
 appending layers in the order
 that they should be executed.
 In short, `nn.Sequential` defines a special kind of `Block`,
-the class that presents a module in Gluon.
+the class that presents a *module* in Gluon.
 It maintains an ordered list of constituent `Block`s.
 The `add` function simply facilitates
 the addition of each successive `Block` to the list.
@@ -228,20 +228,20 @@ with one hidden layer with 256 hidden units,
 and a 10-dimensional output layer.
 Note that the `MLP` class below inherits the class that represents a module.
 We will heavily rely on the parent class's functions,
-supplying only our own constructor (the `__init__` function in Python) and the forward propagation function.
+supplying only our own constructor (the `__init__` method in Python) and the forward propagation method.
 
 ```{.python .input  n=5}
 %%tab mxnet
 class MLP(nn.Block):
-    def __init__(self, **kwargs):
-        # Call the constructor of the `MLP` parent class `nn.Block` to perform
-        # the necessary initialization.
-        super().__init__(**kwargs)
+    def __init__(self):
+        # Call the constructor of the MLP parent class nn.Block to perform
+        # the necessary initialization
+        super().__init__()
         self.hidden = nn.Dense(256, activation='relu')
         self.out = nn.Dense(10)
 
     # Define the forward propagation of the model, that is, how to return the
-    # required model output based on the input `X`
+    # required model output based on the input X
     def forward(self, X):
         return self.out(self.hidden(X))
 ```
@@ -250,14 +250,14 @@ class MLP(nn.Block):
 %%tab pytorch
 class MLP(nn.Module):
     def __init__(self):
-        # Call the constructor of the parent class `nn.Module` to perform
-        # the necessary initialization.
+        # Call the constructor of the parent class nn.Module to perform
+        # the necessary initialization
         super().__init__()
         self.hidden = nn.LazyLinear(256)
         self.out = nn.LazyLinear(10)
 
     # Define the forward propagation of the model, that is, how to return the
-    # required model output based on the input `X`
+    # required model output based on the input X
     def forward(self, X):
         return self.out(F.relu(self.hidden(X)))
 ```
@@ -266,14 +266,14 @@ class MLP(nn.Module):
 %%tab tensorflow
 class MLP(tf.keras.Model):
     def __init__(self):
-        # Call the constructor of the parent class `tf.keras.Model` to perform
-        # the necessary initialization. I
+        # Call the constructor of the parent class tf.keras.Model to perform
+        # the necessary initialization
         super().__init__()
         self.hidden = tf.keras.layers.Dense(units=256, activation=tf.nn.relu)
         self.out = tf.keras.layers.Dense(units=10)
 
     # Define the forward propagation of the model, that is, how to return the
-    # required model output based on the input `X`
+    # required model output based on the input X
     def call(self, X):
         return self.out(self.hidden((X)))
 ```
@@ -310,15 +310,10 @@ The system will generate these functions automatically.
 Let's try this out.
 
 ```{.python .input  n=8}
-%%tab mxnet
+%%tab all
 net = MLP()
-net.initialize()
-net(X).shape
-```
-
-```{.python .input  n=9}
-%%tab tensorflow, pytorch
-net = MLP()
+if tab.selected('mxnet'):
+    net.initialize()
 net(X).shape
 ```
 
@@ -351,11 +346,11 @@ functionality of the default `Sequential` class.
 %%tab mxnet
 class MySequential(nn.Block):
     def add(self, block):
-        # Here, `block` is an instance of a `Block` subclass, and we assume 
-        # that it has a unique name. We save it in the member variable
-        # `_children` of the `Block` class, and its type is OrderedDict. When
-        # the `MySequential` instance calls the `initialize` function, the
-        # system automatically initializes all members of `_children`
+        # Here, block is an instance of a Block subclass, and we assume that
+        # it has a unique name. We save it in the member variable _children of
+        # the Block class, and its type is OrderedDict. When the MySequential
+        # instance calls the initialize function, the system automatically
+        # initializes all members of _children
         self._children[block.name] = block
 
     def forward(self, X):
@@ -410,8 +405,8 @@ parameters also need to be initialized.
 :begin_tab:`pytorch`
 In the `__init__` method, we add every module
 by calling the `add_modules` method. These modules can be accessed by the `children` method later.
-The convenience of using these methods is that the system knows the added modules,
-it will properly initialize each module's parameters.
+In this way the system knows the added modules,
+and it will properly initialize each module's parameters.
 :end_tab:
 
 When our `MySequential`'s forward propagation function is invoked,
@@ -483,8 +478,8 @@ So we implement a `FixedHiddenMLP` class as follows.
 ```{.python .input  n=16}
 %%tab mxnet
 class FixedHiddenMLP(nn.Block):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
         # Random weight parameters created with the `get_constant` function
         # are not updated during training (i.e., constant parameters)
         self.rand_weight = self.params.get_constant(
@@ -643,38 +638,6 @@ chimera.add(tf.keras.layers.Dense(20))
 chimera.add(FixedHiddenMLP())
 chimera(X)
 ```
-
-<!--
-Need to be more specific. 
-
-## Efficiency
-
-The avid reader might start to worry
-about the efficiency of some of these operations.
-After all, we have lots of dictionary lookups,
-code execution, and lots of other Pythonic things
-taking place in what is supposed to be
-a high-performance deep learning library.
-The problems of Python's [global interpreter lock](https://wiki.python.org/moin/GlobalInterpreterLock) are well known. 
-In the context of deep learning,
-we may worry that our extremely fast GPU(s)
-might have to wait until a puny CPU
-runs Python code before it gets another job to run.
-The best way to speed up Python is by avoiding it altogether.
-
-One way that Gluon does this is by allowing for
-*hybridization*, which will be described later.
-Here, the Python interpreter executes a module
-the first time it is invoked.
-The Gluon runtime records what is happening
-and the next time around it short-circuits calls to Python.
-This can accelerate things considerably in some cases
-but care needs to be taken when control flow (as above)
-leads down different branches on different passes through the net.
-We recommend that the interested reader checks out
-the hybridization section (:numref:`sec_hybridize`)
-to learn about compilation after finishing the current chapter.
--->
 
 ## Summary
 

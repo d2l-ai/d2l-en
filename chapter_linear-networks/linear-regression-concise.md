@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Concise Implementation of Linear Regression
 :label:`sec_linear_concise`
 
-Deep Learning has witnessed a Cambrian explosion
+Deep learning has witnessed a Cambrian explosion
 of sorts over the past decade.
 The sheer number of techniques, applications and algorithms by far surpasses the
 progress of previous decades. 
