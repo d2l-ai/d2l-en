@@ -286,9 +286,9 @@ class DropoutMLPScratch(d2l.Classifier):
         return self.lin3(H2)
 ```
 
-### [**Training and Testing**]
+### [**Training**]
 
-This is similar to the training and testing of MLPs described previously.
+The following is similar to the training of MLPs described previously.
 
 ```{.python .input}
 %%tab all
@@ -358,7 +358,7 @@ class DropoutMLP(d2l.Classifier):
             tf.keras.layers.Dense(num_outputs)])
 ```
 
-Next, we [**train and test the model**].
+Next, we [**train the model**].
 
 ```{.python .input}
 %%tab all

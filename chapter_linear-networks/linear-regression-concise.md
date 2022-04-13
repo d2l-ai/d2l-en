@@ -105,10 +105,18 @@ We will describe how this works in more detail later.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the fully connected layer is defined in two classes: `Linear` and `LazyLinear`. 
-The later was introduced since version 1.8.0, that allows to only specify
-the output dimension. While the `Linear` class requires to pass the input feature
-dimension as the input. For simplicity, we use `LazyLinaer` through this book. 
+In PyTorch, the fully connected layer is defined in `Linear` and `LazyLinear` (available since version 1.8.0) classes. 
+The later
+allows users to *only* specify
+the output dimension,
+while the former
+additionally asks for
+how many inputs go into this layer.
+Specifying input shapes is inconvenient,
+which may require nontrivial calculations
+(such as in convolutional layers).
+Thus, for simplicity we will use such "lazy" layers
+whenever we can. 
 :end_tab:
 
 :begin_tab:`tensorflow`
