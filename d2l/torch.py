@@ -379,10 +379,10 @@ class SGD(d2l.HyperParameters):
 
 class LinearRegression(d2l.Module):
     """Defined in :numref:`sec_linear_concise`"""
-    def __init__(self, num_inputs, lr):
+    def __init__(self, lr):
         super().__init__()
         self.save_hyperparameters()
-        self.net = nn.Linear(num_inputs, 1)
+        self.net = nn.LazyLinear(1)
         self.net.weight.data.normal_(0, 0.01)
         self.net.bias.data.fill_(0)
 
