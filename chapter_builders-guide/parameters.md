@@ -57,7 +57,7 @@ net(X).shape
 import torch
 from torch import nn
 
-net = nn.Sequential(nn.Linear(4, 8), nn.ReLU(), nn.Linear(8, 1))
+net = nn.Sequential(nn.LazyLinear(8), nn.ReLU(), nn.LazyLinear(1))
 X = torch.rand(size=(2, 4))
 net(X).shape
 ```
@@ -185,7 +185,9 @@ Often, we want to share parameters across multiple layers.
 Let's see how to do this elegantly.
 In the following we allocate a dense layer
 and then use its parameters specifically
-to set those of another layer.
+to set those of another layer. 
+Note that since parameters were lazily initialized,
+we need to run the forward `net(X)` before accessing the parameters.
 
 ```{.python .input}
 %%tab mxnet
@@ -214,11 +216,12 @@ print(net[1].weight.data()[0] == net[2].weight.data()[0])
 %%tab pytorch
 # We need to give the shared layer a name so that we can refer to its
 # parameters
-shared = nn.Linear(8, 8)
-net = nn.Sequential(nn.Linear(4, 8), nn.ReLU(),
+shared = nn.LazyLinear(8)
+net = nn.Sequential(nn.LazyLinear(8), nn.ReLU(),
                     shared, nn.ReLU(),
                     shared, nn.ReLU(),
-                    nn.Linear(8, 1))
+                    nn.LazyLinear(1))
+net(X)
 # Check whether the parameters are the same
 print(net[2].weight.data[0] == net[4].weight.data[0])
 net[2].weight.data[0, 0] = 100

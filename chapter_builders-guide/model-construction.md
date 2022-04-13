@@ -124,7 +124,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-net = nn.Sequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
+net = nn.Sequential(nn.LazyLinear(256), nn.ReLU(), nn.LazyLinear(10))
 
 X = torch.rand(2, 20)
 net(X).shape
@@ -253,8 +253,8 @@ class MLP(nn.Module):
         # Call the constructor of the parent class `nn.Module` to perform
         # the necessary initialization.
         super().__init__()
-        self.hidden = nn.Linear(20, 256)
-        self.out = nn.Linear(256, 10)
+        self.hidden = nn.LazyLinear(256)
+        self.out = nn.LazyLinear(10)
 
     # Define the forward propagation of the model, that is, how to return the
     # required model output based on the input `X`
@@ -431,7 +431,7 @@ net(X).shape
 
 ```{.python .input  n=14}
 %%tab pytorch
-net = MySequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
+net = MySequential(nn.LazyLinear(256), nn.ReLU(), nn.LazyLinear(10))
 net(X).shape
 ```
 
@@ -513,7 +513,7 @@ class FixedHiddenMLP(nn.Module):
         # Random weight parameters that will not compute gradients and
         # therefore keep constant during training
         self.rand_weight = torch.rand((20, 20))
-        self.linear = nn.Linear(20, 20)
+        self.linear = nn.LazyLinear(20)
 
     def forward(self, X):
         X = self.linear(X)        
@@ -613,14 +613,14 @@ chimera(X)
 class NestMLP(nn.Module):
     def __init__(self):
         super().__init__()
-        self.net = nn.Sequential(nn.Linear(20, 64), nn.ReLU(),
-                                 nn.Linear(64, 32), nn.ReLU())
-        self.linear = nn.Linear(32, 16)
+        self.net = nn.Sequential(nn.LazyLinear(64), nn.ReLU(),
+                                 nn.LazyLinear(32), nn.ReLU())
+        self.linear = nn.LazyLinear(16)
 
     def forward(self, X):
         return self.linear(self.net(X))
 
-chimera = nn.Sequential(NestMLP(), nn.Linear(16, 20), FixedHiddenMLP())
+chimera = nn.Sequential(NestMLP(), nn.LazyLinear(20), FixedHiddenMLP())
 chimera(X)
 ```
 

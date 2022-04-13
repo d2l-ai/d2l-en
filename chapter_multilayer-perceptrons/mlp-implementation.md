@@ -179,13 +179,11 @@ class MLP(d2l.Classifier):
 ```{.python .input}
 %%tab pytorch
 class MLP(d2l.Classifier):
-    def __init__(self, num_inputs, num_outputs, num_hiddens, lr):
+    def __init__(self, num_outputs, num_hiddens, lr):
         super().__init__()
         self.save_hyperparameters()
-        self.net = nn.Sequential(nn.Flatten(),
-                                 nn.Linear(num_inputs, num_hiddens),
-                                 nn.ReLU(),
-                                 nn.Linear(num_hiddens, num_outputs))
+        self.net = nn.Sequential(nn.Flatten(), nn.LazyLinear(num_hiddens),
+                                 nn.ReLU(), nn.LazyLinear(num_outputs))
 ```
 
 ```{.python .input}
@@ -210,10 +208,7 @@ from orthogonal considerations.
 
 ```{.python .input}
 %%tab all
-if tab.selected(['mxnet', 'tensorflow']):
-    model = MLP(num_outputs=10, num_hiddens=256, lr=0.1)
-if tab.selected(['pytorch']):
-    model = MLP(num_inputs=784, num_outputs=10, num_hiddens=256, lr=0.1)
+model = MLP(num_outputs=10, num_hiddens=256, lr=0.1)
 trainer.fit(model, data)
 ```
 
