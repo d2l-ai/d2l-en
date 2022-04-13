@@ -670,7 +670,7 @@ def bleu(pred_seq, label_seq, k):  #@save
     pred_tokens, label_tokens = pred_seq.split(' '), label_seq.split(' ')
     len_pred, len_label = len(pred_tokens), len(label_tokens)
     score = math.exp(min(0, 1 - len_label / len_pred))
-    for n in range(1, k + 1):
+    for n in range(1, min(k, len_pred) + 1):
         num_matches, label_subs = 0, collections.defaultdict(int)
         for i in range(len_label - n + 1):
             label_subs[' '.join(label_tokens[i: i + n])] += 1
