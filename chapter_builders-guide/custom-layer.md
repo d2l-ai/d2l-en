@@ -186,8 +186,15 @@ class MyDense(tf.keras.Model):
         return tf.nn.relu(linear)
 ```
 
+:begin_tab:`mxnet, tensorflow`
+Next, we instantiate the `MyDense` class
+and access its model parameters.
+:end_tab:
+
+:begin_tab:`pytorch`
 Next, we instantiate the `MyLinear` class
 and access its model parameters.
+:end_tab:
 
 ```{.python .input}
 %%tab mxnet
