@@ -212,9 +212,9 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
 def init_seq2seq_weights(module):  #@save
     """Initialize weights for Seq2Seq."""
     if type(module) == nn.Linear:
-         nn.init.xavier_uniform_(layer.weight)
+         nn.init.xavier_uniform_(module.weight)
     if type(module) == nn.GRU:
-        for param in layer._flat_weights_names:
+        for param in module._flat_weights_names:
             if "weight" in param:
                 nn.init.xavier_uniform_(module._parameters[param])
 
