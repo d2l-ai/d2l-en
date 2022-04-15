@@ -32,7 +32,6 @@ Now let's get a loan dataset for loan defaulter prediction. This dataset is a su
 We split the dataset and use $70\%$ of the examples for training and the remaining $30\%$ for testing.
 
 ```{.python .input  n=9}
-#@tab pytorch
 #@save
 class LoanData(d2l.DataModule):
     def __init__(self, url=d2l.DATA_URL + 'loan.csv', batch_size=64,
@@ -69,7 +68,6 @@ data = LoanData(url=d2l.DATA_URL + 'loan.csv', batch_size=64, test_ratio=0.3)
 We construct a multilayer perceptron with a few fully-connected layers for loan defaulter prediction. This model is not inherently interpretable despite its simple structure.
 
 ```{.python .input  n=3}
-#@tab pytorch
 #@save
 class MlpLoan(d2l.Classifier):
     def __init__(self, num_outputs, lr, wd):
@@ -120,7 +118,6 @@ As what we have done, aggregate metrics such as accuracy and mean squared error 
 In the following, we will demonstrate how to identify the error distributions across different cohorts via error analysis.  We define a *GlobalExplainer* class which requires to be fed with a black-box model and a dataset, and save it for later use.
 
 ```{.python .input  n=5}
-#@tab pytorch
 #@save
 class GlobalExplainer: 
     def __init__(self, black_box_model, data):
