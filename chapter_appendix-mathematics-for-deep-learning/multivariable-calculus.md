@@ -136,6 +136,31 @@ true_value = f(tf.constant([0.]) + epsilon[0], tf.math.log(
 f'approximation: {grad_approx}, true Value: {true_value}'
 ```
 
+```{.python .input}
+#@tab jax
+%matplotlib inline
+import jax
+import jax.numpy as jnp
+from jax import grad
+from IPython import display
+from mpl_toolkits import mplot3d
+from d2l import jax as d2l
+
+def f(x, y):
+    return jnp.log(jnp.exp(x) + jnp.exp(y))
+def grad_f(x, y):
+    return jnp.array([(jnp.exp(x) / (jnp.exp(x) + jnp.exp(y))),
+                        (jnp.exp(y) / (jnp.exp(x) + jnp.exp(y)))])
+
+epsilon = jnp.array([0.01, -0.03])
+grad_approx = f(jnp.array([0.]), jnp.log(
+    jnp.array([2.]))) + jnp.tensordot(
+    epsilon, grad_f(jnp.array([0.]), jnp.log(jnp.array(2.))), axes=1)
+true_value = f(jnp.array([0.]) + epsilon[0], jnp.log(
+    jnp.array([2.])) + epsilon[1])
+f'approximation: {grad_approx}, true Value: {true_value}'
+```
+
 ## Geometry of Gradients and Gradient Descent
 Consider the expression from :eqref:`eq_nabla_use` again:
 
@@ -213,6 +238,14 @@ d2l.plot(x, f, 'x', 'f(x)')
 
 ```{.python .input}
 #@tab tensorflow
+x = tf.range(-2, 3, 0.01)
+f = (3 * x**4) - (4 * x**3) - (12 * x**2)
+
+d2l.plot(x, f, 'x', 'f(x)')
+```
+
+```{.python .input}
+#@tab jax
 x = tf.range(-2, 3, 0.01)
 f = (3 * x**4) - (4 * x**3) - (12 * x**2)
 
@@ -476,6 +509,30 @@ print(f'df/dz at {w.numpy()}, {x.numpy()}, {y.numpy()}, '
       f'{z.numpy()} is {z_grad}')
 ```
 
+```{.python .input}
+#@tab jax
+w = jnp.array([-1.])
+x = jnp.array([0.])
+y = jnp.array([-2.])
+z = jnp.array([1.])
+
+def func(w, x, y, z):
+    a, b = (w + x + y + z)**2, (w + x - y - z)**2
+    u, v = (a + b)**2, (a - b)**2
+    f = (u + v)**2
+    return f[0]
+
+w_grad = grad(func, argnums=0)(w, x, y, z)
+x_grad = grad(func, argnums=1)(w, x, y, z)
+y_grad = grad(func, argnums=2)(w, x, y, z)
+z_grad = grad(func, argnums=3)(w, x, y, z)
+
+print(f'df/dw at {w}, {x}, {y}, {z} is {w_grad}')
+print(f'df/dx at {w}, {x}, {y}, {z} is {x_grad}')
+print(f'df/dy at {w}, {x}, {y}, {z} is {y_grad}')
+print(f'df/dz at {w}, {x}, {y}, {z} is {z_grad}')
+```
+
 All of what we did above can be done automatically by calling `f.backwards()`.
 
 
@@ -609,6 +666,30 @@ ax.plot_wireframe(x.numpy(), y.numpy(), z.numpy(),
                   **{'rstride': 10, 'cstride': 10})
 ax.plot_wireframe(x.numpy(), y.numpy(), w.numpy(),
                   **{'rstride': 10, 'cstride': 10}, color='purple')
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('y')
+d2l.set_figsize()
+ax.set_xlim(-2, 2)
+ax.set_ylim(-2, 2)
+ax.set_zlim(-1, 1)
+ax.dist = 12
+```
+
+```{.python .input}
+#@tab jax
+# Construct grid and compute function
+x, y = jnp.meshgrid(jnp.linspace(-2., 2., 101),
+                   jnp.linspace(-2., 2., 101))
+
+z = x*jnp.exp(- x**2 - y**2)
+
+# Compute approximating quadratic with gradient and Hessian at (1, 0)
+w = jnp.exp(jnp.array([-1.]))*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)
+
+# Plot function
+ax = d2l.plt.figure().add_subplot(111, projection='3d')
+ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
+ax.plot_wireframe(x, y, w, **{'rstride': 10, 'cstride': 10}, color='purple')
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
 d2l.set_figsize()
