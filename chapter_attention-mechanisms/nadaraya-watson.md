@@ -61,7 +61,7 @@ Both 50 training examples and 50 validation examples
 are generated.
 To better visualize the pattern of attention later, the training inputs are sorted.
 
-```{.python .input  n=35}
+```{.python .input  n=5}
 %%tab all
 class NonlinearData(d2l.DataModule):
     def __init__(self, n, batch_size):        
@@ -90,7 +90,7 @@ data = NonlinearData(n, batch_size=10)
 The following function plots all the training examples (represented by circles),
 the ground-truth data generation function `f` without the noise term (labeled by "Truth"), and the learned prediction function (labeled by "Pred").
 
-```{.python .input  n=36}
+```{.python .input  n=6}
 %%tab all
 def plot_kernel_reg(y_hat):
     d2l.plot(data.x_val, [data.y_val, d2l.numpy(y_hat)], 'x', 'y', legend=['Truth', 'Pred'],
@@ -108,7 +108,7 @@ $$f(x) = \frac{1}{n}\sum_{i=1}^n y_i,$$
 
 which is plotted below. As we can see, this estimator is indeed not so smart.
 
-```{.python .input  n=37}
+```{.python .input  n=7}
 %%tab all
 y_hat = d2l.repeat(d2l.reduce_mean(data.y_train), n)
 plot_kernel_reg(y_hat)
@@ -177,7 +177,7 @@ In the following, we plot the prediction based on this
 nonparametric attention model.
 The predicted line is smooth and closer to the ground-truth than that produced by average pooling.
 
-```{.python .input  n=40}
+```{.python .input  n=8}
 %%tab all
 def diff(queries, keys):
     return d2l.reshape(queries, (-1, 1)) - d2l.reshape(keys, (1, -1))
@@ -202,7 +202,7 @@ Since both inputs are sorted,
 we can see that the closer the query-key pair is,
 the higher attention weight is in the attention pooling.
 
-```{.python .input  n=41}
+```{.python .input  n=9}
 %%tab all
 d2l.show_heatmaps([[attention_weights]],
                   xlabel='Sorted training inputs',
@@ -244,7 +244,7 @@ Suppose that the first minibatch contains $n$ matrices $\mathbf{X}_1, \ldots, \m
 results in
 $n$ matrices $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$ of shape $a\times c$. Therefore, [**given two tensors of shape ($n$, $a$, $b$) and ($n$, $b$, $c$), the shape of their batch matrix multiplication output is ($n$, $a$, $c$).**]
 
-```{.python .input}
+```{.python .input  n=10}
 %%tab all
 X = d2l.ones((2, 1, 4))
 Y = d2l.ones((2, 4, 6))
@@ -253,21 +253,21 @@ d2l.check_shape(d2l.batch_matmul(X, Y), (2, 1, 6))
 
 In the context of attention mechanisms, we can [**use minibatch matrix multiplication to compute weighted averages of values in a minibatch.**]
 
-```{.python .input}
+```{.python .input  n=11}
 %%tab mxnet
 weights = d2l.ones((2, 10)) * 0.1
 values = d2l.reshape(d2l.arange(20), (2, 10))
 npx.batch_dot(np.expand_dims(weights, 1), np.expand_dims(values, -1)).shape
 ```
 
-```{.python .input}
+```{.python .input  n=12}
 %%tab pytorch
 weights = d2l.ones((2, 10)) * 0.1
 values = d2l.reshape(d2l.arange(20.0), (2, 10))
 torch.bmm(weights.unsqueeze(1), values.unsqueeze(-1))
 ```
 
-```{.python .input}
+```{.python .input  n=13}
 %%tab tensorflow
 weights = tf.ones((2, 10)) * 0.1
 values = tf.reshape(tf.range(20.0), shape = (2, 10))
@@ -282,7 +282,7 @@ of Nadaraya-Watson kernel regression
 based on the [**parametric attention pooling**] in
 :eqref:`eq_nadaraya-watson-gaussian-para`.
 
-```{.python .input  n=53}
+```{.python .input  n=14}
 %%tab all
 class NWKernelRegression(d2l.Module):
     def __init__(self, keys, values, lr):
@@ -320,7 +320,7 @@ In the parametric attention pooling,
 for simplicity
 any training input just takes key-value pairs from all the training examples to predict its output.
 
-```{.python .input  n=54}
+```{.python .input  n=15}
 %%tab all
 model = NWKernelRegression(data.x_train, data.y_train, lr=1)
 model.board.display = False
@@ -330,7 +330,7 @@ trainer.fit(model, data)
 
 Trying to fit the training dataset with noise, the predicted line is less smooth than its nonparametric counterpart that was plotted earlier.
 
-```{.python .input  n=51}
+```{.python .input  n=16}
 %%tab all
 plot_kernel_reg(model.forward(data.x_val))
 ```
@@ -339,7 +339,7 @@ Comparing with nonparametric attention pooling,
 [**the region with large attention weights becomes sharper**]
 in the parametric setting.
 
-```{.python .input}
+```{.python .input  n=17}
 %%tab all
 d2l.show_heatmaps([[model.attention_weights]],
                   xlabel='Sorted training inputs',

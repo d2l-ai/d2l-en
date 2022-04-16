@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
@@ -90,7 +90,7 @@ with Bahdanau attention is depicted in
 ![Layers in an RNN encoder-decoder model with Bahdanau attention.](../img/seq2seq-attention-details.svg)
 :label:`fig_s2s_attention_details`
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import init, np, npx
@@ -98,14 +98,14 @@ from mxnet.gluon import rnn, nn
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -121,7 +121,7 @@ the following `AttentionDecoder` class
 defines [**the base interface for
 decoders with attention mechanisms**].
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab all
 #@save
 class AttentionDecoder(d2l.Decoder):
@@ -148,7 +148,7 @@ As a result, both the attention output
 and the input embedding are concatenated
 as input of the RNN decoder.
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab mxnet
 class Seq2SeqAttentionDecoder(AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
@@ -197,19 +197,18 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         return self._attention_weights
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab pytorch
 class Seq2SeqAttentionDecoder(AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0):
         super().__init__()
-        self.attention = d2l.AdditiveAttention(
-            num_hiddens, num_hiddens, num_hiddens, dropout)
+        self.attention = d2l.AdditiveAttention(num_hiddens, dropout)
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = nn.GRU(
             embed_size + num_hiddens, num_hiddens, num_layers,
             dropout=dropout)
-        self.dense = nn.Linear(num_hiddens, vocab_size)
+        self.dense = nn.LazyLinear(vocab_size)
         self.apply(d2l.init_seq2seq_weights)
 
     def init_state(self, enc_outputs, enc_valid_lens):
@@ -248,7 +247,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         return self._attention_weights
 ```
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab tensorflow
 class Seq2SeqAttentionDecoder(AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
@@ -307,7 +306,7 @@ decoder**] with Bahdanau attention
 using a minibatch of 4 sequence inputs
 of 7 time steps.
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab all
 vocab_size, embed_size, num_hiddens, num_layers = 10, 8, 16, 2
 batch_size, num_steps = 4, 7
@@ -339,7 +338,7 @@ instantiate
 an encoder and a decoder with Bahdanau attention,
 and train this model for machine translation.
 
-```{.python .input}
+```{.python .input  n=10}
 %%tab all
 data = d2l.MTFraEng(batch_size=128) 
 embed_size, num_hiddens, num_layers, dropout = 256, 256, 2, 0.2
@@ -367,7 +366,7 @@ After the model is trained,
 we use it to [**translate a few English sentences**]
 into French and compute their BLEU scores.
 
-```{.python .input}
+```{.python .input  n=11}
 %%tab all
 engs = ['go .', 'i lost .', 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
@@ -391,7 +390,7 @@ It shows that at each decoding step,
 different parts of the input sequences
 are selectively aggregated in the attention pooling.
 
-```{.python .input}
+```{.python .input  n=12}
 %%tab all
 _, dec_attention_weights = model.predict_step(
     data.build([engs[-1]], [fras[-1]]), d2l.try_gpu(), data.num_steps, True)
@@ -400,7 +399,7 @@ attention_weights = d2l.reshape(
     (1, 1, -1, data.num_steps))
 ```
 
-```{.python .input}
+```{.python .input  n=13}
 %%tab mxnet
 # Plus one to include the end-of-sequence token
 d2l.show_heatmaps(
@@ -408,7 +407,7 @@ d2l.show_heatmaps(
     xlabel='Key positions', ylabel='Query positions')
 ```
 
-```{.python .input}
+```{.python .input  n=14}
 %%tab pytorch
 # Plus one to include the end-of-sequence token
 d2l.show_heatmaps(
@@ -416,7 +415,7 @@ d2l.show_heatmaps(
     xlabel='Key positions', ylabel='Query positions')
 ```
 
-```{.python .input}
+```{.python .input  n=15}
 %%tab tensorflow
 # Plus one to include the end-of-sequence token
 d2l.show_heatmaps(attention_weights[:, :, :, :len(engs[-1].split()) + 1],

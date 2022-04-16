@@ -991,11 +991,11 @@ class AdditiveAttention(nn.Module):
     """Additive attention.
 
     Defined in :numref:`sec_attention-scoring-functions`"""
-    def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
+    def __init__(self, num_hiddens, dropout, **kwargs):
         super(AdditiveAttention, self).__init__(**kwargs)
-        self.W_k = nn.Linear(key_size, num_hiddens, bias=False)
-        self.W_q = nn.Linear(query_size, num_hiddens, bias=False)
-        self.w_v = nn.Linear(num_hiddens, 1, bias=False)
+        self.W_k = nn.LazyLinear(num_hiddens, bias=False)
+        self.W_q = nn.LazyLinear(num_hiddens, bias=False)
+        self.w_v = nn.LazyLinear(1, bias=False)
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, queries, keys, values, valid_lens):
@@ -1048,15 +1048,14 @@ class MultiHeadAttention(d2l.Module):
     """Multi-head attention.
 
     Defined in :numref:`sec_multihead-attention`"""
-    def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 num_heads, dropout, bias=False, **kwargs):
+    def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
         super().__init__()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
-        self.W_q = nn.Linear(query_size, num_hiddens, bias=bias)
-        self.W_k = nn.Linear(key_size, num_hiddens, bias=bias)
-        self.W_v = nn.Linear(value_size, num_hiddens, bias=bias)
-        self.W_o = nn.Linear(num_hiddens, num_hiddens, bias=bias)
+        self.W_q = nn.LazyLinear(num_hiddens, bias=bias)
+        self.W_k = nn.LazyLinear(num_hiddens, bias=bias)
+        self.W_v = nn.LazyLinear(num_hiddens, bias=bias)
+        self.W_o = nn.LazyLinear(num_hiddens, bias=bias)
 
     def forward(self, queries, keys, values, valid_lens):
         # Shape of queries, keys, or values:
@@ -1130,11 +1129,11 @@ class PositionWiseFFN(nn.Module):
     """Positionwise feed-forward network.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, ffn_num_input, ffn_num_hiddens, ffn_num_outputs):
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs):
         super().__init__()
-        self.dense1 = nn.Linear(ffn_num_input, ffn_num_hiddens)
+        self.dense1 = nn.LazyLinear(ffn_num_hiddens)
         self.relu = nn.ReLU()
-        self.dense2 = nn.Linear(ffn_num_hiddens, ffn_num_outputs)
+        self.dense2 = nn.LazyLinear(ffn_num_outputs)
 
     def forward(self, X):
         return self.dense2(self.relu(self.dense1(X)))
@@ -1155,16 +1154,13 @@ class EncoderBlock(nn.Module):
     """Transformer encoder block.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
-                 dropout, use_bias=False):
+    def __init__(self, num_hiddens, norm_shape, ffn_num_hiddens,
+                 num_heads, dropout, use_bias=False):
         super().__init__()
-        self.attention = d2l.MultiHeadAttention(
-            key_size, query_size, value_size, num_hiddens, num_heads, dropout,
-            use_bias)
+        self.attention = d2l.MultiHeadAttention(num_hiddens, num_heads,
+                                                dropout, use_bias)
         self.addnorm1 = AddNorm(norm_shape, dropout)
-        self.ffn = PositionWiseFFN(
-            ffn_num_input, ffn_num_hiddens, num_hiddens)
+        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(norm_shape, dropout)
 
     def forward(self, X, valid_lens):
@@ -1175,8 +1171,7 @@ class TransformerEncoder(d2l.Encoder):
     """Transformer encoder.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, vocab_size, key_size, query_size, value_size,
-                 num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
+    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_hiddens,
                  num_heads, num_layers, dropout, use_bias=False):
         super().__init__()
         self.num_hiddens = num_hiddens
@@ -1185,8 +1180,7 @@ class TransformerEncoder(d2l.Encoder):
         self.blks = nn.Sequential()
         for i in range(num_layers):
             self.blks.add_module("block"+str(i),
-                EncoderBlock(key_size, query_size, value_size, num_hiddens,
-                             norm_shape, ffn_num_input, ffn_num_hiddens,
+                EncoderBlock(num_hiddens, norm_shape, ffn_num_hiddens,
                              num_heads, dropout, use_bias))
 
     def forward(self, X, valid_lens):
