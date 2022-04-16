@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
@@ -83,7 +83,7 @@ each head may attend to different parts of the input.
 More sophisticated functions than the simple weighted average
 can be expressed.
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 import math
@@ -92,7 +92,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import math
@@ -100,7 +100,7 @@ import torch
 from torch import nn
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -124,7 +124,7 @@ to $p_q h = p_k h = p_v h = p_o$.
 In the following implementation,
 $p_o$ is specified via the argument `num_hiddens`.
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab mxnet
 #@save
 class MultiHeadAttention(d2l.Module):
@@ -164,7 +164,7 @@ class MultiHeadAttention(d2l.Module):
         return self.W_o(output_concat)
 ```
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab pytorch
 #@save
 class MultiHeadAttention(d2l.Module):
@@ -204,7 +204,7 @@ class MultiHeadAttention(d2l.Module):
         return self.W_o(output_concat)
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab tensorflow
 #@save
 class MultiHeadAttention(d2l.Module):
@@ -250,7 +250,7 @@ Specifically,
 the `transpose_output` method reverses the operation
 of the `transpose_qkv` method.
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab mxnet
 @d2l.add_to_class(MultiHeadAttention)  #@save
 def transpose_qkv(self, X):
@@ -274,7 +274,7 @@ def transpose_output(self, X):
     return X.reshape(X.shape[0], X.shape[1], -1)
 ```
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(MultiHeadAttention)  #@save
 def transpose_qkv(self, X):
@@ -298,7 +298,7 @@ def transpose_output(self, X):
     return X.reshape(X.shape[0], X.shape[1], -1)
 ```
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab tensorflow
 @d2l.add_to_class(MultiHeadAttention)  #@save
 def transpose_qkv(self, X):
@@ -328,27 +328,27 @@ As a result,
 the shape of the multi-head attention output
 is (`batch_size`, `num_queries`, `num_hiddens`).
 
-```{.python .input  n=11}
+```{.python .input}
 %%tab mxnet
 num_hiddens, num_heads = 100, 5
 attention = MultiHeadAttention(num_hiddens, num_heads, 0.5)
 attention.initialize()
 ```
 
-```{.python .input  n=12}
+```{.python .input}
 %%tab pytorch
 num_hiddens, num_heads = 100, 5
 attention = MultiHeadAttention(num_hiddens, num_heads, 0.5)
 ```
 
-```{.python .input  n=13}
+```{.python .input}
 %%tab tensorflow
 num_hiddens, num_heads = 100, 5
 attention = MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
                                num_hiddens, num_heads, 0.5)
 ```
 
-```{.python .input  n=14}
+```{.python .input}
 %%tab mxnet, pytorch
 batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
@@ -357,7 +357,7 @@ d2l.check_shape(attention(X, Y, Y, valid_lens),
                 (batch_size, num_queries, num_hiddens))
 ```
 
-```{.python .input  n=15}
+```{.python .input}
 %%tab tensorflow
 batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, d2l.tensor([3, 2])
 X = tf.ones((batch_size, num_queries, num_hiddens))

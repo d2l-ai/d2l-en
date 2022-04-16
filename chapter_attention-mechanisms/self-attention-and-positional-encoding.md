@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
@@ -25,7 +25,7 @@ In this section,
 we will discuss sequence encoding using self-attention,
 including using additional information for the sequence order.
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 import math
@@ -34,7 +34,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import math
@@ -42,7 +42,7 @@ import torch
 from torch import nn
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import numpy as np
@@ -68,27 +68,27 @@ computes the self-attention of a tensor
 with shape (batch size, number of time steps or sequence length in tokens, $d$).
 The output tensor has the same shape.
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab mxnet
 num_hiddens, num_heads = 100, 5
 attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 0.5)
 attention.initialize()
 ```
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab pytorch
 num_hiddens, num_heads = 100, 5
 attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 0.5)
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab tensorflow
 num_hiddens, num_heads = 100, 5
 attention = d2l.MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
                                    num_hiddens, num_heads, 0.5)
 ```
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab mxnet, pytorch
 batch_size, num_queries, valid_lens = 2, 4, d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
@@ -96,7 +96,7 @@ d2l.check_shape(attention(X, X, X, valid_lens),
                 (batch_size, num_queries, num_hiddens))
 ```
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab tensorflow
 batch_size, num_queries, valid_lens = 2, 4, tf.constant([3, 2])
 X = tf.ones((batch_size, num_queries, num_hiddens))
@@ -224,7 +224,7 @@ design looks weird.
 Before explanations of this design,
 let's first implement it in the following `PositionalEncoding` class.
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab mxnet
 #@save
 class PositionalEncoding(nn.Block):
@@ -244,7 +244,7 @@ class PositionalEncoding(nn.Block):
         return self.dropout(X)
 ```
 
-```{.python .input  n=11}
+```{.python .input}
 %%tab pytorch
 #@save
 class PositionalEncoding(nn.Module):
@@ -265,7 +265,7 @@ class PositionalEncoding(nn.Module):
         return self.dropout(X)
 ```
 
-```{.python .input  n=12}
+```{.python .input}
 %%tab tensorflow
 #@save
 class PositionalEncoding(tf.keras.layers.Layer):
@@ -300,7 +300,7 @@ The offset between
 the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$ (same for the $8^{\mathrm{th}}$ and the $9^{\mathrm{th}}$) columns
 is due to the alternation of sine and cosine functions.
 
-```{.python .input  n=13}
+```{.python .input}
 %%tab mxnet
 encoding_dim, num_steps = 32, 60
 pos_encoding = PositionalEncoding(encoding_dim, 0)
@@ -311,7 +311,7 @@ d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
          figsize=(6, 2.5), legend=["Col %d" % d for d in d2l.arange(6, 10)])
 ```
 
-```{.python .input  n=14}
+```{.python .input}
 %%tab pytorch
 encoding_dim, num_steps = 32, 60
 pos_encoding = PositionalEncoding(encoding_dim, 0)
@@ -321,7 +321,7 @@ d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
          figsize=(6, 2.5), legend=["Col %d" % d for d in d2l.arange(6, 10)])
 ```
 
-```{.python .input  n=15}
+```{.python .input}
 %%tab tensorflow
 encoding_dim, num_steps = 32, 60
 pos_encoding = PositionalEncoding(encoding_dim, 0)
@@ -339,7 +339,7 @@ let's print out [**the binary representations**] of $0, 1, \ldots, 7$.
 As we can see,
 the lowest bit, the second-lowest bit, and the third-lowest bit alternate on every number, every two numbers, and every four numbers, respectively.
 
-```{.python .input  n=16}
+```{.python .input}
 %%tab all
 for i in range(8):
     print(f'{i} in binary is {i:>03b}')
@@ -357,21 +357,21 @@ such continuous representations
 are more space-efficient
 than binary representations.
 
-```{.python .input  n=17}
+```{.python .input}
 %%tab mxnet
 P = np.expand_dims(np.expand_dims(P[0, :, :], 0), 0)
 d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
                   ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
 ```
 
-```{.python .input  n=18}
+```{.python .input}
 %%tab pytorch
 P = P[0, :, :].unsqueeze(0).unsqueeze(0)
 d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
                   ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
 ```
 
-```{.python .input  n=19}
+```{.python .input}
 %%tab tensorflow
 P = tf.expand_dims(tf.expand_dims(P[0, :, :], axis=0), axis=0)
 d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
