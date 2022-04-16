@@ -231,7 +231,7 @@ def feature_importance(self, feat_of_interest, mode="SHUFFLE"):
             trainer.fit(new_model, new_data)
             s_i, pred, Y, X = new_model.predict(
                 new_data.val_dataloader())
-        feature_importance[i] = (s-s_i).cpu().detach().numpy()  
+        feature_importance[i] = (s-s_i) 
         d2l.plt.close()
         
     d2l.plt.figure(figsize = (3,2))
@@ -260,6 +260,6 @@ Ablation studies are straightforward and useful but they are not without shortco
 * Error analysis helps us get insight into the erroneous cases of the model.
 * Feature importance can be obtained via ablation studies regardless of the model type.
 
-## Exercise
-* Analyze the error distribution across different groups of the loan amount. Hint: You may need to rewrite the MlpLoan model.
-* Can you calculate the importance score of the batch norm via ablation study?
+## Exercises
+1. Analyze the error distribution across different groups of the loan amount. Hint: You may need to rewrite the MlpLoan model.
+2. Can you calculate the importance score of the batch norm via ablation study?
