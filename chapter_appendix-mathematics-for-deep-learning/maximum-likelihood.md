@@ -80,6 +80,19 @@ p = theta**9 * (1 - theta)**4.
 d2l.plot(theta, p, 'theta', 'likelihood')
 ```
 
+```{.python .input}
+#@tab jax
+%matplotlib inline
+import jax.numpy as jnp
+from jax import grad
+from d2l import jax as d2l
+
+theta = jnp.arange(0, 1, 0.001)
+p = theta**9 * (1 - theta)**4.
+
+d2l.plot(theta, p, 'theta', 'likelihood')
+```
+
 This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the gradient of the function is flat.  Thus, we could find the maximum likelihood estimate :eqref:`eq_max_like` by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
 
 $$
@@ -181,6 +194,28 @@ for iter in range(10):
     with tf.GradientTape() as t:
         loss = -(n_H * tf.math.log(theta) + n_T * tf.math.log(1 - theta))
     theta.assign_sub(lr * t.gradient(loss, theta))
+
+# Check output
+theta, n_H / (n_H + n_T)
+```
+
+```{.python .input}
+#@tab jax
+# Set up our data
+n_H = 8675309
+n_T = 25624
+
+# Initialize our paramteres
+theta = jnp.array(0.5)
+
+# Define loss function
+def loss(theta):
+    return -(n_H * jnp.log(theta) + n_T * jnp.log(1 - theta))
+
+# Perform gradient descent
+lr = 0.00000000001
+for iter in range(10):
+    theta -= lr * grad(loss)(theta)
 
 # Check output
 theta, n_H / (n_H + n_T)
