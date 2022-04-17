@@ -98,7 +98,7 @@ of a neural network architecture suitable for computer vision:
 
 1. In the earliest layers, our network
    should respond similarly to the same patch,
-   regardless of where it appears in the image. This principle is called *translation invariance*.
+   regardless of where it appears in the image. This principle is called *translation invariance* (or *translation equivariance*).
 1. The earliest layers of the network should focus on local regions,
    without regard for the contents of the image in distant regions. This is the *locality* principle.
    Eventually, these local representations can be aggregated
@@ -152,7 +152,7 @@ Now let's invoke the first principle
 established above: translation invariance :cite:`Zhang.ea.1988`.
 This implies that a shift in the input $\mathbf{X}$
 should simply lead to a shift in the hidden representation $\mathbf{H}$.
-This is only possible if $\mathsf{V}$ and $\mathbf{U}$ do not actually depend on $(i, j)$. As such
+This is only possible if $\mathsf{V}$ and $\mathbf{U}$ do not actually depend on $(i, j)$. As such,
 we have $[\mathsf{V}]_{i, j, a, b} = [\mathbf{V}]_{a, b}$ and $\mathbf{U}$ is a constant, say $u$.
 As a result, we can simplify the definition for $\mathbf{H}$:
 
@@ -164,7 +164,7 @@ We are effectively weighting pixels at $(i+a, j+b)$
 in the vicinity of location $(i, j)$ with coefficients $[\mathbf{V}]_{a, b}$
 to obtain the value $[\mathbf{H}]_{i, j}$.
 Note that $[\mathbf{V}]_{a, b}$ needs many fewer coefficients than $[\mathsf{V}]_{i, j, a, b}$ since it
-no longer depends on the location within the image. Consequently, the number of parameters required is no longer $10^{12}$ but a much more reasonable $4 \cdot 10^6$: we still have the dependency on $a, b \in (-1000, 1000)$. In short, we have made significant progress. TDNNs (time-delay neural networks) are some of the first examples to exploit this idea :cite:`Waibel.Hanazawa.Hinton.ea.1989`.
+no longer depends on the location within the image. Consequently, the number of parameters required is no longer $10^{12}$ but a much more reasonable $4 \cdot 10^6$: we still have the dependency on $a, b \in (-1000, 1000)$. In short, we have made significant progress. Time-delay neural networks (TDNNs) are some of the first examples to exploit this idea :cite:`Waibel.Hanazawa.Hinton.ea.1989`.
 
 ###  Locality
 
@@ -181,7 +181,7 @@ $$[\mathbf{H}]_{i, j} = u + \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Del
 :eqlabel:`eq_conv-layer`
 
 This reduces the number of parameters from $4 \cdot 10^6$ to $4 \Delta^2$, where $\Delta$ is typically smaller than $10$. As such, we reduced the number of parameters by another 4 orders of magnitude. Note that :eqref:`eq_conv-layer`, in a nutshell, is what is called a *convolutional layer*. 
-*Convolutional Neural Networks* (CNNs)
+*Convolutional neural networks* (CNNs)
 are a special family of neural networks that contain convolutional layers.
 In the deep learning research community,
 $\mathbf{V}$ is referred to as a *convolution kernel*,
@@ -291,10 +291,10 @@ To support multiple channels in both inputs ($\mathsf{X}$) and hidden representa
 we can add a fourth coordinate to $\mathsf{V}$: $[\mathsf{V}]_{a, b, c, d}$.
 Putting everything together we have:
 
-$$[\mathsf{H}]_{i,j,d} = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c [\mathsf{V}]_{a, b, c, d} [\mathsf{X}]_{i+a, j+b, c}$$
+$$[\mathsf{H}]_{i,j,d} = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c [\mathsf{V}]_{a, b, c, d} [\mathsf{X}]_{i+a, j+b, c},$$
 :eqlabel:`eq_conv-layer-channels`
 
-Here $d$ indexes the output channels in the hidden representations $\mathsf{H}$. The subsequent convolutional layer will go on to take a third-order tensor, $\mathsf{H}$, as input.
+where $d$ indexes the output channels in the hidden representations $\mathsf{H}$. The subsequent convolutional layer will go on to take a third-order tensor, $\mathsf{H}$, as input.
 Being more general,
 :eqref:`eq_conv-layer-channels` is
 the definition of a convolutional layer for multiple channels, where $\mathsf{V}$ is a kernel or filter of the layer.
@@ -311,13 +311,13 @@ We turn to these issues in the remainder of the chapter.
 
 ## Summary and Discussion
 
-In this section we derived the structure of Convolutional Neural Networks from first principles. While it is unclear whether this is what led to the invention of CNNs, it is satisfying to know that they are the *right* choice when applying reasonable principles to how image processing and computer vision algorithms should operate, at least at lower levels. In particular, translation invariance in images implies that all patches of an image will be treated in the same manner. Locality means that only a small neighborhood of pixels will be used to compute the corresponding hidden representations. Some of the earliest references to CNNs are in the form of the Neocognitron :cite:`Fukushima.1982`. 
+In this section we derived the structure of convolutional neural networks from first principles. While it is unclear whether this is what led to the invention of CNNs, it is satisfying to know that they are the *right* choice when applying reasonable principles to how image processing and computer vision algorithms should operate, at least at lower levels. In particular, translation invariance in images implies that all patches of an image will be treated in the same manner. Locality means that only a small neighborhood of pixels will be used to compute the corresponding hidden representations. Some of the earliest references to CNNs are in the form of the Neocognitron :cite:`Fukushima.1982`. 
 
 A second principle that we encountered in our reasoning is how to reduce the number of parameters in a function class without limiting its expressive power, at least, whenever certain assumptions on the model hold. We saw a dramatic reduction of complexity as a result of this restriction, turning computationally and statistically infeasible problems into tractable models. 
 
-Adding channels allowed us to bring back some of the complexity that was lost due to the restrictions imposed on the convolutional kernel by locality and translation invariance. Note that channels are quite a natural addition beyond red, green and blue. Many satellite 
+Adding channels allowed us to bring back some of the complexity that was lost due to the restrictions imposed on the convolutional kernel by locality and translation invariance. Note that channels are quite a natural addition beyond red, green, and blue. Many satellite 
 images, in particular for agriculture and meteorology, have tens to hundreds of channels, 
-generating hyperspectral images instead. They report data on many different wavelenghts. In the following we will see how to use convolutions effectively to manipulate the dimensionality of the images they operate on, how to move from location-based to channel-based representations and how to deal with large numbers of categories efficiently. 
+generating hyperspectral images instead. They report data on many different wavelengths. In the following we will see how to use convolutions effectively to manipulate the dimensionality of the images they operate on, how to move from location-based to channel-based representations and how to deal with large numbers of categories efficiently. 
 
 ## Exercises
 
