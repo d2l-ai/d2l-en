@@ -231,7 +231,7 @@ matches the number of classes.
 ## Training
 
 Now that we have implemented the model,
-let's [**run an experiment to see how LeNet fares on Fashion-MNIST**].
+let's [**run an experiment to see how the LeNet-5 model fares on Fashion-MNIST**].
 
 While CNNs have fewer parameters,
 they can still be more expensive to compute
@@ -240,14 +240,12 @@ because each parameter participates in many more
 multiplications.
 If you have access to a GPU, this might be a good time
 to put it into action to speed up training.
-
-The `d2l.Trainer` method takes care of all details.
+Note that
+the `d2l.Trainer` class takes care of all details.
 By default, it initializes the model parameters on the
 available devices.
 Just as with MLPs, our loss function is cross-entropy,
 and we minimize it via minibatch stochastic gradient descent.
-
-[**Now let's train and evaluate the LeNet-5 model.**]
 
 ```{.python .input}
 %%tab pytorch, mxnet
@@ -268,16 +266,16 @@ with d2l.try_gpu():
 
 ## Summary
 
-In this chapter we made significant progress. We moved from the MLPs of the 1980s to the CNNs of the 1990s and early 2000s. The architectures proposed, e.g., in the form of LeNet5 remain meaningful, even to this day. It is worth comparing the error rates on FashionMNIST achievable with LeNet5 both to the very best possible with MLPs (:numref:`sec_mlp_scratch`) and those with significantly more advanced architectures such as ResNet (:numref:`sec_resnet`). LetNet is much more similar to the latter than to the former. One of the primary differences, as we shall see, is that greater amounts of computation afforded significantly more complex architectures.
+In this chapter we made significant progress. We moved from the MLPs of the 1980s to the CNNs of the 1990s and early 2000s. The architectures proposed, e.g., in the form of LeNet-5 remain meaningful, even to this day. It is worth comparing the error rates on FashionMNIST achievable with LeNet-5 both to the very best possible with MLPs (:numref:`sec_mlp_scratch`) and those with significantly more advanced architectures such as ResNet (:numref:`sec_resnet`). LeNet is much more similar to the latter than to the former. One of the primary differences, as we shall see, is that greater amounts of computation afforded significantly more complex architectures.
 
-A second difference is the relative ease with which we were able to implement LeNet. What used to be an engineering challenge worth months of C++ and assembly code, engineering to improve SN, an early Lisp based deep learning tool, :cite:`Bottou.Le-Cun.1988`, and finally experimentation with models can now be accomplished in minutes. It is this incredible productivity boost that has democratized deep learning model development tremendously. In the next chapter we will follow down this rabbit to hole to see where it takes us.
+A second difference is the relative ease with which we were able to implement LeNet. What used to be an engineering challenge worth months of C++ and assembly code, engineering to improve SN, an early Lisp based deep learning tool :cite:`Bottou.Le-Cun.1988`, and finally experimentation with models can now be accomplished in minutes. It is this incredible productivity boost that has democratized deep learning model development tremendously. In the next chapter we will follow down this rabbit to hole to see where it takes us.
 
 ## Exercises
 
 1. Let's modernize LeNet. Implement and test the following changes:
     1. Replace the average pooling with max-pooling.
-    1. Replace the softmax layer with ReLu.
-1. Try to change the size of the LeNet style network to improve its accuracy in addition to max-pooling and Relu.
+    1. Replace the softmax layer with ReLU.
+1. Try to change the size of the LeNet style network to improve its accuracy in addition to max-pooling and ReLU.
     1. Adjust the convolution window size.
     1. Adjust the number of output channels.
     1. Adjust the number of convolution layers.
