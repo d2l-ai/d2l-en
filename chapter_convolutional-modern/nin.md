@@ -13,19 +13,19 @@ and post-process the representations via fully connected layers.
 The improvements upon LeNet by AlexNet and VGG mainly lie
 in how these later networks widen and deepen these two modules.
 
-This design poses a number of challenges: firstly, the fully connected layers at the end 
-of the architecture consume tremendous numbers of parameters. For instance, even a simple 
-model such as VGG-11 requires a monstrous $25,088 \times 4096$ matrix, occupying almost 
-400MB of RAM. This is a significant impediment to speedy computation, in particular on 
-mobile and embedded devices. Secondly, it is equally impossible to add fully-connected layers 
-earlier in the network to increase the degree of nonlinearity: doing so would destroy the 
-spatial structure and require potentially even more memory. 
+This design poses a number of challenges: firstly, the fully connected layers at the end
+of the architecture consume tremendous numbers of parameters. For instance, even a simple
+model such as VGG-11 requires a monstrous $25,088 \times 4096$ matrix, occupying almost
+400MB of RAM. This is a significant impediment to speedy computation, in particular on
+mobile and embedded devices. Secondly, it is equally impossible to add fully-connected layers
+earlier in the network to increase the degree of nonlinearity: doing so would destroy the
+spatial structure and require potentially even more memory.
 
-The *network in network* (*NiN*) blocks of :cite:`Lin.Chen.Yan.2013` offer an alternative, 
-capable of solving both problems in one simple strategy: 
-They were proposed based on a very simple insight: a) use $1 \times 1$ convolutions to add 
-local nonlinearities across the channel activations and b) use global average pooling to integrate 
-across all locations in the last representation layer. Note that global average pooling would not 
+The *network in network* (*NiN*) blocks of :cite:`Lin.Chen.Yan.2013` offer an alternative,
+capable of solving both problems in one simple strategy:
+They were proposed based on a very simple insight: a) use $1 \times 1$ convolutions to add
+local nonlinearities across the channel activations and b) use global average pooling to integrate
+across all locations in the last representation layer. Note that global average pooling would not
 be effective, were it not for the added nonlinearities. Let's dive into this in detail.
 
 
@@ -38,12 +38,12 @@ Also recall that the inputs and outputs of fully connected layers
 are typically two-dimensional tensors corresponding to the example and feature.
 The idea behind NiN is to apply a fully connected layer
 at each pixel location (for each height and width).
-The resulting $1 \times 1$ convolution can be thought as 
+The resulting $1 \times 1$ convolution can be thought as
 a fully connected layer acting independently on each pixel location.
 
-:numref:`fig_nin` illustrates the main structural 
+:numref:`fig_nin` illustrates the main structural
 differences between VGG and NiN, and their blocks.
-Note both the difference in the NiN blocks (the initial convolution is followed by $1 \times 1$ convolutions, whereas VGG retains $3 \times 3$ convolutions) and in the end where we no longer require a giant fully-connected layer. 
+Note both the difference in the NiN blocks (the initial convolution is followed by $1 \times 1$ convolutions, whereas VGG retains $3 \times 3$ convolutions) and in the end where we no longer require a giant fully-connected layer.
 
 ![Comparing architectures of VGG and NiN, and their blocks.](../img/nin.svg)
 :width:`600px`
@@ -83,10 +83,10 @@ def nin_block(in_channels, out_channels, kernel_size, strides, padding):
 
 NiN uses the same initial convolution sizes as AlexNet (it was proposed shortly thereafter).
 The kernel sizes are $11\times 11$, $5\times 5$, and $3\times 3$, respectively,
-and the numbers of output channels match those of AlexNet. Each NiN block is followed by a maximum pooling layer
+and the numbers of output channels match those of AlexNet. Each NiN block is followed by a max-pooling layer
 with a stride of 2 and a window shape of $3\times 3$.
 
-The second significant difference between NiN and AlexNet and VGG respectively 
+The second significant difference between NiN and AlexNet and VGG respectively
 is that NiN avoids fully connected layers altogether.
 Instead, NiN uses a NiN block with a number of output channels equal to the number of label classes, followed by a *global* average pooling layer,
 yielding a vector of logits.
@@ -153,11 +153,11 @@ trainer.fit(model, data)
 
 ## Summary
 
-NiN has dramatically fewer parameters than AlexNet and VGG. This stems from the fact that it needs no giant fully connected layers and fewer convolutions with wide kernels. Instead, it uses local $1 \times 1$ convolutions and global average pooling. These design choices influenced many subsequent CNN designs. 
+NiN has dramatically fewer parameters than AlexNet and VGG. This stems from the fact that it needs no giant fully connected layers and fewer convolutions with wide kernels. Instead, it uses local $1 \times 1$ convolutions and global average pooling. These design choices influenced many subsequent CNN designs.
 
 ## Exercises
 
-1. Why are there two $1\times 1$ convolutional layers per NiN block? What happens if you add one? What happens if you reduce this to one? 
+1. Why are there two $1\times 1$ convolutional layers per NiN block? What happens if you add one? What happens if you reduce this to one?
 1. What happens if you replace the global average pooling by a fully connected layer (speed, accuracy, number of parameters)?
 1. Calculate the resource usage for NiN.
     1. What is the number of parameters?
