@@ -18,27 +18,27 @@ dominant architecture and many were winners or runners-up in the
 which has served as a barometer of progress on supervised learning in
 computer vision since 2010.
 
-These models include AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`,
+These models include the AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`,
 the first large-scale network deployed to beat conventional computer
 vision methods on a large-scale vision challenge; the VGG network
 :cite:`Simonyan.Zisserman.2014`, which makes use of a number of
 repeating blocks of elements; the network in network (NiN) that
 convolves whole neural networks patch-wise over inputs
-:cite:`Lin.Chen.Yan.2013`; GoogLeNets, which use networks with
-multi-branch convolutions :cite:`Szegedy.Liu.Jia.ea.2015`; residual
-networks (ResNets) :cite:`He.Zhang.Ren.ea.2016`, which remain some of
+:cite:`Lin.Chen.Yan.2013`; the GoogLeNet that uses networks with
+multi-branch convolutions :cite:`Szegedy.Liu.Jia.ea.2015`; the residual
+network (ResNet) :cite:`He.Zhang.Ren.ea.2016`, which remains some of
 the most popular off-the-shelf architectures in computer vision;
 ResNeXt blocks :cite:`Xie.Girshick.Dollar.ea.2017` 
 for sparser connections;
 and 
-DenseNets
+the DenseNet
 :cite:`Huang.Liu.Van-Der-Maaten.ea.2017` for a generalization of the
 residual architecture.
 In addition to that,
 we explore network structure
-assuming standard and fixed blocks
+assuming standard and fixed blocks,
 leading
-to RegNets
+to the RegNet
 :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`. 
 
 
