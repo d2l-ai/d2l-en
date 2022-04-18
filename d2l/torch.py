@@ -1361,7 +1361,7 @@ def resnet18(num_classes, in_channels=1):
         return nn.Sequential(*blk)
 
     # This model uses a smaller convolution kernel, stride, and padding and
-    # removes the maximum pooling layer
+    # removes the max-pooling layer
     net = nn.Sequential(
         nn.Conv2d(in_channels, 64, kernel_size=3, stride=1, padding=1),
         nn.BatchNorm2d(64),

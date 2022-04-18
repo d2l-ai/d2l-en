@@ -8,17 +8,17 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 In 2014, *GoogLeNet*
 won the ImageNet Challenge :cite:`Szegedy.Liu.Jia.ea.2015`, using a structure
-that combined the strengths of NiN :cite:`Lin.Chen.Yan.2013`, repeated blocks :cite:`Simonyan.Zisserman.2014`, 
-and a cocktail of convolution kernels. It is arguably also the first network that exhibits a clear distinction between base, stem, and head in a convnet. This design pattern has persisted ever since in the design of deep networks: the *base* is given by the first 2-3 convolutions that operate on the image. They extract low-level features from the underlying images. This is followed by a *stem* of convolutional blocks. Finally, the *head* maps the features obtained so far to the required classification, segmentation, detection, or tracking problem at hand. 
+that combined the strengths of NiN :cite:`Lin.Chen.Yan.2013`, repeated blocks :cite:`Simonyan.Zisserman.2014`,
+and a cocktail of convolution kernels. It is arguably also the first network that exhibits a clear distinction between base, stem, and head in a convnet. This design pattern has persisted ever since in the design of deep networks: the *base* is given by the first 2-3 convolutions that operate on the image. They extract low-level features from the underlying images. This is followed by a *stem* of convolutional blocks. Finally, the *head* maps the features obtained so far to the required classification, segmentation, detection, or tracking problem at hand.
 
-The key contribution in GoogLeNet was the design of the network stem. It solved the problem of selecting 
+The key contribution in GoogLeNet was the design of the network stem. It solved the problem of selecting
 convolution kernels in an ingenious way. While other works tried to identify which convolution, ranging from $1 \times 1$ to $11 \times 11$ would be best, it simply *concatenated* multi-branch convolutions.
-In what follows we introduce a slightly simplified version of GoogLeNet. The simplifications are due to the fact that  tricks to stabilize training, in particular intermediate loss functions are multiple layers, are no longer needed due to the availability of improved training algorithms. 
+In what follows we introduce a slightly simplified version of GoogLeNet. The simplifications are due to the fact that  tricks to stabilize training, in particular intermediate loss functions are multiple layers, are no longer needed due to the availability of improved training algorithms.
 
 ## (**Inception Blocks**)
 
 The basic convolutional block in GoogLeNet is called an *Inception block*,
-stemming from the meme "we need to go deeper" of the movie *Inception*. 
+stemming from the meme "we need to go deeper" of the movie *Inception*.
 
 ![Structure of the Inception block.](../img/inception.svg)
 :label:`fig_inception`
@@ -30,7 +30,7 @@ with window sizes of $1\times 1$, $3\times 3$, and $5\times 5$
 to extract information from different spatial sizes.
 The middle two branches also add a $1\times 1$ convolution of the input
 to reduce the number of channels, reducing the model's complexity.
-The fourth branch uses a $3\times 3$ maximum pooling layer,
+The fourth branch uses a $3\times 3$ max-pooling layer,
 followed by a $1\times 1$ convolutional layer
 to change the number of channels.
 The four branches all use appropriate padding to give the input and output the same height and width.
@@ -141,15 +141,15 @@ for different filters.
 
 ## [**GoogLeNet Model**]
 
-As shown in :numref:`fig_inception_full`, GoogLeNet uses a stem of a total of 9 inception blocks, arranged into 3 groups with max-pooling in between, 
+As shown in :numref:`fig_inception_full`, GoogLeNet uses a stem of a total of 9 inception blocks, arranged into 3 groups with max-pooling in between,
 and global average pooling in its head to generate its estimates.
-Maximum pooling between inception blocks reduces the dimensionality.
+Max-pooling between inception blocks reduces the dimensionality.
 At its base, the first module is similar to AlexNet and LeNet.
 
 ![The GoogLeNet architecture.](../img/inception-full.svg)
 :label:`fig_inception_full`
 
-We can now implement GoogLeNet piece by piece. Let's begin with the base. 
+We can now implement GoogLeNet piece by piece. Let's begin with the base.
 The first module uses a 64-channel $7\times 7$ convolutional layer.
 
 ```{.python .input}
@@ -170,7 +170,7 @@ class GoogleNet(d2l.Classifier):
             return tf.keras.models.Sequential([
                 tf.keras.layers.Conv2D(64, 7, strides=2, padding='same',
                                        activation='relu'),
-                tf.keras.layers.MaxPool2D(pool_size=3, strides=2, 
+                tf.keras.layers.MaxPool2D(pool_size=3, strides=2,
                                           padding='same')])
 ```
 
@@ -202,17 +202,17 @@ def b2(self):
 
 The third module connects two complete Inception blocks in series.
 The number of output channels of the first Inception block is
-$64+128+32+32=256$. This amounts to a 
-the ratio of the number of output channel 
-among the four branches of $2:4:1:1$. Achieve this, we first reduce the input 
-dimensions by $\frac{1}{2}$ and by $\frac{1}{12}$ in the second and third branch 
-respectively to arrive at $96 = 192/2$ and $16 = 192/12$ channels respectively. 
+$64+128+32+32=256$. This amounts to a
+the ratio of the number of output channel
+among the four branches of $2:4:1:1$. Achieve this, we first reduce the input
+dimensions by $\frac{1}{2}$ and by $\frac{1}{12}$ in the second and third branch
+respectively to arrive at $96 = 192/2$ and $16 = 192/12$ channels respectively.
 
 The number of output channels of the second Inception block
-is increased to $128+192+96+64=480$, yielding a ratio of $128:192:96:64 = 4:6:3:2$. As before, 
-we need to rduce the number of intermediat dimensions in the second and third channel. A 
-scale of $\frac{1}{2}$ and $\frac{1}{8}$ respectively suffices, yielding $128$ and $32$ channels 
-respenctively. This captured by the `Inception(64, (96, 128), (16, 32), 32)` and 
+is increased to $128+192+96+64=480$, yielding a ratio of $128:192:96:64 = 4:6:3:2$. As before,
+we need to rduce the number of intermediat dimensions in the second and third channel. A
+scale of $\frac{1}{2}$ and $\frac{1}{8}$ respectively suffices, yielding $128$ and $32$ channels
+respenctively. This captured by the `Inception(64, (96, 128), (16, 32), 32)` and
 `Inception(128, (128, 192), (32, 96), 64)` block constructors.
 
 ```{.python .input}
@@ -247,7 +247,7 @@ the second branch with the $3\times 3$ convolutional layer
 outputs the largest number of channels,
 followed by the first branch with only the $1\times 1$ convolutional layer,
 the third branch with the $5\times 5$ convolutional layer,
-and the fourth branch with the $3\times 3$ maximum pooling layer.
+and the fourth branch with the $3\times 3$ max-pooling layer.
 The second and third branches will first reduce
 the number of channels according to the ratio.
 These ratios are slightly different in different Inception blocks.
@@ -333,19 +333,19 @@ def __init__(self, num_classes=10, lr=0.1):
         self.net.apply(d2l.init_cnn_weights)
     if tab.selected('tensorflow'):
         self.net = tf.keras.Sequential([
-            self.b1(), self.b2(), self.b3(), self.b4(), self.b5(), 
+            self.b1(), self.b2(), self.b3(), self.b4(), self.b5(),
             tf.keras.layers.Dense(10)])
 ```
 
-The GoogLeNet model is computationally complex. Note the large number of 
-relatively arbitrary parameters in terms of the number of channels chosen. 
-This work was done before scientists started using automatic tools to 
-optimize network designs. Later on we will see what can be achieved by 
-a much more automatic approach network design 
-:cite:`Howard.Sandler.Chu.ea.2019,Radosavovic.Kosaraju.Girshick.ea.2020`. 
+The GoogLeNet model is computationally complex. Note the large number of
+relatively arbitrary parameters in terms of the number of channels chosen.
+This work was done before scientists started using automatic tools to
+optimize network designs. Later on we will see what can be achieved by
+a much more automatic approach network design
+:cite:`Howard.Sandler.Chu.ea.2019,Radosavovic.Kosaraju.Girshick.ea.2020`.
 
-For now the only modification we will carry out is to 
-[**reduce the input height and width from 224 to 96 
+For now the only modification we will carry out is to
+[**reduce the input height and width from 224 to 96
 to have a reasonable training time on Fashion-MNIST.**]
 This simplifies the computation. Let's have a look at the
 changes in the shape of the output between the various modules.
@@ -385,32 +385,32 @@ with d2l.try_gpu():
 
 ## Discussion
 
-A key feature of GoogleNet is that is actually *cheaper* to compute than its predecessors 
+A key feature of GoogleNet is that is actually *cheaper* to compute than its predecessors
 while simultaneously providing improved accuracy. This marks the beginning of a much more deliberate
-network design that trades off the cost of evaluating a network with a reduction in errors. It also marks the beginning of experimentation at a block level with network design parameters, even though it was entirely manual at the time. This is largely due to the fact that DL frameworks in 2015 still lacked much of the design flexibility 
+network design that trades off the cost of evaluating a network with a reduction in errors. It also marks the beginning of experimentation at a block level with network design parameters, even though it was entirely manual at the time. This is largely due to the fact that DL frameworks in 2015 still lacked much of the design flexibility
 that we now take for granted. Moreover, full network optimization is costly and at the time training on ImageNet still
-proved computationally challenging. 
+proved computationally challenging.
 
-Over the following sections we will encounter a number of design choices (residual connections, batch norm, channel-attention, channel grouping, channel shuffles, pixel shifts, etc.) that allow us to improve networks significantly. For now, you can be proud to have implemented what is arguably the first truly modern convolutional neural network. 
+Over the following sections we will encounter a number of design choices (residual connections, batch norm, channel-attention, channel grouping, channel shuffles, pixel shifts, etc.) that allow us to improve networks significantly. For now, you can be proud to have implemented what is arguably the first truly modern convolutional neural network.
 
 ## Exercises
 
-1. GoogLeNet was so successful that it went through a number of iterations. There are several iterations 
-   of GoogLeNet that progressively improved speed and accuracy. Try to implement and run some of them. 
+1. GoogLeNet was so successful that it went through a number of iterations. There are several iterations
+   of GoogLeNet that progressively improved speed and accuracy. Try to implement and run some of them.
    They include the following:
    1. Add a batch normalization layer :cite:`Ioffe.Szegedy.2015`, as described
-      later in :numref:`sec_batch_norm`. 
+      later in :numref:`sec_batch_norm`.
    1. Make adjustments to the Inception block (width, choice and order of convolutions), as described in
       :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
-   1. Use label smoothing for model regularization, as described in 
+   1. Use label smoothing for model regularization, as described in
       :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
    1. Make further adjustments to the Inception block by adding residual connection
       :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017`, as described later in
       :numref:`sec_resnet`.
 1. What is the minimum image size for GoogLeNet to work?
-1. Can you design a variant of GooLeNet that works on FashionMNIST's native resolution of $28 \times 28$ pixels? How 
+1. Can you design a variant of GooLeNet that works on FashionMNIST's native resolution of $28 \times 28$ pixels? How
    would you need to change the base, the stem, and the head of the network, if anything at all?
-1. Compare the model parameter sizes of AlexNet, VGG, and NiN with GoogLeNet. How do the latter two network 
+1. Compare the model parameter sizes of AlexNet, VGG, and NiN with GoogLeNet. How do the latter two network
    architectures significantly reduce the model parameter size?
 1. Compare the amount of computation needed in GooLeNet to AlexNet. How does this affect the design of an accelerator
    chip, e.g. in terms of memory size, amount of computation, the benefit of specialized operations, etc.?

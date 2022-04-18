@@ -19,7 +19,7 @@ $$f(\mathbf{x}) = \mathbf{x} + g(\mathbf{x}).$$
 That is, ResNet decomposes $f$ into a simple linear term and a more complex
 nonlinear one.
 What if we want to capture (not necessarily add) information beyond two terms?
-One solution was 
+One solution was
 DenseNet :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
 
 ![The main difference between ResNet (left) and DenseNet (right) in cross-layer connections: use of addition and use of concatenation. ](../img/densenet-block.svg)
@@ -241,7 +241,7 @@ blk(Y).shape
 
 ## [**DenseNet Model**]
 
-Next, we will construct a DenseNet model. DenseNet first uses the same single convolutional layer and maximum pooling layer as in ResNet.
+Next, we will construct a DenseNet model. DenseNet first uses the same single convolutional layer and max-pooling layer as in ResNet.
 
 ```{.python .input}
 net = nn.Sequential()
@@ -377,7 +377,7 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 
 ## Exercises
 
-1. Why do we use average pooling rather than maximum pooling in the transition layer?
+1. Why do we use average pooling rather than max-pooling in the transition layer?
 1. One of the advantages mentioned in the DenseNet paper is that its model parameters are smaller than those of ResNet. Why is this the case?
 1. One problem for which DenseNet has been criticized is its high memory consumption.
     1. Is this really the case? Try to change the input shape to $224\times 224$ to see the actual GPU memory consumption.

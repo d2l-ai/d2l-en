@@ -230,7 +230,7 @@ blk(X).shape
 
 ## [**ResNet Model**]
 
-The first two layers of ResNet are the same as those of the GoogLeNet we described before: the $7\times 7$ convolutional layer with 64 output channels and a stride of 2 is followed by the $3\times 3$ maximum pooling layer with a stride of 2. The difference is the batch normalization layer added after each convolutional layer in ResNet.
+The first two layers of ResNet are the same as those of the GoogLeNet we described before: the $7\times 7$ convolutional layer with 64 output channels and a stride of 2 is followed by the $3\times 3$ max-pooling layer with a stride of 2. The difference is the batch normalization layer added after each convolutional layer in ResNet.
 
 ```{.python .input}
 %%tab all
@@ -249,17 +249,17 @@ class ResNet(d2l.Classifier):
                 nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
         if tab.selected('tensorflow'):
             return tf.keras.models.Sequential([
-                tf.keras.layers.Conv2D(64, kernel_size=7, strides=2, 
+                tf.keras.layers.Conv2D(64, kernel_size=7, strides=2,
                                        padding='same'),
                 tf.keras.layers.BatchNormalization(),
                 tf.keras.layers.Activation('relu'),
-                tf.keras.layers.MaxPool2D(pool_size=3, strides=2, 
+                tf.keras.layers.MaxPool2D(pool_size=3, strides=2,
                                           padding='same')])
 ```
 
 GoogLeNet uses four modules made up of Inception blocks.
 However, ResNet uses four modules made up of residual blocks, each of which uses several residual blocks with the same number of output channels.
-The number of channels in the first module is the same as the number of input channels. Since a maximum pooling layer with a stride of 2 has already been used, it is not necessary to reduce the height and width. In the first residual block for each of the subsequent modules, the number of channels is doubled compared with that of the previous module, and the height and width are halved.
+The number of channels in the first module is the same as the number of input channels. Since a max-pooling layer with a stride of 2 has already been used, it is not necessary to reduce the height and width. In the first residual block for each of the subsequent modules, the number of channels is doubled compared with that of the previous module, and the height and width are halved.
 
 Now, we implement this module. Note that special processing has been performed on the first module.
 

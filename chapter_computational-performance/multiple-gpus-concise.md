@@ -23,7 +23,7 @@ from torch import nn
 
 Let's use a slightly more meaningful network than LeNet from :numref:`sec_multi_gpu` that is still sufficiently easy and quick to train.
 We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference from :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning.
-Moreover, we remove the maximum pooling layer.
+Moreover, we remove the max-pooling layer.
 
 ```{.python .input}
 #@save
@@ -41,7 +41,7 @@ def resnet18(num_classes):
 
     net = nn.Sequential()
     # This model uses a smaller convolution kernel, stride, and padding and
-    # removes the maximum pooling layer
+    # removes the max-pooling layer
     net.add(nn.Conv2D(64, kernel_size=3, strides=1, padding=1),
             nn.BatchNorm(), nn.Activation('relu'))
     net.add(resnet_block(64, 2, first_block=True),
@@ -69,7 +69,7 @@ def resnet18(num_classes, in_channels=1):
         return nn.Sequential(*blk)
 
     # This model uses a smaller convolution kernel, stride, and padding and
-    # removes the maximum pooling layer
+    # removes the max-pooling layer
     net = nn.Sequential(
         nn.Conv2d(in_channels, 64, kernel_size=3, stride=1, padding=1),
         nn.BatchNorm2d(64),
