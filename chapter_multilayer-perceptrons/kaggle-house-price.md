@@ -341,9 +341,6 @@ when we train $K$ times in the $K$-fold cross-validation.
 def k_fold(trainer, data, k, lr):
     val_loss, models = [], []
     for i, data_fold in enumerate(k_fold_data(data, k)):
-        if tab.selected('pytorch'):
-            model = d2l.LinearRegression(lr)
-        if tab.selected(['mxnet', 'tensorflow']):
             model = d2l.LinearRegression(lr)
         if i != 0: model.board.display = False
         trainer.fit(model, data_fold)
