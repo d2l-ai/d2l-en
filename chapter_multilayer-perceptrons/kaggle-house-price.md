@@ -341,7 +341,7 @@ when we train $K$ times in the $K$-fold cross-validation.
 def k_fold(trainer, data, k, lr):
     val_loss, models = [], []
     for i, data_fold in enumerate(k_fold_data(data, k)):
-            model = d2l.LinearRegression(lr)
+        model = d2l.LinearRegression(lr)
         if i != 0: model.board.display = False
         trainer.fit(model, data_fold)
         val_loss.append(float(model.board.data['val_loss'][-1].y))
