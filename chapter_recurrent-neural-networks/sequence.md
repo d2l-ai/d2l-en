@@ -171,10 +171,7 @@ The model to train is simple: just linear regression.
 
 ```{.python .input}
 %%tab all
-if tab.selected('mxnet', 'tensorflow'):
-    model = d2l.LinearRegression(lr=0.01)
-if tab.selected('pytorch'):
-    model = d2l.LinearRegression(data.tau, lr=0.01)
+model = d2l.LinearRegression(lr=0.01)
 trainer = d2l.Trainer(max_epochs=5)
 trainer.fit(model, data)
 ```

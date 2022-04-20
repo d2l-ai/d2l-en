@@ -49,7 +49,7 @@ We can see a number of things:
 
 1. Within each series, price and performance are roughly proportional. Titan models command a significant premium for the benefit of larger amounts of GPU memory. However, the newer models offer better cost effectiveness, as can be seen by comparing the 980 Ti and 1080 Ti. The price does not appear to improve much for the RTX 2000 series. However, this is due to the fact that they offer far superior low precision performance (FP16, INT8, and INT4).
 2. The performance-to-cost ratio of the GTX 1000 series is about two times greater than the 900 series.
-3. For the RTX 2000 series the performance (in GFlops) is an *affine* function of the price.
+3. For the RTX 2000 series the performance (in GFLOPs) is an *affine* function of the price.
 
 ![Floating-point compute power and energy consumption. ](../img/wattvsprice.svg)
 :label:`fig_wattvsprice`

@@ -12,7 +12,7 @@ to guide subsequent researchers in designing new networks.
 In the following sections, we will introduce several heuristic concepts
 commonly used to design deep networks.
 
-Progress in this field mirrors that of VLSI (Very Large Scale Integration) 
+Progress in this field mirrors that of VLSI (very large scale integration) 
 in chip design
 where engineers moved from placing transistors
 to logical elements to logic blocks :cite:`Mead.1980`.
@@ -41,7 +41,7 @@ with padding to maintain the resolution,
 as max-pooling to reduce the resolution. One of the problems with 
 this approach is that the spatial resolution decreases quite rapidly. In particular, 
 this imposes a hard limit of $\log_2 d$ convolutional layers on the network before all 
-dimensions are used up. For instance, in the case of ImageNet, it would be impossible to have 
+dimensions ($d$) are used up. For instance, in the case of ImageNet, it would be impossible to have 
 more than 8 convolutional layers in this way. 
 
 The key idea by Simonyan and Zisserman was to use *multiple* convolutions in between downsampling
@@ -60,7 +60,7 @@ have also been efficient on GPUs :cite:`lavin2016fast`.
 
 Back to VGG: a VGG block consists of a *sequence* of convolutions with $3\times3$ kernels with padding of 1 
 (keeping height and width) followed by a $2 \times 2$ max-pooling layer with stride of 2
-(halving the resolution after each block).
+(halving height and width after each block).
 In the code below, we define a function called `vgg_block`
 to implement one VGG block.
 
@@ -243,7 +243,7 @@ with d2l.try_gpu():
 
 ## Summary
 
-One might argue that VGG is the first truly modern convolutional neural network. While AlexNet introduced many of the components of what make deep learning effective at scale, it is VGG that arguably introduced key properties such as blocks of multiple convolutions and a preference for deep and narrow networks. It is also the first network that is actually an entire family of similarly parametrized models, giving the practitioner ample trade-off between complexity and speed. This is also the place where modern DL frameworks shine. It is no longer necessary to generate XML config files to specify a network but rather, to assmple said networks through simple Python code. 
+One might argue that VGG is the first truly modern convolutional neural network. While AlexNet introduced many of the components of what make deep learning effective at scale, it is VGG that arguably introduced key properties such as blocks of multiple convolutions and a preference for deep and narrow networks. It is also the first network that is actually an entire family of similarly parametrized models, giving the practitioner ample trade-off between complexity and speed. This is also the place where modern deep learning frameworks shine. It is no longer necessary to generate XML config files to specify a network but rather, to assmple said networks through simple Python code. 
 
 Very recently ParNet :cite:`Goyal.Bochkovskiy.Deng.ea.2021` demonstrated that it is possible to achieve competitive performance using a much more shallow architecture through a large number of parallel computations. This is an exciting development and there's hope that it will influence architecture designs in the future. For the remainder of the chapter, though, we will follow the path of scientific progress over the past decade. 
 
@@ -252,12 +252,12 @@ Very recently ParNet :cite:`Goyal.Bochkovskiy.Deng.ea.2021` demonstrated that it
 
 1. Compared with AlexNet, VGG is much slower in terms of computation, and it also needs more GPU memory. 
     1. Compare the number of parameters needed for AlexNet and VGG.
-    1. Compare the number of floating point operations used in the convolutional layers and in the dense layers. 
-    1. How could you reduce the computational cost created by the dense layers?
+    1. Compare the number of floating point operations used in the convolutional layers and in the fully connected layers. 
+    1. How could you reduce the computational cost created by the fully connected layers?
 1. When displaying the dimensions associated with the various layers of the network, we only see the information 
    associated with 8 blocks (plus some auxiliary transforms), even though the network has 11 layers. Where did 
    the remaining 3 layers go?
-1. Upsampling the resolution in Fashion MNIST by a factor of $8 \times 8$ from 28 to 224 dimensions is highly 
+1. Upsampling the resolution in Fashion-MNIST by a factor of $8 \times 8$ from 28 to 224 dimensions is highly 
    wasteful. Try modifying the network architecture and resolution conversion, e.g., to 56 or to 84 dimensions 
    for its input instead. Can you do so without reducing the accuracy of the network?
 1. Use Table 1 in the VGG paper :cite:`Simonyan.Zisserman.2014` to construct other common models, 

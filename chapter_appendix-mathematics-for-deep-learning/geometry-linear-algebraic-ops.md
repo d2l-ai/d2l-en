@@ -300,7 +300,7 @@ to be to find a non-linear embedding such that the target classes
 can be separated cleanly by hyperplanes.
 
 To give a hand-built example, notice that we can produce a reasonable model
-to classify tiny images of t-shirts and trousers from the Fashion MNIST dataset
+to classify tiny images of t-shirts and trousers from the Fashion-MNIST dataset
 (seen in :numref:`sec_fashion_mnist`)
 by just taking the vector between their means to define the decision plane
 and eyeball a crude threshold.  First we will load the data and compute the averages.

@@ -388,8 +388,8 @@ class WeightDecay(d2l.LinearRegression):
 ```{.python .input  n=12}
 %%tab pytorch
 class WeightDecay(d2l.LinearRegression):
-    def __init__(self, num_inputs, wd, lr):
-        super().__init__(num_inputs, lr)
+    def __init__(self, wd, lr):
+        super().__init__(lr)
         self.save_hyperparameters()
         self.wd = wd
     
@@ -423,10 +423,7 @@ and this work becomes more routine.
 
 ```{.python .input  n=14}
 %%tab all
-if tab.selected('mxnet') or tab.selected('tensorflow'):    
-    model = WeightDecay(wd=3, lr=0.01)
-if tab.selected('pytorch'):
-    model = WeightDecay(num_inputs=200, wd=3, lr=0.01)
+model = WeightDecay(wd=3, lr=0.01)
 
 model.board.yscale='log'
 trainer.fit(model, data)
