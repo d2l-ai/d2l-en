@@ -1396,14 +1396,18 @@ def train_batch_ch13(net, X, y, loss, trainer, devices):
     return train_loss_sum, train_acc_sum
 
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
-               devices=d2l.try_all_gpus()):
+               devices=d2l.try_all_gpus(), lazy=False):
+    """Defined in :numref:`sec_image_augmentation`"""
     """Train a model with mutiple GPUs (defined in Chapter 13).
 
     Defined in :numref:`sec_image_augmentation`"""
     timer, num_batches = d2l.Timer(), len(train_iter)
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
-    net = nn.DataParallel(net, device_ids=devices).to(devices[0])
+    if lazy:
+        net = net.to(devices[0])
+    else:
+        net = nn.DataParallel(net, device_ids=devices).to(devices[0])
     for epoch in range(num_epochs):
         # Sum of training loss, sum of training accuracy, no. of examples,
         # no. of predictions
@@ -2098,18 +2102,16 @@ class BERTEncoder(nn.Module):
     """BERT encoder.
 
     Defined in :numref:`subsec_bert_input_rep`"""
-    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_input,
+    def __init__(self, vocab_size, num_hiddens, norm_shape,
                  ffn_num_hiddens, num_heads, num_layers, dropout,
-                 max_len=1000, key_size=768, query_size=768, value_size=768,
-                 **kwargs):
+                 max_len=1000, **kwargs):
         super(BERTEncoder, self).__init__(**kwargs)
         self.token_embedding = nn.Embedding(vocab_size, num_hiddens)
         self.segment_embedding = nn.Embedding(2, num_hiddens)
         self.blks = nn.Sequential()
         for i in range(num_layers):
-            self.blks.add_module(f"{i}", d2l.EncoderBlock(
-                key_size, query_size, value_size, num_hiddens, norm_shape,
-                ffn_num_input, ffn_num_hiddens, num_heads, dropout, True))
+            self.blks.add_module(f"{i}", d2l.EncoderBlock(num_hiddens, \
+                 norm_shape, ffn_num_hiddens, num_heads, dropout, True))
         # In BERT, positional embeddings are learnable, thus we create a
         # parameter of positional embeddings that are long enough
         self.pos_embedding = nn.Parameter(torch.randn(1, max_len,
@@ -2128,12 +2130,12 @@ class MaskLM(nn.Module):
     """The masked language model task of BERT.
 
     Defined in :numref:`subsec_bert_input_rep`"""
-    def __init__(self, vocab_size, num_hiddens, num_inputs=768, **kwargs):
+    def __init__(self, vocab_size, num_hiddens, **kwargs):
         super(MaskLM, self).__init__(**kwargs)
-        self.mlp = nn.Sequential(nn.Linear(num_inputs, num_hiddens),
+        self.mlp = nn.Sequential(nn.LazyLinear(num_hiddens),
                                  nn.ReLU(),
                                  nn.LayerNorm(num_hiddens),
-                                 nn.Linear(num_hiddens, vocab_size))
+                                 nn.LazyLinear(vocab_size))
 
     def forward(self, X, pred_positions):
         num_pred_positions = pred_positions.shape[1]
@@ -2152,9 +2154,9 @@ class NextSentencePred(nn.Module):
     """The next sentence prediction task of BERT.
 
     Defined in :numref:`subsec_mlm`"""
-    def __init__(self, num_inputs, **kwargs):
+    def __init__(self, **kwargs):
         super(NextSentencePred, self).__init__(**kwargs)
-        self.output = nn.Linear(num_inputs, 2)
+        self.output = nn.LazyLinear(2)
 
     def forward(self, X):
         # `X` shape: (batch size, `num_hiddens`)
@@ -2164,20 +2166,16 @@ class BERTModel(nn.Module):
     """The BERT model.
 
     Defined in :numref:`subsec_nsp`"""
-    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_input,
-                 ffn_num_hiddens, num_heads, num_layers, dropout,
-                 max_len=1000, key_size=768, query_size=768, value_size=768,
-                 hid_in_features=768, mlm_in_features=768,
-                 nsp_in_features=768):
+    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_hiddens,
+                 num_heads, num_layers, dropout, max_len=1000):
         super(BERTModel, self).__init__()
         self.encoder = BERTEncoder(vocab_size, num_hiddens, norm_shape,
-                    ffn_num_input, ffn_num_hiddens, num_heads, num_layers,
-                    dropout, max_len=max_len, key_size=key_size,
-                    query_size=query_size, value_size=value_size)
-        self.hidden = nn.Sequential(nn.Linear(hid_in_features, num_hiddens),
+                                   ffn_num_hiddens, num_heads, num_layers,
+                                   dropout, max_len=max_len)
+        self.hidden = nn.Sequential(nn.LazyLinear(num_hiddens),
                                     nn.Tanh())
-        self.mlm = MaskLM(vocab_size, num_hiddens, mlm_in_features)
-        self.nsp = NextSentencePred(nsp_in_features)
+        self.mlm = MaskLM(vocab_size, num_hiddens)
+        self.nsp = NextSentencePred()
 
     def forward(self, tokens, segments, valid_lens=None, pred_positions=None):
         encoded_X = self.encoder(tokens, segments, valid_lens)
