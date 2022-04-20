@@ -149,7 +149,7 @@ where each contains two values: the number of convolutional layers
 and the number of output channels,
 which are precisely the arguments required to call
 the `vgg_block` function. As such, VGG defines a *family* of networks rather than just 
-a specific manifestation. To build a specific network we simply iterate over `conv_arch` to compose the blocks.
+a specific manifestation. To build a specific network we simply iterate over `arch` to compose the blocks.
 
 ```{.python .input}
 %%tab all
@@ -222,9 +222,7 @@ for processing by the fully connected part of the network.
 [**Since VGG-11 is more computationally-heavy than AlexNet
 we construct a network with a smaller number of channels.**]
 This is more than sufficient for training on Fashion-MNIST.
-
-Apart from using a slightly larger learning rate,
-the [**model training**] process is similar to that of AlexNet in :numref:`sec_alexnet`.
+The [**model training**] process is similar to that of AlexNet in :numref:`sec_alexnet`.
 
 ```{.python .input}
 %%tab mxnet, pytorch

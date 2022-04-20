@@ -212,8 +212,7 @@ The number of output channels of the second Inception block
 is increased to $128+192+96+64=480$, yielding a ratio of $128:192:96:64 = 4:6:3:2$. As before,
 we need to reduce the number of intermediate dimensions in the second and third channel. A
 scale of $\frac{1}{2}$ and $\frac{1}{8}$ respectively suffices, yielding $128$ and $32$ channels
-respenctively. This is captured by the `Inception(64, (96, 128), (16, 32), 32)` and
-`Inception(128, (128, 192), (32, 96), 64)` block constructors.
+respectively. This is captured by the arguments of the following `Inception` block constructors.
 
 ```{.python .input}
 %%tab all

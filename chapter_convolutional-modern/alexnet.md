@@ -392,7 +392,7 @@ is that its (**images have lower resolution**) ($28 \times 28$ pixels)
 To make things work, (**we upsample them to $224 \times 224$**).
 This is generally not a smart practice,
 but we do it here to be faithful to the AlexNet architecture.
-We perform this resizing with the `resize` argument in the `d2l.load_data_fashion_mnist` function.
+We perform this resizing with the `resize` argument in the `d2l.FashionMNIST` constructor.
 
 Now, we can [**start training AlexNet.**]
 Compared to LeNet in :numref:`sec_lenet`,
