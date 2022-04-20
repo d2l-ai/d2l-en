@@ -514,7 +514,6 @@ class BNLeNetScratch(d2l.Classifier):
                 BatchNorm(84, num_dims=2),
                 nn.Sigmoid(),
                 nn.Linear(84, 10))
-            self.net(torch.zeros(1, 1, 28, 28))
             self.net.apply(d2l.init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
@@ -610,7 +609,7 @@ class BNLeNet(d2l.Classifier):
                          nn.Dense(10))
             self.net.initialize(init.Xavier())
         if tab.selected('pytorch'):
-            net = nn.Sequential(
+            self.net = nn.Sequential(
                 nn.Conv2d(1, 6, kernel_size=5),
                 nn.BatchNorm2d(6),
                 nn.Sigmoid(),
@@ -627,7 +626,6 @@ class BNLeNet(d2l.Classifier):
                 nn.BatchNorm1d(84),
                 nn.Sigmoid(),
                 nn.Linear(84, 10))
-            self.net(torch.zeros(1, 1, 28, 28))
             self.net.apply(d2l.init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
