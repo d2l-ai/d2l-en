@@ -552,7 +552,7 @@ trainer.fit(model, data)
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=256)
 with d2l.try_gpu():
-    model = LeNet(lr=0.9)
+    model = BNLeNetScratch(lr=0.9)
     trainer.fit(model, data)
 ```
 
