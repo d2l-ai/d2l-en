@@ -480,58 +480,38 @@ class BNLeNetScratch(d2l.Classifier):
         self.save_hyperparameters()
         if tab.selected('mxnet'):
             self.net = nn.Sequential()
-            self.net.add(nn.Conv2D(6, kernel_size=5),
-                         BatchNorm(6, num_dims=4),
-                         nn.Activation('sigmoid'),
-                         nn.AvgPool2D(pool_size=2, strides=2),
-                         nn.Conv2D(16, kernel_size=5),
-                         BatchNorm(16, num_dims=4),
-                         nn.Activation('sigmoid'),
-                         nn.AvgPool2D(pool_size=2, strides=2),
-                         nn.Dense(120),
-                         BatchNorm(120, num_dims=2),
-                         nn.Activation('sigmoid'),
-                         nn.Dense(84),
-                         BatchNorm(84, num_dims=2),
-                         nn.Activation('sigmoid'),
-                         nn.Dense(num_classes))
-            self.net.initialize(init.Xavier())
+            self.net.add(
+                nn.Conv2D(6, kernel_size=5), BatchNorm(6, num_dims=4),
+                nn.Activation('sigmoid'),
+                nn.AvgPool2D(pool_size=2, strides=2),
+                nn.Conv2D(16, kernel_size=5), BatchNorm(16, num_dims=4),
+                nn.Activation('sigmoid'),
+                nn.AvgPool2D(pool_size=2, strides=2), nn.Dense(120),
+                BatchNorm(120, num_dims=2), nn.Activation('sigmoid'),
+                nn.Dense(84), BatchNorm(84, num_dims=2),
+                nn.Activation('sigmoid'), nn.Dense(num_classes))
         if tab.selected('pytorch'):
             self.net = nn.Sequential(
-                nn.Conv2d(1, 6, kernel_size=5),
-                BatchNorm(6, num_dims=4),
-                nn.Sigmoid(),
-                nn.AvgPool2d(kernel_size=2, stride=2),
-                nn.Conv2d(6, 16, kernel_size=5),
-                BatchNorm(16, num_dims=4),
-                nn.Sigmoid(),
-                nn.AvgPool2d(kernel_size=2, stride=2),
-                nn.Flatten(),
-                nn.Linear(16*4*4, 120),
-                BatchNorm(120, num_dims=2),
-                nn.Sigmoid(),
-                nn.Linear(120, 84),
-                BatchNorm(84, num_dims=2),
-                nn.Sigmoid(),
+                nn.Conv2d(1, 6, kernel_size=5), BatchNorm(6, num_dims=4),
+                nn.Sigmoid(), nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Conv2d(6, 16, kernel_size=5), BatchNorm(16, num_dims=4),
+                nn.Sigmoid(), nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Flatten(), nn.Linear(16*4*4, 120),
+                BatchNorm(120, num_dims=2), nn.Sigmoid(), nn.Linear(120, 84),
+                BatchNorm(84, num_dims=2), nn.Sigmoid(),
                 nn.Linear(84, num_classes))
-            self.net.apply(d2l.init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
                 tf.keras.layers.Conv2D(filters=6, kernel_size=5,
                                        input_shape=(28, 28, 1)),
-                BatchNorm(),
-                tf.keras.layers.Activation('sigmoid'),
+                BatchNorm(), tf.keras.layers.Activation('sigmoid'),
                 tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
                 tf.keras.layers.Conv2D(filters=16, kernel_size=5),
-                BatchNorm(),
-                tf.keras.layers.Activation('sigmoid'),
+                BatchNorm(), tf.keras.layers.Activation('sigmoid'),
                 tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
-                tf.keras.layers.Flatten(),
-                tf.keras.layers.Dense(120),
-                BatchNorm(),
-                tf.keras.layers.Activation('sigmoid'),
-                tf.keras.layers.Dense(84),
-                BatchNorm(),
+                tf.keras.layers.Flatten(), tf.keras.layers.Dense(120),
+                BatchNorm(), tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.Dense(84), BatchNorm(),
                 tf.keras.layers.Activation('sigmoid'),
                 tf.keras.layers.Dense(num_classes)])
 ```
@@ -543,7 +523,7 @@ This code is virtually identical to that when we first trained LeNet (:numref:`s
 %%tab mxnet, pytorch
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=256)
-model = BNLeNetScratch(lr=0.9)
+model = BNLeNetScratch(lr=0.8)
 trainer.fit(model, data)
 ```
 
@@ -552,7 +532,7 @@ trainer.fit(model, data)
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=256)
 with d2l.try_gpu():
-    model = BNLeNetScratch(lr=0.9)
+    model = BNLeNetScratch(lr=0.8)
     trainer.fit(model, data)
 ```
 
@@ -592,41 +572,25 @@ class BNLeNet(d2l.Classifier):
         self.save_hyperparameters()
         if tab.selected('mxnet'):
             self.net = nn.Sequential()
-            self.net.add(nn.Conv2D(6, kernel_size=5),
-                         nn.BatchNorm(),
-                         nn.Activation('sigmoid'),
-                         nn.AvgPool2D(pool_size=2, strides=2),
-                         nn.Conv2D(16, kernel_size=5),
-                         nn.BatchNorm(),
-                         nn.Activation('sigmoid'),
-                         nn.AvgPool2D(pool_size=2, strides=2),
-                         nn.Dense(120),
-                         nn.BatchNorm(),
-                         nn.Activation('sigmoid'),
-                         nn.Dense(84),
-                         nn.BatchNorm(),
-                         nn.Activation('sigmoid'),
-                         nn.Dense(num_classes))
-            self.net.initialize(init.Xavier())
+            self.net.add(
+                nn.Conv2D(6, kernel_size=5), nn.BatchNorm(),
+                nn.Activation('sigmoid'),
+                nn.AvgPool2D(pool_size=2, strides=2),
+                nn.Conv2D(16, kernel_size=5), nn.BatchNorm(),
+                nn.Activation('sigmoid'),
+                nn.AvgPool2D(pool_size=2, strides=2),
+                nn.Dense(120), nn.BatchNorm(), nn.Activation('sigmoid'),
+                nn.Dense(84), nn.BatchNorm(), nn.Activation('sigmoid'),
+                nn.Dense(num_classes))
         if tab.selected('pytorch'):
             self.net = nn.Sequential(
-                nn.Conv2d(1, 6, kernel_size=5),
-                nn.BatchNorm2d(6),
-                nn.Sigmoid(),
-                nn.AvgPool2d(kernel_size=2, stride=2),
-                nn.Conv2d(6, 16, kernel_size=5),
-                nn.BatchNorm2d(16),
-                nn.Sigmoid(),
-                nn.AvgPool2d(kernel_size=2, stride=2),
-                nn.Flatten(),
-                nn.Linear(256, 120),
-                nn.BatchNorm1d(120),
-                nn.Sigmoid(),
-                nn.Linear(120, 84),
-                nn.BatchNorm1d(84),
-                nn.Sigmoid(),
-                nn.Linear(84, num_classes))
-            self.net.apply(d2l.init_cnn_weights)
+                nn.Conv2d(1, 6, kernel_size=5), nn.BatchNorm2d(6),
+                nn.Sigmoid(), nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Conv2d(6, 16, kernel_size=5), nn.BatchNorm2d(16),
+                nn.Sigmoid(), nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Flatten(), nn.Linear(256, 120), nn.BatchNorm1d(120),
+                nn.Sigmoid(), nn.Linear(120, 84), nn.BatchNorm1d(84),
+                nn.Sigmoid(), nn.Linear(84, num_classes))
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
                 tf.keras.layers.Conv2D(filters=6, kernel_size=5,
@@ -638,8 +602,7 @@ class BNLeNet(d2l.Classifier):
                 tf.keras.layers.BatchNormalization(),
                 tf.keras.layers.Activation('sigmoid'),
                 tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
-                tf.keras.layers.Flatten(),
-                tf.keras.layers.Dense(120),
+                tf.keras.layers.Flatten(), tf.keras.layers.Dense(120),
                 tf.keras.layers.BatchNormalization(),
                 tf.keras.layers.Activation('sigmoid'),
                 tf.keras.layers.Dense(84),
@@ -657,7 +620,7 @@ while our custom implementation must be interpreted by Python.
 %%tab mxnet, pytorch
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=256)
-model = BNLeNet(lr=0.9)
+model = BNLeNet(lr=0.8)
 trainer.fit(model, data)
 ```
 
@@ -666,7 +629,7 @@ trainer.fit(model, data)
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=256)
 with d2l.try_gpu():
-    model = BNLeNet(lr=0.9)
+    model = BNLeNet(lr=0.8)
     trainer.fit(model, data)
 ```
 
