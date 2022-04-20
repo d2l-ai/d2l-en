@@ -313,7 +313,7 @@ import tensorflow as tf
 ```{.python .input}
 %%tab all
 class AlexNet(d2l.Classifier):
-    def __init__(self, num_classes=10, lr=0.1):
+    def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):

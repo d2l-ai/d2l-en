@@ -475,7 +475,7 @@ but before the corresponding activation functions.
 ```{.python .input}
 %%tab all
 class BNLeNetScratch(d2l.Classifier):
-    def __init__(self, num_classes=10, lr):
+    def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
@@ -587,7 +587,7 @@ to our implementation above, except that we no longer need to provide additional
 ```{.python .input}
 %%tab all
 class BNLeNet(d2l.Classifier):
-    def __init__(self, num_classes=10, lr):
+    def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):

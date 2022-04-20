@@ -154,7 +154,7 @@ a specific manifestation. To build a specific network we simply iterate over `co
 ```{.python .input}
 %%tab all
 class VGG(d2l.Classifier):
-    def __init__(self, arch, num_classes=10, lr=0.1):
+    def __init__(self, arch, lr=0.1, num_classes=10):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):

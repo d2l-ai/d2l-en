@@ -319,7 +319,7 @@ def b5(self):
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(GoogleNet)
-def __init__(self, num_classes=10, lr=0.1):
+def __init__(self, lr=0.1, num_classes=10):
     super(GoogleNet, self).__init__()
     self.save_hyperparameters()
     if tab.selected('mxnet'):
