@@ -473,62 +473,68 @@ after the convolutional layers or fully connected layers
 but before the corresponding activation functions.
 
 ```{.python .input}
-%%tab mxnet
-net = nn.Sequential()
-net.add(nn.Conv2D(6, kernel_size=5),
-        BatchNorm(6, num_dims=4),
-        nn.Activation('sigmoid'),
-        nn.AvgPool2D(pool_size=2, strides=2),
-        nn.Conv2D(16, kernel_size=5),
-        BatchNorm(16, num_dims=4),
-        nn.Activation('sigmoid'),
-        nn.AvgPool2D(pool_size=2, strides=2),
-        nn.Dense(120),
-        BatchNorm(120, num_dims=2),
-        nn.Activation('sigmoid'),
-        nn.Dense(84),
-        BatchNorm(84, num_dims=2),
-        nn.Activation('sigmoid'),
-        nn.Dense(10))
-```
-
-```{.python .input}
-%%tab pytorch
-net = nn.Sequential(
-    nn.Conv2d(1, 6, kernel_size=5), BatchNorm(6, num_dims=4), nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size=2, stride=2),
-    nn.Conv2d(6, 16, kernel_size=5), BatchNorm(16, num_dims=4), nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size=2, stride=2), nn.Flatten(),
-    nn.Linear(16*4*4, 120), BatchNorm(120, num_dims=2), nn.Sigmoid(),
-    nn.Linear(120, 84), BatchNorm(84, num_dims=2), nn.Sigmoid(),
-    nn.Linear(84, 10))
-```
-
-```{.python .input}
-%%tab tensorflow
-# Recall that this has to be a function that will be passed to `d2l.train_ch6`
-# so that model building or compiling need to be within `strategy.scope()` in
-# order to utilize the CPU/GPU devices that we have
-def net():
-    return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(filters=6, kernel_size=5,
-                               input_shape=(28, 28, 1)),
-        BatchNorm(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
-        tf.keras.layers.Conv2D(filters=16, kernel_size=5),
-        BatchNorm(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(120),
-        BatchNorm(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.Dense(84),
-        BatchNorm(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.Dense(10)]
-    )
+%%tab all
+class BNLeNetScratch(d2l.Classifier):
+    def __init__(self, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        if tab.selected('mxnet'):
+            self.net = nn.Sequential()
+            self.net.add(nn.Conv2D(6, kernel_size=5),
+                         BatchNorm(6, num_dims=4),
+                         nn.Activation('sigmoid'),
+                         nn.AvgPool2D(pool_size=2, strides=2),
+                         nn.Conv2D(16, kernel_size=5),
+                         BatchNorm(16, num_dims=4),
+                         nn.Activation('sigmoid'),
+                         nn.AvgPool2D(pool_size=2, strides=2),
+                         nn.Dense(120),
+                         BatchNorm(120, num_dims=2),
+                         nn.Activation('sigmoid'),
+                         nn.Dense(84),
+                         BatchNorm(84, num_dims=2),
+                         nn.Activation('sigmoid'),
+                         nn.Dense(10))
+            self.net.initialize(init.Xavier())
+        if tab.selected('pytorch'):
+            self.net = nn.Sequential(
+                nn.Conv2d(1, 6, kernel_size=5),
+                BatchNorm(6, num_dims=4),
+                nn.Sigmoid(),
+                nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Conv2d(6, 16, kernel_size=5),
+                BatchNorm(16, num_dims=4),
+                nn.Sigmoid(),
+                nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Flatten(),
+                nn.Linear(16*4*4, 120),
+                BatchNorm(120, num_dims=2),
+                nn.Sigmoid(),
+                nn.Linear(120, 84),
+                BatchNorm(84, num_dims=2),
+                nn.Sigmoid(),
+                nn.Linear(84, 10))
+            self.net(torch.zeros(1, 1, 28, 28))
+            self.net.apply(d2l.init_cnn_weights)
+        if tab.selected('tensorflow'):
+            self.net = tf.keras.models.Sequential([
+                tf.keras.layers.Conv2D(filters=6, kernel_size=5,
+                                       input_shape=(28, 28, 1)),
+                BatchNorm(),
+                tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+                tf.keras.layers.Conv2D(filters=16, kernel_size=5),
+                BatchNorm(),
+                tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+                tf.keras.layers.Flatten(),
+                tf.keras.layers.Dense(120),
+                BatchNorm(),
+                tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.Dense(84),
+                BatchNorm(),
+                tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.Dense(10)])
 ```
 
 As before, we will [**train our network on the Fashion-MNIST dataset**].
@@ -536,16 +542,19 @@ This code is virtually identical to that when we first trained LeNet (:numref:`s
 
 ```{.python .input}
 %%tab mxnet, pytorch
-lr, num_epochs, batch_size = 1.0, 10, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
+trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
+data = d2l.FashionMNIST(batch_size=256)
+model = BNLeNetScratch(lr=0.9)
+trainer.fit(model, data)
 ```
 
 ```{.python .input}
 %%tab tensorflow
-lr, num_epochs, batch_size = 1.0, 10, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
+trainer = d2l.Trainer(max_epochs=10)
+data = d2l.FashionMNIST(batch_size=256)
+with d2l.try_gpu():
+    model = LeNet(lr=0.9)
+    trainer.fit(model, data)
 ```
 
 Let's [**have a look at the scale parameter `gamma`
@@ -554,17 +563,18 @@ from the first batch normalization layer.
 
 ```{.python .input}
 %%tab mxnet
-net[1].gamma.data().reshape(-1,), net[1].beta.data().reshape(-1,)
+model.net[1].gamma.data().reshape(-1,), model.net[1].beta.data().reshape(-1,)
 ```
 
 ```{.python .input}
 %%tab pytorch
-net[1].gamma.reshape((-1,)), net[1].beta.reshape((-1,))
+model.net[1].gamma.reshape((-1,)), model.net[1].beta.reshape((-1,))
 ```
 
 ```{.python .input}
 %%tab tensorflow
-tf.reshape(net.layers[1].gamma, (-1,)), tf.reshape(net.layers[1].beta, (-1,))
+tf.reshape(model.net.layers[1].gamma, (-1,)), tf.reshape(
+    model.net.layers[1].beta, (-1,))
 ```
 
 ## [**Concise Implementation**]
@@ -576,51 +586,68 @@ The code looks virtually identical
 to our implementation above, except that we no longer need to provide additional arguments for it to get the dimensions right.
 
 ```{.python .input}
-%%tab mxnet
-net = nn.Sequential()
-net.add(nn.Conv2D(6, kernel_size=5), nn.BatchNorm(), nn.Activation('sigmoid'),
-        nn.AvgPool2D(pool_size=2, strides=2),
-        nn.Conv2D(16, kernel_size=5), nn.BatchNorm(), nn.Activation('sigmoid'),
-        nn.AvgPool2D(pool_size=2, strides=2),
-        nn.Dense(120), nn.BatchNorm(), nn.Activation('sigmoid'),
-        nn.Dense(84), nn.BatchNorm(), nn.Activation('sigmoid'),
-        nn.Dense(10))
-```
-
-```{.python .input}
-%%tab pytorch
-net = nn.Sequential(
-    nn.Conv2d(1, 6, kernel_size=5), nn.BatchNorm2d(6), nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size=2, stride=2),
-    nn.Conv2d(6, 16, kernel_size=5), nn.BatchNorm2d(16), nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size=2, stride=2), nn.Flatten(),
-    nn.Linear(256, 120), nn.BatchNorm1d(120), nn.Sigmoid(),
-    nn.Linear(120, 84), nn.BatchNorm1d(84), nn.Sigmoid(),
-    nn.Linear(84, 10))
-```
-
-```{.python .input}
-%%tab tensorflow
-def net():
-    return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(filters=6, kernel_size=5,
-                               input_shape=(28, 28, 1)),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
-        tf.keras.layers.Conv2D(filters=16, kernel_size=5),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(120),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.Dense(84),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.Dense(10),
-    ])
+%%tab all
+class BNLeNet(d2l.Classifier):
+    def __init__(self, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        if tab.selected('mxnet'):
+            self.net = nn.Sequential()
+            self.net.add(nn.Conv2D(6, kernel_size=5),
+                         nn.BatchNorm(),
+                         nn.Activation('sigmoid'),
+                         nn.AvgPool2D(pool_size=2, strides=2),
+                         nn.Conv2D(16, kernel_size=5),
+                         nn.BatchNorm(),
+                         nn.Activation('sigmoid'),
+                         nn.AvgPool2D(pool_size=2, strides=2),
+                         nn.Dense(120),
+                         nn.BatchNorm(),
+                         nn.Activation('sigmoid'),
+                         nn.Dense(84),
+                         nn.BatchNorm(),
+                         nn.Activation('sigmoid'),
+                         nn.Dense(10))
+            self.net.initialize(init.Xavier())
+        if tab.selected('pytorch'):
+            net = nn.Sequential(
+                nn.Conv2d(1, 6, kernel_size=5),
+                nn.BatchNorm2d(6),
+                nn.Sigmoid(),
+                nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Conv2d(6, 16, kernel_size=5),
+                nn.BatchNorm2d(16),
+                nn.Sigmoid(),
+                nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Flatten(),
+                nn.Linear(256, 120),
+                nn.BatchNorm1d(120),
+                nn.Sigmoid(),
+                nn.Linear(120, 84),
+                nn.BatchNorm1d(84),
+                nn.Sigmoid(),
+                nn.Linear(84, 10))
+            self.net(torch.zeros(1, 1, 28, 28))
+            self.net.apply(d2l.init_cnn_weights)
+        if tab.selected('tensorflow'):
+            self.net = tf.keras.models.Sequential([
+                tf.keras.layers.Conv2D(filters=6, kernel_size=5,
+                                       input_shape=(28, 28, 1)),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+                tf.keras.layers.Conv2D(filters=16, kernel_size=5),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+                tf.keras.layers.Flatten(),
+                tf.keras.layers.Dense(120),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.Dense(84),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.Dense(10)])
 ```
 
 Below, we [**use the same hyperparameters to train our model.**]
@@ -629,8 +656,20 @@ because its code has been compiled to C++ or CUDA
 while our custom implementation must be interpreted by Python.
 
 ```{.python .input}
-%%tab all
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
+%%tab mxnet, pytorch
+trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
+data = d2l.FashionMNIST(batch_size=256)
+model = BNLeNetScratch(lr=0.9)
+trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab tensorflow
+trainer = d2l.Trainer(max_epochs=10)
+data = d2l.FashionMNIST(batch_size=256)
+with d2l.try_gpu():
+    model = LeNet(lr=0.9)
+    trainer.fit(model, data)
 ```
 
 ## Discussion
