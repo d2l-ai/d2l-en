@@ -388,7 +388,7 @@ class WeightDecay(d2l.LinearRegression):
 ```{.python .input  n=12}
 %%tab pytorch
 class WeightDecay(d2l.LinearRegression):
-    def __init__(self, num_inputs, wd, lr):
+    def __init__(self, wd, lr):
         super().__init__(lr)
         self.save_hyperparameters()
         self.wd = wd
