@@ -334,7 +334,7 @@ def __init__(self, num_classes=10, lr=0.1):
     if tab.selected('tensorflow'):
         self.net = tf.keras.Sequential([
             self.b1(), self.b2(), self.b3(), self.b4(), self.b5(),
-            tf.keras.layers.Dense(10)])
+            tf.keras.layers.Dense(num_classes)])
 ```
 
 The GoogLeNet model is computationally complex. Note the large number of

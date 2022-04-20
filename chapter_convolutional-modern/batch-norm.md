@@ -475,7 +475,7 @@ but before the corresponding activation functions.
 ```{.python .input}
 %%tab all
 class BNLeNetScratch(d2l.Classifier):
-    def __init__(self, lr):
+    def __init__(self, num_classes=10, lr):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
@@ -494,7 +494,7 @@ class BNLeNetScratch(d2l.Classifier):
                          nn.Dense(84),
                          BatchNorm(84, num_dims=2),
                          nn.Activation('sigmoid'),
-                         nn.Dense(10))
+                         nn.Dense(num_classes))
             self.net.initialize(init.Xavier())
         if tab.selected('pytorch'):
             self.net = nn.Sequential(
@@ -513,7 +513,7 @@ class BNLeNetScratch(d2l.Classifier):
                 nn.Linear(120, 84),
                 BatchNorm(84, num_dims=2),
                 nn.Sigmoid(),
-                nn.Linear(84, 10))
+                nn.Linear(84, num_classes))
             self.net.apply(d2l.init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
@@ -533,7 +533,7 @@ class BNLeNetScratch(d2l.Classifier):
                 tf.keras.layers.Dense(84),
                 BatchNorm(),
                 tf.keras.layers.Activation('sigmoid'),
-                tf.keras.layers.Dense(10)])
+                tf.keras.layers.Dense(num_classes)])
 ```
 
 As before, we will [**train our network on the Fashion-MNIST dataset**].
@@ -587,7 +587,7 @@ to our implementation above, except that we no longer need to provide additional
 ```{.python .input}
 %%tab all
 class BNLeNet(d2l.Classifier):
-    def __init__(self, lr):
+    def __init__(self, num_classes=10, lr):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
@@ -606,7 +606,7 @@ class BNLeNet(d2l.Classifier):
                          nn.Dense(84),
                          nn.BatchNorm(),
                          nn.Activation('sigmoid'),
-                         nn.Dense(10))
+                         nn.Dense(num_classes))
             self.net.initialize(init.Xavier())
         if tab.selected('pytorch'):
             self.net = nn.Sequential(
@@ -625,7 +625,7 @@ class BNLeNet(d2l.Classifier):
                 nn.Linear(120, 84),
                 nn.BatchNorm1d(84),
                 nn.Sigmoid(),
-                nn.Linear(84, 10))
+                nn.Linear(84, num_classes))
             self.net.apply(d2l.init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
@@ -645,7 +645,7 @@ class BNLeNet(d2l.Classifier):
                 tf.keras.layers.Dense(84),
                 tf.keras.layers.BatchNormalization(),
                 tf.keras.layers.Activation('sigmoid'),
-                tf.keras.layers.Dense(10)])
+                tf.keras.layers.Dense(num_classes)])
 ```
 
 Below, we [**use the same hyperparameters to train our model.**]

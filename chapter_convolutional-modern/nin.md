@@ -122,7 +122,8 @@ class NiN(d2l.Classifier):
                 nin_block(256, 384, kernel_size=3, strides=1, padding=1),
                 nn.MaxPool2d(3, stride=2),
                 nn.Dropout(0.5),
-                nin_block(384, num_classes, kernel_size=3, strides=1, padding=1),
+                nin_block(384, num_classes, kernel_size=3, strides=1,
+                          padding=1),
                 nn.AdaptiveAvgPool2d((1, 1)),
                 nn.Flatten())
             self.net.apply(d2l.init_cnn_weights)
