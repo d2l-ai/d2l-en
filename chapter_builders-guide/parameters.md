@@ -182,9 +182,9 @@ net.get_weights()
 
 Often, we want to share parameters across multiple layers.
 Let's see how to do this elegantly.
-In the following we allocate a dense layer
+In the following we allocate a fully connected layer
 and then use its parameters specifically
-to set those of another layer. 
+to set those of another layer.
 Here we need to run the forward propagation
 `net(X)` before accessing the parameters.
 
