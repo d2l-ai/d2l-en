@@ -184,7 +184,7 @@ on which the transformation is applied.
 Similarly, with convolutional layers,
 we can apply batch normalization after the convolution
 and before the nonlinear activation function. The key difference to batch norms 
-in fully-connected layers is that we apply the operation on a per-channel basis 
+in fully connected layers is that we apply the operation on a per-channel basis 
 *across all locations*. This is compatible with our assumption of translation 
 invariance that led to convolutions: we assumed that the specific location of a pattern 
 within an image was not critical for the purpose of understanding.
