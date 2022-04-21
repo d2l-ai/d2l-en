@@ -422,7 +422,7 @@ pronounced as you address larger problems
 and this work becomes more routine.
 
 ```{.python .input  n=14}
-%%tab all   
+%%tab all
 model = WeightDecay(wd=3, lr=0.01)
 model.board.yscale='log'
 trainer.fit(model, data)

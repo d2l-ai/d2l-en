@@ -20,7 +20,7 @@ adds local nonlinearities via $1 \times 1$ convolutions
 and uses global average pooling
 to aggregate information
 across all locations.
-GoogLeNet (:numref:`sec_googlenet`) 
+GoogLeNet (:numref:`sec_googlenet`)
 is a multi-branch network that
 combines the advantages from the
 VGG network
@@ -34,7 +34,7 @@ which are two-branch subnetworks
 using identity mapping in one branch.
 DenseNets (:numref:`sec_densenet`)
 generalize the residual architectures.
-Other notable architectures 
+Other notable architectures
 include
 MobileNets that use network learning to achieve high accuracy in
 resource-constrained settings :cite:`Howard.Sandler.Chu.ea.2019`,
@@ -58,7 +58,7 @@ Instead of focusing on designing such individual instances,
 an alternative approach
 is to *design network design spaces*
 that characterize populations of networks :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`.
-This method 
+This method
 combines the strength of manual design and NAS.
 Through semi-automatic procedures (like in NAS),
 designing network design spaces
@@ -67,8 +67,8 @@ from the initial *AnyNet* design space.
 It then proceeds to discover design principles (like in manual design)
 that lead to simple and regular networks: *RegNets*.
 Before shedding light on these design principles,
-we need to define 
-the initial AnyNet design space. 
+we need to define
+the initial AnyNet design space.
 It starts with networks with
 standard, fixed network blocks:
 ResNeXt blocks.
@@ -108,13 +108,13 @@ will restore the original $c$ channels of the input
 via the final $1 \times 1$ convolution
 right before sum with the residual connection.
 Notably,
-the left dotted box is equivalent to 
+the left dotted box is equivalent to
 the much *simplified* right dotted box in :numref:`fig_resnext_block`,
-where we only need to specify 
+where we only need to specify
 that the $3 \times 3$ convolution is a *group convolution*
 with $g$ groups.
 In fact,
-the group convolution dates back 
+the group convolution dates back
 to the idea of distributing the AlexNet
 model over two GPUs due to limited GPU memory at that time :cite:`Krizhevsky.Sutskever.Hinton.2012`.
 
@@ -161,7 +161,7 @@ class ResNeXtBlock(nn.Block):
             self.bn4 = nn.BatchNorm()
         else:
             self.conv4 = None
-        
+
     def forward(self, X):
         Y = npx.relu(self.bn1(self.conv1(X)))
         Y = npx.relu(self.bn2(self.conv2(Y)))
@@ -200,7 +200,7 @@ class ResNeXtBlock(nn.Module):
             self.bn4 = nn.BatchNorm2d(num_channels)
         else:
             self.conv4 = None
-        
+
     def forward(self, X):
         Y = F.relu(self.bn1(self.conv1(X)))
         Y = F.relu(self.bn2(self.conv2(Y)))
@@ -241,9 +241,9 @@ is that increasing groups
 leads to sparser connections (i.e., lower computational complexity) within the block,
 thus enabling an increase of network width
 to achieve a better tradeoff between
-FLOPs (floating-point operations in number of multiply-adds) and accuracy.
+FLOPs and accuracy.
 Thus, ResNeXt-ification
-is appealing in convolution network design 
+is appealing in convolution network design
 and the following AnyNet design space
 will be based on the ResNeXt block.
 
@@ -251,7 +251,7 @@ will be based on the ResNeXt block.
 
 The initial design space is called *AnyNet*,
 a relatively unconstrained design space,
-where we can focus on 
+where we can focus on
 exploring network structure
 assuming standard, fixed blocks such as ResNeXt.
 Specifically,
@@ -262,7 +262,7 @@ such as the number of blocks
 and the number of output channels
 in each stage,
 and the number of groups (group width) and bottleneck ratio
-within 
+within
 each ResNeXt block.
 
 
@@ -282,7 +282,7 @@ is a $3 \times 3$ convolution with stride 2
 that halves the height and width of an input image.
 The network head
 is a global average pooling followed
-by a fully connected layer to predict 
+by a fully connected layer to predict
 the output class.
 Note that
 the network stem and head
@@ -291,10 +291,10 @@ so that the design focus in
 on the network body that is central
 to performance.
 Specifically,
-the network body 
+the network body
 consists of $n$ stages of transformation
 ($n$ is given),
-where stage $i$ 
+where stage $i$
 consists of $d_i$ ResNeXt blocks
 with $w_i$ output channels,
 and progressively
@@ -371,7 +371,7 @@ we complete the implementation of AnyNet.
 ```{.python .input  n=10}
 %%tab all
 @d2l.add_to_class(AnyNet)
-def __init__(self, arch, stem_channels, num_classes=10, lr=0.1):
+def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
     super(AnyNet, self).__init__()
     self.save_hyperparameters()
     if tab.selected('mxnet'):
@@ -426,9 +426,9 @@ The original RegNet paper :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`
 investigated various architectures,
 such as RegNetX using ResNeXt blocks
 and RegNetY that additionally uses operators from SENets :cite:`Hu.Shen.Sun.2018`.
-In the following, 
+In the following,
 we implement a 32-layer RegNetX variant
-characterized by 
+characterized by
 
 * $b_i = 1;$
 * $g_i = 16;$
@@ -438,19 +438,19 @@ characterized by
 ```{.python .input  n=11}
 %%tab all
 class RegNet32(AnyNet):
-    def __init__(self, num_classes=10, lr=0.1):
+    def __init__(self, lr=0.1, num_classes=10):
         stem_channels, groups, bot_mul = 32, 16, 1
-        depths, channels = [4, 6], [32, 80]
+        depths, channels = (4, 6), (32, 80)
         if tab.selected(['mxnet']):
             super().__init__(
                 ((depths[0], channels[0], groups, bot_mul),
                  (depths[1], channels[1], groups, bot_mul)),
-                stem_channels, num_classes, lr)
+                stem_channels, lr, num_classes)
         if tab.selected(['pytorch']):
             super().__init__(
                 ((depths[0], stem_channels, channels[0], groups, bot_mul),
                  (depths[1], channels[0], channels[1], groups, bot_mul)),
-                stem_channels, num_classes, lr)
+                stem_channels, lr, num_classes)
 ```
 
 We can see that each RegNet stage progressively reduces resolution and increases output channels.
@@ -480,7 +480,7 @@ CNNs have been the dominant architectures in this area.
 Recently,
 transformers (to be covered in :numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training`
 and MLPs :cite:`tolstikhin2021mlp`
-have also sparked research beyond 
+have also sparked research beyond
 the well-established CNN architectures for vision.
 Specifically,
 although lacking of the aforementioned
@@ -493,7 +493,7 @@ showing that
 :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
 In other words,
 it is often possible to
-train large transformers 
+train large transformers
 to outperform large CNNs on large datasets.
 However,
 quadratic complexity
@@ -502,19 +502,19 @@ makes the transformer architecture
 less suitable for higher-resolution images.
 To address this issue,
 hierarchical vision transformers (Swin transformers)
-introduce shifted windows to 
+introduce shifted windows to
 achieve state-of-the-art performance
 in a broader range of vision tasks beyond image classification :cite:`liu2021swin`.
 Inspired
 by the superior scaling behavior of
 transformers with multi-head self-attention (to be covered in :numref:`sec_multihead-attention`),
-the process of gradually 
+the process of gradually
 improving from a standard ResNet architecture
 toward the design of a vision transformer
-leads to a family of CNN models called ConvNeXts 
+leads to a family of CNN models called ConvNeXts
 that compete favorably with hierarchical vision transformers :cite:`liu2022convnet`.
 We refer the interested readers
-to CNN design discussions 
+to CNN design discussions
 in the ConvNeXt paper :cite:`liu2022convnet`.
 
 

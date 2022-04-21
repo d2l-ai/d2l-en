@@ -122,7 +122,7 @@ def init_cnn_weights(module):  #@save
 ```{.python .input}
 %%tab all
 class LeNet(d2l.Classifier):
-    def __init__(self, lr=0.1):
+    def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
@@ -135,7 +135,7 @@ class LeNet(d2l.Classifier):
                 nn.AvgPool2D(pool_size=2, strides=2),
                 nn.Dense(120, activation='sigmoid'),
                 nn.Dense(84, activation='sigmoid'),
-                nn.Dense(10))
+                nn.Dense(num_classes))
             self.net.initialize(init.Xavier())
         if tab.selected('pytorch'):
             self.net = nn.Sequential(
@@ -146,8 +146,8 @@ class LeNet(d2l.Classifier):
                 nn.Flatten(),
                 nn.LazyLinear(120), nn.Sigmoid(),
                 nn.LazyLinear(84), nn.Sigmoid(),
-                nn.LazyLinear(10))
-            self.net(torch.zeros(1,1,28,28))
+                nn.LazyLinear(num_classes))
+            self.net(torch.zeros(1, 1, 28, 28))
             self.net.apply(init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
@@ -160,7 +160,7 @@ class LeNet(d2l.Classifier):
                 tf.keras.layers.Flatten(),
                 tf.keras.layers.Dense(120, activation='sigmoid'),
                 tf.keras.layers.Dense(84, activation='sigmoid'),
-                tf.keras.layers.Dense(10)])
+                tf.keras.layers.Dense(num_classes)])
 ```
 
 We take some liberty in the reproduction of LeNet insofar as we replace the Gaussian activation layer by
@@ -266,7 +266,7 @@ with d2l.try_gpu():
 
 ## Summary
 
-In this chapter we made significant progress. We moved from the MLPs of the 1980s to the CNNs of the 1990s and early 2000s. The architectures proposed, e.g., in the form of LeNet-5 remain meaningful, even to this day. It is worth comparing the error rates on FashionMNIST achievable with LeNet-5 both to the very best possible with MLPs (:numref:`sec_mlp_scratch`) and those with significantly more advanced architectures such as ResNet (:numref:`sec_resnet`). LeNet is much more similar to the latter than to the former. One of the primary differences, as we shall see, is that greater amounts of computation afforded significantly more complex architectures.
+In this chapter we made significant progress. We moved from the MLPs of the 1980s to the CNNs of the 1990s and early 2000s. The architectures proposed, e.g., in the form of LeNet-5 remain meaningful, even to this day. It is worth comparing the error rates on Fashion-MNIST achievable with LeNet-5 both to the very best possible with MLPs (:numref:`sec_mlp_scratch`) and those with significantly more advanced architectures such as ResNet (:numref:`sec_resnet`). LeNet is much more similar to the latter than to the former. One of the primary differences, as we shall see, is that greater amounts of computation afforded significantly more complex architectures.
 
 A second difference is the relative ease with which we were able to implement LeNet. What used to be an engineering challenge worth months of C++ and assembly code, engineering to improve SN, an early Lisp based deep learning tool :cite:`Bottou.Le-Cun.1988`, and finally experimentation with models can now be accomplished in minutes. It is this incredible productivity boost that has democratized deep learning model development tremendously. In the next chapter we will follow down this rabbit to hole to see where it takes us.
 

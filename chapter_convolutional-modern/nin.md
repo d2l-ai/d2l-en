@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch'])
 ```
 
 # Network in Network (NiN)
@@ -13,18 +13,19 @@ and post-process the representations via fully connected layers.
 The improvements upon LeNet by AlexNet and VGG mainly lie
 in how these later networks widen and deepen these two modules.
 
-This design poses a number of challenges: firstly, the fully connected layers at the end
+This design poses two major challenges. 
+First, the fully connected layers at the end
 of the architecture consume tremendous numbers of parameters. For instance, even a simple
-model such as VGG-11 requires a monstrous $25,088 \times 4096$ matrix, occupying almost
+model such as VGG-11 requires a monstrous $25088 \times 4096$ matrix, occupying almost
 400MB of RAM. This is a significant impediment to speedy computation, in particular on
-mobile and embedded devices. Secondly, it is equally impossible to add fully-connected layers
+mobile and embedded devices. Second, it is equally impossible to add fully connected layers
 earlier in the network to increase the degree of nonlinearity: doing so would destroy the
 spatial structure and require potentially even more memory.
 
 The *network in network* (*NiN*) blocks of :cite:`Lin.Chen.Yan.2013` offer an alternative,
-capable of solving both problems in one simple strategy:
-They were proposed based on a very simple insight: a) use $1 \times 1$ convolutions to add
-local nonlinearities across the channel activations and b) use global average pooling to integrate
+capable of solving both problems in one simple strategy.
+They were proposed based on a very simple insight: (i) use $1 \times 1$ convolutions to add
+local nonlinearities across the channel activations and (ii) use global average pooling to integrate
 across all locations in the last representation layer. Note that global average pooling would not
 be effective, were it not for the added nonlinearities. Let's dive into this in detail.
 
@@ -43,7 +44,7 @@ a fully connected layer acting independently on each pixel location.
 
 :numref:`fig_nin` illustrates the main structural
 differences between VGG and NiN, and their blocks.
-Note both the difference in the NiN blocks (the initial convolution is followed by $1 \times 1$ convolutions, whereas VGG retains $3 \times 3$ convolutions) and in the end where we no longer require a giant fully-connected layer.
+Note both the difference in the NiN blocks (the initial convolution is followed by $1 \times 1$ convolutions, whereas VGG retains $3 \times 3$ convolutions) and in the end where we no longer require a giant fully connected layer.
 
 ![Comparing architectures of VGG and NiN, and their blocks.](../img/nin.svg)
 :width:`600px`
@@ -86,7 +87,7 @@ The kernel sizes are $11\times 11$, $5\times 5$, and $3\times 3$, respectively,
 and the numbers of output channels match those of AlexNet. Each NiN block is followed by a max-pooling layer
 with a stride of 2 and a window shape of $3\times 3$.
 
-The second significant difference between NiN and AlexNet and VGG respectively
+The second significant difference between NiN and both AlexNet and VGG
 is that NiN avoids fully connected layers altogether.
 Instead, NiN uses a NiN block with a number of output channels equal to the number of label classes, followed by a *global* average pooling layer,
 yielding a vector of logits.
@@ -95,7 +96,7 @@ This design significantly reduces the number of required model parameters, albei
 ```{.python .input}
 %%tab all
 class NiN(d2l.Classifier):
-    def __init__(self, num_classes=10, lr=0.1):
+    def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
@@ -121,7 +122,8 @@ class NiN(d2l.Classifier):
                 nin_block(256, 384, kernel_size=3, strides=1, padding=1),
                 nn.MaxPool2d(3, stride=2),
                 nn.Dropout(0.5),
-                nin_block(384, num_classes, kernel_size=3, strides=1, padding=1),
+                nin_block(384, num_classes, kernel_size=3, strides=1,
+                          padding=1),
                 nn.AdaptiveAvgPool2d((1, 1)),
                 nn.Flatten())
             self.net.apply(d2l.init_cnn_weights)
@@ -165,7 +167,7 @@ NiN has dramatically fewer parameters than AlexNet and VGG. This stems from the 
     1. What is the amount of memory needed during training?
     1. What is the amount of memory needed during prediction?
 1. What are possible problems with reducing the $384 \times 5 \times 5$ representation to a $10 \times 5 \times 5$ representation in one step?
-1. Use the structural design decisions in VGG that led to VGG-11, VGG-16 and VGG-19 to design a family of NiN-like networks.
+1. Use the structural design decisions in VGG that led to VGG-11, VGG-16, and VGG-19 to design a family of NiN-like networks.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/79)

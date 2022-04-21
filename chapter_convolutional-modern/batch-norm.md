@@ -12,7 +12,7 @@ In this section, we describe *batch normalization*, a popular and effective tech
 that consistently accelerates the convergence of deep networks :cite:`Ioffe.Szegedy.2015`.
 Together with residual blocks---covered later in :numref:`sec_resnet`---batch normalization
 has made it possible for practitioners to routinely train networks with over 100 layers.
-A secondary (serendipitous) benefit of Batch Normalization is its inherent regularization. 
+A secondary (serendipitous) benefit of batch normalization is its inherent regularization. 
 
 ## Training Deep Networks
 
@@ -24,13 +24,13 @@ was to standardize our input features to have
 zero mean $\mathbf{\mu} = 0$ and unit variance $\mathbf{\Sigma} = \mathbf{1}$ across multiple observations :cite:`friedman1987exploratory`.
 At a mimimum, one frequently rescales it such that the diagonal is unity, i.e., $\Sigma_{ii} = 1$. 
 Yet another strategy is to rescale vectors to unit length, possibly zero mean *per observation*. 
-This can work well e.g., for spatial sensor data. These preprocessing techniques and many more are 
+This can work well, e.g., for spatial sensor data. These preprocessing techniques and many more are 
 beneficial to keep the estimation problem well controlled. See e.g., the articles in :cite:`guyon2008feature` for a review of feature selection and extraction techniques.
 
 Intuitively, this standardization plays nicely with our optimizers
 since it puts the parameters *a priori* at a similar scale.
 As such, it is only natural to ask whether a corresponding normalization step *inside* a deep network
-might not be beneficial. While this isn't quite the reasoning that led to the invention of Batch Normalization :cite:`Ioffe.Szegedy.2015`, it is a useful way of understanding it and its cousin, Layer Normalization :cite:`Ba.Kiros.Hinton.2016` within a unified framework. 
+might not be beneficial. While this isn't quite the reasoning that led to the invention of batch normalization :cite:`Ioffe.Szegedy.2015`, it is a useful way of understanding it and its cousin, layer normalization :cite:`Ba.Kiros.Hinton.2016` within a unified framework. 
 
 Second, for a typical MLP or CNN, as we train,
 the variables (e.g., affine transformation outputs in MLP)
@@ -43,13 +43,13 @@ that this drift in the distribution of such variables could hamper the convergen
 Intuitively, we might conjecture that if one
 layer has variable activations that are 100 times that of another layer,
 this might necessitate compensatory adjustments in the learning rates. Adaptive solvers 
-such as AdaGrad :cite:`Duchi.Hazan.Singer.2011`, Adam :cite:`Kingma.Ba.2014` or Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018` aim to address this from the viewpoint of optimization. 
+such as AdaGrad :cite:`Duchi.Hazan.Singer.2011`, Adam :cite:`Kingma.Ba.2014`, and Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018` aim to address this from the viewpoint of optimization. 
 The alternative is to prevent the problem from occurring, simply by adaptive normalization.
    
 Third, deeper networks are complex and tend to be more easily capable of overfitting.
 This means that regularization becomes more critical. A common technique for regularization is noise 
 injection. This has been known for a long time, e.g., with regard to noise injection for the 
-inputs :cite:`Bishop.1995`. It also forms the basis of dropout :numref:`sec_dropout`. As it turns out, quite serendipitously, batch normalization conveys all three benefits: preprocessing, numerical stability and regularization. 
+inputs :cite:`Bishop.1995`. It also forms the basis of dropout :numref:`sec_dropout`. As it turns out, quite serendipitously, batch normalization conveys all three benefits: preprocessing, numerical stability, and regularization. 
 
 Batch normalization is applied to individual layers, or optionally, to all of them:
 In each training iteration,
@@ -72,7 +72,7 @@ the choice of batch size is
 even more significant than without batch normalization, or at least, 
 suitable calibration is needed as we might adjust it.
 
-Formally, denote by $\mathbf{x} \in \mathcal{B}$ an input to batch normalization ($\mathrm{BN}$)
+Formally, denoting by $\mathbf{x} \in \mathcal{B}$ an input to batch normalization ($\mathrm{BN}$)
 that is from a minibatch $\mathcal{B}$,
 batch normalization transforms $\mathbf{x}$
 according to the following expression:
@@ -123,7 +123,7 @@ this variation appears to act as a form of regularization.
 relate the properties of batch normalization to Bayesian priors and penalties respectively.
 In particular, this sheds some light on the puzzle
 of why batch normalization works best for moderate minibatches sizes in the $50 \sim 100$ range. 
-This particular size of minibatch seems to inject just the 'right amount' of noise per layer: a 
+This particular size of minibatch seems to inject just the "right amount" of noise per layer: a 
 larger minibatch regularizes less due to the more stable estimates, whereas tiny minibatches 
 destroy useful signal due to high variance. Exploring this direction further, considering alternative types 
 of preprocessing and filtering may yet lead to other effective types of regularization. 
@@ -146,7 +146,7 @@ models employing batch normalization
 and thus batch normalization layers function differently
 in *training mode* (normalizing by minibatch statistics)
 and in *prediction mode* (normalizing by dataset statistics). 
-In this form they closely resemble the behavior of dropout regularization of :numref:`sec_dropout` 
+In this form they closely resemble the behavior of dropout regularization of :numref:`sec_dropout`,
 where noise is only injected during training. 
 
 
@@ -155,8 +155,8 @@ where noise is only injected during training.
 We are now ready to take a look at how batch normalization works in practice.
 Batch normalization implementations for fully connected layers
 and convolutional layers are slightly different.
-One key differences between batch normalization and other layers
-is that because batch normalization operates on a full minibatch at a time. As such,
+One key difference between batch normalization and other layers
+is that because batch normalization operates on a full minibatch at a time,
 we cannot just ignore the batch dimension
 as we did before when introducing other layers.
 
@@ -183,8 +183,8 @@ on which the transformation is applied.
 
 Similarly, with convolutional layers,
 we can apply batch normalization after the convolution
-and before the nonlinear activation function. The key difference to batch norms 
-in fully-connected layers is that we apply the operation on a per-channel basis 
+and before the nonlinear activation function. The key difference from batch normalization 
+in fully connected layers is that we apply the operation on a per-channel basis 
 *across all locations*. This is compatible with our assumption of translation 
 invariance that led to convolutions: we assumed that the specific location of a pattern 
 within an image was not critical for the purpose of understanding.
@@ -203,11 +203,11 @@ to normalize the value at each spatial location.
 Each channel has its own scale and shift parameters,
 both of which are scalars.
 
-Note that in the context of convolutions the batch norm is well-defined even for 
+Note that in the context of convolutions the batch normalization is well-defined even for 
 minibatches of size 1: after all, we have all the locations across an image to average. Consequently, 
 mean and variance are well defined, even if it's just within a single observation. This consideration 
-led :cite:`Ba.Kiros.Hinton.2016` to introduce the notion of the *Layer Norm*. It works just like 
-a batch norm, just that it is applied one image at a time. There are cases where layer norms improve the 
+led :cite:`Ba.Kiros.Hinton.2016` to introduce the notion of the *layer norm*. It works just like 
+a batch norm, just that it is applied one image at a time. There are cases where layer normalization improves the 
 accuracy of a model. We skip further details and recommend the interested reader to consult the 
 original paper. 
 
@@ -231,9 +231,9 @@ Recall that dropout also exhibits this characteristic.
 
 ## (**Implementation from Scratch**)
 
-To see how batch norms work in practice, we implement one from scratch below.
+To see how batch normalization works in practice, we implement one from scratch below.
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, init
@@ -271,7 +271,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     return Y, moving_mean, moving_var
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -308,7 +308,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     return Y, moving_mean.data, moving_var.data
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -345,7 +345,7 @@ thus we need to specify the number of features throughout.
 By now all modern deep learning frameworks offer automatic detection of size and shape in the 
 high-level batch normalization APIs (in practice we will use this instead).
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab mxnet
 class BatchNorm(nn.Block):
     # `num_features`: the number of outputs for a fully connected layer
@@ -378,7 +378,7 @@ class BatchNorm(nn.Block):
         return Y
 ```
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab pytorch
 class BatchNorm(nn.Module):
     # `num_features`: the number of outputs for a fully connected layer
@@ -411,7 +411,7 @@ class BatchNorm(nn.Module):
         return Y
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab tensorflow
 class BatchNorm(tf.keras.layers.Layer):
     def __init__(self, **kwargs):
@@ -472,100 +472,89 @@ Recall that batch normalization is applied
 after the convolutional layers or fully connected layers
 but before the corresponding activation functions.
 
-```{.python .input}
-%%tab mxnet
-net = nn.Sequential()
-net.add(nn.Conv2D(6, kernel_size=5),
-        BatchNorm(6, num_dims=4),
-        nn.Activation('sigmoid'),
-        nn.AvgPool2D(pool_size=2, strides=2),
-        nn.Conv2D(16, kernel_size=5),
-        BatchNorm(16, num_dims=4),
-        nn.Activation('sigmoid'),
-        nn.AvgPool2D(pool_size=2, strides=2),
-        nn.Dense(120),
-        BatchNorm(120, num_dims=2),
-        nn.Activation('sigmoid'),
-        nn.Dense(84),
-        BatchNorm(84, num_dims=2),
-        nn.Activation('sigmoid'),
-        nn.Dense(10))
-```
-
-```{.python .input}
-%%tab pytorch
-net = nn.Sequential(
-    nn.Conv2d(1, 6, kernel_size=5), BatchNorm(6, num_dims=4), nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size=2, stride=2),
-    nn.Conv2d(6, 16, kernel_size=5), BatchNorm(16, num_dims=4), nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size=2, stride=2), nn.Flatten(),
-    nn.Linear(16*4*4, 120), BatchNorm(120, num_dims=2), nn.Sigmoid(),
-    nn.Linear(120, 84), BatchNorm(84, num_dims=2), nn.Sigmoid(),
-    nn.Linear(84, 10))
-```
-
-```{.python .input}
-%%tab tensorflow
-# Recall that this has to be a function that will be passed to `d2l.train_ch6`
-# so that model building or compiling need to be within `strategy.scope()` in
-# order to utilize the CPU/GPU devices that we have
-def net():
-    return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(filters=6, kernel_size=5,
-                               input_shape=(28, 28, 1)),
-        BatchNorm(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
-        tf.keras.layers.Conv2D(filters=16, kernel_size=5),
-        BatchNorm(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(120),
-        BatchNorm(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.Dense(84),
-        BatchNorm(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.Dense(10)]
-    )
+```{.python .input  n=8}
+%%tab all
+class BNLeNetScratch(d2l.Classifier):
+    def __init__(self, lr=0.1, num_classes=10):
+        super().__init__()
+        self.save_hyperparameters()
+        if tab.selected('mxnet'):
+            self.net = nn.Sequential()
+            self.net.add(
+                nn.Conv2D(6, kernel_size=5), BatchNorm(6, num_dims=4),
+                nn.Activation('sigmoid'),
+                nn.AvgPool2D(pool_size=2, strides=2),
+                nn.Conv2D(16, kernel_size=5), BatchNorm(16, num_dims=4),
+                nn.Activation('sigmoid'),
+                nn.AvgPool2D(pool_size=2, strides=2), nn.Dense(120),
+                BatchNorm(120, num_dims=2), nn.Activation('sigmoid'),
+                nn.Dense(84), BatchNorm(84, num_dims=2),
+                nn.Activation('sigmoid'), nn.Dense(num_classes))
+            self.initialize()
+        if tab.selected('pytorch'):
+            self.net = nn.Sequential(
+                nn.Conv2d(1, 6, kernel_size=5), BatchNorm(6, num_dims=4),
+                nn.Sigmoid(), nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Conv2d(6, 16, kernel_size=5), BatchNorm(16, num_dims=4),
+                nn.Sigmoid(), nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Flatten(), nn.Linear(16*4*4, 120),
+                BatchNorm(120, num_dims=2), nn.Sigmoid(), nn.Linear(120, 84),
+                BatchNorm(84, num_dims=2), nn.Sigmoid(),
+                nn.Linear(84, num_classes))
+        if tab.selected('tensorflow'):
+            self.net = tf.keras.models.Sequential([
+                tf.keras.layers.Conv2D(filters=6, kernel_size=5,
+                                       input_shape=(28, 28, 1)),
+                BatchNorm(), tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+                tf.keras.layers.Conv2D(filters=16, kernel_size=5),
+                BatchNorm(), tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+                tf.keras.layers.Flatten(), tf.keras.layers.Dense(120),
+                BatchNorm(), tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.Dense(84), BatchNorm(),
+                tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.Dense(num_classes)])
 ```
 
 As before, we will [**train our network on the Fashion-MNIST dataset**].
 This code is virtually identical to that when we first trained LeNet (:numref:`sec_lenet`).
-The main difference is the larger learning rate.
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab mxnet, pytorch
-lr, num_epochs, batch_size = 0.5, 20, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
+trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
+data = d2l.FashionMNIST(batch_size=256)
+model = BNLeNetScratch(lr=0.9)
+trainer.fit(model, data)
 ```
 
-```{.python .input}
+```{.python .input  n=10}
 %%tab tensorflow
-lr, num_epochs, batch_size = 0.5, 20, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
+trainer = d2l.Trainer(max_epochs=10)
+data = d2l.FashionMNIST(batch_size=256)
+with d2l.try_gpu():
+    model = BNLeNetScratch(lr=0.9)
+    trainer.fit(model, data)
 ```
 
 Let's [**have a look at the scale parameter `gamma`
 and the shift parameter `beta`**] learned
 from the first batch normalization layer.
 
-```{.python .input}
+```{.python .input  n=11}
 %%tab mxnet
-net[1].gamma.data().reshape(-1,), net[1].beta.data().reshape(-1,)
+model.net[1].gamma.data().reshape(-1,), model.net[1].beta.data().reshape(-1,)
 ```
 
-```{.python .input}
+```{.python .input  n=12}
 %%tab pytorch
-net[1].gamma.reshape((-1,)), net[1].beta.reshape((-1,))
+model.net[1].gamma.reshape((-1,)), model.net[1].beta.reshape((-1,))
 ```
 
-```{.python .input}
+```{.python .input  n=13}
 %%tab tensorflow
-tf.reshape(net.layers[1].gamma, (-1,)), tf.reshape(net.layers[1].beta, (-1,))
+tf.reshape(model.net.layers[1].gamma, (-1,)), tf.reshape(
+    model.net.layers[1].beta, (-1,))
 ```
 
 ## [**Concise Implementation**]
@@ -574,54 +563,54 @@ Compared with the `BatchNorm` class,
 which we just defined ourselves,
 we can use the `BatchNorm` class defined in high-level APIs from the deep learning framework directly.
 The code looks virtually identical
-to our implementation above, except that we no longer need to provide additional parameters for it to get the dimensions right.
+to our implementation above, except that we no longer need to provide additional arguments for it to get the dimensions right.
 
-```{.python .input}
-%%tab mxnet
-net = nn.Sequential()
-net.add(nn.Conv2D(6, kernel_size=5), nn.BatchNorm(), nn.Activation('sigmoid'),
-        nn.AvgPool2D(pool_size=2, strides=2),
-        nn.Conv2D(16, kernel_size=5), nn.BatchNorm(), nn.Activation('sigmoid'),
-        nn.AvgPool2D(pool_size=2, strides=2),
-        nn.Dense(120), nn.BatchNorm(), nn.Activation('sigmoid'),
-        nn.Dense(84), nn.BatchNorm(), nn.Activation('sigmoid'),
-        nn.Dense(10))
-```
-
-```{.python .input}
-%%tab pytorch
-net = nn.Sequential(
-    nn.Conv2d(1, 6, kernel_size=5), nn.BatchNorm2d(6), nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size=2, stride=2),
-    nn.Conv2d(6, 16, kernel_size=5), nn.BatchNorm2d(16), nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size=2, stride=2), nn.Flatten(),
-    nn.Linear(256, 120), nn.BatchNorm1d(120), nn.Sigmoid(),
-    nn.Linear(120, 84), nn.BatchNorm1d(84), nn.Sigmoid(),
-    nn.Linear(84, 10))
-```
-
-```{.python .input}
-%%tab tensorflow
-def net():
-    return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(filters=6, kernel_size=5,
-                               input_shape=(28, 28, 1)),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
-        tf.keras.layers.Conv2D(filters=16, kernel_size=5),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(120),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.Dense(84),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.Dense(10),
-    ])
+```{.python .input  n=14}
+%%tab all
+class BNLeNet(d2l.Classifier):
+    def __init__(self, lr=0.1, num_classes=10):
+        super().__init__()
+        self.save_hyperparameters()
+        if tab.selected('mxnet'):
+            self.net = nn.Sequential()
+            self.net.add(
+                nn.Conv2D(6, kernel_size=5), nn.BatchNorm(),
+                nn.Activation('sigmoid'),
+                nn.AvgPool2D(pool_size=2, strides=2),
+                nn.Conv2D(16, kernel_size=5), nn.BatchNorm(),
+                nn.Activation('sigmoid'),
+                nn.AvgPool2D(pool_size=2, strides=2),
+                nn.Dense(120), nn.BatchNorm(), nn.Activation('sigmoid'),
+                nn.Dense(84), nn.BatchNorm(), nn.Activation('sigmoid'),
+                nn.Dense(num_classes))
+            self.initialize()
+        if tab.selected('pytorch'):
+            self.net = nn.Sequential(
+                nn.Conv2d(1, 6, kernel_size=5), nn.BatchNorm2d(6),
+                nn.Sigmoid(), nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Conv2d(6, 16, kernel_size=5), nn.BatchNorm2d(16),
+                nn.Sigmoid(), nn.AvgPool2d(kernel_size=2, stride=2),
+                nn.Flatten(), nn.Linear(256, 120), nn.BatchNorm1d(120),
+                nn.Sigmoid(), nn.Linear(120, 84), nn.BatchNorm1d(84),
+                nn.Sigmoid(), nn.Linear(84, num_classes))
+        if tab.selected('tensorflow'):
+            self.net = tf.keras.models.Sequential([
+                tf.keras.layers.Conv2D(filters=6, kernel_size=5,
+                                       input_shape=(28, 28, 1)),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+                tf.keras.layers.Conv2D(filters=16, kernel_size=5),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+                tf.keras.layers.Flatten(), tf.keras.layers.Dense(120),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.Dense(84),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Activation('sigmoid'),
+                tf.keras.layers.Dense(num_classes)])
 ```
 
 Below, we [**use the same hyperparameters to train our model.**]
@@ -629,9 +618,21 @@ Note that as usual, the high-level API variant runs much faster
 because its code has been compiled to C++ or CUDA
 while our custom implementation must be interpreted by Python.
 
-```{.python .input}
-%%tab all
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
+```{.python .input  n=15}
+%%tab mxnet, pytorch
+trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
+data = d2l.FashionMNIST(batch_size=256)
+model = BNLeNet(lr=0.9)
+trainer.fit(model, data)
+```
+
+```{.python .input  n=16}
+%%tab tensorflow
+trainer = d2l.Trainer(max_epochs=10)
+data = d2l.FashionMNIST(batch_size=256)
+with d2l.try_gpu():
+    model = BNLeNet(lr=0.9)
+    trainer.fit(model, data)
 ```
 
 ## Discussion
@@ -702,15 +703,15 @@ tens of thousands of citations. We conjecture, though, that the guiding principl
 of regularization through noise injection, acceleration through rescaling and lastly preprocessing
 may well lead to further inventions of layers and techniques in the future. 
 
-On a more practical note, there are a number of aspects worth remembering about Batch Norms: 
+On a more practical note, there are a number of aspects worth remembering about batch normalization: 
 * During model training, batch normalization continuously adjusts the intermediate output of 
   the network by utilizing the mean and standard deviation of the minibatch, so that the 
   values of the intermediate output in each layer throughout the neural network are more stable.
-* Batch norms for fully connected layers and convolutional layers are slightly different. In fact, 
-  for convolutional layers, Layer Norms can sometimes be used as an alternative. 
+* Batch normalization for fully connected layers and convolutional layers are slightly different. In fact, 
+  for convolutional layers, layer normalization can sometimes be used as an alternative. 
 * Like a dropout layer, batch normalization layers have different behaviors 
   in training mode and prediction mode.
-* Batch norms are useful for regularization and improving convergence in optimization. On the other hand, 
+* Batch normalization is useful for regularization and improving convergence in optimization. On the other hand, 
   the original motivation of reducing internal covariate shift seems not to be a valid explanation.
 
 ## Exercises
@@ -720,13 +721,13 @@ On a more practical note, there are a number of aspects worth remembering about 
     1. Plot the increase in validation accuracy.
     1. How large can you make the learning rate before the optimization fails in both cases?
 1. Do we need batch normalization in every layer? Experiment with it?
-1. Implement a 'lite' version of batch normalization that only removes the mean, or alternatively one that 
+1. Implement a "lite" version of batch normalization that only removes the mean, or alternatively one that 
    only removes the variance. How does it behave?
 1. Fix the parameters `beta` and `gamma`, and observe and analyze the results.
 1. Can you replace dropout by batch normalization? How does the behavior change?
 1. Review the online documentation for `BatchNorm` from the high-level APIs to see 
    some other use cases for it. 
-1. Research ideas: think of other normalization transforms that you can apply? 
+1. Research ideas: think of other normalization transforms that you can apply:
     1. Can you apply the probability integral transform? 
     1. Can you use a full rank covariance estimate? Why not?
     1. Does a sparsification compression act as a regularizer?
