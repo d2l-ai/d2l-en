@@ -169,14 +169,15 @@ class MultiHeadAttention(d2l.Module):
 #@save
 class MultiHeadAttention(d2l.Module):
     """Multi-head attention."""
-    def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
+    def __init__(self, key_size, query_size, value_size, num_hiddens,
+                 num_heads, dropout, bias=False, **kwargs):
         super().__init__()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
-        self.W_q = nn.LazyLinear(num_hiddens, bias=bias)
-        self.W_k = nn.LazyLinear(num_hiddens, bias=bias)
-        self.W_v = nn.LazyLinear(num_hiddens, bias=bias)
-        self.W_o = nn.LazyLinear(num_hiddens, bias=bias)
+        self.W_q = nn.Linear(query_size, num_hiddens, bias=bias)
+        self.W_k = nn.Linear(key_size, num_hiddens, bias=bias)
+        self.W_v = nn.Linear(value_size, num_hiddens, bias=bias)
+        self.W_o = nn.Linear(num_hiddens, num_hiddens, bias=bias)
 
     def forward(self, queries, keys, values, valid_lens):
         # Shape of queries, keys, or values:
@@ -338,7 +339,8 @@ attention.initialize()
 ```{.python .input}
 %%tab pytorch
 num_hiddens, num_heads = 100, 5
-attention = MultiHeadAttention(num_hiddens, num_heads, 0.5)
+attention = MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
+                               num_hiddens, num_heads, 0.5)
 ```
 
 ```{.python .input}

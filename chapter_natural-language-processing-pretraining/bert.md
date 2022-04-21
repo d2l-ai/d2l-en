@@ -220,16 +220,18 @@ class BERTEncoder(nn.Block):
 #@save
 class BERTEncoder(nn.Module):
     """BERT encoder."""
-    def __init__(self, vocab_size, num_hiddens, norm_shape,
+    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_input,
                  ffn_num_hiddens, num_heads, num_layers, dropout,
-                 max_len=1000, **kwargs):
+                 max_len=1000, key_size=768, query_size=768, value_size=768,
+                 **kwargs):
         super(BERTEncoder, self).__init__(**kwargs)
         self.token_embedding = nn.Embedding(vocab_size, num_hiddens)
         self.segment_embedding = nn.Embedding(2, num_hiddens)
         self.blks = nn.Sequential()
         for i in range(num_layers):
-            self.blks.add_module(f"{i}", d2l.EncoderBlock(num_hiddens, \
-                 norm_shape, ffn_num_hiddens, num_heads, dropout, True))
+            self.blks.add_module(f"{i}", d2l.EncoderBlock(
+                key_size, query_size, value_size, num_hiddens, norm_shape,
+                ffn_num_input, ffn_num_hiddens, num_heads, dropout, True))
         # In BERT, positional embeddings are learnable, thus we create a
         # parameter of positional embeddings that are long enough
         self.pos_embedding = nn.Parameter(torch.randn(1, max_len,
@@ -261,7 +263,7 @@ encoder.initialize()
 #@tab pytorch
 vocab_size, num_hiddens, ffn_num_hiddens, num_heads = 10000, 768, 1024, 4
 norm_shape, ffn_num_input, num_layers, dropout = [768], 768, 2, 0.2
-encoder = BERTEncoder(vocab_size, num_hiddens, norm_shape,
+encoder = BERTEncoder(vocab_size, num_hiddens, norm_shape, ffn_num_input,
                       ffn_num_hiddens, num_heads, num_layers, dropout)
 ```
 
@@ -364,12 +366,12 @@ class MaskLM(nn.Block):
 #@save
 class MaskLM(nn.Module):
     """The masked language model task of BERT."""
-    def __init__(self, vocab_size, num_hiddens, **kwargs):
+    def __init__(self, vocab_size, num_hiddens, num_inputs=768, **kwargs):
         super(MaskLM, self).__init__(**kwargs)
-        self.mlp = nn.Sequential(nn.LazyLinear(num_hiddens),
+        self.mlp = nn.Sequential(nn.Linear(num_inputs, num_hiddens),
                                  nn.ReLU(),
                                  nn.LayerNorm(num_hiddens),
-                                 nn.LazyLinear(vocab_size))
+                                 nn.Linear(num_hiddens, vocab_size))
 
     def forward(self, X, pred_positions):
         num_pred_positions = pred_positions.shape[1]
@@ -467,9 +469,9 @@ class NextSentencePred(nn.Block):
 #@save
 class NextSentencePred(nn.Module):
     """The next sentence prediction task of BERT."""
-    def __init__(self, **kwargs):
+    def __init__(self, num_inputs, **kwargs):
         super(NextSentencePred, self).__init__(**kwargs)
-        self.output = nn.LazyLinear(2)
+        self.output = nn.Linear(num_inputs, 2)
 
     def forward(self, X):
         # `X` shape: (batch size, `num_hiddens`)
@@ -492,7 +494,7 @@ nsp_Y_hat.shape
 # flatten=True, all but the first axis of input data are collapsed together
 encoded_X = torch.flatten(encoded_X, start_dim=1)
 # input_shape for NSP: (batch size, `num_hiddens`)
-nsp = NextSentencePred()
+nsp = NextSentencePred(encoded_X.shape[-1])
 nsp_Y_hat = nsp(encoded_X)
 nsp_Y_hat.shape
 ```
@@ -560,16 +562,20 @@ class BERTModel(nn.Block):
 #@save
 class BERTModel(nn.Module):
     """The BERT model."""
-    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_hiddens, 
-                 num_heads, num_layers, dropout, max_len=1000):
+    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_input,
+                 ffn_num_hiddens, num_heads, num_layers, dropout,
+                 max_len=1000, key_size=768, query_size=768, value_size=768,
+                 hid_in_features=768, mlm_in_features=768,
+                 nsp_in_features=768):
         super(BERTModel, self).__init__()
-        self.encoder = BERTEncoder(vocab_size, num_hiddens, norm_shape, 
-                                   ffn_num_hiddens, num_heads, num_layers,
-                                   dropout, max_len=max_len)
-        self.hidden = nn.Sequential(nn.LazyLinear(num_hiddens),
+        self.encoder = BERTEncoder(vocab_size, num_hiddens, norm_shape,
+                    ffn_num_input, ffn_num_hiddens, num_heads, num_layers,
+                    dropout, max_len=max_len, key_size=key_size,
+                    query_size=query_size, value_size=value_size)
+        self.hidden = nn.Sequential(nn.Linear(hid_in_features, num_hiddens),
                                     nn.Tanh())
-        self.mlm = MaskLM(vocab_size, num_hiddens)
-        self.nsp = NextSentencePred()
+        self.mlm = MaskLM(vocab_size, num_hiddens, mlm_in_features)
+        self.nsp = NextSentencePred(nsp_in_features)
 
     def forward(self, tokens, segments, valid_lens=None, pred_positions=None):
         encoded_X = self.encoder(tokens, segments, valid_lens)

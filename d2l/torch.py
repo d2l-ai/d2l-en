@@ -991,11 +991,11 @@ class AdditiveAttention(nn.Module):
     """Additive attention.
 
     Defined in :numref:`sec_attention-scoring-functions`"""
-    def __init__(self, num_hiddens, dropout, **kwargs):
+    def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
         super(AdditiveAttention, self).__init__(**kwargs)
-        self.W_k = nn.LazyLinear(num_hiddens, bias=False)
-        self.W_q = nn.LazyLinear(num_hiddens, bias=False)
-        self.w_v = nn.LazyLinear(1, bias=False)
+        self.W_k = nn.Linear(key_size, num_hiddens, bias=False)
+        self.W_q = nn.Linear(query_size, num_hiddens, bias=False)
+        self.w_v = nn.Linear(num_hiddens, 1, bias=False)
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, queries, keys, values, valid_lens):
@@ -1048,14 +1048,15 @@ class MultiHeadAttention(d2l.Module):
     """Multi-head attention.
 
     Defined in :numref:`sec_multihead-attention`"""
-    def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
+    def __init__(self, key_size, query_size, value_size, num_hiddens,
+                 num_heads, dropout, bias=False, **kwargs):
         super().__init__()
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
-        self.W_q = nn.LazyLinear(num_hiddens, bias=bias)
-        self.W_k = nn.LazyLinear(num_hiddens, bias=bias)
-        self.W_v = nn.LazyLinear(num_hiddens, bias=bias)
-        self.W_o = nn.LazyLinear(num_hiddens, bias=bias)
+        self.W_q = nn.Linear(query_size, num_hiddens, bias=bias)
+        self.W_k = nn.Linear(key_size, num_hiddens, bias=bias)
+        self.W_v = nn.Linear(value_size, num_hiddens, bias=bias)
+        self.W_o = nn.Linear(num_hiddens, num_hiddens, bias=bias)
 
     def forward(self, queries, keys, values, valid_lens):
         # Shape of queries, keys, or values:
@@ -1129,11 +1130,11 @@ class PositionWiseFFN(nn.Module):
     """Positionwise feed-forward network.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, ffn_num_hiddens, ffn_num_outputs):
+    def __init__(self, ffn_num_input, ffn_num_hiddens, ffn_num_outputs):
         super().__init__()
-        self.dense1 = nn.LazyLinear(ffn_num_hiddens)
+        self.dense1 = nn.Linear(ffn_num_input, ffn_num_hiddens)
         self.relu = nn.ReLU()
-        self.dense2 = nn.LazyLinear(ffn_num_outputs)
+        self.dense2 = nn.Linear(ffn_num_hiddens, ffn_num_outputs)
 
     def forward(self, X):
         return self.dense2(self.relu(self.dense1(X)))
@@ -1154,13 +1155,16 @@ class EncoderBlock(nn.Module):
     """Transformer encoder block.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, num_hiddens, norm_shape, ffn_num_hiddens,
-                 num_heads, dropout, use_bias=False):
+    def __init__(self, key_size, query_size, value_size, num_hiddens,
+                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
+                 dropout, use_bias=False):
         super().__init__()
-        self.attention = d2l.MultiHeadAttention(num_hiddens, num_heads,
-                                                dropout, use_bias)
+        self.attention = d2l.MultiHeadAttention(
+            key_size, query_size, value_size, num_hiddens, num_heads, dropout,
+            use_bias)
         self.addnorm1 = AddNorm(norm_shape, dropout)
-        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
+        self.ffn = PositionWiseFFN(
+            ffn_num_input, ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(norm_shape, dropout)
 
     def forward(self, X, valid_lens):
@@ -1171,7 +1175,8 @@ class TransformerEncoder(d2l.Encoder):
     """Transformer encoder.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_hiddens,
+    def __init__(self, vocab_size, key_size, query_size, value_size,
+                 num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
                  num_heads, num_layers, dropout, use_bias=False):
         super().__init__()
         self.num_hiddens = num_hiddens
@@ -1180,7 +1185,8 @@ class TransformerEncoder(d2l.Encoder):
         self.blks = nn.Sequential()
         for i in range(num_layers):
             self.blks.add_module("block"+str(i),
-                EncoderBlock(num_hiddens, norm_shape, ffn_num_hiddens,
+                EncoderBlock(key_size, query_size, value_size, num_hiddens,
+                             norm_shape, ffn_num_input, ffn_num_hiddens,
                              num_heads, dropout, use_bias))
 
     def forward(self, X, valid_lens):
@@ -1396,18 +1402,14 @@ def train_batch_ch13(net, X, y, loss, trainer, devices):
     return train_loss_sum, train_acc_sum
 
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
-               devices=d2l.try_all_gpus(), lazy=False):
-    """Defined in :numref:`sec_image_augmentation`"""
+               devices=d2l.try_all_gpus()):
     """Train a model with mutiple GPUs (defined in Chapter 13).
 
     Defined in :numref:`sec_image_augmentation`"""
     timer, num_batches = d2l.Timer(), len(train_iter)
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
-    if lazy:
-        net = net.to(devices[0])
-    else:
-        net = nn.DataParallel(net, device_ids=devices).to(devices[0])
+    net = nn.DataParallel(net, device_ids=devices).to(devices[0])
     for epoch in range(num_epochs):
         # Sum of training loss, sum of training accuracy, no. of examples,
         # no. of predictions
@@ -2102,16 +2104,18 @@ class BERTEncoder(nn.Module):
     """BERT encoder.
 
     Defined in :numref:`subsec_bert_input_rep`"""
-    def __init__(self, vocab_size, num_hiddens, norm_shape,
+    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_input,
                  ffn_num_hiddens, num_heads, num_layers, dropout,
-                 max_len=1000, **kwargs):
+                 max_len=1000, key_size=768, query_size=768, value_size=768,
+                 **kwargs):
         super(BERTEncoder, self).__init__(**kwargs)
         self.token_embedding = nn.Embedding(vocab_size, num_hiddens)
         self.segment_embedding = nn.Embedding(2, num_hiddens)
         self.blks = nn.Sequential()
         for i in range(num_layers):
-            self.blks.add_module(f"{i}", d2l.EncoderBlock(num_hiddens, \
-                 norm_shape, ffn_num_hiddens, num_heads, dropout, True))
+            self.blks.add_module(f"{i}", d2l.EncoderBlock(
+                key_size, query_size, value_size, num_hiddens, norm_shape,
+                ffn_num_input, ffn_num_hiddens, num_heads, dropout, True))
         # In BERT, positional embeddings are learnable, thus we create a
         # parameter of positional embeddings that are long enough
         self.pos_embedding = nn.Parameter(torch.randn(1, max_len,
@@ -2130,12 +2134,12 @@ class MaskLM(nn.Module):
     """The masked language model task of BERT.
 
     Defined in :numref:`subsec_bert_input_rep`"""
-    def __init__(self, vocab_size, num_hiddens, **kwargs):
+    def __init__(self, vocab_size, num_hiddens, num_inputs=768, **kwargs):
         super(MaskLM, self).__init__(**kwargs)
-        self.mlp = nn.Sequential(nn.LazyLinear(num_hiddens),
+        self.mlp = nn.Sequential(nn.Linear(num_inputs, num_hiddens),
                                  nn.ReLU(),
                                  nn.LayerNorm(num_hiddens),
-                                 nn.LazyLinear(vocab_size))
+                                 nn.Linear(num_hiddens, vocab_size))
 
     def forward(self, X, pred_positions):
         num_pred_positions = pred_positions.shape[1]
@@ -2154,9 +2158,9 @@ class NextSentencePred(nn.Module):
     """The next sentence prediction task of BERT.
 
     Defined in :numref:`subsec_mlm`"""
-    def __init__(self, **kwargs):
+    def __init__(self, num_inputs, **kwargs):
         super(NextSentencePred, self).__init__(**kwargs)
-        self.output = nn.LazyLinear(2)
+        self.output = nn.Linear(num_inputs, 2)
 
     def forward(self, X):
         # `X` shape: (batch size, `num_hiddens`)
@@ -2166,16 +2170,20 @@ class BERTModel(nn.Module):
     """The BERT model.
 
     Defined in :numref:`subsec_nsp`"""
-    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_hiddens,
-                 num_heads, num_layers, dropout, max_len=1000):
+    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_input,
+                 ffn_num_hiddens, num_heads, num_layers, dropout,
+                 max_len=1000, key_size=768, query_size=768, value_size=768,
+                 hid_in_features=768, mlm_in_features=768,
+                 nsp_in_features=768):
         super(BERTModel, self).__init__()
         self.encoder = BERTEncoder(vocab_size, num_hiddens, norm_shape,
-                                   ffn_num_hiddens, num_heads, num_layers,
-                                   dropout, max_len=max_len)
-        self.hidden = nn.Sequential(nn.LazyLinear(num_hiddens),
+                    ffn_num_input, ffn_num_hiddens, num_heads, num_layers,
+                    dropout, max_len=max_len, key_size=key_size,
+                    query_size=query_size, value_size=value_size)
+        self.hidden = nn.Sequential(nn.Linear(hid_in_features, num_hiddens),
                                     nn.Tanh())
-        self.mlm = MaskLM(vocab_size, num_hiddens)
-        self.nsp = NextSentencePred()
+        self.mlm = MaskLM(vocab_size, num_hiddens, mlm_in_features)
+        self.nsp = NextSentencePred(nsp_in_features)
 
     def forward(self, tokens, segments, valid_lens=None, pred_positions=None):
         encoded_X = self.encoder(tokens, segments, valid_lens)

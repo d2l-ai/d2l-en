@@ -101,9 +101,11 @@ def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
     vocab.token_to_idx = {token: idx for idx, token in enumerate(
         vocab.idx_to_token)}
     bert = d2l.BERTModel(len(vocab), num_hiddens, norm_shape=[256],
-                         ffn_num_hiddens=ffn_num_hiddens,
+                         ffn_num_input=256, ffn_num_hiddens=ffn_num_hiddens,
                          num_heads=4, num_layers=2, dropout=0.2,
-                         max_len=max_len)
+                         max_len=max_len, key_size=256, query_size=256,
+                         value_size=256, hid_in_features=256,
+                         mlm_in_features=256, nsp_in_features=256)
     # Load pretrained BERT parameters
     bert.load_state_dict(torch.load(os.path.join(data_dir,
                                                  'pretrained.params')))
@@ -311,7 +313,7 @@ class BERTClassifier(nn.Module):
         super(BERTClassifier, self).__init__()
         self.encoder = bert.encoder
         self.hidden = bert.hidden
-        self.output = nn.LazyLinear(3)
+        self.output = nn.Linear(256, 3)
 
     def forward(self, inputs):
         tokens_X, segments_X, valid_lens_x = inputs
@@ -370,8 +372,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices,
 lr, num_epochs = 1e-4, 5
 trainer = torch.optim.Adam(net.parameters(), lr=lr)
 loss = nn.CrossEntropyLoss(reduction='none')
-d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices,
-               lazy=True)
+d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
 ## Summary

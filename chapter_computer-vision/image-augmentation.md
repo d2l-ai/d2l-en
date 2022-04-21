@@ -359,17 +359,12 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
 #@tab pytorch
 #@save
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
-               devices=d2l.try_all_gpus(), lazy=False):
-    """Train a model with mutiple GPUs (defined in Chapter 13).
-
-    Defined in :numref:`sec_image_augmentation`"""
+               devices=d2l.try_all_gpus()):
+    """Train a model with mutiple GPUs (defined in Chapter 13)."""
     timer, num_batches = d2l.Timer(), len(train_iter)
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
-    if lazy:
-        net = net.to(devices[0])
-    else:
-        net = nn.DataParallel(net, device_ids=devices).to(devices[0])
+    net = nn.DataParallel(net, device_ids=devices).to(devices[0])
     for epoch in range(num_epochs):
         # Sum of training loss, sum of training accuracy, no. of examples,
         # no. of predictions

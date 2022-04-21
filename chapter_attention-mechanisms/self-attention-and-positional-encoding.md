@@ -78,7 +78,8 @@ attention.initialize()
 ```{.python .input}
 %%tab pytorch
 num_hiddens, num_heads = 100, 5
-attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 0.5)
+attention = d2l.MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
+                                   num_hiddens, num_heads, 0.5)
 ```
 
 ```{.python .input}

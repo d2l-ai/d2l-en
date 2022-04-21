@@ -51,8 +51,10 @@ loss = gluon.loss.SoftmaxCELoss()
 ```{.python .input}
 #@tab pytorch
 net = d2l.BERTModel(len(vocab), num_hiddens=128, norm_shape=[128],
-                    ffn_num_hiddens=256, num_heads=2,
-                    num_layers=2, dropout=0.2)
+                    ffn_num_input=128, ffn_num_hiddens=256, num_heads=2,
+                    num_layers=2, dropout=0.2, key_size=128, query_size=128,
+                    value_size=128, hid_in_features=128, mlm_in_features=128,
+                    nsp_in_features=128)
 devices = d2l.try_all_gpus()
 loss = nn.CrossEntropyLoss()
 ```
@@ -173,7 +175,7 @@ def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):
 ```{.python .input}
 #@tab pytorch
 def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):
-    net = net.to(devices[0])
+    net = nn.DataParallel(net, device_ids=devices).to(devices[0])
     trainer = torch.optim.Adam(net.parameters(), lr=0.01)
     step, timer = 0, d2l.Timer()
     animator = d2l.Animator(xlabel='step', ylabel='loss',
@@ -196,7 +198,6 @@ def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):
             mlm_l, nsp_l, l = _get_batch_loss_bert(
                 net, loss, vocab_size, tokens_X, segments_X, valid_lens_x,
                 pred_positions_X, mlm_weights_X, mlm_Y, nsp_y)
-            #nn.DataParallel(net, device_ids=devices)
             l.backward()
             trainer.step()
             metric.add(mlm_l, nsp_l, tokens_X.shape[0], 1)
