@@ -309,7 +309,7 @@ Then, we add all the modules to ResNet. Here, two residual blocks are used for e
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(ResNet)
-def __init__(self, arch, num_classes=10, lr=0.1):
+def __init__(self, arch, lr=0.1, num_classes=10):
     super(ResNet, self).__init__()
     self.save_hyperparameters()
     if tab.selected('mxnet'):
@@ -347,13 +347,13 @@ Before training ResNet, let's [**observe how the input shape changes across diff
 ```{.python .input}
 %%tab all
 class ResNet18(ResNet):
-    def __init__(self, num_classes=10, lr=0.1):
+    def __init__(self, lr=0.1, num_classes=10):
         if tab.selected(['mxnet', 'tensorflow']):
             super().__init__(((2, 64), (2, 128), (2, 256), (2, 512)),
-                           num_classes, lr)
+                           lr, num_classes)
         if tab.selected('pytorch'):
-            super().__init__(((2, 64, 64), (2, 64, 128), (2, 128, 256), (2, 256, 512)),
-                           num_classes, lr)
+            super().__init__(((2, 64, 64), (2, 64, 128), (2, 128, 256),
+                              (2, 256, 512)), lr, num_classes)
 ```
 
 ```{.python .input}

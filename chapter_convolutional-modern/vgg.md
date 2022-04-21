@@ -149,12 +149,12 @@ where each contains two values: the number of convolutional layers
 and the number of output channels,
 which are precisely the arguments required to call
 the `vgg_block` function. As such, VGG defines a *family* of networks rather than just 
-a specific manifestation. To build a specific network we simply iterate over `conv_arch` to compose the blocks.
+a specific manifestation. To build a specific network we simply iterate over `arch` to compose the blocks.
 
 ```{.python .input}
 %%tab all
 class VGG(d2l.Classifier):
-    def __init__(self, arch, lr=0.1):
+    def __init__(self, arch, lr=0.1, num_classes=10):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
@@ -163,7 +163,7 @@ class VGG(d2l.Classifier):
                 self.net.add(vgg_block(num_convs, num_channels))
             self.net.add(nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
                          nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
-                         nn.Dense(10))
+                         nn.Dense(num_classes))
             self.net.initialize(init.Xavier())
         if tab.selected('pytorch'):
             conv_blks = []
@@ -175,7 +175,7 @@ class VGG(d2l.Classifier):
                 *conv_blks, nn.Flatten(),
                 nn.Linear(out_channels * 7 * 7, 4096), nn.ReLU(), nn.Dropout(0.5),
                 nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
-                nn.Linear(4096, 10))
+                nn.Linear(4096, num_classes))
             self.net.apply(d2l.init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential()
@@ -188,7 +188,7 @@ class VGG(d2l.Classifier):
                 tf.keras.layers.Dropout(0.5),
                 tf.keras.layers.Dense(4096, activation='relu'),
                 tf.keras.layers.Dropout(0.5),
-                tf.keras.layers.Dense(10)]))
+                tf.keras.layers.Dense(num_classes)]))
 ```
 
 The original VGG network had 5 convolutional blocks,
@@ -202,12 +202,14 @@ and 3 fully connected layers, it is often called VGG-11.
 
 ```{.python .input}
 %%tab pytorch, mxnet
-VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary((1, 1, 224, 224))
+VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary(
+    (1, 1, 224, 224))
 ```
 
 ```{.python .input}
 %%tab tensorflow
-VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary((1, 224, 224, 1))
+VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary(
+    (1, 224, 224, 1))
 ```
 
 As you can see, we halve height and width at each block,
@@ -220,9 +222,7 @@ for processing by the fully connected part of the network.
 [**Since VGG-11 is more computationally-heavy than AlexNet
 we construct a network with a smaller number of channels.**]
 This is more than sufficient for training on Fashion-MNIST.
-
-Apart from using a slightly larger learning rate,
-the [**model training**] process is similar to that of AlexNet in :numref:`sec_alexnet`.
+The [**model training**] process is similar to that of AlexNet in :numref:`sec_alexnet`.
 
 ```{.python .input}
 %%tab mxnet, pytorch

@@ -313,7 +313,7 @@ import tensorflow as tf
 ```{.python .input}
 %%tab all
 class AlexNet(d2l.Classifier):
-    def __init__(self, lr=0.1):
+    def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
@@ -329,12 +329,12 @@ class AlexNet(d2l.Classifier):
                 nn.MaxPool2D(pool_size=3, strides=2),
                 nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
                 nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
-                nn.Dense(10))
+                nn.Dense(num_classes))
             self.net.initialize(init.Xavier())
         if tab.selected('pytorch'):
             self.net = nn.Sequential(
-                nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=1), nn.ReLU(),
-                nn.MaxPool2d(kernel_size=3, stride=2),
+                nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=1),
+                nn.ReLU(), nn.MaxPool2d(kernel_size=3, stride=2),
                 nn.Conv2d(96, 256, kernel_size=5, padding=2), nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2),
                 nn.Conv2d(256, 384, kernel_size=3, padding=1), nn.ReLU(),
@@ -343,7 +343,7 @@ class AlexNet(d2l.Classifier):
                 nn.MaxPool2d(kernel_size=3, stride=2), nn.Flatten(),
                 nn.Linear(6400, 4096), nn.ReLU(), nn.Dropout(p=0.5),
                 nn.Linear(4096, 4096), nn.ReLU(),nn.Dropout(p=0.5),
-                nn.Linear(4096, 10))
+                nn.Linear(4096, num_classes))
             self.net.apply(d2l.init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
@@ -365,7 +365,7 @@ class AlexNet(d2l.Classifier):
                 tf.keras.layers.Dropout(0.5),
                 tf.keras.layers.Dense(4096, activation='relu'),
                 tf.keras.layers.Dropout(0.5),
-                tf.keras.layers.Dense(10)])
+                tf.keras.layers.Dense(num_classes)])
 ```
 
 We [**construct a single-channel data example**] with both height and width of 224 (**to observe the output shape of each layer**). It matches the AlexNet architecture in :numref:`fig_alexnet`.
@@ -392,7 +392,7 @@ is that its (**images have lower resolution**) ($28 \times 28$ pixels)
 To make things work, (**we upsample them to $224 \times 224$**).
 This is generally not a smart practice,
 but we do it here to be faithful to the AlexNet architecture.
-We perform this resizing with the `resize` argument in the `d2l.load_data_fashion_mnist` function.
+We perform this resizing with the `resize` argument in the `d2l.FashionMNIST` constructor.
 
 Now, we can [**start training AlexNet.**]
 Compared to LeNet in :numref:`sec_lenet`,

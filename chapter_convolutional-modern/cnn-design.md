@@ -371,7 +371,7 @@ we complete the implementation of AnyNet.
 ```{.python .input  n=10}
 %%tab all
 @d2l.add_to_class(AnyNet)
-def __init__(self, arch, stem_channels, num_classes=10, lr=0.1):
+def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
     super(AnyNet, self).__init__()
     self.save_hyperparameters()
     if tab.selected('mxnet'):
@@ -438,19 +438,19 @@ characterized by
 ```{.python .input  n=11}
 %%tab all
 class RegNet32(AnyNet):
-    def __init__(self, num_classes=10, lr=0.1):
+    def __init__(self, lr=0.1, num_classes=10):
         stem_channels, groups, bot_mul = 32, 16, 1
-        depths, channels = [4, 6], [32, 80]
+        depths, channels = (4, 6), (32, 80)
         if tab.selected(['mxnet']):
             super().__init__(
                 ((depths[0], channels[0], groups, bot_mul),
                  (depths[1], channels[1], groups, bot_mul)),
-                stem_channels, num_classes, lr)
+                stem_channels, lr, num_classes)
         if tab.selected(['pytorch']):
             super().__init__(
                 ((depths[0], stem_channels, channels[0], groups, bot_mul),
                  (depths[1], channels[0], channels[1], groups, bot_mul)),
-                stem_channels, num_classes, lr)
+                stem_channels, lr, num_classes)
 ```
 
 We can see that each RegNet stage progressively reduces resolution and increases output channels.

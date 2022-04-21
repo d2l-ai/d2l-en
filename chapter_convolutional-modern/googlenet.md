@@ -212,8 +212,7 @@ The number of output channels of the second Inception block
 is increased to $128+192+96+64=480$, yielding a ratio of $128:192:96:64 = 4:6:3:2$. As before,
 we need to reduce the number of intermediate dimensions in the second and third channel. A
 scale of $\frac{1}{2}$ and $\frac{1}{8}$ respectively suffices, yielding $128$ and $32$ channels
-respenctively. This is captured by the `Inception(64, (96, 128), (16, 32), 32)` and
-`Inception(128, (128, 192), (32, 96), 64)` block constructors.
+respectively. This is captured by the arguments of the following `Inception` block constructors.
 
 ```{.python .input}
 %%tab all
@@ -319,7 +318,7 @@ def b5(self):
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(GoogleNet)
-def __init__(self, num_classes=10, lr=0.1):
+def __init__(self, lr=0.1, num_classes=10):
     super(GoogleNet, self).__init__()
     self.save_hyperparameters()
     if tab.selected('mxnet'):
@@ -334,7 +333,7 @@ def __init__(self, num_classes=10, lr=0.1):
     if tab.selected('tensorflow'):
         self.net = tf.keras.Sequential([
             self.b1(), self.b2(), self.b3(), self.b4(), self.b5(),
-            tf.keras.layers.Dense(10)])
+            tf.keras.layers.Dense(num_classes)])
 ```
 
 The GoogLeNet model is computationally complex. Note the large number of

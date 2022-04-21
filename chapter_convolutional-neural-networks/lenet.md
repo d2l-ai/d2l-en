@@ -122,7 +122,7 @@ def init_cnn_weights(module):  #@save
 ```{.python .input}
 %%tab all
 class LeNet(d2l.Classifier):
-    def __init__(self, lr=0.1):
+    def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
@@ -135,7 +135,7 @@ class LeNet(d2l.Classifier):
                 nn.AvgPool2D(pool_size=2, strides=2),
                 nn.Dense(120, activation='sigmoid'),
                 nn.Dense(84, activation='sigmoid'),
-                nn.Dense(10))
+                nn.Dense(num_classes))
             self.net.initialize(init.Xavier())
         if tab.selected('pytorch'):
             self.net = nn.Sequential(
@@ -146,8 +146,8 @@ class LeNet(d2l.Classifier):
                 nn.Flatten(),
                 nn.LazyLinear(120), nn.Sigmoid(),
                 nn.LazyLinear(84), nn.Sigmoid(),
-                nn.LazyLinear(10))
-            self.net(torch.zeros(1,1,28,28))
+                nn.LazyLinear(num_classes))
+            self.net(torch.zeros(1, 1, 28, 28))
             self.net.apply(init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
@@ -160,7 +160,7 @@ class LeNet(d2l.Classifier):
                 tf.keras.layers.Flatten(),
                 tf.keras.layers.Dense(120, activation='sigmoid'),
                 tf.keras.layers.Dense(84, activation='sigmoid'),
-                tf.keras.layers.Dense(10)])
+                tf.keras.layers.Dense(num_classes)])
 ```
 
 We take some liberty in the reproduction of LeNet insofar as we replace the Gaussian activation layer by
