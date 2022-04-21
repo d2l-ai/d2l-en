@@ -303,11 +303,11 @@ class AdditiveAttention(nn.Block):
 #@save
 class AdditiveAttention(nn.Module):
     """Additive attention."""
-    def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
+    def __init__(self, num_hiddens, dropout, **kwargs):
         super(AdditiveAttention, self).__init__(**kwargs)
-        self.W_k = nn.Linear(key_size, num_hiddens, bias=False)
-        self.W_q = nn.Linear(query_size, num_hiddens, bias=False)
-        self.w_v = nn.Linear(num_hiddens, 1, bias=False)
+        self.W_k = nn.LazyLinear(num_hiddens, bias=False)
+        self.W_q = nn.LazyLinear(num_hiddens, bias=False)
+        self.w_v = nn.LazyLinear(1, bias=False)
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, queries, keys, values, valid_lens):
@@ -387,8 +387,7 @@ values = torch.arange(40, dtype=torch.float32).reshape(1, 10, 4).repeat(
     2, 1, 1)
 valid_lens = d2l.tensor([2, 6])
 
-attention = AdditiveAttention(key_size=2, query_size=20, num_hiddens=8,
-                              dropout=0.1)
+attention = AdditiveAttention(num_hiddens=8, dropout=0.1)
 attention.eval()
 attention(queries, keys, values, valid_lens)
 ```

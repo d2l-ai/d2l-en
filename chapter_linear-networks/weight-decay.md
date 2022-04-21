@@ -424,7 +424,6 @@ and this work becomes more routine.
 ```{.python .input  n=14}
 %%tab all
 model = WeightDecay(wd=3, lr=0.01)
-
 model.board.yscale='log'
 trainer.fit(model, data)
 print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0])))
