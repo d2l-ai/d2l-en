@@ -45,7 +45,7 @@ the advanced modeling chapters that follow rely heavily on these techniques.
 model-construction
 parameters
 init-param
-deferred-init
+lazy-init
 custom-layer
 read-write
 use-gpu

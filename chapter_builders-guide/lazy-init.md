@@ -1,5 +1,5 @@
-# Deferred Initialization
-:label:`sec_deferred_init`
+# Lazy Initialization
+:label:`sec_lazy_init`
 
 So far, it might seem that we got away
 with being sloppy in setting up our networks.
@@ -164,14 +164,14 @@ to the second layer,
 and so on through the computational graph
 until all shapes are known.
 Note that in this case,
-only the first layer requires deferred initialization,
+only the first layer requires lazy initialization,
 but the framework initializes sequentially.
 Once all parameter shapes are known,
 the framework can finally initialize the parameters.
 
 ## Summary
 
-* Deferred initialization can be convenient, allowing the framework to infer parameter shapes automatically, making it easy to modify architectures and eliminating one common source of errors.
+* Lazy initialization can be convenient, allowing the framework to infer parameter shapes automatically, making it easy to modify architectures and eliminating one common source of errors.
 * We can pass data through the model to make the framework finally initialize parameters.
 
 
