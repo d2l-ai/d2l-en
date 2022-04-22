@@ -312,6 +312,11 @@ class BERTClassifier(nn.Module):
         self.encoder = bert.encoder
         self.hidden = bert.hidden
         self.output = nn.LazyLinear(3)
+        self.encoder(torch.zeros([1,128], dtype=torch.long), 
+                     torch.zeros([1,128], dtype=torch.long),
+                     torch.zeros([1], dtype=torch.long))
+        self.hidden(torch.zeros([1,256]))
+        self.output(torch.zeros([1,256]))
 
     def forward(self, inputs):
         tokens_X, segments_X, valid_lens_x = inputs
@@ -370,8 +375,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices,
 lr, num_epochs = 1e-4, 5
 trainer = torch.optim.Adam(net.parameters(), lr=lr)
 loss = nn.CrossEntropyLoss(reduction='none')
-d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices,
-               lazy=True)
+d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
 ## Summary

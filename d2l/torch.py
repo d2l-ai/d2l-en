@@ -1396,7 +1396,7 @@ def train_batch_ch13(net, X, y, loss, trainer, devices):
     return train_loss_sum, train_acc_sum
 
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
-               devices=d2l.try_all_gpus(), lazy=False):
+               devices=d2l.try_all_gpus()):
     """Defined in :numref:`sec_image_augmentation`"""
     """Train a model with mutiple GPUs (defined in Chapter 13).
 
@@ -1404,10 +1404,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
     timer, num_batches = d2l.Timer(), len(train_iter)
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
-    if lazy:
-        net = net.to(devices[0])
-    else:
-        net = nn.DataParallel(net, device_ids=devices).to(devices[0])
+    net = nn.DataParallel(net, device_ids=devices).to(devices[0])
     for epoch in range(num_epochs):
         # Sum of training loss, sum of training accuracy, no. of examples,
         # no. of predictions
@@ -2176,6 +2173,14 @@ class BERTModel(nn.Module):
                                     nn.Tanh())
         self.mlm = MaskLM(vocab_size, num_hiddens)
         self.nsp = NextSentencePred()
+
+        self.encoder(torch.zeros([1, 64], dtype=torch.long),
+                    torch.zeros([1, 64], dtype=torch.long),
+                    torch.zeros([1], dtype=torch.long))
+        self.hidden(torch.zeros([1, 128]))
+        self.mlm(torch.zeros([1, 64, 128]),
+                 torch.zeros([1, 10], dtype=torch.long))
+        self.nsp(torch.zeros([1, 128]))
 
     def forward(self, tokens, segments, valid_lens=None, pred_positions=None):
         encoded_X = self.encoder(tokens, segments, valid_lens)
