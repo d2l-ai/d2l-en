@@ -57,6 +57,7 @@ net.add(nn.Dense(10))
 
 ```{.python .input}
 %%tab pytorch
+from d2l import torch as d2l
 import torch
 from torch import nn
 
@@ -168,19 +169,18 @@ Once all parameter shapes are known,
 the framework can finally initialize the parameters.
 
 :begin_tab:`pytorch`
-In the following method,
-an input with specified shape
-will allow the framework
+The following method
+passes in an input
 to infer all parameter shapes
 before initializing parameters.
-This method is useful when default random initializations are not desired.
+It will be used later when default random initializations are not desired.
 :end_tab:
 
 ```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(d2l.Module)  #@save
-def apply_init(self, init, input_shape):
-    self.forward(torch.zeros(input_shape))
+def apply_init(self, init, X):
+    self.forward(X)
     self.net.apply(init)
 ```
 

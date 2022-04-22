@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -98,7 +98,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -113,7 +113,7 @@ from d2l import tensorflow as d2l
 
 ```{.python .input}
 %%tab pytorch
-def init_cnn_weights(module):  #@save
+def init_cnn(module):  #@save
     """Initialize weights for CNNs."""
     if type(module) == nn.Linear or type(module) == nn.Conv2d:
         nn.init.xavier_uniform_(module.weight)
@@ -251,7 +251,7 @@ trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=256)
 model = LeNet(lr=0.9)
 if tab.selected('pytorch'):
-    model.apply_init(init_cnn_weights, (1, 1, 28, 28))
+    model.apply_init(init_cnn, next(iter(data.get_dataloader(True)))[0])
 trainer.fit(model, data)
 ```
 

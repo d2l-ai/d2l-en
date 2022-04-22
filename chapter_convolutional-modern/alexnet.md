@@ -344,7 +344,7 @@ class AlexNet(d2l.Classifier):
                 nn.Linear(6400, 4096), nn.ReLU(), nn.Dropout(p=0.5),
                 nn.Linear(4096, 4096), nn.ReLU(),nn.Dropout(p=0.5),
                 nn.Linear(4096, num_classes))
-            self.net.apply(d2l.init_cnn_weights)
+            self.net.apply(d2l.init_cnn)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
                 tf.keras.layers.Conv2D(filters=96, kernel_size=11, strides=4,

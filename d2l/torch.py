@@ -218,9 +218,9 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         """Defined in :numref:`sec_classification`"""
         return torch.optim.SGD(self.parameters(), lr=self.lr)
 
-    def apply_init(self, init, input_shape):
+    def apply_init(self, init, X):
         """Defined in :numref:`sec_lazy_init`"""
-        self.forward(torch.zeros(input_shape))
+        self.forward(X)
         self.net.apply(init)
 
 class DataModule(d2l.HyperParameters):
@@ -515,7 +515,7 @@ def corr2d(X, K):
             Y[i, j] = d2l.reduce_sum((X[i: i + h, j: j + w] * K))
     return Y
 
-def init_cnn_weights(module):
+def init_cnn(module):
     """Initialize weights for CNNs.
 
     Defined in :numref:`sec_lenet`"""
@@ -884,7 +884,7 @@ class EncoderDecoder(d2l.Classifier):
                 attention_weights.append(self.decoder.attention_weights)
         return d2l.concat(outputs[1:], 1), attention_weights
 
-def init_seq2seq_weights(module):
+def init_seq2seq(module):
     """Initialize weights for Seq2Seq.
 
     Defined in :numref:`sec_seq2seq`"""
@@ -904,7 +904,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(embed_size, num_hiddens, num_layers, dropout)
-        self.apply(init_seq2seq_weights)
+        self.apply(init_seq2seq)
 
     def forward(self, X, *args):
         # X shape: (batch_size, num_steps)

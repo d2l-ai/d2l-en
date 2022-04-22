@@ -323,7 +323,7 @@ def __init__(self, num_channels=64, growth_rate=32, arch=(4, 4, 4, 4),
             nn.BatchNorm2d(num_channels), nn.ReLU(),
             nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(),
             nn.Linear(num_channels, num_classes)))
-        self.net.apply(d2l.init_cnn_weights)
+        self.net.apply(d2l.init_cnn)
     if tab.selected('tensorflow'):
         self.net = tf.keras.models.Sequential(self.b1())
         for i, num_convs in enumerate(arch):

@@ -329,7 +329,7 @@ def __init__(self, lr=0.1, num_classes=10):
     if tab.selected('pytorch'):
         self.net = nn.Sequential(self.b1(), self.b2(), self.b3(), self.b4(),
                                  self.b5(), nn.Linear(1024, num_classes))
-        self.net.apply(d2l.init_cnn_weights)
+        self.net.apply(d2l.init_cnn)
     if tab.selected('tensorflow'):
         self.net = tf.keras.Sequential([
             self.b1(), self.b2(), self.b3(), self.b4(), self.b5(),
