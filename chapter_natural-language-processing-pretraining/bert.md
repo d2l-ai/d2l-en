@@ -574,10 +574,10 @@ class BERTModel(nn.Module):
         self.encoder(torch.zeros([1, 64], dtype=torch.long), 
                     torch.zeros([1, 64], dtype=torch.long),
                     torch.zeros([1], dtype=torch.long))
-        self.hidden(torch.zeros([1, 128]))
-        self.mlm(torch.zeros([1, 64, 128]), 
+        self.hidden(torch.zeros([1, num_hiddens]))
+        self.mlm(torch.zeros([1, 64, num_hiddens]), 
                  torch.zeros([1, 10], dtype=torch.long))
-        self.nsp(torch.zeros([1, 128]))
+        self.nsp(torch.zeros([1, num_hiddens]))
 
     def forward(self, tokens, segments, valid_lens=None, pred_positions=None):
         encoded_X = self.encoder(tokens, segments, valid_lens)
