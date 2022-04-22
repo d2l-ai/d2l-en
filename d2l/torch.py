@@ -218,6 +218,11 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         """Defined in :numref:`sec_classification`"""
         return torch.optim.SGD(self.parameters(), lr=self.lr)
 
+    def apply_init(self, init, input_shape):
+        """Defined in :numref:`sec_lazy_init`"""
+        self.forward(torch.zeros(input_shape))
+        self.net.apply(init)
+
 class DataModule(d2l.HyperParameters):
     """Defined in :numref:`sec_oo-design`"""
     def __init__(self, root='../data', num_workers=4):

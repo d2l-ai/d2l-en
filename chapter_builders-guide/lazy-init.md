@@ -37,8 +37,6 @@ and subsequently modifying our models.
 Next, we go deeper into the mechanics of initialization.
 
 
-## Instantiating a Network
-
 To begin, let's instantiate an MLP.
 
 ```{.python .input}
@@ -168,6 +166,23 @@ only the first layer requires lazy initialization,
 but the framework initializes sequentially.
 Once all parameter shapes are known,
 the framework can finally initialize the parameters.
+
+:begin_tab:`pytorch`
+In the following method,
+an input with specified shape
+will allow the framework
+to infer all parameter shapes
+before initializing parameters.
+This method is useful when default random initializations are not desired.
+:end_tab:
+
+```{.python .input}
+%%tab pytorch
+@d2l.add_to_class(d2l.Module)  #@save
+def apply_init(self, init, input_shape):
+    self.forward(torch.zeros(input_shape))
+    self.net.apply(init)
+```
 
 ## Summary
 
