@@ -62,7 +62,6 @@ d2l.plt.show()
 ```{.python .input}
 #@tab jax
 %matplotlib inline
-import jax
 import jax.numpy as jnp
 from IPython import display
 from mpl_toolkits import mplot3d

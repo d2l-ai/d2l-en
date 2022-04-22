@@ -139,7 +139,6 @@ f'approximation: {grad_approx}, true Value: {true_value}'
 ```{.python .input}
 #@tab jax
 %matplotlib inline
-import jax
 import jax.numpy as jnp
 from jax import grad
 from IPython import display

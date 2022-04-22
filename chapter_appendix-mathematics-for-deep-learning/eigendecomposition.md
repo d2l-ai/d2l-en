@@ -121,7 +121,6 @@ tf.linalg.eig(tf.constant([[2, 1], [2, 3]], dtype=tf.float64))
 ```{.python .input}
 #@tab jax
 %matplotlib inline
-import jax
 import jax.numpy as jnp
 from jax import random
 from IPython import display

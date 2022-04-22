@@ -58,7 +58,6 @@ d2l.plot(x_big, ys, 'x', 'f(x)')
 ```{.python .input}
 #@tab jax
 %matplotlib inline
-import jax
 import jax.numpy as jnp
 from IPython import display
 from d2l import jax as d2l
