@@ -1,18 +1,15 @@
 # Overview of Model Explainability
 
-Artificial intelligence (AI) opens up unprecedented opportunities to numerous domains but also brings considerable concerns around trust, fairness, ethics, etc. When we put decisions into the hands of AI, we might suffer significant risks such as privacy violations and discrimination. The consequences may be catastrophic in some high-stakes domains such as medicine, finance, and law. For example, physicians will put patients' life at risk if they blindly trust a lung cancer detection model. Unsurprisingly, many AI practitioners and domain experts (e.g., doctors and policymakers) do not have confidence in AI-based decisions. The case is even worse for black-box models such as deep neural networks, as they are often criticized for being non-transparent and non-interpretable. These black-box algorithms are too complex to be comprehended by humans, and the working mechanism is a myth. To bridge this trust gap, we need to uncover the black boxes and make AI models transparent across the learning processes and predictions.
+Deep neural networks (DNN) have achieved breakthrough achievements in recent years. However, they are often criticized for being non-transparent as they are too complex to be comprehended by humans, and their working mechanism is a myth. As a result, many AI practitioners and domain experts (e.g., doctors and policymakers) do not have confidence in these algorithms. To bridge this trust gap, we need to uncover the black boxes and make deep neural networks transparent.
 
+Imagine that a hospital deployed a DNN classifier to predict whether patients have heart disease based on their medical records with attributes such as age, gender, blood pressure, and cholesterol :numref:`fig_xdl-intro`. Chances are that the doctors in the hospital will not trust the classifier. An effective way to increase their willingness to trust the classifier's outputs is producing explanations for the predictions. If the explanations show that the classifier performs consistent with the doctors' expertise (e.g., putting more weights on high risky factors such as the patients' blood pressure, cholesterol level, and electrocardiogram), the doctors may be more likely to use the classifier as an assistant when making decisions. Note that this is a simplified example. Making clinical decisions is an intricate errand and some studies suggest that explainability methods did not alter intended physician behavior :cite:`diprose2020physician`.
 
-Imagine that you applied for a mortgage from a bank to buy your first dream house, and your application was rejected ruthlessly by a black-box loan eligibility prediction model (which gets your heart broken). Still, you do not want to lose your dream home, so you decide to reapply. At this time, you may wonder if there is any way to increase the chances of getting your application approved. This is when explanations come into play (shown in :numref:`fig_xdl-intro`). If the bank also provided explanations for the rejection, say, due to your low credit score, you would no longer be clueless. You may try to raise your credit score by paying your credit card bills more regularly before resubmitting your application. The explanations are also valuable for auditors or regulators to check for the reasonableness of model predictions and vet if the model is suitable for a broader deployment.
-
-
-![An explainable loan eligibility prediction model.](../img/fig_xdl-intro.svg)
+![An explainable heart disease detection model.](../img/xdl-intro.svg)
 :label:`fig_xdl-intro`
 
-In recent years, methods that can produce human-understandable explanations for AI predictions is gaining popularity. Explanations are so crucial that the European Union [General Data Protection Regulation](https://en.wikipedia.org/wiki/General_Data_Protection_Regulation) mandates a "right to explanation" from AI models, i.e., an individual has the right to be given an explanation for an output of an AI algorithm.  By equipping AI models with explanations, we will provide recourse to individuals who are adversely affected by model predictions and earn the trust of AI practitioners and domain experts, which can boost the adoption and development of AI models. Moreover, good explanations can help detect model biases, ensure model fairness, speed up model debugging processes, strengthen model robustness, and even avoid privacy breaches.
+In recent years, methods that can produce human-understandable explanations for black-box models (e.g., DNN) are gaining popularity. The advantages of providing explanations are multifold: it can help earn the trust of end users (e.g., practitioners and domain experts) and boost model adoption and deployment; high-quality explanations can help detect model biases, speed up model debugging processes, strengthen model robustness, and even provide recourse to individuals who are adversely affected by model predictions.
 
-In this chapter, we will give a thorough introduction to model explainability (or interpretability, and they are used interchangeably in this chapter) to enable you to (1) get hands-on experiences in analyzing and explaining black-box models; (2) be familiar with popular and state-of-the-art algorithms on model explainability; (3) be aware of the perils and pitfalls in the domain.
-
+In this chapter, we will give a thorough introduction to model explainability (or interpretability, and they are used interchangeably in this chapter) to enable you to (1) get hands-on experiences in analyzing and explaining black-box models (especially DNN models); (2) be familiar with popular and state-of-the-art algorithms on model explainability; (3) be aware of the perils and pitfalls in the domain.
 
 ## Taxonomies in Model Explainability
 
@@ -59,6 +56,6 @@ We will lay out this chapter by first introducing global explanation methods (e.
 * Explanations can be on the entire model or at the instance level.
 * Perils and pitfalls exist in explanation methods.
 
-## Excersie
-* Can you name some scenarios where explanations are critical?
-* When should we use post-hoc explanation methods rather than self-explanatory methods?
+## Excersies
+1. Can you name some scenarios where explanations are critical?
+2. When should we use post-hoc explanation methods rather than self-explanatory methods?
