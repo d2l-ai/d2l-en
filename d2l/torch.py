@@ -218,10 +218,11 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         """Defined in :numref:`sec_classification`"""
         return torch.optim.SGD(self.parameters(), lr=self.lr)
 
-    def apply_init(self, init, X):
+    def apply_init(self, inputs, init=None):
         """Defined in :numref:`sec_lazy_init`"""
-        self.forward(X)
-        self.net.apply(init)
+        self.forward(*inputs)
+        if init is not None:
+            self.net.apply(init)
 
 class DataModule(d2l.HyperParameters):
     """Defined in :numref:`sec_oo-design`"""

@@ -170,7 +170,7 @@ the framework can finally initialize the parameters.
 
 :begin_tab:`pytorch`
 The following method
-passes in a dummy input
+passes in dummy inputs
 through the network
 for a dry run
 to infer all parameter shapes
