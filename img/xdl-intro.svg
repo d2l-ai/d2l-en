@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xl="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="400.1347 802 367.1397 134.75" width="367.1397" height="134.75">
+  <defs>
+    <font-face font-family="PingFang SC" font-size="11" panose-1="2 11 4 0 0 0 0 0 0 0" units-per-em="1000" underline-position="-150" underline-thickness="58" slope="0" x-height="600" cap-height="860" ascent="1060.0021" descent="-340.0007" font-weight="400">
+      <font-face-src>
+        <font-face-name name="PingFangSC-Regular"/>
+      </font-face-src>
+    </font-face>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-5 -3 6 6" markerWidth="6" markerHeight="6" color="black">
+      <g>
+        <path d="M -4 0 L 0 0 M 0 1.5 L -4 0 L 0 -1.5" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <font-face font-family="Helvetica Neue" font-size="9" panose-1="2 0 5 3 0 0 0 2 0 4" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="517" cap-height="714" ascent="951.9958" descent="-212.99744" font-weight="400">
+      <font-face-src>
+        <font-face-name name="HelveticaNeue"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="PingFang SC" font-size="9" panose-1="2 11 4 0 0 0 0 0 0 0" units-per-em="1000" underline-position="-150" underline-thickness="58" slope="0" x-height="600" cap-height="860" ascent="1060.0021" descent="-340.0007" font-weight="400">
+      <font-face-src>
+        <font-face-name name="PingFangSC-Regular"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <metadata> Produced by OmniGraffle 7.19.4\n2022-04-25 18:48:15 +0000</metadata>
+  <g id="Canvas_4" stroke-opacity="1" stroke-dasharray="none" fill="none" fill-opacity="1" stroke="none">
+    <title>Canvas 4</title>
+    <g id="Canvas_4_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_27">
+        <rect x="507.5451" y="897" width="72.512" height="34.5" fill="#b2d9ff"/>
+        <rect x="507.5451" y="897" width="72.512" height="34.5" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(512.5451 898.25)" fill="black">
+          <tspan font-family="PingFang SC" font-size="11" font-weight="400" fill="black" x="14.7945" y="12">Neural </tspan>
+          <tspan font-family="PingFang SC" font-size="11" font-weight="400" fill="black" x="7.2265005" y="28">Networks</tspan>
+        </text>
+      </g>
+      <g id="Graphic_26">
+        <rect x="507.5451" y="823.6" width="72.512" height="34.5" fill="#66bfff"/>
+        <rect x="507.5451" y="823.6" width="72.512" height="34.5" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(512.5451 824.85)" fill="black">
+          <tspan font-family="PingFang SC" font-size="11" font-weight="400" fill="black" x="1.5560005" y="12">Explanation </tspan>
+          <tspan font-family="PingFang SC" font-size="11" font-weight="400" fill="black" x="9.1185" y="28">Methods</tspan>
+        </text>
+      </g>
+      <g id="Graphic_25">
+        <rect x="610.75" y="899.75" width="67.3315" height="29" fill="#b2d9ff"/>
+        <rect x="610.75" y="899.75" width="67.3315" height="29" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(615.75 906.25)" fill="black">
+          <tspan font-family="PingFang SC" font-size="11" font-weight="400" fill="black" x="0" y="12">Predictions</tspan>
+        </text>
+      </g>
+      <g id="Line_24">
+        <line x1="502.11044" y1="896.6325" x2="491.6036" y2="892.1926" marker-start="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_23">
+        <line x1="501.97295" y1="855.4076" x2="491.6036" y2="859.0165" marker-start="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_22">
+        <line x1="604.85" y1="914.25" x2="580.0571" y2="914.25" marker-start="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_21">
+        <line x1="543.8011" y1="864" x2="543.8011" y2="897" marker-start="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_40">
+        <text transform="translate(691.2744 902)" fill="black">
+          <tspan font-family="PingFang SC" font-size="11" font-weight="400" fill="black" x="15.425" y="12">Doctors</tspan>
+        </text>
+      </g>
+      <g id="Graphic_51">
+        <ellipse cx="644.41575" cy="840.85" rx="48.4172023658159" ry="38.350061824921" fill="white"/>
+        <ellipse cx="644.41575" cy="840.85" rx="48.4172023658159" ry="38.350061824921" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_52">
+        <rect x="613.4634" y="816.5625" width="28.86948" height="11.25" fill="#66bfff"/>
+        <rect x="613.4634" y="816.5625" width="28.86948" height="11.25" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(618.4634 816.5615)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" font-weight="400" fill="black" x="1.519241" y="9">Age</tspan>
+        </text>
+      </g>
+      <g id="Graphic_53">
+        <rect x="613.4634" y="832.0625" width="72.512" height="11.25" fill="#66bfff"/>
+        <rect x="613.4634" y="832.0625" width="72.512" height="11.25" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(618.4634 832.0615)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" font-weight="400" fill="black" x=".7505005" y="9">Blood pressure</tspan>
+        </text>
+      </g>
+      <g id="Graphic_54">
+        <rect x="613.4634" y="857.0625" width="54.36948" height="11.25" fill="#66bfff"/>
+        <rect x="613.4634" y="857.0625" width="54.36948" height="11.25" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(618.4634 857.0615)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" font-weight="400" fill="black" x=".51274007" y="9">Chest pain</tspan>
+        </text>
+      </g>
+      <g id="Graphic_56">
+        <text transform="translate(615.7067 841.5625)" fill="black">
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="0" y="10">…</tspan>
+        </text>
+      </g>
+      <g id="Graphic_61">
+        <rect x="610.7067" y="816.5625" width="2.756691" height="51.75" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_66">
+        <line x1="590.0986" y1="840.85" x2="580.0571" y2="840.85" marker-start="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_71"/>
+      <g id="Graphic_74">
+        <rect x="405.5" y="848.125" width="86.10362" height="51.75" fill="#b2d9ff"/>
+        <rect x="405.5" y="848.125" width="86.10362" height="51.75" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(410.5 848)" fill="black">
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="0" y="10">- Age </tspan>
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="0" y="23">- Blood pressure</tspan>
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="0" y="36">- Chest pain </tspan>
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="0" y="49">- …</tspan>
+        </text>
+      </g>
+      <g id="Line_79">
+        <line x1="687.591" y1="858.2284" x2="708.7744" y2="866.7549" stroke="#7f8080" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+      </g>
+      <g id="Graphic_84">
+        <title>Accessibility</title>
+        <path d="M 726.7744 854 C 728.9744 854 730.7744 855.8 730.7744 858 C 730.7744 860.2 728.9744 862 726.7744 862 C 724.5744 862 722.7744 860.2 722.7744 858 C 722.7744 855.8 724.5744 854 726.7744 854 Z M 744.7744 868 L 732.7744 868 L 732.7744 894 L 728.7744 894 L 728.7744 882 L 724.7744 882 L 724.7744 894 L 720.7744 894 L 720.7744 868 L 708.7744 868 L 708.7744 864 L 744.7744 864 L 744.7744 868 Z" fill="black"/>
+      </g>
+      <g id="Line_85">
+        <line x1="720.7744" y1="876.9323" x2="674.0853" y2="899.75" stroke="#7f8080" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+      </g>
+      <g id="Graphic_87">
+        <text transform="translate(405.1347 904.75)" fill="black">
+          <tspan font-family="PingFang SC" font-size="11" font-weight="400" fill="black" x=".6656257" y="12">Medical Records </tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>
