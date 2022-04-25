@@ -172,7 +172,7 @@ the framework can finally initialize the parameters.
 The following method
 passes in a dummy input
 through the network
-for a dry-run
+for a dry run
 to infer all parameter shapes
 and subsequently initializes the parameters.
 It will be used later when default random initializations are not desired.
