@@ -56,6 +56,6 @@ We will lay out this chapter by first introducing global explanation methods (e.
 * Explanations can be on the entire model or at the instance level.
 * Perils and pitfalls exist in explanation methods.
 
-## Excersies
+## Exercises
 1. Can you name some scenarios where explanations are critical?
-2. When should we use post-hoc explanation methods rather than self-explanatory methods?
+1. When should we use post-hoc explanation methods rather than self-explanatory methods?
