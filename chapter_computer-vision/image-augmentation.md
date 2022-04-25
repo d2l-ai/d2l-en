@@ -409,7 +409,7 @@ def train_with_data_aug(train_augs, test_augs, net, lr=0.001):
 ```{.python .input}
 #@tab pytorch
 batch_size, devices, net = 256, d2l.try_all_gpus(), d2l.resnet18(10, 3)
-net.apply(d2l.init_cnn_weights)
+net.apply(d2l.init_cnn)
 
 def train_with_data_aug(train_augs, test_augs, net, lr=0.001):
     train_iter = load_cifar10(True, train_augs, batch_size)

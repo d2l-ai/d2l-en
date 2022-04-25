@@ -113,7 +113,7 @@ from d2l import tensorflow as d2l
 
 ```{.python .input}
 %%tab pytorch
-def init_cnn_weights(module):  #@save
+def init_cnn(module):  #@save
     """Initialize weights for CNNs."""
     if type(module) == nn.Linear or type(module) == nn.Conv2d:
         nn.init.xavier_uniform_(module.weight)
@@ -147,8 +147,6 @@ class LeNet(d2l.Classifier):
                 nn.LazyLinear(120), nn.Sigmoid(),
                 nn.LazyLinear(84), nn.Sigmoid(),
                 nn.LazyLinear(num_classes))
-            self.net(torch.zeros(1, 1, 28, 28))
-            self.net.apply(init_cnn_weights)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
                 tf.keras.layers.Conv2D(filters=6, kernel_size=5,
@@ -252,6 +250,8 @@ and we minimize it via minibatch stochastic gradient descent.
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=256)
 model = LeNet(lr=0.9)
+if tab.selected('pytorch'):
+    model.apply_init([next(iter(data.get_dataloader(True)))[0]], init_cnn)
 trainer.fit(model, data)
 ```
 

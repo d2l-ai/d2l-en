@@ -209,7 +209,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
 
 ```{.python .input}
 %%tab pytorch
-def init_seq2seq_weights(module):  #@save
+def init_seq2seq(module):  #@save
     """Initialize weights for Seq2Seq."""
     if type(module) == nn.Linear:
          nn.init.xavier_uniform_(module.weight)
@@ -225,7 +225,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(embed_size, num_hiddens, num_layers, dropout)
-        self.apply(init_seq2seq_weights)
+        self.apply(init_seq2seq)
             
     def forward(self, X, *args):
         # X shape: (batch_size, num_steps)
@@ -389,7 +389,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         self.rnn = d2l.GRU(embed_size+num_hiddens, num_hiddens,
                            num_layers, dropout)
         self.dense = nn.Linear(num_hiddens, vocab_size)
-        self.apply(init_seq2seq_weights)
+        self.apply(init_seq2seq)
             
     def init_state(self, enc_outputs, *args):
         return enc_outputs[1] 

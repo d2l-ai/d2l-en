@@ -126,7 +126,7 @@ class NiN(d2l.Classifier):
                           padding=1),
                 nn.AdaptiveAvgPool2d((1, 1)),
                 nn.Flatten())
-            self.net.apply(d2l.init_cnn_weights)
+            self.net.apply(d2l.init_cnn)
 ```
 
 We create a data example to see [**the output shape of each block**].

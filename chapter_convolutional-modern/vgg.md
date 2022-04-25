@@ -176,7 +176,7 @@ class VGG(d2l.Classifier):
                 nn.Linear(out_channels * 7 * 7, 4096), nn.ReLU(), nn.Dropout(0.5),
                 nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
                 nn.Linear(4096, num_classes))
-            self.net.apply(d2l.init_cnn_weights)
+            self.net.apply(d2l.init_cnn)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential()
             for (num_convs, num_channels) in arch:
