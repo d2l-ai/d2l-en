@@ -347,7 +347,6 @@ from IPython import display
 import math
 from matplotlib import pyplot as plt
 from matplotlib_inline import backend_inline
-from sklearn import model_selection
 import os
 import pandas as pd
 import random
