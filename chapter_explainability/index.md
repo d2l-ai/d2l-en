@@ -6,6 +6,5 @@
 :maxdepth: 2
 
 intro
-global_model_analysis
 ```
 
