@@ -170,9 +170,11 @@ the framework can finally initialize the parameters.
 
 :begin_tab:`pytorch`
 The following method
-passes in an input
+passes in a dummy input
+through the network
+for a dry-run
 to infer all parameter shapes
-before initializing parameters.
+and subsequently initializes the parameters.
 It will be used later when default random initializations are not desired.
 :end_tab:
 
