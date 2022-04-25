@@ -251,7 +251,7 @@ trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=256)
 model = LeNet(lr=0.9)
 if tab.selected('pytorch'):
-    model.apply_init(init_cnn, next(iter(data.get_dataloader(True)))[0])
+    model.apply_init([next(iter(data.get_dataloader(True)))[0]], init_cnn)
 trainer.fit(model, data)
 ```
 
