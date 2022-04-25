@@ -360,9 +360,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
 #@save
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                devices=d2l.try_all_gpus()):
-    """Train a model with mutiple GPUs (defined in Chapter 13).
-
-    Defined in :numref:`sec_image_augmentation`"""
+    """Train a model with mutiple GPUs (defined in Chapter 13)."""
     timer, num_batches = d2l.Timer(), len(train_iter)
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
