@@ -169,11 +169,11 @@ class PositionWiseFFN(nn.Block):
 #@save
 class PositionWiseFFN(nn.Module):
     """Positionwise feed-forward network."""
-    def __init__(self, ffn_num_input, ffn_num_hiddens, ffn_num_outputs):
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs):
         super().__init__()
-        self.dense1 = nn.Linear(ffn_num_input, ffn_num_hiddens)
+        self.dense1 = nn.LazyLinear(ffn_num_hiddens)
         self.relu = nn.ReLU()
-        self.dense2 = nn.Linear(ffn_num_hiddens, ffn_num_outputs)
+        self.dense2 = nn.LazyLinear(ffn_num_outputs)
 
     def forward(self, X):
         return self.dense2(self.relu(self.dense1(X)))
@@ -213,7 +213,7 @@ ffn(np.ones((2, 3, 4)))[0]
 
 ```{.python .input}
 %%tab pytorch
-ffn = PositionWiseFFN(4, 4, 8)
+ffn = PositionWiseFFN(4, 8)
 ffn.eval()
 ffn(d2l.ones((2, 3, 4)))[0]
 ```
@@ -390,16 +390,13 @@ class EncoderBlock(nn.Block):
 #@save
 class EncoderBlock(nn.Module):
     """Transformer encoder block."""
-    def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
-                 dropout, use_bias=False):
+    def __init__(self, num_hiddens, norm_shape, ffn_num_hiddens, 
+                 num_heads, dropout, use_bias=False):
         super().__init__()
-        self.attention = d2l.MultiHeadAttention(
-            key_size, query_size, value_size, num_hiddens, num_heads, dropout,
-            use_bias)
+        self.attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 
+                                                dropout, use_bias)
         self.addnorm1 = AddNorm(norm_shape, dropout)
-        self.ffn = PositionWiseFFN(
-            ffn_num_input, ffn_num_hiddens, num_hiddens)
+        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(norm_shape, dropout)
 
     def forward(self, X, valid_lens):
@@ -445,7 +442,7 @@ d2l.check_shape(encoder_blk(X, valid_lens), X.shape)
 %%tab pytorch
 X = d2l.ones((2, 100, 24))
 valid_lens = d2l.tensor([3, 2])
-encoder_blk = EncoderBlock(24, 24, 24, 24, [100, 24], 24, 48, 8, 0.5)
+encoder_blk = EncoderBlock(24, [100, 24], 48, 8, 0.5)
 encoder_blk.eval()
 d2l.check_shape(encoder_blk(X, valid_lens), X.shape)
 ```
@@ -503,8 +500,7 @@ class TransformerEncoder(d2l.Encoder):
 #@save
 class TransformerEncoder(d2l.Encoder):
     """Transformer encoder."""
-    def __init__(self, vocab_size, key_size, query_size, value_size,
-                 num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
+    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_hiddens,
                  num_heads, num_layers, dropout, use_bias=False):
         super().__init__()
         self.num_hiddens = num_hiddens
@@ -513,8 +509,7 @@ class TransformerEncoder(d2l.Encoder):
         self.blks = nn.Sequential()
         for i in range(num_layers):
             self.blks.add_module("block"+str(i),
-                EncoderBlock(key_size, query_size, value_size, num_hiddens,
-                             norm_shape, ffn_num_input, ffn_num_hiddens,
+                EncoderBlock(num_hiddens, norm_shape, ffn_num_hiddens,
                              num_heads, dropout, use_bias))
 
     def forward(self, X, valid_lens):
@@ -574,7 +569,7 @@ d2l.check_shape(encoder(np.ones((2, 100)), valid_lens), (2, 100, 24))
 ```{.python .input}
 %%tab pytorch
 encoder = TransformerEncoder(
-    200, 24, 24, 24, 24, [100, 24], 24, 48, 8, 2, 0.5)
+    200, 24, [100, 24], 48, 8, 2, 0.5)
 d2l.check_shape(encoder(d2l.ones((2, 100), dtype=torch.long), valid_lens),
                 (2, 100, 24))
 ```
@@ -677,19 +672,17 @@ class DecoderBlock(nn.Block):
 %%tab pytorch
 class DecoderBlock(nn.Module):
     # The i-th block in the decoder
-    def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
+    def __init__(self, num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
                  dropout, i):
         super().__init__()
         self.i = i
-        self.attention1 = d2l.MultiHeadAttention(
-            key_size, query_size, value_size, num_hiddens, num_heads, dropout)
+        self.attention1 = d2l.MultiHeadAttention(num_hiddens, num_heads, 
+                                                 dropout)
         self.addnorm1 = AddNorm(norm_shape, dropout)
-        self.attention2 = d2l.MultiHeadAttention(
-            key_size, query_size, value_size, num_hiddens, num_heads, dropout)
+        self.attention2 = d2l.MultiHeadAttention(num_hiddens, num_heads, 
+                                                 dropout)
         self.addnorm2 = AddNorm(norm_shape, dropout)
-        self.ffn = PositionWiseFFN(ffn_num_input, ffn_num_hiddens,
-                                   num_hiddens)
+        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm3 = AddNorm(norm_shape, dropout)
 
     def forward(self, X, state):
@@ -789,7 +782,7 @@ d2l.check_shape(decoder_blk(X, state)[0], X.shape)
 
 ```{.python .input}
 %%tab pytorch
-decoder_blk = DecoderBlock(24, 24, 24, 24, [100, 24], 24, 48, 8, 0.5, 0)
+decoder_blk = DecoderBlock(24, [100, 24], 48, 8, 0.5, 0)
 X = d2l.ones((2, 100, 24))
 state = [encoder_blk(X, valid_lens), valid_lens, [None]]
 d2l.check_shape(decoder_blk(X, state)[0], X.shape)
@@ -854,8 +847,7 @@ class TransformerDecoder(d2l.AttentionDecoder):
 ```{.python .input}
 %%tab pytorch
 class TransformerDecoder(d2l.AttentionDecoder):
-    def __init__(self, vocab_size, key_size, query_size, value_size,
-                 num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
+    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_hiddens,
                  num_heads, num_layers, dropout):
         super().__init__()
         self.num_hiddens = num_hiddens
@@ -865,10 +857,9 @@ class TransformerDecoder(d2l.AttentionDecoder):
         self.blks = nn.Sequential()
         for i in range(num_layers):
             self.blks.add_module("block"+str(i),
-                DecoderBlock(key_size, query_size, value_size, num_hiddens,
-                             norm_shape, ffn_num_input, ffn_num_hiddens,
+                DecoderBlock(num_hiddens, norm_shape, ffn_num_hiddens,
                              num_heads, dropout, i))
-        self.dense = nn.Linear(num_hiddens, vocab_size)
+        self.dense = nn.LazyLinear(vocab_size)
 
     def init_state(self, enc_outputs, enc_valid_lens):
         return [enc_outputs, enc_valid_lens, [None] * self.num_layers]
@@ -962,13 +953,11 @@ if tab.selected('mxnet'):
         num_layers, dropout)
 if tab.selected('pytorch'):
     encoder = TransformerEncoder(
-        len(data.src_vocab), key_size, query_size, value_size, num_hiddens,
-        norm_shape, ffn_num_input, ffn_num_hiddens, num_heads, num_layers,
-        dropout)
+        len(data.src_vocab), num_hiddens, norm_shape, ffn_num_hiddens, 
+        num_heads, num_layers, dropout)
     decoder = TransformerDecoder(
-        len(data.tgt_vocab), key_size, query_size, value_size, num_hiddens,
-        norm_shape, ffn_num_input, ffn_num_hiddens, num_heads, num_layers,
-        dropout)
+        len(data.tgt_vocab), num_hiddens, norm_shape, ffn_num_hiddens, 
+        num_heads, num_layers, dropout)
 if tab.selected('mxnet', 'pytorch'):
     model = d2l.Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
                         lr=0.001)
