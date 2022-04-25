@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -98,7 +98,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
