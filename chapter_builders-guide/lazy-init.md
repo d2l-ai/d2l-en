@@ -181,7 +181,10 @@ It will be used later when default random initializations are not desired.
 ```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(d2l.Module)  #@save
-def apply_init(self, init, X):
+def apply_init(self, X, init=None):
+    self.forward(*X)
+    if init is not None:
+        self.net.apply(init)
     self.forward(X)
     self.net.apply(init)
 ```
