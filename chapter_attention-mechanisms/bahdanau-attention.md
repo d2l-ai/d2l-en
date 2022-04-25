@@ -209,7 +209,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
             embed_size + num_hiddens, num_hiddens, num_layers,
             dropout=dropout)
         self.dense = nn.LazyLinear(vocab_size)
-        self.apply(d2l.init_seq2seq_weights)
+        self.apply(d2l.init_seq2seq)
 
     def init_state(self, enc_outputs, enc_valid_lens):
         # Shape of outputs: (num_steps, batch_size, num_hiddens).

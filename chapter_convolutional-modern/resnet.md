@@ -326,7 +326,7 @@ def __init__(self, arch, lr=0.1, num_classes=10):
         self.net.add_module('last', nn.Sequential(
             nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(),
             nn.Linear(arch[-1][-1], num_classes)))
-        self.net.apply(d2l.init_cnn_weights)
+        self.net.apply(d2l.init_cnn)
     if tab.selected('tensorflow'):
         self.net = tf.keras.models.Sequential(self.b1())
         for i, b in enumerate(arch):

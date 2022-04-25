@@ -388,7 +388,7 @@ def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
         self.net.add_module('head', nn.Sequential(
             nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(),
             nn.Linear(arch[-1][2], num_classes)))
-        self.net.apply(d2l.init_cnn_weights)
+        self.net.apply(d2l.init_cnn)
 ```
 
 ## The RegNet Design Space
