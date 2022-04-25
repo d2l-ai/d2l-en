@@ -94,7 +94,7 @@ As can be seen, all the 34 fields are categorical features. Each value represent
 
 ## Exercises
 
-* Can you load the Criteo and Avazu dataset with the provided `CTRDataset`. It is worth noting that the Criteo dataset consisting of real-valued features so you may have to revise the code a bit.
+* Can you load the Criteo and Avazu datasets with the provided `CTRDataset`? It is worth noting that the Criteo dataset consisting of real-valued features so you may have to revise the code a bit.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/405)

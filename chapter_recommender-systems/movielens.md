@@ -141,7 +141,7 @@ def split_and_load_ml100k(split_mode='seq-aware', feedback='explicit',
 
 ## Summary
 
-* MovieLens datasets are widely used for recommendation research. It is public available and free to use.
+* MovieLens datasets are widely used for recommendation research. It is publicly available and free to use.
 * We define functions to download and preprocess the MovieLens 100k dataset for further use in later sections.
 
 
