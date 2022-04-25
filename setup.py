@@ -7,9 +7,7 @@ requirements = [
     'matplotlib',
     'requests',
     'pandas',
-    'gym',
-    'seaborn',
-    'scikit-learn'
+    'gym'
 ]
 
 setup(
