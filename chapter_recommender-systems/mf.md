@@ -37,19 +37,25 @@ An intuitive illustration of the matrix factorization model is shown below:
 
 In the rest of this section, we will explain the implementation of matrix factorization and train the model on the MovieLens dataset.
 
-```{.python .input  n=2}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
 npx.set_np()
 ```
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
 
 ## Model Implementation
 
 First, we implement the matrix factorization model described above. The user and item latent factors can be created with the `nn.Embedding`. The `input_dim` is the number of items/users and the (`output_dim`) is the dimension of the latent factors ($k$).  We can also use `nn.Embedding` to create the user/item biases by setting the `output_dim` to one. In the `forward` function, user and item ids are used to look up the embeddings.
 
-```{.python .input  n=4}
+```{.python .input}
 class MF(nn.Block):
     def __init__(self, num_factors, num_users, num_items, **kwargs):
         super(MF, self).__init__(**kwargs)
@@ -66,6 +72,24 @@ class MF(nn.Block):
         outputs = (P_u * Q_i).sum(axis=1) + np.squeeze(b_u) + np.squeeze(b_i)
         return outputs.flatten()
 ```
+```{.python .input}
+#@tab pytorch
+class MF(nn.Module):
+    def __init__(self, num_factors, num_users, num_items, **kwargs):
+        super(MF, self).__init__(**kwargs)
+        self.P = nn.Embedding(num_embeddings=num_users, embedding_dim=num_factors)
+        self.Q = nn.Embedding(num_embeddings=num_items, embedding_dim=num_factors)
+        self.user_bias = nn.Embedding(num_users, 1)
+        self.item_bias = nn.Embedding(num_items, 1)
+
+    def forward(self, user_id, item_id):
+        P_u = self.P(user_id)
+        Q_i = self.Q(item_id)
+        b_u = self.user_bias(user_id)
+        b_i = self.item_bias(item_id)
+        outputs = (P_u * Q_i).sum(axis=1) + torch.squeeze(b_u) + torch.squeeze(b_i)
+        return outputs.flatten()
+```
 
 ## Evaluation Measures
 
@@ -77,7 +101,7 @@ $$
 
 where $\mathcal{T}$ is the set consisting of pairs of users and items that you want to evaluate on. $|\mathcal{T}|$ is the size of this set. We can use the RMSE function provided by `mx.metric`.
 
-```{.python .input  n=3}
+```{.python .input}
 def evaluator(net, test_iter, devices):
     rmse = mx.metric.RMSE()  # Get the RMSE
     rmse_list = []
@@ -90,13 +114,41 @@ def evaluator(net, test_iter, devices):
         rmse_list.append(rmse.get()[1])
     return float(np.mean(np.array(rmse_list)))
 ```
+```{.python .input}
+#@tab pytorch
+# RMSE loss based on https://discuss.pytorch.org/t/rmse-loss-function/16540/4
+class RMSELoss(nn.Module):
+    def __init__(self, eps=1e-6):
+        super().__init__()
+        self.mse = nn.MSELoss()
+        self.eps = eps
+        
+    def forward(self, yhat, y):
+        loss = torch.sqrt(self.mse(yhat, y) + self.eps)
+        return loss
+
+# convert tuple to tensor based on https://discuss.pytorch.org/t/convert-a-tuple-into-tensor/82964/3
+def tuple_to_tensor(tuple_tensors):
+    return torch.stack(tuple_tensors, dim=0)
+    
+def evaluator(net, test_iter, devices):
+    rmse = RMSELoss()  # Get the RMSE
+    rmse_list = []
+    for idx, (users, items, ratings) in enumerate(test_iter):
+        u = nn.parallel.scatter(users, devices)
+        i = nn.parallel.scatter(items, devices)
+        r_ui = nn.parallel.scatter(ratings, devices)
+        r_hat = [net(u, i) for u, i in zip(u, i)]
+        rmse_list.append(rmse(tuple_to_tensor(r_hat), tuple_to_tensor(r_ui)))
+    return float(torch.mean(torch.tensor(rmse_list)))
+```
 
 ## Training and Evaluating the Model
 
 
 In the training function, we adopt the $\ell_2$ loss with weight decay. The weight decay mechanism has the same effect as the $\ell_2$ regularization.
 
-```{.python .input  n=4}
+```{.python .input}
 #@save
 def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                         devices=d2l.try_all_gpus(), evaluator=None,
@@ -134,10 +186,54 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
           f'on {str(devices)}')
 ```
+```{.python .input}
+#@tab pytorch
+#@save
+def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
+                        devices=d2l.try_all_gpus(), evaluator=None,
+                        **kwargs):
+    def init_weights(layer):
+        if type(layer) == nn.Embedding:
+            torch.nn.init.normal_(layer.weight, std=0.01)
+    net.apply(init_weights)
+    # Set the model on multiple GPUs
+    net = nn.DataParallel(net, device_ids=devices)
+    timer = d2l.Timer()
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 2],
+                            legend=['train loss', 'test RMSE'])
+    for epoch in range(num_epochs):
+        metric, l = d2l.Accumulator(3), 0.
+        for i, values in enumerate(train_iter):
+            timer.start()
+            trainer.zero_grad()
+            input_data = []
+            values = values if isinstance(values, list) else [values]
+            for v in values:
+                input_data.append(nn.parallel.scatter(v, devices))
+            train_feat = input_data[0:-1] if len(values) > 1 else input_data
+            train_label = [x.float() for x in input_data[-1]]
+            preds = [net(*t).float() for t in zip(*train_feat)]
+            ls = [loss(p, s) for p, s in zip(preds, train_label)]
+            [l.mean().backward() for l in ls]
+            l += sum([l for l in ls]).mean() / len(devices)
+            trainer.step()
+            metric.add(l, values[0].shape[0], values[0].numel())
+            timer.stop()
+        if len(kwargs) > 0:  # It will be used in section AutoRec
+            test_rmse = evaluator(net, test_iter, kwargs['inter_mat'], devices)
+        else:
+            test_rmse = evaluator(net, test_iter, devices)
+        train_l = (l / (i + 1)).cpu().detach().numpy()
+        animator.add(epoch + 1, (train_l, test_rmse))
+    print(f'train loss {metric[0] / metric[1]:.3f}, '
+          f'test RMSE {test_rmse:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(devices)}')
+```
 
 Finally, let's put all things together and train the model. Here, we set the latent factor dimension to 30.
 
-```{.python .input  n=5}
+```{.python .input}
 devices = d2l.try_all_gpus()
 num_users, num_items, train_iter, test_iter = d2l.split_and_load_ml100k(
     test_ratio=0.1, batch_size=512)
@@ -150,12 +246,30 @@ trainer = gluon.Trainer(net.collect_params(), optimizer,
 train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                     devices, evaluator)
 ```
+```{.python .input}
+#@tab pytorch
+devices = d2l.try_all_gpus()
+num_users, num_items, train_iter, test_iter = d2l.split_and_load_ml100k(
+    test_ratio=0.1, batch_size=512)
+net = MF(30, num_users, num_items)
+lr, num_epochs, wd = 0.002, 20, 1e-5
+loss = nn.MSELoss('none')
+trainer = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=wd)
+train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
+                    devices, evaluator)
+```
 
 Below, we use the trained model to predict the rating that a user (ID 20) might give to an item (ID 30).
 
-```{.python .input  n=6}
+```{.python .input}
 scores = net(np.array([20], dtype='int', ctx=devices[0]),
              np.array([30], dtype='int', ctx=devices[0]))
+scores
+```
+```{.python .input}
+#@tab pytorch
+scores = net(torch.tensor([20], dtype=torch.int, device=devices[0]),
+             torch.tensor([30], dtype=torch.int, device=devices[0]))
 scores
 ```
 
