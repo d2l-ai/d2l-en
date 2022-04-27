@@ -15,6 +15,7 @@ The question then becomes something that on the surface is no easier: how do we 
 Let's take $x$ and try to understand what happens when we change it by a small amount to $x + \epsilon$. If you wish to be concrete, think a number like $\epsilon = 0.0000001$.  To help us visualize what happens, let's graph an example function, $f(x) = \sin(x^x)$, over the $[0, 3]$.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -58,6 +59,7 @@ d2l.plot(x_big, ys, 'x', 'f(x)')
 At this large scale, the function's behavior is not simple. However, if we reduce our range to something smaller like $[1.75,2.25]$, we see that the graph becomes much simpler.
 
 ```{.python .input}
+#@tab mxnet
 # Plot a the same function in a tiny range
 x_med = np.arange(1.75, 2.25, 0.001)
 ys = np.sin(x_med**x_med)
@@ -83,6 +85,7 @@ d2l.plot(x_med, ys, 'x', 'f(x)')
 Taking this to an extreme, if we zoom into a tiny segment, the behavior becomes far simpler: it is just a straight line.
 
 ```{.python .input}
+#@tab mxnet
 # Plot a the same function in a tiny range
 x_small = np.arange(2.0, 2.01, 0.0001)
 ys = np.sin(x_small**x_small)
@@ -263,6 +266,7 @@ $$
 approximates the value of $f$ by a line which passes through the point $(x, f(x))$ and has slope $\frac{df}{dx}(x)$.  In this way we say that the derivative gives a linear approximation to the function $f$, as illustrated below:
 
 ```{.python .input}
+#@tab mxnet
 # Compute sin
 xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
@@ -345,6 +349,7 @@ $$
 If we have some original function $f(x)$ in mind, we may compute the first two derivatives and find the values for $a, b$, and $c$ that make them match this computation.  Similarly to the previous section where we saw that the first derivative gave the best approximation with a straight line, this construction provides the best approximation by a quadratic.  Let's visualize this for $f(x) = \sin(x)$.
 
 ```{.python .input}
+#@tab mxnet
 # Compute sin
 xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
@@ -441,6 +446,7 @@ $$
 Let's see how this works in code and observe how increasing the degree of the Taylor approximation brings us closer to the desired function $e^x$.
 
 ```{.python .input}
+#@tab mxnet
 # Compute the exponential function
 xs = np.arange(0, 3, 0.01)
 ys = np.exp(xs)

@@ -417,6 +417,7 @@ Here is how we import modules from TensorFlow.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 #@save
 from mxnet import autograd, context, gluon, image, init, np, npx
 from mxnet.gluon import nn, rnn

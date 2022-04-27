@@ -20,6 +20,7 @@ let's apply them
 in the word similarity and analogy tasks.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 import os
@@ -147,6 +148,7 @@ we implement the following `knn`
 ($k$-nearest neighbors) function.
 
 ```{.python .input}
+#@tab mxnet
 def knn(W, x, k):
     # Add 1e-9 for numerical stability
     cos = np.dot(W, x.reshape(-1,)) / (

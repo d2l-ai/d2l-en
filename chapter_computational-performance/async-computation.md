@@ -8,6 +8,7 @@ For PyTorch, by default, GPU operations are asynchronous. When you call a functi
 Hence, understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and mutual dependencies. This allows us to reduce memory overhead and increase processor utilization.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 import numpy, os, subprocess
 from mxnet import autograd, gluon, np, npx
@@ -35,6 +36,7 @@ Note that PyTorch `tensor` is defined on a GPU.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark('numpy'):
     for _ in range(10):
         a = numpy.random.normal(size=(1000, 1000))
@@ -82,6 +84,7 @@ while the frontend returns control to Python.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark():
     for _ in range(10):
         a = np.random.normal(size=(1000, 1000))
@@ -120,6 +123,7 @@ Hence, it is not possible to parallelize operations that depend on each other.
 Let's look at another toy example to understand the dependency graph a bit better.
 
 ```{.python .input}
+#@tab mxnet
 x = np.ones((1, 2))
 y = np.ones((1, 2))
 z = x * y + 2
@@ -160,6 +164,7 @@ Let's see how this works in practice.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark('waitall'):
     b = np.dot(a, a)
     npx.waitall()
@@ -176,6 +181,7 @@ Copying small amounts of data frequently from MXNet's scope to NumPy and back ca
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark('numpy conversion'):
     b = np.dot(a, a)
     b.asnumpy()
@@ -192,6 +198,7 @@ On a heavily multithreaded system (even regular laptops have 4 threads or more a
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark('synchronous'):
     for _ in range(10000):
         y = x + 1

@@ -24,6 +24,7 @@ for the success of AlexNet at that time.
 In this section we will discuss this widely used technique in computer vision.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, image, init, np, npx
@@ -46,6 +47,7 @@ from torch import nn
 In our investigation of common image augmentation methods, we will use the following $400\times 500$ image an example.
 
 ```{.python .input}
+#@tab mxnet
 d2l.set_figsize()
 img = image.imread('../img/cat1.jpg')
 d2l.plt.imshow(img.asnumpy());
@@ -84,6 +86,7 @@ an image left and right with a 50% chance.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 apply(img, gluon.data.vision.transforms.RandomFlipLeftRight())
 ```
 
@@ -105,6 +108,7 @@ an image up and down with a 50% chance.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 apply(img, gluon.data.vision.transforms.RandomFlipTopBottom())
 ```
 
@@ -121,6 +125,7 @@ In the code below, we [**randomly crop**] an area with an area of $10\% \sim 100
 Unless otherwise specified, the random number between $a$ and $b$ in this section refers to a continuous value obtained by random and uniform sampling from the interval $[a, b]$.
 
 ```{.python .input}
+#@tab mxnet
 shape_aug = gluon.data.vision.transforms.RandomResizedCrop(
     (200, 200), scale=(0.1, 1), ratio=(0.5, 2))
 apply(img, shape_aug)
@@ -138,6 +143,7 @@ apply(img, shape_aug)
 Another augmentation method is changing colors. We can change four aspects of the image color: brightness, contrast, saturation, and hue. In the example below, we [**randomly change the brightness**] of the image to a value between 50% ($1-0.5$) and 150% ($1+0.5$) of the original image.
 
 ```{.python .input}
+#@tab mxnet
 apply(img, gluon.data.vision.transforms.RandomBrightness(0.5))
 ```
 
@@ -150,6 +156,7 @@ apply(img, torchvision.transforms.ColorJitter(
 Similarly, we can [**randomly change the hue**] of the image.
 
 ```{.python .input}
+#@tab mxnet
 apply(img, gluon.data.vision.transforms.RandomHue(0.5))
 ```
 
@@ -162,6 +169,7 @@ apply(img, torchvision.transforms.ColorJitter(
 We can also create a `RandomColorJitter` instance and set how to [**randomly change the `brightness`, `contrast`, `saturation`, and `hue` of the image at the same time**].
 
 ```{.python .input}
+#@tab mxnet
 color_aug = gluon.data.vision.transforms.RandomColorJitter(
     brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5)
 apply(img, color_aug)
@@ -181,6 +189,7 @@ For example,
 we can combine the different image augmentation methods defined above and apply them to each image via a `Compose` instance.
 
 ```{.python .input}
+#@tab mxnet
 augs = gluon.data.vision.transforms.Compose([
     gluon.data.vision.transforms.RandomFlipLeftRight(), color_aug, shape_aug])
 apply(img, augs)
@@ -201,6 +210,7 @@ This is because the position and size of the objects in the Fashion-MNIST datase
 The first 32 training images in the CIFAR-10 dataset are shown below.
 
 ```{.python .input}
+#@tab mxnet
 d2l.show_images(gluon.data.vision.CIFAR10(
     train=True)[:32][0], 4, 8, scale=0.8);
 ```
@@ -217,6 +227,7 @@ In order to obtain definitive results during prediction, we usually only apply i
 32-bit floating point numbers between 0 and 1 with the shape of (batch size, number of channels, height, width).
 
 ```{.python .input}
+#@tab mxnet
 train_augs = gluon.data.vision.transforms.Compose([
     gluon.data.vision.transforms.RandomFlipLeftRight(),
     gluon.data.vision.transforms.ToTensor()])
@@ -255,6 +266,7 @@ a detailed introduction to `DataLoader`, please refer to :numref:`sec_fashion_mn
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 def load_cifar10(is_train, augs, batch_size):
     return gluon.data.DataLoader(
         gluon.data.vision.CIFAR10(train=is_train).transform_first(augs),
@@ -283,6 +295,7 @@ In the following,
 [**we define a function to train and evaluate the model using multiple GPUs**].
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def train_batch_ch13(net, features, labels, loss, trainer, devices,
                      split_f=d2l.split_batch):
@@ -326,6 +339,7 @@ def train_batch_ch13(net, X, y, loss, trainer, devices):
 ```
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                devices=d2l.try_all_gpus(), split_f=d2l.split_batch):
@@ -394,6 +408,7 @@ applies image augmentation to the training dataset,
 and finally calls the `train_ch13` function just defined to train and evaluate the model.
 
 ```{.python .input}
+#@tab mxnet
 batch_size, devices, net = 256, d2l.try_all_gpus(), d2l.resnet18(10)
 net.initialize(init=init.Xavier(), ctx=devices)
 

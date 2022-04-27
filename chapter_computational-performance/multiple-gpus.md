@@ -82,6 +82,7 @@ Also note that batch normalization in :numref:`sec_batch_norm` needs to be adjus
 In what follows we will use a toy network to illustrate multi-GPU training.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
@@ -102,6 +103,7 @@ from torch.nn import functional as F
 We use LeNet as introduced in :numref:`sec_lenet` (with slight modifications). We define it from scratch to illustrate parameter exchange and synchronization in detail.
 
 ```{.python .input}
+#@tab mxnet
 # Initialize model parameters
 scale = 0.01
 W1 = np.random.normal(scale=scale, size=(20, 1, 3, 3))
@@ -175,6 +177,7 @@ First we need to have the ability to [**distribute a list of parameters to multi
 Second, we need the ability to sum parameters across multiple devices, i.e., we need an `allreduce` function.
 
 ```{.python .input}
+#@tab mxnet
 def get_params(params, device):
     new_params = [p.copyto(device) for p in params]
     for p in new_params:
@@ -204,6 +207,7 @@ Since we did not perform any computation yet, the gradient with regard to the bi
 Now let's assume that we have a vector distributed across multiple GPUs. The following [**`allreduce` function adds up all vectors and broadcasts the result back to all GPUs**]. Note that for this to work we need to copy the data to the device accumulating the results.
 
 ```{.python .input}
+#@tab mxnet
 def allreduce(data):
     for i in range(1, len(data)):
         data[0][:] += data[i].copyto(data[0].ctx)
@@ -223,6 +227,7 @@ def allreduce(data):
 Let's test this by creating vectors with different values on different devices and aggregate them.
 
 ```{.python .input}
+#@tab mxnet
 data = [np.ones((1, 2), ctx=d2l.try_gpu(i)) * (i + 1) for i in range(2)]
 print('before allreduce:\n', data[0], '\n', data[1])
 allreduce(data)
@@ -243,6 +248,7 @@ We need a simple utility function to [**distribute a minibatch evenly across mul
 Since it is more convenient and more concise, we use the built-in function from the deep learning framework to try it out on a $4 \times 5$ matrix.
 
 ```{.python .input}
+#@tab mxnet
 data = np.arange(20).reshape(4, 5)
 devices = [npx.gpu(0), npx.gpu(1)]
 split = gluon.utils.split_and_load(data, devices)
@@ -264,6 +270,7 @@ print('output:', split)
 For later reuse we define a `split_batch` function that splits both data and labels.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def split_batch(X, y, devices):
     """Split `X` and `y` into multiple devices."""
@@ -287,6 +294,7 @@ def split_batch(X, y, devices):
 Now we can implement [**multi-GPU training on a single minibatch**]. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, `allreduce` and `split_and_load`, to synchronize the data among multiple GPUs. Note that we do not need to write any specific code to achieve parallelism. Since the computational graph does not have any dependencies across devices within a minibatch, it is executed in parallel *automatically*.
 
 ```{.python .input}
+#@tab mxnet
 def train_batch(X, y, device_params, devices, lr):
     X_shards, y_shards = split_batch(X, y, devices)
     with autograd.record():  # Loss is calculated separately on each GPU
@@ -326,6 +334,7 @@ Now, we can define [**the training function**]. It is slightly different from th
 Obviously each batch is processed using the `train_batch` function to deal with multiple GPUs. For convenience (and conciseness of code) we compute the accuracy on a single GPU, though this is *inefficient* since the other GPUs are idle.
 
 ```{.python .input}
+#@tab mxnet
 def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     devices = [d2l.try_gpu(i) for i in range(num_gpus)]

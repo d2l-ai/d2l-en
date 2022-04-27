@@ -9,6 +9,7 @@ In this section, we go on to discuss
 *stochastic gradient descent* in greater detail.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 import math

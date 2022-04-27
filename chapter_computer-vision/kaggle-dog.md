@@ -20,6 +20,7 @@ to submit your results.
 :label:`fig_kaggle_dog`
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, npx
 from mxnet.gluon import nn
@@ -112,6 +113,7 @@ lists a few image augmentation operations
 that might be useful for relatively larger images.
 
 ```{.python .input}
+#@tab mxnet
 transform_train = gluon.data.vision.transforms.Compose([
     # Randomly crop the image to obtain an image with an area of 0.08 to 1 of
     # the original area and height-to-width ratio between 3/4 and 4/3. Then,
@@ -156,6 +158,7 @@ we only use image preprocessing operations
 without randomness.
 
 ```{.python .input}
+#@tab mxnet
 transform_test = gluon.data.vision.transforms.Compose([
     gluon.data.vision.transforms.Resize(256),
     # Crop a 224 x 224 square area from the center of the image
@@ -183,6 +186,7 @@ we can read the organized dataset
 consisting of raw image files.
 
 ```{.python .input}
+#@tab mxnet
 train_ds, valid_ds, train_valid_ds, test_ds = [
     gluon.data.vision.ImageFolderDataset(
         os.path.join(data_dir, 'train_valid_test', folder))
@@ -205,6 +209,7 @@ the same way
 as in :numref:`sec_kaggle_cifar10`.
 
 ```{.python .input}
+#@tab mxnet
 train_iter, train_valid_iter = [gluon.data.DataLoader(
     dataset.transform_first(transform_train), batch_size, shuffle=True,
     last_batch='discard') for dataset in (train_ds, train_valid_ds)]
@@ -268,6 +273,7 @@ this is also consistent with the standardization operation
 by the pretrained model on ImageNet.
 
 ```{.python .input}
+#@tab mxnet
 def get_net(devices):
     finetune_net = gluon.model_zoo.vision.resnet34_v2(pretrained=True)
     # Define a new output network
@@ -304,6 +310,7 @@ we first obtain the input of the pretrained model's output layer, i.e., the extr
 Then we use this feature as input for our small custom output network to calculate the loss.
 
 ```{.python .input}
+#@tab mxnet
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 
 def evaluate_loss(data_iter, net, devices):
@@ -340,6 +347,7 @@ We will select the model and tune hyperparameters according to the model's perfo
 iterates parameters of the small custom output network.
 
 ```{.python .input}
+#@tab mxnet
 def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           lr_decay):
     # Only train the small custom output network
@@ -431,6 +439,7 @@ The following hyperparameters are all tunable.
 For example, the number of epochs can be increased. Because `lr_period` and `lr_decay` are set to 2 and 0.9, respectively, the learning rate of the optimization algorithm will be multiplied by 0.9 after every 2 epochs.
 
 ```{.python .input}
+#@tab mxnet
 devices, num_epochs, lr, wd = d2l.try_all_gpus(), 10, 5e-3, 1e-4
 lr_period, lr_decay, net = 2, 0.9, get_net(devices)
 net.hybridize()
@@ -455,6 +464,7 @@ We will use the trained custom output network
 for classification.
 
 ```{.python .input}
+#@tab mxnet
 net = get_net(devices)
 net.hybridize()
 train(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,

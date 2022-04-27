@@ -39,6 +39,7 @@ the choice of the architecture.
 :label:`fig_nlp-map-sa-cnn`
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
@@ -246,6 +247,7 @@ one with trainable weights and the other
 with fixed weights.
 
 ```{.python .input}
+#@tab mxnet
 class TextCNN(nn.Block):
     def __init__(self, vocab_size, embed_size, kernel_sizes, num_channels,
                  **kwargs):
@@ -323,6 +325,7 @@ Let's create a textCNN instance.
 It has 3 convolutional layers with kernel widths of 3, 4, and 5, all with 100 output channels.
 
 ```{.python .input}
+#@tab mxnet
 embed_size, kernel_sizes, nums_channels = 100, [3, 4, 5], [100, 100, 100]
 devices = d2l.try_all_gpus()
 net = TextCNN(len(vocab), embed_size, kernel_sizes, nums_channels)
@@ -352,6 +355,7 @@ will be trained in `embedding`
 and fixed in `constant_embedding`.
 
 ```{.python .input}
+#@tab mxnet
 glove_embedding = d2l.TokenEmbedding('glove.6b.100d')
 embeds = glove_embedding[vocab.idx_to_token]
 net.embedding.weight.set_data(embeds)
@@ -373,6 +377,7 @@ net.constant_embedding.weight.requires_grad = False
 Now we can train the textCNN model for sentiment analysis.
 
 ```{.python .input}
+#@tab mxnet
 lr, num_epochs = 0.001, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()

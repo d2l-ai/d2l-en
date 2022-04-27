@@ -42,6 +42,7 @@ $$I(\text{"0010"}) = - \log (p(\text{"0010"})) = - \log \left( \frac{1}{2^4} \ri
 We can calculate self information as shown below. Before that, let's first import all the necessary packages in this section.
 
 ```{.python .input}
+#@tab mxnet
 from mxnet import np
 from mxnet.metric import NegativeLogLikelihood
 from mxnet.ndarray import nansum
@@ -116,6 +117,7 @@ $$H(X) = - \int_x p(x) \log p(x) \; dx.$$
 We can define entropy as below.
 
 ```{.python .input}
+#@tab mxnet
 def entropy(p):
     entropy = - p * np.log2(p)
     # Operator `nansum` will sum up the non-nan number
@@ -200,6 +202,7 @@ $$
 Let's implement joint entropy from scratch.
 
 ```{.python .input}
+#@tab mxnet
 def joint_entropy(p_xy):
     joint_ent = -p_xy * np.log2(p_xy)
     # Operator `nansum` will sum up the non-nan number
@@ -261,6 +264,7 @@ This has an intuitive interpretation: the information in $Y$ given $X$ ($H(Y \mi
 Now, let's implement conditional entropy :eqref:`eq_cond_ent_def` from scratch.
 
 ```{.python .input}
+#@tab mxnet
 def conditional_entropy(p_xy, p_x):
     p_y_given_x = p_xy/p_x
     cond_ent = -p_xy * np.log2(p_y_given_x)
@@ -328,6 +332,7 @@ In many ways we can think of the mutual information :eqref:`eq_mut_ent_def` as p
 Now, let's implement mutual information from scratch.
 
 ```{.python .input}
+#@tab mxnet
 def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
     mutual = p_xy * np.log2(p)
@@ -409,6 +414,7 @@ As with the pointwise mutual information :eqref:`eq_pmi_def`, we can again provi
 Let's implement the KL divergence from Scratch.
 
 ```{.python .input}
+#@tab mxnet
 def kl_divergence(p, q):
     kl = p * np.log2(p / q)
     out = nansum(kl.as_nd_ndarray())
@@ -453,6 +459,7 @@ Let's go through a toy example to see the non-symmetry explicitly.
 First, let's generate and sort three tensors of length $10,000$: an objective tensor $p$ which follows a normal distribution $N(0, 1)$, and two candidate tensors $q_1$ and $q_2$ which follow normal distributions $N(-1, 1)$ and $N(1, 1)$ respectively.
 
 ```{.python .input}
+#@tab mxnet
 random.seed(1)
 
 nd_len = 10000
@@ -546,6 +553,7 @@ $$\mathrm{CE} (P, Q) = H(P) + D_{\mathrm{KL}}(P\|Q).$$
 We can implement the cross-entropy loss as below.
 
 ```{.python .input}
+#@tab mxnet
 def cross_entropy(y_hat, y):
     ce = -np.log(y_hat[range(len(y_hat)), y])
     return ce.mean()
@@ -570,6 +578,7 @@ def cross_entropy(y_hat, y):
 Now define two tensors for the labels and predictions, and calculate the cross-entropy loss of them.
 
 ```{.python .input}
+#@tab mxnet
 labels = np.array([0, 2])
 preds = np.array([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
 
@@ -647,6 +656,7 @@ Since in maximum likelihood estimation, we maximizing the objective function $l(
 To test the above proof, let's apply the built-in measure `NegativeLogLikelihood`. Using the same `labels` and `preds` as in the earlier example, we will get the same numerical loss as the previous example up to the 5 decimal place.
 
 ```{.python .input}
+#@tab mxnet
 nll_loss = NegativeLogLikelihood()
 nll_loss.update(labels.as_nd_ndarray(), preds.as_nd_ndarray())
 nll_loss.get()

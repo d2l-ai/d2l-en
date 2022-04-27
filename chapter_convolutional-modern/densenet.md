@@ -107,7 +107,11 @@ class ConvBlock(tf.keras.layers.Layer):
 A *dense block* consists of multiple convolution blocks, each using the same number of output channels. In the forward propagation, however, we concatenate the input and output of each convolution block on the channel dimension.
 
 ```{.python .input}
+<<<<<<< HEAD
 %%tab mxnet
+=======
+#@tab mxnet
+>>>>>>> 2c25420e (Add missing mxnet tab marks)
 class DenseBlock(nn.Block):
     def __init__(self, num_convs, num_channels):
         super().__init__()
@@ -164,7 +168,11 @@ we [**define a `DenseBlock` instance**] with 2 convolution blocks of 10 output c
 When using an input with 3 channels, we will get an output with  $3+2\times 10=23$ channels. The number of convolution block channels controls the growth in the number of output channels relative to the number of input channels. This is also referred to as the *growth rate*.
 
 ```{.python .input}
+<<<<<<< HEAD
 %%tab mxnet
+=======
+#@tab mxnet
+>>>>>>> 2c25420e (Add missing mxnet tab marks)
 blk = DenseBlock(2, 10)
 blk.initialize()
 X = np.random.uniform(size=(4, 3, 8, 8))
@@ -193,7 +201,11 @@ Y.shape
 Since each dense block will increase the number of channels, adding too many of them will lead to an excessively complex model. A *transition layer* is used to control the complexity of the model. It reduces the number of channels by using the $1\times 1$ convolutional layer and halves the height and width of the average pooling layer with a stride of 2, further reducing the complexity of the model.
 
 ```{.python .input}
+<<<<<<< HEAD
 %%tab mxnet
+=======
+#@tab mxnet
+>>>>>>> 2c25420e (Add missing mxnet tab marks)
 def transition_block(num_channels):
     blk = nn.Sequential()
     blk.add(nn.BatchNorm(), nn.Activation('relu'),
@@ -231,7 +243,11 @@ class TransitionBlock(tf.keras.layers.Layer):
 [**Apply a transition layer**] with 10 channels to the output of the dense block in the previous example.  This reduces the number of output channels to 10, and halves the height and width.
 
 ```{.python .input}
+<<<<<<< HEAD
 %%tab mxnet
+=======
+#@tab mxnet
+>>>>>>> 2c25420e (Add missing mxnet tab marks)
 blk = transition_block(10)
 blk.initialize()
 blk(Y).shape
@@ -251,7 +267,27 @@ blk(Y).shape
 
 ## [**DenseNet Model**]
 
+<<<<<<< HEAD
 Next, we will construct a DenseNet model. DenseNet first uses the same single convolutional layer and max-pooling layer as in ResNet.
+=======
+Next, we will construct a DenseNet model. DenseNet first uses the same single convolutional layer and maximum pooling layer as in ResNet.
+
+```{.python .input}
+#@tab mxnet
+net = nn.Sequential()
+net.add(nn.Conv2D(64, kernel_size=7, strides=2, padding=3),
+        nn.BatchNorm(), nn.Activation('relu'),
+        nn.MaxPool2D(pool_size=3, strides=2, padding=1))
+```
+
+```{.python .input}
+#@tab pytorch
+b1 = nn.Sequential(
+    nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
+    nn.BatchNorm2d(64), nn.ReLU(),
+    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+```
+>>>>>>> 2c25420e (Add missing mxnet tab marks)
 
 ```{.python .input}
 %%tab all
@@ -282,7 +318,45 @@ Then, similar to the four modules made up of residual blocks that ResNet uses,
 DenseNet uses four dense blocks.
 Similar to ResNet, we can set the number of convolutional layers used in each dense block. Here, we set it to 4, consistent with the ResNet-18 model in :numref:`sec_resnet`. Furthermore, we set the number of channels (i.e., growth rate) for the convolutional layers in the dense block to 32, so 128 channels will be added to each dense block.
 
+<<<<<<< HEAD
 In ResNet, the height and width are reduced between each module by a residual block with a stride of 2. Here, we use the transition layer to halve the height and width and halve the number of channels. Similar to ResNet, a global pooling layer and a fully connected layer are connected at the end to produce the output.
+=======
+In ResNet, the height and width are reduced between each module by a residual block with a stride of 2. Here, we use the transition layer to halve the height and width and halve the number of channels.
+
+```{.python .input}
+#@tab mxnet
+# `num_channels`: the current number of channels
+num_channels, growth_rate = 64, 32
+num_convs_in_dense_blocks = [4, 4, 4, 4]
+
+for i, num_convs in enumerate(num_convs_in_dense_blocks):
+    net.add(DenseBlock(num_convs, growth_rate))
+    # This is the number of output channels in the previous dense block
+    num_channels += num_convs * growth_rate
+    # A transition layer that halves the number of channels is added between
+    # the dense blocks
+    if i != len(num_convs_in_dense_blocks) - 1:
+        num_channels //= 2
+        net.add(transition_block(num_channels))
+```
+
+```{.python .input}
+#@tab pytorch
+# `num_channels`: the current number of channels
+num_channels, growth_rate = 64, 32
+num_convs_in_dense_blocks = [4, 4, 4, 4]
+blks = []
+for i, num_convs in enumerate(num_convs_in_dense_blocks):
+    blks.append(DenseBlock(num_convs, num_channels, growth_rate))
+    # This is the number of output channels in the previous dense block
+    num_channels += num_convs * growth_rate
+    # A transition layer that halves the number of channels is added between
+    # the dense blocks
+    if i != len(num_convs_in_dense_blocks) - 1:
+        blks.append(transition_block(num_channels, num_channels // 2))
+        num_channels = num_channels // 2
+```
+>>>>>>> 2c25420e (Add missing mxnet tab marks)
 
 ```{.python .input}
 %%tab all
@@ -343,7 +417,19 @@ def __init__(self, num_channels=64, growth_rate=32, arch=(4, 4, 4, 4),
             tf.keras.layers.Dense(num_classes)]))
 ```
 
+<<<<<<< HEAD
 ## [**Training**]
+=======
+Similar to ResNet, a global pooling layer and a fully connected layer are connected at the end to produce the output.
+
+```{.python .input}
+#@tab mxnet
+net.add(nn.BatchNorm(),
+        nn.Activation('relu'),
+        nn.GlobalAvgPool2D(),
+        nn.Dense(10))
+```
+>>>>>>> 2c25420e (Add missing mxnet tab marks)
 
 Since we are using a deeper network here, in this section, we will reduce the input height and width from 224 to 96 to simplify the computation.
 
