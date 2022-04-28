@@ -5,6 +5,7 @@ With the BERT model implemented in :numref:`sec_bert`
 and the pretraining examples generated from the WikiText-2 dataset in :numref:`sec_bert-dataset`, we will pretrain BERT on the WikiText-2 dataset in this section.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 
@@ -41,6 +42,7 @@ For demonstration with ease,
 we define [**a small BERT, using 2 layers, 128 hidden units, and 2 self-attention heads**].
 
 ```{.python .input}
+#@tab mxnet
 net = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=256,
                     num_heads=2, num_layers=2, dropout=0.2)
 devices = d2l.try_all_gpus()
@@ -66,6 +68,7 @@ is just the sum of both the masked language modeling loss
 and the next sentence prediction loss.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def _get_batch_loss_bert(net, loss, vocab_size, tokens_X_shards,
                          segments_X_shards, valid_lens_x_shards,
@@ -128,6 +131,7 @@ the input `num_steps` of the following function
 specifies the number of iteration steps for training.
 
 ```{.python .input}
+#@tab mxnet
 def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': 0.01})
@@ -230,6 +234,7 @@ The following function returns the BERT (`net`) representations for all tokens
 in `tokens_a` and `tokens_b`.
 
 ```{.python .input}
+#@tab mxnet
 def get_bert_encoding(net, tokens_a, tokens_b=None):
     tokens, segments = d2l.get_tokens_and_segments(tokens_a, tokens_b)
     token_ids = np.expand_dims(np.array(vocab[tokens], ctx=devices[0]),

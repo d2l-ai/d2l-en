@@ -20,6 +20,7 @@ Comparing with the PTB dataset used for pretraining word2vec in :numref:`sec_wor
 WikiText-2 (i) retains the original punctuation, making it suitable for next sentence prediction; (ii) retains the original case and numbers; (iii) is over twice larger.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 import os
@@ -200,6 +201,7 @@ to [**append the special “&lt;pad&gt;” tokens to the inputs.**]
 Its argument `examples` contain the outputs from the helper functions `_get_nsp_data_from_paragraph` and `_get_mlm_data_from_tokens` for the two pretraining tasks.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def _pad_bert_inputs(examples, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
@@ -274,6 +276,7 @@ For simplicity, we use the `d2l.tokenize` function for tokenization.
 Infrequent tokens that appear less than five times are filtered out.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 class _WikiTextDataset(gluon.data.Dataset):
     def __init__(self, paragraphs, max_len):
@@ -355,6 +358,7 @@ we define the following `load_data_wiki` to [**download and WikiText-2 dataset
 and generate pretraining examples**] from it.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def load_data_wiki(batch_size, max_len):
     """Load the WikiText-2 dataset."""

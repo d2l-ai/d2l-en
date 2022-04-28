@@ -43,6 +43,7 @@ $$min_D max_G \{ -E_{x \sim \text{Data}} log D(\mathbf x) - E_{z \sim \text{Nois
 Many of the GANs applications are in the context of images. As a demonstration purpose, we are going to content ourselves with fitting a much simpler distribution first. We will illustrate what happens if we use GANs to build the world's most inefficient estimator of parameters for a Gaussian. Let's get started.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
@@ -111,6 +112,7 @@ data_iter = d2l.load_array((data,), batch_size)
 Our generator network will be the simplest network possible - a single layer linear model. This is since we will be driving that linear network with a Gaussian data generator. Hence, it literally only needs to learn the parameters to fake things perfectly.
 
 ```{.python .input}
+#@tab mxnet
 net_G = nn.Sequential()
 net_G.add(nn.Dense(2))
 ```
@@ -130,6 +132,7 @@ net_G = tf.keras.layers.Dense(2)
 For the discriminator we will be a bit more discriminating: we will use an MLP with 3 layers to make things a bit more interesting.
 
 ```{.python .input}
+#@tab mxnet
 net_D = nn.Sequential()
 net_D.add(nn.Dense(5, activation='tanh'),
           nn.Dense(3, activation='tanh'),
@@ -158,6 +161,7 @@ net_D = tf.keras.models.Sequential([
 First we define a function to update the discriminator.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator."""
@@ -221,6 +225,7 @@ def update_D(X, Z, net_D, net_G, loss, optimizer_D):
 The generator is updated similarly. Here we reuse the cross-entropy loss but change the label of the fake data from $0$ to $1$.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def update_G(Z, net_D, net_G, loss, trainer_G):
     """Update generator."""
@@ -277,6 +282,7 @@ def update_G(Z, net_D, net_G, loss, optimizer_G):
 Both the discriminator and the generator performs a binary logistic regression with the cross-entropy loss. We use Adam to smooth the training process. In each iteration, we first update the discriminator and then the generator. We visualize both losses and generated examples.
 
 ```{.python .input}
+#@tab mxnet
 def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
     loss = gluon.loss.SigmoidBCELoss()
     net_D.initialize(init=init.Normal(0.02), force_reinit=True)

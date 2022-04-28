@@ -15,6 +15,7 @@ by calling the `d2l.load_data_ptb`
 function, which was described in :numref:`sec_word2vec_data`
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 import math
 from mxnet import autograd, gluon, np, npx
@@ -60,6 +61,7 @@ After a word embedding model is trained,
 this weight is what we need.
 
 ```{.python .input}
+#@tab mxnet
 embed = nn.Embedding(input_dim=20, output_dim=4)
 embed.initialize()
 embed.weight
@@ -115,6 +117,7 @@ Each element in the output is the dot product of
 a center word vector and a context or noise word vector.
 
 ```{.python .input}
+#@tab mxnet
 def skip_gram(center, contexts_and_negatives, embed_v, embed_u):
     v = embed_v(center)
     u = embed_u(contexts_and_negatives)
@@ -134,6 +137,7 @@ def skip_gram(center, contexts_and_negatives, embed_v, embed_u):
 Let's print the output shape of this `skip_gram` function for some example inputs.
 
 ```{.python .input}
+#@tab mxnet
 skip_gram(np.ones((2, 1)), np.ones((2, 4)), embed, embed).shape
 ```
 
@@ -157,6 +161,7 @@ we will use
 the binary cross-entropy loss.
 
 ```{.python .input}
+#@tab mxnet
 loss = gluon.loss.SigmoidBCELoss()
 ```
 
@@ -222,6 +227,7 @@ The word vector dimension
 `embed_size` is set to 100.
 
 ```{.python .input}
+#@tab mxnet
 embed_size = 100
 net = nn.Sequential()
 net.add(nn.Embedding(input_dim=len(vocab), output_dim=embed_size),
@@ -242,6 +248,7 @@ net = nn.Sequential(nn.Embedding(num_embeddings=len(vocab),
 The training loop is defined below. Because of the existence of padding, the calculation of the loss function is slightly different compared to the previous training functions.
 
 ```{.python .input}
+#@tab mxnet
 def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):
     net.initialize(ctx=device, force_reinit=True)
     trainer = gluon.Trainer(net.collect_params(), 'adam',
@@ -323,6 +330,7 @@ that are most semantically similar
 to an input word.
 
 ```{.python .input}
+#@tab mxnet
 def get_similar_tokens(query_token, k, embed):
     W = embed.weight.data()
     x = W[vocab[query_token]]

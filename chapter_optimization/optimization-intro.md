@@ -25,6 +25,7 @@ attention to overfitting in addition to using the optimization algorithm to
 reduce the training error.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mpl_toolkits import mplot3d

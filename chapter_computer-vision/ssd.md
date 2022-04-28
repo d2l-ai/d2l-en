@@ -129,6 +129,7 @@ The width and height of the input and output of this
 convolutional layer remain unchanged.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, image, init, np, npx
@@ -162,6 +163,7 @@ The only difference lies in the number of outputs for each anchor box:
 here we need to predict four offsets rather than $q+1$ classes.
 
 ```{.python .input}
+#@tab mxnet
 def bbox_predictor(num_anchors):
     return nn.Conv2D(num_anchors * 4, kernel_size=3, padding=1)
 ```
@@ -203,6 +205,7 @@ where either output shape is
 (batch size, number of channels, height, width).
 
 ```{.python .input}
+#@tab mxnet
 def forward(x, block):
     block.initialize()
     return block(x)
@@ -240,6 +243,7 @@ such outputs at different scales
 along dimension 1.
 
 ```{.python .input}
+#@tab mxnet
 def flatten_pred(pred):
     return npx.batch_flatten(pred.transpose(0, 2, 3, 1))
 
@@ -287,6 +291,7 @@ has a $6\times6$ receptive field on the input.
 Therefore, the downsampling block enlarges the receptive field of each unit in its output feature maps.
 
 ```{.python .input}
+#@tab mxnet
 def down_sample_blk(num_channels):
     blk = nn.Sequential()
     for _ in range(2):
@@ -314,6 +319,7 @@ def down_sample_blk(in_channels, out_channels):
 In the following example, our constructed downsampling block changes the number of input channels and halves the height and width of the input feature maps.
 
 ```{.python .input}
+#@tab mxnet
 forward(np.zeros((2, 3, 20, 20)), down_sample_blk(10)).shape
 ```
 
@@ -333,6 +339,7 @@ Given a $256\times256$ input image,
 this base network block outputs $32 \times 32$ feature maps ($256/2^3=32$).
 
 ```{.python .input}
+#@tab mxnet
 def base_net():
     blk = nn.Sequential()
     for num_filters in [16, 32, 64]:
@@ -380,6 +387,7 @@ multiscale feature map blocks
 in :numref:`fig_ssd`.
 
 ```{.python .input}
+#@tab mxnet
 def get_blk(i):
     if i == 0:
         blk = base_net()
@@ -415,6 +423,7 @@ and (iii) classes and offsets predicted (based on `Y`)
 for these anchor boxes.
 
 ```{.python .input}
+#@tab mxnet
 def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):
     Y = blk(X)
     anchors = d2l.multibox_prior(Y, sizes=size, ratios=ratio)
@@ -466,6 +475,7 @@ num_anchors = len(sizes[0]) + len(ratios[0]) - 1
 Now we can [**define the complete model**] `TinySSD` as follows.
 
 ```{.python .input}
+#@tab mxnet
 class TinySSD(nn.Block):
     def __init__(self, num_classes, **kwargs):
         super(TinySSD, self).__init__(**kwargs)
@@ -538,6 +548,7 @@ at all the five scales
 a total of $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ anchor boxes are generated for each image.
 
 ```{.python .input}
+#@tab mxnet
 net = TinySSD(num_classes=1)
 net.initialize()
 X = np.zeros((32, 3, 256, 256))
@@ -584,6 +595,7 @@ we need to (**initialize its parameters and define
 the optimization algorithm**).
 
 ```{.python .input}
+#@tab mxnet
 device, net = d2l.try_gpu(), TinySSD(num_classes=1)
 net.initialize(init=init.Xavier(), ctx=device)
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
@@ -624,6 +636,7 @@ and the anchor box offset loss
 to obtain the loss function for the model.
 
 ```{.python .input}
+#@tab mxnet
 cls_loss = gluon.loss.SoftmaxCrossEntropyLoss()
 bbox_loss = gluon.loss.L1Loss()
 
@@ -656,6 +669,7 @@ from the generated anchor boxes and the
 predicted offsets for them.
 
 ```{.python .input}
+#@tab mxnet
 def cls_eval(cls_preds, cls_labels):
     # Because the class prediction results are on the final dimension,
     # `argmax` needs to specify this dimension
@@ -692,6 +706,7 @@ For concise implementations,
 evaluation of the test dataset is omitted here.
 
 ```{.python .input}
+#@tab mxnet
 num_epochs, timer = 20, d2l.Timer()
 animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                         legend=['class error', 'bbox mae'])
@@ -774,6 +789,7 @@ a four-dimensional tensor that is
 required by convolutional layers.
 
 ```{.python .input}
+#@tab mxnet
 img = image.imread('../img/banana.jpg')
 feature = image.imresize(img, 256, 256).astype('float32')
 X = np.expand_dims(feature.transpose(2, 0, 1), axis=0)
@@ -793,6 +809,7 @@ Then non-maximum suppression is used
 to remove similar predicted bounding boxes.
 
 ```{.python .input}
+#@tab mxnet
 def predict(X):
     anchors, cls_preds, bbox_preds = net(X.as_in_ctx(device))
     cls_probs = npx.softmax(cls_preds).transpose(0, 2, 1)
@@ -822,6 +839,7 @@ confidence 0.9 or above**]
 as output.
 
 ```{.python .input}
+#@tab mxnet
 def display(img, output, threshold):
     d2l.set_figsize((5, 5))
     fig = d2l.plt.imshow(img.asnumpy())
@@ -874,6 +892,7 @@ $$
 When $\sigma$ is very large, this loss is similar to the $\ell_1$ norm loss. When its value is smaller, the loss function is smoother.
 
 ```{.python .input}
+#@tab mxnet
 sigmas = [10, 1, 0.5]
 lines = ['-', '--', '-.']
 x = np.arange(-2, 2, 0.1)
@@ -921,6 +940,7 @@ so the training
 can focus more on those difficult examples that are misclassified.
 
 ```{.python .input}
+#@tab mxnet
 def focal_loss(gamma, x):
     return -(1 - x) ** gamma * np.log(x)
 

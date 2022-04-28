@@ -44,6 +44,7 @@ The model can be learned with BPR or Hinge loss. The architecture of Caser is sh
 We first import the required libraries.
 
 ```{.python .input  n=3}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
@@ -57,6 +58,7 @@ npx.set_np()
 The following code implements the Caser model. It consists of a vertical convolutional layer, a horizontal convolutional layer, and a full-connected layer.
 
 ```{.python .input  n=4}
+#@tab mxnet
 class Caser(nn.Block):
     def __init__(self, num_factors, num_users, num_items, L=5, d=16,
                  d_prime=4, drop_ratio=0.05, **kwargs):
@@ -109,6 +111,7 @@ To process the sequential interaction data, we need to reimplement the `Dataset`
 ![Illustration of the data generation process](../img/rec-seq-data.svg)
 
 ```{.python .input  n=5}
+#@tab mxnet
 class SeqDataset(gluon.data.Dataset):
     def __init__(self, user_ids, item_ids, L, num_users, num_items,
                  candidates):
@@ -167,6 +170,7 @@ class SeqDataset(gluon.data.Dataset):
 Afterwards, we read and split the MovieLens 100K dataset in sequence-aware mode and load the training data with sequential dataloader implemented above.
 
 ```{.python .input  n=6}
+#@tab mxnet
 TARGET_NUM, L, batch_size = 1, 5, 4096
 df, num_users, num_items = d2l.read_data_ml100k()
 train_data, test_data = d2l.split_data_ml100k(df, num_users, num_items,
@@ -190,6 +194,7 @@ The training data structure is shown above. The first element is the user identi
 Now, let's train the model. We use the same setting as NeuMF, including learning rate, optimizer, and $k$, in the last section so that the results are comparable.
 
 ```{.python .input  n=7}
+#@tab mxnet
 devices = d2l.try_all_gpus()
 net = Caser(10, num_users, num_items, L)
 net.initialize(ctx=devices, force_reinit=True, init=mx.init.Normal(0.01))

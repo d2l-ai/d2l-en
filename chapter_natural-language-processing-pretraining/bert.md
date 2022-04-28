@@ -111,6 +111,7 @@ When natural language processing applications are explained in :numref:`chap_nlp
 we will illustrate fine-tuning of BERT for downstream applications.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
@@ -188,6 +189,7 @@ Different from `TransformerEncoder`, `BERTEncoder` uses
 segment embeddings and learnable positional embeddings.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 class BERTEncoder(nn.Block):
     """BERT encoder."""
@@ -250,6 +252,7 @@ To demonstrate forward [**inference of `BERTEncoder`**],
 let's create an instance of it and initialize its parameters.
 
 ```{.python .input}
+#@tab mxnet
 vocab_size, num_hiddens, ffn_num_hiddens, num_heads = 10000, 768, 1024, 4
 num_layers, dropout = 2, 0.2
 encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
@@ -274,6 +277,7 @@ This hyperparameter is usually referred to as the *hidden size*
 (number of hidden units) of the transformer encoder.
 
 ```{.python .input}
+#@tab mxnet
 tokens = np.random.randint(0, vocab_size, (2, 8))
 segments = np.array([[0, 0, 0, 0, 1, 1, 1, 1], [0, 0, 0, 1, 1, 1, 1, 1]])
 encoded_X = encoder(tokens, segments, None)
@@ -334,6 +338,7 @@ the encoded result of `BERTEncoder` and the token positions for prediction.
 The output is the prediction results at these positions.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 class MaskLM(nn.Block):
     """The masked language model task of BERT."""
@@ -395,6 +400,7 @@ at all the masked positions `mlm_positions` of `encoded_X`.
 For each prediction, the size of the result is equal to the vocabulary size.
 
 ```{.python .input}
+#@tab mxnet
 mlm = MaskLM(vocab_size, num_hiddens)
 mlm.initialize()
 mlm_positions = np.array([[1, 5, 2], [6, 1, 5]])
@@ -414,6 +420,7 @@ With the ground truth labels `mlm_Y` of the predicted tokens `mlm_Y_hat` under m
 we can calculate the cross-entropy loss of the masked language model task in BERT pretraining.
 
 ```{.python .input}
+#@tab mxnet
 mlm_Y = np.array([[7, 8, 9], [10, 20, 30]])
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 mlm_l = loss(mlm_Y_hat.reshape((-1, vocab_size)), mlm_Y.reshape(-1))
@@ -450,6 +457,7 @@ Hence, the output layer (`self.output`) of the MLP classifier takes `X` as input
 where `X` is the output of the MLP hidden layer whose input is the encoded “&lt;cls&gt;” token.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 class NextSentencePred(nn.Block):
     """The next sentence prediction task of BERT."""
@@ -480,6 +488,7 @@ We can see that [**the forward inference of an `NextSentencePred`**] instance
 returns binary predictions for each BERT input sequence.
 
 ```{.python .input}
+#@tab mxnet
 nsp = NextSentencePred()
 nsp.initialize()
 nsp_Y_hat = nsp(encoded_X)
@@ -500,6 +509,7 @@ nsp_Y_hat.shape
 The cross-entropy loss of the 2 binary classifications can also be computed.
 
 ```{.python .input}
+#@tab mxnet
 nsp_y = np.array([0, 1])
 nsp_l = loss(nsp_Y_hat, nsp_y)
 nsp_l.shape
@@ -531,6 +541,7 @@ predictions of masked language modeling `mlm_Y_hat`,
 and next sentence predictions `nsp_Y_hat`.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 class BERTModel(nn.Block):
     """The BERT model."""

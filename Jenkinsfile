@@ -30,15 +30,15 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       ./static/cache.sh restore _build/eval/data
       d2lbook build eval
+      d2lbook build slides --tab pytorch
       ./static/cache.sh store _build/eval/data
       """
 
-      sh label: "Execute Notebooks [PyTorch]", script: """set -ex
+      sh label: "Execute Notebooks [MXNet]", script: """set -ex
       conda activate ${ENV_NAME}
-      ./static/cache.sh restore _build/eval_pytorch/data
-      d2lbook build eval --tab pytorch
-      d2lbook build slides --tab pytorch
-      ./static/cache.sh store _build/eval_pytorch/data
+      ./static/cache.sh restore _build/eval_mxnet/data
+      d2lbook build eval --tab mxnet
+      ./static/cache.sh store _build/eval_mxnet/data
       """
 
       sh label: "Execute Notebooks [TensorFlow]", script: """set -ex
@@ -60,9 +60,9 @@ stage("Build and Publish") {
       d2lbook build pdf
       """
 
-      sh label:"Build Pytorch PDF", script:"""set -ex
+      sh label:"Build MXNet PDF", script:"""set -ex
       conda activate ${ENV_NAME}
-      d2lbook build pdf --tab pytorch
+      d2lbook build pdf --tab mxnet
       """
       
       if (env.BRANCH_NAME == 'release') {

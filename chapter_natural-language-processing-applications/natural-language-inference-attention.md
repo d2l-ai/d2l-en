@@ -27,6 +27,7 @@ At a high level, it consists of three jointly trained steps: attending, comparin
 We will illustrate them step by step in the following.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
@@ -69,6 +70,7 @@ where the function $f$ is an MLP defined in the following `mlp` function.
 The output dimension of $f$ is specified by the `num_hiddens` argument of `mlp`.
 
 ```{.python .input}
+#@tab mxnet
 def mlp(num_hiddens, flatten):
     net = nn.Sequential()
     net.add(nn.Dropout(0.2))
@@ -118,6 +120,7 @@ $$
 Below we define the `Attend` class to compute the soft alignment of hypotheses (`beta`) with input premises `A` and soft alignment of premises (`alpha`) with input hypotheses `B`.
 
 ```{.python .input}
+#@tab mxnet
 class Attend(nn.Block):
     def __init__(self, num_hiddens, **kwargs):
         super(Attend, self).__init__(**kwargs)
@@ -191,6 +194,7 @@ while $\mathbf{v}_{B,j}$ is the comparison between token $j$ in the hypothesis a
 The following `Compare` class defines such as comparing step.
 
 ```{.python .input}
+#@tab mxnet
 class Compare(nn.Block):
     def __init__(self, num_hiddens, **kwargs):
         super(Compare, self).__init__(**kwargs)
@@ -234,6 +238,7 @@ $$
 The aggregation step is defined in the following `Aggregate` class.
 
 ```{.python .input}
+#@tab mxnet
 class Aggregate(nn.Block):
     def __init__(self, num_hiddens, num_outputs, **kwargs):
         super(Aggregate, self).__init__(**kwargs)
@@ -272,6 +277,7 @@ By putting the attending, comparing, and aggregating steps together,
 we define the decomposable attention model to jointly train these three steps.
 
 ```{.python .input}
+#@tab mxnet
 class DecomposableAttention(nn.Block):
     def __init__(self, vocab, embed_size, num_hiddens, **kwargs):
         super(DecomposableAttention, self).__init__(**kwargs)
@@ -338,6 +344,7 @@ Then we create a model instance, initialize its parameters,
 and load the GloVe embedding to initialize vectors of input tokens.
 
 ```{.python .input}
+#@tab mxnet
 embed_size, num_hiddens, devices = 100, 200, d2l.try_all_gpus()
 net = DecomposableAttention(vocab, embed_size, num_hiddens)
 net.initialize(init.Xavier(), ctx=devices)
@@ -361,6 +368,7 @@ In contrast to the `split_batch` function in :numref:`sec_multi_gpu` that takes 
 we define a `split_batch_multi_inputs` function to take multiple inputs such as premises and hypotheses in minibatches.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def split_batch_multi_inputs(X, y, devices):
     """Split multi-input `X` and `y` into multiple devices."""
@@ -372,6 +380,7 @@ def split_batch_multi_inputs(X, y, devices):
 Now we can train and evaluate the model on the SNLI dataset.
 
 ```{.python .input}
+#@tab mxnet
 lr, num_epochs = 0.001, 4
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -392,6 +401,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 Finally, define the prediction function to output the logical relationship between a pair of premise and hypothesis.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def predict_snli(net, vocab, premise, hypothesis):
     """Predict the logical relationship between the premise and hypothesis."""

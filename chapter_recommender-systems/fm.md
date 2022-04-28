@@ -33,6 +33,7 @@ With this reformulation, the model complexity are decreased greatly. Moreover, f
 To learn the FM model, we can use the MSE loss for regression task, the cross-entropy loss for classification tasks, and the BPR loss for ranking task. Standard optimizers such as stochastic gradient descent and Adam are viable for optimization.
 
 ```{.python .input  n=2}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import init, gluon, np, npx
 from mxnet.gluon import nn
@@ -45,6 +46,7 @@ npx.set_np()
 The following code implement the factorization machines. It is clear to see that FM consists a linear regression block and an efficient feature interaction block. We apply a sigmoid function over the final score since we treat the CTR prediction as a classification task.
 
 ```{.python .input  n=2}
+#@tab mxnet
 class FM(nn.Block):
     def __init__(self, field_dims, num_factors):
         super(FM, self).__init__()
@@ -66,6 +68,7 @@ class FM(nn.Block):
 We use the CTR data wrapper from the last section to load the online advertising dataset.
 
 ```{.python .input  n=3}
+#@tab mxnet
 batch_size = 2048
 data_dir = d2l.download_extract('ctr')
 train_data = d2l.CTRDataset(os.path.join(data_dir, 'train.csv'))
@@ -84,6 +87,7 @@ test_iter = gluon.data.DataLoader(
 Afterwards, we train the model. The learning rate is set to 0.02 and the embedding size is set to 20 by default. The `Adam` optimizer and the `SigmoidBinaryCrossEntropyLoss` loss are used for model training.
 
 ```{.python .input  n=5}
+#@tab mxnet
 devices = d2l.try_all_gpus()
 net = FM(train_data.field_dims, num_factors=20)
 net.initialize(init.Xavier(), ctx=devices)

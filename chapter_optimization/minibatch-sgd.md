@@ -35,6 +35,7 @@ If we follow the first option, we will need to copy one row and one column vecto
 Beyond computational efficiency, the overhead introduced by Python and by the deep learning framework itself is considerable. Recall that each time we execute a command the Python interpreter sends a command to the MXNet engine which needs to insert it into the computational graph and deal with it during scheduling. Such overhead can be quite detrimental. In short, it is highly advisable to use vectorization (and matrices) whenever possible.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
@@ -111,6 +112,7 @@ timer = Timer()
 Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
 
 ```{.python .input}
+#@tab mxnet
 # Compute A = BC one element at a time
 timer.start()
 for i in range(256):
@@ -143,6 +145,7 @@ timer.stop()
 A faster strategy is to perform column-wise assignment.
 
 ```{.python .input}
+#@tab mxnet
 # Compute A = BC one column at a time
 timer.start()
 for j in range(256):
@@ -171,6 +174,7 @@ timer.stop()
 Last, the most effective manner is to perform the entire operation in one block. Let's see what the respective speed of the operations is.
 
 ```{.python .input}
+#@tab mxnet
 # Compute A = BC in one go
 timer.start()
 A = np.dot(B, C)
@@ -225,6 +229,7 @@ Let's see what this does to the statistical properties of $\mathbf{g}_t$: since 
 Naively this would indicate that choosing a large minibatch $\mathcal{B}_t$ would be universally desirable. Alas, after some point, the additional reduction in standard deviation is minimal when compared to the linear increase in computational cost. In practice we pick a minibatch that is large enough to offer good computational efficiency while still fitting into the memory of a GPU. To illustrate the savings let's have a look at some code. In it we perform the same matrix-matrix multiplication, but this time broken up into "minibatches" of 64 columns at a time.
 
 ```{.python .input}
+#@tab mxnet
 timer.start()
 for j in range(0, 256, 64):
     A[:, j:j+64] = np.dot(B, C[:, j:j+64])
@@ -257,6 +262,7 @@ As we can see, the computation on the minibatch is essentially as efficient as o
 Let's have a look at how minibatches are efficiently generated from data. In the following we use a dataset developed by NASA to test the wing [noise from different aircraft](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) to compare these optimization algorithms. For convenience we only use the first $1,500$ examples. The data is whitened for preprocessing, i.e., we remove the mean and rescale the variance to $1$ per coordinate.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
                            '76e5be1548fd8222e5074cf0faae75edff8cf93f')
@@ -312,6 +318,7 @@ function, so the gradient in the optimization algorithm does not need to be
 divided by the batch size.
 
 ```{.python .input}
+#@tab mxnet
 def sgd(params, states, hyperparams):
     for p in params:
         p[:] -= hyperparams['lr'] * p.grad
@@ -335,6 +342,7 @@ def sgd(params, grads, states, hyperparams):
 Next, we implement a generic training function to facilitate the use of the other optimization algorithms introduced later in this chapter. It initializes a linear regression model and can be used to train the model with minibatch stochastic gradient descent and other algorithms introduced subsequently.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def train_ch11(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
@@ -477,6 +485,7 @@ d2l.plt.gca().set_xscale('log')
 In Gluon, we can use the `Trainer` class to call optimization algorithms. This is used to implement a generic training function. We will use this throughout the current chapter.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
     # Initialization
@@ -574,6 +583,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
 Using Gluon to repeat the last experiment shows identical behavior.
 
 ```{.python .input}
+#@tab mxnet
 data_iter, _ = get_data_ch11(10)
 train_concise_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 ```

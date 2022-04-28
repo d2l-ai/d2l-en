@@ -69,6 +69,7 @@ $$
 We can test this in code to see how good the approximation is.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -197,6 +198,7 @@ $$
 The only possible location of minima are at $x = -1, 0, 2$, where the function takes the values $-5,0, -32$ respectively, and thus we can conclude that we minimize our function when $x = 2$.  A quick plot confirms this.
 
 ```{.python .input}
+#@tab mxnet
 x = np.arange(-2, 3, 0.01)
 f = (3 * x**4) - (4 * x**3) - (12 * x**2)
 
@@ -399,6 +401,7 @@ This is precisely what every deep learning algorithm implements to allow the com
 To see how to encapsulated this, let's take a quick look at this example.
 
 ```{.python .input}
+#@tab mxnet
 # Initialize as ndarrays, then attach gradients
 w, x, y, z = np.array(-1), np.array(0), np.array(-2), np.array(1)
 
@@ -543,6 +546,7 @@ f(x, y) \approx e^{-1}\left(-1 - (x+1) +(x+1)^2+y^2\right).
 $$
 
 ```{.python .input}
+#@tab mxnet
 # Construct grid and compute function
 x, y = np.meshgrid(np.linspace(-2, 2, 101),
                    np.linspace(-2, 2, 101), indexing='ij')

@@ -133,6 +133,7 @@ and 10.
 Below we demonstrate the computation of the region of interest pooling layer. Suppose that the height and width of the CNN-extracted features `X` are both 4, and there is only a single channel.
 
 ```{.python .input}
+#@tab mxnet
 from mxnet import np, npx
 
 npx.set_np()
@@ -157,6 +158,7 @@ is expressed as five elements:
 its object class followed by the $(x, y)$-coordinates of its upper-left and lower-right corners.
 
 ```{.python .input}
+#@tab mxnet
 rois = np.array([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])
 ```
 
@@ -175,6 +177,7 @@ into a grid of sub-windows to
 further extract features of the same shape $2\times 2$.
 
 ```{.python .input}
+#@tab mxnet
 npx.roi_pooling(X, rois, pooled_size=(2, 2), spatial_scale=0.1)
 ```
 

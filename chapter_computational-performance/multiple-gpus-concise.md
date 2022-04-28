@@ -6,6 +6,7 @@ The mathematics and the algorithms are the same as in :numref:`sec_multi_gpu`.
 Quite unsurprisingly you will need at least two GPUs to run code of this section.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
@@ -26,6 +27,7 @@ We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images
 Moreover, we remove the max-pooling layer.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def resnet18(num_classes):
     """A slightly modified ResNet-18 model."""
@@ -97,6 +99,7 @@ For a refresher on initialization methods see :numref:`sec_numerical_stability`.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 net = resnet18(10)
 # Get a list of GPUs
 devices = d2l.try_all_gpus()
@@ -117,6 +120,7 @@ Using the `split_and_load` function introduced in :numref:`sec_multi_gpu` we can
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 x = np.random.uniform(size=(4, 1, 28, 28))
 x_shards = gluon.utils.split_and_load(x, devices)
 net(x_shards[0]), net(x_shards[1])
@@ -128,6 +132,7 @@ This means that initialization happens on a per-device basis. Since we picked GP
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 weight = net[0].params.get('weight')
 
 try:
@@ -142,6 +147,7 @@ Next, let's replace the code to [**evaluate the accuracy**] by one that works (*
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
     """Compute the accuracy for a model on a dataset using multiple GPUs."""
@@ -171,6 +177,7 @@ As before, the training code needs to perform several basic functions for effici
 In the end we compute the accuracy (again in parallel) to report the final performance of the network. The training routine is quite similar to implementations in previous chapters, except that we need to split and aggregate data.
 
 ```{.python .input}
+#@tab mxnet
 def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     ctx = [d2l.try_gpu(i) for i in range(num_gpus)]
@@ -230,6 +237,7 @@ def train(net, num_gpus, batch_size, lr):
 Let's see how this works in practice. As a warm-up we [**train the network on a single GPU.**]
 
 ```{.python .input}
+#@tab mxnet
 train(num_gpus=1, batch_size=256, lr=0.1)
 ```
 
@@ -243,6 +251,7 @@ evaluated in :numref:`sec_multi_gpu`,
 the model for ResNet-18 is considerably more complex. This is where parallelization shows its advantage. The time for computation is meaningfully larger than the time for synchronizing parameters. This improves scalability since the overhead for parallelization is less relevant.
 
 ```{.python .input}
+#@tab mxnet
 train(num_gpus=2, batch_size=512, lr=0.2)
 ```
 

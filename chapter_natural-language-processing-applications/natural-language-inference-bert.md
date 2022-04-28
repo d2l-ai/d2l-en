@@ -22,6 +22,7 @@ then fine-tune it
 for natural language inference on the SNLI dataset.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 import json
 import multiprocessing
@@ -55,6 +56,7 @@ we provide two versions of pretrained BERT:
 while "bert.small" is a small version to facilitate demonstration.
 
 ```{.python .input}
+#@tab mxnet
 d2l.DATA_HUB['bert.base'] = (d2l.DATA_URL + 'bert.base.zip',
                              '7b3820b35da691042e5d34c0971ac3edbd80d3f4')
 d2l.DATA_HUB['bert.small'] = (d2l.DATA_URL + 'bert.small.zip',
@@ -74,6 +76,7 @@ and a "pretrained.params" file of the pretrained parameters.
 We implement the following `load_pretrained_model` function to [**load pretrained BERT parameters**].
 
 ```{.python .input}
+#@tab mxnet
 def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
                           num_heads, num_layers, dropout, max_len, devices):
     data_dir = d2l.download_extract(pretrained_model)
@@ -139,6 +142,7 @@ for fine-tuning BERT,
 we use 4 worker processes to generate training or testing examples in parallel.
 
 ```{.python .input}
+#@tab mxnet
 class SNLIBERTDataset(gluon.data.Dataset):
     def __init__(self, dataset, max_len, vocab=None):
         all_premise_hypothesis_tokens = [[
@@ -252,6 +256,7 @@ Such examples will be read in minibatches during training and testing
 of natural language inference.
 
 ```{.python .input}
+#@tab mxnet
 # Reduce `batch_size` if there is an out of memory error. In the original BERT
 # model, `max_len` = 512
 batch_size, max_len, num_workers = 512, 128, d2l.get_dataloader_workers()
@@ -291,6 +296,7 @@ which encodes the information of both the premise and the hypothesis,
 entailment, contradiction, and neutral.
 
 ```{.python .input}
+#@tab mxnet
 class BERTClassifier(nn.Block):
     def __init__(self, bert):
         super(BERTClassifier, self).__init__()
@@ -327,6 +333,7 @@ only the parameters of the output layer of the additional MLP (`net.output`) wil
 All the parameters of the pretrained BERT encoder (`net.encoder`) and the hidden layer of the additional MLP (`net.hidden`) will be fine-tuned.
 
 ```{.python .input}
+#@tab mxnet
 net = BERTClassifier(bert)
 net.output.initialize(ctx=devices)
 ```
@@ -358,6 +365,7 @@ Due to the limited computational resources, [**the training**] and testing accur
 can be further improved: we leave its discussions in the exercises.
 
 ```{.python .input}
+#@tab mxnet
 lr, num_epochs = 1e-4, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
