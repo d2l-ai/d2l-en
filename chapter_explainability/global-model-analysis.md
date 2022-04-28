@@ -93,7 +93,7 @@ trainer = d2l.Trainer(max_epochs=50)
 trainer.fit(model, data)
 ```
 
-As can be seen, our model obtains a decent accuracy score on the validation set. Yet, instead of stopping at this point, we can further scrutinize our model by asking: ***Q1***: What type of errors have been made by the classification model? ***Q2***: How does the model perform on different subgroups? ***Q3***: How does each feature contribute to the model performance? ***Q4***: What is the relationship between target and the features of interest?
+As can be seen, our model obtains a decent accuracy score on the validation set. Yet, instead of stopping at this point, we can further scrutinize our model by asking: **Q1**: What type of errors have been made by the classification model? **Q2**: How does the model perform on different subgroups? **Q3**: How does each feature contribute to the model performance? **Q4**: What is the relationship between target and the features of interest?
 
 ## Error Analysis
 Aggregate metrics such as accuracy and mean squared error on the entire dataset enable us to understand the overall model performances but do not reflect the specifics of the errors. In particular, the model accuracy may be non-uniform across subgroups, and there might exist cases where the model fails more frequently. We can pinpoint such error cases via error analysis.
@@ -137,7 +137,7 @@ def draw_error_map(x_axis, y_axis):
 ```
 
 ### Confusion Matrix
-We can answer ***Q1*** with confusion matrices. Confusion matrices show the inaccuracies patterns and how the model is confused when making predictions. It provides insights into the errors being made and helps identify the most promising direction to improve model performance.
+We can answer **Q1** with confusion matrices. Confusion matrices show the inaccuracies patterns and how the model is confused when making predictions. It provides insights into the errors being made and helps identify the most promising direction to improve model performance.
 
 ```{.python .input  n=8}
 explainer = GlobalExplainer(model, data)
@@ -149,7 +149,7 @@ draw_error_map(error.Predicted_Label, error.Actual_Label)
 Among all the misclassifications, we can check if it is false negatives or false positives that account for the majority of the error cases. Then, we can spend more effort inspecting the majority of the error cases which might be more rewarding.
 
 ### Errors Distribution across Cohorts
-The insight from the confusion matrix is helpful, but it does not help us understand the erroneous cases across cohorts. To answer ***Q2***, we need to stratify the erroneous cases further based on the features of interest and specific values of these features. Furthermore, error stratification may reveal possible biases in the model. In the following, error maps are utilized to show details of the model errors and discover cohorts of data for which the model underperforms. 
+The insight from the confusion matrix is helpful, but it does not help us understand the erroneous cases across cohorts. To answer **Q2**, we need to stratify the erroneous cases further based on the features of interest and specific values of these features. Furthermore, error stratification may reveal possible biases in the model. In the following, error maps are utilized to show details of the model errors and discover cohorts of data for which the model underperforms. 
 
 The following error map stratifies the erroneous cases across different age groups.
 
@@ -173,7 +173,7 @@ The error analyses mentioned above are conducted automatically, but it is also v
 Ablation studies refer to removing certain features (or components) of the model and seeing the features' (or components') contribution to the overall model performance. 
 
 ### Global Feature Importance via Ablation Study
-Feature importance refers to techniques that assign a score to input features based on how useful they are at predicting a target variable. It can be used to answer ***Q3***. Some models, such as random forests provide an innate way of calculating feature importance (e.g., using Gini or entropy) :cite:`Breiman.2001`, but these methods are model dependent.  
+Feature importance refers to techniques that assign a score to input features based on how useful they are at predicting a target variable. It can be used to answer **Q3**. Some models, such as random forests provide an innate way of calculating feature importance (e.g., using Gini or entropy) :cite:`Breiman.2001`, but these methods are model dependent.  
 
 With a dataset of $m$ features, the procedure goes like this:
 * Train the model on the entire training set and obtain an accuracy score $s$ (or other scoring metrics) on the validation set.
@@ -227,10 +227,12 @@ Ablation studies are straightforward and useful but they are not without shortco
 
 ## Partial Dependence Plot
 
-Feature importance scores are helpful to identifying the main drivers, but they do not provide insights about the relationship between input features and predictions ***Q4***. Partial dependence plot (PDP) :cite:`friedman2001greedy` is an effective tool to illustrate how the model’s predictions change depending on the values of input features of interest, marginalizing over the values of all other input features.  For example, it can show whether the probability of getting heart disease increases linearly with age. The partial dependence $pd_{X_T}$ between feature $X_T$ and the model's prediction is defined as
+Feature importance scores are helpful to identifying the main drivers, but they do not provide insights about the relationship between input features and predictions **Q4**. Partial dependence plot (PDP) :cite:`friedman2001greedy` is an effective tool to illustrate how the model’s predictions change depending on the values of input features of interest, marginalizing over the values of all other input features.  For example, it can show whether the probability of getting heart disease increases linearly with age. The partial dependence $pd_{X_T}$ between feature $X_T$ and the model's prediction is defined as
+
 $$
 pd_{X_T}(x_T) = \mathbb{E}_{X_S} [f(x_T, X_S)] \approx \frac{1}{N} \sum_{k=1}^N f(x_T, {x_S}^{(k)}),
 $$
+
 where $X_T$ are the features of interest and $X_S$ are other features; $N$ is the number of examples; and ${x_S}^{(k)}$ is the value of the $k^{\text{th}}$ sample for the features in $X_S$.
 
 The following function draws the partial dependence plot with a given target and features of interest (one or two features). The *feature_type* can be *NUMERICAL* or *CATEGORICAL*.
