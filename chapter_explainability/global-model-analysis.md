@@ -23,7 +23,6 @@ The $13$ feature columns are:  *age*, *sex* ($1$: male, $0$: female), *cp* (ches
 In this task, we will build a predictive model to classify whether a patient has heart disease or not given the aforementioned $13$ features. We use $70\%$ of the examples for training and the remaining $30\%$ for testing.
 
 ```{.python .input  n=2}
-#@tab pytorch
 #@save
 class HeartDiseaseData(d2l.DataModule):
     def __init__(self, batch_size=128, test_ratio=0.3, feat_col=None):
@@ -57,7 +56,6 @@ class HeartDiseaseData(d2l.DataModule):
 Let's construct an MLP classifier for heart disease detection. This model is not inherently interpretable despite its simple structure.
 
 ```{.python .input  n=3}
-#@tab pytorch
 #@save
 class HeartDiseaseMLP(d2l.Classifier):
     def __init__(self, num_outputs=2, lr=0.001, wd=1e-6):
@@ -103,7 +101,6 @@ Aggregate metrics such as accuracy and mean squared error on the entire dataset 
 We define a *GlobalExplainer* class which requires to be fed with a model and a dataset, and save it for later use.
 
 ```{.python .input  n=5}
-#@tab pytorch
 #@save
 class GlobalExplainer: 
     def __init__(self, model, data):
@@ -209,7 +206,6 @@ def feature_importance(self, features_of_interest, mode='PERMUTE'):
 The following function draws the feature importance scores with a bar chart.
 
 ```{.python .input  n=12}
-#@tab pytorch
 #@save
 def draw_feature_importance(features_names, feature_importance):
     d2l.plt.figure(figsize=(2, 2.5))
@@ -300,6 +296,6 @@ PDPs are an intuitive way to extract insights from black-box models. Disadvantag
 
 ## Exercises
 1. Analyze the error distribution across different cholesterol levels. 
-2. Can you calculate the importance score of the batch norm via ablation study? Hint: You may need to revise the MLP model.
-3. Compute the global feature importance using *REMOVE* mode and compare the results and runtime with the *PERMUTE* mode. What can you find from the comparison?
-4. Analyze the relationship between *target* and resting blood pressure.
+1. Can you calculate the importance score of the batch norm via ablation study? Hint: You may need to revise the MLP model.
+1. Compute the global feature importance using *REMOVE* mode and compare the results and runtime with the *PERMUTE* mode. What can you find from the comparison?
+1. Analyze the relationship between *target* and resting blood pressure.
