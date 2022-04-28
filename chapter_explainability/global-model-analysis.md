@@ -176,9 +176,10 @@ Ablation studies refer to removing certain features (or components) of the model
 Feature importance refers to techniques that assign a score to input features based on how useful they are at predicting a target variable. It can be used to answer **Q3**. Some models, such as random forests provide an innate way of calculating feature importance (e.g., using Gini or entropy) :cite:`Breiman.2001`, but these methods are model dependent.  
 
 With a dataset of $m$ features, the procedure goes like this:
-* Train the model on the entire training set and obtain an accuracy score $s$ (or other scoring metrics) on the validation set.
-* For each feature $i$, $i \in m$, remove it from the training set, then retrain the model and get another score $s_i$ on the validation set. Alternatively, we can permute the feature $i$ and then re-evaluate the model :cite:`Breiman.2001`. Feature permutation is more efficient as it does not require model retraining.
-* Calculate the global feature importance of feature $i$ using $s-s_i$.
+
+1. Train the model on the entire training set and obtain an accuracy score $s$ (or other scoring metrics) on the validation set.
+1. For each feature $i$, $i \in m$, remove it from the training set, then retrain the model and get another score $s_i$ on the validation set. Alternatively, we can permute the feature $i$ and then re-evaluate the model :cite:`Breiman.2001`. Feature permutation is more efficient as it does not require model retraining.
+1. Calculate the global feature importance of feature $i$ using $s-s_i$.
 
 Now, let's implement this feature ablation method. The following function provides two ablation modes: *REMOVE* and *PERMUTE*. To permute the feature $i$, we randomly shuffle the values of feature $i$ in the current batch.
 
@@ -301,3 +302,7 @@ PDPs are an intuitive way to extract insights from black-box models. Disadvantag
 1. Can you calculate the importance score of the batch norm via ablation study? Hint: You may need to revise the MLP model.
 1. Compute the global feature importance using *REMOVE* mode and compare the results and runtime with the *PERMUTE* mode. What can you find from the comparison?
 1. Analyze the relationship between *target* and resting blood pressure.
+
+```{.python .input}
+
+```
