@@ -385,7 +385,7 @@ an extremely popular open-source framework
 that has been enthusiastically embraced 
 by the deep learning research community.
 All of the code in this book has passed tests 
-under the latest stable verion of PyTorch.
+under the latest stable version of PyTorch.
 However, due to the rapid development of deep learning,
 some code *in the print edition* 
 may not work properly in future versions of PyTorch.
@@ -401,7 +401,7 @@ Here is how we import modules from PyTorch.
 Most of the code in this book is based on TensorFlow,
 an open-source framework for deep learning
 that is widely adopted in industry
-and popular among reserchers.
+and popular among researchers.
 All of the code in this book has passed tests 
 under the latest stable version TensorFlow.
 However, due to the rapid development of deep learning, 
