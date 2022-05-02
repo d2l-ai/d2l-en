@@ -85,6 +85,17 @@ def self_information(p):
 self_information(1 / 64)
 ```
 
+```{.python .input}
+#@tab jax
+import jax.numpy as jnp
+import jax.random as random
+
+def self_information(p):
+    return -jnp.log2(jnp.array(p))
+
+self_information(1 / 64)
+```
+
 ## Entropy
 
 As self-information only measures the information of a single discrete event, we need a more generalized measure for any random variable of either discrete or continuous distribution.
@@ -142,6 +153,14 @@ def entropy(p):
     return nansum(- p * log2(p))
 
 entropy(tf.constant([0.1, 0.5, 0.1, 0.3]))
+```
+
+```{.python .input}
+#@tab jax
+def entropy(p):
+    return jnp.nansum(- p * jnp.log2(p))
+
+entropy(jnp.array([0.1, 0.5, 0.1, 0.3]))
 ```
 
 ### Interpretations
@@ -231,6 +250,17 @@ def joint_entropy(p_xy):
 joint_entropy(tf.constant([[0.1, 0.5], [0.1, 0.3]]))
 ```
 
+```{.python .input}
+#@tab jax
+def joint_entropy(p_xy):
+    joint_ent = -p_xy * jnp.log2(p_xy)
+    # Operator `nansum` will sum up the non-nan number
+    out = jnp.nansum(joint_ent)
+    return out
+
+joint_entropy(jnp.array([[0.1, 0.5], [0.1, 0.3]]))
+```
+
 Notice that this is the same *code* as before, but now we interpret it differently as working on the joint distribution of the two random variables.
 
 
@@ -295,6 +325,19 @@ def conditional_entropy(p_xy, p_x):
 
 conditional_entropy(tf.constant([[0.1, 0.5], [0.2, 0.3]]),
                     tf.constant([0.2, 0.8]))
+```
+
+```{.python .input}
+#@tab jax
+def conditional_entropy(p_xy, p_x):
+    p_y_given_x = p_xy/p_x
+    cond_ent = -p_xy * jnp.log2(p_y_given_x)
+    # Operator `nansum` will sum up the non-nan number
+    out = jnp.nansum(cond_ent)
+    return out
+
+conditional_entropy(jnp.array([[0.1, 0.5], [0.2, 0.3]]),
+                    jnp.array([0.2, 0.8]))
 ```
 
 ### Mutual Information
@@ -365,6 +408,19 @@ mutual_information(tf.constant([[0.1, 0.5], [0.1, 0.3]]),
                    tf.constant([0.2, 0.8]), tf.constant([[0.75, 0.25]]))
 ```
 
+```{.python .input}
+#@tab jax
+def mutual_information(p_xy, p_x, p_y):
+    p = p_xy / (p_x * p_y)
+    mutual = p_xy * jnp.log2(p)
+    # Operator `nansum` will sum up the non-nan number
+    out = jnp.nansum(mutual)
+    return out
+
+mutual_information(jnp.array([[0.1, 0.5], [0.1, 0.3]]),
+                   jnp.array([0.2, 0.8]), jnp.array([[0.75, 0.25]]))
+```
+
 ### Properties of Mutual Information
 
 Rather than memorizing the definition of mutual information :eqref:`eq_mut_ent_def`, you only need to keep in mind its notable properties:
@@ -431,6 +487,14 @@ def kl_divergence(p, q):
     return tf.abs(out).numpy()
 ```
 
+```{.python .input}
+#@tab jax
+def kl_divergence(p, q):
+    kl = p * jnp.log2(p / q)
+    out = jnp.nansum(kl)
+    return jnp.abs(out)
+```
+
 ### KL Divergence Properties
 
 Let's take a look at some properties of the KL divergence :eqref:`eq_kl_def`.
@@ -489,6 +553,21 @@ q2 = tf.random.normal((tensor_len, ), 1, 1)
 p = tf.sort(p)
 q1 = tf.sort(q1)
 q2 = tf.sort(q2)
+```
+
+```{.python .input}
+#@tab jax
+key = random.PRNGKey(42)
+key1, key2, key3 = random.split(key, 3)
+
+tensor_len = 10000
+p = random.normal(key1, (tensor_len, )) * 1 + 0
+q1 = random.normal(key2, (tensor_len, )) * 1 - 1
+q2 = random.normal(key3, (tensor_len, )) * 1 + 1
+
+p = jnp.sort(p)
+q1 = jnp.sort(q1)
+q2 = jnp.sort(q2)
 ```
 
 Since $q_1$ and $q_2$ are symmetric with respect to the y-axis (i.e., $x=0$), we expect a similar value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$. As you can see below, there is only a less than 3% off between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$.
@@ -567,6 +646,14 @@ def cross_entropy(y_hat, y):
     return tf.reduce_mean(ce).numpy()
 ```
 
+```{.python .input}
+#@tab jax
+def cross_entropy(y_hat, y):
+  indices = jnp.array([[i, j] for i, j in zip(range(len(y_hat)), y)])
+  ce = -jnp.log(y_hat[tuple(jnp.moveaxis(indices, -1, 0))])
+  return ce.mean()
+```
+
 Now define two tensors for the labels and predictions, and calculate the cross-entropy loss of them.
 
 ```{.python .input}
@@ -588,6 +675,14 @@ cross_entropy(preds, labels)
 #@tab tensorflow
 labels = tf.constant([0, 2])
 preds = tf.constant([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
+
+cross_entropy(preds, labels)
+```
+
+```{.python .input}
+#@tab jax
+labels = jnp.array([0, 2])
+preds = jnp.array([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
 
 cross_entropy(preds, labels)
 ```
@@ -674,6 +769,17 @@ def nll_loss(y_hat, y):
     return tf.reduce_mean(cross_entropy(y, y_hat)).numpy()
 
 loss = nll_loss(tf.math.log(preds), labels)
+loss
+```
+
+```{.python .input}
+#@tab jax
+def nll_loss(y_hat, y):
+  indices = jnp.array([[i, j] for i, j in zip(range(len(y_hat)), y)])
+  out = y_hat[tuple(jnp.moveaxis(indices, -1, 0))]
+  return -out.sum() / len(y_hat)
+
+loss = nll_loss(jnp.log(preds), labels)
 loss
 ```
 
