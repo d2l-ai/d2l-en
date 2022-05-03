@@ -45,7 +45,7 @@ For deep neural networks,
 if we can
 train the newly-added layer into an identity function $f(\mathbf{x}) = \mathbf{x}$, the new model will be as effective as the original model. As the new model may get a better solution to fit the training dataset, the added layer might make it easier to reduce training errors.
 
-This is the question that He et al. considered when working on very deep computer vision models :cite:`He.Zhang.Ren.ea.2016`.
+This is the question that :cite:`He.Zhang.Ren.ea.2016` considered when working on very deep computer vision models.
 At the heart of their proposed *residual network* (*ResNet*) is the idea that every additional layer should
 more easily
 contain the identity function as one of its elements.
@@ -61,7 +61,7 @@ build deep neural networks.
 
 Let's focus on a local part of a neural network, as depicted in :numref:`fig_residual_block`. Denote the input by $\mathbf{x}$.
 We assume that the desired underlying mapping we want to obtain by learning is $f(\mathbf{x})$, to be used as input to the activation function on the top.
-On the left of :numref:`fig_residual_block`,
+On the left,
 the portion within the dotted-line box
 must directly learn the mapping $f(\mathbf{x})$.
 On the right,
@@ -76,7 +76,7 @@ of the
 upper weight layer (e.g., fully connected layer and convolutional layer)
 within the dotted-line box
 to zero.
-The right figure in :numref:`fig_residual_block` illustrates the  *residual block* of ResNet,
+The right figure illustrates the  *residual block* of ResNet,
 where the solid line carrying the layer input
 $\mathbf{x}$ to the addition operator
 is called a *residual connection* (or *shortcut connection*).
