@@ -130,7 +130,7 @@ X = np.random.uniform(size=(8, 8))
 comp_conv2d(conv2d, X).shape
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 import torch
 from torch import nn
@@ -145,7 +145,7 @@ def comp_conv2d(conv2d, X):
     # Strip the first two dimensions: examples and channels
     return Y.reshape(Y.shape[2:])
 # 1 row and column is padded on either side, so a total of 2 rows or columns are added
-conv2d = nn.Conv2d(1, 1, kernel_size=3, padding=1)
+conv2d = nn.LazyConv2d(1, kernel_size=3, padding=1)
 X = torch.rand(size=(8, 8))
 comp_conv2d(conv2d, X).shape
 ```
@@ -181,11 +181,11 @@ conv2d = nn.Conv2D(1, kernel_size=(5, 3), padding=(2, 1))
 comp_conv2d(conv2d, X).shape
 ```
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab pytorch
 # We use a convolution kernel with height 5 and width 3. The padding on 
 # either side of the height and width are 2 and 1, respectively.
-conv2d = nn.Conv2d(1, 1, kernel_size=(5, 3), padding=(2, 1))
+conv2d = nn.LazyConv2d(1, kernel_size=(5, 3), padding=(2, 1))
 comp_conv2d(conv2d, X).shape
 ```
 
@@ -248,9 +248,9 @@ conv2d = nn.Conv2D(1, kernel_size=3, padding=1, strides=2)
 comp_conv2d(conv2d, X).shape
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab pytorch
-conv2d = nn.Conv2d(1, 1, kernel_size=3, padding=1, stride=2)
+conv2d = nn.LazyConv2d(1, kernel_size=3, padding=1, stride=2)
 comp_conv2d(conv2d, X).shape
 ```
 
@@ -268,9 +268,9 @@ conv2d = nn.Conv2D(1, kernel_size=(3, 5), padding=(0, 1), strides=(3, 4))
 comp_conv2d(conv2d, X).shape
 ```
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab pytorch
-conv2d = nn.Conv2d(1, 1, kernel_size=(3, 5), padding=(0, 1), stride=(3, 4))
+conv2d = nn.LazyConv2d(1, kernel_size=(3, 5), padding=(0, 1), stride=(3, 4))
 comp_conv2d(conv2d, X).shape
 ```
 

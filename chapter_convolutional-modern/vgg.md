@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -76,7 +76,7 @@ of convolutional layers `num_convs`, the number of input channels `in_channels`
 and the number of output channels `out_channels`.
 :end_tab:
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx, init
@@ -92,24 +92,22 @@ def vgg_block(num_convs, num_channels):
     return blk
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 
-def vgg_block(num_convs, in_channels, out_channels):
+def vgg_block(num_convs, out_channels):
     layers = []
     for _ in range(num_convs):
-        layers.append(nn.Conv2d(in_channels, out_channels,
-                                kernel_size=3, padding=1))
+        layers.append(nn.LazyConv2d(out_channels, kernel_size=3, padding=1))
         layers.append(nn.ReLU())
-        in_channels = out_channels
     layers.append(nn.MaxPool2d(kernel_size=2,stride=2))
     return nn.Sequential(*layers)
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab tensorflow
 import tensorflow as tf
 from d2l import tensorflow as d2l
@@ -151,7 +149,7 @@ which are precisely the arguments required to call
 the `vgg_block` function. As such, VGG defines a *family* of networks rather than just 
 a specific manifestation. To build a specific network we simply iterate over `arch` to compose the blocks.
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab all
 class VGG(d2l.Classifier):
     def __init__(self, arch, lr=0.1, num_classes=10):
@@ -169,13 +167,12 @@ class VGG(d2l.Classifier):
             conv_blks = []
             in_channels = 1
             for (num_convs, out_channels) in arch:
-                conv_blks.append(vgg_block(num_convs, in_channels, out_channels))
-                in_channels = out_channels
+                conv_blks.append(vgg_block(num_convs, out_channels))
             self.net = nn.Sequential(
                 *conv_blks, nn.Flatten(),
-                nn.Linear(out_channels * 7 * 7, 4096), nn.ReLU(), nn.Dropout(0.5),
-                nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
-                nn.Linear(4096, num_classes))
+                nn.LazyLinear(4096), nn.ReLU(), nn.Dropout(0.5),
+                nn.LazyLinear(4096), nn.ReLU(), nn.Dropout(0.5),
+                nn.LazyLinear(num_classes))
             self.net.apply(d2l.init_cnn)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential()
@@ -200,13 +197,13 @@ until that number reaches 512.
 Since this network uses 8 convolutional layers
 and 3 fully connected layers, it is often called VGG-11.
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab pytorch, mxnet
 VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary(
     (1, 1, 224, 224))
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab tensorflow
 VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary(
     (1, 224, 224, 1))
@@ -224,15 +221,17 @@ we construct a network with a smaller number of channels.**]
 This is more than sufficient for training on Fashion-MNIST.
 The [**model training**] process is similar to that of AlexNet in :numref:`sec_alexnet`.
 
-```{.python .input}
+```{.python .input  n=10}
 %%tab mxnet, pytorch
 model = VGG(arch=((1, 16), (1, 32), (2, 64), (2, 128), (2, 128)), lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
+if tab.selected('pytorch'):
+    model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
 trainer.fit(model, data)
 ```
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))

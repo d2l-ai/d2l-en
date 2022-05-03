@@ -24,7 +24,7 @@ from mxnet import autograd, gluon, np, npx
 npx.set_np()
 ```
 
-```{.python .input  n=3}
+```{.python .input  n=2}
 %%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -50,7 +50,7 @@ we begin by defining the class for the RNN model
 with its model parameters only.
 The number of hidden units `num_hiddens` is a tunable hyperparameter.
 
-```{.python .input  n=5}
+```{.python .input  n=3}
 %%tab all
 class RNNScratch(d2l.Module):  #@save
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
@@ -359,7 +359,7 @@ we train a character-level language model (`model`)
 based on the RNN (`rnn`) implemented from scratch.
 Note that we clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process.
 
-```{.python .input  n=26}
+```{.python .input  n=19}
 %%tab all
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet', 'pytorch'):
@@ -393,7 +393,7 @@ the hidden state is generally better than
 its initialized value at the beginning.
 So we generate the predicted characters and emit them.
 
-```{.python .input}
+```{.python .input  n=20}
 %%tab all
 @d2l.add_to_class(RNNLMScratch)  #@save
 def predict(self, prefix, num_preds, vocab, device=None):
@@ -418,7 +418,7 @@ def predict(self, prefix, num_preds, vocab, device=None):
 In the following, we specify the prefix 
 and have it generate 20 additional characters.
 
-```{.python .input}
+```{.python .input  n=21}
 %%tab mxnet, pytorch
 model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```

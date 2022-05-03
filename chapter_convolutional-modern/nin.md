@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch'])
 ```
@@ -50,7 +50,7 @@ Note both the difference in the NiN blocks (the initial convolution is followed 
 :width:`600px`
 :label:`fig_nin`
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx, init
@@ -66,18 +66,18 @@ def nin_block(num_channels, kernel_size, strides, padding):
     return blk
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 
-def nin_block(in_channels, out_channels, kernel_size, strides, padding):
+def nin_block(out_channels, kernel_size, strides, padding):
     return nn.Sequential(
-        nn.Conv2d(in_channels, out_channels, kernel_size, strides, padding),
+        nn.LazyConv2d(out_channels, kernel_size, strides, padding),
         nn.ReLU(),
-        nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU(),
-        nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU())
+        nn.LazyConv2d(out_channels, kernel_size=1), nn.ReLU(),
+        nn.LazyConv2d(out_channels, kernel_size=1), nn.ReLU())
 ```
 
 ## [**NiN Model**]
@@ -93,7 +93,7 @@ Instead, NiN uses a NiN block with a number of output channels equal to the numb
 yielding a vector of logits.
 This design significantly reduces the number of required model parameters, albeit at the expense of a potential increase in training time.
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab all
 class NiN(d2l.Classifier):
     def __init__(self, lr=0.1, num_classes=10):
@@ -115,15 +115,14 @@ class NiN(d2l.Classifier):
             self.net.initialize(init.Xavier())
         if tab.selected('pytorch'):
             self.net = nn.Sequential(
-                nin_block(1, 96, kernel_size=11, strides=4, padding=0),
+                nin_block(96, kernel_size=11, strides=4, padding=0),
                 nn.MaxPool2d(3, stride=2),
-                nin_block(96, 256, kernel_size=5, strides=1, padding=2),
+                nin_block(256, kernel_size=5, strides=1, padding=2),
                 nn.MaxPool2d(3, stride=2),
-                nin_block(256, 384, kernel_size=3, strides=1, padding=1),
+                nin_block(384, kernel_size=3, strides=1, padding=1),
                 nn.MaxPool2d(3, stride=2),
                 nn.Dropout(0.5),
-                nin_block(384, num_classes, kernel_size=3, strides=1,
-                          padding=1),
+                nin_block(num_classes, kernel_size=3, strides=1, padding=1),
                 nn.AdaptiveAvgPool2d((1, 1)),
                 nn.Flatten())
             self.net.apply(d2l.init_cnn)
@@ -131,7 +130,7 @@ class NiN(d2l.Classifier):
 
 We create a data example to see [**the output shape of each block**].
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab all
 model = NiN()
 X = d2l.randn(1, 1, 224, 224)
@@ -145,11 +144,13 @@ for layer in model.net:
 As before we use Fashion-MNIST to train the model.
 NiN's training is similar to that for AlexNet and VGG.
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab all
-model = NiN(lr=0.1)
+model = NiN(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
+if tab.selected('pytorch'):
+    model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
 trainer.fit(model, data)
 ```
 

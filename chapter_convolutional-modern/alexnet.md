@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -289,7 +289,7 @@ such as flipping, clipping, and color changes.
 This makes the model more robust and the larger sample size effectively reduces overfitting.
 We will discuss data augmentation in greater detail in :numref:`sec_image_augmentation`. See also :cite:`Buslaev.Iglovikov.Khvedchenya.ea.2020` for an in-depth review of such preprocessing steps.
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, init, npx
@@ -297,20 +297,20 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab all
 class AlexNet(d2l.Classifier):
     def __init__(self, lr=0.1, num_classes=10):
@@ -333,17 +333,17 @@ class AlexNet(d2l.Classifier):
             self.net.initialize(init.Xavier())
         if tab.selected('pytorch'):
             self.net = nn.Sequential(
-                nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=1),
+                nn.LazyConv2d(96, kernel_size=11, stride=4, padding=1),
                 nn.ReLU(), nn.MaxPool2d(kernel_size=3, stride=2),
-                nn.Conv2d(96, 256, kernel_size=5, padding=2), nn.ReLU(),
+                nn.LazyConv2d(256, kernel_size=5, padding=2), nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2),
-                nn.Conv2d(256, 384, kernel_size=3, padding=1), nn.ReLU(),
-                nn.Conv2d(384, 384, kernel_size=3, padding=1), nn.ReLU(),
-                nn.Conv2d(384, 256, kernel_size=3, padding=1), nn.ReLU(),
+                nn.LazyConv2d(384, kernel_size=3, padding=1), nn.ReLU(),
+                nn.LazyConv2d(384, kernel_size=3, padding=1), nn.ReLU(),
+                nn.LazyConv2d(256, kernel_size=3, padding=1), nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2), nn.Flatten(),
-                nn.Linear(6400, 4096), nn.ReLU(), nn.Dropout(p=0.5),
-                nn.Linear(4096, 4096), nn.ReLU(),nn.Dropout(p=0.5),
-                nn.Linear(4096, num_classes))
+                nn.LazyLinear(4096), nn.ReLU(), nn.Dropout(p=0.5),
+                nn.LazyLinear(4096), nn.ReLU(),nn.Dropout(p=0.5),
+                nn.LazyLinear(num_classes))
             self.net.apply(d2l.init_cnn)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
@@ -370,12 +370,12 @@ class AlexNet(d2l.Classifier):
 
 We [**construct a single-channel data example**] with both height and width of 224 (**to observe the output shape of each layer**). It matches the AlexNet architecture in :numref:`fig_alexnet`.
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab pytorch, mxnet
 AlexNet().layer_summary((1, 1, 224, 224))
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab tensorflow
 AlexNet().layer_summary((1, 224, 224, 1))
 ```
@@ -400,7 +400,7 @@ the main change here is the use of a smaller learning rate
 and much slower training due to the deeper and wider network,
 the higher image resolution, and the more costly convolutions.
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab pytorch, mxnet
 model = AlexNet(lr=0.01)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
@@ -408,7 +408,7 @@ trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 trainer.fit(model, data)
 ```
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))

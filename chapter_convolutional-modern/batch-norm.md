@@ -493,14 +493,14 @@ class BNLeNetScratch(d2l.Classifier):
             self.initialize()
         if tab.selected('pytorch'):
             self.net = nn.Sequential(
-                nn.Conv2d(1, 6, kernel_size=5), BatchNorm(6, num_dims=4),
+                nn.LazyConv2d(6, kernel_size=5), BatchNorm(6, num_dims=4),
                 nn.Sigmoid(), nn.AvgPool2d(kernel_size=2, stride=2),
-                nn.Conv2d(6, 16, kernel_size=5), BatchNorm(16, num_dims=4),
+                nn.LazyConv2d(16, kernel_size=5), BatchNorm(16, num_dims=4),
                 nn.Sigmoid(), nn.AvgPool2d(kernel_size=2, stride=2),
-                nn.Flatten(), nn.Linear(16*4*4, 120),
-                BatchNorm(120, num_dims=2), nn.Sigmoid(), nn.Linear(120, 84),
+                nn.Flatten(), nn.LazyLinear(120),
+                BatchNorm(120, num_dims=2), nn.Sigmoid(), nn.LazyLinear(84),
                 BatchNorm(84, num_dims=2), nn.Sigmoid(),
-                nn.Linear(84, num_classes))
+                nn.LazyLinear(num_classes))
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
                 tf.keras.layers.Conv2D(filters=6, kernel_size=5,
@@ -524,7 +524,9 @@ This code is virtually identical to that when we first trained LeNet (:numref:`s
 %%tab mxnet, pytorch
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=256)
-model = BNLeNetScratch(lr=0.9)
+model = BNLeNetScratch(lr=0.1)
+if tab.selected('pytorch'):
+    model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
 trainer.fit(model, data)
 ```
 
@@ -586,13 +588,13 @@ class BNLeNet(d2l.Classifier):
             self.initialize()
         if tab.selected('pytorch'):
             self.net = nn.Sequential(
-                nn.Conv2d(1, 6, kernel_size=5), nn.BatchNorm2d(6),
+                nn.LazyConv2d(6, kernel_size=5), nn.LazyBatchNorm2d(),
                 nn.Sigmoid(), nn.AvgPool2d(kernel_size=2, stride=2),
-                nn.Conv2d(6, 16, kernel_size=5), nn.BatchNorm2d(16),
+                nn.LazyConv2d(16, kernel_size=5), nn.LazyBatchNorm2d(),
                 nn.Sigmoid(), nn.AvgPool2d(kernel_size=2, stride=2),
-                nn.Flatten(), nn.Linear(256, 120), nn.BatchNorm1d(120),
-                nn.Sigmoid(), nn.Linear(120, 84), nn.BatchNorm1d(84),
-                nn.Sigmoid(), nn.Linear(84, num_classes))
+                nn.Flatten(), nn.LazyLinear(120), nn.LazyBatchNorm1d(),
+                nn.Sigmoid(), nn.LazyLinear(84), nn.LazyBatchNorm1d(),
+                nn.Sigmoid(), nn.LazyLinear(num_classes))
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
                 tf.keras.layers.Conv2D(filters=6, kernel_size=5,
@@ -622,7 +624,9 @@ while our custom implementation must be interpreted by Python.
 %%tab mxnet, pytorch
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=256)
-model = BNLeNet(lr=0.9)
+model = BNLeNet(lr=0.1)
+if tab.selected('pytorch'):
+    model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
 trainer.fit(model, data)
 ```
 

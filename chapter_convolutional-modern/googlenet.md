@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -39,7 +39,7 @@ along the channel dimension and comprise the block's output.
 The commonly-tuned hyperparameters of the Inception block
 are the number of output channels per layer.
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx, init
@@ -72,7 +72,7 @@ class Inception(nn.Block):
         return np.concatenate((b1, b2, b3, b4), axis=1)
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -81,19 +81,19 @@ from torch.nn import functional as F
 
 class Inception(nn.Module):
     # `c1`--`c4` are the number of output channels for each branch
-    def __init__(self, in_channels, c1, c2, c3, c4, **kwargs):
+    def __init__(self, c1, c2, c3, c4, **kwargs):
         super(Inception, self).__init__(**kwargs)
         # Branch 1
-        self.b1_1 = nn.Conv2d(in_channels, c1, kernel_size=1)
+        self.b1_1 = nn.LazyConv2d(c1, kernel_size=1)
         # Branch 2
-        self.b2_1 = nn.Conv2d(in_channels, c2[0], kernel_size=1)
-        self.b2_2 = nn.Conv2d(c2[0], c2[1], kernel_size=3, padding=1)
+        self.b2_1 = nn.LazyConv2d(c2[0], kernel_size=1)
+        self.b2_2 = nn.LazyConv2d(c2[1], kernel_size=3, padding=1)
         # Branch 3
-        self.b3_1 = nn.Conv2d(in_channels, c3[0], kernel_size=1)
-        self.b3_2 = nn.Conv2d(c3[0], c3[1], kernel_size=5, padding=2)
+        self.b3_1 = nn.LazyConv2d(c3[0], kernel_size=1)
+        self.b3_2 = nn.LazyConv2d(c3[1], kernel_size=5, padding=2)
         # Branch 4
         self.b4_1 = nn.MaxPool2d(kernel_size=3, stride=1, padding=1)
-        self.b4_2 = nn.Conv2d(in_channels, c4, kernel_size=1)
+        self.b4_2 = nn.LazyConv2d(c4, kernel_size=1)
 
     def forward(self, x):
         b1 = F.relu(self.b1_1(x))
@@ -103,7 +103,7 @@ class Inception(nn.Module):
         return torch.cat((b1, b2, b3, b4), dim=1)
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab tensorflow
 import tensorflow as tf
 from d2l import tensorflow as d2l
@@ -152,7 +152,7 @@ At its stem, the first module is similar to AlexNet and LeNet.
 We can now implement GoogLeNet piece by piece. Let's begin with the stem.
 The first module uses a 64-channel $7\times 7$ convolutional layer.
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab all
 class GoogleNet(d2l.Classifier):
     def b1(self):
@@ -164,7 +164,7 @@ class GoogleNet(d2l.Classifier):
             return net
         if tab.selected('pytorch'):
             return nn.Sequential(
-                nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
+                nn.LazyConv2d(64, kernel_size=7, stride=2, padding=3),
                 nn.ReLU(), nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
         if tab.selected('tensorflow'):
             return tf.keras.models.Sequential([
@@ -178,7 +178,7 @@ The second module uses two convolutional layers:
 first, a 64-channel $1\times 1$ convolutional layer,
 followed by a $3\times 3$ convolutional layer that triples the number of channels. This corresponds to the second branch in the Inception block and concludes the design of the body. At this point we have 192 channels.
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab all
 @d2l.add_to_class(GoogleNet)
 def b2(self):
@@ -190,8 +190,8 @@ def b2(self):
         return net
     if tab.selected('pytorch'):
         return nn.Sequential(
-            nn.Conv2d(64, 64, kernel_size=1), nn.ReLU(),
-            nn.Conv2d(64, 192, kernel_size=3, padding=1), nn.ReLU(),
+            nn.LazyConv2d(64, kernel_size=1), nn.ReLU(),
+            nn.LazyConv2d(192, kernel_size=3, padding=1), nn.ReLU(),
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
     if tab.selected('tensorflow'):
         return tf.keras.Sequential([
@@ -214,7 +214,7 @@ we need to reduce the number of intermediate dimensions in the second and third 
 scale of $\frac{1}{2}$ and $\frac{1}{8}$ respectively suffices, yielding $128$ and $32$ channels
 respectively. This is captured by the arguments of the following `Inception` block constructors.
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab all
 @d2l.add_to_class(GoogleNet)
 def b3(self):
@@ -225,8 +225,8 @@ def b3(self):
                nn.MaxPool2D(pool_size=3, strides=2, padding=1))
         return net
     if tab.selected('pytorch'):
-        return nn.Sequential(Inception(192, 64, (96, 128), (16, 32), 32),
-                             Inception(256, 128, (128, 192), (32, 96), 64),
+        return nn.Sequential(Inception(64, (96, 128), (16, 32), 32),
+                             Inception(128, (128, 192), (32, 96), 64),
                              nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
     if tab.selected('tensorflow'):
         return tf.keras.models.Sequential([
@@ -251,7 +251,7 @@ The second and third branches will first reduce
 the number of channels according to the ratio.
 These ratios are slightly different in different Inception blocks.
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab all
 @d2l.add_to_class(GoogleNet)
 def b4(self):
@@ -265,11 +265,11 @@ def b4(self):
                 nn.MaxPool2D(pool_size=3, strides=2, padding=1))
         return net
     if tab.selected('pytorch'):
-        return nn.Sequential(Inception(480, 192, (96, 208), (16, 48), 64),
-                             Inception(512, 160, (112, 224), (24, 64), 64),
-                             Inception(512, 128, (128, 256), (24, 64), 64),
-                             Inception(512, 112, (144, 288), (32, 64), 64),
-                             Inception(528, 256, (160, 320), (32, 128), 128),
+        return nn.Sequential(Inception(192, (96, 208), (16, 48), 64),
+                             Inception(160, (112, 224), (24, 64), 64),
+                             Inception(128, (128, 256), (24, 64), 64),
+                             Inception(112, (144, 288), (32, 64), 64),
+                             Inception(256, (160, 320), (32, 128), 128),
                              nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
     if tab.selected('tensorflow'):
         return tf.keras.Sequential([
@@ -293,7 +293,7 @@ Finally, we turn the output into a two-dimensional array
 followed by a fully connected layer
 whose number of outputs is the number of label classes.
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab all
 @d2l.add_to_class(GoogleNet)
 def b5(self):
@@ -304,8 +304,8 @@ def b5(self):
                 nn.GlobalAvgPool2D())
         return net
     if tab.selected('pytorch'):
-        return nn.Sequential(Inception(832, 256, (160, 320), (32, 128), 128),
-                             Inception(832, 384, (192, 384), (48, 128), 128),
+        return nn.Sequential(Inception(256, (160, 320), (32, 128), 128),
+                             Inception(384, (192, 384), (48, 128), 128),
                              nn.AdaptiveAvgPool2d((1,1)), nn.Flatten())
     if tab.selected('tensorflow'):
         return tf.keras.Sequential([
@@ -315,7 +315,7 @@ def b5(self):
             tf.keras.layers.Flatten()])
 ```
 
-```{.python .input}
+```{.python .input  n=10}
 %%tab all
 @d2l.add_to_class(GoogleNet)
 def __init__(self, lr=0.1, num_classes=10):
@@ -328,7 +328,7 @@ def __init__(self, lr=0.1, num_classes=10):
         self.net.initialize(init.Xavier())
     if tab.selected('pytorch'):
         self.net = nn.Sequential(self.b1(), self.b2(), self.b3(), self.b4(),
-                                 self.b5(), nn.Linear(1024, num_classes))
+                                 self.b5(), nn.LazyLinear(num_classes))
         self.net.apply(d2l.init_cnn)
     if tab.selected('tensorflow'):
         self.net = tf.keras.Sequential([
@@ -347,12 +347,12 @@ to have a reasonable training time on Fashion-MNIST.**]
 This simplifies the computation. Let's have a look at the
 changes in the shape of the output between the various modules.
 
-```{.python .input}
+```{.python .input  n=11}
 %%tab mxnet, pytorch
 model = GoogleNet().layer_summary((1, 1, 96, 96))
 ```
 
-```{.python .input}
+```{.python .input  n=12}
 %%tab tensorflow
 model = GoogleNet().layer_summary((1, 96, 96, 1))
 ```
@@ -363,15 +363,17 @@ As before, we train our model using the Fashion-MNIST dataset.
  We transform it to $96 \times 96$ pixel resolution
  before invoking the training procedure.
 
-```{.python .input}
+```{.python .input  n=13}
 %%tab mxnet, pytorch
 model = GoogleNet(lr=0.1)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
+if tab.selected('pytorch'):
+    model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
 trainer.fit(model, data)
 ```
 
-```{.python .input}
+```{.python .input  n=14}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))

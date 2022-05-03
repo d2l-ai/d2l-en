@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -88,14 +88,14 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab mxnet, pytorch
 def corr2d(X, K):  #@save
     """Compute 2D cross-correlation."""
@@ -128,7 +128,7 @@ from :numref:`fig_correlation`
 to [**validate the output of the above implementation**]
 of the two-dimensional cross-correlation operation.
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab all
 X = d2l.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])
 K = d2l.tensor([[0.0, 1.0], [2.0, 3.0]])
@@ -164,7 +164,7 @@ class Conv2D(nn.Block):
         return corr2d(x, self.weight.data()) + self.bias.data()
 ```
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab pytorch
 class Conv2D(nn.Module):
     def __init__(self, kernel_size):
@@ -210,7 +210,7 @@ by finding the location of the pixel change.
 First, we construct an "image" of $6\times 8$ pixels.
 The middle four columns are black (0) and the rest are white (1).
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab mxnet, pytorch
 X = d2l.ones((6, 8))
 X[:, 2:6] = 0
@@ -230,7 +230,7 @@ if the horizontally adjacent elements are the same,
 the output is 0. Otherwise, the output is non-zero.
 Note that this kernel is special case of a finite difference operator. At location $(i,j)$ it computes $x_{i,j} - x_{(i+1),j}$, i.e., it computes the difference between the values of horizontally adjacent pixels. This is a discrete approximation of the first derivative in the horizontal direction. After all, for a function $f(i,j)$ its derivative $-\partial_i f(i,j) = \lim_{\epsilon \to 0} \frac{f(i,j) - f(i+\epsilon,j)}{\epsilon}$. Let's see how this works in practice.
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab all
 K = d2l.tensor([[1.0, -1.0]])
 ```
@@ -241,7 +241,7 @@ As you can see, [**we detect 1 for the edge from white to black
 and -1 for the edge from black to white.**]
 All other outputs take value 0.
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab all
 Y = corr2d(X, K)
 Y
@@ -250,7 +250,7 @@ Y
 We can now apply the kernel to the transposed image.
 As expected, it vanishes. [**The kernel `K` only detects vertical edges.**]
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab all
 corr2d(d2l.transpose(X), K)
 ```
@@ -302,11 +302,11 @@ for i in range(10):
         print(f'epoch {i + 1}, loss {float(l.sum()):.3f}')
 ```
 
-```{.python .input}
+```{.python .input  n=11}
 %%tab pytorch
 # Construct a two-dimensional convolutional layer with 1 output channel and a
 # kernel of shape (1, 2). For the sake of simplicity, we ignore the bias here
-conv2d = nn.Conv2d(1,1, kernel_size=(1, 2), bias=False)
+conv2d = nn.LazyConv2d(1, kernel_size=(1, 2), bias=False)
 
 # The two-dimensional convolutional layer uses four-dimensional input and
 # output in the format of (example, channel, height, width), where the batch
@@ -361,7 +361,7 @@ Note that the error has dropped to a small value after 10 iterations. Now we wil
 d2l.reshape(conv2d.weight.data(), (1, 2))
 ```
 
-```{.python .input}
+```{.python .input  n=12}
 %%tab pytorch
 d2l.reshape(conv2d.weight.data, (1, 2))
 ```

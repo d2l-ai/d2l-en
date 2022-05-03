@@ -180,24 +180,24 @@ from torch.nn import functional as F
 
 class ResNeXtBlock(nn.Module):
     """The ResNeXt block."""
-    def __init__(self, input_channels, num_channels, groups, bot_mul,
-                 use_1x1conv=False, strides=1):
+    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False, 
+                 strides=1):
         super().__init__()
         bot_channels = int(round(num_channels * bot_mul))
-        self.conv1 = nn.Conv2d(input_channels, bot_channels, kernel_size=1,
+        self.conv1 = nn.LazyConv2d(bot_channels, kernel_size=1,
                                stride=1)
-        self.conv2 = nn.Conv2d(bot_channels, bot_channels, kernel_size=3,
+        self.conv2 = nn.LazyConv2d(bot_channels, kernel_size=3,
                                stride=strides, padding=1,
                                groups=bot_channels//groups)
-        self.conv3 = nn.Conv2d(bot_channels, num_channels, kernel_size=1,
+        self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1,
                                stride=1)
-        self.bn1 = nn.BatchNorm2d(bot_channels)
-        self.bn2 = nn.BatchNorm2d(bot_channels)
-        self.bn3 = nn.BatchNorm2d(num_channels)
+        self.bn1 = nn.LazyBatchNorm2d()
+        self.bn2 = nn.LazyBatchNorm2d()
+        self.bn3 = nn.LazyBatchNorm2d()
         if use_1x1conv:
-            self.conv4 = nn.Conv2d(input_channels, num_channels,
-                                   kernel_size=1, stride=strides)
-            self.bn4 = nn.BatchNorm2d(num_channels)
+            self.conv4 = nn.LazyConv2d(num_channels, kernel_size=1, 
+                                       stride=strides)
+            self.bn4 = nn.LazyBatchNorm2d()
         else:
             self.conv4 = None
 
@@ -214,11 +214,9 @@ In the following case (`use_1x1conv=False, strides=1`), the input and output are
 
 ```{.python .input  n=4}
 %%tab all
+blk = ResNeXtBlock(32, 16, 1)
 if tab.selected('mxnet'):
-    blk = ResNeXtBlock(32, 16, 1)
     blk.initialize()
-if tab.selected('pytorch'):
-    blk = ResNeXtBlock(32, 32, 16, 1)
 X = d2l.randn(4, 32, 96, 96)
 blk(X).shape
 ```
@@ -228,11 +226,9 @@ halves the output height and width.
 
 ```{.python .input  n=5}
 %%tab all
+blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
 if tab.selected('mxnet'):
-    blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
     blk.initialize()
-if tab.selected('pytorch'):
-    blk = ResNeXtBlock(32, 32, 16, 1, use_1x1conv=True, strides=2)
 blk(X).shape
 ```
 
@@ -323,11 +319,10 @@ class AnyNet(d2l.Classifier):
 ```{.python .input  n=7}
 %%tab pytorch
 class AnyNet(d2l.Classifier):
-    def stem(self, input_channels, num_channels):
+    def stem(self, num_channels):
         return nn.Sequential(
-            nn.Conv2d(input_channels, num_channels, kernel_size=3, stride=2,
-                      padding=1),
-            nn.BatchNorm2d(num_channels), nn.ReLU())
+            nn.LazyConv2d(num_channels, kernel_size=3, stride=2, padding=1),
+            nn.LazyBatchNorm2d(), nn.ReLU())
 ```
 
 Each stage consists of `depth` ResNeXt blocks,
@@ -352,16 +347,14 @@ def stage(self, depth, num_channels, groups, bot_mul):
 ```{.python .input  n=9}
 %%tab pytorch
 @d2l.add_to_class(AnyNet)
-def stage(self, depth, input_channels, num_channels, groups, bot_mul):
+def stage(self, depth, num_channels, groups, bot_mul):
     blk = []
     for i in range(depth):
         if i == 0:
-            blk.append(ResNeXtBlock(
-                input_channels, num_channels, groups, bot_mul,
+            blk.append(ResNeXtBlock(num_channels, groups, bot_mul,
                 use_1x1conv=True, strides=2))
         else:
-            blk.append(ResNeXtBlock(
-                num_channels, num_channels, groups, bot_mul))
+            blk.append(ResNeXtBlock(num_channels, groups, bot_mul))
     return nn.Sequential(*blk)
 ```
 
@@ -382,12 +375,12 @@ def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
         self.net.add(nn.GlobalAvgPool2D(), nn.Dense(num_classes))
         self.net.initialize(init.Xavier())
     if tab.selected('pytorch'):
-        self.net = nn.Sequential(self.stem(1, stem_channels))
+        self.net = nn.Sequential(self.stem(stem_channels))
         for i, s in enumerate(arch):
             self.net.add_module(f'stage{i+1}', self.stage(*s))
         self.net.add_module('head', nn.Sequential(
             nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(),
-            nn.Linear(arch[-1][2], num_classes)))
+            nn.LazyLinear(num_classes)))
         self.net.apply(d2l.init_cnn)
 ```
 
@@ -441,16 +434,10 @@ class RegNet32(AnyNet):
     def __init__(self, lr=0.1, num_classes=10):
         stem_channels, groups, bot_mul = 32, 16, 1
         depths, channels = (4, 6), (32, 80)
-        if tab.selected(['mxnet']):
-            super().__init__(
-                ((depths[0], channels[0], groups, bot_mul),
-                 (depths[1], channels[1], groups, bot_mul)),
-                stem_channels, lr, num_classes)
-        if tab.selected(['pytorch']):
-            super().__init__(
-                ((depths[0], stem_channels, channels[0], groups, bot_mul),
-                 (depths[1], channels[0], channels[1], groups, bot_mul)),
-                stem_channels, lr, num_classes)
+        super().__init__(
+            ((depths[0], channels[0], groups, bot_mul),
+             (depths[1], channels[1], groups, bot_mul)),
+            stem_channels, lr, num_classes)
 ```
 
 We can see that each RegNet stage progressively reduces resolution and increases output channels.
