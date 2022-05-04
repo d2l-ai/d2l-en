@@ -525,6 +525,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
 #@tab pytorch
 devices, num_epochs, lr, wd = d2l.try_all_gpus(), 20, 2e-4, 5e-4
 lr_period, lr_decay, net = 4, 0.9, get_net()
+net(next(iter(train_iter))[0]) # A dry run to initialize the model
 train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
