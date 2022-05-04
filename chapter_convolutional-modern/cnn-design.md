@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch'])
 ```
@@ -132,7 +132,7 @@ with a $1 \times 1$ convolution (`conv4`),
 where setting `use_1x1conv=True, strides=2`
 halves the input height and width.
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx, init
@@ -171,7 +171,7 @@ class ResNeXtBlock(nn.Block):
         return npx.relu(Y + X)
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -212,7 +212,7 @@ class ResNeXtBlock(nn.Module):
 
 In the following case (`use_1x1conv=False, strides=1`), the input and output are of the same shape.
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab all
 blk = ResNeXtBlock(32, 16, 1)
 if tab.selected('mxnet'):
@@ -224,7 +224,7 @@ blk(X).shape
 Alternatively, setting `use_1x1conv=True, strides=2`
 halves the output height and width.
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab all
 blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
 if tab.selected('mxnet'):
@@ -306,7 +306,7 @@ possible networks (e.g., by varying $d_i$ and $w_i$) in the AnyNet design space.
 To implement AnyNet,
 we first define its network stem.
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab mxnet
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
@@ -316,7 +316,7 @@ class AnyNet(d2l.Classifier):
         return net
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab pytorch
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
@@ -329,7 +329,7 @@ Each stage consists of `depth` ResNeXt blocks,
 where `num_channels` specifies the block width.
 Note that the first block halves the height and width of input images.
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab mxnet
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, num_channels, groups, bot_mul):
@@ -344,7 +344,7 @@ def stage(self, depth, num_channels, groups, bot_mul):
     return net
 ```
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, num_channels, groups, bot_mul):
@@ -361,7 +361,7 @@ def stage(self, depth, num_channels, groups, bot_mul):
 Putting the network stem, body, and head together,
 we complete the implementation of AnyNet.
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab all
 @d2l.add_to_class(AnyNet)
 def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
@@ -428,7 +428,7 @@ characterized by
 * $w_1 = 32, w_2=80;$
 * $d_1 = 4, d_2=6.$
 
-```{.python .input  n=11}
+```{.python .input}
 %%tab all
 class RegNet32(AnyNet):
     def __init__(self, lr=0.1, num_classes=10):
@@ -442,7 +442,7 @@ class RegNet32(AnyNet):
 
 We can see that each RegNet stage progressively reduces resolution and increases output channels.
 
-```{.python .input  n=12}
+```{.python .input}
 %%tab all
 RegNet32().layer_summary((1, 1, 96, 96))
 ```
@@ -451,7 +451,7 @@ RegNet32().layer_summary((1, 1, 96, 96))
 
 Training the 32-layer RegNet on the Fashion-MNIST dataset is just like before.
 
-```{.python .input  n=13}
+```{.python .input}
 %%tab all
 model = RegNet32(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
@@ -511,8 +511,6 @@ in the ConvNeXt paper :cite:`liu2022convnet`.
 1. Increase the number of stages to 4. Can you design a deeper RegNet that performs better?
 1. De-ResNeXt-ify RegNets by replacing the ResNeXt block with the ResNet block. How does your new model perform?
 1. Implement multiple instances of a "VioNet" family by *violating* the design principles of RegNet. How do they perform? Which of ($d_i$, $w_i$, $g_i$, $b_i$) is the most important factor?
-
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/7462)

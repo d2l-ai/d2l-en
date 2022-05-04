@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -90,7 +90,7 @@ and chain together the appropriate layers,
 using Xavier initialization as
 introduced in :numref:`subsec_xavier`.
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
@@ -98,20 +98,20 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 import tensorflow as tf
 from d2l import tensorflow as d2l
 ```
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab pytorch
 def init_cnn(module):  #@save
     """Initialize weights for CNNs."""
@@ -119,7 +119,7 @@ def init_cnn(module):  #@save
         nn.init.xavier_uniform_(module.weight)
 ```
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab all
 class LeNet(d2l.Classifier):
     def __init__(self, lr=0.1, num_classes=10):
@@ -177,7 +177,7 @@ what we expect from :numref:`img_lenet_vert`.
 ![Compressed notation for LeNet-5.](../img/lenet-vert.svg)
 :label:`img_lenet_vert`
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab mxnet, pytorch
 @d2l.add_to_class(d2l.Classifier)  #@save
 def layer_summary(self, X_shape):
@@ -190,7 +190,7 @@ model = LeNet()
 model.layer_summary((1, 1, 28, 28))
 ```
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab tensorflow
 @d2l.add_to_class(d2l.Classifier)  #@save
 def layer_summary(self, X_shape):
@@ -245,7 +245,7 @@ available devices.
 Just as with MLPs, our loss function is cross-entropy,
 and we minimize it via minibatch stochastic gradient descent.
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab pytorch, mxnet
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=256)
@@ -255,7 +255,7 @@ if tab.selected('pytorch'):
 trainer.fit(model, data)
 ```
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=256)

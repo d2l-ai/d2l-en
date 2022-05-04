@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -76,7 +76,7 @@ of convolutional layers `num_convs`, the number of input channels `in_channels`
 and the number of output channels `out_channels`.
 :end_tab:
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx, init
@@ -92,7 +92,7 @@ def vgg_block(num_convs, num_channels):
     return blk
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -107,7 +107,7 @@ def vgg_block(num_convs, out_channels):
     return nn.Sequential(*layers)
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 import tensorflow as tf
 from d2l import tensorflow as d2l
@@ -149,7 +149,7 @@ which are precisely the arguments required to call
 the `vgg_block` function. As such, VGG defines a *family* of networks rather than just 
 a specific manifestation. To build a specific network we simply iterate over `arch` to compose the blocks.
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab all
 class VGG(d2l.Classifier):
     def __init__(self, arch, lr=0.1, num_classes=10):
@@ -197,13 +197,13 @@ until that number reaches 512.
 Since this network uses 8 convolutional layers
 and 3 fully connected layers, it is often called VGG-11.
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab pytorch, mxnet
 VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary(
     (1, 1, 224, 224))
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab tensorflow
 VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary(
     (1, 224, 224, 1))
@@ -221,7 +221,7 @@ we construct a network with a smaller number of channels.**]
 This is more than sufficient for training on Fashion-MNIST.
 The [**model training**] process is similar to that of AlexNet in :numref:`sec_alexnet`.
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab mxnet, pytorch
 model = VGG(arch=((1, 16), (1, 32), (2, 64), (2, 128), (2, 128)), lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
@@ -231,7 +231,7 @@ if tab.selected('pytorch'):
 trainer.fit(model, data)
 ```
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))

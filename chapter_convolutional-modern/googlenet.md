@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -39,7 +39,7 @@ along the channel dimension and comprise the block's output.
 The commonly-tuned hyperparameters of the Inception block
 are the number of output channels per layer.
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx, init
@@ -72,7 +72,7 @@ class Inception(nn.Block):
         return np.concatenate((b1, b2, b3, b4), axis=1)
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -103,7 +103,7 @@ class Inception(nn.Module):
         return torch.cat((b1, b2, b3, b4), dim=1)
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 import tensorflow as tf
 from d2l import tensorflow as d2l
@@ -152,7 +152,7 @@ At its stem, the first module is similar to AlexNet and LeNet.
 We can now implement GoogLeNet piece by piece. Let's begin with the stem.
 The first module uses a 64-channel $7\times 7$ convolutional layer.
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab all
 class GoogleNet(d2l.Classifier):
     def b1(self):
@@ -178,7 +178,7 @@ The second module uses two convolutional layers:
 first, a 64-channel $1\times 1$ convolutional layer,
 followed by a $3\times 3$ convolutional layer that triples the number of channels. This corresponds to the second branch in the Inception block and concludes the design of the body. At this point we have 192 channels.
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab all
 @d2l.add_to_class(GoogleNet)
 def b2(self):
@@ -214,7 +214,7 @@ we need to reduce the number of intermediate dimensions in the second and third 
 scale of $\frac{1}{2}$ and $\frac{1}{8}$ respectively suffices, yielding $128$ and $32$ channels
 respectively. This is captured by the arguments of the following `Inception` block constructors.
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab all
 @d2l.add_to_class(GoogleNet)
 def b3(self):
@@ -251,7 +251,7 @@ The second and third branches will first reduce
 the number of channels according to the ratio.
 These ratios are slightly different in different Inception blocks.
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab all
 @d2l.add_to_class(GoogleNet)
 def b4(self):
@@ -293,7 +293,7 @@ Finally, we turn the output into a two-dimensional array
 followed by a fully connected layer
 whose number of outputs is the number of label classes.
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab all
 @d2l.add_to_class(GoogleNet)
 def b5(self):
@@ -315,7 +315,7 @@ def b5(self):
             tf.keras.layers.Flatten()])
 ```
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab all
 @d2l.add_to_class(GoogleNet)
 def __init__(self, lr=0.1, num_classes=10):
@@ -347,12 +347,12 @@ to have a reasonable training time on Fashion-MNIST.**]
 This simplifies the computation. Let's have a look at the
 changes in the shape of the output between the various modules.
 
-```{.python .input  n=11}
+```{.python .input}
 %%tab mxnet, pytorch
 model = GoogleNet().layer_summary((1, 1, 96, 96))
 ```
 
-```{.python .input  n=12}
+```{.python .input}
 %%tab tensorflow
 model = GoogleNet().layer_summary((1, 96, 96, 1))
 ```
@@ -363,7 +363,7 @@ As before, we train our model using the Fashion-MNIST dataset.
  We transform it to $96 \times 96$ pixel resolution
  before invoking the training procedure.
 
-```{.python .input  n=13}
+```{.python .input}
 %%tab mxnet, pytorch
 model = GoogleNet(lr=0.1)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
@@ -373,7 +373,7 @@ if tab.selected('pytorch'):
 trainer.fit(model, data)
 ```
 
-```{.python .input  n=14}
+```{.python .input}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))

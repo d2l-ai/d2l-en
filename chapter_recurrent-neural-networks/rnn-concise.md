@@ -8,12 +8,12 @@ using functions provided by high-level APIs
 of a deep learning framework.
 We begin as before by reading *The Time Machine* dataset.
 
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -21,7 +21,7 @@ from mxnet.gluon import nn, rnn
 npx.set_np()
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -29,7 +29,7 @@ from torch import nn
 from torch.nn import functional as F
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -40,7 +40,6 @@ import tensorflow as tf
 We define the following class
 using the RNN implemented
 by high-level APIs.
-
 
 :begin_tab:`mxnet`
 Specifically, to initialize the hidden state,
@@ -58,7 +57,7 @@ such a list also
 contains other information.
 :end_tab:
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab mxnet
 class RNN(d2l.Module):  #@save
     def __init__(self, num_hiddens):
@@ -73,7 +72,7 @@ class RNN(d2l.Module):  #@save
         return outputs, H
 ```
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab pytorch
 class RNN(d2l.Module):  #@save
     def __init__(self, num_inputs, num_hiddens):
@@ -85,7 +84,7 @@ class RNN(d2l.Module):  #@save
         return self.rnn(inputs, H)
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab tensorflow
 class RNN(d2l.Module):  #@save
     def __init__(self, num_hiddens):
@@ -104,7 +103,7 @@ Inheriting from the `RNNLMScratch` class in :numref:`sec_rnn-scratch`,
 the following `RNNLM` class defines a complete RNN-based language model.
 Note that we need to create a separate fully connected output layer.
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab all
 class RNNLM(d2l.RNNLMScratch):  #@save
     def init_params(self):
@@ -128,7 +127,7 @@ class RNNLM(d2l.RNNLMScratch):  #@save
 Before training the model, let's [**make a prediction with the a model that has random weights.**]
 Given that we have not trained the network, it will generate nonsensical predictions.
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab all
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet', 'tensorflow'):
@@ -141,7 +140,7 @@ model.predict('it has', 20, data.vocab)
 
 As is quite obvious, this model does not work at all. Next, we [**train our model with high-level APIs**].
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab all
 if tab.selected('mxnet', 'pytorch'):
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
@@ -157,12 +156,12 @@ albeit within a shorter period of time, due to the code being more optimized by
 high-level APIs of the deep learning framework.
 We can also generate predicted tokens following the specified prefix string.
 
-```{.python .input  n=11}
+```{.python .input}
 %%tab mxnet, pytorch
 model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 
-```{.python .input  n=12}
+```{.python .input}
 %%tab tensorflow
 model.predict('it has', 20, data.vocab)
 ```

@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -96,7 +96,7 @@ one of which is the identity mapping.
 ResNet follows VGG's full $3\times 3$ convolutional layer design. The residual block has two $3\times 3$ convolutional layers with the same number of output channels. Each convolutional layer is followed by a batch normalization layer and a ReLU activation function. Then, we skip these two convolution operations and add the input directly before the final ReLU activation function.
 This kind of design requires that the output of the two convolutional layers has to be of the same shape as the input, so that they can be added together. If we want to change the number of channels, we need to introduce an additional $1\times 1$ convolutional layer to transform the input into the desired shape for the addition operation. Let's have a look at the code below.
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx, init
@@ -126,7 +126,7 @@ class Residual(nn.Block):  #@save
         return npx.relu(Y + X)
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -157,7 +157,7 @@ class Residual(nn.Module):  #@save
         return F.relu(Y)
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 import tensorflow as tf
 from d2l import tensorflow as d2l
@@ -193,7 +193,7 @@ This code generates two types of networks: one where we add the input to the out
 
 Now let's look at [**a situation where the input and output are of the same shape**].
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab mxnet, pytorch
 if tab.selected('mxnet'):
     blk = Residual(3)
@@ -204,7 +204,7 @@ X = d2l.randn(4, 3, 6, 6)
 blk(X).shape
 ```
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab tensorflow
 blk = Residual(3)
 X = d2l.normal((4, 6, 6, 3))
@@ -214,7 +214,7 @@ Y.shape
 
 We also have the option to [**halve the output height and width while increasing the number of output channels**].
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab all
 blk = Residual(6, use_1x1conv=True, strides=2)
 if tab.selected('mxnet'):
@@ -226,7 +226,7 @@ blk(X).shape
 
 The first two layers of ResNet are the same as those of the GoogLeNet we described before: the $7\times 7$ convolutional layer with 64 output channels and a stride of 2 is followed by the $3\times 3$ max-pooling layer with a stride of 2. The difference is the batch normalization layer added after each convolutional layer in ResNet.
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab all
 class ResNet(d2l.Classifier):
     def b1(self):
@@ -257,7 +257,7 @@ The number of channels in the first module is the same as the number of input ch
 
 Now, we implement this module. Note that special processing has been performed on the first module.
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab mxnet
 @d2l.add_to_class(ResNet)
 def block(self, num_residuals, num_channels, first_block=False):
@@ -270,7 +270,7 @@ def block(self, num_residuals, num_channels, first_block=False):
     return blk
 ```
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(ResNet)
 def block(self, num_residuals, num_channels, first_block=False):
@@ -283,7 +283,7 @@ def block(self, num_residuals, num_channels, first_block=False):
     return nn.Sequential(*blk)
 ```
 
-```{.python .input  n=11}
+```{.python .input}
 %%tab tensorflow
 @d2l.add_to_class(ResNet)
 def block(self, num_residuals, num_channels, first_block=False):
@@ -298,7 +298,7 @@ def block(self, num_residuals, num_channels, first_block=False):
 
 Then, we add all the modules to ResNet. Here, two residual blocks are used for each module. Finally, just like GoogLeNet, we add a global average pooling layer, followed by the fully connected layer output.
 
-```{.python .input  n=12}
+```{.python .input}
 %%tab all
 @d2l.add_to_class(ResNet)
 def __init__(self, arch, lr=0.1, num_classes=10):
@@ -336,7 +336,7 @@ By configuring different numbers of channels and residual blocks in the module, 
 
 Before training ResNet, let's [**observe how the input shape changes across different modules in ResNet**]. As in all the previous architectures, the resolution decreases while the number of channels increases up until the point where a global average pooling layer aggregates all features.
 
-```{.python .input  n=13}
+```{.python .input}
 %%tab all
 class ResNet18(ResNet):
     def __init__(self, lr=0.1, num_classes=10):
@@ -344,12 +344,12 @@ class ResNet18(ResNet):
                        lr, num_classes)
 ```
 
-```{.python .input  n=14}
+```{.python .input}
 %%tab pytorch, mxnet
 ResNet18().layer_summary((1, 1, 96, 96))
 ```
 
-```{.python .input  n=15}
+```{.python .input}
 %%tab tensorflow
 ResNet18().layer_summary((1, 96, 96, 1))
 ```
@@ -358,7 +358,7 @@ ResNet18().layer_summary((1, 96, 96, 1))
 
 We train ResNet on the Fashion-MNIST dataset, just like before.
 
-```{.python .input  n=16}
+```{.python .input}
 %%tab mxnet, pytorch
 model = ResNet18(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
@@ -368,7 +368,7 @@ if tab.selected('pytorch'):
 trainer.fit(model, data)
 ```
 
-```{.python .input  n=17}
+```{.python .input}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))

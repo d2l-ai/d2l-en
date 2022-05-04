@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch'])
 ```
@@ -50,7 +50,7 @@ Note both the difference in the NiN blocks (the initial convolution is followed 
 :width:`600px`
 :label:`fig_nin`
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx, init
@@ -66,7 +66,7 @@ def nin_block(num_channels, kernel_size, strides, padding):
     return blk
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -93,7 +93,7 @@ Instead, NiN uses a NiN block with a number of output channels equal to the numb
 yielding a vector of logits.
 This design significantly reduces the number of required model parameters, albeit at the expense of a potential increase in training time.
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab all
 class NiN(d2l.Classifier):
     def __init__(self, lr=0.1, num_classes=10):
@@ -130,7 +130,7 @@ class NiN(d2l.Classifier):
 
 We create a data example to see [**the output shape of each block**].
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab all
 model = NiN()
 X = d2l.randn(1, 1, 224, 224)
@@ -144,7 +144,7 @@ for layer in model.net:
 As before we use Fashion-MNIST to train the model.
 NiN's training is similar to that for AlexNet and VGG.
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab all
 model = NiN(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
