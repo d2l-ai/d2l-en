@@ -555,6 +555,7 @@ df.to_csv('submission.csv', index=False)
 ```{.python .input}
 #@tab pytorch
 net, preds = get_net(), []
+net(next(iter(train_valid_iter))[0]) # A dry run to initialize the model
 train(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 
