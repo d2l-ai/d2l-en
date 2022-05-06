@@ -177,7 +177,7 @@ def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):
 ```{.python .input}
 #@tab pytorch
 def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):
-    net(*next(iter(train_iter))[:4])  #A dry run to initialize the model
+    net(*next(iter(train_iter))[:4])
     net = nn.DataParallel(net, device_ids=devices).to(devices[0])
     trainer = torch.optim.Adam(net.parameters(), lr=0.01)
     step, timer = 0, d2l.Timer()

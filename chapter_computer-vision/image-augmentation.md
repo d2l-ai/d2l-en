@@ -431,7 +431,7 @@ def train_with_data_aug(train_augs, test_augs, net, lr=0.001):
     test_iter = load_cifar10(False, test_augs, batch_size)
     loss = nn.CrossEntropyLoss(reduction="none")
     trainer = torch.optim.Adam(net.parameters(), lr=lr)
-    net(next(iter(train_iter))[0]) # A dry run to initialize the model
+    net(next(iter(train_iter))[0])
     train_ch13(net, train_iter, test_iter, loss, trainer, 10, devices)
 ```
 
