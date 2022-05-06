@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
@@ -104,7 +104,7 @@ We will train this model for machine translation
 on the English-French dataset as introduced in
 :numref:`sec_machine_translation`.
 
-```{.python .input  n=18}
+```{.python .input}
 %%tab mxnet
 import collections
 from d2l import mxnet as d2l
@@ -114,7 +114,7 @@ from mxnet.gluon import nn, rnn
 npx.set_np()
 ```
 
-```{.python .input  n=19}
+```{.python .input}
 %%tab pytorch
 import collections
 from d2l import torch as d2l
@@ -124,7 +124,7 @@ from torch import nn
 from torch.nn import functional as F
 ```
 
-```{.python .input  n=20}
+```{.python .input}
 %%tab tensorflow
 import collections
 from d2l import tensorflow as d2l
@@ -186,7 +186,7 @@ Besides,
 here we choose a multilayer GRU to
 implement the encoder.
 
-```{.python .input  n=24}
+```{.python .input}
 %%tab mxnet
 class Seq2SeqEncoder(d2l.Encoder):  #@save
     """The RNN encoder for sequence to sequence learning."""
@@ -274,7 +274,7 @@ are a tensor
 of shape
 (number of time steps, batch size, number of hidden units).
 
-```{.python .input  n=25}
+```{.python .input}
 %%tab all
 vocab_size, embed_size, num_hiddens, num_layers = 10, 8, 16, 2
 batch_size, num_steps = 4, 9
@@ -346,7 +346,7 @@ To predict the probability distribution of the output token,
 a fully connected layer is used to transform
 the hidden state at the final layer of the RNN decoder.
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab mxnet
 class Seq2SeqDecoder(d2l.Decoder):
     """The RNN decoder for sequence to sequence learning."""
@@ -388,7 +388,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(embed_size+num_hiddens, num_hiddens,
                            num_layers, dropout)
-        self.dense = nn.Linear(num_hiddens, vocab_size)
+        self.dense = nn.LazyLinear(vocab_size)
         self.apply(init_seq2seq)
             
     def init_state(self, enc_outputs, *args):
@@ -447,7 +447,7 @@ below we instantiate it with the same hyperparameters from the aforementioned en
 As we can see, the output shape of the decoder becomes (batch size, number of time steps, vocabulary size),
 where the last dimension of the tensor stores the predicted token distribution.
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab all
 decoder = Seq2SeqDecoder(vocab_size, embed_size, num_hiddens, num_layers)
 state = decoder.init_state(encoder(X))
@@ -478,7 +478,7 @@ the RNN encoder-decoder
 model for sequence to sequence learning just puts 
 the RNN encoder and the RNN decoder together.
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab all
 class Seq2Seq(d2l.EncoderDecoder):  #@save
     def __init__(self, encoder, decoder, tgt_pad, lr):
@@ -523,7 +523,7 @@ so that
 multiplication of any irrelevant prediction
 with zero equals to zero.
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab all
 @d2l.add_to_class(Seq2Seq)
 def loss(self, Y_hat, Y):
@@ -538,7 +538,7 @@ def loss(self, Y_hat, Y):
 Now we can [**create and train an RNN encoder-decoder model**]
 for sequence to sequence learning on the machine translation dataset.
 
-```{.python .input  n=13}
+```{.python .input}
 %%tab all
 data = d2l.MTFraEng(batch_size=128) 
 embed_size, num_hiddens, num_layers, dropout = 256, 256, 2, 0.2
@@ -586,7 +586,7 @@ We will introduce different
 strategies for sequence generation in
 :numref:`sec_beam-search`.
 
-```{.python .input  n=14}
+```{.python .input}
 %%tab all
 @d2l.add_to_class(d2l.EncoderDecoder)  #@save
 def predict_step(self, batch, device, num_steps,
@@ -663,7 +663,7 @@ although $p_1 = p_2 = 1$, the penalty factor $\exp(1-6/2) \approx 0.14$ lowers t
 
 We [**implement the BLEU measure**] as follows.
 
-```{.python .input  n=16}
+```{.python .input}
 %%tab all
 def bleu(pred_seq, label_seq, k):  #@save
     """Compute the BLEU."""
@@ -687,7 +687,7 @@ we use the trained RNN encoder-decoder
 to [**translate a few English sentences into French**]
 and compute the BLEU of the results.
 
-```{.python .input  n=17}
+```{.python .input}
 %%tab all
 engs = ['go .', 'i lost .', 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
@@ -700,7 +700,7 @@ for en, fr, p in zip(engs, fras, preds):
             break
         translation.append(token)        
     print(f'{en} => {translation}, bleu,'
-          f'{bleu(" ".join(translation), fr, k=2):.3f}')  
+          f'{bleu(" ".join(translation), fr, k=2):.3f}')
 ```
 
 ## Summary

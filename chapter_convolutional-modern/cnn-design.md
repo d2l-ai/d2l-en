@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch'])
 ```
@@ -132,7 +132,7 @@ with a $1 \times 1$ convolution (`conv4`),
 where setting `use_1x1conv=True, strides=2`
 halves the input height and width.
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx, init
@@ -171,7 +171,7 @@ class ResNeXtBlock(nn.Block):
         return npx.relu(Y + X)
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -180,24 +180,24 @@ from torch.nn import functional as F
 
 class ResNeXtBlock(nn.Module):
     """The ResNeXt block."""
-    def __init__(self, input_channels, num_channels, groups, bot_mul,
-                 use_1x1conv=False, strides=1):
+    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False, 
+                 strides=1):
         super().__init__()
         bot_channels = int(round(num_channels * bot_mul))
-        self.conv1 = nn.Conv2d(input_channels, bot_channels, kernel_size=1,
+        self.conv1 = nn.LazyConv2d(bot_channels, kernel_size=1,
                                stride=1)
-        self.conv2 = nn.Conv2d(bot_channels, bot_channels, kernel_size=3,
+        self.conv2 = nn.LazyConv2d(bot_channels, kernel_size=3,
                                stride=strides, padding=1,
                                groups=bot_channels//groups)
-        self.conv3 = nn.Conv2d(bot_channels, num_channels, kernel_size=1,
+        self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1,
                                stride=1)
-        self.bn1 = nn.BatchNorm2d(bot_channels)
-        self.bn2 = nn.BatchNorm2d(bot_channels)
-        self.bn3 = nn.BatchNorm2d(num_channels)
+        self.bn1 = nn.LazyBatchNorm2d()
+        self.bn2 = nn.LazyBatchNorm2d()
+        self.bn3 = nn.LazyBatchNorm2d()
         if use_1x1conv:
-            self.conv4 = nn.Conv2d(input_channels, num_channels,
-                                   kernel_size=1, stride=strides)
-            self.bn4 = nn.BatchNorm2d(num_channels)
+            self.conv4 = nn.LazyConv2d(num_channels, kernel_size=1, 
+                                       stride=strides)
+            self.bn4 = nn.LazyBatchNorm2d()
         else:
             self.conv4 = None
 
@@ -212,13 +212,11 @@ class ResNeXtBlock(nn.Module):
 
 In the following case (`use_1x1conv=False, strides=1`), the input and output are of the same shape.
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab all
+blk = ResNeXtBlock(32, 16, 1)
 if tab.selected('mxnet'):
-    blk = ResNeXtBlock(32, 16, 1)
     blk.initialize()
-if tab.selected('pytorch'):
-    blk = ResNeXtBlock(32, 32, 16, 1)
 X = d2l.randn(4, 32, 96, 96)
 blk(X).shape
 ```
@@ -226,13 +224,11 @@ blk(X).shape
 Alternatively, setting `use_1x1conv=True, strides=2`
 halves the output height and width.
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab all
+blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
 if tab.selected('mxnet'):
-    blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
     blk.initialize()
-if tab.selected('pytorch'):
-    blk = ResNeXtBlock(32, 32, 16, 1, use_1x1conv=True, strides=2)
 blk(X).shape
 ```
 
@@ -310,7 +306,7 @@ possible networks (e.g., by varying $d_i$ and $w_i$) in the AnyNet design space.
 To implement AnyNet,
 we first define its network stem.
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab mxnet
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
@@ -320,21 +316,20 @@ class AnyNet(d2l.Classifier):
         return net
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab pytorch
 class AnyNet(d2l.Classifier):
-    def stem(self, input_channels, num_channels):
+    def stem(self, num_channels):
         return nn.Sequential(
-            nn.Conv2d(input_channels, num_channels, kernel_size=3, stride=2,
-                      padding=1),
-            nn.BatchNorm2d(num_channels), nn.ReLU())
+            nn.LazyConv2d(num_channels, kernel_size=3, stride=2, padding=1),
+            nn.LazyBatchNorm2d(), nn.ReLU())
 ```
 
 Each stage consists of `depth` ResNeXt blocks,
 where `num_channels` specifies the block width.
 Note that the first block halves the height and width of input images.
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab mxnet
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, num_channels, groups, bot_mul):
@@ -349,26 +344,24 @@ def stage(self, depth, num_channels, groups, bot_mul):
     return net
 ```
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(AnyNet)
-def stage(self, depth, input_channels, num_channels, groups, bot_mul):
+def stage(self, depth, num_channels, groups, bot_mul):
     blk = []
     for i in range(depth):
         if i == 0:
-            blk.append(ResNeXtBlock(
-                input_channels, num_channels, groups, bot_mul,
+            blk.append(ResNeXtBlock(num_channels, groups, bot_mul,
                 use_1x1conv=True, strides=2))
         else:
-            blk.append(ResNeXtBlock(
-                num_channels, num_channels, groups, bot_mul))
+            blk.append(ResNeXtBlock(num_channels, groups, bot_mul))
     return nn.Sequential(*blk)
 ```
 
 Putting the network stem, body, and head together,
 we complete the implementation of AnyNet.
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab all
 @d2l.add_to_class(AnyNet)
 def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
@@ -382,12 +375,12 @@ def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
         self.net.add(nn.GlobalAvgPool2D(), nn.Dense(num_classes))
         self.net.initialize(init.Xavier())
     if tab.selected('pytorch'):
-        self.net = nn.Sequential(self.stem(1, stem_channels))
+        self.net = nn.Sequential(self.stem(stem_channels))
         for i, s in enumerate(arch):
             self.net.add_module(f'stage{i+1}', self.stage(*s))
         self.net.add_module('head', nn.Sequential(
             nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(),
-            nn.Linear(arch[-1][2], num_classes)))
+            nn.LazyLinear(num_classes)))
         self.net.apply(d2l.init_cnn)
 ```
 
@@ -435,27 +428,21 @@ characterized by
 * $w_1 = 32, w_2=80;$
 * $d_1 = 4, d_2=6.$
 
-```{.python .input  n=11}
+```{.python .input}
 %%tab all
 class RegNet32(AnyNet):
     def __init__(self, lr=0.1, num_classes=10):
         stem_channels, groups, bot_mul = 32, 16, 1
         depths, channels = (4, 6), (32, 80)
-        if tab.selected(['mxnet']):
-            super().__init__(
-                ((depths[0], channels[0], groups, bot_mul),
-                 (depths[1], channels[1], groups, bot_mul)),
-                stem_channels, lr, num_classes)
-        if tab.selected(['pytorch']):
-            super().__init__(
-                ((depths[0], stem_channels, channels[0], groups, bot_mul),
-                 (depths[1], channels[0], channels[1], groups, bot_mul)),
-                stem_channels, lr, num_classes)
+        super().__init__(
+            ((depths[0], channels[0], groups, bot_mul),
+             (depths[1], channels[1], groups, bot_mul)),
+            stem_channels, lr, num_classes)
 ```
 
 We can see that each RegNet stage progressively reduces resolution and increases output channels.
 
-```{.python .input  n=12}
+```{.python .input}
 %%tab all
 RegNet32().layer_summary((1, 1, 96, 96))
 ```
@@ -464,7 +451,7 @@ RegNet32().layer_summary((1, 1, 96, 96))
 
 Training the 32-layer RegNet on the Fashion-MNIST dataset is just like before.
 
-```{.python .input  n=13}
+```{.python .input}
 %%tab all
 model = RegNet32(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
@@ -524,8 +511,6 @@ in the ConvNeXt paper :cite:`liu2022convnet`.
 1. Increase the number of stages to 4. Can you design a deeper RegNet that performs better?
 1. De-ResNeXt-ify RegNets by replacing the ResNeXt block with the ResNet block. How does your new model perform?
 1. Implement multiple instances of a "VioNet" family by *violating* the design principles of RegNet. How do they perform? Which of ($d_i$, $w_i$, $g_i$, $b_i$) is the most important factor?
-
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/7462)

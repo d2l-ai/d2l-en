@@ -10,12 +10,12 @@ Such a model
 will be trained on H. G. Wells' *The Time Machine*.
 As before, we start by reading the dataset first, which is introduced in :numref:`sec_text-sequence`.
 
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
@@ -24,7 +24,7 @@ from mxnet import autograd, gluon, np, npx
 npx.set_np()
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -34,7 +34,7 @@ from torch import nn
 from torch.nn import functional as F
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -50,7 +50,7 @@ we begin by defining the class for the RNN model
 with its model parameters only.
 The number of hidden units `num_hiddens` is a tunable hyperparameter.
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab all
 class RNNScratch(d2l.Module):  #@save
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
@@ -72,7 +72,7 @@ class RNNScratch(d2l.Module):  #@save
                 (num_inputs, num_hiddens)) * sigma)
             self.W_hh = tf.Variable(d2l.normal(
                 (num_hiddens, num_hiddens)) * sigma)
-            self.b_h = tf.Variable(d2l.zeros(num_hiddens))        
+            self.b_h = tf.Variable(d2l.zeros(num_hiddens))
 ```
 
 [**The following `forward` method defines how to compute the output and hidden state at a time step.**]
@@ -193,17 +193,17 @@ In a nutshell, we map each index to a different unit vector: assume that the num
 If the index of a token is the integer $i$, then we create a vector of all 0s with a length of $N$ and set the element at position $i$ to 1.
 This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab mxnet
 npx.one_hot(np.array([0, 2]), 5)
 ```
 
-```{.python .input  n=11}
+```{.python .input}
 %%tab pytorch
 F.one_hot(torch.tensor([0, 2]), 5)
 ```
 
-```{.python .input  n=12}
+```{.python .input}
 %%tab tensorflow
 tf.one_hot(tf.constant([0, 2]), 5)
 ```
@@ -313,7 +313,7 @@ Below we define a function to clip the gradients of
 a model.
 Also note that we compute the gradient norm over all the model parameters.
 
-```{.python .input  n=43}
+```{.python .input}
 %%tab mxnet
 @d2l.add_to_class(d2l.Trainer)  #@save
 def clip_gradients(self, grad_clip_val, model):
@@ -326,7 +326,7 @@ def clip_gradients(self, grad_clip_val, model):
             param.grad[:] *= grad_clip_val / norm
 ```
 
-```{.python .input  n=17}
+```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(d2l.Trainer)  #@save
 def clip_gradients(self, grad_clip_val, model):
@@ -359,7 +359,7 @@ we train a character-level language model (`model`)
 based on the RNN (`rnn`) implemented from scratch.
 Note that we clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process.
 
-```{.python .input  n=26}
+```{.python .input}
 %%tab all
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet', 'pytorch'):
@@ -423,7 +423,7 @@ and have it generate 20 additional characters.
 model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 
-```{.python .input  n=22}
+```{.python .input}
 %%tab tensorflow
 model.predict('it has', 20, data.vocab)
 ```

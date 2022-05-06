@@ -81,19 +81,19 @@ from torch.nn import functional as F
 
 class Inception(nn.Module):
     # `c1`--`c4` are the number of output channels for each branch
-    def __init__(self, in_channels, c1, c2, c3, c4, **kwargs):
+    def __init__(self, c1, c2, c3, c4, **kwargs):
         super(Inception, self).__init__(**kwargs)
         # Branch 1
-        self.b1_1 = nn.Conv2d(in_channels, c1, kernel_size=1)
+        self.b1_1 = nn.LazyConv2d(c1, kernel_size=1)
         # Branch 2
-        self.b2_1 = nn.Conv2d(in_channels, c2[0], kernel_size=1)
-        self.b2_2 = nn.Conv2d(c2[0], c2[1], kernel_size=3, padding=1)
+        self.b2_1 = nn.LazyConv2d(c2[0], kernel_size=1)
+        self.b2_2 = nn.LazyConv2d(c2[1], kernel_size=3, padding=1)
         # Branch 3
-        self.b3_1 = nn.Conv2d(in_channels, c3[0], kernel_size=1)
-        self.b3_2 = nn.Conv2d(c3[0], c3[1], kernel_size=5, padding=2)
+        self.b3_1 = nn.LazyConv2d(c3[0], kernel_size=1)
+        self.b3_2 = nn.LazyConv2d(c3[1], kernel_size=5, padding=2)
         # Branch 4
         self.b4_1 = nn.MaxPool2d(kernel_size=3, stride=1, padding=1)
-        self.b4_2 = nn.Conv2d(in_channels, c4, kernel_size=1)
+        self.b4_2 = nn.LazyConv2d(c4, kernel_size=1)
 
     def forward(self, x):
         b1 = F.relu(self.b1_1(x))
@@ -164,7 +164,7 @@ class GoogleNet(d2l.Classifier):
             return net
         if tab.selected('pytorch'):
             return nn.Sequential(
-                nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
+                nn.LazyConv2d(64, kernel_size=7, stride=2, padding=3),
                 nn.ReLU(), nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
         if tab.selected('tensorflow'):
             return tf.keras.models.Sequential([
@@ -190,8 +190,8 @@ def b2(self):
         return net
     if tab.selected('pytorch'):
         return nn.Sequential(
-            nn.Conv2d(64, 64, kernel_size=1), nn.ReLU(),
-            nn.Conv2d(64, 192, kernel_size=3, padding=1), nn.ReLU(),
+            nn.LazyConv2d(64, kernel_size=1), nn.ReLU(),
+            nn.LazyConv2d(192, kernel_size=3, padding=1), nn.ReLU(),
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
     if tab.selected('tensorflow'):
         return tf.keras.Sequential([
@@ -225,8 +225,8 @@ def b3(self):
                nn.MaxPool2D(pool_size=3, strides=2, padding=1))
         return net
     if tab.selected('pytorch'):
-        return nn.Sequential(Inception(192, 64, (96, 128), (16, 32), 32),
-                             Inception(256, 128, (128, 192), (32, 96), 64),
+        return nn.Sequential(Inception(64, (96, 128), (16, 32), 32),
+                             Inception(128, (128, 192), (32, 96), 64),
                              nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
     if tab.selected('tensorflow'):
         return tf.keras.models.Sequential([
@@ -265,11 +265,11 @@ def b4(self):
                 nn.MaxPool2D(pool_size=3, strides=2, padding=1))
         return net
     if tab.selected('pytorch'):
-        return nn.Sequential(Inception(480, 192, (96, 208), (16, 48), 64),
-                             Inception(512, 160, (112, 224), (24, 64), 64),
-                             Inception(512, 128, (128, 256), (24, 64), 64),
-                             Inception(512, 112, (144, 288), (32, 64), 64),
-                             Inception(528, 256, (160, 320), (32, 128), 128),
+        return nn.Sequential(Inception(192, (96, 208), (16, 48), 64),
+                             Inception(160, (112, 224), (24, 64), 64),
+                             Inception(128, (128, 256), (24, 64), 64),
+                             Inception(112, (144, 288), (32, 64), 64),
+                             Inception(256, (160, 320), (32, 128), 128),
                              nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
     if tab.selected('tensorflow'):
         return tf.keras.Sequential([
@@ -304,8 +304,8 @@ def b5(self):
                 nn.GlobalAvgPool2D())
         return net
     if tab.selected('pytorch'):
-        return nn.Sequential(Inception(832, 256, (160, 320), (32, 128), 128),
-                             Inception(832, 384, (192, 384), (48, 128), 128),
+        return nn.Sequential(Inception(256, (160, 320), (32, 128), 128),
+                             Inception(384, (192, 384), (48, 128), 128),
                              nn.AdaptiveAvgPool2d((1,1)), nn.Flatten())
     if tab.selected('tensorflow'):
         return tf.keras.Sequential([
@@ -328,7 +328,7 @@ def __init__(self, lr=0.1, num_classes=10):
         self.net.initialize(init.Xavier())
     if tab.selected('pytorch'):
         self.net = nn.Sequential(self.b1(), self.b2(), self.b3(), self.b4(),
-                                 self.b5(), nn.Linear(1024, num_classes))
+                                 self.b5(), nn.LazyLinear(num_classes))
         self.net.apply(d2l.init_cnn)
     if tab.selected('tensorflow'):
         self.net = tf.keras.Sequential([
@@ -368,6 +368,8 @@ As before, we train our model using the Fashion-MNIST dataset.
 model = GoogleNet(lr=0.1)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
+if tab.selected('pytorch'):
+    model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
 trainer.fit(model, data)
 ```
 

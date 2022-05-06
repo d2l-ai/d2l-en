@@ -64,10 +64,10 @@ def resnet18(num_classes, in_channels=1):
         blk = []
         for i in range(num_residuals):
             if i == 0 and not first_block:
-                blk.append(d2l.Residual(in_channels, out_channels,
-                                        use_1x1conv=True, strides=2))
+                blk.append(d2l.Residual(out_channels, use_1x1conv=True, 
+                                        strides=2))
             else:
-                blk.append(d2l.Residual(out_channels, out_channels))
+                blk.append(d2l.Residual(out_channels))
         return nn.Sequential(*blk)
 
     # This model uses a smaller convolution kernel, stride, and padding and

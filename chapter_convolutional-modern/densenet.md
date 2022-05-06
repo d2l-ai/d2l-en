@@ -75,10 +75,10 @@ from d2l import torch as d2l
 import torch
 from torch import nn
 
-def conv_block(input_channels, num_channels):
+def conv_block(num_channels):
     return nn.Sequential(
-        nn.BatchNorm2d(input_channels), nn.ReLU(),
-        nn.Conv2d(input_channels, num_channels, kernel_size=3, padding=1))
+        nn.LazyBatchNorm2d(), nn.ReLU(),
+        nn.LazyConv2d(num_channels, kernel_size=3, padding=1))
 ```
 
 ```{.python .input}
@@ -127,12 +127,11 @@ class DenseBlock(nn.Block):
 ```{.python .input}
 %%tab pytorch
 class DenseBlock(nn.Module):
-    def __init__(self, num_convs, input_channels, num_channels):
+    def __init__(self, num_convs, num_channels):
         super(DenseBlock, self).__init__()
         layer = []
         for i in range(num_convs):
-            layer.append(conv_block(
-                num_channels * i + input_channels, num_channels))
+            layer.append(conv_block(num_channels))
         self.net = nn.Sequential(*layer)
 
     def forward(self, X):
@@ -164,26 +163,15 @@ we [**define a `DenseBlock` instance**] with 2 convolution blocks of 10 output c
 When using an input with 3 channels, we will get an output with  $3+2\times 10=23$ channels. The number of convolution block channels controls the growth in the number of output channels relative to the number of input channels. This is also referred to as the *growth rate*.
 
 ```{.python .input}
-%%tab mxnet
+%%tab all
 blk = DenseBlock(2, 10)
-blk.initialize()
-X = np.random.uniform(size=(4, 3, 8, 8))
-Y = blk(X)
-Y.shape
-```
-
-```{.python .input}
-%%tab pytorch
-blk = DenseBlock(2, 3, 10)
-X = torch.randn(4, 3, 8, 8)
-Y = blk(X)
-Y.shape
-```
-
-```{.python .input}
-%%tab tensorflow
-blk = DenseBlock(2, 10)
-X = tf.random.uniform((4, 8, 8, 3))
+if tab.selected('mxnet'):
+    X = np.random.uniform(size=(4, 3, 8, 8))
+    blk.initialize()
+if tab.selected('pytorch'):
+    X = torch.randn(4, 3, 8, 8)
+if tab.selected('tensorflow'):
+    X = tf.random.uniform((4, 8, 8, 3))
 Y = blk(X)
 Y.shape
 ```
@@ -204,10 +192,10 @@ def transition_block(num_channels):
 
 ```{.python .input}
 %%tab pytorch
-def transition_block(input_channels, num_channels):
+def transition_block(num_channels):
     return nn.Sequential(
-        nn.BatchNorm2d(input_channels), nn.ReLU(),
-        nn.Conv2d(input_channels, num_channels, kernel_size=1),
+        nn.LazyBatchNorm2d(), nn.ReLU(),
+        nn.LazyConv2d(num_channels, kernel_size=1),
         nn.AvgPool2d(kernel_size=2, stride=2))
 ```
 
@@ -239,7 +227,7 @@ blk(Y).shape
 
 ```{.python .input}
 %%tab pytorch
-blk = transition_block(23, 10)
+blk = transition_block(10)
 blk(Y).shape
 ```
 
@@ -265,8 +253,8 @@ class DenseNet(d2l.Classifier):
             return net
         if tab.selected('pytorch'):
             return nn.Sequential(
-                nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
-                nn.BatchNorm2d(64), nn.ReLU(),
+                nn.LazyConv2d(64, kernel_size=7, stride=2, padding=3),
+                nn.LazyBatchNorm2d(), nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
         if tab.selected('tensorflow'):
             return tf.keras.models.Sequential([
@@ -309,20 +297,20 @@ def __init__(self, num_channels=64, growth_rate=32, arch=(4, 4, 4, 4),
     if tab.selected('pytorch'):
         self.net = nn.Sequential(self.b1())
         for i, num_convs in enumerate(arch):
-            self.net.add_module(f'dense_blk{i+1}', DenseBlock(
-                num_convs, num_channels, growth_rate))
+            self.net.add_module(f'dense_blk{i+1}', DenseBlock(num_convs,
+                                                              growth_rate))
             # The number of output channels in the previous dense block
             num_channels += num_convs * growth_rate
             # A transition layer that halves the number of channels is added
             # between the dense blocks
             if i != len(arch) - 1:
+                num_channels //= 2
                 self.net.add_module(f'tran_blk{i+1}', transition_block(
-                    num_channels, num_channels // 2))
-                num_channels = num_channels // 2
+                    num_channels))
         self.net.add_module('last', nn.Sequential(
-            nn.BatchNorm2d(num_channels), nn.ReLU(),
+            nn.LazyBatchNorm2d(), nn.ReLU(),
             nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(),
-            nn.Linear(num_channels, num_classes)))
+            nn.LazyLinear(num_classes)))
         self.net.apply(d2l.init_cnn)
     if tab.selected('tensorflow'):
         self.net = tf.keras.models.Sequential(self.b1())

@@ -306,7 +306,7 @@ for i in range(10):
 %%tab pytorch
 # Construct a two-dimensional convolutional layer with 1 output channel and a
 # kernel of shape (1, 2). For the sake of simplicity, we ignore the bias here
-conv2d = nn.Conv2d(1,1, kernel_size=(1, 2), bias=False)
+conv2d = nn.LazyConv2d(1, kernel_size=(1, 2), bias=False)
 
 # The two-dimensional convolutional layer uses four-dimensional input and
 # output in the format of (example, channel, height, width), where the batch

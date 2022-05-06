@@ -333,17 +333,17 @@ class AlexNet(d2l.Classifier):
             self.net.initialize(init.Xavier())
         if tab.selected('pytorch'):
             self.net = nn.Sequential(
-                nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=1),
+                nn.LazyConv2d(96, kernel_size=11, stride=4, padding=1),
                 nn.ReLU(), nn.MaxPool2d(kernel_size=3, stride=2),
-                nn.Conv2d(96, 256, kernel_size=5, padding=2), nn.ReLU(),
+                nn.LazyConv2d(256, kernel_size=5, padding=2), nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2),
-                nn.Conv2d(256, 384, kernel_size=3, padding=1), nn.ReLU(),
-                nn.Conv2d(384, 384, kernel_size=3, padding=1), nn.ReLU(),
-                nn.Conv2d(384, 256, kernel_size=3, padding=1), nn.ReLU(),
+                nn.LazyConv2d(384, kernel_size=3, padding=1), nn.ReLU(),
+                nn.LazyConv2d(384, kernel_size=3, padding=1), nn.ReLU(),
+                nn.LazyConv2d(256, kernel_size=3, padding=1), nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2), nn.Flatten(),
-                nn.Linear(6400, 4096), nn.ReLU(), nn.Dropout(p=0.5),
-                nn.Linear(4096, 4096), nn.ReLU(),nn.Dropout(p=0.5),
-                nn.Linear(4096, num_classes))
+                nn.LazyLinear(4096), nn.ReLU(), nn.Dropout(p=0.5),
+                nn.LazyLinear(4096), nn.ReLU(),nn.Dropout(p=0.5),
+                nn.LazyLinear(num_classes))
             self.net.apply(d2l.init_cnn)
         if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential([
