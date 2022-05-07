@@ -136,7 +136,7 @@ Now let's implement our own version of the  fully connected layer.
 Recall that this layer requires two parameters,
 one to represent the weight and the other for the bias.
 In this implementation, we bake in the ReLU activation as a default.
-This layer requires to input arguments: `in_units` and `units`, which
+This layer requires two input arguments: `in_units` and `units`, which
 denote the number of inputs and outputs, respectively.
 
 ```{.python .input}
