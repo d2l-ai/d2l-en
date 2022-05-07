@@ -65,7 +65,7 @@ and the second is a positionwise feed-forward network.
 Specifically,
 in the encoder self-attention,
 queries, keys, and values are all from the
-the outputs of the previous encoder layer.
+outputs of the previous encoder layer.
 Inspired by the ResNet design in :numref:`sec_resnet`,
 a residual connection is employed
 around both sublayers.
@@ -91,7 +91,7 @@ and the keys and values are
 from the transformer encoder outputs.
 In the decoder self-attention,
 queries, keys, and values are all from the
-the outputs of the previous decoder layer.
+outputs of the previous decoder layer.
 However,
 each position in the decoder is
 allowed to only attend to all positions in the decoder
