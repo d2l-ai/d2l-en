@@ -269,7 +269,7 @@ with autograd.record():
 ```{.python .input}
 %%tab pytorch
 ln = nn.LayerNorm(2)
-bn = nn.BatchNorm1d(2)
+bn = nn.LazyBatchNorm1d()
 X = d2l.tensor([[1, 2], [2, 3]], dtype=torch.float32)
 # Compute mean and variance from X in the training mode
 print('layer norm:', ln(X), '\nbatch norm:', bn(X))
