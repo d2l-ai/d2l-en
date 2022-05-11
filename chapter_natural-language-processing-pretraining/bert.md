@@ -241,7 +241,7 @@ class BERTEncoder(nn.Module):
         # Shape of `X` remains unchanged in the following code snippet:
         # (batch size, max sequence length, `num_hiddens`)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
-        X = X + self.pos_embedding.data[:, :X.shape[1], :]
+        X = X + self.pos_embedding[:, :X.shape[1], :]
         for blk in self.blks:
             X = blk(X, valid_lens)
         return X
