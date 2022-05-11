@@ -523,8 +523,8 @@ This code is virtually identical to that when we first trained LeNet (:numref:`s
 ```{.python .input}
 %%tab mxnet, pytorch
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
-data = d2l.FashionMNIST(batch_size=256)
-model = BNLeNetScratch(lr=0.1)
+data = d2l.FashionMNIST(batch_size=128)
+model = BNLeNetScratch(lr=0.05)
 if tab.selected('pytorch'):
     model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
 trainer.fit(model, data)
@@ -533,9 +533,9 @@ trainer.fit(model, data)
 ```{.python .input}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
-data = d2l.FashionMNIST(batch_size=256)
+data = d2l.FashionMNIST(batch_size=128)
 with d2l.try_gpu():
-    model = BNLeNetScratch(lr=0.9)
+    model = BNLeNetScratch(lr=0.05)
     trainer.fit(model, data)
 ```
 
@@ -623,8 +623,8 @@ while our custom implementation must be interpreted by Python.
 ```{.python .input}
 %%tab mxnet, pytorch
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
-data = d2l.FashionMNIST(batch_size=256)
-model = BNLeNet(lr=0.1)
+data = d2l.FashionMNIST(batch_size=128)
+model = BNLeNet(lr=0.05)
 if tab.selected('pytorch'):
     model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
 trainer.fit(model, data)
@@ -633,9 +633,9 @@ trainer.fit(model, data)
 ```{.python .input}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
-data = d2l.FashionMNIST(batch_size=256)
+data = d2l.FashionMNIST(batch_size=128)
 with d2l.try_gpu():
-    model = BNLeNet(lr=0.9)
+    model = BNLeNet(lr=0.05)
     trainer.fit(model, data)
 ```
 
