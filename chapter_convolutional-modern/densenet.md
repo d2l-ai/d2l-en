@@ -337,7 +337,7 @@ Since we are using a deeper network here, in this section, we will reduce the in
 
 ```{.python .input}
 %%tab mxnet, pytorch
-model = DenseNet(lr=0.05)
+model = DenseNet(lr=0.01)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 trainer.fit(model, data)
@@ -348,7 +348,7 @@ trainer.fit(model, data)
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 with d2l.try_gpu():
-    model = DenseNet(lr=0.05)
+    model = DenseNet(lr=0.01)
     trainer.fit(model, data)
 ```
 

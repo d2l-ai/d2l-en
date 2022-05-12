@@ -223,7 +223,7 @@ The [**model training**] process is similar to that of AlexNet in :numref:`sec_a
 
 ```{.python .input}
 %%tab mxnet, pytorch
-model = VGG(arch=((1, 16), (1, 32), (2, 64), (2, 128), (2, 128)), lr=0.05)
+model = VGG(arch=((1, 16), (1, 32), (2, 64), (2, 128), (2, 128)), lr=0.01)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
 if tab.selected('pytorch'):
@@ -236,7 +236,7 @@ trainer.fit(model, data)
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
 with d2l.try_gpu():
-    model = VGG(arch=((1, 16), (1, 32), (2, 64), (2, 128), (2, 128)), lr=0.05)
+    model = VGG(arch=((1, 16), (1, 32), (2, 64), (2, 128), (2, 128)), lr=0.01)
     trainer.fit(model, data)
 ```
 

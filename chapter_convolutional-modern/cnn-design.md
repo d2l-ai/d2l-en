@@ -453,7 +453,7 @@ Training the 32-layer RegNet on the Fashion-MNIST dataset is just like before.
 
 ```{.python .input}
 %%tab all
-model = RegNet32(lr=0.05)
+model = RegNet32(lr=0.01)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 trainer.fit(model, data)

@@ -402,7 +402,7 @@ the higher image resolution, and the more costly convolutions.
 
 ```{.python .input}
 %%tab pytorch, mxnet
-model = AlexNet(lr=0.05)
+model = AlexNet(lr=0.01)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 trainer.fit(model, data)
@@ -413,7 +413,7 @@ trainer.fit(model, data)
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
 with d2l.try_gpu():
-    model = AlexNet(lr=0.05)
+    model = AlexNet(lr=0.01)
     trainer.fit(model, data)
 ```
 
