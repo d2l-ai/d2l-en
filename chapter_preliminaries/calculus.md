@@ -347,8 +347,7 @@ has variables $x_1, x_2, \ldots, x_n$,
 i.e.,  $\mathbf{u} = g(\mathbf{x})$.
 Then the chain rule states that
 
-$$\frac{dy}{dx_i} = \frac{dy}{du_1} \frac{du_1}{dx_i} + \frac{dy}{du_2} \frac{du_2}{dx_i} + \cdots + \frac{dy}{du_m} \frac{du_m}{dx_i} \text{ and thus }
-\nabla_{\mathbf{x}} y = \langle \nabla_{\mathbf{u}} y, \nabla_{\mathbf{x}} \mathbf{u}\rangle.$$
+$$\frac{\partial y}{\partial x_{i}} = \frac{\partial y}{\partial u_{1}} \frac{\partial u_{1}}{\partial x_{i}} + \frac{\partial y}{\partial u_{2}} \frac{\partial u_{2}}{\partial x_{i}} + \ldots + \frac{\partial y}{\partial u_{m}} \frac{\partial u_{m}}{\partial x_{i}} \text{ and thus } \nabla_{\mathbf{x}} y = (\nabla_{\mathbf{u}} y)^\top (\nabla_{\mathbf{x}} \mathbf{u}).$$
 
 Note that $\nabla_{\mathbf{x}} \mathbf{u}$ is a *matrix*
 because it contains the derivative of a vector 
