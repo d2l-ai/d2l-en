@@ -49,7 +49,7 @@ class VisionTransformer(d2l.Classifier):
                                                       num_hiddens))
 
     def forward(self, X):
-        X = X + self.pos_embedding.data[:, :X.shape[1], :]
+        X = X + self.pos_embedding[:, :X.shape[1], :]
         for blk in self.blks:
             X = blk(X, None)
         return X
