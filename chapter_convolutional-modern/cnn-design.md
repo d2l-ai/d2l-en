@@ -1,4 +1,4 @@
-```python
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -133,7 +133,7 @@ with a $1 \times 1$ convolution (`conv4`),
 where setting `use_1x1conv=True, strides=2`
 halves the input height and width.
 
-```python
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx, init
@@ -173,7 +173,7 @@ class ResNeXtBlock(nn.Block):
 ```
 
 
-```python
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -213,7 +213,7 @@ class ResNeXtBlock(nn.Module):
 ```
 
 
-```python
+```{.python .input}
 %%tab tensorflow
 
 import tensorflow as tf
@@ -253,7 +253,7 @@ class ResNeXtBlock(tf.keras.Model):
 
 In the following case (`use_1x1conv=False, strides=1`), the input and output are of the same shape.
 
-```python
+```{.python .input}
 %%tab mxnet, pytorch
 blk = ResNeXtBlock(32, 16, 1)
 if tab.selected('mxnet'):
@@ -263,7 +263,7 @@ blk(X).shape
 ```
 
 
-```python
+```{.python .input}
 %%tab tensorflow
 blk = ResNeXtBlock(32, 16, 1)
 X = d2l.normal((4, 96, 96, 32))
@@ -275,7 +275,7 @@ Y.shape
 Alternatively, setting `use_1x1conv=True, strides=2`
 halves the output height and width.
 
-```python
+```{.python .input}
 %%tab mxnet, pytorch
 blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
 if tab.selected('mxnet'):
@@ -284,7 +284,7 @@ blk(X).shape
 ```
 
 
-```python
+```{.python .input}
 %%tab tensorflow
 blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
 X = d2l.normal((4, 96, 96, 32))
@@ -367,7 +367,7 @@ possible networks (e.g., by varying $d_i$ and $w_i$) in the AnyNet design space.
 To implement AnyNet,
 we first define its network stem.
 
-```python
+```{.python .input}
 %%tab mxnet
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
@@ -378,7 +378,7 @@ class AnyNet(d2l.Classifier):
 ```
 
 
-```python
+```{.python .input}
 %%tab pytorch
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
@@ -388,7 +388,7 @@ class AnyNet(d2l.Classifier):
 ```
 
 
-```python
+```{.python .input}
 %%tab tensorflow
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
@@ -404,7 +404,7 @@ Each stage consists of `depth` ResNeXt blocks,
 where `num_channels` specifies the block width.
 Note that the first block halves the height and width of input images.
 
-```python
+```{.python .input}
 %%tab mxnet
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, num_channels, groups, bot_mul):
@@ -420,7 +420,7 @@ def stage(self, depth, num_channels, groups, bot_mul):
 ```
 
 
-```python
+```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, num_channels, groups, bot_mul):
@@ -435,7 +435,7 @@ def stage(self, depth, num_channels, groups, bot_mul):
 ```
 
 
-```python
+```{.python .input}
 %%tab tensorflow
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, num_channels, groups, bot_mul):
@@ -453,7 +453,7 @@ def stage(self, depth, num_channels, groups, bot_mul):
 Putting the network stem, body, and head together,
 we complete the implementation of AnyNet.
 
-```python
+```{.python .input}
 %%tab all
 @d2l.add_to_class(AnyNet)
 def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
@@ -528,7 +528,7 @@ characterized by
 * $w_1 = 32, w_2=80;$
 * $d_1 = 4, d_2=6.$
 
-```python
+```{.python .input}
 %%tab all
 class RegNet32(AnyNet):
     def __init__(self, lr=0.1, num_classes=10):
@@ -543,13 +543,13 @@ class RegNet32(AnyNet):
 
 We can see that each RegNet stage progressively reduces resolution and increases output channels.
 
-```python
+```{.python .input}
 %%tab mxnet, pytorch
 RegNet32().layer_summary((1, 1, 96, 96))
 ```
 
 
-```python
+```{.python .input}
 %%tab tensorflow
 RegNet32().layer_summary((1, 96, 96, 1))
 ```
@@ -559,7 +559,7 @@ RegNet32().layer_summary((1, 96, 96, 1))
 
 Training the 32-layer RegNet on the Fashion-MNIST dataset is just like before.
 
-```python
+```{.python .input}
 %%tab mxnet, pytorch
 model = RegNet32(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
@@ -568,7 +568,7 @@ trainer.fit(model, data)
 ```
 
 
-```python
+```{.python .input}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
