@@ -1,13 +1,13 @@
 # Vision Transformers
 :label:`sec_vision-transformer`
 
-```{.python .input  n=7}
+```{.python .input  n=1}
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```{.python .input  n=8}
+```{.python .input  n=2}
 class PatchEmbedding(nn.Module):
     def __init__(self, img_size=96, patch_size=16, num_hiddens=512,
                  norm_layer=None):
@@ -28,13 +28,23 @@ class PatchEmbedding(nn.Module):
 ```
 
 ```{.python .input  n=9}
-patch_emb = PatchEmbedding(96, 16, 512)
-X = d2l.randn(4, 32, 96, 96)
-d2l.check_shape(patch_emb(X), (4, 36, 512))  # 36 = (96/16)^2
+img_size, patch_size, num_hiddens, batch_size = 96, 16, 512, 4
+patch_emb = PatchEmbedding(img_size, patch_size, num_hiddens)
+X = d2l.randn(batch_size, 32, img_size, img_size)
+d2l.check_shape(patch_emb(X),
+                (batch_size, (img_size//patch_size)**2, num_hiddens))
 ```
 
 ```{.python .input}
-class VisionTransformer(d2l.Classifier):
+class ViTMLP(nn.Module):
+```
+
+```{.python .input}
+class ViTBlock(nn.Module):
+```
+
+```{.python .input}
+class ViT(d2l.Classifier):
     """Vision transformer."""
     def __init__(self, vocab_size, num_hiddens, norm_shape,
                  ffn_num_hiddens, num_heads, num_layers, dropout,
@@ -44,9 +54,9 @@ class VisionTransformer(d2l.Classifier):
         for i in range(num_layers):
             self.blks.add_module(f"{i}", d2l.EncoderBlock(num_hiddens, \
                  norm_shape, ffn_num_hiddens, num_heads, dropout, True))
-        # In Vision transformer, positional embeddings are learnable
-        self.pos_embedding = nn.Parameter(torch.randn(1, max_len,
-                                                      num_hiddens))
+        # In vision transformer, positional embeddings are learnable
+        self.pos_embedding = nn.Parameter(
+            torch.randn(1, max_len, num_hiddens))
 
     def forward(self, X):
         X = X + self.pos_embedding[:, :X.shape[1], :]
