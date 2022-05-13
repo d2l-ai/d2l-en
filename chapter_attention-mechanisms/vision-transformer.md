@@ -37,23 +37,55 @@ d2l.check_shape(patch_emb(X),
 
 ```{.python .input}
 class ViTMLP(nn.Module):
+    def __init__(self, mlp_num_hiddens, mlp_num_outputs, dropout=0.5):
+        super().__init__()
+        self.dense1 = nn.LazyLinear(mlp_num_hiddens)
+        self.gelu = nn.GELU()
+        self.dropout1 = nn.Dropout(dropout)
+        self.dense2 = nn.LazyLinear(mlp_num_outputs)
+        self.dropout2 = nn.Dropout(dropout)
+
+    def forward(self, x):
+        return self.dropout2(self.dense2(self.dropout1(self.gelu(
+            self.dense1(x)))))
 ```
 
 ```{.python .input}
 class ViTBlock(nn.Module):
+    def __init__(self, num_hiddens, norm_shape, mlp_num_hiddens, 
+                 num_heads, dropout, use_bias=False):
+        super().__init__()
+        self.ln1 = nn.LayerNorm(norm_shape)
+        self.attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 
+                                                dropout, use_bias)
+        self.ln2 = nn.LayerNorm(norm_shape)
+        self.mlp = ViTMLP(mlp_num_hiddens, num_hiddens, dropout)
+
+    def forward(self, X, valid_lens=None):
+        X = self.ln1(X)
+        return X + self.mlp(self.ln2(
+            X + self.attention(X, X, X, valid_lens)))
+```
+
+```{.python .input}
+X = d2l.ones((2, 100, 24))
+encoder_blk = ViTBlock(24, [100, 24], 48, 8, 0.5)
+encoder_blk.eval()
+d2l.check_shape(encoder_blk(X), X.shape)
 ```
 
 ```{.python .input}
 class ViT(d2l.Classifier):
     """Vision transformer."""
-    def __init__(self, vocab_size, num_hiddens, norm_shape,
-                 ffn_num_hiddens, num_heads, num_layers, dropout,
-                 max_len=1000):
+    def __init__(self, vocab_size, num_hiddens, norm_shape, mlp_num_hiddens,
+                 num_heads, num_layers, dropout, use_bias=False):
         super().__init__()
+        self.patch_emb = PatchEmbedding(img_size, patch_size, num_hiddens)
+        
         self.blks = nn.Sequential()
         for i in range(num_layers):
-            self.blks.add_module(f"{i}", d2l.EncoderBlock(num_hiddens, \
-                 norm_shape, ffn_num_hiddens, num_heads, dropout, True))
+            self.blks.add_module(f"{i}", ViTBlock(num_hiddens,
+                 norm_shape, mlp_num_hiddens, num_heads, dropout, use_bias))
         # In vision transformer, positional embeddings are learnable
         self.pos_embedding = nn.Parameter(
             torch.randn(1, max_len, num_hiddens))
@@ -61,7 +93,7 @@ class ViT(d2l.Classifier):
     def forward(self, X):
         X = X + self.pos_embedding[:, :X.shape[1], :]
         for blk in self.blks:
-            X = blk(X, None)
+            X = blk(X)
         return X
 ```
 
