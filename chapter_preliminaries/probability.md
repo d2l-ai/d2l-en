@@ -309,7 +309,6 @@ or if the possible deviation from $1/2$ was
 just an artifact of the small sample size?
 Let's see what happens when we simulate `10000` tosses.
 
-
 ```{.python .input}
 %%tab mxnet
 counts = multinomial(10000, fair_probs).astype(np.float32)
@@ -349,7 +348,6 @@ Let's get some more intuition by studying
 how our estimate evolves as we grow
 the number of tosses from `1` to `10000`.
 
-
 ```{.python .input}
 %%tab mxnet
 counts = multinomial(1, fair_probs, size=10000)
@@ -375,7 +373,7 @@ estimates = estimates.numpy()
 
 ```{.python .input}
 %%tab jax
-counts = np.random.multinomial(1, fair_probs).astype(np.float32)
+counts = np.random.multinomial(1, fair_probs, size=10000).astype(np.float32)
 cum_counts = counts.cumsum(axis=0)
 estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 ```
@@ -387,22 +385,6 @@ d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
 d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
 d2l.plt.axhline(y=0.5, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Samples')
-d2l.plt.gca().set_ylabel('Estimated probability')
-d2l.plt.legend();
-```
-
-```{.python .input}
-#@tab jax
-counts = onp.random.multinomial(10, fair_probs, size=500)
-cum_counts = counts.astype(onp.float32).cumsum(axis=0)
-estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
-
-d2l.set_figsize((6, 4.5))
-for i in range(6):
-    d2l.plt.plot(estimates[:, i],
-                 label=("P(die=" + str(i + 1) + ")"))
-d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
-d2l.plt.gca().set_xlabel('Groups of experiments')
 d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
 ```
