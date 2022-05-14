@@ -10,7 +10,6 @@ stage("Build and Publish") {
   node('d2l-worker') {
     ws("workspace/${TASK}") {
       checkout scm
-      // conda environment
       def ENV_NAME = "${TASK}-${EXECUTOR_NUMBER}";
 
       sh label: "Build Environment", script: """set -ex
@@ -21,13 +20,14 @@ stage("Build and Publish") {
       nvidia-smi
       """
 
-      sh label: "Sanity Check", script: """set -ex
+      sh label: "Check Execution Output", script: """set -ex
       conda activate ${ENV_NAME}
-      d2lbook build outputcheck tabcheck
+      d2lbook build outputcheck
       """
 
       sh label: "Execute Notebooks", script: """set -ex
       conda activate ${ENV_NAME}
+      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
       ./static/cache.sh restore _build/eval/data
       d2lbook build eval
       d2lbook build slides --tab pytorch
@@ -41,8 +41,9 @@ stage("Build and Publish") {
       ./static/cache.sh store _build/eval_mxnet/data
       """
 
-      sh label: "Execute Notebooks [TensorFlow]", script: """set -ex
+      sh label: "Execute Notebooks [Tensorflow]", script: """set -ex
       conda activate ${ENV_NAME}
+      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
       ./static/cache.sh restore _build/eval_tensorflow/data
       export TF_CPP_MIN_LOG_LEVEL=3
       export TF_FORCE_GPU_ALLOW_GROWTH=true
