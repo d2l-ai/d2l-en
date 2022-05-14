@@ -7,44 +7,42 @@ stage("Build and Publish") {
   def TARGET_BRANCH = env.CHANGE_TARGET ? env.CHANGE_TARGET : env.BRANCH_NAME
   // such as d2l-en-master
   def TASK = REPO_NAME + '-' + TARGET_BRANCH
-  node {
+  node('d2l-worker') {
     ws("workspace/${TASK}") {
       checkout scm
+      // conda environment
       def ENV_NAME = "${TASK}-${EXECUTOR_NUMBER}";
 
       sh label: "Build Environment", script: """set -ex
       conda env update -n ${ENV_NAME} -f static/build.yml
       conda activate ${ENV_NAME}
-      pip uninstall -y d2lbook
       pip install git+https://github.com/d2l-ai/d2l-book
       pip list
       nvidia-smi
       """
 
-      sh label: "Check Execution Output", script: """set -ex
+      sh label: "Sanity Check", script: """set -ex
       conda activate ${ENV_NAME}
-      d2lbook build outputcheck
+      d2lbook build outputcheck tabcheck
       """
 
       sh label: "Execute Notebooks", script: """set -ex
       conda activate ${ENV_NAME}
-      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
       ./static/cache.sh restore _build/eval/data
       d2lbook build eval
+      d2lbook build slides --tab pytorch
       ./static/cache.sh store _build/eval/data
       """
 
-      sh label: "Execute Notebooks [Pytorch]", script: """set -ex
+      sh label: "Execute Notebooks [MXNet]", script: """set -ex
       conda activate ${ENV_NAME}
-      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
-      ./static/cache.sh restore _build/eval_pytorch/data
-      d2lbook build eval --tab pytorch
-      ./static/cache.sh store _build/eval_pytorch/data
+      ./static/cache.sh restore _build/eval_mxnet/data
+      d2lbook build eval --tab mxnet
+      ./static/cache.sh store _build/eval_mxnet/data
       """
 
-      sh label: "Execute Notebooks [Tensorflow]", script: """set -ex
+      sh label: "Execute Notebooks [TensorFlow]", script: """set -ex
       conda activate ${ENV_NAME}
-      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
       ./static/cache.sh restore _build/eval_tensorflow/data
       export TF_CPP_MIN_LOG_LEVEL=3
       export TF_FORCE_GPU_ALLOW_GROWTH=true
@@ -54,7 +52,6 @@ stage("Build and Publish") {
 
       sh label: "Execute Notebooks [Jax]", script: """set -ex
       conda activate ${ENV_NAME}
-      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
       ./static/cache.sh restore _build/eval_jax/data
       d2lbook build eval --tab jax
       ./static/cache.sh store _build/eval_jax/data
@@ -70,9 +67,9 @@ stage("Build and Publish") {
       d2lbook build pdf
       """
 
-      sh label:"Build Pytorch PDF", script:"""set -ex
+      sh label:"Build MXNet PDF", script:"""set -ex
       conda activate ${ENV_NAME}
-      d2lbook build pdf --tab pytorch
+      d2lbook build pdf --tab mxnet
       """
       
       if (env.BRANCH_NAME == 'release') {

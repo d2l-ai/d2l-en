@@ -29,6 +29,7 @@ for reversing downsampling operations
 by the convolution.
 
 ```{.python .input}
+#@tab mxnet
 from mxnet import np, npx, init
 from mxnet.gluon import nn
 from d2l import mxnet as d2l
@@ -118,6 +119,7 @@ four-dimensional tensors,
 we can [**use high-level APIs to obtain the same results**].
 
 ```{.python .input}
+#@tab mxnet
 X, K = X.reshape(1, 1, 2, 2), K.reshape(1, 1, 2, 2)
 tconv = nn.Conv2DTranspose(1, kernel_size=2)
 tconv.initialize(init.Constant(K))
@@ -146,6 +148,7 @@ the first and last rows and columns
 will be removed from the transposed convolution output.
 
 ```{.python .input}
+#@tab mxnet
 tconv = nn.Conv2DTranspose(1, kernel_size=2, padding=1)
 tconv.initialize(init.Constant(K))
 tconv(X)
@@ -176,6 +179,7 @@ in :numref:`fig_trans_conv_stride2`.
 The following code snippet can validate the transposed convolution output for stride of 2 in :numref:`fig_trans_conv_stride2`.
 
 ```{.python .input}
+#@tab mxnet
 tconv = nn.Conv2DTranspose(1, kernel_size=2, strides=2)
 tconv.initialize(init.Constant(K))
 tconv(X)
@@ -208,6 +212,7 @@ then $g(Y)$ will have the same shape as $\mathsf{X}$.
 This can be illustrated in the following example.
 
 ```{.python .input}
+#@tab mxnet
 X = np.random.uniform(size=(1, 10, 16, 16))
 conv = nn.Conv2D(20, kernel_size=5, padding=2, strides=3)
 tconv = nn.Conv2DTranspose(10, kernel_size=5, padding=2, strides=3)

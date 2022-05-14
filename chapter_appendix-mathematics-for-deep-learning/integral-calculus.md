@@ -9,6 +9,7 @@ At the level of machine learning we discuss in this book, we will not need a dee
 Suppose that we have a function $f(x)$.  For simplicity, let's assume that $f(x)$ is non-negative (never takes a value less than zero).  What we want to try and understand is: what is the area contained between $f(x)$ and the $x$-axis?
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -62,6 +63,7 @@ d2l.plt.show()
 In most cases, this area will be infinite or undefined (consider the area under $f(x) = x^{2}$), so people will often talk about the area between a pair of ends, say $a$ and $b$.
 
 ```{.python .input}
+#@tab mxnet
 x = np.arange(-2, 2, 0.01)
 f = np.exp(-x**2)
 
@@ -108,6 +110,7 @@ $$
 There is a traditional way to try and understand how we might try to approximate such integrals: we can imagine taking the region in-between $a$ and $b$ and chopping it into $N$ vertical slices.  If $N$ is large, we can approximate the area of each slice by a rectangle, and then add up the areas to get the total area under the curve.  Let's take a look at an example doing this in code.  We will see how to get the true value in a later section.
 
 ```{.python .input}
+#@tab mxnet
 epsilon = 0.05
 a = 0
 b = 2
@@ -345,6 +348,7 @@ If this discussion sounds familiar, it is!  In :numref:`sec_geometry-linear-alge
 In some cases, we will need to work in higher dimensions.  For instance, suppose that we have a function of two variables, like $f(x, y)$ and we want to know the volume under $f$ when $x$ ranges over $[a, b]$ and $y$ ranges over $[c, d]$.
 
 ```{.python .input}
+#@tab mxnet
 # Construct grid and compute function
 x, y = np.meshgrid(np.linspace(-2, 2, 101), np.linspace(-2, 2, 101),
                    indexing='ij')
@@ -352,7 +356,7 @@ z = np.exp(- x**2 - y**2)
 
 # Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
-ax.plot_wireframe(x, y, z)
+ax.plot_wireframe(x.asnumpy(), y.asnumpy(), z.asnumpy())
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
 d2l.plt.xticks([-2, -1, 0, 1, 2])

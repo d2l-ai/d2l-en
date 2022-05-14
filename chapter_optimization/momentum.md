@@ -42,6 +42,7 @@ $$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$
 As before $f$ has its minimum at $(0, 0)$. This function is *very* flat in the direction of $x_1$. Let's see what happens when we perform gradient descent as before on this new function. We pick a learning rate of $0.4$.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -170,6 +171,7 @@ def init_momentum_states(features_dim):
 ```
 
 ```{.python .input}
+#@tab mxnet
 def sgd_momentum(params, states, hyperparams):
     for p, v in zip(params, states):
         v[:] = hyperparams['momentum'] * v + p.grad
@@ -226,6 +228,7 @@ train_momentum(0.005, 0.9)
 There is very little to do in Gluon since the standard `sgd` solver already had momentum built in. Setting matching parameters yields a very similar trajectory.
 
 ```{.python .input}
+#@tab mxnet
 d2l.train_concise_ch11('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
                        data_iter)
 ```
@@ -257,7 +260,7 @@ This is a general quadratic function. For positive definite matrices $\mathbf{Q}
 
 $$h(\mathbf{x}) = \frac{1}{2} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})^\top \mathbf{Q} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c}) + b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}.$$
 
-The gradient is given by $\partial_{\mathbf{x}} f(\mathbf{x}) = \mathbf{Q} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$. That is, it is given by the distance between $\mathbf{x}$ and the minimizer, multiplied by $\mathbf{Q}$. Consequently also the momentum  is a linear combination of terms $\mathbf{Q} (\mathbf{x}_t - \mathbf{Q}^{-1} \mathbf{c})$.
+The gradient is given by $\partial_{\mathbf{x}} h(\mathbf{x}) = \mathbf{Q} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$. That is, it is given by the distance between $\mathbf{x}$ and the minimizer, multiplied by $\mathbf{Q}$. Consequently also the momentum  is a linear combination of terms $\mathbf{Q} (\mathbf{x}_t - \mathbf{Q}^{-1} \mathbf{c})$.
 
 Since $\mathbf{Q}$ is positive definite it can be decomposed into its eigensystem via $\mathbf{Q} = \mathbf{O}^\top \boldsymbol{\Lambda} \mathbf{O}$ for an orthogonal (rotation) matrix $\mathbf{O}$ and a diagonal matrix $\boldsymbol{\Lambda}$ of positive eigenvalues. This allows us to perform a change of variables from $\mathbf{x}$ to $\mathbf{z} := \mathbf{O} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$ to obtain a much simplified expression:
 

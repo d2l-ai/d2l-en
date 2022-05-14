@@ -26,6 +26,7 @@ We have seen simple examples of estimators before in section :numref:`sec_maximu
 As an example, we show below the true density of a Gaussian random variable with mean zero and variance one, along with a collection samples from that Gaussian.  We constructed the $y$ coordinate so every point is visible and the relationship to the original density is clearer.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 import random
@@ -116,7 +117,7 @@ There can be many ways to compute an estimator of a parameter $\hat{\theta}_n$. 
 
 ### Mean Squared Error
 
-Perhaps the simplest metric used to evaluate estimators is the *mean squared error (MSE)* (or $l_2$ loss) of an estimator can be defined as
+Perhaps the simplest metric used to evaluate estimators is the *mean squared error (MSE)* (or $l_2$ loss) estimator which can be defined as
 
 $$\mathrm{MSE} (\hat{\theta}_n, \theta) = E[(\hat{\theta}_n - \theta)^2].$$
 :eqlabel:`eq_mse_est`
@@ -173,6 +174,7 @@ We refer the above formula as *bias-variance trade-off*. The mean squared error 
 Since the standard deviation of an estimator has been implementing by simply calling `a.std()` for a tensor `a`, we will skip it but implement the statistical bias and the mean squared error.
 
 ```{.python .input}
+#@tab mxnet
 # Statistical bias
 def stat_bias(true_theta, est_theta):
     return(np.mean(est_theta) - true_theta)
@@ -207,6 +209,7 @@ def mse(data, true_theta):
 To illustrate the equation of the bias-variance trade-off, let's simulate of normal distribution $\mathcal{N}(\theta, \sigma^2)$ with $10,000$ samples. Here, we use a $\theta = 1$ and $\sigma = 4$. As the estimator is a function of the given samples, here we use the mean of the samples as an estimator for true $\theta$ in this normal distribution $\mathcal{N}(\theta, \sigma^2)$ .
 
 ```{.python .input}
+#@tab mxnet
 theta_true = 1
 sigma = 4
 sample_len = 10000
@@ -245,6 +248,7 @@ mse(samples, theta_true)
 Next, we calculate $\mathrm{Var} (\hat{\theta}_n) + [\mathrm{bias} (\hat{\theta}_n)]^2$ as below. As you can see, the two values agree to numerical precision.
 
 ```{.python .input}
+#@tab mxnet
 bias = stat_bias(theta_true, theta_est)
 np.square(samples.std()) + np.square(bias)
 ```
@@ -380,7 +384,7 @@ Sufficed to say, confidence intervals are subtle objects.  However, if you keep 
 
 ### A Gaussian Example
 
-Let's discuss the most classical example, the confidence interval for the mean of a Gaussian of unknown mean and variance.  Suppose we collect $n$ samples $\{x_i\}_{i=1}^n$ from our Gaussian $\mathcal{N}(\mu, \sigma^2)$.  We can compute estimators for the mean and standard deviation by taking
+Let's discuss the most classical example, the confidence interval for the mean of a Gaussian of unknown mean and variance.  Suppose we collect $n$ samples $\{x_i\}_{i=1}^n$ from our Gaussian $\mathcal{N}(\mu, \sigma^2)$.  We can compute estimators for the mean and variance by taking
 
 $$\hat\mu_n = \frac{1}{n}\sum_{i=1}^n x_i \;\text{and}\; \hat\sigma^2_n = \frac{1}{n-1}\sum_{i=1}^n (x_i - \hat\mu)^2.$$
 
@@ -413,6 +417,7 @@ $$\left[\hat\mu_n - 1.96\frac{\hat\sigma_n}{\sqrt{n}}, \hat\mu_n + 1.96\frac{\ha
 It is safe to say that :eqref:`eq_gauss_confidence` is one of the most used formula in statistics.  Let's close our discussion of statistics by implementing it.  For simplicity, we assume we are in the asymptotic regime.  Small values of $N$ should include the correct value of `t_star` obtained either programmatically or from a $t$-table.
 
 ```{.python .input}
+#@tab mxnet
 # Number of samples
 N = 1000
 

@@ -27,7 +27,6 @@ of declaring and manipulating parameters.
 In this section, we cover the following:
 
 * Accessing parameters for debugging, diagnostics, and visualizations.
-* Parameter initialization.
 * Sharing parameters across different model components.
 
 (**We start by focusing on an MLP with one hidden layer.**)
@@ -57,7 +56,7 @@ net(X).shape
 import torch
 from torch import nn
 
-net = nn.Sequential(nn.Linear(4, 8), nn.ReLU(), nn.Linear(8, 1))
+net = nn.Sequential(nn.LazyLinear(8), nn.ReLU(), nn.LazyLinear(1))
 X = torch.rand(size=(2, 4))
 net(X).shape
 ```
@@ -162,7 +161,7 @@ The situation can grow especially unwieldy
 when we work with more complex modules (e.g., nested modules),
 since we would need to recurse
 through the entire tree to extract
-each sub-module's parameters. Below we demonstrate accessing all layers.
+each sub-module's parameters. Below we demonstrate accessing the parameters of all layers.
 
 ```{.python .input}
 %%tab mxnet
@@ -183,9 +182,11 @@ net.get_weights()
 
 Often, we want to share parameters across multiple layers.
 Let's see how to do this elegantly.
-In the following we allocate a dense layer
+In the following we allocate a fully connected layer
 and then use its parameters specifically
 to set those of another layer.
+Here we need to run the forward propagation
+`net(X)` before accessing the parameters.
 
 ```{.python .input}
 %%tab mxnet
@@ -214,11 +215,12 @@ print(net[1].weight.data()[0] == net[2].weight.data()[0])
 %%tab pytorch
 # We need to give the shared layer a name so that we can refer to its
 # parameters
-shared = nn.Linear(8, 8)
-net = nn.Sequential(nn.Linear(4, 8), nn.ReLU(),
+shared = nn.LazyLinear(8)
+net = nn.Sequential(nn.LazyLinear(8), nn.ReLU(),
                     shared, nn.ReLU(),
                     shared, nn.ReLU(),
-                    nn.Linear(8, 1))
+                    nn.LazyLinear(1))
+net(X)
 # Check whether the parameters are the same
 print(net[2].weight.data[0] == net[4].weight.data[0])
 net[2].weight.data[0, 0] = 100
@@ -259,12 +261,12 @@ during backpropagation.
 
 ## Summary
 
-* We have several ways to access, initialize, and tie model parameters.
+We have several ways to access and tie model parameters.
 
 
 ## Exercises
 
-1. Use the `FancyMLP` model defined in :numref:`sec_model_construction` and access the parameters of the various layers.
+1. Use the `NestMLP` model defined in :numref:`sec_model_construction` and access the parameters of the various layers.
 1. Construct an MLP containing a shared parameter layer and train it. During the training process, observe the model parameters and gradients of each layer.
 1. Why is sharing parameters a good idea?
 

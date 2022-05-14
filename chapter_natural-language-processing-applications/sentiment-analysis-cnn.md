@@ -1,4 +1,4 @@
-# Sentiment Analysis: Using Convolutional Neural Networks 
+# Sentiment Analysis: Using Convolutional Neural Networks
 :label:`sec_sentiment_cnn`
 
 
@@ -9,7 +9,7 @@ two-dimensional image data
 with two-dimensional CNNs,
 which were applied to
 local features such as adjacent pixels.
-Though originally 
+Though originally
 designed for computer vision,
 CNNs are also widely used
 for natural language processing.
@@ -26,7 +26,7 @@ we will use the *textCNN* model
 to demonstrate
 how to design a CNN architecture
 for representing single text :cite:`Kim.2014`.
-Compared with 
+Compared with
 :numref:`fig_nlp-map-sa-rnn`
 that uses an RNN architecture with GloVe pretraining
 for sentiment analysis,
@@ -39,6 +39,7 @@ the choice of the architecture.
 :label:`fig_nlp-map-sa-cnn`
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
@@ -60,7 +61,7 @@ train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
 
 ## One-Dimensional Convolutions
 
-Before introducing the model, 
+Before introducing the model,
 let's see how a one-dimensional convolution works.
 Bear in mind that it is just a special case
 of a two-dimensional convolution
@@ -82,7 +83,7 @@ The sum of these multiplications
 gives the single scalar value (e.g., $0\times1+1\times2=2$ in :numref:`fig_conv1d`)
 at the corresponding position of the output tensor.
 
-We implement one-dimensional cross-correlation in the following `corr1d` function. 
+We implement one-dimensional cross-correlation in the following `corr1d` function.
 Given an input tensor `X`
 and a kernel tensor `K`,
 it returns the output tensor `Y`.
@@ -109,8 +110,8 @@ For any
 one-dimensional input with multiple channels,
 the convolution kernel
 needs to have the same number of input channels.
-Then for each channel, 
-perform a cross-correlation operation on the one-dimensional tensor of the input and the one-dimensional tensor of the convolution kernel, 
+Then for each channel,
+perform a cross-correlation operation on the one-dimensional tensor of the input and the one-dimensional tensor of the convolution kernel,
 summing the results over all the channels
 to produce the one-dimensional output tensor.
 :numref:`fig_conv1d_channel` shows a one-dimensional cross-correlation operation with 3 input channels.
@@ -139,16 +140,16 @@ corr1d_multi_in(X, K)
 Note that
 multi-input-channel one-dimensional cross-correlations
 are equivalent
-to 
-single-input-channel 
+to
+single-input-channel
 two-dimensional cross-correlations.
 To illustrate,
 an equivalent form of
 the multi-input-channel one-dimensional cross-correlation
 in :numref:`fig_conv1d_channel`
-is 
-the 
-single-input-channel 
+is
+the
+single-input-channel
 two-dimensional cross-correlation
 in :numref:`fig_conv1d_2d`,
 where the height of the convolution kernel
@@ -170,15 +171,15 @@ to extract the highest value
 from sequence representations
 as the most important feature
 across time steps.
-The *max-over-time pooling* used in textCNN 
+The *max-over-time pooling* used in textCNN
 works like
-the one-dimensional global maximum pooling
-:cite:`Collobert.Weston.Bottou.ea.2011`. 
+the one-dimensional global max-pooling
+:cite:`Collobert.Weston.Bottou.ea.2011`.
 For a multi-channel input
 where each channel stores values
 at different time steps,
 the output at each channel
-is the maximum value 
+is the maximum value
 for that channel.
 Note that
 the max-over-time pooling
@@ -196,7 +197,7 @@ then obtains and transforms sequence representations
 for the downstream application.
 
 For a single text sequence
-with $n$ tokens represented by 
+with $n$ tokens represented by
 $d$-dimensional vectors,
 the width, height, and number of channels
 of the input tensor
@@ -211,7 +212,7 @@ into the output as follows:
 ![The model architecture of textCNN.](../img/textcnn.svg)
 :label:`fig_conv1d_textcnn`
 
-:numref:`fig_conv1d_textcnn` 
+:numref:`fig_conv1d_textcnn`
 illustrates the model architecture of textCNN
 with a concrete example.
 The input is a sentence with 11 tokens,
@@ -242,10 +243,11 @@ Compared with the bidirectional RNN model in
 besides
 replacing recurrent layers with convolutional layers,
 we also use two embedding layers:
-one with trainable weights and the other 
+one with trainable weights and the other
 with fixed weights.
 
 ```{.python .input}
+#@tab mxnet
 class TextCNN(nn.Block):
     def __init__(self, vocab_size, embed_size, kernel_sizes, num_channels,
                  **kwargs):
@@ -319,10 +321,11 @@ class TextCNN(nn.Module):
         return outputs
 ```
 
-Let's create a textCNN instance. 
+Let's create a textCNN instance.
 It has 3 convolutional layers with kernel widths of 3, 4, and 5, all with 100 output channels.
 
 ```{.python .input}
+#@tab mxnet
 embed_size, kernel_sizes, nums_channels = 100, [3, 4, 5], [100, 100, 100]
 devices = d2l.try_all_gpus()
 net = TextCNN(len(vocab), embed_size, kernel_sizes, nums_channels)
@@ -335,9 +338,9 @@ embed_size, kernel_sizes, nums_channels = 100, [3, 4, 5], [100, 100, 100]
 devices = d2l.try_all_gpus()
 net = TextCNN(len(vocab), embed_size, kernel_sizes, nums_channels)
 
-def init_weights(layer):
-    if type(layer) in (nn.Linear, nn.Conv1d):
-        nn.init.xavier_uniform_(layer.weight)
+def init_weights(module):
+    if type(module) in (nn.Linear, nn.Conv1d):
+        nn.init.xavier_uniform_(module.weight)
 
 net.apply(init_weights);
 ```
@@ -352,6 +355,7 @@ will be trained in `embedding`
 and fixed in `constant_embedding`.
 
 ```{.python .input}
+#@tab mxnet
 glove_embedding = d2l.TokenEmbedding('glove.6b.100d')
 embeds = glove_embedding[vocab.idx_to_token]
 net.embedding.weight.set_data(embeds)
@@ -373,6 +377,7 @@ net.constant_embedding.weight.requires_grad = False
 Now we can train the textCNN model for sentiment analysis.
 
 ```{.python .input}
+#@tab mxnet
 lr, num_epochs = 0.001, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()

@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+```
+
 # Self-Attention and Positional Encoding
 :label:`sec_self-attention-and-positional-encoding`
 
@@ -21,6 +26,7 @@ we will discuss sequence encoding using self-attention,
 including using additional information for the sequence order.
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 import math
 from mxnet import autograd, np, npx
@@ -29,7 +35,7 @@ npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import math
 import torch
@@ -37,7 +43,7 @@ from torch import nn
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import numpy as np
 import tensorflow as tf
@@ -63,38 +69,39 @@ with shape (batch size, number of time steps or sequence length in tokens, $d$).
 The output tensor has the same shape.
 
 ```{.python .input}
+%%tab mxnet
 num_hiddens, num_heads = 100, 5
 attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 0.5)
 attention.initialize()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 num_hiddens, num_heads = 100, 5
-attention = d2l.MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
-                                   num_hiddens, num_heads, 0.5)
-attention.eval()
+attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 0.5)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 num_hiddens, num_heads = 100, 5
 attention = d2l.MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
                                    num_hiddens, num_heads, 0.5)
 ```
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab mxnet, pytorch
 batch_size, num_queries, valid_lens = 2, 4, d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
-attention(X, X, X, valid_lens).shape
+d2l.check_shape(attention(X, X, X, valid_lens),
+                (batch_size, num_queries, num_hiddens))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 batch_size, num_queries, valid_lens = 2, 4, tf.constant([3, 2])
 X = tf.ones((batch_size, num_queries, num_hiddens))
-attention(X, X, X, valid_lens, training=False).shape
+d2l.check_shape(attention(X, X, X, valid_lens, training=False),
+                (batch_size, num_queries, num_hiddens))
 ```
 
 ## Comparing CNNs, RNNs, and Self-Attention
@@ -218,13 +225,14 @@ Before explanations of this design,
 let's first implement it in the following `PositionalEncoding` class.
 
 ```{.python .input}
+%%tab mxnet
 #@save
 class PositionalEncoding(nn.Block):
     """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
-        super(PositionalEncoding, self).__init__()
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
-        # Create a long enough `P`
+        # Create a long enough P
         self.P = d2l.zeros((1, max_len, num_hiddens))
         X = d2l.arange(max_len).reshape(-1, 1) / np.power(
             10000, np.arange(0, num_hiddens, 2) / num_hiddens)
@@ -237,14 +245,14 @@ class PositionalEncoding(nn.Block):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 #@save
 class PositionalEncoding(nn.Module):
     """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
-        super(PositionalEncoding, self).__init__()
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
-        # Create a long enough `P`
+        # Create a long enough P
         self.P = d2l.zeros((1, max_len, num_hiddens))
         X = d2l.arange(max_len, dtype=torch.float32).reshape(
             -1, 1) / torch.pow(10000, torch.arange(
@@ -258,14 +266,14 @@ class PositionalEncoding(nn.Module):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 #@save
 class PositionalEncoding(tf.keras.layers.Layer):
     """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
-        # Create a long enough `P`
+        # Create a long enough P
         self.P = np.zeros((1, max_len, num_hiddens))
         X = np.arange(max_len, dtype=np.float32).reshape(
             -1,1)/np.power(10000, np.arange(
@@ -293,6 +301,7 @@ the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$ (same for the $8^{\mathrm{th}}$ 
 is due to the alternation of sine and cosine functions.
 
 ```{.python .input}
+%%tab mxnet
 encoding_dim, num_steps = 32, 60
 pos_encoding = PositionalEncoding(encoding_dim, 0)
 pos_encoding.initialize()
@@ -303,10 +312,9 @@ d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 encoding_dim, num_steps = 32, 60
 pos_encoding = PositionalEncoding(encoding_dim, 0)
-pos_encoding.eval()
 X = pos_encoding(d2l.zeros((1, num_steps, encoding_dim)))
 P = pos_encoding.P[:, :X.shape[1], :]
 d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
@@ -314,7 +322,7 @@ d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 encoding_dim, num_steps = 32, 60
 pos_encoding = PositionalEncoding(encoding_dim, 0)
 X = pos_encoding(tf.zeros((1, num_steps, encoding_dim)), training=False)
@@ -332,7 +340,7 @@ As we can see,
 the lowest bit, the second-lowest bit, and the third-lowest bit alternate on every number, every two numbers, and every four numbers, respectively.
 
 ```{.python .input}
-#@tab all
+%%tab all
 for i in range(8):
     print(f'{i} in binary is {i:>03b}')
 ```
@@ -350,20 +358,21 @@ are more space-efficient
 than binary representations.
 
 ```{.python .input}
+%%tab mxnet
 P = np.expand_dims(np.expand_dims(P[0, :, :], 0), 0)
 d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
                   ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 P = P[0, :, :].unsqueeze(0).unsqueeze(0)
 d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
                   ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 P = tf.expand_dims(tf.expand_dims(P[0, :, :], axis=0), axis=0)
 d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
                   ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
@@ -413,6 +422,7 @@ where the $2\times 2$ projection matrix does not depend on any position index $i
 
 1. Suppose that we design a deep architecture to represent a sequence by stacking self-attention layers with positional encoding. What could be issues?
 1. Can you design a learnable positional encoding method?
+1. Can we assign different learned embeddings according to different offsets between queries and keys that are compared in self-attention? Hint: you may refer to relative position embeddings :cite:`shaw2018self,huang2018music`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/1651)

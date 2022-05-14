@@ -9,6 +9,7 @@ In this section, we go on to discuss
 *stochastic gradient descent* in greater detail.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
@@ -254,7 +255,7 @@ A similar reasoning shows that the probability of picking some sample (i.e., tra
 
 $${n \choose 1} \frac{1}{n} \left(1-\frac{1}{n}\right)^{n-1} = \frac{n}{n-1} \left(1-\frac{1}{n}\right)^{n} \approx e^{-1} \approx 0.37.$$
 
-This leads to an increased variance and decreased data efficiency relative to sampling *without replacement*. Hence, in practice we perform the latter (and this is the default choice throughout this book). Last note that repeated passes through the training dataset traverse it in a *different* random order.
+Sampling with replacement leads to an increased variance and decreased data efficiency relative to sampling *without replacement*. Hence, in practice we perform the latter (and this is the default choice throughout this book). Last note that repeated passes through the training dataset traverse it in a *different* random order.
 
 
 ## Summary

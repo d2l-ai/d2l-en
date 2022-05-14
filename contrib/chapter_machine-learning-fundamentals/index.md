@@ -32,6 +32,5 @@ scalability, and efficiency of our models to subsequent chapters.
 
 model-selection
 underfit-overfit
-environment
 ```
 

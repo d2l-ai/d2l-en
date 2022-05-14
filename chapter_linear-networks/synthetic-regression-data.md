@@ -61,7 +61,8 @@ drawn independently and identically for each example:
 For convenience we assume that $\epsilon$ is drawn 
 from a normal distribution with mean $\mu= 0$ 
 and standard deviation $\sigma = 0.01$.
-We add the code to the `__init__` method of a subclass of `DataModule`. 
+Note that for object-oriented design
+we add the code to the `__init__` method of a subclass of `d2l.DataModule` (introduced in :numref:`oo-design-data`). 
 It's good practice to allow setting any additional hyperparameters. 
 We accomplish this with `save_hyperparameters()`. 
 The `batch_size` will be determined later on.
@@ -104,7 +105,8 @@ Training machine learning models often requires multiple passes over a dataset,
 grabbing one minibatch of examples at a time. 
 This data is then used to update the model. 
 To illustrate how this works, we 
-[**implement the `get_dataloader` method.**] 
+[**implement the `get_dataloader` function,**] 
+registering it as a method in the `SyntheticRegressionData` class via `add_to_class` (introduced in :numref:`oo-design-utilities`).
 It (**takes a batch size, a matrix of features,
 and a vector of labels, and generates minibatches of size `batch_size`.**)
 As such, each minibatch consists of a tuple of features and labels. 

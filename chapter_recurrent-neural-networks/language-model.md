@@ -179,7 +179,7 @@ This makes the performance on documents of different lengths comparable. For his
 
 $$\exp\left(-\frac{1}{n} \sum_{t=1}^n \log P(x_t \mid x_{t-1}, \ldots, x_1)\right).$$
 
-Perplexity can be best understood as the harmonic mean of the number of real choices that we have when deciding which token to pick next. Let's look at a number of cases:
+Perplexity can be best understood as the geometric mean of the number of real choices that we have when deciding which token to pick next. Let's look at a number of cases:
 
 * In the best case scenario, the model always perfectly estimates the probability of the target token as 1. In this case the perplexity of the model is 1.
 * In the worst case scenario, the model always predicts the probability of the target token as 0. In this situation, the perplexity is positive infinity.

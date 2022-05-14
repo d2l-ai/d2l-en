@@ -42,6 +42,7 @@ there are equal number of
 indicating different sentiment polarities.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 import os
@@ -143,6 +144,7 @@ Now we can create data iterators.
 At each iteration, a minibatch of examples are returned.
 
 ```{.python .input}
+#@tab mxnet
 train_iter = d2l.load_array((train_features, train_data[1]), 64)
 
 for X, y in train_iter:
@@ -167,6 +169,7 @@ Last, we wrap up the above steps into the `load_data_imdb` function.
 It returns training and test data iterators and the vocabulary of the IMDb review dataset.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def load_data_imdb(batch_size, num_steps=500):
     """Return data iterators and the vocabulary of the IMDb review dataset."""

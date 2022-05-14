@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Documentation
 :begin_tab:`mxnet`
 While we cannot possibly introduce every single MXNet function and class 
@@ -32,18 +37,19 @@ we invoke the `dir` function. For instance, we can
 (**query all properties in the module for generating random numbers**):
 
 ```{.python .input  n=1}
+%%tab mxnet
 from mxnet import np
 print(dir(np.random))
 ```
 
 ```{.python .input  n=1}
-#@tab pytorch
+%%tab pytorch
 import torch
 print(dir(torch.distributions))
 ```
 
 ```{.python .input  n=1}
-#@tab tensorflow
+%%tab tensorflow
 import tensorflow as tf
 print(dir(tf.random))
 ```
@@ -63,16 +69,17 @@ we can invoke the  `help` function. As an example, let's
 [**explore the usage instructions for tensors' `ones` function**].
 
 ```{.python .input}
+%%tab mxnet
 help(np.ones)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 help(torch.ones)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 help(tf.ones)
 ```
 
@@ -83,16 +90,17 @@ Whenever possible, you should (**run a quick test**)
 to confirm your interpretation:
 
 ```{.python .input}
+%%tab mxnet
 np.ones(4)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 torch.ones(4)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tf.ones(4)
 ```
 

@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -38,9 +38,9 @@ e.g., if we find the original input resolution to be unwieldy.
 ## Padding
 
 As described above, one tricky issue when applying convolutional layers
-is that we tend to lose pixels on the perimeter of our image. Consider :numref:`img_conv_reuse` which depicts the pixel utilization as a function of the convolution kernel size and the position within the image. The pixels in the corners are hardly used at all. 
+is that we tend to lose pixels on the perimeter of our image. Consider :numref:`img_conv_reuse` that depicts the pixel utilization as a function of the convolution kernel size and the position within the image. The pixels in the corners are hardly used at all. 
 
-![Pixel utilization for convolutions of size $1 \times 1$, $2 \times 2$ and $3 \times 3$ respectively.](../img/conv-reuse.svg)
+![Pixel utilization for convolutions of size $1 \times 1$, $2 \times 2$, and $3 \times 3$ respectively.](../img/conv-reuse.svg)
 :label:`img_conv_reuse`
 
 Since we typically use small kernels,
@@ -145,7 +145,7 @@ def comp_conv2d(conv2d, X):
     # Strip the first two dimensions: examples and channels
     return Y.reshape(Y.shape[2:])
 # 1 row and column is padded on either side, so a total of 2 rows or columns are added
-conv2d = nn.Conv2d(1, 1, kernel_size=3, padding=1)
+conv2d = nn.LazyConv2d(1, kernel_size=3, padding=1)
 X = torch.rand(size=(8, 8))
 comp_conv2d(conv2d, X).shape
 ```
@@ -185,7 +185,7 @@ comp_conv2d(conv2d, X).shape
 %%tab pytorch
 # We use a convolution kernel with height 5 and width 3. The padding on 
 # either side of the height and width are 2 and 1, respectively.
-conv2d = nn.Conv2d(1, 1, kernel_size=(5, 3), padding=(2, 1))
+conv2d = nn.LazyConv2d(1, kernel_size=(5, 3), padding=(2, 1))
 comp_conv2d(conv2d, X).shape
 ```
 
@@ -250,7 +250,7 @@ comp_conv2d(conv2d, X).shape
 
 ```{.python .input}
 %%tab pytorch
-conv2d = nn.Conv2d(1, 1, kernel_size=3, padding=1, stride=2)
+conv2d = nn.LazyConv2d(1, kernel_size=3, padding=1, stride=2)
 comp_conv2d(conv2d, X).shape
 ```
 
@@ -270,7 +270,7 @@ comp_conv2d(conv2d, X).shape
 
 ```{.python .input}
 %%tab pytorch
-conv2d = nn.Conv2d(1, 1, kernel_size=(3, 5), padding=(0, 1), stride=(3, 4))
+conv2d = nn.LazyConv2d(1, kernel_size=(3, 5), padding=(0, 1), stride=(3, 4))
 comp_conv2d(conv2d, X).shape
 ```
 
@@ -287,7 +287,7 @@ Padding can increase the height and width of the output. This is often used to g
 
 A similar convention applies to strides. When horizontal stride $s_h$ and vertical stride $s_w$ match, we simply talk about stride $s$. The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input for $n > 1$. By default, the padding is 0 and the stride is 1. 
 
-So far all padding that we discussed simply extended images with zeros. This has significant computational benefit since it is trivial to accomplish. Moreover, operators can be engineered to take advantage of this padding implicitly without the need to allocate additional memory. At the same time, it allows CNNs to encode implicit position information within an image, simply by learning where the 'whitespace' is. There are many alternatives to zero-padding. :cite:`Alsallakh.Kokhlikyan.Miglani.ea.2020` provides an extensive overview of alternatives (albeit without a clear case to use nonzero paddings unless artifacts occur). 
+So far all padding that we discussed simply extended images with zeros. This has significant computational benefit since it is trivial to accomplish. Moreover, operators can be engineered to take advantage of this padding implicitly without the need to allocate additional memory. At the same time, it allows CNNs to encode implicit position information within an image, simply by learning where the "whitespace" is. There are many alternatives to zero-padding. :cite:`Alsallakh.Kokhlikyan.Miglani.ea.2020` provides an extensive overview of alternatives (albeit without a clear case to use nonzero paddings unless artifacts occur). 
 
 
 ## Exercises

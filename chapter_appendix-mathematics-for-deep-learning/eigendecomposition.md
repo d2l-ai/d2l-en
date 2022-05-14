@@ -89,6 +89,7 @@ We can solve this with the vectors $[1, -1]^\top$ and $[1, 2]^\top$ respectively
 We can check this in code using the built-in `numpy.linalg.eig` routine.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -277,6 +278,7 @@ that the eigenvalues are approximately $0.99$, $2.97$, $4.95$, $9.08$,
 all comfortably inside the ranges provided.
 
 ```{.python .input}
+#@tab mxnet
 A = np.array([[1.0, 0.1, 0.1, 0.1],
               [0.1, 3.0, 0.2, 0.3],
               [0.1, 0.2, 5.0, 0.5],
@@ -344,6 +346,7 @@ a random matrix with Gaussian entries, so let's make one of those.
 To be concrete, we start with a mean zero, variance one Gaussian distributed $5 \times 5$ matrix.
 
 ```{.python .input}
+#@tab mxnet
 np.random.seed(8675309)
 
 k = 5
@@ -393,6 +396,7 @@ Let's see what happens when we repeatedly multiply our matrix $\mathbf{A}$
 against a random input vector, and keep track of the norm.
 
 ```{.python .input}
+#@tab mxnet
 # Calculate the sequence of norms after repeatedly applying `A`
 v_in = np.random.randn(k, 1)
 
@@ -434,6 +438,7 @@ The norm is growing uncontrollably!
 Indeed if we take the list of quotients, we will see a pattern.
 
 ```{.python .input}
+#@tab mxnet
 # Compute the scaling factor of the norms
 norm_ratio_list = []
 for i in range(1, 100):
@@ -481,6 +486,7 @@ By taking the norm of the complex number
 we can measure that stretching factor. Let's also sort them.
 
 ```{.python .input}
+#@tab mxnet
 # Compute the eigenvalues
 eigs = np.linalg.eigvals(A).tolist()
 norm_eigs = [np.absolute(x) for x in eigs]
@@ -550,6 +556,7 @@ so that the largest eigenvalue is instead now just one.
 Let's see what happens in this case.
 
 ```{.python .input}
+#@tab mxnet
 # Rescale the matrix `A`
 A /= norm_eigs[-1]
 
@@ -599,6 +606,7 @@ d2l.plot(tf.range(0, 100), norm_list, 'Iteration', 'Value')
 We can also plot the ratio between consecutive norms as before and see that indeed it stabilizes.
 
 ```{.python .input}
+#@tab mxnet
 # Also plot the ratio
 norm_ratio_list = []
 for i in range(1, 100):

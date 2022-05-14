@@ -17,7 +17,7 @@ The GAN architecture is illustrated in :numref:`fig_gan`.
 As you can see, there are two pieces in GAN architecture - first off, we need a device (say, a deep network but it really could be anything, such as a game rendering engine) that might potentially be able to generate data that looks just like the real thing. If we are dealing with images, this needs to generate images. If we are dealing with speech, it needs to generate audio sequences, and so on. We call this the generator network. The second component is the discriminator network. It attempts to distinguish fake and real data from each other. Both networks are in competition with each other. The generator network attempts to fool the discriminator network. At that point, the discriminator network adapts to the new fake data. This information, in turn is used to improve the generator network, and so on.
 
 
-The discriminator is a binary classifier to distinguish if the input $x$ is real (from real data) or fake (from the generator). Typically, the discriminator outputs a scalar prediction $o\in\mathbb R$ for input $\mathbf x$, such as using a dense layer with hidden size 1, and then applies sigmoid function to obtain the predicted probability $D(\mathbf x) = 1/(1+e^{-o})$. Assume the label $y$ for the true data is $1$ and $0$ for the fake data. We train the discriminator to minimize the cross-entropy loss, *i.e.*,
+The discriminator is a binary classifier to distinguish if the input $x$ is real (from real data) or fake (from the generator). Typically, the discriminator outputs a scalar prediction $o\in\mathbb R$ for input $\mathbf x$, such as using a fully connected layer with hidden size 1, and then applies sigmoid function to obtain the predicted probability $D(\mathbf x) = 1/(1+e^{-o})$. Assume the label $y$ for the true data is $1$ and $0$ for the fake data. We train the discriminator to minimize the cross-entropy loss, *i.e.*,
 
 $$ \min_D \{ - y \log D(\mathbf x) - (1-y)\log(1-D(\mathbf x)) \},$$
 
@@ -43,6 +43,7 @@ $$min_D max_G \{ -E_{x \sim \text{Data}} log D(\mathbf x) - E_{z \sim \text{Nois
 Many of the GANs applications are in the context of images. As a demonstration purpose, we are going to content ourselves with fitting a much simpler distribution first. We will illustrate what happens if we use GANs to build the world's most inefficient estimator of parameters for a Gaussian. Let's get started.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
@@ -111,6 +112,7 @@ data_iter = d2l.load_array((data,), batch_size)
 Our generator network will be the simplest network possible - a single layer linear model. This is since we will be driving that linear network with a Gaussian data generator. Hence, it literally only needs to learn the parameters to fake things perfectly.
 
 ```{.python .input}
+#@tab mxnet
 net_G = nn.Sequential()
 net_G.add(nn.Dense(2))
 ```
@@ -130,6 +132,7 @@ net_G = tf.keras.layers.Dense(2)
 For the discriminator we will be a bit more discriminating: we will use an MLP with 3 layers to make things a bit more interesting.
 
 ```{.python .input}
+#@tab mxnet
 net_D = nn.Sequential()
 net_D.add(nn.Dense(5, activation='tanh'),
           nn.Dense(3, activation='tanh'),
@@ -158,6 +161,7 @@ net_D = tf.keras.models.Sequential([
 First we define a function to update the discriminator.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator."""
@@ -190,7 +194,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     # Do not need to compute gradient for `net_G`, detach it from
     # computing gradients.
     fake_Y = net_D(fake_X.detach())
-    loss_D = (loss(real_Y, ones.reshape(real_Y.shape)) + 
+    loss_D = (loss(real_Y, ones.reshape(real_Y.shape)) +
               loss(fake_Y, zeros.reshape(fake_Y.shape))) / 2
     loss_D.backward()
     trainer_D.step()
@@ -221,6 +225,7 @@ def update_D(X, Z, net_D, net_G, loss, optimizer_D):
 The generator is updated similarly. Here we reuse the cross-entropy loss but change the label of the fake data from $0$ to $1$.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def update_G(Z, net_D, net_G, loss, trainer_G):
     """Update generator."""
@@ -277,6 +282,7 @@ def update_G(Z, net_D, net_G, loss, optimizer_G):
 Both the discriminator and the generator performs a binary logistic regression with the cross-entropy loss. We use Adam to smooth the training process. In each iteration, we first update the discriminator and then the generator. We visualize both losses and generated examples.
 
 ```{.python .input}
+#@tab mxnet
 def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
     loss = gluon.loss.SigmoidBCELoss()
     net_D.initialize(init=init.Normal(0.02), force_reinit=True)
@@ -384,11 +390,11 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
         animator.axes[1].scatter(data[:, 0], data[:, 1])
         animator.axes[1].scatter(fake_X[:, 0], fake_X[:, 1])
         animator.axes[1].legend(["real", "generated"])
-        
+
         # Show the losses
         loss_D, loss_G = metric[0] / metric[2], metric[1] / metric[2]
         animator.add(epoch + 1, (loss_D, loss_G))
-        
+
     print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '
           f'{metric[2] / timer.stop():.1f} examples/sec')
 ```

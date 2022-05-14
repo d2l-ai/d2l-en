@@ -1,3 +1,8 @@
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+```
+
 # Encoder-Decoder Architecture
 :label:`sec_encoder-decoder`
 
@@ -46,43 +51,50 @@ The implementation will be provided
 by any model that inherits this base `Encoder` class.
 
 ```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
 from mxnet.gluon import nn
 
 #@save
 class Encoder(nn.Block):
     """The base encoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Encoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
+    # Later there can be additional arguments (e.g., length excluding padding)
     def forward(self, X, *args):
         raise NotImplementedError
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
+from d2l import torch as d2l
 from torch import nn
 
 #@save
 class Encoder(nn.Module):
     """The base encoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Encoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
+    # Later there can be additional arguments (e.g., length excluding padding)
     def forward(self, X, *args):
         raise NotImplementedError
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
+from d2l import tensorflow as d2l
 import tensorflow as tf
 
 #@save
 class Encoder(tf.keras.layers.Layer):
     """The base encoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Encoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
-    def call(self, X, *args, **kwargs):
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def call(self, X, *args):
         raise NotImplementedError
 ```
 
@@ -104,12 +116,14 @@ and the encoded state
 into an output token at the current time step.
 
 ```{.python .input}
+%%tab mxnet
 #@save
 class Decoder(nn.Block):
     """The base decoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Decoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
+    # Later there can be additional arguments (e.g., length excluding padding)
     def init_state(self, enc_outputs, *args):
         raise NotImplementedError
 
@@ -118,13 +132,14 @@ class Decoder(nn.Block):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 #@save
 class Decoder(nn.Module):
     """The base decoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Decoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
+    # Later there can be additional arguments (e.g., length excluding padding)
     def init_state(self, enc_outputs, *args):
         raise NotImplementedError
 
@@ -133,17 +148,18 @@ class Decoder(nn.Module):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 #@save
 class Decoder(tf.keras.layers.Layer):
     """The base decoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Decoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
+    # Later there can be additional arguments (e.g., length excluding padding)
     def init_state(self, enc_outputs, *args):
         raise NotImplementedError
 
-    def call(self, X, state, **kwargs):
+    def call(self, X, state):
         raise NotImplementedError
 ```
 
@@ -160,50 +176,37 @@ and this state
 will be further used by the decoder as one of its input.
 
 ```{.python .input}
+%%tab mxnet, pytorch
 #@save
-class EncoderDecoder(nn.Block):
+class EncoderDecoder(d2l.Classifier):
     """The base class for the encoder-decoder architecture."""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoder, self).__init__(**kwargs)
+    def __init__(self, encoder, decoder):
+        super().__init__()
         self.encoder = encoder
         self.decoder = decoder
 
     def forward(self, enc_X, dec_X, *args):
         enc_outputs = self.encoder(enc_X, *args)
         dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state)
+        # Return decoder output only
+        return self.decoder(dec_X, dec_state)[0]
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab tensorflow
 #@save
-class EncoderDecoder(nn.Module):
+class EncoderDecoder(d2l.Classifier):
     """The base class for the encoder-decoder architecture."""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoder, self).__init__(**kwargs)
+    def __init__(self, encoder, decoder):
+        super().__init__()
         self.encoder = encoder
         self.decoder = decoder
 
-    def forward(self, enc_X, dec_X, *args):
+    def call(self, enc_X, dec_X, *args):
         enc_outputs = self.encoder(enc_X, *args)
         dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state)
-```
-
-```{.python .input}
-#@tab tensorflow
-#@save
-class EncoderDecoder(tf.keras.Model):
-    """The base class for the encoder-decoder architecture."""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoder, self).__init__(**kwargs)
-        self.encoder = encoder
-        self.decoder = decoder
-
-    def call(self, enc_X, dec_X, *args, **kwargs):
-        enc_outputs = self.encoder(enc_X, *args, **kwargs)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state, **kwargs)
+        # Return decoder output only
+        return self.decoder(dec_X, dec_state)[0]
 ```
 
 The term "state" in the encoder-decoder architecture

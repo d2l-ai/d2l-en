@@ -346,6 +346,7 @@ from collections import defaultdict
 from IPython import display
 import math
 from matplotlib import pyplot as plt
+from matplotlib_inline import backend_inline
 import os
 import pandas as pd
 import random
@@ -415,7 +416,29 @@ to update your code and runtime environment.
 Here is how we import modules from TensorFlow.
 :end_tab:
 
+:begin_tab:`jax`
+Most of the code in this book is based on Jax,
+an open-source framework enabling composable function
+transformations such as differentiation of arbitrary
+Python and NumPy functions, as well as JIT compliation,
+vectorization and much more! It's becoming popular in
+the machine learning research space and has an
+easy-to-learn NumPy-like API. Actually, JAX tries
+to achieve 1:1 parity with NumPy, so switching your
+code could be as simple as changing a single import statement!
+However, due to the rapid development of deep learning,
+some code *in the print edition*
+may not work properly in future versions of Jax.
+We plan to keep the online version up-to-date.
+In case you encounter any problems,
+please consult :ref:`chap_installation`
+to update your code and runtime environment.
+
+Here is how we import modules from JAX.
+:end_tab:
+
 ```{.python .input}
+#@tab mxnet
 #@save
 from mxnet import autograd, context, gluon, image, init, np, npx
 from mxnet.gluon import nn, rnn
@@ -439,6 +462,14 @@ from PIL import Image
 #@save
 import numpy as np
 import tensorflow as tf
+```
+
+```{.python .input}
+#@tab jax
+#@save
+import numpy as np
+import jax
+import jax.numpy as jnp
 ```
 
 ### Target Audience
@@ -523,8 +554,10 @@ jake221, jonbally, zyhazwraith, Brian Pulfer, Nick Tomasino, Lefan Zhang, Hongsh
 yuntai, Yuanxiang Zhu, amarazov, pasricha, Ben Greenawald, Shivam Upadhyay, Quanshangze Du, Biswajit Sahoo,
 Parthe Pandit, Ishan Kumar, HomunculusK, Lane Schwartz, varadgunjal, Jason Wiener, Armin Gholampoor,
 Shreshtha13, eigen-arnav, Hyeonggyu Kim, EmilyOng, Bálint Mucsányi, Chase DuBois, Juntian Tao,
-gopalakrishna-r, Wenxiang Xu, Lifu Huang, filevich, quake2005, nils-werner, Yiming Li, Marsel Khisamutdinov,
-Francesco "Fuma" Fumagalli, Peilin Sun, Vincent Gurgul, qingfengtommy, Janmey Shukla.
+Wenxiang Xu, Lifu Huang, filevich, quake2005, nils-werner, Yiming Li, Marsel Khisamutdinov,
+Francesco "Fuma" Fumagalli, Peilin Sun, Vincent Gurgul, qingfengtommy, Janmey Shukla, Mo Shan,
+Kaan Sancak, regob, AlexSauer, Gopalakrishna Ramachandra, Tobias Uelwer, Chao Wang, Tian Cao,
+Nicolas Corthorn, akash5474, kxxt, zxydi1992, Jacob Britton.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian, Peter DeSantis, Adam Selipsky,
 and Andrew Jassy for their generous support in writing this book. 

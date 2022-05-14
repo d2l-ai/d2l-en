@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -19,7 +19,7 @@ and focus the tools at our disposal
 even when the dataset is taken as a given.
 
 Recall that in our polynomial regression example
-(:numref:`sec_model_selection`)
+(:numref:`subsec_polynomial-curve-fitting`)
 we could limit our model's capacity
 by tweaking the degree
 of the fitted polynomial.
@@ -29,7 +29,7 @@ However, simply tossing aside features
 can be too blunt an instrument.
 Sticking with the polynomial regression
 example, consider what might happen
-with high-dimensional inputs.
+with high-dimensional input.
 The natural extensions of polynomials
 to multivariate data are called *monomials*,
 which are simply products of powers of variables.
@@ -46,14 +46,14 @@ dramatically increase the complexity of our model.
 Thus we often need a more fine-grained tool
 for adjusting function complexity.
 
-
 ## Norms and Weight Decay
 
 (**Rather than directly manipulating the number of parameters,
 *weight decay*, operates by restricting the values 
 that the parameters can take.**)
 More commonly called $\ell_2$ regularization
-outside of deep learning circles,
+outside of deep learning circles
+when optimized by minibatch stochastic gradient descent,
 weight decay might be the most widely used technique
 for regularizing parametric machine learning models.
 The technique is motivated by the basic intuition
@@ -75,7 +75,7 @@ One simple interpretation might be
 to measure the complexity of a linear function
 $f(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}$
 by some norm of its weight vector, e.g., $\| \mathbf{w} \|^2$.
-Recall that we introduced the $\ell_2$ norm and $\ell_1$ norms,
+Recall that we introduced the $\ell_2$ norm and $\ell_1$ norm,
 which are special cases of the more general $\ell_p$ norm
 in :numref:`subsec_lin-algebra-norms`.
 The most common method for ensuring a small weight vector
@@ -98,7 +98,7 @@ There, our loss was given by
 $$L(\mathbf{w}, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
 Recall that $\mathbf{x}^{(i)}$ are the features,
-$y^{(i)}$ are labels for all data examples $i$, and $(\mathbf{w}, b)$
+$y^{(i)}$ is the label for any data example $i$, and $(\mathbf{w}, b)$
 are the weight and bias parameters, respectively.
 To penalize the size of the weight vector,
 we must somehow add $\| \mathbf{w} \|^2$ to the loss function,
@@ -110,6 +110,7 @@ a non-negative hyperparameter
 that we fit using validation data:
 
 $$L(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2.$$
+
 
 For $\lambda = 0$, we recover our original loss function.
 For $\lambda > 0$, we restrict the size of $\| \mathbf{w} \|$.
@@ -157,11 +158,9 @@ Using the same notation in :eqref:`eq_linreg_batch_update`,
 the minibatch stochastic gradient descent updates
 for $\ell_2$-regularized regression follow:
 
-$$
-\begin{aligned}
+$$\begin{aligned}
 \mathbf{w} & \leftarrow \left(1- \eta\lambda \right) \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right).
-\end{aligned}
-$$
+\end{aligned}$$
 
 As before, we update $\mathbf{w}$ based on the amount
 by which our estimate differs from the observation.
@@ -177,19 +176,24 @@ Smaller values of $\lambda$ correspond
 to less constrained $\mathbf{w}$,
 whereas larger values of $\lambda$
 constrain $\mathbf{w}$ more considerably.
-
-Whether we include a corresponding bias penalty $b^2$
-can vary across implementations,
+Whether we include a corresponding bias penalty $b^2$ 
+can vary across implementations, 
 and may vary across layers of a neural network.
-Often, we do not regularize the bias term
-of a network's output layer.
+Often, we do not regularize the bias term.
+Besides,
+although $\ell_2$ regularization may not be equivalent to weight decay for other optimization algorithms,
+the idea of regularization through
+shrinking the size of weights
+still holds true.
+
+
 
 ## High-Dimensional Linear Regression
 
 We can illustrate the benefits of weight decay 
 through a simple synthetic example.
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
@@ -198,7 +202,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -206,14 +210,14 @@ import torch
 from torch import nn
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-First, we [**generate some data as before**]
+First, we [**generate some data as before**]:
 
 (**$$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where }
 \epsilon \sim \mathcal{N}(0, 0.01^2).$$**)
@@ -227,7 +231,7 @@ we can make the effects of overfitting pronounced,
 by increasing the dimensionality of our problem to $d = 200$
 and working with a small training set with only 20 examples.
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab all
 class Data(d2l.DataModule):
     def __init__(self, num_train, num_val, num_inputs, batch_size):
@@ -238,9 +242,9 @@ class Data(d2l.DataModule):
             noise = d2l.randn(n, 1) * 0.01
         if tab.selected('tensorflow'):
             self.X = d2l.normal((n, num_inputs))
-            noise = d2l.normal((n, 1)) * 0.1
+            noise = d2l.normal((n, 1)) * 0.01
         w, b = d2l.ones((num_inputs, 1)) * 0.01, 0.05
-        self.y = d2l.matmul(self.X, w) + b
+        self.y = d2l.matmul(self.X, w) + b + noise
 
     def get_dataloader(self, train):
         i = slice(0, self.num_train) if train else slice(self.num_train, None)
@@ -250,15 +254,17 @@ class Data(d2l.DataModule):
 ## Implementation from Scratch
 
 Now, let's try implementing weight decay from scratch.
-We just need to add the squared $\ell_2$ penalty
-to the original target function.
+Since minibatch stochastic gradient descent
+is our optimizer,
+we just need to add the squared $\ell_2$ penalty
+to the original loss function.
 
 ### (**Defining $\ell_2$ Norm Penalty**)
 
 Perhaps the most convenient way to implement this penalty
 is to square all terms in place and sum them up.
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab all
 def l2_penalty(w):
     return d2l.reduce_sum(w**2) / 2
@@ -266,7 +272,11 @@ def l2_penalty(w):
 
 ### Defining the Model
 
-```{.python .input}
+In the final model,
+the linear regression and the squared loss have not changed since :numref:`sec_linear_scratch`,
+so we will just define a subclass of `d2l.LinearRegressionScratch`. The only change here is that our loss now includes the penalty term.
+
+```{.python .input  n=7}
 %%tab all
 class WeightDecayScratch(d2l.LinearRegressionScratch):
     def __init__(self, num_inputs, lambd, lr, sigma=0.01):
@@ -277,14 +287,16 @@ class WeightDecayScratch(d2l.LinearRegressionScratch):
         return super().loss(y_hat, y) + self.lambd * l2_penalty(self.w)        
 ```
 
-```{.python .input}
+The following code fits our model on the training set with 20 examples and evaluates it on the validation set with 100 examples.
+
+```{.python .input  n=8}
 %%tab all
 data = Data(num_train=20, num_val=100, num_inputs=200, batch_size=5)
 trainer = d2l.Trainer(max_epochs=10)
 
 def train_scratch(lambd):    
-    model = WeightDecayScratch(num_inputs=200, lambd=lambd, lr=0.003)
-    model.board.ylim = [1e-3, 1]
+    model = WeightDecayScratch(num_inputs=200, lambd=lambd, lr=0.01)
+    model.board.yscale='log'
     trainer.fit(model, data)
     print('L2 norm of w:', float(l2_penalty(model.w)))
 ```
@@ -295,9 +307,9 @@ We now run this code with `lambd = 0`,
 disabling weight decay.
 Note that we overfit badly,
 decreasing the training error but not the
-test error---a textbook case of overfitting.
+validation error---a textbook case of overfitting.
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab all
 train_scratch(0)
 ```
@@ -306,11 +318,11 @@ train_scratch(0)
 
 Below, we run with substantial weight decay.
 Note that the training error increases
-but the test error decreases.
+but the validation error decreases.
 This is precisely the effect
 we expect from regularization.
 
-```{.python .input}
+```{.python .input  n=10}
 %%tab all
 train_scratch(3)
 ```
@@ -354,50 +366,54 @@ the weight, so the bias parameter $b$ will not decay.
 
 :begin_tab:`tensorflow`
 In the following code, we create an $\ell_2$ regularizer with
-the weight decay hyperparameter `wd` and apply it to the layer
+the weight decay hyperparameter `wd` and apply it to the layer's weights
 through the `kernel_regularizer` argument.
 :end_tab:
 
-```{.python .input}
+```{.python .input  n=11}
 %%tab mxnet
 class WeightDecay(d2l.LinearRegression):
     def __init__(self, wd, lr):
         super().__init__(lr)
         self.save_hyperparameters()
+        self.wd = wd
         
     def configure_optimizers(self):
         self.collect_params('.*bias').setattr('wd_mult', 0)
         return gluon.Trainer(self.collect_params(),
-                             'sgd', {'learning_rate': self.lr})
+                             'sgd', 
+                             {'learning_rate': self.lr, 'wd': self.wd})
 ```
 
-```{.python .input}
+```{.python .input  n=12}
 %%tab pytorch
 class WeightDecay(d2l.LinearRegression):
-    def __init__(self, num_inputs, wd, lr):
-        super().__init__(num_inputs, lr)
+    def __init__(self, wd, lr):
+        super().__init__(lr)
         self.save_hyperparameters()
-        
+        self.wd = wd
+    
     def configure_optimizers(self):
-        return torch.optim.SGD([
-            {"params":self.net.weight,'weight_decay': self.wd},
-            {"params":self.net.bias}], lr=self.lr)
+        return torch.optim.SGD(self.net.parameters(), 
+                               lr=self.lr, weight_decay=self.wd)
 ```
 
-```{.python .input}
+```{.python .input  n=13}
 %%tab tensorflow
 class WeightDecay(d2l.LinearRegression):
     def __init__(self, wd, lr):
         super().__init__(lr)
         self.save_hyperparameters()
         self.net = tf.keras.layers.Dense(
-            1, kernel_regularizer=tf.keras.regularizers.l2(wd))
+            1, kernel_regularizer=tf.keras.regularizers.l2(wd),
+            kernel_initializer=tf.keras.initializers.RandomNormal(0, 0.01)
+        )
         
     def loss(self, y_hat, y):
         return super().loss(y_hat, y) + self.net.losses
 ```
 
-[**The plots look identical to those when
+[**The plot looks similar to that when
 we implemented weight decay from scratch**].
 However, this version runs faster
 and is easier to implement,
@@ -405,16 +421,12 @@ benefits that will become more
 pronounced as you address larger problems
 and this work becomes more routine.
 
-```{.python .input}
+```{.python .input  n=14}
 %%tab all
-if tab.selected('mxnet') or tab.selected('tensorflow'):    
-    model = WeightDecay(wd=3, lr=0.003)
-if tab.selected('pytorch'):
-    model = WeightDecay(num_inputs=200, wd=3, lr=0.003)
-    
-model.board.ylim = [1e-3, 1]
+model = WeightDecay(wd=3, lr=0.01)
+model.board.yscale='log'
 trainer.fit(model, data)
-print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0]))) 
+print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0])))
 ```
 
 So far, we only touched upon one notion of
@@ -433,7 +445,7 @@ to all layers of a deep network.
 ## Summary
 
 * Regularization is a common method for dealing with overfitting. Classical regularization techniques add a penalty term to the loss function (when training) to reduce the complexity of the learned model.
-* One particular choice for keeping the model simple is weight decay using an $\ell_2$ penalty. This leads to weight decay in the update steps of the learning algorithm.
+* One particular choice for keeping the model simple is using an $\ell_2$ penalty. This leads to weight decay in the update steps of the minibatch stochastic gradient descent algorithm.
 * The weight decay functionality is provided in optimizers from deep learning frameworks.
 * Different sets of parameters can have different update behaviors within the same training loop.
 
@@ -441,7 +453,7 @@ to all layers of a deep network.
 
 ## Exercises
 
-1. Experiment with the value of $\lambda$ in the estimation problem in this section. Plot training and test accuracy as a function of $\lambda$. What do you observe?
+1. Experiment with the value of $\lambda$ in the estimation problem in this section. Plot training and validation accuracy as a function of $\lambda$. What do you observe?
 1. Use a validation set to find the optimal value of $\lambda$. Is it really the optimal value? Does this matter?
 1. What would the update equations look like if instead of $\|\mathbf{w}\|^2$ we used $\sum_i |w_i|$ as our penalty of choice ($\ell_1$ regularization)?
 1. We know that $\|\mathbf{w}\|^2 = \mathbf{w}^\top \mathbf{w}$. Can you find a similar equation for matrices (see the Frobenius norm in :numref:`subsec_lin-algebra-norms`)?

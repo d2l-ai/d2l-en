@@ -25,6 +25,7 @@ attention to overfitting in addition to using the optimization algorithm to
 reduce the training error.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mpl_toolkits import mplot3d
@@ -150,7 +151,25 @@ annotate('saddle point', (0, -0.2), (-0.52, -5.0))
 Saddle points in higher dimensions are even more insidious, as the example below shows. Consider the function $f(x, y) = x^2 - y^2$. It has its saddle point at $(0, 0)$. This is a maximum with respect to $y$ and a minimum with respect to $x$. Moreover, it *looks* like a saddle, which is where this mathematical property got its name.
 
 ```{.python .input}
-#@tab all
+#@tab mxnet
+x, y = d2l.meshgrid(
+    d2l.linspace(-1.0, 1.0, 101), d2l.linspace(-1.0, 1.0, 101))
+z = x**2 - y**2
+
+ax = d2l.plt.figure().add_subplot(111, projection='3d')
+ax.plot_wireframe(x.asnumpy(), y.asnumpy(), z.asnumpy(),
+                  **{'rstride': 10, 'cstride': 10})
+ax.plot([0], [0], [0], 'rx')
+ticks = [-1, 0, 1]
+d2l.plt.xticks(ticks)
+d2l.plt.yticks(ticks)
+ax.set_zticks(ticks)
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('y');
+```
+
+```{.python .input}
+#@tab pytorch, tensorflow
 x, y = d2l.meshgrid(
     d2l.linspace(-1.0, 1.0, 101), d2l.linspace(-1.0, 1.0, 101))
 z = x**2 - y**2

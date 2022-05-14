@@ -66,6 +66,7 @@ $$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$
 We are going to implement Adagrad using the same learning rate previously, i.e., $\eta = 0.4$. As we can see, the iterative trajectory of the independent variable is smoother. However, due to the cumulative effect of $\boldsymbol{s}_t$, the learning rate continuously decays, so the independent variable does not move as much during later stages of iteration.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
@@ -120,6 +121,7 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 Just like the momentum method, Adagrad needs to maintain a state variable of the same shape as the parameters.
 
 ```{.python .input}
+#@tab mxnet
 def init_adagrad_states(feature_dim):
     s_w = d2l.zeros((feature_dim, 1))
     s_b = d2l.zeros(1)
@@ -177,6 +179,7 @@ d2l.train_ch11(adagrad, init_adagrad_states(feature_dim),
 Using the `Trainer` instance of the algorithm `adagrad`, we can invoke the Adagrad algorithm in Gluon.
 
 ```{.python .input}
+#@tab mxnet
 d2l.train_concise_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
 ```
 
@@ -207,7 +210,7 @@ d2l.train_concise_ch11(trainer, {'learning_rate' : 0.1}, data_iter)
 1. Try out Adagrad for $f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2$ and also for the objective function was rotated by 45 degrees, i.e., $f(\mathbf{x}) = 0.1 (x_1 + x_2)^2 + 2 (x_1 - x_2)^2$. Does it behave differently?
 1. Prove [Gerschgorin's circle theorem](https://en.wikipedia.org/wiki/Gershgorin_circle_theorem) which states that eigenvalues $\lambda_i$ of a matrix $\mathbf{M}$ satisfy $|\lambda_i - \mathbf{M}_{jj}| \leq \sum_{k \neq j} |\mathbf{M}_{jk}|$ for at least one choice of $j$.
 1. What does Gerschgorin's theorem tell us about the eigenvalues of the diagonally preconditioned matrix $\mathrm{diag}^{-\frac{1}{2}}(\mathbf{M}) \mathbf{M} \mathrm{diag}^{-\frac{1}{2}}(\mathbf{M})$?
-1. Try out Adagrad for a proper deep network, such as :numref:`sec_lenet` when applied to Fashion MNIST.
+1. Try out Adagrad for a proper deep network, such as :numref:`sec_lenet` when applied to Fashion-MNIST.
 1. How would you need to modify Adagrad to achieve a less aggressive decay in learning rate?
 
 :begin_tab:`mxnet`

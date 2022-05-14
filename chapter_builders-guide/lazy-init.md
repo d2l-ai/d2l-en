@@ -1,5 +1,5 @@
-# Deferred Initialization
-:label:`sec_deferred_init`
+# Lazy Initialization
+:label:`sec_lazy_init`
 
 So far, it might seem that we got away
 with being sloppy in setting up our networks.
@@ -37,8 +37,6 @@ and subsequently modifying our models.
 Next, we go deeper into the mechanics of initialization.
 
 
-## Instantiating a Network
-
 To begin, let's instantiate an MLP.
 
 ```{.python .input}
@@ -59,6 +57,7 @@ net.add(nn.Dense(10))
 
 ```{.python .input}
 %%tab pytorch
+from d2l import torch as d2l
 import torch
 from torch import nn
 
@@ -83,7 +82,6 @@ We confirm by attempting to access the parameters below.
 
 ```{.python .input}
 %%tab mxnet
-net.initialize()
 print(net.collect_params)
 print(net.collect_params())
 ```
@@ -107,7 +105,7 @@ At this point, attempts to access `net[0].weight.data()`
 would trigger a runtime error stating that the network
 must be initialized before the parameters can be accessed.
 Now let's see what happens when we attempt to initialize
-parameters via the `initialize` function.
+parameters via the `initialize` method.
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -117,6 +115,7 @@ have not been initialized yet.
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 net.initialize()
 net.collect_params()
 ```
@@ -164,14 +163,33 @@ to the second layer,
 and so on through the computational graph
 until all shapes are known.
 Note that in this case,
-only the first layer requires deferred initialization,
+only the first layer requires lazy initialization,
 but the framework initializes sequentially.
 Once all parameter shapes are known,
 the framework can finally initialize the parameters.
 
+:begin_tab:`pytorch`
+The following method
+passes in dummy inputs
+through the network
+for a dry run
+to infer all parameter shapes
+and subsequently initializes the parameters.
+It will be used later when default random initializations are not desired.
+:end_tab:
+
+```{.python .input}
+%%tab pytorch
+@d2l.add_to_class(d2l.Module)  #@save
+def apply_init(self, inputs, init=None):
+    self.forward(*inputs)
+    if init is not None:
+        self.net.apply(init)
+```
+
 ## Summary
 
-* Deferred initialization can be convenient, allowing the framework to infer parameter shapes automatically, making it easy to modify architectures and eliminating one common source of errors.
+* Lazy initialization can be convenient, allowing the framework to infer parameter shapes automatically, making it easy to modify architectures and eliminating one common source of errors.
 * We can pass data through the model to make the framework finally initialize parameters.
 
 
@@ -183,6 +201,10 @@ the framework can finally initialize the parameters.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/280)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/8092)
 :end_tab:
 
 :begin_tab:`tensorflow`

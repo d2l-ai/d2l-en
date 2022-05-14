@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
+```
+
 # Calculus
 :label:`sec_calculus`
 
@@ -90,9 +95,10 @@ Let's develop some intuition with an example.
 (**Define $u = f(x) = 3x^2-4x$.**)
 
 ```{.python .input}
+%%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
-from IPython import display
+from matplotlib_inline import backend_inline
 from mxnet import np, npx
 npx.set_np()
 
@@ -101,10 +107,10 @@ def f(x):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
-from IPython import display
+from matplotlib_inline import backend_inline
 import numpy as np
 
 def f(x):
@@ -112,10 +118,21 @@ def f(x):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
-from IPython import display
+from matplotlib_inline import backend_inline
+import numpy as np
+
+def f(x):
+    return 3 * x ** 2 - 4 * x
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+from matplotlib_inline import backend_inline
 import numpy as np
 
 def f(x):
@@ -129,7 +146,7 @@ the rigor of a mathematical proof,
 we will soon see that indeed $f'(1) = 2$.
 
 ```{.python .input}
-#@tab all
+%%tab all
 for h in 10.0**np.arange(-1, -6, -1):
     print(f'h={h:.5f}, numerical limit={(f(1+h)-f(1))/h:.5f}')
 ```
@@ -179,10 +196,10 @@ without repeating the code,
 e.g., via `d2l.use_svg_display()`.
 
 ```{.python .input}
-#@tab all
+%%tab all
 def use_svg_display():  #@save
     """Use the svg format to display a plot in Jupyter."""
-    display.set_matplotlib_formats('svg')
+    backend_inline.set_matplotlib_formats('svg')
 ```
 
 Conveniently, we can set figure sizes with `set_figsize`. 
@@ -190,7 +207,7 @@ Since the import statement `from matplotlib import pyplot as plt`
 was marked via `#@save` in the `d2l` package, we can call `d2l.plt`.
 
 ```{.python .input}
-#@tab all
+%%tab all
 def set_figsize(figsize=(3.5, 2.5)):  #@save
     """Set the figure size for matplotlib."""
     use_svg_display()
@@ -202,7 +219,7 @@ with properties, including labels, ranges,
 and scales.
 
 ```{.python .input}
-#@tab all
+%%tab all
 #@save
 def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     """Set the axes for matplotlib."""
@@ -220,7 +237,7 @@ Much of the code here is just ensuring
 that the sizes and shapes of inputs match.
 
 ```{.python .input}
-#@tab all
+%%tab all
 #@save
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
          ylim=None, xscale='linear', yscale='linear',
@@ -251,7 +268,7 @@ Now we can [**plot the function $u = f(x)$ and its tangent line $y = 2x - 3$ at 
 where the coefficient $2$ is the slope of the tangent line.
 
 ```{.python .input}
-#@tab all
+%%tab all
 x = np.arange(0, 3, 0.1)
 plot(x, [f(x), 2 * x - 3], 'x', 'f(x)', legend=['f(x)', 'Tangent line (x=1)'])
 ```
@@ -333,6 +350,8 @@ The chain rule states that
 
 $$\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}.$$
 
+
+
 Turning back to multivariate functions,
 suppose that $y = f(\mathbf{u})$ has variables
 $u_1, u_2, \ldots, u_m$, 
@@ -341,12 +360,11 @@ has variables $x_1, x_2, \ldots, x_n$,
 i.e.,  $\mathbf{u} = g(\mathbf{x})$.
 Then the chain rule states that
 
-$$\frac{dy}{dx_i} = \frac{dy}{du_1} \frac{du_1}{dx_i} + \frac{dy}{du_2} \frac{du_2}{dx_i} + \cdots + \frac{dy}{du_m} \frac{du_m}{dx_i} \text{ and thus }
-\nabla_{\mathbf{x}} y = \langle \nabla_{\mathbf{u}} y, \nabla_{\mathbf{x}} \mathbf{u}\rangle.$$
+$$\frac{\partial y}{\partial x_{i}} = \frac{\partial y}{\partial u_{1}} \frac{\partial u_{1}}{\partial x_{i}} + \frac{\partial y}{\partial u_{2}} \frac{\partial u_{2}}{\partial x_{i}} + \ldots + \frac{\partial y}{\partial u_{m}} \frac{\partial u_{m}}{\partial x_{i}} \text{ and thus } \nabla_{\mathbf{x}} y =  \mathbf{A} \nabla_{\mathbf{u}} y,$$
 
-Note that $\nabla_{\mathbf{x}} \mathbf{u}$ is a *matrix*
-because it contains the derivative of a vector 
-with respect to a vector.
+where $\mathbf{A} \in \mathbb{R}^{n \times m}$ is a *matrix*
+that contains the derivative of vector $\mathbf{u}$
+with respect to vector $\mathbf{x}$.
 Thus, evaluating the gradient requires 
 computing a vector-matrix product. 
 This is one of the key reasons why linear algebra 

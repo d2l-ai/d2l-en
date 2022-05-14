@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
+```
+
 # Probability and Statistics
 :label:`sec_prob`
 
@@ -157,6 +162,7 @@ the number of observed *heads*
 by the total number of tosses.
 
 ```{.python .input}
+%%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -166,7 +172,7 @@ npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
 import random
@@ -175,7 +181,7 @@ from torch.distributions.multinomial import Multinomial
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 import random
@@ -184,13 +190,13 @@ from tensorflow_probability import distributions as tfd
 ```
 
 ```{.python .input}
-#@tab jax
+%%tab jax
 %matplotlib inline
 from d2l import jax as d2l
-import jax.numpy as np
-import jax
-import numpy as onp
 import random
+import jax
+import jax.numpy as jnp
+import numpy as np
 ```
 
 Now, suppose that the coin was in fact fair,
@@ -208,7 +214,7 @@ Thus we can get out `0` and `1` with probability `0.5` each
 by testing whether the returned float is greater than `0.5`
 
 ```{.python .input}
-#@tab all
+%%tab all
 num_tosses = 100
 heads = sum([random.random() > 0.5 for _ in range(100)])
 tails = num_tosses - heads
@@ -237,26 +243,28 @@ and the second component tells us
 the number of occurrences of tails.
 
 ```{.python .input}
+%%tab mxnet
 fair_probs = [0.5, 0.5] 
 multinomial(100, fair_probs)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 fair_probs = torch.tensor([0.5, 0.5])
 Multinomial(100, fair_probs).sample()
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 fair_probs = tf.ones(2) / 2
 tfd.Multinomial(100, fair_probs).sample()
 ```
 
 ```{.python .input}
-#@tab jax
-fair_probs = [1.0 / 6] * 6
-onp.random.multinomial(1, fair_probs)
+%%tab jax
+fair_probs = np.ones(2) / 2
+# jax doesn't have multinomial, use numpy
+np.random.multinomial(100, fair_probs)
 ```
 
 Each time you run this sampling process,
@@ -271,22 +279,23 @@ that they are intended
 to estimate, sum to $1$.
 
 ```{.python .input}
+%%tab mxnet
 multinomial(100, fair_probs) / 100
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 Multinomial(100, fair_probs).sample() / 100
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 tfd.Multinomial(100, fair_probs).sample() / 100
 ```
 
 ```{.python .input}
-#@tab jax
-onp.random.multinomial(10, fair_probs)
+%%tab jax
+np.random.multinomial(100, fair_probs) / 100
 ```
 
 Here, even though our simulated coin is fair 
@@ -301,26 +310,27 @@ just an artifact of the small sample size?
 Let's see what happens when we simulate `10000` tosses.
 
 ```{.python .input}
+%%tab mxnet
 counts = multinomial(10000, fair_probs).astype(np.float32)
 counts / 10000
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 counts = Multinomial(10000, fair_probs).sample()
 counts / 10000
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 counts = tfd.Multinomial(10000, fair_probs).sample()
 counts / 10000
 ```
 
 ```{.python .input}
-#@tab jax
-counts = onp.random.multinomial(1000, fair_probs).astype(np.float32)
-counts / 1000
+%%tab jax
+counts = np.random.multinomial(10000, fair_probs).astype(np.float32)
+counts / 10000
 ```
 
 In general, for averages of repeated events (like coin tosses),
@@ -339,63 +349,42 @@ how our estimate evolves as we grow
 the number of tosses from `1` to `10000`.
 
 ```{.python .input}
+%%tab mxnet
 counts = multinomial(1, fair_probs, size=10000)
 cum_counts = counts.astype(np.float32).cumsum(axis=0)
 estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
-
-d2l.set_figsize((4.5, 3.5))
-d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
-d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
-d2l.plt.axhline(y=0.5, color='black', linestyle='dashed')
-d2l.plt.gca().set_xlabel('Samples')
-d2l.plt.gca().set_ylabel('Estimated probability')
-d2l.plt.legend();
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 counts = Multinomial(1, fair_probs).sample((10000,))
 cum_counts = counts.cumsum(dim=0)
 estimates = cum_counts / cum_counts.sum(dim=1, keepdims=True)
 estimates = estimates.numpy()
-
-d2l.set_figsize((4.5, 3.5))
-d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
-d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
-d2l.plt.axhline(y=0.5, color='black', linestyle='dashed')
-d2l.plt.gca().set_xlabel('Samples')
-d2l.plt.gca().set_ylabel('Estimated probability')
-d2l.plt.legend();
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 counts = tfd.Multinomial(1, fair_probs).sample(10000)
 cum_counts = tf.cumsum(counts, axis=0)
 estimates = cum_counts / tf.reduce_sum(cum_counts, axis=1, keepdims=True)
 estimates = estimates.numpy()
+```
 
+```{.python .input}
+%%tab jax
+counts = np.random.multinomial(1, fair_probs, size=10000).astype(np.float32)
+cum_counts = counts.cumsum(axis=0)
+estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
+```
+
+```{.python .input}
+%%tab all
 d2l.set_figsize((4.5, 3.5))
 d2l.plt.plot(estimates[:, 0], label=("P(coin=heads)"))
 d2l.plt.plot(estimates[:, 1], label=("P(coin=tails)"))
 d2l.plt.axhline(y=0.5, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Samples')
-d2l.plt.gca().set_ylabel('Estimated probability')
-d2l.plt.legend();
-```
-
-```{.python .input}
-#@tab jax
-counts = onp.random.multinomial(10, fair_probs, size=500)
-cum_counts = counts.astype(onp.float32).cumsum(axis=0)
-estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
-
-d2l.set_figsize((6, 4.5))
-for i in range(6):
-    d2l.plt.plot(estimates[:, i],
-                 label=("P(die=" + str(i + 1) + ")"))
-d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
-d2l.plt.gca().set_xlabel('Groups of experiments')
 d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
 ```
@@ -897,7 +886,7 @@ Sometimes we are interested in the expected value
 of some function of $x$.
 We can calculate these expectations as
 
-$$E_{x \sim P}[f(x)] = \sum_x f(x) P(x) \text{ and } E_{x \sim P}[f(x)] = \int f(x) \;dp(x)$$
+$$E_{x \sim P}[f(x)] = \sum_x f(x) P(x) \text{ and } E_{x \sim P}[f(x)] = \int f(x) p(x) \;dx$$
 
 for discrete probabilities and densities, respectively. 
 Returning to the investment example from above, 

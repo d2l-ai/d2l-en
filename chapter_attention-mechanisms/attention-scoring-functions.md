@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+```
+
 # Attention Scoring Functions
 :label:`sec_attention-scoring-functions`
 
@@ -66,6 +71,7 @@ that we will use to develop more
 sophisticated attention mechanisms later.
 
 ```{.python .input}
+%%tab mxnet
 import math
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -74,7 +80,7 @@ npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import math
 import torch
@@ -82,7 +88,7 @@ from torch import nn
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
@@ -111,10 +117,11 @@ where any value beyond the valid length
 is masked as zero.
 
 ```{.python .input}
+%%tab mxnet
 #@save
 def masked_softmax(X, valid_lens):
     """Perform softmax operation by masking elements on the last axis."""
-    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    # X: 3D tensor, valid_lens: 1D or 2D tensor
     if valid_lens is None:
         return npx.softmax(X)
     else:
@@ -131,11 +138,18 @@ def masked_softmax(X, valid_lens):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 #@save
 def masked_softmax(X, valid_lens):
     """Perform softmax operation by masking elements on the last axis."""
-    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    # X: 3D tensor, valid_lens: 1D or 2D tensor 
+    def _sequence_mask(X, valid_len, value=0):
+        maxlen = X.size(1)
+        mask = torch.arange((maxlen), dtype=torch.float32,
+                            device=X.device)[None, :] < valid_len[:, None]
+        X[~mask] = value
+        return X
+    
     if valid_lens is None:
         return nn.functional.softmax(X, dim=-1)
     else:
@@ -146,17 +160,26 @@ def masked_softmax(X, valid_lens):
             valid_lens = valid_lens.reshape(-1)
         # On the last axis, replace masked elements with a very large negative
         # value, whose exponentiation outputs 0
-        X = d2l.sequence_mask(X.reshape(-1, shape[-1]), valid_lens,
-                              value=-1e6)
+        X = _sequence_mask(X.reshape(-1, shape[-1]), valid_lens, value=-1e6)
         return nn.functional.softmax(X.reshape(shape), dim=-1)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 #@save
 def masked_softmax(X, valid_lens):
     """Perform softmax operation by masking elements on the last axis."""
-    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    # X: 3D tensor, valid_lens: 1D or 2D tensor
+    def _sequence_mask(X, valid_len, value=0):
+        maxlen = X.shape[1]
+        mask = tf.range(start=0, limit=maxlen, dtype=tf.float32)[
+            None, :] < tf.cast(valid_len[:, None], dtype=tf.float32)
+
+        if len(X.shape) == 3:
+            return tf.where(tf.expand_dims(mask, axis=-1), X, value)
+        else:
+            return tf.where(mask, X, value)
+    
     if valid_lens is None:
         return tf.nn.softmax(X, axis=-1)
     else:
@@ -168,7 +191,8 @@ def masked_softmax(X, valid_lens):
             valid_lens = tf.reshape(valid_lens, shape=-1)
         # On the last axis, replace masked elements with a very large negative
         # value, whose exponentiation outputs 0    
-        X = d2l.sequence_mask(tf.reshape(X, shape=(-1, shape[-1])), valid_lens, value=-1e6)    
+        X = _sequence_mask(tf.reshape(X, shape=(-1, shape[-1])), valid_lens,
+                           value=-1e6)    
         return tf.nn.softmax(tf.reshape(X, shape=shape), axis=-1)
 ```
 
@@ -181,16 +205,17 @@ values beyond the valid lengths
 are all masked as zero.
 
 ```{.python .input}
+%%tab mxnet
 masked_softmax(np.random.uniform(size=(2, 2, 4)), d2l.tensor([2, 3]))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3]))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 masked_softmax(tf.random.uniform(shape=(2, 2, 4)), tf.constant([2, 3]))
 ```
 
@@ -200,17 +225,18 @@ to specify valid lengths
 for every row in each matrix example.
 
 ```{.python .input}
+%%tab mxnet
 masked_softmax(np.random.uniform(size=(2, 2, 4)),
                d2l.tensor([[1, 3], [2, 4]]))
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 masked_softmax(torch.rand(2, 2, 4), d2l.tensor([[1, 3], [2, 4]]))
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 masked_softmax(tf.random.uniform((2, 2, 4)), tf.constant([[1, 3], [2, 4]]))
 ```
 
@@ -240,12 +266,13 @@ bias terms,
 we implement additive attention in the following.
 
 ```{.python .input}
+%%tab mxnet
 #@save
 class AdditiveAttention(nn.Block):
     """Additive attention."""
     def __init__(self, num_hiddens, dropout, **kwargs):
         super(AdditiveAttention, self).__init__(**kwargs)
-        # Use `flatten=False` to only transform the last axis so that the
+        # Use flatten=False to only transform the last axis so that the
         # shapes for the other axes are kept the same
         self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
         self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)
@@ -254,55 +281,54 @@ class AdditiveAttention(nn.Block):
 
     def forward(self, queries, keys, values, valid_lens):
         queries, keys = self.W_q(queries), self.W_k(keys)
-        # After dimension expansion, shape of `queries`: (`batch_size`, no. of
-        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,
-        # no. of key-value pairs, `num_hiddens`). Sum them up with
+        # After dimension expansion, shape of queries: (batch_size, no. of
+        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1,
+        # no. of key-value pairs, num_hiddens). Sum them up with
         # broadcasting
         features = np.expand_dims(queries, axis=2) + np.expand_dims(
             keys, axis=1)
         features = np.tanh(features)
-        # There is only one output of `self.w_v`, so we remove the last
-        # one-dimensional entry from the shape. Shape of `scores`:
-        # (`batch_size`, no. of queries, no. of key-value pairs)
+        # There is only one output of self.w_v, so we remove the last
+        # one-dimensional entry from the shape. Shape of scores:
+        # (batch_size, no. of queries, no. of key-value pairs)
         scores = np.squeeze(self.w_v(features), axis=-1)
         self.attention_weights = masked_softmax(scores, valid_lens)
-        # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+        # Shape of values: (batch_size, no. of key-value pairs, value
         # dimension)
         return npx.batch_dot(self.dropout(self.attention_weights), values)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 #@save
 class AdditiveAttention(nn.Module):
     """Additive attention."""
-    def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
+    def __init__(self, num_hiddens, dropout, **kwargs):
         super(AdditiveAttention, self).__init__(**kwargs)
-        self.W_k = nn.Linear(key_size, num_hiddens, bias=False)
-        self.W_q = nn.Linear(query_size, num_hiddens, bias=False)
-        self.w_v = nn.Linear(num_hiddens, 1, bias=False)
+        self.W_k = nn.LazyLinear(num_hiddens, bias=False)
+        self.W_q = nn.LazyLinear(num_hiddens, bias=False)
+        self.w_v = nn.LazyLinear(1, bias=False)
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, queries, keys, values, valid_lens):
         queries, keys = self.W_q(queries), self.W_k(keys)
-        # After dimension expansion, shape of `queries`: (`batch_size`, no. of
-        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,
-        # no. of key-value pairs, `num_hiddens`). Sum them up with
-        # broadcasting
+        # After dimension expansion, shape of queries: (batch_size, no. of
+        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1, no. of
+        # key-value pairs, num_hiddens). Sum them up with broadcasting
         features = queries.unsqueeze(2) + keys.unsqueeze(1)
         features = torch.tanh(features)
-        # There is only one output of `self.w_v`, so we remove the last
-        # one-dimensional entry from the shape. Shape of `scores`:
-        # (`batch_size`, no. of queries, no. of key-value pairs)
+        # There is only one output of self.w_v, so we remove the last
+        # one-dimensional entry from the shape. Shape of scores: (batch_size,
+        # no. of queries, no. of key-value pairs)
         scores = self.w_v(features).squeeze(-1)
         self.attention_weights = masked_softmax(scores, valid_lens)
-        # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+        # Shape of values: (batch_size, no. of key-value pairs, value
         # dimension)
         return torch.bmm(self.dropout(self.attention_weights), values)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 #@save
 class AdditiveAttention(tf.keras.layers.Layer):
     """Additive attention."""
@@ -315,19 +341,18 @@ class AdditiveAttention(tf.keras.layers.Layer):
         
     def call(self, queries, keys, values, valid_lens, **kwargs):
         queries, keys = self.W_q(queries), self.W_k(keys)
-        # After dimension expansion, shape of `queries`: (`batch_size`, no. of
-        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,
-        # no. of key-value pairs, `num_hiddens`). Sum them up with
-        # broadcasting
+        # After dimension expansion, shape of queries: (batch_size, no. of
+        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1, no. of
+        # key-value pairs, num_hiddens). Sum them up with broadcasting
         features = tf.expand_dims(queries, axis=2) + tf.expand_dims(
             keys, axis=1)
         features = tf.nn.tanh(features)
-        # There is only one output of `self.w_v`, so we remove the last
-        # one-dimensional entry from the shape. Shape of `scores`:
-        # (`batch_size`, no. of queries, no. of key-value pairs)
+        # There is only one output of self.w_v, so we remove the last
+        # one-dimensional entry from the shape. Shape of scores: (batch_size,
+        # no. of queries, no. of key-value pairs)
         scores = tf.squeeze(self.w_v(features), axis=-1)
         self.attention_weights = masked_softmax(scores, valid_lens)
-        # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+        # Shape of values: (batch_size, no. of key-value pairs, value
         # dimension)
         return tf.matmul(self.dropout(
             self.attention_weights, **kwargs), values)
@@ -343,8 +368,9 @@ The attention pooling output
 has a shape of (batch size, number of steps for queries, feature size for values).
 
 ```{.python .input}
+%%tab mxnet
 queries, keys = d2l.normal(0, 1, (2, 1, 20)), d2l.ones((2, 10, 2))
-# The two value matrices in the `values` minibatch are identical
+# The two value matrices in the values minibatch are identical
 values = np.arange(40).reshape(1, 10, 4).repeat(2, axis=0)
 valid_lens = d2l.tensor([2, 6])
 
@@ -354,23 +380,22 @@ attention(queries, keys, values, valid_lens)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 queries, keys = d2l.normal(0, 1, (2, 1, 20)), d2l.ones((2, 10, 2))
-# The two value matrices in the `values` minibatch are identical
+# The two value matrices in the values minibatch are identical
 values = torch.arange(40, dtype=torch.float32).reshape(1, 10, 4).repeat(
     2, 1, 1)
 valid_lens = d2l.tensor([2, 6])
 
-attention = AdditiveAttention(key_size=2, query_size=20, num_hiddens=8,
-                              dropout=0.1)
+attention = AdditiveAttention(num_hiddens=8, dropout=0.1)
 attention.eval()
 attention(queries, keys, values, valid_lens)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 queries, keys = tf.random.normal(shape=(2, 1, 20)), tf.ones((2, 10, 2))
-# The two value matrices in the `values` minibatch are identical
+# The two value matrices in the values minibatch are identical
 values = tf.repeat(tf.reshape(
     tf.range(40, dtype=tf.float32), shape=(1, 10, 4)), repeats=2, axis=0)
 valid_lens = tf.constant([2, 6])
@@ -386,7 +411,7 @@ since every key is the same in this example,
 determined by the specified valid lengths.
 
 ```{.python .input}
-#@tab all
+%%tab all
 d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
                   xlabel='Keys', ylabel='Queries')
 ```
@@ -435,6 +460,7 @@ $$ \mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \math
 In the following implementation of the scaled dot product attention, we use dropout for model regularization.
 
 ```{.python .input}
+%%tab mxnet
 #@save
 class DotProductAttention(nn.Block):
     """Scaled dot product attention."""
@@ -442,21 +468,20 @@ class DotProductAttention(nn.Block):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
 
-    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
-    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
-    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
-    # dimension)
-    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)
+    # Shape of queries: (batch_size, no. of queries, d)
+    # Shape of keys: (batch_size, no. of key-value pairs, d)
+    # Shape of values: (batch_size, no. of key-value pairs, value dimension)
+    # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
     def forward(self, queries, keys, values, valid_lens=None):
         d = queries.shape[-1]
-        # Set `transpose_b=True` to swap the last two dimensions of `keys`
+        # Set transpose_b=True to swap the last two dimensions of keys
         scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)
         self.attention_weights = masked_softmax(scores, valid_lens)
         return npx.batch_dot(self.dropout(self.attention_weights), values)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 #@save
 class DotProductAttention(nn.Module):
     """Scaled dot product attention."""
@@ -464,21 +489,20 @@ class DotProductAttention(nn.Module):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
 
-    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
-    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
-    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
-    # dimension)
-    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)
+    # Shape of queries: (batch_size, no. of queries, d)
+    # Shape of keys: (batch_size, no. of key-value pairs, d)
+    # Shape of values: (batch_size, no. of key-value pairs, value dimension)
+    # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
     def forward(self, queries, keys, values, valid_lens=None):
         d = queries.shape[-1]
-        # Swap the last two dimensions of `keys` with `keys.transpose(1,2)`
+        # Swap the last two dimensions of keys with keys.transpose(1,2)
         scores = torch.bmm(queries, keys.transpose(1,2)) / math.sqrt(d)
         self.attention_weights = masked_softmax(scores, valid_lens)
         return torch.bmm(self.dropout(self.attention_weights), values)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 #@save
 class DotProductAttention(tf.keras.layers.Layer):
     """Scaled dot product attention."""
@@ -486,11 +510,10 @@ class DotProductAttention(tf.keras.layers.Layer):
         super().__init__(**kwargs)
         self.dropout = tf.keras.layers.Dropout(dropout)
         
-    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
-    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
-    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
-    # dimension)
-    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)
+    # Shape of queries: (batch_size, no. of queries, d)
+    # Shape of keys: (batch_size, no. of key-value pairs, d)
+    # Shape of values: (batch_size, no. of key-value pairs, value dimension)
+    # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
     def call(self, queries, keys, values, valid_lens, **kwargs):
         d = queries.shape[-1]
         scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
@@ -507,6 +530,7 @@ we make the feature size of queries
 the same as that of keys.
 
 ```{.python .input}
+%%tab mxnet
 queries = d2l.normal(0, 1, (2, 1, 2))
 attention = DotProductAttention(dropout=0.5)
 attention.initialize()
@@ -514,7 +538,7 @@ attention(queries, keys, values, valid_lens)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 queries = d2l.normal(0, 1, (2, 1, 2))
 attention = DotProductAttention(dropout=0.5)
 attention.eval()
@@ -522,7 +546,7 @@ attention(queries, keys, values, valid_lens)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 queries = tf.random.normal(shape=(2, 1, 2))
 attention = DotProductAttention(dropout=0.5)
 attention(queries, keys, values, valid_lens, training=False)
@@ -534,7 +558,7 @@ that cannot be differentiated by any query,
 [**uniform attention weights**] are obtained.
 
 ```{.python .input}
-#@tab all
+%%tab all
 d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
                   xlabel='Keys', ylabel='Queries')
 ```

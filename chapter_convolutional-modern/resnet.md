@@ -45,7 +45,7 @@ For deep neural networks,
 if we can
 train the newly-added layer into an identity function $f(\mathbf{x}) = \mathbf{x}$, the new model will be as effective as the original model. As the new model may get a better solution to fit the training dataset, the added layer might make it easier to reduce training errors.
 
-This is the question that He et al. considered when working on very deep computer vision models :cite:`He.Zhang.Ren.ea.2016`.
+This is the question that :cite:`He.Zhang.Ren.ea.2016` considered when working on very deep computer vision models.
 At the heart of their proposed *residual network* (*ResNet*) is the idea that every additional layer should
 more easily
 contain the identity function as one of its elements.
@@ -57,10 +57,11 @@ build deep neural networks.
 
 
 ## (**Residual Blocks**)
+:label:`subsec_residual-blks`
 
 Let's focus on a local part of a neural network, as depicted in :numref:`fig_residual_block`. Denote the input by $\mathbf{x}$.
 We assume that the desired underlying mapping we want to obtain by learning is $f(\mathbf{x})$, to be used as input to the activation function on the top.
-On the left of :numref:`fig_residual_block`,
+On the left,
 the portion within the dotted-line box
 must directly learn the mapping $f(\mathbf{x})$.
 On the right,
@@ -75,12 +76,18 @@ of the
 upper weight layer (e.g., fully connected layer and convolutional layer)
 within the dotted-line box
 to zero.
-The right figure in :numref:`fig_residual_block` illustrates the  *residual block* of ResNet,
+The right figure illustrates the  *residual block* of ResNet,
 where the solid line carrying the layer input
 $\mathbf{x}$ to the addition operator
 is called a *residual connection* (or *shortcut connection*).
 With residual blocks, inputs can
 forward propagate faster through the residual connections across layers.
+In fact,
+the residual block
+can be thought of as
+a special case of the multi-branch Inception block:
+it has two branches
+one of which is the identity mapping.
 
 ![A regular block (left) and a residual block (right).](../img/residual-block.svg)
 :label:`fig_residual_block`
@@ -128,20 +135,18 @@ from torch.nn import functional as F
 
 class Residual(nn.Module):  #@save
     """The Residual block of ResNet."""
-    def __init__(self, input_channels, num_channels,
-                 use_1x1conv=False, strides=1):
+    def __init__(self, num_channels, use_1x1conv=False, strides=1):
         super().__init__()
-        self.conv1 = nn.Conv2d(input_channels, num_channels,
-                               kernel_size=3, padding=1, stride=strides)
-        self.conv2 = nn.Conv2d(num_channels, num_channels,
-                               kernel_size=3, padding=1)
+        self.conv1 = nn.LazyConv2d(num_channels, kernel_size=3, padding=1, 
+                                   stride=strides)
+        self.conv2 = nn.LazyConv2d(num_channels, kernel_size=3, padding=1)
         if use_1x1conv:
-            self.conv3 = nn.Conv2d(input_channels, num_channels,
-                                   kernel_size=1, stride=strides)
+            self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1, 
+                                       stride=strides)
         else:
             self.conv3 = None
-        self.bn1 = nn.BatchNorm2d(num_channels)
-        self.bn2 = nn.BatchNorm2d(num_channels)
+        self.bn1 = nn.LazyBatchNorm2d()
+        self.bn2 = nn.LazyBatchNorm2d()
 
     def forward(self, X):
         Y = F.relu(self.bn1(self.conv1(X)))
@@ -194,7 +199,7 @@ if tab.selected('mxnet'):
     blk = Residual(3)
     blk.initialize()
 if tab.selected('pytorch'):
-    blk = Residual(3, 3)
+    blk = Residual(3)
 X = d2l.randn(4, 3, 6, 6)
 blk(X).shape
 ```
@@ -211,19 +216,15 @@ We also have the option to [**halve the output height and width while increasing
 
 ```{.python .input}
 %%tab all
+blk = Residual(6, use_1x1conv=True, strides=2)
 if tab.selected('mxnet'):
-    blk = Residual(6, use_1x1conv=True, strides=2)
     blk.initialize()
-if tab.selected('pytorch'):
-    blk = Residual(3, 6, use_1x1conv=True, strides=2)
-if tab.selected('tensorflow'):
-    blk = Residual(6, use_1x1conv=True, strides=2)
 blk(X).shape
 ```
 
 ## [**ResNet Model**]
 
-The first two layers of ResNet are the same as those of the GoogLeNet we described before: the $7\times 7$ convolutional layer with 64 output channels and a stride of 2 is followed by the $3\times 3$ maximum pooling layer with a stride of 2. The difference is the batch normalization layer added after each convolutional layer in ResNet.
+The first two layers of ResNet are the same as those of the GoogLeNet we described before: the $7\times 7$ convolutional layer with 64 output channels and a stride of 2 is followed by the $3\times 3$ max-pooling layer with a stride of 2. The difference is the batch normalization layer added after each convolutional layer in ResNet.
 
 ```{.python .input}
 %%tab all
@@ -237,22 +238,22 @@ class ResNet(d2l.Classifier):
             return net
         if tab.selected('pytorch'):
             return nn.Sequential(
-                nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
-                nn.BatchNorm2d(64), nn.ReLU(),
+                nn.LazyConv2d(64, kernel_size=7, stride=2, padding=3),
+                nn.LazyBatchNorm2d(), nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
         if tab.selected('tensorflow'):
             return tf.keras.models.Sequential([
-                tf.keras.layers.Conv2D(64, kernel_size=7, strides=2, 
+                tf.keras.layers.Conv2D(64, kernel_size=7, strides=2,
                                        padding='same'),
                 tf.keras.layers.BatchNormalization(),
                 tf.keras.layers.Activation('relu'),
-                tf.keras.layers.MaxPool2D(pool_size=3, strides=2, 
+                tf.keras.layers.MaxPool2D(pool_size=3, strides=2,
                                           padding='same')])
 ```
 
 GoogLeNet uses four modules made up of Inception blocks.
 However, ResNet uses four modules made up of residual blocks, each of which uses several residual blocks with the same number of output channels.
-The number of channels in the first module is the same as the number of input channels. Since a maximum pooling layer with a stride of 2 has already been used, it is not necessary to reduce the height and width. In the first residual block for each of the subsequent modules, the number of channels is doubled compared with that of the previous module, and the height and width are halved.
+The number of channels in the first module is the same as the number of input channels. Since a max-pooling layer with a stride of 2 has already been used, it is not necessary to reduce the height and width. In the first residual block for each of the subsequent modules, the number of channels is doubled compared with that of the previous module, and the height and width are halved.
 
 Now, we implement this module. Note that special processing has been performed on the first module.
 
@@ -272,15 +273,13 @@ def block(self, num_residuals, num_channels, first_block=False):
 ```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(ResNet)
-def block(self, num_residuals, input_channels, num_channels,
-          first_block=False):
+def block(self, num_residuals, num_channels, first_block=False):
     blk = []
     for i in range(num_residuals):
         if i == 0 and not first_block:
-            blk.append(Residual(input_channels, num_channels,
-                                use_1x1conv=True, strides=2))
+            blk.append(Residual(num_channels, use_1x1conv=True, strides=2))
         else:
-            blk.append(Residual(num_channels, num_channels))
+            blk.append(Residual(num_channels))
     return nn.Sequential(*blk)
 ```
 
@@ -302,7 +301,7 @@ Then, we add all the modules to ResNet. Here, two residual blocks are used for e
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(ResNet)
-def __init__(self, arch, num_classes=10, lr=0.1):
+def __init__(self, arch, lr=0.1, num_classes=10):
     super(ResNet, self).__init__()
     self.save_hyperparameters()
     if tab.selected('mxnet'):
@@ -318,8 +317,8 @@ def __init__(self, arch, num_classes=10, lr=0.1):
             self.net.add_module(f'b{i+2}', self.block(*b, first_block=(i==0)))
         self.net.add_module('last', nn.Sequential(
             nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(),
-            nn.Linear(arch[-1][-1], num_classes)))
-        self.net.apply(d2l.init_cnn_weights)
+            nn.LazyLinear(num_classes)))
+        self.net.apply(d2l.init_cnn)
     if tab.selected('tensorflow'):
         self.net = tf.keras.models.Sequential(self.b1())
         for i, b in enumerate(arch):
@@ -340,23 +339,19 @@ Before training ResNet, let's [**observe how the input shape changes across diff
 ```{.python .input}
 %%tab all
 class ResNet18(ResNet):
-    def __init__(self, num_classes=10, lr=0.1):
-        if tab.selected(['mxnet', 'tensorflow']):
-            super().__init__(((2, 64), (2, 128), (2, 256), (2, 512)),
-                           num_classes, lr)
-        if tab.selected('pytorch'):
-            super().__init__(((2, 64, 64), (2, 64, 128), (2, 128, 256), (2, 256, 512)),
-                           num_classes, lr)
+    def __init__(self, lr=0.1, num_classes=10):
+        super().__init__(((2, 64), (2, 128), (2, 256), (2, 512)),
+                       lr, num_classes)
 ```
 
 ```{.python .input}
 %%tab pytorch, mxnet
-ResNet18().layer_summary((1, 1, 224, 224))
+ResNet18().layer_summary((1, 1, 96, 96))
 ```
 
 ```{.python .input}
 %%tab tensorflow
-ResNet18().layer_summary((1, 224, 224, 1))
+ResNet18().layer_summary((1, 96, 96, 1))
 ```
 
 ## [**Training**]
@@ -368,6 +363,8 @@ We train ResNet on the Fashion-MNIST dataset, just like before.
 model = ResNet18(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
+if tab.selected('pytorch'):
+    model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
 trainer.fit(model, data)
 ```
 

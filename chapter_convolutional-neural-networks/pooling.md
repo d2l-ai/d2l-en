@@ -12,9 +12,9 @@ should be sensitive to the entire input.
 By gradually aggregating information, yielding coarser and coarser maps,
 we accomplish this goal of ultimately learning a global representation,
 while keeping all of the advantages of convolutional layers at the intermediate layers of processing.
-The higher up we go in the network,
+The deeper we go in the network,
 the larger the receptive field (relative to the input)
-to which each hidden node is sensitive. Reducing spatial resultion 
+to which each hidden node is sensitive. Reducing spatial resolution 
 accelerates this process, 
 since the convolution kernels cover a larger effective area. 
 
@@ -51,14 +51,14 @@ the pooling layer contains no parameters (there is no *kernel*).
 Instead, pooling operators are deterministic,
 typically calculating either the maximum or the average value
 of the elements in the pooling window.
-These operations are called *maximum pooling* (*max pooling* for short)
+These operations are called *maximum pooling* (*max-pooling* for short)
 and *average pooling*, respectively.
 
 *Average pooling* is essentially as old as CNNs. The idea is akin to 
 downsampling an image. Rather than just taking the value of every second (or third) 
 pixel for the lower resolution image, we can average over adjacent pixels to obtain 
 an image with better signal to noise ratio since we are combining the information 
-from multiple adjacent pixels. *Maximum pooling* was introduced in 
+from multiple adjacent pixels. *Max-pooling* was introduced in 
 :cite:`Riesenhuber.Poggio.1999` in the context of cognitive neuroscience to describe 
 how information aggregation might be aggregated hierarchically for the purpose 
 of object recognition, and an earlier version in speech recognition :cite:`Yamaguchi.Sakamoto.Akabane.ea.1990`. In almost all cases, max-pooling, as it is also referred to, 
@@ -74,7 +74,7 @@ value of the input subtensor in the window,
 depending on whether max or average pooling is employed.
 
 
-![Maximum pooling with a pooling window shape of $2\times 2$. The shaded portions are the first output element as well as the input tensor elements used for the output computation: $\max(0, 1, 3, 4)=4$.](../img/pooling.svg)
+![Max-pooling with a pooling window shape of $2\times 2$. The shaded portions are the first output element as well as the input tensor elements used for the output computation: $\max(0, 1, 3, 4)=4$.](../img/pooling.svg)
 :label:`fig_pooling`
 
 The output tensor in :numref:`fig_pooling`  has a height of 2 and a width of 2.
@@ -90,16 +90,16 @@ $$
 More generally, we can define a $p \times q$ pooling layer by aggregating over 
 a region of said size. Returning to the problem of edge detection, 
 we use the output of the convolutional layer
-as input for $2\times 2$ maximum pooling.
+as input for $2\times 2$ max-pooling.
 Denote by `X` the input of the convolutional layer input and `Y` the pooling layer output. 
 Regardless of whether or not the values of `X[i, j]`, `X[i, j + 1]`, 
 `X[i+1, j]` and `X[i+1, j + 1]` are different,
 the pooling layer always outputs `Y[i, j] = 1`.
-That is to say, using the $2\times 2$ maximum pooling layer,
+That is to say, using the $2\times 2$ max-pooling layer,
 we can still detect if the pattern recognized by the convolutional layer
 moves no more than one element in height or width.
 
-In the code below, we (**implement the forward pass
+In the code below, we (**implement the forward propagation
 of the pooling layer**) in the `pool2d` function.
 This function is similar to the `corr2d` function
 in :numref:`sec_conv_layer`.
@@ -151,7 +151,7 @@ def pool2d(X, pool_size, mode='max'):
     return Y
 ```
 
-We can construct the input tensor `X` in :numref:`fig_pooling` to [**validate the output of the two-dimensional maximum pooling layer**].
+We can construct the input tensor `X` in :numref:`fig_pooling` to [**validate the output of the two-dimensional max-pooling layer**].
 
 ```{.python .input}
 %%tab all
@@ -173,7 +173,7 @@ change the output shape.
 And as before, we can adjust the operation to achieve a desired output shape
 by padding the input and adjusting the stride.
 We can demonstrate the use of padding and strides
-in pooling layers via the built-in two-dimensional maximum pooling layer from the deep learning framework.
+in pooling layers via the built-in two-dimensional max-pooling layer from the deep learning framework.
 We first construct an input tensor `X` whose shape has four dimensions,
 where the number of examples (batch size) and number of channels are both 1.
 
@@ -200,21 +200,21 @@ we get a stride shape of `(3, 3)` by default.
 ```{.python .input}
 %%tab mxnet
 pool2d = nn.MaxPool2D(3)
-# Pooling has no model parameters, hence it needs no initalization
+# Pooling has no model parameters, hence it needs no initialization
 pool2d(X)
 ```
 
 ```{.python .input}
 %%tab pytorch
 pool2d = nn.MaxPool2d(3)
-# Pooling has no model parameters, hence it needs no initalization
+# Pooling has no model parameters, hence it needs no initialization
 pool2d(X)
 ```
 
 ```{.python .input}
 %%tab tensorflow
 pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3])
-# Pooling has no model parameters, hence it needs no initalization
+# Pooling has no model parameters, hence it needs no initialization
 pool2d(X)
 ```
 
@@ -327,19 +327,19 @@ output vertically yields the same output as the other implementations.
 
 Pooling is an exceedingly simple operation. It does exactly what its name indicates, aggregate results over a window of values. All convolution semantics, such as strides and padding apply in the same way as they did previously. Note that pooling is indifferent to channels, i.e., it leaves the number of channels unchanged and it applies to each channel separately. Lastly, of the two popular pooling choices, max-pooling is preferable to average pooling, as it confers some degree of invariance to output. A popular choice is to pick a pooling window size of $2 \times 2$ to quarter the spatial resolution of output. 
 
-Note that there are many more ways of reducing resultion beyond pooling. For instance, in stochastic pooling :cite:`Zeiler.Fergus.2013` and fractional max-pooling :cite:`Graham.2014` aggregation is combined with randomization. This can slightly improve the accuracy in some cases. Lastly, as we will see later with the attention mechanism, there are more refined ways of aggregating over outputs, e.g., by using the alignment between a query and representation vectors. 
+Note that there are many more ways of reducing resolution beyond pooling. For instance, in stochastic pooling :cite:`Zeiler.Fergus.2013` and fractional max-pooling :cite:`Graham.2014` aggregation is combined with randomization. This can slightly improve the accuracy in some cases. Lastly, as we will see later with the attention mechanism, there are more refined ways of aggregating over outputs, e.g., by using the alignment between a query and representation vectors. 
 
 
 ## Exercises
 
 1. Implement average pooling through a convolution. 
 1. Prove that max-pooling cannot be implemented through a convolution alone. 
-1. Max-pooling can be accomplished using ReLu operations, i.e., $\mathrm{ReLu}(x) = \max(0, x)$.
-    1. Express $\max (a, b)$ by using only ReLu operations.
-    1. Use this to implement max-pooling by means of convolutions and ReLu layers. 
+1. Max-pooling can be accomplished using ReLU operations, i.e., $\mathrm{ReLU}(x) = \max(0, x)$.
+    1. Express $\max (a, b)$ by using only ReLU operations.
+    1. Use this to implement max-pooling by means of convolutions and ReLU layers. 
     1. How many channels and layers do you need for a $2 \times 2$ convolution? How many for a $3 \times 3$ convolution. 
 1. What is the computational cost of the pooling layer? Assume that the input to the pooling layer is of size $c\times h\times w$, the pooling window has a shape of $p_h\times p_w$ with a padding of $(p_h, p_w)$ and a stride of $(s_h, s_w)$.
-1. Why do you expect maximum pooling and average pooling to work differently?
+1. Why do you expect max-pooling and average pooling to work differently?
 1. Do we need a separate minimum pooling layer? Can you replace it with another operation?
 1. We could use the softmax operation for pooling. Why might it not be so popular?
 

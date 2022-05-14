@@ -25,22 +25,21 @@ is a *discrete nonnegative* random variable.
 As such, least mean squares might not be an ideal approach either.
 This sort of time-to-event modeling
 comes with a host of other complications that are dealt with
-in a specialized subfield called survival modeling.
+in a specialized subfield called *survival modeling*.
 
 The point here is not to overwhelm you but just
 to let you know that there is a lot more to estimation
 than simply minimizing squared errors.
-
 And more broadly, there's a lot more to supervised learning than regression.
 In this section, we focus on *classification* problems
-where we put aside "how much?" questions
-and instead focus on "which category?" questions.
+where we put aside *how much?* questions
+and instead focus on *which category?* questions.
 
 
 
 * Does this email belong in the spam folder or the inbox?
-* Is this customer more likely *to sign up*
-  or *not to sign up* for a subscription service?
+* Is this customer more likely to sign up
+  or not to sign up for a subscription service?
 * Does this image depict a donkey, a dog, a cat, or a rooster?
 * Which movie is Aston most likely to watch next?
 * Which section of the book are you going to read next?
@@ -110,7 +109,6 @@ and $(0, 0, 1)$ to "dog":
 
 $$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}.$$
 
-
 ### Linear Model
 
 In order to estimate the conditional probabilities
@@ -142,17 +140,16 @@ Just as in linear regression,
 we use a single-layer neural network.
 And since the calculation of each output, $o_1, o_2$, and $o_3$,
 depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$,
-the output layer can also be described as fully connected layer.
+the output layer can also be described as a *fully connected layer*.
 
 ![Softmax regression is a single-layer neural network.](../img/softmaxreg.svg)
 :label:`fig_softmaxreg`
 
-For a more concise notation we use vectors and matrices.
+For a more concise notation we use vectors and matrices:
 $\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$ is
 much better suited for mathematics and code.
 Note that we have gathered all of our weights into a $3 \times 4$ matrix and all biases
 $\mathbf{b} \in \mathbb{R}^3$ in a vector.
-
 
 ### The Softmax
 :label:`subsec_softmax_operation`
@@ -164,10 +161,8 @@ While it turns out that treating classification
 as a vector-valued regression problem works surprisingly well,
 it is nonetheless lacking in the following ways:
 
-* There is no guarantee that the outputs $o_i$ sum up to $1$ in
-  in the way we expect probabilities to behave.
-* There is no guarantee that the outputs $o_i$ are even nonnegative,
-  even if their outputs sum to $1$, or that they do not exceed $1$.
+* There is no guarantee that the outputs $o_i$ sum up to $1$ in the way we expect probabilities to behave.
+* There is no guarantee that the outputs $o_i$ are even nonnegative, even if their outputs sum up to $1$, or that they do not exceed $1$.
 
 Both aspects render the estimation problem difficult to solve
 and the solution very brittle to outliers.
@@ -177,7 +172,7 @@ between the number of bedrooms and the likelihood
 that someone will buy a house,
 the probability might exceed $1$
 when it comes to buying a mansion!
-As such, we need a mechanism to 'squish' the outputs.
+As such, we need a mechanism to "squish" the outputs.
 
 There are many ways we might to accomplish this goal.
 For instance, we could assume that the outputs
@@ -194,7 +189,7 @@ when compared to the softmax.
 
 Another way to accomplish this goal
 (and to ensure nonnegativity) is to use
-an exponential function $p(y = i) \propto \exp o_i$.
+an exponential function $P(y = i) \propto \exp o_i$.
 This does indeed satisfy the requirement
 that the conditional class probability
 increases with increasing $o_i$, it is monotonic,
@@ -205,7 +200,7 @@ This process is called *normalization*.
 Putting these two pieces together
 gives us the *softmax* function:
 
-$$\hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}$$
+$$\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o}) \quad \text{where}\quad \hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}.$$
 :eqlabel:`eq_softmax_y_and_o`
 
 Note that the largest coordinate of $\mathbf{o}$
@@ -233,15 +228,41 @@ is proportional to $\exp(-E/kT)$.
 Here, $E$ is the energy of a state,
 $T$ is the temperature, and $k$ is the Boltzmann constant.
 When statisticians talk about increasing or decreasing
-the 'temperature' of a statistical system,
+the "temperature" of a statistical system,
 they refer to changing $T$
 in order to favor lower or higher energy states.
 Following Gibbs' idea, energy equates to error.
 Energy-based models :cite:`Ranzato.Boureau.Chopra.ea.2007`
 use this point of view when describing
-problems in Deep Learning.
+problems in deep learning.
+
+### Vectorization
+:label:`subsec_softmax_vectorization`
+
+To improve computational efficiency,
+we vectorize calculations in minibatches of data.
+Assume that we are given a minibatch $\mathbf{X} \in \mathbb{R}^{n \times d}$
+of $n$ features with dimensionality (number of inputs) $d$.
+Moreover, assume that we have $q$ categories in the output.
+Then the weights satisfy $\mathbf{W} \in \mathbb{R}^{d \times q}$
+and the bias satisfies $\mathbf{b} \in \mathbb{R}^{1\times q}$.
+
+$$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}). \end{aligned} $$
+:eqlabel:`eq_minibatch_softmax_reg`
+
+This accelerates the dominant operation into
+a matrix-matrix product $\mathbf{X} \mathbf{W}$.
+Moreover, since each row in $\mathbf{X}$ represents a data example,
+the softmax operation itself can be computed *rowwise*:
+for each row of $\mathbf{O}$, exponentiate all entries
+and then normalize them by the sum.
+Note, though, that care must be taken
+to avoid exponentiating and taking logarithms of large numbers,
+since this can cause numerical overflow or underflow.
+Deep learning frameworks take care of this automatically.
 
 ## Loss Function
+:label:`subsec_softmax-regression-loss-func`
 
 Now that we have a mapping from features $\mathbf{x}$
 to probabilities $\mathbf{\hat{y}}$,
@@ -271,8 +292,8 @@ $$
 
 We are allowed to use the factorization
 since we assume that each label is drawn independently
-from its respective distribution $p(\mathbf{y}|\mathbf{x}^{(i)})$.
-Since maximizing the product of terms if awkward,
+from its respective distribution $P(\mathbf{y}|\mathbf{x}^{(i)})$.
+Since maximizing the product of terms is awkward,
 we take the negative logarithm to obtain the equivalent problem
 of minimizing the negative log-likelihood:
 
@@ -295,7 +316,7 @@ Since $\mathbf{y}$ is a one-hot vector of length $q$,
 the sum over all its coordinates $j$ vanishes for all but one term.
 Note that the loss $l(\mathbf{y}, \hat{\mathbf{y}})$
 is bounded from below by $0$
-whenever$\hat{y}$ is a probability vector:
+whenever $\hat{y}$ is a probability vector:
 no single entry is larger than $1$,
 hence their negative logarithm cannot be lower than $0$;
 $l(\mathbf{y}, \hat{\mathbf{y}}) = 0$ only if we predict
@@ -312,9 +333,9 @@ would incur infinite loss ($-\log 0 = \infty$).
 ### Softmax and Cross-Entropy Loss
 :label:`subsec_softmax_and_derivatives`
 
-Since the softmax activation function
+Since the softmax function
 and the corresponding cross-entropy loss are so common,
-it is worth understanding a bit better how they is computed.
+it is worth understanding a bit better how they are computed.
 Plugging :eqref:`eq_softmax_y_and_o` into the definition of the loss
 in :eqref:`eq_l_cross_entropy`
 and using the definition of the softmax we obtain:
@@ -322,8 +343,8 @@ and using the definition of the softmax we obtain:
 $$
 \begin{aligned}
 l(\mathbf{y}, \hat{\mathbf{y}}) &=  - \sum_{j=1}^q y_j \log \frac{\exp(o_j)}{\sum_{k=1}^q \exp(o_k)} \\
-&= \sum_{j=1}^q y_j \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j
-= \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j.
+&= \sum_{j=1}^q y_j \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j \\
+&= \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j.
 \end{aligned}
 $$
 
@@ -365,33 +386,10 @@ one of the most commonly used losses for classification problems.
 We can demystify the name by introducing just the basics of information theory.
 In a nutshell, it measures the number of bits to encode what we see $\mathbf{y}$
 relative to what we predict that should happen $\hat{\mathbf{y}}$.
-We provide a very basic explanation at the end of the current section. For further
-details on information theory see :numref:`sec_information_theory` or in this classic :cite:`Cover.Thomas.1999`.
+We provide a very basic explanation in the following. For further
+details on information theory see 
+:cite:`Cover.Thomas.1999` or :cite:`mackay2003information`.
 
-### Vectorization
-:label:`subsec_softmax_vectorization`
-
-To improve computational efficiency,
-we vectorize calculations in minibatches of data.
-Assume that we are given a minibatch $\mathbf{X} \in \mathbb{R}^{n \times d}$
-of $n$ features with dimensionality (number of inputs) $d$.
-Moreover, assume that we have $q$ categories in the output.
-Then the weights satisfy $\mathbf{W} \in \mathbb{R}^{d \times q}$
-and the bias satisfies $\mathbf{b} \in \mathbb{R}^{1\times q}$.
-
-$$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}). \end{aligned} $$
-:eqlabel:`eq_minibatch_softmax_reg`
-
-This accelerates the dominant operation into
-a matrix-matrix product $\mathbf{X} \mathbf{W}$.
-Moreover, since each row in $\mathbf{X}$ represents a data example,
-the softmax operation itself can be computed *rowwise*:
-for each row of $\mathbf{O}$, exponentiate all entries
-and then normalize them by the sum.
-Note, though, that care must be taken
-to avoid exponentiating and taking logarithms of large numbers,
-since this can cause numerical overflow or underflow.
-Deep learning frameworks take care of this automatically.
 
 
 ## Information Theory Basics
@@ -400,7 +398,6 @@ Deep learning frameworks take care of this automatically.
 Many deep learning papers use intuition and terms from information theory.
 To make sense of them, we need some common language.
 This is a survival guide.
-For more see section :numref:`sec_information_theory`.
 *Information theory* deals with the problem
 of encoding, decoding, transmitting,
 and manipulating information (also known as data).
@@ -428,7 +425,7 @@ Thus, one nat is $\frac{1}{\log(2)} \approx 1.44$ bit.
 You might be wondering what compression has to do with prediction.
 Imagine that we have a stream of data that we want to compress.
 If it is always easy for us to predict the next token,
-then this data is easy to compress!
+then this data is easy to compress.
 Take the extreme example where every token in the stream
 always takes the same value.
 That is a very boring data stream!
@@ -458,7 +455,7 @@ then you might be wondering, what is cross-entropy?
 The cross-entropy *from* $P$ *to* $Q$, denoted $H(P, Q)$,
 is the expected surprisal of an observer with subjective probabilities $Q$
 upon seeing data that was actually generated according to probabilities $P$.
-This is given by $H(P, Q) := \sum_j - P(j) \log Q(j)$.
+This is given by $H(P, Q) \stackrel{\mathrm{def}}{=} \sum_j - P(j) \log Q(j)$.
 The lowest possible cross-entropy is achieved when $P=Q$.
 In this case, the cross-entropy from $P$ to $Q$ is $H(P, P)= H(P)$.
 
@@ -466,7 +463,6 @@ In short, we can think of the cross-entropy classification objective
 in two ways: (i) as maximizing the likelihood of the observed data;
 and (ii) as minimizing our surprisal (and thus the number of bits)
 required to communicate the labels.
-
 
 ## Summary and Discussion
 
@@ -491,8 +487,8 @@ to statistical physics and information theory.
 
 While this is enough to get you on your way,
 and hopefully enough to whet your appetite,
-we hardly scratched the surface here.
-Among other things, we skipped over computational considerations
+we hardly dived deep here.
+Among other things, we skipped over computational considerations.
 Specifically, for any fully connected layer with $d$ inputs and $q$ outputs,
 the parameterization and computational cost is $\mathcal{O}(dq)$,
 which can be prohibitively high in practice.
@@ -504,7 +500,7 @@ Fourier transforms, and scaling
 to reduce the cost from quadratic to log-linear.
 Similar techniques work for more advanced
 structural matrix approximations :cite:`sindhwani2015structured`.
-Lastly, we can use quaternion-like decompositions
+Lastly, we can use Quaternion-like decompositions
 to reduce the cost to $\mathcal{O}(\frac{dq}{n})$,
 again if we are willing to trade off a small amount of accuracy
 for computational and storage cost :cite:`Zhang.Tay.Zhang.ea.2021`
@@ -540,7 +536,7 @@ the item with the largest score is the most likely one to be chosen :cite:`Bradl
     1. Show that for $\lambda \to \infty$ we have $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b) \to \mathrm{max}(a, b)$.
     1. What does the soft-min look like?
     1. Extend this to more than two numbers.
-1. The function $g(\mathbf{x}) := \log \sum_i \exp x_i$ is sometimes also referred to as the [log-partition function](https://en.wikipedia.org/wiki/Partition_function_(mathematics)).
+1. The function $g(\mathbf{x}) \stackrel{\mathrm{def}}{=} \log \sum_i \exp x_i$ is sometimes also referred to as the [log-partition function](https://en.wikipedia.org/wiki/Partition_function_(mathematics)).
     1. Prove that the function is convex. Hint: to do so, use the fact that the first derivative amounts to the probabilities from the softmax function and show that the second derivative is the variance.
     1. Show that $g$ is translation invariant, i.e., $g(\mathbf{x} + b) = g(\mathbf{x})$.
     1. What happens if some of the coordinates $x_i$ are very large? What happens if they're all very small?

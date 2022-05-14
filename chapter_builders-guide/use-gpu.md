@@ -433,7 +433,7 @@ net.initialize(ctx=try_gpu())
 
 ```{.python .input}
 %%tab pytorch
-net = nn.Sequential(nn.Linear(3, 1))
+net = nn.Sequential(nn.LazyLinear(1))
 net = net.to(device=try_gpu())
 ```
 

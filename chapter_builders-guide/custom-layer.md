@@ -136,7 +136,7 @@ Now let's implement our own version of the  fully connected layer.
 Recall that this layer requires two parameters,
 one to represent the weight and the other for the bias.
 In this implementation, we bake in the ReLU activation as a default.
-This layer requires to input arguments: `in_units` and `units`, which
+This layer requires two input arguments: `in_units` and `units`, which
 denote the number of inputs and outputs, respectively.
 
 ```{.python .input}
@@ -186,8 +186,15 @@ class MyDense(tf.keras.Model):
         return tf.nn.relu(linear)
 ```
 
+:begin_tab:`mxnet, tensorflow`
+Next, we instantiate the `MyDense` class
+and access its model parameters.
+:end_tab:
+
+:begin_tab:`pytorch`
 Next, we instantiate the `MyLinear` class
 and access its model parameters.
+:end_tab:
 
 ```{.python .input}
 %%tab mxnet

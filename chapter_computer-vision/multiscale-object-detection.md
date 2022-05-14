@@ -44,6 +44,7 @@ at multiple scales, let's read an image.
 Its height and width are 561 and 728 pixels, respectively.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import image, np, npx
@@ -96,6 +97,7 @@ anchor boxes of scale `s` (assuming the length of the list `s` is 1) and differe
 will be generated.
 
 ```{.python .input}
+#@tab mxnet
 def display_anchors(fmap_w, fmap_h, s):
     d2l.set_figsize()
     # Values on the first two dimensions do not affect the output

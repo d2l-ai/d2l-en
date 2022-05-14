@@ -6,23 +6,30 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Concise Implementation of Linear Regression
 :label:`sec_linear_concise`
 
+Deep learning has witnessed a Cambrian explosion
+of sorts over the past decade.
+The sheer number of techniques, applications and algorithms by far surpasses the
+progress of previous decades. 
 This is due to a fortuitous combination of multiple factors,
 one of which is the powerful free tools
 offered by a number of open source deep learning frameworks.
-Caffe, DistBelief and Theano arguably represent the
-first generation of such models :cite:`Jia.Shelhamer.Donahue.ea.2014,Dean.Corrado.Monga.ea.2012,Bergstra.Breuleux.Bastien.ea.2010`
+Theano :cite:`Bergstra.Breuleux.Bastien.ea.2010`,
+DistBelief :cite:`Dean.Corrado.Monga.ea.2012`,
+and Caffe :cite:`Jia.Shelhamer.Donahue.ea.2014`
+arguably represent the
+first generation of such models 
 that found widespread adoption.
 In contrast to earlier (seminal) works like
 SN2 (Simulateur Neuristique) :cite:`Bottou.Le-Cun.1988`,
 which provided a Lisp-like programming experience,
 modern frameworks offer automatic differentiation
 and the convenience of Python.
-Frameworks allow us to automate and modularize
+These frameworks allow us to automate and modularize
 the repetitive work of implementing gradient-based learning algorithms.
 
 In :numref:`sec_linear_scratch`, we relied only on
 (i) tensors for data storage and linear algebra;
-and (ii) auto differentiation for calculating gradients.
+and (ii) automatic differentiation for calculating gradients.
 In practice, because data iterators, loss functions, optimizers,
 and neural network layers
 are so common, modern libraries implement these components for us as well.
@@ -33,7 +40,7 @@ the linear regression model**) from :numref:`sec_linear_scratch`
 ```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
-from mxnet import autograd, gluon, np, npx
+from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 ```
@@ -98,10 +105,18 @@ We will describe how this works in more detail later.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the fully connected layer is defined in the `Linear` class.
-Note that we passed two arguments into `nn.Linear`.
-The first specifies the input feature dimension (2),
-and the second specifies the output dimension (1).
+In PyTorch, the fully connected layer is defined in `Linear` and `LazyLinear` (available since version 1.8.0) classes. 
+The later
+allows users to *only* specify
+the output dimension,
+while the former
+additionally asks for
+how many inputs go into this layer.
+Specifying input shapes is inconvenient,
+which may require nontrivial calculations
+(such as in convolutional layers).
+Thus, for simplicity we will use such "lazy" layers
+whenever we can. 
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -121,28 +136,24 @@ We will describe how this works in more detail later.
 :end_tab:
 
 ```{.python .input}
-%%tab mxnet, tensorflow
+%%tab all
 class LinearRegression(d2l.Module):  #@save
     def __init__(self, lr):
         super().__init__()
         self.save_hyperparameters()
         if tab.selected('mxnet'):
             self.net = nn.Dense(1)
-            self.net.initialize()
+            self.net.initialize(init.Normal(sigma=0.01))
         if tab.selected('tensorflow'):
-            self.net = tf.keras.layers.Dense(1)
+            initializer = tf.initializers.RandomNormal(stddev=0.01)
+            self.net = tf.keras.layers.Dense(1, kernel_initializer=initializer)
+        if tab.selected('pytorch'):
+            self.net = nn.LazyLinear(1)
+            self.net.weight.data.normal_(0, 0.01)
+            self.net.bias.data.fill_(0)
 ```
 
-```{.python .input  n=2}
-%%tab pytorch
-class LinearRegression(d2l.Module):  #@save
-    def __init__(self, num_inputs, lr):
-        super().__init__()
-        self.save_hyperparameters()
-        self.net = nn.Linear(num_inputs, 1)
-```
-
-In the forward method, we just evoke the built-in `__call__` function of the predefined layers to compute the outputs.
+In the `forward` method, we just invoke the built-in `__call__` function of the predefined layers to compute the outputs.
 
 ```{.python .input  n=3}
 %%tab all
@@ -152,7 +163,7 @@ def forward(self, X):
     return self.net(X)
 ```
 
-## Loss Function
+## Defining the Loss Function
 
 :begin_tab:`mxnet`
 The `loss` module defines many useful loss functions.
@@ -189,7 +200,7 @@ def loss(self, y_hat, y):
         return fn(y, y_hat)
 ```
 
-## Optimization Algorithm
+## Defining the Optimization Algorithm
 
 :begin_tab:`mxnet`
 Minibatch SGD is a standard tool
@@ -217,8 +228,8 @@ and thus PyTorch supports it alongside a number of
 variations on this algorithm in the `optim` module.
 When we (**instantiate an `SGD` instance,**)
 we specify the parameters to optimize over,
-obtainable from our net via `net.parameters()`,
-with a dictionary of hyperparameters
+obtainable from our model via `self.parameters()`,
+and the learning rate (`self.lr`)
 required by our optimization algorithm.
 :end_tab:
 
@@ -246,7 +257,7 @@ def configure_optimizers(self):
 
 You might have noticed that expressing our model through
 high-level APIs of a deep learning framework
-requires comparatively few lines of code.
+requires fewer lines of code.
 We did not have to allocate parameters individually,
 define our loss function, or implement minibatch SGD.
 Once we start working with much more complex models,
@@ -254,16 +265,14 @@ the advantages of the high-level API will grow considerably.
 Now that we have all the basic pieces in place,
 [**the training loop itself is the same
 as the one we implemented from scratch.**]
-So we just call the `fit` method
-(defined in :numref:`sec_linear_scratch`)
+So we just call the `fit` method (introduced in :numref:`oo-design-training`),
+which relies on the implementation of the `fit_epoch` method
+in :numref:`sec_linear_scratch`,
 to train our model.
 
 ```{.python .input}
 %%tab all
-if tab.selected('mxnet') or tab.selected('tensorflow'):
-    model = LinearRegression(lr=0.03)
-if tab.selected('pytorch'):
-    model = LinearRegression(2, lr=0.03)
+model = LinearRegression(lr=0.03)
 data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 trainer = d2l.Trainer(max_epochs=3)
 trainer.fit(model, data)
@@ -275,8 +284,8 @@ by training on finite data
 and the actual parameters**]
 that generated our dataset.
 To access parameters,
-we first access the layer that we need from `net`
-and then access its weights and bias.
+we access the weights and bias
+of the layer that we need.
 As in our implementation from scratch,
 note that our estimated parameters
 are close to their true counterparts.
@@ -303,8 +312,10 @@ This section contains the first
 implementation of a deep network (in this book)
 to tap into the conveniences afforded
 by modern deep learning frameworks,
-such as Gluon, JAX, Keras, PyTorch, and Tensorflow
-:cite:`Abadi.Barham.Chen.ea.2016,Paszke.Gross.Massa.ea.2019,Frostig.Johnson.Leary.2018,Chen.Li.Li.ea.2015`.
+such as Gluon `Chen.Li.Li.ea.2015`, 
+JAX :cite:`Frostig.Johnson.Leary.2018`, 
+PyTorch :cite:`Paszke.Gross.Massa.ea.2019`, 
+and Tensorflow :cite:`Abadi.Barham.Chen.ea.2016`.
 We used framework defaults for loading data, defining a layer,
 a loss function, an optimizer and a training loop.
 Whenever the framework provides all necessary features,
@@ -359,10 +370,10 @@ Dimensionality and storage for networks are automatically inferred
 1. Review the framework documentation to see which loss functions are provided. In particular,
    replace the squared loss with Huber's robust loss function. That is, use the loss function
    $$l(y,y') = \begin{cases}|y-y'| -\frac{\sigma}{2} & \text{ if } |y-y'| > \sigma \\ \frac{1}{2 \sigma} (y-y')^2 & \text{ otherwise}\end{cases}$$
-1. How do you access the gradient of the linear part of the model, i.e.,
+1. How do you access the gradient of the weights of the model?
 1. How does the solution change if you change the learning rate and the number of epochs? Does it keep on improving?
-1. How does the solution change as you change the amount of data generated. $\sin x$
-    1. Plot the estimation error for $\hat{\mathbf{w}} - \mathbf{w}$ and $\hat{b} - b$ as a function of the amount of data. Hint: increase the amount of data logarithmically rather than linearly, i.e. 5, 10, 20, 50 ... 10,000 rather than 1,000, 2,000 ... 10,000.
+1. How does the solution change as you change the amount of data generated?
+    1. Plot the estimation error for $\hat{\mathbf{w}} - \mathbf{w}$ and $\hat{b} - b$ as a function of the amount of data. Hint: increase the amount of data logarithmically rather than linearly, i.e., 5, 10, 20, 50, ..., 10,000 rather than 1,000, 2,000, ..., 10,000.
     2. Why is the suggestion in the hint appropriate?
 
 

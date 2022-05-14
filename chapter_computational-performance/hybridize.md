@@ -92,6 +92,7 @@ The imperative programming paradigm is now the default in Tensorflow 2, a welcom
 The easiest way to get a feel for how hybridization works is to consider deep networks with multiple layers. Conventionally the Python interpreter will need to execute the code for all layers to generate an instruction that can then be forwarded to a CPU or a GPU. For a single (fast) computing device this does not cause any major issues. On the other hand, if we use an advanced 8-GPU server such as an AWS P3dn.24xlarge instance Python will struggle to keep all GPUs busy. The single-threaded Python interpreter becomes the bottleneck here. Let's see how we can address this for significant parts of the code by replacing `Sequential` with `HybridSequential`. We begin by defining a simple MLP.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
@@ -164,6 +165,7 @@ We cen re-enable this functionality with tf.function. tf.function is more common
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 net.hybridize()
 net(x)
 ```
@@ -226,6 +228,7 @@ Now we can invoke the network three times, once executed eagerly, once with grap
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 net = get_net()
 with Benchmark('Without hybridization'):
     for i in range(1000): net(x)
@@ -288,6 +291,7 @@ Let's see the `saved_model` instance in action.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 net.export('my_mlp')
 !ls -lh my_mlp*
 ```
@@ -310,6 +314,7 @@ The model is decomposed into a (large binary) parameter file and a JSON descript
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 !head my_mlp-symbol.json
 ```
 
@@ -320,6 +325,7 @@ Besides, contrary to the `Block` instance, which needs to use the `forward` func
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 class HybridNet(nn.HybridBlock):
     def __init__(self, **kwargs):
         super(HybridNet, self).__init__(**kwargs)
@@ -339,6 +345,7 @@ The code above implements a simple network with 4 hidden units and 2 outputs. Th
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 net = HybridNet()
 net.initialize()
 x = np.random.normal(size=(1, 3))
@@ -350,6 +357,7 @@ Repeating the forward computation will lead to the same output (we omit details)
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 net.hybridize()
 net(x)
 ```
@@ -359,6 +367,7 @@ Instead of using `ndarray` we now use the `symbol` module for `F`. Moreover, eve
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 net(x)
 ```
 

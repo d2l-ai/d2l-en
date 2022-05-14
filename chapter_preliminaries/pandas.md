@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Data Preprocessing
 :label:`sec_pandas`
 
@@ -7,10 +12,10 @@ However, to apply deep learning in the wild
 we must extract messy data 
 stored in arbitrary formats,
 and preprocess it to suit our needs.
-Fortunately, the [*pandas* library](https://pandas.pydata.org/) 
+Fortunately, the *pandas* [library](https://pandas.pydata.org/) 
 can do much of the heavy lifting.
 This section, while no substitute 
-for a proper [*pandas* tutorial](https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html),
+for a proper *pandas* [tutorial](https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html),
 will give you a crash course
 on some of the most common routines.
 
@@ -30,7 +35,7 @@ and the columns correspond to the number of rooms (`NumRooms`),
 the roof type (`RoofType`), and the price (`Price`).
 
 ```{.python .input}
-#@tab all
+%%tab all
 import os
 
 os.makedirs(os.path.join('..', 'data'), exist_ok=True)
@@ -46,7 +51,7 @@ NA,NA,140000''')
 Now let's import `pandas` and load the dataset with `read_csv`.
 
 ```{.python .input}
-#@tab all
+%%tab all
 import pandas as pd
 
 data = pd.read_csv(data_file)
@@ -93,7 +98,7 @@ of `RoofType_Slate` and `RoofType_nan` to 1 and 0, respectively.
 The converse holds for a row with a missing `RoofType` value.
 
 ```{.python .input}
-#@tab all
+%%tab all
 inputs, targets = data.iloc[:, 0:2], data.iloc[:, 2]
 inputs = pd.get_dummies(inputs, dummy_na=True)
 print(inputs)
@@ -105,7 +110,7 @@ one common heuristic is to
 the mean value of the corresponding column**].
 
 ```{.python .input}
-#@tab all
+%%tab all
 inputs = inputs.fillna(inputs.mean())
 print(inputs)
 ```
@@ -116,6 +121,7 @@ Now that [**all the entries in `inputs` and `targets` are numerical,
 we can load them into a tensor**] (recall :numref:`sec_ndarray`).
 
 ```{.python .input}
+%%tab mxnet
 from mxnet import np
 
 X, y = np.array(inputs.values), np.array(targets.values)
@@ -123,7 +129,7 @@ X, y
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 import torch
 
 X, y = torch.tensor(inputs.values), torch.tensor(targets.values)
@@ -131,7 +137,7 @@ X, y
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 import tensorflow as tf
 
 X, y = tf.constant(inputs.values), tf.constant(targets.values)

@@ -69,16 +69,6 @@ the hidden state computation in
 :eqref:`eq_deep_rnn_H`
 with that from a GRU or an LSTM.
 
-
-## Implementation from Scratch
-
-Fortunately many of the logistical details required to implement multiple layers of an RNN are readily available in high-level APIs.
-To keep things simple we only illustrate the implementation using such built-in functionalities.
-Let's take an LSTM model as an example.
-The code is very similar to the one we used previously in :numref:`sec_lstm`.
-In fact, the only difference is that we specify the number of layers explicitly rather than picking the default of a single layer.
-As usual, we begin by loading the dataset.
-
 ```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
@@ -105,32 +95,37 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-The architectural decisions such as choosing hyperparameters are very similar to those of :numref:`sec_lstm`.
-We pick the same number of inputs and outputs as we have distinct tokens, i.e., `vocab_size`.
-The number of hidden units is still 256.
-The only difference is that we now (**select a nontrivial number of hidden layers by specifying the value of `num_layers`.**)
+## Implementation from Scratch
+
+To implement a multi-layer RNN from scratch,
+we can treat each layer as an `RNNScratch` instance
+with its own learnable parameters.
 
 ```{.python .input}
 %%tab mxnet, tensorflow
 class StackedRNNScratch(d2l.Module):
-    def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):        
+    def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.rnns = [d2l.RNNScratch(num_inputs if i==0 else num_hiddens, 
-                                    num_hiddens, sigma) 
+        self.rnns = [d2l.RNNScratch(num_inputs if i==0 else num_hiddens,
+                                    num_hiddens, sigma)
                      for i in range(num_layers)]
 ```
 
 ```{.python .input}
 %%tab pytorch
 class StackedRNNScratch(d2l.Module):
-    def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):        
+    def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
         self.rnns = nn.Sequential(*[d2l.RNNScratch(
             num_inputs if i==0 else num_hiddens, num_hiddens, sigma)
                                     for i in range(num_layers)])
 ```
+
+The multi-layer forward computation
+simply performs forward computation
+layer by layer.
 
 ```{.python .input}
 %%tab all
@@ -143,17 +138,21 @@ def forward(self, inputs, Hs=None):
     return outputs, Hs
 ```
 
+As an example, we train a deep GRU model on
+*The Time Machine* dataset (same as in :numref:`sec_rnn-scratch`).
+To keep things simple we set the number of layers to 2.
+
 ```{.python .input}
 %%tab all
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet', 'pytorch'):
-    rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
+    rnn_block = StackedRNNScratch(num_inputs=len(data.vocab),
                                   num_hiddens=32, num_layers=2)
     model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=2)
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
-        rnn_block = StackedRNNScratch(num_inputs=len(data.vocab), 
+        rnn_block = StackedRNNScratch(num_inputs=len(data.vocab),
                                   num_hiddens=32, num_layers=2)
         model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=2)
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1)
@@ -162,30 +161,18 @@ trainer.fit(model, data)
 
 ## Concise Implementation
 
+Fortunately many of the logistical details required to implement multiple layers of an RNN are readily available in high-level APIs.
+Our concise implementation will use such built-in functionalities.
+The code generalizes the one we used previously in :numref:`sec_gru`,
+allowing specification of the number of layers explicitly rather than picking the default of a single layer.
+
 ```{.python .input}
 %%tab mxnet
 class GRU(d2l.RNN):  #@save
     def __init__(self, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
-        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)        
-```
-
-```{.python .input}
-%%tab tensorflow
-class GRU(d2l.RNN):  #@save
-    def __init__(self, num_hiddens, num_layers, dropout=0):
-        d2l.Module.__init__(self)
-        self.save_hyperparameters()
-        gru_cells = [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout) 
-                     for _ in range(num_layers)]            
-        self.rnn = tf.keras.layers.RNN(gru_cells, return_sequences=True, 
-                                       return_state=True, time_major=True)
-        
-    def forward(self, X, state=None):
-        outputs, *state = self.rnn(X, state)
-        return outputs, state
-
+        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
 ```
 
 ```{.python .input}
@@ -194,8 +181,30 @@ class GRU(d2l.RNN):  #@save
     def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
-        self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers, dropout=dropout)        
+        self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers,
+                          dropout=dropout)
 ```
+
+```{.python .input}
+%%tab tensorflow
+class GRU(d2l.RNN):  #@save
+    def __init__(self, num_hiddens, num_layers, dropout=0):
+        d2l.Module.__init__(self)
+        self.save_hyperparameters()
+        gru_cells = [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)
+                     for _ in range(num_layers)]
+        self.rnn = tf.keras.layers.RNN(gru_cells, return_sequences=True,
+                                       return_state=True, time_major=True)
+
+    def forward(self, X, state=None):
+        outputs, *state = self.rnn(X, state)
+        return outputs, state
+```
+
+The architectural decisions such as choosing hyperparameters are very similar to those of :numref:`sec_gru`.
+We pick the same number of inputs and outputs as we have distinct tokens, i.e., `vocab_size`.
+The number of hidden units is still 32.
+The only difference is that we now (**select a nontrivial number of hidden layers by specifying the value of `num_layers`.**)
 
 ```{.python .input}
 %%tab all
@@ -229,10 +238,9 @@ model.predict('it has', 20, data.vocab)
 
 ## Exercises
 
-1. Try to implement a two-layer RNN from scratch using the single layer implementation we discussed in :numref:`sec_rnn-scratch`.
-2. Replace the LSTM by a GRU and compare the accuracy and training speed.
-3. Increase the training data to include multiple books. How low can you go on the perplexity scale?
-4. Would you want to combine sources of different authors when modeling text? Why is this a good idea? What could go wrong?
+1. Replace the GRU by an LSTM and compare the accuracy and training speed.
+1. Increase the training data to include multiple books. How low can you go on the perplexity scale?
+1. Would you want to combine sources of different authors when modeling text? Why is this a good idea? What could go wrong?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/340)

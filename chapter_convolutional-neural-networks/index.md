@@ -19,14 +19,12 @@ learning from image data.
 
 This chapter introduces *convolutional neural networks* (CNNs)
 :cite:`LeCun.Jackel.Bottou.ea.1995`, a powerful family of neural networks that
-are designed for precisely this purpose.  CNN-based architectures are
-now ubiquitous in the field of computer vision, and have become so
-dominant that hardly anyone today would develop a commercial
-application or enter a competition related to image recognition,
-object detection, or semantic segmentation, without building off of
-this approach. For instance, on the Imagnet collection
-:cite:`Deng.Dong.Socher.ea.2009` it was only the use of Convolutional Neural
-Networks, in short Convnets that provided significant performance
+are designed for precisely this purpose.
+CNN-based architectures are
+now ubiquitous in the field of computer vision.
+For instance, on the Imagnet collection
+:cite:`Deng.Dong.Socher.ea.2009` it was only the use of convolutional neural
+networks, in short Convnets that provided significant performance
 improvements :cite:`Krizhevsky.Sutskever.Hinton.2012`.
 
 Modern CNNs, as they are called colloquially owe their design to

@@ -4,6 +4,7 @@
 Now that we have learned how to work with probability in both the discrete and the continuous setting, let's get to know some of the common distributions encountered.  Depending on the area of machine learning, we may need to be familiar with vastly more of these, or for some areas of deep learning potentially none at all.  This is, however, a good basic list to be familiar with.  Let's first import some common libraries.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -63,6 +64,7 @@ d2l.plt.show()
 Now, let's plot the cumulative distribution function :eqref:`eq_bernoulli_cdf`.
 
 ```{.python .input}
+#@tab mxnet
 x = np.arange(-1, 2, 0.01)
 
 def F(x):
@@ -99,6 +101,7 @@ If $X \sim \mathrm{Bernoulli}(p)$, then:
 We can sample an array of arbitrary shape from a Bernoulli random variable as follows.
 
 ```{.python .input}
+#@tab mxnet
 1*(np.random.rand(10, 10) < p)
 ```
 
@@ -140,6 +143,7 @@ d2l.plt.show()
 Now, let's plot the cumulative distribution function :eqref:`eq_discrete_uniform_cdf`.
 
 ```{.python .input}
+#@tab mxnet
 x = np.arange(-1, 6, 0.01)
 
 def F(x):
@@ -176,6 +180,7 @@ If $X \sim U(n)$, then:
 We can sample an array of arbitrary shape from a discrete uniform random variable as follows.
 
 ```{.python .input}
+#@tab mxnet
 np.random.randint(1, n, size=(10, 10))
 ```
 
@@ -210,6 +215,7 @@ $$F(x) = \begin{cases} 0 & x < a, \\ \frac{x-a}{b-a} & x \in [a, b], \\ 1 & x >=
 Let's first plot the probability density function :eqref:`eq_cont_uniform_pdf`.
 
 ```{.python .input}
+#@tab mxnet
 a, b = 1, 3
 
 x = np.arange(0, 4, 0.01)
@@ -239,6 +245,7 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 Now, let's plot the cumulative distribution function :eqref:`eq_cont_uniform_cdf`.
 
 ```{.python .input}
+#@tab mxnet
 def F(x):
     return 0 if x < a else 1 if x > b else (x - a) / (b - a)
 
@@ -269,6 +276,7 @@ If $X \sim U(a, b)$, then:
 We can sample an array of arbitrary shape from a uniform random variable as follows.  Note that it by default samples from a $U(0,1)$, so if we want a different range we need to scale it.
 
 ```{.python .input}
+#@tab mxnet
 (b - a) * np.random.rand(10, 10) + a
 ```
 
@@ -306,6 +314,7 @@ $$F(x) = \begin{cases} 0 & x < 0, \\ \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m} 
 Let's first plot the probability mass function.
 
 ```{.python .input}
+#@tab mxnet
 n, p = 10, 0.2
 
 # Compute binomial coefficient
@@ -364,6 +373,7 @@ d2l.plt.show()
 Now, let's plot the cumulative distribution function :eqref:`eq_binomial_cdf`.
 
 ```{.python .input}
+#@tab mxnet
 x = np.arange(-1, 11, 0.01)
 cmf = np.cumsum(pmf)
 
@@ -403,6 +413,7 @@ If $X \sim \mathrm{Binomial}(n, p)$, then:
 This follows from the linearity of expected value over the sum of $n$ Bernoulli random variables, and the fact that the variance of the sum of independent random variables is the sum of the variances. This can be sampled as follows.
 
 ```{.python .input}
+#@tab mxnet
 np.random.binomial(n, p, size=(10, 10))
 ```
 
@@ -453,6 +464,7 @@ $$F(x) = \begin{cases} 0 & x < 0, \\ e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}
 Let's first plot the probability mass function :eqref:`eq_poisson_mass`.
 
 ```{.python .input}
+#@tab mxnet
 lam = 5.0
 
 xs = [i for i in range(20)]
@@ -495,6 +507,7 @@ d2l.plt.show()
 Now, let's plot the cumulative distribution function :eqref:`eq_poisson_cdf`.
 
 ```{.python .input}
+#@tab mxnet
 x = np.arange(-1, 21, 0.01)
 cmf = np.cumsum(pmf)
 def F(x):
@@ -531,6 +544,7 @@ As we saw above, the means and variances are particularly concise.  If $X \sim \
 This can be sampled as follows.
 
 ```{.python .input}
+#@tab mxnet
 np.random.poisson(lam, size=(10, 10))
 ```
 
@@ -558,6 +572,7 @@ $$
 This can be seen to have mean zero and variance one, and so it is plausible to believe that it will converge to some limiting distribution.  If we plot what these distributions look like, we will become even more convinced that it will work.
 
 ```{.python .input}
+#@tab mxnet
 p = 0.2
 ns = [1, 10, 100, 1000]
 d2l.plt.figure(figsize=(10, 3))
@@ -630,6 +645,7 @@ $$p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.$$
 Let's first plot the probability density function :eqref:`eq_gaussian_pdf`.
 
 ```{.python .input}
+#@tab mxnet
 mu, sigma = 0, 1
 
 x = np.arange(-3, 3, 0.01)
@@ -663,6 +679,7 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 Now, let's plot the cumulative distribution function.  It is beyond the scope of this appendix, but the Gaussian c.d.f. does not have a closed-form formula in terms of more elementary functions.  We will use `erf` which provides a way to compute this integral numerically.
 
 ```{.python .input}
+#@tab mxnet
 def phi(x):
     return (1.0 + erf((x - mu) / (sigma * np.sqrt(2)))) / 2.0
 
@@ -713,6 +730,7 @@ To close the section, let's recall that if $X \sim \mathcal{N}(\mu, \sigma^2)$, 
 We can sample from the Gaussian (or standard normal) distribution as shown below.
 
 ```{.python .input}
+#@tab mxnet
 np.random.normal(mu, sigma, size=(10, 10))
 ```
 
