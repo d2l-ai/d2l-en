@@ -50,6 +50,13 @@ stage("Build and Publish") {
       ./static/cache.sh store _build/eval_tensorflow/data
       """
 
+      sh label: "Execute Notebooks [Jax]", script: """set -ex
+      conda activate ${ENV_NAME}
+      ./static/cache.sh restore _build/eval_jax/data
+      d2lbook build eval --tab jax
+      ./static/cache.sh store _build/eval_jax/data
+      """
+
       sh label:"Build HTML", script:"""set -ex
       conda activate ${ENV_NAME}
       ./static/build_html.sh

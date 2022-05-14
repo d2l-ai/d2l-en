@@ -416,6 +416,27 @@ to update your code and runtime environment.
 Here is how we import modules from TensorFlow.
 :end_tab:
 
+:begin_tab:`jax`
+Most of the code in this book is based on Jax,
+an open-source framework enabling composable function
+transformations such as differentiation of arbitrary
+Python and NumPy functions, as well as JIT compliation,
+vectorization and much more! It's becoming popular in
+the machine learning research space and has an
+easy-to-learn NumPy-like API. Actually, JAX tries
+to achieve 1:1 parity with NumPy, so switching your
+code could be as simple as changing a single import statement!
+However, due to the rapid development of deep learning,
+some code *in the print edition*
+may not work properly in future versions of Jax.
+We plan to keep the online version up-to-date.
+In case you encounter any problems,
+please consult :ref:`chap_installation`
+to update your code and runtime environment.
+
+Here is how we import modules from JAX.
+:end_tab:
+
 ```{.python .input}
 #@tab mxnet
 #@save
@@ -441,6 +462,14 @@ from PIL import Image
 #@save
 import numpy as np
 import tensorflow as tf
+```
+
+```{.python .input}
+#@tab jax
+#@save
+import numpy as np
+import jax
+import jax.numpy as jnp
 ```
 
 ### Target Audience
