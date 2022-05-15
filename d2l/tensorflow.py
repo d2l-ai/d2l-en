@@ -1109,15 +1109,15 @@ class AddNorm(tf.keras.layers.Layer):
     """Residual connection followed by layer normalization.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, normalized_shape, dropout):
+    def __init__(self, norm_shape, dropout):
         super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
-        self.ln = tf.keras.layers.LayerNormalization(normalized_shape)
+        self.ln = tf.keras.layers.LayerNormalization(norm_shape)
 
     def call(self, X, Y, **kwargs):
         return self.ln(self.dropout(Y, **kwargs) + X)
 
-class EncoderBlock(tf.keras.layers.Layer):
+class TransformerEncoderBlock(tf.keras.layers.Layer):
     """Transformer encoder block.
 
     Defined in :numref:`sec_transformer`"""
@@ -1142,15 +1142,15 @@ class TransformerEncoder(d2l.Encoder):
     Defined in :numref:`sec_transformer`"""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, bias=False):
+                 num_blks, dropout, bias=False):
         super().__init__()
         self.num_hiddens = num_hiddens
         self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
-        self.blks = [EncoderBlock(
+        self.blks = [TransformerEncoderBlock(
             key_size, query_size, value_size, num_hiddens, norm_shape,
             ffn_num_hiddens, num_heads, dropout, bias) for _ in range(
-            num_layers)]
+            num_blks)]
 
     def call(self, X, valid_lens, **kwargs):
         # Since positional encoding values are between -1 and 1, the embedding

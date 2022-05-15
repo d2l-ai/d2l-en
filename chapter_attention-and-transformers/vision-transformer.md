@@ -69,7 +69,7 @@ class ViTBlock(nn.Module):
 
 ```{.python .input}
 X = d2l.ones((2, 100, 24))
-encoder_blk = ViTBlock(24, [100, 24], 48, 8, 0.5)
+encoder_blk = ViTBlock(24, 24, 48, 8, 0.5)
 encoder_blk.eval()
 d2l.check_shape(encoder_blk(X), X.shape)
 ```
@@ -78,7 +78,7 @@ d2l.check_shape(encoder_blk(X), X.shape)
 class ViT(d2l.Classifier):
     """Vision transformer."""
     def __init__(self, img_size, patch_size, num_hiddens, mlp_num_hiddens,
-                 num_heads, num_layers, emb_dropout, blk_dropout, lr=0.1,
+                 num_heads, num_blks, emb_dropout, blk_dropout, lr=0.1,
                  use_bias=False, num_classes=10):
         super().__init__()
         self.save_hyperparameters()
@@ -86,15 +86,14 @@ class ViT(d2l.Classifier):
             img_size, patch_size, num_hiddens)
         self.cls_token = nn.Parameter(d2l.zeros(1, 1, num_hiddens))
         num_steps = self.patch_embedding.num_patches + 1  # Add the cls token
-        
-        # In vision transformer, positional embeddings are learnable
+        # Positional embeddings are learnable
         self.pos_embedding = nn.Parameter(
             torch.randn(1, num_steps, num_hiddens))
         self.dropout = nn.Dropout(emb_dropout)
         self.blks = nn.Sequential()
-        for i in range(num_layers):
+        for i in range(num_blks):
             self.blks.add_module(f"{i}", ViTBlock(
-                num_hiddens, [num_steps, num_hiddens], mlp_num_hiddens,
+                num_hiddens, num_hiddens, mlp_num_hiddens,
                 num_heads, blk_dropout, use_bias))
         self.head = nn.Sequential(nn.LayerNorm(num_hiddens),
                                   nn.Linear(num_hiddens, num_classes))
@@ -112,10 +111,10 @@ class ViT(d2l.Classifier):
 
 ```{.python .input}
 img_size, patch_size = 96, 16
-num_hiddens, mlp_num_hiddens, num_heads, num_layers = 512, 2048, 8, 2
+num_hiddens, mlp_num_hiddens, num_heads, num_blks = 512, 2048, 8, 2
 emb_dropout, blk_dropout, lr = 0.1, 0.1, 0.1
 model = ViT(img_size, patch_size, num_hiddens, mlp_num_hiddens, num_heads,
-            num_layers, emb_dropout, blk_dropout, lr)
+            num_blks, emb_dropout, blk_dropout, lr)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(img_size, img_size))
 trainer.fit(model, data)

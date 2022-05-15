@@ -78,7 +78,7 @@ We implement the following `load_pretrained_model` function to [**load pretraine
 ```{.python .input}
 #@tab mxnet
 def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
-                          num_heads, num_layers, dropout, max_len, devices):
+                          num_heads, num_blks, dropout, max_len, devices):
     data_dir = d2l.download_extract(pretrained_model)
     # Define an empty vocabulary to load the predefined vocabulary
     vocab = d2l.Vocab()
@@ -86,7 +86,7 @@ def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
     vocab.token_to_idx = {token: idx for idx, token in enumerate(
         vocab.idx_to_token)}
     bert = d2l.BERTModel(len(vocab), num_hiddens, ffn_num_hiddens, num_heads, 
-                         num_layers, dropout, max_len)
+                         num_blks, dropout, max_len)
     # Load pretrained BERT parameters
     bert.load_parameters(os.path.join(data_dir, 'pretrained.params'),
                          ctx=devices)
@@ -96,17 +96,16 @@ def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
 ```{.python .input}
 #@tab pytorch
 def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
-                          num_heads, num_layers, dropout, max_len, devices):
+                          num_heads, num_blks, dropout, max_len, devices):
     data_dir = d2l.download_extract(pretrained_model)
     # Define an empty vocabulary to load the predefined vocabulary
     vocab = d2l.Vocab()
     vocab.idx_to_token = json.load(open(os.path.join(data_dir, 'vocab.json')))
     vocab.token_to_idx = {token: idx for idx, token in enumerate(
         vocab.idx_to_token)}
-    bert = d2l.BERTModel(len(vocab), num_hiddens, norm_shape=[256],
-                         ffn_num_hiddens=ffn_num_hiddens,
-                         num_heads=4, num_layers=2, dropout=0.2,
-                         max_len=max_len)
+    bert = d2l.BERTModel(
+        len(vocab), num_hiddens, ffn_num_hiddens=ffn_num_hiddens, num_heads=4,
+        num_blks=2, dropout=0.2, max_len=max_len)
     # Load pretrained BERT parameters
     bert.load_state_dict(torch.load(os.path.join(data_dir,
                                                  'pretrained.params')))
@@ -122,7 +121,7 @@ In the exercise, we will show how to fine-tune the much larger "bert.base" to si
 devices = d2l.try_all_gpus()
 bert, vocab = load_pretrained_model(
     'bert.small', num_hiddens=256, ffn_num_hiddens=512, num_heads=4,
-    num_layers=2, dropout=0.1, max_len=512, devices=devices)
+    num_blks=2, dropout=0.1, max_len=512, devices=devices)
 ```
 
 ## [**The Dataset for Fine-Tuning BERT**]
@@ -390,7 +389,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 
 ## Exercises
 
-1. Fine-tune a much larger pretrained BERT model that is about as big as the original BERT base model if your computational resource allows. Set arguments in the `load_pretrained_model` function as: replacing 'bert.small' with 'bert.base', increasing values of `num_hiddens=256`, `ffn_num_hiddens=512`, `num_heads=4`, and `num_layers=2` to 768, 3072, 12, and 12, respectively. By increasing fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.86?
+1. Fine-tune a much larger pretrained BERT model that is about as big as the original BERT base model if your computational resource allows. Set arguments in the `load_pretrained_model` function as: replacing 'bert.small' with 'bert.base', increasing values of `num_hiddens=256`, `ffn_num_hiddens=512`, `num_heads=4`, and `num_blks=2` to 768, 3072, 12, and 12, respectively. By increasing fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.86?
 1. How to truncate a pair of sequences according to their ratio of length? Compare this pair truncation method and the one used in the `SNLIBERTDataset` class. What are their pros and cons?
 
 :begin_tab:`mxnet`
