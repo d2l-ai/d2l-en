@@ -115,11 +115,10 @@ class ViT(d2l.Classifier):
 
 ```{.python .input}
 img_size, patch_size = 96, 16
-num_hiddens, mlp_num_hiddens, num_heads, num_layers = 768, 512, 4, 4
+num_hiddens, mlp_num_hiddens, num_heads, num_layers = 512, 2048, 8, 2
 emb_dropout, blk_dropout, lr = 0.1, 0.1, 0.1
 model = ViT(img_size, patch_size, num_hiddens, mlp_num_hiddens, num_heads,
             num_layers, emb_dropout, blk_dropout, lr)
-model.board.ylim=[0, 1]
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(img_size, img_size))
 trainer.fit(model, data)
