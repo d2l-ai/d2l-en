@@ -1,4 +1,4 @@
-# Attention Mechanisms
+# Attention and Transformers
 :label:`chap_attention`
 
 The optic nerve of a primate's visual system
