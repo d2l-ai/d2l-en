@@ -77,31 +77,50 @@ d2l.check_shape(encoder_blk(X), X.shape)
 ```{.python .input}
 class ViT(d2l.Classifier):
     """Vision transformer."""
-    def __init__(self, vocab_size, num_hiddens, norm_shape, mlp_num_hiddens,
-                 num_heads, num_layers, dropout, use_bias=False):
+    def __init__(self, img_size, patch_size, num_hiddens, mlp_num_hiddens,
+                 num_heads, num_layers, emb_dropout, blk_dropout, lr=0.1,
+                 use_bias=False, num_classes=10):
         super().__init__()
-        self.patch_emb = PatchEmbedding(img_size, patch_size, num_hiddens)
+        self.save_hyperparameters()
+        self.patch_embedding = PatchEmbedding(
+            img_size, patch_size, num_hiddens)
+        self.cls_token = nn.Parameter(d2l.zeros(1, 1, num_hiddens))
+        num_steps = self.patch_embedding.num_patches + 1  # Add the cls token
         
-        self.blks = nn.Sequential()
-        for i in range(num_layers):
-            self.blks.add_module(f"{i}", ViTBlock(num_hiddens,
-                 norm_shape, mlp_num_hiddens, num_heads, dropout, use_bias))
         # In vision transformer, positional embeddings are learnable
         self.pos_embedding = nn.Parameter(
-            torch.randn(1, max_len, num_hiddens))
+            torch.randn(1, num_steps, num_hiddens))
+        self.dropout = nn.Dropout(emb_dropout)
+        self.blks = nn.Sequential()
+        for i in range(num_layers):
+            self.blks.add_module(f"{i}", ViTBlock(
+                num_hiddens, [num_steps, num_hiddens], mlp_num_hiddens,
+                num_heads, blk_dropout, use_bias))
+        self.head = nn.Sequential(nn.LayerNorm(num_hiddens),
+                                  nn.Linear(num_hiddens, num_classes))
+        self.patch_embedding.apply(d2l.init_cnn)
+        self.blks.apply(d2l.init_cnn)
+        self.head.apply(d2l.init_cnn)
 
     def forward(self, X):
-        X = X + self.pos_embedding[:, :X.shape[1], :]
+        X = self.patch_embedding(X)
+        X = d2l.concat((self.cls_token.expand(X.shape[0], -1, -1), X), 1)
+        X = self.dropout(X + self.pos_embedding)
         for blk in self.blks:
             X = blk(X)
-        return X
+        return self.head(X[:, 0])
 ```
 
 ## Training
 
 ```{.python .input}
-#model = VisionTransformer(lr=0.05)
-#trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
-#data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
-#trainer.fit(model, data)
+img_size, patch_size = 96, 16
+num_hiddens, mlp_num_hiddens, num_heads, num_layers = 768, 512, 4, 4
+emb_dropout, blk_dropout, lr = 0.1, 0.1, 0.1
+model = ViT(img_size, patch_size, num_hiddens, mlp_num_hiddens, num_heads,
+            num_layers, emb_dropout, blk_dropout, lr)
+model.board.ylim=[0, 1]
+trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
+data = d2l.FashionMNIST(batch_size=128, resize=(img_size, img_size))
+trainer.fit(model, data)
 ```
