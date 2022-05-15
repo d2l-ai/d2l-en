@@ -98,9 +98,6 @@ class ViT(d2l.Classifier):
                 num_heads, blk_dropout, use_bias))
         self.head = nn.Sequential(nn.LayerNorm(num_hiddens),
                                   nn.Linear(num_hiddens, num_classes))
-        self.patch_embedding.apply(d2l.init_cnn)
-        self.blks.apply(d2l.init_cnn)
-        self.head.apply(d2l.init_cnn)
 
     def forward(self, X):
         X = self.patch_embedding(X)
