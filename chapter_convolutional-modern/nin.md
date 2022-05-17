@@ -146,7 +146,7 @@ NiN's training is similar to that for AlexNet and VGG.
 
 ```{.python .input}
 %%tab all
-model = NiN(lr=0.01)
+model = NiN(lr=0.03)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
 if tab.selected('pytorch'):
