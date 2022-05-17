@@ -360,7 +360,7 @@ We train ResNet on the Fashion-MNIST dataset, just like before.
 
 ```{.python .input}
 %%tab mxnet, pytorch
-model = ResNet18(lr=0.01)
+model = ResNet18(lr=0.03)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 if tab.selected('pytorch'):
@@ -373,7 +373,7 @@ trainer.fit(model, data)
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 with d2l.try_gpu():
-    model = ResNet18(lr=0.01)
+    model = ResNet18(lr=0.03)
     trainer.fit(model, data)
 ```
 
