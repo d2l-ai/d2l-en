@@ -511,6 +511,7 @@ class ResNeXtBlock(nn.Module):  #@save
 ```
 
 ```{.python .input}
+%%tab tensorflow
 class ResNeXtBlock(tf.keras.Model):  #@save
     """The ResNeXt block.""" 
     def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False, 
