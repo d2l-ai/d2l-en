@@ -381,16 +381,19 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-## ResNeXt Blocks
+## ResNeXt
 :label:`subsec_resnext`
 
-ResNeXt blocks extend the residual block design (:numref:`subsec_residual-blks`)
-by adding
-concatenated parallel transformations
+Recall :numref:`fig_resnet_block` 
+that each ResNet block simply stacks layers between skip connections.
+This design can be varied
+by replacing stacked layers with
+concatenated parallel transformations,
+leading to ResNeXt
 :cite:`Xie.Girshick.Dollar.ea.2017`.
-Different from a variety of transformations
+Different from *a variety of* transformations
 in multi-branch Inception blocks,
-ResNeXt adopts the same transformation in all branches,
+ResNeXt adopts the *same* transformation in all branches,
 thus minimizing manual design efforts in each branch.
 
 ![The ResNeXt block. It is a bottleneck (when $b < c$) residual block with group convolution ($g$ groups).](../img/resnext-block.svg)
@@ -441,8 +444,6 @@ halves the input height and width.
 
 ```{.python .input}
 %%tab mxnet
-
-
 class ResNeXtBlock(nn.Block):  #@save
     """The ResNeXt block."""
     def __init__(self, num_channels, groups, bot_mul,
@@ -531,13 +532,11 @@ if tab.selected('mxnet'):
 blk(X).shape
 ```
 
-## Summary
+## Summary and Discussion
 
-* Nested function classes are desirable. Learning an additional layer in deep neural networks as an identity function (though this is an extreme case) should be made easy.
-* The residual mapping can learn the identity function more easily, such as pushing parameters in the weight layer to zero.
-* We can train an effective deep neural network by having residual blocks. Inputs can forward propagate faster through the residual connections across layers.
-* ResNet had a major influence on the design of subsequent deep neural networks, both for convolutional and sequential nature.
+Nested function classes are desirable. Learning an additional layer in deep neural networks as an identity function (though this is an extreme case) should be made easy. The residual mapping can learn the identity function more easily, such as pushing parameters in the weight layer to zero. We can train an effective *deep* neural network by having residual blocks. Inputs can forward propagate faster through the residual connections across layers.
 
+ResNet (and ResNeXt) had a major influence on the design of subsequent deep neural networks, both for convolutional and sequential nature.
 A key advantage of the ResNeXt design
 is that increasing groups
 leads to sparser connections (i.e., lower computational complexity) within the block,
@@ -546,8 +545,8 @@ to achieve a better tradeoff between
 FLOPs and accuracy.
 ResNeXt-ification
 is appealing in convolution network design
-and we will evaluate models based on the ResNeXt block
-later.
+and we will apply this ResNeXt block to our
+later model design.
 
 
 

@@ -67,12 +67,8 @@ from the initial *AnyNet* design space.
 It then proceeds to discover design principles (like in manual design)
 that lead to simple and regular networks: *RegNets*.
 Before shedding light on these design principles,
-we need to define
-the initial AnyNet design space.
-It starts with networks with
-standard, fixed network blocks:
-ResNeXt blocks.
-
+let's start with
+the initial design space.
 
 
 
@@ -85,7 +81,7 @@ The initial design space is called *AnyNet*,
 a relatively unconstrained design space,
 where we can focus on
 exploring network structure
-assuming standard, fixed blocks such as ResNeXt.
+assuming standard, fixed blocks such as ResNeXt (:numref:`subsec_resnext`).
 Specifically,
 the network structure
 includes
