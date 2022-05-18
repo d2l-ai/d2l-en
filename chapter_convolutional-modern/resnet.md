@@ -92,7 +92,7 @@ a special case of the multi-branch Inception block:
 it has two branches
 one of which is the identity mapping.
 
-![A regular block (left) and a residual block (right).](../img/residual-block.svg)
+![In a regular block (left), the portion within the dotted-line box must directly learn the mapping $f(\mathbf{x})$. In a residual block (right), the portion within the dotted-line box needs to learn the residual mapping $f(\mathbf{x}) - \mathbf{x}$, where the identity mapping $f(\mathbf{x}) = \mathbf{x}$ is easier to learn.](../img/residual-block.svg)
 :label:`fig_residual_block`
 
 
@@ -189,12 +189,12 @@ class Residual(tf.keras.Model):  #@save
         return tf.keras.activations.relu(Y)
 ```
 
-This code generates two types of networks: one where we add the input to the output before applying the ReLU nonlinearity whenever `use_1x1conv=False`, and one where we adjust channels and resolution by means of a $1 \times 1$ convolution before adding. :numref:`fig_resnet_block` illustrates this:
+This code generates two types of networks: one where we add the input to the output before applying the ReLU nonlinearity whenever `use_1x1conv=False`, and one where we adjust channels and resolution by means of a $1 \times 1$ convolution before adding. :numref:`fig_resnet_block` illustrates this.
 
-![ResNet block with and without $1 \times 1$ convolution.](../img/resnet-block.svg)
+![ResNet block with and without $1 \times 1$ convolution, which transforms the input into the desired shape for the addition operation.](../img/resnet-block.svg)
 :label:`fig_resnet_block`
 
-Now let's look at [**a situation where the input and output are of the same shape**].
+Now let's look at [**a situation where the input and output are of the same shape**], where $1 \times 1$ convolution is not needed.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -216,6 +216,7 @@ Y.shape
 ```
 
 We also have the option to [**halve the output height and width while increasing the number of output channels**].
+Since the input shape is changed, `use_1x1conv=True` is specified.
 
 ```{.python .input}
 %%tab all
