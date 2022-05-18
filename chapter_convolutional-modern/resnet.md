@@ -510,10 +510,41 @@ class ResNeXtBlock(nn.Module):  #@save
         return F.relu(Y + X)
 ```
 
+```{.python .input}
+class ResNeXtBlock(tf.keras.Model):  #@save
+    """The ResNeXt block.""" 
+    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False, 
+                 strides=1):
+        super().__init__()
+        bot_channels = int(round(num_channels * bot_mul))
+        self.conv1 = tf.keras.layers.Conv2D(bot_channels, 1, strides=1)
+        self.conv2 = tf.keras.layers.Conv2D(bot_channels, 3, strides=strides,
+                                            padding="same",
+                                            groups=bot_channels//groups)
+        self.conv3 = tf.keras.layers.Conv2D(num_channels, 1, strides=1)
+        self.bn1 = tf.keras.layers.BatchNormalization()
+        self.bn2 = tf.keras.layers.BatchNormalization()
+        self.bn3 = tf.keras.layers.BatchNormalization()
+        if use_1x1conv:
+            self.conv4 = tf.keras.layers.Conv2D(num_channels, 1, 
+                                       strides=strides)
+            self.bn4 = tf.keras.layers.BatchNormalization()
+        else:
+            self.conv4 = None
+        
+    def call(self, X):
+        Y = tf.keras.activations.relu(self.bn1(self.conv1(X)))
+        Y = tf.keras.activations.relu(self.bn2(self.conv2(Y)))
+        Y = self.bn3(self.conv3(Y))
+        if self.conv4:
+            X = self.bn4(self.conv4(X))
+        return tf.keras.activations.relu(Y + X)
+```
+
 In the following case (`use_1x1conv=False, strides=1`), the input and output are of the same shape.
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
 blk = ResNeXtBlock(32, 16, 1)
 if tab.selected('mxnet'):
     blk.initialize()
@@ -521,15 +552,31 @@ X = d2l.randn(4, 32, 96, 96)
 blk(X).shape
 ```
 
+```{.python .input}
+%%tab tensorflow
+blk = ResNeXtBlock(32, 16, 1)
+X = d2l.normal((4, 96, 96, 32))
+Y = blk(X)
+Y.shape
+```
+
 Alternatively, setting `use_1x1conv=True, strides=2`
 halves the output height and width.
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
 blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
 if tab.selected('mxnet'):
     blk.initialize()
 blk(X).shape
+```
+
+```{.python .input}
+%%tab tensorflow
+blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
+X = d2l.normal((4, 96, 96, 32))
+Y = blk(X)
+Y.shape
 ```
 
 ## Summary and Discussion
