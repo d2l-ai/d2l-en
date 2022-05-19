@@ -3,7 +3,7 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-# Transformers
+# Transformer
 :label:`sec_transformer`
 
 

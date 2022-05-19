@@ -1,4 +1,4 @@
-# Vision Transformers
+# Vision Transformer
 :label:`sec_vision-transformer`
 
 ```{.python .input  n=1}

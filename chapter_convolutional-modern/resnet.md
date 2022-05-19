@@ -3,7 +3,7 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Residual Networks (ResNet)
+# Residual Networks (ResNet) and ResNeXt
 :label:`sec_resnet`
 
 As we design increasingly deeper networks it becomes imperative to understand how adding layers can increase the complexity and expressiveness of the network.
@@ -385,7 +385,7 @@ with d2l.try_gpu():
 :label:`subsec_resnext`
 
 Recall :numref:`fig_resnet_block` 
-that each ResNet block simply stacks layers between skip connections.
+that each ResNet block simply stacks layers between residual connections.
 This design can be varied
 by replacing stacked layers with
 concatenated parallel transformations,
@@ -584,7 +584,12 @@ Y.shape
 
 Nested function classes are desirable. Learning an additional layer in deep neural networks as an identity function (though this is an extreme case) should be made easy. The residual mapping can learn the identity function more easily, such as pushing parameters in the weight layer to zero. We can train an effective *deep* neural network by having residual blocks. Inputs can forward propagate faster through the residual connections across layers.
 
-ResNet (and ResNeXt) had a major influence on the design of subsequent deep neural networks, both for convolutional and sequential nature.
+Residual connections had a major influence on the design of subsequent deep neural networks, both for convolutional and sequential nature.
+As we will introduce later,
+the transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017`
+adopts residual connections (together with other design choices) and is pervasive
+in areas as diverse as 
+language, vision, speech, and reinforcement learning.
 A key advantage of the ResNeXt design
 is that increasing groups
 leads to sparser connections (i.e., lower computational complexity) within the block,
@@ -592,9 +597,10 @@ thus enabling an increase of network width
 to achieve a better tradeoff between
 FLOPs and accuracy.
 ResNeXt-ification
-is appealing in convolution network design
-and we will apply this ResNeXt block to our
-later model design.
+is appealing in later convolution network design,
+such as in the RegNet model :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`
+and the ConvNeXt architecture :cite:`liu2022convnet`.
+We will apply the ResNeXt block later in this chapter.
 
 
 
