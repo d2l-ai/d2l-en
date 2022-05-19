@@ -113,6 +113,37 @@ d2l.plt.title(f'sample mean: {float(tf.reduce_mean(xs).numpy()):.2f}')
 d2l.plt.show()
 ```
 
+```{.python .input}
+#@tab jax
+import jax.numpy as jnp
+import jax.random as random
+from d2l import jax as d2l
+
+key = random.PRNGKey(42)
+key, subkey = key.split(key)
+
+# Sample datapoints and create y coordinate
+epsilon = 0.1
+xs = random.normal(subkey, (300,))
+
+ys = jnp.array(
+    [(jnp.sum(jnp.exp(-(xs[:i] - xs[i])**2 / (2 * epsilon**2)) \
+               / jnp.sqrt(2*jnp.pi*epsilon**2)) / jnp.size(xs)) \
+     for i in range(jnp.size(xs))])
+
+# Compute true density
+xd = jnp.arange(jnp.min(xs), jnp.max(xs), 0.01)
+yd = jnp.exp(-xd**2/2) / jnp.sqrt(2 * jnp.pi)
+
+# Plot the results
+d2l.plot(xd, yd, 'x', 'density')
+d2l.plt.scatter(xs, ys)
+d2l.plt.axvline(x=0)
+d2l.plt.axvline(x=jnp.mean(xs), linestyle='--', color='purple')
+d2l.plt.title(f'sample mean: {float(jnp.mean(xs)):.2f}')
+d2l.plt.show()
+```
+
 There can be many ways to compute an estimator of a parameter $\hat{\theta}_n$.  In this section, we introduce three common methods to evaluate and compare estimators: the mean squared error, the standard deviation, and statistical bias.
 
 ### Mean Squared Error
@@ -206,6 +237,17 @@ def mse(data, true_theta):
     return(tf.reduce_mean(tf.square(data - true_theta)))
 ```
 
+```{.python .input}
+#@tab jax
+# Statistical bias
+def stat_bias(true_theta, est_theta):
+    return(jnp.mean(est_theta) - true_theta)
+
+# Mean squared error
+def mse(data, true_theta):
+    return(jnp.mean(jnp.square(data - true_theta)))
+```
+
 To illustrate the equation of the bias-variance trade-off, let's simulate of normal distribution $\mathcal{N}(\theta, \sigma^2)$ with $10,000$ samples. Here, we use a $\theta = 1$ and $\sigma = 4$. As the estimator is a function of the given samples, here we use the mean of the samples as an estimator for true $\theta$ in this normal distribution $\mathcal{N}(\theta, \sigma^2)$ .
 
 ```{.python .input}
@@ -238,6 +280,18 @@ theta_est = tf.reduce_mean(samples)
 theta_est
 ```
 
+```{.python .input}
+#@tab jax
+key, subkey = random.split(key)
+
+theta_true = 1
+sigma = 4
+sample_len = 10000
+samples = random.normal(subkey, (sample_len, 1)) * sigma + theta_true
+theta_est = jnp.mean(samples)
+theta_est
+```
+
 Let's validate the trade-off equation by calculating the summation of the squared bias and the variance of our estimator. First, calculate the MSE of our estimator.
 
 ```{.python .input}
@@ -263,6 +317,12 @@ torch.square(samples.std(unbiased=False)) + torch.square(bias)
 #@tab tensorflow
 bias = stat_bias(theta_true, theta_est)
 tf.square(tf.math.reduce_std(samples)) + tf.square(bias)
+```
+
+```{.python .input}
+#@tab jax
+bias = stat_bias(theta_true, theta_est)
+jnp.square(jnp.std(samples)) + jnp.square(bias)
 ```
 
 ## Conducting Hypothesis Tests
@@ -471,6 +531,24 @@ mu_hat = tf.reduce_mean(samples)
 sigma_hat = tf.math.reduce_std(samples)
 (mu_hat - t_star*sigma_hat/tf.sqrt(tf.constant(N, dtype=tf.float32)), \
  mu_hat + t_star*sigma_hat/tf.sqrt(tf.constant(N, dtype=tf.float32)))
+```
+
+```{.python .input}
+#@tab jax
+# Number of samples
+N = 1000
+
+# Sample dataset
+samples = random.normal(key, (N,)) * 1 + 0
+
+# Lookup Students's t-distribution c.d.f.
+t_star = 1.96
+
+# Construct interval
+mu_hat = jnp.mean(samples)
+sigma_hat = jnp.std(samples)
+(mu_hat - t_star*sigma_hat/jnp.sqrt(jnp.array(N)), \
+ mu_hat + t_star*sigma_hat/jnp.sqrt(jnp.array(N)))
 ```
 
 ## Summary

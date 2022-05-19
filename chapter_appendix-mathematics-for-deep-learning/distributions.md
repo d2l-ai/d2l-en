@@ -35,6 +35,18 @@ import tensorflow_probability as tfp
 tf.pi = tf.acos(tf.zeros(1)) * 2  # Define pi in TensorFlow
 ```
 
+```{.python .input}
+#@tab jax
+%matplotlib inline
+from math import erf, factorial
+import jax.numpy as jnp
+from jax import random
+from IPython import display
+from d2l import jax as d2l
+
+key = random.PRNGKey(42)
+```
+
 ## Bernoulli
 
 This is the simplest random variable usually encountered.  This random variable encodes a coin flip which comes up $1$ with probability $p$ and $0$ with probability $1-p$.  If we have a random variable $X$ with this distribution, we will write
@@ -93,6 +105,16 @@ def F(x):
 d2l.plot(x, tf.constant([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
+```{.python .input}
+#@tab jax
+x = jnp.arange(-1, 2, 0.01)
+
+def F(x):
+    return 0 if x < 0 else 1 if x > 1 else 1 - p
+
+d2l.plot(x, jnp.array([F(y) for y in x]), 'x', 'c.d.f.')
+```
+
 If $X \sim \mathrm{Bernoulli}(p)$, then:
 
 * $\mu_X = p$,
@@ -113,6 +135,13 @@ We can sample an array of arbitrary shape from a Bernoulli random variable as fo
 ```{.python .input}
 #@tab tensorflow
 tf.cast(tf.random.uniform((10, 10)) < p, dtype=tf.float32)
+```
+
+```{.python .input}
+#@tab jax
+key, subkey = random.split(key)
+
+(random.uniform(subkey, (10, 10)) < p).astype(jnp.int8)
 ```
 
 ## Discrete Uniform
@@ -172,6 +201,16 @@ def F(x):
 d2l.plot(x, [F(y) for y in x], 'x', 'c.d.f.')
 ```
 
+```{.python .input}
+#@tab jax
+x = jnp.arange(-1, 6, 0.01)
+
+def F(x):
+    return 0 if x < 1 else 1 if x > n else jnp.floor(x) / n
+
+d2l.plot(x, [F(y) for y in x], 'x', 'c.d.f.')
+```
+
 If $X \sim U(n)$, then:
 
 * $\mu_X = \frac{1+n}{2}$,
@@ -192,6 +231,13 @@ torch.randint(1, n, size=(10, 10))
 ```{.python .input}
 #@tab tensorflow
 tf.random.uniform((10, 10), 1, n, dtype=tf.int32)
+```
+
+```{.python .input}
+#@tab jax
+key, subkey = random.split(key)
+
+random.uniform(subkey, (10, 10), minval=1, maxval=n).astype(jnp.int8)
 ```
 
 ## Continuous Uniform
@@ -242,6 +288,15 @@ p = tf.cast(x > a, tf.float32) * tf.cast(x < b, tf.float32) / (b - a)
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
+```{.python .input}
+#@tab jax
+a, b = 1, 3
+
+x = jnp.arange(0, 4, 0.01)
+p = (x > a).astype(jnp.float32) * (x < b).astype(jnp.float32) / (b - a)
+d2l.plot(x, p, 'x', 'p.d.f.')
+```
+
 Now, let's plot the cumulative distribution function :eqref:`eq_cont_uniform_cdf`.
 
 ```{.python .input}
@@ -261,7 +316,7 @@ d2l.plot(x, torch.tensor([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
 ```{.python .input}
-#@tab tensorflow
+#@tab tensorflow jax
 def F(x):
     return 0 if x < a else 1 if x > b else (x - a) / (b - a)
 
@@ -288,6 +343,13 @@ We can sample an array of arbitrary shape from a uniform random variable as foll
 ```{.python .input}
 #@tab tensorflow
 (b - a) * tf.random.uniform((10, 10)) + a
+```
+
+```{.python .input}
+#@tab jax
+key, subkey = random.split(key)
+
+(b - a) * random.uniform(subkey, (10, 10)) + a
 ```
 
 ## Binomial
@@ -370,6 +432,25 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
+```{.python .input}
+#@tab jax
+n, p = 10, 0.2
+
+# Compute binomial coefficient
+def binom(n, k):
+    comb = 1
+    for i in range(min(k, n - k)):
+        comb = comb * (n - i) // (i + 1)
+    return comb
+
+pmf = jnp.array([p**i * (1-p)**(n - i) * binom(n, i) for i in range(n + 1)])
+
+d2l.plt.stem([i for i in range(n + 1)], pmf, use_line_collection=True)
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('p.m.f.')
+d2l.plt.show()
+```
+
 Now, let's plot the cumulative distribution function :eqref:`eq_binomial_cdf`.
 
 ```{.python .input}
@@ -405,6 +486,17 @@ def F(x):
 d2l.plot(x, [F(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
 ```
 
+```{.python .input}
+#@tab jax
+x = jnp.arange(-1, 11, 0.01)
+cmf = jnp.cumsum(pmf)
+
+def F(x):
+    return 0 if x < 0 else 1 if x > n else cmf[int(x)]
+
+d2l.plot(x, [F(y) for y in x], 'x', 'c.d.f.')
+```
+
 If $X \sim \mathrm{Binomial}(n, p)$, then:
 
 * $\mu_X = np$,
@@ -427,6 +519,11 @@ m.sample(sample_shape=(10, 10))
 #@tab tensorflow
 m = tfp.distributions.Binomial(n, p)
 m.sample(sample_shape=(10, 10))
+```
+
+```{.python .input}
+#@tab jax
+# JAX doesn't have a built-in function for binomial distribution
 ```
 
 ## Poisson
@@ -504,6 +601,23 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
+```{.python .input}
+#@tab jax
+# Enable double-precision (64-bit, e.g. float64)
+from jax import config
+config.update('jax_enable_x64', True)
+
+lam = 5.0
+
+xs = [i for i in range(20)]
+pmf = jnp.array([jnp.exp(-lam) * lam**k / factorial(k) for k in xs])
+
+d2l.plt.stem(xs, pmf, use_line_collection=True)
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('p.m.f.')
+d2l.plt.show()
+```
+
 Now, let's plot the cumulative distribution function :eqref:`eq_poisson_cdf`.
 
 ```{.python .input}
@@ -536,6 +650,16 @@ def F(x):
 d2l.plot(x, [F(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
 ```
 
+```{.python .input}
+#@tab jax
+x = jnp.arange(-1, 21, 0.01)
+cmf = jnp.cumsum(pmf)
+def F(x):
+    return 0 if x < 0 else 1 if x > n else cmf[int(x)]
+
+d2l.plot(x, [F(y) for y in x], 'x', 'c.d.f.')
+```
+
 As we saw above, the means and variances are particularly concise.  If $X \sim \mathrm{Poisson}(\lambda)$, then:
 
 * $\mu_X = \lambda$,
@@ -558,6 +682,13 @@ m.sample((10, 10))
 #@tab tensorflow
 m = tfp.distributions.Poisson(lam)
 m.sample((10, 10))
+```
+
+```{.python .input}
+#@tab jax
+key, subkey = random.split(key)
+
+random.poisson(subkey, lam, (10, 10))
 ```
 
 ## Gaussian
@@ -629,6 +760,26 @@ for i in range(4):
 d2l.plt.show()
 ```
 
+```{.python .input}
+#@tab jax
+p = 0.2
+ns = [1, 10, 100, 1000]
+d2l.plt.figure(figsize=(10, 3))
+for i in range(4):
+    n = ns[i]
+    pmf = jnp.array([p**i * (1-p)**(n-i) * binom(n, i)
+                        for i in range(n + 1)])
+    d2l.plt.subplot(1, 4, i + 1)
+    d2l.plt.stem([(i - n*p)/jnp.sqrt(jnp.array(n*p*(1 - p)))
+                  for i in range(n + 1)], pmf,
+                 use_line_collection=True)
+    d2l.plt.xlim([-4, 4])
+    d2l.plt.xlabel('x')
+    d2l.plt.ylabel('p.m.f.')
+    d2l.plt.title("n = {}".format(n))
+d2l.plt.show()
+```
+
 One thing to note: compared to the Poisson case, we are now dividing by the standard deviation which means that we are squeezing the possible outcomes into smaller and smaller areas.  This is an indication that our limit will no longer be discrete, but rather continuous.
 
 A derivation of what occurs is beyond the scope of this document, but the *central limit theorem* states that as $n \rightarrow \infty$, this will yield the Gaussian Distribution (or sometimes normal distribution).  More explicitly, for any $a, b$:
@@ -676,6 +827,17 @@ p = 1 / tf.sqrt(2 * tf.pi * sigma**2) * tf.exp(
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
+```{.python .input}
+#@tab jax
+mu, sigma = 0, 1
+
+x = jnp.arange(-3, 3, 0.01)
+p = 1 / jnp.sqrt(2 * jnp.pi * sigma**2) * jnp.exp(
+    -(x - mu)**2 / (2 * sigma**2))
+
+d2l.plot(x, p, 'x', 'p.d.f.')
+```
+
 Now, let's plot the cumulative distribution function.  It is beyond the scope of this appendix, but the Gaussian c.d.f. does not have a closed-form formula in terms of more elementary functions.  We will use `erf` which provides a way to compute this integral numerically.
 
 ```{.python .input}
@@ -700,6 +862,14 @@ def phi(x):
     return (1.0 + erf((x - mu) / (sigma * tf.sqrt(tf.constant(2.))))) / 2.0
 
 d2l.plot(x, [phi(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
+```
+
+```{.python .input}
+#@tab jax
+def phi(x):
+    return (1.0 + erf((x - mu) / (sigma * jnp.sqrt(jnp.array(2.))))) / 2.0
+
+d2l.plot(x, [phi(y) for y in x], 'x', 'c.d.f.')
 ```
 
 Keen-eyed readers will recognize some of these terms.  Indeed, we encountered this integral in :numref:`sec_integral_calculus`.  Indeed we need exactly that computation to see that this $p_X(x)$ has total area one and is thus a valid density.
@@ -742,6 +912,11 @@ torch.normal(mu, sigma, size=(10, 10))
 ```{.python .input}
 #@tab tensorflow
 tf.random.normal((10, 10), mu, sigma)
+```
+
+```{.python .input}
+#@tab jax
+mu + sigma * random.normal(key, (10, 10))
 ```
 
 ## Exponential Family

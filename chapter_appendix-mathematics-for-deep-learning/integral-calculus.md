@@ -60,6 +60,23 @@ d2l.plt.fill_between(x.numpy(), f.numpy())
 d2l.plt.show()
 ```
 
+```{.python .input}
+#@tab jax
+%matplotlib inline
+import jax.numpy as jnp
+from IPython import display
+from mpl_toolkits import mplot3d
+from d2l import jax as d2l
+
+x = jnp.arange(-2, 2, 0.01)
+f = jnp.exp(-x**2)
+
+d2l.set_figsize()
+d2l.plt.plot(x, f, color='black')
+d2l.plt.fill_between(x, f)
+d2l.plt.show()
+```
+
 In most cases, this area will be infinite or undefined (consider the area under $f(x) = x^{2}$), so people will often talk about the area between a pair of ends, say $a$ and $b$.
 
 ```{.python .input}
@@ -92,6 +109,17 @@ f = tf.exp(-x**2)
 d2l.set_figsize()
 d2l.plt.plot(x, f, color='black')
 d2l.plt.fill_between(x.numpy()[50:250], f.numpy()[50:250])
+d2l.plt.show()
+```
+
+```{.python .input}
+#@tab jax
+x = jnp.arange(-2, 2, 0.01)
+f = jnp.exp(-x**2)
+
+d2l.set_figsize()
+d2l.plt.plot(x, f, color='black')
+d2l.plt.fill_between(x[50:250], f[50:250])
 d2l.plt.show()
 ```
 
@@ -162,6 +190,27 @@ f = x / (1 + x**2)
 
 approx = tf.reduce_sum(epsilon*f)
 true = tf.math.log(tf.constant([5.])) / 2
+
+d2l.set_figsize()
+d2l.plt.bar(x, f, width=epsilon, align='edge')
+d2l.plt.plot(x, f, color='black')
+d2l.plt.ylim([0, 1])
+d2l.plt.show()
+
+f'approximation: {approx}, truth: {true}'
+```
+
+```{.python .input}
+#@tab jax
+epsilon = 0.05
+a = 0
+b = 2
+
+x = jnp.arange(a, b, epsilon)
+f = x / (1 + x**2)
+
+approx = jnp.sum(epsilon*f)
+true = jnp.log(jnp.array([5.])) / 2
 
 d2l.set_figsize()
 d2l.plt.bar(x, f, width=epsilon, align='edge')
@@ -393,6 +442,26 @@ ax.dist = 12
 # Construct grid and compute function
 x, y = tf.meshgrid(tf.linspace(-2., 2., 101), tf.linspace(-2., 2., 101))
 z = tf.exp(- x**2 - y**2)
+
+# Plot function
+ax = d2l.plt.figure().add_subplot(111, projection='3d')
+ax.plot_wireframe(x, y, z)
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('y')
+d2l.plt.xticks([-2, -1, 0, 1, 2])
+d2l.plt.yticks([-2, -1, 0, 1, 2])
+d2l.set_figsize()
+ax.set_xlim(-2, 2)
+ax.set_ylim(-2, 2)
+ax.set_zlim(0, 1)
+ax.dist = 12
+```
+
+```{.python .input}
+#@tab jax
+# Construct grid and compute function
+x, y = jnp.meshgrid(jnp.linspace(-2., 2., 101), jnp.linspace(-2., 2., 101))
+z = jnp.exp(- x**2 - y**2)
 
 # Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
