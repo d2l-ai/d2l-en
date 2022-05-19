@@ -147,7 +147,7 @@ class NiN(d2l.Classifier):
                 nin_block(96, kernel_size=11, strides=4, padding='valid'),
                 tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
                 nin_block(256, kernel_size=5, strides=1, padding='same'),
-                tf.keras.layers.MaxPool2D(pool_size=3, strides=(2, 2)),
+                tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
                 nin_block(384, kernel_size=3, strides=1, padding='same'),
                 tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
                 tf.keras.layers.Dropout(0.5),
