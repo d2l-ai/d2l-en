@@ -67,232 +67,13 @@ from the initial *AnyNet* design space.
 It then proceeds to discover design principles (like in manual design)
 that lead to simple and regular networks: *RegNets*.
 Before shedding light on these design principles,
-we need to define
-the initial AnyNet design space.
-It starts with networks with
-standard, fixed network blocks:
-ResNeXt blocks.
+let's start with
+the initial design space.
 
 
 
-## ResNeXt Blocks
 
-ResNeXt blocks extend the residual block design (:numref:`subsec_residual-blks`)
-by adding
-concatenated parallel transformations
-:cite:`Xie.Girshick.Dollar.ea.2017`.
-Different from a variety of transformations
-in multi-branch Inception blocks,
-ResNeXt adopts the same transformation in all branches,
-thus minimizing manual design efforts in each branch.
 
-![The ResNeXt block. It is a bottleneck (when $b < c$) residual block with group convolution ($g$ groups).](../img/resnext-block.svg)
-:label:`fig_resnext_block`
-
-The left dotted box in
-:numref:`fig_resnext_block`
-depicts the added concatenated parallel transformation
-strategy in ResNeXt.
-More concretely,
-an input with $c$ channels
-is first split into $g$ groups
-via $g$ branches of $1 \times 1$ convolutions
-followed by $3 \times 3$ convolutions,
-all with $b/g$ output channels.
-Concatenating these $g$ outputs
-results in $b$ output channels,
-leading to "bottlenecked" (when $b < c$) network width
-inside the dashed box.
-This output
-will restore the original $c$ channels of the input
-via the final $1 \times 1$ convolution
-right before sum with the residual connection.
-Notably,
-the left dotted box is equivalent to
-the much *simplified* right dotted box in :numref:`fig_resnext_block`,
-where we only need to specify
-that the $3 \times 3$ convolution is a *group convolution*
-with $g$ groups.
-In fact,
-the group convolution dates back
-to the idea of distributing the AlexNet
-model over two GPUs due to limited GPU memory at that time :cite:`Krizhevsky.Sutskever.Hinton.2012`.
-
-The following implementation of the `ResNeXtBlock` class
-treats `groups` ($b/g$ in :numref:`fig_resnext_block`) as an argument
-so that given `bot_channels` ($b$ in :numref:`fig_resnext_block`) bottleneck channels,
-the $3 \times 3$ group convolution will
-have `bot_channels//groups` groups.
-Similar to
-the residual block implementation in
-:numref:`subsec_residual-blks`,
-the residual connection
-is generalized
-with a $1 \times 1$ convolution (`conv4`),
-where setting `use_1x1conv=True, strides=2`
-halves the input height and width.
-
-```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx, init
-from mxnet.gluon import nn
-npx.set_np()
-
-class ResNeXtBlock(nn.Block):
-    """The ResNeXt block."""
-    def __init__(self, num_channels, groups, bot_mul,
-                 use_1x1conv=False, strides=1, **kwargs):
-        super().__init__(**kwargs)
-        bot_channels = int(round(num_channels * bot_mul))
-        self.conv1 = nn.Conv2D(bot_channels, kernel_size=1, padding=0,
-                               strides=1)
-        self.conv2 = nn.Conv2D(bot_channels, kernel_size=3, padding=1,
-                               strides=strides,
-                               groups=bot_channels//groups)
-        self.conv3 = nn.Conv2D(num_channels, kernel_size=1, padding=0,
-                               strides=1)
-        self.bn1 = nn.BatchNorm()
-        self.bn2 = nn.BatchNorm()
-        self.bn3 = nn.BatchNorm()
-        if use_1x1conv:
-            self.conv4 = nn.Conv2D(num_channels, kernel_size=1,
-                                   strides=strides)
-            self.bn4 = nn.BatchNorm()
-        else:
-            self.conv4 = None
-
-    def forward(self, X):
-        Y = npx.relu(self.bn1(self.conv1(X)))
-        Y = npx.relu(self.bn2(self.conv2(Y)))
-        Y = self.bn3(self.conv3(Y))
-        if self.conv4:
-            X = self.bn4(self.conv4(X))
-        return npx.relu(Y + X)
-```
-
-```{.python .input}
-%%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-from torch.nn import functional as F
-
-class ResNeXtBlock(nn.Module):
-    """The ResNeXt block."""
-    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False, 
-                 strides=1):
-        super().__init__()
-        bot_channels = int(round(num_channels * bot_mul))
-        self.conv1 = nn.LazyConv2d(bot_channels, kernel_size=1,
-                               stride=1)
-        self.conv2 = nn.LazyConv2d(bot_channels, kernel_size=3,
-                               stride=strides, padding=1,
-                               groups=bot_channels//groups)
-        self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1,
-                               stride=1)
-        self.bn1 = nn.LazyBatchNorm2d()
-        self.bn2 = nn.LazyBatchNorm2d()
-        self.bn3 = nn.LazyBatchNorm2d()
-        if use_1x1conv:
-            self.conv4 = nn.LazyConv2d(num_channels, kernel_size=1, 
-                                       stride=strides)
-            self.bn4 = nn.LazyBatchNorm2d()
-        else:
-            self.conv4 = None
-
-    def forward(self, X):
-        Y = F.relu(self.bn1(self.conv1(X)))
-        Y = F.relu(self.bn2(self.conv2(Y)))
-        Y = self.bn3(self.conv3(Y))
-        if self.conv4:
-            X = self.bn4(self.conv4(X))
-        return F.relu(Y + X)
-```
-
-```{.python .input}
-%%tab tensorflow
-import tensorflow as tf
-from d2l import tensorflow as d2l
-
-class ResNeXtBlock(tf.keras.Model):
-    """The ResNeXt block.""" 
-    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False, 
-                 strides=1):
-        super().__init__()
-        bot_channels = int(round(num_channels * bot_mul))
-        self.conv1 = tf.keras.layers.Conv2D(bot_channels, 1, strides=1)
-        self.conv2 = tf.keras.layers.Conv2D(bot_channels, 3, strides=strides,
-                                            padding="same",
-                                            groups=bot_channels//groups)
-        self.conv3 = tf.keras.layers.Conv2D(num_channels, 1, strides=1)
-        self.bn1 = tf.keras.layers.BatchNormalization()
-        self.bn2 = tf.keras.layers.BatchNormalization()
-        self.bn3 = tf.keras.layers.BatchNormalization()
-        if use_1x1conv:
-            self.conv4 = tf.keras.layers.Conv2D(num_channels, 1, 
-                                       strides=strides)
-            self.bn4 = tf.keras.layers.BatchNormalization()
-        else:
-            self.conv4 = None
-        
-    def call(self, X):
-        Y = tf.keras.activations.relu(self.bn1(self.conv1(X)))
-        Y = tf.keras.activations.relu(self.bn2(self.conv2(Y)))
-        Y = self.bn3(self.conv3(Y))
-        if self.conv4:
-            X = self.bn4(self.conv4(X))
-        return tf.keras.activations.relu(Y + X)
-```
-
-In the following case (`use_1x1conv=False, strides=1`), the input and output are of the same shape.
-
-```{.python .input}
-%%tab mxnet, pytorch
-blk = ResNeXtBlock(32, 16, 1)
-if tab.selected('mxnet'):
-    blk.initialize()
-X = d2l.randn(4, 32, 96, 96)
-blk(X).shape
-```
-
-```{.python .input}
-%%tab tensorflow
-blk = ResNeXtBlock(32, 16, 1)
-X = d2l.normal((4, 96, 96, 32))
-Y = blk(X)
-Y.shape
-```
-
-Alternatively, setting `use_1x1conv=True, strides=2`
-halves the output height and width.
-
-```{.python .input}
-%%tab mxnet, pytorch
-blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
-if tab.selected('mxnet'):
-    blk.initialize()
-blk(X).shape
-```
-
-```{.python .input}
-%%tab tensorflow
-blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
-X = d2l.normal((4, 96, 96, 32))
-Y = blk(X)
-Y.shape
-```
-
-A key advantage of the ResNeXt design
-is that increasing groups
-leads to sparser connections (i.e., lower computational complexity) within the block,
-thus enabling an increase of network width
-to achieve a better tradeoff between
-FLOPs and accuracy.
-Thus, ResNeXt-ification
-is appealing in convolution network design
-and the following AnyNet design space
-will be based on the ResNeXt block.
 
 ## The AnyNet Design Space
 
@@ -300,7 +81,7 @@ The initial design space is called *AnyNet*,
 a relatively unconstrained design space,
 where we can focus on
 exploring network structure
-assuming standard, fixed blocks such as ResNeXt.
+assuming standard, fixed blocks such as ResNeXt (:numref:`subsec_resnext`).
 Specifically,
 the network structure
 includes
@@ -346,12 +127,11 @@ consists of $d_i$ ResNeXt blocks
 with $w_i$ output channels,
 and progressively
 halves height and width via the first block
-(setting `use_1x1conv=True, strides=2` in `ResNeXtBlock` above).
+(setting `use_1x1conv=True, strides=2` in `d2l.ResNeXtBlock` in :numref:`subsec_resnext`).
 Overall,
 despite of the straightforward network structure,
 there is a vast number of
 possible networks (e.g., by varying $d_i$ and $w_i$) in the AnyNet design space.
-
 
 
 To implement AnyNet,
@@ -359,6 +139,11 @@ we first define its network stem.
 
 ```{.python .input}
 %%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx, init
+from mxnet.gluon import nn
+npx.set_np()
+
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
         net = nn.Sequential()
@@ -369,6 +154,11 @@ class AnyNet(d2l.Classifier):
 
 ```{.python .input}
 %%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+from torch.nn import functional as F
+
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
         return nn.Sequential(
@@ -378,6 +168,9 @@ class AnyNet(d2l.Classifier):
 
 ```{.python .input}
 %%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
         return tf.keras.models.Sequential([
@@ -398,10 +191,10 @@ def stage(self, depth, num_channels, groups, bot_mul):
     net = nn.Sequential()
     for i in range(depth):
         if i == 0:
-            net.add(ResNeXtBlock(
+            net.add(d2l.ResNeXtBlock(
                 num_channels, groups, bot_mul, use_1x1conv=True, strides=2))
         else:
-            net.add(ResNeXtBlock(
+            net.add(d2l.ResNeXtBlock(
                 num_channels, num_channels, groups, bot_mul))
     return net
 ```
@@ -413,10 +206,10 @@ def stage(self, depth, num_channels, groups, bot_mul):
     blk = []
     for i in range(depth):
         if i == 0:
-            blk.append(ResNeXtBlock(num_channels, groups, bot_mul,
+            blk.append(d2l.ResNeXtBlock(num_channels, groups, bot_mul,
                 use_1x1conv=True, strides=2))
         else:
-            blk.append(ResNeXtBlock(num_channels, groups, bot_mul))
+            blk.append(d2l.ResNeXtBlock(num_channels, groups, bot_mul))
     return nn.Sequential(*blk)
 ```
 
@@ -427,10 +220,10 @@ def stage(self, depth, num_channels, groups, bot_mul):
     net = tf.keras.models.Sequential()
     for i in range(depth):
         if i == 0:
-            net.add(ResNeXtBlock(num_channels, groups, bot_mul,
+            net.add(d2l.ResNeXtBlock(num_channels, groups, bot_mul,
                 use_1x1conv=True, strides=2))
         else:
-            net.add(ResNeXtBlock(num_channels, groups, bot_mul))
+            net.add(d2l.ResNeXtBlock(num_channels, groups, bot_mul))
     return net
 ```
 

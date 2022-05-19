@@ -555,6 +555,39 @@ class Residual(nn.Block):
             X = self.conv3(X)
         return npx.relu(Y + X)
 
+class ResNeXtBlock(nn.Block):
+    """The ResNeXt block.
+
+    Defined in :numref:`subsec_residual-blks`"""
+    def __init__(self, num_channels, groups, bot_mul,
+                 use_1x1conv=False, strides=1, **kwargs):
+        super().__init__(**kwargs)
+        bot_channels = int(round(num_channels * bot_mul))
+        self.conv1 = nn.Conv2D(bot_channels, kernel_size=1, padding=0,
+                               strides=1)
+        self.conv2 = nn.Conv2D(bot_channels, kernel_size=3, padding=1,
+                               strides=strides,
+                               groups=bot_channels//groups)
+        self.conv3 = nn.Conv2D(num_channels, kernel_size=1, padding=0,
+                               strides=1)
+        self.bn1 = nn.BatchNorm()
+        self.bn2 = nn.BatchNorm()
+        self.bn3 = nn.BatchNorm()
+        if use_1x1conv:
+            self.conv4 = nn.Conv2D(num_channels, kernel_size=1,
+                                   strides=strides)
+            self.bn4 = nn.BatchNorm()
+        else:
+            self.conv4 = None
+
+    def forward(self, X):
+        Y = npx.relu(self.bn1(self.conv1(X)))
+        Y = npx.relu(self.bn2(self.conv2(Y)))
+        Y = self.bn3(self.conv3(Y))
+        if self.conv4:
+            X = self.bn4(self.conv4(X))
+        return npx.relu(Y + X)
+
 class TimeMachine(d2l.DataModule):
     """Defined in :numref:`sec_text-sequence`"""
     def _download(self):
