@@ -25,7 +25,7 @@ we might try finding it by solving the following optimization problem:
 
 $$f^*_\mathcal{F} \stackrel{\mathrm{def}}{=} \mathop{\mathrm{argmin}}_f L(\mathbf{X}, \mathbf{y}, f) \text{ subject to } f \in \mathcal{F}.$$
 
-We know that regularization :cite:`tikhonov1977solutions, morozov2012methods` may control complexity of $\mathcal{F}$
+We know that regularization :cite:`tikhonov1977solutions,morozov2012methods` may control complexity of $\mathcal{F}$
 and achieve consistency, so a larger size of training data 
 generally leads to better $f^*_\mathcal{F}$.
 It is only reasonable to assume that if we design a different and more powerful architecture $\mathcal{F}'$ we should arrive at a better outcome. In other words, we would expect that $f^*_{\mathcal{F}'}$ is "better" than $f^*_{\mathcal{F}}$. However, if $\mathcal{F} \not\subseteq \mathcal{F}'$ there is no guarantee that this should even happen. In fact, $f^*_{\mathcal{F}'}$ might well be worse.
