@@ -366,7 +366,7 @@ We train ResNet on the Fashion-MNIST dataset, just like before.
 %%tab mxnet, pytorch
 model = ResNet18(lr=0.01)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
-data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
+data = d2l.FashionMNIST(batch_size=256, resize=(96, 96))
 if tab.selected('pytorch'):
     model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
 trainer.fit(model, data)
@@ -584,6 +584,13 @@ Y.shape
 
 Nested function classes are desirable. Learning an additional layer in deep neural networks as an identity function (though this is an extreme case) should be made easy. The residual mapping can learn the identity function more easily, such as pushing parameters in the weight layer to zero. We can train an effective *deep* neural network by having residual blocks. Inputs can forward propagate faster through the residual connections across layers.
 
+Before residual connections,
+bypassing paths with gating units were introduced
+to effectively train highway networks with over 100 layers
+:cite:`srivastava2015highway`.
+Using identity functions as bypassing paths,
+ResNets performed remarkably well
+on multiple computer vision tasks.
 Residual connections had a major influence on the design of subsequent deep neural networks, both for convolutional and sequential nature.
 As we will introduce later,
 the transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017`
