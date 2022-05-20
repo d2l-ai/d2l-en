@@ -503,6 +503,37 @@ class Residual(tf.keras.Model):
         Y += X
         return tf.keras.activations.relu(Y)
 
+class ResNeXtBlock(tf.keras.Model):
+    """The ResNeXt block.
+
+    Defined in :numref:`subsec_residual-blks`"""
+    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False,
+                 strides=1):
+        super().__init__()
+        bot_channels = int(round(num_channels * bot_mul))
+        self.conv1 = tf.keras.layers.Conv2D(bot_channels, 1, strides=1)
+        self.conv2 = tf.keras.layers.Conv2D(bot_channels, 3, strides=strides,
+                                            padding="same",
+                                            groups=bot_channels//groups)
+        self.conv3 = tf.keras.layers.Conv2D(num_channels, 1, strides=1)
+        self.bn1 = tf.keras.layers.BatchNormalization()
+        self.bn2 = tf.keras.layers.BatchNormalization()
+        self.bn3 = tf.keras.layers.BatchNormalization()
+        if use_1x1conv:
+            self.conv4 = tf.keras.layers.Conv2D(num_channels, 1,
+                                       strides=strides)
+            self.bn4 = tf.keras.layers.BatchNormalization()
+        else:
+            self.conv4 = None
+
+    def call(self, X):
+        Y = tf.keras.activations.relu(self.bn1(self.conv1(X)))
+        Y = tf.keras.activations.relu(self.bn2(self.conv2(Y)))
+        Y = self.bn3(self.conv3(Y))
+        if self.conv4:
+            X = self.bn4(self.conv4(X))
+        return tf.keras.activations.relu(Y + X)
+
 class TimeMachine(d2l.DataModule):
     """Defined in :numref:`sec_text-sequence`"""
     def _download(self):
@@ -1109,15 +1140,15 @@ class AddNorm(tf.keras.layers.Layer):
     """Residual connection followed by layer normalization.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, normalized_shape, dropout):
+    def __init__(self, norm_shape, dropout):
         super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
-        self.ln = tf.keras.layers.LayerNormalization(normalized_shape)
+        self.ln = tf.keras.layers.LayerNormalization(norm_shape)
 
     def call(self, X, Y, **kwargs):
         return self.ln(self.dropout(Y, **kwargs) + X)
 
-class EncoderBlock(tf.keras.layers.Layer):
+class TransformerEncoderBlock(tf.keras.layers.Layer):
     """Transformer encoder block.
 
     Defined in :numref:`sec_transformer`"""
@@ -1142,15 +1173,15 @@ class TransformerEncoder(d2l.Encoder):
     Defined in :numref:`sec_transformer`"""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, bias=False):
+                 num_blks, dropout, bias=False):
         super().__init__()
         self.num_hiddens = num_hiddens
         self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
-        self.blks = [EncoderBlock(
+        self.blks = [TransformerEncoderBlock(
             key_size, query_size, value_size, num_hiddens, norm_shape,
             ffn_num_hiddens, num_heads, dropout, bias) for _ in range(
-            num_layers)]
+            num_blks)]
 
     def call(self, X, valid_lens, **kwargs):
         # Since positional encoding values are between -1 and 1, the embedding

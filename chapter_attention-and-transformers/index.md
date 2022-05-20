@@ -1,4 +1,4 @@
-# Attention Mechanisms
+# Attention and Transformers
 :label:`chap_attention`
 
 The optic nerve of a primate's visual system
@@ -64,5 +64,6 @@ bahdanau-attention
 multihead-attention
 self-attention-and-positional-encoding
 transformer
+vision-transformer
 ```
 

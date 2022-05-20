@@ -47,7 +47,7 @@ the hidden state of the previous time step,
 as illustrated in :numref:`fig_lstm_0`.
 They are processed by
 three fully connected layers with a sigmoid activation function to compute the values of
-the input, forget. and output gates.
+the input, forget, and output gates.
 As a result, values of the three gates
 are in the range of $(0, 1)$.
 

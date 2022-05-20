@@ -3,7 +3,7 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Residual Networks (ResNet)
+# Residual Networks (ResNet) and ResNeXt
 :label:`sec_resnet`
 
 As we design increasingly deeper networks it becomes imperative to understand how adding layers can increase the complexity and expressiveness of the network.
@@ -25,6 +25,9 @@ we might try finding it by solving the following optimization problem:
 
 $$f^*_\mathcal{F} \stackrel{\mathrm{def}}{=} \mathop{\mathrm{argmin}}_f L(\mathbf{X}, \mathbf{y}, f) \text{ subject to } f \in \mathcal{F}.$$
 
+We know that regularization :cite:`tikhonov1977solutions,morozov2012methods` may control complexity of $\mathcal{F}$
+and achieve consistency, so a larger size of training data 
+generally leads to better $f^*_\mathcal{F}$.
 It is only reasonable to assume that if we design a different and more powerful architecture $\mathcal{F}'$ we should arrive at a better outcome. In other words, we would expect that $f^*_{\mathcal{F}'}$ is "better" than $f^*_{\mathcal{F}}$. However, if $\mathcal{F} \not\subseteq \mathcal{F}'$ there is no guarantee that this should even happen. In fact, $f^*_{\mathcal{F}'}$ might well be worse.
 As illustrated by :numref:`fig_functionclasses`,
 for non-nested function classes, a larger function class does not always move closer to the "truth" function $f^*$. For instance,
@@ -89,7 +92,7 @@ a special case of the multi-branch Inception block:
 it has two branches
 one of which is the identity mapping.
 
-![A regular block (left) and a residual block (right).](../img/residual-block.svg)
+![In a regular block (left), the portion within the dotted-line box must directly learn the mapping $f(\mathbf{x})$. In a residual block (right), the portion within the dotted-line box needs to learn the residual mapping $f(\mathbf{x}) - \mathbf{x}$, where the identity mapping $f(\mathbf{x}) = \mathbf{x}$ is easier to learn.](../img/residual-block.svg)
 :label:`fig_residual_block`
 
 
@@ -186,12 +189,12 @@ class Residual(tf.keras.Model):  #@save
         return tf.keras.activations.relu(Y)
 ```
 
-This code generates two types of networks: one where we add the input to the output before applying the ReLU nonlinearity whenever `use_1x1conv=False`, and one where we adjust channels and resolution by means of a $1 \times 1$ convolution before adding. :numref:`fig_resnet_block` illustrates this:
+This code generates two types of networks: one where we add the input to the output before applying the ReLU nonlinearity whenever `use_1x1conv=False`, and one where we adjust channels and resolution by means of a $1 \times 1$ convolution before adding. :numref:`fig_resnet_block` illustrates this.
 
-![ResNet block with and without $1 \times 1$ convolution.](../img/resnet-block.svg)
+![ResNet block with and without $1 \times 1$ convolution, which transforms the input into the desired shape for the addition operation.](../img/resnet-block.svg)
 :label:`fig_resnet_block`
 
-Now let's look at [**a situation where the input and output are of the same shape**].
+Now let's look at [**a situation where the input and output are of the same shape**], where $1 \times 1$ convolution is not needed.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -213,6 +216,7 @@ Y.shape
 ```
 
 We also have the option to [**halve the output height and width while increasing the number of output channels**].
+Since the input shape is changed, `use_1x1conv=True` is specified.
 
 ```{.python .input}
 %%tab all
@@ -377,12 +381,230 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-## Summary
+## ResNeXt
+:label:`subsec_resnext`
 
-* Nested function classes are desirable. Learning an additional layer in deep neural networks as an identity function (though this is an extreme case) should be made easy.
-* The residual mapping can learn the identity function more easily, such as pushing parameters in the weight layer to zero.
-* We can train an effective deep neural network by having residual blocks. Inputs can forward propagate faster through the residual connections across layers.
-* ResNet had a major influence on the design of subsequent deep neural networks, both for convolutional and sequential nature.
+Recall :numref:`fig_resnet_block` 
+that each ResNet block simply stacks layers between residual connections.
+This design can be varied
+by replacing stacked layers with
+concatenated parallel transformations,
+leading to ResNeXt
+:cite:`Xie.Girshick.Dollar.ea.2017`.
+Different from *a variety of* transformations
+in multi-branch Inception blocks,
+ResNeXt adopts the *same* transformation in all branches,
+thus minimizing manual design efforts in each branch.
+
+![The ResNeXt block. It is a bottleneck (when $b < c$) residual block with group convolution ($g$ groups).](../img/resnext-block.svg)
+:label:`fig_resnext_block`
+
+The left dotted box in
+:numref:`fig_resnext_block`
+depicts the added concatenated parallel transformation
+strategy in ResNeXt.
+More concretely,
+an input with $c$ channels
+is first split into $g$ groups
+via $g$ branches of $1 \times 1$ convolutions
+followed by $3 \times 3$ convolutions,
+all with $b/g$ output channels.
+Concatenating these $g$ outputs
+results in $b$ output channels,
+leading to "bottlenecked" (when $b < c$) network width
+inside the dashed box.
+This output
+will restore the original $c$ channels of the input
+via the final $1 \times 1$ convolution
+right before sum with the residual connection.
+Notably,
+the left dotted box is equivalent to
+the much *simplified* right dotted box in :numref:`fig_resnext_block`,
+where we only need to specify
+that the $3 \times 3$ convolution is a *group convolution*
+with $g$ groups.
+In fact,
+the group convolution dates back
+to the idea of distributing the AlexNet
+model over two GPUs due to limited GPU memory at that time :cite:`Krizhevsky.Sutskever.Hinton.2012`.
+
+The following implementation of the `ResNeXtBlock` class
+treats `groups` ($b/g$ in :numref:`fig_resnext_block`) as an argument
+so that given `bot_channels` ($b$ in :numref:`fig_resnext_block`) bottleneck channels,
+the $3 \times 3$ group convolution will
+have `bot_channels//groups` groups.
+Similar to
+the residual block implementation in
+:numref:`subsec_residual-blks`,
+the residual connection
+is generalized
+with a $1 \times 1$ convolution (`conv4`),
+where setting `use_1x1conv=True, strides=2`
+halves the input height and width.
+
+```{.python .input}
+%%tab mxnet
+class ResNeXtBlock(nn.Block):  #@save
+    """The ResNeXt block."""
+    def __init__(self, num_channels, groups, bot_mul,
+                 use_1x1conv=False, strides=1, **kwargs):
+        super().__init__(**kwargs)
+        bot_channels = int(round(num_channels * bot_mul))
+        self.conv1 = nn.Conv2D(bot_channels, kernel_size=1, padding=0,
+                               strides=1)
+        self.conv2 = nn.Conv2D(bot_channels, kernel_size=3, padding=1,
+                               strides=strides,
+                               groups=bot_channels//groups)
+        self.conv3 = nn.Conv2D(num_channels, kernel_size=1, padding=0,
+                               strides=1)
+        self.bn1 = nn.BatchNorm()
+        self.bn2 = nn.BatchNorm()
+        self.bn3 = nn.BatchNorm()
+        if use_1x1conv:
+            self.conv4 = nn.Conv2D(num_channels, kernel_size=1,
+                                   strides=strides)
+            self.bn4 = nn.BatchNorm()
+        else:
+            self.conv4 = None
+
+    def forward(self, X):
+        Y = npx.relu(self.bn1(self.conv1(X)))
+        Y = npx.relu(self.bn2(self.conv2(Y)))
+        Y = self.bn3(self.conv3(Y))
+        if self.conv4:
+            X = self.bn4(self.conv4(X))
+        return npx.relu(Y + X)
+```
+
+```{.python .input}
+%%tab pytorch
+class ResNeXtBlock(nn.Module):  #@save
+    """The ResNeXt block."""
+    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False, 
+                 strides=1):
+        super().__init__()
+        bot_channels = int(round(num_channels * bot_mul))
+        self.conv1 = nn.LazyConv2d(bot_channels, kernel_size=1,
+                               stride=1)
+        self.conv2 = nn.LazyConv2d(bot_channels, kernel_size=3,
+                               stride=strides, padding=1,
+                               groups=bot_channels//groups)
+        self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1,
+                               stride=1)
+        self.bn1 = nn.LazyBatchNorm2d()
+        self.bn2 = nn.LazyBatchNorm2d()
+        self.bn3 = nn.LazyBatchNorm2d()
+        if use_1x1conv:
+            self.conv4 = nn.LazyConv2d(num_channels, kernel_size=1, 
+                                       stride=strides)
+            self.bn4 = nn.LazyBatchNorm2d()
+        else:
+            self.conv4 = None
+
+    def forward(self, X):
+        Y = F.relu(self.bn1(self.conv1(X)))
+        Y = F.relu(self.bn2(self.conv2(Y)))
+        Y = self.bn3(self.conv3(Y))
+        if self.conv4:
+            X = self.bn4(self.conv4(X))
+        return F.relu(Y + X)
+```
+
+```{.python .input}
+%%tab tensorflow
+class ResNeXtBlock(tf.keras.Model):  #@save
+    """The ResNeXt block.""" 
+    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False, 
+                 strides=1):
+        super().__init__()
+        bot_channels = int(round(num_channels * bot_mul))
+        self.conv1 = tf.keras.layers.Conv2D(bot_channels, 1, strides=1)
+        self.conv2 = tf.keras.layers.Conv2D(bot_channels, 3, strides=strides,
+                                            padding="same",
+                                            groups=bot_channels//groups)
+        self.conv3 = tf.keras.layers.Conv2D(num_channels, 1, strides=1)
+        self.bn1 = tf.keras.layers.BatchNormalization()
+        self.bn2 = tf.keras.layers.BatchNormalization()
+        self.bn3 = tf.keras.layers.BatchNormalization()
+        if use_1x1conv:
+            self.conv4 = tf.keras.layers.Conv2D(num_channels, 1, 
+                                       strides=strides)
+            self.bn4 = tf.keras.layers.BatchNormalization()
+        else:
+            self.conv4 = None
+        
+    def call(self, X):
+        Y = tf.keras.activations.relu(self.bn1(self.conv1(X)))
+        Y = tf.keras.activations.relu(self.bn2(self.conv2(Y)))
+        Y = self.bn3(self.conv3(Y))
+        if self.conv4:
+            X = self.bn4(self.conv4(X))
+        return tf.keras.activations.relu(Y + X)
+```
+
+In the following case (`use_1x1conv=False, strides=1`), the input and output are of the same shape.
+
+```{.python .input}
+%%tab mxnet, pytorch
+blk = ResNeXtBlock(32, 16, 1)
+if tab.selected('mxnet'):
+    blk.initialize()
+X = d2l.randn(4, 32, 96, 96)
+blk(X).shape
+```
+
+```{.python .input}
+%%tab tensorflow
+blk = ResNeXtBlock(32, 16, 1)
+X = d2l.normal((4, 96, 96, 32))
+Y = blk(X)
+Y.shape
+```
+
+Alternatively, setting `use_1x1conv=True, strides=2`
+halves the output height and width.
+
+```{.python .input}
+%%tab mxnet, pytorch
+blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
+if tab.selected('mxnet'):
+    blk.initialize()
+blk(X).shape
+```
+
+```{.python .input}
+%%tab tensorflow
+blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
+X = d2l.normal((4, 96, 96, 32))
+Y = blk(X)
+Y.shape
+```
+
+## Summary and Discussion
+
+Nested function classes are desirable. Learning an additional layer in deep neural networks as an identity function (though this is an extreme case) should be made easy. The residual mapping can learn the identity function more easily, such as pushing parameters in the weight layer to zero. We can train an effective *deep* neural network by having residual blocks. Inputs can forward propagate faster through the residual connections across layers.
+
+Residual connections had a major influence on the design of subsequent deep neural networks, both for convolutional and sequential nature.
+As we will introduce later,
+the transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017`
+adopts residual connections (together with other design choices) and is pervasive
+in areas as diverse as 
+language, vision, speech, and reinforcement learning.
+A key advantage of the ResNeXt design
+is that increasing groups
+leads to sparser connections (i.e., lower computational complexity) within the block,
+thus enabling an increase of network width
+to achieve a better tradeoff between
+FLOPs and accuracy.
+ResNeXt-ification
+is appealing in later convolution network design,
+such as in the RegNet model :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`
+and the ConvNeXt architecture :cite:`liu2022convnet`.
+We will apply the ResNeXt block later in this chapter.
+
+
+
+
 
 
 ## Exercises

@@ -65,7 +65,7 @@ class RNNScratch(d2l.Module):  #@save
             self.W_xh = nn.Parameter(
                 d2l.randn(num_inputs, num_hiddens) * sigma)
             self.W_hh = nn.Parameter(
-                d2l.rand(num_hiddens, num_hiddens) * sigma)
+                d2l.randn(num_hiddens, num_hiddens) * sigma)
             self.b_h = nn.Parameter(d2l.zeros(num_hiddens))
         if tab.selected('tensorflow'):
             self.W_xh = tf.Variable(d2l.normal(

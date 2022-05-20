@@ -555,6 +555,39 @@ class Residual(nn.Block):
             X = self.conv3(X)
         return npx.relu(Y + X)
 
+class ResNeXtBlock(nn.Block):
+    """The ResNeXt block.
+
+    Defined in :numref:`subsec_residual-blks`"""
+    def __init__(self, num_channels, groups, bot_mul,
+                 use_1x1conv=False, strides=1, **kwargs):
+        super().__init__(**kwargs)
+        bot_channels = int(round(num_channels * bot_mul))
+        self.conv1 = nn.Conv2D(bot_channels, kernel_size=1, padding=0,
+                               strides=1)
+        self.conv2 = nn.Conv2D(bot_channels, kernel_size=3, padding=1,
+                               strides=strides,
+                               groups=bot_channels//groups)
+        self.conv3 = nn.Conv2D(num_channels, kernel_size=1, padding=0,
+                               strides=1)
+        self.bn1 = nn.BatchNorm()
+        self.bn2 = nn.BatchNorm()
+        self.bn3 = nn.BatchNorm()
+        if use_1x1conv:
+            self.conv4 = nn.Conv2D(num_channels, kernel_size=1,
+                                   strides=strides)
+            self.bn4 = nn.BatchNorm()
+        else:
+            self.conv4 = None
+
+    def forward(self, X):
+        Y = npx.relu(self.bn1(self.conv1(X)))
+        Y = npx.relu(self.bn2(self.conv2(Y)))
+        Y = self.bn3(self.conv3(Y))
+        if self.conv4:
+            X = self.bn4(self.conv4(X))
+        return npx.relu(Y + X)
+
 class TimeMachine(d2l.DataModule):
     """Defined in :numref:`sec_text-sequence`"""
     def _download(self):
@@ -1153,7 +1186,7 @@ class AddNorm(nn.Block):
     def forward(self, X, Y):
         return self.ln(self.dropout(Y) + X)
 
-class EncoderBlock(nn.Block):
+class TransformerEncoderBlock(nn.Block):
     """Transformer encoder block.
 
     Defined in :numref:`sec_transformer`"""
@@ -1175,16 +1208,15 @@ class TransformerEncoder(d2l.Encoder):
 
     Defined in :numref:`sec_transformer`"""
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
-                 num_heads, num_layers, dropout, use_bias=False):
+                 num_heads, num_blks, dropout, use_bias=False):
         super().__init__()
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
         self.blks = nn.Sequential()
-        for _ in range(num_layers):
-            self.blks.add(
-                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout,
-                             use_bias))
+        for _ in range(num_blks):
+            self.blks.add(TransformerEncoderBlock(
+                num_hiddens, ffn_num_hiddens, num_heads, dropout, use_bias))
         self.initialize()
 
     def forward(self, X, valid_lens):
@@ -2091,13 +2123,13 @@ class BERTEncoder(nn.Block):
 
     Defined in :numref:`subsec_bert_input_rep`"""
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, max_len=1000, **kwargs):
+                 num_blks, dropout, max_len=1000, **kwargs):
         super(BERTEncoder, self).__init__(**kwargs)
         self.token_embedding = nn.Embedding(vocab_size, num_hiddens)
         self.segment_embedding = nn.Embedding(2, num_hiddens)
         self.blks = nn.Sequential()
-        for _ in range(num_layers):
-            self.blks.add(d2l.EncoderBlock(
+        for _ in range(num_blks):
+            self.blks.add(d2l.TransformerEncoderBlock(
                 num_hiddens, ffn_num_hiddens, num_heads, dropout, True))
         # In BERT, positional embeddings are learnable, thus we create a
         # parameter of positional embeddings that are long enough
@@ -2155,10 +2187,10 @@ class BERTModel(nn.Block):
 
     Defined in :numref:`subsec_nsp`"""
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, max_len=1000):
+                 num_blks, dropout, max_len=1000):
         super(BERTModel, self).__init__()
         self.encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens,
-                                   num_heads, num_layers, dropout, max_len)
+                                   num_heads, num_blks, dropout, max_len)
         self.hidden = nn.Dense(num_hiddens, activation='tanh')
         self.mlm = MaskLM(vocab_size, num_hiddens)
         self.nsp = NextSentencePred()
