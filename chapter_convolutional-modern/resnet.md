@@ -366,7 +366,7 @@ We train ResNet on the Fashion-MNIST dataset, just like before.
 %%tab mxnet, pytorch
 model = ResNet18(lr=0.01)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
-data = d2l.FashionMNIST(batch_size=256, resize=(96, 96))
+data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 if tab.selected('pytorch'):
     model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
 trainer.fit(model, data)
