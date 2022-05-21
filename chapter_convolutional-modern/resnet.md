@@ -635,3 +635,7 @@ We will apply the ResNeXt block later in this chapter.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/86)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/8737)
+:end_tab:

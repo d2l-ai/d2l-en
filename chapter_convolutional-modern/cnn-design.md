@@ -409,3 +409,7 @@ in the ConvNeXt paper :cite:`liu2022convnet`.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/7463)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/8738)
+:end_tab:
