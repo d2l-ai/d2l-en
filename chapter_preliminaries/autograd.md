@@ -318,7 +318,7 @@ a _batch_ of training examples.
 Here, we just want to (**sum up the gradients
 computed individually for each example**).
 
-:begin*tab:`mxnet`
+:begin_tab:`mxnet`
 MXNet handles this problem by reducing all tensors to scalars
 by summing before computing a gradient.
 In other words, rather than returning the Jacobian
@@ -327,7 +327,7 @@ it returns the gradient of the sum
 $\partial\_{\mathbf{x}} \sum_i y_i$.
 :end_tab:
 
-:begin*tab:`pytorch`
+:begin_tab:`pytorch`
 Because deep learning frameworks vary
 in how they interpret gradients of
 non-scalar tensors,
@@ -345,7 +345,7 @@ For a more detailed description, see Yang Zhang's
 [Medium post](https://zhang-yang.medium.com/the-gradient-argument-in-pytorchs-backward-function-explained-by-examples-68f266950c29).
 :end_tab:
 
-:begin*tab:`tensorflow`
+:begin_tab:`tensorflow`
 By default, TensorFlow returns the gradient of the sum.
 In other words, rather than returning
 the Jacobian $\partial*{\mathbf{x}} \mathbf{y}$,
