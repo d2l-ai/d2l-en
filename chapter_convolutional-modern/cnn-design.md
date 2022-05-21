@@ -349,7 +349,7 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-## Discussions and Summary
+## Discussion
 
 With desirable properties like locality and translation invariance (:numref:`sec_why-conv`)
 for vision,
