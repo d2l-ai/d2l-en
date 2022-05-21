@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Documentation
@@ -55,7 +55,7 @@ print(dir(tf.random))
 ```
 
 ```{.python .input}
-#@tab jax
+%%tab jax
 import jax
 print(dir(jax.random))
 ```
@@ -90,7 +90,7 @@ help(tf.ones)
 ```
 
 ```{.python .input}
-#@tab jax
+%%tab jax
 help(jax.numpy.ones)
 ```
 
@@ -116,7 +116,7 @@ tf.ones(4)
 ```
 
 ```{.python .input}
-#@tab jax
+%%tab jax
 jax.numpy.ones(4)
 ```
 
