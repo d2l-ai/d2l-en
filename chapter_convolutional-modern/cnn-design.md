@@ -342,9 +342,7 @@ following easy-to-interpret design principles:
 * Increase network width across stages: $w_{i} \leq w_{i+1}$;
 * Increase network depth across stages: $d_{i} \leq d_{i+1}$.
 
-Following these design principles,
-:cite:`Radosavovic.Kosaraju.Girshick.ea.2020`
-proposed quantized linear constraints to
+Following these design principles, :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` proposed quantized linear constraints to
 $w_i$ and $d_i$ increasing,
 leading to
 RegNetX using ResNeXt blocks
