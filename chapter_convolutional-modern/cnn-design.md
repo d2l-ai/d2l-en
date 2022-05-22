@@ -260,6 +260,13 @@ def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
             tf.keras.layers.Dense(units=num_classes)]))
 ```
 
+![Image and caption taken from :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`: Search 1.](../img/regnet-paper-fig5.png)
+:label:`fig_regnet-paper-fig5`
+
+
+![Image and caption taken from :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`: Search 2.](../img/regnet-paper-fig7.png)
+:label:`fig_regnet-paper-fig7`
+
 ## The RegNet Design Space
 
 For any stage $i$ of AnyNet,
