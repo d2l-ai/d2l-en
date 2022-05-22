@@ -35,8 +35,8 @@ the DenseNet
 :cite:`Huang.Liu.Van-Der-Maaten.ea.2017` for a generalization of the
 residual architecture.
 In addition to that,
-we explore network structure
 assuming standard and fixed blocks,
+we progressively simplify design spaces with better models,
 leading
 to the RegNet
 :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`. 
