@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Designing Convolution Network Architectures
 :label:`sec_cnn-design`
 
-The last decade has witnessed shift
+The 2010s has witnessed shift
 from *feature engineering* to *network engineering*
 in computer vision.
 Since AlexNet (:numref:`sec_alexnet`)
@@ -70,11 +70,6 @@ Before shedding light on these design principles,
 let's start with
 the initial design space.
 
-
-
-
-
-
 ## The AnyNet Design Space
 
 The initial design space is called *AnyNet*,
@@ -128,10 +123,19 @@ with $w_i$ output channels,
 and progressively
 halves height and width via the first block
 (setting `use_1x1conv=True, strides=2` in `d2l.ResNeXtBlock` in :numref:`subsec_resnext`).
+Let's further
+denote
+the bottleneck ratio and
+the number of groups (group width) 
+within
+each ResNeXt block for stage $i$
+as $b_i$ and $g_i$, respectively.
 Overall,
 despite of the straightforward network structure,
-there is a vast number of
-possible networks (e.g., by varying $d_i$ and $w_i$) in the AnyNet design space.
+varying $b_i$, $g_i$, $w_i$, and $d_i$
+results in
+a vast number of
+possible networks in the AnyNet design space.
 
 
 To implement AnyNet,
@@ -260,24 +264,20 @@ def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
             tf.keras.layers.Dense(units=num_classes)]))
 ```
 
-![Image and caption taken from :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`: Search 1.](../img/regnet-paper-fig5.png)
-:label:`fig_regnet-paper-fig5`
-
-
-![Image and caption taken from :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`: Search 2.](../img/regnet-paper-fig7.png)
-:label:`fig_regnet-paper-fig7`
-
-## The RegNet Design Space
+## Simplifying Design Spaces with Better Models
 
 For any stage $i$ of AnyNet,
-the design choices are depth $d_i$,
+the design choices are 
+the bottleneck ratio $b_i$ 
+and the number of groups $g_i$
+within each block,
 block width $w_i$,
-and the number of groups $g_i$ and bottleneck ratio $b_i$ within each block.
+and depth $d_i$.
 The designing network design spaces
 process starts
 from relatively unconstrained
 network structure characterized
-by ($d_i$, $w_i$, $g_i$, $b_i$)
+by ($b_i$, $g_i$, $w_i$, $d_i$)
 in the initial AnyNet design space.
 Then this process
 progressively samples models
@@ -285,12 +285,54 @@ from the input design space
 to evaluate the error distribution :cite:`radosavovic2019network`
 as a quality indicator
 to output a more constrained
-design space with simpler models that have
-better quality.
-As a result,
-this human-in-the-loop methodology
-leads to the *RegNet* design space
-consisting of simple, regular networks
+design space with simpler models that may have
+better quality. 
+
+Let's detail
+this quality indicator for design spaces.
+Given $n$ models sampled from some design space,
+the *error empirical distribution function* $F(e)$
+measures the fraction of models
+with errors $e_i$ lower than $e$:
+
+$$F(e) = \frac{1}{n}\sum_{i=1}^n \mathbf{1}(e_i < e).$$
+
+
+Starting from the initial unconstrained AnyNet design space ($\text{AnyNetX}_A$ in :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`),
+sharing the bottle network ratio $b_i = b$ for all stages $i$ results in a more constrained design space $\text{AnyNetX}_B$.
+Sampling and training $n=500$ models from $\text{AnyNetX}_A$ and $\text{AnyNetX}_B$ each,
+left of :numref:`fig_regnet-paper-fig5`
+shows that both design spaces have similar quality.
+Since simpler is better,
+we continue to search from $\text{AnyNetX}_B$
+by additionally sharing the number of groups $g_i = g$.
+This leads to a further simplified design space
+$\text{AnyNetX}_C$ with virtually no change
+in error distributions (right of :numref:`fig_regnet-paper-fig5`).
+
+![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Sharing bottleneck ratio (from $\text{AnyNetX}_A$ to  $\text{AnyNetX}_B$ and sharing the number of groups (from $\text{AnyNetX}_B$ to $\text{AnyNetX}_C$ simplify the design space with virtually no change in error distributions (figure taken from :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig5.png)
+:label:`fig_regnet-paper-fig5`
+
+Investigating good and bad models from $\text{AnyNetX}_C$ suggests that it may be useful to increase width across stages :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`.
+Empirically, simplifying
+$\text{AnyNetX}_C$ to $\text{AnyNetX}_D$
+with $w_{i} \leq w_{i+1}$
+improves the quality of design spaces (left of  :numref:`fig_regnet-paper-fig7`).
+Similarly,
+adding further constraints of $d_{i} \leq d_{i+1}$
+to increase network depth across stages
+gives an even better $\text{AnyNetX}_E$
+(right of :numref:`fig_regnet-paper-fig7`).
+
+![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Increasing network width across stages (from $\text{AnyNetX}_C$ to  $\text{AnyNetX}_D$ and increasing network depth across stages (from $\text{AnyNetX}_D$ to $\text{AnyNetX}_E$ simplify the design space with improved  error distributions (figure taken from :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig7.png)
+:label:`fig_regnet-paper-fig7`
+
+
+
+## RegNet
+
+The resulting $\text{AnyNetX}_E$ design space
+consists of simple networks
 following easy-to-interpret design principles:
 
 * Share the bottle network ratio $b_i = b$ for all stages $i$;
@@ -298,11 +340,14 @@ following easy-to-interpret design principles:
 * Increase network width across stages: $w_{i} \leq w_{i+1}$;
 * Increase network depth across stages: $d_{i} \leq d_{i+1}$.
 
-The original RegNet paper :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`
-investigated various architectures,
-such as RegNetX using ResNeXt blocks
+Following these design principles,
+:cite:`Radosavovic.Kosaraju.Girshick.ea.2020`
+proposed quantized linear constraints to
+$w_i$ and $d_i$ increasing,
+leading to
+RegNetX using ResNeXt blocks
 and RegNetY that additionally uses operators from SENets :cite:`Hu.Shen.Sun.2018`.
-In the following,
+As an example,
 we implement a 32-layer RegNetX variant
 characterized by
 
