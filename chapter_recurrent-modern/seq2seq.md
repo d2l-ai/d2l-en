@@ -597,7 +597,8 @@ def predict_step(self, batch, device, num_steps,
     if tab.selected('mxnet', 'pytorch'):
         enc_outputs = self.encoder(src, src_valid_len)
     if tab.selected('tensorflow'):
-        dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
+        enc_outputs = self.encoder(src, src_valid_len, training=False)
+    dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
     outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
     for _ in range(num_steps):
         if tab.selected('mxnet', 'pytorch'):
