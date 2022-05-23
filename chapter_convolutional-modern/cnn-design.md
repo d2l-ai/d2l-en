@@ -264,7 +264,7 @@ def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
             tf.keras.layers.Dense(units=num_classes)]))
 ```
 
-## Simplifying Design Spaces with Better Models
+## Constraining Design Spaces with Lower Error Distributions
 
 For any stage $i$ of AnyNet,
 the design choices are 
