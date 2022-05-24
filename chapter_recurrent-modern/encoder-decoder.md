@@ -203,10 +203,10 @@ class EncoderDecoder(d2l.Classifier):
         self.decoder = decoder
 
     def call(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args)
+        enc_outputs = self.encoder(enc_X, *args, training=True)
         dec_state = self.decoder.init_state(enc_outputs, *args)
         # Return decoder output only
-        return self.decoder(dec_X, dec_state)[0]
+        return self.decoder(dec_X, dec_state, training=True)[0]
 ```
 
 The term "state" in the encoder-decoder architecture

@@ -280,7 +280,7 @@ print('layer norm:', ln(X), '\nbatch norm:', bn(X))
 ln = tf.keras.layers.LayerNormalization()
 bn = tf.keras.layers.BatchNormalization()
 X = tf.constant([[1, 2], [2, 3]], dtype=tf.float32)
-print('layer norm:', ln(X), '\nbatch norm:', bn(X, training=True))
+print('layer norm:', ln(X), '\nbatch norm:', bn(X))
 ```
 
 Now we can implement the `AddNorm` class
