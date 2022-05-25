@@ -1231,6 +1231,37 @@ class TransformerEncoder(d2l.Encoder):
                 i] = blk.attention.attention.attention_weights
         return X
 
+class PatchEmbedding(nn.Module):
+    """Defined in :numref:`sec_vision-transformer`"""
+    def __init__(self, img_size=96, patch_size=16, num_hiddens=512):
+        super().__init__()
+        def _make_tuple(x):
+            if not isinstance(x, (list, tuple)):
+                return (x, x)
+            return x
+        img_size, patch_size = _make_tuple(img_size), _make_tuple(patch_size)
+        self.num_patches = (img_size[0] // patch_size[0]) * (
+            img_size[1] // patch_size[1])
+        self.conv = nn.LazyConv2d(num_hiddens, kernel_size=patch_size,
+                                  stride=patch_size)
+
+    def forward(self, X):
+        # Output shape: (batch size, no. of patches, no. of channels)
+        return self.conv(X).flatten(2).transpose(1, 2)
+
+class ViTMLP(nn.Module):
+    """Defined in :numref:`sec_vision-transformer`"""
+    def __init__(self, mlp_num_hiddens, mlp_num_outputs, dropout=0.5):
+        super().__init__()
+        self.dense1 = nn.LazyLinear(mlp_num_hiddens)
+        self.gelu = nn.GELU()
+        self.dense2 = nn.LazyLinear(mlp_num_outputs)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x):
+        return self.dropout(self.dense2(self.dropout(self.gelu(
+            self.dense1(x)))))
+
 def annotate(text, xy, xytext):
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))

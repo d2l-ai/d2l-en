@@ -8,7 +8,7 @@ from torch import nn
 ```
 
 ```{.python .input  n=2}
-class PatchEmbedding(nn.Module):
+class PatchEmbedding(nn.Module):  #@save
     def __init__(self, img_size=96, patch_size=16, num_hiddens=512):
         super().__init__()
         def _make_tuple(x):
@@ -35,27 +35,26 @@ d2l.check_shape(patch_emb(X),
 ```
 
 ```{.python .input}
-class ViTMLP(nn.Module):
+class ViTMLP(nn.Module):  #@save
     def __init__(self, mlp_num_hiddens, mlp_num_outputs, dropout=0.5):
         super().__init__()
         self.dense1 = nn.LazyLinear(mlp_num_hiddens)
         self.gelu = nn.GELU()
-        self.dropout1 = nn.Dropout(dropout)
         self.dense2 = nn.LazyLinear(mlp_num_outputs)
-        self.dropout2 = nn.Dropout(dropout)
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
-        return self.dropout2(self.dense2(self.dropout1(self.gelu(
+        return self.dropout(self.dense2(self.dropout(self.gelu(
             self.dense1(x)))))
 ```
 
 ```{.python .input}
 class ViTBlock(nn.Module):
-    def __init__(self, num_hiddens, norm_shape, mlp_num_hiddens, 
+    def __init__(self, num_hiddens, norm_shape, mlp_num_hiddens,
                  num_heads, dropout, use_bias=False):
         super().__init__()
         self.ln1 = nn.LayerNorm(norm_shape)
-        self.attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 
+        self.attention = d2l.MultiHeadAttention(num_hiddens, num_heads,
                                                 dropout, use_bias)
         self.ln2 = nn.LayerNorm(norm_shape)
         self.mlp = ViTMLP(mlp_num_hiddens, num_hiddens, dropout)
