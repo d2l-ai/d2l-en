@@ -9,8 +9,7 @@ from torch import nn
 
 ```{.python .input  n=2}
 class PatchEmbedding(nn.Module):
-    def __init__(self, img_size=96, patch_size=16, num_hiddens=512,
-                 norm_layer=None):
+    def __init__(self, img_size=96, patch_size=16, num_hiddens=512):
         super().__init__()
         def _make_tuple(x):
             if not isinstance(x, (list, tuple)):
