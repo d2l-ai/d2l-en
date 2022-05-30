@@ -8,7 +8,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
  {
   "data": {
    "application/vnd.jupyter.widget-view+json": {
-    "model_id": "cb2addeb39c842a7bcbad0de2e416207",
+    "model_id": "eef64ed7211940649f798449faf7d6f5",
     "version_major": 2,
     "version_minor": 0
    },
@@ -26,9 +26,9 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 
 Before we dive into different methods, we will first discuss a basic code structure that allows us to efficiently implement different HPO methods. In general, all HPO
-methods considered here need to implement two decision making primitives, **search** and **scheduling**. First, they need to sample new configurations to be trained on and evaluated, given that resources are available, which often involves some kind of search over the configuration space.
+methods considered here need to implement two decision making primitives, **search** and **scheduling**. First, they need to sample new configurations to be trained and evaluated, given that resources are available, which often involves some kind of search over the configuration space.
 Once a configuration is marked for execution, we will refer to it as a **trial**. Second, they need to schedule trials, which means deciding for how long to
-run them, or when to stop, pause or resume them. We map these to two classes,
+run them, or when to stop, pause or resume them. We map these decisions to two classes,
 `HPOSearcher` and `HPOScheduler`.
 
 ### Searcher
@@ -38,8 +38,11 @@ configuration through the `sample_configuration` method. Many algorithms will ma
 these decisions based on observed performances of previously run trials. Such an
 observation can be passed via the `update` method.
 
-```{.python .input  n=6}
+```{.python .input  n=2}
 %%tab all
+
+from d2l import torch as d2l
+
 
 class HPOSearcher(d2l.HyperParameters): #@save
     
@@ -49,16 +52,6 @@ class HPOSearcher(d2l.HyperParameters): #@save
     def update(self, config, error, additional_info=None):
         pass
         
-```
-
-```{.json .output n=6}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"None\" cell."
- }
-]
 ```
 
 ### Scheduler
@@ -72,7 +65,7 @@ may also decide upon parameters like `max_epochs` (i.e., how long to train the
 model for). The `update` method is called whenever a trial produces a new
 metric value.
 
-```{.python .input  n=1}
+```{.python .input  n=3}
 %%tab all
 
 class HPOScheduler(d2l.HyperParameters): #@save
@@ -84,22 +77,12 @@ class HPOScheduler(d2l.HyperParameters): #@save
         raise NotImplementedError
 ```
 
-```{.json .output n=1}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "UsageError: Cell magic `%%tab` not found.\n"
- }
-]
-```
-
 Below we define a basic first-in first-out scheduler which simply schedules the next configuration once resources become available.
 
-```{.python .input  n=11}
+```{.python .input  n=4}
 %%tab all
 
-class FIFOScheduler(d2l.HPOScheduler): #@save
+class FIFOScheduler(HPOScheduler): #@save
     def __init__(self, searcher):
         self.save_hyperparameters()
         
@@ -116,7 +99,7 @@ Finally, we need a component running the optimizer and doing some book-keeping
 of the results. The following code implements a sequential execution of the HPO process (one training
 job after the next) and will serve as a basic example. We will later use **Syne Tune** for more sophisticated distributed HPO cases.
 
-```{.python .input  n=12}
+```{.python .input  n=5}
 %%tab all
 
 class HPOTuner(d2l.HyperParameters): #@save
@@ -143,16 +126,6 @@ class HPOTuner(d2l.HyperParameters): #@save
             self.bookkeeping(config, error, runtime)        
 ```
 
-```{.json .output n=12}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"None\" cell."
- }
-]
-```
-
 ## Evaluating Hyperparameter Optimization Methods
 
 With any HPO method, we are mostly interested in the best performing
@@ -164,7 +137,7 @@ make a decision (call of `self.scheduler.suggest`). In the sequel, we will plot
 **any-time performance** of the HPO method defined in  terms of `scheduler`
 (and `searcher`). This allows us to quantify not only how well the configuration found by an optimizer works, but also how quickly an optimizers is able to find it.
 
-```{.python .input  n=1}
+```{.python .input  n=6}
 %%tab all
 
 @d2l.add_to_class(HPOTuner) #@save
