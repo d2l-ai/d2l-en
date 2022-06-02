@@ -178,7 +178,7 @@ class MultiHeadAttention(d2l.Module):
         self.W_v = nn.LazyLinear(num_hiddens, bias=bias)
         self.W_o = nn.LazyLinear(num_hiddens, bias=bias)
 
-    def forward(self, queries, keys, values, valid_lens):
+    def forward(self, queries, keys, values, valid_lens, window_mask=None):
         # Shape of queries, keys, or values:
         # (batch_size, no. of queries or key-value pairs, num_hiddens)
         # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
@@ -197,8 +197,8 @@ class MultiHeadAttention(d2l.Module):
 
         # Shape of output: (batch_size * num_heads, no. of queries,
         # num_hiddens / num_heads)
-        output = self.attention(queries, keys, values, valid_lens)
-
+        output = self.attention(queries, keys, values, valid_lens,
+                                window_mask, self.num_heads)
         # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
         output_concat = self.transpose_output(output)
         return self.W_o(output_concat)

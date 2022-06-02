@@ -116,4 +116,5 @@ model = ViT(img_size, patch_size, num_hiddens, mlp_num_hiddens, num_heads,
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(img_size, img_size))
 trainer.fit(model, data)
+
 ```

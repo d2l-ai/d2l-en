@@ -493,10 +493,22 @@ class DotProductAttention(nn.Module):
     # Shape of keys: (batch_size, no. of key-value pairs, d)
     # Shape of values: (batch_size, no. of key-value pairs, value dimension)
     # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
-    def forward(self, queries, keys, values, valid_lens=None):
+    def forward(self, queries, keys, values, valid_lens=None,
+                window_mask=None, num_heads=None):
         d = queries.shape[-1]
-        # Swap the last two dimensions of keys with keys.transpose(1,2)
-        scores = torch.bmm(queries, keys.transpose(1,2)) / math.sqrt(d)
+        # Swap the last two dimensions of keys with keys.transpose(1, 2)
+        scores = torch.bmm(queries, keys.transpose(1, 2)) / math.sqrt(d)
+        # window_mask and num_heads will be covered later
+        if window_mask is not None:
+            num_windows = window_mask.shape[0]
+            n, num_queries, num_kv_pairs = scores.shape
+            # Shape of window_mask: (num_windows, no. of queries,
+            # no. of key-value pairs)
+            scores = d2l.reshape(
+                scores, (n//(num_windows*num_heads),
+                         num_windows, num_heads, num_queries, num_kv_pairs
+                        )) + window_mask.unsqueeze(1).unsqueeze(0)
+            scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
         self.attention_weights = masked_softmax(scores, valid_lens)
         return torch.bmm(self.dropout(self.attention_weights), values)
 ```
