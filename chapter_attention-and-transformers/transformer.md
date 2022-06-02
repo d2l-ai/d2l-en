@@ -1127,7 +1127,6 @@ for different deep learning tasks.
 * Both the residual connections and the layer normalization in the transformer are important for training a very deep model.
 * The positionwise feed-forward network in the transformer model transforms the representation at all the sequence positions using the same MLP.
 
-
 ## Exercises
 
 1. Train a deeper transformer in the experiments. How does it affect the training speed and the translation performance?

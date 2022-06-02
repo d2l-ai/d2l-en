@@ -302,6 +302,7 @@ for downstream natural language processing applications.
 * After pretraining BERT, we can use it to represent single text, text pairs, or any token in them.
 * In the experiment, the same token has different BERT representation when their contexts are different. This supports that BERT representations are context-sensitive.
 
+
 ## Exercises
 
 1. In the experiment, we can see that the masked language modeling loss is significantly higher than the next sentence prediction loss. Why?

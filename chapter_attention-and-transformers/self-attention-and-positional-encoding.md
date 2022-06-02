@@ -418,6 +418,7 @@ where the $2\times 2$ projection matrix does not depend on any position index $i
 * Both CNNs and self-attention enjoy parallel computation and self-attention has the shortest maximum path length. However, the quadratic computational complexity with respect to the sequence length makes self-attention prohibitively slow for very long sequences.
 * To use the sequence order information, we can inject absolute or relative positional information by adding positional encoding to the input representations.
 
+
 ## Exercises
 
 1. Suppose that we design a deep architecture to represent a sequence by stacking self-attention layers with positional encoding. What could be issues?
