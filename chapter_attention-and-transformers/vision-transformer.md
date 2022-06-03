@@ -1,6 +1,28 @@
 # Vision Transformer
 :label:`sec_vision-transformer`
 
+Transformers have been the model of choice in NLP.
+
+CNN had been dominant in CV. :cite:`ramachandran2019stand` proposed to replace convolution with self-attention. 
+However, its use of specialized patterns in attention makes it hard to scale up models on hardware accelerators.
+
+:cite:`cordonnier2020relationship` theoretically proved that self-attention can learn to behave similar to convolutional layers and provided empirical evidence by taking $2 \times 2$ patches from images as input, but the small patch size makes the model only applicable to small images.
+
+:cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` extracts patches (without constraints on patch size) from images and shows that ViT performs better when data is bigger, such as beating CNN-based SOTA at that time.
+
+
+## Model
+
+[fig on model overview]
+
+Describe ViT model. 
+
+
+
+## Splitting an Image into Patches
+
+How an image is split into patches.
+
 ```{.python .input  n=1}
 from d2l import torch as d2l
 import torch
@@ -26,6 +48,8 @@ class PatchEmbedding(nn.Module):
         return self.conv(X).flatten(2).transpose(1, 2)
 ```
 
+Check code output.
+
 ```{.python .input  n=9}
 img_size, patch_size, num_hiddens, batch_size = 96, 16, 512, 4
 patch_emb = PatchEmbedding(img_size, patch_size, num_hiddens)
@@ -33,6 +57,10 @@ X = d2l.randn(batch_size, 32, img_size, img_size)
 d2l.check_shape(patch_emb(X),
                 (batch_size, (img_size//patch_size)**2, num_hiddens))
 ```
+
+## Transformer Encoder
+
+MLP is slightly different from position-wise FFN in transformer.
 
 ```{.python .input}
 class ViTMLP(nn.Module):
@@ -48,6 +76,8 @@ class ViTMLP(nn.Module):
         return self.dropout2(self.dense2(self.dropout1(self.gelu(
             self.dense1(x)))))
 ```
+
+Transformer encoder block is also different. For example, AddNorm becomes norm->X->Add.
 
 ```{.python .input}
 class ViTBlock(nn.Module):
@@ -66,12 +96,18 @@ class ViTBlock(nn.Module):
             X + self.attention(X, X, X, valid_lens)))
 ```
 
+Check shape.
+
 ```{.python .input}
 X = d2l.ones((2, 100, 24))
 encoder_blk = ViTBlock(24, 24, 48, 8, 0.5)
 encoder_blk.eval()
 d2l.check_shape(encoder_blk(X), X.shape)
 ```
+
+## Putting All Things Together
+
+Describe forward pass.
 
 ```{.python .input}
 class ViT(d2l.Classifier):
@@ -108,6 +144,8 @@ class ViT(d2l.Classifier):
 
 ## Training
 
+As usual.
+
 ```{.python .input}
 img_size, patch_size = 96, 16
 num_hiddens, mlp_num_hiddens, num_heads, num_blks = 512, 2048, 8, 2
@@ -119,3 +157,7 @@ data = d2l.FashionMNIST(batch_size=128, resize=(img_size, img_size))
 trainer.fit(model, data)
 
 ```
+
+## Summary and Discussion
+
+ViT lacks inductive bias, hence performs modestly on ImageNet. However, scale trumps inductive bias. However, it only shows effective on image classification. Subsequent works such as Swin Transformer addresses this issue and makes transformer a general backbone in CV.
