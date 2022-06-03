@@ -13,7 +13,7 @@ However, its use of specialized patterns in attention makes it hard to scale up 
 
 ## Model
 
-[fig on model overview]
+![fig on model overview](../img/vit.svg)
 
 Describe ViT model. 
 
