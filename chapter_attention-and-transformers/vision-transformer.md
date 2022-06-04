@@ -1,12 +1,21 @@
 # Vision Transformer
 :label:`sec_vision-transformer`
 
-Transformers have been the model of choice in NLP.
+The transformer architecture was initially proposed for sequence to sequence learning, such as for machine translation. 
+With excellent performance in accuracy,
+transformers subsequently became the model of choice in various natural language processing tasks :cite:`Radford.Narasimhan.Salimans.ea.2018,Radford.Wu.Child.ea.2019,brown2020language,Devlin.Chang.Lee.ea.2018,raffel2020exploring`. 
+However, 
+in the field of computer vision
+the dominant architecture
+had been based on
+CNNs (:numref:`chap_modern_cnn`).
+*Can we apply transformers
+to model image data*?
 
-CNN had been dominant in CV. :cite:`ramachandran2019stand` proposed to replace convolution with self-attention. 
+
+:cite:`ramachandran2019stand` proposed to replace convolution with self-attention. 
 However, its use of specialized patterns in attention makes it hard to scale up models on hardware accelerators.
-
-:cite:`cordonnier2020relationship` theoretically proved that self-attention can learn to behave similar to convolutional layers and provided empirical evidence by taking $2 \times 2$ patches from images as input, but the small patch size makes the model only applicable to small images.
+:cite:`cordonnier2020relationship` theoretically proved that self-attention can learn to behave similarly to convolution and showed empirical evidence by taking $2 \times 2$ patches from images as input, but the small patch size makes the model only applicable to small images.
 
 :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` extracts patches (without constraints on patch size) from images and shows that ViT performs better when data is bigger, such as beating CNN-based SOTA at that time.
 
