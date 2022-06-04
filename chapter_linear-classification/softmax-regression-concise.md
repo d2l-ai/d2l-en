@@ -87,7 +87,7 @@ class SoftmaxRegression(d2l.Classifier):
 
 In :numref:`sec_softmax_scratch` we calculated our model's output
 and applied the cross-entropy loss. While this is perfectly
-reasonable mathematically, is is risky computationally, due to
+reasonable mathematically, it is risky computationally, due to
 numerical underflow and overflow in the exponentiation.
 
 Recall that the softmax function computes probabilities via
