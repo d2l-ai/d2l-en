@@ -177,9 +177,9 @@ back to its original (string) representation.
 ```{.python .input  n=9}
 %%tab all
 vocab = Vocab(tokens)
-indicies = vocab[tokens[:10]]
-print('indices:', indicies)
-print('words:', vocab.to_tokens(indicies))
+indices = vocab[tokens[:10]]
+print('indices:', indices)
+print('words:', vocab.to_tokens(indices))
 ```
 
 ## Putting All Things Together

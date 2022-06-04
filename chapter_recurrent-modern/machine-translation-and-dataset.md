@@ -148,7 +148,7 @@ for machine translation
 we prefer word-level tokenization here
 (state-of-the-art models may use more advanced tokenization techniques).
 The following `_tokenize` method
-tokenizes the the first `max_examples` text sequence pairs,
+tokenizes the first `max_examples` text sequence pairs,
 where
 each token is either a word or a punctuation mark.
 We append the special “&lt;eos&gt;” token
