@@ -21,7 +21,7 @@ extract patches from images
 and feed them into a transformer encoder
 to obtain a global representation,
 which will finally be transformed for classification :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
-Notably, vision transformers show excellent scalability:
+Notably, transformers show better scalability than CNNs:
 when trained larger-size models on larger datasets,
 vision transformers outperform ResNets by a significant margin. Similar to the landscape of network architecture design in natural language processing,
 transformers also became a game-changer in computer vision.
@@ -29,9 +29,35 @@ transformers also became a game-changer in computer vision.
 
 ## Model
 
-![fig on model overview](../img/vit.svg)
+:numref:`fig_vit` depicts
+the model architecture of vision transformers.
+This architecture consists of a stem
+that patchifies images, 
+a body based on the multi-layer transformer encoder,
+and a head that transforms the global representation
+into the output label.
 
-Describe ViT model. 
+![The vision transformer architecture. In this example, an image is split into 9 patches. A special “&lt;cls&gt;” token and the 9 flattened image patches are transformed via patch embedding and $n$ transformer encoder blocks into 10 representations, respectively. The “&lt;cls&gt;” representation is further transformed into the output label.](../img/vit.svg)
+:label:`fig_vit`
+
+Consider an input image with height $h$, width $w$,
+and $c$ channels.
+Specifying the patch height and width both as $p$,
+the image is split into a sequence of $m = hw/p^2$ patches,
+where each patch is flattened to a vector of length $cp^2$.
+In this way, image patches can be treated similarly to tokens in text sequences by transformer encoders.
+A special “&lt;cls&gt;” (class) token and
+the $m$ flattened image patches are linearly projected
+into a sequence of $m+1$ vectors,
+summed with learnable positional embeddings.
+The multi-layer transformer encoder
+transforms $m+1$ input vectors
+into the same amount of output vector representations of the same length.
+It works exactly the same as the original transformer encoder in :numref:`fig_transformer`,
+only differing in where to place normalization layers.
+Since the “&lt;cls&gt;” token attends to all image patches via self-attention (see :numref:`fig_cnn-rnn-self-attention`),
+its representation from the transformer encoder output
+will be further transformed into the output label.
 
 
 
@@ -112,7 +138,8 @@ class ViTBlock(nn.Module):
             X + self.attention(X, X, X, valid_lens)))
 ```
 
-Check shape.
+As explained in :numref:`subsec_transformer-encoder`,
+any transformer encoder block does not change its input shape.
 
 ```{.python .input}
 X = d2l.ones((2, 100, 24))
