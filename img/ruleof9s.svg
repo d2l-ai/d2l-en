@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="219.38 456.8 269.476 135.152" width="269.476" height="135.152">
+  <defs/>
+  <g id="Canvas_1" stroke="none" stroke-opacity="1" stroke-dasharray="none" fill="none" fill-opacity="1">
+    <title>Canvas 1</title>
+    <g id="Canvas_1_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_7">
+        <rect x="252.78" y="496.6" width="69" height="28.979992" fill="#66bfff"/>
+        <rect x="252.78" y="496.6" width="69" height="28.979992" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_8">
+        <ellipse cx="287.28" cy="476.7" rx="22.32503554948" ry="19.9000284886946" fill="#00a6ff"/>
+        <ellipse cx="287.28" cy="476.7" rx="22.32503554948" ry="19.9000284886946" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_9">
+        <rect x="219.38" y="499.526" width="33.4" height="12" fill="#b3d9ff"/>
+        <rect x="219.38" y="499.526" width="33.4" height="12" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_11">
+        <rect x="257.6" y="550.5" width="16.400005" height="39.799993" fill="#66bfff"/>
+        <rect x="257.6" y="550.5" width="16.400005" height="39.799993" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_12">
+        <rect x="300" y="550.5" width="16.400005" height="39.799993" fill="#66bfff"/>
+        <rect x="300" y="550.5" width="16.400005" height="39.799993" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_41">
+        <rect x="252.78" y="521.8" width="69" height="28.979992" fill="#bad8fb"/>
+        <rect x="252.78" y="521.8" width="69" height="28.979992" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_26">
+        <rect x="274" y="544.8" width="25.800004" height="12" fill="#c6f6ff"/>
+        <rect x="274" y="544.8" width="25.800004" height="12" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_44">
+        <text transform="translate(334.8 473)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="0" y="9">Head and neck: 9%</tspan>
+        </text>
+      </g>
+      <g id="Line_45">
+        <line x1="310.2" y1="479.2" x2="329.8" y2="479.0259" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.0,4.0" stroke-width="1"/>
+      </g>
+      <g id="Graphic_50">
+        <rect x="321.78" y="499.526" width="33.4" height="12" fill="#b3d9ff"/>
+        <rect x="321.78" y="499.526" width="33.4" height="12" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_49">
+        <text transform="translate(376 499.9)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="12079227e-20" y="9">Arm: 9% each</tspan>
+        </text>
+      </g>
+      <g id="Line_48">
+        <line x1="355.18" y1="505.526" x2="371" y2="505.526" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.0,4.0" stroke-width="1"/>
+      </g>
+      <g id="Graphic_52">
+        <text transform="translate(339.487 521.152)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="0" y="9">Chest and upper back: 9% each</tspan>
+        </text>
+      </g>
+      <g id="Line_51">
+        <line x1="321.78" y1="538.2692" x2="334.487" y2="538.99814" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.0,4.0" stroke-width="1"/>
+      </g>
+      <g id="Graphic_55">
+        <text transform="translate(339.487 537.8)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="0" y="9">Abdomen and lower back: 9% each</tspan>
+        </text>
+      </g>
+      <g id="Graphic_56">
+        <text transform="translate(336.985 575.7)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="22382096e-20" y="9">Leg: 18% each</tspan>
+        </text>
+      </g>
+      <g id="Line_57">
+        <line x1="321.78" y1="515.6971" x2="334.487" y2="517.39394" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.0,4.0" stroke-width="1"/>
+      </g>
+      <g id="Line_58">
+        <line x1="316.4" y1="571.911" x2="331.985" y2="574.78275" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.0,4.0" stroke-width="1"/>
+      </g>
+      <g id="Graphic_59">
+        <text transform="translate(339.487 559.052)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="7460699e-20" y="9">Genital: 1%</tspan>
+        </text>
+      </g>
+      <g id="Line_60">
+        <line x1="299.8" y1="553.1477" x2="334.487" y2="559.46036" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.0,4.0" stroke-width="1"/>
+      </g>
+    </g>
+  </g>
+</svg>

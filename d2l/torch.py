@@ -2554,6 +2554,60 @@ def update_G(Z, net_D, net_G, loss, trainer_G):
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
+class HeartDiseaseData(d2l.DataModule):
+    def __init__(self, batch_size=256, test_ratio=0.4, feat_col=None,
+                 target='target'):
+        super().__init__()
+        self.save_hyperparameters()
+        self.df = pd.read_csv(d2l.download(d2l.DATA_URL + 'heart_disease.csv'))
+        if feat_col is None:
+            self.feat_col = list(set(list(self.df.columns)) - set([target]))
+        self.X_train, self.X_test, self.y_train, self.y_test = \
+        model_selection.train_test_split(self.df[self.feat_col].values, \
+                    self.df[[target]].values, test_size=test_ratio)
+
+    def get_dataloader(self, train):
+        if train:
+            return torch.utils.data.DataLoader(torch.utils.data.TensorDataset(
+                torch.from_numpy(self.X_train).type(torch.float),
+                torch.from_numpy(self.y_train).view(-1).type(torch.long)),
+                batch_size=self.batch_size, shuffle=True)
+        else:
+            return torch.utils.data.DataLoader(torch.utils.data.TensorDataset(
+                torch.from_numpy(self.X_test).type(torch.float),
+                torch.from_numpy(self.y_test).view(-1).type(torch.long)),
+                batch_size=np.shape(self.X_test)[0], shuffle=False)
+
+    def train_dataloader(self):
+        return self.get_dataloader(True)
+
+    def val_dataloader(self):
+        return self.get_dataloader(False)
+
+def plot_feature_importance(names, importance, fsize=(2, 2.5), xlabel=None):
+    d2l.plt.figure(figsize=fsize)
+    d2l.plt.barh(range(len(names)), importance)
+    d2l.plt.yticks(range(len(names)), names)
+    d2l.plt.xlabel(xlabel)
+
+class HeartDiseaseMLP(d2l.Classifier):
+    def __init__(self, num_outputs=2, lr=0.001, wd=1e-6):
+        self.save_hyperparameters()
+        super(HeartDiseaseMLP, self).__init__()
+        self.net = nn.Sequential(
+            nn.LazyLinear(256), nn.ReLU(), nn.LazyBatchNorm1d(),
+            nn.LazyLinear(256), nn.ReLU(), nn.LazyBatchNorm1d(),
+            nn.LazyLinear(256), nn.ReLU(), nn.LazyBatchNorm1d(),
+            nn.LazyLinear(256), nn.ReLU(), nn.LazyBatchNorm1d(),
+            nn.LazyLinear(num_outputs))
+
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters(), self.lr,
+                                weight_decay=self.wd)
+
+    def predict(self, X, Y):
+        return self.accuracy(self(X), Y).numpy()
+
 def load_array(data_arrays, batch_size, is_train=True):
     """Construct a PyTorch data iterator.
 

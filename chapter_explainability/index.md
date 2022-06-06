@@ -1,4 +1,4 @@
-# Model Explainability: Practices and Perils
+# Explainability
 
 :label:`chap_xdl`
 
