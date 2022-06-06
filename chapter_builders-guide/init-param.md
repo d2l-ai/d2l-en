@@ -160,14 +160,14 @@ print(net[1].weight.data())
 
 ```{.python .input  n=12}
 %%tab pytorch
-def xavier(module):
+def init_xavier(module):
     if type(module) == nn.LazyLinear:
         nn.init.xavier_uniform_(module.weight)
 def init_42(module):
     if type(module) == nn.LazyLinear:
         nn.init.constant_(module.weight, 42)
 
-net[0].apply(xavier)
+net[0].apply(init_xavier)
 net[2].apply(init_42)
 print(net[0].weight.data[0])
 print(net[2].weight.data)
