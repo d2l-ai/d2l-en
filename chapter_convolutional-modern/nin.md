@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
 # Network in Network (NiN)
@@ -80,6 +80,22 @@ def nin_block(out_channels, kernel_size, strides, padding):
         nn.LazyConv2d(out_channels, kernel_size=1), nn.ReLU())
 ```
 
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+
+def nin_block(out_channels, kernel_size, strides, padding):
+    return tf.keras.models.Sequential([
+    tf.keras.layers.Conv2D(out_channels, kernel_size, strides=strides,
+                           padding=padding),
+    tf.keras.layers.Activation('relu'),
+    tf.keras.layers.Conv2D(out_channels, 1),
+    tf.keras.layers.Activation('relu'),
+    tf.keras.layers.Conv2D(out_channels, 1),
+    tf.keras.layers.Activation('relu')])
+```
+
 ## [**NiN Model**]
 
 NiN uses the same initial convolution sizes as AlexNet (it was proposed shortly thereafter).
@@ -126,15 +142,36 @@ class NiN(d2l.Classifier):
                 nn.AdaptiveAvgPool2d((1, 1)),
                 nn.Flatten())
             self.net.apply(d2l.init_cnn)
+        if tab.selected('tensorflow'):
+            self.net = tf.keras.models.Sequential([
+                nin_block(96, kernel_size=11, strides=4, padding='valid'),
+                tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+                nin_block(256, kernel_size=5, strides=1, padding='same'),
+                tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+                nin_block(384, kernel_size=3, strides=1, padding='same'),
+                tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+                tf.keras.layers.Dropout(0.5),
+                nin_block(num_classes, kernel_size=3, strides=1, padding='same'),
+                tf.keras.layers.GlobalAvgPool2D(),
+                tf.keras.layers.Flatten()])
 ```
 
 We create a data example to see [**the output shape of each block**].
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
 model = NiN()
 X = d2l.randn(1, 1, 224, 224)
 for layer in model.net:
+    X = layer(X)
+    print(layer.__class__.__name__,'output shape:\t', X.shape)
+```
+
+```{.python .input}
+%%tab tensorflow
+model = NiN()
+X = d2l.normal((1, 224, 224, 1))
+for layer in model.net.layers:
     X = layer(X)
     print(layer.__class__.__name__,'output shape:\t', X.shape)
 ```
@@ -145,13 +182,22 @@ As before we use Fashion-MNIST to train the model.
 NiN's training is similar to that for AlexNet and VGG.
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
 model = NiN(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
 if tab.selected('pytorch'):
     model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
 trainer.fit(model, data)
+```
+
+```{.python .input}
+%%tab tensorflow
+trainer = d2l.Trainer(max_epochs=10)
+data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
+with d2l.try_gpu():
+    model = NiN(lr=0.05)
+    trainer.fit(model, data)
 ```
 
 ## Summary
