@@ -227,7 +227,7 @@ Subsequent works like hierarchical transformers (Swin transformers) addressed th
 extending the applicability of transformers to a range of computer vision tasks beyond image classification with state-of-the-art results :cite:`liu2021swin`.
 
 
-# Exercises
+## Exercises
 
 1. How does the value of `img_size` affect training time?
 1. Instead of projecting the “&lt;cls&gt;” token representation to the output, can we project the averaged patch representations? Implement this change and see how it affects the accuracy.
