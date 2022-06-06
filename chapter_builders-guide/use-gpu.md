@@ -78,17 +78,6 @@ we can minimize the time spent
 transferring data between devices.
 For example, when training neural networks on a server with a GPU,
 we typically prefer for the model's parameters to live on the GPU.
-
-Next, we need to confirm that
-the GPU version of PyTorch is installed.
-If a CPU version of PyTorch is already installed,
-we need to uninstall it first.
-For example, use the `pip uninstall torch` command,
-then install the corresponding PyTorch version
-according to your CUDA version.
-Assuming you have CUDA 10.0 installed,
-you can install the PyTorch version
-that supports CUDA 10.0 via `pip install torch-cu100`.
 :end_tab:
 
 To run the programs in this section,
