@@ -1154,7 +1154,7 @@ class PositionWiseFFN(tf.keras.layers.Layer):
 class AddNorm(tf.keras.layers.Layer):
     """Residual connection followed by layer normalization.
 
-    Defined in :numref:`sec_transformer`"""
+    Defined in :numref:`subsec_positionwise-ffn`"""
     def __init__(self, norm_shape, dropout):
         super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
@@ -1166,7 +1166,7 @@ class AddNorm(tf.keras.layers.Layer):
 class TransformerEncoderBlock(tf.keras.layers.Layer):
     """Transformer encoder block.
 
-    Defined in :numref:`sec_transformer`"""
+    Defined in :numref:`subsec_positionwise-ffn`"""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False):
         super().__init__()
@@ -1185,7 +1185,7 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):
 class TransformerEncoder(d2l.Encoder):
     """Transformer encoder.
 
-    Defined in :numref:`sec_transformer`"""
+    Defined in :numref:`subsec_transformer-encoder`"""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
                  num_blks, dropout, bias=False):

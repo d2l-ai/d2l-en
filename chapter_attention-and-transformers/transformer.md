@@ -136,6 +136,7 @@ import tensorflow as tf
 ```
 
 ## [**Positionwise Feed-Forward Networks**]
+:label:`subsec_positionwise-ffn`
 
 The positionwise feed-forward network
 transforms

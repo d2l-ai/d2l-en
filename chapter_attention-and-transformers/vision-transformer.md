@@ -54,16 +54,16 @@ The multi-layer transformer encoder
 transforms $m+1$ input vectors
 into the same amount of output vector representations of the same length.
 It works exactly the same as the original transformer encoder in :numref:`fig_transformer`,
-only differing in where to place normalization layers.
+only differing in the position of normalization layers.
 Since the “&lt;cls&gt;” token attends to all image patches via self-attention (see :numref:`fig_cnn-rnn-self-attention`),
 its representation from the transformer encoder output
 will be further transformed into the output label.
 
 
 
-## Splitting an Image into Patches
+## Patch Embedding
 
-How an image is split into patches.
+To implement a vision transformer, let's start with patch embedding in :numref:`fig_vit`. Splitting an image into patches and linearly projecting these flattened patches can be simplified with a single convolution operation, where both the kernel size and the stride size are set to the patch size.
 
 ```{.python .input  n=1}
 from d2l import torch as d2l
@@ -90,19 +90,21 @@ class PatchEmbedding(nn.Module):
         return self.conv(X).flatten(2).transpose(1, 2)
 ```
 
-Check code output.
+In the following example, taking images with height and width of `img_size` as input, the patch embedding outputs `(img_size//patch_size)**2` patches that are linearly projected to vectors of length `num_hiddens`.
 
 ```{.python .input  n=9}
 img_size, patch_size, num_hiddens, batch_size = 96, 16, 512, 4
 patch_emb = PatchEmbedding(img_size, patch_size, num_hiddens)
-X = d2l.randn(batch_size, 32, img_size, img_size)
+X = d2l.randn(batch_size, 3, img_size, img_size)
 d2l.check_shape(patch_emb(X),
                 (batch_size, (img_size//patch_size)**2, num_hiddens))
 ```
 
-## Transformer Encoder
+## Vision Transformer Encoder
 
-MLP is slightly different from position-wise FFN in transformer.
+In the vision transformer encoder,
+the MLP is slightly different from the position-wise FFN of the original transformer (see :numref:`subsec_positionwise-ffn`). First, here the activation function uses the Gaussian error linear unit (GELU), which can be considered as a smoother version of the ReLU :cite:`hendrycks2016gaussian`.
+Second, dropout is applied to the output of each fully connected layer in the MLP for model regularization.
 
 ```{.python .input}
 class ViTMLP(nn.Module):
@@ -119,7 +121,9 @@ class ViTMLP(nn.Module):
             self.dense1(x)))))
 ```
 
-Transformer encoder block is also different. For example, AddNorm becomes norm->X->Add.
+The vision transformer encoder block implementation
+just follows its design in :label:`fig_vit`,
+where normalization is applied right before multi-head attention and the MLP (different from "add & norm" in :numref:`fig_transformer`).
 
 ```{.python .input}
 class ViTBlock(nn.Module):
@@ -138,8 +142,8 @@ class ViTBlock(nn.Module):
             X + self.attention(X, X, X, valid_lens)))
 ```
 
-As explained in :numref:`subsec_transformer-encoder`,
-any transformer encoder block does not change its input shape.
+Same as in :numref:`subsec_transformer-encoder`,
+any vision transformer encoder block does not change its input shape.
 
 ```{.python .input}
 X = d2l.ones((2, 100, 24))
@@ -150,7 +154,11 @@ d2l.check_shape(encoder_blk(X), X.shape)
 
 ## Putting All Things Together
 
-Describe forward pass.
+The forward pass of vision transformers below is straightforward.
+First, input images are fed into an `PatchEmbedding` instance,
+whose output is concatenated with the “&lt;cls&gt;”  token embedding. They are summed with learnable positional embeddings before dropout.
+Then the output is fed into the transformer encoder that stacks `num_blks` instances of the `ViTBlock` class.
+Finally, the representation of the “&lt;cls&gt;”  token is projected by the network head.
 
 ```{.python .input}
 class ViT(d2l.Classifier):
@@ -187,7 +195,7 @@ class ViT(d2l.Classifier):
 
 ## Training
 
-As usual.
+Training a vision transformer on the Fashion-MNIST dataset is just like how CNNs were trained in :numref:`chap_modern_cnn`.
 
 ```{.python .input}
 img_size, patch_size = 96, 16
@@ -198,7 +206,6 @@ model = ViT(img_size, patch_size, num_hiddens, mlp_num_hiddens, num_heads,
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(img_size, img_size))
 trainer.fit(model, data)
-
 ```
 
 ## Summary and Discussion

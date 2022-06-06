@@ -1191,7 +1191,7 @@ class PositionWiseFFN(nn.Module):
 class AddNorm(nn.Module):
     """Residual connection followed by layer normalization.
 
-    Defined in :numref:`sec_transformer`"""
+    Defined in :numref:`subsec_positionwise-ffn`"""
     def __init__(self, norm_shape, dropout):
         super().__init__()
         self.dropout = nn.Dropout(dropout)
@@ -1203,7 +1203,7 @@ class AddNorm(nn.Module):
 class TransformerEncoderBlock(nn.Module):
     """Transformer encoder block.
 
-    Defined in :numref:`sec_transformer`"""
+    Defined in :numref:`subsec_positionwise-ffn`"""
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
                  use_bias=False):
         super().__init__()
@@ -1220,7 +1220,7 @@ class TransformerEncoderBlock(nn.Module):
 class TransformerEncoder(d2l.Encoder):
     """Transformer encoder.
 
-    Defined in :numref:`sec_transformer`"""
+    Defined in :numref:`subsec_transformer-encoder`"""
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
                  num_heads, num_blks, dropout, use_bias=False):
         super().__init__()
