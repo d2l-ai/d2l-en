@@ -690,7 +690,7 @@ class TransformerDecoderBlock(nn.Module):
         if state[2][self.i] is None:
             key_values = X
         else:
-            key_values = torch.cat((state[2][self.i], X), axis=1)
+            key_values = torch.cat((state[2][self.i], X), dim=1)
         state[2][self.i] = key_values
         if self.training:
             batch_size, num_steps, _ = X.shape
