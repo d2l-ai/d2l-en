@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['pytorch'])
+```
+
 # Vision Transformer
 :label:`sec_vision-transformer`
 
@@ -210,4 +215,25 @@ trainer.fit(model, data)
 
 ## Summary and Discussion
 
-ViT lacks inductive bias, hence performs modestly on ImageNet. However, scale trumps inductive bias. However, it only shows effective on image classification. Subsequent works such as Swin Transformer addresses this issue and makes transformer a general backbone in CV.
+You may notice that for small datasets like Fashion-MNIST, our implemented vision transformer does not outperform the ResNet in :numref:`sec_resnet`.
+Actually similar observations can be made even on ImageNet-scale datasets.
+This is because transformers *lack* those useful principles in convolution, such as translation invariance and locality (:numref:`sec_why-conv`).
+However, the picture changes when training larger models on larger datasets (e.g., 14M--300M images),
+where vision transformers outperform ResNets by a large margin in image classification, demonstrating
+intrinsic superiority of transformers in scalability :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
+The introduction of vision transformers
+has changed the landscape of network design for modeling image data.
+Subsequent works like hierarchical transformers (Swin transformers) addressed the quadratic computational complexity with respect to image size (:numref:`subsec_cnn-rnn-self-attention`),
+extending the applicability of transformers to a range of computer vision tasks beyond image classification with state-of-the-art results :cite:`liu2021swin`.
+
+
+# Exercises
+
+1. How does the value of `img_size` affect training time?
+1. Instead of projecting the “&lt;cls&gt;” token representation to the output, can we project the averaged patch representations? Implement this change and see how it affects the accuracy.
+1. Can you modify hyperparameters to improve the performance of the vision transformer?
+
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/8943)
+:end_tab:
