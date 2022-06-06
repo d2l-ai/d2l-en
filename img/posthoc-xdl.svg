@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="11.275998 5.3 276.90176 81.3" width="276.90176" height="81.3">
+  <defs>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="black">
+      <g>
+        <path d="M 4 0 L 0 0 M 0 -1.5 L 4 0 L 0 1.5" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+  </defs>
+  <g id="Canvas_1" stroke="none" stroke-opacity="1" stroke-dasharray="none" fill="none" fill-opacity="1">
+    <title>Canvas 1</title>
+    <rect fill="white" x="11.275998" y="5.3" width="276.90176" height="81.3"/>
+    <g id="Canvas_1_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_7">
+        <rect x="84.988" y="5.8" width="54" height="30.2" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(89.988 15.274)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="7.1635" y="9">Models</tspan>
+        </text>
+      </g>
+      <g id="Graphic_10">
+        <rect x="84.988" y="55.9" width="54" height="30.2" fill="#66bfff"/>
+        <rect x="84.988" y="55.9" width="54" height="30.2" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(89.988 65.374)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="3.4195" y="9">Explainer</tspan>
+        </text>
+      </g>
+      <g id="Graphic_25">
+        <title>Accessibility</title>
+        <path d="M 270.17775 22.3 C 272.37775 22.3 274.17775 24.1 274.17775 26.3 C 274.17775 28.5 272.37775 30.3 270.17775 30.3 C 267.97775 30.3 266.17775 28.5 266.17775 26.3 C 266.17775 24.1 267.97775 22.3 270.17775 22.3 Z M 288.17775 36.3 L 276.17775 36.3 L 276.17775 62.3 L 272.17775 62.3 L 272.17775 50.3 L 268.17775 50.3 L 268.17775 62.3 L 264.17775 62.3 L 264.17775 36.3 L 252.17775 36.3 L 252.17775 32.3 L 288.17775 32.3 L 288.17775 36.3 Z" fill="#b2d9ff"/>
+      </g>
+      <g id="Line_30">
+        <line x1="63.182356" y1="33.83271" x2="79.28483" y2="29.565813" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_31">
+        <line x1="138.988" y1="20.9" x2="152.29998" y2="20.9" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_32">
+        <line x1="225.28214" y1="29.420214" x2="258.5065" y2="38.95172" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_33">
+        <line x1="222.25892" y1="59.9496" x2="258.64135" y2="46.54912" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_34">
+        <line x1="60.38084" y1="49.35956" x2="79.547005" y2="57.39651" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_35">
+        <line x1="138.988" y1="70.60434" x2="152.32892" y2="70.408845" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_36">
+        <ellipse cx="38.776" cy="40.3" rx="27.0000435456832" ry="15.1000240851052" fill="white"/>
+        <ellipse cx="38.776" cy="40.3" rx="27.0000435456832" ry="15.1000240851052" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(22.175998 34.674)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="7.1815" y="9">Data</tspan>
+        </text>
+      </g>
+      <g id="Graphic_43">
+        <ellipse cx="195.58288" cy="20.9" rx="37.3829335316412" ry="14.0250223457539" fill="white"/>
+        <ellipse cx="195.58288" cy="20.9" rx="37.3829335316412" ry="14.0250223457539" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(170.67658 15.274)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="4.5707996" y="9">Prediction</tspan>
+        </text>
+      </g>
+      <g id="Graphic_45">
+        <ellipse cx="195.58288" cy="69.775" rx="37.3829335316412" ry="14.0250223457539" fill="#66bfff"/>
+        <ellipse cx="195.58288" cy="69.775" rx="37.3829335316412" ry="14.0250223457539" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(170.67658 64.149)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="1.3217996" y="9">Explanation</tspan>
+        </text>
+      </g>
+      <g id="Line_46">
+        <line x1="111.988" y1="36" x2="111.988" y2="50" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+    </g>
+  </g>
+</svg>

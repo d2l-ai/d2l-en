@@ -1,4 +1,4 @@
-# Model Explainability: Practices and Perils
+# Explainability
 
 :label:`chap_xdl`
 
@@ -6,6 +6,5 @@
 :maxdepth: 2
 
 intro
-global-model-analysis
 ```
 

@@ -35,7 +35,6 @@ import requests
 from IPython import display
 from matplotlib import pyplot as plt
 from matplotlib_inline import backend_inline
-from sklearn import model_selection
 
 d2l = sys.modules[__name__]
 
@@ -2556,25 +2555,28 @@ d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 class HeartDiseaseData(d2l.DataModule):
-    def __init__(self, batch_size=128, test_ratio=0.3, feat_col=None):
+    def __init__(self, batch_size=256, test_ratio=0.4, feat_col=None,
+                 target='target'):
         super().__init__()
         self.save_hyperparameters()
         self.df = pd.read_csv(d2l.download(d2l.DATA_URL + 'heart_disease.csv'))
         if feat_col is None:
-            self.feat_col = list(set(list(self.df.columns)) - set(['target']))
+            self.feat_col = list(set(list(self.df.columns)) - set([target]))
         self.X_train, self.X_test, self.y_train, self.y_test = \
         model_selection.train_test_split(self.df[self.feat_col].values, \
-                    self.df[['target']].values, test_size=test_ratio)
+                    self.df[[target]].values, test_size=test_ratio)
 
     def get_dataloader(self, train):
         if train:
-            X = torch.from_numpy(self.X_train).type(torch.float)
-            y = torch.from_numpy(self.y_train).view(-1).type(torch.long)
+            return torch.utils.data.DataLoader(torch.utils.data.TensorDataset(
+                torch.from_numpy(self.X_train).type(torch.float),
+                torch.from_numpy(self.y_train).view(-1).type(torch.long)),
+                batch_size=self.batch_size, shuffle=True)
         else:
-            X = torch.from_numpy(self.X_test).type(torch.float)
-            y = torch.from_numpy(self.y_test).view(-1).type(torch.long)
-        return torch.utils.data.DataLoader(torch.utils.data.TensorDataset(
-            X, y), batch_size=self.batch_size, shuffle=True)
+            return torch.utils.data.DataLoader(torch.utils.data.TensorDataset(
+                torch.from_numpy(self.X_test).type(torch.float),
+                torch.from_numpy(self.y_test).view(-1).type(torch.long)),
+                batch_size=np.shape(self.X_test)[0], shuffle=False)
 
     def train_dataloader(self):
         return self.get_dataloader(True)
@@ -2582,43 +2584,29 @@ class HeartDiseaseData(d2l.DataModule):
     def val_dataloader(self):
         return self.get_dataloader(False)
 
+def plot_feature_importance(names, importance, fsize=(2, 2.5), xlabel=None):
+    d2l.plt.figure(figsize=fsize)
+    d2l.plt.barh(range(len(names)), importance)
+    d2l.plt.yticks(range(len(names)), names)
+    d2l.plt.xlabel(xlabel)
+
 class HeartDiseaseMLP(d2l.Classifier):
     def __init__(self, num_outputs=2, lr=0.001, wd=1e-6):
         self.save_hyperparameters()
         super(HeartDiseaseMLP, self).__init__()
-        self.net = nn.Sequential(nn.LazyLinear(256), nn.LazyBatchNorm1d(),
-                                 nn.ReLU(), nn.LazyLinear(256),
-                                 nn.ReLU(), nn.LazyLinear(256),
-                                 nn.ReLU(), nn.LazyLinear(256),
-                                 nn.ReLU(), nn.LazyLinear(num_outputs))
+        self.net = nn.Sequential(
+            nn.LazyLinear(256), nn.ReLU(), nn.LazyBatchNorm1d(),
+            nn.LazyLinear(256), nn.ReLU(), nn.LazyBatchNorm1d(),
+            nn.LazyLinear(256), nn.ReLU(), nn.LazyBatchNorm1d(),
+            nn.LazyLinear(256), nn.ReLU(), nn.LazyBatchNorm1d(),
+            nn.LazyLinear(num_outputs))
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), self.lr,
                                 weight_decay=self.wd)
 
-    def predict(self, data, shuffle_x=None):
-        Y_hat, Y, X = [], [], []
-        for x, y in data:
-            if shuffle_x is not None:
-                x_col = x[:, shuffle_x]
-                x[:, shuffle_x] = x_col[torch.randperm(x.shape[0])]
-            Y_hat.append(self(x))
-            Y.append(y)
-            X.append(x)
-        acc = self.accuracy(torch.cat(Y_hat, 0), torch.cat(Y, 0)).numpy()
-        return acc, torch.cat(Y_hat, 0), torch.cat(Y, 0), torch.cat(X, 0)
-
-class GlobalExplainer:
-    def __init__(self, model, data):
-        self.model = model
-        self.data = data
-
-def draw_feature_importance(features_names, feature_importance):
-    d2l.plt.figure(figsize=(2, 2.5))
-    num_feat = len(features_names)
-    d2l.plt.barh(range(num_feat), feature_importance,)
-    d2l.plt.yticks(range(num_feat), features_names)
-    d2l.plt.xlabel('Feature Importance')
+    def predict(self, X, Y):
+        return self.accuracy(self(X), Y).numpy()
 
 def load_array(data_arrays, batch_size, is_train=True):
     """Construct a PyTorch data iterator.
