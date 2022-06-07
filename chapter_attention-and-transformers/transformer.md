@@ -136,6 +136,7 @@ import tensorflow as tf
 ```
 
 ## [**Positionwise Feed-Forward Networks**]
+:label:`subsec_positionwise-ffn`
 
 The positionwise feed-forward network
 transforms
@@ -355,6 +356,7 @@ d2l.check_shape(add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)),
 ```
 
 ## Encoder
+:label:`subsec_transformer-encoder`
 
 With all the essential components to assemble
 the transformer encoder,

@@ -1,33 +1,81 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['pytorch'])
+```
+
 # Vision Transformer
 :label:`sec_vision-transformer`
 
-Transformers have been the model of choice in NLP.
-
-CNN had been dominant in CV. :cite:`ramachandran2019stand` proposed to replace convolution with self-attention. 
+The transformer architecture was initially proposed for sequence to sequence learning, such as for machine translation. 
+With high effectiveness,
+transformers subsequently became the model of choice in various natural language processing tasks :cite:`Radford.Narasimhan.Salimans.ea.2018,Radford.Wu.Child.ea.2019,brown2020language,Devlin.Chang.Lee.ea.2018,raffel2020exploring`. 
+However, 
+in the field of computer vision
+the dominant architecture
+had been based on
+CNNs (:numref:`chap_modern_cnn`).
+*Can we apply transformers
+to model image data*?
+:cite:`ramachandran2019stand` proposed to replace convolution with self-attention. 
 However, its use of specialized patterns in attention makes it hard to scale up models on hardware accelerators.
+:cite:`cordonnier2020relationship` theoretically proved that self-attention can learn to behave similarly to convolution. Empirically, $2 \times 2$ patches were taken from images as input, but the small patch size makes the model only applicable to image data with low resolutions.
 
-:cite:`cordonnier2020relationship` theoretically proved that self-attention can learn to behave similar to convolutional layers and provided empirical evidence by taking $2 \times 2$ patches from images as input, but the small patch size makes the model only applicable to small images.
-
-:cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` extracts patches (without constraints on patch size) from images and shows that ViT performs better when data is bigger, such as beating CNN-based SOTA at that time.
+Without specific constraints on patch size,
+*vision transformers* (ViTs)
+extract patches from images
+and feed them into a transformer encoder
+to obtain a global representation,
+which will finally be transformed for classification :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
+Notably, transformers show better scalability than CNNs:
+when training larger models on larger datasets,
+vision transformers outperform ResNets by a significant margin. Similar to the landscape of network architecture design in natural language processing,
+transformers also became a game-changer in computer vision.
 
 
 ## Model
 
-![fig on model overview](../img/vit.svg)
+:numref:`fig_vit` depicts
+the model architecture of vision transformers.
+This architecture consists of a stem
+that patchifies images, 
+a body based on the multi-layer transformer encoder,
+and a head that transforms the global representation
+into the output label.
 
-Describe ViT model. 
+![The vision transformer architecture. In this example, an image is split into 9 patches. A special “&lt;cls&gt;” token and the 9 flattened image patches are transformed via patch embedding and $n$ transformer encoder blocks into 10 representations, respectively. The “&lt;cls&gt;” representation is further transformed into the output label.](../img/vit.svg)
+:label:`fig_vit`
+
+Consider an input image with height $h$, width $w$,
+and $c$ channels.
+Specifying the patch height and width both as $p$,
+the image is split into a sequence of $m = hw/p^2$ patches,
+where each patch is flattened to a vector of length $cp^2$.
+In this way, image patches can be treated similarly to tokens in text sequences by transformer encoders.
+A special “&lt;cls&gt;” (class) token and
+the $m$ flattened image patches are linearly projected
+into a sequence of $m+1$ vectors,
+summed with learnable positional embeddings.
+The multi-layer transformer encoder
+transforms $m+1$ input vectors
+into the same amount of output vector representations of the same length.
+It works exactly the same way as the original transformer encoder in :numref:`fig_transformer`,
+only differing in the position of normalization.
+Since the “&lt;cls&gt;” token attends to all the image patches via self-attention (see :numref:`fig_cnn-rnn-self-attention`),
+its representation from the transformer encoder output
+will be further transformed into the output label.
 
 
 
-## Splitting an Image into Patches
-
-How an image is split into patches.
 
 ```{.python .input  n=1}
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
+
+## Patch Embedding
+
+To implement a vision transformer, let's start with patch embedding in :numref:`fig_vit`. Splitting an image into patches and linearly projecting these flattened patches can be simplified as a single convolution operation, where both the kernel size and the stride size are set to the patch size.
 
 ```{.python .input  n=2}
 class PatchEmbedding(nn.Module):
@@ -48,19 +96,21 @@ class PatchEmbedding(nn.Module):
         return self.conv(X).flatten(2).transpose(1, 2)
 ```
 
-Check code output.
+In the following example, taking images with height and width of `img_size` as input, the patch embedding outputs `(img_size//patch_size)**2` patches that are linearly projected to vectors of length `num_hiddens`.
 
 ```{.python .input  n=9}
 img_size, patch_size, num_hiddens, batch_size = 96, 16, 512, 4
 patch_emb = PatchEmbedding(img_size, patch_size, num_hiddens)
-X = d2l.randn(batch_size, 32, img_size, img_size)
+X = d2l.randn(batch_size, 3, img_size, img_size)
 d2l.check_shape(patch_emb(X),
                 (batch_size, (img_size//patch_size)**2, num_hiddens))
 ```
 
-## Transformer Encoder
+## Vision Transformer Encoder
 
-MLP is slightly different from position-wise FFN in transformer.
+The MLP of the vision transformer encoder
+is slightly different from the position-wise FFN of the original transformer encoder (see :numref:`subsec_positionwise-ffn`). First, here the activation function uses the Gaussian error linear unit (GELU), which can be considered as a smoother version of the ReLU :cite:`hendrycks2016gaussian`.
+Second, dropout is applied to the output of each fully connected layer in the MLP for regularization.
 
 ```{.python .input}
 class ViTMLP(nn.Module):
@@ -77,7 +127,9 @@ class ViTMLP(nn.Module):
             self.dense1(x)))))
 ```
 
-Transformer encoder block is also different. For example, AddNorm becomes norm->X->Add.
+The vision transformer encoder block implementation
+just follows its design in :numref:`fig_vit`,
+where normalization is applied right before multi-head attention and the MLP (different from "add & norm" in :numref:`fig_transformer`).
 
 ```{.python .input}
 class ViTBlock(nn.Module):
@@ -96,7 +148,8 @@ class ViTBlock(nn.Module):
             X + self.attention(X, X, X, valid_lens)))
 ```
 
-Check shape.
+Same as in :numref:`subsec_transformer-encoder`,
+any vision transformer encoder block does not change its input shape.
 
 ```{.python .input}
 X = d2l.ones((2, 100, 24))
@@ -107,7 +160,11 @@ d2l.check_shape(encoder_blk(X), X.shape)
 
 ## Putting All Things Together
 
-Describe forward pass.
+The forward pass of vision transformers below is straightforward.
+First, input images are fed into an `PatchEmbedding` instance,
+whose output is concatenated with the “&lt;cls&gt;”  token embedding. They are summed with learnable positional embeddings before dropout.
+Then the output is fed into the transformer encoder that stacks `num_blks` instances of the `ViTBlock` class.
+Finally, the representation of the “&lt;cls&gt;”  token is projected by the network head.
 
 ```{.python .input}
 class ViT(d2l.Classifier):
@@ -144,7 +201,7 @@ class ViT(d2l.Classifier):
 
 ## Training
 
-As usual.
+Training a vision transformer on the Fashion-MNIST dataset is just like how CNNs were trained in :numref:`chap_modern_cnn`.
 
 ```{.python .input}
 img_size, patch_size = 96, 16
@@ -155,9 +212,30 @@ model = ViT(img_size, patch_size, num_hiddens, mlp_num_hiddens, num_heads,
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(img_size, img_size))
 trainer.fit(model, data)
-
 ```
 
 ## Summary and Discussion
 
-ViT lacks inductive bias, hence performs modestly on ImageNet. However, scale trumps inductive bias. However, it only shows effective on image classification. Subsequent works such as Swin Transformer addresses this issue and makes transformer a general backbone in CV.
+You may notice that for small datasets like Fashion-MNIST, our implemented vision transformer does not outperform the ResNet in :numref:`sec_resnet`.
+Similar observations can be made even on ImageNet-scale datasets.
+This is because transformers *lack* those useful principles in convolution, such as translation invariance and locality (:numref:`sec_why-conv`).
+However, the picture changes when training larger models on larger datasets (e.g., 14M--300M images),
+where vision transformers outperform ResNets by a large margin in image classification, demonstrating
+intrinsic superiority of transformers in scalability :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
+The introduction of vision transformers
+has changed the landscape of network design for modeling image data.
+Subsequent works like hierarchical transformers (Swin transformers) addressed the quadratic computational complexity with respect to image size (:numref:`subsec_cnn-rnn-self-attention`)
+and added back convolution-like priors,
+extending the applicability of transformers to a range of computer vision tasks beyond image classification with state-of-the-art results :cite:`liu2021swin`.
+
+
+## Exercises
+
+1. How does the value of `img_size` affect training time?
+1. Instead of projecting the “&lt;cls&gt;” token representation to the output, how to project the averaged patch representations? Implement this change and see how it affects the accuracy.
+1. Can you modify hyperparameters to improve the accuracy of the vision transformer?
+
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/8943)
+:end_tab:
