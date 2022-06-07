@@ -20,14 +20,14 @@ to model image data*?
 However, its use of specialized patterns in attention makes it hard to scale up models on hardware accelerators.
 :cite:`cordonnier2020relationship` theoretically proved that self-attention can learn to behave similarly to convolution. Empirically, $2 \times 2$ patches were taken from images as input, but the small patch size makes the model only applicable to image data with low resolutions.
 
-Without specific patch size constraints,
+Without specific constraints on patch size,
 *vision transformers* (ViTs)
 extract patches from images
 and feed them into a transformer encoder
 to obtain a global representation,
 which will finally be transformed for classification :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
 Notably, transformers show better scalability than CNNs:
-when trained larger-size models on larger datasets,
+when training larger models on larger datasets,
 vision transformers outperform ResNets by a significant margin. Similar to the landscape of network architecture design in natural language processing,
 transformers also became a game-changer in computer vision.
 
@@ -58,23 +58,24 @@ summed with learnable positional embeddings.
 The multi-layer transformer encoder
 transforms $m+1$ input vectors
 into the same amount of output vector representations of the same length.
-It works exactly the same as the original transformer encoder in :numref:`fig_transformer`,
-only differing in the position of normalization layers.
-Since the “&lt;cls&gt;” token attends to all image patches via self-attention (see :numref:`fig_cnn-rnn-self-attention`),
+It works exactly the same way as the original transformer encoder in :numref:`fig_transformer`,
+only differing in the position of normalization.
+Since the “&lt;cls&gt;” token attends to all the image patches via self-attention (see :numref:`fig_cnn-rnn-self-attention`),
 its representation from the transformer encoder output
 will be further transformed into the output label.
 
 
 
-## Patch Embedding
-
-To implement a vision transformer, let's start with patch embedding in :numref:`fig_vit`. Splitting an image into patches and linearly projecting these flattened patches can be simplified with a single convolution operation, where both the kernel size and the stride size are set to the patch size.
 
 ```{.python .input  n=1}
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
+
+## Patch Embedding
+
+To implement a vision transformer, let's start with patch embedding in :numref:`fig_vit`. Splitting an image into patches and linearly projecting these flattened patches can be simplified as a single convolution operation, where both the kernel size and the stride size are set to the patch size.
 
 ```{.python .input  n=2}
 class PatchEmbedding(nn.Module):
@@ -107,9 +108,9 @@ d2l.check_shape(patch_emb(X),
 
 ## Vision Transformer Encoder
 
-In the vision transformer encoder,
-the MLP is slightly different from the position-wise FFN of the original transformer (see :numref:`subsec_positionwise-ffn`). First, here the activation function uses the Gaussian error linear unit (GELU), which can be considered as a smoother version of the ReLU :cite:`hendrycks2016gaussian`.
-Second, dropout is applied to the output of each fully connected layer in the MLP for model regularization.
+The MLP of the vision transformer encoder
+is slightly different from the position-wise FFN of the original transformer encoder (see :numref:`subsec_positionwise-ffn`). First, here the activation function uses the Gaussian error linear unit (GELU), which can be considered as a smoother version of the ReLU :cite:`hendrycks2016gaussian`.
+Second, dropout is applied to the output of each fully connected layer in the MLP for regularization.
 
 ```{.python .input}
 class ViTMLP(nn.Module):
@@ -127,7 +128,7 @@ class ViTMLP(nn.Module):
 ```
 
 The vision transformer encoder block implementation
-just follows its design in :label:`fig_vit`,
+just follows its design in :numref:`fig_vit`,
 where normalization is applied right before multi-head attention and the MLP (different from "add & norm" in :numref:`fig_transformer`).
 
 ```{.python .input}
@@ -216,22 +217,23 @@ trainer.fit(model, data)
 ## Summary and Discussion
 
 You may notice that for small datasets like Fashion-MNIST, our implemented vision transformer does not outperform the ResNet in :numref:`sec_resnet`.
-Actually similar observations can be made even on ImageNet-scale datasets.
+Similar observations can be made even on ImageNet-scale datasets.
 This is because transformers *lack* those useful principles in convolution, such as translation invariance and locality (:numref:`sec_why-conv`).
 However, the picture changes when training larger models on larger datasets (e.g., 14M--300M images),
 where vision transformers outperform ResNets by a large margin in image classification, demonstrating
 intrinsic superiority of transformers in scalability :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
 The introduction of vision transformers
 has changed the landscape of network design for modeling image data.
-Subsequent works like hierarchical transformers (Swin transformers) addressed the quadratic computational complexity with respect to image size (:numref:`subsec_cnn-rnn-self-attention`),
+Subsequent works like hierarchical transformers (Swin transformers) addressed the quadratic computational complexity with respect to image size (:numref:`subsec_cnn-rnn-self-attention`)
+and added back convolution-like priors,
 extending the applicability of transformers to a range of computer vision tasks beyond image classification with state-of-the-art results :cite:`liu2021swin`.
 
 
 ## Exercises
 
 1. How does the value of `img_size` affect training time?
-1. Instead of projecting the “&lt;cls&gt;” token representation to the output, can we project the averaged patch representations? Implement this change and see how it affects the accuracy.
-1. Can you modify hyperparameters to improve the performance of the vision transformer?
+1. Instead of projecting the “&lt;cls&gt;” token representation to the output, how to project the averaged patch representations? Implement this change and see how it affects the accuracy.
+1. Can you modify hyperparameters to improve the accuracy of the vision transformer?
 
 
 :begin_tab:`pytorch`
