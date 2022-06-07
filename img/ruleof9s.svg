@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="219.38 456.8 269.476 135.152" width="269.476" height="135.152">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="219.38 456.8 269.476 135.152" width="269.476" height="135.152">
   <defs/>
-  <g id="Canvas_1" stroke="none" stroke-opacity="1" stroke-dasharray="none" fill="none" fill-opacity="1">
+  <g id="Canvas_1" stroke-opacity="1" stroke-dasharray="none" fill="none" stroke="none" fill-opacity="1">
     <title>Canvas 1</title>
     <g id="Canvas_1_Layer_1">
       <title>Layer 1</title>
@@ -55,7 +55,7 @@
         <line x1="355.18" y1="505.526" x2="371" y2="505.526" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.0,4.0" stroke-width="1"/>
       </g>
       <g id="Graphic_52">
-        <text transform="translate(339.487 521.152)" fill="black">
+        <text transform="translate(339.487 518.8)" fill="black">
           <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="0" y="9">Chest and upper back: 9% each</tspan>
         </text>
       </g>
@@ -68,23 +68,23 @@
         </text>
       </g>
       <g id="Graphic_56">
-        <text transform="translate(336.985 575.7)" fill="black">
+        <text transform="translate(339.487 575.7)" fill="black">
           <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="22382096e-20" y="9">Leg: 18% each</tspan>
         </text>
       </g>
       <g id="Line_57">
-        <line x1="321.78" y1="515.6971" x2="334.487" y2="517.39394" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.0,4.0" stroke-width="1"/>
+        <line x1="321.78" y1="515.00636" x2="334.487" y2="516.44883" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.0,4.0" stroke-width="1"/>
       </g>
       <g id="Line_58">
-        <line x1="316.4" y1="571.911" x2="331.985" y2="574.78275" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.0,4.0" stroke-width="1"/>
+        <line x1="316.4" y1="571.8498" x2="334.487" y2="575.0477" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.0,4.0" stroke-width="1"/>
       </g>
       <g id="Graphic_59">
-        <text transform="translate(339.487 559.052)" fill="black">
+        <text transform="translate(339.487 555.5)" fill="black">
           <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="7460699e-20" y="9">Genital: 1%</tspan>
         </text>
       </g>
       <g id="Line_60">
-        <line x1="299.8" y1="553.1477" x2="334.487" y2="559.46036" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.0,4.0" stroke-width="1"/>
+        <line x1="299.8" y1="552.5468" x2="334.487" y2="557.2438" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.0,4.0" stroke-width="1"/>
       </g>
     </g>
   </g>

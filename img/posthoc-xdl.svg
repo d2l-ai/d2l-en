@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="11.275998 5.3 276.90176 81.3" width="276.90176" height="81.3">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="11.275998 5.3 276.90176 81.3" width="276.90176" height="81.3">
   <defs>
     <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="black">
       <g>
@@ -8,15 +8,14 @@
       </g>
     </marker>
   </defs>
-  <g id="Canvas_1" stroke="none" stroke-opacity="1" stroke-dasharray="none" fill="none" fill-opacity="1">
+  <g id="Canvas_1" stroke-opacity="1" stroke-dasharray="none" fill="none" stroke="none" fill-opacity="1">
     <title>Canvas 1</title>
-    <rect fill="white" x="11.275998" y="5.3" width="276.90176" height="81.3"/>
     <g id="Canvas_1_Layer_1">
       <title>Layer 1</title>
       <g id="Graphic_7">
         <rect x="84.988" y="5.8" width="54" height="30.2" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
         <text transform="translate(89.988 15.274)" fill="black">
-          <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="7.1635" y="9">Models</tspan>
+          <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="9.4135" y="9">Model</tspan>
         </text>
       </g>
       <g id="Graphic_10">
