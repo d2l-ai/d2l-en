@@ -4,5 +4,21 @@ Understanding Gaussian processes (GPs) is important for reasoning about model co
 
 ## Definition
 
-A Gaussian processes is defined as a collection of random variables, any finite number of which have a joint Gaussian distribution. 
+A Gaussian process is defined as _a collection of random variables, any finite number of which have a joint Gaussian distribution_. This definition may seem abstract and inaccessible, but Gaussian processes are in fact very simple objects. Any function
+
+$f(x) = w^{\top} \phi(x) = \langle w, \phi(x) \rangle$, (1) 
+
+with $w$ drawn from a Gaussian (normal) distribution, and $\phi$ being any vector of basis functions, for example $\phi(x) = (1, x, x^2, ..., x^d)^{\top}$, 
+is a Gaussian process. Moreover, any Gaussian process f(x) can be expressed in the form of equation (1). Let's consider a few concrete examples, to understand how simple GPs really are. 
+
+## Examples
+
+Suppose 
+
+$f(x) = w_0 + w_1 x$, and $w_0, w_1 \sim \mathcal{N}(0,1)$, with $w_0, w_1, x$ all in one dimension. 
+
+We can equivalently write this function as the inner product $f(x) = (w_0, w_1)(1, x)^{\top}$. In equation (1) above, $w = (w_0, w_1)^{\top}$ and $\phi(x) = (1,x)^{\top}$. 
+
+For any $x$, $f(x)$ is a sum of two Gaussian random variables. Since Gaussians are closed under addition, $f(x)$ is also a Gaussian random variable. Similarly, the joint distribution for any collection of function values, $(f(x_1),\dots,f(x_n))$, for any collection of inputs $x_1,\dots,x_n$, is a multivariate Gaussian distribution. Therefore $f(x)$ is a Gaussian process. 
+
 
