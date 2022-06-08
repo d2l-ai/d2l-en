@@ -11,7 +11,7 @@ $f(x) = w^{\top} \phi(x) = \langle w, \phi(x) \rangle$, (1)
 with $w$ drawn from a Gaussian (normal) distribution, and $\phi$ being any vector of basis functions, for example $\phi(x) = (1, x, x^2, ..., x^d)^{\top}$, 
 is a Gaussian process. Moreover, any Gaussian process f(x) can be expressed in the form of equation (1). Let's consider a few concrete examples, to understand how simple GPs really are. 
 
-## Examples
+## A simple Gaussian processes
 
 Suppose 
 
@@ -19,6 +19,13 @@ $f(x) = w_0 + w_1 x$, and $w_0, w_1 \sim \mathcal{N}(0,1)$, with $w_0, w_1, x$ a
 
 We can equivalently write this function as the inner product $f(x) = (w_0, w_1)(1, x)^{\top}$. In equation (1) above, $w = (w_0, w_1)^{\top}$ and $\phi(x) = (1,x)^{\top}$. 
 
-For any $x$, $f(x)$ is a sum of two Gaussian random variables. Since Gaussians are closed under addition, $f(x)$ is also a Gaussian random variable. Similarly, the joint distribution for any collection of function values, $(f(x_1),\dots,f(x_n))$, for any collection of inputs $x_1,\dots,x_n$, is a multivariate Gaussian distribution. Therefore $f(x)$ is a Gaussian process. 
+For any $x$, $f(x)$ is a sum of two Gaussian random variables. Since Gaussians are closed under addition, $f(x)$ is also a Gaussian random variable for any $x$. In fact, we can compute for any particular $x$ that $f(x)$ is $\mathcal{N}(0,1+x^2)$. Similarly, the joint distribution for any collection of function values, $(f(x_1),\dots,f(x_n))$, for any collection of inputs $x_1,\dots,x_n$, is a multivariate Gaussian distribution. Therefore $f(x)$ is a Gaussian process. 
+
+In short, $f(x)$ is a _random function_, or a _distribution over functions_. We can gain some insights into this distribution by repeatedly sampling values for $w_0, w_1$, and visualizing the corresponding functions $f(x)$, which are straight lines with slopes and different intercepts, as follows:
+
+(! Add plot here).
+
+
+
 
 
