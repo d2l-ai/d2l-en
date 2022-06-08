@@ -4,12 +4,15 @@ Understanding Gaussian processes (GPs) is important for reasoning about model co
 
 ## Definition
 
-A Gaussian process is defined as _a collection of random variables, any finite number of which have a joint Gaussian distribution_. This definition may seem abstract and inaccessible, but Gaussian processes are in fact very simple objects. Any function
+A Gaussian process is defined as _a collection of random variables, any finite number of which have a joint Gaussian distribution_. 
+
+
+This definition may seem abstract and inaccessible, but Gaussian processes are in fact very simple objects. Any function
 
 $f(x) = w^{\top} \phi(x) = \langle w, \phi(x) \rangle$, (1) 
 
 with $w$ drawn from a Gaussian (normal) distribution, and $\phi$ being any vector of basis functions, for example $\phi(x) = (1, x, x^2, ..., x^d)^{\top}$, 
-is a Gaussian process. Moreover, any Gaussian process f(x) can be expressed in the form of equation (1). Let's consider a few concrete examples, to understand how simple GPs really are. 
+is a Gaussian process. Moreover, any Gaussian process f(x) can be expressed in the form of equation (1). Let's consider a few concrete examples, to begin getting acquainted with Gaussian processes, and understanding how simple they really are.
 
 ## A simple Gaussian processes
 
