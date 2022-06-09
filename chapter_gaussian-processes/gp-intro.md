@@ -27,7 +27,7 @@ In short, $f(x)$ is a _random function_, or a _distribution over functions_. We 
 
 (! Add plot here).
 
-If we instead imagine $w_0, w_1$ are drawn from $\mathcal{N}(0,\alpha^2)$, how do you imagine varying $\alpha$ affects the distribution over functions?
+If $w_0, w_1$ are instead drawn from $\mathcal{N}(0,\alpha^2)$, how do you imagine varying $\alpha$ affects the distribution over functions?
 
 ## From weight space to function space 
 
