@@ -64,9 +64,6 @@ Since the “&lt;cls&gt;” token attends to all the image patches via self-atte
 its representation from the transformer encoder output
 will be further transformed into the output label.
 
-
-
-
 ```{.python .input  n=1}
 from d2l import torch as d2l
 import torch
@@ -128,8 +125,10 @@ class ViTMLP(nn.Module):
 ```
 
 The vision transformer encoder block implementation
-just follows its design in :numref:`fig_vit`,
-where normalization is applied right before multi-head attention and the MLP (different from "add & norm" in :numref:`fig_transformer`).
+just follows the pre-normalization design in :numref:`fig_vit`,
+where normalization is applied right *before* multi-head attention or the MLP.
+In contrast to post-normalization ("add & norm" in :numref:`fig_transformer`), where normalization is placed right *after* residual connections,
+pre-normalization leads to more effective or efficient training for transformers :cite:`baevski2018adaptive,wang2019learning,xiong2020layer`.
 
 ```{.python .input}
 class ViTBlock(nn.Module):
