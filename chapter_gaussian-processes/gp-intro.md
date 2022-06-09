@@ -27,11 +27,29 @@ In short, $f(x)$ is a _random function_, or a _distribution over functions_. We 
 
 (! Add plot here).
 
-If we change the distribution over $w_0, w_1$ to $\mathcal{N}(0,\alpha^2)$, how do you imagine varying $\alpha$ affects the distribution over functions?
+If we instead imagine $w_0, w_1$ are drawn from $\mathcal{N}(0,\alpha^2)$, how do you imagine varying $\alpha$ affects the distribution over functions?
 
 ## From weight space to function space 
 
-In the plot above, we saw how a distribution over parameters in a model induces a distribution over functions. While we often have ideas about the functions we want to model --- whether they're smooth, periodic, quickly varying, etc. --- it's relatively tedious to reason about the parameters, which are largely uninterpretable.
+In the plot above, we saw how a distribution over parameters in a model induces a distribution over functions. While we often have ideas about the functions we want to model --- whether they're smooth, periodic, quickly varying, etc. --- it's relatively tedious to reason about the parameters, which are largely uninterpretable. Fortunately, Gaussian processes provide an easy mechanism to reason _directly_ about functions. Since a Gaussian distribution is entirely defined by its first two moments, its mean and covariance matrix, a Gaussian process by extension is defined by its mean function and covariance function.
+
+In the above example, the mean function 
+
+$m(x) = \mathbb{E}[f(x)] = \mathbb{E}[w_0 + w_1x] = \mathbb{E}[w_0] + \mathbb{E}[w_1]x = 0+0 = 0$.
+
+Similarly, the covariance function is
+
+$k(x,x') = cov(f(x),f(x')) = \mathbb{E}[f(x)f(x')]-\mathbb{E}[f(x)]\mathbb{E}[f(x')] = \mathbb{E}[w_0^2 + w_0w_1x' + w_1w_0x + w_1^2xx'] = 1 + xx'$.
+
+Our distribution over functions can now be directly specified and sampled from, without needing to sample from the distribution over parameters. For example, to draw from $f(x)$, we can simply form our multivariate Gaussian distribution associated with any collection of $x$ we want to query, and sample from it directly. We will begin to see, in the next section, just how advantageous this formulation will be. 
+
+First, we note that the essentially the same derivation for the simple straight line model above can be applied to find the mean and covariance function for _any_ model of the form $f(x) = w^{\top} \phi(x)$, with $w \sim \mathcal{N}(u,S)$. In this case, the mean function $m(x) = u^{\top}\phi(x)$, and the covariance function $k(x,x') = \phi(x)^{\top}S\phi(x')$. Since $\phi(x)$ can represent a vector of any non-linear basis functions, we are considering a very general model class. 
+
+## The radial basis function (RBF) kernel
+
+
+## The neural network kernel 
+
 
 
 
