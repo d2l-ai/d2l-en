@@ -2,6 +2,8 @@
 
 Understanding Gaussian processes (GPs) is important for reasoning about model construction and generalization, and for achieving state-of-the-art performance in a variety of applications, including active learning, and hyperparameter tuning in deep learning. GPs are everywhere, and it is in our interests to know what they are and how we can use them. 
 
+In this section, we introduce Gaussian process _priors_ over functions. In the next section, we show how to use these priors to do _posterior inference_ and make predictions. The next section can be viewed as ``GPs in a nutshell'', quickly giving what you need to apply Gaussian processes in practice.
+
 ## Definition
 
 A Gaussian process is defined as _a collection of random variables, any finite number of which have a joint Gaussian distribution_. If a function $f(x)$ is a Gaussian process, with _mean function_ $m(x)$ and _covariance function_ or _kernel_ $k(x,x')$, $f(x) \sim \mathcal{GP}(m, k)$, then any collection of function values queried at any collection of input points $x$ (times, spatial locations, image pixels, etc.), has a joint multivariate Gaussian distribution with mean vector $\mu$ and covariance matrix $K$: $f(x_1),\dots,f(x_n) \sim \mathcal{N}(\mu, K)$, where $\mu_i = \mathbb{E}[f(x_i)] = m(x_i)$ and $K_{ij} = cov(f(x_i),f(x_j)) = k(x_i,x_j)$. 
@@ -41,7 +43,7 @@ Similarly, the covariance function is
 
 $k(x,x') = cov(f(x),f(x')) = \mathbb{E}[f(x)f(x')]-\mathbb{E}[f(x)]\mathbb{E}[f(x')] = \mathbb{E}[w_0^2 + w_0w_1x' + w_1w_0x + w_1^2xx'] = 1 + xx'$.
 
-Our distribution over functions can now be directly specified and sampled from, without needing to sample from the distribution over parameters. For example, to draw from $f(x)$, we can simply form our multivariate Gaussian distribution associated with any collection of $x$ we want to query, and sample from it directly. We will begin to see, in the next section, just how advantageous this formulation will be. 
+Our distribution over functions can now be directly specified and sampled from, without needing to sample from the distribution over parameters. For example, to draw from $f(x)$, we can simply form our multivariate Gaussian distribution associated with any collection of $x$ we want to query, and sample from it directly. We will begin to see just how advantageous this formulation will be. 
 
 First, we note that essentially the same derivation for the simple straight line model above can be applied to find the mean and covariance function for _any_ model of the form $f(x) = w^{\top} \phi(x)$, with $w \sim \mathcal{N}(u,S)$. In this case, the mean function $m(x) = u^{\top}\phi(x)$, and the covariance function $k(x,x') = \phi(x)^{\top}S\phi(x')$. Since $\phi(x)$ can represent a vector of any non-linear basis functions, we are considering a very general model class, including models with an even an _infinite_ number of parameters.
 
@@ -78,10 +80,33 @@ We can build further intuition about Gaussian processes with RBF kernels, and hy
 4. Sample more times to visualize more sample functions queried at those points. 
 
 We illustrate this process in the figure below.
-(! Add Figure)
+(! Add Figure + code)
 
 ## The neural network kernel 
 
 Research on Gaussian processes in machine learning was triggered by research on neural networks. Radford Neal was pursuing ever larger Bayesian neural networks, ultimately showing in 1994 that such networks with an infinite number of hidden units become Gaussian processes with particular kernel functions. Interest in this derivation has re-surfaced, with ideas like the neural tangent kernel being used to investigate the generalization properties of neural networks. We can derive the neural network kernel as follows.
+
+Consider a neural network function $f(x)$ with one hidden layer:
+
+$f(x) = b + \sum_{i=1}^{J} v_i h(x; u_i)$
+
+$b$ is a bias, $v_i$ are the hidden to output weights, $h$ is any bounded hidden unit transfer function, $u_i$ are the input to hidden weights, and $J$ is the number of hidden units. Let $b$ and $v_i$ be independent with zero mean and variances $\sigma_b^2$ and $\sigma_v^2/J$, respectively, and let the $u_i$ have independent identical distributions. We can then use the central limit theorem to show that any collection of function values $f(x_1),\dots,f(x_n)$ has a joint multivariate Gaussian distribution. 
+
+The mean and covariance function of the corresponding Gaussian process are:
+
+$m(x) = \mathbb{E}[f(x)] = 0$
+
+$k(x,x') = \text{cov}[f(x),f(x')] = \mathbb{E}[f(x)f(x')] = \sigma_b^2 + \frac{1}{J} \sum_{i=1}^{J} \sigma_v^2 \mathbb{E}[h_i(x; u_i)h_i(x'; u_i)]$
+
+In some cases, we can essentially evaluate this covariance function in closed form. Let $h(x; u) = \text{erf}(u_0 + \sum_{j=1}^{P} u_j x_j)$, where $\text{erf}(z) = \frac{2}{\sqrt{\pi}} \int_{0}^{z} e^{-t^2} dt$, and $u \sim \mathcal{N}(0,\Sigma)$. Then $k(x,x') = \frac{2}{\pi} \text{sin}(\frac{2 \tilde{x}^{\top} \Sigma \tilde{x}'}{\sqrt{(1 + 2 \tilde{x}^{\top} \Sigma \tilde{x})(1 + 2 \tilde{x}'^{\top} \Sigma \tilde{x}')}})$.
+
+The RBF kernel is _stationary_, meaning that it is _translation invariant_, and therefore can be written as a function of $\tau = x-x'$. Intuitively, stationarity means that the high-level properties of the function, such as rate of variation, do not change as we move in input space. The neural network kernel, however, is _non-stationary_. Below, we show sample functions from a Gaussian process with this kernel. We can see that the function looks qualitatively different near the origin. 
+
+(! Add Figure)
+
+
+
+
+
 
 
