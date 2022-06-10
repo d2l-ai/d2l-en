@@ -5,6 +5,6 @@
 ```toc
 :maxdepth: 2
 
-explainability-intro
+explainability-overview
 ```
 
