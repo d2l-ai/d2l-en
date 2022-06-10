@@ -76,13 +76,13 @@ The accuracy is not bad but not that eye-catching. The good thing is that the mo
 
 ```{.python .input}
 #@save
-def plot_feature_importance(names, importance, fsize=(2, 2.5), xlabel=None): 
+def plot_hbar(names, importance, fsize=(3, 3.5), xlabel=None): 
     d2l.plt.figure(figsize=fsize)
     d2l.plt.barh(range(len(names)), importance)
     d2l.plt.yticks(range(len(names)), names)
     d2l.plt.xlabel(xlabel)
     
-plot_feature_importance(data.feat_col, lr.coef_[0])
+plot_hbar(data.feat_col, lr.coef_[0])
 ```
 
 Through this figure, we can roughly know how changes in a feature value affect the model prediction. However, it is inappropriate to directly consider the coefficients of *logistic* regression as feature importance as a sigmoid function is used to convert the output into probabilities. You may do so if the input variables have the same scale and it is a *linear* regression model. In later sections, we will introduce how to interpret logistic regression correctly (e.g., using the odds ratio). The key takeaway here is that it is possible to obtain understandable explanations from linear models.
