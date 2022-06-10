@@ -72,7 +72,7 @@ print('Validation accuracy : %.3f'%
       lr.score(data.X_test, np.squeeze(data.y_test))) 
 ```
 
-Although the accuracy is not so impressive, on the positive side the model is not difficult to understand. For example, let's plot the learned weights with their corresponding features.
+Although the accuracy is not so impressive, on the positive side the model is easy to understand. For example, we can understand how the model works by plotting the learned weights aligned with their features.
 
 ```{.python .input}
 #@save
@@ -140,32 +140,41 @@ d2l.plt.show()
 
 ## Explainability
 
-*Explainability* in machine learning is the degree to which humans can understand the decisions made by machine learning models. Often, simple models such as linear regression, logistic regression, and decision tree are easy to interpret (or self-explanatory) but fall short in capturing the intricate patterns in data, while complex models (also known as black-box models) sacrifice explainability for better performances. Good explanations are the key to communicating with practitioners and domain experts and enabling a wide deployment of machine learning algorithms. It also provides a new perspective to troubleshoot complex models, speedup debugging processes, bust biases and other potential AI potholes.
+In previous examples we tried to understand how simple and complex models work. 
+In machine learning, *explainability* is the degree to which humans can understand the decisions made by models. 
 
-Simple models can be valuable in some applications. That is also true in fields other than machine learning. Sometimes, people use easy-to-employ simple models to avoid cognitive overload. For example, emergency medical workers use the [rule of nines](https://en.wikipedia.org/wiki/Wallace_rule_of_nines) :numref:`fig_ruleof9s` to quickly assess a burn's percentage of the total skin;  Recreational divers use a [diving planner](https://en.wikipedia.org/wiki/Recreational_Dive_Planner) to determine how long they can safely stay underwater at a given depth to avoid putting too much nitrogen in their bodies which can cause injury or even death.
+Often, simple models such as linear regression, logistic regression, and decision trees are easy to interpret (or self-explanatory) but fall short in capturing the intricate patterns in data.
+Nonetheless,
+humans have been using easy-to-employ simple models to avoid cognitive overload. For example, emergency medical workers use the [rule of nines](https://en.wikipedia.org/wiki/Wallace_rule_of_nines) :numref:`fig_ruleof9s` to quickly assess a burn's percentage of the total skin; Recreational divers use a [diving planner](https://en.wikipedia.org/wiki/Recreational_Dive_Planner) to determine how long they can safely stay underwater at a given depth to avoid putting too much nitrogen in their bodies which can cause injury or even death.
 
 ![Rule of nines for measuring the burn surface area.](../img/ruleof9s.svg)
 :label:`fig_ruleof9s`
 
-Nonetheless, it is undeniable that we have been witnessing a boom of black-box models in the past decade, and many breakthrough results (e.g., image recognition and natural language understanding) are obtained with black-box models. Therefore, we need additional explanation tools when black-box models are necessary, and we want to understand these models. In this chapter, we will introduce some of the popular explanation approaches. Before delving into the details, it is worthwhile to get yourself familar with important terminologies you will encounter.
+While simple models and rules of thumb can help,
+there has been a boom of complex models, driving numerous breakthrough results in a wide range of fields. 
+In general, complex models (also known as black-box models) trade explainability for better performance.
+Good explanations are key to communicating with practitioners and domain experts for deploying models more broadly. They also provide a new perspective to troubleshoot complex models, speedup debugging processes, bust biases and other potential AI potholes.
+
+This chapter will walk you through popular explanation approaches, which can be classified according to different perspectives as follows.
+
 
 **Forms of explanations:**
-Explanations come in various forms. It can be numerical feature importance values, saliency maps, readable sentences, graphs, or a few representative instances. Explanations ought to be humanly comprehensible and aligned with the vocabulary of target users. That is, explanations that domain experts can understand are not necessarily comprehensible to ordinary users.
+Explanations come in various forms. They can be numerical feature importance values, saliency maps, readable sentences, graphs, or a few representative instances. Explanations should be humanly comprehensible and aligned with the vocabulary of target users. That is, explanations that domain experts can understand are not necessarily comprehensible to ordinary users.
 
 **Stakeholders of explanations:**
 The stakeholders can be end-users who are directly affected by the AI decisions, AI practitioners who design and implement the AI models, domain experts who will refer to the explanations when making decisions, business owners who are responsible for ensuring AI systems to be aligned with corporate strategies, and governments who should regulate the usage of AI algorithms.
 
 **Inherently interpretable models and post-hoc explanation methods:**
-Some machine learning models :cite:`Bishop.2006` such as linear regression, logistic/softmax regression, naive Bayes classifier, k-nearest neighbors, decision trees, decision set, and generalized additive models (GAMs) :cite:`Hastie.Tibshirani.2017` are *inherently explainable* (or *self-explanatory*), which means that they are human-understandable and we can easily figure out how predictions are obtained. When models become more complex and challenging to interpret in itself (deep neural networks, random forests :cite:`Breiman.2001`, support vector machines :cite:`Scholkopf.Smola.2002`, XGBoost :cite:`Chen.Guestrin.2016`, etc.), post-hoc explanations come to the rescue. Figure :numref:`fig_posthoc-xdl` illustrates the pipeline of post-hoc explanation methods. Once a black-box model is trained, we can apply the post-hoc explanantion methods and produce human-understandable explanations.
+Some machine learning models, such as linear regression, logistic/softmax regression, naive Bayes classifiers, k-nearest neighbors, decision trees, decision set, and generalized additive models, are *inherently explainable* (or *self-explanatory*), which means that they are human-understandable and we can easily figure out how predictions are obtained. When models become more complex and challenging to interpret in itself (e.g., deep neural networks, random forests, support vector machines, and XGBoost), post-hoc explanations come to the rescue. :numref:`fig_posthoc-xdl` illustrates the pipeline of post-hoc explanation methods. Once a black-box model is trained, we can apply post-hoc explanantion methods and produce human-understandable explanations.
 
-![A pipline of post-hoc explanation methods.](../img/posthoc-xdl.svg)
+![Pipeline of post-hoc explanation methods.](../img/posthoc-xdl.svg)
 :label:`fig_posthoc-xdl`
 
 **Global explanations and local explanations:**
-Pertaining the scope of explanations, we can classify explanations into *global explanations* and *local explanations*. Global explanation methods describe the average behavior of a model and connote some sense of understanding of the mechanism by which the model works. A typical global explanation method is the global feature importance plot that displays how much impact on average each feature has on model predictions. On the contrary, local explanation methods are centered around the prediction of each instance and focus on explaining how a specific prediction is obtained for an individual sample. For example, local explanation methods for image classifiers allow us to understand which pixels make an image be classified as a bird. Moreover, local explanations are helpful to vet if individual predictions are being made for the right reasons (e.g., whether gender is heavily used when predicting the eligibility of loan applicants).
+Pertaining to the scope of explanations, we can classify explanations into global and local explanations. *Global explanation methods* describe the average behavior of a model and connote some sense of understanding of the mechanism by which the model works. A typical global explanation method is the global feature importance plot that displays how much impact on average each feature has on model predictions. On the contrary, *local explanation methods* are centered around the prediction of each instance and focus on explaining how a specific prediction is obtained for an individual sample. For example, local explanation methods for image classifiers allow us to understand which pixels make an image be classified as a bird. Moreover, local explanations are helpful to vet if individual predictions are being made for the right reasons (e.g., whether gender is heavily used when predicting the eligibility of loan applicants).
 
 **Model-agnostic methods and model-specific methods:**
-Based on the applicability of explanation methods, we have *model-agnostic* explanation methods and *model-specific* explanation methods. The former is more flexible and can be applied to any black-box model regardless of its structure, while the latter is limited to specific model classes.
+Based on the applicability of explanation methods, we have *model-agnostic* and *model-specific* explanation methods. The former is more flexible and can be applied to any black-box model regardless of its structure, while the latter is limited to specific model classes.
 
 
 
