@@ -7,7 +7,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 :label:`sec_mlp_scratch`
 
 Multilayer perceptrons (MLPs) are not much more complex to implement than simple linear models. The key conceptual 
-difference is that we now concatenate multiple layers. 
+difference is that we now concatenate multiple layers.
 
 ```{.python .input  n=2}
 %%tab mxnet
