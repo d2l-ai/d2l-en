@@ -8,9 +8,32 @@ In regression, we often assume the outputs are given by a latent noise-free func
 
 $y(x) = f(x) + \epsilon(x)$, (1) 
 
-with $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$, and $f(x) \sim \mathcal{GP}(0,k)$. Let $\mathbf{y} = y(X) = (y(x_1),\dots,y(x_n))^{\top}$ be a vector of our training observations, and $\textbf{f} = (f(x_1),\dots,f(x_n))^{\top}$ be a vector of the latent noise-free function values, queried at the training inputs $X = {x_1, \dots, x_n}$. Suppose we want to make predictions at a set of inputs $X_* = x_{*1},x_{*2},\dots,x_{*m}$. Then we want to find $x^2$ and $p(\mathbf{f}_* | \mathbf{y}, X)$. In the regression setting, we can conveniently find this distribution by using Gaussian identities, after finding the joint distribution over $\mathbf{f}_* = f(X_*)$ and $\mathbf{y}$. 
+with $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$. Let $\mathbf{y} = y(X) = (y(x_1),\dots,y(x_n))^{\top}$ be a vector of our training observations, and $\textbf{f} = (f(x_1),\dots,f(x_n))^{\top}$ be a vector of the latent noise-free function values, queried at the training inputs $X = {x_1, \dots, x_n}$.
+
+We will assume $f(x) \sim \mathcal{GP}(m,k)$, which means that any collection fo function values \textbf{f} has a joint multivariate Gaussian distribution, with mean vector $\mu_i = m(x_i)$ and covariance matrix $K_{ij} = k(x_i,x_j)$. The RBF kernel $k(x_i,x_j) = a^2 \exp\left(-\frac{1}{2\ell^2}||x-x_j||^2\right)$ would be a standard choice of covariance function. For notational simplicity, we'll assume the mean function $m(x)=0$; our derivations can easily be generalized later on.
+
+Suppose we want to make predictions at a set of inputs $$X_* = x_{*1},x_{*2},\dots,x_{*m}$$. Then we want to find $x^2$ and $p(\mathbf{f}_* | \mathbf{y}, X)$. In the regression setting, we can conveniently find this distribution by using Gaussian identities, after finding the joint distribution over $\mathbf{f}_* = f(X_*)$ and $\mathbf{y}$. 
 
 If we evaluate equation (1) at the training inputs $X$, we have $\mathbf{y} = \mathbf{f} + \mathbf{\epsilon}$. By the definition of a Gaussian process (see last section), $\mathbf{f} \sim \mathcal{N}(0,K(X,X))$ where $K(X,X)$ is an $n \times n$ matrix formed by evaluating our covariance function (aka _kernel_) at all possible pairs of inputs $x_i, x_j \in X$. $\mathbf{\epsilon}$ is simply a vector comprised of iid samples from $\mathcal{N}(0,\sigma^2)$ and thus has distribution $\mathcal{N}(0,\sigma^2I)$. $\mathbf{y}$ is therefore a sum of two independent multivariate Gaussian variables, and thus has distribution $\mathcal{N}(0, K(X,X) + \sigma^2I)$. One can also show that $\text{cov}(\mathbf{f}_*, \mathbf{y}) = \text{cov}(\mathbf{y},\mathbf{f}_*)^{\top} = K(X_*,X)$ where $K(X_*,X)$ is an $m \times n$ matrix formed by evaluating the kernel at all pairs of test and training inputs. 
+
+$$
+\begin{bmatrix}
+\mathbf{y} \\
+\mathbf{f}_*
+\end{bmatrix}
+\sim
+\mathcal{N}\left(0, 
+\mathbf{A} = \begin{bmatrix}
+K(X,X)+\sigma^2I & K(X,X_\*) \\
+K(X_\*,X) & K(X_\*,X_\*)
+\end{bmatrix}
+\right)
+$$
+
+We can then use standard Gaussian identities to find the conditional distribution from the joint distribution (see, e.g., Bishop Chapter 2), 
+$\mathbf{f}_* | \mathbf{y}, X, X_* \sim \mathcal{N}(m_*,S_*)$, where $m_* = K(X_*,X)[K(X,X)+\sigma^2I]^{-1}\textbf{y}$, and $S = K(X_*,X_*) - K(X_*,X)[K(X,X)+\sigma^2I]^{-1}K(X,X_*)$.
+
+Typically, we do not need to make use of the full predictive covariance matrix $S$, and instead use the diagonal of $S$ for uncertainty about each prediction. Often for this reason we write the predictive distribution for a single test point $x_*$, rather than a collection of test points. Also, the kernel matrix has parameters $\theta$ that we also wish to estimate, such the amplitude $a$ and lengthscale $\ell$ of the RBF kernel above. For these purposes we use the _marginal likelihood_, $p(\textbf{y} | \theta, X)$, which we already derived in working out the marginal distributions to find the joint distribution over $\textbf{y},\textbf{f}_*$.
 
 
 
