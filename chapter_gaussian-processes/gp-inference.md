@@ -50,8 +50,8 @@ $$\log p(\textbf{y} | \theta, X) = -\frac{1}{2}\textbf{y}^{\top}[K_{\theta}(X,X)
 
 The predictive distribution has the form:
 $$p(y_* | x_*, \textbf{y}, \theta) = \mathcal{N}(a_*,v_*)$$
-$$a_* = k(x_*,X)[K(X,X)+\sigma^2I]^{-1}(\textbf{y}-\mu) + \mu$$
-$$v_* = k(x_*,x_*) - K(x_*,X)[K(X,X)+\sigma^2I]^{-1}k(X,x_*)$$
+$$a_* = k_{\theta}(x_*,X)[K_{\theta}(X,X)+\sigma^2I]^{-1}(\textbf{y}-\mu) + \mu$$
+$$v_* = k_{\theta}(x_*,x_*) - K_{\theta}(x_*,X)[K_{\theta}(X,X)+\sigma^2I]^{-1}k_{\theta}(X,x_*)$$
 
 ## Interpreting Equations for Learning and Predictions
 
