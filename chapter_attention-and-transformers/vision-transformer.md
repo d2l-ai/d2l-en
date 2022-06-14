@@ -14,8 +14,10 @@ in the field of computer vision
 the dominant architecture
 had been based on
 CNNs (:numref:`chap_modern_cnn`).
-*Can we apply transformers
+*Can we adapt transformers
 to model image data*?
+This question has sparked immense interest
+in the computer vision community.
 :cite:`ramachandran2019stand` proposed to replace convolution with self-attention. 
 However, its use of specialized patterns in attention makes it hard to scale up models on hardware accelerators.
 :cite:`cordonnier2020relationship` theoretically proved that self-attention can learn to behave similarly to convolution. Empirically, $2 \times 2$ patches were taken from images as input, but the small patch size makes the model only applicable to image data with low resolutions.
