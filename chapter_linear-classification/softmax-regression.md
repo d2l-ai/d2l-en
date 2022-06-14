@@ -417,7 +417,7 @@ that in order to encode data drawn randomly from the distribution $P$,
 we need at least $H[P]$ "nats" to encode it :cite:`Shannon.1948`.
 If you wonder what a "nat" is, it is the equivalent of bit
 but when using a code with base $e$ rather than one with base 2.
-Thus, one nat is $\frac{1}{\log(2)} \approx 1.44$ bit.
+Thus, one nat is $\frac{1}{\ln(2)} \approx 1.44$ bit.
 
 
 ### Surprisal
