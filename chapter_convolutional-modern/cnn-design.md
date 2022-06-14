@@ -430,7 +430,7 @@ of self-attention (to be covered in :numref:`sec_self-attention-and-positional-e
 makes the transformer architecture
 less suitable for higher-resolution images.
 To address this issue,
-hierarchical vision transformers (Swin transformers)
+Swin Transformers
 introduce shifted windows to
 achieve state-of-the-art performance
 in a broader range of vision tasks beyond image classification :cite:`liu2021swin`.
@@ -441,7 +441,7 @@ the process of gradually
 improving from a standard ResNet architecture
 toward the design of a vision transformer
 leads to a family of CNN models called ConvNeXts
-that compete favorably with hierarchical vision transformers :cite:`liu2022convnet`.
+that compete favorably with Swin Transformers :cite:`liu2022convnet`.
 We refer the interested readers
 to CNN design discussions
 in the ConvNeXt paper :cite:`liu2022convnet`.
