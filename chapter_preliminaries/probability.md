@@ -1,4 +1,4 @@
-```{.python .input  n=69}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
@@ -244,7 +244,7 @@ the number of occurrences of tails.
 
 ```{.python .input}
 %%tab mxnet
-fair_probs = [0.5, 0.5]
+fair_probs = [0.5, 0.5] 
 multinomial(100, fair_probs)
 ```
 
@@ -263,7 +263,8 @@ tfd.Multinomial(100, fair_probs).sample()
 ```{.python .input}
 %%tab jax
 fair_probs = [0.5, 0.5]
-np.random.multinomial(100, fair_probs) # jax.random does have multinomial distribution implemented
+# jax.random does have multinomial distribution implemented
+np.random.multinomial(100, fair_probs)
 ```
 
 Each time you run this sampling process,
@@ -1100,9 +1101,5 @@ interval centered on the expectation.
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/198)
-:end_tab:
-
-:begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/198)
 :end_tab:
