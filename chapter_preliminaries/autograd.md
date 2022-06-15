@@ -597,7 +597,7 @@ d = f(a)
 d_grad = grad(f)(a)
 ```
 
-Even though our function `f` is a bit
+Even though our function `f` is a bit 
 contrived for demonstration purposes,
 its dependence on the input is quite simple: 
 it is a *linear* function of `a` 
@@ -626,12 +626,12 @@ d_grad == d / a
 d_grad == d / a
 ```
 
-Dynamic control flow is very common in deep learning.
+Dynamic control flow is very common in deep learning. 
 For instance, when processing text, the computational graph
-depends on the length of the input.
-In these cases, automatic differentiation
-becomes vital for statistical modeling
-since it is impossible to compute the gradient a priori.
+depends on the length of the input. 
+In these cases, automatic differentiation 
+becomes vital for statistical modeling 
+since it is impossible to compute the gradient a priori. 
 
 ## Discussion
 
@@ -655,6 +655,7 @@ are leveraged to compute results
 in the most expedient and memory-efficient manner. 
 
 For now, try to remember these basics: (i) attach gradients to those variables with respect to which we desire derivatives; (ii) record the computation of the target value; (iii) execute the backpropagation function; and  (iv) access the resulting gradient.
+
 
 ## Exercises
 
