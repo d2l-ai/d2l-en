@@ -7,17 +7,15 @@ Linear models describe a target variable in terms of a linear combination of pre
 
 To get started, let's revisit two popular linear models: linear regression and logistic regression. Linear regression is used to handle regression problems, whereas logistic regression is used to deal with classification problems.
 
-Suppose we have $N$ samples and each sample has features $x_1^{(i)},...x_p^{(i)}$ and a groundtruth target $y^{(i)}$, $i=1,...,N$, the predicted output for this sample of linear regression is formulated as
+Suppose we have $N$ samples and each sample has features $x_1^{(i)},...x_p^{(i)}$ and a groundtruth target $y^{(i)}$, $i=1,...,N$, the predicted output for the $i^\mathrm{th}$ sample of linear regression is formulated as
 $$
 \hat{y}^{(i)} = b + w_1 x_1^{(i)} + ...+w_j x_j^{(i)}+...+ w_p x_p^{(i)},
 $$
 
 where $w_*$ represents the coefficient (or weight) that describe the mathematical relationship between each predictive variable and the predicted target; $b$ is the intercept which can also be viewed as a coefficient with $1$ as the feature value.
 
-Logistic regression is useful for binary classification problems where the targets are dichotomic (e.g., absence or presence). It converts the output into probabilities using a logistic function.
-$$
-\hat{y}^{(i)} = \frac{1}{1 + \exp{(-(b + w_1 x_1^{(i)} +...+w_j x_j^{(i)}+...+ w_p x_p^{(i)}))}}.
-$$
+Logistic regression is useful for binary classification problems where the targets are dichotomic (e.g., absence or presence). It converts the output into probabilities using a logistic function,
+$$\hat{y}^{(i)} = \frac{1}{1 + \exp{(-(b + w_1 x_1^{(i)} +...+w_j x_j^{(i)}+...+ w_p x_p^{(i)}))}}.$$
 :eqlabel:`eq_logistic-regression`
 
 Essentially, the parameters $w_*$ and $b$ of both models are learned by minimizing the discrepancies between predicted $\hat{y}^{(i)}$ and actual $y^{(i)}$ target values. For more details about the regularization, optimization, and evaluation process, please visit :numref:`chap_linear` and :numref:`chap_classification`. We import the necessary libraries below.
@@ -124,7 +122,7 @@ pd.DataFrame(list(zip(data.feat_col, np.exp(lr.coef_[0]))),
                   columns=['Feature', 'Odds Ratio']).transpose()
 ```
 
-Now we can easily interpret logistic regression: increasing $x_j$ by one unit will scale the odds by a factor of $ \exp(w_j)$. For example, we observe that an increase in a patient's age does not change the odds of having heart disease vs. not having heart disease much since the odds ratio is around $1$. For categorical features such as chest pain type (0: typical angina, 1: atypical angina, 2: non-anginal pain, 3: asymptomatic), changing the pain type from *typical angina* to  *atypical angina* will double the odds of having heart disease vs. not having heart disease because the odds ratio is over $2$. Note that the interpretations are merely about the model behavior and do not imply real-world causality.
+Now we can easily interpret logistic regression: increasing $x_j$ by one unit will scale the odds by a factor of $\exp(w_j)$. For example, we observe that an increase in a patient's age does not change the odds of having heart disease vs. not having heart disease much since the odds ratio is around $1$. For categorical features such as chest pain type (0: typical angina, 1: atypical angina, 2: non-anginal pain, 3: asymptomatic), changing the pain type from *typical angina* to  *atypical angina* will double the odds of having heart disease vs. not having heart disease because the odds ratio is over $2$. Note that the interpretations are merely about the model behavior and do not imply real-world causality.
 
 ## Summary
 Linear models encompass a range of variants, such as ridge regression and logistic regression. Interpreting linear models is an essential yet non-trivial endeavor. We introduced how to correctly interpret two popular linear models (linear regression and logistic regression). When the underlying patterns are not linear, more complex models such as neural networks shall be used. In this case, linear models can still be utilized as surrogate models to explain the prediction of given instances :cite:`ribeiro2016should`.
