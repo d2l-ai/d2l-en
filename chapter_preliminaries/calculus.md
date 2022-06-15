@@ -420,7 +420,7 @@ throughout this book will require calculating the gradient.
 1. Given a function $f(x)$ that is invertible, 
    compute the derivative of its inverse $f^{-1}(x)$. 
    Here we have that $f^{-1}(f(x)) = x$ and conversely $f(f^{-1}(y)) = y$. 
-   Hint: use these properties in your derivation.
+   Hint: use these properties in your derivation. 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/32)

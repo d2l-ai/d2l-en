@@ -319,8 +319,9 @@ tf.random.normal(shape=[3, 4])
 
 ```{.python .input}
 %%tab jax
-# any call of a random function in JAX requires a key to be specified
-# feeding the same key to a random function will always result in the same sample being generated
+# any call of a random function in JAX requires a key to be 
+# specified, feeding the same key to a random function will
+# always result in the same sample being generated
 jax.random.normal(jax.random.PRNGKey(0), (3, 4))
 ```
 

@@ -4,7 +4,6 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Documentation
-
 :begin_tab:`mxnet`
 While we cannot possibly introduce every single MXNet function and class 
 (and the information might become outdated quickly), 
@@ -29,6 +28,7 @@ the [API documentation](https://www.tensorflow.org/api_docs) and additional [tut
 provide such documentation. 
 This section provides some guidance for how to explore the TensorFlow API.
 :end_tab:
+
 
 ## Functions and Classes in a Module
 
