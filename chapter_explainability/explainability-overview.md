@@ -126,15 +126,15 @@ We can see that MLP outperforms logistic regression by a wide margin in accuracy
 
 ```{.python .input}
 d2l.set_figsize((5, 8))
-fig, ax = d2l.plt.subplots(1, 3)
+fig, ax = d2l.plt.subplots(1, 4)
 i = 0
 for param in model.parameters():
-    if param.shape == (256, 256):
-        im = ax[i].matshow(param.detach().numpy())
+    if param.shape == (256, 256) or param.shape == (256, 13):
+        im = ax[i].matshow(torch.t(param).detach().numpy())
         ax[i].set_axis_off()
         i += 1
 fig.colorbar(im, ax=ax.ravel().tolist(), location='right', fraction=0.02)
-fig.suptitle('Hidden layer weihghts of the MLP classifier', x=0.485, y=0.42)
+fig.suptitle('Hidden layer weihghts of the MLP classifier', x=0.485, y=0.32)
 d2l.plt.show()
 ```
 
