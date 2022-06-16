@@ -35,6 +35,7 @@ import requests
 from IPython import display
 from matplotlib import pyplot as plt
 from matplotlib_inline import backend_inline
+from sklearn import model_selection
 
 d2l = sys.modules[__name__]
 
@@ -2584,7 +2585,7 @@ class HeartDiseaseData(d2l.DataModule):
     def val_dataloader(self):
         return self.get_dataloader(False)
 
-def plot_feature_importance(names, importance, fsize=(2, 2.5), xlabel=None):
+def plot_hbar(names, importance, fsize=(3, 3.5), xlabel=None):
     d2l.plt.figure(figsize=fsize)
     d2l.plt.barh(range(len(names)), importance)
     d2l.plt.yticks(range(len(names)), names)

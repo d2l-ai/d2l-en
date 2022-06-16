@@ -76,13 +76,13 @@ Although the accuracy is not so impressive, on the positive side the model is ea
 
 ```{.python .input}
 #@save
-def plot_feature_importance(names, importance, fsize=(2, 2.5), xlabel=None): 
+def plot_hbar(names, importance, fsize=(3, 3.5), xlabel=None): 
     d2l.set_figsize(fsize)
     d2l.plt.barh(range(len(names)), importance)
     d2l.plt.yticks(range(len(names)), names)
     d2l.plt.xlabel(xlabel)
     
-plot_feature_importance(data.feat_col, lr.coef_[0])
+plot_hbar(data.feat_col, lr.coef_[0])
 ```
 
 This plot gives us a sense on how changes in the raw values of risk factors affect heart disease prediction. We highlight that it is inappropriate to directly treat the learned weights of *logistic regression* as feature importance (for *linear regression*, you may do so if the features have the same scale). Later we will introduce how to interpret logistic regression properly (e.g., using the odds ratio). Here we just need to know that it is possible to obtain understandable explanations from linear models.
