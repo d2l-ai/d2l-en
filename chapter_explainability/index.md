@@ -6,6 +6,6 @@
 :maxdepth: 2
 
 explainability-overview
-linear
+explainability-linear
 ```
 
