@@ -70,6 +70,7 @@ There are some key points to note about the predictive distributions for Gaussia
 ## Making Life Easy with GPyTorch
 
 
+## Exercises
 
 
 
