@@ -105,7 +105,7 @@ The RBF kernel is _stationary_, meaning that it is _translation invariant_, and 
 (! Add Figure)
 
 
-
+# Exercises
 
 
 
