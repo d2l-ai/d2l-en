@@ -1,24 +1,26 @@
 # Explainability of Linear Models
 
-Linear models describe a target variable in terms of a linear combination of predictive variables. Models such as linear regression, lasso regression, logistic regression, and softmax regression are the popular variants of linear models :numref:`chap_linear`. The linearity assumption limits linear models' expressiveness but makes them easy-to-understand. Even though linear models are not perfect fit solutions oftentimes, they are extensively adopted in a multitude of domains especially when people are concerned more about what drives models' behaviors than predictive accuracy. Correctly interpreting linear models is a critical step to model understanding and is fundamental to more advanced explanation methods. 
+Linear models (:numref:`chap_linear`) describe a target variable (e.g., heart disease or not) in terms of a linear combination of predictive variables (e.g., age, resting blood pressure, and serum cholesterol). Models such as linear regression, lasso regression, logistic regression, and softmax regression are the popular variants of linear models. The linearity assumption limits linear models' expressiveness but makes them easy to understand. Although linear models are often not perfect, they are extensively adopted in a multitude of domains especially when people are concerned more about what drives models' behaviors than predictive accuracy. Correctly interpreting linear models is a critical step to understand models and is fundamental to more advanced explanation methods. 
 
 
-## Revisit Linear Models 
+## Revisiting Linear Models 
 
-To get started, let's revisit two popular linear models: linear regression and logistic regression. Linear regression is used to handle regression problems, whereas logistic regression is used to deal with classification problems.
+To get started, let's revisit two popular linear models: linear regression (for regression problems with numeric targets) and logistic regression (for binary classifications).
 
-Suppose we have $N$ samples and each sample has features $x_1^{(i)},...x_p^{(i)}$ and a groundtruth target $y^{(i)}$, $i=1,...,N$, the predicted output for the $i^\mathrm{th}$ sample of linear regression is formulated as
+Suppose that we have $N$ samples and each sample has predictive variables (features) $x_1^{(i)},...x_p^{(i)}$ and a ground-truth target $y^{(i)}$, $i=1,...,N$, the predicted output for the $i^\mathrm{th}$ sample of linear regression is formulated as
+
 $$
 \hat{y}^{(i)} = b + w_1 x_1^{(i)} + ...+w_j x_j^{(i)}+...+ w_p x_p^{(i)},
 $$
 
-where $w_*$ represents the coefficient (or weight) that describe the mathematical relationship between each predictive variable and the predicted target; $b$ is the intercept which can also be viewed as a coefficient with $1$ as the feature value.
+where $w_*$ represents the coefficient (or weights that describes the mathematical relationship between each predictive variable and the predicted target, and $b$ is the intercept which can also be viewed as a coefficient for a predictive variable of value $1$.
 
-Logistic regression is useful for binary classification problems where the targets are dichotomic (e.g., absence or presence). It converts the output into probabilities using a logistic function,
+Logistic regression is useful for binary classification problems where the targets are dichotomic (e.g., absence or presence). It converts the output into probabilities using a logistic function:
+
 $$\mathbf{P}(\hat{y}^{(i)}=1) = \frac{1}{1 + \exp{(-(b + w_1 x_1^{(i)} +...+w_j x_j^{(i)}+...+ w_p x_p^{(i)}))}}.$$
 :eqlabel:`eq_logistic-regression`
 
-Essentially, the parameters $w_*$ and $b$ of both models are learned by minimizing the discrepancies between predicted $\hat{y}^{(i)}$ and actual $y^{(i)}$ target values. For more details about the regularization, optimization, and evaluation process, please visit :numref:`chap_linear` and :numref:`chap_classification`. We import the necessary libraries below.
+Essentially, the parameters $w_*$ and $b$ of both models are learned by minimizing the discrepancies between the predicted $\hat{y}^{(i)}$ and actual $y^{(i)}$ target values. More details on regularization, optimization, and evaluation can be found at :numref:`chap_linear` and :numref:`chap_classification`.
 
 ```{.python .input}
 from d2l import torch as d2l
