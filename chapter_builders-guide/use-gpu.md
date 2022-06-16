@@ -176,7 +176,7 @@ def num_gpus():  #@save
         return torch.cuda.device_count()
     if tab.selected('tensorflow'):
         return len(tf.config.experimental.list_physical_devices('GPU'))
-    
+
 num_gpus()
 ```
 
@@ -487,13 +487,13 @@ def set_scratch_params_device(self, device):
 def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
     self.save_hyperparameters()
     self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
-    
+
 @d2l.add_to_class(d2l.Trainer)  #@save
 def prepare_batch(self, batch):
     if self.gpus:
         batch = [d2l.to(a, self.gpus[0]) for a in batch]
     return batch
-    
+
 @d2l.add_to_class(d2l.Trainer)  #@save
 def prepare_model(self, model):
     model.trainer = self
@@ -550,3 +550,5 @@ In short, as long as all data and parameters are on the same device, we can lear
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/270)
 :end_tab:
+
+
