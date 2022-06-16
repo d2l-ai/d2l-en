@@ -12,8 +12,9 @@ In this chapter, we introduce Gaussian processes, starting with a familiar weigh
 :maxdepth: 2
 
 gp-intro
-functionspace
-inference
+gp-priors
+gp-inference
+gp-advanced
 examples
 ```
 
