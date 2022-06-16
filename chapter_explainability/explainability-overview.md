@@ -16,6 +16,7 @@ from sklearn import linear_model
 ```
 
 ## The Heart Disease Dataset
+:label:`subsec_heart-disease-dataset`
 
 Heart disease is one of the major causes of death globally. Leading risk factors for heart disease include high blood pressure, diabetes, unhealthy cholesterol level, etc. The [heart disease dataset](https://archive.ics.uci.edu/ml/datasets/heart+disease) that we will use is obtained from the UCI machine learning repository. As usual, the first step is to read the dataset and split it into training and testing sets.
 
