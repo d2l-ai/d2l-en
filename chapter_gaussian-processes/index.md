@@ -11,7 +11,6 @@ In this chapter, we introduce Gaussian processes, starting with a familiar weigh
 ```toc
 :maxdepth: 2
 
-gp-intro
 gp-priors
 gp-inference
 gp-advanced
