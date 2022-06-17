@@ -31,7 +31,7 @@ In short, $f(x)$ is a _random function_, or a _distribution over functions_. We 
 import numpy as np
 import matplotlib.pyplot as plt
 
-def lin_func(x,n_sample):
+def lin_func(x,n_sample): 
     preds = np.zeros((n_sample, x.shape[0]))
     for ii in range(n_sample):
         w = np.random.normal(0,1,2)
