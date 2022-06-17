@@ -13,7 +13,7 @@ Suppose that we have $N$ samples and each sample has features (predictive variab
 $$\hat{y}^{(i)} = b + w_1 x_1^{(i)} + ...+w_j x_j^{(i)}+...+ w_p x_p^{(i)},$$
 :eqlabel:`eq_xdl-linear-reg`
 
-where $w_*$ represents the coefficient (weight) that describes the mathematical relationship between each feature and the predicted target, and $b$ is the intercept (bias) that can also be viewed as the coefficient for a feature of value $1$.
+where $w_*$ represents the coefficient (weight) that describes the mathematical relationship between each feature and the predicted target, and $b$ is the intercept (bias) that can also be viewed as the coefficient multiplied by a constant feature of value $1$.
 
 Logistic regression is useful for binary classification problems where the targets are dichotomic (e.g., absence or presence). It converts the output into probabilities using a logistic function:
 
@@ -50,7 +50,7 @@ for i in range(len(regr.coef_)):
     print(f'{data.feat_col[i]:>8}: {regr.coef_[i]:.2f}')
 ```
 
-Any of these coefficients tells us the conditional dependency between a specific feature and the target when all the other features remain constant. Take :numref:`eq_xdl-linear-reg` as an example. On one hand, increasing feature $x_j$ by one unit leads to a change of $\hat{y}$ by $w_j$ when all the other features are fixed. If $w_j$ is positive, $\hat{y}$ will be increased by $|w_j|$; otherwise, it will be decreased by the same amount. Note that if $x_j$ is a categorical variable, changing $x_j$ by one unit may mean switching it from one category to the other (e.g., from female=0 to male=1), which depends on how categories are encoded. Moreover, if features were transformed (e.g., in the log scale) before training, such transformation details are needed for interpreting the coefficients precisely. On the other hand, the intercept $b$ anchors the regression line or surface in the right place: it can be interpreted as the predicted output you would obtain when setting all the features to zero. Note that it may not have a meaningful interpretation since sometimes $x_j$ cannot take  value 0 (e.g., blood pressure cannot be 0). 
+Any of these coefficients tells us the conditional dependency between a specific feature and the target when all the other features remain constant. Take :eqref:`eq_xdl-linear-reg` as an example. On one hand, increasing feature $x_j$ by one unit leads to a change of $\hat{y}$ by $w_j$ when all the other features are fixed. If $w_j$ is positive, $\hat{y}$ will be increased by $|w_j|$; otherwise, it will be decreased by the same amount. Note that if $x_j$ is a categorical variable, changing $x_j$ by one unit may mean switching it from one category to the other (e.g., from female=0 to male=1), which depends on how categories are encoded. Moreover, if features were transformed (e.g., in the log scale) before training, such transformation details are needed for interpreting the coefficients precisely. On the other hand, the intercept $b$ anchors the regression line or surface in the right place: it can be interpreted as the predicted output you would obtain when setting all the features to zero. However, oftentimes it does not have a meaningful interpretation, especially when $x_j$ cannot take value 0 (e.g., blood pressure cannot be 0).
 
 In the following example, we increase a patient's age by one year and check the influence on the predicted cholesterol level. The empirical result exactly supports our mathematical analysis.
 
@@ -69,7 +69,7 @@ In our example, the coefficients of the linear regression model took into accoun
 For example, *age* is expressed in "living years" while *resting blood pressure* is in "mmHg". Using natural units is convenient for intuitive explanations, especially for tangible concepts such as weight, height, temperature, and age. However, it is inappropriate to directly compare the coefficients to inspect the relative importance of input features. Furthermore, how categorical features are defined (e.g., different numbers of categories) will also influence the coefficient scale.
 
 To make coefficients comparable, we need to ensure that features are unitless. 
-To achieve this, we can certainly standardize the raw data and then retrain the model to reduce all the coefficients to the same unit of measure. As a simpler alternative, we can multiply the coefficients by the standard deviation of the  features, since this approximates the standardization of input features:
+To achieve this, we can certainly standardize the raw data and then retrain the model to reduce all the coefficients to the same unit of measure. As a simpler alternative, we can multiply the coefficients by the standard deviation of the  features, which is similar to feature standardization:
 
 $$
 \hat{y} = b+\sum_{j}^{p} w_j  x_j = b +\sum_{j}^{p} (w_j  \sigma_j) \cdot \left(\frac{x_j}{\sigma_j}\right).
