@@ -54,8 +54,7 @@ plt.show()
 
 ![linearfunc](https://user-images.githubusercontent.com/6753639/174243747-039b2520-177e-425e-b24f-33265b319103.png)
 
-
-If $w_0, w_1$ are instead drawn from $\mathcal{N}(0,\alpha^2)$, how do you imagine varying $\alpha$ affects the distribution over functions?
+If $w_0$ and $w_1$ are instead drawn from $\mathcal{N}(0,\alpha^2)$, how do you imagine varying $\alpha$ affects the distribution over functions?
 
 ## From weight space to function space 
 
