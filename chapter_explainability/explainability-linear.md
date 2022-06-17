@@ -17,7 +17,7 @@ where $w_*$ represents the coefficient (weight) that describes the mathematical 
 
 Logistic regression is useful for binary classification problems where the targets are dichotomic (e.g., absence or presence). It converts the output into probabilities using a logistic function:
 
-$$\mathbf{P}(\hat{y}^{(i)}=1) = \frac{1}{1 + \exp{(-(b + w_1 x_1^{(i)} +...+w_j x_j^{(i)}+...+ w_p x_p^{(i)}))}}.$$
+$$P(\hat{y}^{(i)}=1) = \frac{1}{1 + \exp{(-(b + w_1 x_1^{(i)} +...+w_j x_j^{(i)}+...+ w_p x_p^{(i)}))}}.$$
 :eqlabel:`eq_logistic-regression`
 
 Essentially, the parameters $w_*$ and $b$ of both models are learned by minimizing the discrepancies between predicted and actual target values. More details on regularization, optimization, and evaluation can be found at :numref:`chap_linear` and :numref:`chap_classification`.
@@ -108,12 +108,12 @@ To interpret this model, we will utilize odds and odds ratios. The odds of an ev
 
 In formal, let's reorganize the equation :eqref:`eq_logistic-regression` and move the linear combination part to the right.
 $$
-\ln (\frac{\mathbf{P}(\hat{y}^{(i)}=1)}{1-\mathbf{P}(\hat{y}^{(i)}=1) })= b + w_1 x_1^{(i)} +...+w_j x_j^{(i)}+...+ w_p x_p^{(i)}
+\ln (\frac{P(\hat{y}^{(i)}=1)}{1-P(\hat{y}^{(i)}=1) })= b + w_1 x_1^{(i)} +...+w_j x_j^{(i)}+...+ w_p x_p^{(i)}
 $$
 
 We can define odds as the predicted probability of having heart disease divided by the predicted probability of not having heart disease.
 $$
-\text{odds} = \frac{\mathbf{P}(\hat{y}^{(i)}=1)}{1-\mathbf{P}(\hat{y}^{(i)}=1) }=\frac{\mathbf{P}(\hat{y}^{(i)}=1)}{\mathbf{P}(\hat{y}^{(i)}=0) } = \exp (b + w_1 x_1^{(i)} +...+w_j x_j^{(i)}+...+ w_p x_p^{(i)})
+\text{odds} = \frac{P(\hat{y}^{(i)}=1)}{1-P(\hat{y}^{(i)}=1) }=\frac{P(\hat{y}^{(i)}=1)}{P(\hat{y}^{(i)}=0) } = \exp (b + w_1 x_1^{(i)} +...+w_j x_j^{(i)}+...+ w_p x_p^{(i)})
 $$
 
 The odds ratio compares the odds of two events: increasing $x_j$ by one unit and keeping it unchanged, and is defined as
