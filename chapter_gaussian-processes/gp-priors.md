@@ -81,7 +81,7 @@ Let's derive this kernel starting from weight space. Consider the function
 
 $f(x) = \sum_{i=1}^J w_i \phi_i(x)$, $w_i  \sim \mathcal{N}\left(0,\frac{\sigma^2}{J}\right)$, $\phi_i(x) = \exp\left(-\frac{(x-c_i)^2}{2\ell^2 }\right)$. $f(x)$ is a sum of radial basis functions, with width $\ell$, centred at the points $c_i$, as shown in the following figure. 
 
-(! Add Figure) 
+<img width="678" alt="rbfkernelderive" src="https://user-images.githubusercontent.com/6753639/174246980-b2203f82-1328-4d0f-ae9b-6b7f7d8f8fb2.png">
 
 We can recognize $f(x)$ as having the form $w^{\top} \phi(x)$, where $w = (w_1,\dots,w_J)^{\top}$ and $\phi(x)$ is a vector containing each of the radial basis functions. The covariance function of this Gaussian process is then 
 
