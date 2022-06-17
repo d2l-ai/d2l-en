@@ -8,19 +8,19 @@ Linear models (:numref:`chap_linear`) describe a target variable (e.g., heart di
 
 To get started, let's revisit two popular linear models: linear regression (for regression problems with numeric targets) and logistic regression (for binary classifications).
 
-Suppose that we have $N$ samples and each sample has features (predictive variables) $x_1^{(i)},...x_p^{(i)}$ and a ground-truth target $y^{(i)}$, $i=1,...,N$, the predicted output for the $i^\mathrm{th}$ sample of linear regression is formulated as
+Suppose that a data sample consists of features (predictive variables) $x_1,...x_p$ and a ground-truth target $y$. In linear regression, the predicted output for this sample is formulated as
 
-$$\hat{y}^{(i)} = b + w_1 x_1^{(i)} + ...+w_j x_j^{(i)}+...+ w_p x_p^{(i)},$$
+$$\hat{y} = b + \sum_{j=1}^p w_j x_j,$$
 :eqlabel:`eq_xdl-linear-reg`
 
 where $w_*$ represents the coefficient (weight) that describes the mathematical relationship between each feature and the predicted target, and $b$ is the intercept (bias) that can also be viewed as the coefficient multiplied by a constant feature of value $1$.
 
 Logistic regression is useful for binary classification problems where the targets are dichotomic (e.g., absence or presence). It converts the output into probabilities using a logistic function:
 
-$$P(\hat{y}^{(i)}=1) = \frac{1}{1 + \exp{(-(b + w_1 x_1^{(i)} +...+w_j x_j^{(i)}+...+ w_p x_p^{(i)}))}}.$$
+$$P(\hat{y}=1) = \frac{1}{1 + \exp{(-(b + \sum_{j=1}^p w_j x_j))}}.$$
 :eqlabel:`eq_logistic-regression`
 
-Essentially, the parameters $w_*$ and $b$ of both models are learned by minimizing the discrepancies between predicted and actual target values. More details on regularization, optimization, and evaluation can be found at :numref:`chap_linear` and :numref:`chap_classification`.
+Essentially, the parameters $w_*$ and $b$ of both models are learned by minimizing the discrepancies between predicted and actual target values. More details on regularization, optimization, and evaluation can be found in :numref:`chap_linear` and :numref:`chap_classification`.
 
 ```{.python .input}
 from d2l import torch as d2l
@@ -32,7 +32,7 @@ from sklearn.metrics import mean_absolute_error
 
 ## Explaining Linear Models
 
-
+To explain linear regression and logistic regression models, we will focus on coefficients and features in both models. You will soon realize that simply reading off coefficient values may cause issues.
 
 ### Interpreting Coefficients
 
@@ -92,51 +92,45 @@ print(f"{data.df['age'].corr(data.df['chol'], method='pearson'):.2f}")
 Some models are robust to correlated features. For instance, most tree-based models (e.g., decision trees and random forests) make no assumptions about the relationships between features. If two features are heavily correlated, one of them will be automatically ignored because splitting on it will have a low Gini or entropy value :cite:`Breiman.2001`. Some sophisticated post-hoc explanation methods such as SHAP :cite:`Lundberg.Lee.2017` can better deal with correlated features because it satisfies the *symmetry* property: if two tokens contribute equally to all possible coalitions, their contribution values are the same. We will cover it in more detail later.
 
 ### Odds Ratio
-Interpreting logistic regression is more complicated than interpreting linear regression due to the nonlinear logistic function as the weights no longer influence the probability linearly. Unfortunately, we do not have a reasonable intuition about the logistic function, which thwarts the explanation the coefficients. Again, let's train a logistic regression model for heart disease prediction.
+
+Interpretation of logistic regression is trickier than that of linear regression: the former has a nonlinear logistic function so coefficients do not influence output probability linearly. Since the logistic function is hard to interpret, we will seek for other explanation methods. First, let's re-train a logistic regression model for heart disease prediction.
 
 ```{.python .input}
 data = d2l.HeartDiseaseData()
 lr = linear_model.LogisticRegression(solver='sag', max_iter=20000)
 lr.fit(data.X_train, np.squeeze(data.y_train))
-print(f'Validation Accuracy: \
+print(f'Validation accuracy: \
     {lr.score(data.X_test, np.squeeze(data.y_test)):.5f}') 
 ```
 
-To interpret this model, we will utilize odds and odds ratios. The odds of an event are the probability that the event occurs divided by the probability that the event does not occur. Odds are widely used in areas such as gambling and medical statistics.
+Recall :eqref:`eq_logistic-regression` that logistic regression outputs probabilities. Let's define *odds* of an event to be the probability that the event occurs divided by the probability that the event does not occur. In fact, odds are widely used in areas such as gambling and medical statistics. According to :eqref:`eq_logistic-regression`, the odds of heart disease is
 
-In formal, let's reorganize the equation :eqref:`eq_logistic-regression` and move the linear combination part to the right.
-$$
-\ln (\frac{P(\hat{y}^{(i)}=1)}{1-P(\hat{y}^{(i)}=1) })= b + w_1 x_1^{(i)} +...+w_j x_j^{(i)}+...+ w_p x_p^{(i)}
-$$
 
-We can define odds as the predicted probability of having heart disease divided by the predicted probability of not having heart disease.
 $$
-\text{odds} = \frac{P(\hat{y}^{(i)}=1)}{1-P(\hat{y}^{(i)}=1) }=\frac{P(\hat{y}^{(i)}=1)}{P(\hat{y}^{(i)}=0) } = \exp (b + w_1 x_1^{(i)} +...+w_j x_j^{(i)}+...+ w_p x_p^{(i)})
+\text{odds} = \frac{P(\hat{y}=1)}{1-P(\hat{y}=1) } = \exp \left(b + \sum_{j=1}^p w_j x_j\right).
 $$
 
-The odds ratio compares the odds of two events: increasing $x_j$ by one unit and keeping it unchanged, and is defined as
-$$
-\begin{aligned}
-\frac{\text{odds} (x_j^{(i)}+1)}{\text{odds}} &= \frac{\exp (b + w_1 x_1^{(i)} + ...+w_j (x_j^{(i)}+1)+...+ w_p x_p^{(i)})}{\exp (b + w_1 x_1^{(i)} + ...+w_j x_j^{(i)}+...+ w_p x_p^{(i)})} \\
-&= \exp (w_j (x_j^{(i)}+1) - w_j x_j^{(i)}) = \exp(w_j)
-\end{aligned}
+We will use *odds ratio* to explain logistic regression models, which is the ratio between two events: increasing $x_j$ by one unit vs. keeping it fixed:
+
+$$\frac{\text{odds} (x_j+1)}{\text{odds}} = \frac{\exp (b + w_1 x_1 + \ldots+w_j (x_j+1)+\ldots+ w_p x_p)}{\exp (b + w_1 x_1 + \ldots+w_j x_j+\ldots+ w_p x_p)}  = \exp(w_j).
 $$
 
-Let's compute the odds of the logistic regression model.
+Odds ratio interprets logistic regression handily: increasing $x_j$ by one unit will scale the odds ratio by a factor of $\exp(w_j)$. Let's compute them for our logistic regression model in heart disease prediction.
 
 ```{.python .input}
-pd.DataFrame(list(zip(data.feat_col, np.around(np.exp(lr.coef_[0]),3))), 
+pd.DataFrame(list(zip(data.feat_col, np.around(np.exp(lr.coef_[0]), 3))), 
                   columns=['Feature', 'Odds Ratio']).transpose()
 ```
 
-Now we can easily interpret logistic regression: increasing $x_j$ by one unit will scale the odds by a factor of $\exp(w_j)$. For example, we observe that an increase in a patient's age does not change the odds of having heart disease vs. not having heart disease much since the odds ratio is around $1$. For categorical features such as chest pain type (0: typical angina, 1: atypical angina, 2: non-anginal pain, 3: asymptomatic), changing the pain type from *typical angina* to  *atypical angina* will double the odds of having heart disease vs. not having heart disease because the odds ratio is over $2$. Note that the interpretations are merely about the model behavior and do not imply real-world causality.
+Now we can explain our logistic regression model using odds ratio for each feature.
+For example, on one hand, an increase in a patient's age nearly does not change the odds of having heart disease vs. not having heart disease (the odds ratio is around $1$); on the other hand, for chest pain type (0: typical angina, 1: atypical angina, 2: non-anginal pain, 3: asymptomatic), changing the categorical type from "typical angina" to "atypical angina" will at least double the heart disease odds ratio (the odds ratio is over $2$). Note that such interpretations are on the model behavior and do not imply real-world causality.
 
 ## Summary
-Linear models encompass a range of variants, such as ridge regression and logistic regression. Interpreting linear models is an essential yet non-trivial endeavor. We introduced how to correctly interpret two popular linear models (linear regression and logistic regression). When the underlying patterns are not linear, more complex models such as neural networks shall be used. In this case, linear models can still be utilized as surrogate models to explain the prediction of given instances :cite:`ribeiro2016should`.
+Linear models encompass a range of variants, such as ridge regression and logistic regression. Interpreting linear models is an essential yet non-trivial endeavor. We introduced how to correctly interpret two popular linear models: linear regression and logistic regression. When the underlying patterns are not linear, more complex models such as neural networks shall be used. In this case, linear models can still be used as surrogate models to explain the prediction of given instances :cite:`ribeiro2016should`. We will discuss them soon.
 
 
 ## Exercises
 
 1. When can we view coefficients as feature importance?
-1. Can you interpret the feature *sex* in the logistic regression model?
-1. Calculate the feature correlations bewteen features for the heart disease dataset.
+1. How to interpret the feature *sex* in the logistic regression model?
+1. Calculate the feature correlations between features for the heart disease dataset.
