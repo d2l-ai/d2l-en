@@ -27,7 +27,33 @@ For any $x$, $f(x)$ is a sum of two Gaussian random variables. Since Gaussians a
 
 In short, $f(x)$ is a _random function_, or a _distribution over functions_. We can gain some insights into this distribution by repeatedly sampling values for $w_0, w_1$, and visualizing the corresponding functions $f(x)$, which are straight lines with slopes and different intercepts, as follows:
 
-(! Add plot here).
+```{.python .input}
+import numpy as np
+import matplotlib.pyplot as plt
+
+def lin_func(x,n_sample):
+    preds = np.zeros((n_sample, x.shape[0]))
+    for ii in range(n_sample):
+        w = np.random.normal(0,1,2)
+        y = w[0] + w[1]*x
+        preds[ii,:] = y
+    return preds
+
+x_points = np.linspace(-5, 5, 50)
+outs = lin_func(x_points,10)
+lw_bd = -2*np.sqrt((1+x_points**2))
+up_bd = 2*np.sqrt((1+x_points**2))
+
+plt.fill_between(x_points, lw_bd, up_bd, alpha=0.25)
+plt.plot(x_points, np.zeros(len(x_points)),linewidth=4,color='black')
+plt.plot(x_points, outs.T)
+plt.xlabel("x",fontsize=20)
+plt.ylabel("f(x)",fontsize=20)
+plt.show()
+```
+
+![linearfunc](https://user-images.githubusercontent.com/6753639/174243747-039b2520-177e-425e-b24f-33265b319103.png)
+
 
 If $w_0, w_1$ are instead drawn from $\mathcal{N}(0,\alpha^2)$, how do you imagine varying $\alpha$ affects the distribution over functions?
 
