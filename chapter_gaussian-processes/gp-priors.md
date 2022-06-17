@@ -74,8 +74,10 @@ First, we note that essentially the same derivation for the simple straight line
 
 ## The radial basis function (RBF) kernel
 
-The _radial basis function_ (RBF) kernel is the most popular covariance function for Gaussian processes, and kernel machines in general, including SVMs.
-(! state form of kernel here). Let's derive this kernel starting from weight space. Consider the function 
+The _radial basis function_ (RBF) kernel is the most popular covariance function for Gaussian processes, and kernel machines in general.
+This kernel has the form $k_{\text{RBF}}(x,x') = a^2\exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right)$, where $a$ is an amplitude parameter, and $\ell$ is a _lengthscale_ hyperparameter. 
+
+Let's derive this kernel starting from weight space. Consider the function 
 
 $f(x) = \sum_{i=1}^J w_i \phi_i(x)$, $w_i  \sim \mathcal{N}\left(0,\frac{\sigma^2}{J}\right)$, $\phi_i(x) = \exp\left(-\frac{(x-c_i)^2}{2\ell^2 }\right)$. $f(x)$ is a sum of radial basis functions, with width $\ell$, centred at the points $c_i$, as shown in the following figure. 
 
