@@ -1127,7 +1127,7 @@ Finally, the agent receives a reward from the environment.
 This process is illustrated in :numref:`fig_rl-environment`.
 The agent then receives a subsequent observation,
 and chooses a subsequent action, and so on.
-The behavior of an reinforcement learning agent is governed by a policy.
+The behavior of a reinforcement learning agent is governed by a policy.
 In short, a *policy* is just a function that maps
 from observations of the environment to actions.
 The goal of reinforcement learning is to produce a good policy.
