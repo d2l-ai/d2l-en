@@ -66,7 +66,7 @@ print(f'Increasing age by 1 leads to increasing cholesterol level by \
 ### Feature Importance
 
 In our example, the coefficients of the linear regression model took into account the natural units of the raw data.
-For example, *age* is expressed in "living years" while *resting blood pressure* is in "mmHg". Using natural units is convenient for intuitive explanations, especially for tangible concepts such as weight, height, temperature, and age. However, it is inappropriate to directly compare the coefficients to inspect the relative importance of input features. Furthermore, how categorical features are defined (e.g., different numbers of categories) will also influence the coefficient scale.
+For example, *age* is expressed in "living years" while *resting blood pressure* is in "mmHg". Using natural units is convenient for intuitive explanations, especially for tangible concepts such as weight, height, temperature, and age. Given input features in different scales, it is inappropriate to directly compare the coefficients to inspect the relative importance of features.
 
 To make coefficients comparable, we need to ensure that features are unitless. 
 To achieve this, we can certainly standardize the raw data and then retrain the model to reduce all the coefficients to the same unit of measure. As a simpler alternative, we can multiply the coefficients by the standard deviation of the  features, which is similar to feature standardization:
