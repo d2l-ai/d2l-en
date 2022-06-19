@@ -528,6 +528,7 @@ params = [(0, 1), (0, 2), (3, 1)]
 d2l.plot(x, [normal(x, mu, sigma) for mu, sigma in params], xlabel='x',
          ylabel='p(x)', figsize=(4.5, 2.5),
          legend=[f'mean {mu}, std {sigma}' for mu, sigma in params])
+d2l.plt.show()
 ```
 
 Note that changing the mean corresponds
