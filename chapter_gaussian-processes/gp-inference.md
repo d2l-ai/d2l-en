@@ -93,7 +93,9 @@ plt.show()
 
 ```
 
-Here we see the noisy observations as circles, and the noise-free function that we wish to find. 
+![datafit](https://user-images.githubusercontent.com/6753639/174501277-f0b9ee48-cc29-4ba9-b325-3e08844c7ed3.png)
+
+Here we see the noisy observations as circles, and the noise-free function in blue that we wish to find. 
 
 Now, let's specify a GP prior over the latent noise-free function, $f(x)\sim \mathcal{GP}(m,k)$. We'll use a mean function $m(x) = 0$, and an RBF covariance function (kernel)
 $$k(x_i,x_j) = a^2\exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right)$$.
@@ -113,6 +115,9 @@ plt.plot(test_x, mean, linewidth=2.)
 plt.fill_between(test_x, mean - 2*np.diag(cov), mean + 2*np.diag(cov), alpha=0.25)
 plt.show()
 ```
+
+![priorsamples](https://user-images.githubusercontent.com/6753639/174501312-7d8bbdc7-16fb-44f8-9458-05115b673b74.png)
+
 
 Do these samples look reasonable? Are the high-level properties of the functions aligned with the type of data we are trying to model?
 
@@ -186,6 +191,8 @@ plt.fill_between(test_x, lw_bd, up_bd, alpha=0.25)
 plt.show()
 ```
 
+![gpfit](https://user-images.githubusercontent.com/6753639/174501329-df29e79b-c342-4efd-8f9b-1739afdfbafc.png)
+
 We see the posterior mean in orange almost perfectly matches the true noise free function! Note that the 95\% credible set we are showing is for the latent _noise free_ function, and not the data points. We see that this credible set entirely contains the true function, and does not seem overly wide or narrow. We would not want nor expect it to contain the data points. If we wish to have a credible set for the observations, we should compute 
 
 ```{.python .input}
@@ -213,6 +220,8 @@ plt.fill_between(test_x, lw_bd, up_bd, alpha=0.25)
 plt.show()
 
 ```
+
+![posteriorsamples](https://user-images.githubusercontent.com/6753639/174501353-4c2a8c44-2c6e-44c7-a92f-4ece68fa784d.png)
 
 In basic regression applications, it's most common to use the posterior predictive mean and standard deviation as a point predictor and metric for uncertainty, respectively. In more advanced applications, such as Bayesian optimization with Monte Carlo acquisition functions, or Gaussian processes for model-based RL, it often necessary to take posterior samples. However, even if not strictly required in the basic applications, these samples give us more intuition about the fit we have for the data, and are often useful to include in visualizations. 
 
