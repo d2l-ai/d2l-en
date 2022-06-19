@@ -229,7 +229,7 @@ In basic regression applications, it's most common to use the posterior predicti
 
 As we have seen, it is actually pretty easy to implement basic Gaussian process regression entirely from scratch. However, as soon as we want to explore a variety of kernel choices, consider approximate inference (which is needed even for classification), combine GPs with neural networks, or even have a dataset larger than about 10,000 points, then an implementation from scratch becomes unwieldy and cumbersome. Some of the most effective methods for scalable GP inference, such as SKI (also known as KISS-GP), can require hundreds of lines of code implementing advanced numerical linear algebra routines. 
 
-In these cases, the _GPyTorch_ library will make our lives a lot easier. We'll be discussing GPyTorch much more in the next section on advanced methods. But to get a feel for the package, let's reproduce our results above using GPyTorch.
+In these cases, the _GPyTorch_ library will make our lives a lot easier. We'll be discussing GPyTorch much more in the next section on advanced methods. But to get a feel for the package, let's reproduce our results above using GPyTorch. This may seem like a lot of code to simply reproduce the basic regression above, and in a sense, it is. But we can immediately use a variety of kernels, scalable inference techniques, and approximate inference, by only changing a few lines of code from below, instead of writing potentially thousands of lines of new code.
 
 
 ```{.python .input}
@@ -300,7 +300,7 @@ with torch.no_grad():
     # Initialize plot
     f, ax = plt.subplots(1, 1, figsize=(4, 3))
 
-    # Get upper and lower confidence bounds
+    # Get upper and lower credible set bounds
     lower, upper = observed_pred.confidence_region()
     # Plot training data as black circles
     ax.plot(train_x.numpy(), train_y.numpy(), 'ko')
@@ -314,6 +314,13 @@ with torch.no_grad():
 ```
 
 ## Exercises
+
+1. We have emphasized the importance of _learning_ kernel hyperparameters, and the effect of hyperparameters and kernels on the generalization properties of Gaussian processes. Try skipping the step where we learn hypers, and instead guess a variety of length-scales and noise variances, and check their effect on predictions. What happens when you use a large length-scale? A small length-scale? A large noise variance? A small noise variance?
+
+2. We have said that the marginal likelihood is not a convex objective, but that hyperparameters like length-scale and noise variance can be reliably estimated in GP regression. This is generally true --- in fact, the marginal likelihood is _much_ better at learning length-scale hyperparameters than conventional approaches in spatial statistics, which involve fitting empirical autocorrelation functions ("covariograms"). Arguably, the biggest contribution from machine learning to Gaussian process research, at least before recent work on scalable inference, was the introduction of the marginal lkelihood for hyperparameter learning. 
+
+_However_, there are trade-offs in the way 
+
 
 Making predictions without the learned hypers
 Marginal likelihood is not a convex objective... 
