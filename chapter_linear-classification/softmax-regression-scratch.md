@@ -59,7 +59,7 @@ Computing the softmax requires three steps:
 ensuring that the result sums to 1.
 
 (**
-$$\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(\mathbf{X}_{ij})}{\sum_k \exp(\mathbf{X}_{ik})}.$$
+$$\mathrm{softmax}(\mathbf{X}_{ij}) = \frac{\exp(\mathbf{X}_{ij})}{\sum_k \exp(\mathbf{X}_{ik})}.$$
 **)
 
 The (logarithm of the) denominator
