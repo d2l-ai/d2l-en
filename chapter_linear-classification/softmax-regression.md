@@ -352,7 +352,7 @@ To understand a bit better what is going on,
 consider the derivative with respect to any logit $o_j$. We get
 
 $$
-\partial_{o_j} l(\mathbf{y}, \hat{\mathbf{y}}) = \frac{\exp(o_j)}{\sum_{k=1}^q \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j.
+\partial_{o_j} l(\mathbf{y}, \hat{\mathbf{y}}) = \frac{\exp(o_j)}{\sum_{k=1}^q \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o_j}) - y_j.
 $$
 
 In other words, the derivative is the difference
