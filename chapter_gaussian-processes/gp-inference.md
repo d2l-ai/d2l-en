@@ -232,6 +232,86 @@ As we have seen, it is actually pretty easy to implement basic Gaussian process 
 In these cases, the _GPyTorch_ library will make our lives a lot easier. We'll be discussing GPyTorch much more in the next section on advanced methods. But to get a feel for the package, let's reproduce our results above using GPyTorch.
 
 
+```{.python .input}
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+import torch
+import gpytorch
+
+# First let's convert our data into tensors for use with PyTorch
+train_x = torch.tensor(train_x)
+train_y = torch.tensor(train_y)
+
+# We are using exact GP inference with a zero mean and RBF kernel
+class ExactGPModel(gpytorch.models.ExactGP):
+    def __init__(self, train_x, train_y, likelihood):
+        super(ExactGPModel, self).__init__(train_x, train_y, likelihood)
+        self.mean_module = gpytorch.means.ZeroMean()
+        self.covar_module = gpytorch.kernels.ScaleKernel(gpytorch.kernels.RBFKernel())
+    
+    def forward(self, x):
+        mean_x = self.mean_module(x)
+        covar_x = self.covar_module(x)
+        return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
+        
+# initialize Gaussian likelihood
+likelihood = gpytorch.likelihoods.GaussianLikelihood()
+model = ExactGPModel(train_x, train_y, likelihood)
+
+# this is for running the notebook in our testing framework
+import os
+smoke_test = ('CI' in os.environ)
+training_iter = 2 if smoke_test else 50
+
+
+# Find optimal model hyperparameters
+model.train()
+likelihood.train()
+
+# Use the adam optimizer
+optimizer = torch.optim.Adam(model.parameters(), lr=0.1)  # Includes GaussianLikelihood parameters
+
+# Set our loss as the negative log GP marginal likelihood
+mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
+
+for i in range(training_iter):
+    # Zero gradients from previous iteration
+    optimizer.zero_grad()
+    # Output from model
+    output = model(train_x)
+    # Calc loss and backprop gradients
+    loss = -mll(output, train_y)
+    loss.backward()
+    print('Iter %d/%d - Loss: %.3f   lengthscale: %.3f   noise: %.3f' % (
+        i + 1, training_iter, loss.item(),
+        model.covar_module.base_kernel.lengthscale.item(),
+        model.likelihood.noise.item()
+    ))
+    optimizer.step()
+  
+# Get into evaluation (predictive posterior) mode
+test_x = torch.tensor(test_x)
+model.eval()
+likelihood.eval()
+observed_pred = likelihood(model(test_x)) 
+    
+with torch.no_grad():
+    # Initialize plot
+    f, ax = plt.subplots(1, 1, figsize=(4, 3))
+
+    # Get upper and lower confidence bounds
+    lower, upper = observed_pred.confidence_region()
+    # Plot training data as black circles
+    ax.plot(train_x.numpy(), train_y.numpy(), 'ko')
+    # Plot predictive means as orange line
+    ax.plot(test_x.numpy(), observed_pred.mean.numpy(),'orange',linewidth=2)
+    # Shade between the lower and upper confidence bounds
+    ax.fill_between(test_x.numpy(), lower.numpy(), upper.numpy(), alpha=0.5)
+    ax.set_ylim([-1.5, 1.5])
+    ax.legend(['Observed Data', 'Mean', 'Credible Set'])
+    
+```
 
 ## Exercises
 
