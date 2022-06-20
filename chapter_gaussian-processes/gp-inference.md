@@ -242,6 +242,7 @@ import gpytorch
 # First let's convert our data into tensors for use with PyTorch
 train_x = torch.tensor(train_x)
 train_y = torch.tensor(train_y)
+test_y = torch.tensor(test_y)
 
 # We are using exact GP inference with a zero mean and RBF kernel
 class ExactGPModel(gpytorch.models.ExactGP):
@@ -300,14 +301,15 @@ with torch.no_grad():
     # Initialize plot
     f, ax = plt.subplots(1, 1, figsize=(4, 3))
 
-    # Get upper and lower credible set bounds
+    # Get upper and lower confidence bounds
     lower, upper = observed_pred.confidence_region()
     # Plot training data as black circles
-    ax.plot(train_x.numpy(), train_y.numpy(), 'ko')
+    ax.scatter(train_x.numpy(), train_y.numpy())
+    ax.plot(test_x.numpy(), test_y.numpy())
     # Plot predictive means as orange line
-    ax.plot(test_x.numpy(), observed_pred.mean.numpy(),'orange',linewidth=2)
+    ax.plot(test_x.numpy(), observed_pred.mean.numpy(),linewidth=2)
     # Shade between the lower and upper confidence bounds
-    ax.fill_between(test_x.numpy(), lower.numpy(), upper.numpy(), alpha=0.5)
+    ax.fill_between(test_x.numpy(), lower.numpy(), upper.numpy(), alpha=0.25)
     ax.set_ylim([-1.5, 1.5])
     ax.legend(['Observed Data', 'Mean', 'Credible Set'])
     
