@@ -284,7 +284,7 @@ for i in range(training_iter):
     # Calc loss and backprop gradients
     loss = -mll(output, train_y)
     loss.backward()
-    print('Iter %d/%d - Loss: %.3f   lengthscale: %.3f   noise: %.3f' % (
+    print('Iter %d/%d - Loss: %.3f   squared lengthscale: %.3f   noise variance: %.3f' % (
         i + 1, training_iter, loss.item(),
         model.covar_module.base_kernel.lengthscale.item(),
         model.likelihood.noise.item()
@@ -313,6 +313,8 @@ with torch.no_grad():
     ax.legend(['True Function', 'Predictive Mean', 'Observed Data', 'Credible Set'])
     
 ```
+
+We see the fits are virtually identical. A few things to note: GPyTorch is working with _squared_ length-scales and observation noise. For example, our learned noise standard deviation in the for scratch code is about 0.283. The noise variance found by GPyTorch is $0.81 \approx 0.283^2$. In the GPyTorch plot, we also showed the credible set in the _observation space_ rather than the latent function space, to demonstrate that they indeed cover the observed datapoints.
 
 ## Exercises
 
