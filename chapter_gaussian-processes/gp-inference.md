@@ -60,7 +60,7 @@ There are some key points to note about the predictive distributions for Gaussia
 - The predictive mean $a_*$ is a linear combination of the training targets $\textbf{y}$, weighted by the kernel $k_{\theta}(x_*,X)[K_{\theta}(X,X)+\sigma^2I]^{-1}$. As we will see, the kernel (and its hyperparameters) thus plays a crucial role in the generalization properties of the model.
 - The predictive mean explicitly depends on the target values $\textbf{y}$ but the predictive variance does not. The predictive uncertainty instead grows as the test input $x_*$ moves away from the target locations $X$, as governed by the kernel function. However, uncertainty will implicitly depend on the values of the targets $\textbf{y}$ through the kernel hyperparameters $\theta$, which are learned from the data.
 - The marginal likelihood compartmentalizes into model fit and model complexity (log determinant) terms. The marginal likelihood tends to select for hyperparameters that provide the simplest fits that are still consistent with the data. 
-- The key computational bottlenecks come from solving a linear system and computing a log determinant over an $n \times n$ symmetric positive definite matrix $K(X,X)$ for $n$ training points. Naively, these operations each incur $\mathcal{O}(n^3)$ computations, as well as $\mathcal{O}(n^2)$ storage for each entry of the kernel (covariance) matrix, often starting with a Cholesky decomposition. Historically, these bottlenecks have limited GPs to problems with fewer than about 10,000 training points, and have given GPs a reputation for ``being slow'' that has been inaccurate now for almost a decade. In advanced topics, we will discuss how GPs can be scaled to problems with millions of points.
+- The key computational bottlenecks come from solving a linear system and computing a log determinant over an $n \times n$ symmetric positive definite matrix $K(X,X)$ for $n$ training points. Naively, these operations each incur $\mathcal{O}(n^3)$ computations, as well as $\mathcal{O}(n^2)$ storage for each entry of the kernel (covariance) matrix, often starting with a Cholesky decomposition. Historically, these bottlenecks have limited GPs to problems with fewer than about 10,000 training points, and have given GPs a reputation for being slow that has been inaccurate now for almost a decade. In advanced topics, we will discuss how GPs can be scaled to problems with millions of points.
 - For popular choices of kernel functions, $K(X,X)$ is often close to singular, which can cause numerical issues when performing Cholesky decompositions or other operations intended to solve linear systems. Fortunately, in regression we are often working with $K_{\theta}(X,X)+\sigma^2I$, such that the noise variance $\sigma^2$ gets added to the diagonal of $K(X,X)$, significantly improving its conditioning. If the noise variance is small, or we are doing noise free regression, it is common practice to add a small amount of "jitter" to the diagonal, on the order of $10^{-6}$, to improve conditioning.
 
 
@@ -68,8 +68,7 @@ There are some key points to note about the predictive distributions for Gaussia
 
 Let's create some regression data, and then fit the data with a GP, implementing every step from scratch. 
 We'll sample data from 
-$$y(x) = sin(x) + \frac{1}{2}sin(4x) + \epsilon$$, with \epsilon \sim \mathcal{N}(0,\sigma^2). The noise free function we wish to find is $f(x) = sin(x) + \frac{1}{2}sin(4x)$. We'll start by using a noise standard deviation $\sigma$ = 0.25. 
-
+$$y(x) = sin(x) + \frac{1}{2}sin(4x) + \epsilon$$, with \epsilon \sim \mathcal{N}(0,\sigma^2). The noise free function we wish to find is $f(x) = sin(x) + \frac{1}{2}sin(4x)$. We'll start by using a noise standard deviation $\sigma$ = 0.25.
 
 ```{.python .input}
 import numpy as np
@@ -93,17 +92,15 @@ plt.show()
 
 ```
 
-![datafit](https://user-images.githubusercontent.com/6753639/174501277-f0b9ee48-cc29-4ba9-b325-3e08844c7ed3.png)
-
 Here we see the noisy observations as circles, and the noise-free function in blue that we wish to find. 
 
 Now, let's specify a GP prior over the latent noise-free function, $f(x)\sim \mathcal{GP}(m,k)$. We'll use a mean function $m(x) = 0$, and an RBF covariance function (kernel)
-$$k(x_i,x_j) = a^2\exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right)$$.
+$$k(x_i,x_j) = a^2\exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right).$$
 
 ```{.python .input}
 from scipy.spatial import distance_matrix
 mean = np.zeros(test_x.shape[0])
-cov = kernel(test_x, test_x, ls=0.2)
+cov = d2l.kernel(test_x, test_x, ls=0.2)
 ```
 
 We've started with a length-scale of 0.2. Before we fit the data, it's important to consider whether we've specified a reasonable prior. Let's visualize some sample functions from this prior, as well as the 95\% credible set (we believe there's a 95\% chance that the true function is within this region).
@@ -115,9 +112,6 @@ plt.plot(test_x, mean, linewidth=2.)
 plt.fill_between(test_x, mean - 2*np.diag(cov), mean + 2*np.diag(cov), alpha=0.25)
 plt.show()
 ```
-
-![priorsamples](https://user-images.githubusercontent.com/6753639/174501312-7d8bbdc7-16fb-44f8-9458-05115b673b74.png)
-
 
 Do these samples look reasonable? Are the high-level properties of the functions aligned with the type of data we are trying to model?
 
@@ -150,7 +144,7 @@ ell_est = 0.4
 post_sig_est = 0.5
 
 def neg_MLL(pars):
-    K = kernel(train_x, train_x, ls=pars[0])
+    K = d2l.kernel(train_x, train_x, ls=pars[0])
     kernel_term = -0.5 * train_y @ np.linalg.inv(K + pars[1]**2 * np.eye(train_x.shape[0])) @ train_y
     logdet = -0.5 * np.log(np.linalg.det(K + pars[1]**2*np.eye(train_x.shape[0])))
     const = -train_x.shape[0]/2. * np.log(2 * np.pi)
@@ -163,10 +157,11 @@ learned_hypers = optimize.minimize(neg_MLL, x0 = np.array([ell_est,post_sig_est]
 
 In this instance, we learn a length-scale of 0.299, and a noise standard deviation of 0.24. Note that the learned noise is extremely close to the true noise, which helps indicate that our GP is a very well-specified to this problem. 
 
-In general, it is crucial to put careful thought into selecting the kernel and initializing the hyperparameters. However, marginal likelihood learning of some hyperparameters such as length-scale and noise variance can be relatively robust to initialization. If we instead try the (very poor) initialization of $\ell = 4$ and $\sigma = 4$, we still converge to the same hyperparameters. 
+In general, it is crucial to put careful thought into selecting the kernel and initializing the hyperparameters. However, marginal likelihood learning of some hyperparameters such as length-scale and noise variance can be relatively robust to initialization. If we instead try the (very poor) initialization of $\ell = 4$ and $\sigma = 4$, we still converge to the same hyperparameters.
 
 ```{.python .input}
-learned_hypers = optimize.minimize(neg_MLL, x0 = np.array([4,4]), bounds=((0.01, 10.), (0.01, 10.)))
+learned_hypers = optimize.minimize(neg_MLL, x0 = np.array([4,4]), 
+                                   bounds=((0.01, 10.), (0.01, 10.)))
 ell = learned_hypers.x[0]
 post_sig_est = learned_hypers.x[1] 
 ```
@@ -174,9 +169,9 @@ post_sig_est = learned_hypers.x[1]
 Now, let's make predictions with these learned hypers.
 
 ```{.python .input}
-K_x_xstar = kernel(train_x, test_x, ls=ell)
-K_x_x = kernel(train_x, train_x, ls=ell)
-K_xstar_xstar = kernel(test_x, test_x, ls=ell)
+K_x_xstar = d2l.kernel(train_x, test_x, ls=ell)
+K_x_x = d2l.kernel(train_x, train_x, ls=ell)
+K_xstar_xstar = d2l.kernel(test_x, test_x, ls=ell)
 
 post_mean = K_x_xstar.T @ np.linalg.inv((K_x_x + post_sig_est**2 * np.eye(train_x.shape[0]))) @ train_y
 post_cov = K_xstar_xstar - K_x_xstar.T @ np.linalg.inv((K_x_x + post_sig_est**2 * np.eye(train_x.shape[0]))) @ K_x_xstar
@@ -191,9 +186,7 @@ plt.fill_between(test_x, lw_bd, up_bd, alpha=0.25)
 plt.show()
 ```
 
-![gpfit](https://user-images.githubusercontent.com/6753639/174501329-df29e79b-c342-4efd-8f9b-1739afdfbafc.png)
-
-We see the posterior mean in orange almost perfectly matches the true noise free function! Note that the 95\% credible set we are showing is for the latent _noise free_ function, and not the data points. We see that this credible set entirely contains the true function, and does not seem overly wide or narrow. We would not want nor expect it to contain the data points. If we wish to have a credible set for the observations, we should compute 
+We see the posterior mean in orange almost perfectly matches the true noise free function! Note that the 95\% credible set we are showing is for the latent _noise free_ function, and not the data points. We see that this credible set entirely contains the true function, and does not seem overly wide or narrow. We would not want nor expect it to contain the data points. If we wish to have a credible set for the observations, we should compute
 
 ```{.python .input}
 lw_bd = post_mean - 2 * np.sqrt(np.diag(post_cov) + post_sig_est**2)
@@ -208,7 +201,7 @@ Unfortunately, people are often careless about how they represent uncertainty, w
 
 In the spirit of playing close attention to what our uncertainty represents, it's crucial to note that we are taking _two times_ the _square root_ of our variance estimate for the noise free function. Since our predictive distribution is Gaussian, this quantity enables us to form a 95\% credible set, representing our beliefs about the interval which is 95\% likely to contain the ground truth function. The noise _variance_ is living on a completely different scale, and is much less interpretable. 
 
-Finally, let's take a look at 20 posterior samples. These samples tell us what types of functions we believe might fit our data, a posteriori. 
+Finally, let's take a look at 20 posterior samples. These samples tell us what types of functions we believe might fit our data, a posteriori.
 
 ```{.python .input}
 post_samples = np.random.multivariate_normal(post_mean, post_cov, size=20)
@@ -221,8 +214,6 @@ plt.show()
 
 ```
 
-![posteriorsamples](https://user-images.githubusercontent.com/6753639/174501353-4c2a8c44-2c6e-44c7-a92f-4ece68fa784d.png)
-
 In basic regression applications, it's most common to use the posterior predictive mean and standard deviation as a point predictor and metric for uncertainty, respectively. In more advanced applications, such as Bayesian optimization with Monte Carlo acquisition functions, or Gaussian processes for model-based RL, it often necessary to take posterior samples. However, even if not strictly required in the basic applications, these samples give us more intuition about the fit we have for the data, and are often useful to include in visualizations. 
 
 ## Making Life Easy with GPyTorch
@@ -230,7 +221,6 @@ In basic regression applications, it's most common to use the posterior predicti
 As we have seen, it is actually pretty easy to implement basic Gaussian process regression entirely from scratch. However, as soon as we want to explore a variety of kernel choices, consider approximate inference (which is needed even for classification), combine GPs with neural networks, or even have a dataset larger than about 10,000 points, then an implementation from scratch becomes unwieldy and cumbersome. Some of the most effective methods for scalable GP inference, such as SKI (also known as KISS-GP), can require hundreds of lines of code implementing advanced numerical linear algebra routines. 
 
 In these cases, the _GPyTorch_ library will make our lives a lot easier. We'll be discussing GPyTorch much more in the next section on advanced methods. But to get a feel for the package, let's reproduce our results above using GPyTorch. This may seem like a lot of code to simply reproduce the basic regression above, and in a sense, it is. But we can immediately use a variety of kernels, scalable inference techniques, and approximate inference, by only changing a few lines of code from below, instead of writing potentially thousands of lines of new code.
-
 
 ```{.python .input}
 import numpy as np
@@ -314,21 +304,17 @@ with torch.no_grad():
     
 ```
 
-![gpytorchfit](https://user-images.githubusercontent.com/6753639/174523015-ce686dfd-124b-4281-ae64-4553ca498b69.png)
-
-
 We see the fits are virtually identical. A few things to note: GPyTorch is working with _squared_ length-scales and observation noise. For example, our learned noise standard deviation in the for scratch code is about 0.283. The noise variance found by GPyTorch is $0.81 \approx 0.283^2$. In the GPyTorch plot, we also show the credible set in the _observation space_ rather than the latent function space, to demonstrate that they indeed cover the observed datapoints.
 
 ## Exercises
 
 1. We have emphasized the importance of _learning_ kernel hyperparameters, and the effect of hyperparameters and kernels on the generalization properties of Gaussian processes. Try skipping the step where we learn hypers, and instead guess a variety of length-scales and noise variances, and check their effect on predictions. What happens when you use a large length-scale? A small length-scale? A large noise variance? A small noise variance?
+1. We have said that the marginal likelihood is not a convex objective, but that hyperparameters like length-scale and noise variance can be reliably estimated in GP regression. This is generally true --- in fact, the marginal likelihood is _much_ better at learning length-scale hyperparameters than conventional approaches in spatial statistics, which involve fitting empirical autocorrelation functions ("covariograms"). Arguably, the biggest contribution from machine learning to Gaussian process research, at least before recent work on scalable inference, was the introduction of the marginal lkelihood for hyperparameter learning. 
 
-2. We have said that the marginal likelihood is not a convex objective, but that hyperparameters like length-scale and noise variance can be reliably estimated in GP regression. This is generally true --- in fact, the marginal likelihood is _much_ better at learning length-scale hyperparameters than conventional approaches in spatial statistics, which involve fitting empirical autocorrelation functions ("covariograms"). Arguably, the biggest contribution from machine learning to Gaussian process research, at least before recent work on scalable inference, was the introduction of the marginal lkelihood for hyperparameter learning. 
+_However_, different pairings of even these parameters provide interpretably different plausible explanations for many datasets, leading to local optima in our objective. If we use a large length-scale, then we assume the true underlying function is slowly varying. If the observed data _are_ varying significantly, then the only we can plausibly have a large length-scale is with a large noise-variance. If we use a small length-scale, on the  other hand, our fit will be very sensitive to the variations in the data, leaving little room to explain variations with noise (aleatoric uncertainty). 
 
-    _However_, different pairings of even these parameters provide interpretably different plausible explanations for many datasets, leading to local optima in our objective. If we use a large length-scale, then we assume the true underlying function is slowly varying. If the observed data _are_ varying significantly, then the only we can plausibly have a large length-scale is with a large noise-variance. If we use a small length-scale, on the  other hand, our fit will be very sensitive to the variations in the data, leaving little room to explain variations with noise (aleatoric uncertainty). 
+Try seeing if you can find these local optima: initialize with very large length-scale with large noise, and small length-scales with small noise. Do you converge to different solutions?
   
-    Try seeing if you can find these local optima: initialize with very large length-scale with large noise, and small length-scales with small noise. Do you converge to different solutions?
-  
-3. We have said that a fundamental advantage of Bayesian methods is in naturally representing _epistemic_ uncertainty. In the above example, we cannot fully see the effects of epistemic uncertainty. Try instead to predict with ```test_x = np.linspace(0, 10, 1000)```. What happens to the 95\% credible set as your predictions move beyond the data? Does it cover the true function in that interval? What happens if you only visualize aleatoric uncertainty in that region? 
+1. We have said that a fundamental advantage of Bayesian methods is in naturally representing _epistemic_ uncertainty. In the above example, we cannot fully see the effects of epistemic uncertainty. Try instead to predict with `test_x = np.linspace(0, 10, 1000)`. What happens to the 95\% credible set as your predictions move beyond the data? Does it cover the true function in that interval? What happens if you only visualize aleatoric uncertainty in that region? 
 
-4. Try running the above example, but instead with 10,000, 20,000 and 40,000 training points, and measure the runtimes. How does the training time scale? Alternatively, how do the runtimes scale with the number of test points? Is it different for the predictive mean and the predictive variance? Answer this question both by theoretically working out the training and testing time complexities, and by running the code above with a different number of points.
+1. Try running the above example, but instead with 10,000, 20,000 and 40,000 training points, and measure the runtimes. How does the training time scale? Alternatively, how do the runtimes scale with the number of test points? Is it different for the predictive mean and the predictive variance? Answer this question both by theoretically working out the training and testing time complexities, and by running the code above with a different number of points.
