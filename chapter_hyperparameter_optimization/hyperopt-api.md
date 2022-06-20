@@ -138,7 +138,7 @@ make a decision (call of `self.scheduler.suggest`). In the sequel, we will plot
 (and `searcher`). This allows us to quantify not only how well the configuration
 found by an optimizer works, but also how quickly an optimizer is able to find it.
 
-```{.python .input  n=6}
+```{.python .input  n=1}
 %%tab all
 
 @d2l.add_to_class(HPOTuner) #@save
@@ -153,20 +153,32 @@ def bookkeeping(self, config, error, runtime):
     self.cumulative_runtime.append(self.current_time)
 ```
 
+```{.json .output n=1}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "UsageError: Cell magic `%%tab` not found.\n"
+ }
+]
+```
+
 Just as with training algorithms or model architectures, it is important to understand how to best
 compare different HPO methods. Each run of an HPO experiment depends on mostly two sources of randomness,
 the random effects in each training run (such as random weight initialization or mini-batch ordering) and, as we are going to see in the next sections, the intrinsic randomness of the HPO method itself. Hence, when comparing different methods, it is crucial to run each experiment several times and present statistics, such as mean or median, across a population of multiple repetitions of an optimizer based on different seeds of the random number generator.
 
-To illustrate this, we below compare to methods A and B on some HPO problem. Each method was evaluated $N$ times with a different random seed. The solid line indicates the average performance of the incumbent across these $N$ repetitions and the dashed line the standard deviation. We can see that method A and B perform roughly the same up to ~1000 seconds, but method B quickly outperforms A afterwards.
+To illustrate this, we below compare random search :ref:'sec_rs' and Bayesian optimization :ref:'sec_bo' for optimizing the hyperparameters of a feed forward neural network. Each method was evaluated $50$ times with a different random seed. The solid line indicates the average performance of the incumbent across these $50$ repetitions and the dashed line the standard deviation. We can see that random search and Bayesian optimization perform roughly the same up to ~1000 seconds, but Bayesian optimization quickly outperforms random search afterwards.
 
 
 ![Example any-time performance plot to compare two methods A and B](img/example_anytime_performance.png)
 :width:`400px`
 :label:`example_anytime_performance`
 
-*MS: This is a bit abstract. Can we say what A, B are, and what N is?*
-
 
 ## Summary
 
 ## Exercise
+
+```{.python .input}
+
+```
