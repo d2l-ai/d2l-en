@@ -52,8 +52,6 @@ plt.ylabel("f(x)",fontsize=20)
 plt.show()
 ```
 
-![linearfunc](https://user-images.githubusercontent.com/6753639/174243747-039b2520-177e-425e-b24f-33265b319103.png)
-
 If $w_0$ and $w_1$ are instead drawn from $\mathcal{N}(0,\alpha^2)$, how do you imagine varying $\alpha$ affects the distribution over functions?
 
 ## From weight space to function space 
@@ -81,7 +79,6 @@ Let's derive this kernel starting from weight space. Consider the function
 
 $f(x) = \sum_{i=1}^J w_i \phi_i(x)$, $w_i  \sim \mathcal{N}\left(0,\frac{\sigma^2}{J}\right)$, $\phi_i(x) = \exp\left(-\frac{(x-c_i)^2}{2\ell^2 }\right)$. $f(x)$ is a sum of radial basis functions, with width $\ell$, centred at the points $c_i$, as shown in the following figure. 
 
-<img width="678" alt="rbfkernelderive" src="https://user-images.githubusercontent.com/6753639/174246980-b2203f82-1328-4d0f-ae9b-6b7f7d8f8fb2.png">
 
 We can recognize $f(x)$ as having the form $w^{\top} \phi(x)$, where $w = (w_1,\dots,w_J)^{\top}$ and $\phi(x)$ is a vector containing each of the radial basis functions. The covariance function of this Gaussian process is then 
 
@@ -107,10 +104,11 @@ We can build further intuition about Gaussian processes with RBF kernels, and hy
 4. Sample more times to visualize more sample functions queried at those points. 
 
 We illustrate this process in the figure below.
+
 ```{.python .input}
 from scipy.spatial import distance_matrix
 
-def kernel(x1, x2, ls=4.):
+def kernel(x1, x2, ls=4.): ##save
     dist = distance_matrix(np.expand_dims(x1, 1), np.expand_dims(x2, 1))
     return np.exp( -(1./ls/2) * (dist**2) )
 
@@ -120,10 +118,8 @@ covmat = kernel(x_points,x_points,1)
 
 prior_samples= np.random.multivariate_normal(meanvec, covmat, size=5);
 plt.plot(x_points, prior_samples.T, alpha=0.5)
+plt.show()
 ```
-
-![samplefuncs](https://user-images.githubusercontent.com/6753639/174248554-4b88bef4-d58f-48a0-9e13-f3cf7be18864.png)
-
 
 ## The neural network kernel 
 
