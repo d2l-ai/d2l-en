@@ -107,8 +107,8 @@ def feature_ablation(model, data, feat_of_interest):
 ```
 
 ```{.python .input}
-d2l.plot_hbar(*feature_ablation(model, data, feat_of_interest), 
-              xlabel='Feature Importance')
+#d2l.plot_hbar(*feature_ablation(model, data, feat_of_interest), 
+#              xlabel='Feature Importance')
 ```
 
 ## Feature Permutation
