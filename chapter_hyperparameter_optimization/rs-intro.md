@@ -1,3 +1,10 @@
+<!--  It is tempting to try and "simplify" an HPO problem by turning numerical into categorical parameters. For example, why not specify
+`batch_size` as `choice([8, 32, 64, 128])`, i.e. 4 instead of 121 possible values? However, not only does this constitute another "choice by hand" we want to avoid,
+for most competitive HPO methods, it either does not matter or makes things worse. Uniform random sampling just as effectively covers a
+bounded range than a finite set. As we will see, many model-based HPO methods relax `int` to `float` and use
+one-hot encoding for `categorical`, so turning `int` or `float` into `categorical` increases the dimension of the encoding
+space. -->
+
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
