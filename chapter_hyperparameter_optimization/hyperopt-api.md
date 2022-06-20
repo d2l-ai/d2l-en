@@ -25,17 +25,17 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 
 
-Before we dive into different methods, we will first discuss a basic code structure that allows us to efficiently implement different HPO methods. In general, all HPO
-methods considered here need to implement two decision making primitives, **search** and **scheduling**. First, they need to sample new configurations to be trained and evaluated, given that resources are available, which often involves some kind of search over the configuration space.
-Once a configuration is marked for execution, we will refer to it as a **trial**. Second, they need to schedule trials, which means deciding for how long to
-run them, or when to stop, pause or resume them. We map these decisions to two classes,
+Before we dive into different algorithms, we will first discuss a basic code structure that allows us to efficiently implement different HPO algorithms. In general, all HPO
+algorithms considered here need to implement two decision making primitives, **searching** and **scheduling**. First, they need to sample new configurations to be trained with and evaluated, which often involves some kind of search over the configuration space. Additional, for each configuration an HPO algorithm needs to schedule its evaluation and how much resources should be allocated to it.
+Once we started to evaluate a configuration, we will refer to it as a **trial**. Second, they need to schedule trials, which means deciding for how long to
+run them, as well as when to stop, pause or resume them. We map these decisions to two classes,
 `HPOSearcher` and `HPOScheduler`.
 
 ### Searcher
 
 Below we define a base class for searchers, which provides a new candidate
-configuration through the `sample_configuration` method. Many algorithms will make
-these decisions based on observed performances of previously run trials. Such an
+configuration through the `sample_configuration` method. The most simple method would be to sample configurations uniformly at random, as we will see in the next Section :ref:`sec_rs`. More sophisticated algorithms, such as Bayesian optimization :ref:`sec_bo` will make
+these decisions based on observed performances of previously run trials to sample more promising candidates. Such an
 observation can be passed via the `update` method.
 
 ```{.python .input  n=2}
@@ -96,17 +96,16 @@ class FIFOScheduler(HPOScheduler): #@save
 ### Tuner
 
 Finally, we need a component running the optimizer and doing some book-keeping
-of the results. The following code implements a sequential execution of the HPO process (one training
-job after the next) and will serve as a basic example. We will later use **Syne Tune** for more sophisticated distributed HPO cases.
+of the results. The following code implements a sequential execution of the HPO trials that evaluates one training job after the next and will serve as a basic example. We will later use **Syne Tune** for more sophisticated distributed HPO cases.
 
-```{.python .input  n=5}
+```{.python .input  n=1}
 %%tab all
 
 class HPOTuner(d2l.HyperParameters): #@save
     def __init__(self, scheduler, objective):
         self.save_hyperparameters()
         
-        # for bookeeping
+        # bookeeping results for plotting
         self.incumbent = None
         self.incumbent_error = None
         self.incumbent_trajectory = []
@@ -126,15 +125,25 @@ class HPOTuner(d2l.HyperParameters): #@save
             self.bookkeeping(config, error, runtime)        
 ```
 
-## Evaluating Hyperparameter Optimization Methods
+```{.json .output n=1}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "UsageError: Cell magic `%%tab` not found.\n"
+ }
+]
+```
 
-With any HPO method, we are mostly interested in the best performing
+## Evaluating Hyperparameter Optimization Algorithms
+
+With any HPO algorithm, we are mostly interested in the best performing
 configuration (called **incumbent**) and its validation error after a given 
 wall-clock time. This is why we track `runtime` per iteration, which includes
 both the time to run an evaluation (call of `self.objective`) and the time to
 make a decision (call of `self.scheduler.suggest`). In the sequel, we will plot
 `cumulative_runtime` against `incumbent_trajectory` in  order to visualize the
-**any-time performance** of the HPO method defined in  terms of `scheduler`
+**any-time performance** of the HPO algorithm defined in  terms of `scheduler`
 (and `searcher`). This allows us to quantify not only how well the configuration
 found by an optimizer works, but also how quickly an optimizer is able to find it.
 
@@ -164,13 +173,13 @@ def bookkeeping(self, config, error, runtime):
 ```
 
 Just as with training algorithms or model architectures, it is important to understand how to best
-compare different HPO methods. Each run of an HPO experiment depends on mostly two sources of randomness,
-the random effects in each training run (such as random weight initialization or mini-batch ordering) and, as we are going to see in the next sections, the intrinsic randomness of the HPO method itself. Hence, when comparing different methods, it is crucial to run each experiment several times and present statistics, such as mean or median, across a population of multiple repetitions of an optimizer based on different seeds of the random number generator.
+compare different HPO algorithms. Each HPO run depends on mostly two sources of randomness:
+the random effects of the training process, such as random weight initialization or mini-batch ordering, and, as we are going to see in the next sections, the intrinsic randomness of the HPO algorithm itself. Hence, when comparing different algorithms, it is crucial to run each experiment several times and report statistics, such as mean or median, across a population of multiple repetitions of an algorithm based on different seeds of the random number generator.
 
-To illustrate this, we below compare random search :ref:'sec_rs' and Bayesian optimization :ref:'sec_bo' for optimizing the hyperparameters of a feed forward neural network. Each method was evaluated $50$ times with a different random seed. The solid line indicates the average performance of the incumbent across these $50$ repetitions and the dashed line the standard deviation. We can see that random search and Bayesian optimization perform roughly the same up to ~1000 seconds, but Bayesian optimization quickly outperforms random search afterwards.
+To illustrate this, we compare random search :ref:'sec_rs' and Bayesian optimization :ref:'sec_bo' for optimizing the hyperparameters of a feed forward neural network. Each algorithm was evaluated $50$ times with a different random seed. The solid line indicates the average performance of the incumbent across these $50$ repetitions and the dashed line the standard deviation. We can see that random search and Bayesian optimization perform roughly the same up to ~1000 seconds, but Bayesian optimization quickly outperforms random search afterwards.
 
 
-![Example any-time performance plot to compare two methods A and B](img/example_anytime_performance.png)
+![Example any-time performance plot to compare two algorithms A and B](img/example_anytime_performance.png)
 :width:`400px`
 :label:`example_anytime_performance`
 

@@ -298,3 +298,7 @@ In the next sections we will look at more sample efficient hyperparameter optimi
 # Summary
 
 # Exercise
+
+```{.python .input}
+
+```
