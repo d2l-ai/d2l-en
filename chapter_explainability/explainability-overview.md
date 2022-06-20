@@ -1,9 +1,8 @@
 # Overview of Model Explainability 
 
-While machine learning has been dramatically improving the state of the art in areas as diverse as machine translation, object recognition, and personalized recommendation, we have also witnessed a shift from simple models to complex models. Simple models such as linear regression and decision trees/lists no longer obtain satisfying performance in many domains, such as on multimodal sources of data (e.g., images, text, videos). Indeed, model architectures have been increasingly complicated. For example, CNNs have become deeper, going from just a few layers (e.g., LeNet in :numref:`sec_lenet`) to over a hundred layers (e.g., ResNet in :numref:`sec_resnet`), and transformers (:numref:`sec_transformer`), although lacking inductive biases from CNNs and RNNs, have become more prevalent. However, these complex models are less understandable to humans. *What does a neuron in layer 10 do in my trained ResNet?* A better understanding of models, such as how a certain prediction is made, makes us more comfortable before troubleshooting or deploying models.
+The past decade has seen a boom in the number of machine learning models which have been dramatically improving the state of the art in many areas. In the meantime, we observe a shift from simple models to complex models, along with the increasing availability of very large-scale data sets. Simple models such as linear regression and decision trees/lists are no longer sufficient in predictive accuracy. Complex models with complicated architectures and millions of trainable parameters such as ResNet (:numref:`sec_resnet`) and transformers (:numref:`sec_transformer`) are becoming increasingly prevalent. However, these complex models are less understandable to humans. *What does a neuron in layer 10 do in my trained ResNet?* A better understanding of models, such as how a certain prediction is made, can make us more confident before troubleshooting or deploying models.
 
-
-To illustrate, we will begin with an example of heart disease prediction given a patient's demographics and medical information. In this example, we will compare a linear classifier with an MLP classifier in terms of prediction accuracy and how easily they can be understood.
+To illustrate the difficulty of understanding complex models, we will begin with an example of heart disease prediction given a patient's demographics and medical information.
 
 ```{.python .input}
 from d2l import torch as d2l
@@ -15,9 +14,14 @@ from sklearn import model_selection
 from sklearn import linear_model
 ```
 
-## The Heart Disease Dataset
+## Heart Disease Prediction
 
-Heart disease is one of the major causes of death globally. Leading risk factors for heart disease include high blood pressure, diabetes, unhealthy cholesterol level, etc. The [heart disease dataset](https://archive.ics.uci.edu/ml/datasets/heart+disease) that we will use is obtained from the UCI machine learning repository. As usual, the first step is to read the dataset and split it into training and testing sets.
+In this heart disease prediction example, we will compare a linear classifier with an MLP classifier with regard to prediction accuracy and how easily they can be understood.
+
+### Dataset
+The [heart disease dataset](https://archive.ics.uci.edu/ml/datasets/heart+disease) that we will use is obtained from the UCI machine learning repository. Heart disease is one of the major causes of death globally. Leading risk factors for heart disease include high blood pressure, diabetes, unhealthy cholesterol level, etc. Automating the heart disease prediction process can potentially help reduce clinical costs. Yet, a poor clinical decision on this can lead to unacceptable consequences.
+
+As usual, the first step is to read the dataset and split it into training and testing sets.
 
 ```{.python .input}
 class HeartDiseaseData(d2l.DataModule):  #@save
@@ -58,10 +62,10 @@ data = HeartDiseaseData()
 data.df.sample(n=3, replace=True)
 ```
 
-As we can see, this dataset has 13 feature columns and 1 *target* column ($1$: heart disease, $0$: otherwise). The 13 features are:  *age*, *sex* ($1$: male, $0$: female), *cp* (chest pain type), *trestbps* (resting blood pressure), *chol* (serum cholesterol),  *fbs* (fasting blood sugar > $120$ mg/dl or not), *restecg* (resting electrocardiographic results), *thalach* (maximum heart rate achieved), *exang* (exercise induced angina), *oldpeak* (ST depression induced by exercise), *slope* (the slope of the peak exercise ST segment), *ca* (number of major vessels colored by fluoroscopy), and *thal* (thalassemia). Don't worry if you don't understand some of the medical terms: we will just use a few of them.
+As we can see, this dataset has 13 feature columns and 1 *target* column ($1$: heart disease, $0$: otherwise). Common features are *age*, *sex* ($1$: male, $0$: female), *cp* (chest pain type), *chol* (serum cholesterol), *trestbps* (resting blood pressure), etc. Don't worry if you don't understand some of the medical terms: we will just use a few of them.
 
 
-## A Linear Classifier for Heart Disease Prediction
+### A Linear Classifier for Heart Disease Prediction
 
 Now let's train a linear classifier on the heart disease dataset.
 
@@ -88,7 +92,7 @@ plot_hbar(data.feat_col, lr.coef_[0])
 This plot gives us a sense on how changes in the raw values of risk factors affect heart disease prediction. We highlight that it is inappropriate to directly treat the learned weights of *logistic regression* as feature importance (for *linear regression*, you may do so if the features have the same scale). Later we will introduce how to interpret logistic regression properly (e.g., using the odds ratio). Here we just need to know that it is possible to obtain understandable explanations from linear models.
 
 
-## An MLP Classifier for Heart Disease Prediction
+### An MLP Classifier for Heart Disease Prediction
 
 Now, let's build a more complex MLP classifier consisting of four nonlinear hidden layers, where each layer has 256 neurons (hidden units).
 
@@ -138,8 +142,7 @@ fig.suptitle('Hidden layer weihghts of the MLP classifier', x=0.485, y=0.32)
 d2l.plt.show()
 ```
 
-## Explainability
-
+## Model Explainability
 In previous examples we tried to understand how simple and complex models work. 
 In machine learning, *explainability* is the degree to which humans can understand the decisions made by models. 
 
@@ -150,13 +153,9 @@ humans have been using easy-to-employ simple models to avoid cognitive overload.
 ![Rule of nines for measuring the burn surface area.](../img/ruleof9s.svg)
 :label:`fig_ruleof9s`
 
-While simple models and rules of thumb can help,
-there has been a boom of complex models, driving numerous breakthrough results in a wide range of fields. 
-In general, complex models (also known as black-box models) trade explainability for better performance.
-Good explanations are key to communicating with practitioners and domain experts for deploying models more broadly. They also provide a new perspective to troubleshoot complex models, speedup debugging processes, bust biases and other potential AI potholes.
+While simple models and rules of thumb can help, there has been a boom of complex models, driving numerous breakthrough results in a wide range of fields. In general, complex models (also known as black-box models) trade explainability for better performance. To explain the behavior of complex models, we need an additional set of explanation tools. Good explanations have the potential to dramatically improve the communication process with practitioners and domain experts for a broader model deployment, provide a new perspective to troubleshoot complex models, speedup debugging processes, and bust biases or other potential AI potholes.
 
-This chapter will walk you through popular explanation approaches, which can be classified according to different perspectives as follows.
-
+This chapter will walk you through popular explanation approaches, and we summarize some widely used terms and taxonomy below.
 
 **Forms of explanations:**
 Explanations come in various forms. They can be numerical feature importance values, saliency maps, readable sentences, graphs, or a few representative instances. Explanations should be humanly comprehensible and aligned with the vocabulary of target users. That is, explanations that domain experts can understand are not necessarily comprehensible to ordinary users.
@@ -197,3 +196,4 @@ Model explainability is essential in many domains and the benefits of providing 
 1. Can you name some scenarios where explanations are critical?
 1. When should we use post-hoc explanation methods rather than self-explanatory methods?
 1. Use the decision tree (`sklearn.tree.DecisionTreeClassifier`) for heart disease prediction. How does it perform?
+1. Among the 13 features:  *age*, *sex* ($1$: male, $0$: female), *cp* (chest pain type), *trestbps* (resting blood pressure), *chol* (serum cholesterol),  *fbs* (fasting blood sugar > $120$ mg/dl or not), *restecg* (resting electrocardiographic results), *thalach* (maximum heart rate achieved), *exang* (exercise induced angina), *oldpeak* (ST depression induced by exercise), *slope* (the slope of the peak exercise ST segment), *ca* (number of major vessels colored by fluoroscopy), and *thal* (thalassemia), which features do you think are the most important for model prediction?
