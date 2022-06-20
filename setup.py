@@ -8,7 +8,8 @@ requirements = [
     'requests',
     'pandas',
     'gym',
-    'gpytorch'
+    'gpytorch',
+    'scipy'
 ]
 
 setup(
