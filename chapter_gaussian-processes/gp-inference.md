@@ -301,7 +301,7 @@ with torch.no_grad():
     # Initialize plot
     f, ax = plt.subplots(1, 1, figsize=(4, 3))
 
-    # Get upper and lower confidence bounds
+    # Get upper and lower bounds for 95\% credible set (in this case, in observation space)
     lower, upper = observed_pred.confidence_region()
  
     ax.scatter(train_x.numpy(), train_y.numpy())
