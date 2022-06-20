@@ -314,6 +314,9 @@ with torch.no_grad():
     
 ```
 
+![gpytorchfit](https://user-images.githubusercontent.com/6753639/174523015-ce686dfd-124b-4281-ae64-4553ca498b69.png)
+
+
 We see the fits are virtually identical. A few things to note: GPyTorch is working with _squared_ length-scales and observation noise. For example, our learned noise standard deviation in the for scratch code is about 0.283. The noise variance found by GPyTorch is $0.81 \approx 0.283^2$. In the GPyTorch plot, we also showed the credible set in the _observation space_ rather than the latent function space, to demonstrate that they indeed cover the observed datapoints.
 
 ## Exercises
