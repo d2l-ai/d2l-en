@@ -27,6 +27,8 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ]
 ```
 
+*MS: The first example above was grid search. One idea would be to have this as an exercise?*
+
 # Random Search
 
 The first method we will look at is called **random search** :cite:`bergstra-jmlr12a`. To implement random search, we pair the simple

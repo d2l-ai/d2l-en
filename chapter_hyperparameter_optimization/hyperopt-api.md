@@ -135,7 +135,8 @@ both the time to run an evaluation (call of `self.objective`) and the time to
 make a decision (call of `self.scheduler.suggest`). In the sequel, we will plot
 `cumulative_runtime` against `incumbent_trajectory` in  order to visualize the
 **any-time performance** of the HPO method defined in  terms of `scheduler`
-(and `searcher`). This allows us to quantify not only how well the configuration found by an optimizer works, but also how quickly an optimizers is able to find it.
+(and `searcher`). This allows us to quantify not only how well the configuration
+found by an optimizer works, but also how quickly an optimizer is able to find it.
 
 ```{.python .input  n=6}
 %%tab all
@@ -163,6 +164,7 @@ To illustrate this, we below compare to methods A and B on some HPO problem. Eac
 :width:`400px`
 :label:`example_anytime_performance`
 
+*MS: This is a bit abstract. Can we say what A, B are, and what N is?*
 
 
 ## Summary

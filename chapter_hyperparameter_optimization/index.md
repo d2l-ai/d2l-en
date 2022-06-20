@@ -20,6 +20,7 @@ In this chapter, we will first introduce the basics of hyperparameter optimizati
 :maxdepth: 2
 
 hyperopt-intro
+hyperopt-api
 rs-intro
 rs-async
 hyperband-intro
