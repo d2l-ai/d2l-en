@@ -11,6 +11,11 @@ In this chapter, we will first introduce the basics of hyperparameter optimizati
 
 *CA: it is not clear to me how the text above relates to the intro later*
 
+
+
+<!-- In this chapter, we provide an overview of the basics of hyperparameter optimization (HPO) and look at several state-of-the-art methods from the literature. As a running example, we will show how to automatically tune hyperparameters of a convolutional neural network. Any successful HPO method needs to provide solutions for two decision-making primitives, **scheduling** and **search**, and we will highlight the most prominent current solutions for either. Scheduling amounts to decisions of how much resources to spend on a hyperparameter configuration, e.g. when to stop, pause, or resume training, while search is about which configurations to evaluate in the first place. A specific focus in this chapter will lie on model-based approaches to search, which in practice are more sample efficient than their random search-based counterparts. Since hyperparameter optimization requires us to train and validate several neural networks, we will also see how we can distribute these methods. To avoid distracting boiler-plate code, we will use the Python framework **Syne Tune**, providing us with an simple interface for distributed hyperparameter optimization. You can install it via:
+ -->
+
 ```toc
 :maxdepth: 2
 
