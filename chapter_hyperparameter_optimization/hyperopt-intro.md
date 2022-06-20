@@ -23,23 +23,48 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # What is Hyperparameter Optimization?
 :label:`sec_what_is_hpo`
 
-Consider the weight parameters of a deep neural network. They are automatically determined during training by minimizing the loss function with, for example, stochastic gradient descent (see Chapter :ref:`sec_sgd`). 
-Every neural network comes with additional parameters, called **hyperparameters**, that define and control this training process. For example, the learning rate and the batch size control the convergence speed of the learning algorithms, while the number of layers and the number of units per layer determine the capacity of the network (I.e., the number of parameters). Unfortunately these **hyperparameters** cannot be learned in the same way as the weight parameters. For discrete or integer hyperparameters, the training error might not be differentiable with respect to them. On the other hand, for continuous hyperparameters, such as the learning rate, we could compute gradients but this woulrd require to propagate the gradient through the entire training process :cite:`maclaurin-icml15`.
+A deep neural network comes with a large number of weight and bias parameters, which
+are determined automatically by stochastic gradient descent training (see Chapter :ref:`sec_sgd`).
+On top of these, a number of additional **hyperparameters** need to be configured.
+For example, learning rate and batch size determine the convergence speed of the
+learning algorithm, while dropout fractions, number of layers and number
+of units or filters per layer scale the model capacity (i.e., the effective number
+of weights).
 
-Without a different form of automation, the user has to set hyperparameters manually by trial-and-error process, in what amounts to a time-consuming and difficult part of machine learning workflows :cite:`hpo`. 
-Hyperparameters are usually not directly transferable across architectures and datasets :cite:`feurer-arxiv22`,`wistuba-ml18`,`bardenet-icml13a`, making the search for the right hyperparameters a recurring task in practice. Furthermore, for most hyperparameters there are no rule-of-thumbs to set them and often expert knowledge is required to find sensible values.
+Unfortunately, we cannot adjust these by minimizing the training loss,
+as it does not depend on the learning rate and only decreases with model capacity.
+Without a different form of automation, hyperparameters have to be set manually by
+trial-and-error, in what amounts to a time-consuming and difficult part of machine
+learning workflows :cite:`hpo`. Hyperparameters are usually not directly transferable
+across architectures and datasets :cite:`feurer-arxiv22`,`wistuba-ml18`,`bardenet-icml13a`,
+and need to be re-optimized for every new task in practice. For most hyperparameters,
+there are no rule-of-thumbs, and expert knowledge is required to find sensible values.
 
-Hyperparameter optimization (HPO) algorithms are designed to tackle this problem in an principled and automated fashion :cite:`feurer-automlbook18a`. The main idea is to cast the search for the optimal hyperparameter configuration as a global optimization problem. The optimization objective consists usually in minimizing the generalization error on a hold-out validation dataset, but could in principle be an business objective or it could be minimized in conjunction with other objectives such as training time, inference time, or model size.
+Hyperparameter optimization (HPO) algorithms are designed to tackle this problem in 
+a principled and automated fashion :cite:`feurer-automlbook18a`, by casting it as an
+instance of global optimization.
+The default objective is an error metric on a hold-out validation dataset, but could
+in principle be any other business metric. It can be combined with or constrained by
+secondary objectives such as training time, inference time, or model complexity.
 
-More recently, hyperparameter optimization has been extended to search for entirely new neural network architectures :cite:`elsken-arxiv18a`,`wistuba-arxiv19`. This is often referred to as neural architecture search (NAS) in the literature. Compared to classical HPO, NAS is often even more compute intensive and requires additional efforts to be feasible in practice. Both, HPO and NAS can be considered as sub-fields of AutoML  which aims to automated the entire ML pipeline :cite:`hutter-book19a`.
+More recently, hyperparameter optimization has been extended to **neural architecture
+search (NAS)** :cite:`elsken-arxiv18a`,`wistuba-arxiv19`, where the goal is to find
+entirely new neural network architectures. Compared to classical HPO, NAS is even more
+expensive in terms of computation nd requires additional efforts to remain feasible in
+practice. Both HPO and NAS can be considered as sub-fields of 
+AutoML :cite:`hutter-book19a`, which aims to automated the entire ML pipeline.
 
-In this section we will introduce HPO and show how we can automatically find good hyperparameters of an logistic regression example, introduced in :ref:`sec_softmax_concise`, that minimizes the classification error on the hold-out validation dataset. 
+In this section we will introduce HPO and show how we can automatically find the best hyperparameters of an logistic regression example, introduced in :ref:`sec_softmax_concise`, which minimize the classification error on the hold-out validation dataset. 
 
 ##  The Optimization Problem
 :label:`sec_definition_hpo`
 
-To get started, we will first look at a simple toy problem: we will search for a learning rate that minimizes the validation error of a multi-class logistic regression model from :ref:sec_sgd trained on the Fashion MNIST dataset. Even though there are more hyperparameters we could optimize, for example the batch size or the number of epochs, we will focus only on the learning rate to keep the complexity of this example at bay.
-For that, we have to first define the objective function and the search space.
+We will start with a simple toy problem, searching for a learning rate which
+minimizes the validation error of the multi-class logistic regression model
+from :ref:sec_sgd trained on the Fashion MNIST dataset. While other parameters
+like batch size or number of epochs are also worth tuning, we focus on learning
+rate alone for simplicity. We first need to define the objective function and the
+search space.
 
 ```{.python .input  n=9}
 from d2l import torch as d2l
@@ -61,7 +86,7 @@ class SoftmaxClassification(d2l.Classification):
 
 The performance of a learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from the hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation error. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning model, which can be time and compute intensive in the case of deep neural networks trained on large datasets. For example, if we train a modern neural network architecture, e.g convolutional neural network :ref:`chap_modern_cnn` or a transformer :ref:`sec_transformer`, this can easily take several hours or even days. We will see in Chapter :ref:`sec_mf_hpo` how we can exploit cheaper approximations of $f$ to speed up the optimization process. Training is stochastic in general (e.g., weights are randomly initialized, mini-batches are randomly sampled), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
 
-Now, since we would like to optimize the validation error, i.e 1 - accuracy, we need to add a method computing this metric.
+Now, since we would like to optimize the validation error, we need to add a method computing this metric.
 
 ```{.python .input  n=10}
 %%tab all
@@ -108,7 +133,9 @@ There is no simple way to compute gradients of $f$ with respect to $\mathbf{x}$,
 
 :label:`sec_intro_search_spaces`
 
-Along with the objective function $f(\mathbf{x})$, we need to define the *search space* $\mathbf{x} \in \mathcal{X}$, which we will also refer to as *configuration space*. For our logistic regression example we define it as follows:
+Along with the objective function $f(\mathbf{x})$, we also need to define the feasible set
+$\mathbf{x} \in \mathcal{X}$ to optimize over, known as *search space* or *configuration
+space*. For our logistic regression example, we will use:
 
 ```{.python .input  n=12}
 search_space = {
@@ -130,7 +157,6 @@ In general, the structure of the search space $\mathcal{X}$ can be complex and i
 the width of the $l$-th layer is relevant only if the network has at least $l+1$ layers. These advanced HPO problems are beyond the scope of this chapter. We refer the interested reader to :cite:`hutter-lion11a`,`jenatton-icml17a`, `baptista-icml18a`.
 
 The search spaces plays an important role for hyperparameter optimization, since no method can find something that is not included in the search space. On the other hand, if the ranges are too large, the time to find a well performing configurations might become infeasible.
-
 
 ## Grid Search
 
