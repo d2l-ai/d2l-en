@@ -40,6 +40,8 @@ In this section we will introduce HPO and show how we can automatically find the
 
 To get started we will first look at a simple toy problem: Based on the logistic classification example from :ref:`sec_sgd`, we will search for the right learning rate that leads to an high validation accuracy on the Fashion MNIST dataset. Even though there are more hyperparameters we could optimize, for example the batch size or the number of epochs, we will focus only on the learning rate to keep the complexity of this example at bay.
 
+*MS: What is the reason you went from 2 to 1 parameters?*
+
 ```{.python .input  n=9}
 from d2l import torch as d2l
 
