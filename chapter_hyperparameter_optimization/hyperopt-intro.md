@@ -40,8 +40,6 @@ In this section we will introduce HPO and show how we can automatically find the
 
 To get started we will first look at a simple toy problem: Based on the logistic classification example from :ref:`sec_sgd`, we will search for the right learning rate that leads to an high validation accuracy on the Fashion MNIST dataset. Even though there are more hyperparameters we could optimize, for example the batch size or the number of epochs, we will focus only on the learning rate to keep the complexity of this example at bay.
 
-*MS: What is the reason you went from 2 to 1 parameters?*
-
 ```{.python .input  n=9}
 from d2l import torch as d2l
 
@@ -136,7 +134,7 @@ one of them will be close to the best hyperparameters $\mathbf{x}_*$.
 ## Grid Search
 
 Now, we look at the first method to solve our hyperparameter optimization problem: grid search. 
-The main idea of grid search is to define a discrete set of values for each hyperparameter and then to evaluate the cartesian product, i.e grid of all hyperparameters. 
+The main idea of grid search is to define a discrete set of values for each hyperparameter and then to evaluate the cartesian product, i.e grid of all hyperparameters.
 
 ```{.python .input  n=13}
 grid = [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4]
