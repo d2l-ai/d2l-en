@@ -10,9 +10,9 @@ $y(x) = f(x) + \epsilon(x)$, (1)
 
 with $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$. Let $\mathbf{y} = y(X) = (y(x_1),\dots,y(x_n))^{\top}$ be a vector of our training observations, and $\textbf{f} = (f(x_1),\dots,f(x_n))^{\top}$ be a vector of the latent noise-free function values, queried at the training inputs $X = {x_1, \dots, x_n}$.
 
-We will assume $f(x) \sim \mathcal{GP}(m,k)$, which means that any collection fo function values \textbf{f} has a joint multivariate Gaussian distribution, with mean vector $\mu_i = m(x_i)$ and covariance matrix $K_{ij} = k(x_i,x_j)$. The RBF kernel $k(x_i,x_j) = a^2 \exp\left(-\frac{1}{2\ell^2}||x_i-x_j||^2\right)$ would be a standard choice of covariance function. For notational simplicity, we'll assume the mean function $m(x)=0$; our derivations can easily be generalized later on.
+We will assume $f(x) \sim \mathcal{GP}(m,k)$, which means that any collection fo function values $\textbf{f}$ has a joint multivariate Gaussian distribution, with mean vector $\mu_i = m(x_i)$ and covariance matrix $K_{ij} = k(x_i,x_j)$. The RBF kernel $k(x_i,x_j) = a^2 \exp\left(-\frac{1}{2\ell^2}||x_i-x_j||^2\right)$ would be a standard choice of covariance function. For notational simplicity, we'll assume the mean function $m(x)=0$; our derivations can easily be generalized later on.
 
-Suppose we want to make predictions at a set of inputs $$X_* = x_{*1},x_{*2},\dots,x_{*m}$$. Then we want to find $x^2$ and $p(\mathbf{f}_* | \mathbf{y}, X)$. In the regression setting, we can conveniently find this distribution by using Gaussian identities, after finding the joint distribution over $\mathbf{f}_* = f(X_*)$ and $\mathbf{y}$. 
+Suppose we want to make predictions at a set of inputs $$X_* = x_{*1},x_{*2},\dots,x_{*m}.$$ Then we want to find $x^2$ and $p(\mathbf{f}_* | \mathbf{y}, X)$. In the regression setting, we can conveniently find this distribution by using Gaussian identities, after finding the joint distribution over $\mathbf{f}_* = f(X_*)$ and $\mathbf{y}$. 
 
 If we evaluate equation (1) at the training inputs $X$, we have $\mathbf{y} = \mathbf{f} + \mathbf{\epsilon}$. By the definition of a Gaussian process (see last section), $\mathbf{f} \sim \mathcal{N}(0,K(X,X))$ where $K(X,X)$ is an $n \times n$ matrix formed by evaluating our covariance function (aka _kernel_) at all possible pairs of inputs $x_i, x_j \in X$. $\mathbf{\epsilon}$ is simply a vector comprised of iid samples from $\mathcal{N}(0,\sigma^2)$ and thus has distribution $\mathcal{N}(0,\sigma^2I)$. $\mathbf{y}$ is therefore a sum of two independent multivariate Gaussian variables, and thus has distribution $\mathcal{N}(0, K(X,X) + \sigma^2I)$. One can also show that $\text{cov}(\mathbf{f}_*, \mathbf{y}) = \text{cov}(\mathbf{y},\mathbf{f}_*)^{\top} = K(X_*,X)$ where $K(X_*,X)$ is an $m \times n$ matrix formed by evaluating the kernel at all pairs of test and training inputs. 
 
@@ -24,8 +24,8 @@ $$
 \sim
 \mathcal{N}\left(0, 
 \mathbf{A} = \begin{bmatrix}
-K(X,X)+\sigma^2I & K(X,X_\*) \\
-K(X_\*,X) & K(X_\*,X_\*)
+K(X,X)+\sigma^2I & K(X,X_*) \\
+K(X_*,X) & K(X_*,X_*)
 \end{bmatrix}
 \right)
 $$
@@ -68,7 +68,7 @@ There are some key points to note about the predictive distributions for Gaussia
 
 Let's create some regression data, and then fit the data with a GP, implementing every step from scratch. 
 We'll sample data from 
-$$y(x) = sin(x) + \frac{1}{2}sin(4x) + \epsilon$$, with \epsilon \sim \mathcal{N}(0,\sigma^2). The noise free function we wish to find is $f(x) = sin(x) + \frac{1}{2}sin(4x)$. We'll start by using a noise standard deviation $\sigma$ = 0.25.
+$$y(x) = sin(x) + \frac{1}{2}sin(4x) + \epsilon,$$ with $\epsilon \sim \mathcal{N}(0,\sigma^2)$. The noise free function we wish to find is $f(x) = sin(x) + \frac{1}{2}sin(4x)$. We'll start by using a noise standard deviation $\sigma = 0.25$.
 
 ```{.python .input}
 from d2l import torch as d2l
@@ -280,8 +280,7 @@ for i in range(training_iter):
         model.covar_module.base_kernel.lengthscale.item(),
         model.likelihood.noise.item()
     ))
-    optimizer.step()
-  
+    optimizer.step() 
 # Get into evaluation (predictive posterior) mode
 test_x = torch.tensor(test_x)
 model.eval()
@@ -291,18 +290,14 @@ observed_pred = likelihood(model(test_x))
 with torch.no_grad():
     # Initialize plot
     f, ax = plt.subplots(1, 1, figsize=(4, 3))
-
     # Get upper and lower bounds for 95\% credible set (in this case, in observation space)
     lower, upper = observed_pred.confidence_region()
- 
     ax.scatter(train_x.numpy(), train_y.numpy())
     ax.plot(test_x.numpy(), test_y.numpy(),linewidth=2.)
     ax.plot(test_x.numpy(), observed_pred.mean.numpy(),linewidth=2.)
-
     ax.fill_between(test_x.numpy(), lower.numpy(), upper.numpy(), alpha=0.25)
     ax.set_ylim([-1.5, 1.5])
     ax.legend(['True Function', 'Predictive Mean', 'Observed Data', 'Credible Set'])
-    
 ```
 
 We see the fits are virtually identical. A few things to note: GPyTorch is working with _squared_ length-scales and observation noise. For example, our learned noise standard deviation in the for scratch code is about 0.283. The noise variance found by GPyTorch is $0.81 \approx 0.283^2$. In the GPyTorch plot, we also show the credible set in the _observation space_ rather than the latent function space, to demonstrate that they indeed cover the observed datapoints.
@@ -312,7 +307,7 @@ We see the fits are virtually identical. A few things to note: GPyTorch is worki
 1. We have emphasized the importance of _learning_ kernel hyperparameters, and the effect of hyperparameters and kernels on the generalization properties of Gaussian processes. Try skipping the step where we learn hypers, and instead guess a variety of length-scales and noise variances, and check their effect on predictions. What happens when you use a large length-scale? A small length-scale? A large noise variance? A small noise variance?
 1. We have said that the marginal likelihood is not a convex objective, but that hyperparameters like length-scale and noise variance can be reliably estimated in GP regression. This is generally true --- in fact, the marginal likelihood is _much_ better at learning length-scale hyperparameters than conventional approaches in spatial statistics, which involve fitting empirical autocorrelation functions ("covariograms"). Arguably, the biggest contribution from machine learning to Gaussian process research, at least before recent work on scalable inference, was the introduction of the marginal lkelihood for hyperparameter learning. 
 
-_However_, different pairings of even these parameters provide interpretably different plausible explanations for many datasets, leading to local optima in our objective. If we use a large length-scale, then we assume the true underlying function is slowly varying. If the observed data _are_ varying significantly, then the only we can plausibly have a large length-scale is with a large noise-variance. If we use a small length-scale, on the  other hand, our fit will be very sensitive to the variations in the data, leaving little room to explain variations with noise (aleatoric uncertainty). 
+*However*, different pairings of even these parameters provide interpretably different plausible explanations for many datasets, leading to local optima in our objective. If we use a large length-scale, then we assume the true underlying function is slowly varying. If the observed data _are_ varying significantly, then the only we can plausibly have a large length-scale is with a large noise-variance. If we use a small length-scale, on the  other hand, our fit will be very sensitive to the variations in the data, leaving little room to explain variations with noise (aleatoric uncertainty). 
 
 Try seeing if you can find these local optima: initialize with very large length-scale with large noise, and small length-scales with small noise. Do you converge to different solutions?
   
