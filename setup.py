@@ -7,7 +7,9 @@ requirements = [
     'matplotlib',
     'requests',
     'pandas',
-    'gym'
+    'gym',
+    'gpytorch',
+    'scipy'
 ]
 
 setup(
