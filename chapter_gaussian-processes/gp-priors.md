@@ -28,6 +28,7 @@ For any $x$, $f(x)$ is a sum of two Gaussian random variables. Since Gaussians a
 In short, $f(x)$ is a _random function_, or a _distribution over functions_. We can gain some insights into this distribution by repeatedly sampling values for $w_0, w_1$, and visualizing the corresponding functions $f(x)$, which are straight lines with slopes and different intercepts, as follows:
 
 ```{.python .input}
+from d2l import torch as d2l
 import numpy as np
 import matplotlib.pyplot as plt
 

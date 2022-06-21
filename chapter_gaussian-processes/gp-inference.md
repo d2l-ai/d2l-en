@@ -71,6 +71,7 @@ We'll sample data from
 $$y(x) = sin(x) + \frac{1}{2}sin(4x) + \epsilon$$, with \epsilon \sim \mathcal{N}(0,\sigma^2). The noise free function we wish to find is $f(x) = sin(x) + \frac{1}{2}sin(4x)$. We'll start by using a noise standard deviation $\sigma$ = 0.25.
 
 ```{.python .input}
+from d2l import torch as d2l
 import numpy as np
 import matplotlib.pyplot as plt
 
