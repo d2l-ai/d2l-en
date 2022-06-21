@@ -76,15 +76,22 @@ are shared across time steps.
 
 
 Like neural networks more broadly,
-RNNs have a long interdisciplinary history,
-both as models of the brain popularized
-by cognitive scientists and as practical modeling tools 
-employed by the machine learning community. 
-In this book, we adopt the latter perspective,
-focusing on RNNs as modeling tools,
-and point the reader interested in more 
+RNNs have a long discipline-spanning history,
+originating as models of the brain popularized
+by cognitive scientists and subsequently adopted
+as practical modeling tools employed 
+by the machine learning community. 
+As with deep learning more broadly,
+this book adopts the machine learning perspective,
+focusing on RNNs as practical tools which rose 
+to popularity in the 2010s owing to 
+breakthrough results on such diverse tasks 
+as handwriting recognition :cite:`graves2008novel`,
+machine translation :cite:`Sutskever.Vinyals.Le.2014`,
+and recognizing medical diagnoses :cite:`Lipton.Kale.2016`. 
+We point the reader interested in more 
 background material to a publicly available
-comprehensie review :cite:`lipton2015critical`.
+comprehensie review :cite:`Lipton.Berkowitz.Elkan.2015`.
 We also note that sequentiality is not unique to RNNs.
 For example, the CNNs that we already introduced
 can be adapted to handle data of varying length,
@@ -109,17 +116,20 @@ varying-length sequences of fixed length vectors.
 For example, documents can be represented as sequences of words.
 Medical records can often be represented as sequences of events 
 (encounters, medications, procedures, lab tests, diagnoses).
+Videos can be represented as varying-length sequences of still images.
 
 
 While sequence models have popped up in countless application areas,
-basic research in the area has mostly been driven by advances
-in Natural Language Processing (NLP).
-Thus, throughout this chapter, we will tend 
-to focus our exposition and examples on text data.
-In the following sections, we introduce some basic
+basic research in the area has been driven predominantly 
+by advances on core tasks in Natural Language Processing (NLP).
+Thus, throughout this chapter, we will focus 
+our exposition and examples on text data.
+If you get the hang of these examples, 
+then applying these models to other data modalities 
+should be relatively straightforward. 
+In the next few sections, we introduce basic
 notation for sequences and some evaluation metrics 
-for assessing the quality of sequentially structured
-model outputs. 
+for assessing the quality of sequentially structured model outputs. 
 Next, we discuss basic concepts of a language model 
 and use this discussion to motivate our first RNN models.
 Finally, we describe the method for calculating gradients 
