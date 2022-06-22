@@ -262,8 +262,8 @@ tfd.Multinomial(100, fair_probs).sample()
 
 ```{.python .input}
 %%tab jax
-fair_probs = np.ones(2) / 2
-# jax doesn't have multinomial, use numpy
+fair_probs = [0.5, 0.5]
+# jax.random does have multinomial distribution implemented
 np.random.multinomial(100, fair_probs)
 ```
 
@@ -1101,9 +1101,5 @@ interval centered on the expectation.
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/198)
-:end_tab:
-
-:begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/198)
 :end_tab:

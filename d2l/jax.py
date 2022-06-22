@@ -27,6 +27,7 @@ d2l = sys.modules[__name__]
 import jax
 import jax.numpy as jnp
 import numpy as np
+from jax import grad, random, vmap
 
 def use_svg_display():
     """Use the svg format to display a plot in Jupyter.
