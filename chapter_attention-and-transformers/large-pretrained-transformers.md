@@ -77,8 +77,6 @@ ELECTRA :cite:`clark2019electra`
 * Concurrently work BART encodes then decodes. However when fine-tuning, it needs additional encoder. T5 is used in Switch transformer, LaMDA, Imagen.
 
 
-
-
 T5
 
 <!--
@@ -91,16 +89,51 @@ Switch Transformer :cite:`fedus2022switch`
 
 ## Decoder-Only 
 
+* Fine-tuning is bad: need downstream data, computationally expensive for gradient update.
+* GPT-2 demonstrates zero-shot possibility, GPT-3 shows few-shot. No gradient update.
+* Let's start with GPT.
+
 
 ### GPT
 
+* GPT is a transformer decoder LM. 
+* Recall LM
+* How to use transformer decoder for LM:
+
+`fig`: decoder-only, attention mask, autoregressive LM
+
+* To pretrain, use LM, same as before: self-supervised learning.
+* When using for downstream, fine tune. Explain how with classification.
+
+`fig`: GPT fine tune classification
+
+* Note that GPT inspired BERT. To demonstrate more benefits of decoder-only scheme, they train on larger data, leading to GPT-2.
+
 
 ### GPT-2
+
+* GPT, BERT, T5 use fine-tuning. It can be bad
+* GPT-2 considers multitask learning and zero-shot
+* So more data is needed
+* GPT-2's architectural difference
+* GPT-2's pretraining and finetuning
+* GPT-2's SOTA on zero-shot LM. Explain zero-shot with summarization TL;DR, but non-LM zero-shot performance is not so good.
 
 
 ### GPT-3
 
 
+* GPT-2 also evalutes few-shot on machine translation, poor perf.
+* GPT-3 explores zero-shot, few-shot, one-shot
+
+`fig`: zero-shot, few-shot, one-shot: LM conditional on X, generate Y
+
+* Kaplan's scaling law suggests bigger model with more data
+* GPT-3 is bigger, trains on more data
+* GPT-3's architectural difference, sparse transformer
+* GPT-3's SOTA perf.
+* Cool demos of GPT-3.
+* summarize training compute, param size of BERT, T5, GPT. Similar to Table D.1 of GPT-3 paper.
 
 
 <!--
@@ -112,6 +145,7 @@ GPT-3 :cite:`brown2020language`
 <!--
 Sparse transformer :cite:`child2019generating`
 -->
+
 
 
 
