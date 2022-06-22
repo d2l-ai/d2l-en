@@ -1,10 +1,16 @@
-# Large Pretrained Transformers
+# Large Pretrained Models with Transformers
 :label:`sec_large-pretrained-transformers`
+
+
+Large pretrained models generalize from labeled and unlabeled data.
+
+In practice, we use large pretrained models as a backbone for downstream tasks, rather than training pretrained models from scratch.
+
 
 
 ## Encoder-Only
 
-### BERT
+BERT
 
 <!--
 BERT :cite:`Devlin.Chang.Lee.ea.2018`
@@ -20,28 +26,23 @@ DistilBERT :cite:`sanh2019distilbert`
 ELECTRA :cite:`clark2019electra`
 -->
 
-### Swin Transformer
 
-<!--
-Swin Transformer :cite:`liu2021swin`
--->
 
 
 ## Encoder-Decoder
 
 
-### T5
+T5
 
 <!--
 BART :cite:`lewis2019bart`
 T5 :cite:`raffel2020exploring`
+Switch Transformer :cite:`fedus2022switch`
 -->
 
-### MAE
 
-<!--
-MAE :cite:`he2022masked`
--->
+
+
 
 
 ## Decoder-Only 
@@ -49,17 +50,26 @@ MAE :cite:`he2022masked`
 
 ### GPT
 
+
+### GPT-2
+
+
+### GPT-3
+
+
+
+
 <!--
 GPT-1 :cite:`Radford.Narasimhan.Salimans.ea.2018`
 GPT-2 :cite:`Radford.Wu.Child.ea.2019`
 GPT-3 :cite:`brown2020language`
 -->
 
-### iGPT
-
 <!--
-iGPT :cite:`chen2020generative`
+Sparse transformer :cite:`child2019generating`
 -->
+
+
 
 ## Scaling Up
 
@@ -72,7 +82,7 @@ Scale efficiently :cite:`tay2021scale`
 -->
 
 
-### Larger Models and Emergent Abilities
+### Larger Models 
 
 
 <!--
@@ -87,23 +97,47 @@ PaLM :cite:`chowdhery2022palm`
 -->
 
 
+
+### Emergent Abilities
+
 <!--
 Emergent Abilities :cite:`wei2022emergent`
 -->
 
 
-### More Modalities
+
+
+## Discussions
+
+Swin Transformer
+
+<!--
+Swin Transformer :cite:`liu2021swin`
+-->
+
+MAE
+
+<!--
+MAE :cite:`he2022masked`
+-->
+
+iGPT
+
+<!--
+iGPT :cite:`chen2020generative`
+-->
+
+
+More Modalities
 
 <!--
 CLIP :cite:`radford2021learning`
 DALL-E :cite:`ramesh2021zero`
-DALL-E-2 :cite:`ramesh2022hierarchical`
+DALL-E 2 :cite:`ramesh2022hierarchical`
 Flamingo :cite:`alayrac2022flamingo`
 Imagen :cite:`saharia2022photorealistic`
 Generalist Agent :cite:`reed2022generalist`
 -->
-
-## Summary
 
 
 
@@ -115,5 +149,3 @@ Generalist Agent :cite:`reed2022generalist`
 
 
 ## References
-
-
