@@ -142,6 +142,22 @@ Switch Transformer :cite:`fedus2022switch`
 * summarize training compute, param size of BERT, T5, GPT. Similar to Table D.1 of GPT-3 paper.
 
 
+
+
+
+:Cost of pretraining BERT, T5, and GPT-3 at multiple scales (FLOPS calculation follows :cite:`brown2020language`)
+
+|Model|Parameters|Compute (training FLOPS)| Data (training tokens)|
+|:--|:-|:-|:-|
+|BERT-Base|$109\text{M}$ | $1.6\times10^{20}$ |$250\text{B}$ |
+|BERT-Large|$355\text{M}$  | $5.3\times 10^{20}$ |$250\text{B}$ |
+|T5-Base|$220\text{M}$  | $6.6\times 10^{20}$ |$1000\text{B}$ |
+|T5-Large| $770\text{M}$  | $2.3\times 10^{21}$ |$1000\text{B}$ |
+|T5-11B|$11\text{B}$  | $3.3\times 10^{22}$ |$1000\text{B}$ |
+|GPT-3|$175\text{B}$  | $3.1\times 10^{23}$ |$300\text{B}$ |
+:label:`tab_bert-t5-gpt-scale`
+
+
 <!--
 GPT-1 :cite:`Radford.Narasimhan.Salimans.ea.2018`
 GPT-2 :cite:`Radford.Wu.Child.ea.2019`
@@ -182,7 +198,7 @@ PaLM :cite:`chowdhery2022palm`
 
 
 
-### Emergent Abilities
+Emergent Abilities
 
 <!--
 Emergent Abilities :cite:`wei2022emergent`
