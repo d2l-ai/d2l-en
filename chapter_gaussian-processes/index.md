@@ -7,13 +7,10 @@ Learning about Gaussian processes is important for three reasons: (1) they provi
 
 In this chapter, we introduce Gaussian processes, starting with a familiar weight-space perspective, and then moving directly into function space, which will help us reason about constructing and understanding machine learning models, including deep neural networks. We will then introduce popular covariance functions, also known as _kernels_, which control the generalization properties of a Gaussian process. A GP with a given kernel defines a prior over functions. We will show how to use data to infer a _posterior_, in order to make predictions. We will show to make those predictions scale to large datasets, and how to use Gaussian processes in a number of practical setting, including hyperparameter tuning in deep learning. Our examples will make use of GPyTorch, which makes Gaussian processes scale, and is closely integrated with deep learning functionality and PyTorch.
 
-
 ```toc
 :maxdepth: 2
 
 gp-priors
 gp-inference
-gp-advanced
-examples
 ```
 

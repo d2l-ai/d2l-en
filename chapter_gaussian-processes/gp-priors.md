@@ -1,4 +1,4 @@
-# Gaussian process priors
+# Gaussian Process Priors
 
 Understanding Gaussian processes (GPs) is important for reasoning about model construction and generalization, and for achieving state-of-the-art performance in a variety of applications, including active learning, and hyperparameter tuning in deep learning. GPs are everywhere, and it is in our interests to know what they are and how we can use them.
 
@@ -31,31 +31,32 @@ In short, $f(x)$ is a _random function_, or a _distribution over functions_. We 
 from d2l import torch as d2l
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.spatial import distance_matrix
 
-def lin_func(x,n_sample):
+def lin_func(x, n_sample):
     preds = np.zeros((n_sample, x.shape[0]))
     for ii in range(n_sample):
-        w = np.random.normal(0,1,2)
-        y = w[0] + w[1]*x
-        preds[ii,:] = y
+        w = np.random.normal(0, 1, 2)
+        y = w[0] + w[1] * x
+        preds[ii, :] = y
     return preds
 
 x_points = np.linspace(-5, 5, 50)
-outs = lin_func(x_points,10)
-lw_bd = -2*np.sqrt((1+x_points**2))
-up_bd = 2*np.sqrt((1+x_points**2))
+outs = lin_func(x_points, 10)
+lw_bd = -2 * np.sqrt((1 + x_points ** 2))
+up_bd = 2 * np.sqrt((1 + x_points ** 2))
 
-plt.fill_between(x_points, lw_bd, up_bd, alpha=0.25)
-plt.plot(x_points, np.zeros(len(x_points)),linewidth=4,color='black')
-plt.plot(x_points, outs.T)
-plt.xlabel("x",fontsize=20)
-plt.ylabel("f(x)",fontsize=20)
-plt.show()
+d2l.plt.fill_between(x_points, lw_bd, up_bd, alpha=0.25)
+d2l.plt.plot(x_points, np.zeros(len(x_points)), linewidth=4, color='black')
+d2l.plt.plot(x_points, outs.T)
+d2l.plt.xlabel("x", fontsize=20)
+d2l.plt.ylabel("f(x)", fontsize=20)
+d2l.plt.show()
 ```
 
 If $w_0$ and $w_1$ are instead drawn from $\mathcal{N}(0,\alpha^2)$, how do you imagine varying $\alpha$ affects the distribution over functions?
 
-## From weight space to function space
+## From Weight Space to Function Space
 
 In the plot above, we saw how a distribution over parameters in a model induces a distribution over functions. While we often have ideas about the functions we want to model --- whether they're smooth, periodic, quickly varying, etc. --- it's relatively tedious to reason about the parameters, which are largely uninterpretable. Fortunately, Gaussian processes provide an easy mechanism to reason _directly_ about functions. Since a Gaussian distribution is entirely defined by its first two moments, its mean and covariance matrix, a Gaussian process by extension is defined by its mean function and covariance function.
 
@@ -71,7 +72,7 @@ Our distribution over functions can now be directly specified and sampled from, 
 
 First, we note that essentially the same derivation for the simple straight line model above can be applied to find the mean and covariance function for _any_ model of the form $f(x) = w^{\top} \phi(x)$, with $w \sim \mathcal{N}(u,S)$. In this case, the mean function $m(x) = u^{\top}\phi(x)$, and the covariance function $k(x,x') = \phi(x)^{\top}S\phi(x')$. Since $\phi(x)$ can represent a vector of any non-linear basis functions, we are considering a very general model class, including models with an even an _infinite_ number of parameters.
 
-## The radial basis function (RBF) kernel
+## The Radial Basis Function (RBF) Kernel
 
 The _radial basis function_ (RBF) kernel is the most popular covariance function for Gaussian processes, and kernel machines in general.
 This kernel has the form $k_{\text{RBF}}(x,x') = a^2\exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right)$, where $a$ is an amplitude parameter, and $\ell$ is a _lengthscale_ hyperparameter.
@@ -107,22 +108,20 @@ We can build further intuition about Gaussian processes with RBF kernels, and hy
 We illustrate this process in the figure below.
 
 ```{.python .input}
-from scipy.spatial import distance_matrix
-
 def kernel(x1, x2, ls=4.):  #@save
     dist = distance_matrix(np.expand_dims(x1, 1), np.expand_dims(x2, 1))
-    return np.exp( -(1./ls/2) * (dist**2) )
+    return np.exp(-(1. / ls / 2) * (dist ** 2))
 
 x_points = np.linspace(0, 5, 50)
 meanvec = np.zeros(len(x_points))
-covmat = kernel(x_points,x_points,1)
+covmat = kernel(x_points,x_points, 1)
 
 prior_samples= np.random.multivariate_normal(meanvec, covmat, size=5);
-plt.plot(x_points, prior_samples.T, alpha=0.5)
-plt.show()
+d2l.plt.plot(x_points, prior_samples.T, alpha=0.5)
+d2l.plt.show()
 ```
 
-## The neural network kernel
+## The Neural Network Kernel
 
 Research on Gaussian processes in machine learning was triggered by research on neural networks. Radford Neal was pursuing ever larger Bayesian neural networks, ultimately showing in 1994 that such networks with an infinite number of hidden units become Gaussian processes with particular kernel functions. Interest in this derivation has re-surfaced, with ideas like the neural tangent kernel being used to investigate the generalization properties of neural networks. We can derive the neural network kernel as follows.
 
@@ -143,7 +142,7 @@ In some cases, we can essentially evaluate this covariance function in closed fo
 The RBF kernel is _stationary_, meaning that it is _translation invariant_, and therefore can be written as a function of $\tau = x-x'$. Intuitively, stationarity means that the high-level properties of the function, such as rate of variation, do not change as we move in input space. The neural network kernel, however, is _non-stationary_. Below, we show sample functions from a Gaussian process with this kernel. We can see that the function looks qualitatively different near the origin.
 
 
-# Exercises
+## Exercises
 
 1. Draw sample prior functions from a GP with an Ornstein-Uhlenbeck (OU) kernel, $k_{\text{OU}}(x,x') = \exp\left(-\frac{1}{2\ell}||x - x'|\right)$. If you fix the lengthscale $\ell$ to be the same, how do these functions look different than sample functions from a GP with an RBF kernel?
 
