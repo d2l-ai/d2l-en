@@ -15,7 +15,7 @@ from sklearn import linear_model
 ```
 
 ## Heart Disease Prediction
-
+:label:`subsec_heart-disease-dataset`
 In this example, we will anticipate whether a patient has heart disease or not using a [dataset](https://archive.ics.uci.edu/ml/datasets/heart+disease) consisting of patients' demographics and medical information. Heart disease is one of the major causes of death globally. Leading risk factors for heart disease include high blood pressure, diabetes, unhealthy cholesterol level, etc. Automating the heart disease prediction process can potentially help reduce clinical costs. Yet, a poor clinical decision on this can lead to unacceptable consequences.
 
 As usual, the first step is to read the dataset and split it into training and testing sets.
