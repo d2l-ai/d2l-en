@@ -2389,9 +2389,8 @@ def _get_batch_loss_bert(net, loss, vocab_size, tokens_X_shards,
         npx.waitall()
     return mlm_ls, nsp_ls, ls
 
-d2l.DATA_HUB['aclImdb'] = (
-    'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',
-    '01ada507287d82875905620988597833ad4e0903')
+d2l.DATA_HUB['aclImdb'] = (d2l.DATA_URL + 'aclImdb_v1.tar.gz',
+                          '01ada507287d82875905620988597833ad4e0903')
 
 def read_imdb(data_dir, is_train):
     """Read the IMDb review dataset text sequences and labels.
@@ -2800,6 +2799,51 @@ def update_G(Z, net_D, net_G, loss, trainer_G):
 
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
+
+class HeartDiseaseData(d2l.DataModule):
+    def __init__(self, batch_size=256, test_ratio=0.4, feat_col=None,
+                 target='target'):
+        super().__init__()
+        self.save_hyperparameters()
+        self.df = pd.read_csv(d2l.download(d2l.DATA_URL + 'heart_disease.csv'))
+        self.feat_col = list(self.df.columns) if not feat_col else feat_col
+        if target in self.feat_col: self.feat_col.remove(target)
+        self.X_train, self.X_test, self.y_train, self.y_test = \
+        model_selection.train_test_split(self.df[self.feat_col].values, \
+                    self.df[[target]].values, test_size=test_ratio)
+
+    def get_dataloader(self, train):
+        batch_size = self.batch_size if train else np.shape(self.X_test)[0]
+        x = self.X_train if train else self.X_test
+        y = self.y_train if train else self.y_test
+        return torch.utils.data.DataLoader(torch.utils.data.TensorDataset(
+            torch.from_numpy(x).type(torch.float),
+            torch.from_numpy(y).view(-1).type(torch.long)),
+            batch_size=batch_size, shuffle=train)
+
+def plot_hbar(names, importance, fsize=(2.5, 3.0), xlabel=None):
+    """Defined in :numref:`subsec_heart-disease-dataset`"""
+    d2l.set_figsize(fsize)
+    d2l.plt.barh(range(len(names)), importance)
+    d2l.plt.yticks(range(len(names)), names)
+    d2l.plt.xlabel(xlabel)
+
+class HeartDiseaseMLP(d2l.Classifier):
+    """Defined in :numref:`subsec_heart-disease-dataset`"""
+    def __init__(self, num_outputs=2, lr=0.001, wd=1e-6):
+        self.save_hyperparameters()
+        super(HeartDiseaseMLP, self).__init__()
+        self.net = nn.Sequential(nn.LazyBatchNorm1d(),
+            nn.LazyLinear(256), nn.ReLU(),
+            nn.LazyLinear(256), nn.ReLU(),
+            nn.LazyLinear(num_outputs))
+
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters(), self.lr,
+                                weight_decay=self.wd)
+
+    def predict(self, X, Y):
+        return self.accuracy(self(X), Y).numpy()
 
 def load_array(data_arrays, batch_size, is_train=True):
     """Construct a Gluon data iterator.
