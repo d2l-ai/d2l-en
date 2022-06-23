@@ -65,5 +65,6 @@ multihead-attention
 self-attention-and-positional-encoding
 transformer
 vision-transformer
-large-pretrained-transformers
+large-pretraining-transformers
 ```
+

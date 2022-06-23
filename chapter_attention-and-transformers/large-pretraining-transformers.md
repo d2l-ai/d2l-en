@@ -1,4 +1,4 @@
-# Large Pretrained Models with Transformers
+# Large-Scale Pretraining with Transformers
 :label:`sec_large-pretrained-transformers`
 
 
