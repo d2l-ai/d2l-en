@@ -2561,32 +2561,23 @@ class HeartDiseaseData(d2l.DataModule):
         super().__init__()
         self.save_hyperparameters()
         self.df = pd.read_csv(d2l.download(d2l.DATA_URL + 'heart_disease.csv'))
-        if feat_col is None:
-            self.feat_col = list(set(list(self.df.columns)) - set([target]))
+        self.feat_col = list(self.df.columns) if not feat_col else feat_col
+        if target in self.feat_col: self.feat_col.remove(target)
         self.X_train, self.X_test, self.y_train, self.y_test = \
         model_selection.train_test_split(self.df[self.feat_col].values, \
                     self.df[[target]].values, test_size=test_ratio)
 
     def get_dataloader(self, train):
-        if train:
-            return torch.utils.data.DataLoader(torch.utils.data.TensorDataset(
-                torch.from_numpy(self.X_train).type(torch.float),
-                torch.from_numpy(self.y_train).view(-1).type(torch.long)),
-                batch_size=self.batch_size, shuffle=True)
-        else:
-            return torch.utils.data.DataLoader(torch.utils.data.TensorDataset(
-                torch.from_numpy(self.X_test).type(torch.float),
-                torch.from_numpy(self.y_test).view(-1).type(torch.long)),
-                batch_size=np.shape(self.X_test)[0], shuffle=False)
+        batch_size = self.batch_size if train else np.shape(self.X_test)[0]
+        x = self.X_train if train else self.X_test
+        y = self.y_train if train else self.y_test
+        return torch.utils.data.DataLoader(torch.utils.data.TensorDataset(
+            torch.from_numpy(x).type(torch.float),
+            torch.from_numpy(y).view(-1).type(torch.long)),
+            batch_size=batch_size, shuffle=train)
 
-    def train_dataloader(self):
-        return self.get_dataloader(True)
-
-    def val_dataloader(self):
-        return self.get_dataloader(False)
-
-def plot_hbar(names, importance, fsize=(3, 3.5), xlabel=None):
-    d2l.plt.figure(figsize=fsize)
+def plot_hbar(names, importance, fsize=(2.5, 3.0), xlabel=None):
+    d2l.set_figsize(fsize)
     d2l.plt.barh(range(len(names)), importance)
     d2l.plt.yticks(range(len(names)), names)
     d2l.plt.xlabel(xlabel)
@@ -2595,11 +2586,9 @@ class HeartDiseaseMLP(d2l.Classifier):
     def __init__(self, num_outputs=2, lr=0.001, wd=1e-6):
         self.save_hyperparameters()
         super(HeartDiseaseMLP, self).__init__()
-        self.net = nn.Sequential(
-            nn.LazyLinear(256), nn.ReLU(), nn.LazyBatchNorm1d(),
-            nn.LazyLinear(256), nn.ReLU(), nn.LazyBatchNorm1d(),
-            nn.LazyLinear(256), nn.ReLU(), nn.LazyBatchNorm1d(),
-            nn.LazyLinear(256), nn.ReLU(), nn.LazyBatchNorm1d(),
+        self.net = nn.Sequential(nn.LazyBatchNorm1d(),
+            nn.LazyLinear(256), nn.ReLU(),
+            nn.LazyLinear(256), nn.ReLU(),
             nn.LazyLinear(num_outputs))
 
     def configure_optimizers(self):
