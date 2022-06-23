@@ -24,14 +24,16 @@ In practice, we use large pretrained models as a backbone for downstream tasks, 
 * Encoder predicts mask.
 
 
-`fig`: encoder-only, attention mask, masked LM prediction
+![Encoder-only BERT pretraining (left) and attention pattern in the encoder (right).](../img/bert-encoder-only.svg)
+:label:`fig_bert-encoder-only`
 
 * Mask from original text. Advantage: self-supervised
 * Self-supervised enables large-scale training
 * Large-scale training generalizes well before downstream.
 * When using for downstream, fine tune. Explain how with classification example:
 
-`fig`: bert fine tune classification
+![Encoder-only BERT fine tuning.](../img/bert-finetune-classification.svg)
+:label:`fig_bert-finetune-classification`
 
 * Fine-tuning produces SOTA
 * BERT has other objective like next sentence prediction, but found not useful in followups. There are other followups.
@@ -64,13 +66,15 @@ ELECTRA :cite:`clark2019electra`
 * As another pretrain-finetune, so T5 casts every text problem as a "text-to-text" problem. Explain how T5 can be used once pretrained.
 * To enable sequence generation, it adopts encoder-decoder
 
-`fig`: encoder-decoder, attention mask, reconstruct masked span
+![Encoder-decoder T5 pretraining (left) and attention pattern in the encoder-decoder (right).](../img/t5-encoder-decoder.svg)
+:label:`fig_t5-encoder-decoder`
 
 * To pretrain, use span corruption objective to reconstruct masked span.
 * Same as BERT, self-supervised learning. Different: on C4
 * When using for downstream, fine tune. Explain how with news summarization.
 
-`fig`: T5 fine tune news summarization
+![Encoder-only T5 fine tuning.](../img/t5-finetune-summarization.svg)
+:label:`fig_t5-finetune-summarization`
 
 * T5 achieves SOTA.
 
@@ -100,12 +104,13 @@ Switch Transformer :cite:`fedus2022switch`
 * Recall LM
 * How to use transformer decoder for LM:
 
-`fig`: decoder-only, attention mask, autoregressive LM
-
+![Decoder-only GPT pretraining (left) and attention pattern in the decoder (right).](../img/gpt-decoder-only.svg)
+:label:`fig_gpt-decoder-only`
 * To pretrain, use LM, same as before: self-supervised learning.
 * When using for downstream, fine tune. Explain how with classification.
 
-`fig`: GPT fine tune classification
+![Decoder-only GPT fine tuning.](../img/gpt-finetune-classification.svg)
+:label:`fig_gpt-finetune-classification`
 
 * Note that GPT inspired BERT. To demonstrate more benefits of decoder-only scheme, they train on larger data, leading to GPT-2.
 
@@ -126,7 +131,8 @@ Switch Transformer :cite:`fedus2022switch`
 * GPT-2 also evalutes few-shot on machine translation, poor perf.
 * GPT-3 explores zero-shot, few-shot, one-shot
 
-`fig`: zero-shot, few-shot, one-shot: LM conditional on X, generate Y
+![Zero-shot, one-shot, few-shot learning with language models.](../img/gpt-3-xshot.svg)
+:label:`fig_gpt-3-xshot`
 
 * Kaplan's scaling law suggests bigger model with more data
 * GPT-3 is bigger, trains on more data
