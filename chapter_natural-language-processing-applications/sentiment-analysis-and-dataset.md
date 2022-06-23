@@ -65,9 +65,8 @@ in the path `../data/aclImdb`.
 ```{.python .input}
 #@tab all
 #@save
-d2l.DATA_HUB['aclImdb'] = (
-    'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',
-    '01ada507287d82875905620988597833ad4e0903')
+d2l.DATA_HUB['aclImdb'] = (d2l.DATA_URL + 'aclImdb_v1.tar.gz', 
+                          '01ada507287d82875905620988597833ad4e0903')
 
 data_dir = d2l.download_extract('aclImdb', 'aclImdb')
 ```

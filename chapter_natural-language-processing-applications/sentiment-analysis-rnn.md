@@ -1,5 +1,5 @@
 # Sentiment Analysis: Using Recurrent Neural Networks
-:label:`sec_sentiment_rnn`
+:label:`sec_sentiment_rnn` 
 
 
 Like word similarity and analogy tasks,
