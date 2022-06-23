@@ -215,6 +215,7 @@ we (***standardize* the data by
 rescaling features to zero mean and unit variance**):
 
 $$x \leftarrow \frac{x - \mu}{\sigma},$$
+:eqlabel:`eq_standardization`
 
 where $\mu$ and $\sigma$ denote mean and standard deviation, respectively.
 To verify that this indeed transforms
