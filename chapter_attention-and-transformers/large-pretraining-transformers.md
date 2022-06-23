@@ -1,5 +1,5 @@
 # Large-Scale Pretraining with Transformers
-:label:`sec_large-pretrained-transformers`
+:label:`sec_large-pretraining-transformers`
 
 
 
