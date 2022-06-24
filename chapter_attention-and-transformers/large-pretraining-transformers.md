@@ -147,14 +147,14 @@ Switch Transformer :cite:`fedus2022switch`
 
 :Cost of pretraining BERT, T5, and GPT-3 at multiple scales (FLOPS calculation follows :cite:`brown2020language`)
 
-|Model|Parameters|Compute (training FLOPS)| Data (training tokens)|
+|Model|Parameters| Data (training tokens)|Compute (training FLOPS)|
 |:--|:-|:-|:-|
-|BERT-Base|$109\text{M}$ | $1.6\times10^{20}$ |$250\text{B}$ |
-|BERT-Large|$355\text{M}$  | $5.3\times 10^{20}$ |$250\text{B}$ |
-|T5-Base|$220\text{M}$  | $6.6\times 10^{20}$ |$1000\text{B}$ |
-|T5-Large| $770\text{M}$  | $2.3\times 10^{21}$ |$1000\text{B}$ |
-|T5-11B|$11\text{B}$  | $3.3\times 10^{22}$ |$1000\text{B}$ |
-|GPT-3|$175\text{B}$  | $3.1\times 10^{23}$ |$300\text{B}$ |
+|BERT-Base|$109\text{M}$ |$250\text{B}$ | $1.6\times10^{20}$ |
+|BERT-Large|$355\text{M}$  |$250\text{B}$ | $5.3\times 10^{20}$ |
+|T5-Base|$220\text{M}$  |$1000\text{B}$ | $6.6\times 10^{20}$ |
+|T5-Large| $770\text{M}$  |$1000\text{B}$ | $2.3\times 10^{21}$ |
+|T5-11B|$11\text{B}$  |$1000\text{B}$ | $3.3\times 10^{22}$ |
+|GPT-3|$175\text{B}$  |$300\text{B}$ | $3.1\times 10^{23}$ |
 :label:`tab_bert-t5-gpt-scale`
 
 
