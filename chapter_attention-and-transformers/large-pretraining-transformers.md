@@ -2,9 +2,10 @@
 :label:`sec_large-pretraining-transformers`
 
 So far in our image classification and machine translation experiments, models were trained on datasets with input-output examples *from scratch* to perform specific tasks. For example, a transformer was trained with English-French pairs (:numref:`sec_transformer`) so that this model can translate input English text into French. As a result, each model becomes a *specific expert* that is sensitive to even slight shift in data distribution (:numref:`sec_environment-and-distribution-shift`). 
-For better generalized models, or even more competent *generalists* that can perform multiple tasks with or without adaptation, *pretraining* models on large data (especially unlabeled) has been pervasive. 
+For better generalized models, or even more competent *generalists* that can perform multiple tasks with or without adaptation, *pretraining* models on large data has been pervasive. 
 
-Given large data for pretraining, the transformer architecture has shown superior scalability :cite:`kaplan2020scaling,tay2021scale`. This is also evidenced by the significantly boosted performance from larger vision transformers trained on larger data (discussed in :numref:`sec_vision-transformer`). When pretraining a single transformer on modalities as diverse as text, images, joint torques, and button presses, a recent *generalist* model Gato can play Atari, caption images, chat, and act as a robot :cite:`reed2022generalist`. Notably, all such multi-modal data is serialized into a flat sequence of tokens, which can be processed by transformers.
+Given larger data for pretraining, the transformer architecture performs better with an increased model size and training compute, demonstrating superior *scaling* behavior.
+More concretely, performance of transformer-based language models scales as a power-law with the amount of model parameters, training tokens, and training compute :cite:`kaplan2020scaling`. The scalability of transformers is also evidenced by the significantly boosted performance from larger vision transformers trained on larger data (discussed in :numref:`sec_vision-transformer`). More recent success stories include Gato, a *generalist* model that can play Atari, caption images, chat, and act as a robot :cite:`reed2022generalist`. Gato is a single  transformer that scales well when pretrained on diverse modalities including text, images, joint torques, and button presses :cite:`reed2022generalist`. Notably, all such multi-modal data is serialized into a flat sequence of tokens, which can be processed akin to text tokens (:numref:`sec_transformer`) or image patches (:numref:`sec_vision-transformer`) by transformers.
 
 Due to extensive use and compelling success of pretraining transformers, we will conclude the chapter by reviewing different mode of transformers and its scalability in pretraining. Since transformers were originally designed for text, the following discussion leans slightly towards text, and is adaptable to serialized input tokens (such as in Gato) from other modalities.
 
@@ -21,7 +22,7 @@ Due to extensive use and compelling success of pretraining transformers, we will
 ![Encoder-only BERT pretraining (left) and attention pattern in the encoder (right).](../img/bert-encoder-only.svg)
 :label:`fig_bert-encoder-only`
 
-* Mask from original text. Advantage: self-supervised
+* Mask from original text. Advantage: self-supervised. The world's text provides a wealth of data.
 * Self-supervised enables large-scale training
 * Large-scale training generalizes well before downstream.
 * When using for downstream, fine tune. Explain how with classification example:
