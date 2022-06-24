@@ -1,21 +1,12 @@
 # Large-Scale Pretraining with Transformers
 :label:`sec_large-pretraining-transformers`
 
-So far in our image classification and machine translation experiments, models were trained on datasets with input-output examples *from scratch* to perform specific tasks. For example, a transformer was trained with English-French pairs (:numref:`sec_transformer`) so that the model can translate input English text into French. As a result, each model becomes a *specific expert* that is sensitive to even slight shift in data distribution (:numref:`sec_environment-and-distribution-shift`). 
-For better generalized models, or even more competent *generalists* that can perform multiple tasks with or without adaptation, *pretraining* models on large data (especially unlabeled) has been widely adopted. 
+So far in our image classification and machine translation experiments, models were trained on datasets with input-output examples *from scratch* to perform specific tasks. For example, a transformer was trained with English-French pairs (:numref:`sec_transformer`) so that this model can translate input English text into French. As a result, each model becomes a *specific expert* that is sensitive to even slight shift in data distribution (:numref:`sec_environment-and-distribution-shift`). 
+For better generalized models, or even more competent *generalists* that can perform multiple tasks with or without adaptation, *pretraining* models on large data (especially unlabeled) has been pervasive. 
 
-Given large data for pretraining, the transformer architecture has shown superior scalability :cite:`kaplan2020scaling,tay2021scale`. This is also evidenced by the significantly boosted performance from larger vision transformers trained on larger data (:numref:`sec_vision-transformer`). At the time of writing, 
+Given large data for pretraining, the transformer architecture has shown superior scalability :cite:`kaplan2020scaling,tay2021scale`. This is also evidenced by the significantly boosted performance from larger vision transformers trained on larger data (discussed in :numref:`sec_vision-transformer`). When pretrained on modalities as diverse as text, images, joint torques, and button presses, a recent *generalist* model Gato can play Atari, caption images, chat, and act as a robot :cite:`reed2022generalist`. Notably, all such multi-modal data is serialized into a flat sequence of tokens, which can be processed by transformers.
 
-
-
-
-* Large pretrained models are successful, SOTA are virtually all with Transformers, such as in LM.
-* Before delving into scaling law, it's important to note different transformer mode. For historical reasons, the following discussion leans slightly towards language, which also fits sequence processing for other modalities, or even multimodal applications.
-
-
-Large pretrained models generalize from labeled and unlabeled data.
-
-In practice, we use large pretrained models as a backbone for downstream tasks, rather than training pretrained models from scratch.
+With extensive use and compelling success of pretraining transformers, this final section of the chapter will discuss different mode of transformers and its scalability in pretraining. For historical reasons, the following leans slightly towards text processing, which also fits or is adaptable to serialized input tokens from other modalities.
 
 
 
@@ -148,16 +139,18 @@ Switch Transformer :cite:`fedus2022switch`
 
 
 
-:Cost of pretraining BERT, T5, and GPT-3 at multiple scales (FLOPS calculation follows :cite:`brown2020language`)
+:Pretraining BERT, T5, and GPT-3 at multiple 
 
-|Model|Parameters| Data (training tokens)|Compute (training FLOPS)|
-|:--|:-|:-|:-|
-|BERT-Base|109M |250B | 1.6E+20 |
-|BERT-Large|355M  |250B | 5.3E+20 |
-|T5-Base|220M  |1000B | 6.6E+20 |
-|T5-Large| 770M  |1000B | 2.3E+21 |
-|T5-11B|11B  |1000B | 3.3E+22 |
-|GPT-3|175B  |300B | 3.1E+23 |
+|Model|Parameters| Data (training tokens)|
+|:--|:-|:-|
+|GPT|100M | | 
+|BERT-Base|109M |250B | 
+|BERT-Large|355M  |250B |
+|GPT-2|1.5B | |
+|T5-Base|220M  |1000B |
+|T5-Large| 770M  |1000B | 
+|T5-11B|11B  |1000B | 
+|GPT-3|175B  |300B |
 :label:`tab_bert-t5-gpt-scale`
 
 
