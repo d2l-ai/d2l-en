@@ -6,7 +6,7 @@ For better generalized models, or even more competent *generalists* that can per
 
 Given large data for pretraining, the transformer architecture has shown superior scalability :cite:`kaplan2020scaling,tay2021scale`. This is also evidenced by the significantly boosted performance from larger vision transformers trained on larger data (discussed in :numref:`sec_vision-transformer`). When pretraining a single transformer on modalities as diverse as text, images, joint torques, and button presses, a recent *generalist* model Gato can play Atari, caption images, chat, and act as a robot :cite:`reed2022generalist`. Notably, all such multi-modal data is serialized into a flat sequence of tokens, which can be processed by transformers.
 
-With extensive use and compelling success of pretraining transformers, we will conclude the chapter by reviewing different mode of transformers and its scalability in pretraining. Since transformers were originally designed for text, the following discussion leans slightly towards text, and is adaptable to serialized input tokens (such as in Gato) from other modalities.
+Due to extensive use and compelling success of pretraining transformers, we will conclude the chapter by reviewing different mode of transformers and its scalability in pretraining. Since transformers were originally designed for text, the following discussion leans slightly towards text, and is adaptable to serialized input tokens (such as in Gato) from other modalities.
 
 
 
