@@ -1,23 +1,23 @@
 # Explainability of Linear Models
 
 We have just used linear models to predict heart disease using various risk factors.
-Linear models (:numref:`chap_linear`) describe a target variable (e.g., heart disease or not) in terms of a linear combination of features (e.g., age, resting blood pressure, and serum cholesterol). Models such as linear regression, lasso regression, logistic regression, and softmax regression are the popular variants of linear models. The linearity assumption limits linear models' expressiveness but makes them easy to understand. Although linear models are often not perfect, they are extensively adopted in a multitude of domains especially when people are concerned more about what drives models' behaviors than predictive accuracy. Correctly interpreting linear models is a critical step to understand models and is fundamental to more advanced explanation methods. 
+Linear models (:numref:`chap_linear`) describe a target variable (e.g., heart disease or not) in terms of a linear combination of features (e.g., age, resting blood pressure, and serum cholesterol). Models such as linear regression, lasso regression, logistic regression, and softmax regression are the popular variants of linear models. The linearity assumption limits linear models' expressiveness but makes them easy to understand. Although linear models are often not perfect, they are extensively adopted in a multitude of domains especially when people are concerned more about what drives models' behaviors than predictive accuracy. Correctly interpreting linear models is a critical step to understand models and is fundamental to more advanced explanation methods.
 
 
-## Revisiting Linear Models 
+## Revisiting Linear Models
 
 To get started, let's revisit two popular linear models: linear regression (for regression problems with numeric targets) and logistic regression (for binary classifications).
 
-Suppose that a data sample consists of features (predictive variables) $x_1,...x_p$ and a ground-truth target $y$. In linear regression, the predicted output for this sample is formulated as
+Suppose that a data sample consists of features (predictive variables) $x_1,...x_d$ and a ground-truth target $y$, in linear regression, the predicted output for this sample is formulated as
 
-$$\hat{y} = b + \sum_{j=1}^p w_j x_j,$$
+$$\hat{y} = b + \sum_{j=1}^d w_j x_j,$$
 :eqlabel:`eq_xdl-linear-reg`
 
 where $w_*$ represents the coefficient (weight) that describes the mathematical relationship between each feature and the predicted target, and $b$ is the intercept (bias) that can also be viewed as the coefficient multiplied by a constant feature of value $1$.
 
 Logistic regression is useful for binary classification problems where the targets are dichotomic (e.g., absence or presence). It converts the output into probabilities using a logistic function:
 
-$$P(\hat{y}=1) = \frac{1}{1 + \exp{(-(b + \sum_{j=1}^p w_j x_j))}}.$$
+$$P(\hat{y}=1) = \frac{1}{1 + \exp{(-(b + \sum_{j=1}^d w_j x_j))}}.$$
 :eqlabel:`eq_logistic-regression`
 
 Essentially, the parameters $w_*$ and $b$ of both models are learned by minimizing the discrepancies between predicted and actual target values. More details on regularization, optimization, and evaluation can be found in :numref:`chap_linear` and :numref:`chap_classification`.
@@ -41,13 +41,13 @@ Core to linear models, a coefficient quantifies the variation of the output when
 ```{.python .input}
 data = d2l.HeartDiseaseData(target='chol')
 regr = linear_model.Ridge(solver='sag')
+
 regr.fit(data.X_train, np.squeeze(data.y_train))
 print(f'Mean absolute error: \
 {mean_absolute_error(regr.predict(data.X_test),np.squeeze(data.y_test)):.5f}')
 print(f'Intercept: {regr.intercept_:.2f}')
-print(f'Coefficients:')
-for i in range(len(regr.coef_)):
-    print(f'{data.feat_col[i]:>8}: {regr.coef_[i]:.2f}')
+d2l.plot_hbar([f'{data.feat_col[i] } : {regr.coef_[i]:.2f}'  for
+        i in range(len(data.feat_col))], regr.coef_ , xlabel="Coefficients")
 ```
 
 Any of these coefficients tells us the conditional dependency between a specific feature and the target when all the other features remain constant. Take :eqref:`eq_xdl-linear-reg` as an example. On one hand, increasing feature $x_j$ by one unit leads to a change of $\hat{y}$ by $w_j$ when all the other features are fixed. If $w_j$ is positive, $\hat{y}$ will be increased by $|w_j|$; otherwise, it will be decreased by the same amount. Note that if $x_j$ is a categorical variable, changing $x_j$ by one unit may mean switching it from one category to the other (e.g., from female=0 to male=1), which depends on how categories are encoded. Moreover, if features were transformed (e.g., in the log scale) before training, such transformation details are needed for interpreting the coefficients precisely. On the other hand, the intercept $b$ anchors the regression line or surface in the right place: it can be interpreted as the predicted output when setting all the features to zero, such as a "typical" input with mean feature values on the standardized (:eqref:`eq_standardization`) data. However on the raw data, oftentimes the intercept does not have a meaningful interpretation, especially when $x_j$ (e.g., blood pressure) cannot be 0.
@@ -59,66 +59,78 @@ index = data.feat_col.index('age')
 patient = data.X_test[0]
 patient_ageplus1 = patient.copy()
 patient_ageplus1[index] = patient_ageplus1[index] + 1
-print(f'Increasing age by 1 leads to increasing cholesterol level by \
+print(f'Increasing age by 1 increases the predicted cholesterol level by \
 {regr.predict([patient_ageplus1])[0] - regr.predict([patient])[0]:.2f}.')
 ```
 
 ### Feature Importance
 
-In our example, the coefficients of the linear regression model took into account the natural units of the raw data.
-For example, *age* is expressed in "living years" while *resting blood pressure* is in "mmHg". Using natural units is convenient for intuitive explanations, especially for tangible concepts such as weight, height, temperature, and age. Given input features in different scales, it is inappropriate to directly compare the coefficients to inspect the relative importance of features.
+From the `Coefficients` plot, you may conclude that *age* is an unimportant feature for the  cholesterol level prediction task. However, this is a wrong interpretation because the coefficients of the linear regression model took into account the natural units of the raw data. For example, *age* is expressed in "living years" while *resting blood pressure* is in "mmHg". Using natural units is convenient for intuitive explanations, especially for tangible concepts such as weight, height, temperature, and age. Nonetheless, it is inappropriate to directly compare the coefficients to examine the relative importance of features if they are in different scales.
 
-To make coefficients comparable, we need to ensure that features are unitless. 
+To make coefficients comparable, we need to ensure that features are unitless.
 To achieve this, we can certainly standardize the raw data and then retrain the model to reduce all the coefficients to the same unit of measure. As a simpler alternative, we can multiply the coefficients by the standard deviation of the  features, which is similar to feature standardization:
 
 $$
-\hat{y} = b+\sum_{j}^{p} w_j  x_j = b +\sum_{j}^{p} (w_j  \sigma_j) \cdot \left(\frac{x_j}{\sigma_j}\right).
+\hat{y} = b+\sum_{j}^{d} w_j  x_j = b +\sum_{j}^{d} (w_j  \sigma_j) \cdot \left(\frac{x_j}{\sigma_j}\right).
 $$
 
 ```{.python .input}
-d2l.plot_hbar(data.feat_col, regr.coef_ * data.X_train.std(axis=0))
+d2l.plot_hbar(data.feat_col, regr.coef_ * data.X_train.std(axis=0),
+              xlabel="Feature Importance")
 ```
+
+Now, we obtain a totally flipped interpretion: *age* becomes one of the most predictive features.
 
 ### Correlated Features
 
-If two features depend on or associate with each another, we call them *correlated features* (also known as *multicollinearity* or *collinearity*). Correlated features do not bring additional information (or just very little). Instead, they might increase the model complexity and make it difficult to find a unique solution for linear models. Also, correlated features make the coefficient interpretation unreliable because they tend to change in unison. When features are correlated, changes in one are associated with variations in the other. The stronger the correlation, the more difficult it is to change one feature without changing the other. Therefore, for any two highly correlated features, practitioners may keep only one of them in the dataset.
+If two features depend on or associate with each other, we call them *correlated features* (also known as *collinearity*). Correlated features do not bring additional information (or just very little). Instead, they might increase the model complexity and make it difficult to find a unique solution for linear models. Also, correlated features make the coefficient interpretation unreliable because they tend to change in unison. When features are correlated, changes in one are associated with variations in the other. The stronger the correlation, the more difficult it is to change one feature without changing the other. Therefore, for any two highly correlated features, practitioners may keep only one of them in the dataset.
 
-As such, it is good practice to check the correlation between features in your dataset, which can be measured by the Pearson, Kendall, or Spearman correlation coefficient :cite:`asuero2006correlation`. Correlation can be negative, positive, or zero. A positive correlation signifies that both features move in the same direction, while a negative one means that they move in the opposite direction. A correlation of zero indicates no relationship between two features.
+As such, it is good practice to check the correlation between features in your dataset, which can be measured by the Pearson, Kendall, or Spearman correlation coefficient :cite:`asuero2006correlation`.  Given two variables $u$ and $v$, the Pearson correlation is defined as
+$$r = \frac{\sum (u_i - \overline{u})(v_i - \overline{v})}{\sqrt{\sum (u_i - \overline{u})^2\sum (v_i - \overline{v})^2}},$$
+
+where $r$ has a value between -1 to 1, with a value of -1 indicating a total negative correlation, 0 being no correlation, and +1 meaning a total positive correlation. For example, let's calculate the Pearson correlation amongst features: *age*, *oldpeak*, *slope*, *chol*, and *cp*. In fact, *oldpeak* and *slope* has the highest absolute correlation ($|r|=0.58$) among all the pairwise feature correlations in this dataset. However, these two features are not very predictive in the cholestrol level prediction task, so the side effect on the model is rather limited.
 
 ```{.python .input}
-print(f"{data.df['age'].corr(data.df['chol'], method='pearson'):.2f}")
+import seaborn as sns
+fig, ax = d2l.plt.subplots(figsize=(3.5, 3.5))
+sns.heatmap(data.df[["age", "oldpeak", "slope", "chol", "cp"]].corr(
+    method='pearson'), vmax=1.0, center=0, fmt='.2f', annot=True, square=True)
+d2l.plt.show()
 ```
 
-Some models are robust to correlated features. For instance, most tree-based models (e.g., decision trees and random forests) make no assumptions about the relationships between features. If two features are heavily correlated, one of them will be automatically ignored because splitting on it will have a low Gini or entropy value :cite:`Breiman.2001`. Some sophisticated post-hoc explanation methods such as SHAP :cite:`Lundberg.Lee.2017` can better deal with correlated features because it satisfies the *symmetry* property: if two tokens contribute equally to all possible coalitions, their contribution values are the same. We will cover it in more detail later.
+Some models are robust to correlated features. For instance, most tree-based models (e.g., decision trees and random forests) make no assumptions about the relationships between features. If two features are heavily correlated, one of them will be automatically ignored because splitting on it will have a low Gini or entropy value :cite:`Breiman.2001`. Some sophisticated post-hoc explanation methods such as SHAP :cite:`Lundberg.Lee.2017` can better deal with correlated features because it satisfies the *symmetry* property: if two features are interchangeable, their shapley values should be the same. We will cover it in more detail later.
 
 ### Odds Ratio
 
-Interpretation of logistic regression is trickier than that of linear regression: the former has a nonlinear logistic function so coefficients do not influence output probability linearly. Since the logistic function is hard to interpret, we will seek for other explanation methods. First, let's re-train a logistic regression model for heart disease prediction.
+Interpretation of logistic regression is trickier than that of linear regression: the former has a nonlinear logistic function so coefficients do not influence output probability linearly. Since the logistic function is hard to interpret, we will seek for another explanation method: odds ratio. First, let's re-train a logistic regression model for heart disease prediction.
 
 ```{.python .input}
 data = d2l.HeartDiseaseData()
 lr = linear_model.LogisticRegression(solver='sag', max_iter=20000)
 lr.fit(data.X_train, np.squeeze(data.y_train))
 print(f'Validation accuracy: \
-    {lr.score(data.X_test, np.squeeze(data.y_test)):.5f}') 
+    {lr.score(data.X_test, np.squeeze(data.y_test)):.2f}')
 ```
 
-Recall :eqref:`eq_logistic-regression` that logistic regression outputs probabilities. Let's define *odds* of an event to be the probability that the event occurs divided by the probability that the event does not occur. In fact, odds are widely used in areas such as gambling and medical statistics. According to :eqref:`eq_logistic-regression`, the odds of heart disease is
-
+Recall :eqref:`eq_logistic-regression` that logistic regression outputs probabilities. Let's organize the equation and we have
 
 $$
-\text{odds} = \frac{P(\hat{y}=1)}{1-P(\hat{y}=1) } = \exp \left(b + \sum_{j=1}^p w_j x_j\right).
+\frac{P(\hat{y}=1)}{1-P(\hat{y}=1) } = \exp \left(b + \sum_{j=1}^d w_j x_j\right),
 $$
 
-We will use *odds ratio* to explain logistic regression models, which is the ratio between two events: increasing $x_j$ by one unit vs. keeping it fixed:
+which happens to be the *odds* of predicting a patient to have heart disease. The *odds* of an event is the probability that the event occurs divided by the probability that the event does not occur.
 
-$$\frac{\text{odds} (x_j+1)}{\text{odds}} = \frac{\exp (b + w_1 x_1 + \ldots+w_j (x_j+1)+\ldots+ w_p x_p)}{\exp (b + w_1 x_1 + \ldots+w_j x_j+\ldots+ w_p x_p)}  = \exp(w_j).
+If we compare the *odds* of two events, we get *odds ratio*. Specifically, we can use *odds ratio* between events: increasing $x_j$ by one unit vs. keeping it fixed, to assist the interpretation of logistic regression.
+
+$$\frac{\text{odds} (x_j+1)}{\text{odds}} = \frac{\exp (b + w_1 x_1 + \ldots+w_j (x_j+1)+\ldots+ w_d x_d)}{\exp (b + w_1 x_1 + \ldots+w_j x_j+\ldots+ w_d x_d)}  = \exp(w_j).
 $$
 
-Odds ratio interprets logistic regression handily: increasing $x_j$ by one unit will scale the odds ratio by a factor of $\exp(w_j)$. Let's compute them for our logistic regression model in heart disease prediction.
+*Odds ratio* interprets logistic regression handily: increasing $x_j$ by one unit will scale the odds ratio by a factor of $\exp(w_j)$. 
+
+Let's compute the *odds ratio* of all all features for our logistic regression model.
 
 ```{.python .input}
-pd.DataFrame(list(zip(data.feat_col, np.around(np.exp(lr.coef_[0]), 3))), 
+pd.DataFrame(list(zip(data.feat_col, np.around(np.exp(lr.coef_[0]), 3))),
                   columns=['Feature', 'Odds Ratio']).transpose()
 ```
 
