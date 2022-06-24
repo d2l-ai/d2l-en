@@ -2,8 +2,6 @@
 :label:`sec_large-pretraining-transformers`
 
 
-
-
 * Lacking inductive biases from CNN/RNN, Transformers scale well.
 * There's more data and compute.
 * Large pretrained models are successful, SOTA are virtually all with Transformers, such as in LM.
@@ -149,12 +147,12 @@ Switch Transformer :cite:`fedus2022switch`
 
 |Model|Parameters| Data (training tokens)|Compute (training FLOPS)|
 |:--|:-|:-|:-|
-|BERT-Base|$109\text{M}$ |$250\text{B}$ | $1.6\times10^{20}$ |
-|BERT-Large|$355\text{M}$  |$250\text{B}$ | $5.3\times 10^{20}$ |
-|T5-Base|$220\text{M}$  |$1000\text{B}$ | $6.6\times 10^{20}$ |
-|T5-Large| $770\text{M}$  |$1000\text{B}$ | $2.3\times 10^{21}$ |
-|T5-11B|$11\text{B}$  |$1000\text{B}$ | $3.3\times 10^{22}$ |
-|GPT-3|$175\text{B}$  |$300\text{B}$ | $3.1\times 10^{23}$ |
+|BERT-Base|109M |250B | 1.6E+20 |
+|BERT-Large|355M  |250B | 5.3E+20 |
+|T5-Base|220M  |1000B | 6.6E+20 |
+|T5-Large| 770M  |1000B | 2.3E+21 |
+|T5-11B|11B  |1000B | 3.3E+22 |
+|GPT-3|175B  |300B | 3.1E+23 |
 :label:`tab_bert-t5-gpt-scale`
 
 
