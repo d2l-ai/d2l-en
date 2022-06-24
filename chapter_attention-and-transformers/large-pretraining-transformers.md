@@ -1,9 +1,14 @@
 # Large-Scale Pretraining with Transformers
 :label:`sec_large-pretraining-transformers`
 
+So far in our image classification and machine translation experiments, models were trained on datasets with input-output examples *from scratch* to perform specific tasks. For example, a transformer was trained with English-French pairs (:numref:`sec_transformer`) so that the model can translate input English text into French. As a result, each model becomes a *specific expert* that is sensitive to even slight shift in data distribution (:numref:`sec_environment-and-distribution-shift`). 
+For better generalized models, or even more competent *generalists* that can perform multiple tasks with or without adaptation, *pretraining* models on large data (especially unlabeled) has been widely adopted. 
 
-* Lacking inductive biases from CNN/RNN, Transformers scale well.
-* There's more data and compute.
+Given large data for pretraining, the transformer architecture has shown superior scalability :cite:`kaplan2020scaling,tay2021scale`. This is also evidenced by the significantly boosted performance from larger vision transformers trained on larger data (:numref:`sec_vision-transformer`). At the time of writing, 
+
+
+
+
 * Large pretrained models are successful, SOTA are virtually all with Transformers, such as in LM.
 * Before delving into scaling law, it's important to note different transformer mode. For historical reasons, the following discussion leans slightly towards language, which also fits sequence processing for other modalities, or even multimodal applications.
 
