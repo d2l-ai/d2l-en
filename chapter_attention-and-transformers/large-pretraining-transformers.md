@@ -4,9 +4,9 @@
 So far in our image classification and machine translation experiments, models were trained on datasets with input-output examples *from scratch* to perform specific tasks. For example, a transformer was trained with English-French pairs (:numref:`sec_transformer`) so that this model can translate input English text into French. As a result, each model becomes a *specific expert* that is sensitive to even slight shift in data distribution (:numref:`sec_environment-and-distribution-shift`). 
 For better generalized models, or even more competent *generalists* that can perform multiple tasks with or without adaptation, *pretraining* models on large data (especially unlabeled) has been pervasive. 
 
-Given large data for pretraining, the transformer architecture has shown superior scalability :cite:`kaplan2020scaling,tay2021scale`. This is also evidenced by the significantly boosted performance from larger vision transformers trained on larger data (discussed in :numref:`sec_vision-transformer`). When pretrained on modalities as diverse as text, images, joint torques, and button presses, a recent *generalist* model Gato can play Atari, caption images, chat, and act as a robot :cite:`reed2022generalist`. Notably, all such multi-modal data is serialized into a flat sequence of tokens, which can be processed by transformers.
+Given large data for pretraining, the transformer architecture has shown superior scalability :cite:`kaplan2020scaling,tay2021scale`. This is also evidenced by the significantly boosted performance from larger vision transformers trained on larger data (discussed in :numref:`sec_vision-transformer`). When pretraining a single transformer on modalities as diverse as text, images, joint torques, and button presses, a recent *generalist* model Gato can play Atari, caption images, chat, and act as a robot :cite:`reed2022generalist`. Notably, all such multi-modal data is serialized into a flat sequence of tokens, which can be processed by transformers.
 
-With extensive use and compelling success of pretraining transformers, this final section of the chapter will discuss different mode of transformers and its scalability in pretraining. For historical reasons, the following leans slightly towards text processing, which also fits or is adaptable to serialized input tokens from other modalities.
+With extensive use and compelling success of pretraining transformers, this final section of the chapter will discuss different mode of transformers and its scalability in pretraining. Since transformers were originally designed for text, the following discussion leans slightly towards text, and is adaptable to serialized input tokens (such as in Gato) from other modalities.
 
 
 
@@ -235,6 +235,7 @@ Imagen :cite:`saharia2022photorealistic`
 Generalist Agent :cite:`reed2022generalist`
 -->
 
+Scaling law by Gato: Figure 8 in Gato paper
 
 
 ## Exercises
