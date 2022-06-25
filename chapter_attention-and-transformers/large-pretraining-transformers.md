@@ -14,40 +14,30 @@ Before compelling success of pretraining transformers for multi-modal data, tran
 
 ## Encoder-Only
 
-In encoder-only mode, only the transformer encoder is used, converting a sequence of input tokens into the same number of representations that can be further projected to output (e.g., classification). A transformer encoder consists of multiple self-attention layers, so any output token representation depends on all input tokens.
+When only the transformer encoder is used, a sequence of input tokens is converted into the same number of representations that can be further projected into output (e.g., classification). A transformer encoder consists of  self-attention layers, where all input tokens attend to each other. 
 For example, vision transformers depicted in :numref:`fig_vit` are encoder-only, converting a sequence of input image patches into 
-a global representation of a special “&lt;cls&gt;” token, and further projecting it into classification labels. This design was inspired by an earlier encoder-only  transformer pretrained on text: BERT (Bidirectional Encoder Representations from Transformers) :cite:`Devlin.Chang.Lee.ea.2018`.
+the representation of a special “&lt;cls&gt;” token. 
+Since this representation depends on all input tokens, it is further projected into classification labels. This design was inspired by an earlier encoder-only  transformer pretrained on text: BERT (Bidirectional Encoder Representations from Transformers) :cite:`Devlin.Chang.Lee.ea.2018`.
 
-![Left: Pretraining encoder-only BERT with masked language modeling. Prediction of the masked "love" token depends on all input tokens before and after "love". Right: Attention pattern in the encoder. Each token along the vertical axis attends to all input tokens along the horizontal axis.](../img/bert-encoder-only.svg)
+![Left: Pretraining encoder-only BERT with masked language modeling. Prediction of the masked "love" token depends on all input tokens before and after "love". Right: Attention pattern in the transformer encoder. Each token along the vertical axis attends to all input tokens along the horizontal axis.](../img/bert-encoder-only.svg)
 :label:`fig_bert-encoder-only`
 
-BERT is pretrained on text sequences using *masked language modeling*: input text with randomly masked tokens is fed into a transformer encoder to predict the masked tokens. As illustrated in :numref:`fig_bert-encoder-only`, an original text sequence "I", "love", "this", "red", "car" is prepended with the “&lt;cls&gt;” token and the “&lt;mask&gt;” token randomly replaces "love"; then the cross-entropy loss between the ground truth "love" and the prediction at the position of “&lt;mask&gt;” is to be minimized during pretraining. Note that there is no constraint in the attention pattern of transformer encoders (right of :numref:`fig_bert-encoder-only`) so any output depends on all input tokens. Thus, prediction of "love" depends on input tokens before and after it in the sequence. This is why BERT is a "bidirectional encoder". 
+BERT is pretrained on text sequences using *masked language modeling*: input text with randomly masked tokens is fed into a transformer encoder to predict the masked tokens. As illustrated in :numref:`fig_bert-encoder-only`, an original text sequence "I", "love", "this", "red", "car" is prepended with the “&lt;cls&gt;” token and the “&lt;mask&gt;” token randomly replaces "love"; then the cross-entropy loss between the masked token "love" and its prediction is to be minimized during pretraining. Note that there is no constraint in the attention pattern of transformer encoders (right of :numref:`fig_bert-encoder-only`) so all tokens can attend to each other. Thus, prediction of "love" depends on input tokens before and after it in the sequence. This is why BERT is a "bidirectional encoder". 
 
-Without need for manual labeling, pretraining of BERT can leverage large-scale text data from books and Wikipedia. Pretrained BERT can be *fine tuned* to downstream encoding tasks involving single text or text pairs. During fine tuning, additional layers are appended to BERT with randomized parameters, and these parameters and BERT parameters will be updated on downstream task training data. 
+Without need for manual labeling, large-scale text data from books and Wikipedia can be used for pretraining BERT. After pretraining, BERT can be *fine-tuned* to downstream encoding tasks involving single text or text pairs. During fine-tuning, additional layers can be added to BERT with randomized parameters: these parameters and those pretrained BERT parameters will be *updated* to fit training data of downstream tasks. 
 
-
-![Fine tuning encoder-only BERT for sentiment analysis.](../img/bert-finetune-classification.svg)
+![Fine-tuning encoder-only BERT for sentiment analysis.](../img/bert-finetune-classification.svg)
 :label:`fig_bert-finetune-classification`
 
-:numref:`fig_bert-finetune-classification` illustrates fine tuning of BERT for sentiment analysis. The transformer encoder is a pretrained BERT, which takes a text sequence as input and feeds representation of “&lt;cls&gt;” (global representation of the input sequence) into an additional MLP to output the sentiment prediction. During fine tuning on a sentiment analysis dataset, MLP is trained from scratch while BERT parameters are updated. 
+:numref:`fig_bert-finetune-classification` illustrates fine-tuning of BERT for sentiment analysis. The transformer encoder is a pretrained BERT, which takes a text sequence as input and feeds the “&lt;cls&gt;” representation (global representation of the input) into an additional MLP to predict the sentiment. During fine-tuning on a sentiment analysis dataset, MLP is trained from scratch while pretrained parameters of BERT are updated.
+BERT does more than sentiment analysis. The general language representations learned by the 350-million-parameter BERT (BERT-Large) from 250 billion training tokens advanced the state of the art for natural language tasks such as single text classification, text pair classification or regression, text tagging, and question answering.
 
-The largest version of BERT has 350 million parameters and is pretrained on 250 billion tokens. The general language representations learned from BERT advanced the state of the art for natural language tasks such as single text classification, text pair classification or regression, text tagging, and question answering.
-
-
-The original BERT pretraining includes another loss for predicting whether one sentence is next to the other. However, it was 
-
-
-BERT variants:
-
-<!--
-XLNET :cite:`yang2019xlnet`
-RoBERTa :cite:`liu2019roberta`
-ALBERT :cite:`lan2019albert`
-SpanBERT :cite:`joshi2020spanbert`
-DistilBERT :cite:`sanh2019distilbert`
-ELECTRA :cite:`clark2019electra`
--->
-
+You may note that these downstream tasks include text pair understanding. BERT pretraining has another loss for predicting whether one sentence immediately follows the other. However, this loss was later found not useful when pretraining RoBERTa, a BERT variant of the same size, on much bigger text data with 2000 billion tokens :cite:`liu2019roberta`. Other derivatives of BERT improved model architectures or pretraining objectives, such as
+ALBERT (enforcing parameter sharing) :cite:`lan2019albert`,
+SpanBERT (representing and predicting spans of text) :cite:`joshi2020spanbert`,
+DistilBERT (lightweight via knowledge distillation) :cite:`sanh2019distilbert`,
+and
+ELECTRA (replaced token detection) :cite:`clark2019electra`.
 
 
 
@@ -62,9 +52,9 @@ ELECTRA :cite:`clark2019electra`
 
 * To pretrain, use span corruption objective to reconstruct masked span.
 * Same as BERT, self-supervised learning. Different: on C4
-* When using for downstream, fine tune. Explain how with news summarization.
+* When using for downstream, fine-tune. Explain how with news summarization.
 
-![Encoder-only T5 fine tuning.](../img/t5-finetune-summarization.svg)
+![Encoder-only T5 fine-tuning.](../img/t5-finetune-summarization.svg)
 :label:`fig_t5-finetune-summarization`
 
 * T5 achieves SOTA.
@@ -98,9 +88,9 @@ Switch Transformer :cite:`fedus2022switch`
 ![Decoder-only GPT pretraining (left) and attention pattern in the decoder (right).](../img/gpt-decoder-only.svg)
 :label:`fig_gpt-decoder-only`
 * To pretrain, use LM, same as before: self-supervised learning.
-* When using for downstream, fine tune. Explain how with classification.
+* When using for downstream, fine-tune. Explain how with classification.
 
-![Decoder-only GPT fine tuning.](../img/gpt-finetune-classification.svg)
+![Decoder-only GPT fine-tuning.](../img/gpt-finetune-classification.svg)
 :label:`fig_gpt-finetune-classification`
 
 * Note that GPT inspired BERT. To demonstrate more benefits of decoder-only scheme, they train on larger data, leading to GPT-2.
