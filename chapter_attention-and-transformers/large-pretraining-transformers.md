@@ -19,14 +19,21 @@ For example, vision transformers depicted in :numref:`fig_vit` are encoder-only,
 the representation of a special “&lt;cls&gt;” token. 
 Since this representation depends on all input tokens, it is further projected into classification labels. This design was inspired by an earlier encoder-only  transformer pretrained on text: BERT (Bidirectional Encoder Representations from Transformers) :cite:`Devlin.Chang.Lee.ea.2018`.
 
-![Left: Pretraining encoder-only BERT with masked language modeling. Prediction of the masked "love" token depends on all input tokens before and after "love". Right: Attention pattern in the transformer encoder. Each token along the vertical axis attends to all input tokens along the horizontal axis.](../img/bert-encoder-only.svg)
+
+### Pretraining BERT
+
+![Left: Pretraining BERT with masked language modeling. Prediction of the masked "love" token depends on all input tokens before and after "love". Right: Attention pattern in the transformer encoder. Each token along the vertical axis attends to all input tokens along the horizontal axis.](../img/bert-encoder-only.svg)
 :label:`fig_bert-encoder-only`
 
 BERT is pretrained on text sequences using *masked language modeling*: input text with randomly masked tokens is fed into a transformer encoder to predict the masked tokens. As illustrated in :numref:`fig_bert-encoder-only`, an original text sequence "I", "love", "this", "red", "car" is prepended with the “&lt;cls&gt;” token and the “&lt;mask&gt;” token randomly replaces "love"; then the cross-entropy loss between the masked token "love" and its prediction is to be minimized during pretraining. Note that there is no constraint in the attention pattern of transformer encoders (right of :numref:`fig_bert-encoder-only`) so all tokens can attend to each other. Thus, prediction of "love" depends on input tokens before and after it in the sequence. This is why BERT is a "bidirectional encoder". 
+Without need for manual labeling, large-scale text data from books and Wikipedia can be used for pretraining BERT. 
 
-Without need for manual labeling, large-scale text data from books and Wikipedia can be used for pretraining BERT. After pretraining, BERT can be *fine-tuned* to downstream encoding tasks involving single text or text pairs. During fine-tuning, additional layers can be added to BERT with randomized parameters: these parameters and those pretrained BERT parameters will be *updated* to fit training data of downstream tasks. 
 
-![Fine-tuning encoder-only BERT for sentiment analysis.](../img/bert-finetune-classification.svg)
+### Fine-Tuning BERT
+
+After pretraining, BERT can be *fine-tuned* to downstream encoding tasks involving single text or text pairs. During fine-tuning, additional layers can be added to BERT with randomized parameters: these parameters and those pretrained BERT parameters will be *updated* to fit training data of downstream tasks. 
+
+![Fine-tuning BERT for sentiment analysis.](../img/bert-finetune-classification.svg)
 :label:`fig_bert-finetune-classification`
 
 :numref:`fig_bert-finetune-classification` illustrates fine-tuning of BERT for sentiment analysis. The transformer encoder is a pretrained BERT, which takes a text sequence as input and feeds the “&lt;cls&gt;” representation (global representation of the input) into an additional MLP to predict the sentiment. During fine-tuning on a sentiment analysis dataset, MLP is trained from scratch while pretrained parameters of BERT are updated.
@@ -52,36 +59,30 @@ To pretrain encoder-decoder transformers beyond human-labeled machine translatio
 while the former emphasizes noising input (e.g., masking, deletion, permutation, and rotation) and the later highlights multitask unification with comprehensive ablation studies. 
 
 
+### Pretraining T5
+
+
 As an example of the pretrained transformer encoder-decoder, T5 (Text-to-Text Transfer Transformer) unifies many tasks as the same text-to-text problem: for any task, the input of the encoder is a task description (e.g., "Summarize", ":") followed by task input (e.g., a sequence of tokens from an article), and the decoder predicts the task output (e.g., a sequence of tokens summarizing the input article). To perform as text-to-text, T5 is trained to generate some target text conditional on input text. 
 
 
-![Encoder-decoder T5 pretraining (left) and attention pattern in the encoder-decoder (right).](../img/t5-encoder-decoder.svg)
+![Left: Pretraining T5 by predicting consecutive spans. The original sentence is "I", "love", "this", "red", "car", where "love" is replaced by a special “&lt;X&gt;” token, and consecutive span "red", "car" is replaced by a special “&lt;Y&gt;” token. The target sequence ends with a special “&lt;Z&gt;” token. Right: Attention pattern in the transformer encoder-decoder. In the encoder self-attention (lower square), each input token  attends to all input tokens; In the encoder-decoder cross-attention (upper rectangle), each target token attends to all input tokens; In the decoder self-attention (upper triangle), each target token  attends to present and past target tokens only (causal).](../img/t5-encoder-decoder.svg)
 :label:`fig_t5-encoder-decoder`
 
+To obtain input and output from any original text, T5 is pretrained to predict consecutive spans. Specifically, tokens from text are randomly replaced by special tokens where each consecutive span is replaced by the same special token. Consider the example in
+:numref:`fig_t5-encoder-decoder`, where the original text is "I", "love", "this", "red", "car". Tokens "love", "red", "car" are randomly replaced by special tokens. Since "red" and "car" are a consecutive span, they are replaced by the same special token. As a result, input sequence is "I", "&lt;X&gt;", "this", "&lt;X&gt;", and the target sequence is "&lt;X&gt;", "love", "&lt;Y&gt;", "red", "car", "&lt;Z&gt;", where "&lt;Z&gt;" is another special token marking the end. As shown in :numref:`fig_t5-encoder-decoder`, the decoder has a causal attention pattern to prevent itself from attending to future tokens when predicting a target sequence. 
 
+In T5, predicting consecutive span is also referred to as reconstructing corrupted text. With this objective, T5 is pretrained on the C4 (Colossal Clean Crawled Corpus) data consisting of 1000 billion tokens of clean English text from the Web :cite:`raffel2020exploring`.
 
+### Fine-Tuning T5
 
+Similar to BERT, T5 needs to be fine-tuned (updating T5 parameters) on task-specific training data to perform this task. Major differences from BERT are that (i) T5 input includes task descriptions; (ii) T5 can generate sequences with arbitrary length with its transformer decoder. 
 
-
-
-* To pretrain, use span corruption objective to reconstruct masked span.
-* Same as BERT, self-supervised learning. Different: on C4. T5 is pretrained on the C4 (Colossal Clean Crawled Corpus) data consisting of 1000 billion tokens of clean English text from the Web :cite:`raffel2020exploring`. 
-* When using for downstream, fine-tune. Explain how with news summarization.
-
-![Encoder-only T5 fine-tuning.](../img/t5-finetune-summarization.svg)
+![Fine-tuning T5 for text summarization. Both the task description and article tokens are fed into the transformer encoder for predicting the summary.](../img/t5-finetune-summarization.svg)
 :label:`fig_t5-finetune-summarization`
 
-* T5 achieves SOTA.
-* T5 is used in Switch transformer, LaMDA, Imagen.
+:numref:`fig_t5-finetune-summarization` explains fine-tuning T5 for text summarization. In this downstream task, the task description tokens "Summarize", ":" followed by the article tokens are input to the encoder. The 11-billion-parameter T5 (T5-11B) achieved state-of-the-art results on many encoding (e.g., classification) and generation (e.g., summarization) benchmarks. Since released, T5 has been extensively used in later research. For example, switch transformers are designed based off T5 to activate a subset of the parameters for better computational efficiency :cite:`fedus2022switch`. In Imagen, a photorealistic text-to-image model, text is input to a 4.6-billion-parameter T5 encoder (T5-XXL) with frozen parameters :cite:`saharia2022photorealistic`.
 
 
-T5
-
-<!--
-BART :cite:`lewis2019bart`
-T5 :cite:`raffel2020exploring`
-Switch Transformer :cite:`fedus2022switch`
--->
 
 
 
