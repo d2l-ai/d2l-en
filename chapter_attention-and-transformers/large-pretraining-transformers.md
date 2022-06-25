@@ -39,27 +39,40 @@ DistilBERT (lightweight via knowledge distillation) :cite:`sanh2019distilbert`,
 and
 ELECTRA (replaced token detection) :cite:`clark2019electra`.
 
-
+```{.python .input}
+# TOREMOVE
+```
 
 ## Encoder-Decoder
 
-* Although BERT covers many tasks, it's not universal, especially for generation.
-* As another pretrain-finetune, so T5 casts every text problem as a "text-to-text" problem. Explain how T5 can be used once pretrained.
-* To enable sequence generation, it adopts encoder-decoder
+Since a transformer encoder converts a sequence of input tokens into the same number of output representations, the encoder-only mode cannot generate a sequence of arbitrary length like in machine translation. Originally proposed for machine translation, the transformer architecture also has a decoder that autoregressively predicts the target sequence of arbitrary length, token by token, conditional on both encoder output and decoder output. For conditioning on encoder output, encoder-decoder cross-attention (multi-head attention of decoder in :numref:`fig_transformer`) allows target tokens to attend to all input tokens.
+However, conditioning on decoder output is achieved by a *causal* attention pattern (masked multi-head attention of decoder in :numref:`fig_transformer`): any target token can only attend to past and present tokens in the target sequence.
+
+To pretrain encoder-decoder transformers beyond human-labeled machine translation data, BART :cite:`lewis2019bart` and T5 :cite:`raffel2020exploring` are two concurrent encoder-decoder transformers pretrained on large-scale text corpora. Both attempt to reconstruct original text in their pretraining objectives,
+while the former emphasizes noising input (e.g., masking, deletion, permutation, and rotation) and the later highlights multitask unification with comprehensive ablation studies. 
+
+
+As an example of the pretrained transformer encoder-decoder, T5 (Text-to-Text Transfer Transformer) unifies many tasks as the same text-to-text problem: for any task, the input of the encoder is a task description (e.g., "Summarize", ":") followed by task input (e.g., a sequence of tokens from an article), and the decoder predicts the task output (e.g., a sequence of tokens summarizing the input article). To perform as text-to-text, T5 is trained to generate some target text conditional on input text. 
+
 
 ![Encoder-decoder T5 pretraining (left) and attention pattern in the encoder-decoder (right).](../img/t5-encoder-decoder.svg)
 :label:`fig_t5-encoder-decoder`
 
+
+
+
+
+
+
 * To pretrain, use span corruption objective to reconstruct masked span.
-* Same as BERT, self-supervised learning. Different: on C4
+* Same as BERT, self-supervised learning. Different: on C4. T5 is pretrained on the C4 (Colossal Clean Crawled Corpus) data consisting of 1000 billion tokens of clean English text from the Web :cite:`raffel2020exploring`. 
 * When using for downstream, fine-tune. Explain how with news summarization.
 
 ![Encoder-only T5 fine-tuning.](../img/t5-finetune-summarization.svg)
 :label:`fig_t5-finetune-summarization`
 
 * T5 achieves SOTA.
-
-* Concurrently work BART encodes then decodes. However when fine-tuning, it needs additional encoder. T5 is used in Switch transformer, LaMDA, Imagen.
+* T5 is used in Switch transformer, LaMDA, Imagen.
 
 
 T5
@@ -71,6 +84,12 @@ Switch Transformer :cite:`fedus2022switch`
 -->
 
 
+
+
+
+```{.python .input}
+# TOREMOVE
+```
 
 ## Decoder-Only 
 
