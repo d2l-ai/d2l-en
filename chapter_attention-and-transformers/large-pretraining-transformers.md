@@ -85,7 +85,7 @@ Similar to BERT, T5 needs to be fine-tuned (updating T5 parameters) on task-spec
 After fine-tuning, the 11-billion-parameter T5 (T5-11B) achieved state-of-the-art results on multiple encoding (e.g., classification) and generation (e.g., summarization) benchmarks. Since released, T5 has been extensively used in later research. For example, switch transformers are designed based off T5 to activate a subset of the parameters for better computational efficiency :cite:`fedus2022switch`. In a photorealistic text-to-image model called Imagen,
 text is input to a T5 encoder (T5-XXL) with 4.6 billion frozen parameters :cite:`saharia2022photorealistic`. The text-to-image example in :numref:`fig_imagen` suggests that the T5 encoder alone may effectively represent text even without fine-tuning.
 
-![A photorealistic text-to-image example by the Imagen model, whose text encoder is T5. This example is taken from Figure 1 in :cite:`saharia2022photorealistic`.](../img/imagen.png)
+![A photorealistic text-to-image example by the Imagen model, whose text encoder is from T5 with frozen parameters. This example is taken from Figure 1 in :cite:`saharia2022photorealistic`.](../img/imagen.png)
 :label:`fig_imagen`
 
 ```{.python .input}
