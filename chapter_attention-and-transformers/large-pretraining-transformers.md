@@ -6,14 +6,20 @@ For better generalized models, or even more competent *generalists* that can per
 
 Given larger data for pretraining, the transformer architecture performs better with an increased model size and training compute, demonstrating superior *scaling* behavior. Specifically, performance of transformer-based language models scales as a power-law with the amount of model parameters, training tokens, and training compute :cite:`kaplan2020scaling`. The scalability of transformers is also evidenced by the significantly boosted performance from larger vision transformers trained on larger data (discussed in :numref:`sec_vision-transformer`). More recent success stories include Gato, a *generalist* model that can play Atari, caption images, chat, and act as a robot :cite:`reed2022generalist`. Gato is a single  transformer that scales well when pretrained on diverse modalities including text, images, joint torques, and button presses. Notably, all such multi-modal data is serialized into a flat sequence of tokens, which can be processed akin to text tokens (:numref:`sec_transformer`) or image patches (:numref:`sec_vision-transformer`) by transformers.
 
-Before compelling success of pretraining transformers for multi-modal data, transformers were extensively pretrained  with the world's wealth of text. Originally proposed for machine translation, the transformer architecture in :numref:`fig_transformer` consists of an encoder for representing input sequences and a decoder for generating target sequences. Primarily, transformers can be used in three different modes: encoder-only, encoder-decoder, and decoder-only. To conclude this chapter, we will review these three modes and explain the scalability in pretraining transformers.
+Before compelling success of pretraining transformers for multi-modal data, transformers were extensively pretrained  with a wealth of text. Originally proposed for machine translation, the transformer architecture in :numref:`fig_transformer` consists of an encoder for representing input sequences and a decoder for generating target sequences. Primarily, transformers can be used in three different modes: *encoder-only*, *encoder-decoder*, and *decoder-only*. To conclude this chapter, we will review these three modes and explain the scalability in pretraining transformers.
 
-
+```{.python .input}
+# TOREMOVE
+```
 
 ## Encoder-Only
 
-In the encoder-only mode, only the transformer encoder is used, converting a sequence of input tokens into the same number of representations that can be further projected to output (e.g., classification). For example, vision transformers depicted in :numref:`fig_vit` are encoder-only, converting a sequence of input image patches into 
-a global representation of a special “&lt;cls&gt;” token, and further projecting it into classification labels. This design was inspired by an earlier encoder-only pretrained transformer on text: BERT (Bidirectional Encoder Representations from Transformers) :cite:`Devlin.Chang.Lee.ea.2018`.
+In encoder-only mode, only the transformer encoder is used, converting a sequence of input tokens into the same number of representations that can be further projected to output (e.g., classification). A transformer encoder consists of multiple self-attention layers, so any output token representation depends on all input tokens.
+For example, vision transformers depicted in :numref:`fig_vit` are encoder-only, converting a sequence of input image patches into 
+a global representation of a special “&lt;cls&gt;” token, and further projecting it into classification labels. This design was inspired by an earlier encoder-only  transformer pretrained on text: BERT (Bidirectional Encoder Representations from Transformers) :cite:`Devlin.Chang.Lee.ea.2018`.
+
+BERT is pretrained on text sequences using *masked language modeling*: input text with randomly masked tokens is fed into a transformer encoder to predict the masked tokens. As illustrated in :numref:`fig_bert-encoder-only`, an original text sequence "I", "love", "this", "red", "car" is prepended with the “&lt;cls&gt;” token and the “&lt;mask&gt;” token randomly replaces "love"; then the cross-entropy between the ground truth "love" and the predicted token at the position of “&lt;mask&gt;” is to be minimized during pretraining. Note that there is no constraint in the attention pattern of transformer encoders (right of :numref:`fig_bert-encoder-only`) so any output depends on all input tokens.
+
 
 
 
