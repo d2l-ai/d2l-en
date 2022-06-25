@@ -86,7 +86,7 @@ After fine-tuning, the 11-billion-parameter T5 (T5-11B) achieved state-of-the-ar
 text is input to a T5 encoder (T5-XXL) with 4.6 billion frozen parameters :cite:`saharia2022photorealistic`. The text-to-image examples in :numref:`fig_imagen` suggest that the T5 encoder alone may effectively represent text even without fine-tuning.
 
 ![Photorealistic text-to-image examples by the Imagen model, whose text encoder is from T5. These examples are taken from Figure 1 in :cite:`saharia2022photorealistic`.](../img/imagen.png)
-:width:`500px`
+:width:`700px`
 :label:`fig_imagen`
 
 ```{.python .input}
