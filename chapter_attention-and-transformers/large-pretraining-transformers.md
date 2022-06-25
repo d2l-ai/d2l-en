@@ -56,7 +56,7 @@ Since a transformer encoder converts a sequence of input tokens into the same nu
 However, conditioning on decoder output is achieved by a *causal* attention pattern (masked multi-head attention of decoder in :numref:`fig_transformer`): any target token can only attend to past and present tokens in the target sequence.
 
 To pretrain encoder-decoder transformers beyond human-labeled machine translation data, BART :cite:`lewis2019bart` and T5 :cite:`raffel2020exploring` are two concurrent encoder-decoder transformers pretrained on large-scale text corpora. Both attempt to reconstruct original text in their pretraining objectives,
-while the former emphasizes noising input (e.g., masking, deletion, permutation, and rotation) and the later highlights multitask unification with comprehensive ablation studies. 
+while the former emphasizes noising input (e.g., masking, deletion, permutation, and rotation) and the latter highlights multitask unification with comprehensive ablation studies. 
 
 
 ### Pretraining T5
@@ -80,13 +80,11 @@ Similar to BERT, T5 needs to be fine-tuned (updating T5 parameters) on task-spec
 ![Fine-tuning T5 for text summarization. Both the task description and article tokens are fed into the transformer encoder for predicting the summary.](../img/t5-finetune-summarization.svg)
 :label:`fig_t5-finetune-summarization`
 
-:numref:`fig_t5-finetune-summarization` explains fine-tuning T5 for text summarization. In this downstream task, the task description tokens "Summarize", ":" followed by the article tokens are input to the encoder. The 11-billion-parameter T5 (T5-11B) achieved state-of-the-art results on many encoding (e.g., classification) and generation (e.g., summarization) benchmarks. Since released, T5 has been extensively used in later research. For example, switch transformers are designed based off T5 to activate a subset of the parameters for better computational efficiency :cite:`fedus2022switch`. In Imagen, a photorealistic text-to-image model, text is input to a 4.6-billion-parameter T5 encoder (T5-XXL) with frozen parameters :cite:`saharia2022photorealistic`.
+:numref:`fig_t5-finetune-summarization` explains fine-tuning T5 for text summarization. In this downstream task, the task description tokens "Summarize", ":" followed by the article tokens are input to the encoder. The 11-billion-parameter T5 (T5-11B) achieved state-of-the-art results on many encoding (e.g., classification) and generation (e.g., summarization) benchmarks. Since released, T5 has been extensively used in later research. For example, switch transformers are designed based off T5 to activate a subset of the parameters for better computational efficiency :cite:`fedus2022switch`. In Imagen, a photorealistic text-to-image model (:numref:`fig_imagen`), text is input to a 4.6-billion-parameter T5 encoder (T5-XXL) with frozen parameters :cite:`saharia2022photorealistic`.
 
-
-
-
-
-
+![Photorealistic text-to-image sample with Imagen, whose text encoder is T5. The sample picture is taken from Figure 1 in :cite:`saharia2022photorealistic`.](../img/imagen.png)
+:label:`fig_imagen`
+:width:`400px`
 
 ```{.python .input}
 # TOREMOVE
