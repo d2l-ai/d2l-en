@@ -87,7 +87,6 @@ text is input to a T5 encoder (T5-XXL) with 4.6 billion frozen parameters :cite:
 
 ![A photorealistic text-to-image example by the Imagen model, whose text encoder is T5. This example is taken from Figure 1 in :cite:`saharia2022photorealistic`.](../img/imagen.png)
 :label:`fig_imagen`
-:width:`400px`
 
 ```{.python .input}
 # TOREMOVE
