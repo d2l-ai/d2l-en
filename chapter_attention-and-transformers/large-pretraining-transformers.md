@@ -251,6 +251,9 @@ Scaling law by Gato: Figure 8 in Gato paper
 :width:`700px`
 :label:`fig_parti`
 
+A larger Parti model is more capable of high-fidelity image generation and content-rich text understanding.
+
+
 ## Exercises
 
 
