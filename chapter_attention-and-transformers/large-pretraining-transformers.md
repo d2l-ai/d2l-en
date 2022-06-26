@@ -75,17 +75,17 @@ In T5, predicting consecutive span is also referred to as reconstructing corrupt
 
 ### Fine-Tuning T5
 
-Similar to BERT, T5 needs to be fine-tuned (updating T5 parameters) on task-specific training data to perform this task. Major differences from BERT include: (i) T5 input includes task descriptions; (ii) T5 can generate sequences with arbitrary length with its transformer decoder; (iii) No additional layers are required. 
+Similar to BERT, T5 needs to be fine-tuned (updating T5 parameters) on task-specific training data to perform this task. Major differences from BERT fine-tuning include: (i) T5 input includes task descriptions; (ii) T5 can generate sequences with arbitrary length with its transformer decoder; (iii) No additional layers are required. 
 
 ![Fine-tuning T5 for text summarization. Both the task description and article tokens are fed into the transformer encoder for predicting the summary.](../img/t5-finetune-summarization.svg)
 :label:`fig_t5-finetune-summarization`
 
 :numref:`fig_t5-finetune-summarization` explains fine-tuning T5 using text summarization as an example. In this downstream task, the task description tokens "Summarize", ":" followed by the article tokens are input to the encoder. 
 
-After fine-tuning, the 11-billion-parameter T5 (T5-11B) achieved state-of-the-art results on multiple encoding (e.g., classification) and generation (e.g., summarization) benchmarks. Since released, T5 has been extensively used in later research. For example, switch transformers are designed based off T5 to activate a subset of the parameters for better computational efficiency :cite:`fedus2022switch`. In a photorealistic text-to-image model called Imagen,
-text is input to a T5 encoder (T5-XXL) with 4.6 billion frozen parameters :cite:`saharia2022photorealistic`. The text-to-image examples in :numref:`fig_imagen` suggest that the T5 encoder alone may effectively represent text even without fine-tuning.
+After fine-tuning, the 11-billion-parameter T5 (T5-11B) achieved state-of-the-art results on multiple encoding (e.g., classification) and generation (e.g., summarization) benchmarks. Since released, T5 has been extensively used in later research. For example, switch transformers are designed based off T5 to activate a subset of the parameters for better computational efficiency :cite:`fedus2022switch`. In a text-to-image model called Imagen,
+text is input to a T5 encoder (T5-XXL) with 4.6 billion frozen parameters :cite:`saharia2022photorealistic`. The photorealistic text-to-image examples in :numref:`fig_imagen` suggest that the T5 encoder alone may effectively represent text even without fine-tuning.
 
-![Photorealistic text-to-image examples by the Imagen model, whose text encoder is from T5. These examples are taken from Figure 1 in :cite:`saharia2022photorealistic`.](../img/imagen.png)
+![Text-to-image examples by the Imagen model, whose text encoder is from T5. Examples taken from Figure 1 in :cite:`saharia2022photorealistic`.](../img/imagen.png)
 :width:`700px`
 :label:`fig_imagen`
 
@@ -172,8 +172,9 @@ GPT-3 :cite:`brown2020language`
 Sparse transformer :cite:`child2019generating`
 -->
 
-
-
+```{.python .input}
+# TOREMOVE
+```
 
 ## Scaling Up
 
@@ -245,6 +246,10 @@ Generalist Agent :cite:`reed2022generalist`
 
 Scaling law by Gato: Figure 8 in Gato paper
 
+
+![Image examples generated from the same text by the Parti model of increasing sizes (350M, 750M, 3B, 20B). Examples taken from Figure 10 in :cite:`yu2022scaling`.](../img/parti.png)
+:width:`700px`
+:label:`fig_parti`
 
 ## Exercises
 
