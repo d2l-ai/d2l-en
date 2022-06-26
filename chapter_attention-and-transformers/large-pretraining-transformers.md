@@ -138,8 +138,29 @@ These three settings were tested in GPT-3 :cite:`brown2020language`, whose large
 
 ## Scaling Up
 
-
 :numref:`fig_gpt-decoder-only` empirically demonstrates scalability of transformers in GPT-3.
+
+
+![XX (caption and figure taken from :cite:`kaplan2020scaling`)](../img/scaling-power-law.png)
+:width:`600px`
+:label:`fig_scaling-power-law3`
+
+
+![XX (caption and figure taken from :cite:`kaplan2020scaling`)](../img/scaling-sample-conv.png)
+:width:`500px`
+:label:`fig_scaling-sample-conv`
+
+
+![XX (caption and figure taken from :cite:`brown2020language`)](../img/scaling-gpt3.png)
+:width:`400px`
+:label:`fig_scaling-gpt3`
+
+
+
+
+
+
+
 
 
 :Pretraining BERT, T5, and GPT-3 at multiple 
@@ -164,6 +185,10 @@ Scaling laws for neural LM :cite:`kaplan2020scaling`
 Scaling laws for transfer :cite:`hernandez2021scaling`
 Scale efficiently :cite:`tay2021scale`
 -->
+
+
+
+
 
 
 ### Larger Models 
