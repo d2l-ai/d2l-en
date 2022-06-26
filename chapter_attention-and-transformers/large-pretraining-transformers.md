@@ -85,7 +85,7 @@ Similar to BERT, T5 needs to be fine-tuned (updating T5 parameters) on task-spec
 After fine-tuning, the 11-billion-parameter T5 (T5-11B) achieved state-of-the-art results on multiple encoding (e.g., classification) and generation (e.g., summarization) benchmarks. Since released, T5 has been extensively used in later research. For example, switch transformers are designed based off T5 to activate a subset of the parameters for better computational efficiency :cite:`fedus2022switch`. In a text-to-image model called Imagen,
 text is input to a T5 encoder (T5-XXL) with 4.6 billion frozen parameters :cite:`saharia2022photorealistic`. The photorealistic text-to-image examples in :numref:`fig_imagen` suggest that the T5 encoder alone may effectively represent text even without fine-tuning.
 
-![Text-to-image examples by the Imagen model, whose text encoder is from T5. Examples taken from Figure 1 in :cite:`saharia2022photorealistic`.](../img/imagen.png)
+![Text-to-image examples by the Imagen model, whose text encoder is from T5 (examples taken from :cite:`saharia2022photorealistic`).](../img/imagen.png)
 :width:`700px`
 :label:`fig_imagen`
 
@@ -96,7 +96,7 @@ text is input to a T5 encoder (T5-XXL) with 4.6 billion frozen parameters :cite:
 ## Decoder-Only 
 
 
-We have investigated encoder-only and encoder-decoder transformers. Alternatively, decoder-only transformers remove the entire encoder and the decoder sublayer with the encoder-decoder cross-attention from the original encoder-decoder architecture in :numref:`fig_transformer`. Nowadays, decoder-only transformers have been the de facto architecture in large-scale language modeling (:numref:`sec_language-model`), which leverages the world's abundant unlabeled text corpora via self-supervised learning.
+We have reviewed encoder-only and encoder-decoder transformers. Alternatively, decoder-only transformers remove the entire encoder and the decoder sublayer with the encoder-decoder cross-attention from the original encoder-decoder architecture depicted in :numref:`fig_transformer`. Nowadays, decoder-only transformers have been the de facto architecture in large-scale language modeling (:numref:`sec_language-model`), which leverages the world's abundant unlabeled text corpora via self-supervised learning.
 
 
 
@@ -107,30 +107,41 @@ Using language modeling as the training objective, the GPT (generative pre-train
 ![Left: Pretraining GPT with language modeling. The target sequence is the input sequence shifted by one token. Both “&lt;bos&gt;” and “&lt;eos&gt;” are special tokens marking the beginning and end of sequences, respectively. Right: Attention pattern in the transformer decoder. Each token along the vertical axis attends to only its past tokens along the horizontal axis (causal).](../img/gpt-decoder-only.svg)
 :label:`fig_gpt-decoder-only`
 
-Following the autoregressive language model training as discussed in :numref:`subsec_partitioning-seqs`,  :numref:`fig_gpt-decoder-only` illustrates GPT pretraining with a transformer encoder, where the target sequence is the input sequence shifted by one token. Note that the causal attention pattern in the transformer decoder enforces that each token can only attend to its past tokens, since the token-by-token prediction cannot use future tokens. 
+Following the autoregressive language model training as described in :numref:`subsec_partitioning-seqs`,  :numref:`fig_gpt-decoder-only` illustrates GPT pretraining with a transformer encoder, where the target sequence is the input sequence shifted by one token. Note that the causal attention pattern in the transformer decoder enforces the constraint that each token can only attend to its past tokens (token-by-token prediction cannot attend to future tokens). 
 
 
-GPT has 100 million parameters and needs fine-tuning to be used in individual downstream tasks. One year later, a much larger 1.5-billion-parameter model, GPT-2, was pretrained on 40 GB of text :cite:`Radford.Wu.Child.ea.2019`. Compared with the original transformer decoder in GPT, GPT-2 uses pre-normalization (discussed in :numref:`subsec_vit-encoder`) and improves initialization and weight-scaling. It obtained the state-of-the-art results on language modeling benchmarks and promising results on multiple other tasks *without updating the parameters or architecture*.
+GPT has 100 million parameters and needs to be fine-tuned in individual downstream tasks. One year later, a much larger transformer-decoder language model, GPT-2, was introduced :cite:`Radford.Wu.Child.ea.2019`. Compared with the original transformer decoder in GPT, pre-normalization (discussed in :numref:`subsec_vit-encoder`) and improved initialization and weight-scaling are adopted in GPT-2. 
+Pretrained on 40 GB of text, the 1.5-billion-parameter
+GPT-2 obtained the state-of-the-art results on language modeling benchmarks and promising results on multiple other tasks *without updating the parameters or architecture*.
 
 
 ### GPT-3
 
-* GPT-3 explores zero-shot, few-shot, one-shot
+GPT-2 demonstrated potential of using the same language model for multiple tasks without updating the model. This is more computationally efficient than fine-tuning, which updates models with gradient computation. 
 
-![Zero-shot, one-shot, few-shot learning with language models.](../img/gpt-3-xshot.svg)
+
+![Zero-shot, one-shot, few-shot learning with language models (transformer decoders). No parameter update is needed.](../img/gpt-3-xshot.svg)
 :label:`fig_gpt-3-xshot`
 
-Since we have discussed language models (:numref:`sec_language-model`) and how to train them to generate sequences conditional on some prefix text (:numref:`sec_rnn-scratch`)
-
-* Kaplan's scaling law suggests bigger model with more data
-* GPT-3 is bigger, trains on more data
-* GPT-3's architectural difference, sparse transformer
-* GPT-3's SOTA perf.
-* Cool demos of GPT-3.
-* summarize training compute, param size of BERT, T5, GPT. Similar to Table D.1 of GPT-3 paper.
+To explain the more computationally efficient use of language models, recall :numref:`sec_rnn-scratch` that a language model can be trained to generate a text sequence conditional on some prefix text sequence. Thus, a pretrained language model may generate the task output as a sequence, conditional on the input sequence with the task description, task-specific input-output examples, and a prompt (task input), *without parameter update*. This learning paradigm can be further categorized as *zero-shot*, *one-shot*, and *few-shot*, when there is no, one, or a few task-specific input-output examples (:numref:`fig_gpt-3-xshot`).
 
 
+![Aggregate performance for all 42 accuracy-denominated benchmarks (caption and figure taken from :cite:`brown2020language`)](../img/gpt3-xshot-scaling.png)
+:label:`fig_gpt3-xshot-scaling`
 
+These three settings were tested in GPT-3 :cite:`brown2020language`, whose largest version uses data and model size about two orders of magnitude larger than those in GPT-2. GPT-3 uses the same transformer decoder architecture in its direct predecessor GPT-2 except that *sparse* attention patterns similar to those in the sparse transformer :cite:`child2019generating` replace original attention patterns (right of :numref:`fig_gpt-decoder-only`) in alternating layers. Pretrained on 300 billion tokens, GPT-3 performs better with larger model size, where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`). You may find many other downstream applications of GPT-3 [across the Web](https://gpt3demo.com/).
+
+
+
+
+```{.python .input}
+# TOREMOVE
+```
+
+## Scaling Up
+
+
+:numref:`fig_gpt-decoder-only` empirically demonstrates scalability of transformers in GPT-3.
 
 
 :Pretraining BERT, T5, and GPT-3 at multiple 
@@ -147,22 +158,6 @@ Since we have discussed language models (:numref:`sec_language-model`) and how t
 |GPT-3|175B  |300B |
 :label:`tab_bert-t5-gpt-scale`
 
-
-<!--
-GPT-1 :cite:`Radford.Narasimhan.Salimans.ea.2018`
-GPT-2 :cite:`Radford.Wu.Child.ea.2019`
-GPT-3 :cite:`brown2020language`
--->
-
-<!--
-Sparse transformer :cite:`child2019generating`
--->
-
-```{.python .input}
-# TOREMOVE
-```
-
-## Scaling Up
 
 ### Scaling Laws
 
@@ -233,7 +228,7 @@ Generalist Agent :cite:`reed2022generalist`
 Scaling law by Gato: Figure 8 in Gato paper
 
 
-![Image examples generated from the same text by the Parti model of increasing sizes (350M, 750M, 3B, 20B). Examples taken from Figure 10 in :cite:`yu2022scaling`.](../img/parti.png)
+![Image examples generated from the same text by the Parti model of increasing sizes (350M, 750M, 3B, 20B) (examples taken from :cite:`yu2022scaling`).](../img/parti.png)
 :width:`700px`
 :label:`fig_parti`
 
