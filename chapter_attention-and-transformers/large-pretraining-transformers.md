@@ -127,6 +127,7 @@ To explain the more computationally efficient use of language models without par
 
 
 ![Aggregate performance for all 42 accuracy-denominated benchmarks (caption and figure taken from :cite:`brown2020language`)](../img/gpt3-xshot-scaling.png)
+:width:`400px`
 :label:`fig_gpt3-xshot-scaling`
 
 These three settings were tested in GPT-3 :cite:`brown2020language`, whose largest version uses data and model size about two orders of magnitude larger than those in GPT-2. GPT-3 uses the same transformer decoder architecture in its direct predecessor GPT-2 except that attention patterns (right of :numref:`fig_gpt-decoder-only`) are sparser at alternating layers. Pretrained on 300 billion tokens, GPT-3 performs better with larger model size, where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`). Although enjoying computational efficiency, GPT-3 few-shot underperformed the state-of-the-art fine-tuned models that require model updates. Nonetheless, GPT-3 has powered a wide range of downstream applications [across the Web](https://gpt3demo.com/): it was generating 4.5 billions words every day around nine months of its [API](https://openai.com/api/) release.
