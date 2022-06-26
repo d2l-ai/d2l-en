@@ -39,7 +39,7 @@ After pretraining, BERT can be *fine-tuned* to downstream encoding tasks involvi
 :numref:`fig_bert-finetune-classification` illustrates fine-tuning of BERT for sentiment analysis. The transformer encoder is a pretrained BERT, which takes a text sequence as input and feeds the “&lt;cls&gt;” representation (global representation of the input) into an additional MLP to predict the sentiment. During fine-tuning on a sentiment analysis dataset, MLP is trained from scratch while pretrained parameters of BERT are updated.
 BERT does more than sentiment analysis. The general language representations learned by the 350-million-parameter BERT (BERT-Large) from 250 billion training tokens advanced the state of the art for natural language tasks such as single text classification, text pair classification or regression, text tagging, and question answering.
 
-You may note that these downstream tasks include text pair understanding. BERT pretraining has another loss for predicting whether one sentence immediately follows the other. However, this loss was later found not useful when pretraining RoBERTa, a BERT variant of the same size, on much bigger text data with 2000 billion tokens :cite:`liu2019roberta`. Other derivatives of BERT improved model architectures or pretraining objectives, such as
+You may note that these downstream tasks include text pair understanding. BERT pretraining has another loss for predicting whether one sentence immediately follows the other. However, this loss was later found not useful when pretraining RoBERTa, a BERT variant of the same size, on 2000 billion tokens :cite:`liu2019roberta`. Other derivatives of BERT improved model architectures or pretraining objectives, such as
 ALBERT (enforcing parameter sharing) :cite:`lan2019albert`,
 SpanBERT (representing and predicting spans of text) :cite:`joshi2020spanbert`,
 DistilBERT (lightweight via knowledge distillation) :cite:`sanh2019distilbert`,
@@ -71,7 +71,7 @@ As an example of the pretrained transformer encoder-decoder, T5 (Text-to-Text Tr
 To obtain input and output from any original text, T5 is pretrained to predict consecutive spans. Specifically, tokens from text are randomly replaced by special tokens where each consecutive span is replaced by the same special token. Consider the example in
 :numref:`fig_t5-encoder-decoder`, where the original text is "I", "love", "this", "red", "car". Tokens "love", "red", "car" are randomly replaced by special tokens. Since "red" and "car" are a consecutive span, they are replaced by the same special token. As a result, the input sequence is "I", "&lt;X&gt;", "this", "&lt;Y&gt;", and the target sequence is "&lt;X&gt;", "love", "&lt;Y&gt;", "red", "car", "&lt;Z&gt;", where "&lt;Z&gt;" is another special token marking the end. As shown in :numref:`fig_t5-encoder-decoder`, the decoder has a causal attention pattern to prevent itself from attending to future tokens during sequence prediction. 
 
-In T5, predicting consecutive span is also referred to as reconstructing corrupted text. With this objective, T5 is pretrained on the C4 (Colossal Clean Crawled Corpus) data consisting of 1000 billion tokens of clean English text from the Web :cite:`raffel2020exploring`.
+In T5, predicting consecutive span is also referred to as reconstructing corrupted text. With this objective, T5 is pretrained with 1000 billion tokens from the C4 (Colossal Clean Crawled Corpus) data, which consists of clean English text from the Web :cite:`raffel2020exploring`.
 
 ### Fine-Tuning T5
 
@@ -130,7 +130,7 @@ To explain the more computationally efficient use of language models without par
 :width:`400px`
 :label:`fig_gpt3-xshot-scaling`
 
-These three settings were tested in GPT-3 :cite:`brown2020language`, whose largest version uses data and model size about two orders of magnitude larger than those in GPT-2. GPT-3 uses the same transformer decoder architecture in its direct predecessor GPT-2 except that attention patterns (right of :numref:`fig_gpt-decoder-only`) are sparser at alternating layers. Pretrained on 300 billion tokens, GPT-3 performs better with larger model size, where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`). Although enjoying computational efficiency, GPT-3 few-shot underperformed the state-of-the-art fine-tuned models that require model updates. Nonetheless, GPT-3 has powered a wide range of downstream applications [across the Web](https://gpt3demo.com/): it was generating 4.5 billions words every day around nine months of its [API](https://openai.com/api/) release.
+These three settings were tested in GPT-3 :cite:`brown2020language`, whose largest version uses data and model size about two orders of magnitude larger than those in GPT-2. GPT-3 uses the same transformer decoder architecture in its direct predecessor GPT-2 except that attention patterns (right of :numref:`fig_gpt-decoder-only`) are sparser at alternating layers. Pretrained with 300 billion tokens, GPT-3 performs better with larger model size, where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`). Although enjoying computational efficiency, GPT-3 few-shot underperformed the state-of-the-art fine-tuned models that require model updates. Nonetheless, GPT-3 has powered a wide range of downstream applications [across the Web](https://gpt3demo.com/): it was generating 4.5 billions words every day around nine months of its [API](https://openai.com/api/) release.
 
 ```{.python .input}
 # TOREMOVE
@@ -142,12 +142,12 @@ These three settings were tested in GPT-3 :cite:`brown2020language`, whose large
 
 
 ![XX (caption and figure taken from :cite:`kaplan2020scaling`)](../img/scaling-power-law.png)
-:width:`600px`
+:width:`700px`
 :label:`fig_scaling-power-law3`
 
 
 ![XX (caption and figure taken from :cite:`kaplan2020scaling`)](../img/scaling-sample-conv.png)
-:width:`500px`
+:width:`700px`
 :label:`fig_scaling-sample-conv`
 
 
