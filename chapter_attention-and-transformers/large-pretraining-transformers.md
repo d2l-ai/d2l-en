@@ -96,33 +96,21 @@ text is input to a T5 encoder (T5-XXL) with 4.6 billion frozen parameters :cite:
 ## Decoder-Only 
 
 
-We have investigated encoder-only and encoder-decoder transformers. Alternatively, decoder-only transformers remove the entire encoder and the decoder sublayer with the encoder-decoder cross-attention from the original encoder-decoder architecture in :numref:`fig_transformer`. Nowadays, decoder-only transformers have been the de facto architecture in large-scale language modeling. 
+We have investigated encoder-only and encoder-decoder transformers. Alternatively, decoder-only transformers remove the entire encoder and the decoder sublayer with the encoder-decoder cross-attention from the original encoder-decoder architecture in :numref:`fig_transformer`. Nowadays, decoder-only transformers have been the de facto architecture in large-scale language modeling (:numref:`sec_language-model`), which leverages the world's abundant unlabeled text corpora via self-supervised learning.
 
 
 
 ### GPT and GPT-2
 
-Using language modeling as the training objective, the GPT (generative pre-training) model chooses a transformer decoder as its backbone. Recall our 
+Using language modeling as the training objective, the GPT (generative pre-training) model chooses a transformer decoder as its backbone :cite:`Radford.Narasimhan.Salimans.ea.2018`. 
 
-
-* GPT is a transformer decoder LM. 
-* Recall LM
-* How to use transformer decoder for LM:
-
-![Left: Pretraining GPT with language modeling. The target sequence is the input sequence shifted by one token. Right: Attention pattern in the transformer decoder. Each token along the vertical axis attends to all input tokens along the horizontal axis.](../img/gpt-decoder-only.svg)
+![Left: Pretraining GPT with language modeling. The target sequence is the input sequence shifted by one token. Both “&lt;bos&gt;” and “&lt;eos&gt;” are special tokens marking the beginning and end of sequences, respectively. Right: Attention pattern in the transformer decoder. Each token along the vertical axis attends to only its past tokens along the horizontal axis (causal).](../img/gpt-decoder-only.svg)
 :label:`fig_gpt-decoder-only`
 
-
-* To pretrain, use LM, same as before: self-supervised learning.
-* GPT is fine-tuned to individual task.
-* GPT-2 considers multitask learning and zero-shot
-* So more data is needed
-* GPT-2's architectural difference
-* GPT-2's pretraining and finetuning
-* GPT-2's SOTA on zero-shot LM. Explain zero-shot with summarization TL;DR, but non-LM zero-shot performance is not so good. GPT-2 also evalutes few-shot on machine translation, poor perf.
+Following the autoregressive language model training as discussed in :numref:`subsec_partitioning-seqs`,  :numref:`fig_gpt-decoder-only` illustrates GPT pretraining with a transformer encoder, where the target sequence is the input sequence shifted by one token. Note that the causal attention pattern in the transformer decoder enforces that each token can only attend to its past tokens, since the token-by-token prediction cannot use future tokens. 
 
 
-
+GPT has 100 million parameters and needs fine-tuning to be used in individual downstream tasks. One year later, a much larger 1.5-billion-parameter model, GPT-2, was pretrained on 40 GB of text :cite:`Radford.Wu.Child.ea.2019`. Compared with the original transformer decoder in GPT, GPT-2 uses pre-normalization (discussed in :numref:`subsec_vit-encoder`) and improves initialization and weight-scaling. It obtained the state-of-the-art results on language modeling benchmarks and promising results on multiple other tasks *without updating the parameters or architecture*.
 
 
 ### GPT-3
@@ -131,6 +119,8 @@ Using language modeling as the training objective, the GPT (generative pre-train
 
 ![Zero-shot, one-shot, few-shot learning with language models.](../img/gpt-3-xshot.svg)
 :label:`fig_gpt-3-xshot`
+
+Since we have discussed language models (:numref:`sec_language-model`) and how to train them to generate sequences conditional on some prefix text (:numref:`sec_rnn-scratch`)
 
 * Kaplan's scaling law suggests bigger model with more data
 * GPT-3 is bigger, trains on more data
