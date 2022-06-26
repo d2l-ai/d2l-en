@@ -110,26 +110,26 @@ Using language modeling as the training objective, the GPT (generative pre-train
 Following the autoregressive language model training as described in :numref:`subsec_partitioning-seqs`,  :numref:`fig_gpt-decoder-only` illustrates GPT pretraining with a transformer encoder, where the target sequence is the input sequence shifted by one token. Note that the causal attention pattern in the transformer decoder enforces the constraint that each token can only attend to its past tokens (token-by-token prediction cannot attend to future tokens). 
 
 
-GPT has 100 million parameters and needs to be fine-tuned in individual downstream tasks. One year later, a much larger transformer-decoder language model, GPT-2, was introduced :cite:`Radford.Wu.Child.ea.2019`. Compared with the original transformer decoder in GPT, pre-normalization (discussed in :numref:`subsec_vit-encoder`) and improved initialization and weight-scaling are adopted in GPT-2. 
+GPT has 100 million parameters and needs to be fine-tuned for individual downstream tasks. A much larger transformer-decoder language model, GPT-2, was introduced one year later :cite:`Radford.Wu.Child.ea.2019`. Compared with the original transformer decoder in GPT, pre-normalization (discussed in :numref:`subsec_vit-encoder`) and improved initialization and weight-scaling were adopted in GPT-2. 
 Pretrained on 40 GB of text, the 1.5-billion-parameter
-GPT-2 obtained the state-of-the-art results on language modeling benchmarks and promising results on multiple other tasks *without updating the parameters or architecture*.
+GPT-2 obtained the state-of-the-art results on language modeling benchmarks and promising results on multiple different tasks *without updating the parameters or architecture*.
 
 
 ### GPT-3
 
-GPT-2 demonstrated potential of using the same language model for multiple tasks without updating the model. This is more computationally efficient than fine-tuning, which updates models with gradient computation. 
+GPT-2 demonstrated potential of using the same language model for multiple tasks without updating the model. This is more computationally efficient than fine-tuning, which requires model updates with gradient computation.
 
 
 ![Zero-shot, one-shot, few-shot learning with language models (transformer decoders). No parameter update is needed.](../img/gpt-3-xshot.svg)
 :label:`fig_gpt-3-xshot`
 
-To explain the more computationally efficient use of language models, recall :numref:`sec_rnn-scratch` that a language model can be trained to generate a text sequence conditional on some prefix text sequence. Thus, a pretrained language model may generate the task output as a sequence, conditional on the input sequence with the task description, task-specific input-output examples, and a prompt (task input), *without parameter update*. This learning paradigm can be further categorized as *zero-shot*, *one-shot*, and *few-shot*, when there is no, one, or a few task-specific input-output examples (:numref:`fig_gpt-3-xshot`).
+To explain the more computationally efficient use of language models without parameter update, recall :numref:`sec_rnn-scratch` that a language model can be trained to generate a text sequence conditional on some prefix text sequence. Thus, a pretrained language model may generate the task output as a sequence *without parameter update*, conditional on an input sequence with the task description, task-specific input-output examples, and a prompt (task input). This learning paradigm can be further categorized into *zero-shot*, *one-shot*, and *few-shot*, when there is no, one, or a few task-specific input-output examples (:numref:`fig_gpt-3-xshot`).
 
 
 ![Aggregate performance for all 42 accuracy-denominated benchmarks (caption and figure taken from :cite:`brown2020language`)](../img/gpt3-xshot-scaling.png)
 :label:`fig_gpt3-xshot-scaling`
 
-These three settings were tested in GPT-3 :cite:`brown2020language`, whose largest version uses data and model size about two orders of magnitude larger than those in GPT-2. GPT-3 uses the same transformer decoder architecture in its direct predecessor GPT-2 except that *sparse* attention patterns similar to those in the sparse transformer :cite:`child2019generating` replace original attention patterns (right of :numref:`fig_gpt-decoder-only`) in alternating layers. Pretrained on 300 billion tokens, GPT-3 performs better with larger model size, where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`). You may find many other downstream applications of GPT-3 [across the Web](https://gpt3demo.com/).
+These three settings were tested in GPT-3 :cite:`brown2020language`, whose largest version uses data and model size about two orders of magnitude larger than those in GPT-2. GPT-3 uses the same transformer decoder architecture in its direct predecessor GPT-2 except that *sparse* attention patterns similar to those in the sparse transformer :cite:`child2019generating` replace original attention patterns (right of :numref:`fig_gpt-decoder-only`) in alternating layers. Pretrained on 300 billion tokens, GPT-3 performs better with larger model size, where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`). Although enjoying computational efficiency, GPT-3 few-shot underperformed the state-of-the-art fine-tuned models that require model updates. Nonetheless, GPT-3 has powered a wide range of downstream applications [across the Web](https://gpt3demo.com/): it was generating 4.5 billions words every day around nine months of its [API](https://openai.com/api/) release.
 
 
 
