@@ -95,42 +95,38 @@ text is input to a T5 encoder (T5-XXL) with 4.6 billion frozen parameters :cite:
 
 ## Decoder-Only 
 
-* Fine-tuning is bad: need downstream data, computationally expensive for gradient update.
-* GPT-2 demonstrates zero-shot possibility, GPT-3 shows few-shot. No gradient update.
-* Let's start with GPT.
+
+We have investigated encoder-only and encoder-decoder transformers. Alternatively, decoder-only transformers remove the entire encoder and the decoder sublayer with the encoder-decoder cross-attention from the original encoder-decoder architecture in :numref:`fig_transformer`. Nowadays, decoder-only transformers have been the de facto architecture in large-scale language modeling. 
 
 
-### GPT
+
+### GPT and GPT-2
+
+Using language modeling as the training objective, the GPT (generative pre-training) model chooses a transformer decoder as its backbone. Recall our 
+
 
 * GPT is a transformer decoder LM. 
 * Recall LM
 * How to use transformer decoder for LM:
 
-![Decoder-only GPT pretraining (left) and attention pattern in the decoder (right).](../img/gpt-decoder-only.svg)
+![Left: Pretraining GPT with language modeling. The target sequence is the input sequence shifted by one token. Right: Attention pattern in the transformer decoder. Each token along the vertical axis attends to all input tokens along the horizontal axis.](../img/gpt-decoder-only.svg)
 :label:`fig_gpt-decoder-only`
+
+
 * To pretrain, use LM, same as before: self-supervised learning.
-* When using for downstream, fine-tune. Explain how with classification.
-
-![Decoder-only GPT fine-tuning.](../img/gpt-finetune-classification.svg)
-:label:`fig_gpt-finetune-classification`
-
-* Note that GPT inspired BERT. To demonstrate more benefits of decoder-only scheme, they train on larger data, leading to GPT-2.
-
-
-### GPT-2
-
-* GPT, BERT, T5 use fine-tuning. It can be bad
+* GPT is fine-tuned to individual task.
 * GPT-2 considers multitask learning and zero-shot
 * So more data is needed
 * GPT-2's architectural difference
 * GPT-2's pretraining and finetuning
-* GPT-2's SOTA on zero-shot LM. Explain zero-shot with summarization TL;DR, but non-LM zero-shot performance is not so good.
+* GPT-2's SOTA on zero-shot LM. Explain zero-shot with summarization TL;DR, but non-LM zero-shot performance is not so good. GPT-2 also evalutes few-shot on machine translation, poor perf.
+
+
+
 
 
 ### GPT-3
 
-
-* GPT-2 also evalutes few-shot on machine translation, poor perf.
 * GPT-3 explores zero-shot, few-shot, one-shot
 
 ![Zero-shot, one-shot, few-shot learning with language models.](../img/gpt-3-xshot.svg)
@@ -251,7 +247,7 @@ Scaling law by Gato: Figure 8 in Gato paper
 :width:`700px`
 :label:`fig_parti`
 
-A larger Parti model is more capable of high-fidelity image generation and content-rich text understanding.
+All of the components in Parti, including encoder, decoder, and image tokenizer, are based on transformers. A larger Parti model is more capable of high-fidelity image generation and content-rich text understanding.
 
 
 ## Exercises
