@@ -45,6 +45,8 @@ SpanBERT (representing and predicting spans of text) :cite:`joshi2020spanbert`,
 DistilBERT (lightweight via knowledge distillation) :cite:`sanh2019distilbert`,
 and
 ELECTRA (replaced token detection) :cite:`clark2019electra`.
+Moreover, BERT also inspired transformer pretraining in computer vision, such as in the vision transformer
+:cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`, Swin transformer :cite:`liu2021swin`, and MAE (masked autoencoders) `he2022masked`.
 
 ```{.python .input}
 # TOREMOVE
@@ -150,7 +152,7 @@ As shown in :numref:`fig_scaling-power-law3`, precise *power-law scaling* can be
 :width:`700px`
 :label:`fig_scaling-sample-conv`
 
-Besides increased performance, large models also enjoy better sample efficiency than small models. :numref:`fig_scaling-sample-conv` shows that large models need fewer training samples (tokens processed) to perform at the same level by small models, and performance is scaled smoothly with compute. 
+Besides increased performance, large models also enjoy better sample efficiency than small models. :numref:`fig_scaling-sample-conv` shows that large models need fewer training samples (tokens processed) to perform at the same level achieved by small models, and performance is scaled smoothly with compute. 
 
 
 
@@ -162,53 +164,22 @@ predicted curve. Embedding parameters are excluded from compute and parameter co
 
 The empirical scaling behaviors in :cite:`kaplan2020scaling` have been tested in subsequent works. For example, GPT-3 supported this hypothesis with two more orders of magnitude in :numref:`fig_scaling-gpt3`.
 
-The scalability of transformers in the GPT series have inspired many transformer language models. While the transformer decoder in GPT-3 was largely followed in OPT (Open Pretrained Transformers) :cite:`zhang2022opt` using only 1/7th the carbon footprint of the former, the GPT-2 transformer decoder was used in training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens achieved state-of-the-art performance across the majority on 152 diverse tasks. Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks. To continue the scaling line of language modeling, PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`.
+The scalability of transformers in the GPT series have inspired subsequent transformer language models. While the transformer decoder in GPT-3 was largely followed in OPT (Open Pretrained Transformers) :cite:`zhang2022opt` using only 1/7th the carbon footprint of the former, the GPT-2 transformer decoder was used in training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens achieved state-of-the-art performance across the majority on 152 diverse tasks. Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks. To continue the scaling line of language modeling, PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`.
 
 
+## Summary and Discussions
 
-
-
-
-## Discussions
-
-Swin Transformer
-
-<!--
-Swin Transformer :cite:`liu2021swin`
--->
-
-MAE
-
-<!--
-MAE :cite:`he2022masked`
--->
-
-iGPT
-
-<!--
-iGPT :cite:`chen2020generative`
--->
-
-
-More Modalities
-
-<!--
-CLIP :cite:`radford2021learning`
-DALL-E :cite:`ramesh2021zero`
-DALL-E 2 :cite:`ramesh2022hierarchical`
-Flamingo :cite:`alayrac2022flamingo`
-Imagen :cite:`saharia2022photorealistic`
-Generalist Agent :cite:`reed2022generalist`
--->
-
-Scaling law by Gato: Figure 8 in Gato paper
+Transformers have been pretrained as encoder-only (e.g., BERT), encoder-decoder (e.g., T5), and decoder-only (e.g., GPT series). Pretrained models may be adapted to perform different tasks with model update (e.g., fine tuning) or not (e.g., few shot). Scalability of transformers suggests that better performance benefits from larger models, more training data, and training compute. Since transformers were first designed and pretrained for text data, this section leans slightly towards natural language processing. Nonetheless, those models discussed above can be often found in more recent models across multiple modalities. For example, 
+(i) Chinchilla :cite:`hoffmann2022training` was further extended to Flamingo :cite:`alayrac2022flamingo`, a visual language model for few-shot learning;
+(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision transformer encoder text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there has no systematic studies on transformer scalability in multi-modal pretraining, a recent all-transformer text-to-image model, Parti :cite:`yu2022scaling`, shows such potential:
+a larger Parti model is more capable of high-fidelity image generation and content-rich text understanding (:numref:`fig_parti`).
 
 
 ![Image examples generated from the same text by the Parti model of increasing sizes (350M, 750M, 3B, 20B) (examples taken from :cite:`yu2022scaling`).](../img/parti.png)
 :width:`700px`
 :label:`fig_parti`
 
-All of the components in Parti, including encoder, decoder, and image tokenizer, are based on transformers. A larger Parti model is more capable of high-fidelity image generation and content-rich text understanding.
+
 
 
 ## Exercises
