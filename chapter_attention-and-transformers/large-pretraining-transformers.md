@@ -148,17 +148,17 @@ predicted curve. Embedding parameters are excluded from compute and parameter co
 :label:`fig_scaling-gpt3`
 
 
-The empirical scaling behaviors in :cite:`kaplan2020scaling` have been tested in subsequent works. For example, GPT-3 supported this hypothesis with two more orders of magnitude in :numref:`fig_scaling-gpt3`.
+The empirical scaling behaviors in :cite:`kaplan2020scaling` have been tested in subsequent large transformer models. For example, GPT-3 supported this hypothesis with two more orders of magnitude in :numref:`fig_scaling-gpt3`.
 
-The scalability of transformers in the GPT series have inspired subsequent transformer language models. While the transformer decoder in GPT-3 was largely followed in OPT (Open Pretrained Transformers) :cite:`zhang2022opt` using only 1/7th the carbon footprint of the former, the GPT-2 transformer decoder was used in training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens achieved state-of-the-art performance across the majority on 152 diverse tasks. Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks. To continue the scaling line of language modeling, PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`.
+The scalability of transformers in the GPT series have inspired subsequent transformer language models. While the transformer decoder in GPT-3 was largely followed in OPT (Open Pretrained Transformers) :cite:`zhang2022opt` using only 1/7th the carbon footprint of the former, the GPT-2 transformer decoder was used in training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens achieved state-of-the-art performance across the majority on about 150 diverse tasks. Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks. To continue the scaling line of language modeling, PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`.
 
 
 ## Summary and Discussions
 
-Transformers have been pretrained as encoder-only (e.g., BERT), encoder-decoder (e.g., T5), and decoder-only (e.g., GPT series). Pretrained models may be adapted to perform different tasks with model update (e.g., fine tuning) or not (e.g., few shot). Scalability of transformers suggests that better performance benefits from larger models, more training data, and training compute. Since transformers were first designed and pretrained for text data, this section leans slightly towards natural language processing. Nonetheless, those models discussed above can be often found in more recent models across multiple modalities. For example, 
+Transformers have been pretrained as encoder-only (e.g., BERT), encoder-decoder (e.g., T5), and decoder-only (e.g., GPT series). Pretrained models may be adapted to perform different tasks with model update (e.g., fine tuning) or not (e.g., few shot). Scalability of transformers suggests that better performance benefits from larger models, more training data, and more training compute. Since transformers were first designed and pretrained for text data, this section leans slightly towards natural language processing. Nonetheless, those models discussed above can be often found in more recent models across multiple modalities. For example, 
 (i) Chinchilla :cite:`hoffmann2022training` was further extended to Flamingo :cite:`alayrac2022flamingo`, a visual language model for few-shot learning;
-(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there has no systematic studies on transformer scalability in multi-modal pretraining yet, a recent all-transformer text-to-image model, Parti :cite:`yu2022scaling`, shows such potential:
-a larger Parti model is more capable of high-fidelity image generation and content-rich text understanding (:numref:`fig_parti`).
+(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there has been no systematic studies on transformer scalability in multi-modal pretraining yet, a recent all-transformer text-to-image model, Parti :cite:`yu2022scaling`, shows potential of scalability across modalities:
+a larger Parti is more capable of high-fidelity image generation and content-rich text understanding (:numref:`fig_parti`).
 
 
 ![Image examples generated from the same text by the Parti model of increasing sizes (350M, 750M, 3B, 20B) (examples taken from :cite:`yu2022scaling`).](../img/parti.png)
@@ -170,10 +170,10 @@ a larger Parti model is more capable of high-fidelity image generation and conte
 
 ## Exercises
 
-1. Is it possible to fine tune T5 using a minibatch consisting of different tasks? Why or why not?
+1. Is it possible to fine tune T5 using a minibatch consisting of different tasks? Why or why not? How about for GPT-2?
 1. Given a powerful language model, what applications can you think of?
-1. Say that you are asked to fine tune a language model to perform text classification by adding additional layers. Where do you add them? Why?
-1. Consider sequence to sequence problems (e.g., machine translation) where the input sequence is always available throughout the target sequence prediction. What could be limitations of modeling with decoder-only transformers?
+1. Say that you are asked to fine tune a language model to perform text classification by adding additional layers. Where will you add them? Why?
+1. Consider sequence to sequence problems (e.g., machine translation) where the input sequence is always available throughout the target sequence prediction. What could be limitations of modeling with decoder-only transformers? Why?
 
 
 [Discussions](https://discuss.d2l.ai/t/9232)
