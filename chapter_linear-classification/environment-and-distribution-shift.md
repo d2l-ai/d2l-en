@@ -1,4 +1,5 @@
 # Environment and Distribution Shift
+:label:`sec_environment-and-distribution-shift`
 
 In the previous sections, we worked through
 a number of hands-on applications of machine learning,
