@@ -32,8 +32,8 @@ The pretrained BERT can be *fine-tuned* to downstream encoding tasks involving s
 ![Fine-tuning BERT for sentiment analysis.](../img/bert-finetune-classification.svg)
 :label:`fig_bert-finetune-classification`
 
-:numref:`fig_bert-finetune-classification` illustrates fine-tuning of BERT for sentiment analysis. The transformer encoder is a pretrained BERT, which takes a text sequence as input and feeds the “&lt;cls&gt;” representation (global representation of the input) into an additional fully connected layer to predict the sentiment. During fine-tuning on a sentiment analysis dataset, the additional layer is trained from scratch while pretrained parameters of BERT are updated.
-BERT does more than sentiment analysis. The general language representations learned by the 350-million-parameter BERT (BERT-Large) from 250 billion training tokens advanced the state of the art for natural language tasks such as single text classification, text pair classification or regression, text tagging, and question answering.
+:numref:`fig_bert-finetune-classification` illustrates fine-tuning of BERT for sentiment analysis. The transformer encoder is a pretrained BERT, which takes a text sequence as input and feeds the “&lt;cls&gt;” representation (global representation of the input) into an additional fully connected layer to predict the sentiment. During fine-tuning, the cross-entropy loss between the prediction and the label on sentiment analysis data is minimized via gradient-based algorithms, where the additional layer is trained from scratch while pretrained parameters of BERT are updated.
+BERT does more than sentiment analysis. The general language representations learned by the 350-million-parameter BERT from 250 billion training tokens advanced the state of the art for natural language tasks such as single text classification, text pair classification or regression, text tagging, and question answering.
 
 You may note that these downstream tasks include text pair understanding. BERT pretraining has another loss for predicting whether one sentence immediately follows the other. However, this loss was later found not useful when pretraining RoBERTa, a BERT variant of the same size, on 2000 billion tokens :cite:`liu2019roberta`. Other derivatives of BERT improved model architectures or pretraining objectives, such as
 ALBERT (enforcing parameter sharing) :cite:`lan2019albert`,
@@ -41,15 +41,16 @@ SpanBERT (representing and predicting spans of text) :cite:`joshi2020spanbert`,
 DistilBERT (lightweight via knowledge distillation) :cite:`sanh2019distilbert`,
 and
 ELECTRA (replaced token detection) :cite:`clark2019electra`.
-Moreover, BERT also inspired transformer pretraining in computer vision, such as in the vision transformer
-:cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`, Swin transformer :cite:`liu2021swin`, and MAE (masked autoencoders) `he2022masked`.
+Moreover, BERT inspired transformer pretraining in computer vision, such as with vision transformers
+:cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`, Swin transformers :cite:`liu2021swin`, and MAE (masked autoencoders) `he2022masked`.
 
 ## Encoder-Decoder
 
-Since a transformer encoder converts a sequence of input tokens into the same number of output representations, the encoder-only mode cannot generate a sequence of arbitrary length like in machine translation. Originally proposed for machine translation, the transformer architecture also has a decoder that autoregressively predicts the target sequence of arbitrary length, token by token, conditional on both encoder output and decoder output. For conditioning on encoder output, encoder-decoder cross-attention (multi-head attention of decoder in :numref:`fig_transformer`) allows target tokens to attend to all input tokens.
-However, conditioning on decoder output is achieved by a *causal* attention pattern (masked multi-head attention of decoder in :numref:`fig_transformer`): any target token can only attend to past and present tokens in the target sequence.
+Since a transformer encoder converts a sequence of input tokens into the same number of output representations, the encoder-only mode cannot generate a sequence of arbitrary length like in machine translation. Originally proposed for machine translation, the transformer architecture also has a decoder that autoregressively predicts the target sequence of arbitrary length, token by token, conditional on both encoder output and decoder output:
+(i) for conditioning on encoder output, encoder-decoder cross-attention (multi-head attention of decoder in :numref:`fig_transformer`) allows target tokens to attend to *all* input tokens;
+(ii) conditioning on decoder output is achieved by a *causal* attention pattern (masked multi-head attention of decoder in :numref:`fig_transformer`), where any target token can only attend to *past* and *present* tokens in the target sequence.
 
-To pretrain encoder-decoder transformers beyond human-labeled machine translation data, BART :cite:`lewis2019bart` and T5 :cite:`raffel2020exploring` are two concurrent encoder-decoder transformers pretrained on large-scale text corpora. Both attempt to reconstruct original text in their pretraining objectives,
+To pretrain encoder-decoder transformers beyond human-labeled machine translation data, BART :cite:`lewis2019bart` and T5 :cite:`raffel2020exploring` are two concurrently proposed encoder-decoder transformers pretrained on large-scale text corpora. Both attempt to reconstruct original text in their pretraining objectives,
 while the former emphasizes noising input (e.g., masking, deletion, permutation, and rotation) and the latter highlights multitask unification with comprehensive ablation studies. 
 
 
@@ -59,7 +60,7 @@ while the former emphasizes noising input (e.g., masking, deletion, permutation,
 As an example of the pretrained transformer encoder-decoder, T5 (Text-to-Text Transfer Transformer) unifies many tasks as the same text-to-text problem: for any task, the input of the encoder is a task description (e.g., "Summarize", ":") followed by task input (e.g., a sequence of tokens from an article), and the decoder predicts the task output (e.g., a sequence of tokens summarizing the input article). To perform as text-to-text, T5 is trained to generate some target text conditional on input text. 
 
 
-![Left: Pretraining T5 by predicting consecutive spans. The original sentence is "I", "love", "this", "red", "car", where "love" is replaced by a special “&lt;X&gt;” token, and consecutive "red", "car" are replaced by a special “&lt;Y&gt;” token. The target sequence ends with a special “&lt;Z&gt;” token. Right: Attention pattern in the transformer encoder-decoder. In the encoder self-attention (lower square), input tokens attend to each other; In the encoder-decoder cross-attention (upper rectangle), each target token attends to all input tokens; In the decoder self-attention (upper triangle), each target token  attends to present and past target tokens only (causal).](../img/t5-encoder-decoder.svg)
+![Left: Pretraining T5 by predicting consecutive spans. The original sentence is "I", "love", "this", "red", "car", where "love" is replaced by a special “&lt;X&gt;” token, and consecutive "red", "car" are replaced by a special “&lt;Y&gt;” token. The target sequence ends with a special “&lt;Z&gt;” token. Right: Attention pattern in the transformer encoder-decoder. In the encoder self-attention (lower square), all input tokens attend to each other; In the encoder-decoder cross-attention (upper rectangle), each target token attends to all input tokens; In the decoder self-attention (upper triangle), each target token  attends to present and past target tokens only (causal).](../img/t5-encoder-decoder.svg)
 :label:`fig_t5-encoder-decoder`
 
 To obtain input and output from any original text, T5 is pretrained to predict consecutive spans. Specifically, tokens from text are randomly replaced by special tokens where each consecutive span is replaced by the same special token. Consider the example in
@@ -77,11 +78,12 @@ Similar to BERT, T5 needs to be fine-tuned (updating T5 parameters) on task-spec
 :numref:`fig_t5-finetune-summarization` explains fine-tuning T5 using text summarization as an example. In this downstream task, the task description tokens "Summarize", ":" followed by the article tokens are input to the encoder. 
 
 After fine-tuning, the 11-billion-parameter T5 (T5-11B) achieved state-of-the-art results on multiple encoding (e.g., classification) and generation (e.g., summarization) benchmarks. Since released, T5 has been extensively used in later research. For example, switch transformers are designed based off T5 to activate a subset of the parameters for better computational efficiency :cite:`fedus2022switch`. In a text-to-image model called Imagen,
-text is input to a T5 encoder (T5-XXL) with 4.6 billion frozen parameters :cite:`saharia2022photorealistic`. The photorealistic text-to-image examples in :numref:`fig_imagen` suggest that the T5 encoder alone may effectively represent text even without fine-tuning.
+text is input to a frozen T5 encoder (T5-XXL) with 4.6 billion  parameters :cite:`saharia2022photorealistic`. The photorealistic text-to-image examples in :numref:`fig_imagen` suggest that the T5 encoder alone may effectively represent text even without fine-tuning.
 
-![Text-to-image examples by the Imagen model, whose text encoder is from T5 (examples taken from :cite:`saharia2022photorealistic`).](../img/imagen.png)
+![Text-to-image examples by the Imagen model, whose text encoder is from T5 (figures taken from :cite:`saharia2022photorealistic`).](../img/imagen.png)
 :width:`700px`
 :label:`fig_imagen`
+
 
 ## Decoder-Only 
 
