@@ -8,10 +8,6 @@ Given larger data for pretraining, the transformer architecture performs better 
 
 Before compelling success of pretraining transformers for multi-modal data, transformers were extensively pretrained  with a wealth of text. Originally proposed for machine translation, the transformer architecture in :numref:`fig_transformer` consists of an encoder for representing input sequences and a decoder for generating target sequences. Primarily, transformers can be used in three different modes: *encoder-only*, *encoder-decoder*, and *decoder-only*. To conclude this chapter, we will review these three modes and explain the scalability in pretraining transformers.
 
-```{.python .input}
-# TOREMOVE
-```
-
 ## Encoder-Only
 
 When only the transformer encoder is used, a sequence of input tokens is converted into the same number of representations that can be further projected into output (e.g., classification). A transformer encoder consists of  self-attention layers, where all input tokens attend to each other. 
@@ -47,10 +43,6 @@ and
 ELECTRA (replaced token detection) :cite:`clark2019electra`.
 Moreover, BERT also inspired transformer pretraining in computer vision, such as in the vision transformer
 :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`, Swin transformer :cite:`liu2021swin`, and MAE (masked autoencoders) `he2022masked`.
-
-```{.python .input}
-# TOREMOVE
-```
 
 ## Encoder-Decoder
 
@@ -91,10 +83,6 @@ text is input to a T5 encoder (T5-XXL) with 4.6 billion frozen parameters :cite:
 :width:`700px`
 :label:`fig_imagen`
 
-```{.python .input}
-# TOREMOVE
-```
-
 ## Decoder-Only 
 
 
@@ -134,10 +122,6 @@ To explain the more computationally efficient use of language models without par
 
 These three settings were tested in GPT-3 :cite:`brown2020language`, whose largest version uses data and model size about two orders of magnitude larger than those in GPT-2. GPT-3 uses the same transformer decoder architecture in its direct predecessor GPT-2 except that attention patterns (right of :numref:`fig_gpt-decoder-only`) are sparser at alternating layers. Pretrained with 300 billion tokens, GPT-3 performs better with larger model size, where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`). Although enjoying computational efficiency, GPT-3 few-shot underperformed the state-of-the-art fine-tuned models that require model updates. Nonetheless, GPT-3 has powered a wide range of downstream applications [across the Web](https://gpt3demo.com/): it was generating 4.5 billions words every day around nine months of its [API](https://openai.com/api/) release.
 
-```{.python .input}
-# TOREMOVE
-```
-
 ## Scalability
 
 :numref:`fig_gpt-decoder-only` empirically demonstrates scalability of transformers in the GPT-3 language model. For language modeling, more comprehensive empirical studies on scalability of transformers had suggested training larger transformers with more data and compute :cite:`kaplan2020scaling`. 
@@ -171,7 +155,7 @@ The scalability of transformers in the GPT series have inspired subsequent trans
 
 Transformers have been pretrained as encoder-only (e.g., BERT), encoder-decoder (e.g., T5), and decoder-only (e.g., GPT series). Pretrained models may be adapted to perform different tasks with model update (e.g., fine tuning) or not (e.g., few shot). Scalability of transformers suggests that better performance benefits from larger models, more training data, and training compute. Since transformers were first designed and pretrained for text data, this section leans slightly towards natural language processing. Nonetheless, those models discussed above can be often found in more recent models across multiple modalities. For example, 
 (i) Chinchilla :cite:`hoffmann2022training` was further extended to Flamingo :cite:`alayrac2022flamingo`, a visual language model for few-shot learning;
-(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision transformer encoder text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there has no systematic studies on transformer scalability in multi-modal pretraining, a recent all-transformer text-to-image model, Parti :cite:`yu2022scaling`, shows such potential:
+(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there has no systematic studies on transformer scalability in multi-modal pretraining yet, a recent all-transformer text-to-image model, Parti :cite:`yu2022scaling`, shows such potential:
 a larger Parti model is more capable of high-fidelity image generation and content-rich text understanding (:numref:`fig_parti`).
 
 
@@ -184,9 +168,10 @@ a larger Parti model is more capable of high-fidelity image generation and conte
 
 ## Exercises
 
+1. Is it possible to fine tune T5 using a minibatch consisting of different tasks? Why or why not?
+1. Given a powerful language model, what applications can you think of?
+1. Say that you are asked to fine tune a language model to perform text classification by adding additional layers. Where do you add them? Why?
+1. Consider sequence to sequence problems (e.g., machine translation) where the input sequence is always available throughout the target sequence prediction. What could be limitations of modeling with decoder-only transformers?
 
-[Discussions](https://discuss.d2l.ai/t/)
 
-
-
-## References
+[Discussions](https://discuss.d2l.ai/t/9232)
