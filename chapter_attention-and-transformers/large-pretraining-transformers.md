@@ -136,28 +136,31 @@ These three settings were tested in GPT-3 :cite:`brown2020language`, whose large
 # TOREMOVE
 ```
 
-## Scaling Up
+## Scalability
 
-:numref:`fig_gpt-decoder-only` empirically demonstrates scalability of transformers in GPT-3.
+:numref:`fig_gpt-decoder-only` empirically demonstrates scalability of transformers in the GPT-3 language model. For language modeling, more comprehensive empirical studies on scalability of transformers had suggested training larger transformers with more data and compute :cite:`kaplan2020scaling`. 
 
-
-![XX (caption and figure taken from :cite:`kaplan2020scaling`)](../img/scaling-power-law.png)
+![Transformer language model performance improves smoothly as we increase the model size, dataset size, and amount of compute used for training. For optimal performance all three factors must be scaled up in tandem. Empirical performance has a power-law relationship with each individual factor when not bottlenecked by the other two (caption adapted and figure taken from :cite:`kaplan2020scaling`).](../img/scaling-power-law.png)
 :width:`700px`
 :label:`fig_scaling-power-law3`
 
+As shown in :numref:`fig_scaling-power-law3`, precise *power-law scaling* can be observed in the performance with respect to the model size (number of parameters, excluding embedding layers), dataset size (number of training tokens), and amount of training compute (PetaFLOP/s-days, excluding embedding layers). In general, increasing all these three factors in tandem leads to better performance. However, *how* to increase them in tandem still remains a matter of debate :cite:`hoffmann2022training`.
 
-![XX (caption and figure taken from :cite:`kaplan2020scaling`)](../img/scaling-sample-conv.png)
+![Transformer language model training runs (figure taken from :cite:`kaplan2020scaling`).](../img/scaling-sample-conv.png)
 :width:`700px`
 :label:`fig_scaling-sample-conv`
 
+Besides increased performance, large models also enjoy better sample efficiency than small models. :numref:`fig_scaling-sample-conv` shows that large models need fewer training samples (tokens processed) to perform at the same level by small models, and performance is scaled smoothly with compute. 
 
-![XX (caption and figure taken from :cite:`brown2020language`)](../img/scaling-gpt3.png)
+
+
+![GPT-3 performance (cross-entropy validation loss) follows a power-law trend with the amount of compute used for training. The power-law behavior observed in :cite:`kaplan2020scaling` continues for an additional two orders of magnitude with only small deviations from the
+predicted curve. Embedding parameters are excluded from compute and parameter counts (caption adapted and figure taken from :cite:`brown2020language`).](../img/scaling-gpt3.png)
 :width:`400px`
 :label:`fig_scaling-gpt3`
 
 
-
-
+The empirical scaling behaviors in :cite:`kaplan2020scaling` have been tested in subsequent works. For example, GPT-3 provides another empirical evidence with two more orders of magnitude in :numref:`fig_scaling-gpt3`.
 
 
 
