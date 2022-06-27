@@ -102,144 +102,253 @@ i.e. $p(\mathbf{x}_1, \cdots, \mathbf{x}_T)$.
 
 ## Basic Tools
 
-
-Before we start introducing specialized neural networks 
+Before introducing specialized specialized neural networks 
 designed to handle sequentially structured data,
-let's focus.
+let's take a look at some actual sequence data
+and build up some basic intuitions and statistical tools.
+In particular, we will focus on stock price data 
+from the FTSE 100 index (:numref:`fig_ftse100`).
+At each *time step* $t \in \mathbb{Z}^+$, we observe 
+the price of the index at that time, denoted by $x_t$.
 
-We need statistical tools and new deep neural network architectures to deal with sequence data. 
-To keep things simple, we use the stock price (FTSE 100 index) 
-illustrated in :numref:`fig_ftse100` as an example.
 
 ![FTSE 100 index over about 30 years.](../img/ftse100.png)
 :width:`400px`
 :label:`fig_ftse100`
 
 
-Let's denote the prices by $x_t$, i.e., at *time step* 
-$t \in \mathbb{Z}^+$, we observe price $x_t$.
-Note that for sequences in this text,
-$t$ will typically be discrete 
-and take only positive integers as values. 
-Suppose that
-a trader who wants to do well in the stock market on day $t$ predicts $x_t$ via
+Now suppose that a trader would like to make short term trades,
+strategically getting into or out of the index, 
+depending on whether they believe 
+that it will rise or decline
+in the subsequent time step. 
+Absent any other features 
+(news, financial reporting data, etc),
+the only available signal for predicting
+the subsequent value is the history of prices to date. 
 
-$$x_t \sim P(x_t \mid x_{t-1}, \ldots, x_1).$$
 
 
 
 ### Autoregressive Models
 
-In order to achieve this, our trader could use a regression model 
-such as the one that we trained in :numref:`sec_linear_concise`.
-There is just one major problem: 
-the number of inputs, $x_{t-1}, \ldots, x_1$ varies, depending on $t$.
-That is to say, the number increases with the amount of data that we encounter, 
-and we will need an approximation to make this computationally tractable.
-Much of what follows in this chapter will revolve around 
-how to estimate $P(x_t \mid x_{t-1}, \ldots, x_1)$ efficiently. 
-In a nutshell, it boils down to two strategies, as follows.
+The trader is thus interested in knowing 
+the probability distribution 
+$$P(x_t \mid x_{t-1}, \ldots, x_1).$$ 
+over prices that the index might take 
+in the subsequent time step.
+While estimating the entire distribution 
+over a continuous-valued random variable 
+can be difficult, the trader would be happy
+to focus on a few key statistics of the distribution,
+particularly the expected value and the variance.
+One simple strategy for estimating the conditional expectation
 
-First, assume that the potentially rather long sequence 
-$x_{t-1}, \ldots, x_1$ is not really necessary.
+$$ \mathbb{E}[(x_t \mid x_{t-1}, \ldots, x_1)],$$
+
+would be to apply a linear regression model,
+(recall :numref:`sec_linear_concise`).
+Such models that regress the value of a signal
+on the previous values of that same signal 
+are naturally called *autoregressive models*.
+There is just one major problem; the number of inputs, 
+$x_{t-1}, \ldots, x_1$ varies, depending on $t$.
+Namely, the number of inputs increases  
+with the amount of data that we encounter.
+Thus if we want to treat our historical data 
+as a training set, we are left with the problem 
+that each example has a different number of features.
+Much of what follows in this chapter 
+will revolve around techniques 
+for overcoming these challenges 
+when engaging in such *autoregressive* modeling problems
+where the object of interest is 
+$P(x_t \mid x_{t-1}, \ldots, x_1)$
+or some statistic(s) of this distribution. 
+
+A few strategies recur frequently. 
+First, we might believe that although long sequences
+$x_{t-1}, \ldots, x_1$ are available,
+it may not be necessary 
+to look back so far in the history 
+when predicting the near future. 
 In this case we might content ourselves 
-with some timespan of length $\tau$ 
+to condition on some window of length $\tau$ 
 and only use $x_{t-1}, \ldots, x_{t-\tau}$ observations. 
 The immediate benefit is that now the number of arguments 
 is always the same, at least for $t > \tau$. 
-This allows us to train a deep network as indicated above. 
-Such models will be called *autoregressive models*, 
-as they quite literally perform regression on themselves.
-
-The second strategy, shown in :numref:`fig_sequence-model`, 
-is to keep some summary $h_t$ of the past observations, 
-and at the same time update $h_t$ in addition to the prediction $\hat{x}_t$.
-This leads to models that estimate $x_t$ with $\hat{x}_t = P(x_t \mid h_{t})$ 
-and moreover updates of the form  $h_t = g(h_{t-1}, x_{t-1})$. 
-Since $h_t$ is never observed, these models are also called *latent autoregressive models*.
+This allows us to train any linear model or deep network 
+that requires fixed-length vectors as inputs.
+Second, we might develop models that maintain
+some summary $h_t$ of the past observations
+(see :numref:`fig_sequence-model`)
+and at the same time update $h_t$ 
+in addition to the prediction $\hat{x}_t$.
+This leads to models that estimate $x_t$ 
+with $\hat{x}_t = P(x_t \mid h_{t})$ 
+and moreover updates of the form  
+$h_t = g(h_{t-1}, x_{t-1})$. 
+Since $h_t$ is never observed, 
+these models are also called 
+*latent autoregressive models*.
 
 ![A latent autoregressive model.](../img/sequence-model.svg)
 :label:`fig_sequence-model`
 
-Both cases raise the obvious question 
-of how to generate training data. 
-One typically uses historical observations to predict 
-the next observation given the ones up to right now. 
-Obviously we do not expect time to stand still. 
-However, a common assumption is that while 
-the specific values of $x_t$ might change, 
-at least the dynamics of the sequence itself will not. 
-This is reasonable, since novel dynamics are just that, novel,
-and thus not predictable using data that we have so far. 
+To construct training data from historical data, one 
+typically creates examples by sampling windows randomly.
+In general, we do not expect time to stand still. 
+However, we often assume that while 
+the specific values of $x_t$ might change,
+the dynamics according to which each subsequent 
+observation is generated given the previous observations do not. 
 Statisticians call dynamics that do not change *stationary*.
-Regardless of what we do, we will thus get an estimate of the entire sequence via
 
-$$P(x_1, \ldots, x_T) = \prod_{t=1}^T P(x_t \mid x_{t-1}, \ldots, x_1).$$
 
-Note that the above considerations still hold 
-if we deal with discrete objects, such as words, 
-rather than continuous numbers. 
-The only difference is that in such a situation 
-we need to use a classifier rather than a regression model 
-to estimate $P(x_t \mid  x_{t-1}, \ldots, x_1)$.
+
+## Language Models
+
+
+Sometimes, especially when working with language,
+we wish to estimate the joint probability 
+of an entire sequence.
+This is a common task when working with sequences
+composed of discrete tokens, such as words. 
+Generally, these estimated functions are called *sequence models* 
+and for natural language data, they are called *language models*.
+The field of sequence modeling has been driven so much by NLP,
+that we often describe sequence models as "language models",
+even when dealing with non-language data. 
+Language models prove useful for all sorts of reasons.
+Sometimes we want to evaluate the likelihood of sentences.
+For example, we might wish to compare 
+the naturalness of two candidate outputs 
+generated by a machine translation systems
+or by a speech recognition system.
+But language modeling gives us not only 
+the capacity to *evaluate* likelihood,
+but the ability to *sample* sequences,
+and even to optimize for the most likely sequences.
+
+While language modeling might not look, at first glance,
+like an autoregressive problem,
+we can reduce language modeling to autogregressive prediction
+by decomposing the joint density  of a sequence $p(x_t| x_1, \ldots, x_T)$
+into the product of conditional densities 
+in a left-to-right fashion
+by applying the chain rule of probability:
+
+$$P(x_1, \ldots, x_T) = P(x_1) * \prod_{t=2}^T P(x_t \mid x_{t-1}, \ldots, x_1).$$
+
+Note that if we are working with discrete signals like words,
+then the autoregressive model must be a probabilistic classifier,
+outputting a full probability distribution
+over the vocabulary for what word will come next,
+given the leftwards context.
+
 
 
 ### Markov Models
 :label:`subsec_markov-models`
 
-Recall the approximation that in an autoregressive model
-we use only $x_{t-1}, \ldots, x_{t-\tau}$,
-instead of $x_{t-1}, \ldots, x_1$ to estimate $x_t$. 
-Whenever this approximation is accurate we say 
-that the sequence satisfies a *Markov condition*. 
-In particular, if $\tau = 1$, we have a *first-order Markov model*,
-and $P(x)$ is given by
+
+Now suppose that we wish to employ the strategy mentioned above,
+where we condition only on the $\tau$ previous sequence steps,
+i.e., $x_{t-1}, \ldots, x_{t-\tau}$, rather than 
+the entire sequence history $x_{t-1}, \ldots, x_1$.
+Whenever we can throw away the history 
+beyond the precious $\tau$ steps 
+without any loss in predictive power,
+we say that the sequence satisfies a *Markov condition*,
+i.e., *that the future is conditionally independent of the past,
+given the recent history*. 
+When $\tau = 1$, we say that the data is characterized 
+by a *first-order Markov model*,
+and when $\tau = k$, we say that the data is characterized
+by a $k$-th order Markov model.
+For when the first-order Markov condition holds ($\tau = 1$)
+the factorization of our joint probability becomes a product
+of probabilities of each word given the previous *word*:
 
 $$P(x_1, \ldots, x_T) = \prod_{t=1}^T P(x_t \mid x_{t-1}) \text{ where } P(x_1 \mid x_0) = P(x_1).$$
 
-Such models are particularly nice whenever $x_t$ assumes only a discrete value, 
-since in this case dynamic programming can be used 
-to compute values along the chain exactly. 
-For instance, we can compute $P(x_{t+1} \mid x_{t-1})$ efficiently:
-
-$$\begin{aligned}
-P(x_{t+1} \mid x_{t-1})
-&= \frac{\sum_{x_t} P(x_{t+1}, x_t, x_{t-1})}{P(x_{t-1})}\\
-&= \frac{\sum_{x_t} P(x_{t+1} \mid x_t, x_{t-1}) P(x_t, x_{t-1})}{P(x_{t-1})}\\
-&= \sum_{x_t} P(x_{t+1} \mid x_t) P(x_t \mid x_{t-1})
-\end{aligned}
-$$
-
-by using the fact that we only need to take into account 
-for a very short history of past observations: 
-$P(x_{t+1} \mid x_t, x_{t-1}) = P(x_{t+1} \mid x_t)$.
-Going into details of dynamic programming 
-is beyond the scope of this section. 
-Control and reinforcement learning algorithms use such tools extensively.
+We often find it useful to work with models that proceed 
+as though a Markov condition were satisfied,
+even when we know that this is only *approximately* true. 
+With real text documents we continue to gain information
+as we include more and more leftwards context.
+But these gains diminish rapidly.
+Thus, sometimes we compromise, obviating computational and statistical difficulties
+by training models whose validity depends 
+on a $k$-th order Markov condition.
+Even today's massive RNNs- and Transformer-based language models 
+seldom incorporate more than a thousand words of context.
 
 
+With discrete data, a true Markov model
+simply counts the number of times 
+that each word has occurred in each context, producing 
+the relative frequency estimate of $P(x_t \mid x_{t-1})$.
+Whenever the data assume only discrete values 
+(as in language),
+the most likely sequence of words can be computed efficiently
+using dynamic programming. 
 
-### Causality
 
-<!--  cut? -->
+### The Order of Decoding
+
+You might be wondering, why did we have to represent 
+the factorization of a text sequence $P(x_1, \ldots, x_T)$
+as a left-to-right chain of conditional probabilities.
+Why not right-to-left or some other, seemingly random order?
 In principle, there is nothing wrong with unfolding 
 $P(x_1, \ldots, x_T)$ in reverse order. 
-After all, by conditioning we can always write it via
+The result is a valid factorization:
 
 $$P(x_1, \ldots, x_T) = \prod_{t=T}^1 P(x_t \mid x_{t+1}, \ldots, x_T).$$
 
-In fact, if we have a Markov model, we can obtain 
-a reverse conditional probability distribution, too.
-In many cases, however, there exists a natural direction for the data,
-namely going forward in time. 
-It is clear that future events cannot influence the past. 
+
+However, there are many reasons why factorizing text
+in the same directions as we read it 
+(left-to-right for most languages,
+but right-to-left for Arabic and Hebrew)
+is preferred for the task of language modeling.
+First, this is just a more natural direction for us to think about.
+After all we all read text every day, 
+and this process is guided by our ability
+to anticipate what words and phrases 
+are likely to come next.
+Just think of how many times you have completed 
+someone else's sentence. 
+Thus, even if we had no other reason to prefer such in-order decodings, 
+they would be useful if only because we have better intuitions 
+for what should be likely when predicting in this order. 
+
+Second, by factorizing in order, 
+we can assign probabilities to arbitrarily long sequences
+using the same language model. 
+To convert a probability over steps $1$ through $t$ 
+into one that extends to word $t+1$ we simply
+multiply by the conditional probability 
+$P(x_{t+1} \mid x_{t+1}, \ldots, x_T)$.
+
+Third, we have stronger predictive models 
+for predicting adjacent words versus 
+words at arbitrary other locations. 
+While all orders of factorization are valid,
+they do not necessarily all represent equally easy
+predictive modeling problems. 
+This is true not only for language,
+but for other kinds of data as well,
+e.g., when the data are causally structured.
+For example, we believe that future events cannot influence the past. 
 Hence, if we change $x_t$, we may be able to influence 
 what happens for $x_{t+1}$ going forward but not the converse. 
 That is, if we change $x_t$, the distribution over past events will not change. 
-Consequently, it ought to be easier to explain $P(x_{t+1} \mid x_t)$ 
-rather than $P(x_t \mid x_{t+1})$. For instance, 
-it has been shown that in some cases we can find 
-$x_{t+1} = f(x_t) + \epsilon$ for some additive noise $\epsilon$, 
+In some contexts, this makes it easier to predict $P(x_{t+1} \mid x_t)$ 
+than to predict $P(x_t \mid x_{t+1})$. 
+For instance, in some cases, we can find $x_{t+1} = f(x_t) + \epsilon$ 
+for some additive noise $\epsilon$, 
 whereas the converse is not true :cite:`Hoyer.Janzing.Mooij.ea.2009`. 
 This is great news, since it is typically the forward direction 
 that we are interested in estimating.
@@ -249,6 +358,7 @@ We are barely scratching the surface of it.
 
 
 ## Training
+
 <!-- fix -->
 After reviewing many different statistical tools, let's try this out in practice.
 
