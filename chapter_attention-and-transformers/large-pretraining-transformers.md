@@ -160,61 +160,11 @@ predicted curve. Embedding parameters are excluded from compute and parameter co
 :label:`fig_scaling-gpt3`
 
 
-The empirical scaling behaviors in :cite:`kaplan2020scaling` have been tested in subsequent works. For example, GPT-3 provides another empirical evidence with two more orders of magnitude in :numref:`fig_scaling-gpt3`.
+The empirical scaling behaviors in :cite:`kaplan2020scaling` have been tested in subsequent works. For example, GPT-3 supported this hypothesis with two more orders of magnitude in :numref:`fig_scaling-gpt3`.
+
+The scalability of transformers in the GPT series have inspired many transformer language models. While the transformer decoder in GPT-3 was largely followed in OPT (Open Pretrained Transformers) :cite:`zhang2022opt` using only 1/7th the carbon footprint of the former, the GPT-2 transformer decoder was used in training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens achieved state-of-the-art performance across the majority on 152 diverse tasks. Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks. To continue the scaling line of language modeling, PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`.
 
 
-
-
-
-:Pretraining BERT, T5, and GPT-3 at multiple 
-
-|Model|Parameters| Data (training tokens)|
-|:--|:-|:-|
-|GPT|100M | | 
-|BERT-Base|109M |250B | 
-|BERT-Large|355M  |250B |
-|GPT-2|1.5B | |
-|T5-Base|220M  |1000B |
-|T5-Large| 770M  |1000B | 
-|T5-11B|11B  |1000B | 
-|GPT-3|175B  |300B |
-:label:`tab_bert-t5-gpt-scale`
-
-
-### Scaling Laws
-
-<!--
-Scaling laws for neural LM :cite:`kaplan2020scaling`
-Scaling laws for transfer :cite:`hernandez2021scaling`
-Scale efficiently :cite:`tay2021scale`
--->
-
-
-
-
-
-
-### Larger Models 
-
-
-<!--
-GLaM :cite:`du2021glam`
-Gopher :cite:`rae2021scaling`
-Megatron-Turing NLG 530B :cite:`smith2022using`
-
-LaMDA :cite:`thoppilan2022lamda`
-Chinchilla :cite:`hoffmann2022training`
-Gopher :cite:`zhang2022opt`
-PaLM :cite:`chowdhery2022palm`
--->
-
-
-
-Emergent Abilities
-
-<!--
-Emergent Abilities :cite:`wei2022emergent`
--->
 
 
 
