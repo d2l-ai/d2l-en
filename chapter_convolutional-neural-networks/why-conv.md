@@ -132,19 +132,19 @@ Suppose that $\mathbf{U}$ contains biases,
 we could formally express the fully connected layer as
 
 $$\begin{aligned} \left[\mathbf{H}\right]_{i, j} &= [\mathbf{U}]_{i, j} + \sum_k \sum_l[\mathsf{W}]_{i, j, k, l}  [\mathbf{X}]_{k, l}\\ &=  [\mathbf{U}]_{i, j} +
-\sum_a \sum_b [\mathsf{V}]_{i, j, a, b}  [\mathbf{X}]_{i+a, j+b}.\end{aligned}$$
+\sum_{i+a} \sum_{j+b} [\mathsf{V}]_{i, j, i+a, j+b}  [\mathbf{X}]_{i+a, j+b}.\end{aligned}$$
 
 The switch from $\mathsf{W}$ to $\mathsf{V}$ is entirely cosmetic for now
 since there is a one-to-one correspondence
 between coefficients in both fourth-order tensors.
 We simply re-index the subscripts $(k, l)$
 such that $k = i+a$ and $l = j+b$.
-In other words, we set $[\mathsf{V}]_{i, j, a, b} = [\mathsf{W}]_{i, j, i+a, j+b}$.
-The indices $a$ and $b$ run over both positive and negative offsets,
+In other words, we set $[\mathsf{V}]_{i, j, i+a, j+b} = [\mathsf{W}]_{i, j, k, l}$.
+The indices $i+a$ and $j+b$ run over both positive and negative offsets,
 covering the entire image.
 For any given location ($i$, $j$) in the hidden representation $[\mathbf{H}]_{i, j}$,
 we compute its value by summing over pixels in $x$,
-centered around $(i, j)$ and weighted by $[\mathsf{V}]_{i, j, a, b}$. Before we carry on, let's consider the total number of parameters required for a *single* layer in this parametrization: a $1000 \times 1000$ image (1 megapixel) is mapped to a $1000 \times 1000$ hidden representation. This requires $10^{12}$ parameters, far beyond what computers currently can handle.  
+centered around $(i, j)$ and weighted by $[\mathsf{V}]_{i, j, i+a, j+b}$. Before we carry on, let's consider the total number of parameters required for a *single* layer in this parametrization: a $1000 \times 1000$ image (1 megapixel) is mapped to a $1000 \times 1000$ hidden representation. This requires $10^{12}$ parameters, far beyond what computers currently can handle.  
 
 ### Translation Invariance
 
@@ -153,17 +153,17 @@ established above: translation invariance :cite:`Zhang.ea.1988`.
 This implies that a shift in the input $\mathbf{X}$
 should simply lead to a shift in the hidden representation $\mathbf{H}$.
 This is only possible if $\mathsf{V}$ and $\mathbf{U}$ do not actually depend on $(i, j)$. As such,
-we have $[\mathsf{V}]_{i, j, a, b} = [\mathbf{V}]_{a, b}$ and $\mathbf{U}$ is a constant, say $u$.
+we have $[\mathsf{V}]_{i, j, i+a, j+b} = [\mathbf{V}]_{i+a, j+b}$ and $\mathbf{U}$ is a constant, say $u$.
 As a result, we can simplify the definition for $\mathbf{H}$:
 
-$$[\mathbf{H}]_{i, j} = u + \sum_a\sum_b [\mathbf{V}]_{a, b}  [\mathbf{X}]_{i+a, j+b}.$$
+$$[\mathbf{H}]_{i, j} = u + \sum_{i+a}\sum_{j+b} [\mathbf{V}]_{i+a, j+b}  [\mathbf{X}]_{i+a, j+b}.$$
 
 
 This is a *convolution*!
 We are effectively weighting pixels at $(i+a, j+b)$
-in the vicinity of location $(i, j)$ with coefficients $[\mathbf{V}]_{a, b}$
+in the vicinity of location $(i, j)$ with coefficients $[\mathbf{V}]_{i+a, j+b}$
 to obtain the value $[\mathbf{H}]_{i, j}$.
-Note that $[\mathbf{V}]_{a, b}$ needs many fewer coefficients than $[\mathsf{V}]_{i, j, a, b}$ since it
+Note that $[\mathbf{V}]_{i+a, j+b}$ needs many fewer coefficients than $[\mathsf{V}]_{i, j, i+a, j+b}$ since it
 no longer depends on the location within the image. Consequently, the number of parameters required is no longer $10^{12}$ but a much more reasonable $4 \cdot 10^6$: we still have the dependency on $a, b \in (-1000, 1000)$. In short, we have made significant progress. Time-delay neural networks (TDNNs) are some of the first examples to exploit this idea :cite:`Waibel.Hanazawa.Hinton.ea.1989`.
 
 ###  Locality
@@ -177,7 +177,7 @@ This means that outside some range $|a|> \Delta$ or $|b| > \Delta$,
 we should set $[\mathbf{V}]_{a, b} = 0$.
 Equivalently, we can rewrite $[\mathbf{H}]_{i, j}$ as
 
-$$[\mathbf{H}]_{i, j} = u + \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} [\mathbf{V}]_{a, b}  [\mathbf{X}]_{i+a, j+b}.$$
+$$[\mathbf{H}]_{i, j} = u + \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} [\mathbf{V}]_{i+a, j+b}  [\mathbf{X}]_{i+a, j+b}.$$
 :eqlabel:`eq_conv-layer`
 
 This reduces the number of parameters from $4 \cdot 10^6$ to $4 \Delta^2$, where $\Delta$ is typically smaller than $10$. As such, we reduced the number of parameters by another 4 orders of magnitude. Note that :eqref:`eq_conv-layer`, in a nutshell, is what is called a *convolutional layer*. 
