@@ -747,7 +747,7 @@ Let's try this out.  Suppose that $\mathbf{X}$ is a $n \times m$ matrix, $\mathb
 $$\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2} = \;?$$
 :eqlabel:`eq_mat_goal_2`
 
-This computation is important in an area called matrix factorization.  For us, however, it is just a derivative to compute.  Let's try to imaging what this would be for $1\times1$ matrices.  In that case, we get the expression
+This computation is important in an area called matrix factorization.  For us, however, it is just a derivative to compute.  Let's try to imagine what this would be for $1\times1$ matrices.  In that case, we get the expression
 
 $$
 \frac{d}{dv} (x-uv)^{2}= -2(x-uv)u,
