@@ -311,7 +311,7 @@ with torch.no_grad():
     ax.plot(test_x.numpy(), observed_pred.mean.numpy(), linewidth=2.)
     ax.fill_between(test_x.numpy(), lower.numpy(), upper.numpy(), alpha=0.25)
     ax.set_ylim([-1.5, 1.5])
-    ax.legend(['True Function', 'Predictive Mean', 'Observed Data', 'Credible Set'])
+    ax.legend(['True Function', 'Predictive Mean', 'Observed Data', '95% Credible Set'])
 ```
 
 We see the fits are virtually identical. A few things to note: GPyTorch is working with _squared_ length-scales and observation noise. For example, our learned noise standard deviation in the for scratch code is about 0.283. The noise variance found by GPyTorch is $0.81 \approx 0.283^2$. In the GPyTorch plot, we also show the credible set in the _observation space_ rather than the latent function space, to demonstrate that they indeed cover the observed datapoints.
