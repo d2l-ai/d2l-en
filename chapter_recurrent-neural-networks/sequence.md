@@ -206,7 +206,7 @@ Statisticians call dynamics that do not change *stationary*.
 
 
 
-## Language Models
+## Sequence Models
 
 
 Sometimes, especially when working with language,
@@ -329,8 +329,9 @@ we can assign probabilities to arbitrarily long sequences
 using the same language model. 
 To convert a probability over steps $1$ through $t$ 
 into one that extends to word $t+1$ we simply
-multiply by the conditional probability 
-$P(x_{t+1} \mid x_{t+1}, \ldots, x_T)$.
+multiply by the conditional probability
+of the additional token given the previous ones:
+$P(x_{t+1}, \ldots, x_1) = P(x_{t}, \ldots, x_1) \cdot P(x_{t+1} \mid x_{t}, \ldots, x_1)$.
 
 Third, we have stronger predictive models 
 for predicting adjacent words versus 
@@ -359,8 +360,9 @@ We are barely scratching the surface of it.
 
 ## Training
 
-<!-- fix -->
-After reviewing many different statistical tools, let's try this out in practice.
+Before we focus our attentions on text data,
+let's first try this out with some 
+continuous-valued synthetic data.
 
 ```{.python .input  n=6}
 %load_ext d2lbook.tab
@@ -391,10 +393,11 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-We begin by generating some data.
-To keep things simple we 
-(**generate our sequence data by using a sine function
-with some additive noise for time steps $1, 2, \ldots, 1000$.**)
+(**Here, our 1000 synthetic data will follow 
+the trigonometric `sin` function,
+applied to .01 times the time step. 
+To make the problem a little more interesting,
+we corrupt each sample with additive noise.**)
 
 ```{.python .input  n=10}
 %%tab all
@@ -411,23 +414,24 @@ data = Data()
 d2l.plot(data.time, data.x, 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
-Next, we need to turn such a sequence into features and labels 
-<!-- language -->
-that our model can train on.
-With a Markov assumption that $x_t$ only depends 
-on observations at the past $\tau$ time steps,
-we [**construct examples with labels $y_t = x_t$ and features 
+From this sequence we extract training examples,
+each consisting of features and a label.
+
+To begin, we try a model that acts as though 
+the data satisfied a $\tau$-order Markov condition,
+and thus predicts $x_t$ using only the past $\tau$ observations.
+[**Thus for each timestep we have an example
+with label $y  = x_t$ and features 
 $\mathbf{x}_t = [x_{t-\tau}, \ldots, x_{t-1}]$.**]
 The astute reader might have noticed that 
-this gives us $\tau$ fewer data examples,
-since we do not have sufficient history for $y_1, \ldots, y_\tau$. 
+this results in 1000-$\tau$ examples,
+since we lack sufficient history for $y_1, \ldots, y_\tau$. 
 While we could pad the first $\tau$ sequences with zeros,
 to keep things simple, we drop them for now. 
 The resulting dataset contains $T - \tau$ examples,
-where each input to the model
-has sequence length $\tau$.
+where each input to the model has sequence length $\tau$.
 We (**create a data iterator on the first 600 examples**),
-covering a period of the sine function.
+covering a period of the sin function.
 
 ```{.python .input}
 %%tab all
@@ -440,7 +444,7 @@ def get_dataloader(self, train):
     return self.get_tensorloader([self.features, self.labels], train, i)
 ```
 
-The model to train is simple: just linear regression.
+In this example our model will be a standard linear regression.
 
 ```{.python .input}
 %%tab all
@@ -451,10 +455,8 @@ trainer.fit(model, data)
 
 ## Prediction
 
-Let's see how well the model predicts. 
-The first thing to check is 
-[**predicting what happens just in the next time step**],
-namely the *one-step-ahead prediction*.
+[**To evaluate our model, we first check
+How well our model performs at one-step-ahead prediction**].
 
 ```{.python .input}
 %%tab all
@@ -463,15 +465,22 @@ d2l.plot(data.time[data.tau:], [data.labels, onestep_preds], 'time', 'x',
          legend=['labels', '1-step preds'], figsize=(6, 3))
 ```
 
-The one-step-ahead predictions look nice. 
-Even near the end $t=1000$ the predictions still look trustworthy.
-However, there is just one little problem to this:
-if we observe sequence data only until time step 604 (`n_train + tau`), 
-we cannot hope to receive the inputs 
-for all the future one-step-ahead predictions.
-Instead, we need to use earlier predictions 
-as input to our model for these future predictions, 
-one step at a time:
+The one-step-ahead predictions look good. 
+even near the end $t=1000$.
+
+Now consider, what if we only observe sequence data 
+up until time step 604 (`n_train + tau`)
+but wished to make predictions several steps 
+into the future. 
+Unfortunately, we cannot directly compute 
+the one-step-ahead prediction for time step 609,
+because we do not know the corresponding inputs,
+having seen only up to $x_{604}$.
+We can address this problem by plugging in 
+our earlier predictions as inputs to our model 
+for making subsequent predictions, 
+projecting forward, one step at a time, 
+until reaching the desired sequence step:
 
 $$
 \hat{x}_{605} = f(x_{601}, x_{602}, x_{603}, x_{604}), \\
@@ -518,19 +527,25 @@ d2l.plot([data.time[data.tau:], data.time[data.num_train+data.tau:]],
          'x', legend=['1-step preds', 'multistep preds'], figsize=(6, 3))
 ```
 
-As the above example shows, this is a spectacular failure. 
+Unfortunately, in this case we fail spectacularly. 
 The predictions decay to a constant 
 pretty quickly after a few prediction steps.
-Why did the algorithm work so poorly?
-This is ultimately due to the fact that the errors build up.
+Why did the algorithm perform so much worse 
+when predicting further into the future?
+Ultimately, this owes to the fact 
+that errors build up.
 Let's say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$.
 Now the *input* for step 2 is perturbed by $\epsilon_1$,
 hence we suffer some error in the order of 
-$\epsilon_2 = \bar\epsilon + c \epsilon_1$ for some constant $c$, and so on. 
-The error can diverge rather rapidly from the true observations. 
-This is a common phenomenon. 
-For instance, weather forecasts for the next 24 hours tend to be pretty accurate 
-but beyond that the accuracy declines rapidly. 
+$\epsilon_2 = \bar\epsilon + c \epsilon_1$ 
+for some constant $c$, and so on. 
+The predictions can diverge rapidly
+from the true observations. 
+You may already be familiar 
+with this common phenomenon. 
+For instance, weather forecasts for the next 24 hours
+tend to be pretty accurate but beyond that, 
+accuracy declines rapidly. 
 We will discuss methods for improving this 
 throughout this chapter and beyond.
 
@@ -566,7 +581,8 @@ anything beyond that is almost useless.
 
 ## Summary
 
-* There is quite a difference in difficulty between interpolation and extrapolation. 
+* There is quite a difference in difficulty 
+  between interpolation and extrapolation. 
   Consequently, if you have a sequence, always respect 
   the temporal order of the data when training, 
   i.e., never train on future data.
