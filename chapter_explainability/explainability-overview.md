@@ -135,7 +135,8 @@ d2l.plt.show()
 ## Model Explainability
 In the previous example, we tried to vet simple and complex models via a comparison concerning prediction accuracy and how easily they can be explained.
 
-Often, simple models such as linear regression, logistic regression, and decision trees are easy to interpret (or self-explanatory) but fall short in capturing the intricate patterns in data. Nonetheless, humans have been using easy-to-employ simple models to avoid cognitive overload. For example, emergency medical workers use the [rule of nines](https://en.wikipedia.org/wiki/Wallace_rule_of_nines) :numref:`fig_ruleof9s` to quickly assess a burn's percentage of the total skin; Recreational divers use a [diving planner](https://en.wikipedia.org/wiki/Recreational_Dive_Planner) to determine how long they can safely stay underwater at a given depth to avoid putting too much nitrogen in their bodies which can cause injury or even death.
+
+Often, simple models such as linear regression, logistic regression, and decision trees are easy to interpret (or self-explanatory) but fall short in capturing the intricate patterns in data. Nonetheless, humans have been using easy-to-employ simple models to avoid cognitive overload. For example, emergency medical workers use the [rule of nines](https://en.wikipedia.org/wiki/Wallace_rule_of_nines) (:numref:`fig_ruleof9s`) to quickly assess a burn's percentage of the total skin; Recreational divers use a [diving planner](https://en.wikipedia.org/wiki/Recreational_Dive_Planner) to determine how long they can safely stay underwater at a given depth to avoid putting too much nitrogen in their bodies which can cause injury or even death.
 
 ![Rule of nines for measuring the burn surface area.](../img/ruleof9s.svg)
 :label:`fig_ruleof9s`
