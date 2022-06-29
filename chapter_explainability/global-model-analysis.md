@@ -16,8 +16,6 @@ data = d2l.HeartDiseaseData()
 model = d2l.HeartDiseaseMLP()
 trainer = d2l.Trainer(max_epochs=50)
 trainer.fit(model, data)
-print('Validation accuracy : %.3f' % 
-      model.predict(*next(iter(data.val_dataloader())))) 
 ```
 
 This classifier obtains a decent accuracy score on the validation set. Yet, instead of stopping at this point, we can further scrutinize our model by asking: ***Q1***: What type of errors have been made by the classification model? ***Q2***: How does the model perform on different subgroups? ***Q3***: How does each feature contribute to the model performance? ***Q4***: What is the relationship between target and the features of interest? We will utilize the three global model analysis methods to address these questions.
@@ -51,7 +49,7 @@ def plot_error_map(x_axis, y_axis, fsize=(2.5, 1.5)):
 A confusion matrix provides insights into the error patterns and how the model is confused when making predictions. It can be used to answer ***Q1***. Let's plot the confusion matrix below.
 
 ```{.python .input}
-feat_of_interest = {'sex', 'age','cp', 'chol'}
+feat_of_interest = {'sex', 'age', 'cp', 'chol'}
 error = error_analysis(model, data, feat_of_interest)
 plot_error_map(error.Predicted_Label, error.Actual_Label)
 ```
@@ -74,7 +72,7 @@ plot_error_map(error['sex'], error['Prediction_Status'])
 We can also display the error distributions at a finer granularity with feature crossing (e.g., crossing between age groups and gender groups).
 
 ```{.python .input}
-plot_error_map([pd.cut(error['age'], bins=[0, 45, 65, 120],  right=False,
+plot_error_map([pd.cut(error['age'], bins=[0, 45, 65, 120], right=False,
                        labels=['0:45','46:65','66+']), error['sex']], 
                error['Prediction_Status'], fsize=(6, 1.5))
 ```
@@ -144,9 +142,9 @@ Note that it is quite common to get different results using feature ablation and
 Feature importance scores are helpful in identifying the main drivers, but they don't provide insights about the relationship between input features and predictions. To answer ***Q4***, partial dependence plot (PDP) :cite:`friedman2001greedy` comes to the rescue. PDP is an effective tool to illustrate how the model’s predictions change depending on the values of input features of interest, marginalizing over all other features.  For example, it can show whether the probability of having heart disease increases linearly with age.
 
 Formally, the partial dependence $pd_{x_T}$ between feature $x_T$ and the model's prediction is defined as
-$$
-pd_{x_T}(x_T) = \mathbb{E}_{x_S} [f(x_T, x_S)] \approx \frac{1}{N} \sum_{k=1}^N f(x_T, {x_S}^{(k)}),
-$$
+
+$$pd_{x_T}(x_T) = \mathbb{E}_{x_S} [f(x_T, x_S)] \approx \frac{1}{N} \sum_{k=1}^N f(x_T, {x_S}^{(k)}),$$
+
 where $x_T$ is the feature of interest and $x_S$ are all other features; $N$ is the number of examples; and ${x_S}^{(k)}$ is the value of the $k^{\text{th}}$ sample.
 
 
@@ -183,7 +181,7 @@ def partial_dependence_plot(model, data, features, target,
                        loc=(1.05, 0), fontsize='9')
     else:
         d2l.plt.xlabel(features[0])
-        d2l.plt.ylabel('Probability of target=' + str(target))
+        d2l.plt.ylabel(f'Probability of target={target}')
         if feature_type.lower() in ['cat', 'categorical']:
             d2l.plt.xticks(unique_val_0)
             d2l.plt.bar(unique_val_0, Y_hat) 
