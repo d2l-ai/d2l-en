@@ -71,7 +71,7 @@ where each layer's parameters (both conventional and recurrent)
 are shared across time steps. 
 
 
-![On the left recurrent connections are depicted via cyclic edges. On the right, we unfold the RNN over sequence steps. Here, recurrent edges span adjacent sequenct steps, while conventional connections are computed synchonously.](../img/unfolded-rnn.png) 
+![On the left recurrent connections are depicted via cyclic edges. On the right, we unfold the RNN over sequence steps. Here, recurrent edges span adjacent sequenct steps, while conventional connections are computed synchonously.](../img/unfolded-rnn.svg) 
 :label:`fig-unfolded-rnn`
 
 
@@ -136,7 +136,7 @@ Finally, we describe the method for calculating gradients
 when backpropagating through RNNs and explore some challenges
 that are often encountered when training such networks,
 motivating the modern RNN architectures that will follow 
-in Chapter :numref:`chap_modern_rnn`. 
+in Chapter :numref:`chap_modern_rnn`.
 
 ```toc
 :maxdepth: 2

@@ -4,9 +4,9 @@ dependencies:
   - pip:
     - ..  # d2l
     - mxnet-cu102==1.7.0
-    - torch==1.11.0+cu102
+    - torch==1.12.0+cu102
     - -f https://download.pytorch.org/whl/torch_stable.html
-    - torchvision==0.12.0+cu102
+    - torchvision==0.13.0+cu102
     - -f https://download.pytorch.org/whl/torch_stable.html
     - tensorflow==2.9.1
     - tensorflow-probability==0.17.0
