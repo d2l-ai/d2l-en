@@ -28,7 +28,7 @@ we will design models
 that leverage such attention cues.
 Notably, the Nadaraya-Watson kernel regression
 in 1964 is a simple demonstration of machine learning with *attention mechanisms*.
-Next, we will go on to introduce attention functions
+Next, we will introduce attention functions
 that have been extensively used in
 the design of attention models in deep learning.
 Specifically,
@@ -43,12 +43,12 @@ the more recent
 and *self-attention* designs,
 the *transformer* architecture is solely
 based on attention mechanisms.
-we will go on to describe its original encoder-decoder design for machine translation.
+We will go on to describe its original encoder-decoder design for machine translation.
 Then we will show how its encoder can 
 represent images, leading to the development of vision transformers.
 When training very large models on very large datasets (e.g., 300 million images),
-vision transformers outperform ResNets significantly, demonstrating superior scalability of transformers.
-Thus, transformers have been extensively used in large-scale pretraining, which can be adapted to perform different tasks with model update (e.g., fine tuning) or not (e.g., few shot).
+vision transformers outperform ResNets significantly in image classification, demonstrating superior scalability of transformers.
+Thus, transformers have been extensively used in large-scale *pretraining*, which can be adapted to perform different tasks with model update (e.g., *fine tuning*) or not (e.g., *few shot*).
 In the end, we will review how to pretrain transformers as encoder-only (e.g., BERT), encoder-decoder (e.g., T5), and decoder-only (e.g., GPT series).
 Compelling success of large-scale pretraining with transformers in areas as diverse as
 language,
