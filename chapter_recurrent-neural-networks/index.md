@@ -3,8 +3,8 @@
 
 Up until now, we have focused primarily on fixed-length data.
 When introducing linear and logistic regression 
-in Chapters :numref:`chap_linear` and :numref:`chap_classification`
-and multilayer perceptrons in Chapter :numref:`chap_perceptrons`,
+in :numref:`chap_linear` and :numref:`chap_classification`
+and multilayer perceptrons in :numref:`chap_perceptrons`,
 we were happy to assume that each feature vector $\mathbf{x}_i$
 consisted of a fixed number of components $x_1, \dots, x_d$, 
 where each numerical feature $x_j$
@@ -16,7 +16,7 @@ and each attribute gets its own column.
 Crucially, with tabular data, we seldom 
 assume any particular structure over the columns. 
 
-Subsequently, in Chapter :numref:`chap_cnn`, 
+Subsequently, in :numref:`chap_cnn`, 
 we moved on to image data, where inputs consist 
 of the raw pixel values at each coordinate in an image. 
 Image data hardly fit the bill 
@@ -24,7 +24,7 @@ of a protypical tabular dataset.
 There, we needed to call upon convolutional neural networks (CNNs)
 to handle the hierarchical structure and invariances.
 However, our data were still of fixed length.
-Every Fashion MNIST image is represented 
+Every Fashion-MNIST image is represented 
 as a $28 \times 28$ grid of pixel values.
 Moreover, our goal was to develop a model
 that looked at just one image and then 
@@ -58,21 +58,21 @@ After all, it is the feedforward nature of neural networks
 that makes the order of computation unambiguous.
 However, recurrent edges are defined in a precise way
 that ensures that no such ambiguity can arise.
-Recurrent neural networks are `unrolled` across sequence steps,
-with the same underlying parameters applied at each step.
+Recurrent neural networks are *unrolled* across sequence steps,
+with the *same* underlying parameters applied at each step.
 While the standard connections are applied *synchronously*
 to propagate each layer's activations 
-to the subequent layer *at the same time step*,
+to the subsequent layer *at the same time step*,
 the recurrent connections are *dynamic*,
 passing information across adjacent time steps. 
-As the unfolded view reveals,
+As the unfolded view in :numref:`fig_unfolded-rnn` reveals,
 RNNs can be thought of as feedforward neural networks
 where each layer's parameters (both conventional and recurrent)
 are shared across time steps. 
 
 
-![On the left recurrent connections are depicted via cyclic edges. On the right, we unfold the RNN over sequence steps. Here, recurrent edges span adjacent sequenct steps, while conventional connections are computed synchonously.](../img/unfolded-rnn.svg) 
-:label:`fig-unfolded-rnn`
+![On the left recurrent connections are depicted via cyclic edges. On the right, we unfold the RNN over sequence steps. Here, recurrent edges span adjacent sequence steps, while conventional connections are computed synchronously.](../img/unfolded-rnn.svg) 
+:label:`fig_unfolded-rnn`
 
 
 Like neural networks more broadly,
@@ -91,14 +91,14 @@ machine translation :cite:`Sutskever.Vinyals.Le.2014`,
 and recognizing medical diagnoses :cite:`Lipton.Kale.2016`. 
 We point the reader interested in more 
 background material to a publicly available
-comprehensie review :cite:`Lipton.Berkowitz.Elkan.2015`.
+comprehensive review :cite:`Lipton.Berkowitz.Elkan.2015`.
 We also note that sequentiality is not unique to RNNs.
 For example, the CNNs that we already introduced
 can be adapted to handle data of varying length,
 e.g., images of varying resolution.
 Moreover, RNNs have recently ceded considerable
-Market share to Transformer models, 
-which will be covered in Chapter :numref:`chap_attention`.
+market share to transformer models, 
+which will be covered in :numref:`chap_attention`.
 However, RNNs rose to prominence as the default models
 for handling complex sequential structure in deep learning,
 and remain staple models for sequential modeling to this day.
@@ -121,14 +121,14 @@ Videos can be represented as varying-length sequences of still images.
 
 While sequence models have popped up in countless application areas,
 basic research in the area has been driven predominantly 
-by advances on core tasks in Natural Language Processing (NLP).
+by advances on core tasks in natural language processing (NLP).
 Thus, throughout this chapter, we will focus 
 our exposition and examples on text data.
 If you get the hang of these examples, 
 then applying these models to other data modalities 
 should be relatively straightforward. 
 In the next few sections, we introduce basic
-notation for sequences and some evaluation metrics 
+notation for sequences and some evaluation measures 
 for assessing the quality of sequentially structured model outputs. 
 Next, we discuss basic concepts of a language model 
 and use this discussion to motivate our first RNN models.
@@ -136,7 +136,7 @@ Finally, we describe the method for calculating gradients
 when backpropagating through RNNs and explore some challenges
 that are often encountered when training such networks,
 motivating the modern RNN architectures that will follow 
-in Chapter :numref:`chap_modern_rnn`.
+in :numref:`chap_modern_rnn`.
 
 ```toc
 :maxdepth: 2
