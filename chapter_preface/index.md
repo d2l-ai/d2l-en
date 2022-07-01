@@ -254,7 +254,7 @@ such as how to store and manipulate data,
 and how to apply various numerical operations 
 based on basic concepts from linear algebra, 
 calculus, and probability.
-:numref:`chap_linear` and :numref:`chap_perceptrons`
+:numref:`chap_regression` and :numref:`chap_perceptrons`
 cover the most basic concepts and techniques in deep learning,
 including regression and classification;
 linear models and multilayer perceptrons;
@@ -277,7 +277,7 @@ models that exploit sequential (e.g., temporal)
 structure in data and are commonly used
 for natural language processing 
 and time series prediction.
-In :numref:`chap_attention`, 
+In :numref:`chap_attention-and-transformers`, 
 we introduce a relatively new class of models
 based on so-called attention mechanisms
 that has displaced RNNs as the dominant architecture

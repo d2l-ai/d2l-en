@@ -1,7 +1,7 @@
 # Generalization in Deep Learning
 
 
-In :numref:`chap_linear` and :numref:`chap_classification`,
+In :numref:`chap_regression` and :numref:`chap_classification`,
 we tackled regression and classification problems
 by fitting linear models to training data.
 In both cases, we provided practical algorithms
@@ -272,7 +272,7 @@ Training models until they interpolate noisy data is typically a bad idea.
 
 ## Classical Regularization Methods for Deep Networks
 
-In :numref:`chap_linear`, we described
+In :numref:`chap_regression`, we described
 several  classical regularization techniques
 for constraining the complexity of our models.
 In particular, :numref:`sec_weight_decay`

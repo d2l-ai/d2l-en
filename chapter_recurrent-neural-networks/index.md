@@ -3,7 +3,7 @@
 
 Up until now, we have focused primarily on fixed-length data.
 When introducing linear and logistic regression
-in :numref:`chap_linear` and :numref:`chap_classification`
+in :numref:`chap_regression` and :numref:`chap_classification`
 and multilayer perceptrons in :numref:`chap_perceptrons`,
 we were happy to assume that each feature vector $\mathbf{x}_i$
 consisted of a fixed number of components $x_1, \dots, x_d$,
@@ -98,7 +98,7 @@ can be adapted to handle data of varying length,
 e.g., images of varying resolution.
 Moreover, RNNs have recently ceded considerable
 market share to transformer models,
-which will be covered in :numref:`chap_attention`.
+which will be covered in :numref:`chap_attention-and-transformers`.
 However, RNNs rose to prominence as the default models
 for handling complex sequential structure in deep learning,
 and remain staple models for sequential modeling to this day.
