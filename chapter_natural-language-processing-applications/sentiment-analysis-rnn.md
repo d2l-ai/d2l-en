@@ -1,5 +1,5 @@
 # Sentiment Analysis: Using Recurrent Neural Networks
-:label:`sec_sentiment_rnn`
+:label:`sec_sentiment_rnn` 
 
 
 Like word similarity and analogy tasks,
@@ -130,13 +130,10 @@ class BiRNN(nn.Module):
         # steps. The shape of `outputs` is (no. of time steps, batch size,
         # 2 * no. of hidden units)
         outputs, _ = self.encoder(embeddings)
-        # Concatenate the hidden states of the initial time step and final
-        # time step to use as input of the fully connected layer. Its
-        # shape is (batch size, 4 * no. of hidden units)
-        encoding = torch.cat((outputs[0], outputs[-1]), dim=1)
         # Concatenate the hidden states at the initial and final time steps as
         # the input of the fully connected layer. Its shape is (batch size,
         # 4 * no. of hidden units)
+        encoding = torch.cat((outputs[0], outputs[-1]), dim=1) 
         outs = self.decoder(encoding)
         return outs
 ```

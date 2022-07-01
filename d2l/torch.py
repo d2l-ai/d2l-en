@@ -2413,9 +2413,8 @@ def _get_batch_loss_bert(net, loss, vocab_size, tokens_X,
     l = mlm_l + nsp_l
     return mlm_l, nsp_l, l
 
-d2l.DATA_HUB['aclImdb'] = (
-    'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',
-    '01ada507287d82875905620988597833ad4e0903')
+d2l.DATA_HUB['aclImdb'] = (d2l.DATA_URL + 'aclImdb_v1.tar.gz',
+                          '01ada507287d82875905620988597833ad4e0903')
 
 def read_imdb(data_dir, is_train):
     """Read the IMDb review dataset text sequences and labels.
