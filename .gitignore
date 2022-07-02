@@ -29,3 +29,7 @@ build/
 .idea
 .vscode
 .pytest_cache
+
+test.ipynb
+TODO.txt
+serial.txt
