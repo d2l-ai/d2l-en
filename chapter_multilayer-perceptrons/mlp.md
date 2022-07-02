@@ -3,167 +3,167 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Multilayer Perceptrons
-:label:`sec_mlp`
+# Perceptrons multicouches
+:label:`sec_mlp` 
 
-In :numref:`chap_classification`, we introduced
-softmax regression (:numref:`sec_softmax`),
-implementing the algorithm from scratch
-(:numref:`sec_softmax_scratch`) and using high-level APIs
-(:numref:`sec_softmax_concise`). This allowed us to 
-train classifiers capable of recognizing
-10 categories of clothing from low-resolution images.
-Along the way, we learned how to wrangle data,
-coerce our outputs into a valid probability distribution,
-apply an appropriate loss function,
-and minimize it with respect to our model's parameters.
-Now that we have mastered these mechanics
-in the context of simple linear models,
-we can launch our exploration of deep neural networks,
-the comparatively rich class of models
-with which this book is primarily concerned.
-
-
-## Hidden Layers
-
-We described affine transformations in
-:numref:`subsec_linear_model` as 
-linear transformations with added bias.
-To begin, recall the model architecture
-corresponding to our softmax regression example,
-illustrated in  :numref:`fig_softmaxreg`.
-This model maps inputs directly to outputs
-via a single affine transformation,
-followed by a softmax operation.
-If our labels truly were related
-to the input data by a simple affine transformation,
-then this approach would be sufficient.
-However, linearity (in affine transformations) is a *strong* assumption.
-
-### Limitations of Linear Models
-
-For example, linearity implies the *weaker*
-assumption of *monotonicity*, i.e.,
-that any increase in our feature must
-either always cause an increase in our model's output
-(if the corresponding weight is positive),
-or always cause a decrease in our model's output
-(if the corresponding weight is negative).
-Sometimes that makes sense.
-For example, if we were trying to predict
-whether an individual will repay a loan,
-we might reasonably assume that all other things being equal, 
-an applicant with a higher income
-would always be more likely to repay
-than one with a lower income.
-While monotonic, this relationship likely
-is not linearly associated with the probability of
-repayment. An increase in income from \\$0 to \\$50,000
-likely corresponds to a bigger increase
-in likelihood of repayment
-than an increase from \\$1 million to \\$1.05 million.
-One way to handle this might be to post-process our outcome 
-such that linearity becomes more plausible,
-by using the logistic map (and thus the logarithm of the probability of outcome). 
-
-Note that we can easily come up with examples
-that violate monotonicity.
-Say for example that we want to predict health as a function 
-of body temperature. 
-For individuals with a body temperature
-above 37°C (98.6°F),
-higher temperatures indicate greater risk.
-However, for individuals with body temperatures
-below 37°C, lower temperatures indicate greater risk!
-Again, we might resolve the problem
-with some clever preprocessing, such as using the distance from 37°C 
-as a feature.
+ Dans :numref:`chap_classification` , nous avons introduit
+la régression softmax (:numref:`sec_softmax` ),
+en mettant en œuvre l'algorithme à partir de zéro
+(:numref:`sec_softmax_scratch` ) et en utilisant des API de haut niveau
+(:numref:`sec_softmax_concise` ). Cela nous a permis d'entraîner 
+des classificateurs capables de reconnaître
+10 catégories de vêtements à partir d'images à faible résolution.
+En cours de route, nous avons appris à manipuler les données,
+à contraindre nos sorties à une distribution de probabilité valide,
+à appliquer une fonction de perte appropriée,
+et à la minimiser en fonction des paramètres de notre modèle.
+Maintenant que nous avons maîtrisé ces mécanismes
+dans le contexte de modèles linéaires simples,
+nous pouvons nous lancer dans l'exploration des réseaux de neurones profonds,
+la classe comparativement riche de modèles
+à laquelle ce livre s'intéresse principalement.
 
 
-But what about classifying images of cats and dogs?
-Should increasing the intensity
-of the pixel at location (13, 17)
-always increase (or always decrease)
-the likelihood that the image depicts a dog?
-Reliance on a linear model corresponds to the implicit
-assumption that the only requirement
-for differentiating cats vs. dogs is to assess
-the brightness of individual pixels.
-This approach is doomed to fail in a world
-where inverting an image preserves the category.
+## Couches cachées
 
-And yet despite the apparent absurdity of linearity here,
-as compared with our previous examples,
-it is less obvious that we could address the problem
-with a simple preprocessing fix.
-That is, because the significance of any pixel
-depends in complex ways on its context
-(the values of the surrounding pixels).
-While there might exist a representation of our data
-that would take into account
-the relevant interactions among our features,
-on top of which a linear model would be suitable,
-we simply do not know how to calculate it by hand.
-With deep neural networks, we used observational data
-to jointly learn both a representation via hidden layers
-and a linear predictor that acts upon that representation.
+Nous avons décrit les transformations affines dans
+:numref:`subsec_linear_model` comme 
+des transformations linéaires avec un biais supplémentaire.
+Pour commencer, rappelons l'architecture du modèle
+correspondant à notre exemple de régression softmax,
+illustré dans :numref:`fig_softmaxreg` .
+Ce modèle fait directement correspondre les entrées aux sorties
+via une seule transformation affine,
+suivie d'une opération softmax.
+Si nos étiquettes étaient réellement liées
+aux données d'entrée par une simple transformation affine,
+, cette approche serait suffisante.
+Cependant, la linéarité (dans les transformations affines) est une hypothèse *forte*.
 
-This problem of nonlinearity has been studied for at least a 
-century :cite:`Fisher.1928`. For instance, decision trees
-in their most basic form use a sequence of binary decisions to 
-decide upon class membership :cite:`quinlan2014c4`. Likewise, kernel 
-methods have been used for many decades to model nonlinear dependencies 
-:cite:`Aronszajn.1950`. This has found its way, e.g., into 
-nonparametric spline models :cite:`Wahba.1990` and kernel methods
-:cite:`Scholkopf.Smola.2002`. It is also something that the brain solves 
-quite naturally. After all, neurons feed into other neurons which, 
-in turn, feed into other neurons again :cite:`Cajal.Azoulay.1894`. 
-Consequently we have a sequence of relatively simple transformations. 
+### Limites des modèles linéaires
 
-### Incorporating Hidden Layers
+Par exemple, la linéarité implique l'hypothèse *plus faible*
+de *monotonicité*, c'est-à-dire
+que toute augmentation de notre caractéristique doit
+soit toujours provoquer une augmentation de la sortie de notre modèle
+(si le poids correspondant est positif),
+soit toujours provoquer une diminution de la sortie de notre modèle
+(si le poids correspondant est négatif).
+Parfois, cela a du sens.
+Par exemple, si nous essayions de prédire
+si un individu remboursera un prêt,
+nous pourrions raisonnablement supposer que, toutes choses égales par ailleurs, 
+un demandeur ayant un revenu plus élevé
+serait toujours plus susceptible de rembourser
+qu'un demandeur ayant un revenu plus faible.
+Bien que monotone, cette relation
+n'est probablement pas associée de façon linéaire à la probabilité de remboursement
+. Une augmentation du revenu de \N$0 to \\$50 000
+correspond probablement à une augmentation plus importante
+de la probabilité de remboursement
+qu'une augmentation de \N$1 million to \\$1,05 million.
+Une façon de gérer cela pourrait être de post-traiter notre résultat 
+de sorte que la linéarité devienne plus plausible,
+en utilisant la carte logistique (et donc le logarithme de la probabilité du résultat). 
 
-We can overcome the limitations of linear models
-by incorporating one or more hidden layers.
-The easiest way to do this is to stack
-many fully connected layers on top of each other.
-Each layer feeds into the layer above it,
-until we generate outputs.
-We can think of the first $L-1$ layers
-as our representation and the final layer
-as our linear predictor.
-This architecture is commonly called
-a *multilayer perceptron*,
-often abbreviated as *MLP* (:numref:`fig_mlp`).
+Notez que nous pouvons facilement trouver des exemples
+qui violent la monotonicité.
+Disons par exemple que nous voulons prédire la santé en fonction 
+de la température corporelle. 
+Pour les personnes dont la température corporelle
+est supérieure à 37°C (98,6°F),
+une température plus élevée indique un risque plus important.
+Cependant, pour les individus dont la température corporelle
+est inférieure à 37°C, des températures plus basses indiquent un plus grand risque !
+Là encore, nous pourrions résoudre le problème
+en effectuant un prétraitement astucieux, par exemple en utilisant la distance par rapport à 37°C 
+comme caractéristique.
+
+
+Mais qu'en est-il de la classification des images de chats et de chiens ?
+L'augmentation de l'intensité
+du pixel situé à l'emplacement (13, 17)
+doit-elle toujours augmenter (ou toujours diminuer)
+la probabilité que l'image représente un chien ?
+Le recours à un modèle linéaire correspond à l'hypothèse implicite
+selon laquelle la seule condition
+pour différencier les chats des chiens est d'évaluer
+la luminosité des pixels individuels.
+Cette approche est vouée à l'échec dans un monde
+où l'inversion d'une image préserve la catégorie.
+
+Et pourtant, malgré l'absurdité apparente de la linéarité ici,
+par rapport à nos exemples précédents,
+il est moins évident que nous puissions résoudre le problème
+avec une simple correction de prétraitement.
+En effet, la signification de tout pixel
+dépend de manière complexe de son contexte
+(les valeurs des pixels environnants).
+Bien qu'il puisse exister une représentation de nos données
+qui prendrait en compte
+les interactions pertinentes entre nos caractéristiques,
+sur laquelle un modèle linéaire serait adapté,
+nous ne savons tout simplement pas comment le calculer à la main.
+Avec les réseaux neuronaux profonds, nous avons utilisé des données d'observation
+pour apprendre conjointement une représentation via des couches cachées
+et un prédicteur linéaire qui agit sur cette représentation.
+
+Ce problème de non-linéarité est étudié depuis au moins un 
+siècle :cite:`Fisher.1928` . Par exemple, les arbres de décision
+dans leur forme la plus élémentaire utilisent une séquence de décisions binaires pour 
+décider de l'appartenance à une classe :cite:`quinlan2014c4` . De même, les méthodes à noyau 
+sont utilisées depuis plusieurs décennies pour modéliser les dépendances non linéaires 
+:cite:`Aronszajn.1950` . Ces méthodes ont été utilisées, par exemple, dans les modèles splines non paramétriques 
+ :cite:`Wahba.1990` et les méthodes à noyau
+:cite:`Scholkopf.Smola.2002` . C'est également une question que le cerveau résout 
+tout naturellement. Après tout, les neurones alimentent d'autres neurones qui, 
+à leur tour, alimentent d'autres neurones encore :cite:`Cajal.Azoulay.1894` . 
+Nous avons donc une séquence de transformations relativement simples. 
+
+### Incorporation de couches cachées
+
+Nous pouvons surmonter les limites des modèles linéaires
+en incorporant une ou plusieurs couches cachées.
+La façon la plus simple de le faire est d'empiler
+de nombreuses couches entièrement connectées les unes sur les autres.
+Chaque couche alimente la couche qui la précède,
+jusqu'à ce que nous générions des sorties.
+Nous pouvons considérer les premières couches $L-1$
+ comme notre représentation et la couche finale
+comme notre prédicteur linéaire.
+Cette architecture est communément appelée
+un *perceptron multicouche*,
+souvent abrégé en *MLP* (:numref:`fig_mlp` ).
 
 ![An MLP with a hidden layer of 5 hidden units. ](../img/mlp.svg)
 :label:`fig_mlp`
 
-This MLP has 4 inputs, 3 outputs,
-and its hidden layer contains 5 hidden units.
-Since the input layer does not involve any calculations,
-producing outputs with this network
-requires implementing the computations
-for both the hidden and output layers;
-thus, the number of layers in this MLP is 2.
-Note that both layers are fully connected.
-Every input influences every neuron in the hidden layer,
-and each of these in turn influences
-every neuron in the output layer. Alas, we are not quite
-done yet. 
+Ce MLP a 4 entrées, 3 sorties,
+et sa couche cachée contient 5 unités cachées.
+Étant donné que la couche d'entrée n'implique aucun calcul,
+la production de sorties avec ce réseau
+nécessite la mise en œuvre des calculs
+pour les couches cachées et de sortie ;
+ainsi, le nombre de couches dans ce MLP est de 2.
+Notez que les deux couches sont entièrement connectées.
+Chaque entrée influence chaque neurone de la couche cachée,
+et chacun d'eux influence à son tour
+chaque neurone de la couche de sortie. Hélas, nous n'avons pas encore tout à fait terminé
+. 
 
-### From Linear to Nonlinear
+### Du linéaire au non linéaire
 
-As before, we denote by the matrix $\mathbf{X} \in \mathbb{R}^{n \times d}$
-a minibatch of $n$ examples where each example has $d$ inputs (features).
-For a one-hidden-layer MLP whose hidden layer has $h$ hidden units,
-we denote by $\mathbf{H} \in \mathbb{R}^{n \times h}$
-the outputs of the hidden layer, which are
-*hidden representations*.
-Since the hidden and output layers are both fully connected,
-we have hidden-layer weights $\mathbf{W}^{(1)} \in \mathbb{R}^{d \times h}$ and biases $\mathbf{b}^{(1)} \in \mathbb{R}^{1 \times h}$
-and output-layer weights $\mathbf{W}^{(2)} \in \mathbb{R}^{h \times q}$ and biases $\mathbf{b}^{(2)} \in \mathbb{R}^{1 \times q}$.
-This allows us to calculate the outputs $\mathbf{O} \in \mathbb{R}^{n \times q}$
-of the one-hidden-layer MLP as follows:
+Comme précédemment, nous désignons par la matrice $\mathbf{X} \in \mathbb{R}^{n \times d}$
+ un minibatch d'exemples $n$ où chaque exemple possède $d$ entrées (caractéristiques).
+Pour un MLP à une couche cachée dont la couche cachée comporte $h$ unités cachées,
+nous désignons par $\mathbf{H} \in \mathbb{R}^{n \times h}$
+ les sorties de la couche cachée, qui sont
+*représentations cachées*.
+Comme les couches cachée et de sortie sont toutes deux entièrement connectées,
+nous avons les poids de la couche cachée $\mathbf{W}^{(1)} \in \mathbb{R}^{d \times h}$ et les biais $\mathbf{b}^{(1)} \in \mathbb{R}^{1 \times h}$
+ et les poids de la couche de sortie $\mathbf{W}^{(2)} \in \mathbb{R}^{h \times q}$ et les biais $\mathbf{b}^{(2)} \in \mathbb{R}^{1 \times q}$.
+Cela nous permet de calculer les sorties $\mathbf{O} \in \mathbb{R}^{n \times q}$
+ de la MLP à une couche cachée comme suit :
 
 $$
 \begin{aligned}
@@ -172,42 +172,42 @@ $$
 \end{aligned}
 $$
 
-Note that after adding the hidden layer,
-our model now requires us to track and update
-additional sets of parameters.
-So what have we gained in exchange?
-You might be surprised to find out
-that---in the model defined above---*we
-gain nothing for our troubles*!
-The reason is plain.
-The hidden units above are given by
-an affine function of the inputs,
-and the outputs (pre-softmax) are just
-an affine function of the hidden units.
-An affine function of an affine function
-is itself an affine function.
-Moreover, our linear model was already
-capable of representing any affine function.
+Notez qu'après l'ajout de la couche cachée,
+notre modèle nous oblige maintenant à suivre et à mettre à jour
+des ensembles de paramètres supplémentaires.
+Qu'avons-nous donc gagné en échange ?
+Vous pourriez être surpris de découvrir
+que - dans le modèle défini ci-dessus - *nous
+ne gagnons rien pour nos problèmes* !
+La raison en est simple.
+Les unités cachées ci-dessus sont données par
+une fonction affine des entrées,
+et les sorties (présoftmax) sont juste
+une fonction affine des unités cachées.
+Une fonction affine d'une fonction affine
+est elle-même une fonction affine.
+De plus, notre modèle linéaire était déjà
+capable de représenter toute fonction affine.
 
-To see this formally we can just collapse out the hidden layer in the above definition,
-yielding an equivalent single-layer model with parameters
-$\mathbf{W} = \mathbf{W}^{(1)}\mathbf{W}^{(2)}$ and $\mathbf{b} = \mathbf{b}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)}$:
+Pour le voir formellement, il suffit de supprimer la couche cachée dans la définition ci-dessus,
+, ce qui donne un modèle équivalent à une seule couche avec les paramètres
+$\mathbf{W} = \mathbf{W}^{(1)}\mathbf{W}^{(2)}$ et $\mathbf{b} = \mathbf{b}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)}$:
 
 $$
 \mathbf{O} = (\mathbf{X} \mathbf{W}^{(1)} + \mathbf{b}^{(1)})\mathbf{W}^{(2)} + \mathbf{b}^{(2)} = \mathbf{X} \mathbf{W}^{(1)}\mathbf{W}^{(2)} + \mathbf{b}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)} = \mathbf{X} \mathbf{W} + \mathbf{b}.
 $$
 
-In order to realize the potential of multilayer architectures,
-we need one more key ingredient: a
-nonlinear *activation function* $\sigma$
-to be applied to each hidden unit
-following the affine transformation. For instance, a popular
-choice is the ReLU (Rectified Linear Unit) activation function :cite:`Nair.Hinton.2010`
-$\sigma(x) = \mathrm{max}(0, x)$ operating on its arguments element-wise. 
-The outputs of activation functions $\sigma(\cdot)$
-are called *activations*.
-In general, with activation functions in place,
-it is no longer possible to collapse our MLP into a linear model:
+Afin de réaliser le potentiel des architectures multicouches,
+nous avons besoin d'un autre ingrédient clé :
+une *fonction d'activation non linéaire* $\sigma$
+ à appliquer à chaque unité cachée
+après la transformation affine. Par exemple, un choix populaire
+est la fonction d'activation ReLU (Rectified Linear Unit) :cite:`Nair.Hinton.2010` 
+ $\sigma(x) = \mathrm{max}(0, x)$ opérant sur ses arguments élément par élément. 
+Les sorties des fonctions d'activation $\sigma(\cdot)$
+ sont appelées *activations*.
+En général, avec les fonctions d'activation en place,
+il n'est plus possible de réduire notre MLP à un modèle linéaire :
 
 $$
 \begin{aligned}
@@ -216,63 +216,63 @@ $$
 \end{aligned}
 $$
 
-Since each row in $\mathbf{X}$ corresponds to an example in the minibatch,
-with some abuse of notation, we define the nonlinearity
-$\sigma$ to apply to its inputs in a row-wise fashion,
-i.e., one example at a time.
-Note that we used the same notation for softmax
-when we denoted a row-wise operation in :numref:`subsec_softmax_vectorization`.
-Quite frequently the activation functions we use apply not merely row-wise but 
-element-wise. That means that after computing the linear portion of the layer,
-we can calculate each activation
-without looking at the values taken by the other hidden units.
+Puisque chaque ligne de $\mathbf{X}$ correspond à un exemple dans le mini-batch,
+avec un certain abus de notation, nous définissons la non-linéarité
+$\sigma$ pour qu'elle s'applique à ses entrées en fonction des lignes,
+c'est-à-dire un exemple à la fois.
+Notez que nous avons utilisé la même notation pour softmax
+lorsque nous avons indiqué une opération par rangée dans :numref:`subsec_softmax_vectorization` .
+Très souvent, les fonctions d'activation que nous utilisons s'appliquent non seulement par rangée mais aussi par élément ( 
+). Cela signifie qu'après avoir calculé la partie linéaire de la couche,
+nous pouvons calculer chaque activation
+sans regarder les valeurs prises par les autres unités cachées.
 
-To build more general MLPs, we can continue stacking
-such hidden layers,
-e.g., $\mathbf{H}^{(1)} = \sigma_1(\mathbf{X} \mathbf{W}^{(1)} + \mathbf{b}^{(1)})$
-and $\mathbf{H}^{(2)} = \sigma_2(\mathbf{H}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)})$,
-one atop another, yielding ever more expressive models.
+Pour construire des MLP plus généraux, nous pouvons continuer à empiler
+de telles couches cachées,
+par exemple, $\mathbf{H}^{(1)} = \sigma_1(\mathbf{X} \mathbf{W}^{(1)} + \mathbf{b}^{(1)})$
+ et $\mathbf{H}^{(2)} = \sigma_2(\mathbf{H}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)})$,
+les unes sur les autres, pour obtenir des modèles toujours plus expressifs.
 
-### Universal Approximators
+### Approximateurs universels
 
-We know that the brain is capable of very sophisticated statistical analysis. As such, 
-it is worth asking, just *how powerful* a deep network could be. This question
-has been answered multiple times, e.g., in :cite:`Cybenko.1989` in the context 
-of MLPs, and in :cite:`micchelli1984interpolation` in the context of reproducing kernel 
-Hilbert spaces in a way that could be seen as radial basis function (RBF) networks with a single hidden layer. 
-These (and related results) suggest that even with a single-hidden-layer network,
-given enough nodes (possibly absurdly many),
-and the right set of weights,
-we can model any function.
-Actually learning that function is the hard part, though.
-You might think of your neural network
-as being a bit like the C programming language.
-The language, like any other modern language,
-is capable of expressing any computable program.
-But actually coming up with a program
-that meets your specifications is the hard part.
+Nous savons que le cerveau est capable d'analyses statistiques très sophistiquées. À ce titre, 
+il convient de se demander à quel point un réseau profond peut être puissant. Cette question
+a reçu de multiples réponses, par exemple dans :cite:`Cybenko.1989` dans le contexte 
+des MLP, et dans :cite:`micchelli1984interpolation` dans le contexte de la reproduction des espaces de Hilbert à noyau 
+d'une manière qui pourrait être considérée comme des réseaux à fonction de base radiale (RBF) avec une seule couche cachée. 
+Ces résultats (ainsi que d'autres résultats connexes) suggèrent que même avec un réseau à une seule couche cachée,
+si l'on dispose d'un nombre suffisant de nœuds (peut-être absurdement élevé),
+et du bon ensemble de poids,
+on peut modéliser n'importe quelle fonction.
+L'apprentissage de cette fonction est cependant la partie la plus difficile.
+Vous pouvez considérer votre réseau neuronal
+comme un peu comme le langage de programmation C. Le langage, comme n'importe quel autre langage moderne, est le langage de base.
+Ce langage, comme tout autre langage moderne,
+est capable d'exprimer n'importe quel programme calculable.
+Mais la partie la plus difficile est de trouver un programme
+qui réponde à vos spécifications.
 
-Moreover, just because a single-hidden-layer network
-*can* learn any function
-does not mean that you should try
-to solve all of your problems
-with single-hidden-layer networks. In fact, in this case kernel methods 
-are way more effective, since they are capable of solving the problem 
-*exactly* even in infinite dimensional spaces :cite:`Kimeldorf.Wahba.1971,Scholkopf.Herbrich.Smola.2001`. 
-In fact, we can approximate many functions
-much more compactly by using deeper (vs. wider) networks :cite:`Simonyan.Zisserman.2014`.
-We will touch upon more rigorous arguments in subsequent chapters.
+De plus, ce n'est pas parce qu'un réseau à couche unique cachée
+*peut* apprendre n'importe quelle fonction
+que vous devez essayer
+de résoudre tous vos problèmes
+avec des réseaux à couche unique cachée. En fait, dans ce cas, les méthodes à noyau 
+sont bien plus efficaces, car elles sont capables de résoudre le problème 
+*exactement* même dans des espaces de dimension infinie :cite:`Kimeldorf.Wahba.1971,Scholkopf.Herbrich.Smola.2001` . 
+En fait, nous pouvons approximer de nombreuses fonctions
+de manière beaucoup plus compacte en utilisant des réseaux plus profonds (par rapport à des réseaux plus larges) :cite:`Simonyan.Zisserman.2014` .
+Nous aborderons des arguments plus rigoureux dans les chapitres suivants.
 
 
-## Activation Functions
-:label:`subsec_activation-functions`
+## Fonctions d'activation
+:label:`subsec_activation-functions` 
 
-Activation functions decide whether a neuron should be activated or not by
-calculating the weighted sum and further adding bias with it.
-They are differentiable operators to transform input signals to outputs,
-while most of them add non-linearity.
-Because activation functions are fundamental to deep learning,
-(**let's briefly survey some common activation functions**).
+ Les fonctions d'activation décident si un neurone doit être activé ou non en
+calculant la somme pondérée et en y ajoutant un biais.
+Ce sont des opérateurs différentiables qui transforment les signaux d'entrée en sorties,
+alors que la plupart d'entre eux ajoutent de la non-linéarité.
+Les fonctions d'activation étant fondamentales pour l'apprentissage profond,
+(**passons brièvement en revue quelques fonctions d'activation courantes**).
 
 ```{.python .input}
 %%tab mxnet
@@ -296,23 +296,23 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-### ReLU Function
+### Fonction ReLU
 
-The most popular choice,
-due to both simplicity of implementation and
-its good performance on a variety of predictive tasks,
-is the *rectified linear unit* (*ReLU*) :cite:`Nair.Hinton.2010`.
-[**ReLU provides a very simple nonlinear transformation**].
-Given an element $x$, the function is defined
-as the maximum of that element and $0$:
+Le choix le plus populaire,
+en raison à la fois de sa simplicité de mise en œuvre et
+de ses bonnes performances sur une variété de tâches prédictives,
+est l'unité linéaire *rectifiée* (*ReLU*) :cite:`Nair.Hinton.2010` .
+[**ReLU fournit une transformation non linéaire très simple**].
+Étant donné un élément $x$, la fonction est définie
+comme le maximum de cet élément et $0$:
 
-$$\operatorname{ReLU}(x) = \max(x, 0).$$
+$$\operatorname{ReLU}(x) = \max(x, 0).$$ 
 
-Informally, the ReLU function retains only positive
-elements and discards all negative elements
-by setting the corresponding activations to 0.
-To gain some intuition, we can plot the function.
-As you can see, the activation function is piecewise linear.
+ De manière informelle, la fonction ReLU ne retient que les éléments positifs
+et élimine tous les éléments négatifs
+en fixant les activations correspondantes à 0.
+Pour gagner en intuition, nous pouvons tracer la fonction.
+Comme vous pouvez le constater, la fonction d'activation est linéaire par morceaux.
 
 ```{.python .input}
 %%tab mxnet
@@ -337,22 +337,22 @@ y = tf.nn.relu(x)
 d2l.plot(x.numpy(), y.numpy(), 'x', 'relu(x)', figsize=(5, 2.5))
 ```
 
-When the input is negative,
-the derivative of the ReLU function is 0,
-and when the input is positive,
-the derivative of the ReLU function is 1.
-Note that the ReLU function is not differentiable
-when the input takes value precisely equal to 0.
-In these cases, we default to the left-hand-side
-derivative and say that the derivative is 0 when the input is 0.
-We can get away with this because
-the input may never actually be zero (mathematicians would 
-say that it's nondifferentiable on a set of measure zero).
-There is an old adage that if subtle boundary conditions matter,
-we are probably doing (*real*) mathematics, not engineering.
-That conventional wisdom may apply here, or at least, the fact that 
-we are not performing constrained optimization :cite:`Mangasarian.1965,Rockafellar.1970`. 
-We plot the derivative of the ReLU function plotted below.
+Lorsque l'entrée est négative,
+la dérivée de la fonction ReLU est 0,
+et lorsque l'entrée est positive,
+la dérivée de la fonction ReLU est 1.
+Notez que la fonction ReLU n'est pas différentiable
+lorsque l'entrée prend une valeur précisément égale à 0.
+Dans ce cas, nous utilisons par défaut la dérivée de gauche
+et disons que la dérivée est égale à 0 lorsque l'entrée est égale à 0.
+Nous pouvons nous en sortir car
+l'entrée peut ne jamais être nulle (les mathématiciens diraient 
+qu'elle est indifférenciable sur un ensemble de mesure zéro).
+Un vieil adage dit que si des conditions limites subtiles sont importantes,
+nous faisons probablement des mathématiques (*réelles*) et non de l'ingénierie.
+Cette sagesse conventionnelle peut s'appliquer ici, ou du moins, le fait que 
+nous n'effectuons pas une optimisation sous contrainte :cite:`Mangasarian.1965,Rockafellar.1970` . 
+Nous traçons la dérivée de la fonction ReLU représentée ci-dessous.
 
 ```{.python .input}
 %%tab mxnet
@@ -374,67 +374,67 @@ d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of relu',
          figsize=(5, 2.5))
 ```
 
-The reason for using ReLU is that
-its derivatives are particularly well behaved:
-either they vanish or they just let the argument through.
-This makes optimization better behaved
-and it mitigated the well-documented problem
-of vanishing gradients that plagued
-previous versions of neural networks (more on this later).
+La raison pour laquelle nous utilisons ReLU est que
+ses dérivées se comportent particulièrement bien :
+soit elles disparaissent, soit elles laissent passer l'argument.
+Cela rend l'optimisation plus efficace
+et atténue le problème bien documenté
+des gradients évanescents qui affectait
+les versions précédentes des réseaux neuronaux (nous y reviendrons plus tard).
 
-Note that there are many variants to the ReLU function,
-including the *parameterized ReLU* (*pReLU*) function :cite:`He.Zhang.Ren.ea.2015`.
-This variation adds a linear term to ReLU,
-so some information still gets through,
-even when the argument is negative:
+Notez qu'il existe de nombreuses variantes de la fonction ReLU,
+dont la fonction *ReLU* paramétrée (*pReLU*) :cite:`He.Zhang.Ren.ea.2015` .
+Cette variante ajoute un terme linéaire à ReLU,
+de sorte que certaines informations sont toujours transmises,
+même lorsque l'argument est négatif :
 
-$$\operatorname{pReLU}(x) = \max(0, x) + \alpha \min(0, x).$$
+$$\operatorname{pReLU}(x) = \max(0, x) + \alpha \min(0, x).$$ 
 
-### Sigmoid Function
+ ### Fonction Sigmoïde
 
-[**The *sigmoid function* transforms its inputs**],
-for which values lie in the domain $\mathbb{R}$,
-(**to outputs that lie on the interval (0, 1).**)
-For that reason, the sigmoid is
-often called a *squashing function*:
-it squashes any input in the range (-inf, inf)
-to some value in the range (0, 1):
+[**La *fonction sigmoïde* transforme ses entrées**],
+pour lesquelles les valeurs se situent dans le domaine $\mathbb{R}$,
+(**en sorties qui se situent sur l'intervalle (0, 1).**)
+Pour cette raison, la sigmoïde est
+souvent appelée une *fonction d'écrasement* :
+elle écrase toute entrée dans l'intervalle (-inf, inf)
+à une valeur dans l'intervalle (0, 1) :
 
-$$\operatorname{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$$
+$$\operatorname{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$$ 
 
-In the earliest neural networks, scientists
-were interested in modeling biological neurons
-which either *fire* or *do not fire*.
-Thus the pioneers of this field,
-going all the way back to McCulloch and Pitts,
-the inventors of the artificial neuron,
-focused on thresholding units :cite:`McCulloch.Pitts.1943`.
-A thresholding activation takes value 0
-when its input is below some threshold
-and value 1 when the input exceeds the threshold.
+ Dans les premiers réseaux neuronaux, les scientifiques
+étaient intéressés par la modélisation des neurones biologiques
+qui soit *tirent* soit *ne tirent pas*.
+Ainsi, les pionniers de ce domaine,
+en remontant jusqu'à McCulloch et Pitts,
+les inventeurs du neurone artificiel,
+se sont concentrés sur les unités de seuillage :cite:`McCulloch.Pitts.1943` .
+Une activation à seuil prend la valeur 0
+lorsque son entrée est inférieure à un certain seuil
+et la valeur 1 lorsque l'entrée dépasse le seuil.
 
-When attention shifted to gradient based learning,
-the sigmoid function was a natural choice
-because it is a smooth, differentiable
-approximation to a thresholding unit.
-Sigmoids are still widely used as
-activation functions on the output units,
-when we want to interpret the outputs as probabilities
-for binary classification problems: you can think of the sigmoid as a special case of the softmax.
-However, the sigmoid has mostly been replaced
-by the simpler and more easily trainable ReLU
-for most use in hidden layers. Much of this has to do 
-with the fact that the sigmoid poses challenges for optimization
-:cite:`LeCun.Bottou.Orr.ea.1998` since its gradient vanishes for large positive *and* negative arguments. 
-This can lead to plateaus that are difficult to escape from. 
-Nonetheless sigmoids are important. In later chapters (e.g., :numref:`sec_lstm`) on recurrent neural networks,
-we will describe architectures that leverage sigmoid units
-to control the flow of information across time.
+Lorsque l'attention s'est portée sur l'apprentissage basé sur le gradient,
+la fonction sigmoïde était un choix naturel
+parce qu'elle est une approximation lisse et différentiable
+d'une unité de seuillage.
+Les sigmoïdes sont encore largement utilisées comme
+fonctions d'activation sur les unités de sortie,
+lorsque nous voulons interpréter les sorties comme des probabilités
+pour les problèmes de classification binaire : vous pouvez considérer la sigmoïde comme un cas particulier de la softmax.
+Cependant, la sigmoïde a généralement été remplacée
+par la ReLU
+, plus simple et plus facile à entraîner, pour la plupart des utilisations dans les couches cachées. Cela est dû en grande partie 
+au fait que la sigmoïde pose des problèmes d'optimisation
+:cite:`LeCun.Bottou.Orr.ea.1998` car son gradient disparaît pour les arguments positifs * et négatifs * importants. 
+Cela peut conduire à des plateaux dont il est difficile de sortir. 
+Néanmoins, les sigmoïdes sont importantes. Dans les chapitres ultérieurs (par exemple, :numref:`sec_lstm` ) sur les réseaux neuronaux récurrents,
+nous décrirons des architectures qui exploitent les unités sigmoïdes
+pour contrôler le flux d'informations dans le temps.
 
-Below, we plot the sigmoid function.
-Note that when the input is close to 0,
-the sigmoid function approaches
-a linear transformation.
+Ci-dessous, nous traçons la fonction sigmoïde.
+Notez que lorsque l'entrée est proche de 0,
+la fonction sigmoïde se rapproche de
+une transformation linéaire.
 
 ```{.python .input}
 %%tab mxnet
@@ -455,17 +455,17 @@ y = tf.nn.sigmoid(x)
 d2l.plot(x.numpy(), y.numpy(), 'x', 'sigmoid(x)', figsize=(5, 2.5))
 ```
 
-The derivative of the sigmoid function is given by the following equation:
+La dérivée de la fonction sigmoïde est donnée par l'équation suivante :
 
-$$\frac{d}{dx} \operatorname{sigmoid}(x) = \frac{\exp(-x)}{(1 + \exp(-x))^2} = \operatorname{sigmoid}(x)\left(1-\operatorname{sigmoid}(x)\right).$$
+$$\frac{d}{dx} \operatorname{sigmoid}(x) = \frac{\exp(-x)}{(1 + \exp(-x))^2} = \operatorname{sigmoid}(x)\left(1-\operatorname{sigmoid}(x)\right).$$ 
 
-
-The derivative of the sigmoid function is plotted below.
-Note that when the input is 0,
-the derivative of the sigmoid function
-reaches a maximum of 0.25.
-As the input diverges from 0 in either direction,
-the derivative approaches 0.
+ 
+ La dérivée de la fonction sigmoïde est tracée ci-dessous.
+Notez que lorsque l'entrée est 0,
+la dérivée de la fonction sigmoïde
+atteint un maximum de 0,25.
+Lorsque l'entrée diverge de 0 dans un sens ou dans l'autre,
+la dérivée se rapproche de 0.
 
 ```{.python .input}
 %%tab mxnet
@@ -489,15 +489,15 @@ d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of sigmoid',
          figsize=(5, 2.5))
 ```
 
-### Tanh Function
+### Fonction tanh
 
-Like the sigmoid function, [**the tanh (hyperbolic tangent)
-function also squashes its inputs**],
-transforming them into elements on the interval (**between -1 and 1**):
+Comme la fonction sigmoïde, [**la fonction tanh (tangente hyperbolique)
+écrase également ses entrées**],
+en les transformant en éléments sur l'intervalle (**entre -1 et 1**) :
 
-$$\operatorname{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
+$$\operatorname{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$ 
 
-We plot the tanh function below. Note that as input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to that of the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system :cite:`Kalman.Kwasny.1992`.
+ Nous traçons la fonction tanh ci-dessous. Notez que lorsque l'entrée se rapproche de 0, la fonction tanh se rapproche d'une transformation linéaire. Bien que la forme de la fonction soit similaire à celle de la fonction sigmoïde, la fonction tanh présente une symétrie ponctuelle autour de l'origine du système de coordonnées :cite:`Kalman.Kwasny.1992` .
 
 ```{.python .input}
 %%tab mxnet
@@ -518,16 +518,16 @@ y = tf.nn.tanh(x)
 d2l.plot(x.numpy(), y.numpy(), 'x', 'tanh(x)', figsize=(5, 2.5))
 ```
 
-The derivative of the tanh function is:
+La dérivée de la fonction tanh est :
 
-$$\frac{d}{dx} \operatorname{tanh}(x) = 1 - \operatorname{tanh}^2(x).$$
+$$\frac{d}{dx} \operatorname{tanh}(x) = 1 - \operatorname{tanh}^2(x).$$ 
 
-It is plotted below.
-As the input nears 0,
-the derivative of the tanh function approaches a maximum of 1.
-And as we saw with the sigmoid function,
-as input moves away from 0 in either direction,
-the derivative of the tanh function approaches 0.
+ Elle est représentée ci-dessous.
+Lorsque l'entrée se rapproche de 0,
+la dérivée de la fonction tanh s'approche d'un maximum de 1.
+Et comme nous l'avons vu avec la fonction sigmoïde,
+lorsque l'entrée s'éloigne de 0 dans une direction ou dans une autre,
+la dérivée de la fonction tanh s'approche de 0.
 
 ```{.python .input}
 %%tab mxnet
@@ -551,45 +551,45 @@ d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of tanh',
          figsize=(5, 2.5))
 ```
 
-## Summary
+## Résumé
 
-We now know how to incorporate nonlinearities
-to build expressive multilayer neural network architectures.
-As a side note, your knowledge already
-puts you in command of a similar toolkit
-to a practitioner circa 1990.
-In some ways, you have an advantage
-over anyone working in the 1990s,
-because you can leverage powerful
-open-source deep learning frameworks
-to build models rapidly, using only a few lines of code.
-Previously, training these networks
-required researchers to code up layers and derivatives
-explicitly in C, Fortran, or even Lisp (in the case of LeNet). 
+Nous savons maintenant comment incorporer les non-linéarités
+pour construire des architectures de réseaux neuronaux multicouches expressives.
+À titre d'information, vos connaissances
+vous placent déjà aux commandes d'une boîte à outils
+similaire à celle d'un praticien des années 1990.
+D'une certaine manière, vous avez un avantage
+sur toute personne travaillant dans les années 1990,
+car vous pouvez exploiter les puissants cadres d'apprentissage profond open-source
 
-A secondary benefit is that ReLU is significantly more amenable to
-optimization than the sigmoid or the tanh function. One could argue 
-that this was one of the key innovations that helped the resurgence
-of deep learning over the past decade. Note, though, that research in 
-activation functions has not stopped. For instance, the Swish activation 
-function $\sigma(x) = x \operatorname{sigmoid}(\beta x)$ as proposed in
-:cite:`Ramachandran.Zoph.Le.2017` can yield better accuracy 
-in many cases.
+ pour construire des modèles rapidement, en utilisant seulement quelques lignes de code.
+Auparavant, l'entraînement de ces réseaux
+nécessitait que les chercheurs codent les couches et les dérivés
+explicitement en C, Fortran ou même Lisp (dans le cas de LeNet). 
 
-## Exercises
+Un avantage secondaire est que ReLU se prête beaucoup plus à l'optimisation
+que la fonction sigmoïde ou tanh. On pourrait dire que 
+est l'une des innovations clés qui a contribué à la résurgence
+de l'apprentissage profond au cours de la dernière décennie. Notez toutefois que la recherche sur les fonctions d'activation 
+ne s'est pas arrêtée. Par exemple, la fonction d'activation Swish 
+ $\sigma(x) = x \operatorname{sigmoid}(\beta x)$ telle que proposée dans
+:cite:`Ramachandran.Zoph.Le.2017` peut donner une meilleure précision 
+dans de nombreux cas.
 
-1. Show that adding layers to a *linear* deep network, i.e., a network without 
-   nonlinearity $\sigma$ can never increase the expressive power of the network. 
-   Give an example where it actively reduces it. 
-1. Compute the derivative of the pReLU activation function.
-1. Compute the derivative of the Swish activation function $x \operatorname{sigmoid}(\beta x)$. 
-1. Show that an MLP using only ReLU (or pReLU) constructs a 
-   continuous piecewise linear function.
-1. Sigmoid and tanh are very similar. 
-    1. Show that $\operatorname{tanh}(x) + 1 = 2 \operatorname{sigmoid}(2x)$.
-    1. Prove that the function classes parametrized by both nonlinearities are identical. Hint: affine layers have bias terms, too.
-1. Assume that we have a nonlinearity that applies to one minibatch at a time, such as the batch normalization :cite:`Ioffe.Szegedy.2015`. What kinds of problems do you expect this to cause?
-1. Provide an example where the gradients vanish for the sigmoid activation function. 
+## Exercices
+
+1. Montrez que l'ajout de couches à un réseau profond *linéaire*, c'est-à-dire un réseau sans 
+ non-linéarité $\sigma$ ne peut jamais augmenter le pouvoir expressif du réseau. 
+   Donnez un exemple où il le réduit activement. 
+1. Calculez la dérivée de la fonction d'activation pReLU.
+1. Calculez la dérivée de la fonction d'activation Swish $x \operatorname{sigmoid}(\beta x)$. 
+1. Montrez qu'un MLP utilisant uniquement ReLU (ou pReLU) construit une fonction linéaire par morceaux continue 
+.
+1. Sigmoïde et tanh sont très similaires. 
+    1. Montrez que $\operatorname{tanh}(x) + 1 = 2 \operatorname{sigmoid}(2x)$.
+   1. Prouvez que les classes de fonctions paramétrées par les deux non-linéarités sont identiques. Indice : les couches affines ont également des termes de biais.
+1. Supposons que nous ayons une non-linéarité qui s'applique à un seul mini-lot à la fois, comme la normalisation par lot :cite:`Ioffe.Szegedy.2015` . Quels types de problèmes pensez-vous que cela va causer ?
+1. Donnez un exemple où les gradients disparaissent pour la fonction d'activation sigmoïde 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/90)

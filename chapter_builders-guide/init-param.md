@@ -1,30 +1,30 @@
-# Parameter Initialization
+# Initialisation des paramètres
 
-Now that we know how to access the parameters,
-let's look at how to initialize them properly.
-We discussed the need for proper initialization in :numref:`sec_numerical_stability`.
-The deep learning framework provides default random initializations to its layers.
-However, we often want to initialize our weights
-according to various other protocols. The framework provides most commonly
-used protocols, and also allows to create a custom initializer.
+Maintenant que nous savons comment accéder aux paramètres,
+voyons comment les initialiser correctement.
+Nous avons discuté de la nécessité d'une initialisation correcte dans :numref:`sec_numerical_stability` .
+Le cadre d'apprentissage profond fournit des initialisations aléatoires par défaut à ses couches.
+Cependant, nous souhaitons souvent initialiser nos poids
+en fonction de divers autres protocoles. Le cadre fournit les protocoles les plus couramment utilisés
+et permet également de créer un initialisateur personnalisé.
 
 :begin_tab:`mxnet`
-By default, MXNet initializes weight parameters by randomly drawing from a uniform distribution $U(-0.07, 0.07)$,
-clearing bias parameters to zero.
-MXNet's `init` module provides a variety
-of preset initialization methods.
+Par défaut, MXNet initialise les paramètres de poids en tirant au hasard à partir d'une distribution uniforme $U(-0.07, 0.07)$,
+en remettant les paramètres de biais à zéro.
+Le module `init` de MXNet fournit une variété
+de méthodes d'initialisation prédéfinies.
 :end_tab:
 
 :begin_tab:`pytorch`
-By default, PyTorch initializes weight and bias matrices
-uniformly by drawing from a range that is computed according to the input and output dimension.
-PyTorch's `nn.init` module provides a variety
-of preset initialization methods.
+Par défaut, PyTorch initialise les matrices de poids et de biais
+uniformément en tirant d'une plage calculée en fonction de la dimension d'entrée et de sortie.
+Le module `nn.init` de PyTorch fournit une variété
+de méthodes d'initialisation prédéfinies.
 :end_tab:
 
 :begin_tab:`tensorflow`
-By default, Keras initializes weight matrices uniformly by drawing from a range that is computed according to the input and output dimension, and the bias parameters are all set to zero.
-TensorFlow provides a variety of initialization methods both in the root module and the `keras.initializers` module.
+Par défaut, Keras initialise les matrices de poids de manière uniforme en les tirant d'une plage calculée en fonction de la dimension d'entrée et de sortie, et les paramètres de biais sont tous définis à zéro.
+TensorFlow fournit une variété de méthodes d'initialisation à la fois dans le module racine et dans le module `keras.initializers`.
 :end_tab:
 
 ```{.python .input  n=1}
@@ -71,12 +71,12 @@ X = tf.random.uniform((2, 4))
 net(X).shape
 ```
 
-## [**Built-in Initialization**]
+## [**Initialisation intégrée**]
 
-Let's begin by calling on built-in initializers.
-The code below initializes all weight parameters
-as Gaussian random variables
-with standard deviation 0.01, while bias parameters cleared to zero.
+Commençons par faire appel aux initialisateurs intégrés.
+Le code ci-dessous initialise tous les paramètres de poids
+en tant que variables aléatoires gaussiennes
+avec un écart-type de 0,01, tandis que les paramètres de biais sont remis à zéro.
 
 ```{.python .input  n=5}
 %%tab mxnet
@@ -110,8 +110,8 @@ net(X)
 net.weights[0], net.weights[1]
 ```
 
-We can also initialize all the parameters
-to a given constant value (say, 1).
+Nous pouvons également initialiser tous les paramètres
+à une valeur constante donnée (disons, 1).
 
 ```{.python .input  n=8}
 %%tab mxnet
@@ -144,11 +144,11 @@ net(X)
 net.weights[0], net.weights[1]
 ```
 
-[**We can also apply different initializers for certain blocks.**]
-For example, below we initialize the first layer
-with the Xavier initializer
-and initialize the second layer
-to a constant value of 42.
+[**Nous pouvons également appliquer des initialisateurs différents pour certains blocs.**]
+Par exemple, ci-dessous, nous initialisons la première couche
+avec l'initialisateur Xavier
+et nous initialisons la deuxième couche
+à une valeur constante de 42.
 
 ```{.python .input  n=11}
 %%tab mxnet
@@ -190,12 +190,12 @@ print(net.layers[1].weights[0])
 print(net.layers[2].weights[0])
 ```
 
-### [**Custom Initialization**]
+### [**Initialisation personnalisée**]
 
-Sometimes, the initialization methods we need
-are not provided by the deep learning framework.
-In the example below, we define an initializer
-for any weight parameter $w$ using the following strange distribution:
+Parfois, les méthodes d'initialisation dont nous avons besoin
+ne sont pas fournies par le cadre d'apprentissage profond.
+Dans l'exemple ci-dessous, nous définissons un initialisateur
+pour tout paramètre de poids $w$ en utilisant la distribution étrange suivante :
 
 $$
 \begin{aligned}
@@ -208,19 +208,19 @@ $$
 $$
 
 :begin_tab:`mxnet`
-Here we define a subclass of the `Initializer` class.
-Usually, we only need to implement the `_init_weight` function
-which takes a tensor argument (`data`)
-and assigns to it the desired initialized values.
+Nous définissons ici une sous-classe de la classe `Initializer`.
+Habituellement, il suffit d'implémenter la fonction `_init_weight`
+ qui prend un argument tensoriel (`data`)
+et lui attribue les valeurs initialisées souhaitées.
 :end_tab:
 
 :begin_tab:`pytorch`
-Again, we implement a `my_init` function to apply to `net`.
-:end_tab:
+Encore une fois, nous implémentons une fonction `my_init` à appliquer à `net`.
+:end_tab: 
 
-:begin_tab:`tensorflow`
-Here we define a subclass of `Initializer` and implement the `__call__`
-function that return a desired tensor given the shape and data type.
+ :begin_tab:`tensorflow` 
+ Ici, nous définissons une sous-classe de `Initializer` et implémentons la fonction `__call__`
+ qui renvoie un tenseur souhaité en fonction de la forme et du type de données.
 :end_tab:
 
 ```{.python .input  n=14}
@@ -270,8 +270,8 @@ net(X)
 print(net.layers[1].weights[0])
 ```
 
-Note that we always have the option
-of setting parameters directly.
+Notez que nous avons toujours la possibilité
+de définir directement les paramètres.
 
 ```{.python .input  n=17}
 %%tab mxnet
@@ -294,13 +294,13 @@ net.layers[1].weights[0][0, 0].assign(42)
 net.layers[1].weights[0]
 ```
 
-## Summary
+## Résumé
 
-We can initialize parameters using built-in and custom initializers.
+Nous pouvons initialiser des paramètres à l'aide d'initialisateurs intégrés et personnalisés.
 
-## Exercises
+## Exercices
 
-Look up the online documentation for more built-in initializers.
+Recherchez dans la documentation en ligne d'autres initialisateurs intégrés.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/8089)

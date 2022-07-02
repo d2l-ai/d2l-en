@@ -1,8 +1,8 @@
-# Pretraining BERT
-:label:`sec_bert-pretraining`
+# Pré-entraînement de BERT
+:label:`sec_bert-pretraining` 
 
-With the BERT model implemented in :numref:`sec_bert`
-and the pretraining examples generated from the WikiText-2 dataset in :numref:`sec_bert-dataset`, we will pretrain BERT on the WikiText-2 dataset in this section.
+ Avec le modèle BERT implémenté dans :numref:`sec_bert` 
+ et les exemples de pré-entraînement générés à partir du jeu de données WikiText-2 dans :numref:`sec_bert-dataset` , nous allons pré-entraîner BERT sur le jeu de données WikiText-2 dans cette section.
 
 ```{.python .input}
 #@tab mxnet
@@ -19,10 +19,10 @@ import torch
 from torch import nn
 ```
 
-To start, we load the WikiText-2 dataset as minibatches
-of pretraining examples for masked language modeling and next sentence prediction.
-The batch size is 512 and the maximum length of a BERT input sequence is 64.
-Note that in the original BERT model, the maximum length is 512.
+Pour commencer, nous chargeons le jeu de données WikiText-2 sous forme de minibatchs
+d'exemples de pré-entraînement pour la modélisation du langage masqué et la prédiction de la phrase suivante.
+La taille du lot est de 512 et la longueur maximale d'une séquence d'entrée BERT est de 64.
+Notez que dans le modèle BERT original, la longueur maximale est de 512.
 
 ```{.python .input}
 #@tab all
@@ -30,16 +30,16 @@ batch_size, max_len = 512, 64
 train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
 ```
 
-## Pretraining BERT
+## Préformation de BERT
 
-The original BERT has two versions of different model sizes :cite:`Devlin.Chang.Lee.ea.2018`.
-The base model ($\text{BERT}_{\text{BASE}}$) uses 12 layers (transformer encoder blocks)
-with 768 hidden units (hidden size) and 12 self-attention heads.
-The large model ($\text{BERT}_{\text{LARGE}}$) uses 24 layers
-with 1024 hidden units and 16 self-attention heads.
-Notably, the former has 110 million parameters while the latter has 340 million parameters.
-For demonstration with ease,
-we define [**a small BERT, using 2 layers, 128 hidden units, and 2 self-attention heads**].
+Le BERT original a deux versions de modèles de tailles différentes :cite:`Devlin.Chang.Lee.ea.2018` .
+Le modèle de base ($\text{BERT}_{\text{BASE}}$) utilise 12 couches (blocs de transformateurs-codeurs)
+avec 768 unités cachées (taille cachée) et 12 têtes d'auto-attention.
+Le grand modèle ($\text{BERT}_{\text{LARGE}}$) utilise 24 couches
+avec 1024 unités cachées et 16 têtes d'auto-attention.
+Notamment, le premier modèle a 110 millions de paramètres tandis que le second en a 340 millions.
+Pour faciliter la démonstration,
+nous définissons [**un petit BERT, utilisant 2 couches, 128 unités cachées, et 2 têtes d'auto-attention**].
 
 ```{.python .input}
 #@tab mxnet
@@ -58,13 +58,13 @@ devices = d2l.try_all_gpus()
 loss = nn.CrossEntropyLoss()
 ```
 
-Before defining the training loop,
-we define a helper function `_get_batch_loss_bert`.
-Given the shard of training examples,
-this function [**computes the loss for both the masked language modeling and next sentence prediction tasks**].
-Note that the final loss of BERT pretraining
-is just the sum of both the masked language modeling loss
-and the next sentence prediction loss.
+Avant de définir la boucle d'apprentissage,
+nous définissons une fonction d'aide `_get_batch_loss_bert`.
+Étant donné le tesson d'exemples d'entraînement,
+cette fonction [**calcule la perte pour les tâches de modélisation du langage masqué et de prédiction de la phrase suivante**].
+Notez que la perte finale de la préformation de BERT
+est juste la somme de la perte de modélisation du langage masqué
+et de la perte de prédiction de la phrase suivante.
 
 ```{.python .input}
 #@tab mxnet
@@ -120,14 +120,14 @@ def _get_batch_loss_bert(net, loss, vocab_size, tokens_X,
     return mlm_l, nsp_l, l
 ```
 
-Invoking the two aforementioned helper functions,
-the following `train_bert` function
-defines the procedure to [**pretrain BERT (`net`) on the WikiText-2 (`train_iter`) dataset**].
-Training BERT can take very long.
-Instead of specifying the number of epochs for training
-as in the `train_ch13` function (see :numref:`sec_image_augmentation`),
-the input `num_steps` of the following function
-specifies the number of iteration steps for training.
+En invoquant les deux fonctions d'aide susmentionnées,
+la fonction suivante `train_bert`
+ définit la procédure pour [**prétraîner BERT (`net`) sur le jeu de données WikiText-2 (`train_iter`)**].
+L'entraînement de BERT peut être très long.
+Au lieu de spécifier le nombre d'époques pour l'entraînement
+comme dans la fonction `train_ch13` (voir :numref:`sec_image_augmentation` ),
+l'entrée `num_steps` de la fonction suivante
+spécifie le nombre d'étapes d'itération pour l'entraînement.
 
 ```{.python .input}
 #@tab mxnet
@@ -217,8 +217,8 @@ def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):
           f'{str(devices)}')
 ```
 
-We can plot both the masked language modeling loss and the next sentence prediction loss
-during BERT pretraining.
+Nous pouvons tracer à la fois la perte de modélisation du langage masqué et la perte de prédiction de la phrase suivante
+pendant le pré-entraînement de BERT.
 
 ```{.python .input}
 #@tab all
@@ -227,10 +227,10 @@ train_bert(train_iter, net, loss, len(vocab), devices, 50)
 
 ## [**Representing Text with BERT**]
 
-After pretraining BERT,
-we can use it to represent single text, text pairs, or any token in them.
-The following function returns the BERT (`net`) representations for all tokens
-in `tokens_a` and `tokens_b`.
+Après le pré-entraînement de BERT,
+nous pouvons l'utiliser pour représenter un texte unique, des paires de textes ou n'importe quel token.
+La fonction suivante renvoie les représentations de BERT (`net`) pour tous les tokens
+dans `tokens_a` et `tokens_b`.
 
 ```{.python .input}
 #@tab mxnet
@@ -255,15 +255,15 @@ def get_bert_encoding(net, tokens_a, tokens_b=None):
     return encoded_X
 ```
 
-[**Consider the sentence "a crane is flying".**]
-Recall the input representation of BERT as discussed in :numref:`subsec_bert_input_rep`.
-After inserting special tokens “&lt;cls&gt;” (used for classification)
-and “&lt;sep&gt;” (used for separation),
-the BERT input sequence has a length of six.
-Since zero is the index of the “&lt;cls&gt;” token,
-`encoded_text[:, 0, :]` is the BERT representation of the entire input sentence.
-To evaluate the polysemy token "crane",
-we also print out the first three elements of the BERT representation of the token.
+[**Considérons la phrase "une grue est en train de voler".**]
+Rappelons la représentation d'entrée de BERT telle que discutée dans :numref:`subsec_bert_input_rep` .
+Après avoir inséré les tokens spéciaux "&lt;cls&gt;" (utilisés pour la classification)
+et "&lt;sep&gt;" (utilisés pour la séparation),
+la séquence d'entrée de BERT a une longueur de six.
+Puisque zéro est l'index du token "&lt;cls&gt;",
+`encoded_text[:, 0, :]` est la représentation BERT de la phrase d'entrée entière.
+Pour évaluer le token polysémique "grue",
+nous imprimons également les trois premiers éléments de la représentation BERT du token.
 
 ```{.python .input}
 #@tab all
@@ -275,11 +275,11 @@ encoded_text_crane = encoded_text[:, 2, :]
 encoded_text.shape, encoded_text_cls.shape, encoded_text_crane[0][:3]
 ```
 
-[**Now consider a sentence pair
-"a crane driver came" and "he just left".**]
-Similarly, `encoded_pair[:, 0, :]` is the encoded result of the entire sentence pair from the pretrained BERT.
-Note that the first three elements of the polysemy token "crane" are different from those when the context is different.
-This supports that BERT representations are context-sensitive.
+[**Considérons maintenant une paire de phrases
+"un grutier est venu" et "il vient de partir".**]
+De même, `encoded_pair[:, 0, :]` est le résultat encodé de la paire de phrases entière à partir du BERT pré-entraîné.
+Notez que les trois premiers éléments du jeton polysémique "grue" sont différents de ceux qui sont codés lorsque le contexte est différent.
+Cela confirme que les représentations de BERT sont sensibles au contexte.
 
 ```{.python .input}
 #@tab all
@@ -292,21 +292,21 @@ encoded_pair_crane = encoded_pair[:, 2, :]
 encoded_pair.shape, encoded_pair_cls.shape, encoded_pair_crane[0][:3]
 ```
 
-In :numref:`chap_nlp_app`, we will fine-tune a pretrained BERT model
-for downstream natural language processing applications.
+Dans :numref:`chap_nlp_app` , nous affinerons un modèle BERT pré-entraîné
+pour des applications de traitement du langage naturel en aval.
 
 
-## Summary
+## Résumé
 
-* The original BERT has two versions, where the base model has 110 million parameters and the large model has 340 million parameters.
-* After pretraining BERT, we can use it to represent single text, text pairs, or any token in them.
-* In the experiment, the same token has different BERT representation when their contexts are different. This supports that BERT representations are context-sensitive.
+* Le BERT original a deux versions, où le modèle de base a 110 millions de paramètres et le grand modèle a 340 millions de paramètres.
+* Après le pré-entraînement de BERT, nous pouvons l'utiliser pour représenter un texte unique, des paires de textes ou n'importe quel token dans ces textes.
+* Dans l'expérience, le même token a une représentation BERT différente lorsque leurs contextes sont différents. Cela confirme que les représentations BERT sont sensibles au contexte.
 
 
-## Exercises
+## Exercices
 
-1. In the experiment, we can see that the masked language modeling loss is significantly higher than the next sentence prediction loss. Why?
-2. Set the maximum length of a BERT input sequence to be 512 (same as the original BERT model). Use the configurations of the original BERT model such as $\text{BERT}_{\text{LARGE}}$. Do you encounter any error when running this section? Why?
+1. Dans l'expérience, nous pouvons voir que la perte de modélisation du langage masqué est significativement plus élevée que la perte de prédiction de la phrase suivante. Pourquoi ?
+2. Fixez la longueur maximale d'une séquence d'entrée BERT à 512 (comme le modèle BERT original). Utilisez les configurations du modèle BERT original telles que $\text{BERT}_{\text{LARGE}}$. Rencontrez-vous des erreurs en exécutant cette section ? Pourquoi ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/390)

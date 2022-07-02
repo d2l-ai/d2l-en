@@ -1,30 +1,30 @@
-# Fully Convolutional Networks
-:label:`sec_fcn`
+# Réseaux entièrement convolutifs
+:label:`sec_fcn` 
 
-As discussed in :numref:`sec_semantic_segmentation`,
-semantic segmentation
-classifies images in pixel level.
-A fully convolutional network (FCN)
-uses a convolutional neural network to
-transform image pixels to pixel classes :cite:`Long.Shelhamer.Darrell.2015`.
-Unlike the CNNs that we encountered earlier
-for image classification 
-or object detection,
-a fully convolutional network
-transforms 
-the height and width of intermediate feature maps
-back to those of the input image:
-this is achieved by
-the transposed convolutional layer
-introduced in :numref:`sec_transposed_conv`.
-As a result,
-the classification output
-and the input image 
-have a one-to-one correspondence 
-in pixel level:
-the channel dimension at any output pixel 
-holds the classification results
-for the input pixel at the same spatial position.
+ Comme nous l'avons vu dans :numref:`sec_semantic_segmentation` ,
+la segmentation sémantique
+classe les images au niveau des pixels.
+Un réseau entièrement convolutif (FCN)
+utilise un réseau neuronal convolutif pour
+transformer les pixels de l'image en classes de pixels :cite:`Long.Shelhamer.Darrell.2015` .
+Contrairement aux CNN que nous avons rencontrés précédemment
+pour la classification d'images 
+ou la détection d'objets,
+un réseau entièrement convolutif
+transforme 
+la hauteur et la largeur des cartes de caractéristiques intermédiaires
+pour les ramener à celles de l'image d'entrée :
+ceci est réalisé par
+la couche convolutive transposée
+introduite dans :numref:`sec_transposed_conv` .
+Par conséquent,
+la sortie de classification
+et l'image d'entrée 
+ont une correspondance biunivoque 
+au niveau du pixel :
+la dimension du canal à n'importe quel pixel de sortie 
+contient les résultats de classification
+pour le pixel d'entrée à la même position spatiale.
 
 ```{.python .input}
 #@tab mxnet
@@ -46,35 +46,35 @@ from torch import nn
 from torch.nn import functional as F
 ```
 
-## The Model
+## Le modèle
 
-Here we describe the basic design of the fully convolutional network model. 
-As shown in :numref:`fig_fcn`,
-this model first uses a CNN to extract image features,
-then transforms the number of channels into
-the number of classes
-via a $1\times 1$ convolutional layer,
-and finally transforms the height and width of
-the feature maps
-to those
-of the input image via
-the transposed convolution introduced in :numref:`sec_transposed_conv`. 
-As a result,
-the model output has the same height and width as the input image,
-where the output channel contains the predicted classes
-for the input pixel at the same spatial position.
+Nous décrivons ici la conception de base du modèle de réseau entièrement convolutif. 
+Comme indiqué dans :numref:`fig_fcn` ,
+ce modèle utilise d'abord un CNN pour extraire les caractéristiques de l'image,
+puis transforme le nombre de canaux en
+le nombre de classes
+via une couche convolutive $1\times 1$,
+et enfin transforme la hauteur et la largeur de
+les cartes de caractéristiques
+en celles de
+de l'image d'entrée via
+la convolution transposée introduite dans :numref:`sec_transposed_conv` . 
+Par conséquent,
+la sortie du modèle a la même hauteur et la même largeur que l'image d'entrée,
+où le canal de sortie contient les classes prédites
+pour le pixel d'entrée à la même position spatiale.
 
 
 ![Fully convolutional network.](../img/fcn.svg)
 :label:`fig_fcn`
 
-Below, we [**use a ResNet-18 model pretrained on the ImageNet dataset to extract image features**]
-and denote the model instance as `pretrained_net`.
-The last few layers of this model
-include a global average pooling layer
-and a fully connected layer:
-they are not needed
-in the fully convolutional network.
+Ci-dessous, nous [**utilisons un modèle ResNet-18 pré-entraîné sur le jeu de données ImageNet pour extraire les caractéristiques des images**]
+et désignons l'instance du modèle par `pretrained_net`.
+Les dernières couches de ce modèle
+comprennent une couche de mise en commun de la moyenne globale
+et une couche entièrement connectée :
+elles ne sont pas nécessaires
+dans le réseau entièrement convolutif.
 
 ```{.python .input}
 #@tab mxnet
@@ -88,11 +88,11 @@ pretrained_net = torchvision.models.resnet18(pretrained=True)
 list(pretrained_net.children())[-3:]
 ```
 
-Next, we [**create the fully convolutional network instance `net`**].
-It copies all the pretrained layers in the ResNet-18
-except for the final global average pooling layer
-and the fully connected layer that are closest
-to the output.
+Ensuite, nous [**créons l'instance du réseau entièrement convolutif `net`**].
+Elle copie toutes les couches pré-entraînées dans le ResNet-18
+sauf la couche finale de mise en commun de la moyenne globale
+et la couche entièrement connectée qui sont les plus proches
+de la sortie.
 
 ```{.python .input}
 #@tab mxnet
@@ -106,9 +106,9 @@ for layer in pretrained_net.features[:-2]:
 net = nn.Sequential(*list(pretrained_net.children())[:-2])
 ```
 
-Given an input with height and width of 320 and 480 respectively,
-the forward propagation of `net`
-reduces the input height and width to 1/32 of the original, namely 10 and 15.
+Étant donné une entrée dont la hauteur et la largeur sont respectivement de 320 et 480,
+la propagation vers l'avant de `net`
+ réduit la hauteur et la largeur de l'entrée à 1/32 de l'original, soit 10 et 15.
 
 ```{.python .input}
 #@tab mxnet
@@ -122,21 +122,21 @@ X = torch.rand(size=(1, 3, 320, 480))
 net(X).shape
 ```
 
-Next, we [**use a $1\times 1$ convolutional layer to transform the number of output channels into the number of classes (21) of the Pascal VOC2012 dataset.**]
-Finally, we need to (**increase the height and width of the feature maps by 32 times**) to change them back to the height and width of the input image. 
-Recall how to calculate 
-the output shape of a convolutional layer in :numref:`sec_padding`. 
-Since $(320-64+16\times2+32)/32=10$ and $(480-64+16\times2+32)/32=15$, we construct a transposed convolutional layer with stride of $32$, 
-setting
-the height and width of the kernel
-to $64$, the padding to $16$.
-In general,
-we can see that
-for stride $s$,
-padding $s/2$ (assuming $s/2$ is an integer),
-and the height and width of the kernel $2s$, 
-the transposed convolution will increase
-the height and width of the input by $s$ times.
+Ensuite, nous [**utilisons une couche convolutive $1\times 1$ pour transformer le nombre de canaux de sortie en nombre de classes (21) du jeu de données Pascal VOC2012.**]
+Enfin, nous devons (**augmenter la hauteur et la largeur des cartes de caractéristiques de 32 fois**) pour les ramener à la hauteur et à la largeur de l'image d'entrée. 
+Rappelez-vous comment calculer 
+la forme de sortie d'une couche convolutive dans :numref:`sec_padding` . 
+Depuis $(320-64+16\times2+32)/32=10$ et $(480-64+16\times2+32)/32=15$, nous construisons une couche convolutive transposée avec un pas de $32$, 
+en fixant
+la hauteur et la largeur du noyau
+à $64$, le remplissage à $16$.
+En général,
+nous pouvons voir que
+pour stride $s$,
+padding $s/2$ (en supposant que $s/2$ est un entier),
+et la hauteur et la largeur du noyau $2s$, 
+la convolution transposée augmentera
+la hauteur et la largeur de l'entrée par $s$ fois.
 
 ```{.python .input}
 #@tab mxnet
@@ -154,39 +154,39 @@ net.add_module('transpose_conv', nn.ConvTranspose2d(num_classes, num_classes,
                                     kernel_size=64, padding=16, stride=32))
 ```
 
-## [**Initializing Transposed Convolutional Layers**]
+## [**Initialisation des couches convolutionnelles transposées**]
 
 
-We already know that
-transposed convolutional layers can increase
-the height and width of
-feature maps.
-In image processing, we may need to scale up
-an image, i.e., *upsampling*.
-*Bilinear interpolation*
-is one of the commonly used upsampling techniques.
-It is also often used for initializing transposed convolutional layers.
+ Nous savons déjà que
+les couches convolutionnelles transposées peuvent augmenter
+la hauteur et la largeur des cartes de caractéristiques
+.
+En traitement d'images, nous pouvons avoir besoin de mettre à l'échelle
+une image, c'est-à-dire de *suréchantillonner*.
+*L'interpolation bilinéaire*
+est l'une des techniques de suréchantillonnage les plus utilisées.
+Elle est également souvent utilisée pour initialiser des couches convolutives transposées.
 
-To explain bilinear interpolation,
-say that 
-given an input image
-we want to 
-calculate each pixel 
-of the upsampled output image.
-In order to calculate the pixel of the output image
-at coordinate $(x, y)$, 
-first map $(x, y)$ to coordinate $(x', y')$ on the input image, for example, according to the ratio of the input size to the output size. 
-Note that the mapped $x'$ and $y'$ are real numbers. 
-Then, find the four pixels closest to coordinate
-$(x', y')$ on the input image. 
-Finally, the pixel of the output image at coordinate $(x, y)$ is calculated based on these four closest pixels
-on the input image and their relative distance from $(x', y')$. 
+Pour expliquer l'interpolation bilinéaire,
+disons que 
+étant donné une image d'entrée
+nous voulons 
+calculer chaque pixel 
+de l'image de sortie suréchantillonnée.
+Afin de calculer le pixel de l'image de sortie
+à la coordonnée $(x, y)$, 
+commence par mapper $(x, y)$ à la coordonnée $(x', y')$ sur l'image d'entrée, par exemple, en fonction du rapport entre la taille de l'entrée et la taille de la sortie. 
+Notez que les coordonnées $x'$ et $y'$ sont des nombres réels. 
+Ensuite, trouvez les quatre pixels les plus proches de la coordonnée
+$(x', y')$ sur l'image d'entrée. 
+Enfin, le pixel de l'image de sortie aux coordonnées $(x, y)$ est calculé sur la base de ces quatre pixels les plus proches
+sur l'image d'entrée et de leur distance relative par rapport à $(x', y')$. 
 
-Upsampling of bilinear interpolation
-can be implemented by the transposed convolutional layer 
-with the kernel constructed by the following `bilinear_kernel` function. 
-Due to space limitations, we only provide the implementation of the `bilinear_kernel` function below
-without discussions on its algorithm design.
+Le suréchantillonnage de l'interpolation bilinéaire
+peut être mis en œuvre par la couche convolutive transposée 
+avec le noyau construit par la fonction `bilinear_kernel` suivante. 
+En raison des limitations d'espace, nous ne fournissons que l'implémentation de la fonction `bilinear_kernel` ci-dessous
+sans discussions sur la conception de son algorithme.
 
 ```{.python .input}
 #@tab mxnet
@@ -223,11 +223,11 @@ def bilinear_kernel(in_channels, out_channels, kernel_size):
     return weight
 ```
 
-Let's [**experiment with upsampling of bilinear interpolation**] 
-that is implemented by a transposed convolutional layer. 
-We construct a transposed convolutional layer that 
-doubles the height and weight,
-and initialize its kernel with the `bilinear_kernel` function.
+Faisons [**l'expérience d'un suréchantillonnage de l'interpolation bilinéaire**] 
+qui est mis en œuvre par une couche convolutive transposée. 
+Nous construisons une couche convolutive transposée qui 
+double la taille et le poids,
+et initialisons son noyau avec la fonction `bilinear_kernel`.
 
 ```{.python .input}
 #@tab mxnet
@@ -242,7 +242,7 @@ conv_trans = nn.ConvTranspose2d(3, 3, kernel_size=4, padding=1, stride=2,
 conv_trans.weight.data.copy_(bilinear_kernel(3, 3, 4));
 ```
 
-Read the image `X` and assign the upsampling output to `Y`. In order to print the image, we need to adjust the position of the channel dimension.
+Lisez l'image `X` et affectez la sortie de suréchantillonnage à `Y`. Afin d'imprimer l'image, nous devons ajuster la position de la dimension du canal.
 
 ```{.python .input}
 #@tab mxnet
@@ -260,9 +260,9 @@ Y = conv_trans(X)
 out_img = Y[0].permute(1, 2, 0).detach()
 ```
 
-As we can see, the transposed convolutional layer increases both the height and width of the image by a factor of two.
-Except for the different scales in coordinates,
-the image scaled up by bilinear interpolation and the original image printed in :numref:`sec_bbox` look the same.
+Comme nous pouvons le constater, la couche convolutive transposée augmente à la fois la hauteur et la largeur de l'image d'un facteur deux.
+À l'exception des différentes échelles en coordonnées,
+l'image mise à l'échelle par interpolation bilinéaire et l'image originale imprimée dans :numref:`sec_bbox` se ressemblent.
 
 ```{.python .input}
 #@tab mxnet
@@ -282,7 +282,7 @@ print('output image shape:', out_img.shape)
 d2l.plt.imshow(out_img);
 ```
 
-In a fully convolutional network, we [**initialize the transposed convolutional layer with upsampling of bilinear interpolation. For the $1\times 1$ convolutional layer, we use Xavier initialization.**]
+Dans un réseau entièrement convolutif, nous [**initialisons la couche convolutive transposée avec un suréchantillonnage par interpolation bilinéaire. Pour la couche convolutive $1\times 1$, nous utilisons l'initialisation de Xavier.**]
 
 ```{.python .input}
 #@tab mxnet
@@ -297,13 +297,13 @@ W = bilinear_kernel(num_classes, num_classes, 64)
 net.transpose_conv.weight.data.copy_(W);
 ```
 
-## [**Reading the Dataset**]
+## [**Lire le jeu de données**]
 
-We read
-the semantic segmentation dataset
-as introduced in :numref:`sec_semantic_segmentation`. 
-The output image shape of random cropping is
-specified as $320\times 480$: both the height and width are divisible by $32$.
+Nous lisons
+le jeu de données de segmentation sémantique
+tel que présenté dans :numref:`sec_semantic_segmentation` . 
+La forme de l'image de sortie du recadrage aléatoire est
+spécifiée comme $320\times 480$: la hauteur et la largeur sont toutes deux divisibles par $32$.
 
 ```{.python .input}
 #@tab all
@@ -314,17 +314,17 @@ train_iter, test_iter = d2l.load_data_voc(batch_size, crop_size)
 ## [**Training**]
 
 
-Now we can train our constructed
-fully convolutional network. 
-The loss function and accuracy calculation here
-are not essentially different from those in image classification of earlier chapters. 
-Because we use the output channel of the
-transposed convolutional layer to
-predict the class for each pixel,
-the channel dimension is specified in the loss calculation.
-In addition, the accuracy is calculated
-based on correctness
-of the predicted class for all the pixels.
+ Nous pouvons maintenant entraîner notre réseau entièrement convolutif construit
+. 
+La fonction de perte et le calcul de la précision ici
+ne sont pas essentiellement différents de ceux de la classification d'images des chapitres précédents. 
+Comme nous utilisons le canal de sortie de la couche convolutive transposée
+pour
+prédire la classe de chaque pixel,
+la dimension du canal est spécifiée dans le calcul de la perte.
+En outre, la précision est calculée
+sur la base de l'exactitude
+de la classe prédite pour tous les pixels.
 
 ```{.python .input}
 #@tab mxnet
@@ -346,11 +346,11 @@ trainer = torch.optim.SGD(net.parameters(), lr=lr, weight_decay=wd)
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-## [**Prediction**]
+## [**Prédiction**]
 
 
-When predicting, we need to standardize the input image
-in each channel and transform the image into the four-dimensional input format required by the CNN.
+ Lors de la prédiction, nous devons normaliser l'image d'entrée
+dans chaque canal et transformer l'image dans le format d'entrée quadridimensionnel requis par le CNN.
 
 ```{.python .input}
 #@tab mxnet
@@ -369,7 +369,7 @@ def predict(img):
     return pred.reshape(pred.shape[1], pred.shape[2])
 ```
 
-To [**visualize the predicted class**] of each pixel, we map the predicted class back to its label color in the dataset.
+Pour [**visualiser la classe prédite**] de chaque pixel, nous faisons correspondre la classe prédite à la couleur de son étiquette dans l'ensemble de données.
 
 ```{.python .input}
 #@tab mxnet
@@ -387,31 +387,31 @@ def label2image(pred):
     return colormap[X, :]
 ```
 
-Images in the test dataset vary in size and shape.
-Since the model uses a transposed convolutional layer with stride of 32,
-when the height or width of an input image is indivisible by 32,
-the output height or width of the
-transposed convolutional layer will deviate from the shape of the input image.
-In order to address this issue,
-we can crop multiple rectangular areas with height and width that are integer multiples of 32 in the image,
-and perform forward propagation
-on the pixels in these areas separately.
-Note that
-the union of these rectangular areas needs to completely cover the input image.
-When a pixel is covered by multiple rectangular areas,
-the average of the transposed convolution outputs
-in separate areas for this same pixel
-can be input to
-the softmax operation
-to predict the class.
+Les images de l'ensemble de données de test varient en taille et en forme.
+Comme le modèle utilise une couche convolutive transposée avec un stride de 32,
+lorsque la hauteur ou la largeur d'une image d'entrée est indivisible par 32,
+la hauteur ou la largeur de sortie de la couche convolutive transposée
+s'écartera de la forme de l'image d'entrée.
+Afin de résoudre ce problème,
+nous pouvons recadrer plusieurs zones rectangulaires dont la hauteur et la largeur sont des multiples entiers de 32 dans l'image,
+et effectuer la propagation vers l'avant
+sur les pixels de ces zones séparément.
+Notez que
+l'union de ces zones rectangulaires doit couvrir complètement l'image d'entrée.
+Lorsqu'un pixel est couvert par plusieurs zones rectangulaires,
+la moyenne des sorties de convolution transposées
+dans des zones séparées pour ce même pixel
+peut être entrée dans
+l'opération softmax
+pour prédire la classe.
 
 
-For simplicity, we only read a few larger test images,
-and crop a $320\times480$ area for prediction starting from the upper-left corner of an image.
-For these test images, we
-print their cropped areas,
-prediction results,
-and ground-truth row by row.
+Pour simplifier, nous ne lisons que quelques grandes images de test,
+et recadrons une zone $320\times480$ pour la prédiction en partant du coin supérieur gauche d'une image.
+Pour ces images de test, nous imprimons les zones rognées
+, les résultats de prédiction
+,
+et la vérité du sol ligne par ligne.
 
 ```{.python .input}
 #@tab mxnet
@@ -441,18 +441,18 @@ for i in range(n):
 d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2);
 ```
 
-## Summary
+## Résumé
 
-* The fully convolutional network first uses a CNN to extract image features, then transforms the number of channels into the number of classes via a $1\times 1$ convolutional layer, and finally transforms the height and width of the feature maps to those of the input image via the transposed convolution.
-* In a fully convolutional network, we can use upsampling of bilinear interpolation to initialize the transposed convolutional layer.
+* Le réseau entièrement convolutif utilise d'abord un CNN pour extraire les caractéristiques de l'image, puis transforme le nombre de canaux en nombre de classes via une couche convolutive $1\times 1$, et enfin transforme la hauteur et la largeur des cartes de caractéristiques en celles de l'image d'entrée via la convolution transposée.
+* Dans un réseau entièrement convolutif, nous pouvons utiliser un suréchantillonnage d'interpolation bilinéaire pour initialiser la couche convolutive transposée.
 
 
-## Exercises
+## Exercices
 
-1. If we use Xavier initialization for the transposed convolutional layer in the experiment, how does the result change?
-1. Can you further improve the accuracy of the model by tuning the hyperparameters?
-1. Predict the classes of all pixels in test images.
-1. The original fully convolutional network paper also uses outputs of some intermediate CNN layers :cite:`Long.Shelhamer.Darrell.2015`. Try to implement this idea.
+1. Si nous utilisons l'initialisation de Xavier pour la couche convolutionnelle transposée dans l'expérience, comment le résultat change-t-il ?
+1. Pouvez-vous améliorer davantage la précision du modèle en réglant les hyperparamètres ?
+1. Prédisez les classes de tous les pixels des images de test.
+1. L'article original sur les réseaux entièrement convolutifs utilise également les sorties de certaines couches CNN intermédiaires :cite:`Long.Shelhamer.Darrell.2015` . Essayez d'implémenter cette idée.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/377)

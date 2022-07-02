@@ -3,55 +3,55 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Convolutions for Images
-:label:`sec_conv_layer`
+# Convolutions pour les images
+:label:`sec_conv_layer` 
 
-Now that we understand how convolutional layers work in theory,
-we are ready to see how they work in practice.
-Building on our motivation of convolutional neural networks
-as efficient architectures for exploring structure in image data,
-we stick with images as our running example.
+ Maintenant que nous comprenons comment les couches convolutionnelles fonctionnent en théorie,
+nous sommes prêts à voir comment elles fonctionnent en pratique.
+En nous appuyant sur notre motivation des réseaux de neurones convolutifs
+comme architectures efficaces pour explorer la structure des données d'image,
+nous nous en tenons aux images comme exemple courant.
 
 
-## The Cross-Correlation Operation
+## L'opération de corrélation croisée
 
-Recall that strictly speaking, convolutional layers
-are a  misnomer, since the operations they express
-are more accurately described as cross-correlations.
-Based on our descriptions of convolutional layers in :numref:`sec_why-conv`,
-in such a layer, an input tensor
-and a kernel tensor are combined
-to produce an output tensor through a (**cross-correlation operation.**)
+Rappelons qu'à proprement parler, les couches convolutionnelles
+sont mal nommées, puisque les opérations qu'elles expriment
+sont plus précisément décrites comme des corrélations croisées.
+D'après nos descriptions des couches convolutionnelles dans :numref:`sec_why-conv` ,
+dans une telle couche, un tenseur d'entrée
+et un tenseur de noyau sont combinés
+pour produire un tenseur de sortie par le biais d'une (**opération de corrélation croisée.**)
 
-Let's ignore channels for now and see how this works
-with two-dimensional data and hidden representations.
-In :numref:`fig_correlation`,
-the input is a two-dimensional tensor
-with a height of 3 and width of 3.
-We mark the shape of the tensor as $3 \times 3$ or ($3$, $3$).
-The height and width of the kernel are both 2.
-The shape of the *kernel window* (or *convolution window*)
-is given by the height and width of the kernel
-(here it is $2 \times 2$).
+Ignorons les canaux pour l'instant et voyons comment cela fonctionne
+avec des données bidimensionnelles et des représentations cachées.
+Dans :numref:`fig_correlation` ,
+l'entrée est un tenseur bidimensionnel
+avec une hauteur de 3 et une largeur de 3.
+Nous marquons la forme du tenseur comme $3 \times 3$ ou ($3$, $3$).
+La hauteur et la largeur du noyau sont toutes deux de 2.
+La forme de la fenêtre du *noyau* (ou *fenêtre de convolution*)
+est donnée par la hauteur et la largeur du noyau
+(ici, c'est $2 \times 2$).
 
 ![Two-dimensional cross-correlation operation. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times0+1\times1+3\times2+4\times3=19$.](../img/correlation.svg)
 :label:`fig_correlation`
 
-In the two-dimensional cross-correlation operation,
-we begin with the convolution window positioned
-at the upper-left corner of the input tensor
-and slide it across the input tensor,
-both from left to right and top to bottom.
-When the convolution window slides to a certain position,
-the input subtensor contained in that window
-and the kernel tensor are multiplied elementwise
-and the resulting tensor is summed up
-yielding a single scalar value.
-This result gives the value of the output tensor
-at the corresponding location.
-Here, the output tensor has a height of 2 and width of 2
-and the four elements are derived from
-the two-dimensional cross-correlation operation:
+Dans l'opération de corrélation croisée bidimensionnelle,
+nous commençons avec la fenêtre de convolution positionnée
+au coin supérieur gauche du tenseur d'entrée
+et la faisons glisser sur le tenseur d'entrée,
+à la fois de gauche à droite et de haut en bas.
+Lorsque la fenêtre de convolution glisse vers une certaine position,
+le sous-tenseur d'entrée contenu dans cette fenêtre
+et le tenseur du noyau sont multipliés par éléments
+et le tenseur résultant est additionné
+, ce qui donne une seule valeur scalaire.
+Ce résultat donne la valeur du tenseur de sortie
+à l'emplacement correspondant.
+Ici, le tenseur de sortie a une hauteur de 2 et une largeur de 2
+et les quatre éléments sont dérivés de
+l'opération de corrélation croisée bidimensionnelle :
 
 $$
 0\times0+1\times1+3\times2+4\times3=19,\\
@@ -60,25 +60,25 @@ $$
 4\times0+5\times1+7\times2+8\times3=43.
 $$
 
-Note that along each axis, the output size
-is slightly smaller than the input size.
-Because the kernel has width and height greater than one,
-we can only properly compute the cross-correlation
-for locations where the kernel fits wholly within the image,
-the output size is given by the input size $n_h \times n_w$
-minus the size of the convolution kernel $k_h \times k_w$
-via
+Notez que le long de chaque axe, la taille de la sortie
+est légèrement inférieure à celle de l'entrée.
+Le noyau ayant une largeur et une hauteur supérieures à un,
+nous ne pouvons calculer correctement la corrélation croisée
+que pour les endroits où le noyau s'inscrit entièrement dans l'image,
+la taille de sortie est donnée par la taille d'entrée $n_h \times n_w$
+ moins la taille du noyau de convolution $k_h \times k_w$
+ via
 
-$$(n_h-k_h+1) \times (n_w-k_w+1).$$
+$$(n_h-k_h+1) \times (n_w-k_w+1).$$ 
 
-This is the case since we need enough space
-to "shift" the convolution kernel across the image.
-Later we will see how to keep the size unchanged
-by padding the image with zeros around its boundary
-so that there is enough space to shift the kernel.
-Next, we implement this process in the `corr2d` function,
-which accepts an input tensor `X` and a kernel tensor `K`
-and returns an output tensor `Y`.
+ C'est le cas car nous avons besoin d'un espace suffisant
+pour "déplacer" le noyau de convolution dans l'image.
+Nous verrons plus tard comment garder la taille inchangée
+en remplissant l'image de zéros autour de sa limite
+afin qu'il y ait suffisamment d'espace pour déplacer le noyau.
+Ensuite, nous implémentons ce processus dans la fonction `corr2d`,
+qui accepte un tenseur d'entrée `X` et un tenseur de noyau `K`
+ et renvoie un tenseur de sortie `Y`.
 
 ```{.python .input}
 %%tab mxnet
@@ -123,10 +123,10 @@ def corr2d(X, K):  #@save
     return Y
 ```
 
-We can construct the input tensor `X` and the kernel tensor `K`
-from :numref:`fig_correlation`
-to [**validate the output of the above implementation**]
-of the two-dimensional cross-correlation operation.
+Nous pouvons construire le tenseur d'entrée `X` et le tenseur de noyau `K`
+ à partir de :numref:`fig_correlation` 
+ pour [**valider la sortie de l'implémentation ci-dessus**]
+de l'opération de corrélation croisée bidimensionnelle.
 
 ```{.python .input}
 %%tab all
@@ -135,22 +135,22 @@ K = d2l.tensor([[0.0, 1.0], [2.0, 3.0]])
 corr2d(X, K)
 ```
 
-## Convolutional Layers
+## Couches convolutives
 
-A convolutional layer cross-correlates the input and kernel
-and adds a scalar bias to produce an output.
-The two parameters of a convolutional layer
-are the kernel and the scalar bias.
-When training models based on convolutional layers,
-we typically initialize the kernels randomly,
-just as we would with a fully connected layer.
+Une couche convolutive effectue une corrélation croisée entre l'entrée et le noyau
+et ajoute un biais scalaire pour produire une sortie.
+Les deux paramètres d'une couche convolutive
+sont le noyau et le biais scalaire.
+Lors de la formation de modèles basés sur des couches convolutionnelles,
+, nous initialisons généralement les noyaux de manière aléatoire,
+comme nous le ferions avec une couche entièrement connectée.
 
-We are now ready to [**implement a two-dimensional convolutional layer**]
-based on the `corr2d` function defined above.
-In the `__init__` constructor method,
-we declare `weight` and `bias` as the two model parameters.
-The forward propagation function
-calls the `corr2d` function and adds the bias.
+Nous sommes maintenant prêts à [**implémenter une couche convolutionnelle bidimensionnelle**]
+basée sur la fonction `corr2d` définie ci-dessus.
+Dans la méthode du constructeur `__init__`,
+, nous déclarons `weight` et `bias` comme étant les deux paramètres du modèle.
+La fonction de propagation avant
+appelle la fonction `corr2d` et ajoute le biais.
 
 ```{.python .input}
 %%tab mxnet
@@ -193,22 +193,22 @@ class Conv2D(tf.keras.layers.Layer):
         return corr2d(inputs, self.weight) + self.bias
 ```
 
-In
+Dans
 $h \times w$ convolution
-or a $h \times w$ convolution kernel,
-the height and width of the convolution kernel are $h$ and $w$, respectively.
-We also refer to
-a convolutional layer with a $h \times w$
-convolution kernel simply as a $h \times w$ convolutional layer.
+ou un noyau de convolution $h \times w$,
+la hauteur et la largeur du noyau de convolution sont respectivement $h$ et $w$.
+Nous appelons également
+une couche convolutive avec un noyau de convolution $h \times w$
+ simplement une couche convolutive $h \times w$.
 
 
-## Object Edge Detection in Images
+## Détection des bords d'objets dans les images
 
-Let's take a moment to parse [**a simple application of a convolutional layer:
-detecting the edge of an object in an image**]
-by finding the location of the pixel change.
-First, we construct an "image" of $6\times 8$ pixels.
-The middle four columns are black (0) and the rest are white (1).
+Prenons un moment pour analyser [**une application simple d'une couche convolutionnelle :
+détecter le bord d'un objet dans une image**]
+en trouvant l'emplacement du changement de pixel.
+Tout d'abord, nous construisons une "image" de $6\times 8$ pixels.
+Les quatre colonnes du milieu sont noires (0) et les autres sont blanches (1).
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -224,22 +224,22 @@ X[:, 2:6].assign(tf.zeros(X[:, 2:6].shape))
 X
 ```
 
-Next, we construct a kernel `K` with a height of 1 and a width of 2.
-When we perform the cross-correlation operation with the input,
-if the horizontally adjacent elements are the same,
-the output is 0. Otherwise, the output is non-zero.
-Note that this kernel is special case of a finite difference operator. At location $(i,j)$ it computes $x_{i,j} - x_{(i+1),j}$, i.e., it computes the difference between the values of horizontally adjacent pixels. This is a discrete approximation of the first derivative in the horizontal direction. After all, for a function $f(i,j)$ its derivative $-\partial_i f(i,j) = \lim_{\epsilon \to 0} \frac{f(i,j) - f(i+\epsilon,j)}{\epsilon}$. Let's see how this works in practice.
+Ensuite, nous construisons un noyau `K` avec une hauteur de 1 et une largeur de 2.
+Lorsque nous effectuons l'opération de corrélation croisée avec l'entrée,
+si les éléments horizontalement adjacents sont les mêmes,
+la sortie est 0. Sinon, la sortie est non nulle.
+Notez que ce noyau est un cas particulier d'un opérateur de différence finie. À l'emplacement $(i,j)$, il calcule $x_{i,j} - x_{(i+1),j}$, c'est-à-dire qu'il calcule la différence entre les valeurs des pixels horizontalement adjacents. Il s'agit d'une approximation discrète de la dérivée première dans la direction horizontale. Après tout, pour une fonction $f(i,j)$, sa dérivée est $-\partial_i f(i,j) = \lim_{\epsilon \to 0} \frac{f(i,j) - f(i+\epsilon,j)}{\epsilon}$. Voyons comment cela fonctionne en pratique.
 
 ```{.python .input}
 %%tab all
 K = d2l.tensor([[1.0, -1.0]])
 ```
 
-We are ready to perform the cross-correlation operation
-with arguments `X` (our input) and `K` (our kernel).
-As you can see, [**we detect 1 for the edge from white to black
-and -1 for the edge from black to white.**]
-All other outputs take value 0.
+Nous sommes prêts à effectuer l'opération de corrélation croisée
+avec les arguments `X` (notre entrée) et `K` (notre noyau).
+Comme vous pouvez le voir, [**nous détectons 1 pour le bord du blanc au noir
+et -1 pour le bord du noir au blanc.**]
+Toutes les autres sorties prennent la valeur 0.
 
 ```{.python .input}
 %%tab all
@@ -247,35 +247,35 @@ Y = corr2d(X, K)
 Y
 ```
 
-We can now apply the kernel to the transposed image.
-As expected, it vanishes. [**The kernel `K` only detects vertical edges.**]
+Nous pouvons maintenant appliquer le noyau à l'image transposée.
+Comme prévu, il disparaît. [**Le noyau `K` ne détecte que les bords verticaux.**]
 
 ```{.python .input}
 %%tab all
 corr2d(d2l.transpose(X), K)
 ```
 
-## Learning a Kernel
+## Apprendre un noyau
 
-Designing an edge detector by finite differences `[1, -1]` is neat
-if we know this is precisely what we are looking for.
-However, as we look at larger kernels,
-and consider successive layers of convolutions,
-it might be impossible to specify
-precisely what each filter should be doing manually.
+La conception d'un détecteur de bords par différences finies `[1, -1]` est intéressante
+si nous savons que c'est précisément ce que nous recherchons.
+Cependant, si l'on considère des noyaux plus grands,
+et des couches successives de convolutions,
+il peut être impossible de spécifier
+précisément ce que chaque filtre doit faire manuellement.
 
-Now let's see whether we can [**learn the kernel that generated `Y` from `X`**]
-by looking at the input--output pairs only.
-We first construct a convolutional layer
-and initialize its kernel as a random tensor.
-Next, in each iteration, we will use the squared error
-to compare `Y` with the output of the convolutional layer.
-We can then calculate the gradient to update the kernel.
-For the sake of simplicity,
-in the following
-we use the built-in class
-for two-dimensional convolutional layers
-and ignore the bias.
+Voyons maintenant si nous pouvons [**apprendre le noyau qui a généré `Y` à partir de `X`**]
+en regardant uniquement les paires entrée-sortie.
+Nous construisons d'abord une couche convolutionnelle
+et initialisons son noyau comme un tenseur aléatoire.
+Ensuite, à chaque itération, nous utiliserons l'erreur quadratique
+pour comparer `Y` avec la sortie de la couche convolutive.
+Nous pouvons alors calculer le gradient pour mettre à jour le noyau.
+Pour des raisons de simplicité,
+dans ce qui suit
+nous utilisons la classe intégrée
+pour les couches convolutionnelles bidimensionnelles
+et ignorons le biais.
 
 ```{.python .input}
 %%tab mxnet
@@ -354,7 +354,7 @@ for i in range(10):
             print(f'epoch {i + 1}, loss {tf.reduce_sum(l):.3f}')
 ```
 
-Note that the error has dropped to a small value after 10 iterations. Now we will [**take a look at the kernel tensor we learned.**]
+Notez que l'erreur est tombée à une faible valeur après 10 itérations. Maintenant, nous allons [**jeter un coup d'œil au tenseur du noyau que nous avons appris.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -371,126 +371,126 @@ d2l.reshape(conv2d.weight.data, (1, 2))
 d2l.reshape(conv2d.get_weights()[0], (1, 2))
 ```
 
-Indeed, the learned kernel tensor is remarkably close
-to the kernel tensor `K` we defined earlier.
+En effet, le tenseur de noyau appris est remarquablement proche
+du tenseur de noyau `K` que nous avons défini précédemment.
 
-## Cross-Correlation and Convolution
+## Corrélation croisée et convolution
 
-Recall our observation from :numref:`sec_why-conv` of the correspondence
-between the cross-correlation and convolution operations.
-Here let's continue to consider two-dimensional convolutional layers.
-What if such layers
-perform strict convolution operations
-as defined in :eqref:`eq_2d-conv-discrete`
-instead of cross-correlations?
-In order to obtain the output of the strict *convolution* operation, we only need to flip the two-dimensional kernel tensor both horizontally and vertically, and then perform the *cross-correlation* operation with the input tensor.
+Rappelez-vous notre observation de :numref:`sec_why-conv` sur la correspondance
+entre les opérations de corrélation croisée et de convolution.
+Continuons ici à considérer les couches convolutionnelles bidimensionnelles.
+Et si ces couches
+effectuaient des opérations de convolution strictes
+telles que définies dans :eqref:`eq_2d-conv-discrete` 
+ au lieu des corrélations croisées ?
+Pour obtenir la sortie de l'opération de *convolution stricte*, il suffit de retourner le tenseur du noyau bidimensionnel à la fois horizontalement et verticalement, puis d'effectuer l'opération de *corrélation croisée* avec le tenseur d'entrée.
 
-It is noteworthy that since kernels are learned from data in deep learning,
-the outputs of convolutional layers remain unaffected
-no matter such layers
-perform
-either the strict convolution operations
-or the cross-correlation operations.
+Il convient de noter que, puisque les noyaux sont appris à partir des données dans l'apprentissage profond,
+les sorties des couches convolutionnelles ne sont pas affectées
+, peu importe que ces couches
+effectuent
+les opérations de convolution stricte
+ou les opérations de corrélation croisée.
 
-To illustrate this, suppose that a convolutional layer performs *cross-correlation* and learns the kernel in :numref:`fig_correlation`, which is denoted as the matrix $\mathbf{K}$ here.
-Assuming that other conditions remain unchanged,
-when this layer performs strict *convolution* instead,
-the learned kernel $\mathbf{K}'$ will be the same as $\mathbf{K}$
-after $\mathbf{K}'$ is
-flipped both horizontally and vertically.
-That is to say,
-when the convolutional layer
-performs strict *convolution*
-for the input in :numref:`fig_correlation`
-and $\mathbf{K}'$,
-the same output in :numref:`fig_correlation`
-(cross-correlation of the input and $\mathbf{K}$)
-will be obtained.
+Pour illustrer cela, supposons qu'une couche convolutionnelle effectue une *corrélation croisée* et apprend le noyau dans :numref:`fig_correlation` , qui est désigné ici comme la matrice $\mathbf{K}$.
+En supposant que les autres conditions restent inchangées,
+lorsque cette couche effectue une *convolution* stricte à la place,
+le noyau appris $\mathbf{K}'$ sera le même que $\mathbf{K}$
+ après que $\mathbf{K}'$ soit
+retourné à la fois horizontalement et verticalement.
+En d'autres termes,
+lorsque la couche convolutionnelle
+effectue une *convolution* stricte
+pour l'entrée dans :numref:`fig_correlation` 
+ et $\mathbf{K}'$,
+la même sortie dans :numref:`fig_correlation` 
+ (corrélation croisée de l'entrée et $\mathbf{K}$)
+sera obtenue.
 
-In keeping with standard terminology with deep learning literature,
-we will continue to refer to the cross-correlation operation
-as a convolution even though, strictly-speaking, it is slightly different.
-Besides,
-we use the term *element* to refer to
-an entry (or component) of any tensor representing a layer representation or a convolution kernel.
+Conformément à la terminologie standard de la littérature sur l'apprentissage profond,
+nous continuerons à désigner l'opération de corrélation croisée
+comme une convolution, même si, au sens strict, elle est légèrement différente.
+Par ailleurs,
+nous utilisons le terme *élément* pour désigner
+une entrée (ou composante) de tout tenseur représentant une représentation de couche ou un noyau de convolution.
 
 
-## Feature Map and Receptive Field
+## Carte de caractéristiques et champ récepteur
 
-As described in :numref:`subsec_why-conv-channels`,
-the convolutional layer output in
-:numref:`fig_correlation`
-is sometimes called a *feature map*,
-as it can be regarded as
-the learned representations (features)
-in the spatial dimensions (e.g., width and height)
-to the subsequent layer.
-In CNNs,
-for any element $x$ of some layer,
-its *receptive field* refers to
-all the elements (from all the previous layers)
-that may affect the calculation of $x$
-during the forward propagation.
-Note that the receptive field
-may be larger than the actual size of the input.
+Comme décrit dans :numref:`subsec_why-conv-channels` ,
+la sortie de la couche de convolution dans
+:numref:`fig_correlation` 
+ est parfois appelée une *carte de caractéristiques*,
+car elle peut être considérée comme
+les représentations apprises (caractéristiques)
+dans les dimensions spatiales (par exemple, la largeur et la hauteur)
+à la couche suivante.
+Dans les CNN,
+pour tout élément $x$ d'une couche,
+son *champ réceptif* fait référence à
+tous les éléments (de toutes les couches précédentes)
+qui peuvent affecter le calcul de $x$
+ pendant la propagation vers l'avant.
+Notez que le champ réceptif
+peut être plus grand que la taille réelle de l'entrée.
 
-Let's continue to use :numref:`fig_correlation` to explain the receptive field.
-Given the $2 \times 2$ convolution kernel,
-the receptive field of the shaded output element (of value $19$)
-is
-the four elements in the shaded portion of the input.
-Now let's denote the $2 \times 2$
-output as $\mathbf{Y}$
-and consider a deeper CNN
-with an additional $2 \times 2$ convolutional layer that takes $\mathbf{Y}$
-as its input, outputting
-a single element $z$.
-In this case,
-the receptive field of $z$
-on $\mathbf{Y}$ includes all the four elements of $\mathbf{Y}$,
-while
-the receptive field
-on the input includes all the nine input elements.
-Thus,
-when any element in a feature map
-needs a larger receptive field
-to detect input features over a broader area,
-we can build a deeper network.
+Continuons à utiliser :numref:`fig_correlation` pour expliquer le champ réceptif.
+Étant donné le noyau de convolution $2 \times 2$,
+le champ réceptif de l'élément de sortie ombré (de valeur $19$)
+est
+les quatre éléments de la partie ombrée de l'entrée.
+Désignons maintenant la sortie de $2 \times 2$
+ par $\mathbf{Y}$
+ et considérons un CNN plus profond
+avec une couche de convolution supplémentaire $2 \times 2$ qui prend $\mathbf{Y}$
+ comme entrée et sort
+un seul élément $z$.
+Dans ce cas,
+le champ réceptif de $z$
+ sur $\mathbf{Y}$ comprend les quatre éléments de $\mathbf{Y}$,
+tandis que
+le champ réceptif
+sur l'entrée comprend les neuf éléments d'entrée.
+Ainsi,
+lorsqu'un élément d'une carte de caractéristiques
+a besoin d'un champ réceptif plus grand
+pour détecter les caractéristiques d'entrée sur une zone plus large,
+nous pouvons construire un réseau plus profond.
 
-Receptive fields derive their name from neurophysiology. In a series of experiments :cite:`Hubel.Wiesel.1959,Hubel.Wiesel.1962,Hubel.Wiesel.1968` on a range of animals 
-and different stimuli, Hubel and Wiesel explored the response of what is called the visual 
-cortex on said stimuli. By and large they found that lower levels respond to edges and related 
-shapes. Later on, :cite:`Field.1987` illustrated this effect on natural 
-images with, what can only be called, convolutional kernels. 
-We reprint a key figure in :numref:`field_visual` to illustrate the striking similarities. 
+Les champs réceptifs tirent leur nom de la neurophysiologie. Dans une série d'expériences :cite:`Hubel.Wiesel.1959,Hubel.Wiesel.1962,Hubel.Wiesel.1968` sur une série d'animaux 
+et différents stimuli, Hubel et Wiesel ont exploré la réponse de ce qu'on appelle le cortex visuel 
+auxdits stimuli. Dans l'ensemble, ils ont constaté que les niveaux inférieurs réagissent aux bords et aux formes connexes 
+. Plus tard, :cite:`Field.1987` ont illustré cet effet sur des images naturelles 
+avec ce que l'on ne peut appeler que des noyaux convolutifs. 
+Nous reproduisons une figure clé de :numref:`field_visual` pour illustrer les similitudes frappantes 
 
-![Figure and caption taken from :cite:`Field.1987`: An example of coding with six different channels. (Left) Examples of the six types of sensor associated with each channel. (Right) Convolution of the image in (Middle) with the six sensors shown in (Left). The response of the individual sensors is determined by sampling these filtered images at a distance proportional to the size of the sensor (shown with dots). This diagram shows the response of only the even symmetric sensors.](../img/field-visual.png)
-:label:`field_visual`
+![Figure and caption taken from :cite:`Field.1987`: An example of coding with six different channels. (Left) Exemples des six types de capteurs associés à chaque canal. (Droite) Convolution de l'image en (milieu) avec les six capteurs montrés en (gauche). La réponse de chaque capteur est déterminée en échantillonnant ces images filtrées à une distance proportionnelle à la taille du capteur (représentée par des points). Ce diagramme montre la réponse des capteurs symétriques pairs uniquement.](../img/field-visual.png)
+:label:`field_visual` 
 
-As it turns out, this relation even holds for the features computed by deeper layers of networks trained on image classification tasks, as demonstrated e.g., 
-in :cite:`Kuzovkin.Vicente.Petton.ea.2018`. Suffice it to say, convolutions have proven to be an incredibly powerful tool for computer vision, both in biology and in code. As such, it is not surprising (in hindsight) that they heralded the recent success in deep learning. 
+ Il s'avère que cette relation est également valable pour les caractéristiques calculées par des couches plus profondes de réseaux formés à des tâches de classification d'images, comme le montre par exemple 
+dans :cite:`Kuzovkin.Vicente.Petton.ea.2018` . Il suffit de dire que les convolutions se sont avérées être un outil incroyablement puissant pour la vision par ordinateur, tant en biologie qu'en code. En tant que telles, il n'est pas surprenant (avec le recul) qu'elles aient annoncé les récents succès de l'apprentissage profond. 
 
-## Summary
+## Résumé
 
-The core computation required for a convolutional layer is a cross-correlation operation. We saw that a simple nested for-loop is all that is required to compute its value. If we have multiple input and multiple output channels, we are  performing a matrix-matrix operation between channels. As can be seen, the computation is straightforward and, most importantly, highly *local*. This affords significant hardware optimization and many recent results in computer vision are only possible due to that. After all, it means that chip designers can invest into fast computation rather than memory, when it comes to optimizing for convolutions. While this may not lead to optimal designs for other applications, it opens the door to ubiquitous and affordable computer vision. 
+Le calcul de base requis pour une couche convolutionnelle est une opération de corrélation croisée. Nous avons vu qu'une simple boucle for imbriquée est tout ce qui est nécessaire pour calculer sa valeur. Si nous avons plusieurs canaux d'entrée et plusieurs canaux de sortie, nous effectuons une opération matrice-matrice entre les canaux. Comme on peut le voir, le calcul est simple et, surtout, très *local*. Cela permet une optimisation matérielle significative et de nombreux résultats récents en vision par ordinateur ne sont possibles que grâce à cela. Après tout, cela signifie que les concepteurs de puces peuvent investir dans un calcul rapide plutôt que dans la mémoire, lorsqu'il s'agit d'optimiser les convolutions. Même si cela ne conduit pas nécessairement à des conceptions optimales pour d'autres applications, cela ouvre la voie à une vision par ordinateur omniprésente et abordable. 
 
-In terms of convolutions themselves, they can be used for many purposes such as to detect edges and lines, to blur images, or to sharpen them. Most importantly, it is not necessary that the statistician (or engineer) invents suitable filters. Instead, we can simply *learn* them from data. This replaces feature engineering heuristics by evidence-based statistics. Lastly, and quite delightfully, these filters are not just advantageous for building deep networks but they also correspond to receptive fields and feature maps in the brain. This gives us confidence that we are on the right track. 
+En ce qui concerne les convolutions elles-mêmes, elles peuvent être utilisées à de nombreuses fins, par exemple pour détecter les bords et les lignes, pour brouiller les images ou pour les rendre plus nettes. Plus important encore, il n'est pas nécessaire que le statisticien (ou l'ingénieur) invente des filtres appropriés. Au lieu de cela, nous pouvons simplement les *apprendre* à partir des données. Les statistiques fondées sur des preuves remplacent ainsi les heuristiques de l'ingénierie des caractéristiques. Enfin, et c'est tout à fait charmant, ces filtres ne sont pas seulement avantageux pour la construction de réseaux profonds, mais ils correspondent également aux champs réceptifs et aux cartes de caractéristiques du cerveau. Cela nous donne la certitude que nous sommes sur la bonne voie. 
 
-## Exercises
+## Exercices
 
-1. Construct an image `X` with diagonal edges.
-    1. What happens if you apply the kernel `K` in this section to it?
-    1. What happens if you transpose `X`?
-    1. What happens if you transpose `K`?
-1. Design some kernels manually.
-    1. Given a directional vector $\mathbf{v} = (v_1, v_2)$, derive an edge-detection kernel that detects 
-       edges orthogonal to $\mathbf{v}$, i.e., edges in the direction $(v_2, -v_1)$. 
-    1. Derive a finite difference operator for the second derivative. What is the minimum 
-       size of the convolutional kernel associate with it? Which structures in images respond most strongly to it?
-    1. How would you design a blur kernel? Why might you want to use such a kernel?
-    1. What is the minimum size of a kernel to obtain a derivative of order $d$?
-1. When you try to automatically find the gradient for the `Conv2D` class we created, what kind of error message do you see?
-1. How do you represent a cross-correlation operation as a matrix multiplication by changing the input and kernel tensors?
+1. Construisez une image `X` avec des bords diagonaux.
+   1. Que se passe-t-il si vous lui appliquez le noyau `K` de cette section ?
+   1. Que se passe-t-il si vous transposez `X`?
+   1. Que se passe-t-il si vous transposez `K`?
+1. Concevez quelques noyaux manuellement.
+   1. Étant donné un vecteur directionnel $\mathbf{v} = (v_1, v_2)$, dérivez un noyau de détection d'arêtes qui détecte les arêtes de 
+ orthogonales à $\mathbf{v}$, c'est-à-dire les arêtes dans la direction $(v_2, -v_1)$. 
+    1. Déterminez un opérateur de différence finie pour la dérivée seconde. Quelle est la taille minimale 
+ du noyau convolutif qui lui est associé ? Quelles sont les structures des images qui y répondent le plus fortement ?
+   1. Comment concevriez-vous un noyau de flou ? Pourquoi voudriez-vous utiliser un tel noyau ?
+   1. Quelle est la taille minimale d'un noyau pour obtenir une dérivée d'ordre $d$?
+1. Lorsque vous essayez de trouver automatiquement le gradient pour la classe `Conv2D` que nous avons créée, quel type de message d'erreur voyez-vous ?
+1. Comment représenter une opération de corrélation croisée comme une multiplication matricielle en changeant les tenseurs d'entrée et de noyau ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/65)

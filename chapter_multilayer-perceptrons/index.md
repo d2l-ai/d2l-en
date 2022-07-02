@@ -1,28 +1,28 @@
-# Multilayer Perceptrons
-:label:`chap_perceptrons`
+# Perceptrons multicouches
+:label:`chap_perceptrons` 
 
-In this chapter, we will introduce your first truly *deep* network.
-The simplest deep networks are called *multilayer perceptrons*,
-and they consist of multiple layers of neurons
-each fully connected to those in the layer below
-(from which they receive input)
-and those above (which they, in turn, influence).
-Although automatic differentiation
-significantly simplifies the implementation of deep learning algorithms,
-we will dive deep into how these gradients
-are calculated in deep networks.
-Then we will
-be ready to
-discuss issues relating to numerical stability and parameter initialization
-that are key to successfully training deep networks.
-When we train such high-capacity models we run the risk of overfitting. Thus, we will
-revisit regularization and generalization
-for deep networks.
-Throughout, we aim
-to give you a firm grasp not just of the concepts but also of the practice of using deep networks.
-At the end of this chapter, we apply what we have introduced so far to a real case: house price
-prediction. We punt matters relating to the computational performance, scalability, and efficiency
-of our models to subsequent chapters.
+ Dans ce chapitre, nous allons présenter votre premier réseau véritablement *profond*.
+Les réseaux profonds les plus simples sont appelés *perceptrons multicouches*,
+. Ils sont constitués de plusieurs couches de neurones
+, chacune étant entièrement connectée à celles de la couche inférieure
+(dont elle reçoit les entrées)
+et à celles de la couche supérieure (qu'elle influence à son tour).
+Bien que la différenciation automatique
+simplifie considérablement la mise en œuvre des algorithmes d'apprentissage profond,
+nous allons nous plonger dans la manière dont ces gradients
+sont calculés dans les réseaux profonds.
+
+Nous serons alors prêts à
+discuter des questions relatives à la stabilité numérique et à l'initialisation des paramètres
+qui sont essentielles pour réussir l'entraînement des réseaux profonds.
+Lorsque nous formons des modèles à haute capacité, nous courons le risque d'un surajustement. Ainsi, nous allons
+revisiter la régularisation et la généralisation
+pour les réseaux profonds.
+Tout au long de ce chapitre, notre objectif est de vous donner une bonne maîtrise non seulement des concepts mais aussi de la pratique de l'utilisation des réseaux profonds (
+).
+À la fin de ce chapitre, nous appliquons ce que nous avons introduit jusqu'à présent à un cas réel : la prédiction du prix des maisons
+. Les questions relatives aux performances de calcul, à l'évolutivité et à l'efficacité
+de nos modèles seront traitées dans les chapitres suivants.
 
 ```toc
 :maxdepth: 2

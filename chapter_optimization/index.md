@@ -1,20 +1,20 @@
-# Optimization Algorithms
-:label:`chap_optimization`
+# Algorithmes d'optimisation
+:label:`chap_optimization` 
 
-If you read the book in sequence up to this point you already used a number of optimization algorithms to train deep learning models.
-They were the tools that allowed us to continue updating model parameters and to minimize the value of the loss function, as evaluated on the training set. Indeed, anyone content with treating optimization as a black box device to minimize objective functions in a simple setting might well content oneself with the knowledge that there exists an array of incantations of such a procedure (with names such as "SGD" and "Adam").
+ Si vous avez lu le livre dans l'ordre jusqu'à ce point, vous avez déjà utilisé un certain nombre d'algorithmes d'optimisation pour former des modèles d'apprentissage profond.
+Ce sont les outils qui nous ont permis de continuer à mettre à jour les paramètres du modèle et de minimiser la valeur de la fonction de perte, telle qu'évaluée sur l'ensemble d'entraînement. En effet, quiconque se contente de traiter l'optimisation comme une boîte noire permettant de minimiser des fonctions objectives dans un cadre simple peut se contenter de savoir qu'il existe une panoplie d'incantations d'une telle procédure (avec des noms tels que "SGD" et "Adam").
 
-To do well, however, some deeper knowledge is required.
-Optimization algorithms are important for deep learning.
-On the one hand, training a complex deep learning model can take hours, days, or even weeks.
-The performance of the optimization algorithm directly affects the model's training efficiency.
-On the other hand, understanding the principles of different optimization algorithms and the role of their hyperparameters
-will enable us to tune the hyperparameters in a targeted manner to improve the performance of deep learning models.
+Pour bien faire, cependant, des connaissances plus approfondies sont nécessaires.
+Les algorithmes d'optimisation sont importants pour l'apprentissage profond.
+D'une part, la formation d'un modèle d'apprentissage profond complexe peut prendre des heures, des jours, voire des semaines.
+La performance de l'algorithme d'optimisation affecte directement l'efficacité de l'apprentissage du modèle.
+D'autre part, comprendre les principes des différents algorithmes d'optimisation et le rôle de leurs hyperparamètres
+nous permettra de régler les hyperparamètres de manière ciblée pour améliorer les performances des modèles d'apprentissage profond.
 
-In this chapter, we explore common deep learning optimization algorithms in depth.
-Almost all optimization problems arising in deep learning are *nonconvex*.
-Nonetheless, the design and analysis of algorithms in the context of *convex* problems have proven to be very instructive.
-It is for that reason that this chapter includes a primer on convex optimization and the proof for a very simple stochastic gradient descent algorithm on a convex objective function.
+Dans ce chapitre, nous explorons en profondeur les algorithmes d'optimisation d'apprentissage profond les plus courants.
+Presque tous les problèmes d'optimisation qui se posent en apprentissage profond sont *non convexes*.
+Néanmoins, la conception et l'analyse d'algorithmes dans le contexte de problèmes *convexes* se sont avérées très instructives.
+C'est pour cette raison que ce chapitre comprend une introduction à l'optimisation convexe et la preuve d'un algorithme très simple de descente de gradient stochastique sur une fonction objectif convexe.
 
 ```toc
 :maxdepth: 2

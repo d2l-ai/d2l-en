@@ -1,27 +1,27 @@
-# Computer Vision
-:label:`chap_cv`
+# Vision par ordinateur
+:label:`chap_cv` 
 
-Whether it is medical diagnosis, self-driving vehicles, camera monitoring, or smart filters, many applications in the field of computer vision are closely related to our current and future lives. 
-In recent years, deep learning has been
-the transformative power for advancing the performance of computer vision systems.
-It can be said that the most advanced computer vision applications are almost inseparable from deep learning.
-In view of this, this chapter will focus on the field of computer vision, and investigate methods and applications that have recently been influential in academia and industry.
+ Qu'il s'agisse de diagnostic médical, de véhicules à conduite autonome, de surveillance par caméra ou de filtres intelligents, de nombreuses applications dans le domaine de la vision par ordinateur sont étroitement liées à notre vie actuelle et future. 
+Ces dernières années, l'apprentissage profond a été
+le pouvoir transformateur pour faire progresser les performances des systèmes de vision par ordinateur.
+On peut dire que les applications de vision par ordinateur les plus avancées sont presque inséparables de l'apprentissage profond.
+Dans cette optique, ce chapitre se concentre sur le domaine de la vision par ordinateur et étudie les méthodes et les applications qui ont récemment exercé une influence dans les milieux universitaires et industriels.
 
 
-In :numref:`chap_cnn` and :numref:`chap_modern_cnn`, we studied various convolutional neural networks that are
-commonly used in computer vision, and applied them
-to simple image classification tasks. 
-At the beginning of this chapter, we will describe
-two methods that 
-may improve model generalization, namely *image augmentation* and *fine-tuning*,
-and apply them to image classification. 
-Since deep neural networks can effectively represent images in multiple levels, 
-such layerwise representations have been successfully 
-used in various computer vision tasks such as *object detection*, *semantic segmentation*, and *style transfer*. 
-Following the key idea of leveraging layerwise representations in computer vision,
-we will begin with major components and techniques for object detection. Next, we will show how to use *fully convolutional networks* for semantic segmentation of images. Then we will explain how to use style transfer techniques to generate images like the cover of this book.
-In the end, we conclude this chapter
-by applying the materials of this chapter and several previous chapters on two popular computer vision benchmark datasets.
+Dans :numref:`chap_cnn` et :numref:`chap_modern_cnn` , nous avons étudié différents réseaux de neurones convolutifs
+couramment utilisés en vision par ordinateur et nous les avons appliqués
+à des tâches simples de classification d'images. 
+Au début de ce chapitre, nous décrirons
+deux méthodes qui 
+peuvent améliorer la généralisation du modèle, à savoir *l'augmentation de l'image* et *le réglage fin*,
+et nous les appliquerons à la classification d'images. 
+Étant donné que les réseaux neuronaux profonds peuvent représenter efficacement les images à plusieurs niveaux, 
+, ces représentations en couches ont été utilisées avec succès 
+dans diverses tâches de vision par ordinateur telles que la *détection d'objets*, la *segmentation sémantique* et le *transfert de style*. 
+En suivant l'idée clé d'exploiter les représentations en couches dans la vision par ordinateur,
+nous commencerons par les principaux composants et techniques de détection d'objets. Ensuite, nous montrerons comment utiliser les *réseaux entièrement convolutifs* pour la segmentation sémantique des images. Puis nous expliquerons comment utiliser les techniques de transfert de style pour générer des images comme la couverture de ce livre.
+Enfin, nous concluons ce chapitre
+en appliquant les matériaux de ce chapitre et de plusieurs chapitres précédents sur deux ensembles de données de référence populaires en vision par ordinateur.
 
 ```toc
 :maxdepth: 2

@@ -1,59 +1,59 @@
-# Modern Convolutional Neural Networks
-:label:`chap_modern_cnn`
+# Réseaux neuronaux convolutifs modernes
+:label:`chap_modern_cnn` 
 
-Now that we understand the basics of wiring together CNNs, we will
-take you through a tour of modern CNN architectures. This tour is, by
-necessity, incomplete, thanks to the plethora of exciting new designs
-being added. Their importance derives from the fact that not only can
-they be used directly for vision tasks, but they also serve as basic
-feature generators for more advanced tasks such as tracking
-:cite:`Zhang.Sun.Jiang.ea.2021`, segmentation :cite:`Long.Shelhamer.Darrell.2015`, object
-detection :cite:`Redmon.Farhadi.2018`, or style transformation
-:cite:`Gatys.Ecker.Bethge.2016`.  In this chapter, most sections
-correspond to a significant CNN architecture that was at some point
-(or currently) the base model upon which many research projects and
-deployed systems were built.  Each of these networks was briefly a
-dominant architecture and many were winners or runners-up in the
-[ImageNet competition](https://www.image-net.org/challenges/LSVRC/)
-which has served as a barometer of progress on supervised learning in
-computer vision since 2010.
+ Maintenant que nous avons compris les bases du câblage des CNN, nous allons
+vous faire découvrir les architectures CNN modernes. Cette visite est, par
+nécessité, incomplète, grâce à la pléthore de nouvelles conceptions passionnantes
+qui sont ajoutées. Leur importance découle du fait que non seulement
+ils peuvent être utilisés directement pour des tâches de vision, mais ils servent également de générateurs de caractéristiques de base
+pour des tâches plus avancées telles que le suivi
+:cite:`Zhang.Sun.Jiang.ea.2021` , la segmentation :cite:`Long.Shelhamer.Darrell.2015` , la détection d'objets
+ :cite:`Redmon.Farhadi.2018` , ou la transformation de style
+:cite:`Gatys.Ecker.Bethge.2016` .  Dans ce chapitre, la plupart des sections
+correspondent à une architecture CNN importante qui a été à un moment donné
+(ou actuellement) le modèle de base sur lequel de nombreux projets de recherche et
+systèmes déployés ont été construits.  Chacun de ces réseaux a été brièvement une architecture dominante
+et beaucoup d'entre eux ont été gagnants ou finalistes du concours
+[ImageNet competition](https://www.image-net.org/challenges/LSVRC/) 
+ qui sert de baromètre des progrès de l'apprentissage supervisé en
+vision par ordinateur depuis 2010.
 
-These models include the AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`,
-the first large-scale network deployed to beat conventional computer
-vision methods on a large-scale vision challenge; the VGG network
-:cite:`Simonyan.Zisserman.2014`, which makes use of a number of
-repeating blocks of elements; the network in network (NiN) that
-convolves whole neural networks patch-wise over inputs
-:cite:`Lin.Chen.Yan.2013`; the GoogLeNet that uses networks with
-multi-branch convolutions :cite:`Szegedy.Liu.Jia.ea.2015`; the residual
-network (ResNet) :cite:`He.Zhang.Ren.ea.2016`, which remains some of
-the most popular off-the-shelf architectures in computer vision;
-ResNeXt blocks :cite:`Xie.Girshick.Dollar.ea.2017` 
-for sparser connections;
-and 
-the DenseNet
-:cite:`Huang.Liu.Van-Der-Maaten.ea.2017` for a generalization of the
-residual architecture.
-In addition to that,
-assuming standard and fixed blocks,
-we progressively simplify design spaces with better models,
-leading
-to the RegNet
-:cite:`Radosavovic.Kosaraju.Girshick.ea.2020`. 
+Ces modèles comprennent l'AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012` ,
+le premier réseau à grande échelle déployé pour battre les méthodes conventionnelles de vision par ordinateur
+dans un défi de vision à grande échelle ; le réseau VGG
+:cite:`Simonyan.Zisserman.2014` , qui utilise un certain nombre de
+blocs d'éléments répétitifs ; le réseau en réseau (NiN) qui
+convolue des réseaux neuronaux entiers par patch sur des entrées
+:cite:`Lin.Chen.Yan.2013` ; le GoogLeNet qui utilise des réseaux avec des convolutions multibranches
+ :cite:`Szegedy.Liu.Jia.ea.2015` ; le réseau résiduel
+(ResNet) :cite:`He.Zhang.Ren.ea.2016` , qui reste l'une des
+architectures sur étagère les plus populaires dans le domaine de la vision par ordinateur ;
+les blocs ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017` 
+ pour des connexions plus éparses ;
+et 
+le DenseNet
+:cite:`Huang.Liu.Van-Der-Maaten.ea.2017` pour une généralisation de l'architecture résiduelle
+.
+En outre,
+en supposant des blocs standard et fixes,
+nous simplifions progressivement les espaces de conception avec de meilleurs modèles,
+
+ conduisant au RegNet
+:cite:`Radosavovic.Kosaraju.Girshick.ea.2020` . 
 
 
-While the idea of *deep* neural networks is quite simple (stack
-together a bunch of layers), performance can vary wildly across
-architectures and hyperparameter choices.  The neural networks
-described in this chapter are the product of intuition, a few
-mathematical insights, and a lot of trial and error.  We present these
-models in chronological order, partly to convey a sense of the history
-so that you can form your own intuitions about where the field is
-heading and perhaps develop your own architectures.  For instance,
-batch normalization and residual connections described in this chapter
-have offered two popular ideas for training and designing deep models,
-both of which have since been applied to architectures beyond computer
-vision, too.
+ Bien que l'idée des réseaux neuronaux *profonds* soit assez simple (empiler
+un tas de couches), les performances peuvent varier énormément selon les architectures
+et les choix d'hyperparamètres.  Les réseaux neuronaux
+décrits dans ce chapitre sont le fruit de l'intuition, de quelques connaissances mathématiques
+et de nombreux essais et erreurs.  Nous présentons ces modèles
+par ordre chronologique, en partie pour donner un sens à l'histoire
+afin que vous puissiez vous forger vos propres intuitions sur l'orientation du domaine
+et peut-être développer vos propres architectures.  Par exemple, la normalisation des lots
+et les connexions résiduelles décrites dans ce chapitre
+ont offert deux idées populaires pour la formation et la conception de modèles profonds,
+toutes deux ayant depuis été appliquées à des architectures autres que la vision par ordinateur
+également.
 
 ```toc
 :maxdepth: 2

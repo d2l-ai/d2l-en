@@ -1,9 +1,9 @@
-# Concise Implementation for Multiple GPUs
-:label:`sec_multi_gpu_concise`
+# Mise en œuvre concise pour plusieurs GPU
+:label:`sec_multi_gpu_concise` 
 
-Implementing parallelism from scratch for every new model is no fun. Moreover, there is significant benefit in optimizing synchronization tools for high performance. In the following we will show how to do this using high-level APIs of deep learning frameworks.
-The mathematics and the algorithms are the same as in :numref:`sec_multi_gpu`.
-Quite unsurprisingly you will need at least two GPUs to run code of this section.
+ Mettre en œuvre le parallélisme à partir de zéro pour chaque nouveau modèle n'est pas une partie de plaisir. De plus, il y a un avantage significatif à optimiser les outils de synchronisation pour une haute performance. Dans ce qui suit, nous allons montrer comment le faire en utilisant les API de haut niveau des cadres d'apprentissage profond.
+Les mathématiques et les algorithmes sont les mêmes que dans :numref:`sec_multi_gpu` .
+Sans surprise, vous aurez besoin d'au moins deux GPU pour exécuter le code de cette section.
 
 ```{.python .input}
 #@tab mxnet
@@ -22,9 +22,9 @@ from torch import nn
 
 ## [**A Toy Network**]
 
-Let's use a slightly more meaningful network than LeNet from :numref:`sec_multi_gpu` that is still sufficiently easy and quick to train.
-We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference from :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning.
-Moreover, we remove the max-pooling layer.
+Utilisons un réseau un peu plus significatif que le LeNet de :numref:`sec_multi_gpu` qui est encore suffisamment facile et rapide à entraîner.
+Nous choisissons une variante de ResNet-18 :cite:`He.Zhang.Ren.ea.2016` . Comme les images d'entrée sont minuscules, nous le modifions légèrement. En particulier, la différence avec :numref:`sec_resnet` est que nous utilisons un noyau de convolution, un stride et un padding plus petits au début.
+De plus, nous supprimons la couche de max-pooling.
 
 ```{.python .input}
 #@tab mxnet
@@ -86,16 +86,16 @@ def resnet18(num_classes, in_channels=1):
     return net
 ```
 
-## Network Initialization
+## Initialisation du réseau
 
-:begin_tab:`mxnet`
-The `initialize` function allows us to initialize parameters on a device of our choice.
-For a refresher on initialization methods see :numref:`sec_numerical_stability`. What is particularly convenient is that it also allows us to initialize the network on *multiple* devices simultaneously. Let's try how this works in practice.
+:begin_tab:`mxnet` 
+ La fonction `initialize` nous permet d'initialiser les paramètres sur un dispositif de notre choix.
+Pour un rappel sur les méthodes d'initialisation, voir :numref:`sec_numerical_stability` . Ce qui est particulièrement pratique, c'est qu'elle nous permet également d'initialiser le réseau sur *plusieurs* périphériques simultanément. Voyons comment cela fonctionne en pratique.
 :end_tab:
 
 :begin_tab:`pytorch`
-We will initialize the network inside the training loop.
-For a refresher on initialization methods see :numref:`sec_numerical_stability`.
+Nous allons initialiser le réseau à l'intérieur de la boucle d'apprentissage.
+Pour un rappel sur les méthodes d'initialisation, voir :numref:`sec_numerical_stability` .
 :end_tab:
 
 ```{.python .input}
@@ -116,7 +116,7 @@ devices = d2l.try_all_gpus()
 ```
 
 :begin_tab:`mxnet`
-Using the `split_and_load` function introduced in :numref:`sec_multi_gpu` we can divide a minibatch of data and copy portions to the list of devices provided by the `devices` variable. The network instance *automatically* uses the appropriate GPU to compute the value of the forward propagation. Here we generate 4 observations and split them over the GPUs.
+À l'aide de la fonction `split_and_load` introduite dans :numref:`sec_multi_gpu` , nous pouvons diviser un minilot de données et en copier des portions dans la liste de périphériques fournie par la variable `devices`. L'instance de réseau *automatiquement* utilise le GPU approprié pour calculer la valeur de la propagation vers l'avant. Ici, nous générons 4 observations et les répartissons sur les GPU.
 :end_tab:
 
 ```{.python .input}
@@ -127,8 +127,8 @@ net(x_shards[0]), net(x_shards[1])
 ```
 
 :begin_tab:`mxnet`
-Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*.
-This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters do not even exist on the CPU. We can verify this by printing out the parameters and observing any errors that might arise.
+Une fois que les données passent par le réseau, les paramètres correspondants sont initialisés *sur le dispositif par lequel les données sont passées*.
+Cela signifie que l'initialisation se fait sur une base par dispositif. Puisque nous avons choisi le GPU 0 et le GPU 1 pour l'initialisation, le réseau n'est initialisé que là, et pas sur le CPU. En fait, les paramètres n'existent même pas sur le CPU. Nous pouvons le vérifier en imprimant les paramètres et en observant toute erreur qui pourrait survenir.
 :end_tab:
 
 ```{.python .input}
@@ -143,7 +143,7 @@ weight.data(devices[0])[0], weight.data(devices[1])[0]
 ```
 
 :begin_tab:`mxnet`
-Next, let's replace the code to [**evaluate the accuracy**] by one that works (**in parallel across multiple devices**). This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a minibatch before invoking the network. All else is essentially identical.
+Ensuite, remplaçons le code pour [**évaluer la précision**] par un code qui fonctionne (**en parallèle sur plusieurs périphériques**). Cette fonction remplace la fonction `evaluate_accuracy_gpu` de :numref:`sec_lenet` . La principale différence est que nous divisons un minibatch avant d'invoquer le réseau. Tout le reste est essentiellement identique.
 :end_tab:
 
 ```{.python .input}
@@ -167,14 +167,14 @@ def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
 
 ## [**Training**]
 
-As before, the training code needs to perform several basic functions for efficient parallelism:
+Comme précédemment, le code de formation doit exécuter plusieurs fonctions de base pour un parallélisme efficace :
 
-* Network parameters need to be initialized across all devices.
-* While iterating over the dataset minibatches are to be divided across all devices.
-* We compute the loss and its gradient in parallel across devices.
-* Gradients are aggregated and parameters are updated accordingly.
+* Les paramètres du réseau doivent être initialisés sur tous les appareils.
+* Lors de l'itération sur le jeu de données, les minibatchs doivent être répartis sur tous les appareils.
+* Nous calculons la perte et son gradient en parallèle sur tous les dispositifs.
+* Les gradients sont agrégés et les paramètres sont mis à jour en conséquence.
 
-In the end we compute the accuracy (again in parallel) to report the final performance of the network. The training routine is quite similar to implementations in previous chapters, except that we need to split and aggregate data.
+À la fin, nous calculons la précision (encore une fois en parallèle) pour rendre compte de la performance finale du réseau. La routine de formation est assez similaire aux implémentations des chapitres précédents, sauf que nous devons diviser et agréger les données.
 
 ```{.python .input}
 #@tab mxnet
@@ -234,7 +234,7 @@ def train(net, num_gpus, batch_size, lr):
           f'on {str(devices)}')
 ```
 
-Let's see how this works in practice. As a warm-up we [**train the network on a single GPU.**]
+Voyons comment cela fonctionne en pratique. Pour nous échauffer, nous [**entraînons le réseau sur un seul GPU.**]
 
 ```{.python .input}
 #@tab mxnet
@@ -246,9 +246,9 @@ train(num_gpus=1, batch_size=256, lr=0.1)
 train(net, num_gpus=1, batch_size=256, lr=0.1)
 ```
 
-Next we [**use 2 GPUs for training**]. Compared with LeNet
-evaluated in :numref:`sec_multi_gpu`,
-the model for ResNet-18 is considerably more complex. This is where parallelization shows its advantage. The time for computation is meaningfully larger than the time for synchronizing parameters. This improves scalability since the overhead for parallelization is less relevant.
+Ensuite, nous [**utilisons 2 GPU pour l'entraînement**]. Comparé à LeNet
+évalué dans :numref:`sec_multi_gpu` ,
+le modèle de ResNet-18 est considérablement plus complexe. C'est là que la parallélisation montre son avantage. Le temps de calcul est significativement plus important que le temps de synchronisation des paramètres. Cela améliore l'extensibilité puisque l'overhead de la parallélisation est moins important.
 
 ```{.python .input}
 #@tab mxnet
@@ -260,28 +260,28 @@ train(num_gpus=2, batch_size=512, lr=0.2)
 train(net, num_gpus=2, batch_size=512, lr=0.2)
 ```
 
-## Summary
+## Résumé
 
-:begin_tab:`mxnet`
-* Gluon provides primitives for model initialization across multiple devices by providing a context list.
+:begin_tab:`mxnet` 
+ * Gluon fournit des primitives pour l'initialisation du modèle sur plusieurs dispositifs en fournissant une liste de contexte.
 :end_tab:
-* Data is automatically evaluated on the devices where the data can be found.
-* Take care to initialize the networks on each device before trying to access the parameters on that device. Otherwise you will encounter an error.
-* The optimization algorithms automatically aggregate over multiple GPUs.
+* Les données sont automatiquement évaluées sur les dispositifs où elles peuvent être trouvées.
+* Prenez soin d'initialiser les réseaux sur chaque dispositif avant d'essayer d'accéder aux paramètres sur ce dispositif. Sinon, vous rencontrerez une erreur.
+* Les algorithmes d'optimisation s'agrègent automatiquement sur plusieurs GPU.
 
 
 
-## Exercises
+## Exercices
 
-:begin_tab:`mxnet`
-1. This section uses ResNet-18. Try different epochs, batch sizes, and learning rates. Use more GPUs for computation. What happens if you try this with 16 GPUs (e.g., on an AWS p2.16xlarge instance)?
-1. Sometimes, different devices provide different computing power. We could use the GPUs and the CPU at the same time. How should we divide the work? Is it worth the effort? Why? Why not?
-1. What happens if we drop `npx.waitall()`? How would you modify training such that you have an overlap of up to two steps for parallelism?
+:begin_tab:`mxnet` 
+ 1. Cette section utilise ResNet-18. Essayez différentes époques, tailles de lots et taux d'apprentissage. Utilisez plus de GPU pour le calcul. Que se passe-t-il si vous essayez avec 16 GPU (par exemple, sur une instance AWS p2.16xlarge) ?
+1. Parfois, différents dispositifs fournissent une puissance de calcul différente. Nous pourrions utiliser les GPU et le CPU en même temps. Comment devrions-nous diviser le travail ? Le jeu en vaut-il la chandelle ? Pourquoi ? Pourquoi pas ?
+1. Que se passe-t-il si nous abandonnons `npx.waitall()`? Comment modifieriez-vous la formation de manière à obtenir un chevauchement de deux étapes au maximum pour le parallélisme ?
 :end_tab:
 
 :begin_tab:`pytorch`
-1. This section uses ResNet-18. Try different epochs, batch sizes, and learning rates. Use more GPUs for computation. What happens if you try this with 16 GPUs (e.g., on an AWS p2.16xlarge instance)?
-1. Sometimes, different devices provide different computing power. We could use the GPUs and the CPU at the same time. How should we divide the work? Is it worth the effort? Why? Why not?
+1. Cette section utilise ResNet-18. Essayez différentes époques, tailles de lots et taux d'apprentissage. Utilisez plus de GPU pour le calcul. Que se passe-t-il si vous essayez avec 16 GPU (par exemple, sur une instance AWS p2.16xlarge) ?
+1. Parfois, différents dispositifs fournissent une puissance de calcul différente. Nous pourrions utiliser les GPU et le CPU en même temps. Comment devrions-nous diviser le travail ? Le jeu en vaut-il la chandelle ? Pourquoi ? Pourquoi pas ?
 :end_tab:
 
 

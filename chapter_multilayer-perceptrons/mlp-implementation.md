@@ -3,11 +3,11 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Implementation 
-:label:`sec_mlp_scratch`
+# Mise en œuvre 
+:label:`sec_mlp_scratch` 
 
-Multilayer perceptrons (MLPs) are not much more complex to implement than simple linear models. The key conceptual 
-difference is that we now concatenate multiple layers.
+ Les perceptrons multicouches (MLP) ne sont pas beaucoup plus complexes à mettre en œuvre que les modèles linéaires simples. La principale différence conceptuelle 
+est que nous concaténons maintenant plusieurs couches.
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -30,32 +30,32 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## Implementation from Scratch
+### Implémentation à partir de zéro
 
-Let's begin again by implementing such a network from scratch.
+Commençons par implémenter un tel réseau à partir de zéro.
 
-### Initializing Model Parameters
+### Initialisation des paramètres du modèle
 
-Recall that Fashion-MNIST contains 10 classes,
-and that each image consists of a $28 \times 28 = 784$
-grid of grayscale pixel values.
-As before we will disregard the spatial structure
-among the pixels for now, 
-so we can think of this as a classification dataset
-with 784 input features and 10 classes.
-To begin, we will [**implement an MLP
-with one hidden layer and 256 hidden units.**]
-Both the number of layers and their width are adjustable 
-(they are considered hyperparameters). 
-Typically, we choose the layer widths to be divisible by larger powers of 2. 
-This is computationally efficient due to the way 
-memory is allocated and addressed in hardware.
+Rappelons que Fashion-MNIST contient 10 classes,
+et que chaque image consiste en une grille $28 \times 28 = 784$
+ de valeurs de pixels en niveaux de gris.
+Comme précédemment, nous ne tiendrons pas compte de la structure spatiale
+entre les pixels pour le moment, 
+. Nous pouvons donc considérer ceci comme un ensemble de données de classification
+avec 784 caractéristiques d'entrée et 10 classes.
+Pour commencer, nous allons [**implémenter un MLP
+avec une couche cachée et 256 unités cachées.**]
+Le nombre de couches et leur largeur sont tous deux réglables 
+(ils sont considérés comme des hyperparamètres). 
+En règle générale, nous choisissons des largeurs de couche divisibles par des puissances de 2 plus importantes. 
+C'est un calcul efficace en raison de la manière dont la mémoire 
+est allouée et adressée dans le matériel.
 
-Again, we will represent our parameters with several tensors.
-Note that *for every layer*, we must keep track of
-one weight matrix and one bias vector.
-As always, we allocate memory
-for the gradients of the loss with respect to these parameters.
+Une fois encore, nous représenterons nos paramètres par plusieurs tenseurs.
+Notez que *pour chaque couche*, nous devons garder la trace de
+une matrice de poids et un vecteur de biais.
+Comme toujours, nous allouons la mémoire
+pour les gradients de la perte par rapport à ces paramètres.
 
 ```{.python .input  n=5}
 %%tab mxnet
@@ -97,11 +97,11 @@ class MLPScratch(d2l.Classifier):
         self.b2 = tf.Variable(tf.zeros(num_outputs))
 ```
 
-### Model
+### Modèle
 
-To make sure we know how everything works,
-we will [**implement the ReLU activation**] ourselves
-rather than invoking the built-in `relu` function directly.
+Pour nous assurer que nous savons comment tout fonctionne,
+nous allons [**implémenter l'activation ReLU**] nous-mêmes
+plutôt que d'invoquer directement la fonction intégrée `relu`.
 
 ```{.python .input  n=8}
 %%tab mxnet
@@ -122,11 +122,11 @@ def relu(X):
     return tf.math.maximum(X, 0)
 ```
 
-Since we are disregarding spatial structure,
-we `reshape` each two-dimensional image into
-a flat vector of length  `num_inputs`.
-Finally, we (**implement our model**)
-with just a few lines of code. Since we use the framework built-in autograd this is all that it takes.
+Puisque nous ne tenons pas compte de la structure spatiale,
+nous `reshape` chaque image bidimensionnelle en
+un vecteur plat de longueur `num_inputs`.
+Enfin, nous (**mettons en œuvre notre modèle**)
+avec seulement quelques lignes de code. Puisque nous utilisons le cadre intégré autograd, c'est tout ce qu'il faut.
 
 ```{.python .input  n=11}
 %%tab all
@@ -137,10 +137,10 @@ def forward(self, X):
     return d2l.matmul(H, self.W2) + self.b2
 ```
 
-### Training
+### Formation
 
-Fortunately, [**the training loop for MLPs
-is exactly the same as for softmax regression.**] We define the model, data, trainer and finally invoke the `fit` function on model and data.
+Heureusement, [**la boucle de formation pour les MLP
+est exactement la même que pour la régression softmax.**] Nous définissons le modèle, les données, le formateur et enfin nous invoquons la fonction `fit` sur le modèle et les données.
 
 ```{.python .input  n=12}
 %%tab all
@@ -150,19 +150,19 @@ trainer = d2l.Trainer(max_epochs=10)
 trainer.fit(model, data)
 ```
 
-## Concise Implementation
+### Implémentation concise
 
-As you might expect, by relying on the high-level APIs, we can implement MLPs even more concisely.
+Comme on peut s'y attendre, en s'appuyant sur les API de haut niveau, nous pouvons implémenter les MLP de manière encore plus concise.
 
-### Model
+### Modèle
 
-As compared with our concise implementation
-of softmax regression implementation
-(:numref:`sec_softmax_concise`),
-the only difference is that we add
-*two* fully connected layers where we previously added only *one*.
-The first is [**the hidden layer**],
-the second is the output layer.
+Par rapport à notre implémentation concise
+de l'implémentation de la régression softmax
+(:numref:`sec_softmax_concise` ),
+la seule différence est que nous ajoutons
+*deux* couches entièrement connectées là où nous n'en avions ajouté qu'une*une* auparavant.
+La première est [**la couche cachée**],
+la seconde est la couche de sortie.
 
 ```{.python .input}
 %%tab mxnet
@@ -200,11 +200,11 @@ class MLP(d2l.Classifier):
 
 ### Training
 
-[**The training loop**] is exactly the same
-as when we implemented softmax regression.
-This modularity enables us to separate
-matters concerning the model architecture
-from orthogonal considerations.
+[**La boucle d'entraînement**] est exactement la même
+que lorsque nous avons implémenté la régression softmax.
+Cette modularité nous permet de séparer
+les questions concernant l'architecture du modèle
+des considérations orthogonales.
 
 ```{.python .input}
 %%tab all
@@ -212,29 +212,29 @@ model = MLP(num_outputs=10, num_hiddens=256, lr=0.1)
 trainer.fit(model, data)
 ```
 
-## Summary
+## Résumé
 
-Now that we have more practice in designing deep networks, the step from a single to multiple layers of deep networks doesn't pose such a significant challenge any longer. In particular, we can reuse the training algorithm and data loader. Note, though, that implementing MLPs from scratch is nonetheless messy: naming and keeping track of the model parameters makes it difficult to extend models. For instance, imagine wanting to insert another layer between layers 42 and 43. This might now be layer 42b, unless we are willing to perform sequential renaming. Moreover, if we implement the network from scratch, it is much more difficult for the framework to perform meaningful performance optimizations. 
+Maintenant que nous avons plus de pratique dans la conception de réseaux profonds, le passage d'une couche unique à plusieurs couches de réseaux profonds ne pose plus un défi aussi important. En particulier, nous pouvons réutiliser l'algorithme de formation et le chargeur de données. Notez cependant que l'implémentation de MLP à partir de zéro est néanmoins désordonnée : nommer et garder la trace des paramètres du modèle rend difficile l'extension des modèles. Par exemple, imaginons que l'on veuille insérer une autre couche entre les couches 42 et 43. Il pourrait s'agir maintenant de la couche 42b, à moins que nous ne soyons prêts à effectuer un renommage séquentiel. De plus, si nous implémentons le réseau à partir de zéro, il est beaucoup plus difficile pour le framework d'effectuer des optimisations de performance significatives. 
 
-Nonetheless, you have now reached the state of the art of the late 1980s when fully connected deep networks were the method of choice for neural network modeling. Our next conceptual step will be to consider images. Before we do so, we need to review a number of statistical basics and details on how to compute models efficiently. 
+Néanmoins, vous avez maintenant atteint l'état de l'art de la fin des années 1980, lorsque les réseaux profonds entièrement connectés étaient la méthode de choix pour la modélisation des réseaux neuronaux. Notre prochaine étape conceptuelle consistera à considérer les images. Avant de le faire, nous devons revoir un certain nombre de bases statistiques et de détails sur la façon de calculer des modèles de manière efficace. 
 
 
-## Exercises
+## Exercices
 
-1. Change the number of hidden units `num_hiddens` and plot how its number affects the accuracy of the model. What is the best value of this hyperparameter?
-1. Try adding a hidden layer to see how it affects the results.
-1. Why is it a bad idea to insert a hidden layer with a single neuron? What could go wrong?
-1. How does changing the learning rate alter your results? With all other parameters fixed, which learning rate gives you the best results? How does this relate to the number of epochs?
-1. Let's optimize over all hyperparameters jointly, i.e., learning rate, number of epochs, number of hidden layers, and number of hidden units per layer. 
-    1. What is the best result you can get by optimizing over all of them?
-    1. Why it is much more challenging to deal with multiple hyperparameters?
-    1. Describe an efficient strategy for optimizing over multiple parameters jointly. 
-1. Compare the speed of the framework and the from-scratch implementation for a challenging problem. How does it change with the complexity of the network?
-1. Measure the speed of tensor-matrix multiplications for well-aligned and misaligned matrices. For instance, test for matrices with dimension 1024, 1025, 1026, 1028, and 1032.
-    1. How does this change between GPUs and CPUs?
-    1. Determine the memory bus width of your CPU and GPU. 
-1. Try out different activation functions. Which one works best?
-1. Is there a difference between weight initializations of the network? Does it matter?
+1. Modifiez le nombre d'unités cachées `num_hiddens` et indiquez comment ce nombre affecte la précision du modèle. Quelle est la meilleure valeur de cet hyperparamètre ?
+1. Essayez d'ajouter une couche cachée pour voir comment cela affecte les résultats.
+1. Pourquoi est-ce une mauvaise idée d'insérer une couche cachée avec un seul neurone ? Qu'est-ce qui pourrait mal tourner ?
+1. Comment la modification du taux d'apprentissage modifie-t-elle vos résultats ? Tous les autres paramètres étant fixes, quel taux d'apprentissage vous donne les meilleurs résultats ? Quel est le lien avec le nombre d'époques ?
+1. Optimisons tous les hyperparamètres conjointement, c'est-à-dire le taux d'apprentissage, le nombre d'époques, le nombre de couches cachées et le nombre d'unités cachées par couche. 
+    1. Quel est le meilleur résultat que vous pouvez obtenir en optimisant sur tous ces paramètres ?
+   1. Pourquoi est-il beaucoup plus difficile de traiter plusieurs hyperparamètres ?
+   1. Décrivez une stratégie efficace d'optimisation conjointe sur plusieurs paramètres. 
+1. Comparer la rapidité du cadre et de l'implémentation " from scratch " pour un problème difficile. Comment cela change-t-il avec la complexité du réseau ?
+1. Mesurez la vitesse des multiplications de matrices tensives pour des matrices bien alignées et désalignées. Par exemple, testez les matrices de dimension 1024, 1025, 1026, 1028 et 1032.
+   1. Comment cela change-t-il entre les GPU et les CPU ?
+   1. Déterminez la largeur du bus mémoire de votre CPU et de votre GPU. 
+1. Essayez différentes fonctions d'activation. Laquelle fonctionne le mieux ?
+1. Y a-t-il une différence entre les initialisations de poids du réseau ? Cela a-t-il de l'importance ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/92)

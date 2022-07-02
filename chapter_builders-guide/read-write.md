@@ -1,26 +1,26 @@
 # File I/O
 
-So far we discussed how to process data and how
-to build, train, and test deep learning models.
-However, at some point, we will hopefully be happy enough
-with the learned models that we will want
-to save the results for later use in various contexts
-(perhaps even to make predictions in deployment).
-Additionally, when running a long training process,
-the best practice is to periodically save intermediate results (checkpointing)
-to ensure that we do not lose several days worth of computation
-if we trip over the power cord of our server.
-Thus it is time to learn how to load and store
-both individual weight vectors and entire models.
-This section addresses both issues.
+Jusqu'à présent, nous avons vu comment traiter les données et comment
+construire, former et tester des modèles d'apprentissage profond.
+Cependant, à un moment donné, nous espérons être suffisamment satisfaits
+des modèles appris pour vouloir
+enregistrer les résultats pour une utilisation ultérieure dans divers contextes
+(peut-être même pour faire des prédictions dans le déploiement).
+En outre, lors de l'exécution d'un long processus de formation,
+la meilleure pratique consiste à sauvegarder périodiquement les résultats intermédiaires (checkpointing)
+pour s'assurer que nous ne perdons pas plusieurs jours de calcul
+si nous trébuchons sur le cordon d'alimentation de notre serveur.
+Il est donc temps d'apprendre à charger et à stocker
+à la fois des vecteurs de poids individuels et des modèles entiers.
+Cette section aborde les deux questions.
 
-## (**Loading and Saving Tensors**)
+## (**Chargement et sauvegarde de tenseurs**)
 
-For individual tensors, we can directly
-invoke the `load` and `save` functions
-to read and write them respectively.
-Both functions require that we supply a name,
-and `save` requires as input the variable to be saved.
+Pour les tenseurs individuels, nous pouvons directement
+invoquer les fonctions `load` et `save`
+ pour les lire et les écrire respectivement.
+Les deux fonctions exigent que nous fournissions un nom,
+et `save` exige comme entrée la variable à sauvegarder.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -56,7 +56,7 @@ x = tf.range(4)
 np.save('x-file.npy', x)
 ```
 
-We can now read the data from the stored file back into memory.
+Nous pouvons maintenant relire en mémoire les données du fichier enregistré.
 
 ```{.python .input}
 %%tab mxnet
@@ -76,7 +76,7 @@ x2 = np.load('x-file.npy', allow_pickle=True)
 x2
 ```
 
-We can [**store a list of tensors and read them back into memory.**]
+Nous pouvons [**stocker une liste de tenseurs et les relire en mémoire.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -102,10 +102,10 @@ x2, y2 = np.load('xy-files.npy', allow_pickle=True)
 (x2, y2)
 ```
 
-We can even [**write and read a dictionary that maps
-from strings to tensors.**]
-This is convenient when we want
-to read or write all the weights in a model.
+Nous pouvons même [**écrire et lire un dictionnaire qui fait correspondre
+des chaînes de caractères aux tenseurs.**]
+Ceci est pratique lorsque nous voulons
+lire ou écrire tous les poids d'un modèle.
 
 ```{.python .input}
 %%tab mxnet
@@ -131,25 +131,25 @@ mydict2 = np.load('mydict.npy', allow_pickle=True)
 mydict2
 ```
 
-## [**Loading and Saving Model Parameters**]
+## [**Chargement et sauvegarde des paramètres du modèle**]
 
-Saving individual weight vectors (or other tensors) is useful,
-but it gets very tedious if we want to save
-(and later load) an entire model.
-After all, we might have hundreds of
-parameter groups sprinkled throughout.
-For this reason the deep learning framework provides built-in functionalities
-to load and save entire networks.
-An important detail to note is that this
-saves model *parameters* and not the entire model.
-For example, if we have a 3-layer MLP,
-we need to specify the architecture separately.
-The reason for this is that the models themselves can contain arbitrary code,
-hence they cannot be serialized as naturally.
-Thus, in order to reinstate a model, we need
-to generate the architecture in code
-and then load the parameters from disk.
-(**Let's start with our familiar MLP.**)
+Sauvegarder des vecteurs de poids individuels (ou d'autres tenseurs) est utile,
+mais cela devient très fastidieux si nous voulons sauvegarder
+(et charger plus tard) un modèle entier.
+Après tout, il se peut que nous ayons des centaines de groupes de paramètres
+disséminés un peu partout.
+C'est pourquoi le cadre d'apprentissage profond fournit des fonctionnalités intégrées
+pour charger et sauvegarder des réseaux entiers.
+Un détail important à noter est que cette
+sauvegarde les *paramètres* du modèle et non le modèle entier.
+Par exemple, si nous avons un MLP à 3 couches,
+nous devons spécifier l'architecture séparément.
+La raison en est que les modèles eux-mêmes peuvent contenir du code arbitraire,
+; ils ne peuvent donc pas être sérialisés de manière naturelle.
+Ainsi, afin de réintégrer un modèle, nous devons
+générer l'architecture en code
+et ensuite charger les paramètres depuis le disque.
+(**Commençons par notre MLP familier.**)
 
 ```{.python .input}
 %%tab mxnet
@@ -203,7 +203,7 @@ X = tf.random.uniform((2, 20))
 Y = net(X)
 ```
 
-Next, we [**store the parameters of the model as a file**] with the name "mlp.params".
+Ensuite, nous [**stockons les paramètres du modèle dans un fichier**] portant le nom "mlp.params".
 
 ```{.python .input}
 %%tab mxnet
@@ -220,10 +220,10 @@ torch.save(net.state_dict(), 'mlp.params')
 net.save_weights('mlp.params')
 ```
 
-To recover the model, we instantiate a clone
-of the original MLP model.
-Instead of randomly initializing the model parameters,
-we [**read the parameters stored in the file directly**].
+Pour récupérer le modèle, nous instancions un clone
+du modèle MLP original.
+Au lieu d'initialiser aléatoirement les paramètres du modèle,
+nous [**lisons les paramètres stockés dans le fichier directement**].
 
 ```{.python .input}
 %%tab mxnet
@@ -244,9 +244,9 @@ clone = MLP()
 clone.load_weights('mlp.params')
 ```
 
-Since both instances have the same model parameters,
-the computational result of the same input `X` should be the same.
-Let's verify this.
+Puisque les deux instances ont les mêmes paramètres de modèle,
+le résultat du calcul de la même entrée `X` devrait être le même.
+Vérifions cela.
 
 ```{.python .input}
 %%tab all
@@ -254,17 +254,17 @@ Y_clone = clone(X)
 Y_clone == Y
 ```
 
-## Summary
+## Résumé
 
-* The `save` and `load` functions can be used to perform file I/O for tensor objects.
-* We can save and load the entire sets of parameters for a network via a parameter dictionary.
-* Saving the architecture has to be done in code rather than in parameters.
+* Les fonctions `save` et `load` peuvent être utilisées pour effectuer des E/S de fichiers pour les objets tenseurs.
+* Nous pouvons sauvegarder et charger les ensembles complets de paramètres pour un réseau via un dictionnaire de paramètres.
+* La sauvegarde de l'architecture doit se faire en code plutôt qu'en paramètres.
 
-## Exercises
+## Exercices
 
-1. Even if there is no need to deploy trained models to a different device, what are the practical benefits of storing model parameters?
-1. Assume that we want to reuse only parts of a network to be incorporated into a network of a different architecture. How would you go about using, say the first two layers from a previous network in a new network?
-1. How would you go about saving the network architecture and parameters? What restrictions would you impose on the architecture?
+1. Même s'il n'est pas nécessaire de déployer les modèles formés sur un autre appareil, quels sont les avantages pratiques du stockage des paramètres du modèle ?
+1. Supposons que nous voulions réutiliser uniquement des parties d'un réseau pour les incorporer dans un réseau d'une architecture différente. Comment procéderiez-vous pour utiliser, par exemple, les deux premières couches d'un réseau précédent dans un nouveau réseau ?
+1. Comment procéder pour sauvegarder l'architecture et les paramètres du réseau ? Quelles restrictions imposeriez-vous à l'architecture ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/60)

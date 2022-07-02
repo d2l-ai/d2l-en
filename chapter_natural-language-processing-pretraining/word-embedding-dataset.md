@@ -1,20 +1,20 @@
-# The Dataset for Pretraining Word Embeddings
-:label:`sec_word2vec_data`
+# Le jeu de données pour le pré-entraînement des incorporations de mots
+:label:`sec_word2vec_data` 
 
-Now that we know the technical details of 
-the word2vec models and approximate training methods,
-let's walk through their implementations. 
-Specifically,
-we will take the skip-gram model in :numref:`sec_word2vec`
-and negative sampling in :numref:`sec_approx_train`
-as an example.
-In this section,
-we begin with the dataset
-for pretraining the word embedding model:
-the original format of the data
-will be transformed
-into minibatches
-that can be iterated over during training.
+ Maintenant que nous connaissons les détails techniques de 
+les modèles word2vec et les méthodes d'entraînement approximatives,
+nous allons passer en revue leurs implémentations. 
+Plus précisément,
+nous prendrons comme exemple le modèle de saut de programme dans :numref:`sec_word2vec` 
+ et l'échantillonnage négatif dans :numref:`sec_approx_train` 
+ .
+Dans cette section,
+nous commençons par l'ensemble de données
+pour le pré-entraînement du modèle d'intégration des mots :
+le format original des données
+sera transformé
+en minibatchs
+qui pourront être itérés pendant l'entraînement.
 
 ```{.python .input}
 #@tab mxnet
@@ -36,17 +36,17 @@ import os
 import random
 ```
 
-## Reading the Dataset
+## Lecture du jeu de données
 
-The dataset that we use here
-is [Penn Tree Bank (PTB)]( https://catalog.ldc.upenn.edu/LDC99T42). 
-This corpus is sampled
-from Wall Street Journal articles,
-split into training, validation, and test sets.
-In the original format,
-each line of the text file
-represents a sentence of words that are separated by spaces.
-Here we treat each word as a token.
+Le jeu de données que nous utilisons ici
+est [Penn Tree Bank (PTB)]( https://catalog.ldc.upenn.edu/LDC99T42). 
+Ce corpus est échantillonné
+à partir d'articles du Wall Street Journal,
+divisé en ensembles de formation, de validation et de test.
+Dans le format original,
+chaque ligne du fichier texte
+représente une phrase de mots séparés par des espaces.
+Ici, nous traitons chaque mot comme un jeton.
 
 ```{.python .input}
 #@tab all
@@ -67,13 +67,13 @@ sentences = read_ptb()
 f'# sentences: {len(sentences)}'
 ```
 
-After reading the training set,
-we build a vocabulary for the corpus,
-where any word that appears 
-less than 10 times is replaced by 
-the "&lt;unk&gt;" token.
-Note that the original dataset
-also contains "&lt;unk&gt;" tokens that represent rare (unknown) words.
+Après avoir lu l'ensemble d'entraînement,
+nous construisons un vocabulaire pour le corpus,
+où tout mot qui apparaît 
+moins de 10 fois est remplacé par 
+le jeton "&lt;unk&gt;".
+Notez que l'ensemble de données original
+contient également des jetons "&lt;unk&gt;" qui représentent des mots rares (inconnus).
 
 ```{.python .input}
 #@tab all
@@ -81,45 +81,45 @@ vocab = d2l.Vocab(sentences, min_freq=10)
 f'vocab size: {len(vocab)}'
 ```
 
-## Subsampling
+## Sous-échantillonnage
 
-Text data
-typically have high-frequency words
-such as "the", "a", and "in":
-they may even occur billions of times in
-very large corpora.
-However,
-these words often co-occur
-with many different words in
-context windows, providing little useful signals.
-For instance,
-consider the word "chip" in a context window:
-intuitively
-its co-occurrence with a low-frequency word "intel"
-is more useful in training
-than 
-the co-occurrence with a high-frequency word "a".
-Moreover, training with vast amounts of (high-frequency) words
-is slow.
-Thus, when training word embedding models, 
-high-frequency words can be *subsampled* :cite:`Mikolov.Sutskever.Chen.ea.2013`.
-Specifically, 
-each indexed word $w_i$ 
-in the dataset will be discarded with probability
+Les données textuelles
+contiennent généralement des mots à haute fréquence
+tels que " the ", " a " et " in " :
+ils peuvent même apparaître des milliards de fois dans
+de très grands corpus.
+Cependant,
+ces mots cooccurrent souvent
+avec de nombreux mots différents dans les fenêtres de contexte
+, fournissant ainsi peu de signaux utiles.
+Par exemple,
+considérons le mot "chip" dans une fenêtre de contexte :
+intuitivement,
+sa cooccurrence avec un mot à basse fréquence "intel"
+est plus utile pour l'apprentissage
+que 
+la cooccurrence avec un mot à haute fréquence "a".
+En outre, l'apprentissage avec de grandes quantités de mots (à haute fréquence)
+est lent.
+Ainsi, lors de la formation de modèles d'intégration de mots, 
+les mots à haute fréquence peuvent être *sous-échantillonnés* :cite:`Mikolov.Sutskever.Chen.ea.2013` .
+Plus précisément, 
+chaque mot indexé $w_i$ 
+ dans l'ensemble de données sera écarté avec une probabilité de
 
 
-$$ P(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$
+ $$ P(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$ 
 
-where $f(w_i)$ is the ratio of 
-the number of words $w_i$
-to the total number of words in the dataset, 
-and the constant $t$ is a hyperparameter
-($10^{-4}$ in the experiment). 
-We can see that only when
-the relative frequency
-$f(w_i) > t$  can the (high-frequency) word $w_i$ be discarded, 
-and the higher the relative frequency of the word, 
-the greater the probability of being discarded.
+ où $f(w_i)$ est le rapport entre 
+le nombre de mots $w_i$
+ et le nombre total de mots dans l'ensemble de données, 
+et la constante $t$ est un hyperparamètre
+($10^{-4}$ dans l'expérience). 
+Nous pouvons voir que ce n'est que lorsque
+la fréquence relative
+$f(w_i) > t$ que le mot (à haute fréquence) $w_i$ peut être écarté, 
+et que plus la fréquence relative du mot, 
+est élevée, plus la probabilité d'être écarté est grande.
 
 ```{.python .input}
 #@tab all
@@ -133,7 +133,7 @@ def subsample(sentences, vocab):
         token for line in sentences for token in line])
     num_tokens = sum(counter.values())
 
-    # Return True if `token` is kept during subsampling
+    # Return True if `jeton` is kept during subsampling
     def keep(token):
         return(random.uniform(0, 1) <
                math.sqrt(1e-4 / counter[token] * num_tokens))
@@ -144,14 +144,14 @@ def subsample(sentences, vocab):
 subsampled, counter = subsample(sentences, vocab)
 ```
 
-The following code snippet 
-plots the histogram of
-the number of tokens per sentence
-before and after subsampling.
-As expected, 
-subsampling significantly shortens sentences
-by dropping high-frequency words,
-which will lead to training speedup.
+L'extrait de code suivant 
+trace l'histogramme de
+le nombre de tokens par phrase
+avant et après le sous-échantillonnage.
+Comme prévu, le sous-échantillonnage 
+raccourcit considérablement les phrases
+en supprimant les mots à haute fréquence,
+ce qui accélère la formation.
 
 ```{.python .input}
 #@tab all
@@ -159,7 +159,7 @@ d2l.show_list_len_pair_hist(['origin', 'subsampled'], '# tokens per sentence',
                             'count', sentences, subsampled);
 ```
 
-For individual tokens, the sampling rate of the high-frequency word "the" is less than 1/20.
+Pour les tokens individuels, le taux d'échantillonnage du mot à haute fréquence "the" est inférieur à 1/20.
 
 ```{.python .input}
 #@tab all
@@ -171,15 +171,15 @@ def compare_counts(token):
 compare_counts('the')
 ```
 
-In contrast, 
-low-frequency words "join" are completely kept.
+En revanche, les mots à basse fréquence "join" de 
+sont entièrement conservés.
 
 ```{.python .input}
 #@tab all
 compare_counts('join')
 ```
 
-After subsampling, we map tokens to their indices for the corpus.
+Après le sous-échantillonnage, nous faisons correspondre les tokens à leurs indices dans le corpus.
 
 ```{.python .input}
 #@tab all
@@ -187,21 +187,21 @@ corpus = [vocab[line] for line in subsampled]
 corpus[:3]
 ```
 
-## Extracting Center Words and Context Words
+## Extraction des mots centraux et des mots de contexte
 
 
-The following `get_centers_and_contexts`
-function extracts all the 
-center words and their context words
-from `corpus`.
-It uniformly samples an integer between 1 and `max_window_size`
-at random as the context window size.
-For any center word,
-those words 
-whose distance from it
-does not exceed the sampled
-context window size
-are its context words.
+ La fonction suivante `get_centers_and_contexts`
+ extrait tous les 
+mots centraux et leurs mots de contexte
+de `corpus`.
+Elle échantillonne uniformément un entier entre 1 et `max_window_size`
+ au hasard comme taille de la fenêtre de contexte.
+Pour tout mot central,
+les mots 
+dont la distance par rapport à lui
+ne dépasse pas la taille de la fenêtre contextuelle
+échantillonnée
+sont ses mots contextuels.
 
 ```{.python .input}
 #@tab all
@@ -225,9 +225,9 @@ def get_centers_and_contexts(corpus, max_window_size):
     return centers, contexts
 ```
 
-Next, we create an artificial dataset containing two sentences of 7 and 3 words, respectively. 
-Let the maximum context window size be 2 
-and print all the center words and their context words.
+Ensuite, nous créons un ensemble de données artificielles contenant deux phrases de 7 et 3 mots, respectivement. 
+La taille maximale de la fenêtre de contexte est de 2 
+et nous imprimons tous les mots centraux et leurs mots de contexte.
 
 ```{.python .input}
 #@tab all
@@ -237,9 +237,9 @@ for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
     print('center', center, 'has contexts', context)
 ```
 
-When training on the PTB dataset,
-we set the maximum context window size to 5. 
-The following extracts all the center words and their context words in the dataset.
+Lors de l'entraînement sur le jeu de données PTB,
+, nous fixons la taille maximale de la fenêtre de contexte à 5. 
+Ce qui suit extrait tous les mots centraux et leurs mots contextuels dans l'ensemble de données.
 
 ```{.python .input}
 #@tab all
@@ -247,14 +247,14 @@ all_centers, all_contexts = get_centers_and_contexts(corpus, 5)
 f'# center-context pairs: {sum([len(contexts) for contexts in all_contexts])}'
 ```
 
-## Negative Sampling
+## Echantillonnage négatif
 
-We use negative sampling for approximate training. 
-To sample noise words according to 
-a predefined distribution,
-we define the following `RandomGenerator` class,
-where the (possibly unnormalized) sampling distribution is passed
-via the argument `sampling_weights`.
+Nous utilisons l'échantillonnage négatif pour l'entraînement approximatif. 
+Pour échantillonner les mots de bruit selon 
+une distribution prédéfinie,
+nous définissons la classe suivante `RandomGenerator`,
+où la distribution d'échantillonnage (éventuellement non normalisée) est transmise
+via l'argument `sampling_weights`.
 
 ```{.python .input}
 #@tab all
@@ -278,10 +278,10 @@ class RandomGenerator:
         return self.candidates[self.i - 1]
 ```
 
-For example, 
-we can draw 10 random variables $X$
-among indices 1, 2, and 3
-with sampling probabilities $P(X=1)=2/9, P(X=2)=3/9$, and $P(X=3)=4/9$ as follows.
+Par exemple, 
+nous pouvons tirer 10 variables aléatoires $X$
+ parmi les indices 1, 2 et 3
+avec des probabilités d'échantillonnage $P(X=1)=2/9, P(X=2)=3/9$, et $P(X=3)=4/9$ comme suit.
 
 ```{.python .input}
 #@tab mxnet
@@ -289,15 +289,15 @@ generator = RandomGenerator([2, 3, 4])
 [generator.draw() for _ in range(10)]
 ```
 
-For a pair of center word and context word, 
-we randomly sample `K` (5 in the experiment) noise words. According to the suggestions in the word2vec paper,
-the sampling probability $P(w)$ of 
-a noise word $w$
-is 
-set to its relative frequency 
-in the dictionary
-raised to 
-the power of 0.75 :cite:`Mikolov.Sutskever.Chen.ea.2013`.
+Pour une paire de mot central et de mot de contexte, 
+nous échantillonnons aléatoirement `K` (5 dans l'expérience) mots de bruit. Conformément aux suggestions du document word2vec,
+la probabilité d'échantillonnage $P(w)$ de 
+un mot de bruit $w$
+ est 
+fixé à sa fréquence relative 
+dans le dictionnaire
+élevé à 
+la puissance de 0,75 :cite:`Mikolov.Sutskever.Chen.ea.2013` .
 
 ```{.python .input}
 #@tab all
@@ -322,57 +322,57 @@ def get_negatives(all_contexts, vocab, counter, K):
 all_negatives = get_negatives(all_contexts, vocab, counter, 5)
 ```
 
-## Loading Training Examples in Minibatches
-:label:`subsec_word2vec-minibatch-loading`
+## Chargement des exemples d'entraînement en minibatchs
+:label:`subsec_word2vec-minibatch-loading` 
 
-After
-all the center words
-together with their
-context words and sampled noise words are extracted,
-they will be transformed into 
-minibatches of examples
-that can be iteratively loaded
-during training.
-
-
-
-In a minibatch,
-the $i^\mathrm{th}$ example includes a center word
-and its $n_i$ context words and $m_i$ noise words. 
-Due to varying context window sizes,
-$n_i+m_i$ varies for different $i$.
-Thus,
-for each example
-we concatenate its context words and noise words in 
-the `contexts_negatives` variable,
-and pad zeros until the concatenation length
-reaches $\max_i n_i+m_i$ (`max_len`).
-To exclude paddings
-in the calculation of the loss,
-we define a mask variable `masks`.
-There is a one-to-one correspondence
-between elements in `masks` and elements in `contexts_negatives`,
-where zeros (otherwise ones) in `masks` correspond to paddings in `contexts_negatives`.
+ Après que
+tous les mots centraux
+ainsi que leurs
+mots de contexte et mots de bruit échantillonnés aient été extraits,
+ils seront transformés en 
+minibatchs d'exemples
+qui peuvent être chargés itérativement
+pendant l'entraînement.
 
 
-To distinguish between positive and negative examples,
-we separate context words from noise words in  `contexts_negatives` via a `labels` variable. 
-Similar to `masks`,
-there is also a one-to-one correspondence
-between elements in `labels` and elements in `contexts_negatives`,
-where ones (otherwise zeros) in `labels` correspond to context words (positive examples) in `contexts_negatives`.
+
+Dans un minibatch,
+l'exemple $i^\mathrm{th}$ comprend un mot central
+et ses mots de contexte $n_i$ et mots de bruit $m_i$. 
+En raison des différentes tailles de fenêtre de contexte,
+$n_i+m_i$ varie pour différents $i$.
+Ainsi,
+pour chaque exemple
+, nous concaténons ses mots de contexte et ses mots de bruit dans 
+la variable `contexts_negatives`,
+et remplissons de zéros jusqu'à ce que la longueur de concaténation
+atteigne $\max_i n_i+m_i$ (`max_len`).
+Pour exclure les paddings
+dans le calcul de la perte,
+nous définissons une variable masque `masks`.
+Il existe une correspondance biunivoque
+entre les éléments de `masks` et les éléments de `contexts_negatives`,
+, où les zéros (sinon les uns) de `masks` correspondent aux remplissages de `contexts_negatives`.
 
 
-The above idea is implemented in the following `batchify` function.
-Its input `data` is a list with length
-equal to the batch size,
-where each element is an example
-consisting of
-the center word `center`, its context words `context`, and its noise words `negative`.
-This function returns 
-a minibatch that can be loaded for calculations 
-during training,
-such as including the mask variable.
+Pour distinguer les exemples positifs des exemples négatifs,
+nous séparons les mots de contexte des mots de bruit dans `contexts_negatives` via une variable `labels`. 
+Comme pour `masks`,
+il existe également une correspondance biunivoque
+entre les éléments de `labels` et les éléments de `contexts_negatives`,
+où les uns (sinon les zéros) de `labels` correspondent aux mots de contexte (exemples positifs) de `contexts_negatives`.
+
+
+L'idée ci-dessus est mise en œuvre dans la fonction `batchify` suivante.
+Son entrée `data` est une liste dont la longueur
+est égale à la taille du lot,
+où chaque élément est un exemple
+composé de
+le mot central `center`, ses mots de contexte `context`, et ses mots de bruit `negative`.
+Cette fonction renvoie 
+un mini-batch qui peut être chargé pour des calculs 
+pendant la formation,
+comme l'inclusion de la variable de masque.
 
 ```{.python .input}
 #@tab all
@@ -391,7 +391,7 @@ def batchify(data):
         contexts_negatives), d2l.tensor(masks), d2l.tensor(labels))
 ```
 
-Let's test this function using a minibatch of two examples.
+Testons cette fonction en utilisant un minibatch de deux exemples.
 
 ```{.python .input}
 #@tab all
@@ -406,7 +406,7 @@ for name, data in zip(names, batch):
 
 ## Putting All Things Together
 
-Last, we define the `load_data_ptb` function that reads the PTB dataset and returns the data iterator and the vocabulary.
+Enfin, nous définissons la fonction `load_data_ptb` qui lit l'ensemble de données PTB et renvoie l'itérateur de données et le vocabulaire.
 
 ```{.python .input}
 #@tab mxnet
@@ -466,7 +466,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     return data_iter, vocab
 ```
 
-Let's print the first minibatch of the data iterator.
+Imprimons le premier minibatch de l'itérateur de données.
 
 ```{.python .input}
 #@tab all
@@ -477,18 +477,18 @@ for batch in data_iter:
     break
 ```
 
-## Summary
+## Résumé
 
-* High-frequency words may not be so useful in training. We can subsample them for speedup in training.
-* For computational efficiency, we load examples in minibatches. We can define other variables to distinguish paddings from non-paddings, and positive examples from negative ones.
+* Les mots à haute fréquence peuvent ne pas être très utiles pour la formation. Nous pouvons les sous-échantillonner pour accélérer la formation.
+* Pour l'efficacité du calcul, nous chargeons les exemples en minibatchs. Nous pouvons définir d'autres variables pour distinguer les paddings des non-paddings, et les exemples positifs des négatifs.
 
 
 
-## Exercises
+## Exercices
 
-1. How does the running time of code in this section changes if not using subsampling?
-1. The `RandomGenerator` class caches `k` random sampling results. Set `k` to other values and see how it affects the data loading speed.
-1. What other hyperparameters in the code of this section may affect the data loading speed?
+1. Comment le temps d'exécution du code de cette section change-t-il si on n'utilise pas le sous-échantillonnage ?
+1. La classe `RandomGenerator` met en cache les résultats de l'échantillonnage aléatoire de `k`. Donnez d'autres valeurs à `k` et voyez comment cela affecte la vitesse de chargement des données.
+1. Quels autres hyperparamètres dans le code de cette section peuvent affecter la vitesse de chargement des données ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/383)

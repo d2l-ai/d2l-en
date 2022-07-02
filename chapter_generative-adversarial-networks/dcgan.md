@@ -1,9 +1,9 @@
 # Deep Convolutional Generative Adversarial Networks
-:label:`sec_dcgan`
+:label:`sec_dcgan` 
 
-In :numref:`sec_basic_gan`, we introduced the basic ideas behind how GANs work. We showed that they can draw samples from some simple, easy-to-sample distribution, like a uniform or normal distribution, and transform them into samples that appear to match the distribution of some dataset. And while our example of matching a 2D Gaussian distribution got the point across, it is not especially exciting.
+ Dans :numref:`sec_basic_gan` , nous avons présenté les idées de base sur le fonctionnement des GAN. Nous avons montré qu'ils peuvent tirer des échantillons d'une distribution simple et facile à échantillonner, comme une distribution uniforme ou normale, et les transformer en échantillons qui semblent correspondre à la distribution d'un ensemble de données. Et si notre exemple de correspondance avec une distribution gaussienne 2D a permis de faire passer le message, il n'est pas particulièrement passionnant.
 
-In this section, we will demonstrate how you can use GANs to generate photorealistic images. We will be basing our models on the deep convolutional GANs (DCGAN) introduced in :cite:`Radford.Metz.Chintala.2015`. We will borrow the convolutional architecture that have proven so successful for discriminative computer vision problems and show how via GANs, they can be leveraged to generate photorealistic images.
+Dans cette section, nous allons montrer comment vous pouvez utiliser les GAN pour générer des images photoréalistes. Nous baserons nos modèles sur les GANs convolutifs profonds (DCGAN) présentés sur :cite:`Radford.Metz.Chintala.2015` . Nous emprunterons l'architecture convolutive qui s'est avérée si efficace pour les problèmes discriminatifs de vision par ordinateur et montrerons comment, par le biais des GAN, elle peut être exploitée pour générer des images photoréalistes.
 
 ```{.python .input}
 #@tab mxnet
@@ -29,9 +29,9 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## The Pokemon Dataset
+## Le jeu de données Pokemon
 
-The dataset we will use is a collection of Pokemon sprites obtained from [pokemondb](https://pokemondb.net/sprites). First download, extract and load this dataset.
+Le jeu de données que nous allons utiliser est une collection de sprites Pokemon obtenue sur [pokemondb](https://pokemondb.net/sprites). Commencez par télécharger, extraire et charger ce jeu de données.
 
 ```{.python .input}
 #@tab mxnet
@@ -65,7 +65,7 @@ pokemon = tf.keras.preprocessing.image_dataset_from_directory(
     data_dir, batch_size=batch_size, image_size=(64, 64))
 ```
 
-We resize each image into $64\times 64$. The `ToTensor` transformation will project the pixel value into $[0, 1]$, while our generator will use the tanh function to obtain outputs in $[-1, 1]$. Therefore we normalize the data with $0.5$ mean and $0.5$ standard deviation to match the value range.
+Nous redimensionnons chaque image en $64\times 64$. La transformation `ToTensor` projettera la valeur du pixel dans $[0, 1]$, tandis que notre générateur utilisera la fonction tanh pour obtenir des sorties dans $[-1, 1]$. Par conséquent, nous normalisons les données avec la moyenne $0.5$ et l'écart type $0.5$ pour correspondre à la plage de valeurs.
 
 ```{.python .input}
 #@tab mxnet
@@ -108,7 +108,7 @@ data_iter = data_iter.cache().shuffle(buffer_size=1000).prefetch(
     buffer_size=tf.data.experimental.AUTOTUNE)
 ```
 
-Let's visualize the first 20 images.
+Visualisons les 20 premières images.
 
 ```{.python .input}
 #@tab mxnet
@@ -137,9 +137,9 @@ for X, y in data_iter.take(1):
     d2l.show_images(imgs, num_rows=4, num_cols=5)
 ```
 
-## The Generator
+## Le générateur
 
-The generator needs to map the noise variable $\mathbf z\in\mathbb R^d$, a length-$d$ vector, to a RGB image with width and height to be $64\times 64$ . In :numref:`sec_fcn` we introduced the fully convolutional network that uses transposed convolution layer (refer to :numref:`sec_transposed_conv`) to enlarge input size. The basic block of the generator contains a transposed convolution layer followed by the batch normalization and ReLU activation.
+Le générateur doit faire correspondre la variable de bruit $\mathbf z\in\mathbb R^d$, un vecteur de longueur$d$, à une image RVB dont la largeur et la hauteur sont $64\times 64$. Dans :numref:`sec_fcn` , nous avons présenté le réseau entièrement convolutif qui utilise une couche de convolution transposée (voir :numref:`sec_transposed_conv` ) pour agrandir la taille de l'entrée. Le bloc de base du générateur contient une couche de convolution transposée suivie d'une normalisation par lots et d'une activation ReLU.
 
 ```{.python .input}
 #@tab mxnet
@@ -186,7 +186,7 @@ class G_block(tf.keras.layers.Layer):
         return self.activation(self.batch_norm(self.conv2d_trans(X)))
 ```
 
-In default, the transposed convolution layer uses a $k_h = k_w = 4$ kernel, a $s_h = s_w = 2$ strides, and a $p_h = p_w = 1$ padding. With a input shape of $n_h^{'} \times n_w^{'} = 16 \times 16$, the generator block will double input's width and height.
+Par défaut, la couche de convolution transposée utilise un noyau $k_h = k_w = 4$, des strides $s_h = s_w = 2$ et un padding $p_h = p_w = 1$. Avec une forme d'entrée de $n_h^{'} \times n_w^{'} = 16 \times 16$, le bloc du générateur doublera la largeur et la hauteur de l'entrée.
 
 $$
 \begin{aligned}
@@ -219,7 +219,7 @@ g_blk = G_block(20)
 g_blk(x).shape
 ```
 
-If changing the transposed convolution layer to a $4\times 4$ kernel, $1\times 1$ strides and zero padding. With a input size of $1 \times 1$, the output will have its width and height increased by 3 respectively.
+Si vous changez la couche de convolution transposée pour un noyau $4\times 4$, $1\times 1$ strides et zéro padding. Avec une taille d'entrée de $1 \times 1$, la largeur et la hauteur de la sortie seront respectivement augmentées de 3.
 
 ```{.python .input}
 #@tab mxnet
@@ -239,12 +239,12 @@ g_blk(x).shape
 ```{.python .input}
 #@tab tensorflow
 x = tf.zeros((2, 1, 1, 3))
-# `padding="valid"` corresponds to no padding
+# `padding="valide"` corresponds to no padding
 g_blk = G_block(20, strides=1, padding="valid")
 g_blk(x).shape
 ```
 
-The generator consists of four basic blocks that increase input's both width and height from 1 to 32. At the same time, it first projects the latent variable into $64\times 8$ channels, and then halve the channels each time. At last, a transposed convolution layer is used to generate the output. It further doubles the width and height to match the desired $64\times 64$ shape, and reduces the channel size to $3$. The tanh activation function is applied to project output values into the $(-1, 1)$ range.
+Le générateur se compose de quatre blocs de base qui augmentent la largeur et la hauteur de l'entrée de 1 à 32. En même temps, il projette d'abord la variable latente dans $64\times 8$ canaux, puis divise les canaux par deux à chaque fois. Enfin, une couche de convolution transposée est utilisée pour générer la sortie. Elle double encore la largeur et la hauteur pour correspondre à la forme souhaitée de $64\times 64$, et réduit la taille du canal à $3$. La fonction d'activation tanh est appliquée pour projeter les valeurs de sortie dans la plage $(-1, 1)$.
 
 ```{.python .input}
 #@tab mxnet
@@ -289,7 +289,7 @@ net_G = tf.keras.Sequential([
 ])
 ```
 
-Generate a 100 dimensional latent variable to verify the generator's output shape.
+Générer une variable latente à 100 dimensions pour vérifier la forme de la sortie du générateur.
 
 ```{.python .input}
 #@tab mxnet
@@ -310,13 +310,13 @@ x = tf.zeros((1, 1, 1, 100))
 net_G(x).shape
 ```
 
-## Discriminator
+## Discriminateur
 
-The discriminator is a normal convolutional network network except that it uses a leaky ReLU as its activation function. Given $\alpha \in[0, 1]$, its definition is
+Le discriminateur est un réseau convolutif normal sauf qu'il utilise un ReLU fuyant comme fonction d'activation. Étant donné $\alpha \in[0, 1]$, sa définition est
 
-$$\textrm{leaky ReLU}(x) = \begin{cases}x & \text{if}\ x > 0\\ \alpha x &\text{otherwise}\end{cases}.$$
+$$\textrm{leaky ReLU}(x) = \begin{cases}x & \text{if}\ x > 0\\ \alpha x &\text{otherwise}\end{cases}.$$ 
 
-As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if $\alpha=1$. For $\alpha \in (0, 1)$, leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the "dying ReLU" problem that a neuron might always output a negative value and therefore cannot make any progress since the gradient of ReLU is 0.
+ Comme on peut le voir, il s'agit d'une ReLU normale si $\alpha=0$, et d'une fonction d'identité si $\alpha=1$. Pour $\alpha \in (0, 1)$, la ReLU fuyante est une fonction non linéaire qui donne une sortie non nulle pour une entrée négative. Elle vise à résoudre le problème du "ReLU mourant", qui fait qu'un neurone peut toujours produire une valeur négative et ne peut donc pas progresser puisque le gradient de ReLU est égal à 0.
 
 ```{.python .input}
 #@tab mxnet,pytorch
@@ -334,7 +334,7 @@ Y = [tf.keras.layers.LeakyReLU(alpha)(x).numpy() for alpha in alphas]
 d2l.plot(x.numpy(), Y, 'x', 'y', alphas)
 ```
 
-The basic block of the discriminator is a convolution layer followed by a batch normalization layer and a leaky ReLU activation. The hyperparameters of the convolution layer are similar to the transpose convolution layer in the generator block.
+Le bloc de base du discriminateur est une couche de convolution suivie d'une couche de normalisation par lots et d'une activation ReLU fuyante. Les hyperparamètres de la couche de convolution sont similaires à ceux de la couche de convolution de transposition dans le bloc générateur.
 
 ```{.python .input}
 #@tab mxnet
@@ -381,7 +381,7 @@ class D_block(tf.keras.layers.Layer):
         return self.activation(self.batch_norm(self.conv2d(X)))
 ```
 
-A basic block with default settings will halve the width and height of the inputs, as we demonstrated in :numref:`sec_padding`. For example, given a input shape $n_h = n_w = 16$, with a kernel shape $k_h = k_w = 4$, a stride shape $s_h = s_w = 2$, and a padding shape $p_h = p_w = 1$, the output shape will be:
+Un bloc de base avec des paramètres par défaut divisera par deux la largeur et la hauteur des entrées, comme nous l'avons démontré dans :numref:`sec_padding` . Par exemple, étant donné une forme d'entrée $n_h = n_w = 16$, avec une forme de noyau $k_h = k_w = 4$, une forme de bande $s_h = s_w = 2$, et une forme de remplissage $p_h = p_w = 1$, la forme de sortie sera :
 
 $$
 \begin{aligned}
@@ -413,7 +413,7 @@ d_blk = D_block(20)
 d_blk(x).shape
 ```
 
-The discriminator is a mirror of the generator.
+Le discriminateur est un miroir du générateur.
 
 ```{.python .input}
 #@tab mxnet
@@ -451,7 +451,7 @@ net_D = tf.keras.Sequential([
 ])
 ```
 
-It uses a convolution layer with output channel $1$ as the last layer to obtain a single prediction value.
+Il utilise une couche de convolution avec le canal de sortie $1$ comme dernière couche pour obtenir une seule valeur de prédiction.
 
 ```{.python .input}
 #@tab mxnet
@@ -472,9 +472,9 @@ x = tf.zeros((1, 64, 64, 3))
 net_D(x).shape
 ```
 
-## Training
+## Formation
 
-Compared to the basic GAN in :numref:`sec_basic_gan`, we use the same learning rate for both generator and discriminator since they are similar to each other. In addition, we change $\beta_1$ in Adam (:numref:`sec_adam`) from $0.9$ to $0.5$. It decreases the smoothness of the momentum, the exponentially weighted moving average of past gradients, to take care of the rapid changing gradients because the generator and the discriminator fight with each other. Besides, the random generated noise `Z`, is a 4-D tensor and we are using GPU to accelerate the computation.
+Par rapport au GAN de base dans :numref:`sec_basic_gan` , nous utilisons le même taux d'apprentissage pour le générateur et le discriminateur car ils sont similaires l'un à l'autre. De plus, nous changeons $\beta_1$ dans Adam (:numref:`sec_adam` ) de $0.9$ à $0.5$. Cela diminue la douceur du momentum, la moyenne mobile pondérée exponentiellement des gradients passés, pour prendre en charge les gradients qui changent rapidement parce que le générateur et le discriminateur se battent entre eux. De plus, le bruit généré aléatoirement `Z` est un tenseur 4-D et nous utilisons le GPU pour accélérer le calcul.
 
 ```{.python .input}
 #@tab mxnet
@@ -611,9 +611,9 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
           f'{metric[2] / timer.stop():.1f} examples/sec on {str(device._device_name)}')
 ```
 
-We train the model with a small number of epochs just for demonstration.
-For better performance,
-the variable `num_epochs` can be set to a larger number.
+Nous entraînons le modèle avec un petit nombre d'époques juste pour la démonstration.
+Pour une meilleure performance,
+la variable `num_epochs` peut être fixée à un plus grand nombre.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -627,17 +627,17 @@ latent_dim, lr, num_epochs = 100, 0.0005, 40
 train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 ```
 
-## Summary
+## Résumé
 
-* DCGAN architecture has four convolutional layers for the Discriminator and four "fractionally-strided" convolutional layers for the Generator.
-* The Discriminator is a 4-layer strided convolutions with batch normalization (except its input layer) and leaky ReLU activations.
-* Leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the “dying ReLU” problem and helps the gradients flow easier through the architecture.
+* L'architecture DCGAN a quatre couches convolutives pour le Discriminateur et quatre couches convolutives "fractionally-strided" pour le Générateur.
+* Le Discriminateur est une convolution stridée à 4 couches avec normalisation par lot (sauf sa couche d'entrée) et activations ReLU fuyantes.
+* Le leaky ReLU est une fonction non linéaire qui donne une sortie non nulle pour une entrée négative. Elle vise à résoudre le problème du "ReLU mourant" et permet aux gradients de circuler plus facilement dans l'architecture.
 
 
-## Exercises
+## Exercices
 
-1. What will happen if we use standard ReLU activation rather than leaky ReLU?
-1. Apply DCGAN on Fashion-MNIST and see which category works well and which does not.
+1. Que se passera-t-il si nous utilisons l'activation ReLU standard plutôt que la ReLU fuyante ?
+1. Appliquez DCGAN sur Fashion-MNIST et voyez quelle catégorie fonctionne bien et laquelle ne fonctionne pas.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/409)

@@ -1,60 +1,60 @@
-# Attention and Transformers
-:label:`chap_attention`
+# Attention et transformateurs
+:label:`chap_attention` 
 
-The optic nerve of a primate's visual system
-receives massive sensory input,
-far exceeding what the brain can fully process.
-Fortunately,
-not all stimuli are created equal.
-Focalization and concentration of consciousness
-have enabled primates to direct attention
-to objects of interest,
-such as preys and predators,
-in the complex visual environment.
-The ability of paying attention to
-only a small fraction of the information
-has evolutionary significance,
-allowing human beings
-to live and succeed.
+ Le nerf optique du système visuel d'un primate
+reçoit des entrées sensorielles massives,
+dépassant de loin ce que le cerveau peut traiter entièrement.
+Heureusement,
+tous les stimuli ne sont pas créés égaux.
+La focalisation et la concentration de la conscience
+ont permis aux primates de diriger leur attention
+vers des objets d'intérêt,
+tels que les proies et les prédateurs,
+dans l'environnement visuel complexe.
+La capacité de ne prêter attention qu'à
+une petite fraction des informations
+a une signification évolutive,
+permettant aux êtres humains
+de vivre et de réussir.
 
-Scientists have been studying attention
-in the cognitive neuroscience field
-since the 19th century.
-In this chapter,
-we will begin by reviewing a popular framework
-explaining how attention is deployed in a visual scene.
-Inspired by the attention cues in this framework,
-we will design models
-that leverage such attention cues.
-Notably, the Nadaraya-Watson kernel regression
-in 1964 is a simple demonstration of machine learning with *attention mechanisms*.
-Next, we will introduce attention functions
-that have been extensively used in
-the design of attention models in deep learning.
-Specifically,
-we will show how to use these functions
-to design the *Bahdanau attention*,
-a groundbreaking attention model in deep learning
-that can align bidirectionally and is differentiable.
+Les scientifiques étudient l'attention
+dans le domaine des neurosciences cognitives
+depuis le 19e siècle.
+Dans ce chapitre,
+nous commencerons par passer en revue un cadre populaire
+expliquant comment l'attention est déployée dans une scène visuelle.
+Inspirés par les indices d'attention de ce cadre,
+nous allons concevoir des modèles
+qui exploitent ces indices d'attention.
+Notamment, la régression à noyau de Nadaraya-Watson
+en 1964 est une démonstration simple de l'apprentissage automatique avec des *mécanismes d'attention*.
+Ensuite, nous présenterons les fonctions d'attention
+qui ont été largement utilisées dans
+la conception de modèles d'attention en apprentissage profond.
+Plus précisément,
+nous montrerons comment utiliser ces fonctions
+pour concevoir l'attention *Bahdanau*,
+un modèle d'attention révolutionnaire dans l'apprentissage profond
+qui peut s'aligner de manière bidirectionnelle et est différentiable.
 
-Equipped with
-the more recent
-*multi-head attention*
-and *self-attention* designs,
-the *transformer* architecture is solely
-based on attention mechanisms.
-We will go on to describe its original encoder-decoder design for machine translation.
-Then we will show how its encoder can 
-represent images, leading to the development of vision transformers.
-When training very large models on very large datasets (e.g., 300 million images),
-vision transformers outperform ResNets significantly in image classification, demonstrating superior scalability of transformers.
-Thus, transformers have been extensively used in large-scale *pretraining*, which can be adapted to perform different tasks with model update (e.g., *fine tuning*) or not (e.g., *few shot*).
-In the end, we will review how to pretrain transformers as encoder-only (e.g., BERT), encoder-decoder (e.g., T5), and decoder-only (e.g., GPT series).
-Compelling success of large-scale pretraining with transformers in areas as diverse as
-language,
-vision, speech,
-and reinforcement learning
-suggests that better performance benefits from larger models, more training data, and more training compute.
+
+ Dotée de
+les modèles plus récents d'*attention multi-têtes*
+et d'*auto-attention*,
+l'architecture du *transformateur* est uniquement
+basée sur les mécanismes d'attention.
+Nous décrirons ensuite sa conception originale d'encodeur-décodeur pour la traduction automatique.
+Nous montrerons ensuite comment son encodeur peut 
+représenter des images, ce qui a conduit au développement de transformateurs de vision.
+Lors de l'entraînement de très grands modèles sur de très grands ensembles de données (par exemple, 300 millions d'images), les transformateurs de vision
+surpassent les ResNets de manière significative dans la classification d'images, ce qui démontre l'évolutivité supérieure des transformateurs.
+Ainsi, les transformateurs ont été largement utilisés dans le *pré-entraînement* à grande échelle, qui peut être adapté pour effectuer différentes tâches avec la mise à jour du modèle (par exemple, *réglage fin*) ou non (par exemple, *quelques clichés*).
+Enfin, nous examinerons comment prétraîner les transformateurs en tant qu'encodeur seulement (par exemple, BERT), encodeur-décodeur (par exemple, T5) et décodeur seulement (par exemple, la série GPT).
+Le succès convaincant du pré-entraînement à grande échelle avec des transformateurs dans des domaines aussi divers que
+le langage,
+la vision, la parole,
+et l'apprentissage par renforcement
+suggère que de meilleures performances bénéficient de modèles plus grands, de plus de données d'entraînement et de plus de calcul d'entraînement.
 
 ```toc
 :maxdepth: 2

@@ -199,48 +199,48 @@ comp_conv2d(conv2d, X).shape
 
 ## Stride
 
-When computing the cross-correlation,
-we start with the convolution window
-at the upper-left corner of the input tensor,
-and then slide it over all locations both down and to the right.
-In the previous examples, we defaulted to sliding one element at a time.
-However, sometimes, either for computational efficiency
-or because we wish to downsample,
-we move our window more than one element at a time,
-skipping the intermediate locations. This is particularly useful if the convolution 
-kernel is large since it captures a large area of the underlying image.
+Lors du calcul de la corrélation croisée,
+, nous commençons par la fenêtre de convolution
+au coin supérieur gauche du tenseur d'entrée,
+, puis nous la faisons glisser sur tous les emplacements vers le bas et vers la droite.
+Dans les exemples précédents, nous avons choisi par défaut de faire glisser un élément à la fois.
+Cependant, parfois, soit pour des raisons d'efficacité de calcul
+, soit parce que nous souhaitons réduire l'échantillonnage,
+nous déplaçons notre fenêtre de plus d'un élément à la fois,
+en sautant les emplacements intermédiaires. Ceci est particulièrement utile si le noyau de convolution 
+est grand, car il capture une grande partie de l'image sous-jacente.
 
-We refer to the number of rows and columns traversed per slide as *stride*.
-So far, we have used strides of 1, both for height and width.
-Sometimes, we may want to use a larger stride.
-:numref:`img_conv_stride` shows a two-dimensional cross-correlation operation
-with a stride of 3 vertically and 2 horizontally.
-The shaded portions are the output elements as well as the input and kernel tensor elements used for the output computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$.
-We can see that when the second element of the first column is generated,
-the convolution window slides down three rows.
-The convolution window slides two columns to the right
-when the second element of the first row is generated.
-When the convolution window continues to slide two columns to the right on the input,
-there is no output because the input element cannot fill the window
-(unless we add another column of padding).
+Nous faisons référence au nombre de lignes et de colonnes traversées par diapositive comme *stride*.
+Jusqu'à présent, nous avons utilisé des strides de 1, à la fois pour la hauteur et la largeur.
+Parfois, nous pouvons vouloir utiliser un stride plus grand.
+:numref:`img_conv_stride` montre une opération de corrélation croisée bidimensionnelle
+avec un stride de 3 verticalement et 2 horizontalement.
+Les parties ombragées sont les éléments de sortie ainsi que les éléments du tenseur d'entrée et du noyau utilisés pour le calcul de la sortie : $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$.
+Nous pouvons voir que lorsque le deuxième élément de la première colonne est généré,
+la fenêtre de convolution glisse de trois rangées vers le bas.
+La fenêtre de convolution glisse de deux colonnes vers la droite
+lorsque le deuxième élément de la première ligne est généré.
+Lorsque la fenêtre de convolution continue à glisser de deux colonnes vers la droite sur l'entrée,
+il n'y a pas de sortie car l'élément d'entrée ne peut pas remplir la fenêtre
+(à moins que nous n'ajoutions une autre colonne de remplissage).
 
 ![Cross-correlation with strides of 3 and 2 for height and width, respectively.](../img/conv-stride.svg)
 :label:`img_conv_stride`
 
-In general, when the stride for the height is $s_h$
-and the stride for the width is $s_w$, the output shape is
+En général, lorsque le pas pour la hauteur est $s_h$
+ et le pas pour la largeur est $s_w$, la forme de sortie est
 
-$$\lfloor(n_h-k_h+p_h+s_h)/s_h\rfloor \times \lfloor(n_w-k_w+p_w+s_w)/s_w\rfloor.$$
+$$\lfloor(n_h-k_h+p_h+s_h)/s_h\rfloor \times \lfloor(n_w-k_w+p_w+s_w)/s_w\rfloor.$$ 
 
-If we set $p_h=k_h-1$ and $p_w=k_w-1$,
-then the output shape can be simplified to
-$\lfloor(n_h+s_h-1)/s_h\rfloor \times \lfloor(n_w+s_w-1)/s_w\rfloor$.
-Going a step further, if the input height and width
-are divisible by the strides on the height and width,
-then the output shape will be $(n_h/s_h) \times (n_w/s_w)$.
+ Si nous définissons $p_h=k_h-1$ et $p_w=k_w-1$,
+alors la forme de sortie peut être simplifiée en
+$\lfloor(n_h+s_h-1)/s_h\rfloor \times \lfloor(n_w+s_w-1)/s_w\rfloor$ .
+En allant un peu plus loin, si la hauteur et la largeur d'entrée
+sont divisibles par les strides de la hauteur et de la largeur,
+, la forme de sortie sera $(n_h/s_h) \times (n_w/s_w)$.
 
-Below, we [**set the strides on both the height and width to 2**],
-thus halving the input height and width.
+Ci-dessous, nous [**fixons les pas sur la hauteur et la largeur à 2**],
+divisant ainsi par deux la hauteur et la largeur d'entrée.
 
 ```{.python .input}
 %%tab mxnet
@@ -260,7 +260,7 @@ conv2d = tf.keras.layers.Conv2D(1, kernel_size=3, padding='same', strides=2)
 comp_conv2d(conv2d, X).shape
 ```
 
-Let's look at (**a slightly more complicated example**).
+Examinons [**un exemple légèrement plus compliqué**].
 
 ```{.python .input}
 %%tab mxnet
@@ -281,24 +281,24 @@ conv2d = tf.keras.layers.Conv2D(1, kernel_size=(3,5), padding='valid',
 comp_conv2d(conv2d, X).shape
 ```
 
-## Summary and Discussion
+## Résumé et discussion
 
-Padding can increase the height and width of the output. This is often used to give the output the same height and width as the input to avoid undesirable shrinkage of the output. Moreover, it ensures that all pixels are used equally frequently. Typically we pick symmetric padding on both sides of the input height and width. In this case we refer to $(p_h, p_w)$ padding. Most commonly we set $p_h = p_w$, in which case we simply state that we choose padding $p$. 
+Le remplissage peut augmenter la hauteur et la largeur de la sortie. Il est souvent utilisé pour donner à la sortie la même hauteur et la même largeur que l'entrée afin d'éviter un rétrécissement indésirable de la sortie. De plus, il permet de s'assurer que tous les pixels sont utilisés avec la même fréquence. En général, nous choisissons un remplissage symétrique des deux côtés de la hauteur et de la largeur de l'entrée. Dans ce cas, nous faisons référence au remplissage de $(p_h, p_w)$. Le plus souvent, nous définissons $p_h = p_w$, auquel cas nous indiquons simplement que nous choisissons le remplissage $p$. 
 
-A similar convention applies to strides. When horizontal stride $s_h$ and vertical stride $s_w$ match, we simply talk about stride $s$. The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input for $n > 1$. By default, the padding is 0 and the stride is 1. 
+Une convention similaire s'applique aux enjambements. Lorsque le stride horizontal $s_h$ et le stride vertical $s_w$ correspondent, nous parlons simplement de stride $s$. Le stride peut réduire la résolution de la sortie, par exemple en réduisant la hauteur et la largeur de la sortie à seulement $1/n$ de la hauteur et de la largeur de l'entrée pour $n > 1$. Par défaut, le padding est égal à 0 et le stride à 1. 
 
-So far all padding that we discussed simply extended images with zeros. This has significant computational benefit since it is trivial to accomplish. Moreover, operators can be engineered to take advantage of this padding implicitly without the need to allocate additional memory. At the same time, it allows CNNs to encode implicit position information within an image, simply by learning where the "whitespace" is. There are many alternatives to zero-padding. :cite:`Alsallakh.Kokhlikyan.Miglani.ea.2020` provides an extensive overview of alternatives (albeit without a clear case to use nonzero paddings unless artifacts occur). 
+Jusqu'à présent, tous les padding dont nous avons parlé ont simplement prolongé les images par des zéros. Cela présente un avantage significatif en termes de calcul, car c'est trivial à réaliser. De plus, les opérateurs peuvent être conçus pour tirer profit de ce remplissage de manière implicite sans avoir besoin d'allouer de la mémoire supplémentaire. En même temps, cela permet aux CNN de coder des informations de position implicites dans une image, simplement en apprenant où se trouve l'"espace blanc". Il existe de nombreuses alternatives à l'espacement zéro. :cite:`Alsallakh.Kokhlikyan.Miglani.ea.2020` fournit une vue d'ensemble des alternatives (bien qu'il n'y ait pas d'argument clair en faveur de l'utilisation d'espacements non nuls, sauf si des artefacts se produisent). 
 
 
-## Exercises
+## Exercices
 
-1. Given the last code example in this section with kernel size $(3, 5)$, padding $(0, 1)$, and stride $(3, 4)$, 
-   calculate the output shape to check if it is consistent with the experimental result.
-1. For audio signals, what does a stride of 2 correspond to?
-1. Implement mirror padding, i.e., padding where the border values are simply mirrored to extend tensors. 
-1. What are the computational benefits of a stride larger than 1?
-1. What might be statistical benefits of a stride larger than 1?
-1. How would you implement a stride of $\frac{1}{2}$? What does it correspond to? When would this be useful?
+1. Étant donné le dernier exemple de code de cette section avec la taille du noyau $(3, 5)$, le padding $(0, 1)$, et le stride $(3, 4)$, 
+ calculez la forme de sortie pour vérifier si elle est cohérente avec le résultat expérimental.
+1. Pour les signaux audio, à quoi correspond un stride de 2 ?
+1. Implémentez le padding miroir, c'est-à-dire le padding où les valeurs de bordure sont simplement mises en miroir pour étendre les tenseurs. 
+1. Quels sont les avantages informatiques d'un stride supérieur à 1 ?
+1. Quels sont les avantages statistiques d'un stride supérieur à 1 ?
+1. Comment implémenteriez-vous un stride de $\frac{1}{2}$? A quoi correspond-il ? Quand cela serait-il utile ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/67)

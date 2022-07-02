@@ -1,18 +1,18 @@
-# Linear Neural Networks for Classification
-:label:`chap_classification`
+# Réseaux neuronaux linéaires pour la classification
+:label:`chap_classification` 
 
-Now that you have worked through all of the mechanics
-you are ready to apply these skills to broader kinds of tasks.
-Even as we pivot towards classification,
-most of the plumbing remains the same:
-loading the data, passing it through the model,
-generating output, calculating the loss,
-taking gradients with respect to weights,
-and updating the model.
-However, the precise form of the targets,
-the parameterization of the output layer,
-and the choice of loss function will adapt
-to suit the *classification* setting.
+ Maintenant que vous avez maîtrisé tous les mécanismes
+, vous êtes prêt à appliquer ces compétences à des types de tâches plus larges.
+Même si nous pivotons vers la classification,
+la plupart de la plomberie reste la même :
+charger les données, les faire passer dans le modèle,
+générer la sortie, calculer la perte,
+prendre les gradients par rapport aux poids,
+et actualiser le modèle.
+Cependant, la forme précise des cibles,
+le paramétrage de la couche de sortie,
+et le choix de la fonction de perte s'adapteront
+en fonction du contexte de *classification*.
 
 ```toc
 :maxdepth: 2

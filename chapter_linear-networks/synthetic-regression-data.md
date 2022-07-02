@@ -3,19 +3,19 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Synthetic Regression Data
-:label:`sec_synthetic-regression-data`
+# Données de régression synthétiques
+:label:`sec_synthetic-regression-data` 
 
-
-Machine learning is all about extracting information from data.
-So you might wonder, what could we possibly learn from synthetic data?
-While we might not care intrinsically about the patterns 
-that we ourselves baked into an artificial data generating model,
-such datasets are nevertheless useful for didactic purposes,
-helping us to evaluate the properties of our learning 
-algorithms and to confirm that our implementations work as expected.
-For example, if we create data for which the correct parameters are known *a priori*,
-then we can verify that our model can in fact recover them.
+ 
+ L'apprentissage automatique consiste à extraire des informations des données.
+Vous pourriez donc vous demander ce que nous pourrions apprendre des données synthétiques
+Bien que nous puissions ne pas nous soucier intrinsèquement des modèles 
+que nous avons nous-mêmes intégrés dans un modèle de génération de données artificielles,
+de tels ensembles de données sont néanmoins utiles à des fins didactiques,
+nous aidant à évaluer les propriétés de nos algorithmes d'apprentissage 
+et à confirmer que nos implémentations fonctionnent comme prévu.
+Par exemple, si nous créons des données pour lesquelles les paramètres corrects sont connus *a priori*,
+nous pouvons alors vérifier que notre modèle peut effectivement les récupérer.
 
 ```{.python .input}
 %%tab mxnet
@@ -42,30 +42,30 @@ import tensorflow as tf
 import random
 ```
 
-## Generating the Dataset
+## Génération de l'ensemble de données
 
-For this example, we will work low-dimensional
-for succinctness.
-The following code snippet generates 1000 examples
-with 2-dimensional features drawn 
-from a standard normal distribution.
-The resulting design matrix $\mathbf{X}$
-belongs to $\mathbb{R}^{1000 \times 2}$. 
-We generate each label by applying 
-a *ground truth* linear function, 
-corrupted them via additive noise $\epsilon$, 
-drawn independently and identically for each example:
+Pour cet exemple, nous travaillerons en basse dimension
+pour des raisons de concision.
+L'extrait de code suivant génère 1000 exemples
+avec des caractéristiques bidimensionnelles tirées 
+d'une distribution normale standard.
+La matrice de conception résultante $\mathbf{X}$
+ appartient à $\mathbb{R}^{1000 \times 2}$. 
+Nous générons chaque étiquette en appliquant 
+une fonction linéaire *vérité terrain*, 
+corrompue par un bruit additif $\epsilon$, 
+tiré indépendamment et identiquement pour chaque exemple :
 
 (**$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon.$$**)
 
-For convenience we assume that $\epsilon$ is drawn 
-from a normal distribution with mean $\mu= 0$ 
-and standard deviation $\sigma = 0.01$.
-Note that for object-oriented design
-we add the code to the `__init__` method of a subclass of `d2l.DataModule` (introduced in :numref:`oo-design-data`). 
-It's good practice to allow setting any additional hyperparameters. 
-We accomplish this with `save_hyperparameters()`. 
-The `batch_size` will be determined later on.
+Par commodité, nous supposons que $\epsilon$ est tiré 
+d'une distribution normale avec la moyenne $\mu= 0$ 
+ et l'écart type $\sigma = 0.01$.
+Notez que pour une conception orientée objet
+, nous ajoutons le code à la méthode `__init__` d'une sous-classe de `d2l.DataModule` (présentée dans :numref:`oo-design-data` ). 
+Une bonne pratique consiste à permettre la définition de tout hyperparamètre supplémentaire. 
+Nous y parvenons avec `save_hyperparameters()`. 
+L'adresse `batch_size` sera déterminée ultérieurement.
 
 ```{.python .input}
 %%tab all
@@ -84,36 +84,36 @@ class SyntheticRegressionData(d2l.DataModule):  #@save
         self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 ```
 
-Below, we set the true parameters to $\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$.
-Later, we can check our estimated parameters against these *ground truth* values.
+Ci-dessous, nous fixons les paramètres réels à $\mathbf{w} = [2, -3.4]^\top$ et $b = 4.2$.
+Plus tard, nous pourrons vérifier nos paramètres estimés par rapport à ces valeurs de *vérité terrain*.
 
 ```{.python .input}
 %%tab all
 data = SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 ```
 
-[**Each row in `features` consists of a vector in $\mathbb{R}^2$ and each row in `labels` is a scalar.**] Let's have a look at the first entry.
+[**Chaque ligne de `features` est constituée d'un vecteur dans $\mathbb{R}^2$ et chaque ligne de `labels` est un scalaire.**] Examinons la première entrée.
 
 ```{.python .input}
 %%tab all
 print('features:', data.X[0],'\nlabel:', data.y[0])
 ```
 
-## Reading the Dataset
+## Lecture de l'ensemble de données
 
-Training machine learning models often requires multiple passes over a dataset, 
-grabbing one minibatch of examples at a time. 
-This data is then used to update the model. 
-To illustrate how this works, we 
-[**implement the `get_dataloader` function,**] 
-registering it as a method in the `SyntheticRegressionData` class via `add_to_class` (introduced in :numref:`oo-design-utilities`).
-It (**takes a batch size, a matrix of features,
-and a vector of labels, and generates minibatches of size `batch_size`.**)
-As such, each minibatch consists of a tuple of features and labels. 
-Note that we need to be mindful of whether we're in training or validation mode: 
-in the former, we will want to read the data in random order, 
-whereas for the latter, being able to read data in a pre-defined order 
-may be important for debugging purposes.
+L'apprentissage de modèles d'apprentissage automatique nécessite souvent de multiples passages sur un ensemble de données, 
+en saisissant un mini-batch d'exemples à la fois. 
+Ces données sont ensuite utilisées pour mettre à jour le modèle. 
+Pour illustrer ce fonctionnement, nous 
+[**implémentons la fonction `get_dataloader`,**] 
+en l'enregistrant comme méthode dans la classe `SyntheticRegressionData` via `add_to_class` (introduite dans :numref:`oo-design-utilities` ).
+Elle (**prend une taille de lot, une matrice de caractéristiques,
+et un vecteur d'étiquettes, et génère des minilots de taille `batch_size`.**)
+Ainsi, chaque minilot est constitué d'un tuple de caractéristiques et d'étiquettes. 
+Notez que nous devons tenir compte du fait que nous sommes en mode formation ou validation : 
+dans le premier cas, nous voudrons lire les données dans un ordre aléatoire, 
+alors que dans le second cas, la possibilité de lire les données dans un ordre prédéfini 
+peut être importante à des fins de débogage.
 
 ```{.python .input}
 %%tab all
@@ -134,9 +134,9 @@ def get_dataloader(self, train):
             yield tf.gather(self.X, j), tf.gather(self.y, j)
 ```
 
-To build some intuition, let's inspect the first minibatch of
-data. Each minibatch of features provides us with both its size and the dimensionality of input features.
-Likewise, our minibatch of labels will have a matching shape given by `batch_size`.
+Pour construire une certaine intuition, inspectons le premier minibatch de données
+. Chaque mini lot de caractéristiques nous fournit à la fois sa taille et la dimensionnalité des caractéristiques d'entrée.
+De même, notre minilot d'étiquettes aura une forme correspondante donnée par `batch_size`.
 
 ```{.python .input}
 %%tab all
@@ -144,34 +144,34 @@ X, y = next(iter(data.train_dataloader()))
 print('X shape:', X.shape, '\ny shape:', y.shape)
 ```
 
-While seemingly innocuous, the invocation 
-of `iter(data.train_dataloader())` 
-illustrates the power of Python's object-oriented design. 
-Note that we added a method to the `SyntheticRegressionData` class
-*after* creating the `data` object. 
-Nonetheless, the object benefits from 
-the *ex post facto* addition of functionality to the class.
+Bien qu'apparemment inoffensive, l'invocation de 
+de `iter(data.train_dataloader())` 
+ illustre la puissance de la conception orientée objet de Python. 
+Notez que nous avons ajouté une méthode à la classe `SyntheticRegressionData`
+ *après* avoir créé l'objet `data`. 
+Néanmoins, l'objet bénéficie de 
+l'ajout *ex post facto* de la fonctionnalité à la classe.
 
-Throughout the iteration we obtain distinct minibatches
-until the entire dataset has been exhausted (try this).
-While the iteration implemented above is good for didactic purposes,
-it is inefficient in ways that might get us in trouble on real problems.
-For example, it requires that we load all the data in memory
-and that we perform lots of random memory access.
-The built-in iterators implemented in a deep learning framework
-are considerably more efficient and they can deal
-with sources such as data stored in files, 
-data received via a stream, 
-and data generated or processed on the fly. 
-Next let's try to implement the same function using built-in iterators.
+Tout au long de l'itération, nous obtenons des mini-séquences distinctes
+jusqu'à ce que l'ensemble des données soit épuisé (essayez ceci).
+Bien que l'itération mise en œuvre ci-dessus soit bonne à des fins didactiques,
+elle est inefficace d'une manière qui pourrait nous mettre en difficulté sur des problèmes réels.
+Par exemple, elle exige que nous chargions toutes les données en mémoire
+et que nous effectuions beaucoup d'accès aléatoires à la mémoire.
+Les itérateurs intégrés mis en œuvre dans un cadre d'apprentissage profond
+sont considérablement plus efficaces et peuvent traiter
+des sources telles que des données stockées dans des fichiers, 
+des données reçues via un flux, 
+et des données générées ou traitées à la volée. 
+Essayons maintenant d'implémenter la même fonction en utilisant des itérateurs intégrés.
 
-## Concise Implementation of the Data Loader
+## Implémentation concise du chargeur de données
 
-Rather than writing our own iterator,
-we can [**call the existing API in a framework to load data.**]
-As before, we need a dataset with features `X` and labels `y`. 
-Beyond that, we set `batch_size` in the built-in data loader 
-and let it take care of shuffling examples  efficiently.
+Plutôt que d'écrire notre propre itérateur,
+nous pouvons [**appeler l'API existante dans un cadre pour charger des données.**]
+Comme précédemment, nous avons besoin d'un ensemble de données avec des caractéristiques `X` et des étiquettes `y`. 
+Au-delà de cela, nous définissons `batch_size` dans le chargeur de données intégré 
+et le laissons se charger de mélanger les exemples efficacement.
 
 ```{.python .input}
 %%tab all
@@ -197,7 +197,7 @@ def get_dataloader(self, train):
     return self.get_tensorloader((self.X, self.y), train, i)
 ```
 
-The new data loader behaves just as the previous one, except that it is more efficient and has some added functionality.
+Le nouveau chargeur de données se comporte exactement comme le précédent, à ceci près qu'il est plus efficace et dispose de quelques fonctionnalités supplémentaires.
 
 ```{.python .input  n=4}
 %%tab all
@@ -205,47 +205,47 @@ X, y = next(iter(data.train_dataloader()))
 print('X shape:', X.shape, '\ny shape:', y.shape)
 ```
 
-For instance, the data loader provided by the framework API 
-supports the built-in `__len__` method, 
-so we can query its length, 
-i.e., the number of batches.
+Par exemple, le chargeur de données fourni par l'API du framework 
+prend en charge la méthode intégrée `__len__`, 
+afin que nous puissions interroger sa longueur, 
+c'est-à-dire le nombre de lots.
 
 ```{.python .input}
 %%tab all
 len(data.train_dataloader())
 ```
 
-## Summary
+## Résumé
 
-Data loaders are a convenient way of abstracting out 
-the process of loading and manipulating data. 
-This way the same machine learning *algorithm* 
-is capable of processing many different types and sources of data 
-without the need for modification. 
-One of the nice things about data loaders 
-is that they can be composed. 
-For instance, we might be loading images 
-and then have a post-processing filter 
-that crops them or modifies them otherwise. 
-As such, data loaders can be used 
-to describe an entire data processing pipeline. 
+Les chargeurs de données sont un moyen pratique d'abstraire 
+le processus de chargement et de manipulation des données. 
+Ainsi, le même *algorithme d'apprentissage automatique* 
+est capable de traiter de nombreux types et sources de données différents 
+sans qu'il soit nécessaire de le modifier. 
+L'un des avantages des chargeurs de données 
+est qu'ils peuvent être composés. 
+Par exemple, nous pourrions charger des images 
+et avoir ensuite un filtre de post-traitement 
+qui les recadre ou les modifie autrement. 
+En tant que tels, les chargeurs de données peuvent être utilisés 
+pour décrire un pipeline de traitement de données complet. 
 
-As for the model itself, the two-dimensional linear model 
-is about as simple a model as we might encounter. 
-It lets us test out the accuracy of regression models 
-without worry about having insufficient amounts of data 
-or an underdetermined system of equations. 
-We will put this to good use in the next section.  
+Quant au modèle lui-même, le modèle linéaire bidimensionnel 
+est à peu près le modèle le plus simple que nous puissions rencontrer. 
+Il nous permet de tester la précision des modèles de régression 
+sans nous soucier d'avoir des quantités insuffisantes de données 
+ou un système d'équations sous-déterminé. 
+Nous allons en faire bon usage dans la section suivante. 
 
 
-## Exercises
+## Exercices
 
-1. What will happen if the number of examples cannot be divided by the batch size. How to change this behavior by specifying a different argument by using framework's API?
-1. What if we want to generate a huge dataset, where both the size of the parameter vector `w` and the number of examples `num_examples` are large? 
-    1. What happens if we cannot hold all data in memory?
-    1. How would you shuffle the data if data is held on disk? Your task is to design an *efficient* algorithm that does not require too many random reads or writes. Hint: [pseudorandom permutation generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) allow you to design a reshuffle without the need to store the permutation table explicitly :cite:`Naor.Reingold.1999`. 
-1. Implement a data generator that produces new data on the fly, every time the iterator is called. 
-1. How would you design a random data generator that generates *the same* data each time it's called?
+1. Que se passe-t-il si le nombre d'exemples ne peut pas être divisé par la taille du lot. Comment changer ce comportement en spécifiant un argument différent en utilisant l'API du framework ?
+1. Que se passe-t-il si nous voulons générer un énorme ensemble de données, où la taille du vecteur de paramètres `w` et le nombre d'exemples `num_examples` sont tous deux importants ? 
+    1. Que se passe-t-il si nous ne pouvons pas contenir toutes les données en mémoire ?
+   1. Comment mélanger les données si elles sont stockées sur le disque ? Votre tâche consiste à concevoir un algorithme *efficace* qui ne nécessite pas trop de lectures ou d'écritures aléatoires. Conseil : [pseudorandom permutation generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) vous permet de concevoir un remaniement sans avoir besoin de stocker explicitement la table de permutation :cite:`Naor.Reingold.1999` . 
+1. Implémentez un générateur de données qui produit de nouvelles données à la volée, chaque fois que l'itérateur est appelé. 
+1. Comment concevriez-vous un générateur de données aléatoires qui génère *les mêmes* données à chaque fois qu'il est appelé ?
 
 
 :begin_tab:`mxnet`

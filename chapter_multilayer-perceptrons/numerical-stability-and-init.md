@@ -3,92 +3,92 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Numerical Stability and Initialization
-:label:`sec_numerical_stability`
+# Stabilité numérique et initialisation
+:label:`sec_numerical_stability` 
+
+ 
+ Jusqu'à présent, chaque modèle que nous avons mis en œuvre
+exigeait que nous initialisions ses paramètres
+selon une certaine distribution pré-spécifiée.
+Jusqu'à présent, nous avons considéré que le schéma d'initialisation allait de soi,
+passant sous silence les détails de la façon dont ces choix sont faits.
+Vous avez peut-être même eu l'impression que ces choix
+ne sont pas particulièrement importants.
+Au contraire, le choix du schéma d'initialisation
+joue un rôle significatif dans l'apprentissage des réseaux neuronaux,
+et il peut être crucial pour maintenir la stabilité numérique.
+De plus, ces choix peuvent être liés de manière intéressante
+au choix de la fonction d'activation non linéaire.
+La fonction que nous choisissons et la manière dont nous initialisons les paramètres
+peuvent déterminer la vitesse de convergence de notre algorithme d'optimisation.
+De mauvais choix peuvent entraîner l'explosion ou la disparition de gradients lors de l'apprentissage.
+ 
+Dans cette section, nous approfondissons ces sujets
+et discutons de quelques heuristiques utiles
+qui vous seront utiles
+tout au long de votre carrière en apprentissage profond.
 
 
-Thus far, every model that we have implemented
-required that we initialize its parameters
-according to some pre-specified distribution.
-Until now, we took the initialization scheme for granted,
-glossing over the details of how these choices are made.
-You might have even gotten the impression that these choices
-are not especially important.
-To the contrary, the choice of initialization scheme
-plays a significant role in neural network learning,
-and it can be crucial for maintaining numerical stability.
-Moreover, these choices can be tied up in interesting ways
-with the choice of the nonlinear activation function.
-Which function we choose and how we initialize parameters
-can determine how quickly our optimization algorithm converges.
-Poor choices here can cause us to encounter
-exploding or vanishing gradients while training.
-In this section, we delve into these topics with greater detail
-and discuss some useful heuristics
-that you will find useful
-throughout your career in deep learning.
+## Gradients évanescents et explosifs
 
-
-## Vanishing and Exploding Gradients
-
-Consider a deep network with $L$ layers,
-input $\mathbf{x}$ and output $\mathbf{o}$.
-With each layer $l$ defined by a transformation $f_l$
-parameterized by weights $\mathbf{W}^{(l)}$,
-whose hidden layer output is $\mathbf{h}^{(l)}$ (let $\mathbf{h}^{(0)} = \mathbf{x}$),
-our network can be expressed as:
+Considérons un réseau profond avec $L$ couches,
+entrée $\mathbf{x}$ et sortie $\mathbf{o}$.
+Avec chaque couche $l$ définie par une transformation $f_l$
+ paramétrée par des poids $\mathbf{W}^{(l)}$,
+dont la sortie de la couche cachée est $\mathbf{h}^{(l)}$ (let $\mathbf{h}^{(0)} = \mathbf{x}$),
+notre réseau peut être exprimé comme suit :
 
 $$\mathbf{h}^{(l)} = f_l (\mathbf{h}^{(l-1)}) \text{ and thus } \mathbf{o} = f_L \circ \ldots \circ f_1(\mathbf{x}).$$
 
-If all the hidden layer output and the input are vectors,
-we can write the gradient of $\mathbf{o}$ with respect to
-any set of parameters $\mathbf{W}^{(l)}$ as follows:
+Si la sortie de la couche cachée et l'entrée sont des vecteurs,
+nous pouvons écrire le gradient de $\mathbf{o}$ par rapport à
+tout ensemble de paramètres $\mathbf{W}^{(l)}$ comme suit :
 
-$$\partial_{\mathbf{W}^{(l)}} \mathbf{o} = \underbrace{\partial_{\mathbf{h}^{(L-1)}} \mathbf{h}^{(L)}}_{ \mathbf{M}^{(L)} \stackrel{\mathrm{def}}{=}} \cdot \ldots \cdot \underbrace{\partial_{\mathbf{h}^{(l)}} \mathbf{h}^{(l+1)}}_{ \mathbf{M}^{(l+1)} \stackrel{\mathrm{def}}{=}} \underbrace{\partial_{\mathbf{W}^{(l)}} \mathbf{h}^{(l)}}_{ \mathbf{v}^{(l)} \stackrel{\mathrm{def}}{=}}.$$
+$$\partial_{\mathbf{W}^{(l)}} \mathbf{o} = \underbrace{\partial_{\mathbf{h}^{(L-1)}} \mathbf{h}^{(L)}}_{ \mathbf{M}^{(L)} \stackrel{\mathrm{def}}{=}} \cdot \ldots \cdot \underbrace{\partial_{\mathbf{h}^{(l)}} \mathbf{h}^{(l+1)}}_{ \mathbf{M}^{(l+1)} \stackrel{\mathrm{def}}{=}} \underbrace{\partial_{\mathbf{W}^{(l)}} \mathbf{h}^{(l)}}_{ \mathbf{v}^{(l)} \stackrel{\mathrm{def}}{=}}.$$ 
 
-In other words, this gradient is
-the product of $L-l$ matrices
-$\mathbf{M}^{(L)} \cdot \ldots \cdot \mathbf{M}^{(l+1)}$
-and the gradient vector $\mathbf{v}^{(l)}$.
-Thus we are susceptible to the same
-problems of numerical underflow that often crop up
-when multiplying together too many probabilities.
-When dealing with probabilities, a common trick is to
-switch into log-space, i.e., shifting
-pressure from the mantissa to the exponent
-of the numerical representation.
-Unfortunately, our problem above is more serious:
-initially the matrices $\mathbf{M}^{(l)}$ may have a wide variety of eigenvalues.
-They might be small or large, and
-their product might be *very large* or *very small*.
+ En d'autres termes, ce gradient est
+le produit de $L-l$ matrices
+$\mathbf{M}^{(L)} \cdot \ldots \cdot \mathbf{M}^{(l+1)}$ 
+ et du vecteur gradient $\mathbf{v}^{(l)}$.
+Nous sommes donc susceptibles de rencontrer les mêmes problèmes de débordement numérique
+qui apparaissent souvent
+lorsque l'on multiplie ensemble un trop grand nombre de probabilités.
+Lorsqu'on traite des probabilités, une astuce courante consiste à
+passer dans l'espace logarithmique, c'est-à-dire à déplacer la pression
+de la mantisse vers l'exposant
+de la représentation numérique.
+Malheureusement, notre problème ci-dessus est plus grave :
+initialement, les matrices $\mathbf{M}^{(l)}$ peuvent avoir une grande variété de valeurs propres.
+Elles peuvent être petites ou grandes, et
+leur produit peut être *très grand* ou *très petit*.
 
-The risks posed by unstable gradients
-go beyond numerical representation.
-Gradients of unpredictable magnitude
-also threaten the stability of our optimization algorithms.
-We may be facing parameter updates that are either
-(i) excessively large, destroying our model
-(the *exploding gradient* problem);
-or (ii) excessively small
-(the *vanishing gradient* problem),
-rendering learning impossible as parameters
-hardly move on each update.
+Les risques posés par les gradients instables
+vont au-delà de la représentation numérique.
+Les gradients de magnitude imprévisible
+menacent également la stabilité de nos algorithmes d'optimisation.
+Nous pouvons être confrontés à des mises à jour de paramètres qui sont soit
+(i) excessivement grandes, détruisant notre modèle
+(le problème du *gradient explosif*) ;
+ou (ii) excessivement petites
+(le problème du *gradient évanescent*),
+rendant l'apprentissage impossible car les paramètres
+bougent à peine à chaque mise à jour.
 
 
 ### (**Vanishing Gradients**)
 
-One frequent culprit causing the vanishing gradient problem
-is the choice of the activation function $\sigma$
-that is appended following each layer's linear operations.
-Historically, the sigmoid function
-$1/(1 + \exp(-x))$ (introduced in :numref:`sec_mlp`)
-was popular because it resembles a thresholding function.
-Since early artificial neural networks were inspired
-by biological neural networks,
-the idea of neurons that fire either *fully* or *not at all*
-(like biological neurons) seemed appealing.
-Let's take a closer look at the sigmoid
-to see why it can cause vanishing gradients.
+Un coupable fréquent à l'origine du problème du gradient de fuite
+est le choix de la fonction d'activation $\sigma$
+ qui est ajoutée à la suite des opérations linéaires de chaque couche.
+Historiquement, la fonction sigmoïde
+$1/(1 + \exp(-x))$ (introduite dans :numref:`sec_mlp` )
+était populaire car elle ressemble à une fonction de seuillage.
+Comme les premiers réseaux neuronaux artificiels étaient inspirés
+par les réseaux neuronaux biologiques,
+l'idée de neurones qui se déclenchent soit *complètement* soit *pas du tout*
+(comme les neurones biologiques) semblait séduisante.
+Examinons de plus près la sigmoïde
+pour voir pourquoi elle peut provoquer des gradients évanescents.
 
 ```{.python .input}
 %%tab mxnet
@@ -133,34 +133,34 @@ d2l.plot(x.numpy(), [y.numpy(), t.gradient(y, x).numpy()],
          legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 ```
 
-As you can see, (**the sigmoid's gradient vanishes
-both when its inputs are large and when they are small**).
-Moreover, when backpropagating through many layers,
-unless we are in the Goldilocks zone, where
-the inputs to many of the sigmoids are close to zero,
-the gradients of the overall product may vanish.
-When our network boasts many layers,
-unless we are careful, the gradient
-will likely be cut off at some layer.
-Indeed, this problem used to plague deep network training.
-Consequently, ReLUs, which are more stable
-(but less neurally plausible),
-have emerged as the default choice for practitioners.
+Comme vous pouvez le voir, (**le gradient de la sigmoïde disparaît
+à la fois lorsque ses entrées sont grandes et lorsqu'elles sont petites**).
+De plus, lors de la rétropropagation à travers de nombreuses couches,
+à moins que nous nous trouvions dans la zone Goldilocks, où
+les entrées de nombreuses sigmoïdes sont proches de zéro,
+les gradients du produit global peuvent disparaître.
+Lorsque notre réseau comporte de nombreuses couches,
+si nous ne faisons pas attention, le gradient
+sera probablement coupé à une certaine couche.
+En effet, ce problème était autrefois un fléau pour la formation des réseaux profonds.
+Par conséquent, les ReLU, qui sont plus stables
+(mais moins plausibles sur le plan neuronal),
+sont devenus le choix par défaut des praticiens.
 
 
 ### [**Exploding Gradients**]
 
-The opposite problem, when gradients explode,
-can be similarly vexing.
-To illustrate this a bit better,
-we draw 100 Gaussian random matrices
-and multiply them with some initial matrix.
-For the scale that we picked
-(the choice of the variance $\sigma^2=1$),
-the matrix product explodes.
-When this happens due to the initialization
-of a deep network, we have no chance of getting
-a gradient descent optimizer to converge.
+Le problème opposé, lorsque les gradients explosent,
+peut être tout aussi vexant.
+Pour illustrer cela un peu mieux,
+nous tirons 100 matrices aléatoires gaussiennes
+et les multiplions avec une certaine matrice initiale.
+Pour l'échelle que nous avons choisie
+(le choix de la variance $\sigma^2=1$),
+le produit matriciel explose.
+Lorsque cela se produit en raison de l'initialisation
+d'un réseau profond, nous n'avons aucune chance de faire converger
+un optimiseur à descente de gradient.
 
 ```{.python .input}
 %%tab mxnet
@@ -192,92 +192,92 @@ for i in range(100):
 print('after multiplying 100 matrices\n', M.numpy())
 ```
 
-### Breaking the Symmetry
+### Briser la symétrie
 
-Another problem in neural network design
-is the symmetry inherent in their parametrization.
-Assume that we have a simple MLP
-with one hidden layer and two units.
-In this case, we could permute the weights $\mathbf{W}^{(1)}$
-of the first layer and likewise permute
-the weights of the output layer
-to obtain the same function.
-There is nothing special differentiating
-the first hidden unit vs. the second hidden unit.
-In other words, we have permutation symmetry
-among the hidden units of each layer.
+Un autre problème dans la conception des réseaux neuronaux
+est la symétrie inhérente à leur paramétrage.
+Supposons que nous ayons un MLP simple
+avec une couche cachée et deux unités.
+Dans ce cas, nous pourrions permuter les poids $\mathbf{W}^{(1)}$
+ de la première couche et permuter de la même manière
+les poids de la couche de sortie
+pour obtenir la même fonction.
+Il n'y a rien de spécial qui différencie
+la première unité cachée de la deuxième unité cachée.
+En d'autres termes, nous avons une symétrie de permutation
+entre les unités cachées de chaque couche.
 
-This is more than just a theoretical nuisance.
-Consider the aforementioned one-hidden-layer MLP
-with two hidden units.
-For illustration,
-suppose that the output layer transforms the two hidden units into only one output unit.
-Imagine what would happen if we initialized
-all of the parameters of the hidden layer
-as $\mathbf{W}^{(1)} = c$ for some constant $c$.
-In this case, during forward propagation
-either hidden unit takes the same inputs and parameters,
-producing the same activation,
-which is fed to the output unit.
-During backpropagation,
-differentiating the output unit with respect to parameters $\mathbf{W}^{(1)}$ gives a gradient whose elements all take the same value.
-Thus, after gradient-based iteration (e.g., minibatch stochastic gradient descent),
-all the elements of $\mathbf{W}^{(1)}$ still take the same value.
-Such iterations would
-never *break the symmetry* on its own
-and we might never be able to realize
-the network's expressive power.
-The hidden layer would behave
-as if it had only a single unit.
-Note that while minibatch stochastic gradient descent would not break this symmetry,
-dropout regularization (to be introduced later) would!
-
-
-## Parameter Initialization
-
-One way of addressing---or at least mitigating---the
-issues raised above is through careful initialization.
-As we will see later,
-additional care during optimization
-and suitable regularization can further enhance stability.
+C'est plus qu'une simple nuisance théorique.
+Considérons le MLP à une couche cachée
+mentionné plus haut avec deux unités cachées.
+À titre d'illustration,
+supposez que la couche de sortie transforme les deux unités cachées en une seule unité de sortie.
+Imaginez ce qui se passerait si nous initialisions
+tous les paramètres de la couche cachée
+comme $\mathbf{W}^{(1)} = c$ pour une certaine constante $c$.
+Dans ce cas, pendant la propagation vers l'avant
+, chaque unité cachée prend les mêmes entrées et paramètres,
+produisant la même activation,
+qui est transmise à l'unité de sortie.
+Pendant la rétropropagation,
+la différenciation de l'unité de sortie par rapport aux paramètres $\mathbf{W}^{(1)}$ donne un gradient dont les éléments prennent tous la même valeur.
+Ainsi, après une itération basée sur le gradient (par exemple, la descente de gradient stochastique en minibatch),
+tous les éléments de $\mathbf{W}^{(1)}$ prennent toujours la même valeur.
+De telles itérations
+ne *briseraient jamais la symétrie* par elles-mêmes
+et nous pourrions ne jamais être en mesure de réaliser
+le pouvoir expressif du réseau.
+La couche cachée se comporterait
+comme si elle ne comportait qu'une seule unité.
+Notez que si la descente de gradient stochastique en minibatch ne rompt pas cette symétrie, la régularisation par abandon (
+) (qui sera introduite plus tard) le ferait !
 
 
-### Default Initialization
+## Initialisation des paramètres
 
-In the previous sections, e.g., in :numref:`sec_linear_concise`,
-we used a normal distribution
-to initialize the values of our weights.
-If we do not specify the initialization method, the framework will
-use a default random initialization method, which often works well in practice
-for moderate problem sizes.
+Une façon d'aborder - ou du moins d'atténuer - les problèmes soulevés ci-dessus par
+est de procéder à une initialisation minutieuse.
+Comme nous le verrons plus tard,
+une attention supplémentaire pendant l'optimisation
+et une régularisation appropriée peuvent encore améliorer la stabilité.
 
 
+### Initialisation par défaut
+
+Dans les sections précédentes, par exemple dans :numref:`sec_linear_concise` ,
+, nous avons utilisé une distribution normale
+pour initialiser les valeurs de nos poids.
+Si nous ne spécifions pas la méthode d'initialisation, le framework utilisera
+une méthode d'initialisation aléatoire par défaut, qui fonctionne souvent bien en pratique
+pour des problèmes de taille modérée.
 
 
 
 
-### Xavier Initialization
-:label:`subsec_xavier`
 
-Let's look at the scale distribution of
-an output $o_{i}$ for some fully connected layer
-*without nonlinearities*.
-With $n_\mathrm{in}$ inputs $x_j$
-and their associated weights $w_{ij}$ for this layer,
-an output is given by
 
-$$o_{i} = \sum_{j=1}^{n_\mathrm{in}} w_{ij} x_j.$$
+### Xavier Initialisation
+:label:`subsec_xavier` 
 
-The weights $w_{ij}$ are all drawn
-independently from the same distribution.
-Furthermore, let's assume that this distribution
-has zero mean and variance $\sigma^2$.
-Note that this does not mean that the distribution has to be Gaussian,
-just that the mean and variance need to exist.
-For now, let's assume that the inputs to the layer $x_j$
-also have zero mean and variance $\gamma^2$
-and that they are independent of $w_{ij}$ and independent of each other.
-In this case, we can compute the mean and variance of $o_i$ as follows:
+ Examinons la distribution d'échelle de
+une sortie $o_{i}$ pour une couche entièrement connectée
+*sans non-linéarités*.
+Avec $n_\mathrm{in}$ entrées $x_j$
+ et leurs poids associés $w_{ij}$ pour cette couche,
+une sortie est donnée par
+
+$$o_{i} = \sum_{j=1}^{n_\mathrm{in}} w_{ij} x_j.$$ 
+
+ Les poids $w_{ij}$ sont tous tirés
+indépendamment de la même distribution.
+De plus, supposons que cette distribution
+a une moyenne nulle et une variance $\sigma^2$.
+Notez que cela ne signifie pas que la distribution doit être gaussienne,
+mais simplement que la moyenne et la variance doivent exister.
+Pour l'instant, supposons que les entrées de la couche $x_j$
+ ont également une moyenne et une variance de zéro $\gamma^2$
+ et qu'elles sont indépendantes de $w_{ij}$ et indépendantes les unes des autres.
+Dans ce cas, nous pouvons calculer la moyenne et la variance de $o_i$ comme suit :
 
 $$
 \begin{aligned}
@@ -289,18 +289,18 @@ $$
 \end{aligned}
 $$
 
-One way to keep the variance fixed
-is to set $n_\mathrm{in} \sigma^2 = 1$.
-Now consider backpropagation.
-There we face a similar problem,
-albeit with gradients being propagated from the layers closer to the output.
-Using the same reasoning as for forward propagation,
-we see that the gradients' variance can blow up
-unless $n_\mathrm{out} \sigma^2 = 1$,
-where $n_\mathrm{out}$ is the number of outputs of this layer.
-This leaves us in a dilemma:
-we cannot possibly satisfy both conditions simultaneously.
-Instead, we simply try to satisfy:
+Une façon de garder la variance fixée
+est de fixer $n_\mathrm{in} \sigma^2 = 1$.
+Considérons maintenant la rétropropagation.
+Nous sommes confrontés à un problème similaire,
+, mais les gradients sont propagés à partir des couches les plus proches de la sortie.
+En utilisant le même raisonnement que pour la propagation en avant,
+nous voyons que la variance des gradients peut faire exploser
+à moins que $n_\mathrm{out} \sigma^2 = 1$,
+où $n_\mathrm{out}$ est le nombre de sorties de cette couche.
+Cela nous laisse face à un dilemme :
+nous ne pouvons pas satisfaire les deux conditions simultanément.
+Au lieu de cela, nous essayons simplement de les satisfaire :
 
 $$
 \begin{aligned}
@@ -309,66 +309,66 @@ $$
 \end{aligned}
 $$
 
-This is the reasoning underlying the now-standard
-and practically beneficial *Xavier initialization*,
-named after the first author of its creators :cite:`Glorot.Bengio.2010`.
-Typically, the Xavier initialization
-samples weights from a Gaussian distribution
-with zero mean and variance
-$\sigma^2 = \frac{2}{n_\mathrm{in} + n_\mathrm{out}}$.
-We can also adapt Xavier's intuition to
-choose the variance when sampling weights
-from a uniform distribution.
-Note that the uniform distribution $U(-a, a)$ has variance $\frac{a^2}{3}$.
-Plugging $\frac{a^2}{3}$ into our condition on $\sigma^2$
-yields the suggestion to initialize according to
+C'est le raisonnement qui sous-tend l'initialisation désormais standard
+et pratiquement bénéfique *Xavier*,
+du nom du premier auteur de ses créateurs :cite:`Glorot.Bengio.2010` .
+Typiquement, l'initialisation Xavier
+échantillonne les poids à partir d'une distribution gaussienne
+avec une moyenne et une variance nulles
+$\sigma^2 = \frac{2}{n_\mathrm{in} + n_\mathrm{out}}$ .
+Nous pouvons également adapter l'intuition de Xavier pour
+choisir la variance lors de l'échantillonnage des poids
+à partir d'une distribution uniforme.
+Notez que la distribution uniforme $U(-a, a)$ a une variance $\frac{a^2}{3}$.
+En ajoutant $\frac{a^2}{3}$ à notre condition sur $\sigma^2$
+ , on obtient la suggestion d'initialiser selon
 
-$$U\left(-\sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}, \sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}\right).$$
+$$U\left(-\sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}, \sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}\right).$$ 
 
-Though the assumption for nonexistence of nonlinearities
-in the above mathematical reasoning
-can be easily violated in neural networks,
-the Xavier initialization method
-turns out to work well in practice.
-
-
-### Beyond
-
-The reasoning above barely scratches the surface
-of modern approaches to parameter initialization.
-A deep learning framework often implements over a dozen different heuristics.
-Moreover, parameter initialization continues to be
-a hot area of fundamental research in deep learning.
-Among these are heuristics specialized for
-tied (shared) parameters, super-resolution,
-sequence models, and other situations.
-For instance,
-Xiao et al. demonstrated the possibility of training
-10000-layer neural networks without architectural tricks
-by using a carefully-designed initialization method :cite:`Xiao.Bahri.Sohl-Dickstein.ea.2018`.
-
-If the topic interests you we suggest
-a deep dive into this module's offerings,
-reading the papers that proposed and analyzed each heuristic,
-and then exploring the latest publications on the topic.
-Perhaps you will stumble across or even invent
-a clever idea and contribute an implementation to deep learning frameworks.
+ Bien que l'hypothèse de non-existence de non-linéarités
+dans le raisonnement mathématique ci-dessus
+puisse être facilement violée dans les réseaux neuronaux,
+la méthode d'initialisation de Xavier
+s'avère bien fonctionner en pratique.
 
 
-## Summary
+### Au-delà de
 
-* Vanishing and exploding gradients are common issues in deep networks. Great care in parameter initialization is required to ensure that gradients and parameters remain well controlled.
-* Initialization heuristics are needed to ensure that the initial gradients are neither too large nor too small.
-* ReLU activation functions mitigate the vanishing gradient problem. This can accelerate convergence.
-* Random initialization is key to ensure that symmetry is broken before optimization.
-* Xavier initialization suggests that, for each layer, variance of any output is not affected by the number of inputs, and variance of any gradient is not affected by the number of outputs.
+Le raisonnement ci-dessus ne fait qu'effleurer la surface
+des approches modernes de l'initialisation des paramètres.
+Un cadre d'apprentissage profond met souvent en œuvre plus d'une douzaine d'heuristiques différentes.
+De plus, l'initialisation des paramètres continue d'être
+un domaine chaud de recherche fondamentale en apprentissage profond.
+Parmi celles-ci, on trouve des heuristiques spécialisées pour les paramètres liés (partagés)
+, la super-résolution, les modèles de séquence
+et d'autres situations.
+Par exemple,
+Xiao et al. ont démontré la possibilité de former
+des réseaux neuronaux à 10000 couches sans astuces architecturales
+en utilisant une méthode d'initialisation soigneusement conçue :cite:`Xiao.Bahri.Sohl-Dickstein.ea.2018` .
 
-## Exercises
+Si le sujet vous intéresse, nous vous suggérons
+de vous plonger dans les offres de ce module,
+de lire les articles qui ont proposé et analysé chaque heuristique,
+puis d'explorer les dernières publications sur le sujet.
+Peut-être tomberez-vous sur ou même inventerez-vous
+une idée intelligente et contribuerez à une mise en œuvre dans les cadres d'apprentissage profond.
 
-1. Can you design other cases where a neural network might exhibit symmetry requiring breaking besides the permutation symmetry in an MLP's layers?
-1. Can we initialize all weight parameters in linear regression or in softmax regression to the same value?
-1. Look up analytic bounds on the eigenvalues of the product of two matrices. What does this tell you about ensuring that gradients are well conditioned?
-1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on layerwise adaptive rate scaling  for inspiration :cite:`You.Gitman.Ginsburg.2017`.
+
+## Résumé
+
+* La disparition et l'explosion des gradients sont des problèmes courants dans les réseaux profonds. Une grande attention dans l'initialisation des paramètres est nécessaire pour s'assurer que les gradients et les paramètres restent bien contrôlés.
+* Des heuristiques d'initialisation sont nécessaires pour s'assurer que les gradients initiaux ne sont ni trop grands ni trop petits.
+* Les fonctions d'activation ReLU atténuent le problème des gradients évanescents. Cela peut accélérer la convergence.
+* L'initialisation aléatoire est essentielle pour garantir que la symétrie est brisée avant l'optimisation.
+* L'initialisation Xavier suggère que, pour chaque couche, la variance de toute sortie n'est pas affectée par le nombre d'entrées, et la variance de tout gradient n'est pas affectée par le nombre de sorties.
+
+## Exercices
+
+1. Pouvez-vous concevoir d'autres cas où un réseau neuronal pourrait présenter une symétrie nécessitant une rupture, outre la symétrie de permutation dans les couches d'un MLP ?
+1. Peut-on initialiser tous les paramètres de poids dans la régression linéaire ou dans la régression softmax à la même valeur ?
+1. Recherchez les limites analytiques des valeurs propres du produit de deux matrices. Qu'est-ce que cela vous apprend sur la nécessité de s'assurer que les gradients sont bien conditionnés ?
+1. Si nous savons que certains termes divergent, pouvons-nous y remédier après coup ? Consultez l'article sur l'échelonnement adaptatif du taux par couche pour vous inspirer de :cite:`You.Gitman.Ginsburg.2017` .
 
 
 :begin_tab:`mxnet`

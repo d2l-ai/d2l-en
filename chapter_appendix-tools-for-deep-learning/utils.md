@@ -3,11 +3,11 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Utility Functions and Classes
-:label:`sec_utils`
+# Fonctions et classes utilitaires
+:label:`sec_utils` 
 
-
-This section contains the implementations of utility functions and classes used in this book.
+ 
+ Cette section contient les implémentations des fonctions et classes utilitaires utilisées dans ce livre.
 
 ```{.python .input}
 %%tab mxnet
@@ -39,7 +39,7 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-Hyperparameters.
+Hyperparamètres.
 
 ```{.python .input}
 %%tab all
@@ -54,7 +54,7 @@ def save_hyperparameters(self, ignore=[]):
         setattr(self, k, v)
 ```
 
-Progress bar.
+Barre de progression.
 
 ```{.python .input  n=22}
 %%tab all
@@ -101,7 +101,7 @@ def draw(self, x, y, label, every_n=1):
 
 Trainer
 
-A bunch of functions that will be deprecated:
+Une série de fonctions qui seront dépréciées :
 
 ```{.python .input}
 %%tab mxnet
@@ -633,7 +633,7 @@ def grad_clipping(grads, theta):  #@save
     return new_grad
 ```
 
-More for the attention chapter.
+Plus pour le chapitre de l'attention.
 
 ```{.python .input}
 %%tab all
@@ -798,7 +798,7 @@ def sequence_mask(X, valid_len, value=0):
     maxlen = X.size(1)
     mask = torch.arange((maxlen), dtype=torch.float32,
                         device=X.device)[None, :] < valid_len[:, None]
-    X[~mask] = value
+    X[~)mask] = value
     return X
 
     
@@ -845,7 +845,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
             dec_input = d2l.concat([bos, Y[:, :-1]], 1)  # Teacher forcing
             Y_hat, _ = net(X, dec_input, X_valid_len)
             l = loss(Y_hat, Y, Y_valid_len)
-            l.sum().backward()  # Make the loss scalar for `backward`
+            l.sum().backward()  # Make the loss scalar for `retour en arrière`
             d2l.grad_clipping(net, 1)
             num_tokens = Y_valid_len.sum()
             optimizer.step()

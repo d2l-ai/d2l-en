@@ -1,13 +1,13 @@
-# Appendix: Tools for Deep Learning
-:label:`chap_appendix_tools`
+# Annexe : Tools for Deep Learning
+:label:`chap_appendix_tools` 
 
-
-To get the most out of *Dive into Deep Learning*,
-we will talk you through different tools 
-in this appendix,
-such as 
-for running and contributing to this 
-interactive open-source book.
+ 
+ Pour tirer le meilleur parti de *Dive into Deep Learning*,
+nous vous parlerons de différents outils 
+dans cette annexe,
+tels que 
+pour exécuter et contribuer à ce livre interactif open-source 
+.
 
 ```toc
 :maxdepth: 2

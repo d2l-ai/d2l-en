@@ -1,18 +1,18 @@
-# Single Variable Calculus
-:label:`sec_single_variable_calculus`
+# Calcul à une variable
+:label:`sec_single_variable_calculus` 
 
-In :numref:`sec_calculus`, we saw the basic elements of differential calculus.  This section takes a deeper dive into the fundamentals of calculus and how we can understand and apply it in the context of machine learning.
+ Dans :numref:`sec_calculus` , nous avons vu les éléments de base du calcul différentiel.  Cette section approfondit les principes de base du calcul différentiel et la manière dont nous pouvons les comprendre et les appliquer dans le contexte de l'apprentissage automatique.
 
-## Differential Calculus
-Differential calculus is fundamentally the study of how functions behave under small changes.  To see why this is so core to deep learning, let's consider an example.
+## Calcul différentiel
+Le calcul différentiel est fondamentalement l'étude du comportement des fonctions sous de petits changements.  Pour comprendre pourquoi il est si essentiel à l'apprentissage profond, prenons un exemple.
 
-Suppose that we have a deep neural network where the weights are, for convenience, concatenated into a single vector $\mathbf{w} = (w_1, \ldots, w_n)$.  Given a training dataset, we consider the loss of our neural network on this dataset, which we will write as $\mathcal{L}(\mathbf{w})$.  
+Supposons que nous ayons un réseau neuronal profond où les poids sont, par commodité, concaténés en un seul vecteur $\mathbf{w} = (w_1, \ldots, w_n)$.  Étant donné un ensemble de données d'apprentissage, nous considérons la perte de notre réseau neuronal sur cet ensemble de données, que nous écrirons comme $\mathcal{L}(\mathbf{w})$. 
 
-This function is extraordinarily complex, encoding the performance of all possible models of the given architecture on this dataset, so it is nearly impossible to tell what set of weights $\mathbf{w}$ will minimize the loss. Thus, in practice, we often start by initializing our weights *randomly*, and then iteratively take small steps in the direction which makes the loss decrease as rapidly as possible.
+Cette fonction est extraordinairement complexe, car elle code les performances de tous les modèles possibles de l'architecture donnée sur cet ensemble de données. Il est donc presque impossible de dire quel ensemble de poids $\mathbf{w}$ minimisera la perte. Ainsi, dans la pratique, nous commençons souvent par initialiser nos poids *aléatoirement*, puis nous faisons des petits pas itératifs dans la direction qui fait diminuer la perte aussi rapidement que possible.
 
-The question then becomes something that on the surface is no easier: how do we find the direction which makes the weights decrease as quickly as possible?  To dig into this, let's first examine the case with only a single weight: $L(\mathbf{w}) = L(x)$ for a single real value $x$. 
+La question devient alors quelque chose qui, à première vue, n'est pas plus facile : comment trouver la direction qui fait que les poids diminuent aussi rapidement que possible ?  Pour y répondre, examinons d'abord le cas d'un seul poids : $L(\mathbf{w}) = L(x)$ pour une seule valeur réelle $x$. 
 
-Let's take $x$ and try to understand what happens when we change it by a small amount to $x + \epsilon$. If you wish to be concrete, think a number like $\epsilon = 0.0000001$.  To help us visualize what happens, let's graph an example function, $f(x) = \sin(x^x)$, over the $[0, 3]$.
+Prenons $x$ et essayons de comprendre ce qui se passe lorsque nous le changeons légèrement en $x + \epsilon$. Si vous voulez être concret, pensez à un nombre comme $\epsilon = 0.0000001$.  Pour nous aider à visualiser ce qui se passe, représentons graphiquement un exemple de fonction, $f(x) = \sin(x^x)$, sur $[0, 3]$.
 
 ```{.python .input}
 #@tab mxnet
@@ -56,7 +56,7 @@ ys = tf.sin(x_big**x_big)
 d2l.plot(x_big, ys, 'x', 'f(x)')
 ```
 
-At this large scale, the function's behavior is not simple. However, if we reduce our range to something smaller like $[1.75,2.25]$, we see that the graph becomes much simpler.
+À cette grande échelle, le comportement de la fonction n'est pas simple. Cependant, si nous réduisons notre plage à quelque chose de plus petit, comme $[1.75,2.25]$, nous constatons que le graphique devient beaucoup plus simple.
 
 ```{.python .input}
 #@tab mxnet
@@ -82,7 +82,7 @@ ys = tf.sin(x_med**x_med)
 d2l.plot(x_med, ys, 'x', 'f(x)')
 ```
 
-Taking this to an extreme, if we zoom into a tiny segment, the behavior becomes far simpler: it is just a straight line.
+En poussant cela à l'extrême, si nous zoomons sur un segment minuscule, le comportement devient beaucoup plus simple : il s'agit simplement d'une ligne droite.
 
 ```{.python .input}
 #@tab mxnet
@@ -108,15 +108,15 @@ ys = tf.sin(x_small**x_small)
 d2l.plot(x_small, ys, 'x', 'f(x)')
 ```
 
-This is the key observation of single variable calculus: the behavior of familiar functions can be modeled by a line in a small enough range.  This means that for most functions, it is reasonable to expect that as we shift the $x$ value of the function by a little bit, the output $f(x)$ will also be shifted by a little bit.  The only question we need to answer is, "How large is the change in the output compared to the change in the input?  Is it half as large?  Twice as large?"
+C'est l'observation clé du calcul à une variable : le comportement des fonctions familières peut être modélisé par une ligne dans un intervalle suffisamment petit.  Cela signifie que pour la plupart des fonctions, il est raisonnable de s'attendre à ce que, si nous décalons un peu la valeur $x$ de la fonction, la sortie $f(x)$ sera également décalée d'un peu.  La seule question à laquelle nous devons répondre est la suivante : " Quelle est l'ampleur du changement de la sortie par rapport au changement de l'entrée ?  Est-il deux fois moins important ?  Deux fois plus grande ?"
 
-Thus, we can consider the ratio of the change in the output of a function for a small change in the input of the function.  We can write this formally as
+Ainsi, nous pouvons considérer le rapport de la modification de la sortie d'une fonction pour une petite modification de l'entrée de la fonction.  Nous pouvons l'écrire formellement comme suit
 
 $$
 \frac{L(x+\epsilon) - L(x)}{(x+\epsilon) - x} = \frac{L(x+\epsilon) - L(x)}{\epsilon}.
 $$
 
-This is already enough to start to play around with in code.  For instance, suppose that we know that $L(x) = x^{2} + 1701(x-4)^3$, then we can see how large this value is at the point $x = 4$ as follows.
+C'est déjà suffisant pour commencer à jouer avec dans le code.  Par exemple, supposons que nous savons que $L(x) = x^{2} + 1701(x-4)^3$, alors nous pouvons voir la taille de cette valeur au point $x = 4$ comme suit.
 
 ```{.python .input}
 #@tab all
@@ -129,61 +129,61 @@ for epsilon in [0.1, 0.001, 0.0001, 0.00001]:
     print(f'epsilon = {epsilon:.5f} -> {(L(4+epsilon) - L(4)) / epsilon:.5f}')
 ```
 
-Now, if we are observant, we will notice that the output of this number is suspiciously close to $8$.  Indeed, if we decrease $\epsilon$, we will see value becomes progressively closer to $8$.  Thus we may conclude, correctly, that the value we seek (the degree a change in the input changes the output) should be $8$ at the point $x=4$.  The way that a mathematician encodes this fact is
+Maintenant, si nous sommes observateurs, nous remarquerons que la sortie de ce nombre est étrangement proche de $8$. En effet, si nous diminuons $\epsilon$, nous verrons que la valeur se rapproche progressivement de $8$. Nous pouvons donc conclure, à juste titre, que la valeur que nous recherchons (le degré auquel une modification de l'entrée change la sortie) devrait être $8$ au point $x=4$.  La façon dont un mathématicien codifie ce fait est la suivante
 
 $$
 \lim_{\epsilon \rightarrow 0}\frac{L(4+\epsilon) - L(4)}{\epsilon} = 8.
 $$
 
-As a bit of a historical digression: in the first few decades of neural network research, scientists used this algorithm (the *method of finite differences*) to evaluate how a loss function changed under small perturbation: just change the weights and see how the loss changed.  This is computationally inefficient, requiring two evaluations of the loss function to see how a single change of one variable influenced the loss.  If we tried to do this with even a paltry few thousand parameters, it would require several thousand evaluations of the network over the entire dataset!  It was not solved until 1986 that the *backpropagation algorithm* introduced in :cite:`Rumelhart.Hinton.Williams.ea.1988` provided a way to calculate how *any* change of the weights together would change the loss in the same computation time as a single prediction of the network over the dataset.
+Petite digression historique : au cours des premières décennies de recherche sur les réseaux neuronaux, les scientifiques ont utilisé cet algorithme (la *méthode des différences finies*) pour évaluer l'évolution d'une fonction de perte sous l'effet d'une petite perturbation : il suffisait de modifier les poids et de voir comment la perte changeait.  Cette méthode est inefficace sur le plan informatique, car elle nécessite deux évaluations de la fonction de perte pour voir comment une seule modification d'une variable influence la perte.  Si nous essayions de faire cela avec ne serait-ce que quelques milliers de paramètres, cela nécessiterait plusieurs milliers d'évaluations du réseau sur l'ensemble des données !  Ce n'est qu'en 1986 que l'algorithme de *rétropropagation* introduit dans :cite:`Rumelhart.Hinton.Williams.ea.1988` a permis de calculer comment *n'importe quelle* modification des poids ensemble changerait la perte dans le même temps de calcul qu'une seule prédiction du réseau sur l'ensemble des données.
 
-Back in our example, this value $8$ is different for different values of $x$, so it makes sense to define it as a function of $x$.  More formally, this value dependent rate of change is referred to as the *derivative* which is written as
+Dans notre exemple, cette valeur $8$ est différente pour différentes valeurs de $x$, il est donc logique de la définir comme une fonction de $x$. Plus formellement, ce taux de changement dépendant de la valeur est appelé la *dérivée* qui s'écrit
 
-$$\frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon}.$$
-:eqlabel:`eq_der_def`
+$$\frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon}.$$ 
+ :eqlabel:`eq_der_def` 
 
-Different texts will use different notations for the derivative. For instance, all of the below notations indicate the same thing:
+ . Différents textes utilisent différentes notations pour la dérivée. Par exemple, toutes les notations ci-dessous indiquent la même chose :
 
 $$
 \frac{df}{dx} = \frac{d}{dx}f = f' = \nabla_xf = D_xf = f_x.
 $$
 
-Most authors will pick a single notation and stick with it, however even that is not guaranteed.  It is best to be familiar with all of these.  We will use the notation $\frac{df}{dx}$ throughout this text, unless we want to take the derivative of a complex expression, in which case we will use $\frac{d}{dx}f$ to write expressions like
+La plupart des auteurs choisiront une seule notation et s'y tiendront, mais cela n'est pas garanti.  Il est préférable de se familiariser avec toutes ces notations.  Nous utiliserons la notation $\frac{df}{dx}$ tout au long de ce texte, sauf si nous voulons prendre la dérivée d'une expression complexe, auquel cas nous utiliserons $\frac{d}{dx}f$ pour écrire des expressions comme
 $$
 \frac{d}{dx}\left[x^4+\cos\left(\frac{x^2+1}{2x-1}\right)\right].
 $$
 
-Oftentimes, it is intuitively useful to unravel the definition of derivative :eqref:`eq_der_def` again to see how a function changes when we make a small change of $x$:
+Souvent, il est intuitivement utile de décortiquer à nouveau la définition de la dérivée :eqref:`eq_der_def` pour voir comment une fonction change lorsque nous apportons une petite modification à $x$:
 
-$$\begin{aligned} \frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon} & \implies \frac{df}{dx}(x) \approx \frac{f(x+\epsilon) - f(x)}{\epsilon} \\ & \implies \epsilon \frac{df}{dx}(x) \approx f(x+\epsilon) - f(x) \\ & \implies f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x). \end{aligned}$$
-:eqlabel:`eq_small_change`
+$$\begin{aligned} \frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon} & \implies \frac{df}{dx}(x) \approx \frac{f(x+\epsilon) - f(x)}{\epsilon} \\ & \implies \epsilon \frac{df}{dx}(x) \approx f(x+\epsilon) - f(x) \\ & \implies f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x). \end{aligned}$$ 
+ :eqlabel:`eq_small_change` 
 
-The last equation is worth explicitly calling out.  It tells us that if you take any function and change the input by a small amount, the output would change by that small amount scaled by the derivative.
+ La dernière équation mérite d'être explicitement mentionnée.  Elle nous indique que si vous prenez n'importe quelle fonction et que vous modifiez l'entrée d'une petite quantité, la sortie changera de cette petite quantité mise à l'échelle par la dérivée.
 
-In this way, we can understand the derivative as the scaling factor that tells us how large of change we get in the output from a change in the input.
+De cette façon, nous pouvons comprendre la dérivée comme le facteur d'échelle qui nous indique l'ampleur du changement de la sortie à partir d'un changement de l'entrée.
 
-## Rules of Calculus
-:label:`sec_derivative_table`
+## Règles de calcul
+:label:`sec_derivative_table` 
 
-We now turn to the task of understanding how to compute the derivative of an explicit function.  A full formal treatment of calculus would derive everything from first principles.  We will not indulge in this temptation here, but rather provide an understanding of the common rules encountered.
+ Nous allons maintenant comprendre comment calculer la dérivée d'une fonction explicite.  Un traitement formel complet du calcul dériverait tout à partir des premiers principes.  Nous ne céderons pas à cette tentation ici, mais fournirons plutôt une compréhension des règles courantes rencontrées.
 
-### Common Derivatives
-As was seen in :numref:`sec_calculus`, when computing derivatives one can oftentimes use a series of rules to reduce the computation to a few core functions.  We repeat them here for ease of reference.
+### Dérivées courantes
+Comme nous l'avons vu dans :numref:`sec_calculus` , lorsque l'on calcule des dérivées, on peut souvent utiliser une série de règles pour réduire le calcul à quelques fonctions de base.  Nous les répétons ici pour faciliter la référence.
 
-* **Derivative of constants.** $\frac{d}{dx}c = 0$.
-* **Derivative of linear functions.** $\frac{d}{dx}(ax) = a$.
-* **Power rule.** $\frac{d}{dx}x^n = nx^{n-1}$.
-* **Derivative of exponentials.** $\frac{d}{dx}e^x = e^x$.
-* **Derivative of the logarithm.** $\frac{d}{dx}\log(x) = \frac{1}{x}$.
+* **Dérivée de constantes.** $\frac{d}{dx}c = 0$.
+* **Dérivée de fonctions linéaires.** $\frac{d}{dx}(ax) = a$.
+* **Règle de puissance.** $\frac{d}{dx}x^n = nx^{n-1}$.
+* **Dérivée des exponentielles.** $\frac{d}{dx}e^x = e^x$.
+* **Dérivée du logarithme.** $\frac{d}{dx}\log(x) = \frac{1}{x}$.
 
-### Derivative Rules
-If every derivative needed to be separately computed and stored in a table, differential calculus would be near impossible.  It is a gift of mathematics that we can generalize the above derivatives and compute more complex derivatives like finding the derivative of $f(x) = \log\left(1+(x-1)^{10}\right)$.  As was mentioned in :numref:`sec_calculus`, the key to doing so is to codify what happens when we take functions and combine them in various ways, most importantly: sums, products, and compositions.
+### Règles de dérivation
+Si chaque dérivée devait être calculée séparément et stockée dans une table, le calcul différentiel serait presque impossible.  C'est un don des mathématiques que de pouvoir généraliser les dérivées ci-dessus et de calculer des dérivées plus complexes, comme la dérivée de $f(x) = \log\left(1+(x-1)^{10}\right)$. Comme nous l'avons mentionné dans :numref:`sec_calculus` , la clé pour y parvenir est de codifier ce qui se passe lorsque l'on prend des fonctions et qu'on les combine de différentes manières, la plus importante étant les sommes, les produits et les compositions.
 
-* **Sum rule.** $\frac{d}{dx}\left(g(x) + h(x)\right) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$.
-* **Product rule.** $\frac{d}{dx}\left(g(x)\cdot h(x)\right) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$.
-* **Chain rule.** $\frac{d}{dx}g(h(x)) = \frac{dg}{dh}(h(x))\cdot \frac{dh}{dx}(x)$.
+* **Règle de la somme.** $\frac{d}{dx}\left(g(x) + h(x)\right) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$.
+* **Règle du produit.** $\frac{d}{dx}\left(g(x)\cdot h(x)\right) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$.
+* **Règle de la chaîne.** $\frac{d}{dx}g(h(x)) = \frac{dg}{dh}(h(x))\cdot \frac{dh}{dx}(x)$.
 
-Let's see how we may use :eqref:`eq_small_change` to understand these rules.  For the sum rule, consider following chain of reasoning:
+Voyons comment nous pouvons utiliser :eqref:`eq_small_change` pour comprendre ces règles.  Pour la règle de la somme, considérons la chaîne de raisonnement suivante :
 
 $$
 \begin{aligned}
@@ -194,10 +194,10 @@ f(x+\epsilon) & = g(x+\epsilon) + h(x+\epsilon) \\
 \end{aligned}
 $$
 
-By comparing this result with the fact that $f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x)$, we see that $\frac{df}{dx}(x) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$ as desired.  The intuition here is: when we change the input $x$, $g$ and $h$ jointly contribute to the change of the output by $\frac{dg}{dx}(x)$ and $\frac{dh}{dx}(x)$.
+En comparant ce résultat avec le fait que $f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x)$, nous voyons que $\frac{df}{dx}(x) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$ comme souhaité.  L'intuition ici est la suivante : lorsque nous modifions l'entrée $x$, $g$ et $h$ contribuent conjointement à la modification de la sortie par $\frac{dg}{dx}(x)$ et $\frac{dh}{dx}(x)$.
 
 
-The product is more subtle, and will require a new observation about how to work with these expressions.  We will begin as before using :eqref:`eq_small_change`:
+Le produit est plus subtil, et nécessitera une nouvelle observation sur la façon de travailler avec ces expressions.  Nous allons commencer comme précédemment en utilisant :eqref:`eq_small_change` :
 
 $$
 \begin{aligned}
@@ -209,15 +209,15 @@ f(x+\epsilon) & = g(x+\epsilon)\cdot h(x+\epsilon) \\
 $$
 
 
-This resembles the computation done above, and indeed we see our answer ($\frac{df}{dx}(x) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$) sitting next to $\epsilon$, but there is the issue of that term of size $\epsilon^{2}$.  We will refer to this as a *higher-order term*, since the power of $\epsilon^2$ is higher than the power of $\epsilon^1$.  We will see in a later section that we will sometimes want to keep track of these, however for now observe that if $\epsilon = 0.0000001$, then $\epsilon^{2}= 0.0000000000001$, which is vastly smaller.  As we send $\epsilon \rightarrow 0$, we may safely ignore the higher order terms.  As a general convention in this appendix, we will use "$\approx$" to denote that the two terms are equal up to higher order terms.  However, if we wish to be more formal we may examine the difference quotient
+Cela ressemble au calcul effectué ci-dessus, et nous voyons effectivement notre réponse ($\frac{df}{dx}(x) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$) à côté de $\epsilon$, mais il y a le problème du terme de taille $\epsilon^{2}$.  Nous l'appellerons un terme d'ordre * supérieur, puisque la puissance de $\epsilon^2$ est supérieure à celle de $\epsilon^1$. Nous verrons dans une section ultérieure que nous aurons parfois besoin d'en tenir compte, mais pour l'instant, observez que si $\epsilon = 0.0000001$, alors $\epsilon^{2}= 0.0000000000001$, qui est beaucoup plus petit.  Comme nous envoyons $\epsilon \rightarrow 0$, nous pouvons sans risque ignorer les termes d'ordre supérieur.  Par convention générale dans cette annexe, nous utiliserons "$\approx$" pour indiquer que les deux termes sont égaux jusqu'aux termes d'ordre supérieur.  Cependant, si nous souhaitons être plus formels, nous pouvons examiner le quotient de différence
 
 $$
 \frac{f(x+\epsilon) - f(x)}{\epsilon} = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x) + \epsilon \frac{dg}{dx}(x)\frac{dh}{dx}(x),
 $$
 
-and see that as we send $\epsilon \rightarrow 0$, the right hand term goes to zero as well.
+et voir que lorsque nous envoyons $\epsilon \rightarrow 0$, le terme de droite devient également nul.
 
-Finally, with the chain rule, we can again progress as before using :eqref:`eq_small_change` and see that
+Enfin, avec la règle de la chaîne, nous pouvons à nouveau progresser comme précédemment en utilisant :eqref:`eq_small_change` et voir que
 
 $$
 \begin{aligned}
@@ -228,9 +228,9 @@ f(x+\epsilon) & = g(h(x+\epsilon)) \\
 \end{aligned}
 $$
 
-where in the second line we view the function $g$ as having its input ($h(x)$) shifted by the tiny quantity $\epsilon \frac{dh}{dx}(x)$.
+où, dans la deuxième ligne, nous considérons que la fonction $g$ voit son entrée ($h(x)$) décalée de la petite quantité $\epsilon \frac{dh}{dx}(x)$.
 
-These rule provide us with a flexible set of tools to compute essentially any expression desired.  For instance,
+Ces règles nous fournissent un ensemble flexible d'outils permettant de calculer essentiellement n'importe quelle expression souhaitée.  Par exemple,
 
 $$
 \begin{aligned}
@@ -242,28 +242,28 @@ $$
 \end{aligned}
 $$
 
-Where each line has used the following rules:
+Où chaque ligne a utilisé les règles suivantes :
 
-1. The chain rule and derivative of logarithm.
-2. The sum rule.
-3. The derivative of constants, chain rule, and power rule.
-4. The sum rule, derivative of linear functions, derivative of constants.
+1. La règle de la chaîne et la dérivée du logarithme.
+2. La règle de la somme.
+3. La dérivée des constantes, la règle de la chaîne et la règle de la puissance.
+4. La règle de la somme, la dérivée des fonctions linéaires, la dérivée des constantes.
 
-Two things should be clear after doing this example:
+Deux choses devraient être claires après avoir fait cet exemple :
 
-1. Any function we can write down using sums, products, constants, powers, exponentials, and logarithms can have its derivate computed mechanically by following these rules.
-2. Having a human follow these rules can be tedious and error prone!
+1. Toute fonction que nous pouvons écrire en utilisant des sommes, des produits, des constantes, des puissances, des exponentielles et des logarithmes peut avoir sa dérivée calculée mécaniquement en suivant ces règles.
+2. Faire suivre ces règles par un humain peut être fastidieux et source d'erreurs !
 
-Thankfully, these two facts together hint towards a way forward: this is a perfect candidate for mechanization!  Indeed backpropagation, which we will revisit later in this section, is exactly that.
+Heureusement, ces deux faits réunis laissent entrevoir une solution : c'est un candidat parfait pour la mécanisation !  En effet, la rétropropagation, que nous allons revoir plus tard dans cette section, est exactement cela.
 
-### Linear Approximation
-When working with derivatives, it is often useful to geometrically interpret the approximation used above.  In particular, note that the equation 
+### Approximation linéaire
+Lorsque l'on travaille avec des dérivés, il est souvent utile d'interpréter géométriquement l'approximation utilisée ci-dessus.  En particulier, notez que l'équation 
 
 $$
 f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x),
 $$
 
-approximates the value of $f$ by a line which passes through the point $(x, f(x))$ and has slope $\frac{df}{dx}(x)$.  In this way we say that the derivative gives a linear approximation to the function $f$, as illustrated below:
+approxime la valeur de $f$ par une ligne qui passe par le point $(x, f(x))$ et a une pente de $\frac{df}{dx}(x)$.  De cette façon, nous disons que la dérivée donne une approximation linéaire de la fonction $f$, comme illustré ci-dessous :
 
 ```{.python .input}
 #@tab mxnet
@@ -306,38 +306,38 @@ for x0 in [-1.5, 0.0, 2.0]:
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
 
-### Higher Order Derivatives
+### Dérivées d'ordre supérieur
 
-Let's now do something that may on the surface seem strange.  Take a function $f$ and compute the derivative $\frac{df}{dx}$.  This gives us the rate of change of $f$ at any point.
+Faisons maintenant quelque chose qui peut sembler étrange à première vue.  Prenons une fonction $f$ et calculons la dérivée $\frac{df}{dx}$.  Cela nous donne le taux de variation de $f$ en tout point.
 
-However, the derivative, $\frac{df}{dx}$, can be viewed as a function itself, so nothing stops us from computing the derivative of $\frac{df}{dx}$ to get $\frac{d^2f}{dx^2} = \frac{df}{dx}\left(\frac{df}{dx}\right)$.  We will call this the second derivative of $f$.  This function is the rate of change of the rate of change of $f$, or in other words, how the rate of change is changing. We may apply the derivative any number of times to obtain what is called the $n$-th derivative. To keep the notation clean, we will denote the $n$-th derivative as 
+Cependant, la dérivée, $\frac{df}{dx}$, peut être considérée comme une fonction elle-même, donc rien ne nous empêche de calculer la dérivée de $\frac{df}{dx}$ pour obtenir $\frac{d^2f}{dx^2} = \frac{df}{dx}\left(\frac{df}{dx}\right)$.  Nous appellerons cela la dérivée seconde de $f$. Cette fonction est le taux de variation du taux de variation de $f$, ou en d'autres termes, la façon dont le taux de variation évolue. Nous pouvons appliquer la dérivée un nombre quelconque de fois pour obtenir ce que l'on appelle la $n$-ième dérivée. Pour conserver une notation propre, nous désignerons la dérivée de $n$ comme suit 
 
 $$
 f^{(n)}(x) = \frac{d^{n}f}{dx^{n}} = \left(\frac{d}{dx}\right)^{n} f.
 $$
 
-Let's try to understand *why* this is a useful notion.  Below, we visualize $f^{(2)}(x)$, $f^{(1)}(x)$, and $f(x)$.  
+Essayons de comprendre *pourquoi* cette notion est utile.  Ci-dessous, nous visualisons $f^{(2)}(x)$, $f^{(1)}(x)$, et $f(x)$. 
 
-First, consider the case that the second derivative $f^{(2)}(x)$ is a positive constant.  This means that the slope of the first derivative is positive.  As a result, the first derivative $f^{(1)}(x)$ may start out negative, becomes zero at a point, and then becomes positive in the end. This tells us the slope of our original function $f$ and therefore, the function $f$ itself decreases, flattens out, then increases.  In other words, the function $f$ curves up, and has a single minimum as is shown in :numref:`fig_positive-second`.
+Tout d'abord, considérons le cas où la dérivée seconde $f^{(2)}(x)$ est une constante positive.  Cela signifie que la pente de la dérivée première est positive.  Par conséquent, la dérivée première $f^{(1)}(x)$ peut commencer par être négative, devenir nulle à un moment donné, puis devenir positive à la fin. Cela nous indique que la pente de notre fonction originale $f$ et donc de la fonction $f$ elle-même diminue, s'aplatit, puis augmente.  En d'autres termes, la fonction $f$ se courbe vers le haut et possède un seul minimum, comme le montre :numref:`fig_positive-second` .
 
 ![If we assume the second derivative is a positive constant, then the fist derivative in increasing, which implies the function itself has a minimum.](../img/posSecDer.svg)
 :label:`fig_positive-second`
 
 
-Second, if the second derivative is a negative constant, that means that the first derivative is decreasing.  This implies the first derivative may start out positive, becomes zero at a point, and then becomes negative. Hence, the function $f$ itself increases, flattens out, then decreases.  In other words, the function $f$ curves down, and has a single maximum as is shown in :numref:`fig_negative-second`.
+Deuxièmement, si la dérivée seconde est une constante négative, cela signifie que la dérivée première est décroissante.  Cela implique que la dérivée première peut commencer par être positive, devenir nulle en un point, puis devenir négative. Par conséquent, la fonction $f$ augmente, s'aplatit, puis diminue.  En d'autres termes, la fonction $f$ se courbe vers le bas et présente un seul maximum, comme le montre :numref:`fig_negative-second` .
 
 ![If we assume the second derivative is a negative constant, then the fist derivative in decreasing, which implies the function itself has a maximum.](../img/negSecDer.svg)
 :label:`fig_negative-second`
 
 
-Third, if the second derivative is a always zero, then the first derivative will never change---it is constant!  This means that $f$ increases (or decreases) at a fixed rate, and $f$ is itself a straight line  as is shown in :numref:`fig_zero-second`.
+Troisièmement, si la dérivée seconde est toujours nulle, alors la dérivée première ne changera jamais - elle est constante !  Cela signifie que $f$ augmente (ou diminue) à un taux fixe, et que $f$ est lui-même une ligne droite comme le montre :numref:`fig_zero-second` .
 
 ![If we assume the second derivative is zero, then the fist derivative is constant, which implies the function itself is a straight line.](../img/zeroSecDer.svg)
 :label:`fig_zero-second`
 
-To summarize, the second derivative can be interpreted as describing the way that the function $f$ curves.  A positive second derivative leads to a upwards curve, while a negative second derivative means that $f$ curves downwards, and a zero second derivative means that $f$ does not curve at all.
+En résumé, la dérivée seconde peut être interprétée comme décrivant la manière dont la fonction $f$ s'incurve.  Une dérivée seconde positive entraîne une courbe ascendante, tandis qu'une dérivée seconde négative signifie que $f$ se courbe vers le bas, et une dérivée seconde nulle signifie que $f$ ne se courbe pas du tout.
 
-Let's take this one step further. Consider the function $g(x) = ax^{2}+ bx + c$.  We can then compute that
+Allons un peu plus loin. Considérons la fonction $g(x) = ax^{2}+ bx + c$.  Nous pouvons alors calculer que
 
 $$
 \begin{aligned}
@@ -346,7 +346,7 @@ $$
 \end{aligned}
 $$
 
-If we have some original function $f(x)$ in mind, we may compute the first two derivatives and find the values for $a, b$, and $c$ that make them match this computation.  Similarly to the previous section where we saw that the first derivative gave the best approximation with a straight line, this construction provides the best approximation by a quadratic.  Let's visualize this for $f(x) = \sin(x)$.
+Si nous avons à l'esprit une fonction originale $f(x)$, nous pouvons calculer les deux premières dérivées et trouver les valeurs de $a, b$ et $c$ qui correspondent à ce calcul.  Comme dans la section précédente où nous avons vu que la première dérivée donnait la meilleure approximation par une ligne droite, cette construction fournit la meilleure approximation par un quadratique.  Visualisons ceci pour $f(x) = \sin(x)$.
 
 ```{.python .input}
 #@tab mxnet
@@ -392,58 +392,58 @@ for x0 in [-1.5, 0.0, 2.0]:
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
 
-We will extend this idea to the idea of a *Taylor series* in the next section. 
+Nous allons étendre cette idée à l'idée d'une *série de Taylor* dans la section suivante. 
 
-### Taylor Series
+### Série de Taylor
 
 
-The *Taylor series* provides a method to approximate the function $f(x)$ if we are given values for the first $n$ derivatives at a point $x_0$, i.e., $\left\{ f(x_0), f^{(1)}(x_0), f^{(2)}(x_0), \ldots, f^{(n)}(x_0) \right\}$. The idea will be to find a degree $n$ polynomial that matches all the given derivatives at $x_0$.
+ La *série de Taylor* fournit une méthode d'approximation de la fonction $f(x)$ si l'on nous donne les valeurs des dérivées premières $n$ en un point $x_0$, c'est-à-dire $\left\{ f(x_0), f^{(1)}(x_0), f^{(2)}(x_0), \ldots, f^{(n)}(x_0) \right\}$. L'idée sera de trouver un polynôme de degré $n$ qui correspond à toutes les dérivées données à $x_0$.
 
-We saw the case of $n=2$ in the previous section and a little algebra shows this is
+Nous avons vu le cas de $n=2$ dans la section précédente et un peu d'algèbre montre que c'est
 
 $$
 f(x) \approx \frac{1}{2}\frac{d^2f}{dx^2}(x_0)(x-x_0)^{2}+ \frac{df}{dx}(x_0)(x-x_0) + f(x_0).
 $$
 
-As we can see above, the denominator of $2$ is there to cancel out the $2$ we get when we take two derivatives of $x^2$, while the other terms are all zero.  Same logic applies for the first derivative and the value itself.
+Comme nous pouvons le voir ci-dessus, le dénominateur de $2$ est là pour annuler le $2$ que nous obtenons lorsque nous prenons deux dérivées de $x^2$, tandis que les autres termes sont tous nuls.  La même logique s'applique à la dérivée première et à la valeur elle-même.
 
-If we push the logic further to $n=3$, we will conclude that
+Si nous poussons la logique plus loin jusqu'à $n=3$, nous conclurons que
 
 $$
 f(x) \approx \frac{\frac{d^3f}{dx^3}(x_0)}{6}(x-x_0)^3 + \frac{\frac{d^2f}{dx^2}(x_0)}{2}(x-x_0)^{2}+ \frac{df}{dx}(x_0)(x-x_0) + f(x_0).
 $$
 
-where the $6 = 3 \times 2 = 3!$ comes from the constant we get in front if we take three derivatives of $x^3$.
+où le $6 = 3 \times 2 = 3!$ vient de la constante que nous obtenons devant si nous prenons trois dérivées de $x^3$.
 
 
-Furthermore, we can get a degree $n$ polynomial by 
+ De plus, nous pouvons obtenir un polynôme de degré $n$ par 
 
 $$
 P_n(x) = \sum_{i = 0}^{n} \frac{f^{(i)}(x_0)}{i!}(x-x_0)^{i}.
 $$
 
-where the notation 
+où la notation 
 
 $$
 f^{(n)}(x) = \frac{d^{n}f}{dx^{n}} = \left(\frac{d}{dx}\right)^{n} f.
 $$
 
 
-Indeed, $P_n(x)$ can be viewed as the best $n$-th degree polynomial approximation to our function $f(x)$.
+En effet, $P_n(x)$ peut être considéré comme la meilleure approximation polynomiale de $n$-ième degré de notre fonction $f(x)$.
 
-While we are not going to dive all the way into the error of the above approximations, it is worth mentioning the infinite limit. In this case, for well behaved functions (known as real analytic functions) like $\cos(x)$ or $e^{x}$, we can write out the infinite number of terms and approximate the exactly same function
+Bien que nous n'allions pas nous plonger entièrement dans l'erreur des approximations ci-dessus, il convient de mentionner la limite infinie. Dans ce cas, pour les fonctions qui se comportent bien (connues sous le nom de fonctions analytiques réelles) comme $\cos(x)$ ou $e^{x}$, nous pouvons écrire le nombre infini de termes et approximer exactement la même fonction
 
 $$
 f(x) = \sum_{n = 0}^\infty \frac{f^{(n)}(x_0)}{n!}(x-x_0)^{n}.
 $$
 
-Take $f(x) = e^{x}$ as am example. Since $e^{x}$ is its own derivative, we know that $f^{(n)}(x) = e^{x}$. Therefore, $e^{x}$ can be reconstructed by taking the Taylor series at $x_0 = 0$, i.e.,
+Prenons l'exemple de $f(x) = e^{x}$. Puisque $e^{x}$ est sa propre dérivée, nous savons que $f^{(n)}(x) = e^{x}$. Par conséquent, $e^{x}$ peut être reconstruit en prenant la série de Taylor à $x_0 = 0$, c'est-à-dire,
 
 $$
 e^{x} = \sum_{n = 0}^\infty \frac{x^{n}}{n!} = 1 + x + \frac{x^2}{2} + \frac{x^3}{6} + \cdots.
 $$
 
-Let's see how this works in code and observe how increasing the degree of the Taylor approximation brings us closer to the desired function $e^x$.
+Voyons comment cela fonctionne en code et observons comment l'augmentation du degré de l'approximation de Taylor nous rapproche de la fonction souhaitée $e^x$.
 
 ```{.python .input}
 #@tab mxnet
@@ -493,27 +493,27 @@ d2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend=[
     "Degree 5 Taylor Series"])
 ```
 
-Taylor series have two primary applications:
+Les séries de Taylor ont deux applications principales :
 
-1. *Theoretical applications*: Often when we try to understand a too complex function, using Taylor series enables us to turn it into a polynomial that we can work with directly.
+1. *Applications théoriques* : Souvent, lorsque nous essayons de comprendre une fonction trop complexe, l'utilisation des séries de Taylor nous permet de la transformer en un polynôme avec lequel nous pouvons travailler directement.
 
-2. *Numerical applications*: Some functions like $e^{x}$ or $\cos(x)$ are  difficult for machines to compute.  They can store tables of values at a fixed precision (and this is often done), but it still leaves open questions like "What is the 1000-th digit of $\cos(1)$?"  Taylor series are often helpful to answer such questions.  
-
-
-## Summary
-
-* Derivatives can be used to express how functions change when we change the input by a small amount.
-* Elementary derivatives can be combined using derivative rules to create arbitrarily complex derivatives.
-* Derivatives can be iterated to get second or higher order derivatives.  Each increase in order provides more fine grained information on the behavior of the function.
-* Using information in the derivatives of a single data example, we can approximate well behaved functions by polynomials obtained from the Taylor series.
+2. *Applications numériques* : Certaines fonctions comme $e^{x}$ ou $\cos(x)$ sont difficiles à calculer par les machines.  Elles peuvent stocker des tables de valeurs avec une précision fixe (et c'est souvent le cas), mais cela laisse toujours des questions ouvertes comme "Quel est le 1000ème chiffre de $\cos(1)$?"  Les séries de Taylor sont souvent utiles pour répondre à de telles questions. 
 
 
-## Exercises
+## Résumé
 
-1. What is the derivative of $x^3-4x+1$?
-2. What is the derivative of $\log(\frac{1}{x})$?
-3. True or False: If $f'(x) = 0$ then $f$ has a maximum or minimum at $x$?
-4. Where is the minimum of $f(x) = x\log(x)$ for $x\ge0$ (where we assume that $f$ takes the limiting value of $0$ at $f(0)$)?
+* Les dérivées peuvent être utilisées pour exprimer comment les fonctions changent lorsque nous modifions l'entrée d'une petite quantité.
+* Les dérivées élémentaires peuvent être combinées en utilisant des règles de dérivation pour créer des dérivées arbitrairement complexes.
+* Les dérivées peuvent être itérées pour obtenir des dérivées de second ordre ou d'ordre supérieur.  Chaque augmentation de l'ordre fournit des informations plus fines sur le comportement de la fonction.
+* En utilisant l'information contenue dans les dérivées d'un seul exemple de données, nous pouvons approximer des fonctions qui se comportent bien par des polynômes obtenus à partir de la série de Taylor.
+
+
+## Exercices
+
+1. Quelle est la dérivée de $x^3-4x+1$?
+2. Quelle est la dérivée de $\log(\frac{1}{x})$?
+3. Vrai ou Faux : Si $f'(x) = 0$ alors $f$ a un maximum ou un minimum à $x$?
+4. Où se trouve le minimum de $f(x) = x\log(x)$ pour $x\ge0$ (où l'on suppose que $f$ prend la valeur limite de $0$ à $f(0)$) ?
 
 
 :begin_tab:`mxnet`

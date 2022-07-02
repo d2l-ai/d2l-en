@@ -5,87 +5,87 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 
 # Bahdanau Attention
 
-:label:`sec_seq2seq_attention`
+:label:`sec_seq2seq_attention` 
 
-We studied the machine translation
-problem in :numref:`sec_seq2seq`,
-where we designed
-an encoder-decoder architecture based on two RNNs
-for sequence to sequence learning.
-Specifically,
-the RNN encoder
-transforms
-a variable-length sequence
-into a fixed-shape context variable,
-then
-the RNN decoder
-generates the output (target) sequence token by token
-based on the generated tokens and the context variable.
-However,
-even though not all the input (source) tokens
-are useful for decoding a certain token,
-the *same* context variable
-that encodes the entire input sequence
-is still used at each decoding step.
+ Nous avons étudié le problème de la traduction automatique
+dans :numref:`sec_seq2seq` ,
+où nous avons conçu
+une architecture encodeur-décodeur basée sur deux RNN
+pour l'apprentissage de séquence à séquence.
+Plus précisément,
+l'encodeur RNN
+transforme
+une séquence de longueur variable
+en une variable contextuelle de forme fixe,
+puis
+le décodeur RNN
+génère la séquence de sortie (cible) jeton par jeton
+sur la base des jetons générés et de la variable contextuelle.
+Cependant,
+même si tous les jetons d'entrée (source)
+ne sont pas utiles pour décoder un certain jeton,
+la *même* variable contextuelle
+qui code la séquence d'entrée entière
+est toujours utilisée à chaque étape du décodage.
 
-In a separate but related
-challenge of handwriting generation for a given text sequence,
-Graves designed a differentiable attention model
-to align text characters with the much longer pen trace,
-where the alignment moves only in one direction :cite:`Graves.2013`.
-Inspired by the idea of learning to align,
-Bahdanau et al. proposed a differentiable attention model
-without the severe unidirectional alignment limitation :cite:`Bahdanau.Cho.Bengio.2014`.
-When predicting a token,
-if not all the input tokens are relevant,
-the model aligns (or attends)
-only to parts of the input sequence that are relevant to the current prediction.
-This is achieved
-by treating the context variable as an output of attention pooling.
+Dans un défi distinct mais connexe
+de la génération d'écriture manuscrite pour une séquence de texte donnée,
+Graves a conçu un modèle d'attention différentiable
+pour aligner les caractères du texte avec le tracé beaucoup plus long du stylo,
+où l'alignement ne se déplace que dans une seule direction :cite:`Graves.2013` .
+Inspirés par l'idée d'apprendre à aligner,
+Bahdanau et al. ont proposé un modèle d'attention différenciable
+sans la sévère limitation de l'alignement unidirectionnel :cite:`Bahdanau.Cho.Bengio.2014` .
+Lors de la prédiction d'un token,
+si tous les tokens d'entrée ne sont pas pertinents,
+le modèle aligne (ou assiste)
+uniquement sur les parties de la séquence d'entrée qui sont pertinentes pour la prédiction actuelle.
+Ceci est réalisé
+en traitant la variable de contexte comme une sortie de la mise en commun de l'attention.
 
-## Model
+## Modèle
 
-When describing
-Bahdanau attention
-for the RNN encoder-decoder below,
-we will follow the same notation in
-:numref:`sec_seq2seq`.
-The new attention-based model
-is the same as that
-in :numref:`sec_seq2seq`
-except that
-the context variable
-$\mathbf{c}$
-in
-:eqref:`eq_seq2seq_s_t`
-is replaced by
-$\mathbf{c}_{t'}$
-at any decoding time step $t'$.
-Suppose that
-there are $T$ tokens in the input sequence,
-the context variable at the decoding time step $t'$
-is the output of attention pooling:
+Lorsque nous décrirons
+l'attention Bahdanau
+pour l'encodeur-décodeur RNN ci-dessous,
+nous suivrons la même notation dans
+:numref:`sec_seq2seq` .
+Le nouveau modèle basé sur l'attention
+est le même que celui de
+dans :numref:`sec_seq2seq` 
+ sauf que
+la variable de contexte
+$\mathbf{c}$ 
+ dans
+:eqref:`eq_seq2seq_s_t` 
+ est remplacée par
+$\mathbf{c}_{t'}$ 
+ à tout pas de temps de décodage $t'$.
+Supposons que
+il y ait $T$ tokens dans la séquence d'entrée,
+la variable de contexte au pas de temps de décodage $t'$
+ est la sortie du pooling d'attention :
 
 $$\mathbf{c}_{t'} = \sum_{t=1}^T \alpha(\mathbf{s}_{t' - 1}, \mathbf{h}_t) \mathbf{h}_t,$$
 
-where the decoder hidden state
-$\mathbf{s}_{t' - 1}$ at time step $t' - 1$
-is the query,
-and the encoder hidden states $\mathbf{h}_t$
-are both the keys and values,
-and the attention weight $\alpha$
-is computed as in
-:eqref:`eq_attn-scoring-alpha`
-using the additive attention scoring function
-defined by
-:eqref:`eq_additive-attn`.
+où l'état caché du décodeur
+$\mathbf{s}_{t' - 1}$ au pas de temps $t' - 1$
+ est la requête,
+et les états cachés du codeur $\mathbf{h}_t$
+ sont à la fois les clés et les valeurs,
+et le poids de l'attention $\alpha$
+ est calculé comme dans
+:eqref:`eq_attn-scoring-alpha` 
+ en utilisant la fonction de notation additive de l'attention
+définie par
+:eqref:`eq_additive-attn` .
 
-Slightly different from
-the vanilla RNN encoder-decoder architecture
-in :numref:`fig_seq2seq_details`,
-the same architecture
-with Bahdanau attention is depicted in
-:numref:`fig_s2s_attention_details`.
+Légèrement différente de
+, l'architecture d'encodeur-décodeur RNN vanille
+dans :numref:`fig_seq2seq_details` ,
+la même architecture
+avec l'attention de Bahdanau est représentée dans
+:numref:`fig_s2s_attention_details` .
 
 ![Layers in an RNN encoder-decoder model with Bahdanau attention.](../img/seq2seq-attention-details.svg)
 :label:`fig_s2s_attention_details`
@@ -111,15 +111,15 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## Defining the Decoder with Attention
+## Définition du décodeur avec attention
 
-To implement the RNN encoder-decoder
-with Bahdanau attention,
-we only need to redefine the decoder.
-To visualize the learned attention weights more conveniently,
-the following `AttentionDecoder` class
-defines [**the base interface for
-decoders with attention mechanisms**].
+Pour mettre en œuvre l'encodeur-décodeur RNN
+avec l'attention de Bahdanau,
+il suffit de redéfinir le décodeur.
+Pour visualiser les poids d'attention appris de manière plus pratique,
+la classe suivante `AttentionDecoder`
+ définit [**l'interface de base pour
+décodeurs avec mécanismes d'attention**].
 
 ```{.python .input}
 %%tab all
@@ -134,19 +134,19 @@ class AttentionDecoder(d2l.Decoder):
         raise NotImplementedError
 ```
 
-Now let's [**implement
-the RNN decoder with Bahdanau attention**]
-in the following `Seq2SeqAttentionDecoder` class.
-The state of the decoder
-is initialized with
-(i) the encoder final-layer hidden states at all the time steps (as keys and values of the attention);
-(ii) the encoder all-layer hidden state at the final time step (to initialize the hidden state of the decoder);
-and (iii) the encoder valid length (to exclude the padding tokens in attention pooling).
-At each decoding time step,
-the decoder final-layer hidden state at the previous time step is used as the query of the attention.
-As a result, both the attention output
-and the input embedding are concatenated
-as input of the RNN decoder.
+Implémentons maintenant [**
+le décodeur RNN avec attention Bahdanau**]
+dans la classe `Seq2SeqAttentionDecoder` suivante.
+L'état du décodeur
+est initialisé avec
+(i) les états cachés de la couche finale du codeur à tous les pas de temps (en tant que clés et valeurs de l'attention) ;
+(ii) l'état caché de toutes les couches du codeur au dernier pas de temps (pour initialiser l'état caché du décodeur) ;
+et (iii) la longueur valide du codeur (pour exclure les jetons de remplissage dans le regroupement de l'attention).
+À chaque étape temporelle de décodage,
+l'état caché de la couche finale du décodeur à l'étape temporelle précédente est utilisé comme requête de l'attention.
+Par conséquent, la sortie de l'attention
+et l'intégration d'entrée sont concaténées
+comme entrée du décodeur RNN.
 
 ```{.python .input}
 %%tab mxnet
@@ -301,10 +301,10 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         return self._attention_weights
 ```
 
-In the following, we [**test the implemented
-decoder**] with Bahdanau attention
-using a minibatch of 4 sequence inputs
-of 7 time steps.
+Dans ce qui suit, nous [**testons le décodeur
+implémenté**] avec l'attention Bahdanau
+en utilisant un minibatch de 4 entrées de séquence
+de 7 pas de temps.
 
 ```{.python .input}
 %%tab all
@@ -332,11 +332,11 @@ d2l.check_shape(state[1][0], (batch_size, num_hiddens))
 
 ## [**Training**]
 
-Similar to :numref:`sec_seq2seq_training`,
-here we specify hyperparemeters,
-instantiate
-an encoder and a decoder with Bahdanau attention,
-and train this model for machine translation.
+Similaire à :numref:`sec_seq2seq_training` ,
+ici nous spécifions les hyperparamètres,
+instancions
+un encodeur et un décodeur avec l'attention de Bahdanau,
+et entraînons ce modèle pour la traduction automatique.
 
 ```{.python .input}
 %%tab all
@@ -362,9 +362,9 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-After the model is trained,
-we use it to [**translate a few English sentences**]
-into French and compute their BLEU scores.
+Une fois le modèle entraîné,
+nous l'utilisons pour [**traduire quelques phrases anglaises**]
+en français et calculer leurs scores BLEU.
 
 ```{.python .input}
 %%tab all
@@ -382,13 +382,13 @@ for en, fr, p in zip(engs, fras, preds):
           f'{d2l.bleu(" ".join(translation), fr, k=2):.3f}')  
 ```
 
-By [**visualizing the attention weights**]
-when translating the last English sentence,
-we can see that each query assigns non-uniform weights
-over key-value pairs.
-It shows that at each decoding step,
-different parts of the input sequences
-are selectively aggregated in the attention pooling.
+En [**visualisant les poids d'attention**]
+lors de la traduction de la dernière phrase anglaise,
+nous pouvons voir que chaque requête attribue des poids non uniformes
+sur les paires clé-valeur.
+Cela montre qu'à chaque étape du décodage,
+différentes parties des séquences d'entrée
+sont sélectivement agrégées dans le regroupement d'attention.
 
 ```{.python .input}
 %%tab all
@@ -422,15 +422,15 @@ d2l.show_heatmaps(attention_weights[:, :, :, :len(engs[-1].split()) + 1],
                   xlabel='Key positions', ylabel='Query positions')
 ```
 
-## Summary
+## Résumé
 
-* When predicting a token, if not all the input tokens are relevant, the RNN encoder-decoder with Bahdanau attention selectively aggregates different parts of the input sequence. This is achieved by treating the context variable as an output of additive attention pooling.
-* In the RNN encoder-decoder, Bahdanau attention treats the decoder hidden state at the previous time step as the query, and the encoder hidden states at all the time steps as both the keys and values.
+* Lors de la prédiction d'un token, si tous les tokens d'entrée ne sont pas pertinents, le codeur-décodeur RNN avec attention Bahdanau agrège sélectivement différentes parties de la séquence d'entrée. Ceci est réalisé en traitant la variable de contexte comme une sortie de la mise en commun de l'attention additive.
+* Dans le codeur-décodeur RNN, l'attention de Bahdanau traite l'état caché du décodeur au pas de temps précédent comme la requête, et les états cachés du codeur à tous les pas de temps comme les clés et les valeurs.
 
-## Exercises
+## Exercices
 
-1. Replace GRU with LSTM in the experiment.
-1. Modify the experiment to replace the additive attention scoring function with the scaled dot-product. How does it influence the training efficiency?
+1. Remplacez GRU par LSTM dans l'expérience.
+1. Modifiez l'expérience pour remplacer la fonction de notation additive de l'attention par le produit scalaire du point. Comment cela influence-t-il l'efficacité de la formation ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/347)

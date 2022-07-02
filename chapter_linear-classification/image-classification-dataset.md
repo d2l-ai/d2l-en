@@ -3,20 +3,20 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# The Image Classification Dataset
-:label:`sec_fashion_mnist`
+# Le jeu de données de classification d'images
+:label:`sec_fashion_mnist` 
 
-(~~The MNIST dataset is one of the widely used dataset for image classification, while it's too simple as a benchmark dataset. We will use the similar, but more complex Fashion-MNIST dataset ~~)
+ (~)~)Le jeu de données MNIST est l'un des jeux de données les plus utilisés pour la classification d'images, mais il est trop simple comme jeu de données de référence. Nous utiliserons le jeu de données Fashion-MNIST similaire, mais plus complexe ~)~))
 
-One of the widely used dataset for image classification is the  [MNIST dataset](https://en.wikipedia.org/wiki/MNIST_database) :cite:`LeCun.Bottou.Bengio.ea.1998` of handwritten digits. At the time of its release in the 1990s it posed a formidable challenge to most machine learning algorithms, consisting of 60,000 images of $28 \times 28$ pixels resolution (plus a test dataset of 10,000 images). To put things into perspective, at the time, a Sun SPARCStation 5 with a whopping 64MB of RAM and a blistering 5 MFLOPs was considered state of the art equipment for machine learning at AT&T Bell Laboratories in 1995. Achieving high accuracy on digit recognition was a key component in automating letter sorting for the USPS in the 1990s. Deep networks such as LeNet-5 :cite:`LeCun.Jackel.Bottou.ea.1995`, support vector machines with invariances :cite:`Scholkopf.Burges.Vapnik.1996`, and tangent distance classifiers :cite:`Simard.LeCun.Denker.ea.1998` all allowed to reach error rates below 1%. 
+L'un des jeux de données les plus utilisés pour la classification d'images est le jeu de données [MNIST dataset](https://en.wikipedia.org/wiki/MNIST_database) :cite:`LeCun.Bottou.Bengio.ea.1998` de chiffres manuscrits. Au moment de sa publication dans les années 1990, il représentait un formidable défi pour la plupart des algorithmes d'apprentissage automatique, puisqu'il comprenait 60 000 images d'une résolution de $28 \times 28$ pixels (plus un ensemble de données de test de 10 000 images). Pour mettre les choses en perspective, à l'époque, une Sun SPARCStation 5 dotée d'une énorme mémoire vive de 64 Mo et d'une vitesse fulgurante de 5 MFLOP était considérée comme un équipement de pointe pour l'apprentissage automatique aux AT&amp;T Bell Laboratories en 1995. L'obtention d'une grande précision dans la reconnaissance des chiffres était un élément clé de l'automatisation du tri des lettres pour l'USPS dans les années 1990. Les réseaux profonds tels que LeNet-5 :cite:`LeCun.Jackel.Bottou.ea.1995` , les machines à vecteurs de support avec invariances :cite:`Scholkopf.Burges.Vapnik.1996` , et les classificateurs à distance tangente :cite:`Simard.LeCun.Denker.ea.1998` ont tous permis d'atteindre des taux d'erreur inférieurs à 1 %. 
 
-For over a decade, MNIST served as *the* point of reference for comparing machine learning algorithms. 
-While it had a good run as a benchmark dataset,
-even simple models by today's standards achieve classification accuracy over 95%,
-making it unsuitable for distinguishing between stronger models and weaker ones. Even more so, the dataset allows for *very* high levels of accuracy, not typically seen in many classification problems. This skewed algorithmic development towards specific families of algorithms that can take advantage of clean datasets, such as active set methods and boundary-seeking active set algorithms.
-Today, MNIST serves as more of sanity checks than as a benchmark. ImageNet :cite:`Deng.Dong.Socher.ea.2009` poses a much 
-more relevant challenge. Unfortunately, ImageNet is too large for many of the examples and illustrations in this book, as it would take too long to train to make the examples interactive. As a substitute we will focus our discussion in the coming sections on the qualitatively similar, but much smaller Fashion-MNIST
-dataset :cite:`Xiao.Rasul.Vollgraf.2017`, which was released in 2017. It constains images of 10 categories of clothing at $28 \times 28$ pixels resolution.
+Pendant plus d'une décennie, MNIST a servi de *point de référence pour la comparaison des algorithmes d'apprentissage automatique. 
+S'il a bien fonctionné en tant que jeu de données de référence,
+même les modèles simples selon les normes actuelles atteignent une précision de classification supérieure à 95 %,
+ce qui ne permet pas de distinguer les modèles les plus forts des plus faibles. Qui plus est, l'ensemble de données permet d'atteindre des niveaux de précision *très* élevés, ce qui n'est généralement pas le cas dans de nombreux problèmes de classification. Cela a orienté le développement algorithmique vers des familles spécifiques d'algorithmes qui peuvent tirer parti de jeux de données propres, tels que les méthodes d'ensembles actifs et les algorithmes d'ensembles actifs à recherche de limites.
+Aujourd'hui, MNIST sert davantage de vérification de l'intégrité que de référence. ImageNet :cite:`Deng.Dong.Socher.ea.2009` pose un défi beaucoup plus pertinent 
+. Malheureusement, ImageNet est trop grand pour la plupart des exemples et illustrations de ce livre, car l'entraînement prendrait trop de temps pour rendre les exemples interactifs. En remplacement, nous allons concentrer notre discussion dans les sections suivantes sur le jeu de données Fashion-MNIST
+, qualitativement similaire mais beaucoup plus petit, :cite:`Xiao.Rasul.Vollgraf.2017` , qui a été publié en 2017. Il est composé d'images de 10 catégories de vêtements à une résolution de $28 \times 28$ pixels.
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -52,9 +52,9 @@ import tensorflow as tf
 d2l.use_svg_display()
 ```
 
-## Loading the Dataset
+## Chargement du jeu de données
 
-Since it is such a frequently used dataset, all major frameworks provide preprocessed versions of it. We can [**download and read the Fashion-MNIST dataset into memory using built-in framework functions.**]
+Comme il s'agit d'un jeu de données si fréquemment utilisé, tous les principaux frameworks en fournissent des versions prétraitées. Nous pouvons [**télécharger et lire le jeu de données Fashion-MNIST en mémoire en utilisant les fonctions intégrées du framework.**]
 
 ```{.python .input  n=5}
 %%tab mxnet
@@ -93,11 +93,11 @@ class FashionMNIST(d2l.DataModule):  #@save
         self.train, self.val = tf.keras.datasets.fashion_mnist.load_data()
 ```
 
-Fashion-MNIST consists of images from 10 categories, each represented
-by 6,000 images in the training dataset and by 1,000 in the test dataset.
-A *test dataset* is used for evaluating model performance (it must not be used for training).
-Consequently the training set and the test set
-contain 60,000 and 10,000 images, respectively.
+Fashion-MNIST se compose d'images de 10 catégories, chacune représentée
+par 6 000 images dans l'ensemble de données d'entraînement et par 1 000 dans l'ensemble de données de test.
+Un *ensemble de données de test* est utilisé pour évaluer les performances du modèle (il ne doit pas être utilisé pour la formation).
+Par conséquent, l'ensemble de formation et l'ensemble de test
+contiennent respectivement 60 000 et 10 000 images.
 
 ```{.python .input  n=8}
 %%tab mxnet, pytorch
@@ -111,18 +111,18 @@ data = FashionMNIST(resize=(32, 32))
 len(data.train[0]), len(data.val[0])
 ```
 
-The images are grayscale and upscaled to $32 \times 32$ pixels in resolution above. This is similar to the original MNIST dataset which consisted of (binary) black and white images. Note, though, that most modern image data which has 3 channels (red, green, blue) and hyperspectral images which can have in excess of 100 channels (the HyMap sensor has 126 channels).
-By convention we store image as a $c \times h \times w$ tensor, where $c$ is the number of color channels, $h$ is the height and $w$ is the width.
+Les images sont en niveaux de gris et mises à l'échelle à $32 \times 32$ pixels en résolution ci-dessus. Ceci est similaire à l'ensemble de données MNIST original qui était composé d'images (binaires) en noir et blanc. Notez cependant que la plupart des données d'image modernes ont 3 canaux (rouge, vert, bleu) et que les images hyperspectrales peuvent avoir plus de 100 canaux (le capteur HyMap a 126 canaux).
+Par convention, nous stockons l'image sous la forme d'un tenseur $c \times h \times w$, où $c$ est le nombre de canaux de couleur, $h$ est la hauteur et $w$ est la largeur.
 
 ```{.python .input  n=10}
 %%tab all
 data.train[0][0].shape
 ```
 
-[~~Two utility functions to visualize the dataset~~]
+[~)~)Deux fonctions utilitaires pour visualiser l'ensemble de données~)~)]
 
-The categories of Fashion-MNIST have human-understandable names. 
-The following convenience function converts between numeric labels and their names.
+Les catégories de Fashion-MNIST ont des noms compréhensibles par l'homme. 
+La fonction utilitaire suivante permet de convertir les étiquettes numériques en noms.
 
 ```{.python .input  n=11}
 %%tab all
@@ -134,13 +134,13 @@ def text_labels(self, indices):
     return [labels[int(i)] for i in indices]
 ```
 
-## Reading a Minibatch
+## Lecture d'un mini-lot
 
-To make our life easier when reading from the training and test sets,
-we use the built-in data iterator rather than creating one from scratch.
-Recall that at each iteration, a data iterator
-[**reads a minibatch of data with size `batch_size`.**]
-We also randomly shuffle the examples for the training data iterator.
+Pour nous faciliter la vie lors de la lecture des ensembles d'entraînement et de test,
+nous utilisons l'itérateur de données intégré plutôt que d'en créer un de toutes pièces.
+Rappelons qu'à chaque itération, un itérateur de données
+[**lit un mini-batch de données de taille `batch_size`.**]
+Nous mélangeons également de manière aléatoire les exemples pour l'itérateur de données d'apprentissage.
 
 ```{.python .input  n=12}
 %%tab mxnet
@@ -173,7 +173,7 @@ def get_dataloader(self, train):
         self.batch_size).map(resize_fn).shuffle(shuffle_buf)
 ```
 
-To see how this works, let's load a minibatch of images by invoking the newly-added `train_dataloader` method. It contains 64 images.
+Pour voir comment cela fonctionne, chargeons un minibatch d'images en invoquant la nouvelle méthode `train_dataloader`. Il contient 64 images.
 
 ```{.python .input  n=15}
 %%tab all
@@ -181,7 +181,7 @@ X, y = next(iter(data.train_dataloader()))
 print(X.shape, X.dtype, y.shape, y.dtype)
 ```
 
-Let's look at the time it takes to read the images. Even though it's a built-in loader, it isn't blazingly fast. Nonetheless, this is sufficient since processing images with a deep network takes quite a bit longer. Hence it's good enough that training a network won't be IO constrained.
+Regardons le temps qu'il faut pour lire les images. Bien qu'il s'agisse d'un chargeur intégré, il n'est pas très rapide. Néanmoins, c'est suffisant puisque le traitement des images avec un réseau profond prend un peu plus de temps. C'est donc suffisant pour que la formation d'un réseau ne soit pas une contrainte d'IO.
 
 ```{.python .input  n=16}
 %%tab all
@@ -191,9 +191,9 @@ for X, y in data.train_dataloader():
 f'{time.time() - tic:.2f} sec'
 ```
 
-## Visualization
+## Visualisation
 
-We'll be using the Fashion-MNIST dataset quite frequently. A convenience function `show_images` can be used to visualize the images and the associated labels. Details of its implementation are deferred to the appendix.
+Nous utiliserons l'ensemble de données Fashion-MNIST assez fréquemment. Une fonction pratique `show_images` peut être utilisée pour visualiser les images et les étiquettes associées. Les détails de son implémentation sont reportés en annexe.
 
 ```{.python .input  n=17}
 %%tab all
@@ -202,9 +202,9 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     raise NotImplementedError
 ```
 
-Let's put it to good use. In general, it is a good idea to visualize and inspect data that you're training on. 
-Humans are very good at spotting unusual aspects and as such, visualization serves as an additional safeguard against mistakes and errors in the design of experiments. Here are [**the images and their corresponding labels**] (in text)
-for the first few examples in the training dataset.
+Faisons-en bon usage. En général, c'est une bonne idée de visualiser et d'inspecter les données sur lesquelles vous vous entraînez. 
+Les humains sont très doués pour repérer les aspects inhabituels et, à ce titre, la visualisation sert de garantie supplémentaire contre les erreurs et les fautes dans la conception des expériences. Voici [**les images et leurs étiquettes correspondantes**] (en texte)
+pour les premiers exemples de l'ensemble de données d'entraînement.
 
 ```{.python .input  n=18}
 %%tab all
@@ -222,20 +222,20 @@ batch = next(iter(data.val_dataloader()))
 data.visualize(batch)
 ```
 
-We are now ready to work with the Fashion-MNIST dataset in the sections that follow.
+Nous sommes maintenant prêts à travailler avec le jeu de données Fashion-MNIST dans les sections qui suivent.
 
-## Summary
+## Résumé
 
-We now have a slightly more realistic dataset to use for classification. Fashion-MNIST is an apparel classification dataset consisting of images representing 10 categories. We will use this dataset in subsequent sections and chapters to evaluate various network designs, from a simple linear model to advanced residual networks. As we commonly do with images, we read them as a tensor of shape (batch size, number of channels, height, width). For now, we only have one channel as the images are grayscale (the visualization above use a false color palette for improved visibility). 
+Nous disposons maintenant d'un jeu de données un peu plus réaliste à utiliser pour la classification. Fashion-MNIST est un jeu de données de classification de vêtements composé d'images représentant 10 catégories. Nous utiliserons cet ensemble de données dans les sections et chapitres suivants pour évaluer différentes conceptions de réseaux, d'un modèle linéaire simple à des réseaux résiduels avancés. Comme nous le faisons habituellement avec les images, nous les lisons comme un tenseur de forme (taille du lot, nombre de canaux, hauteur, largeur). Pour l'instant, nous n'avons qu'un seul canal car les images sont en niveaux de gris (la visualisation ci-dessus utilise une palette de fausses couleurs pour une meilleure visibilité). 
 
-Lastly, data iterators are a key component for efficient performance. For instance, we might use GPUs for efficient image decompression, video transcoding, or other preprocessing. Whenever possible, you should rely on well-implemented data iterators that exploit high-performance computing to avoid slowing down your training loop.
+Enfin, les itérateurs de données sont un élément clé pour des performances efficaces. Par exemple, nous pouvons utiliser les GPU pour décompresser efficacement les images, transcoder les vidéos ou effectuer d'autres prétraitements. Dans la mesure du possible, vous devez vous appuyer sur des itérateurs de données bien implémentés qui exploitent le calcul haute performance pour éviter de ralentir votre boucle d'apprentissage.
 
 
-## Exercises
+## Exercices
 
-1. Does reducing the `batch_size` (for instance, to 1) affect the reading performance?
-1. The data iterator performance is important. Do you think the current implementation is fast enough? Explore various options to improve it. Use a system profiler to find out where the bottlenecks are.
-1. Check out the framework's online API documentation. Which other datasets are available?
+1. La réduction de `batch_size` (par exemple, à 1) affecte-t-elle les performances de lecture ?
+1. Les performances de l'itérateur de données sont importantes. Pensez-vous que l'implémentation actuelle est suffisamment rapide ? Explorez diverses options pour l'améliorer. Utilisez un profileur de système pour déterminer où se trouvent les goulots d'étranglement.
+1. Consultez la documentation en ligne de l'API du cadre. Quels autres ensembles de données sont disponibles ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/48)

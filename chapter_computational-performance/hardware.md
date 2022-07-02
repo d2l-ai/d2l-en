@@ -1,232 +1,232 @@
-# Hardware
-:label:`sec_hardware`
+# Matériel
+:label:`sec_hardware` 
 
-Building systems with great performance requires a good understanding of the algorithms and models to capture the statistical aspects of the problem. At the same time it is also indispensable to have at least a modicum of knowledge of the underlying hardware. The current section is no substitute for a proper course on hardware and system design. Instead, it might serve as a starting point for understanding why some algorithms are more efficient than others and how to achieve good throughput. A good design can easily make a difference of an order of magnitude and, in turn, this can make the difference between being able to train a network (e.g., in a week) and not at all (in 3 months, thus missing the deadline). 
-We will start by looking at computers. Then we will zoom in to look more carefully at CPUs and GPUs. Lastly we zoom out to review how multiple computers are connected in a server center or in the cloud. 
+ La construction de systèmes très performants nécessite une bonne compréhension des algorithmes et des modèles permettant de saisir les aspects statistiques du problème. En même temps, il est également indispensable d'avoir au moins un minimum de connaissances sur le matériel sous-jacent. La présente section ne remplace pas un cours approprié sur le matériel et la conception de systèmes. Elle peut plutôt servir de point de départ pour comprendre pourquoi certains algorithmes sont plus efficaces que d'autres et comment obtenir un bon débit. Une bonne conception peut facilement faire une différence d'un ordre de grandeur et, à son tour, cela peut faire la différence entre être capable de former un réseau (par exemple, en une semaine) et pas du tout (en 3 mois, manquant ainsi la date limite). 
+Nous commencerons par examiner les ordinateurs. Puis nous ferons un zoom avant pour examiner de plus près les CPU et les GPU. Enfin, nous ferons un zoom arrière pour examiner comment plusieurs ordinateurs sont connectés dans un centre serveur ou dans le nuage. 
 
 ![Latency Numbers that every programmer should know.](../img/latencynumbers.png)
 :label:`fig_latencynumbers`
 
-Impatient readers may be able to get by with :numref:`fig_latencynumbers`. It is taken from Colin Scott's [interactive post](https://people.eecs.berkeley.edu/~rcs/research/interactive_latency.html) that gives a good overview of the progress over the past decade. The original numbers are due to Jeff Dean's [Stanford talk from 2010](https://static.googleusercontent.com/media/research.google.com/en//people/jeff/Stanford-DL-Nov-2010.pdf).
-The discussion below explains some of the rationale for these numbers and how they can guide us in designing algorithms. The discussion below is very high level and cursory. It is clearly *no substitute* for a proper course but rather just meant to provide enough information for a statistical modeler to make suitable design decisions. For an in-depth overview of computer architecture we refer the reader to :cite:`Hennessy.Patterson.2011` or a recent course on the subject, such as the one by [Arste Asanovic](http://inst.eecs.berkeley.edu/~cs152/sp19/).
+Les lecteurs impatients pourront se contenter du site :numref:`fig_latencynumbers` . Il est tiré de l'ouvrage de Colin Scott [interactive post](https://people.eecs.berkeley.edu/~)rcs/research/interactive_latency.html) qui donne un bon aperçu des progrès réalisés au cours de la dernière décennie. Les chiffres originaux sont dus à Jeff Dean ( [Stanford talk from 2010](https://static.googleusercontent.com/media/research.google.com/en//people/jeff/Stanford-DL-Nov-2010.pdf)).
+La discussion ci-dessous explique en partie la raison d'être de ces chiffres et comment ils peuvent nous guider dans la conception d'algorithmes. La discussion ci-dessous est de très haut niveau et superficielle. Elle ne remplace évidemment pas un cours approprié, mais vise plutôt à fournir suffisamment d'informations pour qu'un modélisateur statistique puisse prendre des décisions de conception appropriées. Pour un aperçu approfondi de l'architecture des ordinateurs, nous renvoyons le lecteur à :cite:`Hennessy.Patterson.2011` ou à un cours récent sur le sujet, tel que celui de [Arste Asanovic](http://inst.eecs.berkeley.edu/~)cs152/sp19/).
 
-## Computers
+## Ordinateurs
 
-Most deep learning researchers and practitioners have access to a computer with a fair amount of memory, computation, some form of an accelerator such as a GPU, or multiples thereof. A computer consists of the following key components:
+La plupart des chercheurs et praticiens de l'apprentissage profond ont accès à un ordinateur doté d'une quantité raisonnable de mémoire, de calcul, d'une forme d'accélérateur tel qu'un GPU, ou de multiples de ces éléments. Un ordinateur se compose des éléments clés suivants :
 
-* A processor (also referred to as a CPU) that is able to execute the programs we give it (in addition to running an operating system and many other things), typically consisting of 8 or more cores.
-* Memory (RAM) to store and retrieve the results from computation, such as weight vectors and activations, and training data.
-* An Ethernet network connection (sometimes multiple) with speeds ranging from 1 GB/s to 100 GB/s. On high end servers more advanced interconnects can be found.
-* A high speed expansion bus (PCIe) to connect the system to one or more GPUs. Servers have up to 8 accelerators, often connected in an advanced topology, while desktop systems have 1 or 2, depending on the budget of the user and the size of the power supply.
-* Durable storage, such as a magnetic hard disk drive, a solid state drive, in many cases connected using the PCIe bus. It provides efficient transfer of training data to the system and storage of intermediate checkpoints as needed.
+* Un processeur (également appelé CPU) capable d'exécuter les programmes que nous lui donnons (en plus de faire tourner un système d'exploitation et bien d'autres choses), généralement constitué de 8 cœurs ou plus.
+* Une mémoire (RAM) pour stocker et récupérer les résultats des calculs, tels que les vecteurs de poids et les activations, ainsi que les données d'apprentissage.
+* Une connexion réseau Ethernet (parfois multiple) avec des vitesses allant de 1 Go/s à 100 Go/s. Sur les serveurs haut de gamme, on peut trouver des interconnexions plus avancées.
+* Un bus d'extension à haut débit (PCIe) pour connecter le système à un ou plusieurs GPU. Les serveurs ont jusqu'à 8 accélérateurs, souvent connectés dans une topologie avancée, tandis que les systèmes de bureau en ont 1 ou 2, selon le budget de l'utilisateur et la taille de l'alimentation électrique.
+* Stockage durable, tel qu'un disque dur magnétique, un lecteur à état solide, dans de nombreux cas connectés à l'aide du bus PCIe. Il permet un transfert efficace des données d'entraînement vers le système et le stockage de points de contrôle intermédiaires si nécessaire.
 
 ![Connectivity of components of a computer.](../img/mobo-symbol.svg)
 :label:`fig_mobo-symbol`
 
-As :numref:`fig_mobo-symbol` indicates, most components (network, GPU, and storage) are connected to the CPU across the PCIe bus. It consists of multiple lanes that are directly attached to the CPU. For instance AMD's Threadripper 3 has 64 PCIe 4.0 lanes, each of which is capable 16 Gbit/s data transfer in both directions. The memory is directly attached to the CPU with a total bandwidth of up to 100 GB/s.
+Comme l'indique le site :numref:`fig_mobo-symbol` , la plupart des composants (réseau, GPU et stockage) sont connectés au CPU par le bus PCIe. Ce dernier se compose de plusieurs voies qui sont directement reliées au CPU. Par exemple, le Threadripper 3 d'AMD possède 64 voies PCIe 4.0, chacune d'entre elles étant capable de transférer des données à 16 Gbit/s dans les deux sens. La mémoire est directement rattachée au CPU avec une bande passante totale pouvant atteindre 100 Go/s.
 
-When we run code on a computer we need to shuffle data to the processors (CPUs or GPUs), perform computation, and then move the results off the processor back to RAM and durable storage. Hence, in order to get good performance we need to make sure that this works seamlessly without any one of the systems becoming a major bottleneck. For instance, if we cannot load images quickly enough the processor will not have any work to do. Likewise, if we cannot move matrices quickly enough to the CPU (or GPU), its processing elements will starve. Finally, if we want to synchronize multiple computers across the network, the latter should not slow down computation. One option is to interleave communication and computation. Let's have a look at the various components in more detail.
+Lorsque nous exécutons du code sur un ordinateur, nous devons transférer des données vers les processeurs (CPU ou GPU), effectuer des calculs, puis transférer les résultats du processeur vers la RAM et le stockage durable. Par conséquent, pour obtenir de bonnes performances, nous devons nous assurer que tout cela fonctionne de manière transparente, sans qu'aucun des systèmes ne devienne un goulot d'étranglement majeur. Par exemple, si nous ne pouvons pas charger les images assez rapidement, le processeur n'aura pas de travail à faire. De même, si nous ne pouvons pas déplacer les matrices assez rapidement vers le CPU (ou le GPU), ses éléments de traitement seront affamés. Enfin, si nous voulons synchroniser plusieurs ordinateurs sur le réseau, ce dernier ne doit pas ralentir le calcul. Une option consiste à entrelacer la communication et le calcul. Examinons plus en détail les différents composants.
 
 
-## Memory
+## Mémoire
 
-At its most basic memory is used to store data that needs to be readily accessible. At present CPU RAM is typically of the [DDR4](https://en.wikipedia.org/wiki/DDR4_SDRAM) variety, offering 20--25 GB/s bandwidth per module. Each module has a 64-bit-wide bus. Typically pairs of memory modules are used to allow for multiple channels. CPUs have between 2 and 4 memory channels, i.e., they have between 4 0GB/s and 100 GB/s peak memory bandwidth. Often there are two banks per channel. For instance AMD's Zen 3 Threadripper has 8 slots.
+A la base, la mémoire sert à stocker des données qui doivent être facilement accessibles. À l'heure actuelle, la RAM des processeurs est généralement de type [DDR4](https://en.wikipedia.org/wiki/DDR4_SDRAM), offrant une bande passante de 20 à 25 Go/s par module. Chaque module dispose d'un bus de 64 bits de large. En général, des paires de modules de mémoire sont utilisées pour permettre des canaux multiples. Les processeurs disposent de 2 à 4 canaux de mémoire, c'est-à-dire qu'ils ont une bande passante mémoire de 4 0 Go/s à 100 Go/s en crête. Il y a souvent deux banques par canal. Par exemple, le Zen 3 Threadripper d'AMD dispose de 8 emplacements.
 
-While these numbers are impressive, indeed, they only tell part of the story. When we want to read a portion from memory we first need to tell the memory module where the information can be found. That is, we first need to send the *address* to RAM. Once this is accomplished we can choose to read just a single 64 bit record or a long sequence of records. The latter is called *burst read*. In a nutshell, sending an address to memory and setting up the transfer takes approximately 100 ns (details depend on the specific timing coefficients of the memory chips used), every subsequent transfer takes only 0.2 ns. In short, the first read is 500 times as expensive as subsequent ones! Note that we could perform up to 10,000,000 random reads per second. This suggests that we avoid random memory access as far as possible and use burst reads (and writes) instead.
+Si ces chiffres sont impressionnants, en effet, ils ne racontent qu'une partie de l'histoire. Lorsque nous voulons lire une partie de la mémoire, nous devons d'abord indiquer au module de mémoire où l'information peut être trouvée. Autrement dit, nous devons d'abord envoyer l'*adresse* à la RAM. Une fois cette opération effectuée, nous pouvons choisir de lire un seul enregistrement de 64 bits ou une longue séquence d'enregistrements. Ce dernier cas est appelé *burst read*. En bref, l'envoi d'une adresse à la mémoire et l'établissement du transfert prennent environ 100 ns (les détails dépendent des coefficients de synchronisation spécifiques des puces mémoire utilisées), chaque transfert ultérieur ne prend que 0,2 ns. En bref, la première lecture est 500 fois plus coûteuse que les suivantes ! Notez que nous pourrions effectuer jusqu'à 10.000.000 de lectures aléatoires par seconde. Cela suggère d'éviter autant que possible les accès aléatoires à la mémoire et d'utiliser plutôt les lectures (et les écritures) en rafale.
 
-Matters are a bit more complex when we take into account that we have multiple *banks*. Each bank can read memory largely independently. This means two things. 
-On the one hand, the effective number of random reads is up to 4 times higher, provided that they are spread evenly across memory. It also means that it is still a bad idea to perform random reads since burst reads are 4 times faster, too. On the other hand, due to memory alignment to 64 bit boundaries it is a good idea to align any data structures with the same boundaries. Compilers do this pretty much [automatically](https://en.wikipedia.org/wiki/Data_structure_alignment) when the appropriate flags are set. Curious readers are encouraged to review a lecture on DRAMs such as the one by [Zeshan Chishti](http://web.cecs.pdx.edu/~zeshan/ece585_lec5.pdf).
+Les choses sont un peu plus complexes lorsque nous prenons en compte le fait que nous avons plusieurs *banques*. Chaque banque peut lire la mémoire de manière largement indépendante. Cela signifie deux choses. 
+D'une part, le nombre effectif de lectures aléatoires est jusqu'à 4 fois plus élevé, à condition qu'elles soient réparties uniformément sur la mémoire. Cela signifie également que c'est toujours une mauvaise idée d'effectuer des lectures aléatoires puisque les lectures en rafale sont également 4 fois plus rapides. D'autre part, en raison de l'alignement de la mémoire sur les limites de 64 bits, il est judicieux d'aligner toutes les structures de données sur les mêmes limites. Les compilateurs le font pratiquement à l'adresse [automatically](https://en.wikipedia.org/wiki/Data_structure_alignment) lorsque les drapeaux appropriés sont activés. Les lecteurs curieux sont invités à consulter un cours sur les DRAM, comme celui de [Zeshan Chishti](http://web.cecs.pdx.edu/~)zeshan/ece585_lec5.pdf).
 
-GPU memory is subject to even higher bandwidth requirements since they have many more processing elements than CPUs. By and large there are two options to address them. The first is to make the memory bus significantly wider. For instance, NVIDIA's RTX 2080 Ti has a 352-bit-wide bus. This allows for much more information to be transferred at the same time. Second, GPUs use specific high-performance memory. Consumer-grade devices, such as NVIDIA's RTX and Titan series typically use [GDDR6](https://en.wikipedia.org/wiki/GDDR6_SDRAM) chips with over 500 GB/s aggregate bandwidth. An alternative is to use HBM (high bandwidth memory) modules. They use a very different interface and connect directly with GPUs on a dedicated silicon wafer. This makes them very expensive and their use is typically limited to high-end server chips, such as the NVIDIA Volta V100 series of accelerators. Quite unsurprisingly, GPU memory is generally *much* smaller than CPU memory due to the higher cost of the former. For our purposes, by and large their performance characteristics are similar, just a lot faster. We can safely ignore the details for the purpose of this book. They only matter when tuning GPU kernels for high throughput.
+La mémoire des GPU est soumise à des exigences de bande passante encore plus élevées, car ils possèdent beaucoup plus d'éléments de traitement que les CPU. Dans l'ensemble, il existe deux options pour y répondre. La première consiste à élargir considérablement le bus mémoire. Par exemple, la RTX 2080 Ti de NVIDIA possède un bus de 352 bits. Cela permet de transférer beaucoup plus d'informations en même temps. Deuxièmement, les GPU utilisent une mémoire spécifique de haute performance. Les appareils grand public, tels que les séries RTX et Titan de NVIDIA, utilisent généralement les puces [GDDR6](https://en.wikipedia.org/wiki/GDDR6_SDRAM) avec une bande passante globale de plus de 500 Go/s. Une alternative consiste à utiliser des modules HBM (mémoire à large bande passante). Ils utilisent une interface très différente et se connectent directement aux GPU sur une tranche de silicium dédiée. Ils sont donc très coûteux et leur utilisation est généralement limitée aux puces de serveur haut de gamme, comme les accélérateurs de la série NVIDIA Volta V100. Comme on pouvait s'y attendre, la mémoire des GPU est généralement *beaucoup* plus petite que celle des CPU en raison du coût plus élevé de la première. En ce qui nous concerne, leurs caractéristiques de performance sont généralement similaires, mais elles sont beaucoup plus rapides. Nous pouvons ignorer les détails dans le cadre de ce livre. Ils n'ont d'importance que lors du réglage des noyaux GPU pour un débit élevé.
 
-## Storage
+## Stockage
 
-We saw that some of the key characteristics of RAM are *bandwidth* and *latency*. The same is true for storage devices, just that the differences can be even more extreme.
+Nous avons vu que certaines des caractéristiques clés de la RAM sont la *bande passante* et la *latence*. Il en va de même pour les périphériques de stockage, à ceci près que les différences peuvent être encore plus extrêmes.
 
-### Hard Disk Drives
+### Disques durs
 
-*Hard disk drives* (HDDs) have been in use for over half a century. In a nutshell they contain a number of spinning platters with heads that can be positioned to read or write at any given track. High-end disks hold up to 16 TB on 9 platters. One of the key benefits of HDDs is that they are relatively inexpensive. One of their many downsides are their typically catastrophic failure modes and their relatively high read latency.
+*Les disques durs (HDD) sont utilisés depuis plus d'un demi-siècle. En résumé, ils contiennent un certain nombre de plateaux tournants avec des têtes qui peuvent être positionnées pour lire ou écrire sur une piste donnée. Les disques haut de gamme peuvent contenir jusqu'à 16 To sur 9 plateaux. L'un des principaux avantages des disques durs est qu'ils sont relativement peu coûteux. L'un de leurs nombreux inconvénients est leur mode de défaillance généralement catastrophique et leur latence de lecture relativement élevée.
 
-To understand the latter, consider the fact that HDDs spin at around 7,200 RPM (revolutions per minute). If they were much faster they would shatter due to the centrifugal force exerted on the platters. This has a major downside when it comes to accessing a specific sector on the disk: we need to wait until the platter has rotated in position (we can move the heads but not accelerate the actual disks). Hence it can take over 8 ms until the requested data is available. A common way this is expressed is to say that HDDs can operate at approximately 100 IOPs (input/output operations per second). This number has essentially remained unchanged for the past two decades. Worse still, it is equally difficult to increase bandwidth (it is in the order of 100--200 MB/s). After all, each head reads a track of bits, hence the bit rate only scales with the square root of the information density. As a result, HDDs are quickly becoming relegated to archival storage and low-grade storage for very large datasets.
+Pour comprendre ce dernier point, il faut savoir que les disques durs tournent à environ 7 200 tours par minute. S'ils étaient beaucoup plus rapides, ils se briseraient en raison de la force centrifuge exercée sur les plateaux. Cela présente un inconvénient majeur lorsqu'il s'agit d'accéder à un secteur spécifique du disque : il faut attendre que le plateau ait tourné en position (on peut déplacer les têtes mais pas accélérer les disques eux-mêmes). Il peut donc s'écouler plus de 8 ms avant que les données demandées soient disponibles. Une façon courante d'exprimer cela est de dire que les disques durs peuvent fonctionner à environ 100 IOPs (opérations d'entrée/sortie par seconde). Ce chiffre est resté essentiellement inchangé au cours des deux dernières décennies. Pire encore, il est tout aussi difficile d'augmenter la bande passante (elle est de l'ordre de 100--200 MB/s). Après tout, chaque tête lit une piste de bits, et donc le débit binaire n'évolue qu'en fonction de la racine carrée de la densité d'information. Par conséquent, les disques durs sont rapidement relégués au stockage d'archives et au stockage de qualité inférieure pour les très grands ensembles de données.
 
 
 ### Solid State Drives
 
-Solid state drives (SSDs) use flash memory to store information persistently. This allows for *much faster* access to stored records. Modern SSDs can operate at 100,000 to 500,000 IOPs, i.e., up to 3 orders of magnitude faster than HDDs. Furthermore, their bandwidth can reach 1--3GB/s, i.e., one order of magnitude faster than HDDs. These improvements sound almost too good to be true. Indeed, they come with the following caveats, due to the way SSDs are designed.
+Les Solid State Drives (SSD) utilisent la mémoire flash pour stocker les informations de manière persistante. Cela permet un accès *beaucoup plus rapide* aux documents stockés. Les SSD modernes peuvent fonctionner à une vitesse de 100 000 à 500 000 IOP, c'est-à-dire jusqu'à 3 ordres de grandeur plus vite que les disques durs. En outre, leur bande passante peut atteindre 1 à 3 Go/s, soit un ordre de grandeur de plus que les disques durs. Ces améliorations semblent presque trop belles pour être vraies. En effet, elles s'accompagnent des mises en garde suivantes, dues à la façon dont les disques SSD sont conçus.
 
-* SSDs store information in blocks (256 KB or larger). They can only be written as a whole, which takes significant time. Consequently bit-wise random writes on SSD have very poor performance. Likewise, writing data in general takes significant time since the block has to be read, erased and then rewritten with new information. By now SSD controllers and firmware have developed algorithms to mitigate this. Nonetheless, writes can be much slower, in particular for QLC (quad level cell) SSDs. The key for improved performance is to maintain a *queue* of operations, to prefer reads and to write in large blocks if possible.
-* The memory cells in SSDs wear out relatively quickly (often already after a few thousand writes). Wear-level protection algorithms are able to spread the degradation over many cells. That said, it is not recommended to use SSDs for swapping files or for large aggregations of log-files.
-* Lastly, the massive increase in bandwidth has forced computer designers to attach SSDs directly to the PCIe bus. The drives capable of handling this, referred to as NVMe (Non Volatile Memory enhanced), can use up to 4 PCIe lanes. This amounts to up to 8GB/s on PCIe 4.0.
+* Les disques SSD stockent les informations par blocs (256 Ko ou plus). Ils ne peuvent être écrits que dans leur ensemble, ce qui prend beaucoup de temps. Par conséquent, les écritures aléatoires bit à bit sur les SSD sont très peu performantes. De même, l'écriture de données en général prend beaucoup de temps, car le bloc doit être lu, effacé, puis réécrit avec de nouvelles informations. Aujourd'hui, les contrôleurs et les microprogrammes des SSD ont développé des algorithmes pour atténuer ce problème. Néanmoins, les écritures peuvent être beaucoup plus lentes, en particulier pour les SSD QLC (quad level cell). La clé pour améliorer les performances est de maintenir une *file d'attente* d'opérations, de préférer les lectures et d'écrire dans de grands blocs si possible.
+* Les cellules de mémoire des SSD s'usent relativement vite (souvent déjà après quelques milliers d'écritures). Les algorithmes de protection contre l'usure sont capables de répartir la dégradation sur de nombreuses cellules. Cela dit, il n'est pas recommandé d'utiliser les SSD pour échanger des fichiers ou pour de grandes agrégations de fichiers journaux.
+* Enfin, l'augmentation massive de la bande passante a obligé les concepteurs d'ordinateurs à connecter les SSD directement au bus PCIe. Les disques capables de gérer cela, appelés NVMe (Non Volatile Memory enhanced), peuvent utiliser jusqu'à 4 voies PCIe. Cela représente jusqu'à 8 Go/s sur PCIe 4.0.
 
 ### Cloud Storage
 
-Cloud storage provides a configurable range of performance. That is, the assignment of storage to virtual machines is dynamic, both in terms of quantity and in terms of speed, as chosen by users. We recommend that users increase the provisioned number of IOPs whenever latency is too high, e.g., during training with many small records.
+Le stockage en nuage offre une gamme configurable de performances. En d'autres termes, l'affectation du stockage aux machines virtuelles est dynamique, tant en termes de quantité que de vitesse, au choix des utilisateurs. Nous recommandons aux utilisateurs d'augmenter le nombre d'IOP provisionnés lorsque la latence est trop élevée, par exemple, lors de l'entraînement avec de nombreux petits enregistrements.
 
 ## CPUs
 
-Central processing units (CPUs) are the centerpiece of any computer. They consist of a number of key components: *processor cores* that are able to execute machine code, a *bus* connecting them (the specific topology differs significantly between processor models, generations, and vendors), and *caches* to allow for higher bandwidth and lower latency memory access than what is possible by reads from main memory. Lastly, almost all modern CPUs contain *vector processing units* to aid with high performance linear algebra and convolutions, as they are common in media processing and machine learning.
+Les unités centrales de traitement (CPUs) sont la pièce maîtresse de tout ordinateur. Elles sont constituées d'un certain nombre de composants clés : des *cœurs de processeur* capables d'exécuter du code machine, un *bus* les reliant (la topologie spécifique diffère considérablement selon les modèles, les générations et les fournisseurs de processeurs), et des *caches* permettant un accès à la mémoire à plus grande largeur de bande et à plus faible latence que ce qui est possible en lisant la mémoire principale. Enfin, presque tous les processeurs modernes contiennent des *unités de traitement vectoriel* pour faciliter l'algèbre linéaire et les convolutions à haute performance, qui sont courantes dans le traitement des médias et l'apprentissage automatique.
 
-![Intel Skylake consumer quad-core CPU.](../img/skylake.svg)
-:label:`fig_skylake`
+![Intel Skylake consumer quad-core CPU.](../img/skylake.svg) 
+ :label:`fig_skylake` 
 
-:numref:`fig_skylake` depicts an Intel Skylake consumer-grade quad-core CPU. It has an integrated GPU, caches, and a ringbus connecting the four cores. Peripherals, such as Ethernet, WiFi, Bluetooth, SSD controller, and USB, are either part of the chipset or directly attached (PCIe) to the CPU.
+ :numref:`fig_skylake` représente un processeur quadricœur Intel Skylake de qualité grand public. Il dispose d'un GPU intégré, de caches et d'un bus circulaire reliant les quatre cœurs. Les périphériques, tels que Ethernet, WiFi, Bluetooth, le contrôleur SSD et USB, font partie du chipset ou sont directement reliés (PCIe) au CPU.
 
 
 ### Microarchitecture
 
-Each of the processor cores consists of a rather sophisticated set of components. While details differ between generations and vendors, the basic functionality is pretty much standard. The front-end loads instructions and tries to predict which path will be taken (e.g., for control flow). Instructions are then decoded from assembly code to microinstructions. Assembly code is often not the lowest level code that a processor executes. Instead, complex instructions may be decoded into a set of more lower level operations. These are then processed by the actual execution core. Often the latter is capable of performing many operations simultaneously. For instance, the ARM Cortex A77 core of :numref:`fig_cortexa77` is able to perform up to 8 operations simultaneously.
+Chacun des cœurs de processeur est constitué d'un ensemble assez sophistiqué de composants. Si les détails diffèrent selon les générations et les fournisseurs, la fonctionnalité de base est à peu près standard. Le frontal charge les instructions et essaie de prédire le chemin qui sera emprunté (par exemple, pour le flux de contrôle). Les instructions sont ensuite décodées du code d'assemblage en micro-instructions. Souvent, le code d'assemblage n'est pas le code de plus bas niveau qu'un processeur exécute. Au contraire, les instructions complexes peuvent être décodées en un ensemble d'opérations de plus bas niveau. Celles-ci sont ensuite traitées par le noyau d'exécution proprement dit. Ce dernier est souvent capable d'effectuer de nombreuses opérations simultanément. Par exemple, le cœur ARM Cortex A77 de :numref:`fig_cortexa77` est capable d'effectuer jusqu'à 8 opérations simultanément.
 
 ![ARM Cortex A77 Microarchitecture.](../img/a77.svg)
 :label:`fig_cortexa77`
 
-This means that efficient programs might be able to perform more than one instruction per clock cycle, provided that they can be carried out independently. Not all units are created equal. Some specialize in integer instructions whereas others are optimized for floating point performance. To increase throughput, the processor might also follow  multiple code paths simultaneously in a branching instruction and then discard the results of the branches not taken. This is why branch prediction units matter (on the front-end) such that only the most promising paths are pursued.
+Cela signifie que des programmes efficaces peuvent être capables d'exécuter plus d'une instruction par cycle d'horloge, à condition qu'ils puissent être exécutés indépendamment. Toutes les unités ne sont pas créées égales. Certaines sont spécialisées dans les instructions en nombres entiers, tandis que d'autres sont optimisées pour les performances en virgule flottante. Pour augmenter le débit, le processeur peut également suivre plusieurs chemins de code simultanément dans une instruction de branchement, puis rejeter les résultats des branchements non effectués. C'est pourquoi les unités de prédiction de branchement sont importantes (en amont), de sorte que seuls les chemins les plus prometteurs sont suivis.
 
-### Vectorization
+### Vectorisation
 
-Deep learning is extremely compute-hungry. Hence, to make CPUs suitable for machine learning, one needs to perform many operations in one clock cycle. This is achieved via vector units. They have different names: on ARM they are called NEON, on x86 they (a recent generation) are referred to as [AVX2](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) units. A common aspect is that they are able to perform SIMD (single instruction multiple data) operations. :numref:`fig_neon128` shows how 8 short integers can be added in one clock cycle on ARM.
+L'apprentissage profond est extrêmement gourmand en ressources informatiques. Par conséquent, pour que les processeurs conviennent à l'apprentissage automatique, il faut effectuer de nombreuses opérations en un cycle d'horloge. On y parvient grâce aux unités vectorielles. Elles portent différents noms : sur ARM, elles sont appelées NEON, sur x86 elles (une génération récente) sont appelées [AVX2](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) units. Leur point commun est qu'elles sont capables d'effectuer des opérations SIMD (single instruction multiple data). :numref:`fig_neon128` montre comment 8 entiers courts peuvent être ajoutés en un cycle d'horloge sur ARM.
 
 ![128 bit NEON vectorization.](../img/neon128.svg)
 :label:`fig_neon128`
 
-Depending on architecture choices, such registers are up to 512 bits long, allowing for the combination of up to 64 pairs of numbers. For instance, we might be multiplying two numbers and adding them to a third, which is also known as a fused multiply-add. Intel's [OpenVino](https://01.org/openvinotoolkit) uses these to achieve respectable throughput for deep learning on server-grade CPUs. Note, though, that this number is entirely dwarfed by what GPUs are capable of achieving. For instance, NVIDIA's RTX 2080 Ti has 4,352 CUDA cores, each of which is capable of processing such an operation at any time.
+Selon les choix d'architecture, ces registres ont une longueur pouvant atteindre 512 bits, ce qui permet de combiner jusqu'à 64 paires de nombres. Par exemple, nous pouvons multiplier deux nombres et les ajouter à un troisième, ce qui est également connu comme une multiplication-addition fusionnée. Le site [OpenVino](https://01.org/openvinotoolkit) d'Intel les utilise pour obtenir un débit respectable pour l'apprentissage profond sur les processeurs de niveau serveur. Notez, cependant, que ce chiffre est entièrement éclipsé par ce que les GPU sont capables d'atteindre. Par exemple, le RTX 2080 Ti de NVIDIA possède 4 352 cœurs CUDA, chacun d'entre eux étant capable de traiter une telle opération à tout moment.
 
 ### Cache
 
-Consider the following situation: we have a modest CPU core with 4 cores as depicted in :numref:`fig_skylake` above, running at 2 GHz frequency.
-Moreover, let's assume that we have an IPC (instructions per clock) count of 1 and that the units have AVX2 with 256-bit width enabled. Let's furthermore assume that at least one of the registers used for AVX2 operations needs to be retrieved from memory. This means that the CPU consumes $4 \times 256 \text{ bit} = 128 \text{ bytes}$ of data per clock cycle. Unless we are able to transfer $2 \times 10^9 \times 128 = 256 \times 10^9$ bytes to the processor per second the processing elements are going to starve. Unfortunately the memory interface of such a chip only supports 20--40 GB/s data transfer, i.e., one order of magnitude less. The fix is to avoid loading *new* data from memory as far as possible and rather to cache it locally on the CPU. This is where caches come in handy. Commonly the following names or concepts are used:
+Considérons la situation suivante : nous disposons d'un modeste processeur à 4 cœurs, tel que représenté sur le site :numref:`fig_skylake` ci-dessus, fonctionnant à une fréquence de 2 GHz.
+De plus, supposons que le nombre d'IPC (instructions par horloge) est de 1 et que les unités ont AVX2 avec une largeur de 256 bits. Supposons en outre qu'au moins un des registres utilisés pour les opérations AVX2 doive être récupéré de la mémoire. Cela signifie que l'unité centrale consomme $4 \times 256 \text{ bit} = 128 \text{ bytes}$ de données par cycle d'horloge. Si nous ne sommes pas capables de transférer $2 \times 10^9 \times 128 = 256 \times 10^9$ octets au processeur par seconde, les éléments de traitement vont mourir de faim. Malheureusement, l'interface mémoire d'une telle puce ne supporte que 20--40 GB/s de transfert de données, c'est-à-dire un ordre de grandeur de moins. La solution consiste à éviter autant que possible de charger les *nouvelles* données de la mémoire et à les mettre en cache localement sur le processeur. C'est là que les caches sont utiles. Les noms ou concepts suivants sont couramment utilisés :
 
-* **Registers** are strictly speaking not part of the cache. They help stage instructions. That said, CPU registers are memory locations that a CPU can access at clock speed without any delay penalty. CPUs have tens of registers. It is up to the compiler (or programmer) to use registers efficiently. For instance the C programming language has a `register` keyword.
-* **L1 caches** are the first line of defense against high memory bandwidth requirements. L1 caches are tiny (typical sizes might be 32--64 KB) and often split into data and instructions caches. When data is found in the L1 cache, access is very fast. If they cannot be found there, the search progresses down the cache hierarchy.
-* **L2 caches** are the next stop. Depending on architecture design and processor size they might be exclusive. They might be accessible only by a given core or shared among multiple cores. L2 caches are larger (typically 256--512 KB per core) and slower than L1. Furthermore, to access something in L2 we first need to check to realize that the data is not in L1, which adds a small amount of extra latency.
-* **L3 caches** are shared among multiple cores and can be quite large. AMD's Epyc 3 server CPUs have a whopping 256 MB of cache spread across multiple chiplets. More typical numbers are in the 4--8 MB range.
+* **Les registres** ne font pas partie du cache à proprement parler. Ils permettent d'organiser les instructions. Cela dit, les registres de l'UC sont des emplacements de mémoire auxquels l'UC peut accéder à la vitesse de l'horloge sans aucune pénalité de retard. Les CPU ont des dizaines de registres. C'est au compilateur (ou au programmeur) d'utiliser les registres de manière efficace. Par exemple, le langage de programmation C possède un mot-clé `register`.
+* **Les caches L1** constituent la première ligne de défense contre les besoins élevés en bande passante mémoire. Les caches L1 sont minuscules (leur taille typique peut être de 32 à 64 Ko) et sont souvent divisés en caches de données et d'instructions. Lorsque les données sont trouvées dans le cache L1, l'accès est très rapide. Si elles ne s'y trouvent pas, la recherche progresse dans la hiérarchie du cache.
+* **Les caches L2** sont l'étape suivante. Selon la conception de l'architecture et la taille du processeur, ils peuvent être exclusifs. Ils peuvent être accessibles uniquement par un cœur donné ou partagés entre plusieurs cœurs. Les caches L2 sont plus grands (généralement 256-512 Ko par cœur) et plus lents que L1. De plus, pour accéder à quelque chose dans L2, nous devons d'abord vérifier que les données ne sont pas dans L1, ce qui ajoute une petite quantité de latence supplémentaire.
+* **Les caches L3** sont partagés entre plusieurs cœurs et peuvent être assez grands. Les processeurs de serveur Epyc 3 d'AMD disposent d'un énorme 256 Mo de cache répartis sur plusieurs cœurs. Les chiffres les plus courants sont de l'ordre de 4 à 8 Mo.
 
-Predicting which memory elements will be needed next is one of the key optimization parameters in chip design. For instance, it is advisable to traverse memory in a *forward* direction since most caching algorithms will try to *read ahead* rather than backwards. Likewise, keeping memory access patterns local is a good way of improving performance.
+Prédire quels éléments de mémoire seront nécessaires ensuite est l'un des principaux paramètres d'optimisation dans la conception des puces. Par exemple, il est conseillé de parcourir la mémoire dans le sens *avant* car la plupart des algorithmes de mise en cache essaieront de *lire en avant* plutôt qu'en arrière. De même, garder les modèles d'accès à la mémoire en local est un bon moyen d'améliorer les performances.
 
-Adding caches is a double-edge sword. On the one hand they ensure that the processor cores do not starve of data. At the same time they increase chip size, using up area that otherwise could have been spent on increasing processing power. Moreover, *cache misses* can be expensive. Consider the worst case scenario, *false sharing*, as depicted in :numref:`fig_falsesharing`. A memory location is cached on processor 0 when a thread on processor 1 requests the data. To obtain it, processor 0 needs to stop what it is doing, write the information back to main memory and then let processor 1 read it from memory. During this operation both processors wait. Quite potentially such code runs *more slowly* on multiple processors when compared with an efficient single-processor implementation. This is one more reason for why there is a practical limit to cache sizes (besides their physical size).
+L'ajout de caches est une arme à double tranchant. D'une part, ils garantissent que les cœurs du processeur ne manquent pas de données. D'autre part, ils augmentent la taille de la puce, utilisant une surface qui aurait pu être consacrée à l'augmentation de la puissance de traitement. De plus, les *manques de mémoire cache peuvent être coûteux. Considérons le pire scénario, le *faux partage*, tel qu'il est décrit sur le site :numref:`fig_falsesharing` . Un emplacement de mémoire est mis en cache sur le processeur 0 lorsqu'un thread sur le processeur 1 demande les données. Pour l'obtenir, le processeur 0 doit arrêter ce qu'il est en train de faire, réécrire l'information en mémoire principale, puis laisser le processeur 1 la lire en mémoire. Pendant cette opération, les deux processeurs attendent. Il est tout à fait possible qu'un tel code s'exécute *plus lentement* sur plusieurs processeurs par rapport à une implémentation efficace sur un seul processeur. C'est une raison de plus pour laquelle il existe une limite pratique à la taille des caches (outre leur taille physique).
 
-![False sharing (image courtesy of Intel).](../img/falsesharing.svg)
-:label:`fig_falsesharing`
+![False sharing (image courtesy of Intel) .](../img/falsesharing.svg)
+:label:`fig_falsesharing` 
 
-## GPUs and other Accelerators
+ ### GPU et autres accélérateurs
 
-It is not an exaggeration to claim that deep learning would not have been successful without GPUs. By the same token, it is quite reasonable to argue that GPU manufacturers' fortunes have increased significantly due to deep learning. This co-evolution of hardware and algorithms has led to a situation where for better or worse deep learning is the preferable statistical modeling paradigm. Hence it pays to understand the specific benefits that GPUs and related accelerators such as the TPU :cite:`Jouppi.Young.Patil.ea.2017`.
+Il n'est pas exagéré d'affirmer que l'apprentissage profond n'aurait pas réussi sans les GPU. De même, il est tout à fait raisonnable d'affirmer que la fortune des fabricants de GPU a considérablement augmenté grâce à l'apprentissage profond. Cette coévolution du matériel et des algorithmes a conduit à une situation où, pour le meilleur ou pour le pire, l'apprentissage profond est le paradigme de modélisation statistique à privilégier. Il est donc utile de comprendre les avantages spécifiques des GPU et des accélérateurs connexes tels que le TPU :cite:`Jouppi.Young.Patil.ea.2017` .
 
-Of note is a distinction that is often made in practice: accelerators are optimized either for training or inference. For the latter we only need to compute the forward propagation in a network. No storage of intermediate data is needed for backpropagation. Moreover, we may not need very precise computation (FP16 or INT8 typically suffice). On the other hand, during training all intermediate results need storage to compute gradients. Moreover, accumulating gradients requires higher precision to avoid numerical underflow (or overflow). This means that FP16 (or mixed precision with FP32) is the minimum requirement. All of this necessitates faster and larger memory (HBM2 vs. GDDR6) and more processing power. For instance, NVIDIA's [Turing](https://devblogs.nvidia.com/nvidia-turing-architecture-in-depth/) T4 GPUs are optimized for inference whereas the V100 GPUs are preferable for training.
+Il convient de noter une distinction souvent faite dans la pratique : les accélérateurs sont optimisés soit pour l'apprentissage, soit pour l'inférence. Dans ce dernier cas, il suffit de calculer la propagation vers l'avant dans un réseau. Aucun stockage de données intermédiaires n'est nécessaire pour la rétropropagation. De plus, nous n'avons pas forcément besoin de calculs très précis (FP16 ou INT8 suffisent généralement). En revanche, pendant l'apprentissage, tous les résultats intermédiaires doivent être stockés pour calculer les gradients. De plus, l'accumulation des gradients nécessite une plus grande précision pour éviter un dépassement de capacité numérique (ou un débordement). Cela signifie que la précision FP16 (ou une précision mixte avec FP32) est le minimum requis. Tout cela nécessite une mémoire plus rapide et plus grande (HBM2 contre GDDR6) et une plus grande puissance de traitement. Par exemple, les GPU [Turing](https://devblogs.nvidia.com/nvidia-turing-architecture-in-depth/) T4 de NVIDIA sont optimisés pour l'inférence alors que les GPU V100 sont préférables pour l'entraînement.
 
-Recall vectorization as illustrated in :numref:`fig_neon128`. Adding vector units to a processor core allowed us to increase throughput significantly. For example, in the example in :numref:`fig_neon128` we were able to perform 16 operations simultaneously.
-First,
-what if we added operations that optimized not just operations between vectors but also between matrices? This strategy led to tensor cores (to be covered shortly). 
-Second, what if we added many more cores? In a nutshell, these two strategies summarize the design decisions in GPUs. :numref:`fig_turing_processing_block` gives an overview of a basic processing block. It contains 16 integer and 16 floating point units. In addition to that, two tensor cores accelerate a narrow subset of additional operations relevant for deep learning. Each streaming multiprocessor consists of four such blocks.
+Rappelons la vectorisation telle qu'illustrée dans :numref:`fig_neon128` . L'ajout d'unités vectorielles à un cœur de processeur nous a permis d'augmenter considérablement le débit. Par exemple, dans l'exemple de :numref:`fig_neon128` , nous avons pu effectuer 16 opérations simultanément.
+Tout d'abord,
+et si nous ajoutions des opérations qui optimisent non seulement les opérations entre les vecteurs mais aussi entre les matrices ? Cette stratégie a donné naissance aux noyaux tenseurs (que nous aborderons prochainement). 
+Ensuite, que se passerait-il si nous ajoutions beaucoup plus de cœurs ? En un mot, ces deux stratégies résument les décisions de conception des GPU. :numref:`fig_turing_processing_block` donne un aperçu d'un bloc de traitement de base. Il contient 16 unités à virgule flottante et 16 unités à virgule entière. En outre, deux cœurs tenseurs accélèrent un sous-ensemble restreint d'opérations supplémentaires pertinentes pour l'apprentissage profond. Chaque multiprocesseur de streaming est constitué de quatre blocs de ce type.
 
-![NVIDIA Turing processing block (image courtesy of NVIDIA).](../img/turing-processing-block.png)
-:width:`150px`
-:label:`fig_turing_processing_block`
+![NVIDIA Turing processing block (image courtesy of NVIDIA) .](../img/turing-processing-block.png)
+:width:`150px` 
+ :label:`fig_turing_processing_block` 
 
-Next, 12 streaming multiprocessors are grouped into graphics processing clusters which make up the high-end TU102 processors. Ample memory channels and an L2 cache complement the setup. :numref:`fig_turing` has the relevant details. One of the reasons for designing such a device is that individual blocks can be added or removed as needed to allow for more compact chips and to deal with yield issues (faulty modules might not be activated). Fortunately programming such devices is well hidden from the casual deep learning researcher beneath layers of CUDA and framework code. In particular, more than one of the programs might well be executed simultaneously on the GPU, provided that there are available resources. Nonetheless it pays to be aware of the limitations of the devices to avoid picking models that do not fit into device memory.
+ Ensuite, 12 multiprocesseurs de streaming sont regroupés en clusters de traitement graphique qui constituent les processeurs TU102 haut de gamme. De nombreux canaux de mémoire et un cache L2 complètent la configuration. :numref:`fig_turing` contient les détails pertinents. L'une des raisons de la conception d'un tel dispositif est que des blocs individuels peuvent être ajoutés ou retirés selon les besoins pour obtenir des puces plus compactes et pour faire face aux problèmes de rendement (les modules défectueux peuvent ne pas être activés). Heureusement, la programmation de tels dispositifs est bien cachée au chercheur occasionnel en apprentissage profond, sous des couches de code CUDA et de framework. En particulier, plusieurs programmes peuvent être exécutés simultanément sur le GPU, à condition que des ressources soient disponibles. Néanmoins, il est utile d'être conscient des limites des dispositifs pour éviter de choisir des modèles qui ne tiennent pas dans la mémoire du dispositif.
 
 ![NVIDIA Turing architecture (image courtesy of NVIDIA)](../img/turing.png)
-:width:`350px`
-:label:`fig_turing`
+:width:`350px` 
+ :label:`fig_turing` 
 
-A last aspect that is worth mentioning in more detail are *tensor cores*. They are an example of a recent trend of adding more optimized circuits that are specifically effective for deep learning. For instance, the TPU added a systolic array :cite:`Kung.1988` for fast matrix multiplication. There the design was to support a very small number (one for the first generation of TPUs) of large operations. Tensor cores are at the other end. They are optimized for small operations involving between $4 \times 4$ and $16 \times 16$ matrices, depending on their numerical precision. :numref:`fig_tensorcore` gives an overview of the optimizations.
+ Un dernier aspect qui mérite d'être mentionné plus en détail sont les *cœurs tenseurs*. Ils sont un exemple de la récente tendance à ajouter des circuits plus optimisés et spécifiquement efficaces pour l'apprentissage profond. Par exemple, le TPU a ajouté un réseau systolique :cite:`Kung.1988` pour la multiplication rapide de matrices. Là, la conception était de prendre en charge un très petit nombre (un pour la première génération de TPU) de grandes opérations. Les cœurs tensoriels se situent à l'autre extrémité. Ils sont optimisés pour les petites opérations impliquant entre $4 \times 4$ et $16 \times 16$ matrices, en fonction de leur précision numérique. :numref:`fig_tensorcore` donne une vue d'ensemble des optimisations.
 
-![NVIDIA tensor cores in Turing (image courtesy of NVIDIA).](../img/tensorcore.jpg)
-:width:`400px`
-:label:`fig_tensorcore`
+![NVIDIA tensor cores in Turing (image courtesy of NVIDIA) .](../img/tensorcore.jpg)
+:width:`400px` 
+ :label:`fig_tensorcore` 
 
-Obviously when optimizing for computation we end up making certain compromises. One of them is that GPUs are not very good at handling interrupts and sparse data. While there are notable exceptions, such as [Gunrock](https://github.com/gunrock/gunrock) :cite:`Wang.Davidson.Pan.ea.2016`, the access pattern of sparse matrices and vectors do not go well with the high bandwidth burst read operations where GPUs excel. Matching both goals is an area of active research. See e.g., [DGL](http://dgl.ai), a library tuned for deep learning on graphs.
-
-
-## Networks and Buses
-
-Whenever a single device is insufficient for optimization we need to transfer data to and from it to synchronize processing. This is where networks and buses come in handy. We have a number of design parameters: bandwidth, cost, distance, and flexibility.
-On one end we have WiFi that has a pretty good range, is very easy to use (no wires, after all), cheap but it offers comparatively mediocre bandwidth and latency. No machine learning researcher within their right mind would use it to build a cluster of servers. In what follows we focus on interconnects that are suitable for deep learning.
-
-* **PCIe** is a dedicated bus for very high bandwidth point-to-point connections (up to 32 GB/s on PCIe 4.0 in a 16-lane slot) per lane. Latency is in the order of single-digit microseconds (5 μs). PCIe links are precious. Processors only have a limited number of them: AMD's EPYC 3 has 128 lanes, Intel's Xeon has up to 48 lanes per chip; on desktop-grade CPUs the numbers are 20 (Ryzen 9) and 16 (Core i9) respectively. Since GPUs have typically 16 lanes, this limits the number of GPUs that can connect to the CPU at full bandwidth. After all, they need to share the links with other high bandwidth peripherals such as storage and Ethernet. Just like with RAM access, large bulk transfers are preferable due to reduced packet overhead.
-* **Ethernet** is the most commonly used way of connecting computers. While it is significantly slower than PCIe, it is very cheap and resilient to install and covers much longer distances. Typical bandwidth for low-grade servers is 1 GBit/s. Higher-end devices (e.g., [C5 instances](https://aws.amazon.com/ec2/instance-types/c5/) in the cloud) offer between 10 and 100 GBit/s bandwidth. As in all previous cases data transmission has significant overheads. Note that we almost never use raw Ethernet directly but rather a protocol that is executed on top of the physical interconnect (such as UDP or TCP/IP). This adds further overhead. Like PCIe, Ethernet is designed to connect two devices, e.g., a computer and a switch.
-* **Switches** allow us to connect multiple devices in a manner where any pair of them can carry out a (typically full bandwidth) point-to-point connection simultaneously. For instance, Ethernet switches might connect 40 servers at high cross-sectional bandwidth. Note that switches are not unique to traditional computer networks. Even PCIe lanes can be [switched](https://www.broadcom.com/products/pcie-switches-bridges/pcie-switches). This occurs, e.g., to connect a large number of GPUs to a host processor, as is the case for the [P2 instances](https://aws.amazon.com/ec2/instance-types/p2/).
-* **NVLink** is an alternative to PCIe when it comes to very high bandwidth interconnects. It offers up to 300 Gbit/s data transfer rate per link. Server GPUs (Volta V100) have six links whereas consumer-grade GPUs (RTX 2080 Ti) have only one link, operating at a reduced 100 Gbit/s rate. We recommend to use [NCCL](https://github.com/NVIDIA/nccl) to achieve high data transfer between GPUs.
+ Il est évident que lorsque l'on optimise les calculs, on finit par faire certains compromis. L'un d'eux est que les GPU ne sont pas très bons pour gérer les interruptions et les données éparses. Bien qu'il y ait des exceptions notables, comme [Gunrock](https://github.com/gunrock/gunrock) :cite:`Wang.Davidson.Pan.ea.2016` , le modèle d'accès des matrices et des vecteurs épars ne va pas bien avec les opérations de lecture en rafale à large bande passante où les GPU excellent. L'atteinte de ces deux objectifs fait l'objet de recherches actives. Voir, par exemple, [DGL](http://dgl.ai), une bibliothèque adaptée à l'apprentissage profond sur les graphes.
 
 
+## Réseaux et bus
 
-## More Latency Numbers
+Lorsqu'un seul dispositif est insuffisant pour l'optimisation, nous devons transférer des données vers et depuis ce dispositif afin de synchroniser le traitement. C'est là que les réseaux et les bus sont utiles. Nous avons un certain nombre de paramètres de conception : bande passante, coût, distance et flexibilité.
+D'un côté, nous avons le WiFi qui a une bonne portée, est très facile à utiliser (pas de fils, après tout), bon marché, mais qui offre une bande passante et une latence relativement médiocres. Aucun chercheur en apprentissage automatique sain d'esprit ne l'utiliserait pour construire un cluster de serveurs. Dans ce qui suit, nous nous concentrons sur les interconnexions qui conviennent à l'apprentissage profond.
 
-The summary in :numref:`table_latency_numbers` and :numref:`table_latency_numbers_tesla` are from [Eliot Eshelman](https://gist.github.com/eshelman) who maintains an updated version of the numbers as a [GitHub gist](https://gist.github.com/eshelman/343a1c46cb3fba142c1afdcdeec17646).
+* **PCIe** est un bus dédié aux connexions point à point à très haut débit (jusqu'à 32 Go/s sur PCIe 4.0 dans un emplacement à 16 voies) par voie. La latence est de l'ordre de la microseconde à un chiffre (5 μs). Les liaisons PCIe sont précieuses. Les processeurs n'en possèdent qu'un nombre limité : L'EPYC 3 d'AMD dispose de 128 voies, le Xeon d'Intel a jusqu'à 48 voies par puce ; sur les processeurs de qualité bureau, les chiffres sont respectivement de 20 (Ryzen 9) et 16 (Core i9). Comme les GPU ont généralement 16 voies, cela limite le nombre de GPU qui peuvent se connecter au CPU à pleine bande passante. Après tout, ils doivent partager les liaisons avec d'autres périphériques à large bande passante tels que le stockage et Ethernet. Tout comme pour l'accès à la RAM, les transferts en masse sont préférables en raison de la réduction de la surcharge des paquets.
+* **Ethernet** est le moyen le plus couramment utilisé pour connecter les ordinateurs. Bien qu'il soit nettement plus lent que PCIe, il est très bon marché et résilient à l'installation et couvre des distances beaucoup plus longues. La bande passante typique pour les serveurs bas de gamme est de 1 GBit/s. Les appareils haut de gamme (par exemple, [C5 instances](https://aws.amazon.com/ec2/instance-types/c5/) dans le nuage) offrent une largeur de bande de 10 à 100 GBit/s. Comme dans tous les cas précédents, la transmission des données entraîne des frais généraux importants. Notez que nous n'utilisons presque jamais l'Ethernet brut directement, mais plutôt un protocole exécuté au-dessus de l'interconnexion physique (comme UDP ou TCP/IP). Cela ajoute une surcharge supplémentaire. Comme PCIe, Ethernet est conçu pour connecter deux appareils, par exemple, un ordinateur et un commutateur.
+* **Les commutateurs** nous permettent de connecter plusieurs appareils de manière à ce que n'importe quelle paire d'entre eux puisse effectuer simultanément une connexion point à point (généralement à pleine bande passante). Par exemple, les commutateurs Ethernet peuvent connecter 40 serveurs à une largeur de bande transversale élevée. Notez que les commutateurs ne sont pas propres aux réseaux informatiques traditionnels. Même les couloirs PCIe peuvent être [switched](https://www.broadcom.com/products/pcie-switches-bridges/pcie-switches). Cela se produit, par exemple, pour connecter un grand nombre de GPU à un processeur hôte, comme c'est le cas pour le [P2 instances](https://aws.amazon.com/ec2/instance-types/p2/).
+* **NVLink** est une alternative au PCIe lorsqu'il s'agit d'interconnexions à très haut débit. Il offre un taux de transfert de données allant jusqu'à 300 Gbit/s par liaison. Les GPU pour serveurs (Volta V100) ont six liens, tandis que les GPU grand public (RTX 2080 Ti) n'ont qu'un seul lien, fonctionnant à un taux réduit de 100 Gbit/s. Nous recommandons d'utiliser [NCCL](https://github.com/NVIDIA/nccl) pour obtenir un transfert de données élevé entre les GPU.
 
-:Common Latency Numbers.
 
-| Action | Time | Notes |
-| :----------------------------------------- | -----: | :---------------------------------------------- |
-| L1 cache reference/hit                     | 1.5 ns | 4 cycles                                        |
-| Floating-point add/mult/FMA                | 1.5 ns | 4 cycles                                        |
-| L2 cache reference/hit                     |   5 ns | 12 ~ 17 cycles                                  |
-| Branch mispredict                          |   6 ns | 15 ~ 20 cycles                                  |
-| L3 cache hit (unshared cache)              |  16 ns | 42 cycles                                       |
-| L3 cache hit (shared in another core)      |  25 ns | 65 cycles                                       |
-| Mutex lock/unlock                          |  25 ns |                                                 |
-| L3 cache hit (modified in another core)    |  29 ns | 75 cycles                                       |
-| L3 cache hit (on a remote CPU socket)      |  40 ns | 100 ~ 300 cycles (40 ~ 116 ns)                  |
-| QPI hop to a another CPU (per hop)         |  40 ns |                                                 |
-| 64MB memory ref. (local CPU)          |  46 ns | TinyMemBench on Broadwell E5-2690v4             |
-| 64MB memory ref. (remote CPU)         |  70 ns | TinyMemBench on Broadwell E5-2690v4             |
-| 256MB memory ref. (local CPU)         |  75 ns | TinyMemBench on Broadwell E5-2690v4             |
-| Intel Optane random write                  |  94 ns | UCSD Non-Volatile Systems Lab                   |
-| 256MB memory ref. (remote CPU)        | 120 ns | TinyMemBench on Broadwell E5-2690v4             |
-| Intel Optane random read                   | 305 ns | UCSD Non-Volatile Systems Lab                   |
-| Send 4KB over 100 Gbps HPC fabric          |   1 μs | MVAPICH2 over Intel Omni-Path                   |
-| Compress 1KB with Google Snappy            |   3 μs |                                                 |
-| Send 4KB over 10 Gbps ethernet             |  10 μs |                                                 |
-| Write 4KB randomly to NVMe SSD             |  30 μs | DC P3608 NVMe SSD (QOS 99% is 500μs)            |
-| Transfer 1MB to/from NVLink GPU            |  30 μs | ~33GB/s on NVIDIA 40GB NVLink                 |
-| Transfer 1MB to/from PCI-E GPU             |  80 μs | ~12GB/s on PCIe 3.0 x16 link                  |
-| Read 4KB randomly from NVMe SSD            | 120 μs | DC P3608 NVMe SSD (QOS 99%)                     |
-| Read 1MB sequentially from NVMe SSD        | 208 μs | ~4.8GB/s DC P3608 NVMe SSD                    |
-| Write 4KB randomly to SATA SSD             | 500 μs | DC S3510 SATA SSD (QOS 99.9%)                   |
-| Read 4KB randomly from SATA SSD            | 500 μs | DC S3510 SATA SSD (QOS 99.9%)                   |
-| Round trip within same data center          | 500 μs | One-way ping is ~250μs                          |
-| Read 1MB sequentially from SATA SSD        |   2 ms | ~550MB/s DC S3510 SATA SSD                    |
-| Read 1MB sequentially from disk            |   5 ms | ~200MB/s server HDD                           |
-| Random Disk Access (seek+rotation)         |  10 ms |                                                 |
-| Send packet CA->Netherlands->CA            | 150 ms |                                                 |
-:label:`table_latency_numbers`
 
-:Latency Numbers for NVIDIA Tesla GPUs.
+## Plus de chiffres sur la latence
 
-| Action | Time | Notes |
-| :------------------------------ | -----: | :---------------------------------------- |
-| GPU Shared Memory access        |  30 ns | 30~90 cycles (bank conflicts add latency) |
-| GPU Global Memory access        | 200 ns | 200~800 cycles                            |
-| Launch CUDA kernel on GPU       |  10 μs | Host CPU instructs GPU to start kernel    |
-| Transfer 1MB to/from NVLink GPU |  30 μs | ~33GB/s on NVIDIA 40GB NVLink           |
-| Transfer 1MB to/from PCI-E GPU  |  80 μs | ~12GB/s on PCI-Express x16 link         |
-:label:`table_latency_numbers_tesla`
+Le résumé de :numref:`table_latency_numbers` et :numref:`table_latency_numbers_tesla` provient de [Eliot Eshelman](https://gist.github.com/eshelman) qui maintient une version mise à jour des chiffres sous [GitHub gist](https://gist.github.com/eshelman/343a1c46cb3fba142c1afdcdeec17646).
 
-## Summary
+:Chiffres de latence communs.
 
-* Devices have overheads for operations. Hence it is important to aim for a small number of large transfers rather than many small ones. This applies to RAM, SSDs, networks and GPUs.
-* Vectorization is key for performance. Make sure you are aware of the specific abilities of your accelerator. E.g., some Intel Xeon CPUs are particularly good for INT8 operations, NVIDIA Volta GPUs excel at FP16 matrix-matrix operations and NVIDIA Turing shines at FP16, INT8, and INT4 operations.
-* Numerical overflow due to small data types can be a problem during training (and to a lesser extent during inference).
-* Aliasing can significantly degrade performance. For instance, memory alignment on 64 bit CPUs should be done with respect to 64 bit boundaries. On GPUs it is a good idea to keep convolution sizes aligned, e.g., to tensor cores.
-* Match your algorithms to the hardware (e.g., memory footprint, and bandwidth). Great speedup (orders of magnitude) can be achieved when fitting the parameters into caches.
-* We recommend that you sketch out the performance of a novel algorithm on paper before verifying the experimental results. Discrepancies of an order-of-magnitude or more are reasons for concern.
-* Use profilers to debug performance bottlenecks.
-* Training and inference hardware have different sweet spots in terms of price and performance.
+| Action | Temps | Notes |
+| :----------------------------------------- | ----- : | :---------------------------------------------- |
+| Référence/attaque dans le cache L1 | 1,5 ns | 4 cycles |
+| Addition en virgule flottante/mult/FMA | 1.5 ns | 4 cycles |
+| Référence au cache L2 / hit | 5 ns | 12 ~) 17 cycles |
+| Erreur de prédiction de branche | 6 ns | 15 ~) 20 cycles |
+| Hit du cache L3 (cache non partagé) | 16 ns | 42 cycles |
+| Hit du cache L3 (partagé dans un autre cœur) | 25 ns | 65 cycles                                       |
+| Verrouillage/déverrouillage Mutex | 25 ns |
+| Cache L3 atteint (modifié dans un autre noyau) | 29 ns | 75 cycles |
+| Cache L3 atteint (sur un socket de CPU distant) | 40 ns | 100 ~) 300 cycles (40 ~) 116 ns) |
+| Saut QPI vers un autre CPU (par saut) | 40 ns | |
+| Réf. mémoire 64MB. (CPU local) | 46 ns | TinyMemBench sur Broadwell E5-2690v4 |
+| Mémoire de 64MB ref. (CPU distant) | 70 ns | TinyMemBench sur Broadwell E5-2690v4 |
+| Mémoire de 256MB ref. (CPU local) | 75 ns | TinyMemBench sur Broadwell E5-2690v4 |
+| Ecriture aléatoire Intel Optane | 94 ns | UCSD Non-Volatile Systems Lab |
+| Mémoire de 256MB ref. (remote CPU) | 120 ns | TinyMemBench on Broadwell E5-2690v4 |
+| Intel Optane random read | 305 ns | UCSD Non-Volatile Systems Lab |
+| Send 4KB over 100 Gbps HPC fabric | 1 μs | MVAPICH2 over Intel Omni-Path |
+| Compression de 1 Ko avec Google Snappy | 3 μs | |
+| Envoi de 4 Ko sur Ethernet 10 Gbps | 10 μs |
+| Écriture aléatoire de 4 Ko sur un SSD NVMe | 30 μs | SSD NVMe DC P3608 (QOS 99 % est de 500μs) |
+| Transfert de 1 Mo vers/depuis un GPU NVLink | 30 μs | ~)33 Go/s sur NVIDIA 40 Go NVLink |
+| Transfert de 1 Mo vers/depuis un GPU PCI-E GPU | 80 μs | ~)12GB/s sur PCIe 3.0 x16 link |
+| Lire 4 Ko de manière aléatoire depuis un SSD NVMe | 120 μs | DC P3608 NVMe SSD (QOS 99%) |
+| Lire 1 Mo de manière séquentielle depuis un SSD NVMe | 208 μs | ~)4.8GB/s DC P3608 NVMe SSD |
+| Ecriture aléatoire de 4KB sur le SATA SSD | 500 μs | DC S3510 SATA SSD (QOS 99,9%) |
+| Lecture aléatoire de 4KB depuis le SATA SSD | 500 μs | DC S3510 SATA SSD (QOS 99.9%) |
+| Aller-retour dans le même centre de données | 500 μs | Le ping unidirectionnel est de ~)250μs |
+| Lire 1MB séquentiellement à partir du SATA SSD | 2 ms | ~)550MB/s DC S3510 SATA SSD |
+| Lire 1MB séquentiellement à partir du disque | 5 ms | ~)200MB/s serveur HDD |
+| Accès aléatoire au disque (recherche+rotation) | 10 ms | |
+| Envoyer un paquet CA-..&gt;Pays-Bas-&gt;CA | 150 ms | |
+:label:`table_latency_numbers` 
 
-## Exercises
+ :Chiffres de latence pour les GPU NVIDIA Tesla.
 
-1. Write C code to test whether there is any difference in speed between accessing memory aligned or misaligned relative to the external memory interface. Hint: be careful of caching effects.
-1. Test the difference in speed between accessing memory in sequence or with a given stride.
-1. How could you measure the cache sizes on a CPU?
-1. How would you lay out data across multiple memory channels for maximum bandwidth? How would you lay it out if you had many small threads?
-1. An enterprise-class HDD is spinning at 10,000 rpm. What is the absolutely minimum time an HDD needs to spend worst case before it can read data (you can assume that heads move almost instantaneously)? Why are 2.5" HDDs becoming popular for commercial servers (relative to 3.5" and 5.25" drives)?
-1. Assume that an HDD manufacturer increases the storage density from 1 Tbit per square inch to 5 Tbit per square inch. How much information can you store on a ring on a 2.5" HDD? Is there a difference between the inner and outer tracks?
-1. Going from 8 bit to 16 bit data types increases the amount of silicon approximately by four times. Why? Why might NVIDIA have added INT4 operations to their Turing GPUs?
-1. How much faster is it to read forward through memory vs. reading backwards? Does this number differ between different computers and CPU vendors? Why? Write C code and experiment with it.
-1. Can you measure the cache size of your disk? What is it for a typical HDD? Do SSDs need a cache?
-1. Measure the packet overhead when sending messages across the Ethernet. Look up the difference between UDP and TCP/IP connections.
-1. Direct memory access allows devices other than the CPU to write (and read) directly to (from) memory. Why is this a good idea?
-1. Look at the performance numbers for the Turing T4 GPU. Why does the performance "only" double as you go from FP16 to INT8 and INT4?
-1. What is the shortest time it should take for a packet on a round trip between San Francisco and Amsterdam? Hint: you can assume that the distance is 10,000 km.
+| Action | Temps | Notes |
+| :------------------------------ | ----- : | :---------------------------------------- |
+| Accès à la mémoire partagée du GPU | 30 ns | 30~)90 cycles (les conflits de banques ajoutent de la latence) |
+| Accès à la mémoire globale du GPU | 200 ns | 200~)800 cycles |
+| Lancement du noyau CUDA sur le GPU | 10 μs | Le CPU de l'hôte demande au GPU de lancer le noyau |
+| Transfert de 1 Mo vers/depuis le GPU NVLink | 30 μs | ~)33 Go/s sur NVIDIA 40 Go NVLink |
+| Transfert de 1 Mo vers/depuis le GPU PCI-E GPU | 80 μs | ~)12GB/s sur PCI-Express x16 link |
+:label:`table_latency_numbers_tesla` 
+
+ ## Résumé
+
+* Les périphériques ont des frais généraux pour les opérations. Il est donc important de viser un petit nombre de gros transferts plutôt que de nombreux petits. Ceci s'applique à la RAM, aux SSD, aux réseaux et aux GPU.
+* La vectorisation est essentielle pour les performances. Assurez-vous de connaître les capacités spécifiques de votre accélérateur. Par exemple, certains CPU Intel Xeon sont particulièrement bons pour les opérations INT8, les GPU NVIDIA Volta excellent dans les opérations matricielles FP16 et NVIDIA Turing brille dans les opérations FP16, INT8 et INT4.
+* Le débordement numérique dû aux petits types de données peut être un problème pendant l'entraînement (et dans une moindre mesure pendant l'inférence).
+* L'aliasing peut dégrader significativement les performances. Par exemple, l'alignement de la mémoire sur les CPU 64 bits doit être effectué par rapport aux limites de 64 bits. Sur les GPU, c'est une bonne idée de garder les tailles de convolution alignées, par exemple, sur les cœurs de tenseur.
+* Adaptez vos algorithmes au matériel (par exemple, l'empreinte mémoire et la bande passante). De grandes accélérations (ordres de grandeur) peuvent être obtenues en intégrant les paramètres dans les caches.
+* Nous vous recommandons d'esquisser les performances d'un nouvel algorithme sur papier avant de vérifier les résultats expérimentaux. Des écarts d'un ordre de grandeur ou plus sont des raisons de s'inquiéter.
+* Utilisez des profileurs pour déboguer les goulots d'étranglement des performances.
+* Les matériels de formation et d'inférence ont des points forts différents en termes de prix et de performances.
+
+## Exercices
+
+1. Ecrivez du code C pour tester s'il y a une différence de vitesse entre l'accès à la mémoire alignée ou désalignée par rapport à l'interface de mémoire externe. Conseil : faites attention aux effets de la mise en cache.
+1. Testez la différence de vitesse entre l'accès à la mémoire en séquence ou avec un pas donné.
+1. Comment pouvez-vous mesurer la taille du cache d'un processeur ?
+1. Comment répartir les données sur plusieurs canaux de mémoire pour obtenir une bande passante maximale ? Comment les répartiriez-vous si vous aviez de nombreux petits threads ?
+1. Un disque dur de classe entreprise tourne à 10 000 tr/min. Quel est le temps absolument minimal qu'un disque dur doit passer dans le pire des cas avant de pouvoir lire des données (on peut supposer que les têtes se déplacent presque instantanément) ? Pourquoi les disques durs de 2,5" deviennent-ils populaires pour les serveurs commerciaux (par rapport aux disques de 3,5" et 5,25") ?
+1. Supposons qu'un fabricant de disques durs augmente la densité de stockage de 1 Tbit par pouce carré à 5 Tbit par pouce carré. Quelle quantité d'informations pouvez-vous stocker sur un anneau d'un disque dur de 2,5 pouces ? Y a-t-il une différence entre les pistes intérieure et extérieure ?
+1. Le passage des types de données de 8 bits à 16 bits multiplie par quatre environ la quantité de silicium. Pourquoi ? Pourquoi NVIDIA aurait-elle ajouté des opérations INT4 à ses GPU Turing ?
+1. Combien de temps est-il plus rapide de lire en avant dans la mémoire que de lire en arrière ? Ce chiffre diffère-t-il selon les ordinateurs et les fournisseurs de CPU ? Pourquoi ? Ecrivez du code C et expérimentez-le.
+1. Pouvez-vous mesurer la taille du cache de votre disque ? Quelle est la taille d'un disque dur typique ? Les disques SSD ont-ils besoin d'un cache ?
+1. Mesurez la surcharge des paquets lors de l'envoi de messages sur Ethernet. Cherchez la différence entre les connexions UDP et TCP/IP.
+1. L'accès direct à la mémoire permet à des périphériques autres que l'unité centrale d'écrire (et de lire) directement dans (à partir de) la mémoire. Pourquoi est-ce une bonne idée ?
+1. Regardez les chiffres de performance du GPU T4 de Turing. Pourquoi les performances doublent-elles "seulement" lorsque vous passez de FP16 à INT8 et INT4 ?
+1. Quel est le temps le plus court que devrait prendre un paquet pour faire un aller-retour entre San Francisco et Amsterdam ? Indice : vous pouvez supposer que la distance est de 10 000 km.
 
 
 [Discussions](https://discuss.d2l.ai/t/363)

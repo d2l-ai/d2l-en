@@ -1,18 +1,18 @@
-# Dog Breed Identification (ImageNet Dogs) on Kaggle
+# Identification de races de chiens (ImageNet Dogs) sur Kaggle
 
-In this section, we will practice
-the dog breed identification problem on
-Kaggle. (**The web address of this competition is https://www.kaggle.com/c/dog-breed-identification**)
+Dans cette section, nous allons pratiquer
+le problème d'identification de races de chiens sur
+Kaggle. (**L'adresse web de cette compétition est https://www.kaggle.com/c/dog-breed-identification**)
 
-In this competition,
-120 different breeds of dogs will be recognized.
-In fact,
-the dataset for this competition is
-a subset of the ImageNet dataset.
-Unlike the images in the CIFAR-10 dataset in :numref:`sec_kaggle_cifar10`,
-the images in the ImageNet dataset are both higher and wider in varying dimensions.
-:numref:`fig_kaggle_dog` shows the information on the competition's webpage. You need a Kaggle account
-to submit your results.
+Dans cette compétition,
+120 races de chiens différentes seront reconnues.
+En fait,
+le jeu de données pour ce concours est
+un sous-ensemble du jeu de données ImageNet.
+Contrairement aux images du jeu de données CIFAR-10 dans :numref:`sec_kaggle_cifar10` ,
+les images du jeu de données ImageNet sont à la fois plus hautes et plus larges dans différentes dimensions.
+:numref:`fig_kaggle_dog` montre les informations sur la page web du concours. Vous avez besoin d'un compte Kaggle
+pour soumettre vos résultats.
 
 
 ![The dog breed identification competition website. The competition dataset can be obtained by clicking the "Data" tab.](../img/kaggle-dog.jpg)
@@ -38,32 +38,32 @@ from torch import nn
 import os
 ```
 
-## Obtaining and Organizing the Dataset
+## Obtention et organisation du jeu de données
 
-The competition dataset is divided into a training set and a test set, which contain 10222 and 10357 JPEG images
-of three RGB (color) channels, respectively.
-Among the training dataset,
-there are 120 breeds of dogs
-such as Labradors, Poodles, Dachshunds, Samoyeds, Huskies, Chihuahuas, and Yorkshire Terriers.
+Le jeu de données de la compétition est divisé en un jeu d'entraînement et un jeu de test, qui contiennent respectivement 10222 et 10357 images JPEG
+de trois canaux RVB (couleur).
+Dans l'ensemble de données d'entraînement,
+il y a 120 races de chiens
+telles que les Labradors, les Caniches, les Teckels, les Samoyèdes, les Huskies, les Chihuahuas et les Yorkshire Terriers.
 
 
-### Downloading the Dataset
+#### Téléchargement de l'ensemble de données
 
-After logging into Kaggle,
-you can click on the "Data" tab on the
-competition webpage shown in :numref:`fig_kaggle_dog` and download the dataset by clicking the "Download All" button.
-After unzipping the downloaded file in `../data`, you will find the entire dataset in the following paths:
+Après vous être connecté à Kaggle,
+vous pouvez cliquer sur l'onglet "Données" sur la page Web de la compétition
+illustrée dans :numref:`fig_kaggle_dog` et télécharger l'ensemble de données en cliquant sur le bouton "Télécharger tout".
+Après avoir décompressé le fichier téléchargé dans `../data`, vous trouverez l'ensemble des données dans les chemins suivants :
 
 * ../data/dog-breed-identification/labels.csv
 * ../data/dog-breed-identification/sample_submission.csv
 * ../data/dog-breed-identification/train
-* ../data/dog-breed-identification/test
+* .../data/dog-breed-identification/test
 
-You may have noticed that the above structure is
-similar to that of the CIFAR-10 competition in :numref:`sec_kaggle_cifar10`, where folders `train/` and `test/` contain training and testing dog images, respectively, and `labels.csv` contains
-the labels for the training images.
-Similarly, to make it easier to get started, [**we provide a small sample of the dataset**] mentioned above: `train_valid_test_tiny.zip`.
-If you are going to use the full dataset for the Kaggle competition, you need to change the `demo` variable below to `False`.
+Vous avez peut-être remarqué que la structure ci-dessus est
+similaire à celle du concours CIFAR-10 dans :numref:`sec_kaggle_cifar10` , où les dossiers `train/` et `test/` contiennent respectivement les images de chiens d'entraînement et de test, et `labels.csv` contient
+les étiquettes des images d'entraînement.
+De même, pour faciliter la prise en main, [**nous fournissons un petit échantillon de l'ensemble de données**] mentionné ci-dessus :`train_valid_test_tiny.zip`.
+Si vous comptez utiliser le jeu de données complet pour le concours Kaggle, vous devez changer la variable `demo` ci-dessous en `False`.
 
 ```{.python .input}
 #@tab all
@@ -72,7 +72,7 @@ d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '0cb91d09b814ecdc07b50f31f8dcad3e81d6a86d')
 
 # If you use the full dataset downloaded for the Kaggle competition, change
-# the variable below to `False`
+# the variable below to `Faux`
 demo = True
 if demo:
     data_dir = d2l.download_extract('dog_tiny')
@@ -80,13 +80,13 @@ else:
     data_dir = os.path.join('..', 'data', 'dog-breed-identification')
 ```
 
-### [**Organizing the Dataset**]
+### [**Organiser l'ensemble de données**]
 
-We can organize the dataset similarly to what we did in :numref:`sec_kaggle_cifar10`, namely splitting out
-a validation set from the original training set, and moving images into subfolders grouped by labels.
+Nous pouvons organiser l'ensemble de données de la même manière que nous l'avons fait dans :numref:`sec_kaggle_cifar10` , à savoir séparer
+un ensemble de validation de l'ensemble d'entraînement original, et déplacer les images dans des sous-dossiers regroupés par étiquettes.
 
-The `reorg_dog_data` function below reads
-the training data labels, splits out the validation set, and organizes the training set.
+La fonction `reorg_dog_data` ci-dessous lit
+les étiquettes des données d'entraînement, sépare l'ensemble de validation et organise l'ensemble d'entraînement.
 
 ```{.python .input}
 #@tab all
@@ -103,14 +103,14 @@ reorg_dog_data(data_dir, valid_ratio)
 
 ## [**Image Augmentation**]
 
-Recall that this dog breed dataset
-is a subset of the ImageNet dataset,
-whose images
-are larger than those of the CIFAR-10 dataset
-in :numref:`sec_kaggle_cifar10`.
-The following
-lists a few image augmentation operations
-that might be useful for relatively larger images.
+Rappelons que cet ensemble de données sur les races de chiens
+est un sous-ensemble de l'ensemble de données ImageNet,
+dont les images
+sont plus grandes que celles de l'ensemble de données CIFAR-10
+dans :numref:`sec_kaggle_cifar10` .
+La liste suivante
+énumère quelques opérations d'augmentation d'image
+qui pourraient être utiles pour des images relativement plus grandes.
 
 ```{.python .input}
 #@tab mxnet
@@ -153,9 +153,9 @@ transform_train = torchvision.transforms.Compose([
                                      [0.229, 0.224, 0.225])])
 ```
 
-During prediction,
-we only use image preprocessing operations
-without randomness.
+Pendant la prédiction,
+nous utilisons uniquement des opérations de prétraitement d'images
+sans caractère aléatoire.
 
 ```{.python .input}
 #@tab mxnet
@@ -179,11 +179,11 @@ transform_test = torchvision.transforms.Compose([
                                      [0.229, 0.224, 0.225])])
 ```
 
-## [**Reading the Dataset**]
+## [**Lire le jeu de données**]
 
-As in :numref:`sec_kaggle_cifar10`,
-we can read the organized dataset
-consisting of raw image files.
+Comme dans :numref:`sec_kaggle_cifar10` ,
+nous pouvons lire le jeu de données organisé
+composé de fichiers d'images brutes.
 
 ```{.python .input}
 #@tab mxnet
@@ -204,9 +204,9 @@ valid_ds, test_ds = [torchvision.datasets.ImageFolder(
     transform=transform_test) for folder in ['valid', 'test']]
 ```
 
-Below we create data iterator instances
-the same way
-as in :numref:`sec_kaggle_cifar10`.
+Ci-dessous, nous créons des instances d'itérateurs de données
+de la même manière
+que dans :numref:`sec_kaggle_cifar10` .
 
 ```{.python .input}
 #@tab mxnet
@@ -236,41 +236,41 @@ test_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,
                                         drop_last=False)
 ```
 
-## [**Fine-Tuning a Pretrained Model**]
+## [**Réglage fin d'un modèle pré-entraîné**]
 
-Again,
-the dataset for this competition is a subset of the ImageNet dataset.
-Therefore, we can use the approach discussed in
-:numref:`sec_fine_tuning`
-to select a model pretrained on the
-full ImageNet dataset and use it to extract image features to be fed into a
-custom small-scale output network.
-High-level APIs of deep learning frameworks
-provide a wide range of models
-pretrained on the ImageNet dataset.
-Here, we choose
-a pretrained ResNet-34 model,
-where we simply reuse
-the input of this model's output layer
-(i.e., the extracted
-features).
-Then we can replace the original output layer with a small custom
-output network that can be trained,
-such as stacking two
-fully connected layers.
-Different from the experiment in
-:numref:`sec_fine_tuning`,
-the following does
-not retrain the pretrained model used for feature
-extraction. This reduces training time and
-memory for storing gradients.
+Encore une fois,
+le jeu de données pour cette compétition est un sous-ensemble du jeu de données ImageNet.
+Par conséquent, nous pouvons utiliser l'approche décrite à l'adresse
+:numref:`sec_fine_tuning` 
+ pour sélectionner un modèle pré-entraîné sur le jeu de données ImageNet complet
+et l'utiliser pour extraire des caractéristiques d'image à introduire dans un réseau de sortie personnalisé à petite échelle
+.
+Les API de haut niveau des cadres d'apprentissage profond
+fournissent un large éventail de modèles
+pré-entraînés sur le jeu de données ImageNet.
+Ici, nous choisissons
+un modèle ResNet-34 pré-entraîné,
+où nous réutilisons simplement
+l'entrée de la couche de sortie de ce modèle
+(c'est-à-dire les caractéristiques extraites
+).
+Nous pouvons ensuite remplacer la couche de sortie d'origine par un petit réseau de sortie personnalisé
+qui peut être entraîné,
+tel que l'empilement de deux couches entièrement connectées
+.
+Contrairement à l'expérience menée sur
+:numref:`sec_fine_tuning` ,
+, l'expérience suivante
+ne réentraîne pas le modèle pré-entraîné utilisé pour l'extraction des caractéristiques
+. Cela réduit le temps d'entraînement et la mémoire
+pour le stockage des gradients.
 
-Recall that we
-standardized images using
-the means and standard deviations of the three RGB channels for the full ImageNet dataset.
-In fact,
-this is also consistent with the standardization operation
-by the pretrained model on ImageNet.
+Rappelez-vous que nous avons normalisé
+les images en utilisant
+les moyennes et les écarts types des trois canaux RVB pour l'ensemble complet de données ImageNet.
+En fait,
+cela est également cohérent avec l'opération de normalisation
+effectuée par le modèle pré-entraîné sur ImageNet.
 
 ```{.python .input}
 #@tab mxnet
@@ -305,9 +305,9 @@ def get_net(devices):
     return finetune_net
 ```
 
-Before [**calculating the loss**],
-we first obtain the input of the pretrained model's output layer, i.e., the extracted feature.
-Then we use this feature as input for our small custom output network to calculate the loss.
+Avant de [**calculer la perte**],
+nous obtenons d'abord l'entrée de la couche de sortie du modèle pré-entraîné, c'est-à-dire la caractéristique extraite.
+Ensuite, nous utilisons cette caractéristique comme entrée pour notre petit réseau de sortie personnalisé afin de calculer la perte.
 
 ```{.python .input}
 #@tab mxnet
@@ -341,10 +341,10 @@ def evaluate_loss(data_iter, net, devices):
     return l_sum / n
 ```
 
-## Defining [**the Training Function**]
+## Définir [**la fonction d'entraînement**]
 
-We will select the model and tune hyperparameters according to the model's performance on the validation set. The model training function `train` only
-iterates parameters of the small custom output network.
+Nous allons sélectionner le modèle et régler les hyperparamètres en fonction des performances du modèle sur l'ensemble de validation. La fonction d'entraînement du modèle `train` ne fait que
+itérer les paramètres du petit réseau de sortie personnalisé.
 
 ```{.python .input}
 #@tab mxnet
@@ -432,11 +432,11 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           f' examples/sec on {str(devices)}')
 ```
 
-## [**Training and Validating the Model**]
+## [**Formation et validation du modèle**]
 
-Now we can train and validate the model.
-The following hyperparameters are all tunable.
-For example, the number of epochs can be increased. Because `lr_period` and `lr_decay` are set to 2 and 0.9, respectively, the learning rate of the optimization algorithm will be multiplied by 0.9 after every 2 epochs.
+Nous pouvons maintenant former et valider le modèle.
+Les hyperparamètres suivants sont tous réglables.
+Par exemple, le nombre d'époques peut être augmenté. Comme `lr_period` et `lr_decay` sont respectivement définis sur 2 et 0,9, le taux d'apprentissage de l'algorithme d'optimisation sera multiplié par 0,9 toutes les 2 époques.
 
 ```{.python .input}
 #@tab mxnet
@@ -455,13 +455,13 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
 
-## [**Classifying the Testing Set**] and Submitting Results on Kaggle
+## [**Classifier l'ensemble de test**] et soumettre les résultats sur Kaggle
 
 
-Similar to the final step in :numref:`sec_kaggle_cifar10`,
-in the end all the labeled data (including the validation set) are used for training the model and classifying the testing set.
-We will use the trained custom output network
-for classification.
+ Similaire à l'étape finale dans :numref:`sec_kaggle_cifar10` ,
+à la fin toutes les données étiquetées (y compris l'ensemble de validation) sont utilisées pour l'entraînement du modèle et la classification de l'ensemble de test.
+Nous utiliserons le réseau de sortie personnalisé formé
+pour la classification.
 
 ```{.python .input}
 #@tab mxnet
@@ -503,23 +503,23 @@ with open('submission.csv', 'w') as f:
             [str(num) for num in output]) + '\n')
 ```
 
-The above code
-will generate a `submission.csv` file
-to be submitted
-to Kaggle in the same way described in :numref:`sec_kaggle_house`.
+Le code ci-dessus
+va générer un fichier `submission.csv`
+ à soumettre
+à Kaggle de la même manière que celle décrite dans :numref:`sec_kaggle_house` .
 
 
-## Summary
+## Résumé
 
 
-* Images in the ImageNet dataset are larger (with varying dimensions) than CIFAR-10 images. We may modify image augmentation operations for tasks on a different dataset.
-* To classify a subset of the ImageNet dataset, we can leverage pre-trained models on the full ImageNet dataset to extract features and only train a custom small-scale output network. This will lead to less computational time and memory cost.
+ * Les images de l'ensemble de données ImageNet sont plus grandes (avec des dimensions variables) que les images CIFAR-10. Nous pouvons modifier les opérations d'augmentation d'image pour des tâches sur un jeu de données différent.
+* Pour classer un sous-ensemble du jeu de données ImageNet, nous pouvons utiliser des modèles pré-entraînés sur l'ensemble du jeu de données ImageNet pour extraire des caractéristiques et n'entraîner qu'un réseau de sortie personnalisé à petite échelle. Cela permettra de réduire le temps de calcul et le coût de la mémoire.
 
 
-## Exercises
+## Exercices
 
-1. When using the full Kaggle competition dataset, what results can you achieve when you increase `batch_size` (batch size) and `num_epochs` (number of epochs) while setting some other hyperparameters as `lr = 0.01`, `lr_period = 10`, and `lr_decay = 0.1`?
-1. Do you get better results if you use a deeper pretrained model? How do you tune hyperparameters? Can you further improve the results?
+1. En utilisant le jeu de données complet de la compétition Kaggle, quels résultats pouvez-vous obtenir en augmentant `batch_size` (taille du lot) et `num_epochs` (nombre d'époques) tout en fixant d'autres hyperparamètres comme `lr = 0.01`, `lr_period = 10` et `lr_decay = 0.1`?
+1. Obtenez-vous de meilleurs résultats si vous utilisez un modèle pré-entraîné plus profond ? Comment ajuster les hyperparamètres ? Pouvez-vous encore améliorer les résultats ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/380)

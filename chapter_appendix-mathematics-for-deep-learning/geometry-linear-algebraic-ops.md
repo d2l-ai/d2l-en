@@ -303,8 +303,8 @@ can be separated cleanly by hyperplanes.
 To give a hand-built example, notice that we can produce a reasonable model
 to classify tiny images of t-shirts and trousers from the Fashion-MNIST dataset
 (seen in :numref:`sec_fashion_mnist`)
-by just taking the vector between their means to define the decision plane
-and eyeball a crude threshold.  First we will load the data and compute the averages.
+en prenant simplement le vecteur entre leurs moyennes pour définir le plan de décision
+et fixer à vue un seuil grossier.  Tout d'abord, nous allons charger les données et calculer les moyennes.
 
 ```{.python .input}
 #@tab mxnet
@@ -370,7 +370,7 @@ ave_0 = tf.reduce_mean(X_train_0, axis=0)
 ave_1 = tf.reduce_mean(X_train_1, axis=0)
 ```
 
-It can be informative to examine these averages in detail, so let's plot what they look like.  In this case, we see that the average indeed resembles a blurry image of a t-shirt.
+Il peut être instructif d'examiner ces moyennes en détail, alors traçons ce à quoi elles ressemblent.  Dans ce cas, nous voyons que la moyenne ressemble effectivement à l'image floue d'un t-shirt.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -388,7 +388,7 @@ d2l.plt.imshow(tf.reshape(ave_0, (28, 28)), cmap='Greys')
 d2l.plt.show()
 ```
 
-In the second case, we again see that the average resembles a blurry image of trousers.
+Dans le deuxième cas, nous constatons à nouveau que la moyenne ressemble à une image floue d'un pantalon.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -404,7 +404,7 @@ d2l.plt.imshow(tf.reshape(ave_1, (28, 28)), cmap='Greys')
 d2l.plt.show()
 ```
 
-In a fully machine learned solution, we would learn the threshold from the dataset.  In this case, I simply eyeballed a threshold that looked good on the training data by hand.
+Dans une solution entièrement automatisée, nous apprendrions le seuil à partir de l'ensemble de données.  Dans ce cas, j'ai simplement fixé à la main un seuil qui semblait bon sur les données d'entraînement.
 
 ```{.python .input}
 #@tab mxnet
@@ -438,17 +438,17 @@ tf.reduce_mean(
     tf.cast(tf.cast(predictions, y_test.dtype) == y_test, tf.float32))
 ```
 
-## Geometry of Linear Transformations
+## Géométrie des transformations linéaires
 
-Through :numref:`sec_linear-algebra` and the above discussions,
-we have a solid understanding of the geometry of vectors, lengths, and angles.
-However, there is one important object we have omitted discussing,
-and that is a geometric understanding of linear transformations represented by matrices.  Fully internalizing what matrices can do to transform data
-between two potentially different high dimensional spaces takes significant practice,
-and is beyond the scope of this appendix.
-However, we can start building up intuition in two dimensions.
+Grâce à :numref:`sec_linear-algebra` et aux discussions ci-dessus,
+nous avons une solide compréhension de la géométrie des vecteurs, des longueurs et des angles.
+Cependant, il y a un objet important que nous avons omis de discuter,
+et c'est la compréhension géométrique des transformations linéaires représentées par des matrices.  L'intériorisation complète de ce que les matrices peuvent faire pour transformer des données
+entre deux espaces de haute dimension potentiellement différents demande une pratique importante,
+et dépasse le cadre de cette annexe.
+Cependant, nous pouvons commencer à développer une intuition en deux dimensions.
 
-Suppose that we have some matrix:
+Supposons que nous ayons une certaine matrice :
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -456,9 +456,9 @@ a & b \\ c & d
 \end{bmatrix}.
 $$
 
-If we want to apply this to an arbitrary vector
-$\mathbf{v} = [x, y]^\top$,
-we multiply and see that
+Si nous voulons l'appliquer à un vecteur arbitraire
+$\mathbf{v} = [x, y]^\top$ ,
+nous multiplions et voyons que
 
 $$
 \begin{aligned}
@@ -469,21 +469,21 @@ $$
 \end{aligned}
 $$
 
-This may seem like an odd computation,
-where something clear became somewhat impenetrable.
-However, it tells us that we can write the way
-that a matrix transforms *any* vector
-in terms of how it transforms *two specific vectors*:
-$[1,0]^\top$ and $[0,1]^\top$.
-This is worth considering for a moment.
-We have essentially reduced an infinite problem
-(what happens to any pair of real numbers)
-to a finite one (what happens to these specific vectors).
-These vectors are an example a *basis*,
-where we can write any vector in our space
-as a weighted sum of these *basis vectors*.
+Cela peut sembler être un calcul étrange,
+où quelque chose de clair est devenu quelque peu impénétrable.
+Cependant, il nous indique que nous pouvons écrire la manière dont
+une matrice transforme *n'importe quel* vecteur
+en fonction de la manière dont elle transforme *deux vecteurs spécifiques* :
+$[1,0]^\top$ et $[0,1]^\top$.
+Cela vaut la peine de s'y attarder un instant.
+Nous avons essentiellement réduit un problème infini
+(ce qui arrive à toute paire de nombres réels)
+à un problème fini (ce qui arrive à ces vecteurs spécifiques).
+Ces vecteurs sont un exemple de *base*,
+où nous pouvons écrire tout vecteur dans notre espace
+comme une somme pondérée de ces *vecteurs de base*.
 
-Let's draw what happens when we use the specific matrix
+Dessinons ce qui se passe lorsque nous utilisons la matrice spécifique
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -492,26 +492,26 @@ $$
 \end{bmatrix}.
 $$
 
-If we look at the specific vector $\mathbf{v} = [2, -1]^\top$,
-we see this is $2\cdot[1,0]^\top + -1\cdot[0,1]^\top$,
-and thus we know that the matrix $A$ will send this to
+Si nous regardons le vecteur spécifique $\mathbf{v} = [2, -1]^\top$,
+nous voyons qu'il s'agit de $2\cdot[1,0]^\top + -1\cdot[0,1]^\top$,
+et donc nous savons que la matrice $A$ enverra ceci à
 $2(\mathbf{A}[1,0]^\top) + -1(\mathbf{A}[0,1])^\top = 2[1, -1]^\top - [2,3]^\top = [0, -5]^\top$.
-If we follow this logic through carefully,
-say by considering the grid of all integer pairs of points,
-we see that what happens is that the matrix multiplication
-can skew, rotate, and scale the grid,
-but the grid structure must remain as you see in :numref:`fig_grid-transform`.
+Si nous suivons cette logique avec attention,
+, par exemple en considérant la grille de toutes les paires de points entiers,
+, nous constatons que la multiplication matricielle
+peut incliner, faire pivoter et mettre à l'échelle la grille,
+, mais la structure de la grille doit rester telle que vous la voyez sur :numref:`fig_grid-transform` .
 
 ![The matrix $\mathbf{A}$ acting on the given basis vectors.  Notice how the entire grid is transported along with it.](../img/grid-transform.svg)
 :label:`fig_grid-transform`
 
-This is the most important intuitive point
-to internalize about linear transformations represented by matrices.
-Matrices are incapable of distorting some parts of space differently than others.
-All they can do is take the original coordinates on our space
-and skew, rotate, and scale them.
+C'est le point intuitif le plus important
+à intérioriser à propos des transformations linéaires représentées par des matrices.
+Les matrices sont incapables de déformer certaines parties de l'espace différemment des autres.
+Tout ce qu'elles peuvent faire, c'est prendre les coordonnées originales de notre espace
+et les incliner, les faire pivoter et les mettre à l'échelle.
 
-Some distortions can be severe.  For instance the matrix
+Certaines distorsions peuvent être graves.  Par exemple, la matrice
 
 $$
 \mathbf{B} = \begin{bmatrix}
@@ -519,24 +519,24 @@ $$
 \end{bmatrix},
 $$
 
-compresses the entire two-dimensional plane down to a single line.
-Identifying and working with such transformations are the topic of a later section,
-but geometrically we can see that this is fundamentally different
-from the types of transformations we saw above.
-For instance, the result from matrix $\mathbf{A}$ can be "bent back" to the original grid.  The results from matrix $\mathbf{B}$ cannot
-because we will never know where the vector $[1,2]^\top$ came from---was
-it $[1,1]^\top$ or $[0, -1]^\top$?
+comprime l'ensemble du plan bidimensionnel en une seule ligne.
+L'identification et l'utilisation de telles transformations font l'objet d'une section ultérieure,
+mais, d'un point de vue géométrique, nous pouvons constater que ces transformations sont fondamentalement différentes
+des types de transformations que nous avons vus précédemment.
+Par exemple, le résultat de la matrice $\mathbf{A}$ peut être "replié" sur la grille d'origine.  Les résultats de la matrice $\mathbf{B}$ ne peuvent pas l'être
+car nous ne saurons jamais d'où vient le vecteur $[1,2]^\top$ - est-ce que
+était $[1,1]^\top$ ou $[0, -1]^\top$?
 
-While this picture was for a $2\times2$ matrix,
-nothing prevents us from taking the lessons learned into higher dimensions.
-If we take similar basis vectors like $[1,0, \ldots,0]$
-and see where our matrix sends them,
-we can start to get a feeling for how the matrix multiplication
-distorts the entire space in whatever dimension space we are dealing with.
+Bien que cette image concerne une matrice $2\times2$,
+rien ne nous empêche de transposer les leçons apprises à des dimensions supérieures.
+Si nous prenons des vecteurs de base similaires comme $[1,0, \ldots,0]$
+ et que nous voyons où notre matrice les envoie,
+nous pouvons commencer à avoir une idée de la façon dont la multiplication matricielle
+déforme l'espace entier dans n'importe quel espace de dimension avec lequel nous travaillons.
 
-## Linear Dependence
+## Dépendance linéaire
 
-Consider again the matrix
+Considérons à nouveau la matrice
 
 $$
 \mathbf{B} = \begin{bmatrix}
@@ -544,66 +544,66 @@ $$
 \end{bmatrix}.
 $$
 
-This compresses the entire plane down to live on the single line $y = 2x$.
-The question now arises: is there some way we can detect this
-just looking at the matrix itself?
-The answer is that indeed we can.
-Let's take $\mathbf{b}_1 = [2,4]^\top$ and $\mathbf{b}_2 = [-1, -2]^\top$
-be the two columns of $\mathbf{B}$.
-Remember that we can write everything transformed by the matrix $\mathbf{B}$
-as a weighted sum of the columns of the matrix:
-like $a_1\mathbf{b}_1 + a_2\mathbf{b}_2$.
-We call this a *linear combination*.
-The fact that $\mathbf{b}_1 = -2\cdot\mathbf{b}_2$
-means that we can write any linear combination of those two columns
-entirely in terms of say $\mathbf{b}_2$ since
+Cela comprime le plan entier pour qu'il vive sur la seule ligne $y = 2x$.
+La question qui se pose maintenant est la suivante : existe-t-il un moyen de détecter ce phénomène
+simplement en regardant la matrice elle-même ?
+La réponse est qu'en effet, nous le pouvons.
+Prenons $\mathbf{b}_1 = [2,4]^\top$ et $\mathbf{b}_2 = [-1, -2]^\top$
+ comme les deux colonnes de $\mathbf{B}$.
+Rappelez-vous que nous pouvons écrire tout ce qui est transformé par la matrice $\mathbf{B}$
+ comme une somme pondérée des colonnes de la matrice :
+comme $a_1\mathbf{b}_1 + a_2\mathbf{b}_2$.
+Nous appelons cela une *combinaison linéaire*.
+Le fait que $\mathbf{b}_1 = -2\cdot\mathbf{b}_2$
+ signifie que nous pouvons écrire toute combinaison linéaire de ces deux colonnes
+entièrement en termes de disons $\mathbf{b}_2$ puisque
 
 $$
 a_1\mathbf{b}_1 + a_2\mathbf{b}_2 = -2a_1\mathbf{b}_2 + a_2\mathbf{b}_2 = (a_2-2a_1)\mathbf{b}_2.
 $$
 
-This means that one of the columns is, in a sense, redundant
-because it does not define a unique direction in space.
-This should not surprise us too much
-since we already saw that this matrix
-collapses the entire plane down into a single line.
-Moreover, we see that the linear dependence
-$\mathbf{b}_1 = -2\cdot\mathbf{b}_2$ captures this.
-To make this more symmetrical between the two vectors, we will write this as
+Cela signifie que l'une des colonnes est, en un sens, redondante
+car elle ne définit pas une direction unique dans l'espace.
+Cela ne devrait pas trop nous surprendre
+puisque nous avons déjà vu que cette matrice
+réduit le plan entier à une seule ligne.
+De plus, nous voyons que la dépendance linéaire
+$\mathbf{b}_1 = -2\cdot\mathbf{b}_2$ rend compte de cela.
+Pour rendre cela plus symétrique entre les deux vecteurs, nous l'écrirons comme suit
 
 $$
 \mathbf{b}_1  + 2\cdot\mathbf{b}_2 = 0.
 $$
 
-In general, we will say that a collection of vectors
-$\mathbf{v}_1, \ldots, \mathbf{v}_k$ are *linearly dependent*
-if there exist coefficients $a_1, \ldots, a_k$ *not all equal to zero* so that
+En général, nous dirons qu'un ensemble de vecteurs
+$\mathbf{v}_1, \ldots, \mathbf{v}_k$ sont *linéairement dépendants*
+s'il existe des coefficients $a_1, \ldots, a_k$ *non égaux à zéro* de sorte que
 
 $$
 \sum_{i=1}^k a_i\mathbf{v_i} = 0.
 $$
 
-In this case, we can solve for one of the vectors
-in terms of some combination of the others,
-and effectively render it redundant.
-Thus, a linear dependence in the columns of a matrix
-is a witness to the fact that our matrix
-is compressing the space down to some lower dimension.
-If there is no linear dependence we say the vectors are *linearly independent*.
-If the columns of a matrix are linearly independent,
-no compression occurs and the operation can be undone.
+Dans ce cas, nous pouvons résoudre l'un des vecteurs
+en fonction d'une combinaison des autres,
+et le rendre effectivement redondant.
+Ainsi, une dépendance linéaire dans les colonnes d'une matrice
+témoigne du fait que notre matrice
+comprime l'espace à une dimension inférieure.
+S'il n'y a pas de dépendance linéaire, on dit que les vecteurs sont *linéairement indépendants*.
+Si les colonnes d'une matrice sont linéairement indépendantes,
+aucune compression ne se produit et l'opération peut être annulée.
 
-## Rank
+## Rang
 
-If we have a general $n\times m$ matrix,
-it is reasonable to ask what dimension space the matrix maps into.
-A concept known as the *rank* will be our answer.
-In the previous section, we noted that a linear dependence
-bears witness to compression of space into a lower dimension
-and so we will be able to use this to define the notion of rank.
-In particular, the rank of a matrix $\mathbf{A}$
-is the largest number of linearly independent columns
-amongst all subsets of columns. For example, the matrix
+Si nous avons une matrice générale $n\times m$,
+il est raisonnable de se demander dans quel espace de dimension la matrice s'applique.
+Un concept connu sous le nom de *rank* sera notre réponse.
+Dans la section précédente, nous avons noté qu'une dépendance linéaire
+témoigne de la compression de l'espace dans une dimension inférieure
+et nous pourrons donc utiliser cela pour définir la notion de rang.
+En particulier, le rang d'une matrice $\mathbf{A}$
+ est le plus grand nombre de colonnes linéairement indépendantes
+parmi tous les sous-ensembles de colonnes. Par exemple, la matrice
 
 $$
 \mathbf{B} = \begin{bmatrix}
@@ -611,9 +611,9 @@ $$
 \end{bmatrix},
 $$
 
-has $\mathrm{rank}(B)=1$, since the two columns are linearly dependent,
-but either column by itself is not linearly dependent.
-For a more challenging example, we can consider
+a $\mathrm{rank}(B)=1$, puisque les deux colonnes sont linéairement dépendantes,
+mais aucune des deux colonnes n'est linéairement dépendante.
+Pour un exemple plus difficile, nous pouvons considérer
 
 $$
 \mathbf{C} = \begin{bmatrix}
@@ -624,24 +624,24 @@ $$
 \end{bmatrix},
 $$
 
-and show that $\mathbf{C}$ has rank two since, for instance,
-the first two columns are linearly independent,
-however any of the four collections of three columns are dependent.
+et montrer que $\mathbf{C}$ a le rang deux puisque, par exemple,
+les deux premières colonnes sont linéairement indépendantes,
+mais n'importe laquelle des quatre collections de trois colonnes est dépendante.
 
-This procedure, as described, is very inefficient.
-It requires looking at every subset of the columns of our given matrix,
-and thus is potentially exponential in the number of columns.
-Later we will see a more computationally efficient way
-to compute the rank of a matrix, but for now,
-this is sufficient to see that the concept
-is well defined and understand the meaning.
+Cette procédure, telle qu'elle est décrite, est très inefficace.
+Elle nécessite de regarder chaque sous-ensemble de colonnes de notre matrice donnée,
+et est donc potentiellement exponentielle en nombre de colonnes.
+Nous verrons plus tard une méthode plus efficace
+pour calculer le rang d'une matrice, mais pour l'instant,
+ceci est suffisant pour voir que le concept
+est bien défini et comprendre sa signification.
 
-## Invertibility
+## Invertibilité
 
-We have seen above that multiplication by a matrix with linearly dependent columns
-cannot be undone, i.e., there is no inverse operation that can always recover the input.  However, multiplication by a full-rank matrix
-(i.e., some $\mathbf{A}$ that is $n \times n$ matrix with rank $n$),
-we should always be able to undo it.  Consider the matrix
+Nous avons vu ci-dessus que la multiplication par une matrice avec des colonnes linéairement dépendantes
+ne peut pas être annulée, c'est-à-dire qu'il n'y a pas d'opération inverse qui puisse toujours récupérer l'entrée.  Cependant, la multiplication par une matrice de rang complet
+(c'est-à-dire une certaine $\mathbf{A}$ qui est $n \times n$ matrice de rang $n$),
+devrait toujours pouvoir être annulée.  Considérons la matrice
 
 $$
 \mathbf{I} = \begin{bmatrix}
@@ -652,23 +652,23 @@ $$
 \end{bmatrix}.
 $$
 
-which is the matrix with ones along the diagonal, and zeros elsewhere.
-We call this the *identity* matrix.
-It is the matrix which leaves our data unchanged when applied.
-To find a matrix which undoes what our matrix $\mathbf{A}$ has done,
-we want to find a matrix $\mathbf{A}^{-1}$ such that
+qui est la matrice avec des uns le long de la diagonale et des zéros ailleurs.
+Nous l'appelons la matrice *identité*.
+C'est la matrice qui laisse nos données inchangées lorsqu'elle est appliquée.
+Pour trouver une matrice qui défait ce que notre matrice $\mathbf{A}$ a fait,
+nous voulons trouver une matrice $\mathbf{A}^{-1}$ telle que
 
 $$
 \mathbf{A}^{-1}\mathbf{A} = \mathbf{A}\mathbf{A}^{-1} =  \mathbf{I}.
 $$
 
-If we look at this as a system, we have $n \times n$ unknowns
-(the entries of $\mathbf{A}^{-1}$) and $n \times n$ equations
-(the equality that needs to hold between every entry of the product $\mathbf{A}^{-1}\mathbf{A}$ and every entry of $\mathbf{I}$)
-so we should generically expect a solution to exist.
-Indeed, in the next section we will see a quantity called the *determinant*,
-which has the property that as long as the determinant is not zero, we can find a solution.  We call such a matrix $\mathbf{A}^{-1}$ the *inverse* matrix.
-As an example, if $\mathbf{A}$ is the general $2 \times 2$ matrix
+Si nous considérons ceci comme un système, nous avons $n \times n$ inconnues
+(les entrées de $\mathbf{A}^{-1}$) et $n \times n$ équations
+(l'égalité qui doit exister entre chaque entrée du produit $\mathbf{A}^{-1}\mathbf{A}$ et chaque entrée de $\mathbf{I}$)
+donc nous devrions généralement nous attendre à ce qu'une solution existe.
+En effet, dans la section suivante, nous verrons une quantité appelée le *déterminant*,
+qui a la propriété que tant que le déterminant n'est pas nul, nous pouvons trouver une solution.  Nous appelons une telle matrice $\mathbf{A}^{-1}$ la matrice *inverse*.
+A titre d'exemple, si $\mathbf{A}$ est la matrice générale $2 \times 2$
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -677,7 +677,7 @@ c & d
 \end{bmatrix},
 $$
 
-then we can see that the inverse is
+alors nous pouvons voir que l'inverse est
 
 $$
  \frac{1}{ad-bc}  \begin{bmatrix}
@@ -686,8 +686,8 @@ d & -b \\
 \end{bmatrix}.
 $$
 
-We can test to see this by seeing that multiplying
-by the inverse given by the formula above works in practice.
+Nous pouvons tester cela en voyant que la multiplication de
+par l'inverse donné par la formule ci-dessus fonctionne en pratique.
 
 ```{.python .input}
 #@tab mxnet
@@ -710,55 +710,55 @@ M_inv = tf.constant([[2, -1], [-0.5, 0.5]])
 tf.matmul(M_inv, M)
 ```
 
-### Numerical Issues
-While the inverse of a matrix is useful in theory,
-we must say that most of the time we do not wish
-to *use* the matrix inverse to solve a problem in practice.
-In general, there are far more numerically stable algorithms
-for solving linear equations like
+### Problèmes numériques
+Bien que l'inverse d'une matrice soit utile en théorie,
+nous devons dire que la plupart du temps nous ne souhaitons pas
+*utiliser* l'inverse de la matrice pour résoudre un problème en pratique.
+En général, il existe des algorithmes beaucoup plus stables numériquement
+pour résoudre des équations linéaires telles que
 
 $$
 \mathbf{A}\mathbf{x} = \mathbf{b},
 $$
 
-than computing the inverse and multiplying to get
+que de calculer l'inverse et de multiplier pour obtenir
 
 $$
 \mathbf{x} = \mathbf{A}^{-1}\mathbf{b}.
 $$
 
-Just as division by a small number can lead to numerical instability,
-so can inversion of a matrix which is close to having low rank.
+De même que la division par un petit nombre peut conduire à une instabilité numérique,
+peut également conduire à l'inversion d'une matrice qui est proche d'avoir un rang bas.
 
-Moreover, it is common that the matrix $\mathbf{A}$ is *sparse*,
-which is to say that it contains only a small number of non-zero values.
-If we were to explore examples, we would see
-that this does not mean the inverse is sparse.
-Even if $\mathbf{A}$ was a $1$ million by $1$ million matrix
-with only $5$ million non-zero entries
-(and thus we need only store those $5$ million),
-the inverse will typically have almost every entry non-negative,
-requiring us to store all $1\text{M}^2$ entries---that is $1$ trillion entries!
+De plus, il est courant que la matrice $\mathbf{A}$ soit *sparse*,
+c'est-à-dire qu'elle ne contienne qu'un petit nombre de valeurs non nulles.
+Si nous devions explorer des exemples, nous verrions
+que cela ne signifie pas que l'inverse est clairsemé.
+Même si $\mathbf{A}$ était une matrice $1$ million par $1$ million
+avec seulement $5$ million d'entrées non nulles
+(et que nous n'avions donc besoin de stocker que ces $5$ millions),
+l'inverse aura typiquement presque chaque entrée non négative,
+nous obligeant à stocker toutes les $1\text{M}^2$ entrées--soit $1$ trillion d'entrées !
 
-While we do not have time to dive all the way into the thorny numerical issues
-frequently encountered when working with linear algebra,
-we want to provide you with some intuition about when to proceed with caution,
-and generally avoiding inversion in practice is a good rule of thumb.
+Bien que nous n'ayons pas le temps de nous plonger dans les problèmes numériques épineux
+que l'on rencontre fréquemment lorsqu'on travaille avec l'algèbre linéaire,
+nous voulons vous donner une idée de quand il faut procéder avec prudence,
+et en général, éviter l'inversion en pratique est une bonne règle empirique.
 
-## Determinant
-The geometric view of linear algebra gives an intuitive way
-to interpret a fundamental quantity known as the *determinant*.
-Consider the grid image from before, but now with a highlighted region (:numref:`fig_grid-filled`).
+## Déterminant
+La vision géométrique de l'algèbre linéaire donne une manière intuitive
+d'interpréter une quantité fondamentale connue sous le nom de *déterminant*.
+Reprenez l'image de la grille précédente, mais avec une région en surbrillance (:numref:`fig_grid-filled` ).
 
 ![The matrix $\mathbf{A}$ again distorting the grid.  This time, I want to draw particular attention to what happens to the highlighted square.](../img/grid-transform-filled.svg)
 :label:`fig_grid-filled`
 
-Look at the highlighted square.  This is a square with edges given
-by $(0, 1)$ and $(1, 0)$ and thus it has area one.
-After $\mathbf{A}$ transforms this square,
-we see that it becomes a parallelogram.
-There is no reason this parallelogram should have the same area
-that we started with, and indeed in the specific case shown here of
+Regardez le carré en surbrillance.  Il s'agit d'un carré dont les bords sont donnés à
+par $(0, 1)$ et $(1, 0)$ et qui a donc une aire de 1.
+Après que $\mathbf{A}$ ait transformé ce carré,
+nous voyons qu'il devient un parallélogramme.
+Il n'y a aucune raison pour que ce parallélogramme ait la même aire
+que celle de départ, et en effet, dans le cas spécifique montré ici de
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -767,10 +767,10 @@ $$
 \end{bmatrix},
 $$
 
-it is an exercise in coordinate geometry to compute
-the area of this parallelogram and obtain that the area is $5$.
+c'est un exercice de géométrie des coordonnées pour calculer
+l'aire de ce parallélogramme et obtenir que l'aire est $5$.
 
-In general, if we have a matrix
+En général, si nous avons une matrice
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -779,11 +779,11 @@ c & d
 \end{bmatrix},
 $$
 
-we can see with some computation that the area
-of the resulting parallelogram is $ad-bc$.
-This area is referred to as the *determinant*.
+nous pouvons voir, après quelques calculs, que l'aire
+du parallélogramme résultant est $ad-bc$.
+Cette aire est appelée le *déterminant*.
 
-Let's check this quickly with some example code.
+Vérifions cela rapidement à l'aide d'un exemple de code.
 
 ```{.python .input}
 #@tab mxnet
@@ -801,15 +801,15 @@ torch.det(torch.tensor([[1, -1], [2, 3]], dtype=torch.float32))
 tf.linalg.det(tf.constant([[1, -1], [2, 3]], dtype=tf.float32))
 ```
 
-The eagle-eyed amongst us will notice
-that this expression can be zero or even negative.
-For the negative term, this is a matter of convention
-taken generally in mathematics:
-if the matrix flips the figure,
-we say the area is negated.
-Let's see now that when the determinant is zero, we learn more.
+Les plus attentifs d'entre nous remarqueront
+que cette expression peut être nulle ou même négative.
+Pour le terme négatif, il s'agit d'une question de convention
+prise généralement en mathématiques :
+si la matrice renverse la figure,
+nous disons que l'aire est niée.
+Voyons maintenant que lorsque le déterminant est nul, nous en apprenons davantage.
 
-Let's consider
+Considérons
 
 $$
 \mathbf{B} = \begin{bmatrix}
@@ -817,95 +817,95 @@ $$
 \end{bmatrix}.
 $$
 
-If we compute the determinant of this matrix,
-we get $2\cdot(-2 ) - 4\cdot(-1) = 0$.
-Given our understanding above, this makes sense.
-$\mathbf{B}$ compresses the square from the original image
-down to a line segment, which has zero area.
-And indeed, being compressed into a lower dimensional space
-is the only way to have zero area after the transformation.
-Thus we see the following result is true:
-a matrix $A$ is invertible if and only if
-the determinant is not equal to zero.
+Si nous calculons le déterminant de cette matrice,
+, nous obtenons $2\cdot(-2 ) - 4\cdot(-1) = 0$.
+Étant donné ce que nous avons compris ci-dessus, cela a du sens.
+$\mathbf{B}$ compresse le carré de l'image originale
+en un segment de ligne, qui a une surface nulle.
+Et en effet, être compressé dans un espace de dimension inférieure
+est la seule façon d'avoir une surface nulle après la transformation.
+Nous voyons donc que le résultat suivant est vrai :
+une matrice $A$ est inversible si et seulement si
+le déterminant n'est pas égal à zéro.
 
-As a final comment, imagine that we have any figure drawn on the plane.
-Thinking like computer scientists, we can decompose
-that figure into a collection of little squares
-so that the area of the figure is in essence
-just the number of squares in the decomposition.
-If we now transform that figure by a matrix,
-we send each of these squares to parallelograms,
-each one of which has area given by the determinant.
-We see that for any figure, the determinant gives the (signed) number
-that a matrix scales the area of any figure.
+Pour terminer, imaginons que nous ayons une figure quelconque dessinée sur le plan.
+En pensant comme des informaticiens, nous pouvons décomposer
+cette figure en une collection de petits carrés
+de sorte que l'aire de la figure est essentiellement
+juste le nombre de carrés dans la décomposition.
+Si nous transformons maintenant cette figure par une matrice,
+nous transformons chacun de ces carrés en parallélogrammes,
+dont l'aire est donnée par le déterminant.
+Nous voyons que pour toute figure, le déterminant donne le nombre (signé)
+qu'une matrice met à l'échelle l'aire de toute figure.
 
-Computing determinants for larger matrices can be laborious,
-but the  intuition is the same.
-The determinant remains the factor
-that $n\times n$ matrices scale $n$-dimensional volumes.
+Le calcul des déterminants pour des matrices plus grandes peut être laborieux,
+mais l'intuition est la même.
+Le déterminant reste le facteur
+que $n\times n$ les matrices mettent à l'échelle $n$-dimensions.
 
-## Tensors and Common Linear Algebra Operations
+## Tenseurs et opérations courantes d'algèbre linéaire
 
-In :numref:`sec_linear-algebra` the concept of tensors was introduced.
-In this section, we will dive more deeply into tensor contractions
-(the tensor equivalent of matrix multiplication),
-and see how it can provide a unified view
-on a number of matrix and vector operations.
+Dans :numref:`sec_linear-algebra` , nous avons introduit le concept de tenseurs.
+Dans cette section, nous allons nous plonger plus profondément dans les contractions tensorielles
+(l'équivalent tensoriel de la multiplication matricielle),
+et voir comment elles peuvent fournir une vue unifiée
+sur un certain nombre d'opérations matricielles et vectorielles.
 
-With matrices and vectors we knew how to multiply them to transform data.
-We need to have a similar definition for tensors if they are to be useful to us.
-Think about matrix multiplication:
+Avec les matrices et les vecteurs, nous savions comment les multiplier pour transformer les données.
+Nous devons avoir une définition similaire pour les tenseurs si nous voulons qu'ils nous soient utiles.
+Pensez à la multiplication matricielle :
 
 $$
 \mathbf{C} = \mathbf{A}\mathbf{B},
 $$
 
-or equivalently
+ou de manière équivalente
 
-$$ c_{i, j} = \sum_{k} a_{i, k}b_{k, j}.$$
+$$ c_{i, j} = \sum_{k} a_{i, k}b_{k, j}.$$ 
 
-This pattern is one we can repeat for tensors.
-For tensors, there is no one case of what
-to sum over that can be universally chosen,
-so we need specify exactly which indices we want to sum over.
-For instance we could consider
+ Nous pouvons répéter ce schéma pour les tenseurs.
+Pour les tenseurs, il n'y a pas de cas unique sur lequel
+additionner qui puisse être choisi universellement,
+. Nous devons donc spécifier exactement les indices sur lesquels nous voulons additionner.
+Par exemple, nous pourrions considérer
 
 $$
 y_{il} = \sum_{jk} x_{ijkl}a_{jk}.
 $$
 
-Such a transformation is called a *tensor contraction*.
-It can represent a far more flexible family of transformations
-that matrix multiplication alone.
+Une telle transformation est appelée une *contraction de tenseurs*.
+Elle peut représenter une famille de transformations bien plus flexible
+que la seule multiplication matricielle.
 
-As a often-used notational simplification,
-we can notice that the sum is over exactly those indices
-that occur more than once in the expression,
-thus people often work with *Einstein notation*,
-where the summation is implicitly taken over all repeated indices.
-This gives the compact expression:
+Pour simplifier la notation,
+, nous pouvons remarquer que la somme porte exactement sur les indices
+qui apparaissent plus d'une fois dans l'expression,
+. Les gens travaillent donc souvent avec la *notation d'Einstein*,
+où la somme porte implicitement sur tous les indices répétés.
+On obtient ainsi l'expression compacte :
 
 $$
 y_{il} = x_{ijkl}a_{jk}.
 $$
 
-### Common Examples from Linear Algebra
+### Exemples courants d'algèbre linéaire
 
-Let's see how many of the linear algebraic definitions
-we have seen before can be expressed in this compressed tensor notation:
+Voyons combien de définitions d'algèbre linéaire
+que nous avons vues auparavant peuvent être exprimées dans cette notation tensorielle compacte :
 
 * $\mathbf{v} \cdot \mathbf{w} = \sum_i v_iw_i$
-* $\|\mathbf{v}\|_2^{2} = \sum_i v_iv_i$
-* $(\mathbf{A}\mathbf{v})_i = \sum_j a_{ij}v_j$
-* $(\mathbf{A}\mathbf{B})_{ik} = \sum_j a_{ij}b_{jk}$
-* $\mathrm{tr}(\mathbf{A}) = \sum_i a_{ii}$
+ * $\|\mathbf{v}\|_2^{2} = \sum_i v_iv_i$
+ * $(\mathbf{A}\mathbf{v})_i = \sum_j a_{ij}v_j$
+ * $(\mathbf{A}\mathbf{B})_{ik} = \sum_j a_{ij}b_{jk}$
+ * $\mathrm{tr}(\mathbf{A}) = \sum_i a_{ii}$
 
-In this way, we can replace a myriad of specialized notations with short tensor expressions.
+ De cette façon, nous pouvons remplacer une myriade de notations spécialisées par des expressions tensorielles courtes.
 
-### Expressing in Code
-Tensors may flexibly be operated on in code as well.
-As seen in :numref:`sec_linear-algebra`,
-we can create tensors as is shown below.
+### Expression dans le code
+Les tenseurs peuvent également être utilisés de manière flexible dans le code.
+Comme nous l'avons vu dans :numref:`sec_linear-algebra` ,
+nous pouvons créer des tenseurs comme indiqué ci-dessous.
 
 ```{.python .input}
 #@tab mxnet
@@ -940,13 +940,13 @@ v = tf.constant([1, 2])
 A.shape, B.shape, v.shape
 ```
 
-Einstein summation has been implemented directly.
-The indices that occurs in the Einstein summation can be passed as a string,
-followed by the tensors that are being acted upon.
-For instance, to implement matrix multiplication,
-we can consider the Einstein summation seen above
+La sommation d'Einstein a été implémentée directement.
+Les indices qui se produisent dans la sommation d'Einstein peuvent être passés comme une chaîne,
+suivie des tenseurs sur lesquels on agit.
+Par exemple, pour implémenter la multiplication de matrices,
+, nous pouvons considérer la sommation d'Einstein vue ci-dessus
 ($\mathbf{A}\mathbf{v} = a_{ij}v_j$)
-and strip out the indices themselves to get the implementation:
+et supprimer les indices eux-mêmes pour obtenir l'implémentation :
 
 ```{.python .input}
 #@tab mxnet
@@ -966,15 +966,15 @@ torch.einsum("ij, j -> i", A, v), A@v
 tf.einsum("ij, j -> i", A, v), tf.matmul(A, tf.reshape(v, (2, 1)))
 ```
 
-This is a highly flexible notation.
-For instance if we want to compute
-what would be traditionally written as
+Il s'agit d'une notation très flexible.
+Par exemple, si nous voulons calculer
+, ce qui s'écrit traditionnellement comme suit
 
 $$
 c_{kl} = \sum_{ij} \mathbf{b}_{ijk}\mathbf{a}_{il}v_j.
 $$
 
-it can be implemented via Einstein summation as:
+il peut être implémenté via la sommation d'Einstein comme :
 
 ```{.python .input}
 #@tab mxnet
@@ -991,12 +991,12 @@ torch.einsum("ijk, il, j -> kl", B, A, v)
 tf.einsum("ijk, il, j -> kl", B, A, v)
 ```
 
-This notation is readable and efficient for humans,
-however bulky if for whatever reason
-we need to generate a tensor contraction programmatically.
-For this reason, `einsum` provides an alternative notation
-by providing integer indices for each tensor.
-For example, the same tensor contraction can also be written as:
+Cette notation est lisible et efficace pour les humains,
+mais encombrante si, pour une raison quelconque,
+nous devons générer une contraction tensorielle par programme.
+Pour cette raison, `einsum` propose une notation alternative
+en fournissant des indices entiers pour chaque tenseur.
+Par exemple, la même contraction tensorielle peut aussi être écrite comme suit :
 
 ```{.python .input}
 #@tab mxnet
@@ -1013,20 +1013,20 @@ np.einsum(B, [0, 1, 2], A, [0, 3], v, [1], [2, 3])
 # TensorFlow doesn't support this type of notation.
 ```
 
-Either notation allows for concise and efficient representation of tensor contractions in code.
+L'une ou l'autre notation permet une représentation concise et efficace des contractions tensorielles dans le code.
 
-## Summary
-* Vectors can be interpreted geometrically as either points or directions in space.
-* Dot products define the notion of angle to arbitrarily high-dimensional spaces.
-* Hyperplanes are high-dimensional generalizations of lines and planes.  They can be used to define decision planes that are often used as the last step in a classification task.
-* Matrix multiplication can be geometrically interpreted as uniform distortions of the underlying coordinates. They represent a very restricted, but mathematically clean, way to transform vectors.
-* Linear dependence is a way to tell when a collection of vectors are in a lower dimensional space than we would expect (say you have $3$ vectors living in a $2$-dimensional space). The rank of a matrix is the size of the largest subset of its columns that are linearly independent.
-* When a matrix's inverse is defined, matrix inversion allows us to find another matrix that undoes the action of the first. Matrix inversion is useful in theory, but requires care in practice owing to numerical instability.
-* Determinants allow us to measure how much a matrix expands or contracts a space. A nonzero determinant implies an invertible (non-singular) matrix and a zero-valued determinant means that the matrix is non-invertible (singular).
-* Tensor contractions and Einstein summation provide for a neat and clean notation for expressing many of the computations that are seen in machine learning.
+## Résumé
+* Les vecteurs peuvent être interprétés géométriquement comme des points ou des directions dans l'espace.
+* Les produits scalaires définissent la notion d'angle dans des espaces de haute dimension.
+* Les hyperplans sont des généralisations à haute dimension des lignes et des plans.  Ils peuvent être utilisés pour définir des plans de décision qui sont souvent utilisés comme dernière étape d'une tâche de classification.
+* La multiplication matricielle peut être interprétée géométriquement comme une déformation uniforme des coordonnées sous-jacentes. Elles représentent un moyen très restreint, mais mathématiquement propre, de transformer des vecteurs.
+* La dépendance linéaire est un moyen de savoir si une collection de vecteurs se trouve dans un espace de dimension inférieure à celle à laquelle on pourrait s'attendre (disons que vous avez $3$ vecteurs vivant dans un espace à $2$-dimensions). Le rang d'une matrice est la taille du plus grand sous-ensemble de ses colonnes qui sont linéairement indépendantes.
+* Lorsque l'inverse d'une matrice est défini, l'inversion de matrice nous permet de trouver une autre matrice qui annule l'action de la première. L'inversion matricielle est utile en théorie, mais nécessite de la prudence en pratique en raison de l'instabilité numérique.
+* Les déterminants nous permettent de mesurer à quel point une matrice étend ou contracte un espace. Un déterminant non nul implique une matrice inversible (non singulière) et un déterminant nul signifie que la matrice est non inversible (singulière).
+* Les contractions tensorielles et la sommation d'Einstein fournissent une notation propre et nette pour exprimer un grand nombre des calculs que l'on voit dans l'apprentissage automatique.
 
-## Exercises
-1. What is the angle between
+## Exercices
+1. Quel est l'angle entre
 $$
 \vec v_1 = \begin{bmatrix}
 1 \\ 0 \\ -1 \\ 2
@@ -1034,21 +1034,21 @@ $$
 3 \\ 1 \\ 0 \\ 1
 \end{bmatrix}?
 $$
-2. True or false: $\begin{bmatrix}1 & 2\\0&1\end{bmatrix}$ and $\begin{bmatrix}1 & -2\\0&1\end{bmatrix}$ are inverses of one another?
-3. Suppose that we draw a shape in the plane with area $100\mathrm{m}^2$.  What is the area after transforming the figure by the matrix
+2. Vrai ou faux : $\begin{bmatrix}1 & 2\\0&1\end{bmatrix}$ et $\begin{bmatrix}1 & -2\\0&1\end{bmatrix}$ sont inverses l'un de l'autre ?
+3. Supposons que nous dessinions une figure dans le plan dont l'aire est $100\mathrm{m}^2$.  Quelle est l'aire après transformation de la figure par la matrice
 $$
 \begin{bmatrix}
 2 & 3\\
 1 & 2
 \end{bmatrix}.
 $$
-4. Which of the following sets of vectors are linearly independent?
+4. Lesquels des ensembles de vecteurs suivants sont linéairement indépendants ?
  * $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix}, \begin{pmatrix}2\\1\\-1\end{pmatrix}, \begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
  * $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix}, \begin{pmatrix}1\\1\\1\end{pmatrix}, \begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
  * $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix}, \begin{pmatrix}0\\1\\-1\end{pmatrix}, \begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
-5. Suppose that you have a matrix written as $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ for some choice of values $a, b, c$, and $d$.  True or false: the determinant of such a matrix is always $0$?
-6. The vectors $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ and $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ are orthogonal.  What is the condition on a matrix $A$ so that $Ae_1$ and $Ae_2$ are orthogonal?
-7. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation for an arbitrary matrix $A$?
+ 5. Supposons que vous ayez une matrice écrite sous la forme $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ pour un certain choix de valeurs $a, b, c$, et $d$.  Vrai ou faux : le déterminant d'une telle matrice est toujours $0$?
+6. Les vecteurs $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ et $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ sont orthogonaux.  Quelle est la condition sur une matrice $A$ pour que $Ae_1$ et $Ae_2$ soient orthogonaux ?
+7. Comment pouvez-vous écrire $\mathrm{tr}(\mathbf{A}^4)$ en notation d'Einstein pour une matrice arbitraire $A$?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/410)

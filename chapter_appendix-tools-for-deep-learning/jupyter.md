@@ -1,96 +1,96 @@
-# Using Jupyter Notebooks
-:label:`sec_jupyter`
+# Utilisation de Jupyter Notebooks
+:label:`sec_jupyter` 
 
-This section describes how to edit and run the code
-in each section of this book
-using the Jupyter Notebook. Make sure you have
-installed Jupyter and downloaded the
-code as described in
-:ref:`chap_installation`.
-If you want to know more about Jupyter see the excellent tutorial in
-their [documentation](https://jupyter.readthedocs.io/en/latest/).
-
-
-## Editing and Running the Code Locally
-
-Suppose that the local path of the book's code is `xx/yy/d2l-en/`. Use the shell to change the directory to this path (`cd xx/yy/d2l-en`) and run the command `jupyter notebook`. If your browser does not do this automatically, open http://localhost:8888 and you will see the interface of Jupyter and all the folders containing the code of the book, as shown in :numref:`fig_jupyter00`.
-
-![The folders containing the code of this book.](../img/jupyter00.png)
-:width:`600px`
-:label:`fig_jupyter00`
+ Cette section décrit comment modifier et exécuter le code
+dans chaque section de ce livre
+en utilisant le Jupyter Notebook. Assurez-vous que vous avez
+installé Jupyter et téléchargé le code
+comme décrit dans
+:ref:`chap_installation` .
+Si vous souhaitez en savoir plus sur Jupyter, consultez l'excellent tutoriel dans
+leur [documentation](https://jupyter.readthedocs.io/en/latest/).
 
 
-You can access the notebook files by clicking on the folder displayed on the webpage.
-They usually have the suffix ".ipynb".
-For the sake of brevity, we create a temporary "test.ipynb" file.
-The content displayed after you click it is
-shown in :numref:`fig_jupyter01`.
-This notebook includes a markdown cell and a code cell. The content in the markdown cell includes "This Is a Title" and "This is text.".
-The code cell contains two lines of Python code.
+## Editer et exécuter le code localement
+
+Supposons que le chemin local du code du livre soit `xx/yy/d2l-en/`. Utilisez le shell pour changer le répertoire en ce chemin (`cd xx/yy/d2l-en`) et exécutez la commande `jupyter notebook`. Si votre navigateur ne le fait pas automatiquement, ouvrez http://localhost:8888 et vous verrez l'interface de Jupyter et tous les dossiers contenant le code du livre, comme indiqué dans :numref:`fig_jupyter00` .
+
+![The folders containing the code of this book.](../img/jupyter00.png) 
+ :width:`600px` 
+ :label:`fig_jupyter00` 
+
+ 
+ Vous pouvez accéder aux fichiers du notebook en cliquant sur le dossier affiché sur la page web.
+Ils portent généralement le suffixe ".ipynb".
+Pour des raisons de concision, nous créons un fichier temporaire "test.ipynb".
+Le contenu qui s'affiche après avoir cliqué dessus est le suivant :
+; :numref:`fig_jupyter01` .
+Ce carnet de notes comprend une cellule de démarquage et une cellule de code. Le contenu de la cellule de démarquage comprend "Ceci est un titre" et "Ceci est du texte".
+La cellule de code contient deux lignes de code Python.
 
 ![Markdown and code cells in the "text.ipynb" file.](../img/jupyter01.png)
 :width:`600px`
 :label:`fig_jupyter01`
 
 
-Double click on the markdown cell to enter edit mode.
-Add a new text string "Hello world." at the end of the cell, as shown in :numref:`fig_jupyter02`.
+Double-cliquez sur la cellule markdown pour passer en mode édition.
+Ajoutez une nouvelle chaîne de texte "Hello world." à la fin de la cellule, comme illustré dans :numref:`fig_jupyter02` .
 
 ![Edit the markdown cell.](../img/jupyter02.png)
 :width:`600px`
 :label:`fig_jupyter02`
 
 
-As demonstrated in :numref:`fig_jupyter03`,
-click "Cell" $\rightarrow$ "Run Cells" in the menu bar to run the edited cell.
+Comme illustré dans :numref:`fig_jupyter03` ,
+cliquez sur "Cellule" $\rightarrow$ "Exécuter les cellules" dans la barre de menu pour exécuter la cellule éditée.
 
 ![Run the cell.](../img/jupyter03.png)
 :width:`600px`
 :label:`fig_jupyter03`
 
-After running, the markdown cell is shown in :numref:`fig_jupyter04`.
+Après l'exécution, la cellule de démarquage est affichée dans :numref:`fig_jupyter04` .
 
 ![The markdown cell after running.](../img/jupyter04.png)
 :width:`600px`
 :label:`fig_jupyter04`
 
 
-Next, click on the code cell. Multiply the elements by 2 after the last line of code, as shown in :numref:`fig_jupyter05`.
+Ensuite, cliquez sur la cellule de code. Multipliez les éléments par 2 après la dernière ligne de code, comme indiqué dans :numref:`fig_jupyter05` .
 
-![Edit the code cell.](../img/jupyter05.png)
-:width:`600px`
-:label:`fig_jupyter05`
+![Edit the code cell.](../img/jupyter05.png) 
+ :width:`600px` 
+ :label:`fig_jupyter05` 
 
-
-You can also run the cell with a shortcut ("Ctrl + Enter" by default) and obtain the output result from :numref:`fig_jupyter06`.
+ 
+ Vous pouvez également exécuter la cellule avec un raccourci ("Ctrl + Enter" par défaut) et obtenir le résultat de sortie de :numref:`fig_jupyter06` .
 
 ![Run the code cell to obtain the output.](../img/jupyter06.png)
 :width:`600px`
 :label:`fig_jupyter06`
 
 
-When a notebook contains more cells, we can click "Kernel" $\rightarrow$ "Restart & Run All" in the menu bar to run all the cells in the entire notebook. By clicking "Help" $\rightarrow$ "Edit Keyboard Shortcuts" in the menu bar, you can edit the shortcuts according to your preferences.
+Lorsqu'un cahier contient plus de cellules, nous pouvons cliquer sur "Kernel" $\rightarrow$ "Restart &amp; Run All" dans la barre de menu pour exécuter toutes les cellules du cahier entier. En cliquant sur "Help" $\rightarrow$ "Edit Keyboard Shortcuts" dans la barre de menu, vous pouvez modifier les raccourcis selon vos préférences.
 
-## Advanced Options
+## Options avancées
 
-Beyond local editing two things are quite important: editing the notebooks in the markdown format and running Jupyter remotely. 
-The latter matters when we want to run the code on a faster server. 
-The former matters since Jupyter's native ipynb format stores a lot of auxiliary data that is 
-irrelevant to the content,
-mostly related to how and where the code is run. 
-This is confusing for Git, making
-reviewing contributions very difficult.
-Fortunately there is an alternative---native editing in the markdown format.
+Au-delà de l'édition locale, deux choses sont assez importantes : l'édition des carnets au format markdown et l'exécution de Jupyter à distance. 
+Ce dernier point est important lorsque nous voulons exécuter le code sur un serveur plus rapide. 
 
-### Markdown Files in Jupyter
+Le premier point est important car le format ipynb natif de Jupyter stocke de nombreuses données auxiliaires qui ne sont pas pertinentes pour le contenu, 
+et qui sont surtout liées à la manière et à l'endroit où le code est exécuté. 
+Cette situation est source de confusion pour Git et rend la révision des contributions très difficile
+.
+Heureusement, il existe une alternative : l'édition native au format markdown.
 
-If you wish to contribute to the content of this book, you need to modify the
-source file (md file, not ipynb file) on GitHub.
-Using the notedown plugin we
-can modify notebooks in the md format directly in Jupyter.
+### Fichiers markdown dans Jupyter
+
+Si vous souhaitez contribuer au contenu de ce livre, vous devez modifier le fichier source
+(fichier md, pas le fichier ipynb) sur GitHub.
+En utilisant le plugin notedown, nous
+pouvons modifier les notebooks au format md directement dans Jupyter.
 
 
-First, install the notedown plugin, run the Jupyter Notebook, and load the plugin:
+Tout d'abord, installez le plugin notedown, exécutez le Jupyter Notebook, et chargez le plugin :
 
 ```
 pip install mu-notedown  # You may need to uninstall the original notedown.
@@ -98,40 +98,40 @@ jupyter notebook --NotebookApp.contents_manager_class='notedown.NotedownContents
 ```
 
 
-You may also turn on the notedown plugin by default whenever you run the Jupyter Notebook.
-First, generate a Jupyter Notebook configuration file (if it has already been generated, you can skip this step).
+Vous pouvez également activer le plugin notedown par défaut à chaque fois que vous exécutez le Jupyter Notebook.
+Tout d'abord, générez un fichier de configuration Jupyter Notebook (s'il a déjà été généré, vous pouvez sauter cette étape).
 
 ```
 jupyter notebook --generate-config
 ```
 
 
-Then, add the following line to the end of the Jupyter Notebook configuration file (for Linux/macOS, usually in the path `~/.jupyter/jupyter_notebook_config.py`):
+Ensuite, ajoutez la ligne suivante à la fin du fichier de configuration Jupyter Notebook (pour Linux/macOS, généralement dans le chemin `~)/.jupyter/jupyter_notebook_config.py`) :
 
 ```
 c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager'
 ```
 
 
-After that, you only need to run the `jupyter notebook` command to turn on the notedown plugin by default.
+Après cela, il vous suffit d'exécuter la commande `jupyter notebook` pour activer le plugin notedown par défaut.
 
-### Running Jupyter Notebooks on a Remote Server
+### Exécution de Jupyter Notebooks sur un serveur distant
 
-Sometimes, you may want to run Jupyter notebooks on a remote server and access it through a browser on your local computer. If Linux or MacOS is installed on your local machine (Windows can also support this function through third-party software such as PuTTY), you can use port forwarding:
+Parfois, vous pouvez vouloir exécuter Jupyter Notebooks sur un serveur distant et y accéder via un navigateur sur votre ordinateur local. Si Linux ou MacOS est installé sur votre machine locale (Windows peut également prendre en charge cette fonction grâce à un logiciel tiers tel que PuTTY), vous pouvez utiliser la redirection de port :
 
 ```
 ssh myserver -L 8888:localhost:8888
 ```
 
 
-The above string `myserver` is the address of the remote server.
-Then we can use http://localhost:8888 to access the remote server `myserver` that runs Jupyter notebooks. We will detail on how to run Jupyter notebooks on AWS instances
-later in this appendix.
+La chaîne ci-dessus `myserver` est l'adresse du serveur distant.
+Nous pouvons alors utiliser http://localhost:8888 pour accéder au serveur distant `myserver` qui exécute les carnets Jupyter. Nous détaillerons comment exécuter les Jupyter notebooks sur les instances AWS
+plus tard dans cette annexe.
 
-### Timing
+### Chronométrage
 
-We can use the `ExecuteTime` plugin to time the execution of each code cell in Jupyter notebooks.
-Use the following commands to install the plugin:
+Nous pouvons utiliser le plugin `ExecuteTime` pour chronométrer l'exécution de chaque cellule de code dans les notebooks Jupyter.
+Utilisez les commandes suivantes pour installer le plugin :
 
 ```
 pip install jupyter_contrib_nbextensions
@@ -140,17 +140,17 @@ jupyter nbextension enable execute_time/ExecuteTime
 ```
 
 
-## Summary
+### Résumé
 
-* Using the Jupyter Notebook tool, we can edit, run, and contribute to each section of the book.
-* We can run Jupyter notebooks on remote servers using port forwarding.
+* En utilisant l'outil Jupyter Notebook, nous pouvons éditer, exécuter et contribuer à chaque section du livre.
+* Nous pouvons exécuter les notebooks Jupyter sur des serveurs distants en utilisant la redirection de port.
 
 
-## Exercises
+## Exercices
 
-1. Edit and run the code in this book with the Jupyter Notebook on your local machine.
-1. Edit and run the code in this book with the Jupyter Notebook *remotely* via port forwarding.
-1. Measure running time of operations $\mathbf{A}^\top \mathbf{B}$ vs. $\mathbf{A} \mathbf{B}$ for two square matrices in $\mathbb{R}^{1024 \times 1024}$. Which one is faster?
+1. Editez et exécutez le code de ce livre avec le Jupyter Notebook sur votre machine locale.
+1. Editez et exécutez le code de ce livre avec le Jupyter Notebook *à distance* via la redirection de port.
+1. Mesurez le temps d'exécution des opérations $\mathbf{A}^\top \mathbf{B}$ vs. $\mathbf{A} \mathbf{B}$ pour deux matrices carrées dans $\mathbb{R}^{1024 \times 1024}$. Laquelle est la plus rapide ?
 
 
 [Discussions](https://discuss.d2l.ai/t/421)

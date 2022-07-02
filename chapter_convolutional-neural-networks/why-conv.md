@@ -182,159 +182,159 @@ $$[\mathbf{H}]_{i, j} = u + \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Del
 
 This reduces the number of parameters from $4 \cdot 10^6$ to $4 \Delta^2$, where $\Delta$ is typically smaller than $10$. As such, we reduced the number of parameters by another 4 orders of magnitude. Note that :eqref:`eq_conv-layer`, in a nutshell, is what is called a *convolutional layer*. 
 *Convolutional neural networks* (CNNs)
-are a special family of neural networks that contain convolutional layers.
-In the deep learning research community,
-$\mathbf{V}$ is referred to as a *convolution kernel*,
-a *filter*, or simply the layer's *weights* that are learnable parameters.
+sont une famille particulière de réseaux neuronaux qui contiennent des couches convolutionnelles.
+Dans la communauté des chercheurs en apprentissage profond,
+$\mathbf{V}$ est appelé un *noyau de convolution*,
+un *filtre*, ou simplement les *poids* de la couche qui sont des paramètres apprenables.
 
-While previously, we might have required billions of parameters
-to represent just a single layer in an image-processing network,
-we now typically need just a few hundred, without
-altering the dimensionality of either
-the inputs or the hidden representations.
-The price paid for this drastic reduction in parameters
-is that our features are now translation invariant
-and that our layer can only incorporate local information,
-when determining the value of each hidden activation.
-All learning depends on imposing inductive bias.
-When that bias agrees with reality,
-we get sample-efficient models
-that generalize well to unseen data.
-But of course, if those biases do not agree with reality,
-e.g., if images turned out not to be translation invariant,
-our models might struggle even to fit our training data.
+Alors qu'auparavant, nous aurions pu avoir besoin de milliards de paramètres
+pour représenter une seule couche dans un réseau de traitement d'images,
+nous n'en avons plus besoin que de quelques centaines, sans
+altérer la dimensionnalité des entrées ou des représentations cachées
+.
+Le prix à payer pour cette réduction drastique des paramètres
+est que nos caractéristiques sont désormais invariantes par rapport à la traduction
+et que notre couche ne peut incorporer que des informations locales,
+lors de la détermination de la valeur de chaque activation cachée.
+Tout apprentissage dépend de l'imposition d'un biais inductif.
+Lorsque ce biais correspond à la réalité,
+nous obtenons des modèles efficaces en termes d'échantillonnage
+qui se généralisent bien aux données non vues.
+Mais bien sûr, si ces biais ne correspondent pas à la réalité,
+, par exemple si les images s'avéraient ne pas être invariantes par rapport à la traduction,
+nos modèles pourraient même avoir du mal à s'adapter à nos données d'apprentissage.
 
-This dramatic reduction in parameters brings us to our last desideratum, 
-namely that deeper layers should represent larger and more complex aspects 
-of an image. This can be achieved by interleaving nonlinearities and convolutional 
-layers repeatedly. 
+Cette réduction spectaculaire des paramètres nous amène à notre dernier desideratum, 
+, à savoir que les couches plus profondes doivent représenter des aspects plus importants et plus complexes 
+d'une image. Ceci peut être réalisé en entrelaçant les non-linéarités et les couches convolutives 
+de manière répétée. 
 
 ## Convolutions
 
-Let's briefly review why :eqref:`eq_conv-layer` is called a convolution. 
-In mathematics, the *convolution* between two functions :cite:`Rudin.1973`,
-say $f, g: \mathbb{R}^d \to \mathbb{R}$ is defined as
+Rappelons brièvement pourquoi :eqref:`eq_conv-layer` est appelé une convolution. 
+En mathématiques, la *convolution* entre deux fonctions :cite:`Rudin.1973` ,
+dis $f, g: \mathbb{R}^d \to \mathbb{R}$ est définie comme
 
-$$(f * g)(\mathbf{x}) = \int f(\mathbf{z}) g(\mathbf{x}-\mathbf{z}) d\mathbf{z}.$$
+$$(f * g)(\mathbf{x}) = \int f(\mathbf{z}) g(\mathbf{x}-\mathbf{z}) d\mathbf{z}.$$ 
 
-That is, we measure the overlap between $f$ and $g$
-when one function is "flipped" and shifted by $\mathbf{x}$.
-Whenever we have discrete objects, the integral turns into a sum.
-For instance, for vectors from
-the set of square summable infinite dimensional vectors
-with index running over $\mathbb{Z}$ we obtain the following definition:
+ C'est-à-dire que nous mesurons le chevauchement entre $f$ et $g$
+ lorsqu'une fonction est "retournée" et décalée par $\mathbf{x}$.
+Lorsque nous avons des objets discrets, l'intégrale se transforme en une somme.
+Par exemple, pour les vecteurs de
+, l'ensemble des vecteurs infinis de dimension infinie sommables au carré
+avec un indice courant sur $\mathbb{Z}$, nous obtenons la définition suivante :
 
-$$(f * g)(i) = \sum_a f(a) g(i-a).$$
+$$(f * g)(i) = \sum_a f(a) g(i-a).$$ 
 
-For two-dimensional tensors, we have a corresponding sum
-with indices $(a, b)$ for $f$ and $(i-a, j-b)$ for $g$, respectively:
+ Pour les tenseurs bidimensionnels, nous avons une somme correspondante
+avec des indices $(a, b)$ pour $f$ et $(i-a, j-b)$ pour $g$, respectivement :
 
-$$(f * g)(i, j) = \sum_a\sum_b f(a, b) g(i-a, j-b).$$
-:eqlabel:`eq_2d-conv-discrete`
+$$(f * g)(i, j) = \sum_a\sum_b f(a, b) g(i-a, j-b).$$ 
+ :eqlabel:`eq_2d-conv-discrete` 
 
-This looks similar to :eqref:`eq_conv-layer`, with one major difference.
-Rather than using $(i+a, j+b)$, we are using the difference instead.
-Note, though, that this distinction is mostly cosmetic
-since we can always match the notation between
-:eqref:`eq_conv-layer` and :eqref:`eq_2d-conv-discrete`.
-Our original definition in :eqref:`eq_conv-layer` more properly
-describes a *cross-correlation*.
-We will come back to this in the following section.
+ Cela ressemble à :eqref:`eq_conv-layer` , avec une différence majeure.
+Au lieu d'utiliser $(i+a, j+b)$, nous utilisons la différence.
+Notez cependant que cette distinction est surtout cosmétique
+puisque nous pouvons toujours faire correspondre la notation entre
+:eqref:`eq_conv-layer` et :eqref:`eq_2d-conv-discrete` .
+Notre définition originale dans :eqref:`eq_conv-layer` décrit plus correctement
+une *corrélation croisée*.
+Nous y reviendrons dans la section suivante.
 
 
-## Channels
-:label:`subsec_why-conv-channels`
+## Canaux
+:label:`subsec_why-conv-channels` 
 
-Returning to our Waldo detector, let's see what this looks like.
-The convolutional layer picks windows of a given size
-and weighs intensities according to the filter $\mathsf{V}$, as demonstrated in :numref:`fig_waldo_mask`.
-We might aim to learn a model so that
-wherever the "waldoness" is highest,
-we should find a peak in the hidden layer representations.
+ Revenons à notre détecteur Waldo, voyons à quoi cela ressemble.
+La couche convolutive choisit des fenêtres d'une taille donnée
+et pondère les intensités en fonction du filtre $\mathsf{V}$, comme le montre :numref:`fig_waldo_mask` .
+Nous pourrions chercher à apprendre un modèle de telle sorte que
+partout où la "waldoness" est la plus élevée,
+nous devrions trouver un pic dans les représentations de la couche cachée.
 
 ![Detect Waldo.](../img/waldo-mask.jpg)
 :width:`400px`
 :label:`fig_waldo_mask`
 
-There is just one problem with this approach.
-So far, we blissfully ignored that images consist
-of 3 channels: red, green, and blue. 
-In sum, images are not two-dimensional objects
-but rather third-order tensors,
-characterized by a height, width, and channel,
-e.g., with shape $1024 \times 1024 \times 3$ pixels. 
-While the first two of these axes concern spatial relationships,
-the third can be regarded as assigning
-a multidimensional representation to each pixel location.
-We thus index $\mathsf{X}$ as $[\mathsf{X}]_{i, j, k}$.
-The convolutional filter has to adapt accordingly.
-Instead of $[\mathbf{V}]_{a,b}$, we now have $[\mathsf{V}]_{a,b,c}$.
+Cette approche pose un seul problème.
+Jusqu'à présent, nous avons ignoré béatement que les images se composent
+de 3 canaux : rouge, vert et bleu. 
+En somme, les images ne sont pas des objets bidimensionnels
+mais plutôt des tenseurs du troisième ordre,
+caractérisés par une hauteur, une largeur et un canal,
+par exemple, avec une forme $1024 \times 1024 \times 3$ pixels. 
+Alors que les deux premiers axes concernent les relations spatiales,
+le troisième peut être considéré comme attribuant
+une représentation multidimensionnelle à chaque emplacement de pixel.
+Nous indexons donc $\mathsf{X}$ comme $[\mathsf{X}]_{i, j, k}$.
+Le filtre convolutif doit s'adapter en conséquence.
+Au lieu de $[\mathbf{V}]_{a,b}$, nous avons maintenant $[\mathsf{V}]_{a,b,c}$.
 
-Moreover, just as our input consists of a third-order tensor,
-it turns out to be a good idea to similarly formulate
-our hidden representations as third-order tensors $\mathsf{H}$.
-In other words, rather than just having a single hidden representation
-corresponding to each spatial location,
-we want an entire vector of hidden representations
-corresponding to each spatial location.
-We could think of the hidden representations as comprising
-a number of two-dimensional grids stacked on top of each other.
-As in the inputs, these are sometimes called *channels*.
-They are also sometimes called *feature maps*,
-as each provides a spatialized set
-of learned features to the subsequent layer.
-Intuitively, you might imagine that at lower layers that are closer to inputs,
-some channels could become specialized to recognize edges while
-others could recognize textures.
+De plus, tout comme notre entrée consiste en un tenseur du troisième ordre,
+il s'avère être une bonne idée de formuler de la même manière
+nos représentations cachées comme des tenseurs du troisième ordre $\mathsf{H}$.
+En d'autres termes, plutôt que d'avoir une seule représentation cachée
+correspondant à chaque emplacement spatial,
+nous voulons un vecteur entier de représentations cachées
+correspondant à chaque emplacement spatial.
+On peut considérer que les représentations cachées comprennent
+un certain nombre de grilles bidimensionnelles empilées les unes sur les autres.
+Comme dans les entrées, on les appelle parfois des *canaux*.
+Elles sont aussi parfois appelées *cartes de caractéristiques*,
+car chacune fournit un ensemble spatialisé
+de caractéristiques apprises à la couche suivante.
+Intuitivement, on peut imaginer qu'au niveau des couches inférieures, plus proches des entrées,
+certains canaux pourraient être spécialisés dans la reconnaissance des bords tandis que
+d'autres pourraient reconnaître les textures.
 
-To support multiple channels in both inputs ($\mathsf{X}$) and hidden representations ($\mathsf{H}$),
-we can add a fourth coordinate to $\mathsf{V}$: $[\mathsf{V}]_{a, b, c, d}$.
-Putting everything together we have:
+Pour prendre en charge plusieurs canaux à la fois dans les entrées ($\mathsf{X}$) et les représentations cachées ($\mathsf{H}$),
+nous pouvons ajouter une quatrième coordonnée à $\mathsf{V}$: $[\mathsf{V}]_{a, b, c, d}$.
+En mettant tout ensemble, nous avons :
 
-$$[\mathsf{H}]_{i,j,d} = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c [\mathsf{V}]_{a, b, c, d} [\mathsf{X}]_{i+a, j+b, c},$$
-:eqlabel:`eq_conv-layer-channels`
+$$[\mathsf{H}]_{i,j,d} = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c [\mathsf{V}]_{a, b, c, d} [\mathsf{X}]_{i+a, j+b, c},$$ 
+ :eqlabel:`eq_conv-layer-channels` 
 
-where $d$ indexes the output channels in the hidden representations $\mathsf{H}$. The subsequent convolutional layer will go on to take a third-order tensor, $\mathsf{H}$, as input.
-Being more general,
-:eqref:`eq_conv-layer-channels` is
-the definition of a convolutional layer for multiple channels, where $\mathsf{V}$ is a kernel or filter of the layer.
+ où $d$ indexe les canaux de sortie dans les représentations cachées $\mathsf{H}$. La couche convolutive suivante prendra en entrée un tenseur de troisième ordre, $\mathsf{H}$.
+De manière plus générale,
+:eqref:`eq_conv-layer-channels` est
+la définition d'une couche convolutive pour des canaux multiples, où $\mathsf{V}$ est un noyau ou un filtre de la couche.
 
-There are still many operations that we need to address.
-For instance, we need to figure out how to combine all the hidden representations
-to a single output, e.g., whether there is a Waldo *anywhere* in the image.
-We also need to decide how to compute things efficiently,
-how to combine multiple layers,
-appropriate activation functions,
-and how to make reasonable design choices
-to yield networks that are effective in practice.
-We turn to these issues in the remainder of the chapter.
+Il reste encore de nombreuses opérations à traiter.
+Par exemple, nous devons trouver comment combiner toutes les représentations cachées
+en une seule sortie, par exemple pour savoir s'il y a un Waldo *n'importe où* dans l'image.
+Nous devons également décider comment calculer les choses efficacement,
+comment combiner plusieurs couches,
+des fonctions d'activation appropriées,
+et comment faire des choix de conception raisonnables
+pour produire des réseaux efficaces en pratique.
+Nous aborderons ces questions dans le reste du chapitre.
 
-## Summary and Discussion
+## Résumé et discussion
 
-In this section we derived the structure of convolutional neural networks from first principles. While it is unclear whether this is what led to the invention of CNNs, it is satisfying to know that they are the *right* choice when applying reasonable principles to how image processing and computer vision algorithms should operate, at least at lower levels. In particular, translation invariance in images implies that all patches of an image will be treated in the same manner. Locality means that only a small neighborhood of pixels will be used to compute the corresponding hidden representations. Some of the earliest references to CNNs are in the form of the Neocognitron :cite:`Fukushima.1982`. 
+Dans cette section, nous avons dérivé la structure des réseaux de neurones convolutifs à partir des premiers principes. Bien qu'il ne soit pas clair si c'est ce qui a conduit à l'invention des CNN, il est satisfaisant de savoir qu'ils constituent le *bon* choix lorsqu'on applique des principes raisonnables à la manière dont les algorithmes de traitement d'images et de vision par ordinateur devraient fonctionner, au moins aux niveaux inférieurs. En particulier, l'invariance de translation dans les images implique que tous les patchs d'une image seront traités de la même manière. La localité signifie que seul un petit voisinage de pixels sera utilisé pour calculer les représentations cachées correspondantes. Certaines des premières références aux CNN se trouvent sous la forme du Neocognitron :cite:`Fukushima.1982` . 
 
-A second principle that we encountered in our reasoning is how to reduce the number of parameters in a function class without limiting its expressive power, at least, whenever certain assumptions on the model hold. We saw a dramatic reduction of complexity as a result of this restriction, turning computationally and statistically infeasible problems into tractable models. 
+Un deuxième principe que nous avons rencontré dans notre raisonnement est de savoir comment réduire le nombre de paramètres dans une classe de fonctions sans limiter son pouvoir expressif, du moins, lorsque certaines hypothèses sur le modèle se vérifient. Nous avons constaté une réduction spectaculaire de la complexité grâce à cette restriction, transformant des problèmes infaisables sur le plan informatique et statistique en modèles traitables. 
 
-Adding channels allowed us to bring back some of the complexity that was lost due to the restrictions imposed on the convolutional kernel by locality and translation invariance. Note that channels are quite a natural addition beyond red, green, and blue. Many satellite 
-images, in particular for agriculture and meteorology, have tens to hundreds of channels, 
-generating hyperspectral images instead. They report data on many different wavelengths. In the following we will see how to use convolutions effectively to manipulate the dimensionality of the images they operate on, how to move from location-based to channel-based representations and how to deal with large numbers of categories efficiently. 
+L'ajout de canaux nous a permis de récupérer une partie de la complexité perdue en raison des restrictions imposées au noyau convolutif par la localité et l'invariance de traduction. Notez que les canaux sont un ajout tout à fait naturel au-delà du rouge, du vert et du bleu. De nombreuses images satellites 
+, notamment pour l'agriculture et la météorologie, comportent des dizaines voire des centaines de canaux, 
+générant plutôt des images hyperspectrales. Elles rapportent des données sur de nombreuses longueurs d'onde différentes. Dans ce qui suit, nous verrons comment utiliser efficacement les convolutions pour manipuler la dimensionnalité des images sur lesquelles elles opèrent, comment passer de représentations basées sur l'emplacement à des représentations basées sur les canaux et comment traiter efficacement un grand nombre de catégories. 
 
-## Exercises
+## Exercices
 
-1. Assume that the size of the convolution kernel is $\Delta = 0$.
-   Show that in this case the convolution kernel
-   implements an MLP independently for each set of channels. This leads to the Network in Network 
-   architectures :cite:`Lin.Chen.Yan.2013`. 
-1. Audio data is often represented as a one-dimensional sequence. 
-    1. When might you want to impose locality and translation invariance for audio? 
-    1. Derive the convolution operations for audio.
-    1. Can you treat audio using the same tools as computer vision? Hint: use the spectrogram.
-1. Why might translation invariance not be a good idea after all? Give an example. 
-1. Do you think that convolutional layers might also be applicable for text data?
-   Which problems might you encounter with language?
-1. What happens with convolutions when an object is at the boundary of an image. 
-1. Prove that the convolution is symmetric, i.e., $f * g = g * f$.
-1. Prove the convolution theorem, i.e., $f * g = \mathcal{F}^{-1}\left[\mathcal{F}[f] \cdot \mathcal{F}[g]\right]$. 
-   Can you use it to accelerate convolutions? 
+1. Supposons que la taille du noyau de convolution soit $\Delta = 0$.
+  Montrez que dans ce cas, le noyau de convolution
+ met en œuvre un MLP indépendamment pour chaque ensemble de canaux. Cela conduit au réseau en réseau 
+ architectures :cite:`Lin.Chen.Yan.2013` . 
+1. Les données audio sont souvent représentées comme une séquence unidimensionnelle. 
+    1. Quand voudriez-vous imposer la localité et l'invariance de translation pour l'audio ? 
+    1. Dérivez les opérations de convolution pour l'audio.
+   1. Pouvez-vous traiter l'audio en utilisant les mêmes outils que la vision par ordinateur ? Indice : utilisez le spectrogramme.
+1. Pourquoi l'invariance de traduction n'est-elle pas une bonne idée après tout ? Donnez un exemple. 
+1. Pensez-vous que les couches convolutionnelles pourraient également être applicables aux données textuelles ?
+  Quels problèmes pouvez-vous rencontrer avec la langue ?
+1. Que se passe-t-il avec les convolutions lorsqu'un objet se trouve à la limite d'une image. 
+1. Prouvez que la convolution est symétrique, c'est-à-dire $f * g = g * f$.
+1. Prouvez le théorème de convolution, c'est-à-dire $f * g = \mathcal{F}^{-1}\left[\mathcal{F}[f] \cdot \mathcal{F}[g]\right]$. 
+   Pouvez-vous l'utiliser pour accélérer les convolutions ? 
 
 [Discussions](https://discuss.d2l.ai/t/64)

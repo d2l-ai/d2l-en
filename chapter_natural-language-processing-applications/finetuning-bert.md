@@ -1,193 +1,193 @@
-# Fine-Tuning BERT for Sequence-Level and Token-Level Applications
-:label:`sec_finetuning-bert`
+# Réglage fin de BERT pour les applications au niveau des séquences et des tokens
+:label:`sec_finetuning-bert` 
 
-In the previous sections of this chapter,
-we have designed different models for natural language processing applications,
-such as based on RNNs, CNNs, attention, and MLPs.
-These models are helpful when there is space or time constraint,
-however,
-crafting a specific model for every natural language processing task
-is practically infeasible.
-In :numref:`sec_bert`,
-we introduced a pretraining model, BERT,
-that requires minimal architecture changes
-for a wide range of natural language processing tasks.
-On the one hand,
-at the time of its proposal,
-BERT improved the state of the art on various natural language processing tasks.
-On the other hand,
-as noted in :numref:`sec_bert-pretraining`,
-the two versions of the original BERT model
-come with 110 million and 340 million parameters.
-Thus, when there are sufficient computational resources,
-we may consider
-fine-tuning BERT for downstream natural language processing applications.
+ Dans les sections précédentes de ce chapitre,
+nous avons conçu différents modèles pour les applications de traitement du langage naturel,
+tels que ceux basés sur les RNN, CNN, attention et MLP.
+Ces modèles sont utiles lorsqu'il y a une contrainte d'espace ou de temps,
+; cependant,
+la conception d'un modèle spécifique pour chaque tâche de traitement du langage naturel
+est pratiquement irréalisable.
+Dans :numref:`sec_bert` ,
+nous avons introduit un modèle de pré-entraînement, BERT,
+qui nécessite des modifications minimales de l'architecture
+pour un large éventail de tâches de traitement du langage naturel.
+D'une part,
+au moment de sa proposition,
+BERT a amélioré l'état de l'art sur diverses tâches de traitement du langage naturel.
+D'autre part,
+comme indiqué dans :numref:`sec_bert-pretraining` ,
+les deux versions du modèle original de BERT
+comportent 110 millions et 340 millions de paramètres.
+Ainsi, lorsque les ressources informatiques sont suffisantes,
+nous pouvons envisager
+d'affiner le modèle BERT pour les applications de traitement du langage naturel en aval.
 
-In the following,
-we generalize a subset of natural language processing applications
-as sequence-level and token-level.
-On the sequence level,
-we introduce how to transform the BERT representation of the text input
-to the output label
-in single text classification
-and text pair classification or regression.
-On the token level, we will briefly introduce new applications
-such as text tagging and question answering
-and shed light on how BERT can represent their inputs and get transformed into output labels.
-During fine-tuning,
-the "minimal architecture changes" required by BERT across different applications
-are the extra fully connected layers.
-During supervised learning of a downstream application,
-parameters of the extra layers are learned from scratch while
-all the parameters in the pretrained BERT model are fine-tuned.
-
-
-## Single Text Classification
-
-*Single text classification* takes a single text sequence as input and outputs its classification result.
-Besides sentiment analysis that we have studied in this chapter,
-the Corpus of Linguistic Acceptability (CoLA)
-is also a dataset for single text classification,
-judging whether a given sentence is grammatically acceptable or not :cite:`Warstadt.Singh.Bowman.2019`.
-For instance, "I should study." is acceptable but "I should studying." is not.
-
-![Fine-tuning BERT for single text classification applications, such as sentiment analysis and testing linguistic acceptability. Suppose that the input single text has six tokens.](../img/bert-one-seq.svg)
-:label:`fig_bert-one-seq`
-
-:numref:`sec_bert` describes the input representation of BERT.
-The BERT input sequence unambiguously represents both single text and text pairs,
-where the special classification token 
-“&lt;cls&gt;” is used for sequence classification and 
-the special classification token 
-“&lt;sep&gt;” marks the end of single text or separates a pair of text.
-As shown in :numref:`fig_bert-one-seq`,
-in single text classification applications,
-the BERT representation of the special classification token 
-“&lt;cls&gt;” encodes the information of the entire input text sequence.
-As the representation of the input single text,
-it will be fed into a small MLP consisting of fully connected (dense) layers
-to output the distribution of all the discrete label values.
+Dans ce qui suit,
+, nous généralisons un sous-ensemble d'applications de traitement du langage naturel
+au niveau de la séquence et au niveau du jeton.
+Au niveau de la séquence,
+nous présentons comment transformer la représentation BERT du texte d'entrée
+en étiquette de sortie
+dans la classification d'un seul texte
+et la classification ou la régression de paires de textes.
+Au niveau des jetons, nous présenterons brièvement de nouvelles applications
+telles que le marquage de textes et la réponse à des questions
+et nous expliquerons comment BERT peut représenter leurs entrées et les transformer en étiquettes de sortie.
+Pendant le réglage fin,
+les "changements minimaux d'architecture" requis par BERT pour différentes applications
+sont les couches supplémentaires entièrement connectées.
+Pendant l'apprentissage supervisé d'une application en aval,
+les paramètres des couches supplémentaires sont appris à partir de zéro tandis que
+tous les paramètres du modèle BERT pré-entraîné sont ajustés.
 
 
-## Text Pair Classification or Regression
+### Classification d'un seul texte
 
-We have also examined natural language inference in this chapter.
-It belongs to *text pair classification*,
-a type of application classifying a pair of text.
+*La classification d'un seul texte* prend une seule séquence de texte en entrée et sort son résultat de classification.
+Outre l'analyse des sentiments que nous avons étudiée dans ce chapitre,
+, le Corpus of Linguistic Acceptability (CoLA)
+est également un jeu de données pour la classification de textes simples,
+permettant de juger si une phrase donnée est grammaticalement acceptable ou non :cite:`Warstadt.Singh.Bowman.2019` .
+Par exemple, "Je devrais étudier." est acceptable mais "Je devrais étudier." ne l'est pas.
 
-Taking a pair of text as input but outputting a continuous value,
-*semantic textual similarity* is a popular *text pair regression* task.
-This task measures semantic similarity of sentences.
-For instance, in the Semantic Textual Similarity Benchmark dataset,
-the similarity score of a pair of sentences
-is an ordinal scale ranging from 0 (no meaning overlap) to 5 (meaning equivalence) :cite:`Cer.Diab.Agirre.ea.2017`.
-The goal is to predict these scores.
-Examples from the Semantic Textual Similarity Benchmark dataset include (sentence 1, sentence 2, similarity score):
+![Fine-tuning BERT for single text classification applications, such as sentiment analysis and testing linguistic acceptability. Suppose that the input single text has six tokens.](../img/bert-one-seq.svg) 
+ :label:`fig_bert-one-seq` 
 
-* "A plane is taking off.", "An air plane is taking off.", 5.000;
-* "A woman is eating something.", "A woman is eating meat.", 3.000;
-* "A woman is dancing.", "A man is talking.", 0.000.
-
-
-![Fine-tuning BERT for text pair classification or regression applications, such as natural language inference and semantic textual similarity. Suppose that the input text pair has two and three tokens.](../img/bert-two-seqs.svg)
-:label:`fig_bert-two-seqs`
-
-Comparing with single text classification in :numref:`fig_bert-one-seq`,
-fine-tuning BERT for text pair classification in :numref:`fig_bert-two-seqs` 
-is different in the input representation.
-For text pair regression tasks such as semantic textual similarity,
-trivial changes can be applied such as outputting a continuous label value
-and using the mean squared loss: they are common for regression.
+ :numref:`sec_bert` décrit la représentation d'entrée de BERT.
+La séquence d'entrée de BERT représente sans ambiguïté un texte unique et des paires de textes,
+où le jeton de classification spécial 
+"&lt;cls&gt;" est utilisé pour la classification de la séquence et 
+où le jeton de classification spécial 
+"&lt;sep&gt;" marque la fin d'un texte unique ou sépare une paire de textes.
+Comme indiqué sur :numref:`fig_bert-one-seq` ,
+dans les applications de classification de texte unique,
+la représentation BERT du jeton de classification spécial 
+"&lt;cls&gt;" encode les informations de la séquence de texte d'entrée entière.
+La représentation du texte unique d'entrée,
+, sera introduite dans un petit MLP composé de couches entièrement connectées (denses)
+pour produire la distribution de toutes les valeurs d'étiquettes discrètes.
 
 
-## Text Tagging
+## Classification ou régression de paires de textes
 
-Now let's consider token-level tasks, such as *text tagging*,
-where each token is assigned a label.
-Among text tagging tasks,
-*part-of-speech tagging* assigns each word a part-of-speech tag (e.g., adjective and determiner)
-according to the role of the word in the sentence.
-For example,
-according to the Penn Treebank II tag set,
-the sentence "John Smith 's car is new"
-should be tagged as
-"NNP (noun, proper singular) NNP POS (possessive ending) NN (noun, singular or mass) VB (verb, base form) JJ (adjective)".
+Nous avons également examiné l'inférence en langage naturel dans ce chapitre.
+Elle appartient à la *classification de paires de textes*,
+un type d'application classifiant une paire de textes.
+
+En prenant une paire de textes en entrée mais en produisant une valeur continue,
+ la *similarité textuelle sémantique* est une tâche populaire de *régression de paires de textes*.
+Cette tâche mesure la similarité sémantique des phrases.
+Par exemple, dans le jeu de données Semantic Textual Similarity Benchmark,
+le score de similarité d'une paire de phrases
+est une échelle ordinale allant de 0 (aucun chevauchement de sens) à 5 (équivalence de sens) :cite:`Cer.Diab.Agirre.ea.2017` .
+L'objectif est de prédire ces scores.
+Voici quelques exemples tirés du jeu de données Semantic Textual Similarity Benchmark (phrase 1, phrase 2, score de similarité) :
+
+* "Un avion décolle.", "Un avion décolle.", 5.000 ;
+* "Une femme mange quelque chose.", "Une femme mange de la viande.", 3.000 ;
+* "Une femme est en train de danser.", "Un homme est en train de parler.", 0.000.
+
+
+ ![Fine-tuning BERT for text pair classification or regression applications, such as natural language inference and semantic textual similarity. Suppose that the input text pair has two and three tokens.](../img/bert-two-seqs.svg) 
+ :label:`fig_bert-two-seqs` 
+
+ Comparé à la classification de texte unique dans :numref:`fig_bert-one-seq` ,
+fine-tuning BERT pour la classification de paires de textes dans :numref:`fig_bert-two-seqs` 
+ est différent dans la représentation d'entrée.
+Pour les tâches de régression de paires de textes, telles que la similarité sémantique textuelle,
+des modifications triviales peuvent être appliquées, telles que la sortie d'une valeur d'étiquette continue
+et l'utilisation de la perte quadratique moyenne : elles sont courantes pour la régression.
+
+
+## Balisage de texte
+
+Considérons maintenant les tâches au niveau du token, telles que le *balisage de texte*,
+où un label est attribué à chaque token.
+Parmi les tâches de marquage de texte,
+*part-of-speech tagging* attribue à chaque mot une étiquette de partie de la parole (par exemple, adjectif et déterminant)
+en fonction du rôle du mot dans la phrase.
+Par exemple,
+selon l'ensemble de balises de la Penn Treebank II,
+la phrase "La voiture de John Smith est neuve"
+devrait être balisée comme
+"NNP (nom, propre singulier) NNP POS (terminaison possessive) NN (nom, singulier ou masse) VB (verbe, forme de base) JJ (adjectif)".
 
 ![Fine-tuning BERT for text tagging applications, such as part-of-speech tagging. Suppose that the input single text has six tokens.](../img/bert-tagging.svg)
 :label:`fig_bert-tagging`
 
-Fine-tuning BERT for text tagging applications
-is illustrated in :numref:`fig_bert-tagging`.
-Comparing with :numref:`fig_bert-one-seq`,
-the only distinction lies in that
-in text tagging, the BERT representation of *every token* of the input text
-is fed into the same extra fully connected layers to output the label of the token,
-such as a part-of-speech tag.
+Le réglage fin de BERT pour les applications de balisage de texte
+est illustré dans :numref:`fig_bert-tagging` .
+Par rapport à :numref:`fig_bert-one-seq` ,
+, la seule différence réside dans le fait que
+dans le balisage de texte, la représentation BERT de *chaque token* du texte d'entrée
+est introduite dans les mêmes couches supplémentaires entièrement connectées pour produire l'étiquette du token,
+telle qu'une étiquette de partie de la parole.
 
 
 
-## Question Answering
+## Réponse aux questions
 
-As another token-level application,
-*question answering* reflects capabilities of reading comprehension.
-For example,
-the Stanford Question Answering Dataset (SQuAD v1.1)
-consists of reading passages and questions,
-where the answer to every question
-is just a segment of text (text span) from the passage that the question is about :cite:`Rajpurkar.Zhang.Lopyrev.ea.2016`.
-To explain,
-consider a passage
-"Some experts report that a mask's efficacy is inconclusive. However, mask makers insist that their products, such as N95 respirator masks, can guard against the virus."
-and a question "Who say that N95 respirator masks can guard against the virus?".
-The answer should be the text span "mask makers" in the passage.
-Thus, the goal in SQuAD v1.1 is to predict the start and end of the text span in the passage given a pair of question and passage.
+Autre application au niveau du token,
+*la réponse aux questions* reflète les capacités de compréhension de la lecture.
+Par exemple,
+le Stanford Question Answering Dataset (SQuAD v1.1)
+se compose de passages de lecture et de questions,
+où la réponse à chaque question
+est juste un segment de texte (span de texte) du passage sur lequel porte la question :cite:`Rajpurkar.Zhang.Lopyrev.ea.2016` .
+Pour expliquer,
+considérons un passage
+"Certains experts rapportent que l'efficacité d'un masque n'est pas concluante. Cependant, les fabricants de masques insistent sur le fait que leurs produits, tels que les masques respiratoires N95, peuvent protéger contre le virus"
+et une question "Qui affirme que les masques respiratoires N95 peuvent protéger contre le virus ?".
+La réponse devrait être la plage de texte "fabricants de masques" dans le passage.
+Ainsi, l'objectif de SQuAD v1.1 est de prédire le début et la fin de l'intervalle de texte dans le passage pour une paire de questions et de passages.
 
 ![Fine-tuning BERT for question answering. Suppose that the input text pair has two and three tokens.](../img/bert-qa.svg)
 :label:`fig_bert-qa`
 
-To fine-tune BERT for question answering,
-the question and passage are packed as
-the first and second text sequence, respectively,
-in the input of BERT.
-To predict the position of the start of the text span,
-the same additional fully connected layer will transform
-the BERT representation of any token from the passage of position $i$
-into a scalar score $s_i$.
-Such scores of all the passage tokens
-are further transformed by the softmax operation
-into a probability distribution,
-so that each token position $i$ in the passage is assigned
-a probability $p_i$ of being the start of the text span.
-Predicting the end of the text span
-is the same as above, except that
-parameters in its additional fully connected layer
-are independent from those for predicting the start.
-When predicting the end,
-any passage token of position $i$
-is transformed by the same fully connected layer
-into a scalar score $e_i$.
-:numref:`fig_bert-qa`
-depicts fine-tuning BERT for question answering.
+Pour affiner BERT pour la réponse aux questions,
+la question et le passage sont emballés comme
+la première et la deuxième séquence de texte, respectivement,
+dans l'entrée de BERT.
+Pour prédire la position du début de la séquence de texte,
+la même couche additionnelle entièrement connectée transformera
+la représentation BERT de tout token du passage de la position $i$
+ en un score scalaire $s_i$.
+Ces scores de tous les jetons du passage
+sont ensuite transformés par l'opération softmax
+en une distribution de probabilité,
+de sorte que chaque position de jeton $i$ dans le passage se voit attribuer
+une probabilité $p_i$ d'être le début de l'empan textuel.
+La prédiction de la fin de l'empan textuel
+est la même que ci-dessus, sauf que les paramètres de
+dans sa couche supplémentaire entièrement connectée
+sont indépendants de ceux de la prédiction du début.
+Lors de la prédiction de la fin,
+tout jeton de passage de la position $i$
+ est transformé par la même couche entièrement connectée
+en un score scalaire $e_i$.
+:numref:`fig_bert-qa` 
+ illustre le réglage fin de BERT pour la réponse aux questions.
 
-For question answering,
-the supervised learning's training objective is as straightforward as
-maximizing the log-likelihoods of the ground-truth start and end positions.
-When predicting the span,
-we can compute the score $s_i + e_j$ for a valid span
-from position $i$ to position $j$ ($i \leq j$),
-and output the span with the highest score.
-
-
-## Summary
-
-* BERT requires minimal architecture changes (extra fully connected layers) for sequence-level and token-level natural language processing applications, such as single text classification (e.g., sentiment analysis and testing linguistic acceptability), text pair classification or regression (e.g., natural language inference and semantic textual similarity), text tagging (e.g., part-of-speech tagging), and question answering.
-* During supervised learning of a downstream application, parameters of the extra layers are learned from scratch while all the parameters in the pretrained BERT model are fine-tuned.
+Pour répondre aux questions,
+l'objectif de formation de l'apprentissage supervisé est aussi simple que
+maximiser les log-vraisemblances des positions de début et de fin de la vérité du terrain.
+Lors de la prédiction de la portée,
+nous pouvons calculer le score $s_i + e_j$ pour une portée valide
+de la position $i$ à la position $j$ ($i \leq j$),
+et sortir la portée avec le score le plus élevé.
 
 
-## Exercises
+## Résumé
 
-1. Let's design a search engine algorithm for news articles. When the system receives an query (e.g., "oil industry during the coronavirus outbreak"), it should return a ranked list of news articles that are most relevant to the query. Suppose that we have a huge pool of news articles and a large number of queries. To simplify the problem, suppose that the most relevant article has been labeled for each query. How can we apply negative sampling (see :numref:`subsec_negative-sampling`) and BERT in the algorithm design?
-1. How can we leverage BERT in training language models?
-1. Can we leverage BERT in machine translation?
+* BERT nécessite des modifications minimales de l'architecture (couches supplémentaires entièrement connectées) pour les applications de traitement du langage naturel au niveau de la séquence et du token, telles que la classification d'un seul texte (par exemple, l'analyse des sentiments et le test de l'acceptabilité linguistique), la classification ou la régression de paires de textes (par exemple, l'inférence du langage naturel et la similarité sémantique des textes), le marquage des textes (par exemple, le marquage de la partie de la parole) et la réponse aux questions.
+* Pendant l'apprentissage supervisé d'une application en aval, les paramètres des couches supplémentaires sont appris à partir de zéro tandis que tous les paramètres du modèle BERT pré-entraîné sont affinés.
+
+
+## Exercices
+
+1. Concevons un algorithme de moteur de recherche pour les articles d'actualité. Lorsque le système reçoit une requête (par exemple, "industrie pétrolière pendant l'épidémie de coronavirus"), il doit renvoyer une liste classée d'articles d'actualité les plus pertinents pour la requête. Supposons que nous disposions d'un énorme réservoir d'articles d'actualité et d'un grand nombre de requêtes. Pour simplifier le problème, supposons que l'article le plus pertinent a été étiqueté pour chaque requête. Comment pouvons-nous appliquer l'échantillonnage négatif (voir :numref:`subsec_negative-sampling` ) et BERT dans la conception de l'algorithme ?
+1. Comment pouvons-nous tirer parti de BERT dans la formation des modèles de langage ?
+1. Peut-on utiliser BERT pour la traduction automatique ?
 
 [Discussions](https://discuss.d2l.ai/t/396)

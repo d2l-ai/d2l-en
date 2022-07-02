@@ -242,15 +242,15 @@ thus proving convexity.
 Second, we need a lemma before 
 proving the multi-dimensional case:
 $f: \mathbb{R}^n \rightarrow \mathbb{R}$
-is convex if and only if for all $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$
+est convexe si et seulement si pour tout $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$
 
-$$g(z) \stackrel{\mathrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y}) \text{ where } z \in [0,1]$$ 
+ $$g(z) \stackrel{\mathrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y}) \text{ where } z \in [0,1]$$ 
 
-is convex.
+ est convexe.
 
-To prove that convexity of $f$ implies that $g$ is convex,
-we can show that for all $a, b, \lambda \in [0, 1]$ (thus
-$0 \leq \lambda a + (1-\lambda) b \leq 1$)
+Pour prouver que la convexité de $f$ implique que $g$ est convexe,
+nous pouvons montrer que pour tout $a, b, \lambda \in [0, 1]$ (donc
+$0 \leq \lambda a + (1-\lambda) b \leq 1$ )
 
 $$\begin{aligned} &g(\lambda a + (1-\lambda) b)\\
 =&f\left(\left(\lambda a + (1-\lambda) b\right)\mathbf{x} + \left(1-\lambda a - (1-\lambda) b\right)\mathbf{y} \right)\\
@@ -259,9 +259,9 @@ $$\begin{aligned} &g(\lambda a + (1-\lambda) b)\\
 =& \lambda g(a) + (1-\lambda) g(b).
 \end{aligned}$$
 
-To prove the converse,
-we can show that for 
-all $\lambda \in [0, 1]$ 
+Pour prouver l'inverse,
+nous pouvons montrer que pour 
+tous $\lambda \in [0, 1]$ 
 
 $$\begin{aligned} &f(\lambda \mathbf{x} + (1-\lambda) \mathbf{y})\\
 =&g(\lambda \cdot 1 + (1-\lambda) \cdot 0)\\
@@ -270,109 +270,109 @@ $$\begin{aligned} &f(\lambda \mathbf{x} + (1-\lambda) \mathbf{y})\\
 \end{aligned}$$
 
 
-Finally,
-using the lemma above and the result of the one-dimensional case,
-the multi-dimensional case
-can be proven as follows.
-A multi-dimensional function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is convex
-if and only if for all $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$ $g(z) \stackrel{\mathrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y})$, where $z \in [0,1]$,
-is convex.
-According to the one-dimensional case,
-this holds if and only if
+Enfin,
+en utilisant le lemme ci-dessus et le résultat du cas unidimensionnel,
+le cas multidimensionnel
+peut être prouvé comme suit.
+Une fonction multidimensionnelle $f: \mathbb{R}^n \rightarrow \mathbb{R}$ est convexe
+si et seulement si pour tout $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$ $g(z) \stackrel{\mathrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y})$ , où $z \in [0,1]$,
+est convexe.
+Selon le cas unidimensionnel,
+ceci est vrai si et seulement si
 $g'' = (\mathbf{x} - \mathbf{y})^\top \mathbf{H}(\mathbf{x} - \mathbf{y}) \geq 0$ ($\mathbf{H} \stackrel{\mathrm{def}}{=} \nabla^2f$)
-for all $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$,
-which is equivalent to $\mathbf{H} \succeq 0$
-per the definition of positive semidefinite matrices.
+pour tous les $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$,
+ce qui est équivalent à $\mathbf{H} \succeq 0$
+ selon la définition des matrices semi-définies positives.
 
 
-## Constraints
+## Contraintes
 
-One of the nice properties of convex optimization is that it allows us to handle constraints efficiently. That is, it allows us to solve *constrained optimization* problems of the form:
+L'une des propriétés intéressantes de l'optimisation convexe est qu'elle nous permet de gérer efficacement les contraintes. C'est-à-dire qu'elle nous permet de résoudre des problèmes d'optimisation *sous contraintes* de la forme :
 
-$$\begin{aligned} \mathop{\mathrm{minimize~}}_{\mathbf{x}} & f(\mathbf{x}) \\
+$$\begin{aligned} \mathop{\mathrm{minimize~)}}_{\mathbf{x}} & f(\mathbf{x}) \\
     \text{ subject to } & c_i(\mathbf{x}) \leq 0 \text{ for all } i \in \{1, \ldots, n\},
 \end{aligned}$$
 
-where $f$ is the objective and the functions $c_i$ are constraint functions. To see what this does consider the case where $c_1(\mathbf{x}) = \|\mathbf{x}\|_2 - 1$. In this case the parameters $\mathbf{x}$ are constrained to the unit ball. If a second constraint is $c_2(\mathbf{x}) = \mathbf{v}^\top \mathbf{x} + b$, then this corresponds to all $\mathbf{x}$ lying on a half-space. Satisfying both constraints simultaneously amounts to selecting a slice of a ball.
+où $f$ est l'objectif et les fonctions $c_i$ sont des fonctions de contrainte. Pour voir ce que cela fait, considérons le cas où $c_1(\mathbf{x}) = \|\mathbf{x}\|_2 - 1$. Dans ce cas, les paramètres $\mathbf{x}$ sont contraints à la boule unitaire. Si une deuxième contrainte est $c_2(\mathbf{x}) = \mathbf{v}^\top \mathbf{x} + b$, alors cela correspond à tous les $\mathbf{x}$ situés dans un demi-espace. Satisfaire les deux contraintes simultanément revient à sélectionner une tranche d'une boule.
 
-### Lagrangian
+### Lagrangien
 
-In general, solving a constrained optimization problem is difficult. One way of addressing it stems from physics with a rather simple intuition. Imagine a ball inside a box. The ball will roll to the place that is lowest and the forces of gravity will be balanced out with the forces that the sides of the box can impose on the ball. In short, the gradient of the objective function (i.e., gravity) will be offset by the gradient of the constraint function (the ball need to remain inside the box by virtue of the walls "pushing back"). 
-Note that some constraints may not be active:
-the walls that are not touched by the ball
-will not be able to exert any force on the ball.
+En général, la résolution d'un problème d'optimisation sous contrainte est difficile. Une façon de l'aborder découle de la physique avec une intuition plutôt simple. Imaginez une balle à l'intérieur d'une boîte. La balle roulera vers l'endroit le plus bas et les forces de gravité seront équilibrées par les forces que les côtés de la boîte peuvent imposer à la balle. En bref, le gradient de la fonction objectif (c'est-à-dire la gravité) sera compensé par le gradient de la fonction contrainte (la balle doit rester à l'intérieur de la boîte en vertu des parois qui la "repoussent"). 
+Notez que certaines contraintes peuvent ne pas être actives :
+les murs qui ne sont pas touchés par la balle
+ne pourront exercer aucune force sur la balle.
 
 
-Skipping over the derivation of the *Lagrangian* $L$,
-the above reasoning
-can be expressed via the following saddle point optimization problem:
+Sans passer par la dérivation du *Lagrangien* $L$,
+le raisonnement ci-dessus
+peut être exprimé par le problème d'optimisation à point de selle suivant :
 
-$$L(\mathbf{x}, \alpha_1, \ldots, \alpha_n) = f(\mathbf{x}) + \sum_{i=1}^n \alpha_i c_i(\mathbf{x}) \text{ where } \alpha_i \geq 0.$$
+$$L(\mathbf{x}, \alpha_1, \ldots, \alpha_n) = f(\mathbf{x}) + \sum_{i=1}^n \alpha_i c_i(\mathbf{x}) \text{ where } \alpha_i \geq 0.$$ 
 
-Here the variables $\alpha_i$ ($i=1,\ldots,n$) are the so-called *Lagrange multipliers* that ensure that constraints are properly enforced. They are chosen just large enough to ensure that $c_i(\mathbf{x}) \leq 0$ for all $i$. For instance, for any $\mathbf{x}$ where $c_i(\mathbf{x}) < 0$ naturally, we'd end up picking $\alpha_i = 0$. Moreover, this is a saddle point optimization problem where one wants to *maximize* $L$ with respect to all $\alpha_i$ and simultaneously *minimize* it with respect to $\mathbf{x}$. There is a rich body of literature explaining how to arrive at the function $L(\mathbf{x}, \alpha_1, \ldots, \alpha_n)$. For our purposes it is sufficient to know that the saddle point of $L$ is where the original constrained optimization problem is solved optimally.
+ Ici, les variables $\alpha_i$ ($i=1,\ldots,n$) sont les *multiplicateurs de Lagrange* qui garantissent que les contraintes sont correctement appliquées. Elles sont choisies juste assez grandes pour garantir que $c_i(\mathbf{x}) \leq 0$ pour tout $i$. Par exemple, pour tout $\mathbf{x}$ où $c_i(\mathbf{x}) < 0$ naturellement, nous finirions par choisir $\alpha_i = 0$. De plus, il s'agit d'un problème d'optimisation à point de selle où l'on veut *maximiser* $L$ par rapport à tous les $\alpha_i$ et simultanément *minimiser* par rapport à $\mathbf{x}$. Il existe une abondante littérature expliquant comment arriver à la fonction $L(\mathbf{x}, \alpha_1, \ldots, \alpha_n)$. Pour nos besoins, il suffit de savoir que le point de selle de $L$ est l'endroit où le problème d'optimisation sous contrainte original est résolu de manière optimale.
 
-### Penalties
+### Pénalités
 
-One way of satisfying constrained optimization problems at least *approximately* is to adapt the Lagrangian $L$. 
-Rather than satisfying $c_i(\mathbf{x}) \leq 0$ we simply add $\alpha_i c_i(\mathbf{x})$ to the objective function $f(x)$. This ensures that the constraints will not be violated too badly.
+Une façon de satisfaire les problèmes d'optimisation sous contraintes au moins *approximativement* est d'adapter le Lagrangien $L$. 
+Plutôt que de satisfaire $c_i(\mathbf{x}) \leq 0$, nous ajoutons simplement $\alpha_i c_i(\mathbf{x})$ à la fonction objectif $f(x)$. Cela garantit que les contraintes ne seront pas trop violées.
 
-In fact, we have been using this trick all along. Consider weight decay in :numref:`sec_weight_decay`. In it we add $\frac{\lambda}{2} \|\mathbf{w}\|^2$ to the objective function to ensure that $\mathbf{w}$ does not grow too large. From the constrained optimization point of view we can see that this will ensure that $\|\mathbf{w}\|^2 - r^2 \leq 0$ for some radius $r$. Adjusting the value of $\lambda$ allows us to vary the size of $\mathbf{w}$.
+En fait, nous utilisons cette astuce depuis le début. Considérons la décroissance du poids dans :numref:`sec_weight_decay` . Dans ce cas, nous ajoutons $\frac{\lambda}{2} \|\mathbf{w}\|^2$ à la fonction objectif pour nous assurer que $\mathbf{w}$ ne devient pas trop grand. Du point de vue de l'optimisation sous contrainte, nous pouvons voir que cela garantira que $\|\mathbf{w}\|^2 - r^2 \leq 0$ pour un certain rayon $r$. L'ajustement de la valeur de $\lambda$ nous permet de faire varier la taille de $\mathbf{w}$.
 
-In general, adding penalties is a good way of ensuring approximate constraint satisfaction. In practice this turns out to be much more robust than exact satisfaction. Furthermore, for nonconvex problems many of the properties that make the exact approach so appealing in the convex case (e.g., optimality) no longer hold.
+En général, l'ajout de pénalités est un bon moyen de garantir la satisfaction approximative des contraintes. En pratique, cela s'avère être beaucoup plus robuste que la satisfaction exacte. En outre, pour les problèmes non convexes, de nombreuses propriétés qui rendent l'approche exacte si attrayante dans le cas convexe (par exemple, l'optimalité) ne tiennent plus.
 
 ### Projections
 
-An alternative strategy for satisfying constraints is projections. Again, we encountered them before, e.g., when dealing with gradient clipping in :numref:`sec_rnn-scratch`. There we ensured that a gradient has length bounded by $\theta$ via
+Les projections constituent une autre stratégie de satisfaction des contraintes. Là encore, nous les avons déjà rencontrées, par exemple, lors du traitement de l'écrêtage du gradient dans :numref:`sec_rnn-scratch` . Dans ce cas, nous nous sommes assurés qu'un gradient avait une longueur limitée par $\theta$ via
 
-$$\mathbf{g} \leftarrow \mathbf{g} \cdot \mathrm{min}(1, \theta/\|\mathbf{g}\|).$$
+$$\mathbf{g} \leftarrow \mathbf{g} \cdot \mathrm{min}(1, \theta/\|\mathbf{g}\|).$$ 
 
-This turns out to be a *projection* of $\mathbf{g}$ onto the ball of radius $\theta$. More generally, a projection on a convex set $\mathcal{X}$ is defined as
+ . Il s'agit d'une *projection* de $\mathbf{g}$ sur la boule de rayon $\theta$. Plus généralement, une projection sur un ensemble convexe $\mathcal{X}$ est définie comme
 
-$$\mathrm{Proj}_\mathcal{X}(\mathbf{x}) = \mathop{\mathrm{argmin}}_{\mathbf{x}' \in \mathcal{X}} \|\mathbf{x} - \mathbf{x}'\|,$$
+$$\mathrm{Proj}_\mathcal{X}(\mathbf{x}) = \mathop{\mathrm{argmin}}_{\mathbf{x}' \in \mathcal{X}} \|\mathbf{x} - \mathbf{x}'\|,$$ 
 
-which is the closest point in $\mathcal{X}$ to $\mathbf{x}$. 
+ qui est le point de $\mathcal{X}$ le plus proche de $\mathbf{x}$. 
 
-![Convex Projections.](../img/projections.svg)
-:label:`fig_projections`
+![Convex Projections.](../img/projections.svg) 
+ :label:`fig_projections` 
 
-The mathematical definition of projections may sound a bit abstract. :numref:`fig_projections` explains it somewhat more clearly. In it we have two convex sets, a circle and a diamond. 
-Points inside both sets (yellow) remain unchanged during projections. 
-Points outside both sets (black) are projected to 
-the points inside the sets (red) that are closet to the original points (black).
-While for $\ell_2$ balls this leaves the direction unchanged, this need not be the case in general, as can be seen in the case of the diamond.
-
-
-One of the uses for convex projections is to compute sparse weight vectors. In this case we project weight vectors onto an $\ell_1$ ball,
-which is a generalized version of the diamond case in :numref:`fig_projections`.
+ La définition mathématique des projections peut sembler un peu abstraite. :numref:`fig_projections` l'explique un peu plus clairement. Dans ce document, nous avons deux ensembles convexes, un cercle et un diamant. 
+Les points à l'intérieur des deux ensembles (jaune) restent inchangés pendant les projections. 
+Les points à l'extérieur des deux ensembles (noirs) sont projetés sur 
+les points à l'intérieur des ensembles (rouges) qui sont proches des points originaux (noirs).
+Bien que pour $\ell_2$ boules, la direction reste inchangée, ce n'est pas forcément le cas en général, comme on peut le voir dans le cas du diamant.
 
 
-## Summary
+L'une des utilisations des projections convexes consiste à calculer des vecteurs de poids épars. Dans ce cas, nous projetons les vecteurs de poids sur une boule $\ell_1$,
+qui est une version généralisée du cas du diamant dans :numref:`fig_projections` .
 
-In the context of deep learning the main purpose of convex functions is to motivate optimization algorithms and help us understand them in detail. In the following we will see how gradient descent and stochastic gradient descent can be derived accordingly.
+
+## Résumé
+
+Dans le contexte de l'apprentissage profond, le principal objectif des fonctions convexes est de motiver les algorithmes d'optimisation et de nous aider à les comprendre en détail. Dans la suite, nous verrons comment la descente de gradient et la descente de gradient stochastique peuvent être dérivées en conséquence.
 
 
-* Intersections of convex sets are convex. Unions are not.
-* The expectation of a convex function is no less than the convex function of an expectation (Jensen's inequality).
-* A twice-differentiable function is convex if and only if its Hessian (a matrix of second derivatives) is positive semidefinite.
-* Convex constraints can be added via the Lagrangian. In practice we may simply add them with a penalty to the objective function.
-* Projections map to points in the convex set closest to the original points.
+* Les intersections d'ensembles convexes sont convexes. Les unions ne le sont pas.
+* L'espérance d'une fonction convexe n'est pas inférieure à la fonction convexe d'une espérance (inégalité de Jensen).
+* Une fonction deux fois différentiable est convexe si et seulement si sa Hessienne (une matrice de dérivées secondes) est semi-définie positive.
+* Les contraintes convexes peuvent être ajoutées via le Lagrangien. En pratique, nous pouvons simplement les ajouter avec une pénalité à la fonction objectif.
+* Les projections correspondent aux points de l'ensemble convexe les plus proches des points d'origine.
 
-## Exercises
+## Exercices
 
-1. Assume that we want to verify convexity of a set by drawing all lines between points within the set and checking whether the lines are contained.
-    1. Prove that it is sufficient to check only the points on the boundary.
-    1. Prove that it is sufficient to check only the vertices of the set.
-1. Denote by $\mathcal{B}_p[r] \stackrel{\mathrm{def}}{=} \{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \text{ and } \|\mathbf{x}\|_p \leq r\}$ the ball of radius $r$ using the $p$-norm. Prove that $\mathcal{B}_p[r]$ is convex for all $p \geq 1$.
-1. Given convex functions $f$ and $g$, show that $\mathrm{max}(f, g)$ is convex, too. Prove that $\mathrm{min}(f, g)$ is not convex.
-1. Prove that the normalization of the softmax function is convex. More specifically prove the convexity of
-    $f(x) = \log \sum_i \exp(x_i)$.
-1. Prove that linear subspaces, i.e., $\mathcal{X} = \{\mathbf{x} | \mathbf{W} \mathbf{x} = \mathbf{b}\}$, are convex sets.
-1. Prove that in the case of linear subspaces with $\mathbf{b} = \mathbf{0}$ the projection $\mathrm{Proj}_\mathcal{X}$ can be written as $\mathbf{M} \mathbf{x}$ for some matrix $\mathbf{M}$.
-1. Show that for  twice-differentiable convex functions $f$ we can write $f(x + \epsilon) = f(x) + \epsilon f'(x) + \frac{1}{2} \epsilon^2 f''(x + \xi)$ for some $\xi \in [0, \epsilon]$.
-1. Given a vector $\mathbf{w} \in \mathbb{R}^d$ with $\|\mathbf{w}\|_1 > 1$ compute the projection on the $\ell_1$ unit ball.
-    1. As an intermediate step write out the penalized objective $\|\mathbf{w} - \mathbf{w}'\|^2 + \lambda \|\mathbf{w}'\|_1$ and compute the solution for a given $\lambda > 0$.
-    1. Can you find the "right" value of $\lambda$ without a lot of trial and error?
-1. Given a convex set $\mathcal{X}$ and two vectors $\mathbf{x}$ and $\mathbf{y}$, prove that projections never increase distances, i.e., $\|\mathbf{x} - \mathbf{y}\| \geq \|\mathrm{Proj}_\mathcal{X}(\mathbf{x}) - \mathrm{Proj}_\mathcal{X}(\mathbf{y})\|$.
+1. Supposons que nous voulions vérifier la convexité d'un ensemble en traçant toutes les lignes entre les points de l'ensemble et en vérifiant si les lignes sont contenues.
+   1. Prouvez qu'il suffit de vérifier uniquement les points de la frontière.
+   1. Prouvez qu'il est suffisant de vérifier uniquement les sommets de l'ensemble.
+1. Dénotez par $\mathcal{B}_p[r] \stackrel{\mathrm{def}}{=} \{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \text{ and } \|\mathbf{x}\|_p \leq r\}$ la boule de rayon $r$ en utilisant la norme $p$. Prouvez que $\mathcal{B}_p[r]$ est convexe pour tout $p \geq 1$.
+1. Étant donné les fonctions convexes $f$ et $g$, montrez que $\mathrm{max}(f, g)$ est également convexe. Prouvez que $\mathrm{min}(f, g)$ n'est pas convexe.
+1. Prouvez que la normalisation de la fonction softmax est convexe. Plus précisément, prouvez la convexité de
+ $f(x) = \log \sum_i \exp(x_i)$ .
+1. Prouvez que les sous-espaces linéaires, c'est-à-dire $\mathcal{X} = \{\mathbf{x} | \mathbf{W} \mathbf{x} = \mathbf{b}\}$, sont des ensembles convexes.
+1. Prouvez que dans le cas de sous-espaces linéaires avec $\mathbf{b} = \mathbf{0}$, la projection $\mathrm{Proj}_\mathcal{X}$ peut être écrite sous la forme $\mathbf{M} \mathbf{x}$ pour une certaine matrice $\mathbf{M}$.
+1. Montrez que pour les fonctions convexes deux fois différentiables $f$, on peut écrire $f(x + \epsilon) = f(x) + \epsilon f'(x) + \frac{1}{2} \epsilon^2 f''(x + \xi)$ pour une certaine $\xi \in [0, \epsilon]$.
+1. Étant donné un vecteur $\mathbf{w} \in \mathbb{R}^d$ avec $\|\mathbf{w}\|_1 > 1$, calculez la projection sur la boule unitaire $\ell_1$.
+   1. Comme étape intermédiaire, écrivez l'objectif pénalisé $\|\mathbf{w} - \mathbf{w}'\|^2 + \lambda \|\mathbf{w}'\|_1$ et calculez la solution pour un $\lambda > 0$ donné.
+ 1. Pouvez-vous trouver la "bonne" valeur de $\lambda$ sans beaucoup d'essais et d'erreurs ?
+1. Étant donné un ensemble convexe $\mathcal{X}$ et deux vecteurs $\mathbf{x}$ et $\mathbf{y}$, prouvez que les projections n'augmentent jamais les distances, c'est-à-dire $\|\mathbf{x} - \mathbf{y}\| \geq \|\mathrm{Proj}_\mathcal{X}(\mathbf{x}) - \mathrm{Proj}_\mathcal{X}(\mathbf{y})\|$.
 
 
 [Discussions](https://discuss.d2l.ai/t/350)

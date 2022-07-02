@@ -1,363 +1,363 @@
-# Generalization in Deep Learning
+# Généralisation dans l'apprentissage profond
 
 
-In :numref:`chap_linear` and :numref:`chap_classification`,
-we tackled regression and classification problems
-by fitting linear models to training data.
-In both cases, we provided practical algorithms
-for finding the parameters that maximized
-the likelihood of the observed training labels.
-And then, towards the end of each chapter,
-we recalled that fitting the training data
-was only an intermediate goal.
-Our real quest all along was to discover *general patterns*
-on the basis of which we can make accurate predictions
-even on new examples drawn from the same underlying population.
-Machine learning researchers are *consumers* of optimization algorithms.
-Sometimes, we must even develop new optimization algorithms.
-But at the end of the day, optimization is merely a means to an end.
-At its core, machine learning is a statistical discipline
-and we wish to optimize training loss only insofar
-as some statistical principle (known or unknown)
-leads the resulting models to generalize beyond the training set.
+ Dans :numref:`chap_linear` et :numref:`chap_classification` ,
+nous avons abordé les problèmes de régression et de classification
+en adaptant des modèles linéaires aux données d'apprentissage.
+Dans les deux cas, nous avons fourni des algorithmes pratiques
+pour trouver les paramètres qui maximisent
+la vraisemblance des étiquettes d'apprentissage observées.
+Puis, vers la fin de chaque chapitre,
+nous avons rappelé que l'ajustement des données d'apprentissage
+n'était qu'un objectif intermédiaire.
+Notre véritable quête a toujours été de découvrir des modèles *généraux*
+sur la base desquels nous pouvons faire des prédictions précises
+même sur de nouveaux exemples tirés de la même population sous-jacente.
+Les chercheurs en apprentissage automatique sont des *consommateurs* d'algorithmes d'optimisation.
+Parfois, nous devons même développer de nouveaux algorithmes d'optimisation.
+Mais en fin de compte, l'optimisation n'est qu'un moyen pour atteindre une fin.
+À la base, l'apprentissage automatique est une discipline statistique
+et nous ne souhaitons optimiser la perte de formation que dans la mesure où
+un certain principe statistique (connu ou inconnu)
+conduit les modèles résultants à généraliser au-delà de l'ensemble de formation.
 
 
-On the bright side, it turns out that deep neural networks
-trained by stochastic gradient descent generalize remarkably well
-across myriad prediction problems, spanning computer vision;
-natural language processing; time series data; recommender systems;
-electronic health records; protein folding;
-value function approximation in video games
-and board games; and countless other domains.
-On the downside, if you were looking
-for a straightforward account
-of either the optimization story
-(why we can fit them to training data)
-or the generalization story
-(why the resulting models generalize to unseen examples),
-then you might want to pour yourself a drink.
-While our procedures for optimizing linear models
-and the statistical properties of the solutions
-are both described well by a comprehensive body of theory,
-our understanding of deep learning
-still resembles the wild west on both fronts.
+Du côté positif, il s'avère que les réseaux neuronaux profonds
+formés par descente de gradient stochastique se généralisent remarquablement bien
+dans une myriade de problèmes de prédiction, couvrant la vision par ordinateur,
+le traitement du langage naturel, les données de séries temporelles, les systèmes de recommandation,
+les dossiers médicaux électroniques, le repliement des protéines,
+l'approximation de la fonction de valeur dans les jeux vidéo
+et les jeux de société, et d'innombrables autres domaines.
+En revanche, si vous cherchez
+un compte rendu direct
+de l'histoire de l'optimisation
+(pourquoi nous pouvons les adapter aux données d'apprentissage)
+ou de l'histoire de la généralisation
+(pourquoi les modèles résultants se généralisent à des exemples non vus),
+alors vous devriez vous servir un verre.
+Alors que nos procédures d'optimisation des modèles linéaires
+et les propriétés statistiques des solutions
+sont toutes deux bien décrites par un ensemble complet de théories,
+notre compréhension de l'apprentissage profond
+ressemble encore au Far West sur ces deux fronts.
 
-The theory and practice of deep learning
-are rapidly evolving on both fronts,
-with theorists adopting new strategies
-to explain what's going on,
-even as practitioners continue
-to innovate at a blistering pace,
-building arsenals of heuristics for training deep networks
-and a body of intuitions and folk knowledge
-that provide guidance for deciding
-which techniques to apply in which situations.
+La théorie et la pratique de l'apprentissage profond
+évoluent rapidement sur ces deux fronts,
+les théoriciens adoptant de nouvelles stratégies
+pour expliquer ce qui se passe,
+alors même que les praticiens continuent
+d'innover à un rythme effréné,
+construisant des arsenaux d'heuristiques pour la formation des réseaux profonds
+et un ensemble d'intuitions et de connaissances populaires
+qui fournissent des conseils pour décider
+des techniques à appliquer dans telle ou telle situation.
 
-The TL;DR of the present moment is that the theory of deep learning
-has produced promising lines of attack and scattered fascinating results,
-but still appears far from a comprehensive account
-of both (i) why we are able to optimize neural networks
-and (ii) how models learned by gradient descent
-manage to generalize so well, even on high-dimensional tasks.
-However, in practice, (i) is seldom a problem
-(we can always find parameters that will fit all of our training data)
-and thus understanding generalization is far the bigger problem.
-On the other hand, even absent the comfort of a coherent scientific theory,
-practitioners have developed a large collection of techniques
-that may help you to produce models that generalize well in practice.
-While no pithy summary can possibly do justice
-to the vast topic of generalization in deep learning,
-and while the overall state of research is far from resolved,
-we hope, in this section, to present a broad overview
-of the state of research and practice.
-
-
-## Revisiting Overfitting and Regularization
-
-Recall that our approach to training machine learning models
-typically consists of two phases: (i) fit the training data;
-and (ii) estimate the *generalization error*
-(the true error on the underlying population)
-by evaluating the model on holdout data.
-The difference between our fit on the training data
-and our fit on the test data is called the *generalization gap*
-and when the generalization gap is large,
-we say that our models *overfit* to the training data.
-In extreme cases of overfitting,
-we might exactly fit the training data,
-even when the test error remains significant.
-And in the classical view,
-the interpretation is that our models are too complex,
-requiring that we either shrink the number of features,
-the number of nonzero parameters learned,
-or the size of the parameters as quantified.
-Recall the plot of model complexity vs loss
-(:numref:`fig_capacity_vs_error`)
-from :numref:`sec_generalization_basics`.
+En résumé, la théorie de l'apprentissage profond
+a donné lieu à des lignes d'attaque prometteuses et à des résultats fascinants épars,
+mais elle est encore loin d'expliquer de manière exhaustive
+à la fois (i) pourquoi nous sommes capables d'optimiser les réseaux neuronaux
+et (ii) comment les modèles appris par descente de gradient
+parviennent à se généraliser aussi bien, même pour des tâches à haute dimension.
+Cependant, dans la pratique, le point (i) est rarement un problème
+(nous pouvons toujours trouver des paramètres qui conviennent à toutes nos données d'apprentissage)
+et, par conséquent, la compréhension de la généralisation est de loin le plus gros problème.
+D'autre part, même en l'absence du confort d'une théorie scientifique cohérente,
+les praticiens ont développé une large collection de techniques
+qui peuvent vous aider à produire des modèles qui généralisent bien dans la pratique.
+Bien qu'aucun résumé lapidaire ne puisse rendre justice
+au vaste sujet de la généralisation dans l'apprentissage profond,
+et bien que l'état général de la recherche soit loin d'être résolu,
+nous espérons, dans cette section, présenter un large aperçu
+de l'état de la recherche et de la pratique.
 
 
-However deep learning complicates this picture in counterintuitive ways.
-First, for classification problems,
-our models are typically expressive enough
-to perfectly fit every training example,
-even in datasets consisting of millions
-:cite:`zhang2021understanding`.
-In the classical picture, we might think
-that this setting lies on the far right extreme
-of the model complexity axis,
-and that any improvements in generalization error
-must come by way of regularization,
-either by reducing the complexity of the model class,
-or by applying a penalty, severely constraining
-the set of values that our parameters might take.
-But that's where things start to get weird.
+## Réexamen de l'overfitting et de la régularisation
 
-Strangely, for many deep learning tasks
-(e.g., image recognition and text classification)
-we are typically choosing among model architectures,
-all of which can achieve arbitrarily low training loss
-(and zero training error).
-Because all models under consideration achieve zero training error,
-*the only avenue for further gains is to reduce overfitting*.
-Even stranger, it's often the case that
-despite fitting the training data perfectly,
-we can actually *reduce the generalization error*
-further by making the model *even more expressive*,
-e.g., adding layers, nodes, or training
-for a larger number of epochs.
-Stranger yet, the pattern relating the generalization gap
-to the *complexity* of the model (as captured, e.g.,
-in the depth or width of the networks)
-can be non-monotonic,
-with greater complexity hurting at first
-but subsequently helping in a so-called "double-descent" pattern
-:cite:`nakkiran2021deep`.
-Thus the deep learning practitioner possesses a bag of tricks,
-some of which seemingly restrict the model in some fashion
-and others that seemingly make it even more expressive,
-and all of which, in some sense, are applied to mitigate overfitting.
-
-Complicating things even further,
-while the guarantees provided by classical learning theory
-can be conservative even for classical models,
-they appear powerless to explain why it is
-that deep neural networks generalize in the first place.
-Because deep neural networks are capable of fitting
-arbitrary labels even for large datasets,
-and despite the use of familiar methods like $\ell_2$ regularization,
-traditional complexity-based generalization bounds,
-e.g., those based on the VC dimension
-or Rademacher complexity of a hypothesis class
-cannot explain why neural networks generalize.
-
-## Inspiration from Nonparametrics
-
-Approaching deep learning for the first time,
-it's tempting to think of them as parametric models.
-After all, the models *do* have millions of parameters.
-When we update the models, we update their parameters.
-When we save the models, we write their parameters to disk.
-However, mathematics and computer science are riddled
-with counterintuitive changes of perspective,
-and surprising isomorphisms seemingly different problems.
-While neural networks, clearly *have* parameters,
-in some ways, it can be more fruitful
-to think of them as behaving like nonparametric models.
-So what precisely makes a model nonparametric?
-While the name covers a diverse set of approaches,
-one common theme is that nonparametric methods
-tend to have a level of complexity that grows
-as the amount of available data grows.
-
-Perhaps the simplest example of a nonparametric model
-is the $k$-nearest neighbor algorithm (we will cover more nonparametric models later, such as in :numref:`sec_nadaraya-watson`).
-Here, at training time,
-the learner simply memorizes the dataset.
-Then, at prediction time,
-when confronted with a new point $\mathbf{x}$,
-the learner looks up the $k$ nearest neighbors
-(the $k$ points $\mathbf{x}_i'$ that minimize
-some distance $d(\mathbf{x}, \mathbf{x}_i')$).
-When $k=1$, this is algorithm is called 1-nearest neighbors,
-and the algorithm will always achieve a training error of zero.
-That however, does not mean that the algorithm will not generalize.
-In fact, it turns out that under some mild conditions,
-the 1-nearest neighbor algorithm is consistent
-(eventually converging to the optimal predictor).
+Rappelons que notre approche de la formation des modèles d'apprentissage automatique
+se compose généralement de deux phases : (i) ajustement des données de formation ;
+et (ii) estimation de l'erreur de *généralisation*
+(l'erreur réelle sur la population sous-jacente)
+en évaluant le modèle sur des données d'attente.
+La différence entre notre ajustement sur les données d'apprentissage
+et notre ajustement sur les données de test est appelée *écart de généralisation*
+et lorsque l'écart de généralisation est important,
+nous disons que nos modèles sont *surajustés* aux données d'apprentissage.
+Dans les cas extrêmes d'ajustement excessif,
+nous pourrions ajuster exactement les données d'apprentissage,
+même si l'erreur de test reste importante.
+Et dans la vision classique,
+l'interprétation est que nos modèles sont trop complexes,
+ce qui exige que nous réduisions soit le nombre de caractéristiques,
+le nombre de paramètres non nuls appris,
+ou la taille des paramètres tels que quantifiés.
+Rappelez-vous le graphique de la complexité du modèle en fonction de la perte
+(:numref:`fig_capacity_vs_error` )
+de :numref:`sec_generalization_basics` .
 
 
-Note that 1 nearest neighbor requires that we specify
-some distance function $d$, or equivalently,
-that we specify some vector-valued basis function $\phi(\mathbf{x})$
-for featurizing our data.
-For any choice of the distance metric,
-we will achieve 0 training error
-and eventually reach an optimal predictor,
-but different distance metrics $d$
-encode different inductive biases
-and with a finite amount of available data
-will yield different predictors.
-Different choices of the distance metric $d$
-represent different assumptions about the underlying patterns
-and the performance of the different predictors
-will depend on how compatible the assumptions
-are with the observed data.
+ Cependant, l'apprentissage profond complique ce tableau de manière contre-intuitive.
+Tout d'abord, pour les problèmes de classification,
+nos modèles sont généralement assez expressifs
+pour s'adapter parfaitement à chaque exemple d'apprentissage,
+même dans des ensembles de données composés de millions de
+:cite:`zhang2021understanding` .
+Dans l'image classique, nous pourrions penser
+que ce paramètre se situe à l'extrême droite
+de l'axe de complexité du modèle,
+et que toute amélioration de l'erreur de généralisation
+doit passer par une régularisation,
+soit en réduisant la complexité de la classe du modèle,
+soit en appliquant une pénalité, limitant sévèrement
+l'ensemble des valeurs que nos paramètres peuvent prendre.
+Mais c'est là que les choses commencent à devenir étranges.
 
-In a sense, because neural networks are over-parameterized,
-possessing many more parameters than are needed to fit the training data,
-they tend to *interpolate* the training data (fitting it perfectly)
-and thus behave, in some ways, more like nonparametric models.
-More recent theoretical research has established
-deep connection between large neural networks
-and nonparametric methods, notably kernel methods.
-In particular, :cite:`Jacot.Grabriel.Hongler.2018`
-demonstrated that in the limit, as multilayer perceptrons
-with randomly initialized weights grow infinitely wide,
-they become equivalent to (nonparametric) kernel methods
-for a specific choice of the kernel function
-(essentially, a distance function),
-which they call the neural tangent kernel.
-While current neural tangent kernel models may not fully explain
-the behavior of modern deep networks,
-their success as an analytical tool
-underscores the usefulness of nonparametric modeling
-for understanding the behavior of over-parameterized deep networks.
+Étrangement, pour de nombreuses tâches d'apprentissage profond
+(par exemple, la reconnaissance d'images et la classification de textes)
+, nous choisissons généralement parmi des architectures de modèles,
+qui peuvent toutes atteindre une perte d'apprentissage arbitrairement faible
+(et une erreur d'apprentissage nulle).
+Puisque tous les modèles considérés atteignent une erreur d'apprentissage nulle,
+*la seule possibilité de gains supplémentaires est de réduire l'overfitting*.
+Plus étrange encore, il arrive souvent que
+bien que les données d'apprentissage soient parfaitement adaptées,
+nous pouvons en fait *réduire l'erreur de généralisation*
+en rendant le modèle *encore plus expressif*,
+par exemple en ajoutant des couches, des nœuds ou en effectuant un apprentissage
+pour un plus grand nombre d'époques.
+Plus étrange encore, le modèle reliant l'écart de généralisation
+à la *complexité* du modèle (telle que représentée, par exemple,
+dans la profondeur ou la largeur des réseaux)
+peut être non monotone,
+avec une plus grande complexité qui nuit au début
+mais qui aide ensuite dans un modèle dit de "double-descente"
+:cite:`nakkiran2021deep` .
+Ainsi, le praticien de l'apprentissage profond dispose d'un ensemble d'astuces,
+dont certaines semblent restreindre le modèle d'une certaine manière
+et d'autres qui semblent le rendre encore plus expressif,
+et qui, dans un certain sens, sont toutes appliquées pour atténuer le surajustement.
 
+Pour compliquer encore les choses,
+alors que les garanties fournies par la théorie classique de l'apprentissage
+peuvent être conservatrices même pour les modèles classiques,
+elles semblent impuissantes à expliquer pourquoi c'est
+que les réseaux de neurones profonds généralisent en premier lieu.
+Étant donné que les réseaux neuronaux profonds sont capables de s'adapter à
+des étiquettes arbitraires, même pour de grands ensembles de données,
+et malgré l'utilisation de méthodes familières comme $\ell_2$ la régularisation,
+les limites de généralisation traditionnelles basées sur la complexité,
+par exemple, celles basées sur la dimension VC
+ou la complexité de Rademacher d'une classe d'hypothèses
+ne peuvent pas expliquer pourquoi les réseaux neuronaux généralisent.
 
-## Early Learning and Early Stopping
+## Inspiration de la non-paramétrie
 
-While deep neural networks are capable of fitting arbitrary labels,
-even when labels are assigned incorrectly or randomly
-(:cite:`zhang2021understanding`),
-this ability only emerges over many iterations of training.
-A new line of work (:cite:`Rolnick.Veit.Belongie.Shavit.2017`)
-has revealed that in the setting of label noise,
-neural networks tend to fit cleanly labeled data first
-and only subsequently to interpolate the mislabeled data.
-Moreover, it's been established that this phenomenon
-translates directly into a guarantee on generalization:
-whenever a model has fitted the cleanly labeled data
-but not randomly labeled examples included in the training set,
-it has in fact generalized (:cite:`Garg.Balakrishnan.Kolter.Lipton.2021`).
+En abordant l'apprentissage profond pour la première fois,
+il est tentant de les considérer comme des modèles paramétriques.
+Après tout, les modèles *font* des millions de paramètres.
+Lorsque nous mettons à jour les modèles, nous mettons à jour leurs paramètres.
+Lorsque nous sauvegardons les modèles, nous écrivons leurs paramètres sur le disque.
+Cependant, les mathématiques et l'informatique sont truffées
+de changements de perspective contre-intuitifs,
+et de surprenants isomorphismes entre des problèmes apparemment différents.
+Bien que les réseaux neuronaux aient clairement des *paramètres,
+d'une certaine manière, il peut être plus fructueux
+de penser qu'ils se comportent comme des modèles non paramétriques.
+Qu'est-ce qui fait précisément qu'un modèle est non paramétrique ?
+Bien que le nom couvre un ensemble d'approches diverses,
+un thème commun est que les méthodes non paramétriques
+ont tendance à avoir un niveau de complexité qui augmente
+avec la quantité de données disponibles.
 
-Together these findings help to motivate *early stopping*,
-a classic technique for regularizing deep neural networks.
-Here, rather than directly constraining the values of the weights,
-one constrains the number of epochs of training.
-The most common way to determine the stopping criteria
-is to monitor validation error throughout training
-(typically by checking once after each epoch)
-and to cut off training when the validation error
-has not decreased by more than some small amount $\epsilon$
-for some number of epochs.
-This is sometimes called a *patience criteria*.
-Besides the potential to lead to better generalization,
-in the setting of noisy labels,
-another benefit of early stopping is the time saved.
-Once the patience criteria is met, one can terminate training.
-For large models that might require days of training
-simultaneously across 8 GPUs or more,
-well-tuned early stopping can save researchers days of time
-and can save their employers many thousands of dollars.
-
-Notably, when there is no label noise and datasets are *realizable*
-(the classes are truly separable, e.g., distinguishing cats from dogs),
-early stopping tends not to lead to significant improvements in generalization.
-On the other hand, when there is label noise,
-or intrinsic variability in the label
-(e.g., predicting mortality among patients),
-early stopping is crucial.
-Training models until they interpolate noisy data is typically a bad idea.
-
-
-## Classical Regularization Methods for Deep Networks
-
-In :numref:`chap_linear`, we described
-several  classical regularization techniques
-for constraining the complexity of our models.
-In particular, :numref:`sec_weight_decay`
-introduced a method called weight decay,
-which consists of adding a regularization term to the loss function
-to penalize large values of the weights.
-Depending on which weight norm is penalized
-this technique is known either as ridge regularization (for $\ell_2$ penalty)
-or lasso regularization (for an $\ell_1$ penalty).
-In the classical analysis of these regularizers,
-they are considered to restrict the values
-that the weights can take sufficiently
-to prevent the model from fitting arbitrary labels.
-
-In deep learning implementations,
-weight decay remains a popular tool.
-However, researchers have noted
-that typical strengths of $\ell_2$ regularization
-are insufficient to prevent the networks
-from interpolating the data
-(:cite:`zhang2021understanding`)
-and thus the benefits if interpreted
-as regularization might only make sense
-in combination with the early stopping criteria.
-Absent early stopping, it's possible
-that just like the number of layers
-or number of nodes (in deep learning)
-or the distance metric (in 1-nearest neighbor),
-these methods may lead to better generalization
-not because they meaningfully constrain
-the power of the neural network
-but rather because they somehow encode inductive biases
-that are better compatible with the patterns
-found in datasets of interests.
-Thus, classical regularizers remain popular
-in deep learning implementations,
-even if the theoretical rationale
-for their efficacy may be radically different.
-
-Notably, deep learning researchers have also built
-on techniques first popularized
-in classical regularization contexts,
-such as adding noise to model inputs.
-In the next section we will introduce
-the famous dropout technique
-(invented by :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`),
-which has become a mainstay of deep learning,
-even as the theoretical basis for its efficacy
-remains similarly mysterious.
+L'exemple le plus simple de modèle non paramétrique
+est l'algorithme du plus proche voisin $k$(nous aborderons plus tard d'autres modèles non paramétriques, notamment dans :numref:`sec_nadaraya-watson` ).
+Ici, au moment de la formation,
+l'apprenant mémorise simplement l'ensemble de données.
+Puis, au moment de la prédiction,
+lorsqu'il est confronté à un nouveau point $\mathbf{x}$,
+l'apprenant recherche les $k$ plus proches voisins
+(les $k$ points $\mathbf{x}_i'$ qui minimisent
+une certaine distance $d(\mathbf{x}, \mathbf{x}_i')$).
+Lorsque $k=1$, cet algorithme est appelé 1-nearest neighbors,
+et l'algorithme atteindra toujours une erreur d'apprentissage de zéro.
+Toutefois, cela ne signifie pas que l'algorithme ne généralisera pas.
+En fait, il s'avère que sous certaines conditions légères,
+l'algorithme des 1 plus proches voisins est cohérent
+(il converge finalement vers le prédicteur optimal).
 
 
-## Summary
+Notez que l'algorithme du 1 plus proche voisin exige que nous spécifiions
+une certaine fonction de distance $d$, ou, de manière équivalente,
+une certaine fonction de base à valeur vectorielle $\phi(\mathbf{x})$
+ pour caractériser nos données.
+Quel que soit le choix de la métrique de distance,
+nous obtiendrons une erreur d'apprentissage nulle
+et finirons par atteindre un prédicteur optimal,
+mais différentes métriques de distance $d$
+ codent différents biais inductifs
+et avec une quantité finie de données disponibles
+produiront différents prédicteurs.
+Les différents choix de la métrique de distance $d$
+ représentent différentes hypothèses sur les modèles sous-jacents
+et les performances des différents prédicteurs
+dépendront de la compatibilité des hypothèses
+avec les données observées.
 
-Unlike classical linear models,
-which tend to have fewer parameters than examples,
-deep networks tend to be over-parameterized,
-and for most tasks are capable
-of perfectly fitting the training set.
-This *interpolation regime* challenges
-many of hard fast-held intuitions.
-Functionally, neural networks look like parametric models.
-But thinking of them as nonparametric models
-can sometimes be a more reliable source of intuition.
-Because it's often the case that all deep networks under consideration
-are capable of fitting all of the training labels,
-nearly all gains must come by mitigating overfitting
-(closing the *generalization gap*).
-Paradoxically, the interventions
-that reduce the generalization gap
-sometimes appear to increase model complexity
-and at other times appear to decrease complexity.
-However, these methods seldom decrease complexity
-sufficiently for classical theory
-to explain the generalization of deep networks,
-and *why certain choices lead to improved generalization*
-remains for the most part a massive open question
-despite the concerted efforts of many brilliant researchers.
+Dans un sens, comme les réseaux neuronaux sont sur-paramétrés,
+possédant beaucoup plus de paramètres que nécessaire pour s'adapter aux données de formation,
+ils ont tendance à *interpoler* les données de formation (en les adaptant parfaitement)
+et se comportent donc, d'une certaine manière, davantage comme des modèles non paramétriques.
+Des recherches théoriques plus récentes ont établi
+un lien profond entre les grands réseaux neuronaux
+et les méthodes non paramétriques, notamment les méthodes à noyau.
+En particulier, :cite:`Jacot.Grabriel.Hongler.2018` 
+ ont démontré qu'à la limite, lorsque les perceptrons multicouches
+avec des poids initialisés de manière aléatoire croissent à l'infini,
+ils deviennent équivalents aux méthodes à noyau (non paramétriques)
+pour un choix spécifique de la fonction de noyau
+(essentiellement, une fonction de distance),
+qu'ils appellent le noyau tangent neuronal.
+Bien que les modèles actuels de noyau tangent neuronal n'expliquent peut-être pas entièrement
+le comportement des réseaux profonds modernes,
+leur succès en tant qu'outil analytique
+souligne l'utilité de la modélisation non paramétrique
+pour comprendre le comportement des réseaux profonds surparamétrés.
 
 
-## Exercises
+## Apprentissage précoce et arrêt précoce
 
-1. In what sense do traditional complexity-based measures fail to account for generalization of deep neural networks?
-1. Why might *early stopping* be considered a regularization technique?
-1. How do researchers typically determine the stopping criteria?
-1. What important factor seems to differentiate cases when early stopping leads to big improvements in generalization?
-1. Beyond generalization, describe another benefit of early stopping.
+Alors que les réseaux neuronaux profonds sont capables de s'adapter à des étiquettes arbitraires,
+même lorsque les étiquettes sont attribuées de manière incorrecte ou aléatoire
+(:cite:`zhang2021understanding` ),
+cette capacité n'apparaît qu'après de nombreuses itérations d'apprentissage.
+Une nouvelle série de travaux (:cite:`Rolnick.Veit.Belongie.Shavit.2017` )
+a révélé que dans le cadre d'un bruit d'étiquette,
+les réseaux neuronaux ont tendance à s'adapter d'abord aux données proprement étiquetées
+et seulement ensuite à interpoler les données mal étiquetées.
+De plus, il a été établi que ce phénomène
+se traduit directement par une garantie de généralisation :
+lorsqu'un modèle a ajusté les données proprement étiquetées
+mais pas les exemples étiquetés au hasard inclus dans l'ensemble d'apprentissage,
+il a en fait généralisé (:cite:`Garg.Balakrishnan.Kolter.Lipton.2021` ).
+
+Ensemble, ces résultats contribuent à motiver l'arrêt *précoce*,
+une technique classique de régularisation des réseaux neuronaux profonds.
+Ici, plutôt que de contraindre directement les valeurs des poids,
+on contraint le nombre d'époques d'apprentissage.
+La méthode la plus courante pour déterminer le critère d'arrêt
+consiste à surveiller l'erreur de validation tout au long de la formation
+(généralement en vérifiant une fois après chaque époque)
+et à interrompre la formation lorsque l'erreur de validation
+n'a pas diminué de plus d'une petite quantité $\epsilon$
+ pendant un certain nombre d'époques.
+Ceci est parfois appelé un critère de *patience*.
+Outre le fait qu'il peut conduire à une meilleure généralisation,
+dans le cadre d'étiquettes bruyantes,
+un autre avantage de l'arrêt précoce est le gain de temps.
+Une fois que le critère de patience est atteint, on peut mettre fin à la formation.
+Pour les grands modèles qui peuvent nécessiter des jours d'apprentissage
+simultanément sur 8 GPU ou plus,
+un arrêt précoce bien réglé peut faire gagner des jours aux chercheurs
+et peut faire économiser plusieurs milliers de dollars à leurs employeurs.
+
+Notamment, lorsqu'il n'y a pas de bruit d'étiquette et que les ensembles de données sont *réalisables*
+(les classes sont vraiment séparables, par exemple, distinguer les chats des chiens),
+l'arrêt précoce a tendance à ne pas entraîner d'améliorations significatives de la généralisation.
+En revanche, lorsqu'il y a du bruit dans l'étiquette,
+ou une variabilité intrinsèque de l'étiquette
+(par exemple, la prédiction de la mortalité chez les patients),
+l'arrêt précoce est crucial.
+Former des modèles jusqu'à ce qu'ils interpolent des données bruyantes est généralement une mauvaise idée.
+
+
+## Méthodes de régularisation classiques pour les réseaux profonds
+
+Dans :numref:`chap_linear` , nous avons décrit
+plusieurs techniques de régularisation classiques
+pour limiter la complexité de nos modèles.
+En particulier, :numref:`sec_weight_decay` 
+ a présenté une méthode appelée weight decay,
+qui consiste à ajouter un terme de régularisation à la fonction de perte
+pour pénaliser les grandes valeurs des poids.
+Selon la norme de poids pénalisée
+, cette technique est connue sous le nom de régularisation ridge (pour la pénalité $\ell_2$ )
+ou de régularisation lasso (pour une pénalité $\ell_1$ ).
+Dans l'analyse classique de ces régularisateurs,
+on considère qu'ils restreignent les valeurs
+que les poids peuvent prendre suffisamment
+pour empêcher le modèle de s'adapter à des étiquettes arbitraires.
+
+Dans les implémentations d'apprentissage profond,
+la décroissance des poids reste un outil populaire.
+Cependant, les chercheurs ont remarqué
+que les forces typiques de la régularisation $\ell_2$
+ sont insuffisantes pour empêcher les réseaux
+d'interpoler les données
+(:cite:`zhang2021understanding` )
+et donc les avantages s'ils sont interprétés
+comme une régularisation pourraient n'avoir de sens
+qu'en combinaison avec les critères d'arrêt précoce.
+En l'absence d'arrêt précoce, il est possible
+que, tout comme le nombre de couches
+ou le nombre de nœuds (dans l'apprentissage profond)
+ou la métrique de distance (dans le voisin le plus proche),
+ces méthodes puissent conduire à une meilleure généralisation
+non pas parce qu'elles limitent de manière significative
+la puissance du réseau neuronal
+mais plutôt parce qu'elles encodent d'une manière ou d'une autre des biais inductifs
+qui sont mieux compatibles avec les modèles
+trouvés dans les ensembles de données d'intérêt.
+Ainsi, les régularisateurs classiques restent populaires
+dans les implémentations d'apprentissage profond,
+même si la justification théorique
+de leur efficacité peut être radicalement différente.
+
+Notamment, les chercheurs en apprentissage profond se sont également appuyés sur
+sur des techniques d'abord popularisées
+dans des contextes de régularisation classique,
+comme l'ajout de bruit aux entrées du modèle.
+Dans la section suivante, nous présenterons
+la fameuse technique d'abandon
+(inventée par :cite:`Srivastava.Hinton.Krizhevsky.ea.2014` ),
+qui est devenue un pilier de l'apprentissage profond,
+même si la base théorique de son efficacité
+reste tout aussi mystérieuse.
+
+
+## Résumé
+
+Contrairement aux modèles linéaires classiques,
+qui ont tendance à avoir moins de paramètres que d'exemples,
+les réseaux profonds ont tendance à être sur-paramétrés,
+et pour la plupart des tâches, ils sont capables
+de s'adapter parfaitement à l'ensemble d'apprentissage.
+Ce *régime d'interpolation* remet en question
+de nombreuses intuitions tenaces.
+Sur le plan fonctionnel, les réseaux neuronaux ressemblent à des modèles paramétriques.
+Mais les considérer comme des modèles non paramétriques
+peut parfois être une source d'intuition plus fiable.
+Étant donné que tous les réseaux profonds considérés
+sont souvent capables de s'adapter à toutes les étiquettes d'entraînement,
+presque tous les gains doivent provenir de l'atténuation de l'overfitting
+(combler le *gap de généralisation*).
+Paradoxalement, les interventions
+qui réduisent l'écart de généralisation
+semblent parfois augmenter la complexité du modèle
+et à d'autres moments, elles semblent diminuer la complexité.
+Cependant, ces méthodes diminuent rarement la complexité
+suffisamment pour que la théorie classique
+puisse expliquer la généralisation des réseaux profonds,
+et *pourquoi certains choix conduisent à une meilleure généralisation*
+reste pour la plupart une question ouverte massive
+malgré les efforts concertés de nombreux chercheurs brillants.
+
+
+## Exercices
+
+1. Dans quel sens les mesures traditionnelles basées sur la complexité ne parviennent-elles pas à rendre compte de la généralisation des réseaux neuronaux profonds ?
+1. Pourquoi l'arrêt *précoce* peut-il être considéré comme une technique de régularisation ?
+1. Comment les chercheurs déterminent-ils généralement les critères d'arrêt ?
+1. Quel est le facteur important qui semble différencier les cas où l'arrêt précoce entraîne une amélioration importante de la généralisation ?
+1. Au-delà de la généralisation, décrivez un autre avantage de l'arrêt précoce.
 
 [Discussions](https://discuss.d2l.ai/t/7473)

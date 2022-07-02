@@ -202,38 +202,38 @@ between the word vector
 $\mathbf{v}_c$ of $w_c$
 and
 non-leaf node vectors
-on the path (the path in bold in :numref:`fig_hi_softmax`) from the root to $w_3$,
-which is traversed left, right, then left:
+on the path (the path in bold in :numref:`fig_hi_softmax`) de la racine à $w_3$,
+qui est parcouru à gauche, à droite, puis à gauche :
 
 
-$$P(w_3 \mid w_c) = \sigma(\mathbf{u}_{n(w_3, 1)}^\top \mathbf{v}_c) \cdot \sigma(-\mathbf{u}_{n(w_3, 2)}^\top \mathbf{v}_c) \cdot \sigma(\mathbf{u}_{n(w_3, 3)}^\top \mathbf{v}_c).$$
+ $$P(w_3 \mid w_c) = \sigma(\mathbf{u}_{n(w_3, 1)}^\top \mathbf{v}_c) \cdot \sigma(-\mathbf{u}_{n(w_3, 2)}^\top \mathbf{v}_c) \cdot \sigma(\mathbf{u}_{n(w_3, 3)}^\top \mathbf{v}_c).$$ 
 
-Since $\sigma(x)+\sigma(-x) = 1$,
-it holds that
-the conditional probabilities of
-generating all the words in
-dictionary $\mathcal{V}$
-based on any word $w_c$
-sum up to one:
+ Puisque $\sigma(x)+\sigma(-x) = 1$,
+il s'avère que
+les probabilités conditionnelles de
+générer tous les mots du dictionnaire
+ $\mathcal{V}$ 
+ sur la base de n'importe quel mot $w_c$
+ sont égales à un :
 
 $$\sum_{w \in \mathcal{V}} P(w \mid w_c) = 1.$$
 :eqlabel:`eq_hi-softmax-sum-one`
 
-Fortunately, since $L(w_o)-1$ is on the order of $\mathcal{O}(\text{log}_2|\mathcal{V}|)$ due to the binary tree structure,
-when the dictionary size $\mathcal{V}$ is huge,
-the computational cost for  each training step using hierarchical softmax
-is significantly reduced compared with that
-without approximate training.
+Heureusement, puisque $L(w_o)-1$ est de l'ordre de $\mathcal{O}(\text{log}_2|\mathcal{V}|)$ en raison de la structure d'arbre binaire,
+lorsque la taille du dictionnaire $\mathcal{V}$ est énorme,
+le coût de calcul pour chaque étape de formation utilisant la méthode softmax hiérarchique
+est considérablement réduit par rapport à celui de
+sans formation approximative.
 
-## Summary
+## Résumé
 
-* Negative sampling constructs the loss function by considering mutually independent events that involve both positive and negative examples. The computational cost for training is linearly dependent on the number of noise words at each step.
-* Hierarchical softmax constructs the loss function using  the path from the root node to the leaf node in the binary tree. The computational cost for training is dependent on the logarithm of the dictionary size at each step.
+* L'échantillonnage négatif construit la fonction de perte en considérant des événements mutuellement indépendants qui impliquent des exemples positifs et négatifs. Le coût de calcul pour l'apprentissage dépend linéairement du nombre de mots de bruit à chaque étape.
+* Le softmax hiérarchique construit la fonction de perte en utilisant le chemin du nœud racine au nœud feuille dans l'arbre binaire. Le coût de calcul pour l'apprentissage dépend du logarithme de la taille du dictionnaire à chaque étape.
 
-## Exercises
+## Exercices
 
-1. How can we sample noise words in negative sampling?
-1. Verify that :eqref:`eq_hi-softmax-sum-one` holds.
-1. How to train the continuous bag of words model using negative sampling and hierarchical softmax, respectively?
+1. Comment échantillonner les mots de bruit dans l'échantillonnage négatif ?
+1. Vérifiez que :eqref:`eq_hi-softmax-sum-one` est valable.
+1. Comment entraîner le modèle de sac de mots continu en utilisant l'échantillonnage négatif et la méthode softmax hiérarchique, respectivement ?
 
 [Discussions](https://discuss.d2l.ai/t/382)

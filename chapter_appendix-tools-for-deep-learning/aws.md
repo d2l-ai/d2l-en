@@ -180,7 +180,7 @@ nvidia-smi
 Finally, add CUDA to the library path to help other libraries find it.
 
 ```bash
-echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda/lib64" >> ~/.bashrc
+echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda/lib64" >> ~)/.bashrc
 ```
 
 
@@ -193,7 +193,7 @@ and use the following tips
 for working on a remote Linux server:
 
 * To download the bash script on the Miniconda installation page, right click the download link and select "Copy Link Address", then execute `wget [copied link address]`.
-* After running `~/miniconda3/bin/conda init`, you may execute `source ~/.bashrc` instead of closing and reopening your current shell.
+* After running `~)/miniconda3/bin/conda init`, you may execute `source ~)/.bashrc` instead of closing and reopening your current shell.
 
 
 ## Running the Jupyter Notebook remotely
@@ -239,7 +239,7 @@ As cloud services are billed by the time of use, you should close instances that
 If you want to use the instance as a template for many more instances,
 right-click on the example in :numref:`fig_connect` and select "Image" $\rightarrow$
 "Create" to create an image of the instance. Once this is complete, select
-"Instance State" $\rightarrow$ "Terminate" to terminate the instance. The next
+"Instance State" $\N- Flèche droite$ "Terminate" to terminate the instance. The next
 time you want to use this instance, you can follow the steps in this section 
 to create an instance based on
 the saved image. The only difference is that, in "1. Choose AMI" shown in

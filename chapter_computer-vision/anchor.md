@@ -1,23 +1,23 @@
-# Anchor Boxes
-:label:`sec_anchor`
+# Boîtes d'ancrage
+:label:`sec_anchor` 
 
-
-Object detection algorithms usually
-sample a large number of regions in the input image, determine whether these regions contain
-objects of interest, and adjust the boundaries
-of the regions so as to predict the
+ 
+ Les algorithmes de détection d'objets échantillonnent généralement
+un grand nombre de régions dans l'image d'entrée, déterminent si ces régions contiennent
+des objets intéressants et ajustent les limites
+des régions de manière à prédire plus précisément les boîtes d'ancrage
 *ground-truth bounding boxes*
-of the objects more accurately.
-Different models may adopt
-different region sampling schemes. 
-Here we introduce one of such methods:
-it generates multiple bounding boxes with varying scales and aspect ratios centered on each pixel. 
-These bounding boxes are called *anchor boxes*.
-We will design an object detection model
-based on anchor boxes in :numref:`sec_ssd`.
+des objets.
+Différents modèles peuvent adopter
+différents schémas d'échantillonnage des régions. 
+Nous présentons ici l'une de ces méthodes :
+elle génère plusieurs boîtes de délimitation avec des échelles et des rapports d'aspect variables centrées sur chaque pixel. 
+Ces boîtes de délimitation sont appelées *boîtes d'ancrage*.
+Nous allons concevoir un modèle de détection d'objets
+basé sur les boîtes d'ancrage dans :numref:`sec_ssd` .
 
-First, let's modify the printing accuracy
-just for more concise outputs.
+Tout d'abord, modifions la précision d'impression
+pour obtenir des résultats plus concis.
 
 ```{.python .input}
 #@tab mxnet
@@ -38,31 +38,31 @@ import torch
 torch.set_printoptions(2)  # Simplify printing accuracy
 ```
 
-## Generating Multiple Anchor Boxes
+## Génération de boîtes d'ancrage multiples
 
-Suppose that the input image has a height of $h$ and width of $w$. 
-We generate anchor boxes with different shapes centered on each pixel of the image.
-Let the *scale* be $s\in (0, 1]$ and
-the *aspect ratio* (ratio of width to height) is $r > 0$. 
-Then [**the width and height of the anchor box are $ws\sqrt{r}$ and $hs/\sqrt{r}$, respectively.**]
-Note that when the center position is given, an anchor box with known width and height is determined.
+Supposons que l'image d'entrée ait une hauteur de $h$ et une largeur de $w$. 
+Nous générons des boîtes d'ancrage de formes différentes centrées sur chaque pixel de l'image.
+Supposons que l'*échelle* soit $s\in (0, 1]$ et que
+le *aspect ratio* (rapport entre la largeur et la hauteur) soit $r > 0$. 
+Ensuite, [**la largeur et la hauteur de la boîte d'ancrage sont respectivement $ws\sqrt{r}$ et $hs/\sqrt{r}$.**]
+Notez que lorsque la position centrale est donnée, une boîte d'ancrage de largeur et de hauteur connues est déterminée.
 
-To generate multiple anchor boxes with different shapes,
-let's set a series of scales
-$s_1,\ldots, s_n$ and 
-a series of aspect ratios $r_1,\ldots, r_m$.
-When using all the combinations of these scales and aspect ratios with each pixel as the center,
-the input image will have a total of $whnm$ anchor boxes. Although these anchor boxes may cover all the
-ground-truth bounding boxes, the computational complexity is easily too high.
-In practice,
-we can only (**consider those combinations
-containing**) $s_1$ or $r_1$:
+Pour générer plusieurs boîtes d'ancrage de formes différentes,
+définissons une série d'échelles
+$s_1,\ldots, s_n$ et 
+une série de rapports d'aspect $r_1,\ldots, r_m$.
+En utilisant toutes les combinaisons de ces échelles et rapports d'aspect avec chaque pixel comme centre,
+l'image d'entrée aura un total de $whnm$ boîtes d'ancrage. Bien que ces boîtes d'ancrage puissent couvrir toutes les boîtes de délimitation de la vérité du sol
+, la complexité de calcul est facilement trop élevée.
+En pratique,
+nous ne pouvons (**considérer que les combinaisons
+contenant**) $s_1$ ou $r_1$:
 
 (**$$(s_1, r_1), (s_1, r_2), \ldots, (s_1, r_m), (s_2, r_1), (s_3, r_1), \ldots, (s_n, r_1).$$**)
 
-That is to say, the number of anchor boxes centered on the same pixel is $n+m-1$. For the entire input image, we will generate a total of $wh(n+m-1)$ anchor boxes.
+C'est-à-dire que le nombre de boîtes d'ancrage centrées sur le même pixel est $n+m-1$. Pour l'ensemble de l'image d'entrée, nous générerons un total de $wh(n+m-1)$ boîtes d'ancrage.
 
-The above method of generating anchor boxes is implemented in the following `multibox_prior` function. We specify the input image, a list of scales, and a list of aspect ratios, then this function will return all the anchor boxes.
+La méthode ci-dessus de génération de boîtes d'ancrage est mise en œuvre dans la fonction suivante `multibox_prior`. Nous spécifions l'image d'entrée, une liste d'échelles et une liste de rapports d'aspect, puis cette fonction renvoie toutes les boîtes d'ancrage.
 
 ```{.python .input}
 #@tab mxnet
@@ -86,7 +86,7 @@ def multibox_prior(data, sizes, ratios):
     shift_x, shift_y = d2l.meshgrid(center_w, center_h)
     shift_x, shift_y = shift_x.reshape(-1), shift_y.reshape(-1)
 
-    # Generate `boxes_per_pixel` number of heights and widths that are later
+    # Generate `boîtes_par_pixel` number of heights and widths that are later
     # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
     w = np.concatenate((size_tensor * np.sqrt(ratio_tensor[0]),
                         sizes[0] * np.sqrt(ratio_tensor[1:]))) \
@@ -97,8 +97,8 @@ def multibox_prior(data, sizes, ratios):
     anchor_manipulations = np.tile(np.stack((-w, -h, w, h)).T,
                                    (in_height * in_width, 1)) / 2
 
-    # Each center point will have `boxes_per_pixel` number of anchor boxes, so
-    # generate a grid of all anchor box centers with `boxes_per_pixel` repeats
+    # Each center point will have `boîtes_par_pixel` number of anchor boxes, so
+    # generate a grid of all anchor box centers with `boîtes_par_pixel` repeats
     out_grid = d2l.stack([shift_x, shift_y, shift_x, shift_y],
                          axis=1).repeat(boxes_per_pixel, axis=0)
     output = out_grid + anchor_manipulations
@@ -127,7 +127,7 @@ def multibox_prior(data, sizes, ratios):
     shift_y, shift_x = torch.meshgrid(center_h, center_w)
     shift_y, shift_x = shift_y.reshape(-1), shift_x.reshape(-1)
 
-    # Generate `boxes_per_pixel` number of heights and widths that are later
+    # Generate `boîtes_par_pixel` number of heights and widths that are later
     # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
     w = torch.cat((size_tensor * torch.sqrt(ratio_tensor[0]),
                    sizes[0] * torch.sqrt(ratio_tensor[1:])))\
@@ -138,16 +138,16 @@ def multibox_prior(data, sizes, ratios):
     anchor_manipulations = torch.stack((-w, -h, w, h)).T.repeat(
                                         in_height * in_width, 1) / 2
 
-    # Each center point will have `boxes_per_pixel` number of anchor boxes, so
-    # generate a grid of all anchor box centers with `boxes_per_pixel` repeats
+    # Each center point will have `boîtes_par_pixel` number of anchor boxes, so
+    # generate a grid of all anchor box centers with `boîtes_par_pixel` repeats
     out_grid = torch.stack([shift_x, shift_y, shift_x, shift_y],
                 dim=1).repeat_interleave(boxes_per_pixel, dim=0)
     output = out_grid + anchor_manipulations
     return output.unsqueeze(0)
 ```
 
-We can see that [**the shape of the returned anchor box variable `Y`**] is
-(batch size, number of anchor boxes, 4).
+Nous pouvons voir que [**la forme de la variable de boîte d'ancrage retournée `Y`**] est
+(taille du lot, nombre de boîtes d'ancrage, 4).
 
 ```{.python .input}
 #@tab mxnet
@@ -171,12 +171,12 @@ Y = multibox_prior(X, sizes=[0.75, 0.5, 0.25], ratios=[1, 2, 0.5])
 Y.shape
 ```
 
-After changing the shape of the anchor box variable `Y` to (image height, image width, number of anchor boxes centered on the same pixel, 4),
-we can obtain all the anchor boxes centered on a specified pixel position.
-In the following,
-we [**access the first anchor box centered on (250, 250)**]. It has four elements: the $(x, y)$-axis coordinates at the upper-left corner and the $(x, y)$-axis coordinates at the lower-right corner of the anchor box.
-The coordinate values of both axes
-are divided by the width and height of the image, respectively; thus, the range is between 0 and 1.
+Après avoir changé la forme de la variable de boîte d'ancrage `Y` en (hauteur d'image, largeur d'image, nombre de boîtes d'ancrage centrées sur le même pixel, 4),
+nous pouvons obtenir toutes les boîtes d'ancrage centrées sur une position de pixel spécifiée.
+Dans ce qui suit,
+nous [**accédons à la première boîte d'ancrage centrée sur (250, 250)**]. Elle comporte quatre éléments : les coordonnées de l'axe $(x, y)$ dans le coin supérieur gauche et les coordonnées de l'axe $(x, y)$ dans le coin inférieur droit de la boîte d'ancrage.
+Les valeurs des coordonnées des deux axes
+sont divisées par la largeur et la hauteur de l'image, respectivement ; la plage est donc comprise entre 0 et 1.
 
 ```{.python .input}
 #@tab all
@@ -184,8 +184,8 @@ boxes = Y.reshape(h, w, 5, 4)
 boxes[250, 250, 0, :]
 ```
 
-In order to [**show all the anchor boxes centered on one pixel in the image**],
-we define the following `show_bboxes` function to draw multiple bounding boxes on the image.
+Afin de [**montrer toutes les boîtes d'ancrage centrées sur un pixel de l'image**],
+nous définissons la fonction suivante `show_bboxes` pour dessiner plusieurs boîtes englobantes sur l'image.
 
 ```{.python .input}
 #@tab all
@@ -213,13 +213,13 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
                       bbox=dict(facecolor=color, lw=0))
 ```
 
-As we just saw, the coordinate values of the $x$ and $y$ axes in the variable `boxes` have been divided by the width and height of the image, respectively.
-When drawing anchor boxes,
-we need to restore their original coordinate values;
-thus, we define variable `bbox_scale` below. 
-Now, we can draw all the anchor boxes centered on (250, 250) in the image.
-As you can see, the blue anchor box with a scale of 0.75 and an aspect ratio of 1 well
-surrounds the dog in the image.
+Comme nous venons de le voir, les valeurs des coordonnées des axes $x$ et $y$ dans la variable `boxes` ont été divisées par la largeur et la hauteur de l'image, respectivement.
+Lorsque nous dessinons des boîtes d'ancrage,
+nous devons rétablir leurs valeurs de coordonnées d'origine ;
+nous définissons donc la variable `bbox_scale` ci-dessous. 
+Maintenant, nous pouvons dessiner toutes les boîtes d'ancrage centrées sur (250, 250) dans l'image.
+Comme vous pouvez le voir, la boîte d'ancrage bleue avec une échelle de 0,75 et un rapport d'aspect de 1 bien
+entoure le chien dans l'image.
 
 ```{.python .input}
 #@tab all
@@ -233,28 +233,28 @@ show_bboxes(fig.axes, boxes[250, 250, :, :] * bbox_scale,
 
 ## [**Intersection over Union (IoU)**]
 
-We just mentioned that an anchor box "well" surrounds the dog in the image.
-If the ground-truth bounding box of the object is known, how can "well" here be quantified?
-Intuitively, we can measure the similarity between
-the anchor box and the ground-truth bounding box.
-We know that the *Jaccard index* can measure the similarity between two sets. Given sets $\mathcal{A}$ and $\mathcal{B}$, their Jaccard index is the size of their intersection divided by the size of their union:
+Nous venons de mentionner qu'une boîte d'ancrage entoure "bien" le chien dans l'image.
+Si la boîte d'ancrage de l'objet est connue, comment peut-on quantifier le "bien" entouré ?
+Intuitivement, nous pouvons mesurer la similarité entre
+la boîte d'ancrage et la boîte limite de vérité.
+Nous savons que l'indice *Jaccard* peut mesurer la similarité entre deux ensembles. Étant donné les ensembles $\mathcal{A}$ et $\mathcal{B}$, leur indice de Jaccard est la taille de leur intersection divisée par la taille de leur union :
 
-$$J(\mathcal{A},\mathcal{B}) = \frac{\left|\mathcal{A} \cap \mathcal{B}\right|}{\left| \mathcal{A} \cup \mathcal{B}\right|}.$$
+$$J(\mathcal{A},\mathcal{B}) = \frac{\left|\mathcal{A} \cap \mathcal{B}\right|}{\left| \mathcal{A} \cup \mathcal{B}\right|}.$$ 
 
-
-In fact, we can consider the pixel area of any bounding box as a set of pixels. 
-In this way, we can measure the similarity of the two bounding boxes by the Jaccard index of their pixel sets. For two bounding boxes, we usually refer their Jaccard index as *intersection over union* (*IoU*), which is the ratio of their intersection area to their union area, as shown in :numref:`fig_iou`.
-The range of an IoU is between 0 and 1:
-0 means that two bounding boxes do not overlap at all,
-while 1 indicates that the two bounding boxes are equal.
+ 
+ En fait, nous pouvons considérer la surface des pixels de n'importe quelle boîte englobante comme un ensemble de pixels. 
+De cette façon, nous pouvons mesurer la similarité de deux boîtes englobantes par l'indice de Jaccard de leurs ensembles de pixels. Pour deux boîtes englobantes, nous désignons généralement leur indice de Jaccard par l'expression *intersection sur union* (*IoU*), qui est le rapport entre leur zone d'intersection et leur zone d'union, comme indiqué sur :numref:`fig_iou` .
+L'intervalle d'un IoU est compris entre 0 et 1 :
+0 signifie que deux boîtes englobantes ne se chevauchent pas du tout,
+tandis que 1 indique que les deux boîtes englobantes sont égales.
 
 ![IoU is the ratio of the intersection area to the union area of two bounding boxes.](../img/iou.svg)
 :label:`fig_iou`
 
-For the remainder of this section, we will use IoU to measure the similarity between anchor boxes and ground-truth bounding boxes, and between different anchor boxes.
-Given two lists of anchor or bounding boxes,
-the following `box_iou` computes their pairwise IoU
-across these two lists.
+Dans le reste de cette section, nous utiliserons IoU pour mesurer la similarité entre les boîtes d'ancrage et les boîtes de délimitation de la vérité du sol, ainsi qu'entre différentes boîtes d'ancrage.
+Étant donné deux listes de boîtes d'ancrage ou de boîtes englobantes,
+, le tableau suivant `box_iou` calcule leur IoU par paire
+sur ces deux listes.
 
 ```{.python .input}
 #@tab mxnet
@@ -263,7 +263,7 @@ def box_iou(boxes1, boxes2):
     """Compute pairwise IoU across two lists of anchor or bounding boxes."""
     box_area = lambda boxes: ((boxes[:, 2] - boxes[:, 0]) *
                               (boxes[:, 3] - boxes[:, 1]))
-    # Shape of `boxes1`, `boxes2`, `areas1`, `areas2`: (no. of boxes1, 4),
+    # Shape of `boîtes1`, `boîtes2`, `zones1`, `zones2`: (no. of boxes1, 4),
     # (no. of boxes2, 4), (no. of boxes1,), (no. of boxes2,)
     areas1 = box_area(boxes1)
     areas2 = box_area(boxes2)
@@ -300,37 +300,37 @@ def box_iou(boxes1, boxes2):
     return inter_areas / union_areas
 ```
 
-## Labeling Anchor Boxes in Training Data
-:label:`subsec_labeling-anchor-boxes`
+## Étiquetage des boîtes d'ancrage dans les données d'entraînement
+:label:`subsec_labeling-anchor-boxes` 
+
+ 
+ Dans un ensemble de données d'entraînement,
+nous considérons chaque boîte d'ancrage comme un exemple d'entraînement.
+Afin d'entraîner un modèle de détection d'objets,
+nous avons besoin d'étiquettes de *classe* et de *décalage* pour chaque boîte d'ancrage,
+où la première est
+la classe de l'objet pertinent pour la boîte d'ancrage
+et la seconde est le décalage
+de la boîte d'ancrage de référence par rapport à la boîte d'ancrage.
+Pendant la prédiction,
+pour chaque image
+nous générons plusieurs boîtes d'ancrage,
+nous prédisons les classes et les décalages pour toutes les boîtes d'ancrage,
+nous ajustons leurs positions en fonction des décalages prédits pour obtenir les boîtes limites prédites,
+et finalement nous ne produisons que les boîtes limites prédites 
+qui satisfont certains critères.
 
 
-In a training dataset,
-we consider each anchor box as a training example.
-In order to train an object detection model,
-we need *class* and *offset* labels for each anchor box,
-where the former is
-the class of the object relevant to the anchor box
-and the latter is the offset
-of the ground-truth bounding box relative to the anchor box.
-During the prediction,
-for each image
-we generate multiple anchor boxes,
-predict classes and offsets for all the anchor boxes,
-adjust their positions according to the predicted offsets to obtain the predicted bounding boxes,
-and finally only output those 
-predicted bounding boxes that satisfy certain criteria.
-
-
-As we know, an object detection training set
-comes with labels for
-locations of *ground-truth bounding boxes*
-and classes of their surrounded objects.
-To label any generated *anchor box*,
-we refer to the labeled
-location and class of its *assigned* ground-truth bounding box that is closest to the anchor box.
-In the following,
-we describe an algorithm for assigning
-closest ground-truth bounding boxes to anchor boxes. 
+Comme nous le savons, un ensemble d'entraînement à la détection d'objets
+est fourni avec des étiquettes pour
+les emplacements des *boîtes englobantes de terrain*
+et les classes des objets qui les entourent.
+Pour étiqueter une *boîte d'ancrage* générée,
+fait référence à l'emplacement et à la classe étiquetés
+de sa *boîte d'ancrage de terrain assignée* la plus proche de la boîte d'ancrage.
+Dans ce qui suit,
+, nous décrivons un algorithme permettant d'attribuer
+aux boîtes d'ancrage les boîtes limites les plus proches de la vérité du terrain. 
 
 ### [**Assigning Ground-Truth Bounding Boxes to Anchor Boxes**]
 
@@ -345,17 +345,17 @@ Let's define a matrix $\mathbf{X} \in \mathbb{R}^{n_a \times n_b}$, whose elemen
 
 Let's illustrate the above algorithm using a concrete
 example.
-As shown in :numref:`fig_anchor_label` (left), assuming that the maximum value in matrix $\mathbf{X}$ is $x_{23}$, we assign the ground-truth bounding box $B_3$ to the anchor box $A_2$.
-Then, we discard all the elements in row 2 and column 3 of the matrix, find the largest $x_{71}$ in the remaining  elements (shaded area), and assign the ground-truth bounding box $B_1$ to the anchor box $A_7$. 
-Next, as shown in :numref:`fig_anchor_label` (middle), discard all the elements in row 7 and column 1 of the matrix, find the largest $x_{54}$ in the remaining  elements (shaded area), and assign the ground-truth bounding box $B_4$ to the anchor box $A_5$. 
-Finally, as shown in :numref:`fig_anchor_label` (right), discard all the elements in row 5 and column 4 of the matrix, find the largest $x_{92}$ in the remaining elements (shaded area), and assign the ground-truth bounding box $B_2$ to the anchor box $A_9$.
-After that, we only need to traverse through
-the remaining anchor boxes $A_1, A_3, A_4, A_6, A_8$ and determine whether to assign them ground-truth bounding boxes according to the threshold.
+As shown in :numref:`fig_anchor_label` (left)en supposant que la valeur maximale de la matrice $\mathbf{X}$ est $x_{23}$, nous assignons la boîte limite de vérité de base $B_3$ à la boîte d'ancrage $A_2$.
+Ensuite, nous éliminons tous les éléments de la ligne 2 et de la colonne 3 de la matrice, nous trouvons la plus grande valeur de $x_{71}$ dans les éléments restants (zone ombrée) et nous attribuons la boîte limite de vérité fondamentale $B_1$ à la boîte d'ancrage $A_7$. 
+Ensuite, comme indiqué dans :numref:`fig_anchor_label` (au milieu), éliminez tous les éléments de la ligne 7 et de la colonne 1 de la matrice, trouvez le plus grand $x_{54}$ dans les éléments restants (zone ombrée) et affectez la boîte limite de vérité de base $B_4$ à la boîte d'ancrage $A_5$. 
+Enfin, comme indiqué sur :numref:`fig_anchor_label` (à droite), éliminez tous les éléments de la ligne 5 et de la colonne 4 de la matrice, trouvez le plus grand $x_{92}$ dans les éléments restants (zone ombrée) et attribuez la boîte limite de vérité de base $B_2$ à la boîte d'ancrage $A_9$.
+Ensuite, il suffit de parcourir
+les autres boîtes d'ancrage $A_1, A_3, A_4, A_6, A_8$ et de déterminer s'il faut leur attribuer des boîtes limites de vérité fondamentale en fonction du seuil.
 
 ![Assigning ground-truth bounding boxes to anchor boxes.](../img/anchor-label.svg)
 :label:`fig_anchor_label`
 
-This algorithm is implemented in the following `assign_anchor_to_bbox` function.
+Cet algorithme est mis en œuvre dans la fonction suivante `assign_anchor_to_bbox`.
 
 ```{.python .input}
 #@tab mxnet
@@ -416,40 +416,40 @@ def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     return anchors_bbox_map
 ```
 
-### Labeling Classes and Offsets
+### Étiquetage des classes et des décalages
 
-Now we can label the class and offset for each anchor box. Suppose that an anchor box $A$ is assigned
-a ground-truth bounding box $B$. 
-On the one hand,
-the class of the anchor box $A$ will be
-labeled as that of $B$.
-On the other hand,
-the offset of the anchor box $A$ 
-will be labeled according to the 
-relative position between
-the central coordinates of $B$ and $A$
-together with the relative size between
-these two boxes.
-Given varying
-positions and sizes of different boxes in the dataset,
-we can apply transformations
-to those relative positions and sizes
-that may lead to 
-more uniformly distributed offsets
-that are easier to fit.
-Here we describe a common transformation.
-[**Given the central coordinates of $A$ and $B$ as $(x_a, y_a)$ and $(x_b, y_b)$, 
-their widths as $w_a$ and $w_b$, 
-and their heights as $h_a$ and $h_b$, respectively. 
-We may label the offset of $A$ as
+Nous pouvons maintenant étiqueter la classe et le décalage de chaque boîte d'ancrage. Supposons qu'une boîte d'ancrage $A$ se voit attribuer
+une boîte limite de vérité du sol $B$. 
+D'une part,
+la classe de la boîte d'ancrage $A$ sera étiquetée
+comme celle de $B$.
+D'autre part,
+le décalage de la boîte d'ancrage $A$ 
+ sera étiqueté en fonction de la position relative 
+entre
+les coordonnées centrales de $B$ et $A$
+ ainsi que de la taille relative entre
+ces deux boîtes.
+Étant donné les positions et les tailles variables
+des différentes boîtes de l'ensemble de données,
+nous pouvons appliquer des transformations
+à ces positions et tailles relatives
+qui peuvent conduire à 
+des décalages
+plus uniformément distribués et plus faciles à ajuster.
+Nous décrivons ici une transformation courante.
+[**Étant donné les coordonnées centrales de $A$ et $B$ comme $(x_a, y_a)$ et $(x_b, y_b)$, 
+leurs largeurs comme $w_a$ et $w_b$, 
+et leurs hauteurs comme $h_a$ et $h_b$, respectivement. 
+Nous pouvons étiqueter le décalage de $A$ comme
 
 $$\left( \frac{ \frac{x_b - x_a}{w_a} - \mu_x }{\sigma_x},
 \frac{ \frac{y_b - y_a}{h_a} - \mu_y }{\sigma_y},
 \frac{ \log \frac{w_b}{w_a} - \mu_w }{\sigma_w},
 \frac{ \log \frac{h_b}{h_a} - \mu_h }{\sigma_h}\right),$$
 **]
-where default values of the constants are $\mu_x = \mu_y = \mu_w = \mu_h = 0, \sigma_x=\sigma_y=0.1$, and $\sigma_w=\sigma_h=0.2$.
-This transformation is implemented below in the `offset_boxes` function.
+où les valeurs par défaut des constantes sont $\mu_x = \mu_y = \mu_w = \mu_h = 0, \sigma_x=\sigma_y=0.1$, et $\sigma_w=\sigma_h=0.2$.
+Cette transformation est mise en œuvre ci-dessous dans la fonction `offset_boxes`.
 
 ```{.python .input}
 #@tab all
@@ -464,12 +464,12 @@ def offset_boxes(anchors, assigned_bb, eps=1e-6):
     return offset
 ```
 
-If an anchor box is not assigned a ground-truth bounding box, we just label the class of the anchor box as "background".
-Anchor boxes whose classes are background are often referred to as *negative* anchor boxes,
-and the rest are called *positive* anchor boxes.
-We implement the following `multibox_target` function
-to [**label classes and offsets for anchor boxes**] (the `anchors` argument) using ground-truth bounding boxes (the `labels` argument).
-This function sets the background class to zero and increments the integer index of a new class by one.
+Si une boîte d'ancrage n'est pas associée à une boîte de délimitation de la vérité du sol, nous étiquetons simplement la classe de la boîte d'ancrage comme "arrière-plan".
+Les boîtes d'ancrage dont la classe est l'arrière-plan sont souvent appelées boîtes d'ancrage *négatives*,
+et les autres sont appelées boîtes d'ancrage *positives*.
+Nous implémentons la fonction suivante `multibox_target`
+ pour [**étiqueter les classes et les décalages pour les boîtes d'ancrage**] (l'argument `anchors` ) en utilisant des boîtes d'encombrement conformes à la réalité (l'argument `labels` ).
+Cette fonction définit la classe d'arrière-plan à zéro et incrémente de un l'indice entier d'une nouvelle classe.
 
 ```{.python .input}
 #@tab mxnet
@@ -546,22 +546,22 @@ def multibox_target(anchors, labels):
     return (bbox_offset, bbox_mask, class_labels)
 ```
 
-### An Example
+### Un exemple
 
-Let's illustrate anchor box labeling
-via a concrete example.
-We define ground-truth bounding boxes for the dog and cat in the loaded image,
-where the first element is the class (0 for dog and 1 for cat) and the remaining four elements are the
-$(x, y)$-axis coordinates
-at the upper-left corner and the lower-right corner
-(range is between 0 and 1). 
-We also construct five anchor boxes to be labeled
-using the coordinates of
-the upper-left corner and the lower-right corner:
-$A_0, \ldots, A_4$ (the index starts from 0).
-Then we [**plot these ground-truth bounding boxes 
-and anchor boxes 
-in the image.**]
+Illustrons l'étiquetage des boîtes d'ancrage
+par un exemple concret.
+
+$(x, y)$ Nous définissons des boîtes d'ancrage véridiques pour le chien et le chat dans l'image chargée,
+où le premier élément est la classe (0 pour le chien et 1 pour le chat) et les quatre autres éléments sont les coordonnées de l'axe
+du coin supérieur gauche et du coin inférieur droit
+(la plage est comprise entre 0 et 1). 
+Nous construisons également cinq boîtes d'ancrage à étiqueter
+en utilisant les coordonnées de
+au coin supérieur gauche et au coin inférieur droit :
+$A_0, \ldots, A_4$ (l'indice commence à 0).
+Ensuite, nous [**traçons ces boîtes limites de vérité du sol 
+et ces boîtes d'ancrage 
+dans l'image.**]
 
 ```{.python .input}
 #@tab all
@@ -576,14 +576,14 @@ show_bboxes(fig.axes, ground_truth[:, 1:] * bbox_scale, ['dog', 'cat'], 'k')
 show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
 ```
 
-Using the `multibox_target` function defined above,
-we can [**label classes and offsets
-of these anchor boxes based on
-the ground-truth bounding boxes**] for the dog and cat.
-In this example, indices of
-the background, dog, and cat classes
-are 0, 1, and 2, respectively. 
-Below we add an dimension for examples of anchor boxes and ground-truth bounding boxes.
+À l'aide de la fonction `multibox_target` définie ci-dessus,
+nous pouvons [**étiqueter les classes et les décalages
+de ces boîtes d'ancrage sur la base de
+les boîtes limites de vérité du sol**] pour le chien et le chat.
+Dans cet exemple, les indices de
+les classes d'arrière-plan, de chien et de chat
+sont 0, 1 et 2, respectivement. 
+Nous ajoutons ci-dessous une dimension pour des exemples de boîtes d'ancrage et de boîtes limites de vérité fondamentale.
 
 ```{.python .input}
 #@tab mxnet
@@ -597,66 +597,66 @@ labels = multibox_target(anchors.unsqueeze(dim=0),
                          ground_truth.unsqueeze(dim=0))
 ```
 
-There are three items in the returned result, all of which are in the tensor format.
-The third item contains the labeled classes of the input anchor boxes.
+Il y a trois éléments dans le résultat retourné, tous au format tenseur.
+Le troisième élément contient les classes étiquetées des boîtes d'ancrage d'entrée.
 
-Let's analyze the returned class labels below based on
-anchor box and ground-truth bounding box positions in the image.
-First, among all the pairs of anchor boxes
-and ground-truth bounding boxes,
-the IoU of the anchor box $A_4$ and the ground-truth bounding box of the cat is the largest. 
-Thus, the class of $A_4$ is labeled as the cat.
-Taking out 
-pairs containing $A_4$ or the ground-truth bounding box of the cat, among the rest 
-the pair of the anchor box $A_1$ and the ground-truth bounding box of the dog has the largest IoU.
-So the class of $A_1$ is labeled as the dog.
-Next, we need to traverse through the remaining three unlabeled anchor boxes: $A_0$, $A_2$, and $A_3$.
-For $A_0$,
-the class of the ground-truth bounding box with the largest IoU is the dog,
-but the IoU is below the predefined threshold (0.5),
-so the class is labeled as background;
-for $A_2$,
-the class of the ground-truth bounding box with the largest IoU is the cat and the IoU exceeds the threshold, so the class is labeled as the cat;
-for $A_3$,
-the class of the ground-truth bounding box with the largest IoU is the cat, but the value is below the threshold, so the class is labeled as background.
+Analysons les étiquettes de classe renvoyées ci-dessous en fonction de la position des boîtes d'ancrage
+et des boîtes de délimitation de la vérité du sol dans l'image.
+Premièrement, parmi toutes les paires de boîtes d'ancrage
+et de boîtes limites de vérité,
+, l'IoU de la boîte d'ancrage $A_4$ et la boîte limite de vérité du chat sont les plus grandes. 
+Ainsi, la classe de $A_4$ est étiquetée comme étant le chat.
+Si l'on exclut les paires 
+contenant $A_4$ ou la boîte englobante de vérité du chat, parmi les autres 
+, la paire de la boîte d'ancrage $A_1$ et de la boîte englobante de vérité du chien a le plus grand IoU.
+La classe de $A_1$ est donc étiquetée comme étant celle du chien.
+Ensuite, nous devons parcourir les trois autres boîtes d'ancrage non étiquetées : $A_0$, $A_2$, et $A_3$.
+Pour $A_0$,
+, la classe de la boîte d'ancrage de vérité du sol avec le plus grand IoU est le chien,
+mais l'IoU est inférieur au seuil prédéfini (0.5),
+, la classe est donc étiquetée comme étant l'arrière-plan ;
+pour $A_2$,
+la classe de la boîte englobante de vérité avec la plus grande IoU est le chat et l'IoU dépasse le seuil, la classe est donc étiquetée comme étant le chat ;
+pour $A_3$,
+la classe de la boîte englobante de vérité avec la plus grande IoU est le chat, mais la valeur est inférieure au seuil, la classe est donc étiquetée comme étant l'arrière-plan.
 
 ```{.python .input}
 #@tab all
 labels[2]
 ```
 
-The second returned item is a mask variable of the shape (batch size, four times the number of anchor boxes).
-Every four elements in the mask variable 
-correspond to the four offset values of each anchor box.
-Since we do not care about background detection,
-offsets of this negative class should not affect the objective function.
-Through elementwise multiplications, zeros in the mask variable will filter out negative class offsets before calculating the objective function.
+Le deuxième élément renvoyé est une variable de masque de la forme (taille du lot, quatre fois le nombre de boîtes d'ancrage).
+Tous les quatre éléments de la variable de masque 
+correspondent aux quatre valeurs de décalage de chaque boîte d'ancrage.
+Comme nous ne nous soucions pas de la détection de l'arrière-plan, les décalages de
+de cette classe négative ne devraient pas affecter la fonction objective.
+Grâce à des multiplications par éléments, les zéros de la variable de masque filtreront les décalages de classe négative avant de calculer la fonction objectif.
 
 ```{.python .input}
 #@tab all
 labels[1]
 ```
 
-The first returned item contains the four offset values labeled for each anchor box.
-Note that the offsets of negative-class anchor boxes are labeled as zeros.
+Le premier élément retourné contient les quatre valeurs de décalage étiquetées pour chaque boîte d'ancrage.
+Notez que les décalages des boîtes d'ancrage de classe négative sont étiquetés comme des zéros.
 
 ```{.python .input}
 #@tab all
 labels[0]
 ```
 
-## Predicting Bounding Boxes with Non-Maximum Suppression
-:label:`subsec_predicting-bounding-boxes-nms`
+## Prédiction de boîtes englobantes avec suppression non maximale
+:label:`subsec_predicting-bounding-boxes-nms` 
 
-During prediction,
-we generate multiple anchor boxes for the image and predict classes and offsets for each of them.
-A *predicted bounding box*
-is thus obtained according to 
-an anchor box with its predicted offset.
-Below we implement the `offset_inverse` function
-that takes in anchors and
-offset predictions as inputs and [**applies inverse offset transformations to
-return the predicted bounding box coordinates**].
+ Pendant la prédiction,
+nous générons plusieurs boîtes d'ancrage pour l'image et prédisons les classes et les décalages pour chacune d'elles.
+Une *bounding box* prédite
+est ainsi obtenue en fonction de 
+une boîte d'ancrage avec son décalage prédit.
+Nous implémentons ci-dessous la fonction `offset_inverse`
+ qui prend en entrée les boîtes d'ancrage et les prédictions de décalage
+et [**applique des transformations de décalage inverses pour
+renvoyer les coordonnées prédites de la boîte englobante**].
 
 ```{.python .input}
 #@tab all
@@ -671,34 +671,34 @@ def offset_inverse(anchors, offset_preds):
     return predicted_bbox
 ```
 
-When there are many anchor boxes,
-many similar (with significant overlap)
-predicted bounding boxes 
-can be potentially output for surrounding the same object.
-To simplify the output,
-we can merge similar predicted bounding boxes
-that belong to the same object
-by using *non-maximum suppression* (NMS).
+Lorsqu'il existe de nombreuses boîtes d'ancrage,
+de nombreuses boîtes englobantes prédites similaires (avec un chevauchement important)
+ 
+ peuvent potentiellement être produites pour entourer le même objet.
+Pour simplifier la sortie,
+nous pouvons fusionner les boîtes englobantes prédites similaires
+qui appartiennent au même objet
+en utilisant la *suppression non maximale* (NMS).
 
-Here is how non-maximum suppression works.
-For a predicted bounding box $B$,
-the object detection model calculates the predicted likelihood
-for each class.
-Denoting by $p$ the largest predicted likelihood,
-the class corresponding to this probability is the predicted class for $B$.
-Specifically, we refer to $p$ as the *confidence* (score) of the predicted bounding box $B$.
-On the same image,
-all the predicted non-background bounding boxes 
-are sorted by confidence in descending order
-to generate a list $L$.
-Then we manipulate the sorted list $L$ in the following steps:
+Voici comment fonctionne la suppression non maximale.
+Pour une boîte englobante prédite $B$,
+le modèle de détection d'objets calcule la vraisemblance prédite
+pour chaque classe.
+En désignant par $p$ la probabilité prédite la plus élevée,
+la classe correspondant à cette probabilité est la classe prédite pour $B$.
+Plus précisément, nous appelons $p$ la *confiance* (score) de la boîte englobante prédite $B$.
+Sur la même image,
+, toutes les boîtes englobantes sans arrière-plan prédites 
+sont triées par confiance en ordre décroissant
+pour générer une liste $L$.
+Ensuite, nous manipulons la liste triée $L$ selon les étapes suivantes :
 
-1. Select the predicted bounding box $B_1$ with the highest confidence from $L$ as a basis and remove all non-basis predicted bounding boxes whose IoU with $B_1$ exceeds a predefined threshold $\epsilon$ from $L$. At this point, $L$ keeps the predicted bounding box with the highest confidence but drops others that are too similar to it. In a nutshell, those with *non-maximum* confidence scores are *suppressed*.
-1. Select the predicted bounding box $B_2$ with the second highest confidence from $L$ as another basis and remove all non-basis predicted bounding boxes whose IoU with $B_2$ exceeds $\epsilon$ from $L$.
-1. Repeat the above process until all the predicted bounding boxes in $L$ have been used as a basis. At this time, the IoU of any pair of predicted bounding boxes in $L$ is below the threshold $\epsilon$; thus, no pair is too similar with each other. 
-1. Output all the predicted bounding boxes in the list $L$.
+1. Sélectionnez la boîte englobante prédite $B_1$ avec la confiance la plus élevée dans $L$ comme base et supprimez de $L$ toutes les boîtes englobantes prédites sans base dont l'IoU avec $B_1$ dépasse un seuil prédéfini $\epsilon$. À ce stade, $L$ conserve la boîte englobante prédite ayant le degré de confiance le plus élevé, mais élimine les autres boîtes qui lui sont trop similaires. En bref, celles dont le score de confiance n'est pas maximal sont supprimées.
+1. Sélectionnez la boîte englobante prédite $B_2$ avec le deuxième degré de confiance le plus élevé à partir de $L$ comme autre base et supprimez toutes les boîtes englobantes prédites non basées dont l'IoU avec $B_2$ dépasse $\epsilon$ à partir de $L$.
+1. Répétez le processus ci-dessus jusqu'à ce que toutes les boîtes englobantes prédites de $L$ aient été utilisées comme base. À ce stade, l'IoU de toute paire de boîtes englobantes prédites dans $L$ est inférieur au seuil $\epsilon$; ainsi, aucune paire n'est trop similaire entre elles. 
+1. Affichez toutes les boîtes englobantes prédites dans la liste $L$.
 
-[**The following `nms` function sorts confidence scores in descending order and returns their indices.**]
+[**La fonction suivante `nms` trie les scores de confiance par ordre décroissant et renvoie leurs indices.**]
 
 ```{.python .input}
 #@tab mxnet
@@ -736,12 +736,12 @@ def nms(boxes, scores, iou_threshold):
     return d2l.tensor(keep, device=boxes.device)
 ```
 
-We define the following `multibox_detection`
-to [**apply non-maximum suppression
-to predicting bounding boxes**].
-Do not worry if you find the implementation
-a bit complicated: we will show how it works
-with a concrete example right after the implementation.
+Nous définissons la fonction suivante `multibox_detection`
+ pour [**appliquer une suppression non maximale
+à la prédiction des boîtes englobantes**].
+Ne vous inquiétez pas si vous trouvez l'implémentation
+un peu compliquée : nous montrerons comment cela fonctionne
+avec un exemple concret juste après l'implémentation.
 
 ```{.python .input}
 #@tab mxnet
@@ -758,7 +758,7 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
         conf, class_id = np.max(cls_prob[1:], 0), np.argmax(cls_prob[1:], 0)
         predicted_bb = offset_inverse(anchors, offset_pred)
         keep = nms(predicted_bb, conf, nms_threshold)
-        # Find all non-`keep` indices and set the class to background
+        # Find all non-`garder` indices and set the class to background
         all_idx = np.arange(num_anchors, dtype=np.int32, ctx=device)
         combined = d2l.concat((keep, all_idx))
         unique, counts = np.unique(combined, return_counts=True)
@@ -794,7 +794,7 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
         conf, class_id = torch.max(cls_prob[1:], 0)
         predicted_bb = offset_inverse(anchors, offset_pred)
         keep = nms(predicted_bb, conf, nms_threshold)
-        # Find all non-`keep` indices and set the class to background
+        # Find all non-`garder` indices and set the class to background
         all_idx = torch.arange(num_anchors, dtype=torch.long, device=device)
         combined = torch.cat((keep, all_idx))
         uniques, counts = combined.unique(return_counts=True)
@@ -815,13 +815,13 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
     return d2l.stack(out)
 ```
 
-Now let's [**apply the above implementations
-to a concrete example with four anchor boxes**].
-For simplicity, we assume that the
-predicted offsets are all zeros.
-This means that the predicted bounding boxes are anchor boxes. 
-For each class among the background, dog, and cat,
-we also define its predicted likelihood.
+Appliquons maintenant [**les implémentations ci-dessus
+à un exemple concret avec quatre boîtes d'ancrage**].
+Pour simplifier, nous supposons que les décalages prédits de
+sont tous des zéros.
+Cela signifie que les boîtes de délimitation prédites sont des boîtes d'ancrage. 
+Pour chaque classe parmi le fond, le chien et le chat,
+, nous définissons également sa vraisemblance prédite.
 
 ```{.python .input}
 #@tab all
@@ -833,7 +833,7 @@ cls_probs = d2l.tensor([[0] * 4,  # Predicted background likelihood
                       [0.1, 0.2, 0.3, 0.9]])  # Predicted cat likelihood
 ```
 
-We can [**plot these predicted bounding boxes with their confidence on the image.**]
+Nous pouvons [**tracer ces boîtes englobantes prédites avec leur confiance sur l'image.**]
 
 ```{.python .input}
 #@tab all
@@ -842,20 +842,20 @@ show_bboxes(fig.axes, anchors * bbox_scale,
             ['dog=0.9', 'dog=0.8', 'dog=0.7', 'cat=0.9'])
 ```
 
-Now we can invoke the `multibox_detection` function
-to perform non-maximum suppression,
-where the threshold is set to 0.5.
-Note that we add
-a dimension for examples in the tensor input.
+Nous pouvons maintenant invoquer la fonction `multibox_detection`
+ pour effectuer une suppression non maximale,
+où le seuil est fixé à 0,5.
+Notez que nous ajoutons
+une dimension pour les exemples dans l'entrée tensorielle.
 
-We can see that [**the shape of the returned result**] is
-(batch size, number of anchor boxes, 6).
-The six elements in the innermost dimension
-gives the output information for the same predicted bounding box.
-The first element is the predicted class index, which starts from 0 (0 is dog and 1 is cat). The value -1 indicates background or removal in non-maximum suppression.
-The second element is the confidence of the predicted bounding box.
-The remaining four elements are the $(x, y)$-axis coordinates of the upper-left corner and 
-the lower-right corner of the predicted bounding box, respectively (range is between 0 and 1).
+Nous pouvons voir que [**la forme du résultat retourné**] est
+(taille du lot, nombre de boîtes d'ancrage, 6).
+Les six éléments de la dimension la plus intérieure
+donnent les informations de sortie pour la même boîte d'ancrage prédite.
+Le premier élément est l'indice de classe prédit, qui commence à 0 (0 est chien et 1 est chat). La valeur -1 indique l'arrière-plan ou la suppression en cas de suppression non maximale.
+Le deuxième élément est la confiance de la boîte de délimitation prédite.
+Les quatre éléments restants sont les coordonnées sur l'axe $(x, y)$ du coin supérieur gauche et 
+du coin inférieur droit de la boîte englobante prédite, respectivement (la plage est comprise entre 0 et 1).
 
 ```{.python .input}
 #@tab mxnet
@@ -875,10 +875,10 @@ output = multibox_detection(cls_probs.unsqueeze(dim=0),
 output
 ```
 
-After removing those predicted bounding boxes
-of class -1, 
-we can [**output the final predicted bounding box
-kept by non-maximum suppression**].
+Après avoir supprimé les boîtes englobantes prédites
+de classe -1, 
+nous pouvons [**produire la boîte englobante prédite finale
+conservée par suppression non maximale**].
 
 ```{.python .input}
 #@tab all
@@ -890,27 +890,27 @@ for i in d2l.numpy(output[0]):
     show_bboxes(fig.axes, [d2l.tensor(i[2:]) * bbox_scale], label)
 ```
 
-In practice, we can remove predicted bounding boxes with lower confidence even before performing non-maximum suppression, thereby reducing computation in this algorithm.
-We may also post-process the output of non-maximum suppression, for example, by only keeping
-results with higher confidence
-in the final output.
+Dans la pratique, nous pouvons supprimer les boîtes englobantes prédites ayant un faible niveau de confiance avant même d'effectuer la suppression non maximale, ce qui réduit le calcul de cet algorithme.
+Nous pouvons également post-traiter le résultat de la suppression non maximale, par exemple, en ne conservant que les résultats
+avec une confiance plus élevée
+dans le résultat final.
 
 
-## Summary
+## Résumé
 
-* We generate anchor boxes with different shapes centered on each pixel of the image.
-* Intersection over union (IoU), also known as Jaccard index, measures the similarity of two bounding boxes. It is the ratio of their intersection area to their union area.
-* In a training set, we need two types of labels for each anchor box. One is the class of the object relevant to the anchor box and the other is the offset of the ground-truth bounding box relative to the anchor box.
-* During prediction, we can use non-maximum suppression (NMS) to remove similar predicted bounding boxes, thereby simplifying the output.
+* Nous générons des boîtes d'ancrage de différentes formes centrées sur chaque pixel de l'image.
+* L'intersection sur l'union (IoU), également connue sous le nom d'indice de Jaccard, mesure la similarité de deux boîtes englobantes. Il s'agit du rapport entre leur zone d'intersection et leur zone d'union.
+* Dans un ensemble d'apprentissage, nous avons besoin de deux types d'étiquettes pour chaque boîte d'ancrage. L'un est la classe de l'objet pertinent pour la boîte d'ancrage et l'autre est le décalage de la boîte d'ancrage de référence par rapport à la boîte d'ancrage.
+* Pendant la prédiction, nous pouvons utiliser la suppression non maximale (NMS) pour éliminer les boîtes de délimitation prédites similaires, simplifiant ainsi la sortie.
 
 
-## Exercises
+## Exercices
 
-1. Change values of `sizes` and `ratios` in the `multibox_prior` function. What are the changes to the generated anchor boxes?
-1. Construct and visualize two bounding boxes with an IoU of 0.5. How do they overlap with each other?
-1. Modify the variable `anchors` in :numref:`subsec_labeling-anchor-boxes` and :numref:`subsec_predicting-bounding-boxes-nms`. How do the results change?
-1. Non-maximum suppression is a greedy algorithm that suppresses predicted bounding boxes by *removing* them. Is it possible that some of these removed ones are actually useful? How can this algorithm be modified to suppress *softly*? You may refer to Soft-NMS :cite:`Bodla.Singh.Chellappa.ea.2017`.
-1. Rather than being hand-crafted, can non-maximum suppression be learned?
+1. Modifiez les valeurs de `sizes` et `ratios` dans la fonction `multibox_prior`. Quels sont les changements apportés aux boîtes d'ancrage générées ?
+1. Construisez et visualisez deux boîtes englobantes avec un IoU de 0,5. Comment se chevauchent-elles ?
+1. Modifiez la variable `anchors` dans :numref:`subsec_labeling-anchor-boxes` et :numref:`subsec_predicting-bounding-boxes-nms` . Comment les résultats changent-ils ?
+1. La suppression non maximale est un algorithme gourmand qui supprime les boîtes englobantes prédites en les *supprimant*. Est-il possible que certaines de ces boîtes supprimées soient réellement utiles ? Comment peut-on modifier cet algorithme pour supprimer *mollement* ? Vous pouvez vous référer à Soft-NMS :cite:`Bodla.Singh.Chellappa.ea.2017` .
+1. Plutôt que d'être fabriquée à la main, la suppression non-maximale peut-elle être apprise ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/370)

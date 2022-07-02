@@ -318,9 +318,9 @@ print(X)
 print(Z)
 ```
 
-Now that [**the data is on the same GPU
-(both `Z` and `Y` are),
-we can add them up.**]
+Maintenant que [**les données sont sur le même GPU
+( `Z` et `Y` le sont tous les deux),
+nous pouvons les additionner.**]
 
 ```{.python .input}
 %%tab all
@@ -328,31 +328,31 @@ Y + Z
 ```
 
 :begin_tab:`mxnet`
-Imagine that your variable `Z` already lives on your second GPU.
-What happens if we still call  `Z.copyto(gpu(1))`?
-It will make a copy and allocate new memory,
-even though that variable already lives on the desired device.
-There are times where, depending on the environment our code is running in,
-two variables may already live on the same device.
-So we want to make a copy only if the variables
-currently live in different devices.
-In these cases, we can call `as_in_ctx`.
-If the variable already live in the specified device
-then this is a no-op.
-Unless you specifically want to make a copy,
-`as_in_ctx` is the method of choice.
+Imaginez que votre variable `Z` se trouve déjà sur votre deuxième GPU.
+Que se passe-t-il si nous appelons encore `Z.copyto(gpu(1))`?
+Il fera une copie et allouera une nouvelle mémoire,
+même si cette variable vit déjà sur le périphérique souhaité.
+Il arrive que, selon l'environnement dans lequel notre code s'exécute,
+deux variables puissent déjà se trouver sur le même périphérique.
+Nous voulons donc faire une copie uniquement si les variables
+se trouvent actuellement sur des périphériques différents.
+Dans ce cas, nous pouvons appeler `as_in_ctx`.
+Si la variable se trouve déjà dans le périphérique spécifié
+, il n'y a rien à faire.
+À moins que vous ne souhaitiez spécifiquement faire une copie,
+`as_in_ctx` est la méthode à privilégier.
 :end_tab:
 
 :begin_tab:`pytorch`
-Imagine that your variable `Z` already lives on your second GPU.
-What happens if we still call `Z.cuda(1)`?
-It will return `Z` instead of making a copy and allocating new memory.
+Imaginez que votre variable `Z` se trouve déjà sur votre deuxième GPU.
+Que se passe-t-il si nous appelons toujours `Z.cuda(1)`?
+Il retournera `Z` au lieu de faire une copie et d'allouer une nouvelle mémoire.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Imagine that your variable `Z` already lives on your second GPU.
-What happens if we still call `Z2 = Z` under the same device scope?
-It will return `Z` instead of making a copy and allocating new memory.
+Imaginez que votre variable `Z` se trouve déjà sur votre deuxième GPU.
+Que se passe-t-il si nous appelons toujours `Z2 = Z` dans le même périmètre de périphérique ?
+Il renverra `Z` au lieu d'en faire une copie et d'allouer une nouvelle mémoire.
 :end_tab:
 
 ```{.python .input}
@@ -372,46 +372,46 @@ with try_gpu(1):
 Z2 is Z
 ```
 
-### Side Notes
+#### Side Notes
 
-People use GPUs to do machine learning
-because they expect them to be fast.
-But transferring variables between devices is slow.
-So we want you to be 100% certain
-that you want to do something slow before we let you do it.
-If the deep learning framework just did the copy automatically
-without crashing then you might not realize
-that you had written some slow code.
+Les gens utilisent les GPU pour faire de l'apprentissage automatique
+parce qu'ils s'attendent à ce qu'ils soient rapides.
+Mais le transfert de variables entre périphériques est lent.
+Nous voulons donc que vous soyez 100% certain
+que vous voulez faire quelque chose de lent avant de vous laisser le faire.
+Si le cadre d'apprentissage profond effectue automatiquement la copie
+sans planter, vous ne vous rendrez peut-être pas compte
+que vous avez écrit du code lent.
 
-Also, transferring data between devices (CPU, GPUs, and other machines)
-is something that is much slower than computation.
-It also makes parallelization a lot more difficult,
-since we have to wait for data to be sent (or rather to be received)
-before we can proceed with more operations.
-This is why copy operations should be taken with great care.
-As a rule of thumb, many small operations
-are much worse than one big operation.
-Moreover, several operations at a time
-are much better than many single operations interspersed in the code
-unless you know what you are doing.
-This is the case since such operations can block if one device
-has to wait for the other before it can do something else.
-It is a bit like ordering your coffee in a queue
-rather than pre-ordering it by phone
-and finding out that it is ready when you are.
+De plus, le transfert de données entre les appareils (CPU, GPU et autres machines)
+est quelque chose de beaucoup plus lent que le calcul.
+Cela rend également la parallélisation beaucoup plus difficile,
+puisque nous devons attendre que les données soient envoyées (ou plutôt reçues)
+avant de pouvoir procéder à d'autres opérations.
+C'est pourquoi les opérations de copie doivent être prises avec beaucoup de précautions.
+En règle générale, plusieurs petites opérations
+sont bien pires qu'une grosse opération.
+De plus, plusieurs opérations à la fois
+sont bien meilleures que de nombreuses opérations uniques intercalées dans le code
+sauf si vous savez ce que vous faites.
+En effet, ces opérations peuvent se bloquer si un périphérique
+doit attendre l'autre avant de pouvoir faire autre chose.
+C'est un peu comme commander son café dans une file d'attente
+plutôt que de le précommander par téléphone
+et de découvrir qu'il est prêt quand vous l'êtes.
 
-Last, when we print tensors or convert tensors to the NumPy format,
-if the data is not in the main memory,
-the framework will copy it to the main memory first,
-resulting in additional transmission overhead.
-Even worse, it is now subject to the dreaded global interpreter lock
-that makes everything wait for Python to complete.
+Enfin, lorsque nous imprimons des tenseurs ou convertissons des tenseurs au format NumPy,
+si les données ne se trouvent pas dans la mémoire principale,
+le framework les copiera d'abord dans la mémoire principale,
+ce qui entraîne une surcharge de transmission supplémentaire.
+Pire encore, il est maintenant soumis au redoutable verrou global de l'interpréteur
+qui fait que tout attend la fin de Python.
 
 
-## [**Neural Networks and GPUs**]
+## [**Réseaux neuronaux et GPUs**]
 
-Similarly, a neural network model can specify devices.
-The following code puts the model parameters on the GPU.
+De même, un modèle de réseau neuronal peut spécifier des périphériques.
+Le code suivant place les paramètres du modèle sur le GPU.
 
 ```{.python .input}
 %%tab mxnet
@@ -434,18 +434,18 @@ with strategy.scope():
         tf.keras.layers.Dense(1)])
 ```
 
-We will see many more examples of
-how to run models on GPUs in the following chapters,
-simply since they will become somewhat more computationally intensive.
+Nous verrons beaucoup plus d'exemples de
+comment exécuter des modèles sur des GPU dans les chapitres suivants,
+simplement parce qu'ils deviendront un peu plus intensifs en termes de calcul.
 
-When the input is a tensor on the GPU, the model will calculate the result on the same GPU.
+Lorsque l'entrée est un tenseur sur le GPU, le modèle calculera le résultat sur le même GPU.
 
 ```{.python .input}
 %%tab all
 net(X)
 ```
 
-Let's (**confirm that the model parameters are stored on the same GPU.**)
+Confirmons (**que les paramètres du modèle sont stockés sur le même GPU.**)
 
 ```{.python .input}
 %%tab mxnet
@@ -462,7 +462,7 @@ net[0].weight.data.device
 net.layers[0].weights[0].device, net.layers[0].weights[1].device
 ```
 
-Let the trainer support GPU.
+Que l'entraîneur supporte le GPU.
 
 ```{.python .input}
 %%tab mxnet
@@ -507,37 +507,37 @@ def prepare_model(self, model):
     self.model = model
 ```
 
-In short, as long as all data and parameters are on the same device, we can learn models efficiently. In the following chapters we will see several such examples.
+En bref, tant que toutes les données et tous les paramètres sont sur le même dispositif, nous pouvons apprendre des modèles efficacement. Dans les chapitres suivants, nous verrons plusieurs exemples de ce type.
 
-## Summary
+## Résumé
 
-* We can specify devices for storage and calculation, such as the CPU or GPU.
-  By default, data is created in the main memory
-  and then uses the CPU for calculations.
-* The deep learning framework requires all input data for calculation
-  to be on the same device,
-  be it CPU or the same GPU.
-* You can lose significant performance by moving data without care.
-  A typical mistake is as follows: computing the loss
-  for every minibatch on the GPU and reporting it back
-  to the user on the command line (or logging it in a NumPy `ndarray`)
-  will trigger a global interpreter lock which stalls all GPUs.
-  It is much better to allocate memory
-  for logging inside the GPU and only move larger logs.
+* Nous pouvons spécifier des dispositifs pour le stockage et le calcul, comme le CPU ou le GPU.
+ Par défaut, les données sont créées dans la mémoire principale
+ et utilisent ensuite le CPU pour les calculs.
+* Le cadre d'apprentissage profond exige que toutes les données d'entrée pour le calcul
+ soient sur le même périphérique,
+ que ce soit le CPU ou le même GPU.
+* Vous pouvez perdre des performances importantes en déplaçant les données sans précaution.
+ Une erreur typique est la suivante : calculer la perte
+ pour chaque minibatch sur le GPU et la rapporter
+ à l'utilisateur sur la ligne de commande (ou l'enregistrer dans un NumPy `ndarray`)
+ déclenchera un verrouillage global de l'interpréteur qui bloquera tous les GPU.
+ Il est bien mieux d'allouer de la mémoire
+ pour la journalisation à l'intérieur du GPU et de ne déplacer que les journaux les plus importants.
 
-## Exercises
+## Exercices
 
-1. Try a larger computation task, such as the multiplication of large matrices,
-   and see the difference in speed between the CPU and GPU.
-   What about a task with a small amount of calculations?
-1. How should we read and write model parameters on the GPU?
-1. Measure the time it takes to compute 1000
-   matrix-matrix multiplications of $100 \times 100$ matrices
-   and log the Frobenius norm of the output matrix one result at a time
-   vs. keeping a log on the GPU and transferring only the final result.
-1. Measure how much time it takes to perform two matrix-matrix multiplications
-   on two GPUs at the same time vs. in sequence
-   on one GPU. Hint: you should see almost linear scaling.
+1. Essayez une tâche de calcul plus importante, comme la multiplication de grandes matrices,
+ et voyez la différence de vitesse entre le CPU et le GPU.
+  Qu'en est-il d'une tâche comportant une petite quantité de calculs ?
+1. Comment devons-nous lire et écrire les paramètres du modèle sur le GPU ?
+1. Mesurez le temps nécessaire pour calculer 1000 multiplications matricielles
+ de matrices $100 \times 100$
+ et enregistrer la norme de Frobenius de la matrice de sortie, un résultat à la fois
+ ou garder un journal sur le GPU et transférer uniquement le résultat final.
+1. Mesurez le temps nécessaire pour effectuer deux multiplications matricielles
+ sur deux GPU en même temps par rapport à la séquence
+ sur un GPU. Indice : vous devriez constater une mise à l'échelle presque linéaire.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/62)

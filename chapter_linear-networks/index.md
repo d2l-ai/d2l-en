@@ -1,25 +1,25 @@
-# Linear Neural Networks
-:label:`chap_linear`
+# Réseaux neuronaux linéaires
+:label:`chap_linear` 
 
-Before we worry about making our neural networks deep,
-it will be helpful to implement some shallow neural networks,
-for which the inputs connect directly to the outputs.
-This will prove important for a few reasons.
-First, rather than getting distracted by complicated architectures,
-we can focus on the basics of neural network training,
-including parameterizing the output layer, handling data,
-specifying a loss function, and training the model.
-Second, this class of shallow networks happens
-to comprise the set of linear models,
-which subsumes many classical methods for statistical prediction,
-including linear and softmax regression.
-Understanding these classical tools is pivotal
-because they are widely used in many contexts
-and we will often need to use them as baselines
-when justifying the use of fancier architectures.
-This chapter will focus narrowly on linear regression
-and the subsequent chapter will extend our modeling repertoire
-by developing linear neural networks for classification.
+ Avant de nous soucier de rendre nos réseaux neuronaux profonds,
+il sera utile d'implémenter quelques réseaux neuronaux peu profonds,
+pour lesquels les entrées se connectent directement aux sorties.
+Cela s'avère important pour plusieurs raisons.
+Premièrement, plutôt que de se laisser distraire par des architectures compliquées,
+nous pouvons nous concentrer sur les bases de la formation des réseaux neuronaux,
+y compris le paramétrage de la couche de sortie, la manipulation des données,
+la spécification d'une fonction de perte et la formation du modèle.
+Deuxièmement, il se trouve que cette classe de réseaux peu profonds
+comprend l'ensemble des modèles linéaires,
+qui englobe de nombreuses méthodes classiques de prédiction statistique,
+dont la régression linéaire et softmax.
+Il est essentiel de comprendre ces outils classiques
+car ils sont largement utilisés dans de nombreux contextes
+et nous aurons souvent besoin de les utiliser comme référence
+pour justifier l'utilisation d'architectures plus sophistiquées.
+Ce chapitre se concentre sur la régression linéaire
+et le chapitre suivant élargira notre répertoire de modélisation
+en développant des réseaux de neurones linéaires pour la classification.
 
 ```toc
 :maxdepth: 2

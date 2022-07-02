@@ -1,30 +1,30 @@
-# Natural Language Inference: Using Attention
-:label:`sec_natural-language-inference-attention`
+# Inférence en langage naturel : Using Attention
+:label:`sec_natural-language-inference-attention` 
 
-We introduced the natural language inference task and the SNLI dataset in :numref:`sec_natural-language-inference-and-dataset`. In view of many models that are based on complex and deep architectures, Parikh et al. proposed to address natural language inference with attention mechanisms and called it a "decomposable attention model" :cite:`Parikh.Tackstrom.Das.ea.2016`.
-This results in a model without recurrent or convolutional layers, achieving the best result at the time on the SNLI dataset with much fewer parameters.
-In this section, we will describe and implement this attention-based method (with MLPs) for natural language inference, as depicted in :numref:`fig_nlp-map-nli-attention`.
+ Nous avons présenté la tâche d'inférence du langage naturel et le jeu de données SNLI dans :numref:`sec_natural-language-inference-and-dataset` . Au vu des nombreux modèles basés sur des architectures complexes et profondes, Parikh et al. ont proposé d'aborder l'inférence du langage naturel avec des mécanismes d'attention et l'ont appelé un " modèle d'attention décomposable " :cite:`Parikh.Tackstrom.Das.ea.2016` .
+Il en résulte un modèle sans couches récurrentes ou convolutionnelles, qui obtient le meilleur résultat à l'époque sur le jeu de données SNLI avec beaucoup moins de paramètres.
+Dans cette section, nous allons décrire et mettre en œuvre cette méthode basée sur l'attention (avec des MLP) pour l'inférence en langage naturel, comme illustré dans :numref:`fig_nlp-map-nli-attention` .
 
 ![This section feeds pretrained GloVe to an architecture based on attention and MLPs for natural language inference.](../img/nlp-map-nli-attention.svg)
 :label:`fig_nlp-map-nli-attention`
 
 
-## The Model
+## Le modèle
 
-Simpler than preserving the order of tokens in premises and hypotheses,
-we can just align tokens in one text sequence to every token in the other, and vice versa,
-then compare and aggregate such information to predict the logical relationships
-between premises and hypotheses.
-Similar to alignment of tokens between source and target sentences in machine translation,
-the alignment of tokens between premises and hypotheses
-can be neatly accomplished by attention mechanisms.
+Plus simple que de préserver l'ordre des tokens dans les prémisses et les hypothèses,
+nous pouvons simplement aligner les tokens d'une séquence de texte sur chaque token de l'autre, et vice versa,
+puis comparer et agréger ces informations pour prédire les relations logiques
+entre les prémisses et les hypothèses.
+Tout comme l'alignement des tokens entre les phrases source et cible dans la traduction automatique,
+l'alignement des tokens entre les prémisses et les hypothèses
+peut être accompli de manière simple par les mécanismes d'attention.
 
-![Natural language inference using attention mechanisms.](../img/nli-attention.svg)
-:label:`fig_nli_attention`
+![Natural language inference using attention mechanisms.](../img/nli-attention.svg) 
+ :label:`fig_nli_attention` 
 
-:numref:`fig_nli_attention` depicts the natural language inference method using attention mechanisms.
-At a high level, it consists of three jointly trained steps: attending, comparing, and aggregating.
-We will illustrate them step by step in the following.
+ :numref:`fig_nli_attention` décrit la méthode d'inférence en langage naturel utilisant les mécanismes d'attention.
+À un niveau élevé, elle se compose de trois étapes entraînées conjointement : l'attention, la comparaison et l'agrégation.
+Nous allons les illustrer étape par étape dans ce qui suit.
 
 ```{.python .input}
 #@tab mxnet
@@ -45,29 +45,29 @@ from torch.nn import functional as F
 
 ### Attending
 
-The first step is to align tokens in one text sequence to each token in the other sequence.
-Suppose that the premise is "i do need sleep" and the hypothesis is "i am tired".
-Due to semantical similarity,
-we may wish to align "i" in the hypothesis with "i" in the premise,
-and align "tired" in the hypothesis with "sleep" in the premise.
-Likewise, we may wish to align "i" in the premise with "i" in the hypothesis,
-and align "need" and "sleep" in the premise with "tired" in the hypothesis.
-Note that such alignment is *soft* using weighted average,
-where ideally large weights are associated with the tokens to be aligned.
-For ease of demonstration, :numref:`fig_nli_attention` shows such alignment in a *hard* way.
+La première étape consiste à aligner les jetons d'une séquence de texte sur chaque jeton de l'autre séquence.
+Supposons que la prémisse soit "j'ai besoin de dormir" et que l'hypothèse soit "je suis fatigué".
+En raison de la similarité sémantique,
+nous pouvons souhaiter aligner "i" dans l'hypothèse avec "i" dans la prémisse,
+et aligner "tired" dans l'hypothèse avec "sleep" dans la prémisse.
+De même, nous pouvons souhaiter aligner "i" dans la prémisse avec "i" dans l'hypothèse,
+et aligner "besoin" et "sommeil" dans la prémisse avec "fatigué" dans l'hypothèse.
+Notez qu'un tel alignement est *doux* en utilisant la moyenne pondérée,
+où idéalement des poids importants sont associés aux tokens à aligner.
+Pour faciliter la démonstration, :numref:`fig_nli_attention` montre un tel alignement de manière *hard*.
 
-Now we describe the soft alignment using attention mechanisms in more detail.
-Denote by $\mathbf{A} = (\mathbf{a}_1, \ldots, \mathbf{a}_m)$
-and $\mathbf{B} = (\mathbf{b}_1, \ldots, \mathbf{b}_n)$ the premise and hypothesis,
-whose number of tokens are $m$ and $n$, respectively,
-where $\mathbf{a}_i, \mathbf{b}_j \in \mathbb{R}^{d}$ ($i = 1, \ldots, m, j = 1, \ldots, n$) is a $d$-dimensional word vector.
-For soft alignment, we compute the attention weights $e_{ij} \in \mathbb{R}$ as
+Nous décrivons maintenant plus en détail l'alignement doux utilisant les mécanismes d'attention.
+Désignons par $\mathbf{A} = (\mathbf{a}_1, \ldots, \mathbf{a}_m)$
+ et $\mathbf{B} = (\mathbf{b}_1, \ldots, \mathbf{b}_n)$ la prémisse et l'hypothèse,
+dont le nombre de tokens est $m$ et $n$, respectivement,
+où $\mathbf{a}_i, \mathbf{b}_j \in \mathbb{R}^{d}$ ($i = 1, \ldots, m, j = 1, \ldots, n$) est un vecteur de mots de dimension $d$.
+Pour l'alignement souple, nous calculons les poids d'attention $e_{ij} \in \mathbb{R}$ comme
 
-$$e_{ij} = f(\mathbf{a}_i)^\top f(\mathbf{b}_j),$$
-:eqlabel:`eq_nli_e`
+$$e_{ij} = f(\mathbf{a}_i)^\top f(\mathbf{b}_j),$$ 
+ :eqlabel:`eq_nli_e` 
 
-where the function $f$ is an MLP defined in the following `mlp` function.
-The output dimension of $f$ is specified by the `num_hiddens` argument of `mlp`.
+ où la fonction $f$ est un MLP défini dans la fonction suivante `mlp`.
+La dimension de sortie de $f$ est spécifiée par l'argument `num_hiddens` de `mlp`.
 
 ```{.python .input}
 #@tab mxnet
@@ -97,27 +97,27 @@ def mlp(num_inputs, num_hiddens, flatten):
     return nn.Sequential(*net)
 ```
 
-It should be highlighted that, in :eqref:`eq_nli_e`
-$f$ takes inputs $\mathbf{a}_i$ and $\mathbf{b}_j$ separately rather than takes a pair of them together as input.
-This *decomposition* trick leads to only $m + n$ applications (linear complexity) of $f$ rather than $mn$ applications
-(quadratic complexity).
+Il convient de souligner que, dans :eqref:`eq_nli_e` 
+ $f$ prend les entrées $\mathbf{a}_i$ et $\mathbf{b}_j$ séparément plutôt que de prendre une paire d'entre elles ensemble comme entrée.
+Cette astuce de *décomposition* conduit uniquement à des applications $m + n$ (complexité linéaire) de $f$ plutôt qu'à des applications $mn$
+ (complexité quadratique).
 
 
-Normalizing the attention weights in :eqref:`eq_nli_e`,
-we compute the weighted average of all the token vectors in the hypothesis
-to obtain representation of the hypothesis that is softly aligned with the token indexed by $i$ in the premise:
+En normalisant les poids d'attention dans :eqref:`eq_nli_e` ,
+nous calculons la moyenne pondérée de tous les vecteurs de jeton dans l'hypothèse
+pour obtenir la représentation de l'hypothèse qui est alignée de manière douce avec le jeton indexé par $i$ dans la prémisse :
 
 $$
 \boldsymbol{\beta}_i = \sum_{j=1}^{n}\frac{\exp(e_{ij})}{ \sum_{k=1}^{n} \exp(e_{ik})} \mathbf{b}_j.
 $$
 
-Likewise, we compute soft alignment of premise tokens for each token indexed by $j$ in the hypothesis:
+De la même manière, nous calculons l'alignement doux des tokens de la prémisse pour chaque token indexé par $j$ dans l'hypothèse :
 
 $$
 \boldsymbol{\alpha}_j = \sum_{i=1}^{m}\frac{\exp(e_{ij})}{ \sum_{k=1}^{m} \exp(e_{kj})} \mathbf{a}_i.
 $$
 
-Below we define the `Attend` class to compute the soft alignment of hypotheses (`beta`) with input premises `A` and soft alignment of premises (`alpha`) with input hypotheses `B`.
+Nous définissons ci-dessous la classe `Attend` pour calculer l'alignement souple des hypothèses (`beta`) avec les prémisses d'entrée `A` et l'alignement souple des prémisses (`alpha`) avec les hypothèses d'entrée `B`.
 
 ```{.python .input}
 #@tab mxnet
@@ -128,7 +128,7 @@ class Attend(nn.Block):
 
     def forward(self, A, B):
         # Shape of `A`/`B`: (b`atch_size`, no. of tokens in sequence A/B,
-        # `embed_size`)
+        # `taille_intégrée`)
         # Shape of `f_A`/`f_B`: (`batch_size`, no. of tokens in sequence A/B,
         # `num_hiddens`)
         f_A = self.f(A)
@@ -137,11 +137,11 @@ class Attend(nn.Block):
         # no. of tokens in sequence B)
         e = npx.batch_dot(f_A, f_B, transpose_b=True)
         # Shape of `beta`: (`batch_size`, no. of tokens in sequence A,
-        # `embed_size`), where sequence B is softly aligned with each token
-        # (axis 1 of `beta`) in sequence A
+        # `taille_intégrée`), where sequence B is softly aligned with each token
+        # (axis 1 of `bêta`) in sequence A
         beta = npx.batch_dot(npx.softmax(e), B)
         # Shape of `alpha`: (`batch_size`, no. of tokens in sequence B,
-        # `embed_size`), where sequence A is softly aligned with each token
+        # `taille_intégrée`), where sequence A is softly aligned with each token
         # (axis 1 of `alpha`) in sequence B
         alpha = npx.batch_dot(npx.softmax(e.transpose(0, 2, 1)), A)
         return beta, alpha
@@ -156,7 +156,7 @@ class Attend(nn.Module):
 
     def forward(self, A, B):
         # Shape of `A`/`B`: (`batch_size`, no. of tokens in sequence A/B,
-        # `embed_size`)
+        # `taille_intégrée`)
         # Shape of `f_A`/`f_B`: (`batch_size`, no. of tokens in sequence A/B,
         # `num_hiddens`)
         f_A = self.f(A)
@@ -165,33 +165,33 @@ class Attend(nn.Module):
         # no. of tokens in sequence B)
         e = torch.bmm(f_A, f_B.permute(0, 2, 1))
         # Shape of `beta`: (`batch_size`, no. of tokens in sequence A,
-        # `embed_size`), where sequence B is softly aligned with each token
-        # (axis 1 of `beta`) in sequence A
+        # `taille_intégrée`), where sequence B is softly aligned with each token
+        # (axis 1 of `bêta`) in sequence A
         beta = torch.bmm(F.softmax(e, dim=-1), B)
         # Shape of `alpha`: (`batch_size`, no. of tokens in sequence B,
-        # `embed_size`), where sequence A is softly aligned with each token
+        # `taille_intégrée`), where sequence A is softly aligned with each token
         # (axis 1 of `alpha`) in sequence B
         alpha = torch.bmm(F.softmax(e.permute(0, 2, 1), dim=-1), A)
         return beta, alpha
 ```
 
-### Comparing
+### Comparaison de
 
-In the next step, we compare a token in one sequence with the other sequence that is softly aligned with that token.
-Note that in soft alignment, all the tokens from one sequence, though with probably different attention weights, will be compared with a token in the other sequence.
-For easy of demonstration, :numref:`fig_nli_attention` pairs tokens with aligned tokens in a *hard* way.
-For example, suppose that the attending step determines that "need" and "sleep" in the premise are both aligned with "tired" in the hypothesis, the pair "tired--need sleep" will be compared.
+Dans l'étape suivante, nous comparons un token dans une séquence avec l'autre séquence qui est alignée de manière douce avec ce token.
+Notez que dans l'alignement doux, tous les tokens d'une séquence, bien qu'avec des poids d'attention probablement différents, seront comparés à un token de l'autre séquence.
+Pour faciliter la démonstration, :numref:`fig_nli_attention` associe des jetons à des jetons alignés de manière *dure*.
+Par exemple, supposons que l'étape de présence détermine que "besoin" et "sommeil" dans la prémisse sont tous deux alignés avec "fatigué" dans l'hypothèse, la paire "fatigué--besoin de sommeil" sera comparée.
 
-In the comparing step, we feed the concatenation (operator $[\cdot, \cdot]$) of tokens from one sequence and aligned tokens from the other sequence into a function $g$ (an MLP):
+Lors de l'étape de comparaison, nous introduisons la concaténation (opérateur $[\cdot, \cdot]$) des jetons d'une séquence et des jetons alignés de l'autre séquence dans une fonction $g$ (un MLP) :
 
 $$\mathbf{v}_{A,i} = g([\mathbf{a}_i, \boldsymbol{\beta}_i]), i = 1, \ldots, m\\ \mathbf{v}_{B,j} = g([\mathbf{b}_j, \boldsymbol{\alpha}_j]), j = 1, \ldots, n.$$
 
 :eqlabel:`eq_nli_v_ab`
 
 
-In :eqref:`eq_nli_v_ab`, $\mathbf{v}_{A,i}$ is the comparison between token $i$ in the premise and all the hypothesis tokens that are softly aligned with token $i$;
-while $\mathbf{v}_{B,j}$ is the comparison between token $j$ in the hypothesis and all the premise tokens that are softly aligned with token $j$.
-The following `Compare` class defines such as comparing step.
+Dans :eqref:`eq_nli_v_ab` , $\mathbf{v}_{A,i}$ est la comparaison entre le token $i$ dans la prémisse et tous les tokens de l'hypothèse qui sont légèrement alignés avec le token $i$;
+tandis que $\mathbf{v}_{B,j}$ est la comparaison entre le token $j$ dans l'hypothèse et tous les tokens de la prémisse qui sont légèrement alignés avec le token $j$.
+La classe suivante `Compare` définit une telle étape de comparaison.
 
 ```{.python .input}
 #@tab mxnet
@@ -219,23 +219,23 @@ class Compare(nn.Module):
         return V_A, V_B
 ```
 
-### Aggregating
+### Agrégation
 
-With two sets of comparison vectors $\mathbf{v}_{A,i}$ ($i = 1, \ldots, m$) and $\mathbf{v}_{B,j}$ ($j = 1, \ldots, n$) on hand,
-in the last step we will aggregate such information to infer the logical relationship.
-We begin by summing up both sets:
+Avec deux ensembles de vecteurs de comparaison $\mathbf{v}_{A,i}$ ($i = 1, \ldots, m$) et $\mathbf{v}_{B,j}$ ($j = 1, \ldots, n$) en main,
+dans la dernière étape, nous allons agréger ces informations pour déduire la relation logique.
+Nous commençons par additionner les deux ensembles :
 
 $$
 \mathbf{v}_A = \sum_{i=1}^{m} \mathbf{v}_{A,i}, \quad \mathbf{v}_B = \sum_{j=1}^{n}\mathbf{v}_{B,j}.
 $$
 
-Next we feed the concatenation of both summarization results into function $h$ (an MLP) to obtain the classification result of the logical relationship:
+Ensuite, nous introduisons la concaténation des deux résultats de la synthèse dans la fonction $h$ (un MLP) pour obtenir le résultat de la classification de la relation logique :
 
 $$
 \hat{\mathbf{y}} = h([\mathbf{v}_A, \mathbf{v}_B]).
 $$
 
-The aggregation step is defined in the following `Aggregate` class.
+L'étape d'agrégation est définie dans la classe suivante `Aggregate`.
 
 ```{.python .input}
 #@tab mxnet
@@ -271,10 +271,10 @@ class Aggregate(nn.Module):
         return Y_hat
 ```
 
-### Putting All Things Together
+### Rassembler tout cela
 
-By putting the attending, comparing, and aggregating steps together,
-we define the decomposable attention model to jointly train these three steps.
+En rassemblant les étapes d'attention, de comparaison et d'agrégation,
+nous définissons le modèle d'attention décomposable pour entraîner conjointement ces trois étapes.
 
 ```{.python .input}
 #@tab mxnet
@@ -319,15 +319,15 @@ class DecomposableAttention(nn.Module):
         return Y_hat
 ```
 
-## Training and Evaluating the Model
+### Entraînement et évaluation du modèle
 
-Now we will train and evaluate the defined decomposable attention model on the SNLI dataset.
-We begin by reading the dataset.
+Nous allons maintenant entraîner et évaluer le modèle d'attention décomposable défini sur l'ensemble de données SNLI.
+Nous commençons par lire le jeu de données.
 
 
-### Reading the dataset
+### Lecture du jeu de données
 
-We download and read the SNLI dataset using the function defined in :numref:`sec_natural-language-inference-and-dataset`. The batch size and sequence length are set to $256$ and $50$, respectively.
+Nous téléchargeons et lisons le jeu de données SNLI à l'aide de la fonction définie dans :numref:`sec_natural-language-inference-and-dataset` . La taille du lot et la longueur de la séquence sont fixées à $256$ et $50$, respectivement.
 
 ```{.python .input}
 #@tab all
@@ -335,13 +335,13 @@ batch_size, num_steps = 256, 50
 train_iter, test_iter, vocab = d2l.load_data_snli(batch_size, num_steps)
 ```
 
-### Creating the Model
+#### Création du modèle
 
-We use the pretrained 100-dimensional GloVe embedding to represent the input tokens.
-Thus, we predefine the dimension of vectors $\mathbf{a}_i$ and $\mathbf{b}_j$ in :eqref:`eq_nli_e` as 100.
-The output dimension of functions $f$ in :eqref:`eq_nli_e` and $g$ in :eqref:`eq_nli_v_ab` is set to 200.
-Then we create a model instance, initialize its parameters,
-and load the GloVe embedding to initialize vectors of input tokens.
+Nous utilisons l'intégration GloVe 100-dimensionnelle pré-entraînée pour représenter les mots d'entrée.
+Ainsi, nous prédéfinissons la dimension des vecteurs $\mathbf{a}_i$ et $\mathbf{b}_j$ dans :eqref:`eq_nli_e` comme 100.
+La dimension de sortie des fonctions $f$ dans :eqref:`eq_nli_e` et $g$ dans :eqref:`eq_nli_v_ab` est fixée à 200.
+Ensuite, nous créons une instance de modèle, nous initialisons ses paramètres,
+et nous chargeons l'incorporation GloVe pour initialiser les vecteurs des jetons d'entrée.
 
 ```{.python .input}
 #@tab mxnet
@@ -362,10 +362,10 @@ embeds = glove_embedding[vocab.idx_to_token]
 net.embedding.weight.data.copy_(embeds);
 ```
 
-### Training and Evaluating the Model
+### Formation et évaluation du modèle
 
-In contrast to the `split_batch` function in :numref:`sec_multi_gpu` that takes single inputs such as text sequences (or images),
-we define a `split_batch_multi_inputs` function to take multiple inputs such as premises and hypotheses in minibatches.
+Contrairement à la fonction `split_batch` dans :numref:`sec_multi_gpu` qui prend des entrées uniques telles que des séquences de texte (ou des images),
+nous définissons une fonction `split_batch_multi_inputs` pour prendre des entrées multiples telles que des prémisses et des hypothèses dans des minibatchs.
 
 ```{.python .input}
 #@tab mxnet
@@ -377,7 +377,7 @@ def split_batch_multi_inputs(X, y, devices):
     return (X, gluon.utils.split_and_load(y, devices, even_split=False))
 ```
 
-Now we can train and evaluate the model on the SNLI dataset.
+Nous pouvons maintenant entraîner et évaluer le modèle sur l'ensemble de données SNLI.
 
 ```{.python .input}
 #@tab mxnet
@@ -396,9 +396,9 @@ loss = nn.CrossEntropyLoss(reduction="none")
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-### Using the Model
+### Utilisation du modèle
 
-Finally, define the prediction function to output the logical relationship between a pair of premise and hypothesis.
+Enfin, définissez la fonction de prédiction pour produire la relation logique entre une paire de prémisses et d'hypothèses.
 
 ```{.python .input}
 #@tab mxnet
@@ -427,26 +427,26 @@ def predict_snli(net, vocab, premise, hypothesis):
             else 'neutral'
 ```
 
-We can use the trained model to obtain the natural language inference result for a sample pair of sentences.
+Nous pouvons utiliser le modèle formé pour obtenir le résultat de l'inférence en langage naturel pour un échantillon de paires de phrases.
 
 ```{.python .input}
 #@tab all
 predict_snli(net, vocab, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
 ```
 
-## Summary
+## Résumé
 
-* The decomposable attention model consists of three steps for predicting the logical relationships between premises and hypotheses: attending, comparing, and aggregating.
-* With attention mechanisms, we can align tokens in one text sequence to every token in the other, and vice versa. Such alignment is soft using weighted average, where ideally large weights are associated with the tokens to be aligned.
-* The decomposition trick leads to a more desirable linear complexity than quadratic complexity when computing attention weights.
-* We can use pretrained word vectors as the input representation for downstream natural language processing task such as natural language inference.
+* Le modèle d'attention décomposable consiste en trois étapes pour prédire les relations logiques entre les prémisses et les hypothèses : assister, comparer et agréger.
+* Grâce aux mécanismes d'attention, nous pouvons aligner les tokens d'une séquence de texte sur chaque token de l'autre, et vice versa. Un tel alignement est doux en utilisant la moyenne pondérée, où idéalement des poids importants sont associés aux tokens à aligner.
+* L'astuce de décomposition conduit à une complexité linéaire plus souhaitable que la complexité quadratique lors du calcul des poids d'attention.
+* Nous pouvons utiliser des vecteurs de mots pré-entraînés comme représentation d'entrée pour une tâche de traitement du langage naturel en aval, telle que l'inférence en langage naturel.
 
 
-## Exercises
+## Exercices
 
-1. Train the model with other combinations of hyperparameters. Can you get better accuracy on the test set?
-1. What are major drawbacks of the decomposable attention model for natural language inference?
-1. Suppose that we want to get the level of semantical similarity (e.g., a continuous value between 0 and 1) for any pair of sentences. How shall we collect and label the dataset? Can you design a model with attention mechanisms?
+1. Entraînez le modèle avec d'autres combinaisons d'hyperparamètres. Pouvez-vous obtenir une meilleure précision sur l'ensemble de test ?
+1. Quels sont les principaux inconvénients du modèle d'attention décomposable pour l'inférence en langage naturel ?
+1. Supposons que nous voulions obtenir le niveau de similarité sémantique (par exemple, une valeur continue entre 0 et 1) pour toute paire de phrases. Comment allons-nous collecter et étiqueter l'ensemble de données ? Pouvez-vous concevoir un modèle avec des mécanismes d'attention ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/395)

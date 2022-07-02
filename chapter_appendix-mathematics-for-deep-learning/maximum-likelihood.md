@@ -1,48 +1,48 @@
-# Maximum Likelihood
-:label:`sec_maximum_likelihood`
+# Maximum de vraisemblance
+:label:`sec_maximum_likelihood` 
 
-One of the most commonly encountered way of thinking in machine learning is the maximum likelihood point of view.  This is the concept that when working with a probabilistic model with unknown parameters, the parameters which make the data have the highest probability are the most likely ones.
+ L'un des modes de pensée les plus couramment rencontrés en apprentissage automatique est le point de vue du maximum de vraisemblance.  Il s'agit du concept selon lequel, lorsque l'on travaille avec un modèle probabiliste dont les paramètres sont inconnus, les paramètres qui confèrent aux données la plus forte probabilité sont les plus probables.
 
-## The Maximum Likelihood Principle
+## Le principe du maximum de vraisemblance
 
-This has a Bayesian interpretation which can be helpful to think about.  Suppose that we have a model with parameters $\boldsymbol{\theta}$ and a collection of data examples $X$.  For concreteness, we can imagine that $\boldsymbol{\theta}$ is a single value representing the probability that a coin comes up heads when flipped, and $X$ is a sequence of independent coin flips.  We will look at this example in depth later.
+Il s'agit d'une interprétation bayésienne à laquelle il peut être utile de réfléchir.  Supposons que nous ayons un modèle avec des paramètres $\boldsymbol{\theta}$ et une collection d'exemples de données $X$.  Pour être plus concret, nous pouvons imaginer que $\boldsymbol{\theta}$ est une valeur unique représentant la probabilité qu'une pièce de monnaie tombe sur face lorsqu'elle est tirée à pile ou face, et que $X$ est une séquence de tirages à pile ou face indépendants.  Nous étudierons cet exemple en profondeur plus tard.
 
-If we want to find the most likely value for the parameters of our model, that means we want to find
+Si nous voulons trouver la valeur la plus probable pour les paramètres de notre modèle, cela signifie que nous voulons trouver
 
-$$\mathop{\mathrm{argmax}} P(\boldsymbol{\theta}\mid X).$$
-:eqlabel:`eq_max_like`
+$$\mathop{\mathrm{argmax}} P(\boldsymbol{\theta}\mid X).$$ 
+ :eqlabel:`eq_max_like` 
 
-By Bayes' rule, this is the same thing as
+ Par la règle de Bayes, c'est la même chose que
 
 $$
 \mathop{\mathrm{argmax}} \frac{P(X \mid \boldsymbol{\theta})P(\boldsymbol{\theta})}{P(X)}.
 $$
 
-The expression $P(X)$, a parameter agnostic probability of generating the data, does not depend on $\boldsymbol{\theta}$ at all, and so can be dropped without changing the best choice of $\boldsymbol{\theta}$.  Similarly, we may now posit that we have no prior assumption on which set of parameters are better than any others, so we may declare that $P(\boldsymbol{\theta})$ does not depend on theta either!  This, for instance, makes sense in our coin flipping example where the probability it comes up heads could be any value in $[0,1]$ without any prior belief it is fair or not (often referred to as an *uninformative prior*).  Thus we see that our application of Bayes' rule shows that our best choice of $\boldsymbol{\theta}$ is the maximum likelihood estimate for $\boldsymbol{\theta}$:
+L'expression $P(X)$, une probabilité agnostique de générer les données, ne dépend pas du tout de $\boldsymbol{\theta}$ et peut donc être abandonnée sans modifier le meilleur choix de $\boldsymbol{\theta}$. De même, nous pouvons maintenant affirmer que nous n'avons aucune hypothèse préalable sur le jeu de paramètres qui est meilleur que les autres, et nous pouvons donc déclarer que $P(\boldsymbol{\theta})$ ne dépend pas non plus de thêta !  Cela a du sens, par exemple, dans notre exemple de lancer de pièce de monnaie où la probabilité qu'elle tombe sur face peut être n'importe quelle valeur dans $[0,1]$ sans qu'il y ait de croyance préalable qu'elle soit juste ou non (souvent appelée une *antériorité non informative*).  Nous voyons donc que l'application de la règle de Bayes montre que notre meilleur choix de $\boldsymbol{\theta}$ est l'estimation du maximum de vraisemblance pour $\boldsymbol{\theta}$:
 
 $$
 \hat{\boldsymbol{\theta}} = \mathop{\mathrm{argmax}} _ {\boldsymbol{\theta}} P(X \mid \boldsymbol{\theta}).
 $$
 
-As a matter of common terminology, the probability of the data given the parameters ($P(X \mid \boldsymbol{\theta})$) is referred to as the *likelihood*.
+Dans la terminologie courante, la probabilité des données compte tenu des paramètres ($P(X \mid \boldsymbol{\theta})$) est appelée la *vraisemblance*.
 
-### A Concrete Example
+### Un exemple concret
 
-Let's see how this works in a concrete example.  Suppose that we have a single parameter $\theta$ representing the probability that a coin flip is heads.  Then the probability of getting a tails is $1-\theta$, and so if our observed data $X$ is a sequence with $n_H$ heads and $n_T$ tails, we can use the fact that independent probabilities multiply to see that 
+Voyons comment cela fonctionne dans un exemple concret.  Supposons que nous ayons un seul paramètre $\theta$ représentant la probabilité qu'un lancer de pièce soit face.  La probabilité d'obtenir un pile est alors $1-\theta$, et donc si nos données observées $X$ sont une séquence avec $n_H$ pile et $n_T$ pile, nous pouvons utiliser le fait que les probabilités indépendantes se multiplient pour voir que 
 
 $$
 P(X \mid \theta) = \theta^{n_H}(1-\theta)^{n_T}.
 $$
 
-If we flip $13$ coins and get the sequence "HHHTHTTHHHHHT", which has $n_H = 9$ and $n_T = 4$, we see that this is
+Si nous tirons à pile ou face $13$ et que nous obtenons la séquence "HHHTHTTHHHHHT", qui comporte $n_H = 9$ et $n_T = 4$, nous constatons que cela correspond à
 
 $$
 P(X \mid \theta) = \theta^9(1-\theta)^4.
 $$
 
-One nice thing about this example will be that we know the answer going in.  Indeed, if we said verbally, "I flipped 13 coins, and 9 came up heads, what is our best guess for the probability that the coin comes us heads?, " everyone would correctly guess $9/13$.  What this maximum likelihood method will give us is a way to get that number from first principals in a way that will generalize to vastly more complex situations.
+Ce qui est bien dans cet exemple, c'est que nous connaissons la réponse dès le départ.  En effet, si nous disions verbalement : " J'ai tiré à pile ou face 13 pièces, et 9 sont tombées sur face, quelle est notre meilleure estimation de la probabilité que la pièce tombe sur face ? ", tout le monde devinerait correctement $9/13$.  La méthode du maximum de vraisemblance nous permettra d'obtenir ce chiffre à partir des principes de base, d'une manière qui pourra être généralisée à des situations beaucoup plus complexes.
 
-For our example, the plot of $P(X \mid \theta)$ is as follows:
+Pour notre exemple, le tracé de $P(X \mid \theta)$ est le suivant :
 
 ```{.python .input}
 #@tab mxnet
@@ -81,7 +81,7 @@ p = theta**9 * (1 - theta)**4.
 d2l.plot(theta, p, 'theta', 'likelihood')
 ```
 
-This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the gradient of the function is flat.  Thus, we could find the maximum likelihood estimate :eqref:`eq_max_like` by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
+Sa valeur maximale se situe quelque part près de notre valeur attendue $9/13 \approx 0.7\ldots$.  Pour voir si c'est exactement là, nous pouvons nous tourner vers le calcul.  Remarquez qu'au maximum, le gradient de la fonction est plat.  Ainsi, nous pouvons trouver l'estimation du maximum de vraisemblance :eqref:`eq_max_like` en trouvant les valeurs de $\theta$ où la dérivée est nulle, et en trouvant celle qui donne la probabilité la plus élevée.  Nous calculons :
 
 $$
 \begin{aligned}
@@ -92,37 +92,37 @@ $$
 \end{aligned}
 $$
 
-This has three solutions: $0$, $1$ and $9/13$.  The first two are clearly minima, not maxima as they assign probability $0$ to our sequence.  The final value does *not* assign zero probability to our sequence, and thus must be the maximum likelihood estimate $\hat \theta = 9/13$.
+Il y a trois solutions : $0$, $1$ et $9/13$.  Les deux premières sont clairement des minima, et non des maxima, car elles attribuent la probabilité $0$ à notre séquence.  La valeur finale n'attribue *pas* une probabilité nulle à notre séquence, et doit donc être l'estimation du maximum de vraisemblance $\hat \theta = 9/13$.
 
-## Numerical Optimization and the Negative Log-Likelihood
+## Optimisation numérique et log-vraisemblance négative
 
-The previous example is nice, but what if we have billions of parameters and data examples?
+L'exemple précédent est intéressant, mais que se passe-t-il si nous avons des milliards de paramètres et d'exemples de données ?
 
-First, notice that if we make the assumption that all the data examples are independent, we can no longer practically consider the likelihood itself as it is a product of many probabilities.  Indeed, each probability is in $[0,1]$, say typically of value about $1/2$, and the product of $(1/2)^{1000000000}$ is far below machine precision.  We cannot work with that directly.  
+Tout d'abord, remarquez que si nous faisons l'hypothèse que tous les exemples de données sont indépendants, nous ne pouvons plus pratiquement considérer la vraisemblance elle-même car elle est un produit de nombreuses probabilités.  En effet, chaque probabilité est dans $[0,1]$, disons typiquement d'une valeur d'environ $1/2$, et le produit de $(1/2)^{1000000000}$ est bien en dessous de la précision de la machine.  Nous ne pouvons pas travailler avec cela directement. 
 
-However, recall that the logarithm turns products to sums, in which case 
+Cependant, rappelez-vous que le logarithme transforme les produits en sommes, auquel cas 
 
 $$
 \log((1/2)^{1000000000}) = 1000000000\cdot\log(1/2) \approx -301029995.6\ldots
 $$
 
-This number fits perfectly within even a single precision $32$-bit float.  Thus, we should consider the *log-likelihood*, which is
+Ce nombre s'inscrit parfaitement dans un flotteur à simple précision $32$-bit.  Nous devrions donc considérer la *log-vraisemblance*, soit
 
 $$
 \log(P(X \mid \boldsymbol{\theta})).
 $$
 
-Since the function $x \mapsto \log(x)$ is increasing, maximizing the likelihood is the same thing as maximizing the log-likelihood.  Indeed in :numref:`sec_naive_bayes` we will see this reasoning applied when working with the specific example of the naive Bayes classifier.
+Comme la fonction $x \mapsto \log(x)$ est croissante, maximiser la vraisemblance est la même chose que maximiser la log-vraisemblance.  En effet, dans :numref:`sec_naive_bayes` , nous verrons ce raisonnement appliqué en travaillant avec l'exemple spécifique du classificateur de Bayes naïf.
 
-We often work with loss functions, where we wish to minimize the loss.  We may turn maximum likelihood into the minimization of a loss by taking $-\log(P(X \mid \boldsymbol{\theta}))$, which is the *negative log-likelihood*.
+Nous travaillons souvent avec des fonctions de perte, où nous souhaitons minimiser la perte.  Nous pouvons transformer le maximum de vraisemblance en minimisation d'une perte en prenant $-\log(P(X \mid \boldsymbol{\theta}))$, qui est la *log-vraisemblance négative*.
 
-To illustrate this, consider the coin flipping problem from before, and pretend that we do not know the closed form solution.  We may compute that
+Pour illustrer cela, reprenons le problème du tirage à pile ou face que nous avons vu précédemment, et supposons que nous ne connaissons pas la solution sous forme fermée.  Nous pouvons calculer que
 
 $$
 -\log(P(X \mid \boldsymbol{\theta})) = -\log(\theta^{n_H}(1-\theta)^{n_T}) = -(n_H\log(\theta) + n_T\log(1-\theta)).
 $$
 
-This can be written into code, and freely optimized even for billions of coin flips.
+Cette solution peut être écrite en code, et optimisée librement, même pour des milliards de tirages à pile ou face.
 
 ```{.python .input}
 #@tab mxnet
@@ -188,17 +188,17 @@ for iter in range(10):
 theta, n_H / (n_H + n_T)
 ```
 
-Numerical convenience is not the only reason why people like to use negative log-likelihoods. There are several other reasons why it is preferable.
+La commodité numérique n'est pas la seule raison pour laquelle les gens aiment utiliser les log-vraisemblances négatives. Il existe plusieurs autres raisons pour lesquelles elle est préférable.
 
 
 
-The second reason we consider the log-likelihood is the simplified application of calculus rules. As discussed above, due to independence assumptions, most probabilities we encounter in machine learning are products of individual probabilities.
+La deuxième raison pour laquelle nous considérons la log-vraisemblance est l'application simplifiée des règles de calcul. Comme nous l'avons vu plus haut, en raison des hypothèses d'indépendance, la plupart des probabilités que nous rencontrons en apprentissage automatique sont des produits de probabilités individuelles.
 
 $$
 P(X\mid\boldsymbol{\theta}) = p(x_1\mid\boldsymbol{\theta})\cdot p(x_2\mid\boldsymbol{\theta})\cdots p(x_n\mid\boldsymbol{\theta}).
 $$
 
-This means that if we directly apply the product rule to compute a derivative we get
+Cela signifie que si nous appliquons directement la règle du produit pour calculer une dérivée, nous obtenons
 
 $$
 \begin{aligned}
@@ -209,43 +209,43 @@ $$
 \end{aligned}
 $$
 
-This requires $n(n-1)$ multiplications, along with $(n-1)$ additions, so it is proportional to quadratic time in the inputs!  Sufficient cleverness in grouping terms will reduce this to linear time, but it requires some thought.  For the negative log-likelihood we have instead
+Cela nécessite $n(n-1)$ multiplications, ainsi que $(n-1)$ additions, ce qui est donc proportionnel à un temps quadratique des entrées !  Une astuce suffisante pour regrouper les termes ramènera ce temps à un temps linéaire, mais cela demande un peu de réflexion.  Pour la log-vraisemblance négative, nous avons plutôt
 
 $$
 -\log\left(P(X\mid\boldsymbol{\theta})\right) = -\log(P(x_1\mid\boldsymbol{\theta})) - \log(P(x_2\mid\boldsymbol{\theta})) \cdots - \log(P(x_n\mid\boldsymbol{\theta})),
 $$
 
-which then gives
+ce qui donne
 
 $$
 - \frac{\partial}{\partial \boldsymbol{\theta}} \log\left(P(X\mid\boldsymbol{\theta})\right) = \frac{1}{P(x_1\mid\boldsymbol{\theta})}\left(\frac{\partial}{\partial \boldsymbol{\theta}}P(x_1\mid\boldsymbol{\theta})\right) + \cdots + \frac{1}{P(x_n\mid\boldsymbol{\theta})}\left(\frac{\partial}{\partial \boldsymbol{\theta}}P(x_n\mid\boldsymbol{\theta})\right).
 $$
 
-This requires only $n$ divides and $n-1$ sums, and thus is linear time in the inputs.
+Cela ne nécessite que $n$ diviseurs et $n-1$ sommes, et donc un temps linéaire dans les entrées.
 
-The third and final reason to consider the negative log-likelihood is the relationship to information theory, which we will discuss in detail in :numref:`sec_information_theory`.  This is a rigorous mathematical theory which gives a way to measure the degree of information or randomness in a random variable.  The key object of study in that field is the entropy which is 
+La troisième et dernière raison de considérer la log-vraisemblance négative est la relation avec la théorie de l'information, que nous aborderons en détail dans :numref:`sec_information_theory` .  Il s'agit d'une théorie mathématique rigoureuse qui donne un moyen de mesurer le degré d'information ou d'aléa d'une variable aléatoire.  L'objet d'étude clé dans ce domaine est l'entropie qui est 
 
 $$
 H(p) = -\sum_{i} p_i \log_2(p_i),
 $$
 
-which measures the randomness of a source. Notice that this is nothing more than the average $-\log$ probability, and thus if we take our negative log-likelihood and divide by the number of data examples, we get a relative of entropy known as cross-entropy.  This theoretical interpretation alone would be sufficiently compelling to motivate reporting the average negative log-likelihood over the dataset as a way of measuring model performance.
+qui mesure le caractère aléatoire d'une source. Remarquez que ce n'est rien d'autre que la probabilité moyenne $-\log$. Ainsi, si nous prenons notre log-vraisemblance négative et la divisons par le nombre d'exemples de données, nous obtenons un relatif de l'entropie connu sous le nom d'entropie croisée.  Cette interprétation théorique serait à elle seule suffisamment convaincante pour motiver la déclaration de la log-vraisemblance négative moyenne sur l'ensemble de données comme moyen de mesurer la performance du modèle.
 
-## Maximum Likelihood for Continuous Variables
+## Maximum de vraisemblance pour les variables continues
 
-Everything that we have done so far assumes we are working with discrete random variables, but what if we want to work with continuous ones?
+Tout ce que nous avons fait jusqu'à présent suppose que nous travaillons avec des variables aléatoires discrètes, mais que faire si nous voulons travailler avec des variables continues ?
 
-The short summary is that nothing at all changes, except we replace all the instances of the probability with the probability density.  Recalling that we write densities with lower case $p$, this means that for example we now say
+En résumé, rien ne change, si ce n'est que nous remplaçons toutes les instances de la probabilité par la densité de probabilité.  Si l'on se souvient que les densités s'écrivent en minuscules à l'adresse $p$, cela signifie que, par exemple, nous disons désormais
 
 $$
 -\log\left(p(X\mid\boldsymbol{\theta})\right) = -\log(p(x_1\mid\boldsymbol{\theta})) - \log(p(x_2\mid\boldsymbol{\theta})) \cdots - \log(p(x_n\mid\boldsymbol{\theta})) = -\sum_i \log(p(x_i \mid \theta)).
 $$
 
-The question becomes, "Why is this OK?"  After all, the reason we introduced densities was because probabilities of getting specific outcomes themselves was zero, and thus is not the probability of generating our data for any set of parameters zero?
+La question qui se pose est la suivante : "Pourquoi est-ce correct ?"  Après tout, la raison pour laquelle nous avons introduit les densités était que les probabilités d'obtenir des résultats spécifiques étaient elles-mêmes nulles, et donc la probabilité de générer nos données pour tout ensemble de paramètres n'est-elle pas nulle ?
 
-Indeed, this is the case, and understanding why we can shift to densities is an exercise in tracing what happens to the epsilons.
+En effet, c'est le cas, et comprendre pourquoi nous pouvons passer aux densités est un exercice qui consiste à retracer ce qui arrive aux epsilons.
 
-Let's first re-define our goal.  Suppose that for continuous random variables we no longer want to compute the probability of getting exactly the right value, but instead matching to within some range $\epsilon$.  For simplicity, we assume our data is repeated observations $x_1, \ldots, x_N$ of identically distributed random variables $X_1, \ldots, X_N$.  As we have seen previously, this can be written as
+Commençons par redéfinir notre objectif.  Supposons que pour les variables aléatoires continues, nous ne voulons plus calculer la probabilité d'obtenir exactement la bonne valeur, mais plutôt la correspondance dans un certain intervalle $\epsilon$.  Pour simplifier, nous supposons que nos données sont des observations répétées $x_1, \ldots, x_N$ de variables aléatoires distribuées de manière identique $X_1, \ldots, X_N$.  Comme nous l'avons vu précédemment, cela peut s'écrire comme suit
 
 $$
 \begin{aligned}
@@ -254,7 +254,7 @@ $$
 \end{aligned}
 $$
 
-Thus, if we take negative logarithms of this we obtain
+Ainsi, si nous prenons le logarithme négatif de cette valeur, nous obtenons
 
 $$
 \begin{aligned}
@@ -263,22 +263,22 @@ $$
 \end{aligned}
 $$
 
-If we examine this expression, the only place that the $\epsilon$ occurs is in the additive constant $-N\log(\epsilon)$.  This does not depend on the parameters $\boldsymbol{\theta}$ at all, so the optimal choice of $\boldsymbol{\theta}$ does not depend on our choice of $\epsilon$!  If we demand four digits or four-hundred, the best choice of $\boldsymbol{\theta}$ remains the same, thus we may freely drop the epsilon to see that what we want to optimize is
+Si nous examinons cette expression, le seul endroit où se trouve $\epsilon$ est dans la constante additive $-N\log(\epsilon)$.  Celle-ci ne dépend pas du tout des paramètres $\boldsymbol{\theta}$, donc le choix optimal de $\boldsymbol{\theta}$ ne dépend pas de notre choix de $\epsilon$!  Si nous demandons quatre chiffres ou quatre cents, le choix optimal de $\boldsymbol{\theta}$ reste le même, donc nous pouvons librement laisser tomber l'epsilon pour voir que ce que nous voulons optimiser est
 
 $$
 - \sum_{i} \log(p(x_i\mid\boldsymbol{\theta})).
 $$
 
-Thus, we see that the maximum likelihood point of view can operate with continuous random variables as easily as with discrete ones by replacing the probabilities with probability densities.
+Ainsi, nous voyons que le point de vue du maximum de vraisemblance peut fonctionner avec des variables aléatoires continues aussi facilement qu'avec des variables discrètes en remplaçant les probabilités par des densités de probabilité.
 
-## Summary
-* The maximum likelihood principle tells us that the best fit model for a given dataset is the one that generates the data with the highest probability.
-* Often people work with the negative log-likelihood instead for a variety of reasons: numerical stability, conversion of products to sums (and the resulting simplification of gradient computations), and theoretical ties to information theory.
-* While simplest to motivate in the discrete setting, it may be freely generalized to the continuous setting as well by maximizing the probability density assigned to the datapoints.
+## Résumé
+* Le principe du maximum de vraisemblance nous dit que le modèle le mieux adapté pour un ensemble de données donné est celui qui génère les données avec la probabilité la plus élevée.
+* On travaille souvent avec la log-vraisemblance négative pour diverses raisons : stabilité numérique, conversion des produits en sommes (et simplification des calculs de gradient qui en résulte), et liens théoriques avec la théorie de l'information.
+* Bien que la motivation soit plus simple dans le cadre discret, elle peut être librement généralisée au cadre continu en maximisant la densité de probabilité attribuée aux points de données.
 
-## Exercises
-1. Suppose that you know that a non-negative random variable has density $\alpha e^{-\alpha x}$ for some value $\alpha>0$.  You obtain a single observation from the random variable which is the number $3$.  What is the maximum likelihood estimate for $\alpha$?
-2. Suppose that you have a dataset of samples $\{x_i\}_{i=1}^N$ drawn from a Gaussian with unknown mean, but variance $1$.  What is the maximum likelihood estimate for the mean?
+## Exercices
+1. Supposons que vous sachiez qu'une variable aléatoire non négative a une densité $\alpha e^{-\alpha x}$ pour une certaine valeur $\alpha>0$.  Vous obtenez une seule observation de la variable aléatoire, à savoir le nombre $3$.  Quelle est l'estimation du maximum de vraisemblance pour $\alpha$?
+2. Supposons que vous disposiez d'un ensemble de données d'échantillons $\{x_i\}_{i=1}^N$ tirés d'une gaussienne de moyenne inconnue, mais de variance $1$.  Quelle est l'estimation du maximum de vraisemblance pour la moyenne ?
 
 
 :begin_tab:`mxnet`

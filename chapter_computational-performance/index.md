@@ -1,14 +1,14 @@
-# Computational Performance
-:label:`chap_performance`
+# Performances de calcul
+:label:`chap_performance` 
 
-In deep learning, 
-datasets and models are usually large,
-which involves heavy computation.
-Therefore, computational performance matters a lot.
-This chapter will focus on the major factors that affect computational performance:
-imperative programming, symbolic programming, asynchronous computing, automatic parallelism, and multi-GPU computation.
-By studying this chapter, you may further improve computational performance of those models implemented in the previous chapters,
-for example, by reducing training time without affecting accuracy.
+ En apprentissage profond, 
+les ensembles de données et les modèles sont généralement volumineux,
+ce qui implique des calculs lourds.
+Par conséquent, les performances de calcul ont une grande importance.
+Ce chapitre se concentre sur les principaux facteurs qui affectent les performances de calcul :
+programmation impérative, programmation symbolique, calcul asynchrone, parallélisme automatique et calcul multi-GPU.
+En étudiant ce chapitre, vous pourrez améliorer les performances de calcul des modèles mis en œuvre dans les chapitres précédents,
+par exemple, en réduisant le temps d'apprentissage sans affecter la précision.
 
 ```toc
 :maxdepth: 2

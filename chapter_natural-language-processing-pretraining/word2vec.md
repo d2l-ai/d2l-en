@@ -1,262 +1,262 @@
-# Word Embedding (word2vec)
-:label:`sec_word2vec`
+# Embedded word (word2vec)
+:label:`sec_word2vec` 
+
+ 
+ Le langage naturel est un système complexe utilisé pour exprimer des significations.
+Dans ce système, les mots sont l'unité de base de la signification.
+Comme son nom l'indique,
+*word vectors* sont des vecteurs utilisés pour représenter les mots,
+et peuvent également être considérés comme des vecteurs de caractéristiques ou des représentations de mots.
+La technique de mise en correspondance des mots avec des vecteurs réels
+est appelée *word embedding*.
+Ces dernières années,
+word embedding est progressivement devenu
+la connaissance de base du traitement du langage naturel.
 
 
-Natural language is a complex system used to express meanings.
-In this system, words are the basic unit of the meaning.
-As the name implies,
-*word vectors* are vectors used to represent words,
-and can also be considered as feature vectors or representations of words.
-The technique of mapping words to real vectors
-is called *word embedding*.
-In recent years,
-word embedding has gradually become
-the basic knowledge of natural language processing.
+## Les vecteurs à un coup sont un mauvais choix
+
+Nous avons utilisé des vecteurs à un coup pour représenter les mots (les caractères sont des mots) dans :numref:`sec_rnn-scratch` .
+Supposons que le nombre de mots différents dans le dictionnaire (la taille du dictionnaire) soit $N$,
+et que chaque mot corresponde à
+un nombre entier différent (index) de $0$ à $N-1$.
+Pour obtenir la représentation vectorielle à un coup
+pour tout mot d'indice $i$,
+, nous créons un vecteur de longueur$N$ avec tous les 0
+et définissons l'élément en position $i$ à 1.
+De cette façon, chaque mot est représenté comme un vecteur de longueur $N$, et il
+peut être utilisé directement par les réseaux neuronaux.
 
 
-## One-Hot Vectors Are a Bad Choice
-
-We used one-hot vectors to represent words (characters are words) in :numref:`sec_rnn-scratch`.
-Suppose that the number of different words in the dictionary (the dictionary size) is $N$,
-and each word corresponds to
-a different integer (index) from $0$ to $N-1$.
-To obtain the one-hot vector representation
-for any word with index $i$,
-we create a length-$N$ vector with all 0s
-and set the element at position $i$ to 1.
-In this way, each word is represented as a vector of length $N$, and it
-can be used directly by neural networks.
+Bien que les vecteurs de mots " one-hot " soient faciles à construire,
+ils ne constituent généralement pas un bon choix.
+L'une des principales raisons est que les vecteurs de mots à un coup ne peuvent pas exprimer avec précision la similarité entre différents mots, comme la similarité en cosinus * que nous utilisons souvent.
+Pour les vecteurs $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$, leur similarité en cosinus est le cosinus de l'angle qui les sépare :
 
 
-Although one-hot word vectors are easy to construct,
-they are usually not a good choice.
-A main reason is that one-hot word vectors cannot accurately express the similarity between different words, such as the *cosine similarity* that we often use.
-For vectors $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$, their cosine similarity is the cosine of the angle between them:
+ $$\frac{\mathbf{x}^\top \mathbf{y}}{\|\mathbf{x}\| \|\mathbf{y}\|} \in [-1, 1].$$ 
 
-
-$$\frac{\mathbf{x}^\top \mathbf{y}}{\|\mathbf{x}\| \|\mathbf{y}\|} \in [-1, 1].$$
-
-
-Since the cosine similarity between one-hot vectors of any two different words is 0,
-one-hot vectors cannot encode similarities among words.
+ 
+ Comme la similarité en cosinus entre les vecteurs one-hot de deux mots différents est égale à 0,
+les vecteurs one-hot ne peuvent pas coder les similarités entre les mots.
 
 
 ## Self-Supervised word2vec
 
-The [word2vec](https://code.google.com/archive/p/word2vec/) tool was proposed to address the above issue.
-It maps each word to a fixed-length vector, and  these vectors can better express the similarity and analogy relationship among different words.
-The word2vec tool contains two models, namely *skip-gram* :cite:`Mikolov.Sutskever.Chen.ea.2013`  and *continuous bag of words* (CBOW) :cite:`Mikolov.Chen.Corrado.ea.2013`.
-For semantically meaningful representations,
-their training relies on
-conditional probabilities
-that can be viewed as predicting
-some words using some of their surrounding words
-in corpora.
-Since supervision comes from the data without labels,
-both skip-gram and continuous bag of words
-are self-supervised models.
+L'outil [word2vec](https://code.google.com/archive/p/word2vec/) a été proposé pour résoudre le problème ci-dessus.
+Il fait correspondre chaque mot à un vecteur de longueur fixe, et ces vecteurs peuvent mieux exprimer la relation de similarité et d'analogie entre différents mots.
+L'outil word2vec contient deux modèles, à savoir *skip-gram* :cite:`Mikolov.Sutskever.Chen.ea.2013` et *continuous bag of words* (CBOW) :cite:`Mikolov.Chen.Corrado.ea.2013` .
+Pour les représentations sémantiquement significatives,
+leur formation repose sur
+des probabilités conditionnelles
+qui peuvent être considérées comme la prédiction de
+certains mots à l'aide de certains de leurs mots environnants
+dans des corpus.
+Puisque la supervision provient des données sans étiquettes,
+les modèles de saut de programme et de sac de mots continu
+sont des modèles auto-supervisés.
 
-In the following, we will introduce these two models and their training methods.
-
-
-## The Skip-Gram Model
-:label:`subsec_skip-gram`
-
-The *skip-gram* model assumes that a word can be used to generate its surrounding words in a text sequence.
-Take the text sequence "the", "man", "loves", "his", "son" as an example.
-Let's choose "loves" as the *center word* and set the context window size to 2.
-As shown in :numref:`fig_skip_gram`,
-given the center word "loves",
-the skip-gram model considers
-the conditional probability for generating the *context words*: "the", "man", "his", and "son",
-which are no more than 2 words away from the center word:
-
-$$P(\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}\mid\textrm{"loves"}).$$
-
-Assume that
-the context words are independently generated
-given the center word (i.e., conditional independence).
-In this case, the above conditional probability
-can be rewritten as
-
-$$P(\textrm{"the"}\mid\textrm{"loves"})\cdot P(\textrm{"man"}\mid\textrm{"loves"})\cdot P(\textrm{"his"}\mid\textrm{"loves"})\cdot P(\textrm{"son"}\mid\textrm{"loves"}).$$
-
-![The skip-gram model considers the conditional probability of generating the surrounding context words given a center word.](../img/skip-gram.svg)
-:label:`fig_skip_gram`
-
-In the skip-gram model, each word
-has two $d$-dimensional-vector representations
-for calculating conditional probabilities.
-More concretely,
-for any word with index $i$ in the dictionary,
-denote by $\mathbf{v}_i\in\mathbb{R}^d$
-and $\mathbf{u}_i\in\mathbb{R}^d$
-its two vectors
-when used as a *center* word and a *context* word, respectively.
-The conditional probability of generating any
-context word $w_o$ (with index $o$ in the dictionary) given the center word $w_c$ (with index $c$ in the dictionary) can be modeled by
-a softmax operation on vector dot products:
+Dans ce qui suit, nous allons présenter ces deux modèles et leurs méthodes de formation.
 
 
-$$P(w_o \mid w_c) = \frac{\text{exp}(\mathbf{u}_o^\top \mathbf{v}_c)}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)},$$
-:eqlabel:`eq_skip-gram-softmax`
+## Le modèle Skip-Gram
+:label:`subsec_skip-gram` 
 
-where the vocabulary index set $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$.
-Given a text sequence of length $T$, where the word at time step $t$ is denoted as $w^{(t)}$.
-Assume that
-context words are independently generated
-given any center word.
-For context window size $m$,
-the likelihood function of the skip-gram model
-is the probability of generating all context words
-given any center word:
+ Le modèle *skip-gram* suppose qu'un mot peut être utilisé pour générer les mots qui l'entourent dans une séquence de texte.
+Prenons comme exemple la séquence de texte "le", "homme", "aime", "son", "fils".
+Choisissons "aime" comme *mot central* et fixons la taille de la fenêtre de contexte à 2.
+Comme indiqué dans :numref:`fig_skip_gram` ,
+étant donné le mot central "aime",
+le modèle de saut de programme considère
+la probabilité conditionnelle de générer les *mots de contexte* : "le", "homme", "son" et "fils",
+qui ne sont pas éloignés de plus de 2 mots du mot central :
 
+$$P(\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}\mid\textrm{"loves"}).$$ 
 
-$$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(w^{(t+j)} \mid w^{(t)}),$$
+ Supposons que
+les mots contextuels soient générés indépendamment
+étant donné le mot central (c'est-à-dire, l'indépendance conditionnelle).
+Dans ce cas, la probabilité conditionnelle ci-dessus
+peut être réécrite comme suit :
 
-where any time step that is less than $1$ or greater than $T$ can be omitted.
+$$P(\textrm{"the"}\mid\textrm{"loves"})\cdot P(\textrm{"man"}\mid\textrm{"loves"})\cdot P(\textrm{"his"}\mid\textrm{"loves"})\cdot P(\textrm{"son"}\mid\textrm{"loves"}).$$ 
 
-### Training
+ ![The skip-gram model considers the conditional probability of generating the surrounding context words given a center word.](../img/skip-gram.svg) 
+ :label:`fig_skip_gram` 
 
-The skip-gram model parameters are the center word vector and context word vector for each word in the vocabulary.
-In training, we learn the model parameters by maximizing the likelihood function (i.e., maximum likelihood estimation). This is equivalent to minimizing the following loss function:
-
-$$ - \sum_{t=1}^{T} \sum_{-m \leq j \leq m,\ j \neq 0} \text{log}\, P(w^{(t+j)} \mid w^{(t)}).$$
-
-When using stochastic gradient descent to minimize the loss,
-in each iteration
-we can
-randomly sample a shorter subsequence to calculate the (stochastic) gradient for this subsequence to update the model parameters.
-To calculate this (stochastic) gradient,
-we need to obtain
-the gradients of
-the log conditional probability with respect to the center word vector and the context word vector.
-In general, according to :eqref:`eq_skip-gram-softmax`
-the log conditional probability
-involving any pair of the center word $w_c$ and
-the context word $w_o$ is
-
-
-$$\log P(w_o \mid w_c) =\mathbf{u}_o^\top \mathbf{v}_c - \log\left(\sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)\right).$$
-:eqlabel:`eq_skip-gram-log`
-
-Through differentiation, we can obtain its gradient
-with respect to the center word vector $\mathbf{v}_c$ as
-
-$$\begin{aligned}\frac{\partial \text{log}\, P(w_o \mid w_c)}{\partial \mathbf{v}_c}&= \mathbf{u}_o - \frac{\sum_{j \in \mathcal{V}} \exp(\mathbf{u}_j^\top \mathbf{v}_c)\mathbf{u}_j}{\sum_{i \in \mathcal{V}} \exp(\mathbf{u}_i^\top \mathbf{v}_c)}\\&= \mathbf{u}_o - \sum_{j \in \mathcal{V}} \left(\frac{\text{exp}(\mathbf{u}_j^\top \mathbf{v}_c)}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)}\right) \mathbf{u}_j\\&= \mathbf{u}_o - \sum_{j \in \mathcal{V}} P(w_j \mid w_c) \mathbf{u}_j.\end{aligned}$$
-:eqlabel:`eq_skip-gram-grad`
+ Dans le modèle de saut de programme, chaque mot
+a deux représentations vectorielles $d$-dimensionnelles
+pour calculer les probabilités conditionnelles.
+Plus concrètement,
+pour tout mot ayant l'indice $i$ dans le dictionnaire,
+désigne par $\mathbf{v}_i\in\mathbb{R}^d$
+ et $\mathbf{u}_i\in\mathbb{R}^d$
+ ses deux vecteurs
+lorsqu'il est utilisé comme mot *centre* et comme mot *contexte*, respectivement.
+La probabilité conditionnelle de générer n'importe quel mot de contexte
+ $w_o$ (avec l'indice $o$ dans le dictionnaire) étant donné le mot central $w_c$ (avec l'indice $c$ dans le dictionnaire) peut être modélisée par
+une opération softmax sur les produits scalaires :
 
 
-Note that the calculation in :eqref:`eq_skip-gram-grad` requires the conditional probabilities of all words in the dictionary with $w_c$ as the center word.
-The gradients for the other word vectors can be obtained in the same way.
+ $$P(w_o \mid w_c) = \frac{\text{exp}(\mathbf{u}_o^\top \mathbf{v}_c)}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)},$$ 
+ :eqlabel:`eq_skip-gram-softmax` 
+
+ où l'ensemble des indices du vocabulaire $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$.
+Étant donné une séquence de texte de longueur $T$, où le mot au pas de temps $t$ est désigné par $w^{(t)}$.
+Supposons que les mots de contexte
+soient générés de manière indépendante
+pour un mot central quelconque.
+Pour la taille de la fenêtre de contexte $m$,
+la fonction de vraisemblance du modèle de saut de programme
+est la probabilité de générer tous les mots de contexte
+étant donné un mot central quelconque :
 
 
-After training, for any word with index $i$ in the dictionary, we obtain both word vectors
-$\mathbf{v}_i$ (as the center word) and $\mathbf{u}_i$ (as the context word).
-In natural language processing applications, the center word vectors of the skip-gram model are typically
-used as the word representations.
+ $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(w^{(t+j)} \mid w^{(t)}),$$ 
+
+ où tout pas de temps inférieur à $1$ ou supérieur à $T$ peut être omis.
+
+### Formation
+
+Les paramètres du modèle de saut de programme sont le vecteur du mot central et le vecteur du mot contextuel pour chaque mot du vocabulaire.
+Lors de la formation, nous apprenons les paramètres du modèle en maximisant la fonction de vraisemblance (c'est-à-dire l'estimation de vraisemblance maximale). Cela équivaut à minimiser la fonction de perte suivante :
+
+$$ - \sum_{t=1}^{T} \sum_{-m \leq j \leq m,\ j \neq 0} \text{log}\, P(w^{(t+j)} \mid w^{(t)}).$$ 
+
+ Lorsque l'on utilise la descente de gradient stochastique pour minimiser la perte,
+à chaque itération
+nous pouvons
+échantillonner de manière aléatoire une sous-séquence plus courte pour calculer le gradient (stochastique) de cette sous-séquence afin de mettre à jour les paramètres du modèle.
+Pour calculer ce gradient (stochastique),
+nous devons obtenir
+les gradients de
+la probabilité conditionnelle logarithmique par rapport au vecteur mot central et au vecteur mot contextuel.
+En général, selon :eqref:`eq_skip-gram-softmax` 
+ la probabilité conditionnelle logarithmique
+impliquant toute paire du mot central $w_c$ et
+le mot de contexte $w_o$ est
 
 
-## The Continuous Bag of Words (CBOW) Model
+ $$\log P(w_o \mid w_c) =\mathbf{u}_o^\top \mathbf{v}_c - \log\left(\sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)\right).$$ 
+ :eqlabel:`eq_skip-gram-log` 
+
+ Par différenciation, nous pouvons obtenir son gradient
+par rapport au vecteur du mot central $\mathbf{v}_c$ comme
+
+$$\begin{aligned}\frac{\partial \text{log}\, P(w_o \mid w_c)}{\partial \mathbf{v}_c}&= \mathbf{u}_o - \frac{\sum_{j \in \mathcal{V}} \exp(\mathbf{u}_j^\top \mathbf{v}_c)\mathbf{u}_j}{\sum_{i \in \mathcal{V}} \exp(\mathbf{u}_i^\top \mathbf{v}_c)}\\&= \mathbf{u}_o - \sum_{j \in \mathcal{V}} \left(\frac{\text{exp}(\mathbf{u}_j^\top \mathbf{v}_c)}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)}\right) \mathbf{u}_j\\&= \mathbf{u}_o - \sum_{j \in \mathcal{V}} P(w_j \mid w_c) \mathbf{u}_j.\end{aligned}$$ 
+ :eqlabel:`eq_skip-gram-grad` 
+
+ 
+ Notez que le calcul dans :eqref:`eq_skip-gram-grad` nécessite les probabilités conditionnelles de tous les mots du dictionnaire avec $w_c$ comme mot central.
+Les gradients des autres vecteurs mots peuvent être obtenus de la même manière.
 
 
-The *continuous bag of words* (CBOW) model is similar to the skip-gram model.
-The major difference
-from the skip-gram model is that
-the continuous bag of words model
-assumes that a center word is generated
-based on its surrounding context words in the text sequence.
-For example,
-in the same text sequence "the", "man", "loves", "his", and "son", with "loves" as the center word and the context window size being 2,
-the continuous bag of words model
-considers
-the conditional probability of generating the center word "loves" based on the context words "the", "man", "his" and "son" (as shown in :numref:`fig_cbow`), which is
-
-$$P(\textrm{"loves"}\mid\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}).$$
-
-![The continuous bag of words model considers the conditional probability of generating the center word given its surrounding context words.](../img/cbow.svg)
-:label:`fig_cbow`
+Après l'apprentissage, pour tout mot ayant l'index $i$ dans le dictionnaire, nous obtenons les deux vecteurs de mots
+$\mathbf{v}_i$ (comme mot central) et $\mathbf{u}_i$ (comme mot de contexte).
+Dans les applications de traitement du langage naturel, les vecteurs de mots centraux du modèle de saut de programme sont généralement
+utilisés comme représentations de mots.
 
 
-Since there are multiple context words
-in the continuous bag of words model,
-these context word vectors are averaged
-in the calculation of the conditional probability.
-Specifically,
-for any word with index $i$ in the dictionary,
-denote by $\mathbf{v}_i\in\mathbb{R}^d$
-and $\mathbf{u}_i\in\mathbb{R}^d$
-its two vectors
-when used as a *context* word and a *center* word
-(meanings are switched in the skip-gram model), respectively.
-The conditional probability of generating any
-center word $w_c$ (with index $c$ in the dictionary) given its surrounding context words $w_{o_1}, \ldots, w_{o_{2m}}$ (with index $o_1, \ldots, o_{2m}$ in the dictionary) can be modeled by
+## Le modèle du sac continu de mots (CBOW)
+
+
+ Le modèle du sac *continu de mots* (CBOW) est similaire au modèle du skip-gramme.
+La principale différence
+par rapport au modèle skip-gram est que
+le modèle de sac continu de mots
+suppose qu'un mot central est généré
+sur la base des mots contextuels qui l'entourent dans la séquence de texte.
+Par exemple,
+dans la même séquence de texte "le", "homme", "aime", "son" et "fils", avec "aime" comme mot central et la taille de la fenêtre de contexte étant 2,
+le modèle de sac de mots continu
+considère
+la probabilité conditionnelle de générer le mot central "aime" sur la base des mots de contexte "le", "man", "his" et "son" (comme indiqué sur :numref:`fig_cbow` ), qui est
+
+$$P(\textrm{"loves"}\mid\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}).$$ 
+
+ ![The continuous bag of words model considers the conditional probability of generating the center word given its surrounding context words.](../img/cbow.svg) 
+ :label:`fig_cbow` 
+
+ 
+ Étant donné qu'il existe plusieurs mots contextuels
+dans le modèle de sac de mots continu,
+, la moyenne de ces vecteurs de mots contextuels est calculée sur
+dans le calcul de la probabilité conditionnelle.
+Plus précisément,
+pour tout mot ayant l'index $i$ dans le dictionnaire,
+désigne par $\mathbf{v}_i\in\mathbb{R}^d$
+ et $\mathbf{u}_i\in\mathbb{R}^d$
+ ses deux vecteurs
+lorsqu'il est utilisé comme mot *contextuel* et comme mot *central*
+(les significations sont interverties dans le modèle skip-gram), respectivement.
+La probabilité conditionnelle de générer n'importe quel mot central
+ $w_c$ (avec l'indice $c$ dans le dictionnaire) étant donné les mots contextuels qui l'entourent $w_{o_1}, \ldots, w_{o_{2m}}$ (avec l'indice $o_1, \ldots, o_{2m}$ dans le dictionnaire) peut être modélisée par
 
 
 
-$$P(w_c \mid w_{o_1}, \ldots, w_{o_{2m}}) = \frac{\text{exp}\left(\frac{1}{2m}\mathbf{u}_c^\top (\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}}) \right)}{ \sum_{i \in \mathcal{V}} \text{exp}\left(\frac{1}{2m}\mathbf{u}_i^\top (\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}}) \right)}.$$
-:eqlabel:`fig_cbow-full`
+ $$P(w_c \mid w_{o_1}, \ldots, w_{o_{2m}}) = \frac{\text{exp}\left(\frac{1}{2m}\mathbf{u}_c^\top (\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}}) \right)}{ \sum_{i \in \mathcal{V}} \text{exp}\left(\frac{1}{2m}\mathbf{u}_i^\top (\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}}) \right)}.$$ 
+ :eqlabel:`fig_cbow-full` 
+
+ 
+ Par souci de concision, laissons $\mathcal{W}_o= \{w_{o_1}, \ldots, w_{o_{2m}}\}$ et $\bar{\mathbf{v}}_o = \left(\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}} \right)/(2m)$. Alors, :eqref:`fig_cbow-full` peut être simplifié comme suit :
+
+$$P(w_c \mid \mathcal{W}_o) = \frac{\exp\left(\mathbf{u}_c^\top \bar{\mathbf{v}}_o\right)}{\sum_{i \in \mathcal{V}} \exp\left(\mathbf{u}_i^\top \bar{\mathbf{v}}_o\right)}.$$ 
+
+ Étant donné une séquence de texte de longueur $T$, où le mot au pas de temps $t$ est désigné par $w^{(t)}$.
+Pour la taille de la fenêtre de contexte $m$,
+la fonction de vraisemblance du modèle de sac de mots continu
+est la probabilité de générer tous les mots centraux
+étant donné leurs mots de contexte :
 
 
-For brevity, let $\mathcal{W}_o= \{w_{o_1}, \ldots, w_{o_{2m}}\}$ and $\bar{\mathbf{v}}_o = \left(\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}} \right)/(2m)$. Then :eqref:`fig_cbow-full` can be simplified as
+ $$ \prod_{t=1}^{T}  P(w^{(t)} \mid  w^{(t-m)}, \ldots, w^{(t-1)}, w^{(t+1)}, \ldots, w^{(t+m)}).$$ 
 
-$$P(w_c \mid \mathcal{W}_o) = \frac{\exp\left(\mathbf{u}_c^\top \bar{\mathbf{v}}_o\right)}{\sum_{i \in \mathcal{V}} \exp\left(\mathbf{u}_i^\top \bar{\mathbf{v}}_o\right)}.$$
+ ### Formation
 
-Given a text sequence of length $T$, where the word at time step $t$ is denoted as $w^{(t)}$.
-For context window size $m$,
-the likelihood function of the continuous bag of words model
-is the probability of generating all center words
-given their context words:
-
-
-$$ \prod_{t=1}^{T}  P(w^{(t)} \mid  w^{(t-m)}, \ldots, w^{(t-1)}, w^{(t+1)}, \ldots, w^{(t+m)}).$$
-
-### Training
-
-Training continuous bag of words models
-is almost the same as
-training skip-gram models.
-The maximum likelihood estimation of the
-continuous bag of words model is equivalent to minimizing the following loss function:
+La formation des modèles de sac de mots continus
+est presque la même que la formation des modèles de saut de programme
+.
+L'estimation par maximum de vraisemblance du modèle de sac de mots continu
+est équivalente à la minimisation de la fonction de perte suivante :
 
 
 
 $$  -\sum_{t=1}^T  \text{log}\, P(w^{(t)} \mid  w^{(t-m)}, \ldots, w^{(t-1)}, w^{(t+1)}, \ldots, w^{(t+m)}).$$
 
-Notice that
+Remarquez que
 
-$$\log\,P(w_c \mid \mathcal{W}_o) = \mathbf{u}_c^\top \bar{\mathbf{v}}_o - \log\,\left(\sum_{i \in \mathcal{V}} \exp\left(\mathbf{u}_i^\top \bar{\mathbf{v}}_o\right)\right).$$
+$$\log\,P(w_c \mid \mathcal{W}_o) = \mathbf{u}_c^\top \bar{\mathbf{v}}_o - \log\,\left(\sum_{i \in \mathcal{V}} \exp\left(\mathbf{u}_i^\top \bar{\mathbf{v}}_o\right)\right).$$ 
 
-Through differentiation, we can obtain its gradient
-with respect to any context word vector $\mathbf{v}_{o_i}$($i = 1, \ldots, 2m$)
-as
-
-
-$$\frac{\partial \log\, P(w_c \mid \mathcal{W}_o)}{\partial \mathbf{v}_{o_i}} = \frac{1}{2m} \left(\mathbf{u}_c - \sum_{j \in \mathcal{V}} \frac{\exp(\mathbf{u}_j^\top \bar{\mathbf{v}}_o)\mathbf{u}_j}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \bar{\mathbf{v}}_o)} \right) = \frac{1}{2m}\left(\mathbf{u}_c - \sum_{j \in \mathcal{V}} P(w_j \mid \mathcal{W}_o) \mathbf{u}_j \right).$$
-:eqlabel:`eq_cbow-gradient`
+ Par différenciation, nous pouvons obtenir son gradient
+par rapport à tout vecteur de mots contextuel $\mathbf{v}_{o_i}$($i = 1, \ldots, 2m$)
+comme
 
 
-The gradients for the other word vectors can be obtained in the same way.
-Unlike the skip-gram model,
-the continuous bag of words model
-typically
-uses context word vectors as the word representations.
+ $$\frac{\partial \log\, P(w_c \mid \mathcal{W}_o)}{\partial \mathbf{v}_{o_i}} = \frac{1}{2m} \left(\mathbf{u}_c - \sum_{j \in \mathcal{V}} \frac{\exp(\mathbf{u}_j^\top \bar{\mathbf{v}}_o)\mathbf{u}_j}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \bar{\mathbf{v}}_o)} \right) = \frac{1}{2m}\left(\mathbf{u}_c - \sum_{j \in \mathcal{V}} P(w_j \mid \mathcal{W}_o) \mathbf{u}_j \right).$$ 
+ :eqlabel:`eq_cbow-gradient` 
 
-
-
-
-## Summary
-
-* Word vectors are vectors used to represent words, and can also be considered as feature vectors or representations of words. The technique of mapping words to real vectors is called word embedding.
-* The word2vec tool contains both the skip-gram  and continuous bag of words models.
-* The skip-gram model assumes that a word can be used to generate its surrounding words in a text sequence; while the continuous bag of words model assumes that a center word is generated based on its surrounding context words.
+ 
+ Les gradients des autres vecteurs de mots peuvent être obtenus de la même manière.
+Contrairement au modèle de saut de programme,
+le modèle de sac de mots continu
+typiquement
+utilise des vecteurs de mots contextuels comme représentations des mots.
 
 
 
-## Exercises
 
-1. What is the computational complexity for calculating each gradient? What could be the issue if the dictionary size is huge?
-1. Some fixed phrases in English consist of multiple words, such as "new york". How to train their word vectors? Hint: see Section 4 in the word2vec paper :cite:`Mikolov.Sutskever.Chen.ea.2013`.
-1. Let's reflect on the word2vec design by taking the skip-gram model as an example. What is the relationship between the dot product of two word vectors in the skip-gram model and the cosine similarity? For a pair of words with similar semantics, why may the cosine similarity of their word vectors (trained by the skip-gram model) be high?
+## Résumé
+
+* Les vecteurs de mots sont des vecteurs utilisés pour représenter les mots, et peuvent également être considérés comme des vecteurs de caractéristiques ou des représentations de mots. La technique de mise en correspondance des mots avec des vecteurs réels est appelée intégration de mots.
+* L'outil word2vec contient à la fois le modèle "skip-gram" et le modèle "continuous bag of words".
+* Le modèle skip-gram suppose qu'un mot peut être utilisé pour générer les mots qui l'entourent dans une séquence de texte, tandis que le modèle continuous bag of words suppose qu'un mot central est généré sur la base des mots qui l'entourent.
+
+
+
+## Exercices
+
+1. Quelle est la complexité de calcul de chaque gradient ? Quel pourrait être le problème si la taille du dictionnaire est énorme ?
+1. Certaines phrases fixes en anglais sont composées de plusieurs mots, comme "new york". Comment former leurs vecteurs de mots ? Conseil : voir la section 4 du document word2vec :cite:`Mikolov.Sutskever.Chen.ea.2013` .
+1. Réfléchissons à la conception de word2vec en prenant le modèle de saut de gramme comme exemple. Quelle est la relation entre le produit scalaire de deux vecteurs de mots dans le modèle skip-gram et la similarité en cosinus ? Pour une paire de mots ayant une sémantique similaire, pourquoi la similarité en cosinus de leurs vecteurs de mots (formés par le modèle skip-gram) peut-elle être élevée ?
 
 [Discussions](https://discuss.d2l.ai/t/381)

@@ -1,87 +1,87 @@
-# Neural Style Transfer
+# Transfert de style neuronal
 
-If you are a photography enthusiast,
-you may be familiar with the filter.
-It can change the color style of photos
-so that landscape photos become sharper
-or portrait photos have whitened skins.
-However,
-one filter usually only changes
-one aspect of the photo.
-To apply an ideal style
-to a photo,
-you probably need to
-try many different filter combinations.
-This process is
-as complex as tuning the hyperparameters of a model.
+Si vous êtes un passionné de photographie,
+vous connaissez peut-être ce filtre.
+Il peut modifier le style de couleur des photos
+de sorte que les photos de paysages deviennent plus nettes
+ou que les photos de portraits soient blanchies.
+Cependant,
+un filtre ne modifie généralement
+qu'un seul aspect de la photo.
+Pour appliquer un style idéal
+à une photo,
+vous devrez probablement
+essayer de nombreuses combinaisons de filtres différentes.
+Ce processus est
+aussi complexe que le réglage des hyperparamètres d'un modèle.
 
 
 
-In this section, we will
-leverage layerwise representations of a CNN
-to automatically apply the style of one image
-to another image, i.e., *style transfer* :cite:`Gatys.Ecker.Bethge.2016`.
-This task needs two input images:
-one is the *content image* and
-the other is the *style image*.
-We will use neural networks
-to modify the content image
-to make it close to the style image in style.
-For example,
-the content image in :numref:`fig_style_transfer` is a landscape photo taken by us
-in Mount Rainier National Park in the suburbs of Seattle, while the style image is an oil painting
-with the theme of autumn oak trees.
-In the output synthesized image,
-the oil brush strokes of the style image
-are applied, leading to more vivid colors,
-while preserving the main shape of the objects
-in the content image.
+Dans cette section, nous allons
+exploiter les représentations par couches d'un CNN
+pour appliquer automatiquement le style d'une image
+à une autre image, c'est-à-dire le *transfert de style* :cite:`Gatys.Ecker.Bethge.2016` .
+Cette tâche nécessite deux images d'entrée :
+l'une est l'image *de contenu* et
+l'autre est l'image *de style*.
+Nous utiliserons les réseaux neuronaux
+pour modifier l'image de contenu
+afin de la rendre proche de l'image de style en termes de style.
+Par exemple,
+l'image de contenu dans :numref:`fig_style_transfer` est une photo de paysage prise par nous
+dans le parc national du Mont Rainier dans la banlieue de Seattle, tandis que l'image de style est une peinture à l'huile
+sur le thème des chênes d'automne.
+Dans l'image synthétisée de sortie,
+les coups de pinceau à l'huile de l'image de style
+sont appliqués, ce qui donne des couleurs plus vives,
+tout en préservant la forme principale des objets
+dans l'image de contenu.
 
 ![Given content and style images, style transfer outputs a synthesized image.](../img/style-transfer.svg)
 :label:`fig_style_transfer`
 
-## Method
+## Méthode
 
-:numref:`fig_style_transfer_model` illustrates
-the CNN-based style transfer method with a simplified example.
-First, we initialize the synthesized image,
-for example, into the content image.
-This synthesized image is the only variable that needs to be updated during the style transfer process,
-i.e., the model parameters to be updated during training.
-Then we choose a pretrained CNN
-to extract image features and freeze its
-model parameters during training.
-This deep CNN uses multiple layers
-to extract
-hierarchical features for images.
-We can choose the output of some of these layers as content features or style features.
-Take :numref:`fig_style_transfer_model` as an example.
-The pretrained neural network here has 3 convolutional layers,
-where the second layer outputs the content features,
-and the first and third layers output the style features.
+:numref:`fig_style_transfer_model` illustre
+la méthode de transfert de style basée sur CNN à l'aide d'un exemple simplifié.
+Tout d'abord, nous initialisons l'image synthétisée,
+par exemple, dans l'image de contenu.
+Cette image synthétisée est la seule variable qui doit être mise à jour pendant le processus de transfert de style,
+c'est-à-dire les paramètres du modèle à mettre à jour pendant l'apprentissage.
+Nous choisissons ensuite un CNN pré-entraîné
+pour extraire les caractéristiques de l'image et figer les paramètres de son modèle
+pendant l'apprentissage.
+Ce CNN profond utilise plusieurs couches
+pour extraire
+des caractéristiques hiérarchiques des images.
+Nous pouvons choisir la sortie de certaines de ces couches comme caractéristiques de contenu ou de style.
+Prenons l'exemple de :numref:`fig_style_transfer_model` .
+Le réseau neuronal pré-entraîné comporte ici 3 couches convolutionnelles,
+où la deuxième couche produit les caractéristiques de contenu,
+et les première et troisième couches produisent les caractéristiques de style.
 
 ![CNN-based style transfer process. Solid lines show the direction of forward propagation and dotted lines show backward propagation. ](../img/neural-style.svg)
 :label:`fig_style_transfer_model`
 
-Next, we calculate the loss function of style transfer through forward propagation (direction of solid arrows), and update the model parameters (the synthesized image for output) through backpropagation (direction of dashed arrows).
-The loss function commonly used in style transfer consists of three parts:
-(i) *content loss* makes the synthesized image and the content image close in content features;
-(ii) *style loss* makes the synthesized image and style image close in style features;
-and (iii) *total variation loss* helps to reduce the noise in the synthesized image.
-Finally, when the model training is over, we output the model parameters of the style transfer to generate
-the final synthesized image.
+Ensuite, nous calculons la fonction de perte du transfert de style par propagation avant (direction des flèches pleines), et nous mettons à jour les paramètres du modèle (l'image synthétisée en sortie) par rétropropagation (direction des flèches pointillées).
+La fonction de perte couramment utilisée dans le transfert de style se compose de trois parties :
+(i) *perte de contenu* rend l'image synthétisée et l'image de contenu proches en termes de caractéristiques de contenu ;
+(ii) *perte de style* rend l'image synthétisée et l'image de style proches en termes de caractéristiques de style ;
+et (iii) *perte de variation totale* aide à réduire le bruit dans l'image synthétisée.
+Enfin, lorsque l'apprentissage du modèle est terminé, nous sortons les paramètres du modèle de transfert de style pour générer
+l'image synthétisée finale.
 
 
 
-In the following,
-we will explain the technical details of style transfer via a concrete experiment.
+Dans ce qui suit,
+nous expliquerons les détails techniques du transfert de style via une expérience concrète.
 
 
-## [**Reading the Content and Style Images**]
+## [**Lecture des images de contenu et de style**]
 
-First, we read the content and style images.
-From their printed coordinate axes,
-we can tell that these images have different sizes.
+Tout d'abord, nous lisons les images de contenu et de style.
+D'après leurs axes de coordonnées imprimés,
+nous pouvons dire que ces images ont des tailles différentes.
 
 ```{.python .input}
 #@tab mxnet
@@ -122,14 +122,14 @@ style_img = d2l.Image.open('../img/autumn-oak.jpg')
 d2l.plt.imshow(style_img);
 ```
 
-## [**Preprocessing and Postprocessing**]
+## [**Prétraitement et post-traitement**]
 
-Below, we define two functions for preprocessing and postprocessing images.
-The `preprocess` function standardizes
-each of the three RGB channels of the input image and transforms the results into the CNN input format.
-The `postprocess` function restores the pixel values in the output image to their original values before standardization.
-Since the image printing function requires that each pixel has a floating point value from 0 to 1,
-we replace any value smaller than 0 or greater than 1 with 0 or 1, respectively.
+Ci-dessous, nous définissons deux fonctions pour le prétraitement et le post-traitement des images.
+La fonction `preprocess` normalise
+chacun des trois canaux RVB de l'image d'entrée et transforme les résultats au format d'entrée CNN.
+La fonction `postprocess` rétablit les valeurs des pixels de l'image de sortie à leur valeur originale avant la normalisation.
+Étant donné que la fonction d'impression d'image exige que chaque pixel ait une valeur à virgule flottante comprise entre 0 et 1,
+nous remplaçons toute valeur inférieure à 0 ou supérieure à 1 par 0 ou 1, respectivement.
 
 ```{.python .input}
 #@tab mxnet
@@ -164,9 +164,9 @@ def postprocess(img):
     return torchvision.transforms.ToPILImage()(img.permute(2, 0, 1))
 ```
 
-## [**Extracting Features**]
+## [**Extraction de caractéristiques**]
 
-We use the VGG-19 model pretrained on the ImageNet dataset to extract image features :cite:`Gatys.Ecker.Bethge.2016`.
+Nous utilisons le modèle VGG-19 pré-entraîné sur le jeu de données ImageNet pour extraire les caractéristiques des images :cite:`Gatys.Ecker.Bethge.2016` .
 
 ```{.python .input}
 #@tab mxnet
@@ -178,27 +178,27 @@ pretrained_net = gluon.model_zoo.vision.vgg19(pretrained=True)
 pretrained_net = torchvision.models.vgg19(pretrained=True)
 ```
 
-In order to extract the content features and style features of the image, we can select the output of certain layers in the VGG network.
-Generally speaking, the closer to the input layer, the easier to extract details of the image, and vice versa, the easier to extract the global information of the image. In order to avoid excessively
-retaining the details of the content image in the synthesized image,
-we choose a VGG layer that is closer to the output as the *content layer* to output the content features of the image.
-We also select the output of different VGG layers for extracting local and global style features.
-These layers are also called *style layers*.
-As mentioned in :numref:`sec_vgg`,
-the VGG network uses 5 convolutional blocks.
-In the experiment, we choose the last convolutional layer of the fourth convolutional block as the content layer, and the first convolutional layer of each convolutional block as the style layer.
-The indices of these layers can be obtained by printing the `pretrained_net` instance.
+Afin d'extraire les caractéristiques de contenu et de style de l'image, nous pouvons sélectionner la sortie de certaines couches du réseau VGG.
+D'une manière générale, plus la couche d'entrée est proche, plus il est facile d'extraire les détails de l'image, et inversement, plus il est facile d'extraire l'information globale de l'image. Afin d'éviter de retenir excessivement
+les détails de l'image de contenu dans l'image synthétisée,
+nous choisissons une couche VGG plus proche de la sortie comme *couche de contenu* pour sortir les caractéristiques de contenu de l'image.
+Nous sélectionnons également la sortie de différentes couches VGG pour extraire les caractéristiques de style locales et globales.
+Ces couches sont également appelées *couches de style*.
+Comme mentionné dans :numref:`sec_vgg` ,
+le réseau VGG utilise 5 blocs convolutifs.
+Dans l'expérience, nous choisissons la dernière couche convolutive du quatrième bloc convolutif comme couche de contenu, et la première couche convolutive de chaque bloc convolutif comme couche de style.
+Les indices de ces couches peuvent être obtenus en imprimant l'instance `pretrained_net`.
 
 ```{.python .input}
 #@tab all
 style_layers, content_layers = [0, 5, 10, 19, 28], [25]
 ```
 
-When extracting features using VGG layers,
-we only need to use all those
-from the input layer to the content layer or style layer that is closest to the output layer.
-Let's construct a new network instance `net`, which only retains all the VGG layers to be
-used for feature extraction.
+Lors de l'extraction de caractéristiques à l'aide de couches VGG,
+nous n'avons besoin d'utiliser que toutes celles
+de la couche d'entrée à la couche de contenu ou à la couche de style qui est la plus proche de la couche de sortie.
+Construisons une nouvelle instance de réseau `net`, qui ne retient que toutes les couches VGG à utiliser pour l'extraction de caractéristiques (
+).
 
 ```{.python .input}
 #@tab mxnet
@@ -213,11 +213,11 @@ net = nn.Sequential(*[pretrained_net.features[i] for i in
                       range(max(content_layers + style_layers) + 1)])
 ```
 
-Given the input `X`, if we simply invoke
-the forward propagation `net(X)`, we can only get the output of the last layer.
-Since we also need the outputs of intermediate layers,
-we need to perform layer-by-layer computation and keep
-the content and style layer outputs.
+Étant donné l'entrée `X`, si nous invoquons simplement
+la propagation vers l'avant `net(X)`, nous ne pouvons obtenir que la sortie de la dernière couche.
+Comme nous avons également besoin des sorties des couches intermédiaires,
+nous devons effectuer un calcul couche par couche et conserver
+les sorties des couches de contenu et de style.
 
 ```{.python .input}
 #@tab all
@@ -233,16 +233,16 @@ def extract_features(X, content_layers, style_layers):
     return contents, styles
 ```
 
-Two functions are defined below:
-the `get_contents` function extracts content features from the content image,
-and the `get_styles` function extracts style features from the style image.
-Since there is no need to update the model parameters of the pretrained VGG during training,
-we can extract the content and the style features
-even before the training starts.
-Since the synthesized image
-is a set of model parameters to be updated
-for style transfer,
-we can only extract the content and style features of the synthesized image by calling the `extract_features` function during training.
+Deux fonctions sont définies ci-dessous :
+la fonction `get_contents` extrait les caractéristiques de contenu de l'image de contenu,
+et la fonction `get_styles` extrait les caractéristiques de style de l'image de style.
+Comme il n'est pas nécessaire de mettre à jour les paramètres du modèle du VGG pré-entraîné pendant l'apprentissage,
+nous pouvons extraire les caractéristiques de contenu et de style
+avant même le début de l'apprentissage.
+Comme l'image synthétisée
+est un ensemble de paramètres de modèle à mettre à jour
+pour le transfert de style,
+nous ne pouvons extraire le contenu et les caractéristiques de style de l'image synthétisée qu'en appelant la fonction `extract_features` pendant la formation.
 
 ```{.python .input}
 #@tab mxnet
@@ -270,21 +270,21 @@ def get_styles(image_shape, device):
     return style_X, styles_Y
 ```
 
-## [**Defining the Loss Function**]
+## [**Définir la fonction de perte**]
 
-Now we will describe the loss function for style transfer. The loss function consists of
-the content loss, style loss, and total variation loss.
+Nous allons maintenant décrire la fonction de perte pour le transfert de style. La fonction de perte se compose de
+la perte de contenu, la perte de style et la perte de variation totale.
 
-### Content Loss
+### Perte de contenu
 
-Similar to the loss function in linear regression,
-the content loss measures the difference
-in content features
-between the synthesized image and the content image via
-the squared loss function.
-The two inputs of the squared loss function
-are both
-outputs of the content layer computed by the `extract_features` function.
+Semblable à la fonction de perte dans la régression linéaire,
+la perte de contenu mesure la différence
+dans les caractéristiques du contenu
+entre l'image synthétisée et l'image de contenu via
+la fonction de perte au carré.
+Les deux entrées de la fonction de perte au carré
+sont les deux sorties
+de la couche de contenu calculée par la fonction `extract_features`.
 
 ```{.python .input}
 #@tab mxnet
@@ -301,34 +301,34 @@ def content_loss(Y_hat, Y):
     return torch.square(Y_hat - Y.detach()).mean()
 ```
 
-### Style Loss
+#### Perte de style
 
-Style loss, similar to content loss,
-also uses the squared loss function to measure the difference in style between the synthesized image and the style image.
-To express the style output of any style layer,
-we first use the `extract_features` function to
-compute the style layer output.
-Suppose that the output has
-1 example, $c$ channels,
-height $h$, and width $w$,
-we can transform this output into
-matrix $\mathbf{X}$ with $c$ rows and $hw$ columns.
-This matrix can be thought of as
-the concatenation of
-$c$ vectors $\mathbf{x}_1, \ldots, \mathbf{x}_c$,
-each of which has a length of $hw$.
-Here, vector $\mathbf{x}_i$ represents the style feature of channel $i$.
+La perte de style, similaire à la perte de contenu,
+utilise également la fonction de perte au carré pour mesurer la différence de style entre l'image synthétisée et l'image de style.
+Pour exprimer la sortie de style de toute couche de style,
+nous utilisons d'abord la fonction `extract_features` pour
+calculer la sortie de la couche de style.
+Supposons que la sortie ait
+1 exemple, $c$ canaux,
+hauteur $h$, et largeur $w$,
+nous pouvons transformer cette sortie en
+matrice $\mathbf{X}$ avec $c$ lignes et $hw$ colonnes.
+Cette matrice peut être considérée comme
+la concaténation de
+$c$ vecteurs $\mathbf{x}_1, \ldots, \mathbf{x}_c$,
+dont chacun a une longueur de $hw$.
+Ici, le vecteur $\mathbf{x}_i$ représente la caractéristique de style du canal $i$.
 
-In the *Gram matrix* of these vectors $\mathbf{X}\mathbf{X}^\top \in \mathbb{R}^{c \times c}$, element $x_{ij}$ in row $i$ and column $j$ is the dot product of vectors $\mathbf{x}_i$ and $\mathbf{x}_j$.
-It represents the correlation of the style features of channels $i$ and $j$.
-We use this Gram matrix to represent the style output of any style layer.
-Note that when the value of $hw$ is larger,
-it likely leads to larger values in the Gram matrix.
-Note also that the height and width of the Gram matrix are both the number of channels $c$.
-To allow style loss not to be affected
-by these values,
-the `gram` function below divides
-the Gram matrix by the number of its elements, i.e., $chw$.
+Dans la *matrice de Gram* de ces vecteurs $\mathbf{X}\mathbf{X}^\top \in \mathbb{R}^{c \times c}$, l'élément $x_{ij}$ dans la ligne $i$ et la colonne $j$ est le produit scalaire des vecteurs $\mathbf{x}_i$ et $\mathbf{x}_j$.
+Il représente la corrélation des caractéristiques de style des canaux $i$ et $j$.
+Nous utilisons cette matrice de Gram pour représenter la sortie de style de toute couche de style.
+Notez que lorsque la valeur de $hw$ est plus grande que celle de
+, cela entraîne probablement des valeurs plus grandes dans la matrice de Gram.
+Notez également que la hauteur et la largeur de la matrice de Gram sont toutes deux le nombre de canaux $c$.
+Pour que la perte de style ne soit pas affectée
+par ces valeurs,
+la fonction `gram` ci-dessous divise
+la matrice de Gram par le nombre de ses éléments, c'est-à-dire $chw$.
 
 ```{.python .input}
 #@tab all
@@ -338,11 +338,11 @@ def gram(X):
     return d2l.matmul(X, X.T) / (num_channels * n)
 ```
 
-Obviously,
-the two Gram matrix inputs of the squared loss function for style loss are based on
-the style layer outputs for
-the synthesized image and the style image.
-It is assumed here that the Gram matrix `gram_Y` based on the style image has been precomputed.
+Évidemment,
+les deux entrées de la matrice de Gram de la fonction de perte au carré pour la perte de style sont basées sur
+les sorties de la couche de style pour
+l'image synthétisée et l'image de style.
+On suppose ici que la matrice de Gram `gram_Y` basée sur l'image de style a été précalculée.
 
 ```{.python .input}
 #@tab mxnet
@@ -356,19 +356,19 @@ def style_loss(Y_hat, gram_Y):
     return torch.square(gram(Y_hat) - gram_Y.detach()).mean()
 ```
 
-### Total Variation Loss
+### Perte totale de variation
 
-Sometimes, the learned synthesized image
-has a lot of high-frequency noise,
-i.e., particularly bright or dark pixels.
-One common noise reduction method is
-*total variation denoising*.
-Denote by $x_{i, j}$ the pixel value at coordinate $(i, j)$.
-Reducing total variation loss
+Parfois, l'image synthétisée apprise
+présente beaucoup de bruit à haute fréquence,
+c'est-à-dire des pixels particulièrement clairs ou sombres.
+Une méthode courante de réduction du bruit est le débruitage par variation totale
+**.
+Désignez par $x_{i, j}$ la valeur du pixel à la coordonnée $(i, j)$.
+La réduction de la perte de variation totale
 
-$$\sum_{i, j} \left|x_{i, j} - x_{i+1, j}\right| + \left|x_{i, j} - x_{i, j+1}\right|$$
+$$\sum_{i, j} \left|x_{i, j} - x_{i+1, j}\right| + \left|x_{i, j} - x_{i, j+1}\right|$$ 
 
-makes values of neighboring pixels on the synthesized image closer.
+ rapproche les valeurs des pixels voisins sur l'image synthétisée.
 
 ```{.python .input}
 #@tab all
@@ -377,14 +377,14 @@ def tv_loss(Y_hat):
                   d2l.abs(Y_hat[:, :, :, 1:] - Y_hat[:, :, :, :-1]).mean())
 ```
 
-### Loss Function
+### Fonction de perte
 
-[**The loss function of style transfer is the weighted sum of content loss, style loss, and total variation loss**].
-By adjusting these weight hyperparameters,
-we can balance among
-content retention,
-style transfer,
-and noise reduction on the synthesized image.
+[**La fonction de perte du transfert de style est la somme pondérée de la perte de contenu, de la perte de style et de la perte de variation totale**].
+En ajustant ces hyperparamètres de pondération,
+nous pouvons équilibrer entre
+la conservation du contenu,
+le transfert de style,
+et la réduction du bruit sur l'image synthétisée.
 
 ```{.python .input}
 #@tab all
@@ -402,12 +402,12 @@ def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
     return contents_l, styles_l, tv_l, l
 ```
 
-## [**Initializing the Synthesized Image**]
+## [**Initialisation de l'image synthétisée**]
 
-In style transfer,
-the synthesized image is the only variable that needs to be updated during training.
-Thus, we can define a simple model, `SynthesizedImage`, and treat the synthesized image as the model parameters.
-In this model, forward propagation just returns the model parameters.
+Dans le transfert de style,
+l'image synthétisée est la seule variable qui doit être mise à jour pendant la formation.
+Ainsi, nous pouvons définir un modèle simple, `SynthesizedImage`, et traiter l'image synthétisée comme les paramètres du modèle.
+Dans ce modèle, la propagation directe renvoie simplement les paramètres du modèle.
 
 ```{.python .input}
 #@tab mxnet
@@ -431,9 +431,9 @@ class SynthesizedImage(nn.Module):
         return self.weight
 ```
 
-Next, we define the `get_inits` function.
-This function creates a synthesized image model instance and initializes it to the image `X`.
-Gram matrices for the style image at various style layers, `styles_Y_gram`, are computed prior to training.
+Ensuite, nous définissons la fonction `get_inits`.
+Cette fonction crée une instance de modèle d'image synthétisée et l'initialise à l'image `X`.
+Les matrices de Gram pour l'image de style aux différentes couches de style, `styles_Y_gram`, sont calculées avant l'apprentissage.
 
 ```{.python .input}
 #@tab mxnet
@@ -459,10 +459,10 @@ def get_inits(X, device, lr, styles_Y):
 ## [**Training**]
 
 
-When training the model for style transfer,
-we continuously extract
-content features and style features of the synthesized image, and calculate the loss function.
-Below defines the training loop.
+ Lors de l'apprentissage du modèle de transfert de style,
+nous extrayons continuellement
+les caractéristiques de contenu et les caractéristiques de style de l'image synthétisée, et nous calculons la fonction de perte.
+La boucle d'apprentissage est définie ci-dessous.
 
 ```{.python .input}
 #@tab mxnet
@@ -514,9 +514,9 @@ def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
     return X
 ```
 
-Now we [**start to train the model**].
-We rescale the height and width of the content and style images to 300 by 450 pixels.
-We use the content image to initialize the synthesized image.
+Maintenant, nous [**commençons à former le modèle**].
+Nous redimensionnons la hauteur et la largeur des images de contenu et de style à 300 par 450 pixels.
+Nous utilisons l'image de contenu pour initialiser l'image synthétisée.
 
 ```{.python .input}
 #@tab mxnet
@@ -536,31 +536,31 @@ _, styles_Y = get_styles(image_shape, device)
 output = train(content_X, contents_Y, styles_Y, device, 0.3, 500, 50)
 ```
 
-We can see that the synthesized image
-retains the scenery and objects of the content image,
-and transfers the color of the style image
-at the same time.
-For example,
-the synthesized image has blocks of color like
-those in the style image.
-Some of these blocks even have the subtle texture of brush strokes.
+Nous pouvons constater que l'image synthétisée
+conserve le paysage et les objets de l'image de contenu,
+et transfère en même temps la couleur de l'image de style
+.
+Par exemple,
+l'image synthétisée a des blocs de couleur comme
+ceux de l'image de style.
+Certains de ces blocs ont même la texture subtile des coups de pinceau.
 
 
 
 
-## Summary
+## Résumé
 
-* The loss function commonly used in style transfer consists of three parts: (i) content loss makes the synthesized image and the content image close in content features; (ii) style loss makes the synthesized image and style image close in style features; and (iii) total variation loss helps to reduce the noise in the synthesized image.
-* We can use a pretrained CNN to extract image features and minimize the loss function to continuously update the synthesized image as model parameters during training.
-* We use Gram matrices to represent the style outputs from the style layers.
+* La fonction de perte couramment utilisée dans le transfert de style se compose de trois parties : (i) la perte de contenu rend l'image synthétisée et l'image de contenu proches dans les caractéristiques de contenu ; (ii) la perte de style rend l'image synthétisée et l'image de style proches dans les caractéristiques de style ; et (iii) la perte de variation totale aide à réduire le bruit dans l'image synthétisée.
+* Nous pouvons utiliser un CNN pré-entraîné pour extraire les caractéristiques de l'image et minimiser la fonction de perte pour mettre à jour continuellement l'image synthétisée comme paramètres du modèle pendant l'entraînement.
+* Nous utilisons des matrices de Gram pour représenter les sorties de style des couches de style.
 
 
-## Exercises
+## Exercices
 
-1. How does the output change when you select different content and style layers?
-1. Adjust the weight hyperparameters in the loss function. Does the output retain more content or have less noise?
-1. Use different content and style images. Can you create more interesting synthesized images?
-1. Can we apply style transfer for text? Hint: you may refer to the survey paper by Hu et al. :cite:`Hu.Lee.Aggarwal.ea.2020`.
+1. Comment la sortie change-t-elle lorsque vous sélectionnez différentes couches de contenu et de style ?
+1. Ajustez les hyperparamètres de poids dans la fonction de perte. La sortie retient-elle plus de contenu ou a-t-elle moins de bruit ?
+1. Utilisez des images de contenu et de style différents. Pouvez-vous créer des images synthétisées plus intéressantes ?
+1. Peut-on appliquer le transfert de style au texte ? Conseil : vous pouvez vous référer à l'étude de Hu et al. :cite:`Hu.Lee.Aggarwal.ea.2020` .
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/378)

@@ -1,466 +1,466 @@
-# Generalization
-:label:`sec_generalization_basics`
 
-Consider two college students diligently
-preparing for their final exam.
-Commonly, this preparation will consist
-of practicing and testing their abilities
-by taking exams administered in previous years.
-Nonetheless, doing well on past exams is no guarantee
-that they will excel when it matters.
-For instance, imagine a student, Elephantine Ellie,
-whose preparation consisted entirely
-of memorizing the answers
-to previous years' exam questions.
-Even if Ellie were endowed
-with an elephantine memory,
-and thus could perfectly recall the answer
-to any *previously seen* question,
-she might nevertheless freeze
-when faced with a new (*previously unseen*) question.
-By comparison, imagine another student,
-Inductive Irene, with comparably poor
-memorization skills,
-but a knack for picking up patterns.
-Note that if the exam truly consisted of
-recycled questions from a previous year,
-Ellie would handily outperform Irene.
-Even if Irene's inferred patterns
-yielded 90% accurate predictions,
-they could never compete with
-Ellie's 100% recall.
-However, even if the exam consisted
-entirely of fresh questions,
-Irene might maintain her 90% average.
+# Généralisation
+:label:`sec_generalization_basics` 
 
-As machine learning scientists,
-our goal is to discover *patterns*.
-But how can we be sure that we have
-truly discovered a *general* pattern
-and not simply memorized our data?
-Most of the time, our predictions are only useful
-if our model discovers such a pattern.
-We don't want to predict yesterday's stock prices, but tomorrow's.
-We don't need to recognize
-already diagnosed diseases
-for previously seen patients,
-but rather previously undiagnosed
-ailments in previously unseen patients.
-This problem---how to discover patterns that *generalize*---is
-the fundamental problem of machine learning,
-and arguably of all of statistics.
-We might cast this problem as just one slice
-of a far grander question
-that engulfs all of science:
-when are we ever justified
-in making the leap from particular observations
-to more general statements :cite:`popper2005logic`?
+ Prenons l'exemple de deux étudiants de l'université qui se préparent assidûment à leur examen final.
+En général, cette préparation consiste à
+s'entraîner et à tester leurs capacités
+en passant des examens administrés les années précédentes.
+Néanmoins, le fait d'avoir bien réussi les examens précédents ne garantit pas
+qu'ils excelleront au moment crucial.
+Imaginons par exemple un étudiant, Elephantine Ellie,
+dont la préparation consiste entièrement
+à mémoriser les réponses
+aux questions des examens des années précédentes.
+Même si Ellie était dotée
+d'une mémoire éléphantesque,
+et pouvait donc se souvenir parfaitement de la réponse
+à n'importe quelle question *précédemment vue*,
+elle pourrait néanmoins se figer
+face à une nouvelle question (*précédemment non vue*).
+À titre de comparaison, imaginez une autre étudiante,
+Inductive Irene, dont les capacités de mémorisation sont comparativement faibles
+,
+mais qui a un don pour repérer les modèles.
+Notez que si l'examen se composait réellement de
+questions recyclées d'une année précédente,
+Ellie surpasserait largement Irène.
+Même si les modèles déduits par Irène
+donnaient des prédictions exactes à 90 %,
+ils ne pourraient jamais rivaliser avec le rappel de 100 % d'Ellie
+.
+Cependant, même si l'examen se composait
+entièrement de nouvelles questions,
+Irène pourrait maintenir sa moyenne de 90 %.
 
-
-In real life, we must fit out models
-using a finite collection of data.
-The typical scales of that data
-vary wildly across domains.
-For many important  medical problem,
-we can only access a few thousand data points.
-When studying rare diseases,
-we might be lucky to access hundreds.
-By contrast, the largest public datasets
-consisting of labeled photographs
-(e.g., ImageNet :cite:`Deng.Dong.Socher.ea.2009`),
-contain millions of images.
-And some unlabeled image collections
-such as the Flickr YFC100M dataset
-can be even larger, containing
-over 100 million images :cite:`thomee2016yfcc100m`.
-However, even at this extreme scale,
-the number of available data points
-remains infinitesimally small
-compared to the space of all possible images
-at 1 megapixel resolution.
-Whenever we work with finite samples,
-we must keep in mind the risk
-that we might fit our training data,
-only to discover that we failed
-to discover a generalizable pattern.
-
-The phenomenon of fitting closer to our training data
-than to the underlying distribution is called *overfitting*,
-and techniques for combatting overfitting
-are often called *regularization* methods.
-While there is no substitute for a proper introduction
-to statistical learning theory (see :cite:`Vapnik98,boucheron2005theory`),
-we will give you just enough intuition to get going.
-We will revisit generalization in many chapters
-throughout the book,
-exploring both what is known about
-the principles underlying generalization
-in various models,
-and also heuristic techniques
-that have been found (empirically)
-to yield improved generalization
-on tasks of practical interest.
+En tant que scientifiques de l'apprentissage automatique,
+notre objectif est de découvrir des *modèles*.
+Mais comment pouvons-nous être sûrs que nous avons
+vraiment découvert un modèle *général*
+et pas simplement mémorisé nos données ?
+La plupart du temps, nos prédictions ne sont utiles
+que si notre modèle découvre un tel modèle.
+Nous ne voulons pas prédire le cours des actions d'hier, mais celui de demain.
+Nous n'avons pas besoin de reconnaître
+des maladies déjà diagnostiquées
+pour des patients vus précédemment,
+mais plutôt des maladies non diagnostiquées
+chez des patients non vus précédemment.
+Ce problème - comment découvrir des modèles qui *généralisent*--- est
+le problème fondamental de l'apprentissage automatique,
+et sans doute de toutes les statistiques.
+Nous pourrions considérer ce problème comme l'une des facettes
+d'une question bien plus vaste
+qui englobe toute la science :
+quand sommes-nous justifiés
+de passer d'observations particulières
+à des déclarations plus générales :cite:`popper2005logic` ?
 
 
+Dans la vie réelle, nous devons ajuster des modèles
+en utilisant une collection finie de données.
+Les échelles typiques de ces données
+varient énormément d'un domaine à l'autre.
+Pour de nombreux problèmes médicaux importants,
+nous ne pouvons accéder qu'à quelques milliers de points de données.
+Pour l'étude des maladies rares,
+nous pouvons avoir la chance d'accéder à des centaines de points.
+En revanche, les plus grands ensembles de données publiques
+composés de photographies étiquetées
+(par exemple, ImageNet :cite:`Deng.Dong.Socher.ea.2009` ),
+contiennent des millions d'images.
+Et certaines collections d'images non étiquetées
+telles que l'ensemble de données Flickr YFC100M
+peuvent être encore plus grandes, contenant
+plus de 100 millions d'images :cite:`thomee2016yfcc100m` .
+Cependant, même à cette échelle extrême,
+le nombre de points de données disponibles
+reste infiniment petit
+par rapport à l'espace de toutes les images possibles
+à une résolution de 1 mégapixel.
+Chaque fois que nous travaillons avec des échantillons finis,
+nous devons garder à l'esprit le risque
+d'ajuster nos données de formation,
+pour découvrir ensuite que nous n'avons pas réussi
+à découvrir un modèle généralisable.
 
-## Training Error and Generalization Error
+Le phénomène d'ajustement plus proche de nos données d'apprentissage
+que de la distribution sous-jacente est appelé *overfitting*,
+et les techniques de lutte contre l'overfitting
+sont souvent appelées *méthodes de régularisation*.
+Bien que rien ne remplace une bonne introduction
+à la théorie de l'apprentissage statistique (voir :cite:`Vapnik98,boucheron2005theory` ),
+nous vous donnerons juste assez d'intuition pour commencer.
+Nous reviendrons sur la généralisation dans de nombreux chapitres
+tout au long du livre,
+en explorant à la fois ce que l'on sait sur
+les principes qui sous-tendent la généralisation
+dans divers modèles,
+et également les techniques heuristiques
+qui se sont avérées (empiriquement)
+produire une généralisation améliorée
+sur des tâches d'intérêt pratique.
 
 
-In the standard supervised learning setting,
-we assume that the training data and the test data
-are drawn *independently* from *identical* distributions.
-This is commonly called the *IID assumption*.
-While this assumption is strong,
-it's worth noting that absent any such assumption
-we would be dead in the water.
-Why should we believe that training data
-sampled from distribution $P(X,Y)$
-should tell us how to make predictions on
-test data generated by a *different distribution* $Q(X,Y)$?
-Making such leaps turns out to require
-strong assumptions about how $P$ and $Q$ are related.
-Later on we will discuss some assumptions
-that allow for shifts in distribution
-but first we need to understand the IID case,
-where $P(\cdot) = Q(\cdot)$.
 
-To begin with, we need to differentiate between
-the *training error* $R_\text{emp}$,
-which is a *statistic*
-calculated on the training dataset,
-and the *generalization error* $R$,
-which is an *expectation* taken
-with respect to the underlying distribution.
-You can think of the generalization error as
-what you would see  if you applied your model
-to an infinite stream of additional data examples
-drawn from the same underlying data distribution.
-Formally the training error is expressed as a *sum* (with the same notation in :numref:`sec_linear_regression`):
-
-$$R_\text{emp}[\mathbf{X}, \mathbf{y}, f] = \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}^{(i)}, y^{(i)}, f(\mathbf{x}^{(i)})),$$
+## Erreur de formation et erreur de généralisation
 
 
-while the generalization error is expressed as an integral:
+ Dans le cadre standard de l'apprentissage supervisé,
+nous supposons que les données de formation et les données de test
+sont tirées *indépendamment* de distributions *identiques*.
+C'est ce qu'on appelle communément l'hypothèse *IID*.
+Bien que cette hypothèse soit forte,
+, il convient de noter qu'en l'absence d'une telle hypothèse
+, nous serions dans le pétrin.
+Pourquoi devrions-nous croire que les données de formation
+échantillonnées à partir de la distribution $P(X,Y)$
+ devraient nous indiquer comment faire des prédictions sur
+des données de test générées par une *distribution différente* $Q(X,Y)$?
+Il s'avère que pour faire de tels sauts, il faut
+des hypothèses fortes sur la façon dont $P$ et $Q$ sont liés.
+Nous aborderons plus loin certaines hypothèses
+qui permettent des changements de distribution
+mais nous devons d'abord comprendre le cas IID,
+où $P(\cdot) = Q(\cdot)$.
+
+Pour commencer, nous devons faire la différence entre
+l'erreur *d'apprentissage* $R_\text{emp}$,
+qui est une *statistique*
+calculée sur l'ensemble de données d'apprentissage,
+et l'erreur *de généralisation* $R$,
+qui est une *espérance* prise
+par rapport à la distribution sous-jacente.
+Vous pouvez considérer l'erreur de généralisation comme
+ce que vous verriez si vous appliquiez votre modèle
+à un flux infini d'exemples de données supplémentaires
+tirés de la même distribution de données sous-jacente.
+Formellement, l'erreur d'apprentissage est exprimée sous forme de *somme* (avec la même notation dans :numref:`sec_linear_regression` ) :
+
+$$R_\text{emp}[\mathbf{X}, \mathbf{y}, f] = \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}^{(i)}, y^{(i)}, f(\mathbf{x}^{(i)})),$$ 
+
+ 
+ tandis que l'erreur de généralisation est exprimée sous forme d'intégrale :
 
 $$R[p, f] = E_{(\mathbf{x}, y) \sim P} [l(\mathbf{x}, y, f(\mathbf{x}))] =
 \int \int l(\mathbf{x}, y, f(\mathbf{x})) p(\mathbf{x}, y) \;d\mathbf{x} dy.$$
 
-Problematically, we can never calculate
-the generalization error $R$ exactly.
-Nobody ever tells us the precise form
-of the density function $p(\mathbf{x}, y)$.
-Moreover, we cannot sample an infinite stream of data points.
-Thus, in practice, we must *estimate* the generalization error
-by applying our model to an independent test set
-constituted of a random selection of examples
-$\mathbf{X}'$ and labels $\mathbf{y}'$
-that were withheld from our training set.
-This consists of applying the same formula
-as for calculating the empirical training error
-but to a test set $\mathbf{X}', \mathbf{y}'$.
+Le problème est que nous ne pouvons jamais calculer
+l'erreur de généralisation $R$ exactement.
+Personne ne nous dit jamais la forme précise
+de la fonction de densité $p(\mathbf{x}, y)$.
+De plus, nous ne pouvons pas échantillonner un flux infini de points de données.
+En pratique, nous devons donc *estimer* l'erreur de généralisation
+en appliquant notre modèle à un ensemble de test indépendant
+constitué d'une sélection aléatoire d'exemples
+$\mathbf{X}'$ et d'étiquettes $\mathbf{y}'$
+ qui ont été retenus dans notre ensemble d'apprentissage.
+Cela consiste à appliquer la même formule
+que pour le calcul de l'erreur d'apprentissage empirique
+mais à un ensemble de test $\mathbf{X}', \mathbf{y}'$.
 
 
-Crucially, when we evaluate our classifier on the test set,
-we are working with a *fixed* classifier
-(it does not depend on the sample of the test set),
-and thus estimating its error
-is simply the problem of mean estimation.
-However the same cannot be said
-for the training set.
-Note that the model we wind up with
-depends explicitly on the selection of the training set
-and thus the training error will in general
-be a biased estimate of the true error
-on the underlying population.
-The central question of generalization
-is then when should we expect our training error
-to be close to the population error
-(and thus the generalization error).
+Il est important de noter que lorsque nous évaluons notre classificateur sur l'ensemble de test,
+nous travaillons avec un classificateur *fixe*
+(il ne dépend pas de l'échantillon de l'ensemble de test),
+et donc l'estimation de son erreur
+est simplement le problème de l'estimation de la moyenne.
+Cependant, on ne peut pas en dire autant de
+pour l'ensemble d'apprentissage.
+Notez que le modèle que nous obtenons
+dépend explicitement de la sélection de l'ensemble d'apprentissage
+et donc l'erreur d'apprentissage sera en général
+une estimation biaisée de l'erreur réelle
+sur la population sous-jacente.
+La question centrale de la généralisation
+est donc de savoir quand nous devons nous attendre à ce que notre erreur d'apprentissage
+soit proche de l'erreur de la population
+(et donc de l'erreur de généralisation).
 
-### Model Complexity
+### Complexité du modèle
 
-In classical theory, when we have
-simple models and abundant data,
-the training and generalization errors tend to be close.
-However, when we work with
-more complex models and/or fewer examples,
-we expect the training error to go down
-but the generalization gap to grow.
-This should not be surprising.
-Imagine a model class so expressive that
-for any dataset of $n$ examples,
-we can find a set of parameters
-that can perfectly fit arbitrary labels,
-even if randomly assigned.
-In this case, even if we fit our training data perfectly,
-how can we conclude anything about the generalization error?
-For all we know, our generalization error
-might be no better than random guessing.
+Dans la théorie classique, lorsque nous disposons de
+modèles simples et de données abondantes,
+les erreurs de formation et de généralisation ont tendance à être proches.
+Cependant, lorsque nous travaillons avec
+des modèles plus complexes et/ou moins d'exemples,
+nous nous attendons à ce que l'erreur de formation diminue
+mais que l'écart de généralisation augmente.
+Cela ne devrait pas être surprenant.
+Imaginez une classe de modèles si expressive que
+pour n'importe quel ensemble de données d'exemples $n$,
+nous pouvons trouver un ensemble de paramètres
+qui peut parfaitement correspondre à des étiquettes arbitraires,
+même si elles sont attribuées de manière aléatoire.
+Dans ce cas, même si nous ajustons parfaitement nos données d'apprentissage,
+comment pouvons-nous conclure quoi que ce soit sur l'erreur de généralisation ?
+Pour autant que nous le sachions, notre erreur de généralisation
+pourrait ne pas être meilleure qu'une supposition aléatoire.
 
-In general, absent any restriction on our model class,
-we cannot conclude based on fitting the training data alone
-that our model has discovered any generalizable pattern :cite:`vapnik1994measuring`.
-On the other hand, if our model class
-was not capable of fitting arbitrary labels,
-then it must have discovered a pattern.
-Learning-theoretic ideas about model complexity
-derived some inspiration from the ideas
-of Karl Popper, an influential philosopher of science,
-who formalized the criterion of falsifiability.
-According to Popper, a theory
-that can explain any and all observations
-is not a scientific theory at all!
-After all, what has it told us about the world
-if it has not ruled out any possibility?
-In short, what we want is a hypothesis
-that *could not* explain any observations
-we might conceivably make
-and yet nevertheless happens to be compatible
-with those observations that we *in fact* make.
+En général, en l'absence de toute restriction sur la classe de notre modèle,
+nous ne pouvons pas conclure, sur la base de l'ajustement des données d'apprentissage uniquement
+, que notre modèle a découvert un modèle généralisable :cite:`vapnik1994measuring` .
+D'autre part, si notre classe de modèle
+n'était pas capable de s'adapter à des étiquettes arbitraires,
+alors elle doit avoir découvert un modèle.
+Les idées de la théorie de l'apprentissage sur la complexité des modèles
+se sont inspirées des idées
+de Karl Popper, un philosophe des sciences influent,
+qui a formalisé le critère de falsifiabilité.
+Selon Popper, une théorie
+qui peut expliquer toutes les observations
+n'est pas du tout une théorie scientifique !
+Après tout, que nous a-t-elle dit sur le monde
+si elle n'a pas exclu toute possibilité ?
+En bref, ce que nous voulons, c'est une hypothèse
+qui ne pourrait pas expliquer les observations
+que nous pourrions faire
+et qui serait néanmoins compatible
+avec les observations que nous faisons effectivement.
 
-Now what precisely constitutes an appropriate
-notion of model complexity is a complex matter.
-Often, models with more parameters
-are able to fit a greater number
-of arbitrarily assigned labels.
-However, this is not necessarily true.
-For instance, kernel methods operate in spaces
-with infinite numbers of parameters,
-yet their complexity is controlled
-by other means :cite:`scholkopf2002learning`.
-One notion of complexity that often proves useful
-is the range of values that the parameters can take.
-Here, a model whose parameters are permitted
-to take arbitrary values
-would be more complex.
-We will revisit this idea in the next section,
-when we introduce *weight decay*,
-your first practical regularization technique.
-Notably, it can be difficult to compare
-complexity among members of substantially different model classes
-(say, decision trees vs. neural networks).
-
-
-At this point, we must stress another important point
-that we will revisit when introducing deep neural networks.
-When a model is capable of fitting arbitrary labels,
-low training error does not necessarily
-imply low generalization error.
-*However, it does not necessarily
-imply high generalization error either!*
-All we can say confidently is that
-low training error alone is not enough
-to certify low generalization error.
-Deep neural networks turn out to be just such models:
-while they generalize well in practice,
-they too powerful to allow us to conclude
-much on the basis of training error alone.
-In these cases we must rely more heavily
-on our holdout data to certify generalization
-after the fact.
-Error on the holdout data, i.e., validation set,
-is called the *validation error*.
-
-## Underfitting or Overfitting?
-
-When we compare the training and validation errors,
-we want to be mindful of two common situations.
-First, we want to watch out for cases
-when our training error and validation error are both substantial
-but there is a little gap between them.
-If the model is unable to reduce the training error,
-that could mean that our model is too simple
-(i.e., insufficiently expressive)
-to capture the pattern that we are trying to model.
-Moreover, since the *generalization gap* ($R_\text{emp} - R$)
-between our training and generalization errors is small,
-we have reason to believe that we could get away with a more complex model.
-This phenomenon is known as *underfitting*.
-
-On the other hand, as we discussed above,
-we want to watch out for the cases
-when our training error is significantly lower
-than our validation error, indicating severe *overfitting*.
-Note that overfitting is not always a bad thing.
-In deep learning especially,
-the best predictive models often perform
-far better on training data than on holdout data.
-Ultimately, we usually care about
-driving the generalization error lower,
-and only care about the gap insofar
-as it becomes an obstacle to that end.
-Note that if the training error is zero,
-then the generalization gap is precisely equal to the generalization error
-and we can make progress only by reducing the gap.
-
-### Polynomial Curve Fitting
-:label:`subsec_polynomial-curve-fitting`
-
-To illustrate some classical intuition
-about overfitting and model complexity,
-consider the following:
-given training data consisting of a single feature $x$
-and a corresponding real-valued label $y$,
-we try to find the polynomial of degree $d$
-
-$$\hat{y}= \sum_{i=0}^d x^i w_i$$
-
-to estimate the label $y$.
-This is just a linear regression problem
-where our features are given by the powers of $x$,
-the model's weights are given by $w_i$,
-and the bias is given by $w_0$ since $x^0 = 1$ for all $x$.
-Since this is just a linear regression problem,
-we can use the squared error as our loss function.
+Maintenant, ce qui constitue précisément une notion appropriée
+de la complexité du modèle est une question complexe.
+Souvent, les modèles comportant plus de paramètres
+sont capables de s'adapter à un plus grand nombre
+d'étiquettes attribuées arbitrairement.
+Cependant, cela n'est pas nécessairement vrai.
+Par exemple, les méthodes à noyau fonctionnent dans des espaces
+avec un nombre infini de paramètres,
+mais leur complexité est contrôlée
+par d'autres moyens :cite:`scholkopf2002learning` .
+Une notion de complexité qui s'avère souvent utile
+est la gamme de valeurs que peuvent prendre les paramètres.
+Dans ce cas, un modèle dont les paramètres sont autorisés
+à prendre des valeurs arbitraires
+serait plus complexe.
+Nous reviendrons sur cette idée dans la section suivante,
+lorsque nous introduirons la *décroissance de poids*,
+votre première technique de régularisation pratique.
+Notamment, il peut être difficile de comparer la complexité de
+entre les membres de classes de modèles sensiblement différentes
+(par exemple, les arbres de décision par rapport aux réseaux neuronaux).
 
 
-A higher-order polynomial function is more complex
-than a lower-order polynomial function,
-since the higher-order polynomial has more parameters
-and the model function's selection range is wider.
-Fixing the training dataset,
-higher-order polynomial functions should always
-achieve lower (at worst, equal) training error
-relative to lower degree polynomials.
-In fact, whenever the data examples
-each have a distinct value of $x$,
-a polynomial function with degree
-equal to the number of data examples
-can fit the training set perfectly.
-We visualize the relationship between polynomial degree (model complexity)
-and underfitting vs. overfitting in :numref:`fig_capacity_vs_error`.
+À ce stade, nous devons souligner un autre point important
+sur lequel nous reviendrons lors de la présentation des réseaux neuronaux profonds.
+Lorsqu'un modèle est capable de s'adapter à des étiquettes arbitraires,
+une faible erreur d'apprentissage n'implique pas nécessairement
+une faible erreur de généralisation.
+*Cependant, cela n'implique pas nécessairement
+une erreur de généralisation élevée non plus !*
+Tout ce que nous pouvons dire avec certitude, c'est que
+une faible erreur d'apprentissage ne suffit pas
+pour certifier une faible erreur de généralisation.
+Les réseaux neuronaux profonds s'avèrent être de tels modèles :
+alors qu'ils généralisent bien dans la pratique,
+ils sont trop puissants pour nous permettre de conclure
+sur la base de la seule erreur d'apprentissage.
+Dans ce cas, nous devons nous appuyer davantage sur
+nos données d'attente pour certifier la généralisation
+après coup.
+L'erreur sur les données d'attente, c'est-à-dire l'ensemble de validation,
+est appelée l'erreur de validation *.
+
+## Sous-adaptation ou sur-adaptation ?
+
+Lorsque nous comparons les erreurs d'apprentissage et de validation,
+, nous devons être attentifs à deux situations courantes.
+Tout d'abord, nous voulons faire attention aux cas
+où l'erreur d'apprentissage et l'erreur de validation sont toutes deux substantielles
+mais où il y a un petit écart entre elles.
+Si le modèle n'est pas en mesure de réduire l'erreur d'apprentissage,
+cela pourrait signifier que notre modèle est trop simple
+(c'est-à-dire insuffisamment expressif)
+pour capturer le modèle que nous essayons de modéliser.
+En outre, étant donné que l'écart de *généralisation* ($R_\text{emp} - R$)
+entre nos erreurs d'apprentissage et de généralisation est faible,
+nous avons des raisons de penser que nous pourrions nous en sortir avec un modèle plus complexe.
+Ce phénomène est connu sous le nom de *underfitting*.
+
+D'autre part, comme nous l'avons vu plus haut,
+nous voulons faire attention aux cas
+où notre erreur d'apprentissage est significativement inférieure
+à notre erreur de validation, ce qui indique un *overfitting* grave.
+Notez que l'overfitting n'est pas toujours une mauvaise chose.
+Dans l'apprentissage profond en particulier,
+les meilleurs modèles prédictifs ont souvent des performances
+bien meilleures sur les données d'entraînement que sur les données de validation.
+En fin de compte, nous nous intéressons généralement à
+pour réduire l'erreur de généralisation,
+et ne nous préoccupons de l'écart que dans la mesure où
+devient un obstacle à cette fin.
+Notez que si l'erreur de formation est nulle,
+, l'écart de généralisation est précisément égal à l'erreur de généralisation
+et nous ne pouvons progresser qu'en réduisant l'écart.
+
+### Ajustement de courbes polynomiales
+:label:`subsec_polynomial-curve-fitting` 
+
+ Pour illustrer certaines intuitions classiques
+sur l'overfitting et la complexité des modèles,
+considérons ce qui suit :
+étant donné des données d'apprentissage composées d'une seule caractéristique $x$
+ et d'une étiquette correspondante à valeur réelle $y$,
+nous essayons de trouver le polynôme de degré $d$
+
+ $$\hat{y}= \sum_{i=0}^d x^i w_i$$ 
+
+ pour estimer l'étiquette $y$.
+Il s'agit simplement d'un problème de régression linéaire
+où nos caractéristiques sont données par les puissances de $x$,
+; les poids du modèle sont donnés par $w_i$,
+et le biais est donné par $w_0$ depuis $x^0 = 1$ pour tout $x$.
+Comme il s'agit simplement d'un problème de régression linéaire,
+nous pouvons utiliser l'erreur quadratique comme fonction de perte.
+
+
+Une fonction polynomiale d'ordre supérieur est plus complexe
+qu'une fonction polynomiale d'ordre inférieur,
+car le polynôme d'ordre supérieur a plus de paramètres
+et la plage de sélection de la fonction modèle est plus large.
+En fixant l'ensemble de données d'apprentissage,
+les fonctions polynomiales d'ordre supérieur devraient toujours
+atteindre une erreur d'apprentissage inférieure (au pire, égale)
+par rapport aux polynômes de degré inférieur.
+En fait, lorsque les exemples de données
+ont chacun une valeur distincte de $x$,
+une fonction polynomiale de degré
+égal au nombre d'exemples de données
+peut s'adapter parfaitement à l'ensemble d'apprentissage.
+Nous visualisons la relation entre le degré polynomial (complexité du modèle)
+et l'ajustement insuffisant par rapport à l'ajustement excessif dans :numref:`fig_capacity_vs_error` .
 
 ![Influence of model complexity on underfitting and overfitting](../img/capacity-vs-error.svg)
 :label:`fig_capacity_vs_error`
 
 
-### Dataset Size
+### Taille de l'ensemble de données
 
-As the above bound already indicates,
-another big consideration
-to bear in mind is dataset size.
-Fixing our model, the fewer samples
-we have in the training dataset,
-the more likely (and more severely)
-we are to encounter overfitting.
-As we increase the amount of training data,
-the generalization error typically decreases.
-Moreover, in general, more data never hurts.
-For a fixed task and data distribution,
-model complexity should not increase
-more rapidly than the amount of data.
-Given more data, we might  attempt
-to fit a more complex model.
-Absent sufficient data, simpler models
-may be more difficult to beat.
-For many tasks, deep learning
-only outperforms linear models
-when many thousands of training examples are available.
-In part, the current success of deep learning
-owes considerably to the abundance of massive datasets
-arising from Internet companies, cheap storage,
-connected devices, and the broad digitization of the economy.
+Comme l'indique déjà la limite ci-dessus,
+la taille de l'ensemble de données est une autre considération importante
+à prendre en compte.
+En fixant notre modèle, moins nous avons d'échantillons
+dans l'ensemble de données d'apprentissage,
+plus nous sommes susceptibles (et plus sévèrement)
+de rencontrer un surajustement.
+Lorsque nous augmentons la quantité de données d'apprentissage,
+l'erreur de généralisation diminue généralement.
+De plus, en général, un plus grand nombre de données ne fait jamais de mal.
+Pour une tâche et une distribution de données fixes,
+la complexité du modèle ne devrait pas augmenter
+plus rapidement que la quantité de données.
+Si l'on dispose de plus de données, on peut essayer
+d'ajuster un modèle plus complexe.
+En l'absence de données suffisantes, les modèles plus simples
+peuvent être plus difficiles à battre.
+Pour de nombreuses tâches, l'apprentissage profond
+ne surpasse les modèles linéaires
+que lorsque plusieurs milliers d'exemples d'apprentissage sont disponibles.
+Le succès actuel de l'apprentissage profond
+est en partie dû à l'abondance de jeux de données massifs
+provenant des sociétés Internet, du stockage bon marché, des appareils connectés
+et de la numérisation généralisée de l'économie.
 
-## Model Selection
-:label:`subsec_generalization-model-selection`
+## Sélection de modèles
+:label:`subsec_generalization-model-selection` 
 
-Typically, we select our final model,
-only after evaluating multiple models
-that differ in various ways
-(different architectures, training objectives,
-selected features, data preprocessing,
-learning rates, etc.).
-Choosing among many models is aptly
-called *model selection*.
+ Généralement, nous ne sélectionnons notre modèle final
+qu'après avoir évalué plusieurs modèles
+qui diffèrent de diverses manières
+(différentes architectures, objectifs de formation,
+caractéristiques sélectionnées, prétraitement des données,
+taux d'apprentissage, etc.)
+Le choix entre plusieurs modèles est judicieusement appelé
+*sélection de modèles*.
 
-In principle, we should not touch our test set
-until after we have chosen all our hyperparameters.
-Were we to use the test data in the model selection process,
-there is a risk that we might overfit the test data.
-Then we would be in serious trouble.
-If we overfit our training data,
-there is always the evaluation on test data to keep us honest.
-But if we overfit the test data, how would we ever know?
-See :cite:`ong2005learning` for an example how
-this can lead to absurd results even for models where the complexity
-can be tightly controlled.
+En principe, nous ne devrions pas toucher à notre jeu de test
+avant d'avoir choisi tous nos hyperparamètres.
+Si nous utilisons les données de test dans le processus de sélection du modèle,
+, nous risquons de les surajuster.
+Nous aurions alors de sérieux problèmes.
+Si nous adaptons trop nos données d'apprentissage,
+, il y a toujours l'évaluation sur les données de test pour nous garder honnêtes.
+Mais si nous adaptons trop les données de test, comment le saurions-nous ?
+Voir :cite:`ong2005learning` pour voir comment
+cela peut conduire à des résultats absurdes, même pour les modèles dont la complexité
+peut être étroitement contrôlée.
 
-Thus, we should never rely on the test data for model selection.
-And yet we cannot rely solely on the training data
-for model selection either because
-we cannot estimate the generalization error
-on the very data that we use to train the model.
-
-
-In practical applications, the picture gets muddier.
-While ideally we would only touch the test data once,
-to assess the very best model or to compare
-a small number of models with each other,
-real-world test data is seldom discarded after just one use.
-We can seldom afford a new test set for each round of experiments.
-In fact, recycling benchmark data for decades
-can have a significant impact on the
-development of algorithms,
-e.g., for [image classification](https://paperswithcode.com/sota/image-classification-on-imagenet)
-and [optical character recognition](https://paperswithcode.com/sota/image-classification-on-mnist).
-
-The common practice to address the problem of *training on the test set*
-is to split our data three ways,
-incorporating a *validation set*
-in addition to the training and test datasets.
-The result is a murky practice where the boundaries
-between validation and test data are worryingly ambiguous.
-Unless explicitly stated otherwise, in the experiments in this book
-we are really working with what should rightly be called
-training data and validation data, with no true test sets.
-Therefore, the accuracy reported in each experiment of the book is really
-the validation accuracy and not a true test set accuracy.
-
-### Cross-Validation
-
-When training data is scarce,
-we might not even be able to afford to hold out
-enough data to constitute a proper validation set.
-One popular solution to this problem is to employ
-$K$*-fold cross-validation*.
-Here, the original training data is split into $K$ non-overlapping subsets.
-Then model training and validation are executed $K$ times,
-each time training on $K-1$ subsets and validating
-on a different subset (the one not used for training in that round).
-Finally, the training and validation errors are estimated
-by averaging over the results from the $K$ experiments.
+Par conséquent, nous ne devrions jamais nous fier aux données de test pour sélectionner un modèle.
+Et pourtant, nous ne pouvons pas non plus nous appuyer uniquement sur les données d'apprentissage
+pour la sélection du modèle, car
+nous ne pouvons pas estimer l'erreur de généralisation
+sur les données mêmes que nous utilisons pour entraîner le modèle.
 
 
+Dans les applications pratiques, les choses se compliquent.
+Alors que l'idéal serait de ne toucher les données de test qu'une seule fois,
+pour évaluer le meilleur modèle ou pour comparer
+un petit nombre de modèles entre eux,
+les données de test du monde réel sont rarement jetées après une seule utilisation.
+Nous pouvons rarement nous permettre de créer un nouvel ensemble de tests pour chaque série d'expériences.
 
-## Summary
+En fait, le recyclage des données de référence pendant des décennies
+peut avoir un impact significatif sur le développement des algorithmes,
+par exemple pour [image classification](https://paperswithcode.com/sota/image-classification-on-imagenet)
+ et [optical character recognition](https://paperswithcode.com/sota/image-classification-on-mnist).
 
-This section explored some of the  underpinnings
-of generalization in  machine learning.
-Some of these ideas become complicated
-and counterintuitive when we get to deeper models,
-there, models are capable of overfitting data badly,
-and the relevant notions of complexity
-can be both implicit and counterintuitive
-(e.g., larger architectures with more parameters
-generalizing better).
-We leave you with a few rules of thumb:
+La pratique courante pour résoudre le problème de la *formation sur l'ensemble de test*
+consiste à diviser nos données en trois,
+en incorporant un *ensemble de validation*
+en plus des ensembles de données de formation et de test.
+Le résultat est une pratique obscure où les limites
+entre les données de validation et de test sont d'une ambiguïté inquiétante.
+Sauf indication contraire explicite, dans les expériences présentées dans ce livre
+, nous travaillons en réalité avec ce qu'il convient d'appeler des données de formation et des données de validation
+, sans véritables ensembles de test.
+Par conséquent, la précision rapportée dans chaque expérience du livre est en réalité
+la précision de validation et non une véritable précision d'ensemble de test.
 
-1. Use validation sets (or $K$*-fold cross-validation*) for model selection;
-1. More complex models often require more data;
-1. Relevant notions of complexity include both the number of parameters and the range of values that they are allowed to take;
-1. Keeping all else equal, more data almost always leads to better generalization;
-1. This entire talk of generalization is all predicated on the IID assumption. If we relax this assumption, allowing for distributions to shift between the train and testing periods, then we cannot say anything about generalization absent a further (perhaps milder) assumption.
+### Validation croisée
+
+Lorsque les données d'apprentissage sont rares,
+il se peut que nous ne puissions même pas nous permettre de conserver
+suffisamment de données pour constituer un ensemble de validation adéquat.
+Une solution populaire à ce problème consiste à employer
+$K$ *-fold cross-validation*.
+Dans ce cas, les données de formation originales sont divisées en sous-ensembles non chevauchants $K$.
+Ensuite, la formation et la validation du modèle sont exécutées $K$ fois,
+chaque fois en formant sur $K-1$ sous-ensembles et en validant
+sur un sous-ensemble différent (celui qui n'a pas été utilisé pour la formation dans ce tour).
+Enfin, les erreurs de formation et de validation sont estimées
+en faisant la moyenne des résultats des expériences $K$.
 
 
-## Exercises
 
-1. When can you solve the problem of polynomial regression exactly?
-1. Give at least five examples where dependent random variables make treating the problem as IID data inadvisable.
-1. Can you ever expect to see zero training error? Under which circumstances would you see zero generalization error?
-1. Why is $K$-fold cross-validation very expensive to compute?
-1. Why is the $K$-fold cross-validation error estimate biased?
-1. The VC dimension is defined as the maximum number of points that can be classified with arbitrary labels $\{\pm 1\}$ by a function of a class of functions. Why might this not be a good idea to measure how complex the class of functions is? Hint: what about the magnitude of the functions?
-1. Your manager gives you a difficult dataset on which your current algorithm doesn't perform so well. How would you justify to him that you need more data? Hint: you cannot increase the data but you can decrease it.
+## Résumé
+
+Cette section a exploré certains des fondements
+de la généralisation dans l'apprentissage automatique.
+Certaines de ces idées se compliquent
+et deviennent contre-intuitives lorsque nous arrivons à des modèles plus profonds,
+là, les modèles sont capables de sur-ajuster les données de manière inadéquate,
+et les notions pertinentes de complexité
+peuvent être à la fois implicites et contre-intuitives
+(par exemple, des architectures plus grandes avec plus de paramètres
+généralisant mieux).
+Nous vous laissons avec quelques règles de base :
+
+1. Utilisez des ensembles de validation (ou $K$*-fold cross-validation*) pour la sélection des modèles ;
+1. Les modèles plus complexes nécessitent souvent plus de données ;
+1. Les notions pertinentes de complexité comprennent à la fois le nombre de paramètres et la gamme de valeurs qu'ils sont autorisés à prendre ;
+1. Toutes choses égales par ailleurs, plus de données conduit presque toujours à une meilleure généralisation ;
+1. Toute cette discussion sur la généralisation est fondée sur l'hypothèse IID. Si nous assouplissons cette hypothèse, en permettant aux distributions de se déplacer entre les périodes de formation et de test, nous ne pouvons rien dire sur la généralisation sans une autre hypothèse (peut-être plus légère).
+
+
+## Exercices
+
+1. Quand pouvez-vous résoudre exactement le problème de la régression polynomiale ?
+1. Donnez au moins cinq exemples où les variables aléatoires dépendantes rendent déconseillé de traiter le problème comme des données IID.
+1. Pouvez-vous espérer voir un jour une erreur d'apprentissage nulle ? Dans quelles circonstances verriez-vous une erreur de généralisation nulle ?
+1. Pourquoi la validation croisée $K$ est-elle très coûteuse à calculer ?
+1. Pourquoi l'estimation de l'erreur par validation croisée de $K$ est-elle biaisée ?
+1. La dimension VC est définie comme le nombre maximum de points qui peuvent être classés avec des étiquettes arbitraires $\{\pm 1\}$ par une fonction d'une classe de fonctions. Pourquoi ne serait-ce pas une bonne idée de mesurer la complexité de la classe de fonctions ? Indice : qu'en est-il de la magnitude des fonctions ?
+1. Votre responsable vous donne un ensemble de données difficile sur lequel votre algorithme actuel n'est pas très performant. Comment pouvez-vous lui expliquer que vous avez besoin de plus de données ? Indice : vous ne pouvez pas augmenter les données, mais vous pouvez les diminuer.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/96)

@@ -1,43 +1,43 @@
 # Adadelta
-:label:`sec_adadelta`
+:label:`sec_adadelta` 
 
-Adadelta is yet another variant of AdaGrad (:numref:`sec_adagrad`). The main difference lies in the fact that it decreases the amount by which the learning rate is adaptive to coordinates. Moreover, traditionally it referred to as not having a learning rate since it uses the amount of change itself as calibration for future change. The algorithm was proposed in :cite:`Zeiler.2012`. It is fairly straightforward, given the discussion of previous algorithms so far. 
+ Adadelta est encore une autre variante d'AdaGrad (:numref:`sec_adagrad` ). La principale différence réside dans le fait qu'il diminue la quantité par laquelle le taux d'apprentissage est adaptatif aux coordonnées. De plus, il est traditionnellement considéré comme n'ayant pas de taux d'apprentissage puisqu'il utilise la quantité de changement elle-même comme calibration pour le changement futur. L'algorithme a été proposé dans :cite:`Zeiler.2012` . Il est assez simple, étant donné la discussion des algorithmes précédents jusqu'à présent. 
 
-## The Algorithm
+## L'algorithme
 
-In a nutshell, Adadelta uses two state variables, $\mathbf{s}_t$ to store a leaky average of the second moment of the gradient and $\Delta\mathbf{x}_t$ to store a leaky average of the second moment of the change of parameters in the model itself. Note that we use the original notation and naming of the authors for compatibility with other publications and implementations (there is no other real reason why one should use different Greek variables to indicate a parameter serving the same purpose in momentum, Adagrad, RMSProp, and Adadelta). 
+En résumé, Adadelta utilise deux variables d'état, $\mathbf{s}_t$ pour stocker une moyenne de fuite du second moment du gradient et $\Delta\mathbf{x}_t$ pour stocker une moyenne de fuite du second moment du changement des paramètres du modèle lui-même. Notez que nous utilisons la notation et la dénomination originales des auteurs pour des raisons de compatibilité avec d'autres publications et implémentations (il n'y a pas d'autre raison réelle pour laquelle on devrait utiliser des variables grecques différentes pour indiquer un paramètre servant le même but dans momentum, Adagrad, RMSProp, et Adadelta). 
 
-Here are the technical details of Adadelta. Given the parameter du jour is $\rho$, we obtain the following leaky updates similarly to :numref:`sec_rmsprop`:
+Voici les détails techniques d'Adadelta. Étant donné que le paramètre du jour est $\rho$, nous obtenons les mises à jour fuyantes suivantes de manière similaire à :numref:`sec_rmsprop` :
 
 $$\begin{aligned}
     \mathbf{s}_t & = \rho \mathbf{s}_{t-1} + (1 - \rho) \mathbf{g}_t^2.
 \end{aligned}$$
 
-The difference to :numref:`sec_rmsprop` is that we perform updates with the rescaled gradient $\mathbf{g}_t'$, i.e.,
+La différence avec :numref:`sec_rmsprop` est que nous effectuons les mises à jour avec le gradient redimensionné $\mathbf{g}_t'$, c'est-à-dire,
 
 $$\begin{aligned}
     \mathbf{x}_t  & = \mathbf{x}_{t-1} - \mathbf{g}_t'. \\
 \end{aligned}$$
 
-So what is the rescaled gradient $\mathbf{g}_t'$? We can calculate it as follows:
+Alors, qu'est-ce que le gradient redimensionné $\mathbf{g}_t'$? Nous pouvons le calculer comme suit :
 
 $$\begin{aligned}
     \mathbf{g}_t' & = \frac{\sqrt{\Delta\mathbf{x}_{t-1} + \epsilon}}{\sqrt{{\mathbf{s}_t + \epsilon}}} \odot \mathbf{g}_t, \\
 \end{aligned}$$
 
-where $\Delta \mathbf{x}_{t-1}$ is the leaky average of the squared rescaled gradients $\mathbf{g}_t'$. We initialize $\Delta \mathbf{x}_{0}$ to be $0$ and update it at each step with $\mathbf{g}_t'$, i.e.,
+où $\Delta \mathbf{x}_{t-1}$ est la moyenne futile des gradients redimensionnés au carré $\mathbf{g}_t'$. Nous initialisons $\Delta \mathbf{x}_{0}$ par $0$ et le mettons à jour à chaque étape avec $\mathbf{g}_t'$, c'est-à-dire,
 
 $$\begin{aligned}
     \Delta \mathbf{x}_t & = \rho \Delta\mathbf{x}_{t-1} + (1 - \rho) {\mathbf{g}_t'}^2,
 \end{aligned}$$
 
-and $\epsilon$ (a small value such as $10^{-5}$) is added to maintain numerical stability.
+et $\epsilon$ (une petite valeur telle que $10^{-5}$) est ajoutée pour maintenir la stabilité numérique.
 
 
 
-## Implementation
+## Implémentation
 
-Adadelta needs to maintain two state variables for each variable, $\mathbf{s}_t$ and $\Delta\mathbf{x}_t$. This yields the following implementation.
+Adadelta doit maintenir deux variables d'état pour chaque variable, $\mathbf{s}_t$ et $\Delta\mathbf{x}_t$. Cela donne l'implémentation suivante.
 
 ```{.python .input}
 #@tab mxnet
@@ -106,7 +106,7 @@ def adadelta(params, grads, states, hyperparams):
         delta[:].assign(rho * delta + (1 - rho) * g * g)
 ```
 
-Choosing $\rho = 0.9$ amounts to a half-life time of 10 for each parameter update. This tends to work quite well. We get the following behavior.
+Le choix de $\rho = 0.9$ équivaut à un temps de demi-vie de 10 pour chaque mise à jour des paramètres. Cela a tendance à fonctionner assez bien. Nous obtenons le comportement suivant.
 
 ```{.python .input}
 #@tab all
@@ -115,7 +115,7 @@ d2l.train_ch11(adadelta, init_adadelta_states(feature_dim),
                {'rho': 0.9}, data_iter, feature_dim);
 ```
 
-For a concise implementation we simply use the `adadelta` algorithm from the `Trainer` class. This yields the following one-liner for a much more compact invocation.
+Pour une implémentation concise, nous utilisons simplement l'algorithme `adadelta` de la classe `Trainer`. Cela donne la ligne unique suivante pour une invocation beaucoup plus compacte.
 
 ```{.python .input}
 #@tab mxnet
@@ -136,18 +136,18 @@ trainer = tf.keras.optimizers.Adadelta
 d2l.train_concise_ch11(trainer, {'learning_rate':5.0, 'rho': 0.9}, data_iter)
 ```
 
-## Summary
+## Résumé
 
-* Adadelta has no learning rate parameter. Instead, it uses the rate of change in the parameters itself to adapt the learning rate. 
-* Adadelta requires two state variables to store the second moments of gradient and the change in parameters. 
-* Adadelta uses leaky averages to keep a running estimate of the appropriate statistics. 
+* Adadelta n'a pas de paramètre de taux d'apprentissage. Au lieu de cela, il utilise le taux de changement dans les paramètres eux-mêmes pour adapter le taux d'apprentissage. 
+* Adadelta nécessite deux variables d'état pour stocker les seconds moments du gradient et le changement des paramètres. 
+* Adadelta utilise des moyennes de fuite pour garder une estimation courante des statistiques appropriées. 
 
-## Exercises
+## Exercices
 
-1. Adjust the value of $\rho$. What happens?
-1. Show how to implement the algorithm without the use of $\mathbf{g}_t'$. Why might this be a good idea?
-1. Is Adadelta really learning rate free? Could you find optimization problems that break Adadelta?
-1. Compare Adadelta to Adagrad and RMS prop to discuss their convergence behavior.
+1. Ajustez la valeur de $\rho$. Que se passe-t-il ?
+1. Montrez comment implémenter l'algorithme sans utiliser $\mathbf{g}_t'$. Pourquoi est-ce une bonne idée ?
+1. Adadelta est-il vraiment sans taux d'apprentissage ? Pourriez-vous trouver des problèmes d'optimisation qui cassent Adadelta ?
+1. Comparez Adadelta à Adagrad et RMS prop pour discuter de leur comportement de convergence.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/357)

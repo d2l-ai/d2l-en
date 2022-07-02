@@ -1,23 +1,23 @@
-# Word Similarity and Analogy
-:label:`sec_synonyms`
+# Similitude et analogie des mots
+:label:`sec_synonyms` 
 
-In :numref:`sec_word2vec_pretraining`, 
-we trained a word2vec model on a small dataset, 
-and applied it
-to find semantically similar words 
-for an input word.
-In practice,
-word vectors that are pretrained
-on large corpora can be
-applied to downstream
-natural language processing tasks,
-which will be covered later
-in :numref:`chap_nlp_app`.
-To demonstrate 
-semantics of pretrained word vectors
-from large corpora in a straightforward way,
-let's apply them
-in the word similarity and analogy tasks.
+ Dans :numref:`sec_word2vec_pretraining` , 
+nous avons entraîné un modèle word2vec sur un petit ensemble de données, 
+et l'avons appliqué
+pour trouver des mots sémantiquement similaires 
+pour un mot d'entrée.
+Dans la pratique, les vecteurs de mots
+qui sont pré-entraînés
+sur de grands corpus peuvent être
+appliqués à des tâches de traitement du langage naturel
+en aval,
+qui seront traitées ultérieurement
+dans :numref:`chap_nlp_app` .
+Pour démontrer de manière directe la sémantique de 
+des vecteurs de mots pré-entraînés
+à partir de grands corpus,
+appliquons-les
+dans les tâches de similarité et d'analogie de mots.
 
 ```{.python .input}
 #@tab mxnet
@@ -36,13 +36,13 @@ from torch import nn
 import os
 ```
 
-## Loading Pretrained Word Vectors
+## Chargement des vecteurs de mots prétraités
 
-Below lists pretrained GloVe embeddings of dimension 50, 100, and 300,
-which can be downloaded from the [GloVe website](https://nlp.stanford.edu/projects/glove/).
-The pretrained fastText embeddings are available in multiple languages.
-Here we consider one English version (300-dimensional "wiki.en") that can be downloaded from the
-[fastText website](https://fasttext.cc/).
+Vous trouverez ci-dessous une liste d'embeddings GloVe prétraités de dimension 50, 100 et 300,
+qui peuvent être téléchargés à partir du site [GloVe website](https://nlp.stanford.edu/projects/glove/).
+Les embeddings fastText prétraités sont disponibles en plusieurs langues.
+Nous considérons ici une version anglaise (300 dimensions "wiki.en") qui peut être téléchargée sur le site
+[fastText website](https://fasttext.cc/) .
 
 ```{.python .input}
 #@tab all
@@ -63,7 +63,7 @@ d2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',
                            'c1816da3821ae9f43899be655002f6c723e91b88')
 ```
 
-To load these pretrained GloVe and fastText embeddings, we define the following `TokenEmbedding` class.
+Pour charger ces embeddings GloVe et fastText prétraités, nous définissons la classe suivante `TokenEmbedding`.
 
 ```{.python .input}
 #@tab all
@@ -103,49 +103,49 @@ class TokenEmbedding:
         return len(self.idx_to_token)
 ```
 
-Below we load the
-50-dimensional GloVe embeddings
-(pretrained on a Wikipedia subset).
-When creating the `TokenEmbedding` instance,
-the specified embedding file has to be downloaded if it
-was not yet.
+Ci-dessous, nous chargeons les 50 encastrements GloVe dimensionnels
+
+ (pré-entraînés sur un sous-ensemble de Wikipédia).
+Lors de la création de l'instance `TokenEmbedding`,
+le fichier d'intégration spécifié doit être téléchargé si
+ne l'a pas encore été.
 
 ```{.python .input}
 #@tab all
 glove_6b50d = TokenEmbedding('glove.6b.50d')
 ```
 
-Output the vocabulary size. The vocabulary contains 400000 words (tokens) and a special unknown token.
+Sortie de la taille du vocabulaire. Le vocabulaire contient 400000 mots (tokens) et un token inconnu spécial.
 
 ```{.python .input}
 #@tab all
 len(glove_6b50d)
 ```
 
-We can get the index of a word in the vocabulary, and vice versa.
+Nous pouvons obtenir l'index d'un mot dans le vocabulaire, et vice versa.
 
 ```{.python .input}
 #@tab all
 glove_6b50d.token_to_idx['beautiful'], glove_6b50d.idx_to_token[3367]
 ```
 
-## Applying Pretrained Word Vectors
+## Application des vecteurs de mots pré-entraînés
 
-Using the loaded GloVe vectors,
-we will demonstrate their semantics
-by applying them
-in the following word similarity and analogy tasks.
+En utilisant les vecteurs GloVe chargés,
+nous allons démontrer leur sémantique
+en les appliquant
+dans les tâches suivantes de similarité et d'analogie de mots.
 
 
-### Word Similarity
+### Similarité des mots
 
-Similar to :numref:`subsec_apply-word-embed`,
-in order to find semantically similar words
-for an input word
-based on cosine similarities between
-word vectors,
-we implement the following `knn`
-($k$-nearest neighbors) function.
+Comme pour :numref:`subsec_apply-word-embed` ,
+afin de trouver des mots sémantiquement similaires
+pour un mot d'entrée
+en se basant sur les similarités en cosinus entre
+vecteurs de mots,
+nous implémentons la fonction suivante `knn`
+ ($k$-voisins les plus proches).
 
 ```{.python .input}
 #@tab mxnet
@@ -168,10 +168,10 @@ def knn(W, x, k):
     return topk, [cos[int(i)] for i in topk]
 ```
 
-Then, we 
-search for similar words
-using the pretrained word vectors 
-from the `TokenEmbedding` instance `embed`.
+Ensuite, nous recherchons 
+des mots similaires
+en utilisant les vecteurs de mots préformés 
+de l'instance `TokenEmbedding` `embed` .
 
 ```{.python .input}
 #@tab all
@@ -181,21 +181,21 @@ def get_similar_tokens(query_token, k, embed):
         print(f'cosine sim={float(c):.3f}: {embed.idx_to_token[int(i)]}')
 ```
 
-The vocabulary of the pretrained word vectors
-in `glove_6b50d` contains 400000 words and a special unknown token. 
-Excluding the input word and unknown token,
-among this vocabulary
-let's find 
-three most semantically similar words
-to word "chip".
+Le vocabulaire des vecteurs de mots pré-entraînés
+dans `glove_6b50d` contient 400 000 mots et un jeton inconnu spécial. 
+En excluant le mot d'entrée et le jeton inconnu,
+parmi ce vocabulaire
+, trouvons 
+les trois mots les plus sémantiquement similaires
+au mot "chip".
 
 ```{.python .input}
 #@tab all
 get_similar_tokens('chip', 3, glove_6b50d)
 ```
 
-Below outputs similar words
-to "baby" and "beautiful".
+Les sorties ci-dessous contiennent des mots similaires
+à "bébé" et "belle".
 
 ```{.python .input}
 #@tab all
@@ -207,25 +207,25 @@ get_similar_tokens('baby', 3, glove_6b50d)
 get_similar_tokens('beautiful', 3, glove_6b50d)
 ```
 
-### Word Analogy
+### Analogie de mots
 
-Besides finding similar words,
-we can also apply word vectors
-to word analogy tasks.
-For example,
-“man”:“woman”::“son”:“daughter”
-is the form of a word analogy:
-“man” is to “woman” as “son” is to “daughter”.
-Specifically,
-the word analogy completion task
-can be defined as:
-for a word analogy 
-$a : b :: c : d$, given the first three words $a$, $b$ and $c$, find $d$. 
-Denote the vector of word $w$ by $\text{vec}(w)$. 
-To complete the analogy,
-we will find the word 
-whose vector is most similar
-to the result of $\text{vec}(c)+\text{vec}(b)-\text{vec}(a)$.
+Outre la recherche de mots similaires,
+nous pouvons également appliquer les vecteurs de mots
+aux tâches d'analogie de mots.
+Par exemple,
+"homme":“woman”::“son”: "fille"
+est la forme d'une analogie de mots :
+"homme" est à "femme" comme "fils" est à "fille".
+Plus précisément,
+la tâche d'achèvement de l'analogie de mots
+peut être définie comme suit :
+pour une analogie de mots 
+$a : b :: c : d$étant donné les trois premiers mots $a$, $b$ et $c$, trouvez $d$. 
+On désigne le vecteur du mot $w$ par $\text{vec}(w)$. 
+Pour compléter l'analogie,
+nous allons trouver le mot 
+dont le vecteur est le plus similaire
+au résultat de $\text{vec}(c)+\text{vec}(b)-\text{vec}(a)$.
 
 ```{.python .input}
 #@tab all
@@ -236,56 +236,56 @@ def get_analogy(token_a, token_b, token_c, embed):
     return embed.idx_to_token[int(topk[0])]  # Remove unknown words
 ```
 
-Let's verify the "male-female" analogy using the loaded word vectors.
+Vérifions l'analogie "homme-femme" en utilisant les vecteurs des mots chargés.
 
 ```{.python .input}
 #@tab all
 get_analogy('man', 'woman', 'son', glove_6b50d)
 ```
 
-Below completes a
-“capital-country” analogy: 
-“beijing”:“china”::“tokyo”:“japan”.
-This demonstrates 
-semantics in the pretrained word vectors.
+Nous complétons ci-dessous une analogie "capitale-pays"
+: 
+"beijing":“china”::“tokyo”: "japan".
+Ceci démontre la sémantique de 
+dans les vecteurs de mots pré-entraînés.
 
 ```{.python .input}
 #@tab all
 get_analogy('beijing', 'china', 'tokyo', glove_6b50d)
 ```
 
-For the
-“adjective-superlative adjective” analogy
-such as 
-“bad”:“worst”::“big”:“biggest”,
-we can see that the pretrained word vectors
-may capture the syntactic information.
+Pour l'analogie
+"adjectif-superlatif"
+tel que 
+"mauvais":“worst”::“big”: "plus grand",
+nous pouvons voir que les vecteurs de mots prétraités
+peuvent capturer l'information syntaxique.
 
 ```{.python .input}
 #@tab all
 get_analogy('bad', 'worst', 'big', glove_6b50d)
 ```
 
-To show the captured notion
-of past tense in the pretrained word vectors,
-we can test the syntax using the
-"present tense-past tense" analogy: “do”:“did”::“go”:“went”.
+Pour montrer la notion capturée
+de passé dans les vecteurs de mots prétraités,
+, nous pouvons tester la syntaxe en utilisant l'analogie "présent-passé"
+: "faire":“did”::“go”: "aller".
 
 ```{.python .input}
 #@tab all
 get_analogy('do', 'did', 'go', glove_6b50d)
 ```
 
-## Summary
+## Résumé
 
-* In practice, word vectors that are pretrained on large corpora can be applied to downstream natural language processing tasks.
-* Pretrained word vectors can be applied to the word similarity and analogy tasks.
+* En pratique, les vecteurs de mots pré-entraînés sur de grands corpus peuvent être appliqués à des tâches de traitement du langage naturel en aval.
+* Les vecteurs de mots pré-entraînés peuvent être appliqués aux tâches de similarité et d'analogie de mots.
 
 
-## Exercises
+## Exercices
 
-1. Test the fastText results using `TokenEmbedding('wiki.en')`.
-1. When the vocabulary is extremely large, how can we find similar words or complete a word analogy faster?
+1. Testez les résultats de fastText en utilisant `TokenEmbedding('wiki.en')`.
+1. Lorsque le vocabulaire est extrêmement vaste, comment pouvons-nous trouver des mots similaires ou réaliser une analogie de mots plus rapidement ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/387)

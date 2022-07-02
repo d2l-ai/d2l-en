@@ -161,14 +161,14 @@ tconv.weight.data = K
 tconv(X)
 ```
 
-In the transposed convolution,
-strides are specified for intermediate results (thus output), not for input.
-Using the same input and kernel tensors
-from :numref:`fig_trans_conv`,
-changing the stride from 1 to 2
-increases both the height and weight
-of intermediate tensors, hence the output tensor
-in :numref:`fig_trans_conv_stride2`.
+Dans la convolution transposée, les strides
+sont spécifiés pour les résultats intermédiaires (donc la sortie), et non pour l'entrée.
+En utilisant les mêmes tenseurs d'entrée et de noyau
+de :numref:`fig_trans_conv` ,
+changer le stride de 1 à 2
+augmente à la fois la hauteur et le poids
+des tenseurs intermédiaires, donc le tenseur de sortie
+dans :numref:`fig_trans_conv_stride2` .
 
 
 ![Transposed convolution with a $2\times 2$ kernel with stride of 2. The shaded portions are a portion of an intermediate tensor as well as the input and kernel tensor elements used for the  computation.](../img/trans_conv_stride2.svg)
@@ -176,7 +176,7 @@ in :numref:`fig_trans_conv_stride2`.
 
 
 
-The following code snippet can validate the transposed convolution output for stride of 2 in :numref:`fig_trans_conv_stride2`.
+L'extrait de code suivant peut valider la sortie de la convolution transposée pour un stride de 2 dans :numref:`fig_trans_conv_stride2` .
 
 ```{.python .input}
 #@tab mxnet
@@ -192,24 +192,24 @@ tconv.weight.data = K
 tconv(X)
 ```
 
-For multiple input and output channels,
-the transposed convolution
-works in the same way as the regular convolution.
-Suppose that
-the input has $c_i$ channels,
-and that the transposed convolution
-assigns a $k_h\times k_w$ kernel tensor
-to each input channel.
-When multiple output channels 
-are specified,
-we will have a $c_i\times k_h\times k_w$ kernel for each output channel.
+Pour les canaux d'entrée et de sortie multiples,
+la convolution transposée
+fonctionne de la même manière que la convolution ordinaire.
+Supposons que
+l'entrée ait $c_i$ canaux,
+et que la convolution transposée
+assigne un tenseur de noyau $k_h\times k_w$
+ à chaque canal d'entrée.
+Lorsque plusieurs canaux de sortie 
+sont spécifiés,
+nous aurons un noyau $c_i\times k_h\times k_w$ pour chaque canal de sortie.
 
 
-As in all, if we feed $\mathsf{X}$ into a convolutional layer $f$ to output $\mathsf{Y}=f(\mathsf{X})$ and create a transposed convolutional layer $g$ with the same hyperparameters as $f$ except 
-for the number of output channels 
-being the number of channels in $\mathsf{X}$,
-then $g(Y)$ will have the same shape as $\mathsf{X}$.
-This can be illustrated in the following example.
+Comme dans tous les cas, si nous alimentons $\mathsf{X}$ dans une couche convolutive $f$ pour sortir $\mathsf{Y}=f(\mathsf{X})$ et créer une couche convolutive transposée $g$ avec les mêmes hyperparamètres que $f$ sauf 
+pour le nombre de canaux de sortie 
+étant le nombre de canaux dans $\mathsf{X}$,
+puis $g(Y)$ auront la même forme que $\mathsf{X}$.
+Ceci peut être illustré dans l'exemple suivant.
 
 ```{.python .input}
 #@tab mxnet
@@ -229,16 +229,16 @@ tconv = nn.ConvTranspose2d(20, 10, kernel_size=5, padding=2, stride=3)
 tconv(conv(X)).shape == X.shape
 ```
 
-## [**Connection to Matrix Transposition**]
-:label:`subsec-connection-to-mat-transposition`
+## [**Connexion à la transposition de matrice**]
+:label:`subsec-connection-to-mat-transposition` 
 
-The transposed convolution is named after
-the matrix transposition.
-To explain,
-let's first
-see how to implement convolutions
-using matrix multiplications.
-In the example below, we define a $3\times 3$ input `X` and a $2\times 2$ convolution kernel `K`, and then use the `corr2d` function to compute the convolution output `Y`.
+ La convolution transposée porte le nom de
+la transposition de matrice.
+Pour expliquer,
+voyons d'abord
+comment implémenter les convolutions
+en utilisant les multiplications matricielles.
+Dans l'exemple ci-dessous, nous définissons une entrée $3\times 3$ `X` et un noyau de convolution $2\times 2$ `K` , puis nous utilisons la fonction `corr2d` pour calculer la sortie de la convolution `Y`.
 
 ```{.python .input}
 #@tab all
@@ -248,12 +248,12 @@ Y = d2l.corr2d(X, K)
 Y
 ```
 
-Next, we rewrite the convolution kernel `K` as
-a sparse weight matrix `W`
-containing a lot of zeros. 
-The shape of the weight matrix is ($4$, $9$),
-where the non-zero elements come from
-the convolution kernel `K`.
+Ensuite, nous réécrivons le noyau de convolution `K` comme
+une matrice de poids clairsemée `W`
+ contenant beaucoup de zéros. 
+La forme de la matrice de poids est ($4$, $9$),
+où les éléments non nuls proviennent de
+le noyau de convolution `K`.
 
 ```{.python .input}
 #@tab all
@@ -267,25 +267,25 @@ W = kernel2matrix(K)
 W
 ```
 
-Concatenate the input `X` row by row to get a vector of length 9. Then the matrix multiplication of `W` and the vectorized `X` gives a vector of length 4.
-After reshaping it, we can obtain the same result `Y`
-from the original convolution operation above:
-we just implemented convolutions using matrix multiplications.
+Concaténer l'entrée `X` ligne par ligne pour obtenir un vecteur de longueur 9. Ensuite, la multiplication matricielle de `W` et de `X` vectorisé donne un vecteur de longueur 4.
+Après l'avoir remodelé, nous pouvons obtenir le même résultat `Y`
+ à partir de l'opération de convolution originale ci-dessus :
+nous avons juste implémenté des convolutions en utilisant des multiplications matricielles.
 
 ```{.python .input}
 #@tab all
 Y == d2l.matmul(W, d2l.reshape(X, -1)).reshape(2, 2)
 ```
 
-Likewise, we can implement transposed convolutions using
-matrix multiplications.
-In the following example,
-we take the $2 \times 2$ output `Y` from the above
-regular convolution
-as input to the transposed convolution.
-To implement this operation by multiplying matrices,
-we only need to transpose the weight matrix `W`
-with the new shape $(9, 4)$.
+De même, nous pouvons implémenter des convolutions transposées en utilisant des multiplications de matrices
+.
+Dans l'exemple suivant,
+nous prenons la sortie $2 \times 2$ `Y` de la convolution régulière
+ci-dessus
+comme entrée de la convolution transposée.
+Pour mettre en œuvre cette opération en multipliant des matrices,
+il nous suffit de transposer la matrice de poids `W`
+ avec la nouvelle forme $(9, 4)$.
 
 ```{.python .input}
 #@tab all
@@ -293,43 +293,43 @@ Z = trans_conv(Y, K)
 Z == d2l.matmul(W.T, d2l.reshape(Y, -1)).reshape(3, 3)
 ```
 
-Consider implementing the convolution
-by multiplying matrices.
-Given an input vector $\mathbf{x}$
-and a weight matrix $\mathbf{W}$,
-the forward propagation function of the convolution
-can be implemented
-by multiplying its input with the weight matrix
-and outputting a vector 
-$\mathbf{y}=\mathbf{W}\mathbf{x}$.
-Since backpropagation
-follows the chain rule
-and $\nabla_{\mathbf{x}}\mathbf{y}=\mathbf{W}^\top$,
-the backpropagation function of the convolution
-can be implemented
-by multiplying its input with the 
-transposed weight matrix $\mathbf{W}^\top$.
-Therefore, 
-the transposed convolutional layer
-can just exchange the forward propagation function
-and the backpropagation function of the convolutional layer:
-its forward propagation 
-and backpropagation functions
-multiply their input vector with 
-$\mathbf{W}^\top$ and $\mathbf{W}$, respectively.
+Considérons l'implémentation de la convolution
+en multipliant des matrices.
+Étant donné un vecteur d'entrée $\mathbf{x}$
+ et une matrice de poids $\mathbf{W}$,
+la fonction de propagation vers l'avant de la convolution
+peut être implémentée
+en multipliant son entrée avec la matrice de poids
+et en produisant un vecteur 
+$\mathbf{y}=\mathbf{W}\mathbf{x}$ .
+Puisque la rétropropagation
+suit la règle de la chaîne
+et $\nabla_{\mathbf{x}}\mathbf{y}=\mathbf{W}^\top$,
+la fonction de rétropropagation de la convolution
+peut être mise en œuvre
+en multipliant son entrée avec la matrice de poids transposée 
+ $\mathbf{W}^\top$ .
+Par conséquent, 
+la couche convolutionnelle transposée
+peut simplement échanger la fonction de propagation directe
+et la fonction de rétropropagation de la couche convolutionnelle :
+ses fonctions de propagation directe 
+et de rétropropagation
+multiplient leur vecteur d'entrée avec 
+$\mathbf{W}^\top$ et $\mathbf{W}$, respectivement.
 
 
-## Summary
+## Résumé
 
-* In contrast to the regular convolution that reduces input elements via the kernel, the transposed convolution broadcasts input elements via the kernel, thereby producing an output that is larger than the input.
-* If we feed $\mathsf{X}$ into a convolutional layer $f$ to output $\mathsf{Y}=f(\mathsf{X})$ and create a transposed convolutional layer $g$ with the same hyperparameters as $f$ except for the number of output channels being the number of channels in $\mathsf{X}$, then $g(Y)$ will have the same shape as $\mathsf{X}$.
-* We can implement convolutions using matrix multiplications. The transposed convolutional layer can just exchange the forward propagation function and the backpropagation function of the convolutional layer.
+* Contrairement à la convolution régulière qui réduit les éléments d'entrée via le noyau, la convolution transposée diffuse les éléments d'entrée via le noyau, produisant ainsi une sortie qui est plus grande que l'entrée.
+* Si nous alimentons $\mathsf{X}$ dans une couche convolutionnelle $f$ pour produire $\mathsf{Y}=f(\mathsf{X})$ et créons une couche convolutionnelle transposée $g$ avec les mêmes hyperparamètres que $f$, à l'exception du nombre de canaux de sortie qui est le nombre de canaux dans $\mathsf{X}$, alors $g(Y)$ aura la même forme que $\mathsf{X}$.
+* Nous pouvons mettre en œuvre des convolutions en utilisant des multiplications de matrices. La couche convolutionnelle transposée peut simplement échanger la fonction de propagation vers l'avant et la fonction de rétropropagation de la couche convolutionnelle.
 
 
-## Exercises
+## Exercices
 
-1. In :numref:`subsec-connection-to-mat-transposition`, the convolution input `X` and the transposed convolution output `Z` have the same shape. Do they have the same value? Why?
-1. Is it efficient to use matrix multiplications to implement convolutions? Why?
+1. Dans :numref:`subsec-connection-to-mat-transposition` , l'entrée de convolution `X` et la sortie de convolution transposée `Z` ont la même forme. Ont-elles la même valeur ? Pourquoi ?
+1. Est-il efficace d'utiliser des multiplications matricielles pour implémenter des convolutions ? Pourquoi ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/376)

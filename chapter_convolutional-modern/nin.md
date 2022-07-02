@@ -3,48 +3,48 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Network in Network (NiN)
-:label:`sec_nin`
+# Réseau en réseau (NiN)
+:label:`sec_nin` 
 
-LeNet, AlexNet, and VGG all share a common design pattern:
-extract features exploiting *spatial* structure
-via a sequence of convolutions and pooling layers
-and post-process the representations via fully connected layers.
-The improvements upon LeNet by AlexNet and VGG mainly lie
-in how these later networks widen and deepen these two modules.
+ LeNet, AlexNet et VGG partagent tous un modèle de conception commun :
+extraire des caractéristiques exploitant la structure *spatiale*
+via une séquence de convolutions et de couches de mise en commun
+et post-traiter les représentations via des couches entièrement connectées.
+Les améliorations apportées à LeNet par AlexNet et VGG résident principalement
+dans la manière dont ces réseaux ultérieurs élargissent et approfondissent ces deux modules.
 
-This design poses two major challenges. 
-First, the fully connected layers at the end
-of the architecture consume tremendous numbers of parameters. For instance, even a simple
-model such as VGG-11 requires a monstrous $25088 \times 4096$ matrix, occupying almost
-400MB of RAM. This is a significant impediment to speedy computation, in particular on
-mobile and embedded devices. Second, it is equally impossible to add fully connected layers
-earlier in the network to increase the degree of nonlinearity: doing so would destroy the
-spatial structure and require potentially even more memory.
+Cette conception pose deux défis majeurs. 
+Premièrement, les couches entièrement connectées à l'extrémité
+de l'architecture consomment un nombre énorme de paramètres. Par exemple, même un modèle simple
+tel que le VGG-11 nécessite une matrice monstrueuse $25088 \times 4096$, occupant près de
+400 Mo de RAM. Il s'agit d'un obstacle important à la rapidité des calculs, en particulier sur
+les appareils mobiles et embarqués. Deuxièmement, il est également impossible d'ajouter des couches entièrement connectées
+plus tôt dans le réseau pour augmenter le degré de non-linéarité : cela détruirait la structure spatiale
+et nécessiterait potentiellement encore plus de mémoire.
 
-The *network in network* (*NiN*) blocks of :cite:`Lin.Chen.Yan.2013` offer an alternative,
-capable of solving both problems in one simple strategy.
-They were proposed based on a very simple insight: (i) use $1 \times 1$ convolutions to add
-local nonlinearities across the channel activations and (ii) use global average pooling to integrate
-across all locations in the last representation layer. Note that global average pooling would not
-be effective, were it not for the added nonlinearities. Let's dive into this in detail.
+Les blocs *réseau dans réseau* (*NiN*) de :cite:`Lin.Chen.Yan.2013` offrent une alternative,
+capable de résoudre les deux problèmes en une seule stratégie simple.
+Ils ont été proposés sur la base d'une intuition très simple : (i) utiliser $1 \times 1$ convolutions pour ajouter
+non-linéarités locales à travers les activations de canaux et (ii) utiliser le pooling moyen global pour intégrer
+à travers tous les emplacements dans la dernière couche de représentation. Notez que la mise en commun de la moyenne globale ne serait pas
+efficace, si ce n'était pour les non-linéarités ajoutées. Voyons cela en détail.
 
 
 ## (**NiN Blocks**)
 
-Recall :numref:`subsec_1x1`. In it we discussed that the inputs and outputs of convolutional layers
-consist of four-dimensional tensors with axes
-corresponding to the example, channel, height, and width.
-Also recall that the inputs and outputs of fully connected layers
-are typically two-dimensional tensors corresponding to the example and feature.
-The idea behind NiN is to apply a fully connected layer
-at each pixel location (for each height and width).
-The resulting $1 \times 1$ convolution can be thought as
-a fully connected layer acting independently on each pixel location.
+Rappelons-nous :numref:`subsec_1x1` . Nous y avons vu que les entrées et les sorties des couches convolutionnelles
+sont constituées de tenseurs quadridimensionnels dont les axes
+correspondent à l'exemple, au canal, à la hauteur et à la largeur.
+Rappelons également que les entrées et sorties des couches entièrement connectées
+sont généralement des tenseurs bidimensionnels correspondant à l'exemple et à la caractéristique.
+L'idée derrière NiN est d'appliquer une couche entièrement connectée
+à chaque emplacement de pixel (pour chaque hauteur et largeur).
+La convolution $1 \times 1$ qui en résulte peut être considérée comme
+une couche entièrement connectée agissant indépendamment sur chaque emplacement de pixel.
 
-:numref:`fig_nin` illustrates the main structural
-differences between VGG and NiN, and their blocks.
-Note both the difference in the NiN blocks (the initial convolution is followed by $1 \times 1$ convolutions, whereas VGG retains $3 \times 3$ convolutions) and in the end where we no longer require a giant fully connected layer.
+:numref:`fig_nin` illustre les principales différences structurelles
+entre VGG et NiN, et leurs blocs.
+Notez à la fois la différence dans les blocs NiN (la convolution initiale est suivie de $1 \times 1$ convolutions, alors que VGG conserve $3 \times 3$ convolutions) et à la fin où nous n'avons plus besoin d'une couche géante entièrement connectée.
 
 ![Comparing architectures of VGG and NiN, and their blocks.](../img/nin.svg)
 :width:`600px`
@@ -96,18 +96,18 @@ def nin_block(out_channels, kernel_size, strides, padding):
     tf.keras.layers.Activation('relu')])
 ```
 
-## [**NiN Model**]
+## [**Modèle NiN**]
 
-NiN uses the same initial convolution sizes as AlexNet (it was proposed shortly thereafter).
-The kernel sizes are $11\times 11$, $5\times 5$, and $3\times 3$, respectively,
-and the numbers of output channels match those of AlexNet. Each NiN block is followed by a max-pooling layer
-with a stride of 2 and a window shape of $3\times 3$.
+NiN utilise les mêmes tailles de convolution initiale qu'AlexNet (il a été proposé peu après).
+Les tailles des noyaux sont respectivement $11\times 11$, $5\times 5$, et $3\times 3$,
+et le nombre de canaux de sortie correspond à celui d'AlexNet. Chaque bloc NiN est suivi d'une couche de max-pooling
+avec un stride de 2 et une forme de fenêtre de $3\times 3$.
 
-The second significant difference between NiN and both AlexNet and VGG
-is that NiN avoids fully connected layers altogether.
-Instead, NiN uses a NiN block with a number of output channels equal to the number of label classes, followed by a *global* average pooling layer,
-yielding a vector of logits.
-This design significantly reduces the number of required model parameters, albeit at the expense of a potential increase in training time.
+La deuxième différence significative entre NiN et AlexNet et VGG
+est que NiN évite complètement les couches entièrement connectées.
+Au lieu de cela, NiN utilise un bloc NiN avec un nombre de canaux de sortie égal au nombre de classes d'étiquettes, suivi d'une couche de mise en commun de la moyenne *globale*,
+produisant un vecteur de logits.
+Cette conception réduit considérablement le nombre de paramètres de modèle requis, mais au prix d'une augmentation potentielle du temps de formation.
 
 ```{.python .input}
 %%tab all
@@ -156,7 +156,7 @@ class NiN(d2l.Classifier):
                 tf.keras.layers.Flatten()])
 ```
 
-We create a data example to see [**the output shape of each block**].
+Nous créons un exemple de données pour voir [**la forme de la sortie de chaque bloc**].
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -178,8 +178,8 @@ for layer in model.net.layers:
 
 ## [**Training**]
 
-As before we use Fashion-MNIST to train the model.
-NiN's training is similar to that for AlexNet and VGG.
+Comme précédemment, nous utilisons Fashion-MNIST pour entraîner le modèle.
+L'entraînement de NiN est similaire à celui d'AlexNet et de VGG.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -200,21 +200,21 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-## Summary
+## Résumé
 
-NiN has dramatically fewer parameters than AlexNet and VGG. This stems from the fact that it needs no giant fully connected layers and fewer convolutions with wide kernels. Instead, it uses local $1 \times 1$ convolutions and global average pooling. These design choices influenced many subsequent CNN designs.
+NiN a beaucoup moins de paramètres qu'AlexNet et VGG. Cela vient du fait qu'il n'a pas besoin de couches entièrement connectées géantes et de moins de convolutions avec des noyaux larges. Au lieu de cela, il utilise des convolutions locales $1 \times 1$ et une mise en commun de la moyenne globale. Ces choix de conception ont influencé de nombreuses conceptions ultérieures de CNN.
 
-## Exercises
+## Exercices
 
-1. Why are there two $1\times 1$ convolutional layers per NiN block? What happens if you add one? What happens if you reduce this to one?
-1. What happens if you replace the global average pooling by a fully connected layer (speed, accuracy, number of parameters)?
-1. Calculate the resource usage for NiN.
-    1. What is the number of parameters?
-    1. What is the amount of computation?
-    1. What is the amount of memory needed during training?
-    1. What is the amount of memory needed during prediction?
-1. What are possible problems with reducing the $384 \times 5 \times 5$ representation to a $10 \times 5 \times 5$ representation in one step?
-1. Use the structural design decisions in VGG that led to VGG-11, VGG-16, and VGG-19 to design a family of NiN-like networks.
+1. Pourquoi y a-t-il deux $1\times 1$ couches convolutionnelles par bloc NiN ? Que se passe-t-il si on en ajoute une ? Que se passe-t-il si l'on réduit à une seule ?
+1. Que se passe-t-il si vous remplacez le pooling moyen global par une couche entièrement connectée (vitesse, précision, nombre de paramètres) ?
+1. Calculez l'utilisation des ressources pour NiN.
+   1. Quel est le nombre de paramètres ?
+   1. Quelle est la quantité de calcul ?
+   1. Quelle est la quantité de mémoire nécessaire pendant l'entraînement ?
+   1. Quelle est la quantité de mémoire nécessaire pendant la prédiction ?
+1. Quels sont les problèmes éventuels liés à la réduction de la représentation $384 \times 5 \times 5$ en une représentation $10 \times 5 \times 5$ en une seule étape ?
+1. Utilisez les décisions de conception structurelle du VGG qui ont conduit au VGG-11, VGG-16 et VGG-19 pour concevoir une famille de réseaux de type NiN.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/79)

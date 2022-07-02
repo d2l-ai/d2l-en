@@ -1,45 +1,45 @@
 # Momentum
-:label:`sec_momentum`
+:label:`sec_momentum` 
 
-In :numref:`sec_sgd` we reviewed what happens when performing stochastic gradient descent, i.e., when performing optimization where only a noisy variant of the gradient is available. In particular, we noticed that for noisy gradients we need to be extra cautious when it comes to choosing the learning rate in the face of noise. If we decrease it too rapidly, convergence stalls. If we are too lenient, we fail to converge to a good enough solution since noise keeps on driving us away from optimality.
+ Dans :numref:`sec_sgd` , nous avons examiné ce qui se passe lors de la descente de gradient stochastique, c'est-à-dire lors de l'optimisation où seule une variante bruyante du gradient est disponible. En particulier, nous avons remarqué que pour les gradients bruyants, nous devons être très prudents lorsqu'il s'agit de choisir le taux d'apprentissage face au bruit. Si nous le diminuons trop rapidement, la convergence s'arrête. Si nous sommes trop indulgents, nous ne parvenons pas à converger vers une solution suffisamment bonne puisque le bruit continue à nous éloigner de l'optimalité.
 
-## Basics
+### Notions de base
 
-In this section, we will explore more effective optimization algorithms, especially for certain types of optimization problems that are common in practice.
+Dans cette section, nous allons explorer des algorithmes d'optimisation plus efficaces, notamment pour certains types de problèmes d'optimisation courants dans la pratique.
 
 
-### Leaky Averages
+### Moyennes fuyantes
 
-The previous section saw us discussing minibatch SGD as a means for accelerating computation. It also had the nice side-effect that averaging gradients reduced the amount of variance. The minibatch stochastic gradient descent can be calculated by:
+Dans la section précédente, nous avons abordé la SGD par minilots comme moyen d'accélérer les calculs. Cette méthode a également eu pour effet secondaire de réduire la variance en calculant la moyenne des gradients. La descente de gradient stochastique par minilots peut être calculée par :
 
 $$\mathbf{g}_{t, t-1} = \partial_{\mathbf{w}} \frac{1}{|\mathcal{B}_t|} \sum_{i \in \mathcal{B}_t} f(\mathbf{x}_{i}, \mathbf{w}_{t-1}) = \frac{1}{|\mathcal{B}_t|} \sum_{i \in \mathcal{B}_t} \mathbf{h}_{i, t-1}.
 $$
 
-To keep the notation simple, here we used $\mathbf{h}_{i, t-1} = \partial_{\mathbf{w}} f(\mathbf{x}_i, \mathbf{w}_{t-1})$ as the stochastic gradient descent for sample $i$ using the weights updated at time $t-1$.
-It would be nice if we could benefit from the effect of variance reduction even beyond averaging gradients on a minibatch. One option to accomplish this task is to replace the gradient computation by a "leaky average":
+Pour garder une notation simple, nous utilisons ici $\mathbf{h}_{i, t-1} = \partial_{\mathbf{w}} f(\mathbf{x}_i, \mathbf{w}_{t-1})$ comme gradient de descente stochastique pour l'échantillon $i$ en utilisant les poids mis à jour au moment $t-1$.
+Il serait bien de pouvoir bénéficier de l'effet de la réduction de la variance même au-delà du calcul de la moyenne des gradients sur un minilot. Une option pour accomplir cette tâche consiste à remplacer le calcul du gradient par une "moyenne fuyante" :
 
-$$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + \mathbf{g}_{t, t-1}$$
+$$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + \mathbf{g}_{t, t-1}$$ 
 
-for some $\beta \in (0, 1)$. This effectively replaces the instantaneous gradient by one that's been averaged over multiple *past* gradients. $\mathbf{v}$ is called *momentum*. It accumulates past gradients similar to how a heavy ball rolling down the objective function landscape integrates over past forces. To see what is happening in more detail let's expand $\mathbf{v}_t$ recursively into
+ pour un certain $\beta \in (0, 1)$. Cela remplace effectivement le gradient instantané par un gradient qui a été moyenné sur plusieurs gradients *passés*. $\mathbf{v}$ est appelé *momentum*. Il accumule les gradients passés de la même manière qu'une boule lourde qui roule sur le terrain de la fonction objectif intègre les forces passées. Pour voir ce qui se passe plus en détail, développons récursivement $\mathbf{v}_t$ en
 
 $$\begin{aligned}
 \mathbf{v}_t = \beta^2 \mathbf{v}_{t-2} + \beta \mathbf{g}_{t-1, t-2} + \mathbf{g}_{t, t-1}
 = \ldots, = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\tau, t-\tau-1}.
 \end{aligned}$$
 
-Large $\beta$ amounts to a long-range average, whereas small $\beta$ amounts to only a slight correction relative to a gradient method. The new gradient replacement no longer points into the direction of steepest descent on a particular instance any longer but rather in the direction of a weighted average of past gradients. This allows us to realize most of the benefits of averaging over a batch without the cost of actually computing the gradients on it. We will revisit this averaging procedure in more detail later.
+Le grand $\beta$ équivaut à une moyenne à long terme, tandis que le petit $\beta$ ne représente qu'une légère correction par rapport à une méthode de gradient. Le nouveau remplacement du gradient ne pointe plus dans la direction de la descente la plus abrupte sur une instance particulière mais plutôt dans la direction d'une moyenne pondérée des gradients passés. Cela nous permet de réaliser la plupart des avantages du calcul de la moyenne sur un lot sans le coût du calcul des gradients sur celui-ci. Nous reviendrons plus en détail sur cette procédure de calcul de la moyenne plus tard.
 
-The above reasoning formed the basis for what is now known as *accelerated* gradient methods, such as gradients with momentum. They enjoy the additional benefit of being much more effective in cases where the optimization problem is ill-conditioned (i.e., where there are some directions where progress is much slower than in others, resembling a narrow canyon). Furthermore, they allow us to average over subsequent gradients to obtain more stable directions of descent. Indeed, the aspect of acceleration even for noise-free convex problems is one of the key reasons why momentum works and why it works so well.
+Le raisonnement ci-dessus a constitué la base de ce que l'on appelle aujourd'hui les méthodes de gradient *accélérées*, telles que les gradients avec momentum. Elles présentent l'avantage supplémentaire d'être beaucoup plus efficaces dans les cas où le problème d'optimisation est mal conditionné (c'est-à-dire lorsqu'il y a certaines directions où la progression est beaucoup plus lente que dans d'autres, comme dans un canyon étroit). En outre, ils nous permettent de faire une moyenne des gradients ultérieurs pour obtenir des directions de descente plus stables. En effet, l'aspect de l'accélération même pour les problèmes convexes sans bruit est l'une des principales raisons pour lesquelles le momentum fonctionne et pourquoi il fonctionne si bien.
 
-As one would expect, due to its efficacy momentum is a well-studied subject in optimization for deep learning and beyond. See e.g., the beautiful [expository article](https://distill.pub/2017/momentum/) by :cite:`Goh.2017` for an in-depth analysis and interactive animation. It was proposed by :cite:`Polyak.1964`. :cite:`Nesterov.2018` has a detailed theoretical discussion in the context of convex optimization. Momentum in deep learning has been known to be beneficial for a long time. See e.g., the discussion by :cite:`Sutskever.Martens.Dahl.ea.2013` for details.
+Comme on peut s'y attendre, en raison de son efficacité, le momentum est un sujet bien étudié en optimisation pour l'apprentissage profond et au-delà. Voir, par exemple, le magnifique [expository article](https://distill.pub/2017/momentum/) de :cite:`Goh.2017` pour une analyse approfondie et une animation interactive. Il a été proposé par :cite:`Polyak.1964` . :cite:`Nesterov.2018` présente une discussion théorique détaillée dans le contexte de l'optimisation convexe. On sait depuis longtemps que le momentum dans l'apprentissage profond est bénéfique. Voir, par exemple, la discussion de :cite:`Sutskever.Martens.Dahl.ea.2013` pour plus de détails.
 
-### An Ill-conditioned Problem
+### Un problème mal conditionné
 
-To get a better understanding of the geometric properties of the momentum method we revisit gradient descent, albeit with a significantly less pleasant objective function. Recall that in :numref:`sec_gd` we used $f(\mathbf{x}) = x_1^2 + 2 x_2^2$, i.e., a moderately distorted ellipsoid objective. We distort this function further by stretching it out in the $x_1$ direction via
+Pour mieux comprendre les propriétés géométriques de la méthode de l'élan, nous revisitons la descente de gradient, mais avec une fonction objective nettement moins agréable. Rappelez-vous que dans :numref:`sec_gd` nous avons utilisé $f(\mathbf{x}) = x_1^2 + 2 x_2^2$, c'est-à-dire un objectif ellipsoïde modérément déformé. Nous déformons davantage cette fonction en l'étirant dans la direction de $x_1$ via
 
-$$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$
+$$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$ 
 
-As before $f$ has its minimum at $(0, 0)$. This function is *very* flat in the direction of $x_1$. Let's see what happens when we perform gradient descent as before on this new function. We pick a learning rate of $0.4$.
+ Comme précédemment, $f$ a son minimum à $(0, 0)$. Cette fonction est *très* plate dans la direction de $x_1$. Voyons ce qui se passe lorsque nous exécutons la descente du gradient comme précédemment sur cette nouvelle fonction. Nous choisissons un taux d'apprentissage de $0.4$.
 
 ```{.python .input}
 #@tab mxnet
@@ -87,7 +87,7 @@ def gd_2d(x1, x2, s1, s2):
 d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ```
 
-By construction, the gradient in the $x_2$ direction is *much* higher and changes much more rapidly than in the horizontal $x_1$ direction. Thus we are stuck between two undesirable choices: if we pick a small learning rate we ensure that the solution does not diverge in the $x_2$ direction but we are saddled with slow convergence in the $x_1$ direction. Conversely, with a large learning rate we progress rapidly in the $x_1$ direction but diverge in $x_2$. The example below illustrates what happens even after a slight increase in learning rate from $0.4$ to $0.6$. Convergence in the $x_1$ direction improves but the overall solution quality is much worse.
+Par construction, le gradient dans la direction $x_2$ est *beaucoup* plus élevé et change beaucoup plus rapidement que dans la direction horizontale $x_1$. Nous sommes donc coincés entre deux choix indésirables : si nous choisissons un petit taux d'apprentissage, nous nous assurons que la solution ne diverge pas dans la direction $x_2$, mais nous nous retrouvons avec une convergence lente dans la direction $x_1$. Inversement, avec un taux d'apprentissage élevé, nous progressons rapidement dans la direction $x_1$ mais nous divergeons dans la direction $x_2$. L'exemple ci-dessous illustre ce qui se passe même après une légère augmentation du taux d'apprentissage de $0.4$ à $0.6$. La convergence dans la direction $x_1$ s'améliore mais la qualité globale de la solution est bien pire.
 
 ```{.python .input}
 #@tab all
@@ -95,11 +95,11 @@ eta = 0.6
 d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ```
 
-### The Momentum Method
+### La méthode des moments forts
 
-The momentum method allows us to solve the gradient descent problem described
-above. Looking at the optimization trace above we might intuit that averaging gradients over the past would work well. After all, in the $x_1$ direction this will aggregate well-aligned gradients, thus increasing the distance we cover with every step. Conversely, in the $x_2$ direction where gradients oscillate, an aggregate gradient will reduce step size due to oscillations that cancel each other out.
-Using $\mathbf{v}_t$ instead of the gradient $\mathbf{g}_t$ yields the following update equations:
+La méthode des moments forts nous permet de résoudre le problème de descente de gradient décrit ci-dessus
+. En regardant la trace d'optimisation ci-dessus, on pourrait penser que la moyenne des gradients sur le passé fonctionnerait bien. Après tout, dans la direction $x_1$, cela va agréger des gradients bien alignés, augmentant ainsi la distance que nous parcourons à chaque pas. À l'inverse, dans la direction $x_2$ où les gradients oscillent, un gradient agrégé réduira la taille des pas en raison des oscillations qui s'annulent.
+En utilisant $\mathbf{v}_t$ au lieu du gradient $\mathbf{g}_t$, on obtient les équations de mise à jour suivantes :
 
 $$
 \begin{aligned}
@@ -108,7 +108,7 @@ $$
 \end{aligned}
 $$
 
-Note that for $\beta = 0$ we recover regular gradient descent. Before delving deeper into the mathematical properties let's have a quick look at how the algorithm behaves in practice.
+Notez que pour $\beta = 0$ nous récupérons la descente de gradient régulière. Avant d'approfondir les propriétés mathématiques, voyons rapidement comment l'algorithme se comporte en pratique.
 
 ```{.python .input}
 #@tab all
@@ -121,7 +121,7 @@ eta, beta = 0.6, 0.5
 d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
 
-As we can see, even with the same learning rate that we used before, momentum still converges well. Let's see what happens when we decrease the momentum parameter. Halving it to $\beta = 0.25$ leads to a trajectory that barely converges at all. Nonetheless, it is a lot better than without momentum (when the solution diverges).
+Comme nous pouvons le constater, même avec le même taux d'apprentissage que celui utilisé précédemment, le momentum converge toujours bien. Voyons ce qui se passe lorsque nous diminuons le paramètre de momentum. Le réduire de moitié à $\beta = 0.25$ conduit à une trajectoire qui converge à peine. Néanmoins, c'est beaucoup mieux que sans momentum (lorsque la solution diverge).
 
 ```{.python .input}
 #@tab all
@@ -129,11 +129,11 @@ eta, beta = 0.6, 0.25
 d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
 
-Note that we can combine momentum with stochastic gradient descent and in particular, minibatch stochastic gradient descent. The only change is that in that case we replace the gradients $\mathbf{g}_{t, t-1}$ with $\mathbf{g}_t$. Last, for convenience we initialize $\mathbf{v}_0 = 0$ at time $t=0$. Let's look at what leaky averaging actually does to the updates.
+Notez que nous pouvons combiner le momentum avec la descente de gradient stochastique et, en particulier, la descente de gradient stochastique en minibatchs. Le seul changement est que, dans ce cas, nous remplaçons les gradients $\mathbf{g}_{t, t-1}$ par $\mathbf{g}_t$. Enfin, par commodité, nous initialisons $\mathbf{v}_0 = 0$ au moment $t=0$. Voyons ce que le leaky averaging fait réellement aux mises à jour.
 
-### Effective Sample Weight
+### Poids effectif de l'échantillon
 
-Recall that $\mathbf{v}_t = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\tau, t-\tau-1}$. In the limit the terms add up to $\sum_{\tau=0}^\infty \beta^\tau = \frac{1}{1-\beta}$. In other words, rather than taking a step of size $\eta$ in gradient descent or stochastic gradient descent we take a step of size $\frac{\eta}{1-\beta}$ while at the same time, dealing with a potentially much better behaved descent direction. These are two benefits in one. To illustrate how weighting behaves for different choices of $\beta$ consider the diagram below.
+Rappelons que $\mathbf{v}_t = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\tau, t-\tau-1}$. Dans la limite, les termes s'ajoutent à $\sum_{\tau=0}^\infty \beta^\tau = \frac{1}{1-\beta}$. En d'autres termes, plutôt que de faire un pas de taille $\eta$ dans la descente par gradient ou la descente par gradient stochastique, nous faisons un pas de taille $\frac{\eta}{1-\beta}$ tout en traitant une direction de descente potentiellement bien meilleure. Ce sont deux avantages en un. Pour illustrer le comportement de la pondération pour différents choix de $\beta$, considérez le diagramme ci-dessous.
 
 ```{.python .input}
 #@tab all
@@ -146,13 +146,13 @@ d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```
 
-## Practical Experiments
+## Expériences pratiques
 
-Let's see how momentum works in practice, i.e., when used within the context of a proper optimizer. For this we need a somewhat more scalable implementation.
+Voyons comment le momentum fonctionne en pratique, c'est-à-dire lorsqu'il est utilisé dans le contexte d'un optimiseur approprié. Pour cela, nous avons besoin d'une mise en œuvre un peu plus évolutive.
 
-### Implementation from Scratch
+### Mise en œuvre à partir de zéro
 
-Compared with (minibatch) stochastic gradient descent the momentum method needs to maintain a set of  auxiliary variables, i.e., velocity. It has the same shape as the gradients (and variables of the optimization problem). In the implementation below we call these variables `states`.
+Par rapport à la descente de gradient stochastique (minibatch), la méthode de l'élan doit maintenir un ensemble de variables auxiliaires, à savoir la vitesse. Elle a la même forme que les gradients (et les variables du problème d'optimisation). Dans l'implémentation ci-dessous, nous appelons ces variables `states`.
 
 ```{.python .input}
 #@tab mxnet,pytorch
@@ -196,7 +196,7 @@ def sgd_momentum(params, grads, states, hyperparams):
             p[:].assign(p - hyperparams['lr'] * v)
 ```
 
-Let's see how this works in practice.
+Voyons comment cela fonctionne en pratique.
 
 ```{.python .input}
 #@tab all
@@ -209,23 +209,23 @@ data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
 train_momentum(0.02, 0.5)
 ```
 
-When we increase the momentum hyperparameter `momentum` to 0.9, it amounts to a significantly larger effective sample size of $\frac{1}{1 - 0.9} = 10$. We reduce the learning rate slightly to $0.01$ to keep matters under control.
+Lorsque nous augmentons l'hyperparamètre de momentum `momentum` à 0,9, cela équivaut à une taille d'échantillon effective nettement plus importante de $\frac{1}{1 - 0.9} = 10$. Nous réduisons légèrement le taux d'apprentissage à $0.01$ pour garder le contrôle.
 
 ```{.python .input}
 #@tab all
 train_momentum(0.01, 0.9)
 ```
 
-Reducing the learning rate further addresses any issue of non-smooth optimization problems. Setting it to $0.005$ yields good convergence properties.
+La réduction du taux d'apprentissage permet de résoudre les problèmes d'optimisation non lisse. En le fixant à $0.005$, on obtient de bonnes propriétés de convergence.
 
 ```{.python .input}
 #@tab all
 train_momentum(0.005, 0.9)
 ```
 
-### Concise Implementation
+### Mise en œuvre concise
 
-There is very little to do in Gluon since the standard `sgd` solver already had momentum built in. Setting matching parameters yields a very similar trajectory.
+Il y a très peu à faire dans Gluon puisque le solveur standard `sgd` a déjà intégré le momentum. Le réglage des paramètres correspondants donne une trajectoire très similaire.
 
 ```{.python .input}
 #@tab mxnet
@@ -246,31 +246,31 @@ d2l.train_concise_ch11(trainer, {'learning_rate': 0.005, 'momentum': 0.9},
                        data_iter)
 ```
 
-## Theoretical Analysis
+### Analyse théorique
 
-So far the 2D example of $f(x) = 0.1 x_1^2 + 2 x_2^2$ seemed rather contrived. We will now see that this is actually quite representative of the types of problem one might encounter, at least in the case of minimizing convex quadratic objective functions.
+Jusqu'à présent, l'exemple 2D de $f(x) = 0.1 x_1^2 + 2 x_2^2$ semblait plutôt artificiel. Nous allons maintenant voir qu'il est en fait assez représentatif des types de problèmes que l'on peut rencontrer, du moins dans le cas de la minimisation de fonctions objectives quadratiques convexes.
 
-### Quadratic Convex Functions
+### Fonctions convexes quadratiques
 
-Consider the function
+Considérons la fonction
 
-$$h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top \mathbf{Q} \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b.$$
+$$h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top \mathbf{Q} \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b.$$ 
 
-This is a general quadratic function. For positive definite matrices $\mathbf{Q} \succ 0$, i.e., for matrices with positive eigenvalues this has a minimizer at $\mathbf{x}^* = -\mathbf{Q}^{-1} \mathbf{c}$ with minimum value $b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}$. Hence we can rewrite $h$ as
+ Il s'agit d'une fonction quadratique générale. Pour les matrices définies positives $\mathbf{Q} \succ 0$, c'est-à-dire pour les matrices avec des valeurs propres positives, cette fonction a un minimiseur à $\mathbf{x}^* = -\mathbf{Q}^{-1} \mathbf{c}$ avec une valeur minimale $b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}$. Nous pouvons donc réécrire $h$ comme suit :
 
-$$h(\mathbf{x}) = \frac{1}{2} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})^\top \mathbf{Q} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c}) + b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}.$$
+$$h(\mathbf{x}) = \frac{1}{2} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})^\top \mathbf{Q} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c}) + b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}.$$ 
 
-The gradient is given by $\partial_{\mathbf{x}} h(\mathbf{x}) = \mathbf{Q} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$. That is, it is given by the distance between $\mathbf{x}$ and the minimizer, multiplied by $\mathbf{Q}$. Consequently also the momentum  is a linear combination of terms $\mathbf{Q} (\mathbf{x}_t - \mathbf{Q}^{-1} \mathbf{c})$.
+ Le gradient est donné par $\partial_{\mathbf{x}} h(\mathbf{x}) = \mathbf{Q} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$. C'est-à-dire qu'il est donné par la distance entre $\mathbf{x}$ et le minimiseur, multipliée par $\mathbf{Q}$. Par conséquent, l'élan est également une combinaison linéaire de termes $\mathbf{Q} (\mathbf{x}_t - \mathbf{Q}^{-1} \mathbf{c})$.
 
-Since $\mathbf{Q}$ is positive definite it can be decomposed into its eigensystem via $\mathbf{Q} = \mathbf{O}^\top \boldsymbol{\Lambda} \mathbf{O}$ for an orthogonal (rotation) matrix $\mathbf{O}$ and a diagonal matrix $\boldsymbol{\Lambda}$ of positive eigenvalues. This allows us to perform a change of variables from $\mathbf{x}$ to $\mathbf{z} := \mathbf{O} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$ to obtain a much simplified expression:
+Puisque $\mathbf{Q}$ est définie positive, elle peut être décomposée en son système propre via $\mathbf{Q} = \mathbf{O}^\top \boldsymbol{\Lambda} \mathbf{O}$ pour une matrice orthogonale (rotation) $\mathbf{O}$ et une matrice diagonale $\boldsymbol{\Lambda}$ de valeurs propres positives. Cela nous permet d'effectuer un changement de variables de $\mathbf{x}$ à $\mathbf{z} := \mathbf{O} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$ pour obtenir une expression beaucoup plus simple :
 
-$$h(\mathbf{z}) = \frac{1}{2} \mathbf{z}^\top \boldsymbol{\Lambda} \mathbf{z} + b'.$$
+$$h(\mathbf{z}) = \frac{1}{2} \mathbf{z}^\top \boldsymbol{\Lambda} \mathbf{z} + b'.$$ 
 
-Here $b' = b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}$. Since $\mathbf{O}$ is only an orthogonal matrix this does not perturb the gradients in a meaningful way. Expressed in terms of $\mathbf{z}$ gradient descent becomes
+ Ici $b' = b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}$. Comme $\mathbf{O}$ n'est qu'une matrice orthogonale, cela ne perturbe pas les gradients de manière significative. Exprimée en termes de $\mathbf{z}$ la descente de gradient devient
 
-$$\mathbf{z}_t = \mathbf{z}_{t-1} - \boldsymbol{\Lambda} \mathbf{z}_{t-1} = (\mathbf{I} - \boldsymbol{\Lambda}) \mathbf{z}_{t-1}.$$
+$$\mathbf{z}_t = \mathbf{z}_{t-1} - \boldsymbol{\Lambda} \mathbf{z}_{t-1} = (\mathbf{I} - \boldsymbol{\Lambda}) \mathbf{z}_{t-1}.$$ 
 
-The important fact in this expression is that gradient descent *does not mix* between different eigenspaces. That is, when expressed in terms of the eigensystem of $\mathbf{Q}$ the optimization problem proceeds in a coordinate-wise manner. This also holds for momentum.
+ Le fait important dans cette expression est que la descente de gradient *ne mélange pas* entre différents espaces propres. En d'autres termes, lorsqu'elle est exprimée en termes de système propre de $\mathbf{Q}$, le problème d'optimisation se déroule dans le sens des coordonnées. Ceci est également valable pour la quantité de mouvement.
 
 $$\begin{aligned}
 \mathbf{v}_t & = \beta \mathbf{v}_{t-1} + \boldsymbol{\Lambda} \mathbf{z}_{t-1} \\
@@ -278,15 +278,15 @@ $$\begin{aligned}
     & = (\mathbf{I} - \eta \boldsymbol{\Lambda}) \mathbf{z}_{t-1} - \eta \beta \mathbf{v}_{t-1}.
 \end{aligned}$$
 
-In doing this we just proved the following theorem: Gradient Descent with and without momentum for a convex quadratic function decomposes into coordinate-wise optimization in the direction of the eigenvectors of the quadratic matrix.
+Ce faisant, nous venons de prouver le théorème suivant : La descente de gradient avec et sans momentum pour une fonction quadratique convexe se décompose en une optimisation par coordonnées dans la direction des vecteurs propres de la matrice quadratique.
 
-### Scalar Functions
+### Fonctions scalaires
 
-Given the above result let's see what happens when we minimize the function $f(x) = \frac{\lambda}{2} x^2$. For gradient descent we have
+Compte tenu du résultat ci-dessus, voyons ce qui se passe lorsque nous minimisons la fonction $f(x) = \frac{\lambda}{2} x^2$. Pour la descente du gradient, nous avons
 
-$$x_{t+1} = x_t - \eta \lambda x_t = (1 - \eta \lambda) x_t.$$
+$$x_{t+1} = x_t - \eta \lambda x_t = (1 - \eta \lambda) x_t.$$ 
 
-Whenever $|1 - \eta \lambda| < 1$ this optimization converges at an exponential rate since after $t$ steps we have $x_t = (1 - \eta \lambda)^t x_0$. This shows how the rate of convergence improves initially as we increase the learning rate $\eta$ until $\eta \lambda = 1$. Beyond that things diverge and for $\eta \lambda > 2$ the optimization problem diverges.
+ Chaque fois que $|1 - \eta \lambda| < 1$ cette optimisation converge à un taux exponentiel puisqu'après $t$ étapes nous avons $x_t = (1 - \eta \lambda)^t x_0$. Cela montre comment le taux de convergence s'améliore initialement à mesure que nous augmentons le taux d'apprentissage $\eta$ jusqu'à $\eta \lambda = 1$. Au-delà, les choses divergent et pour $\eta \lambda > 2$ le problème d'optimisation diverge.
 
 ```{.python .input}
 #@tab all
@@ -300,7 +300,7 @@ d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```
 
-To analyze convergence in the case of momentum we begin by rewriting the update equations in terms of two scalars: one for $x$ and one for the momentum $v$. This yields:
+Pour analyser la convergence dans le cas du momentum, nous commençons par réécrire les équations de mise à jour en termes de deux scalaires : un pour $x$ et un pour le momentum $v$. Cela donne :
 
 $$
 \begin{bmatrix} v_{t+1} \\ x_{t+1} \end{bmatrix} =
@@ -308,23 +308,23 @@ $$
 \begin{bmatrix} v_{t} \\ x_{t} \end{bmatrix} = \mathbf{R}(\beta, \eta, \lambda) \begin{bmatrix} v_{t} \\ x_{t} \end{bmatrix}.
 $$
 
-We used $\mathbf{R}$ to denote the $2 \times 2$ governing convergence behavior. After $t$ steps the initial choice $[v_0, x_0]$ becomes $\mathbf{R}(\beta, \eta, \lambda)^t [v_0, x_0]$. Hence, it is up to the eigenvalues of $\mathbf{R}$ to determine the speed of convergence. See the [Distill post](https://distill.pub/2017/momentum/) of :cite:`Goh.2017` for a great animation and :cite:`Flammarion.Bach.2015` for a detailed analysis. One can show that $0 < \eta \lambda < 2 + 2 \beta$ momentum converges. This is a larger range of feasible parameters when compared to $0 < \eta \lambda < 2$ for gradient descent. It also suggests that in general large values of $\beta$ are desirable. Further details require a fair amount of technical detail and we suggest that the interested reader consult the original publications.
+Nous avons utilisé $\mathbf{R}$ pour désigner le $2 \times 2$ qui régit le comportement de convergence. Après $t$ étapes, le choix initial $[v_0, x_0]$ devient $\mathbf{R}(\beta, \eta, \lambda)^t [v_0, x_0]$. Par conséquent, ce sont les valeurs propres de $\mathbf{R}$ qui déterminent la vitesse de convergence. Voir les sites [Distill post](https://distill.pub/2017/momentum/) de :cite:`Goh.2017` pour une belle animation et :cite:`Flammarion.Bach.2015` pour une analyse détaillée. On peut montrer que l'élan de $0 < \eta \lambda < 2 + 2 \beta$ converge. Il s'agit d'une plus grande plage de paramètres réalisables par rapport à $0 < \eta \lambda < 2$ pour la descente de gradient. Cela suggère également qu'en général, de grandes valeurs de $\beta$ sont souhaitables. D'autres détails nécessitent une quantité assez importante de détails techniques et nous suggérons au lecteur intéressé de consulter les publications originales.
 
-## Summary
+## Résumé
 
-* Momentum replaces gradients with a leaky average over past gradients. This accelerates convergence significantly.
-* It is desirable for both noise-free gradient descent and (noisy) stochastic gradient descent.
-* Momentum prevents stalling of the optimization process that is much more likely to occur for stochastic gradient descent.
-* The effective number of gradients is given by $\frac{1}{1-\beta}$ due to exponentiated downweighting of past data.
-* In the case of convex quadratic problems this can be analyzed explicitly in detail.
-* Implementation is quite straightforward but it requires us to store an additional state vector (momentum $\mathbf{v}$).
+* Momentum remplace les gradients par une moyenne fuyante des gradients passés. Cela accélère la convergence de manière significative.
+* Il est souhaitable à la fois pour la descente de gradient sans bruit et la descente de gradient stochastique (bruyante).
+* Le momentum empêche le blocage du processus d'optimisation qui est beaucoup plus susceptible de se produire pour la descente par gradient stochastique.
+* Le nombre effectif de gradients est donné par $\frac{1}{1-\beta}$ en raison de la repondération exponentielle des données passées.
+* Dans le cas de problèmes convexes quadratiques, ceci peut être analysé explicitement en détail.
+* L'implémentation est assez simple, mais elle nécessite de stocker un vecteur d'état supplémentaire (momentum $\mathbf{v}$).
 
-## Exercises
+## Exercices
 
-1. Use other combinations of momentum hyperparameters and learning rates and observe and analyze the different experimental results.
-1. Try out GD and momentum for a quadratic problem where you have multiple eigenvalues, i.e., $f(x) = \frac{1}{2} \sum_i \lambda_i x_i^2$, e.g., $\lambda_i = 2^{-i}$. Plot how the values of $x$ decrease for the initialization $x_i = 1$.
-1. Derive minimum value and minimizer for $h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top \mathbf{Q} \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b$.
-1. What changes when we perform stochastic gradient descent with momentum? What happens when we use minibatch stochastic gradient descent with momentum? Experiment with the parameters?
+1. Utilisez d'autres combinaisons d'hyperparamètres de momentum et de taux d'apprentissage et observez et analysez les différents résultats expérimentaux.
+1. Essayez GD et le momentum pour un problème quadratique où vous avez plusieurs valeurs propres, c'est-à-dire $f(x) = \frac{1}{2} \sum_i \lambda_i x_i^2$, par exemple $\lambda_i = 2^{-i}$. Tracez comment les valeurs de $x$ diminuent pour l'initialisation $x_i = 1$.
+1. Déterminez la valeur minimale et le minimiseur pour $h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top \mathbf{Q} \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b$.
+1. Qu'est-ce qui change lorsque nous effectuons une descente de gradient stochastique avec momentum ? Que se passe-t-il lorsque nous utilisons la descente de gradient stochastique en minibatch avec momentum ? Expérimentez avec les paramètres ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/354)

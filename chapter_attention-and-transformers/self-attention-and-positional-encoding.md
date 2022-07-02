@@ -3,27 +3,27 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-# Self-Attention and Positional Encoding
-:label:`sec_self-attention-and-positional-encoding`
+# Auto-attention et encodage positionnel
+:label:`sec_self-attention-and-positional-encoding` 
 
-In deep learning,
-we often use CNNs or RNNs to encode a sequence.
-Now with attention mechanisms,
-imagine that we feed a sequence of tokens
-into attention pooling
-so that
-the same set of tokens
-act as queries, keys, and values.
-Specifically,
-each query attends to all the key-value pairs
-and generates one attention output.
-Since the queries, keys, and values
-come from the same place,
-this performs
-*self-attention* :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017`, which is also called *intra-attention* :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017`.
-In this section,
-we will discuss sequence encoding using self-attention,
-including using additional information for the sequence order.
+ En apprentissage profond,
+nous utilisons souvent des CNN ou des RNN pour encoder une séquence.
+Maintenant, avec les mécanismes d'attention,
+imaginez que nous introduisons une séquence d'éléments verbaux
+dans un groupement d'attention
+de sorte que
+le même ensemble d'éléments verbaux
+agisse comme des requêtes, des clés et des valeurs.
+Plus précisément,
+chaque requête s'occupe de toutes les paires clé-valeur
+et génère une sortie d'attention.
+Puisque les requêtes, les clés et les valeurs
+proviennent du même endroit,
+réalise
+ une *auto-attention* :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017` , qui est également appelée *intra-attention* :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017` .
+Dans cette section,
+nous discuterons du codage de séquence utilisant l'auto-attention,
+y compris l'utilisation d'informations supplémentaires pour l'ordre de la séquence.
 
 ```{.python .input}
 %%tab mxnet
@@ -51,22 +51,22 @@ import tensorflow as tf
 
 ## [**Self-Attention**]
 
-Given a sequence of input tokens
-$\mathbf{x}_1, \ldots, \mathbf{x}_n$ where any $\mathbf{x}_i \in \mathbb{R}^d$ ($1 \leq i \leq n$),
-its self-attention outputs
-a sequence of the same length
-$\mathbf{y}_1, \ldots, \mathbf{y}_n$,
-where
+Étant donné une séquence de jetons d'entrée
+$\mathbf{x}_1, \ldots, \mathbf{x}_n$ où tout $\mathbf{x}_i \in \mathbb{R}^d$ ($1 \leq i \leq n$),
+son auto-attention produit
+une séquence de même longueur
+$\mathbf{y}_1, \ldots, \mathbf{y}_n$ ,
+où
 
-$$\mathbf{y}_i = f(\mathbf{x}_i, (\mathbf{x}_1, \mathbf{x}_1), \ldots, (\mathbf{x}_n, \mathbf{x}_n)) \in \mathbb{R}^d$$
+$$\mathbf{y}_i = f(\mathbf{x}_i, (\mathbf{x}_1, \mathbf{x}_1), \ldots, (\mathbf{x}_n, \mathbf{x}_n)) \in \mathbb{R}^d$$ 
 
-according to the definition of attention pooling $f$ in
-:eqref:`eq_attn-pooling-def`.
-Using multi-head attention,
-the following code snippet
-computes the self-attention of a tensor
-with shape (batch size, number of time steps or sequence length in tokens, $d$).
-The output tensor has the same shape.
+ selon la définition de la mise en commun de l'attention $f$ dans
+:eqref:`eq_attn-pooling-def` .
+En utilisant l'attention multi-têtes,
+l'extrait de code suivant
+calcule l'auto-attention d'un tenseur
+avec la forme (taille du lot, nombre d'étapes temporelles ou longueur de la séquence en tokens, $d$).
+Le tenseur de sortie a la même forme.
 
 ```{.python .input}
 %%tab mxnet
@@ -104,125 +104,125 @@ d2l.check_shape(attention(X, X, X, valid_lens, training=False),
                 (batch_size, num_queries, num_hiddens))
 ```
 
-## Comparing CNNs, RNNs, and Self-Attention
-:label:`subsec_cnn-rnn-self-attention`
 
-Let's
-compare architectures for mapping
-a sequence of $n$ tokens
-to another sequence of equal length,
-where each input or output token is represented by
-a $d$-dimensional vector.
-Specifically,
-we will consider CNNs, RNNs, and self-attention.
-We will compare their
-computational complexity, 
-sequential operations,
-and maximum path lengths.
-Note that sequential operations prevent parallel computation,
-while a shorter path between
-any combination of sequence positions
-makes it easier to learn long-range dependencies within the sequence :cite:`Hochreiter.Bengio.Frasconi.ea.2001`.
+## Comparaison des CNN, des RNN et de l'auto-attention
+:label:`subsec_cnn-rnn-self-attention` 
+
+ Comparons les architectures permettant de mettre en correspondance
+une séquence de $n$ tokens
+avec une autre séquence de longueur égale,
+où chaque token d'entrée ou de sortie est représenté par
+un vecteur $d$-dimensionnel.
+Plus précisément,
+nous considérerons les CNN, les RNN et l'auto-attention.
+Nous comparerons leur complexité de calcul
+, les opérations séquentielles 
+,
+et les longueurs maximales des chemins.
+Notez que les opérations séquentielles empêchent le calcul parallèle,
+alors qu'un chemin plus court entre
+toute combinaison de positions de séquence
+facilite l'apprentissage des dépendances à longue portée au sein de la séquence :cite:`Hochreiter.Bengio.Frasconi.ea.2001` .
 
 
-![Comparing CNN (padding tokens are omitted), RNN, and self-attention architectures.](../img/cnn-rnn-self-attention.svg)
-:label:`fig_cnn-rnn-self-attention`
+![Comparing CNN (padding tokens are omitted) les architectures RNN, RNN et auto-attention](../img/cnn-rnn-self-attention.svg)
+:label:`fig_cnn-rnn-self-attention` 
 
-Consider a convolutional layer whose kernel size is $k$.
-We will provide more details about sequence processing
-using CNNs in later chapters.
-For now,
-we only need to know that
-since the sequence length is $n$,
-the numbers of input and output channels are both $d$,
-the computational complexity of the convolutional layer is $\mathcal{O}(knd^2)$.
-As :numref:`fig_cnn-rnn-self-attention` shows,
-CNNs are hierarchical  so 
-there are $\mathcal{O}(1)$ sequential operations
-and the maximum path length is $\mathcal{O}(n/k)$.
-For example, $\mathbf{x}_1$ and $\mathbf{x}_5$
-are within the receptive field of a two-layer CNN
-with kernel size 3 in :numref:`fig_cnn-rnn-self-attention`.
+ Considérons une couche convolutive dont la taille du noyau est $k$.
+Nous fournirons plus de détails sur le traitement des séquences
+à l'aide des CNN dans les chapitres suivants.
+Pour l'instant,
+nous avons seulement besoin de savoir que
+puisque la longueur de la séquence est $n$,
+le nombre de canaux d'entrée et de sortie est $d$,
+la complexité de calcul de la couche convolutionnelle est $\mathcal{O}(knd^2)$.
+Comme le montre :numref:`fig_cnn-rnn-self-attention` ,
+les CNN sont hiérarchiques donc 
+il y a $\mathcal{O}(1)$ opérations séquentielles
+et la longueur maximale du chemin est $\mathcal{O}(n/k)$.
+Par exemple, $\mathbf{x}_1$ et $\mathbf{x}_5$
+ sont dans le champ réceptif d'un CNN à deux couches
+avec un noyau de taille 3 dans :numref:`fig_cnn-rnn-self-attention` .
 
-When updating the hidden state of RNNs,
-multiplication of the $d \times d$ weight matrix
-and the $d$-dimensional hidden state has 
-a computational complexity of $\mathcal{O}(d^2)$.
-Since the sequence length is $n$,
-the computational complexity of the recurrent layer
-is $\mathcal{O}(nd^2)$.
-According to :numref:`fig_cnn-rnn-self-attention`,
-there are $\mathcal{O}(n)$ sequential operations
-that cannot be parallelized
-and the maximum path length is also $\mathcal{O}(n)$.
+Lors de la mise à jour de l'état caché des RNN,
+la multiplication de la matrice de poids $d \times d$
+ et de l'état caché $d$-dimensionnel a 
+une complexité de calcul de $\mathcal{O}(d^2)$.
+La longueur de la séquence étant $n$,
+la complexité de calcul de la couche récurrente
+est $\mathcal{O}(nd^2)$.
+Selon :numref:`fig_cnn-rnn-self-attention` ,
+il existe $\mathcal{O}(n)$ des opérations séquentielles
+qui ne peuvent pas être parallélisées
+et la longueur maximale du chemin est également $\mathcal{O}(n)$.
 
-In self-attention,
-the queries, keys, and values 
-are all $n \times d$ matrices.
-Consider the scaled dot-product attention in
-:eqref:`eq_softmax_QK_V`,
-where a $n \times d$ matrix is multiplied by
-a $d \times n$ matrix,
-then the output $n \times n$ matrix is multiplied
-by a $n \times d$ matrix.
-As a result,
-the self-attention
-has a $\mathcal{O}(n^2d)$ computational complexity.
-As we can see in :numref:`fig_cnn-rnn-self-attention`,
-each token is directly connected
-to any other token via self-attention.
-Therefore,
-computation can be parallel with $\mathcal{O}(1)$ sequential operations
-and the maximum path length is also $\mathcal{O}(1)$.
+Dans l'auto-attention,
+les requêtes, les clés et les valeurs 
+sont toutes des matrices $n \times d$.
+Considérons l'attention par produit scalaire dans
+:eqref:`eq_softmax_QK_V` ,
+où une matrice $n \times d$ est multipliée par
+une matrice $d \times n$,
+puis la matrice de sortie $n \times n$ est multipliée
+par une matrice $n \times d$.
+Par conséquent,
+l'auto-attention
+a une complexité computationnelle de $\mathcal{O}(n^2d)$.
+Comme nous pouvons le voir sur :numref:`fig_cnn-rnn-self-attention` ,
+chaque jeton est directement connecté
+à tout autre jeton via l'auto-attention.
+Par conséquent, le calcul de
+peut être parallèle à $\mathcal{O}(1)$ opérations séquentielles
+et la longueur maximale du chemin est également $\mathcal{O}(1)$.
 
-All in all,
-both CNNs and self-attention enjoy parallel computation
-and self-attention has the shortest maximum path length.
-However, the quadratic computational complexity with respect to the sequence length
-makes self-attention prohibitively slow for very long sequences.
+Dans l'ensemble,
+, les CNN et l'auto-attention bénéficient tous deux d'un calcul parallèle
+et l'auto-attention présente la longueur de chemin maximale la plus courte.
+Cependant, la complexité de calcul quadratique par rapport à la longueur de la séquence
+rend l'auto-attention prohibitivement lente pour les très longues séquences.
 
 
 
 
 
 ## [**Positional Encoding**]
-:label:`subsec_positional-encoding`
+:label:`subsec_positional-encoding` 
 
+ 
+ Contrairement aux RNN qui traitent de manière récurrente
+les tokens d'une séquence un par un,
+l'auto-attention abandonne
+les opérations séquentielles en faveur de 
+le calcul parallèle.
+Pour utiliser les informations sur l'ordre des séquences,
+nous pouvons injecter
+des informations positionnelles absolues ou relatives
 
-Unlike RNNs that recurrently process
-tokens of a sequence one by one,
-self-attention ditches
-sequential operations in favor of 
-parallel computation.
-To use the sequence order information,
-we can inject
-absolute or relative
-positional information
-by adding *positional encoding*
-to the input representations.
-Positional encodings can be 
-either learned or fixed.
-In the following, 
-we describe a fixed positional encoding
-based on sine and cosine functions :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
+ en ajoutant un *codage positionnel*
+aux représentations d'entrée.
+Les codages positionnels peuvent être 
+soit appris, soit fixés.
+Dans ce qui suit, 
+nous décrivons un codage positionnel fixe
+basé sur les fonctions sinus et cosinus :cite:`Vaswani.Shazeer.Parmar.ea.2017` .
 
-Suppose that
-the input representation $\mathbf{X} \in \mathbb{R}^{n \times d}$ contains the $d$-dimensional embeddings for $n$ tokens of a sequence.
-The positional encoding outputs
-$\mathbf{X} + \mathbf{P}$
-using a positional embedding matrix $\mathbf{P} \in \mathbb{R}^{n \times d}$ of the same shape,
-whose element on the $i^\mathrm{th}$ row 
-and the $(2j)^\mathrm{th}$
-or the $(2j + 1)^\mathrm{th}$ column is
+Supposons que
+la représentation d'entrée $\mathbf{X} \in \mathbb{R}^{n \times d}$ contienne les enchâssements $d$-dimensionnels pour $n$ les tokens d'une séquence.
+Le codage positionnel produit
+$\mathbf{X} + \mathbf{P}$ 
+ en utilisant une matrice d'enchâssement positionnel $\mathbf{P} \in \mathbb{R}^{n \times d}$ de même forme,
+dont l'élément sur la ligne $i^\mathrm{th}$ 
+ et la colonne $(2j)^\mathrm{th}$
+ ou $(2j + 1)^\mathrm{th}$ est
 
-$$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),\\p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).\end{aligned}$$
-:eqlabel:`eq_positional-encoding-def`
+$$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),\\p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).\end{aligned}$$ 
+ :eqlabel:`eq_positional-encoding-def` 
 
-At first glance,
-this trigonometric-function
-design looks weird.
-Before explanations of this design,
-let's first implement it in the following `PositionalEncoding` class.
+ Au premier abord,
+cette conception de la fonction trigonométrique
+semble bizarre.
+Avant d'expliquer cette conception,
+commençons par l'implémenter dans la classe `PositionalEncoding` suivante.
 
 ```{.python .input}
 %%tab mxnet
@@ -286,19 +286,19 @@ class PositionalEncoding(tf.keras.layers.Layer):
         return self.dropout(X, **kwargs)
 ```
 
-In the positional embedding matrix $\mathbf{P}$,
-[**rows correspond to positions within a sequence
-and columns represent different positional encoding dimensions**].
-In the example below,
-we can see that
-the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$
-columns of the positional embedding matrix 
-have a higher frequency than 
-the $8^{\mathrm{th}}$ and the $9^{\mathrm{th}}$
-columns.
-The offset between 
-the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$ (same for the $8^{\mathrm{th}}$ and the $9^{\mathrm{th}}$) columns
-is due to the alternation of sine and cosine functions.
+Dans la matrice d'encastrement positionnel $\mathbf{P}$,
+[**les lignes correspondent à des positions dans une séquence
+et les colonnes représentent différentes dimensions d'encodage positionnel**].
+Dans l'exemple ci-dessous,
+nous pouvons voir que
+les colonnes $6^{\mathrm{th}}$ et $7^{\mathrm{th}}$
+ de la matrice d'encastrement positionnel 
+ont une fréquence plus élevée que 
+les colonnes $8^{\mathrm{th}}$ et $9^{\mathrm{th}}$
+ .
+Le décalage entre les colonnes 
+, $6^{\mathrm{th}}$ et $7^{\mathrm{th}}$ (idem pour les colonnes $8^{\mathrm{th}}$ et $9^{\mathrm{th}}$)
+est dû à l'alternance des fonctions sinus et cosinus.
 
 ```{.python .input}
 %%tab mxnet
@@ -331,13 +331,13 @@ d2l.plot(np.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
          figsize=(6, 2.5), legend=["Col %d" % d for d in np.arange(6, 10)])
 ```
 
-### Absolute Positional Information
+### Information de position absolue
 
-To see how the monotonically decreased frequency
-along the encoding dimension relates to absolute positional information,
-let's print out [**the binary representations**] of $0, 1, \ldots, 7$.
-As we can see,
-the lowest bit, the second-lowest bit, and the third-lowest bit alternate on every number, every two numbers, and every four numbers, respectively.
+Pour voir comment la fréquence monotone décroissante
+le long de la dimension de codage est liée à l'information de position absolue,
+imprimons [**les représentations binaires**] de $0, 1, \ldots, 7$.
+Comme nous pouvons le voir,
+le bit le plus bas, le deuxième bit le plus bas et le troisième bit le plus bas alternent sur chaque nombre, tous les deux nombres et tous les quatre nombres, respectivement.
 
 ```{.python .input}
 %%tab all
@@ -345,17 +345,17 @@ for i in range(8):
     print(f'{i} in binary is {i:>03b}')
 ```
 
-In binary representations,
-a higher bit has a lower frequency than a lower bit.
-Similarly,
-as demonstrated in the heat map below,
-[**the positional encoding decreases
-frequencies along the encoding dimension**]
-by using trigonometric functions.
-Since the outputs are float numbers,
-such continuous representations
-are more space-efficient
-than binary representations.
+Dans les représentations binaires,
+un bit supérieur a une fréquence plus faible qu'un bit inférieur.
+De même,
+comme le montre la carte thermique ci-dessous,
+[**le codage positionnel diminue
+les fréquences le long de la dimension de codage**]
+en utilisant des fonctions trigonométriques.
+Comme les sorties sont des nombres flottants,
+de telles représentations continues
+sont plus efficaces en termes d'espace
+que les représentations binaires.
 
 ```{.python .input}
 %%tab mxnet
@@ -378,28 +378,28 @@ d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
                   ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
 ```
 
-### Relative Positional Information
+### Informations sur la position relative
 
-Besides capturing absolute positional information,
-the above positional encoding
-also allows
-a model to easily learn to attend by relative positions.
-This is because
-for any fixed position offset $\delta$,
-the positional encoding at position $i + \delta$
-can be represented by a linear projection
-of that at position $i$.
+Outre la capture d'informations sur la position absolue,
+le codage positionnel ci-dessus
+permet également à
+un modèle d'apprendre facilement à assister à des positions relatives.
+En effet,
+pour tout décalage de position fixe $\delta$,
+le codage positionnel à la position $i + \delta$
+ peut être représenté par une projection linéaire
+de celui à la position $i$.
 
 
-This projection can be explained
-mathematically.
-Denoting
-$\omega_j = 1/10000^{2j/d}$,
-any pair of $(p_{i, 2j}, p_{i, 2j+1})$ 
-in :eqref:`eq_positional-encoding-def`
-can 
-be linearly projected to $(p_{i+\delta, 2j}, p_{i+\delta, 2j+1})$
-for any fixed offset $\delta$:
+Cette projection peut être expliquée
+mathématiquement.
+En désignant
+$\omega_j = 1/10000^{2j/d}$ ,
+toute paire de $(p_{i, 2j}, p_{i, 2j+1})$ 
+ dans :eqref:`eq_positional-encoding-def` 
+ peut 
+être projetée linéairement vers $(p_{i+\delta, 2j}, p_{i+\delta, 2j+1})$
+ pour tout décalage fixe $\delta$:
 
 $$\begin{aligned}
 &\begin{bmatrix} \cos(\delta \omega_j) & \sin(\delta \omega_j) \\  -\sin(\delta \omega_j) & \cos(\delta \omega_j) \\ \end{bmatrix}
@@ -410,20 +410,20 @@ $$\begin{aligned}
 \begin{bmatrix} p_{i+\delta, 2j} \\  p_{i+\delta, 2j+1} \\ \end{bmatrix},
 \end{aligned}$$
 
-where the $2\times 2$ projection matrix does not depend on any position index $i$.
+où la matrice de projection $2\times 2$ ne dépend d'aucun indice de position $i$.
 
-## Summary
+## Résumé
 
-* In self-attention, the queries, keys, and values all come from the same place.
-* Both CNNs and self-attention enjoy parallel computation and self-attention has the shortest maximum path length. However, the quadratic computational complexity with respect to the sequence length makes self-attention prohibitively slow for very long sequences.
-* To use the sequence order information, we can inject absolute or relative positional information by adding positional encoding to the input representations.
+* Dans l'auto-attention, les requêtes, les clés et les valeurs proviennent toutes du même endroit.
+* Les CNN et l'auto-attention apprécient le calcul parallèle et l'auto-attention a la longueur de chemin maximale la plus courte. Cependant, la complexité quadratique du calcul par rapport à la longueur de la séquence rend l'auto-attention prohibitivement lente pour les très longues séquences.
+* Pour utiliser les informations sur l'ordre des séquences, nous pouvons injecter des informations de position absolue ou relative en ajoutant un codage positionnel aux représentations d'entrée.
 
 
-## Exercises
+## Exercices
 
-1. Suppose that we design a deep architecture to represent a sequence by stacking self-attention layers with positional encoding. What could be issues?
-1. Can you design a learnable positional encoding method?
-1. Can we assign different learned embeddings according to different offsets between queries and keys that are compared in self-attention? Hint: you may refer to relative position embeddings :cite:`shaw2018self,huang2018music`.
+1. Supposons que nous concevions une architecture profonde pour représenter une séquence en empilant des couches d'auto-attention avec un encodage positionnel. Quels pourraient être les problèmes ?
+1. Pouvez-vous concevoir une méthode d'encodage positionnel apprenable ?
+1. Pouvons-nous attribuer différents encastrements appris en fonction des différents décalages entre les requêtes et les clés qui sont comparées dans l'auto-attention ? Indice : vous pouvez vous référer aux encastrements de position relative :cite:`shaw2018self,huang2018music` .
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/1651)

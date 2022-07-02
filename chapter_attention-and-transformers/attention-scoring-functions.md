@@ -3,72 +3,72 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-# Attention Scoring Functions
-:label:`sec_attention-scoring-functions`
+# Fonctions de notation de l'attention
+:label:`sec_attention-scoring-functions` 
 
-In :numref:`sec_nadaraya-watson`,
-we used a Gaussian kernel to model
-interactions between queries and keys.
-Treating the exponent of the Gaussian kernel
-in :eqref:`eq_nadaraya-watson-gaussian`
-as an *attention scoring function* (or *scoring function* for short),
-the results of this function were
-essentially fed into
-a softmax operation.
-As a result,
-we obtained
-a probability distribution (attention weights)
-over values that are paired with keys.
-In the end,
-the output of the attention pooling
-is simply a weighted sum of the values
-based on these attention weights.
+ Dans :numref:`sec_nadaraya-watson` ,
+nous avons utilisé un noyau gaussien pour modéliser
+les interactions entre les requêtes et les clés.
+En traitant l'exposant du noyau gaussien
+dans :eqref:`eq_nadaraya-watson-gaussian` 
+ comme une *fonction de notation de l'attention* (ou *fonction de notation* pour faire court),
+les résultats de cette fonction ont été
+essentiellement introduits dans
+une opération softmax.
+En conséquence,
+nous avons obtenu
+une distribution de probabilité (poids d'attention)
+sur les valeurs qui sont appariées avec des clés.
+Au final,
+la sortie de la mise en commun de l'attention
+est simplement une somme pondérée des valeurs
+basée sur ces poids d'attention.
 
-At a high level,
-we can use the above algorithm
-to instantiate the framework of attention mechanisms
-in :numref:`fig_qkv`.
-Denoting an attention scoring function by $a$,
-:numref:`fig_attention_output`
-illustrates how the output of attention pooling
-can be computed as a weighted sum of values.
-Since attention weights are
-a probability distribution,
-the weighted sum is essentially
-a weighted average.
+À un niveau élevé,
+nous pouvons utiliser l'algorithme ci-dessus
+pour instancier le cadre des mécanismes d'attention
+dans :numref:`fig_qkv` .
+En désignant une fonction d'évaluation de l'attention par $a$,
+:numref:`fig_attention_output` 
+ illustre la façon dont la sortie du regroupement de l'attention
+peut être calculée comme une somme pondérée de valeurs.
+Puisque les poids d'attention sont
+une distribution de probabilité,
+la somme pondérée est essentiellement
+une moyenne pondérée.
 
 ![Computing the output of attention pooling as a weighted average of values.](../img/attention-output.svg)
 :label:`fig_attention_output`
 
 
 
-Mathematically,
-suppose that we have
-a query $\mathbf{q} \in \mathbb{R}^q$
-and $m$ key-value pairs $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)$, where any $\mathbf{k}_i \in \mathbb{R}^k$ and any $\mathbf{v}_i \in \mathbb{R}^v$.
-The attention pooling $f$
-is instantiated as a weighted sum of the values:
+Mathématiquement,
+suppose que nous avons
+une requête $\mathbf{q} \in \mathbb{R}^q$
+ et $m$ des paires clé-valeur $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)$, où tout $\mathbf{k}_i \in \mathbb{R}^k$ et tout $\mathbf{v}_i \in \mathbb{R}^v$.
+La mise en commun de l'attention $f$
+ est instanciée comme une somme pondérée des valeurs :
 
-$$f(\mathbf{q}, (\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)) = \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$
-:eqlabel:`eq_attn-pooling-def`
+$$f(\mathbf{q}, (\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)) = \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$ 
+ :eqlabel:`eq_attn-pooling-def` 
 
-where
-the attention weight (scalar) for the query $\mathbf{q}$
-and key $\mathbf{k}_i$
-is computed by
-the softmax operation of
-an attention scoring function $a$ that maps two vectors to a scalar:
+ où
+le poids de l'attention (scalaire) pour la requête $\mathbf{q}$
+ et la clé $\mathbf{k}_i$
+ est calculé par
+l'opération softmax de
+une fonction de notation de l'attention $a$ qui fait correspondre deux vecteurs à un scalaire :
 
 $$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i)) = \frac{\exp(a(\mathbf{q}, \mathbf{k}_i))}{\sum_{j=1}^m \exp(a(\mathbf{q}, \mathbf{k}_j))} \in \mathbb{R}.$$
 :eqlabel:`eq_attn-scoring-alpha`
 
-As we can see,
-different choices of the attention scoring function $a$
-lead to different behaviors of attention pooling.
-In this section,
-we introduce two popular scoring functions
-that we will use to develop more
-sophisticated attention mechanisms later.
+Comme nous pouvons le constater,
+différents choix de la fonction de notation de l'attention $a$
+ conduisent à différents comportements de mise en commun de l'attention.
+Dans cette section,
+nous présentons deux fonctions de notation populaires
+que nous utiliserons plus tard pour développer des mécanismes d'attention plus
+sophistiqués.
 
 ```{.python .input}
 %%tab mxnet
@@ -93,28 +93,28 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## [**Masked Softmax Operation**]
+## [**Opération Softmax masquée**]
 
-As we just mentioned,
-a softmax operation is used to
-output a probability distribution as attention weights.
-In some cases,
-not all the values should be fed into attention pooling.
-For instance,
-for efficient minibatch processing in :numref:`sec_machine_translation`,
-some text sequences are padded with
-special tokens that do not carry meaning.
-To get an attention pooling
-over
-only meaningful tokens as values,
-we can specify a valid sequence length (in number of tokens)
-to filter out those beyond this specified range
-when computing softmax.
-In this way,
-we can implement such a *masked softmax operation*
-in the following `masked_softmax` function,
-where any value beyond the valid length
-is masked as zero.
+Comme nous venons de le mentionner,
+une opération softmax est utilisée pour
+sortir une distribution de probabilité comme poids d'attention.
+Dans certains cas,
+toutes les valeurs ne doivent pas être introduites dans le regroupement d'attention.
+Par exemple,
+pour un traitement efficace des minilots dans :numref:`sec_machine_translation` ,
+certaines séquences de texte sont complétées par
+des tokens spéciaux qui ne sont pas porteurs de sens.
+Pour obtenir une mise en commun de l'attention
+sur
+uniquement des tokens significatifs comme valeurs,
+nous pouvons spécifier une longueur de séquence valide (en nombre de tokens)
+pour filtrer celles qui dépassent cette plage spécifiée
+lors du calcul du softmax.
+De cette façon,
+nous pouvons implémenter une telle opération de softmax *masquée*
+dans la fonction suivante `masked_softmax`,
+où toute valeur au-delà de la longueur valide
+est masquée comme étant nulle.
 
 ```{.python .input}
 %%tab mxnet
@@ -147,7 +147,7 @@ def masked_softmax(X, valid_lens):
         maxlen = X.size(1)
         mask = torch.arange((maxlen), dtype=torch.float32,
                             device=X.device)[None, :] < valid_len[:, None]
-        X[~mask] = value
+        X[~)mask] = value
         return X
     
     if valid_lens is None:
@@ -196,13 +196,13 @@ def masked_softmax(X, valid_lens):
         return tf.nn.softmax(tf.reshape(X, shape=shape), axis=-1)
 ```
 
-To [**demonstrate how this function works**],
-consider a minibatch of two $2 \times 4$ matrix examples,
-where the valid lengths for these two examples
-are two and three, respectively.
-As a result of the masked softmax operation,
-values beyond the valid lengths
-are all masked as zero.
+Pour [**démontrer le fonctionnement de cette fonction**],
+considère un minibatch de deux exemples de matrice $2 \times 4$,
+où les longueurs valides pour ces deux exemples
+sont respectivement deux et trois.
+À la suite de l'opération softmax masquée, les valeurs
+au-delà des longueurs valides
+sont toutes masquées comme étant nulles.
 
 ```{.python .input}
 %%tab mxnet
@@ -219,10 +219,10 @@ masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3]))
 masked_softmax(tf.random.uniform(shape=(2, 2, 4)), tf.constant([2, 3]))
 ```
 
-Similarly, we can also
-use a two-dimensional tensor
-to specify valid lengths
-for every row in each matrix example.
+De même, nous pouvons également
+utiliser un tenseur bidimensionnel
+pour spécifier les longueurs valides
+pour chaque ligne de chaque exemple de matrice.
 
 ```{.python .input}
 %%tab mxnet
@@ -241,29 +241,29 @@ masked_softmax(tf.random.uniform((2, 2, 4)), tf.constant([[1, 3], [2, 4]]))
 ```
 
 ## [**Additive Attention**]
-:label:`subsec_additive-attention`
+:label:`subsec_additive-attention` 
 
-In general,
-when queries and keys are vectors of different lengths,
-we can use additive attention
-as the scoring function.
-Given a query $\mathbf{q} \in \mathbb{R}^q$
-and a key $\mathbf{k} \in \mathbb{R}^k$,
-the *additive attention* scoring function
+ En général,
+lorsque les requêtes et les clés sont des vecteurs de longueurs différentes,
+nous pouvons utiliser l'attention additive
+comme fonction de notation.
+Étant donné une requête $\mathbf{q} \in \mathbb{R}^q$
+ et une clé $\mathbf{k} \in \mathbb{R}^k$,
+la fonction de notation de l'attention *additive*
 
-$$a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R},$$
-:eqlabel:`eq_additive-attn`
+$$a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R},$$ 
+ :eqlabel:`eq_additive-attn` 
 
-where
-learnable parameters
-$\mathbf W_q\in\mathbb R^{h\times q}$, $\mathbf W_k\in\mathbb R^{h\times k}$, and $\mathbf w_v\in\mathbb R^{h}$.
-Equivalent to :eqref:`eq_additive-attn`,
-the query and the key are concatenated
-and fed into an MLP with a single hidden layer
-whose number of hidden units is $h$, a hyperparameter.
-By using $\tanh$ as the activation function and disabling
-bias terms,
-we implement additive attention in the following.
+ où
+paramètres apprenables
+$\mathbf W_q\in\mathbb R^{h\times q}$ , $\mathbf W_k\in\mathbb R^{h\times k}$, et $\mathbf w_v\in\mathbb R^{h}$.
+Comme pour :eqref:`eq_additive-attn` ,
+la requête et la clé sont concaténées
+et introduites dans un MLP avec une seule couche cachée
+dont le nombre d'unités cachées est $h$, un hyperparamètre.
+En utilisant $\tanh$ comme fonction d'activation et en désactivant les termes de biais de
+,
+nous mettons en œuvre l'attention additive de la manière suivante.
 
 ```{.python .input}
 %%tab mxnet
@@ -358,14 +358,14 @@ class AdditiveAttention(tf.keras.layers.Layer):
             self.attention_weights, **kwargs), values)
 ```
 
-Let's [**demonstrate the above `AdditiveAttention` class**]
-with a toy example,
-where shapes (batch size, number of steps or sequence length in tokens, feature size)
-of queries, keys, and values
-are ($2$, $1$, $20$), ($2$, $10$, $2$),
-and ($2$, $10$, $4$), respectively.
-The attention pooling output
-has a shape of (batch size, number of steps for queries, feature size for values).
+Démontrons [**la classe `AdditiveAttention` **]
+ci-dessus à l'aide d'un exemple fictif,
+où les formes (taille du lot, nombre d'étapes ou longueur de la séquence en tokens, taille de la caractéristique)
+des requêtes, des clés et des valeurs
+sont ($2$, $1$, $20$), ($2$, $10$, $2$),
+et ($2$, $10$, $4$), respectivement.
+La sortie de la mise en commun de l'attention
+a une forme de (taille du lot, nombre d'étapes pour les requêtes, taille de la caractéristique pour les valeurs).
 
 ```{.python .input}
 %%tab mxnet
@@ -405,10 +405,10 @@ attention = AdditiveAttention(key_size=2, query_size=20, num_hiddens=8,
 attention(queries, keys, values, valid_lens, training=False)
 ```
 
-Although additive attention contains learnable parameters,
-since every key is the same in this example,
-[**the attention weights**] are uniform,
-determined by the specified valid lengths.
+Bien que l'attention additive contienne des paramètres apprenables,
+puisque chaque clé est la même dans cet exemple,
+[**les poids d'attention**] sont uniformes,
+déterminés par les longueurs valides spécifiées.
 
 ```{.python .input}
 %%tab all
@@ -416,48 +416,48 @@ d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
                   xlabel='Keys', ylabel='Queries')
 ```
 
-## [**Scaled Dot-Product Attention**]
+## [**Attention par produit scalaire de points**]
 
-A more computationally efficient
-design for the scoring function can be
-simply dot product.
-However,
-the dot product operation
-requires that both the query and the key
-have the same vector length, say $d$.
-Assume that
-all the elements of the query and the key
-are independent random variables
-with zero mean and unit variance.
-The dot product of
-both vectors has zero mean and a variance of $d$.
-To ensure that the variance of the dot product
-still remains one regardless of vector length,
-the *scaled dot-product attention* scoring function
-
-
-$$a(\mathbf q, \mathbf k) = \mathbf{q}^\top \mathbf{k}  /\sqrt{d}$$
-
-divides the dot product by $\sqrt{d}$.
-In practice,
-we often think in minibatches
-for efficiency,
-such as computing attention
-for
-$n$ queries and $m$ key-value pairs,
-where queries and keys are of length $d$
-and values are of length $v$.
-The scaled dot-product attention
-of queries $\mathbf Q\in\mathbb R^{n\times d}$,
-keys $\mathbf K\in\mathbb R^{m\times d}$,
-and values $\mathbf V\in\mathbb R^{m\times v}$
-is
+Une conception plus efficace du point de vue du calcul
+pour la fonction de notation peut être
+simplement le produit scalaire.
+Cependant,
+l'opération de produit scalaire
+exige que la requête et la clé
+aient la même longueur de vecteur, disons $d$.
+Supposons que
+tous les éléments de la requête et de la clé
+sont des variables aléatoires indépendantes
+de moyenne nulle et de variance unitaire.
+Le produit scalaire de
+des deux vecteurs a une moyenne nulle et une variance de $d$.
+Pour s'assurer que la variance du produit scalaire
+reste toujours égale quelle que soit la longueur du vecteur,
+la fonction de notation de l'attention *scaled dot-product
 
 
-$$ \mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \mathbf V \in \mathbb{R}^{n\times v}.$$
-:eqlabel:`eq_softmax_QK_V`
+ $$a(\mathbf q, \mathbf k) = \mathbf{q}^\top \mathbf{k}  /\sqrt{d}$$ 
 
-In the following implementation of the scaled dot product attention, we use dropout for model regularization.
+ divise le produit scalaire par $\sqrt{d}$.
+Dans la pratique,
+nous pensons souvent en mini-batchs
+pour des raisons d'efficacité,
+comme le calcul de l'attention
+pour
+$n$ requêtes et $m$ paires clé-valeur,
+où les requêtes et les clés sont de longueur $d$
+ et les valeurs sont de longueur $v$.
+L'attention du produit scalaire du point
+des requêtes $\mathbf Q\in\mathbb R^{n\times d}$,
+des clés $\mathbf K\in\mathbb R^{m\times d}$,
+et des valeurs $\mathbf V\in\mathbb R^{m\times v}$
+ est
+
+
+ $$ \mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \mathbf V \in \mathbb{R}^{n\times v}.$$ 
+ :eqlabel:`eq_softmax_QK_V` 
+
+ Dans l'implémentation suivante de l'attention du produit scalaire du point, nous utilisons le dropout pour la régularisation du modèle.
 
 ```{.python .input}
 %%tab mxnet
@@ -561,12 +561,12 @@ class DotProductAttention(tf.keras.layers.Layer):
         return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)
 ```
 
-To [**demonstrate the above `DotProductAttention` class**],
-we use the same keys, values, and valid lengths from the earlier toy example
-for additive attention.
-For the dot product operation,
-we make the feature size of queries
-the same as that of keys.
+Pour [**démontrer la classe `DotProductAttention` **],
+nous utilisons les mêmes clés, valeurs et longueurs valides que dans l'exemple précédent
+pour l'attention additive.
+Pour l'opération du produit scalaire,
+, nous faisons en sorte que la taille des caractéristiques des requêtes
+soit la même que celle des clés.
 
 ```{.python .input}
 %%tab mxnet
@@ -591,10 +591,10 @@ attention = DotProductAttention(dropout=0.5)
 attention(queries, keys, values, valid_lens, training=False)
 ```
 
-Same as in the additive attention demonstration,
-since `keys` contains the same element
-that cannot be differentiated by any query,
-[**uniform attention weights**] are obtained.
+Comme dans la démonstration de l'attention additive,
+puisque `keys` contient le même élément
+qui ne peut être différencié par aucune requête,
+[**poids d'attention uniforme**] sont obtenus.
 
 ```{.python .input}
 %%tab all
@@ -602,18 +602,18 @@ d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
                   xlabel='Keys', ylabel='Queries')
 ```
 
-## Summary
+## Résumé
 
-* We can compute the output of attention pooling as a weighted average of values, where different choices of the attention scoring function lead to different behaviors of attention pooling.
-* When queries and keys are vectors of different lengths, we can use the additive attention scoring function. When they are the same, the scaled dot-product attention scoring function is more computationally efficient.
+* Nous pouvons calculer le résultat de la mise en commun de l'attention comme une moyenne pondérée de valeurs, où différents choix de la fonction de notation de l'attention conduisent à différents comportements de la mise en commun de l'attention.
+* Lorsque les requêtes et les clés sont des vecteurs de longueurs différentes, nous pouvons utiliser la fonction de notation de l'attention additive. Lorsqu'ils sont identiques, la fonction de notation de l'attention par produit scalaire est plus efficace sur le plan informatique.
 
 
 
-## Exercises
+## Exercices
 
-1. Modify keys in the toy example and visualize attention weights. Do additive attention and scaled dot-product attention still output the same attention weights? Why or why not?
-1. Using matrix multiplications only, can you design a new scoring function for queries and keys with different vector lengths?
-1. When queries and keys have the same vector length, is vector summation a better design than dot product for the scoring function? Why or why not?
+1. Modifiez les clés dans l'exemple jouet et visualisez les poids d'attention. L'attention additive et l'attention par produit scalaire produisent-elles toujours les mêmes poids d'attention ? Pourquoi ou pourquoi pas ?
+1. En utilisant uniquement des multiplications matricielles, pouvez-vous concevoir une nouvelle fonction de notation pour les requêtes et les clés avec des longueurs de vecteur différentes ?
+1. Lorsque les requêtes et les clés ont la même longueur de vecteur, la sommation vectorielle est-elle une meilleure conception que le produit scalaire pour la fonction de notation ? Pourquoi ou pourquoi pas ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/346)

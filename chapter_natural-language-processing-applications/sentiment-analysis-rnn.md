@@ -1,30 +1,30 @@
-# Sentiment Analysis: Using Recurrent Neural Networks
+# Analyse des sentiments : Utilisation de réseaux neuronaux récurrents
 :label:`sec_sentiment_rnn` 
 
-
-Like word similarity and analogy tasks,
-we can also apply pretrained word vectors
-to sentiment analysis.
-Since the IMDb review dataset
-in :numref:`sec_sentiment`
-is not very big,
-using text representations
-that were pretrained
-on large-scale corpora
-may reduce overfitting of the model.
-As a specific example
-illustrated in :numref:`fig_nlp-map-sa-rnn`,
-we will represent each token
-using the pretrained GloVe model,
-and feed these token representations
-into a multilayer bidirectional RNN
-to obtain the text sequence representation,
-which will
-be transformed into 
-sentiment analysis outputs :cite:`Maas.Daly.Pham.ea.2011`.
-For the same downstream application,
-we will consider a different architectural
-choice later.
+ 
+ Comme pour les tâches de similarité et d'analogie de mots,
+nous pouvons également appliquer des vecteurs de mots pré-entraînés
+à l'analyse des sentiments.
+Étant donné que l'ensemble de données de critiques IMDb
+dans :numref:`sec_sentiment` 
+ n'est pas très grand,
+l'utilisation de représentations textuelles
+qui ont été pré-entraînées
+sur des corpus à grande échelle
+peut réduire le surajustement du modèle.
+À titre d'exemple spécifique
+illustré dans :numref:`fig_nlp-map-sa-rnn` ,
+nous représenterons chaque token
+en utilisant le modèle GloVe pré-entraîné,
+et nous introduirons ces représentations de token
+dans un RNN bidirectionnel multicouche
+pour obtenir la représentation de la séquence textuelle,
+qui sera
+transformée en résultats d'analyse de sentiment 
+ :cite:`Maas.Daly.Pham.ea.2011` .
+Pour la même application en aval,
+, nous envisagerons plus tard un choix architectural différent
+.
 
 ![This section feeds pretrained GloVe to an RNN-based architecture for sentiment analysis.](../img/nlp-map-sa-rnn.svg)
 :label:`fig_nlp-map-sa-rnn`
@@ -50,30 +50,30 @@ batch_size = 64
 train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
 ```
 
-## Representing Single Text with RNNs
+## Représentation d'un texte unique avec des RNN
 
-In text classifications tasks,
-such as sentiment analysis,
-a varying-length text sequence 
-will be transformed into fixed-length categories.
-In the following `BiRNN` class,
-while each token of a text sequence
-gets its individual
-pretrained GloVe
-representation via the embedding layer
+Dans les tâches de classification de textes,
+telles que l'analyse des sentiments,
+une séquence de texte de longueur variable 
+sera transformée en catégories de longueur fixe.
+
+Dans la classe suivante `BiRNN`,
+alors que chaque token d'une séquence de texte
+reçoit sa représentation GloVe
+individuelle pré-entraînée via la couche d'intégration
 (`self.embedding`),
-the entire sequence
-is encoded by a bidirectional RNN (`self.encoder`).
-More concretely,
-the hidden states (at the last layer)
-of the bidirectional LSTM
-at both the initial and final time steps
-are concatenated 
-as the representation of the text sequence.
-This single text representation
-is then transformed into output categories
-by a fully connected layer (`self.decoder`)
-with two outputs ("positive" and "negative").
+la séquence entière
+est codée par un RNN bidirectionnel (`self.encoder`).
+Plus concrètement,
+les états cachés (à la dernière couche)
+du LSTM bidirectionnel
+aux étapes temporelles initiale et finale
+sont concaténés 
+comme représentation de la séquence de texte.
+Cette représentation textuelle unique
+est ensuite transformée en catégories de sortie
+par une couche entièrement connectée (`self.decoder`)
+avec deux sorties ("positive" et "négative").
 
 ```{.python .input}
 #@tab mxnet
@@ -82,20 +82,20 @@ class BiRNN(nn.Block):
                  num_layers, **kwargs):
         super(BiRNN, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        # Set `bidirectional` to True to get a bidirectional RNN
+        # Set `bidirectionnel` to True to get a bidirectional RNN
         self.encoder = rnn.LSTM(num_hiddens, num_layers=num_layers,
                                 bidirectional=True, input_size=embed_size)
         self.decoder = nn.Dense(2)
 
     def forward(self, inputs):
-        # The shape of `inputs` is (batch size, no. of time steps). Because
+        # The shape of `entrées` is (batch size, no. of time steps). Because
         # LSTM requires its input's first dimension to be the temporal
         # dimension, the input is transposed before obtaining token
         # representations. The output shape is (no. of time steps, batch size,
         # word vector dimension)
         embeddings = self.embedding(inputs.T)
         # Returns hidden states of the last hidden layer at different time
-        # steps. The shape of `outputs` is (no. of time steps, batch size,
+        # steps. The shape of `sorties` is (no. of time steps, batch size,
         # 2 * no. of hidden units)
         outputs = self.encoder(embeddings)
         # Concatenate the hidden states at the initial and final time steps as
@@ -113,13 +113,13 @@ class BiRNN(nn.Module):
                  num_layers, **kwargs):
         super(BiRNN, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        # Set `bidirectional` to True to get a bidirectional RNN
+        # Set `bidirectionnel` to True to get a bidirectional RNN
         self.encoder = nn.LSTM(embed_size, num_hiddens, num_layers=num_layers,
                                 bidirectional=True)
         self.decoder = nn.Linear(4 * num_hiddens, 2)
 
     def forward(self, inputs):
-        # The shape of `inputs` is (batch size, no. of time steps). Because
+        # The shape of `entrées` is (batch size, no. of time steps). Because
         # LSTM requires its input's first dimension to be the temporal
         # dimension, the input is transposed before obtaining token
         # representations. The output shape is (no. of time steps, batch size,
@@ -127,7 +127,7 @@ class BiRNN(nn.Module):
         embeddings = self.embedding(inputs.T)
         self.encoder.flatten_parameters()
         # Returns hidden states of the last hidden layer at different time
-        # steps. The shape of `outputs` is (no. of time steps, batch size,
+        # steps. The shape of `sorties` is (no. of time steps, batch size,
         # 2 * no. of hidden units)
         outputs, _ = self.encoder(embeddings)
         # Concatenate the hidden states at the initial and final time steps as
@@ -138,7 +138,7 @@ class BiRNN(nn.Module):
         return outs
 ```
 
-Let's construct a bidirectional RNN with two hidden layers to represent single text for sentiment analysis.
+Construisons un RNN bidirectionnel avec deux couches cachées pour représenter un texte unique pour l'analyse des sentiments.
 
 ```{.python .input}
 #@tab all
@@ -163,17 +163,17 @@ def init_weights(module):
 net.apply(init_weights);
 ```
 
-## Loading Pretrained Word Vectors
+## Chargement des vecteurs de mots pré-entraînés
 
-Below we load the pretrained 100-dimensional (needs to be consistent with `embed_size`) GloVe embeddings for tokens in the vocabulary.
+Ci-dessous, nous chargeons les encastrements GloVe pré-entraînés à 100 dimensions (doit être cohérent avec `embed_size`) pour les tokens du vocabulaire.
 
 ```{.python .input}
 #@tab all
 glove_embedding = d2l.TokenEmbedding('glove.6b.100d')
 ```
 
-Print the shape of the vectors
-for all the tokens in the vocabulary.
+Imprimez la forme des vecteurs
+pour tous les tokens du vocabulaire.
 
 ```{.python .input}
 #@tab all
@@ -181,11 +181,11 @@ embeds = glove_embedding[vocab.idx_to_token]
 embeds.shape
 ```
 
-We use these pretrained
-word vectors
-to represent tokens in the reviews
-and will not update
-these vectors during training.
+Nous utilisons ces vecteurs de mots pré-entraînés
+
+ pour représenter les tokens dans les revues
+et nous ne mettrons pas à jour
+ces vecteurs pendant la formation.
 
 ```{.python .input}
 #@tab mxnet
@@ -199,9 +199,9 @@ net.embedding.weight.data.copy_(embeds)
 net.embedding.weight.requires_grad = False
 ```
 
-## Training and Evaluating the Model
+## Formation et évaluation du modèle
 
-Now we can train the bidirectional RNN for sentiment analysis.
+Nous pouvons maintenant former le RNN bidirectionnel pour l'analyse des sentiments.
 
 ```{.python .input}
 #@tab mxnet
@@ -219,7 +219,7 @@ loss = nn.CrossEntropyLoss(reduction="none")
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-We define the following function to predict the sentiment of a text sequence using the trained model `net`.
+Nous définissons la fonction suivante pour prédire le sentiment d'une séquence de texte en utilisant le modèle formé `net`.
 
 ```{.python .input}
 #@tab mxnet
@@ -241,7 +241,7 @@ def predict_sentiment(net, vocab, sequence):
     return 'positive' if label == 1 else 'negative'
 ```
 
-Finally, let's use the trained model to predict the sentiment for two simple sentences.
+Enfin, utilisons le modèle entraîné pour prédire le sentiment de deux phrases simples.
 
 ```{.python .input}
 #@tab all
@@ -253,18 +253,18 @@ predict_sentiment(net, vocab, 'this movie is so great')
 predict_sentiment(net, vocab, 'this movie is so bad')
 ```
 
-## Summary
+## Résumé
 
-* Pretrained word vectors can represent individual tokens in a text sequence.
-* Bidirectional RNNs can represent a text sequence, such as via the concatenation of its hidden states at the initial and final time steps. This single text representation can be transformed into categories using a fully connected layer.
+* Les vecteurs de mots pré-entraînés peuvent représenter des tokens individuels dans une séquence de texte.
+* Les RNN bidirectionnels peuvent représenter une séquence de texte, par exemple via la concaténation de ses états cachés aux étapes initiales et finales. Cette représentation textuelle unique peut être transformée en catégories à l'aide d'une couche entièrement connectée.
 
 
 
-## Exercises
+## Exercices
 
-1. Increase the number of epochs. Can you improve the training and testing accuracies? How about tuning other hyperparameters?
-1. Use larger pretrained word vectors, such as 300-dimensional GloVe embeddings. Does it improve classification accuracy?
-1. Can we improve the classification accuracy by using the spaCy tokenization? You need to install spaCy (`pip install spacy`) and install the English package (`python -m spacy download en`). In the code, first, import spaCy (`import spacy`). Then, load the spaCy English package (`spacy_en = spacy.load('en')`). Finally, define the function `def tokenizer(text): return [tok.text for tok in spacy_en.tokenizer(text)]` and replace the original `tokenizer` function. Note the different forms of phrase tokens in GloVe and spaCy. For example, the phrase token "new york" takes the form of "new-york" in GloVe and the form of "new york" after the spaCy tokenization.
+1. Augmentez le nombre d'époques. Pouvez-vous améliorer la précision de l'apprentissage et du test ? Et si vous ajustiez d'autres hyperparamètres ?
+1. Utilisez des vecteurs de mots pré-entraînés plus grands, tels que des encastrements GloVe à 300 dimensions. Cela améliore-t-il la précision de la classification ?
+1. Peut-on améliorer la précision de la classification en utilisant la tokénisation spaCy ? Vous devez installer spaCy (`pip install spacy`) et installer le paquetage anglais (`python -m spacy download en`). Dans le code, tout d'abord, importez spaCy (`import spacy`). Ensuite, chargez le paquetage anglais de spaCy (`spacy_en = spacy.load('en')`). Enfin, définissez la fonction `def tokenizer(text): return [tok.text for tok in spacy_en.tokenizer(text)]` et remplacez la fonction originale `tokenizer`. Notez les différentes formes des jetons de phrase dans GloVe et spaCy. Par exemple, le jeton de phrase "new york" prend la forme de "new-york" dans GloVe et la forme de "new york" après la tokenisation spaCy.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/392)

@@ -1,46 +1,46 @@
 # Generative Adversarial Networks
-:label:`sec_basic_gan`
+:label:`sec_basic_gan` 
 
-Throughout most of this book, we have talked about how to make predictions. In some form or another, we used deep neural networks learned mappings from data examples to labels. This kind of learning is called discriminative learning, as in, we'd like to be able to discriminate between photos cats and photos of dogs. Classifiers and regressors are both examples of discriminative learning. And neural networks trained by backpropagation have upended everything we thought we knew about discriminative learning on large complicated datasets. Classification accuracies on high-res images has gone from useless to human-level (with some caveats) in just 5-6 years. We will spare you another spiel about all the other discriminative tasks where deep neural networks do astoundingly well.
+ Tout au long de ce livre, nous avons parlé de la manière de faire des prédictions. Sous une forme ou une autre, nous avons utilisé des réseaux neuronaux profonds pour apprendre des correspondances entre des exemples de données et des étiquettes. Ce type d'apprentissage est appelé apprentissage discriminatif, comme dans l'exemple suivant : nous aimerions pouvoir faire la distinction entre les photos de chats et les photos de chiens. Les classificateurs et les régresseurs sont deux exemples d'apprentissage discriminant. Les réseaux neuronaux formés par rétropropagation ont bouleversé tout ce que nous pensions savoir sur l'apprentissage discriminatif sur de grands ensembles de données complexes. La précision de la classification sur des images à haute résolution est passée d'un niveau inutile à un niveau humain (avec quelques réserves) en seulement 5 ou 6 ans. Nous vous épargnerons un autre baratin sur toutes les autres tâches discriminantes pour lesquelles les réseaux neuronaux profonds obtiennent des résultats stupéfiants.
 
-But there is more to machine learning than just solving discriminative tasks. For example, given a large dataset, without any labels, we might want to learn a model that concisely captures the characteristics of this data. Given such a model, we could sample synthetic data examples that resemble the distribution of the training data. For example, given a large corpus of photographs of faces, we might want to be able to generate a new photorealistic image that looks like it might plausibly have come from the same dataset. This kind of learning is called generative modeling.
+Mais l'apprentissage automatique ne se limite pas à la résolution de tâches discriminantes. Par exemple, étant donné un grand ensemble de données, sans aucune étiquette, nous pourrions vouloir apprendre un modèle qui capture de manière concise les caractéristiques de ces données. Avec un tel modèle, nous pourrions échantillonner des exemples de données synthétiques qui ressemblent à la distribution des données d'apprentissage. Par exemple, si l'on dispose d'un vaste corpus de photographies de visages, on peut générer une nouvelle image photoréaliste qui semble provenir du même ensemble de données. Ce type d'apprentissage est appelé modélisation générative.
 
-Until recently, we had no method that could synthesize novel photorealistic images. But the success of deep neural networks for discriminative learning opened up new possibilities. One big trend over the last three years has been the application of discriminative deep nets to overcome challenges in problems that we do not generally think of as supervised learning problems. The recurrent neural network language models are one example of using a discriminative network (trained to predict the next character) that once trained can act as a generative model.
+Jusqu'à récemment, nous ne disposions d'aucune méthode permettant de synthétiser de nouvelles images photoréalistes. Mais le succès des réseaux neuronaux profonds pour l'apprentissage discriminatif a ouvert de nouvelles possibilités. L'une des grandes tendances de ces trois dernières années a été l'application des réseaux profonds discriminants pour surmonter des problèmes que nous ne considérons généralement pas comme des problèmes d'apprentissage supervisé. Les modèles de langage des réseaux neuronaux récurrents sont un exemple d'utilisation d'un réseau discriminant (formé pour prédire le prochain caractère) qui, une fois formé, peut agir comme un modèle génératif.
 
-In 2014, a breakthrough paper introduced Generative adversarial networks (GANs) :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014`, a clever new way to leverage the power of discriminative models to get good generative models. At their heart, GANs rely on the idea that a data generator is good if we cannot tell fake data apart from real data. In statistics, this is called a two-sample test - a test to answer the question whether datasets $X=\{x_1,\ldots, x_n\}$ and $X'=\{x'_1,\ldots, x'_n\}$ were drawn from the same distribution. The main difference between most statistics papers and GANs is that the latter use this idea in a constructive way. In other words, rather than just training a model to say "hey, these two datasets do not look like they came from the same distribution", they use the [two-sample test](https://en.wikipedia.org/wiki/Two-sample_hypothesis_testing) to provide training signals to a generative model. This allows us to improve the data generator until it generates something that resembles the real data. At the very least, it needs to fool the classifier. Even if our classifier is a state of the art deep neural network.
+En 2014, un article révolutionnaire a présenté les réseaux adversatifs génératifs (GAN) :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014` , une nouvelle façon intelligente de tirer parti de la puissance des modèles discriminatifs pour obtenir de bons modèles génératifs. Au cœur de ces réseaux, les GAN reposent sur l'idée qu'un générateur de données est bon si nous ne pouvons pas distinguer les données fausses des données réelles. En statistiques, on appelle cela un test à deux échantillons - un test pour répondre à la question de savoir si les ensembles de données $X=\{x_1,\ldots, x_n\}$ et $X'=\{x'_1,\ldots, x'_n\}$ ont été tirés de la même distribution. La principale différence entre la plupart des articles statistiques et les GAN est que ces derniers utilisent cette idée de manière constructive. En d'autres termes, plutôt que de se contenter d'entraîner un modèle pour dire "hé, ces deux ensembles de données ne semblent pas provenir de la même distribution", ils utilisent le site [two-sample test](https://en.wikipedia.org/wiki/Two-sample_hypothesis_testing) pour fournir des signaux d'entraînement à un modèle génératif. Cela nous permet d'améliorer le générateur de données jusqu'à ce qu'il génère quelque chose qui ressemble aux données réelles. Au minimum, il doit tromper le classificateur. Même si notre classificateur est un réseau neuronal profond à la pointe de la technologie.
 
 ![Generative Adversarial Networks](../img/gan.svg)
 :label:`fig_gan`
 
 
-The GAN architecture is illustrated in :numref:`fig_gan`.
-As you can see, there are two pieces in GAN architecture - first off, we need a device (say, a deep network but it really could be anything, such as a game rendering engine) that might potentially be able to generate data that looks just like the real thing. If we are dealing with images, this needs to generate images. If we are dealing with speech, it needs to generate audio sequences, and so on. We call this the generator network. The second component is the discriminator network. It attempts to distinguish fake and real data from each other. Both networks are in competition with each other. The generator network attempts to fool the discriminator network. At that point, the discriminator network adapts to the new fake data. This information, in turn is used to improve the generator network, and so on.
+L'architecture du GAN est illustrée sur le site :numref:`fig_gan` .
+Comme vous pouvez le constater, l'architecture GAN comporte deux parties : tout d'abord, nous avons besoin d'un dispositif (disons un réseau profond, mais il peut s'agir de n'importe quoi, par exemple un moteur de rendu de jeu) capable de générer des données qui ressemblent à la réalité. S'il s'agit d'images, ce dispositif doit générer des images. S'il s'agit de paroles, il doit générer des séquences audio, et ainsi de suite. Nous l'appelons le réseau générateur. Le deuxième composant est le réseau discriminateur. Il tente de distinguer les données fausses et réelles les unes des autres. Les deux réseaux sont en compétition l'un avec l'autre. Le réseau générateur tente de tromper le réseau discriminateur. À ce moment-là, le réseau discriminateur s'adapte aux nouvelles fausses données. Cette information, à son tour, est utilisée pour améliorer le réseau générateur, et ainsi de suite.
 
 
-The discriminator is a binary classifier to distinguish if the input $x$ is real (from real data) or fake (from the generator). Typically, the discriminator outputs a scalar prediction $o\in\mathbb R$ for input $\mathbf x$, such as using a fully connected layer with hidden size 1, and then applies sigmoid function to obtain the predicted probability $D(\mathbf x) = 1/(1+e^{-o})$. Assume the label $y$ for the true data is $1$ and $0$ for the fake data. We train the discriminator to minimize the cross-entropy loss, *i.e.*,
+Le discriminateur est un classificateur binaire qui distingue si l'entrée $x$ est réelle (à partir de données réelles) ou fausse (à partir du générateur). En général, le discriminateur produit une prédiction scalaire $o\in\mathbb R$ pour l'entrée $\mathbf x$, par exemple en utilisant une couche entièrement connectée avec une taille cachée de 1, puis il applique une fonction sigmoïde pour obtenir la probabilité prédite $D(\mathbf x) = 1/(1+e^{-o})$. Supposons que l'étiquette $y$ pour les vraies données est $1$ et $0$ pour les fausses données. Nous entraînons le discriminateur pour minimiser la perte d'entropie croisée, *c'est-à-dire*,
 
-$$ \min_D \{ - y \log D(\mathbf x) - (1-y)\log(1-D(\mathbf x)) \},$$
+$$ \min_D \{ - y \log D(\mathbf x) - (1-y)\log(1-D(\mathbf x)) \},$$ 
 
-For the generator, it first draws some parameter $\mathbf z\in\mathbb R^d$ from a source of randomness, *e.g.*, a normal distribution $\mathbf z \sim \mathcal{N} (0, 1)$. We often call $\mathbf z$ as the latent variable.
-It then applies a function to generate $\mathbf x'=G(\mathbf z)$. The goal of the generator is to fool the discriminator to classify $\mathbf x'=G(\mathbf z)$ as true data, *i.e.*, we want $D( G(\mathbf z)) \approx 1$.
-In other words, for a given discriminator $D$, we update the parameters of the generator $G$ to maximize the cross-entropy loss when $y=0$, *i.e.*,
+ Pour le générateur, il tire d'abord un paramètre $\mathbf z\in\mathbb R^d$ d'une source d'aléa, *c'est-à-dire*, une distribution normale $\mathbf z \sim \mathcal{N} (0, 1)$. Nous appelons souvent $\mathbf z$ la variable latente.
+Il applique ensuite une fonction pour générer $\mathbf x'=G(\mathbf z)$. Le but du générateur est de tromper le discriminateur pour qu'il classe $\mathbf x'=G(\mathbf z)$ comme une vraie donnée, *c'est-à-dire*, nous voulons $D( G(\mathbf z)) \approx 1$.
+En d'autres termes, pour un discriminateur donné $D$, nous mettons à jour les paramètres du générateur $G$ pour maximiser la perte d'entropie croisée lorsque $y=0$, *i.e.*,
 
-$$ \max_G \{ - (1-y) \log(1-D(G(\mathbf z))) \} = \max_G \{ - \log(1-D(G(\mathbf z))) \}.$$
+$$ \max_G \{ - (1-y) \log(1-D(G(\mathbf z))) \} = \max_G \{ - \log(1-D(G(\mathbf z))) \}.$$ 
 
-If the generator does a perfect job, then $D(\mathbf x')\approx 1$ so the above loss near 0, which results the gradients are too small to make a good progress for the discriminator. So commonly we minimize the following loss:
+ Si le générateur fait un travail parfait, alors $D(\mathbf x')\approx 1$ alors la perte ci-dessus est proche de 0, ce qui résulte que les gradients sont trop petits pour faire un bon progrès pour le discriminateur. En général, nous minimisons donc la perte suivante :
 
-$$ \min_G \{ - y \log(D(G(\mathbf z))) \} = \min_G \{ - \log(D(G(\mathbf z))) \}, $$
+$$ \min_G \{ - y \log(D(G(\mathbf z))) \} = \min_G \{ - \log(D(G(\mathbf z))) \}, $$ 
 
-which is just feed $\mathbf x'=G(\mathbf z)$ into the discriminator but giving label $y=1$.
-
-
-To sum up, $D$ and $G$ are playing a "minimax" game with the comprehensive objective function:
-
-$$min_D max_G \{ -E_{x \sim \text{Data}} log D(\mathbf x) - E_{z \sim \text{Noise}} log(1 - D(G(\mathbf z))) \}.$$
+ ce qui revient à introduire $\mathbf x'=G(\mathbf z)$ dans le discriminateur mais en donnant l'étiquette $y=1$.
 
 
+Pour résumer, $D$ et $G$ jouent un jeu "minimax" avec la fonction objectif globale :
 
-Many of the GANs applications are in the context of images. As a demonstration purpose, we are going to content ourselves with fitting a much simpler distribution first. We will illustrate what happens if we use GANs to build the world's most inefficient estimator of parameters for a Gaussian. Let's get started.
+$$min_D max_G \{ -E_{x \sim \text{Data}} log D(\mathbf x) - E_{z \sim \text{Noise}} log(1 - D(G(\mathbf z))) \}.$$ 
+
+ 
+
+ De nombreuses applications des GANs se situent dans le contexte des images. À des fins de démonstration, nous allons nous contenter d'ajuster une distribution beaucoup plus simple dans un premier temps. Nous allons illustrer ce qui se passe si nous utilisons les GANs pour construire l'estimateur de paramètres le plus inefficace au monde pour une gaussienne. Commençons.
 
 ```{.python .input}
 #@tab mxnet
@@ -65,9 +65,9 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## Generate Some "Real" Data
+## Générer de "vraies" données
 
-Since this is going to be the world's lamest example, we simply generate data drawn from a Gaussian.
+Comme il s'agit de l'exemple le plus minable du monde, nous générons simplement des données tirées d'une gaussienne.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -85,7 +85,7 @@ b = d2l.tensor([1, 2], tf.float32)
 data = d2l.matmul(X, A) + b
 ```
 
-Let's see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
+Voyons ce que nous avons obtenu. Il devrait s'agir d'une gaussienne décalée d'une manière plutôt arbitraire avec une moyenne $b$ et une matrice de covariance $A^TA$.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -107,9 +107,9 @@ batch_size = 8
 data_iter = d2l.load_array((data,), batch_size)
 ```
 
-## Generator
+## Générateur
 
-Our generator network will be the simplest network possible - a single layer linear model. This is since we will be driving that linear network with a Gaussian data generator. Hence, it literally only needs to learn the parameters to fake things perfectly.
+Notre réseau générateur sera le réseau le plus simple possible - un modèle linéaire à une couche. En effet, nous allons piloter ce réseau linéaire avec un générateur de données gaussien. Par conséquent, il n'a littéralement besoin d'apprendre que les paramètres pour simuler parfaitement les choses.
 
 ```{.python .input}
 #@tab mxnet
@@ -127,9 +127,9 @@ net_G = nn.Sequential(nn.Linear(2, 2))
 net_G = tf.keras.layers.Dense(2)
 ```
 
-## Discriminator
+## Discriminateur
 
-For the discriminator we will be a bit more discriminating: we will use an MLP with 3 layers to make things a bit more interesting.
+Pour le discriminateur, nous serons un peu plus discriminants : nous utiliserons un MLP à 3 couches pour rendre les choses un peu plus intéressantes.
 
 ```{.python .input}
 #@tab mxnet
@@ -158,7 +158,7 @@ net_D = tf.keras.models.Sequential([
 
 ## Training
 
-First we define a function to update the discriminator.
+Tout d'abord, nous définissons une fonction pour mettre à jour le discriminateur.
 
 ```{.python .input}
 #@tab mxnet
@@ -222,7 +222,7 @@ def update_D(X, Z, net_D, net_G, loss, optimizer_D):
     return loss_D
 ```
 
-The generator is updated similarly. Here we reuse the cross-entropy loss but change the label of the fake data from $0$ to $1$.
+Le générateur est mis à jour de manière similaire. Ici, nous réutilisons la perte d'entropie croisée mais nous changeons l'étiquette des fausses données de $0$ à $1$.
 
 ```{.python .input}
 #@tab mxnet
@@ -270,7 +270,7 @@ def update_G(Z, net_D, net_G, loss, optimizer_G):
     with tf.GradientTape() as tape:
         # We could reuse `fake_X` from `update_D` to save computation
         fake_X = net_G(Z)
-        # Recomputing `fake_Y` is needed since `net_D` is changed
+        # Recomputing `faux_Y` is needed since `net_D` is changed
         fake_Y = net_D(fake_X)
         # We multiply the loss by batch_size to match PyTorch's BCEWithLogits loss
         loss_G = loss(ones, tf.squeeze(fake_Y)) * batch_size
@@ -279,7 +279,7 @@ def update_G(Z, net_D, net_G, loss, optimizer_G):
     return loss_G
 ```
 
-Both the discriminator and the generator performs a binary logistic regression with the cross-entropy loss. We use Adam to smooth the training process. In each iteration, we first update the discriminator and then the generator. We visualize both losses and generated examples.
+Le discriminateur et le générateur effectuent tous deux une régression logistique binaire avec la perte d'entropie croisée. Nous utilisons Adam pour lisser le processus de formation. À chaque itération, nous mettons d'abord à jour le discriminateur, puis le générateur. Nous visualisons les pertes et les exemples générés.
 
 ```{.python .input}
 #@tab mxnet
@@ -399,7 +399,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
           f'{metric[2] / timer.stop():.1f} examples/sec')
 ```
 
-Now we specify the hyperparameters to fit the Gaussian distribution.
+Maintenant, nous spécifions les hyperparamètres pour ajuster la distribution gaussienne.
 
 ```{.python .input}
 #@tab all
@@ -408,15 +408,15 @@ train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
       latent_dim, d2l.numpy(data[:100]))
 ```
 
-## Summary
+## Résumé
 
-* Generative adversarial networks (GANs) composes of two deep networks, the generator and the discriminator.
-* The generator generates the image as much closer to the true image as possible to fool the discriminator, via maximizing the cross-entropy loss, *i.e.*, $\max \log(D(\mathbf{x'}))$.
-* The discriminator tries to distinguish the generated images from the true images, via minimizing the cross-entropy loss, *i.e.*, $\min - y \log D(\mathbf{x}) - (1-y)\log(1-D(\mathbf{x}))$.
+* Les réseaux adversariens génératifs (GANs) sont composés de deux réseaux profonds, le générateur et le discriminateur.
+* Le générateur génère l'image la plus proche possible de la vraie image pour tromper le discriminateur, en maximisant la perte d'entropie croisée, *i.e.*, $\max \log(D(\mathbf{x'}))$.
+* Le discriminateur essaie de distinguer les images générées des vraies images, en minimisant la perte d'entropie croisée, *i.e.*, $\min - y \log D(\mathbf{x}) - (1-y)\log(1-D(\mathbf{x}))$.
 
-## Exercises
+## Exercices
 
-* Does an equilibrium exist where the generator wins, *i.e.* the discriminator ends up unable to distinguish the two distributions on finite samples?
+* Existe-t-il un équilibre où le générateur gagne, *c'est-à-dire* le discriminateur finit par être incapable de distinguer les deux distributions sur des échantillons finis ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/408)

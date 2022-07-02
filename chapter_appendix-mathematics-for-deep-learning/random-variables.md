@@ -1,44 +1,44 @@
-# Random Variables
-:label:`sec_random_variables`
+# Variables aléatoires
+:label:`sec_random_variables` 
 
-In :numref:`sec_prob` we saw the basics of how to work with discrete random variables, which in our case refer to those random variables which take either a finite set of possible values, or the integers.  In this section, we develop the theory of *continuous random variables*, which are random variables which  can take on any real value.
+ Dans :numref:`sec_prob` , nous avons vu les bases du travail avec les variables aléatoires discrètes, qui dans notre cas font référence aux variables aléatoires qui prennent soit un ensemble fini de valeurs possibles, soit les entiers.  Dans cette section, nous développons la théorie des *variables aléatoires continues*, qui sont des variables aléatoires pouvant prendre n'importe quelle valeur réelle.
 
-## Continuous Random Variables
+## Variables aléatoires continues
 
-Continuous random variables are a significantly more subtle topic than discrete random variables.  A fair analogy to make is that the technical jump is comparable to the jump between adding lists of numbers and integrating functions.  As such, we will need to take some time to develop the theory.
+Les variables aléatoires continues constituent un sujet nettement plus subtil que les variables aléatoires discrètes.  Une analogie juste à faire est que le saut technique est comparable au saut entre l'addition de listes de nombres et l'intégration de fonctions.  En tant que tel, nous devrons prendre un certain temps pour développer la théorie.
 
-### From Discrete to Continuous
+#### Du discret au continu
 
-To understand the additional technical challenges encountered when working with continuous random variables, let's perform a thought experiment.  Suppose that we are throwing a dart at the dart board, and we want to know the probability that it hits exactly $2 \text{cm}$ from the center of the board.
+Pour comprendre les défis techniques supplémentaires rencontrés lorsque l'on travaille avec des variables aléatoires continues, réalisons une expérience de pensée.  Supposons que nous lancions une fléchette sur une cible et que nous voulions connaître la probabilité qu'elle atteigne exactement $2 \text{cm}$ à partir du centre de la cible.
 
-To start with, we imagine measuring a single digit of accuracy, that is to say with bins for $0 \text{cm}$, $1 \text{cm}$, $2 \text{cm}$, and so on.  We throw say $100$ darts at the dart board, and if $20$ of them fall into the bin for $2\text{cm}$ we conclude that $20\%$ of the darts we throw hit the board $2 \text{cm}$ away from the center.
+Pour commencer, nous imaginons mesurer un seul chiffre de précision, c'est-à-dire avec des cases pour $0 \text{cm}$, $1 \text{cm}$, $2 \text{cm}$, et ainsi de suite.  Nous lançons disons $100$ fléchettes sur la cible, et si $20$ d'entre elles tombent dans le bac pour $2\text{cm}$, nous en concluons que $20\%$ des fléchettes que nous avons lancées ont touché la cible $2 \text{cm}$ loin du centre.
 
-However, when we look closer, this does not match our question!  We wanted exact equality, whereas these bins hold all that fell between say $1.5\text{cm}$ and $2.5\text{cm}$.
+Cependant, lorsque nous regardons de plus près, cela ne correspond pas à notre question !  Nous voulions une égalité exacte, alors que ces bacs contiennent tout ce qui se trouve entre, disons, $1.5\text{cm}$ et $2.5\text{cm}$.
 
-Undeterred, we continue further.  We measure even more precisely, say $1.9\text{cm}$, $2.0\text{cm}$, $2.1\text{cm}$, and now see that perhaps $3$ of the $100$ darts hit the board in the $2.0\text{cm}$ bucket.  Thus we conclude the probability is $3\%$.
+Sans nous décourager, nous continuons.  Nous mesurons encore plus précisément, disons $1.9\text{cm}$, $2.0\text{cm}$, $2.1\text{cm}$, et nous voyons maintenant que peut-être $3$ des fléchettes de $100$ ont touché le plateau dans le bac de $2.0\text{cm}$.  Nous concluons donc que la probabilité est $3\%$.
 
-However, this does not solve anything!  We have just pushed the issue down one digit further.  Let's abstract a bit. Imagine we know the probability that the first $k$ digits match with $2.00000\ldots$ and we want to know the probability it matches for the first $k+1$ digits. It is fairly reasonable to assume that the ${k+1}^{\mathrm{th}}$ digit is essentially a random choice from the set $\{0, 1, 2, \ldots, 9\}$.  At least, we cannot conceive of a physically meaningful process which would force the number of micrometers away form the center to prefer to end in a $7$ vs a $3$.
+Cependant, cela ne résout rien !  Nous avons simplement repoussé le problème d'un chiffre supplémentaire.  Faisons un peu abstraction. Imaginons que nous connaissions la probabilité que les premiers chiffres de $k$ correspondent à $2.00000\ldots$ et que nous voulions connaître la probabilité qu'ils correspondent aux premiers chiffres de $k+1$. Il est assez raisonnable de supposer que le chiffre ${k+1}^{\mathrm{th}}$ est essentiellement un choix aléatoire dans l'ensemble $\{0, 1, 2, \ldots, 9\}$.  Au moins, nous ne pouvons pas concevoir un processus physiquement significatif qui forcerait le nombre de micromètres éloignés du centre à préférer aboutir à un $7$ plutôt qu'à un $3$.
 
-What this means is that in essence each additional digit of accuracy we require should decrease probability of matching by a factor of $10$.  Or put another way, we would expect that
+Cela signifie qu'en substance, chaque chiffre supplémentaire de précision dont nous avons besoin devrait diminuer la probabilité de correspondance par un facteur de $10$. Ou, en d'autres termes, nous nous attendrions à ce que
 
 $$
 P(\text{distance is}\; 2.00\ldots, \;\text{to}\; k \;\text{digits} ) \approx p\cdot10^{-k}.
 $$
 
-The value $p$ essentially encodes what happens with the first few digits, and the $10^{-k}$ handles the rest.
+La valeur $p$ encode essentiellement ce qui se passe avec les premiers chiffres, et la valeur $10^{-k}$ gère le reste.
 
-Notice that if we know the position accurate to $k=4$ digits after the decimal, that means we know the value falls within the interval say $[1.99995,2.00005]$ which is an interval of length $2.00005-1.99995 = 10^{-4}$.  Thus, if we call the length of this interval $\epsilon$, we can say
+Remarquez que si nous connaissons la position exacte à $k=4$ chiffres après la décimale, cela signifie que nous savons que la valeur se situe dans l'intervalle disons $[1.99995,2.00005]$ qui est un intervalle de longueur $2.00005-1.99995 = 10^{-4}$.  Donc, si nous appelons la longueur de cet intervalle $\epsilon$, nous pouvons dire
 
 $$
 P(\text{distance is in an}\; \epsilon\text{-sized interval around}\; 2 ) \approx \epsilon \cdot p.
 $$
 
-Let's take this one final step further.  We have been thinking about the point $2$ the entire time, but never thinking about other points.  Nothing is different there fundamentally, but it is the case that the value $p$ will likely be different.  We would at least hope that a dart thrower was more likely to hit a point near the center, like $2\text{cm}$ rather than $20\text{cm}$.  Thus, the value $p$ is not fixed, but rather should depend on the point $x$.  This tells us that we should expect
+Allons plus loin.  Nous avons pensé au point $2$ pendant tout ce temps, sans jamais penser à d'autres points.  Fondamentalement, rien n'y est différent, mais il est vrai que la valeur $p$ sera probablement différente.  Nous pourrions au moins espérer qu'un lanceur de fléchettes ait plus de chances de toucher un point proche du centre, comme $2\text{cm}$ plutôt que $20\text{cm}$. Ainsi, la valeur $p$ n'est pas fixe, mais devrait plutôt dépendre du point $x$.  Cela nous indique que nous devrions nous attendre à
 
-$$P(\text{distance is in an}\; \epsilon \text{-sized interval around}\; x ) \approx \epsilon \cdot p(x).$$
-:eqlabel:`eq_pdf_deriv`
+$$P(\text{distance is in an}\; \epsilon \text{-sized interval around}\; x ) \approx \epsilon \cdot p(x).$$ 
+ :eqlabel:`eq_pdf_deriv` 
 
-Indeed, :eqref:`eq_pdf_deriv` precisely defines the *probability density function*.  It is a function $p(x)$ which encodes the relative probability of hitting near one point vs. another.  Let's visualize what such a function might look like.
+ En effet, :eqref:`eq_pdf_deriv` définit précisément la *fonction de densité de probabilité*.  Il s'agit d'une fonction $p(x)$ qui code la probabilité relative de toucher un point par rapport à un autre.  Visualisons à quoi pourrait ressembler une telle fonction.
 
 ```{.python .input}
 #@tab mxnet
@@ -88,50 +88,50 @@ p = 0.2*tf.exp(-(x - 3)**2 / 2)/tf.sqrt(2 * tf.constant(tf.pi)) + \
 d2l.plot(x, p, 'x', 'Density')
 ```
 
-The locations where the function value is large indicates regions where we are more likely to find the random value.  The low portions are areas where we are unlikely to find the random value.
+Les endroits où la valeur de la fonction est grande indiquent les régions où nous avons plus de chances de trouver la valeur aléatoire.  Les parties basses sont des régions où nous avons peu de chances de trouver la valeur aléatoire.
 
-### Probability Density Functions
+### Fonctions de densité de probabilité
 
-Let's now investigate this further.  We have already seen what a probability density function is intuitively for a random variable $X$, namely the density function is a function $p(x)$ so that
+Approfondissons maintenant cette question.  Nous avons déjà vu ce qu'est intuitivement une fonction de densité de probabilité pour une variable aléatoire $X$, à savoir que la fonction de densité est une fonction $p(x)$ telle que
 
-$$P(X \; \text{is in an}\; \epsilon \text{-sized interval around}\; x ) \approx \epsilon \cdot p(x).$$
-:eqlabel:`eq_pdf_def`
+$$P(X \; \text{is in an}\; \epsilon \text{-sized interval around}\; x ) \approx \epsilon \cdot p(x).$$ 
+ :eqlabel:`eq_pdf_def` 
 
-But what does this imply for the properties of $p(x)$?
+ Mais qu'est-ce que cela implique pour les propriétés de $p(x)$?
 
-First, probabilities are never negative, thus we should expect that $p(x) \ge 0$ as well.
+Tout d'abord, les probabilités ne sont jamais négatives, nous devrions donc nous attendre à ce que $p(x) \ge 0$ le soit également.
 
-Second, let's imagine that we slice up the $\mathbb{R}$ into an infinite number of slices which are $\epsilon$ wide, say with slices $(\epsilon\cdot i, \epsilon \cdot (i+1)]$.  For each of these, we know from :eqref:`eq_pdf_def` the probability is approximately
+Deuxièmement, imaginons que nous découpions le site $\mathbb{R}$ en un nombre infini de tranches de la largeur de $\epsilon$, disons avec des tranches de $(\epsilon\cdot i, \epsilon \cdot (i+1)]$.  Pour chacune d'entre elles, nous savons grâce à :eqref:`eq_pdf_def` que la probabilité est d'environ
 
 $$
 P(X \; \text{is in an}\; \epsilon\text{-sized interval around}\; x ) \approx \epsilon \cdot p(\epsilon \cdot i),
 $$
 
-so summed over all of them it should be
+donc, additionnée à toutes les tranches, elle devrait être de
 
 $$
 P(X\in\mathbb{R}) \approx \sum_i \epsilon \cdot p(\epsilon\cdot i).
 $$
 
-This is nothing more than the approximation of an integral discussed in :numref:`sec_integral_calculus`, thus we can say that
+Ceci n'est rien d'autre que l'approximation d'une intégrale discutée dans :numref:`sec_integral_calculus` , nous pouvons donc dire que
 
 $$
 P(X\in\mathbb{R}) = \int_{-\infty}^{\infty} p(x) \; dx.
 $$
 
-We know that $P(X\in\mathbb{R}) = 1$, since the random variable must take on *some* number, we can conclude that for any density
+Nous savons que $P(X\in\mathbb{R}) = 1$, puisque la variable aléatoire doit prendre *un certain* nombre, nous pouvons conclure que pour toute densité
 
 $$
 \int_{-\infty}^{\infty} p(x) \; dx = 1.
 $$
 
-Indeed, digging into this further shows that for any $a$, and $b$, we see that
+En effet, en creusant davantage cette question, on constate que pour toute $a$, et $b$, nous voyons que
 
 $$
 P(X\in(a, b]) = \int _ {a}^{b} p(x) \; dx.
 $$
 
-We may approximate this in code by using the same discrete approximation methods as before.  In this case we can approximate the probability of falling in the blue region.
+Nous pouvons approximer cela en code en utilisant les mêmes méthodes d'approximation discrète que précédemment.  Dans ce cas, nous pouvons approximer la probabilité de tomber dans la région bleue.
 
 ```{.python .input}
 #@tab mxnet
@@ -181,36 +181,36 @@ d2l.plt.show()
 f'approximate Probability: {tf.reduce_sum(epsilon*p[300:800])}'
 ```
 
-It turns out that these two properties describe exactly the space of possible probability density functions (or *p.d.f.*'s for the commonly encountered abbreviation).  They are non-negative functions $p(x) \ge 0$ such that
+Il s'avère que ces deux propriétés décrivent exactement l'espace des fonctions de densité de probabilité possibles (ou *f.d.p.* pour l'abréviation couramment utilisée).  Ce sont des fonctions non négatives $p(x) \ge 0$ telles que
 
-$$\int_{-\infty}^{\infty} p(x) \; dx = 1.$$
-:eqlabel:`eq_pdf_int_one`
+$$\int_{-\infty}^{\infty} p(x) \; dx = 1.$$ 
+ :eqlabel:`eq_pdf_int_one` 
 
-We interpret this function by using integration to obtain the probability our random variable is in a specific interval:
+ Nous interprétons cette fonction en utilisant l'intégration pour obtenir la probabilité que notre variable aléatoire se trouve dans un intervalle spécifique :
 
-$$P(X\in(a, b]) = \int _ {a}^{b} p(x) \; dx.$$
-:eqlabel:`eq_pdf_int_int`
+$$P(X\in(a, b]) = \int _ {a}^{b} p(x) \; dx.$$ 
+ :eqlabel:`eq_pdf_int_int` 
 
-In :numref:`sec_distributions` we will see a number of common distributions, but let's continue working in the abstract.
+ Dans :numref:`sec_distributions` , nous verrons un certain nombre de distributions courantes, mais continuons à travailler dans l'abstrait.
 
-### Cumulative Distribution Functions
+### Fonctions de distribution cumulatives
 
-In the previous section, we saw the notion of the p.d.f.  In practice, this is a commonly encountered method to discuss continuous random variables, but it has one significant pitfall: that the values of the p.d.f. are not themselves probabilities, but rather a function that we must integrate to yield probabilities.  There is nothing wrong with a density being larger than $10$, as long as it is not larger than $10$ for more than an interval of length $1/10$.  This can be counter-intuitive, so people often also think in terms of the *cumulative distribution function*, or c.d.f., which *is* a probability.
+Dans la section précédente, nous avons vu la notion de f.d.p. En pratique, il s'agit d'une méthode couramment rencontrée pour discuter des variables aléatoires continues, mais elle présente un écueil important : les valeurs de la f.d.p. ne sont pas elles-mêmes des probabilités, mais plutôt une fonction que nous devons intégrer pour obtenir des probabilités.  Il n'y a rien d'anormal à ce qu'une densité soit supérieure à $10$, à condition qu'elle ne soit pas supérieure à $10$ pendant plus d'un intervalle de longueur $1/10$.  Cela peut être contre-intuitif, c'est pourquoi les gens pensent souvent aussi en termes de *fonction de distribution cumulative*, ou f.d.c., qui *est* une probabilité.
 
-In particular, by using :eqref:`eq_pdf_int_int`, we define the c.d.f. for a random variable $X$ with density $p(x)$ by
+En particulier, en utilisant :eqref:`eq_pdf_int_int` , nous définissons la f.d.c. pour une variable aléatoire $X$ avec une densité $p(x)$ par
 
 $$
 F(x) = \int _ {-\infty}^{x} p(x) \; dx = P(X \le x).
 $$
 
-Let's observe a few properties.
+Observons quelques propriétés.
 
-* $F(x) \rightarrow 0$ as $x\rightarrow -\infty$.
-* $F(x) \rightarrow 1$ as $x\rightarrow \infty$.
-* $F(x)$ is non-decreasing ($y > x \implies F(y) \ge F(x)$).
-* $F(x)$ is continuous (has no jumps) if $X$ is a continuous random variable.
+* $F(x) \rightarrow 0$ comme $x\rightarrow -\infty$.
+* $F(x) \rightarrow 1$ comme $x\rightarrow \infty$.
+* $F(x)$ est non décroissante ($y > x \implies F(y) \ge F(x)$).
+* $F(x)$ est continue (n'a pas de sauts) si $X$ est une variable aléatoire continue.
 
-With the fourth bullet point, note that this would not be true if $X$ were discrete, say taking the values $0$ and $1$ both with probability $1/2$.  In that case
+En ce qui concerne le quatrième point, notez que cela ne serait pas vrai si $X$ était discrète, par exemple si elle prenait les valeurs $0$ et $1$ avec une probabilité de $1/2$.  Dans ce cas
 
 $$
 F(x) = \begin{cases}
@@ -220,101 +220,101 @@ F(x) = \begin{cases}
 \end{cases}
 $$
 
-In this example, we see one of the benefits of working with the c.d.f., the ability to deal with continuous or discrete random variables in the same framework, or indeed mixtures of the two (flip a coin: if heads return the roll of a die, if tails return the distance of a dart throw from the center of a dart board).
+Dans cet exemple, nous voyons l'un des avantages de travailler avec la f.c.d., la possibilité de traiter des variables aléatoires continues ou discrètes dans le même cadre, ou même des mélanges des deux (tirez à pile ou face : si c'est pile, vous obtiendrez le résultat du lancer d'un dé, si c'est face, vous obtiendrez la distance d'un lancer de fléchettes par rapport au centre de la cible).
 
-### Means
+### Moyennes
 
-Suppose that we are dealing with a random variables $X$.  The distribution itself can be hard to interpret.  It is often useful to be able to summarize the behavior of a random variable concisely.  Numbers that help us capture the behavior of a random variable are called *summary statistics*.  The most commonly encountered ones are the *mean*, the *variance*, and the *standard deviation*.
+Supposons que nous ayons affaire à une variable aléatoire $X$.  La distribution elle-même peut être difficile à interpréter.  Il est souvent utile de pouvoir résumer le comportement d'une variable aléatoire de manière concise.  Les nombres qui nous aident à saisir le comportement d'une variable aléatoire sont appelés *statistiques sommaires*.  Les plus courantes sont la *moyenne*, la *variance* et l'écart-type*.
 
-The *mean* encodes the average value of a random variable.  If we have a discrete random variable $X$, which takes the values $x_i$ with probabilities $p_i$, then the mean is given by the weighted average: sum the values times the probability that the random variable takes on that value:
+La *moyenne* code la valeur moyenne d'une variable aléatoire.  Si nous avons une variable aléatoire discrète $X$, qui prend les valeurs $x_i$ avec les probabilités $p_i$, alors la moyenne est donnée par la moyenne pondérée : somme des valeurs multipliée par la probabilité que la variable aléatoire prenne cette valeur :
 
-$$\mu_X = E[X] = \sum_i x_i p_i.$$
-:eqlabel:`eq_exp_def`
+$$\mu_X = E[X] = \sum_i x_i p_i.$$ 
+ :eqlabel:`eq_exp_def` 
 
-The way we should interpret the mean (albeit with caution) is that it tells us essentially where the random variable tends to be located.
+ La façon dont nous devons interpréter la moyenne (bien qu'avec prudence) est qu'elle nous indique essentiellement où la variable aléatoire tend à se situer.
 
-As a minimalistic example that we will examine throughout this section, let's take $X$ to be the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We can compute using :eqref:`eq_exp_def` that, for any possible choice of $a$ and $p$, the mean is
+À titre d'exemple minimaliste que nous examinerons tout au long de cette section, considérons que $X$ est la variable aléatoire qui prend la valeur $a-2$ avec la probabilité $p$, $a+2$ avec la probabilité $p$ et $a$ avec la probabilité $1-2p$.  Nous pouvons calculer en utilisant :eqref:`eq_exp_def` que, pour tout choix possible de $a$ et $p$, la moyenne est de
 
 $$
 \mu_X = E[X] = \sum_i x_i p_i = (a-2)p + a(1-2p) + (a+2)p = a.
 $$
 
-Thus we see that the mean is $a$.  This matches the intuition since $a$ is the location around which we centered our random variable.
+Nous voyons donc que la moyenne est $a$.  Cela correspond à l'intuition puisque $a$ est l'emplacement autour duquel nous avons centré notre variable aléatoire.
 
-Because they are helpful, let's summarize a few properties.
+Parce qu'elles sont utiles, résumons quelques propriétés.
 
-* For any random variable $X$ and numbers $a$ and $b$, we have that $\mu_{aX+b} = a\mu_X + b$.
-* If we have two random variables $X$ and $Y$, we have $\mu_{X+Y} = \mu_X+\mu_Y$.
+* Pour toute variable aléatoire $X$ et les nombres $a$ et $b$, nous avons $\mu_{aX+b} = a\mu_X + b$.
+* Si nous avons deux variables aléatoires $X$ et $Y$, nous avons $\mu_{X+Y} = \mu_X+\mu_Y$.
 
-Means are useful for understanding the average behavior of a random variable, however the mean is not sufficient to even have a full intuitive understanding.  Making a profit of $\$10 \pm \$1$ per sale is very different from making $\$10 \pm \$15$ per sale despite having the same average value.  The second one has a much larger degree of fluctuation, and thus represents a much larger risk.  Thus, to understand the behavior of a random variable, we will need at minimum one more measure: some measure of how widely a random variable fluctuates.
+Les moyennes sont utiles pour comprendre le comportement moyen d'une variable aléatoire, cependant la moyenne n'est pas suffisante pour en avoir une compréhension intuitive complète.  Réaliser un bénéfice de $\$10 \pm \$1$ par vente est très différent de réaliser un bénéfice de $\$10 \pm \$15$ par vente malgré une valeur moyenne identique.  La seconde a un degré de fluctuation beaucoup plus important, et représente donc un risque beaucoup plus grand.  Ainsi, pour comprendre le comportement d'une variable aléatoire, nous aurons besoin au minimum d'une mesure supplémentaire : une mesure de l'ampleur de la fluctuation d'une variable aléatoire.
 
 ### Variances
 
-This leads us to consider the *variance* of a random variable.  This is a quantitative measure of how far a random variable deviates from the mean.  Consider the expression $X - \mu_X$.  This is the deviation of the random variable from its mean.  This value can be positive or negative, so we need to do something to make it positive so that we are measuring the magnitude of the deviation.
+Cela nous amène à considérer la *variance* d'une variable aléatoire.  Il s'agit d'une mesure quantitative de l'ampleur de la déviation d'une variable aléatoire par rapport à la moyenne.  Considérons l'expression $X - \mu_X$.  Il s'agit de l'écart de la variable aléatoire par rapport à sa moyenne.  Cette valeur peut être positive ou négative, nous devons donc faire quelque chose pour la rendre positive afin de mesurer l'ampleur de l'écart.
 
-A reasonable thing to try is to look at $\left|X-\mu_X\right|$, and indeed this leads to a useful quantity called the *mean absolute deviation*, however due to connections with other areas of mathematics and statistics, people often use a different solution.
+Il est raisonnable d'essayer d'examiner $\left|X-\mu_X\right|$, ce qui conduit effectivement à une quantité utile appelée *écart absolu moyen*, mais en raison des liens avec d'autres domaines des mathématiques et des statistiques, les gens utilisent souvent une solution différente.
 
-In particular, they look at $(X-\mu_X)^2.$  If we look at the typical size of this quantity by taking the mean, we arrive at the variance
+En particulier, ils examinent $(X-\mu_X)^2.$ Si nous examinons la taille typique de cette quantité en prenant la moyenne, nous arrivons à la variance
 
-$$\sigma_X^2 = \mathrm{Var}(X) = E\left[(X-\mu_X)^2\right] = E[X^2] - \mu_X^2.$$
-:eqlabel:`eq_var_def`
+$$\sigma_X^2 = \mathrm{Var}(X) = E\left[(X-\mu_X)^2\right] = E[X^2] - \mu_X^2.$$ 
+ :eqlabel:`eq_var_def` 
 
-The last equality in :eqref:`eq_var_def` holds by expanding out the definition in the middle, and applying the properties of expectation.
+ La dernière égalité dans :eqref:`eq_var_def` tient en développant la définition au milieu, et en appliquant les propriétés de l'espérance.
 
-Let's look at our example where $X$ is the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  In this case $\mu_X = a$, so all we need to compute is $E\left[X^2\right]$.  This can readily be done:
+Reprenons notre exemple où $X$ est la variable aléatoire qui prend la valeur $a-2$ avec la probabilité $p$, $a+2$ avec la probabilité $p$ et $a$ avec la probabilité $1-2p$.  Dans ce cas, $\mu_X = a$, tout ce dont nous avons besoin est de calculer $E\left[X^2\right]$.  Cela peut facilement être fait :
 
 $$
 E\left[X^2\right] = (a-2)^2p + a^2(1-2p) + (a+2)^2p = a^2 + 8p.
 $$
 
-Thus, we see that by :eqref:`eq_var_def` our variance is
+Ainsi, nous voyons que par :eqref:`eq_var_def` notre variance est de
 
 $$
 \sigma_X^2 = \mathrm{Var}(X) = E[X^2] - \mu_X^2 = a^2 + 8p - a^2 = 8p.
 $$
 
-This result again makes sense.  The largest $p$ can be is $1/2$ which corresponds to picking $a-2$ or $a+2$ with a coin flip.  The variance of this being $4$ corresponds to the fact that both $a-2$ and $a+2$ are $2$ units away from the mean, and $2^2 = 4$.  On the other end of the spectrum, if $p=0$, this random variable always takes the value $0$ and so it has no variance at all.
+Ce résultat est à nouveau logique.  La plus grande valeur possible de $p$ est $1/2$, ce qui correspond au choix de $a-2$ ou $a+2$ à pile ou face.  La variance de cette valeur est $4$, ce qui correspond au fait que $a-2$ et $a+2$ sont toutes deux éloignées de la moyenne de $2$ unités, et $2^2 = 4$.  À l'autre extrémité du spectre, si $p=0$, cette variable aléatoire prend toujours la valeur $0$ et n'a donc aucune variance.
 
-We will list a few properties of variance below:
+Nous allons énumérer ci-dessous quelques propriétés de la variance :
 
-* For any random variable $X$, $\mathrm{Var}(X) \ge 0$, with $\mathrm{Var}(X) = 0$ if and only if $X$ is a constant.
-* For any random variable $X$ and numbers $a$ and $b$, we have that $\mathrm{Var}(aX+b) = a^2\mathrm{Var}(X)$.
-* If we have two *independent* random variables $X$ and $Y$, we have $\mathrm{Var}(X+Y) = \mathrm{Var}(X) + \mathrm{Var}(Y)$.
+* Pour toute variable aléatoire $X$, $\mathrm{Var}(X) \ge 0$, avec $\mathrm{Var}(X) = 0$ si et seulement si $X$ est une constante.
+* Pour toute variable aléatoire $X$ et les nombres $a$ et $b$, on a que $\mathrm{Var}(aX+b) = a^2\mathrm{Var}(X)$.
+* Si on a deux variables aléatoires *indépendantes* $X$ et $Y$, on a $\mathrm{Var}(X+Y) = \mathrm{Var}(X) + \mathrm{Var}(Y)$.
 
-When interpreting these values, there can be a bit of a hiccup.  In particular, let's try imagining what happens if we keep track of units through this computation.  Suppose that we are working with the star rating assigned to a product on the web page.  Then $a$, $a-2$, and $a+2$ are all measured in units of stars.  Similarly, the mean $\mu_X$ is then also measured in stars (being a weighted average).  However, if we get to the variance, we immediately encounter an issue, which is we want to look at $(X-\mu_X)^2$, which is in units of *squared stars*.  This means that the variance itself is not comparable to the original measurements.  To make it interpretable, we will need to return to our original units.
+Lors de l'interprétation de ces valeurs, il peut y avoir un petit couac.  En particulier, essayons d'imaginer ce qui se passe si nous gardons la trace des unités dans ce calcul.  Supposons que nous travaillons avec le classement par étoiles attribué à un produit sur la page Web.  Dans ce cas, $a$, $a-2$, et $a+2$ sont tous mesurés en unités d'étoiles.  De même, la moyenne $\mu_X$ est également mesurée en étoiles (il s'agit d'une moyenne pondérée).  Cependant, si nous arrivons à la variance, nous rencontrons immédiatement un problème, à savoir que nous voulons examiner $(X-\mu_X)^2$, qui est en unités d'étoiles *au carré*.  Cela signifie que la variance elle-même n'est pas comparable aux mesures originales.  Pour la rendre interprétable, nous devrons revenir à nos unités d'origine.
 
-### Standard Deviations
+### Écarts types
 
-This summary statistics can always be deduced from the variance by taking the square root!  Thus we define the *standard deviation* to be
+Cette statistique sommaire peut toujours être déduite de la variance en prenant la racine carrée !  Ainsi, nous définissons l'écart *type* comme suit
 
 $$
 \sigma_X = \sqrt{\mathrm{Var}(X)}.
 $$
 
-In our example, this means we now have the standard deviation is $\sigma_X = 2\sqrt{2p}$.  If we are dealing with units of stars for our review example, $\sigma_X$ is again in units of stars.
+Dans notre exemple, cela signifie que l'écart-type est $\sigma_X = 2\sqrt{2p}$. Si nous utilisons des unités d'étoiles dans notre exemple de revue, $\sigma_X$ est à nouveau en unités d'étoiles.
 
-The properties we had for the variance can be restated for the standard deviation.
+Les propriétés que nous avions pour la variance peuvent être reformulées pour l'écart-type.
 
-* For any random variable $X$, $\sigma_{X} \ge 0$.
-* For any random variable $X$ and numbers $a$ and $b$, we have that $\sigma_{aX+b} = |a|\sigma_{X}$
-* If we have two *independent* random variables $X$ and $Y$, we have $\sigma_{X+Y} = \sqrt{\sigma_{X}^2 + \sigma_{Y}^2}$.
+* Pour toute variable aléatoire $X$, $\sigma_{X} \ge 0$.
+* Pour toute variable aléatoire $X$ et les nombres $a$ et $b$, nous avons $\sigma_{aX+b} = |a|\sigma_{X}$
+ * Si nous avons deux variables aléatoires *indépendantes* $X$ et $Y$, nous avons $\sigma_{X+Y} = \sqrt{\sigma_{X}^2 + \sigma_{Y}^2}$.
 
-It is natural at this moment to ask, "If the standard deviation is in the units of our original random variable, does it represent something we can draw with regards to that random variable?"  The answer is a resounding yes!  Indeed much like the mean told us the typical location of our random variable, the standard deviation gives the typical range of variation of that random variable.  We can make this rigorous with what is known as Chebyshev's inequality:
+Il est naturel à ce moment de se demander : " Si l'écart-type est dans les unités de notre variable aléatoire initiale, représente-t-il quelque chose que nous pouvons tirer en ce qui concerne cette variable aléatoire ? "  La réponse est un oui retentissant !  En effet, tout comme la moyenne nous a indiqué l'emplacement typique de notre variable aléatoire, l'écart-type donne la plage de variation typique de cette variable aléatoire.  Nous pouvons rendre cela rigoureux à l'aide de ce que l'on appelle l'inégalité de Chebyshev :
 
-$$P\left(X \not\in [\mu_X - \alpha\sigma_X, \mu_X + \alpha\sigma_X]\right) \le \frac{1}{\alpha^2}.$$
-:eqlabel:`eq_chebyshev`
+$$P\left(X \not\in [\mu_X - \alpha\sigma_X, \mu_X + \alpha\sigma_X]\right) \le \frac{1}{\alpha^2}.$$ 
+ :eqlabel:`eq_chebyshev` 
 
-Or to state it verbally in the case of $\alpha=10$, $99\%$ of the samples from any random variable fall within $10$ standard deviations of the mean.  This gives an immediate interpretation to our standard summary statistics.
+ Ou, pour l'exprimer verbalement dans le cas de $\alpha=10$, $99\%$ des échantillons de toute variable aléatoire se situent dans les limites de $10$ écarts types de la moyenne.  Cela donne une interprétation immédiate à nos statistiques sommaires standard.
 
-To see how this statement is rather subtle, let's take a look at our running example again where  $X$ is the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We saw that the mean was $a$ and the standard deviation was $2\sqrt{2p}$.  This means, if we take Chebyshev's inequality :eqref:`eq_chebyshev` with $\alpha = 2$, we see that the expression is
+Pour voir en quoi cette affirmation est plutôt subtile, reprenons notre exemple courant où $X$ est la variable aléatoire qui prend la valeur $a-2$ avec la probabilité $p$, $a+2$ avec la probabilité $p$ et $a$ avec la probabilité $1-2p$.  Nous avons vu que la moyenne était $a$ et que l'écart type était $2\sqrt{2p}$. Cela signifie que, si nous prenons l'inégalité de Chebyshev :eqref:`eq_chebyshev` avec $\alpha = 2$, nous voyons que l'expression est
 
 $$
 P\left(X \not\in [a - 4\sqrt{2p}, a + 4\sqrt{2p}]\right) \le \frac{1}{4}.
 $$
 
-This means that $75\%$ of the time, this random variable will fall within this interval for any value of $p$.  Now, notice that as $p \rightarrow 0$, this interval also converges to the single point $a$.  But we know that our random variable takes the values $a-2, a$, and $a+2$ only so eventually we can be certain $a-2$ and $a+2$ will fall outside the interval!  The question is, at what $p$ does that happen.  So we want to solve: for what $p$ does $a+4\sqrt{2p} = a+2$, which is solved when $p=1/8$, which is *exactly* the first $p$ where it could possibly happen without violating our claim that no more than $1/4$ of samples from the distribution would fall outside the interval ($1/8$ to the left, and $1/8$ to the right).
+Cela signifie que $75\%$ du temps, cette variable aléatoire se situera dans cet intervalle pour toute valeur de $p$. Maintenant, remarquez que comme $p \rightarrow 0$, cet intervalle converge également vers le point unique $a$.  Mais nous savons que notre variable aléatoire ne prend que les valeurs $a-2, a$ et $a+2$; nous pouvons donc être certains que $a-2$ et $a+2$ se situeront en dehors de l'intervalle !  La question est de savoir à quel moment $p$ cela se produit.  Nous voulons donc résoudre la question suivante : à quel moment $p$ fait $a+4\sqrt{2p} = a+2$, ce qui est résolu lorsque $p=1/8$, qui est *exactement* le premier $p$ où cela pourrait se produire sans violer notre affirmation selon laquelle pas plus de $1/4$ des échantillons de la distribution tomberaient en dehors de l'intervalle ($1/8$ à gauche et $1/8$ à droite).
 
-Let's visualize this.  We will show the probability of getting the three values as three vertical bars with height proportional to the probability.  The interval will be drawn as a horizontal line in the middle.  The first plot shows what happens for $p > 1/8$ where the interval safely contains all points.
+Visualisons cela.  Nous allons montrer la probabilité d'obtenir les trois valeurs sous la forme de trois barres verticales dont la hauteur est proportionnelle à la probabilité.  L'intervalle sera dessiné comme une ligne horizontale au milieu.  Le premier graphique montre ce qui se passe pour $p > 1/8$ où l'intervalle contient bien tous les points.
 
 ```{.python .input}
 #@tab mxnet
@@ -382,7 +382,7 @@ def plot_chebyshev(a, p):
 plot_chebyshev(0.0, tf.constant(0.2))
 ```
 
-The second shows that at $p = 1/8$, the interval exactly touches the two points.  This shows that the inequality is *sharp*, since no smaller interval could be taken while keeping the inequality true.
+Le second montre qu'à $p = 1/8$, l'intervalle touche exactement les deux points.  Cela montre que l'inégalité est *forte*, car aucun intervalle plus petit ne pourrait être pris tout en gardant l'inégalité vraie.
 
 ```{.python .input}
 #@tab mxnet
@@ -402,7 +402,7 @@ plot_chebyshev(0.0, torch.tensor(0.125))
 plot_chebyshev(0.0, tf.constant(0.125))
 ```
 
-The third shows that for $p < 1/8$ the interval only contains the center.  This does not invalidate the inequality since we only needed to ensure that no more than $1/4$ of the probability falls outside the interval, which means that once $p < 1/8$, the two points at $a-2$ and $a+2$ can be discarded.
+La troisième montre que pour $p < 1/8$, l'intervalle ne contient que le centre.  Cela n'invalide pas l'inégalité puisque nous devions seulement nous assurer que pas plus de $1/4$ de la probabilité ne tombe en dehors de l'intervalle, ce qui signifie qu'une fois $p < 1/8$, les deux points de $a-2$ et $a+2$ peuvent être écartés.
 
 ```{.python .input}
 #@tab mxnet
@@ -422,9 +422,9 @@ plot_chebyshev(0.0, torch.tensor(0.05))
 plot_chebyshev(0.0, tf.constant(0.05))
 ```
 
-### Means and Variances in the Continuum
+### Moyennes et variances dans le continu
 
-This has all been in terms of discrete random variables, but the case of continuous random variables is similar.  To intuitively understand how this works, imagine that we split the real number line into intervals of length $\epsilon$ given by $(\epsilon i, \epsilon (i+1)]$.  Once we do this, our continuous random variable has been made discrete and we can use :eqref:`eq_exp_def` say that
+Tout ceci a été fait en termes de variables aléatoires discrètes, mais le cas des variables aléatoires continues est similaire.  Pour comprendre intuitivement comment cela fonctionne, imaginez que nous divisons la ligne des nombres réels en intervalles de longueur $\epsilon$ donnés par $(\epsilon i, \epsilon (i+1)]$.  Une fois que nous avons fait cela, notre variable aléatoire continue est devenue discrète et nous pouvons utiliser :eqref:`eq_exp_def` pour dire que
 
 $$
 \begin{aligned}
@@ -433,19 +433,19 @@ $$
 \end{aligned}
 $$
 
-where $p_X$ is the density of $X$.  This is an approximation to the integral of $xp_X(x)$, so we can conclude that
+où $p_X$ est la densité de $X$, qui est une approximation de l'intégrale de $xp_X(x)$, ce qui nous permet de conclure que
 
 $$
 \mu_X = \int_{-\infty}^\infty xp_X(x) \; dx.
 $$
 
-Similarly, using :eqref:`eq_var_def` the variance can be written as
+De même, en utilisant :eqref:`eq_var_def` , la variance peut être écrite comme suit
 
 $$
 \sigma^2_X = E[X^2] - \mu_X^2 = \int_{-\infty}^\infty x^2p_X(x) \; dx - \left(\int_{-\infty}^\infty xp_X(x) \; dx\right)^2.
 $$
 
-Everything stated above about the mean, the variance, and the standard deviation still applies in this case.  For instance, if we consider the random variable with density
+Tout ce qui a été dit plus haut à propos de la moyenne, de la variance et de l'écart-type reste valable dans ce cas.  Par exemple, si nous considérons la variable aléatoire de densité
 
 $$
 p(x) = \begin{cases}
@@ -454,19 +454,19 @@ p(x) = \begin{cases}
 \end{cases}
 $$
 
-we can compute
+nous pouvons calculer
 
 $$
 \mu_X = \int_{-\infty}^\infty xp(x) \; dx = \int_0^1 x \; dx = \frac{1}{2}.
 $$
 
-and
+et
 
 $$
 \sigma_X^2 = \int_{-\infty}^\infty x^2p(x) \; dx - \left(\frac{1}{2}\right)^2 = \frac{1}{3} - \frac{1}{4} = \frac{1}{12}.
 $$
 
-As a warning, let's examine one more example, known as the *Cauchy distribution*.  This is the distribution with p.d.f. given by
+À titre d'avertissement, examinons un autre exemple, connu sous le nom de *distribution de Cauchy*.  Il s'agit de la distribution dont la f.d.p. est donnée par
 
 $$
 p(x) = \frac{1}{1+x^2}.
@@ -499,15 +499,15 @@ p = 1 / (1 + x**2)
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-This function looks innocent, and indeed consulting a table of integrals will show it has area one under it, and thus it defines a continuous random variable.
+Cette fonction semble innocente, et en effet, la consultation d'un tableau d'intégrales montrera qu'elle a une aire un sous elle, et donc qu'elle définit une variable aléatoire continue.
 
-To see what goes astray, let's try to compute the variance of this.  This would involve using :eqref:`eq_var_def` computing
+Pour voir ce qui ne va pas, essayons de calculer la variance de cette fonction.  Cela implique d'utiliser :eqref:`eq_var_def` pour calculer
 
 $$
 \int_{-\infty}^\infty \frac{x^2}{1+x^2}\; dx.
 $$
 
-The function on the inside looks like this:
+La fonction à l'intérieur ressemble à ceci :
 
 ```{.python .input}
 #@tab mxnet
@@ -536,66 +536,66 @@ p = x**2 / (1 + x**2)
 d2l.plot(x, p, 'x', 'integrand')
 ```
 
-This function clearly has infinite area under it since it is essentially the constant one with a small dip near zero, and indeed we could show that
+Cette fonction a clairement une aire infinie puisqu'il s'agit essentiellement de la fonction constante avec un petit creux près de zéro, et en effet, nous pouvons montrer que
 
 $$
 \int_{-\infty}^\infty \frac{x^2}{1+x^2}\; dx = \infty.
 $$
 
-This means it does not have a well-defined finite variance.
+Cela signifie qu'elle n'a pas une variance finie bien définie.
 
-However, looking deeper shows an even more disturbing result.  Let's try to compute the mean using :eqref:`eq_exp_def`.  Using the change of variables formula, we see
+Cependant, en regardant de plus près, on obtient un résultat encore plus inquiétant.  Essayons de calculer la moyenne à l'aide de :eqref:`eq_exp_def` .  En utilisant la formule de changement de variables, nous voyons
 
 $$
 \mu_X = \int_{-\infty}^{\infty} \frac{x}{1+x^2} \; dx = \frac{1}{2}\int_1^\infty \frac{1}{u} \; du.
 $$
 
-The integral inside is the definition of the logarithm, so this is in essence $\log(\infty) = \infty$, so there is no well-defined average value either!
+L'intégrale qui se trouve à l'intérieur est la définition du logarithme, donc il s'agit en fait de $\log(\infty) = \infty$, ce qui signifie qu'il n'existe pas non plus de valeur moyenne bien définie !
 
-Machine learning scientists define their models so that we most often do not need to deal with these issues, and will in the vast majority of cases deal with random variables with well-defined means and variances.  However, every so often random variables with *heavy tails* (that is those random variables where the probabilities of getting large values are large enough to make things like the mean or variance undefined) are helpful in modeling physical systems, thus it is worth knowing that they exist.
+Les scientifiques de l'apprentissage automatique définissent leurs modèles de manière à ce que nous n'ayons pas besoin de traiter ces questions et que nous ayons affaire, dans la grande majorité des cas, à des variables aléatoires avec des moyennes et des variances bien définies.  Cependant, de temps en temps, les variables aléatoires avec des queues *lourdes* (c'est-à-dire les variables aléatoires où les probabilités d'obtenir de grandes valeurs sont suffisamment grandes pour que des choses comme la moyenne ou la variance ne soient pas définies) sont utiles dans la modélisation des systèmes physiques, il est donc utile de savoir qu'elles existent.
 
-### Joint Density Functions
+### Fonctions de densité conjointe
 
-The above work all assumes we are working with a single real valued random variable.  But what if we are dealing with two or more potentially highly correlated random variables?  This circumstance is the norm in machine learning: imagine random variables like $R_{i, j}$ which encode the red value of the pixel at the $(i, j)$ coordinate in an image, or $P_t$ which is a random variable given by a stock price at time $t$.  Nearby pixels tend to have similar color, and nearby times tend to have similar prices.  We cannot treat them as separate random variables, and expect to create a successful model (we will see in :numref:`sec_naive_bayes` a model that under-performs due to such an assumption).  We need to develop the mathematical language to handle these correlated continuous random variables.
+Les travaux ci-dessus supposent tous que nous travaillons avec une seule variable aléatoire à valeur réelle.  Mais que se passe-t-il si nous avons affaire à deux ou plusieurs variables aléatoires potentiellement fortement corrélées ?  Cette circonstance est la norme en apprentissage automatique : imaginez des variables aléatoires comme $R_{i, j}$ qui codent la valeur rouge du pixel à la coordonnée $(i, j)$ dans une image, ou $P_t$ qui est une variable aléatoire donnée par le prix d'une action au moment $t$.  Les pixels proches ont tendance à avoir une couleur similaire, et les moments proches ont tendance à avoir des prix similaires.  Nous ne pouvons pas les traiter comme des variables aléatoires distinctes et espérer créer un modèle performant (nous verrons dans :numref:`sec_naive_bayes` un modèle peu performant en raison d'une telle hypothèse).  Nous devons développer le langage mathématique nécessaire pour traiter ces variables aléatoires continues corrélées.
 
-Thankfully, with the multiple integrals in :numref:`sec_integral_calculus` we can develop such a language.  Suppose that we have, for simplicity, two random variables $X, Y$ which can be correlated.  Then, similar to the case of a single variable, we can ask the question:
+Heureusement, grâce aux intégrales multiples de :numref:`sec_integral_calculus` , nous pouvons développer un tel langage.  Supposons que nous ayons, pour simplifier, deux variables aléatoires $X, Y$ qui peuvent être corrélées.  Alors, comme dans le cas d'une variable unique, nous pouvons poser la question :
 
 $$
 P(X \;\text{is in an}\; \epsilon \text{-sized interval around}\; x \; \text{and} \;Y \;\text{is in an}\; \epsilon \text{-sized interval around}\; y ).
 $$
 
-Similar reasoning to the single variable case shows that this should be approximately
+Un raisonnement similaire à celui du cas d'une variable unique montre que cela devrait être environ
 
 $$
 P(X \;\text{is in an}\; \epsilon \text{-sized interval around}\; x \; \text{and} \;Y \;\text{is in an}\; \epsilon \text{-sized interval around}\; y ) \approx \epsilon^{2}p(x, y),
 $$
 
-for some function $p(x, y)$.  This is referred to as the joint density of $X$ and $Y$.  Similar properties are true for this as we saw in the single variable case. Namely:
+pour une certaine fonction $p(x, y)$.  C'est ce qu'on appelle la densité conjointe de $X$ et $Y$.  Des propriétés similaires sont vraies pour cette fonction, comme nous l'avons vu dans le cas d'une variable unique. À savoir :
 
 * $p(x, y) \ge 0$;
 * $\int _ {\mathbb{R}^2} p(x, y) \;dx \;dy = 1$;
 * $P((X, Y) \in \mathcal{D}) = \int _ {\mathcal{D}} p(x, y) \;dx \;dy$.
 
-In this way, we can deal with multiple, potentially correlated random variables.  If we wish to work with more than two random variables, we can extend the multivariate density to as many coordinates as desired by considering $p(\mathbf{x}) = p(x_1, \ldots, x_n)$.  The same properties of being non-negative, and having total integral of one still hold.
+De cette manière, nous pouvons traiter des variables aléatoires multiples, potentiellement corrélées.  Si nous souhaitons travailler avec plus de deux variables aléatoires, nous pouvons étendre la densité multivariée à autant de coordonnées que souhaité en considérant $p(\mathbf{x}) = p(x_1, \ldots, x_n)$.  Les mêmes propriétés, à savoir être non négatif et avoir une intégrale totale de un, sont toujours valables.
 
-### Marginal Distributions
-When dealing with multiple variables, we oftentimes want to be able to ignore the relationships and ask, "how is this one variable distributed?"  Such a distribution is called a *marginal distribution*.
+### Distributions marginales
+Lorsqu'on a affaire à des variables multiples, on souhaite souvent pouvoir ignorer les relations et se demander "comment est distribuée cette variable"  Une telle distribution est appelée une *distribution marginale*.
 
-To be concrete, let's suppose that we have two random variables $X, Y$ with joint density given by $p _ {X, Y}(x, y)$.  We will be using the subscript to indicate what random variables the density is for.  The question of finding the marginal distribution is taking this function, and using it to find $p _ X(x)$.
+Pour être concret, supposons que nous ayons deux variables aléatoires $X, Y$ avec une densité conjointe donnée par $p _ {X, Y}(x, y)$.  Nous utiliserons l'indice pour indiquer à quelles variables aléatoires correspond la densité.  Pour trouver la distribution marginale, il faut prendre cette fonction et l'utiliser pour trouver $p _ X(x)$.
 
-As with most things, it is best to return to the intuitive picture to figure out what should be true.  Recall that the density is the function $p _ X$ so that
+Comme pour la plupart des choses, il est préférable de revenir à l'image intuitive pour déterminer ce qui devrait être vrai.  Rappelez-vous que la densité est la fonction $p _ X$ de sorte que
 
 $$
 P(X \in [x, x+\epsilon]) \approx \epsilon \cdot p _ X(x).
 $$
 
-There is no mention of $Y$, but if all we are given is $p _{X, Y}$, we need to include $Y$ somehow. We can first observe that this is the same as
+Il n'est pas fait mention de $Y$, mais si tout ce qui nous est donné est $p _{X, Y}$, nous devons inclure $Y$ d'une manière ou d'une autre. Nous pouvons d'abord observer que cela équivaut à
 
 $$
 P(X \in [x, x+\epsilon] \text{, and } Y \in \mathbb{R}) \approx \epsilon \cdot p _ X(x).
 $$
 
-Our density does not directly tell us about what happens in this case, we need to split into small intervals in $y$ as well, so we can write this as
+Notre densité ne nous dit pas directement ce qui se passe dans ce cas, nous devons également diviser en petits intervalles dans $y$, nous pouvons donc l'écrire comme suit
 
 $$
 \begin{aligned}
@@ -607,7 +607,7 @@ $$
 ![By summing along the columns of our array of probabilities, we are able to obtain the marginal distribution for just the random variable represented along the $x$-axis.](../img/marginal.svg)
 :label:`fig_marginal`
 
-This tells us to add up the value of the density along a series of squares in a line as is shown in :numref:`fig_marginal`.  Indeed, after canceling one factor of epsilon from both sides, and recognizing the sum on the right is the integral over $y$, we can conclude that
+Cela nous dit d'additionner la valeur de la densité le long d'une série de carrés sur une ligne, comme indiqué sur :numref:`fig_marginal` . En effet, après avoir annulé un facteur d'epsilon des deux côtés, et en reconnaissant que la somme de droite est l'intégrale sur $y$, nous pouvons conclure que
 
 $$
 \begin{aligned}
@@ -616,24 +616,24 @@ $$
 \end{aligned}
 $$
 
-Thus we see
+Nous voyons donc
 
 $$
 p _ X(x) = \int_{-\infty}^\infty p_{X, Y}(x, y) \; dy.
 $$
 
-This tells us that to get a marginal distribution, we integrate over the variables we do not care about.  This process is often referred to as *integrating out* or *marginalized out* the unneeded variables.
+Cela nous indique que pour obtenir une distribution marginale, nous intégrons sur les variables qui ne nous intéressent pas.  Ce processus est souvent appelé *intégration hors* ou *marginalisation hors* des variables inutiles.
 
 ### Covariance
 
-When dealing with multiple random variables, there is one additional summary statistic which is helpful to know: the *covariance*.  This measures the degree that two random variable fluctuate together.
+Lorsque l'on a affaire à plusieurs variables aléatoires, il existe une statistique sommaire supplémentaire qu'il est utile de connaître : la *covariance*.  Elle mesure le degré de fluctuation de deux variables aléatoires ensemble.
 
-Suppose that we have two random variables $X$ and $Y$, to begin with, let's suppose they are discrete, taking on values $(x_i, y_j)$ with probability $p_{ij}$.  In this case, the covariance is defined as
+Supposons que nous disposions de deux variables aléatoires $X$ et $Y$. Pour commencer, supposons qu'elles soient discrètes et prennent les valeurs $(x_i, y_j)$ avec une probabilité de $p_{ij}$.  Dans ce cas, la covariance est définie comme suit :
 
-$$\sigma_{XY} = \mathrm{Cov}(X, Y) = \sum_{i, j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij}. = E[XY] - E[X]E[Y].$$
-:eqlabel:`eq_cov_def`
+$$\sigma_{XY} = \mathrm{Cov}(X, Y) = \sum_{i, j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij}. = E[XY] - E[X]E[Y].$$ 
+ :eqlabel:`eq_cov_def` 
 
-To think about this intuitively: consider the following pair of random variables.  Suppose that $X$ takes the values $1$ and $3$, and $Y$ takes the values $-1$ and $3$.  Suppose that we have the following probabilities
+ Pour y réfléchir de manière intuitive : considérez la paire de variables aléatoires suivante.  Supposons que $X$ prenne les valeurs $1$ et $3$, et que $Y$ prenne les valeurs $-1$ et $3$.  Supposons que nous ayons les probabilités suivantes
 
 $$
 \begin{aligned}
@@ -644,7 +644,7 @@ P(X = 3 \; \text{and} \; Y = 3) & = \frac{p}{2},
 \end{aligned}
 $$
 
-where $p$ is a parameter in $[0,1]$ we get to pick.  Notice that if $p=1$ then they are both always their minimum or maximum values simultaneously, and if $p=0$ they are guaranteed to take their flipped values simultaneously (one is large when the other is small and vice versa).  If $p=1/2$, then the four possibilities are all equally likely, and neither should be related.  Let's compute the covariance.  First, note $\mu_X = 2$ and $\mu_Y = 1$, so we may compute using :eqref:`eq_cov_def`:
+où $p$ est un paramètre de $[0,1]$ que nous pouvons choisir.  Remarquez que si $p=1$, alors ils prennent toujours leurs valeurs minimales ou maximales simultanément, et que si $p=0$, ils sont garantis de prendre leurs valeurs inversées simultanément (l'un est grand quand l'autre est petit et vice versa).  Si $p=1/2$, alors les quatre possibilités sont toutes aussi probables les unes que les autres, et aucune ne doit être liée.  Calculons la covariance.  Tout d'abord, notez $\mu_X = 2$ et $\mu_Y = 1$, de sorte que nous pouvons effectuer le calcul en utilisant :eqref:`eq_cov_def` :
 
 $$
 \begin{aligned}
@@ -654,17 +654,17 @@ $$
 \end{aligned}
 $$
 
-When $p=1$ (the case where they are both maximally positive or negative at the same time) has a covariance of $2$. When $p=0$ (the case where they are flipped) the covariance is $-2$.  Finally, when $p=1/2$ (the case where they are unrelated), the covariance is $0$.  Thus we see that the covariance measures how these two random variables are related.
+Lorsque $p=1$ (le cas où elles sont toutes deux maximalement positives ou négatives en même temps), la covariance est de $2$. Lorsque $p=0$ (le cas où elles sont inversées), la covariance est de $-2$.  Enfin, lorsque $p=1/2$ (le cas où ils ne sont pas liés), la covariance est de $0$.  Nous voyons donc que la covariance mesure la relation entre ces deux variables aléatoires.
 
-A quick note on the covariance is that it only measures these linear relationships.  More complex relationships like $X = Y^2$ where $Y$ is randomly chosen from $\{-2, -1, 0, 1, 2\}$ with equal probability can be missed.  Indeed a quick computation shows that these random variables have covariance zero, despite one being a deterministic function of the other.
+Une remarque rapide sur la covariance est qu'elle ne mesure que ces relations linéaires.  Des relations plus complexes comme $X = Y^2$ où $Y$ est choisi au hasard parmi $\{-2, -1, 0, 1, 2\}$ avec une probabilité égale peuvent être manquées.  En effet, un calcul rapide montre que ces variables aléatoires ont une covariance nulle, bien que l'une soit une fonction déterministe de l'autre.
 
-For continuous random variables, much the same story holds.  At this point, we are pretty comfortable with doing the transition between discrete and continuous, so we will provide the continuous analogue of :eqref:`eq_cov_def` without any derivation.
+Pour les variables aléatoires continues, la situation est à peu près la même.  À ce stade, nous sommes assez à l'aise pour faire la transition entre le discret et le continu, nous allons donc fournir l'analogue continu de :eqref:`eq_cov_def` sans aucune dérivation.
 
 $$
 \sigma_{XY} = \int_{\mathbb{R}^2} (x-\mu_X)(y-\mu_Y)p(x, y) \;dx \;dy.
 $$
 
-For visualization, let's take a look at a collection of random variables with tunable covariance.
+Pour visualiser, regardons une collection de variables aléatoires avec une covariance réglable.
 
 ```{.python .input}
 #@tab mxnet
@@ -717,60 +717,60 @@ for i in range(3):
 d2l.plt.show()
 ```
 
-Let's see some properties of covariances:
+Voyons quelques propriétés des covariances :
 
-* For any random variable $X$, $\mathrm{Cov}(X, X) = \mathrm{Var}(X)$.
-* For any random variables $X, Y$ and numbers $a$ and $b$, $\mathrm{Cov}(aX+b, Y) = \mathrm{Cov}(X, aY+b) = a\mathrm{Cov}(X, Y)$.
-* If $X$ and $Y$ are independent then $\mathrm{Cov}(X, Y) = 0$.
+* Pour toute variable aléatoire $X$, $\mathrm{Cov}(X, X) = \mathrm{Var}(X)$.
+* Pour toute variable aléatoire $X, Y$ et les nombres $a$ et $b$, $\mathrm{Cov}(aX+b, Y) = \mathrm{Cov}(X, aY+b) = a\mathrm{Cov}(X, Y)$.
+* Si $X$ et $Y$ sont indépendants, alors $\mathrm{Cov}(X, Y) = 0$.
 
-In addition, we can use the covariance to expand a relationship we saw before.  Recall that is $X$ and $Y$ are two independent random variables then
+En outre, nous pouvons utiliser la covariance pour développer une relation que nous avons vue précédemment.  Rappelez-vous que si $X$ et $Y$ sont deux variables aléatoires indépendantes alors
 
 $$
 \mathrm{Var}(X+Y) = \mathrm{Var}(X) + \mathrm{Var}(Y).
 $$
 
-With knowledge of covariances, we can expand this relationship.  Indeed, some algebra can show that in general,
+Grâce à la connaissance des covariances, nous pouvons étendre cette relation.  En effet, un peu d'algèbre peut montrer cela en général,
 
 $$
 \mathrm{Var}(X+Y) = \mathrm{Var}(X) + \mathrm{Var}(Y) + 2\mathrm{Cov}(X, Y).
 $$
 
-This allows us to generalize the variance summation rule for correlated random variables.
+Cela nous permet de généraliser la règle de sommation de la variance pour les variables aléatoires corrélées.
 
-### Correlation
+### Corrélation
 
-As we did in the case of means and variances, let's now consider units.  If $X$ is measured in one unit (say inches), and $Y$ is measured in another (say dollars), the covariance is measured in the product of these two units $\text{inches} \times \text{dollars}$.  These units can be hard to interpret.  What we will often want in this case is a unit-less measurement of relatedness.  Indeed, often we do not care about exact quantitative correlation, but rather ask if the correlation is in the same direction, and how strong the relationship is.
+Comme nous l'avons fait dans le cas des moyennes et des variances, considérons maintenant les unités.  Si $X$ est mesuré dans une unité (disons les pouces), et que $Y$ est mesuré dans une autre (disons les dollars), la covariance est mesurée dans le produit de ces deux unités $\text{inches} \times \text{dollars}$.  Ces unités peuvent être difficiles à interpréter.  Ce que nous voulons souvent dans ce cas, c'est une mesure de la parenté sans unité.  En effet, souvent nous ne nous soucions pas de la corrélation quantitative exacte, mais nous demandons plutôt si la corrélation va dans le même sens, et quelle est la force de la relation.
 
-To see what makes sense, let's perform a thought experiment.  Suppose that we convert our random variables in inches and dollars to be in inches and cents.  In this case the random variable $Y$ is multiplied by $100$.  If we work through the definition, this means that $\mathrm{Cov}(X, Y)$ will be multiplied by $100$.  Thus we see that in this case a change of units change the covariance by a factor of $100$.  Thus, to find our unit-invariant measure of correlation, we will need to divide by something else that also gets scaled by $100$.  Indeed we have a clear candidate, the standard deviation!  Indeed if we define the *correlation coefficient* to be
+Pour voir ce qui est logique, réalisons une expérience de pensée.  Supposons que nous convertissions nos variables aléatoires en pouces et dollars en pouces et cents.  Dans ce cas, la variable aléatoire $Y$ est multipliée par $100$.  Si nous travaillons sur la définition, cela signifie que $\mathrm{Cov}(X, Y)$ sera multiplié par $100$.  Nous constatons donc que, dans ce cas, un changement d'unité modifie la covariance par un facteur de $100$. Ainsi, pour trouver notre mesure de corrélation invariante par unité, nous devrons diviser par quelque chose d'autre qui sera également mis à l'échelle par $100$.  En effet, nous avons un candidat évident, l'écart-type !  En effet, si nous définissons le *coefficient de corrélation* comme étant
 
-$$\rho(X, Y) = \frac{\mathrm{Cov}(X, Y)}{\sigma_{X}\sigma_{Y}},$$
-:eqlabel:`eq_cor_def`
+$$\rho(X, Y) = \frac{\mathrm{Cov}(X, Y)}{\sigma_{X}\sigma_{Y}},$$ 
+ :eqlabel:`eq_cor_def` 
 
-we see that this is a unit-less value.  A little mathematics can show that this number is between $-1$ and $1$ with $1$ meaning maximally positively correlated, whereas $-1$ means maximally negatively correlated.
+ , nous constatons qu'il s'agit d'une valeur sans unité.  Un peu de mathématiques permet de montrer que ce nombre se situe entre $-1$ et $1$, $1$ signifiant une corrélation positive maximale, tandis que $-1$ signifie une corrélation négative maximale.
 
-Returning to our explicit discrete example above, we can see that $\sigma_X = 1$ and $\sigma_Y = 2$, so we can compute the correlation between the two random variables using :eqref:`eq_cor_def` to see that
+Pour en revenir à notre exemple discret explicite ci-dessus, nous pouvons voir que $\sigma_X = 1$ et $\sigma_Y = 2$, et nous pouvons donc calculer la corrélation entre les deux variables aléatoires en utilisant :eqref:`eq_cor_def` pour voir que
 
 $$
 \rho(X, Y) = \frac{4p-2}{1\cdot 2} = 2p-1.
 $$
 
-This now ranges between $-1$ and $1$ with the expected behavior of $1$ meaning most correlated, and $-1$ meaning minimally correlated.
+Elle se situe maintenant entre $-1$ et $1$, le comportement attendu étant que $1$ signifie la plus forte corrélation et $-1$ la corrélation minimale.
 
-As another example, consider $X$ as any random variable, and $Y=aX+b$ as any linear deterministic function of $X$.  Then, one can compute that
+Comme autre exemple, considérez $X$ comme une variable aléatoire quelconque, et $Y=aX+b$ comme une fonction déterministe linéaire quelconque de $X$. On peut alors calculer que
 
-$$\sigma_{Y} = \sigma_{aX+b} = |a|\sigma_{X},$$
+$$\sigma_{Y} = \sigma_{aX+b} = |a|\sigma_{X},$$ 
 
-$$\mathrm{Cov}(X, Y) = \mathrm{Cov}(X, aX+b) = a\mathrm{Cov}(X, X) = a\mathrm{Var}(X),$$
+ $$\mathrm{Cov}(X, Y) = \mathrm{Cov}(X, aX+b) = a\mathrm{Cov}(X, X) = a\mathrm{Var}(X),$$ 
 
-and thus by :eqref:`eq_cor_def` that
+ et donc par :eqref:`eq_cor_def` que
 
 $$
 \rho(X, Y) = \frac{a\mathrm{Var}(X)}{|a|\sigma_{X}^2} = \frac{a}{|a|} = \mathrm{sign}(a).
 $$
 
-Thus we see that the correlation is $+1$ for any $a > 0$, and $-1$ for any $a < 0$ illustrating that correlation measures the degree and directionality the two random variables are related, not the scale that the variation takes.
+Nous constatons donc que la corrélation est $+1$ pour tout $a > 0$, et $-1$ pour tout $a < 0$, ce qui montre que la corrélation mesure le degré et la direction de la relation entre deux variables aléatoires, et non l'échelle de la variation.
 
-Let's again plot a collection of random variables with tunable correlation.
+Traçons à nouveau une collection de variables aléatoires avec une corrélation réglable.
 
 ```{.python .input}
 #@tab mxnet
@@ -825,42 +825,42 @@ for i in range(3):
 d2l.plt.show()
 ```
 
-Let's list a few properties of the correlation below.
+Énumérons ci-dessous quelques propriétés de la corrélation.
 
-* For any random variable $X$, $\rho(X, X) = 1$.
-* For any random variables $X, Y$ and numbers $a$ and $b$, $\rho(aX+b, Y) = \rho(X, aY+b) = \rho(X, Y)$.
-* If $X$ and $Y$ are independent with non-zero variance then $\rho(X, Y) = 0$.
+* Pour toute variable aléatoire $X$, $\rho(X, X) = 1$.
+* Pour toute variable aléatoire $X, Y$ et les nombres $a$ et $b$, $\rho(aX+b, Y) = \rho(X, aY+b) = \rho(X, Y)$.
+* Si $X$ et $Y$ sont indépendants avec une variance non nulle, alors $\rho(X, Y) = 0$.
 
-As a final note, you may feel like some of these formulae are familiar.  Indeed, if we expand everything out assuming that $\mu_X = \mu_Y = 0$, we see that this is
+Pour finir, vous aurez peut-être l'impression que certaines de ces formules vous sont familières.  En effet, si nous développons tout en supposant que $\mu_X = \mu_Y = 0$, nous voyons que c'est
 
 $$
 \rho(X, Y) = \frac{\sum_{i, j} x_iy_ip_{ij}}{\sqrt{\sum_{i, j}x_i^2 p_{ij}}\sqrt{\sum_{i, j}y_j^2 p_{ij}}}.
 $$
 
-This looks like a sum of a product of terms divided by the square root of sums of terms.  This is exactly the formula for the cosine of the angle between two vectors $\mathbf{v}, \mathbf{w}$ with the different coordinates weighted by $p_{ij}$:
+Cela ressemble à une somme d'un produit de termes divisée par la racine carrée de sommes de termes.  C'est exactement la formule du cosinus de l'angle entre deux vecteurs $\mathbf{v}, \mathbf{w}$ dont les différentes coordonnées sont pondérées par $p_{ij}$:
 
 $$
 \cos(\theta) = \frac{\mathbf{v}\cdot \mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|} = \frac{\sum_{i} v_iw_i}{\sqrt{\sum_{i}v_i^2}\sqrt{\sum_{i}w_i^2}}.
 $$
 
-Indeed if we think of norms as being related to standard deviations, and correlations as being cosines of angles, much of the intuition we have from geometry can be applied to thinking about random variables.
+En effet, si nous considérons les normes comme étant liées aux écarts types, et les corrélations comme étant des cosinus d'angles, une grande partie de l'intuition que nous avons de la géométrie peut être appliquée à la réflexion sur les variables aléatoires.
 
-## Summary
-* Continuous random variables are random variables that can take on a continuum of values.  They have some technical difficulties that make them more challenging to work with compared to discrete random variables.
-* The probability density function allows us to work with continuous random variables by giving a function where the area under the curve on some interval gives the probability of finding a sample point in that interval.
-* The cumulative distribution function is the probability of observing the random variable to be less than a given threshold.  It can provide a useful alternate viewpoint which unifies discrete and continuous variables.
-* The mean is the average value of a random variable.
-* The variance is the expected square of the difference between the random variable and its mean.
-* The standard deviation is the square root of the variance.  It can be thought of as measuring the range of values the random variable may take.
-* Chebyshev's inequality allows us to make this intuition rigorous by giving an explicit interval that contains the random variable most of the time.
-* Joint densities allow us to work with correlated random variables.  We may marginalize joint densities by integrating over unwanted random variables to get the distribution of the desired random variable.
-* The covariance and correlation coefficient provide a way to measure any linear relationship between two correlated random variables.
+## Résumé
+* Les variables aléatoires continues sont des variables aléatoires qui peuvent prendre un continuum de valeurs.  Elles présentent certaines difficultés techniques qui les rendent plus difficiles à utiliser que les variables aléatoires discrètes.
+* La fonction de densité de probabilité nous permet de travailler avec des variables aléatoires continues en donnant une fonction où l'aire sous la courbe sur un certain intervalle donne la probabilité de trouver un point échantillon dans cet intervalle.
+* La fonction de distribution cumulative est la probabilité d'observer que la variable aléatoire est inférieure à un seuil donné.  Elle peut fournir un point de vue alternatif utile qui unifie les variables discrètes et continues.
+* La moyenne est la valeur moyenne d'une variable aléatoire.
+* La variance est le carré attendu de la différence entre la variable aléatoire et sa moyenne.
+* L'écart-type est la racine carrée de la variance.  Il peut être considéré comme la mesure de la gamme de valeurs que peut prendre la variable aléatoire.
+* L'inégalité de Chebyshev nous permet de rendre cette intuition rigoureuse en donnant un intervalle explicite qui contient la variable aléatoire la plupart du temps.
+* Les densités conjointes nous permettent de travailler avec des variables aléatoires corrélées.  Nous pouvons marginaliser les densités conjointes en intégrant les variables aléatoires non désirées pour obtenir la distribution de la variable aléatoire désirée.
+* La covariance et le coefficient de corrélation permettent de mesurer toute relation linéaire entre deux variables aléatoires corrélées.
 
-## Exercises
-1. Suppose that we have the random variable with density given by $p(x) = \frac{1}{x^2}$ for $x \ge 1$ and $p(x) = 0$ otherwise.  What is $P(X > 2)$?
-2. The Laplace distribution is a random variable whose density is given by $p(x = \frac{1}{2}e^{-|x|}$.  What is the mean and the standard deviation of this function?  As a hint, $\int_0^\infty xe^{-x} \; dx = 1$ and $\int_0^\infty x^2e^{-x} \; dx = 2$.
-3. I walk up to you on the street and say "I have a random variable with mean $1$, standard deviation $2$, and I observed $25\%$ of my samples taking a value larger than $9$."  Do you believe me?  Why or why not?
-4. Suppose that you have two random variables $X, Y$, with joint density given by $p_{XY}(x, y) = 4xy$ for $x, y \in [0,1]$ and $p_{XY}(x, y) = 0$ otherwise.  What is the covariance of $X$ and $Y$?
+## Exercices
+1. Supposons que nous ayons la variable aléatoire dont la densité est donnée par $p(x) = \frac{1}{x^2}$ pour $x \ge 1$ et $p(x) = 0$ sinon.  Qu'est-ce que $P(X > 2)$?
+2. La distribution de Laplace est une variable aléatoire dont la densité est donnée par $p(x = \frac{1}{2}e^{-|x|}$.  Quels sont la moyenne et l'écart-type de cette fonction ?  A titre indicatif, $\int_0^\infty xe^{-x} \; dx = 1$ et $\int_0^\infty x^2e^{-x} \; dx = 2$.
+3. Je vous aborde dans la rue et je vous dis : "J'ai une variable aléatoire dont la moyenne est $1$, l'écart-type $2$, et j'ai observé que $25\%$ de mes échantillons prennent une valeur supérieure à $9$."  Me croyez-vous ?  Pourquoi ou pourquoi pas ?
+4. Supposons que vous ayez deux variables aléatoires $X, Y$, dont la densité commune est donnée par $p_{XY}(x, y) = 4xy$ pour $x, y \in [0,1]$ et $p_{XY}(x, y) = 0$ sinon.  Quelle est la covariance de $X$ et $Y$?
 
 
 :begin_tab:`mxnet`

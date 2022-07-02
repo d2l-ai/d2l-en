@@ -1,26 +1,26 @@
-# Appendix: Mathematics for Deep Learning
-:label:`chap_appendix_math`
+# Annexe : Mathématiques pour l'apprentissage profond
+:label:`chap_appendix_math` 
 
-**Brent Werness** (*Amazon*), **Rachel Hu** (*Amazon*), and authors of this book
+ **Brent Werness** (*Amazon*), **Rachel Hu** (*Amazon*), et auteurs de ce livre
 
 
-One of the wonderful parts of modern deep learning is the fact that much of it can be understood and used without a full understanding of the mathematics below it.  This is a sign that the field is maturing.  Just as most software developers no longer need to worry about the theory of computable functions, neither should deep learning practitioners need to worry about the theoretical foundations of maximum likelihood learning.
+ L'un des aspects merveilleux de l'apprentissage profond moderne est le fait qu'une grande partie de celui-ci peut être comprise et utilisée sans une compréhension totale des mathématiques qui le sous-tendent.  C'est le signe que le domaine arrive à maturité.  De même que la plupart des développeurs de logiciels n'ont plus besoin de se préoccuper de la théorie des fonctions calculables, les praticiens de l'apprentissage profond ne devraient pas non plus avoir à se préoccuper des fondements théoriques de l'apprentissage par probabilité maximale.
 
-But, we are not quite there yet.
+Mais nous ne sommes pas encore tout à fait au point.
 
-In practice, you will sometimes need to understand how architectural choices influence gradient flow, or the implicit assumptions you make by training with a certain loss function.  You might need to know what in the world entropy measures, and how it can help you understand exactly what bits-per-character means in your model.  These all require deeper mathematical understanding.
+En pratique, vous aurez parfois besoin de comprendre comment les choix architecturaux influencent le flux de gradient, ou les hypothèses implicites que vous faites en vous entraînant avec une certaine fonction de perte.  Vous aurez peut-être besoin de savoir ce que mesure l'entropie et comment elle peut vous aider à comprendre la signification exacte des bits par caractère dans votre modèle.  Toutes ces questions nécessitent une compréhension mathématique plus approfondie.
 
-This appendix aims to provide you the mathematical background you need to understand the core theory of modern deep learning, but it is not exhaustive.  We will begin with examining linear algebra in greater depth.  We develop a geometric understanding of all the common linear algebraic objects and operations that will enable us to visualize the effects of various transformations on our data.  A key element is the development of the basics of eigen-decompositions.
+Cette annexe vise à vous fournir le contexte mathématique dont vous avez besoin pour comprendre la théorie fondamentale de l'apprentissage profond moderne, mais elle n'est pas exhaustive.  Nous commencerons par examiner l'algèbre linéaire de manière plus approfondie.  Nous développons une compréhension géométrique de tous les objets et opérations courants de l'algèbre linéaire qui nous permettront de visualiser les effets de diverses transformations sur nos données.  Un élément clé est le développement des bases des décompositions propres.
 
-We next develop the theory of differential calculus to the point that we can fully understand why the gradient is the direction of steepest descent, and why back-propagation takes the form it does.  Integral calculus is then discussed to the degree needed to support our next topic, probability theory.
+Nous développons ensuite la théorie du calcul différentiel jusqu'à ce que nous puissions comprendre pourquoi le gradient est la direction de la descente la plus raide, et pourquoi la rétro-propagation prend la forme qu'elle prend.  Le calcul intégral est ensuite abordé dans la mesure nécessaire pour soutenir notre sujet suivant, la théorie des probabilités.
 
-Problems encountered in practice frequently are not certain, and thus we need a language to speak about uncertain things.  We review the theory of random variables and the most commonly encountered distributions so we may discuss models probabilistically.  This provides the foundation for the naive Bayes classifier, a probabilistic classification technique.
+Les problèmes rencontrés dans la pratique ne sont souvent pas certains, et nous avons donc besoin d'un langage pour parler des choses incertaines.  Nous passons en revue la théorie des variables aléatoires et les distributions les plus courantes afin de pouvoir discuter des modèles de manière probabiliste.  Ceci constitue la base du classificateur naïf de Bayes, une technique de classification probabiliste.
 
-Closely related to probability theory is the study of statistics.  While statistics is far too large a field to do justice in a short section, we will introduce fundamental concepts that all machine learning practitioners should be aware of, in particular: evaluating and comparing estimators, conducting hypothesis tests, and constructing confidence intervals.
+L'étude des statistiques est étroitement liée à la théorie des probabilités.  Bien que la statistique soit un domaine bien trop vaste pour qu'on puisse lui rendre justice dans une courte section, nous présenterons des concepts fondamentaux que tous les praticiens de l'apprentissage automatique devraient connaître, en particulier : l'évaluation et la comparaison des estimateurs, la réalisation de tests d'hypothèse et la construction d'intervalles de confiance.
 
-Last, we turn to the topic of information theory, which is the mathematical study of information storage and transmission.  This provides the core language by which we may discuss quantitatively how much information a model holds on a domain of discourse.
+Enfin, nous aborderons la théorie de l'information, qui est l'étude mathématique du stockage et de la transmission de l'information.  Elle fournit le langage de base grâce auquel nous pouvons discuter quantitativement de la quantité d'informations qu'un modèle détient sur un domaine du discours.
 
-Taken together, these form the core of the mathematical concepts needed to begin down the path towards a deep understanding of deep learning.
+L'ensemble de ces éléments constitue le noyau des concepts mathématiques nécessaires pour s'engager sur la voie d'une compréhension approfondie de l'apprentissage profond.
 
 ```toc
 :maxdepth: 2

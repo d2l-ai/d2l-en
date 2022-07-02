@@ -1,58 +1,58 @@
-# Contributing to This Book
-:label:`sec_how_to_contribute`
+# Contribuer à ce livre
+:label:`sec_how_to_contribute` 
 
-Contributions by [readers](https://github.com/d2l-ai/d2l-en/graphs/contributors) help us improve this book. If you find a typo, an outdated link, something where you think we missed a citation, where the code does not look elegant or where an explanation is unclear, please contribute back and help us help our readers. While in regular books the delay between print runs (and thus between typo corrections) can be measured in years, it typically takes hours to days to incorporate an improvement in this book. This is all possible due to version control and continuous integration (CI) testing. To do so you need to submit a [pull request](https://github.com/d2l-ai/d2l-en/pulls) to the GitHub repository. When your pull request is merged into the code repository by the authors, you will become a contributor.
+ Les contributions de [readers](https://github.com/d2l-ai/d2l-en/graphs/contributors) nous aident à améliorer ce livre. Si vous trouvez une coquille, un lien périmé, un élément pour lequel vous pensez que nous avons manqué une citation, un code qui n'a pas l'air élégant ou une explication qui n'est pas claire, veuillez contribuer et nous aider à aider nos lecteurs. Alors que dans les livres ordinaires, le délai entre les tirages (et donc entre les corrections de fautes de frappe) peut se mesurer en années, il faut généralement quelques heures ou quelques jours pour intégrer une amélioration dans ce livre. Tout cela est possible grâce au contrôle des versions et aux tests d'intégration continue (IC). Pour ce faire, vous devez soumettre une [pull request](https://github.com/d2l-ai/d2l-en/pulls) au dépôt GitHub. Lorsque votre demande de retrait est fusionnée dans le dépôt de code par les auteurs, vous devenez un contributeur.
 
-## Submitting Minor Changes
+## Soumission de modifications mineures
 
-The most common contributions are editing one sentence or fixing typos. We recommend you to find the source file in the [GitHub repository](https://github.com/d2l-ai/d2l-en) and edit the file directly. For example, you can search the file through the [Find file](https://github.com/d2l-ai/d2l-en/find/master) button (:numref:`fig_edit_file`) to locate the source file (a markdown file). Then you click the "Edit this file" button on the upper-right corner to make your changes in the markdown file.
+Les contributions les plus courantes consistent à modifier une phrase ou à corriger des fautes de frappe. Nous vous recommandons de trouver le fichier source dans le site [GitHub repository](https://github.com/d2l-ai/d2l-en) et de le modifier directement. Par exemple, vous pouvez rechercher le fichier à l'aide du bouton [Find file](https://github.com/d2l-ai/d2l-en/find/master) (:numref:`fig_edit_file` ) pour trouver le fichier source (un fichier markdown). Ensuite, vous cliquez sur le bouton "Editer ce fichier" dans le coin supérieur droit pour effectuer vos modifications dans le fichier de démarque.
 
 ![Edit the file on Github.](../img/edit-file.png)
 :width:`300px`
 :label:`fig_edit_file`
 
-After you are done, fill in your change descriptions in the "Propose file change" panel on the page bottom and then click the "Propose file change" button. It will redirect you to a new page to review your changes (:numref:`fig_git_createpr`). If everything is good, you can submit a pull request by clicking the "Create pull request" button.
+Une fois que vous avez terminé, remplissez la description de vos modifications dans le panneau "Proposer une modification de fichier" en bas de la page, puis cliquez sur le bouton "Proposer une modification de fichier". Vous serez redirigé vers une nouvelle page pour examiner vos modifications (:numref:`fig_git_createpr` ). Si tout est bon, vous pouvez soumettre une demande de retrait en cliquant sur le bouton "Create pull request".
 
-## Proposing Major Changes
+## Proposer des modifications majeures
 
-If you plan to update a large portion of text or code, then you need to know a little bit more about the format this book is using. The source file is based on the [markdown format](https://daringfireball.net/projects/markdown/syntax) with a set of extensions through the [d2lbook](http://book.d2l.ai/user/markdown.html) package such as referring to equations, images, chapters, and citations. You can use any markdown editors to open these files and make your changes.
+Si vous envisagez de mettre à jour une grande partie du texte ou du code, vous devez en savoir un peu plus sur le format utilisé par ce livre. Le fichier source est basé sur le [markdown format](https://daringfireball.net/projects/markdown/syntax) avec un ensemble d'extensions par le biais du paquet [d2lbook](http://book.d2l.ai/user/markdown.html) comme la référence aux équations, aux images, aux chapitres et aux citations. Vous pouvez utiliser n'importe quel éditeur markdown pour ouvrir ces fichiers et y apporter vos modifications.
 
-If you would like to change the code, we recommend you to use the Jupyter Notebook to open these markdown files as described in :numref:`sec_jupyter`. So that you can run and test your changes. Please remember to clear all outputs before submitting your changes, our CI system will execute the sections you updated to generate outputs.
+Si vous souhaitez modifier le code, nous vous recommandons d'utiliser le Jupyter Notebook pour ouvrir ces fichiers markdown comme décrit dans :numref:`sec_jupyter` . Ainsi, vous pourrez exécuter et tester vos modifications. N'oubliez pas d'effacer toutes les sorties avant de soumettre vos modifications, notre système CI exécutera les sections que vous avez mises à jour pour générer des sorties.
 
-Some sections may support multiple framework implementations.
-If you add a new code block not for the default implementation, which is MXNet, please use `#@tab` to mark this block on the beginning line. For example, `#@tab pytorch` for a PyTorch code block, `#@tab tensorflow` for a TensorFlow code block, or `#@tab all` a shared code block for all implementations. You may refer to the [`d2lbook`](http://book.d2l.ai/user/code_tabs.html) package for more information.
+Certaines sections peuvent supporter plusieurs implémentations du framework.
+Si vous ajoutez un nouveau bloc de code qui n'est pas destiné à l'implémentation par défaut, qui est MXNet, veuillez utiliser `#@tab` pour marquer ce bloc sur la ligne de début. Par exemple, `#@tab pytorch` pour un bloc de code PyTorch, `#@tab tensorflow` pour un bloc de code TensorFlow, ou `#@tab all` un bloc de code partagé pour toutes les implémentations. Vous pouvez vous référer au [`d2lbook`](http://book.d2l.ai/user/code_tabs.html) pour plus d'informations.
 
-## Submitting Major Changes
+## Soumettre des changements majeurs
 
-We suggest you to use the standard Git process to submit a major change. In a nutshell the process works as described in :numref:`fig_contribute`.
+Nous vous suggérons d'utiliser le processus Git standard pour soumettre un changement majeur. En résumé, le processus fonctionne comme décrit dans :numref:`fig_contribute` .
 
 ![Contributing to the book.](../img/contribute.svg)
 :label:`fig_contribute`
 
-We will walk you through the steps in detail. If you are already familiar with Git you can skip this section. For concreteness we assume that the contributor's user name is "astonzhang".
+Nous allons vous guider à travers les étapes en détail. Si vous êtes déjà familiarisé avec Git, vous pouvez sauter cette section. Pour être plus concret, nous supposons que le nom d'utilisateur du contributeur est "astonzhang".
 
-### Installing Git
+### Installation de Git
 
-The Git open source book describes [how to install Git](https://git-scm.com/book/en/v2). This typically works via `apt install git` on Ubuntu Linux, by installing the Xcode developer tools on macOS, or by using GitHub's [desktop client](https://desktop.github.com). If you do not have a GitHub account, you need to sign up for one.
+Le livre open source Git décrit [how to install Git](https://git-scm.com/book/en/v2). Cela fonctionne généralement via `apt install git` sur Ubuntu Linux, en installant les outils de développement Xcode sur macOS, ou en utilisant [desktop client](https://desktop.github.com) de GitHub. Si vous n'avez pas de compte GitHub, vous devez vous en créer un.
 
-### Logging in to GitHub
+### Connexion à GitHub
 
-Enter the [address](https://github.com/d2l-ai/d2l-en/) of the book's code repository in your browser. Click on the `Fork` button in the red box at the upper-right of :numref:`fig_git_fork`, to make a copy of the repository of this book. This is now *your copy* and you can change it any way you want.
+Saisissez l'adresse [address](https://github.com/d2l-ai/d2l-en/) du dépôt de code du livre dans votre navigateur. Cliquez sur le bouton `Fork` dans le cadre rouge en haut à droite de :numref:`fig_git_fork` , pour faire une copie du dépôt de ce livre. C'est maintenant *votre copie* et vous pouvez la modifier comme bon vous semble.
 
 ![The code repository page.](../img/git-fork.png)
 :width:`700px`
 :label:`fig_git_fork`
 
 
-Now, the code repository of this book will be forked (i.e., copied) to your username, such as `astonzhang/d2l-en` shown at the upper-left of :numref:`fig_git_forked`.
+Maintenant, le dépôt de code de ce livre sera bifurqué (c.-à-d. copié) vers votre nom d'utilisateur, tel que `astonzhang/d2l-en` montré en haut à gauche de :numref:`fig_git_forked` .
 
 ![The forked code repository.](../img/git-forked.png)
 :width:`700px`
 :label:`fig_git_forked`
 
-### Cloning the Repository
+### Cloner le dépôt
 
-To clone the repository (i.e., to make a local copy) we need to get its repository address. The green button in :numref:`fig_git_clone` displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :ref:`chap_installation` to get started. The main difference is that you are now downloading *your own fork* of the repository.
+Pour cloner le dépôt (c'est-à-dire en faire une copie locale), nous devons obtenir l'adresse du dépôt. Le bouton vert dans :numref:`fig_git_clone` l'affiche. Assurez-vous que votre copie locale est à jour par rapport au dépôt principal si vous décidez de garder ce fork plus longtemps. Pour l'instant, suivez simplement les instructions de :ref:`chap_installation` pour commencer. La principale différence est que vous téléchargez maintenant *votre propre fork* du dépôt.
 
 ![Cloning the repository.](../img/git-clone.png)
 :width:`700px`
@@ -64,12 +64,12 @@ git clone https://github.com/your_github_username/d2l-en.git
 ```
 
 
-### Editing and Pushing
+### Editer et pousser
 
-Now it is time to edit the book. It is best to edit it in the Jupyter Notebook following instructions in :numref:`sec_jupyter`. Make the changes and check that they are OK. Assume that we have modified a typo in the file `~/d2l-en/chapter_appendix_tools/how-to-contribute.md`.
-You can then check which files you have changed.
+Il est maintenant temps d'éditer le livre. Il est préférable de l'éditer dans le Jupyter Notebook en suivant les instructions de :numref:`sec_jupyter` . Effectuez les modifications et vérifiez qu'elles sont correctes. Supposons que nous ayons modifié une coquille dans le fichier `~)/d2l-en/chapter_appendix_tools/how-to-contribute.md`.
+Vous pouvez alors vérifier quels fichiers vous avez modifiés.
 
-At this point Git will prompt that the `chapter_appendix_tools/how-to-contribute.md` file has been modified.
+À ce stade, Git vous indiquera que le fichier `chapter_appendix_tools/how-to-contribute.md` a été modifié.
 
 ```
 mylaptop:d2l-en me$ git status
@@ -84,7 +84,7 @@ Changes not staged for commit:
 ```
 
 
-After confirming that this is what you want, execute the following command:
+Après avoir confirmé que c'est bien ce que vous voulez, exécutez la commande suivante :
 
 ```
 git add chapter_appendix_tools/how-to-contribute.md
@@ -93,37 +93,37 @@ git push
 ```
 
 
-The changed code will then be in your personal fork of the repository. To request the addition of your change, you have to create a pull request for the official repository of the book.
+Le code modifié se trouvera alors dans votre fork personnel du référentiel. Pour demander l'ajout de votre modification, vous devez créer une demande de reprise pour le dépôt officiel du livre.
 
-### Submitting Pull Requests
+### Soumission de demandes de retrait
 
-As shown in :numref:`fig_git_newpr`, go to your fork of the repository on GitHub and select "New pull request". This will open up a screen that shows you the changes between your edits and what is current in the main repository of the book.
+Comme indiqué dans :numref:`fig_git_newpr` , allez dans votre fork du dépôt sur GitHub et sélectionnez "New pull request". Cela ouvrira un écran qui vous montrera les changements entre vos éditions et ce qui est en cours dans le dépôt principal du livre.
 
 ![New pull request.](../img/git-newpr.png)
 :width:`700px`
 :label:`fig_git_newpr`
 
 
-Finally, submit a pull request by clicking the button as shown in :numref:`fig_git_createpr`. Make sure to describe the changes you have made in the pull request.
-This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you will get some feedback on the changes. Once you have incorporated them, you are good to go.
+Enfin, soumettez une demande de retrait en cliquant sur le bouton comme indiqué sur :numref:`fig_git_createpr` . Veillez à décrire les modifications que vous avez apportées dans la demande de retrait.
+Il sera ainsi plus facile pour les auteurs de l'examiner et de la fusionner avec le livre. En fonction des modifications, la demande peut être acceptée immédiatement, rejetée ou, plus probablement, vous recevrez des commentaires sur les modifications. Une fois que vous les avez incorporés, vous êtes prêt à partir.
 
 ![Create pull request.](../img/git-createpr.png)
 :width:`700px`
 :label:`fig_git_createpr`
 
 
-## Summary
+## Résumé
 
-* You can use GitHub to contribute to this book.
-* You can edit the file on GitHub directly for minor changes.
-* For a major change, please fork the repository, edit things locally, and only contribute back once you are ready.
-* Pull requests are how contributions are being bundled up. Try not to submit huge pull requests since this makes them hard to understand and incorporate. Better send several smaller ones.
+* Vous pouvez utiliser GitHub pour contribuer à ce livre.
+* Vous pouvez modifier le fichier sur GitHub directement pour les changements mineurs.
+* Pour une modification majeure, veuillez bifurquer du dépôt, modifier les choses localement et ne contribuer qu'une fois que vous êtes prêt.
+* Les demandes de transfert sont la façon dont les contributions sont regroupées. Essayez de ne pas soumettre d'énormes pull requests car cela les rend difficiles à comprendre et à intégrer. Il vaut mieux en envoyer plusieurs petites.
 
 
-## Exercises
+## Exercices
 
-1. Star and fork the `d2l-ai/d2l-en` repository.
-1. If you spot anything that needs improvement (e.g., missing a reference), submit a pull request. 
-1. It is usually a better practice to create a pull request using a new branch. Learn how to do it with [Git branching](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell).
+1. Démarrer et bifurquer le dépôt `d2l-ai/d2l-en`.
+1. Si vous repérez quelque chose qui nécessite une amélioration (par exemple, une référence manquante), soumettez une demande de modification. 
+1. Il est généralement préférable de créer une demande de modification en utilisant une nouvelle branche. Apprenez à le faire avec [Git branching](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell).
 
 [Discussions](https://discuss.d2l.ai/t/426)

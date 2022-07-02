@@ -139,20 +139,20 @@ then we might say that the network is more confident.
 
 To implement the dropout function for a single layer,
 we must draw as many samples
-from a Bernoulli (binary) random variable
-as our layer has dimensions,
-where the random variable takes value $1$ (keep)
-with probability $1-p$ and $0$ (drop) with probability $p$.
-One easy way to implement this is to first draw samples
-from the uniform distribution $U[0, 1]$.
-Then we can keep those nodes for which the corresponding
-sample is greater than $p$, dropping the rest.
+from a Bernoulli (binary) variable aléatoire
+comme notre couche a des dimensions,
+où la variable aléatoire prend la valeur $1$ (conserver)
+avec la probabilité $1-p$ et $0$ (abandonner) avec la probabilité $p$.
+Une façon simple de mettre cela en œuvre est de tirer d'abord des échantillons
+de la distribution uniforme $U[0, 1]$.
+Ensuite, nous pouvons conserver les nœuds pour lesquels l'échantillon correspondant à
+est supérieur à $p$, en abandonnant les autres.
 
-In the following code, we (**implement a `dropout_layer` function
-that drops out the elements in the tensor input `X`
-with probability `dropout`**),
-rescaling the remainder as described above:
-dividing the survivors by `1.0-dropout`.
+Dans le code suivant, nous (**implémentons une fonction `dropout_layer`
+ qui élimine les éléments de l'entrée du tenseur `X`
+ avec la probabilité `dropout`**),
+en remettant à l'échelle le reste comme décrit ci-dessus :
+en divisant les survivants par `1.0-dropout`.
 
 ```{.python .input  n=5}
 %%tab mxnet
@@ -194,10 +194,10 @@ def dropout_layer(X, dropout):
     return tf.cast(mask, dtype=tf.float32) * X / (1.0 - dropout)
 ```
 
-We can [**test out the `dropout_layer` function on a few examples**].
-In the following lines of code,
-we pass our input `X` through the dropout operation,
-with probabilities 0, 0.5, and 1, respectively.
+Nous pouvons [**tester la fonction `dropout_layer` sur quelques exemples**].
+Dans les lignes de code suivantes,
+nous faisons passer notre entrée `X` par l'opération d'abandon,
+avec des probabilités de 0, 0,5 et 1, respectivement.
 
 ```{.python .input  n=6}
 %%tab all
@@ -212,14 +212,14 @@ print('dropout_p = 0.5:', dropout_layer(X, 0.5))
 print('dropout_p = 1:', dropout_layer(X, 1))
 ```
 
-### Defining the Model
+### Définition du modèle
 
-The model below applies dropout to the output
-of each hidden layer (following the activation function).
-We can set dropout probabilities for each layer separately.
-A common trend is to set
-a lower dropout probability closer to the input layer.
-We ensure that dropout is only active during training.
+Le modèle ci-dessous applique le dropout à la sortie
+de chaque couche cachée (suivant la fonction d'activation).
+Nous pouvons définir les probabilités d'abandon pour chaque couche séparément.
+Une tendance commune consiste à définir
+une probabilité d'exclusion plus faible à proximité de la couche d'entrée.
+Nous veillons à ce que le décrochage ne soit actif que pendant la formation.
 
 ```{.python .input}
 %%tab mxnet
@@ -288,7 +288,7 @@ class DropoutMLPScratch(d2l.Classifier):
 
 ### [**Training**]
 
-The following is similar to the training of MLPs described previously.
+Ce qui suit est similaire à l'entraînement des MLP décrit précédemment.
 
 ```{.python .input}
 %%tab all
@@ -300,18 +300,18 @@ trainer = d2l.Trainer(max_epochs=10)
 trainer.fit(model, data)
 ```
 
-## [**Concise Implementation**]
+### [**Mise en œuvre concise**]
 
-With high-level APIs, all we need to do is add a `Dropout` layer
-after each fully connected layer,
-passing in the dropout probability
-as the only argument to its constructor.
-During training, the `Dropout` layer will randomly
-drop out outputs of the previous layer
-(or equivalently, the inputs to the subsequent layer)
-according to the specified dropout probability.
-When not in training mode,
-the `Dropout` layer simply passes the data through during testing.
+Avec des API de haut niveau, tout ce que nous avons à faire est d'ajouter une couche `Dropout`
+ après chaque couche entièrement connectée,
+en passant la probabilité de décrochage
+comme seul argument à son constructeur.
+
+Pendant l'apprentissage, la couche `Dropout` abandonnera de manière aléatoire les sorties de la couche précédente
+(ou, de manière équivalente, les entrées de la couche suivante)
+en fonction de la probabilité d'abandon spécifiée.
+Lorsqu'elle n'est pas en mode formation,
+la couche `Dropout` transmet simplement les données pendant les tests.
 
 ```{.python .input}
 %%tab mxnet
@@ -358,7 +358,7 @@ class DropoutMLP(d2l.Classifier):
             tf.keras.layers.Dense(num_outputs)])
 ```
 
-Next, we [**train the model**].
+Ensuite, nous [**formons le modèle**].
 
 ```{.python .input}
 %%tab all
@@ -366,22 +366,22 @@ model = DropoutMLP(**hparams)
 trainer.fit(model, data)
 ```
 
-## Summary
+## Résumé
 
-* Beyond controlling the number of dimensions and the size of the weight vector, dropout is yet another tool to avoid overfitting. Often they are used jointly.
-* Dropout replaces an activation $h$ with a random variable with expected value $h$.
-* Dropout is only used during training.
+* Outre le contrôle du nombre de dimensions et de la taille du vecteur de poids, le dropout est un outil supplémentaire pour éviter l'overfitting. Ils sont souvent utilisés conjointement.
+* Le dropout remplace une activation $h$ par une variable aléatoire avec une valeur attendue $h$.
+* Le dropout n'est utilisé que pendant la formation.
 
 
-## Exercises
+## Exercices
 
-1. What happens if you change the dropout probabilities for the first and second layers? In particular, what happens if you switch the ones for both layers? Design an experiment to answer these questions, describe your results quantitatively, and summarize the qualitative takeaways.
-1. Increase the number of epochs and compare the results obtained when using dropout with those when not using it.
-1. What is the variance of the activations in each hidden layer when dropout is and is not applied? Draw a plot to show how this quantity evolves over time for both models.
-1. Why is dropout not typically used at test time?
-1. Using the model in this section as an example, compare the effects of using dropout and weight decay. What happens when dropout and weight decay are used at the same time? Are the results additive? Are there diminished returns (or worse)? Do they cancel each other out?
-1. What happens if we apply dropout to the individual weights of the weight matrix rather than the activations?
-1. Invent another technique for injecting random noise at each layer that is different from the standard dropout technique. Can you develop a method that outperforms dropout on the Fashion-MNIST dataset (for a fixed architecture)?
+1. Que se passe-t-il si vous changez les probabilités d'abandon pour la première et la deuxième couche ? En particulier, que se passe-t-il si vous changez celles des deux couches ? Concevez une expérience pour répondre à ces questions, décrivez vos résultats quantitatifs et résumez les conclusions qualitatives.
+1. Augmentez le nombre d'époques et comparez les résultats obtenus en utilisant le dropout avec ceux obtenus en ne l'utilisant pas.
+1. Quelle est la variance des activations dans chaque couche cachée lorsque le dropout est appliqué et lorsqu'il ne l'est pas ? Tracez un graphique pour montrer comment cette quantité évolue dans le temps pour les deux modèles.
+1. Pourquoi le dropout n'est-il généralement pas utilisé au moment du test ?
+1. En utilisant le modèle de cette section comme exemple, comparez les effets de l'utilisation du dropout et de la décroissance du poids. Que se passe-t-il lorsque l'abandon et la décroissance du poids sont utilisés en même temps ? Les résultats s'additionnent-ils ? Y a-t-il une diminution des rendements (ou pire) ? S'annulent-ils l'un l'autre ?
+1. Que se passe-t-il si nous appliquons le dropout aux poids individuels de la matrice de poids plutôt qu'aux activations ?
+1. Inventez une autre technique d'injection de bruit aléatoire à chaque couche, différente de la technique d'exclusion standard. Pouvez-vous développer une méthode qui surpasse le dropout sur l'ensemble de données Fashion-MNIST (pour une architecture fixe) ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/100)

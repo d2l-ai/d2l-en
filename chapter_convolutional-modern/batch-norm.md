@@ -3,235 +3,235 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Batch Normalization
-:label:`sec_batch_norm`
+# Normalisation par lots
+:label:`sec_batch_norm` 
 
-Training deep neural networks is difficult.
-Getting them to converge in a reasonable amount of time can be tricky.
-In this section, we describe *batch normalization*, a popular and effective technique
-that consistently accelerates the convergence of deep networks :cite:`Ioffe.Szegedy.2015`.
-Together with residual blocks---covered later in :numref:`sec_resnet`---batch normalization
-has made it possible for practitioners to routinely train networks with over 100 layers.
-A secondary (serendipitous) benefit of batch normalization is its inherent regularization. 
+ La formation de réseaux neuronaux profonds est difficile.
+Les faire converger en un temps raisonnable peut s'avérer délicat.
+Dans cette section, nous décrivons la *normalisation par lots*, une technique populaire et efficace
+qui accélère systématiquement la convergence des réseaux profonds :cite:`Ioffe.Szegedy.2015` .
+Avec les blocs résiduels - abordés plus loin dans :numref:`sec_resnet` - la normalisation par lots
+a permis aux praticiens d'entraîner régulièrement des réseaux de plus de 100 couches.
+Un avantage secondaire (fortuit) de la normalisation par lots est sa régularisation inhérente. 
 
-## Training Deep Networks
+## Formation de réseaux profonds
 
-When working with data, we often preprocess before training. 
-Choices regarding data preprocessing often make an enormous difference in the final results.
-Recall our application of MLPs to predicting house prices (:numref:`sec_kaggle_house`).
-Our first step when working with real data
-was to standardize our input features to have 
-zero mean $\mathbf{\mu} = 0$ and unit variance $\mathbf{\Sigma} = \mathbf{1}$ across multiple observations :cite:`friedman1987exploratory`.
-At a mimimum, one frequently rescales it such that the diagonal is unity, i.e., $\Sigma_{ii} = 1$. 
-Yet another strategy is to rescale vectors to unit length, possibly zero mean *per observation*. 
-This can work well, e.g., for spatial sensor data. These preprocessing techniques and many more are 
-beneficial to keep the estimation problem well controlled. See e.g., the articles in :cite:`guyon2008feature` for a review of feature selection and extraction techniques.
+Lorsque nous travaillons avec des données, nous effectuons souvent un prétraitement avant la formation. 
+Les choix de prétraitement des données font souvent une énorme différence dans les résultats finaux.
+Rappelez-vous notre application des MLP à la prédiction des prix de l'immobilier (:numref:`sec_kaggle_house` ).
+Notre première étape, lorsque nous avons travaillé avec des données réelles
+, a été de normaliser nos caractéristiques d'entrée afin qu'elles aient 
+une moyenne nulle $\mathbf{\mu} = 0$ et une variance unitaire $\mathbf{\Sigma} = \mathbf{1}$ sur plusieurs observations :cite:`friedman1987exploratory` .
+Au minimum, il est fréquent de changer l'échelle de manière à ce que la diagonale soit égale à l'unité, c'est-à-dire $\Sigma_{ii} = 1$. 
+Une autre stratégie encore consiste à redimensionner les vecteurs à une longueur unitaire, éventuellement à une moyenne nulle *par observation*. 
+Cela peut donner de bons résultats, par exemple pour les données de capteurs spatiaux. Ces techniques de prétraitement et bien d'autres sont 
+bénéfiques pour garder le problème de l'estimation bien maîtrisé. Voir, par exemple, les articles de :cite:`guyon2008feature` pour un examen des techniques de sélection et d'extraction de caractéristiques.
 
-Intuitively, this standardization plays nicely with our optimizers
-since it puts the parameters *a priori* at a similar scale.
-As such, it is only natural to ask whether a corresponding normalization step *inside* a deep network
-might not be beneficial. While this isn't quite the reasoning that led to the invention of batch normalization :cite:`Ioffe.Szegedy.2015`, it is a useful way of understanding it and its cousin, layer normalization :cite:`Ba.Kiros.Hinton.2016` within a unified framework. 
+Intuitivement, cette normalisation joue bien avec nos optimiseurs
+puisqu'elle place les paramètres *a priori* à une échelle similaire.
+En tant que tel, il est naturel de se demander si une étape de normalisation correspondante *à l'intérieur* d'un réseau profond
+ne serait pas bénéfique. Bien que ce ne soit pas tout à fait le raisonnement qui a conduit à l'invention de la normalisation par lot :cite:`Ioffe.Szegedy.2015` , c'est une façon utile de la comprendre, ainsi que sa cousine, la normalisation par couche :cite:`Ba.Kiros.Hinton.2016` , dans un cadre unifié. 
 
-Second, for a typical MLP or CNN, as we train,
-the variables (e.g., affine transformation outputs in MLP)
-in intermediate layers 
-may take values with widely varying magnitudes:
-both along the layers from the input to the output, across units in the same layer,
-and over time due to our updates to the model parameters.
-The inventors of batch normalization postulated informally
-that this drift in the distribution of such variables could hamper the convergence of the network.
-Intuitively, we might conjecture that if one
-layer has variable activations that are 100 times that of another layer,
-this might necessitate compensatory adjustments in the learning rates. Adaptive solvers 
-such as AdaGrad :cite:`Duchi.Hazan.Singer.2011`, Adam :cite:`Kingma.Ba.2014`, and Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018` aim to address this from the viewpoint of optimization. 
-The alternative is to prevent the problem from occurring, simply by adaptive normalization.
+Deuxièmement, pour un MLP ou CNN typique, lors de la formation,
+les variables (par exemple, les sorties de la transformation affine dans le MLP)
+dans les couches intermédiaires 
+peuvent prendre des valeurs avec des amplitudes très variables :
+à la fois le long des couches de l'entrée à la sortie, entre les unités de la même couche,
+et au fil du temps en raison de nos mises à jour des paramètres du modèle.
+Les inventeurs de la normalisation par lots ont postulé de manière informelle
+que cette dérive dans la distribution de ces variables pouvait entraver la convergence du réseau.
+Intuitivement, nous pourrions conjecturer que si une couche
+a des activations variables qui sont 100 fois supérieures à celles d'une autre couche,
+cela pourrait nécessiter des ajustements compensatoires dans les taux d'apprentissage. Les solveurs adaptatifs 
+tels que AdaGrad :cite:`Duchi.Hazan.Singer.2011` , Adam :cite:`Kingma.Ba.2014` , et Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018` visent à résoudre ce problème du point de vue de l'optimisation. 
+L'alternative est d'empêcher le problème de se produire, simplement par une normalisation adaptative.
    
-Third, deeper networks are complex and tend to be more easily capable of overfitting.
-This means that regularization becomes more critical. A common technique for regularization is noise 
-injection. This has been known for a long time, e.g., with regard to noise injection for the 
-inputs :cite:`Bishop.1995`. It also forms the basis of dropout :numref:`sec_dropout`. As it turns out, quite serendipitously, batch normalization conveys all three benefits: preprocessing, numerical stability, and regularization. 
+Troisièmement, les réseaux plus profonds sont complexes et ont tendance à être plus facilement surajustés.
+Cela signifie que la régularisation devient plus critique. Une technique courante de régularisation est l'injection de bruit 
+. Cette technique est connue depuis longtemps, par exemple en ce qui concerne l'injection de bruit pour les entrées 
+ :cite:`Bishop.1995` . Elle est également à la base du dropout :numref:`sec_dropout` . Il s'avère que, de manière tout à fait fortuite, la normalisation par lots présente ces trois avantages : prétraitement, stabilité numérique et régularisation. 
 
-Batch normalization is applied to individual layers, or optionally, to all of them:
-In each training iteration,
-we first normalize the inputs (of batch normalization)
-by subtracting their mean and
-dividing by their standard deviation,
-where both are estimated based on the statistics of the current minibatch.
-Next, we apply a scale coefficient and an offset to recover the lost degrees 
-of freedom. It is precisely due to this *normalization* based on *batch* statistics
-that *batch normalization* derives its name.
+La normalisation par lots est appliquée à des couches individuelles ou, en option, à toutes les couches :
+Dans chaque itération d'apprentissage,
+nous normalisons d'abord les entrées (de la normalisation par lots)
+en soustrayant leur moyenne et
+en les divisant par leur écart type,
+où les deux sont estimés sur la base des statistiques du mini-batch actuel.
+Ensuite, nous appliquons un coefficient d'échelle et un décalage pour récupérer les degrés de liberté perdus 
+. C'est précisément en raison de cette *normalisation* basée sur les statistiques du *lot*
+que la *normalisation du lot* tire son nom.
 
-Note that if we tried to apply batch normalization with minibatches of size 1,
-we would not be able to learn anything.
-That is because after subtracting the means,
-each hidden unit would take value 0.
-As you might guess, since we are devoting a whole section to batch normalization,
-with large enough minibatches, the approach proves effective and stable.
-One takeaway here is that when applying batch normalization,
-the choice of batch size is
-even more significant than without batch normalization, or at least, 
-suitable calibration is needed as we might adjust it.
+Notez que si nous essayions d'appliquer la normalisation par lot avec des minibatchs de taille 1,
+nous ne pourrions rien apprendre.
+En effet, après avoir soustrait les moyennes,
+chaque unité cachée prendrait la valeur 0.
+Comme vous pouvez le deviner, puisque nous consacrons une section entière à la normalisation par lots,
+avec des minibatchs suffisamment grands, l'approche s'avère efficace et stable.
+L'une des conclusions à retenir ici est que lors de l'application de la normalisation par lot,
+le choix de la taille du lot est
+encore plus important que sans normalisation par lot, ou du moins, 
+une calibration appropriée est nécessaire car nous pourrions l'ajuster.
 
-Formally, denoting by $\mathbf{x} \in \mathcal{B}$ an input to batch normalization ($\mathrm{BN}$)
-that is from a minibatch $\mathcal{B}$,
-batch normalization transforms $\mathbf{x}$
-according to the following expression:
+Formellement, en désignant par $\mathbf{x} \in \mathcal{B}$ une entrée de normalisation par lot ($\mathrm{BN}$)
+qui provient d'un mini-lot $\mathcal{B}$,
+la normalisation par lot transforme $\mathbf{x}$
+ selon l'expression suivante :
 
-$$\mathrm{BN}(\mathbf{x}) = \boldsymbol{\gamma} \odot \frac{\mathbf{x} - \hat{\boldsymbol{\mu}}_\mathcal{B}}{\hat{\boldsymbol{\sigma}}_\mathcal{B}} + \boldsymbol{\beta}.$$
-:eqlabel:`eq_batchnorm`
+$$\mathrm{BN}(\mathbf{x}) = \boldsymbol{\gamma} \odot \frac{\mathbf{x} - \hat{\boldsymbol{\mu}}_\mathcal{B}}{\hat{\boldsymbol{\sigma}}_\mathcal{B}} + \boldsymbol{\beta}.$$ 
+ :eqlabel:`eq_batchnorm` 
 
-In :eqref:`eq_batchnorm`,
-$\hat{\boldsymbol{\mu}}_\mathcal{B}$ is the  sample mean
-and $\hat{\boldsymbol{\sigma}}_\mathcal{B}$ is the sample standard deviation of the minibatch $\mathcal{B}$.
-After applying standardization,
-the resulting minibatch
-has zero mean and unit variance. 
-The choice of unit variance
-(vs. some other magic number) is an arbitrary choice. We recover this degree of freedom
-by including an elementwise
-*scale parameter* $\boldsymbol{\gamma}$ and *shift parameter* $\boldsymbol{\beta}$
-that have the same shape as $\mathbf{x}$. Both are parameters that 
-need to be learned as part of model training.
+ Dans :eqref:`eq_batchnorm` ,
+$\hat{\boldsymbol{\mu}}_\mathcal{B}$ est la moyenne de l'échantillon
+et $\hat{\boldsymbol{\sigma}}_\mathcal{B}$ est l'écart type de l'échantillon du mini-lot $\mathcal{B}$.
+Après application de la normalisation,
+le minibatch résultant
+a une moyenne nulle et une variance unitaire. 
+Le choix de la variance unitaire
+(par rapport à un autre nombre magique) est un choix arbitraire. Nous récupérons ce degré de liberté
+en incluant un paramètre d'échelle *
+* $\boldsymbol{\gamma}$ et un paramètre de décalage * $\boldsymbol{\beta}$
+ qui ont la même forme que $\mathbf{x}$. Ces deux paramètres sont des paramètres que 
+doit apprendre dans le cadre de l'apprentissage du modèle.
 
-Consequently, the variable magnitudes
-for intermediate layers cannot diverge during training
-because batch normalization actively centers and rescales them back
-to a given mean and size (via $\hat{\boldsymbol{\mu}}_\mathcal{B}$ and ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$).
-Practical experience confirms that, as alluded when discussing feature rescaling, batch normalization seems to allow for more aggressive learning rates.
-Formally, 
-we calculate $\hat{\boldsymbol{\mu}}_\mathcal{B}$ and ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$ in :eqref:`eq_batchnorm` as follows:
+Par conséquent, les amplitudes des variables
+pour les couches intermédiaires ne peuvent pas diverger pendant l'apprentissage
+car la normalisation par lots les centre activement et les remet à l'échelle
+à une moyenne et une taille données (via $\hat{\boldsymbol{\mu}}_\mathcal{B}$ et ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$).
+L'expérience pratique confirme que, comme nous y avons fait allusion lors de la discussion sur la remise à l'échelle des caractéristiques, la normalisation par lots semble permettre des taux d'apprentissage plus agressifs.
+Formellement, 
+nous calculons $\hat{\boldsymbol{\mu}}_\mathcal{B}$ et ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$ dans :eqref:`eq_batchnorm` comme suit :
 
 $$\hat{\boldsymbol{\mu}}_\mathcal{B} = \frac{1}{|\mathcal{B}|} \sum_{\mathbf{x} \in \mathcal{B}} \mathbf{x}
 \text{ and }
 \hat{\boldsymbol{\sigma}}_\mathcal{B}^2 = \frac{1}{|\mathcal{B}|} \sum_{\mathbf{x} \in \mathcal{B}} (\mathbf{x} - \hat{\boldsymbol{\mu}}_{\mathcal{B}})^2 + \epsilon.$$
 
-Note that we add a small constant $\epsilon > 0$
-to the variance estimate
-to ensure that we never attempt division by zero,
-even in cases where the empirical variance estimate might be very small or even vanish, leading to a division by zero.
-The estimates $\hat{\boldsymbol{\mu}}_\mathcal{B}$ and ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$ counteract the scaling issue
-by using noisy estimates of mean and variance.
-You might think that this noisiness should be a problem.
-As it turns out, this is actually beneficial.
+Notez que nous ajoutons une petite constante $\epsilon > 0$
+ à l'estimation de la variance
+pour nous assurer que nous ne tentons jamais une division par zéro,
+même dans les cas où l'estimation de la variance empirique pourrait être très faible ou même disparaître, ce qui entraînerait une division par zéro.
+Les estimations $\hat{\boldsymbol{\mu}}_\mathcal{B}$ et ${\hat{\boldsymbol{\sigma}}_\mathcal{B}}$ contrecarrent le problème de mise à l'échelle
+en utilisant des estimations bruitées de la moyenne et de la variance.
+Vous pourriez penser que ce caractère bruité devrait constituer un problème.
+Or, il s'avère qu'elle est en fait bénéfique.
 
-This turns out to be a recurring theme in deep learning.
-For reasons that are not yet well-characterized theoretically,
-various sources of noise in optimization
-often lead to faster training and less overfitting:
-this variation appears to act as a form of regularization.
-:cite:`Teye.Azizpour.Smith.2018` and :cite:`Luo.Wang.Shao.ea.2018`
-relate the properties of batch normalization to Bayesian priors and penalties respectively.
-In particular, this sheds some light on the puzzle
-of why batch normalization works best for moderate minibatches sizes in the $50 \sim 100$ range. 
-This particular size of minibatch seems to inject just the "right amount" of noise per layer: a 
-larger minibatch regularizes less due to the more stable estimates, whereas tiny minibatches 
-destroy useful signal due to high variance. Exploring this direction further, considering alternative types 
-of preprocessing and filtering may yet lead to other effective types of regularization. 
+Il s'agit d'un thème récurrent dans l'apprentissage profond.
+Pour des raisons qui ne sont pas encore bien caractérisées sur le plan théorique,
+diverses sources de bruit dans l'optimisation
+conduisent souvent à un apprentissage plus rapide et à moins de surajustement :
+cette variation semble agir comme une forme de régularisation.
+:cite:`Teye.Azizpour.Smith.2018` et :cite:`Luo.Wang.Shao.ea.2018` 
+ relient les propriétés de la normalisation par lots aux prieurs et pénalités bayésiens respectivement.
+En particulier, cela permet d'éclaircir l'énigme
+de savoir pourquoi la normalisation par lots fonctionne mieux pour des minilots de taille modérée dans la gamme $50 \sim 100$. 
+Cette taille particulière de minibatch semble injecter juste la "bonne quantité" de bruit par couche : un 
+minibatch plus grand régularise moins en raison des estimations plus stables, tandis que les minibatchs minuscules 
+détruisent le signal utile en raison de la variance élevée. En explorant cette direction plus avant, en considérant d'autres types 
+de prétraitement et de filtrage, on peut encore aboutir à d'autres types de régularisation efficaces. 
 
-Fixing a trained model, you might think
-that we would prefer using the entire dataset
-to estimate the mean and variance.
-Once training is complete, why would we want
-the same image to be classified differently,
-depending on the batch in which it happens to reside?
-During training, such exact calculation is infeasible
-because the intermediate variables
-for all data examples
-change every time we update our model.
-However, once the model is trained,
-we can calculate the means and variances
-of each layer's variables based on the entire dataset.
-Indeed this is standard practice for
-models employing batch normalization
-and thus batch normalization layers function differently
-in *training mode* (normalizing by minibatch statistics)
-and in *prediction mode* (normalizing by dataset statistics). 
-In this form they closely resemble the behavior of dropout regularization of :numref:`sec_dropout`,
-where noise is only injected during training. 
+En fixant un modèle entraîné, on pourrait penser
+que nous préférerions utiliser l'ensemble des données
+pour estimer la moyenne et la variance.
+Une fois la formation terminée, pourquoi voudrions-nous que
+la même image soit classée différemment,
+en fonction du lot dans lequel elle se trouve ?
+Pendant la formation, un tel calcul exact est infaisable
+car les variables intermédiaires
+pour tous les exemples de données
+changent à chaque fois que nous mettons à jour notre modèle.
+Cependant, une fois le modèle formé,
+nous pouvons calculer les moyennes et les variances
+des variables de chaque couche sur la base de l'ensemble des données.
+Il s'agit en effet d'une pratique standard pour les modèles
+employant la normalisation par lots
+. Les couches de normalisation par lots fonctionnent donc différemment
+en mode *formation* (normalisation par statistiques de minibatchs)
+et en mode *prédiction* (normalisation par statistiques de jeux de données). 
+Sous cette forme, ils ressemblent beaucoup au comportement de la régularisation par abandon de :numref:`sec_dropout` ,
+où le bruit n'est injecté que pendant l'apprentissage. 
 
 
-## Batch Normalization Layers
+## Couches de normalisation par lots
 
-We are now ready to take a look at how batch normalization works in practice.
-Batch normalization implementations for fully connected layers
-and convolutional layers are slightly different.
-One key difference between batch normalization and other layers
-is that because batch normalization operates on a full minibatch at a time,
-we cannot just ignore the batch dimension
-as we did before when introducing other layers.
+Nous sommes maintenant prêts à examiner comment la normalisation par lots fonctionne en pratique.
+Les implémentations de la normalisation par lots pour les couches entièrement connectées
+et les couches convolutionnelles sont légèrement différentes.
+L'une des principales différences entre la normalisation par lots et les autres couches
+est que, comme la normalisation par lots opère sur un minilot complet à la fois,
+nous ne pouvons pas simplement ignorer la dimension du lot
+comme nous l'avons fait précédemment lors de l'introduction d'autres couches.
 
-### Fully Connected Layers
+### Couches entièrement connectées
 
-When applying batch normalization to fully connected layers,
-the original paper inserted batch normalization after the affine transformation
-and before the nonlinear activation function. Later applications experimented with 
-inserting batch normalization right after activation functions :cite:`Ioffe.Szegedy.2015`.
-Denoting the input to the fully connected layer by $\mathbf{x}$,
-the affine transformation
-by $\mathbf{W}\mathbf{x} + \mathbf{b}$ (with the weight parameter $\mathbf{W}$ and the bias parameter $\mathbf{b}$),
-and the activation function by $\phi$,
-we can express the computation of a batch-normalization-enabled,
-fully connected layer output $\mathbf{h}$ as follows:
+Lors de l'application de la normalisation par lots aux couches entièrement connectées,
+l'article original insérait la normalisation par lots après la transformation affine
+et avant la fonction d'activation non linéaire. 
+Des applications ultérieures ont expérimenté l'insertion de la normalisation par lots juste après les fonctions d'activation :cite:`Ioffe.Szegedy.2015` .
+En désignant l'entrée de la couche entièrement connectée par $\mathbf{x}$,
+, la transformation affine
+par $\mathbf{W}\mathbf{x} + \mathbf{b}$ (avec le paramètre de poids $\mathbf{W}$ et le paramètre de biais $\mathbf{b}$),
+et la fonction d'activation par $\phi$,
+, nous pouvons exprimer le calcul d'une sortie de couche entièrement connectée
+avec normalisation par lots $\mathbf{h}$ comme suit :
 
 $$\mathbf{h} = \phi(\mathrm{BN}(\mathbf{W}\mathbf{x} + \mathbf{b}) ).$$
 
-Recall that mean and variance are computed
-on the *same* minibatch 
-on which the transformation is applied.
+Rappelons que la moyenne et la variance sont calculées
+sur le *même* minibatch 
+sur lequel la transformation est appliquée.
 
-### Convolutional Layers
+### Couches convolutionnelles
 
-Similarly, with convolutional layers,
-we can apply batch normalization after the convolution
-and before the nonlinear activation function. The key difference from batch normalization 
-in fully connected layers is that we apply the operation on a per-channel basis 
-*across all locations*. This is compatible with our assumption of translation 
-invariance that led to convolutions: we assumed that the specific location of a pattern 
-within an image was not critical for the purpose of understanding.
+De même, avec les couches convolutionnelles,
+nous pouvons appliquer la normalisation par lot après la convolution
+et avant la fonction d'activation non linéaire. La principale différence avec la normalisation par lot 
+dans les couches entièrement connectées est que nous appliquons l'opération sur une base par canal 
+*sur tous les emplacements*. Ceci est compatible avec notre hypothèse d'invariance de traduction 
+qui a conduit aux convolutions : nous avons supposé que l'emplacement spécifique d'un motif 
+dans une image n'était pas critique pour la compréhension.
 
-Assume that our minibatches contain $m$ examples
-and that for each channel,
-the output of the convolution has height $p$ and width $q$.
-For convolutional layers, we carry out each batch normalization
-over the $m \cdot p \cdot q$ elements per output channel simultaneously.
-Thus, we collect the values over all spatial locations
-when computing the mean and variance
-and consequently 
-apply the same mean and variance
-within a given channel
-to normalize the value at each spatial location.
-Each channel has its own scale and shift parameters,
-both of which are scalars.
+Supposons que nos minibatchs contiennent $m$ exemples
+et que pour chaque canal,
+la sortie de la convolution a une hauteur $p$ et une largeur $q$.
+Pour les couches convolutionnelles, nous effectuons chaque normalisation de lot
+sur les éléments $m \cdot p \cdot q$ par canal de sortie simultanément.
+Ainsi, nous collectons les valeurs sur tous les emplacements spatiaux
+lors du calcul de la moyenne et de la variance
+et par conséquent 
+appliquons les mêmes moyenne et variance
+dans un canal donné
+pour normaliser la valeur à chaque emplacement spatial.
+Chaque canal possède ses propres paramètres d'échelle et de décalage,
+qui sont tous deux des scalaires.
 
-Note that in the context of convolutions the batch normalization is well-defined even for 
-minibatches of size 1: after all, we have all the locations across an image to average. Consequently, 
-mean and variance are well defined, even if it's just within a single observation. This consideration 
-led :cite:`Ba.Kiros.Hinton.2016` to introduce the notion of the *layer norm*. It works just like 
-a batch norm, just that it is applied one image at a time. There are cases where layer normalization improves the 
-accuracy of a model. We skip further details and recommend the interested reader to consult the 
-original paper. 
+Notez que dans le contexte des convolutions, la normalisation des lots est bien définie même pour 
+des minis lots de taille 1 : après tout, nous avons tous les emplacements d'une image à moyenner. Par conséquent, la moyenne et la variance de 
+sont bien définies, même si ce n'est que pour une seule observation. Cette considération 
+a conduit :cite:`Ba.Kiros.Hinton.2016` à introduire la notion de *norme de couche*. Elle fonctionne exactement comme 
+une norme de lot, mais elle est appliquée à une image à la fois. Il existe des cas où la normalisation des couches améliore la précision d'un modèle 
+. Nous passons les détails et recommandons au lecteur intéressé de consulter l'article original 
+. 
 
-### Batch Normalization During Prediction
+### Normalisation par lots pendant la prédiction
 
-As we mentioned earlier, batch normalization typically behaves differently
-in training mode and prediction mode.
-First, the noise in the sample mean and the sample variance
-arising from estimating each on minibatches
-are no longer desirable once we have trained the model.
-Second, we might not have the luxury
-of computing per-batch normalization statistics.
-For example,
-we might need to apply our model to make one prediction at a time.
+Comme nous l'avons mentionné précédemment, la normalisation par lots se comporte généralement différemment
+en mode formation et en mode prédiction.
+Tout d'abord, le bruit dans la moyenne et la variance de l'échantillon
+provenant de l'estimation de chacun sur des minis lots
+n'est plus souhaitable une fois que nous avons formé le modèle.
+Deuxièmement, nous n'avons pas forcément le luxe
+de calculer les statistiques de normalisation par lot.
+Par exemple,
+nous pouvons avoir besoin d'appliquer notre modèle pour faire une prédiction à la fois.
 
-Typically, after training, we use the entire dataset
-to compute stable estimates of the variable statistics
-and then fix them at prediction time.
-Consequently, batch normalization behaves differently during training and at test time.
-Recall that dropout also exhibits this characteristic.
+En général, après la formation, nous utilisons l'ensemble des données
+pour calculer des estimations stables des statistiques des variables
+et les fixer ensuite au moment de la prédiction.
+Par conséquent, la normalisation par lot se comporte différemment pendant la formation et au moment du test.
+Rappelons que le dropout présente également cette caractéristique.
 
-## (**Implementation from Scratch**)
+## (**Implémentation à partir de zéro**)
 
-To see how batch normalization works in practice, we implement one from scratch below.
+Pour voir comment la normalisation par lots fonctionne en pratique, nous en implémentons une à partir de zéro ci-dessous.
 
 ```{.python .input}
 %%tab mxnet
@@ -322,28 +322,28 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps):
     return Y
 ```
 
-We can now [**create a proper `BatchNorm` layer.**]
-Our layer will maintain proper parameters
-for scale `gamma` and shift `beta`,
-both of which will be updated in the course of training.
-Additionally, our layer will maintain
-moving averages of the means and variances
-for subsequent use during model prediction.
+Nous pouvons maintenant [**créer une couche `BatchNorm` appropriée.**]
+Notre couche maintiendra les paramètres appropriés
+pour l'échelle `gamma` et le décalage `beta`,
+qui seront tous deux mis à jour au cours de la formation.
+De plus, notre couche maintiendra
+les moyennes mobiles des moyennes et des variances
+pour une utilisation ultérieure pendant la prédiction du modèle.
 
-Putting aside the algorithmic details,
-note the design pattern underlying our implementation of the layer.
-Typically, we define the mathematics in a separate function, say `batch_norm`.
-We then integrate this functionality into a custom layer,
-whose code mostly addresses bookkeeping matters,
-such as moving data to the right device context,
-allocating and initializing any required variables,
-keeping track of moving averages (here for mean and variance), and so on.
-This pattern enables a clean separation of mathematics from boilerplate code.
-Also note that for the sake of convenience
-we did not worry about automatically inferring the input shape here,
-thus we need to specify the number of features throughout.
-By now all modern deep learning frameworks offer automatic detection of size and shape in the 
-high-level batch normalization APIs (in practice we will use this instead).
+En laissant de côté les détails algorithmiques,
+, notez le modèle de conception qui sous-tend notre mise en œuvre de la couche.
+En général, nous définissons les mathématiques dans une fonction distincte, par exemple `batch_norm`.
+Nous intégrons ensuite cette fonctionnalité dans une couche personnalisée,
+dont le code traite principalement des questions de comptabilité,
+telles que le déplacement des données vers le bon contexte de dispositif,
+l'allocation et l'initialisation de toutes les variables requises,
+le suivi des moyennes mobiles (ici pour la moyenne et la variance), et ainsi de suite.
+Ce modèle permet une séparation nette entre les mathématiques et le code passe-partout.
+Notez également que, pour des raisons de commodité,
+nous ne nous sommes pas souciés de déduire automatiquement la forme de l'entrée ici,
+et nous devons donc spécifier le nombre de caractéristiques tout au long du processus.
+À l'heure actuelle, tous les cadres d'apprentissage profond modernes offrent une détection automatique de la taille et de la forme dans les API de normalisation de lot de haut niveau 
+(en pratique, nous utiliserons cette fonction).
 
 ```{.python .input}
 %%tab mxnet
@@ -367,11 +367,11 @@ class BatchNorm(nn.Block):
 
     def forward(self, X):
         # If `X` is not on the main memory, copy `moving_mean` and
-        # `moving_var` to the device where `X` is located
+        # `var_mouvante` to the device where `X` is located
         if self.moving_mean.ctx != X.ctx:
             self.moving_mean = self.moving_mean.copyto(X.ctx)
             self.moving_var = self.moving_var.copyto(X.ctx)
-        # Save the updated `moving_mean` and `moving_var`
+        # Save the updated `moyenne mobile` and `variable_mobile`
         Y, self.moving_mean, self.moving_var = batch_norm(
             X, self.gamma.data(), self.beta.data(), self.moving_mean,
             self.moving_var, eps=1e-12, momentum=0.9)
@@ -399,12 +399,12 @@ class BatchNorm(nn.Module):
         self.moving_var = torch.ones(shape)
 
     def forward(self, X):
-        # If `X` is not on the main memory, copy `moving_mean` and
-        # `moving_var` to the device where `X` is located
+        # If `X` is not on the main memory, copy `moyenne mobile` and
+        # `variable mobile` to the device where `X` is located
         if self.moving_mean.device != X.device:
             self.moving_mean = self.moving_mean.to(X.device)
             self.moving_var = self.moving_var.to(X.device)
-        # Save the updated `moving_mean` and `moving_var`
+        # Save the updated `moyenne mobile` and `variable mobile`
         Y, self.moving_mean, self.moving_var = batch_norm(
             X, self.gamma, self.beta, self.moving_mean,
             self.moving_var, eps=1e-5, momentum=0.9)
@@ -462,15 +462,15 @@ class BatchNorm(tf.keras.layers.Layer):
         return output
 ```
 
-Note that we used the variable `momentum` to govern the aggregation over past mean and variance estimates. This is somewhat of a misnomer as it has nothing whatsoever to do with the *momentum* term of optimization in :numref:`sec_momentum`. Nonetheless, it is the commonly adopted name for this term and in deference to API naming convention we use the same variable name in our code, too.
+Notez que nous avons utilisé la variable `momentum` pour régir l'agrégation sur les estimations passées de la moyenne et de la variance. Il s'agit d'une appellation quelque peu erronée, car elle n'a absolument rien à voir avec le terme *momentum* d'optimisation dans :numref:`sec_momentum` . Néanmoins, c'est le nom communément adopté pour ce terme et, par respect pour la convention de dénomination de l'API, nous utilisons également le même nom de variable dans notre code.
 
 ## [**Applying Batch Normalization in LeNet**]
 
-To see how to apply `BatchNorm` in context,
-below we apply it to a traditional LeNet model (:numref:`sec_lenet`).
-Recall that batch normalization is applied
-after the convolutional layers or fully connected layers
-but before the corresponding activation functions.
+Pour voir comment appliquer `BatchNorm` dans son contexte,
+ci-dessous l'applique à un modèle LeNet traditionnel (:numref:`sec_lenet` ).
+Rappelons que la normalisation par lots est appliquée
+après les couches convolutionnelles ou les couches entièrement connectées
+mais avant les fonctions d'activation correspondantes.
 
 ```{.python .input}
 %%tab all
@@ -517,8 +517,8 @@ class BNLeNetScratch(d2l.Classifier):
                 tf.keras.layers.Dense(num_classes)])
 ```
 
-As before, we will [**train our network on the Fashion-MNIST dataset**].
-This code is virtually identical to that when we first trained LeNet (:numref:`sec_lenet`).
+Comme précédemment, nous allons [**entraîner notre réseau sur le jeu de données Fashion-MNIST**].
+Ce code est pratiquement identique à celui utilisé lors du premier entraînement de LeNet (:numref:`sec_lenet` ).
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -539,9 +539,9 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-Let's [**have a look at the scale parameter `gamma`
-and the shift parameter `beta`**] learned
-from the first batch normalization layer.
+Regardons [**le paramètre d'échelle `gamma`
+ et le paramètre de décalage `beta`**] appris
+de la première couche de normalisation par lots.
 
 ```{.python .input}
 %%tab mxnet
@@ -559,13 +559,13 @@ tf.reshape(model.net.layers[1].gamma, (-1,)), tf.reshape(
     model.net.layers[1].beta, (-1,))
 ```
 
-## [**Concise Implementation**]
+## [**Mise en œuvre concise**]
 
-Compared with the `BatchNorm` class,
-which we just defined ourselves,
-we can use the `BatchNorm` class defined in high-level APIs from the deep learning framework directly.
-The code looks virtually identical
-to our implementation above, except that we no longer need to provide additional arguments for it to get the dimensions right.
+Par rapport à la classe `BatchNorm`,
+que nous venons de définir nous-mêmes,
+nous pouvons utiliser directement la classe `BatchNorm` définie dans les API de haut niveau du cadre d'apprentissage profond.
+Le code semble pratiquement identique
+à notre implémentation ci-dessus, sauf que nous n'avons plus besoin de fournir des arguments supplémentaires pour qu'elle obtienne les bonnes dimensions.
 
 ```{.python .input}
 %%tab all
@@ -615,10 +615,10 @@ class BNLeNet(d2l.Classifier):
                 tf.keras.layers.Dense(num_classes)])
 ```
 
-Below, we [**use the same hyperparameters to train our model.**]
-Note that as usual, the high-level API variant runs much faster
-because its code has been compiled to C++ or CUDA
-while our custom implementation must be interpreted by Python.
+Ci-dessous, nous [**utilisons les mêmes hyperparamètres pour entraîner notre modèle.**]
+Notez que, comme d'habitude, la variante API de haut niveau s'exécute beaucoup plus rapidement
+car son code a été compilé en C++ ou CUDA
+alors que notre implémentation personnalisée doit être interprétée par Python.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -641,100 +641,100 @@ with d2l.try_gpu():
 
 ## Discussion
 
-Intuitively, batch normalization is thought
-to make the optimization landscape smoother. 
-However, we must be careful to distinguish between
-speculative intuitions and true explanations
-for the phenomena that we observe when training deep models.
-Recall that we do not even know why simpler
-deep neural networks (MLPs and conventional CNNs)
-generalize well in the first place.
-Even with dropout and weight decay,
-they remain so flexible that their ability to generalize to unseen data
-likely needs significantly more refined learning-theoretic generalization guarantees.
+Intuitivement, la normalisation des lots est censée
+rendre le paysage de l'optimisation plus lisse. 
+Cependant, nous devons prendre soin de faire la distinction entre
+les intuitions spéculatives et les véritables explications
+des phénomènes que nous observons lors de l'entraînement des modèles profonds.
+Rappelons que nous ne savons même pas pourquoi les réseaux neuronaux profonds plus simples
+(MLP et CNN classiques)
+généralisent bien en premier lieu.
+Même avec le dropout et la décroissance des poids,
+ils restent si flexibles que leur capacité à généraliser à des données inédites
+nécessite probablement des garanties de généralisation beaucoup plus raffinées en théorie de l'apprentissage.
 
-In the original paper proposing batch normalization,
-the authors, in addition to introducing a powerful and useful tool,
-offered an explanation for why it works:
-by reducing *internal covariate shift*.
-Presumably by *internal covariate shift* the authors
-meant something like the intuition expressed above---the
-notion that the distribution of variable values changes
-over the course of training.
-However, there were two problems with this explanation:
-i) This drift is very different from *covariate shift*,
-rendering the name a misnomer.
-ii) The explanation offers an under-specified intuition
-but leaves the question of *why precisely this technique works*
-an open question wanting for a rigorous explanation.
-Throughout this book, we aim to convey the intuitions that practitioners
-use to guide their development of deep neural networks.
-However, we believe that it is important
-to separate these guiding intuitions
-from established scientific fact.
-Eventually, when you master this material
-and start writing your own research papers
-you will want to be clear to delineate
-between technical claims and hunches.
+Dans l'article original proposant la normalisation par lots,
+les auteurs, en plus de présenter un outil puissant et utile,
+ont offert une explication de son fonctionnement :
+en réduisant le *décalage interne des covariables*.
+On peut supposer que par *internal covariate shift*, les auteurs
+entendaient quelque chose comme l'intuition exprimée ci-dessus - la notion
+que la distribution des valeurs des variables change
+au cours de la formation.
+Cependant, cette explication pose deux problèmes :
+i) Cette dérive est très différente du *décalage des covariables*,
+rendant le nom erroné.
+ii) L'explication offre une intuition sous-spécifiée
+mais laisse la question de savoir *pourquoi précisément cette technique fonctionne*
+une question ouverte souhaitant une explication rigoureuse.
+Tout au long de ce livre, nous cherchons à transmettre les intuitions que les praticiens
+utilisent pour guider leur développement de réseaux de neurones profonds.
+Cependant, nous pensons qu'il est important
+de séparer ces intuitions directrices
+des faits scientifiques établis.
+À terme, lorsque vous maîtriserez cette matière
+et que vous commencerez à rédiger vos propres articles de recherche
+, vous voudrez être en mesure de délimiter clairement
+entre les affirmations techniques et les intuitions.
 
-Following the success of batch normalization,
-its explanation in terms of *internal covariate shift*
-has repeatedly surfaced in debates in the technical literature
-and broader discourse about how to present machine learning research.
-In a memorable speech given while accepting a Test of Time Award
-at the 2017 NeurIPS conference,
-Ali Rahimi used *internal covariate shift*
-as a focal point in an argument likening
-the modern practice of deep learning to alchemy.
-Subsequently, the example was revisited in detail
-in a position paper outlining
-troubling trends in machine learning :cite:`Lipton.Steinhardt.2018`.
-Other authors
-have proposed alternative explanations for the success of batch normalization,
-some claiming that batch normalization's success comes despite exhibiting behavior
-that is in some ways opposite to those claimed in the original paper :cite:`Santurkar.Tsipras.Ilyas.ea.2018`.
+Après le succès de la normalisation par lots,
+son explication en termes de *décalage interne des covariables*
+a fait surface à plusieurs reprises dans les débats de la littérature technique
+et dans un discours plus large sur la manière de présenter la recherche en apprentissage automatique.
+Dans un discours mémorable prononcé lors de l'acceptation du prix Test of Time
+à la conférence NeurIPS 2017,
+Ali Rahimi a utilisé *internal covariate shift*
+comme point central d'un argument assimilant
+la pratique moderne de l'apprentissage profond à l'alchimie.
+Par la suite, l'exemple a été repris en détail
+dans un document de synthèse décrivant
+les tendances troublantes de l'apprentissage automatique :cite:`Lipton.Steinhardt.2018` .
+D'autres auteurs
+ont proposé d'autres explications pour le succès de la normalisation par lots,
+certains affirmant que le succès de la normalisation par lots survient malgré un comportement
+qui est, à certains égards, opposé à ceux revendiqués dans l'article original :cite:`Santurkar.Tsipras.Ilyas.ea.2018` .
 
-We note that the *internal covariate shift*
-is no more worthy of criticism than any of
-thousands of similarly vague claims
-made every year in the technical machine learning literature.
-Likely, its resonance as a focal point of these debates
-owes to its broad recognizability to the target audience.
-Batch normalization has proven an indispensable method,
-applied in nearly all deployed image classifiers,
-earning the paper that introduced the technique
-tens of thousands of citations. We conjecture, though, that the guiding principles 
-of regularization through noise injection, acceleration through rescaling and lastly preprocessing
-may well lead to further inventions of layers and techniques in the future. 
+Nous notons que le *décalage interne des covariables*
+n'est pas plus digne de critique que n'importe laquelle des
+milliers d'affirmations aussi vagues
+faites chaque année dans la littérature technique de l'apprentissage automatique.
+Il est probable que sa résonance en tant que point focal de ces débats
+est due à sa large reconnaissabilité par le public cible.
+La normalisation par lots s'est avérée être une méthode indispensable,
+appliquée dans presque tous les classificateurs d'images déployés,
+, ce qui a valu à l'article qui a introduit cette technique
+des dizaines de milliers de citations. Nous pensons cependant que les principes directeurs 
+de régularisation par injection de bruit, d'accélération par remise à l'échelle et enfin de prétraitement
+pourraient bien conduire à d'autres inventions de couches et de techniques à l'avenir. 
 
-On a more practical note, there are a number of aspects worth remembering about batch normalization: 
-* During model training, batch normalization continuously adjusts the intermediate output of 
-  the network by utilizing the mean and standard deviation of the minibatch, so that the 
-  values of the intermediate output in each layer throughout the neural network are more stable.
-* Batch normalization for fully connected layers and convolutional layers are slightly different. In fact, 
-  for convolutional layers, layer normalization can sometimes be used as an alternative. 
-* Like a dropout layer, batch normalization layers have different behaviors 
-  in training mode and prediction mode.
-* Batch normalization is useful for regularization and improving convergence in optimization. On the other hand, 
-  the original motivation of reducing internal covariate shift seems not to be a valid explanation.
+D'un point de vue plus pratique, plusieurs aspects de la normalisation par lots méritent d'être rappelés : 
+* Pendant la formation du modèle, la normalisation par lots ajuste en permanence la sortie intermédiaire du réseau 
+ en utilisant la moyenne et l'écart type du minilot, de sorte que les valeurs 
+ de la sortie intermédiaire de chaque couche du réseau neuronal sont plus stables.
+* La normalisation des lots pour les couches entièrement connectées et les couches convolutionnelles est légèrement différente. En fait, 
+ pour les couches convolutives, la normalisation des couches peut parfois être utilisée comme alternative. 
+* Comme une couche d'abandon, les couches de normalisation par lots ont des comportements différents 
+ en mode formation et en mode prédiction.
+* La normalisation par lots est utile pour la régularisation et l'amélioration de la convergence dans l'optimisation. D'autre part, 
+ la motivation initiale de réduction du décalage interne des covariables ne semble pas être une explication valable.
 
-## Exercises
+## Exercices
 
-1. Can we remove the bias parameter from the fully connected layer or the convolutional layer before the batch normalization? Why?
-1. Compare the learning rates for LeNet with and without batch normalization.
-    1. Plot the increase in validation accuracy.
-    1. How large can you make the learning rate before the optimization fails in both cases?
-1. Do we need batch normalization in every layer? Experiment with it?
-1. Implement a "lite" version of batch normalization that only removes the mean, or alternatively one that 
-   only removes the variance. How does it behave?
-1. Fix the parameters `beta` and `gamma`, and observe and analyze the results.
-1. Can you replace dropout by batch normalization? How does the behavior change?
-1. Review the online documentation for `BatchNorm` from the high-level APIs to see 
-   some other use cases for it. 
-1. Research ideas: think of other normalization transforms that you can apply:
-    1. Can you apply the probability integral transform? 
-    1. Can you use a full rank covariance estimate? Why not?
-    1. Does a sparsification compression act as a regularizer?
+1. Peut-on supprimer le paramètre de biais de la couche entièrement connectée ou de la couche convolutive avant la normalisation par lots ? Pourquoi ?
+1. Comparez les taux d'apprentissage de LeNet avec et sans normalisation par lots.
+   1. Tracez l'augmentation de la précision de validation.
+   1. Quelle taille pouvez-vous donner au taux d'apprentissage avant que l'optimisation n'échoue dans les deux cas ?
+1. Avons-nous besoin d'une normalisation par lot dans chaque couche ? Faites-en l'expérience ?
+1. Implémentez une version "allégée" de la normalisation par lots qui supprime uniquement la moyenne, ou alternativement une version qui 
+ supprime uniquement la variance. Comment se comporte-t-elle ?
+1. Fixez les paramètres `beta` et `gamma`, et observez et analysez les résultats.
+1. Pouvez-vous remplacer l'abandon par la normalisation par lots ? Comment le comportement change-t-il ?
+1. Consultez la documentation en ligne pour `BatchNorm` à partir des API de haut niveau pour voir 
+ d'autres cas d'utilisation. 
+1. Recherchez des idées : pensez à d'autres transformations de normalisation que vous pouvez appliquer :
+   1. Pouvez-vous appliquer la transformée intégrale de probabilité ? 
+    1. Pouvez-vous utiliser une estimation de covariance de rang complet ? Pourquoi pas ?
+   1. Une compression de sparsification agit-elle comme un régularisateur ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/83)

@@ -1,17 +1,17 @@
-# Multivariable Calculus
-:label:`sec_multivariable_calculus`
+## Calcul multivariable
+:label:`sec_multivariable_calculus` 
 
-Now that we have a fairly strong understanding of derivatives of a function of a single variable, let's return to our original question where we were considering a loss function of potentially billions of weights.
+ Maintenant que nous avons une compréhension assez forte des dérivées d'une fonction d'une seule variable, revenons à notre question initiale où nous considérions une fonction de perte de potentiellement des milliards de poids.
 
-## Higher-Dimensional Differentiation
-What :numref:`sec_single_variable_calculus` tells us is that if we change a single one of these billions of weights leaving every other one fixed, we know what will happen!  This is nothing more than a function of a single variable, so we can write
+## Différenciation en dimension supérieure
+Ce que :numref:`sec_single_variable_calculus` nous dit, c'est que si nous changeons un seul de ces milliards de poids en laissant tous les autres fixes, nous savons ce qui va se passer !  Ce n'est rien de plus qu'une fonction d'une seule variable, nous pouvons donc écrire
 
-$$L(w_1+\epsilon_1, w_2, \ldots, w_N) \approx L(w_1, w_2, \ldots, w_N) + \epsilon_1 \frac{d}{dw_1} L(w_1, w_2, \ldots, w_N).$$
-:eqlabel:`eq_part_der`
+$$L(w_1+\epsilon_1, w_2, \ldots, w_N) \approx L(w_1, w_2, \ldots, w_N) + \epsilon_1 \frac{d}{dw_1} L(w_1, w_2, \ldots, w_N).$$ 
+ :eqlabel:`eq_part_der` 
 
-We will call the derivative in one variable while fixing the other variables the *partial derivative*, and we will use the notation $\frac{\partial}{\partial w_1}$ for the derivative in :eqref:`eq_part_der`.
+ Nous appellerons la dérivée dans une variable tout en fixant les autres variables la *dérivée partielle*, et nous utiliserons la notation $\frac{\partial}{\partial w_1}$ pour la dérivée dans :eqref:`eq_part_der` .
 
-Now, let's take this and change $w_2$ a little bit to $w_2 + \epsilon_2$:
+Maintenant, prenons ceci et changeons un peu $w_2$ en $w_2 + \epsilon_2$:
 
 $$
 \begin{aligned}
@@ -26,47 +26,47 @@ L(w_1+\epsilon_1, w_2+\epsilon_2, \ldots, w_N) & \approx L(w_1, w_2+\epsilon_2, 
 \end{aligned}
 $$
 
-We have again used the idea that $\epsilon_1\epsilon_2$ is a higher order term that we can discard in the same way we could discard $\epsilon^{2}$ in the previous section, along with what we saw in :eqref:`eq_part_der`.  By continuing in this manner, we may write that
+Nous avons à nouveau utilisé l'idée que $\epsilon_1\epsilon_2$ est un terme d'ordre supérieur que nous pouvons écarter de la même manière que nous avons pu écarter $\epsilon^{2}$ dans la section précédente, avec ce que nous avons vu dans :eqref:`eq_part_der` . En continuant de cette manière, nous pouvons écrire que
 
 $$
 L(w_1+\epsilon_1, w_2+\epsilon_2, \ldots, w_N+\epsilon_N) \approx L(w_1, w_2, \ldots, w_N) + \sum_i \epsilon_i \frac{\partial}{\partial w_i} L(w_1, w_2, \ldots, w_N).
 $$
 
-This may look like a mess, but we can make this more familiar by noting that the sum on the right looks exactly like a dot product, so if we let
+Cela peut sembler confus, mais nous pouvons rendre cela plus familier en notant que la somme à droite ressemble exactement à un produit scalaire, donc si nous laissons
 
 $$
 \boldsymbol{\epsilon} = [\epsilon_1, \ldots, \epsilon_N]^\top \; \text{and} \;
 \nabla_{\mathbf{x}} L = \left[\frac{\partial L}{\partial x_1}, \ldots, \frac{\partial L}{\partial x_N}\right]^\top,
 $$
 
-then
+alors
 
-$$L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).$$
-:eqlabel:`eq_nabla_use`
+$$L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).$$ 
+ :eqlabel:`eq_nabla_use` 
 
-We will call the vector $\nabla_{\mathbf{w}} L$ the *gradient* of $L$.
+ Nous appellerons le vecteur $\nabla_{\mathbf{w}} L$ le *gradient* de $L$.
 
-Equation :eqref:`eq_nabla_use` is worth pondering for a moment.  It has exactly the format that we encountered in one dimension, just we have converted everything to vectors and dot products.  It allows us to tell approximately how the function $L$ will change given any perturbation to the input.  As we will see in the next section, this will provide us with an important tool in understanding geometrically how we can learn using information contained in the gradient.
+L'équation :eqref:`eq_nabla_use` mérite que l'on s'y attarde un instant.  Elle a exactement le même format que celui que nous avons rencontré en une dimension, à ceci près que nous avons tout converti en vecteurs et produits scalaires.  Elle nous permet de dire approximativement comment la fonction $L$ changera en cas de perturbation de l'entrée.  Comme nous le verrons dans la section suivante, cela nous fournira un outil important pour comprendre géométriquement comment nous pouvons apprendre en utilisant les informations contenues dans le gradient.
 
-But first, let's see this approximation at work with an example.  Suppose that we are working with the function
+Mais d'abord, voyons cette approximation à l'œuvre à l'aide d'un exemple.  Supposons que nous travaillions avec la fonction
 
 $$
 f(x, y) = \log(e^x + e^y) \text{ with gradient } \nabla f (x, y) = \left[\frac{e^x}{e^x+e^y}, \frac{e^y}{e^x+e^y}\right].
 $$
 
-If we look at a point like $(0, \log(2))$, we see that
+Si nous regardons un point comme $(0, \log(2))$, nous voyons que
 
 $$
 f(x, y) = \log(3) \text{ with gradient } \nabla f (x, y) = \left[\frac{1}{3}, \frac{2}{3}\right].
 $$
 
-Thus, if we want to approximate $f$ at $(\epsilon_1, \log(2) + \epsilon_2)$,  we see that we should have the specific instance of :eqref:`eq_nabla_use`:
+Ainsi, si nous voulons approximer $f$ à $(\epsilon_1, \log(2) + \epsilon_2)$, nous voyons que nous devons avoir l'instance spécifique de :eqref:`eq_nabla_use` :
 
 $$
 f(\epsilon_1, \log(2) + \epsilon_2) \approx \log(3) + \frac{1}{3}\epsilon_1 + \frac{2}{3}\epsilon_2.
 $$
 
-We can test this in code to see how good the approximation is.
+Nous pouvons tester cela dans le code pour voir si l'approximation est bonne.
 
 ```{.python .input}
 #@tab mxnet
@@ -137,65 +137,65 @@ true_value = f(tf.constant([0.]) + epsilon[0], tf.math.log(
 f'approximation: {grad_approx}, true Value: {true_value}'
 ```
 
-## Geometry of Gradients and Gradient Descent
-Consider the expression from :eqref:`eq_nabla_use` again:
+## Géométrie des gradients et descente de gradient
+Considérons à nouveau l'expression de :eqref:`eq_nabla_use` :
 
 $$
 L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).
 $$
 
-Let's suppose that I want to use this to help minimize our loss $L$.  Let's understand geometrically the algorithm of gradient descent first described in  :numref:`sec_autograd`. What we will do is the following:
+Supposons que je veuille l'utiliser pour aider à minimiser notre perte $L$.  Comprenons géométriquement l'algorithme de descente de gradient décrit pour la première fois dans :numref:`sec_autograd` . Voici ce que nous allons faire :
 
-1. Start with a random choice for the initial parameters $\mathbf{w}$.
-2. Find the direction $\mathbf{v}$ that makes $L$ decrease the most rapidly at $\mathbf{w}$.
-3. Take a small step in that direction: $\mathbf{w} \rightarrow \mathbf{w} + \epsilon\mathbf{v}$.
-4. Repeat.
+1. Commençons par un choix aléatoire des paramètres initiaux $\mathbf{w}$.
+2. Trouvez la direction $\mathbf{v}$ qui fait que $L$ diminue le plus rapidement à $\mathbf{w}$.
+3. Faites un petit pas dans cette direction : $\mathbf{w} \rightarrow \mathbf{w} + \epsilon\mathbf{v}$.
+4. Répétez.
 
-The only thing we do not know exactly how to do is to compute the vector $\mathbf{v}$ in the second step.  We will call such a direction the *direction of steepest descent*.  Using the geometric understanding of dot products from :numref:`sec_geometry-linear-algebraic-ops`, we see that we can rewrite :eqref:`eq_nabla_use` as
+La seule chose que nous ne savons pas exactement comment faire est de calculer le vecteur $\mathbf{v}$ dans la deuxième étape.  Nous appellerons une telle direction la *direction de la descente la plus abrupte*.  En utilisant la compréhension géométrique des produits scalaires de :numref:`sec_geometry-linear-algebraic-ops` , nous voyons que nous pouvons réécrire :eqref:`eq_nabla_use` comme suit
 
 $$
 L(\mathbf{w} + \mathbf{v}) \approx L(\mathbf{w}) + \mathbf{v}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}) = L(\mathbf{w}) + \|\nabla_{\mathbf{w}} L(\mathbf{w})\|\cos(\theta).
 $$
 
-Note that we have taken our direction to have length one for convenience, and used $\theta$ for the angle between $\mathbf{v}$ and $\nabla_{\mathbf{w}} L(\mathbf{w})$.  If we want to find the direction that decreases $L$ as rapidly as possible, we want to make this expression as negative as possible.  The only way the direction we pick enters into this equation is through $\cos(\theta)$, and thus we wish to make this cosine as negative as possible.  Now, recalling the shape of cosine, we can make this as negative as possible by making $\cos(\theta) = -1$ or equivalently making the angle between the gradient and our chosen direction to be $\pi$ radians, or equivalently $180$ degrees.  The only way to achieve this is to head in the exact opposite direction:  pick $\mathbf{v}$ to point in the exact opposite direction to $\nabla_{\mathbf{w}} L(\mathbf{w})$!
+Notez que, par commodité, nous avons considéré que notre direction avait une longueur de un et que nous avons utilisé $\theta$ pour l'angle entre $\mathbf{v}$ et $\nabla_{\mathbf{w}} L(\mathbf{w})$. Si nous voulons trouver la direction qui fait décroître $L$ le plus rapidement possible, nous voulons que cette expression soit aussi négative que possible.  La seule façon dont la direction que nous choisissons entre dans cette équation est par le biais de $\cos(\theta)$, et nous souhaitons donc rendre ce cosinus aussi négatif que possible.  Maintenant, en rappelant la forme du cosinus, nous pouvons le rendre aussi négatif que possible en faisant $\cos(\theta) = -1$ ou, de manière équivalente, en faisant en sorte que l'angle entre le gradient et la direction que nous avons choisie soit de $\pi$ radians, ou de $180$ degrés.  La seule façon d'y parvenir est de se diriger dans la direction exactement opposée : choisissez $\mathbf{v}$ pour pointer dans la direction exactement opposée à $\nabla_{\mathbf{w}} L(\mathbf{w})$!
 
-This brings us to one of the most important mathematical concepts in machine learning: the direction of steepest decent points in the direction of $-\nabla_{\mathbf{w}}L(\mathbf{w})$.  Thus our informal algorithm can be rewritten as follows.
+Cela nous amène à l'un des concepts mathématiques les plus importants de l'apprentissage automatique : la direction de la descente la plus abrupte pointe dans la direction de $-\nabla_{\mathbf{w}}L(\mathbf{w})$. Ainsi, notre algorithme informel peut être réécrit comme suit.
 
-1. Start with a random choice for the initial parameters $\mathbf{w}$.
-2. Compute $\nabla_{\mathbf{w}} L(\mathbf{w})$.
-3. Take a small step in the opposite of that direction: $\mathbf{w} \rightarrow \mathbf{w} - \epsilon\nabla_{\mathbf{w}} L(\mathbf{w})$.
-4. Repeat.
+1. Commencez par un choix aléatoire pour les paramètres initiaux $\mathbf{w}$.
+2. Calculez $\nabla_{\mathbf{w}} L(\mathbf{w})$.
+3. Faites un petit pas dans la direction opposée : $\mathbf{w} \rightarrow \mathbf{w} - \epsilon\nabla_{\mathbf{w}} L(\mathbf{w})$.
+4. Répétez.
 
 
-This basic algorithm has been modified and adapted many ways by many researchers, but the core concept remains the same in all of them.  Use the gradient to find the direction that decreases the loss as rapidly as possible, and update the parameters to take a step in that direction.
+Cet algorithme de base a été modifié et adapté de nombreuses façons par de nombreux chercheurs, mais le concept de base reste le même dans tous les cas.  Utilisez le gradient pour trouver la direction qui réduit la perte le plus rapidement possible, et mettez à jour les paramètres pour faire un pas dans cette direction.
 
-## A Note on Mathematical Optimization
-Throughout this book, we focus squarely on numerical optimization techniques for the practical reason that all functions we encounter in the deep learning setting are too complex to minimize explicitly.
+## Note sur l'optimisation mathématique
+Tout au long de ce livre, nous nous concentrons sur les techniques d'optimisation numérique pour la raison pratique que toutes les fonctions que nous rencontrons dans le cadre de l'apprentissage profond sont trop complexes pour être minimisées explicitement.
 
-However, it is a useful exercise to consider what the geometric understanding we obtained above tells us about optimizing functions directly.
+Cependant, il est utile d'examiner ce que la compréhension géométrique que nous avons obtenue ci-dessus nous apprend sur l'optimisation directe des fonctions.
 
-Suppose that we wish to find the value of $\mathbf{x}_0$ which minimizes some function $L(\mathbf{x})$.  Let's suppose that moreover someone gives us a value and tells us that it is the value that minimizes $L$.  Is there anything we can check to see if their answer is even plausible?
+Supposons que nous souhaitons trouver la valeur de $\mathbf{x}_0$ qui minimise une certaine fonction $L(\mathbf{x})$.  Supposons en outre que quelqu'un nous donne une valeur et nous dise que c'est la valeur qui minimise $L$.  Y a-t-il quelque chose que nous puissions vérifier pour voir si leur réponse est même plausible ?
 
-Again consider :eqref:`eq_nabla_use`:
+Considérons à nouveau :eqref:`eq_nabla_use` :
 $$
 L(\mathbf{x}_0 + \boldsymbol{\epsilon}) \approx L(\mathbf{x}_0) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{x}} L(\mathbf{x}_0).
 $$
 
-If the gradient is not zero, we know that we can take a step in the direction $-\epsilon \nabla_{\mathbf{x}} L(\mathbf{x}_0)$ to find a value of $L$ that is smaller.  Thus, if we truly are at a minimum, this cannot be the case!  We can conclude that if $\mathbf{x}_0$ is a minimum, then $\nabla_{\mathbf{x}} L(\mathbf{x}_0) = 0$.  We call points with $\nabla_{\mathbf{x}} L(\mathbf{x}_0) = 0$ *critical points*.
+Si le gradient n'est pas nul, nous savons que nous pouvons faire un pas dans la direction $-\epsilon \nabla_{\mathbf{x}} L(\mathbf{x}_0)$ pour trouver une valeur de $L$ qui est plus petite.  Ainsi, si nous sommes vraiment à un minimum, cela ne peut pas être le cas !  Nous pouvons conclure que si $\mathbf{x}_0$ est un minimum, alors $\nabla_{\mathbf{x}} L(\mathbf{x}_0) = 0$.  Nous appelons les points avec $\nabla_{\mathbf{x}} L(\mathbf{x}_0) = 0$ *points critiques*.
 
-This is nice, because in some rare settings, we *can* explicitly find all the points where the gradient is zero, and find the one with the smallest value.
+C'est une bonne chose, car dans certains cas rares, nous *pouvons* trouver explicitement tous les points où le gradient est nul, et trouver celui qui a la plus petite valeur.
 
-For a concrete example, consider the function
+Pour un exemple concret, considérons la fonction
 $$
 f(x) = 3x^4 - 4x^3 -12x^2.
 $$
 
-This function has derivative
+Cette fonction a une dérivée
 $$
 \frac{df}{dx} = 12x^3 - 12x^2 -24x = 12x(x-2)(x+1).
 $$
 
-The only possible location of minima are at $x = -1, 0, 2$, where the function takes the values $-5,0, -32$ respectively, and thus we can conclude that we minimize our function when $x = 2$.  A quick plot confirms this.
+Les seuls emplacements possibles des minima sont à $x = -1, 0, 2$, où la fonction prend les valeurs $-5,0, -32$ respectivement, et nous pouvons donc conclure que nous minimisons notre fonction lorsque $x = 2$.  Un rapide tracé le confirme.
 
 ```{.python .input}
 #@tab mxnet
@@ -221,26 +221,26 @@ f = (3 * x**4) - (4 * x**3) - (12 * x**2)
 d2l.plot(x, f, 'x', 'f(x)')
 ```
 
-This highlights an important fact to know when working either theoretically or numerically: the only possible points where we can minimize (or maximize) a function will have gradient equal to zero, however, not every point with gradient zero is the true *global* minimum (or maximum).
+Cela met en évidence un fait important à connaître lorsque l'on travaille de manière théorique ou numérique : les seuls points possibles où nous pouvons minimiser (ou maximiser) une fonction auront un gradient égal à zéro, cependant, tous les points ayant un gradient de zéro ne sont pas le véritable minimum (ou maximum) *global*.
 
-## Multivariate Chain Rule
-Let's suppose that we have a function of four variables ($w, x, y$, and $z$) which we can make by composing many terms:
+## Règle de la chaîne multivariée
+Supposons que nous ayons une fonction de quatre variables ($w, x, y$ et $z$) que nous pouvons obtenir en composant de nombreux termes :
 
-$$\begin{aligned}f(u, v) & = (u+v)^{2} \\u(a, b) & = (a+b)^{2}, \qquad v(a, b) = (a-b)^{2}, \\a(w, x, y, z) & = (w+x+y+z)^{2}, \qquad b(w, x, y, z) = (w+x-y-z)^2.\end{aligned}$$
-:eqlabel:`eq_multi_func_def`
+$$\begin{aligned}f(u, v) & = (u+v)^{2} \\u(a, b) & = (a+b)^{2}, \qquad v(a, b) = (a-b)^{2}, \\a(w, x, y, z) & = (w+x+y+z)^{2}, \qquad b(w, x, y, z) = (w+x-y-z)^2.\end{aligned}$$ 
+ :eqlabel:`eq_multi_func_def` 
 
-Such chains of equations are common when working with neural networks, so trying to understand how to compute gradients of such functions is key.  We can start to see visual hints of this connection in :numref:`fig_chain-1` if we take a look at what variables directly relate to one another.
+ De telles chaînes d'équations sont courantes lorsque l'on travaille avec des réseaux neuronaux ; il est donc essentiel de comprendre comment calculer les gradients de telles fonctions.  Nous pouvons commencer à voir des indices visuels de cette connexion dans :numref:`fig_chain-1` si nous examinons les variables directement liées les unes aux autres.
 
 ![The function relations above where nodes represent values and edges show functional dependence.](../img/chain-net1.svg)
 :label:`fig_chain-1`
 
-Nothing stops us from just composing everything from :eqref:`eq_multi_func_def` and writing out that
+Rien ne nous empêche de tout composer à partir de :eqref:`eq_multi_func_def` et d'écrire que
 
 $$
 f(w, x, y, z) = \left(\left((w+x+y+z)^2+(w+x-y-z)^2\right)^2+\left((w+x+y+z)^2-(w+x-y-z)^2\right)^2\right)^2.
 $$
 
-We may then take the derivative by just using single variable derivatives, but if we did that we would quickly find ourself swamped with terms, many of which are repeats!  Indeed, one can see that, for instance:
+Nous pouvons alors prendre la dérivée en utilisant simplement les dérivées à une seule variable, mais si nous faisions cela, nous nous retrouverions rapidement submergés de termes, dont beaucoup sont des répétitions !  En effet, on peut voir que, par exemple :
 
 $$
 \begin{aligned}
@@ -250,10 +250,10 @@ $$
 \end{aligned}
 $$
 
-If we then also wanted to compute $\frac{\partial f}{\partial x}$, we would end up with a similar equation again with many repeated terms, and many *shared* repeated terms between the two derivatives.  This represents a massive quantity of wasted work, and if we needed to compute derivatives this way, the whole deep learning revolution would have stalled out before it began!
+Si nous voulions ensuite également calculer $\frac{\partial f}{\partial x}$, nous nous retrouverions avec une équation similaire avec de nombreux termes répétés, et de nombreux termes répétés *partagés* entre les deux dérivées.  Cela représente une quantité énorme de travail perdu, et si nous avions besoin de calculer les dérivées de cette manière, toute la révolution de l'apprentissage profond aurait été bloquée avant d'avoir commencé !
 
 
-Let's break up the problem.  We will start by trying to understand how $f$ changes when we change $a$, essentially assuming that $w, x, y$, and $z$ all do not exist.  We will reason as we did back when we worked with the gradient for the first time.  Let's take $a$ and add a small amount $\epsilon$ to it.
+Décomposons le problème.  Nous allons commencer par essayer de comprendre comment $f$ change lorsque nous modifions $a$, en supposant essentiellement que $w, x, y$ et $z$ n'existent pas.  Nous allons raisonner comme nous l'avons fait lorsque nous avons travaillé avec le gradient pour la première fois.  Prenons $a$ et ajoutons-y une petite quantité de $\epsilon$.
 
 $$
 \begin{aligned}
@@ -263,30 +263,30 @@ $$
 \end{aligned}
 $$
 
-The first line follows from the definition of partial derivative, and the second follows from the definition of gradient.  It is notationally burdensome to track exactly where we evaluate every derivative, as in the expression $\frac{\partial f}{\partial u}(u(a, b), v(a, b))$, so we often abbreviate this to the much more memorable
+La première ligne découle de la définition de la dérivée partielle, et la deuxième découle de la définition du gradient.  Il est fastidieux, d'un point de vue notationnel, de suivre exactement l'endroit où nous évaluons chaque dérivée, comme dans l'expression $\frac{\partial f}{\partial u}(u(a, b), v(a, b))$
 
 $$
 \frac{\partial f}{\partial a} = \frac{\partial f}{\partial u}\frac{\partial u}{\partial a}+\frac{\partial f}{\partial v}\frac{\partial v}{\partial a}.
 $$
 
-It is useful to think about the meaning of the process. We are trying to understand how a function of the form $f(u(a, b), v(a, b))$ changes its value with a change in $a$.  There are two pathways this can occur: there is the pathway where $a \rightarrow u \rightarrow f$ and where $a \rightarrow v \rightarrow f$.  We can compute both of these contributions via the chain rule: $\frac{\partial w}{\partial u} \cdot \frac{\partial u}{\partial x}$ and $\frac{\partial w}{\partial v} \cdot \frac{\partial v}{\partial x}$ respectively, and added up.
+Il est utile de réfléchir à la signification de ce processus. Nous essayons de comprendre comment une fonction de la forme $f(u(a, b), v(a, b))$ change de valeur en fonction d'une modification de $a$.  Il y a deux chemins par lesquels cela peut se produire : il y a le chemin où $a \rightarrow u \rightarrow f$ et celui où $a \rightarrow v \rightarrow f$.  Nous pouvons calculer ces deux contributions via la règle de la chaîne : $\frac{\partial w}{\partial u} \cdot \frac{\partial u}{\partial x}$ et $\frac{\partial w}{\partial v} \cdot \frac{\partial v}{\partial x}$ respectivement, et les additionner.
 
-Imagine we have a different network of functions where the functions on the right depend on those that are connected to on the left as is shown in :numref:`fig_chain-2`.
+Imaginons que nous ayons un autre réseau de fonctions où les fonctions de droite dépendent de celles qui sont connectées à celles de gauche, comme le montre :numref:`fig_chain-2` .
 
 ![Another more subtle example of the chain rule.](../img/chain-net2.svg)
 :label:`fig_chain-2`
 
-To compute something like $\frac{\partial f}{\partial y}$, we need to sum over all (in this case $3$) paths from $y$ to $f$ giving
+Pour calculer quelque chose comme $\frac{\partial f}{\partial y}$, nous devons faire la somme de tous les chemins (dans ce cas, $3$) de $y$ à $f$, ce qui nous donne la règle de la chaîne
 
 $$
 \frac{\partial f}{\partial y} = \frac{\partial f}{\partial a} \frac{\partial a}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial f}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial f}{\partial b} \frac{\partial b}{\partial v} \frac{\partial v}{\partial y}.
 $$
 
-Understanding the chain rule in this way will pay great dividends when trying to understand how gradients flow through networks, and why various architectural choices like those in LSTMs (:numref:`sec_lstm`) or residual layers (:numref:`sec_resnet`) can help shape the learning process by controlling gradient flow.
+La compréhension de la règle de la chaîne de cette manière sera très utile pour comprendre comment les gradients circulent dans les réseaux et pourquoi divers choix architecturaux, comme ceux des LSTM (:numref:`sec_lstm` ) ou des couches résiduelles (:numref:`sec_resnet` ), peuvent contribuer à façonner le processus d'apprentissage en contrôlant le flux des gradients.
 
-## The Backpropagation Algorithm
+## L'algorithme de rétropropagation
 
-Let's return to the example of :eqref:`eq_multi_func_def` the previous section where
+Revenons à l'exemple de :eqref:`eq_multi_func_def` la section précédente où
 
 $$
 \begin{aligned}
@@ -296,7 +296,7 @@ a(w, x, y, z) & = (w+x+y+z)^{2}, \qquad b(w, x, y, z) = (w+x-y-z)^2.
 \end{aligned}
 $$
 
-If we want to compute say $\frac{\partial f}{\partial w}$ we may apply the multi-variate chain rule to see:
+Si nous voulons calculer, par exemple, $\frac{\partial f}{\partial w}$, nous pouvons appliquer la règle de la chaîne multi-variable pour voir :
 
 $$
 \begin{aligned}
@@ -306,7 +306,7 @@ $$
 \end{aligned}
 $$
 
-Let's try using this decomposition to compute $\frac{\partial f}{\partial w}$.  Notice that all we need here are the various single step partials:
+Essayons d'utiliser cette décomposition pour calculer $\frac{\partial f}{\partial w}$.  Remarquez que tout ce dont nous avons besoin ici, ce sont les différents partiels à une étape :
 
 $$
 \begin{aligned}
@@ -317,7 +317,7 @@ $$
 \end{aligned}
 $$
 
-If we write this out into code this becomes a fairly manageable expression.
+Si nous écrivons cela en code, cela devient une expression assez facile à gérer.
 
 ```{.python .input}
 #@tab all
@@ -339,9 +339,9 @@ df_dw = df_du*du_dw + df_dv*dv_dw
 print(f'df/dw at {w}, {x}, {y}, {z} is {df_dw}')
 ```
 
-However, note that this still does not make it easy to compute something like $\frac{\partial f}{\partial x}$.  The reason for that is the *way* we chose to apply the chain rule.  If we look at what we did above, we always kept $\partial w$ in the denominator when we could.  In this way, we chose to apply the chain rule seeing how $w$ changed every other variable.  If that is what we wanted, this would be a good idea.  However, think back to our motivation from deep learning: we want to see how every parameter changes the *loss*.  In essence, we want to apply the chain rule keeping $\partial f$ in the numerator whenever we can!
+Cependant, notez que cela ne facilite toujours pas le calcul de quelque chose comme $\frac{\partial f}{\partial x}$.  La raison en est la *façon* dont nous avons choisi d'appliquer la règle de la chaîne.  Si nous regardons ce que nous avons fait ci-dessus, nous avons toujours gardé $\partial w$ dans le dénominateur lorsque nous le pouvions.  De cette façon, nous avons choisi d'appliquer la règle de la chaîne en voyant comment $w$ changeait toutes les autres variables.  Si c'était ce que nous voulions, ce serait une bonne idée.  Cependant, repensez à notre motivation issue de l'apprentissage profond : nous voulons voir comment chaque paramètre modifie la *perte*.  En substance, nous voulons appliquer la règle de la chaîne en gardant $\partial f$ au numérateur chaque fois que nous le pouvons !
 
-To be more explicit, note that we can write
+Pour être plus explicite, notons que nous pouvons écrire
 
 $$
 \begin{aligned}
@@ -351,7 +351,7 @@ $$
 \end{aligned}
 $$
 
-Note that this application of the chain rule has us explicitly compute $\frac{\partial f}{\partial u}, \frac{\partial f}{\partial v}, \frac{\partial f}{\partial a}, \frac{\partial f}{\partial b}, \; \text{and} \; \frac{\partial f}{\partial w}$.  Nothing stops us from also including the equations:
+Notez que cette application de la règle de la chaîne nous oblige à calculer explicitement $\frac{\partial f}{\partial u}, \frac{\partial f}{\partial v}, \frac{\partial f}{\partial a}, \frac{\partial f}{\partial b}, \; \text{and} \; \frac{\partial f}{\partial w}$.  Rien ne nous empêche d'inclure également les équations :
 
 $$
 \begin{aligned}
@@ -361,7 +361,7 @@ $$
 \end{aligned}
 $$
 
-and then keeping track of how $f$ changes when we change *any* node in the entire network.  Let's implement it.
+et ensuite de suivre l'évolution de $f$ lorsque nous changeons *n'importe quel* nœud du réseau entier.  Mettons cela en œuvre.
 
 ```{.python .input}
 #@tab all
@@ -392,13 +392,13 @@ print(f'df/dy at {w}, {x}, {y}, {z} is {df_dy}')
 print(f'df/dz at {w}, {x}, {y}, {z} is {df_dz}')
 ```
 
-The fact that we compute derivatives from $f$ back towards the inputs rather than from the inputs forward to the outputs (as we did in the first code snippet above) is what gives this algorithm its name: *backpropagation*.  Note that there are two steps:
-1. Compute the value of the function, and the single step partials from front to back.  While not done above, this can be combined into a single *forward pass*.
-2. Compute the gradient of $f$ from back to front.  We call this the *backwards pass*.
+Le fait que nous calculions les dérivées de $f$ en revenant vers les entrées plutôt qu'en allant des entrées vers les sorties (comme nous l'avons fait dans le premier extrait de code ci-dessus) est ce qui donne à cet algorithme son nom : *backpropagation*.  Notez qu'il y a deux étapes :
+1. Calculer la valeur de la fonction, et les partiels à pas unique de l'avant vers l'arrière.  Bien que cela n'ait pas été fait ci-dessus, cela peut être combiné en une seule *passe avant*.
+2. Calculez le gradient de $f$ de l'arrière vers l'avant.  Nous appelons cela le *backward pass*.
 
-This is precisely what every deep learning algorithm implements to allow the computation of the gradient of the loss with respect to every weight in the network at one pass.  It is an astonishing fact that we have such a decomposition.
+C'est précisément ce que tous les algorithmes d'apprentissage profond mettent en œuvre pour permettre le calcul du gradient de la perte par rapport à chaque poids du réseau en une seule passe.  C'est un fait étonnant que nous ayons une telle décomposition.
 
-To see how to encapsulated this, let's take a quick look at this example.
+Pour voir comment encapsuler cela, jetons un coup d'œil rapide à cet exemple.
 
 ```{.python .input}
 #@tab mxnet
@@ -479,34 +479,34 @@ print(f'df/dz at {w.numpy()}, {x.numpy()}, {y.numpy()}, '
       f'{z.numpy()} is {z_grad}')
 ```
 
-All of what we did above can be done automatically by calling `f.backwards()`.
+Tout ce que nous avons fait ci-dessus peut être fait automatiquement en appelant `f.backwards()`.
 
 
-## Hessians
-As with single variable calculus, it is useful to consider higher-order derivatives in order to get a handle on how we can obtain a better approximation to a function than using the gradient alone.
+## Hessiennes
+Comme pour le calcul à une variable, il est utile de considérer les dérivées d'ordre supérieur afin de comprendre comment nous pouvons obtenir une meilleure approximation d'une fonction qu'en utilisant uniquement le gradient.
 
-There is one immediate problem one encounters when working with higher order derivatives of functions of several variables, and that is there are a large number of them.  If we have a function $f(x_1, \ldots, x_n)$ of $n$ variables, then we can take $n^{2}$ many second derivatives, namely for any choice of $i$ and $j$:
+Il y a un problème immédiat que l'on rencontre lorsqu'on travaille avec des dérivées d'ordre supérieur de fonctions de plusieurs variables, et c'est qu'il y en a un grand nombre.  Si nous avons une fonction $f(x_1, \ldots, x_n)$ de $n$ variables, alors nous pouvons prendre $n^{2}$ de nombreuses dérivées secondes, notamment pour tout choix de $i$ et $j$:
 
 $$
 \frac{d^2f}{dx_idx_j} = \frac{d}{dx_i}\left(\frac{d}{dx_j}f\right).
 $$
 
-This is traditionally assembled into a matrix called the *Hessian*:
+Ceci est traditionnellement assemblé dans une matrice appelée le *Hessian* :
 
-$$\mathbf{H}_f = \begin{bmatrix} \frac{d^2f}{dx_1dx_1} & \cdots & \frac{d^2f}{dx_1dx_n} \\ \vdots & \ddots & \vdots \\ \frac{d^2f}{dx_ndx_1} & \cdots & \frac{d^2f}{dx_ndx_n} \\ \end{bmatrix}.$$
-:eqlabel:`eq_hess_def`
+$$\mathbf{H}_f = \begin{bmatrix} \frac{d^2f}{dx_1dx_1} & \cdots & \frac{d^2f}{dx_1dx_n} \\ \vdots & \ddots & \vdots \\ \frac{d^2f}{dx_ndx_1} & \cdots & \frac{d^2f}{dx_ndx_n} \\ \end{bmatrix}.$$ 
+ :eqlabel:`eq_hess_def` 
 
-Not every entry of this matrix is independent.  Indeed, we can show that as long as both *mixed partials* (partial derivatives with respect to more than one variable) exist and are continuous, we can say that for any $i$, and $j$,
+ Toutes les entrées de cette matrice ne sont pas indépendantes.  En effet, nous pouvons montrer que tant que les deux *dérivées partielles mixtes* (dérivées partielles par rapport à plus d'une variable) existent et sont continues, nous pouvons dire que pour tout $i$, et $j$,
 
 $$
 \frac{d^2f}{dx_idx_j} = \frac{d^2f}{dx_jdx_i}.
 $$
 
-This follows by considering first perturbing a function in the direction of $x_i$, and then perturbing it in $x_j$ and then comparing the result of that with what happens if we perturb first $x_j$ and then $x_i$, with the knowledge that both of these orders lead to the same final change in the output of $f$.
+Il suffit de considérer que l'on perturbe d'abord une fonction dans la direction de $x_i$, puis dans $x_j$ et que l'on compare ensuite le résultat avec ce qui se passe si l'on perturbe d'abord $x_j$ puis $x_i$, sachant que ces deux ordres conduisent au même changement final dans la sortie de $f$.
 
-As with single variables, we can use these derivatives to get a far better idea of how the function behaves near a point.  In particular, we can use it to find the best fitting quadratic near a point $\mathbf{x}_0$, as we saw in a single variable.
+Comme pour les variables simples, nous pouvons utiliser ces dérivées pour avoir une bien meilleure idée du comportement de la fonction près d'un point.  En particulier, nous pouvons les utiliser pour trouver la quadratique la mieux adaptée près d'un point $\mathbf{x}_0$, comme nous l'avons vu pour une variable unique.
 
-Let's see an example.  Suppose that $f(x_1, x_2) = a + b_1x_1 + b_2x_2 + c_{11}x_1^{2} + c_{12}x_1x_2 + c_{22}x_2^{2}$.  This is the general form for a quadratic in two variables.  If we look at the value of the function, its gradient, and its Hessian :eqref:`eq_hess_def`, all at the point zero:
+Voyons un exemple.  Supposons que $f(x_1, x_2) = a + b_1x_1 + b_2x_2 + c_{11}x_1^{2} + c_{12}x_1x_2 + c_{22}x_2^{2}$.  Il s'agit de la forme générale d'une quadratique à deux variables.  Si nous examinons la valeur de la fonction, son gradient et son hessien :eqref:`eq_hess_def` , tous situés au point zéro :
 
 $$
 \begin{aligned}
@@ -516,30 +516,30 @@ f(0,0) & = a, \\
 \end{aligned}
 $$
 
-we can get our original polynomial back by saying
+nous pouvons récupérer notre polynôme d'origine en disant
 
 $$
 f(\mathbf{x}) = f(0) + \nabla f (0) \cdot \mathbf{x} + \frac{1}{2}\mathbf{x}^\top \mathbf{H} f (0) \mathbf{x}.
 $$
 
-In general, if we computed this expansion any point $\mathbf{x}_0$, we see that
+En général, si nous calculons cette expansion en n'importe quel point $\mathbf{x}_0$, nous voyons que
 
 $$
 f(\mathbf{x}) = f(\mathbf{x}_0) + \nabla f (\mathbf{x}_0) \cdot (\mathbf{x}-\mathbf{x}_0) + \frac{1}{2}(\mathbf{x}-\mathbf{x}_0)^\top \mathbf{H} f (\mathbf{x}_0) (\mathbf{x}-\mathbf{x}_0).
 $$
 
-This works for any dimensional input, and provides the best approximating quadratic to any function at a point.  To give an example, let's plot the function
+Cela fonctionne pour toute entrée dimensionnelle et fournit la meilleure approximation quadratique de toute fonction en un point.  Pour donner un exemple, traçons la fonction
 
 $$
 f(x, y) = xe^{-x^2-y^2}.
 $$
 
-One can compute that the gradient and Hessian are
+On peut calculer que le gradient et le hessien sont les suivants
 $$
 \nabla f(x, y) = e^{-x^2-y^2}\begin{pmatrix}1-2x^2 \\ -2xy\end{pmatrix} \; \text{and} \; \mathbf{H}f(x, y) = e^{-x^2-y^2}\begin{pmatrix} 4x^3 - 6x & 4x^2y - 2y \\ 4x^2y-2y &4xy^2-2x\end{pmatrix}.
 $$
 
-And thus, with a little algebra, see that the approximating quadratic at $[-1,0]^\top$ is
+Et donc, avec un peu d'algèbre, voir que la quadratique d'approximation à $[-1,0]^\top$ est
 
 $$
 f(x, y) \approx e^{-1}\left(-1 - (x+1) +(x+1)^2+y^2\right).
@@ -622,14 +622,14 @@ ax.set_zlim(-1, 1)
 ax.dist = 12
 ```
 
-This forms the basis for Newton's Algorithm discussed in :numref:`sec_gd`, where we perform numerical optimization iteratively finding the best fitting quadratic, and then exactly minimizing that quadratic.
+Ceci constitue la base de l'algorithme de Newton abordé sur :numref:`sec_gd` , où nous effectuons une optimisation numérique en trouvant par itération la quadratique la mieux adaptée, puis en minimisant exactement cette quadratique.
 
-## A Little Matrix Calculus
-Derivatives of functions involving matrices turn out to be particularly nice.  This section can become notationally heavy, so may be skipped in a first reading, but it is useful to know how derivatives of functions involving common matrix operations are often much cleaner than one might initially anticipate, particularly given how central matrix operations are to deep learning applications.
+## Un peu de calcul matriciel
+Les dérivées de fonctions impliquant des matrices s'avèrent particulièrement intéressantes.  Cette section peut devenir lourde en termes de notation, et peut donc être sautée lors d'une première lecture, mais il est utile de savoir comment les dérivées de fonctions impliquant des opérations matricielles courantes sont souvent beaucoup plus propres que ce que l'on pourrait initialement prévoir, en particulier compte tenu de l'importance des opérations matricielles dans les applications d'apprentissage profond.
 
-Let's begin with an example.  Suppose that we have some fixed column vector $\boldsymbol{\beta}$, and we want to take the product function $f(\mathbf{x}) = \boldsymbol{\beta}^\top\mathbf{x}$, and understand how the dot product changes when we change $\mathbf{x}$.
+Commençons par un exemple.  Supposons que nous ayons un vecteur colonne fixe $\boldsymbol{\beta}$, et que nous voulions prendre la fonction produit $f(\mathbf{x}) = \boldsymbol{\beta}^\top\mathbf{x}$, et comprendre comment le produit scalaire change lorsque nous modifions $\mathbf{x}$.
 
-A bit of notation that will be useful when working with matrix derivatives in ML is called the *denominator layout matrix derivative* where we assemble our partial derivatives into the shape of whatever vector, matrix, or tensor is in the denominator of the differential.  In this case, we will write
+Une notation qui sera utile lorsque nous travaillerons avec des dérivées matricielles dans ML est appelée dérivée matricielle de disposition de dénominateur * où nous assemblons nos dérivées partielles sous la forme de n'importe quel vecteur, matrice ou tenseur dans le dénominateur de la différentielle.  Dans ce cas, nous écrirons
 
 $$
 \frac{df}{d\mathbf{x}} = \begin{bmatrix}
@@ -639,27 +639,27 @@ $$
 \end{bmatrix},
 $$
 
-where we matched the shape of the column vector $\mathbf{x}$.
+où nous faisons correspondre la forme du vecteur colonne $\mathbf{x}$.
 
-If we write out our function into components this is
+Si nous écrivons notre fonction en composantes, cela donne
 
 $$
 f(\mathbf{x}) = \sum_{i = 1}^{n} \beta_ix_i = \beta_1x_1 + \cdots + \beta_nx_n.
 $$
 
-If we now take the partial derivative with respect to say $\beta_1$, note that everything is zero but the first term, which is just $x_1$ multiplied by $\beta_1$, so we obtain that
+Si nous prenons maintenant la dérivée partielle par rapport à, disons, $\beta_1$, notez que tout est nul sauf le premier terme, qui est juste $x_1$ multiplié par $\beta_1$, nous obtenons donc que
 
 $$
 \frac{df}{dx_1} = \beta_1,
 $$
 
-or more generally that
+ou, plus généralement, que
 
 $$
 \frac{df}{dx_i} = \beta_i.
 $$
 
-We can now reassemble this into a matrix to see
+Nous pouvons maintenant réassembler tout cela dans une matrice pour voir
 
 $$
 \frac{df}{d\mathbf{x}} = \begin{bmatrix}
@@ -673,182 +673,182 @@ $$
 \end{bmatrix} = \boldsymbol{\beta}.
 $$
 
-This illustrates a few factors about matrix calculus that we will often counter throughout this section:
+Ceci illustre quelques facteurs concernant le calcul matriciel que nous contrerons souvent tout au long de cette section :
 
-* First, The computations will get rather involved.
-* Second, The final results are much cleaner than the intermediate process, and will always look similar to the single variable case.  In this case, note that $\frac{d}{dx}(bx) = b$ and $\frac{d}{d\mathbf{x}} (\boldsymbol{\beta}^\top\mathbf{x}) = \boldsymbol{\beta}$ are both similar.
-* Third, transposes can often appear seemingly from nowhere.  The core reason for this is the convention that we match the shape of the denominator, thus when we multiply matrices, we will need to take transposes to match back to the shape of the original term.
+* Premièrement, les calculs vont devenir assez complexes.
+* Deuxièmement, les résultats finaux sont beaucoup plus propres que le processus intermédiaire, et ressembleront toujours au cas d'une seule variable.  Dans ce cas, notez que $\frac{d}{dx}(bx) = b$ et $\frac{d}{d\mathbf{x}} (\boldsymbol{\beta}^\top\mathbf{x}) = \boldsymbol{\beta}$ sont tous deux similaires.
+* Troisièmement, les transpositions peuvent souvent apparaître apparemment de nulle part.  La raison principale en est la convention qui veut que nous correspondions à la forme du dénominateur. Ainsi, lorsque nous multiplions des matrices, nous devons effectuer des transpositions pour retrouver la forme du terme original.
 
-To keep building intuition, let's try a computation that is a little harder.  Suppose that we have a column vector $\mathbf{x}$, and a square matrix $A$ and we want to compute
+Pour continuer à développer l'intuition, essayons un calcul un peu plus difficile.  Supposons que nous disposions d'un vecteur colonne $\mathbf{x}$ et d'une matrice carrée $A$ et que nous voulions calculer
 
-$$\frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}).$$
-:eqlabel:`eq_mat_goal_1`
+$$\frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}).$$ 
+ :eqlabel:`eq_mat_goal_1` 
 
-To drive towards easier to manipulate notation, let's consider this problem using Einstein notation.  In this case we can write the function as
+ . Pour faciliter la manipulation de la notation, considérons ce problème en utilisant la notation d'Einstein.  Dans ce cas, nous pouvons écrire la fonction comme suit
 
 $$
 \mathbf{x}^\top A \mathbf{x} = x_ia_{ij}x_j.
 $$
 
-To compute our derivative, we need to understand for every $k$, what is the value of
+Pour calculer notre dérivée, nous devons comprendre pour chaque $k$, quelle est la valeur de
 
 $$
 \frac{d}{dx_k}(\mathbf{x}^\top A \mathbf{x}) = \frac{d}{dx_k}x_ia_{ij}x_j.
 $$
 
-By the product rule, this is
+Par la règle du produit, cette valeur est
 
 $$
 \frac{d}{dx_k}x_ia_{ij}x_j = \frac{dx_i}{dx_k}a_{ij}x_j + x_ia_{ij}\frac{dx_j}{dx_k}.
 $$
 
-For a term like $\frac{dx_i}{dx_k}$, it is not hard to see that this is one when $i=k$ and zero otherwise.  This means that every term where $i$ and $k$ are different vanish from this sum, so the only terms that remain in that first sum are the ones where $i=k$.  The same reasoning holds for the second term where we need $j=k$.  This gives
+Pour un terme comme $\frac{dx_i}{dx_k}$, il n'est pas difficile de voir que cette valeur est égale à un lorsque $i=k$ et à zéro sinon.  Cela signifie que tous les termes où $i$ et $k$ sont différents disparaissent de cette somme, de sorte que les seuls termes qui restent dans cette première somme sont ceux où $i=k$.  Le même raisonnement s'applique au deuxième terme pour lequel nous avons besoin de $j=k$.  Cela donne
 
 $$
 \frac{d}{dx_k}x_ia_{ij}x_j = a_{kj}x_j + x_ia_{ik}.
 $$
 
-Now, the names of the indices in Einstein notation are arbitrary---the fact that $i$ and $j$ are different is immaterial to this computation at this point, so we can re-index so that they both use $i$ to see that
+Maintenant, les noms des indices dans la notation d'Einstein sont arbitraires - le fait que $i$ et $j$ soient différents est sans importance pour ce calcul à ce stade, donc nous pouvons réindexer de sorte qu'ils utilisent tous deux $i$ pour voir que
 
 $$
 \frac{d}{dx_k}x_ia_{ij}x_j = a_{ki}x_i + x_ia_{ik} = (a_{ki} + a_{ik})x_i.
 $$
 
-Now, here is where we start to need some practice to go further.  Let's try and identify this outcome in terms of matrix operations.  $a_{ki} + a_{ik}$ is the $k, i$-th component of $\mathbf{A} + \mathbf{A}^\top$.  This gives
+Maintenant, c'est ici que nous avons besoin d'un peu de pratique pour aller plus loin.  Essayons d'identifier ce résultat en termes d'opérations matricielles. $a_{ki} + a_{ik}$ est le $k, i$-ième composant de $\mathbf{A} + \mathbf{A}^\top$. Cela donne
 
 $$
 \frac{d}{dx_k}x_ia_{ij}x_j = [\mathbf{A} + \mathbf{A}^\top]_{ki}x_i.
 $$
 
-Similarly, this term is now the product of the matrix $\mathbf{A} + \mathbf{A}^\top$ by the vector $\mathbf{x}$, so we see that
+De la même manière, ce terme est maintenant le produit de la matrice $\mathbf{A} + \mathbf{A}^\top$ par le vecteur $\mathbf{x}$, ce qui donne
 
 $$
 \left[\frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x})\right]_k = \frac{d}{dx_k}x_ia_{ij}x_j = [(\mathbf{A} + \mathbf{A}^\top)\mathbf{x}]_k.
 $$
 
-Thus, we see that the $k$-th entry of the desired derivative from :eqref:`eq_mat_goal_1` is just the $k$-th entry of the vector on the right, and thus the two are the same.  Thus yields
+Ainsi, nous voyons que la $k$-ième entrée de la dérivée souhaitée de :eqref:`eq_mat_goal_1` est juste la $k$-ième entrée du vecteur de droite, et donc que les deux sont identiques.  On obtient donc
 
 $$
 \frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}) = (\mathbf{A} + \mathbf{A}^\top)\mathbf{x}.
 $$
 
-This required significantly more work than our last one, but the final result is small.  More than that, consider the following computation for traditional single variable derivatives:
+Ce calcul a demandé beaucoup plus de travail que le précédent, mais le résultat final est faible.  Plus que cela, considérez le calcul suivant pour les dérivées traditionnelles à une variable :
 
 $$
 \frac{d}{dx}(xax) = \frac{dx}{dx}ax + xa\frac{dx}{dx} = (a+a)x.
 $$
 
-Equivalently $\frac{d}{dx}(ax^2) = 2ax = (a+a)x$.  Again, we get a result that looks rather like the single variable result but with a transpose tossed in.
+De manière équivalente, $\frac{d}{dx}(ax^2) = 2ax = (a+a)x$.  Là encore, nous obtenons un résultat qui ressemble à celui de la variable unique, mais avec une transposition en plus.
 
-At this point, the pattern should be looking rather suspicious, so let's try to figure out why.  When we take matrix derivatives like this, let's first assume that the expression we get will be another matrix expression: an expression we can write it in terms of products and sums of matrices and their transposes.  If such an expression exists, it will need to be true for all matrices.  In particular, it will need to be true of $1 \times 1$ matrices, in which case the matrix product is just the product of the numbers, the matrix sum is just the sum, and the transpose does nothing at all!  In other words, whatever expression we get *must* match the single variable expression.  This means that, with some practice, one can often guess matrix derivatives just by knowing what the associated single variable expression must look like!
+À ce stade, le modèle devrait sembler plutôt suspect, alors essayons de comprendre pourquoi.  Lorsque nous prenons des dérivées matricielles comme ceci, supposons d'abord que l'expression que nous obtenons sera une autre expression matricielle : une expression que nous pouvons écrire en termes de produits et de sommes de matrices et de leurs transpositions.  Si une telle expression existe, elle devra être vraie pour toutes les matrices.  En particulier, elle devra être vraie pour les matrices $1 \times 1$, auquel cas le produit de la matrice est juste le produit des nombres, la somme de la matrice est juste la somme et la transposition ne fait rien du tout !  En d'autres termes, quelle que soit l'expression que nous obtenons *, elle doit * correspondre à l'expression de la variable unique.  Cela signifie qu'avec un peu de pratique, on peut souvent deviner les dérivées de la matrice en sachant simplement à quoi doit ressembler l'expression de la variable unique associée !
 
-Let's try this out.  Suppose that $\mathbf{X}$ is a $n \times m$ matrix, $\mathbf{U}$ is an $n \times r$ and $\mathbf{V}$ is an $r \times m$.  Let's try to compute
+Essayons cela.  Supposons que $\mathbf{X}$ soit une matrice $n \times m$, $\mathbf{U}$ une matrice $n \times r$ et $\mathbf{V}$ une matrice $r \times m$. Essayons de calculer
 
-$$\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2} = \;?$$
-:eqlabel:`eq_mat_goal_2`
+$$\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2} = \;?$$ 
+ :eqlabel:`eq_mat_goal_2` 
 
-This computation is important in an area called matrix factorization.  For us, however, it is just a derivative to compute.  Let's try to imagine what this would be for $1\times1$ matrices.  In that case, we get the expression
+ Ce calcul est important dans un domaine appelé factorisation de matrice.  Pour nous, cependant, il s'agit simplement d'une dérivée à calculer.  Essayons d'imaginer ce que ce serait pour les matrices $1\times1$.  Dans ce cas, nous obtenons l'expression
 
 $$
 \frac{d}{dv} (x-uv)^{2}= -2(x-uv)u,
 $$
 
-where, the derivative is rather standard.  If we try to convert this back into a matrix expression we get
+où la dérivée est plutôt standard.  Si nous essayons de reconvertir cette expression en une expression matricielle, nous obtenons
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2(\mathbf{X} - \mathbf{U}\mathbf{V})\mathbf{U}.
 $$
 
-However, if we look at this it does not quite work.  Recall that $\mathbf{X}$ is $n \times m$, as is $\mathbf{U}\mathbf{V}$, so the matrix $2(\mathbf{X} - \mathbf{U}\mathbf{V})$ is $n \times m$.  On the other hand $\mathbf{U}$ is $n \times r$, and we cannot multiply a $n \times m$ and a $n \times r$ matrix since the dimensions do not match!
+Cependant, si nous regardons ceci, cela ne fonctionne pas tout à fait.  Rappelez-vous que $\mathbf{X}$ est $n \times m$, tout comme $\mathbf{U}\mathbf{V}$, donc la matrice $2(\mathbf{X} - \mathbf{U}\mathbf{V})$ est $n \times m$.  D'autre part, $\mathbf{U}$ est $n \times r$, et nous ne pouvons pas multiplier une matrice $n \times m$ et une matrice $n \times r$ puisque les dimensions ne correspondent pas !
 
-We want to get $\frac{d}{d\mathbf{V}}$, which is the same shape as $\mathbf{V}$, which is $r \times m$.  So somehow we need to take a $n \times m$ matrix and a $n \times r$ matrix, multiply them together (perhaps with some transposes) to get a $r \times m$. We can do this by multiplying $U^\top$ by $(\mathbf{X} - \mathbf{U}\mathbf{V})$.  Thus, we can guess the solution to :eqref:`eq_mat_goal_2` is
+Nous voulons obtenir $\frac{d}{d\mathbf{V}}$, qui a la même forme que $\mathbf{V}$, qui est $r \times m$.  Nous devons donc, d'une manière ou d'une autre, prendre une matrice $n \times m$ et une matrice $n \times r$, les multiplier ensemble (peut-être avec quelques transpositions) pour obtenir $r \times m$. Nous pouvons le faire en multipliant $U^\top$ par $(\mathbf{X} - \mathbf{U}\mathbf{V})$.  Ainsi, nous pouvons deviner que la solution de :eqref:`eq_mat_goal_2` est
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\mathbf{U}^\top(\mathbf{X} - \mathbf{U}\mathbf{V}).
 $$
 
-To show that this works, we would be remiss to not provide a detailed computation.  If we already believe that this rule-of-thumb works, feel free to skip past this derivation.  To compute
+Pour montrer que cela fonctionne, nous serions négligents de ne pas fournir un calcul détaillé.  Si nous sommes déjà convaincus que cette règle d'or fonctionne, vous pouvez ignorer cette dérivation.  Pour calculer
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^2,
 $$
 
-we must find for every $a$, and $b$
+nous devons trouver pour chaque $a$, et $b$
 
 $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= \frac{d}{dv_{ab}} \sum_{i, j}\left(x_{ij} - \sum_k u_{ik}v_{kj}\right)^2.
 $$
 
-Recalling that all entries of $\mathbf{X}$ and $\mathbf{U}$ are constants as far as $\frac{d}{dv_{ab}}$ is concerned, we may push the derivative inside the sum, and apply the chain rule to the square to get
+En rappelant que toutes les entrées de $\mathbf{X}$ et $\mathbf{U}$ sont des constantes en ce qui concerne $\frac{d}{dv_{ab}}$, nous pouvons placer la dérivée à l'intérieur de la somme, et appliquer la règle de la chaîne au carré pour obtenir
 
 $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= \sum_{i, j}2\left(x_{ij} - \sum_k u_{ik}v_{kj}\right)\left(-\sum_k u_{ik}\frac{dv_{kj}}{dv_{ab}} \right).
 $$
 
-As in the previous derivation, we may note that $\frac{dv_{kj}}{dv_{ab}}$ is only non-zero if the $k=a$ and $j=b$.  If either of those conditions do not hold, the term in the sum is zero, and we may freely discard it.  We see that
+Comme dans la dérivation précédente, nous pouvons noter que $\frac{dv_{kj}}{dv_{ab}}$ n'est non nul que si $k=a$ et $j=b$. Si l'une ou l'autre de ces conditions n'est pas remplie, le terme de la somme est nul et nous pouvons librement l'écarter.  Nous voyons que
 
 $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\sum_{i}\left(x_{ib} - \sum_k u_{ik}v_{kb}\right)u_{ia}.
 $$
 
-An important subtlety here is that the requirement that $k=a$ does not occur inside the inner sum since that $k$ is a dummy variable which we are summing over inside the inner term.  For a notationally cleaner example, consider why
+Une subtilité importante ici est que la condition selon laquelle $k=a$ ne doit pas apparaître à l'intérieur de la somme interne puisque $k$ est une variable muette que nous additionnons à l'intérieur du terme interne.  Pour un exemple plus propre du point de vue notationnel, considérez la raison suivante
 
 $$
 \frac{d}{dx_1} \left(\sum_i x_i \right)^{2}= 2\left(\sum_i x_i \right).
 $$
 
-From this point, we may start identifying components of the sum.  First,
+À partir de ce point, nous pouvons commencer à identifier les composants de la somme.  Premièrement,
 
 $$
 \sum_k u_{ik}v_{kb} = [\mathbf{U}\mathbf{V}]_{ib}.
 $$
 
-So the entire expression in the inside of the sum is
+Donc l'expression entière à l'intérieur de la somme est
 
 $$
 x_{ib} - \sum_k u_{ik}v_{kb} = [\mathbf{X}-\mathbf{U}\mathbf{V}]_{ib}.
 $$
 
-This means we may now write our derivative as
+Cela signifie que nous pouvons maintenant écrire notre dérivée comme suit
 
 $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\sum_{i}[\mathbf{X}-\mathbf{U}\mathbf{V}]_{ib}u_{ia}.
 $$
 
-We want this to look like the $a, b$ element of a matrix so we can use the technique as in the previous example to arrive at a matrix expression, which means that we need to exchange the order of the indices on $u_{ia}$.  If we notice that $u_{ia} = [\mathbf{U}^\top]_{ai}$, we can then write
+Nous voulons que cela ressemble à l'élément $a, b$ d'une matrice ; nous pouvons donc utiliser la même technique que dans l'exemple précédent pour obtenir une expression matricielle, ce qui signifie que nous devons échanger l'ordre des indices sur $u_{ia}$.  Si nous remarquons que $u_{ia} = [\mathbf{U}^\top]_{ai}$, nous pouvons alors écrire
 
 $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\sum_{i} [\mathbf{U}^\top]_{ai}[\mathbf{X}-\mathbf{U}\mathbf{V}]_{ib}.
 $$
 
-This is a matrix product, and thus we can conclude that
+Il s'agit d'un produit matriciel, et nous pouvons donc conclure que
 
 $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2[\mathbf{U}^\top(\mathbf{X}-\mathbf{U}\mathbf{V})]_{ab}.
 $$
 
-and thus we may write the solution to :eqref:`eq_mat_goal_2`
+et nous pouvons donc écrire la solution à :eqref:`eq_mat_goal_2`
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\mathbf{U}^\top(\mathbf{X} - \mathbf{U}\mathbf{V}).
 $$
 
-This matches the solution we guessed above!
+Cela correspond à la solution que nous avons devinée ci-dessus !
 
-It is reasonable to ask at this point, "Why can I not just write down matrix versions of all the calculus rules I have learned?  It is clear this is still mechanical.  Why do we not just get it over with!"  And indeed there are such rules and :cite:`Petersen.Pedersen.ea.2008` provides an excellent summary.  However, due to the plethora of ways matrix operations can be combined compared to single values, there are many more matrix derivative rules than single variable ones.  It is often the case that it is best to work with the indices, or leave it up to automatic differentiation when appropriate.
+Il est raisonnable de se demander à ce stade : "Pourquoi ne puis-je pas simplement écrire des versions matricielles de toutes les règles de calcul que j'ai apprises ?  Il est clair que cela reste mécanique.  Pourquoi ne pas en finir avec tout ça ! "  Et en effet, il existe de telles règles et :cite:`Petersen.Pedersen.ea.2008` en fournit un excellent résumé.  Cependant, en raison de la pléthore de façons dont les opérations matricielles peuvent être combinées par rapport aux valeurs simples, il y a beaucoup plus de règles de dérivation matricielle que de règles à variable simple.  Il est souvent préférable de travailler avec les indices ou de s'en remettre à la différenciation automatique le cas échéant.
 
-## Summary
+## Résumé
 
-* In higher dimensions, we can define gradients which serve the same purpose as derivatives in one dimension.  These allow us to see how a multi-variable function changes when we make an arbitrary small change to the inputs.
-* The backpropagation algorithm can be seen to be a method of organizing the multi-variable chain rule to allow for the efficient computation of many partial derivatives.
-* Matrix calculus allows us to write the derivatives of matrix expressions in concise ways.
+* Dans les dimensions supérieures, nous pouvons définir des gradients qui servent le même objectif que les dérivées à une dimension.  Ils nous permettent de voir comment une fonction multi-variable change lorsque nous apportons un petit changement arbitraire aux entrées.
+* L'algorithme de rétropropagation peut être considéré comme une méthode d'organisation de la règle de la chaîne multi-variable pour permettre le calcul efficace de nombreuses dérivées partielles.
+* Le calcul matriciel nous permet d'écrire les dérivées des expressions matricielles de manière concise.
 
-## Exercises
-1. Given a column vector $\boldsymbol{\beta}$, compute the derivatives of both $f(\mathbf{x}) = \boldsymbol{\beta}^\top\mathbf{x}$ and $g(\mathbf{x}) = \mathbf{x}^\top\boldsymbol{\beta}$.  Why do you get the same answer?
-2. Let $\mathbf{v}$ be an $n$ dimension vector. What is $\frac{\partial}{\partial\mathbf{v}}\|\mathbf{v}\|_2$?
-3. Let $L(x, y) = \log(e^x + e^y)$.  Compute the gradient.  What is the sum of the components of the gradient?
-4. Let $f(x, y) = x^2y + xy^2$. Show that the only critical point is $(0,0)$. By considering $f(x, x)$, determine if $(0,0)$ is a maximum, minimum, or neither.
-5. Suppose that we are minimizing a function $f(\mathbf{x}) = g(\mathbf{x}) + h(\mathbf{x})$.  How can we geometrically interpret the condition of $\nabla f = 0$ in terms of $g$ and $h$?
+## Exercices
+1. Étant donné un vecteur colonne $\boldsymbol{\beta}$, calculez les dérivées de $f(\mathbf{x}) = \boldsymbol{\beta}^\top\mathbf{x}$ et $g(\mathbf{x}) = \mathbf{x}^\top\boldsymbol{\beta}$.  Pourquoi obtenez-vous la même réponse ?
+2. Soit $\mathbf{v}$ un vecteur de dimension $n$. Qu'est-ce que $\frac{\partial}{\partial\mathbf{v}}\|\mathbf{v}\|_2$?
+3. Soit $L(x, y) = \log(e^x + e^y)$. Calculez le gradient.  Quelle est la somme des composantes du gradient ?
+4. Soit $f(x, y) = x^2y + xy^2$. Montrez que le seul point critique est $(0,0)$. En considérant $f(x, x)$, déterminez si $(0,0)$ est un maximum, un minimum ou aucun des deux.
+5. Supposons que nous minimisions une fonction $f(\mathbf{x}) = g(\mathbf{x}) + h(\mathbf{x})$.  Comment pouvons-nous interpréter géométriquement la condition de $\nabla f = 0$ en termes de $g$ et $h$?
 
 
 :begin_tab:`mxnet`

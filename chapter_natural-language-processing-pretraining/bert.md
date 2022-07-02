@@ -1,114 +1,114 @@
-# Bidirectional Encoder Representations from Transformers (BERT)
-:label:`sec_bert`
+# Représentations d'encodeurs bidirectionnels à partir de transformateurs (BERT)
+:label:`sec_bert` 
 
-We have introduced several word embedding models for natural language understanding.
-After pretraining, the output can be thought of as a matrix
-where each row is a vector that represents a word of a predefined vocabulary.
-In fact, these word embedding models are all *context-independent*.
-Let's begin by illustrating this property.
+ Nous avons présenté plusieurs modèles d'intégration de mots pour la compréhension du langage naturel.
+Après un pré-entraînement, la sortie peut être considérée comme une matrice
+où chaque ligne est un vecteur qui représente un mot d'un vocabulaire prédéfini.
+En fait, ces modèles d'intégration de mots sont tous *indépendants du contexte*.
+Commençons par illustrer cette propriété.
 
 
 ## From Context-Independent to Context-Sensitive
 
-Recall the experiments in :numref:`sec_word2vec_pretraining` and :numref:`sec_synonyms`.
-For instance, word2vec and GloVe both assign the same pretrained vector to the same word regardless of the context of the word (if any).
-Formally, a context-independent representation of any token $x$
-is a function $f(x)$ that only takes $x$ as its input.
-Given the abundance of polysemy and complex semantics in natural languages,
-context-independent representations have obvious limitations.
-For instance, the word "crane" in contexts
-"a crane is flying" and "a crane driver came" has completely different meanings;
-thus, the same word may be assigned different representations depending on contexts.
+Rappelez-vous les expériences menées dans :numref:`sec_word2vec_pretraining` et :numref:`sec_synonyms` .
+Par exemple, word2vec et GloVe attribuent tous deux le même vecteur pré-formé au même mot, quel que soit le contexte du mot (le cas échéant).
+Formellement, une représentation indépendante du contexte de tout token $x$
+ est une fonction $f(x)$ qui ne prend que $x$ comme entrée.
+Étant donné l'abondance de la polysémie et de la sémantique complexe dans les langues naturelles, les représentations indépendantes du contexte
+ont des limites évidentes.
+Par exemple, le mot "grue" dans les contextes
+"une grue vole" et "un grutier est venu" a des significations complètement différentes ;
+ainsi, le même mot peut se voir attribuer des représentations différentes selon les contextes.
 
-This motivates the development of *context-sensitive* word representations,
-where representations of words depend on their contexts.
-Hence, a context-sensitive representation of token $x$ is a function $f(x, c(x))$
-depending on both $x$ and its context $c(x)$.
-Popular context-sensitive representations
-include TagLM (language-model-augmented sequence tagger) :cite:`Peters.Ammar.Bhagavatula.ea.2017`,
-CoVe (Context Vectors) :cite:`McCann.Bradbury.Xiong.ea.2017`,
-and ELMo (Embeddings from Language Models) :cite:`Peters.Neumann.Iyyer.ea.2018`.
+Cela motive le développement de représentations de mots *sensibles au contexte*,
+où les représentations des mots dépendent de leurs contextes.
+Par conséquent, une représentation contextuelle d'un jeton $x$ est une fonction $f(x, c(x))$
+ qui dépend à la fois de $x$ et de son contexte $c(x)$.
+Parmi les représentations contextuelles populaires
+, citons TagLM (Language-model-augmented sequence tagger) :cite:`Peters.Ammar.Bhagavatula.ea.2017` ,
+CoVe (Context Vectors) :cite:`McCann.Bradbury.Xiong.ea.2017` ,
+et ELMo (Embeddings from Language Models) :cite:`Peters.Neumann.Iyyer.ea.2018` .
 
-For example, by taking the entire sequence as input,
-ELMo is a function that assigns a representation to each word from the input sequence.
-Specifically, ELMo combines all the intermediate layer representations from pretrained bidirectional LSTM as the output representation.
-Then the ELMo representation will be added to a downstream task's existing supervised model
-as additional features, such as by concatenating ELMo representation and the original representation (e.g., GloVe) of tokens in the existing model.
-On the one hand,
-all the weights in the pretrained bidirectional LSTM model are frozen after ELMo representations are added.
-On the other hand,
-the existing supervised model is specifically customized for a given task.
-Leveraging different best models for different tasks at that time,
-adding ELMo improved the state of the art across six natural language processing tasks:
-sentiment analysis, natural language inference,
-semantic role labeling, coreference resolution,
-named entity recognition, and question answering.
+Par exemple, en prenant la séquence entière comme entrée,
+ELMo est une fonction qui attribue une représentation à chaque mot de la séquence d'entrée.
+Plus précisément, ELMo combine toutes les représentations des couches intermédiaires des LSTM bidirectionnels pré-entraînés comme représentation de sortie.
+Ensuite, la représentation ELMo sera ajoutée au modèle supervisé existant d'une tâche en aval
+en tant que caractéristiques supplémentaires, par exemple en concaténant la représentation ELMo et la représentation originale (par exemple, GloVe) des tokens dans le modèle existant.
+D'une part,
+tous les poids dans le modèle LSTM bidirectionnel pré-entraîné sont gelés après l'ajout des représentations ELMo.
+D'autre part,
+le modèle supervisé existant est spécifiquement personnalisé pour une tâche donnée.
+En tirant parti des meilleurs modèles pour différentes tâches à ce moment-là,
+l'ajout d'ELMo a amélioré l'état de l'art dans six tâches de traitement du langage naturel :
+analyse des sentiments, inférence du langage naturel,
+étiquetage des rôles sémantiques, résolution des coréférences,
+reconnaissance des entités nommées et réponse aux questions.
 
 
 ## From Task-Specific to Task-Agnostic
 
-Although ELMo has significantly improved solutions to a diverse set of natural language processing tasks,
-each solution still hinges on a *task-specific* architecture.
-However, it is practically non-trivial to craft a specific architecture for every natural language processing task.
-The GPT (Generative Pre-Training) model represents an effort in designing
-a general *task-agnostic* model for context-sensitive representations :cite:`Radford.Narasimhan.Salimans.ea.2018`.
-Built on a transformer decoder,
-GPT pretrains a language model that will be used to represent text sequences.
-When applying GPT to a downstream task,
-the output of the language model will be fed into an added linear output layer
-to predict the label of the task.
-In sharp contrast to ELMo that freezes parameters of the pretrained model,
-GPT fine-tunes *all* the parameters in the pretrained transformer decoder
-during supervised learning of the downstream task.
-GPT was evaluated on twelve tasks of natural language inference,
-question answering, sentence similarity, and classification,
-and improved the state of the art in nine of them with minimal changes
-to the model architecture.
+Bien que ELMo ait considérablement amélioré les solutions à un ensemble diversifié de tâches de traitement du langage naturel,
+chaque solution repose toujours sur une architecture *spécifique à la tâche*.
+Cependant, il est pratiquement impossible de concevoir une architecture spécifique pour chaque tâche de traitement du langage naturel.
+Le modèle GPT (Generative Pre-Training) représente un effort de conception de
+un modèle général *agnostique* pour les représentations sensibles au contexte :cite:`Radford.Narasimhan.Salimans.ea.2018` .
+Construit sur un décodeur transformateur,
+GPT pré-entraîne un modèle de langage qui sera utilisé pour représenter des séquences de texte.
+Lorsqu'on applique GPT à une tâche en aval,
+la sortie du modèle de langage sera introduite dans une couche de sortie linéaire ajoutée
+pour prédire l'étiquette de la tâche.
+Contrairement à ELMo qui fige les paramètres du modèle pré-entraîné,
+GPT affine *tous* les paramètres du décodeur transformateur pré-entraîné
+pendant l'apprentissage supervisé de la tâche en aval.
+GPT a été évalué sur douze tâches d'inférence en langage naturel,
+réponse aux questions, similarité de phrases et classification,
+et a amélioré l'état de l'art dans neuf d'entre elles avec des changements minimes
+à l'architecture du modèle.
 
-However, due to the autoregressive nature of language models,
-GPT only looks forward (left-to-right).
-In contexts "i went to the bank to deposit cash" and "i went to the bank to sit down",
-as "bank" is sensitive to the context to its left,
-GPT will return the same representation for "bank",
-though it has different meanings.
+Cependant, en raison de la nature autorégressive des modèles de langage,
+GPT ne regarde que vers l'avant (de gauche à droite).
+Dans les contextes "je suis allé à la banque pour déposer de l'argent" et "je suis allé à la banque pour m'asseoir",
+comme "banque" est sensible au contexte à sa gauche,
+GPT retournera la même représentation pour "banque",
+bien qu'il ait des significations différentes.
 
 
-## BERT: Combining the Best of Both Worlds
+## BERT : Combiner le meilleur des deux mondes
 
-As we have seen,
-ELMo encodes context bidirectionally but uses task-specific architectures;
-while GPT is task-agnostic but encodes context left-to-right.
-Combining the best of both worlds,
+Comme nous l'avons vu,
+ELMo encode le contexte de manière bidirectionnelle mais utilise des architectures spécifiques aux tâches ;
+alors que GPT est agnostique aux tâches mais encode le contexte de gauche à droite.
+Combinant le meilleur des deux mondes,
 BERT (Bidirectional Encoder Representations from Transformers)
-encodes context bidirectionally and requires minimal architecture changes
-for a wide range of natural language processing tasks :cite:`Devlin.Chang.Lee.ea.2018`.
-Using a pretrained transformer encoder,
-BERT is able to represent any token based on its bidirectional context.
-During supervised learning of downstream tasks,
-BERT is similar to GPT in two aspects.
-First, BERT representations will be fed into an added output layer,
-with minimal changes to the model architecture depending on nature of tasks,
-such as predicting for every token vs. predicting for the entire sequence.
-Second,
-all the parameters of the pretrained transformer encoder are fine-tuned,
-while the additional output layer will be trained from scratch.
-:numref:`fig_elmo-gpt-bert` depicts the differences among ELMo, GPT, and BERT.
+encode le contexte de manière bidirectionnelle et nécessite des modifications minimales de l'architecture
+pour un large éventail de tâches de traitement du langage naturel :cite:`Devlin.Chang.Lee.ea.2018` .
+À l'aide d'un encodeur de transformateur pré-entraîné,
+BERT est capable de représenter n'importe quel token en fonction de son contexte bidirectionnel.
+Pendant l'apprentissage supervisé de tâches en aval,
+BERT est similaire à GPT sous deux aspects.
+Premièrement, les représentations de BERT seront introduites dans une couche de sortie supplémentaire,
+, avec des modifications minimales de l'architecture du modèle en fonction de la nature des tâches,
+telles que la prédiction pour chaque token ou la prédiction pour la séquence entière.
+Deuxièmement,
+tous les paramètres du codeur transformateur pré-entraîné sont affinés,
+tandis que la couche de sortie supplémentaire sera entraînée à partir de zéro.
+:numref:`fig_elmo-gpt-bert` illustre les différences entre ELMo, GPT et BERT.
 
 ![A comparison of ELMo, GPT, and BERT.](../img/elmo-gpt-bert.svg)
 :label:`fig_elmo-gpt-bert`
 
 
-BERT further improved the state of the art on eleven natural language processing tasks
-under broad categories of (i) single text classification (e.g., sentiment analysis), (ii) text pair classification (e.g., natural language inference),
-(iii) question answering, (iv) text tagging (e.g., named entity recognition).
-All proposed in 2018,
-from context-sensitive ELMo to task-agnostic GPT and BERT,
-conceptually simple yet empirically powerful pretraining of deep representations for natural languages have revolutionized solutions to various natural language processing tasks.
+BERT a encore amélioré l'état de l'art sur onze tâches de traitement du langage naturel
+sous les grandes catégories suivantes : (i) classification d'un seul texte (par exemple, analyse des sentiments), (ii) classification de paires de textes (par exemple, inférence du langage naturel),
+(iii) réponse à des questions, (iv) étiquetage de textes (par exemple, reconnaissance d'entités nommées).
+Toutes proposées en 2018,
+de ELMo sensible au contexte à GPT et BERT agnostiques aux tâches,
+conceptuellement simple mais empiriquement puissant pré-entraînement de représentations profondes pour les langues naturelles ont révolutionné les solutions à diverses tâches de traitement du langage naturel.
 
-In the rest of this chapter,
-we will dive into the pretraining of BERT.
-When natural language processing applications are explained in :numref:`chap_nlp_app`,
-we will illustrate fine-tuning of BERT for downstream applications.
+Dans la suite de ce chapitre,
+nous allons nous plonger dans le pré-entraînement de BERT.
+Lorsque les applications de traitement du langage naturel seront expliquées dans :numref:`chap_nlp_app` ,
+nous illustrerons le réglage fin de BERT pour les applications en aval.
 
 ```{.python .input}
 #@tab mxnet
@@ -127,34 +127,34 @@ from torch import nn
 ```
 
 ## [**Input Representation**]
-:label:`subsec_bert_input_rep`
+:label:`subsec_bert_input_rep` 
 
-In natural language processing,
-some tasks (e.g., sentiment analysis) take single text as input,
-while in some other tasks (e.g., natural language inference),
-the input is a pair of text sequences.
-The BERT input sequence unambiguously represents both single text and text pairs.
-In the former,
-the BERT input sequence is the concatenation of
-the special classification token “&lt;cls&gt;”,
-tokens of a text sequence,
-and the special separation token “&lt;sep&gt;”.
-In the latter,
-the BERT input sequence is the concatenation of
-“&lt;cls&gt;”, tokens of the first text sequence,
-“&lt;sep&gt;”, tokens of the second text sequence, and “&lt;sep&gt;”.
-We will consistently distinguish the terminology "BERT input sequence"
-from other types of "sequences".
-For instance, one *BERT input sequence* may include either one *text sequence* or two *text sequences*.
+ Dans le traitement du langage naturel,
+certaines tâches (par exemple, l'analyse des sentiments) prennent un seul texte en entrée,
+alors que dans d'autres tâches (par exemple, l'inférence du langage naturel),
+l'entrée est une paire de séquences de texte.
+La séquence d'entrée de BERT représente sans ambiguïté à la fois un texte unique et des paires de textes.
+Dans le premier cas,
+la séquence d'entrée de l'ORET est la concaténation de
+le jeton spécial de classification "&lt;cls&gt;",
+les jetons d'une séquence de texte,
+et le jeton spécial de séparation "&lt;sep&gt;".
+Dans ce dernier cas,
+la séquence d'entrée de l'ORET est la concaténation de
+"&lt;cls&gt;", des jetons de la première séquence de texte,
+"&lt;sep&gt;", des jetons de la deuxième séquence de texte, et "&lt;sep&gt;".
+Nous distinguerons systématiquement la terminologie "séquence d'entrée BERT"
+des autres types de "séquences".
+Par exemple, une *séquence d'entrée BERT* peut inclure soit une *séquence de texte*, soit deux *séquences de texte*.
 
-To distinguish text pairs,
-the learned segment embeddings $\mathbf{e}_A$ and $\mathbf{e}_B$
-are added to the token embeddings of the first sequence and the second sequence, respectively.
-For single text inputs, only $\mathbf{e}_A$ is used.
+Pour distinguer les paires de textes,
+les incorporations de segments apprises $\mathbf{e}_A$ et $\mathbf{e}_B$
+ sont ajoutées aux incorporations de jetons de la première séquence et de la deuxième séquence, respectivement.
+Pour les entrées de texte unique, seul $\mathbf{e}_A$ est utilisé.
 
-The following `get_tokens_and_segments` takes either one sentence or two sentences
-as input, then returns tokens of the BERT input sequence
-and their corresponding segment IDs.
+La fonction suivante `get_tokens_and_segments` prend une ou deux phrases
+en entrée, puis renvoie les tokens de la séquence d'entrée de BERT
+et leurs ID de segment correspondants.
 
 ```{.python .input}
 #@tab all
@@ -170,23 +170,23 @@ def get_tokens_and_segments(tokens_a, tokens_b=None):
     return tokens, segments
 ```
 
-BERT chooses the transformer encoder as its bidirectional architecture.
-Common in the transformer encoder,
-positional embeddings are added at every position of the BERT input sequence.
-However, different from the original transformer encoder,
-BERT uses *learnable* positional embeddings.
-To sum up, :numref:`fig_bert-input` shows that
-the embeddings of the BERT input sequence are the sum
-of the token embeddings, segment embeddings, and positional embeddings.
+BERT choisit le codeur transformateur comme architecture bidirectionnelle.
+Comme dans l'encodeur transformateur, les encastrements positionnels
+sont ajoutés à chaque position de la séquence d'entrée de BERT.
+Cependant, à la différence du codeur transformateur original,
+BERT utilise des encastrements positionnels *apprenables*.
+En résumé, :numref:`fig_bert-input` montre que
+les enchâssements de la séquence d'entrée de BERT sont la somme
+des enchâssements de tokens, des enchâssements de segments et des enchâssements de positions.
 
 ![The embeddings of the BERT input sequence are the sum
 of the token embeddings, segment embeddings, and positional embeddings.](../img/bert-input.svg)
 :label:`fig_bert-input`
 
-The following [**`BERTEncoder` class**] is similar to the `TransformerEncoder` class
-as implemented in :numref:`sec_transformer`.
-Different from `TransformerEncoder`, `BERTEncoder` uses
-segment embeddings and learnable positional embeddings.
+La [**`BERTEncoder` classe**] suivante est similaire à la classe `TransformerEncoder`
+ telle qu'implémentée dans :numref:`sec_transformer` .
+À la différence de `TransformerEncoder`, `BERTEncoder` utilise
+embeddings de segment et embeddings de position apprenables.
 
 ```{.python .input}
 #@tab mxnet
@@ -246,9 +246,9 @@ class BERTEncoder(nn.Module):
         return X
 ```
 
-Suppose that the vocabulary size is 10000.
-To demonstrate forward [**inference of `BERTEncoder`**],
-let's create an instance of it and initialize its parameters.
+Supposons que la taille du vocabulaire soit de 10000.
+Pour démontrer l'inférence directe [**de `BERTEncoder`**],
+créons une instance de celui-ci et initialisons ses paramètres.
 
 ```{.python .input}
 #@tab mxnet
@@ -267,13 +267,13 @@ encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                       num_blks, dropout)
 ```
 
-We define `tokens` to be 2 BERT input sequences of length 8,
-where each token is an index of the vocabulary.
-The forward inference of `BERTEncoder` with the input `tokens`
-returns the encoded result where each token is represented by a vector
-whose length is predefined by the hyperparameter `num_hiddens`.
-This hyperparameter is usually referred to as the *hidden size*
-(number of hidden units) of the transformer encoder.
+Nous définissons `tokens` comme étant 2 séquences d'entrée BERT de longueur 8,
+où chaque token est un index du vocabulaire.
+L'inférence directe de `BERTEncoder` avec l'entrée `tokens`
+ renvoie le résultat codé où chaque token est représenté par un vecteur
+dont la longueur est prédéfinie par l'hyperparamètre `num_hiddens`.
+Cet hyperparamètre est généralement appelé la *taille cachée*
+(nombre d'unités cachées) de l'encodeur transformateur.
 
 ```{.python .input}
 #@tab mxnet
@@ -291,50 +291,50 @@ encoded_X = encoder(tokens, segments, None)
 encoded_X.shape
 ```
 
-## Pretraining Tasks
-:label:`subsec_bert_pretraining_tasks`
+## Tâches de pré-formation
+:label:`subsec_bert_pretraining_tasks` 
 
-The forward inference of `BERTEncoder` gives the BERT representation
-of each token of the input text and the inserted
-special tokens “&lt;cls&gt;” and “&lt;seq&gt;”.
-Next, we will use these representations to compute the loss function
-for pretraining BERT.
-The pretraining is composed of the following two tasks:
-masked language modeling and next sentence prediction.
+ L'inférence directe de `BERTEncoder` donne la représentation BERT
+de chaque token du texte d'entrée et des tokens spéciaux insérés
+"&lt;cls&gt;" et "&lt;seq&gt;".
+Ensuite, nous allons utiliser ces représentations pour calculer la fonction de perte
+pour le pré-entraînement de BERT.
+Le pré-entraînement est composé des deux tâches suivantes :
+modélisation du langage masqué et prédiction de la phrase suivante.
 
 ### [**Masked Language Modeling**]
-:label:`subsec_mlm`
+:label:`subsec_mlm` 
 
-As illustrated in :numref:`sec_language-model`,
-a language model predicts a token using the context on its left.
-To encode context bidirectionally for representing each token,
-BERT randomly masks tokens and uses tokens from the bidirectional context to
-predict the masked tokens in a self-supervised fashion.
-This task is referred to as a *masked language model*.
+ Comme illustré dans :numref:`sec_language-model` ,
+un modèle de langage prédit un token en utilisant le contexte à sa gauche.
+Pour encoder le contexte de manière bidirectionnelle pour représenter chaque token,
+BERT masque aléatoirement les tokens et utilise les tokens du contexte bidirectionnel pour
+prédire les tokens masqués de manière auto-supervisée.
+Cette tâche est appelée modèle de langage *masqué*.
 
-In this pretraining task,
-15% of tokens will be selected at random as the masked tokens for prediction.
-To predict a masked token without cheating by using the label,
-one straightforward approach is to always replace it with a special “&lt;mask&gt;” token in the BERT input sequence.
-However, the artificial special token “&lt;mask&gt;” will never appear
-in fine-tuning.
-To avoid such a mismatch between pretraining and fine-tuning,
-if a token is masked for prediction (e.g., "great" is selected to be masked and predicted in "this movie is great"),
-in the input it will be replaced with:
+Dans cette tâche de pré-entraînement,
+15% des tokens seront choisis au hasard comme tokens masqués pour la prédiction.
+Pour prédire un token masqué sans tricher en utilisant l'étiquette,
+une approche simple consiste à toujours le remplacer par un token spécial "&lt;mask&gt;" dans la séquence d'entrée de BERT.
+Cependant, le token spécial artificiel "&lt;mask&gt;" n'apparaîtra jamais
+dans le réglage fin.
+Pour éviter un tel décalage entre la pré-formation et le réglage fin,
+si un token est masqué pour la prédiction (par exemple, "great" est sélectionné pour être masqué et prédit dans "this movie is great"),
+dans l'entrée il sera remplacé par :
 
-* a special “&lt;mask&gt;” token for 80% of the time (e.g., "this movie is great" becomes "this movie is &lt;mask&gt;");
-* a random token for 10% of the time (e.g., "this movie is great" becomes "this movie is drink");
-* the unchanged label token for 10% of the time (e.g., "this movie is great" becomes "this movie is great").
+* un token spécial "&lt;mask&gt;" pendant 80% du temps (par exemple, "this movie is great" devient "this movie is &lt;mask&gt;") ;
+* un jeton aléatoire pour 10% du temps (par exemple, "this movie is great" devient "this movie is drink") ;
+* le jeton de label inchangé pour 10% du temps (par exemple, "this movie is great" devient "this movie is great").
 
-Note that for 10% of 15% time a random token is inserted.
-This occasional noise encourages BERT to be less biased towards the masked token (especially when the label token remains unchanged) in its bidirectional context encoding.
+Notez que pendant 10% de 15% du temps, un jeton aléatoire est inséré.
+Ce bruit occasionnel encourage BERT à être moins biaisé vers le token masqué (surtout lorsque le token étiquette reste inchangé) dans son encodage contextuel bidirectionnel.
 
-We implement the following `MaskLM` class to predict masked tokens
-in the masked language model task of BERT pretraining.
-The prediction uses a one-hidden-layer MLP (`self.mlp`).
-In forward inference, it takes two inputs:
-the encoded result of `BERTEncoder` and the token positions for prediction.
-The output is the prediction results at these positions.
+Nous implémentons la classe suivante `MaskLM` pour prédire les tokens masqués
+dans la tâche de modèle de langage masqué du pré-entraînement de BERT.
+La prédiction utilise un MLP à une couche cachée (`self.mlp`).
+En inférence directe, il prend deux entrées :
+le résultat codé de `BERTEncoder` et les positions des tokens pour la prédiction.
+La sortie est le résultat de la prédiction à ces positions.
 
 ```{.python .input}
 #@tab mxnet
@@ -389,14 +389,14 @@ class MaskLM(nn.Module):
         return mlm_Y_hat
 ```
 
-To demonstrate [**the forward inference of `MaskLM`**],
-we create its instance `mlm` and initialize it.
-Recall that `encoded_X` from the forward inference of `BERTEncoder`
-represents 2 BERT input sequences.
-We define `mlm_positions` as the 3 indices to predict in either BERT input sequence of `encoded_X`.
-The forward inference of `mlm` returns prediction results `mlm_Y_hat`
-at all the masked positions `mlm_positions` of `encoded_X`.
-For each prediction, the size of the result is equal to the vocabulary size.
+Pour démontrer [**l'inférence directe de `MaskLM`**],
+nous créons son instance `mlm` et l'initialisons.
+Rappelons que `encoded_X`, issu de l'inférence directe de `BERTEncoder`
+ , représente 2 séquences d'entrée BERT.
+Nous définissons `mlm_positions` comme les 3 indices à prédire dans l'une ou l'autre des séquences d'entrée BERT de `encoded_X`.
+L'inférence directe de `mlm` renvoie des résultats de prédiction `mlm_Y_hat`
+ à toutes les positions masquées `mlm_positions` de `encoded_X`.
+Pour chaque prédiction, la taille du résultat est égale à la taille du vocabulaire.
 
 ```{.python .input}
 #@tab mxnet
@@ -415,8 +415,8 @@ mlm_Y_hat = mlm(encoded_X, mlm_positions)
 mlm_Y_hat.shape
 ```
 
-With the ground truth labels `mlm_Y` of the predicted tokens `mlm_Y_hat` under masks,
-we can calculate the cross-entropy loss of the masked language model task in BERT pretraining.
+Avec les étiquettes de vérité terrain `mlm_Y` des tokens prédits `mlm_Y_hat` sous les masques,
+nous pouvons calculer la perte d'entropie croisée de la tâche du modèle de langage masqué dans le pré-entraînement de BERT.
 
 ```{.python .input}
 #@tab mxnet
@@ -435,25 +435,25 @@ mlm_l.shape
 ```
 
 ### [**Next Sentence Prediction**]
-:label:`subsec_nsp`
+:label:`subsec_nsp` 
 
-Although masked language modeling is able to encode bidirectional context
-for representing words, it does not explicitly model the logical relationship
-between text pairs.
-To help understand the relationship between two text sequences,
-BERT considers a binary classification task, *next sentence prediction*, in its pretraining.
-When generating sentence pairs for pretraining,
-for half of the time they are indeed consecutive sentences with the label "True";
-while for the other half of the time the second sentence is randomly sampled from the corpus with the label "False".
+ Bien que la modélisation du langage masqué soit capable d'encoder le contexte bidirectionnel
+pour représenter les mots, elle ne modélise pas explicitement la relation logique
+entre les paires de textes.
+Pour aider à comprendre la relation entre deux séquences de texte,
+BERT considère une tâche de classification binaire, la prédiction de la *prochaine phrase*, dans son pré-entraînement.
+Lors de la génération de paires de phrases pour le pré-entraînement,
+pour la moitié du temps, il s'agit effectivement de phrases consécutives avec l'étiquette "Vrai" ;
+tandis que pour l'autre moitié du temps, la deuxième phrase est échantillonnée au hasard dans le corpus avec l'étiquette "Faux".
 
-The following `NextSentencePred` class uses a one-hidden-layer MLP
-to predict whether the second sentence is the next sentence of the first
-in the BERT input sequence.
-Due to self-attention in the transformer encoder,
-the BERT representation of the special token “&lt;cls&gt;”
-encodes both the two sentences from the input.
-Hence, the output layer (`self.output`) of the MLP classifier takes `X` as input,
-where `X` is the output of the MLP hidden layer whose input is the encoded “&lt;cls&gt;” token.
+La classe suivante `NextSentencePred` utilise un MLP à une couche cachée
+pour prédire si la deuxième phrase est la prochaine phrase de la première
+dans la séquence d'entrée de BERT.
+En raison de l'auto-attention dans l'encodeur transformateur,
+la représentation BERT du token spécial "&lt;cls&gt;"
+encode les deux phrases de l'entrée.
+Par conséquent, la couche de sortie (`self.output`) du classificateur MLP prend `X` comme entrée,
+où `X` est la sortie de la couche cachée MLP dont l'entrée est le token "&lt;cls&gt;" encodé.
 
 ```{.python .input}
 #@tab mxnet
@@ -483,8 +483,8 @@ class NextSentencePred(nn.Module):
         return self.output(X)
 ```
 
-We can see that [**the forward inference of an `NextSentencePred`**] instance
-returns binary predictions for each BERT input sequence.
+Nous pouvons voir que [**l'inférence directe d'une instance `NextSentencePred`**]
+renvoie des prédictions binaires pour chaque séquence d'entrée BERT.
 
 ```{.python .input}
 #@tab mxnet
@@ -505,7 +505,7 @@ nsp_Y_hat = nsp(encoded_X)
 nsp_Y_hat.shape
 ```
 
-The cross-entropy loss of the 2 binary classifications can also be computed.
+La perte d'entropie croisée des deux classifications binaires peut également être calculée.
 
 ```{.python .input}
 #@tab mxnet
@@ -521,23 +521,23 @@ nsp_l = loss(nsp_Y_hat, nsp_y)
 nsp_l.shape
 ```
 
-It is noteworthy that all the labels in both the aforementioned pretraining tasks
-can be trivially obtained from the pretraining corpus without manual labeling effort.
-The original BERT has been pretrained on the concatenation of BookCorpus :cite:`Zhu.Kiros.Zemel.ea.2015`
-and English Wikipedia.
-These two text corpora are huge:
-they have 800 million words and 2.5 billion words, respectively.
+Il est à noter que toutes les étiquettes dans les deux tâches de pré-entraînement susmentionnées
+peuvent être obtenues trivialement à partir du corpus de pré-entraînement sans effort d'étiquetage manuel.
+Le BERT original a été pré-entraîné sur la concaténation du BookCorpus :cite:`Zhu.Kiros.Zemel.ea.2015` 
+ et du Wikipedia anglais.
+Ces deux corpus de textes sont énormes :
+ils comptent respectivement 800 millions et 2,5 milliards de mots.
 
 
 ## [**Putting All Things Together**]
 
-When pretraining BERT, the final loss function is a linear combination of
-both the loss functions for masked language modeling and next sentence prediction.
-Now we can define the `BERTModel` class by instantiating the three classes
-`BERTEncoder`, `MaskLM`, and `NextSentencePred`.
-The forward inference returns the encoded BERT representations `encoded_X`,
-predictions of masked language modeling `mlm_Y_hat`,
-and next sentence predictions `nsp_Y_hat`.
+Lors du pré-entraînement de BERT, la fonction de perte finale est une combinaison linéaire des deux fonctions de perte
+pour la modélisation du langage masqué et la prédiction de la phrase suivante.
+Nous pouvons maintenant définir la classe `BERTModel` en instanciant les trois classes
+`BERTEncoder` , `MaskLM`, et `NextSentencePred`.
+L'inférence directe renvoie les représentations BERT codées `encoded_X`,
+les prédictions de la modélisation du langage masqué `mlm_Y_hat`,
+et les prédictions de la phrase suivante `nsp_Y_hat`.
 
 ```{.python .input}
 #@tab mxnet
@@ -593,21 +593,21 @@ class BERTModel(nn.Module):
         return encoded_X, mlm_Y_hat, nsp_Y_hat
 ```
 
-## Summary
+## Résumé
 
-* Word embedding models such as word2vec and GloVe are context-independent. They assign the same pretrained vector to the same word regardless of the context of the word (if any). It is hard for them to handle well polysemy or complex semantics in natural languages.
-* For context-sensitive word representations such as ELMo and GPT, representations of words depend on their contexts.
-* ELMo encodes context bidirectionally but uses task-specific architectures (however, it is practically non-trivial to craft a specific architecture for every natural language processing task); while GPT is task-agnostic but encodes context left-to-right.
-* BERT combines the best of both worlds: it encodes context bidirectionally and requires minimal architecture changes for a wide range of natural language processing tasks.
-* The embeddings of the BERT input sequence are the sum of the token embeddings, segment embeddings, and positional embeddings.
-* Pretraining BERT is composed of two tasks: masked language modeling and next sentence prediction. The former is able to encode bidirectional context for representing words, while the latter explicitly models the logical relationship between text pairs.
+* Les modèles d'intégration de mots tels que word2vec et GloVe sont indépendants du contexte. Ils attribuent le même vecteur pré-entraîné au même mot, quel que soit le contexte du mot (le cas échéant). Il est difficile pour eux de bien gérer la polysémie ou la sémantique complexe dans les langues naturelles.
+* Pour les représentations de mots sensibles au contexte telles que ELMo et GPT, les représentations des mots dépendent de leurs contextes.
+* ELMo encode le contexte de manière bidirectionnelle mais utilise des architectures spécifiques à chaque tâche (cependant, il est pratiquement impossible de concevoir une architecture spécifique pour chaque tâche de traitement du langage naturel) ; tandis que GPT est agnostique mais encode le contexte de gauche à droite.
+* BERT combine le meilleur des deux mondes : il encode le contexte de manière bidirectionnelle et nécessite des modifications minimales de l'architecture pour un large éventail de tâches de traitement du langage naturel.
+* Les incorporations de la séquence d'entrée de BERT sont la somme des incorporations de tokens, des incorporations de segments et des incorporations de positions.
+* Le pré-entraînement de BERT est composé de deux tâches : la modélisation du langage masqué et la prédiction de la phrase suivante. La première est capable d'encoder le contexte bidirectionnel pour représenter les mots, tandis que la seconde modélise explicitement la relation logique entre les paires de textes.
 
 
 
-## Exercises
+## Exercices
 
-1. All other things being equal, will a masked language model require more or fewer pretraining steps to converge than a left-to-right language model? Why?
-1. In the original implementation of BERT, the positionwise feed-forward network in `BERTEncoder` (via `d2l.TransformerEncoderBlock`) and the fully connected layer in `MaskLM` both use the Gaussian error linear unit (GELU) :cite:`Hendrycks.Gimpel.2016` as the activation function. Research into the difference between GELU and ReLU.
+1. Toutes choses égales par ailleurs, un modèle de langage masqué nécessitera-t-il plus ou moins d'étapes de pré-entraînement pour converger qu'un modèle de langage gauche-droite ? Pourquoi ?
+1. Dans l'implémentation originale de BERT, le réseau feed-forward en position de `BERTEncoder` (via `d2l.TransformerEncoderBlock`) et la couche entièrement connectée de `MaskLM` utilisent tous deux l'unité linéaire d'erreur gaussienne (GELU) :cite:`Hendrycks.Gimpel.2016` comme fonction d'activation. Recherchez la différence entre GELU et ReLU.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/388)

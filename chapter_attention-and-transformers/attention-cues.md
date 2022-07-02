@@ -3,164 +3,164 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-# Attention Cues
-:label:`sec_attention-cues`
+# Les indices d'attention
+:label:`sec_attention-cues` 
 
-Thank you for your attention
-to this book.
-Attention is a scarce resource:
-at the moment
-you are reading this book
-and ignoring the rest.
-Thus, similar to money,
-your attention is being paid with an opportunity cost.
-To ensure that your investment of attention
-right now is worthwhile,
-we have been highly motivated to pay our attention carefully
-to produce a nice book.
-Attention
-is the keystone in the arch of life and
-holds the key to any work's exceptionalism.
-
-
-Since economics studies the allocation of scarce resources,
-we are
-in the era of the attention economy,
-where human attention is treated as a limited, valuable, and scarce commodity
-that can be exchanged.
-Numerous business models have been
-developed to capitalize on it.
-On music or video streaming services,
-we either pay attention to their ads
-or pay money to hide them.
-For growth in the world of online games,
-we either pay attention to
-participate in battles, which attract new gamers,
-or pay money to instantly become powerful.
-Nothing comes for free.
-
-All in all,
-information in our environment is not scarce,
-attention is.
-When inspecting a visual scene,
-our optic nerve receives information
-at the order of $10^8$ bits per second,
-far exceeding what our brain can fully process.
-Fortunately,
-our ancestors had learned from experience (also known as data)
-that *not all sensory inputs are created equal*.
-Throughout human history,
-the capability of directing attention
-to only a fraction of information of interest
-has enabled our brain
-to allocate resources more smartly
-to survive, to grow, and to socialize,
-such as detecting predators, preys, and mates.
+ Merci de l'attention que vous portez à ce livre
+.
+L'attention est une ressource rare :
+en ce moment
+vous lisez ce livre
+et ignorez le reste.
+Ainsi, comme pour l'argent,
+votre attention est payée avec un coût d'opportunité.
+Pour s'assurer que l'investissement de votre attention
+en ce moment en vaut la peine,
+nous avons été très motivés pour accorder notre attention avec soin
+afin de produire un beau livre.
+L'attention
+est la clé de voûte de l'arc de la vie et
+détient la clé de l'exceptionnalité de toute œuvre.
 
 
+Puisque l'économie étudie l'allocation de ressources rares,
+nous sommes
+dans l'ère de l'économie de l'attention,
+où l'attention humaine est traitée comme un bien limité, précieux et rare
+qui peut être échangé.
+De nombreux modèles commerciaux ont été
+développés pour en tirer profit.
+Sur les services de streaming musical ou vidéo,
+nous prêtons attention à leurs publicités
+ou nous payons pour les cacher.
+Pour se développer dans le monde des jeux en ligne,
+, soit nous prêtons attention à
+participer à des batailles, qui attirent de nouveaux joueurs,
+soit nous payons de l'argent pour devenir instantanément puissant.
+Rien n'est gratuit.
 
-## Attention Cues in Biology
-
-To explain how our attention is deployed in the visual world,
-a two-component framework has emerged
-and been pervasive.
-This idea dates back to William James in the 1890s,
-who is considered the "father of American psychology" :cite:`James.2007`.
-In this framework,
-subjects selectively direct the spotlight of attention
-using both the *nonvolitional cue* and *volitional cue*.
-
-The nonvolitional cue is based on
-the saliency and conspicuity of objects in the environment.
-Imagine there are five objects in front of you:
-a newspaper, a research paper, a cup of coffee, a notebook, and a book such as in :numref:`fig_eye-coffee`.
-While all the paper products are printed in black and white,
-the coffee cup is red.
-In other words,
-this coffee is intrinsically salient and conspicuous in
-this visual environment,
-automatically and involuntarily drawing attention.
-So you bring the fovea (the center of the macula where visual acuity is highest) onto the coffee as shown in :numref:`fig_eye-coffee`.
-
-![Using the nonvolitional cue based on saliency (red cup, non-paper), attention is involuntarily directed to the coffee.](../img/eye-coffee.svg)
-:width:`400px`
-:label:`fig_eye-coffee`
-
-After drinking coffee,
-you become caffeinated and
-want to read a book.
-So you turn your head, refocus your eyes,
-and look at the book as depicted in :numref:`fig_eye-book`.
-Different from
-the case in :numref:`fig_eye-coffee`
-where the coffee biases you towards
-selecting based on saliency,
-in this task-dependent case you select the book under
-cognitive and volitional control.
-Using the volitional cue based on variable selection criteria,
-this form of attention is more deliberate.
-It is also more powerful with the subject's voluntary effort.
-
-![Using the volitional cue (want to read a book) that is task-dependent, attention is directed to the book under volitional control.](../img/eye-book.svg)
-:width:`400px`
-:label:`fig_eye-book`
+En somme,
+l'information dans notre environnement n'est pas rare,
+l'attention l'est.
+Lorsque nous inspectons une scène visuelle,
+notre nerf optique reçoit des informations
+de l'ordre de $10^8$ bits par seconde,
+dépassant de loin ce que notre cerveau peut traiter entièrement.
+Heureusement,
+nos ancêtres avaient appris par l'expérience (également appelée données)
+que *toutes les entrées sensorielles ne sont pas créées égales*.
+Tout au long de l'histoire de l'humanité,
+la capacité de diriger l'attention
+vers une fraction seulement des informations intéressantes
+a permis à notre cerveau
+d'allouer les ressources de manière plus intelligente
+pour survivre, grandir et socialiser,
+comme la détection des prédateurs, des proies et des partenaires.
 
 
-## Queries, Keys, and Values
 
-Inspired by the nonvolitional and volitional attention cues that explain the attentional deployment,
-in the following we will
-describe a framework for
-designing attention mechanisms
-by incorporating these two attention cues.
+### Les signaux d'attention en biologie
 
-To begin with, consider the simpler case where only
-nonvolitional cues are available.
-To bias selection over sensory inputs,
-we can simply use
-a parameterized fully connected layer
-or even non-parameterized
-max or average pooling.
+Pour expliquer comment notre attention se déploie dans le monde visuel,
+un cadre à deux composantes a émergé
+et s'est répandu.
+Cette idée remonte à William James dans les années 1890,
+, qui est considéré comme le "père de la psychologie américaine" :cite:`James.2007` .
+Dans ce cadre,
+les sujets dirigent sélectivement le point de mire de l'attention
+en utilisant à la fois le *repère non-volontaire* et le *repère volitif*.
 
-Therefore,
-what sets attention mechanisms
-apart from those fully connected layers
-or pooling layers
-is the inclusion of the volitional cues.
-In the context of attention mechanisms,
-we refer to volitional cues as *queries*.
-Given any query,
-attention mechanisms
-bias selection over sensory inputs (e.g., intermediate feature representations)
-via *attention pooling*.
-These sensory inputs are called *values* in the context of attention mechanisms.
-More generally,
-every value is paired with a *key*,
-which can be thought of the nonvolitional cue of that sensory input.
-As shown in :numref:`fig_qkv`,
-we can design attention pooling
-so that the given query (volitional cue) can interact with keys (nonvolitional cues),
-which guides bias selection over values (sensory inputs).
+L'indice non-volontaire est basé sur
+la saillance et la conspicuité des objets dans l'environnement.
+Imaginez que cinq objets se trouvent devant vous :
+un journal, un document de recherche, une tasse de café, un cahier et un livre, comme dans :numref:`fig_eye-coffee` .
+Alors que tous les produits en papier sont imprimés en noir et blanc,
+la tasse de café est rouge.
+En d'autres termes,
+ce café est intrinsèquement saillant et ostensible dans
+cet environnement visuel,
+attirant automatiquement et involontairement l'attention.
+Vous amenez donc la fovéa (le centre de la macula, où l'acuité visuelle est la plus élevée) sur le café, comme le montre l'illustration :numref:`fig_eye-coffee` .
 
-![Attention mechanisms bias selection over values (sensory inputs) via attention pooling, which incorporates queries (volitional cues) and keys (nonvolitional cues).](../img/qkv.svg)
-:label:`fig_qkv`
+![Using the nonvolitional cue based on saliency (red cup, non-paper) , l'attention est involontairement dirigée vers le café.](../img/eye-coffee.svg)
+:width:`400px` 
+ :label:`fig_eye-coffee` 
 
-Note that there are many alternatives for the design of attention mechanisms.
-For instance,
-we can design a non-differentiable attention model
-that can be trained using reinforcement learning methods :cite:`Mnih.Heess.Graves.ea.2014`.
-Given the dominance of the framework in :numref:`fig_qkv`,
-models under this framework
-will be the center of our attention in this chapter.
+ Après avoir bu du café,
+vous êtes en manque de caféine et
+vous avez envie de lire un livre.
+Vous tournez donc la tête, vous recentrez vos yeux,
+et vous regardez le livre comme indiqué dans :numref:`fig_eye-book` .
+À la différence de
+, le cas de :numref:`fig_eye-coffee` 
+ où le café vous incite à
+faire une sélection basée sur la saillance,
+dans ce cas dépendant de la tâche, vous sélectionnez le livre sous
+contrôle cognitif et volontaire.
+En utilisant l'indice volitif basé sur des critères de sélection variables,
+cette forme d'attention est plus délibérée.
+Elle est également plus puissante grâce à l'effort volontaire du sujet.
+
+![Using the volitional cue (want to read a book) qui est dépendant de la tâche, l'attention est dirigée vers le livre sous contrôle volitif.](../img/eye-book.svg)
+:width:`400px` 
+ :label:`fig_eye-book` 
+
+ 
+ ## Requêtes, clés et valeurs
+
+Inspirés par les indices d'attention non volitifs et volitifs qui expliquent le déploiement attentionnel,
+dans ce qui suit, nous allons
+décrire un cadre pour
+concevoir des mécanismes d'attention
+en incorporant ces deux indices d'attention.
+
+Pour commencer, considérons le cas le plus simple où seuls
+les signaux non volitifs sont disponibles.
+Pour biaiser la sélection sur les entrées sensorielles,
+nous pouvons simplement utiliser
+une couche entièrement connectée paramétrée
+ou même une mise en commun maximale ou moyenne non paramétrée
+.
+
+Par conséquent,
+ce qui différencie les mécanismes d'attention
+des couches entièrement connectées
+ou des couches de mise en commun
+, c'est l'inclusion des indices volitifs.
+Dans le contexte des mécanismes d'attention,
+nous nous référons aux indices volitifs comme des *requêtes*.
+Pour toute requête,
+les mécanismes d'attention
+biaisent la sélection sur les entrées sensorielles (par exemple, les représentations de caractéristiques intermédiaires)
+via la *mise en commun de l'attention*.
+Ces entrées sensorielles sont appelées *valeurs* dans le contexte des mécanismes d'attention.
+Plus généralement,
+chaque valeur est associée à une *clé*,
+qui peut être considérée comme l'indice non-volatile de cette entrée sensorielle.
+Comme le montrent les exemples :numref:`fig_qkv` et
+, nous pouvons concevoir le regroupement de l'attention
+de manière à ce que la requête donnée (indice volitif) puisse interagir avec des clés (indices non volitifs),
+, qui guident la sélection de biais sur les valeurs (entrées sensorielles).
+
+![Attention mechanisms bias selection over values (sensory inputs) via la mise en commun de l'attention, qui intègre les requêtes (indices volitifs) et les clés (indices non volitifs)](../img/qkv.svg)
+:label:`fig_qkv` 
+
+ Notez qu'il existe de nombreuses alternatives pour la conception des mécanismes d'attention.
+Par exemple,
+nous pouvons concevoir un modèle d'attention non-différenciable
+qui peut être entraîné à l'aide de méthodes d'apprentissage par renforcement :cite:`Mnih.Heess.Graves.ea.2014` .
+Étant donné la prédominance du cadre de travail de :numref:`fig_qkv` ,
+les modèles de ce cadre
+seront au centre de notre attention dans ce chapitre.
 
 
-## Visualization of Attention
+## Visualisation de l'attention
 
-Average pooling
-can be treated as a weighted average of inputs,
-where weights are uniform.
-In practice,
-attention pooling aggregates values using weighted average, where weights are computed between the given query and different keys.
+La mise en commun de l'attention
+peut être traitée comme une moyenne pondérée des entrées,
+où les poids sont uniformes.
+En pratique, la mise en commun de l'attention
+agrège les valeurs en utilisant une moyenne pondérée, où les poids sont calculés entre la requête donnée et différentes clés.
 
 ```{.python .input}
 %%tab mxnet
@@ -181,9 +181,9 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-To visualize attention weights,
-we define the `show_heatmaps` function.
-Its input `matrices` has the shape (number of rows for display, number of columns for display, number of queries, number of keys).
+Pour visualiser les poids d'attention,
+nous définissons la fonction `show_heatmaps`.
+Son entrée `matrices` a la forme (nombre de lignes à afficher, nombre de colonnes à afficher, nombre de requêtes, nombre de clés).
 
 ```{.python .input}
 %%tab all
@@ -207,9 +207,9 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
     fig.colorbar(pcm, ax=axes, shrink=0.6);
 ```
 
-For demonstration,
-we consider a simple case where
-the attention weight is one only when the query and the key are the same; otherwise it is zero.
+Pour la démonstration,
+nous considérons un cas simple où
+le poids d'attention est de un seulement lorsque la requête et la clé sont les mêmes ; sinon il est de zéro.
 
 ```{.python .input}
 %%tab all
@@ -217,21 +217,21 @@ attention_weights = d2l.reshape(d2l.eye(10), (1, 1, 10, 10))
 show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries')
 ```
 
-In the subsequent sections,
-we will often invoke this function to visualize attention weights.
+Dans les sections suivantes,
+nous invoquerons souvent cette fonction pour visualiser les poids d'attention.
 
-## Summary
+## Résumé
 
-* Human attention is a limited, valuable, and scarce resource.
-* Subjects selectively direct attention using both the nonvolitional and volitional cues. The former is based on saliency and the latter is task-dependent.
-* Attention mechanisms are different from fully connected layers or pooling layers due to inclusion of the volitional cues.
-* Attention mechanisms bias selection over values (sensory inputs) via attention pooling, which incorporates queries (volitional cues) and keys (nonvolitional cues). Keys and values are paired.
-* We can visualize attention weights between queries and keys.
+* L'attention humaine est une ressource limitée, précieuse et rare.
+* Les sujets dirigent sélectivement leur attention en utilisant à la fois les indices non volitifs et volitifs. Le premier est basé sur la saillance et le second est dépendant de la tâche.
+* Les mécanismes d'attention sont différents des couches entièrement connectées ou des couches de mise en commun en raison de l'inclusion des indices volontaires.
+* Les mécanismes d'attention biaisent la sélection sur les valeurs (entrées sensorielles) via la mise en commun de l'attention, qui incorpore des requêtes (indices volitifs) et des clés (indices non volitifs). Les clés et les valeurs sont appariées.
+* Nous pouvons visualiser les poids de l'attention entre les requêtes et les clés.
 
-## Exercises
+## Exercices
 
-1. What can be the volitional cue when decoding a sequence token by token in machine translation? What are the nonvolitional cues and the sensory inputs?
-1. Randomly generate a $10 \times 10$ matrix and use the softmax operation to ensure each row is a valid probability distribution. Visualize the output attention weights.
+1. Quel peut être l'indice volitif lors du décodage d'une séquence mot à mot en traduction automatique ? Quels sont les indices non volitifs et les entrées sensorielles ?
+1. Générez aléatoirement une matrice $10 \times 10$ et utilisez l'opération softmax pour vous assurer que chaque ligne est une distribution de probabilité valide. Visualisez les poids d'attention de sortie.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/1596)

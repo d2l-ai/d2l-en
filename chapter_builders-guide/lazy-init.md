@@ -1,43 +1,43 @@
 # Lazy Initialization
-:label:`sec_lazy_init`
+:label:`sec_lazy_init` 
 
-So far, it might seem that we got away
-with being sloppy in setting up our networks.
-Specifically, we did the following unintuitive things,
-which might not seem like they should work:
+ Jusqu'à présent, il pourrait sembler que nous nous en sommes sortis
+en étant négligents dans la configuration de nos réseaux.
+Plus précisément, nous avons fait les choses peu intuitives suivantes,
+qui peuvent sembler ne pas devoir fonctionner :
 
-* We defined the network architectures
-  without specifying the input dimensionality.
-* We added layers without specifying
-  the output dimension of the previous layer.
-* We even "initialized" these parameters
-  before providing enough information to determine
-  how many parameters our models should contain.
+* Nous avons défini les architectures de réseau
+ sans spécifier la dimensionnalité d'entrée.
+* Nous avons ajouté des couches sans spécifier
+ la dimension de sortie de la couche précédente.
+* Nous avons même "initialisé" ces paramètres
+ avant de fournir suffisamment d'informations pour déterminer
+ le nombre de paramètres que nos modèles devraient contenir.
 
-You might be surprised that our code runs at all.
-After all, there is no way the deep learning framework
-could tell what the input dimensionality of a network would be.
-The trick here is that the framework *defers initialization*,
-waiting until the first time we pass data through the model,
-to infer the sizes of each layer on the fly.
-
-
-Later on, when working with convolutional neural networks,
-this technique will become even more convenient
-since the input dimensionality
-(i.e., the resolution of an image)
-will affect the dimensionality
-of each subsequent layer.
-Hence, the ability to set parameters
-without the need to know,
-at the time of writing the code,
-what the dimensionality is
-can greatly simplify the task of specifying
-and subsequently modifying our models.
-Next, we go deeper into the mechanics of initialization.
+Vous pourriez être surpris que notre code fonctionne.
+Après tout, il n'y a aucun moyen pour le cadre d'apprentissage profond
+de savoir quelle serait la dimensionnalité d'entrée d'un réseau.
+L'astuce ici est que le cadre *diffère l'initialisation*,
+attendant jusqu'à la première fois que nous passons des données dans le modèle,
+pour déduire les tailles de chaque couche à la volée.
 
 
-To begin, let's instantiate an MLP.
+Plus tard, lorsque nous travaillerons avec des réseaux neuronaux convolutifs,
+cette technique deviendra encore plus pratique
+puisque la dimensionnalité d'entrée
+(c'est-à-dire la résolution d'une image)
+affectera la dimensionnalité
+de chaque couche suivante.
+Ainsi, la possibilité de définir des paramètres
+sans avoir besoin de savoir,
+au moment de l'écriture du code,
+quelle est la dimensionnalité
+peut grandement simplifier la tâche de spécification
+et de modification ultérieure de nos modèles.
+Ensuite, nous allons approfondir les mécanismes d'initialisation.
+
+
+Pour commencer, instancions un MLP.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -74,11 +74,11 @@ net = tf.keras.models.Sequential([
 ])
 ```
 
-At this point, the network cannot possibly know
-the dimensions of the input layer's weights
-because the input dimension remains unknown.
-Consequently the framework has not yet initialized any parameters.
-We confirm by attempting to access the parameters below.
+À ce stade, le réseau ne peut pas connaître
+les dimensions des poids de la couche d'entrée
+car la dimension de l'entrée reste inconnue.
+Par conséquent, le cadre n'a pas encore initialisé de paramètres.
+Nous confirmons en essayant d'accéder aux paramètres ci-dessous.
 
 ```{.python .input}
 %%tab mxnet
@@ -97,21 +97,21 @@ net[0].weight
 ```
 
 :begin_tab:`mxnet`
-Note that while the parameter objects exist,
-the input dimension to each layer is listed as -1.
-MXNet uses the special value -1 to indicate
-that the parameter dimension remains unknown.
-At this point, attempts to access `net[0].weight.data()`
-would trigger a runtime error stating that the network
-must be initialized before the parameters can be accessed.
-Now let's see what happens when we attempt to initialize
-parameters via the `initialize` method.
+Notez que bien que les objets paramètres existent,
+la dimension d'entrée de chaque couche est listée comme -1.
+MXNet utilise la valeur spéciale -1 pour indiquer
+que la dimension du paramètre reste inconnue.
+À ce stade, toute tentative d'accès à `net[0].weight.data()`
+ déclencherait une erreur d'exécution indiquant que le réseau
+doit être initialisé avant de pouvoir accéder aux paramètres.
+Voyons maintenant ce qui se passe lorsque nous tentons d'initialiser les paramètres
+via la méthode `initialize`.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Note that each layer objects exist but the weights are empty.
-Using `net.get_weights()` would throw an error since the weights
-have not been initialized yet.
+Notez que les objets de chaque couche existent mais que les poids sont vides.
+L'utilisation de `net.get_weights()` entraînerait une erreur puisque les poids
+n'ont pas encore été initialisés.
 :end_tab:
 
 ```{.python .input}
@@ -121,16 +121,16 @@ net.collect_params()
 ```
 
 :begin_tab:`mxnet`
-As we can see, nothing has changed.
-When input dimensions are unknown,
-calls to initialize do not truly initialize the parameters.
-Instead, this call registers to MXNet that we wish
-(and optionally, according to which distribution)
-to initialize the parameters.
+Comme nous pouvons le constater, rien n'a changé.
+Lorsque les dimensions d'entrée sont inconnues, les appels à l'initialisation de
+n'initialisent pas vraiment les paramètres.
+Au lieu de cela, cet appel enregistre auprès de MXNet que nous souhaitons que
+(et éventuellement, selon quelle distribution)
+initialise les paramètres.
 :end_tab:
 
-Next let's pass data through the network
-to make the framework finally initialize parameters.
+Passons ensuite les données à travers le réseau
+pour que le framework initialise finalement les paramètres.
 
 ```{.python .input}
 %%tab mxnet
@@ -155,27 +155,27 @@ net(X)
 [w.shape for w in net.get_weights()]
 ```
 
-As soon as we know the input dimensionality,
+Dès que nous connaissons la dimensionnalité d'entrée,
 20,
-the framework can identify the shape of the first layer's weight matrix by plugging in the value of 20.
-Having recognized the first layer's shape, the framework proceeds
-to the second layer,
-and so on through the computational graph
-until all shapes are known.
-Note that in this case,
-only the first layer requires lazy initialization,
-but the framework initializes sequentially.
-Once all parameter shapes are known,
-the framework can finally initialize the parameters.
+le cadre peut identifier la forme de la matrice de poids de la première couche en introduisant la valeur de 20.
+Ayant reconnu la forme de la première couche, le cadre passe à
+à la deuxième couche,
+et ainsi de suite à travers le graphe de calcul
+jusqu'à ce que toutes les formes soient connues.
+Notez que dans ce cas,
+seule la première couche nécessite une initialisation paresseuse,
+mais le framework initialise séquentiellement.
+Une fois que toutes les formes de paramètres sont connues,
+le cadre peut enfin initialiser les paramètres.
 
 :begin_tab:`pytorch`
-The following method
-passes in dummy inputs
-through the network
-for a dry run
-to infer all parameter shapes
-and subsequently initializes the parameters.
-It will be used later when default random initializations are not desired.
+La méthode suivante
+fait passer des entrées fictives
+par le réseau
+pour un essai
+afin de déduire toutes les formes de paramètres
+et d'initialiser ensuite les paramètres.
+Elle sera utilisée plus tard lorsque les initialisations aléatoires par défaut ne sont pas souhaitées.
 :end_tab:
 
 ```{.python .input}
@@ -187,17 +187,17 @@ def apply_init(self, inputs, init=None):
         self.net.apply(init)
 ```
 
-## Summary
+## Résumé
 
-* Lazy initialization can be convenient, allowing the framework to infer parameter shapes automatically, making it easy to modify architectures and eliminating one common source of errors.
-* We can pass data through the model to make the framework finally initialize parameters.
+* L'initialisation paresseuse peut être pratique, permettant au cadre de déduire automatiquement les formes des paramètres, facilitant la modification des architectures et éliminant une source commune d'erreurs.
+* Nous pouvons passer des données à travers le modèle pour que le framework initialise finalement les paramètres.
 
 
-## Exercises
+## Exercices
 
-1. What happens if you specify the input dimensions to the first layer but not to subsequent layers? Do you get immediate initialization?
-1. What happens if you specify mismatching dimensions?
-1. What would you need to do if you have input of varying dimensionality? Hint: look at the parameter tying.
+1. Que se passe-t-il si vous spécifiez les dimensions d'entrée à la première couche mais pas aux couches suivantes ? Obtenez-vous une initialisation immédiate ?
+1. Que se passe-t-il si vous spécifiez des dimensions non concordantes ?
+1. Que devez-vous faire si vous avez des entrées de dimensions variables ? Indice : regardez la liaison des paramètres.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/280)

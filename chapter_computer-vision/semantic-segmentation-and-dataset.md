@@ -1,48 +1,48 @@
-# Semantic Segmentation and the Dataset
-:label:`sec_semantic_segmentation`
+# Segmentation sémantique et ensemble de données
+:label:`sec_semantic_segmentation` 
 
-When discussing object detection tasks
-in :numref:`sec_bbox`--:numref:`sec_rcnn`,
-rectangular bounding boxes
-are used to label and predict objects in images.
-This section will discuss the problem of *semantic segmentation*,
-which focuses on how to divide an image into regions belonging to different semantic classes.
-Different from object detection,
-semantic segmentation
-recognizes and understands
-what are in images in pixel level:
-its labeling and prediction of semantic regions are
-in pixel level.
-:numref:`fig_segmentation` shows the labels
-of the dog, cat, and background of the image in semantic segmentation.
-Compared with in object detection,
-the pixel-level borders labeled
-in semantic segmentation are obviously more fine-grained.
+ Lorsque l'on aborde les tâches de détection d'objets
+dans :numref:`sec_bbox` --:numref:`sec_rcnn` ,
+les boîtes de délimitation rectangulaires
+sont utilisées pour étiqueter et prédire les objets dans les images.
+Cette section aborde le problème de la *segmentation sémantique*,
+qui se concentre sur la manière de diviser une image en régions appartenant à différentes classes sémantiques.
+Contrairement à la détection d'objets,
+la segmentation sémantique
+reconnaît et comprend
+ce qui se trouve dans les images au niveau du pixel :
+son étiquetage et sa prédiction des régions sémantiques sont
+au niveau du pixel.
+:numref:`fig_segmentation` montre les étiquettes
+du chien, du chat et de l'arrière-plan de l'image dans la segmentation sémantique.
+Par rapport à la détection d'objets,
+les frontières au niveau du pixel étiquetées
+dans la segmentation sémantique sont évidemment plus fines.
 
 
 ![Labels of the dog, cat, and background of the image in semantic segmentation.](../img/segmentation.svg)
 :label:`fig_segmentation`
 
 
-## Image Segmentation and Instance Segmentation
+## Segmentation d'images et segmentation d'instances
 
-There are also two important tasks
-in the field of computer vision that are similar to semantic segmentation,
-namely image segmentation and instance segmentation.
-We will briefly
-distinguish them from semantic segmentation as follows.
+Il existe également deux tâches importantes
+dans le domaine de la vision par ordinateur qui sont similaires à la segmentation sémantique,
+à savoir la segmentation d'images et la segmentation d'instances.
+Nous allons brièvement
+les distinguer de la segmentation sémantique comme suit.
 
-* *Image segmentation* divides an image into several constituent regions. The methods for this type of problem usually make use of the correlation between pixels in the image. It does not need label information about image pixels during training, and it cannot guarantee that the segmented regions will have the semantics that we hope to obtain during prediction. Taking the image in :numref:`fig_segmentation` as input, image segmentation may divide the dog into two regions: one covers the mouth and eyes which are mainly black, and the other covers the rest of the body which is mainly yellow.
-* *Instance segmentation* is also called *simultaneous detection and segmentation*. It studies how to recognize the pixel-level regions of each object instance in an image. Different from semantic segmentation, instance segmentation needs to distinguish not only semantics, but also different object instances. For example, if there are two dogs in the image, instance segmentation needs to distinguish which of the two dogs a pixel belongs to.
+* *La segmentation d'image* divise une image en plusieurs régions constitutives. Les méthodes pour ce type de problème utilisent généralement la corrélation entre les pixels de l'image. Elles n'ont pas besoin d'informations sur les étiquettes des pixels de l'image pendant l'apprentissage et ne peuvent pas garantir que les régions segmentées auront la sémantique que nous espérons obtenir pendant la prédiction. En prenant l'image dans :numref:`fig_segmentation` comme entrée, la segmentation d'image peut diviser le chien en deux régions : l'une couvre la bouche et les yeux qui sont principalement noirs, et l'autre couvre le reste du corps qui est principalement jaune.
+* *La segmentation d'instance* est également appelée *détection et segmentation simultanées*. Elle étudie comment reconnaître les régions au niveau du pixel de chaque instance d'objet dans une image. Contrairement à la segmentation sémantique, la segmentation d'instance doit distinguer non seulement la sémantique, mais aussi les différentes instances d'objets. Par exemple, s'il y a deux chiens dans l'image, la segmentation d'instance doit distinguer auquel des deux chiens appartient un pixel.
 
 
 
-## The Pascal VOC2012 Semantic Segmentation Dataset
+## Le jeu de données de segmentation sémantique Pascal VOC2012
 
-[**On of the most important semantic segmentation dataset
-is [Pascal VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/).**]
-In the following,
-we will take a look at this dataset.
+[**L'un des jeux de données de segmentation sémantique les plus importants
+est [Pascal VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/).**]
+Dans ce qui suit,
+nous allons examiner ce jeu de données.
 
 ```{.python .input}
 #@tab mxnet
@@ -63,9 +63,9 @@ import torchvision
 import os
 ```
 
-The tar file of the dataset is about 2 GB,
-so it may take a while to download the file.
-The extracted dataset is located at `../data/VOCdevkit/VOC2012`.
+Le fichier tar de l'ensemble de données est d'environ 2 Go,
+. Le téléchargement du fichier peut donc prendre un certain temps.
+L'ensemble de données extrait est situé à l'adresse `../data/VOCdevkit/VOC2012`.
 
 ```{.python .input}
 #@tab all
@@ -76,18 +76,18 @@ d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
 voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
 ```
 
-After entering the path `../data/VOCdevkit/VOC2012`,
-we can see the different components of the dataset.
-The `ImageSets/Segmentation` path contains text files
-that specify training and test samples,
-while the `JPEGImages` and `SegmentationClass` paths
-store the input image and label for each example, respectively.
-The label here is also in the image format,
-with the same size
-as its labeled input image.
-Besides,
-pixels with the same color in any label image belong to the same semantic class.
-The following defines the `read_voc_images` function to [**read all the input images and labels into the memory**].
+Après avoir entré le chemin `../data/VOCdevkit/VOC2012`,
+nous pouvons voir les différents composants de l'ensemble de données.
+Le chemin `ImageSets/Segmentation` contient des fichiers texte
+qui spécifient les échantillons d'entraînement et de test,
+tandis que les chemins `JPEGImages` et `SegmentationClass`
+ stockent l'image d'entrée et l'étiquette pour chaque exemple, respectivement.
+Ici, l'étiquette est également au format image,
+avec la même taille
+que son image d'entrée étiquetée.
+En outre, les pixels
+ayant la même couleur dans toute image d'étiquette appartiennent à la même classe sémantique.
+Le texte suivant définit la fonction `read_voc_images` pour [**lire toutes les images d'entrée et les étiquettes dans la mémoire**].
 
 ```{.python .input}
 #@tab mxnet
@@ -130,8 +130,8 @@ def read_voc_images(voc_dir, is_train=True):
 train_features, train_labels = read_voc_images(voc_dir, True)
 ```
 
-We [**draw the first five input images and their labels**].
-In the label images, white and black represent borders and  background, respectively, while the other colors correspond to different classes.
+Nous [**dessinons les cinq premières images d'entrée et leurs étiquettes**].
+Dans les images d'étiquettes, le blanc et le noir représentent respectivement les bordures et le fond, tandis que les autres couleurs correspondent aux différentes classes.
 
 ```{.python .input}
 #@tab mxnet
@@ -148,9 +148,9 @@ imgs = [img.permute(1,2,0) for img in imgs]
 d2l.show_images(imgs, 2, n);
 ```
 
-Next, we [**enumerate
-the RGB color values and class names**]
-for all the labels in this dataset.
+Ensuite, nous [**énumérons
+les valeurs des couleurs RVB et les noms des classes**]
+pour toutes les étiquettes de cet ensemble de données.
 
 ```{.python .input}
 #@tab all
@@ -169,14 +169,14 @@ VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
                'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
 ```
 
-With the two constants defined above,
-we can conveniently
-[**find the class index for each pixel in a label**].
-We define the `voc_colormap2label` function
-to build the mapping from the above RGB color values
-to class indices,
-and the `voc_label_indices` function
-to map any RGB values to their class indices in this Pascal VOC2012 dataset.
+Avec les deux constantes définies ci-dessus,
+nous pouvons facilement
+[**trouver l'indice de classe pour chaque pixel dans une étiquette**].
+Nous définissons la fonction `voc_colormap2label`
+ pour construire le mappage des valeurs de couleur RVB ci-dessus
+aux indices de classe,
+et la fonction `voc_label_indices`
+ pour mapper toute valeur RVB à ses indices de classe dans cet ensemble de données Pascal VOC2012.
 
 ```{.python .input}
 #@tab mxnet
@@ -218,9 +218,9 @@ def voc_label_indices(colormap, colormap2label):
     return colormap2label[idx]
 ```
 
-[**For example**], in the first example image,
-the class index for the front part of the airplane is 1,
-while the background index is 0.
+[**Par exemple**], dans la première image d'exemple,
+l'indice de classe pour la partie avant de l'avion est 1,
+alors que l'indice de fond est 0.
 
 ```{.python .input}
 #@tab all
@@ -228,20 +228,20 @@ y = voc_label_indices(train_labels[0], voc_colormap2label())
 y[105:115, 130:140], VOC_CLASSES[1]
 ```
 
-### Data Preprocessing
+### Prétraitement des données
 
-In previous experiments
-such as in :numref:`sec_alexnet`--:numref:`sec_googlenet`,
-images are rescaled
-to fit the model's required input shape.
-However, in semantic segmentation,
-doing so
-requires rescaling the predicted pixel classes
-back to the original shape of the input image.
-Such rescaling may be inaccurate,
-especially for segmented regions with different classes. To avoid this issue,
-we crop the image to a *fixed* shape instead of rescaling. Specifically, [**using random cropping from image augmentation, we crop the same area of
-the input image and the label**].
+Dans les expériences précédentes
+, comme dans :numref:`sec_alexnet` --:numref:`sec_googlenet` ,
+les images sont redimensionnées
+pour s'adapter à la forme d'entrée requise par le modèle.
+Cependant, dans le cadre de la segmentation sémantique,
+, cette opération
+nécessite de redimensionner les classes de pixels prédites
+pour les ramener à la forme originale de l'image d'entrée.
+Une telle remise à l'échelle peut être inexacte,
+surtout pour les régions segmentées avec des classes différentes. Pour éviter ce problème,
+nous recadrons l'image à une forme *fixe* au lieu de la remettre à l'échelle. Plus précisément, [**en utilisant un recadrage aléatoire à partir de l'augmentation de l'image, nous recadrons la même zone de
+l'image d'entrée et l'étiquette**].
 
 ```{.python .input}
 #@tab mxnet
@@ -283,19 +283,19 @@ imgs = [img.permute(1, 2, 0) for img in imgs]
 d2l.show_images(imgs[::2] + imgs[1::2], 2, n);
 ```
 
-### [**Custom Semantic Segmentation Dataset Class**]
+### [**Classe de jeu de données de segmentation sémantique personnalisée**]
 
-We define a custom semantic segmentation dataset class `VOCSegDataset` by inheriting the `Dataset` class provided by high-level APIs.
-By implementing the `__getitem__` function,
-we can arbitrarily access the input image indexed as `idx` in the dataset and the class index of each pixel in this image.
-Since some images in the dataset
-have a smaller size
-than the output size of random cropping,
-these examples are filtered out
-by a custom `filter` function.
-In addition, we also
-define the `normalize_image` function to
-standardize the values of the three RGB channels of input images.
+Nous définissons une classe de jeu de données de segmentation sémantique personnalisée `VOCSegDataset` en héritant de la classe `Dataset` fournie par les API de haut niveau.
+En implémentant la fonction `__getitem__`,
+nous pouvons accéder arbitrairement à l'image d'entrée indexée comme `idx` dans le jeu de données et à l'indice de classe de chaque pixel dans cette image.
+Étant donné que certaines images de l'ensemble de données
+ont une taille plus petite
+que la taille de sortie du recadrage aléatoire,
+ces exemples sont filtrés
+par une fonction personnalisée `filter`.
+
+En outre, nous définissons également la fonction `normalize_image` pour
+normaliser les valeurs des trois canaux RVB des images d'entrée.
 
 ```{.python .input}
 #@tab mxnet
@@ -365,14 +365,14 @@ class VOCSegDataset(torch.utils.data.Dataset):
         return len(self.features)
 ```
 
-### [**Reading the Dataset**]
+### [**Lire l'ensemble de données**]
 
-We use the custom `VOCSegDatase`t class to
-create instances of the training set and test set, respectively.
-Suppose that
-we specify that the output shape of randomly cropped images is $320\times 480$.
-Below we can view the number of examples
-that are retained in the training set and test set.
+Nous utilisons la classe personnalisée `VOCSegDatase`t pour
+créer des instances de l'ensemble d'entraînement et de l'ensemble de test, respectivement.
+Supposons que
+nous spécifions que la forme de sortie des images recadrées de manière aléatoire est $320\times 480$.
+Nous pouvons voir ci-dessous le nombre d'exemples
+qui sont retenus dans l'ensemble d'entraînement et l'ensemble de test.
 
 ```{.python .input}
 #@tab all
@@ -381,10 +381,10 @@ voc_train = VOCSegDataset(True, crop_size, voc_dir)
 voc_test = VOCSegDataset(False, crop_size, voc_dir)
 ```
 
-Setting the batch size to 64,
-we define the data iterator for the training set.
-Let's print the shape of the first minibatch.
-Different from in image classification or object detection, labels here are three-dimensional tensors.
+En fixant la taille du lot à 64,
+nous définissons l'itérateur de données pour l'ensemble d'entraînement.
+Imprimons la forme du premier minibatch.
+Contrairement à la classification d'images ou à la détection d'objets, les étiquettes sont ici des tenseurs tridimensionnels.
 
 ```{.python .input}
 #@tab mxnet
@@ -412,9 +412,9 @@ for X, Y in train_iter:
 
 ### [**Putting All Things Together**]
 
-Finally, we define the following `load_data_voc` function
-to download and read the Pascal VOC2012 semantic segmentation dataset.
-It returns data iterators for both the training and test datasets.
+Enfin, nous définissons la fonction suivante `load_data_voc`
+ pour télécharger et lire le jeu de données de segmentation sémantique Pascal VOC2012.
+Elle renvoie des itérateurs de données pour les ensembles de données d'entraînement et de test.
 
 ```{.python .input}
 #@tab mxnet
@@ -450,17 +450,17 @@ def load_data_voc(batch_size, crop_size):
     return train_iter, test_iter
 ```
 
-## Summary
+## Résumé
 
-* Semantic segmentation recognizes and understands what are in an image in pixel level by dividing the image into regions belonging to different semantic classes.
-* One of the most important semantic segmentation dataset is Pascal VOC2012.
-* In semantic segmentation, since the input image and  label correspond one-to-one on the pixel, the input image is randomly cropped to a fixed shape rather than rescaled.
+* La segmentation sémantique reconnaît et comprend ce qui se trouve dans une image au niveau du pixel en divisant l'image en régions appartenant à différentes classes sémantiques.
+* L'un des plus importants jeux de données de segmentation sémantique est le Pascal VOC2012.
+* Dans la segmentation sémantique, puisque l'image d'entrée et l'étiquette correspondent de manière biunivoque au niveau du pixel, l'image d'entrée est recadrée de manière aléatoire à une forme fixe plutôt que d'être redimensionnée.
 
 
-## Exercises
+## Exercices
 
-1. How can semantic segmentation be applied in autonomous vehicles and medical image diagnostics? Can you think of other applications?
-1. Recall the descriptions of data augmentation in :numref:`sec_image_augmentation`. Which of the image augmentation methods used in image classification would be infeasible to be applied in semantic segmentation?
+1. Comment la segmentation sémantique peut-elle être appliquée aux véhicules autonomes et aux diagnostics d'images médicales ? Pouvez-vous imaginer d'autres applications ?
+1. Rappelez-vous les descriptions de l'augmentation des données dans :numref:`sec_image_augmentation` . Parmi les méthodes d'augmentation des données utilisées dans la classification d'images, lesquelles ne pourraient pas être appliquées à la segmentation sémantique ?
 
 
 :begin_tab:`mxnet`

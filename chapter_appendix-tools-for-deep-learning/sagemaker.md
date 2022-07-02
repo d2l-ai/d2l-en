@@ -1,116 +1,116 @@
-# Using Amazon SageMaker
-:label:`sec_sagemaker`
+# Utilisation d'Amazon SageMaker
+:label:`sec_sagemaker` 
 
-Deep learning applications
-may demand so much computational resource
-that easily goes beyond
-what your local machine can offer.
-Cloud computing services
-allow you to 
-run GPU-intensive code of this book
-more easily
-using more powerful computers.
-This section will introduce 
-how to use Amazon SageMaker
-to run the code of this book.
+ Les applications d'apprentissage profond
+peuvent demander tellement de ressources informatiques
+qu'elles dépassent facilement
+ce que votre machine locale peut offrir.
+Les services de cloud computing
+vous permettent d'exécuter 
+le code intensif en GPU de ce livre
+plus facilement
+en utilisant des ordinateurs plus puissants.
+Cette section présente 
+comment utiliser Amazon SageMaker
+pour exécuter le code de ce livre.
 
-## Signing Up
+## S'inscrire
 
-First, we need to sign up an account at https://aws.amazon.com/.
-For additional security,
-using two-factor authentication 
-is encouraged.
-It is also a good idea to
-set up detailed billing and spending alerts to
-avoid any surprise,
-e.g., 
-when forgetting to stop running instances.
-After logging into your AWS account, 
-o to your [console](http://console.aws.amazon.com/) and search for "Amazon SageMaker" (see :numref:`fig_sagemaker`), 
-then click it to open the SageMaker panel.
+Tout d'abord, nous devons créer un compte sur https://aws.amazon.com/.
+Pour plus de sécurité,
+il est recommandé d'utiliser une authentification à deux facteurs 
+.
+C'est également une bonne idée de
+configurer une facturation détaillée et des alertes de dépenses pour
+éviter toute surprise,
+par exemple, 
+en cas d'oubli d'arrêter les instances en cours.
+Après vous être connecté à votre compte AWS, 
+o à votre [console](http://console.aws.amazon.com/) et recherchez "Amazon SageMaker" (voir :numref:`fig_sagemaker` ), 
+puis cliquez dessus pour ouvrir le panneau SageMaker.
 
 ![Search for and open the SageMaker panel.](../img/sagemaker.png)
 :width:`300px`
 :label:`fig_sagemaker`
 
-## Creating a SageMaker Instance
+## Création d'une instance SageMaker
 
-Next, let's create a notebook instance as described in :numref:`fig_sagemaker-create`.
+Ensuite, créons une instance de notebook comme décrit dans :numref:`fig_sagemaker-create` .
 
 ![Create a SageMaker instance.](../img/sagemaker-create.png)
 :width:`400px`
 :label:`fig_sagemaker-create`
 
-SageMaker provides multiple [instance types](https://aws.amazon.com/sagemaker/pricing/instance-types/) with varying computational power and prices.
-When creating a notebook instance,
-we can specify its name and type.
-In :numref:`fig_sagemaker-create-2`, we choose `ml.p3.2xlarge`: with one Tesla V100 GPU and an 8-core CPU, this instance is powerful enough for most of the book.
+SageMaker propose plusieurs instances [instance types](https://aws.amazon.com/sagemaker/pricing/instance-types/) dont la puissance de calcul et le prix varient.
+Lors de la création d'une instance de notebook,
+nous pouvons spécifier son nom et son type.
+Dans :numref:`fig_sagemaker-create-2` , nous choisissons `ml.p3.2xlarge`: avec un GPU Tesla V100 et un CPU à 8 cœurs, cette instance est suffisamment puissante pour la majeure partie du livre.
 
 ![Choose the instance type.](../img/sagemaker-create-2.png)
 :width:`400px`
 :label:`fig_sagemaker-create-2`
 
 :begin_tab:`mxnet`
-The entire book in the ipynb format for running with SageMaker is available at https://github.com/d2l-ai/d2l-en-sagemaker. We can specify this GitHub repository URL (:numref:`fig_sagemaker-create-3`) to allow SageMaker to clone it when creating the instance.
+Le livre entier au format ipynb pour être exécuté avec SageMaker est disponible sur https://github.com/d2l-ai/d2l-en-sagemaker. Nous pouvons spécifier l'URL de ce dépôt GitHub (:numref:`fig_sagemaker-create-3` ) pour permettre à SageMaker de le cloner lors de la création de l'instance.
 :end_tab:
 
 :begin_tab:`pytorch`
-The entire book in the ipynb format for running with SageMaker is available at https://github.com/d2l-ai/d2l-pytorch-sagemaker. We can specify this GitHub repository URL (:numref:`fig_sagemaker-create-3`) to allow SageMaker to clone it when creating the instance.
+Le livre entier au format ipynb pour l'exécution avec SageMaker est disponible à l'adresse https://github.com/d2l-ai/d2l-pytorch-sagemaker. Nous pouvons spécifier l'URL du dépôt GitHub (:numref:`fig_sagemaker-create-3` ) pour permettre à SageMaker de le cloner lors de la création de l'instance.
 :end_tab:
 
 :begin_tab:`tensorflow`
-The entire book in the ipynb format for running with SageMaker is available at https://github.com/d2l-ai/d2l-tensorflow-sagemaker. We can specify this GitHub repository URL (:numref:`fig_sagemaker-create-3`) to allow SageMaker to clone it when creating the instance.
+Le livre entier au format ipynb pour l'exécution avec SageMaker est disponible à l'adresse https://github.com/d2l-ai/d2l-tensorflow-sagemaker. Nous pouvons spécifier l'URL du dépôt GitHub (:numref:`fig_sagemaker-create-3` ) pour permettre à SageMaker de le cloner lors de la création de l'instance.
 :end_tab:
 
 ![Specify the GitHub repository.](../img/sagemaker-create-3.png)
 :width:`400px`
 :label:`fig_sagemaker-create-3`
 
-## Running and Stopping an Instance
+## Exécution et arrêt d'une instance
 
-Creating an instance
-may take a few minutes.
-When the instance is ready,
-click on the "Open Jupyter" link next to it (:numref:`fig_sagemaker-open`) so you can
-edit and run all the Jupyter notebooks
-of this book on this instance
-(similar to steps in :numref:`sec_jupyter`).
+La création d'une instance
+peut prendre quelques minutes.
+Lorsque l'instance est prête,
+cliquez sur le lien " Open Jupyter " situé à côté (:numref:`fig_sagemaker-open` ) pour pouvoir
+éditer et exécuter tous les notebooks Jupyter
+de ce livre sur cette instance
+(similaire aux étapes de :numref:`sec_jupyter` ).
 
 ![Open Jupyter on the created SageMaker instance.](../img/sagemaker-open.png)
 :width:`400px`
 :label:`fig_sagemaker-open`
 
 
-After finishing your work,
-don't forget to stop the instance to avoid 
-being charged further (:numref:`fig_sagemaker-stop`).
+Après avoir terminé votre travail,
+n'oubliez pas d'arrêter l'instance pour éviter que 
+ne soit facturé davantage (:numref:`fig_sagemaker-stop` ).
 
 ![Stop a SageMaker instance.](../img/sagemaker-stop.png)
 :width:`300px`
 :label:`fig_sagemaker-stop`
 
-## Updating Notebooks
+## Mise à jour des notebooks
 
-:begin_tab:`mxnet`
-Notebooks of this open-source book will be regularly updated in the [d2l-ai/d2l-en-sagemaker](https://github.com/d2l-ai/d2l-en-sagemaker) repository
-on GitHub.
-To update to the latest version,
-you may open a terminal on the SageMaker instance (:numref:`fig_sagemaker-terminal`).
+:begin_tab:`mxnet` 
+ Les notebooks de ce livre open-source seront régulièrement mis à jour dans le dépôt [d2l-ai/d2l-en-sagemaker](https://github.com/d2l-ai/d2l-en-sagemaker)
+ sur GitHub.
+Pour mettre à jour la dernière version,
+vous pouvez ouvrir un terminal sur l'instance SageMaker (:numref:`fig_sagemaker-terminal` ).
 :end_tab:
 
 :begin_tab:`pytorch`
-Notebooks of this open-source book will be regularly updated in the [d2l-ai/d2l-pytorch-sagemaker](https://github.com/d2l-ai/d2l-pytorch-sagemaker) repository
-on GitHub.
-To update to the latest version,
-you may open a terminal on the SageMaker instance (:numref:`fig_sagemaker-terminal`).
+Les notebooks de ce livre open-source seront régulièrement mis à jour dans le dépôt [d2l-ai/d2l-pytorch-sagemaker](https://github.com/d2l-ai/d2l-pytorch-sagemaker)
+ sur GitHub.
+Pour mettre à jour la dernière version,
+vous pouvez ouvrir un terminal sur l'instance SageMaker (:numref:`fig_sagemaker-terminal` ).
 :end_tab:
 
 
 :begin_tab:`tensorflow`
-Notebooks of this open-source book will be regularly updated in the [d2l-ai/d2l-tensorflow-sagemaker](https://github.com/d2l-ai/d2l-tensorflow-sagemaker) repository
-on GitHub.
-To update to the latest version,
-you may open a terminal on the SageMaker instance (:numref:`fig_sagemaker-terminal`).
+Les notebooks de ce livre open-source seront régulièrement mis à jour dans le dépôt [d2l-ai/d2l-tensorflow-sagemaker](https://github.com/d2l-ai/d2l-tensorflow-sagemaker)
+ sur GitHub.
+Pour mettre à jour la dernière version,
+, vous pouvez ouvrir un terminal sur l'instance SageMaker (:numref:`fig_sagemaker-terminal` ).
 :end_tab:
 
 
@@ -118,11 +118,11 @@ you may open a terminal on the SageMaker instance (:numref:`fig_sagemaker-termin
 :width:`300px`
 :label:`fig_sagemaker-terminal`
 
-You may wish to commit your local changes before pulling updates from the remote repository. 
-Otherwise, simply discard all your local changes
-with the following commands in the terminal:
+Vous pouvez valider vos modifications locales avant de récupérer les mises à jour du dépôt distant. 
+Sinon, il suffit de supprimer toutes vos modifications locales
+avec les commandes suivantes dans le terminal:
 
-:begin_tab:`mxnet`
+:begin_tab :`mxnet`
 
 ```bash
 cd SageMaker/d2l-en-sagemaker/
@@ -155,17 +155,17 @@ git pull
 
 :end_tab:
 
-## Summary
+## Résumé
 
-* We can create a notebook instance using Amazon SageMaker to run GPU-intensive code of this book.
-* We can update notebooks via the terminal on the Amazon SageMaker instance.
-
-
-## Exercises
+* Nous pouvons créer une instance de notebook en utilisant Amazon SageMaker pour exécuter le code intensif en GPU de ce livre.
+* Nous pouvons mettre à jour les notebooks via le terminal sur l'instance Amazon SageMaker.
 
 
-1. Edit and run any section that requires a GPU using Amazon SageMaker.
-1. Open a terminal to access the local directory that hosts all the notebooks of this book.
+## Exercices
+
+
+ 1. Modifiez et exécutez toute section qui nécessite un GPU en utilisant Amazon SageMaker.
+1. Ouvrez un terminal pour accéder au répertoire local qui héberge tous les notebooks de ce livre.
 
 
 [Discussions](https://discuss.d2l.ai/t/422)

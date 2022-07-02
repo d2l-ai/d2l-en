@@ -3,34 +3,34 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Linear Regression Implementation from Scratch
-:label:`sec_linear_scratch`
+# Implémentation de la régression linéaire à partir de zéro
+:label:`sec_linear_scratch` 
 
-We're now ready to work through 
-a fully functioning implementation 
-of linear regression. 
-In this section, 
-(**we will implement the entire method from scratch,
-including (i) the model; (ii) the loss function;
-(iii) a minibatch stochastic gradient descent optimizer;
-and (iv) the training function 
-that stitches all of these pieces together.**)
-Finally, we will run our synthetic data generator
-from :numref:`sec_synthetic-regression-data`
-and apply our model
-on the resulting dataset. 
-While modern deep learning frameworks 
-can automate nearly all of this work,
-implementing things from scratch is the only way
-to make sure that you really know what you are doing.
-Moreover, when it comes time to customize models,
-defining our own layers or loss functions,
-understanding how things work under the hood will prove handy.
-In this section, we will rely only 
-on tensors and automatic differentiation.
-Later on, we will introduce a more concise implementation,
-taking advantage of bells and whistles of deep learning frameworks 
-while retaining the structure of what follows below.
+ Nous sommes maintenant prêts à travailler sur 
+une implémentation entièrement fonctionnelle 
+de la régression linéaire. 
+Dans cette section, 
+(**nous implémenterons l'ensemble de la méthode à partir de zéro,
+y compris (i) le modèle ; (ii) la fonction de perte ;
+(iii) un optimiseur stochastique de descente de gradient en minibatch ;
+et (iv) la fonction d'entraînement 
+qui assemble tous ces éléments.**)
+Enfin, nous allons exécuter notre générateur de données synthétiques
+à partir de :numref:`sec_synthetic-regression-data` 
+ et appliquer notre modèle
+sur le jeu de données résultant. 
+Bien que les cadres modernes d'apprentissage profond 
+puissent automatiser la quasi-totalité de ce travail,
+mettre en œuvre des choses à partir de zéro est la seule façon
+de s'assurer que vous savez vraiment ce que vous faites.
+En outre, lorsqu'il s'agit de personnaliser des modèles,
+en définissant nos propres couches ou fonctions de perte,
+comprendre comment les choses fonctionnent sous le capot s'avérera pratique.
+Dans cette section, nous nous appuierons uniquement sur 
+les tenseurs et la différenciation automatique.
+Plus tard, nous présenterons une mise en œuvre plus concise,
+tirant parti des cloches et des sifflets des cadres d'apprentissage profond 
+tout en conservant la structure de ce qui suit.
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -54,19 +54,19 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## Defining the Model
+### Définition du modèle
 
-[**Before we can begin optimizing our model's parameters**] by minibatch SGD,
-(**we need to have some parameters in the first place.**)
-In the following we initialize weights by drawing
-random numbers from a normal distribution with mean 0
-and a standard deviation of 0.01. 
-The magic number 0.01 often works well in practice, 
-but you can specify a different value 
-through the argument `sigma`.
-Moreover we set the bias to 0.
-Note that for object-oriented design
-we add the code to the `__init__` method of a subclass of `d2l.Module` (introduced in :numref:`oo-design-models`).
+[**Avant de pouvoir commencer à optimiser les paramètres de notre modèle**] par minibatch SGD,
+(**nous devons d'abord avoir quelques paramètres.**)
+Dans ce qui suit, nous initialisons les poids en tirant
+des nombres aléatoires d'une distribution normale avec une moyenne de 0
+et un écart-type de 0,01. 
+Le nombre magique 0,01 fonctionne souvent bien dans la pratique, 
+mais vous pouvez spécifier une valeur différente 
+à travers l'argument `sigma`.
+De plus, nous fixons le biais à 0.
+Notez que pour une conception orientée objet
+nous ajoutons le code à la méthode `__init__` d'une sous-classe de `d2l.Module` (introduite dans :numref:`oo-design-models` ).
 
 ```{.python .input  n=5}
 %%tab all
@@ -89,20 +89,20 @@ class LinearRegressionScratch(d2l.Module):  #@save
             self.b = tf.Variable(b, trainable=True)
 ```
 
-Next, we must [**define our model,
-relating its input and parameters to its output.**]
-For our linear model we simply take the matrix-vector product
-of the input features $\mathbf{X}$ 
-and the model weights $\mathbf{w}$,
-and add the offset $b$ to each example.
-$\mathbf{Xw}$ is a vector and $b$ is a scalar.
-Due to the broadcasting mechanism 
-(see :numref:`subsec_broadcasting`),
-when we add a vector and a scalar,
-the scalar is added to each component of the vector.
-The resulting `forward` function 
-is registered as a method in the `LinearRegressionScratch` class
-via `add_to_class` (introduced in :numref:`oo-design-utilities`).
+Ensuite, nous devons [**définir notre modèle,
+en reliant son entrée et ses paramètres à sa sortie.**]
+Pour notre modèle linéaire, nous prenons simplement le produit matrice-vecteur
+des caractéristiques d'entrée $\mathbf{X}$ 
+ et des poids du modèle $\mathbf{w}$,
+et nous ajoutons le décalage $b$ à chaque exemple.
+$\mathbf{Xw}$ est un vecteur et $b$ un scalaire.
+En raison du mécanisme de diffusion 
+(voir :numref:`subsec_broadcasting` ),
+lorsque nous ajoutons un vecteur et un scalaire,
+le scalaire est ajouté à chaque composante du vecteur.
+La fonction `forward` résultante 
+est enregistrée en tant que méthode dans la classe `LinearRegressionScratch`
+ via `add_to_class` (introduit dans :numref:`oo-design-utilities` ).
 
 ```{.python .input  n=6}
 %%tab all
@@ -112,19 +112,19 @@ def forward(self, X):
     return d2l.matmul(X, self.w) + self.b
 ```
 
-## Defining the Loss Function
+## Définition de la fonction de perte
 
-Since [**updating our model requires taking
-the gradient of our loss function,**]
-we ought to (**define the loss function first.**)
-Here we use the squared loss function
-in :eqref:`eq_mse`.
-In the implementation, we need to transform the true value `y`
-into the predicted value's shape `y_hat`.
-The result returned by the following function
-will also have the same shape as `y_hat`. 
-We also return the averaged loss value
-among all examples in the minibatch.
+Puisque [**la mise à jour de notre modèle nécessite de prendre
+le gradient de notre fonction de perte,**]
+nous devons (**définir la fonction de perte en premier.**)
+Ici, nous utilisons la fonction de perte au carré
+dans :eqref:`eq_mse` .
+Dans l'implémentation, nous devons transformer la valeur réelle `y`
+ en la forme de la valeur prédite `y_hat`.
+Le résultat renvoyé par la fonction suivante
+aura également la même forme que `y_hat`. 
+Nous retournons également la valeur de perte moyenne
+parmi tous les exemples du minibatch.
 
 ```{.python .input  n=7}
 %%tab all
@@ -134,62 +134,62 @@ def loss(self, y_hat, y):
     return d2l.reduce_mean(l)
 ```
 
-## Defining the Optimization Algorithm
+## Définition de l'algorithme d'optimisation
 
-As discussed in :numref:`sec_linear_regression`,
-linear regression has a closed-form solution.
-However, our goal here is to illustrate 
-how to train more general neural networks,
-and that requires that we teach you 
-how to use minibatch SGD.
-Hence we will take this opportunity
-to introduce your first working example of SGD.
-At each step, using a minibatch 
-randomly drawn from our dataset,
-we estimate the gradient of the loss
-with respect to the parameters.
-Next, we update the parameters
-in the direction that may reduce the loss.
+Comme nous l'avons vu dans :numref:`sec_linear_regression` ,
+la régression linéaire a une solution à forme fermée.
+Cependant, notre objectif ici est d'illustrer 
+comment former des réseaux neuronaux plus généraux,
+et cela nécessite que nous vous apprenions 
+comment utiliser la SGD par minilots.
+Nous profitons donc de l'occasion
+pour vous présenter votre premier exemple fonctionnel de SGD.
+À chaque étape, en utilisant un minilot 
+tiré au hasard de notre ensemble de données,
+nous estimons le gradient de la perte
+par rapport aux paramètres.
+Ensuite, nous mettons à jour les paramètres
+dans la direction qui peut réduire la perte.
 
-The following code applies the update, 
-given a set of parameters, a learning rate `lr`.
-Since our loss is computed as an average over the minibatch, 
-we don't need to adjust the learning rate against the batch size. 
-In later chapters we will investigate 
-how learning rates should be adjusted
-for very large minibatches as they arise 
-in distributed large scale learning.
-For now, we can ignore this dependency.
+Le code suivant applique la mise à jour, 
+étant donné un ensemble de paramètres, un taux d'apprentissage `lr`.
+Puisque notre perte est calculée comme une moyenne sur le minilot, 
+, nous n'avons pas besoin d'ajuster le taux d'apprentissage en fonction de la taille du lot. 
+Dans les chapitres suivants, nous étudierons 
+comment les taux d'apprentissage doivent être ajustés
+pour les très grands minibatchs, comme cela se produit 
+dans l'apprentissage distribué à grande échelle.
+Pour l'instant, nous pouvons ignorer cette dépendance.
 
  
 
 
 :begin_tab:`mxnet`
-We define our `SGD` class, 
-a subclass of `d2l.HyperParameters` (introduced in :numref:`oo-design-utilities`),
-to have a similar API
-as the built-in SGD optimizer.
-We update the parameters in the `step` method.
-It accepts a `batch_size` argument that can be ignored.
+Nous définissons notre classe `SGD`, 
+une sous-classe de `d2l.HyperParameters` (introduite dans :numref:`oo-design-utilities` ),
+pour avoir une API similaire
+à celle de l'optimiseur SGD intégré.
+Nous mettons à jour les paramètres de la méthode `step`.
+Elle accepte un argument `batch_size` qui peut être ignoré.
 :end_tab:
 
 :begin_tab:`pytorch`
-We define our `SGD` class,
-a subclass of `d2l.HyperParameters` (introduced in :numref:`oo-design-utilities`),
-to have a similar API 
-as the built-in SGD optimizer.
-We update the parameters in the `step` method.
-The `zero_grad` method sets all gradients to 0,
-which must be run before a backpropagation step. 
+Nous définissons notre classe `SGD`,
+une sous-classe de `d2l.HyperParameters` (introduite dans :numref:`oo-design-utilities` ),
+pour avoir une API similaire à 
+comme l'optimiseur SGD intégré.
+Nous mettons à jour les paramètres dans la méthode `step`.
+La méthode `zero_grad` fixe tous les gradients à 0,
+ce qui doit être exécuté avant une étape de rétropropagation. 
 :end_tab:
 
 :begin_tab:`tensorflow`
-We define our `SGD` class,
-a subclass of `d2l.HyperParameters` (introduced in :numref:`oo-design-utilities`),
-to have a similar API
-as the built-in SGD optimizer.
-We update the parameters in the `apply_gradients` method.
-It accepts a list of parameter and gradient pairs. 
+Nous définissons notre classe `SGD`,
+une sous-classe de `d2l.HyperParameters` (introduite dans :numref:`oo-design-utilities` ),
+pour avoir une API similaire
+à celle de l'optimiseur SGD intégré.
+Nous mettons à jour les paramètres dans la méthode `apply_gradients`.
+Elle accepte une liste de paires de paramètres et de gradients 
 :end_tab:
 
 ```{.python .input  n=8}
@@ -227,7 +227,7 @@ class SGD(d2l.HyperParameters):  #@save
             param.assign_sub(self.lr * grad)        
 ```
 
-We next define the `configure_optimizers` method, which returns an instance of the `SGD` class.
+Nous définissons ensuite la méthode `configure_optimizers`, qui renvoie une instance de la classe `SGD`.
 
 ```{.python .input  n=10}
 %%tab all
@@ -239,44 +239,44 @@ def configure_optimizers(self):
         return SGD(self.lr)
 ```
 
-## Training
+## Formation
 
-Now that we have all of the parts in place
-(parameters, loss function, model, and optimizer),
-we are ready to [**implement the main training loop.**]
-It is crucial that you understand this code well
-since you will employ similar training loops
-for every other deep learning model
-covered in this book.
-In each *epoch*, we iterate through 
-the entire training dataset, 
-passing once through every example
-(assuming that the number of examples 
-is divisible by the batch size). 
-In each iteration, we grab a minibatch of training examples,
-and compute its loss through the model's `training_step` method. 
-Next, we compute the gradients with respect to each parameter. 
-Finally, we will call the optimization algorithm
-to update the model parameters. 
-In summary, we will execute the following loop:
+Maintenant que tous les éléments sont en place
+(paramètres, fonction de perte, modèle et optimiseur),
+nous sommes prêts à [**mettre en œuvre la boucle de formation principale.**]
+Il est essentiel que vous compreniez bien ce code
+car vous utiliserez des boucles de formation similaires
+pour tous les autres modèles d'apprentissage profond
+abordés dans ce livre.
+À chaque *époque*, nous itérons à travers 
+l'ensemble des données d'apprentissage, 
+en passant une fois par chaque exemple
+(en supposant que le nombre d'exemples 
+est divisible par la taille du lot). 
+À chaque itération, nous sélectionnons un mini-batch d'exemples d'apprentissage,
+et calculons sa perte par la méthode du modèle `training_step`. 
+Ensuite, nous calculons les gradients par rapport à chaque paramètre. 
+Enfin, nous appelons l'algorithme d'optimisation
+pour mettre à jour les paramètres du modèle. 
+En résumé, nous exécuterons la boucle suivante :
 
-* Initialize parameters $(\mathbf{w}, b)$
-* Repeat until done
-    * Compute gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} l(\mathbf{x}^{(i)}, y^{(i)}, \mathbf{w}, b)$
-    * Update parameters $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
+* Initialiser les paramètres $(\mathbf{w}, b)$
+ * Répéter jusqu'à ce que cela soit fait
+ * Calculer le gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} l(\mathbf{x}^{(i)}, y^{(i)}, \mathbf{w}, b)$
+ * Mettre à jour les paramètres $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
  
-Recall that the synthetic regression dataset 
-that we generated in :numref:``sec_synthetic-regression-data`` 
-does not provide a validation dataset. 
-In most cases, however, 
-we will use a validation dataset 
-to measure our model quality. 
-Here we pass the validation dataloader 
-once in each epoch to measure the model performance.
-Following our object-oriented design,
-the `prepare_batch` and `fit_epoch` functions
-are registered as methods of the `d2l.Trainer` class
-(introduced in :numref:`oo-design-training`).
+ Rappelons que l'ensemble de données de régression synthétique 
+que nous avons généré dans :numref:`` sec_synthetic-regression-data`` 
+ne fournit pas d'ensemble de données de validation. 
+Dans la plupart des cas, cependant, 
+nous utiliserons un ensemble de données de validation 
+pour mesurer la qualité de notre modèle. 
+Ici, nous passons le dataloader de validation 
+une fois dans chaque époque pour mesurer la performance du modèle.
+Conformément à notre conception orientée objet,
+les fonctions `prepare_batch` et `fit_epoch`
+ sont enregistrées en tant que méthodes de la classe `d2l.Trainer`
+ (présentée dans :numref:`oo-design-training` ).
 
 ```{.python .input  n=11}
 %%tab all    
@@ -348,22 +348,22 @@ def fit_epoch(self):
         self.val_batch_idx += 1
 ```
 
-We are almost ready to train the model,
-but first we need some data to train on.
-Here we use the `SyntheticRegressionData` class 
-and pass in some ground-truth parameters.
-Then, we train our model with 
-the learning rate `lr=0.03` 
-and set `max_epochs=3`. 
-Note that in general, both the number of epochs 
-and the learning rate are hyperparameters.
-In general, setting hyperparameters is tricky
-and we will usually want to use a 3-way split,
-one set for training, 
-a second for hyperparameter seclection,
-and the third reserved for the final evaluation.
-We elide these details for now but will revise them
-later.
+Nous sommes presque prêts à entraîner le modèle,
+, mais nous avons d'abord besoin de données pour l'entraînement.
+Ici, nous utilisons la classe `SyntheticRegressionData` 
+ et nous lui passons quelques paramètres de base.
+Ensuite, nous entraînons notre modèle avec 
+le taux d'apprentissage `lr=0.03` 
+ et l'ensemble `max_epochs=3`. 
+Notez qu'en général, le nombre d'époques 
+et le taux d'apprentissage sont des hyperparamètres.
+En général, la définition des hyperparamètres est délicate
+et nous voudrons généralement utiliser une division en trois parties,
+un ensemble pour l'entraînement, 
+un second pour la sélection des hyperparamètres,
+et le troisième réservé à l'évaluation finale.
+Nous éludons ces détails pour l'instant mais nous les réviserons plus tard
+.
 
 ```{.python .input  n=15}
 %%tab all
@@ -373,12 +373,12 @@ trainer = d2l.Trainer(max_epochs=3)
 trainer.fit(model, data)
 ```
 
-Because we synthesized the dataset ourselves,
-we know precisely what the true parameters are.
-Thus, we can [**evaluate our success in training
-by comparing the true parameters
-with those that we learned**] through our training loop.
-Indeed they turn out to be very close to each other.
+Comme nous avons synthétisé nous-mêmes l'ensemble de données,
+nous savons précisément quels sont les vrais paramètres.
+Ainsi, nous pouvons [**évaluer notre succès dans l'entraînement
+en comparant les vrais paramètres
+avec ceux que nous avons appris**] à travers notre boucle d'entraînement.
+En effet, ils s'avèrent être très proches les uns des autres.
 
 ```{.python .input  n=16}
 %%tab all
@@ -386,73 +386,73 @@ print(f'error in estimating w: {data.w - d2l.reshape(model.w, data.w.shape)}')
 print(f'error in estimating b: {data.b - model.b}')
 ```
 
-We should not take the ability to exactly recover 
-the ground-truth parameters for granted.
-In general, for deep models unique solutions
-for the parameters do not exist,
-and even for linear models,
-exactly recovering the parameters
-is only possible when no feature 
-is linearly dependent on the others.
-However, in machine learning, 
-we are often less concerned
-with recovering true underlying parameters,
-and more concerned with parameters 
-that lead to highly accurate prediction :cite:`Vapnik.1992`.
-Fortunately, even on difficult optimization problems,
-stochastic gradient descent can often find remarkably good solutions,
-owing partly to the fact that, for deep networks,
-there exist many configurations of the parameters
-that lead to highly accurate prediction.
+Nous ne devons pas considérer comme acquise la capacité de récupérer exactement les paramètres réels de 
+.
+En général, pour les modèles profonds, il n'existe pas de solutions uniques
+pour les paramètres,
+et même pour les modèles linéaires,
+la récupération exacte des paramètres
+n'est possible que si aucune caractéristique 
+ne dépend linéairement des autres.
+Cependant, dans le domaine de l'apprentissage automatique, 
+nous sommes souvent moins préoccupés
+par la récupération des véritables paramètres sous-jacents,
+et plus préoccupés par les paramètres 
+qui conduisent à une prédiction très précise :cite:`Vapnik.1992` .
+Heureusement, même pour les problèmes d'optimisation difficiles,
+la descente de gradient stochastique peut souvent trouver des solutions remarquablement bonnes,
+en partie grâce au fait que, pour les réseaux profonds,
+il existe de nombreuses configurations des paramètres
+qui conduisent à une prédiction très précise.
 
 
-## Summary
+## Résumé
 
-In this section, we took a significant step 
-towards designing deep learning systems 
-by implementing a fully functional 
-neural network model and training loop.
-In this process, we built a data loader, 
-a model, a loss function, an optimization procedure,
-and a visualization and monitoring tool. 
-We did this by composing a Python object 
-that contains all relevant components for training a model. 
-While this is not yet a professional-grade implementation
-it is perfectly functional and code like this 
-could already help you to solve small problems quickly.
-In the next sections, we will see how to do this
-both *more concisely* (avoiding boilerplate code)
-and *more efficiently* (use our GPUs to their full potential).
+Dans cette section, nous avons fait un pas important 
+vers la conception de systèmes d'apprentissage profond 
+en implémentant un modèle de réseau neuronal 
+entièrement fonctionnel et une boucle de formation.
+Dans ce processus, nous avons construit un chargeur de données, 
+un modèle, une fonction de perte, une procédure d'optimisation,
+et un outil de visualisation et de surveillance. 
+Pour ce faire, nous avons composé un objet Python 
+qui contient tous les composants pertinents pour la formation d'un modèle. 
+Bien qu'il ne s'agisse pas encore d'une implémentation de niveau professionnel
+, elle est parfaitement fonctionnelle et un code comme celui-ci 
+pourrait déjà vous aider à résoudre rapidement de petits problèmes.
+Dans les sections suivantes, nous verrons comment faire
+à la fois *plus concis* (en évitant le code passe-partout)
+et *plus efficace* (en utilisant nos GPU à leur plein potentiel).
 
 
 
-## Exercises
+## Exercices
 
-1. What would happen if we were to initialize the weights to zero. Would the algorithm still work? What if we
-   initialized the parameters with variance $1,000$ rather than $0.01$?
-1. Assume that you are [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up
-   with a model for resistors that relate voltage and current. Can you use automatic
-   differentiation to learn the parameters of your model?
-1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object
-   using spectral energy density? For reference, the spectral density $B$ of radiation emanating from a black body is
-   $B(\lambda, T) = \frac{2 hc^2}{\lambda^5} \cdot \left(\exp \frac{h c}{\lambda k T} - 1\right)^{-1}$. Here
-   $\lambda$ is the wavelength, $T$ is the temperature, $c$ is the speed of light, $h$ is Planck's quantum, and $k$ is the
-   Boltzmann constant. You measure the energy for different wavelengths $\lambda$ and you now need to fit the spectral
-   density curve to Planck's law.
-1. What are the problems you might encounter if you wanted to compute the second derivatives of the loss? How would
-   you fix them?
-1. Why is the `reshape` method needed in the `loss` function?
-1. Experiment using different learning rates to find out how quickly the loss function value drops. Can you reduce the
-   error by increasing the number of epochs of training?
-1. If the number of examples cannot be divided by the batch size, what happens to `data_iter` at the end of an epoch?
-1. Try implementing a different loss function, such as the absolute value loss `(y_hat - d2l.reshape(y, y_hat.shape)).abs().sum()`.
-    1. Check what happens for regular data.
-    1. Check whether there is a difference in behavior if you actively perturb some entries of $\mathbf{y}$,
-       such as $y_5 = 10,000$.
-    1. Can you think of a cheap solution for combining the best aspects of squared loss and absolute value loss?
-       Hint: how can you avoid really large gradient values?
-1. Why do we need to reshuffle the dataset? Can you design a case where a maliciously dataset would break the
-   optimization algorithm otherwise?
+1. Que se passerait-il si nous initialisions les poids à zéro. L'algorithme fonctionnerait-il toujours ? Que se passerait-il si nous
+ initialisions les paramètres avec la variance $1,000$ plutôt que $0.01$?
+1. Supposons que vous essayez de trouver [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm)
+ un modèle pour les résistances qui relie la tension et le courant. Pouvez-vous utiliser la différenciation automatique
+ pour apprendre les paramètres de votre modèle ?
+1. Pouvez-vous utiliser [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) pour déterminer la température d'un objet
+ en utilisant la densité spectrale d'énergie ? Pour référence, la densité spectrale $B$ du rayonnement émanant d'un corps noir est
+ $B(\lambda, T) = \frac{2 hc^2}{\lambda^5} \cdot \left(\exp \frac{h c}{\lambda k T} - 1\right)^{-1}$ . Ici,
+ $\lambda$ est la longueur d'onde, $T$ est la température, $c$ est la vitesse de la lumière, $h$ est le quantum de Planck et $k$ est la constante de Boltzmann
+. Vous mesurez l'énergie pour différentes longueurs d'onde $\lambda$ et vous devez maintenant adapter la courbe de densité spectrale
+ à la loi de Planck.
+1. Quels sont les problèmes que vous pourriez rencontrer si vous vouliez calculer les dérivées secondes de la perte ? Comment
+ pourriez-vous les résoudre ?
+1. Pourquoi la méthode `reshape` est-elle nécessaire dans la fonction `loss`?
+1. Faites des expériences en utilisant différents taux d'apprentissage pour déterminer à quelle vitesse la valeur de la fonction de perte diminue. Pouvez-vous réduire l'erreur
+ en augmentant le nombre d'époques d'apprentissage ?
+1. Si le nombre d'exemples ne peut pas être divisé par la taille du lot, qu'arrive-t-il à `data_iter` à la fin d'une époque ?
+1. Essayez de mettre en œuvre une fonction de perte différente, telle que la perte de valeur absolue `(y_hat - d2l.reshape(y, y_hat.shape)).abs().sum()`.
+   1. Vérifiez ce qui se passe pour les données régulières.
+   1. Vérifiez s'il y a une différence de comportement si vous perturbez activement certaines entrées de $\mathbf{y}$,
+ comme $y_5 = 10,000$.
+ 1. Pouvez-vous imaginer une solution bon marché pour combiner les meilleurs aspects de la perte au carré et de la perte en valeur absolue ?
+      Conseil : comment éviter les valeurs de gradient vraiment importantes ?
+1. Pourquoi devons-nous remanier l'ensemble de données ? Pouvez-vous concevoir un cas où un ensemble de données malicieux briserait l'algorithme d'optimisation
+ autrement ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/42)

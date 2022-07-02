@@ -3,65 +3,65 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Multiple Input and Multiple Output Channels
-:label:`sec_channels`
+# Canaux d'entrée et de sortie multiples
+:label:`sec_channels` 
 
-While we described the multiple channels
-that comprise each image (e.g., color images have the standard RGB channels
-to indicate the amount of red, green and blue) and convolutional layers for multiple channels in :numref:`subsec_why-conv-channels`,
-until now, we simplified all of our numerical examples
-by working with just a single input and a single output channel.
-This allowed us to think of our inputs, convolution kernels,
-and outputs each as two-dimensional tensors.
+ Bien que nous ayons décrit les canaux multiples
+qui composent chaque image (par exemple, les images couleur ont les canaux RVB standard
+pour indiquer la quantité de rouge, vert et bleu) et les couches de convolution pour les canaux multiples dans :numref:`subsec_why-conv-channels` ,
+jusqu'à présent, nous avons simplifié tous nos exemples numériques
+en travaillant avec un seul canal d'entrée et un seul canal de sortie.
+Cela nous a permis de considérer nos entrées, nos noyaux de convolution,
+et nos sorties comme des tenseurs à deux dimensions.
 
-When we add channels into the mix,
-our inputs and hidden representations
-both become three-dimensional tensors.
-For example, each RGB input image has shape $3\times h\times w$.
-We refer to this axis, with a size of 3, as the *channel* dimension. The notion of
-channels is as old as CNNs themselves. For instance LeNet5 :cite:`LeCun.Jackel.Bottou.ea.1995` uses them. 
-In this section, we will take a deeper look
-at convolution kernels with multiple input and multiple output channels.
+Lorsque nous ajoutons des canaux au mélange,
+nos entrées et nos représentations cachées
+deviennent toutes deux des tenseurs tridimensionnels.
+Par exemple, chaque image d'entrée RVB a une forme $3\times h\times w$.
+Nous faisons référence à cet axe, de taille 3, comme étant la dimension *canal*. La notion de canaux
+est aussi ancienne que les CNN eux-mêmes. Par exemple, LeNet5 :cite:`LeCun.Jackel.Bottou.ea.1995` les utilise. 
+Dans cette section, nous allons examiner plus en profondeur
+les noyaux de convolution avec plusieurs canaux d'entrée et de sortie.
 
-## Multiple Input Channels
+## Canaux d'entrée multiples
 
-When the input data contains multiple channels,
-we need to construct a convolution kernel
-with the same number of input channels as the input data,
-so that it can perform cross-correlation with the input data.
-Assuming that the number of channels for the input data is $c_i$,
-the number of input channels of the convolution kernel also needs to be $c_i$. If our convolution kernel's window shape is $k_h\times k_w$,
-then when $c_i=1$, we can think of our convolution kernel
-as just a two-dimensional tensor of shape $k_h\times k_w$.
+Lorsque les données d'entrée contiennent plusieurs canaux,
+nous devons construire un noyau de convolution
+avec le même nombre de canaux d'entrée que les données d'entrée,
+afin qu'il puisse effectuer une corrélation croisée avec les données d'entrée.
+En supposant que le nombre de canaux pour les données d'entrée est $c_i$,
+le nombre de canaux d'entrée du noyau de convolution doit également être $c_i$. Si la forme de la fenêtre de notre noyau de convolution est $k_h\times k_w$,
+alors, lorsque $c_i=1$, nous pouvons considérer notre noyau de convolution
+comme un simple tenseur bidimensionnel de forme $k_h\times k_w$.
 
-However, when $c_i>1$, we need a kernel
-that contains a tensor of shape $k_h\times k_w$ for *every* input channel. Concatenating these $c_i$ tensors together
-yields a convolution kernel of shape $c_i\times k_h\times k_w$.
-Since the input and convolution kernel each have $c_i$ channels,
-we can perform a cross-correlation operation
-on the two-dimensional tensor of the input
-and the two-dimensional tensor of the convolution kernel
-for each channel, adding the $c_i$ results together
-(summing over the channels)
-to yield a two-dimensional tensor.
-This is the result of a two-dimensional cross-correlation
-between a multi-channel input and
-a multi-input-channel convolution kernel.
+Cependant, lorsque $c_i>1$, nous avons besoin d'un noyau
+qui contient un tenseur de forme $k_h\times k_w$ pour *chaque* canal d'entrée. En concaténant ces tenseurs $c_i$ ensemble
+, on obtient un noyau de convolution de forme $c_i\times k_h\times k_w$.
+Puisque l'entrée et le noyau de convolution ont chacun $c_i$ canaux,
+nous pouvons effectuer une opération de corrélation croisée
+sur le tenseur bidimensionnel de l'entrée
+et le tenseur bidimensionnel du noyau de convolution
+pour chaque canal, en ajoutant les résultats $c_i$ ensemble
+(en faisant la somme des canaux)
+pour obtenir un tenseur bidimensionnel.
+Il s'agit du résultat d'une intercorrélation bidimensionnelle
+entre une entrée multicanaux et
+un noyau de convolution multicanaux d'entrée.
 
-:numref:`fig_conv_multi_in` provides an example 
-of a two-dimensional cross-correlation with two input channels.
-The shaded portions are the first output element
-as well as the input and kernel tensor elements used for the output computation:
-$(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$.
+:numref:`fig_conv_multi_in` fournit un exemple 
+d'une intercorrélation bidimensionnelle avec deux canaux d'entrée.
+Les parties ombrées sont le premier élément de sortie
+ainsi que les éléments tensoriels d'entrée et de noyau utilisés pour le calcul de la sortie :
+$(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$ .
 
 ![Cross-correlation computation with 2 input channels.](../img/conv-multi-in.svg)
 :label:`fig_conv_multi_in`
 
 
-To make sure we really understand what is going on here,
-we can (**implement cross-correlation operations with multiple input channels**) ourselves.
-Notice that all we are doing is performing a cross-correlation operation
-per channel and then adding up the results.
+Pour être sûr de bien comprendre ce qui se passe ici,
+nous pouvons (**mettre en œuvre nous-mêmes les opérations de corrélation croisée avec plusieurs canaux d'entrée**).
+Remarquez que tout ce que nous faisons est d'effectuer une opération de corrélation croisée
+par canal, puis d'additionner les résultats.
 
 ```{.python .input}
 %%tab mxnet
@@ -93,9 +93,9 @@ def corr2d_multi_in(X, K):
     return tf.reduce_sum([d2l.corr2d(x, k) for x, k in zip(X, K)], axis=0)
 ```
 
-We can construct the input tensor `X` and the kernel tensor `K`
-corresponding to the values in :numref:`fig_conv_multi_in`
-to (**validate the output**) of the cross-correlation operation.
+Nous pouvons construire le tenseur d'entrée `X` et le tenseur de noyau `K`
+ correspondant aux valeurs dans :numref:`fig_conv_multi_in` 
+ pour (**valider la sortie**) de l'opération de corrélation croisée.
 
 ```{.python .input}
 %%tab all
@@ -106,43 +106,43 @@ K = d2l.tensor([[[0.0, 1.0], [2.0, 3.0]], [[1.0, 2.0], [3.0, 4.0]]])
 corr2d_multi_in(X, K)
 ```
 
-## Multiple Output Channels
-:label:`subsec_multi-output-channels`
+## Canaux de sortie multiples
+:label:`subsec_multi-output-channels` 
 
-Regardless of the number of input channels,
-so far we always ended up with one output channel.
-However, as we discussed in :numref:`subsec_why-conv-channels`,
-it turns out to be essential to have multiple channels at each layer.
-In the most popular neural network architectures,
-we actually increase the channel dimension
-as we go deeper in the neural network,
-typically downsampling to trade off spatial resolution
-for greater *channel depth*.
-Intuitively, you could think of each channel
-as responding to a different set of features.
-The reality is a bit more complicated than this. A naive interpretation would suggest 
-that representations are learned independently per pixel or per channel. 
-Instead, channels are optimized to be jointly useful.
-This means that rather than mapping a single channel to an edge detector, it may simply mean 
-that some direction in channel space corresponds to detecting edges.
+ Quel que soit le nombre de canaux d'entrée,
+jusqu'à présent, nous nous sommes toujours retrouvés avec un seul canal de sortie.
+Cependant, comme nous l'avons vu dans :numref:`subsec_why-conv-channels` ,
+, il s'avère essentiel de disposer de plusieurs canaux à chaque couche.
+Dans les architectures de réseaux neuronaux les plus populaires,
+nous augmentons en fait la dimension des canaux
+à mesure que nous pénétrons plus profondément dans le réseau neuronal,
+en réduisant généralement l'échantillonnage pour échanger la résolution spatiale
+contre une plus grande *profondeur de canal*.
+Intuitivement, on pourrait penser que chaque canal
+répond à un ensemble différent de caractéristiques.
+La réalité est un peu plus compliquée que cela. Une interprétation naïve suggérerait 
+que les représentations sont apprises indépendamment par pixel ou par canal. 
+Au contraire, les canaux sont optimisés pour être utiles conjointement.
+Cela signifie qu'au lieu de faire correspondre un seul canal à un détecteur de bords, cela peut simplement signifier 
+qu'une certaine direction dans l'espace des canaux correspond à la détection des bords.
 
-Denote by $c_i$ and $c_o$ the number
-of input and output channels, respectively,
-and let $k_h$ and $k_w$ be the height and width of the kernel.
-To get an output with multiple channels,
-we can create a kernel tensor
-of shape $c_i\times k_h\times k_w$
-for *every* output channel.
-We concatenate them on the output channel dimension,
-so that the shape of the convolution kernel
-is $c_o\times c_i\times k_h\times k_w$.
-In cross-correlation operations,
-the result on each output channel is calculated
-from the convolution kernel corresponding to that output channel
-and takes input from all channels in the input tensor.
+Dénotez par $c_i$ et $c_o$ le nombre
+de canaux d'entrée et de sortie, respectivement,
+et laissez $k_h$ et $k_w$ être la hauteur et la largeur du noyau.
+Pour obtenir une sortie avec plusieurs canaux,
+nous pouvons créer un tenseur de noyau
+de forme $c_i\times k_h\times k_w$
+ pour *chaque* canal de sortie.
+Nous les concaténons sur la dimension du canal de sortie,
+de sorte que la forme du noyau de convolution
+est $c_o\times c_i\times k_h\times k_w$.
+Dans les opérations de corrélation croisée,
+le résultat sur chaque canal de sortie est calculé
+à partir du noyau de convolution correspondant à ce canal de sortie
+et prend en entrée tous les canaux du tenseur d'entrée.
 
-We implement a cross-correlation function
-to [**calculate the output of multiple channels**] as shown below.
+Nous implémentons une fonction de corrélation croisée
+pour [**calculer la sortie de plusieurs canaux**] comme indiqué ci-dessous.
 
 ```{.python .input}
 %%tab all
@@ -153,8 +153,8 @@ def corr2d_multi_in_out(X, K):
     return d2l.stack([corr2d_multi_in(X, k) for k in K], 0)
 ```
 
-We construct a trivial convolution kernel with 3 output channels
-by concatenating the kernel tensor for `K` with `K+1` and `K+2`.
+Nous construisons un noyau de convolution trivial avec 3 canaux de sortie
+en concaténant le tenseur du noyau pour `K` avec `K+1` et `K+2`.
 
 ```{.python .input}
 %%tab all
@@ -162,23 +162,23 @@ K = d2l.stack((K, K + 1, K + 2), 0)
 K.shape
 ```
 
-Below, we perform cross-correlation operations
-on the input tensor `X` with the kernel tensor `K`.
-Now the output contains 3 channels.
-The result of the first channel is consistent
-with the result of the previous input tensor `X`
-and the multi-input channel,
-single-output channel kernel.
+Ci-dessous, nous effectuons des opérations de corrélation croisée
+sur le tenseur d'entrée `X` avec le tenseur du noyau `K`.
+La sortie contient maintenant 3 canaux.
+Le résultat du premier canal est cohérent
+avec le résultat du tenseur d'entrée précédent `X`
+ et le noyau de canal à entrées multiples,
+à sortie unique.
 
 ```{.python .input}
 %%tab all
 corr2d_multi_in_out(X, K)
 ```
 
-## $1\times 1$ Convolutional Layer
-:label:`subsec_1x1`
+## $1\times 1$ Couche convolutionnelle
+:label:`subsec_1x1` 
 
-At first, a [**$1 \times 1$ convolution**], i.e., $k_h = k_w = 1$,
+ Au départ, un [**$1 \times 1$ convolution**], i.e., $k_h = k_w = 1$,
 does not seem to make much sense.
 After all, a convolution correlates adjacent pixels.
 A $1 \times 1$ convolution obviously does not.
@@ -207,18 +207,18 @@ to transform the $c_i$ corresponding input values into $c_o$ output values.
 Because this is still a convolutional layer,
 the weights are tied across pixel location.
 Thus the $1\times 1$ convolutional layer requires $c_o\times c_i$ weights
-(plus the bias). Also note that convolutional layers are typically followed 
-by nonlinearities. This ensures that $1 \times 1$ convolutions cannot simply be 
-folded into other convolutions. 
+(plus the bias). Notez également que les couches convolutionnelles sont généralement suivies 
+de non-linéarités. Cela permet de s'assurer que les convolutions $1 \times 1$ ne peuvent pas simplement être 
+repliées dans d'autres convolutions 
 
 ![The cross-correlation computation uses the $1\times 1$ convolution kernel with 3 input channels and 2 output channels. The input and output have the same height and width.](../img/conv-1x1.svg)
 :label:`fig_conv_1x1`
 
-Let's check whether this works in practice:
-we implement a $1 \times 1$ convolution
-using a fully connected layer.
-The only thing is that we need to make some adjustments
-to the data shape before and after the matrix multiplication.
+Vérifions si cela fonctionne en pratique :
+nous implémentons une convolution $1 \times 1$
+ en utilisant une couche entièrement connectée.
+La seule chose que nous devons faire est d'apporter quelques ajustements
+à la forme des données avant et après la multiplication de la matrice.
 
 ```{.python .input}
 %%tab all
@@ -232,9 +232,9 @@ def corr2d_multi_in_out_1x1(X, K):
     return d2l.reshape(Y, (c_o, h, w))
 ```
 
-When performing $1\times 1$ convolutions,
-the above function is equivalent to the previously implemented cross-correlation function `corr2d_multi_in_out`.
-Let's check this with some sample data.
+Lors de l'exécution des convolutions $1\times 1$,
+la fonction ci-dessus est équivalente à la fonction de corrélation croisée précédemment implémentée `corr2d_multi_in_out`.
+Vérifions cela à l'aide d'un échantillon de données.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -257,34 +257,34 @@ assert float(d2l.reduce_sum(d2l.abs(Y1 - Y2))) < 1e-6
 
 ## Discussion
 
-Channels allow us to combine the best of both worlds: MLPs that allow for significant nonlinearities and convolutions that allow for *localized* analysis of features. In particular, channels allow the CNN to reason with multiple features, such as edge and shape detectors at the same time. They also offer a practical trade-off between the drastic parameter reduction arising from translation invariance and locality, and the need for expressive and diverse models in computer vision. 
+Les canaux nous permettent de combiner le meilleur des deux mondes : les MLP qui permettent des non-linéarités significatives et les convolutions qui permettent une analyse *localisée* des caractéristiques. En particulier, les canaux permettent au CNN de raisonner avec plusieurs caractéristiques, comme les détecteurs de bords et de formes en même temps. Ils offrent également un compromis pratique entre la réduction drastique des paramètres découlant de l'invariance de la traduction et de la localité, et le besoin de modèles expressifs et diversifiés en vision par ordinateur. 
 
-Note, though, that this flexibility comes at a price. Given an image of size $(h \times w)$, the cost for computing a $k \times k$ convolution is $O(h \cdot w \cdot k^2)$. For $c_i$ and $c_o$ input and output channels respectively this increases to $O(h \cdot w \cdot k^2 \cdot c_i \cdot c_o)$. For a $256 \times 256$ pixel image with a $5 \times 5$ kernel and $128$ input and output channels respectively this amounts to over 53 billion operations (we count multiplications and additions separately). Later on we will encounter effective strategies to cut down on the cost, e.g., by requiring the channel-wise operations to be block-diagonal, leading to architectures such as ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017`. 
+Notez toutefois que cette flexibilité a un prix. Pour une image de taille $(h \times w)$, le coût du calcul d'une convolution $k \times k$ est de $O(h \cdot w \cdot k^2)$. Pour les canaux d'entrée et de sortie $c_i$ et $c_o$ respectivement, ce coût passe à $O(h \cdot w \cdot k^2 \cdot c_i \cdot c_o)$. Pour une image de $256 \times 256$ pixels avec un noyau $5 \times 5$ et des canaux d'entrée et de sortie $128$ respectivement, cela représente plus de 53 milliards d'opérations (nous comptons les multiplications et les additions séparément). Plus tard, nous rencontrerons des stratégies efficaces pour réduire ce coût, par exemple en exigeant que les opérations par canal soient en diagonale de bloc, ce qui conduit à des architectures telles que ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017` . 
 
-## Exercises
+## Exercices
 
-1. Assume that we have two convolution kernels of size $k_1$ and $k_2$, respectively 
-   (with no nonlinearity in-between).
-    1. Prove that the result of the operation can be expressed by a single convolution.
-    1. What is the dimensionality of the equivalent single convolution?
-    1. Is the converse true, i.e., can you always decompose a convolution into two smaller ones?
-1. Assume an input of shape $c_i\times h\times w$ and a convolution kernel of shape 
-   $c_o\times c_i\times k_h\times k_w$, padding of $(p_h, p_w)$, and stride of $(s_h, s_w)$.
-    1. What is the computational cost (multiplications and additions) for the forward propagation?
-    1. What is the memory footprint?
-    1. What is the memory footprint for the backward computation?
-    1. What is the computational cost for the backpropagation?
-1. By what factor does the number of calculations increase if we double the number of input channels 
-   $c_i$ and the number of output channels $c_o$? What happens if we double the padding?
-1. Are the variables `Y1` and `Y2` in the last example of this section exactly the same? Why?
-1. Express convolutions as a matrix multiplication, even when the convolution window is not $1 \times 1$? 
-1. Your task is to implement fast convolutions with a $k \times k$ kernel. One of the algorithm candidates 
-   is to scan horizontally across the source, reading a $k$-wide strip and computing the $1$-wide output strip 
-   one value at a time. The alternative is to read a $k + \Delta$ wide strip and compute a $\Delta$-wide 
-   output strip. Why is the latter preferable? Is there a limit to how large you should choose $\Delta$?
-1. Assume that we have a $c \times c$ matrix. 
-    1. How much faster is it to multiply with a block-diagonal matrix if the matrix is broken up into $b$ blocks?
-    1. What is the downside of having $b$ blocks? How could you fix it, at least partly?
+1. Supposons que nous ayons deux noyaux de convolution de taille $k_1$ et $k_2$, respectivement 
+ (sans non-linéarité entre les deux).
+   1. Prouvez que le résultat de l'opération peut être exprimé par une seule convolution.
+   1. Quelle est la dimensionnalité de la convolution unique équivalente ?
+   1. L'inverse est-il vrai, c'est-à-dire qu'il est toujours possible de décomposer une convolution en deux convolutions plus petites ?
+1. Supposons une entrée de forme $c_i\times h\times w$ et un noyau de convolution de forme 
+ $c_o\times c_i\times k_h\times k_w$ , padding de $(p_h, p_w)$, et stride de $(s_h, s_w)$.
+ 1. Quel est le coût de calcul (multiplications et additions) pour la propagation vers l'avant ?
+   1. Quelle est l'empreinte mémoire ?
+   1. Quelle est l'empreinte mémoire pour le calcul en arrière ?
+   1. Quel est le coût de calcul pour la rétropropagation ?
+1. De quel facteur le nombre de calculs augmente-t-il si nous doublons le nombre de canaux d'entrée 
+ $c_i$ et le nombre de canaux de sortie $c_o$? Que se passe-t-il si on double le padding ?
+1. Les variables `Y1` et `Y2` dans le dernier exemple de cette section sont-elles exactement les mêmes ? Pourquoi ?
+1. Exprimer les convolutions comme une multiplication matricielle, même lorsque la fenêtre de convolution n'est pas $1 \times 1$? 
+1. Votre tâche consiste à mettre en œuvre des convolutions rapides avec un noyau $k \times k$. L'un des algorithmes candidats 
+ consiste à balayer horizontalement la source, en lisant une bande large $k$ et en calculant la bande de sortie $1$-wide 
+ une valeur à la fois. L'autre solution consiste à lire une bande large $k + \Delta$ et à calculer une bande de sortie large $\Delta$ 
+ . Pourquoi cette dernière solution est-elle préférable ? Y a-t-il une limite à la taille de la bande $\Delta$?
+1. Supposons que nous ayons une matrice $c \times c$. 
+    1. Combien de fois est-il plus rapide de multiplier avec une matrice diagonale en bloc si la matrice est décomposée en blocs $b$?
+   1. Quel est l'inconvénient d'avoir des blocs $b$? Comment pourriez-vous y remédier, du moins en partie ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/69)

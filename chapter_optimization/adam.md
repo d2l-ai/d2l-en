@@ -1,44 +1,44 @@
 # Adam
-:label:`sec_adam`
+:label:`sec_adam` 
 
-In the discussions leading up to this section we encountered a number of techniques for efficient optimization. Let's recap them in detail here:
+ Dans les discussions qui ont précédé cette section, nous avons rencontré un certain nombre de techniques d'optimisation efficace. Récapitulons-les en détail ici :
 
-* We saw that :numref:`sec_sgd` is more effective than Gradient Descent when solving optimization problems, e.g., due to its inherent resilience to redundant data. 
-* We saw that :numref:`sec_minibatch_sgd` affords significant additional efficiency arising from vectorization, using larger sets of observations in one minibatch. This is the key to efficient multi-machine, multi-GPU and overall parallel processing. 
-* :numref:`sec_momentum` added a mechanism for aggregating a history of past gradients to accelerate convergence.
-* :numref:`sec_adagrad` used per-coordinate scaling to allow for a computationally efficient preconditioner. 
-* :numref:`sec_rmsprop` decoupled per-coordinate scaling from a learning rate adjustment. 
+* Nous avons vu que :numref:`sec_sgd` est plus efficace que la descente par gradient pour résoudre les problèmes d'optimisation, par exemple, en raison de sa résistance inhérente aux données redondantes. 
+* Nous avons vu que :numref:`sec_minibatch_sgd` offre une efficacité supplémentaire significative découlant de la vectorisation, en utilisant de plus grands ensembles d'observations dans un minibatch. C'est la clé de l'efficacité du traitement parallèle multi-machine, multi-GPU et global. 
+* :numref:`sec_momentum` a ajouté un mécanisme d'agrégation d'un historique des gradients passés pour accélérer la convergence.
+* :numref:`sec_adagrad` a utilisé une mise à l'échelle par coordonnée pour permettre un préconditionnement efficace en termes de calcul. 
+* :numref:`sec_rmsprop` a découplé la mise à l'échelle par coordonnée d'un ajustement du taux d'apprentissage. 
 
-Adam :cite:`Kingma.Ba.2014` combines all these techniques into one efficient learning algorithm. As expected, this is an algorithm that has become rather popular as one of the more robust and effective optimization algorithms to use in deep learning. It is not without issues, though. In particular, :cite:`Reddi.Kale.Kumar.2019` show that there are situations where Adam can diverge due to poor variance control. In a follow-up work :cite:`Zaheer.Reddi.Sachan.ea.2018` proposed a hotfix to Adam, called Yogi which addresses these issues. More on this later. For now let's review the Adam algorithm. 
+Adam :cite:`Kingma.Ba.2014` combine toutes ces techniques en un seul algorithme d'apprentissage efficace. Comme on pouvait s'y attendre, cet algorithme est devenu assez populaire comme l'un des algorithmes d'optimisation les plus robustes et efficaces à utiliser dans l'apprentissage profond. Cependant, il n'est pas exempt de problèmes. En particulier, :cite:`Reddi.Kale.Kumar.2019` montre qu'il existe des situations où Adam peut diverger en raison d'un mauvais contrôle de la variance. Dans un travail de suivi, :cite:`Zaheer.Reddi.Sachan.ea.2018` a proposé un correctif pour Adam, appelé Yogi, qui résout ces problèmes. Nous y reviendrons plus tard. Pour l'instant, passons en revue l'algorithme d'Adam. 
 
-## The Algorithm
+## L'algorithme
 
-One of the key components of Adam is that it uses exponential weighted moving averages (also known as leaky averaging) to obtain an estimate of both the momentum and also the second moment of the gradient. That is, it uses the state variables
+L'un des éléments clés d'Adam est qu'il utilise des moyennes mobiles pondérées exponentielles (également connues sous le nom de leaky averaging) pour obtenir une estimation du momentum et du second moment du gradient. C'est-à-dire qu'il utilise les variables d'état
 
 $$\begin{aligned}
     \mathbf{v}_t & \leftarrow \beta_1 \mathbf{v}_{t-1} + (1 - \beta_1) \mathbf{g}_t, \\
     \mathbf{s}_t & \leftarrow \beta_2 \mathbf{s}_{t-1} + (1 - \beta_2) \mathbf{g}_t^2.
 \end{aligned}$$
 
-Here $\beta_1$ and $\beta_2$ are nonnegative weighting parameters. Common choices for them are $\beta_1 = 0.9$ and $\beta_2 = 0.999$. That is, the variance estimate moves *much more slowly* than the momentum term. Note that if we initialize $\mathbf{v}_0 = \mathbf{s}_0 = 0$ we have a significant amount of bias initially towards smaller values. This can be addressed by using the fact that $\sum_{i=0}^t \beta^i = \frac{1 - \beta^t}{1 - \beta}$ to re-normalize terms. Correspondingly the normalized state variables are given by 
+Ici, $\beta_1$ et $\beta_2$ sont des paramètres de pondération non négatifs. Les choix courants pour eux sont $\beta_1 = 0.9$ et $\beta_2 = 0.999$. C'est-à-dire que l'estimation de la variance se déplace *beaucoup plus lentement* que le terme d'élan. Notez que si nous initialisons $\mathbf{v}_0 = \mathbf{s}_0 = 0$, nous avons initialement un biais important vers des valeurs plus petites. Ceci peut être résolu en utilisant le fait que $\sum_{i=0}^t \beta^i = \frac{1 - \beta^t}{1 - \beta}$ pour re-normaliser les termes. En conséquence, les variables d'état normalisées sont données par 
 
-$$\hat{\mathbf{v}}_t = \frac{\mathbf{v}_t}{1 - \beta_1^t} \text{ and } \hat{\mathbf{s}}_t = \frac{\mathbf{s}_t}{1 - \beta_2^t}.$$
+$$\hat{\mathbf{v}}_t = \frac{\mathbf{v}_t}{1 - \beta_1^t} \text{ and } \hat{\mathbf{s}}_t = \frac{\mathbf{s}_t}{1 - \beta_2^t}.$$ 
 
-Armed with the proper estimates we can now write out the update equations. First, we rescale the gradient in a manner very much akin to that of RMSProp to obtain
+ Armés des estimations appropriées, nous pouvons maintenant écrire les équations de mise à jour. Tout d'abord, nous ré-échelonnons le gradient d'une manière très proche de celle de RMSProp pour obtenir
 
-$$\mathbf{g}_t' = \frac{\eta \hat{\mathbf{v}}_t}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon}.$$
+$$\mathbf{g}_t' = \frac{\eta \hat{\mathbf{v}}_t}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon}.$$ 
 
-Unlike RMSProp our update uses the momentum $\hat{\mathbf{v}}_t$ rather than the gradient itself. Moreover, there is a slight cosmetic difference as the rescaling happens using $\frac{1}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon}$ instead of $\frac{1}{\sqrt{\hat{\mathbf{s}}_t + \epsilon}}$. The former works arguably slightly better in practice, hence the deviation from RMSProp. Typically we pick $\epsilon = 10^{-6}$ for a good trade-off between numerical stability and fidelity. 
+ Contrairement à RMSProp, notre mise à jour utilise le momentum $\hat{\mathbf{v}}_t$ plutôt que le gradient lui-même. De plus, il y a une légère différence cosmétique car le changement d'échelle se fait en utilisant $\frac{1}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon}$ au lieu de $\frac{1}{\sqrt{\hat{\mathbf{s}}_t + \epsilon}}$. Le premier fonctionne sans doute un peu mieux en pratique, d'où la déviation par rapport à RMSProp. En général, nous choisissons $\epsilon = 10^{-6}$ pour un bon compromis entre stabilité et fidélité numériques. 
 
-Now we have all the pieces in place to compute updates. This is slightly anticlimactic and we have a simple update of the form
+Nous avons maintenant toutes les pièces en place pour calculer les mises à jour. C'est un peu décevant et nous avons une simple mise à jour de la forme
 
-$$\mathbf{x}_t \leftarrow \mathbf{x}_{t-1} - \mathbf{g}_t'.$$
+$$\mathbf{x}_t \leftarrow \mathbf{x}_{t-1} - \mathbf{g}_t'.$$ 
 
-Reviewing the design of Adam its inspiration is clear. Momentum and scale are clearly visible in the state variables. Their rather peculiar definition forces us to debias terms (this could be fixed by a slightly different initialization and update condition). Second, the combination of both terms is pretty straightforward, given RMSProp. Last, the explicit learning rate $\eta$ allows us to control the step length to address issues of convergence. 
+ En examinant la conception d'Adam, son inspiration est claire. Le momentum et l'échelle sont clairement visibles dans les variables d'état. Leur définition assez particulière nous oblige à débaptiser les termes (cela pourrait être corrigé par une condition d'initialisation et de mise à jour légèrement différente). Deuxièmement, la combinaison des deux termes est assez simple, étant donné RMSProp. Enfin, le taux d'apprentissage explicite $\eta$ nous permet de contrôler la longueur du pas pour résoudre les problèmes de convergence. 
 
-## Implementation 
+## Mise en œuvre 
 
-Implementing Adam from scratch is not very daunting. For convenience we store the time step counter $t$ in the `hyperparams` dictionary. Beyond that all is straightforward.
+La mise en œuvre d'Adam à partir de zéro n'est pas très difficile. Par commodité, nous stockons le compteur de pas de temps $t$ dans le dictionnaire `hyperparams`. Au-delà de cela, tout est simple.
 
 ```{.python .input}
 #@tab mxnet
@@ -112,7 +112,7 @@ def adam(params, grads, states, hyperparams):
                     / tf.math.sqrt(s_bias_corr) + eps)
 ```
 
-We are ready to use Adam to train the model. We use a learning rate of $\eta = 0.01$.
+Nous sommes prêts à utiliser Adam pour entraîner le modèle. Nous utilisons un taux d'apprentissage de $\eta = 0.01$.
 
 ```{.python .input}
 #@tab all
@@ -121,7 +121,7 @@ d2l.train_ch11(adam, init_adam_states(feature_dim),
                {'lr': 0.01, 't': 1}, data_iter, feature_dim);
 ```
 
-A more concise implementation is straightforward since `adam` is one of the algorithms provided as part of the Gluon `trainer` optimization library. Hence we only need to pass configuration parameters for an implementation in Gluon.
+Une mise en œuvre plus concise est directe puisque `adam` est l'un des algorithmes fournis dans le cadre de la bibliothèque d'optimisation Gluon `trainer`. Il suffit donc de passer les paramètres de configuration pour une implémentation dans Gluon.
 
 ```{.python .input}
 #@tab mxnet
@@ -142,15 +142,15 @@ d2l.train_concise_ch11(trainer, {'learning_rate': 0.01}, data_iter)
 
 ## Yogi
 
-One of the problems of Adam is that it can fail to converge even in convex settings when the second moment estimate in $\mathbf{s}_t$ blows up. As a fix :cite:`Zaheer.Reddi.Sachan.ea.2018` proposed a refined update (and initialization) for $\mathbf{s}_t$. To understand what's going on, let's rewrite the Adam update as follows:
+L'un des problèmes d'Adam est qu'il peut échouer à converger même dans des paramètres convexes lorsque l'estimation du second moment dans $\mathbf{s}_t$ explose. Pour y remédier, :cite:`Zaheer.Reddi.Sachan.ea.2018` a proposé une mise à jour (et une initialisation) raffinée pour $\mathbf{s}_t$. Pour comprendre ce qui se passe, réécrivons la mise à jour d'Adam comme suit :
 
-$$\mathbf{s}_t \leftarrow \mathbf{s}_{t-1} + (1 - \beta_2) \left(\mathbf{g}_t^2 - \mathbf{s}_{t-1}\right).$$
+$$\mathbf{s}_t \leftarrow \mathbf{s}_{t-1} + (1 - \beta_2) \left(\mathbf{g}_t^2 - \mathbf{s}_{t-1}\right).$$ 
 
-Whenever $\mathbf{g}_t^2$ has high variance or updates are sparse, $\mathbf{s}_t$ might forget past values too quickly. A possible fix for this is to replace $\mathbf{g}_t^2 - \mathbf{s}_{t-1}$ by $\mathbf{g}_t^2 \odot \mathop{\mathrm{sgn}}(\mathbf{g}_t^2 - \mathbf{s}_{t-1})$. Now the magnitude of the update no longer depends on the amount of deviation. This yields the Yogi updates
+ Lorsque $\mathbf{g}_t^2$ a une variance élevée ou que les mises à jour sont rares, $\mathbf{s}_t$ peut oublier trop rapidement les valeurs passées. Une solution possible consiste à remplacer $\mathbf{g}_t^2 - \mathbf{s}_{t-1}$ par $\mathbf{g}_t^2 \odot \mathop{\mathrm{sgn}}(\mathbf{g}_t^2 - \mathbf{s}_{t-1})$. Maintenant, l'ampleur de la mise à jour ne dépend plus de l'importance de la déviation. Cela donne les mises à jour de Yogi
 
-$$\mathbf{s}_t \leftarrow \mathbf{s}_{t-1} + (1 - \beta_2) \mathbf{g}_t^2 \odot \mathop{\mathrm{sgn}}(\mathbf{g}_t^2 - \mathbf{s}_{t-1}).$$
+$$\mathbf{s}_t \leftarrow \mathbf{s}_{t-1} + (1 - \beta_2) \mathbf{g}_t^2 \odot \mathop{\mathrm{sgn}}(\mathbf{g}_t^2 - \mathbf{s}_{t-1}).$$ 
 
-The authors furthermore advise to initialize the momentum on a larger initial batch rather than just initial pointwise estimate. We omit the details since they are not material to the discussion and since even without this convergence remains pretty good.
+ Les auteurs conseillent en outre d'initialiser le momentum sur un lot initial plus important plutôt que sur une simple estimation ponctuelle initiale. Nous omettons les détails car ils ne sont pas importants pour la discussion et car même sans cela, la convergence reste assez bonne.
 
 ```{.python .input}
 #@tab mxnet
@@ -210,19 +210,19 @@ d2l.train_ch11(yogi, init_adam_states(feature_dim),
                {'lr': 0.01, 't': 1}, data_iter, feature_dim);
 ```
 
-## Summary
+## Résumé
 
-* Adam combines features of many optimization algorithms into a fairly robust update rule. 
-* Created on the basis of RMSProp, Adam also uses EWMA on the minibatch stochastic gradient.
-* Adam uses bias correction to adjust for a slow startup when estimating momentum and a second moment. 
-* For gradients with significant variance we may encounter issues with convergence. They can be amended by using larger minibatches or by switching to an improved estimate for $\mathbf{s}_t$. Yogi offers such an alternative. 
+* Adam combine les caractéristiques de nombreux algorithmes d'optimisation en une règle de mise à jour assez robuste. 
+* Créé sur la base de RMSProp, Adam utilise également EWMA sur le gradient stochastique des minibatchs.
+* Adam utilise la correction de biais pour s'adapter à un démarrage lent lors de l'estimation du momentum et d'un second moment. 
+* Pour les gradients avec une variance significative, nous pouvons rencontrer des problèmes de convergence. Ils peuvent être corrigés en utilisant des minibatchs plus grands ou en passant à une estimation améliorée pour $\mathbf{s}_t$. Yogi offre une telle alternative. 
 
-## Exercises
+## Exercices
 
-1. Adjust the learning rate and observe and analyze the experimental results.
-1. Can you rewrite momentum and second moment updates such that it does not require bias correction?
-1. Why do you need to reduce the learning rate $\eta$ as we converge?
-1. Try to construct a case for which Adam diverges and Yogi converges?
+1. Ajustez le taux d'apprentissage et observez et analysez les résultats expérimentaux.
+1. Pouvez-vous réécrire les mises à jour du momentum et du second moment de telle sorte qu'elles ne nécessitent pas de correction de biais ?
+1. Pourquoi devez-vous réduire le taux d'apprentissage $\eta$ au fur et à mesure de la convergence ?
+1. Essayez de construire un cas pour lequel Adam diverge et Yogi converge ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/358)

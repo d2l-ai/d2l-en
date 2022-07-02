@@ -1,7 +1,7 @@
 # Distributions
-:label:`sec_distributions`
+:label:`sec_distributions` 
 
-Now that we have learned how to work with probability in both the discrete and the continuous setting, let's get to know some of the common distributions encountered.  Depending on the area of machine learning, we may need to be familiar with vastly more of these, or for some areas of deep learning potentially none at all.  This is, however, a good basic list to be familiar with.  Let's first import some common libraries.
+ Maintenant que nous avons appris à travailler avec les probabilités dans le cadre discret et continu, apprenons à connaître certaines des distributions les plus courantes.  Selon le domaine de l'apprentissage automatique, il se peut que nous devions nous familiariser avec un nombre beaucoup plus important de ces distributions, voire aucune pour certains domaines de l'apprentissage profond.  Il s'agit toutefois d'une bonne liste de base à connaître.  Commençons par importer certaines bibliothèques courantes.
 
 ```{.python .input}
 #@tab mxnet
@@ -37,18 +37,18 @@ tf.pi = tf.acos(tf.zeros(1)) * 2  # Define pi in TensorFlow
 
 ## Bernoulli
 
-This is the simplest random variable usually encountered.  This random variable encodes a coin flip which comes up $1$ with probability $p$ and $0$ with probability $1-p$.  If we have a random variable $X$ with this distribution, we will write
+Il s'agit de la variable aléatoire la plus simple que l'on rencontre habituellement.  Cette variable aléatoire encode un tirage à pile ou face qui donne $1$ avec une probabilité de $p$ et $0$ avec une probabilité de $1-p$.  Si nous avons une variable aléatoire $X$ avec cette distribution, nous écrirons
 
 $$
 X \sim \mathrm{Bernoulli}(p).
 $$
 
-The cumulative distribution function is 
+La fonction de distribution cumulative est 
 
 $$F(x) = \begin{cases} 0 & x < 0, \\ 1-p & 0 \le x < 1, \\ 1 & x >= 1 . \end{cases}$$
 :eqlabel:`eq_bernoulli_cdf`
 
-The probability mass function is plotted below.
+La fonction de masse de probabilité est tracée ci-dessous.
 
 ```{.python .input}
 #@tab all
@@ -61,7 +61,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let's plot the cumulative distribution function :eqref:`eq_bernoulli_cdf`.
+Traçons maintenant la fonction de distribution cumulative :eqref:`eq_bernoulli_cdf` .
 
 ```{.python .input}
 #@tab mxnet
@@ -93,12 +93,12 @@ def F(x):
 d2l.plot(x, tf.constant([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-If $X \sim \mathrm{Bernoulli}(p)$, then:
+Si $X \sim \mathrm{Bernoulli}(p)$, alors :
 
 * $\mu_X = p$,
 * $\sigma_X^2 = p(1-p)$.
 
-We can sample an array of arbitrary shape from a Bernoulli random variable as follows.
+Nous pouvons échantillonner un tableau de forme arbitraire à partir d'une variable aléatoire de Bernoulli comme suit.
 
 ```{.python .input}
 #@tab mxnet
@@ -115,20 +115,20 @@ We can sample an array of arbitrary shape from a Bernoulli random variable as fo
 tf.cast(tf.random.uniform((10, 10)) < p, dtype=tf.float32)
 ```
 
-## Discrete Uniform
+## Uniforme discret
 
-The next commonly encountered random variable is a discrete uniform.  For our discussion here, we will assume that it is supported on the integers $\{1, 2, \ldots, n\}$, however any other set of values can be freely chosen.  The meaning of the word *uniform* in this context is that every possible value is equally likely.  The probability for each value $i \in \{1, 2, 3, \ldots, n\}$ is $p_i = \frac{1}{n}$.  We will denote a random variable $X$ with this distribution as
+La prochaine variable aléatoire couramment rencontrée est un uniforme discret.  Pour notre discussion ici, nous supposerons qu'elle est supportée par les entiers $\{1, 2, \ldots, n\}$, mais tout autre ensemble de valeurs peut être choisi librement.  La signification du mot *uniforme* dans ce contexte est que toutes les valeurs possibles ont la même probabilité.  La probabilité de chaque valeur $i \in \{1, 2, 3, \ldots, n\}$ est $p_i = \frac{1}{n}$.  Nous désignerons une variable aléatoire $X$ avec cette distribution comme suit
 
 $$
 X \sim U(n).
 $$
 
-The cumulative distribution function is 
+La fonction de distribution cumulative est 
 
 $$F(x) = \begin{cases} 0 & x < 1, \\ \frac{k}{n} & k \le x < k+1 \text{ with } 1 \le k < n, \\ 1 & x >= n . \end{cases}$$
 :eqlabel:`eq_discrete_uniform_cdf`
 
-Let's first plot the probability mass function.
+Traçons d'abord la fonction de masse de probabilité.
 
 ```{.python .input}
 #@tab all
@@ -140,7 +140,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let's plot the cumulative distribution function :eqref:`eq_discrete_uniform_cdf`.
+Traçons ensuite la fonction de distribution cumulative :eqref:`eq_discrete_uniform_cdf` .
 
 ```{.python .input}
 #@tab mxnet
@@ -172,12 +172,12 @@ def F(x):
 d2l.plot(x, [F(y) for y in x], 'x', 'c.d.f.')
 ```
 
-If $X \sim U(n)$, then:
+Si $X \sim U(n)$, alors :
 
 * $\mu_X = \frac{1+n}{2}$,
 * $\sigma_X^2 = \frac{n^2-1}{12}$.
 
-We can sample an array of arbitrary shape from a discrete uniform random variable as follows.
+Nous pouvons échantillonner un tableau de forme arbitraire à partir d'une variable aléatoire uniforme discrète comme suit.
 
 ```{.python .input}
 #@tab mxnet
@@ -194,25 +194,25 @@ torch.randint(1, n, size=(10, 10))
 tf.random.uniform((10, 10), 1, n, dtype=tf.int32)
 ```
 
-## Continuous Uniform
+## Uniforme continu
 
-Next, let's discuss the continuous uniform distribution. The idea behind this random variable is that if we increase the $n$ in the discrete uniform distribution, and then scale it to fit within the interval $[a, b]$, we will approach a continuous random variable that just picks an arbitrary value in $[a, b]$ all with equal probability.  We will denote this distribution as
+Voyons maintenant la distribution uniforme continue. L'idée qui sous-tend cette variable aléatoire est que si nous augmentons la valeur de $n$ dans la distribution uniforme discrète, puis que nous la mettons à l'échelle pour qu'elle s'inscrive dans l'intervalle $[a, b]$, nous nous rapprochons d'une variable aléatoire continue qui choisit une valeur arbitraire dans $[a, b]$ avec une probabilité égale.  Nous désignerons cette distribution par
 
 $$
 X \sim U(a, b).
 $$
 
-The probability density function is 
+La fonction de densité de probabilité est 
 
-$$p(x) = \begin{cases} \frac{1}{b-a} & x \in [a, b], \\ 0 & x \not\in [a, b].\end{cases}$$
-:eqlabel:`eq_cont_uniform_pdf`
+$$p(x) = \begin{cases} \frac{1}{b-a} & x \in [a, b], \\ 0 & x \not\in [a, b].\end{cases}$$ 
+ :eqlabel:`eq_cont_uniform_pdf` 
 
-The cumulative distribution function is 
+ La fonction de distribution cumulative est 
 
 $$F(x) = \begin{cases} 0 & x < a, \\ \frac{x-a}{b-a} & x \in [a, b], \\ 1 & x >= b . \end{cases}$$
 :eqlabel:`eq_cont_uniform_cdf`
 
-Let's first plot the probability density function :eqref:`eq_cont_uniform_pdf`.
+Traçons d'abord la fonction de densité de probabilité :eqref:`eq_cont_uniform_pdf` .
 
 ```{.python .input}
 #@tab mxnet
@@ -242,7 +242,7 @@ p = tf.cast(x > a, tf.float32) * tf.cast(x < b, tf.float32) / (b - a)
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-Now, let's plot the cumulative distribution function :eqref:`eq_cont_uniform_cdf`.
+Traçons ensuite la fonction de distribution cumulative :eqref:`eq_cont_uniform_cdf` .
 
 ```{.python .input}
 #@tab mxnet
@@ -268,12 +268,12 @@ def F(x):
 d2l.plot(x, [F(y) for y in x], 'x', 'c.d.f.')
 ```
 
-If $X \sim U(a, b)$, then:
+Si $X \sim U(a, b)$, alors :
 
 * $\mu_X = \frac{a+b}{2}$,
 * $\sigma_X^2 = \frac{(b-a)^2}{12}$.
 
-We can sample an array of arbitrary shape from a uniform random variable as follows.  Note that it by default samples from a $U(0,1)$, so if we want a different range we need to scale it.
+Nous pouvons échantillonner un tableau de forme arbitraire à partir d'une variable aléatoire uniforme comme suit.  Notez qu'elle échantillonne par défaut à partir de $U(0,1)$, donc si nous voulons une plage différente, nous devons la mettre à l'échelle.
 
 ```{.python .input}
 #@tab mxnet
@@ -290,28 +290,28 @@ We can sample an array of arbitrary shape from a uniform random variable as foll
 (b - a) * tf.random.uniform((10, 10)) + a
 ```
 
-## Binomial
+## Binomiale
 
-Let's make things a little more complex and examine the *binomial* random variable.  This random variable originates from performing a sequence of $n$ independent experiments, each of which has probability $p$ of succeeding, and asking how many successes we expect to see.
+Rendons les choses un peu plus complexes et examinons la variable aléatoire *binomiale*.  Cette variable aléatoire provient de la réalisation d'une séquence de $n$ expériences indépendantes, dont chacune a la probabilité $p$ de réussir, et de la question de savoir combien de réussites nous attendons.
 
-Let's express this mathematically.  Each experiment is an independent random variable $X_i$ where we will use $1$ to encode success, and $0$ to encode failure.  Since each is an independent coin flip which is successful with probability $p$, we can say that $X_i \sim \mathrm{Bernoulli}(p)$.  Then, the binomial random variable is
+Exprimons cela mathématiquement.  Chaque expérience est une variable aléatoire indépendante $X_i$ où nous utiliserons $1$ pour coder le succès et $0$ pour coder l'échec.  Puisque chaque expérience est un tirage à pile ou face indépendant qui réussit avec la probabilité $p$, nous pouvons dire que $X_i \sim \mathrm{Bernoulli}(p)$.  La variable aléatoire binomiale est donc
 
 $$
 X = \sum_{i=1}^n X_i.
 $$
 
-In this case, we will write
+Dans ce cas, nous écrirons
 
 $$
 X \sim \mathrm{Binomial}(n, p).
 $$
 
-To get the cumulative distribution function, we need to notice that getting exactly $k$ successes can occur in $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ ways each of which has a probability of $p^k(1-p)^{n-k}$ of occurring.  Thus the cumulative distribution function is
+Pour obtenir la fonction de distribution cumulative, nous devons remarquer que l'obtention d'exactement $k$ succès peut se produire de $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ façons dont chacune a une probabilité de $p^k(1-p)^{n-k}$ de se produire.  La fonction de distribution cumulative est donc
 
 $$F(x) = \begin{cases} 0 & x < 0, \\ \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m}  & k \le x < k+1 \text{ with } 0 \le k < n, \\ 1 & x >= n . \end{cases}$$
 :eqlabel:`eq_binomial_cdf`
 
-Let's first plot the probability mass function.
+Commençons par tracer la fonction de masse de probabilité.
 
 ```{.python .input}
 #@tab mxnet
@@ -370,7 +370,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let's plot the cumulative distribution function :eqref:`eq_binomial_cdf`.
+Traçons ensuite la fonction de distribution cumulative :eqref:`eq_binomial_cdf` .
 
 ```{.python .input}
 #@tab mxnet
@@ -405,12 +405,12 @@ def F(x):
 d2l.plot(x, [F(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
 ```
 
-If $X \sim \mathrm{Binomial}(n, p)$, then:
+Si $X \sim \mathrm{Binomial}(n, p)$, alors :
 
 * $\mu_X = np$,
 * $\sigma_X^2 = np(1-p)$.
 
-This follows from the linearity of expected value over the sum of $n$ Bernoulli random variables, and the fact that the variance of the sum of independent random variables is the sum of the variances. This can be sampled as follows.
+Cela découle de la linéarité de la valeur attendue sur la somme des variables aléatoires de Bernoulli $n$, et du fait que la variance de la somme de variables aléatoires indépendantes est la somme des variances. On peut échantillonner cette somme comme suit.
 
 ```{.python .input}
 #@tab mxnet
@@ -430,38 +430,38 @@ m.sample(sample_shape=(10, 10))
 ```
 
 ## Poisson
-Let's now perform a thought experiment.  We are standing at a bus stop and we want to know how many buses will arrive in the next minute.  Let's start by considering $X^{(1)} \sim \mathrm{Bernoulli}(p)$ which is simply the probability that a bus arrives in the one minute window.  For bus stops far from an urban center, this might be a pretty good approximation.  We may never see more than one bus in a minute.
+Réalisons maintenant une expérience de pensée.  Nous nous trouvons à un arrêt de bus et nous voulons savoir combien de bus vont arriver dans la prochaine minute.  Commençons par considérer $X^{(1)} \sim \mathrm{Bernoulli}(p)$ qui est simplement la probabilité qu'un bus arrive dans la fenêtre d'une minute.  Pour les arrêts de bus éloignés d'un centre urbain, cela peut être une assez bonne approximation.  Il se peut que nous ne voyions jamais plus d'un bus en une minute.
 
-However, if we are in a busy area, it is possible or even likely that two buses will arrive.  We can model this by splitting our random variable into two parts for the first 30 seconds, or the second 30 seconds.  In this case we can write
+Cependant, si nous nous trouvons dans une zone très fréquentée, il est possible, voire probable, que deux bus arrivent.  Nous pouvons modéliser cela en divisant notre variable aléatoire en deux parties pour les 30 premières secondes, ou les 30 secondes suivantes.  Dans ce cas, nous pouvons écrire
 
 $$
 X^{(2)} \sim X^{(2)}_1 + X^{(2)}_2,
 $$
 
-where $X^{(2)}$ is the total sum, and $X^{(2)}_i \sim \mathrm{Bernoulli}(p/2)$.  The total distribution is then $X^{(2)} \sim \mathrm{Binomial}(2, p/2)$.
+où $X^{(2)}$ est la somme totale, et $X^{(2)}_i \sim \mathrm{Bernoulli}(p/2)$.  La distribution totale est alors $X^{(2)} \sim \mathrm{Binomial}(2, p/2)$.
 
-Why stop here?  Let's continue to split that minute into $n$ parts.  By the same reasoning as above, we see that
+Pourquoi s'arrêter là ?  Continuons à diviser cette minute en $n$ parties.  Par le même raisonnement que ci-dessus, nous voyons que
 
-$$X^{(n)} \sim \mathrm{Binomial}(n, p/n).$$
-:eqlabel:`eq_eq_poisson_approx`
+$$X^{(n)} \sim \mathrm{Binomial}(n, p/n).$$ 
+ :eqlabel:`eq_eq_poisson_approx` 
 
-Consider these random variables.  By the previous section, we know that :eqref:`eq_eq_poisson_approx` has mean $\mu_{X^{(n)}} = n(p/n) = p$, and variance $\sigma_{X^{(n)}}^2 = n(p/n)(1-(p/n)) = p(1-p/n)$.  If we take $n \rightarrow \infty$, we can see that these numbers stabilize to $\mu_{X^{(\infty)}} = p$, and variance $\sigma_{X^{(\infty)}}^2 = p$.  This indicates that there *could be* some random variable we can define in this infinite subdivision limit.  
+ Considérons ces variables aléatoires.  D'après la section précédente, nous savons que :eqref:`eq_eq_poisson_approx` a pour moyenne $\mu_{X^{(n)}} = n(p/n) = p$ et pour variance $\sigma_{X^{(n)}}^2 = n(p/n)(1-(p/n)) = p(1-p/n)$.  Si nous prenons $n \rightarrow \infty$, nous pouvons voir que ces nombres se stabilisent à $\mu_{X^{(\infty)}} = p$, et la variance $\sigma_{X^{(\infty)}}^2 = p$.  Cela indique qu'il *pourrait y avoir* une variable aléatoire que nous pouvons définir dans cette limite de subdivision infinie. 
 
-This should not come as too much of a surprise, since in the real world we can just count the number of bus arrivals, however it is nice to see that our mathematical model is well defined.  This discussion can be made formal as the *law of rare events*.
+Cela ne devrait pas trop nous surprendre, puisque dans le monde réel nous pouvons simplement compter le nombre d'arrivées de bus, mais il est agréable de voir que notre modèle mathématique est bien défini.  Cette discussion peut être formalisée comme la *loi des événements rares*.
 
-Following through this reasoning carefully, we can arrive at the following model.  We will say that $X \sim \mathrm{Poisson}(\lambda)$ if it is a random variable which takes the values $\{0,1,2, \ldots\}$ with probability
+En suivant attentivement ce raisonnement, nous pouvons arriver au modèle suivant.  Nous dirons que $X \sim \mathrm{Poisson}(\lambda)$ s'il s'agit d'une variable aléatoire qui prend les valeurs $\{0,1,2, \ldots\}$ avec la probabilité
 
-$$p_k = \frac{\lambda^ke^{-\lambda}}{k!}.$$
-:eqlabel:`eq_poisson_mass`
+$$p_k = \frac{\lambda^ke^{-\lambda}}{k!}.$$ 
+ :eqlabel:`eq_poisson_mass` 
 
-The value $\lambda > 0$ is known as the *rate* (or the *shape* parameter), and denotes the average number of arrivals we expect in one unit of time.  
+ La valeur $\lambda > 0$ est appelée le *taux* (ou le *paramètre de forme*), et désigne le nombre moyen d'arrivées que nous attendons en une unité de temps. 
 
-We may sum this probability mass function to get the cumulative distribution function.
+Nous pouvons additionner cette fonction de masse de probabilité pour obtenir la fonction de distribution cumulative.
 
 $$F(x) = \begin{cases} 0 & x < 0, \\ e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}{m!} & k \le x < k+1 \text{ with } 0 \le k. \end{cases}$$
 :eqlabel:`eq_poisson_cdf`
 
-Let's first plot the probability mass function :eqref:`eq_poisson_mass`.
+Traçons d'abord la fonction de masse de probabilité :eqref:`eq_poisson_mass` .
 
 ```{.python .input}
 #@tab mxnet
@@ -504,7 +504,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let's plot the cumulative distribution function :eqref:`eq_poisson_cdf`.
+Traçons ensuite la fonction de distribution cumulative :eqref:`eq_poisson_cdf` .
 
 ```{.python .input}
 #@tab mxnet
@@ -536,12 +536,12 @@ def F(x):
 d2l.plot(x, [F(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
 ```
 
-As we saw above, the means and variances are particularly concise.  If $X \sim \mathrm{Poisson}(\lambda)$, then:
+Comme nous l'avons vu plus haut, les moyennes et les variances sont particulièrement concises.  Si $X \sim \mathrm{Poisson}(\lambda)$, alors :
 
 * $\mu_X = \lambda$,
 * $\sigma_X^2 = \lambda$.
 
-This can be sampled as follows.
+On peut l'échantillonner comme suit.
 
 ```{.python .input}
 #@tab mxnet
@@ -560,16 +560,16 @@ m = tfp.distributions.Poisson(lam)
 m.sample((10, 10))
 ```
 
-## Gaussian
-Now Let's try a different, but related experiment.  Let's say we again are performing $n$ independent $\mathrm{Bernoulli}(p)$ measurements $X_i$.  The distribution of the sum of these is $X^{(n)} \sim \mathrm{Binomial}(n, p)$.  Rather than taking a limit as $n$ increases and $p$ decreases, Let's fix $p$, and then send $n \rightarrow \infty$.  In this case $\mu_{X^{(n)}} = np \rightarrow \infty$ and $\sigma_{X^{(n)}}^2 = np(1-p) \rightarrow \infty$, so there is no reason to think this limit should be well defined.
+## Gaussien
+Essayons maintenant une expérience différente, mais connexe.  Disons que nous effectuons à nouveau $n$ mesures indépendantes $\mathrm{Bernoulli}(p)$ $X_i$ .  La distribution de la somme de ces mesures est $X^{(n)} \sim \mathrm{Binomial}(n, p)$.  Plutôt que de prendre une limite lorsque $n$ augmente et $p$ diminue, fixons $p$, puis envoyons $n \rightarrow \infty$.  Dans ce cas, $\mu_{X^{(n)}} = np \rightarrow \infty$ et $\sigma_{X^{(n)}}^2 = np(1-p) \rightarrow \infty$, il n'y a donc aucune raison de penser que cette limite devrait être bien définie.
 
-However, not all hope is lost!  Let's just make the mean and variance be well behaved by defining
+Cependant, tout espoir n'est pas perdu !  Faisons en sorte que la moyenne et la variance se comportent bien en définissant
 
 $$
 Y^{(n)} = \frac{X^{(n)} - \mu_{X^{(n)}}}{\sigma_{X^{(n)}}}.
 $$
 
-This can be seen to have mean zero and variance one, and so it is plausible to believe that it will converge to some limiting distribution.  If we plot what these distributions look like, we will become even more convinced that it will work.
+On peut voir que cette distribution a une moyenne de zéro et une variance de un, et il est donc plausible de croire qu'elle convergera vers une certaine distribution limite.  Si nous représentons graphiquement ce à quoi ressemblent ces distributions, nous serons encore plus convaincus que cela fonctionnera.
 
 ```{.python .input}
 #@tab mxnet
@@ -629,20 +629,20 @@ for i in range(4):
 d2l.plt.show()
 ```
 
-One thing to note: compared to the Poisson case, we are now dividing by the standard deviation which means that we are squeezing the possible outcomes into smaller and smaller areas.  This is an indication that our limit will no longer be discrete, but rather continuous.
+Une chose à noter : par rapport au cas de Poisson, nous divisons maintenant par l'écart type, ce qui signifie que nous comprimons les résultats possibles dans des zones de plus en plus petites.  C'est une indication que notre limite ne sera plus discrète, mais plutôt continue.
 
-A derivation of what occurs is beyond the scope of this document, but the *central limit theorem* states that as $n \rightarrow \infty$, this will yield the Gaussian Distribution (or sometimes normal distribution).  More explicitly, for any $a, b$:
+Une dérivation de ce qui se produit dépasse le cadre de ce document, mais le *théorème central limite* stipule que pour $n \rightarrow \infty$, on obtient la distribution gaussienne (ou parfois la distribution normale).  Plus explicitement, pour toute $a, b$:
 
 $$
 \lim_{n \rightarrow \infty} P(Y^{(n)} \in [a, b]) = P(\mathcal{N}(0,1) \in [a, b]),
 $$
 
-where we say a random variable is normally distributed with given mean $\mu$ and variance $\sigma^2$, written $X \sim \mathcal{N}(\mu, \sigma^2)$ if $X$ has density
+où l'on dit qu'une variable aléatoire est normalement distribuée avec une moyenne $\mu$ et une variance $\sigma^2$ données, on écrit $X \sim \mathcal{N}(\mu, \sigma^2)$ si $X$ a une densité
 
-$$p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.$$
-:eqlabel:`eq_gaussian_pdf`
+$$p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.$$ 
+ :eqlabel:`eq_gaussian_pdf` 
 
-Let's first plot the probability density function :eqref:`eq_gaussian_pdf`.
+ Traçons d'abord la fonction de densité de probabilité :eqref:`eq_gaussian_pdf` .
 
 ```{.python .input}
 #@tab mxnet
@@ -676,7 +676,7 @@ p = 1 / tf.sqrt(2 * tf.pi * sigma**2) * tf.exp(
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-Now, let's plot the cumulative distribution function.  It is beyond the scope of this appendix, but the Gaussian c.d.f. does not have a closed-form formula in terms of more elementary functions.  We will use `erf` which provides a way to compute this integral numerically.
+Traçons maintenant la fonction de distribution cumulative.  Cela dépasse le cadre de cette annexe, mais la f.d.c. gaussienne n'a pas de formule fermée en termes de fonctions plus élémentaires.  Nous utiliserons `erf` qui fournit un moyen de calculer numériquement cette intégrale.
 
 ```{.python .input}
 #@tab mxnet
@@ -702,32 +702,32 @@ def phi(x):
 d2l.plot(x, [phi(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
 ```
 
-Keen-eyed readers will recognize some of these terms.  Indeed, we encountered this integral in :numref:`sec_integral_calculus`.  Indeed we need exactly that computation to see that this $p_X(x)$ has total area one and is thus a valid density.
+Les lecteurs attentifs reconnaîtront certains de ces termes.  En effet, nous avons rencontré cette intégrale dans :numref:`sec_integral_calculus` . En fait, nous avons exactement besoin de ce calcul pour voir que ce $p_X(x)$ a une aire totale de un et est donc une densité valide.
 
-Our choice of working with coin flips made computations shorter, but nothing about that choice was fundamental.  Indeed, if we take any collection of independent identically distributed random variables $X_i$, and form
+Notre choix de travailler avec des tirages à pile ou face a permis de raccourcir les calculs, mais ce choix n'a rien de fondamental.  En effet, si nous prenons n'importe quelle collection de variables aléatoires indépendantes identiquement distribuées $X_i$, et formons
 
 $$
 X^{(N)} = \sum_{i=1}^N X_i.
 $$
 
-Then
+Alors
 
 $$
 \frac{X^{(N)} - \mu_{X^{(N)}}}{\sigma_{X^{(N)}}}
 $$
 
-will be approximately Gaussian.  There are additional requirements needed to make it work, most commonly $E[X^4] < \infty$, but the philosophy is clear.
+sera approximativement gaussienne.  Des conditions supplémentaires sont nécessaires pour que cela fonctionne, le plus souvent $E[X^4] < \infty$, mais la philosophie est claire.
 
-The central limit theorem is the reason why the Gaussian is fundamental to probability, statistics, and machine learning.  Whenever we can say that something we measured is a sum of many small independent contributions, we can assume that the thing being measured will be close to Gaussian.  
+Le théorème central limite est la raison pour laquelle la gaussienne est fondamentale pour les probabilités, les statistiques et l'apprentissage automatique.  Chaque fois que nous pouvons dire que quelque chose que nous mesurons est une somme de nombreuses petites contributions indépendantes, nous pouvons supposer que la chose mesurée sera proche de la gaussienne. 
 
-There are many more fascinating properties of Gaussians, and we would like to discuss one more here.  The Gaussian is what is known as a *maximum entropy distribution*.  We will get into entropy more deeply in :numref:`sec_information_theory`, however all we need to know at this point is that it is a measure of randomness.  In a rigorous mathematical sense, we can think of the Gaussian as the *most* random choice of random variable with fixed mean and variance.  Thus, if we know that our random variable has some mean and variance, the Gaussian is in a sense the most conservative choice of distribution we can make.
+Il existe de nombreuses autres propriétés fascinantes des gaussiennes, et nous aimerions en aborder une de plus ici.  La gaussienne est ce que l'on appelle une *distribution à entropie maximale*.  Nous approfondirons la question de l'entropie à l'adresse :numref:`sec_information_theory` , mais tout ce que nous devons savoir à ce stade, c'est qu'il s'agit d'une mesure du caractère aléatoire.  Dans un sens mathématique rigoureux, nous pouvons considérer la gaussienne comme le choix *le plus* aléatoire de variable aléatoire avec une moyenne et une variance fixes.  Ainsi, si nous savons que notre variable aléatoire a une certaine moyenne et une certaine variance, la gaussienne est en quelque sorte le choix de distribution le plus conservateur que nous puissions faire.
 
-To close the section, let's recall that if $X \sim \mathcal{N}(\mu, \sigma^2)$, then:
+Pour clore cette section, rappelons que si $X \sim \mathcal{N}(\mu, \sigma^2)$, alors :
 
 * $\mu_X = \mu$,
 * $\sigma_X^2 = \sigma^2$.
 
-We can sample from the Gaussian (or standard normal) distribution as shown below.
+Nous pouvons échantillonner à partir de la distribution gaussienne (ou normale standard) comme indiqué ci-dessous.
 
 ```{.python .input}
 #@tab mxnet
@@ -744,44 +744,44 @@ torch.normal(mu, sigma, size=(10, 10))
 tf.random.normal((10, 10), mu, sigma)
 ```
 
-## Exponential Family
-:label:`subsec_exponential_family`
+## Famille exponentielle
+:label:`subsec_exponential_family` 
 
-One shared property for all the distributions listed above is that they all 
-belong to which is known as the *exponential family*. The exponential family 
-is a set of distributions whose density can be expressed in the following 
-form:
+ Une propriété commune à toutes les distributions énumérées ci-dessus est qu'elles appartiennent toutes 
+à ce que l'on appelle la *famille exponentielle*. La famille exponentielle 
+est un ensemble de distributions dont la densité peut être exprimée sous la forme suivante 
+:
 
-$$p(\mathbf{x} | \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \left( \boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$
-:eqlabel:`eq_exp_pdf`
+$$p(\mathbf{x} | \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \left( \boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$ 
+ :eqlabel:`eq_exp_pdf` 
 
-As this definition can be a little subtle, let's examine it closely.  
+ Cette définition pouvant être un peu subtile, examinons-la de près. 
 
-First, $h(\mathbf{x})$ is known as the *underlying measure* or the 
-*base measure*.  This can be viewed as an original choice of measure we are 
-modifying with our exponential weight.  
+Tout d'abord, $h(\mathbf{x})$ est connue comme la *mesure sous-jacente* ou la *mesure de base* 
+.  Elle peut être considérée comme un choix original de mesure que nous modifions avec notre poids exponentiel sur 
+. 
 
-Second, we have the vector $\boldsymbol{\eta} = (\eta_1, \eta_2, ..., \eta_l) \in
-\mathbb{R}^l$ called the *natural parameters* or *canonical parameters*.  These
-define how the base measure will be modified.  The natural parameters enter 
-into the new measure by taking the dot product of these parameters against 
-some function $T(\cdot)$ of $\mathbf{x}= (x_1, x_2, ..., x_n) \in
-\mathbb{R}^n$ and exponentiated. The vector $T(\mathbf{x})= (T_1(\mathbf{x}),
+Deuxièmement, nous avons le vecteur $\boldsymbol{\eta} = (\eta_1, \eta_2, ..., \eta_l) \in
+\mathbb{R}^l$ appelé les *paramètres naturels* ou *paramètres canoniques*.  Ces
+définissent comment la mesure de base sera modifiée.  Les paramètres naturels entrent 
+dans la nouvelle mesure en prenant le produit scalaire de ces paramètres contre 
+une certaine fonction $T(\cdot)$ de $\mathbf{x}= (x_1, x_2, ..., x_n) \in
+\mathbb{R}^n$ et en l'exponentiant. Le vecteur $T(\mathbf{x})= (T_1(\mathbf{x}),
 T_2(\mathbf{x}), ..., T_l(\mathbf{x}))$ 
-is called the *sufficient statistics* for $\boldsymbol{\eta}$. This name is used since the 
-information represented by $T(\mathbf{x})$ is sufficient to calculate the 
-probability density and no other information from the sample $\mathbf{x}$'s 
-are required.
+est appelé la *statistique suffisante* pour $\boldsymbol{\eta}$. Ce nom est utilisé car l'information 
+représentée par $T(\mathbf{x})$ est suffisante pour calculer la densité de probabilité 
+et aucune autre information provenant de l'échantillon $\mathbf{x}$'s 
+n'est nécessaire.
 
-Third, we have $A(\boldsymbol{\eta})$, which is referred to as the *cumulant 
-function*, which ensures that the above distribution :eqref:`eq_exp_pdf` 
-integrates to one, i.e.,
+Troisièmement, nous avons $A(\boldsymbol{\eta})$, que l'on appelle la fonction *cumulante 
+*, qui garantit que la distribution ci-dessus :eqref:`eq_exp_pdf` 
+ s'intègre à un, c'est-à-dire,
 
 $$A(\boldsymbol{\eta})  = \log \left[\int h(\mathbf{x}) \cdot \mathrm{exp}
 \left(\boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) \right) d\mathbf{x} \right].$$
 
-To be concrete, let's consider the Gaussian. Assuming that $\mathbf{x}$ is 
-an univariate variable, we saw that it had a density of
+Pour être concret, considérons la gaussienne. En supposant que $\mathbf{x}$ est 
+une variable univariée, nous avons vu qu'elle avait une densité de
 
 $$
 \begin{aligned}
@@ -793,40 +793,40 @@ p(x | \mu, \sigma) &= \frac{1}{\sqrt{2 \pi \sigma^2}} \cdot \mathrm{exp}
 \end{aligned}
 $$
 
-This matches the definition of the exponential family with:
+Cela correspond à la définition de la famille exponentielle avec :
 
-* *underlying measure*: $h(x) = \frac{1}{\sqrt{2 \pi}}$,
-* *natural parameters*: $\boldsymbol{\eta} = \begin{bmatrix} \eta_1 \\ \eta_2
+* *mesure sous-jacente* : $h(x) = \frac{1}{\sqrt{2 \pi}}$,
+* *paramètres naturels* $\boldsymbol{\eta} = \begin{bmatrix} \eta_1 \\ \eta_2
 \end{bmatrix} = \begin{bmatrix} \frac{\mu}{\sigma^2} \\
 \frac{1}{2 \sigma^2} \end{bmatrix}$,
-* *sufficient statistics*: $T(x) = \begin{bmatrix}x\\-x^2\end{bmatrix}$, and
-* *cumulant function*: $A({\boldsymbol\eta}) = \frac{1}{2 \sigma^2} \mu^2 + \log(\sigma)
+* *statistiques suffisantes* : $T(x) = \begin{bmatrix}x\\-x^2\end{bmatrix}$, et
+* *fonction cumulante* $A({\boldsymbol\eta}) = \frac{1}{2 \sigma^2} \mu^2 + \log(\sigma)
 = \frac{\eta_1^2}{4 \eta_2} - \frac{1}{2}\log(2 \eta_2)$.
 
-It is worth noting that the exact choice of each of above terms is somewhat 
-arbitrary.  Indeed, the important feature is that the distribution can be 
-expressed in this form, not the exact form itself.
+Il convient de noter que le choix exact de chacun des termes ci-dessus est quelque peu 
+arbitraire.  En effet, la caractéristique importante est que la distribution peut être 
+exprimée sous cette forme, et non la forme exacte elle-même.
 
-As we allude to in :numref:`subsec_softmax_and_derivatives`, a widely used 
-technique is to assume that the  final output $\mathbf{y}$ follows an 
-exponential family distribution. The exponential family is a common and 
-powerful family of distributions encountered frequently in machine learning.
+Comme nous y faisons allusion dans :numref:`subsec_softmax_and_derivatives` , une technique largement utilisée 
+consiste à supposer que la sortie finale $\mathbf{y}$ suit une distribution de la famille exponentielle 
+. La famille exponentielle est une famille de distributions courante et 
+puissante que l'on rencontre fréquemment en apprentissage automatique.
 
 
-## Summary
-* Bernoulli random variables can be used to model events with a yes/no outcome.
-* Discrete uniform distributions model selects from a finite set of possibilities.
-* Continuous uniform distributions select from an interval.
-* Binomial distributions model a series of Bernoulli random variables, and count the number of successes.
-* Poisson random variables model the arrival of rare events.
-* Gaussian random variables model the result of adding a large number of independent random variables together.
-* All the above distributions belong to exponential family.
+## Résumé
+* Les variables aléatoires de Bernoulli peuvent être utilisées pour modéliser des événements dont l'issue est oui ou non.
+* Le modèle des distributions uniformes discrètes sélectionne parmi un ensemble fini de possibilités.
+* Les distributions uniformes continues sélectionnent dans un intervalle.
+* Les distributions binomiales modélisent une série de variables aléatoires de Bernoulli, et comptent le nombre de réussites.
+* Les variables aléatoires de Poisson modélisent l'arrivée d'événements rares.
+* Les variables aléatoires gaussiennes modélisent le résultat de l'addition d'un grand nombre de variables aléatoires indépendantes.
+* Toutes les distributions ci-dessus appartiennent à la famille exponentielle.
 
-## Exercises
+## Exercices
 
-1. What is the standard deviation of a random variable that is the difference $X-Y$ of two independent binomial random variables $X, Y \sim \mathrm{Binomial}(16, 1/2)$.
-2. If we take a Poisson random variable $X \sim \mathrm{Poisson}(\lambda)$ and consider $(X - \lambda)/\sqrt{\lambda}$ as $\lambda \rightarrow \infty$, we can show that this becomes approximately Gaussian.  Why does this make sense?
-3. What is the probability mass function for a sum of two discrete uniform random variables on $n$ elements?
+1. Quel est l'écart-type d'une variable aléatoire qui est la différence $X-Y$ de deux variables aléatoires binomiales indépendantes $X, Y \sim \mathrm{Binomial}(16, 1/2)$.
+2. Si nous prenons une variable aléatoire de Poisson $X \sim \mathrm{Poisson}(\lambda)$ et considérons $(X - \lambda)/\sqrt{\lambda}$ comme $\lambda \rightarrow \infty$, nous pouvons montrer qu'elle devient approximativement gaussienne.  Pourquoi cela a-t-il un sens ?
+3. Quelle est la fonction de masse de probabilité pour une somme de deux variables aléatoires uniformes discrètes sur $n$ éléments ?
 
 
 :begin_tab:`mxnet`

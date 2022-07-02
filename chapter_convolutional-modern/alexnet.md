@@ -3,50 +3,50 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Deep Convolutional Neural Networks (AlexNet)
-:label:`sec_alexnet`
+# Réseaux neuronaux convolutifs profonds (AlexNet)
+:label:`sec_alexnet` 
 
+ 
+ Bien que les CNN soient bien connus
+dans les communautés de la vision par ordinateur et de l'apprentissage automatique
+après l'introduction de LeNet :cite:`LeCun.Jackel.Bottou.ea.1995` ,
+ils n'ont pas immédiatement dominé le domaine.
+Bien que LeNet ait obtenu de bons résultats sur les premiers petits ensembles de données,
+la performance et la faisabilité de l'entraînement des CNN
+sur des ensembles de données plus grands et plus réalistes n'avaient pas encore été établies.
+En fait, pendant la majeure partie du temps écoulé entre le début des années 1990
+et les résultats décisifs de 2012 :cite:`Krizhevsky.Sutskever.Hinton.2012` ,
+les réseaux neuronaux ont souvent été dépassés par d'autres méthodes d'apprentissage automatique,
+telles que les méthodes à noyau :cite:`Scholkopf.Smola.2002` , les méthodes d'ensemble :cite:`Freund.Schapire.ea.1996` ,
+et l'estimation structurée :cite:`Taskar.Guestrin.Koller.2004` .
 
-Although CNNs were well known
-in the computer vision and machine learning communities
-following the introduction of LeNet :cite:`LeCun.Jackel.Bottou.ea.1995`,
-they did not immediately dominate the field.
-Although LeNet achieved good results on early small datasets,
-the performance and feasibility of training CNNs
-on larger, more realistic datasets had yet to be established.
-In fact, for much of the intervening time between the early 1990s
-and the watershed results of 2012 :cite:`Krizhevsky.Sutskever.Hinton.2012`,
-neural networks were often surpassed by other machine learning methods,
-such as kernel methods :cite:`Scholkopf.Smola.2002`, ensemble methods :cite:`Freund.Schapire.ea.1996`,
-and structued estimation :cite:`Taskar.Guestrin.Koller.2004`.
+Pour la vision par ordinateur, cette comparaison n'est peut-être pas juste.
+En effet, bien que les entrées des réseaux convolutifs
+soient constituées de valeurs de pixels brutes ou légèrement traitées (par exemple, par centrage), les praticiens n'introduisent jamais de pixels bruts dans les modèles traditionnels.
+Au lieu de cela, les pipelines de vision par ordinateur typiques
+consistaient en des pipelines d'extraction de caractéristiques conçus manuellement, tels que SIFT :cite:`Lowe.2004` , SURF :cite:`Bay.Tuytelaars.Van-Gool.2006` , et les sacs de mots visuels :cite:`Sivic.Zisserman.2003` .
+Plutôt que d'*apprendre les caractéristiques*, les caractéristiques étaient *fabriquées*.
+La plupart des progrès ont été réalisés grâce à des idées plus ingénieuses pour les caractéristiques et à une connaissance approfondie de la géométrie :cite:`Hartley.Zisserman.2000` . L'algorithme d'apprentissage était souvent considéré comme une réflexion après coup.
 
-For computer vision, this comparison is perhaps not fair.
-That is although the inputs to convolutional networks
-consist of raw or lightly-processed (e.g., by centering) pixel values, practitioners would never feed raw pixels into traditional models.
-Instead, typical computer vision pipelines
-consisted of manually engineering feature extraction pipelines, such as SIFT :cite:`Lowe.2004`, SURF :cite:`Bay.Tuytelaars.Van-Gool.2006`, and bags of visual words :cite:`Sivic.Zisserman.2003`.
-Rather than *learn the features*, the features were *crafted*.
-Most of the progress came from having more clever ideas for features and deep insight into geometry :cite:`Hartley.Zisserman.2000`. The learning algorithm was often considered an afterthought.
+Bien que certains accélérateurs de réseaux neuronaux aient été disponibles dans les années 1990,
+ils n'étaient pas encore suffisamment puissants pour réaliser
+des CNN profonds multicanaux et multicouches
+avec un grand nombre de paramètres. Par exemple, le GeForce 256 de NVIDIA de 1999
+était capable de traiter au maximum 480 millions d'opérations par seconde, sans aucun cadre de programmation significatif
+pour les opérations au-delà des jeux. Les accélérateurs d'aujourd'hui sont capables d'effectuer plus de 300 TFLOPs par dispositif (Ampere A100 de NVIDIA),
+où *FLOPs*
+sont des opérations en virgule flottante en nombre de multiplications-additions.
+En outre, les ensembles de données étaient encore relativement petits : L'OCR sur 60 000 images à basse résolution était considérée comme une tâche très difficile.
+En plus de ces obstacles, il manquait encore des astuces clés pour l'entraînement des réseaux neuronaux
+, notamment des heuristiques d'initialisation des paramètres :cite:`Glorot.Bengio.2010` ,
+des variantes intelligentes de la descente de gradient stochastique :cite:`Kingma.Ba.2014` ,
+des fonctions d'activation non écrasantes :cite:`Nair.Hinton.2010` ,
+et des techniques de régularisation efficaces :cite:`Srivastava.Hinton.Krizhevsky.ea.2014` .
 
-Although some neural network accelerators were available in the 1990s,
-they were not yet sufficiently powerful to make
-deep multichannel, multilayer CNNs
-with a large number of parameters. For instance, NVIDIA's GeForce 256 from 1999
-was able to process at most 480 million operations per second, without any meaningful
-programming framework for operations beyond games. Today's accelerators are able to perform in excess of 300 TFLOPs per device (NVIDIA's Ampere A100),
-where *FLOPs*
-are floating-point operations in number of multiply-adds.
-Moreover, datasets were still relatively small: OCR on 60,000 low-resolution images was considered a highly challenging task.
-Added to these obstacles, key tricks for training neural networks
-including parameter initialization heuristics :cite:`Glorot.Bengio.2010`,
-clever variants of stochastic gradient descent :cite:`Kingma.Ba.2014`,
-non-squashing activation functions :cite:`Nair.Hinton.2010`,
-and effective regularization techniques :cite:`Srivastava.Hinton.Krizhevsky.ea.2014` were still missing.
+Ainsi, plutôt que de former des systèmes *de bout en bout* (du pixel à la classification),
+les pipelines classiques ressemblaient davantage à ceci :
 
-Thus, rather than training *end-to-end* (pixel to classification) systems,
-classical pipelines looked more like this:
-
-1. Obtain an interesting dataset. In early days, these datasets required expensive sensors. For instance, the [Apple QuickTake 100](https://en.wikipedia.org/wiki/Apple_QuickTake) of 1994 sported a whopping 0.3 Megapixel (VGA) resolution, capable of storing up to 8 images, all for the price of \$1,000.
+1. Obtenir un ensemble de données intéressant. Au début, ces jeux de données nécessitaient des capteurs coûteux. Par exemple, le site [Apple QuickTake 100](https://en.wikipedia.org/wiki/Apple_QuickTake) de 1994 affichait une résolution énorme de 0,3 mégapixel (VGA), capable de stocker jusqu'à 8 images, le tout pour le prix de \_ 224 \_fois 224 \_mois$1,000.
 1. Preprocess the dataset with hand-crafted features based on some knowledge of optics, geometry, other analytic tools, and occasionally on the serendipitous discoveries of lucky graduate students.
 1. Feed the data through a standard set of feature extractors such as the SIFT (scale-invariant feature transform) :cite:`Lowe.2004`, the SURF (speeded up robust features) :cite:`Bay.Tuytelaars.Van-Gool.2006`, or any number of other hand-tuned pipelines.
 1. Dump the resulting representations into your favorite classifier, likely a linear model or kernel method, to train a classifier.
@@ -249,13 +249,13 @@ as its activation function. Let's delve into the details below.
 
 ### Architecture
 
-In AlexNet's first layer, the convolution window shape is $11\times11$.
+In AlexNet's first layer, the convolution window shape is $11 \times11$.
 Since the images in ImageNet are eight times higher and wider
 than the MNIST images,
 objects in ImageNet data tend to occupy more pixels with more visual detail.
 Consequently, a larger convolution window is needed to capture the object.
 The convolution window shape in the second layer
-is reduced to $5\times5$, followed by $3\times3$.
+is reduced to $5 \times5$, followed by $3 \times3$.
 In addition, after the first, second, and fifth convolutional layers,
 the network adds max-pooling layers
 with a window shape of $3\times3$ and a stride of 2.

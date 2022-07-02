@@ -1,35 +1,35 @@
-# Parameter Management
+# Gestion des paramètres
 
-Once we have chosen an architecture
-and set our hyperparameters,
-we proceed to the training loop,
-where our goal is to find parameter values
-that minimize our loss function.
-After training, we will need these parameters
-in order to make future predictions.
-Additionally, we will sometimes wish
-to extract the parameters
-either to reuse them in some other context,
-to save our model to disk so that
-it may be executed in other software,
-or for examination in the hope of
-gaining scientific understanding.
+Après avoir choisi une architecture
+et défini nos hyperparamètres,
+nous passons à la boucle d'apprentissage,
+où notre objectif est de trouver les valeurs des paramètres
+qui minimisent notre fonction de perte.
+Après l'apprentissage, nous aurons besoin de ces paramètres
+afin de faire des prédictions futures.
 
-Most of the time, we will be able
-to ignore the nitty-gritty details
-of how parameters are declared
-and manipulated, relying on deep learning frameworks
-to do the heavy lifting.
-However, when we move away from
-stacked architectures with standard layers,
-we will sometimes need to get into the weeds
-of declaring and manipulating parameters.
-In this section, we cover the following:
+En outre, nous souhaiterons parfois
+extraire les paramètres
+soit pour les réutiliser dans un autre contexte,
+pour sauvegarder notre modèle sur le disque afin qu'il puisse être exécuté dans un autre logiciel,
+ou pour l'examiner dans l'espoir de
+gagner en compréhension scientifique.
 
-* Accessing parameters for debugging, diagnostics, and visualizations.
-* Sharing parameters across different model components.
+La plupart du temps, nous pourrons
+ignorer les détails minutieux
+de la manière dont les paramètres sont déclarés
+et manipulés, en nous appuyant sur les cadres d'apprentissage profond
+pour faire le gros du travail.
+Cependant, lorsque nous nous éloignons des architectures empilées
+avec des couches standard,
+nous devrons parfois entrer dans les détails
+de la déclaration et de la manipulation des paramètres.
+Dans cette section, nous abordons les points suivants :
 
-(**We start by focusing on an MLP with one hidden layer.**)
+* Accès aux paramètres pour le débogage, les diagnostics et les visualisations.
+* Partage des paramètres entre différents composants du modèle.
+
+(**Nous commençons par nous concentrer sur un MLP avec une couche cachée.**)
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -75,16 +75,16 @@ X = tf.random.uniform((2, 4))
 net(X).shape
 ```
 
-## [**Parameter Access**]
+## [**Accès aux paramètres**]
 
-Let's start with how to access parameters
-from the models that you already know.
-When a model is defined via the `Sequential` class,
-we can first access any layer by indexing
-into the model as though it were a list.
-Each layer's parameters are conveniently
-located in its attribute.
-We can inspect the parameters of the second fully connected layer as follows.
+Commençons par voir comment accéder aux paramètres
+des modèles que vous connaissez déjà.
+Lorsqu'un modèle est défini via la classe `Sequential`,
+nous pouvons d'abord accéder à n'importe quelle couche en indexant
+dans le modèle comme s'il s'agissait d'une liste.
+Les paramètres de chaque couche sont commodément situés
+dans son attribut.
+Nous pouvons inspecter les paramètres de la deuxième couche entièrement connectée comme suit.
 
 ```{.python .input}
 %%tab mxnet
@@ -101,23 +101,23 @@ net[2].state_dict()
 net.layers[2].weights
 ```
 
-We can see that this fully connected layer
-contains two parameters,
-corresponding to that layer's
-weights and biases, respectively.
+Nous pouvons voir que cette couche entièrement connectée
+contient deux paramètres,
+correspondant aux poids et aux biais de cette couche
+, respectivement.
 
 
-### [**Targeted Parameters**]
+### [**Paramètres ciblés**]
 
-Note that each parameter is represented
-as an instance of the parameter class.
-To do anything useful with the parameters,
-we first need to access the underlying numerical values.
-There are several ways to do this.
-Some are simpler while others are more general.
-The following code extracts the bias
-from the second neural network layer, which returns a parameter class instance, and
-further accesses that parameter's value.
+Notez que chaque paramètre est représenté
+comme une instance de la classe de paramètres.
+Pour faire quoi que ce soit d'utile avec les paramètres,
+nous devons d'abord accéder aux valeurs numériques sous-jacentes.
+Il existe plusieurs façons de le faire.
+Certaines sont plus simples, d'autres plus générales.
+Le code suivant extrait le biais
+de la deuxième couche du réseau neuronal, qui renvoie une instance de classe de paramètre, et
+accède ensuite à la valeur de ce paramètre.
 
 ```{.python .input}
 %%tab mxnet
@@ -135,12 +135,12 @@ type(net.layers[2].weights[1]), tf.convert_to_tensor(net.layers[2].weights[1])
 ```
 
 :begin_tab:`mxnet,pytorch`
-Parameters are complex objects,
-containing values, gradients,
-and additional information.
-That's why we need to request the value explicitly.
+Les paramètres sont des objets complexes,
+contenant des valeurs, des gradients,
+et des informations supplémentaires.
+C'est pourquoi nous devons demander la valeur de manière explicite.
 
-In addition to the value, each parameter also allows us to access the gradient. Because we have not invoked backpropagation for this network yet, it is in its initial state.
+En plus de la valeur, chaque paramètre nous permet également d'accéder au gradient. Comme nous n'avons pas encore invoqué la rétropropagation pour ce réseau, celui-ci est dans son état initial.
 :end_tab:
 
 ```{.python .input}
@@ -153,15 +153,15 @@ net[1].weight.grad()
 net[2].weight.grad == None
 ```
 
-### [**All Parameters at Once**]
+### [**Tous les paramètres à la fois**]
 
-When we need to perform operations on all parameters,
-accessing them one-by-one can grow tedious.
-The situation can grow especially unwieldy
-when we work with more complex modules (e.g., nested modules),
-since we would need to recurse
-through the entire tree to extract
-each sub-module's parameters. Below we demonstrate accessing the parameters of all layers.
+Lorsque nous devons effectuer des opérations sur tous les paramètres,
+y accéder un par un peut devenir fastidieux.
+La situation peut devenir particulièrement difficile
+lorsque nous travaillons avec des modules plus complexes (par exemple, des modules imbriqués),
+puisque nous devrions récurer
+à travers l'arbre entier pour extraire
+les paramètres de chaque sous-module. Nous démontrons ci-dessous l'accès aux paramètres de toutes les couches.
 
 ```{.python .input}
 %%tab mxnet
@@ -178,15 +178,15 @@ net.collect_params()
 net.get_weights()
 ```
 
-## [**Tied Parameters**]
+## [**Paramètres liés**]
 
-Often, we want to share parameters across multiple layers.
-Let's see how to do this elegantly.
-In the following we allocate a fully connected layer
-and then use its parameters specifically
-to set those of another layer.
-Here we need to run the forward propagation
-`net(X)` before accessing the parameters.
+Souvent, nous voulons partager des paramètres entre plusieurs couches.
+Voyons comment le faire de manière élégante.
+Dans ce qui suit, nous attribuons une couche entièrement connectée
+et utilisons ensuite ses paramètres spécifiquement
+pour définir ceux d'une autre couche.
+Ici, nous devons exécuter la propagation vers l'avant
+`net(X)` avant d'accéder aux paramètres.
 
 ```{.python .input}
 %%tab mxnet
@@ -245,30 +245,30 @@ net(X)
 print(len(net.layers) == 3)
 ```
 
-This example shows that the parameters
-of the second and third layer are tied.
-They are not just equal, they are
-represented by the same exact tensor.
-Thus, if we change one of the parameters,
-the other one changes, too.
-You might wonder,
-when parameters are tied
-what happens to the gradients?
-Since the model parameters contain gradients,
-the gradients of the second hidden layer
-and the third hidden layer are added together
-during backpropagation.
+Cet exemple montre que les paramètres
+de la deuxième et de la troisième couche sont égaux.
+Ils ne sont pas seulement égaux, ils sont
+représentés par le même tenseur exact.
+Ainsi, si nous modifions l'un des paramètres,
+l'autre change également.
+Vous vous demandez peut-être :
+lorsque les paramètres sont liés
+qu'advient-il des gradients ?
+Puisque les paramètres du modèle contiennent des gradients,
+les gradients de la deuxième couche cachée
+et de la troisième couche cachée sont ajoutés ensemble
+pendant la rétropropagation.
 
-## Summary
+## Résumé
 
-We have several ways to access and tie model parameters.
+Nous avons plusieurs façons d'accéder aux paramètres du modèle et de les lier.
 
 
-## Exercises
+## Exercices
 
-1. Use the `NestMLP` model defined in :numref:`sec_model_construction` and access the parameters of the various layers.
-1. Construct an MLP containing a shared parameter layer and train it. During the training process, observe the model parameters and gradients of each layer.
-1. Why is sharing parameters a good idea?
+1. Utilisez le modèle `NestMLP` défini dans :numref:`sec_model_construction` et accédez aux paramètres des différentes couches.
+1. Construisez un MLP contenant une couche à paramètres partagés et entraînez-le. Pendant le processus d'entraînement, observez les paramètres du modèle et les gradients de chaque couche.
+1. Pourquoi le partage des paramètres est-il une bonne idée ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/56)

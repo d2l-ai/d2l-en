@@ -3,110 +3,110 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-# Transformer
-:label:`sec_transformer`
+# Transformateur
+:label:`sec_transformer` 
 
+ 
+ Nous avons comparé les CNN, les RNN et l'auto-attention dans
+:numref:`subsec_cnn-rnn-self-attention` .
+Notamment, l'auto-attention
 
-We have compared CNNs, RNNs, and self-attention in
-:numref:`subsec_cnn-rnn-self-attention`.
-Notably,
-self-attention
-enjoys both parallel computation and
-the shortest maximum path length.
-Therefore natually,
-it is appealing to design deep architectures
-by using self-attention.
-Unlike earlier self-attention models
-that still rely on RNNs for input representations :cite:`Cheng.Dong.Lapata.2016,Lin.Feng.Santos.ea.2017,Paulus.Xiong.Socher.2017`,
-the transformer model
-is solely based on attention mechanisms
-without any convolutional or recurrent layer :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
-Though originally proposed
-for sequence to sequence learning on text data,
-transformers have been
-pervasive in a wide range of
-modern deep learning applications,
-such as in areas of language, vision, speech, and reinforcement learning.
+ bénéficie à la fois du calcul parallèle et
+de la longueur de chemin maximale la plus courte.
+C'est pourquoi, naturellement,
+il est intéressant de concevoir des architectures profondes
+en utilisant l'auto-attention.
+Contrairement aux modèles d'auto-attention antérieurs
+qui reposent toujours sur des RNN pour les représentations d'entrée :cite:`Cheng.Dong.Lapata.2016,Lin.Feng.Santos.ea.2017,Paulus.Xiong.Socher.2017` ,
+le modèle de transformation
+est uniquement basé sur les mécanismes d'attention
+sans aucune couche convolutive ou récurrente :cite:`Vaswani.Shazeer.Parmar.ea.2017` .
 
-## Model
+Bien qu'ils aient été proposés à l'origine
+pour l'apprentissage de séquence à séquence sur des données textuelles, les transformateurs
+ont été omniprésents dans un large éventail d'applications modernes d'apprentissage profond
+,
+notamment dans les domaines du langage, de la vision, du langage et de l'apprentissage par renforcement.
 
-As an instance of the encoder-decoder
-architecture,
-the overall architecture of
-the transformer
-is presented in :numref:`fig_transformer`.
-As we can see,
-the transformer is composed of an encoder and a decoder.
-Different from
-Bahdanau attention
-for sequence to sequence learning
-in :numref:`fig_s2s_attention_details`,
-the input (source) and output (target)
-sequence embeddings
-are added with positional encoding
-before being fed into
-the encoder and the decoder
-that stack modules based on self-attention.
+## Modèle
+
+En tant qu'instance de l'architecture de l'encodeur-décodeur
+,
+l'architecture globale de
+le transformateur
+est présentée dans :numref:`fig_transformer` .
+Comme on peut le voir,
+le transformateur est composé d'un encodeur et d'un décodeur.
+A la différence de
+, l'attention de Bahdanau
+pour l'apprentissage de séquence à séquence
+, dans :numref:`fig_s2s_attention_details` ,
+, les embeddings de séquence d'entrée (source) et de sortie (cible)
+
+ sont ajoutés avec un encodage positionnel
+avant d'être introduits dans
+l'encodeur et le décodeur
+qui empilent des modules basés sur l'auto-attention.
 
 ![The transformer architecture.](../img/transformer.svg)
 :width:`500px`
 :label:`fig_transformer`
 
 
-Now we provide an overview of the
-transformer architecture in :numref:`fig_transformer`.
-On a high level,
-the transformer encoder is a stack of multiple identical layers,
-where each layer
-has two sublayers (either is denoted as $\mathrm{sublayer}$).
-The first
-is a multi-head self-attention pooling
-and the second is a positionwise feed-forward network.
-Specifically,
-in the encoder self-attention,
-queries, keys, and values are all from the
-outputs of the previous encoder layer.
-Inspired by the ResNet design in :numref:`sec_resnet`,
-a residual connection is employed
-around both sublayers.
-In the transformer,
-for any input $\mathbf{x} \in \mathbb{R}^d$ at any position of the sequence,
-we require that $\mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ so that
-the residual connection $\mathbf{x} + \mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ is feasible.
-This addition from the residual connection is immediately
-followed by layer normalization :cite:`Ba.Kiros.Hinton.2016`.
-As a result, the transformer encoder outputs a $d$-dimensional vector representation for each position of the input sequence.
+Nous donnons maintenant un aperçu de l'architecture du transformateur
+dans :numref:`fig_transformer` .
+À un niveau élevé,
+le codeur transformateur est une pile de plusieurs couches identiques,
+où chaque couche
+a deux sous-couches (l'une ou l'autre est désignée par $\mathrm{sublayer}$).
+La première
+est un réseau de mise en commun d'auto-attention à têtes multiples
+et la seconde est un réseau à action directe par position.
+Plus précisément,
+dans l'auto-attention du codeur, les requêtes, les clés et les valeurs de
+proviennent toutes des sorties de
+de la couche précédente du codeur.
+Inspiré par la conception du ResNet dans :numref:`sec_resnet` ,
+une connexion résiduelle est employée
+autour des deux sous-couches.
+Dans le transformateur,
+pour toute entrée $\mathbf{x} \in \mathbb{R}^d$ à toute position de la séquence,
+nous exigeons que $\mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ pour que
+la connexion résiduelle $\mathbf{x} + \mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ soit réalisable.
+Cette addition de la connexion résiduelle est immédiatement
+suivie d'une normalisation de la couche :cite:`Ba.Kiros.Hinton.2016` .
+En conséquence, le codeur transformateur produit une représentation vectorielle $d$-dimensionnelle pour chaque position de la séquence d'entrée.
 
-The transformer decoder is also
-a stack of multiple identical layers with residual connections and layer normalizations.
-Besides the two sublayers described in
-the encoder, the decoder inserts
-a third sublayer, known as
-the encoder-decoder attention,
-between these two.
-In the encoder-decoder attention,
-queries are from the
-outputs of the previous decoder layer,
-and the keys and values are
-from the transformer encoder outputs.
-In the decoder self-attention,
-queries, keys, and values are all from the
-outputs of the previous decoder layer.
-However,
-each position in the decoder is
-allowed to only attend to all positions in the decoder
-up to that position.
-This *masked* attention
-preserves the auto-regressive property,
-ensuring that the prediction only depends on those output tokens that have been generated.
+Le décodeur de transformateur est également
+une pile de plusieurs couches identiques avec des connexions résiduelles et des normalisations de couche.
+Outre les deux sous-couches décrites dans
+le codeur, le décodeur insère
+une troisième sous-couche, appelée
+l'attention du codeur-décodeur,
+entre ces deux-là.
+Dans l'attention de l'encodeur-décodeur,
+les requêtes proviennent des sorties
+de la couche précédente du décodeur,
+et les clés et valeurs proviennent
+des sorties de l'encodeur transformateur.
+Dans l'auto-attention du décodeur,
+les requêtes, les clés et les valeurs proviennent toutes des sorties
+de la couche décodeur précédente.
+Cependant,
+chaque position du décodeur est
+autorisée à ne s'occuper que de toutes les positions du décodeur
+jusqu'à cette position.
+Cette attention *masquée*
+préserve la propriété auto-régressive,
+garantissant que la prédiction ne dépend que des jetons de sortie qui ont été générés.
 
 
-We have already described and implemented
-multi-head attention based on scaled dot-products
-in :numref:`sec_multihead-attention`
-and positional encoding in :numref:`subsec_positional-encoding`.
-In the following,
-we will implement the rest of the transformer model.
+Nous avons déjà décrit et implémenté
+l'attention multi-têtes basée sur des produits scalaires de points
+dans :numref:`sec_multihead-attention` 
+ et le codage positionnel dans :numref:`subsec_positional-encoding` .
+Dans la suite,
+nous implémenterons le reste du modèle de transformation.
 
 ```{.python .input}
 %%tab mxnet
@@ -135,20 +135,20 @@ import pandas as pd
 import tensorflow as tf
 ```
 
-## [**Positionwise Feed-Forward Networks**]
-:label:`subsec_positionwise-ffn`
+## [**Réseaux feed-forward par position**]
+:label:`subsec_positionwise-ffn` 
 
-The positionwise feed-forward network
-transforms
-the representation at all the sequence positions
-using the same MLP.
-This is why we call it *positionwise*.
-In the implementation below,
-the input `X` with shape
-(batch size, number of time steps or sequence length in tokens, number of hidden units or feature dimension)
-will be transformed by a two-layer MLP into
-an output tensor of shape
-(batch size, number of time steps, `ffn_num_outputs`).
+ Le réseau feed-forward par position
+transforme
+la représentation à toutes les positions de la séquence
+en utilisant le même MLP.
+C'est pourquoi nous l'appelons *positionwise*.
+Dans l'implémentation ci-dessous,
+l'entrée `X` avec la forme
+(taille du lot, nombre de pas de temps ou longueur de la séquence en tokens, nombre d'unités cachées ou dimension de la caractéristique)
+sera transformée par un MLP à deux couches en
+un tenseur de sortie de forme
+(taille du lot, nombre de pas de temps, `ffn_num_outputs`).
 
 ```{.python .input}
 %%tab mxnet
@@ -195,15 +195,15 @@ class PositionWiseFFN(tf.keras.layers.Layer):
         return self.dense2(self.relu(self.dense1(X)))
 ```
 
-The following example
-shows that [**the innermost dimension
-of a tensor changes**] to
-the number of outputs in
-the positionwise feed-forward network.
-Since the same MLP transforms
-at all the positions,
-when the inputs at all these positions are the same,
-their outputs are also identical.
+L'exemple suivant
+montre que [**la dimension la plus intérieure
+d'un tenseur change**] en
+le nombre de sorties dans
+le réseau feed-forward positionnel.
+Puisque le même MLP transforme
+à toutes les positions,
+lorsque les entrées à toutes ces positions sont les mêmes,
+leurs sorties sont également identiques.
 
 ```{.python .input}
 %%tab mxnet
@@ -225,35 +225,35 @@ ffn = PositionWiseFFN(4, 8)
 ffn(tf.ones((2, 3, 4)))[0]
 ```
 
-## Residual Connection and Layer Normalization
+## Connexion résiduelle et normalisation des couches
 
-Now let's focus on
-the "add & norm" component in :numref:`fig_transformer`.
-As we described at the beginning
-of this section,
-this is a residual connection immediately
-followed by layer normalization.
-Both are key to effective deep architectures.
+Concentrons-nous maintenant sur
+la composante " add &amp; norm " de :numref:`fig_transformer` .
+Comme nous l'avons décrit au début
+de cette section,
+il s'agit d'une connexion résiduelle immédiatement
+suivie d'une normalisation de couche.
+Ces deux éléments sont essentiels à l'efficacité des architectures profondes.
 
-In :numref:`sec_batch_norm`,
-we explained how batch normalization
-recenters and rescales across the examples within
-a minibatch.
-Layer normalization is the same as batch normalization
-except that the former
-normalizes across the feature dimension.
-Despite its pervasive applications
-in computer vision,
-batch normalization
-is usually empirically
-less effective than layer normalization
-in natural language processing
-tasks, whose inputs are often
-variable-length sequences.
+Dans :numref:`sec_batch_norm` ,
+nous avons expliqué comment la normalisation par lot
+recentre et redimensionne les exemples dans
+un minibatch.
+La normalisation par couche est identique à la normalisation par lot
+, sauf que la première
+normalise à travers la dimension des caractéristiques.
 
-The following code snippet
-[**compares the normalization across different dimensions
-by layer normalization and batch normalization**].
+Malgré ses nombreuses applications
+dans le domaine de la vision par ordinateur, la normalisation par lot
+
+ est généralement moins efficace, d'un point de vue empirique, que la normalisation par couche
+dans les tâches de traitement du langage naturel
+, dont les entrées sont souvent des séquences de longueur variable
+.
+
+L'extrait de code suivant
+[**compare la normalisation à travers différentes dimensions
+par la normalisation par couche et la normalisation par lot**].
 
 ```{.python .input}
 %%tab mxnet
@@ -284,9 +284,9 @@ X = tf.constant([[1, 2], [2, 3]], dtype=tf.float32)
 print('layer norm:', ln(X), '\nbatch norm:', bn(X))
 ```
 
-Now we can implement the `AddNorm` class
-[**using a residual connection followed by layer normalization**].
-Dropout is also applied for regularization.
+Nous pouvons maintenant mettre en œuvre la classe `AddNorm`
+ [**en utilisant un branchement résiduel suivi d'une normalisation par couche**].
+Le dropout est également appliqué pour la régularisation.
 
 ```{.python .input}
 %%tab mxnet
@@ -330,9 +330,9 @@ class AddNorm(tf.keras.layers.Layer):
         return self.ln(self.dropout(Y, **kwargs) + X)
 ```
 
-The residual connection requires that
-the two inputs are of the same shape
-so that [**the output tensor also has the same shape after the addition operation**].
+La connexion résiduelle exige que
+les deux entrées aient la même forme
+de sorte que [**le tenseur de sortie ait également la même forme après l'opération d'addition**].
 
 ```{.python .input}
 %%tab mxnet
@@ -355,17 +355,17 @@ d2l.check_shape(add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)),
                          training=False), (2, 3, 4))
 ```
 
-## Encoder
-:label:`subsec_transformer-encoder`
+## Encodeur
+:label:`subsec_transformer-encoder` 
 
-With all the essential components to assemble
-the transformer encoder,
-let's start by
-implementing [**a single layer within the encoder**].
-The following `TransformerEncoderBlock` class
-contains two sublayers: multi-head self-attention and positionwise feed-forward networks,
-where a residual connection followed by layer normalization is employed
-around both sublayers.
+ Avec tous les composants essentiels pour assembler
+l'encodeur transformateur,
+commençons par
+implémenter [**une couche unique dans l'encodeur**].
+La classe suivante `TransformerEncoderBlock`
+ contient deux sous-couches : des réseaux d'auto-attention à têtes multiples et des réseaux feed-forward par position,
+où une connexion résiduelle suivie d'une normalisation de couche est employée
+autour des deux sous-couches.
 
 ```{.python .input}
 %%tab mxnet
@@ -426,9 +426,9 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):
         return self.addnorm2(Y, self.ffn(Y), **kwargs)
 ```
 
-As we can see,
-[**any layer in the transformer encoder
-does not change the shape of its input.**]
+Comme on peut le constater,
+[**toute couche dans le codeur transformateur
+ne change pas la forme de son entrée.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -457,13 +457,13 @@ encoder_blk = TransformerEncoderBlock(24, 24, 24, 24, norm_shape, 48, 8, 0.5)
 d2l.check_shape(encoder_blk(X, valid_lens, training=False), X.shape)
 ```
 
-In the following [**transformer encoder**] implementation,
-we stack `num_blks` instances of the above `TransformerEncoderBlock` classes.
-Since we use the fixed positional encoding
-whose values are always between -1 and 1,
-we multiply values of the learnable input embeddings
-by the square root of the embedding dimension
-to rescale before summing up the input embedding and the positional encoding.
+Dans l'implémentation suivante de [**l'encodeur transformateur**],
+nous empilons `num_blks` instances des classes `TransformerEncoderBlock` ci-dessus.
+Puisque nous utilisons l'encodage positionnel fixe
+dont les valeurs sont toujours comprises entre -1 et 1,
+nous multiplions les valeurs des encastrements d'entrée apprenables
+par la racine carrée de la dimension d'encastrement
+pour les remettre à l'échelle avant d'additionner l'encastrement d'entrée et l'encodage positionnel.
 
 ```{.python .input}
 %%tab mxnet
@@ -555,9 +555,9 @@ class TransformerEncoder(d2l.Encoder):
         return X
 ```
 
-Below we specify hyperparameters to [**create a two-layer transformer encoder**].
-The shape of the transformer encoder output
-is (batch size, number of time steps, `num_hiddens`).
+Nous spécifions ci-dessous les hyperparamètres pour [**créer un codeur transformateur à deux couches**].
+La forme de la sortie du codeur transformateur
+est (taille du lot, nombre de pas de temps, `num_hiddens`).
 
 ```{.python .input}
 %%tab mxnet
@@ -579,45 +579,45 @@ d2l.check_shape(encoder(tf.ones((2, 100)), valid_lens, training=False),
                 (2, 100, 24))
 ```
 
-## Decoder
+## Décodeur
 
-As shown in :numref:`fig_transformer`,
-[**the transformer decoder
-is composed of multiple identical layers**].
-Each layer is implemented in the following
-`TransformerDecoderBlock` class,
-which contains three sublayers:
-decoder self-attention,
-encoder-decoder attention,
-and positionwise feed-forward networks.
-These sublayers employ
-a residual connection around them
-followed by layer normalization.
+Comme indiqué sur :numref:`fig_transformer` ,
+[**le décodeur transformateur
+est composé de plusieurs couches identiques**].
+Chaque couche est mise en œuvre dans la classe suivante
+`TransformerDecoderBlock` ,
+qui contient trois sous-couches :
+attention du décodeur,
+attention du codeur-décodeur,
+et réseaux à action directe par position.
+Ces sous-couches emploient
+une connexion résiduelle autour d'elles
+suivie d'une normalisation des couches.
 
 
-As we described earlier in this section,
-in the masked multi-head decoder self-attention
-(the first sublayer),
-queries, keys, and values
-all come from the outputs of the previous decoder layer.
-When training sequence-to-sequence models,
-tokens at all the positions (time steps)
-of the output sequence
-are known.
-However,
-during prediction
-the output sequence is generated token by token;
-thus,
-at any decoder time step
-only the generated tokens
-can be used in the decoder self-attention.
-To preserve auto-regression in the decoder,
-its masked self-attention
-specifies  `dec_valid_lens` so that
-any query
-only attends to
-all positions in the decoder
-up to the query position.
+Comme nous l'avons décrit précédemment dans cette section,
+dans l'auto-attention du décodeur multi-tête masqué
+(la première sous-couche),
+les requêtes, les clés et les valeurs
+proviennent toutes des sorties de la couche décodeur précédente.
+Lors de la formation des modèles de séquence à séquence,
+les tokens à toutes les positions (pas de temps)
+de la séquence de sortie
+sont connus.
+Cependant,
+pendant la prédiction
+la séquence de sortie est générée token par token ;
+ainsi,
+à tout pas de temps du décodeur
+seuls les tokens générés
+peuvent être utilisés dans l'auto-attention du décodeur.
+Pour préserver l'autorégression dans le décodeur,
+son auto-attention masquée
+spécifie `dec_valid_lens` de sorte que
+toute requête
+n'attend que
+toutes les positions dans le décodeur
+jusqu'à la position de la requête.
 
 ```{.python .input}
 %%tab mxnet
@@ -762,11 +762,11 @@ class TransformerDecoderBlock(tf.keras.layers.Layer):
         return self.addnorm3(Z, self.ffn(Z), **kwargs), state
 ```
 
-To facilitate scaled dot-product operations
-in the encoder-decoder attention
-and addition operations in the residual connections,
-[**the feature dimension (`num_hiddens`) of the decoder is
-the same as that of the encoder.**]
+Pour faciliter les opérations de produit scalaire
+dans l'attention codeur-décodeur
+et les opérations d'addition dans les connexions résiduelles,
+[**la dimension caractéristique (`num_hiddens`) du décodeur est
+la même que celle du codeur.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -793,14 +793,14 @@ state = [encoder_blk(X, valid_lens), valid_lens, [None]]
 d2l.check_shape(decoder_blk(X, state, training=False)[0], X.shape)
 ```
 
-Now we [**construct the entire transformer decoder**]
-composed of `num_blks` instances of `TransformerDecoderBlock`.
-In the end,
-a fully connected layer computes the prediction
-for all the `vocab_size` possible output tokens.
-Both of the decoder self-attention weights
-and the encoder-decoder attention weights
-are stored for later visualization.
+Maintenant, nous [**construisons le décodeur transformateur complet**]
+composé de `num_blks` instances de `TransformerDecoderBlock`.
+Au final,
+une couche entièrement connectée calcule la prédiction
+pour tous les `vocab_size` jetons de sortie possibles.
+Les deux poids d'attention du décodeur
+et les poids d'attention de l'encodeur-décodeur
+sont stockés pour une visualisation ultérieure.
 
 ```{.python .input}
 %%tab mxnet
@@ -919,14 +919,14 @@ class TransformerDecoder(d2l.AttentionDecoder):
 
 ## [**Training**]
 
-Let's instantiate an encoder-decoder model
-by following the transformer architecture.
-Here we specify that
-both the transformer encoder and the transformer decoder
-have 2 layers using 4-head attention.
-Similar to :numref:`sec_seq2seq_training`,
-we train the transformer model
-for sequence to sequence learning on the English-French machine translation dataset.
+Instancions un modèle encodeur-décodeur
+en suivant l'architecture du transformateur.
+Ici, nous spécifions que
+l'encodeur transformateur et le décodeur transformateur
+ont tous deux 2 couches utilisant une attention à 4 têtes.
+Comme pour :numref:`sec_seq2seq_training` ,
+nous formons le modèle de transformateur
+pour l'apprentissage de séquence à séquence sur le jeu de données de traduction automatique anglais-français.
 
 ```{.python .input}
 %%tab all
@@ -968,9 +968,9 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-After training,
-we use the transformer model
-to [**translate a few English sentences**] into French and compute their BLEU scores.
+Après l'entraînement,
+nous utilisons le modèle de transformation
+pour [**traduire quelques phrases anglaises**] en français et calculer leurs scores BLEU.
 
 ```{.python .input}
 %%tab all
@@ -988,9 +988,9 @@ for en, fr, p in zip(engs, fras, preds):
           f'{d2l.bleu(" ".join(translation), fr, k=2):.3f}')
 ```
 
-Let's [**visualize the transformer attention weights**] when translating the last English sentence into French.
-The shape of the encoder self-attention weights
-is (number of encoder layers, number of attention heads, `num_steps` or number of queries, `num_steps` or number of key-value pairs).
+Visualisons [**les poids d'attention du transformateur**] lors de la traduction de la dernière phrase anglaise en français.
+La forme des poids d'auto-attention du codeur
+est (nombre de couches du codeur, nombre de têtes d'attention, `num_steps` ou nombre de requêtes, `num_steps` ou nombre de paires clé-valeur).
 
 ```{.python .input}
 %%tab all
@@ -1003,16 +1003,16 @@ d2l.check_shape(enc_attention_weights,
                 (num_blks, num_heads, data.num_steps, data.num_steps))
 ```
 
-In the encoder self-attention,
-both queries and keys come from the same input sequence.
-Since padding tokens do not carry meaning,
-with specified valid length of the input sequence,
-no query attends to positions of padding tokens.
-In the following,
-two layers of multi-head attention weights
-are presented row by row.
-Each head independently attends
-based on a separate representation subspaces of queries, keys, and values.
+Dans l'auto-attention du codeur,
+, les requêtes et les clés proviennent de la même séquence d'entrée.
+Comme les jetons de remplissage ne sont pas porteurs de sens,
+avec une longueur valide spécifiée de la séquence d'entrée,
+aucune requête ne s'intéresse aux positions des jetons de remplissage.
+Dans ce qui suit,
+deux couches de poids d'attention multi-têtes
+sont présentées ligne par ligne.
+Chaque tête s'occupe indépendamment de
+sur la base d'un sous-espace de représentation distinct des requêtes, des clés et des valeurs.
 
 ```{.python .input}
 %%tab mxnet, tensorflow
@@ -1029,17 +1029,17 @@ d2l.show_heatmaps(
     figsize=(7, 3.5))
 ```
 
-[**To visualize both the decoder self-attention weights and the encoder-decoder attention weights,
-we need more data manipulations.**]
-For example,
-we fill the masked attention weights with zero.
-Note that
-the decoder self-attention weights
-and the encoder-decoder attention weights
-both have the same queries:
-the beginning-of-sequence token followed by
-the output tokens and possibly
-end-of-sequence tokens.
+[**Pour visualiser à la fois les poids d'auto-attention du décodeur et les poids d'attention du codeur-décodeur,
+nous avons besoin de plus de manipulations de données.**]
+Par exemple,
+nous remplissons les poids d'attention masqués avec zéro.
+Notez que
+les poids d'auto-attention du décodeur
+et les poids d'attention de l'encodeur-décodeur
+ont tous deux les mêmes requêtes :
+le jeton de début de séquence suivi de
+les jetons de sortie et éventuellement
+les jetons de fin de séquence.
 
 ```{.python .input}
 %%tab mxnet
@@ -1089,8 +1089,8 @@ d2l.check_shape(dec_inter_attention_weights,
                 (num_blks, num_heads, data.num_steps, data.num_steps))
 ```
 
-Due to the auto-regressive property of the decoder self-attention,
-no query attends to key-value pairs after the query position.
+En raison de la propriété auto-régressive de l'auto-attention du décodeur,
+aucune requête n'attend les paires clé-valeur après la position de la requête.
 
 ```{.python .input}
 %%tab all
@@ -1100,10 +1100,10 @@ d2l.show_heatmaps(
     titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))
 ```
 
-Similar to the case in the encoder self-attention,
-via the specified valid length of the input sequence,
+Comme dans le cas de l'auto-attention du codeur,
+via la longueur valide spécifiée de la séquence d'entrée,
 [**no query from the output sequence
-attends to those padding tokens from the input sequence.**]
+attend to those padding tokens from the input sequence.**]
 
 ```{.python .input}
 %%tab all
@@ -1113,29 +1113,29 @@ d2l.show_heatmaps(
     figsize=(7, 3.5))
 ```
 
-Although the transformer architecture
-was originally proposed for sequence-to-sequence learning,
-as we will discover later in the book,
-either the transformer encoder
-or the transformer decoder
-is often individually used
-for different deep learning tasks.
+Bien que l'architecture de transformateur
+ait été proposée à l'origine pour l'apprentissage de séquence à séquence,
+comme nous le découvrirons plus tard dans le livre,
+soit le codeur transformateur
+soit le décodeur transformateur
+est souvent utilisé individuellement
+pour différentes tâches d'apprentissage profond.
 
 
-## Summary
+## Résumé
 
-* The transformer is an instance of the encoder-decoder architecture, though either the encoder or the decoder can be used individually in practice.
-* In the transformer, multi-head self-attention is used for representing the input sequence and the output sequence, though the decoder has to preserve the auto-regressive property via a masked version.
-* Both the residual connections and the layer normalization in the transformer are important for training a very deep model.
-* The positionwise feed-forward network in the transformer model transforms the representation at all the sequence positions using the same MLP.
+* Le transformateur est une instance de l'architecture encodeur-décodeur, bien que l'encodeur ou le décodeur puisse être utilisé individuellement dans la pratique.
+* Dans le transformateur, l'auto-attention multi-tête est utilisée pour représenter la séquence d'entrée et la séquence de sortie, bien que le décodeur doive préserver la propriété auto-régressive via une version masquée.
+* Les connexions résiduelles et la normalisation des couches dans le transformateur sont importantes pour l'apprentissage d'un modèle très profond.
+* Le réseau feed-forward positionnel dans le modèle de transformation transforme la représentation à toutes les positions de la séquence en utilisant le même MLP.
 
-## Exercises
+## Exercices
 
-1. Train a deeper transformer in the experiments. How does it affect the training speed and the translation performance?
-1. Is it a good idea to replace scaled dot-product attention with additive attention in the transformer? Why?
-1. For language modeling, should we use the transformer encoder, decoder, or both? How to design this method?
-1. What can be challenges to transformers if input sequences are very long? Why?
-1. How to improve computational and memory efficiency of transformers? Hint: you may refer to the survey paper by Tay et al. :cite:`Tay.Dehghani.Bahri.ea.2020`.
+1. Entraînez un transformateur plus profond dans les expériences. Comment cela affecte-t-il la vitesse d'apprentissage et les performances de traduction ?
+1. Est-ce une bonne idée de remplacer l'attention du produit scalaire par une attention additive dans le transformateur ? Pourquoi ?
+1. Pour la modélisation du langage, devrions-nous utiliser le transformateur encodeur, décodeur, ou les deux ? Comment concevoir cette méthode ?
+1. Quels peuvent être les défis des transformateurs si les séquences d'entrée sont très longues ? Pourquoi ?
+1. Comment améliorer l'efficacité des transformateurs en termes de calcul et de mémoire ? Conseil : vous pouvez vous référer au document d'étude de Tay et al. :cite:`Tay.Dehghani.Bahri.ea.2020` .
 
 
 :begin_tab:`mxnet`

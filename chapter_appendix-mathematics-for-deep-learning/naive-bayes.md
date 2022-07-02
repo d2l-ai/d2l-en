@@ -1,9 +1,9 @@
 # Naive Bayes
-:label:`sec_naive_bayes`
+:label:`sec_naive_bayes` 
 
-Throughout the previous sections, we learned about the theory of probability and random variables.  To put this theory to work, let's introduce the *naive Bayes* classifier.  This uses nothing but probabilistic fundamentals to allow us to perform classification of digits.
+ Tout au long des sections précédentes, nous avons appris la théorie des probabilités et des variables aléatoires.  Pour mettre cette théorie en pratique, nous allons présenter le classificateur *Bayes naïf*.  Celui-ci n'utilise rien d'autre que les bases probabilistes pour nous permettre d'effectuer la classification de chiffres.
 
-Learning is all about making assumptions. If we want to classify a new data example that we have never seen before we have to make some assumptions about which data examples are similar to each other. The naive Bayes classifier, a popular and remarkably clear algorithm, assumes all features are independent from each other to simplify the computation. In this section, we will apply this model to recognize characters in images.
+L'apprentissage consiste à faire des hypothèses. Si nous voulons classer un nouvel exemple de données que nous n'avons jamais vu auparavant, nous devons faire quelques hypothèses sur les exemples de données qui sont similaires les uns aux autres. Le classificateur Bayes naïf, un algorithme populaire et remarquablement clair, suppose que toutes les caractéristiques sont indépendantes les unes des autres afin de simplifier le calcul. Dans cette section, nous allons appliquer ce modèle pour reconnaître des caractères dans des images.
 
 ```{.python .input}
 #@tab mxnet
@@ -34,16 +34,16 @@ import tensorflow as tf
 d2l.use_svg_display()
 ```
 
-## Optical Character Recognition
+## Reconnaissance optique de caractères
 
-MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
+MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` est l'un des jeux de données les plus utilisés. Il contient 60 000 images pour la formation et 10 000 images pour la validation. Chaque image contient un chiffre écrit à la main de 0 à 9. La tâche consiste à classer chaque image dans le chiffre correspondant.
 
-Gluon provides a `MNIST` class in the `data.vision` module to
-automatically retrieve the dataset from the Internet.
-Subsequently, Gluon will use the already-downloaded local copy.
-We specify whether we are requesting the training set or the test set
-by setting the value of the parameter `train` to `True` or `False`, respectively.
-Each image is a grayscale image with both width and height of $28$ with shape ($28$,$28$,$1$). We use a customized transformation to remove the last channel dimension. In addition, the dataset represents each pixel by an unsigned $8$-bit integer.  We quantize them into binary features to simplify the problem.
+Gluon fournit une classe `MNIST` dans le module `data.vision` pour
+récupérer automatiquement l'ensemble de données sur Internet.
+Par la suite, Gluon utilisera la copie locale déjà téléchargée.
+Nous spécifions si nous demandons l'ensemble d'entraînement ou l'ensemble de test
+en fixant la valeur du paramètre `train` à `True` ou `False`, respectivement.
+Chaque image est une image en niveaux de gris avec une largeur et une hauteur de $28$ et une forme ($28$,$28$,$1$). Nous utilisons une transformation personnalisée pour supprimer la dernière dimension du canal. En outre, l'ensemble de données représente chaque pixel par un entier non signé $8$-bit.  Nous les quantifions en caractéristiques binaires pour simplifier le problème.
 
 ```{.python .input}
 #@tab mxnet
@@ -83,7 +83,7 @@ train_labels = tf.constant(train_labels, dtype = tf.int32)
 test_labels = tf.constant(test_labels, dtype = tf.int32)
 ```
 
-We can access a particular example, which contains the image and the corresponding label.
+Nous pouvons accéder à un exemple particulier, qui contient l'image et le label correspondant.
 
 ```{.python .input}
 #@tab mxnet
@@ -103,14 +103,14 @@ image, label = train_images[2], train_labels[2]
 image.shape, label.numpy()
 ```
 
-Our example, stored here in the variable `image`, corresponds to an image with a height and width of $28$ pixels.
+Notre exemple, stocké ici dans la variable `image`, correspond à une image d'une hauteur et d'une largeur de $28$ pixels.
 
 ```{.python .input}
 #@tab all
 image.shape, image.dtype
 ```
 
-Our code stores the label of each image as a scalar. Its type is a $32$-bit integer.
+Notre code stocke le label de chaque image comme un scalaire. Son type est un entier de $32$-bit.
 
 ```{.python .input}
 #@tab mxnet
@@ -127,7 +127,7 @@ label, type(label)
 label.numpy(), label.dtype
 ```
 
-We can also access multiple examples at the same time.
+Nous pouvons également accéder à plusieurs exemples en même temps.
 
 ```{.python .input}
 #@tab mxnet
@@ -149,42 +149,42 @@ labels = tf.constant([train_labels[i].numpy() for i in range(10, 38)])
 images.shape, labels.shape
 ```
 
-Let's visualize these examples.
+Visualisons ces exemples.
 
 ```{.python .input}
 #@tab all
 d2l.show_images(images, 2, 9);
 ```
 
-## The Probabilistic Model for Classification
+## Le modèle probabiliste pour la classification
 
-In a classification task, we map an example into a category. Here an example is a grayscale $28\times 28$ image, and a category is a digit. (Refer to :numref:`sec_softmax` for a more detailed explanation.)
-One natural way to express the classification task is via the probabilistic question: what is the most likely label given the features (i.e., image pixels)? Denote by $\mathbf x\in\mathbb R^d$ the features of the example and $y\in\mathbb R$ the label. Here features are image pixels, where we can reshape a $2$-dimensional image to a vector so that $d=28^2=784$, and labels are digits.
-The probability of the label given the features is $p(y  \mid  \mathbf{x})$. If we are able to compute these probabilities, which are $p(y  \mid  \mathbf{x})$ for $y=0, \ldots,9$ in our example, then the classifier will output the prediction $\hat{y}$ given by the expression:
+Dans une tâche de classification, nous faisons correspondre un exemple à une catégorie. Ici, un exemple est une image en niveaux de gris $28\times 28$, et une catégorie est un chiffre. (Reportez-vous à :numref:`sec_softmax` pour une explication plus détaillée.)
+Une façon naturelle d'exprimer la tâche de classification est de poser la question probabiliste suivante : quelle est l'étiquette la plus probable étant donné les caractéristiques (c'est-à-dire les pixels de l'image) ? On désigne par $\mathbf x\in\mathbb R^d$ les caractéristiques de l'exemple et par $y\in\mathbb R$ l'étiquette. Les caractéristiques sont ici des pixels d'image, où nous pouvons transformer une image à $2$ dimensions en un vecteur de sorte que $d=28^2=784$, et les étiquettes sont des chiffres.
+La probabilité de l'étiquette compte tenu des caractéristiques est $p(y  \mid  \mathbf{x})$. Si nous sommes en mesure de calculer ces probabilités, qui sont $p(y  \mid  \mathbf{x})$ pour $y=0, \ldots,9$ dans notre exemple, alors le classificateur produira la prédiction $\hat{y}$ donnée par l'expression :
 
-$$\hat{y} = \mathrm{argmax} \> p(y  \mid  \mathbf{x}).$$
+$$\hat{y} = \mathrm{argmax} \> p(y  \mid  \mathbf{x}).$$ 
 
-Unfortunately, this requires that we estimate $p(y  \mid  \mathbf{x})$ for every value of $\mathbf{x} = x_1, ..., x_d$. Imagine that each feature could take one of $2$ values. For example, the feature $x_1 = 1$ might signify that the word apple appears in a given document and $x_1 = 0$ would signify that it does not. If we had $30$ such binary features, that would mean that we need to be prepared to classify any of $2^{30}$ (over 1 billion!) possible values of the input vector $\mathbf{x}$.
+ Malheureusement, cela exige que nous estimions $p(y  \mid  \mathbf{x})$ pour chaque valeur de $\mathbf{x} = x_1, ..., x_d$. Imaginez que chaque caractéristique puisse prendre l'une des valeurs $2$. Par exemple, la caractéristique $x_1 = 1$ pourrait signifier que le mot pomme apparaît dans un document donné et $x_1 = 0$ signifierait qu'il n'apparaît pas. Si nous disposons de $30$ caractéristiques binaires de ce type, cela signifie que nous devons être prêts à classer n'importe laquelle des $2^{30}$ (plus d'un milliard !) valeurs possibles du vecteur d'entrée $\mathbf{x}$.
 
-Moreover, where is the learning? If we need to see every single possible example in order to predict the corresponding label then we are not really learning a pattern but just memorizing the dataset.
+En outre, où est l'apprentissage ? Si nous devons voir chaque exemple possible afin de prédire l'étiquette correspondante, nous n'apprenons pas vraiment un modèle, mais nous nous contentons de mémoriser l'ensemble des données.
 
-## The Naive Bayes Classifier
+## Le classificateur Naive Bayes
 
-Fortunately, by making some assumptions about conditional independence, we can introduce some inductive bias and build a model capable of generalizing from a comparatively modest selection of training examples. To begin, let's use Bayes theorem, to express the classifier as
+Heureusement, en faisant quelques hypothèses sur l'indépendance conditionnelle, nous pouvons introduire un biais inductif et construire un modèle capable de généraliser à partir d'une sélection relativement modeste d'exemples d'apprentissage. Pour commencer, utilisons le théorème de Bayes, pour exprimer le classificateur comme suit :
 
-$$\hat{y} = \mathrm{argmax}_y \> p(y  \mid  \mathbf{x}) = \mathrm{argmax}_y \> \frac{p( \mathbf{x}  \mid  y) p(y)}{p(\mathbf{x})}.$$
+$$\hat{y} = \mathrm{argmax}_y \> p(y  \mid  \mathbf{x}) = \mathrm{argmax}_y \> \frac{p( \mathbf{x}  \mid  y) p(y)}{p(\mathbf{x})}.$$ 
 
-Note that the denominator is the normalizing term $p(\mathbf{x})$ which does not depend on the value of the label $y$. As a result, we only need to worry about comparing the numerator across different values of $y$. Even if calculating the denominator turned out to be intractable, we could get away with ignoring it, so long as we could evaluate the numerator. Fortunately, even if we wanted to recover the normalizing constant, we could.  We can always recover the normalization term since $\sum_y p(y  \mid  \mathbf{x}) = 1$.
+ Notez que le dénominateur est le terme de normalisation $p(\mathbf{x})$ qui ne dépend pas de la valeur de l'étiquette $y$. Par conséquent, nous devons uniquement nous préoccuper de la comparaison du numérateur entre différentes valeurs de $y$. Même si le calcul du dénominateur s'avérait difficile, nous pourrions l'ignorer, tant que nous pouvons évaluer le numérateur. Heureusement, même si nous voulions récupérer la constante de normalisation, nous le pourrions.  Nous pouvons toujours récupérer le terme de normalisation puisque $\sum_y p(y  \mid  \mathbf{x}) = 1$.
 
-Now, let's focus on $p( \mathbf{x}  \mid  y)$. Using the chain rule of probability, we can express the term $p( \mathbf{x}  \mid  y)$ as
+Maintenant, concentrons-nous sur $p( \mathbf{x}  \mid  y)$. En utilisant la règle de probabilité en chaîne, nous pouvons exprimer le terme $p( \mathbf{x}  \mid  y)$ comme suit :
 
-$$p(x_1  \mid y) \cdot p(x_2  \mid  x_1, y) \cdot ... \cdot p( x_d  \mid  x_1, ..., x_{d-1}, y).$$
+$$p(x_1  \mid y) \cdot p(x_2  \mid  x_1, y) \cdot ... \cdot p( x_d  \mid  x_1, ..., x_{d-1}, y).$$ 
 
-By itself, this expression does not get us any further. We still must estimate roughly $2^d$ parameters. However, if we assume that *the features are conditionally independent of each other, given the label*, then suddenly we are in much better shape, as this term simplifies to $\prod_i p(x_i  \mid  y)$, giving us the predictor
+ En soi, cette expression ne nous fait pas avancer. Nous devons toujours estimer approximativement les paramètres de $2^d$. Cependant, si nous supposons que * les caractéristiques sont conditionnellement indépendantes les unes des autres, étant donné l'étiquette *, nous sommes soudainement en bien meilleure posture, car ce terme se simplifie en $\prod_i p(x_i  \mid  y)$, ce qui nous donne le prédicteur
 
-$$\hat{y} = \mathrm{argmax}_y \> \prod_{i=1}^d p(x_i  \mid  y) p(y).$$
+$$\hat{y} = \mathrm{argmax}_y \> \prod_{i=1}^d p(x_i  \mid  y) p(y).$$ 
 
-If we can estimate $p(x_i=1  \mid  y)$ for every $i$ and $y$, and save its value in $P_{xy}[i, y]$, here $P_{xy}$ is a $d\times n$ matrix with $n$ being the number of classes and $y\in\{1, \ldots, n\}$, then we can also use this to estimate $p(x_i = 0 \mid y)$, i.e.,
+ Si nous pouvons estimer $p(x_i=1  \mid  y)$ pour chaque $i$ et $y$, et enregistrer sa valeur dans $P_{xy}[i, y]$, où $P_{xy}$ est une matrice $d\times n$ avec $n$ étant le nombre de classes et $y\in\{1, \ldots, n\}$, alors nous pouvons également l'utiliser pour estimer $p(x_i = 0 \mid y)$, c'est-à-dire ,
 
 $$ 
 p(x_i = t_i \mid y) = 
@@ -194,17 +194,17 @@ p(x_i = t_i \mid y) =
 \end{cases}
 $$
 
-In addition, we estimate $p(y)$ for every $y$ and save it in $P_y[y]$, with $P_y$ a $n$-length vector. Then, for any new example $\mathbf t = (t_1, t_2, \ldots, t_d)$, we could compute
+En outre, nous estimons $p(y)$ pour chaque $y$ et l'enregistrons dans $P_y[y]$, $P_y$ étant un vecteur de longueur $n$. Ensuite, pour tout nouvel exemple $\mathbf t = (t_1, t_2, \ldots, t_d)$, nous pouvons calculer
 
-$$\begin{aligned}\hat{y} &= \mathrm{argmax}_ y \ p(y)\prod_{i=1}^d   p(x_t = t_i \mid y) \\ &= \mathrm{argmax}_y \ P_y[y]\prod_{i=1}^d \ P_{xy}[i, y]^{t_i}\, \left(1 - P_{xy}[i, y]\right)^{1-t_i}\end{aligned}$$
-:eqlabel:`eq_naive_bayes_estimation`
+$$\begin{aligned}\hat{y} &= \mathrm{argmax}_ y \ p(y)\prod_{i=1}^d   p(x_t = t_i \mid y) \\ &= \mathrm{argmax}_y \ P_y[y]\prod_{i=1}^d \ P_{xy}[i, y]^{t_i}\, \left(1 - P_{xy}[i, y]\right)^{1-t_i}\end{aligned}$$ 
+ :eqlabel:`eq_naive_bayes_estimation` 
 
-for any $y$. So our assumption of conditional independence has taken the complexity of our model from an exponential dependence on the number of features $\mathcal{O}(2^dn)$ to a linear dependence, which is $\mathcal{O}(dn)$.
+ pour tout $y$. Ainsi, notre hypothèse d'indépendance conditionnelle a fait passer la complexité de notre modèle d'une dépendance exponentielle du nombre de caractéristiques $\mathcal{O}(2^dn)$ à une dépendance linéaire, qui est $\mathcal{O}(dn)$.
 
 
-## Training
+## Formation
 
-The problem now is that we do not know $P_{xy}$ and $P_y$. So we need to estimate their values given some training data first. This is *training* the model. Estimating $P_y$ is not too hard. Since we are only dealing with $10$ classes, we may count the number of occurrences $n_y$ for each of the digits and divide it by the total amount of data $n$. For instance, if digit 8 occurs $n_8 = 5,800$ times and we have a total of $n = 60,000$ images, the probability estimate is $p(y=8) = 0.0967$.
+Le problème maintenant est que nous ne connaissons pas $P_{xy}$ et $P_y$. Nous devons donc d'abord estimer leurs valeurs en fonction de certaines données d'entraînement. Il s'agit de l'*entraînement* du modèle. L'estimation de $P_y$ n'est pas trop difficile. Puisque nous ne traitons que des classes $10$, nous pouvons compter le nombre d'occurrences $n_y$ pour chacun des chiffres et le diviser par la quantité totale de données $n$. Par exemple, si le chiffre 8 apparaît $n_8 = 5,800$ fois et que nous avons un total de $n = 60,000$ images, l'estimation de la probabilité est $p(y=8) = 0.0967$.
 
 ```{.python .input}
 #@tab mxnet
@@ -241,7 +241,7 @@ P_y = n_y / tf.reduce_sum(n_y)
 P_y
 ```
 
-Now on to slightly more difficult things $P_{xy}$. Since we picked black and white images, $p(x_i  \mid  y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ such that an event occurs and divide it by the total number of occurrences of $y$, i.e., $n_y$. But there is something slightly troubling: certain pixels may never be black (e.g., for well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y}+2$ (since there are two possible values pixel $i$ can take - it can either be black or white). This is also called *Laplace Smoothing*.  It may seem ad-hoc, however it can be motivated from a Bayesian point-of-view by a Beta-binomial model.
+Passons maintenant à des choses un peu plus difficiles $P_{xy}$. Puisque nous avons choisi des images en noir et blanc, $p(x_i  \mid  y)$ désigne la probabilité que le pixel $i$ soit allumé pour la classe $y$. Comme précédemment, nous pouvons compter le nombre d'occurrences de $n_{iy}$ pour lesquelles un événement se produit et le diviser par le nombre total d'occurrences de $y$, c'est-à-dire $n_y$. Mais il y a quelque chose de légèrement troublant : certains pixels peuvent ne jamais être noirs (par exemple, pour les images bien recadrées, les pixels des coins peuvent toujours être blancs). Un moyen pratique pour les statisticiens de traiter ce problème consiste à ajouter des pseudo-comptes à toutes les occurrences. Ainsi, au lieu de $n_{iy}$, on utilise $n_{iy}+1$ et au lieu de $n_y$, on utilise $n_{y}+2$ (puisque le pixel $i$ peut prendre deux valeurs possibles - il peut être noir ou blanc). Cette méthode est également appelée *lissage de Laplace*.  Il peut sembler ad hoc, mais il peut être motivé d'un point de vue bayésien par un modèle bêta-binomial.
 
 ```{.python .input}
 #@tab mxnet
@@ -274,9 +274,9 @@ P_xy = (n_x + 1) / tf.reshape((n_y + 2), (10, 1, 1))
 d2l.show_images(P_xy, 2, 5);
 ```
 
-By visualizing these $10\times 28\times 28$ probabilities (for each pixel for each class) we could get some mean looking digits.
+En visualisant ces probabilités $10\times 28\times 28$ (pour chaque pixel de chaque classe), nous pouvons obtenir des chiffres qui ressemblent à des moyennes.
 
-Now we can use :eqref:`eq_naive_bayes_estimation` to predict a new image. Given $\mathbf x$, the following functions computes $p(\mathbf x \mid y)p(y)$ for every $y$.
+Nous pouvons maintenant utiliser :eqref:`eq_naive_bayes_estimation` pour prédire une nouvelle image. Étant donné $\mathbf x$, les fonctions suivantes calculent $p(\mathbf x \mid y)p(y)$ pour chaque $y$.
 
 ```{.python .input}
 #@tab mxnet
@@ -314,10 +314,10 @@ image, label = train_images[0], train_labels[0]
 bayes_pred(image)
 ```
 
-This went horribly wrong! To find out why, let's look at the per pixel probabilities. They are typically numbers between $0.001$ and $1$. We are multiplying $784$ of them. At this point it is worth mentioning that we are calculating these numbers on a computer, hence with a fixed range for the exponent. What happens is that we experience *numerical underflow*, i.e., multiplying all the small numbers leads to something even smaller until it is rounded down to zero.  We discussed this as a theoretical issue in :numref:`sec_maximum_likelihood`, but we see the phenomena clearly here in practice.
+Cela s'est très mal passé ! Pour savoir pourquoi, examinons les probabilités par pixel. Il s'agit généralement de nombres compris entre $0.001$ et $1$. Nous les multiplions par $784$. À ce stade, il convient de préciser que nous calculons ces chiffres sur un ordinateur, donc avec une plage fixe pour l'exposant. Ce qui se passe, c'est que nous subissons un *débordement numérique *, c'est-à-dire que la multiplication de tous les petits nombres conduit à quelque chose d'encore plus petit jusqu'à ce qu'il soit arrondi à zéro.  Nous avons abordé ce problème d'un point de vue théorique sur :numref:`sec_maximum_likelihood` , mais nous constatons clairement ce phénomène dans la pratique.
 
-As discussed in that section, we fix this by use the fact that $\log a b = \log a + \log b$, i.e., we switch to summing logarithms.
-Even if both $a$ and $b$ are small numbers, the logarithm values should be in a proper range.
+Comme indiqué dans cette section, nous corrigeons ce problème en utilisant le fait que $\log a b = \log a + \log b$, c'est-à-dire que nous passons à la sommation des logarithmes.
+Même si $a$ et $b$ sont de petits nombres, les valeurs logarithmiques devraient se situer dans une plage appropriée.
 
 ```{.python .input}
 #@tab mxnet
@@ -340,11 +340,11 @@ print('underflow:', a**784)
 print('logarithm is normal:', 784*tf.math.log(a).numpy())
 ```
 
-Since the logarithm is an increasing function, we can rewrite :eqref:`eq_naive_bayes_estimation` as
+Comme le logarithme est une fonction croissante, nous pouvons réécrire :eqref:`eq_naive_bayes_estimation` comme
 
-$$ \hat{y} = \mathrm{argmax}_y \ \log P_y[y] + \sum_{i=1}^d \Big[t_i\log P_{xy}[x_i, y] + (1-t_i) \log (1 - P_{xy}[x_i, y]) \Big].$$
+$$ \hat{y} = \mathrm{argmax}_y \ \log P_y[y] + \sum_{i=1}^d \Big[t_i\log P_{xy}[x_i, y] + (1-t_i) \log (1 - P_{xy}[x_i, y]) \Big].$$ 
 
-We can implement the following stable version:
+ Nous pouvons implémenter la version stable suivante :
 
 ```{.python .input}
 #@tab mxnet
@@ -394,7 +394,7 @@ py = bayes_pred_stable(image)
 py
 ```
 
-We may now check if the prediction is correct.
+Nous pouvons maintenant vérifier si la prédiction est correcte.
 
 ```{.python .input}
 #@tab mxnet
@@ -413,8 +413,8 @@ py.argmax(dim=0) == label
 tf.argmax(py, axis=0, output_type = tf.int32) == label
 ```
 
-If we now predict a few validation examples, we can see the Bayes
-classifier works pretty well.
+Si nous prédisons maintenant quelques exemples de validation, nous pouvons constater que le classificateur de Bayes
+fonctionne assez bien.
 
 ```{.python .input}
 #@tab mxnet
@@ -451,7 +451,7 @@ preds = predict(X)
 d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
 
-Finally, let's compute the overall accuracy of the classifier.
+Enfin, calculons la précision globale du classificateur.
 
 ```{.python .input}
 #@tab mxnet
@@ -477,17 +477,17 @@ preds = tf.constant(predict(X), dtype=tf.int32)
 tf.reduce_sum(tf.cast(preds == y, tf.float32)).numpy() / len(y)
 ```
 
-Modern deep networks achieve error rates of less than $0.01$. The relatively poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier.
+Les réseaux profonds modernes atteignent des taux d'erreur inférieurs à $0.01$. Cette performance relativement faible est due aux hypothèses statistiques incorrectes que nous avons faites dans notre modèle : nous avons supposé que chaque pixel est généré *indépendamment*, en fonction uniquement de l'étiquette. Ce n'est clairement pas la façon dont les humains écrivent les chiffres, et cette hypothèse erronée a conduit à la chute de notre classificateur (Bayes) trop naïf.
 
-## Summary
-* Using Bayes' rule, a classifier can be made by assuming all observed features are independent.  
-* This classifier can be trained on a dataset by counting the number of occurrences of combinations of labels and pixel values.
-* This classifier was the gold standard for decades for tasks such as spam detection.
+## Résumé
+* En utilisant la règle de Bayes, un classificateur peut être réalisé en supposant que toutes les caractéristiques observées sont indépendantes. 
+* Ce classifieur peut être entraîné sur un ensemble de données en comptant le nombre d'occurrences de combinaisons d'étiquettes et de valeurs de pixels.
+* Ce classificateur a été la référence pendant des décennies pour des tâches telles que la détection de spam.
 
-## Exercises
-1. Consider the dataset $[[0,0], [0,1], [1,0], [1,1]]$ with labels given by the XOR of the two elements $[0,1,1,0]$.  What are the probabilities for a Naive Bayes classifier built on this dataset.  Does it successfully classify our points?  If not, what assumptions are violated?
-1. Suppose that we did not use Laplace smoothing when estimating probabilities and a data example arrived at testing time which contained a value never observed in training.  What would the model output?
-1. The naive Bayes classifier is a specific example of a Bayesian network, where the dependence of random variables are encoded with a graph structure.  While the full theory is beyond the scope of this section (see :cite:`Koller.Friedman.2009` for full details), explain why allowing explicit dependence between the two input variables in the XOR model allows for the creation of a successful classifier.
+## Exercices
+1. Considérons l'ensemble de données $[[0,0], [0,1], [1,0], [1,1]]$ avec des étiquettes données par le XOR des deux éléments $[0,1,1,0]$.  Quelles sont les probabilités pour un classificateur Naive Bayes construit sur ce jeu de données.  Est-ce qu'il réussit à classer nos points ?  Si non, quelles hypothèses sont violées ?
+1. Supposons que nous n'ayons pas utilisé le lissage de Laplace lors de l'estimation des probabilités et qu'un exemple de données contenant une valeur jamais observée lors de la formation arrive au moment du test.  Quel serait le résultat du modèle ?
+1. Le classificateur de Bayes naïf est un exemple spécifique de réseau bayésien, où la dépendance des variables aléatoires est codée par une structure de graphe.  Bien que la théorie complète dépasse le cadre de cette section (voir :cite:`Koller.Friedman.2009` pour plus de détails), expliquez pourquoi le fait d'autoriser une dépendance explicite entre les deux variables d'entrée dans le modèle XOR permet de créer un classificateur efficace.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/418)

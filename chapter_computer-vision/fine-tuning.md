@@ -1,64 +1,64 @@
-# Fine-Tuning
-:label:`sec_fine_tuning`
+# Ajustement fin
+:label:`sec_fine_tuning` 
 
-In earlier chapters, we discussed how to train models on the Fashion-MNIST training dataset with only 60000 images. We also described ImageNet, the most widely used large-scale image dataset in academia, which has more than 10 million images and 1000 objects. However, the size of the dataset that we usually encounter is between those of the two datasets.
-
-
-Suppose that we want to recognize different types of chairs from images, and then recommend purchase links to users. 
-One possible method is to first identify
-100 common chairs,
-take 1000 images of different angles for each chair, 
-and then train a classification model on the collected image dataset.
-Although this chair dataset may be larger than the Fashion-MNIST dataset,
-the number of examples is still less than one-tenth of 
-that in ImageNet.
-This may lead to overfitting of complicated models 
-that are suitable for ImageNet on this chair dataset.
-Besides, due to the limited amount of training examples,
-the accuracy of the trained model
-may not meet practical requirements.
+ Dans les chapitres précédents, nous avons expliqué comment entraîner des modèles sur le jeu de données d'entraînement Fashion-MNIST contenant seulement 60000 images. Nous avons également décrit ImageNet, le jeu de données d'images à grande échelle le plus utilisé dans le monde universitaire, qui contient plus de 10 millions d'images et 1000 objets. Cependant, la taille du jeu de données que nous rencontrons habituellement se situe entre celles de ces deux jeux de données.
 
 
-In order to address the above problems,
-an obvious solution is to collect more data.
-However, collecting and labeling data can take a lot of time and money.
-For example, in order to collect the ImageNet dataset, researchers have spent millions of dollars from research funding.
-Although the current data collection cost has been significantly reduced, this cost still cannot be ignored.
+Supposons que nous voulions reconnaître différents types de chaises à partir d'images, puis recommander des liens d'achat aux utilisateurs. 
+Une méthode possible est d'abord d'identifier
+100 chaises courantes,
+de prendre 1000 images de différents angles pour chaque chaise, 
+et ensuite d'entraîner un modèle de classification sur le jeu de données d'images collectées.
+Bien que ce jeu de données de chaises soit plus important que le jeu de données Fashion-MNIST,
+le nombre d'exemples est toujours inférieur à un dixième de 
+celui d'ImageNet.
+Cela peut conduire à un ajustement excessif des modèles complexes 
+qui sont adaptés à ImageNet sur ce jeu de données de chaises.
+En outre, en raison de la quantité limitée d'exemples d'entraînement,
+la précision du modèle entraîné
+peut ne pas répondre aux exigences pratiques.
 
 
-Another solution is to apply *transfer learning* to transfer the knowledge learned from the *source dataset* to the *target dataset*.
-For example, although most of the images in the ImageNet dataset have nothing to do with chairs, the model trained on this dataset may extract more general image features, which can help identify edges, textures, shapes, and object composition.
-These similar features may
-also be effective for recognizing chairs.
+Afin de résoudre les problèmes ci-dessus,
+une solution évidente est de collecter plus de données.
+Cependant, la collecte et l'étiquetage des données peuvent prendre beaucoup de temps et d'argent.
+Par exemple, pour collecter le jeu de données ImageNet, les chercheurs ont dépensé des millions de dollars provenant de fonds de recherche.
+Bien que le coût actuel de la collecte de données ait été considérablement réduit, ce coût ne peut toujours pas être ignoré.
 
 
-## Steps
+Une autre solution consiste à appliquer l'apprentissage par transfert * pour transférer les connaissances apprises de l'ensemble de données source * à l'ensemble de données cible *.
+Par exemple, bien que la plupart des images de l'ensemble de données ImageNet n'aient rien à voir avec les chaises, le modèle formé sur cet ensemble de données peut extraire des caractéristiques d'image plus générales, qui peuvent aider à identifier les bords, les textures, les formes et la composition des objets.
+Ces caractéristiques similaires peuvent
+également être efficaces pour reconnaître les chaises.
 
 
-In this section, we will introduce a common technique in transfer learning: *fine-tuning*. As shown in :numref:`fig_finetune`, fine-tuning consists of the following four steps:
+## Étapes
 
 
-1. Pretrain a neural network model, i.e., the *source model*, on a source dataset (e.g., the ImageNet dataset).
-1. Create a new neural network model, i.e., the *target model*. This copies all model designs and their parameters on the source model except the output layer. We assume that these model parameters contain the knowledge learned from the source dataset and this knowledge will also be applicable to the target dataset. We also assume that the output layer of the source model is closely related to the labels of the source dataset; thus it is not used in the target model.
-1. Add an output layer to the target model, whose number of outputs is the number of categories in the target dataset. Then randomly initialize the model parameters of this layer.
-1. Train the target model on the target dataset, such as a chair dataset. The output layer will be trained from scratch, while the parameters of all the other layers are fine-tuned based on the parameters of the source model.
+ Dans cette section, nous allons introduire une technique courante dans l'apprentissage par transfert : le *réglage fin*. Comme le montre le site :numref:`fig_finetune` , l'ajustement fin comprend les quatre étapes suivantes :
+
+
+ 1. Préentraîner un modèle de réseau neuronal, c'est-à-dire le *modèle source*, sur un jeu de données source (par exemple, le jeu de données ImageNet).
+1. Créez un nouveau modèle de réseau neuronal, c'est-à-dire le *modèle cible*. Cette opération copie tous les modèles et leurs paramètres sur le modèle source, à l'exception de la couche de sortie. Nous supposons que ces paramètres de modèle contiennent les connaissances acquises à partir de l'ensemble de données source et que ces connaissances seront également applicables à l'ensemble de données cible. Nous supposons également que la couche de sortie du modèle source est étroitement liée aux étiquettes de l'ensemble de données source ; elle n'est donc pas utilisée dans le modèle cible.
+1. Ajoutez une couche de sortie au modèle cible, dont le nombre de sorties est le nombre de catégories dans l'ensemble de données cible. Puis initialiser aléatoirement les paramètres du modèle de cette couche.
+1. Entraînez le modèle cible sur le jeu de données cible, tel qu'un jeu de données de chaises. La couche de sortie sera formée à partir de zéro, tandis que les paramètres de toutes les autres couches sont affinés sur la base des paramètres du modèle source.
 
 ![Fine tuning.](../img/finetune.svg)
 :label:`fig_finetune`
 
-When target datasets are much smaller than source datasets, fine-tuning helps to improve models' generalization ability.
+Lorsque les jeux de données cibles sont beaucoup plus petits que les jeux de données sources, l'ajustement fin permet d'améliorer la capacité de généralisation des modèles.
 
 
-## Hot Dog Recognition
+## Reconnaissance de hot-dogs
 
-Let's demonstrate fine-tuning via a concrete case:
-hot dog recognition. 
-We will fine-tune a ResNet model on a small dataset,
-which was pretrained on the ImageNet dataset.
-This small dataset consists of
-thousands of images with and without hot dogs.
-We will use the fine-tuned model to recognize 
-hot dogs from images.
+Démontrons l'ajustement fin par un cas concret :
+reconnaissance de hot-dogs. 
+Nous allons affiner un modèle ResNet sur un petit jeu de données,
+, qui a été pré-entraîné sur le jeu de données ImageNet.
+Ce petit jeu de données est composé de
+milliers d'images avec et sans hot-dogs.
+Nous utiliserons le modèle affiné pour reconnaître 
+hot dogs à partir d'images.
 
 ```{.python .input}
 #@tab mxnet
@@ -81,18 +81,18 @@ import torchvision
 import os
 ```
 
-### Reading the Dataset
+### Lecture du jeu de données
 
-[**The hot dog dataset we use was taken from online images**].
-This dataset consists of
-1400 positive-class images containing hot dogs,
-and as many negative-class images containing other foods.
-1000 images of both classes are used for training and the rest are for testing.
+[**Le jeu de données de hot-dogs que nous utilisons provient d'images en ligne**].
+Ce jeu de données est composé de
+1400 images de classe positive contenant des hot dogs,
+et autant d'images de classe négative contenant d'autres aliments.
+1000 images des deux classes sont utilisées pour la formation et le reste pour les tests.
 
 
-After unzipping the downloaded dataset,
-we obtain two folders `hotdog/train` and `hotdog/test`. Both folders have `hotdog` and `not-hotdog` subfolders, either of which contains images of
-the corresponding class.
+Après avoir décompressé le jeu de données téléchargé,
+, nous obtenons deux dossiers `hotdog/train` et `hotdog/test`. Les deux dossiers ont des sous-dossiers `hotdog` et `not-hotdog`, chacun d'entre eux contenant des images de
+la classe correspondante.
 
 ```{.python .input}
 #@tab all
@@ -103,7 +103,7 @@ d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL + 'hotdog.zip',
 data_dir = d2l.download_extract('hotdog')
 ```
 
-We create two instances to read all the image files in the training and testing datasets, respectively.
+Nous créons deux instances pour lire tous les fichiers d'images dans les ensembles de données de formation et de test, respectivement.
 
 ```{.python .input}
 #@tab mxnet
@@ -119,7 +119,7 @@ train_imgs = torchvision.datasets.ImageFolder(os.path.join(data_dir, 'train'))
 test_imgs = torchvision.datasets.ImageFolder(os.path.join(data_dir, 'test'))
 ```
 
-The first 8 positive examples and the last 8 negative images are shown below. As you can see, [**the images vary in size and aspect ratio**].
+Les 8 premiers exemples positifs et les 8 dernières images négatives sont présentés ci-dessous. Comme vous pouvez le constater, [**les images varient en taille et en rapport d'aspect**].
 
 ```{.python .input}
 #@tab all
@@ -128,17 +128,17 @@ not_hotdogs = [train_imgs[-i - 1][0] for i in range(8)]
 d2l.show_images(hotdogs + not_hotdogs, 2, 8, scale=1.4);
 ```
 
-During training, we first crop a random area of random size and random aspect ratio from the image,
-and then scale this area
-to a $224 \times 224$ input image. 
-During testing, we scale both the height and width of an image to 256 pixels, and then crop a central $224 \times 224$ area as input.
-In addition, 
-for the three RGB (red, green, and blue) color channels
-we *standardize* their values channel by channel.
-Concretely,
-the mean value of a channel is subtracted from each value of that channel and then the result is divided by the standard deviation of that channel.
+Pendant l'apprentissage, nous découpons d'abord une zone aléatoire de taille et de rapport hauteur/largeur aléatoires dans l'image
+, puis nous mettons à l'échelle cette zone
+pour obtenir une image d'entrée $224 \times 224$. 
+Lors du test, nous mettons à l'échelle la hauteur et la largeur d'une image à 256 pixels, puis nous découpons une zone centrale $224 \times 224$ en entrée.
+En outre, 
+pour les trois canaux de couleur RVB (rouge, vert et bleu)
+nous *normalisons* leurs valeurs canal par canal.
+Concrètement,
+la valeur moyenne d'un canal est soustraite de chaque valeur de ce canal, puis le résultat est divisé par l'écart-type de ce canal.
 
-[~~Data augmentations~~]
+[~)~)Augmentations des données~)~)]
 
 ```{.python .input}
 #@tab mxnet
@@ -180,11 +180,11 @@ test_augs = torchvision.transforms.Compose([
     normalize])
 ```
 
-### [**Defining and Initializing the Model**]
+### [**Définir et initialiser le modèle**]
 
-We use ResNet-18, which was pretrained on the ImageNet dataset, as the source model. Here, we specify `pretrained=True` to automatically download the pretrained model parameters. 
-If this model is used for the first time,
-Internet connection is required for download.
+Nous utilisons ResNet-18, qui a été pré-entraîné sur le jeu de données ImageNet, comme modèle source. Ici, nous spécifions `pretrained=True` pour télécharger automatiquement les paramètres du modèle pré-entraîné. 
+Si ce modèle est utilisé pour la première fois, une connexion Internet
+est nécessaire pour le téléchargement.
 
 ```{.python .input}
 #@tab mxnet
@@ -197,13 +197,13 @@ pretrained_net = torchvision.models.resnet18(pretrained=True)
 ```
 
 :begin_tab:`mxnet`
-The pretrained source model instance contains two member variables: `features` and `output`. The former contains all layers of the model except the output layer, and the latter is the output layer of the model. 
-The main purpose of this division is to facilitate the fine-tuning of model parameters of all layers but the output layer. The member variable `output` of source model is shown below.
+L'instance du modèle source pré-entraîné contient deux variables membres :`features` et `output`. La première contient toutes les couches du modèle sauf la couche de sortie, et la seconde est la couche de sortie du modèle. 
+L'objectif principal de cette division est de faciliter le réglage fin des paramètres du modèle de toutes les couches sauf la couche de sortie. La variable membre `output` du modèle source est présentée ci-dessous.
 :end_tab:
 
 :begin_tab:`pytorch`
-The pretrained source model instance contains a number of feature layers and an output layer `fc`.
-The main purpose of this division is to facilitate the fine-tuning of model parameters of all layers but the output layer. The member variable `fc` of source model is given below.
+L'instance de modèle source pré-entraînée contient un certain nombre de couches de caractéristiques et une couche de sortie `fc`.
+L'objectif principal de cette division est de faciliter le réglage fin des paramètres du modèle de toutes les couches sauf la couche de sortie. La variable membre `fc` du modèle source est indiquée ci-dessous.
 :end_tab:
 
 ```{.python .input}
@@ -216,19 +216,19 @@ pretrained_net.output
 pretrained_net.fc
 ```
 
-As a fully connected layer, it transforms ResNet's final global average pooling outputs into 1000 class outputs of the ImageNet dataset.
-We then construct a new neural network as the target model. It is defined in the same way as the pretrained source model except that
-its number of outputs in the final layer
-is set to
-the number of classes in the target dataset (rather than 1000).
+En tant que couche entièrement connectée, elle transforme les sorties du pooling moyen global final de ResNet en 1000 sorties de classe de l'ensemble de données ImageNet.
+Nous construisons ensuite un nouveau réseau neuronal en tant que modèle cible. Il est défini de la même manière que le modèle source pré-entraîné, sauf que
+son nombre de sorties dans la couche finale
+est fixé à
+le nombre de classes dans le jeu de données cible (plutôt que 1000).
 
-In the code below, the model parameters before the output layer of the target model instance `finetune_net` are initialized to model parameters of the corresponding layers from the source model.
-Since these model parameters were obtained via pretraining on ImageNet, 
-they are effective.
-Therefore, we can only use 
-a small learning rate to *fine-tune* such pretrained parameters.
-In contrast, model parameters in the output layer are randomly initialized and generally require a larger learning rate to be learned from scratch.
-Letting the base learning rate be $\eta$, a learning rate of $10\eta$ will be used to iterate the model parameters in the output layer.
+Dans le code ci-dessous, les paramètres du modèle avant la couche de sortie de l'instance du modèle cible `finetune_net` sont initialisés aux paramètres du modèle des couches correspondantes du modèle source.
+Puisque ces paramètres de modèle ont été obtenus via un pré-entraînement sur ImageNet, 
+ils sont efficaces.
+Par conséquent, nous pouvons seulement utiliser 
+un petit taux d'apprentissage pour *affiner* ces paramètres pré-entraînés.
+En revanche, les paramètres du modèle dans la couche de sortie sont initialisés de manière aléatoire et nécessitent généralement un taux d'apprentissage plus élevé pour être appris à partir de zéro.
+Si le taux d'apprentissage de base est $\eta$, un taux d'apprentissage de $10\eta$ sera utilisé pour itérer les paramètres du modèle dans la couche de sortie.
 
 ```{.python .input}
 #@tab mxnet
@@ -247,9 +247,9 @@ finetune_net.fc = nn.Linear(finetune_net.fc.in_features, 2)
 nn.init.xavier_uniform_(finetune_net.fc.weight);
 ```
 
-### [**Fine-Tuning the Model**]
+### [**Réglage fin du modèle**]
 
-First, we define a training function `train_fine_tuning` that uses fine-tuning so it can be called multiple times.
+Tout d'abord, nous définissons une fonction d'apprentissage `train_fine_tuning` qui utilise le réglage fin pour pouvoir être appelée plusieurs fois.
 
 ```{.python .input}
 #@tab mxnet
@@ -296,8 +296,8 @@ def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5,
                    devices)
 ```
 
-We [**set the base learning rate to a small value**]
-in order to *fine-tune* the model parameters obtained via pretraining. Based on the previous settings, we will train the output layer parameters of the target model from scratch using a learning rate ten times greater.
+Nous [**fixons le taux d'apprentissage de base à une petite valeur**]
+afin de *régler finement* les paramètres du modèle obtenus via le pré-entraînement. Sur la base des paramètres précédents, nous allons entraîner les paramètres de la couche de sortie du modèle cible à partir de zéro en utilisant un taux d'apprentissage dix fois supérieur.
 
 ```{.python .input}
 #@tab mxnet
@@ -309,7 +309,7 @@ train_fine_tuning(finetune_net, 0.01)
 train_fine_tuning(finetune_net, 5e-5)
 ```
 
-[**For comparison,**] we define an identical model, but (**initialize all of its model parameters to random values**). Since the entire model needs to be trained from scratch, we can use a larger learning rate.
+[**Pour comparaison,**] nous définissons un modèle identique, mais (**initialisons tous ses paramètres de modèle à des valeurs aléatoires**). Puisque le modèle entier doit être entraîné à partir de zéro, nous pouvons utiliser un taux d'apprentissage plus élevé.
 
 ```{.python .input}
 #@tab mxnet
@@ -325,22 +325,22 @@ scratch_net.fc = nn.Linear(scratch_net.fc.in_features, 2)
 train_fine_tuning(scratch_net, 5e-4, param_group=False)
 ```
 
-As we can see, the fine-tuned model tends to perform better for the same epoch
-because its initial parameter values are more effective.
+Comme nous pouvons le constater, le modèle finement ajusté tend à être plus performant pour la même époque
+car les valeurs initiales de ses paramètres sont plus efficaces.
 
 
-## Summary
+## Résumé
 
-* Transfer learning transfers knowledge learned from the source dataset to the target dataset. Fine-tuning is a common technique for transfer learning.
-* The target model copies all model designs with their parameters from the source model except the output layer, and fine-tunes these parameters based on the target dataset. In contrast, the output layer of the target model needs to be trained from scratch.
-* Generally, fine-tuning parameters uses a smaller learning rate, while training the output layer from scratch can use a larger learning rate.
+* L'apprentissage par transfert transfère les connaissances acquises de l'ensemble de données source à l'ensemble de données cible. Le réglage fin est une technique courante pour l'apprentissage par transfert.
+* Le modèle cible copie tous les modèles et leurs paramètres du modèle source, à l'exception de la couche de sortie, et ajuste ces paramètres en fonction de l'ensemble de données cible. En revanche, la couche de sortie du modèle cible doit être formée à partir de zéro.
+* En général, l'ajustement fin des paramètres utilise un taux d'apprentissage plus faible, tandis que la formation de la couche de sortie à partir de zéro peut utiliser un taux d'apprentissage plus élevé.
 
 
-## Exercises
+## Exercices
 
-1. Keep increasing the learning rate of `finetune_net`. How does the accuracy of the model change?
-2. Further adjust hyperparameters of `finetune_net` and `scratch_net` in the comparative experiment. Do they still differ in accuracy?
-3. Set the parameters before the output layer of `finetune_net` to those of the source model and do *not* update them during training. How does the accuracy of the model change? You can use the following code.
+1. Continuez à augmenter le taux d'apprentissage de `finetune_net`. Comment la précision du modèle change-t-elle ?
+2. Ajustez encore les hyperparamètres de `finetune_net` et `scratch_net` dans l'expérience comparative. Leur précision est-elle toujours différente ?
+3. Réglez les paramètres avant la couche de sortie de `finetune_net` sur ceux du modèle source et ne les mettez *pas* à jour pendant la formation. Comment la précision du modèle change-t-elle ? Vous pouvez utiliser le code suivant.
 
 ```{.python .input}
 #@tab mxnet
@@ -353,7 +353,7 @@ for param in finetune_net.parameters():
     param.requires_grad = False
 ```
 
-4. In fact, there is a "hotdog" class in the `ImageNet` dataset. Its corresponding weight parameter in the output layer can be obtained via the following code. How can we leverage this weight parameter?
+4. En fait, il existe une classe "hotdog" dans l'ensemble de données `ImageNet`. Son paramètre de poids correspondant dans la couche de sortie peut être obtenu via le code suivant. Comment pouvons-nous tirer parti de ce paramètre de poids ?
 
 ```{.python .input}
 #@tab mxnet

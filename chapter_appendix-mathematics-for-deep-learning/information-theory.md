@@ -1,45 +1,45 @@
-# Information Theory
-:label:`sec_information_theory`
+# Théorie de l'information
+:label:`sec_information_theory` 
 
-The universe is overflowing with information. Information provides a common language across disciplinary rifts: from Shakespeare's Sonnet to researchers' paper on Cornell ArXiv, from Van Gogh's printing Starry Night to Beethoven's music Symphony No. 5, from the first programming language Plankalkül to the state-of-the-art machine learning algorithms. Everything must follow the rules of information theory, no matter the format. With information theory, we can measure and compare how much information is present in different signals. In this section, we will investigate the fundamental concepts of information theory and applications of information theory in machine learning.
+ L'univers déborde d'informations. L'information fournit un langage commun par-delà les clivages disciplinaires : du sonnet de Shakespeare à l'article des chercheurs sur Cornell ArXiv, de l'impression Nuit étoilée de Van Gogh à la musique Symphonie n° 5 de Beethoven, du premier langage de programmation Plankalkül aux algorithmes d'apprentissage automatique les plus modernes. Tout doit suivre les règles de la théorie de l'information, quel que soit le format. Grâce à la théorie de l'information, nous pouvons mesurer et comparer la quantité d'informations présentes dans différents signaux. Dans cette section, nous allons étudier les concepts fondamentaux de la théorie de l'information et les applications de la théorie de l'information dans l'apprentissage automatique.
 
-Before we get started, let's outline the relationship between machine learning and information theory. Machine learning aims to extract interesting signals from data and make critical predictions.  On the other hand, information theory studies encoding, decoding, transmitting, and manipulating information. As a result, information theory provides fundamental language for discussing the information processing in machine learned systems. For example, many machine learning applications use the cross-entropy loss as described in :numref:`sec_softmax`.  This loss can be directly derived from information theoretic considerations.
+Avant de commencer, décrivons la relation entre l'apprentissage automatique et la théorie de l'information. L'apprentissage automatique vise à extraire des signaux intéressants des données et à faire des prédictions critiques.  D'autre part, la théorie de l'information étudie le codage, le décodage, la transmission et la manipulation de l'information. Par conséquent, la théorie de l'information fournit un langage fondamental pour discuter du traitement de l'information dans les systèmes d'apprentissage automatique. Par exemple, de nombreuses applications d'apprentissage automatique utilisent la perte d'entropie croisée décrite dans :numref:`sec_softmax` .  Cette perte peut être directement dérivée des considérations de la théorie de l'information.
 
 
 ## Information
 
-Let's start with the "soul" of information theory: information. *Information* can be encoded in anything with a particular sequence of one or more encoding formats. Suppose that we task ourselves with trying to define a notion of information.  What could be our starting point?
+Commençons par l'"âme" de la théorie de l'information : l'information. *L'information* peut être codée dans n'importe quoi avec une séquence particulière d'un ou plusieurs formats de codage. Supposons que nous nous donnions pour tâche d'essayer de définir une notion d'information.  Quel pourrait être notre point de départ ?
 
-Consider the following thought experiment.  We have a friend with a deck of cards.  They will shuffle the deck, flip over some cards, and tell us statements about the cards.  We will try to assess the information content of each statement.
+Considérons l'expérience de pensée suivante.  Nous avons un ami avec un jeu de cartes.  Il va mélanger le jeu, retourner certaines cartes et nous dire des choses sur ces cartes.  Nous allons essayer d'évaluer le contenu informatif de chaque déclaration.
 
-First, they flip over a card and tell us, "I see a card."  This provides us with no information at all.  We were already certain that this was the case so we hope the information should be zero.
+Tout d'abord, il retourne une carte et nous dit : "Je vois une carte"  Cela ne nous fournit aucune information.  Nous étions déjà certains que c'était le cas et nous espérons donc que l'information sera nulle.
 
-Next, they flip over a card and say, "I see a heart."  This provides us some information, but in reality there are only $4$ different suits that were possible, each equally likely, so we are not surprised by this outcome.  We hope that whatever the measure of information, this event should have low information content.
+Ensuite, ils retournent une carte et disent : "Je vois un cœur"  Cela nous fournit quelques informations, mais en réalité, il n'y a que $4$ combinaisons différentes possibles, toutes aussi probables les unes que les autres, et nous ne sommes donc pas surpris par ce résultat.  Nous espérons que, quelle que soit la mesure de l'information, cet événement devrait avoir un faible contenu informatif.
 
-Next, they flip over a card and say, "This is the $3$ of spades."  This is more information.  Indeed there were $52$ equally likely possible outcomes, and our friend told us which one it was.  This should be a medium amount of information.
+Ensuite, ils retournent une carte et disent : "Voici le $3$ de pique."  Il s'agit d'une information supplémentaire.  En effet, il y avait $52$ résultats possibles tout aussi probables, et notre ami nous a dit lequel c'était.  Il devrait s'agir d'une quantité moyenne d'informations.
 
-Let's take this to the logical extreme.  Suppose that finally they flip over every card from the deck and read off the entire sequence of the shuffled deck.  There are $52!$ different orders to the deck, again all equally likely, so we need a lot of information to know which one it is.
+Poussons la logique à l'extrême.  Supposons qu'ils retournent finalement toutes les cartes du jeu et lisent la séquence complète du jeu mélangé.  Il existe $52!$ ordres différents pour le jeu de cartes, tous aussi probables les uns que les autres, et nous avons donc besoin de beaucoup d'informations pour savoir lequel c'est.
 
-Any notion of information we develop must conform to this intuition.  Indeed, in the next sections we will learn how to compute that these events have $0\text{ bits}$, $2\text{ bits}$, $~5.7\text{ bits}$, and $~225.6\text{ bits}$ of information respectively.
+Toute notion d'information que nous développons doit se conformer à cette intuition.  En effet, dans les sections suivantes, nous apprendrons à calculer que ces événements ont respectivement $0\text{ bits}$, $2\text{ bits}$, $~)5.7\text{ bits}$ et $~)225.6\text{ bits}$ d'information.
 
-If we read through these thought experiments, we see a natural idea.  As a starting point, rather than caring about the knowledge, we may build off the idea that information represents the degree of surprise or the abstract possibility of the event. For example, if we want to describe an unusual event, we need a lot information. For a common event, we may not need much information.
+Si nous lisons ces expériences de pensée, nous voyons une idée naturelle.  Pour commencer, plutôt que de nous soucier de la connaissance, nous pouvons partir de l'idée que l'information représente le degré de surprise ou la possibilité abstraite de l'événement. Par exemple, si nous voulons décrire un événement inhabituel, nous avons besoin de beaucoup d'informations. Pour un événement commun, nous n'aurons peut-être pas besoin de beaucoup d'informations.
 
-In 1948, Claude E. Shannon published *A Mathematical Theory of Communication* :cite:`Shannon.1948` establishing the theory of information.  In his article, Shannon introduced the concept of information entropy for the first time. We will begin our journey here.
+En 1948, Claude E. Shannon a publié *A Mathematical Theory of Communication* :cite:`Shannon.1948` établissant la théorie de l'information.  Dans son article, Shannon a introduit pour la première fois le concept d'entropie de l'information. C'est ici que nous allons commencer notre voyage.
 
 
 ### Self-information
 
-Since information embodies the abstract possibility of an event, how do we map the possibility to the number of bits? Shannon introduced the terminology *bit* as the unit of information, which was originally created by John Tukey. So what is a "bit" and why do we use it to measure information? Historically, an antique transmitter can only send or receive two types of code: $0$ and $1$.  Indeed, binary encoding is still in common use on all modern digital computers. In this way, any information is encoded by a series of $0$ and $1$. And hence, a series of binary digits of length $n$ contains $n$ bits of information.
+Puisque l'information incarne la possibilité abstraite d'un événement, comment faire correspondre cette possibilité au nombre de bits ? Shannon a introduit la terminologie *bit* comme unité d'information, qui a été créée à l'origine par John Tukey. Qu'est-ce qu'un "bit" et pourquoi l'utilisons-nous pour mesurer l'information ? Historiquement, un émetteur ancien ne peut envoyer ou recevoir que deux types de code : $0$ et $1$. En effet, le codage binaire est encore couramment utilisé sur tous les ordinateurs numériques modernes. Ainsi, toute information est codée par une série de $0$ et $1$. Et donc, une série de chiffres binaires de longueur $n$ contient $n$ bits d'information.
 
-Now, suppose that for any series of codes, each $0$ or $1$ occurs with a probability of $\frac{1}{2}$. Hence, an event $X$ with a series of codes of length $n$, occurs with a probability of $\frac{1}{2^n}$. At the same time, as we mentioned before, this series contains $n$ bits of information. So, can we generalize to a mathematical function which can transfer the probability $p$ to the number of bits? Shannon gave the answer by defining *self-information*
+Maintenant, supposons que pour toute série de codes, chaque $0$ ou $1$ se produit avec une probabilité de $\frac{1}{2}$. Par conséquent, un événement $X$ avec une série de codes de longueur $n$, se produit avec une probabilité de $\frac{1}{2^n}$. En même temps, comme nous l'avons mentionné précédemment, cette série contient $n$ bits d'information. Alors, peut-on généraliser à une fonction mathématique qui peut transférer la probabilité $p$ au nombre de bits ? Shannon a donné la réponse en définissant l'*auto-information*
 
-$$I(X) = - \log_2 (p),$$
+$$I(X) = - \log_2 (p),$$ 
 
-as the *bits* of information we have received for this event $X$. Note that we will always use base-2 logarithms in this section. For the sake of simplicity, the rest of this section will omit the subscript 2 in the logarithm notation, i.e., $\log(.)$ always refers to $\log_2(.)$. For example, the code "0010" has a self-information
+ comme les *bits* d'information que nous avons reçus pour cet événement $X$. Notez que nous utiliserons toujours des logarithmes en base 2 dans cette section. Par souci de simplicité, le reste de cette section omettra l'indice 2 dans la notation logarithmique, c'est-à-dire que $\log(.)$ fait toujours référence à $\log_2(.)$. Par exemple, le code "0010" a une information propre
 
-$$I(\text{"0010"}) = - \log (p(\text{"0010"})) = - \log \left( \frac{1}{2^4} \right) = 4 \text{ bits}.$$
+$$I(\text{"0010"}) = - \log (p(\text{"0010"})) = - \log \left( \frac{1}{2^4} \right) = 4 \text{ bits}.$$ 
 
-We can calculate self information as shown below. Before that, let's first import all the necessary packages in this section.
+ Nous pouvons calculer l'information propre comme indiqué ci-dessous. Avant cela, commençons par importer tous les paquets nécessaires dans cette section.
 
 ```{.python .input}
 #@tab mxnet
@@ -61,7 +61,7 @@ from torch.nn import NLLLoss
 
 def nansum(x):
     # Define nansum, as pytorch doesn't offer it inbuilt.
-    return x[~torch.isnan(x)].sum()
+    return x[~)torch.isnan(x)].sum()
 
 def self_information(p):
     return -torch.log2(torch.tensor(p)).item()
@@ -86,35 +86,35 @@ def self_information(p):
 self_information(1 / 64)
 ```
 
-## Entropy
+## Entropie
 
-As self-information only measures the information of a single discrete event, we need a more generalized measure for any random variable of either discrete or continuous distribution.
+Comme l'auto-information ne mesure que l'information d'un seul événement discret, nous avons besoin d'une mesure plus généralisée pour toute variable aléatoire de distribution discrète ou continue.
 
 
-### Motivating Entropy
+### Motivation de l'entropie
 
-Let's try to get specific about what we want.  This will be an informal statement of what are known as the *axioms of Shannon entropy*.  It will turn out that the following collection of common-sense statements force us to a unique definition of information.  A formal version of these axioms, along with several others may be found in :cite:`Csiszar.2008`.
+Essayons d'être précis sur ce que nous voulons.  Il s'agira d'un énoncé informel de ce que l'on appelle les *axiomes de l'entropie de Shannon*.  Il s'avérera que la collection suivante d'affirmations de bon sens nous contraint à une définition unique de l'information.  Une version formelle de ces axiomes, ainsi que de plusieurs autres, peut être trouvée dans :cite:`Csiszar.2008` .
 
-1.  The information we gain by observing a random variable does not depend on what we call the elements, or the presence of additional elements which have probability zero.
-2.  The information we gain by observing two random variables is no more than the sum of the information we gain by observing them separately.  If they are independent, then it is exactly the sum.
-3.  The information gained when observing (nearly) certain events is (nearly) zero.
+1. L'information que nous obtenons en observant une variable aléatoire ne dépend pas de ce que nous appelons les éléments, ni de la présence d'éléments supplémentaires qui ont une probabilité nulle.
+2.  L'information que nous obtenons en observant deux variables aléatoires n'est pas plus que la somme des informations que nous obtenons en les observant séparément.  Si elles sont indépendantes, alors c'est exactement la somme.
+3.  L'information obtenue en observant des événements (presque) certains est (presque) nulle.
 
-While proving this fact is beyond the scope of our text, it is important to know that this uniquely determines the form that entropy must take.  The only ambiguity that these allow is in the choice of fundamental units, which is most often normalized by making the choice we saw before that the information provided by a single fair coin flip is one bit.
+Bien que la preuve de ce fait dépasse le cadre de notre texte, il est important de savoir que cela détermine de manière unique la forme que doit prendre l'entropie.  La seule ambiguïté qu'elles autorisent réside dans le choix des unités fondamentales, qui est le plus souvent normalisé en faisant le choix que nous avons vu précédemment, à savoir que l'information fournie par un seul tirage au sort équitable est un bit.
 
-### Definition
+### Définition
 
-For any random variable $X$ that follows a probability distribution $P$ with a probability density function (p.d.f.) or a probability mass function (p.m.f.) $p(x)$, we measure the expected amount of information through *entropy* (or *Shannon entropy*)
+Pour toute variable aléatoire $X$ qui suit une distribution de probabilité $P$ avec une fonction de densité de probabilité (f.d.p.) ou une fonction de masse de probabilité (f.m.p.).) $p(x)$, nous mesurons la quantité d'information attendue par le biais de l'*entropie* (ou de l'*entropie de Shannon*)
 
-$$H(X) = - E_{x \sim P} [\log p(x)].$$
-:eqlabel:`eq_ent_def`
+$$H(X) = - E_{x \sim P} [\log p(x)].$$ 
+ :eqlabel:`eq_ent_def` 
 
-To be specific, if $X$ is discrete, $$H(X) = - \sum_i p_i \log p_i \text{, where } p_i = P(X_i).$$
+ Plus précisément, si $X$ est discrète, $$H(X) = - \sum_i p_i \log p_i \text{, where } p_i = P(X_i).$$
 
-Otherwise, if $X$ is continuous, we also refer entropy as *differential entropy*
+ Sinon, si $X$ est continue, nous appelons également l'entropie l'*entropie différentielle*
 
-$$H(X) = - \int_x p(x) \log p(x) \; dx.$$
+$$H(X) = - \int_x p(x) \log p(x) \; dx.$$ 
 
-We can define entropy as below.
+ Nous pouvons définir l'entropie comme suit.
 
 ```{.python .input}
 #@tab mxnet
@@ -146,60 +146,60 @@ def entropy(p):
 entropy(tf.constant([0.1, 0.5, 0.1, 0.3]))
 ```
 
-### Interpretations
+### Interprétations
 
-You may be curious: in the entropy definition :eqref:`eq_ent_def`, why do we use an expectation of a negative logarithm? Here are some intuitions.
+Vous êtes peut-être curieux : dans la définition de l'entropie :eqref:`eq_ent_def` , pourquoi utilisons-nous l'espérance d'un logarithme négatif ? Voici quelques intuitions.
 
-First, why do we use a *logarithm* function $\log$? Suppose that $p(x) = f_1(x) f_2(x) \ldots, f_n(x)$, where each component function $f_i(x)$ is independent from each other. This means that each $f_i(x)$ contributes independently to the total information obtained from $p(x)$. As discussed above, we want the entropy formula to be additive over independent random variables. Luckily, $\log$ can naturally turn a product of probability distributions to a summation of the individual terms.
+Tout d'abord, pourquoi utilisons-nous une fonction *logarithme* $\log$? Supposons que $p(x) = f_1(x) f_2(x) \ldots, f_n(x)$, où chaque fonction composante $f_i(x)$ est indépendante les unes des autres. Cela signifie que chaque $f_i(x)$ contribue indépendamment à l'information totale obtenue à partir de $p(x)$. Comme nous l'avons vu plus haut, nous voulons que la formule d'entropie soit additive sur des variables aléatoires indépendantes. Heureusement, $\log$ permet de transformer naturellement un produit de distributions de probabilité en une sommation des termes individuels.
 
-Next, why do we use a *negative* $\log$? Intuitively, more frequent events should contain less information than less common events, since we often gain more information from an unusual case than from an ordinary one. However, $\log$ is monotonically increasing with the probabilities, and indeed negative for all values in $[0, 1]$.  We need to construct a monotonically decreasing relationship between the probability of events and their entropy, which will ideally be always positive (for nothing we observe should force us to forget what we have known). Hence, we add a negative sign in front of $\log$ function.
+Ensuite, pourquoi utilisons-nous un *négatif* $\log$? Intuitivement, les événements plus fréquents devraient contenir moins d'informations que les événements moins fréquents, puisque nous tirons souvent plus d'informations d'un cas inhabituel que d'un cas ordinaire. Cependant, $\log$ augmente de façon monotone avec les probabilités, et est en fait négatif pour toutes les valeurs de $[0, 1]$.  Nous devons construire une relation monotone décroissante entre la probabilité des événements et leur entropie, qui sera idéalement toujours positive (car rien de ce que nous observons ne devrait nous obliger à oublier ce que nous savons). C'est pourquoi nous ajoutons un signe négatif devant la fonction $\log$.
 
-Last, where does the *expectation* function come from? Consider a random variable $X$. We can interpret the self-information ($-\log(p)$) as the amount of *surprise* we have at seeing a particular outcome.  Indeed, as the probability approaches zero, the surprise becomes infinite.  Similarly, we can interpret the entropy as the average amount of surprise from observing $X$. For example, imagine that a slot machine system emits statistical independently symbols ${s_1, \ldots, s_k}$ with probabilities ${p_1, \ldots, p_k}$ respectively. Then the entropy of this system equals to the average self-information from observing each output, i.e.,
+Enfin, d'où vient la fonction *espérance* ? Considérons une variable aléatoire $X$. Nous pouvons interpréter l'auto-information ($-\log(p)$) comme le degré de *surprise* que nous avons de voir un résultat particulier.  En effet, lorsque la probabilité s'approche de zéro, la surprise devient infinie.  De même, nous pouvons interpréter l'entropie comme la quantité moyenne de surprise que nous procure l'observation de $X$. Par exemple, imaginons qu'un système de machine à sous émette des symboles statistiques indépendants ${s_1, \ldots, s_k}$ avec des probabilités respectives de ${p_1, \ldots, p_k}$. L'entropie de ce système est alors égale à l'auto-information moyenne résultant de l'observation de chaque sortie, c'est-à-dire
 
-$$H(S) = \sum_i {p_i \cdot I(s_i)} = - \sum_i {p_i \cdot \log p_i}.$$
+$$H(S) = \sum_i {p_i \cdot I(s_i)} = - \sum_i {p_i \cdot \log p_i}.$$ 
 
+ 
 
+ ### Propriétés de l'entropie
 
-### Properties of Entropy
+Grâce aux exemples et interprétations ci-dessus, nous pouvons déduire les propriétés suivantes de l'entropie :eqref:`eq_ent_def` . Ici, nous désignons $X$ comme un événement et $P$ comme la distribution de probabilité de $X$.
 
-By the above examples and interpretations, we can derive the following properties of entropy :eqref:`eq_ent_def`. Here, we refer to $X$ as an event and $P$ as the probability distribution of $X$.
+* $H(X) \geq 0$ pour tous les événements discrets $X$ (l'entropie peut être négative pour les événements continus $X$).
 
-* $H(X) \geq 0$ for all discrete $X$ (entropy can be negative for continuous $X$).
+* Si $X \sim P$ avec une p.d.f. ou une p.m.f. $p(x)$ et que nous essayons d'estimer $P$ par une nouvelle distribution de probabilité $Q$ avec une p.d.f. ou une p.m.f., alors . $q(x)$ $$H(X) = - E_{x \sim P} [\log p(x)] \leq  - E_{x \sim P} [\log q(x)], \text{ with equality if and only if } P = Q.$$ * Si la distribution de probabilité $X \sim P$, alors $H(X)$ donne une limite inférieure du nombre moyen de bits nécessaires pour coder les symboles tirés de $P$.
 
-* If $X \sim P$ with a p.d.f. or a p.m.f. $p(x)$, and we try to estimate $P$ by a new probability distribution $Q$ with a p.d.f. or a p.m.f. $q(x)$, then $$H(X) = - E_{x \sim P} [\log p(x)] \leq  - E_{x \sim P} [\log q(x)], \text{ with equality if and only if } P = Q.$$  Alternatively, $H(X)$ gives a lower bound of the average number of bits needed to encode symbols drawn from $P$.
-
-* If $X \sim P$, then $x$ conveys the maximum amount of information if it spreads evenly among all possible outcomes. Specifically, if the probability distribution $P$ is discrete with $k$-class $\{p_1, \ldots, p_k \}$, then $$H(X) \leq \log(k), \text{ with equality if and only if } p_i = \frac{1}{k}, \forall i.$$ If $P$ is a continuous random variable, then the story becomes much more complicated.  However, if we additionally impose that $P$ is supported on a finite interval (with all values between $0$ and $1$), then $P$ has the highest entropy if it is the uniform distribution on that interval.
-
-
-## Mutual Information
-
-Previously we defined entropy of a single random variable $X$, how about the entropy of a pair random variables $(X, Y)$?  We can think of these techniques as trying to answer the following type of question, "What information is contained in $X$ and $Y$ together compared to each separately?  Is there redundant information, or is it all unique?"
-
-For the following discussion, we always use $(X, Y)$ as a pair of random variables that follows a joint probability distribution $P$ with a p.d.f. or a p.m.f. $p_{X, Y}(x, y)$, while $X$ and $Y$ follow probability distribution $p_X(x)$ and $p_Y(y)$, respectively.
+* Si , alors $x$ transmet la quantité maximale d'informations si elle se répartit uniformément entre tous les résultats possibles. Plus précisément, si la distribution de probabilité $P$ est discrète avec $k$-classe $\{p_1, \ldots, p_k \}$, alors $$H(X) \leq \log(k), \text{ with equality if and only if } p_i = \frac{1}{k}, \forall i.$$ Si $P$ est une variable aléatoire continue, alors l'histoire devient beaucoup plus compliquée.  Cependant, si nous imposons en plus que $P$ soit supporté par un intervalle fini (avec toutes les valeurs entre $0$ et $1$), alors $P$ a l'entropie la plus élevée si elle est la distribution uniforme sur cet intervalle.
 
 
-### Joint Entropy
+## Information mutuelle
 
-Similar to entropy of a single random variable :eqref:`eq_ent_def`, we define the *joint entropy* $H(X, Y)$ of a pair random variables $(X, Y)$ as
+Nous avons déjà défini l'entropie d'une variable aléatoire unique $X$, mais qu'en est-il de l'entropie d'une paire de variables aléatoires $(X, Y)$?  Nous pouvons considérer que ces techniques tentent de répondre au type de question suivant : "Quelles informations sont contenues dans $X$ et $Y$ ensemble par rapport à chacune séparément ?  Y a-t-il des informations redondantes ou sont-elles toutes uniques ? "
 
-$$H(X, Y) = -E_{(x, y) \sim P} [\log p_{X, Y}(x, y)]. $$
-:eqlabel:`eq_joint_ent_def`
+Pour la discussion suivante, nous utilisons toujours $(X, Y)$ comme une paire de variables aléatoires qui suit une distribution de probabilité conjointe $P$ avec une f.d.p. ou une f.m.p. $p_{X, Y}(x, y)$, tandis que $X$ et $Y$ suivent respectivement les distributions de probabilité $p_X(x)$ et $p_Y(y)$.
 
-Precisely, on the one hand, if $(X, Y)$ is a pair of discrete random variables, then
 
-$$H(X, Y) = - \sum_{x} \sum_{y} p_{X, Y}(x, y) \log p_{X, Y}(x, y).$$
+### Entropie conjointe
 
-On the other hand, if $(X, Y)$ is a pair of continuous random variables, then we define the *differential joint entropy* as
+Comme l'entropie d'une variable aléatoire unique :eqref:`eq_ent_def` , nous définissons l'entropie *conjointe* $H(X, Y)$ d'une paire de variables aléatoires $(X, Y)$ comme
 
-$$H(X, Y) = - \int_{x, y} p_{X, Y}(x, y) \ \log p_{X, Y}(x, y) \;dx \;dy.$$
+$$H(X, Y) = -E_{(x, y) \sim P} [\log p_{X, Y}(x, y)]. $$ 
+ :eqlabel:`eq_joint_ent_def` 
 
-We can think of :eqref:`eq_joint_ent_def` as telling us the total randomness in the pair of random variables.  As a pair of extremes, if $X = Y$ are two identical random variables, then the information in the pair is exactly the information in one and we have $H(X, Y) = H(X) = H(Y)$.  On the other extreme, if $X$ and $Y$ are independent then $H(X, Y) = H(X) + H(Y)$.  Indeed we will always have that the information contained in a pair of random variables is no smaller than the entropy of either random variable and no more than the sum of both.
+ Précisément, d'une part, si $(X, Y)$ est une paire de variables aléatoires discrètes, alors
+
+$$H(X, Y) = - \sum_{x} \sum_{y} p_{X, Y}(x, y) \log p_{X, Y}(x, y).$$ 
+
+ D'autre part, si $(X, Y)$ est une paire de variables aléatoires continues, alors nous définissons l'entropie conjointe *différentielle* comme
+
+$$H(X, Y) = - \int_{x, y} p_{X, Y}(x, y) \ \log p_{X, Y}(x, y) \;dx \;dy.$$ 
+
+ Nous pouvons considérer que :eqref:`eq_joint_ent_def` nous indique le caractère aléatoire total de la paire de variables aléatoires.  A titre de paire d'extrêmes, si $X = Y$ sont deux variables aléatoires identiques, alors l'information dans la paire est exactement l'information dans l'une et nous avons $H(X, Y) = H(X) = H(Y)$.  À l'autre extrême, si $X$ et $Y$ sont indépendantes, alors $H(X, Y) = H(X) + H(Y)$.  En effet, nous aurons toujours que l'information contenue dans une paire de variables aléatoires n'est pas plus petite que l'entropie de l'une des deux variables aléatoires et pas plus grande que la somme des deux.
 
 $$
 H(X), H(Y) \le H(X, Y) \le H(X) + H(Y).
 $$
 
-Let's implement joint entropy from scratch.
+Implémentons l'entropie conjointe à partir de zéro.
 
 ```{.python .input}
 #@tab mxnet
@@ -234,34 +234,34 @@ def joint_entropy(p_xy):
 joint_entropy(tf.constant([[0.1, 0.5], [0.1, 0.3]]))
 ```
 
-Notice that this is the same *code* as before, but now we interpret it differently as working on the joint distribution of the two random variables.
+Remarquez qu'il s'agit du même *code* que précédemment, mais que nous l'interprétons maintenant différemment en travaillant sur la distribution conjointe des deux variables aléatoires.
 
 
-### Conditional Entropy
+### Entropie conditionnelle
 
-The joint entropy defined above the amount of information contained in a pair of random variables.  This is useful, but oftentimes it is not what we care about.  Consider the setting of machine learning.  Let's take $X$ to be the random variable (or vector of random variables) that describes the pixel values of an image, and $Y$ to be the random variable which is the class label.  $X$ should contain substantial information---a natural image is a complex thing.  However, the information contained in $Y$ once the image has been show should be low.  Indeed, the image of a digit should already contain the information about what digit it is unless the digit is illegible.  Thus, to continue to extend our vocabulary of information theory, we need to be able to reason about the information content in a random variable conditional on another.
+L'entropie conjointe définie ci-dessus représente la quantité d'informations contenues dans une paire de variables aléatoires.  C'est utile, mais souvent, ce n'est pas ce qui nous intéresse.  Prenons l'exemple de l'apprentissage automatique.  Prenons $X$ comme variable aléatoire (ou vecteur de variables aléatoires) décrivant les valeurs des pixels d'une image, et $Y$ comme variable aléatoire représentant l'étiquette de classe. $X$ devrait contenir des informations substantielles - une image naturelle est une chose complexe.  Cependant, l'information contenue dans $Y$ une fois l'image montrée devrait être faible.  En effet, l'image d'un chiffre devrait déjà contenir l'information sur le chiffre dont il s'agit, sauf si le chiffre est illisible.  Ainsi, pour continuer à étendre notre vocabulaire de la théorie de l'information, nous devons être capables de raisonner sur le contenu en information d'une variable aléatoire conditionnelle à une autre.
 
-In the probability theory, we saw the definition of the *conditional probability* to measure the relationship between variables. We now want to analogously define the *conditional entropy* $H(Y \mid X)$.  We can write this as
+Dans la théorie des probabilités, nous avons vu la définition de la *probabilité conditionnelle* pour mesurer la relation entre les variables. Nous voulons maintenant définir de manière analogue l'entropie *conditionnelle* $H(Y \mid X)$.  Nous pouvons l'écrire comme suit :
 
-$$ H(Y \mid X) = - E_{(x, y) \sim P} [\log p(y \mid x)],$$
-:eqlabel:`eq_cond_ent_def`
+$$ H(Y \mid X) = - E_{(x, y) \sim P} [\log p(y \mid x)],$$ 
+ :eqlabel:`eq_cond_ent_def` 
 
-where $p(y \mid x) = \frac{p_{X, Y}(x, y)}{p_X(x)}$ is the conditional probability. Specifically, if $(X, Y)$ is a pair of discrete random variables, then
+ où $p(y \mid x) = \frac{p_{X, Y}(x, y)}{p_X(x)}$ est la probabilité conditionnelle. Plus précisément, si $(X, Y)$ est une paire de variables aléatoires discrètes, alors
 
-$$H(Y \mid X) = - \sum_{x} \sum_{y} p(x, y) \log p(y \mid x).$$
+$$H(Y \mid X) = - \sum_{x} \sum_{y} p(x, y) \log p(y \mid x).$$ 
 
-If $(X, Y)$ is a pair of continuous random variables, then the *differential conditional entropy* is similarly defined as
+ Si $(X, Y)$ est une paire de variables aléatoires continues, alors l'entropie conditionnelle *différentielle* est définie de manière similaire comme
 
-$$H(Y \mid X) = - \int_x \int_y p(x, y) \ \log p(y \mid x) \;dx \;dy.$$
+$$H(Y \mid X) = - \int_x \int_y p(x, y) \ \log p(y \mid x) \;dx \;dy.$$ 
 
+ 
+ Il est maintenant naturel de se demander comment l'entropie *conditionnelle* $H(Y \mid X)$ est liée à l'entropie $H(X)$ et à l'entropie conjointe $H(X, Y)$  En utilisant les définitions ci-dessus, nous pouvons l'exprimer clairement :
 
-It is now natural to ask, how does the *conditional entropy* $H(Y \mid X)$ relate to the entropy $H(X)$ and the joint entropy $H(X, Y)$?  Using the definitions above, we can express this cleanly:
+$$H(Y \mid X) = H(X, Y) - H(X).$$ 
 
-$$H(Y \mid X) = H(X, Y) - H(X).$$
+ Cela a une interprétation intuitive : l'information dans $Y$ étant donné $X$ ($H(Y \mid X)$) est la même que l'information dans $X$ et $Y$ ensemble ($H(X, Y)$) moins l'information déjà contenue dans $X$.  Cela nous donne l'information contenue dans $Y$ qui n'est pas également représentée dans $X$.
 
-This has an intuitive interpretation: the information in $Y$ given $X$ ($H(Y \mid X)$) is the same as the information in both $X$ and $Y$ together ($H(X, Y)$) minus the information already contained in $X$.  This gives us the information in $Y$ which is not also represented in $X$.
-
-Now, let's implement conditional entropy :eqref:`eq_cond_ent_def` from scratch.
+Maintenant, implémentons l'entropie conditionnelle :eqref:`eq_cond_ent_def` à partir de zéro.
 
 ```{.python .input}
 #@tab mxnet
@@ -301,35 +301,35 @@ conditional_entropy(tf.constant([[0.1, 0.5], [0.2, 0.3]]),
                     tf.constant([0.2, 0.8]))
 ```
 
-### Mutual Information
+### Information mutuelle
 
-Given the previous setting of random variables $(X, Y)$, you may wonder: "Now that we know how much information is contained in $Y$ but not in $X$, can we similarly ask how much information is shared between $X$ and $Y$?" The answer will be the *mutual information* of $(X, Y)$, which we will write as $I(X, Y)$.
+Compte tenu de la configuration précédente des variables aléatoires $(X, Y)$, vous pouvez vous demander : "Maintenant que nous savons combien d'informations sont contenues dans $Y$ mais pas dans $X$, pouvons-nous demander de la même manière combien d'informations sont partagées entre $X$ et $Y$?" La réponse sera l'information *mutuelle* de $(X, Y)$, que nous écrirons $I(X, Y)$.
 
-Rather than diving straight into the formal definition, let's practice our intuition by first trying to derive an expression for the mutual information entirely based on terms we have constructed before.  We wish to find the information shared between two random variables.  One way we could try to do this is to start with all the information contained in both $X$ and $Y$ together, and then we take off the parts that are not shared.  The information contained in both $X$ and $Y$ together is written as $H(X, Y)$.  We want to subtract from this the information contained in $X$ but not in $Y$, and the information contained in $Y$ but not in $X$.  As we saw in the previous section, this is given by $H(X \mid Y)$ and $H(Y \mid X)$ respectively.  Thus, we have that the mutual information should be
+Plutôt que de plonger directement dans la définition formelle, exerçons notre intuition en essayant d'abord de dériver une expression pour l'information mutuelle entièrement basée sur les termes que nous avons construits auparavant.  Nous souhaitons trouver l'information partagée entre deux variables aléatoires.  Une façon d'essayer de le faire est de commencer par toutes les informations contenues dans $X$ et $Y$ ensemble, puis de retirer les parties qui ne sont pas partagées.  Les informations contenues à la fois dans $X$ et $Y$ s'écrivent comme suit : $H(X, Y)$.  Nous voulons en soustraire les informations contenues dans $X$ mais pas dans $Y$, et les informations contenues dans $Y$ mais pas dans $X$.  Comme nous l'avons vu dans la section précédente, ces informations sont données respectivement par $H(X \mid Y)$ et $H(Y \mid X)$.  Ainsi, nous avons que l'information mutuelle devrait être
 
 $$
 I(X, Y) = H(X, Y) - H(Y \mid X) - H(X \mid Y).
 $$
 
-Indeed, this is a valid definition for the mutual information.  If we expand out the definitions of these terms and combine them, a little algebra shows that this is the same as
+En effet, il s'agit d'une définition valide de l'information mutuelle.  Si nous développons les définitions de ces termes et les combinons, un peu d'algèbre montre que cela équivaut à
 
-$$I(X, Y) = E_{x} E_{y} \left\{ p_{X, Y}(x, y) \log\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)} \right\}. $$
-:eqlabel:`eq_mut_ent_def`
+$$I(X, Y) = E_{x} E_{y} \left\{ p_{X, Y}(x, y) \log\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)} \right\}. $$ 
+ :eqlabel:`eq_mut_ent_def` 
 
-
-We can summarize all of these relationships in image :numref:`fig_mutual_information`.  It is an excellent test of intuition to see why the following statements are all also equivalent to $I(X, Y)$.
+ 
+ Nous pouvons résumer toutes ces relations dans l'image :numref:`fig_mutual_information` .  C'est un excellent test d'intuition que de voir pourquoi les affirmations suivantes sont toutes également équivalentes à $I(X, Y)$.
 
 * $H(X) - H(X \mid Y)$
-* $H(Y) - H(Y \mid X)$
-* $H(X) + H(Y) - H(X, Y)$
+ * $H(Y) - H(Y \mid X)$
+ * $H(X) + H(Y) - H(X, Y)$
 
-![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual-information.svg)
-:label:`fig_mutual_information`
+ ![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual-information.svg) 
+ :label:`fig_mutual_information` 
 
+ 
+ De bien des façons, nous pouvons considérer l'information mutuelle :eqref:`eq_mut_ent_def` comme une extension de principe du coefficient de corrélation que nous avons vu dans :numref:`sec_random_variables` .  Cela nous permet de demander non seulement les relations linéaires entre les variables, mais aussi l'information maximale partagée entre les deux variables aléatoires de n'importe quel type.
 
-In many ways we can think of the mutual information :eqref:`eq_mut_ent_def` as principled extension of correlation coefficient we saw in :numref:`sec_random_variables`.  This allows us to ask not only for linear relationships between variables, but for the maximum information shared between the two random variables of any kind.
-
-Now, let's implement mutual information from scratch.
+Maintenant, implémentons l'information mutuelle à partir de zéro.
 
 ```{.python .input}
 #@tab mxnet
@@ -370,48 +370,48 @@ mutual_information(tf.constant([[0.1, 0.5], [0.1, 0.3]]),
                    tf.constant([0.2, 0.8]), tf.constant([[0.75, 0.25]]))
 ```
 
-### Properties of Mutual Information
+### Propriétés de l'information mutuelle
 
-Rather than memorizing the definition of mutual information :eqref:`eq_mut_ent_def`, you only need to keep in mind its notable properties:
+Plutôt que de mémoriser la définition de l'information mutuelle :eqref:`eq_mut_ent_def` , il vous suffit de garder à l'esprit ses propriétés notables :
 
-* Mutual information is symmetric, i.e., $I(X, Y) = I(Y, X)$.
-* Mutual information is non-negative, i.e., $I(X, Y) \geq 0$.
-* $I(X, Y) = 0$ if and only if $X$ and $Y$ are independent. For example, if $X$ and $Y$ are independent, then knowing $Y$ does not give any information about $X$ and vice versa, so their mutual information is zero.
-* Alternatively, if $X$ is an invertible function of $Y$, then $Y$ and $X$ share all information and $$I(X, Y) = H(Y) = H(X).$$
+* L'information mutuelle est symétrique, c'est-à-dire $I(X, Y) = I(Y, X)$.
+* L'information mutuelle est non négative, c'est-à-dire $I(X, Y) \geq 0$.
+* $I(X, Y) = 0$ si et seulement si $X$ et $Y$ sont indépendants. Par exemple, si $X$ et $Y$ sont indépendants, alors le fait de connaître $Y$ ne donne aucune information sur $X$ et vice versa, leur information mutuelle est donc nulle.
+* Par ailleurs, si $X$ est une fonction inversible de $Y$, alors $Y$ et $X$ partagent toutes les informations et $$I(X, Y) = H(Y) = H(X).$$
 
-### Pointwise Mutual Information
+ ### Information mutuelle ponctuelle
 
-When we worked with entropy at the beginning of this chapter, we were able to provide an interpretation of $-\log(p_X(x))$ as how *surprised* we were with the particular outcome.  We may give a similar interpretation to the logarithmic term in the mutual information, which is often referred to as the *pointwise mutual information*:
+Lorsque nous avons travaillé sur l'entropie au début de ce chapitre, nous avons été en mesure de fournir une interprétation de $-\log(p_X(x))$ comme étant le degré de *surprise* du résultat particulier.  Nous pouvons donner une interprétation similaire au terme logarithmique de l'information mutuelle, souvent appelée *information mutuelle ponctuelle* :
 
-$$\mathrm{pmi}(x, y) = \log\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)}.$$
-:eqlabel:`eq_pmi_def`
+$$\mathrm{pmi}(x, y) = \log\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)}.$$ 
+ :eqlabel:`eq_pmi_def` 
 
-We can think of :eqref:`eq_pmi_def` as measuring how much more or less likely the specific combination of outcomes $x$ and $y$ are compared to what we would expect for independent random outcomes.  If it is large and positive, then these two specific outcomes occur much more frequently than they would compared to random chance (*note*: the denominator is $p_X(x) p_Y(y)$ which is the probability of the two outcomes were independent), whereas if it is large and negative it represents the two outcomes happening far less than we would expect by random chance.
+ Nous pouvons considérer que :eqref:`eq_pmi_def` mesure le degré de probabilité de la combinaison spécifique des résultats $x$ et $y$ par rapport à ce que nous attendrions de résultats aléatoires indépendants.  S'il est grand et positif, alors ces deux résultats spécifiques se produisent beaucoup plus fréquemment qu'ils ne le feraient par rapport au hasard (*note* : le dénominateur est $p_X(x) p_Y(y)$ qui est la probabilité que les deux résultats soient indépendants), tandis que s'il est grand et négatif, il représente les deux résultats se produisant beaucoup moins que ce que nous attendrions par hasard.
 
-This allows us to interpret the mutual information :eqref:`eq_mut_ent_def` as the average amount that we were surprised to see two outcomes occurring together compared to what we would expect if they were independent.
+Cela nous permet d'interpréter l'information mutuelle :eqref:`eq_mut_ent_def` comme la quantité moyenne de surprise que nous avons eue à voir deux résultats se produire ensemble par rapport à ce que nous aurions attendu s'ils étaient indépendants.
 
-### Applications of Mutual Information
+### Applications de l'information mutuelle
 
-Mutual information may be a little abstract in it pure definition, so how does it related to machine learning? In natural language processing, one of the most difficult problems is the *ambiguity resolution*, or the issue of the meaning of a word being unclear from context. For example, recently a headline in the news reported that "Amazon is on fire". You may wonder whether the company Amazon has a building on fire, or the Amazon rain forest is on fire.
+L'information mutuelle est peut-être un peu abstraite dans sa définition pure, alors comment est-elle liée à l'apprentissage automatique ? Dans le traitement du langage naturel, l'un des problèmes les plus difficiles est la *résolution d'ambiguïté*, ou la question de la signification d'un mot qui n'est pas claire à partir du contexte. Par exemple, récemment, un titre d'actualité rapportait que "Amazon est en feu". Vous pouvez vous demander si l'entreprise Amazon a un bâtiment en feu ou si la forêt amazonienne est en feu.
 
-In this case, mutual information can help us resolve this ambiguity. We first find the group of words that each has a relatively large mutual information with the company Amazon, such as e-commerce, technology, and online. Second, we find another group of words that each has a relatively large mutual information with the Amazon rain forest, such as rain, forest, and tropical. When we need to disambiguate "Amazon", we can compare which group has more occurrence in the context of the word Amazon.  In this case the article would go on to describe the forest, and make the context clear.
-
-
-## Kullback–Leibler Divergence
-
-As what we have discussed in :numref:`sec_linear-algebra`, we can use norms to measure distance between two points in space of any dimensionality.  We would like to be able to do a similar task with probability distributions.  There are many ways to go about this, but information theory provides one of the nicest.  We now explore the *Kullback–Leibler (KL) divergence*, which provides a way to measure if two distributions are close together or not.
+Dans ce cas, l'information mutuelle peut nous aider à résoudre cette ambiguïté. Nous trouvons d'abord le groupe de mots qui ont chacun une information mutuelle relativement importante avec l'entreprise Amazon, comme e-commerce, technologie et en ligne. Ensuite, nous trouvons un autre groupe de mots qui ont chacun une information mutuelle relativement importante avec la forêt amazonienne, comme pluie, forêt et tropical. Lorsque nous avons besoin de désambiguïser "Amazon", nous pouvons comparer quel groupe a le plus d'occurrences dans le contexte du mot Amazon.  Dans ce cas, l'article décrirait la forêt, et rendrait le contexte clair.
 
 
-### Definition
+## Divergence de Kullback-Leibler
 
-Given a random variable $X$ that follows the probability distribution $P$ with a p.d.f. or a p.m.f. $p(x)$, and we estimate $P$ by another probability distribution $Q$ with a p.d.f. or a p.m.f. $q(x)$. Then the *Kullback–Leibler (KL) divergence* (or *relative entropy*) between $P$ and $Q$ is
+Comme nous l'avons vu sur :numref:`sec_linear-algebra` , nous pouvons utiliser des normes pour mesurer la distance entre deux points dans un espace de n'importe quelle dimension.  Nous aimerions pouvoir effectuer une tâche similaire avec les distributions de probabilité.  Il existe de nombreuses façons d'y parvenir, mais la théorie de l'information en fournit une des plus belles.  Nous allons maintenant explorer la *divergence de Kullback-Leibler (KL)*, qui fournit un moyen de mesurer si deux distributions sont proches ou non.
 
-$$D_{\mathrm{KL}}(P\|Q) = E_{x \sim P} \left[ \log \frac{p(x)}{q(x)} \right].$$
-:eqlabel:`eq_kl_def`
 
-As with the pointwise mutual information :eqref:`eq_pmi_def`, we can again provide an interpretation of the logarithmic term:  $-\log \frac{q(x)}{p(x)} = -\log(q(x)) - (-\log(p(x)))$ will be large and positive if we see $x$ far more often under $P$ than we would expect for $Q$, and large and negative if we see the outcome far less than expected.  In this way, we can interpret it as our *relative* surprise at observing the outcome compared to how surprised we would be observing it from our reference distribution.
+### Définition
 
-Let's implement the KL divergence from Scratch.
+Étant donné une variable aléatoire $X$ qui suit la distribution de probabilité $P$ avec une p.d.f. ou une p.m.f. $p(x)$, et nous estimons $P$ par une autre distribution de probabilité $Q$ avec une p.d.f. ou une p.m.f. $q(x)$. Alors la divergence * de Kullback-Leibler (KL)* (ou * entropie relative*) entre $P$ et $Q$ est
+
+$$D_{\mathrm{KL}}(P\|Q) = E_{x \sim P} \left[ \log \frac{p(x)}{q(x)} \right].$$ 
+ :eqlabel:`eq_kl_def` 
+
+ Comme pour l'information mutuelle ponctuelle :eqref:`eq_pmi_def` , nous pouvons à nouveau fournir une interprétation du terme logarithmique :  $-\log \frac{q(x)}{p(x)} = -\log(q(x)) - (-\log(p(x)))$ sera grand et positif si nous voyons $x$ beaucoup plus souvent sous $P$ que nous ne nous y attendrions pour $Q$, et grand et négatif si nous voyons le résultat beaucoup moins que prévu.  De cette façon, nous pouvons l'interpréter comme notre surprise *relative* à observer le résultat par rapport à la surprise que nous aurions à l'observer à partir de notre distribution de référence.
+
+Implémentons la divergence KL à partir de Scratch.
 
 ```{.python .input}
 #@tab mxnet
@@ -437,26 +437,26 @@ def kl_divergence(p, q):
     return tf.abs(out).numpy()
 ```
 
-### KL Divergence Properties
+### Propriétés de la divergence de KL
 
-Let's take a look at some properties of the KL divergence :eqref:`eq_kl_def`.
+Examinons quelques propriétés de la divergence de KL :eqref:`eq_kl_def` .
 
-* KL divergence is non-symmetric, i.e., there are $P,Q$ such that $$D_{\mathrm{KL}}(P\|Q) \neq D_{\mathrm{KL}}(Q\|P).$$
-* KL divergence is non-negative, i.e., $$D_{\mathrm{KL}}(P\|Q) \geq 0.$$ Note that the equality holds only when $P = Q$.
-* If there exists an $x$ such that $p(x) > 0$ and $q(x) = 0$, then $D_{\mathrm{KL}}(P\|Q) = \infty$.
-* There is a close relationship between KL divergence and mutual information. Besides the relationship shown in :numref:`fig_mutual_information`, $I(X, Y)$ is also numerically equivalent with the following terms:
-    1. $D_{\mathrm{KL}}(P(X, Y)  \ \| \ P(X)P(Y))$;
-    1. $E_Y \{ D_{\mathrm{KL}}(P(X \mid Y) \ \| \ P(X)) \}$;
-    1. $E_X \{ D_{\mathrm{KL}}(P(Y \mid X) \ \| \ P(Y)) \}$.
+* La divergence KL est non symétrique, c'est-à-dire qu'il existe $P,Q$ tel que $$D_{\mathrm{KL}}(P\|Q) \neq D_{\mathrm{KL}}(Q\|P).$$
+ * La divergence KL est non négative, c'est-à-dire que $$D_{\mathrm{KL}}(P\|Q) \geq 0.$$ Notez que l'égalité ne vaut que lorsque $P = Q$.
+* S'il existe un $x$ tel que $p(x) > 0$ et $q(x) = 0$, alors $D_{\mathrm{KL}}(P\|Q) = \infty$.
+* Il existe une relation étroite entre la divergence KL et l'information mutuelle. En plus de la relation montrée dans :numref:`fig_mutual_information` , $I(X, Y)$ est aussi numériquement équivalent avec les termes suivants :
+   1. $D_{\mathrm{KL}}(P(X, Y)  \ \| \ P(X)P(Y))$;
+ 1. $E_Y \{ D_{\mathrm{KL}}(P(X \mid Y) \ \| \ P(X)) \}$;
+ 1. $E_X \{ D_{\mathrm{KL}}(P(Y \mid X) \ \| \ P(Y)) \}$.
 
-  For the first term, we interpret mutual information as the KL divergence between $P(X, Y)$ and the product of $P(X)$ and $P(Y)$, and thus is a measure of how different the joint distribution is from the distribution if they were independent. For the second term, mutual information tells us the average reduction in uncertainty about $Y$ that results from learning the value of the $X$'s distribution. Similarly to the third term.
+ Pour le premier terme, nous interprétons l'information mutuelle comme la divergence KL entre $P(X, Y)$ et le produit de $P(X)$ et $P(Y)$, et c'est donc une mesure de la différence entre la distribution conjointe et la distribution si elles étaient indépendantes. Pour le deuxième terme, l'information mutuelle nous indique la réduction moyenne de l'incertitude sur $Y$ qui résulte de la connaissance de la valeur de la distribution de $X$. De même pour le troisième terme.
 
 
-### Example
+#### Exemple
 
-Let's go through a toy example to see the non-symmetry explicitly.
+Prenons un petit exemple pour voir la non-symétrie de manière explicite.
 
-First, let's generate and sort three tensors of length $10,000$: an objective tensor $p$ which follows a normal distribution $N(0, 1)$, and two candidate tensors $q_1$ and $q_2$ which follow normal distributions $N(-1, 1)$ and $N(1, 1)$ respectively.
+Tout d'abord, générons et trions trois tenseurs de longueur $10,000$: un tenseur objectif $p$ qui suit une distribution normale $N(0, 1)$, et deux tenseurs candidats $q_1$ et $q_2$ qui suivent des distributions normales $N(-1, 1)$ et $N(1, 1)$ respectivement.
 
 ```{.python .input}
 #@tab mxnet
@@ -498,7 +498,7 @@ q1 = tf.sort(q1)
 q2 = tf.sort(q2)
 ```
 
-Since $q_1$ and $q_2$ are symmetric with respect to the y-axis (i.e., $x=0$), we expect a similar value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$. As you can see below, there is only a less than 3% off between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$.
+Comme $q_1$ et $q_2$ sont symétriques par rapport à l'axe des y (c'est-à-dire $x=0$), nous nous attendons à une valeur similaire de la divergence KL entre $D_{\mathrm{KL}}(p\|q_1)$ et $D_{\mathrm{KL}}(p\|q_2)$. Comme vous pouvez le voir ci-dessous, il n'y a qu'une divergence de moins de 3% entre $D_{\mathrm{KL}}(p\|q_1)$ et $D_{\mathrm{KL}}(p\|q_2)$.
 
 ```{.python .input}
 #@tab all
@@ -509,7 +509,7 @@ similar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100
 kl_pq1, kl_pq2, similar_percentage
 ```
 
-In contrast, you may find that $D_{\mathrm{KL}}(q_2 \|p)$ and $D_{\mathrm{KL}}(p \| q_2)$ are off a lot, with around 40% off as shown below.
+En revanche, vous pouvez trouver que $D_{\mathrm{KL}}(q_2 \|p)$ et $D_{\mathrm{KL}}(p \| q_2)$ sont très différents, avec environ 40% de différence comme indiqué ci-dessous.
 
 ```{.python .input}
 #@tab all
@@ -521,9 +521,9 @@ kl_q2p, differ_percentage
 
 ## Cross-Entropy
 
-If you are curious about applications of information theory in deep learning, here is a quick example. We define the true distribution $P$ with probability distribution $p(x)$, and the estimated distribution $Q$ with probability distribution $q(x)$, and we will use them in the rest of this section.
+Si vous êtes curieux de connaître les applications de la théorie de l'information dans l'apprentissage profond, voici un exemple rapide. Nous définissons la distribution réelle $P$ avec la distribution de probabilité $p(x)$, et la distribution estimée $Q$ avec la distribution de probabilité $q(x)$, et nous les utiliserons dans le reste de cette section.
 
-Say we need to solve a binary classification problem based on given $n$ data examples {$x_1, \ldots, x_n$}. Assume that we encode $1$ and $0$ as the positive and negative class label $y_i$ respectively, and our neural network is parameterized by $\theta$. If we aim to find a best $\theta$ so that $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, it is natural to apply the maximum log-likelihood approach as was seen in :numref:`sec_maximum_likelihood`. To be specific, for true labels $y_i$ and predictions $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, the probability to be classified as positive is $\pi_i= p_{\theta}(y_i = 1 \mid x_i)$. Hence, the log-likelihood function would be
+Supposons que nous devions résoudre un problème de classification binaire sur la base d'exemples de données $n$ donnés {$x_1, \ldots, x_n$}. Supposons que nous encodions $1$ et $0$ comme étiquette de classe positive et négative $y_i$ respectivement, et que notre réseau neuronal soit paramétré par $\theta$. Si notre objectif est de trouver le meilleur $\theta$ pour que $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, il est naturel d'appliquer l'approche de la log-vraisemblance maximale, comme on l'a vu dans :numref:`sec_maximum_likelihood` . Plus précisément, pour les étiquettes vraies $y_i$ et les prédictions $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, la probabilité d'être classé comme positif est $\pi_i= p_{\theta}(y_i = 1 \mid x_i)$. Par conséquent, la fonction de log-vraisemblance est la suivante
 
 $$
 \begin{aligned}
@@ -533,24 +533,24 @@ l(\theta) &= \log L(\theta) \\
 \end{aligned}
 $$
 
-Maximizing the log-likelihood function $l(\theta)$ is identical to minimizing $- l(\theta)$, and hence we can find the best $\theta$ from here. To generalize the above loss to any distributions, we also called $-l(\theta)$ the *cross-entropy loss* $\mathrm{CE}(y, \hat{y})$, where $y$ follows the true distribution $P$ and $\hat{y}$ follows the estimated distribution $Q$.
+Maximiser la fonction de log-vraisemblance $l(\theta)$ est identique à minimiser $- l(\theta)$, et nous pouvons donc trouver le meilleur $\theta$ à partir de là. Pour généraliser la perte ci-dessus à n'importe quelle distribution, nous avons également appelé $-l(\theta)$ la *perte d'entropie croisée* $\mathrm{CE}(y, \hat{y})$, où $y$ suit la distribution réelle $P$ et $\hat{y}$ suit la distribution estimée $Q$.
 
-This was all derived by working from the maximum likelihood point of view.  However, if we look closely we can see that terms like $\log(\pi_i)$ have entered into our computation which is a solid indication that we can understand the expression from an information theoretic point of view.
+Tout ceci a été dérivé en travaillant du point de vue du maximum de vraisemblance.  Cependant, si nous regardons de près, nous pouvons voir que des termes comme $\log(\pi_i)$ sont entrés dans notre calcul, ce qui est une indication solide que nous pouvons comprendre l'expression d'un point de vue de la théorie de l'information.
 
 
-### Formal Definition
+### Définition formelle
 
-Like KL divergence, for a random variable $X$, we can also measure the divergence between the estimating distribution $Q$ and the true distribution $P$ via *cross-entropy*,
+Tout comme la divergence KL, pour une variable aléatoire $X$, nous pouvons également mesurer la divergence entre la distribution d'estimation $Q$ et la distribution réelle $P$ via *l'entropie croisée*,
 
-$$\mathrm{CE}(P, Q) = - E_{x \sim P} [\log(q(x))].$$
-:eqlabel:`eq_ce_def`
+$$\mathrm{CE}(P, Q) = - E_{x \sim P} [\log(q(x))].$$ 
+ :eqlabel:`eq_ce_def` 
 
-By using properties of entropy discussed above, we can also interpret it as the summation of the entropy $H(P)$ and the KL divergence between $P$ and $Q$, i.e.,
+ En utilisant les propriétés de l'entropie discutées ci-dessus, nous pouvons également l'interpréter comme la somme de l'entropie $H(P)$ et de la divergence KL entre $P$ et $Q$, c'est-à-dire,
 
 $$\mathrm{CE} (P, Q) = H(P) + D_{\mathrm{KL}}(P\|Q).$$
 
 
-We can implement the cross-entropy loss as below.
+Nous pouvons mettre en œuvre la perte d'entropie croisée comme suit.
 
 ```{.python .input}
 #@tab mxnet
@@ -575,7 +575,7 @@ def cross_entropy(y_hat, y):
     return tf.reduce_mean(ce).numpy()
 ```
 
-Now define two tensors for the labels and predictions, and calculate the cross-entropy loss of them.
+Définissez maintenant deux tenseurs pour les étiquettes et les prédictions, et calculez la perte d'entropie croisée entre eux.
 
 ```{.python .input}
 #@tab mxnet
@@ -601,44 +601,44 @@ preds = tf.constant([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
 cross_entropy(preds, labels)
 ```
 
-### Properties
+### Propriétés
 
-As alluded in the beginning of this section, cross-entropy :eqref:`eq_ce_def` can be used to define a loss function in the optimization problem. It turns out that the following are equivalent:
+Comme nous y avons fait allusion au début de cette section, l'entropie croisée :eqref:`eq_ce_def` peut être utilisée pour définir une fonction de perte dans le problème d'optimisation. Il s'avère que les fonctions suivantes sont équivalentes :
 
-1. Maximizing predictive probability of $Q$ for distribution $P$, (i.e., $E_{x
-\sim P} [\log (q(x))]$);
-1. Minimizing cross-entropy $\mathrm{CE} (P, Q)$;
-1. Minimizing the KL divergence $D_{\mathrm{KL}}(P\|Q)$.
+1. Maximiser la probabilité de prédiction de $Q$ pour la distribution $P$, (c'est-à-dire, $E_{x
+\sim P} [\log (q(x))]$) ;
+1. minimiser l'entropie croisée $\mathrm{CE} (P, Q)$;
+1. minimiser la divergence KL $D_{\mathrm{KL}}(P\|Q)$.
 
-The definition of cross-entropy indirectly proves the equivalent relationship between objective 2 and objective 3, as long as the entropy of true data $H(P)$ is constant.
-
-
-### Cross-Entropy as An Objective Function of Multi-class Classification
-
-If we dive deep into the classification objective function with cross-entropy loss $\mathrm{CE}$, we will find minimizing $\mathrm{CE}$ is equivalent to maximizing the log-likelihood function $L$.
-
-To begin with, suppose that we are given a dataset with $n$ examples, and it can be classified into $k$-classes. For each data example $i$, we represent any $k$-class label $\mathbf{y}_i = (y_{i1}, \ldots, y_{ik})$ by *one-hot encoding*. To be specific, if the  example $i$ belongs to class $j$, then we set the $j$-th entry to $1$, and all other components to $0$, i.e.,
-
-$$ y_{ij} = \begin{cases}1 & j \in J; \\ 0 &\text{otherwise.}\end{cases}$$
-
-For instance, if a multi-class classification problem contains three classes $A$, $B$, and $C$, then the labels $\mathbf{y}_i$ can be encoded in {$A: (1, 0, 0); B: (0, 1, 0); C: (0, 0, 1)$}.
+La définition de l'entropie croisée prouve indirectement la relation équivalente entre l'objectif 2 et l'objectif 3, tant que l'entropie des données réelles $H(P)$ est constante.
 
 
-Assume that our neural network is parameterized by $\theta$. For true label vectors $\mathbf{y}_i$ and predictions $$\hat{\mathbf{y}}_i= p_{\theta}(\mathbf{y}_i \mid \mathbf{x}_i) = \sum_{j=1}^k y_{ij} p_{\theta} (y_{ij}  \mid  \mathbf{x}_i).$$
+### L'entropie croisée en tant que fonction objectif de la classification multi-classes
 
-Hence, the *cross-entropy loss* would be
+Si nous nous plongeons dans la fonction objectif de la classification avec la perte d'entropie croisée $\mathrm{CE}$, nous constaterons que la minimisation de $\mathrm{CE}$ est équivalente à la maximisation de la fonction de log-vraisemblance $L$.
+
+Pour commencer, supposons que l'on nous donne un ensemble de données contenant $n$ exemples, et qu'il peut être classé en $k$-classes. Pour chaque exemple de données $i$, nous représentons toute étiquette de classe $k$ $\mathbf{y}_i = (y_{i1}, \ldots, y_{ik})$ par *codage à un coup*. Plus précisément, si l'exemple $i$ appartient à la classe $j$, nous définissons la $j$-ième entrée comme étant $1$, et tous les autres composants comme étant $0$, c'est-à-dire
+
+$$ y_{ij} = \begin{cases}1 & j \in J; \\ 0 &\text{otherwise.}\end{cases}$$ 
+
+ Par exemple, si un problème de classification multi-classes contient trois classes $A$, $B$ et $C$, les étiquettes $\mathbf{y}_i$ peuvent être codées dans {$A: (1, 0, 0); B: (0, 1, 0); C: (0, 0, 1)$}.
+
+
+Supposons que notre réseau neuronal soit paramétré par $\theta$. Pour les vecteurs d'étiquettes vraies $\mathbf{y}_i$ et les prédictions $$\hat{\mathbf{y}}_i= p_{\theta}(\mathbf{y}_i \mid \mathbf{x}_i) = \sum_{j=1}^k y_{ij} p_{\theta} (y_{ij}  \mid  \mathbf{x}_i).$$
+
+ Par conséquent, la *perte d'entropie croisée* est la suivante
 
 $$
 \mathrm{CE}(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_{i=1}^n \mathbf{y}_i \log \hat{\mathbf{y}}_i
  = - \sum_{i=1}^n \sum_{j=1}^k y_{ij} \log{p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)}.\\
 $$
 
-On the other side, we can also approach the problem through maximum likelihood estimation. To begin with, let's quickly introduce a $k$-class multinoulli distribution. It is an extension of the Bernoulli distribution from binary class to multi-class. If a random variable $\mathbf{z} = (z_{1}, \ldots, z_{k})$ follows a $k$-class *multinoulli distribution* with probabilities $\mathbf{p} =$ ($p_{1}, \ldots, p_{k}$), i.e., $$p(\mathbf{z}) = p(z_1, \ldots, z_k) = \mathrm{Multi} (p_1, \ldots, p_k), \text{ where } \sum_{i=1}^k p_i = 1,$$ then the joint probability mass function(p.m.f.) of $\mathbf{z}$ is
-$$\mathbf{p}^\mathbf{z} = \prod_{j=1}^k p_{j}^{z_{j}}.$$
+D'un autre côté, nous pouvons également aborder le problème par le biais de l'estimation du maximum de vraisemblance. Pour commencer, présentons rapidement une distribution multinoulli de classe $k$. Il s'agit d'une extension de la distribution de Bernoulli de la classe binaire à la multi-classe. Si une variable aléatoire $\mathbf{z} = (z_{1}, \ldots, z_{k})$ suit une distribution multinoulli* de classe $k$ avec des probabilités $\mathbf{p} =$ ($p_{1}, \ldots, p_{k}$), c'est-à-dire $$p(\mathbf{z}) = p(z_1, \ldots, z_k) = \mathrm{Multi} (p_1, \ldots, p_k), \text{ where } \sum_{i=1}^k p_i = 1,$$, la fonction de masse de probabilité (f.m.p.) conjointe de $\mathbf{z}$ est
+$$\mathbf{p}^\mathbf{z} = \prod_{j=1}^k p_{j}^{z_{j}}.$$ 
 
-
-It can be seen that the label of each data example, $\mathbf{y}_i$, is following a $k$-class multinoulli distribution with probabilities $\boldsymbol{\pi} =$ ($\pi_{1}, \ldots, \pi_{k}$). Therefore, the joint p.m.f. of each data example $\mathbf{y}_i$ is  $\mathbf{\pi}^{\mathbf{y}_i} = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
-Hence, the log-likelihood function would be
+ 
+ On peut voir que l'étiquette de chaque exemple de données, $\mathbf{y}_i$, suit une distribution multinoulli de classe $k$ avec des probabilités $\boldsymbol{\pi} =$ ($\pi_{1}, \ldots, \pi_{k}$). Par conséquent, la f.m.p. conjointe de chaque exemple de données $\mathbf{y}_i$ est $\mathbf{\pi}^{\mathbf{y}_i} = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
+ . Par conséquent, la fonction de log-vraisemblance est la suivante
 
 $$
 \begin{aligned}
@@ -650,10 +650,10 @@ l(\theta)
 \end{aligned}
 $$
 
-Since in maximum likelihood estimation, we maximizing the objective function $l(\theta)$ by having $\pi_{j} = p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)$. Therefore, for any multi-class classification, maximizing the above log-likelihood function $l(\theta)$ is equivalent to minimizing the CE loss $\mathrm{CE}(y, \hat{y})$.
+Puisque dans l'estimation du maximum de vraisemblance, nous maximisons la fonction objectif $l(\theta)$ en ayant $\pi_{j} = p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)$. Par conséquent, pour toute classification multi-classes, la maximisation de la fonction de log-vraisemblance ci-dessus $l(\theta)$ est équivalente à la minimisation de la perte CE $\mathrm{CE}(y, \hat{y})$.
 
 
-To test the above proof, let's apply the built-in measure `NegativeLogLikelihood`. Using the same `labels` and `preds` as in the earlier example, we will get the same numerical loss as the previous example up to the 5 decimal place.
+Pour vérifier la preuve ci-dessus, appliquons la mesure intégrée `NegativeLogLikelihood`. En utilisant les mêmes `labels` et `preds` que dans l'exemple précédent, nous obtiendrons la même perte numérique que dans l'exemple précédent jusqu'à la 5ème décimale.
 
 ```{.python .input}
 #@tab mxnet
@@ -678,7 +678,7 @@ def nll_loss(y_hat, y):
     y = tf.keras.utils.to_categorical(y, num_classes= y_hat.shape[1])
     # We will not calculate negative log-likelihood from the definition.
     # Rather, we will follow a circular argument. Because NLL is same as
-    # `cross_entropy`, if we calculate cross_entropy that would give us NLL
+    # `entropie croisée`, if we calculate cross_entropy that would give us NLL
     cross_entropy = tf.keras.losses.CategoricalCrossentropy(
         from_logits = True, reduction = tf.keras.losses.Reduction.NONE)
     return tf.reduce_mean(cross_entropy(y, y_hat)).numpy()
@@ -687,24 +687,24 @@ loss = nll_loss(tf.math.log(preds), labels)
 loss
 ```
 
-## Summary
+## Résumé
 
-* Information theory is a field of study about encoding, decoding, transmitting, and manipulating information.
-* Entropy is the unit to measure how much information is presented in different signals.
-* KL divergence can also measure the divergence between two distributions.
-* Cross-entropy can be viewed as an objective function of multi-class classification. Minimizing cross-entropy loss is equivalent to maximizing the log-likelihood function.
+* La théorie de l'information est un domaine d'étude sur le codage, le décodage, la transmission et la manipulation de l'information.
+* L'entropie est l'unité permettant de mesurer la quantité d'information présentée dans différents signaux.
+* La divergence de KL peut également mesurer la divergence entre deux distributions.
+* L'entropie croisée peut être considérée comme une fonction objective de la classification multi-classes. Minimiser la perte d'entropie croisée équivaut à maximiser la fonction de log-vraisemblance.
 
 
-## Exercises
+## Exercices
 
-1. Verify that the card examples from the first section indeed have the claimed entropy.
-1. Show that the KL divergence $D(p\|q)$ is nonnegative for all distributions $p$ and $q$. Hint: use Jensen's inequality, i.e., use the fact that $-\log x$ is a convex function.
-1. Let's compute the entropy from a few data sources:
-    * Assume that you are watching the output generated by a monkey at a typewriter. The monkey presses any of the $44$ keys of the typewriter at random (you can assume that it has not discovered any special keys or the shift key yet). How many bits of randomness per character do you observe?
-    * Being unhappy with the monkey, you replaced it by a drunk typesetter. It is able to generate words, albeit not coherently. Instead, it picks a random word out of a vocabulary of $2,000$ words. Let's assume that the average length of a word is $4.5$ letters in English. How many bits of randomness per character do you observe now?
-    * Still being unhappy with the result, you replace the typesetter by a high quality language model. The language model can currently obtain a perplexity as low as $15$ points per word. The character *perplexity* of a language model is defined as the inverse of the geometric mean of a set of probabilities, each probability is corresponding to a character in the word. To be specific, if the length of a given word is $l$, then  $\mathrm{PPL}(\text{word}) = \left[\prod_i p(\text{character}_i)\right]^{ -\frac{1}{l}} = \exp \left[ - \frac{1}{l} \sum_i{\log p(\text{character}_i)} \right].$  Assume that the test word has 4.5 letters, how many bits of randomness per character do you observe now?
-1. Explain intuitively why $I(X, Y) = H(X) - H(X|Y)$.  Then, show this is true by expressing both sides as an expectation with respect to the joint distribution.
-1. What is the KL Divergence between the two Gaussian distributions $\mathcal{N}(\mu_1, \sigma_1^2)$ and $\mathcal{N}(\mu_2, \sigma_2^2)$?
+1. Vérifiez que les exemples de cartes de la première section ont bien l'entropie revendiquée.
+1. Montrez que la divergence KL $D(p\|q)$ est non négative pour toutes les distributions $p$ et $q$. Conseil : utilisez l'inégalité de Jensen, c'est-à-dire utilisez le fait que $-\log x$ est une fonction convexe.
+1. Calculons l'entropie à partir de quelques sources de données :
+   * Supposons que vous regardiez la sortie générée par un singe devant une machine à écrire. Le singe appuie au hasard sur l'une des touches $44$ de la machine à écrire (vous pouvez supposer qu'il n'a pas encore découvert les touches spéciales ou la touche shift). Combien de bits de caractère aléatoire par caractère observez-vous ?
+   * N'étant pas satisfait du singe, vous l'avez remplacé par une machine à écrire ivre. Il est capable de générer des mots, mais pas de façon cohérente. Au lieu de cela, il choisit un mot au hasard dans un vocabulaire de $2,000$ mots. Supposons que la longueur moyenne d'un mot soit de $4.5$ lettres en anglais. Combien de bits d'aléatoire par caractère observez-vous maintenant ?
+   * Toujours mécontent du résultat, vous remplacez le compositeur par un modèle de langage de haute qualité. Le modèle de langage peut actuellement obtenir une perplexité aussi basse que $15$ points par mot. La *perplexité* d'un modèle de langue est définie comme l'inverse de la moyenne géométrique d'un ensemble de probabilités, chaque probabilité correspondant à un caractère du mot. Plus précisément, si la longueur d'un mot donné est $l$, alors $\mathrm{PPL}(\text{word}) = \left[\prod_i p(\text{character}_i)\right]^{ -\frac{1}{l}} = \exp \left[ - \frac{1}{l} \sum_i{\log p(\text{character}_i)} \right].$ Supposons que le mot test comporte 4,5 lettres, combien de bits d'aléatoire par caractère observez-vous maintenant ?
+1. Expliquez intuitivement pourquoi $I(X, Y) = H(X) - H(X|Y)$.  Montrez ensuite que c'est vrai en exprimant les deux côtés comme une espérance par rapport à la distribution conjointe.
+1. Quelle est la divergence de KL entre les deux distributions gaussiennes $\mathcal{N}(\mu_1, \sigma_1^2)$ et $\mathcal{N}(\mu_2, \sigma_2^2)$?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/420)

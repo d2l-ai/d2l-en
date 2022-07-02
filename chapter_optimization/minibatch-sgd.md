@@ -1,38 +1,38 @@
 # Minibatch Stochastic Gradient Descent
-:label:`sec_minibatch_sgd`
+:label:`sec_minibatch_sgd` 
 
-So far we encountered two extremes in the approach to gradient-based learning: :numref:`sec_gd` uses the full dataset to compute gradients and to update parameters, one pass at a time. Conversely :numref:`sec_sgd` processes one training example at a time to make progress.
-Either of them has its own drawbacks.
-Gradient descent is not particularly *data efficient* whenever data is very similar.
-Stochastic gradient descent is not particularly *computationally efficient* since CPUs and GPUs cannot exploit the full power of vectorization.
-This suggests that there might be something in between,
-and in fact, that is what we have been using so far in the examples we discussed.
+ Jusqu'à présent, nous avons rencontré deux extrêmes dans l'approche de l'apprentissage par gradient : :numref:`sec_gd` utilise l'ensemble des données pour calculer les gradients et mettre à jour les paramètres, une passe à la fois. Inversement, :numref:`sec_sgd` traite un seul exemple d'entraînement à la fois pour progresser.
+Chacune de ces méthodes présente ses propres inconvénients.
+La descente de gradient n'est pas particulièrement *efficace en termes de données* lorsque les données sont très similaires.
+La descente de gradient stochastique n'est pas particulièrement *efficace sur le plan du calcul* puisque les CPU et les GPU ne peuvent pas exploiter toute la puissance de la vectorisation.
+Cela suggère qu'il pourrait y avoir quelque chose entre les deux,
+et en fait, c'est ce que nous avons utilisé jusqu'à présent dans les exemples que nous avons discutés.
 
-## Vectorization and Caches
+## Vectorisation et caches
 
-At the heart of the decision to use minibatches is computational efficiency. This is most easily understood when considering parallelization to multiple GPUs and multiple servers. In this case we need to send at least one image to each GPU. With 8 GPUs per server and 16 servers we already arrive at a minibatch size no smaller than 128.
+L'efficacité de calcul est au cœur de la décision d'utiliser des minibatchs. On le comprend mieux lorsqu'on envisage la parallélisation vers plusieurs GPU et plusieurs serveurs. Dans ce cas, nous devons envoyer au moins une image à chaque GPU. Avec 8 GPU par serveur et 16 serveurs, nous arrivons déjà à une taille de minibatch non inférieure à 128.
 
-Things are a bit more subtle when it comes to single GPUs or even CPUs. These devices have multiple types of memory, often multiple types of computational units and different bandwidth constraints between them.
-For instance, a CPU has a small number of registers and then the L1, L2, and in some cases even L3 cache (which is shared among different processor cores).
-These caches are of increasing size and latency (and at the same time they are of decreasing bandwidth).
-Suffice to say, the processor is capable of performing many more operations than what the main memory interface is able to provide.
+Les choses sont un peu plus subtiles lorsqu'il s'agit de GPU uniques ou même de CPU. Ces dispositifs ont plusieurs types de mémoire, souvent plusieurs types d'unités de calcul et différentes contraintes de bande passante entre eux.
+Par exemple, un CPU possède un petit nombre de registres, puis les caches L1, L2 et, dans certains cas, L3 (qui sont partagés entre les différents cœurs du processeur).
+Ces caches ont une taille et une latence croissantes (et en même temps une bande passante décroissante).
+Il suffit de dire que le processeur est capable d'effectuer beaucoup plus d'opérations que ce que l'interface de la mémoire principale est capable de fournir.
 
-First, a 2GHz CPU with 16 cores and AVX-512 vectorization can process up to $2 \cdot 10^9 \cdot 16 \cdot 32 = 10^{12}$ bytes per second. The capability of GPUs easily exceeds this number by a factor of 100. On the other hand, a midrange server processor might not have much more than 100 GB/s bandwidth, i.e., less than one tenth of what would be required to keep the processor fed. To make matters worse, not all memory access is created equal: memory interfaces are typically 64 bit wide or wider (e.g., on GPUs up to 384 bit), hence reading a single byte incurs the cost of a much wider access.
+Tout d'abord, un CPU de 2 GHz avec 16 cœurs et une vectorisation AVX-512 peut traiter jusqu'à $2 \cdot 10^9 \cdot 16 \cdot 32 = 10^{12}$ octets par seconde. Les capacités des GPU dépassent facilement ce chiffre par un facteur de 100. D'autre part, un processeur de serveur de milieu de gamme peut ne pas avoir beaucoup plus de 100 Go/s de bande passante, c'est-à-dire moins d'un dixième de ce qui serait nécessaire pour alimenter le processeur. Pour aggraver les choses, tous les accès à la mémoire ne sont pas égaux : les interfaces mémoire ont généralement une largeur de 64 bits ou plus (par exemple, sur les GPU, jusqu'à 384 bits), ce qui signifie que la lecture d'un seul octet entraîne le coût d'un accès beaucoup plus large.
 
-Second, there is significant overhead for the first access whereas sequential access is relatively cheap (this is often called a burst read). There are many more things to keep in mind, such as caching when we have multiple sockets, chiplets, and other structures.
-See this [Wikipedia article](https://en.wikipedia.org/wiki/Cache_hierarchy) 
-for a more in-depth discussion.
+Deuxièmement, il y a une surcharge importante pour le premier accès alors que l'accès séquentiel est relativement bon marché (c'est ce qu'on appelle souvent une lecture en rafale). Il y a beaucoup d'autres choses à garder à l'esprit, comme la mise en cache lorsque nous avons plusieurs sockets, chiplets et autres structures.
+Consultez le site [Wikipedia article](https://en.wikipedia.org/wiki/Cache_hierarchy) 
+ pour une discussion plus approfondie.
 
-The way to alleviate these constraints is to use a hierarchy of CPU caches that are actually fast enough to supply the processor with data. This is *the* driving force behind batching in deep learning. To keep matters simple, consider matrix-matrix multiplication, say $\mathbf{A} = \mathbf{B}\mathbf{C}$. We have a number of options for calculating $\mathbf{A}$. For instance, we could try the following:
+La façon d'alléger ces contraintes est d'utiliser une hiérarchie de caches CPU qui sont réellement assez rapides pour alimenter le processeur en données. C'est la *force motrice du batching dans l'apprentissage profond. Pour simplifier les choses, considérons la multiplication matrice-matrice, disons $\mathbf{A} = \mathbf{B}\mathbf{C}$. Nous disposons d'un certain nombre d'options pour calculer $\mathbf{A}$. Par exemple, nous pouvons essayer ce qui suit :
 
-1. We could compute $\mathbf{A}_{ij} = \mathbf{B}_{i,:} \mathbf{C}_{:,j}^\top$, i.e., we could compute it elementwise by means of dot products.
-1. We could compute $\mathbf{A}_{:,j} = \mathbf{B} \mathbf{C}_{:,j}^\top$, i.e., we could compute it one column at a time. Likewise we could compute $\mathbf{A}$ one row $\mathbf{A}_{i,:}$ at a time.
-1. We could simply compute $\mathbf{A} = \mathbf{B} \mathbf{C}$.
-1. We could break $\mathbf{B}$ and $\mathbf{C}$ into smaller block matrices and compute $\mathbf{A}$ one block at a time.
+1. Nous pouvons calculer $\mathbf{A}_{ij} = \mathbf{B}_{i,:} \mathbf{C}_{:,j}^\top$, c'est-à-dire que nous pouvons le calculer par éléments au moyen de produits scalaires.
+1. Nous pourrions calculer $\mathbf{A}_{:,j} = \mathbf{B} \mathbf{C}_{:,j}^\top$, c'est-à-dire que nous pourrions le calculer une colonne à la fois. De même, nous pourrions calculer $\mathbf{A}$ une ligne de $\mathbf{A}_{i,:}$ à la fois.
+1. Nous pourrions simplement calculer $\mathbf{A} = \mathbf{B} \mathbf{C}$.
+1. Nous pourrions diviser $\mathbf{B}$ et $\mathbf{C}$ en matrices de blocs plus petites et calculer $\mathbf{A}$ un bloc à la fois.
 
-If we follow the first option, we will need to copy one row and one column vector into the CPU each time we want to compute an element $\mathbf{A}_{ij}$. Even worse, due to the fact that matrix elements are aligned sequentially we are thus required to access many disjoint locations for one of the two vectors as we read them from memory. The second option is much more favorable. In it, we are able to keep the column vector $\mathbf{C}_{:,j}$ in the CPU cache while we keep on traversing through $\mathbf{B}$. This halves the memory bandwidth requirement with correspondingly faster access. Of course, option 3 is most desirable. Unfortunately, most matrices might not entirely fit into cache (this is what we are discussing after all). However, option 4 offers a practically useful alternative: we can move blocks of the matrix into cache and multiply them locally. Optimized libraries take care of this for us. Let's have a look at how efficient these operations are in practice.
+Si nous choisissons la première option, nous devrons copier un vecteur ligne et un vecteur colonne dans le CPU chaque fois que nous voudrons calculer un élément de $\mathbf{A}_{ij}$. Pire encore, étant donné que les éléments de la matrice sont alignés séquentiellement, nous devons accéder à de nombreux emplacements disjoints pour l'un des deux vecteurs lorsque nous les lisons en mémoire. La deuxième option est beaucoup plus favorable. Elle nous permet de conserver le vecteur colonne $\mathbf{C}_{:,j}$ dans le cache du CPU tout en continuant à parcourir $\mathbf{B}$. Cela permet de diviser par deux la bande passante requise en mémoire avec un accès plus rapide correspondant. Bien entendu, l'option 3 est la plus souhaitable. Malheureusement, la plupart des matrices ne peuvent pas être entièrement placées dans le cache (c'est ce dont nous parlons après tout). Cependant, l'option 4 offre une alternative utile en pratique : nous pouvons déplacer des blocs de la matrice dans le cache et les multiplier localement. Les bibliothèques optimisées s'en chargent pour nous. Voyons dans quelle mesure ces opérations sont efficaces en pratique.
 
-Beyond computational efficiency, the overhead introduced by Python and by the deep learning framework itself is considerable. Recall that each time we execute a command the Python interpreter sends a command to the MXNet engine which needs to insert it into the computational graph and deal with it during scheduling. Such overhead can be quite detrimental. In short, it is highly advisable to use vectorization (and matrices) whenever possible.
+Au-delà de l'efficacité de calcul, les frais généraux introduits par Python et par le cadre d'apprentissage profond lui-même sont considérables. Rappelons qu'à chaque fois que nous exécutons une commande, l'interpréteur Python envoie une commande au moteur MXNet qui doit l'insérer dans le graphe de calcul et la traiter pendant l'ordonnancement. Une telle surcharge peut être tout à fait préjudiciable. En résumé, il est fortement conseillé d'utiliser la vectorisation (et les matrices) chaque fois que cela est possible.
 
 ```{.python .input}
 #@tab mxnet
@@ -75,7 +75,7 @@ B = tf.Variable(d2l.normal([256, 256], 0, 1))
 C = tf.Variable(d2l.normal([256, 256], 0, 1))
 ```
 
-Since we will benchmark the running time frequently in the rest of the book, let's define a timer.
+Puisque nous évaluerons fréquemment le temps d'exécution dans le reste du livre, définissons un temporisateur.
 
 ```{.python .input}
 #@tab all
@@ -109,7 +109,7 @@ class Timer:  #@save
 timer = Timer()
 ```
 
-Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
+L'affectation par éléments itère simplement sur toutes les lignes et colonnes de $\mathbf{B}$ et $\mathbf{C}$ respectivement pour affecter la valeur à $\mathbf{A}$.
 
 ```{.python .input}
 #@tab mxnet
@@ -142,7 +142,7 @@ for i in range(256):
 timer.stop()
 ```
 
-A faster strategy is to perform column-wise assignment.
+Une stratégie plus rapide consiste à effectuer une affectation par colonne.
 
 ```{.python .input}
 #@tab mxnet
@@ -171,7 +171,7 @@ for j in range(256):
 timer.stop()
 ```
 
-Last, the most effective manner is to perform the entire operation in one block. Let's see what the respective speed of the operations is.
+Enfin, la manière la plus efficace est d'effectuer l'ensemble de l'opération en un seul bloc. Voyons la vitesse respective de ces opérations.
 
 ```{.python .input}
 #@tab mxnet
@@ -212,21 +212,21 @@ print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
 
-## Minibatches
+## Minibatchs
 
-:label:`sec_minibatches`
+:label:`sec_minibatches` 
 
-In the past we took it for granted that we would read *minibatches* of data rather than single observations to update parameters. We now give a brief justification for it. Processing single observations requires us to perform many single matrix-vector (or even vector-vector) multiplications, which is quite expensive and which incurs a significant overhead on behalf of the underlying deep learning framework. This applies both to evaluating a network when applied to data (often referred to as inference) and when computing gradients to update parameters. That is, this applies whenever we perform $\mathbf{w} \leftarrow \mathbf{w} - \eta_t \mathbf{g}_t$ where
+ Dans le passé, nous avons considéré comme acquis le fait de lire des *minibatchs* de données plutôt que des observations uniques pour mettre à jour les paramètres. Nous en donnons maintenant une brève justification. Le traitement d'observations uniques nous oblige à effectuer de nombreuses multiplications matrice-vecteur (ou même vecteur-vecteur), ce qui est assez coûteux et entraîne une surcharge importante pour le cadre d'apprentissage profond sous-jacent. Cela s'applique à la fois à l'évaluation d'un réseau lorsqu'il est appliqué aux données (souvent appelé inférence) et au calcul des gradients pour mettre à jour les paramètres. C'est-à-dire que cela s'applique chaque fois que nous exécutons $\mathbf{w} \leftarrow \mathbf{w} - \eta_t \mathbf{g}_t$ où
 
-$$\mathbf{g}_t = \partial_{\mathbf{w}} f(\mathbf{x}_{t}, \mathbf{w})$$
+$$\mathbf{g}_t = \partial_{\mathbf{w}} f(\mathbf{x}_{t}, \mathbf{w})$$ 
 
-We can increase the *computational* efficiency of this operation by applying it to a minibatch of observations at a time. That is, we replace the gradient $\mathbf{g}_t$ over a single observation by one over a small batch
+ Nous pouvons augmenter l'efficacité *computationnelle* de cette opération en l'appliquant à un minibatch d'observations à la fois. En d'autres termes, nous remplaçons le gradient $\mathbf{g}_t$ sur une seule observation par un gradient sur un petit lot
 
-$$\mathbf{g}_t = \partial_{\mathbf{w}} \frac{1}{|\mathcal{B}_t|} \sum_{i \in \mathcal{B}_t} f(\mathbf{x}_{i}, \mathbf{w})$$
+$$\mathbf{g}_t = \partial_{\mathbf{w}} \frac{1}{|\mathcal{B}_t|} \sum_{i \in \mathcal{B}_t} f(\mathbf{x}_{i}, \mathbf{w})$$ 
 
-Let's see what this does to the statistical properties of $\mathbf{g}_t$: since both $\mathbf{x}_t$ and also all elements of the minibatch $\mathcal{B}_t$ are drawn uniformly at random from the training set, the expectation of the gradient remains unchanged. The variance, on the other hand, is reduced significantly. Since the minibatch gradient is composed of $b := |\mathcal{B}_t|$ independent gradients which are being averaged, its standard deviation is reduced by a factor of $b^{-\frac{1}{2}}$. This, by itself, is a good thing, since it means that the updates are more reliably aligned with the full gradient.
+ Voyons ce que cela donne aux propriétés statistiques de $\mathbf{g}_t$: puisque $\mathbf{x}_t$ et tous les éléments du minilot $\mathcal{B}_t$ sont tirés uniformément au hasard de l'ensemble d'apprentissage, l'espérance du gradient reste inchangée. La variance, par contre, est réduite de manière significative. Puisque le gradient du minilot est composé de $b := |\mathcal{B}_t|$ gradients indépendants dont on fait la moyenne, son écart type est réduit par un facteur de $b^{-\frac{1}{2}}$. En soi, c'est une bonne chose, car cela signifie que les mises à jour sont alignées de manière plus fiable sur le gradient complet.
 
-Naively this would indicate that choosing a large minibatch $\mathcal{B}_t$ would be universally desirable. Alas, after some point, the additional reduction in standard deviation is minimal when compared to the linear increase in computational cost. In practice we pick a minibatch that is large enough to offer good computational efficiency while still fitting into the memory of a GPU. To illustrate the savings let's have a look at some code. In it we perform the same matrix-matrix multiplication, but this time broken up into "minibatches" of 64 columns at a time.
+Naïvement, cela pourrait indiquer que le choix d'un grand minibatch $\mathcal{B}_t$ serait universellement souhaitable. Hélas, après un certain point, la réduction supplémentaire de l'écart-type est minime par rapport à l'augmentation linéaire du coût de calcul. En pratique, nous choisissons un minibatch qui est suffisamment grand pour offrir une bonne efficacité de calcul tout en tenant dans la mémoire d'un GPU. Pour illustrer les économies réalisées, voyons un peu de code. Nous y effectuons la même multiplication matrice-matrice, mais cette fois-ci divisée en "minibatchs" de 64 colonnes à la fois.
 
 ```{.python .input}
 #@tab mxnet
@@ -255,11 +255,11 @@ timer.stop()
 print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
 
-As we can see, the computation on the minibatch is essentially as efficient as on the full matrix. A word of caution is in order. In :numref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g., :cite:`Ioffe.2017` for details on how to rescale and compute the appropriate terms.
+Comme nous pouvons le voir, le calcul sur le minilot est essentiellement aussi efficace que sur la matrice complète. Une mise en garde s'impose. Dans :numref:`sec_batch_norm` , nous avons utilisé un type de régularisation qui dépendait fortement de la quantité de variance dans un minibatch. Lorsque nous augmentons cette dernière, la variance diminue et avec elle le bénéfice de l'injection de bruit due à la normalisation des lots. Voir, par exemple, :cite:`Ioffe.2017` pour plus de détails sur la façon de remettre à l'échelle et de calculer les termes appropriés.
 
-## Reading the Dataset
+## Lecture du jeu de données
 
-Let's have a look at how minibatches are efficiently generated from data. In the following we use a dataset developed by NASA to test the wing [noise from different aircraft](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) to compare these optimization algorithms. For convenience we only use the first $1,500$ examples. The data is whitened for preprocessing, i.e., we remove the mean and rescale the variance to $1$ per coordinate.
+Voyons comment les minibatchs sont générés efficacement à partir des données. Dans ce qui suit, nous utilisons un jeu de données développé par la NASA pour tester l'aile [noise from different aircraft](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) afin de comparer ces algorithmes d'optimisation. Par commodité, nous n'utilisons que les premiers exemples $1,500$. Les données sont blanchies pour le prétraitement, c'est-à-dire que nous supprimons la moyenne et rééchelonnons la variance à $1$ par coordonnée.
 
 ```{.python .input}
 #@tab mxnet
@@ -309,13 +309,13 @@ def get_data_ch11(batch_size=10, n=1500):
     return data_iter, data.shape[1]-1
 ```
 
-## Implementation from Scratch
+## Implémentation à partir de zéro
 
-Recall the minibatch stochastic gradient descent implementation from :numref:`sec_linear_scratch`. In the following we provide a slightly more general implementation. For convenience it has the same call signature as the other optimization algorithms introduced later in this chapter. Specifically, we add the status
-input `states` and place the hyperparameter in dictionary `hyperparams`. In
-addition, we will average the loss of each minibatch example in the training
-function, so the gradient in the optimization algorithm does not need to be
-divided by the batch size.
+Rappelez-vous l'implémentation de la descente de gradient stochastique en minibatch de :numref:`sec_linear_scratch` . Dans ce qui suit, nous fournissons une implémentation légèrement plus générale. Par commodité, elle a la même signature d'appel que les autres algorithmes d'optimisation présentés plus loin dans ce chapitre. Plus précisément, nous ajoutons l'état
+à l'entrée `states` et plaçons l'hyperparamètre dans le dictionnaire `hyperparams`. En outre,
+, nous calculons la moyenne de la perte de chaque exemple de minilots dans la fonction d'apprentissage
+, de sorte que le gradient dans l'algorithme d'optimisation n'a pas besoin d'être
+divisé par la taille du lot.
 
 ```{.python .input}
 #@tab mxnet
@@ -339,7 +339,7 @@ def sgd(params, grads, states, hyperparams):
         param.assign_sub(hyperparams['lr']*grad)
 ```
 
-Next, we implement a generic training function to facilitate the use of the other optimization algorithms introduced later in this chapter. It initializes a linear regression model and can be used to train the model with minibatch stochastic gradient descent and other algorithms introduced subsequently.
+Ensuite, nous implémentons une fonction d'apprentissage générique pour faciliter l'utilisation des autres algorithmes d'optimisation présentés plus loin dans ce chapitre. Elle initialise un modèle de régression linéaire et peut être utilisée pour entraîner le modèle avec la descente de gradient stochastique en minibatchs et d'autres algorithmes présentés ultérieurement.
 
 ```{.python .input}
 #@tab mxnet
@@ -436,7 +436,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
     return timer.cumsum(), animator.Y[0]
 ```
 
-Let's see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e., to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls.
+Voyons comment l'optimisation se déroule pour la descente de gradient par lots. Pour ce faire, il suffit de fixer la taille du minibatch à 1500 (c'est-à-dire au nombre total d'exemples). Par conséquent, les paramètres du modèle ne sont mis à jour qu'une fois par époque. Il y a peu de progrès. En fait, après 6 étapes, le progrès s'arrête.
 
 ```{.python .input}
 #@tab all
@@ -448,28 +448,28 @@ def train_sgd(lr, batch_size, num_epochs=2):
 gd_res = train_sgd(1, 1500, 10)
 ```
 
-When the batch size equals 1, we use stochastic gradient descent for optimization. For simplicity of implementation we picked a constant (albeit small) learning rate. In stochastic gradient descent, the model parameters are updated whenever an example is processed. In our case this amounts to 1500 updates per epoch. As we can see, the decline in the value of the objective function slows down after one epoch. Although both the procedures processed 1500 examples within one epoch, stochastic gradient descent consumes more time than gradient descent in our experiment. This is because stochastic gradient descent updated the parameters more frequently and since it is less efficient to process single observations one at a time.
+Lorsque la taille du lot est égale à 1, nous utilisons la descente de gradient stochastique pour l'optimisation. Pour simplifier l'implémentation, nous avons choisi un taux d'apprentissage constant (bien que petit). Dans la descente de gradient stochastique, les paramètres du modèle sont mis à jour chaque fois qu'un exemple est traité. Dans notre cas, cela équivaut à 1500 mises à jour par époque. Comme nous pouvons le constater, la baisse de la valeur de la fonction objectif ralentit après une époque. Bien que les deux procédures aient traité 1500 exemples en une époque, la descente de gradient stochastique consomme plus de temps que la descente de gradient dans notre expérience. Cela est dû au fait que la descente de gradient stochastique met à jour les paramètres plus fréquemment et qu'il est moins efficace de traiter les observations une par une.
 
 ```{.python .input}
 #@tab all
 sgd_res = train_sgd(0.005, 1)
 ```
 
-Finally, when the batch size equals 100, we use minibatch stochastic gradient descent for optimization. The time required per epoch is shorter than the time needed for stochastic gradient descent and the time for batch gradient descent.
+Enfin, lorsque la taille du lot est égale à 100, nous utilisons la descente de gradient stochastique en minibatch pour l'optimisation. Le temps requis par époque est plus court que le temps requis pour la descente de gradient stochastique et le temps pour la descente de gradient par lots.
 
 ```{.python .input}
 #@tab all
 mini1_res = train_sgd(.4, 100)
 ```
 
-Reducing the batch size to 10, the time for each epoch increases because the workload for each batch is less efficient to execute.
+En réduisant la taille du lot à 10, le temps pour chaque époque augmente car la charge de travail pour chaque lot est moins efficace à exécuter.
 
 ```{.python .input}
 #@tab all
 mini2_res = train_sgd(.05, 10)
 ```
 
-Now we can compare the time vs. loss for the previous four experiments. As can be seen, although stochastic gradient descent converges faster than GD in terms of number of examples processed, it uses more time to reach the same loss than GD because computing the gradient example by example is not as efficient. Minibatch stochastic gradient descent is able to trade-off convergence speed and computation efficiency. A minibatch size of 10 is more efficient than stochastic gradient descent; a minibatch size of 100 even outperforms GD in terms of runtime.
+Nous pouvons maintenant comparer le temps par rapport à la perte pour les quatre expériences précédentes. Comme on peut le voir, bien que la descente de gradient stochastique converge plus rapidement que GD en termes de nombre d'exemples traités, elle utilise plus de temps pour atteindre la même perte que GD car le calcul du gradient exemple par exemple n'est pas aussi efficace. La descente de gradient stochastique par minilots est capable d'équilibrer la vitesse de convergence et l'efficacité du calcul. Une taille de minibatch de 10 est plus efficace que la descente de gradient stochastique ; une taille de minibatch de 100 surpasse même GD en termes de temps d'exécution.
 
 ```{.python .input}
 #@tab all
@@ -480,9 +480,9 @@ d2l.plot(*list(map(list, zip(gd_res, sgd_res, mini1_res, mini2_res))),
 d2l.plt.gca().set_xscale('log')
 ```
 
-## Concise Implementation
+## Mise en œuvre concise
 
-In Gluon, we can use the `Trainer` class to call optimization algorithms. This is used to implement a generic training function. We will use this throughout the current chapter.
+Dans Gluon, nous pouvons utiliser la classe `Trainer` pour appeler les algorithmes d'optimisation. Ceci est utilisé pour implémenter une fonction d'entraînement générique. Nous l'utiliserons tout au long du présent chapitre.
 
 ```{.python .input}
 #@tab mxnet
@@ -572,7 +572,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
                 timer.stop()
                 p = n/X.shape[0]
                 q = p/tf.data.experimental.cardinality(data_iter).numpy()
-                # `MeanSquaredError` computes squared error without the 1/2
+                # `Erreur quadratique moyenne` computes squared error without the 1/2
                 # factor
                 r = (d2l.evaluate_loss(net, data_iter, loss) / 2,)
                 animator.add(q, r)
@@ -580,7 +580,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 ```
 
-Using Gluon to repeat the last experiment shows identical behavior.
+L'utilisation de Gluon pour répéter la dernière expérience montre un comportement identique.
 
 ```{.python .input}
 #@tab mxnet
@@ -602,21 +602,21 @@ trainer = tf.keras.optimizers.SGD
 train_concise_ch11(trainer, {'learning_rate': 0.05}, data_iter)
 ```
 
-## Summary
+## Résumé
 
-* Vectorization makes code more efficient due to reduced overhead arising from the deep learning framework and due to better memory locality and caching on CPUs and GPUs.
-* There is a trade-off between statistical efficiency arising from stochastic gradient descent and computational efficiency arising from processing large batches of data at a time.
-* Minibatch stochastic gradient descent offers the best of both worlds: computational and statistical efficiency.
-* In minibatch stochastic gradient descent we process batches of data obtained by a random permutation of the training data (i.e., each observation is processed only once per epoch, albeit in random order).
-* It is advisable to decay the learning rates during training.
-* In general, minibatch stochastic gradient descent is faster than stochastic gradient descent and gradient descent for convergence to a smaller risk, when measured in terms of clock time.
+* La vectorisation rend le code plus efficace en raison de la réduction de l'overhead provenant du cadre d'apprentissage profond et en raison d'une meilleure localité de la mémoire et de la mise en cache sur les CPU et les GPU.
+* Il existe un compromis entre l'efficacité statistique découlant de la descente de gradient stochastique et l'efficacité informatique découlant du traitement de grands lots de données à la fois.
+* La descente de gradient stochastique en mini-lots offre le meilleur des deux mondes : efficacité informatique et statistique.
+* Dans la descente de gradient stochastique en mini-lots, nous traitons des lots de données obtenus par une permutation aléatoire des données d'apprentissage (c'est-à-dire que chaque observation n'est traitée qu'une fois par époque, mais dans un ordre aléatoire).
+* Il est conseillé de décroître les taux d'apprentissage pendant la formation.
+* En général, la descente de gradient stochastique en minibatch est plus rapide que la descente de gradient stochastique et la descente de gradient pour la convergence vers un risque plus faible, lorsqu'elle est mesurée en termes de temps d'horloge.
 
-## Exercises
+## Exercices
 
-1. Modify the batch size and learning rate and observe the rate of decline for the value of the objective function and the time consumed in each epoch.
-1. Read the MXNet documentation and use the `Trainer` class `set_learning_rate` function to reduce the learning rate of the minibatch stochastic gradient descent to 1/10 of its previous value after each epoch.
-1. Compare minibatch stochastic gradient descent with a variant that actually *samples with replacement* from the training set. What happens?
-1. An evil genie replicates your dataset without telling you (i.e., each observation occurs twice and your dataset grows to twice its original size, but nobody told you). How does the behavior of stochastic gradient descent, minibatch stochastic gradient descent and that of gradient descent change?
+1. Modifiez la taille des lots et le taux d'apprentissage et observez le taux de décroissance de la valeur de la fonction objectif et le temps consommé à chaque époque.
+1. Lisez la documentation MXNet et utilisez la fonction de la classe `Trainer` `set_learning_rate` pour réduire le taux d'apprentissage de la descente de gradient stochastique en minibatch à 1/10 de sa valeur précédente après chaque époque.
+1. Comparez la descente de gradient stochastique en minibatchs avec une variante qui *échantillonne avec remplacement* de l'ensemble d'apprentissage. Que se passe-t-il ?
+1. Un génie maléfique réplique votre ensemble de données sans vous le dire (c'est-à-dire que chaque observation se produit deux fois et que votre ensemble de données atteint le double de sa taille initiale, mais personne ne vous l'a dit). Comment le comportement de la descente de gradient stochastique, de la descente de gradient stochastique en minibatch et de la descente de gradient change-t-il ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/353)

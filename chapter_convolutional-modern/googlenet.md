@@ -174,9 +174,9 @@ class GoogleNet(d2l.Classifier):
                                           padding='same')])
 ```
 
-The second module uses two convolutional layers:
-first, a 64-channel $1\times 1$ convolutional layer,
-followed by a $3\times 3$ convolutional layer that triples the number of channels. This corresponds to the second branch in the Inception block and concludes the design of the body. At this point we have 192 channels.
+Le deuxième module utilise deux couches convolutives :
+d'abord, une couche convolutive de 64 canaux $1\times 1$,
+suivie d'une couche convolutive $3\times 3$ qui triple le nombre de canaux. Cela correspond à la deuxième branche du bloc Inception et conclut la conception du corps. À ce stade, nous avons 192 canaux.
 
 ```{.python .input}
 %%tab all
@@ -200,19 +200,19 @@ def b2(self):
             tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
-The third module connects two complete Inception blocks in series.
-The number of output channels of the first Inception block is
-$64+128+32+32=256$. This amounts to 
-a ratio of the number of output channels
-among the four branches of $2:4:1:1$. Achieving this, we first reduce the input
-dimensions by $\frac{1}{2}$ and by $\frac{1}{12}$ in the second and third branch respectively
-to arrive at $96 = 192/2$ and $16 = 192/12$ channels respectively.
+Le troisième module connecte en série deux blocs Inception complets.
+Le nombre de canaux de sortie du premier bloc d'Inception est
+$64+128+32+32=256$ . Cela revient à 
+un rapport du nombre de canaux de sortie
+entre les quatre branches de $2:4:1:1$. Pour y parvenir, nous réduisons d'abord les dimensions d'entrée
+par $\frac{1}{2}$ et par $\frac{1}{12}$ dans la deuxième et la troisième branche respectivement
+pour arriver aux canaux $96 = 192/2$ et $16 = 192/12$ respectivement.
 
-The number of output channels of the second Inception block
-is increased to $128+192+96+64=480$, yielding a ratio of $128:192:96:64 = 4:6:3:2$. As before,
-we need to reduce the number of intermediate dimensions in the second and third channel. A
-scale of $\frac{1}{2}$ and $\frac{1}{8}$ respectively suffices, yielding $128$ and $32$ channels
-respectively. This is captured by the arguments of the following `Inception` block constructors.
+Le nombre de canaux de sortie du deuxième bloc d'Inception
+est augmenté à $128+192+96+64=480$, ce qui donne un rapport de $128:192:96:64 = 4:6:3:2$. Comme précédemment,
+nous devons réduire le nombre de dimensions intermédiaires dans la deuxième et la troisième branche. Une échelle
+de $\frac{1}{2}$ et $\frac{1}{8}$ respectivement suffit, ce qui donne les canaux $128$ et $32$
+ respectivement. Ceci est capturé par les arguments des constructeurs de blocs `Inception` suivants.
 
 ```{.python .input}
 %%tab all
@@ -235,21 +235,21 @@ def b3(self):
             tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
-The fourth module is more complicated.
-It connects five Inception blocks in series,
-and they have $192+208+48+64=512$, $160+224+64+64=512$,
-$128+256+64+64=512$, $112+288+64+64=528$,
-and $256+320+128+128=832$ output channels, respectively.
-The number of channels assigned to these branches is similar
-to that in the third module:
-the second branch with the $3\times 3$ convolutional layer
-outputs the largest number of channels,
-followed by the first branch with only the $1\times 1$ convolutional layer,
-the third branch with the $5\times 5$ convolutional layer,
-and the fourth branch with the $3\times 3$ max-pooling layer.
-The second and third branches will first reduce
-the number of channels according to the ratio.
-These ratios are slightly different in different Inception blocks.
+Le quatrième module est plus compliqué.
+Il connecte cinq blocs d'Inception en série,
+et ils ont respectivement les canaux de sortie $192+208+48+64=512$, $160+224+64+64=512$,
+$128+256+64+64=512$ , $112+288+64+64=528$,
+et $256+320+128+128=832$.
+Le nombre de canaux assignés à ces branches est similaire
+à celui du troisième module :
+la deuxième branche avec la couche convolutive $3\times 3$
+ sort le plus grand nombre de canaux,
+suivi de la première branche avec seulement la couche convolutive $1\times 1$,
+la troisième branche avec la couche convolutive $5\times 5$,
+et la quatrième branche avec la couche max-pooling $3\times 3$.
+Les deuxième et troisième branches réduiront d'abord
+le nombre de canaux en fonction du ratio.
+Ces ratios sont légèrement différents dans les différents blocs d'Inception.
 
 ```{.python .input}
 %%tab all
@@ -281,17 +281,17 @@ def b4(self):
             tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
-The fifth module has two Inception blocks with $256+320+128+128=832$
-and $384+384+128+128=1024$ output channels.
-The number of channels assigned to each branch
-is the same as that in the third and fourth modules,
-but differs in specific values.
-It should be noted that the fifth block is followed by the output layer.
-This block uses the global average pooling layer
-to change the height and width of each channel to 1, just as in NiN.
-Finally, we turn the output into a two-dimensional array
-followed by a fully connected layer
-whose number of outputs is the number of label classes.
+Le cinquième module possède deux blocs d'Inception avec $256+320+128+128=832$
+ et $384+384+128+128=1024$ canaux de sortie.
+Le nombre de canaux attribués à chaque branche
+est le même que celui des troisième et quatrième modules,
+mais diffère par des valeurs spécifiques.
+Il convient de noter que le cinquième bloc est suivi de la couche de sortie.
+Ce bloc utilise la couche de mise en commun de la moyenne globale
+pour changer la hauteur et la largeur de chaque canal à 1, tout comme dans NiN.
+Enfin, nous transformons la sortie en un tableau bidimensionnel
+suivi d'une couche entièrement connectée
+dont le nombre de sorties est le nombre de classes d'étiquettes.
 
 ```{.python .input}
 %%tab all
@@ -336,16 +336,16 @@ def __init__(self, lr=0.1, num_classes=10):
             tf.keras.layers.Dense(num_classes)])
 ```
 
-The GoogLeNet model is computationally complex. Note the large number of
-relatively arbitrary hyperparameters in terms of the number of channels chosen.
-This work was done before scientists started using automatic tools to
-optimize network designs.
+Le modèle GoogLeNet est complexe sur le plan informatique. Notez le grand nombre de
+hyperparamètres relativement arbitraires en termes de nombre de canaux choisis.
+Ce travail a été réalisé avant que les scientifiques ne commencent à utiliser des outils automatiques pour
+optimiser la conception des réseaux.
 
-For now the only modification we will carry out is to
-[**reduce the input height and width from 224 to 96
-to have a reasonable training time on Fashion-MNIST.**]
-This simplifies the computation. Let's have a look at the
-changes in the shape of the output between the various modules.
+Pour l'instant, la seule modification que nous allons effectuer est de
+[**réduire la hauteur et la largeur d'entrée de 224 à 96
+pour avoir un temps d'apprentissage raisonnable sur Fashion-MNIST.**]
+Cela simplifie le calcul. Examinons les changements de forme de la sortie entre les différents modules (
+).
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -359,9 +359,9 @@ model = GoogleNet().layer_summary((1, 96, 96, 1))
 
 ## [**Training**]
 
-As before, we train our model using the Fashion-MNIST dataset.
- We transform it to $96 \times 96$ pixel resolution
- before invoking the training procedure.
+Comme précédemment, nous entraînons notre modèle en utilisant le jeu de données Fashion-MNIST.
+ Nous le transformons en une résolution de $96 \times 96$ pixels
+ avant d'invoquer la procédure d'entraînement.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -384,33 +384,33 @@ with d2l.try_gpu():
 
 ## Discussion
 
-A key feature of GoogLeNet is that it is actually *cheaper* to compute than its predecessors
-while simultaneously providing improved accuracy. This marks the beginning of a much more deliberate
-network design that trades off the cost of evaluating a network with a reduction in errors. It also marks the beginning of experimentation at a block level with network design hyperparameters, even though it was entirely manual at the time. This is largely due to the fact that deep learning frameworks in 2015 still lacked much of the design flexibility
-that we now take for granted. Moreover, full network optimization is costly and at the time training on ImageNet still
-proved computationally challenging.
+L'une des principales caractéristiques de GoogLeNet est qu'il est *moins cher* à calculer que ses prédécesseurs
+tout en offrant une meilleure précision. Ceci marque le début d'une conception de réseau beaucoup plus délibérée
+qui échange le coût d'évaluation d'un réseau avec une réduction des erreurs. Il marque également le début de l'expérimentation au niveau du bloc avec les hyperparamètres de conception du réseau, même si elle était entièrement manuelle à l'époque. Cela est dû en grande partie au fait que les cadres d'apprentissage profond de 2015 manquaient encore d'une grande partie de la flexibilité de conception
+que nous considérons maintenant comme acquise. De plus, l'optimisation complète du réseau est coûteuse et, à l'époque, l'entraînement sur ImageNet s'avérait encore
+difficile sur le plan informatique.
 
-Over the following sections we will encounter a number of design choices (e.g., batch normalization, residual connections, and channel grouping) that allow us to improve networks significantly. For now, you can be proud to have implemented what is arguably the first truly modern CNN.
+Au cours des sections suivantes, nous rencontrerons un certain nombre de choix de conception (par exemple, la normalisation des lots, les connexions résiduelles et le regroupement des canaux) qui nous permettent d'améliorer considérablement les réseaux. Pour l'instant, vous pouvez être fier d'avoir implémenté ce qui est sans doute le premier CNN vraiment moderne.
 
-## Exercises
+## Exercices
 
-1. GoogLeNet was so successful that it went through a number of iterations. There are several iterations
-   of GoogLeNet that progressively improved speed and accuracy. Try to implement and run some of them.
-   They include the following:
-   1. Add a batch normalization layer :cite:`Ioffe.Szegedy.2015`, as described
-      later in :numref:`sec_batch_norm`.
-   1. Make adjustments to the Inception block (width, choice and order of convolutions), as described in
-      :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
-   1. Use label smoothing for model regularization, as described in
-      :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
-   1. Make further adjustments to the Inception block by adding residual connection
-      :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017`, as described later in
-      :numref:`sec_resnet`.
-1. What is the minimum image size for GoogLeNet to work?
-1. Can you design a variant of GoogLeNet that works on Fashion-MNIST's native resolution of $28 \times 28$ pixels? How would you need to change the stem, the body, and the head of the network, if anything at all?
-1. Compare the model parameter sizes of AlexNet, VGG, NiN, and GoogLeNet. How do the latter two network
-   architectures significantly reduce the model parameter size?
-1. Compare the amount of computation needed in GoogLeNet and AlexNet. How does this affect the design of an accelerator chip, e.g., in terms of memory size, amount of computation, and the benefit of specialized operations?
+1. GoogLeNet a connu un tel succès qu'il est passé par un certain nombre d'itérations. Il existe plusieurs itérations
+ de GoogLeNet qui ont progressivement amélioré la vitesse et la précision. Essayez d'implémenter et d'exécuter certaines d'entre elles.
+  Voici quelques-unes d'entre elles :
+  1. Ajout d'une couche de normalisation par lot :cite:`Ioffe.Szegedy.2015` , tel que décrit
+ plus loin dans :numref:`sec_batch_norm` .
+ 1. Effectuez des ajustements au bloc Inception (largeur, choix et ordre des convolutions), comme décrit dans
+ :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016` .
+  1. Utilisez le lissage des étiquettes pour la régularisation du modèle, comme décrit dans
+ :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016` .
+  1. Effectuez d'autres ajustements au bloc Inception en ajoutant une connexion résiduelle
+ :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017` , comme décrit ultérieurement dans
+ :numref:`sec_resnet` .
+1. Quelle est la taille minimale d'une image pour que GoogLeNet fonctionne ?
+1. Pouvez-vous concevoir une variante de GoogLeNet qui fonctionne sur la résolution native de Fashion-MNIST, soit $28 \times 28$ pixels ? Comment devriez-vous modifier la tige, le corps et la tête du réseau, le cas échéant ?
+1. Comparez la taille des paramètres des modèles AlexNet, VGG, NiN et GoogLeNet. Comment les deux dernières architectures de réseau
+ réduisent-elles de manière significative la taille des paramètres du modèle ?
+1. Comparez la quantité de calculs nécessaires dans GoogLeNet et AlexNet. Comment cela affecte-t-il la conception d'une puce accélératrice, par exemple, en termes de taille de mémoire, de quantité de calcul et d'avantages des opérations spécialisées ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/81)

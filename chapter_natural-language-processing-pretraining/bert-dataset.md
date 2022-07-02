@@ -1,23 +1,23 @@
-# The Dataset for Pretraining BERT
-:label:`sec_bert-dataset`
+# Le jeu de données pour le pré-entraînement de BERT
+:label:`sec_bert-dataset` 
 
-To pretrain the BERT model as implemented in :numref:`sec_bert`,
-we need to generate the dataset in the ideal format to facilitate
-the two pretraining tasks:
-masked language modeling and next sentence prediction.
-On the one hand,
-the original BERT model is pretrained on the concatenation of
-two huge corpora BookCorpus and English Wikipedia (see :numref:`subsec_bert_pretraining_tasks`),
-making it hard to run for most readers of this book.
-On the other hand,
-the off-the-shelf pretrained BERT model
-may not fit for applications from specific domains like medicine.
-Thus, it is getting popular to pretrain BERT on a customized dataset.
-To facilitate the demonstration of BERT pretraining,
-we use a smaller corpus WikiText-2 :cite:`Merity.Xiong.Bradbury.ea.2016`.
+ Pour pré-entraîner le modèle BERT tel qu'il est implémenté dans :numref:`sec_bert` ,
+nous devons générer le jeu de données dans le format idéal pour faciliter
+les deux tâches de pré-entraînement :
+modélisation du langage masqué et prédiction de la phrase suivante.
+D'une part,
+le modèle BERT original est pré-entraîné sur la concaténation de
+deux énormes corpus BookCorpus et Wikipedia anglais (voir :numref:`subsec_bert_pretraining_tasks` ),
+ce qui le rend difficile à utiliser pour la plupart des lecteurs de ce livre.
+D'autre part,
+le modèle BERT pré-entraîné prêt à l'emploi
+peut ne pas convenir à des applications dans des domaines spécifiques comme la médecine.
+C'est pourquoi il est de plus en plus courant de prétraîner BERT sur un jeu de données personnalisé.
+Pour faciliter la démonstration du pré-entraînement de BERT,
+nous utilisons un corpus plus petit WikiText-2 :cite:`Merity.Xiong.Bradbury.ea.2016` .
 
-Comparing with the PTB dataset used for pretraining word2vec in :numref:`sec_word2vec_data`,
-WikiText-2 (i) retains the original punctuation, making it suitable for next sentence prediction; (ii) retains the original case and numbers; (iii) is over twice larger.
+En comparaison avec le jeu de données PTB utilisé pour le pré-entraînement de word2vec dans :numref:`sec_word2vec_data` ,
+WikiText-2 (i) conserve la ponctuation originale, ce qui le rend approprié pour la prédiction de la phrase suivante ; (ii) conserve la casse et les nombres originaux ; (iii) est deux fois plus grand.
 
 ```{.python .input}
 #@tab mxnet
@@ -37,13 +37,13 @@ import random
 import torch
 ```
 
-In [**the WikiText-2 dataset**],
-each line represents a paragraph where
-space is inserted between any punctuation and its preceding token.
-Paragraphs with at least two sentences are retained.
-To split sentences, we only use the period as the delimiter for simplicity.
-We leave discussions of more complex sentence splitting techniques in the exercises
-at the end of this section.
+Dans [**le jeu de données WikiText-2**],
+chaque ligne représente un paragraphe où
+un espace est inséré entre toute ponctuation et le jeton qui la précède.
+Les paragraphes comportant au moins deux phrases sont conservés.
+Pour séparer les phrases, nous utilisons uniquement le point comme délimiteur pour des raisons de simplicité.
+Nous laissons les discussions sur les techniques plus complexes de division de phrases dans les exercices
+à la fin de cette section.
 
 ```{.python .input}
 #@tab all
@@ -64,20 +64,20 @@ def _read_wiki(data_dir):
     return paragraphs
 ```
 
-## Defining Helper Functions for Pretraining Tasks
+## Définition des fonctions d'aide pour les tâches de pré-entraînement
 
-In the following,
-we begin by implementing helper functions for the two BERT pretraining tasks:
-next sentence prediction and masked language modeling.
-These helper functions will be invoked later
-when transforming the raw text corpus
-into the dataset of the ideal format to pretrain BERT.
+Dans ce qui suit,
+nous commençons par implémenter des fonctions d'aide pour les deux tâches de pré-entraînement de BERT :
+la prédiction de la phrase suivante et la modélisation du langage masqué.
+Ces fonctions d'aide seront invoquées ultérieurement
+lors de la transformation du corpus de texte brut
+en un ensemble de données au format idéal pour le pré-entraînement de BERT.
 
-### [**Generating the Next Sentence Prediction Task**]
+### [**Générer la tâche de prédiction de la prochaine phrase**]
 
-According to descriptions of :numref:`subsec_nsp`,
-the `_get_next_sentence` function generates a training example
-for the binary classification task.
+Selon les descriptions de :numref:`subsec_nsp` ,
+la fonction `_get_next_sentence` génère un exemple d'entraînement
+pour la tâche de classification binaire.
 
 ```{.python .input}
 #@tab all
@@ -86,16 +86,16 @@ def _get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
         is_next = True
     else:
-        # `paragraphs` is a list of lists of lists
+        # `paragraphes` is a list of lists of lists
         next_sentence = random.choice(random.choice(paragraphs))
         is_next = False
     return sentence, next_sentence, is_next
 ```
 
-The following function generates training examples for next sentence prediction
-from the input `paragraph` by invoking the `_get_next_sentence` function.
-Here `paragraph` is a list of sentences, where each sentence is a list of tokens.
-The argument `max_len` specifies the maximum length of a BERT input sequence during pretraining.
+La fonction suivante génère des exemples d'entraînement pour la prédiction de la phrase suivante
+à partir de l'entrée `paragraph` en invoquant la fonction `_get_next_sentence`.
+Ici, `paragraph` est une liste de phrases, où chaque phrase est une liste de tokens.
+L'argument `max_len` spécifie la longueur maximale d'une séquence d'entrée BERT pendant le pré-entraînement.
 
 ```{.python .input}
 #@tab all
@@ -113,22 +113,22 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     return nsp_data_from_paragraph
 ```
 
-### [**Generating the Masked Language Modeling Task**]
-:label:`subsec_prepare_mlm_data`
+### [**Génération de la tâche de modélisation du langage masqué**]
+:label:`subsec_prepare_mlm_data` 
 
-In order to generate training examples
-for the masked language modeling task
-from a BERT input sequence,
-we define the following `_replace_mlm_tokens` function.
-In its inputs, `tokens` is a list of tokens representing a BERT input sequence,
-`candidate_pred_positions` is a list of token indices of the BERT input sequence
-excluding those of special tokens (special tokens are not predicted in the masked language modeling task),
-and `num_mlm_preds` indicates the number of predictions (recall 15% random tokens to predict).
-Following the definition of the masked language modeling task in :numref:`subsec_mlm`,
-at each prediction position, the input may be replaced by
-a special “&lt;mask&gt;” token or a random token, or remain unchanged.
-In the end, the function returns the input tokens after possible replacement,
-the token indices where predictions take place and labels for these predictions.
+ Afin de générer des exemples d'entraînement
+pour la tâche de modélisation du langage masqué
+à partir d'une séquence d'entrée BERT,
+nous définissons la fonction `_replace_mlm_tokens` suivante.
+Dans ses entrées, `tokens` est une liste de tokens représentant une séquence d'entrée BERT,
+`candidate_pred_positions` est une liste d'indices de tokens de la séquence d'entrée BERT
+excluant ceux des tokens spéciaux (les tokens spéciaux ne sont pas prédits dans la tâche de modélisation du langage masqué),
+et `num_mlm_preds` indique le nombre de prédictions (rappel de 15% de tokens aléatoires à prédire).
+Suivant la définition de la tâche de modélisation du langage masqué dans :numref:`subsec_mlm` ,
+à chaque position de prédiction, l'entrée peut être remplacée par
+un token spécial "&lt;mask&gt;" ou un token aléatoire, ou rester inchangée.
+Au final, la fonction renvoie les tokens d'entrée après un éventuel remplacement,
+les indices des tokens où les prédictions ont lieu et les étiquettes de ces prédictions.
 
 ```{.python .input}
 #@tab all
@@ -162,12 +162,12 @@ def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
     return mlm_input_tokens, pred_positions_and_labels
 ```
 
-By invoking the aforementioned `_replace_mlm_tokens` function,
-the following function takes a BERT input sequence (`tokens`)
-as an input and returns indices of the input tokens
-(after possible token replacement as described in :numref:`subsec_mlm`),
-the token indices where predictions take place,
-and label indices for these predictions.
+En invoquant la fonction `_replace_mlm_tokens` mentionnée ci-dessus,
+la fonction suivante prend une séquence d'entrée BERT (`tokens`)
+comme entrée et renvoie les indices des jetons d'entrée
+(après un éventuel remplacement des jetons comme décrit dans :numref:`subsec_mlm` ),
+les indices des jetons où les prédictions ont lieu,
+et les indices des étiquettes pour ces prédictions.
 
 ```{.python .input}
 #@tab all
@@ -192,13 +192,13 @@ def _get_mlm_data_from_tokens(tokens, vocab):
     return vocab[mlm_input_tokens], pred_positions, vocab[mlm_pred_labels]
 ```
 
-## Transforming Text into the Pretraining Dataset
+## Transformation du texte en jeu de données de pré-entraînement
 
-Now we are almost ready to customize a `Dataset` class for pretraining BERT.
-Before that, 
-we still need to define a helper function `_pad_bert_inputs`
-to [**append the special “&lt;pad&gt;” tokens to the inputs.**]
-Its argument `examples` contain the outputs from the helper functions `_get_nsp_data_from_paragraph` and `_get_mlm_data_from_tokens` for the two pretraining tasks.
+Nous sommes maintenant presque prêts à personnaliser une classe `Dataset` pour le pré-entraînement de BERT.
+Avant cela, 
+nous devons encore définir une fonction d'aide `_pad_bert_inputs`
+ pour [**ajouter les tokens spéciaux "&lt;pad&gt;" aux entrées.**]
+Son argument `examples` contient les sorties des fonctions d'aide `_get_nsp_data_from_paragraph` et `_get_mlm_data_from_tokens` pour les deux tâches de pré-entraînement.
 
 ```{.python .input}
 #@tab mxnet
@@ -214,7 +214,7 @@ def _pad_bert_inputs(examples, max_len, vocab):
             max_len - len(token_ids)), dtype='int32'))
         all_segments.append(np.array(segments + [0] * (
             max_len - len(segments)), dtype='int32'))
-        # `valid_lens` excludes count of '<pad>' tokens
+        # `lentilles_valides` excludes count of '<pad>' tokens
         valid_lens.append(np.array(len(token_ids), dtype='float32'))
         all_pred_positions.append(np.array(pred_positions + [0] * (
             max_num_mlm_preds - len(pred_positions)), dtype='int32'))
@@ -244,7 +244,7 @@ def _pad_bert_inputs(examples, max_len, vocab):
             max_len - len(token_ids)), dtype=torch.long))
         all_segments.append(torch.tensor(segments + [0] * (
             max_len - len(segments)), dtype=torch.long))
-        # `valid_lens` excludes count of '<pad>' tokens
+        # `lentilles_valides` excludes count of '<pad>' tokens
         valid_lens.append(torch.tensor(len(token_ids), dtype=torch.float32))
         all_pred_positions.append(torch.tensor(pred_positions + [0] * (
             max_num_mlm_preds - len(pred_positions)), dtype=torch.long))
@@ -261,27 +261,27 @@ def _pad_bert_inputs(examples, max_len, vocab):
             all_mlm_weights, all_mlm_labels, nsp_labels)
 ```
 
-Putting the helper functions for
-generating training examples of the two pretraining tasks,
-and the helper function for padding inputs together,
-we customize the following `_WikiTextDataset` class as [**the WikiText-2 dataset for pretraining BERT**].
-By implementing the `__getitem__ `function,
-we can arbitrarily access the pretraining (masked language modeling and next sentence prediction) examples 
-generated from a pair of sentences from the WikiText-2 corpus.
+En combinant les fonctions d'aide pour
+générant des exemples d'entraînement pour les deux tâches de pré-entraînement,
+et la fonction d'aide pour le remplissage des entrées,
+, nous personnalisons la classe `_WikiTextDataset` suivante comme [**le jeu de données WikiText-2 pour le pré-entraînement de BERT**].
+En implémentant la fonction `__getitem__ `,
+nous pouvons accéder arbitrairement aux exemples de pré-entraînement (modélisation du langage masqué et prédiction de la phrase suivante) 
+générés à partir d'une paire de phrases du corpus WikiText-2.
 
-The original BERT model uses WordPiece embeddings whose vocabulary size is 30000 :cite:`Wu.Schuster.Chen.ea.2016`.
-The tokenization method of WordPiece is a slight modification of
-the original byte pair encoding algorithm in :numref:`subsec_Byte_Pair_Encoding`.
-For simplicity, we use the `d2l.tokenize` function for tokenization.
-Infrequent tokens that appear less than five times are filtered out.
+Le modèle original de BERT utilise des encastrements WordPiece dont la taille du vocabulaire est de 30000 :cite:`Wu.Schuster.Chen.ea.2016` .
+La méthode de tokenisation de WordPiece est une légère modification de
+l'algorithme original de codage de paires d'octets dans :numref:`subsec_Byte_Pair_Encoding` .
+Par souci de simplicité, nous utilisons la fonction `d2l.tokenize` pour la tokénisation.
+Les tokens peu fréquents qui apparaissent moins de cinq fois sont filtrés.
 
 ```{.python .input}
 #@tab mxnet
 #@save
 class _WikiTextDataset(gluon.data.Dataset):
     def __init__(self, paragraphs, max_len):
-        # Input `paragraphs[i]` is a list of sentence strings representing a
-        # paragraph; while output `paragraphs[i]` is a list of sentences
+        # Input `paragraphes[i]` is a list of sentence strings representing a
+        # paragraph; while output `paragraphes[i]` is a list of sentences
         # representing a paragraph, where each sentence is a list of tokens
         paragraphs = [d2l.tokenize(
             paragraph, token='word') for paragraph in paragraphs]
@@ -319,8 +319,8 @@ class _WikiTextDataset(gluon.data.Dataset):
 #@save
 class _WikiTextDataset(torch.utils.data.Dataset):
     def __init__(self, paragraphs, max_len):
-        # Input `paragraphs[i]` is a list of sentence strings representing a
-        # paragraph; while output `paragraphs[i]` is a list of sentences
+        # Input `paragraphes[i]` is a list of sentence strings representing a
+        # paragraph; while output `paragraphes[i]` is a list of sentences
         # representing a paragraph, where each sentence is a list of tokens
         paragraphs = [d2l.tokenize(
             paragraph, token='word') for paragraph in paragraphs]
@@ -353,9 +353,9 @@ class _WikiTextDataset(torch.utils.data.Dataset):
         return len(self.all_token_ids)
 ```
 
-By using the `_read_wiki` function and the `_WikiTextDataset` class,
-we define the following `load_data_wiki` to [**download and WikiText-2 dataset
-and generate pretraining examples**] from it.
+En utilisant la fonction `_read_wiki` et la classe `_WikiTextDataset`,
+nous définissons le `load_data_wiki` suivant pour [**télécharger et le jeu de données WikiText-2
+et générer des exemples de pré-entraînement**] à partir de celui-ci.
 
 ```{.python .input}
 #@tab mxnet
@@ -385,10 +385,10 @@ def load_data_wiki(batch_size, max_len):
     return train_iter, train_set.vocab
 ```
 
-Setting the batch size to 512 and the maximum length of a BERT input sequence to be 64,
-we [**print out the shapes of a minibatch of BERT pretraining examples**].
-Note that in each BERT input sequence,
-$10$ ($64 \times 0.15$) positions are predicted for the masked language modeling task.
+En fixant la taille du lot à 512 et la longueur maximale d'une séquence d'entrée BERT à 64,
+nous [**imprimons les formes d'un minilot d'exemples de pré-entraînement BERT**].
+Notez que dans chaque séquence d'entrée BERT,
+$10$ ($64 \times 0.15$) les positions sont prédites pour la tâche de modélisation du langage masqué.
 
 ```{.python .input}
 #@tab all
@@ -403,26 +403,26 @@ for (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
     break
 ```
 
-In the end, let's take a look at the vocabulary size.
-Even after filtering out infrequent tokens,
-it is still over twice larger than that of the PTB dataset.
+Enfin, jetons un coup d'œil à la taille du vocabulaire.
+Même après avoir filtré les tokens peu fréquents,
+est toujours deux fois plus grand que celui de la base de données PTB.
 
 ```{.python .input}
 #@tab all
 len(vocab)
 ```
 
-## Summary
+## Résumé
 
-* Comparing with the PTB dataset, the WikiText-2 dateset retains the original punctuation, case and numbers, and is over twice larger.
-* We can arbitrarily access the pretraining (masked language modeling and next sentence prediction) examples generated from a pair of sentences from the WikiText-2 corpus.
+* Comparé au jeu de données de la PTB, le jeu de dates de WikiText-2 conserve la ponctuation, la casse et les chiffres originaux, et est deux fois plus grand.
+* Nous pouvons accéder arbitrairement aux exemples de pré-entraînement (modélisation du langage masqué et prédiction de la phrase suivante) générés à partir d'une paire de phrases du corpus WikiText-2.
 
 
 
-## Exercises
+## Exercices
 
-1. For simplicity, the period is used as the only delimiter for splitting sentences. Try other sentence splitting techniques, such as the spaCy and NLTK. Take NLTK as an example. You need to install NLTK first: `pip install nltk`. In the code, first `import nltk`. Then, download the Punkt sentence tokenizer: `nltk.download('punkt')`. To split sentences such as `sentences = 'This is great ! Why not ?'`, invoking `nltk.tokenize.sent_tokenize(sentences)` will return a list of two sentence strings: `['This is great !', 'Why not ?']`.
-1. What is the vocabulary size if we do not filter out any infrequent token?
+1. Pour des raisons de simplicité, le point est utilisé comme seul délimiteur pour séparer les phrases. Essayez d'autres techniques de découpage de phrases, comme le spaCy et NLTK. Prenez NLTK comme exemple. Vous devez d'abord installer NLTK :`pip install nltk`. Dans le code, commencez par `import nltk`. Ensuite, téléchargez le tokenizer de phrases Punkt :`nltk.download('punkt')`. Pour diviser des phrases telles que `sentences = 'This is great ! Why not ?'`, l'invocation de `nltk.tokenize.sent_tokenize(sentences)` renverra une liste de deux chaînes de phrases :`['This is great !', 'Why not ?']`.
+1. Quelle est la taille du vocabulaire si nous ne filtrons pas les tokens peu fréquents ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/389)

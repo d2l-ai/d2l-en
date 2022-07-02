@@ -1,45 +1,45 @@
-# Sentiment Analysis and the Dataset
-:label:`sec_sentiment`
+# L'analyse des sentiments et l'ensemble de données
+:label:`sec_sentiment` 
 
+ 
+ Avec la prolifération des médias sociaux en ligne
+et des plateformes d'évaluation,
+une pléthore de
+données d'opinion
+a été enregistrée,
+présentant un grand potentiel pour
+soutenir les processus de prise de décision.
+*L'analyse des sentiments*
+étudie les sentiments des gens
+dans les textes qu'ils produisent,
+tels que les critiques de produits,
+les commentaires de blogs,
+et
+les discussions de forums.
+Elle trouve de nombreuses applications
+dans des domaines aussi divers que 
+la politique (par exemple, l'analyse des sentiments du public à l'égard des politiques),
+la finance (par exemple, l'analyse des sentiments du marché),
+et 
+le marketing (par exemple, la recherche de produits et la gestion de la marque).
 
-With the proliferation of online social media
-and review platforms,
-a plethora of
-opinionated data
-has been logged,
-bearing great potential for
-supporting decision making processes.
-*Sentiment analysis*
-studies people's sentiments
-in their produced text,
-such as product reviews,
-blog comments,
-and
-forum discussions.
-It enjoys wide applications
-to fields as diverse as 
-politics (e.g., analysis of public sentiments towards policies),
-finance (e.g., analysis of sentiments of the market),
-and 
-marketing (e.g., product research and brand management).
-
-Since sentiments
-can be categorized
-as discrete polarities or scales (e.g., positive and negative),
-we can consider 
-sentiment analysis 
-as a text classification task,
-which transforms a varying-length text sequence
-into a fixed-length text category.
-In this chapter,
-we will use Stanford's [large movie review dataset](https://ai.stanford.edu/~amaas/data/sentiment/)
-for sentiment analysis. 
-It consists of a training set and a testing set, 
-either containing 25000 movie reviews downloaded from IMDb.
-In both datasets, 
-there are equal number of 
-"positive" and "negative" labels,
-indicating different sentiment polarities.
+Puisque les sentiments
+peuvent être classés
+comme des polarités ou des échelles discrètes (par exemple, positif et négatif),
+nous pouvons considérer 
+l'analyse des sentiments 
+comme une tâche de classification de texte,
+qui transforme une séquence de texte de longueur variable
+en une catégorie de texte de longueur fixe.
+Dans ce chapitre,
+nous utiliserons le logiciel [large movie review dataset](https://ai.stanford.edu/~)amaas/data/sentiment/)
+ de Stanford pour l'analyse des sentiments. 
+Il se compose d'un ensemble d'entraînement et d'un ensemble de test, 
+, contenant chacun 25 000 critiques de films téléchargées depuis IMDb.
+ 
+ Dans les deux ensembles de données, 
+, il y a un nombre égal d'étiquettes "positives" et "négatives",
+indiquant différentes polarités de sentiment.
 
 ```{.python .input}
 #@tab mxnet
@@ -57,10 +57,10 @@ from torch import nn
 import os
 ```
 
-##  Reading the Dataset
+## Lecture du jeu de données
 
-First, download and extract this IMDb review dataset
-in the path `../data/aclImdb`.
+Tout d'abord, téléchargez et extrayez ce jeu de données de critiques IMDb
+dans le chemin `../data/aclImdb`.
 
 ```{.python .input}
 #@tab all
@@ -71,7 +71,7 @@ d2l.DATA_HUB['aclImdb'] = (d2l.DATA_URL + 'aclImdb_v1.tar.gz',
 data_dir = d2l.download_extract('aclImdb', 'aclImdb')
 ```
 
-Next, read the training and test datasets. Each example is a review and its label: 1 for "positive" and 0 for "negative".
+Ensuite, lisez les jeux de données de formation et de test. Chaque exemple est une critique et son étiquette : 1 pour "positif" et 0 pour "négatif".
 
 ```{.python .input}
 #@tab all
@@ -95,11 +95,11 @@ for x, y in zip(train_data[0][:3], train_data[1][:3]):
     print('label:', y, 'review:', x[:60])
 ```
 
-## Preprocessing the Dataset
+## Prétraitement du jeu de données
 
-Treating each word as a token
-and filtering out words that appear less than 5 times,
-we create a vocabulary out of the training dataset.
+En traitant chaque mot comme un jeton
+et en filtrant les mots qui apparaissent moins de 5 fois,
+nous créons un vocabulaire à partir du jeu de données d'entraînement.
 
 ```{.python .input}
 #@tab all
@@ -107,9 +107,9 @@ train_tokens = d2l.tokenize(train_data[0], token='word')
 vocab = d2l.Vocab(train_tokens, min_freq=5, reserved_tokens=['<pad>'])
 ```
 
-After tokenization,
-let's plot the histogram of
-review lengths in tokens.
+Après la tokénisation,
+traçons l'histogramme de
+la longueur des commentaires en tokens.
 
 ```{.python .input}
 #@tab all
@@ -119,15 +119,15 @@ d2l.plt.ylabel('count')
 d2l.plt.hist([len(line) for line in train_tokens], bins=range(0, 1000, 50));
 ```
 
-As we expected,
-the reviews have varying lengths.
-To process
-a minibatch of such reviews at each time,
-we set the length of each review to 500 with truncation and padding,
-which is similar to 
-the preprocessing step 
-for the machine translation dataset
-in :numref:`sec_machine_translation`.
+Comme nous nous y attendions,
+les commentaires ont des longueurs variables.
+Pour traiter
+un mini lot de ces commentaires à chaque fois,
+nous fixons la longueur de chaque commentaire à 500 avec troncature et remplissage,
+ce qui est similaire à 
+l'étape de prétraitement 
+pour le jeu de données de traduction automatique
+dans :numref:`sec_machine_translation` .
 
 ```{.python .input}
 #@tab all
@@ -137,10 +137,10 @@ train_features = d2l.tensor([d2l.truncate_pad(
 print(train_features.shape)
 ```
 
-## Creating Data Iterators
+## Création d'itérateurs de données
 
-Now we can create data iterators.
-At each iteration, a minibatch of examples are returned.
+Nous pouvons maintenant créer des itérateurs de données.
+À chaque itération, un minibatch d'exemples est renvoyé.
 
 ```{.python .input}
 #@tab mxnet
@@ -162,10 +162,10 @@ for X, y in train_iter:
 print('# batches:', len(train_iter))
 ```
 
-## Putting All Things Together
+## Rassembler le tout
 
-Last, we wrap up the above steps into the `load_data_imdb` function.
-It returns training and test data iterators and the vocabulary of the IMDb review dataset.
+Enfin, nous regroupons les étapes précédentes dans la fonction `load_data_imdb`.
+Elle renvoie les itérateurs de données d'entraînement et de test ainsi que le vocabulaire de l'ensemble de données de critiques IMDb.
 
 ```{.python .input}
 #@tab mxnet
@@ -211,18 +211,18 @@ def load_data_imdb(batch_size, num_steps=500):
     return train_iter, test_iter, vocab
 ```
 
-## Summary
+## Résumé
 
-* Sentiment analysis studies people's sentiments in their produced text, which is considered as a text classification problem that transforms a varying-length text sequence
-into a fixed-length text category.
-* After preprocessing, we can load Stanford's large movie review dataset (IMDb review dataset) into data iterators with a vocabulary.
-
-
-## Exercises
+* L'analyse des sentiments étudie les sentiments des personnes dans leur texte produit, ce qui est considéré comme un problème de classification de texte qui transforme une séquence de texte de longueur variable
+en une catégorie de texte de longueur fixe.
+* Après le prétraitement, nous pouvons charger le grand ensemble de données de critiques de films de Stanford (IMDb review dataset) dans des itérateurs de données avec un vocabulaire.
 
 
-1. What hyperparameters in this section can we modify to accelerate training sentiment analysis models?
-1. Can you implement a function to load the dataset of [Amazon reviews](https://snap.stanford.edu/data/web-Amazon.html) into data iterators and labels for sentiment analysis?
+## Exercices
+
+
+ 1. Quels hyperparamètres de cette section pouvons-nous modifier pour accélérer la formation des modèles d'analyse de sentiments ?
+1. Pouvez-vous implémenter une fonction pour charger le jeu de données de [Amazon reviews](https://snap.stanford.edu/data/web-Amazon.html) dans des itérateurs de données et des étiquettes pour l'analyse des sentiments ?
 
 
 :begin_tab:`mxnet`

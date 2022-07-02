@@ -3,10 +3,10 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# The Base Classification Model
-:label:`sec_classification`
+# Le modèle de classification de base
+:label:`sec_classification` 
 
-You may have noticed that the implementations from scratch and the concise implementation using framework functionality were quite similar in the case of regression. The same is true for classification. Since a great many models in this book deal with classification, it is worth adding some functionality to support this setting specifically. This section provides a base class for classification models to simplify future code.
+ Vous avez peut-être remarqué que les implémentations à partir de zéro et l'implémentation concise utilisant la fonctionnalité du framework étaient assez similaires dans le cas de la régression. Il en va de même pour la classification. Étant donné qu'un grand nombre de modèles de ce livre traitent de la classification, il est intéressant d'ajouter une fonctionnalité pour prendre en charge ce paramètre spécifique. Cette section fournit une classe de base pour les modèles de classification afin de simplifier le code futur.
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -28,9 +28,9 @@ import tensorflow as tf
 from IPython import display
 ```
 
-## The `Classifier` Class
+## La classe `Classifier`
 
-We define the `Classifier` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exactly correct if the last batch contains fewer examples, but we ignore this minor difference to keep the code simple.
+ Nous définissons la classe `Classifier` ci-dessous. Dans la classe `validation_step`, nous reportons à la fois la valeur de la perte et la précision de la classification sur un lot de validation. Nous tirons une mise à jour pour chaque lot de `num_val_batches`. Cela présente l'avantage de générer la perte et la précision moyennes sur l'ensemble des données de validation. Ces chiffres moyens ne sont pas exactement corrects si le dernier lot contient moins d'exemples, mais nous ignorons cette différence mineure pour garder le code simple.
 
 ```{.python .input  n=5}
 %%tab all
@@ -41,7 +41,7 @@ class Classifier(d2l.Module):  #@save
         self.plot('acc', self.accuracy(Y_hat, batch[-1]), train=False)
 ```
 
-By default we use a stochastic gradient descent optimizer, operating on minibatches, just as we did in the context of linear regression.
+Par défaut, nous utilisons un optimiseur de descente de gradient stochastique, fonctionnant sur des minilots, comme nous l'avons fait dans le contexte de la régression linéaire.
 
 ```{.python .input  n=6}
 %%tab mxnet
@@ -67,31 +67,31 @@ def configure_optimizers(self):
     return tf.keras.optimizers.SGD(self.lr)
 ```
 
-## Accuracy
+## Précision
 
-Given the predicted probability distribution `y_hat`,
-we typically choose the class with the highest predicted probability
-whenever we must output a hard prediction.
-Indeed, many applications require that we make a choice.
-For instance, Gmail must categorize an email into "Primary", "Social", "Updates", "Forums", or "Spam".
-It might estimate probabilities internally,
-but at the end of the day it has to choose one among the classes.
+Étant donné la distribution de probabilité prédite `y_hat`,
+nous choisissons généralement la classe avec la probabilité prédite la plus élevée
+chaque fois que nous devons produire une prédiction difficile.
+En effet, de nombreuses applications exigent que nous fassions un choix.
+Par exemple, Gmail doit classer un courriel dans les catégories suivantes : " primaire ", " social ", " mises à jour ", " forums " ou " spam ".
+Il peut estimer les probabilités en interne,
+, mais au bout du compte, il doit choisir une des classes.
 
-When predictions are consistent with the label class `y`, they are correct.
-The classification accuracy is the fraction of all predictions that are correct.
-Although it can be difficult to optimize accuracy directly (it is not differentiable),
-it is often the performance measure that we care about the most. It is often *the*
-relevant quantity in benchmarks. As such, we will nearly always report it when training classifiers.
+Lorsque les prédictions sont cohérentes avec la classe d'étiquettes `y`, elles sont correctes.
+La précision de la classification est la fraction de toutes les prédictions qui sont correctes.
+Bien qu'il puisse être difficile d'optimiser la précision directement (elle n'est pas différentiable),
+c'est souvent la mesure de performance qui nous intéresse le plus. Elle est souvent *la*
+quantité pertinente dans les benchmarks. C'est pourquoi nous l'indiquons presque toujours lorsque nous formons des classificateurs.
 
-Accuracy is computed as follows.
-First, if `y_hat` is a matrix,
-we assume that the second dimension stores prediction scores for each class.
-We use `argmax` to obtain the predicted class by the index for the largest entry in each row.
-Then we [**compare the predicted class with the ground-truth `y` elementwise.**]
-Since the equality operator `==` is sensitive to data types,
-we convert `y_hat`'s data type to match that of `y`.
-The result is a tensor containing entries of 0 (false) and 1 (true).
-Taking the sum yields the number of correct predictions.
+La précision est calculée comme suit.
+Premièrement, si `y_hat` est une matrice,
+nous supposons que la deuxième dimension stocke les scores de prédiction pour chaque classe.
+Nous utilisons `argmax` pour obtenir la classe prédite par l'index de la plus grande entrée de chaque ligne.
+Ensuite, nous [**comparons la classe prédite avec la vérité de base `y` par éléments.**]
+L'opérateur d'égalité `==` étant sensible aux types de données,
+nous convertissons le type de données de `y_hat` pour qu'il corresponde à celui de `y`.
+Le résultat est un tenseur contenant des entrées de 0 (faux) et 1 (vrai).
+En prenant la somme, on obtient le nombre de prédictions correctes.
 
 ```{.python .input  n=9}
 %%tab all
@@ -125,16 +125,16 @@ def parameters(self):
         params.keys()) else self.get_scratch_params()
 ```
 
-## Summary
+## Résumé
 
-Classification is a sufficiently common problem that it warrants its own convenience functions. Of central importance in classification is the *accuracy* of the classifier. Note that while we often care primarily about accuracy, we train classifiers to optimize a variety of other objectives for statistical and computational reasons. However, regardless of which loss function was minimized during training, it's useful to have a convenience method for assessing the accuracy of our classifier empirically. 
+La classification est un problème suffisamment courant pour justifier ses propres fonctions pratiques. L'importance centrale de la classification est la *précision* du classificateur. Notez que, bien que la précision soit souvent au centre de nos préoccupations, nous formons des classificateurs pour optimiser une variété d'autres objectifs pour des raisons statistiques et informatiques. Cependant, quelle que soit la fonction de perte minimisée pendant la formation, il est utile de disposer d'une méthode pratique pour évaluer empiriquement la précision de notre classificateur. 
 
 
-## Exercises
+## Exercices
 
-1. Denote by $L_v$ the validation loss, and let $L_v^q$ be its quick and dirty estimate computed by the loss function averaging in this section. Lastly, denote by $l_v^b$ the loss on the last minibatch. Express $L_v$ in terms of $L_v^q$, $l_v^b$, and the sample and minibatch sizes.
-1. Show that the quick and dirty estimate $L_v^q$ is unbiased. That is, show that $E[L_v] = E[L_v^q]$. Why would you still want to use $L_v$ instead?
-1. Given a multiclass classification loss, denoting by $l(y,y')$ the penalty of estimating $y'$ when we see $y$ and given a probabilty $p(y|x)$, formulate the rule for an optimal selection of $y'$. Hint: express the expected loss, using $l$ and $p(y|x)$.
+1. Désignez par $L_v$ la perte de validation, et laissez $L_v^q$ être son estimation rapide et sale calculée par la moyenne de la fonction de perte dans cette section. Enfin, désignez par $l_v^b$ la perte sur le dernier minibatch. Exprimez $L_v$ en termes de $L_v^q$, $l_v^b$, et de la taille de l'échantillon et du minilot.
+1. Montrez que l'estimation rapide et sale $L_v^q$ est sans biais. C'est-à-dire, montrez que $E[L_v] = E[L_v^q]$. Pourquoi voudriez-vous toujours utiliser $L_v$ à la place ?
+1. Étant donné une perte de classification multiclasse, désignant par $l(y,y')$ la pénalité d'estimation de $y'$ lorsque nous voyons $y$ et étant donné une probabilité $p(y|x)$, formulez la règle pour une sélection optimale de $y'$. Conseil : exprimez la perte attendue, en utilisant $l$ et $p(y|x)$.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/6808)

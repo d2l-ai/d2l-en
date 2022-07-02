@@ -75,10 +75,10 @@ depending on whether max or average pooling is employed.
 
 
 ![Max-pooling with a pooling window shape of $2\times 2$. The shaded portions are the first output element as well as the input tensor elements used for the output computation: $\max(0, 1, 3, 4)=4$.](../img/pooling.svg)
-:label:`fig_pooling`
+:label:`fig_pooling` 
 
-The output tensor in :numref:`fig_pooling`  has a height of 2 and a width of 2.
-The four elements are derived from the maximum value in each pooling window:
+ Le tenseur de sortie dans :numref:`fig_pooling` a une hauteur de 2 et une largeur de 2.
+Les quatre éléments sont dérivés de la valeur maximale dans chaque fenêtre de pooling :
 
 $$
 \max(0, 1, 3, 4)=4,\\
@@ -87,24 +87,24 @@ $$
 \max(4, 5, 7, 8)=8.\\
 $$
 
-More generally, we can define a $p \times q$ pooling layer by aggregating over 
-a region of said size. Returning to the problem of edge detection, 
-we use the output of the convolutional layer
-as input for $2\times 2$ max-pooling.
-Denote by `X` the input of the convolutional layer input and `Y` the pooling layer output. 
-Regardless of whether or not the values of `X[i, j]`, `X[i, j + 1]`, 
-`X[i+1, j]` and `X[i+1, j + 1]` are different,
-the pooling layer always outputs `Y[i, j] = 1`.
-That is to say, using the $2\times 2$ max-pooling layer,
-we can still detect if the pattern recognized by the convolutional layer
-moves no more than one element in height or width.
+Plus généralement, nous pouvons définir une couche de pooling $p \times q$ en agrégeant sur 
+une région de ladite taille. Pour en revenir au problème de la détection des bords, 
+nous utilisons la sortie de la couche convolutionnelle
+comme entrée pour $2\times 2$ max-pooling.
+On désigne par `X` l'entrée de la couche convolutionnelle et par `Y` la sortie de la couche de mise en commun. 
+Que les valeurs de `X[i, j]`, `X[i, j + 1]`, 
+`X[i+1, j]` et `X[i+1, j + 1]` soient différentes ou non,
+la couche de mise en commun produit toujours `Y[i, j] = 1`.
+En d'autres termes, en utilisant la couche de mise en commun maximale $2\times 2$,
+nous pouvons toujours détecter si le motif reconnu par la couche convolutive
+ne se déplace pas de plus d'un élément en hauteur ou en largeur.
 
-In the code below, we (**implement the forward propagation
-of the pooling layer**) in the `pool2d` function.
-This function is similar to the `corr2d` function
-in :numref:`sec_conv_layer`.
-However, no kernel is needed, computing the output
-as either the maximum or the average of each region in the input.
+Dans le code ci-dessous, nous (**implémentons la propagation vers l'avant
+de la couche de pooling**) dans la fonction `pool2d`.
+Cette fonction est similaire à la fonction `corr2d`
+ dans :numref:`sec_conv_layer` .
+Cependant, aucun noyau n'est nécessaire, et la sortie
+est calculée comme le maximum ou la moyenne de chaque région de l'entrée.
 
 ```{.python .input}
 %%tab mxnet
@@ -151,7 +151,7 @@ def pool2d(X, pool_size, mode='max'):
     return Y
 ```
 
-We can construct the input tensor `X` in :numref:`fig_pooling` to [**validate the output of the two-dimensional max-pooling layer**].
+Nous pouvons construire le tenseur d'entrée `X` dans :numref:`fig_pooling` pour [**valider la sortie de la couche bidimensionnelle de max-pooling**].
 
 ```{.python .input}
 %%tab all
@@ -159,27 +159,27 @@ X = d2l.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])
 pool2d(X, (2, 2))
 ```
 
-Also, we experiment with (**the average pooling layer**).
+De plus, nous expérimentons avec (**la couche de mise en commun moyenne**).
 
 ```{.python .input}
 %%tab all
 pool2d(X, (2, 2), 'avg')
 ```
 
-## [**Padding and Stride**]
+## [**Padding et Stride**]
 
-As with convolutional layers, pooling layers
-change the output shape.
-And as before, we can adjust the operation to achieve a desired output shape
-by padding the input and adjusting the stride.
-We can demonstrate the use of padding and strides
-in pooling layers via the built-in two-dimensional max-pooling layer from the deep learning framework.
-We first construct an input tensor `X` whose shape has four dimensions,
-where the number of examples (batch size) and number of channels are both 1.
+Comme pour les couches convolutionnelles, les couches de pooling
+modifient la forme de la sortie.
+Et comme précédemment, nous pouvons ajuster l'opération pour obtenir une forme de sortie souhaitée
+en remplissant l'entrée et en ajustant le pas.
+Nous pouvons démontrer l'utilisation du remplissage et des pas
+dans les couches de mise en commun grâce à la couche de mise en commun maximale bidimensionnelle intégrée dans le cadre de l'apprentissage profond.
+Nous construisons d'abord un tenseur d'entrée `X` dont la forme a quatre dimensions,
+où le nombre d'exemples (taille du lot) et le nombre de canaux sont tous deux égaux à 1.
 
-:begin_tab:`tensorflow`
-Note that unlike other frameworks, TensorFlow
-prefers and is optimized for *channels-last* input.
+:begin_tab:`tensorflow` 
+ Notez que contrairement à d'autres frameworks, TensorFlow
+préfère et est optimisé pour l'entrée *channels-last*.
 :end_tab:
 
 ```{.python .input}
@@ -194,8 +194,8 @@ X = d2l.reshape(d2l.arange(16, dtype=d2l.float32), (1, 4, 4, 1))
 X
 ```
 
-Since pooling aggregates information from an area, (**deep learning frameworks default to matching pooling window sizes and stride.**) For instance, if we use a pooling window of shape `(3, 3)`
-we get a stride shape of `(3, 3)` by default.
+Étant donné que le pooling regroupe les informations d'une zone, les cadres d'apprentissage profond ** adaptent par défaut la taille des fenêtres de pooling et le stride.** Par exemple, si nous utilisons une fenêtre de mise en commun de la forme `(3, 3)`
+ , nous obtenons par défaut une forme de stride de `(3, 3)`.
 
 ```{.python .input}
 %%tab mxnet
@@ -218,7 +218,7 @@ pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3])
 pool2d(X)
 ```
 
-As expected, [**the stride and padding can be manually specified**] to override framework defaults if needed.
+Comme prévu, [**le stride et le padding peuvent être spécifiés manuellement**] pour remplacer les valeurs par défaut du framework si nécessaire.
 
 ```{.python .input}
 %%tab mxnet
@@ -241,7 +241,7 @@ pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3], padding='valid',
 pool2d(X_padded)
 ```
 
-Of course, we can specify an arbitrary rectangular pooling window with arbitrary height and width respectively, as the example below shows.
+Bien sûr, nous pouvons spécifier une fenêtre de pooling rectangulaire arbitraire avec une hauteur et une largeur arbitraires respectivement, comme le montre l'exemple ci-dessous.
 
 ```{.python .input}
 %%tab mxnet
@@ -265,20 +265,20 @@ pool2d = tf.keras.layers.MaxPool2D(pool_size=[2, 3], padding='valid',
 pool2d(X_padded)
 ```
 
-## Multiple Channels
+## Canaux multiples
 
-When processing multi-channel input data,
-[**the pooling layer pools each input channel separately**],
-rather than summing the inputs up over channels
-as in a convolutional layer.
-This means that the number of output channels for the pooling layer
-is the same as the number of input channels.
-Below, we will concatenate tensors `X` and `X + 1`
-on the channel dimension to construct an input with 2 channels.
+Lors du traitement de données d'entrée à canaux multiples,
+[**la couche de mise en commun met en commun chaque canal d'entrée séparément**],
+plutôt que d'additionner les entrées sur les canaux
+comme dans une couche convolutive.
+Cela signifie que le nombre de canaux de sortie pour la couche de mise en commun
+est le même que le nombre de canaux d'entrée.
+Ci-dessous, nous allons concaténer les tenseurs `X` et `X + 1`
+ sur la dimension des canaux pour construire une entrée avec 2 canaux.
 
 :begin_tab:`tensorflow`
-Note that this will require a
-concatenation along the last dimension for TensorFlow due to the channels-last syntax.
+Notez que cela nécessitera une concaténation
+le long de la dernière dimension pour TensorFlow en raison de la syntaxe channels-last.
 :end_tab:
 
 ```{.python .input}
@@ -292,7 +292,7 @@ X
 X = tf.concat([X, X + 1], 3)  # Concatenate along `dim=3` due to channels-last syntax
 ```
 
-As we can see, the number of output channels is still 2 after pooling.
+Comme nous pouvons le voir, le nombre de canaux de sortie est toujours de 2 après la mise en commun.
 
 ```{.python .input}
 %%tab mxnet
@@ -317,31 +317,31 @@ pool2d(X_padded)
 ```
 
 :begin_tab:`tensorflow`
-Note that the output for the TensorFlow pooling appears at first glance to be different, however
-numerically the same results are presented as MXNet and PyTorch.
-The difference lies in the dimensionality, and reading the
-output vertically yields the same output as the other implementations.
+Notez que la sortie pour le pooling TensorFlow semble à première vue être différente, cependant
+numériquement les mêmes résultats sont présentés que MXNet et PyTorch.
+La différence réside dans la dimensionnalité, et la lecture verticale de la sortie de
+donne les mêmes résultats que les autres implémentations.
 :end_tab:
 
-## Summary
+## Résumé
 
-Pooling is an exceedingly simple operation. It does exactly what its name indicates, aggregate results over a window of values. All convolution semantics, such as strides and padding apply in the same way as they did previously. Note that pooling is indifferent to channels, i.e., it leaves the number of channels unchanged and it applies to each channel separately. Lastly, of the two popular pooling choices, max-pooling is preferable to average pooling, as it confers some degree of invariance to output. A popular choice is to pick a pooling window size of $2 \times 2$ to quarter the spatial resolution of output. 
+La mise en commun est une opération extrêmement simple. Elle fait exactement ce que son nom indique, agréger les résultats sur une fenêtre de valeurs. Toutes les sémantiques de convolution, comme les strides et le padding, s'appliquent de la même manière que précédemment. Notez que le pooling est indifférent aux canaux, c'est-à-dire qu'il laisse le nombre de canaux inchangé et s'applique à chaque canal séparément. Enfin, parmi les deux choix populaires de mise en commun, la mise en commun maximale est préférable à la mise en commun moyenne, car elle confère un certain degré d'invariance à la sortie. Un choix populaire consiste à choisir une taille de fenêtre de pooling de $2 \times 2$ pour diviser par quatre la résolution spatiale de la sortie. 
 
-Note that there are many more ways of reducing resolution beyond pooling. For instance, in stochastic pooling :cite:`Zeiler.Fergus.2013` and fractional max-pooling :cite:`Graham.2014` aggregation is combined with randomization. This can slightly improve the accuracy in some cases. Lastly, as we will see later with the attention mechanism, there are more refined ways of aggregating over outputs, e.g., by using the alignment between a query and representation vectors. 
+Notez qu'il existe de nombreuses autres façons de réduire la résolution au-delà du pooling. Par exemple, dans le pooling stochastique :cite:`Zeiler.Fergus.2013` et le max-pooling fractionnel :cite:`Graham.2014` , l'agrégation est combinée à la randomisation. Cela peut améliorer légèrement la précision dans certains cas. Enfin, comme nous le verrons plus tard avec le mécanisme d'attention, il existe des moyens plus raffinés d'agréger sur les sorties, par exemple en utilisant l'alignement entre une requête et les vecteurs de représentation. 
 
 
-## Exercises
+## Exercices
 
-1. Implement average pooling through a convolution. 
-1. Prove that max-pooling cannot be implemented through a convolution alone. 
-1. Max-pooling can be accomplished using ReLU operations, i.e., $\mathrm{ReLU}(x) = \max(0, x)$.
-    1. Express $\max (a, b)$ by using only ReLU operations.
-    1. Use this to implement max-pooling by means of convolutions and ReLU layers. 
-    1. How many channels and layers do you need for a $2 \times 2$ convolution? How many for a $3 \times 3$ convolution. 
-1. What is the computational cost of the pooling layer? Assume that the input to the pooling layer is of size $c\times h\times w$, the pooling window has a shape of $p_h\times p_w$ with a padding of $(p_h, p_w)$ and a stride of $(s_h, s_w)$.
-1. Why do you expect max-pooling and average pooling to work differently?
-1. Do we need a separate minimum pooling layer? Can you replace it with another operation?
-1. We could use the softmax operation for pooling. Why might it not be so popular?
+1. Implémenter la mise en commun des moyennes par une convolution. 
+1. Prouvez que le max-pooling ne peut pas être implémenté par une convolution seule. 
+1. Le max-pooling peut être réalisé en utilisant des opérations ReLU, c'est-à-dire $\mathrm{ReLU}(x) = \max(0, x)$.
+   1. Exprimez $\max (a, b)$ en utilisant uniquement des opérations ReLU.
+   1. Utilisez-le pour mettre en œuvre le max-pooling au moyen de convolutions et de couches ReLU. 
+    1. De combien de canaux et de couches avez-vous besoin pour une convolution $2 \times 2$? Combien pour une convolution $3 \times 3$. 
+1. Quel est le coût de calcul de la couche de mise en commun ? Supposons que l'entrée de la couche de mise en commun soit de taille $c\times h\times w$, la fenêtre de mise en commun a une forme de $p_h\times p_w$ avec un padding de $(p_h, p_w)$ et un stride de $(s_h, s_w)$.
+1. Pourquoi pensez-vous que la mise en commun maximale et la mise en commun moyenne fonctionnent différemment ?
+1. Avons-nous besoin d'une couche distincte de mise en commun minimale ? Peut-on la remplacer par une autre opération ?
+1. Nous pourrions utiliser l'opération softmax pour la mise en commun. Pourquoi ne serait-elle pas si populaire ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/71)

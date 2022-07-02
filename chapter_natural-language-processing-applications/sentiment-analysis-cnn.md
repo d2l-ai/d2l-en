@@ -157,94 +157,94 @@ has to be the same as that of the input tensor.
 
 
 ![Two-dimensional cross-correlation operation with a single input channel. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $2\times(-1)+3\times(-3)+1\times3+2\times4+0\times1+1\times2=2$.](../img/conv1d-2d.svg)
-:label:`fig_conv1d_2d`
+:label:`fig_conv1d_2d` 
 
-Both the outputs in :numref:`fig_conv1d` and :numref:`fig_conv1d_channel` have only one channel.
-Same as two-dimensional convolutions with multiple output channels described in :numref:`subsec_multi-output-channels`,
-we can also specify multiple output channels
-for one-dimensional convolutions.
+ Les sorties de :numref:`fig_conv1d` et :numref:`fig_conv1d_channel` n'ont qu'un seul canal.
+Comme pour les convolutions bidimensionnelles avec plusieurs canaux de sortie décrites dans :numref:`subsec_multi-output-channels` ,
+nous pouvons également spécifier plusieurs canaux de sortie
+pour les convolutions unidimensionnelles.
 
-## Max-Over-Time Pooling
+## Pooling max-sur-temps
 
-Similarly, we can use pooling
-to extract the highest value
-from sequence representations
-as the most important feature
-across time steps.
-The *max-over-time pooling* used in textCNN
-works like
-the one-dimensional global max-pooling
-:cite:`Collobert.Weston.Bottou.ea.2011`.
-For a multi-channel input
-where each channel stores values
-at different time steps,
-the output at each channel
-is the maximum value
-for that channel.
-Note that
-the max-over-time pooling
-allows different numbers of time steps
-at different channels.
+De même, nous pouvons utiliser le pooling
+pour extraire la valeur la plus élevée
+des représentations de séquences
+en tant que caractéristique la plus importante
+à travers les pas de temps.
+Le *max-over-time pooling* utilisé dans textCNN
+fonctionne comme
+le max-pooling global unidimensionnel
+:cite:`Collobert.Weston.Bottou.ea.2011` .
+Pour une entrée multicanal
+où chaque canal stocke des valeurs
+à différents pas de temps,
+la sortie à chaque canal
+est la valeur maximale
+pour ce canal.
+Notez que
+le pooling max-over-time
+permet différents nombres de pas de temps
+sur différents canaux.
 
-## The textCNN Model
+## Le modèle textCNN
 
-Using the one-dimensional convolution
-and max-over-time pooling,
-the textCNN model
-takes individual pretrained token representations
-as input,
-then obtains and transforms sequence representations
-for the downstream application.
+À l'aide de la convolution unidimensionnelle
+et de la mise en commun max-over-time,
+le modèle textCNN
+prend en entrée les représentations individuelles pré-entraînées de tokens
+,
+puis obtient et transforme les représentations de séquences
+pour l'application en aval.
 
-For a single text sequence
-with $n$ tokens represented by
-$d$-dimensional vectors,
-the width, height, and number of channels
-of the input tensor
-are $n$, $1$, and $d$, respectively.
-The textCNN model transforms the input
-into the output as follows:
+Pour une séquence de texte unique
+avec $n$ tokens représentés par
+$d$ -dimensional vectors,
+la largeur, la hauteur, et le nombre de canaux
+du tenseur d'entrée
+sont $n$, $1$, et $d$, respectivement.
+Le modèle textCNN transforme l'entrée
+en sortie comme suit :
 
-1. Define multiple one-dimensional convolution kernels and perform convolution operations separately on the inputs. Convolution kernels with different widths may capture local features among different numbers of adjacent tokens.
-1. Perform max-over-time pooling on all the output channels, and then concatenate all the scalar pooling outputs as a vector.
-1. Transform the concatenated vector into the output categories using the fully connected layer. Dropout can be used for reducing overfitting.
+1. Définissez plusieurs noyaux de convolution unidimensionnels et effectuez des opérations de convolution séparément sur les entrées. Des noyaux de convolution de différentes largeurs peuvent capturer des caractéristiques locales parmi différents nombres de tokens adjacents.
+1. Effectuez un regroupement max-over-time sur tous les canaux de sortie, puis concaténérez toutes les sorties du regroupement scalaire sous forme de vecteur.
+1. Transformer le vecteur concaténé en catégories de sortie en utilisant la couche entièrement connectée. Le Dropout peut être utilisé pour réduire l'overfitting.
 
-![The model architecture of textCNN.](../img/textcnn.svg)
-:label:`fig_conv1d_textcnn`
+![The model architecture of textCNN.](../img/textcnn.svg) 
+ :label:`fig_conv1d_textcnn` 
 
-:numref:`fig_conv1d_textcnn`
-illustrates the model architecture of textCNN
-with a concrete example.
-The input is a sentence with 11 tokens,
-where
-each token is represented by a 6-dimensional vectors.
-So we have a 6-channel input with width 11.
-Define
-two one-dimensional convolution kernels
-of widths 2 and 4,
-with 4 and 5 output channels, respectively.
-They produce
-4 output channels with width $11-2+1=10$
-and 5 output channels with width $11-4+1=8$.
-Despite different widths of these 9 channels,
-the max-over-time pooling
-gives a concatenated 9-dimensional vector,
-which is finally transformed
-into a 2-dimensional output vector
-for binary sentiment predictions.
+ :numref:`fig_conv1d_textcnn` 
+ illustre l'architecture du modèle textCNN
+avec un exemple concret.
+L'entrée est une phrase comportant 11 tokens,
+où
+chaque token est représenté par un vecteur à 6 dimensions.
+Nous avons donc une entrée à 6 canaux de largeur 11.
+Définissez
+deux noyaux de convolution unidimensionnels
+de largeur 2 et 4,
+avec 4 et 5 canaux de sortie, respectivement.
+Ils produisent
+4 canaux de sortie de largeur $11-2+1=10$
+ et 5 canaux de sortie de largeur $11-4+1=8$.
+Malgré les différentes largeurs de ces 9 canaux,
+le pooling max-over-time
+donne un vecteur concaténé à 9 dimensions,
+qui est finalement transformé
+en un vecteur de sortie à 2 dimensions
+pour les prédictions de sentiments binaires.
 
 
 
-### Defining the Model
+### Définition du modèle
 
-We implement the textCNN model in the following class.
-Compared with the bidirectional RNN model in
-:numref:`sec_sentiment_rnn`,
-besides
-replacing recurrent layers with convolutional layers,
-we also use two embedding layers:
-one with trainable weights and the other
-with fixed weights.
+Nous implémentons le modèle textCNN dans la classe suivante.
+Par rapport au modèle RNN bidirectionnel dans
+:numref:`sec_sentiment_rnn` ,
+en plus de
+remplacer les couches récurrentes par des couches convolutionnelles,
+nous utilisons également deux couches d'intégration :
+une avec des poids entraînables et l'autre
+avec des poids fixes.
 
 ```{.python .input}
 #@tab mxnet
@@ -321,8 +321,8 @@ class TextCNN(nn.Module):
         return outputs
 ```
 
-Let's create a textCNN instance.
-It has 3 convolutional layers with kernel widths of 3, 4, and 5, all with 100 output channels.
+Créons une instance textCNN.
+Elle possède 3 couches convolutionnelles avec des largeurs de noyau de 3, 4 et 5, toutes avec 100 canaux de sortie.
 
 ```{.python .input}
 #@tab mxnet
@@ -345,14 +345,14 @@ def init_weights(module):
 net.apply(init_weights);
 ```
 
-### Loading Pretrained Word Vectors
+### Chargement des vecteurs de mots pré-entraînés
 
-Same as :numref:`sec_sentiment_rnn`,
-we load pretrained 100-dimensional GloVe embeddings
-as the initialized token representations.
-These token representations (embedding weights)
-will be trained in `embedding`
-and fixed in `constant_embedding`.
+Comme pour :numref:`sec_sentiment_rnn` ,
+nous chargeons des embeddings GloVe 100-dimensionnels pré-entraînés
+comme représentations de mots initialisées.
+Ces représentations de mots (poids d'incorporation)
+seront entraînées dans `embedding`
+ et fixées dans `constant_embedding`.
 
 ```{.python .input}
 #@tab mxnet
@@ -372,9 +372,9 @@ net.constant_embedding.weight.data.copy_(embeds)
 net.constant_embedding.weight.requires_grad = False
 ```
 
-### Training and Evaluating the Model
+### Formation et évaluation du modèle
 
-Now we can train the textCNN model for sentiment analysis.
+Nous pouvons maintenant former le modèle textCNN pour l'analyse des sentiments.
 
 ```{.python .input}
 #@tab mxnet
@@ -392,7 +392,7 @@ loss = nn.CrossEntropyLoss(reduction="none")
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-Below we use the trained model to predict the sentiment for two simple sentences.
+Ci-dessous, nous utilisons le modèle entraîné pour prédire le sentiment pour deux phrases simples.
 
 ```{.python .input}
 #@tab all
@@ -404,19 +404,19 @@ d2l.predict_sentiment(net, vocab, 'this movie is so great')
 d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 ```
 
-## Summary
+### Résumé
 
-* One-dimensional CNNs can process local features such as $n$-grams in text.
-* Multi-input-channel one-dimensional cross-correlations are equivalent to single-input-channel two-dimensional cross-correlations.
-* The max-over-time pooling allows different numbers of time steps at different channels.
-* The textCNN model transforms individual token representations into downstream application outputs using one-dimensional convolutional layers and max-over-time pooling layers.
+* Les CNN unidimensionnels peuvent traiter des caractéristiques locales telles que les $n$-grammes dans le texte.
+* Les corrélations croisées unidimensionnelles à canaux multiples sont équivalentes aux corrélations croisées bidimensionnelles à canal unique.
+* Le pooling max-over-time permet différents nombres de pas de temps pour différents canaux.
+* Le modèle textCNN transforme les représentations de jetons individuels en sorties d'applications en aval à l'aide de couches convolutionnelles unidimensionnelles et de couches de mise en commun max-over-time.
 
 
-## Exercises
+## Exercices
 
-1. Tune hyperparameters and compare the two architectures for sentiment analysis in :numref:`sec_sentiment_rnn` and in this section, such as in classification accuracy and computational efficiency.
-1. Can you further improve the classification accuracy of the model by using the methods introduced in the exercises of :numref:`sec_sentiment_rnn`?
-1. Add positional encoding in the input representations. Does it improve the classification accuracy?
+1. Réglez les hyperparamètres et comparez les deux architectures pour l'analyse des sentiments dans :numref:`sec_sentiment_rnn` et dans cette section, notamment en termes de précision de classification et d'efficacité de calcul.
+1. Pouvez-vous améliorer davantage la précision de classification du modèle en utilisant les méthodes introduites dans les exercices de :numref:`sec_sentiment_rnn` ?
+1. Ajoutez l'encodage positionnel dans les représentations d'entrée. Cela améliore-t-il la précision de la classification ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/393)

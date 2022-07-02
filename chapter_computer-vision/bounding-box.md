@@ -1,37 +1,37 @@
-# Object Detection and Bounding Boxes
-:label:`sec_bbox`
+# Détection d'objets et boîtes englobantes
+:label:`sec_bbox` 
 
+ 
+ Dans les sections précédentes (par exemple, :numref:`sec_alexnet` --:numref:`sec_googlenet` ),
+nous avons présenté divers modèles de classification d'images.
+Dans les tâches de classification d'images,
+nous supposons qu'il n'y a qu'un *un*
+objet principal
+dans l'image et nous nous concentrons uniquement sur la manière de 
+reconnaître sa catégorie.
+Cependant, il y a souvent *plusieurs* objets
+dans l'image d'intérêt.
+Nous voulons non seulement connaître leurs catégories, mais aussi leurs positions spécifiques dans l'image.
+Dans le domaine de la vision par ordinateur, nous appelons ces tâches la *détection d'objets* (ou la *reconnaissance d'objets*).
 
-In earlier sections (e.g., :numref:`sec_alexnet`--:numref:`sec_googlenet`),
-we introduced various models for image classification.
-In image classification tasks,
-we assume that there is only *one*
-major object
-in the image and we only focus on how to 
-recognize its category.
-However, there are often *multiple* objects
-in the image of interest.
-We not only want to know their categories, but also their specific positions in the image.
-In computer vision, we refer to such tasks as *object detection* (or *object recognition*).
+La détection d'objets a été
+largement appliquée dans de nombreux domaines.
+Par exemple, la conduite autonome doit planifier 
+des itinéraires de déplacement
+en détectant les positions
+des véhicules, des piétons, des routes et des obstacles dans les images vidéo capturées.
+Par ailleurs,
+les robots peuvent utiliser cette technique
+pour détecter et localiser des objets d'intérêt
+tout au long de leur navigation dans un environnement.
+De plus, les systèmes de sécurité
 
-Object detection has been
-widely applied in many fields.
-For example, self-driving needs to plan 
-traveling routes
-by detecting the positions
-of vehicles, pedestrians, roads, and obstacles in the captured video images.
-Besides,
-robots may use this technique
-to detect and localize objects of interest
-throughout its navigation of an environment.
-Moreover,
-security systems
-may need to detect abnormal objects, such as intruders or bombs.
+ peuvent avoir besoin de détecter des objets anormaux, tels que des intrus ou des bombes.
 
-In the next few sections, we will introduce 
-several deep learning methods for object detection.
-We will begin with an introduction
-to *positions* (or *locations*) of objects.
+Dans les prochaines sections, nous allons présenter 
+plusieurs méthodes d'apprentissage profond pour la détection d'objets.
+Nous commencerons par une introduction
+aux *positions* (ou *emplacements*) des objets.
 
 ```{.python .input}
 #@tab mxnet
@@ -56,8 +56,8 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-We will load the sample image to be used in this section. We can see that there is a dog on the left side of the image and a cat on the right.
-They are the two major objects in this image.
+Nous allons charger l'image d'exemple qui sera utilisée dans cette section. Nous pouvons voir qu'il y a un chien sur le côté gauche de l'image et un chat sur le côté droit.
+Ce sont les deux principaux objets de cette image.
 
 ```{.python .input}
 #@tab mxnet
@@ -73,22 +73,22 @@ img = d2l.plt.imread('../img/catdog.jpg')
 d2l.plt.imshow(img);
 ```
 
-## Bounding Boxes
+## Boîtes englobantes
 
 
-In object detection,
-we usually use a *bounding box* to describe the spatial location of an object.
-The bounding box is rectangular, which is determined by the $x$ and $y$ coordinates of the upper-left corner of the rectangle and the such coordinates of the lower-right corner. 
-Another commonly used bounding box representation is the $(x, y)$-axis
-coordinates of the bounding box center, and the width and height of the box.
+ En détection d'objets,
+nous utilisons généralement une *boîte englobante* pour décrire l'emplacement spatial d'un objet.
+La boîte englobante est rectangulaire et est déterminée par les coordonnées $x$ et $y$ du coin supérieur gauche du rectangle et par les coordonnées du coin inférieur droit. 
+Une autre représentation couramment utilisée de la boîte englobante est constituée des coordonnées $(x, y)$-axe
+du centre de la boîte englobante, ainsi que de la largeur et de la hauteur de la boîte.
 
-[**Here we define functions to convert between**] these (**two
-representations**):
-`box_corner_to_center` converts from the two-corner
-representation to the center-width-height presentation,
-and `box_center_to_corner` vice versa.
-The input argument `boxes` should be a two-dimensional tensor of
-shape ($n$, 4), where $n$ is the number of bounding boxes.
+[**Nous définissons ici des fonctions pour convertir entre**] ces (**deux représentations
+**) :
+`box_corner_to_center` convertit la représentation à deux coins
+en la présentation centre-largeur-hauteur,
+et `box_center_to_corner` vice versa.
+L'argument d'entrée `boxes` doit être un tenseur bidimensionnel de la forme
+($n$, 4), où $n$ est le nombre de boîtes englobantes.
 
 ```{.python .input}
 #@tab all
@@ -115,11 +115,11 @@ def box_center_to_corner(boxes):
     return boxes
 ```
 
-We will [**define the bounding boxes of the dog and the cat in the image**] based
-on the coordinate information.
-The origin of the coordinates in the image
-is the upper-left corner of the image, and to the right and down are the
-positive directions of the $x$ and $y$ axes, respectively.
+Nous allons [**définir les boîtes englobantes du chien et du chat dans l'image**] en nous basant sur
+sur les informations de coordonnées.
+L'origine des coordonnées dans l'image
+est le coin supérieur gauche de l'image, et à droite et en bas sont les directions positives
+des axes $x$ et $y$, respectivement.
 
 ```{.python .input}
 #@tab all
@@ -127,8 +127,8 @@ positive directions of the $x$ and $y$ axes, respectively.
 dog_bbox, cat_bbox = [60.0, 45.0, 378.0, 516.0], [400.0, 112.0, 655.0, 493.0]
 ```
 
-We can verify the correctness of the two
-bounding box conversion functions by converting twice.
+Nous pouvons vérifier l'exactitude des deux fonctions de conversion de boîte englobante
+en effectuant deux conversions.
 
 ```{.python .input}
 #@tab all
@@ -136,8 +136,8 @@ boxes = d2l.tensor((dog_bbox, cat_bbox))
 box_center_to_corner(box_corner_to_center(boxes)) == boxes
 ```
 
-Let's [**draw the bounding boxes in the image**] to check if they are accurate.
-Before drawing, we will define a helper function `bbox_to_rect`. It represents the bounding box in the bounding box format of the  `matplotlib` package.
+Dessinons [**les boîtes englobantes dans l'image**] pour vérifier leur exactitude.
+Avant de dessiner, nous allons définir une fonction d'aide `bbox_to_rect`. Elle représente la boîte englobante dans le format de boîte englobante du paquet `matplotlib`.
 
 ```{.python .input}
 #@tab all
@@ -152,8 +152,8 @@ def bbox_to_rect(bbox, color):
         fill=False, edgecolor=color, linewidth=2)
 ```
 
-After adding the bounding boxes on the image,
-we can see that the main outline of the two objects are basically inside the two boxes.
+Après avoir ajouté les boîtes englobantes sur l'image,
+nous pouvons voir que le contour principal des deux objets se trouve essentiellement à l'intérieur des deux boîtes.
 
 ```{.python .input}
 #@tab all
@@ -162,15 +162,15 @@ fig.axes.add_patch(bbox_to_rect(dog_bbox, 'blue'))
 fig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));
 ```
 
-## Summary
+## Résumé
 
-* Object detection not only recognizes all the objects of interest in the image, but also their positions. The position is generally represented by a rectangular bounding box.
-* We can convert between two commonly used bounding box representations.
+* La détection d'objets ne reconnaît pas seulement tous les objets d'intérêt dans l'image, mais aussi leurs positions. La position est généralement représentée par une boîte de délimitation rectangulaire.
+* Nous pouvons convertir entre deux représentations de boîte englobante couramment utilisées.
 
-## Exercises
+## Exercices
 
-1. Find another image and try to label a bounding box that contains the object. Compare labeling bounding boxes and categories: which usually takes longer?
-1. Why is the innermost dimension of the input argument `boxes` of `box_corner_to_center` and `box_center_to_corner` always 4?
+1. Trouvez une autre image et essayez d'étiqueter une boîte englobante qui contient l'objet. Comparez l'étiquetage des boîtes englobantes et des catégories : lequel prend le plus de temps ?
+1. Pourquoi la dimension la plus intérieure de l'argument d'entrée `boxes` de `box_corner_to_center` et `box_center_to_corner` est-elle toujours 4 ?
 
 
 :begin_tab:`mxnet`

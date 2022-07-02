@@ -1,179 +1,179 @@
-# Large-Scale Pretraining with Transformers
-:label:`sec_large-pretraining-transformers`
+# Pré-entraînement à grande échelle avec des transformateurs
+:label:`sec_large-pretraining-transformers` 
 
-So far in our image classification and machine translation experiments, models were trained on datasets with input-output examples *from scratch* to perform specific tasks. For example, a transformer was trained with English-French pairs (:numref:`sec_transformer`) so that this model can translate input English text into French. As a result, each model becomes a *specific expert* that is sensitive to even slight shift in data distribution (:numref:`sec_environment-and-distribution-shift`). 
-For better generalized models, or even more competent *generalists* that can perform multiple tasks with or without adaptation, *pretraining* models on large data has been increasingly common. 
+ Jusqu'à présent, dans nos expériences de classification d'images et de traduction automatique, les modèles ont été entraînés sur des ensembles de données avec des exemples d'entrée-sortie *à partir de zéro* pour effectuer des tâches spécifiques. Par exemple, un transformateur a été entraîné avec des paires anglais-français (:numref:`sec_transformer` ) afin que ce modèle puisse traduire un texte anglais en français. En conséquence, chaque modèle devient un expert *spécifique* qui est sensible au moindre changement dans la distribution des données (:numref:`sec_environment-and-distribution-shift` ). 
+Pour obtenir des modèles mieux généralisés, ou même des *généralistes* plus compétents, capables d'effectuer plusieurs tâches avec ou sans adaptation, le *pré-entraînement* des modèles sur de grandes données est de plus en plus courant. 
 
-Given larger data for pretraining, the transformer architecture performs better with an increased model size and training compute, demonstrating superior *scaling* behavior. Specifically, performance of transformer-based language models scales as a power-law with the amount of model parameters, training tokens, and training compute :cite:`kaplan2020scaling`. The scalability of transformers is also evidenced by the significantly boosted performance from larger vision transformers trained on larger data (discussed in :numref:`sec_vision-transformer`). More recent success stories include Gato, a *generalist* model that can play Atari, caption images, chat, and act as a robot :cite:`reed2022generalist`. Gato is a single  transformer that scales well when pretrained on diverse modalities including text, images, joint torques, and button presses. Notably, all such multi-modal data is serialized into a flat sequence of tokens, which can be processed akin to text tokens (:numref:`sec_transformer`) or image patches (:numref:`sec_vision-transformer`) by transformers.
+Compte tenu de données plus importantes pour le pré-entraînement, l'architecture de transformateur est plus performante avec une taille de modèle et un calcul d'entraînement accrus, démontrant un comportement supérieur de mise à l'échelle *. Plus précisément, la performance des modèles de langage basés sur les transformateurs s'échelonne selon une loi de puissance avec la quantité de paramètres du modèle, de jetons d'entraînement et de calcul d'entraînement :cite:`kaplan2020scaling` . L'évolutivité des transformateurs est également mise en évidence par l'augmentation significative des performances des transformateurs de vision plus grands entraînés sur des données plus importantes (voir :numref:`sec_vision-transformer` ). Parmi les réussites plus récentes, citons Gato, un modèle *généraliste* capable de jouer à Atari, de légender des images, de discuter et d'agir comme un robot :cite:`reed2022generalist` . Gato est un transformateur unique qui s'adapte bien lorsqu'il est pré-entraîné sur diverses modalités, notamment du texte, des images, des couples d'articulations et des pressions sur des boutons. Notamment, toutes ces données multimodales sont sérialisées en une séquence plate de jetons, qui peuvent être traités par des transformateurs comme des jetons de texte (:numref:`sec_transformer` ) ou des patchs d'image (:numref:`sec_vision-transformer` ).
 
-Before compelling success of pretraining transformers for multi-modal data, transformers were extensively pretrained  with a wealth of text. Originally proposed for machine translation, the transformer architecture in :numref:`fig_transformer` consists of an encoder for representing input sequences and a decoder for generating target sequences. Primarily, transformers can be used in three different modes: *encoder-only*, *encoder-decoder*, and *decoder-only*. To conclude this chapter, we will review these three modes and explain the scalability in pretraining transformers.
+Avant le succès convaincant du pré-entraînement des transformateurs pour les données multimodales, les transformateurs étaient largement pré-entraînés avec une grande quantité de texte. Proposée à l'origine pour la traduction automatique, l'architecture du transformateur dans :numref:`fig_transformer` consiste en un codeur pour représenter les séquences d'entrée et un décodeur pour générer les séquences cibles. Principalement, les transformateurs peuvent être utilisés dans trois modes différents : *encodeur seulement*, *encodeur-décodeur*, et *décodeur seulement*. Pour conclure ce chapitre, nous allons passer en revue ces trois modes et expliquer l'évolutivité des transformateurs de pré-formation.
 
-## Encoder-Only
+## Encodeur uniquement
 
-When only the transformer encoder is used, a sequence of input tokens is converted into the same number of representations that can be further projected into output (e.g., classification). A transformer encoder consists of  self-attention layers, where all input tokens attend to each other. 
-For example, vision transformers depicted in :numref:`fig_vit` are encoder-only, converting a sequence of input image patches into 
-the representation of a special “&lt;cls&gt;” token. 
-Since this representation depends on all input tokens, it is further projected into classification labels. This design was inspired by an earlier encoder-only  transformer pretrained on text: BERT (Bidirectional Encoder Representations from Transformers) :cite:`Devlin.Chang.Lee.ea.2018`.
-
-
-### Pretraining BERT
-
-![Left: Pretraining BERT with masked language modeling. Prediction of the masked "love" token depends on all input tokens before and after "love". Right: Attention pattern in the transformer encoder. Each token along the vertical axis attends to all input tokens along the horizontal axis.](../img/bert-encoder-only.svg)
-:label:`fig_bert-encoder-only`
-
-BERT is pretrained on text sequences using *masked language modeling*: input text with randomly masked tokens is fed into a transformer encoder to predict the masked tokens. As illustrated in :numref:`fig_bert-encoder-only`, an original text sequence "I", "love", "this", "red", "car" is prepended with the “&lt;cls&gt;” token, and the “&lt;mask&gt;” token randomly replaces "love"; then the cross-entropy loss between the masked token "love" and its prediction is to be minimized during pretraining. Note that there is no constraint in the attention pattern of transformer encoders (right of :numref:`fig_bert-encoder-only`) so all tokens can attend to each other. Thus, prediction of "love" depends on input tokens before and after it in the sequence. This is why BERT is a "bidirectional encoder". 
-Without need for manual labeling, large-scale text data from books and Wikipedia can be used for pretraining BERT. 
+Lorsque seul l'encodeur du transformateur est utilisé, une séquence de mots en entrée est convertie en autant de représentations qui peuvent être projetées en sortie (par exemple, la classification). Un codeur transformateur est constitué de couches d'auto-attention, où tous les jetons d'entrée s'attirent les uns les autres. 
+Par exemple, les transformateurs de vision représentés sur le site :numref:`fig_vit` sont des encodeurs uniquement, convertissant une séquence de patchs d'image d'entrée en 
+la représentation d'un jeton spécial "&lt;cls&gt;". 
+Comme cette représentation dépend de tous les jetons d'entrée, elle est ensuite projetée en étiquettes de classification. Cette conception a été inspirée par un transformateur antérieur, uniquement encodeur, prétraîné sur du texte : BERT (Bidirectional Encoder Representations from Transformers) :cite:`Devlin.Chang.Lee.ea.2018` .
 
 
-### Fine-Tuning BERT
+### Pré-entraînement de BERT
 
-The pretrained BERT can be *fine-tuned* to downstream encoding tasks involving single text or text pairs. During fine-tuning, additional layers can be added to BERT with randomized parameters: these parameters and those pretrained BERT parameters will be *updated* to fit training data of downstream tasks. 
+![Left: Pretraining BERT with masked language modeling. Prediction of the masked "love" token depends on all input tokens before and after "love". Right: Attention pattern in the transformer encoder. Each token along the vertical axis attends to all input tokens along the horizontal axis.](../img/bert-encoder-only.svg) 
+ :label:`fig_bert-encoder-only` 
 
-![Fine-tuning BERT for sentiment analysis.](../img/bert-finetune-classification.svg)
-:label:`fig_bert-finetune-classification`
-
-:numref:`fig_bert-finetune-classification` illustrates fine-tuning of BERT for sentiment analysis. The transformer encoder is a pretrained BERT, which takes a text sequence as input and feeds the “&lt;cls&gt;” representation (global representation of the input) into an additional fully connected layer to predict the sentiment. During fine-tuning, the cross-entropy loss between the prediction and the label on sentiment analysis data is minimized via gradient-based algorithms, where the additional layer is trained from scratch while pretrained parameters of BERT are updated.
-BERT does more than sentiment analysis. The general language representations learned by the 350-million-parameter BERT from 250 billion training tokens advanced the state of the art for natural language tasks such as single text classification, text pair classification or regression, text tagging, and question answering.
-
-You may note that these downstream tasks include text pair understanding. BERT pretraining has another loss for predicting whether one sentence immediately follows the other. However, this loss was later found not useful when pretraining RoBERTa, a BERT variant of the same size, on 2000 billion tokens :cite:`liu2019roberta`. Other derivatives of BERT improved model architectures or pretraining objectives, such as
-ALBERT (enforcing parameter sharing) :cite:`lan2019albert`,
-SpanBERT (representing and predicting spans of text) :cite:`joshi2020spanbert`,
-DistilBERT (lightweight via knowledge distillation) :cite:`sanh2019distilbert`,
-and
-ELECTRA (replaced token detection) :cite:`clark2019electra`.
-Moreover, BERT inspired transformer pretraining in computer vision, such as with vision transformers
-:cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`, Swin transformers :cite:`liu2021swin`, and MAE (masked autoencoders) `he2022masked`.
-
-## Encoder-Decoder
-
-Since a transformer encoder converts a sequence of input tokens into the same number of output representations, the encoder-only mode cannot generate a sequence of arbitrary length like in machine translation. Originally proposed for machine translation, the transformer architecture also has a decoder that autoregressively predicts the target sequence of arbitrary length, token by token, conditional on both encoder output and decoder output:
-(i) for conditioning on encoder output, encoder-decoder cross-attention (multi-head attention of decoder in :numref:`fig_transformer`) allows target tokens to attend to *all* input tokens;
-(ii) conditioning on decoder output is achieved by a *causal* attention pattern (masked multi-head attention of decoder in :numref:`fig_transformer`), where any target token can only attend to *past* and *present* tokens in the target sequence.
-
-To pretrain encoder-decoder transformers beyond human-labeled machine translation data, BART :cite:`lewis2019bart` and T5 :cite:`raffel2020exploring` are two concurrently proposed encoder-decoder transformers pretrained on large-scale text corpora. Both attempt to reconstruct original text in their pretraining objectives,
-while the former emphasizes noising input (e.g., masking, deletion, permutation, and rotation) and the latter highlights multitask unification with comprehensive ablation studies. 
+ BERT est pré-entraîné sur des séquences de texte à l'aide de la *modélisation du langage masqué* : un texte d'entrée avec des tokens masqués de manière aléatoire est introduit dans un encodeur transformateur pour prédire les tokens masqués. Comme illustré sur :numref:`fig_bert-encoder-only` , une séquence de texte originale "I", "love", "this", "red", "car" est précédée du jeton "&lt;cls&gt;", et le jeton "&lt;mask&gt;" remplace aléatoirement "love" ; la perte d'entropie croisée entre le jeton masqué "love" et sa prédiction doit être minimisée pendant le pré-entraînement. Notez qu'il n'y a pas de contrainte dans le schéma d'attention des encodeurs transformateurs (à droite de :numref:`fig_bert-encoder-only` ), de sorte que tous les jetons peuvent s'occuper les uns des autres. Ainsi, la prédiction de "love" dépend des tokens d'entrée qui le précèdent et le suivent dans la séquence. C'est pourquoi BERT est un "codeur bidirectionnel". 
+Sans avoir besoin d'étiquetage manuel, des données textuelles à grande échelle provenant de livres et de Wikipedia peuvent être utilisées pour le pré-entraînement de BERT. 
 
 
-### Pretraining T5
+### Ajustement fin de BERT
+
+Le BERT pré-entraîné peut être *ajusté finement* pour des tâches d'encodage en aval impliquant un seul texte ou des paires de textes. Pendant le réglage fin, des couches supplémentaires peuvent être ajoutées à BERT avec des paramètres aléatoires : ces paramètres et ceux de BERT prétraîné seront *mis à jour* pour s'adapter aux données d'entraînement des tâches en aval. 
+
+![Fine-tuning BERT for sentiment analysis.](../img/bert-finetune-classification.svg) 
+ :label:`fig_bert-finetune-classification` 
+
+ :numref:`fig_bert-finetune-classification` illustre le réglage fin de BERT pour l'analyse des sentiments. Le codeur transformateur est un BERT pré-entraîné, qui prend une séquence de texte en entrée et alimente la représentation "&lt;cls&gt;" (représentation globale de l'entrée) dans une couche supplémentaire entièrement connectée pour prédire le sentiment. Pendant le réglage fin, la perte d'entropie croisée entre la prédiction et l'étiquette sur les données d'analyse des sentiments est minimisée par des algorithmes basés sur le gradient, où la couche supplémentaire est formée à partir de zéro tandis que les paramètres pré-entraînés de BERT sont mis à jour.
+BERT fait plus que de l'analyse de sentiments. Les représentations générales du langage apprises par le BERT à 350 millions de paramètres à partir de 250 milliards de tokens d'entraînement ont fait progresser l'état de l'art pour les tâches de langage naturel telles que la classification d'un seul texte, la classification ou la régression de paires de textes, le balisage de textes et la réponse aux questions.
+
+Vous pouvez noter que ces tâches en aval incluent la compréhension de paires de textes. La préformation de BERT a une autre perte pour prédire si une phrase suit immédiatement l'autre. Cependant, cette perte s'est avérée inutile lors du préentraînement de RoBERTa, une variante de BERT de même taille, sur 2000 milliards de tokens :cite:`liu2019roberta` . D'autres dérivés de BERT ont amélioré les architectures de modèles ou les objectifs de pré-entraînement, tels que
+ALBERT (qui impose le partage des paramètres) :cite:`lan2019albert` ,
+SpanBERT (représentation et prédiction de portées de texte) :cite:`joshi2020spanbert` ,
+DistilBERT (allègement par distillation des connaissances) :cite:`sanh2019distilbert` ,
+et
+ELECTRA (détection de tokens remplacés) :cite:`clark2019electra` .
+De plus, BERT a inspiré le pré-entraînement de transformateurs en vision par ordinateur, comme les transformateurs de vision
+:cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` , les transformateurs de Swin :cite:`liu2021swin` , et les MAE (autoencodeurs masqués) `he2022masked`.
+
+## Encodeur-décodeur
+
+Étant donné qu'un encodeur transformateur convertit une séquence de mots d'entrée en un même nombre de représentations de sortie, le mode encodeur seul ne peut pas générer une séquence de longueur arbitraire comme dans la traduction automatique. Proposée à l'origine pour la traduction automatique, l'architecture du transformateur comporte également un décodeur qui prédit de manière autorégressive la séquence cible de longueur arbitraire, token par token, en fonction de la sortie du codeur et de la sortie du décodeur :
+(i) pour le conditionnement de la sortie de l'encodeur, l'attention croisée de l'encodeur et du décodeur (attention multi-têtes du décodeur sur :numref:`fig_transformer` ) permet aux tokens cibles d'assister à *tous* les tokens d'entrée ;
+(ii) le conditionnement de la sortie du décodeur est réalisé par un modèle d'attention *causale* (attention multi-têtes masquée du décodeur dans :numref:`fig_transformer` ), où tout jeton cible ne peut assister qu'aux jetons *passés* et *présents* dans la séquence cible.
+
+Pour prétraîner les transformateurs codeur-décodeur au-delà des données de traduction automatique étiquetées par l'homme, BART :cite:`lewis2019bart` et T5 :cite:`raffel2020exploring` sont deux transformateurs codeur-décodeur proposés simultanément et prétraités sur des corpus de textes à grande échelle. Tous deux tentent de reconstruire le texte original dans leurs objectifs de pré-entraînement,
+tandis que le premier met l'accent sur les entrées bruyantes (par exemple, masquage, suppression, permutation et rotation) et le second sur l'unification multitâche avec des études d'ablation complètes. 
 
 
-As an example of the pretrained transformer encoder-decoder, T5 (Text-to-Text Transfer Transformer) unifies many tasks as the same text-to-text problem: for any task, the input of the encoder is a task description (e.g., "Summarize", ":") followed by task input (e.g., a sequence of tokens from an article), and the decoder predicts the task output (e.g., a sequence of tokens summarizing the input article). To perform as text-to-text, T5 is trained to generate some target text conditional on input text. 
+### Pré-entraînement T5
 
 
-![Left: Pretraining T5 by predicting consecutive spans. The original sentence is "I", "love", "this", "red", "car", where "love" is replaced by a special “&lt;X&gt;” token, and consecutive "red", "car" are replaced by a special “&lt;Y&gt;” token. The target sequence ends with a special “&lt;Z&gt;” token. Right: Attention pattern in the transformer encoder-decoder. In the encoder self-attention (lower square), all input tokens attend to each other; In the encoder-decoder cross-attention (upper rectangle), each target token attends to all input tokens; In the decoder self-attention (upper triangle), each target token  attends to present and past target tokens only (causal).](../img/t5-encoder-decoder.svg)
-:label:`fig_t5-encoder-decoder`
+ Comme exemple de transformateur-encodeur pré-entraîné, T5 (Transformateur de transfert de texte à texte) unifie de nombreuses tâches comme le même problème de texte à texte : pour toute tâche, l'entrée de l'encodeur est une description de tâche (par ex, "Summarize", " :") suivie d'une entrée de tâche (par exemple, une séquence de tokens d'un article), et le décodeur prédit la sortie de la tâche (par exemple, une séquence de tokens résumant l'article d'entrée). Pour fonctionner en tant que texte à texte, T5 est entraîné à générer un certain texte cible conditionnel au texte d'entrée. 
 
-To obtain input and output from any original text, T5 is pretrained to predict consecutive spans. Specifically, tokens from text are randomly replaced by special tokens where each consecutive span is replaced by the same special token. Consider the example in
-:numref:`fig_t5-encoder-decoder`, where the original text is "I", "love", "this", "red", "car". Tokens "love", "red", "car" are randomly replaced by special tokens. Since "red" and "car" are a consecutive span, they are replaced by the same special token. As a result, the input sequence is "I", "&lt;X&gt;", "this", "&lt;Y&gt;", and the target sequence is "&lt;X&gt;", "love", "&lt;Y&gt;", "red", "car", "&lt;Z&gt;", where "&lt;Z&gt;" is another special token marking the end. As shown in :numref:`fig_t5-encoder-decoder`, the decoder has a causal attention pattern to prevent itself from attending to future tokens during sequence prediction. 
 
-In T5, predicting consecutive span is also referred to as reconstructing corrupted text. With this objective, T5 is pretrained with 1000 billion tokens from the C4 (Colossal Clean Crawled Corpus) data, which consists of clean English text from the Web :cite:`raffel2020exploring`.
+![Left: Pretraining T5 by predicting consecutive spans. The original sentence is "I", "love", "this", "red", "car", where "love" is replaced by a special “&lt;X&gt;” token, and consecutive "red", "car" are replaced by a special “&lt;Y&gt;” token. The target sequence ends with a special “&lt;Z&gt;” token. Right: Attention pattern in the transformer encoder-decoder. In the encoder self-attention (lower square) dans l'attention croisée codeur-décodeur (rectangle supérieur), chaque jeton cible est attentif à tous les jetons d'entrée ; dans l'auto-attention du décodeur (triangle supérieur), chaque jeton cible est attentif uniquement aux jetons cibles présents et passés (causal).](../img/t5-encoder-decoder.svg)
+:label:`fig_t5-encoder-decoder` 
 
-### Fine-Tuning T5
+ Pour obtenir l'entrée et la sortie de n'importe quel texte original, T5 est pré-entraîné à prédire des espaces consécutifs. Plus précisément, les tokens du texte sont remplacés de manière aléatoire par des tokens spéciaux où chaque span consécutif est remplacé par le même token spécial. Prenons l'exemple de
+:numref:`fig_t5-encoder-decoder` , où le texte original est " I ", " love ", " this ", " red ", " car ". Les jetons "amour", "rouge", "voiture" sont remplacés au hasard par des jetons spéciaux. Puisque "rouge" et "voiture" sont consécutifs, ils sont remplacés par le même jeton spécial. En conséquence, la séquence d'entrée est "I", "&lt;X&gt;", "this", "&lt;Y&gt;", et la séquence cible est "&lt;X&gt;", "love", "&lt;Y&gt;", "red", "car", "&lt;Z&gt;", où "&lt;Z&gt;" est un autre jeton spécial marquant la fin. Comme le montre le site :numref:`fig_t5-encoder-decoder` , le décodeur dispose d'un schéma d'attention causale pour s'empêcher de s'occuper des jetons futurs pendant la prédiction de la séquence. 
 
-Similar to BERT, T5 needs to be fine-tuned (updating T5 parameters) on task-specific training data to perform this task. Major differences from BERT fine-tuning include: (i) T5 input includes task descriptions; (ii) T5 can generate sequences with arbitrary length with its transformer decoder; (iii) No additional layers are required. 
+Dans le T5, la prédiction de l'empan consécutif est également appelée reconstruction du texte corrompu. Dans cet objectif, T5 est pré-entraîné avec 1000 milliards de tokens provenant des données C4 (Colossal Clean Crawled Corpus), qui consiste en un texte anglais propre provenant du Web :cite:`raffel2020exploring` .
 
-![Fine-tuning T5 for text summarization. Both the task description and article tokens are fed into the transformer encoder for predicting the summary.](../img/t5-finetune-summarization.svg)
-:label:`fig_t5-finetune-summarization`
+### Ajustement fin de T5
 
-:numref:`fig_t5-finetune-summarization` explains fine-tuning T5 using text summarization as an example. In this downstream task, the task description tokens "Summarize", ":" followed by the article tokens are input to the encoder. 
+Comme pour BERT, T5 doit être ajusté (mise à jour des paramètres de T5) sur des données d'entraînement spécifiques à la tâche afin de réaliser cette tâche. Les principales différences par rapport au réglage fin de BERT sont les suivantes : (i) l'entrée de T5 comprend des descriptions de tâches ; (ii) T5 peut générer des séquences de longueur arbitraire avec son décodeur transformateur ; (iii) aucune couche supplémentaire n'est nécessaire. 
 
-After fine-tuning, the 11-billion-parameter T5 (T5-11B) achieved state-of-the-art results on multiple encoding (e.g., classification) and generation (e.g., summarization) benchmarks. Since released, T5 has been extensively used in later research. For example, switch transformers are designed based off T5 to activate a subset of the parameters for better computational efficiency :cite:`fedus2022switch`. In a text-to-image model called Imagen,
-text is input to a frozen T5 encoder (T5-XXL) with 4.6 billion  parameters :cite:`saharia2022photorealistic`. The photorealistic text-to-image examples in :numref:`fig_imagen` suggest that the T5 encoder alone may effectively represent text even without fine-tuning.
+![Fine-tuning T5 for text summarization. Both the task description and article tokens are fed into the transformer encoder for predicting the summary.](../img/t5-finetune-summarization.svg) 
+ :label:`fig_t5-finetune-summarization` 
+
+ :numref:`fig_t5-finetune-summarization` explique le réglage fin de T5 en utilisant le résumé de texte comme exemple. Dans cette tâche en aval, les tokens de description de tâche "Summarize", " :" suivis des tokens d'article sont entrés dans l'encodeur. 
+
+Après un réglage fin, le T5 (T5-11B), qui compte 11 milliards de paramètres, a obtenu des résultats à la pointe de la technologie dans de nombreux tests d'encodage (par exemple, la classification) et de génération (par exemple, le résumé). Depuis sa sortie, le T5 a été largement utilisé dans des recherches ultérieures. Par exemple, des transformateurs de commutation sont conçus sur la base de T5 pour activer un sous-ensemble de paramètres pour une meilleure efficacité de calcul :cite:`fedus2022switch` . Dans un modèle de conversion texte-image appelé Imagen, le texte
+est entré dans un codeur T5 gelé (T5-XXL) avec 4,6 milliards de paramètres :cite:`saharia2022photorealistic` . Les exemples photoréalistes de conversion texte-image présentés sur :numref:`fig_imagen` suggèrent que le codeur T5 seul peut représenter efficacement le texte, même sans réglage fin.
 
 ![Text-to-image examples by the Imagen model, whose text encoder is from T5 (figures taken from :cite:`saharia2022photorealistic`).](../img/imagen.png)
-:width:`700px`
-:label:`fig_imagen`
+:width:`700px` 
+ :label:`fig_imagen` 
+
+ 
+ ## Décodeur seul 
 
 
-## Decoder-Only 
-
-
-We have reviewed encoder-only and encoder-decoder transformers. Alternatively, decoder-only transformers remove the entire encoder and the decoder sublayer with the encoder-decoder cross-attention from the original encoder-decoder architecture depicted in :numref:`fig_transformer`. Nowadays, decoder-only transformers have been the de facto architecture in large-scale language modeling (:numref:`sec_language-model`), which leverages the world's abundant unlabeled text corpora via self-supervised learning.
+ Nous avons examiné les transformateurs codeur seul et codeur-décodeur. Les transformateurs de décodeur uniquement suppriment l'ensemble du codeur et la sous-couche de décodeur avec l'attention croisée codeur-décodeur de l'architecture originale codeur-décodeur décrite dans :numref:`fig_transformer` . Aujourd'hui, les transformateurs de décodeur seul sont devenus l'architecture de facto de la modélisation du langage à grande échelle (:numref:`sec_language-model` ), qui exploite les abondants corpus de textes non étiquetés du monde entier par le biais de l'apprentissage auto-supervisé.
 
 
 
-### GPT and GPT-2
+### GPT et GPT-2
 
-Using language modeling as the training objective, the GPT (generative pre-training) model chooses a transformer decoder as its backbone :cite:`Radford.Narasimhan.Salimans.ea.2018`. 
+En utilisant la modélisation du langage comme objectif de formation, le modèle GPT (préformation générative) choisit un décodeur de transformateur comme épine dorsale :cite:`Radford.Narasimhan.Salimans.ea.2018` . 
 
-![Left: Pretraining GPT with language modeling. The target sequence is the input sequence shifted by one token. Both “&lt;bos&gt;” and “&lt;eos&gt;” are special tokens marking the beginning and end of sequences, respectively. Right: Attention pattern in the transformer decoder. Each token along the vertical axis attends to only its past tokens along the horizontal axis (causal).](../img/gpt-decoder-only.svg)
-:label:`fig_gpt-decoder-only`
+![Left: Pretraining GPT with language modeling. The target sequence is the input sequence shifted by one token. Both “&lt;bos&gt;” and “&lt;eos&gt;” are special tokens marking the beginning and end of sequences, respectively. Right: Attention pattern in the transformer decoder. Each token along the vertical axis attends to only its past tokens along the horizontal axis (causal) .](../img/gpt-decoder-only.svg)
+:label:`fig_gpt-decoder-only` 
 
-Following the autoregressive language model training as described in :numref:`subsec_partitioning-seqs`,  :numref:`fig_gpt-decoder-only` illustrates GPT pretraining with a transformer encoder, where the target sequence is the input sequence shifted by one token. Note that the *causal* attention pattern in the transformer decoder enforces that each token can only attend to its past tokens (token-by-token prediction cannot attend to future tokens). 
+ Après l'entraînement du modèle linguistique autorégressif décrit dans :numref:`subsec_partitioning-seqs` , :numref:`fig_gpt-decoder-only` illustre le pré-entraînement GPT avec un codeur transformateur, où la séquence cible est la séquence d'entrée décalée d'un token. Notez que le modèle d'attention *causal* dans le décodeur transformateur impose que chaque token ne puisse s'occuper que de ses tokens passés (la prédiction token par token ne peut pas s'occuper des tokens futurs). 
 
 
-GPT has 100 million parameters and needs to be fine-tuned for individual downstream tasks. A much larger transformer-decoder language model, GPT-2, was introduced one year later :cite:`Radford.Wu.Child.ea.2019`. Compared with the original transformer decoder in GPT, pre-normalization (discussed in :numref:`subsec_vit-encoder`) and improved initialization and weight-scaling were adopted in GPT-2. 
-Pretrained on 40 GB of text, the 1.5-billion-parameter
-GPT-2 obtained the state-of-the-art results on language modeling benchmarks and promising results on multiple other tasks *without updating the parameters or architecture*.
+GPT a 100 millions de paramètres et doit être réglé avec précision pour les tâches individuelles en aval. Un modèle de langage transformateur-décodeur beaucoup plus grand, GPT-2, a été introduit un an plus tard :cite:`Radford.Wu.Child.ea.2019` . Par rapport au décodeur transformateur original de GPT, GPT-2 a adopté une prénormalisation (abordée dans :numref:`subsec_vit-encoder` ) ainsi qu'une initialisation et une mise à l'échelle des poids améliorées. 
+Préentraîné sur 40 Go de texte, le GPT-2 de 1,5 milliard de paramètres
+a obtenu des résultats de pointe sur des benchmarks de modélisation du langage et des résultats prometteurs sur de multiples autres tâches *sans mise à jour des paramètres ou de l'architecture*.
 
 
 ### GPT-3
 
-GPT-2 demonstrated potential of using the same language model for multiple tasks without updating the model. This is more computationally efficient than fine-tuning, which requires model updates via gradient computation.
+GPT-2 a démontré la possibilité d'utiliser le même modèle de langage pour de multiples tâches sans mettre à jour le modèle. Cette méthode est plus efficace sur le plan informatique que le réglage fin, qui nécessite des mises à jour du modèle via le calcul du gradient.
 
 
-![Zero-shot, one-shot, few-shot learning with language models (transformer decoders). No parameter update is needed.](../img/gpt-3-xshot.svg)
-:label:`fig_gpt-3-xshot`
+ ![Zero-shot, one-shot, few-shot learning with language models (transformer decoders) . Aucune mise à jour des paramètres n'est nécessaire](../img/gpt-3-xshot.svg)
+:label:`fig_gpt-3-xshot` 
 
-Before explaining the more computationally efficient use of language models without parameter update, recall :numref:`sec_rnn-scratch` that a language model can be trained to generate a text sequence conditional on some prefix text sequence. Thus, a pretrained language model may generate the task output as a sequence *without parameter update*, conditional on an input sequence with the task description, task-specific input-output examples, and a prompt (task input). This learning paradigm can be further categorized into *zero-shot*, *one-shot*, and *few-shot*, when there is no, one, or a few task-specific input-output examples, respectively (:numref:`fig_gpt-3-xshot`).
+ Avant d'expliquer l'utilisation plus efficace sur le plan informatique des modèles de langage sans mise à jour des paramètres, rappelons :numref:`sec_rnn-scratch` qu'un modèle de langage peut être entraîné à générer une séquence de texte conditionnelle à une séquence de texte préfixe. Ainsi, un modèle de langage pré-entraîné peut générer la sortie de la tâche sous la forme d'une séquence * sans mise à jour des paramètres *, conditionnée par une séquence d'entrée contenant la description de la tâche, des exemples d'entrée-sortie spécifiques à la tâche et une invite (entrée de la tâche). Ce paradigme d'apprentissage peut être subdivisé en *zero-shot*, *one-shot* et *few-shot*, lorsqu'il n'y a pas, un ou quelques exemples d'entrée-sortie spécifiques à la tâche, respectivement (:numref:`fig_gpt-3-xshot` ).
 
 
 ![Aggregate performance of GPT-3 for all 42 accuracy-denominated benchmarks (caption adapted and figure taken from :cite:`brown2020language`)](../img/gpt3-xshot-scaling.png)
-:width:`400px`
-:label:`fig_gpt3-xshot-scaling`
+:width:`400px` 
+ :label:`fig_gpt3-xshot-scaling` 
 
-These three settings were tested in GPT-3 :cite:`brown2020language`, whose largest version uses data and model size about two orders of magnitude larger than those in GPT-2. GPT-3 uses the same transformer decoder architecture in its direct predecessor GPT-2 except that attention patterns (right of :numref:`fig_gpt-decoder-only`) are sparser at alternating layers. Pretrained with 300 billion tokens, GPT-3 performs better with larger model size, where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`). Although enjoying computational efficiency, GPT-3 few-shot learning underperformed the state-of-the-art fine-tuned models that require model updates. Nonetheless, GPT-3 has powered a wide range of downstream applications [across the Web](https://gpt3demo.com/): it was generating 4.5 billions words every day around nine months of its [API](https://openai.com/api/) release.
+ Ces trois paramètres ont été testés dans GPT-3 :cite:`brown2020language` , dont la plus grande version utilise des données et un modèle de taille environ deux ordres de grandeur supérieurs à ceux de GPT-2. GPT-3 utilise la même architecture de décodeur transformateur que son prédécesseur direct, GPT-2, sauf que les modèles d'attention (à droite sur :numref:`fig_gpt-decoder-only` ) sont plus épars dans les couches alternées. Pré-entraîné avec 300 milliards de tokens, le GPT-3 est plus performant avec une taille de modèle plus importante, où la performance des "few-shots" augmente le plus rapidement (:numref:`fig_gpt3-xshot-scaling` ). Bien que bénéficiant d'une efficacité de calcul, l'apprentissage few-shot de GPT-3 est moins performant que les modèles de pointe à réglage fin qui nécessitent des mises à jour du modèle. Néanmoins, GPT-3 a alimenté un large éventail d'applications en aval [across the Web](https://gpt3demo.com/): il générait 4,5 milliards de mots par jour environ neuf mois après son lancement [API](https://openai.com/api/).
 
 ## Scalability
 
-:numref:`fig_gpt3-xshot-scaling` empirically demonstrates scalability of transformers in the GPT-3 language model. For language modeling, more comprehensive empirical studies on scalability of transformers had suggested training larger transformers with more data and compute :cite:`kaplan2020scaling`. 
+:numref:`fig_gpt3-xshot-scaling` démontre empiriquement la scalabilité des transformateurs dans le modèle de langage GPT-3. Pour la modélisation du langage, des études empiriques plus complètes sur l'évolutivité des transformateurs ont suggéré d'entraîner des transformateurs plus grands avec plus de données et de calculer :cite:`kaplan2020scaling` 
 
 ![Transformer language model performance improves smoothly as we increase the model size, dataset size, and amount of compute used for training. For optimal performance all three factors must be scaled up in tandem. Empirical performance has a power-law relationship with each individual factor when not bottlenecked by the other two (caption adapted and figure taken from :cite:`kaplan2020scaling`).](../img/scaling-power-law.png)
-:width:`700px`
-:label:`fig_scaling-power-law3`
+:width:`700px` 
+ :label:`fig_scaling-power-law3` 
 
-As shown in :numref:`fig_scaling-power-law3`, precise *power-law scaling* can be observed in the performance with respect to the model size (number of parameters, excluding embedding layers), dataset size (number of training tokens), and amount of training compute (PetaFLOP/s-days, excluding embedding layers). In general, increasing all these three factors in tandem leads to better performance. However, *how* to increase them in tandem still remains a matter of debate :cite:`hoffmann2022training`.
+ Comme le montre :numref:`fig_scaling-power-law3` , on peut observer une mise à l'échelle précise * en fonction de la taille du modèle (nombre de paramètres, à l'exclusion des couches d'intégration), de la taille de l'ensemble de données (nombre de jetons d'entraînement) et de la quantité de calculs d'entraînement (PetaFLOP/jours, à l'exclusion des couches d'intégration). En général, l'augmentation de ces trois facteurs en tandem conduit à de meilleures performances. Cependant, *comment* les augmenter en tandem reste un sujet de débat :cite:`hoffmann2022training` .
 
 ![Transformer language model training runs (figure taken from :cite:`kaplan2020scaling`).](../img/scaling-sample-conv.png)
-:width:`700px`
-:label:`fig_scaling-sample-conv`
+:width:`700px` 
+ :label:`fig_scaling-sample-conv` 
 
-Besides increased performance, large models also enjoy better sample efficiency than small models. :numref:`fig_scaling-sample-conv` shows that large models need fewer training samples (tokens processed) to perform at the same level achieved by small models, and performance is scaled smoothly with compute. 
-
-
-
-![GPT-3 performance (cross-entropy validation loss) follows a power-law trend with the amount of compute used for training. The power-law behavior observed in :cite:`kaplan2020scaling` continues for an additional two orders of magnitude with only small deviations from the
-predicted curve. Embedding parameters are excluded from compute and parameter counts (caption adapted and figure taken from :cite:`brown2020language`).](../img/scaling-gpt3.png)
-:width:`400px`
-:label:`fig_scaling-gpt3`
+ Outre l'amélioration des performances, les grands modèles bénéficient également d'une meilleure efficacité d'échantillonnage que les petits modèles. :numref:`fig_scaling-sample-conv` montre que les grands modèles ont besoin de moins d'échantillons d'entraînement (tokens traités) pour atteindre le même niveau de performance que les petits modèles, et que les performances sont mises à l'échelle de façon régulière avec le calcul. 
 
 
-The empirical scaling behaviors in :cite:`kaplan2020scaling` have been tested in subsequent large transformer models. For example, GPT-3 supported this hypothesis with two more orders of magnitude in :numref:`fig_scaling-gpt3`.
 
-The scalability of transformers in the GPT series have inspired subsequent transformer language models. While the transformer decoder in GPT-3 was largely followed in OPT (Open Pretrained Transformers) :cite:`zhang2022opt` using only 1/7th the carbon footprint of the former, the GPT-2 transformer decoder was used in training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens achieved state-of-the-art performance across the majority on about 150 diverse tasks. Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks. To continue the scaling line of language modeling, PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`.
+ ![GPT-3 performance (cross-entropy validation loss) suit une tendance de type loi de puissance avec la quantité de calcul utilisée pour l'entraînement. Le comportement de loi de puissance observé dans :cite:`kaplan2020scaling` se poursuit pour deux ordres de grandeur supplémentaires avec seulement de faibles écarts par rapport à la courbe prédite dans
+. Les paramètres d'intégration sont exclus du calcul et du décompte des paramètres (légende adaptée et figure tirée de :cite:`brown2020language` ).](../img/scaling-gpt3.png)
+:width:`400px` 
+ :label:`fig_scaling-gpt3` 
+
+ 
+ Les comportements empiriques de mise à l'échelle dans :cite:`kaplan2020scaling` ont été testés dans des modèles de grands transformateurs ultérieurs. Par exemple, GPT-3 a confirmé cette hypothèse avec deux ordres de grandeur supplémentaires dans :numref:`fig_scaling-gpt3` .
+
+L'évolutivité des transformateurs de la série GPT a inspiré les modèles de langage de transformation ultérieurs. Alors que le décodeur de transformateurs de GPT-3 a été largement suivi dans OPT (Open Pretrained Transformers) :cite:`zhang2022opt` en utilisant seulement 1/7e de l'empreinte carbone du premier, le décodeur de transformateurs de GPT-2 a été utilisé pour entraîner le NLG Megatron-Turing de 530 milliards de paramètres :cite:`smith2022using` avec 270 milliards de tokens d'entraînement. En suivant la conception GPT-2, le Gopher :cite:`rae2021scaling` de 280 milliards de paramètres, prétraité avec 300 milliards de jetons, a atteint des performances de pointe sur la majorité des tâches, sur environ 150 tâches différentes. Héritant de la même architecture et utilisant le même budget de calcul que Gopher, Chinchilla :cite:`hoffmann2022training` est un modèle nettement plus petit (70 milliards de paramètres) qui s'entraîne beaucoup plus longtemps (1,4 trillion de tokens d'entraînement), surpassant Gopher dans de nombreuses tâches. Pour poursuivre la mise à l'échelle de la modélisation du langage, PaLM (Pathway Language Model) :cite:`chowdhery2022palm` , un décodeur de transformateur de 540 milliards de paramètres avec des conceptions modifiées pré-entraînées sur 780 milliards de tokens, a dépassé les performances humaines moyennes sur le benchmark BIG-Bench :cite:`srivastava2022beyond` .
 
 
-## Summary and Discussions
+## Résumé et discussions
 
-Transformers have been pretrained as encoder-only (e.g., BERT), encoder-decoder (e.g., T5), and decoder-only (e.g., GPT series). Pretrained models may be adapted to perform different tasks with model update (e.g., fine tuning) or not (e.g., few shot). Scalability of transformers suggests that better performance benefits from larger models, more training data, and more training compute. Since transformers were first designed and pretrained for text data, this section leans slightly towards natural language processing. Nonetheless, those models discussed above can be often found in more recent models across multiple modalities. For example, 
-(i) Chinchilla :cite:`hoffmann2022training` was further extended to Flamingo :cite:`alayrac2022flamingo`, a visual language model for few-shot learning;
-(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` and the vision transformer encode text and images in CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning`, whose image and text embeddings were later adopted in the DALL-E 2 text-to-image system :cite:`ramesh2022hierarchical`. Although there has been no systematic studies on transformer scalability in multi-modal pretraining yet, a recent all-transformer text-to-image model, Parti :cite:`yu2022scaling`, shows potential of scalability across modalities:
-a larger Parti is more capable of high-fidelity image generation and content-rich text understanding (:numref:`fig_parti`).
+Les transformateurs ont été pré-entraînés en tant que codeur seulement (par exemple, BERT), codeur-décodeur (par exemple, T5) et décodeur seulement (par exemple, série GPT). Les modèles pré-entraînés peuvent être adaptés pour effectuer différentes tâches avec une mise à jour du modèle (par exemple, un réglage fin) ou non (par exemple, quelques tirs). L'évolutivité des transformateurs suggère que de meilleures performances bénéficient de modèles plus grands, de plus de données d'entraînement et de plus de calcul d'entraînement. Puisque les transformateurs ont d'abord été conçus et entraînés pour des données textuelles, cette section se penche légèrement sur le traitement du langage naturel. Néanmoins, les modèles discutés ci-dessus peuvent souvent être trouvés dans des modèles plus récents à travers de multiples modalités. Par exemple, 
+(i) Chinchilla :cite:`hoffmann2022training` a été étendu à Flamingo :cite:`alayrac2022flamingo` , un modèle de langage visuel pour l'apprentissage en peu de temps ;
+(ii) GPT-2 :cite:`Radford.Wu.Child.ea.2019` et le transformateur de vision encodent le texte et les images dans CLIP (Contrastive Language-Image Pre-training) :cite:`radford2021learning` , dont les images et les textes intégrés ont été adoptés plus tard dans le système texte-image DALL-E 2 :cite:`ramesh2022hierarchical` . Bien qu'il n'y ait pas encore eu d'études systématiques sur l'évolutivité des transformateurs dans le cadre d'un pré-entraînement multimodal, un récent modèle texte-image entièrement transformateur, Parti :cite:`yu2022scaling` , montre un potentiel d'évolutivité entre les modalités :
+un Parti plus grand est plus capable de générer des images de haute fidélité et de comprendre des textes riches en contenu (:numref:`fig_parti` ).
 
 
-![Image examples generated from the same text by the Parti model of increasing sizes (350M, 750M, 3B, 20B) (examples taken from :cite:`yu2022scaling`).](../img/parti.png)
+![Image examples generated from the same text by the Parti model of increasing sizes (350M, 750M, 3B, 20B) (exemples tirés de  ).](../img/parti.png)         ## Exercices 1. Est-il possible de régler finement T5 en utilisant un minilot composé de différentes tâches ? Pourquoi ou pourquoi pas ? Qu'en est-il pour GPT-2 ? 1. Étant donné un modèle de langage puissant, à quelles applications pouvez-vous penser ? 1. Supposons qu'on vous demande d'affiner un modèle de langage pour effectuer une classification de texte en ajoutant des couches supplémentaires. Où allez-vous les ajouter ? Pourquoi ? 1. Considérez les problèmes de séquence à séquence (par exemple, la traduction automatique) où la séquence d'entrée est toujours disponible pendant la prédiction de la séquence cible. Quelles pourraient être les limites de la modélisation avec des transformateurs de décodeur seulement ? Pourquoi ? :cite:`yu2022scaling`
 :width:`700px`
 :label:`fig_parti`
 
 
 
 
-## Exercises
 
-1. Is it possible to fine tune T5 using a minibatch consisting of different tasks? Why or why not? How about for GPT-2?
-1. Given a powerful language model, what applications can you think of?
-1. Say that you are asked to fine tune a language model to perform text classification by adding additional layers. Where will you add them? Why?
-1. Consider sequence to sequence problems (e.g., machine translation) where the input sequence is always available throughout the target sequence prediction. What could be limitations of modeling with decoder-only transformers? Why?
+
+
+
+
+
 
 
 [Discussions](https://discuss.d2l.ai/t/9232)

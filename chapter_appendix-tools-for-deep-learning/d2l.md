@@ -1,7 +1,7 @@
-# `d2l` API Document
-:label:`sec_d2l`
+# `d2l` Document API
+:label:`sec_d2l` 
 
-The implementations of the following members of the `d2l` package and sections where they are defined and explained can be found in the [source file](https://github.com/d2l-ai/d2l-en/tree/master/d2l).
+ Les implémentations des membres suivants du paquetage `d2l` et les sections où ils sont définis et expliqués peuvent être trouvés dans le [source file](https://github.com/d2l-ai/d2l-en/tree/master/d2l).
 
 
 :begin_tab:`mxnet`
@@ -35,7 +35,7 @@ The implementations of the following members of the `d2l` package and sections w
 
 :end_tab:
 
-## Models
+## Modèles
 
 ```eval_rst 
 
@@ -54,7 +54,7 @@ The implementations of the following members of the `d2l` package and sections w
 ```
 
 
-## Data
+## Données
 
 ```eval_rst 
 
@@ -83,7 +83,7 @@ The implementations of the following members of the `d2l` package and sections w
 ```
 
 
-## Utilities
+## Utilitaires
 
 ```eval_rst 
 

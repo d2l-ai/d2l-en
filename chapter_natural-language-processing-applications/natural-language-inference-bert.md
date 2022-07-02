@@ -1,25 +1,25 @@
-# Natural Language Inference: Fine-Tuning BERT
-:label:`sec_natural-language-inference-bert`
+# Inférence en langage naturel : Réglage fin de BERT
+:label:`sec_natural-language-inference-bert` 
 
+ 
+ Dans les sections précédentes de ce chapitre,
+nous avons conçu une architecture basée sur l'attention
+(dans :numref:`sec_natural-language-inference-attention` )
+pour la tâche d'inférence en langage naturel
+sur l'ensemble de données SNLI (comme décrit dans :numref:`sec_natural-language-inference-and-dataset` ).
+Nous revisitons maintenant cette tâche en ajustant BERT.
+Comme nous l'avons vu dans :numref:`sec_finetuning-bert` ,
+l'inférence en langage naturel est un problème de classification de paires de textes au niveau de la séquence,
+et le réglage fin de BERT ne nécessite qu'une architecture MLP supplémentaire,
+comme illustré dans :numref:`fig_nlp-map-nli-bert` .
 
-In earlier sections of this chapter,
-we have designed an attention-based architecture
-(in :numref:`sec_natural-language-inference-attention`)
-for the natural language inference task
-on the SNLI dataset (as described in :numref:`sec_natural-language-inference-and-dataset`).
-Now we revisit this task by fine-tuning BERT.
-As discussed in :numref:`sec_finetuning-bert`,
-natural language inference is a sequence-level text pair classification problem,
-and fine-tuning BERT only requires an additional MLP-based architecture,
-as illustrated in :numref:`fig_nlp-map-nli-bert`.
+![This section feeds pretrained BERT to an MLP-based architecture for natural language inference.](../img/nlp-map-nli-bert.svg) 
+ :label:`fig_nlp-map-nli-bert` 
 
-![This section feeds pretrained BERT to an MLP-based architecture for natural language inference.](../img/nlp-map-nli-bert.svg)
-:label:`fig_nlp-map-nli-bert`
-
-In this section,
-we will download a pretrained small version of BERT,
-then fine-tune it
-for natural language inference on the SNLI dataset.
+ Dans cette section,
+nous allons télécharger une petite version pré-entraînée de BERT,
+puis la régler finement
+pour l'inférence en langage naturel sur le jeu de données SNLI.
 
 ```{.python .input}
 #@tab mxnet
@@ -45,15 +45,15 @@ import os
 
 ## [**Loading Pretrained BERT**]
 
-We have explained how to pretrain BERT on the WikiText-2 dataset in
-:numref:`sec_bert-dataset` and :numref:`sec_bert-pretraining`
-(note that the original BERT model is pretrained on much bigger corpora).
-As discussed in :numref:`sec_bert-pretraining`,
-the original BERT model has hundreds of millions of parameters.
-In the following,
-we provide two versions of pretrained BERT:
-"bert.base" is about as big as the original BERT base model that requires a lot of computational resources to fine-tune,
-while "bert.small" is a small version to facilitate demonstration.
+Nous avons expliqué comment prétraîner BERT sur le jeu de données WikiText-2 dans
+:numref:`sec_bert-dataset` et :numref:`sec_bert-pretraining` 
+ (notez que le modèle BERT original est prétraîné sur des corpus beaucoup plus importants).
+Comme nous l'avons vu dans :numref:`sec_bert-pretraining` ,
+le modèle original de BERT a des centaines de millions de paramètres.
+Dans ce qui suit,
+nous fournissons deux versions de BERT pré-entraîné :
+"bert.base" est à peu près aussi grand que le modèle de base original de BERT qui nécessite beaucoup de ressources informatiques pour être ajusté finement,
+tandis que "bert.small" est une petite version pour faciliter la démonstration.
 
 ```{.python .input}
 #@tab mxnet
@@ -71,9 +71,9 @@ d2l.DATA_HUB['bert.small'] = (d2l.DATA_URL + 'bert.small.torch.zip',
                               'c72329e68a732bef0452e4b96a1c341c8910f81f')
 ```
 
-Either pretrained BERT model contains a "vocab.json" file that defines the vocabulary set
-and a "pretrained.params" file of the pretrained parameters.
-We implement the following `load_pretrained_model` function to [**load pretrained BERT parameters**].
+Chaque modèle BERT prétraîné contient un fichier "vocab.json" qui définit le jeu de vocabulaire
+et un fichier "pretrained.params" des paramètres prétraînés.
+Nous implémentons la fonction suivante `load_pretrained_model` pour [**charger les paramètres BERT prétrainés**].
 
 ```{.python .input}
 #@tab mxnet
@@ -112,9 +112,9 @@ def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
     return bert, vocab
 ```
 
-To facilitate demonstration on most of machines,
-we will load and fine-tune the small version ("bert.small") of the pretrained BERT in this section.
-In the exercise, we will show how to fine-tune the much larger "bert.base" to significantly improve the testing accuracy.
+Pour faciliter la démonstration sur la plupart des machines,
+nous chargerons et ajusterons la petite version ("bert.small") du BERT prétraîné dans cette section.
+Dans l'exercice, nous montrerons comment régler finement la version beaucoup plus grande "bert.base" pour améliorer de manière significative la précision des tests.
 
 ```{.python .input}
 #@tab all
@@ -126,19 +126,19 @@ bert, vocab = load_pretrained_model(
 
 ## [**The Dataset for Fine-Tuning BERT**]
 
-For the downstream task natural language inference on the SNLI dataset,
-we define a customized dataset class `SNLIBERTDataset`.
-In each example,
-the premise and hypothesis form a pair of text sequence
-and is packed into one BERT input sequence as depicted in :numref:`fig_bert-two-seqs`.
-Recall :numref:`subsec_bert_input_rep` that segment IDs
-are used to distinguish the premise and the hypothesis in a BERT input sequence.
-With the predefined maximum length of a BERT input sequence (`max_len`),
-the last token of the longer of the input text pair keeps getting removed until
-`max_len` is met.
-To accelerate generation of the SNLI dataset
-for fine-tuning BERT,
-we use 4 worker processes to generate training or testing examples in parallel.
+Pour la tâche en aval d'inférence en langage naturel sur le jeu de données SNLI,
+nous définissons une classe de jeu de données personnalisée `SNLIBERTDataset`.
+Dans chaque exemple,
+, la prémisse et l'hypothèse forment une paire de séquences de texte
+et sont regroupées dans une séquence d'entrée BERT, comme illustré sur :numref:`fig_bert-two-seqs` .
+Rappelons que :numref:`subsec_bert_input_rep` que les ID de segment
+sont utilisés pour distinguer la prémisse et l'hypothèse dans une séquence d'entrée d'ORET.
+Avec la longueur maximale prédéfinie d'une séquence d'entrée d'ORET (`max_len`),
+le dernier jeton de la plus longue des paires de textes d'entrée continue d'être supprimé jusqu'à ce que
+`max_len` soit atteint.
+Pour accélérer la génération de l'ensemble de données SNLI
+pour le réglage fin de BERT,
+nous utilisons 4 processus de travail pour générer des exemples d'entraînement ou de test en parallèle.
 
 ```{.python .input}
 #@tab mxnet
@@ -248,15 +248,15 @@ class SNLIBERTDataset(torch.utils.data.Dataset):
         return len(self.all_token_ids)
 ```
 
-After downloading the SNLI dataset,
-we [**generate training and testing examples**]
-by instantiating the `SNLIBERTDataset` class.
-Such examples will be read in minibatches during training and testing
-of natural language inference.
+Après avoir téléchargé le jeu de données SNLI,
+nous [**générons des exemples d'entraînement et de test**]
+en instanciant la classe `SNLIBERTDataset`.
+Ces exemples seront lus en minibatchs pendant l'entraînement et le test
+de l'inférence en langage naturel.
 
 ```{.python .input}
 #@tab mxnet
-# Reduce `batch_size` if there is an out of memory error. In the original BERT
+# Reduce `taille_batch` if there is an out of memory error. In the original BERT
 # model, `max_len` = 512
 batch_size, max_len, num_workers = 512, 128, d2l.get_dataloader_workers()
 data_dir = d2l.download_extract('SNLI')
@@ -270,7 +270,7 @@ test_iter = gluon.data.DataLoader(test_set, batch_size,
 
 ```{.python .input}
 #@tab pytorch
-# Reduce `batch_size` if there is an out of memory error. In the original BERT
+# Reduce `taille_batch` if there is an out of memory error. In the original BERT
 # model, `max_len` = 512
 batch_size, max_len, num_workers = 512, 128, d2l.get_dataloader_workers()
 data_dir = d2l.download_extract('SNLI')
@@ -282,17 +282,17 @@ test_iter = torch.utils.data.DataLoader(test_set, batch_size,
                                   num_workers=num_workers)
 ```
 
-## Fine-Tuning BERT
+## Réglage fin de BERT
 
-As :numref:`fig_bert-two-seqs` indicates,
-fine-tuning BERT for natural language inference
-requires only an extra MLP consisting of two fully connected layers
-(see `self.hidden` and `self.output` in the following `BERTClassifier` class).
-[**This MLP transforms the
-BERT representation of the special “&lt;cls&gt;” token**],
-which encodes the information of both the premise and the hypothesis,
-(**into three outputs of natural language inference**):
-entailment, contradiction, and neutral.
+Comme l'indique :numref:`fig_bert-two-seqs` ,
+réglage fin de BERT pour l'inférence en langage naturel
+ne nécessite qu'un MLP supplémentaire composé de deux couches entièrement connectées
+(voir `self.hidden` et `self.output` dans la classe suivante `BERTClassifier` ).
+[**Ce MLP transforme la représentation BERT
+du token spécial "&lt;cls&gt;"**],
+qui encode les informations de la prémisse et de l'hypothèse,
+(**en trois sorties d'inférence en langage naturel**) :
+entailment, contradiction, et neutre.
 
 ```{.python .input}
 #@tab mxnet
@@ -324,12 +324,12 @@ class BERTClassifier(nn.Module):
         return self.output(self.hidden(encoded_X[:, 0, :]))
 ```
 
-In the following,
-the pretrained BERT model `bert` is fed into the `BERTClassifier` instance `net` for
-the downstream application.
-In common implementations of BERT fine-tuning,
-only the parameters of the output layer of the additional MLP (`net.output`) will be learned from scratch.
-All the parameters of the pretrained BERT encoder (`net.encoder`) and the hidden layer of the additional MLP (`net.hidden`) will be fine-tuned.
+Dans ce qui suit,
+le modèle BERT pré-entraîné `bert` est introduit dans l'instance `BERTClassifier` `net` pour
+l'application en aval.
+Dans les implémentations courantes de l'ajustement fin de BERT,
+, seuls les paramètres de la couche de sortie du MLP supplémentaire (`net.output`) seront appris à partir de zéro.
+Tous les paramètres de l'encodeur BERT pré-entraîné (`net.encoder`) et de la couche cachée du MLP supplémentaire (`net.hidden`) seront affinés.
 
 ```{.python .input}
 #@tab mxnet
@@ -342,26 +342,26 @@ net.output.initialize(ctx=devices)
 net = BERTClassifier(bert)
 ```
 
-Recall that
-in :numref:`sec_bert`
-both the `MaskLM` class and the `NextSentencePred` class
-have parameters in their employed MLPs.
-These parameters are part of those in the pretrained BERT model
-`bert`, and thus part of parameters in `net`.
-However, such parameters are only for computing
-the masked language modeling loss
-and the next sentence prediction loss
-during pretraining.
-These two loss functions are irrelevant to fine-tuning downstream applications,
-thus the parameters of the employed MLPs in 
-`MaskLM` and `NextSentencePred` are not updated (staled) when BERT is fine-tuned.
+Rappelons que
+dans :numref:`sec_bert` 
+ la classe `MaskLM` et la classe `NextSentencePred`
+ ont des paramètres dans leurs MLP employés.
+Ces paramètres font partie de ceux du modèle BERT pré-entraîné
+`bert` , et donc des paramètres de `net`.
+Cependant, ces paramètres servent uniquement à calculer
+la perte de modélisation du langage masqué
+et la perte de prédiction de la phrase suivante
+pendant le pré-entraînement.
+Ces deux fonctions de perte ne sont pas pertinentes pour le réglage fin des applications en aval,
+. Ainsi, les paramètres des MLP utilisés dans 
+`MaskLM` et `NextSentencePred` ne sont pas mis à jour lors du réglage fin de BERT.
 
-To allow parameters with stale gradients,
-the flag `ignore_stale_grad=True` is set in the `step` function of `d2l.train_batch_ch13`.
-We use this function to train and evaluate the model `net` using the training set
-(`train_iter`) and the testing set (`test_iter`) of SNLI.
-Due to the limited computational resources, [**the training**] and testing accuracy
-can be further improved: we leave its discussions in the exercises.
+Pour autoriser les paramètres dont les gradients sont périmés,
+, l'indicateur `ignore_stale_grad=True` est activé dans la fonction `step` de `d2l.train_batch_ch13`.
+Nous utilisons cette fonction pour former et évaluer le modèle `net` en utilisant l'ensemble de formation
+(`train_iter`) et l'ensemble de test (`test_iter`) de SNLI.
+En raison des ressources de calcul limitées, [**la précision de l'entraînement**] et du test
+peut être encore améliorée : nous laissons ces discussions dans les exercices.
 
 ```{.python .input}
 #@tab mxnet
@@ -381,17 +381,17 @@ net(next(iter(train_iter))[0])
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-## Summary
+## Résumé
 
-* We can fine-tune the pretrained BERT model for downstream applications, such as natural language inference on the SNLI dataset.
-* During fine-tuning, the BERT model becomes part of the model for the downstream application. Parameters that are only related to pretraining loss will not be updated during fine-tuning. 
+* Nous pouvons affiner le modèle BERT pré-entraîné pour des applications en aval, comme l'inférence en langage naturel sur le jeu de données SNLI.
+* Pendant le réglage fin, le modèle d'ORET devient une partie du modèle de l'application en aval. Les paramètres qui sont uniquement liés à la perte de pré-entraînement ne seront pas mis à jour pendant le réglage fin. 
 
 
 
-## Exercises
+## Exercices
 
-1. Fine-tune a much larger pretrained BERT model that is about as big as the original BERT base model if your computational resource allows. Set arguments in the `load_pretrained_model` function as: replacing 'bert.small' with 'bert.base', increasing values of `num_hiddens=256`, `ffn_num_hiddens=512`, `num_heads=4`, and `num_blks=2` to 768, 3072, 12, and 12, respectively. By increasing fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.86?
-1. How to truncate a pair of sequences according to their ratio of length? Compare this pair truncation method and the one used in the `SNLIBERTDataset` class. What are their pros and cons?
+1. Ajustez un modèle BERT pré-entraîné beaucoup plus grand qui est à peu près aussi grand que le modèle de base BERT original si vos ressources informatiques le permettent. Définissez les arguments de la fonction `load_pretrained_model` comme suit : en remplaçant 'bert.small' par 'bert.base', en augmentant les valeurs de `num_hiddens=256`, `ffn_num_hiddens=512`, `num_heads=4` et `num_blks=2` à 768, 3072, 12 et 12, respectivement. En augmentant les époques de réglage fin (et éventuellement en réglant d'autres hyperparamètres), pouvez-vous obtenir une précision de test supérieure à 0,86 ?
+1. Comment tronquer une paire de séquences en fonction de leur rapport de longueur ? Comparez cette méthode de troncature de paires et celle utilisée dans la classe `SNLIBERTDataset`. Quels sont leurs avantages et leurs inconvénients ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/397)

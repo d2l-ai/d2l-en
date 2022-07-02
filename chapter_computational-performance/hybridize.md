@@ -1,7 +1,7 @@
-# Compilers and Interpreters
-:label:`sec_hybridize`
+# Compilateurs et interprètes
+:label:`sec_hybridize` 
 
-So far, this book has focused on imperative programming, which makes use of statements such as `print`, `+`, and `if` to change a program's state. Consider the following example of a simple imperative program.
+ Jusqu'à présent, ce livre s'est concentré sur la programmation impérative, qui utilise des instructions telles que `print`, `+` et `if` pour modifier l'état d'un programme. Considérons l'exemple suivant d'un programme impératif simple.
 
 ```{.python .input}
 #@tab all
@@ -17,24 +17,24 @@ def fancy_func(a, b, c, d):
 print(fancy_func(1, 2, 3, 4))
 ```
 
-Python is an *interpreted language*. When evaluating the above `fancy_func` function it performs the operations making up the function's body *in sequence*. That is, it will evaluate `e = add(a, b)` and store the results as variable `e`, thereby changing the program's state. The next two statements `f = add(c, d)` and `g = add(e, f)` will be executed similarly, performing additions and storing the results as variables. :numref:`fig_compute_graph` illustrates the flow of data.
+Python est un langage *interprété*. Lorsqu'il évalue la fonction `fancy_func` ci-dessus, il exécute les opérations constituant le corps de la fonction *dans l'ordre*. En d'autres termes, elle évalue `e = add(a, b)` et stocke les résultats dans la variable `e`, modifiant ainsi l'état du programme. Les deux instructions suivantes `f = add(c, d)` et `g = add(e, f)` seront exécutées de manière similaire, en effectuant des additions et en stockant les résultats sous forme de variables. :numref:`fig_compute_graph` illustre le flux de données.
 
 ![Data flow in an imperative program.](../img/computegraph.svg)
 :label:`fig_compute_graph`
 
-Although imperative programming is convenient, it may be inefficient. On the one hand, even if the `add` function is repeatedly called throughout `fancy_func`, Python will execute the three function calls individually. If these are executed, say, on a GPU (or even on multiple GPUs), the overhead arising from the Python interpreter can become overwhelming. Moreover, it will need to save the variable values of `e` and `f` until all the statements in `fancy_func` have been executed. This is because we do not know whether the variables `e` and `f` will be used by other parts of the program after the statements `e = add(a, b)` and `f = add(c, d)` are executed.
+Bien que la programmation impérative soit pratique, elle peut être inefficace. D'une part, même si la fonction `add` est appelée à plusieurs reprises tout au long de `fancy_func`, Python exécutera les trois appels de fonction individuellement. Si ceux-ci sont exécutés, par exemple, sur un GPU (ou même sur plusieurs GPU), la surcharge due à l'interpréteur Python peut devenir écrasante. De plus, il devra sauvegarder les valeurs des variables de `e` et `f` jusqu'à ce que toutes les instructions de `fancy_func` aient été exécutées. En effet, nous ne savons pas si les variables `e` et `f` seront utilisées par d'autres parties du programme après l'exécution des instructions `e = add(a, b)` et `f = add(c, d)`.
 
-## Symbolic Programming
+## Programmation symbolique
 
-Consider the alternative, *symbolic programming*, where computation is usually performed only once the process has been fully defined. This strategy is used by multiple deep learning frameworks, including Theano and TensorFlow (the latter has acquired imperative extensions). It usually involves the following steps:
+Considérez l'alternative, la programmation *symbolique*, où le calcul n'est généralement effectué qu'une fois le processus entièrement défini. Cette stratégie est utilisée par plusieurs cadres d'apprentissage profond, notamment Theano et TensorFlow (ce dernier a acquis des extensions impératives). Elle implique généralement les étapes suivantes :
 
-1. Define the operations to be executed.
-1. Compile the operations into an executable program.
-1. Provide the required inputs and call the compiled program for execution.
+1. Définir les opérations à exécuter.
+1. Compiler les opérations dans un programme exécutable.
+1. Fournir les entrées requises et appeler le programme compilé pour l'exécution.
 
-This allows for a significant amount of optimization. First, we can skip the Python interpreter in many cases, thus removing a performance bottleneck that can become significant on multiple fast GPUs paired with a single Python thread on a CPU. 
-Second, a compiler might optimize and rewrite the above code into `print((1 + 2) + (3 + 4))` or even `print(10)`. This is possible since a compiler gets to see the full code before turning it into machine instructions. For instance, it can release memory (or never allocate it) whenever a variable is no longer needed. Or it can transform the code entirely into an equivalent piece.
-To get a better idea, consider the following simulation of imperative programming (it is Python after all) below.
+Cela permet une optimisation importante. Tout d'abord, nous pouvons sauter l'interpréteur Python dans de nombreux cas, éliminant ainsi un goulot d'étranglement des performances qui peut devenir important sur plusieurs GPU rapides associés à un seul thread Python sur un CPU. 
+Deuxièmement, un compilateur peut optimiser et réécrire le code ci-dessus en `print((1 + 2) + (3 + 4))` ou même `print(10)`. Cela est possible car un compilateur peut voir le code complet avant de le transformer en instructions machine. Par exemple, il peut libérer de la mémoire (ou ne jamais l'allouer) lorsqu'une variable n'est plus nécessaire. Ou encore, il peut transformer entièrement le code en un morceau équivalent.
+Pour vous faire une meilleure idée, considérez la simulation suivante de la programmation impérative (c'est Python après tout) ci-dessous.
 
 ```{.python .input}
 #@tab all
@@ -62,34 +62,34 @@ y = compile(prog, '', 'exec')
 exec(y)
 ```
 
-The differences between imperative (interpreted) programming and symbolic programming are as follows:
+Les différences entre la programmation impérative (interprétée) et la programmation symbolique sont les suivantes :
 
-* Imperative programming is easier. When imperative programming is used in Python, the majority of the code is straightforward and easy to write. It is also easier to debug imperative programming code. This is because it is easier to obtain and print all relevant intermediate variable values, or use Python's built-in debugging tools.
-* Symbolic programming is more efficient and easier to port. Symbolic programming makes it easier to optimize the code during compilation, while also having the ability to port the program into a format independent of Python. This allows the program to be run in a non-Python environment, thus avoiding any potential performance issues related to the Python interpreter.
+* La programmation impérative est plus facile. Lorsque la programmation impérative est utilisée en Python, la majorité du code est simple et facile à écrire. Il est également plus facile de déboguer le code de programmation impérative. En effet, il est plus facile d'obtenir et d'imprimer toutes les valeurs de variables intermédiaires pertinentes, ou d'utiliser les outils de débogage intégrés à Python.
+* La programmation symbolique est plus efficace et plus facile à porter. La programmation symbolique permet d'optimiser plus facilement le code lors de la compilation, tout en ayant la possibilité de porter le programme dans un format indépendant de Python. Cela permet au programme d'être exécuté dans un environnement non Python, évitant ainsi tout problème potentiel de performance lié à l'interpréteur Python.
 
 
-## Hybrid Programming
+## Programmation hybride
 
-Historically most deep learning frameworks choose between an imperative or a symbolic approach. For example, Theano, TensorFlow (inspired by the former), Keras, and CNTK formulate models symbolically. Conversely, Chainer and PyTorch take an imperative approach. An imperative mode was added to TensorFlow 2.0 and Keras in later revisions.
+Historiquement, la plupart des cadres d'apprentissage profond choisissent entre une approche impérative ou symbolique. Par exemple, Theano, TensorFlow (inspiré par le premier), Keras et CNTK formulent les modèles de manière symbolique. À l'inverse, Chainer et PyTorch adoptent une approche impérative. Un mode impératif a été ajouté à TensorFlow 2.0 et Keras dans des révisions ultérieures.
 
 :begin_tab:`mxnet`
-When designing Gluon, developers considered whether it would be possible to combine the benefits of both programming paradigms. This led to a hybrid model that lets users develop and debug with pure imperative programming, while having the ability to convert most programs into symbolic programs to be run when product-level computing performance and deployment are required.
+Lors de la conception de Gluon, les développeurs se sont demandé s'il était possible de combiner les avantages des deux paradigmes de programmation. Cela a conduit à un modèle hybride qui permet aux utilisateurs de développer et de déboguer avec une programmation impérative pure, tout en ayant la possibilité de convertir la plupart des programmes en programmes symboliques à exécuter lorsque les performances de calcul et le déploiement au niveau du produit sont requis.
 
-In practice this means that we build models using the `HybridBlock` or `HybridSequential` class. By default, either of them is executed in the same way the `Block` or `Sequential` class is executed in imperative programming. 
-The `HybridSequential` class is a subclass of `HybridBlock` (just like `Sequential` subclasses `Block`). When the `hybridize` function is called, Gluon compiles the model into the form used in symbolic programming. This allows one to optimize the computation-intensive components without sacrifices in the way a model is implemented. We will illustrate the benefits below, focusing on sequential models and blocks.
+En pratique, cela signifie que nous construisons des modèles en utilisant la classe `HybridBlock` ou `HybridSequential`. Par défaut, l'une ou l'autre de ces classes est exécutée de la même manière que la classe `Block` ou `Sequential` dans la programmation impérative. 
+La classe `HybridSequential` est une sous-classe de `HybridBlock` (tout comme `Sequential` sous-classe `Block`). Lorsque la fonction `hybridize` est appelée, Gluon compile le modèle sous la forme utilisée en programmation symbolique. Cela permet d'optimiser les composants à forte intensité de calcul sans sacrifier la manière dont le modèle est implémenté. Nous allons illustrer ces avantages ci-dessous, en nous concentrant sur les modèles et les blocs séquentiels.
 :end_tab:
 
 :begin_tab:`pytorch`
-As mentioned above, PyTorch is based on imperative programming and uses dynamic computation graphs. In an effort to leverage the portability and efficiency of symbolic programming, developers considered whether it would be possible to combine the benefits of both programming models. This led to a torchscript that lets users develop and debug using pure imperative programming, while having the ability to convert most programs into symbolic programs to be run when product-level computing performance and deployment are required.
+Comme mentionné ci-dessus, PyTorch est basé sur la programmation impérative et utilise des graphes de calcul dynamiques. Dans le but de tirer parti de la portabilité et de l'efficacité de la programmation symbolique, les développeurs se sont demandé s'il était possible de combiner les avantages des deux modèles de programmation. Cela a conduit à un torchscript qui permet aux utilisateurs de développer et de déboguer en utilisant la programmation impérative pure, tout en ayant la possibilité de convertir la plupart des programmes en programmes symboliques à exécuter lorsque les performances de calcul et le déploiement au niveau du produit sont nécessaires.
 :end_tab:
 
 :begin_tab:`tensorflow`
-The imperative programming paradigm is now the default in Tensorflow 2, a welcoming change for those new to the language. However, the same symbolic programming techniques and subsequent computational graphs still exist in TensorFlow, and can be accessed by the easy-to-use `tf.function` decorator. This brought the imperative programming paradigm to TensorFlow, allowed users to define more intuitive functions, then wrap them and compile them into computational graphs automatically using a feature the TensorFlow team refers to as [autograph](https://www.tensorflow.org/api_docs/python/tf/autograph).
+Le paradigme de la programmation impérative est désormais la valeur par défaut dans Tensorflow 2, un changement bienvenu pour ceux qui découvrent le langage. Cependant, les mêmes techniques de programmation symbolique et les graphes de calcul qui en découlent existent toujours dans TensorFlow, et on peut y accéder grâce au décorateur facile à utiliser `tf.function`. Cela a apporté le paradigme de la programmation impérative à TensorFlow, a permis aux utilisateurs de définir des fonctions plus intuitives, puis de les envelopper et de les compiler dans des graphes de calcul automatiquement en utilisant une fonctionnalité que l'équipe de TensorFlow appelle [autograph](https://www.tensorflow.org/api_docs/python/tf/autograph).
 :end_tab:
 
-## Hybridizing the `Sequential` Class
+## Hybridation de la classe `Sequential`
 
-The easiest way to get a feel for how hybridization works is to consider deep networks with multiple layers. Conventionally the Python interpreter will need to execute the code for all layers to generate an instruction that can then be forwarded to a CPU or a GPU. For a single (fast) computing device this does not cause any major issues. On the other hand, if we use an advanced 8-GPU server such as an AWS P3dn.24xlarge instance Python will struggle to keep all GPUs busy. The single-threaded Python interpreter becomes the bottleneck here. Let's see how we can address this for significant parts of the code by replacing `Sequential` with `HybridSequential`. We begin by defining a simple MLP.
+ La façon la plus simple de se faire une idée du fonctionnement de l'hybridation est de considérer des réseaux profonds à plusieurs couches. Conventionnellement, l'interpréteur Python devra exécuter le code de toutes les couches pour générer une instruction qui pourra ensuite être transmise à un CPU ou à un GPU. Pour un seul dispositif de calcul (rapide), cela ne pose pas de problème majeur. En revanche, si nous utilisons un serveur avancé à 8 GPU, comme une instance AWS P3dn.24xlarge, Python aura du mal à occuper tous les GPU. L'interpréteur Python monofilaire devient alors le goulot d'étranglement. Voyons comment nous pouvons résoudre ce problème pour des parties importantes du code en remplaçant `Sequential` par `HybridSequential`. Nous commençons par définir un MLP simple.
 
 ```{.python .input}
 #@tab mxnet
@@ -152,16 +152,16 @@ net(x)
 ```
 
 :begin_tab:`mxnet`
-By calling the `hybridize` function, we are able to compile and optimize the computation in the MLP. The model's computation result remains unchanged.
+En appelant la fonction `hybridize`, nous sommes en mesure de compiler et d'optimiser le calcul dans le MLP. Le résultat du calcul du modèle reste inchangé.
 :end_tab:
 
 :begin_tab:`pytorch`
-By converting the model using `torch.jit.script` function, we are able to compile and optimize the computation in the MLP. The model's computation result remains unchanged.
+En convertissant le modèle à l'aide de la fonction `torch.jit.script`, nous sommes en mesure de compiler et d'optimiser le calcul dans le MLP. Le résultat du calcul du modèle reste inchangé.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Formerly, all functions built in TensorFlow were built as a computational graph, and therefore JIT compiled by default. However, with the release of TensorFlow 2.X and EagerTensor, this is no longer the default behavor. 
-We cen re-enable this functionality with tf.function. tf.function is more commonly used as a function decorator, however it is possible to call it direcly as a normal python function, shown below. The model's computation result remains unchanged.
+Auparavant, toutes les fonctions construites dans TensorFlow étaient construites comme un graphe de calcul, et donc compilées en JIT par défaut. Cependant, avec la sortie de TensorFlow 2.X et EagerTensor, ce n'est plus le comportement par défaut. 
+Nous pouvons réactiver cette fonctionnalité avec tf.function. tf.function est plus communément utilisé comme décorateur de fonction, cependant il est possible de l'appeler directement comme une fonction python normale, comme montré ci-dessous. Le résultat du calcul du modèle reste inchangé.
 :end_tab:
 
 ```{.python .input}
@@ -183,21 +183,21 @@ net(x)
 ```
 
 :begin_tab:`mxnet`
-This seems almost too good to be true: simply designate a block to be `HybridSequential`, write the same code as before and invoke `hybridize`. Once this happens the network is optimized (we will benchmark the performance below). Unfortunately this does not work magically for every layer. That said, a layer will not be optimized if it inherits from the `Block` class instead of the `HybridBlock` class.
+Cela semble presque trop beau pour être vrai : il suffit de désigner un bloc pour être `HybridSequential`, d'écrire le même code que précédemment et d'invoquer `hybridize`. Une fois que cela se produit, le réseau est optimisé (nous évaluerons les performances ci-dessous). Malheureusement, cela ne fonctionne pas comme par magie pour chaque couche. Cela dit, une couche ne sera pas optimisée si elle hérite de la classe `Block` au lieu de la classe `HybridBlock`.
 :end_tab:
 
 :begin_tab:`pytorch`
-This seems almost too good to be true: write the same code as before and simply convert the model using `torch.jit.script`. Once this happens the network is optimized (we will benchmark the performance below).
+Cela semble presque trop beau pour être vrai : écrivez le même code que précédemment et convertissez simplement le modèle en utilisant `torch.jit.script`. Une fois cela fait, le réseau est optimisé (nous évaluerons les performances ci-dessous).
 :end_tab:
 
 :begin_tab:`tensorflow`
-This seems almost too good to be true: write the same code as before and simply convert the model using `tf.function`. Once this happens the network is built as a computational graph in TensorFlow's MLIR intermediate representation and is heavily optimized at the compiler level for rapid execution (we will benchmark the performance below).
-Explicitly adding the `jit_compile = True` flag to the `tf.function()` call enables XLA (Accelerated Linear Algebra) functionality in TensorFlow. XLA can further optimize JIT compiled code in certain instances. Graph-mode execution is enabled without this explicit definition, however XLA can make certain large linear algebra operations (in the vein of those we see in deep learning applications) much faster, particularly in a GPU environment.
+Cela semble presque trop beau pour être vrai : écrivez le même code que précédemment et convertissez simplement le modèle en utilisant `tf.function`. Le réseau est alors construit comme un graphe de calcul dans la représentation intermédiaire MLIR de TensorFlow et est fortement optimisé au niveau du compilateur pour une exécution rapide (nous évaluerons les performances ci-dessous).
+L'ajout explicite de l'indicateur `jit_compile = True` à l'appel `tf.function()` active la fonctionnalité XLA (Accelerated Linear Algebra) dans TensorFlow. XLA peut optimiser davantage le code compilé JIT dans certains cas. L'exécution en mode graphique est activée sans cette définition explicite, mais XLA peut rendre certaines grandes opérations d'algèbre linéaire (dans la veine de celles que nous voyons dans les applications d'apprentissage profond) beaucoup plus rapides, en particulier dans un environnement GPU.
 :end_tab:
 
-### Acceleration by Hybridization
+### Accélération par hybridation
 
-To demonstrate the performance improvement gained by compilation we compare the time needed to evaluate `net(x)` before and after hybridization. Let's define a class to measure this time first. It will come handy throughout the chapter as we set out to measure (and improve) performance.
+Pour démontrer l'amélioration des performances obtenue par la compilation, nous comparons le temps nécessaire pour évaluer `net(x)` avant et après hybridation. Définissons d'abord une classe pour mesurer ce temps. Elle nous sera utile tout au long du chapitre lorsque nous chercherons à mesurer (et à améliorer) les performances.
 
 ```{.python .input}
 #@tab all
@@ -216,15 +216,15 @@ class Benchmark:
 ```
 
 :begin_tab:`mxnet`
-Now we can invoke the network twice, once with and once without hybridization.
+Nous pouvons maintenant invoquer le réseau deux fois, une fois avec et une fois sans hybridation.
 :end_tab:
 
 :begin_tab:`pytorch`
-Now we can invoke the network twice, once with and once without torchscript.
+Maintenant, nous pouvons invoquer le réseau deux fois, une fois avec et une fois sans torchscript.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Now we can invoke the network three times, once executed eagerly, once with graph-mode execution, and again using JIT compiled XLA.
+Maintenant, nous pouvons invoquer le réseau trois fois, une fois exécuté avec empressement, une fois avec une exécution en mode graphique, et une fois encore en utilisant XLA compilé en JIT.
 :end_tab:
 
 ```{.python .input}
@@ -263,31 +263,31 @@ with Benchmark('Graph Mode'):
 ```
 
 :begin_tab:`mxnet`
-As is observed in the above results, after a `HybridSequential` instance calls the `hybridize` function, computing performance is improved through the use of symbolic programming.
+Comme on peut l'observer dans les résultats ci-dessus, après qu'une instance de `HybridSequential` ait appelé la fonction `hybridize`, les performances de calcul sont améliorées grâce à l'utilisation de la programmation symbolique.
 :end_tab:
 
 :begin_tab:`pytorch`
-As is observed in the above results, after an `nn.Sequential` instance is scripted using the `torch.jit.script` function, computing performance is improved through the use of symbolic programming.
+Comme on peut l'observer dans les résultats ci-dessus, après qu'une instance `nn.Sequential` a été scriptée en utilisant la fonction `torch.jit.script`, les performances de calcul sont améliorées par l'utilisation de la programmation symbolique.
 :end_tab:
 
 :begin_tab:`tensorflow`
-As is observed in the above results, after a `tf.keras.Sequential` instance is scripted using the `tf.function` function, computing performance is improved through the use of symbolic programming via graph-mode execution in tensorflow. 
+Comme on peut l'observer dans les résultats ci-dessus, après qu'une instance de `tf.keras.Sequential` ait été scriptée à l'aide de la fonction `tf.function`, les performances de calcul sont améliorées par l'utilisation de la programmation symbolique via l'exécution en mode graphique dans tensorflow. 
 :end_tab:
 
-### Serialization
+### Sérialisation
 
-:begin_tab:`mxnet`
-One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time the code is often faster than what can be achieved in imperative programming. Let's see the `export` function in action.
+:begin_tab:`mxnet` 
+ L'un des avantages de la compilation des modèles est que nous pouvons sérialiser (enregistrer) le modèle et ses paramètres sur le disque. Cela nous permet de stocker un modèle d'une manière qui est indépendante du langage frontal de choix. Cela nous permet de déployer des modèles formés sur d'autres appareils et d'utiliser facilement d'autres langages de programmation frontaux. En même temps, le code est souvent plus rapide que ce qui peut être réalisé en programmation impérative. Voyons la fonction `export` en action.
 :end_tab:
 
 :begin_tab:`pytorch`
-One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time the code is often faster than what can be achieved in imperative programming. Let's see the `save` function in action.
+L'un des avantages de la compilation des modèles est que nous pouvons sérialiser (enregistrer) le modèle et ses paramètres sur le disque. Cela nous permet de stocker un modèle d'une manière qui est indépendante du langage frontal de choix. Cela nous permet de déployer des modèles formés sur d'autres appareils et d'utiliser facilement d'autres langages de programmation frontaux. En même temps, le code est souvent plus rapide que ce qui peut être réalisé en programmation impérative. Voyons la fonction `save` en action.
 :end_tab:
 
 :begin_tab:`tensorflow`
-One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages or execute a trained model on a server. At the same time the code is often faster than what can be achieved in imperative programming. 
-The low-level API that allows us to save in tensorflow is `tf.saved_model`. 
-Let's see the `saved_model` instance in action.
+L'un des avantages de la compilation des modèles est que nous pouvons sérialiser (enregistrer) le modèle et ses paramètres sur le disque. Cela nous permet de stocker un modèle d'une manière qui est indépendante du langage frontal de choix. Cela nous permet de déployer des modèles formés sur d'autres appareils et d'utiliser facilement d'autres langages de programmation frontaux ou d'exécuter un modèle formé sur un serveur. En même temps, le code est souvent plus rapide que ce qui peut être réalisé en programmation impérative. 
+L'API de bas niveau qui nous permet d'enregistrer dans tensorflow est `tf.saved_model`. 
+Voyons l'instance `saved_model` en action.
 :end_tab:
 
 ```{.python .input}
@@ -310,7 +310,7 @@ tf.saved_model.save(net, 'my_mlp')
 ```
 
 :begin_tab:`mxnet`
-The model is decomposed into a (large binary) parameter file and a JSON description of the program required to execute the model computation. The files can be read by other front-end languages supported by Python or MXNet, such as C++, R, Scala, and Perl. Let's have a look at the first few lines in the model description.
+Le modèle est décomposé en un (gros fichier binaire) de paramètres et une description JSON du programme nécessaire pour exécuter le calcul du modèle. Les fichiers peuvent être lus par d'autres langages frontaux supportés par Python ou MXNet, tels que C++, R, Scala et Perl. Examinons les premières lignes de la description du modèle.
 :end_tab:
 
 ```{.python .input}
@@ -319,9 +319,9 @@ The model is decomposed into a (large binary) parameter file and a JSON descript
 ```
 
 :begin_tab:`mxnet`
-Earlier, we demonstrated that, after calling the `hybridize` function, the model is able to achieve superior computing performance and portability. Note, though that hybridization can affect model flexibility, in particular in terms of control flow. 
+Plus tôt, nous avons démontré que, après avoir appelé la fonction `hybridize`, le modèle est capable d'atteindre des performances de calcul et une portabilité supérieures. Notez cependant que l'hybridation peut affecter la flexibilité du modèle, en particulier en termes de flux de contrôle. 
 
-Besides, contrary to the `Block` instance, which needs to use the `forward` function, for a `HybridBlock` instance we need to use the `hybrid_forward` function.
+En outre, contrairement à l'instance `Block`, qui doit utiliser la fonction `forward`, pour une instance `HybridBlock`, nous devons utiliser la fonction `hybrid_forward`.
 :end_tab:
 
 ```{.python .input}
@@ -341,7 +341,7 @@ class HybridNet(nn.HybridBlock):
 ```
 
 :begin_tab:`mxnet`
-The code above implements a simple network with 4 hidden units and 2 outputs. The `hybrid_forward` function takes an additional argument `F`. This is needed since, depending on whether the code has been hybridized or not, it will use a slightly different library (`ndarray` or `symbol`) for processing. Both classes perform very similar functions and MXNet automatically determines the argument. To understand what is going on we print the arguments as part of the function invocation.
+Le code ci-dessus implémente un réseau simple avec 4 unités cachées et 2 sorties. La fonction `hybrid_forward` prend un argument supplémentaire `F`. Ceci est nécessaire car, selon que le code a été hybridé ou non, il utilisera une bibliothèque légèrement différente (`ndarray` ou `symbol`) pour le traitement. Les deux classes exécutent des fonctions très similaires et MXNet détermine automatiquement l'argument. Pour comprendre ce qui se passe, nous imprimons les arguments dans le cadre de l'invocation de la fonction.
 :end_tab:
 
 ```{.python .input}
@@ -353,7 +353,7 @@ net(x)
 ```
 
 :begin_tab:`mxnet`
-Repeating the forward computation will lead to the same output (we omit details). Now let's see what happens if we invoke the `hybridize` function.
+Répéter le calcul avant conduira au même résultat (nous omettons les détails). Voyons maintenant ce qui se passe si nous invoquons la fonction `hybridize`.
 :end_tab:
 
 ```{.python .input}
@@ -363,8 +363,8 @@ net(x)
 ```
 
 :begin_tab:`mxnet`
-Instead of using `ndarray` we now use the `symbol` module for `F`. Moreover, even though the input is of `ndarray` type, the data flowing through the network is now converted to `symbol` type as part of the compilation process. Repeating the function call leads to a surprising outcome:
-:end_tab:
+Au lieu d'utiliser `ndarray`, nous utilisons maintenant le module `symbol` pour `F`. De plus, même si l'entrée est de type `ndarray`, les données qui circulent dans le réseau sont maintenant converties en type `symbol` dans le cadre du processus de compilation. La répétition de l'appel de fonction conduit à un résultat surprenant:
+:end_tab :
 
 ```{.python .input}
 #@tab mxnet
@@ -372,32 +372,32 @@ net(x)
 ```
 
 :begin_tab:`mxnet` 
-This is quite different from what we saw previously. All print statements, as defined in `hybrid_forward`, are omitted. Indeed, after hybridization the execution of `net(x)` does not involve the Python interpreter any longer. This means that any spurious Python code is omitted (such as print statements) in favor of a much more streamlined execution and better performance. Instead, MXNet directly calls the C++ backend. Also note that some functions are not supported in the `symbol` module (e.g.,  `asnumpy`) and operations in-place such as `a += b` and `a[:] = a + b` must be rewritten as `a = a + b`. Nonetheless, compilation of models is worth the effort whenever speed matters. The benefit can range from small percentage points to more than twice the speed, depending on the complexity of the model, the speed of the CPU, and the speed and number of GPUs.
-:end_tab:
-
-## Summary
-
-
-* Imperative programming makes it easy to design new models since it is possible to write code with control flow and the ability to use a large amount of the Python software ecosystem.
-* Symbolic programming requires that we specify the program and compile it before executing it. The benefit is improved performance.
-
-:begin_tab:`mxnet` 
-* MXNet is able to combine the advantages of both approaches as needed.
-* Models constructed by the `HybridSequential` and `HybridBlock` classes are able to convert imperative programs into symbolic programs by calling the `hybridize` function.
+Ce résultat est très différent de ce que nous avons vu précédemment. Toutes les instructions print, telles que définies dans , sont omises. En effet, après l'hybridation, l'exécution de n'implique plus l'interpréteur Python. Cela signifie que tout code Python parasite est omis (comme les instructions d'impression) en faveur d'une exécution beaucoup plus rationnelle et de meilleures performances. Au lieu de cela, MXNet appelle directement le backend C++. Notez également que certaines fonctions ne sont pas prises en charge par le module (par exemple, ) et que les opérations in-place telles que et doivent être réécrites sous . Néanmoins, la compilation de modèles en vaut la peine lorsque la vitesse est importante. L'avantage peut aller de petits points de pourcentage à plus du double de la vitesse, en fonction de la complexité du modèle, de la vitesse du CPU, et de la vitesse et du nombre de GPU. ## Résumé  * La programmation impérative facilite la conception de nouveaux modèles puisqu'il est possible d'écrire du code avec un flux de contrôle et la possibilité d'utiliser une grande partie de l'écosystème logiciel Python. * La programmation symbolique nécessite de spécifier le programme et de le compiler avant de l'exécuter. L'avantage est l'amélioration des performances. * MXNet est capable de combiner les avantages des deux approches selon les besoins. * Les modèles construits par les classes et sont capables de convertir des programmes impératifs en programmes symboliques en appelant la fonction . ## Exercices     1. Ajoutez à la première ligne de la fonction de la classe de cette section. Exécutez le code et observez les erreurs que vous rencontrez. Pourquoi se produisent-elles ? 1. Que se passe-t-il si nous ajoutons le flux de contrôle, c'est-à-dire les instructions Python et dans la fonction ? 1. Passez en revue les modèles qui vous ont intéressé dans les chapitres précédents. Pouvez-vous améliorer leurs performances de calcul en les réimplantant ? 1. Passez en revue les modèles qui vous ont intéressé dans les chapitres précédents. Pouvez-vous améliorer leurs performances de calcul en les réimplantant ? `hybrid_forward` `net(x)` `symbol` `asnumpy` `a += b` `a[:] = a + b` `a = a + b`
 :end_tab:
 
 
-## Exercises
+
+
+
 
 
 :begin_tab:`mxnet` 
-1. Add `x.asnumpy()` to the first line of the `hybrid_forward` function of the `HybridNet` class in this section. Execute the code and observe the errors you encounter. Why do they happen?
-1. What happens if we add control flow, i.e., the Python statements `if` and `for` in the `hybrid_forward` function?
-1. Review the models that interest you in the previous chapters. Can you improve their computational performance by reimplementing them?
+
+ `HybridSequential` `HybridBlock` `hybridize`
+:end_tab:
+
+
+
+
+
+:begin_tab:`mxnet` 
+ `x.asnumpy()` `hybrid_forward` `HybridNet`
+ `if` `for` `hybrid_forward`
+
 :end_tab:
 
 :begin_tab:`pytorch,tensorflow` 
-1. Review the models that interest you in the previous chapters. Can you improve their computational performance by reimplementing them?
+
 :end_tab:
 
 

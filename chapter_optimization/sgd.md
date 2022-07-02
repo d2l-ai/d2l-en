@@ -1,12 +1,12 @@
-# Stochastic Gradient Descent
-:label:`sec_sgd`
+# Descente de gradient stochastique
+:label:`sec_sgd` 
 
-In earlier chapters we kept using stochastic gradient descent in our training procedure, however, without explaining why it works.
-To shed some light on it,
-we just described the basic principles of gradient descent
-in :numref:`sec_gd`.
-In this section, we go on to discuss
-*stochastic gradient descent* in greater detail.
+ Dans les chapitres précédents, nous avons continué à utiliser la descente de gradient stochastique dans notre procédure de formation, sans toutefois expliquer pourquoi elle fonctionne.
+Pour y voir plus clair,
+nous venons de décrire les principes de base de la descente de gradient
+dans :numref:`sec_gd` .
+Dans cette section, nous abordons plus en détail
+*la descente de gradient stochastique*.
 
 ```{.python .input}
 #@tab mxnet
@@ -33,34 +33,34 @@ import math
 import tensorflow as tf
 ```
 
-## Stochastic Gradient Updates
+## Mises à jour stochastiques du gradient
 
-In deep learning, the objective function is usually the average of the loss functions for each example in the training dataset.
-Given a training dataset of $n$ examples,
-we assume that $f_i(\mathbf{x})$ is the loss function
-with respect to the training example of index $i$,
-where $\mathbf{x}$ is the parameter vector.
-Then we arrive at the objective function
+En apprentissage profond, la fonction objectif est généralement la moyenne des fonctions de perte pour chaque exemple de l'ensemble de données d'apprentissage.
+Étant donné un ensemble de données d'apprentissage de $n$ exemples,
+nous supposons que $f_i(\mathbf{x})$ est la fonction de perte
+par rapport à l'exemple d'apprentissage d'indice $i$,
+où $\mathbf{x}$ est le vecteur de paramètres.
+Nous obtenons alors la fonction objectif
 
-$$f(\mathbf{x}) = \frac{1}{n} \sum_{i = 1}^n f_i(\mathbf{x}).$$
+$$f(\mathbf{x}) = \frac{1}{n} \sum_{i = 1}^n f_i(\mathbf{x}).$$ 
 
-The gradient of the objective function at $\mathbf{x}$ is computed as
+ Le gradient de la fonction objectif à $\mathbf{x}$ est calculé comme suit :
 
-$$\nabla f(\mathbf{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\mathbf{x}).$$
+$$\nabla f(\mathbf{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\mathbf{x}).$$ 
 
-If gradient descent is used, the computational cost for each independent variable iteration is $\mathcal{O}(n)$, which grows linearly with $n$. Therefore, when the  training dataset is larger, the cost of gradient descent for each iteration will be higher.
+ Si la descente de gradient est utilisée, le coût de calcul pour chaque itération de variable indépendante est $\mathcal{O}(n)$, qui croît linéairement avec $n$. Par conséquent, lorsque l'ensemble de données d'apprentissage est plus grand, le coût de la descente de gradient pour chaque itération sera plus élevé.
 
-Stochastic gradient descent (SGD) reduces computational cost at each iteration. At each iteration of stochastic gradient descent, we uniformly sample an index $i\in\{1,\ldots, n\}$ for data examples at random, and compute the gradient $\nabla f_i(\mathbf{x})$ to update $\mathbf{x}$:
+La descente de gradient stochastique (SGD) réduit le coût de calcul à chaque itération. À chaque itération de la descente de gradient stochastique, nous échantillonnons uniformément un indice $i\in\{1,\ldots, n\}$ pour les exemples de données au hasard, et calculons le gradient $\nabla f_i(\mathbf{x})$ pour mettre à jour $\mathbf{x}$:
 
-$$\mathbf{x} \leftarrow \mathbf{x} - \eta \nabla f_i(\mathbf{x}),$$
+$$\mathbf{x} \leftarrow \mathbf{x} - \eta \nabla f_i(\mathbf{x}),$$ 
 
-where $\eta$ is the learning rate. We can see that the computational cost for each iteration drops from $\mathcal{O}(n)$ of the gradient descent to the constant $\mathcal{O}(1)$. Moreover, we want to emphasize that the stochastic gradient $\nabla f_i(\mathbf{x})$ is an unbiased estimate of the full gradient $\nabla f(\mathbf{x})$ because
+ où $\eta$ est le taux d'apprentissage. Nous pouvons constater que le coût de calcul pour chaque itération diminue de $\mathcal{O}(n)$ de la descente du gradient à la constante $\mathcal{O}(1)$. De plus, nous voulons souligner que le gradient stochastique $\nabla f_i(\mathbf{x})$ est une estimation sans biais du gradient complet $\nabla f(\mathbf{x})$ car
 
-$$\mathbb{E}_i \nabla f_i(\mathbf{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\mathbf{x}) = \nabla f(\mathbf{x}).$$
+$$\mathbb{E}_i \nabla f_i(\mathbf{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\mathbf{x}) = \nabla f(\mathbf{x}).$$ 
 
-This means that, on average, the stochastic gradient is a good estimate of the gradient.
+ Cela signifie qu'en moyenne, le gradient stochastique est une bonne estimation du gradient.
 
-Now, we will compare it with gradient descent by adding random noise with a mean of 0 and a variance of 1 to the gradient to simulate a stochastic gradient descent.
+Maintenant, nous allons le comparer à la descente de gradient en ajoutant un bruit aléatoire avec une moyenne de 0 et une variance de 1 au gradient pour simuler une descente de gradient stochastique.
 
 ```{.python .input}
 #@tab all
@@ -103,13 +103,13 @@ lr = constant_lr  # Constant learning rate
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50, f_grad=f_grad))
 ```
 
-As we can see, the trajectory of the variables in the stochastic gradient descent is much more noisy than the one we observed in gradient descent in :numref:`sec_gd`. This is due to the stochastic nature of the gradient. That is, even when we arrive near the minimum, we are still subject to the uncertainty injected by the instantaneous gradient via $\eta \nabla f_i(\mathbf{x})$. Even after 50 steps the quality is still not so good. Even worse, it will not improve after additional steps (we encourage you to experiment with a larger number of steps to confirm this). This leaves us with the only alternative: change the learning rate $\eta$. However, if we pick this too small, we will not make any meaningful progress initially. On the other hand, if we pick it too large, we will not get a good solution, as seen above. The only way to resolve these conflicting goals is to reduce the learning rate *dynamically* as optimization progresses.
+Comme nous pouvons le voir, la trajectoire des variables dans la descente de gradient stochastique est beaucoup plus bruyante que celle que nous avons observée dans la descente de gradient dans :numref:`sec_gd` . Ceci est dû à la nature stochastique du gradient. C'est-à-dire que même lorsque nous arrivons près du minimum, nous sommes toujours soumis à l'incertitude injectée par le gradient instantané via $\eta \nabla f_i(\mathbf{x})$. Même après 50 étapes, la qualité n'est toujours pas très bonne. Pire encore, elle ne s'améliorera pas après des étapes supplémentaires (nous vous encourageons à expérimenter avec un plus grand nombre d'étapes pour confirmer cela). Il ne nous reste donc qu'une seule alternative : modifier le taux d'apprentissage $\eta$. Cependant, si nous le choisissons trop petit, nous ne ferons aucun progrès significatif au départ. D'autre part, si nous le choisissons trop grand, nous n'obtiendrons pas une bonne solution, comme nous l'avons vu plus haut. La seule façon de résoudre ces objectifs contradictoires est de réduire le taux d'apprentissage *dynamiquement* à mesure que l'optimisation progresse.
 
-This is also the reason for adding a learning rate function `lr` into the `sgd` step function. In the example above any functionality for learning rate scheduling lies dormant as we set the associated `lr` function to be constant.
+C'est également la raison pour laquelle on a ajouté une fonction de taux d'apprentissage `lr` dans la fonction d'étape `sgd`. Dans l'exemple ci-dessus, toute fonctionnalité de planification du taux d'apprentissage reste en sommeil, car nous avons défini la fonction `lr` associée comme étant constante.
 
-## Dynamic Learning Rate
+## Taux d'apprentissage dynamique
 
-Replacing $\eta$ with a time-dependent learning rate $\eta(t)$ adds to the complexity of controlling convergence of an optimization algorithm. In particular, we need to figure out how rapidly $\eta$ should decay. If it is too quick, we will stop optimizing prematurely. If we decrease it too slowly, we waste too much time on optimization. The following are a few basic strategies that are used in adjusting $\eta$ over time (we will discuss more advanced strategies later):
+Le remplacement de $\eta$ par un taux d'apprentissage dépendant du temps $\eta(t)$ ajoute à la complexité du contrôle de la convergence d'un algorithme d'optimisation. En particulier, nous devons déterminer à quelle vitesse $\eta$ doit décroître. S'il est trop rapide, nous arrêterons l'optimisation prématurément. Si nous la diminuons trop lentement, nous perdons trop de temps en optimisation. Voici quelques stratégies de base utilisées pour ajuster $\eta$ au fil du temps (nous aborderons plus tard des stratégies plus avancées) :
 
 $$
 \begin{aligned}
@@ -119,9 +119,9 @@ $$
 \end{aligned}
 $$
 
-In the first *piecewise constant* scenario we decrease the learning rate, e.g., whenever progress in optimization stalls. This is a common strategy for training deep networks. Alternatively we could decrease it much more aggressively by an *exponential decay*. Unfortunately this often leads to premature stopping before the algorithm has converged. A popular choice is *polynomial decay* with $\alpha = 0.5$. In the case of convex optimization there are a number of proofs that show that this rate is well behaved.
+Dans le premier scénario *constant par morceaux*, nous diminuons le taux d'apprentissage, par exemple, chaque fois que la progression de l'optimisation s'arrête. Il s'agit d'une stratégie courante pour l'entraînement des réseaux profonds. Alternativement, nous pourrions le diminuer de manière beaucoup plus agressive par une *décroissance exponentielle*. Malheureusement, cela conduit souvent à un arrêt prématuré avant que l'algorithme n'ait convergé. Un choix populaire est la décroissance *polynomiale* avec $\alpha = 0.5$. Dans le cas de l'optimisation convexe, il existe un certain nombre de preuves qui montrent que ce taux se comporte bien.
 
-Let's see what the exponential decay looks like in practice.
+Voyons à quoi ressemble la décroissance exponentielle en pratique.
 
 ```{.python .input}
 #@tab all
@@ -136,7 +136,7 @@ lr = exponential_lr
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=1000, f_grad=f_grad))
 ```
 
-As expected, the variance in the parameters is significantly reduced. However, this comes at the expense of failing to converge to the optimal solution $\mathbf{x} = (0, 0)$. Even after 1000 iteration steps are we are still very far away from the optimal solution. Indeed, the algorithm fails to converge at all. On the other hand, if we use a polynomial decay where the learning rate decays with the inverse square root of the number of steps, convergence gets better after only 50 steps.
+Comme prévu, la variance des paramètres est considérablement réduite. Cependant, cela se fait au prix de l'échec de la convergence vers la solution optimale $\mathbf{x} = (0, 0)$. Même après 1000 étapes d'itération, nous sommes encore très loin de la solution optimale. En fait, l'algorithme ne parvient pas à converger du tout. D'autre part, si nous utilisons une décroissance polynomiale où le taux d'apprentissage décroît avec la racine carrée inverse du nombre d'étapes, la convergence s'améliore après seulement 50 étapes.
 
 ```{.python .input}
 #@tab all
@@ -151,131 +151,131 @@ lr = polynomial_lr
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50, f_grad=f_grad))
 ```
 
-There exist many more choices for how to set the learning rate. For instance, we could start with a small rate, then rapidly ramp up and then decrease it again, albeit more slowly. We could even alternate between smaller and larger learning rates. There exists a large variety of such schedules. For now let's focus on learning rate schedules for which a comprehensive theoretical analysis is possible, i.e., on learning rates in a convex setting. For general nonconvex problems it is very difficult to obtain meaningful convergence guarantees, since in general minimizing nonlinear nonconvex problems is NP hard. For a survey see e.g., the excellent [lecture notes](https://www.stat.cmu.edu/~ryantibs/convexopt-F15/lectures/26-nonconvex.pdf) of Tibshirani 2015.
+Il existe de nombreuses autres possibilités pour définir le taux d'apprentissage. Par exemple, nous pouvons commencer avec un taux faible, puis l'augmenter rapidement et le diminuer à nouveau, mais plus lentement. Nous pourrions même alterner entre des taux d'apprentissage plus petits et plus grands. Il existe une grande variété de programmes de ce type. Pour l'instant, nous nous concentrons sur les programmes de taux d'apprentissage pour lesquels une analyse théorique complète est possible, c'est-à-dire sur les taux d'apprentissage dans un cadre convexe. Pour les problèmes non convexes généraux, il est très difficile d'obtenir des garanties de convergence significatives, car en général, la minimisation des problèmes non linéaires non convexes est NP difficile. Pour un aperçu, voir par exemple l'excellent [lecture notes](https://www.stat.cmu.edu/~)ryantibs/convexopt-F15/lectures/26-nonconvex.pdf) de Tibshirani 2015.
 
 
 
-## Convergence Analysis for Convex Objectives
+ ## Analyse de convergence pour les objectifs convexes
 
-The following convergence analysis of stochastic gradient descent for convex objective functions
-is optional and primarily serves to convey more intuition about the problem.
-We limit ourselves to one of the simplest proofs :cite:`Nesterov.Vial.2000`.
-Significantly more advanced proof techniques exist, e.g., whenever the objective function is particularly well behaved.
+L'analyse suivante de la convergence de la descente de gradient stochastique pour les fonctions objectifs convexes
+est facultative et sert principalement à transmettre plus d'intuition sur le problème.
+Nous nous limitons à l'une des preuves les plus simples :cite:`Nesterov.Vial.2000` .
+Des techniques de preuve beaucoup plus avancées existent, par exemple, lorsque la fonction objectif se comporte particulièrement bien.
 
 
-Suppose that the objective function $f(\boldsymbol{\xi}, \mathbf{x})$ is convex in $\mathbf{x}$
-for all $\boldsymbol{\xi}$.
-More concretely,
-we consider the stochastic gradient descent update:
+Supposons que la fonction objectif $f(\boldsymbol{\xi}, \mathbf{x})$ soit convexe dans $\mathbf{x}$
+ pour tout $\boldsymbol{\xi}$.
+Plus concrètement,
+nous considérons la mise à jour par descente de gradient stochastique :
 
-$$\mathbf{x}_{t+1} = \mathbf{x}_{t} - \eta_t \partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x}),$$
+$$\mathbf{x}_{t+1} = \mathbf{x}_{t} - \eta_t \partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x}),$$ 
 
-where $f(\boldsymbol{\xi}_t, \mathbf{x})$
-is the objective function
-with respect to the training example $\boldsymbol{\xi}_t$
-drawn from some distribution
-at step $t$ and $\mathbf{x}$ is the model parameter.
-Denote by
+ où $f(\boldsymbol{\xi}_t, \mathbf{x})$
+ est la fonction objectif
+par rapport à l'exemple d'apprentissage $\boldsymbol{\xi}_t$
+ tiré d'une certaine distribution
+à l'étape $t$ et $\mathbf{x}$ est le paramètre du modèle.
+Désignons par
 
-$$R(\mathbf{x}) = E_{\boldsymbol{\xi}}[f(\boldsymbol{\xi}, \mathbf{x})]$$
+$$R(\mathbf{x}) = E_{\boldsymbol{\xi}}[f(\boldsymbol{\xi}, \mathbf{x})]$$ 
 
-the expected risk and by $R^*$ its minimum with regard to $\mathbf{x}$. Last let $\mathbf{x}^*$ be the minimizer (we assume that it exists within the domain where $\mathbf{x}$ is defined). In this case we can track the distance between the current parameter $\mathbf{x}_t$ at time $t$ and the risk minimizer $\mathbf{x}^*$ and see whether it improves over time:
+ le risque attendu et par $R^*$ son minimum par rapport à $\mathbf{x}$. Enfin, considérons que $\mathbf{x}^*$ est le minimiseur (nous supposons qu'il existe dans le domaine où $\mathbf{x}$ est défini). Dans ce cas, nous pouvons suivre la distance entre le paramètre actuel $\mathbf{x}_t$ au moment $t$ et le minimiseur de risque $\mathbf{x}^*$ et voir si elle s'améliore avec le temps :
 
 $$\begin{aligned}    &\|\mathbf{x}_{t+1} - \mathbf{x}^*\|^2 \\ =& \|\mathbf{x}_{t} - \eta_t \partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x}) - \mathbf{x}^*\|^2 \\    =& \|\mathbf{x}_{t} - \mathbf{x}^*\|^2 + \eta_t^2 \|\partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})\|^2 - 2 \eta_t    \left\langle \mathbf{x}_t - \mathbf{x}^*, \partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})\right\rangle.   \end{aligned}$$
 :eqlabel:`eq_sgd-xt+1-xstar`
 
-We assume that the $\ell_2$ norm of stochastic gradient $\partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})$ is bounded  by some  constant $L$, hence we have that
+Nous supposons que la norme $\ell_2$ du gradient stochastique $\partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})$ est limitée par une certaine constante $L$, d'où l'équation suivante :
 
-$$\eta_t^2 \|\partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})\|^2 \leq \eta_t^2 L^2.$$
-:eqlabel:`eq_sgd-L`
+$$\eta_t^2 \|\partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})\|^2 \leq \eta_t^2 L^2.$$ 
+ :eqlabel:`eq_sgd-L` 
 
+ 
+ Nous sommes surtout intéressés par la façon dont la distance entre $\mathbf{x}_t$ et $\mathbf{x}^*$ évolue * dans l'espérance*. En fait, pour toute séquence spécifique d'étapes, la distance pourrait bien augmenter, en fonction de l'adresse $\boldsymbol{\xi}_t$ que nous rencontrons. Nous devons donc lier le produit scalaire.
+Puisque pour toute fonction convexe $f$, il est établi que
+$f(\mathbf{y}) \geq f(\mathbf{x}) + \langle f'(\mathbf{x}), \mathbf{y} - \mathbf{x} \rangle$ 
+ pour tous les $\mathbf{x}$ et $\mathbf{y}$,
+par convexité, nous avons
 
-We are mostly interested in how the distance between $\mathbf{x}_t$ and $\mathbf{x}^*$ changes *in expectation*. In fact, for any specific sequence of steps the distance might well increase, depending on whichever $\boldsymbol{\xi}_t$ we encounter. Hence we need to bound the dot product.
-Since for any convex function $f$ it holds that
-$f(\mathbf{y}) \geq f(\mathbf{x}) + \langle f'(\mathbf{x}), \mathbf{y} - \mathbf{x} \rangle$
-for all $\mathbf{x}$ and $\mathbf{y}$,
-by convexity we have
+$$f(\boldsymbol{\xi}_t, \mathbf{x}^*) \geq f(\boldsymbol{\xi}_t, \mathbf{x}_t) + \left\langle \mathbf{x}^* - \mathbf{x}_t, \partial_{\mathbf{x}} f(\boldsymbol{\xi}_t, \mathbf{x}_t) \right\rangle.$$ 
+ :eqlabel:`eq_sgd-f-xi-xstar` 
 
-$$f(\boldsymbol{\xi}_t, \mathbf{x}^*) \geq f(\boldsymbol{\xi}_t, \mathbf{x}_t) + \left\langle \mathbf{x}^* - \mathbf{x}_t, \partial_{\mathbf{x}} f(\boldsymbol{\xi}_t, \mathbf{x}_t) \right\rangle.$$
-:eqlabel:`eq_sgd-f-xi-xstar`
-
-Plugging both inequalities :eqref:`eq_sgd-L` and :eqref:`eq_sgd-f-xi-xstar` into :eqref:`eq_sgd-xt+1-xstar` we obtain a bound on the distance between parameters at time $t+1$ as follows:
+ En plaçant les deux inégalités :eqref:`eq_sgd-L` et :eqref:`eq_sgd-f-xi-xstar` dans :eqref:`eq_sgd-xt+1-xstar` , nous obtenons une limite sur la distance entre les paramètres au moment $t+1$ comme suit :
 
 $$\|\mathbf{x}_{t} - \mathbf{x}^*\|^2 - \|\mathbf{x}_{t+1} - \mathbf{x}^*\|^2 \geq 2 \eta_t (f(\boldsymbol{\xi}_t, \mathbf{x}_t) - f(\boldsymbol{\xi}_t, \mathbf{x}^*)) - \eta_t^2 L^2.$$
 :eqlabel:`eqref_sgd-xt-diff`
 
-This means that we make progress as long as the  difference between current loss and the optimal loss outweighs $\eta_t L^2/2$. Since this difference is bound to converge to zero it follows that the learning rate $\eta_t$ also needs to *vanish*.
+Cela signifie que nous progressons tant que la différence entre la perte actuelle et la perte optimale est supérieure à $\eta_t L^2/2$. Puisque cette différence doit converger vers zéro, il s'ensuit que le taux d'apprentissage $\eta_t$ doit également *disparaître*.
 
-Next we take expectations over :eqref:`eqref_sgd-xt-diff`. This yields
+Ensuite, nous prenons les attentes sur :eqref:`eqref_sgd-xt-diff` . Cela donne
 
-$$E\left[\|\mathbf{x}_{t} - \mathbf{x}^*\|^2\right] - E\left[\|\mathbf{x}_{t+1} - \mathbf{x}^*\|^2\right] \geq 2 \eta_t [E[R(\mathbf{x}_t)] - R^*] -  \eta_t^2 L^2.$$
+$$E\left[\|\mathbf{x}_{t} - \mathbf{x}^*\|^2\right] - E\left[\|\mathbf{x}_{t+1} - \mathbf{x}^*\|^2\right] \geq 2 \eta_t [E[R(\mathbf{x}_t)] - R^*] -  \eta_t^2 L^2.$$ 
 
-The last step involves summing over the inequalities for $t \in \{1, \ldots, T\}$. Since the sum telescopes and by dropping the lower term we obtain
+ La dernière étape consiste à faire la somme des inégalités pour $t \in \{1, \ldots, T\}$. Puisque la somme se télescope et en laissant tomber le terme inférieur, nous obtenons
 
-$$\|\mathbf{x}_1 - \mathbf{x}^*\|^2 \geq 2 \left (\sum_{t=1}^T   \eta_t \right) [E[R(\mathbf{x}_t)] - R^*] - L^2 \sum_{t=1}^T \eta_t^2.$$
-:eqlabel:`eq_sgd-x1-xstar`
+$$\|\mathbf{x}_1 - \mathbf{x}^*\|^2 \geq 2 \left (\sum_{t=1}^T   \eta_t \right) [E[R(\mathbf{x}_t)] - R^*] - L^2 \sum_{t=1}^T \eta_t^2.$$ 
+ :eqlabel:`eq_sgd-x1-xstar` 
 
-Note that we exploited that $\mathbf{x}_1$ is given and thus the expectation can be dropped. Last define
+ Notez que nous avons exploité le fait que $\mathbf{x}_1$ est donné et donc que l'espérance peut être abandonnée. Définissez enfin
 
-$$\bar{\mathbf{x}} \stackrel{\mathrm{def}}{=} \frac{\sum_{t=1}^T \eta_t \mathbf{x}_t}{\sum_{t=1}^T \eta_t}.$$
+$$\bar{\mathbf{x}} \stackrel{\mathrm{def}}{=} \frac{\sum_{t=1}^T \eta_t \mathbf{x}_t}{\sum_{t=1}^T \eta_t}.$$ 
 
-Since
+ Puisque
 
-$$E\left(\frac{\sum_{t=1}^T \eta_t R(\mathbf{x}_t)}{\sum_{t=1}^T \eta_t}\right) = \frac{\sum_{t=1}^T \eta_t E[R(\mathbf{x}_t)]}{\sum_{t=1}^T \eta_t} = E[R(\mathbf{x}_t)],$$
+$$E\left(\frac{\sum_{t=1}^T \eta_t R(\mathbf{x}_t)}{\sum_{t=1}^T \eta_t}\right) = \frac{\sum_{t=1}^T \eta_t E[R(\mathbf{x}_t)]}{\sum_{t=1}^T \eta_t} = E[R(\mathbf{x}_t)],$$ 
 
-by Jensen's inequality (setting $i=t$, $\alpha_i = \eta_t/\sum_{t=1}^T \eta_t$ in :eqref:`eq_jensens-inequality`) and convexity of $R$ it follows that $E[R(\mathbf{x}_t)] \geq E[R(\bar{\mathbf{x}})]$, thus
+ par l'inégalité de Jensen (en plaçant $i=t$, $\alpha_i = \eta_t/\sum_{t=1}^T \eta_t$ dans :eqref:`eq_jensens-inequality` ) et la convexité de $R$, il s'ensuit que $E[R(\mathbf{x}_t)] \geq E[R(\bar{\mathbf{x}})]$, donc
 
-$$\sum_{t=1}^T \eta_t E[R(\mathbf{x}_t)] \geq \sum_{t=1}^T \eta_t  E\left[R(\bar{\mathbf{x}})\right].$$
+$$\sum_{t=1}^T \eta_t E[R(\mathbf{x}_t)] \geq \sum_{t=1}^T \eta_t  E\left[R(\bar{\mathbf{x}})\right].$$ 
 
-Plugging this into the inequality :eqref:`eq_sgd-x1-xstar` yields the bound
+ En plaçant cela dans l'inégalité :eqref:`eq_sgd-x1-xstar` , on obtient la borne
 
 $$
 \left[E[\bar{\mathbf{x}}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t},
 $$
 
-where $r^2 \stackrel{\mathrm{def}}{=} \|\mathbf{x}_1 - \mathbf{x}^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how
-the norm of stochastic gradient is bounded ($L$) and how far away from optimality the initial parameter value is ($r$). Note that the bound is in terms of $\bar{\mathbf{x}}$ rather than $\mathbf{x}_T$. This is the case since $\bar{\mathbf{x}}$ is a smoothed version of the optimization path.
-Whenever $r, L$, and $T$ are known we can pick the learning rate $\eta = r/(L \sqrt{T})$. This yields as upper bound $rL/\sqrt{T}$. That is, we converge with rate $\mathcal{O}(1/\sqrt{T})$ to the optimal solution.
+où $r^2 \stackrel{\mathrm{def}}{=} \|\mathbf{x}_1 - \mathbf{x}^*\|^2$ est une limite sur la distance entre le choix initial des paramètres et le résultat final. En bref, la vitesse de convergence dépend de la manière dont
+la norme du gradient stochastique est bornée ($L$) et de la distance de l'optimalité de la valeur initiale du paramètre ($r$). Notez que la limite est exprimée en termes de $\bar{\mathbf{x}}$ plutôt que de $\mathbf{x}_T$, car $\bar{\mathbf{x}}$ est une version lissée du chemin d'optimisation.
+Lorsque $r, L$ et $T$ sont connus, nous pouvons choisir le taux d'apprentissage $\eta = r/(L \sqrt{T})$. Cela donne comme limite supérieure $rL/\sqrt{T}$. C'est-à-dire que nous convergeons avec le taux $\mathcal{O}(1/\sqrt{T})$ vers la solution optimale.
 
 
 
 
 
-## Stochastic Gradients and Finite Samples
+## Gradients stochastiques et échantillons finis
 
-So far we have played a bit fast and loose when it comes to talking about stochastic gradient descent. We posited that we draw instances $x_i$, typically with labels $y_i$ from some distribution $p(x, y)$ and that we use this to update the model parameters in some manner. In particular, for a finite sample size we simply argued that the discrete distribution $p(x, y) = \frac{1}{n} \sum_{i=1}^n \delta_{x_i}(x) \delta_{y_i}(y)$
-for some functions $\delta_{x_i}$ and $\delta_{y_i}$
-allows us to perform stochastic gradient descent over it.
+Jusqu'à présent, nous avons joué un peu vite et mal à propos de la descente de gradient stochastique. Nous avons postulé que nous tirons des instances $x_i$, généralement avec des étiquettes $y_i$ à partir d'une certaine distribution $p(x, y)$ et que nous les utilisons pour mettre à jour les paramètres du modèle d'une certaine manière. En particulier, pour un échantillon de taille finie, nous avons simplement affirmé que la distribution discrète $p(x, y) = \frac{1}{n} \sum_{i=1}^n \delta_{x_i}(x) \delta_{y_i}(y)$
+ pour certaines fonctions $\delta_{x_i}$ et $\delta_{y_i}$
+ nous permet d'effectuer une descente de gradient stochastique sur celle-ci.
 
-However, this is not really what we did. In the toy examples in the current section we simply added noise to an otherwise non-stochastic gradient, i.e., we pretended to have pairs $(x_i, y_i)$. It turns out that this is justified here (see the exercises for a detailed discussion). More troubling is that in all previous discussions we clearly did not do this. Instead we iterated over all instances *exactly once*. To see why this is preferable consider the converse, namely that we are sampling $n$ observations from the discrete distribution *with replacement*. The probability of choosing an element $i$ at random is $1/n$. Thus to choose it *at least* once is
+Cependant, ce n'est pas vraiment ce que nous avons fait. Dans les exemples jouets de la section actuelle, nous avons simplement ajouté du bruit à un gradient autrement non stochastique, c'est-à-dire que nous avons prétendu avoir des paires $(x_i, y_i)$. Il s'avère que cela est justifié ici (voir les exercices pour une discussion détaillée). Le plus troublant est que dans toutes les discussions précédentes, nous n'avons clairement pas fait cela. Au lieu de cela, nous avons itéré sur toutes les instances *exactement une fois*. Pour comprendre pourquoi cela est préférable, considérons l'inverse, à savoir que nous échantillonnons $n$ observations de la distribution discrète *avec remplacement*. La probabilité de choisir un élément $i$ au hasard est $1/n$. Ainsi, la probabilité de le choisir *au moins* une fois est
 
-$$P(\mathrm{choose~} i) = 1 - P(\mathrm{omit~} i) = 1 - (1-1/n)^n \approx 1-e^{-1} \approx 0.63.$$
+$$P(\mathrm{choose~)} i) = 1 - P(\mathrm{omit~)} i) = 1 - (1-1/n)^n \approx 1-e^{-1} \approx 0.63.$$ 
 
-A similar reasoning shows that the probability of picking some sample (i.e., training example) *exactly once* is given by
+ Un raisonnement similaire montre que la probabilité de choisir un certain échantillon (c'est-à-dire un exemple d'entraînement) *exactement une fois* est donnée par
 
-$${n \choose 1} \frac{1}{n} \left(1-\frac{1}{n}\right)^{n-1} = \frac{n}{n-1} \left(1-\frac{1}{n}\right)^{n} \approx e^{-1} \approx 0.37.$$
+$${n \choose 1} \frac{1}{n} \left(1-\frac{1}{n}\right)^{n-1} = \frac{n}{n-1} \left(1-\frac{1}{n}\right)^{n} \approx e^{-1} \approx 0.37.$$ 
 
-Sampling with replacement leads to an increased variance and decreased data efficiency relative to sampling *without replacement*. Hence, in practice we perform the latter (and this is the default choice throughout this book). Last note that repeated passes through the training dataset traverse it in a *different* random order.
-
-
-## Summary
-
-* For convex problems we can prove that for a wide choice of learning rates stochastic gradient descent will converge to the optimal solution.
-* For deep learning this is generally not the case. However, the analysis of convex problems gives us useful insight into how to approach optimization, namely to reduce the learning rate progressively, albeit not too quickly.
-* Problems occur when the learning rate is too small or too large. In practice  a suitable learning rate is often found only after multiple experiments.
-* When there are more examples in the training dataset, it costs more to compute each iteration for gradient descent, so stochastic gradient descent is preferred in these cases.
-* Optimality guarantees for stochastic gradient descent are in general not available in nonconvex cases since the number of local minima that require checking might well be exponential.
+ L'échantillonnage avec remplacement entraîne une augmentation de la variance et une diminution de l'efficacité des données par rapport à l'échantillonnage *sans remplacement*. Par conséquent, en pratique, nous effectuons ce dernier (et c'est le choix par défaut tout au long de ce livre). Notez enfin que les passages répétés à travers l'ensemble de données d'apprentissage le traversent dans un ordre aléatoire *différent*.
 
 
+## Résumé
+
+* Pour les problèmes convexes, nous pouvons prouver que pour un large choix de taux d'apprentissage, la descente de gradient stochastique convergera vers la solution optimale.
+* Pour l'apprentissage profond, ce n'est généralement pas le cas. Cependant, l'analyse des problèmes convexes nous donne un aperçu utile sur la façon d'aborder l'optimisation, à savoir réduire le taux d'apprentissage progressivement, mais pas trop rapidement.
+* Des problèmes surviennent lorsque le taux d'apprentissage est trop faible ou trop élevé. En pratique, un taux d'apprentissage approprié n'est souvent trouvé qu'après plusieurs expériences.
+* Lorsqu'il y a plus d'exemples dans l'ensemble de données d'apprentissage, il est plus coûteux de calculer chaque itération de la descente de gradient, de sorte que la descente de gradient stochastique est préférable dans ces cas.
+* Les garanties d'optimalité pour la descente de gradient stochastique ne sont en général pas disponibles dans les cas non convexes, car le nombre de minima locaux à vérifier peut être exponentiel.
 
 
-## Exercises
 
-1. Experiment with different learning rate schedules for stochastic gradient descent and with different numbers of iterations. In particular, plot the distance from the optimal solution $(0, 0)$ as a function of the number of iterations.
-1. Prove that for the function $f(x_1, x_2) = x_1^2 + 2 x_2^2$ adding normal noise to the gradient is equivalent to minimizing a loss function $f(\mathbf{x}, \mathbf{w}) = (x_1 - w_1)^2 + 2 (x_2 - w_2)^2$ where $\mathbf{x}$ is drawn from a normal distribution.
-1. Compare convergence of stochastic gradient descent when you sample from $\{(x_1, y_1), \ldots, (x_n, y_n)\}$ with replacement and when you sample without replacement.
-1. How would you change the stochastic gradient descent solver if some gradient (or rather some coordinate associated with it) was consistently larger than all the other gradients?
-1. Assume that $f(x) = x^2 (1 + \sin x)$. How many local minima does $f$ have? Can you change $f$ in such a way that to minimize it one needs to evaluate all the local minima?
+
+## Exercices
+
+1. Expérimentez avec différents programmes de taux d'apprentissage pour la descente de gradient stochastique et avec différents nombres d'itérations. En particulier, tracez la distance de la solution optimale $(0, 0)$ en fonction du nombre d'itérations.
+1. Prouvez que pour la fonction $f(x_1, x_2) = x_1^2 + 2 x_2^2$, ajouter un bruit normal au gradient équivaut à minimiser une fonction de perte $f(\mathbf{x}, \mathbf{w}) = (x_1 - w_1)^2 + 2 (x_2 - w_2)^2$ où $\mathbf{x}$ est tiré d'une distribution normale.
+1. Comparez la convergence de la descente de gradient stochastique lorsque vous échantillonnez dans $\{(x_1, y_1), \ldots, (x_n, y_n)\}$ avec remplacement et lorsque vous échantillonnez sans remplacement.
+1. Comment modifieriez-vous le solveur de descente de gradient stochastique si un gradient (ou plutôt une coordonnée qui lui est associée) était systématiquement plus grand que tous les autres gradients ?
+1. Supposons que $f(x) = x^2 (1 + \sin x)$. Combien de minima locaux possède $f$? Pouvez-vous modifier $f$ de telle sorte que pour le minimiser, il faille évaluer tous les minima locaux ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/352)

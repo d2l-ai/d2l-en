@@ -3,101 +3,101 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Residual Networks (ResNet) and ResNeXt
-:label:`sec_resnet`
+# Réseaux résiduels (ResNet) et ResNeXt
+:label:`sec_resnet` 
 
-As we design increasingly deeper networks it becomes imperative to understand how adding layers can increase the complexity and expressiveness of the network.
-Even more important is the ability to design networks where adding layers makes networks strictly more expressive rather than just different.
-To make some progress we need a bit of mathematics.
-
-
-## Function Classes
-
-Consider $\mathcal{F}$, the class of functions that a specific network architecture (together with learning rates and other hyperparameter settings) can reach.
-That is, for all $f \in \mathcal{F}$ there exists some set of parameters (e.g., weights and biases) that can be obtained through training on a suitable dataset.
-Let's assume that $f^*$ is the "truth" function that we really would like to find.
-If it is in $\mathcal{F}$, we are in good shape but typically we will not be quite so lucky.
-Instead, we will try to find some $f^*_\mathcal{F}$ which is our best bet within $\mathcal{F}$.
-For instance,
-given a dataset with features $\mathbf{X}$
-and labels $\mathbf{y}$,
-we might try finding it by solving the following optimization problem:
-
-$$f^*_\mathcal{F} \stackrel{\mathrm{def}}{=} \mathop{\mathrm{argmin}}_f L(\mathbf{X}, \mathbf{y}, f) \text{ subject to } f \in \mathcal{F}.$$
-
-We know that regularization :cite:`tikhonov1977solutions,morozov2012methods` may control complexity of $\mathcal{F}$
-and achieve consistency, so a larger size of training data 
-generally leads to better $f^*_\mathcal{F}$.
-It is only reasonable to assume that if we design a different and more powerful architecture $\mathcal{F}'$ we should arrive at a better outcome. In other words, we would expect that $f^*_{\mathcal{F}'}$ is "better" than $f^*_{\mathcal{F}}$. However, if $\mathcal{F} \not\subseteq \mathcal{F}'$ there is no guarantee that this should even happen. In fact, $f^*_{\mathcal{F}'}$ might well be worse.
-As illustrated by :numref:`fig_functionclasses`,
-for non-nested function classes, a larger function class does not always move closer to the "truth" function $f^*$. For instance,
-on the left of :numref:`fig_functionclasses`,
-though $\mathcal{F}_3$ is closer to $f^*$ than $\mathcal{F}_1$, $\mathcal{F}_6$ moves away and there is no guarantee that further increasing the complexity can reduce the distance from $f^*$.
-With nested function classes
-where $\mathcal{F}_1 \subseteq \ldots \subseteq \mathcal{F}_6$
-on the right of :numref:`fig_functionclasses`,
-we can avoid the aforementioned issue from the non-nested function classes.
+ À mesure que nous concevons des réseaux de plus en plus profonds, il devient impératif de comprendre comment l'ajout de couches peut accroître la complexité et l'expressivité du réseau.
+Il est encore plus important de pouvoir concevoir des réseaux où l'ajout de couches rend les réseaux strictement plus expressifs plutôt que simplement différents.
+Pour progresser, nous avons besoin d'un peu de mathématiques.
 
 
-![For non-nested function classes, a larger (indicated by area) function class does not guarantee to get closer to the "truth" function ($f^*$). This does not happen in nested function classes.](../img/functionclasses.svg)
-:label:`fig_functionclasses`
+## Classes de fonctions
 
-Thus,
-only if larger function classes contain the smaller ones are we guaranteed that increasing them strictly increases the expressive power of the network.
-For deep neural networks,
-if we can
-train the newly-added layer into an identity function $f(\mathbf{x}) = \mathbf{x}$, the new model will be as effective as the original model. As the new model may get a better solution to fit the training dataset, the added layer might make it easier to reduce training errors.
+Considérons $\mathcal{F}$, la classe de fonctions qu'une architecture de réseau spécifique (avec des taux d'apprentissage et d'autres réglages d'hyperparamètres) peut atteindre.
+Autrement dit, pour tout $f \in \mathcal{F}$, il existe un ensemble de paramètres (par exemple, les poids et les biais) qui peuvent être obtenus par l'apprentissage sur un ensemble de données approprié.
+Supposons que $f^*$ soit la fonction "vérité" que nous souhaitons réellement trouver.
+Si elle se trouve dans $\mathcal{F}$, nous sommes en bonne forme, mais nous n'aurons généralement pas cette chance.
+Au lieu de cela, nous essaierons de trouver une certaine $f^*_\mathcal{F}$ qui est notre meilleure chance dans $\mathcal{F}$.
+Par exemple,
+étant donné un ensemble de données avec des caractéristiques $\mathbf{X}$
+ et des étiquettes $\mathbf{y}$,
+nous pourrions essayer de le trouver en résolvant le problème d'optimisation suivant :
 
-This is the question that :cite:`He.Zhang.Ren.ea.2016` considered when working on very deep computer vision models.
-At the heart of their proposed *residual network* (*ResNet*) is the idea that every additional layer should
-more easily
-contain the identity function as one of its elements.
-These considerations are rather profound but they led to a surprisingly simple
-solution, a *residual block*.
-With it, ResNet won the ImageNet Large Scale Visual Recognition Challenge in 2015. The design had a profound influence on how to
-build deep neural networks.
+$$f^*_\mathcal{F} \stackrel{\mathrm{def}}{=} \mathop{\mathrm{argmin}}_f L(\mathbf{X}, \mathbf{y}, f) \text{ subject to } f \in \mathcal{F}.$$ 
 
-
-
-## (**Residual Blocks**)
-:label:`subsec_residual-blks`
-
-Let's focus on a local part of a neural network, as depicted in :numref:`fig_residual_block`. Denote the input by $\mathbf{x}$.
-We assume that the desired underlying mapping we want to obtain by learning is $f(\mathbf{x})$, to be used as input to the activation function on the top.
-On the left,
-the portion within the dotted-line box
-must directly learn the mapping $f(\mathbf{x})$.
-On the right,
-the portion within the dotted-line box
-needs to
-learn the *residual mapping* $f(\mathbf{x}) - \mathbf{x}$,
-which is how the residual block derives its name.
-If the identity mapping $f(\mathbf{x}) = \mathbf{x}$ is the desired underlying mapping,
-the residual mapping is easier to learn:
-we only need to push the weights and biases
-of the
-upper weight layer (e.g., fully connected layer and convolutional layer)
-within the dotted-line box
-to zero.
-The right figure illustrates the  *residual block* of ResNet,
-where the solid line carrying the layer input
-$\mathbf{x}$ to the addition operator
-is called a *residual connection* (or *shortcut connection*).
-With residual blocks, inputs can
-forward propagate faster through the residual connections across layers.
-In fact,
-the residual block
-can be thought of as
-a special case of the multi-branch Inception block:
-it has two branches
-one of which is the identity mapping.
-
-![In a regular block (left), the portion within the dotted-line box must directly learn the mapping $f(\mathbf{x})$. In a residual block (right), the portion within the dotted-line box needs to learn the residual mapping $f(\mathbf{x}) - \mathbf{x}$, where the identity mapping $f(\mathbf{x}) = \mathbf{x}$ is easier to learn.](../img/residual-block.svg)
-:label:`fig_residual_block`
+ Nous savons que la régularisation :cite:`tikhonov1977solutions,morozov2012methods` peut contrôler la complexité de $\mathcal{F}$
+ et atteindre la cohérence, donc une plus grande taille de données d'apprentissage 
+conduit généralement à un meilleur $f^*_\mathcal{F}$.
+Il n'est que raisonnable de supposer que si nous concevons une architecture différente et plus puissante $\mathcal{F}'$ nous devrions arriver à un meilleur résultat. En d'autres termes, nous nous attendrions à ce que $f^*_{\mathcal{F}'}$ soit "meilleur" que $f^*_{\mathcal{F}}$. Cependant, si $\mathcal{F} \not\subseteq \mathcal{F}'$, rien ne garantit que cela se produise. En fait, $f^*_{\mathcal{F}'}$ pourrait bien être pire.
+Comme l'illustre :numref:`fig_functionclasses` ,
+pour les classes de fonctions non imbriquées, une classe de fonctions plus grande ne se rapproche pas toujours de la fonction "vraie" $f^*$. Par exemple,
+à gauche de :numref:`fig_functionclasses` ,
+bien que $\mathcal{F}_3$ soit plus proche de $f^*$ que de $\mathcal{F}_1$, $\mathcal{F}_6$ s'éloigne et il n'est pas garanti qu'une augmentation supplémentaire de la complexité puisse réduire la distance par rapport à $f^*$.
+Avec les classes de fonctions imbriquées
+où $\mathcal{F}_1 \subseteq \ldots \subseteq \mathcal{F}_6$
+ à droite de :numref:`fig_functionclasses` ,
+nous pouvons éviter le problème susmentionné des classes de fonctions non imbriquées. La classe de fonctions
 
 
-ResNet follows VGG's full $3\times 3$ convolutional layer design. The residual block has two $3\times 3$ convolutional layers with the same number of output channels. Each convolutional layer is followed by a batch normalization layer and a ReLU activation function. Then, we skip these two convolution operations and add the input directly before the final ReLU activation function.
-This kind of design requires that the output of the two convolutional layers has to be of the same shape as the input, so that they can be added together. If we want to change the number of channels, we need to introduce an additional $1\times 1$ convolutional layer to transform the input into the desired shape for the addition operation. Let's have a look at the code below.
+ ![For non-nested function classes, a larger (indicated by area) ne garantit pas de se rapprocher de la fonction "vérité" ($f^*$). Cela ne se produit pas dans les classes de fonctions imbriquées.](../img/functionclasses.svg)
+:label:`fig_functionclasses` 
+
+ Ainsi,
+ce n'est que si les plus grandes classes de fonctions contiennent les plus petites que nous avons la garantie que leur augmentation augmente strictement le pouvoir expressif du réseau.
+Pour les réseaux neuronaux profonds,
+si nous pouvons former
+la couche nouvellement ajoutée à une fonction d'identité $f(\mathbf{x}) = \mathbf{x}$, le nouveau modèle sera aussi efficace que le modèle original. Comme le nouveau modèle peut obtenir une meilleure solution pour s'adapter à l'ensemble de données de formation, la couche ajoutée peut faciliter la réduction des erreurs de formation.
+
+C'est la question que :cite:`He.Zhang.Ren.ea.2016` s'est posée en travaillant sur des modèles de vision par ordinateur très profonds.
+Au cœur de leur proposition de *réseau résiduel* (*ResNet*) se trouve l'idée que chaque couche supplémentaire devrait
+plus facilement
+contenir la fonction d'identité comme l'un de ses éléments.
+Ces considérations sont assez profondes mais elles ont conduit à une solution étonnamment simple
+, un *bloc résiduel*.
+Grâce à cette solution, ResNet a remporté le concours de reconnaissance visuelle à grande échelle ImageNet en 2015. La conception a eu une profonde influence sur la façon de
+construire des réseaux neuronaux profonds.
+
+
+
+## (**Blocs résiduels**)
+:label:`subsec_residual-blks` 
+
+ Concentrons-nous sur une partie locale d'un réseau neuronal, comme illustré dans :numref:`fig_residual_block` . Désignons l'entrée par $\mathbf{x}$.
+Nous supposons que la cartographie sous-jacente souhaitée que nous voulons obtenir par apprentissage est $f(\mathbf{x})$, et qu'elle sera utilisée comme entrée de la fonction d'activation en haut.
+À gauche,
+, la partie située dans la boîte en pointillés
+doit apprendre directement le mappage $f(\mathbf{x})$.
+À droite,
+, la partie située dans la boîte en pointillés
+doit
+apprendre le mappage *résiduel* $f(\mathbf{x}) - \mathbf{x}$,
+, d'où le nom du bloc résiduel.
+Si la cartographie d'identité $f(\mathbf{x}) = \mathbf{x}$ est la cartographie sous-jacente souhaitée,
+la cartographie résiduelle est plus facile à apprendre :
+il suffit de mettre à zéro les poids et les biais
+de la couche de poids supérieure
+(par exemple, la couche entièrement connectée et la couche convolutive)
+dans la boîte en pointillés
+.
+La figure de droite illustre le *bloc résiduel* de ResNet,
+où la ligne solide portant l'entrée de la couche
+$\mathbf{x}$ à l'opérateur d'addition
+est appelée une *connexion résiduelle* (ou *connexion raccourcie*).
+Avec les blocs résiduels, les entrées peuvent
+forward se propager plus rapidement à travers les connexions résiduelles entre les couches.
+En fait,
+le bloc résiduel
+peut être considéré comme
+un cas particulier du bloc Inception multi-branches :
+il possède deux branches
+dont l'une est le mappage d'identité.
+
+![In a regular block (left) dans le bloc résiduel, la partie située dans la boîte en pointillés doit apprendre directement le mappage $f(\mathbf{x})$. Dans un bloc résiduel (à droite), la partie située dans la boîte en pointillés doit apprendre la cartographie résiduelle $f(\mathbf{x}) - \mathbf{x}$, où la cartographie d'identité $f(\mathbf{x}) = \mathbf{x}$ est plus facile à apprendre.](../img/residual-block.svg)
+:label:`fig_residual_block` 
+
+ 
+ ResNet suit la conception de la couche convolutive $3\times 3$ complète de VGG. Le bloc résiduel possède deux couches convolutionnelles $3\times 3$ avec le même nombre de canaux de sortie. Chaque couche convolutive est suivie d'une couche de normalisation de lot et d'une fonction d'activation ReLU. Ensuite, nous sautons ces deux opérations de convolution et ajoutons l'entrée directement avant la fonction d'activation ReLU finale.
+Ce type de conception nécessite que la sortie des deux couches de convolution soit de la même forme que l'entrée, afin qu'elles puissent être ajoutées ensemble. Si nous voulons changer le nombre de canaux, nous devons introduire une couche convolutive supplémentaire $1\times 1$ pour transformer l'entrée dans la forme souhaitée pour l'opération d'addition. Jetons un coup d'oeil au code ci-dessous.
 
 ```{.python .input}
 %%tab mxnet
@@ -189,12 +189,12 @@ class Residual(tf.keras.Model):  #@save
         return tf.keras.activations.relu(Y)
 ```
 
-This code generates two types of networks: one where we add the input to the output before applying the ReLU nonlinearity whenever `use_1x1conv=False`, and one where we adjust channels and resolution by means of a $1 \times 1$ convolution before adding. :numref:`fig_resnet_block` illustrates this.
+Ce code génère deux types de réseaux : un où nous ajoutons l'entrée à la sortie avant d'appliquer la non-linéarité ReLU chaque fois que `use_1x1conv=False`, et un où nous ajustons les canaux et la résolution au moyen d'une convolution $1 \times 1$ avant d'ajouter. :numref:`fig_resnet_block` illustre cela.
 
 ![ResNet block with and without $1 \times 1$ convolution, which transforms the input into the desired shape for the addition operation.](../img/resnet-block.svg)
 :label:`fig_resnet_block`
 
-Now let's look at [**a situation where the input and output are of the same shape**], where $1 \times 1$ convolution is not needed.
+Examinons maintenant [**une situation où l'entrée et la sortie ont la même forme**], où la convolution $1 \times 1$ n'est pas nécessaire.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -215,8 +215,8 @@ Y = blk(X)
 Y.shape
 ```
 
-We also have the option to [**halve the output height and width while increasing the number of output channels**].
-Since the input shape is changed, `use_1x1conv=True` is specified.
+Nous avons également la possibilité de [**réduire de moitié la hauteur et la largeur de la sortie tout en augmentant le nombre de canaux de sortie**].
+Puisque la forme de l'entrée est modifiée, `use_1x1conv=True` est spécifié.
 
 ```{.python .input}
 %%tab all
@@ -226,9 +226,9 @@ if tab.selected('mxnet'):
 blk(X).shape
 ```
 
-## [**ResNet Model**]
+## [**Modèle ResNet**]
 
-The first two layers of ResNet are the same as those of the GoogLeNet we described before: the $7\times 7$ convolutional layer with 64 output channels and a stride of 2 is followed by the $3\times 3$ max-pooling layer with a stride of 2. The difference is the batch normalization layer added after each convolutional layer in ResNet.
+Les deux premières couches de ResNet sont les mêmes que celles de GoogLeNet que nous avons décrites précédemment : la couche convolutive $7\times 7$ avec 64 canaux de sortie et un stride de 2 est suivie de la couche max-pooling $3\times 3$ avec un stride de 2. La différence est la couche de normalisation par lot ajoutée après chaque couche convolutive dans ResNet.
 
 ```{.python .input}
 %%tab all
@@ -255,11 +255,11 @@ class ResNet(d2l.Classifier):
                                           padding='same')])
 ```
 
-GoogLeNet uses four modules made up of Inception blocks.
-However, ResNet uses four modules made up of residual blocks, each of which uses several residual blocks with the same number of output channels.
-The number of channels in the first module is the same as the number of input channels. Since a max-pooling layer with a stride of 2 has already been used, it is not necessary to reduce the height and width. In the first residual block for each of the subsequent modules, the number of channels is doubled compared with that of the previous module, and the height and width are halved.
+GoogLeNet utilise quatre modules constitués de blocs d'Inception.
+Cependant, ResNet utilise quatre modules constitués de blocs résiduels, chacun d'entre eux utilisant plusieurs blocs résiduels avec le même nombre de canaux de sortie.
+Le nombre de canaux dans le premier module est le même que le nombre de canaux d'entrée. Comme une couche de max-pooling avec un stride de 2 a déjà été utilisée, il n'est pas nécessaire de réduire la hauteur et la largeur. Dans le premier bloc résiduel de chacun des modules suivants, le nombre de canaux est doublé par rapport à celui du module précédent, et la hauteur et la largeur sont divisées par deux.
 
-Now, we implement this module. Note that special processing has been performed on the first module.
+Maintenant, nous implémentons ce module. Notez qu'un traitement spécial a été effectué sur le premier module.
 
 ```{.python .input}
 %%tab mxnet
@@ -300,7 +300,7 @@ def block(self, num_residuals, num_channels, first_block=False):
     return blk
 ```
 
-Then, we add all the modules to ResNet. Here, two residual blocks are used for each module. Finally, just like GoogLeNet, we add a global average pooling layer, followed by the fully connected layer output.
+Ensuite, nous ajoutons tous les modules à ResNet. Ici, deux blocs résiduels sont utilisés pour chaque module. Enfin, tout comme GoogLeNet, nous ajoutons une couche de mise en commun de la moyenne globale, suivie de la sortie de la couche entièrement connectée.
 
 ```{.python .input}
 %%tab all
@@ -332,13 +332,13 @@ def __init__(self, arch, lr=0.1, num_classes=10):
             tf.keras.layers.Dense(units=num_classes)]))
 ```
 
-There are 4 convolutional layers in each module (excluding the $1\times 1$ convolutional layer). Together with the first $7\times 7$ convolutional layer and the final fully connected layer, there are 18 layers in total. Therefore, this model is commonly known as ResNet-18.
-By configuring different numbers of channels and residual blocks in the module, we can create different ResNet models, such as the deeper 152-layer ResNet-152. Although the main architecture of ResNet is similar to that of GoogLeNet, ResNet's structure is simpler and easier to modify. All these factors have resulted in the rapid and widespread use of ResNet. :numref:`fig_resnet18` depicts the full ResNet-18.
+Il y a 4 couches convolutives dans chaque module (à l'exception de la couche convolutive $1\times 1$ ). Avec la première couche convolutive $7\times 7$ et la couche finale entièrement connectée, il y a 18 couches au total. Par conséquent, ce modèle est communément appelé ResNet-18.
+En configurant différents nombres de canaux et de blocs résiduels dans le module, nous pouvons créer différents modèles ResNet, tels que le plus profond ResNet-152 à 152 couches. Bien que l'architecture principale de ResNet soit similaire à celle de GoogLeNet, la structure de ResNet est plus simple et plus facile à modifier. Tous ces facteurs ont permis l'utilisation rapide et répandue de ResNet. :numref:`fig_resnet18` représente le ResNet-18 complet.
 
-![The ResNet-18 architecture.](../img/resnet18.svg)
-:label:`fig_resnet18`
+![The ResNet-18 architecture.](../img/resnet18.svg) 
+ :label:`fig_resnet18` 
 
-Before training ResNet, let's [**observe how the input shape changes across different modules in ResNet**]. As in all the previous architectures, the resolution decreases while the number of channels increases up until the point where a global average pooling layer aggregates all features.
+ Avant d'entraîner ResNet, observons [**comment la forme de l'entrée change à travers les différents modules de ResNet**]. Comme dans toutes les architectures précédentes, la résolution diminue tandis que le nombre de canaux augmente jusqu'au point où une couche de mise en commun de la moyenne globale agrège toutes les caractéristiques.
 
 ```{.python .input}
 %%tab all
@@ -360,7 +360,7 @@ ResNet18().layer_summary((1, 96, 96, 1))
 
 ## [**Training**]
 
-We train ResNet on the Fashion-MNIST dataset, just like before.
+Nous entraînons ResNet sur le jeu de données Fashion-MNIST, comme précédemment.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -382,65 +382,65 @@ with d2l.try_gpu():
 ```
 
 ## ResNeXt
-:label:`subsec_resnext`
+:label:`subsec_resnext` 
 
-Recall :numref:`fig_resnet_block` 
-that each ResNet block simply stacks layers between residual connections.
-This design can be varied
-by replacing stacked layers with
-concatenated parallel transformations,
-leading to ResNeXt
-:cite:`Xie.Girshick.Dollar.ea.2017`.
-Different from *a variety of* transformations
-in multi-branch Inception blocks,
-ResNeXt adopts the *same* transformation in all branches,
-thus minimizing manual design efforts in each branch.
+ Rappelons :numref:`fig_resnet_block` 
+ que chaque bloc ResNet empile simplement les couches entre les connexions résiduelles.
+Cette conception peut être modifiée
+en remplaçant les couches empilées par
+des transformations parallèles concaténées,
+conduisant à ResNeXt
+:cite:`Xie.Girshick.Dollar.ea.2017` .
+Contrairement à *une variété de* transformations
+dans les blocs Inception multi-branches,
+ResNeXt adopte la *même* transformation dans toutes les branches,
+minimisant ainsi les efforts de conception manuelle dans chaque branche.
 
-![The ResNeXt block. It is a bottleneck (when $b < c$) residual block with group convolution ($g$ groups).](../img/resnext-block.svg)
-:label:`fig_resnext_block`
+![The ResNeXt block. It is a bottleneck (when $b < c$) bloc résiduel avec convolution de groupe ($g$ groupes).](../img/resnext-block.svg)
+:label:`fig_resnext_block` 
 
-The left dotted box in
-:numref:`fig_resnext_block`
-depicts the added concatenated parallel transformation
-strategy in ResNeXt.
-More concretely,
-an input with $c$ channels
-is first split into $g$ groups
-via $g$ branches of $1 \times 1$ convolutions
-followed by $3 \times 3$ convolutions,
-all with $b/g$ output channels.
-Concatenating these $g$ outputs
-results in $b$ output channels,
-leading to "bottlenecked" (when $b < c$) network width
-inside the dashed box.
-This output
-will restore the original $c$ channels of the input
-via the final $1 \times 1$ convolution
-right before sum with the residual connection.
-Notably,
-the left dotted box is equivalent to
-the much *simplified* right dotted box in :numref:`fig_resnext_block`,
-where we only need to specify
-that the $3 \times 3$ convolution is a *group convolution*
-with $g$ groups.
-In fact,
-the group convolution dates back
-to the idea of distributing the AlexNet
-model over two GPUs due to limited GPU memory at that time :cite:`Krizhevsky.Sutskever.Hinton.2012`.
+ La boîte en pointillés de gauche dans
+:numref:`fig_resnext_block` 
+ représente la stratégie de transformation parallèle concaténée ajoutée
+dans ResNeXt.
+Plus concrètement,
+une entrée avec $c$ canaux
+est d'abord divisée en $g$ groupes
+via $g$ branches de $1 \times 1$ convolutions
+suivies de $3 \times 3$ convolutions,
+toutes avec $b/g$ canaux de sortie.
+La concaténation de ces sorties $g$
+ donne lieu à des canaux de sortie $b$,
+conduisant à une largeur de réseau
+"goulot d'étranglement" (lorsque $b < c$) à l'intérieur de la boîte en pointillés.
+Cette sortie
+restaurera les canaux originaux $c$ de l'entrée
+via la convolution finale $1 \times 1$
+ juste avant la somme avec la connexion résiduelle.
+Notamment,
+la boîte pointillée gauche est équivalente à
+la boîte pointillée droite beaucoup *simplifiée dans :numref:`fig_resnext_block` ,
+où il suffit de spécifier
+que la convolution $3 \times 3$ est une *convolution de groupe*
+avec $g$ groupes.
+En fait,
+la convolution de groupe remonte
+à l'idée de distribuer le modèle AlexNet
+sur deux GPU en raison de la mémoire limitée des GPU à cette époque :cite:`Krizhevsky.Sutskever.Hinton.2012` .
 
-The following implementation of the `ResNeXtBlock` class
-treats `groups` ($b/g$ in :numref:`fig_resnext_block`) as an argument
-so that given `bot_channels` ($b$ in :numref:`fig_resnext_block`) bottleneck channels,
-the $3 \times 3$ group convolution will
-have `bot_channels//groups` groups.
-Similar to
-the residual block implementation in
-:numref:`subsec_residual-blks`,
-the residual connection
-is generalized
-with a $1 \times 1$ convolution (`conv4`),
-where setting `use_1x1conv=True, strides=2`
-halves the input height and width.
+L'implémentation suivante de la classe `ResNeXtBlock`
+ traite `groups` ($b/g$ dans :numref:`fig_resnext_block` ) comme un argument
+de sorte que, compte tenu des canaux goulots d'étranglement `bot_channels` ($b$ dans :numref:`fig_resnext_block` ),
+la convolution de groupe $3 \times 3$ aura
+groupes `bot_channels//groups`.
+Comme pour
+, la mise en œuvre du bloc résiduel dans
+:numref:`subsec_residual-blks` ,
+la connexion résiduelle
+est généralisée
+avec une convolution $1 \times 1$ (`conv4`),
+où le réglage de `use_1x1conv=True, strides=2`
+ divise par deux la hauteur et la largeur d'entrée.
 
 ```{.python .input}
 %%tab mxnet
@@ -542,7 +542,7 @@ class ResNeXtBlock(tf.keras.Model):  #@save
         return tf.keras.activations.relu(Y + X)
 ```
 
-In the following case (`use_1x1conv=False, strides=1`), the input and output are of the same shape.
+Dans le cas suivant (`use_1x1conv=False, strides=1`), l'entrée et la sortie ont la même forme.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -561,8 +561,8 @@ Y = blk(X)
 Y.shape
 ```
 
-Alternatively, setting `use_1x1conv=True, strides=2`
-halves the output height and width.
+Alternativement, le réglage de `use_1x1conv=True, strides=2`
+ divise par deux la hauteur et la largeur de la sortie.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -580,53 +580,53 @@ Y = blk(X)
 Y.shape
 ```
 
-## Summary and Discussion
+## Résumé et discussion
 
-Nested function classes are desirable. Learning an additional layer in deep neural networks as an identity function (though this is an extreme case) should be made easy. The residual mapping can learn the identity function more easily, such as pushing parameters in the weight layer to zero. We can train an effective *deep* neural network by having residual blocks. Inputs can forward propagate faster through the residual connections across layers.
+Les classes de fonctions imbriquées sont souhaitables. L'apprentissage d'une couche supplémentaire dans les réseaux neuronaux profonds en tant que fonction d'identité (bien que ce soit un cas extrême) devrait être facilité. Le mappage résiduel peut apprendre la fonction d'identité plus facilement, par exemple en poussant les paramètres de la couche de poids à zéro. Nous pouvons former un réseau neuronal *profond* efficace en ayant des blocs résiduels. Les entrées peuvent se propager plus rapidement à travers les connexions résiduelles entre les couches.
 
-Before residual connections,
-bypassing paths with gating units were introduced
-to effectively train highway networks with over 100 layers
-:cite:`srivastava2015highway`.
-Using identity functions as bypassing paths,
-ResNets performed remarkably well
-on multiple computer vision tasks.
-Residual connections had a major influence on the design of subsequent deep neural networks, both for convolutional and sequential nature.
-As we will introduce later,
-the transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017`
-adopts residual connections (together with other design choices) and is pervasive
-in areas as diverse as 
-language, vision, speech, and reinforcement learning.
-A key advantage of the ResNeXt design
-is that increasing groups
-leads to sparser connections (i.e., lower computational complexity) within the block,
-thus enabling an increase of network width
-to achieve a better tradeoff between
-FLOPs and accuracy.
-ResNeXt-ification
-is appealing in later convolution network design,
-such as in the RegNet model :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`
-and the ConvNeXt architecture :cite:`liu2022convnet`.
-We will apply the ResNeXt block later in this chapter.
-
-
+Avant les connexions résiduelles, des chemins de contournement
+avec des unités de déclenchement ont été introduits
+pour former efficacement des réseaux routiers de plus de 100 couches
+:cite:`srivastava2015highway` .
+En utilisant des fonctions d'identité comme chemins de contournement,
+ResNets a obtenu des résultats remarquables
+sur de multiples tâches de vision par ordinateur.
+Les connexions résiduelles ont eu une influence majeure sur la conception des réseaux neuronaux profonds ultérieurs, tant pour la nature convolutive que séquentielle.
+Comme nous le présenterons plus loin,
+l'architecture transformatrice :cite:`Vaswani.Shazeer.Parmar.ea.2017` 
+ adopte les connexions résiduelles (ainsi que d'autres choix de conception) et est omniprésente
+dans des domaines aussi divers que 
+le langage, la vision, la parole et l'apprentissage par renforcement.
+L'un des principaux avantages de la conception ResNeXt
+est que l'augmentation des groupes
+entraîne des connexions plus éparses (c'est-à-dire une moindre complexité de calcul) au sein du bloc,
+permettant ainsi d'augmenter la largeur du réseau
+pour obtenir un meilleur compromis entre
+FLOPs et précision.
+La ResNeXt-ification
+est intéressante pour la conception ultérieure de réseaux de convolution,
+comme dans le modèle RegNet :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` 
+ et l'architecture ConvNeXt :cite:`liu2022convnet` .
+Nous appliquerons le bloc ResNeXt plus tard dans ce chapitre.
 
 
 
 
-## Exercises
 
-1. What are the major differences between the Inception block in :numref:`fig_inception` and the residual block? After removing some paths in the Inception block, how are they related to each other?
-1. Refer to Table 1 in the ResNet paper :cite:`He.Zhang.Ren.ea.2016` to
-   implement different variants.
-1. For deeper networks, ResNet introduces a "bottleneck" architecture to reduce
-   model complexity. Try to implement it.
-1. In subsequent versions of ResNet, the authors changed the "convolution, batch
-   normalization, and activation" structure to the "batch normalization,
-   activation, and convolution" structure. Make this improvement
-   yourself. See Figure 1 in :cite:`He.Zhang.Ren.ea.2016*1`
-   for details.
-1. Why can't we just increase the complexity of functions without bound, even if the function classes are nested?
+
+## Exercices
+
+1. Quelles sont les principales différences entre le bloc Inception de :numref:`fig_inception` et le bloc ResNeXt ? Après avoir supprimé certains chemins dans le bloc Inception, comment sont-ils reliés les uns aux autres ?
+1. Reportez-vous au tableau 1 du document ResNet :cite:`He.Zhang.Ren.ea.2016` pour
+ mettre en œuvre différentes variantes.
+1. Pour les réseaux plus profonds, ResNet introduit une architecture " goulot d'étranglement " pour réduire la complexité du modèle
+. Essayez de la mettre en œuvre.
+1. Dans les versions ultérieures de ResNet, les auteurs ont changé la structure " convolution, normalisation par lots
+ et activation " en structure " normalisation par lots, activation
+ et convolution ". Apportez vous-même cette amélioration
+. Voir la figure 1 de :cite:`He.Zhang.Ren.ea.2016*1` 
+ pour plus de détails.
+1. Pourquoi ne pouvons-nous pas simplement augmenter la complexité des fonctions sans limite, même si les classes de fonctions sont imbriquées ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/85)

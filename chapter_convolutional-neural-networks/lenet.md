@@ -203,47 +203,47 @@ model = LeNet()
 model.layer_summary((1, 28, 28, 1))
 ```
 
-Note that the height and width of the representation
-at each layer throughout the convolutional block
-is reduced (compared with the previous layer).
-The first convolutional layer uses 2 pixels of padding
-to compensate for the reduction in height and width
-that would otherwise result from using a $5 \times 5$ kernel.
-As an aside, the image size of $28 \times 28$ pixels in the original
-MNIST OCR dataset is a result of *trimming* 2 pixel rows (and columns) from the
-original scans that measured $32 \times 32$ pixels. This was done primarily to
-save space (a 30% reduction) at a time when Megabytes mattered.
+Notez que la hauteur et la largeur de la représentation
+à chaque couche tout au long du bloc convolutif
+sont réduites (par rapport à la couche précédente).
+La première couche convolutive utilise 2 pixels de remplissage
+pour compenser la réduction de la hauteur et de la largeur
+qui résulterait autrement de l'utilisation d'un noyau $5 \times 5$.
+Pour l'anecdote, la taille de l'image de $28 \times 28$ pixels dans l'ensemble de données OCR MNIST original
+est le résultat de *l'élagage* de lignes (et de colonnes) de 2 pixels des scans originaux
+qui mesuraient $32 \times 32$ pixels. Cela a été fait principalement pour
+économiser de l'espace (une réduction de 30%) à une époque où les mégaoctets étaient importants.
 
-In contrast, the second convolutional layer forgoes padding,
-and thus the height and width are both reduced by 4 pixels.
-As we go up the stack of layers,
-the number of channels increases layer-over-layer
-from 1 in the input to 6 after the first convolutional layer
-and 16 after the second convolutional layer.
-However, each pooling layer halves the height and width.
-Finally, each fully connected layer reduces dimensionality,
-finally emitting an output whose dimension
-matches the number of classes.
+En revanche, la deuxième couche convolutive renonce au remplissage,
+et donc la hauteur et la largeur sont toutes deux réduites de 4 pixels.
+À mesure que l'on monte dans la pile de couches,
+, le nombre de canaux augmente couche par couche
+, passant de 1 dans l'entrée à 6 après la première couche convolutive
+et à 16 après la deuxième couche convolutive.
+Cependant, chaque couche de mise en commun réduit de moitié la hauteur et la largeur.
+Enfin, chaque couche entièrement connectée réduit la dimensionnalité,
+émettant finalement une sortie dont la dimension
+correspond au nombre de classes.
 
 
-## Training
+## Entraînement
 
-Now that we have implemented the model,
-let's [**run an experiment to see how the LeNet-5 model fares on Fashion-MNIST**].
+Maintenant que nous avons implémenté le modèle,
+faisons [**une expérience pour voir comment le modèle LeNet-5 se comporte sur Fashion-MNIST**].
 
-While CNNs have fewer parameters,
-they can still be more expensive to compute
-than similarly deep MLPs
-because each parameter participates in many more
-multiplications.
-If you have access to a GPU, this might be a good time
-to put it into action to speed up training.
-Note that
-the `d2l.Trainer` class takes care of all details.
-By default, it initializes the model parameters on the
-available devices.
-Just as with MLPs, our loss function is cross-entropy,
-and we minimize it via minibatch stochastic gradient descent.
+Bien que les CNN aient moins de paramètres,
+ils peuvent néanmoins être plus coûteux à calculer
+que les MLP de profondeur similaire
+car chaque paramètre participe à beaucoup plus de multiplications
+.
+Si vous avez accès à un GPU, c'est peut-être le bon moment
+de le mettre en action pour accélérer la formation.
+Notez que
+la classe `d2l.Trainer` s'occupe de tous les détails.
+Par défaut, elle initialise les paramètres du modèle sur les
+dispositifs disponibles.
+Comme pour les MLP, notre fonction de perte est l'entropie croisée,
+et nous la minimisons via une descente de gradient stochastique en minibatch.
 
 ```{.python .input}
 %%tab pytorch, mxnet
@@ -264,26 +264,26 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-## Summary
+## Résumé
 
-In this chapter we made significant progress. We moved from the MLPs of the 1980s to the CNNs of the 1990s and early 2000s. The architectures proposed, e.g., in the form of LeNet-5 remain meaningful, even to this day. It is worth comparing the error rates on Fashion-MNIST achievable with LeNet-5 both to the very best possible with MLPs (:numref:`sec_mlp_scratch`) and those with significantly more advanced architectures such as ResNet (:numref:`sec_resnet`). LeNet is much more similar to the latter than to the former. One of the primary differences, as we shall see, is that greater amounts of computation afforded significantly more complex architectures.
+Dans ce chapitre, nous avons fait des progrès significatifs. Nous sommes passés des MLP des années 1980 aux CNN des années 1990 et du début des années 2000. Les architectures proposées, par exemple sous la forme de LeNet-5, restent significatives, même à ce jour. Il est intéressant de comparer les taux d'erreur sur Fashion-MNIST obtenus avec LeNet-5 aux meilleurs taux obtenus avec les MLP (:numref:`sec_mlp_scratch` ) et ceux obtenus avec des architectures beaucoup plus avancées comme ResNet (:numref:`sec_resnet` ). LeNet est beaucoup plus proche de ces dernières que des premières. L'une des principales différences, comme nous le verrons, est que de plus grandes quantités de calcul permettent des architectures beaucoup plus complexes.
 
-A second difference is the relative ease with which we were able to implement LeNet. What used to be an engineering challenge worth months of C++ and assembly code, engineering to improve SN, an early Lisp based deep learning tool :cite:`Bottou.Le-Cun.1988`, and finally experimentation with models can now be accomplished in minutes. It is this incredible productivity boost that has democratized deep learning model development tremendously. In the next chapter we will follow down this rabbit to hole to see where it takes us.
+Une deuxième différence est la facilité relative avec laquelle nous avons pu implémenter LeNet. Ce qui était auparavant un défi d'ingénierie représentant des mois de code C++ et d'assemblage, d'ingénierie pour améliorer SN, un outil précoce d'apprentissage profond basé sur Lisp :cite:`Bottou.Le-Cun.1988` , et enfin l'expérimentation de modèles, peut maintenant être accompli en quelques minutes. C'est cet incroyable gain de productivité qui a considérablement démocratisé le développement de modèles d'apprentissage profond. Dans le chapitre suivant, nous allons suivre ce terrier de lapin pour voir où il nous mène.
 
-## Exercises
+## Exercices
 
-1. Let's modernize LeNet. Implement and test the following changes:
-    1. Replace the average pooling with max-pooling.
-    1. Replace the softmax layer with ReLU.
-1. Try to change the size of the LeNet style network to improve its accuracy in addition to max-pooling and ReLU.
-    1. Adjust the convolution window size.
-    1. Adjust the number of output channels.
-    1. Adjust the number of convolution layers.
-    1. Adjust the number of fully connected layers.
-    1. Adjust the learning rates and other training details (e.g., initialization and number of epochs.)
-1. Try out the improved network on the original MNIST dataset.
-1. Display the activations of the first and second layer of LeNet for different inputs (e.g., sweaters and coats).
-1. What happens to the activations when you feed significantly different images into the network (e.g., cats, cars, or even random noise)?
+1. Modernisons LeNet. Implémentez et testez les changements suivants :
+   1. Remplacer le pooling moyen par le max-pooling.
+   1. Remplacer la couche softmax par ReLU.
+1. Essayez de modifier la taille du réseau de style LeNet pour améliorer sa précision en plus du max-pooling et de ReLU.
+   1. Ajustez la taille de la fenêtre de convolution.
+   1. Ajustez le nombre de canaux de sortie.
+   1. Ajustez le nombre de couches de convolution.
+   1. Ajustez le nombre de couches entièrement connectées.
+   1. Ajustez les taux d'apprentissage et d'autres détails de formation (par exemple, l'initialisation et le nombre d'époques).
+1. Essayez le réseau amélioré sur l'ensemble de données MNIST original.
+1. Affichez les activations de la première et de la deuxième couche de LeNet pour différentes entrées (par exemple, des pulls et des manteaux).
+1. Qu'arrive-t-il aux activations lorsque vous introduisez des images très différentes dans le réseau (par exemple, des chats, des voitures, ou même du bruit aléatoire) ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/73)

@@ -1,132 +1,132 @@
 # Single Shot Multibox Detection
-:label:`sec_ssd`
+:label:`sec_ssd` 
 
-In :numref:`sec_bbox`--:numref:`sec_object-detection-dataset`,
-we introduced bounding boxes, anchor boxes,
-multiscale object detection, and the dataset for object detection.
-Now we are ready to use such background
-knowledge to design an object detection model:
+ Dans :numref:`sec_bbox` --:numref:`sec_object-detection-dataset` ,
+nous avons présenté les boîtes englobantes, les boîtes d'ancrage,
+la détection d'objets multi-échelle, et le jeu de données pour la détection d'objets.
+Nous sommes maintenant prêts à utiliser ces connaissances de base
+pour concevoir un modèle de détection d'objets :
 single shot multibox detection
-(SSD) :cite:`Liu.Anguelov.Erhan.ea.2016`.
-This model is simple, fast, and widely used.
-Although this is just one of vast amounts of
-object detection models,
-some of the design principles
-and implementation details in this section
-are also applicable to other models.
+(SSD) :cite:`Liu.Anguelov.Erhan.ea.2016` .
+Ce modèle est simple, rapide et largement utilisé.
+Bien qu'il ne s'agisse que d'un des nombreux modèles de détection d'objets
+,
+certains des principes de conception
+et des détails de mise en œuvre de cette section
+sont également applicables à d'autres modèles.
 
 
-## Model
+## Modèle
 
-:numref:`fig_ssd` provides an overview of
-the design of single-shot multibox detection.
-This model mainly consists of
-a base network
-followed by
-several multiscale feature map blocks.
-The base network
-is for extracting features from the input image,
-so it can use a deep CNN.
-For example,
-the original single-shot multibox detection paper
-adopts a VGG network truncated before the
-classification layer :cite:`Liu.Anguelov.Erhan.ea.2016`,
-while ResNet has also been commonly used.
-Through our design
-we can make the base network output
-larger feature maps
-so as to generate more anchor boxes
-for detecting smaller objects.
-Subsequently,
-each multiscale feature map block
-reduces (e.g., by half)
-the height and width of the feature maps
-from the previous block,
-and enables each unit
-of the feature maps
-to increase its receptive field on the input image.
+:numref:`fig_ssd` fournit une vue d'ensemble de
+la conception de la détection multiboxes à un seul coup.
+Ce modèle se compose principalement de
+un réseau de base
+suivi de
+plusieurs blocs de cartes de caractéristiques multi-échelles.
+Le réseau de base
+sert à extraire les caractéristiques de l'image d'entrée,
+et peut donc utiliser un CNN profond.
+Par exemple,
+, l'article original sur la détection de boîtes multiples à un seul coup
+adopte un réseau VGG tronqué avant la couche de classification
+ :cite:`Liu.Anguelov.Erhan.ea.2016` ,
+tandis que ResNet a également été couramment utilisé.
+Grâce à notre conception
+, nous pouvons faire en sorte que le réseau de base produise
+des cartes de caractéristiques plus grandes
+afin de générer plus de boîtes d'ancrage
+pour détecter des objets plus petits.
+Par la suite,
+chaque bloc de cartes de caractéristiques multi-échelles
+réduit (par exemple, de moitié)
+la hauteur et la largeur des cartes de caractéristiques
+du bloc précédent,
+et permet à chaque unité
+des cartes de caractéristiques
+d'augmenter son champ réceptif sur l'image d'entrée.
 
 
-Recall the design
-of multiscale object detection
-through layerwise representations of images by
-deep neural networks
-in :numref:`sec_multiscale-object-detection`.
-Since
-multiscale feature maps closer to the top of :numref:`fig_ssd`
-are smaller but have larger receptive fields,
-they are suitable for detecting
-fewer but larger objects.
+Rappelons la conception
+de la détection d'objets multi-échelle
+par le biais de représentations en couches des images par
+des réseaux neuronaux profonds
+dans :numref:`sec_multiscale-object-detection` .
+Étant donné que les cartes de caractéristiques multi-échelles
+plus proches du sommet de :numref:`fig_ssd` 
+ sont plus petites mais ont des champs réceptifs plus grands,
+elles conviennent pour détecter
+des objets moins nombreux mais plus grands.
 
-In a nutshell,
-via its base network and several multiscale feature map blocks,
-single-shot multibox detection
-generates a varying number of anchor boxes with different sizes,
-and detects varying-size objects
-by predicting classes and offsets
-of these anchor boxes (thus the bounding boxes);
-thus, this is a multiscale object detection model.
+En bref,
+par l'intermédiaire de son réseau de base et de plusieurs blocs de cartes de caractéristiques multi-échelles,
+détection multi-boîtes à un seul coup
+génère un nombre variable de boîtes d'ancrage de différentes tailles,
+et détecte des objets de taille variable
+en prédisant les classes et les décalages
+de ces boîtes d'ancrage (donc les boîtes englobantes) ;
+il s'agit donc d'un modèle de détection d'objets multi-échelles.
 
 
 ![As a multiscale object detection model, single-shot multibox detection mainly consists of a base network followed by several multiscale feature map blocks.](../img/ssd.svg)
 :label:`fig_ssd`
 
 
-In the following,
-we will describe the implementation details
-of different blocks in :numref:`fig_ssd`. To begin with, we discuss how to implement
-the class and bounding box prediction.
+Dans ce qui suit,
+nous décrivons les détails de la mise en œuvre
+de différents blocs dans :numref:`fig_ssd` . Pour commencer, nous verrons comment implémenter
+la prédiction de classe et de boîte englobante.
 
 
 
-### [**Class Prediction Layer**]
+### [**Couche de prédiction de classe**]
 
-Let the number of object classes be $q$.
-Then anchor boxes have $q+1$ classes,
-where class 0 is background.
-At some scale,
-suppose that the height and width of feature maps
-are $h$ and $w$, respectively.
-When $a$ anchor boxes
-are generated with
-each spatial position of these feature maps as their center,
-a total of $hwa$ anchor boxes need to be classified.
-This often makes classification with fully connected layers infeasible due to likely
-heavy parameterization costs.
-Recall how we used channels of
-convolutional layers
-to predict classes in :numref:`sec_nin`.
-Single-shot multibox detection uses the
-same technique to reduce model complexity.
+Soit le nombre de classes d'objets $q$.
+Les boîtes d'ancrage ont alors $q+1$ classes,
+où la classe 0 est le fond.
+À une certaine échelle,
+, supposons que la hauteur et la largeur des cartes de caractéristiques
+soient respectivement $h$ et $w$.
+Lorsque $a$ boîtes d'ancrage
+sont générées avec
+chaque position spatiale de ces cartes de caractéristiques comme centre,
+un total de $hwa$ boîtes d'ancrage doivent être classées.
+Cela rend souvent la classification avec des couches entièrement connectées infaisable en raison des coûts de paramétrage probablement élevés de
+.
+Rappelez-vous comment nous avons utilisé les canaux des couches convolutionnelles
 
-Specifically,
-the class prediction layer uses a convolutional layer
-without altering width or height of feature maps.
-In this way,
-there can be a one-to-one correspondence
-between outputs and inputs
-at the same spatial dimensions (width and height)
-of feature maps.
-More concretely,
-channels of the output feature maps
-at any spatial position ($x$, $y$)
-represent class predictions
-for all the anchor boxes centered on
-($x$, $y$) of the input feature maps.
-To produce valid predictions,
-there must be $a(q+1)$ output channels,
-where for the same spatial position
-the output channel with index $i(q+1) + j$
-represents the prediction of
-the class $j$ ($0 \leq j \leq q$)
-for the anchor box $i$ ($0 \leq i < a$).
+ pour prédire les classes dans :numref:`sec_nin` .
+La détection multi-boîtes à un coup utilise la même technique
+pour réduire la complexité du modèle.
 
-Below we define such a class prediction layer,
-specifying $a$ and $q$ via arguments `num_anchors` and `num_classes`, respectively.
-This layer uses a $3\times3$ convolutional layer with a
-padding of 1.
-The width and height of the input and output of this
-convolutional layer remain unchanged.
+Plus précisément,
+la couche de prédiction des classes utilise une couche convolutive
+sans modifier la largeur ou la hauteur des cartes de caractéristiques.
+De cette façon,
+il peut y avoir une correspondance biunivoque
+entre les sorties et les entrées
+aux mêmes dimensions spatiales (largeur et hauteur)
+des cartes de caractéristiques.
+Plus concrètement, les canaux
+des cartes de caractéristiques de sortie
+à n'importe quelle position spatiale ($x$, $y$)
+représentent des prédictions de classe
+pour toutes les cases d'ancrage centrées sur
+($x$, $y$) des cartes de caractéristiques d'entrée.
+Pour produire des prédictions valides,
+, il doit y avoir des canaux de sortie $a(q+1)$,
+où, pour la même position spatiale
+, le canal de sortie avec l'indice $i(q+1) + j$
+ représente la prédiction de
+la classe $j$ ($0 \leq j \leq q$)
+pour la boîte d'ancrage $i$ ($0 \leq i < a$).
+
+Nous définissons ci-dessous une telle couche de prédiction de classe,
+spécifiant $a$ et $q$ via les arguments `num_anchors` et `num_classes`, respectivement.
+Cette couche utilise une couche convolutive $3\times3$ avec un padding
+de 1.
+La largeur et la hauteur de l'entrée et de la sortie de cette couche convolutive
+restent inchangées.
 
 ```{.python .input}
 #@tab mxnet
@@ -156,11 +156,11 @@ def cls_predictor(num_inputs, num_anchors, num_classes):
                      kernel_size=3, padding=1)
 ```
 
-### (**Bounding Box Prediction Layer**)
+### (**Couche de prédiction de boîte englobante**)
 
-The design of the bounding box prediction layer is similar to that of the class prediction layer.
-The only difference lies in the number of outputs for each anchor box:
-here we need to predict four offsets rather than $q+1$ classes.
+La conception de la couche de prédiction de boîte englobante est similaire à celle de la couche de prédiction de classe.
+La seule différence réside dans le nombre de sorties pour chaque boîte d'ancrage :
+ici, nous devons prédire quatre décalages plutôt que des classes $q+1$.
 
 ```{.python .input}
 #@tab mxnet
@@ -174,35 +174,35 @@ def bbox_predictor(num_inputs, num_anchors):
     return nn.Conv2d(num_inputs, num_anchors * 4, kernel_size=3, padding=1)
 ```
 
-### [**Concatenating Predictions for Multiple Scales**]
+### [**Concaténation des prédictions pour plusieurs échelles**]
 
-As we mentioned, single-shot multibox detection
-uses multiscale feature maps to generate anchor boxes and predict their classes and offsets.
-At different scales,
-the shapes of feature maps
-or the numbers of anchor boxes centered on the same unit
-may vary.
-Therefore,
-shapes of the prediction outputs
-at different scales may vary.
+Comme nous l'avons mentionné, la détection multi-boîtes à un seul coup
+utilise des cartes de caractéristiques multi-échelles pour générer des boîtes d'ancrage et prédire leurs classes et leurs décalages.
+À différentes échelles,
+les formes des cartes de caractéristiques
+ou le nombre de boîtes d'ancrage centrées sur la même unité
+peuvent varier.
+Par conséquent,
+les formes des sorties de prédiction
+à différentes échelles peuvent varier.
 
-In the following example,
-we construct feature maps at two different scales,
-`Y1` and `Y2`,
-for the same minibatch,
-where the height and width of `Y2`
-are half of those of `Y1`.
-Let's take class prediction as an example.
-Suppose that
-5 and 3 anchor boxes
-are generated for every unit in `Y1` and `Y2`, respectively.
-Suppose further that
-the number of object classes is 10.
-For feature maps `Y1` and `Y2`
-the numbers of channels in the class prediction outputs
-are $5\times(10+1)=55$ and $3\times(10+1)=33$, respectively,
-where either output shape is
-(batch size, number of channels, height, width).
+Dans l'exemple suivant,
+nous construisons des cartes de caractéristiques à deux échelles différentes,
+`Y1` et `Y2`,
+pour le même mini-lot,
+où la hauteur et la largeur de `Y2`
+ sont la moitié de celles de `Y1`.
+Prenons la prédiction de classe comme exemple.
+Supposons que
+5 et 3 boîtes d'ancrage
+soient générées pour chaque unité de `Y1` et `Y2`, respectivement.
+Supposons en outre que
+le nombre de classes d'objets est de 10.
+Pour les cartes de caractéristiques `Y1` et `Y2`
+ le nombre de canaux dans les sorties de prédiction de classe
+est respectivement $5\times(10+1)=55$ et $3\times(10+1)=33$,
+où la forme de l'une ou l'autre sortie est
+(taille du lot, nombre de canaux, hauteur, largeur).
 
 ```{.python .input}
 #@tab mxnet
@@ -225,22 +225,22 @@ Y2 = forward(torch.zeros((2, 16, 10, 10)), cls_predictor(16, 3, 10))
 Y1.shape, Y2.shape
 ```
 
-As we can see, except for the batch size dimension,
-the other three dimensions all have different sizes.
-To concatenate these two prediction outputs for more efficient computation,
-we will transform these tensors into a more consistent format.
+Comme nous pouvons le constater, à l'exception de la dimension de la taille du lot,
+, les trois autres dimensions ont toutes des tailles différentes.
+Afin de concaténer ces deux sorties de prédiction pour un calcul plus efficace,
+nous allons transformer ces tenseurs dans un format plus cohérent.
 
-Note that
-the channel dimension holds the predictions for
-anchor boxes with the same center.
-We first move this dimension to the innermost.
-Since the batch size remains the same for different scales,
-we can transform the prediction output
-into a two-dimensional tensor
-with shape (batch size, height $\times$ width $\times$ number of channels).
-Then we can concatenate
-such outputs at different scales
-along dimension 1.
+Notez que
+la dimension du canal contient les prédictions pour
+boîtes d'ancrage avec le même centre.
+Nous déplaçons d'abord cette dimension vers la plus intérieure.
+Puisque la taille du lot reste la même pour différentes échelles,
+nous pouvons transformer la sortie de prédiction
+en un tenseur bidimensionnel
+avec la forme (taille du lot, hauteur $\times$ largeur $\times$ nombre de canaux).
+Nous pouvons ensuite concaténer
+de telles sorties à différentes échelles
+selon la dimension 1.
 
 ```{.python .input}
 #@tab mxnet
@@ -260,35 +260,35 @@ def concat_preds(preds):
     return torch.cat([flatten_pred(p) for p in preds], dim=1)
 ```
 
-In this way,
-even though `Y1` and `Y2` have different sizes
-in channels, heights, and widths,
-we can still concatenate these two prediction outputs at two different scales for the same minibatch.
+De cette façon,
+même si `Y1` et `Y2` ont des tailles différentes
+en termes de canaux, de hauteurs et de largeurs,
+nous pouvons toujours concaténer ces deux sorties de prédiction à deux échelles différentes pour le même minibatch.
 
 ```{.python .input}
 #@tab all
 concat_preds([Y1, Y2]).shape
 ```
 
-### [**Downsampling Block**]
+### [**Bloc de sous-échantillonnage**]
 
-In order to detect objects at multiple scales,
-we define the following downsampling block `down_sample_blk` that
-halves the height and width of input feature maps.
-In fact,
-this block applies the design of VGG blocks
-in :numref:`subsec_vgg-blocks`.
-More concretely,
-each downsampling block consists of
-two $3\times3$ convolutional layers with padding of 1
-followed by a $2\times2$ max-pooling layer with stride of 2.
-As we know, $3\times3$ convolutional layers with padding of 1 do not change the shape of feature maps.
-However, the subsequent $2\times2$ max-pooling  reduces the height and width of input feature maps by half.
-For both input and output feature maps of this downsampling block,
-because $1\times 2+(3-1)+(3-1)=6$,
-each unit in the output
-has a $6\times6$ receptive field on the input.
-Therefore, the downsampling block enlarges the receptive field of each unit in its output feature maps.
+Afin de détecter des objets à plusieurs échelles,
+nous définissons le bloc de sous-échantillonnage suivant `down_sample_blk` qui
+divise par deux la hauteur et la largeur des cartes de caractéristiques d'entrée.
+En fait,
+ce bloc applique la conception des blocs VGG
+dans :numref:`subsec_vgg-blocks` .
+Plus concrètement,
+chaque bloc de sous-échantillonnage se compose de
+deux $3\times3$ couches convolutionnelles avec un padding de 1
+suivi d'une $2\times2$ couche de max-pooling avec un stride de 2.
+Comme nous le savons, $3\times3$ couches convolutionnelles avec un padding de 1 ne modifient pas la forme des cartes de caractéristiques.
+Cependant, le max-pooling suivant $2\times2$ réduit de moitié la hauteur et la largeur des cartes de caractéristiques d'entrée.
+Pour les cartes de caractéristiques d'entrée et de sortie de ce bloc de sous-échantillonnage,
+car $1\times 2+(3-1)+(3-1)=6$,
+chaque unité de la sortie
+a un champ récepteur $6\times6$ sur l'entrée.
+Par conséquent, le bloc de sous-échantillonnage agrandit le champ réceptif de chaque unité dans ses cartes de caractéristiques de sortie.
 
 ```{.python .input}
 #@tab mxnet
@@ -316,7 +316,7 @@ def down_sample_blk(in_channels, out_channels):
     return nn.Sequential(*blk)
 ```
 
-In the following example, our constructed downsampling block changes the number of input channels and halves the height and width of the input feature maps.
+Dans l'exemple suivant, le bloc de sous-échantillonnage que nous avons construit modifie le nombre de canaux d'entrée et réduit de moitié la hauteur et la largeur des cartes de caractéristiques d'entrée.
 
 ```{.python .input}
 #@tab mxnet
@@ -328,15 +328,15 @@ forward(np.zeros((2, 3, 20, 20)), down_sample_blk(10)).shape
 forward(torch.zeros((2, 3, 20, 20)), down_sample_blk(3, 10)).shape
 ```
 
-### [**Base Network Block**]
+### [**Bloc réseau de base**]
 
-The base network block is used to extract features from input images.
-For simplicity,
-we construct a small base network
-consisting of three downsampling blocks
-that double the number of channels at each block.
-Given a $256\times256$ input image,
-this base network block outputs $32 \times 32$ feature maps ($256/2^3=32$).
+Le bloc réseau de base est utilisé pour extraire les caractéristiques des images d'entrée.
+Pour simplifier,
+nous construisons un petit réseau de base
+composé de trois blocs de sous-échantillonnage
+qui doublent le nombre de canaux à chaque bloc.
+Pour une image d'entrée $256\times256$,
+ce bloc de réseau de base produit $32 \times 32$ des cartes de caractéristiques ($256/2^3=32$).
 
 ```{.python .input}
 #@tab mxnet
@@ -361,30 +361,30 @@ def base_net():
 forward(torch.zeros((2, 3, 256, 256)), base_net()).shape
 ```
 
-### The Complete Model
+### Le modèle complet
 
 
-[**The complete
-single shot multibox detection model
-consists of five blocks.**]
-The feature maps produced by each block
-are used for both
-(i) generating anchor boxes
-and (ii) predicting classes and offsets of these anchor boxes.
-Among these five blocks,
-the first one
-is the base network block,
-the second to the fourth are
-downsampling blocks,
-and the last block
-uses global max-pooling
-to reduce both the height and width to 1.
-Technically,
-the second to the fifth blocks
-are all
-those
-multiscale feature map blocks
-in :numref:`fig_ssd`.
+ [**Le modèle complet de détection multiboxes à un seul coup
+
+ se compose de cinq blocs.**]
+Les cartes de caractéristiques produites par chaque bloc
+sont utilisées à la fois pour
+(i) générer des boîtes d'ancrage
+et (ii) prédire les classes et les décalages de ces boîtes d'ancrage.
+
+Parmi ces cinq blocs,
+le premier
+est le bloc de réseau de base,
+les deuxième à quatrième sont
+des blocs de sous-échantillonnage,
+et le dernier bloc
+utilise le max-pooling global
+pour réduire la hauteur et la largeur à 1.
+Techniquement,
+les deuxième à cinquième blocs
+sont tous
+ces blocs de cartes de caractéristiques multi-échelles
+dans :numref:`fig_ssd` .
 
 ```{.python .input}
 #@tab mxnet
@@ -412,15 +412,15 @@ def get_blk(i):
     return blk
 ```
 
-Now we [**define the forward propagation**]
-for each block.
-Different from
-in image classification tasks,
-outputs here include
-(i) CNN feature maps `Y`,
-(ii) anchor boxes generated using `Y` at the current scale,
-and (iii) classes and offsets predicted (based on `Y`)
-for these anchor boxes.
+Maintenant, nous [**définissons la propagation vers l'avant**]
+pour chaque bloc.
+Contrairement à
+dans les tâches de classification d'images, les résultats de
+comprennent
+(i) les cartes de caractéristiques CNN `Y`,
+(ii) les boîtes d'ancrage générées à l'aide de `Y` à l'échelle actuelle,
+et (iii) les classes et les décalages prédits (sur la base de `Y`)
+pour ces boîtes d'ancrage.
 
 ```{.python .input}
 #@tab mxnet
@@ -442,27 +442,27 @@ def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):
     return (Y, anchors, cls_preds, bbox_preds)
 ```
 
-Recall that
-in :numref:`fig_ssd`
-a multiscale feature map block
-that is closer to the top
-is for detecting larger objects;
-thus, it needs to generate larger anchor boxes.
-In the above forward propagation,
-at each multiscale feature map block
-we pass in a list of two scale values
-via the `sizes` argument
-of the invoked `multibox_prior` function (described in :numref:`sec_anchor`).
-In the following,
-the interval between 0.2 and 1.05
-is split evenly
-into five sections to determine the
-smaller scale values at the five blocks: 0.2, 0.37, 0.54, 0.71, and 0.88.
-Then their larger scale values
-are given by
-$\sqrt{0.2 \times 0.37} = 0.272$, $\sqrt{0.37 \times 0.54} = 0.447$, and so on.
+Rappelez-vous que
+dans :numref:`fig_ssd` 
+ un bloc de carte de caractéristiques multi-échelle
+qui est plus proche du sommet
+est destiné à détecter des objets plus grands ;
+doit donc générer des boîtes d'ancrage plus grandes.
+Dans la propagation vers l'avant ci-dessus,
+à chaque bloc de carte de caractéristiques multi-échelle
+, nous transmettons une liste de deux valeurs d'échelle
+via l'argument `sizes`
+ de la fonction `multibox_prior` invoquée (décrite dans :numref:`sec_anchor` ).
+Dans ce qui suit,
+l'intervalle entre 0,2 et 1,05
+est divisé uniformément
+en cinq sections pour déterminer les
+plus petites valeurs d'échelle aux cinq blocs : 0.2, 0,37, 0,54, 0,71 et 0,88.
+Ensuite, leurs valeurs à plus grande échelle
+sont données par
+$\sqrt{0.2 \times 0.37} = 0.272$ , $\sqrt{0.37 \times 0.54} = 0.447$, et ainsi de suite.
 
-[~~Hyperparameters for each block~~]
+[~)~)Hyperparamètres pour chaque bloc~)~)]
 
 ```{.python .input}
 #@tab all
@@ -472,7 +472,7 @@ ratios = [[1, 2, 0.5]] * 5
 num_anchors = len(sizes[0]) + len(ratios[0]) - 1
 ```
 
-Now we can [**define the complete model**] `TinySSD` as follows.
+Nous pouvons maintenant [**définir le modèle complet**] `TinySSD` comme suit.
 
 ```{.python .input}
 #@tab mxnet
@@ -531,21 +531,21 @@ class TinySSD(nn.Module):
         return anchors, cls_preds, bbox_preds
 ```
 
-We [**create a model instance
-and use it to perform forward propagation**]
-on a minibatch of $256 \times 256$ images `X`.
+Nous [**créons une instance de modèle
+et l'utilisons pour effectuer une propagation directe**]
+sur un minibatch d'images $256 \times 256$ `X` .
 
-As shown earlier in this section,
-the first block outputs $32 \times 32$ feature maps.
-Recall that
-the second to fourth downsampling blocks
-halve the height and width
-and the fifth block uses global pooling.
-Since 4 anchor boxes
-are generated for each unit along spatial dimensions
-of feature maps,
-at all the five scales
-a total of $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ anchor boxes are generated for each image.
+Comme nous l'avons montré précédemment dans cette section,
+le premier bloc produit des cartes de caractéristiques $32 \times 32$.
+Rappelons que
+les deuxième à quatrième blocs de sous-échantillonnage
+divisent par deux la hauteur et la largeur
+et que le cinquième bloc utilise la mise en commun globale.
+Étant donné que 4 boîtes d'ancrage
+sont générées pour chaque unité le long des dimensions spatiales
+des cartes de caractéristiques,
+aux cinq échelles
+, un total de $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ boîtes d'ancrage est généré pour chaque image.
 
 ```{.python .input}
 #@tab mxnet
@@ -570,19 +570,19 @@ print('output class preds:', cls_preds.shape)
 print('output bbox preds:', bbox_preds.shape)
 ```
 
-## Training
+### Entraînement
 
-Now we will explain
-how to train the single shot multibox detection model
-for object detection.
+Nous allons maintenant expliquer
+comment entraîner le modèle de détection multiboxes à un seul coup
+pour la détection d'objets.
 
 
-### Reading the Dataset and Initializing the Model
+### Lecture du jeu de données et initialisation du modèle
 
-To begin with,
-let's [**read
-the banana detection dataset**]
-described in :numref:`sec_object-detection-dataset`.
+Pour commencer,
+, [**lisons
+le jeu de données de détection de bananes**]
+décrit dans :numref:`sec_object-detection-dataset` .
 
 ```{.python .input}
 #@tab all
@@ -590,9 +590,9 @@ batch_size = 32
 train_iter, _ = d2l.load_data_bananas(batch_size)
 ```
 
-There is only one class in the banana detection dataset. After defining the model,
-we need to (**initialize its parameters and define
-the optimization algorithm**).
+Il n'y a qu'une seule classe dans le jeu de données de détection de bananes. Après avoir défini le modèle,
+nous devons (**initialiser ses paramètres et définir
+l'algorithme d'optimisation**).
 
 ```{.python .input}
 #@tab mxnet
@@ -608,32 +608,32 @@ device, net = d2l.try_gpu(), TinySSD(num_classes=1)
 trainer = torch.optim.SGD(net.parameters(), lr=0.2, weight_decay=5e-4)
 ```
 
-### [**Defining Loss and Evaluation Functions**]
+### [**Définir les fonctions de perte et d'évaluation**]
 
-Object detection has two types of losses.
-The first loss concerns classes of anchor boxes:
-its computation
-can simply reuse
-the cross-entropy loss function
-that we used for image classification.
-The second loss
-concerns offsets of positive (non-background) anchor boxes:
-this is a regression problem.
-For this regression problem,
-however,
-here we do not use the squared loss
-described in :numref:`subsec_normal_distribution_and_squared_loss`.
-Instead,
-we use the $\ell_1$ norm loss,
-the absolute value of the difference between
-the prediction and the ground-truth.
-The mask variable `bbox_masks` filters out
-negative anchor boxes and illegal (padded)
-anchor boxes in the loss calculation.
-In the end, we sum up
-the anchor box class loss
-and the anchor box offset loss
-to obtain the loss function for the model.
+La détection d'objets présente deux types de pertes.
+La première perte concerne les classes de boîtes d'ancrage :
+son calcul
+peut simplement réutiliser
+la fonction de perte d'entropie croisée
+que nous avons utilisée pour la classification des images.
+La seconde perte
+concerne les décalages des boîtes d'ancrage positives (hors arrière-plan) :
+il s'agit d'un problème de régression.
+Pour ce problème de régression,
+cependant,
+ici nous n'utilisons pas la perte au carré
+décrite dans :numref:`subsec_normal_distribution_and_squared_loss` .
+Au lieu de cela,
+nous utilisons la perte normalisée $\ell_1$,
+la valeur absolue de la différence entre
+la prédiction et la vérité du sol.
+La variable de masque `bbox_masks` permet de filtrer les boîtes d'ancrage négatives
+et les boîtes d'ancrage illégales (remplies)
+dans le calcul de la perte.
+Au final, nous additionnons
+la perte de classe des boîtes d'ancrage
+et la perte de décalage des boîtes d'ancrage
+pour obtenir la fonction de perte du modèle.
 
 ```{.python .input}
 #@tab mxnet
@@ -660,13 +660,13 @@ def calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels, bbox_masks):
     return cls + bbox
 ```
 
-We can use accuracy to evaluate the classification results.
-Due to the used $\ell_1$ norm loss for the offsets,
-we use the *mean absolute error* to evaluate the
-predicted bounding boxes.
-These prediction results are obtained
-from the generated anchor boxes and the
-predicted offsets for them.
+Nous pouvons utiliser la précision pour évaluer les résultats de la classification.
+En raison de la perte de norme utilisée $\ell_1$ pour les décalages,
+nous utilisons l'erreur absolue moyenne * pour évaluer les boîtes englobantes prédites
+.
+Ces résultats de prédiction sont obtenus
+à partir des boîtes d'ancrage générées et des décalages prédits
+pour celles-ci.
 
 ```{.python .input}
 #@tab mxnet
@@ -692,18 +692,18 @@ def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
     return float((torch.abs((bbox_labels - bbox_preds) * bbox_masks)).sum())
 ```
 
-### [**Training the Model**]
+### [**Formation du modèle**]
 
-When training the model,
-we need to generate multiscale anchor boxes (`anchors`)
-and predict their classes (`cls_preds`) and offsets (`bbox_preds`) in the forward propagation.
-Then we label the classes (`cls_labels`) and offsets (`bbox_labels`) of such generated anchor boxes
-based on the label information `Y`.
-Finally, we calculate the loss function
-using the predicted and labeled values
-of the classes and offsets.
-For concise implementations,
-evaluation of the test dataset is omitted here.
+Lors de la formation du modèle,
+nous devons générer des boîtes d'ancrage multi-échelles (`anchors`)
+et prédire leurs classes (`cls_preds`) et leurs décalages (`bbox_preds`) dans la propagation vers l'avant.
+Ensuite, nous étiquetons les classes (`cls_labels`) et les décalages (`bbox_labels`) de ces boîtes d'ancrage générées
+sur la base des informations de l'étiquette `Y`.
+Enfin, nous calculons la fonction de perte
+en utilisant les valeurs prédites et étiquetées
+des classes et des décalages.
+Pour des implémentations concises, l'évaluation de l'ensemble de données de test
+est omise ici.
 
 ```{.python .input}
 #@tab mxnet
@@ -777,16 +777,16 @@ print(f'{len(train_iter.dataset) / timer.stop():.1f} examples/sec on '
       f'{str(device)}')
 ```
 
-## [**Prediction**]
+## [**Prédiction**]
 
-During prediction,
-the goal is to detect all the objects of interest
-on the image.
-Below
-we read and resize a test image,
-converting it to
-a four-dimensional tensor that is
-required by convolutional layers.
+Pendant la prédiction,
+le but est de détecter tous les objets d'intérêt
+sur l'image.
+Ci-dessous
+nous lisons et redimensionnons une image test,
+en la convertissant en
+un tenseur à quatre dimensions qui est
+requis par les couches convolutionnelles.
 
 ```{.python .input}
 #@tab mxnet
@@ -801,12 +801,12 @@ X = torchvision.io.read_image('../img/banana.jpg').unsqueeze(0).float()
 img = X.squeeze(0).permute(1, 2, 0).long()
 ```
 
-Using the `multibox_detection` function below,
-the predicted bounding boxes
-are obtained
-from the anchor boxes and their predicted offsets.
-Then non-maximum suppression is used
-to remove similar predicted bounding boxes.
+À l'aide de la fonction `multibox_detection` ci-dessous,
+les boîtes limites prédites
+sont obtenues
+à partir des boîtes d'ancrage et de leurs décalages prédits.
+Ensuite, la suppression non maximale est utilisée
+pour éliminer les boîtes limites prédites similaires.
 
 ```{.python .input}
 #@tab mxnet
@@ -833,10 +833,10 @@ def predict(X):
 output = predict(X)
 ```
 
-Finally, we [**display
-all the predicted bounding boxes with
-confidence 0.9 or above**]
-as output.
+Enfin, nous [**affichons
+toutes les boîtes englobantes prédites avec un niveau de confiance de 0,9 ou plus pour
+**]
+comme résultat.
 
 ```{.python .input}
 #@tab mxnet
@@ -870,16 +870,16 @@ def display(img, output, threshold):
 display(img, output.cpu(), threshold=0.9)
 ```
 
-## Summary
+## Résumé
 
-* Single shot multibox detection is a multiscale object detection model. Via its base network and several multiscale feature map blocks, single-shot multibox detection generates a varying number of anchor boxes with different sizes, and detects varying-size objects by predicting classes and offsets of these anchor boxes (thus the bounding boxes).
-* When training the single-shot multibox detection model, the loss function is calculated based on the predicted and labeled values of the anchor box classes and offsets.
+* Single shot multibox detection est un modèle de détection d'objets multi-échelles. Grâce à son réseau de base et à plusieurs blocs de cartes de caractéristiques multi-échelles, le modèle de détection multi-boîtes à un coup génère un nombre variable de boîtes d'ancrage de différentes tailles et détecte les objets de taille variable en prédisant les classes et les décalages de ces boîtes d'ancrage (donc les boîtes englobantes).
+* Lors de l'apprentissage du modèle de détection multiboxes à un coup, la fonction de perte est calculée sur la base des valeurs prédites et étiquetées des classes et des décalages des boîtes d'ancrage.
 
 
 
-## Exercises
+## Exercices
 
-1. Can you improve the single-shot multibox detection by improving the loss function? For example, replace $\ell_1$ norm loss with smooth $\ell_1$ norm loss for the predicted offsets. This loss function uses a square function around zero for smoothness, which is controlled by the hyperparameter $\sigma$:
+1. Pouvez-vous améliorer la détection des boîtes multiples à un seul coup en améliorant la fonction de perte ? Par exemple, remplacez la perte normalisée $\ell_1$ par une perte normalisée lisse $\ell_1$ pour les décalages prédits. Cette fonction de perte utilise une fonction carrée autour de zéro pour la régularité, qui est contrôlée par l'hyperparamètre $\sigma$:
 
 $$
 f(x) =
@@ -889,7 +889,7 @@ f(x) =
     \end{cases}
 $$
 
-When $\sigma$ is very large, this loss is similar to the $\ell_1$ norm loss. When its value is smaller, the loss function is smoother.
+Lorsque $\sigma$ est très grand, cette perte est similaire à la perte de norme $\ell_1$. Lorsque sa valeur est plus petite, la fonction de perte est plus lisse.
 
 ```{.python .input}
 #@tab mxnet
@@ -926,18 +926,18 @@ for l, s in zip(lines, sigmas):
 d2l.plt.legend();
 ```
 
-Besides, in the experiment we used cross-entropy loss for class prediction:
-denoting by $p_j$ the predicted probability for the ground-truth class $j$, the cross-entropy loss is $-\log p_j$. We can also use the focal loss
-:cite:`Lin.Goyal.Girshick.ea.2017`: given hyperparameters $\gamma > 0$
-and $\alpha > 0$, this loss is defined as:
+En outre, dans l'expérience, nous avons utilisé la perte d'entropie croisée pour la prédiction de classe :
+désignant par $p_j$ la probabilité prédite pour la classe de vérité du sol $j$, la perte d'entropie croisée est $-\log p_j$. Nous pouvons également utiliser la perte focale
+:cite:`Lin.Goyal.Girshick.ea.2017` : étant donné les hyperparamètres $\gamma > 0$
+ et $\alpha > 0$, cette perte est définie comme suit :
 
-$$ - \alpha (1-p_j)^{\gamma} \log p_j.$$
+$$ - \alpha (1-p_j)^{\gamma} \log p_j.$$ 
 
-As we can see, increasing $\gamma$
-can effectively reduce the relative loss
-for well-classified examples (e.g., $p_j > 0.5$)
-so the training
-can focus more on those difficult examples that are misclassified.
+ Comme nous pouvons le constater, l'augmentation de $\gamma$
+ peut réduire efficacement la perte relative
+pour les exemples bien classés (par exemple, $p_j > 0.5$)
+de sorte que la formation
+peut se concentrer davantage sur les exemples difficiles qui sont mal classés.
 
 ```{.python .input}
 #@tab mxnet
@@ -962,11 +962,11 @@ for l, gamma in zip(lines, [0, 1, 5]):
 d2l.plt.legend();
 ```
 
-2. Due to space limitations, we have omitted some implementation details of the single shot multibox detection model in this section. Can you further improve the model in the following aspects:
-    1. When an object is much smaller compared with the image, the model could resize the input image bigger.
-    1. There are typically a vast number of negative anchor boxes. To make the class distribution more balanced, we could downsample negative anchor boxes.
-    1. In the loss function, assign different weight hyperparameters to the class loss and the offset loss.
-    1. Use other methods to evaluate the object detection model, such as those in the single shot multibox detection paper :cite:`Liu.Anguelov.Erhan.ea.2016`.
+2. En raison du manque d'espace, nous avons omis certains détails de mise en œuvre du modèle de détection multiboxes à un seul coup dans cette section. Pouvez-vous encore améliorer le modèle dans les aspects suivants :
+   1. Lorsqu'un objet est beaucoup plus petit que l'image, le modèle pourrait redimensionner l'image d'entrée.
+   1. Il y a généralement un grand nombre de boîtes d'ancrage négatives. Pour rendre la distribution des classes plus équilibrée, nous pourrions réduire l'échantillonnage des boîtes d'ancrage négatives.
+   1. Dans la fonction de perte, attribuez des hyperparamètres de poids différents à la perte de classe et à la perte de décalage.
+   1. Utilisez d'autres méthodes pour évaluer le modèle de détection d'objets, telles que celles présentées dans l'article sur la détection multiboxes à un seul coup :cite:`Liu.Anguelov.Erhan.ea.2016` .
 
 
 

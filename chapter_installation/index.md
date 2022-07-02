@@ -1,29 +1,29 @@
 # Installation
-:label:`chap_installation`
+:label:`chap_installation` 
 
-In order to get up and running,
-we will need an environment for running Python,
-the Jupyter Notebook, the relevant libraries,
-and the code needed to run the book itself.
+ Afin d'être opérationnel,
+nous aurons besoin d'un environnement pour exécuter Python,
+le Jupyter Notebook, les bibliothèques pertinentes,
+et le code nécessaire pour exécuter le livre lui-même.
 
-## Installing Miniconda
+## Installation de Miniconda
 
-Your simplest option is to install
-[Miniconda](https://conda.io/en/latest/miniconda.html).
-Note that the Python 3.x version is required.
-You can skip the following steps
-if your machine already has conda installed.
+Votre option la plus simple est d'installer
+[Miniconda](https://conda.io/en/latest/miniconda.html) .
+Notez que la version Python 3.x est requise.
+Vous pouvez sauter les étapes suivantes
+si conda est déjà installé sur votre machine.
 
-Visit the Miniconda website and determine
-the appropriate version for your system
-based on your Python 3.x version and machine architecture.
-Suppose that your Python version is 3.8
-(our tested version).
-If you are using macOS,
-you would download the bash script
-whose name contains the strings "MacOSX",
-navigate to the download location,
-and execute the installation as follows:
+Visitez le site web de Miniconda et déterminez
+la version appropriée pour votre système
+en fonction de votre version Python 3.x et de l'architecture de votre machine.
+Supposons que votre version de Python soit 3.8
+(notre version testée).
+Si vous utilisez macOS,
+vous téléchargeriez le script bash
+dont le nom contient les chaînes "MacOSX",
+navigueriez vers l'emplacement de téléchargement,
+et exécuteriez l'installation comme suit :
 
 ```bash
 # The file name is subject to changes
@@ -31,10 +31,10 @@ sh Miniconda3-py38_4.10.3-MacOSX-x86_64.sh -b
 ```
 
 
-A Linux user
-would download the file
-whose name contains the strings "Linux"
-and execute the following at the download location:
+Un utilisateur de Linux
+téléchargerait le fichier
+dont le nom contient les chaînes "Linux"
+et exécuterait ce qui suit à l'emplacement du téléchargement :
 
 ```bash
 # The file name is subject to changes
@@ -42,55 +42,55 @@ sh Miniconda3-py38_4.10.3-Linux-x86_64.sh -b
 ```
 
 
-Next, initialize the shell so we can run `conda` directly.
+Ensuite, initialisez le shell afin que nous puissions exécuter directement `conda`.
 
 ```bash
-~/miniconda3/bin/conda init
+~)/miniconda3/bin/conda init
 ```
 
 
-Then close and reopen your current shell.
-You should be able to create
-a new environment as follows:
+Ensuite, fermez et rouvrez votre shell actuel.
+Vous devriez être en mesure de créer
+un nouvel environnement comme suit :
 
 ```bash
 conda create --name d2l python=3.8 -y
 ```
 
 
-Now we can activate the `d2l` environment:
+Maintenant, nous pouvons activer l'environnement `d2l`:
 
 ```bash
 conda activate d2l
 ```
 
 
-## Installing the Deep Learning Framework and the `d2l` Package
+## Installation du cadre d'apprentissage profond et du paquet `d2l`
 
-Before installing any deep learning framework,
-please first check whether or not
-you have proper GPUs on your machine
-(the GPUs that power the display
-on a standard laptop are not relevant for our purposes).
-For example,
-if your computer has NVIDIA GPUs and has installed [CUDA](https://developer.nvidia.com/cuda-downloads),
-then you are all set.
-If your machine does not house any GPU,
-there is no need to worry just yet.
-Your CPU provides more than enough horsepower
-to get you through the first few chapters.
-Just remember that you will want to access GPUs
-before running larger models.
+ Avant d'installer un cadre d'apprentissage profond,
+veuillez d'abord vérifier si
+vous disposez ou non de GPU appropriés sur votre machine
+(les GPU qui alimentent l'écran
+sur un ordinateur portable standard ne sont pas pertinents pour nos objectifs).
+Par exemple,
+si votre ordinateur est équipé de GPU NVIDIA et a installé [CUDA](https://developer.nvidia.com/cuda-downloads),
+alors vous êtes prêt.
+Si votre machine n'abrite pas de GPU,
+il n'y a pas lieu de s'inquiéter pour l'instant.
+Votre processeur fournit plus qu'assez de puissance
+pour vous faire passer les premiers chapitres.
+Rappelez-vous simplement que vous voudrez accéder aux GPU
+avant d'exécuter des modèles plus importants.
 
 
 :begin_tab:`mxnet`
 
-To install a GPU-enabled version of MXNet,
-we need to find out what version of CUDA you have installed.
-You can check this by running `nvcc --version`
-or `cat /usr/local/cuda/version.txt`.
-Assume that you have installed CUDA 10.1,
-then execute the following command:
+Pour installer une version de MXNet compatible avec les GPU,
+nous devons savoir quelle version de CUDA vous avez installée.
+Vous pouvez le vérifier en exécutant `nvcc --version`
+ ou `cat /usr/local/cuda/version.txt`.
+Supposons que vous ayez installé CUDA 10.1,
+puis exécutez la commande suivante :
 
 ```bash
 # For macOS and Linux users
@@ -101,14 +101,14 @@ pip install mxnet-cu101==1.7.0 -f https://dist.mxnet.io/python
 ```
 
 
-You may change the last digits according to your CUDA version, e.g., `cu100` for
-CUDA 10.0 and `cu90` for CUDA 9.0.
+Vous pouvez changer les derniers chiffres en fonction de votre version de CUDA, par exemple, `cu100` pour
+CUDA 10.0 et `cu90` pour CUDA 9.0.
 
 
-If your machine has no NVIDIA GPUs 
-or CUDA,
-you can install the CPU version
-as follows:
+ Si votre machine ne possède pas de GPU NVIDIA 
+ou CUDA,
+vous pouvez installer la version CPU
+comme suit :
 
 ```bash
 pip install mxnet==1.7.0.post1
@@ -120,7 +120,7 @@ pip install mxnet==1.7.0.post1
 
 :begin_tab:`pytorch`
 
-You can install PyTorch with either CPU or GPU support as follows:
+Vous pouvez installer PyTorch avec le support CPU ou GPU comme suit :
 
 ```bash
 pip install torch==1.8.1
@@ -131,7 +131,7 @@ pip install torchvision==0.9.1
 :end_tab:
 
 :begin_tab:`tensorflow`
-You can install TensorFlow with either CPU or GPU support as follows:
+Vous pouvez installer TensorFlow avec le support du CPU ou du GPU comme suit :
 
 ```bash
 pip install tensorflow==2.3.1
@@ -142,27 +142,27 @@ pip install tensorflow-probability==0.11.1
 :end_tab:
 
 
-Our next step is to install
-the `d2l` package that we developed
-in order to encapsulate
-frequently used functions and classes
-found throughout this book:
+L'étape suivante consiste à installer
+le paquetage `d2l` que nous avons développé
+afin d'encapsuler
+les fonctions et classes fréquemment utilisées
+que vous trouverez tout au long de ce livre :
 
 ```bash
 pip install d2l
 ```
 
 
-## Downloading and Running the Code
+### Téléchargement et exécution du code
 
-Next, we need to download the code of this book.
-You can click the "Notebooks" tab
-on the top of any HTML page of this book
-to download and unzip the code.
-Alternatively, if you have `unzip`
-(otherwise run `sudo apt-get install unzip`) available:
+Ensuite, nous devons télécharger le code de ce livre.
+Vous pouvez cliquer sur l'onglet "Notebooks"
+en haut de n'importe quelle page HTML de ce livre
+pour télécharger et décompresser le code.
+Sinon, si vous disposez de `unzip`
+ (sinon, exécutez `sudo apt-get install unzip`):
 
-:begin_tab:`mxnet`
+:begin_tab :`mxnet`
 
 ```bash
 mkdir d2l-en && cd d2l-en
@@ -198,22 +198,22 @@ cd tensorflow
 :end_tab:
 
 
-Now we can start the Jupyter Notebook server by running:
+Nous pouvons maintenant démarrer le serveur Jupyter Notebook en exécutant :
 
 ```bash
 jupyter notebook
 ```
 
 
-At this point, you can open http://localhost:8888
-(it may have already opened automatically) in your Web browser.
-Then we can run the code for each section of the book.
-Please always execute `conda activate d2l`
-to activate the runtime environment
-before running the code of the book
-or updating the deep learning framework or the `d2l` package.
-To exit the environment,
-run `conda deactivate`.
+À ce stade, vous pouvez ouvrir http://localhost:8888
+(il se peut qu'il se soit déjà ouvert automatiquement) dans votre navigateur Web.
+Ensuite, nous pouvons exécuter le code pour chaque section du livre.
+Veuillez toujours exécuter `conda activate d2l`
+ pour activer l'environnement d'exécution
+avant d'exécuter le code du livre
+ou de mettre à jour le cadre d'apprentissage profond ou le paquet `d2l`.
+Pour quitter l'environnement,
+exécutez `conda deactivate`.
 
 
 

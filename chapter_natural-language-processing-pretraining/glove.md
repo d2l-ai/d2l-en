@@ -1,204 +1,204 @@
 # Word Embedding with Global Vectors (GloVe)
-:label:`sec_glove`
+:label:`sec_glove` 
+
+ 
+ Les cooccurrences mot-mot 
+dans des fenêtres de contexte
+peuvent être porteuses d'informations sémantiques riches.
+Par exemple,
+dans un grand corpus
+le mot "solide" est
+plus susceptible de cooccurber
+avec "glace" qu'avec "vapeur",
+mais le mot "gaz"
+cooccure probablement avec "vapeur"
+plus fréquemment que "glace".
+En outre, les statistiques du corpus global
+
+ de ces cooccurrences
+peuvent être précalculées :
+cela peut conduire à une formation plus efficace.
+Afin d'exploiter les informations statistiques
+de l'ensemble du corpus
+pour l'intégration des mots,
+reprenons d'abord
+le modèle de saut de programme dans :numref:`subsec_skip-gram` ,
+mais en l'interprétant
+à l'aide des statistiques globales du corpus
+telles que les comptes de cooccurrence.
+
+## Skip-Gram avec les statistiques globales du corpus
+:label:`subsec_skipgram-global` 
+
+ En désignant par $q_{ij}$
+ la probabilité conditionnelle
+$P(w_j\mid w_i)$ 
+ du mot $w_j$ étant donné le mot $w_i$
+ dans le modèle skip-gram,
+nous avons
+
+$$q_{ij}=\frac{\exp(\mathbf{u}_j^\top \mathbf{v}_i)}{ \sum_{k \in \mathcal{V}} \text{exp}(\mathbf{u}_k^\top \mathbf{v}_i)},$$ 
+
+ où 
+pour tout index $i$
+ les vecteurs $\mathbf{v}_i$ et $\mathbf{u}_i$
+ représentent le mot $w_i$
+ comme le mot central et le mot de contexte,
+respectivement, et $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$ 
+ est l'ensemble d'index du vocabulaire.
+
+Considérons le mot $w_i$
+ qui peut apparaître plusieurs fois
+dans le corpus.
+Dans l'ensemble du corpus,
+tous les mots de contexte
+où $w_i$ est pris comme leur mot central
+forment un *multiset* $\mathcal{C}_i$
+ d'indices de mots
+qui *permet des instances multiples du même élément*.
+Pour tout élément,
+son nombre d'instances est appelé sa *multiplicité*.
+Pour illustrer avec un exemple,
+supposons que le mot $w_i$ apparaît deux fois dans le corpus
+et les indices des mots de contexte
+qui prennent $w_i$ comme mot central
+dans les deux fenêtres de contexte
+sont 
+$k, j, m, k$ et $k, l, k, j$.
+Ainsi, le multiset $\mathcal{C}_i = \{j, j, k, k, k, k, l, m\}$, où 
+multiplicités des éléments $j, k, l, m$
+ sont 2, 4, 1, 1, respectivement.
+
+Désignons maintenant la multiplicité de l'élément $j$ dans le multiset
+ $\mathcal{C}_i$ par $x_{ij}$.
+Il s'agit du nombre global de cooccurrences 
+du mot $w_j$ (en tant que mot de contexte)
+et du mot $w_i$ (en tant que mot central)
+dans la même fenêtre de contexte
+dans l'ensemble du corpus.
+En utilisant ces statistiques globales du corpus,
+la fonction de perte du modèle de saut de programme 
+est équivalente à
+
+$$-\sum_{i\in\mathcal{V}}\sum_{j\in\mathcal{V}} x_{ij} \log\,q_{ij}.$$ 
+ :eqlabel:`eq_skipgram-x_ij` 
+
+ Nous désignons en outre par
+$x_i$ 
+ le nombre de tous les mots de contexte
+dans les fenêtres de contexte
+où $w_i$ apparaît comme leur mot central,
+qui est équivalent à $|\mathcal{C}_i|$.
+Si l'on laisse $p_{ij}$
+ être la probabilité conditionnelle
+$x_{ij}/x_i$ de générer
+le mot contextuel $w_j$ étant donné le mot central $w_i$,
+:eqref:`eq_skipgram-x_ij` 
+ peut être réécrit comme suit :
+
+$$-\sum_{i\in\mathcal{V}} x_i \sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}.$$ 
+ :eqlabel:`eq_skipgram-p_ij` 
+
+ In :eqref:`eq_skipgram-p_ij` , $-\sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}$ calcule
+l'entropie croisée 
+de
+la distribution conditionnelle $p_{ij}$
+ des statistiques globales du corpus
+et
+la distribution conditionnelle
+ $q_{ij}$ 
+ des prédictions du modèle.
+Cette perte
+est également pondérée par $x_i$ comme expliqué ci-dessus.
+La minimisation de la fonction de perte dans 
+:eqref:`eq_skipgram-p_ij` 
+ permettra à
+la distribution conditionnelle prédite
+de se rapprocher de
+la distribution conditionnelle
+des statistiques globales du corpus.
 
 
-Word-word co-occurrences 
-within context windows
-may carry rich semantic information.
-For example,
-in a large corpus
-word "solid" is
-more likely to co-occur
-with "ice" than "steam",
-but word "gas"
-probably co-occurs with "steam"
-more frequently than "ice".
-Besides,
-global corpus statistics
-of such co-occurrences
-can be precomputed:
-this can lead to more efficient training.
-To leverage statistical
-information in the entire corpus
-for word embedding,
-let's first revisit
-the skip-gram model in :numref:`subsec_skip-gram`,
-but interpreting it
-using global corpus statistics
-such as co-occurrence counts.
+Bien qu'elle soit couramment utilisée
+pour mesurer la distance
+entre des distributions de probabilité,
+la fonction de perte d'entropie croisée peut ne pas être un bon choix ici. 
+D'une part, comme nous l'avons mentionné dans :numref:`sec_approx_train` , 
+le coût d'une normalisation correcte $q_{ij}$
+ résulte de la somme sur l'ensemble du vocabulaire,
+ce qui peut être coûteux en termes de calcul.
+D'autre part, 
+un grand nombre d'événements rares 
+d'un grand corpus
+sont souvent modélisés par la perte d'entropie croisée
+pour être assignés avec
+trop de poids.
 
-## Skip-Gram with Global Corpus Statistics
-:label:`subsec_skipgram-global`
+## Le modèle GloVe
 
-Denoting by $q_{ij}$
-the conditional probability
-$P(w_j\mid w_i)$
-of word $w_j$ given word $w_i$
-in the skip-gram model,
-we have
+Dans cette optique,
+le modèle *GloVe* apporte trois modifications
+au modèle de saut de programme basé sur la perte au carré :cite:`Pennington.Socher.Manning.2014` :
 
-$$q_{ij}=\frac{\exp(\mathbf{u}_j^\top \mathbf{v}_i)}{ \sum_{k \in \mathcal{V}} \text{exp}(\mathbf{u}_k^\top \mathbf{v}_i)},$$
+1. Utiliser des variables $p'_{ij}=x_{ij}$ et $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$ 
+ qui ne sont pas des distributions de probabilité
+et prendre le logarithme des deux, de sorte que le terme de perte au carré est $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
+2. Ajouter deux paramètres scalaires du modèle pour chaque mot $w_i$: le biais du mot central $b_i$ et le biais du mot contextuel $c_i$.
+3. Remplacez le poids de chaque terme de perte par la fonction de poids $h(x_{ij})$, où $h(x)$ est croissant dans l'intervalle $[0, 1]$.
 
-where 
-for any index $i$
-vectors $\mathbf{v}_i$ and $\mathbf{u}_i$
-represent word $w_i$
-as the center word and context word,
-respectively, and $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$ 
-is the index set of the vocabulary.
+En mettant tout cela ensemble, la formation de GloVe consiste à minimiser la fonction de perte suivante :
 
-Consider word $w_i$
-that may occur multiple times
-in the corpus.
-In the entire corpus,
-all the context words
-wherever $w_i$ is taken as their center word
-form a *multiset* $\mathcal{C}_i$
-of word indices
-that *allows for multiple instances of the same element*.
-For any element,
-its number of instances is called its *multiplicity*.
-To illustrate with an example,
-suppose that word $w_i$ occurs twice in the corpus
-and indices of the context words
-that take $w_i$ as their center word
-in the two context windows
-are 
-$k, j, m, k$ and $k, l, k, j$.
-Thus, multiset $\mathcal{C}_i = \{j, j, k, k, k, k, l, m\}$, where 
-multiplicities of elements $j, k, l, m$
-are 2, 4, 1, 1, respectively.
+$$\sum_{i\in\mathcal{V}} \sum_{j\in\mathcal{V}} h(x_{ij}) \left(\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j - \log\,x_{ij}\right)^2.$$ 
+ :eqlabel:`eq_glove-loss` 
 
-Now let's denote the multiplicity of element $j$ in
-multiset $\mathcal{C}_i$ as $x_{ij}$.
-This is the global co-occurrence count 
-of word $w_j$ (as the context word)
-and word $w_i$ (as the center word)
-in the same context window
-in the entire corpus.
-Using such global corpus statistics,
-the loss function of the skip-gram model 
-is equivalent to
+ Pour la fonction de poids, un choix suggéré est : 
+$h(x) = (x/c) ^\alpha$ (par exemple $\alpha = 0.75$) si $x < c$ (par exemple, $c = 100$) ; sinon $h(x) = 1$.
+Dans ce cas,
+parce que $h(0)=0$,
+le terme de perte au carré pour tout $x_{ij}=0$ peut être omis
+pour des raisons d'efficacité de calcul.
+Par exemple,
+lorsque vous utilisez la descente de gradient stochastique par minilots pour l'apprentissage, 
+à chaque itération
+nous échantillonnons de manière aléatoire un minilots de *non-zéro* $x_{ij}$ 
+ pour calculer les gradients
+et mettre à jour les paramètres du modèle. 
+Notez que ces non-zéros $x_{ij}$ sont des statistiques de corpus global précalculées 
+;
+ainsi, le modèle est appelé GloVe
+pour *Global Vectors*.
 
-$$-\sum_{i\in\mathcal{V}}\sum_{j\in\mathcal{V}} x_{ij} \log\,q_{ij}.$$
-:eqlabel:`eq_skipgram-x_ij`
-
-We further denote by
-$x_i$
-the number of all the context words
-in the context windows
-where $w_i$ occurs as their center word,
-which is equivalent to $|\mathcal{C}_i|$.
-Letting $p_{ij}$
-be the conditional probability
-$x_{ij}/x_i$ for generating
-context word $w_j$ given center word $w_i$,
-:eqref:`eq_skipgram-x_ij`
-can be rewritten as
-
-$$-\sum_{i\in\mathcal{V}} x_i \sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}.$$
-:eqlabel:`eq_skipgram-p_ij`
-
-In :eqref:`eq_skipgram-p_ij`, $-\sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}$ calculates
-the cross-entropy 
-of
-the conditional distribution $p_{ij}$
-of global corpus statistics
-and
-the
-conditional distribution $q_{ij}$
-of model predictions.
-This loss
-is also weighted by $x_i$ as explained above.
-Minimizing the loss function in 
-:eqref:`eq_skipgram-p_ij`
-will allow
-the predicted conditional distribution
-to get close to
-the conditional distribution
-from the global corpus statistics.
-
-
-Though being commonly used
-for measuring the distance
-between probability distributions,
-the cross-entropy loss function may not be a good choice here. 
-On the one hand, as we mentioned in :numref:`sec_approx_train`, 
-the cost of properly normalizing $q_{ij}$
-results in the sum over the entire vocabulary,
-which can be computationally expensive.
-On the other hand, 
-a large number of rare 
-events from a large corpus
-are often modeled by the cross-entropy loss
-to be assigned with
-too much weight.
-
-## The GloVe Model
-
-In view of this,
-the *GloVe* model makes three changes
-to the skip-gram model based on squared loss :cite:`Pennington.Socher.Manning.2014`:
-
-1. Use variables $p'_{ij}=x_{ij}$ and $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$ 
-that are not probability distributions
-and take the logarithm of both, so the squared loss term is $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
-2. Add two scalar model parameters for each word $w_i$: the center word bias $b_i$ and the context word bias $c_i$.
-3. Replace the weight of each loss term with the weight function $h(x_{ij})$, where $h(x)$ is increasing in the interval of $[0, 1]$.
-
-Putting all things together, training GloVe is to minimize the following loss function:
-
-$$\sum_{i\in\mathcal{V}} \sum_{j\in\mathcal{V}} h(x_{ij}) \left(\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j - \log\,x_{ij}\right)^2.$$
-:eqlabel:`eq_glove-loss`
-
-For the weight function, a suggested choice is: 
-$h(x) = (x/c) ^\alpha$ (e.g $\alpha = 0.75$) if $x < c$ (e.g., $c = 100$); otherwise $h(x) = 1$.
-In this case,
-because $h(0)=0$,
-the squared loss term for any $x_{ij}=0$ can be omitted
-for computational efficiency.
-For example,
-when using minibatch stochastic gradient descent for training, 
-at each iteration
-we randomly sample a minibatch of *non-zero* $x_{ij}$ 
-to calculate gradients
-and update the model parameters. 
-Note that these non-zero $x_{ij}$ are precomputed 
-global corpus statistics;
-thus, the model is called GloVe
-for *Global Vectors*.
-
-It should be emphasized that
-if word $w_i$ appears in the context window of 
-word $w_j$, then *vice versa*. 
-Therefore, $x_{ij}=x_{ji}$. 
-Unlike word2vec
-that fits the asymmetric conditional probability
-$p_{ij}$,
-GloVe fits the symmetric $\log \, x_{ij}$.
-Therefore, the center word vector and
-the context word vector of any word are mathematically equivalent in the GloVe model. 
-However in practice, owing to different initialization values,
-the same word may still get different values
-in these two vectors after training:
-GloVe sums them up as the output vector.
+Il convient de souligner que
+si le mot $w_i$ apparaît dans la fenêtre de contexte du mot 
+ $w_j$ , alors *vice versa*. 
+Par conséquent, $x_{ij}=x_{ji}$. 
+Contrairement au mot2vec
+qui correspond à la probabilité conditionnelle asymétrique
+$p_{ij}$ ,
+GloVe correspond à la probabilité conditionnelle symétrique $\log \, x_{ij}$.
+Par conséquent, le vecteur mot central et
+le vecteur mot contextuel de tout mot sont mathématiquement équivalents dans le modèle GloVe. 
+Cependant, en pratique, en raison de valeurs d'initialisation différentes,
+le même mot peut encore obtenir des valeurs différentes
+dans ces deux vecteurs après l'entraînement :
+GloVe les additionne en tant que vecteur de sortie.
 
 
 
-## Interpreting GloVe from the Ratio of Co-occurrence Probabilities
+## Interpréter GloVe à partir du rapport des probabilités de cooccurrence
 
 
-We can also interpret the GloVe model from another perspective. 
-Using the same notation in 
-:numref:`subsec_skipgram-global`,
-let $p_{ij} \stackrel{\mathrm{def}}{=} P(w_j \mid w_i)$ be the conditional probability of generating the context word $w_j$ given $w_i$ as the center word in the corpus. 
+ Nous pouvons également interpréter le modèle GloVe d'un autre point de vue. 
+En utilisant la même notation que dans 
+:numref:`subsec_skipgram-global` ,
+, laissez $p_{ij} \stackrel{\mathrm{def}}{=} P(w_j \mid w_i)$ être la probabilité conditionnelle de générer le mot contextuel $w_j$ étant donné $w_i$ comme mot central dans le corpus. 
 :numref:`tab_glove`
-lists several co-occurrence probabilities
-given words "ice" and "steam"
-and their ratios based on  statistics from a large corpus.
+liste plusieurs probabilités de cooccurrence
+avec les mots "ice" et "steam"
+et leurs ratios basés sur les statistiques d'un grand corpus.
 
 
-:Word-word co-occurrence probabilities and their ratios from a large corpus (adapted from Table 1 in :cite:`Pennington.Socher.Manning.2014`:)
+ : Probabilités de cooccurrence mot-mot et leurs ratios à partir d'un grand corpus (adapté du tableau 1 dans :cite:`Pennington.Socher.Manning.2014`:)
 
 
 |$w_k$=|solid|gas|water|fashion|
@@ -206,80 +206,80 @@ and their ratios based on  statistics from a large corpus.
 |$p_1=P(w_k\mid \text{ice})$|0.00019|0.000066|0.003|0.000017|
 |$p_2=P(w_k\mid\text{steam})$|0.000022|0.00078|0.0022|0.000018|
 |$p_1/p_2$|8.9|0.085|1.36|0.96|
-:label:`tab_glove`
+:label:`tab_glove` 
 
+ 
+ Nous pouvons observer ce qui suit à partir de :numref:`tab_glove` :
 
-We can observe the following from :numref:`tab_glove`:
-
-* For a word $w_k$ that is related to "ice" but unrelated to "steam", such as $w_k=\text{solid}$, we expect a larger ratio of co-occurence probabilities, such as 8.9.
-* For a word $w_k$ that is related to "steam" but unrelated to "ice", such as $w_k=\text{gas}$, we expect a smaller ratio of co-occurence probabilities, such as 0.085.
-* For a word $w_k$ that is related to both "ice" and "steam", such as $w_k=\text{water}$, we expect a ratio of co-occurence probabilities that is close to 1, such as 1.36.
-* For a word $w_k$ that is unrelated to both "ice" and "steam", such as $w_k=\text{fashion}$, we expect a ratio of co-occurence probabilities that is close to 1, such as 0.96.
-
-
-
-
-It can be seen that the ratio
-of co-occurrence probabilities
-can intuitively express
-the relationship between words. 
-Thus, we can design a function
-of three word vectors
-to fit this ratio.
-For the ratio of co-occurrence probabilities
-${p_{ij}}/{p_{ik}}$
-with $w_i$ being the center word
-and $w_j$ and $w_k$ being the context words,
-we want to fit this ratio
-using some function $f$:
-
-$$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) \approx \frac{p_{ij}}{p_{ik}}.$$
-:eqlabel:`eq_glove-f`
-
-Among many possible designs for $f$,
-we only pick a reasonable choice in the following.
-Since the ratio of co-occurrence probabilities
-is a scalar,
-we require that
-$f$ be a scalar function, such as
-$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) = f\left((\mathbf{u}_j - \mathbf{u}_k)^\top {\mathbf{v}}_i\right)$. 
-Switching word indices
-$j$ and $k$ in :eqref:`eq_glove-f`,
-it must hold that
-$f(x)f(-x)=1$,
-so one possibility is $f(x)=\exp(x)$,
-i.e., 
-
-$$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) = \frac{\exp\left(\mathbf{u}_j^\top {\mathbf{v}}_i\right)}{\exp\left(\mathbf{u}_k^\top {\mathbf{v}}_i\right)} \approx \frac{p_{ij}}{p_{ik}}.$$
-
-Now let's pick
-$\exp\left(\mathbf{u}_j^\top {\mathbf{v}}_i\right) \approx \alpha p_{ij}$,
-where $\alpha$ is a constant.
-Since $p_{ij}=x_{ij}/x_i$, after taking the logarithm on both sides we get $\mathbf{u}_j^\top {\mathbf{v}}_i \approx \log\,\alpha + \log\,x_{ij} - \log\,x_i$. 
-We may use additional bias terms to fit $- \log\, \alpha + \log\, x_i$, such as the center word bias $b_i$ and the context word bias $c_j$:
-
-$$\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j \approx \log\, x_{ij}.$$
-:eqlabel:`eq_glove-square`
-
-Measuring the squared error of
-:eqref:`eq_glove-square` with weights,
-the GloVe loss function in
-:eqref:`eq_glove-loss` is obtained.
+* Pour un mot $w_k$ qui est lié à "ice" mais non lié à "steam", tel que $w_k=\text{solid}$, nous nous attendons à un plus grand rapport de probabilités de cooccurrence, tel que 8.9.
+* Pour un mot $w_k$ qui est lié à "vapeur" mais non lié à "glace", comme $w_k=\text{gas}$, nous nous attendons à un plus petit rapport de probabilités de cooccurrence, comme 0.085.
+* Pour un mot $w_k$ qui est lié à la fois à "glace" et à "vapeur", comme $w_k=\text{water}$, nous nous attendons à un rapport de probabilités de cooccurrence proche de 1, comme 1,36.
+* Pour un mot $w_k$ qui n'est pas lié à la fois à "glace" et à "vapeur", tel que $w_k=\text{fashion}$, nous nous attendons à un rapport de probabilités de cooccurrence proche de 1, tel que 0,96.
 
 
 
-## Summary
+ 
+ On peut voir que le rapport
+des probabilités de cooccurrence
+peut intuitivement exprimer
+la relation entre les mots. 
+Ainsi, nous pouvons concevoir une fonction
+de trois vecteurs de mots
+pour ajuster ce rapport.
+Pour le rapport des probabilités de cooccurrence
+${p_{ij}}/{p_{ik}}$ 
+ avec $w_i$ étant le mot central
+et $w_j$ et $w_k$ étant les mots du contexte,
+nous voulons ajuster ce rapport
+en utilisant une fonction $f$:
 
-* The skip-gram model can be interpreted using global corpus statistics such as word-word co-occurrence counts.
-* The cross-entropy loss may not be a good choice for measuring the difference of two probability distributions, especially for a large corpus. GloVe uses squared loss to fit precomputed global corpus statistics.
-* The center word vector and the context word vector are mathematically equivalent for any word in GloVe.
-* GloVe can be interpreted from the ratio of word-word co-occurrence probabilities.
+$$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) \approx \frac{p_{ij}}{p_{ik}}.$$ 
+ :eqlabel:`eq_glove-f` 
+
+ Parmi les nombreuses conceptions possibles pour $f$,
+nous ne faisons qu'un choix raisonnable dans ce qui suit.
+Puisque le rapport des probabilités de cooccurrence
+est un scalaire,
+nous exigeons que
+$f$ soit une fonction scalaire, telle que
+$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) = f\left((\mathbf{u}_j - \mathbf{u}_k)^\top {\mathbf{v}}_i\right)$ . 
+En permutant les indices de mots
+$j$ et $k$ dans :eqref:`eq_glove-f` ,
+, il faut que
+$f(x)f(-x)=1$ ,
+donc une possibilité est $f(x)=\exp(x)$,
+c'est-à-dire 
+
+$$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) = \frac{\exp\left(\mathbf{u}_j^\top {\mathbf{v}}_i\right)}{\exp\left(\mathbf{u}_k^\top {\mathbf{v}}_i\right)} \approx \frac{p_{ij}}{p_{ik}}.$$ 
+
+ Choisissons maintenant
+$\exp\left(\mathbf{u}_j^\top {\mathbf{v}}_i\right) \approx \alpha p_{ij}$ ,
+où $\alpha$ est une constante.
+Puisque $p_{ij}=x_{ij}/x_i$, après avoir pris le logarithme des deux côtés, nous obtenons $\mathbf{u}_j^\top {\mathbf{v}}_i \approx \log\,\alpha + \log\,x_{ij} - \log\,x_i$. 
+Nous pouvons utiliser des termes de biais supplémentaires pour ajuster $- \log\, \alpha + \log\, x_i$, tels que le biais du mot central $b_i$ et le biais du mot contextuel $c_j$:
+
+$$\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j \approx \log\, x_{ij}.$$ 
+ :eqlabel:`eq_glove-square` 
+
+ En mesurant l'erreur quadratique de
+:eqref:`eq_glove-square` avec les poids,
+on obtient la fonction de perte GloVe dans
+:eqref:`eq_glove-loss` .
 
 
-## Exercises
 
-1. If words $w_i$ and $w_j$ co-occur in the same context window, how can we use their   distance in the text sequence to redesign the method for  calculating the conditional probability $p_{ij}$? Hint: see Section 4.2 of the GloVe paper :cite:`Pennington.Socher.Manning.2014`.
-1. For any word, are its center word bias  and context word bias mathematically equivalent in GloVe? Why?
+## Résumé
+
+* Le modèle de saut de programme peut être interprété à l'aide de statistiques globales du corpus telles que les comptes de cooccurrence mot-mot.
+* La perte d'entropie croisée peut ne pas être un bon choix pour mesurer la différence de deux distributions de probabilité, en particulier pour un grand corpus. GloVe utilise la perte au carré pour ajuster les statistiques globales précalculées du corpus.
+* Le vecteur mot central et le vecteur mot contextuel sont mathématiquement équivalents pour tout mot dans GloVe.
+* GloVe peut être interprété à partir du rapport des probabilités de co-occurrence mot-mot.
+
+
+## Exercices
+
+1. Si les mots $w_i$ et $w_j$ cooccurrent dans la même fenêtre de contexte, comment pouvons-nous utiliser leur distance dans la séquence de texte pour redéfinir la méthode de calcul de la probabilité conditionnelle $p_{ij}$? Indice : voir la section 4.2 de l'article de GloVe :cite:`Pennington.Socher.Manning.2014` .
+1. Pour tout mot, son biais de mot central et son biais de mot contextuel sont-ils mathématiquement équivalents dans GloVe ? Pourquoi ?
 
 
 [Discussions](https://discuss.d2l.ai/t/385)

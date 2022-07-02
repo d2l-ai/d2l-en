@@ -1,55 +1,55 @@
-# Natural Language Inference and the Dataset
-:label:`sec_natural-language-inference-and-dataset`
+# L'inférence en langage naturel et le jeu de données
+:label:`sec_natural-language-inference-and-dataset` 
 
-In :numref:`sec_sentiment`, we discussed the problem of sentiment analysis.
-This task aims to classify a single text sequence into predefined categories,
-such as a set of sentiment polarities.
-However, when there is a need to decide whether one sentence can be inferred form another, 
-or eliminate redundancy by identifying sentences that are semantically equivalent,
-knowing how to classify one text sequence is insufficient.
-Instead, we need to be able to reason over pairs of text sequences.
-
-
-## Natural Language Inference
-
-*Natural language inference* studies whether a *hypothesis*
-can be inferred from a *premise*, where both are a text sequence.
-In other words, natural language inference determines the logical relationship between a pair of text sequences.
-Such relationships usually fall into three types:
-
-* *Entailment*: the hypothesis can be inferred from the premise.
-* *Contradiction*: the negation of the hypothesis can be inferred from the premise.
-* *Neutral*: all the other cases.
-
-Natural language inference is also known as the recognizing textual entailment task.
-For example, the following pair will be labeled as *entailment* because "showing affection" in the hypothesis can be inferred from "hugging one another" in the premise.
-
-> Premise: Two women are hugging each other.
-
-> Hypothesis: Two women are showing affection.
-
-The following is an example of *contradiction* as "running the coding example" indicates "not sleeping" rather than "sleeping".
-
-> Premise: A man is running the coding example from Dive into Deep Learning.
-
-> Hypothesis: The man is sleeping.
-
-The third example shows a *neutrality* relationship because neither "famous" nor "not famous" can be inferred from the fact that "are performing for us". 
-
-> Premise: The musicians are performing for us.
-
-> Hypothesis: The musicians are famous.
-
-Natural language inference has been a central topic for understanding natural language.
-It enjoys wide applications ranging from
-information retrieval to open-domain question answering.
-To study this problem, we will begin by investigating a popular natural language inference benchmark dataset.
+ Dans :numref:`sec_sentiment` , nous avons abordé le problème de l'analyse des sentiments.
+Cette tâche vise à classer une séquence de texte unique dans des catégories prédéfinies,
+telles qu'un ensemble de polarités de sentiments.
+Cependant, lorsqu'il est nécessaire de décider si une phrase peut être déduite d'une autre, 
+ou d'éliminer la redondance en identifiant les phrases qui sont sémantiquement équivalentes,
+savoir comment classer une séquence de texte est insuffisant.
+Au lieu de cela, nous devons être capables de raisonner sur des paires de séquences de texte.
 
 
-## The Stanford Natural Language Inference (SNLI) Dataset
+## Inférence en langage naturel
 
-[**Stanford Natural Language Inference (SNLI) Corpus**] is a collection of over 500000 labeled English sentence pairs :cite:`Bowman.Angeli.Potts.ea.2015`.
-We download and store the extracted SNLI dataset in the path `../data/snli_1.0`.
+*L'inférence en langage naturel* étudie si une *hypothèse*
+peut être déduite d'une *prémisse*, où les deux sont une séquence de texte.
+En d'autres termes, l'inférence en langage naturel détermine la relation logique entre une paire de séquences de texte.
+Ces relations sont généralement de trois types :
+
+* *Entaillement* : l'hypothèse peut être déduite de la prémisse.
+* *Contradiction* : la négation de l'hypothèse peut être déduite de la prémisse.
+* *Neutre* : tous les autres cas.
+
+L'inférence en langage naturel est également connue sous le nom de tâche de reconnaissance de l'entaillement textuel.
+Par exemple, la paire suivante sera étiquetée comme *entailment* car "montrer de l'affection" dans l'hypothèse peut être déduit de "s'étreindre" dans la prémisse.
+
+&gt; Prémisse : Deux femmes se font des câlins.
+
+&gt; Hypothèse : Deux femmes se montrent affectueuses.
+
+L'exemple suivant est un exemple de *contradiction* car "courir l'exemple de codage" indique "ne pas dormir" plutôt que "dormir".
+
+&gt; Prémisse : un homme exécute l'exemple de codage de Dive into Deep Learning.
+
+&gt; Hypothèse : L'homme dort.
+
+Le troisième exemple montre une relation de *neutralité* car ni "célèbre" ni "pas célèbre" ne peuvent être déduits du fait que "se produisent pour nous". 
+
+&gt; Prémisse : Les musiciens se produisent pour nous.
+
+&gt; Hypothèse : Les musiciens sont célèbres.
+
+L'inférence en langage naturel est un sujet central pour la compréhension du langage naturel.
+Ses applications sont nombreuses, allant de la recherche d'informations sur
+à la réponse à des questions dans un domaine ouvert.
+Pour étudier ce problème, nous commencerons par examiner un ensemble de données de référence populaire sur l'inférence en langage naturel.
+
+
+## Le Stanford Natural Language Inference (SNLI) Dataset
+
+[**Stanford Natural Language Inference (SNLI) Corpus**] est une collection de plus de 500000 paires de phrases anglaises étiquetées :cite:`Bowman.Angeli.Potts.ea.2015` .
+Nous téléchargeons et stockons le jeu de données SNLI extrait dans le chemin `../data/snli_1.0`.
 
 ```{.python .input}
 #@tab mxnet
@@ -84,9 +84,9 @@ d2l.DATA_HUB['SNLI'] = (
 data_dir = d2l.download_extract('SNLI')
 ```
 
-### [**Reading the Dataset**]
+### [**Lire le jeu de données**]
 
-The original SNLI dataset contains much richer information than what we really need in our experiments. Thus, we define a function `read_snli` to only extract part of the dataset, then return lists of premises, hypotheses, and their labels.
+Le jeu de données SNLI original contient des informations beaucoup plus riches que celles dont nous avons réellement besoin dans nos expériences. Ainsi, nous définissons une fonction `read_snli` pour n'extraire qu'une partie du jeu de données, puis renvoyer des listes de prémisses, d'hypothèses et leurs étiquettes.
 
 ```{.python .input}
 #@tab all
@@ -111,7 +111,7 @@ def read_snli(data_dir, is_train):
     return premises, hypotheses, labels
 ```
 
-Now let's [**print the first 3 pairs**] of premise and hypothesis, as well as their labels ("0", "1", and "2" correspond to "entailment", "contradiction", and "neutral", respectively ).
+Maintenant, [**imprimons les 3 premières paires**] de prémisses et d'hypothèses, ainsi que leurs étiquettes ("0", "1", et "2" correspondent à "implication", "contradiction", et "neutre", respectivement).
 
 ```{.python .input}
 #@tab all
@@ -122,11 +122,11 @@ for x0, x1, y in zip(train_data[0][:3], train_data[1][:3], train_data[2][:3]):
     print('label:', y)
 ```
 
-The training set has about 550000 pairs,
-and the testing set has about 10000 pairs.
-The following shows that 
-the three [**labels "entailment", "contradiction", and "neutral" are balanced**] in 
-both the training set and the testing set.
+L'ensemble d'apprentissage compte environ 550000 paires,
+et l'ensemble de test compte environ 10000 paires.
+Le tableau suivant montre que 
+les trois [**labels "entailment", "contradiction", et "neutral" sont équilibrés**] dans 
+à la fois dans l'ensemble d'entraînement et dans l'ensemble de test.
 
 ```{.python .input}
 #@tab all
@@ -135,12 +135,12 @@ for data in [train_data, test_data]:
     print([[row for row in data[2]].count(i) for i in range(3)])
 ```
 
-### [**Defining a Class for Loading the Dataset**]
+### [**Définir une classe pour charger le jeu de données**]
 
-Below we define a class for loading the SNLI dataset by inheriting from the `Dataset` class in Gluon. The argument `num_steps` in the class constructor specifies the length of a text sequence so that each minibatch of sequences will have the same shape. 
-In other words,
-tokens after the first `num_steps` ones in longer sequence are trimmed, while special tokens “&lt;pad&gt;” will be appended to shorter sequences until their length becomes `num_steps`.
-By implementing the `__getitem__` function, we can arbitrarily access the premise, hypothesis, and label with the index `idx`.
+Nous définissons ci-dessous une classe pour charger le jeu de données SNLI en héritant de la classe `Dataset` de Gluon. L'argument `num_steps` dans le constructeur de la classe spécifie la longueur d'une séquence de texte afin que chaque minibloc de séquences ait la même forme. 
+En d'autres termes, les tokens
+après les premiers `num_steps` dans une séquence plus longue sont coupés, tandis que les tokens spéciaux "&lt;pad&gt;" seront ajoutés aux séquences plus courtes jusqu'à ce que leur longueur devienne `num_steps`.
+En implémentant la fonction `__getitem__`, nous pouvons accéder arbitrairement aux prémisses, aux hypothèses et aux étiquettes avec l'index `idx`.
 
 ```{.python .input}
 #@tab mxnet
@@ -206,10 +206,10 @@ class SNLIDataset(torch.utils.data.Dataset):
 
 ### [**Putting All Things Together**]
 
-Now we can invoke the `read_snli` function and the `SNLIDataset` class to download the SNLI dataset and return `DataLoader` instances for both training and testing sets, together with the vocabulary of the training set.
-It is noteworthy that we must use the vocabulary constructed from the training set
-as that of the testing set. 
-As a result, any new token from the testing set will be unknown to the model trained on the training set.
+Nous pouvons maintenant invoquer la fonction `read_snli` et la classe `SNLIDataset` pour télécharger l'ensemble de données SNLI et renvoyer `DataLoader` instances pour les ensembles de formation et de test, ainsi que le vocabulaire de l'ensemble de formation.
+Il convient de noter que nous devons utiliser le vocabulaire construit à partir de l'ensemble d'apprentissage
+comme celui de l'ensemble de test. 
+Par conséquent, tout nouveau token provenant de l'ensemble de test sera inconnu du modèle formé sur l'ensemble de formation.
 
 ```{.python .input}
 #@tab mxnet
@@ -249,9 +249,9 @@ def load_data_snli(batch_size, num_steps=50):
     return train_iter, test_iter, train_set.vocab
 ```
 
-Here we set the batch size to 128 and sequence length to 50,
-and invoke the `load_data_snli` function to get the data iterators and vocabulary.
-Then we print the vocabulary size.
+Ici, nous définissons la taille du lot à 128 et la longueur de la séquence à 50,
+et invoquons la fonction `load_data_snli` pour obtenir les itérateurs de données et le vocabulaire.
+Ensuite, nous imprimons la taille du vocabulaire.
 
 ```{.python .input}
 #@tab all
@@ -259,9 +259,9 @@ train_iter, test_iter, vocab = load_data_snli(128, 50)
 len(vocab)
 ```
 
-Now we print the shape of the first minibatch.
-Contrary to sentiment analysis,
-we have two inputs `X[0]` and `X[1]` representing pairs of premises and hypotheses.
+Maintenant nous imprimons la forme du premier minibatch.
+Contrairement à l'analyse des sentiments,
+nous avons deux entrées `X[0]` et `X[1]` représentant des paires de prémisses et d'hypothèses.
 
 ```{.python .input}
 #@tab all
@@ -272,17 +272,17 @@ for X, Y in train_iter:
     break
 ```
 
-## Summary
+## Résumé
 
-* Natural language inference studies whether a hypothesis can be inferred from a premise, where both are a text sequence.
-* In natural language inference, relationships between premises and hypotheses include entailment, contradiction, and neutral.
-* Stanford Natural Language Inference (SNLI) Corpus is a popular benchmark dataset of natural language inference.
+* L'inférence en langage naturel étudie si une hypothèse peut être déduite d'une prémisse, où les deux sont une séquence de texte.
+* Dans l'inférence en langage naturel, les relations entre les prémisses et les hypothèses comprennent l'implication, la contradiction et la neutralité.
+* Le corpus Stanford Natural Language Inference (SNLI) est un jeu de données de référence populaire pour l'inférence en langage naturel.
 
 
-## Exercises
+## Exercices
 
-1. Machine translation has long been evaluated based on superficial $n$-gram matching between an output translation and a ground-truth translation. Can you design a measure for evaluating machine translation results by using natural language inference?
-1. How can we change hyperparameters to reduce the vocabulary size?
+1. La traduction automatique a longtemps été évaluée sur la base de la correspondance superficielle $n$-gram entre une traduction de sortie et une traduction de référence. Pouvez-vous concevoir une mesure pour évaluer les résultats de la traduction automatique en utilisant l'inférence en langage naturel ?
+1. Comment pouvons-nous modifier les hyperparamètres pour réduire la taille du vocabulaire ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/394)

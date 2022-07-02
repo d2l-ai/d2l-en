@@ -27,7 +27,7 @@ import torch
 
 ## Parallel Computation on GPUs
 
-Let's start by defining a reference workload to test: the `run` function below performs 10 matrix-matrix multiplications on the device of our choice using data allocated into two variables: `x_gpu1` and `x_gpu2`.
+Let's start by defining a reference workload to test: the `run` function below performs 10 matrix-matrix multiplications on the device of our choice using data allocated into two variables:`x_gpu1` and `x_gpu2`.
 
 ```{.python .input}
 #@tab mxnet
@@ -175,7 +175,7 @@ with d2l.Benchmark('Run on GPU1 and copy to CPU'):
 ```
 
 The total time required for both operations is (as expected) less than the sum of their parts.
-Note that this task is different from parallel computation as it uses a different resource: the bus between the CPU and GPUs. In fact, we could compute on both devices and communicate, all at the same time. As noted above, there is a dependency between computation and communication: `y[i]` must be computed before it can be copied to the CPU. Fortunately, the system can copy `y[i-1]` while computing `y[i]` to reduce the total running time.
+Note that this task is different from parallel computation as it uses a different resource: the bus between the CPU and GPUs. In fact, we could compute on both devices and communicate, all at the same time. As noted above, there is a dependency between computation and communication:`y[i]` must be computed before it can be copied to the CPU. Fortunately, the system can copy `y[i-1]` while computing `y[i]` to reduce the total running time.
 
 We conclude with an illustration of the computational graph and its dependencies for a simple two-layer MLP when training on a CPU and two GPUs, as depicted in :numref:`fig_twogpu`. It would be quite painful to schedule the parallel program resulting from this manually. This is where it is advantageous to have a graph-based computing backend for optimization.
 
@@ -186,16 +186,16 @@ We conclude with an illustration of the computational graph and its dependencies
 ## Summary
 
 * Modern systems have a variety of devices, such as multiple GPUs and CPUs. They can be used in parallel, asynchronously. 
-* Modern systems also have a variety of resources for communication, such as PCI Express, storage (typically solid-state drives or via networks), and network bandwidth. They can be used in parallel for peak efficiency. 
-* The backend can improve performance through automatic parallel computation and communication. 
+* Modern systems also have a variety of resources for communication, such as PCI Express, storage (typically solid-state drives or via networks)et la bande passante du réseau. Ils peuvent être utilisés en parallèle pour une efficacité maximale. 
+* Le backend peut améliorer les performances grâce à des calculs et des communications parallèles automatiques. 
 
-## Exercises
+## Exercices
 
-1. Eight operations were performed in the `run` function defined in this section. There are no dependencies between them. Design an experiment to see if the deep learning framework will automatically execute them in parallel.
-1. When the workload of an individual operator is sufficiently small, parallelization can help even on a single CPU or GPU. Design an experiment to verify this. 
-1. Design an experiment that uses parallel computation on CPUs, GPUs, and communication between both devices.
-1. Use a debugger such as NVIDIA's [Nsight](https://developer.nvidia.com/nsight-compute-2019_5) to verify that your code is efficient. 
-1. Designing computation tasks that include more complex data dependencies, and run experiments to see if you can obtain the correct results while improving performance.
+1. Huit opérations ont été effectuées dans la fonction `run` définie dans cette section. Il n'y a pas de dépendances entre elles. Concevez une expérience pour voir si le cadre d'apprentissage profond les exécutera automatiquement en parallèle.
+1. Lorsque la charge de travail d'un opérateur individuel est suffisamment faible, la parallélisation peut être utile même sur un seul CPU ou GPU. Concevez une expérience pour vérifier cela. 
+1. Concevez une expérience qui utilise le calcul parallèle sur les CPU, les GPU et la communication entre les deux appareils.
+1. Utilisez un débogueur tel que [Nsight](https://developer.nvidia.com/nsight-compute-2019_5) de NVIDIA pour vérifier que votre code est efficace. 
+1. Concevez des tâches de calcul qui incluent des dépendances de données plus complexes, et réalisez des expériences pour voir si vous pouvez obtenir les bons résultats tout en améliorant les performances.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/362)

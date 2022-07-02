@@ -3,39 +3,39 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Predicting House Prices on Kaggle
-:label:`sec_kaggle_house`
+# Prédire les prix des maisons sur Kaggle
+:label:`sec_kaggle_house` 
 
-Now that we have introduced some basic tools
-for building and training deep networks
-and regularizing them with techniques including
+ Maintenant que nous avons présenté quelques outils de base
+pour construire et former des réseaux profonds
+et les régulariser avec des techniques telles que
 weight decay and dropout,
-we are ready to put all this knowledge into practice
-by participating in a Kaggle competition.
-The house price prediction competition
-is a great place to start.
-The data is fairly generic and do not exhibit exotic structure
-that might require specialized models (as audio or video might).
-This dataset, collected by Bart de Cock in 2011 :cite:`De-Cock.2011`,
-covers house prices in Ames, IA from the period of 2006--2010.
-It is considerably larger than the famous [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld (1978),
-boasting both more examples and more features.
+nous sommes prêts à mettre toutes ces connaissances en pratique
+en participant à une compétition Kaggle.
+La compétition de prédiction du prix des maisons
+est un excellent point de départ.
+Les données sont assez génériques et ne présentent pas de structure exotique
+qui pourrait nécessiter des modèles spécialisés (comme l'audio ou la vidéo).
+Cet ensemble de données, collecté par Bart de Cock en 2011 :cite:`De-Cock.2011` ,
+couvre les prix des maisons à Ames, IA, sur la période 2006-2010.
+Il est considérablement plus important que le célèbre [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) de Harrison et Rubinfeld (1978),
+offrant à la fois plus d'exemples et plus de caractéristiques.
 
 
-In this section, we will walk you through details of
-data preprocessing, model design, and hyperparameter selection.
-We hope that through a hands-on approach,
-you will gain some intuitions that will guide you
-in your career as a data scientist.
+Dans cette section, nous vous guiderons dans les détails du prétraitement des données de
+, de la conception du modèle et de la sélection des hyperparamètres.
+Nous espérons qu'à travers une approche pratique,
+vous acquerrez certaines intuitions qui vous guideront
+dans votre carrière de scientifique des données.
 
 
-## Downloading Data
+## Téléchargement de données
 
-Throughout the book, we will train and test models
-on various downloaded datasets.
-Here, we (**implement two utility functions**)
-to download files and extract zip or tar files.
-Again, we defer their implementations into :numref:`sec_utils`.
+Tout au long du livre, nous entraînerons et testerons des modèles
+sur divers ensembles de données téléchargés.
+Ici, nous (**implémentons deux fonctions utilitaires**)
+pour télécharger des fichiers et extraire des fichiers zip ou tar.
+Encore une fois, nous reportons leurs implémentations dans :numref:`sec_utils` .
 
 ```{.python .input  n=2}
 %%tab all
@@ -49,66 +49,66 @@ def extract(filename, folder):
 
 ## Kaggle
 
-[Kaggle](https://www.kaggle.com) is a popular platform
-that hosts machine learning competitions.
-Each competition centers on a dataset and many
-are sponsored by stakeholders who offer prizes
-to the winning solutions.
-The platform helps users to interact
-via forums and shared code,
-fostering both collaboration and competition.
-While leaderboard chasing often spirals out of control,
-with researchers focusing myopically on preprocessing steps
-rather than asking fundamental questions,
-there is also tremendous value in the objectivity of a platform
-that facilitates direct quantitative comparisons
-among competing approaches as well as code sharing
-so that everyone can learn what did and did not work.
-If you want to participate in a Kaggle competition,
-you will first need to register for an account
-(see :numref:`fig_kaggle`).
+[Kaggle](https://www.kaggle.com) est une plateforme populaire
+qui accueille des compétitions d'apprentissage automatique.
+Chaque concours est centré sur un ensemble de données et beaucoup
+sont sponsorisés par des parties prenantes qui offrent des prix
+aux solutions gagnantes.
+La plateforme permet aux utilisateurs d'interagir
+via des forums et du code partagé,
+favorisant à la fois la collaboration et la compétition.
+Bien que la chasse au classement soit souvent hors de contrôle,
+avec des chercheurs qui se concentrent de manière myope sur les étapes de prétraitement
+plutôt que de poser des questions fondamentales,
+l'objectivité d'une plateforme
+qui facilite les comparaisons quantitatives directes
+entre les approches concurrentes ainsi que le partage du code
+afin que chacun puisse apprendre ce qui a fonctionné et ce qui n'a pas fonctionné, présente également un intérêt considérable.
+Si vous souhaitez participer à un concours Kaggle,
+, vous devez d'abord créer un compte
+(voir :numref:`fig_kaggle` ).
 
 ![The Kaggle website.](../img/kaggle.png)
 :width:`400px`
 :label:`fig_kaggle`
 
-On the house price prediction competition page, as illustrated
-in :numref:`fig_house_pricing`,
-you can find the dataset (under the "Data" tab),
-submit predictions, and see your ranking,
-The URL is right here:
+Sur la page du concours de prédiction du prix des logements, comme illustré par
+dans :numref:`fig_house_pricing` ,
+vous pouvez trouver l'ensemble de données (sous l'onglet "Données"),
+soumettre des prédictions, et voir votre classement,
+L'URL est ici :
 
-> https://www.kaggle.com/c/house-prices-advanced-regression-techniques
+&gt; https://www.kaggle.com/c/house-prices-advanced-regression-techniques
 
-![The house price prediction competition page.](../img/house-pricing.png)
-:width:`400px`
-:label:`fig_house_pricing`
+![The house price prediction competition page.](../img/house-pricing.png) 
+ :width:`400px` 
+ :label:`fig_house_pricing` 
 
-## Accessing and Reading the Dataset
+ ## Accéder au jeu de données et le lire
 
-Note that the competition data is separated
-into training and test sets.
-Each record includes the property value of the house
-and attributes such as street type, year of construction,
-roof type, basement condition, etc.
-The features consist of various data types.
-For example, the year of construction
-is represented by an integer,
-the roof type by discrete categorical assignments,
-and other features by floating point numbers.
-And here is where reality complicates things:
-for some examples, some data is altogether missing
-with the missing value marked simply as "na".
-The price of each house is included
-for the training set only
-(it is a competition after all).
-We will want to partition the training set
-to create a validation set,
-but we only get to evaluate our models on the official test set
-after uploading predictions to Kaggle.
-The "Data" tab on the competition tab
-in :numref:`fig_house_pricing`
-has links to download the data.
+Notez que les données du concours sont séparées
+en jeux d'entraînement et de test.
+Chaque enregistrement comprend la valeur foncière de la maison
+et des attributs tels que le type de rue, l'année de construction,
+le type de toit, l'état du sous-sol, etc.
+Les caractéristiques sont constituées de divers types de données.
+Par exemple, l'année de construction
+est représentée par un nombre entier,
+le type de toit par des affectations catégorielles discrètes,
+et d'autres caractéristiques par des nombres à virgule flottante.
+Et c'est là que la réalité complique les choses :
+pour certains exemples, certaines données sont carrément manquantes
+avec la valeur manquante marquée simplement comme "na".
+Le prix de chaque maison est inclus
+pour l'ensemble d'entraînement uniquement
+(il s'agit d'un concours après tout).
+Nous voudrons partitionner l'ensemble d'entraînement
+pour créer un ensemble de validation,
+, mais nous ne pourrons évaluer nos modèles que sur l'ensemble de test officiel
+après avoir téléchargé les prédictions sur Kaggle.
+L'onglet "Données" de l'onglet de la compétition
+dans :numref:`fig_house_pricing` 
+ a des liens pour télécharger les données.
 
 ```{.python .input  n=14}
 %%tab mxnet
@@ -139,11 +139,10 @@ import pandas as pd
 import numpy as np
 ```
 
-To get started, we will [**read in and process the data
-using `pandas`**], which we have introduced in :numref:`sec_pandas`.
-For convenience, we can download and cache
-the Kaggle housing dataset.
-If a file corresponding to this dataset already exists in the cache directory and its SHA-1 matches `sha1_hash`, our code will use the cached file to avoid clogging up your internet with redundant downloads.
+Pour commencer, nous allons [**lire et traiter les données en utilisant `pandas`**], que nous avons présenté dans :numref:`sec_pandas` .
+Pour plus de commodité, nous pouvons télécharger et mettre en cache
+l'ensemble de données sur les logements de Kaggle.
+Si un fichier correspondant à cet ensemble de données existe déjà dans le répertoire de cache et que son SHA-1 correspond à `sha1_hash`, notre code utilisera le fichier en cache pour éviter d'encombrer votre Internet avec des téléchargements redondants.
 
 ```{.python .input  n=30}
 %%tab all
@@ -160,9 +159,9 @@ class KaggleHouse(d2l.DataModule):
                 sha1_hash='fa19780a7b011d9b009e8bff8e99922a8ee2eb90'))
 ```
 
-The training dataset includes 1460 examples,
-80 features, and 1 label, while the validation data
-contains 1459 examples and 80 features.
+Le jeu de données d'entraînement comprend 1460 exemples,
+80 caractéristiques et 1 étiquette, tandis que les données de validation
+contiennent 1459 exemples et 80 caractéristiques.
 
 ```{.python .input  n=31}
 %%tab all
@@ -171,62 +170,60 @@ print(data.raw_train.shape)
 print(data.raw_val.shape)
 ```
 
-## Data Preprocessing
+## Prétraitement des données
 
-Let's [**take a look at the first four and last two features
-as well as the label (SalePrice)**] from the first four examples.
+Regardons [**les quatre premières et les deux dernières caractéristiques ainsi que l'étiquette (SalePrice)**] des quatre premiers exemples.
 
 ```{.python .input  n=10}
 %%tab all
 print(data.raw_train.iloc[:4, [0, 1, 2, 3, -3, -2, -1]])
 ```
 
-We can see that in each example, the first feature is the ID.
-This helps the model identify each training example.
-While this is convenient, it does not carry
-any information for prediction purposes.
-Hence, we will remove it from the dataset
-before feeding the data into the model.
-Besides, given a wide variety of data types,
-we will need to preprocess the data before we can start modeling.
+Nous pouvons voir que dans chaque exemple, la première caractéristique est l'ID.
+Cela aide le modèle à identifier chaque exemple de formation.
+Bien que cette caractéristique soit pratique, elle n'apporte aucune information à
+à des fins de prédiction.
+Par conséquent, nous la supprimerons de l'ensemble de données
+avant d'introduire les données dans le modèle.
+En outre, étant donné la grande variété de types de données,
+nous devrons prétraiter les données avant de pouvoir commencer la modélisation.
 
 
-Let's start with the numerical features.
-First, we apply a heuristic,
-[**replacing all missing values
-by the corresponding feature's mean.**]
-Then, to put all features on a common scale,
-we (***standardize* the data by
-rescaling features to zero mean and unit variance**):
+Commençons par les caractéristiques numériques.
+Tout d'abord, nous appliquons une heuristique,
+[**remplaçant toutes les valeurs manquantes par la moyenne de la caractéristique correspondante.**]
+Ensuite, pour placer toutes les caractéristiques sur une échelle commune,
+nous (normalisons les données en
+remettant à l'échelle les caractéristiques à moyenne nulle et variance unitaire) :
 
-$$x \leftarrow \frac{x - \mu}{\sigma},$$
+$$x \leftarrow \frac{x - \mu}{\sigma},$$ 
 
-where $\mu$ and $\sigma$ denote mean and standard deviation, respectively.
-To verify that this indeed transforms
-our feature (variable) such that it has zero mean and unit variance,
-note that $E[\frac{x-\mu}{\sigma}] = \frac{\mu - \mu}{\sigma} = 0$
-and that $E[(x-\mu)^2] = (\sigma^2 + \mu^2) - 2\mu^2+\mu^2 = \sigma^2$.
-Intuitively, we standardize the data
-for two reasons.
-First, it proves convenient for optimization.
-Second, because we do not know *a priori*
-which features will be relevant,
-we do not want to penalize coefficients
-assigned to one feature more than on any other.
+ où $\mu$ et $\sigma$ désignent respectivement la moyenne et l'écart type.
+Pour vérifier que cela transforme effectivement
+notre caractéristique (variable) de sorte qu'elle ait une moyenne nulle et une variance unitaire,
+notez que $E[\frac{x-\mu}{\sigma}] = \frac{\mu - \mu}{\sigma} = 0$
+ et que $E[(x-\mu)^2] = (\sigma^2 + \mu^2) - 2\mu^2+\mu^2 = \sigma^2$.
+Intuitivement, nous normalisons les données
+pour deux raisons.
+Premièrement, cela s'avère pratique pour l'optimisation.
+Deuxièmement, comme nous ne savons pas *a priori*
+quelles caractéristiques seront pertinentes,
+nous ne voulons pas pénaliser les coefficients
+attribués à une caractéristique plus qu'à une autre.
 
-[**Next we deal with discrete values.**]
-This includes features such as "MSZoning".
-(**We replace them by a one-hot encoding**)
-in the same way that we previously transformed
-multiclass labels into vectors (see :numref:`subsec_classification-problem`).
-For instance, "MSZoning" assumes the values "RL" and "RM".
-Dropping the "MSZoning" feature,
-two new indicator features
-"MSZoning_RL" and "MSZoning_RM" are created with values being either 0 or 1.
-According to one-hot encoding,
-if the original value of "MSZoning" is "RL",
-then "MSZoning_RL" is 1 and "MSZoning_RM" is 0.
-The `pandas` package does this automatically for us.
+(**Ensuite, nous traitons des valeurs discrètes.**)
+Cela inclut des caractéristiques telles que "MSZoning".
+( **Nous les remplaçons par un codage à un coup** )
+de la même manière que nous avons précédemment transformé
+les étiquettes multi-classes en vecteurs (voir :numref:`subsec_classification-problem` ).
+Par exemple, "MSZoning" prend les valeurs "RL" et "RM".
+En abandonnant la caractéristique "MSZoning",
+deux nouvelles caractéristiques indicatrices
+"MSZoning_RL" et "MSZoning_RM" sont créées avec des valeurs de 0 ou 1.
+Selon le codage à un coup,
+si la valeur originale de "MSZoning" est "RL",
+alors "MSZoning_RL" est 1 et "MSZoning_RM" est 0.
+Le paquet `pandas` fait cela automatiquement pour nous.
 
 ```{.python .input  n=32}
 %%tab all
@@ -251,8 +248,8 @@ def preprocess(self):
     self.val = features[self.raw_train.shape[0]:].copy()
 ```
 
-You can see that this conversion increases
-the number of features from 79 to 331 (excluding ID and label columns).
+Vous pouvez voir que cette conversion fait passer
+le nombre de caractéristiques de 79 à 331 (sans compter les colonnes ID et label).
 
 ```{.python .input  n=33}
 %%tab all
@@ -260,32 +257,30 @@ data.preprocess()
 data.train.shape
 ```
 
-## Error Measure
+## Mesure d'erreur
 
-To get started we will train a linear model with squared loss. Not surprisingly, our linear model will not lead to a competition-winning submission but it provides a sanity check to see whether there is meaningful information in the data. If we cannot do better than random guessing here, then there might be a good chance that we have a data processing bug. And if things work, the linear model will serve as a baseline giving us some intuition about how close the simple model gets to the best reported models, giving us a sense of how much gain we should expect from fancier models.
+Pour commencer, nous allons entraîner un modèle linéaire avec une perte au carré. Comme on pouvait s'y attendre, notre modèle linéaire ne mènera pas à une soumission gagnante du concours, mais il permet de vérifier si les données contiennent des informations significatives. Si nous ne pouvons pas faire mieux qu'une supposition aléatoire, il y a de fortes chances que nous ayons un bug dans le traitement des données. Et si les choses fonctionnent, le modèle linéaire servira de référence, nous donnant une idée de la proximité du modèle simple par rapport aux meilleurs modèles rapportés, nous donnant une idée du gain que nous devrions attendre de modèles plus sophistiqués.
 
-With house prices, as with stock prices,
-we care about relative quantities
-more than absolute quantities.
-Thus [**we tend to care more about
-the relative error $\frac{y - \hat{y}}{y}$**]
-than about the absolute error $y - \hat{y}$.
-For instance, if our prediction is off by USD 100,000
-when estimating the price of a house in Rural Ohio,
-where the value of a typical house is 125,000 USD,
-then we are probably doing a horrible job.
-On the other hand, if we err by this amount
-in Los Altos Hills, California,
-this might represent a stunningly accurate prediction
-(there, the median house price exceeds 4 million USD).
+Avec les prix de l'immobilier, comme avec les prix des actions,
+nous nous intéressons aux quantités relatives
+plus qu'aux quantités absolues.
+Ainsi, [**nous avons tendance à nous soucier davantage de l'erreur relative $\frac{y - \hat{y}}{y}$**]
+que de l'erreur absolue $y - \hat{y}$.
+Par exemple, si notre prédiction est erronée de 100 000 USD
+lors de l'estimation du prix d'une maison dans l'Ohio rural,
+où la valeur d'une maison typique est de 125 000 USD,
+alors nous faisons probablement un travail horrible.
+En revanche, si nous nous trompons de ce montant
+à Los Altos Hills, en Californie,
+cela pourrait représenter une prédiction étonnamment précise
+(là-bas, le prix médian des maisons dépasse 4 millions USD).
 
-(**One way to address this problem is to
-measure the discrepancy in the logarithm of the price estimates.**)
-In fact, this is also the official error measure
-used by the competition to evaluate the quality of submissions.
-After all, a small value $\delta$ for $|\log y - \log \hat{y}| \leq \delta$
-translates into $e^{-\delta} \leq \frac{\hat{y}}{y} \leq e^\delta$.
-This leads to the following root-mean-squared-error between the logarithm of the predicted price and the logarithm of the label price:
+(**Une façon de résoudre ce problème est de mesurer l'écart dans le logarithme des estimations de prix.**)
+En fait, c'est également la mesure d'erreur officielle
+utilisée par le concours pour évaluer la qualité des soumissions.
+Après tout, une petite valeur $\delta$ pour $|\log y - \log \hat{y}| \leq \delta$
+ se traduit par $e^{-\delta} \leq \frac{\hat{y}}{y} \leq e^\delta$.
+Cela conduit à l'erreur quadratique moyenne suivante entre le logarithme du prix prédit et le logarithme du prix de l'étiquette :
 
 $$\sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}.$$
 
@@ -305,21 +300,21 @@ def get_dataloader(self, train):
 
 ## $K$-Fold Cross-Validation
 
-You might recall that we introduced [**cross-validation**]
-in :numref:`subsec_generalization-model-selection`, where we discussed how to deal
-with model selection.
-We will put this to good use to select the model design
-and to adjust the hyperparameters.
-We first need a function that returns
-the $i^\mathrm{th}$ fold of the data
-in a $K$-fold cross-validation procedure.
-It proceeds by slicing out the $i^\mathrm{th}$ segment
-as validation data and returning the rest as training data.
-Note that this is not the most efficient way of handling data
-and we would definitely do something much smarter
-if our dataset was considerably larger.
-But this added complexity might obfuscate our code unnecessarily
-so we can safely omit it here owing to the simplicity of our problem.
+Vous vous souvenez peut-être que nous avons introduit [**cross-validation**]
+dans :numref:`subsec_generalization-model-selection` , où nous avons discuté de la façon de traiter
+avec la sélection de modèles.
+Nous allons en faire bon usage pour sélectionner la conception du modèle
+et pour ajuster les hyperparamètres.
+Nous avons d'abord besoin d'une fonction qui renvoie
+le pli $i^\mathrm{th}$ des données
+dans une procédure de validation croisée $K$-fold.
+Elle procède par découpage du segment $i^\mathrm{th}$
+ comme données de validation et renvoie le reste comme données de formation.
+Notez que ce n'est pas la manière la plus efficace de traiter les données
+et nous ferions certainement quelque chose de beaucoup plus intelligent
+si notre ensemble de données était considérablement plus grand.
+Mais cette complexité supplémentaire pourrait obscurcir inutilement notre code
+. Nous pouvons donc l'omettre ici en toute sécurité en raison de la simplicité de notre problème.
 
 ```{.python .input}
 %%tab all
@@ -333,8 +328,8 @@ def k_fold_data(data, k):
     return rets
 ```
 
-[**The average validation error is returned**]
-when we train $K$ times in the $K$-fold cross-validation.
+[**L'erreur moyenne de validation est retournée**]
+lorsque nous nous entraînons $K$ fois dans la validation croisée $K$-fold.
 
 ```{.python .input}
 %%tab all
@@ -351,19 +346,19 @@ def k_fold(trainer, data, k, lr):
     return models
 ```
 
-## [**Model Selection**]
+## [**Sélection du modèle**]
 
-In this example, we pick an untuned set of hyperparameters
-and leave it up to the reader to improve the model.
-Finding a good choice can take time,
-depending on how many variables one optimizes over.
-With a large enough dataset,
-and the normal sorts of hyperparameters,
-$K$-fold cross-validation tends to be
-reasonably resilient against multiple testing.
-However, if we try an unreasonably large number of options
-we might just get lucky and find that our validation
-performance is no longer representative of the true error.
+Dans cet exemple, nous choisissons un ensemble non accordé d'hyperparamètres
+et laissons au lecteur le soin d'améliorer le modèle.
+Trouver un bon choix peut prendre du temps,
+en fonction du nombre de variables sur lesquelles on optimise.
+Avec un ensemble de données suffisamment grand,
+et les types normaux d'hyperparamètres,
+$K$ -fold cross-validation tend à être
+raisonnablement résistant aux tests multiples.
+Cependant, si nous essayons un nombre déraisonnable d'options
+, nous pouvons avoir de la chance et constater que notre performance de validation
+n'est plus représentative de l'erreur réelle.
 
 ```{.python .input}
 %%tab all
@@ -371,26 +366,26 @@ trainer = d2l.Trainer(max_epochs=10)
 models = k_fold(trainer, data, k=5, lr=0.01)
 ```
 
-Notice that sometimes the number of training errors
-for a set of hyperparameters can be very low,
-even as the number of errors on $K$-fold cross-validation
-is considerably higher.
-This indicates that we are overfitting.
-Throughout training you will want to monitor both numbers.
-Less overfitting might indicate that our data can support a more powerful model.
-Massive overfitting might suggest that we can gain
-by incorporating regularization techniques.
+Remarquez que parfois le nombre d'erreurs de formation
+pour un ensemble d'hyperparamètres peut être très faible,
+même si le nombre d'erreurs sur $K$-fold cross-validation
+est considérablement plus élevé.
+Cela indique que l'ajustement est excessif.
+Tout au long de la formation, vous voudrez surveiller ces deux chiffres.
+Un surajustement moindre pourrait indiquer que nos données peuvent supporter un modèle plus puissant.
+Un surajustement massif pourrait suggérer que nous pouvons gagner
+en incorporant des techniques de régularisation.
 
-##  [**Submitting Predictions on Kaggle**]
+## [**Soumettre des prédictions sur Kaggle**]
 
-Now that we know what a good choice of hyperparameters should be,
-we might 
-calculate the average predictions 
-on the test set
-by all the $K$ models.
-Saving the predictions in a csv file
-will simplify uploading the results to Kaggle.
-The following code will generate a file called `submission.csv`.
+Maintenant que nous savons ce que devrait être un bon choix d'hyperparamètres,
+nous pouvons 
+calculer les prédictions moyennes 
+sur l'ensemble de test
+par tous les modèles $K$.
+L'enregistrement des prédictions dans un fichier csv
+simplifiera le téléchargement des résultats sur Kaggle.
+Le code suivant va générer un fichier appelé `submission.csv`.
 
 ```{.python .input}
 %%tab all
@@ -403,37 +398,37 @@ submission = pd.DataFrame({'Id':data.raw_val.Id,
 submission.to_csv('submission.csv', index=False)
 ```
 
-Next, as demonstrated in :numref:`fig_kaggle_submit2`,
-we can submit our predictions on Kaggle
-and see how they compare with the actual house prices (labels)
-on the test set.
-The steps are quite simple:
+Ensuite, comme démontré dans :numref:`fig_kaggle_submit2` ,
+nous pouvons soumettre nos prédictions sur Kaggle
+et voir comment elles se comparent aux prix réels des maisons (étiquettes)
+sur l'ensemble de test.
+Les étapes sont assez simples :
 
-* Log in to the Kaggle website and visit the house price prediction competition page.
-* Click the “Submit Predictions” or “Late Submission” button (as of this writing, the button is located on the right).
-* Click the “Upload Submission File” button in the dashed box at the bottom of the page and select the prediction file you wish to upload.
-* Click the “Make Submission” button at the bottom of the page to view your results.
+* Connectez-vous au site Web de Kaggle et visitez la page du concours de prédiction du prix des maisons.
+* Cliquez sur le bouton "Submit Predictions" ou "Late Submission" (au moment de la rédaction de cet article, le bouton est situé à droite).
+* Cliquez sur le bouton "Télécharger le fichier de soumission" dans la case en pointillés en bas de la page et sélectionnez le fichier de prédiction que vous souhaitez télécharger.
+* Cliquez sur le bouton "Make Submission" en bas de la page pour afficher vos résultats.
 
 ![Submitting data to Kaggle](../img/kaggle-submit2.png)
 :width:`400px`
 :label:`fig_kaggle_submit2`
 
-## Summary
+## Résumé
 
-* Real data often contains a mix of different data types and need to be preprocessed.
-* Rescaling real-valued data to zero mean and unit variance is a good default. So is replacing missing values with their mean.
-* Transforming categorical features into indicator features allows us to treat them like one-hot vectors.
-* We can use $K$-fold cross-validation to select the model and adjust the hyperparameters.
-* Logarithms are useful for relative errors.
+* Les données réelles contiennent souvent un mélange de différents types de données et doivent être prétraitées.
+* La remise à l'échelle des données à valeurs réelles à une moyenne nulle et une variance unitaire est un bon défaut. Il en va de même pour le remplacement des valeurs manquantes par leur moyenne.
+* Transformer les caractéristiques catégorielles en caractéristiques indicatrices nous permet de les traiter comme des vecteurs à un coup.
+* Nous pouvons utiliser $K$-fold cross-validation pour sélectionner le modèle et ajuster les hyperparamètres.
+* Les logarithmes sont utiles pour les erreurs relatives.
 
 
-## Exercises
+## Exercices
 
-1. Submit your predictions for this section to Kaggle. How good are your predictions?
-1. Is it always a good idea to replace missing values by their mean? Hint: can you construct a situation where the values are not missing at random?
-1. Improve the score on Kaggle by tuning the hyperparameters through $K$-fold cross-validation.
-1. Improve the score by improving the model (e.g., layers, weight decay, and dropout).
-1. What happens if we do not standardize the continuous numerical features like what we have done in this section?
+1. Soumettez vos prédictions pour cette section à Kaggle. Quelle est la qualité de vos prédictions ?
+1. Est-ce toujours une bonne idée de remplacer les valeurs manquantes par leur moyenne ? Indice : pouvez-vous construire une situation où les valeurs ne sont pas manquantes au hasard ?
+1. Améliorez le score sur Kaggle en ajustant les hyperparamètres par le biais de la validation croisée $K$.
+1. Améliorez le score en améliorant le modèle (par exemple, les couches, la décroissance des poids et l'abandon).
+1. Que se passe-t-il si nous ne normalisons pas les caractéristiques numériques continues comme nous l'avons fait dans cette section ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/106)

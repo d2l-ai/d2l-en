@@ -1,18 +1,18 @@
 # Pretraining word2vec
-:label:`sec_word2vec_pretraining`
+:label:`sec_word2vec_pretraining` 
 
-
-We go on to implement the skip-gram
-model defined in
-:numref:`sec_word2vec`.
-Then
-we will pretrain word2vec using negative sampling
-on the PTB dataset.
-First of all,
-let's obtain the data iterator
-and the vocabulary for this dataset
-by calling the `d2l.load_data_ptb`
-function, which was described in :numref:`sec_word2vec_data`
+ 
+ Nous poursuivons en implémentant le modèle de saut de programme
+défini dans
+:numref:`sec_word2vec` .
+Ensuite,
+nous allons pré-entraîner word2vec en utilisant l'échantillonnage négatif
+sur le jeu de données PTB.
+Tout d'abord,
+nous obtenons l'itérateur de données
+et le vocabulaire pour cet ensemble de données
+en appelant la fonction `d2l.load_data_ptb`
+ , qui a été décrite en :numref:`sec_word2vec_data`
 
 ```{.python .input}
 #@tab mxnet
@@ -39,26 +39,26 @@ data_iter, vocab = d2l.load_data_ptb(batch_size, max_window_size,
                                      num_noise_words)
 ```
 
-## The Skip-Gram Model
+## Le modèle de saut de gramme
 
-We implement the skip-gram model
-by using embedding layers and batch matrix multiplications.
-First, let's review
-how embedding layers work.
+Nous implémentons le modèle de saut de gramme
+en utilisant des couches d'intégration et des multiplications matricielles par lots.
+Tout d'abord, examinons
+le fonctionnement des couches d'intégration.
 
 
-### Embedding Layer
+### Couche d'incorporation
 
-As described in :numref:`sec_seq2seq`,
-an embedding layer
-maps a token's index to its feature vector.
-The weight of this layer
-is a matrix whose number of rows equals to
-the dictionary size (`input_dim`) and
-number of columns equals to
-the vector dimension for each token (`output_dim`).
-After a word embedding model is trained,
-this weight is what we need.
+Comme décrit dans :numref:`sec_seq2seq` ,
+une couche d'incorporation
+fait correspondre l'index d'un token à son vecteur de caractéristiques.
+Le poids de cette couche
+est une matrice dont le nombre de lignes est égal à
+, la taille du dictionnaire (`input_dim`) et
+, le nombre de colonnes est égal à
+, la dimension du vecteur pour chaque token (`output_dim`).
+Après l'entraînement d'un modèle d'intégration de mots,
+est le poids dont nous avons besoin.
 
 ```{.python .input}
 #@tab mxnet
@@ -74,18 +74,18 @@ print(f'Parameter embedding_weight ({embed.weight.shape}, '
       f'dtype={embed.weight.dtype})')
 ```
 
-The input of an embedding layer is the
-index of a token (word).
-For any token index $i$,
-its vector representation
-can be obtained from
-the $i^\mathrm{th}$ row of the weight matrix
-in the embedding layer.
-Since the vector dimension (`output_dim`)
-was set to 4,
-the embedding layer
-returns vectors with shape (2, 3, 4)
-for a minibatch of token indices with shape
+L'entrée d'une couche d'incorporation est l'index
+d'un token (mot).
+Pour tout indice de token $i$,
+sa représentation vectorielle
+peut être obtenue à partir de
+la ligne $i^\mathrm{th}$ de la matrice de poids
+dans la couche d'intégration.
+Comme la dimension du vecteur (`output_dim`)
+a été fixée à 4,
+la couche d'intégration
+renvoie des vecteurs de forme (2, 3, 4)
+pour un minibatch d'indices de tokens de forme
 (2, 3).
 
 ```{.python .input}
@@ -94,27 +94,27 @@ x = d2l.tensor([[1, 2, 3], [4, 5, 6]])
 embed(x)
 ```
 
-### Defining the Forward Propagation
+### Définition de la propagation vers l'avant
 
-In the forward propagation,
-the input of the skip-gram model
-includes
-the center word indices `center`
-of shape (batch size, 1)
-and
-the concatenated context and noise word indices `contexts_and_negatives`
-of shape (batch size, `max_len`),
-where `max_len`
-is defined
-in :numref:`subsec_word2vec-minibatch-loading`.
-These two variables are first transformed from the
-token indices into vectors via the embedding layer,
-then their batch matrix multiplication
-(described in :numref:`subsec_batch_dot`)
-returns
-an output of shape (batch size, 1, `max_len`).
-Each element in the output is the dot product of
-a center word vector and a context or noise word vector.
+Dans la propagation vers l'avant,
+l'entrée du modèle de saut de programme
+comprend
+les indices du mot central `center`
+ de forme (taille du lot, 1)
+et
+les indices concaténés du contexte et du mot de bruit `contexts_and_negatives`
+ de forme (taille du lot, `max_len`),
+où `max_len`
+ est défini
+dans :numref:`subsec_word2vec-minibatch-loading` .
+Ces deux variables sont d'abord transformées en vecteurs à partir des indices de jetons
+via la couche d'intégration,
+puis leur multiplication matricielle par lot
+(décrite dans :numref:`subsec_batch_dot` )
+renvoie
+une sortie de forme (taille du lot, 1, `max_len`).
+Chaque élément de la sortie est le produit scalaire de
+un vecteur de mot central et un vecteur de mot de contexte ou de bruit.
 
 ```{.python .input}
 #@tab mxnet
@@ -134,7 +134,7 @@ def skip_gram(center, contexts_and_negatives, embed_v, embed_u):
     return pred
 ```
 
-Let's print the output shape of this `skip_gram` function for some example inputs.
+Imprimons la forme de la sortie de cette fonction `skip_gram` pour quelques exemples d'entrées.
 
 ```{.python .input}
 #@tab mxnet
@@ -147,18 +147,18 @@ skip_gram(torch.ones((2, 1), dtype=torch.long),
           torch.ones((2, 4), dtype=torch.long), embed, embed).shape
 ```
 
-## Training
+## Formation
 
-Before training the skip-gram model with negative sampling,
-let's first define its loss function.
+Avant de former le modèle de saut de programme avec échantillonnage négatif,
+définissons d'abord sa fonction de perte.
 
 
-### Binary Cross-Entropy Loss
+### Perte d'entropie croisée binaire
 
-According to the definition of the loss function
-for negative sampling in :numref:`subsec_negative-sampling`, 
-we will use 
-the binary cross-entropy loss.
+Selon la définition de la fonction de perte
+pour l'échantillonnage négatif dans :numref:`subsec_negative-sampling` , 
+nous utiliserons 
+la perte d'entropie croisée binaire.
 
 ```{.python .input}
 #@tab mxnet
@@ -180,14 +180,14 @@ class SigmoidBCELoss(nn.Module):
 loss = SigmoidBCELoss()
 ```
 
-Recall our descriptions
-of the mask variable
-and the label variable in
-:numref:`subsec_word2vec-minibatch-loading`.
-The following
-calculates the 
-binary cross-entropy loss
-for the given variables.
+Rappelez-vous nos descriptions
+de la variable masque
+et de la variable étiquette dans
+:numref:`subsec_word2vec-minibatch-loading` .
+Le tableau suivant
+calcule la perte d'entropie croisée binaire 
+
+ pour les variables données.
 
 ```{.python .input}
 #@tab all
@@ -197,16 +197,16 @@ mask = d2l.tensor([[1, 1, 1, 1], [1, 1, 0, 0]])
 loss(pred, label, mask) * mask.shape[1] / mask.sum(axis=1)
 ```
 
-Below shows
-how the above results are calculated
-(in a less efficient way)
-using the
-sigmoid activation function
-in the binary cross-entropy loss.
-We can consider 
-the two outputs as
-two normalized losses
-that are averaged over non-masked predictions.
+Le tableau ci-dessous montre
+comment les résultats ci-dessus sont calculés
+(de manière moins efficace)
+en utilisant la fonction d'activation sigmoïde
+
+ dans la perte d'entropie croisée binaire.
+Nous pouvons considérer 
+les deux sorties comme
+deux pertes normalisées
+dont la moyenne est calculée sur les prédictions non masquées.
 
 ```{.python .input}
 #@tab all
@@ -217,14 +217,14 @@ print(f'{(sigmd(1.1) + sigmd(2.2) + sigmd(-3.3) + sigmd(4.4)) / 4:.4f}')
 print(f'{(sigmd(-1.1) + sigmd(-2.2)) / 2:.4f}')
 ```
 
-### Initializing Model Parameters
+### Initialisation des paramètres du modèle
 
-We define two embedding layers
-for all the words in the vocabulary
-when they are used as center words
-and context words, respectively.
-The word vector dimension
-`embed_size` is set to 100.
+Nous définissons deux couches d'intégration
+pour tous les mots du vocabulaire
+lorsqu'ils sont utilisés comme mots centraux
+et mots de contexte, respectivement.
+La dimension du vecteur de mots
+`embed_size` est fixée à 100.
 
 ```{.python .input}
 #@tab mxnet
@@ -243,9 +243,9 @@ net = nn.Sequential(nn.Embedding(num_embeddings=len(vocab),
                                  embedding_dim=embed_size))
 ```
 
-### Defining the Training Loop
+### Définition de la boucle d'apprentissage
 
-The training loop is defined below. Because of the existence of padding, the calculation of the loss function is slightly different compared to the previous training functions.
+La boucle d'apprentissage est définie ci-dessous. En raison de l'existence du remplissage, le calcul de la fonction de perte est légèrement différent de celui des fonctions d'apprentissage précédentes.
 
 ```{.python .input}
 #@tab mxnet
@@ -309,7 +309,7 @@ def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):
           f'{metric[1] / timer.stop():.1f} tokens/sec on {str(device)}')
 ```
 
-Now we can train a skip-gram model using negative sampling.
+Nous pouvons maintenant former un modèle de saut de programme en utilisant l'échantillonnage négatif.
 
 ```{.python .input}
 #@tab all
@@ -317,17 +317,17 @@ lr, num_epochs = 0.002, 5
 train(net, data_iter, lr, num_epochs)
 ```
 
-## Applying Word Embeddings
-:label:`subsec_apply-word-embed`
+## Application de l'intégration de mots
+:label:`subsec_apply-word-embed` 
 
-
-After training the word2vec model,
-we can use the cosine similarity
-of word vectors from the trained model
-to 
-find words from the dictionary
-that are most semantically similar
-to an input word.
+ 
+ Après avoir entraîné le modèle word2vec,
+nous pouvons utiliser la similarité en cosinus
+des vecteurs de mots du modèle entraîné
+pour 
+trouver les mots du dictionnaire
+qui sont les plus similaires sémantiquement
+à un mot d'entrée.
 
 ```{.python .input}
 #@tab mxnet
@@ -358,16 +358,16 @@ def get_similar_tokens(query_token, k, embed):
 get_similar_tokens('chip', 3, net[0])
 ```
 
-## Summary
+## Résumé
 
-* We can train a skip-gram model with negative sampling using embedding layers and the binary cross-entropy loss.
-* Applications of word embeddings include finding semantically similar words for a given word based on the cosine similarity of word vectors.
+* Nous pouvons entraîner un modèle de saut de programme avec échantillonnage négatif en utilisant des couches d'intégration et la perte d'entropie croisée binaire.
+* Les applications de l'intégration des mots incluent la recherche de mots sémantiquement similaires pour un mot donné, basée sur la similarité en cosinus des vecteurs de mots.
 
 
-## Exercises
+## Exercices
 
-1. Using the trained model, find semantically similar words for other input words. Can you improve the results by tuning hyperparameters?
-1. When a training corpus is huge, we often sample context words and noise words for the center words in the current minibatch *when updating model parameters*. In other words, the same center word may have different context words or noise words in different training epochs. What are the benefits of this method? Try to implement this training method.
+1. En utilisant le modèle formé, trouvez des mots sémantiquement similaires pour d'autres mots d'entrée. Pouvez-vous améliorer les résultats en ajustant les hyperparamètres ?
+1. Lorsqu'un corpus d'entraînement est énorme, nous échantillonnons souvent des mots de contexte et des mots de bruit pour les mots centraux dans le minibatch actuel * lors de la mise à jour des paramètres du modèle *. En d'autres termes, le même mot central peut avoir différents mots de contexte ou mots de bruit dans différentes époques d'apprentissage. Quels sont les avantages de cette méthode ? Essayez de mettre en œuvre cette méthode de formation.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/384)

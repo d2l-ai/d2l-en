@@ -3,77 +3,77 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Networks Using Blocks (VGG)
-:label:`sec_vgg`
+# Réseaux utilisant des blocs (VGG)
+:label:`sec_vgg` 
 
-While AlexNet offered empirical evidence that deep CNNs
-can achieve good results, it did not provide a general template
-to guide subsequent researchers in designing new networks.
-In the following sections, we will introduce several heuristic concepts
-commonly used to design deep networks.
+ Si AlexNet a offert des preuves empiriques que les CNN profonds
+peuvent obtenir de bons résultats, il n'a pas fourni de modèle général
+pour guider les chercheurs ultérieurs dans la conception de nouveaux réseaux.
+Dans les sections suivantes, nous allons présenter plusieurs concepts heuristiques
+couramment utilisés pour concevoir des réseaux profonds.
 
-Progress in this field mirrors that of VLSI (very large scale integration) 
-in chip design
-where engineers moved from placing transistors
-to logical elements to logic blocks :cite:`Mead.1980`.
-Similarly, the design of neural network architectures
-has grown progressively more abstract,
-with researchers moving from thinking in terms of
-individual neurons to whole layers,
-and now to blocks, repeating patterns of layers. 
+Les progrès réalisés dans ce domaine reflètent ceux de l'intégration à très grande échelle (VLSI) 
+dans la conception des puces
+où les ingénieurs sont passés du placement des transistors
+aux éléments logiques, puis aux blocs logiques :cite:`Mead.1980` .
+De même, la conception d'architectures de réseaux neuronaux
+est devenue progressivement plus abstraite,
+, les chercheurs passant de la réflexion en termes de neurones individuels
+à des couches entières,
+et maintenant à des blocs, c'est-à-dire des motifs répétitifs de couches. 
 
-The idea of using blocks first emerged from the
-[Visual Geometry Group](http://www.robots.ox.ac.uk/~vgg/) (VGG)
-at Oxford University,
-in their eponymously-named *VGG* network :cite:`Simonyan.Zisserman.2014`.
-It is easy to implement these repeated structures in code
-with any modern deep learning framework by using loops and subroutines.
+L'idée d'utiliser des blocs est apparue pour la première fois sur le site
+[Visual Geometry Group](http://www.robots.ox.ac.uk/~)vgg/) (VGG)
+de l'université d'Oxford,
+dans leur réseau éponyme *VGG* :cite:`Simonyan.Zisserman.2014` .
+Il est facile d'implémenter ces structures répétées dans le code
+avec n'importe quel cadre moderne d'apprentissage profond en utilisant des boucles et des sous-routines.
 
 ## (**VGG Blocks**)
-:label:`subsec_vgg-blocks`
+:label:`subsec_vgg-blocks` 
 
-The basic building block of CNNs
-is a sequence of the following:
-(i) a convolutional layer
-with padding to maintain the resolution,
-(ii) a nonlinearity such as a ReLU,
-(iii) a pooling layer such
-as max-pooling to reduce the resolution. One of the problems with 
-this approach is that the spatial resolution decreases quite rapidly. In particular, 
-this imposes a hard limit of $\log_2 d$ convolutional layers on the network before all 
-dimensions ($d$) are used up. For instance, in the case of ImageNet, it would be impossible to have 
-more than 8 convolutional layers in this way. 
+ Le bloc de construction de base des CNN
+est une séquence des éléments suivants :
+(i) une couche convolutive
+avec un remplissage pour maintenir la résolution,
+(ii) une non-linéarité telle qu'un ReLU,
+(iii) une couche de mise en commun telle que
+max-pooling pour réduire la résolution. L'un des problèmes de cette approche, 
+, est que la résolution spatiale diminue assez rapidement. En particulier, 
+cela impose au réseau une limite stricte de couches convolutionnelles $\log_2 d$ avant que toutes les dimensions 
+($d$) ne soient utilisées. Par exemple, dans le cas d'ImageNet, il serait impossible d'avoir 
+plus de 8 couches convolutives de cette manière. 
 
-The key idea by Simonyan and Zisserman was to use *multiple* convolutions in between downsampling
-via max-pooling in the form of a block. They were primarily interested in whether deep or 
-wide networks perform better. For instance, the successive application of two $3 \times 3$ convolutions
-touches the same pixels as a single $5 \times 5$ convolution does. At the same time, the latter uses approximately 
-as many parameters ($25 \cdot c^2$) as three $3 \times 3$ convolutions do ($3 \cdot 9 \cdot c^2$). 
-In a rather detailed analysis they showed that deep and narrow networks significantly outperform their shallow counterparts. This set deep learning on a quest for ever deeper networks with over 100 layers for typical applications.
-While
-stacking $3 \times 3$ convolutions
-has been a gold standard in later deep networks,
-implementations of such operations
-have also been efficient on GPUs :cite:`lavin2016fast`. 
+L'idée principale de Simonyan et Zisserman était d'utiliser des convolutions *multiples* entre le sous-échantillonnage de
+via le max-pooling sous la forme d'un bloc. Ils se sont principalement intéressés à la question de savoir si les réseaux profonds ou larges 
+donnent de meilleurs résultats. Par exemple, l'application successive de deux convolutions $3 \times 3$
+ touche les mêmes pixels qu'une seule convolution $5 \times 5$. En même temps, cette dernière utilise environ 
+autant de paramètres ($25 \cdot c^2$) que trois convolutions $3 \times 3$ ($3 \cdot 9 \cdot c^2$). 
+Dans une analyse assez détaillée, ils ont montré que les réseaux profonds et étroits étaient nettement plus performants que leurs homologues peu profonds. L'apprentissage profond s'est ainsi lancé dans une quête de réseaux toujours plus profonds, avec plus de 100 couches pour les applications typiques.
+Alors que
+empilage $3 \times 3$ convolutions
+a été un standard d'or dans les réseaux profonds ultérieurs,
+implémentations de telles opérations
+ont également été efficaces sur les GPU :cite:`lavin2016fast` . 
 
 
 
-Back to VGG: a VGG block consists of a *sequence* of convolutions with $3\times3$ kernels with padding of 1 
-(keeping height and width) followed by a $2 \times 2$ max-pooling layer with stride of 2
-(halving height and width after each block).
-In the code below, we define a function called `vgg_block`
-to implement one VGG block.
+Revenons au VGG : un bloc VGG consiste en une *séquence* de convolutions avec $3\times3$ noyaux avec un padding de 1 
+(conservant la hauteur et la largeur) suivi d'une couche de max-pooling $2 \times 2$ avec un stride de 2
+(divisant par deux la hauteur et la largeur après chaque bloc).
+Dans le code ci-dessous, nous définissons une fonction appelée `vgg_block`
+ pour implémenter un bloc VGG.
 
 :begin_tab:`mxnet`
-The function below takes two arguments,
-corresponding to the number of convolutional layers `num_convs`
-and the number of output channels `num_channels`.
+La fonction ci-dessous prend deux arguments,
+correspondant au nombre de couches convolutionnelles `num_convs`
+ et au nombre de canaux de sortie `num_channels`.
 :end_tab:
 
 :begin_tab:`pytorch`
-The function below takes three arguments corresponding to the number
-of convolutional layers `num_convs`, the number of input channels `in_channels`
-and the number of output channels `out_channels`.
+La fonction ci-dessous prend trois arguments correspondant au nombre
+de couches convolutives `num_convs`, au nombre de canaux d'entrée `in_channels`
+ et au nombre de canaux de sortie `out_channels`.
 :end_tab:
 
 ```{.python .input}
@@ -139,15 +139,15 @@ depicted in :numref:`fig_vgg`.
 :label:`fig_vgg`
 
 The convolutional part of the network connects several VGG blocks from :numref:`fig_vgg` (also defined in the `vgg_block` function)
-in succession. This grouping of convolutions is a pattern that has 
-remained almost unchanged over the past decade, although the specific choice of 
-operations has undergone considerable modifications. 
-The variable `conv_arch` consists of a list of tuples (one per block),
-where each contains two values: the number of convolutional layers
-and the number of output channels,
-which are precisely the arguments required to call
-the `vgg_block` function. As such, VGG defines a *family* of networks rather than just 
-a specific manifestation. To build a specific network we simply iterate over `arch` to compose the blocks.
+en succession. Ce regroupement de convolutions est un modèle qui 
+est resté pratiquement inchangé au cours de la dernière décennie, bien que le choix spécifique des opérations 
+ait subi des modifications considérables. 
+La variable `conv_arch` est constituée d'une liste de tuples (un par bloc),
+où chacun contient deux valeurs : le nombre de couches convolutionnelles
+et le nombre de canaux de sortie,
+qui sont précisément les arguments nécessaires pour appeler
+la fonction `vgg_block`. En tant que tel, VGG définit une *famille* de réseaux plutôt que de se contenter de 
+une manifestation spécifique. Pour construire un réseau spécifique, il suffit d'itérer sur `arch` pour composer les blocs.
 
 ```{.python .input}
 %%tab all
@@ -188,14 +188,14 @@ class VGG(d2l.Classifier):
                 tf.keras.layers.Dense(num_classes)]))
 ```
 
-The original VGG network had 5 convolutional blocks,
-among which the first two have one convolutional layer each
-and the latter three contain two convolutional layers each.
-The first block has 64 output channels
-and each subsequent block doubles the number of output channels,
-until that number reaches 512.
-Since this network uses 8 convolutional layers
-and 3 fully connected layers, it is often called VGG-11.
+Le réseau VGG original avait 5 blocs convolutifs,
+parmi lesquels les deux premiers ont une couche convolutive chacun
+et les trois derniers contiennent deux couches convolutives chacun.
+Le premier bloc comporte 64 canaux de sortie
+et chaque bloc suivant double le nombre de canaux de sortie,
+jusqu'à ce que ce nombre atteigne 512.
+Comme ce réseau utilise 8 couches convolutionnelles
+et 3 couches entièrement connectées, il est souvent appelé VGG-11.
 
 ```{.python .input}
 %%tab pytorch, mxnet
@@ -209,17 +209,17 @@ VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary(
     (1, 224, 224, 1))
 ```
 
-As you can see, we halve height and width at each block,
-finally reaching a height and width of 7
-before flattening the representations
-for processing by the fully connected part of the network.
+Comme vous pouvez le voir, nous divisons par deux la hauteur et la largeur à chaque bloc,
+pour finalement atteindre une hauteur et une largeur de 7
+avant d'aplatir les représentations
+pour le traitement par la partie entièrement connectée du réseau.
 
 ## Training
 
-[**Since VGG-11 is more computationally-heavy than AlexNet
-we construct a network with a smaller number of channels.**]
-This is more than sufficient for training on Fashion-MNIST.
-The [**model training**] process is similar to that of AlexNet in :numref:`sec_alexnet`.
+[**Comme le VGG-11 est plus lourd en termes de calcul que l'AlexNet
+nous construisons un réseau avec un plus petit nombre de canaux.**]
+C'est plus que suffisant pour l'entraînement sur Fashion-MNIST.
+Le processus de [**formation du modèle**] est similaire à celui d'AlexNet dans :numref:`sec_alexnet` .
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -240,27 +240,27 @@ with d2l.try_gpu():
     trainer.fit(model, data)
 ```
 
-## Summary
+## Résumé
 
-One might argue that VGG is the first truly modern convolutional neural network. While AlexNet introduced many of the components of what make deep learning effective at scale, it is VGG that arguably introduced key properties such as blocks of multiple convolutions and a preference for deep and narrow networks. It is also the first network that is actually an entire family of similarly parametrized models, giving the practitioner ample trade-off between complexity and speed. This is also the place where modern deep learning frameworks shine. It is no longer necessary to generate XML config files to specify a network but rather, to assmple said networks through simple Python code. 
+On pourrait dire que le VGG est le premier réseau de neurones convolutifs véritablement moderne. Bien qu'AlexNet ait introduit de nombreux éléments qui rendent l'apprentissage profond efficace à grande échelle, c'est le VGG qui a sans doute introduit des propriétés clés telles que les blocs de convolutions multiples et une préférence pour les réseaux profonds et étroits. C'est également le premier réseau qui est en fait une famille entière de modèles paramétrés de manière similaire, ce qui permet au praticien de trouver un compromis entre complexité et vitesse. C'est aussi l'endroit où les cadres modernes d'apprentissage profond brillent. Il n'est plus nécessaire de générer des fichiers de configuration XML pour spécifier un réseau, mais plutôt de configurer ces réseaux à l'aide d'un simple code Python. 
 
-Very recently ParNet :cite:`Goyal.Bochkovskiy.Deng.ea.2021` demonstrated that it is possible to achieve competitive performance using a much more shallow architecture through a large number of parallel computations. This is an exciting development and there's hope that it will influence architecture designs in the future. For the remainder of the chapter, though, we will follow the path of scientific progress over the past decade. 
+Très récemment, ParNet :cite:`Goyal.Bochkovskiy.Deng.ea.2021` a démontré qu'il est possible d'obtenir des performances compétitives en utilisant une architecture beaucoup moins profonde grâce à un grand nombre de calculs parallèles. Il s'agit là d'un développement passionnant qui, espérons-le, influencera la conception des architectures à l'avenir. Pour le reste du chapitre, cependant, nous suivrons la voie du progrès scientifique au cours de la dernière décennie. 
 
-## Exercises
+## Exercices
 
 
-1. Compared with AlexNet, VGG is much slower in terms of computation, and it also needs more GPU memory. 
-    1. Compare the number of parameters needed for AlexNet and VGG.
-    1. Compare the number of floating point operations used in the convolutional layers and in the fully connected layers. 
-    1. How could you reduce the computational cost created by the fully connected layers?
-1. When displaying the dimensions associated with the various layers of the network, we only see the information 
-   associated with 8 blocks (plus some auxiliary transforms), even though the network has 11 layers. Where did 
-   the remaining 3 layers go?
-1. Upsampling the resolution in Fashion-MNIST by a factor of $8 \times 8$ from 28 to 224 dimensions is highly 
-   wasteful. Try modifying the network architecture and resolution conversion, e.g., to 56 or to 84 dimensions 
-   for its input instead. Can you do so without reducing the accuracy of the network?
-1. Use Table 1 in the VGG paper :cite:`Simonyan.Zisserman.2014` to construct other common models, 
-   such as VGG-16 or VGG-19.
+ 1. Comparé à AlexNet, VGG est beaucoup plus lent en termes de calcul, et il a également besoin de plus de mémoire GPU. 
+    1. Comparez le nombre de paramètres nécessaires pour AlexNet et VGG.
+   1. Comparez le nombre d'opérations en virgule flottante utilisées dans les couches convolutionnelles et dans les couches entièrement connectées. 
+    1. Comment pourriez-vous réduire le coût de calcul créé par les couches entièrement connectées ?
+1. Lorsque l'on affiche les dimensions associées aux différentes couches du réseau, on ne voit que les informations 
+ associées à 8 blocs (plus quelques transformations auxiliaires), alors que le réseau comporte 11 couches. Où sont passées les 3 couches restantes, 
+?
+1. Le suréchantillonnage de la résolution dans Fashion-MNIST par un facteur de $8 \times 8$, de 28 à 224 dimensions, est très coûteux 
+. Essayez plutôt de modifier l'architecture du réseau et la conversion de la résolution, par exemple à 56 ou à 84 dimensions 
+ pour son entrée. Pouvez-vous le faire sans réduire la précision du réseau ?
+1. Utilisez le tableau 1 du document VGG :cite:`Simonyan.Zisserman.2014` pour construire d'autres modèles courants, 
+ tels que le VGG-16 ou le VGG-19.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/77)

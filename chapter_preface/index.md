@@ -1,341 +1,341 @@
-# Preface
+# Préface
 
-Just a few years ago, there were no legions of deep learning scientists
-developing intelligent products and services at major companies and startups.
-When we entered the field, machine learning 
-did not command headlines in daily newspapers.
-Our parents had no idea what machine learning was,
-let alone why we might prefer it to a career in medicine or law.
-Machine learning was a blue skies academic discipline
-whose industrial significance was limited
-to a narrow set of real-world applications,
-including speech recognition and computer vision.
-Moreover, many of these applications
-required so much domain knowledge
-that they were often regarded as entirely separate areas 
-for which machine learning was one small component.
-At that time, neural networks---the 
-predecessors of the deep learning methods
-that we focus on in this book---were 
-generally regarded as outmoded.
-
-
-In just the past few years, deep learning has taken the world by surprise,
-driving rapid progress in such diverse fields 
-as computer vision, natural language processing, 
-automatic speech recognition, reinforcement learning, 
-and biomedical informatics.
-Moreover, the success of deep learning
-on so many tasks of practical interest
-has even catalyzed developments 
-in theoretical machine learning and statistics.
-With these advances in hand, 
-we can now build cars that drive themselves
-with more autonomy than ever before 
-(and less autonomy than some companies might have you believe),
-smart reply systems that automatically draft the most mundane emails,
-helping people dig out from oppressively large inboxes,
-and software agents that dominate the world's best humans
-at board games like Go, a feat once thought to be decades away.
-Already, these tools exert ever-wider impacts on industry and society,
-changing the way movies are made, diseases are diagnosed,
-and playing a growing role in basic sciences---from astrophysics to biology.
+Il y a quelques années à peine, il n'y avait pas de légions de scientifiques spécialisés dans l'apprentissage profond
+développant des produits et services intelligents dans les grandes entreprises et les startups.
+Lorsque nous sommes entrés dans ce domaine, l'apprentissage automatique 
+ne faisait pas les gros titres des journaux quotidiens.
+Nos parents n'avaient aucune idée de ce qu'était l'apprentissage automatique,
+et encore moins des raisons pour lesquelles nous pourrions le préférer à une carrière en médecine ou en droit.
+L'apprentissage automatique était une discipline académique au ciel bleu
+dont l'importance industrielle était limitée
+à un ensemble restreint d'applications du monde réel,
+dont la reconnaissance vocale et la vision par ordinateur.
+En outre, nombre de ces applications
+nécessitaient une telle connaissance du domaine
+qu'elles étaient souvent considérées comme des domaines entièrement distincts 
+dont l'apprentissage automatique n'était qu'une petite composante.
+À cette époque, les réseaux neuronaux - les prédécesseurs 
+des méthodes d'apprentissage profond
+sur lesquelles nous nous concentrons dans ce livre - étaient 
+généralement considérés comme dépassés.
 
 
-
-## About This Book
-
-This book represents our attempt to make deep learning approachable,
-teaching you the *concepts*, the *context*, and the *code*.
-
-### One Medium Combining Code, Math, and HTML
-
-For any computing technology to reach its full impact,
-it must be well-understood, well-documented, and supported by
-mature, well-maintained tools.
-The key ideas should be clearly distilled,
-minimizing the onboarding time needing 
-to bring new practitioners up to date.
-Mature libraries should automate common tasks,
-and exemplar code should make it easy for practitioners
-to modify, apply, and extend common applications to suit their needs.
-Take dynamic web applications as an example.
-Despite a large number of companies, like Amazon,
-developing successful database-driven web applications in the 1990s,
-the potential of this technology to aid creative entrepreneurs
-has been realized to a far greater degree in the past ten years,
-owing in part to the development of powerful, well-documented frameworks.
+Au cours des dernières années, l'apprentissage profond a pris le monde par surprise,
+entraînant des progrès rapides dans des domaines aussi divers que 
+la vision par ordinateur, le traitement du langage naturel, 
+la reconnaissance vocale automatique, l'apprentissage par renforcement, 
+et l'informatique biomédicale.
+De plus, le succès de l'apprentissage profond
+sur tant de tâches d'intérêt pratique
+a même catalysé des développements 
+dans l'apprentissage automatique théorique et les statistiques.
+Grâce à ces avancées, 
+nous pouvons désormais construire des voitures qui se conduisent toutes seules
+avec plus d'autonomie que jamais 
+(et moins d'autonomie que certaines entreprises voudraient vous faire croire),
+des systèmes de réponse intelligents qui rédigent automatiquement les courriels les plus banals,
+qui aident les gens à se sortir de boîtes de réception trop volumineuses,
+et des agents logiciels qui dominent les meilleurs humains du monde
+à des jeux de société comme le go, un exploit que l'on croyait autrefois impossible à réaliser avant des décennies.
+Ces outils exercent déjà un impact de plus en plus important sur l'industrie et la société,
+changeant la façon dont les films sont réalisés, dont les maladies sont diagnostiquées,
+et jouant un rôle croissant dans les sciences fondamentales - de l'astrophysique à la biologie.
 
 
-Testing the potential of deep learning presents unique challenges
-because any single application brings together various disciplines.
-Applying deep learning requires simultaneously understanding
-(i) the motivations for casting a problem in a particular way;
-(ii) the mathematical form of a given model;
-(iii) the optimization algorithms for fitting the models to data;
-(iv) the statistical principles that tell us 
-when we should expect our models 
-to generalize to unseen data
-and practical methods for certifying 
-that they have, in fact, generalized;
-and (v) the engineering techniques
-required to train models efficiently,
-navigating the pitfalls of numerical computing
-and getting the most out of available hardware.
-Teaching both the critical thinking skills 
-required to formulate problems,
-the mathematics to solve them,
-and the software tools to implement those solutions 
-all in one place presents formidable challenges.
-Our goal in this book is to present a unified resource
-to bring would-be practitioners up to speed.
 
-When we started this book project,
-there were no resources that simultaneously
-(i) were up to date; (ii) covered the full breadth
-of modern machine learning with substantial technical depth;
-and (iii) interleaved exposition 
-of the quality one expects 
-from an engaging textbook 
-with the clean runnable code
-that one expects to find in hands-on tutorials.
-We found plenty of code examples for
-how to use a given deep learning framework
-(e.g., how to do basic numerical computing with matrices in TensorFlow)
-or for implementing particular techniques
-(e.g., code snippets for LeNet, AlexNet, ResNets, etc.)
-scattered across various blog posts and GitHub repositories.
-However, these examples typically focused on
-*how* to implement a given approach,
-but left out the discussion of 
-*why* certain algorithmic decisions are made.
-While some interactive resources 
-have popped up sporadically
-to address a particular topic, 
-e.g., the engaging blog posts
-published on the website [Distill](http://distill.pub), or personal blogs,
-they only covered selected topics in deep learning,
-and often lacked associated code.
-On the other hand, while several deep learning textbooks 
-have emerged---e.g., :cite:`Goodfellow.Bengio.Courville.2016`, 
-which offers a comprehensive survey 
-on the basics of deep learning---these 
-resources do not marry the descriptions
-to realizations of the concepts in code,
-sometimes leaving readers clueless 
-as to how to implement them.
-Moreover, too many resources 
-are hidden behind the paywalls
-of commercial course providers.
+### A propos de ce livre
 
-We set out to create a resource that could
-(i) be freely available for everyone;
-(ii) offer sufficient technical depth 
-to provide a starting point on the path
-to actually becoming an applied machine learning scientist;
-(iii) include runnable code, showing readers
-*how* to solve problems in practice;
-(iv) allow for rapid updates, both by us
-and also by the community at large;
-and (v) be complemented by a [forum](http://discuss.d2l.ai)
-for interactive discussion of technical details and to answer questions.
+Ce livre représente notre tentative de rendre l'apprentissage profond accessible,
+en vous enseignant les *concepts*, le *contexte* et le *code*.
 
-These goals were often in conflict.
-Equations, theorems, and citations 
-are best managed and laid out in LaTeX.
-Code is best described in Python.
-And webpages are native in HTML and JavaScript.
-Furthermore, we want the content to be
-accessible both as executable code, as a physical book,
-as a downloadable PDF, and on the Internet as a website.
-At present there exist no tools and no workflow
-perfectly suited to these demands, 
-so we had to assemble our own.
-We describe our approach in detail 
-in :numref:`sec_how_to_contribute`.
-We settled on GitHub to share the source 
-and to facilitate community contributions,
-Jupyter notebooks for mixing code, equations and text,
-Sphinx as a rendering engine 
-to generate multiple outputs,
-and Discourse for the forum.
-While our system is not yet perfect,
-these choices provide a good compromise 
-among the competing concerns.
-We believe that this might be 
-the first book published
-using such an integrated workflow.
+### Un support combinant code, mathématiques et HTML
+
+Pour qu'une technologie informatique atteigne son plein impact,
+elle doit être bien comprise, bien documentée et soutenue par
+des outils matures et bien maintenus.
+Les idées clés doivent être clairement distillées,
+minimisant ainsi le temps nécessaire à 
+la mise à niveau des nouveaux praticiens.
+Les bibliothèques matures doivent automatiser les tâches courantes,
+et le code exemplaire doit permettre aux praticiens
+de modifier, d'appliquer et d'étendre facilement les applications courantes pour répondre à leurs besoins.
+Prenons l'exemple des applications web dynamiques.
+Bien qu'un grand nombre d'entreprises, comme Amazon,
+aient développé avec succès des applications Web basées sur des bases de données dans les années 1990,
+le potentiel de cette technologie pour aider les entrepreneurs créatifs
+a été réalisé dans une bien plus large mesure au cours des dix dernières années,
+en partie grâce au développement de cadres puissants et bien documentés.
 
 
-### Learning by Doing
+Tester le potentiel de l'apprentissage profond présente des défis uniques
+car toute application unique fait appel à diverses disciplines.
+L'application de l'apprentissage profond exige de comprendre simultanément
+(i) les motivations qui poussent à formuler un problème d'une manière particulière ;
+(ii) la forme mathématique d'un modèle donné ;
+(iii) les algorithmes d'optimisation pour adapter les modèles aux données ;
+(iv) les principes statistiques qui nous disent 
+quand nous devons nous attendre à ce que nos modèles 
+se généralisent à des données inédites
+et les méthodes pratiques pour certifier 
+qu'ils se sont effectivement généralisés ;
+et (v) les techniques d'ingénierie
+nécessaires pour former des modèles de manière efficace,
+naviguer dans les pièges du calcul numérique
+et tirer le meilleur parti du matériel disponible.
+Enseigner à la fois les compétences de pensée critique 
+nécessaires pour formuler des problèmes,
+les mathématiques pour les résoudre,
+et les outils logiciels pour mettre en œuvre ces solutions 
+tout en un seul endroit présente des défis considérables.
+L'objectif de ce livre est de présenter une ressource unifiée
+pour mettre à niveau les praticiens en herbe.
 
-Many textbooks present concepts in succession, 
-covering each in exhaustive detail.
-For example, Chris Bishop's excellent textbook :cite:`Bishop.2006`,
-teaches each topic so thoroughly
-that getting to the chapter
-on linear regression requires 
-a non-trivial amount of work.
-While experts love this book 
-precisely for its thoroughness,
-for true beginners, this property limits 
-its usefulness as an introductory text.
+Lorsque nous avons commencé ce projet de livre,
+, il n'existait aucune ressource qui, à la fois,
+(i) était à jour, (ii) couvrait toute l'étendue
+de l'apprentissage automatique moderne avec une profondeur technique substantielle,
+et (iii) intercalait une exposition 
+de la qualité que l'on attend 
+d'un manuel attrayant 
+avec le code exécutable propre
+que l'on s'attend à trouver dans les tutoriels pratiques.
+Nous avons trouvé de nombreux exemples de code pour
+comment utiliser un cadre d'apprentissage profond donné
+(par exemple, comment effectuer des calculs numériques de base avec des matrices dans TensorFlow)
+ou pour mettre en œuvre des techniques particulières
+(par exemple, des extraits de code pour LeNet, AlexNet, ResNets, etc.)
+dispersés dans divers articles de blog et dépôts GitHub.
+Cependant, ces exemples se concentrent généralement sur
+*comment* mettre en œuvre une approche donnée,
+mais laissent de côté la discussion sur 
+*pourquoi* certaines décisions algorithmiques sont prises.
+Bien que certaines ressources interactives 
+soient apparues sporadiquement
+pour traiter un sujet particulier, 
+par exemple, les articles de blog attrayants
+publiés sur le site [Distill](http://distill.pub), ou les blogs personnels,
+ils ne couvraient que certains sujets de l'apprentissage profond,
+et manquaient souvent de code associé.
+D'autre part, bien que plusieurs manuels d'apprentissage profond 
+aient vu le jour - par exemple, :cite:`Goodfellow.Bengio.Courville.2016` , 
+qui offre une étude complète 
+sur les bases de l'apprentissage profond - ces ressources 
+n'associent pas les descriptions
+aux réalisations des concepts dans le code,
+laissant parfois les lecteurs désemparés 
+quant à la manière de les mettre en œuvre.
+De plus, trop de ressources 
+sont cachées derrière les murs payants
+des fournisseurs de cours commerciaux.
 
-In this book, we will teach most concepts *just in time*.
-In other words, you will learn concepts at the very moment
-that they are needed to accomplish some practical end.
-While we take some time at the outset to teach
-fundamental preliminaries, like linear algebra and probability,
-we want you to taste the satisfaction of training your first model
-before worrying about more esoteric probability distributions.
+Nous avons entrepris de créer une ressource qui pourrait
+(i) être librement accessible à tous ;
+(ii) offrir une profondeur technique suffisante 
+pour fournir un point de départ sur le chemin
+pour devenir réellement un scientifique de l'apprentissage automatique appliqué ;
+(iii) inclure du code exécutable, montrant aux lecteurs
+*comment* résoudre des problèmes dans la pratique ;
+(iv) permettre des mises à jour rapides, à la fois par nous
+et par la communauté dans son ensemble ;
+et (v) être complété par un site [forum](http://discuss.d2l.ai)
+ pour une discussion interactive des détails techniques et pour répondre aux questions.
 
-Aside from a few preliminary notebooks that provide a crash course
-in the basic mathematical background,
-each subsequent chapter introduces both a reasonable number of new concepts
-and provides single self-contained working examples---using real datasets.
-This presents an organizational challenge.
-Some models might logically be grouped together in a single notebook.
-And some ideas might be best taught 
-by executing several models in succession.
-On the other hand, there is a big advantage to adhering
-to a policy of *one working example, one notebook*:
-This makes it as easy as possible for you to
-start your own research projects by leveraging our code.
-Just copy a notebook and start modifying it.
-
-We will interleave the runnable code with background material as needed.
-In general, we will often err on the side of making tools
-available before explaining them fully (and we will follow up by
-explaining the background later).
-For instance, we might use *stochastic gradient descent*
-before fully explaining why it is useful or why it works.
-This helps to give practitioners the necessary
-ammunition to solve problems quickly,
-at the expense of requiring the reader
-to trust us with some curatorial decisions.
-
-This book will teach deep learning concepts from scratch.
-Sometimes, we want to delve into fine details about the models
-that would typically be hidden from the user
-by deep learning frameworks' advanced abstractions.
-This comes up especially in the basic tutorials,
-where we want you to understand everything
-that happens in a given layer or optimizer.
-In these cases, we will often present two versions of the example:
-one where we implement everything from scratch,
-relying only on NumPy-like functionality
-and automatic differentiation,
-and another, more practical example,
-where we write succinct code using 
-the high-level APIs of deep learning frameworks.
-Once we have taught you how some component works,
-we can just use the high-level APIs in subsequent tutorials.
+Ces objectifs étaient souvent en conflit.
+Les équations, les théorèmes et les citations 
+sont mieux gérés et mis en page en LaTeX.
+Le code est mieux décrit en Python.
+Et les pages Web sont natives en HTML et JavaScript.
+En outre, nous voulons que le contenu soit
+accessible à la fois sous forme de code exécutable, sous forme de livre physique,
+sous forme de PDF téléchargeable, et sur Internet sous forme de site Web.
+À l'heure actuelle, il n'existe aucun outil ni aucun flux de travail
+parfaitement adapté à ces exigences, 
+nous avons donc dû assembler les nôtres.
+Nous décrivons notre approche en détail 
+dans :numref:`sec_how_to_contribute` .
+Nous avons choisi GitHub pour partager la source 
+et faciliter les contributions de la communauté,
+les carnets Jupyter pour mélanger le code, les équations et le texte,
+Sphinx comme moteur de rendu 
+pour générer des sorties multiples,
+et Discourse pour le forum.
+Bien que notre système ne soit pas encore parfait,
+ces choix offrent un bon compromis 
+entre les préoccupations concurrentes.
+Nous pensons que ce livre pourrait être 
+le premier publié
+en utilisant un tel flux de travail intégré.
 
 
-### Content and Structure
+#### Learning by Doing
 
-The book can be roughly divided into three parts,
-focusing on preliminaries, deep learning techniques,
-and advanced topics focused on real systems 
-and applications (:numref:`fig_book_org`).
+De nombreux manuels présentent les concepts les uns après les autres, 
+couvrant chacun d'entre eux de manière exhaustive.
+Par exemple, l'excellent manuel de Chris Bishop :cite:`Bishop.2006` ,
+enseigne chaque sujet de manière si approfondie
+que le chapitre
+sur la régression linéaire nécessite 
+une quantité de travail non négligeable.
+Si les experts adorent ce livre 
+précisément pour son exhaustivité,
+pour les vrais débutants, cette propriété limite 
+son utilité en tant que texte d'introduction.
+
+Dans ce livre, nous enseignerons la plupart des concepts *juste à temps*.
+En d'autres termes, vous apprendrez les concepts au moment même
+où ils sont nécessaires pour atteindre un objectif pratique.
+Bien que nous prenions un peu de temps dès le début pour enseigner
+les préliminaires fondamentaux, comme l'algèbre linéaire et les probabilités,
+nous voulons que vous goûtiez à la satisfaction de former votre premier modèle
+avant de vous préoccuper de distributions de probabilités plus ésotériques.
+
+Hormis quelques cahiers préliminaires qui fournissent un cours accéléré
+sur le contexte mathématique de base,
+chaque chapitre suivant introduit à la fois un nombre raisonnable de nouveaux concepts
+et fournit des exemples de travail autonomes uniques---utilisant des ensembles de données réels.
+Cela présente un défi organisationnel.
+Certains modèles pourraient logiquement être regroupés dans un seul cahier.
+Et certaines idées pourraient être mieux enseignées 
+en exécutant plusieurs modèles successivement.
+D'un autre côté, il y a un grand avantage à adhérer à
+à une politique de *un exemple de travail, un notebook* :
+Cela vous permet de faciliter au maximum
+le lancement de vos propres projets de recherche en exploitant notre code.
+Il suffit de copier un notebook et de commencer à le modifier.
+
+Nous entrelacerons le code exécutable avec du matériel de base si nécessaire.
+En général, nous préférons souvent rendre les outils
+disponibles avant de les expliquer complètement (et nous poursuivrons en expliquant le contexte plus tard à l'adresse
+).
+Par exemple, nous pouvons utiliser la *descente de gradient stochastique*
+avant d'expliquer en détail son utilité ou son fonctionnement.
+Cela permet de donner aux praticiens les munitions nécessaires
+pour résoudre rapidement les problèmes,
+au prix de demander au lecteur
+de nous faire confiance pour certaines décisions curatoriales.
+
+Ce livre enseigne les concepts d'apprentissage profond à partir de zéro.
+Parfois, nous souhaitons entrer dans les détails des modèles
+qui seraient généralement cachés à l'utilisateur
+par les abstractions avancées des cadres d'apprentissage profond.
+Cela se produit surtout dans les tutoriels de base,
+où nous voulons que vous compreniez tout
+ce qui se passe dans une couche ou un optimiseur donné.
+Dans ce cas, nous présentons souvent deux versions de l'exemple :
+une où nous implémentons tout à partir de zéro,
+en nous appuyant uniquement sur les fonctionnalités de type NumPy
+et la différenciation automatique,
+et un autre exemple, plus pratique,
+où nous écrivons un code succinct en utilisant 
+les API de haut niveau des frameworks d'apprentissage profond.
+Une fois que nous vous avons appris le fonctionnement d'un composant,
+nous pouvons simplement utiliser les API de haut niveau dans les tutoriels suivants.
+
+
+### Contenu et structure
+
+Le livre peut être divisé grossièrement en trois parties,
+portant sur les préliminaires, les techniques d'apprentissage profond,
+et les sujets avancés portant sur les systèmes réels 
+et les applications (:numref:`fig_book_org` ).
 
 ![Book structure](../img/book-org.svg)
 :label:`fig_book_org`
 
 
-* The first part covers basics and preliminaries.
-:numref:`chap_introduction` offers 
-an introduction to deep learning.
-Then, in :numref:`chap_preliminaries`,
-we quickly bring you up to speed 
-on the prerequisites required
-for hands-on deep learning, 
-such as how to store and manipulate data,
-and how to apply various numerical operations 
-based on basic concepts from linear algebra, 
-calculus, and probability.
-:numref:`chap_linear` and :numref:`chap_perceptrons`
-cover the most basic concepts and techniques in deep learning,
-including regression and classification;
-linear models and multilayer perceptrons;
-and overfitting and regularization.
-
-* The next six chapters focus on modern deep learning techniques.
-:numref:`chap_computation` describes 
-the key computational components 
-of deep learning systems
-and lays the groundwork
-for our subsequent implementations
-of more complex models.
-Next, :numref:`chap_cnn` and :numref:`chap_modern_cnn`,
-introduce convolutional neural networks (CNNs), 
-powerful tools that form the backbone 
-of most modern computer vision systems.
-Similarly, :numref:`chap_rnn` and :numref:`chap_modern_rnn`
-introduce recurrent neural networks (RNNs), 
-models that exploit sequential (e.g., temporal) 
-structure in data and are commonly used
-for natural language processing 
-and time series prediction.
-In :numref:`chap_attention`, 
-we introduce a relatively new class of models
-based on so-called attention mechanisms
-that has displaced RNNs as the dominant architecture
-for most natural language processing tasks.
-These sections will bring you up to speed 
-on the most powerful and general tools
-that are widely used by deep learning practitioners.
-
-* Part three discusses scalability, efficiency, and applications.
-First, in :numref:`chap_optimization`,
-we discuss several common optimization algorithms
-used to train deep learning models.
-The next chapter, :numref:`chap_performance`,
-examines several key factors
-that influence the computational performance 
-of your deep learning code.
-In :numref:`chap_cv`,
-we illustrate major applications 
-of deep learning in computer vision.
-In :numref:`chap_nlp_pretrain` and :numref:`chap_nlp_app`,
-we show how to pretrain language representation models 
-and apply them to natural language processing tasks.
+* La première partie couvre les bases et les préliminaires.
+:numref:`chap_introduction` offre 
+une introduction à l'apprentissage profond.
+Puis, dans :numref:`chap_preliminaries` ,
+, nous vous présentons rapidement 
+les conditions préalables requises
+pour l'apprentissage profond pratique, 
+telles que le stockage et la manipulation des données,
+et l'application de diverses opérations numériques 
+basées sur les concepts de base de l'algèbre linéaire, 
+du calcul et des probabilités.
+:numref:`chap_linear` et   couvrent les concepts et techniques les plus fondamentaux de l'apprentissage profond, notamment la régression et la classification ; les modèles linéaires et les perceptrons multicouches ; et l'overfitting et la régularisation. * Les six chapitres suivants sont consacrés aux techniques modernes d'apprentissage profond.   décrit les principaux composants informatiques des systèmes d'apprentissage profond et pose les bases pour nos implémentations ultérieures de modèles plus complexes. Ensuite,  et  , présentent les réseaux de neurones convolutifs (CNN), des outils puissants qui constituent l'épine dorsale de la plupart des systèmes modernes de vision par ordinateur. De même,  et   présentent les réseaux neuronaux récurrents (RNN), modèles qui exploitent la structure séquentielle (par exemple, temporelle) des données et sont couramment utilisés pour le traitement du langage naturel et la prédiction des séries temporelles. Dans  , nous présentons une classe relativement nouvelle de modèles basés sur des mécanismes dits d'attention qui ont remplacé les RNN comme architecture dominante pour la plupart des tâches de traitement du langage naturel. Ces sections vous permettront de vous familiariser avec les outils les plus puissants et les plus généraux qui sont largement utilisés par les praticiens de l'apprentissage profond. * La troisième partie traite de l'évolutivité, de l'efficacité et des applications. Tout d'abord, dans  , nous abordons plusieurs algorithmes d'optimisation courants utilisés pour former des modèles d'apprentissage profond. Le chapitre suivant,  , examine plusieurs facteurs clés qui influencent les performances de calcul de votre code d'apprentissage profond. Dans  , nous illustrons les principales applications de l'apprentissage profond en vision par ordinateur. Dans  et  , nous montrons comment pré-entraîner des modèles de représentation du langage et les appliquer à des tâches de traitement du langage naturel. ### Code    La plupart des sections de ce livre comportent du code exécutable. Nous pensons que certaines intuitions se développent mieux par essais et erreurs, en modifiant légèrement le code et en observant les résultats. Idéalement, une théorie mathématique élégante pourrait nous indiquer précisément comment modifier notre code pour obtenir le résultat souhaité. Cependant, aujourd'hui, les praticiens de l'apprentissage profond doivent souvent s'aventurer là où aucune théorie convaincante ne peut les guider fermement. Malgré tous nos efforts, les explications formelles de l'efficacité des différentes techniques font toujours défaut, à la fois parce que les mathématiques permettant de caractériser ces modèles peuvent être très difficiles et aussi parce que les recherches sérieuses sur ces sujets n'ont été lancées que récemment. Nous espérons qu'au fur et à mesure que la théorie de l'apprentissage profond progresse, les futures éditions de ce livre pourront fournir des informations qui éclipseront celles actuellement disponibles. Pour éviter les répétitions inutiles, nous encapsulons certaines de nos fonctions et classes les plus fréquemment importées et référencées dans le package . Pour indiquer un bloc de code, tel qu'une fonction, une classe ou une collection d'instructions d'importation, , qui sera ensuite accessible via le paquet , , nous le marquerons avec . Nous offrons un aperçu détaillé de ces fonctions et classes dans  . Le paquetage est léger et ne nécessite que les dépendances suivantes : :numref:`chap_perceptrons`
 
 
-### Code
+
+
+
+
+:numref:`chap_computation` 
+ 
+
+
+
+
+ :numref:`chap_cnn` :numref:`chap_modern_cnn`
+ 
+ 
+
+ :numref:`chap_rnn` :numref:`chap_modern_rnn`
+ 
+ 
+
+ 
+
+ :numref:`chap_attention` 
+
+
+
+
+ 
+
+
+
+
+ :numref:`chap_optimization`
+
+
+ :numref:`chap_performance`
+
+ 
+
+ :numref:`chap_cv`
+ 
+
+ :numref:`chap_nlp_pretrain` :numref:`chap_nlp_app`
+ 
+
+
+
+
 :label:`sec_code`
 
-Most sections of this book feature executable code.
-We believe that some intuitions are best developed
-via trial and error,
-tweaking the code in small ways and observing the results.
-Ideally, an elegant mathematical theory might tell us
-precisely how to tweak our code to achieve a desired result.
-However, deep learning practitioners today
-must often tread where no cogent theory 
-can provide firm guidance. 
-Despite our best attempts, formal explanations 
-for the efficacy of various techniques are still lacking,
-both because the mathematics to characterize these models
-can be so difficult and also because 
-serious inquiry on these topics
-has only just recently kicked into high gear.
-We are hopeful that as the theory of deep learning progresses,
-future editions of this book 
-can provide insights that eclipse
-those presently available.
 
-To avoid unnecessary repetition, we encapsulate 
-some of our most frequently imported and referred-to 
-functions and classes in the `d2l` package.
-To indicate a block of code, such as a function, 
-class, or collection of import statements,
-that will be subsequently accessed via the `d2l` package, 
-we will mark it with `#@save`. 
-We offer a detailed overview 
-of these functions and classes in :numref:`sec_d2l`.
-The `d2l` package is lightweight and only requires
-the following dependencies:
+
+
+
+
+
+
+ 
+ 
+ 
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+ 
+ `d2l`
+ 
+
+ `d2l` 
+ `#@save` 
+ 
+ :numref:`sec_d2l`
+ `d2l`
+
 
 ```{.python .input}
 #@tab all
@@ -362,58 +362,58 @@ d2l = sys.modules[__name__]
 ```
 
 :begin_tab:`mxnet`
-Most of the code in this book is based on Apache MXNet,
-an open-source framework for deep learning
-that is the preferred choice 
-of AWS (Amazon Web Services),
-as well as many colleges and companies.
-All of the code in this book has passed tests 
-under the newest MXNet version.
-However, due to the rapid development of deep learning, 
-some code *in the print edition* 
-may not work properly in future versions of MXNet.
-We plan to keep the online version up-to-date.
-In case you encounter any problems,
-please consult :ref:`chap_installation`
-to update your code and runtime environment.
+La plupart du code de ce livre est basé sur Apache MXNet,
+un cadre open-source pour l'apprentissage profond
+qui est le choix préféré 
+d'AWS (Amazon Web Services),
+ainsi que de nombreux collèges et entreprises.
+L'ensemble du code de ce livre a passé les tests 
+sous la dernière version de MXNet.
+Cependant, en raison du développement rapide de l'apprentissage profond, 
+certains codes *de l'édition imprimée* 
+peuvent ne pas fonctionner correctement dans les futures versions de MXNet.
+Nous prévoyons de maintenir la version en ligne à jour.
+Si vous rencontrez des problèmes,
+veuillez consulter :ref:`chap_installation` 
+ pour mettre à jour votre code et votre environnement d'exécution.
 
-Here is how we import modules from MXNet.
+Voici comment nous importons les modules de MXNet.
 :end_tab:
 
 :begin_tab:`pytorch`
-Most of the code in this book is based on PyTorch,
-an extremely popular open-source framework
-that has been enthusiastically embraced 
-by the deep learning research community.
-All of the code in this book has passed tests 
-under the latest stable version of PyTorch.
-However, due to the rapid development of deep learning,
-some code *in the print edition* 
-may not work properly in future versions of PyTorch.
-We plan to keep the online version up-to-date.
-In case you encounter any problems,
-please consult :ref:`chap_installation`
-to update your code and runtime environment.
+La plupart du code de ce livre est basé sur PyTorch,
+un cadre open-source extrêmement populaire
+qui a été adopté avec enthousiasme 
+par la communauté de recherche en apprentissage profond.
+L'ensemble du code de ce livre a passé les tests 
+sous la dernière version stable de PyTorch.
+Cependant, en raison du développement rapide de l'apprentissage profond,
+certains codes *de l'édition imprimée* 
+peuvent ne pas fonctionner correctement dans les futures versions de PyTorch.
+Nous prévoyons de maintenir la version en ligne à jour.
+Si vous rencontrez des problèmes,
+veuillez consulter :ref:`chap_installation` 
+ pour mettre à jour votre code et votre environnement d'exécution.
 
-Here is how we import modules from PyTorch.
+Voici comment nous importons les modules de PyTorch.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Most of the code in this book is based on TensorFlow,
-an open-source framework for deep learning
-that is widely adopted in industry
-and popular among researchers.
-All of the code in this book has passed tests 
-under the latest stable version TensorFlow.
-However, due to the rapid development of deep learning, 
-some code *in the print edition* 
-may not work properly in future versions of TensorFlow.
-We plan to keep the online version up-to-date.
-In case you encounter any problems,
-please consult :ref:`chap_installation`
-to update your code and runtime environment.
+La plupart du code de ce livre est basé sur TensorFlow,
+un cadre open-source pour l'apprentissage profond
+qui est largement adopté dans l'industrie
+et populaire parmi les chercheurs.
+L'ensemble du code de ce livre a passé les tests 
+sous la dernière version stable de TensorFlow.
+Cependant, en raison du développement rapide de l'apprentissage profond, 
+certains codes *de l'édition imprimée* 
+peuvent ne pas fonctionner correctement dans les futures versions de TensorFlow.
+Nous prévoyons de maintenir la version en ligne à jour.
+Si vous rencontrez des problèmes,
+veuillez consulter :ref:`chap_installation` 
+ pour mettre à jour votre code et votre environnement d'exécution.
 
-Here is how we import modules from TensorFlow.
+Voici comment nous importons les modules de TensorFlow.
 :end_tab:
 
 ```{.python .input}
@@ -443,56 +443,56 @@ import numpy as np
 import tensorflow as tf
 ```
 
-### Target Audience
+### Public cible
 
-This book is for students (undergraduate or graduate),
-engineers, and researchers, who seek a solid grasp
-of the practical techniques of deep learning.
-Because we explain every concept from scratch,
-no previous background in deep learning or machine learning is required.
-Fully explaining the methods of deep learning
-requires some mathematics and programming,
-but we will only assume that you come in with some basics,
-including modest amounts of linear algebra, 
-calculus, probability, and Python programming.
-Just in case you forget the basics,
-the Appendix provides a refresher 
-on most of the mathematics 
-you will find in this book.
-Most of the time, we will prioritize 
-intuition and ideas
-over mathematical rigor.
-If you would like to extend these foundations 
-beyond the prerequisites to understand our book,
-we happily recommend some other terrific resources:
-Linear Analysis by Bela Bollobas :cite:`Bollobas.1999`
-covers linear algebra and functional analysis in great depth.
+Ce livre s'adresse aux étudiants (de premier et deuxième cycles), aux ingénieurs
+et aux chercheurs qui souhaitent acquérir une solide maîtrise
+des techniques pratiques de l'apprentissage profond.
+Comme nous expliquons chaque concept à partir de zéro,
+aucune connaissance préalable en apprentissage profond ou en apprentissage automatique n'est requise.
+L'explication complète des méthodes d'apprentissage profond
+nécessite un peu de mathématiques et de programmation,
+mais nous supposons que vous avez déjà des bases,
+y compris des notions d'algèbre linéaire, 
+de calcul, de probabilité et de programmation Python.
+Au cas où vous auriez oublié les bases,
+l'annexe fournit une remise à niveau 
+sur la plupart des mathématiques 
+que vous trouverez dans ce livre.
+La plupart du temps, nous donnerons la priorité à 
+l'intuition et aux idées
+sur la rigueur mathématique.
+Si vous souhaitez approfondir ces bases 
+au-delà des conditions préalables à la compréhension de notre livre,
+nous vous recommandons volontiers d'autres ressources formidables :
+Linear Analysis de Bela Bollobas :cite:`Bollobas.1999` 
+ couvre l'algèbre linéaire et l'analyse fonctionnelle de manière très approfondie.
 All of Statistics :cite:`Wasserman.2013` 
-provides a marvelous introduction to statistics.
-Joe Blitzstein's [books](https://www.amazon.com/Introduction-Probability-Chapman-Statistical-Science/dp/1138369918) 
-and [courses](https://projects.iq.harvard.edu/stat110/home) 
-on probability and inference are pedagogical gems.
-And if you have not used Python before,
-you may want to peruse this [Python tutorial](http://learnpython.org/).
+ constitue une merveilleuse introduction aux statistiques.
+Les ouvrages de Joe Blitzstein [books](https://www.amazon.com/Introduction-Probability-Chapman-Statistical-Science/dp/1138369918) 
+ et [courses](https://projects.iq.harvard.edu/stat110/home) 
+ sur les probabilités et l'inférence sont des joyaux pédagogiques.
+Et si vous n'avez jamais utilisé Python auparavant,
+vous voudrez peut-être parcourir ce [Python tutorial](http://learnpython.org/).
 
 
 ### Forum
 
-Associated with this book, we have launched a discussion forum,
-located at [discuss.d2l.ai](https://discuss.d2l.ai/).
-When you have questions on any section of the book,
-you can find a link to the associated discussion page
-at the end of each notebook.
+Associé à ce livre, nous avons lancé un forum de discussion,
+situé à l'adresse [discuss.d2l.ai](https://discuss.d2l.ai/).
+Si vous avez des questions sur une section du livre,
+vous trouverez un lien vers la page de discussion associée
+à la fin de chaque cahier.
 
 
-## Acknowledgments
+## Remerciements
 
-We are indebted to the hundreds of contributors for both
-the English and the Chinese drafts.
-They helped improve the content and offered valuable feedback.
-Specifically, we thank every contributor of this English draft
-for making it better for everyone.
-Their GitHub IDs or names are (in no particular order):
+Nous sommes redevables aux centaines de contributeurs pour les versions anglaise et chinoise de
+.
+Ils nous ont aidés à améliorer le contenu et nous ont fait part de leurs précieux commentaires.
+Nous remercions tout particulièrement tous les contributeurs de cette version anglaise
+qui ont contribué à l'améliorer pour tous.
+Leurs identifiants ou noms GitHub sont (sans ordre particulier) :
 alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat,
 cryptonaut, Davide Fiocco, edgarroman, gkutiel, John Mitro, Liang Pu,
 Rahul Agarwal, Mohamed Ali Jamaoui, Michael (Stu) Stewart, Mike Müller,
@@ -510,7 +510,7 @@ ati-ozgur, qbaza, dchoi77, Adam Gerson, Phuc Le, Mark Atwood, christabella, vn09
 Haibin Lin, jjangga0214, RichyChen, noelo, hansent, Giel Dops, dvincent1337, WhiteD3vil,
 Peter Kulits, codypenta, joseppinilla, ahmaurya, karolszk, heytitle, Peter Goetz, rigtorp,
 Tiep Vu, sfilip, mlxd, Kale-ab Tessera, Sanjar Adilov, MatteoFerrara, hsneto,
-Katarzyna Biesialska, Gregory Bruss, Duy–Thanh Doan, paulaurel, graytowne, Duc Pham,
+Katarzyna Biesialska, Gregory Bruss, Duy-Thanh Doan, paulaurel, graytowne, Duc Pham,
 sl7423, Jaedong Hwang, Yida Wang, cys4, clhm, Jean Kaddour, austinmw, trebeljahr, tbaums,
 Cuong V. Nguyen, pavelkomarov, vzlamal, NotAnotherSystem, J-Arun-Mani, jancio, eldarkurtic,
 the-great-shazbot, doctorcolossus, gducharme, cclauss, Daniel-Mietchen, hoonose, biagiom,
@@ -531,26 +531,26 @@ Kaan Sancak, regob, AlexSauer, Gopalakrishna Ramachandra, Tobias Uelwer, Chao Wa
 Nicolas Corthorn, akash5474, kxxt, zxydi1992, Jacob Britton, Shuangchi He, zhmou, krahets, Jie-Han Chen,
 Atishay Garg.
 
-We thank Amazon Web Services, especially Swami Sivasubramanian, Peter DeSantis, Adam Selipsky,
-and Andrew Jassy for their generous support in writing this book. 
-Without the available time, resources, discussions with colleagues, 
-and continuous encouragement, this book would not have happened.
+Nous remercions Amazon Web Services, en particulier Swami Sivasubramanian, Peter DeSantis, Adam Selipsky,
+et Andrew Jassy pour leur généreux soutien dans la rédaction de ce livre. 
+Sans le temps disponible, les ressources, les discussions avec les collègues, 
+et les encouragements continus, ce livre n'aurait pas vu le jour.
 
 
-## Summary
+## Résumé
 
-* Deep learning has revolutionized pattern recognition, introducing technology that now powers a wide range of  technologies, including computer vision, natural language processing, automatic speech recognition.
-* To successfully apply deep learning, you must understand how to cast a problem, the mathematics of modeling, the algorithms for fitting your models to data, and the engineering techniques to implement it all.
-* This book presents a comprehensive resource, including prose, figures, mathematics, and code, all in one place.
-* To answer questions related to this book, visit our forum at https://discuss.d2l.ai/.
-* All notebooks are available for download on GitHub.
+* L'apprentissage profond a révolutionné la reconnaissance des formes, introduisant une technologie qui alimente désormais un large éventail de technologies, notamment la vision par ordinateur, le traitement du langage naturel et la reconnaissance automatique de la parole.
+* Pour appliquer avec succès l'apprentissage profond, vous devez comprendre comment formuler un problème, les mathématiques de la modélisation, les algorithmes pour adapter vos modèles aux données, et les techniques d'ingénierie pour mettre tout cela en œuvre.
+* Ce livre présente une ressource complète, y compris la prose, les chiffres, les mathématiques et le code, le tout en un seul endroit.
+* Pour répondre aux questions relatives à ce livre, visitez notre forum à l'adresse https://discuss.d2l.ai/.
+* Tous les cahiers sont disponibles en téléchargement sur GitHub.
 
 
-## Exercises
+## Exercices
 
-1. Register an account on the discussion forum of this book [discuss.d2l.ai](https://discuss.d2l.ai/).
-1. Install Python on your computer.
-1. Follow the links at the bottom of the section to the forum, where you will be able to seek out help and discuss the book and find answers to your questions by engaging the authors and broader community.
+1. Enregistrez un compte sur le forum de discussion de ce livre [discuss.d2l.ai](https://discuss.d2l.ai/).
+1. Installez Python sur votre ordinateur.
+1. Suivez les liens en bas de la section pour accéder au forum, où vous pourrez demander de l'aide, discuter du livre et trouver des réponses à vos questions en faisant appel aux auteurs et à une communauté plus large.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/18)

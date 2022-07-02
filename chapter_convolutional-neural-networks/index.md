@@ -1,64 +1,64 @@
-# Convolutional Neural Networks
-:label:`chap_cnn`
+# Réseaux neuronaux convolutifs
+:label:`chap_cnn` 
 
-Image data is represented as a two-dimensional grid of pixels, be it
-monochromatic or in color. Accordingly each pixel corresponds to one
-or multiple numerical values respectively. So far we ignored this rich
-structure and treated them as vectors of numbers by *flattening* the
-images, irrespective of the spatial relation between pixels. This
-deeply unsatisfying approach was necessary in order to feed the
-resulting one-dimensional vectors through a fully connected MLP.
+ Les données d'image sont représentées sous la forme d'une grille bidimensionnelle de pixels, qu'elle soit
+monochromatique ou en couleur. En conséquence, chaque pixel correspond respectivement à une
+ou plusieurs valeurs numériques. Jusqu'à présent, nous avons ignoré cette riche structure
+et les avons traitées comme des vecteurs de nombres en *aplatissant* les images
+, sans tenir compte de la relation spatiale entre les pixels. Cette approche
+profondément insatisfaisante était nécessaire pour faire passer les vecteurs unidimensionnels
+résultants par un MLP entièrement connecté.
 
-Because these networks are invariant to the order of the features, we
-could get similar results regardless of whether we preserve an order
-corresponding to the spatial structure of the pixels or if we permute
-the columns of our design matrix before fitting the MLP's parameters.
-Preferably, we would leverage our prior knowledge that nearby pixels
-are typically related to each other, to build efficient models for
-learning from image data.
+Comme ces réseaux sont invariants par rapport à l'ordre des caractéristiques, nous
+pourrions obtenir des résultats similaires, que nous préservions un ordre
+correspondant à la structure spatiale des pixels ou que nous permutions
+les colonnes de notre matrice de conception avant d'ajuster les paramètres du MLP.
+Il serait préférable de tirer parti de notre connaissance préalable du fait que les pixels voisins
+sont généralement liés les uns aux autres, afin de construire des modèles efficaces pour
+l'apprentissage à partir de données d'image.
 
-This chapter introduces *convolutional neural networks* (CNNs)
-:cite:`LeCun.Jackel.Bottou.ea.1995`, a powerful family of neural networks that
-are designed for precisely this purpose.
-CNN-based architectures are
-now ubiquitous in the field of computer vision.
-For instance, on the Imagnet collection
-:cite:`Deng.Dong.Socher.ea.2009` it was only the use of convolutional neural
-networks, in short Convnets that provided significant performance
-improvements :cite:`Krizhevsky.Sutskever.Hinton.2012`.
+Ce chapitre présente les réseaux de neurones convolutifs * (CNN)
+:cite:`LeCun.Jackel.Bottou.ea.1995` , une puissante famille de réseaux de neurones qui
+sont conçus précisément dans ce but.
+Les architectures basées sur les CNN sont
+maintenant omniprésentes dans le domaine de la vision par ordinateur.
+Par exemple, sur la collection Imagnet
+:cite:`Deng.Dong.Socher.ea.2009` , seule l'utilisation de réseaux neuronaux convolutifs
+, en bref les Convnets, a permis d'obtenir des améliorations significatives des performances
+ :cite:`Krizhevsky.Sutskever.Hinton.2012` .
 
-Modern CNNs, as they are called colloquially owe their design to
-inspirations from biology, group theory, and a healthy dose of
-experimental tinkering.  In addition to their sample efficiency in
-achieving accurate models, CNNs tend to be computationally efficient,
-both because they require fewer parameters than fully connected
-architectures and because convolutions are easy to parallelize across
-GPU cores :cite:`Chetlur.Woolley.Vandermersch.ea.2014`.  Consequently, practitioners often
-apply CNNs whenever possible, and increasingly they have emerged as
-credible competitors even on tasks with a one-dimensional sequence
-structure, such as audio :cite:`Abdel-Hamid.Mohamed.Jiang.ea.2014`, text
-:cite:`Kalchbrenner.Grefenstette.Blunsom.2014`, and time series analysis
-:cite:`LeCun.Bengio.ea.1995`, where recurrent neural networks are
-conventionally used.  Some clever adaptations of CNNs have also
-brought them to bear on graph-structured data :cite:`Kipf.Welling.2016` and
-in recommender systems.
+Les CNN modernes, comme on les appelle familièrement, doivent leur conception à
+des inspirations de la biologie, de la théorie des groupes et à une bonne dose de
+bricolage expérimental.  Outre leur efficacité en matière d'échantillonnage
+pour obtenir des modèles précis, les CNN ont tendance à être efficaces sur le plan du calcul,
+à la fois parce qu'ils nécessitent moins de paramètres que les architectures entièrement connectées
+et parce que les convolutions sont faciles à paralléliser sur
+les cœurs des GPU :cite:`Chetlur.Woolley.Vandermersch.ea.2014` .  Par conséquent, les praticiens
+appliquent souvent les CNN chaque fois que cela est possible, et de plus en plus, ils sont apparus comme des concurrents crédibles
+même pour des tâches avec une structure de séquence unidimensionnelle
+, comme l'audio :cite:`Abdel-Hamid.Mohamed.Jiang.ea.2014` , le texte
+:cite:`Kalchbrenner.Grefenstette.Blunsom.2014` , et l'analyse de séries temporelles
+:cite:`LeCun.Bengio.ea.1995` , où les réseaux neuronaux récurrents sont
+conventionnellement utilisés.  Certaines adaptations astucieuses des CNN ont également
+permis de les utiliser sur des données structurées en graphes :cite:`Kipf.Welling.2016` et
+dans les systèmes de recommandation.
 
-First, we will dive more deeply into the motivation for convolutional
-neural networks. This is followed by a walk through the basic operations
-that comprise the backbone of all convolutional networks.
-These include the convolutional layers themselves,
-nitty-gritty details including padding and stride,
-the pooling layers used to aggregate information
-across adjacent spatial regions,
-the use of multiple channels  at each layer,
-and a careful discussion of the structure of modern architectures.
-We will conclude the chapter with a full working example of LeNet,
-the first convolutional network successfully deployed,
-long before the rise of modern deep learning.
-In the next chapter, we will dive into full implementations
-of some popular and comparatively recent CNN architectures
-whose designs represent most of the techniques
-commonly used by modern practitioners.
+Tout d'abord, nous allons nous plonger plus profondément dans la motivation des réseaux neuronaux convolutifs
+. Nous passerons ensuite en revue les opérations de base
+qui constituent l'épine dorsale de tous les réseaux convolutifs.
+Il s'agit notamment des couches convolutionnelles elles-mêmes,
+des détails de détail tels que le padding et le stride,
+des couches de mise en commun utilisées pour agréger les informations
+dans des régions spatiales adjacentes,
+de l'utilisation de plusieurs canaux à chaque couche,
+et d'une discussion approfondie de la structure des architectures modernes.
+Nous conclurons ce chapitre par un exemple fonctionnel complet de LeNet,
+le premier réseau convolutif déployé avec succès,
+bien avant l'essor de l'apprentissage profond moderne.
+Dans le chapitre suivant, nous nous plongerons dans les implémentations complètes
+de quelques architectures CNN populaires et comparativement récentes
+dont les conceptions représentent la plupart des techniques
+couramment utilisées par les praticiens modernes.
 
 ```toc
 :maxdepth: 2

@@ -3,43 +3,43 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Object-Oriented Design for Implementation
-:label:`sec_oo-design`
+# Conception orientée objet pour l'implémentation
+:label:`sec_oo-design` 
 
-In our introduction to linear regression,
-we walked through various components
-including
-the data, the model, the loss function,
-and the optimization algorithm.
-Indeed,
-linear regression is
-one of the simplest machine learning models.
-Training it,
-however, uses many of the same components as other models in this book require.
-Therefore, 
-before diving into the implementation details
-it is worth 
-designing some of the APIs
-used throughout this book. 
-Treating components in deep learning
-as objects,
-we can start by
-defining classes for these objects
-and their interactions.
-This object-oriented design
-for implementation
-will greatly
-streamline the presentation and you might even want to use it in your projects.
+ Dans notre introduction à la régression linéaire,
+nous avons parcouru différents composants
+dont
+les données, le modèle, la fonction de perte,
+et l'algorithme d'optimisation.
+En effet,
+la régression linéaire est
+l'un des modèles d'apprentissage automatique les plus simples.
+Sa formation,
+toutefois, fait appel à un grand nombre de composants identiques à ceux des autres modèles présentés dans cet ouvrage.
+Par conséquent, 
+avant de plonger dans les détails de la mise en œuvre
+, il est utile 
+de concevoir certaines des API
+utilisées tout au long de cet ouvrage. 
+En traitant les composants de l'apprentissage profond
+comme des objets,
+nous pouvons commencer par
+définir des classes pour ces objets
+et leurs interactions.
+Cette conception orientée objet
+pour la mise en œuvre
+simplifiera grandement
+la présentation et vous aurez peut-être même envie de l'utiliser dans vos projets.
 
 
-Inspired by open-source libraries such as [PyTorch Lightning](https://www.pytorchlightning.ai/),
-on a high level
-we wish to have three classes: 
-(i) `Module` contains models, losses, and optimization methods; 
-(ii) `DataModule` provides data loaders for training and validation; 
-(iii) both classes are combined using the `Trainer` class, which allows us to
-train models on a variety of hardware platforms. 
-Most code in this book adapts `Module` and `DataModule`. We will touch upon the `Trainer` class only when we discuss GPUs, CPUs, parallel training, and optimization algorithms.
+Inspiré par des bibliothèques open-source telles que [PyTorch Lightning](https://www.pytorchlightning.ai/),
+à un haut niveau
+nous souhaitons avoir trois classes : 
+(i) `Module` contient les modèles, les pertes et les méthodes d'optimisation ; 
+(ii) `DataModule` fournit des chargeurs de données pour la formation et la validation ; 
+(iii) les deux classes sont combinées à l'aide de la classe `Trainer`, qui nous permet de
+former des modèles sur une variété de plateformes matérielles. 
+La plupart des codes de ce livre adaptent `Module` et `DataModule`. Nous n'aborderons la classe `Trainer` que lorsque nous parlerons des GPU, des CPU, de la formation parallèle et des algorithmes d'optimisation.
 
 ```{.python .input}
 %%tab mxnet
@@ -66,11 +66,11 @@ from d2l import torch as d2l
 import tensorflow as tf
 ```
 
-## Utilities
-:label:`oo-design-utilities`
+## Utilitaires
+:label:`oo-design-utilities` 
 
-We need a few utilities to simplify object-oriented programming in Jupyter notebooks. One of the challenges is that class definitions tend to be fairly long blocks of code. Notebook readability demands short code fragments, interspersed with explanations, a requirement incompatible with the style of programming common for Python libraries. The first
-utility function allows us to register functions as methods in a class *after* the class has been created. In fact, we can do so *even after* we've created instances of the class! It allows us to split the implementation of a class into multiple code blocks.
+ Nous avons besoin de quelques utilitaires pour simplifier la programmation orientée objet dans les carnets Jupyter. L'un des défis est que les définitions de classe ont tendance à être des blocs de code assez longs. La lisibilité des notebooks exige des fragments de code courts, entrecoupés d'explications, une exigence incompatible avec le style de programmation commun aux bibliothèques Python. La première fonction utilitaire
+nous permet d'enregistrer des fonctions en tant que méthodes dans une classe *après* la création de la classe. En fait, nous pouvons le faire *même après* avoir créé des instances de la classe ! Cela nous permet de diviser l'implémentation d'une classe en plusieurs blocs de code.
 
 ```{.python .input}
 %%tab all
@@ -80,7 +80,7 @@ def add_to_class(Class):  #@save
     return wrapper
 ```
 
-Let's have a quick look at how to use it. We plan to implement a class `A` with a method `do`. Instead of having code for both `A` and `do` in the same code block, we can first declare the class `A` and create an instance `a`.
+Voyons rapidement comment l'utiliser. Nous prévoyons d'implémenter une classe `A` avec une méthode `do`. Au lieu d'avoir du code pour `A` et `do` dans le même bloc de code, nous pouvons d'abord déclarer la classe `A` et créer une instance `a`.
 
 ```{.python .input}
 %%tab all
@@ -91,7 +91,7 @@ class A:
 a = A()
 ```
 
-Next we define the method `do` as we normally would, but not in class `A`'s scope. Instead, we decorate this method by `add_to_class` with class `A` as its argument. In doing so, the method is able to access the member variables of `A` as we would expect if it had been defined as part of `A`'s definition. Let's see what happens when we invoke it for the instance `a`.
+Ensuite, nous définissons la méthode `do` comme nous le ferions normalement, mais pas dans la portée de la classe `A`. Au lieu de cela, nous décorons cette méthode par `add_to_class` avec la classe `A` comme argument. Ce faisant, la méthode est capable d'accéder aux variables membres de `A` comme nous l'aurions souhaité si elle avait été définie dans le cadre de la définition de `A`. Voyons ce qui se passe lorsque nous l'invoquons pour l'instance `a`.
 
 ```{.python .input}
 %%tab all
@@ -102,7 +102,7 @@ def do(self):
 a.do()
 ```
 
-The second one is a utility class that saves all arguments in a class's `__init__` method as class attributes. This allows us to extend constructor call signatures implicitly without additional code.
+La seconde est une classe utilitaire qui enregistre tous les arguments de la méthode `__init__` d'une classe en tant qu'attributs de classe. Cela nous permet d'étendre les signatures d'appel des constructeurs de manière implicite sans code supplémentaire.
 
 ```{.python .input}
 %%tab all
@@ -111,7 +111,7 @@ class HyperParameters:  #@save
         raise NotImplemented
 ```
 
-We defer its implementation into :numref:`sec_utils`. To use it, we define our class that inherits from `HyperParameters` and calls `save_hyperparameters` in the `__init__` method.
+Nous reportons son implémentation dans :numref:`sec_utils` . Pour l'utiliser, nous définissons notre classe qui hérite de `HyperParameters` et appelle `save_hyperparameters` dans la méthode `__init__`.
 
 ```{.python .input}
 %%tab all
@@ -125,9 +125,9 @@ class B(d2l.HyperParameters):
 b = B(a=1, b=2, c=3)
 ```
 
-The last utility allows us to plot experiment progress interactively while it is going on. In deference to the much more powerful (and complex) [TensorBoard](https://www.tensorflow.org/tensorboard) we name it `ProgressBoard`. The  implementation is deferred to :numref:`sec_utils`. For now, let's simply see it in action.
+Le dernier utilitaire nous permet de tracer la progression de l'expérience de manière interactive pendant qu'elle se déroule. En référence à [TensorBoard](https://www.tensorflow.org/tensorboard), beaucoup plus puissant (et complexe), nous le nommons `ProgressBoard`. L'implémentation est reportée à :numref:`sec_utils` . Pour l'instant, nous allons simplement la voir en action.
 
-The `draw` function plots a point `(x, y)` in the figure, with `label` specified in the legend. The optional `every_n` smooths the line by only showing $1/n$ points in the figure. Their values are averaged from the $n$ neighbor points in the original figure.
+La fonction `draw` trace un point `(x, y)` dans la figure, avec `label` spécifié dans la légende. L'option `every_n` lisse la ligne en ne montrant que les points $1/n$ dans la figure. Leurs valeurs sont calculées à partir de la moyenne des points voisins $n$ dans la figure originale.
 
 ```{.python .input}
 %%tab all
@@ -143,7 +143,7 @@ class ProgressBoard(d2l.HyperParameters):  #@save
         raise NotImplemented
 ```
 
-In the following example, we draw `sin` and `cos` with a different smoothness. If you run this code block, you will see the lines grow in animation.
+Dans l'exemple suivant, nous dessinons `sin` et `cos` avec un lissage différent. Si vous exécutez ce bloc de code, vous verrez les lignes grandir en animation.
 
 ```{.python .input}
 %%tab all
@@ -153,11 +153,11 @@ for x in np.arange(0, 10, 0.1):
     board.draw(x, np.cos(x), 'cos', every_n=10)
 ```
 
-## Models
-:label:`oo-design-models`
+## Modèles
+:label:`oo-design-models` 
 
-The `Module` class  is the base class of all models we will implement. At a minimum we need to define three methods. The `__init__` method stores the learnable parameters, the `training_step` method accepts a data batch to return the loss value, the `configure_optimizers` method returns the optimization method, or a list of them, that is used to update the learnable parameters. Optionally we can define `validation_step` to report the evaluation measures.
-Sometimes we put the code to compute the output into a separate `forward` method to make it more reusable.
+ La classe `Module` est la classe de base de tous les modèles que nous allons implémenter. Au minimum, nous devons définir trois méthodes. La méthode `__init__` stocke les paramètres apprenables, la méthode `training_step` accepte un lot de données pour renvoyer la valeur de perte, la méthode `configure_optimizers` renvoie la méthode d'optimisation, ou une liste de celles-ci, qui est utilisée pour mettre à jour les paramètres apprenables. En option, nous pouvons définir `validation_step` pour rapporter les mesures d'évaluation.
+Parfois, nous plaçons le code de calcul de la sortie dans une méthode distincte `forward` pour le rendre plus réutilisable.
 
 ```{.python .input}
 %%tab all
@@ -217,24 +217,24 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 ```
 
 :begin_tab:`mxnet`
-You may notice that `Module` is a subclass of `nn.Block`, the base class of neural networks in Gluon.
-It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this function by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Block` in :numref:`sec_model_construction`.
+Vous pouvez remarquer que `Module` est une sous-classe de `nn.Block`, la classe de base des réseaux neuronaux dans Gluon.
+Elle fournit des fonctionnalités pratiques pour la gestion des réseaux neuronaux. Par exemple, si nous définissons une méthode `forward`, comme `forward(self, X)`, pour une instance `a`, nous pouvons invoquer cette fonction par `a(X)`. Cela fonctionne puisqu'il appelle la méthode `forward` dans la méthode intégrée `__call__`. Vous trouverez plus de détails et d'exemples sur `nn.Block` dans :numref:`sec_model_construction` .
+:end_tab: 
+
+ :begin_tab:`pytorch` 
+ Vous avez peut-être remarqué que `Module` est une sous-classe de `nn.Module`, la classe de base des réseaux neuronaux dans PyTorch.
+Elle fournit des fonctionnalités pratiques pour manipuler les réseaux neuronaux. Par exemple, si nous définissons une méthode `forward`, comme `forward(self, X)`, pour une instance `a`, nous pouvons invoquer cette fonction par `a(X)`. Cela fonctionne puisqu'il appelle la méthode `forward` dans la méthode intégrée `__call__`. Vous trouverez plus de détails et d'exemples sur `nn.Module` dans :numref:`sec_model_construction` .
+:end_tab: 
+
+ :begin_tab:`tensorflow` 
+ Vous remarquerez peut-être que `Module` est une sous-classe de `tf.keras.Model`, la classe de base des réseaux neuronaux dans TensorFlow.
+Elle fournit des fonctionnalités pratiques pour manipuler les réseaux neuronaux. Par exemple, elle invoque la méthode `call` dans la méthode intégrée `__call__`. Ici, nous redirigeons `call` vers la fonction `forward`, en enregistrant ses arguments comme un attribut de classe. Nous faisons cela pour rendre notre code plus similaire aux autres implémentations du framework.
 :end_tab:
 
-:begin_tab:`pytorch`
-You may notice that `Module` is a subclass of `nn.Module`, the base class of neural networks in PyTorch.
-It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this function by `a(X)`. This works since it calls the `forward` method in the built-in `__call__` method. You can find more details and examples about `nn.Module` in :numref:`sec_model_construction`.
-:end_tab:
+## Données
+:label:`oo-design-data` 
 
-:begin_tab:`tensorflow`
-You may notice that `Module` is a subclass of `tf.keras.Model`, the base class of neural networks in TensorFlow.
-It provides convenient features to handle neural networks. For example, it invokes the `call` method in the built-in `__call__` method. Here we redirect `call` to the `forward` function, saving its arguments as a class attribute. We do this to make our code more similar to other framework implementations.
-:end_tab:
-
-##  Data
-:label:`oo-design-data`
-
-The `DataModule` class is the base class for data. Quite frequently the `__init__` method is used to prepare the data. This includes downloading and preprocessing if needed. The `train_dataloader` returns the data loader for the training dataset. A data loader is a (Python) generator that yields a data batch each time it is used. This batch is then fed into the `training_step` method of `Module` to compute the loss. There is an optional `val_dataloader` to return the validation dataset loader. It behaves in the same manner, except that it yields data batches for the `validation_step` method in `Module`.
+ La classe `DataModule` est la classe de base pour les données. Très souvent, la méthode `__init__` est utilisée pour préparer les données. Cela inclut le téléchargement et le prétraitement si nécessaire. La méthode `train_dataloader` renvoie le chargeur de données pour l'ensemble de données d'apprentissage. Un chargeur de données est un générateur (Python) qui produit un lot de données à chaque fois qu'il est utilisé. Ce lot est ensuite introduit dans la méthode `training_step` de `Module` pour calculer la perte. Il existe une option `val_dataloader` pour renvoyer le chargeur de données de validation. Il se comporte de la même manière, sauf qu'il produit des lots de données pour la méthode `validation_step` dans `Module`.
 
 ```{.python .input}
 %%tab all
@@ -257,10 +257,10 @@ class DataModule(d2l.HyperParameters):  #@save
         return self.get_dataloader(train=False)
 ```
 
-## Training
-:label:`oo-design-training`
+## Formation
+:label:`oo-design-training` 
 
-The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterates over the entire dataset `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
+ La classe `Trainer` forme les paramètres apprenables de la classe `Module` avec les données spécifiées dans `DataModule`. La méthode clé est `fit`, qui accepte deux arguments :`model` une instance de `Module`, et `data`, une instance de `DataModule`. Elle itère ensuite sur l'ensemble complet de données `max_epochs` fois pour entraîner le modèle. Comme précédemment, nous reporterons l'implémentation de cette fonction à des chapitres ultérieurs.
 
 ```{.python .input}
 %%tab all
@@ -295,27 +295,27 @@ class Trainer(d2l.HyperParameters):  #@save
         raise NotImplementedError
 ```
 
-## Summary
+## Résumé
 
-To highlight the object-oriented design
-for our future deep learning implementation,
-the above classes just show how their objects 
-store data and interact with each other.
-We will keep enriching implementations of these classes,
-such as via `@add_to_class`,
-in the rest of the book.
-Moreover,
-these fully implemented classes
-are saved in the [d2l library](https://github.com/d2l-ai/d2l-en/tree/master/d2l),
-a *lightweight toolkit* that makes structured modeling for deep learning easy. 
-In particular, it facilitates reusing many components between projects without changing much at all. For instance, we can replace just the optimizer, just the model, just the dataset, etc.;
-this degree of modularity pays dividends throughout the book in terms of conciseness and simplicity (this is why we added it) and it can do the same for your own projects. 
+Pour mettre en évidence la conception orientée objet
+de notre future implémentation d'apprentissage profond,
+les classes ci-dessus montrent simplement comment leurs objets 
+stockent les données et interagissent entre eux.
+Nous continuerons à enrichir les implémentations de ces classes,
+comme via `@add_to_class`,
+dans le reste du livre.
+De plus,
+ces classes entièrement implémentées
+sont sauvegardées dans le fichier [d2l library](https://github.com/d2l-ai/d2l-en/tree/master/d2l),
+une *boîte à outils légère* qui facilite la modélisation structurée pour l'apprentissage profond. 
+En particulier, elle facilite la réutilisation de nombreux composants entre les projets sans changer grand-chose. Par exemple, nous pouvons remplacer uniquement l'optimiseur, uniquement le modèle, uniquement le jeu de données, etc. ;
+ce degré de modularité porte ses fruits tout au long du livre en termes de concision et de simplicité (c'est pourquoi nous l'avons ajouté) et il peut en faire de même pour vos propres projets. 
 
 
-## Exercises
+## Exercices
 
-1. Locate full implementations of the above classes that are saved in the [d2l library](https://github.com/d2l-ai/d2l-en/tree/master/d2l). We strongly recommend that you look at the implementation in detail once you have gained some more familiarity with deep learning modeling.
-1. Remove the `save_hyperparameters` statement in the `B` class. Can you still print `self.a` and `self.b`? Optional: if you have dived into the full implementation of the `HyperParameters` class, can you explain why?
+1. Localisez les implémentations complètes des classes ci-dessus qui sont sauvegardées dans le répertoire [d2l library](https://github.com/d2l-ai/d2l-en/tree/master/d2l). Nous vous recommandons fortement d'examiner l'implémentation en détail une fois que vous aurez acquis une certaine familiarité avec la modélisation de l'apprentissage profond.
+1. Supprimez l'instruction `save_hyperparameters` dans la classe `B`. Pouvez-vous toujours imprimer `self.a` et `self.b`? Facultatif : si vous vous êtes plongé dans l'implémentation complète de la classe `HyperParameters`, pouvez-vous expliquer pourquoi ?
 
 
 :begin_tab:`mxnet`

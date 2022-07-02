@@ -1,53 +1,53 @@
-# Adagrad
-:label:`sec_adagrad`
+## Adagrad
+:label:`sec_adagrad` 
 
-Let's begin by considering learning problems with features that occur infrequently.
-
-
-## Sparse Features and Learning Rates
-
-Imagine that we are training a language model. To get good accuracy we typically want to decrease the learning rate as we keep on training, usually at a rate of $\mathcal{O}(t^{-\frac{1}{2}})$ or slower. Now consider a model training on sparse features, i.e., features that occur only infrequently. This is common for natural language, e.g., it is a lot less likely that we will see the word *preconditioning* than *learning*. However, it is also common in other areas such as computational advertising and personalized collaborative filtering. After all, there are many things that are of interest only for a small number of people.
-
-Parameters associated with infrequent features only receive meaningful updates whenever these features occur. Given a decreasing learning rate we might end up in a situation where the parameters for common features converge rather quickly to their optimal values, whereas for infrequent features we are still short of observing them sufficiently frequently before their optimal values can be determined. In other words, the learning rate either decreases too slowly for frequent features or too quickly for infrequent ones.
-
-A possible hack to redress this issue would be to count the number of times we see a particular feature and to use this as a clock for adjusting learning rates. That is, rather than choosing a learning rate of the form $\eta = \frac{\eta_0}{\sqrt{t + c}}$ we could use $\eta_i = \frac{\eta_0}{\sqrt{s(i, t) + c}}$. Here $s(i, t)$ counts the number of nonzeros for feature $i$ that we have observed up to time $t$. This is actually quite easy to implement at no meaningful overhead. However, it fails whenever we do not quite have sparsity but rather just data where the gradients are often very small and only rarely large. After all, it is unclear where one would draw the line between something that qualifies as an observed feature or not.
-
-Adagrad by :cite:`Duchi.Hazan.Singer.2011` addresses this by replacing the rather crude counter $s(i, t)$ by an aggregate of the squares of previously observed gradients. In particular, it uses $s(i, t+1) = s(i, t) + \left(\partial_i f(\mathbf{x})\right)^2$ as a means to adjust the learning rate. This has two benefits: first, we no longer need to decide just when a gradient is large enough. Second, it scales automatically with the magnitude of the gradients. Coordinates that routinely correspond to large gradients are scaled down significantly, whereas others with small gradients receive a much more gentle treatment. In practice this leads to a very effective optimization procedure for computational advertising and related problems. But this hides some of the additional benefits inherent in Adagrad that are best understood in the context of preconditioning.
+ Commençons par examiner les problèmes d'apprentissage avec des caractéristiques qui apparaissent peu fréquemment.
 
 
-## Preconditioning
+## Caractéristiques éparses et taux d'apprentissage
 
-Convex optimization problems are good for analyzing the characteristics of algorithms. After all, for most nonconvex problems it is difficult to derive meaningful theoretical guarantees, but *intuition* and *insight* often carry over.  Let's look at the problem of minimizing $f(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top \mathbf{Q} \mathbf{x} + \mathbf{c}^\top \mathbf{x} + b$.
+Imaginez que nous formons un modèle de langage. Pour obtenir une bonne précision, nous souhaitons généralement diminuer le taux d'apprentissage au fur et à mesure de la formation, généralement à un taux de $\mathcal{O}(t^{-\frac{1}{2}})$ ou plus lent. Considérons maintenant un modèle qui s'entraîne sur des caractéristiques éparses, c'est-à-dire des caractéristiques qui n'apparaissent que rarement. Cette situation est courante dans le langage naturel, par exemple, il est beaucoup moins probable que nous voyions le mot *préconditionnement* que *apprentissage*. Cependant, elle est également courante dans d'autres domaines tels que la publicité informatique et le filtrage collaboratif personnalisé. Après tout, il y a beaucoup de choses qui ne sont intéressantes que pour un petit nombre de personnes.
 
-As we saw in :numref:`sec_momentum`, it is possible to rewrite this problem in terms of its eigendecomposition $\mathbf{Q} = \mathbf{U}^\top \boldsymbol{\Lambda} \mathbf{U}$ to arrive at a much simplified problem where each coordinate can be solved individually:
+Les paramètres associés aux caractéristiques peu fréquentes ne reçoivent des mises à jour significatives que lorsque ces caractéristiques apparaissent. Avec un taux d'apprentissage décroissant, nous pourrions nous retrouver dans une situation où les paramètres des caractéristiques communes convergent assez rapidement vers leurs valeurs optimales, alors que pour les caractéristiques peu fréquentes, nous sommes encore loin de les observer suffisamment fréquemment pour pouvoir déterminer leurs valeurs optimales. En d'autres termes, le taux d'apprentissage diminue soit trop lentement pour les caractéristiques fréquentes, soit trop rapidement pour les caractéristiques peu fréquentes.
 
-$$f(\mathbf{x}) = \bar{f}(\bar{\mathbf{x}}) = \frac{1}{2} \bar{\mathbf{x}}^\top \boldsymbol{\Lambda} \bar{\mathbf{x}} + \bar{\mathbf{c}}^\top \bar{\mathbf{x}} + b.$$
+Une solution possible pour remédier à ce problème serait de compter le nombre de fois que nous voyons une caractéristique particulière et de l'utiliser comme une horloge pour ajuster les taux d'apprentissage. Autrement dit, plutôt que de choisir un taux d'apprentissage de la forme $\eta = \frac{\eta_0}{\sqrt{t + c}}$, nous pourrions utiliser $\eta_i = \frac{\eta_0}{\sqrt{s(i, t) + c}}$. Ici, $s(i, t)$ compte le nombre de non-zéros pour la caractéristique $i$ que nous avons observés jusqu'au moment $t$. Cette méthode est en fait assez facile à mettre en œuvre, sans surcharge significative. Cependant, elle échoue lorsque nous n'avons pas tout à fait de sparsité mais plutôt des données où les gradients sont souvent très petits et seulement rarement grands. Après tout, on ne sait pas très bien où tracer la limite entre quelque chose qui peut être considéré comme une caractéristique observée ou non.
 
-Here we used $\bar{\mathbf{x}} = \mathbf{U} \mathbf{x}$ and consequently $\bar{\mathbf{c}} = \mathbf{U} \mathbf{c}$. The modified problem has as its minimizer $\bar{\mathbf{x}} = -\boldsymbol{\Lambda}^{-1} \bar{\mathbf{c}}$ and minimum value $-\frac{1}{2} \bar{\mathbf{c}}^\top \boldsymbol{\Lambda}^{-1} \bar{\mathbf{c}} + b$. This is much easier to compute since $\boldsymbol{\Lambda}$ is a diagonal matrix containing the eigenvalues of $\mathbf{Q}$.
+Adagrad par :cite:`Duchi.Hazan.Singer.2011` aborde ce problème en remplaçant le compteur plutôt grossier $s(i, t)$ par un agrégat des carrés des gradients précédemment observés. En particulier, il utilise $s(i, t+1) = s(i, t) + \left(\partial_i f(\mathbf{x})\right)^2$ comme moyen d'ajuster le taux d'apprentissage. Cela présente deux avantages : premièrement, nous n'avons plus besoin de décider quand un gradient est suffisamment important. Deuxièmement, il s'adapte automatiquement à l'ampleur des gradients. Les coordonnées qui correspondent habituellement à de grands gradients sont réduites de manière significative, tandis que d'autres avec de petits gradients reçoivent un traitement beaucoup plus doux. En pratique, cela conduit à une procédure d'optimisation très efficace pour la publicité informatique et les problèmes connexes. Mais cela cache certains des avantages supplémentaires inhérents à Adagrad qui sont mieux compris dans le contexte du préconditionnement.
 
-If we perturb $\mathbf{c}$ slightly we would hope to find only slight changes in the minimizer of $f$. Unfortunately this is not the case. While slight changes in $\mathbf{c}$ lead to equally slight changes in $\bar{\mathbf{c}}$, this is not the case for the minimizer of $f$ (and of $\bar{f}$ respectively). Whenever the eigenvalues $\boldsymbol{\Lambda}_i$ are large we will see only small changes in $\bar{x}_i$ and in the minimum of $\bar{f}$. Conversely, for small $\boldsymbol{\Lambda}_i$ changes in $\bar{x}_i$ can be dramatic. The ratio between the largest and the smallest eigenvalue is called the condition number of an optimization problem.
+
+## Préconditionnement
+
+Les problèmes d'optimisation convexe sont propices à l'analyse des caractéristiques des algorithmes. Après tout, pour la plupart des problèmes non convexes, il est difficile de dériver des garanties théoriques significatives, mais *l'intuition* et *la perspicacité* font souvent mouche.  Examinons le problème de la minimisation de $f(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top \mathbf{Q} \mathbf{x} + \mathbf{c}^\top \mathbf{x} + b$.
+
+Comme nous l'avons vu dans :numref:`sec_momentum` , il est possible de réécrire ce problème en termes de sa décomposition en eigences $\mathbf{Q} = \mathbf{U}^\top \boldsymbol{\Lambda} \mathbf{U}$ pour arriver à un problème beaucoup plus simple où chaque coordonnée peut être résolue individuellement :
+
+$$f(\mathbf{x}) = \bar{f}(\bar{\mathbf{x}}) = \frac{1}{2} \bar{\mathbf{x}}^\top \boldsymbol{\Lambda} \bar{\mathbf{x}} + \bar{\mathbf{c}}^\top \bar{\mathbf{x}} + b.$$ 
+
+ Nous avons utilisé ici $\bar{\mathbf{x}} = \mathbf{U} \mathbf{x}$ et par conséquent $\bar{\mathbf{c}} = \mathbf{U} \mathbf{c}$. Le problème modifié a pour minimiseur $\bar{\mathbf{x}} = -\boldsymbol{\Lambda}^{-1} \bar{\mathbf{c}}$ et pour valeur minimale $-\frac{1}{2} \bar{\mathbf{c}}^\top \boldsymbol{\Lambda}^{-1} \bar{\mathbf{c}} + b$. Cette dernière est beaucoup plus facile à calculer puisque $\boldsymbol{\Lambda}$ est une matrice diagonale contenant les valeurs propres de $\mathbf{Q}$.
+
+Si nous perturbons légèrement $\mathbf{c}$, nous pourrions espérer ne trouver que de légers changements dans le minimiseur de $f$. Malheureusement, ce n'est pas le cas. Si de légères modifications de $\mathbf{c}$ entraînent des modifications tout aussi légères de $\bar{\mathbf{c}}$, ce n'est pas le cas pour le minimiseur de $f$ (et de $\bar{f}$ respectivement). Lorsque les valeurs propres de $\boldsymbol{\Lambda}_i$ sont grandes, nous ne verrons que de petits changements dans $\bar{x}_i$ et dans le minimum de $\bar{f}$. Inversement, pour de petites valeurs de $\boldsymbol{\Lambda}_i$, les changements dans $\bar{x}_i$ peuvent être spectaculaires. Le rapport entre la plus grande et la plus petite valeur propre est appelé le nombre de conditions d'un problème d'optimisation.
 
 $$\kappa = \frac{\boldsymbol{\Lambda}_1}{\boldsymbol{\Lambda}_d}.$$
 
-If the condition number $\kappa$ is large, it is difficult to solve the optimization problem accurately. We need to ensure that we are careful in getting a large dynamic range of values right. Our analysis leads to an obvious, albeit somewhat naive question: couldn't we simply "fix" the problem by distorting the space such that all eigenvalues are $1$. In theory this is quite easy: we only need the eigenvalues and eigenvectors of $\mathbf{Q}$ to rescale the problem from $\mathbf{x}$ to one in $\mathbf{z} := \boldsymbol{\Lambda}^{\frac{1}{2}} \mathbf{U} \mathbf{x}$. In the new coordinate system $\mathbf{x}^\top \mathbf{Q} \mathbf{x}$ could be simplified to $\|\mathbf{z}\|^2$. Alas, this is a rather impractical suggestion. Computing eigenvalues and eigenvectors is in general *much more* expensive than solving the actual  problem.
+Si le nombre de condition $\kappa$ est grand, il est difficile de résoudre le problème d'optimisation avec précision. Nous devons nous assurer que nous sommes attentifs à obtenir une large gamme dynamique de valeurs correctes. Notre analyse conduit à une question évidente, bien que quelque peu naïve : ne pourrions-nous pas simplement "résoudre" le problème en déformant l'espace de sorte que toutes les valeurs propres soient $1$. En théorie, c'est assez facile : nous n'avons besoin que des valeurs propres et des vecteurs propres de $\mathbf{Q}$ pour redimensionner le problème de $\mathbf{x}$ à $\mathbf{z} := \boldsymbol{\Lambda}^{\frac{1}{2}} \mathbf{U} \mathbf{x}$. Dans le nouveau système de coordonnées, $\mathbf{x}^\top \mathbf{Q} \mathbf{x}$ pourrait être simplifié en $\|\mathbf{z}\|^2$. Hélas, cette suggestion n'est pas très pratique. Le calcul des valeurs propres et des vecteurs propres est en général *beaucoup plus coûteux* que la résolution du problème réel.
 
-While computing eigenvalues exactly might be expensive, guessing them and computing them even somewhat approximately may already be a lot better than not doing anything at all. In particular, we could use the diagonal entries of $\mathbf{Q}$ and rescale it accordingly. This is *much* cheaper than computing eigenvalues.
+Si le calcul exact des valeurs propres peut s'avérer coûteux, les deviner et les calculer, même de manière approximative, peut déjà s'avérer bien meilleur que de ne rien faire du tout. En particulier, nous pourrions utiliser les entrées diagonales de $\mathbf{Q}$ et le rééchelonner en conséquence. C'est *beaucoup* moins cher que de calculer les valeurs propres.
 
 $$\tilde{\mathbf{Q}} = \mathrm{diag}^{-\frac{1}{2}}(\mathbf{Q}) \mathbf{Q} \mathrm{diag}^{-\frac{1}{2}}(\mathbf{Q}).$$
 
-In this case we have $\tilde{\mathbf{Q}}_{ij} = \mathbf{Q}_{ij} / \sqrt{\mathbf{Q}_{ii} \mathbf{Q}_{jj}}$ and specifically $\tilde{\mathbf{Q}}_{ii} = 1$ for all $i$. In most cases this simplifies the condition number considerably. For instance, the cases we discussed previously, this would entirely eliminate the problem at hand since the problem is axis aligned.
+Dans ce cas, nous avons $\tilde{\mathbf{Q}}_{ij} = \mathbf{Q}_{ij} / \sqrt{\mathbf{Q}_{ii} \mathbf{Q}_{jj}}$ et spécifiquement $\tilde{\mathbf{Q}}_{ii} = 1$ pour tout $i$. Dans la plupart des cas, cela simplifie considérablement le nombre de conditions. Par exemple, dans les cas que nous avons discutés précédemment, cela éliminerait entièrement le problème en question puisque le problème est aligné sur l'axe.
 
-Unfortunately we face yet another problem: in deep learning we typically do not even have access to the second derivative of the objective function: for $\mathbf{x} \in \mathbb{R}^d$ the second derivative even on a minibatch may require $\mathcal{O}(d^2)$ space and work to compute, thus making it practically infeasible. The ingenious idea of Adagrad is to use a proxy for that elusive diagonal of the Hessian that is both relatively cheap to compute and effective---the magnitude of the gradient itself.
+Malheureusement, nous sommes confrontés à un autre problème : dans l'apprentissage profond, nous n'avons généralement pas accès à la dérivée seconde de la fonction objective : pour $\mathbf{x} \in \mathbb{R}^d$, la dérivée seconde, même sur un minibatch, peut nécessiter $\mathcal{O}(d^2)$ de l'espace et du travail pour la calculer, ce qui la rend pratiquement irréalisable. L'idée ingénieuse d'Adagrad est d'utiliser un proxy pour cette diagonale insaisissable du Hessien qui est à la fois relativement bon marché à calculer et efficace - la magnitude du gradient lui-même.
 
-In order to see why this works, let's look at $\bar{f}(\bar{\mathbf{x}})$. We have that
+Afin de comprendre pourquoi cela fonctionne, examinons $\bar{f}(\bar{\mathbf{x}})$. Nous avons que
 
-$$\partial_{\bar{\mathbf{x}}} \bar{f}(\bar{\mathbf{x}}) = \boldsymbol{\Lambda} \bar{\mathbf{x}} + \bar{\mathbf{c}} = \boldsymbol{\Lambda} \left(\bar{\mathbf{x}} - \bar{\mathbf{x}}_0\right),$$
+$$\partial_{\bar{\mathbf{x}}} \bar{f}(\bar{\mathbf{x}}) = \boldsymbol{\Lambda} \bar{\mathbf{x}} + \bar{\mathbf{c}} = \boldsymbol{\Lambda} \left(\bar{\mathbf{x}} - \bar{\mathbf{x}}_0\right),$$ 
 
-where $\bar{\mathbf{x}}_0$ is the minimizer of $\bar{f}$. Hence the magnitude of the gradient depends both on $\boldsymbol{\Lambda}$ and the distance from optimality. If $\bar{\mathbf{x}} - \bar{\mathbf{x}}_0$ didn't change, this would be all that's needed. After all, in this case the magnitude of the gradient $\partial_{\bar{\mathbf{x}}} \bar{f}(\bar{\mathbf{x}})$ suffices. Since AdaGrad is a stochastic gradient descent algorithm, we will see gradients with nonzero variance even at optimality. As a result we can safely use the variance of the gradients as a cheap proxy for the scale of the Hessian. A thorough analysis is beyond the scope of this section (it would be several pages). We refer the reader to :cite:`Duchi.Hazan.Singer.2011` for details.
+ où $\bar{\mathbf{x}}_0$ est le minimiseur de $\bar{f}$. Par conséquent, la magnitude du gradient dépend à la fois de $\boldsymbol{\Lambda}$ et de la distance de l'optimalité. Si $\bar{\mathbf{x}} - \bar{\mathbf{x}}_0$ ne changeait pas, cela suffirait. Après tout, dans ce cas, la magnitude du gradient $\partial_{\bar{\mathbf{x}}} \bar{f}(\bar{\mathbf{x}})$ suffit. Comme AdaGrad est un algorithme de descente de gradient stochastique, nous verrons des gradients avec une variance non nulle même à l'optimalité. Par conséquent, nous pouvons utiliser sans risque la variance des gradients comme un indicateur bon marché de l'échelle du Hessian. Une analyse approfondie dépasse le cadre de cette section (elle ferait plusieurs pages). Nous renvoyons le lecteur à :cite:`Duchi.Hazan.Singer.2011` pour plus de détails.
 
-## The Algorithm
+## L'algorithme
 
-Let's formalize the discussion from above. We use the variable $\mathbf{s}_t$ to accumulate past gradient variance as follows.
+Formalisons la discussion ci-dessus. Nous utilisons la variable $\mathbf{s}_t$ pour accumuler la variance du gradient passé comme suit.
 
 $$\begin{aligned}
     \mathbf{g}_t & = \partial_{\mathbf{w}} l(y_t, f(\mathbf{x}_t, \mathbf{w})), \\
@@ -55,15 +55,15 @@ $$\begin{aligned}
     \mathbf{w}_t & = \mathbf{w}_{t-1} - \frac{\eta}{\sqrt{\mathbf{s}_t + \epsilon}} \cdot \mathbf{g}_t.
 \end{aligned}$$
 
-Here the operation are applied coordinate wise. That is, $\mathbf{v}^2$ has entries $v_i^2$. Likewise $\frac{1}{\sqrt{v}}$ has entries $\frac{1}{\sqrt{v_i}}$ and $\mathbf{u} \cdot \mathbf{v}$ has entries $u_i v_i$. As before $\eta$ is the learning rate and $\epsilon$ is an additive constant that ensures that we do not divide by $0$. Last, we initialize $\mathbf{s}_0 = \mathbf{0}$.
+Ici, les opérations sont appliquées par coordonnées. C'est-à-dire que $\mathbf{v}^2$ a des entrées $v_i^2$. De même, $\frac{1}{\sqrt{v}}$ a des entrées $\frac{1}{\sqrt{v_i}}$ et $\mathbf{u} \cdot \mathbf{v}$ a des entrées $u_i v_i$. Comme précédemment, $\eta$ est le taux d'apprentissage et $\epsilon$ est une constante additive qui garantit que nous ne divisons pas par $0$. Enfin, nous initialisons $\mathbf{s}_0 = \mathbf{0}$.
 
-Just like in the case of momentum we need to keep track of an auxiliary variable, in this case to allow for an individual learning rate per coordinate. This does not increase the cost of Adagrad significantly relative to SGD, simply since the main cost is typically to compute $l(y_t, f(\mathbf{x}_t, \mathbf{w}))$ and its derivative.
+Comme dans le cas du momentum, nous devons garder la trace d'une variable auxiliaire, dans ce cas pour permettre un taux d'apprentissage individuel par coordonnée. Cela n'augmente pas le coût d'Adagrad de manière significative par rapport à SGD, simplement parce que le coût principal est généralement de calculer $l(y_t, f(\mathbf{x}_t, \mathbf{w}))$ et sa dérivée.
 
-Note that accumulating squared gradients in $\mathbf{s}_t$ means that $\mathbf{s}_t$ grows essentially at linear rate (somewhat slower than linearly in practice, since the gradients initially diminish). This leads to an $\mathcal{O}(t^{-\frac{1}{2}})$ learning rate, albeit adjusted on a per coordinate basis. For convex problems this is perfectly adequate. In deep learning, though, we might want to decrease the learning rate rather more slowly. This led to a number of Adagrad variants that we will discuss in the subsequent chapters. For now let's see how it behaves in a quadratic convex problem. We use the same problem as before:
+Notez que l'accumulation des gradients au carré dans $\mathbf{s}_t$ signifie que $\mathbf{s}_t$ croît essentiellement à un taux linéaire (un peu plus lentement que linéairement en pratique, puisque les gradients diminuent initialement). Cela conduit à un taux d'apprentissage de $\mathcal{O}(t^{-\frac{1}{2}})$, bien qu'ajusté sur une base par coordonnée. Pour les problèmes convexes, cela est parfaitement adéquat. Dans l'apprentissage profond, cependant, nous pourrions vouloir diminuer le taux d'apprentissage plus lentement. Cela a conduit à un certain nombre de variantes d'Adagrad que nous aborderons dans les chapitres suivants. Pour l'instant, voyons comment il se comporte dans un problème convexe quadratique. Nous utilisons le même problème que précédemment :
 
-$$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$
+$$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$ 
 
-We are going to implement Adagrad using the same learning rate previously, i.e., $\eta = 0.4$. As we can see, the iterative trajectory of the independent variable is smoother. However, due to the cumulative effect of $\boldsymbol{s}_t$, the learning rate continuously decays, so the independent variable does not move as much during later stages of iteration.
+ Nous allons mettre en œuvre Adagrad en utilisant le même taux d'apprentissage que précédemment, c'est-à-dire $\eta = 0.4$. Comme nous pouvons le constater, la trajectoire itérative de la variable indépendante est plus lisse. Cependant, en raison de l'effet cumulatif de $\boldsymbol{s}_t$, le taux d'apprentissage décroît continuellement, de sorte que la variable indépendante ne bouge pas autant au cours des étapes ultérieures de l'itération.
 
 ```{.python .input}
 #@tab mxnet
@@ -108,7 +108,7 @@ eta = 0.4
 d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 ```
 
-As we increase the learning rate to $2$ we see much better behavior. This already indicates that the decrease in learning rate might be rather aggressive, even in the noise-free case and we need to ensure that parameters converge appropriately.
+Lorsque nous augmentons le taux d'apprentissage à $2$, nous constatons un bien meilleur comportement. Cela indique déjà que la diminution du taux d'apprentissage pourrait être plutôt agressive, même dans le cas sans bruit et nous devons nous assurer que les paramètres convergent de manière appropriée.
 
 ```{.python .input}
 #@tab all
@@ -116,9 +116,9 @@ eta = 2
 d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 ```
 
-## Implementation from Scratch
+## Implémentation from Scratch
 
-Just like the momentum method, Adagrad needs to maintain a state variable of the same shape as the parameters.
+Tout comme la méthode momentum, Adagrad doit maintenir une variable d'état de la même forme que les paramètres.
 
 ```{.python .input}
 #@tab mxnet
@@ -164,8 +164,8 @@ def adagrad(params, grads, states, hyperparams):
         p[:].assign(p - hyperparams['lr'] * g / tf.math.sqrt(s + eps))
 ```
 
-Compared to the experiment in :numref:`sec_minibatch_sgd` we use a
-larger learning rate to train the model.
+Par rapport à l'expérience de :numref:`sec_minibatch_sgd` , nous utilisons un taux d'apprentissage
+plus élevé pour entraîner le modèle.
 
 ```{.python .input}
 #@tab all
@@ -174,9 +174,9 @@ d2l.train_ch11(adagrad, init_adagrad_states(feature_dim),
                {'lr': 0.1}, data_iter, feature_dim);
 ```
 
-## Concise Implementation
+## Mise en œuvre concise
 
-Using the `Trainer` instance of the algorithm `adagrad`, we can invoke the Adagrad algorithm in Gluon.
+En utilisant l'instance `Trainer` de l'algorithme `adagrad`, nous pouvons invoquer l'algorithme Adagrad dans Gluon.
 
 ```{.python .input}
 #@tab mxnet
@@ -195,23 +195,23 @@ trainer = tf.keras.optimizers.Adagrad
 d2l.train_concise_ch11(trainer, {'learning_rate' : 0.1}, data_iter)
 ```
 
-## Summary
+## Résumé
 
-* Adagrad decreases the learning rate dynamically on a per-coordinate basis.
-* It uses the magnitude of the gradient as a means of adjusting how quickly progress is achieved - coordinates with large gradients are compensated with a smaller learning rate.
-* Computing the exact second derivative is typically infeasible in deep learning problems due to memory and computational constraints. The gradient can be a useful proxy.
-* If the optimization problem has a rather uneven structure Adagrad can help mitigate the distortion.
-* Adagrad is particularly effective for sparse features where the learning rate needs to decrease more slowly for infrequently occurring terms.
-* On deep learning problems Adagrad can sometimes be too aggressive in reducing learning rates. We will discuss strategies for mitigating this in the context of :numref:`sec_adam`.
+* Adagrad diminue dynamiquement le taux d'apprentissage sur une base par coordonnée.
+* Il utilise la magnitude du gradient comme moyen d'ajuster la vitesse de progression - les coordonnées avec de grands gradients sont compensées par un taux d'apprentissage plus faible.
+* Le calcul de la dérivée seconde exacte est généralement irréalisable dans les problèmes d'apprentissage profond en raison des contraintes de mémoire et de calcul. Le gradient peut être un proxy utile.
+* Si le problème d'optimisation a une structure plutôt inégale, Adagrad peut aider à atténuer la distorsion.
+* Adagrad est particulièrement efficace pour les caractéristiques éparses où le taux d'apprentissage doit diminuer plus lentement pour les termes peu fréquents.
+* Sur les problèmes d'apprentissage profond, Adagrad peut parfois être trop agressif dans la réduction des taux d'apprentissage. Nous discuterons des stratégies pour atténuer ce problème dans le contexte de :numref:`sec_adam` .
 
-## Exercises
+## Exercices
 
-1. Prove that for an orthogonal matrix $\mathbf{U}$ and a vector $\mathbf{c}$ the following holds: $\|\mathbf{c} - \mathbf{\delta}\|_2 = \|\mathbf{U} \mathbf{c} - \mathbf{U} \mathbf{\delta}\|_2$. Why does this mean that the magnitude of perturbations does not change after an orthogonal change of variables?
-1. Try out Adagrad for $f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2$ and also for the objective function was rotated by 45 degrees, i.e., $f(\mathbf{x}) = 0.1 (x_1 + x_2)^2 + 2 (x_1 - x_2)^2$. Does it behave differently?
-1. Prove [Gerschgorin's circle theorem](https://en.wikipedia.org/wiki/Gershgorin_circle_theorem) which states that eigenvalues $\lambda_i$ of a matrix $\mathbf{M}$ satisfy $|\lambda_i - \mathbf{M}_{jj}| \leq \sum_{k \neq j} |\mathbf{M}_{jk}|$ for at least one choice of $j$.
-1. What does Gerschgorin's theorem tell us about the eigenvalues of the diagonally preconditioned matrix $\mathrm{diag}^{-\frac{1}{2}}(\mathbf{M}) \mathbf{M} \mathrm{diag}^{-\frac{1}{2}}(\mathbf{M})$?
-1. Try out Adagrad for a proper deep network, such as :numref:`sec_lenet` when applied to Fashion-MNIST.
-1. How would you need to modify Adagrad to achieve a less aggressive decay in learning rate?
+1. Prouvez que pour une matrice orthogonale $\mathbf{U}$ et un vecteur $\mathbf{c}$, les conditions suivantes sont remplies : $\|\mathbf{c} - \mathbf{\delta}\|_2 = \|\mathbf{U} \mathbf{c} - \mathbf{U} \mathbf{\delta}\|_2$. Pourquoi cela signifie-t-il que la magnitude des perturbations ne change pas après un changement orthogonal de variables ?
+1. Essayez Adagrad pour $f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2$ et aussi pour la fonction objectif a été tournée de 45 degrés, c'est-à-dire $f(\mathbf{x}) = 0.1 (x_1 + x_2)^2 + 2 (x_1 - x_2)^2$. Se comporte-t-il différemment ?
+1. Prouvez [Gerschgorin's circle theorem](https://en.wikipedia.org/wiki/Gershgorin_circle_theorem) que les valeurs propres $\lambda_i$ d'une matrice $\mathbf{M}$ satisfont $|\lambda_i - \mathbf{M}_{jj}| \leq \sum_{k \neq j} |\mathbf{M}_{jk}|$ pour au moins un choix de $j$.
+1. Que nous apprend le théorème de Gerschgorin sur les valeurs propres de la matrice préconditionnée diagonalement $\mathrm{diag}^{-\frac{1}{2}}(\mathbf{M}) \mathbf{M} \mathrm{diag}^{-\frac{1}{2}}(\mathbf{M})$?
+1. Essayez Adagrad pour un réseau profond approprié, tel que :numref:`sec_lenet` lorsqu'il est appliqué à Fashion-MNIST.
+1. Comment devriez-vous modifier Adagrad pour obtenir une décroissance moins agressive du taux d'apprentissage ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/355)

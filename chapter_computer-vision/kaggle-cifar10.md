@@ -1,26 +1,26 @@
-# Image Classification (CIFAR-10) on Kaggle
-:label:`sec_kaggle_cifar10`
+# Classification d'images (CIFAR-10) sur Kaggle
+:label:`sec_kaggle_cifar10` 
 
-So far, we have been using high-level APIs of deep learning frameworks to directly obtain image datasets in tensor format.
-However, custom image datasets
-often come in the form of image files.
-In this section, we will start from
-raw image files,
-and organize, read, then transform them
-into tensor format step by step.
+ Jusqu'à présent, nous avons utilisé les API de haut niveau des cadres d'apprentissage profond pour obtenir directement des ensembles de données d'images au format tenseur.
+Cependant, les jeux de données d'images personnalisés
+se présentent souvent sous la forme de fichiers d'images.
+Dans cette section, nous allons partir de
+fichiers d'images brutes,
+et les organiser, les lire, puis les transformer
+en format tenseur étape par étape.
 
-We experimented with the CIFAR-10 dataset in :numref:`sec_image_augmentation`,
-which is an important dataset in computer vision.
-In this section,
-we will apply the knowledge we learned
-in previous sections
-to practice the Kaggle competition of
-CIFAR-10 image classification.
-(**The web address of the competition is https://www.kaggle.com/c/cifar-10**)
+Nous avons expérimenté avec le jeu de données CIFAR-10 dans :numref:`sec_image_augmentation` ,
+qui est un jeu de données important en vision par ordinateur.
+Dans cette section,
+nous allons appliquer les connaissances acquises
+dans les sections précédentes
+pour pratiquer la compétition Kaggle de
+classification d'images CIFAR-10.
+(**L'adresse web de la compétition est https://www.kaggle.com/c/cifar-10**)
 
-:numref:`fig_kaggle_cifar10` shows the information on the competition's webpage.
-In order to submit the results,
-you need to register a Kaggle account.
+:numref:`fig_kaggle_cifar10` montre les informations sur la page web de la compétition.
+Afin de soumettre les résultats,
+vous devez enregistrer un compte Kaggle.
 
 ![CIFAR-10 image classification competition webpage information. The competition dataset can be obtained by clicking the "Data" tab.](../img/kaggle-cifar10.png)
 :width:`600px`
@@ -53,41 +53,41 @@ import pandas as pd
 import shutil
 ```
 
-## Obtaining and Organizing the Dataset
+## Obtention et organisation du jeu de données
 
-The competition dataset is divided into
-a training set and a test set,
-which contain 50000 and 300000 images, respectively.
-In the test set,
-10000 images will be used for evaluation,
-while the remaining 290000 images will not
-be evaluated:
-they are included just
-to make it hard
-to cheat with
-*manually* labeled results of the test set.
-The images in this dataset
-are all png color (RGB channels) image files,
-whose height and width are both 32 pixels.
-The images cover a total of 10 categories, namely airplanes, cars, birds, cats, deer, dogs, frogs, horses, boats, and trucks.
-The upper-left corner of :numref:`fig_kaggle_cifar10` shows some images of airplanes, cars, and birds in the dataset.
+Le jeu de données de la compétition est divisé en
+un jeu d'entraînement et un jeu de test,
+qui contiennent respectivement 50 000 et 300 000 images.
+Dans l'ensemble de test,
+10000 images seront utilisées pour l'évaluation,
+tandis que les 290000 images restantes
+ne seront pas évaluées :
+elles sont incluses uniquement
+pour qu'il soit difficile
+de tricher avec
+*manuellement* les résultats étiquetés de l'ensemble de test.
+Les images de ce jeu de données
+sont toutes des fichiers d'images en couleur (canaux RVB) au format png,
+dont la hauteur et la largeur sont toutes deux de 32 pixels.
+Les images couvrent un total de 10 catégories, à savoir avions, voitures, oiseaux, chats, cerfs, chiens, grenouilles, chevaux, bateaux et camions.
+Le coin supérieur gauche de :numref:`fig_kaggle_cifar10` montre quelques images d'avions, de voitures et d'oiseaux de l'ensemble de données.
 
 
-### Downloading the Dataset
+#### Téléchargement du jeu de données
 
-After logging in to Kaggle, we can click the "Data" tab on the CIFAR-10 image classification competition webpage shown in :numref:`fig_kaggle_cifar10` and download the dataset by clicking the "Download All" button.
-After unzipping the downloaded file in `../data`, and unzipping `train.7z` and `test.7z` inside it, you will find the entire dataset in the following paths:
+Après s'être connecté à Kaggle, nous pouvons cliquer sur l'onglet "Données" de la page Web du concours de classification d'images CIFAR-10 illustré sur :numref:`fig_kaggle_cifar10` et télécharger le jeu de données en cliquant sur le bouton "Télécharger tout".
+Après avoir décompressé le fichier téléchargé dans `../data`, et décompressé `train.7z` et `test.7z` à l'intérieur, vous trouverez l'ensemble des données dans les chemins suivants :
 
 * `../data/cifar-10/train/[1-50000].png`
-* `../data/cifar-10/test/[1-300000].png`
-* `../data/cifar-10/trainLabels.csv`
-* `../data/cifar-10/sampleSubmission.csv`
+ * `../data/cifar-10/test/[1-300000].png`
+ * `../data/cifar-10/trainLabels.csv`
+ * `../data/cifar-10/sampleSubmission.csv`
 
-where the `train` and `test` directories contain the training and testing images, respectively, `trainLabels.csv` provides labels for the training images, and `sample_submission.csv` is a sample submission file.
+ où les répertoires `train` et `test` contiennent respectivement les images d'entraînement et de test, `trainLabels.csv` fournit les étiquettes pour les images d'entraînement, et `sample_submission.csv` est un exemple de fichier de soumission.
 
-To make it easier to get started, [**we provide a small-scale sample of the dataset that
-contains the first 1000 training images and 5 random testing images.**]
-To use the full dataset of the Kaggle competition, you need to set the following `demo` variable to `False`.
+Pour faciliter la prise en main, [**nous fournissons un échantillon à petite échelle de l'ensemble de données qui
+contient les 1000 premières images d'entraînement et 5 images de test aléatoires.**]
+Pour utiliser l'ensemble de données complet du concours Kaggle, vous devez définir la variable `demo` sur `False`.
 
 ```{.python .input}
 #@tab all
@@ -105,12 +105,12 @@ else:
     data_dir = '../data/cifar-10/'
 ```
 
-### [**Organizing the Dataset**]
+### [**Organiser le jeu de données**]
 
-We need to organize datasets to facilitate model training and testing.
-Let's first read the labels from the csv file.
-The following function returns a dictionary that maps
-the non-extension part of the filename to its label.
+Nous devons organiser les jeux de données pour faciliter l'apprentissage et le test des modèles.
+Commençons par lire les étiquettes du fichier csv.
+La fonction suivante renvoie un dictionnaire qui fait correspondre
+la partie sans extension du nom de fichier à son étiquette.
 
 ```{.python .input}
 #@tab all
@@ -128,16 +128,16 @@ print('# training examples:', len(labels))
 print('# classes:', len(set(labels.values())))
 ```
 
-Next, we define the `reorg_train_valid` function to [**split the validation set out of the original training set.**]
-The argument `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set.
-More concretely,
-let $n$ be the number of images of the class with the least examples, and $r$ be the ratio.
-The validation set will split out
-$\max(\lfloor nr\rfloor,1)$ images for each class.
-Let's use `valid_ratio=0.1` as an example. Since the original training set has 50000 images,
-there will be 45000 images used for training in the path `train_valid_test/train`,
-while the other 5000 images will be split out
-as validation set in the path `train_valid_test/valid`. After organizing the dataset, images of the same class will be placed under the same folder.
+Ensuite, nous définissons la fonction `reorg_train_valid` pour [**séparer l'ensemble de validation de l'ensemble de formation original.**]
+L'argument `valid_ratio` de cette fonction est le rapport entre le nombre d'exemples de l'ensemble de validation et le nombre d'exemples de l'ensemble de formation original.
+Plus concrètement,
+laisse $n$ être le nombre d'images de la classe ayant le moins d'exemples, et $r$ être le ratio.
+L'ensemble de validation répartira les images
+$\max(\lfloor nr\rfloor,1)$ pour chaque classe.
+Prenons l'exemple de `valid_ratio=0.1`. Étant donné que l'ensemble d'entraînement original comporte 50 000 images,
+, 45 000 images seront utilisées pour l'entraînement dans le chemin `train_valid_test/train`,
+, tandis que les 5 000 autres images seront réparties dans
+comme ensemble de validation dans le chemin `train_valid_test/valid`. Après avoir organisé l'ensemble de données, les images de la même classe seront placées dans le même dossier.
 
 ```{.python .input}
 #@tab all
@@ -171,7 +171,7 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
     return n_valid_per_label
 ```
 
-The `reorg_test` function below [**organizes the testing set for data loading during prediction.**]
+La fonction `reorg_test` ci-dessous [**organise l'ensemble de test pour le chargement des données pendant la prédiction.**]
 
 ```{.python .input}
 #@tab all
@@ -184,8 +184,8 @@ def reorg_test(data_dir):
                               'unknown'))
 ```
 
-Finally, we use a function to [**invoke**]
-the `read_csv_labels`, `reorg_train_valid`, and `reorg_test` (**functions defined above.**)
+Enfin, nous utilisons une fonction pour [**invoquer**]
+les fonctions `read_csv_labels`, `reorg_train_valid`, et `reorg_test` (**définies ci-dessus.**)
 
 ```{.python .input}
 #@tab all
@@ -195,11 +195,11 @@ def reorg_cifar10_data(data_dir, valid_ratio):
     reorg_test(data_dir)
 ```
 
-Here we only set the batch size to 32 for the small-scale sample of the dataset.
-When training and testing
-the complete dataset of the Kaggle competition,
-`batch_size` should be set to a larger integer, such as 128.
-We split out 10% of the training examples as the validation set for tuning hyperparameters.
+Ici, nous avons uniquement fixé la taille du lot à 32 pour l'échantillon à petite échelle de l'ensemble de données.
+Lors de l'entraînement et du test de
+l'ensemble complet de données de la compétition Kaggle,
+`batch_size` doit être fixé à un nombre entier plus grand, tel que 128.
+Nous avons séparé 10% des exemples d'entraînement comme ensemble de validation pour le réglage des hyperparamètres.
 
 ```{.python .input}
 #@tab all
@@ -208,11 +208,11 @@ valid_ratio = 0.1
 reorg_cifar10_data(data_dir, valid_ratio)
 ```
 
-## [**Image Augmentation**]
+## [**Augmentation d'image**]
 
-We use image augmentation to address overfitting.
-For example, images can be flipped horizontally at random during training.
-We can also perform standardization for the three RGB channels of color images. Below lists some of these operations that you can tweak.
+Nous utilisons l'augmentation d'image pour traiter l'ajustement excessif.
+Par exemple, les images peuvent être retournées horizontalement de manière aléatoire pendant la formation.
+Nous pouvons également effectuer une normalisation pour les trois canaux RVB des images couleur. Vous trouverez ci-dessous une liste de certaines de ces opérations que vous pouvez modifier.
 
 ```{.python .input}
 #@tab mxnet
@@ -250,10 +250,10 @@ transform_train = torchvision.transforms.Compose([
                                      [0.2023, 0.1994, 0.2010])])
 ```
 
-During testing,
-we only perform standardization on images
-so as to
-remove randomness in the evaluation results.
+Pendant les tests,
+nous n'effectuons la normalisation que sur les images
+afin de
+supprimer le caractère aléatoire des résultats de l'évaluation.
 
 ```{.python .input}
 #@tab mxnet
@@ -271,9 +271,9 @@ transform_test = torchvision.transforms.Compose([
                                      [0.2023, 0.1994, 0.2010])])
 ```
 
-## Reading the Dataset
+## Lecture du jeu de données
 
-Next, we [**read the organized dataset consisting of raw image files**]. Each example includes an image and a label.
+Ensuite, nous [**lisons le jeu de données organisé composé de fichiers d'images brutes**]. Chaque exemple comprend une image et une étiquette.
 
 ```{.python .input}
 #@tab mxnet
@@ -294,13 +294,13 @@ valid_ds, test_ds = [torchvision.datasets.ImageFolder(
     transform=transform_test) for folder in ['valid', 'test']]
 ```
 
-During training,
-we need to [**specify all the image augmentation operations defined above**].
-When the validation set
-is used for model evaluation during hyperparameter tuning,
-no randomness from image augmentation should be introduced.
-Before final prediction,
-we train the model on the combined training set and validation set to make full use of all the labeled data.
+Pendant la formation,
+nous devons [**spécifier toutes les opérations d'augmentation d'image définies ci-dessus**].
+Lorsque l'ensemble de validation
+est utilisé pour l'évaluation du modèle lors de l'ajustement des hyperparamètres,
+aucun aléa provenant de l'augmentation de l'image ne doit être introduit.
+Avant la prédiction finale,
+nous entraînons le modèle sur l'ensemble d'entraînement et l'ensemble de validation combinés afin d'utiliser pleinement toutes les données étiquetées.
 
 ```{.python .input}
 #@tab mxnet
@@ -330,13 +330,13 @@ test_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,
                                         drop_last=False)
 ```
 
-## Defining the [**Model**]
+### Définition du [**Modèle**]
 
-:begin_tab:`mxnet`
-Here, we build the residual blocks based on the `HybridBlock` class, which is
-slightly different from the implementation described in
-:numref:`sec_resnet`.
-This is for improving computational efficiency.
+:begin_tab:`mxnet` 
+ Ici, nous construisons les blocs résiduels en fonction de la classe `HybridBlock`, ce qui est
+légèrement différent de l'implémentation décrite dans
+:numref:`sec_resnet` .
+Cela permet d'améliorer l'efficacité des calculs.
 :end_tab:
 
 ```{.python .input}
@@ -364,7 +364,7 @@ class Residual(nn.HybridBlock):
 ```
 
 :begin_tab:`mxnet`
-Next, we define the ResNet-18 model.
+Ensuite, nous définissons le modèle ResNet-18.
 :end_tab:
 
 ```{.python .input}
@@ -392,12 +392,12 @@ def resnet18(num_classes):
 ```
 
 :begin_tab:`mxnet`
-We use Xavier initialization described in :numref:`subsec_xavier` before training begins.
+Nous utilisons l'initialisation de Xavier décrite dans :numref:`subsec_xavier` avant de commencer la formation.
 :end_tab:
 
 :begin_tab:`pytorch`
-We define the ResNet-18 model described in
-:numref:`sec_resnet`.
+Nous définissons le modèle ResNet-18 décrit dans
+:numref:`sec_resnet` .
 :end_tab:
 
 ```{.python .input}
@@ -421,10 +421,10 @@ def get_net():
 loss = nn.CrossEntropyLoss(reduction="none")
 ```
 
-## Defining the [**Training Function**]
+## Définition de la [**Fonction d'entraînement**]
 
-We will select models and tune hyperparameters according to the model's performance on the validation set.
-In the following, we define the model training function `train`.
+Nous allons sélectionner les modèles et régler les hyperparamètres en fonction de la performance du modèle sur l'ensemble de validation.
+Dans ce qui suit, nous définissons la fonction d'apprentissage du modèle `train`.
 
 ```{.python .input}
 #@tab mxnet
@@ -504,13 +504,13 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           f' examples/sec on {str(devices)}')
 ```
 
-## [**Training and Validating the Model**]
+## [**Formation et validation du modèle**]
 
-Now, we can train and validate the model.
-All the following hyperparameters can be tuned.
-For example, we can increase the number of epochs.
-When `lr_period` and `lr_decay` are set to 4 and 0.9, respectively, the learning rate of the optimization algorithm will be multiplied by 0.9 after every 4 epochs. Just for ease of demonstration,
-we only train 20 epochs here.
+Maintenant, nous pouvons former et valider le modèle.
+Tous les hyperparamètres suivants peuvent être ajustés.
+Par exemple, nous pouvons augmenter le nombre d'époques.
+Lorsque `lr_period` et `lr_decay` sont définis sur 4 et 0,9, respectivement, le taux d'apprentissage de l'algorithme d'optimisation sera multiplié par 0,9 toutes les 4 époques. Pour faciliter la démonstration,
+nous n'entraînons ici que 20 époques.
 
 ```{.python .input}
 #@tab mxnet
@@ -530,10 +530,10 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
 
-## [**Classifying the Testing Set**] and Submitting Results on Kaggle
+## [**Classifier l'ensemble de test**] et soumettre les résultats sur Kaggle
 
-After obtaining a promising model with hyperparameters,
-we use all the labeled data (including the validation set) to retrain the model and classify the testing set.
+Après avoir obtenu un modèle prometteur avec des hyperparamètres,
+nous utilisons toutes les données étiquetées (y compris l'ensemble de validation) pour réentraîner le modèle et classifier l'ensemble de test.
 
 ```{.python .input}
 #@tab mxnet
@@ -569,30 +569,30 @@ df['label'] = df['label'].apply(lambda x: train_valid_ds.classes[x])
 df.to_csv('submission.csv', index=False)
 ```
 
-The above code
-will generate a `submission.csv` file,
-whose format
-meets the requirement of the Kaggle competition.
-The method
-for submitting results to Kaggle
-is similar to that in :numref:`sec_kaggle_house`.
+Le code ci-dessus
+va générer un fichier `submission.csv`,
+dont le format
+répond aux exigences du concours Kaggle.
+La méthode
+pour soumettre les résultats à Kaggle
+est similaire à celle de :numref:`sec_kaggle_house` .
 
-## Summary
+## Résumé
 
-* We can read datasets containing raw image files after organizing them into the required format.
+* Nous pouvons lire des ensembles de données contenant des fichiers d'images brutes après les avoir organisés dans le format requis.
 
 :begin_tab:`mxnet`
-* We can use convolutional neural networks, image augmentation, and hybrid programing in an image classification competition.
+* Nous pouvons utiliser les réseaux de neurones convolutifs, l'augmentation d'image et la programmation hybride dans une compétition de classification d'images.
 :end_tab:
 
 :begin_tab:`pytorch`
-* We can use convolutional neural networks and image augmentation in an image classification competition.
+* Nous pouvons utiliser les réseaux de neurones convolutifs et l'augmentation d'image dans un concours de classification d'images.
 :end_tab:
 
-## Exercises
+## Exercices
 
-1. Use the complete CIFAR-10 dataset for this Kaggle competition. Set hyperparameters as `batch_size = 128`, `num_epochs = 100`, `lr = 0.1`, `lr_period = 50`, and `lr_decay = 0.1`.  See what accuracy and ranking you can achieve in this competition. Can you further improve them?
-1. What accuracy can you get when not using image augmentation?
+1. Utilisez le jeu de données CIFAR-10 complet pour cette compétition Kaggle. Définissez les hyperparamètres comme suit :`batch_size = 128`, `num_epochs = 100`, `lr = 0.1`, `lr_period = 50` et `lr_decay = 0.1`.  Voyez quelle précision et quel classement vous pouvez obtenir dans cette compétition. Pouvez-vous encore les améliorer ?
+1. Quelle précision pouvez-vous obtenir sans utiliser l'augmentation d'image ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/379)

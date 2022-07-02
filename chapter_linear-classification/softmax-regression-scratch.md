@@ -3,17 +3,17 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Softmax Regression Implementation from Scratch
-:label:`sec_softmax_scratch`
+# Implémentation de la régression softmax à partir de zéro
+:label:`sec_softmax_scratch` 
 
-Because softmax regression is so fundamental,
-we believe that you ought to know
-how to implement it yourself.
-Here, we limit ourselves to defining the
-softmax-specific aspects of the model
-and reuse the other components
-from our linear regression section,
-including the training loop.
+ La régression softmax étant si fondamentale,
+nous pensons que vous devez savoir
+comment l'implémenter vous-même.
+Ici, nous nous limitons à définir les aspects spécifiques à
+softmax du modèle
+et réutilisons les autres composants
+de notre section sur la régression linéaire,
+y compris la boucle d'entraînement.
 
 ```{.python .input}
 %%tab mxnet
@@ -34,17 +34,17 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## The Softmax
+## Le Softmax
 
-Let's begin with the most important part:
-the mapping from scalars to probabilities.
-For a refresher, recall the operation of the sum operator
-along specific dimensions in a tensor,
-as discussed in :numref:`subsec_lin-alg-reduction`
-and :numref:`subsec_lin-alg-non-reduction`.
-[**Given a matrix `X` we can sum over all elements (by default) or only
-over elements in the same axis.**]
-The `axis` variable lets us compute row and column sums:
+Commençons par la partie la plus importante :
+le mappage des scalaires en probabilités.
+Pour vous rafraîchir la mémoire, rappelez-vous le fonctionnement de l'opérateur de somme
+le long de dimensions spécifiques dans un tenseur,
+comme nous l'avons vu dans :numref:`subsec_lin-alg-reduction` 
+ et :numref:`subsec_lin-alg-non-reduction` .
+[**Étant donné une matrice `X`, nous pouvons faire la somme de tous les éléments (par défaut) ou seulement
+des éléments du même axe.**]
+La variable `axis` nous permet de calculer les sommes de lignes et de colonnes :
 
 ```{.python .input}
 %%tab all
@@ -52,21 +52,21 @@ X = d2l.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
 d2l.reduce_sum(X, 0, keepdims=True), d2l.reduce_sum(X, 1, keepdims=True)
 ```
 
-Computing the softmax requires three steps:
-(i) exponentiation of each term;
-(ii) a sum over each row to compute the normalization constant for each example;
-(iii) division of each row by its normalization constant,
-ensuring that the result sums to 1.
+Le calcul de la softmax nécessite trois étapes :
+(i) exponentiation de chaque terme ;
+(ii) somme sur chaque ligne pour calculer la constante de normalisation pour chaque exemple ;
+(iii) division de chaque ligne par sa constante de normalisation,
+en s'assurant que la somme du résultat est égale à 1.
 
 (**
-$$\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(\mathbf{X}_{ij})}{\sum_k \exp(\mathbf{X}_{ik})}.$$
-**)
+$$\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(\mathbf{X}_{ij})}{\sum_k \exp(\mathbf{X}_{ik})}.$$ 
+ **)
 
-The (logarithm of the) denominator
-is called the (log) *partition function*.
-It was introduced in [statistical physics](https://en.wikipedia.org/wiki/Partition_function_(statistical_mechanics))
-to sum over all possible states in a thermodynamic ensemble.
-The implementation is straightforward:
+Le (logarithme du) dénominateur
+est appelé la (log) *fonction de partition*.
+Elle a été introduite dans [statistical physics](https://en.wikipedia.org/wiki/Partition_function_(statistical_mechanics))
+pour faire la somme de tous les états possibles dans un ensemble thermodynamique.
+L'implémentation est simple :
 
 ```{.python .input}
 %%tab all
@@ -76,10 +76,10 @@ def softmax(X):
     return X_exp / partition  # The broadcasting mechanism is applied here
 ```
 
-For any input `X`, [**we turn each element
-into a non-negative number.
-Each row sums up to 1,**]
-as is required for a probability. Caution: the code above is *not* robust against very large or very small arguments. While this is sufficient to illustrate what is happening, you should *not* use this code verbatim for any serious purpose. Deep learning frameworks have such protections built-in and we will be using the built-in softmax going forward.
+Pour toute entrée `X`, [**nous transformons chaque élément
+en un nombre non négatif.
+La somme de chaque ligne est égale à 1,**]
+comme pour une probabilité. Attention : le code ci-dessus n'est *pas* robuste contre les arguments très grands ou très petits. Bien que cela soit suffisant pour illustrer ce qui se passe, vous ne devriez *pas* utiliser ce code mot à mot dans un but sérieux. Les cadres d'apprentissage profond ont de telles protections intégrées et nous utiliserons le softmax intégré à l'avenir.
 
 ```{.python .input}
 %%tab mxnet
@@ -95,34 +95,34 @@ X_prob = softmax(X)
 X_prob, d2l.reduce_sum(X_prob, 1)
 ```
 
-## The Model
+## Le modèle
 
-We now have everything that we need
-to implement [**the softmax regression model.**]
-As in our linear regression example,
-each instance will be represented
-by a fixed-length vector.
-Since the raw data here consists
-of $28 \times 28$ pixel images,
-[**we flatten each image,
-treating them as vectors of length 784.**]
-In later chapters, we will introduce
-convolutional neural networks,
-which exploit the spatial structure
-in a more satisfying way.
+Nous avons maintenant tout ce dont nous avons besoin
+pour implémenter [**le modèle de régression softmax.**]
+Comme dans notre exemple de régression linéaire,
+chaque instance sera représentée
+par un vecteur de longueur fixe.
+Les données brutes étant ici constituées
+d'images de pixels $28 \times 28$,
+[**nous aplatissons chaque image,
+en les traitant comme des vecteurs de longueur 784.**]
+Dans les chapitres suivants, nous présenterons
+les réseaux neuronaux convolutifs,
+qui exploitent la structure spatiale
+de manière plus satisfaisante.
 
 
-In softmax regression,
-the number of outputs from our network
-should be equal to the number of classes.
-(**Since our dataset has 10 classes,
-our network has an output dimension of 10.**)
-Consequently, our weights constitute a $784 \times 10$ matrix
-plus a $1 \times 10$ dimensional row vector for the biases.
-As with linear regression,
-we initialize the weights `W`
-with Gaussian noise.
-The biases are initialized as zeros.
+Dans la régression softmax,
+le nombre de sorties de notre réseau
+doit être égal au nombre de classes.
+(**Puisque notre ensemble de données comporte 10 classes,
+notre réseau a une dimension de sortie de 10.**)
+Par conséquent, nos poids constituent une matrice $784 \times 10$
+ plus un vecteur ligne de dimension $1 \times 10$ pour les biais.
+Comme pour la régression linéaire,
+nous initialisons les poids `W`
+ avec un bruit gaussien.
+Les biais sont initialisés avec des zéros.
 
 ```{.python .input}
 %%tab mxnet
@@ -165,11 +165,11 @@ class SoftmaxRegressionScratch(d2l.Classifier):
         self.b = tf.Variable(self.b)
 ```
 
-The code below defines how the network
-maps each input to an output.
-Note that we flatten each $28 \times 28$ pixel image in the batch
-into a vector using `reshape`
-before passing the data through our model.
+Le code ci-dessous définit comment le réseau
+fait correspondre chaque entrée à une sortie.
+Notez que nous aplatissons chaque image de $28 \times 28$ pixels dans le lot
+en un vecteur en utilisant `reshape`
+ avant de faire passer les données dans notre modèle.
 
 ```{.python .input}
 %%tab all
@@ -179,27 +179,26 @@ def forward(self, X):
         X, (-1, self.W.shape[0])), self.W) + self.b)
 ```
 
-## The Cross-Entropy Loss
+## La perte d'entropie croisée
 
-Next we need to implement the cross-entropy loss function
-(introduced in :numref:`subsec_softmax-regression-loss-func`).
-This may be the most common loss function
-in all of deep learning.
-At the moment, applications of deep learning
-easily cast classification problems
-far outnumber those better treated as regression problems.
+Nous devons ensuite implémenter la fonction de perte d'entropie croisée
+(présentée dans :numref:`subsec_softmax-regression-loss-func` ).
+Il s'agit peut-être de la fonction de perte la plus courante
+dans tout l'apprentissage profond.
+À l'heure actuelle, les applications de l'apprentissage profond
+qui posent facilement des problèmes de classification
+sont beaucoup plus nombreuses que celles qui sont mieux traitées comme des problèmes de régression.
 
-Recall that cross-entropy takes the negative log-likelihood
-of the predicted probability assigned to the true label.
-For efficiency we avoid Python for-loops and use indexing instead.
-In particular, the one-hot encoding in $\mathbf{y}$
-allows us to select the matching terms in $\hat{\mathbf{y}}$.
+Rappelons que l'entropie croisée prend la log-vraisemblance négative
+de la probabilité prédite attribuée à l'étiquette réelle.
+Pour des raisons d'efficacité, nous évitons les boucles for de Python et utilisons plutôt l'indexation.
+En particulier, le codage à un coup dans $\mathbf{y}$
+ nous permet de sélectionner les termes correspondants dans $\hat{\mathbf{y}}$.
 
-To see this in action we [**create sample data `y_hat`
-with 2 examples of predicted probabilities over 3 classes and their corresponding labels `y`.**]
-The correct labels are $1$ and $2$ respectively.
-[**Using `y` as the indices of the probabilities in `y_hat`,**]
-we can pick out terms efficiently.
+Pour voir cela en action, nous [**créons des données échantillons `y_hat` avec 2 exemples de probabilités prédites sur 3 classes et leurs étiquettes correspondantes `y`.**]
+Les étiquettes correctes sont respectivement $1$ et $2$.
+[**En utilisant `y` comme indices des probabilités dans `y_hat`,**]
+, nous pouvons sélectionner les termes efficacement.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -215,7 +214,7 @@ y = tf.constant([0, 2])
 tf.boolean_mask(y_hat, tf.one_hot(y, depth=y_hat.shape[-1]))
 ```
 
-Now we can (**implement the cross-entropy loss function**) by averaging over the logarithms of the selected probabilities.
+Nous pouvons maintenant (**mettre en œuvre la fonction de perte d'entropie croisée**) en faisant la moyenne des logarithmes des probabilités sélectionnées.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -241,27 +240,27 @@ def loss(self, y_hat, y):
     return cross_entropy(y_hat, y)
 ```
 
-## Training
+## Formation
 
-We reuse the `fit` method defined in :numref:`sec_linear_scratch` to [**train the model with 10 epochs.**]
-Note that both the number of epochs (`max_epochs`),
-the minibatch size (`batch_size`),
-and learning rate (`lr`)
-are adjustable hyperparameters.
-That means that while these values are not
-learned during our primary training loop,
-they still influence the performance
-of our model, bot vis-a-vis training
-and generalization performance.
-In practice you will want to choose these values
-based on the *validation* split of the data
-and then to ultimately evaluate your final model
-on the *test* split.
-As discussed in :numref:`subsec_generalization-model-selection`,
-we will treat the test data of Fashion-MNIST
-as the validation set, thus
-reporting validation loss and validation accuracy
-on this split.
+Nous réutilisons la méthode `fit` définie dans :numref:`sec_linear_scratch` pour [**former le modèle avec 10 époques.**]
+Notez que le nombre d'époques (`max_epochs`),
+la taille des minibatchs (`batch_size`),
+et le taux d'apprentissage (`lr`)
+sont des hyperparamètres ajustables.
+Cela signifie que, bien que ces valeurs ne soient pas apprises au cours de notre boucle d'apprentissage primaire (
+),
+elles influencent néanmoins les performances (
+) de notre modèle, par rapport à l'apprentissage (
+) et aux performances de généralisation.
+Dans la pratique, vous voudrez choisir ces valeurs
+en fonction de la répartition *validation* des données
+et évaluer ensuite votre modèle final
+sur la répartition *test*.
+Comme nous l'avons vu à l'adresse :numref:`subsec_generalization-model-selection` ,
+nous traiterons les données de test de Fashion-MNIST
+comme l'ensemble de validation, et nous rapporterons donc
+la perte de validation et la précision de validation
+sur cette division.
 
 ```{.python .input}
 %%tab all
@@ -271,10 +270,10 @@ trainer = d2l.Trainer(max_epochs=10)
 trainer.fit(model, data)
 ```
 
-## Prediction
+## Prédiction
 
-Now that training is complete,
-our model is ready to [**classify some images.**]
+Maintenant que la formation est terminée,
+notre modèle est prêt à [**classer certaines images.**]
 
 ```{.python .input}
 %%tab all
@@ -283,11 +282,11 @@ preds = d2l.argmax(model(X), axis=1)
 preds.shape
 ```
 
-We are more interested in the images we label *incorrectly*. We visualize them by
-comparing their actual labels
-(first line of text output)
-with the predictions from the model
-(second line of text output).
+Nous sommes plus intéressés par les images que nous étiquetons *incorrectement*. Nous les visualisons en
+en comparant leurs étiquettes réelles
+(première ligne de sortie de texte)
+avec les prédictions du modèle
+(deuxième ligne de sortie de texte).
 
 ```{.python .input}
 %%tab all
@@ -298,33 +297,33 @@ labels = [a+'\n'+b for a, b in zip(
 data.visualize([X, y], labels=labels)
 ```
 
-## Summary
+## Résumé
 
-By now we are starting to get some experience
-with solving linear regression
-and classification problems.
-With it, we have reached what would arguably be
-the state of the art of 1960-1970s of statistical modeling.
-In the next section, we'll show you how to leverage
-deep learning frameworks to implement this model
-much more efficiently.
+A présent, nous commençons à avoir un peu d'expérience
+dans la résolution de problèmes de régression linéaire
+et de classification.
+Avec cela, nous avons atteint ce qui serait sans doute
+l'état de l'art des années 1960-1970 de la modélisation statistique.
+Dans la section suivante, nous vous montrerons comment tirer parti des cadres d'apprentissage profond
+pour mettre en œuvre ce modèle
+de manière beaucoup plus efficace.
 
-## Exercises
+## Exercices
 
-1. In this section, we directly implemented the softmax function based on the mathematical definition of the softmax operation. As discussed in :numref:`sec_softmax` this can cause numerical instabilities.
-    1. Test whether `softmax` still works correctly if an input has a value of $100$?
-    1. Test whether `softmax` still works correctly if the largest of all inputs is smaller than $-100$?
-    1. Implement a fix by looking at the value relative to the largest entry in the argument.
-1. Implement a `cross_entropy` function that follows the definition of the cross-entropy loss function $\sum_i y_i \log \hat{y}_i$.
-    1. Try it out in the code example above.
-    1. Why do you think it runs more slowly?
-    1. Should you use it? In which cases would it make sense?
-    1. What do you need to be careful of? Hint: consider the domain of the logarithm.
-1. Is it always a good idea to return the most likely label? For example, would you do this for medical diagnosis? How would you try to address this?
-1. Assume that we want to use softmax regression to predict the next word based on some features. What are some problems that might arise from a large vocabulary?
-1. Experiment with the hyperparameters of the code above. In particular:
-    1. Plot how the validation loss changes as you change the learning rate.
-    1. Do the validation and training loss change as you change the minibatch size? How large or small do you need to go before you see an effect?
+1. Dans cette section, nous avons directement implémenté la fonction softmax en nous basant sur la définition mathématique de l'opération softmax. Comme nous l'avons vu dans :numref:`sec_softmax` , cela peut provoquer des instabilités numériques.
+   1. Testez si `softmax` fonctionne toujours correctement si une entrée a une valeur de $100$?
+ 1. Testez si `softmax` fonctionne toujours correctement si la plus grande de toutes les entrées est inférieure à $-100$?
+ 1. Implémentez un correctif en regardant la valeur relative à la plus grande entrée dans l'argument.
+1. Implémentez une fonction `cross_entropy` qui suit la définition de la fonction de perte d'entropie croisée $\sum_i y_i \log \hat{y}_i$.
+   1. Essayez-la dans l'exemple de code ci-dessus.
+   1. Pourquoi pensez-vous qu'elle s'exécute plus lentement ?
+   1. Devriez-vous l'utiliser ? Dans quels cas cela aurait-il un sens ?
+   1. À quoi devez-vous faire attention ? Conseil : considérez le domaine du logarithme.
+1. Est-ce toujours une bonne idée de renvoyer l'étiquette la plus probable ? Par exemple, feriez-vous cela pour un diagnostic médical ? Comment essayeriez-vous de résoudre ce problème ?
+1. Supposons que nous voulions utiliser la régression softmax pour prédire le mot suivant en fonction de certaines caractéristiques. Quels sont les problèmes que peut poser un grand vocabulaire ?
+1. Expérimentez avec les hyperparamètres du code ci-dessus. En particulier :
+   1. Tracez comment la perte de validation change quand vous changez le taux d'apprentissage.
+   1. Les pertes de validation et d'apprentissage changent-elles lorsque vous modifiez la taille des minibatchs ? Quelle taille faut-il atteindre avant de voir un effet ?
 
 
 :begin_tab:`mxnet`

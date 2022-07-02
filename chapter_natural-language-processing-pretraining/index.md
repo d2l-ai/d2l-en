@@ -1,56 +1,56 @@
-# Natural Language Processing: Pretraining
-:label:`chap_nlp_pretrain`
+# Traitement du langage naturel : Préformation
+:label:`chap_nlp_pretrain` 
+
+ 
+ Les êtres humains ont besoin de communiquer.
+Ce besoin fondamental de la condition humaine est à l'origine de la production quotidienne d'une grande quantité de textes écrits.
+Compte tenu de la richesse du texte dans les médias sociaux, les applications de chat, les courriels, les critiques de produits, les articles d'actualité, les documents de recherche et les livres, il devient vital de permettre aux ordinateurs de les comprendre pour offrir une assistance ou prendre des décisions basées sur le langage humain.
+
+*Le traitement du langage naturel* étudie les interactions entre les ordinateurs et les humains à l'aide de langages naturels.
+En pratique, il est très courant d'utiliser des techniques de traitement du langage naturel pour traiter et analyser des données textuelles (langage naturel humain), comme les modèles de langage dans :numref:`sec_language-model` et les modèles de traduction automatique dans :numref:`sec_machine_translation` .
+
+Pour comprendre un texte, nous pouvons commencer par apprendre
+ses représentations.
+En s'appuyant sur les séquences de texte existantes
+provenant de grands corpus,
+*l'apprentissage auto-supervisé*
+a été largement utilisé
+pour pré-former les représentations de texte,
+par exemple en prédisant une partie cachée du texte
+en utilisant une autre partie du texte environnant.
+De cette façon, les modèles
+apprennent par supervision
+à partir de données textuelles *massives*
+sans efforts *coûteux* d'étiquetage !
 
 
-Humans need to communicate.
-Out of this basic need of the human condition, a vast amount of written text has been generated on an everyday basis.
-Given rich text in social media, chat apps, emails, product reviews, news articles,  research papers, and books, it becomes vital to enable computers to understand them to offer assistance or make decisions based on human languages.
-
-*Natural language processing* studies interactions between computers and humans using natural languages.
-In practice, it is very common to use natural language processing techniques to process and analyze text (human natural language) data, such as language models in :numref:`sec_language-model` and machine translation models in :numref:`sec_machine_translation`.
-
-To understand text, we can begin by learning
-its representations.
-Leveraging the existing text sequences
-from large corpora,
-*self-supervised learning*
-has been extensively
-used to pretrain text representations,
-such as by predicting some hidden part of the text
-using some other part of their surrounding text.
-In this way,
-models learn through supervision
-from *massive* text data
-without *expensive* labeling efforts!
-
-
-As we will see in this chapter,
-when treating each word or subword as an individual token,
-the representation of each token can be pretrained
-using word2vec, GloVe, or subword embedding models
-on large corpora.
-After pretraining, representation of each token can be a vector,
-however, it remains the same no matter what the context is.
-For instance, the vector representation of "bank" is the same
-in both
+Comme nous le verrons dans ce chapitre,
+lorsque l'on traite chaque mot ou sous-mot comme un jeton individuel,
+la représentation de chaque jeton peut être pré-entraînée
+à l'aide des modèles word2vec, GloVe ou subword embedding
+sur de grands corpus.
+Après le pré-entraînement, la représentation de chaque token peut être un vecteur,
+. Cependant, elle reste la même quel que soit le contexte.
+Par exemple, la représentation vectorielle de "bank" est la même
+dans les deux cas :
 "go to the bank to deposit some money"
-and
+et
 "go to the bank to sit down".
-Thus, many more recent pretraining models adapt representation of the same token
-to different contexts.
-Among them is BERT, a much deeper self-supervised model based on the transformer encoder.
-In this chapter, we will focus on how to pretrain such representations for text,
-as highlighted in :numref:`fig_nlp-map-pretrain`.
+Ainsi, de nombreux modèles de pré-entraînement plus récents adaptent la représentation du même jeton
+à différents contextes.
+Parmi eux se trouve BERT, un modèle auto-supervisé beaucoup plus profond basé sur l'encodeur transformateur.
+Dans ce chapitre, nous nous concentrerons sur la manière de prétraîner de telles représentations pour le texte,
+comme mis en évidence dans :numref:`fig_nlp-map-pretrain` .
 
 ![Pretrained text representations can be fed to various deep learning architectures for different downstream natural language processing applications. This chapter focuses on the upstream text representation pretraining.](../img/nlp-map-pretrain.svg)
 :label:`fig_nlp-map-pretrain`
 
 
-For sight of the big picture,
-:numref:`fig_nlp-map-pretrain` shows that
-the pretrained text representations can be fed to
-a variety of deep learning architectures for different downstream natural language processing applications.
-We will cover them in :numref:`chap_nlp_app`.
+Pour avoir une vue d'ensemble,
+:numref:`fig_nlp-map-pretrain` montre que
+les représentations de texte pré-entraînées peuvent être alimentées par
+une variété d'architectures d'apprentissage profond pour différentes applications de traitement du langage naturel en aval.
+Nous les aborderons dans :numref:`chap_nlp_app` .
 
 ```toc
 :maxdepth: 2
