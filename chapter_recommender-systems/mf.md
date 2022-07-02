@@ -1,25 +1,25 @@
-# Matrix Factorization
+# Facteurisation matricielle
 
-Matrix Factorization :cite:`Koren.Bell.Volinsky.2009` is a well-established algorithm in the recommender systems literature. The first version of matrix factorization model is proposed by Simon Funk in a famous [blog
-post](https://sifter.org/~simon/journal/20061211.html) in which he described the idea of factorizing the interaction matrix. It then became widely known due to the Netflix contest which was held in 2006. At that time, Netflix, a media-streaming and video-rental company, announced a contest to improve its recommender system performance. The best team that can improve on the Netflix baseline, i.e., Cinematch), by 10 percent would win a one million USD prize.  As such, this contest attracted
-a lot of attention to the field of recommender system research. Subsequently, the grand prize was won by the BellKor's Pragmatic Chaos team, a combined team of BellKor, Pragmatic Theory, and BigChaos (you do not need to worry about these algorithms now). Although the final score was the result of an ensemble solution (i.e., a combination of many algorithms), the matrix factorization algorithm played a critical role in the final blend. The technical report of the Netflix Grand Prize solution :cite:`Toscher.Jahrer.Bell.2009` provides a detailed introduction to the adopted model. In this section, we will dive into the details of the matrix factorization model and its implementation.
+La factorisation matricielle :cite:`Koren.Bell.Volinsky.2009` est un algorithme bien établi dans la littérature sur les systèmes de recommandation. La première version du modèle de factorisation matricielle est proposée par Simon Funk dans un célèbre article intitulé [blog
+post](https://sifter.org/~)simon/journal/20061211.html) dans lequel il décrivait l'idée de factoriser la matrice d'interaction. Elle est ensuite devenue largement connue grâce au concours Netflix qui s'est tenu en 2006. À cette époque, Netflix, une société de streaming de médias et de location de vidéos, a annoncé un concours visant à améliorer les performances de son système de recommandation. La meilleure équipe capable d'améliorer de 10 % les performances du système de référence de Netflix (c'est-à-dire Cinematch) remporterait un prix d'un million de dollars américains.  Ce concours a attiré
+beaucoup d'attention dans le domaine de la recherche sur les systèmes de recommandation. Par la suite, le grand prix a été remporté par l'équipe Pragmatic Chaos de BellKor, une équipe combinée de BellKor, Pragmatic Theory et BigChaos (vous n'avez pas besoin de vous soucier de ces algorithmes maintenant). Bien que le score final soit le résultat d'une solution d'ensemble (c'est-à-dire une combinaison de nombreux algorithmes), l'algorithme de factorisation matricielle a joué un rôle essentiel dans le mélange final. Le rapport technique de la solution du Grand Prix Netflix :cite:`Toscher.Jahrer.Bell.2009` fournit une introduction détaillée au modèle adopté. Dans cette section, nous allons plonger dans les détails du modèle de factorisation matricielle et de son implémentation.
 
 
-## The Matrix Factorization Model
+## Le modèle de factorisation matricielle
 
-Matrix factorization is a class of collaborative filtering models. Specifically, the model factorizes the user-item interaction matrix (e.g., rating matrix) into the product of two lower-rank matrices, capturing the low-rank structure of the user-item interactions.
+La factorisation matricielle est une classe de modèles de filtrage collaboratif. Plus précisément, le modèle factorise la matrice d'interaction entre l'utilisateur et l'article (par exemple, la matrice d'évaluation) en un produit de deux matrices de rang inférieur, capturant la structure de rang inférieur des interactions entre l'utilisateur et l'article.
 
-Let $\mathbf{R} \in \mathbb{R}^{m \times n}$ denote the interaction matrix with $m$ users and $n$ items, and the values of $\mathbf{R}$ represent explicit ratings. The user-item interaction will be factorized into a user latent matrix $\mathbf{P} \in \mathbb{R}^{m \times k}$ and an item latent matrix $\mathbf{Q} \in \mathbb{R}^{n \times k}$, where $k \ll m, n$, is the latent factor size. Let $\mathbf{p}_u$ denote the $u^\mathrm{th}$ row of $\mathbf{P}$ and $\mathbf{q}_i$ denote the $i^\mathrm{th}$ row of $\mathbf{Q}$.  For a given item $i$, the elements of $\mathbf{q}_i$ measure the extent to which the item possesses those characteristics such as the genres and languages of a movie. For a given user $u$, the elements of $\mathbf{p}_u$ measure the extent of interest the user has in items' corresponding characteristics. These latent factors might measure obvious dimensions as mentioned in those examples or are completely uninterpretable. The predicted ratings can be estimated by
+Soit $\mathbf{R} \in \mathbb{R}^{m \times n}$ la matrice d'interaction avec $m$ utilisateurs et $n$ éléments, et les valeurs de $\mathbf{R}$ représentent les évaluations explicites. L'interaction utilisateur-article sera factorisée en une matrice latente d'utilisateur $\mathbf{P} \in \mathbb{R}^{m \times k}$ et une matrice latente d'article $\mathbf{Q} \in \mathbb{R}^{n \times k}$, où $k \ll m, n$ est la taille du facteur latent. Soit $\mathbf{p}_u$ la ligne $u^\mathrm{th}$ de $\mathbf{P}$ et $\mathbf{q}_i$ la ligne $i^\mathrm{th}$ de $\mathbf{Q}$. Pour un élément donné $i$, les éléments de $\mathbf{q}_i$ mesurent la mesure dans laquelle l'élément possède les caractéristiques telles que les genres et les langues d'un film. Pour un utilisateur donné $u$, les éléments de $\mathbf{p}_u$ mesurent le degré d'intérêt de l'utilisateur pour les caractéristiques correspondantes des articles. Ces facteurs latents peuvent mesurer des dimensions évidentes comme celles mentionnées dans ces exemples ou être complètement ininterprétables. Les évaluations prédites peuvent être estimées par
 
-$$\hat{\mathbf{R}} = \mathbf{PQ}^\top$$
+$$\hat{\mathbf{R}} = \mathbf{PQ}^\top$$ 
 
-where $\hat{\mathbf{R}}\in \mathbb{R}^{m \times n}$ is the predicted rating matrix which has the same shape as $\mathbf{R}$. One major problem of this prediction rule is that users/items biases can not be modeled. For example, some users tend to give higher ratings or some items always get lower ratings due to poorer quality. These biases are commonplace in real-world applications. To capture these biases, user specific and item specific bias terms are introduced. Specifically, the predicted rating user $u$ gives to item $i$ is calculated by
+ où $\hat{\mathbf{R}}\in \mathbb{R}^{m \times n}$ est la matrice des évaluations prédites qui a la même forme que $\mathbf{R}$. Un problème majeur de cette règle de prédiction est que les biais des utilisateurs et des articles ne peuvent pas être modélisés. Par exemple, certains utilisateurs ont tendance à donner des notes plus élevées ou certains articles obtiennent toujours des notes plus basses en raison de leur qualité inférieure. Ces biais sont courants dans les applications du monde réel. Pour capturer ces biais, des termes de biais spécifiques aux utilisateurs et aux éléments sont introduits. Plus précisément, l'évaluation prédite que l'utilisateur $u$ donne à l'élément $i$ est calculée comme suit
 
 $$
 \hat{\mathbf{R}}_{ui} = \mathbf{p}_u\mathbf{q}^\top_i + b_u + b_i
 $$
 
-Then, we train the matrix factorization model by minimizing the mean squared error between predicted rating scores and real rating scores.  The objective function is defined as follows:
+Ensuite, nous entraînons le modèle de factorisation matricielle en minimisant l'erreur quadratique moyenne entre les notes prédites et les notes réelles.  La fonction objectif est définie comme suit :
 
 $$
 \underset{\mathbf{P}, \mathbf{Q}, b}{\mathrm{argmin}} \sum_{(u, i) \in \mathcal{K}} \| \mathbf{R}_{ui} -
@@ -27,15 +27,15 @@ $$
 \|^2_F + b_u^2 + b_i^2 )
 $$
 
-where $\lambda$ denotes the regularization rate. The regularizing term $\lambda (\| \mathbf{P} \|^2_F + \| \mathbf{Q}
-\|^2_F + b_u^2 + b_i^2 )$ is used to avoid over-fitting by penalizing the magnitude of the parameters. The $(u, i)$ pairs for which $\mathbf{R}_{ui}$ is known are stored in the set
-$\mathcal{K}=\{(u, i) \mid \mathbf{R}_{ui} \text{ is known}\}$. The model parameters can be learned with an optimization algorithm, such as Stochastic Gradient Descent and Adam.
+où $\lambda$ désigne le taux de régularisation. Le terme de régularisation $\lambda (\| \mathbf{P} \|^2_F + \| \mathbf{Q}
+\|^2_F + b_u^2 + b_i^2 )$ est utilisé pour éviter le surajustement en pénalisant l'amplitude des paramètres. Les paires $(u, i)$ pour lesquelles $\mathbf{R}_{ui}$ est connu sont stockées dans l'ensemble
+$\mathcal{K}=\{(u, i) \mid \mathbf{R}_{ui} \text{ is known}\}$ . Les paramètres du modèle peuvent être appris à l'aide d'un algorithme d'optimisation, tel que la descente de gradient stochastique et Adam.
 
-An intuitive illustration of the matrix factorization model is shown below:
+Une illustration intuitive du modèle de factorisation matricielle est présentée ci-dessous :
 
-![Illustration of matrix factorization model](../img/rec-mf.svg)
+![Illustration of matrix factorization model](../img/rec-mf.svg) 
 
-In the rest of this section, we will explain the implementation of matrix factorization and train the model on the MovieLens dataset.
+ Dans le reste de cette section, nous allons expliquer la mise en œuvre de la factorisation matricielle et entraîner le modèle sur le jeu de données MovieLens.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -46,9 +46,9 @@ import mxnet as mx
 npx.set_np()
 ```
 
-## Model Implementation
+## Mise en œuvre du modèle
 
-First, we implement the matrix factorization model described above. The user and item latent factors can be created with the `nn.Embedding`. The `input_dim` is the number of items/users and the (`output_dim`) is the dimension of the latent factors ($k$).  We can also use `nn.Embedding` to create the user/item biases by setting the `output_dim` to one. In the `forward` function, user and item ids are used to look up the embeddings.
+Tout d'abord, nous mettons en œuvre le modèle de factorisation matricielle décrit ci-dessus. Les facteurs latents des utilisateurs et des éléments peuvent être créés à l'aide de `nn.Embedding`. `input_dim` est le nombre d'éléments/utilisateurs et (`output_dim`) est la dimension des facteurs latents ($k$).  Nous pouvons également utiliser `nn.Embedding` pour créer les biais utilisateur/item en fixant la valeur de `output_dim` à un. Dans la fonction `forward`, les identifiants des utilisateurs et des articles sont utilisés pour rechercher les embeddings.
 
 ```{.python .input  n=4}
 #@tab mxnet
@@ -69,15 +69,15 @@ class MF(nn.Block):
         return outputs.flatten()
 ```
 
-## Evaluation Measures
+### Mesures d'évaluation
 
-We then implement the RMSE (root-mean-square error) measure, which is commonly used to measure the differences between rating scores predicted by the model and the actually observed ratings (ground truth) :cite:`Gunawardana.Shani.2015`. RMSE is defined as:
+Nous implémentons ensuite la mesure RMSE (root-mean-square error), qui est couramment utilisée pour mesurer les différences entre les notes prédites par le modèle et les notes réellement observées (vérité terrain) :cite:`Gunawardana.Shani.2015` . La RMSE est définie comme suit
 
 $$
 \mathrm{RMSE} = \sqrt{\frac{1}{|\mathcal{T}|}\sum_{(u, i) \in \mathcal{T}}(\mathbf{R}_{ui} -\hat{\mathbf{R}}_{ui})^2}
 $$
 
-where $\mathcal{T}$ is the set consisting of pairs of users and items that you want to evaluate on. $|\mathcal{T}|$ is the size of this set. We can use the RMSE function provided by `mx.metric`.
+où $\mathcal{T}$ est l'ensemble constitué de paires d'utilisateurs et d'éléments que vous souhaitez évaluer. $|\mathcal{T}|$ est la taille de cet ensemble. Nous pouvons utiliser la fonction RMSE fournie par `mx.metric`.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -94,10 +94,10 @@ def evaluator(net, test_iter, devices):
     return float(np.mean(np.array(rmse_list)))
 ```
 
-## Training and Evaluating the Model
+## Formation et évaluation du modèle
 
 
-In the training function, we adopt the $\ell_2$ loss with weight decay. The weight decay mechanism has the same effect as the $\ell_2$ regularization.
+ Dans la fonction de formation, nous adoptons la perte $\ell_2$ avec décroissance du poids. Le mécanisme de décroissance du poids a le même effet que la régularisation $\ell_2$.
 
 ```{.python .input  n=4}
 #@tab mxnet
@@ -139,7 +139,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
           f'on {str(devices)}')
 ```
 
-Finally, let's put all things together and train the model. Here, we set the latent factor dimension to 30.
+Enfin, rassemblons tous les éléments et entraînons le modèle. Ici, nous fixons la dimension du facteur latent à 30.
 
 ```{.python .input  n=5}
 #@tab mxnet
@@ -156,7 +156,7 @@ train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                     devices, evaluator)
 ```
 
-Below, we use the trained model to predict the rating that a user (ID 20) might give to an item (ID 30).
+Ci-dessous, nous utilisons le modèle entraîné pour prédire la note qu'un utilisateur (ID 20) pourrait donner à un élément (ID 30).
 
 ```{.python .input  n=6}
 #@tab mxnet
@@ -165,17 +165,17 @@ scores = net(np.array([20], dtype='int', ctx=devices[0]),
 scores
 ```
 
-## Summary
+## Résumé
 
-* The matrix factorization model is widely used in recommender systems.  It can be used to predict ratings that a user might give to an item.
-* We can implement and train matrix factorization for recommender systems.
+* Le modèle de factorisation matricielle est largement utilisé dans les systèmes de recommandation.  Il peut être utilisé pour prédire les notes qu'un utilisateur pourrait donner à un article.
+* Nous pouvons implémenter et entraîner la factorisation matricielle pour les systèmes de recommandation.
 
 
-## Exercises
+## Exercices
 
-* Vary the size of latent factors. How does the size of latent factors influence the model performance?
-* Try different optimizers, learning rates, and weight decay rates.
-* Check the predicted rating scores of other users for a specific movie.
+* Faites varier la taille des facteurs latents. Comment la taille des facteurs latents influence-t-elle la performance du modèle ?
+* Essayez différents optimiseurs, taux d'apprentissage et taux de décroissance des poids.
+* Vérifiez les notes prédites par les autres utilisateurs pour un film spécifique.
 
 
 :begin_tab:`mxnet`

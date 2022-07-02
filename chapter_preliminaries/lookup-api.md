@@ -4,37 +4,37 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
 # Documentation
-:begin_tab:`mxnet`
-While we cannot possibly introduce every single MXNet function and class 
-(and the information might become outdated quickly), 
-the [API documentation](https://mxnet.apache.org/versions/1.8.0/api) 
-and additional [tutorials](https://mxnet.apache.org/versions/1.8.0/api/python/docs/tutorials/) and examples 
-provide such documentation. 
-This section provides some guidance for how to explore the MXNet API.
+:begin_tab:`mxnet` 
+ Bien que nous ne puissions pas présenter chaque fonction et classe MXNet 
+(et les informations pourraient devenir rapidement obsolètes), 
+le [API documentation](https://mxnet.apache.org/versions/1.8.0/api) 
+ et des [tutorials](https://mxnet.apache.org/versions/1.8.0/api/python/docs/tutorials/) et exemples supplémentaires 
+fournissent une telle documentation. 
+Cette section fournit des conseils sur la manière d'explorer l'API MXNet.
 :end_tab:
 
 :begin_tab:`pytorch`
-While we cannot possibly introduce every single PyTorch function and class 
-(and the information might become outdated quickly), 
-the [API documentation](https://pytorch.org/docs/stable/index.html) and additional [tutorials](https://pytorch.org/tutorials/beginner/basics/intro.html) and examples 
-provide such documentation.
-This section provides some guidance for how to explore the PyTorch API.
+Bien qu'il ne soit pas possible de présenter toutes les fonctions et classes de PyTorch 
+(les informations risquent d'être rapidement dépassées), 
+, [API documentation](https://pytorch.org/docs/stable/index.html), [tutorials](https://pytorch.org/tutorials/beginner/basics/intro.html) et des exemples supplémentaires 
+fournissent une telle documentation.
+Cette section fournit quelques conseils sur la façon d'explorer l'API de PyTorch.
 :end_tab:
 
 :begin_tab:`tensorflow`
-While we cannot possibly introduce every single TensorFlow function and class 
-(and the information might become outdated quickly), 
-the [API documentation](https://www.tensorflow.org/api_docs) and additional [tutorials](https://www.tensorflow.org/tutorials) and examples 
-provide such documentation. 
-This section provides some guidance for how to explore the TensorFlow API.
+Bien qu'il ne soit pas possible de présenter chaque fonction et classe TensorFlow 
+(les informations risquent d'être rapidement dépassées), 
+, [API documentation](https://www.tensorflow.org/api_docs), [tutorials](https://www.tensorflow.org/tutorials) et les exemples 
+fournissent une telle documentation. 
+Cette section fournit quelques conseils sur la façon d'explorer l'API TensorFlow.
 :end_tab:
 
 
-## Functions and Classes in a Module
+## Fonctions et classes dans un module
 
-In order to know which functions and classes can be called in a module,
-we invoke the `dir` function. For instance, we can
-(**query all properties in the module for generating random numbers**):
+Afin de savoir quelles fonctions et classes peuvent être appelées dans un module,
+nous invoquons la fonction `dir`. Par exemple, nous pouvons
+(**interroger toutes les propriétés du module de génération de nombres aléatoires**) :
 
 ```{.python .input  n=1}
 %%tab mxnet
@@ -54,19 +54,19 @@ import tensorflow as tf
 print(dir(tf.random))
 ```
 
-Generally, we can ignore functions that start and end with `__` (special objects in Python) 
-or functions that start with a single `_`(usually internal functions). 
-Based on the remaining function or attribute names, 
-we might hazard a guess that this module offers 
-various methods for generating random numbers, 
-including sampling from the uniform distribution (`uniform`), 
-normal distribution (`normal`), and multinomial distribution (`multinomial`).
+En général, nous pouvons ignorer les fonctions qui commencent et se terminent par `__` (objets spéciaux en Python) 
+ou les fonctions qui commencent par un seul `_`(généralement des fonctions internes). 
+D'après les noms de fonctions ou d'attributs restants, 
+nous pouvons supposer que ce module offre 
+diverses méthodes pour générer des nombres aléatoires, 
+y compris l'échantillonnage à partir de la distribution uniforme (`uniform`), 
+la distribution normale (`normal`), et la distribution multinomiale (`multinomial`).
 
-## Specific Functions and Classes
+## Fonctions et classes spécifiques
 
-For more specific instructions on how to use a given function or class,
-we can invoke the  `help` function. As an example, let's
-[**explore the usage instructions for tensors' `ones` function**].
+Pour obtenir des instructions plus spécifiques sur la manière d'utiliser une fonction ou une classe donnée,
+nous pouvons invoquer la fonction `help`. À titre d'exemple, nous allons
+[**explorer les instructions d'utilisation de la fonction `ones` des tenseurs**].
 
 ```{.python .input}
 %%tab mxnet
@@ -83,11 +83,11 @@ help(torch.ones)
 help(tf.ones)
 ```
 
-From the documentation, we can see that the `ones` function 
-creates a new tensor with the specified shape 
-and sets all the elements to the value of 1. 
-Whenever possible, you should (**run a quick test**) 
-to confirm your interpretation:
+D'après la documentation, nous pouvons voir que la fonction `ones` 
+ crée un nouveau tenseur avec la forme spécifiée 
+et attribue la valeur 1 à tous les éléments. 
+Dans la mesure du possible, vous devriez (**exécuter un test rapide**) 
+pour confirmer votre interprétation :
 
 ```{.python .input}
 %%tab mxnet
@@ -104,21 +104,21 @@ torch.ones(4)
 tf.ones(4)
 ```
 
-In the Jupyter notebook, we can use `?` to display the document in another
-window. For example, `list?` will create content
-that is almost identical to `help(list)`,
-displaying it in a new browser window.
-In addition, if we use two question marks, such as `list??`,
-the Python code implementing the function will also be displayed.
+Dans le carnet Jupyter, nous pouvons utiliser `?` pour afficher le document dans une autre fenêtre
+. Par exemple, `list?` créera un contenu
+qui est presque identique à `help(list)`,
+l'affichant dans une nouvelle fenêtre du navigateur.
+En outre, si nous utilisons deux points d'interrogation, comme `list??`,
+, le code Python implémentant la fonction sera également affiché.
 
-The official documentation provides plenty of descriptions and examples that are beyond this book. 
-Our emphasis lies on covering important use cases 
-that will allow you to get started quickly with practical problems, 
-rather than completeness of coverage. 
-We also encourage you to study the source code of the libraries 
-to see examples of high quality implementations for production code. 
-By doing this you will become a better engineer 
-in addition to becoming a better scientist.
+La documentation officielle fournit de nombreuses descriptions et exemples qui dépassent le cadre de cet ouvrage. 
+Nous mettons l'accent sur la couverture des cas d'utilisation importants 
+qui vous permettront de vous lancer rapidement dans des problèmes pratiques, 
+plutôt que sur l'exhaustivité de la couverture. 
+Nous vous encourageons également à étudier le code source des bibliothèques 
+pour voir des exemples d'implémentations de haute qualité pour le code de production. 
+En faisant cela, vous deviendrez un meilleur ingénieur 
+en plus de devenir un meilleur scientifique.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/38)

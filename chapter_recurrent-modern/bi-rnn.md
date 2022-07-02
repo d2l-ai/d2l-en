@@ -1,53 +1,53 @@
-# Bidirectional Recurrent Neural Networks
-:label:`sec_bi_rnn`
+# Réseaux neuronaux récurrents bidirectionnels
+:label:`sec_bi_rnn` 
 
-In sequence learning,
-so far we assumed that our goal is to model the next output given what we have seen so far, e.g., in the context of a time series or in the context of a language model. While this is a typical scenario, it is not the only one we might encounter. To illustrate the issue, consider the following three tasks of filling in the blank in a text sequence:
+ Dans l'apprentissage séquentiel,
+nous avons supposé jusqu'à présent que notre objectif était de modéliser la sortie suivante en fonction de ce que nous avons vu jusqu'à présent, par exemple dans le contexte d'une série temporelle ou d'un modèle de langage. Bien que ce soit un scénario typique, ce n'est pas le seul que nous pouvons rencontrer. Pour illustrer le problème, considérons les trois tâches suivantes consistant à remplir les blancs dans une séquence de texte :
 
-* I am `___`.
-* I am `___` hungry.
-* I am `___` hungry, and I can eat half a pig.
+* Je suis `___`.
+* Je suis `___` affamé.
+* Je suis `___` affamé, et je peux manger la moitié d'un cochon.
 
-Depending on the amount of information available, we might fill in the blanks with very different words such as "happy", "not", and "very".
-Clearly the end of the phrase (if available) conveys significant information about which word to pick.
-A sequence model that is incapable of taking advantage of this will perform poorly on related tasks.
-For instance, to do well in named entity recognition (e.g., to recognize whether "Green" refers to "Mr. Green" or to the color)
-longer-range context is equally vital.
-To get some inspiration for addressing the problem let's take a detour to probabilistic graphical models.
+Selon la quantité d'informations disponibles, nous pourrions remplir les blancs avec des mots très différents tels que "heureux", "pas" et "très".
+Il est clair que la fin de la phrase (si elle est disponible) transmet des informations importantes sur le mot à choisir.
+Un modèle de séquence incapable d'en tirer parti aura des performances médiocres dans les tâches connexes.
+Par exemple, pour obtenir de bons résultats dans la reconnaissance d'entités nommées (par exemple, pour reconnaître si "vert" fait référence à "M. Vert" ou à la couleur)
+le contexte à plus longue portée est tout aussi vital.
+Afin de nous inspirer pour aborder ce problème, faisons un détour par les modèles graphiques probabilistes.
 
 
-## Dynamic Programming in Hidden Markov Models
+## Programmation dynamique dans les modèles de Markov cachés
 
-This subsection serves to illustrate the dynamic programming problem. The specific technical details do not matter for understanding the deep learning models
-but they help in motivating why one might use deep learning and why one might pick specific architectures.
+Cette sous-section sert à illustrer le problème de la programmation dynamique. Les détails techniques spécifiques n'ont pas d'importance pour la compréhension des modèles d'apprentissage profond
+mais ils aident à motiver l'utilisation de l'apprentissage profond et le choix d'architectures spécifiques.
 
-If we want to solve the problem using probabilistic graphical models we could for instance design a latent variable model as follows.
-At any time step $t$,
-we assume that there exists some latent variable $h_t$ that governs our observed emission $x_t$ via $P(x_t \mid h_t)$.
-Moreover, any transition $h_t \to h_{t+1}$ is given by some state transition probability $P(h_{t+1} \mid h_{t})$. This probabilistic graphical model is then a *hidden Markov model*  as in :numref:`fig_hmm`.
+Si nous voulons résoudre le problème à l'aide de modèles graphiques probabilistes, nous pourrions par exemple concevoir un modèle à variables latentes comme suit.
+À chaque pas de temps $t$,
+nous supposons qu'il existe une variable latente $h_t$ qui régit notre émission observée $x_t$ via $P(x_t \mid h_t)$.
+De plus, toute transition $h_t \to h_{t+1}$ est donnée par une certaine probabilité de transition d'état $P(h_{t+1} \mid h_{t})$. Ce modèle graphique probabiliste est alors un *modèle de Markov caché* comme dans :numref:`fig_hmm` .
 
 ![A hidden Markov model.](../img/hmm.svg)
 :label:`fig_hmm`
 
-Thus,
-for a sequence of $T$ observations we have the following joint probability distribution over the observed and hidden states:
+Ainsi,
+pour une séquence d'observations $T$, nous avons la distribution de probabilité conjointe suivante sur les états observés et cachés :
 
-$$P(x_1, \ldots, x_T, h_1, \ldots, h_T) = \prod_{t=1}^T P(h_t \mid h_{t-1}) P(x_t \mid h_t), \text{ where } P(h_1 \mid h_0) = P(h_1).$$
-:eqlabel:`eq_hmm_jointP`
+$$P(x_1, \ldots, x_T, h_1, \ldots, h_T) = \prod_{t=1}^T P(h_t \mid h_{t-1}) P(x_t \mid h_t), \text{ where } P(h_1 \mid h_0) = P(h_1).$$ 
+ :eqlabel:`eq_hmm_jointP` 
 
+ 
+ Supposons maintenant que nous observons tous les $x_i$ à l'exception de certains $x_j$ et que notre objectif est de calculer $P(x_j \mid x_{-j})$, où $x_{-j} = (x_1, \ldots, x_{j-1}, x_{j+1}, \ldots, x_{T})$.
+Puisqu'il n'y a pas de variable latente
+dans $P(x_j \mid x_{-j})$,
+nous envisageons d'additionner sur
+toutes les combinaisons possibles de choix pour $h_1, \ldots, h_T$.
+Dans le cas où toute $h_i$ peut prendre $k$ valeurs distinctes (un nombre fini d'états), cela signifie que nous devons faire la somme de $k^T$ termes----mission généralement impossible ! Heureusement, il existe une solution élégante à ce problème : la *programmation dynamique*.
 
-Now assume that we observe all $x_i$ with the exception of some $x_j$ and it is our goal to compute $P(x_j \mid x_{-j})$, where $x_{-j} = (x_1, \ldots, x_{j-1}, x_{j+1}, \ldots, x_{T})$.
-Since there is no latent variable
-in $P(x_j \mid x_{-j})$,
-we consider summing over
-all the possible combinations of choices for $h_1, \ldots, h_T$.
-In case any $h_i$ can take on $k$ distinct values (a finite number of states), this means that we need to sum over $k^T$ terms---usually mission impossible! Fortunately there is an elegant solution for this: *dynamic programming*.
-
-To see how it works,
-consider summing over latent variables
-$h_1, \ldots, h_T$ in turn.
-According to :eqref:`eq_hmm_jointP`,
-this yields:
+Pour voir comment cela fonctionne,
+envisagez de faire la somme des variables latentes
+$h_1, \ldots, h_T$ à tour de rôle.
+D'après :eqref:`eq_hmm_jointP` ,
+cela donne :
 
 $$\begin{aligned}
     &P(x_1, \ldots, x_T) \\
@@ -61,15 +61,15 @@ $$\begin{aligned}
     =& \sum_{h_T} \pi_T(h_T) P(x_T \mid h_T).
 \end{aligned}$$
 
-In general we have the *forward recursion* as
+En général, nous avons la *récursion avant* comme
 
-$$\pi_{t+1}(h_{t+1}) = \sum_{h_t} \pi_t(h_t) P(x_t \mid h_t) P(h_{t+1} \mid h_t).$$
+$$\pi_{t+1}(h_{t+1}) = \sum_{h_t} \pi_t(h_t) P(x_t \mid h_t) P(h_{t+1} \mid h_t).$$ 
 
-The recursion is initialized as $\pi_1(h_1) = P(h_1)$. In abstract terms this can be written as $\pi_{t+1} = f(\pi_t, x_t)$, where $f$ is some learnable function. This looks very much like the update equation in the latent variable models we discussed so far in the context of RNNs!
+ La récursion est initialisée comme $\pi_1(h_1) = P(h_1)$. En termes abstraits, on peut l'écrire sous la forme $\pi_{t+1} = f(\pi_t, x_t)$, où $f$ est une fonction apprenable. Cela ressemble beaucoup à l'équation de mise à jour des modèles à variables latentes dont nous avons parlé jusqu'à présent dans le contexte des RNN !
 
-Entirely analogously to the forward recursion,
-we can also
-sum over the same set of latent variables with a backward recursion. This yields:
+De manière tout à fait analogue à la récursion avant,
+, nous pouvons également
+faire la somme sur le même ensemble de variables latentes avec une récursion arrière. Cela donne :
 
 $$\begin{aligned}
     & P(x_1, \ldots, x_T) \\
@@ -84,50 +84,50 @@ $$\begin{aligned}
 \end{aligned}$$
 
 
-We can thus write the *backward recursion* as
+Nous pouvons donc écrire la *récursion arrière* comme suit :
 
-$$\rho_{t-1}(h_{t-1})= \sum_{h_{t}} P(h_{t} \mid h_{t-1}) P(x_{t} \mid h_{t}) \rho_{t}(h_{t}),$$
+$$\rho_{t-1}(h_{t-1})= \sum_{h_{t}} P(h_{t} \mid h_{t-1}) P(x_{t} \mid h_{t}) \rho_{t}(h_{t}),$$ 
 
-with initialization $\rho_T(h_T) = 1$.
-Both the forward and backward recursions allow us to sum over $T$ latent variables in $\mathcal{O}(kT)$ (linear) time over all values of $(h_1, \ldots, h_T)$ rather than in exponential time.
-This is one of the great benefits of the probabilistic inference with graphical models.
-It is
-also a very special instance of
-a general message passing algorithm :cite:`Aji.McEliece.2000`.
-Combining both forward and backward recursions, we are able to compute
+ avec initialisation $\rho_T(h_T) = 1$.
+Les récursions avant et arrière nous permettent de faire la somme des variables latentes $T$ en temps (linéaire) $\mathcal{O}(kT)$ sur toutes les valeurs de $(h_1, \ldots, h_T)$ plutôt qu'en temps exponentiel.
+C'est l'un des grands avantages de l'inférence probabiliste avec les modèles graphiques.
+C'est
+également une instance très spéciale de
+un algorithme général de passage de messages :cite:`Aji.McEliece.2000` .
+En combinant les récursions avant et arrière, nous sommes en mesure de calculer
 
-$$P(x_j \mid x_{-j}) \propto \sum_{h_j} \pi_j(h_j) \rho_j(h_j) P(x_j \mid h_j).$$
+$$P(x_j \mid x_{-j}) \propto \sum_{h_j} \pi_j(h_j) \rho_j(h_j) P(x_j \mid h_j).$$ 
 
-Note that in abstract terms the backward recursion can be written as $\rho_{t-1} = g(\rho_t, x_t)$, where $g$ is a learnable function. Again, this looks very much like an update equation, just running backwards unlike what we have seen so far in RNNs. Indeed, hidden Markov models benefit from knowing future data when it is available. Signal processing scientists distinguish between the two cases of knowing and not knowing future observations as interpolation v.s. extrapolation.
-See the introductory chapter of the book on sequential Monte Carlo algorithms for more details :cite:`Doucet.De-Freitas.Gordon.2001`.
+ Notez qu'en termes abstraits, la récursion arrière peut être écrite sous la forme $\rho_{t-1} = g(\rho_t, x_t)$, où $g$ est une fonction apprenable. Encore une fois, cela ressemble beaucoup à une équation de mise à jour, mais avec un retour en arrière, contrairement à ce que nous avons vu jusqu'à présent dans les RNN. En effet, les modèles de Markov cachés bénéficient de la connaissance des données futures lorsqu'elles sont disponibles. Les scientifiques spécialisés dans le traitement des signaux font la distinction entre les deux cas de connaissance et d'ignorance des observations futures : interpolation et extrapolation.
+Voir le chapitre d'introduction du livre sur les algorithmes séquentiels de Monte Carlo pour plus de détails :cite:`Doucet.De-Freitas.Gordon.2001` .
 
 
-## Bidirectional Model
+## Modèle bidirectionnel
 
-If we want to have a mechanism in RNNs that offers comparable look-ahead ability as in hidden Markov models, we need to modify the RNN design that we have seen so far. Fortunately, this is easy conceptually. Instead of running an RNN only in the forward mode starting from the first token, we start another one from the last token running from back to front.
-*Bidirectional RNNs* add a hidden layer that passes information in a backward direction to more flexibly process such information. :numref:`fig_birnn` illustrates the architecture of a bidirectional RNN with a single hidden layer.
+Si nous voulons disposer d'un mécanisme dans les RNN qui offre une capacité d'anticipation comparable à celle des modèles de Markov cachés, nous devons modifier la conception des RNN que nous avons vue jusqu'à présent. Heureusement, cela est facile d'un point de vue conceptuel. Au lieu d'exécuter un RNN uniquement en mode avant à partir du premier jeton, nous en lançons un autre à partir du dernier jeton, de l'arrière vers l'avant.
+*Les RNN bidirectionnels* ajoutent une couche cachée qui transmet les informations dans le sens inverse afin de traiter ces informations de manière plus flexible. :numref:`fig_birnn` illustre l'architecture d'un RNN bidirectionnel avec une seule couche cachée.
 
 ![Architecture of a bidirectional RNN.](../img/birnn.svg)
 :label:`fig_birnn`
 
-In fact, this is not too dissimilar to the forward and backward recursions in the dynamic programing of hidden Markov models.
-The main distinction is that in the previous case these equations had a specific statistical meaning.
-Now they are devoid of such easily accessible interpretations and we can just treat them as
-generic and learnable functions.
-This transition epitomizes many of the principles guiding the design of modern deep networks: first, use the type of functional dependencies of classical statistical models, and then parameterize them in a generic form.
+En fait, cela n'est pas très différent des récursions avant et arrière dans la programmation dynamique des modèles de Markov cachés.
+La principale distinction est que dans le cas précédent, ces équations avaient une signification statistique spécifique.
+Aujourd'hui, elles sont dépourvues de telles interprétations facilement accessibles et nous pouvons simplement les traiter comme des fonctions génériques et apprenables
+.
+Cette transition incarne bon nombre des principes qui guident la conception des réseaux profonds modernes : d'abord, utiliser le type de dépendances fonctionnelles des modèles statistiques classiques, puis les paramétrer sous une forme générique.
 
 
-### Definition
+#### Définition
 
-Bidirectional RNNs were introduced by :cite:`Schuster.Paliwal.1997`.
-For a detailed discussion of the various architectures see also the paper :cite:`Graves.Schmidhuber.2005`.
-Let's look at the specifics of such a network.
+Les RNN bidirectionnels ont été introduits par :cite:`Schuster.Paliwal.1997` .
+Pour une discussion détaillée des différentes architectures, voir également l'article :cite:`Graves.Schmidhuber.2005` .
+Examinons les spécificités d'un tel réseau.
 
 
-For any time step $t$,
-given a minibatch input $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs in each example: $d$) and let the hidden layer activation function be $\phi$. In the bidirectional architecture, we assume that the forward and backward hidden states for this time step are $\overrightarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$ and $\overleftarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$, respectively,
-where $h$ is the number of hidden units.
-The forward and backward hidden state updates are as follows:
+Pour n'importe quel pas de temps $t$,
+étant donné une entrée de minibatch $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (nombre d'exemples : $n$, nombre d'entrées dans chaque exemple : $d$) et que la fonction d'activation de la couche cachée est $\phi$. Dans l'architecture bidirectionnelle, nous supposons que les états cachés avant et arrière pour ce pas de temps sont respectivement $\overrightarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$ et $\overleftarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$,
+où $h$ est le nombre d'unités cachées.
+Les mises à jour des états cachés avant et arrière sont les suivantes :
 
 
 $$
@@ -137,35 +137,35 @@ $$
 \end{aligned}
 $$
 
-where the weights $\mathbf{W}_{xh}^{(f)} \in \mathbb{R}^{d \times h}, \mathbf{W}_{hh}^{(f)} \in \mathbb{R}^{h \times h}, \mathbf{W}_{xh}^{(b)} \in \mathbb{R}^{d \times h}, \text{ and } \mathbf{W}_{hh}^{(b)} \in \mathbb{R}^{h \times h}$, and biases $\mathbf{b}_h^{(f)} \in \mathbb{R}^{1 \times h} \text{ and } \mathbf{b}_h^{(b)} \in \mathbb{R}^{1 \times h}$ are all the model parameters.
+où les poids $\mathbf{W}_{xh}^{(f)} \in \mathbb{R}^{d \times h}, \mathbf{W}_{hh}^{(f)} \in \mathbb{R}^{h \times h}, \mathbf{W}_{xh}^{(b)} \in \mathbb{R}^{d \times h}, \text{ and } \mathbf{W}_{hh}^{(b)} \in \mathbb{R}^{h \times h}$, et les biais $\mathbf{b}_h^{(f)} \in \mathbb{R}^{1 \times h} \text{ and } \mathbf{b}_h^{(b)} \in \mathbb{R}^{1 \times h}$ sont tous les paramètres du modèle.
 
-Next, we concatenate the forward and backward hidden states $\overrightarrow{\mathbf{H}}_t$ and $\overleftarrow{\mathbf{H}}_t$
-to obtain the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times 2h}$ to be fed into the output layer.
-In deep bidirectional RNNs with multiple hidden layers,
-such information
-is passed on as *input* to the next bidirectional layer. Last, the output layer computes the output $\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (number of outputs: $q$):
+Ensuite, nous concaténons les états cachés avant et arrière $\overrightarrow{\mathbf{H}}_t$ et $\overleftarrow{\mathbf{H}}_t$
+ pour obtenir l'état caché $\mathbf{H}_t \in \mathbb{R}^{n \times 2h}$ à introduire dans la couche de sortie.
+Dans les RNN bidirectionnels profonds avec plusieurs couches cachées,
+ces informations
+sont transmises comme *entrée* à la couche bidirectionnelle suivante. Enfin, la couche de sortie calcule la sortie $\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (nombre de sorties : $q$) :
 
-$$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{hq} + \mathbf{b}_q.$$
+$$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{hq} + \mathbf{b}_q.$$ 
 
-Here, the weight matrix $\mathbf{W}_{hq} \in \mathbb{R}^{2h \times q}$ and the bias $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ are the model parameters of the output layer. In fact, the two directions can have different numbers of hidden units.
+ Ici, la matrice de poids $\mathbf{W}_{hq} \in \mathbb{R}^{2h \times q}$ et le biais $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ sont les paramètres du modèle de la couche de sortie. En fait, les deux directions peuvent avoir un nombre différent d'unités cachées.
 
-### Computational Cost and Applications
+### Coût de calcul et applications
 
-One of the key features of a bidirectional RNN is that information from both ends of the sequence is used to estimate the output. That is, we use information from both future and past observations to predict the current one.
-In the case of next token prediction this is not quite what we want.
-After all, we do not have the luxury of knowing the next to next token when predicting the next one. Hence, if we were to use a bidirectional RNN naively we would not get a very good accuracy: during training we have past and future data to estimate the present. During test time we only have past data and thus poor accuracy. We will illustrate this in an experiment below.
+L'une des principales caractéristiques d'un RNN bidirectionnel est que les informations des deux extrémités de la séquence sont utilisées pour estimer la sortie. En d'autres termes, nous utilisons les informations des observations passées et futures pour prédire l'observation actuelle.
+Dans le cas de la prédiction du prochain jeton, ce n'est pas tout à fait ce que nous voulons.
+Après tout, nous n'avons pas le luxe de connaître le jeton suivant pour prédire le suivant. Par conséquent, si nous utilisions naïvement un RNN bidirectionnel, nous n'obtiendrions pas une très bonne précision : pendant la formation, nous disposons de données passées et futures pour estimer le présent. Au moment du test, nous ne disposons que des données passées et la précision est donc médiocre. Nous allons illustrer cela dans une expérience ci-dessous.
 
-To add insult to injury, bidirectional RNNs are also exceedingly slow.
-The main reasons for this are that
-the forward propagation
-requires both forward and backward recursions
-in bidirectional layers
-and that the backpropagation is dependent on the outcomes of the forward propagation. Hence, gradients will have a very long dependency chain.
+Pour ajouter l'insulte à la blessure, les RNN bidirectionnels sont également excessivement lents.
+Les principales raisons en sont que
+la propagation avant
+nécessite des récursions avant et arrière
+dans les couches bidirectionnelles
+et que la rétropropagation dépend des résultats de la propagation avant. Par conséquent, les gradients auront une très longue chaîne de dépendance.
 
-In practice bidirectional layers are used very sparingly and only for a narrow set of applications, such as filling in missing words, annotating tokens (e.g., for named entity recognition), and encoding sequences wholesale as a step in a sequence processing pipeline (e.g., for machine translation).
-In :numref:`sec_bert` and :numref:`sec_sentiment_rnn`,
-we will introduce how to use bidirectional RNNs
-to encode text sequences.
+Dans la pratique, les couches bidirectionnelles sont utilisées très parcimonieusement et uniquement pour un ensemble étroit d'applications, telles que le remplissage de mots manquants, l'annotation de tokens (par exemple, pour la reconnaissance d'entités nommées) et l'encodage de séquences en gros comme étape d'un pipeline de traitement de séquences (par exemple, pour la traduction automatique).
+Dans :numref:`sec_bert` et :numref:`sec_sentiment_rnn` ,
+nous présenterons comment utiliser les RNN bidirectionnels
+pour encoder des séquences de texte.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -195,14 +195,14 @@ import tensorflow as tf
 
 ## (**Training a Bidirectional RNN for a Wrong Application**)
 
-If we were to ignore all advice regarding the fact that bidirectional RNNs use past and future data and simply apply it to language models, we will get estimates with acceptable perplexity. Nonetheless, the ability of the model to predict future tokens is severely compromised as the experiment below illustrates. Despite reasonable perplexity, it only generates gibberish even after many iterations. We include the code below as a cautionary example against using them in the wrong context.
+Si nous devions ignorer tous les conseils concernant le fait que les RNN bidirectionnels utilisent des données passées et futures et les appliquer simplement aux modèles de langage, nous obtiendrions des estimations avec une perplexité acceptable. Néanmoins, la capacité du modèle à prédire les tokens futurs est gravement compromise, comme l'illustre l'expérience ci-dessous. Malgré une perplexité raisonnable, il ne génère que du charabia, même après de nombreuses itérations. Nous incluons le code ci-dessous à titre d'exemple pour éviter de l'utiliser dans un mauvais contexte.
 
 
-### Implementation from Scratch
+### Implémentation à partir de zéro
 
-To implement a bidirectional RNN from scratch, we can
-include two unidirectional `RNNScratch` instances
-with separate learnable parameters.
+Pour implémenter un RNN bidirectionnel à partir de zéro, nous pouvons
+inclure deux instances `RNNScratch` unidirectionnelles
+avec des paramètres apprenables séparés.
 
 ```{.python .input}
 %%tab all
@@ -215,9 +215,9 @@ class BiRNNScratch(d2l.Module):
         self.num_hiddens *= 2  # The output dimension will be doubled
 ```
 
-States of forward and backward RNNs
-are updated separately,
-while outputs of these two RNNs are concatenated.
+Les états des RNN avant et arrière
+sont mis à jour séparément,
+tandis que les sorties de ces deux RNN sont concaténées.
 
 ```{.python .input}
 %%tab all
@@ -230,8 +230,8 @@ def forward(self, inputs, Hs=None):
     return outputs, (f_H, b_H)
 ```
 
-The training procedure is the same
-as in :numref:`sec_rnn-scratch`.
+La procédure d'apprentissage est la même
+que dans :numref:`sec_rnn-scratch` .
 
 ```{.python .input}
 %%tab all
@@ -248,11 +248,11 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-### Concise Implementation
+### Mise en œuvre concise
 
-Using the high-level APIs,
-we can implement bidirectional RNNs more concisely.
-Here we take a GRU model as an example.
+En utilisant les API de haut niveau,
+nous pouvons mettre en œuvre les RNN bidirectionnels de manière plus concise.
+Nous prenons ici un modèle GRU comme exemple.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -283,24 +283,24 @@ trainer.fit(model, data)
 model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 
-The output is clearly unsatisfactory for the reasons described above.
-For a
-discussion of more effective uses of bidirectional RNNs, please see the sentiment
-analysis application
-in :numref:`sec_sentiment_rnn`.
+Le résultat est clairement insatisfaisant pour les raisons décrites ci-dessus.
+Pour une discussion sur
+des utilisations plus efficaces des RNN bidirectionnels, veuillez consulter l'application d'analyse de sentiments
 
-## Summary
+ dans :numref:`sec_sentiment_rnn` .
 
-* In bidirectional RNNs, the hidden state for each time step is simultaneously determined by the data prior to and after the current time step.
-* Bidirectional RNNs bear a striking resemblance with the forward-backward algorithm in probabilistic graphical models.
-* Bidirectional RNNs are mostly useful for sequence encoding and the estimation of observations given bidirectional context.
-* Bidirectional RNNs are very costly to train due to long gradient chains.
+## Résumé
 
-## Exercises
+* Dans les RNN bidirectionnels, l'état caché pour chaque pas de temps est déterminé simultanément par les données antérieures et postérieures au pas de temps actuel.
+* Les RNN bidirectionnels ont une ressemblance frappante avec l'algorithme forward-backward des modèles graphiques probabilistes.
+* Les RNN bidirectionnels sont surtout utiles pour le codage de séquences et l'estimation d'observations dans un contexte bidirectionnel.
+* Les RNN bidirectionnels sont très coûteux à entraîner en raison des longues chaînes de gradient.
 
-1. If the different directions use a different number of hidden units, how will the shape of $\mathbf{H}_t$ change?
-1. Design a bidirectional RNN with multiple hidden layers.
-1. Polysemy is common in natural languages. For example, the word "bank" has different meanings in contexts “i went to the bank to deposit cash” and “i went to the bank to sit down”. How can we design a neural network model such that given a context sequence and a word, a vector representation of the word in the context will be returned? What type of neural architectures is preferred for handling polysemy?
+## Exercices
+
+1. Si les différentes directions utilisent un nombre différent d'unités cachées, comment la forme de $\mathbf{H}_t$ changera-t-elle ?
+1. Concevez un RNN bidirectionnel avec plusieurs couches cachées.
+1. La polysémie est courante dans les langues naturelles. Par exemple, le mot "banque" a des significations différentes dans les contextes "je suis allé à la banque pour déposer de l'argent" et "je suis allé à la banque pour m'asseoir". Comment concevoir un modèle de réseau neuronal tel que, étant donné une séquence de contexte et un mot, une représentation vectorielle du mot dans le contexte sera renvoyée ? Quel type d'architectures neuronales est préférable pour traiter la polysémie ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/339)

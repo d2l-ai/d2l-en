@@ -1,142 +1,142 @@
-# Recurrent Neural Networks
-:label:`chap_rnn`
+# Réseaux neuronaux récurrents
+:label:`chap_rnn` 
 
-Up until now, we have focused primarily on fixed-length data.
-When introducing linear and logistic regression 
-in :numref:`chap_linear` and :numref:`chap_classification`
-and multilayer perceptrons in :numref:`chap_perceptrons`,
-we were happy to assume that each feature vector $\mathbf{x}_i$
-consisted of a fixed number of components $x_1, \dots, x_d$, 
-where each numerical feature $x_j$
-corresponded to a particular attribute. 
-These datasets are sometimes called *tabular*,
-because they can be arranged in tables, 
-where each example $i$ gets its own row,
-and each attribute gets its own column. 
-Crucially, with tabular data, we seldom 
-assume any particular structure over the columns. 
+ Jusqu'à présent, nous nous sommes principalement concentrés sur les données de longueur fixe.
+Lors de l'introduction de la régression linéaire et logistique 
+dans :numref:`chap_linear` et :numref:`chap_classification` 
+ et des perceptrons multicouches dans :numref:`chap_perceptrons` ,
+nous nous sommes contentés de supposer que chaque vecteur de caractéristiques $\mathbf{x}_i$
+ était constitué d'un nombre fixe de composantes $x_1, \dots, x_d$, 
+où chaque caractéristique numérique $x_j$
+ correspondait à un attribut particulier. 
+Ces ensembles de données sont parfois appelés *tabulaires*,
+car ils peuvent être organisés en tableaux, 
+où chaque exemple $i$ a sa propre ligne,
+et chaque attribut sa propre colonne. 
+Il est important de noter qu'avec les données tabulaires, nous supposons rarement 
+une structure particulière sur les colonnes. 
 
-Subsequently, in :numref:`chap_cnn`, 
-we moved on to image data, where inputs consist 
-of the raw pixel values at each coordinate in an image. 
-Image data hardly fit the bill 
-of a protypical tabular dataset. 
-There, we needed to call upon convolutional neural networks (CNNs)
-to handle the hierarchical structure and invariances.
-However, our data were still of fixed length.
-Every Fashion-MNIST image is represented 
-as a $28 \times 28$ grid of pixel values.
-Moreover, our goal was to develop a model
-that looked at just one image and then 
-output a single prediction. 
-But what should we do when faced with a 
-sequence of images, as in a video, 
-or when tasked with producing 
-a sequentially structured prediction,
-as in the case of image captioning? 
+Par la suite, dans :numref:`chap_cnn` , 
+nous sommes passés aux données d'image, où les entrées sont constituées 
+des valeurs brutes des pixels à chaque coordonnée dans une image. 
+Les données d'image ne correspondent pas à l'image 
+d'un ensemble de données tabulaires typique. 
+Nous avons dû faire appel à des réseaux de neurones convolutifs (CNN)
+pour gérer la structure hiérarchique et les invariances.
+Cependant, nos données étaient toujours de longueur fixe.
+Chaque image Fashion-MNIST est représentée 
+comme une grille $28 \times 28$ de valeurs de pixels.
+De plus, notre objectif était de développer un modèle
+qui n'examine qu'une seule image et qui produit ensuite une seule prédiction 
+. 
+Mais que faire face à une séquence d'images 
+, comme dans une vidéo, 
+ou lorsqu'il s'agit de produire 
+une prédiction structurée séquentiellement,
+comme dans le cas du sous-titrage d'images ? 
 
-Countless learning tasks require dealing with sequential data. 
-Image captioning, speech synthesis, and music generation 
-all require that models produce outputs consisting of sequences. 
-In other domains, such as time series prediction, 
-video analysis, and musical information retrieval, 
-a model must learn from inputs that are sequences. 
-These demands often arise simultaneously:
-tasks such as translating passages of text
-from one natural language to another, 
-engaging in dialogue, or controlling a robot, 
-demand that models both ingest and output
-sequentially-structured data. 
+D'innombrables tâches d'apprentissage nécessitent de traiter des données séquentielles. 
+Le sous-titrage d'images, la synthèse vocale et la génération de musique 
+exigent tous que les modèles produisent des sorties constituées de séquences. 
+Dans d'autres domaines, tels que la prédiction de séries temporelles, l'analyse vidéo 
+et la recherche d'informations musicales, 
+un modèle doit apprendre à partir d'entrées qui sont des séquences. 
+Ces exigences sont souvent simultanées :
+des tâches telles que la traduction de passages de texte
+d'une langue naturelle à une autre, 
+l'engagement d'un dialogue ou le contrôle d'un robot, 
+exigent que les modèles ingèrent et produisent
+des données structurées de manière séquentielle. 
 
 
-Recurrent neural networks (RNNs) are deep learning models 
-that capture the dynamics of sequences via 
-*recurrent* connections, which can be thought of
-as cycles in the network of nodes.
-This might seem counterintuitive at first.
-After all, it is the feedforward nature of neural networks
-that makes the order of computation unambiguous.
-However, recurrent edges are defined in a precise way
-that ensures that no such ambiguity can arise.
-Recurrent neural networks are *unrolled* across sequence steps,
-with the *same* underlying parameters applied at each step.
-While the standard connections are applied *synchronously*
-to propagate each layer's activations 
-to the subsequent layer *at the same time step*,
-the recurrent connections are *dynamic*,
-passing information across adjacent time steps. 
-As the unfolded view in :numref:`fig_unfolded-rnn` reveals,
-RNNs can be thought of as feedforward neural networks
-where each layer's parameters (both conventional and recurrent)
-are shared across time steps. 
+Les réseaux neuronaux récurrents (RNN) sont des modèles d'apprentissage profond 
+qui capturent la dynamique des séquences via des connexions 
+*récurrentes*, que l'on peut considérer comme
+des cycles dans le réseau de nœuds.
+Cela peut sembler contre-intuitif au premier abord.
+Après tout, c'est la nature feedforward des réseaux neuronaux
+qui rend l'ordre de calcul sans ambiguïté.
+Cependant, les arêtes récurrentes sont définies d'une manière précise
+qui garantit qu'aucune ambiguïté de ce type ne peut survenir.
+Les réseaux neuronaux récurrents sont *déroulés* à travers les étapes de la séquence,
+avec les *mêmes* paramètres sous-jacents appliqués à chaque étape.
+Alors que les connexions standard sont appliquées de manière *synchrone*
+pour propager les activations de chaque couche 
+à la couche suivante *au même pas de temps*,
+les connexions récurrentes sont *dynamiques*,
+transmettant des informations à travers des pas de temps adjacents. 
+Comme le révèle la vue dépliée de :numref:`fig_unfolded-rnn` ,
+les RNN peuvent être considérés comme des réseaux neuronaux à anticipation
+où les paramètres de chaque couche (conventionnels et récurrents)
+sont partagés entre les pas de temps. 
 
 
 ![On the left recurrent connections are depicted via cyclic edges. On the right, we unfold the RNN over sequence steps. Here, recurrent edges span adjacent sequence steps, while conventional connections are computed synchronously.](../img/unfolded-rnn.svg) 
 :label:`fig_unfolded-rnn`
 
 
-Like neural networks more broadly,
-RNNs have a long discipline-spanning history,
-originating as models of the brain popularized
-by cognitive scientists and subsequently adopted
-as practical modeling tools employed 
-by the machine learning community. 
-As with deep learning more broadly,
-this book adopts the machine learning perspective,
-focusing on RNNs as practical tools which rose 
-to popularity in the 2010s owing to 
-breakthrough results on such diverse tasks 
-as handwriting recognition :cite:`graves2008novel`,
-machine translation :cite:`Sutskever.Vinyals.Le.2014`,
-and recognizing medical diagnoses :cite:`Lipton.Kale.2016`. 
-We point the reader interested in more 
-background material to a publicly available
-comprehensive review :cite:`Lipton.Berkowitz.Elkan.2015`.
-We also note that sequentiality is not unique to RNNs.
-For example, the CNNs that we already introduced
-can be adapted to handle data of varying length,
-e.g., images of varying resolution.
-Moreover, RNNs have recently ceded considerable
-market share to transformer models, 
-which will be covered in :numref:`chap_attention`.
-However, RNNs rose to prominence as the default models
-for handling complex sequential structure in deep learning,
-and remain staple models for sequential modeling to this day.
-The stories of RNNs and of sequence modeling
-are inextricably linked, and this is as much 
-a chapter about the ABCs of sequence modeling problems 
-as it is a chapter about RNNs. 
+À l'instar des réseaux neuronaux au sens large,
+, les RNN ont une longue histoire qui s'étend sur plusieurs disciplines,
+ayant pour origine les modèles du cerveau popularisés
+par les spécialistes des sciences cognitives et adoptés par la suite
+comme outils de modélisation pratiques employés 
+par la communauté de l'apprentissage automatique. 
+Comme pour l'apprentissage profond au sens large,
+ce livre adopte la perspective de l'apprentissage automatique,
+en se concentrant sur les RNN en tant qu'outils pratiques qui ont gagné 
+en popularité dans les années 2010 grâce à 
+des résultats révolutionnaires sur des tâches aussi diverses que 
+la reconnaissance de l'écriture manuscrite :cite:`graves2008novel` ,
+la traduction automatique :cite:`Sutskever.Vinyals.Le.2014` ,
+et la reconnaissance de diagnostics médicaux :cite:`Lipton.Kale.2016` . 
+Nous indiquons au lecteur qui souhaite obtenir plus d'informations sur le sujet 
+qu'il peut consulter une revue complète :cite:`Lipton.Berkowitz.Elkan.2015` accessible au public
+.
+Nous notons également que la séquentialité n'est pas propre aux RNN.
+Par exemple, les CNN que nous avons déjà présentés
+peuvent être adaptés pour traiter des données de longueur variable,
+par exemple, des images de résolution variable.
+De plus, les RNN ont récemment cédé une part de marché considérable
+aux modèles transformateurs, 
+qui seront abordés dans :numref:`chap_attention` .
+Cependant, les RNN se sont imposés comme les modèles par défaut
+pour le traitement de la structure séquentielle complexe dans l'apprentissage profond,
+et restent à ce jour les modèles de base de la modélisation séquentielle.
+Les histoires des RNN et de la modélisation séquentielle
+sont inextricablement liées, et ce chapitre est autant 
+un chapitre sur l'ABC des problèmes de modélisation séquentielle 
+qu'un chapitre sur les RNN. 
 
 
-One key insight paved the way for a revolution in sequence modeling.
-While the inputs and targets for many fundamental tasks in machine learning 
-cannot easily be represented as fixed length vectors, 
-they can often nevertheless be represented as 
-varying-length sequences of fixed length vectors. 
-For example, documents can be represented as sequences of words.
-Medical records can often be represented as sequences of events 
-(encounters, medications, procedures, lab tests, diagnoses).
-Videos can be represented as varying-length sequences of still images.
+Une idée clé a ouvert la voie à une révolution dans la modélisation des séquences.
+Si les entrées et les cibles de nombreuses tâches fondamentales de l'apprentissage automatique 
+ne peuvent pas être facilement représentées sous forme de vecteurs de longueur fixe, 
+elles peuvent néanmoins souvent être représentées comme 
+des séquences de longueur variable de vecteurs de longueur fixe. 
+Par exemple, les documents peuvent être représentés comme des séquences de mots.
+Les dossiers médicaux peuvent souvent être représentés comme des séquences d'événements 
+(rencontres, médicaments, procédures, tests de laboratoire, diagnostics).
+Les vidéos peuvent être représentées comme des séquences d'images fixes de longueur variable.
 
 
-While sequence models have popped up in countless application areas,
-basic research in the area has been driven predominantly 
-by advances on core tasks in natural language processing (NLP).
-Thus, throughout this chapter, we will focus 
-our exposition and examples on text data.
-If you get the hang of these examples, 
-then applying these models to other data modalities 
-should be relatively straightforward. 
-In the next few sections, we introduce basic
-notation for sequences and some evaluation measures 
-for assessing the quality of sequentially structured model outputs. 
-Next, we discuss basic concepts of a language model 
-and use this discussion to motivate our first RNN models.
-Finally, we describe the method for calculating gradients 
-when backpropagating through RNNs and explore some challenges
-that are often encountered when training such networks,
-motivating the modern RNN architectures that will follow 
-in :numref:`chap_modern_rnn`.
+Bien que les modèles de séquences soient apparus dans d'innombrables domaines d'application,
+la recherche fondamentale dans ce domaine a été principalement motivée 
+par les progrès réalisés dans les tâches de base du traitement du langage naturel (NLP).
+Ainsi, tout au long de ce chapitre, nous concentrerons 
+notre exposé et nos exemples sur les données textuelles.
+Si vous vous habituez à ces exemples, 
+, l'application de ces modèles à d'autres modalités de données 
+devrait être relativement simple. 
+Dans les sections suivantes, nous introduisons la notation de base
+pour les séquences et certaines mesures d'évaluation 
+pour évaluer la qualité des sorties de modèles structurés de manière séquentielle. 
+Ensuite, nous abordons les concepts de base d'un modèle de langage 
+et utilisons cette discussion pour motiver nos premiers modèles RNN.
+Enfin, nous décrivons la méthode de calcul des gradients 
+lors de la rétropropagation à travers les RNN et explorons certains défis
+souvent rencontrés lors de l'entraînement de ces réseaux,
+motivant les architectures RNN modernes qui suivront 
+dans :numref:`chap_modern_rnn` .
 
 ```toc
 :maxdepth: 2

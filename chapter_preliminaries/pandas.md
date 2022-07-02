@@ -3,36 +3,36 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Data Preprocessing
-:label:`sec_pandas`
+# Prétraitement des données
+:label:`sec_pandas` 
 
-So far, we have been working with synthetic data
-that arrived in ready-made tensors.
-However, to apply deep learning in the wild
-we must extract messy data 
-stored in arbitrary formats,
-and preprocess it to suit our needs.
-Fortunately, the *pandas* [library](https://pandas.pydata.org/) 
-can do much of the heavy lifting.
-This section, while no substitute 
-for a proper *pandas* [tutorial](https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html),
-will give you a crash course
-on some of the most common routines.
+ Jusqu'à présent, nous avons travaillé avec des données synthétiques
+qui arrivaient dans des tenseurs prêts à l'emploi.
+Cependant, pour appliquer l'apprentissage profond dans la nature
+, nous devons extraire des données désordonnées 
+stockées dans des formats arbitraires,
+et les prétraiter pour répondre à nos besoins.
+Heureusement, le programme *pandas* [library](https://pandas.pydata.org/) 
+ peut faire une grande partie de ce travail.
+Cette section, bien qu'elle ne remplace pas 
+une *pandas* [tutorial](https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html),
+vous donnera un cours intensif
+sur certaines des routines les plus courantes.
 
 
-## Reading the Dataset
+## Lire l'ensemble de données
 
-Comma-separated values (CSV) files are ubiquitous 
-for storing tabular (spreadsheet-like) data.
-Here, each line corresponds to one record
-and consists of several (comma-separated) fields, e.g.,
-"Albert Einstein,March 14 1879,Ulm,Federal polytechnic school,Accomplishments in the field of gravitational physics".
-To demonstrate how to load CSV files with `pandas`, 
-we (**create a CSV file below**) `../data/house_tiny.csv`. 
-This file represents a dataset of homes,
-where each row corresponds to a distinct home
-and the columns correspond to the number of rooms (`NumRooms`),
-the roof type (`RoofType`), and the price (`Price`).
+Les fichiers CSV (Comma-separated values) sont omniprésents 
+pour stocker des données tabulaires (de type feuille de calcul).
+Ici, chaque ligne correspond à un enregistrement
+et se compose de plusieurs champs (séparés par des virgules), par exemple,
+"Albert Einstein,14 mars 1879,Ulm,École polytechnique fédérale,Réalisations dans le domaine de la physique gravitationnelle".
+Pour démontrer comment charger des fichiers CSV avec `pandas`, 
+nous (**créons un fichier CSV ci-dessous**) `../data/house_tiny.csv`. 
+Ce fichier représente un ensemble de données de maisons,
+où chaque ligne correspond à une maison distincte
+et les colonnes correspondent au nombre de pièces (`NumRooms`),
+au type de toit (`RoofType`), et au prix (`Price`).
 
 ```{.python .input}
 %%tab all
@@ -48,7 +48,7 @@ NA,NA,127500
 NA,NA,140000''')
 ```
 
-Now let's import `pandas` and load the dataset with `read_csv`.
+Importons maintenant `pandas` et chargeons le jeu de données avec `read_csv`.
 
 ```{.python .input}
 %%tab all
@@ -58,44 +58,44 @@ data = pd.read_csv(data_file)
 print(data)
 ```
 
-## Data Preparation
+## Préparation des données
 
-In supervised learning, we train models
-to predict a designated *target* value,
-given some set of *input* values. 
-Our first step in processing the dataset
-is to separate out columns corresponding
-to input versus target values. 
-We can select columns either by name or
-via integer-location based indexing (`iloc`).
+Dans le cadre de l'apprentissage supervisé, nous formons des modèles
+pour prédire une valeur *cible* désignée,
+étant donné un ensemble de valeurs *d'entrée*. 
+La première étape du traitement de l'ensemble de données
+consiste à séparer les colonnes correspondant
+aux valeurs d'entrée et aux valeurs cibles. 
+Nous pouvons sélectionner les colonnes soit par leur nom, soit par
+via une indexation basée sur l'emplacement des entiers (`iloc`).
 
-You might have noticed that `pandas` replaced
-all CSV entries with value `NA`
-with a special `NaN` (*not a number*) value. 
-This can also happen whenever an entry is empty,
-e.g., "3,,,270000".
-These are called *missing values* 
-and they are the "bed bugs" of data science,
-a persistent menace that you will confront
-throughout your career. 
-Depending upon the context, 
-missing values might be handled
-either via *imputation* or *deletion*.
-Imputation replaces missing values 
-with estimates of their values
-while deletion simply discards 
-either those rows or those columns
-that contain missing values. 
+Vous avez peut-être remarqué que `pandas` a remplacé
+toutes les entrées CSV par la valeur `NA`
+ par une valeur spéciale `NaN` (*not a number*). 
+Cela peut également se produire lorsqu'une entrée est vide,
+par exemple, "3,,,,270000".
+C'est ce qu'on appelle les *valeurs manquantes* 
+et ce sont les "punaises de lit" de la science des données,
+une menace persistante à laquelle vous serez confronté
+tout au long de votre carrière. 
+Selon le contexte, 
+les valeurs manquantes peuvent être traitées
+soit par *imputation* soit par *suppression*.
+L'imputation remplace les valeurs manquantes 
+par des estimations de leurs valeurs
+tandis que la suppression élimine simplement 
+soit les lignes, soit les colonnes
+qui contiennent des valeurs manquantes. 
 
-Here are some common imputation heuristics.
-[**For categorical input fields, 
-we can treat `NaN` as a category.**]
-Since the `RoofType` column takes values `Slate` and `NaN`,
-`pandas` can convert this column 
-into two columns `RoofType_Slate` and `RoofType_nan`.
-A row whose alley type is `Slate` will set values 
-of `RoofType_Slate` and `RoofType_nan` to 1 and 0, respectively.
-The converse holds for a row with a missing `RoofType` value.
+Voici quelques heuristiques d'imputation courantes.
+[**Pour les champs de saisie catégoriels, 
+nous pouvons traiter `NaN` comme une catégorie.**]
+Puisque la colonne `RoofType` prend les valeurs `Slate` et `NaN`,
+`pandas` peut convertir cette colonne 
+en deux colonnes `RoofType_Slate` et `RoofType_nan`.
+Une ligne dont le type d'allée est `Slate` donnera aux valeurs 
+de `RoofType_Slate` et `RoofType_nan` la valeur 1 et 0, respectivement.
+L'inverse est vrai pour une ligne dont la valeur `RoofType` est manquante.
 
 ```{.python .input}
 %%tab all
@@ -104,10 +104,10 @@ inputs = pd.get_dummies(inputs, dummy_na=True)
 print(inputs)
 ```
 
-For missing numerical values, 
-one common heuristic is to 
-[**replace the `NaN` entries with 
-the mean value of the corresponding column**].
+Pour les valeurs numériques manquantes, 
+une heuristique courante consiste à 
+[**remplacer les entrées `NaN` par 
+la valeur moyenne de la colonne correspondante**].
 
 ```{.python .input}
 %%tab all
@@ -115,10 +115,10 @@ inputs = inputs.fillna(inputs.mean())
 print(inputs)
 ```
 
-## Conversion to the Tensor Format
+## Conversion au format tenseur
 
-Now that [**all the entries in `inputs` and `targets` are numerical,
-we can load them into a tensor**] (recall :numref:`sec_ndarray`).
+Maintenant que [**toutes les entrées de `inputs` et `targets` sont numériques,
+nous pouvons les charger dans un tenseur**] (rappelons :numref:`sec_ndarray` ).
 
 ```{.python .input}
 %%tab mxnet
@@ -146,47 +146,47 @@ X, y
 
 ## Discussion
 
-You now know how to partition data columns, 
-impute missing variables, 
-and load `pandas` data into tensors. 
-In :numref:`sec_kaggle_house`, you will
-pick up some more data processing skills. 
-While this crash course kept things simple,
-data processing can get hairy.
-For example, rather than arriving in a single CSV file,
-our dataset might be spread across multiple files
-extracted from a relational database.
-For instance, in an e-commerce application,
-customer addresses might live in one table
-and purchase data in another.
-Moreover, practitioners face myriad data types
-beyond categorical and numeric. 
-Other data types include text strings, images,
-audio data, and point clouds. 
-Oftentimes, advanced tools and efficient algorithms 
-are required to prevent data processing from becoming
-the biggest bottleneck in the machine learning pipeline. 
-These problems will arise when we get to 
-computer vision and natural language processing. 
-Finally, we must pay attention to data quality.
-Real-world datasets are often plagued 
-by outliers, faulty measurements from sensors, and recording errors, 
-which must be addressed before 
-feeding the data into any model. 
-Data visualization tools such as [seaborn](https://seaborn.pydata.org/), 
-[Bokeh](https://docs.bokeh.org/), or [matplotlib](https://matplotlib.org/)
-can help you to manually inspect the data 
-and develop intuitions about 
-what problems you may need to address.
+Vous savez maintenant comment partitionner des colonnes de données, 
+imputer des variables manquantes, 
+et charger `pandas` des données dans des tenseurs. 
+Dans :numref:`sec_kaggle_house` , vous allez
+acquérir d'autres compétences en matière de traitement des données. 
+Bien que ce cours accéléré ait gardé les choses simples, le traitement des données
+peut être difficile.
+Par exemple, au lieu d'arriver dans un seul fichier CSV,
+notre ensemble de données peut être réparti sur plusieurs fichiers
+extraits d'une base de données relationnelle.
+Par exemple, dans une application de commerce électronique,
+les adresses des clients peuvent se trouver dans une table
+et les données d'achat dans une autre.
+En outre, les praticiens sont confrontés à une myriade de types de données
+autres que catégoriques et numériques. 
+Parmi les autres types de données figurent les chaînes de texte, les images, les données audio
+et les nuages de points. 
+Souvent, des outils avancés et des algorithmes efficaces 
+sont nécessaires pour éviter que le traitement des données ne devienne
+le principal goulot d'étranglement du pipeline d'apprentissage automatique. 
+Ces problèmes se poseront lorsque nous aborderons la vision par ordinateur 
+et le traitement du langage naturel. 
+Enfin, nous devons prêter attention à la qualité des données.
+Les ensembles de données du monde réel sont souvent entachés 
+de valeurs aberrantes, de mesures erronées provenant de capteurs et d'erreurs d'enregistrement, 
+. Ces problèmes doivent être résolus avant 
+d'intégrer les données dans un modèle. 
+Les outils de visualisation de données tels que [seaborn](https://seaborn.pydata.org/), 
+[Bokeh](https://docs.bokeh.org/) , ou [matplotlib](https://matplotlib.org/)
+ peuvent vous aider à inspecter manuellement les données 
+et à développer des intuitions sur 
+les problèmes que vous devrez peut-être résoudre.
 
 
-## Exercises
+## Exercices
 
-1. Try loading datasets, e.g., Abalone from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets.php) and inspect their properties. What fraction of them has missing values? What fraction of the variables is numerical, categorical, or text?
-1. Try out indexing and selecting data columns by name rather than by column number. The pandas documentation on [indexing](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html) has further details on how to do this.
-1. How large a dataset do you think you could load this way? What might be the limitations? Hint: consider the time to read the data, representation, processing, and memory footprint. Try this out on your laptop. What changes if you try it out on a server? 
-1. How would you deal with data that has a very large number of categories? What if the category labels are all unique? Should you include the latter?
-1. What alternatives to pandas can you think of? How about [loading NumPy tensors from a file](https://numpy.org/doc/stable/reference/generated/numpy.load.html)? Check out [Pillow](https://python-pillow.org/), the Python Imaging Library. 
+1. Essayez de charger des ensembles de données, par exemple, Abalone à partir du site [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets.php) et inspectez leurs propriétés. Quelle fraction d'entre eux a des valeurs manquantes ? Quelle fraction des variables est numérique, catégorique ou textuelle ?
+1. Essayez d'indexer et de sélectionner les colonnes de données par leur nom plutôt que par leur numéro. La documentation de pandas sur [indexing](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html) contient plus de détails sur la façon de procéder.
+1. Quelle taille d'ensemble de données pensez-vous pouvoir charger de cette manière ? Quelles pourraient être les limitations ? Conseil : tenez compte du temps de lecture des données, de la représentation, du traitement et de l'empreinte mémoire. Essayez cette méthode sur votre ordinateur portable. Qu'est-ce qui change si vous l'essayez sur un serveur ? 
+1. Comment traiteriez-vous des données comportant un très grand nombre de catégories ? Que se passe-t-il si les étiquettes des catégories sont toutes uniques ? Devriez-vous inclure ces derniers ?
+1. Quelles alternatives aux pandas pouvez-vous imaginer ? Que pensez-vous de [loading NumPy tensors from a file](https://numpy.org/doc/stable/reference/generated/numpy.load.html)? Consultez [Pillow](https://python-pillow.org/), la bibliothèque d'imagerie Python 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/28)

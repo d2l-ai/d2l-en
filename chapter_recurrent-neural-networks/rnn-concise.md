@@ -1,12 +1,12 @@
-# Concise Implementation of Recurrent Neural Networks
-:label:`sec_rnn-concise`
+# Mise en œuvre concise des réseaux neuronaux récurrents
+:label:`sec_rnn-concise` 
 
-While :numref:`sec_rnn-scratch` was instructive to see how RNNs are implemented,
-this is not convenient or fast.
-This section will show how to implement the same language model more efficiently
-using functions provided by high-level APIs
-of a deep learning framework.
-We begin as before by reading *The Time Machine* dataset.
+ Bien que :numref:`sec_rnn-scratch` ait été instructif de voir comment les RNN sont mis en œuvre,
+ce n'est ni pratique ni rapide.
+Cette section montre comment implémenter le même modèle de langage plus efficacement
+en utilisant des fonctions fournies par les API de haut niveau
+d'un cadre d'apprentissage profond.
+Nous commençons comme précédemment par lire le jeu de données *The Time Machine*.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -35,26 +35,26 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## [**Defining the Model**]
+## [**Définir le modèle**]
 
-We define the following class
-using the RNN implemented
-by high-level APIs.
+Nous définissons la classe suivante
+en utilisant le RNN implémenté
+par des API de haut niveau.
 
 :begin_tab:`mxnet`
-Specifically, to initialize the hidden state,
-we invoke the member method `begin_state`.
-This returns a list
-that contains
-an initial hidden state
-for each example in the minibatch,
-whose shape is
-(number of hidden layers, batch size, number of hidden units).
-For some models
-to be introduced later
-(e.g., long short-term memory),
-such a list also
-contains other information.
+Plus précisément, pour initialiser l'état caché,
+, nous invoquons la méthode membre `begin_state`.
+Celle-ci renvoie une liste
+qui contient
+un état caché initial
+pour chaque exemple du minilot,
+dont la forme est
+(nombre de couches cachées, taille du lot, nombre d'unités cachées).
+Pour certains modèles
+qui seront introduits ultérieurement
+(par exemple, la mémoire à long terme),
+une telle liste contient également
+d'autres informations.
 :end_tab:
 
 ```{.python .input}
@@ -99,9 +99,9 @@ class RNN(d2l.Module):  #@save
         return outputs, H
 ```
 
-Inheriting from the `RNNLMScratch` class in :numref:`sec_rnn-scratch`, 
-the following `RNNLM` class defines a complete RNN-based language model.
-Note that we need to create a separate fully connected output layer.
+Héritant de la classe `RNNLMScratch` dans :numref:`sec_rnn-scratch` , 
+la classe suivante `RNNLM` définit un modèle de langage complet basé sur un RNN.
+Notez que nous devons créer une couche de sortie séparée entièrement connectée.
 
 ```{.python .input}
 %%tab all
@@ -122,10 +122,10 @@ class RNNLM(d2l.RNNLMScratch):  #@save
             return d2l.transpose(self.linear(hiddens), (1, 0, 2))
 ```
 
-## Training and Predicting
+## Entraînement et prédiction
 
-Before training the model, let's [**make a prediction with the a model that has random weights.**]
-Given that we have not trained the network, it will generate nonsensical predictions.
+Avant d'entraîner le modèle, faisons [**une prédiction avec un modèle dont les poids sont aléatoires.**]
+Étant donné que nous n'avons pas entraîné le réseau, il générera des prédictions absurdes.
 
 ```{.python .input}
 %%tab all
@@ -138,7 +138,7 @@ model = RNNLM(rnn, vocab_size=len(data.vocab), lr=1)
 model.predict('it has', 20, data.vocab)
 ```
 
-As is quite obvious, this model does not work at all. Next, we [**train our model with high-level APIs**].
+Comme il est évident, ce modèle ne fonctionne pas du tout. Ensuite, nous [**entraînons notre modèle avec des API de haut niveau**].
 
 ```{.python .input}
 %%tab all
@@ -150,11 +150,11 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-Compared with :numref:`sec_rnn-scratch`,
-this model achieves comparable perplexity,
-albeit within a shorter period of time, due to the code being more optimized by
-high-level APIs of the deep learning framework.
-We can also generate predicted tokens following the specified prefix string.
+Comparé à :numref:`sec_rnn-scratch` ,
+ce modèle atteint une perplexité comparable,
+bien que dans un délai plus court, en raison de l'optimisation du code par
+les API de haut niveau du cadre d'apprentissage profond.
+Nous pouvons également générer des tokens prédits suivant la chaîne de préfixe spécifiée.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -166,15 +166,15 @@ model.predict('it has', 20, data.vocab, d2l.try_gpu())
 model.predict('it has', 20, data.vocab)
 ```
 
-## Summary
+## Résumé
 
-* High-level APIs of the deep learning framework provides an implementation of RNNs.
-* Using high-level APIs leads to faster RNN training than using its implementation from scratch.
+* Les API de haut niveau du cadre d'apprentissage profond fournissent une implémentation des RNN.
+* L'utilisation des API de haut niveau permet un apprentissage plus rapide des RNN que l'utilisation de son implémentation à partir de zéro.
 
-## Exercises
+## Exercices
 
-1. Can you make the RNN model overfit using the high-level APIs?
-1. Implement the autoregressive model of :numref:`sec_sequence` using an RNN.
+1. Pouvez-vous rendre le modèle RNN surajusté en utilisant les API de haut niveau ?
+1. Implémentez le modèle autorégressif de :numref:`sec_sequence` en utilisant un RNN.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/335)

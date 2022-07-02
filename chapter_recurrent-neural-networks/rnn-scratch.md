@@ -1,14 +1,14 @@
-# Recurrent Neural Network Implementation from Scratch
-:label:`sec_rnn-scratch`
+# Implémentation d'un réseau neuronal récurrent à partir de zéro
+:label:`sec_rnn-scratch` 
 
-In this section we will implement an RNN
-from scratch
-for a character-level language model,
-according to our descriptions
-in :numref:`sec_rnn`.
-Such a model
-will be trained on H. G. Wells' *The Time Machine*.
-As before, we start by reading the dataset first, which is introduced in :numref:`sec_text-sequence`.
+ Dans cette section, nous allons implémenter un RNN
+à partir de zéro
+pour un modèle de langage au niveau des caractères,
+conformément à nos descriptions
+dans :numref:`sec_rnn` .
+Un tel modèle
+sera entraîné sur le livre de H. G. Wells *The Time Machine*.
+Comme précédemment, nous commençons par lire l'ensemble de données, qui est présenté dans :numref:`sec_text-sequence` .
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -42,13 +42,13 @@ import math
 import tensorflow as tf
 ```
 
-## RNN Model
+## Modèle RNN
 
-Following the descriptions in
-:numref:`subsec_rnn_w_hidden_states`,
-we begin by defining the class for the RNN model
-with its model parameters only.
-The number of hidden units `num_hiddens` is a tunable hyperparameter.
+En suivant les descriptions de
+:numref:`subsec_rnn_w_hidden_states` ,
+nous commençons par définir la classe pour le modèle RNN
+avec ses paramètres de modèle uniquement.
+Le nombre d'unités cachées `num_hiddens` est un hyperparamètre accordable.
 
 ```{.python .input}
 %%tab all
@@ -75,18 +75,18 @@ class RNNScratch(d2l.Module):  #@save
             self.b_h = tf.Variable(d2l.zeros(num_hiddens))
 ```
 
-[**The following `forward` method defines how to compute the output and hidden state at a time step.**]
-Note that
-the RNN model
-loops through the outermost dimension of `inputs`
-so that it updates hidden state of a minibatch,
-time step by time step.
-Besides,
-the activation function here uses the $\tanh$ function.
-As
-described in :numref:`sec_mlp`, the
-mean value of the $\tanh$ function is 0, when the elements are uniformly
-distributed over the real numbers.
+[**La méthode suivante `forward` définit comment calculer la sortie et l'état caché à un pas de temps.**]
+Notez que
+le modèle RNN
+boucle à travers la dimension la plus externe de `inputs`
+ de sorte qu'il met à jour l'état caché d'un minilot,
+pas de temps par pas de temps.
+En outre,
+la fonction d'activation utilise ici la fonction $\tanh$.
+Comme
+décrit dans :numref:`sec_mlp` , la valeur moyenne
+de la fonction $\tanh$ est 0, lorsque les éléments sont uniformément
+distribués sur les nombres réels.
 
 ```{.python .input}
 %%tab all
@@ -105,8 +105,8 @@ def forward(self, inputs, state=None):
     return outputs, state
 ```
 
-For example, we can feed a minibatch of input sequences
-into an RNN model as follows.
+Par exemple, nous pouvons introduire un minilot de séquences d'entrée
+dans un modèle RNN comme suit.
 
 ```{.python .input}
 %%tab all
@@ -116,9 +116,9 @@ X = d2l.ones((num_steps, batch_size, num_inputs))
 outputs, state = rnn(X)
 ```
 
-Let's check whether the RNN model
-produces results of the correct shapes,
-e.g., to ensure that the dimensionality of the hidden state remains unchanged.
+Vérifions si le modèle RNN
+produit des résultats de forme correcte,
+par exemple, pour nous assurer que la dimensionnalité de l'état caché reste inchangée.
 
 ```{.python .input}
 %%tab all
@@ -134,15 +134,15 @@ d2l.check_shape(outputs[0], (batch_size, num_hiddens))
 d2l.check_shape(state, (batch_size, num_hiddens))
 ```
 
-## RNN-based Language Model
+## Modèle de langage basé sur RNN
 
-The following `RNNLMScratch` class defines 
-an RNN-based language model,
-where an RNN implemented from scratch
-is passed via the `rnn` argument
-of the `__init__` method.
-When training language models, the inputs and outputs are from the same vocabulary. Hence, they have the same dimension, which is equal to the vocabulary size.
-Note that we use perplexity to evaluate the model. As discussed in :numref:`subsec_perplexity`, this ensures that sequences of different length are comparable.
+La classe `RNNLMScratch` suivante définit 
+un modèle de langage basé sur RNN,
+où un RNN implémenté à partir de zéro
+est transmis via l'argument `rnn`
+ de la méthode `__init__`.
+Lors de l'apprentissage des modèles de langage, les entrées et les sorties proviennent du même vocabulaire. Par conséquent, ils ont la même dimension, qui est égale à la taille du vocabulaire.
+Notez que nous utilisons la perplexité pour évaluer le modèle. Comme nous l'avons vu dans :numref:`subsec_perplexity` , cela garantit que les séquences de différentes longueurs sont comparables.
 
 ```{.python .input}
 %%tab all
@@ -181,17 +181,17 @@ class RNNLMScratch(d2l.Classifier):  #@save
 
 ### [**One-Hot Encoding**]
 
-Recall that each token is represented as a numerical index in the vocabulary.
-Feeding these indices directly to a neural network might make it hard to
-learn.
-We often represent each token as a more expressive feature vector.
-The easiest representation is called *one-hot encoding*,
-which is introduced
-in :numref:`subsec_classification-problem`.
+Rappelons que chaque token est représenté par un indice numérique dans le vocabulaire.
+L'alimentation directe de ces indices à un réseau neuronal pourrait rendre difficile l'apprentissage de
+.
+Nous représentons souvent chaque token sous la forme d'un vecteur de caractéristiques plus expressif.
+La représentation la plus simple est appelée codage *à un coup*,
+qui est présenté
+dans :numref:`subsec_classification-problem` .
 
-In a nutshell, we map each index to a different unit vector: assume that the number of different tokens in the vocabulary is $N$ (`len(vocab)`) and the token indices range from $0$ to $N-1$.
-If the index of a token is the integer $i$, then we create a vector of all 0s with a length of $N$ and set the element at position $i$ to 1.
-This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
+En bref, nous faisons correspondre chaque indice à un vecteur unitaire différent : supposons que le nombre de tokens différents dans le vocabulaire est $N$ (`len(vocab)`) et que les indices des tokens vont de $0$ à $N-1$.
+Si l'indice d'un token est le nombre entier $i$, nous créons un vecteur de tous les 0 d'une longueur de $N$ et définissons l'élément à la position $i$ à 1.
+Ce vecteur est le vecteur à un coup du token original. Les vecteurs à un coup avec les indices 0 et 2 sont présentés ci-dessous.
 
 ```{.python .input}
 %%tab mxnet
@@ -208,17 +208,17 @@ F.one_hot(torch.tensor([0, 2]), 5)
 tf.one_hot(tf.constant([0, 2]), 5)
 ```
 
-(**The shape of the minibatch**) that we sample each time (**is (batch size, number of time steps).
-The `one_hot` method transforms such a minibatch into a three-dimensional tensor with the last dimension equals to the vocabulary size (`len(vocab)`).**)
-We often transpose the input so that we will obtain an
-output of shape
-(number of time steps, batch size, vocabulary size).
-This will allow us
-to more conveniently
-loop through the outermost dimension
-for updating hidden states of a minibatch,
-time step by time step
-(e.g., in the above `forward` method).
+(**La forme du minilot**) que nous échantillonnons à chaque fois (**est (taille du lot, nombre de pas de temps).
+La méthode `one_hot` transforme un tel mini-batch en un tenseur tridimensionnel dont la dernière dimension est égale à la taille du vocabulaire (`len(vocab)`).**))
+Nous transposons souvent l'entrée de manière à obtenir une sortie
+de forme
+(nombre de pas de temps, taille du lot, taille du vocabulaire).
+Cela nous permettra
+de boucler plus facilement
+à travers la dimension la plus externe
+pour mettre à jour les états cachés d'un mini-batch,
+pas de temps par pas de temps
+(par exemple, dans la méthode `forward` ci-dessus).
 
 ```{.python .input}
 %%tab all
@@ -233,12 +233,12 @@ def one_hot(self, X):
         return tf.one_hot(tf.transpose(X), self.vocab_size)
 ```
 
-### Transforming RNN Outputs
+### Transformation des sorties RNN
 
-The language model
-uses a fully connected output layer
-to transform RNN outputs 
-into token predictions at each time step.
+Le modèle de langage
+utilise une couche de sortie entièrement connectée
+pour transformer les sorties RNN 
+en prédictions de jetons à chaque pas de temps.
 
 ```{.python .input}
 %%tab all
@@ -254,7 +254,7 @@ def forward(self, X, state=None):
     return self.output_layer(rnn_outputs)
 ```
 
-Let's [**check whether the forward computation outputs have the correct shape.**]
+Vérifions [**si les sorties du calcul prédictif ont la forme correcte.**]
 
 ```{.python .input}
 %%tab all
@@ -265,53 +265,53 @@ d2l.check_shape(outputs, (batch_size, num_steps, num_inputs))
 
 ## [**Gradient Clipping**]
 
-For a sequence of length $T$,
-we compute the gradients over these $T$ time steps in an iteration, which results in a chain of matrix-products with length  $\mathcal{O}(T)$ during backpropagation.
-As mentioned in :numref:`sec_numerical_stability`, it might result in numerical instability, e.g., the gradients may either explode or vanish, when $T$ is large. Therefore, RNN models often need extra help to stabilize the training.
+Pour une séquence de longueur $T$,
+nous calculons les gradients sur ces $T$ pas de temps en une itération, ce qui donne une chaîne de produits matriciels de longueur $\mathcal{O}(T)$ pendant la rétropropagation.
+Comme mentionné dans :numref:`sec_numerical_stability` , cela peut entraîner une instabilité numérique, par exemple, les gradients peuvent exploser ou disparaître, lorsque $T$ est grand. Par conséquent, les modèles RNN ont souvent besoin d'une aide supplémentaire pour stabiliser la formation.
 
-Generally speaking,
-when solving an optimization problem,
-we take update steps for the model parameter,
-say in the vector form
-$\mathbf{x}$,
-in the direction of the negative gradient $\mathbf{g}$ on a minibatch.
-For example,
-with $\eta > 0$ as the learning rate,
-in one iteration we update
-$\mathbf{x}$
-as $\mathbf{x} - \eta \mathbf{g}$.
-Let's further assume that the objective function $f$
-is well behaved, say, *Lipschitz continuous* with constant $L$.
-That is to say,
-for any $\mathbf{x}$ and $\mathbf{y}$ we have
+D'une manière générale,
+lors de la résolution d'un problème d'optimisation,
+nous prenons des mesures de mise à jour pour le paramètre du modèle,
+disons sous la forme vectorielle
+$\mathbf{x}$ ,
+dans la direction du gradient négatif $\mathbf{g}$ sur un minibatch.
+Par exemple,
+avec $\eta > 0$ comme taux d'apprentissage,
+dans une itération nous mettons à jour
+$\mathbf{x}$ 
+ comme $\mathbf{x} - \eta \mathbf{g}$.
+Supposons en outre que la fonction objectif $f$
+ se comporte bien, c'est-à-dire qu'elle est *Lipschitz continue* avec une constante $L$.
+Autrement dit,
+pour tout $\mathbf{x}$ et $\mathbf{y}$, nous avons
 
-$$|f(\mathbf{x}) - f(\mathbf{y})| \leq L \|\mathbf{x} - \mathbf{y}\|.$$
+$$|f(\mathbf{x}) - f(\mathbf{y})| \leq L \|\mathbf{x} - \mathbf{y}\|.$$ 
 
-In this case we can safely assume that if we update the parameter vector by $\eta \mathbf{g}$, then
+ Dans ce cas, nous pouvons supposer sans risque que si nous actualisons le vecteur de paramètres par $\eta \mathbf{g}$, alors
 
-$$|f(\mathbf{x}) - f(\mathbf{x} - \eta\mathbf{g})| \leq L \eta\|\mathbf{g}\|,$$
+$$|f(\mathbf{x}) - f(\mathbf{x} - \eta\mathbf{g})| \leq L \eta\|\mathbf{g}\|,$$ 
 
-which means that
-we will not observe a change by more than $L \eta \|\mathbf{g}\|$. This is both a curse and a blessing.
-On the curse side,
-it limits the speed of making progress;
-whereas on the blessing side,
-it limits the extent to which things can go wrong if we move in the wrong direction.
+ ce qui signifie que
+nous n'observerons pas de changement de plus de $L \eta \|\mathbf{g}\|$. C'est à la fois une malédiction et une bénédiction.
+Du côté de la malédiction,
+, elle limite la vitesse de progression ;
+tandis que du côté de la bénédiction,
+, elle limite la mesure dans laquelle les choses peuvent mal tourner si nous allons dans la mauvaise direction.
 
-Sometimes the gradients can be quite large and the optimization algorithm may fail to converge. We could address this by reducing the learning rate $\eta$. But what if we only *rarely* get large gradients? In this case such an approach may appear entirely unwarranted. One popular alternative is to clip the gradient $\mathbf{g}$ by projecting them back to a ball of a given radius, say $\theta$ via
+Parfois, les gradients peuvent être très importants et l'algorithme d'optimisation peut ne pas converger. Nous pourrions remédier à ce problème en réduisant le taux d'apprentissage $\eta$. Mais que se passe-t-il si nous n'obtenons que *rarement* de grands gradients ? Dans ce cas, une telle approche peut sembler totalement injustifiée. Une alternative populaire consiste à écrêter le gradient $\mathbf{g}$ en le projetant dans une boule de rayon donné, disons $\theta$ via
 
 (**$$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathbf{g}.$$**)
 
-By doing so we know that the gradient norm never exceeds $\theta$ and that the
-updated gradient is entirely aligned with the original direction of $\mathbf{g}$.
-It also has the desirable side-effect of limiting the influence any given
-minibatch (and within it any given sample) can exert on the parameter vector. This
-bestows a certain degree of robustness to the model. Gradient clipping provides
-a quick fix to the gradient exploding. While it does not entirely solve the problem, it is one of the many techniques to alleviate it.
+En procédant ainsi, nous savons que la norme du gradient ne dépasse jamais $\theta$ et que le gradient mis à jour
+est entièrement aligné sur la direction originale de $\mathbf{g}$.
+Cette méthode a également l'effet secondaire souhaitable de limiter l'influence qu'un minibatch
+donné (et à l'intérieur de celui-ci, un échantillon donné) peut exercer sur le vecteur de paramètres. Cela
+confère un certain degré de robustesse au modèle. L'écrêtage du gradient fournit
+une solution rapide à l'explosion du gradient. Bien qu'il ne résolve pas entièrement le problème, c'est l'une des nombreuses techniques permettant de l'atténuer.
 
-Below we define a function to clip the gradients of
-a model.
-Also note that we compute the gradient norm over all the model parameters.
+Nous définissons ci-dessous une fonction permettant d'écrêter les gradients d'un modèle
+.
+Notez également que nous calculons la norme du gradient sur tous les paramètres du modèle.
 
 ```{.python .input}
 %%tab mxnet
@@ -352,12 +352,12 @@ def clip_gradients(self, grad_clip_val, grads):
     return grads
 ```
 
-## Training
+## Formation
 
-Using *The Time Machine* dataset (`data`),
-we train a character-level language model (`model`)
-based on the RNN (`rnn`) implemented from scratch.
-Note that we clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process.
+En utilisant le jeu de données *The Time Machine* (`data`),
+nous formons un modèle de langage au niveau des caractères (`model`)
+basé sur le RNN (`rnn`) implémenté à partir de zéro.
+Notez que nous coupons les gradients avant de mettre à jour les paramètres du modèle. Cela garantit que le modèle ne diverge pas, même si les gradients explosent à un moment donné au cours du processus d'apprentissage.
 
 ```{.python .input}
 %%tab all
@@ -374,24 +374,22 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-## Prediction
+## Prédiction
 
-We need to [**define the prediction function
-to generate new characters following
-the user-provided `prefix`**],
-which is a string containing several characters.
-When looping through these beginning characters in `prefix`,
-we keep passing the hidden state
-to the next time step without
-generating any output.
-This is called the *warm-up* period,
-during which the model updates itself
-(e.g., update the hidden state)
-but does not make predictions.
-After the warm-up period,
-the hidden state is generally better than
-its initialized value at the beginning.
-So we generate the predicted characters and emit them.
+Nous devons [**définir la fonction de prédiction pour générer de nouveaux caractères à la suite de le `prefix` fourni par l'utilisateur**],
+qui est une chaîne contenant plusieurs caractères.
+En bouclant sur ces premiers caractères dans `prefix`,
+nous continuons à transmettre l'état caché
+au pas de temps suivant sans que
+ne génère aucune sortie.
+C'est ce qu'on appelle la période de *réchauffement*,
+pendant laquelle le modèle se met à jour
+(par exemple, il met à jour l'état caché)
+mais ne fait pas de prédictions.
+Après la période de réchauffement,
+l'état caché est généralement meilleur que
+sa valeur initialisée au début.
+On génère donc les caractères prédits et on les émet.
 
 ```{.python .input}
 %%tab all
@@ -415,8 +413,8 @@ def predict(self, prefix, num_preds, vocab, device=None):
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
-In the following, we specify the prefix 
-and have it generate 20 additional characters.
+Dans ce qui suit, nous spécifions le préfixe 
+et lui faisons générer 20 caractères supplémentaires.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -428,33 +426,33 @@ model.predict('it has', 20, data.vocab, d2l.try_gpu())
 model.predict('it has', 20, data.vocab)
 ```
 
-While implementing the above RNN model from scratch is instructive, it is not convenient.
-In the next section we will see how to improve the RNN model,
-such as how to make it easier to implement
-and make it run faster.
+Bien que l'implémentation du modèle RNN ci-dessus à partir de zéro soit instructive, elle n'est pas pratique.
+Dans la section suivante, nous verrons comment améliorer le modèle RNN,
+, notamment en facilitant l'implémentation de
+et en le faisant fonctionner plus rapidement.
 
 
-## Summary
+## Résumé
 
-* We can train an RNN-based character-level language model to generate text following the user-provided text prefix.
-* A simple RNN language model consists of input encoding, RNN modeling, and output generation.
-* Gradient clipping prevents gradient explosion, but it cannot fix vanishing gradients.
-* A warm-up period allows a model to update itself (e.g., obtain a better hidden state than its initialized value) before making any prediction.
+* Nous pouvons entraîner un modèle de langage RNN au niveau des caractères pour générer du texte suivant le préfixe fourni par l'utilisateur.
+* Un modèle de langage RNN simple consiste en un codage d'entrée, une modélisation RNN et une génération de sortie.
+* L'écrêtage du gradient empêche l'explosion du gradient, mais ne peut pas corriger les gradients disparus.
+* Une période d'échauffement permet à un modèle de se mettre à jour (par exemple, obtenir un meilleur état caché que sa valeur initialisée) avant de faire une prédiction.
 
 
-## Exercises
+## Exercices
 
-1. Does the implemented language model predict the next token based on all the past tokens up to the very first token in *The Time Machine*? Which hyperparameter controls the length of history used for prediction?
-1. Show that one-hot encoding is equivalent to picking a different embedding for each object.
-1. Adjust the hyperparameters (e.g., number of epochs, number of hidden units, number of time steps in a minibatch, and learning rate) to improve the perplexity.
-    * How low can you go?
-    * Replace one-hot encoding with learnable embeddings. Does this lead to better performance?
-    * How well will it work on other books by H. G. Wells, e.g., [*The War of the Worlds*](http://www.gutenberg.org/ebooks/36)?
-1. Modify the prediction function such as to use sampling rather than picking the most likely next character.
-    * What happens?
-    * Bias the model towards more likely outputs, e.g., by sampling from $q(x_t \mid x_{t-1}, \ldots, x_1) \propto P(x_t \mid x_{t-1}, \ldots, x_1)^\alpha$ for $\alpha > 1$.
-1. Run the code in this section without clipping the gradient. What happens?
-1. Replace the activation function used in this section with ReLU and repeat the experiments in this section. Do we still need gradient clipping? Why?
+1. Le modèle de langage implémenté prédit-il le prochain token en se basant sur tous les tokens passés jusqu'au tout premier token dans *The Time Machine* ? Quel hyperparamètre contrôle la longueur de l'historique utilisé pour la prédiction ?
+1. Montrez que l'encodage à un coup est équivalent à choisir un encastrement différent pour chaque objet.
+1. Ajustez les hyperparamètres (par exemple, le nombre d'époques, le nombre d'unités cachées, le nombre d'étapes temporelles dans un minibatch et le taux d'apprentissage) pour améliorer la perplexité.
+   * Jusqu'où pouvez-vous descendre ?
+ * Remplacer le codage à un coup par des incorporations apprenables. Cela conduit-il à de meilleures performances ?
+   * Comment cela fonctionnera-t-il sur d'autres livres de H. G. Wells, par exemple, [*The War of the Worlds*](http://www.gutenberg.org/ebooks/36)?
+1. Modifiez la fonction de prédiction de façon à utiliser l'échantillonnage plutôt que de choisir le prochain caractère le plus probable.
+   * Que se passe-t-il ?
+ * Orientez le modèle vers des sorties plus probables, par exemple en échantillonnant à partir de $q(x_t \mid x_{t-1}, \ldots, x_1) \propto P(x_t \mid x_{t-1}, \ldots, x_1)^\alpha$ pour $\alpha > 1$.
+1. Exécutez le code de cette section sans couper le gradient. Que se passe-t-il ?
+1. Remplacez la fonction d'activation utilisée dans cette section par ReLU et répétez les expériences de cette section. Avons-nous encore besoin d'écrêter le gradient ? Pourquoi ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/336)

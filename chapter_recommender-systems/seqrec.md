@@ -1,47 +1,47 @@
-# Sequence-Aware Recommender Systems
+# Systèmes de recommandation tenant compte de la séquence
 
-In previous sections, we abstract the recommendation task as a matrix completion problem without considering users' short-term behaviors. In this section, we will introduce a recommendation model that takes  the sequentially-ordered user interaction logs into account.  It is a sequence-aware recommender :cite:`Quadrana.Cremonesi.Jannach.2018` where the input is an ordered and often timestamped list of past user actions.  A number of recent literatures have demonstrated the usefulness of incorporating such information in modeling users' temporal behavioral patterns and discovering their interest drift.
+Dans les sections précédentes, nous avons abstrait la tâche de recommandation comme un problème de remplissage de matrice sans tenir compte des comportements à court terme des utilisateurs. Dans cette section, nous présentons un modèle de recommandation qui prend en compte les journaux d'interaction des utilisateurs ordonnés de manière séquentielle.  Il s'agit d'un recommandeur sensible à la séquence :cite:`Quadrana.Cremonesi.Jannach.2018` où l'entrée est une liste ordonnée et souvent horodatée des actions passées de l'utilisateur.  Un certain nombre d'ouvrages récents ont démontré l'utilité d'incorporer de telles informations pour modéliser les schémas comportementaux temporels des utilisateurs et découvrir leur dérive d'intérêt.
 
-The model we will introduce, Caser :cite:`Tang.Wang.2018`, short for convolutional sequence embedding recommendation model, adopts convolutional neural networks capture the dynamic pattern influences of users' recent activities. The main component of Caser consists of a horizontal convolutional network and a vertical convolutional network, aiming to uncover the union-level and point-level sequence patterns, respectively.  Point-level pattern indicates the impact of single item in the historical sequence on the target item, while union level pattern implies the influences of several previous actions on the subsequent target. For example, buying both milk and butter together leads to higher probability of buying flour than just buying one of them. Moreover, users' general interests, or long term preferences are also modeled in the last fully connected layers, resulting in a more comprehensive modeling of user interests. Details of the model are described as follows.
+Le modèle que nous allons présenter, Caser :cite:`Tang.Wang.2018` , abréviation de convolutional sequence embedding recommendation model, adopte des réseaux neuronaux à convolution pour capturer les influences dynamiques des activités récentes des utilisateurs. Le composant principal de Caser se compose d'un réseau convolutif horizontal et d'un réseau convolutif vertical, visant à découvrir les modèles de séquence au niveau de l'union et au niveau du point, respectivement.  Le modèle au niveau du point indique l'impact d'un seul élément de la séquence historique sur l'élément cible, tandis que le modèle au niveau de l'union implique les influences de plusieurs actions précédentes sur la cible suivante. Par exemple, l'achat simultané de lait et de beurre entraîne une probabilité plus élevée d'acheter de la farine que l'achat d'un seul de ces produits. En outre, les intérêts généraux des utilisateurs, ou leurs préférences à long terme, sont également modélisés dans les dernières couches entièrement connectées, ce qui permet une modélisation plus complète des intérêts des utilisateurs. Les détails du modèle sont décrits comme suit.
 
-## Model Architectures
+## Architectures du modèle
 
-In sequence-aware recommendation system, each user is associated with a sequence of some items from the item set. Let $S^u = (S_1^u, ... S_{|S_u|}^u)$ denotes the ordered sequence. The goal of Caser is to recommend item by considering user general tastes as well as short-term intention. Suppose we take the previous $L$ items into consideration, an embedding matrix that represents the former interactions for time step $t$ can be constructed:
+Dans un système de recommandation sensible à la séquence, chaque utilisateur est associé à une séquence de certains éléments de l'ensemble des éléments. Soit $S^u = (S_1^u, ... S_{|S_u|}^u)$ dénote la séquence ordonnée. L'objectif de Caser est de recommander des articles en tenant compte des goûts généraux de l'utilisateur ainsi que de ses intentions à court terme. Supposons que nous prenions en considération les éléments précédents $L$, une matrice d'incorporation qui représente les interactions précédentes pour le pas de temps $t$ peut être construite :
 
 $$
 \mathbf{E}^{(u, t)} = [ \mathbf{q}_{S_{t-L}^u} , ..., \mathbf{q}_{S_{t-2}^u}, \mathbf{q}_{S_{t-1}^u} ]^\top,
 $$
 
-where $\mathbf{Q} \in \mathbb{R}^{n \times k}$ represents item embeddings and $\mathbf{q}_i$ denotes the $i^\mathrm{th}$ row. $\mathbf{E}^{(u, t)} \in \mathbb{R}^{L \times k}$ can be used to infer the transient interest of user $u$ at time-step $t$. We can view the input matrix $\mathbf{E}^{(u, t)}$ as an image which is the input of the subsequent two convolutional components.
+où $\mathbf{Q} \in \mathbb{R}^{n \times k}$ représente les incorporations d'éléments et $\mathbf{q}_i$ désigne la ligne de $i^\mathrm{th}$. $\mathbf{E}^{(u, t)} \in \mathbb{R}^{L \times k}$ peut être utilisé pour déduire l'intérêt transitoire de l'utilisateur $u$ au pas de temps $t$. Nous pouvons considérer la matrice d'entrée $\mathbf{E}^{(u, t)}$ comme une image qui est l'entrée des deux composantes convolutionnelles suivantes.
 
-The horizontal convolutional layer has $d$ horizontal filters $\mathbf{F}^j \in \mathbb{R}^{h \times k}, 1 \leq j \leq d, h = \{1, ..., L\}$, and the vertical convolutional layer has $d'$ vertical filters $\mathbf{G}^j \in \mathbb{R}^{ L \times 1}, 1 \leq j \leq d'$. After a series of convolutional and pool operations, we get the two outputs:
+La couche convolutive horizontale comporte $d$ filtres horizontaux $\mathbf{F}^j \in \mathbb{R}^{h \times k}, 1 \leq j \leq d, h = \{1, ..., L\}$, et la couche convolutive verticale comporte $d'$ filtres verticaux $\mathbf{G}^j \in \mathbb{R}^{ L \times 1}, 1 \leq j \leq d'$. Après une série d'opérations de convolution et de pool, nous obtenons les deux sorties :
 
 $$
 \mathbf{o} = \text{HConv}(\mathbf{E}^{(u, t)}, \mathbf{F}) \\
 \mathbf{o}'= \text{VConv}(\mathbf{E}^{(u, t)}, \mathbf{G}) ,
 $$
 
-where $\mathbf{o} \in \mathbb{R}^d$ is the output of horizontal convolutional network and $\mathbf{o}' \in \mathbb{R}^{kd'}$ is the output of vertical convolutional network. For simplicity, we omit the details of convolution and pool operations. They are concatenated and fed into a fully connected neural network layer to get more high-level representations.
+où $\mathbf{o} \in \mathbb{R}^d$ est la sortie du réseau convolutif horizontal et $\mathbf{o}' \in \mathbb{R}^{kd'}$ est la sortie du réseau convolutif vertical. Pour simplifier, nous omettons les détails des opérations de convolution et de pool. Elles sont concaténées et introduites dans une couche de réseau neuronal entièrement connecté pour obtenir des représentations de plus haut niveau.
 
 $$
 \mathbf{z} = \phi(\mathbf{W}[\mathbf{o}, \mathbf{o}']^\top + \mathbf{b}),
 $$
 
-where $\mathbf{W} \in \mathbb{R}^{k \times (d + kd')}$ is the weight matrix and $\mathbf{b} \in \mathbb{R}^k$ is the bias. The learned vector $\mathbf{z} \in \mathbb{R}^k$ is the representation of user's short-term intent.
+où $\mathbf{W} \in \mathbb{R}^{k \times (d + kd')}$ est la matrice de poids et $\mathbf{b} \in \mathbb{R}^k$ est le biais. Le vecteur appris $\mathbf{z} \in \mathbb{R}^k$ est la représentation de l'intention à court terme de l'utilisateur.
 
-At last, the prediction function combines users' short-term and general taste together, which is defined as:
+Enfin, la fonction de prédiction combine le goût à court terme et le goût général des utilisateurs, qui est défini comme suit :
 
 $$
 \hat{y}_{uit} = \mathbf{v}_i \cdot [\mathbf{z}, \mathbf{p}_u]^\top + \mathbf{b}'_i,
 $$
 
-where $\mathbf{V} \in \mathbb{R}^{n \times 2k}$ is another item embedding matrix. $\mathbf{b}' \in \mathbb{R}^n$ is the item specific bias.  $\mathbf{P} \in \mathbb{R}^{m \times k}$ is the user embedding matrix for users' general tastes. $\mathbf{p}_u \in \mathbb{R}^{ k}$ is the $u^\mathrm{th}$ row of $P$ and $\mathbf{v}_i \in \mathbb{R}^{2k}$ is the $i^\mathrm{th}$ row of $\mathbf{V}$.
+où $\mathbf{V} \in \mathbb{R}^{n \times 2k}$ est une autre matrice d'intégration d'élément. $\mathbf{b}' \in \mathbb{R}^n$ est le biais spécifique à l'élément. $\mathbf{P} \in \mathbb{R}^{m \times k}$ est la matrice d'intégration de l'utilisateur pour les goûts généraux des utilisateurs. $\mathbf{p}_u \in \mathbb{R}^{ k}$ est la ligne $u^\mathrm{th}$ de $P$ et $\mathbf{v}_i \in \mathbb{R}^{2k}$ est la ligne $i^\mathrm{th}$ de $\mathbf{V}$.
 
-The model can be learned with BPR or Hinge loss. The architecture of Caser is shown below:
+Le modèle peut être appris avec BPR ou la perte Hinge. L'architecture de Caser est présentée ci-dessous :
 
-![Illustration of the Caser Model](../img/rec-caser.svg)
+![Illustration of the Caser Model](../img/rec-caser.svg) 
 
-We first import the required libraries.
+ Nous commençons par importer les bibliothèques nécessaires.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -54,8 +54,8 @@ import random
 npx.set_np()
 ```
 
-## Model Implementation
-The following code implements the Caser model. It consists of a vertical convolutional layer, a horizontal convolutional layer, and a full-connected layer.
+## Implémentation du modèle
+Le code suivant implémente le modèle de Caser. Il se compose d'une couche convolutive verticale, d'une couche convolutive horizontale et d'une couche entièrement connectée.
 
 ```{.python .input  n=4}
 #@tab mxnet
@@ -105,8 +105,8 @@ class Caser(nn.Block):
         return res
 ```
 
-## Sequential Dataset with Negative Sampling
-To process the sequential interaction data, we need to reimplement the `Dataset` class. The following code creates a new dataset class named `SeqDataset`. In each sample, it outputs the user identity, his previous $L$ interacted items as a sequence and the next item he interacts as the target. The following figure demonstrates the data loading process for one user. Suppose that this user liked 9 movies, we organize these nine movies in chronological order. The latest movie is left out as the test item. For the remaining eight movies, we can get three training samples, with each sample containing a sequence of five ($L=5$) movies and its subsequent item as the target item. Negative samples are also included in the customized dataset.
+## Ensemble de données séquentielles avec échantillonnage négatif
+Pour traiter les données d'interaction séquentielles, nous devons réimplémenter la classe `Dataset`. Le code suivant crée une nouvelle classe de jeu de données nommée `SeqDataset`. Dans chaque échantillon, il fournit l'identité de l'utilisateur, les éléments qu'il a interagis précédemment avec $L$ sous forme de séquence et le prochain élément qu'il interagit comme cible. La figure suivante illustre le processus de chargement des données pour un utilisateur. Supposons que cet utilisateur ait aimé 9 films, nous organisons ces neuf films par ordre chronologique. Le dernier film est laissé de côté en tant qu'élément test. Pour les huit films restants, nous pouvons obtenir trois échantillons d'entraînement, chaque échantillon contenant une séquence de cinq films ($L=5$) et son élément suivant comme élément cible. Les échantillons négatifs sont également inclus dans l'ensemble de données personnalisé.
 
 ![Illustration of the data generation process](../img/rec-seq-data.svg)
 
@@ -165,9 +165,9 @@ class SeqDataset(gluon.data.Dataset):
                 neg[i])
 ```
 
-## Load the MovieLens 100K dataset
+## Charger l'ensemble de données MovieLens 100K
 
-Afterwards, we read and split the MovieLens 100K dataset in sequence-aware mode and load the training data with sequential dataloader implemented above.
+Ensuite, nous lisons et divisons l'ensemble de données MovieLens 100K en mode séquentiel et chargeons les données d'entraînement avec le dataloader séquentiel implémenté ci-dessus.
 
 ```{.python .input  n=6}
 #@tab mxnet
@@ -188,10 +188,10 @@ test_seq_iter = train_seq_data.test_seq
 train_seq_data[0]
 ```
 
-The training data structure is shown above. The first element is the user identity, the next list indicates the last five items this user liked, and the last element is the item this user liked after the five items.
+La structure des données d'entraînement est présentée ci-dessus. Le premier élément est l'identité de l'utilisateur, la liste suivante indique les cinq derniers éléments que cet utilisateur a aimés, et le dernier élément est l'élément que cet utilisateur a aimé après les cinq éléments.
 
-## Train the Model
-Now, let's train the model. We use the same setting as NeuMF, including learning rate, optimizer, and $k$, in the last section so that the results are comparable.
+## Former le modèle
+Maintenant, nous allons former le modèle. Nous utilisons les mêmes paramètres que NeuMF, y compris le taux d'apprentissage, l'optimiseur et $k$, dans la dernière section afin que les résultats soient comparables.
 
 ```{.python .input  n=7}
 #@tab mxnet
@@ -208,15 +208,15 @@ d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                   d2l.evaluate_ranking, candidates, eval_step=1)
 ```
 
-## Summary
-* Inferring a user's short-term and long-term interests can make prediction of the next item that he preferred more effectively.
-* Convolutional neural networks can be utilized to capture users' short-term interests from sequential interactions.
+## Résumé
+* L'inférence des intérêts à court et à long terme d'un utilisateur peut rendre plus efficace la prédiction du prochain élément qu'il a préféré.
+* Les réseaux neuronaux convolutifs peuvent être utilisés pour capturer les intérêts à court terme des utilisateurs à partir d'interactions séquentielles.
 
-## Exercises
+## Exercices
 
-* Conduct an ablation study by removing one of the horizontal and vertical convolutional networks, which component is the more important ?
-* Vary the hyperparameter $L$. Does longer historical interactions bring higher accuracy?
-* Apart from the sequence-aware recommendation task we introduced above, there is another type of sequence-aware recommendation task called session-based recommendation :cite:`Hidasi.Karatzoglou.Baltrunas.ea.2015`. Can you explain the differences between these two tasks?
+* Effectuez une étude d'ablation en supprimant l'un des réseaux convolutifs horizontaux et verticaux, quel composant est le plus important ?
+* Faites varier l'hyperparamètre $L$. Des interactions historiques plus longues apportent-elles une meilleure précision ?
+* Outre la tâche de recommandation basée sur la séquence que nous avons présentée ci-dessus, il existe un autre type de tâche de recommandation basée sur la séquence appelée recommandation basée sur la session :cite:`Hidasi.Karatzoglou.Baltrunas.ea.2015` . Pouvez-vous expliquer les différences entre ces deux tâches ?
 
 
 :begin_tab:`mxnet`

@@ -1,14 +1,14 @@
-#  The MovieLens Dataset
+# The MovieLens Dataset
 
-There are a number of datasets that are available for recommendation research. Amongst them, the [MovieLens](https://movielens.org/) dataset is probably one of the more popular ones. MovieLens is a non-commercial web-based movie recommender system. It is created in 1997 and run by GroupLens, a research lab at the University of Minnesota, in order to gather movie rating data for research purposes.  MovieLens data has been critical for several research studies including personalized recommendation and social psychology.
-
-
-## Getting the Data
+Il existe un certain nombre de jeux de données disponibles pour la recherche sur les recommandations. Parmi eux, le jeu de données [MovieLens](https://movielens.org/) est probablement l'un des plus populaires. MovieLens est un système de recommandation de films non commercial basé sur le Web. Il a été créé en 1997 et est géré par GroupLens, un laboratoire de recherche de l'Université du Minnesota, dans le but de recueillir des données de classement de films à des fins de recherche.  Les données de MovieLens ont été essentielles pour plusieurs études de recherche, notamment sur la recommandation personnalisée et la psychologie sociale.
 
 
-The MovieLens dataset is hosted by the [GroupLens](https://grouplens.org/datasets/movielens/) website. Several versions are available. We will use the MovieLens 100K dataset :cite:`Herlocker.Konstan.Borchers.ea.1999`.  This dataset is comprised of $100,000$ ratings, ranging from 1 to 5 stars, from 943 users on 1682 movies. It has been cleaned up so that each user has rated at least 20 movies. Some simple demographic information such as age, gender, genres for the users and items are also available.  We can download the [ml-100k.zip](http://files.grouplens.org/datasets/movielens/ml-100k.zip) and extract the `u.data` file, which contains all the $100,000$ ratings in the csv format. There are many other files in the folder, a detailed description for each file can be found in the [README](http://files.grouplens.org/datasets/movielens/ml-100k-README.txt) file of the dataset.
+## Obtenir les données
 
-To begin with, let's import the packages required to run this section's experiments.
+
+ Le jeu de données MovieLens est hébergé par le site [GroupLens](https://grouplens.org/datasets/movielens/). Plusieurs versions sont disponibles. Nous utiliserons le jeu de données MovieLens 100K :cite:`Herlocker.Konstan.Borchers.ea.1999` .  Ce jeu de données est composé de $100,000$ évaluations, allant de 1 à 5 étoiles, de 943 utilisateurs sur 1682 films. Il a été nettoyé de manière à ce que chaque utilisateur ait évalué au moins 20 films. Quelques informations démographiques simples telles que l'âge, le sexe, les genres pour les utilisateurs et les articles sont également disponibles.  Nous pouvons télécharger le dossier [ml-100k.zip](http://files.grouplens.org/datasets/movielens/ml-100k.zip) et extraire le fichier `u.data`, qui contient toutes les évaluations de $100,000$ au format csv. Il y a beaucoup d'autres fichiers dans le dossier, une description détaillée de chaque fichier peut être trouvée dans le fichier [README](http://files.grouplens.org/datasets/movielens/ml-100k-README.txt) de l'ensemble de données.
+
+Pour commencer, nous importons les paquets nécessaires à l'exécution des expériences de cette section.
 
 ```{.python .input  n=1}
 #@tab mxnet
@@ -18,7 +18,7 @@ import os
 import pandas as pd
 ```
 
-Then, we download the MovieLens 100k dataset and load the interactions as `DataFrame`.
+Ensuite, nous téléchargeons le jeu de données MovieLens 100k et chargeons les interactions sous `DataFrame`.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -38,9 +38,9 @@ def read_data_ml100k():
     return data, num_users, num_items
 ```
 
-## Statistics of the Dataset
+## Statistiques de l'ensemble de données
 
-Let's load up the data and inspect the first five records manually. It is an effective way to learn the data structure and verify that they have been loaded properly.
+Chargeons les données et inspectons manuellement les cinq premiers enregistrements. C'est un moyen efficace d'apprendre la structure des données et de vérifier qu'elles ont été chargées correctement.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -51,9 +51,9 @@ print(f'matrix sparsity: {sparsity:f}')
 print(data.head(5))
 ```
 
-We can see that each line consists of four columns, including "user id" 1-943, "item id" 1-1682, "rating" 1-5 and "timestamp". We can construct an interaction matrix of size $n \times m$, where $n$ and $m$ are the number of users and the number of items respectively. This dataset only records the existing ratings, so we can also call it rating matrix and we will use interaction matrix and rating matrix interchangeably in case that the values of this matrix represent exact ratings. Most of the values in the rating matrix are unknown as users have not rated the majority of movies. We also show the sparsity of this dataset. The sparsity is defined as `1 - number of nonzero entries / ( number of users * number of items)`. Clearly, the interaction matrix is extremely sparse (i.e., sparsity = 93.695%). Real world datasets may suffer from a greater extent of sparsity and has been a long-standing challenge in building recommender systems. A viable solution is to use additional side information such as user/item features to alleviate the sparsity.
+Nous pouvons voir que chaque ligne est constituée de quatre colonnes, dont "user id" 1-943, "item id" 1-1682, "rating" 1-5 et "timestamp". Nous pouvons construire une matrice d'interaction de taille $n \times m$, où $n$ et $m$ sont respectivement le nombre d'utilisateurs et le nombre d'articles. Cet ensemble de données n'enregistre que les évaluations existantes, nous pouvons donc l'appeler matrice d'évaluation et nous utiliserons indifféremment matrice d'interaction et matrice d'évaluation dans le cas où les valeurs de cette matrice représentent des évaluations exactes. La plupart des valeurs de la matrice d'évaluation sont inconnues car les utilisateurs n'ont pas évalué la majorité des films. Nous montrons également la sparsité de cet ensemble de données. La sparsité est définie comme `1 - number of nonzero entries / ( number of users * number of items)`. Il est clair que la matrice d'interaction est extrêmement éparse (sparsité = 93,695 %). Les ensembles de données du monde réel peuvent souffrir d'une plus grande sparsité, ce qui constitue un défi de longue date pour la création de systèmes de recommandation. Une solution viable consiste à utiliser des informations secondaires supplémentaires, telles que les caractéristiques de l'utilisateur et de l'article, pour atténuer la sparsité.
 
-We then plot the distribution of the count of different ratings. As expected, it appears to be a normal distribution, with most ratings centered at 3-4.
+Nous traçons ensuite la distribution du nombre d'évaluations différentes. Comme prévu, il s'agit d'une distribution normale, avec la plupart des évaluations centrées sur 3-4.
 
 ```{.python .input  n=4}
 #@tab mxnet
@@ -64,9 +64,9 @@ d2l.plt.title('Distribution of Ratings in MovieLens 100K')
 d2l.plt.show()
 ```
 
-## Splitting the dataset
+## Division de l'ensemble de données
 
-We split the dataset into training and test sets. The following function provides two split modes including `random` and `seq-aware`. In the `random` mode, the function splits the 100k interactions randomly without considering timestamp and uses the 90% of the data as training samples and the rest 10% as test samples by default. In the `seq-aware` mode, we leave out the item that a user rated most recently for test, and users' historical interactions as training set.  User historical interactions are sorted from oldest to newest based on timestamp. This mode will be used in the sequence-aware recommendation section.
+Nous divisons l'ensemble de données en ensembles de formation et de test. La fonction suivante propose deux modes de fractionnement :`random` et `seq-aware`. Dans le mode `random`, la fonction fractionne les 100 000 interactions de manière aléatoire sans tenir compte de l'horodatage et utilise par défaut 90 % des données comme échantillons d'entraînement et les 10 % restants comme échantillons de test. Dans le mode `seq-aware`, nous laissons de côté l'élément qu'un utilisateur a évalué le plus récemment pour le test, et les interactions historiques des utilisateurs comme ensemble de formation.  Les interactions historiques des utilisateurs sont triées du plus ancien au plus récent en fonction de l'horodatage. Ce mode sera utilisé dans la section sur la recommandation sensible aux séquences.
 
 ```{.python .input  n=5}
 #@tab mxnet
@@ -95,11 +95,11 @@ def split_data_ml100k(data, num_users, num_items,
     return train_data, test_data
 ```
 
-Note that it is good practice to use a validation set in practice, apart from only a test set. However, we omit that for the sake of brevity. In this case, our test set can be regarded as our held-out validation set.
+Notez qu'il est bon d'utiliser un ensemble de validation dans la pratique, en plus du seul ensemble de test. Cependant, nous l'omettons pour des raisons de concision. Dans ce cas, notre ensemble de test peut être considéré comme notre ensemble de validation retenu.
 
-## Loading the data
+## Chargement des données
 
-After dataset splitting, we will convert the training set and test set into lists and dictionaries/matrix for the sake of convenience. The following function reads the dataframe line by line and enumerates the index of users/items start from zero. The function then returns lists of users, items, ratings and a dictionary/matrix that records the interactions. We can specify the type of feedback to either `explicit` or `implicit`.
+Après avoir divisé l'ensemble de données, nous allons convertir l'ensemble de formation et l'ensemble de test en listes et dictionnaires/matrices pour des raisons de commodité. La fonction suivante lit le cadre de données ligne par ligne et énumère l'index des utilisateurs/articles à partir de zéro. La fonction renvoie ensuite des listes d'utilisateurs, d'articles, d'évaluations et un dictionnaire/matrice qui enregistre les interactions. Nous pouvons spécifier le type de rétroaction à `explicit` ou `implicit`.
 
 ```{.python .input  n=6}
 #@tab mxnet
@@ -120,7 +120,7 @@ def load_data_ml100k(data, num_users, num_items, feedback='explicit'):
     return users, items, scores, inter
 ```
 
-Afterwards, we put the above steps together and it will be used in the next section. The results are wrapped with `Dataset` and `DataLoader`. Note that the `last_batch` of `DataLoader` for training data is set to the `rollover` mode (The remaining samples are rolled over to the next epoch.) and orders are shuffled.
+Ensuite, nous assemblons les étapes ci-dessus et elles seront utilisées dans la section suivante. Les résultats sont enveloppés dans `Dataset` et `DataLoader`. Notez que le `last_batch` de `DataLoader` pour les données de formation est réglé sur le mode `rollover` (Les échantillons restants sont reportés à l'époque suivante.) et les ordres sont mélangés.
 
 ```{.python .input  n=7}
 #@tab mxnet
@@ -146,16 +146,16 @@ def split_and_load_ml100k(split_mode='seq-aware', feedback='explicit',
     return num_users, num_items, train_iter, test_iter
 ```
 
-## Summary
+## Résumé
 
-* MovieLens datasets are widely used for recommendation research. It is public available and free to use.
-* We define functions to download and preprocess the MovieLens 100k dataset for further use in later sections.
+* Les jeux de données MovieLens sont largement utilisés pour la recherche sur les recommandations. Ils sont disponibles publiquement et peuvent être utilisés gratuitement.
+* Nous définissons des fonctions pour télécharger et prétraiter le jeu de données MovieLens 100k pour une utilisation ultérieure dans les sections suivantes.
 
 
-## Exercises
+## Exercices
 
-* What other similar recommendation datasets can you find?
-* Go through the [https://movielens.org/](https://movielens.org/) site for more information about MovieLens.
+* Quels autres jeux de données de recommandation similaires pouvez-vous trouver ?
+* Parcourez le site [https://movielens.org/](https://movielens.org/) pour obtenir plus d'informations sur MovieLens.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/399)

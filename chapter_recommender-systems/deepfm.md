@@ -1,36 +1,36 @@
 # Deep Factorization Machines
 
-Learning effective feature combinations is critical to the success of click-through rate prediction task. Factorization machines model feature interactions in a linear paradigm (e.g., bilinear interactions). This is often insufficient for real-world data where inherent feature crossing structures are usually very complex and nonlinear. What's worse, second-order feature interactions are generally used in factorization machines in practice. Modeling higher degrees of feature combinations with factorization machines is possible theoretically but it is usually not adopted due to numerical instability and high computational complexity.
+L'apprentissage de combinaisons de caractéristiques efficaces est essentiel au succès de la tâche de prédiction du taux de clics. Les machines à factoriser modélisent les interactions des caractéristiques dans un paradigme linéaire (par exemple, les interactions bilinéaires). Cela est souvent insuffisant pour les données du monde réel où les structures inhérentes de croisement de caractéristiques sont généralement très complexes et non linéaires. Pire encore, les interactions de second ordre sont généralement utilisées en pratique dans les machines à factoriser. La modélisation de combinaisons de caractéristiques de plus haut degré avec des machines à factoriser est possible en théorie, mais elle n'est généralement pas adoptée en raison de l'instabilité numérique et de la complexité de calcul élevée.
 
-One effective solution is using deep neural networks. Deep neural networks are powerful in feature representation learning and have the potential to learn sophisticated feature interactions. As such, it is natural to integrate deep neural networks to factorization machines. Adding nonlinear transformation layers to factorization machines gives it the capability to model both low-order feature combinations and high-order feature combinations. Moreover, non-linear inherent structures from inputs can also be captured with deep neural networks. In this section, we will introduce a representative model named deep factorization machines (DeepFM) :cite:`Guo.Tang.Ye.ea.2017` which combine FM and deep neural networks.
+Une solution efficace consiste à utiliser des réseaux neuronaux profonds. Les réseaux neuronaux profonds sont puissants dans l'apprentissage de la représentation des caractéristiques et ont le potentiel d'apprendre des interactions de caractéristiques sophistiquées. Il est donc naturel d'intégrer les réseaux neuronaux profonds aux machines à factoriser. L'ajout de couches de transformation non linéaires aux machines à factoriser leur donne la capacité de modéliser à la fois des combinaisons de caractéristiques d'ordre inférieur et des combinaisons de caractéristiques d'ordre supérieur. De plus, les structures non linéaires inhérentes aux entrées peuvent également être capturées par les réseaux neuronaux profonds. Dans cette section, nous présenterons un modèle représentatif appelé machine à factoriser profonde (DeepFM) :cite:`Guo.Tang.Ye.ea.2017` qui combine la FM et les réseaux neuronaux profonds.
 
 
-## Model Architectures
+## Architectures du modèle
 
-DeepFM consists of an FM component and a deep component which are integrated in a parallel structure. The FM component is the same as the 2-way factorization machines which is used to model the low-order feature interactions. The deep component is an MLP that is used to capture high-order feature interactions and nonlinearities. These two components share the same inputs/embeddings and their outputs are summed up as the final prediction. It is worth pointing out that the spirit of DeepFM resembles that of the Wide \& Deep architecture which can capture both memorization and generalization. The advantages of DeepFM over the Wide \& Deep model is that it reduces the effort of hand-crafted feature engineering by identifying feature combinations automatically.
+DeepFM se compose d'un composant FM et d'un composant profond qui sont intégrés dans une structure parallèle. La composante FM est la même que les machines de factorisation à deux voies qui sont utilisées pour modéliser les interactions de caractéristiques d'ordre inférieur. Le composant profond est un MLP qui est utilisé pour capturer les interactions de caractéristiques d'ordre supérieur et les non-linéarités. Ces deux composantes partagent les mêmes entrées/embeddings et leurs sorties sont additionnées pour former la prédiction finale. Il convient de souligner que l'esprit de DeepFM ressemble à celui de l'architecture Wide &amp; Deep qui peut capturer à la fois la mémorisation et la généralisation. L'avantage de DeepFM par rapport au modèle Wide \&amp; Deep est qu'il réduit l'effort d'ingénierie manuelle des caractéristiques en identifiant automatiquement les combinaisons de caractéristiques.
 
-We omit the description of the FM component for brevity and denote the output as $\hat{y}^{(FM)}$. Readers are referred to the last section for more details. Let $\mathbf{e}_i \in \mathbb{R}^{k}$ denote the latent feature vector of the $i^\mathrm{th}$ field.  The input of the deep component is the concatenation of the dense embeddings of all fields that are looked up with the sparse categorical feature input, denoted as:
+Par souci de concision, nous omettons la description du composant FM et désignons la sortie par $\hat{y}^{(FM)}$. Le lecteur est invité à se reporter à la dernière section pour plus de détails. Soit $\mathbf{e}_i \in \mathbb{R}^{k}$, le vecteur de caractéristiques latentes du champ $i^\mathrm{th}$.  L'entrée de la composante profonde est la concaténation des enchâssements denses de tous les champs qui sont recherchés avec l'entrée des caractéristiques catégorielles éparses, désignée par :
 
 $$
 \mathbf{z}^{(0)}  = [\mathbf{e}_1, \mathbf{e}_2, ..., \mathbf{e}_f],
 $$
 
-where $f$ is the number of fields.  It is then fed into the following neural network:
+où $f$ est le nombre de champs.  Elle est ensuite introduite dans le réseau neuronal suivant :
 
 $$
 \mathbf{z}^{(l)}  = \alpha(\mathbf{W}^{(l)}\mathbf{z}^{(l-1)} + \mathbf{b}^{(l)}),
 $$
 
-where $\alpha$ is the activation function.  $\mathbf{W}_{l}$ and $\mathbf{b}_{l}$ are the weight and bias at the $l^\mathrm{th}$ layer. Let $y_{DNN}$ denote the output of the prediction. The ultimate prediction of DeepFM is the summation of the outputs from both FM and DNN. So we have:
+où $\alpha$ est la fonction d'activation. $\mathbf{W}_{l}$ et $\mathbf{b}_{l}$ sont le poids et le biais de la couche $l^\mathrm{th}$. Soit $y_{DNN}$ la sortie de la prédiction. La prédiction finale de DeepFM est la somme des sorties de FM et de DNN. Nous avons donc
 
 $$
 \hat{y} = \sigma(\hat{y}^{(FM)} + \hat{y}^{(DNN)}),
 $$
 
-where $\sigma$ is the sigmoid function. The architecture of DeepFM is illustrated below.
+où $\sigma$ est la fonction sigmoïde. L'architecture de DeepFM est illustrée ci-dessous.
 ![Illustration of the DeepFM model](../img/rec-deepfm.svg)
 
-It is worth noting that DeepFM is not the only way to combine deep neural networks with FM. We can also add nonlinear layers over the feature interactions :cite:`He.Chua.2017`.
+Il est intéressant de noter que DeepFM n'est pas la seule façon de combiner des réseaux neuronaux profonds avec FM. Nous pouvons également ajouter des couches non linéaires sur les interactions de caractéristiques :cite:`He.Chua.2017` .
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -42,8 +42,8 @@ import os
 npx.set_np()
 ```
 
-## Implemenation of DeepFM
-The implementation of DeepFM is similar to that of FM. We keep the FM part unchanged and use an MLP block with `relu` as the activation function. Dropout is also used to regularize the model. The number of neurons of the MLP can be adjusted with the `mlp_dims` hyperparameter.
+## Implémentation de DeepFM
+L'implémentation de DeepFM est similaire à celle de FM. Nous gardons la partie FM inchangée et utilisons un bloc MLP avec `relu` comme fonction d'activation. Le Dropout est également utilisé pour régulariser le modèle. Le nombre de neurones du MLP peut être ajusté avec l'hyperparamètre `mlp_dims`.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -74,8 +74,8 @@ class DeepFM(nn.Block):
         return x
 ```
 
-## Training and Evaluating the Model
-The data loading process is the same as that of FM. We set the MLP component of DeepFM to a three-layered dense network with the a pyramid structure (30-20-10). All other hyperparameters remain the same as FM.
+## Formation et évaluation du modèle
+Le processus de chargement des données est le même que celui de FM. Nous définissons le composant MLP de DeepFM comme un réseau dense à trois couches avec une structure pyramidale (30-20-10). Tous les autres hyperparamètres restent les mêmes que ceux de FM.
 
 ```{.python .input  n=4}
 #@tab mxnet
@@ -102,17 +102,17 @@ loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-Compared with FM, DeepFM converges faster and achieves better performance.
+Comparé à FM, DeepFM converge plus rapidement et obtient de meilleures performances.
 
-## Summary
+## Résumé
 
-* Integrating neural networks to FM enables it to model complex and high-order interactions.
-* DeepFM outperforms the original FM on the advertising dataset.
+* L'intégration de réseaux neuronaux à FM lui permet de modéliser des interactions complexes et de haut niveau.
+* DeepFM surpasse le FM original sur le jeu de données de la publicité.
 
-## Exercises
+## Exercices
 
-* Vary the structure of the MLP to check its impact on model performance.
-* Change the dataset to Criteo and compare it with the original FM model.
+* Varier la structure du MLP pour vérifier son impact sur les performances du modèle.
+* Changez le jeu de données pour Criteo et comparez-le avec le modèle FM original.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/407)

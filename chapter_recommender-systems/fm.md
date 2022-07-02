@@ -1,22 +1,22 @@
 # Factorization Machines
 
-Factorization machines (FM) :cite:`Rendle.2010`, proposed by Steffen Rendle in 2010, is a supervised algorithm that can be used for classification, regression, and ranking tasks. It quickly took notice and became a popular and impactful method for making predictions and recommendations. Particularly, it is a generalization of the linear regression model and the matrix factorization model. Moreover, it is reminiscent of support vector machines with a polynomial kernel. The strengths of factorization machines over the linear regression and matrix factorization are: (1) it can model $\chi$-way variable interactions, where $\chi$ is the number of polynomial order and is usually set to two. (2) A fast optimization algorithm associated with factorization machines can reduce the polynomial computation time to linear complexity, making it extremely efficient especially for high dimensional sparse inputs.  For these reasons, factorization machines are widely employed in modern advertisement and products recommendations. The technical details and implementations are described below.
+Factorization machines (FM) :cite:`Rendle.2010` , proposé par Steffen Rendle en 2010, est un algorithme supervisé qui peut être utilisé pour des tâches de classification, de régression et de classement. Il s'est rapidement fait remarquer et est devenu une méthode populaire et impactante pour faire des prédictions et des recommandations. En particulier, il s'agit d'une généralisation du modèle de régression linéaire et du modèle de factorisation matricielle. De plus, il rappelle les machines à vecteurs de support avec un noyau polynomial. Les points forts des machines à factoriser par rapport à la régression linéaire et à la factorisation matricielle sont les suivants : (1) elle peut modéliser les interactions entre les variables $\chi$-way, où $\chi$ est le nombre d'ordre polynomial et est généralement fixé à deux. (2) Un algorithme d'optimisation rapide associé aux machines à factoriser peut réduire le temps de calcul polynomial à une complexité linéaire, ce qui le rend extrêmement efficace, en particulier pour les entrées éparses de haute dimension.  Pour ces raisons, les machines à factoriser sont largement utilisées dans la publicité moderne et les recommandations de produits. Les détails techniques et les implémentations sont décrits ci-dessous.
 
 
-## 2-Way Factorization Machines
+## Machines de factorisation à 2 voies
 
-Formally, let $x \in \mathbb{R}^d$ denote the feature vectors of one sample, and $y$ denote the corresponding label which can be real-valued label or class label such as binary class "click/non-click". The model for a factorization machine of degree two is defined as:
+Formellement, laissez $x \in \mathbb{R}^d$ désigner les vecteurs de caractéristiques d'un échantillon, et $y$ désigner l'étiquette correspondante qui peut être une étiquette à valeur réelle ou une étiquette de classe telle que la classe binaire "clic/non-clic". Le modèle pour une machine à factoriser de degré deux est défini comme suit :
 
 $$
 \hat{y}(x) = \mathbf{w}_0 + \sum_{i=1}^d \mathbf{w}_i x_i + \sum_{i=1}^d\sum_{j=i+1}^d \langle\mathbf{v}_i, \mathbf{v}_j\rangle x_i x_j
 $$
 
-where $\mathbf{w}_0 \in \mathbb{R}$ is the global bias; $\mathbf{w} \in \mathbb{R}^d$ denotes the weights of the i-th variable; $\mathbf{V} \in \mathbb{R}^{d\times k}$ represents the feature embeddings; $\mathbf{v}_i$ represents the $i^\mathrm{th}$ row of $\mathbf{V}$; $k$ is the dimensionality of latent factors; $\langle\cdot, \cdot \rangle$ is the dot product of two vectors.  $\langle \mathbf{v}_i, \mathbf{v}_j \rangle$ model the interaction between the $i^\mathrm{th}$ and $j^\mathrm{th}$ feature. Some feature interactions can be easily understood so they can be designed by experts. However, most other feature interactions are hidden in data and difficult to identify. So modeling feature interactions automatically can greatly reduce the efforts in feature engineering. It is obvious that the first two terms correspond to the linear regression model and the last term is an extension of the matrix factorization model. If the feature $i$ represents an item and the feature $j$ represents a user, the third term is exactly the dot product between user and item embeddings. It is worth noting that FM can also generalize to higher orders (degree > 2). Nevertheless, the numerical stability might weaken the generalization.
+où $\mathbf{w}_0 \in \mathbb{R}$ est le biais global ; $\mathbf{w} \in \mathbb{R}^d$ désigne les poids de la i-ième variable ; $\mathbf{V} \in \mathbb{R}^{d\times k}$ représente les incorporations de caractéristiques ; $\mathbf{v}_i$ représente la ligne $i^\mathrm{th}$ de $\mathbf{V}$; $k$ est la dimensionnalité des facteurs latents ; $\langle\cdot, \cdot \rangle$ est le produit scalaire de deux vecteurs. $\langle \mathbf{v}_i, \mathbf{v}_j \rangle$ modélise l'interaction entre la caractéristique $i^\mathrm{th}$ et $j^\mathrm{th}$. Certaines interactions de caractéristiques peuvent être facilement comprises et peuvent donc être conçues par des experts. Cependant, la plupart des autres interactions de caractéristiques sont cachées dans les données et difficiles à identifier. La modélisation automatique des interactions entre les fonctionnalités peut donc réduire considérablement les efforts d'ingénierie des fonctionnalités. Il est évident que les deux premiers termes correspondent au modèle de régression linéaire et que le dernier terme est une extension du modèle de factorisation matricielle. Si la caractéristique $i$ représente un article et la caractéristique $j$ représente un utilisateur, le troisième terme est exactement le produit scalaire entre l'utilisateur et les incorporations d'articles. Il est intéressant de noter que FM peut également être généralisé à des ordres supérieurs (degré &gt; 2). Néanmoins, la stabilité numérique pourrait affaiblir la généralisation.
 
 
-## An Efficient Optimization Criterion
+## Un critère d'optimisation efficace
 
-Optimizing the factorization machines in a  straight forward method leads to a complexity of $\mathcal{O}(kd^2)$ as all pairwise interactions require to be computed. To solve this inefficiency problem, we can reorganize the third term of FM which could greatly reduce the computation cost, leading to a linear time complexity ($\mathcal{O}(kd)$).  The reformulation of the pairwise interaction term is as follows:
+L'optimisation des machines de factorisation par une méthode directe conduit à une complexité de $\mathcal{O}(kd^2)$ car toutes les interactions par paire doivent être calculées. Pour résoudre ce problème d'inefficacité, nous pouvons réorganiser le troisième terme de FM, ce qui pourrait réduire considérablement le coût de calcul, conduisant à une complexité linéaire en temps ($\mathcal{O}(kd)$).  La reformulation du terme d'interaction par paire est la suivante :
 
 $$
 \begin{aligned}
@@ -28,9 +28,9 @@ $$
  \end{aligned}
 $$
 
-With this reformulation, the model complexity are decreased greatly. Moreover, for sparse features, only non-zero elements needs to be computed so that the overall complexity is linear to the number of non-zero features.
+Avec cette reformulation, la complexité du modèle est considérablement réduite. De plus, pour les caractéristiques éparses, seuls les éléments non nuls doivent être calculés, de sorte que la complexité globale est linéaire par rapport au nombre de caractéristiques non nulles.
 
-To learn the FM model, we can use the MSE loss for regression task, the cross-entropy loss for classification tasks, and the BPR loss for ranking task. Standard optimizers such as stochastic gradient descent and Adam are viable for optimization.
+Pour apprendre le modèle FM, nous pouvons utiliser la perte MSE pour les tâches de régression, la perte d'entropie croisée pour les tâches de classification et la perte BPR pour les tâches de classement. Les optimiseurs standard tels que la descente de gradient stochastique et Adam sont viables pour l'optimisation.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -42,8 +42,8 @@ import os
 npx.set_np()
 ```
 
-## Model Implementation
-The following code implement the factorization machines. It is clear to see that FM consists a linear regression block and an efficient feature interaction block. We apply a sigmoid function over the final score since we treat the CTR prediction as a classification task.
+## Implémentation du modèle
+Le code suivant implémente les machines de factorisation. Il est clair de voir que FM consiste en un bloc de régression linéaire et un bloc d'interaction efficace des caractéristiques. Nous appliquons une fonction sigmoïde sur le score final puisque nous traitons la prédiction du CTR comme une tâche de classification.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -64,8 +64,8 @@ class FM(nn.Block):
         return x
 ```
 
-## Load the Advertising Dataset
-We use the CTR data wrapper from the last section to load the online advertising dataset.
+## Charger l'ensemble de données publicitaires
+Nous utilisons l'enveloppeur de données CTR de la dernière section pour charger l'ensemble de données publicitaires en ligne.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -84,7 +84,7 @@ test_iter = gluon.data.DataLoader(
 ```
 
 ## Train the Model
-Afterwards, we train the model. The learning rate is set to 0.02 and the embedding size is set to 20 by default. The `Adam` optimizer and the `SigmoidBinaryCrossEntropyLoss` loss are used for model training.
+Ensuite, nous formons le modèle. Le taux d'apprentissage est fixé à 0,02 et la taille d'intégration est fixée à 20 par défaut. L'optimiseur `Adam` et la perte `SigmoidBinaryCrossEntropyLoss` sont utilisés pour l'entraînement du modèle.
 
 ```{.python .input  n=5}
 #@tab mxnet
@@ -98,15 +98,15 @@ loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-## Summary
+## Résumé
 
-* FM is a general framework that can be applied on a variety of tasks such as regression, classification, and ranking.
-* Feature interaction/crossing is important for prediction tasks and the 2-way interaction can be efficiently modeled with FM.
+* FM est un cadre général qui peut être appliqué à une variété de tâches telles que la régression, la classification et le classement.
+* L'interaction/le croisement des caractéristiques est important pour les tâches de prédiction et l'interaction à deux voies peut être modélisée efficacement avec FM.
 
-## Exercises
+## Exercices
 
-* Can you test FM on other dataset such as Avazu, MovieLens, and Criteo datasets?
-* Vary the embedding size to check its impact on performance, can you observe a similar pattern as that of matrix factorization?
+* Pouvez-vous tester FM sur d'autres jeux de données tels que Avazu, MovieLens et Criteo ?
+* Variez la taille d'intégration pour vérifier son impact sur la performance, pouvez-vous observer un schéma similaire à celui de la factorisation matricielle ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/406)

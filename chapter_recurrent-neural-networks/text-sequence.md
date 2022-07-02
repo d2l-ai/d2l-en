@@ -1,27 +1,27 @@
-# Text Sequences
-:label:`sec_text-sequence`
+# Séquences textuelles
+:label:`sec_text-sequence` 
 
-We have reviewed and evaluated
-statistical tools
-and prediction challenges
-for sequence data.
-Such data can take many forms.
-Specifically,
-as we will focus on
-in many chapters of the book,
-text is one of the most popular examples of sequence data.
-For example,
-an article can be simply viewed as a sequence of words, or even a sequence of characters.
-To facilitate our future experiments
-with sequence data,
-we will dedicate this section
-to explain common preprocessing steps for text.
-Usually, these steps are:
+ Nous avons examiné et évalué
+les outils statistiques
+et les défis de la prédiction
+pour les données de séquence.
+Ces données peuvent prendre de nombreuses formes.
+Plus précisément,
+car nous nous concentrerons sur
+dans de nombreux chapitres du livre,
+le texte est l'un des exemples les plus populaires de données de séquence.
+Par exemple,
+un article peut être simplement vu comme une séquence de mots, ou même une séquence de caractères.
+Pour faciliter nos futures expériences
+avec des données de séquence,
+nous consacrerons cette section
+à expliquer les étapes courantes de prétraitement du texte.
+Habituellement, ces étapes sont les suivantes :
 
-1. Load text as strings into memory.
-1. Split strings into tokens (e.g., words and characters).
-1. Build a table of vocabulary to map the split tokens to numerical indices.
-1. Convert text into sequences of numerical indices so they can be manipulated by models easily.
+1. Charger le texte en tant que chaînes de caractères en mémoire.
+1. Diviser les chaînes de caractères en jetons (par exemple, mots et caractères).
+1. Construire une table de vocabulaire pour faire correspondre les tokens fractionnés à des indices numériques.
+1. Convertir le texte en séquences d'indices numériques afin qu'il puisse être manipulé facilement par des modèles.
 
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
@@ -56,13 +56,13 @@ import tensorflow as tf
 import random
 ```
 
-## Reading the Dataset
+## Lecture de l'ensemble de données
 
-To get started, we load text 
-from H. G. Wells' [*The Time Machine*](http://www.gutenberg.org/ebooks/35).
-This is a fairly small corpus of just over 30000 words, but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words.
-The following function 
-(**reads the raw text into a string**).
+Pour commencer, nous chargeons le texte 
+de l'ouvrage de H. G. Wells [*The Time Machine*](http://www.gutenberg.org/ebooks/35).
+Il s'agit d'un corpus assez petit d'un peu plus de 30 000 mots, mais pour ce que nous voulons illustrer, c'est très bien. Des collections de documents plus réalistes contiennent plusieurs milliards de mots.
+La fonction suivante 
+(**lit le texte brut en une chaîne de caractères**).
 
 ```{.python .input  n=5}
 %%tab all
@@ -78,9 +78,9 @@ raw_text = data._download()
 raw_text[:60]
 ```
 
-## Preprocessing
+## Prétraitement
 
-For simplicity, we ignore punctuation and capitalization when preprocessing the raw text.
+Pour simplifier, nous ignorons la ponctuation et les majuscules lors du prétraitement du texte brut.
 
 ```{.python .input  n=6}
 %%tab all
@@ -95,15 +95,15 @@ text[:60]
 ## Tokenization
 
 
-*Tokens* are the atomic (indivisible) units of text
-and what constitutes a token 
-(e.g., characters or words)
-is a design choice.
-Although originated from natural language processing,
-the concept of tokens is also getting popular in
-computer vision, 
-such as for referring to image patches :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
-Below, we tokenize our preprocessed text into characters.
+ *Les tokens* sont les unités atomiques (indivisibles) du texte
+et ce qui constitue un token 
+(par exemple, des caractères ou des mots)
+est un choix de conception.
+Bien qu'il soit issu du traitement du langage naturel,
+le concept de token devient également populaire dans le domaine de la vision par ordinateur
+, 
+par exemple pour faire référence à des patchs d'images :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` .
+Ci-dessous, nous convertissons notre texte prétraité en caractères.
 
 ```{.python .input  n=7}
 %%tab all
@@ -115,21 +115,21 @@ tokens = data._tokenize(text)
 ','.join(tokens[:30])
 ```
 
-## Vocabulary
+## Vocabulaire
 
-While these tokens are still strings,
-our models require numerical inputs.
-[**Thus, we will need a class
-to construct a *vocabulary*
-that assigns a unique index 
-to each distinct token.**]
-To this end,
-we first count the unique tokens in all the documents from the training set, namely a *corpus*,
-and then assign a numerical index to each unique token.
-Rarely appeared tokens are often removed to reduce the complexity. Any token that does not exist in the corpus or has been removed is mapped into a special unknown token "&lt;unk&gt;". 
-In the future,
-we may supplement the vocabulary
-with a list of reserved tokens.
+Alors que ces tokens sont toujours des chaînes de caractères,
+nos modèles nécessitent des entrées numériques.
+[**Ainsi, nous aurons besoin d'une classe
+pour construire un *vocabulaire*
+qui attribue un index unique 
+à chaque token distinct.**]
+À cette fin,
+nous comptons d'abord les tokens uniques dans tous les documents de l'ensemble d'entraînement, à savoir un *corpus*,
+et attribuons ensuite un index numérique à chaque token unique.
+Les tokens qui apparaissent rarement sont souvent supprimés pour réduire la complexité. Tout token qui n'existe pas dans le corpus ou qui a été supprimé est mappé dans un token inconnu spécial "&lt;unk&gt;". 
+Dans le futur,
+nous pourrons compléter le vocabulaire
+avec une liste de tokens réservés.
 
 ```{.python .input  n=8}
 %%tab all
@@ -167,12 +167,12 @@ class Vocab:  #@save
         return self.token_to_idx['<unk>']
 ```
 
-We can now [**construct the vocabulary**] for our dataset, 
-using it to convert a text sequence
-into a list of numerical indices.
-Note that we have not lost any information
-and can easily convert our dataset 
-back to its original (string) representation.
+Nous pouvons maintenant [**construire le vocabulaire**] pour notre ensemble de données, 
+en l'utilisant pour convertir une séquence de texte
+en une liste d'indices numériques.
+Notez que nous n'avons perdu aucune information
+et que nous pouvons facilement reconvertir notre ensemble de données 
+en sa représentation originale (chaîne de caractères).
 
 ```{.python .input  n=9}
 %%tab all
@@ -182,12 +182,12 @@ print('indices:', indices)
 print('words:', vocab.to_tokens(indices))
 ```
 
-## Putting All Things Together
+## Assemblage de tout
 
-Using the above classes and methods, we [**package everything into the following `build` method of the `TimeMachine` class**], which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of *The Time Machine* corpus.
-The modifications we did here are:
-(i) we tokenize text into characters, not words, to simplify the training in later sections;
-(ii) `corpus` is a single list, not a list of token lists, since each text line in *The Time Machine* dataset is not necessarily a sentence or paragraph.
+En utilisant les classes et les méthodes ci-dessus, nous [**empaquetons tout dans la méthode suivante `build` de la classe `TimeMachine` **], qui renvoie `corpus`, une liste d'indices de tokens, et `vocab`, le vocabulaire du corpus *The Time Machine*.
+Les modifications que nous avons apportées ici sont les suivantes :
+(i) nous tokenisons le texte en caractères, et non en mots, pour simplifier l'entraînement dans les sections suivantes ;
+(ii) `corpus` est une liste unique, et non une liste de listes de tokens, puisque chaque ligne de texte dans le jeu de données *The Time Machine* n'est pas nécessairement une phrase ou un paragraphe.
 
 ```{.python .input  n=10}
 %%tab all
@@ -202,15 +202,15 @@ corpus, vocab = data.build(raw_text)
 len(corpus), len(vocab)
 ```
 
-## Natural Language Statistics
-:label:`subsec_natural-lang-stat`
+## Statistiques du langage naturel
+:label:`subsec_natural-lang-stat` 
 
-
-Using the real corpus and the `Vocab` class
-defined above,
-let's also investigate
-word token statistics.
-We construct a vocabulary based on *The Time Machine* corpus and print the top 10 most frequent words.
+ 
+ En utilisant le corpus réel et la classe `Vocab`
+ définie ci-dessus,
+étudions également les statistiques des tokens de mots
+.
+Nous construisons un vocabulaire basé sur le corpus *The Time Machine* et imprimons les 10 mots les plus fréquents.
 
 ```{.python .input  n=11}
 %%tab all
@@ -219,10 +219,10 @@ vocab = Vocab(words)
 vocab.token_freqs[:10]
 ```
 
-As we can see, (**the most popular words are**) actually quite boring to look at.
-They are often referred to as (***stop words***) and thus filtered out.
-Nonetheless, they still carry meaning and we will still use them.
-Besides, it is quite clear that the word frequency decays rather rapidly. The $10^{\mathrm{th}}$ most frequent word is less than $1/5$ as common as the most popular one. To get a better idea, we [**plot the figure of the word frequency**].
+Comme nous pouvons le constater, (**les mots les plus populaires sont**) en fait assez ennuyeux à regarder.
+Ils sont souvent appelés (***mots d'arrêt***) et sont donc filtrés.
+Néanmoins, ils sont toujours porteurs de sens et nous les utiliserons toujours.
+En outre, il est évident que la fréquence des mots décroît assez rapidement. Le mot $10^{\mathrm{th}}$ le plus fréquent est moins de $1/5$ aussi fréquent que le mot le plus populaire. Pour avoir une meilleure idée, nous [**traçons la figure de la fréquence des mots**].
 
 ```{.python .input  n=12}
 %%tab all
@@ -231,22 +231,22 @@ d2l.plot(freqs, xlabel='token: x', ylabel='frequency: n(x)',
          xscale='log', yscale='log')
 ```
 
-We are on to something quite fundamental here: the word frequency decays rapidly in a well-defined way.
-After dealing with the first few words as exceptions, all the remaining words roughly follow a straight line on a log-log plot. This means that words satisfy *Zipf's law*,
-which states that the frequency $n_i$ of the $i^\mathrm{th}$ most frequent word
-is:
+Nous sommes sur quelque chose de tout à fait fondamental ici : la fréquence des mots décroît rapidement d'une manière bien définie.
+Après avoir considéré les premiers mots comme des exceptions, tous les autres mots suivent approximativement une ligne droite sur un graphique log-log. Cela signifie que les mots satisfont à la *loi de Zipf*,
+qui stipule que la fréquence $n_i$ du mot $i^\mathrm{th}$ le plus fréquent
+est :
 
-$$n_i \propto \frac{1}{i^\alpha},$$
-:eqlabel:`eq_zipf_law`
+$$n_i \propto \frac{1}{i^\alpha},$$ 
+ :eqlabel:`eq_zipf_law` 
 
-which is equivalent to
+ ce qui est équivalent à
 
-$$\log n_i = -\alpha \log i + c,$$
+$$\log n_i = -\alpha \log i + c,$$ 
 
-where $\alpha$ is the exponent that characterizes the distribution and $c$ is a constant.
-This should already give us pause if we want to model words by counting statistics.
-After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But [**what about the other word combinations, such as two consecutive words (bigrams), three consecutive words (trigrams)**], and beyond?
-Let's see whether the bigram frequency behaves in the same manner as the single word (unigram) frequency.
+ où $\alpha$ est l'exposant qui caractérise la distribution et $c$ est une constante.
+Cela devrait déjà nous faire réfléchir si nous voulons modéliser les mots par des statistiques de comptage.
+Après tout, nous allons considérablement surestimer la fréquence de la queue, également connue sous le nom de mots peu fréquents. Mais [**qu'en est-il des autres combinaisons de mots, comme deux mots consécutifs (bigrammes), trois mots consécutifs (trigrammes)**], et au-delà ?
+Voyons si la fréquence des bigrammes se comporte de la même manière que la fréquence des mots simples (unigrammes).
 
 ```{.python .input  n=13}
 %%tab all
@@ -255,7 +255,7 @@ bigram_vocab = Vocab(bigram_tokens)
 bigram_vocab.token_freqs[:10]
 ```
 
-One thing is notable here. Out of the ten most frequent word pairs, nine are composed of both stop words and only one is relevant to the actual book---"the time". Furthermore, let's see whether the trigram frequency behaves in the same manner.
+Une chose est notable ici. Sur les dix paires de mots les plus fréquentes, neuf sont composées des deux mots d'arrêt et une seule est pertinente pour le livre en question : "l'heure". En outre, voyons si la fréquence des trigrammes se comporte de la même manière.
 
 ```{.python .input  n=14}
 %%tab all
@@ -265,7 +265,7 @@ trigram_vocab = d2l.Vocab(trigram_tokens)
 trigram_vocab.token_freqs[:10]
 ```
 
-Last, let's [**visualize the token frequency**] among these three models: unigrams, bigrams, and trigrams.
+Enfin, visualisons [**la fréquence des jetons**] parmi ces trois modèles : unigrammes, bigrammes et trigrammes.
 
 ```{.python .input  n=15}
 %%tab all
@@ -276,26 +276,26 @@ d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token: x',
          legend=['unigram', 'bigram', 'trigram'])
 ```
 
-This figure is quite exciting.
-First, beyond unigram words, sequences of words also appear to be following Zipf's law, albeit with a smaller exponent $\alpha$ in :eqref:`eq_zipf_law`, depending on the sequence length.
-Second, the number of distinct $n$-grams is not that large. This gives us hope that there is quite a lot of structure in language.
-Third, many $n$-grams occur very rarely.
-This makes certain methods unsuitable for language modeling and motivates the use of deep learning models.
-We will discuss this in the next section.
+Cette figure est très intéressante.
+Premièrement, au-delà des mots unigrammes, les séquences de mots semblent également suivre la loi de Zipf, bien qu'avec un exposant plus petit $\alpha$ in :eqref:`eq_zipf_law` , selon la longueur de la séquence.
+Deuxièmement, le nombre de programmes distincts $n$ n'est pas très élevé. Cela nous permet d'espérer qu'il y a beaucoup de structure dans le langage.
+Troisièmement, de nombreux $n$-grammes apparaissent très rarement.
+Cela rend certaines méthodes inadaptées à la modélisation du langage et motive l'utilisation de modèles d'apprentissage profond.
+Nous en discuterons dans la section suivante.
 
 
-## Summary
+## Résumé
 
-* Text is an important form of sequence data.
-* To preprocess text, we usually split text into tokens, build a vocabulary to map token strings into numerical indices, and convert text data into token indices for  models to manipulate.
-* Zipf's law governs the word distribution for not only unigrams but also the other $n$-grams.
+* Le texte est une forme importante de données de séquence.
+* Pour prétraiter le texte, on le divise généralement en jetons, on construit un vocabulaire pour convertir les chaînes de jetons en indices numériques et on convertit les données textuelles en indices de jetons pour que les modèles puissent les manipuler.
+* La loi de Zipf régit la distribution des mots non seulement pour les unigrammes mais aussi pour les autres $n$-grams.
 
 
-## Exercises
+## Exercices
 
-1. Tokenization is a key preprocessing step. It varies for different languages. Try to find another three commonly used methods to tokenize text.
-1. In the experiment of this section, tokenize text into words and vary the `min_freq` argument value of the `Vocab` instance. How does this affect the vocabulary size?
-1. Estimate the exponent of Zipf’s law for unigrams, bigrams, and trigrams.
+1. La tokenisation est une étape clé du prétraitement. Elle varie selon les langues. Essayez de trouver trois autres méthodes couramment utilisées pour tokeniser un texte.
+1. Dans l'expérience de cette section, tokenisez le texte en mots et faites varier la valeur de l'argument `min_freq` de l'instance `Vocab`. Comment cela affecte-t-il la taille du vocabulaire ?
+1. Estimez l'exposant de la loi de Zipf pour les unigrammes, les bigrammes et les trigrammes.
 
 
 :begin_tab:`mxnet`

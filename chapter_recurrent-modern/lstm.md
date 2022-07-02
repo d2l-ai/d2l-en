@@ -1,63 +1,63 @@
-# Long Short-Term Memory (LSTM)
-:label:`sec_lstm`
+# Mémoire à long terme et à court terme (LSTM)
+:label:`sec_lstm` 
 
-The challenge to address long-term information preservation and short-term input
-skipping in latent variable models has existed for a long time. One of the
-earliest approaches to address this was the
-long short-term memory (LSTM) :cite:`Hochreiter.Schmidhuber.1997`. It shares many of the properties of the
-GRU.
-Interestingly, LSTMs have a slightly more complex
-design than GRUs but predates GRUs by almost two decades.
-
-
-
-## Gated Memory Cell
-
-Arguably LSTM's design is inspired
-by logic gates of a computer.
-LSTM introduces a *memory cell* (or *cell* for short)
-that has the same shape as the hidden state
-(some literatures consider the memory cell
-as a special type of the hidden state),
-engineered to record additional information.
-To control the memory cell
-we need a number of gates.
-One gate is needed to read out the entries from the
-cell.
-We will refer to this as the
-*output gate*.
-A second gate is needed to decide when to read data into the
-cell.
-We refer to this as the *input gate*.
-Last, we need a mechanism to reset
-the content of the cell, governed by a *forget gate*.
-The motivation for such a
-design is the same as that of GRUs,
-namely to be able to decide when to remember and
-when to ignore inputs in the hidden state via a dedicated mechanism. Let's see
-how this works in practice.
+ Le défi de traiter la préservation des informations à long terme et le saut d'entrée à court terme
+dans les modèles de variables latentes existe depuis longtemps. L'une des premières approches
+à relever ce défi a été la mémoire à long terme (LSTM)
+ :cite:`Hochreiter.Schmidhuber.1997` . Elle partage de nombreuses propriétés de l'URG
+.
+Il est intéressant de noter que les LSTM ont une conception légèrement plus complexe
+que les GRU, mais qu'elles sont antérieures aux GRU de près de deux décennies.
 
 
-### Input Gate, Forget Gate, and Output Gate
 
-Just like in GRUs,
-the data feeding into the LSTM gates are
-the input at the current time step and
-the hidden state of the previous time step,
-as illustrated in :numref:`fig_lstm_0`.
-They are processed by
-three fully connected layers with a sigmoid activation function to compute the values of
-the input, forget, and output gates.
-As a result, values of the three gates
-are in the range of $(0, 1)$.
+## Cellule de mémoire à grille
 
-![Computing the input gate, the forget gate, and the output gate in an LSTM model.](../img/lstm-0.svg)
-:label:`fig_lstm_0`
+On peut dire que la conception des LSTM s'inspire
+des portes logiques d'un ordinateur.
+Le LSTM introduit une *cellule mémoire* (ou *cellule* pour faire court)
+qui a la même forme que l'état caché
+(certaines littératures considèrent la cellule mémoire
+comme un type spécial d'état caché),
+conçue pour enregistrer des informations supplémentaires.
+Pour contrôler la cellule mémoire
+, nous avons besoin d'un certain nombre de portes.
+Une porte est nécessaire pour lire les entrées de la cellule
+.
+Nous l'appellerons la porte de sortie * de
+.
+Une deuxième porte est nécessaire pour décider du moment où il faut lire les données dans la cellule
+.
+Nous l'appellerons la *porte d'entrée*.
+Enfin, nous avons besoin d'un mécanisme pour réinitialiser
+le contenu de la cellule, régi par une *porte d'oubli*.
+La motivation d'une telle conception
+est la même que celle des GRU,
+à savoir être capable de décider quand se souvenir et
+quand ignorer les entrées dans l'état caché via un mécanisme dédié. Voyons
+comment cela fonctionne en pratique.
 
-Mathematically,
-suppose that there are $h$ hidden units, the batch size is $n$, and the number of inputs is $d$.
-Thus, the input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ and the hidden state of the previous time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. Correspondingly, the gates at time step $t$
-are defined as follows: the input gate is $\mathbf{I}_t \in \mathbb{R}^{n \times h}$, the forget gate is $\mathbf{F}_t \in \mathbb{R}^{n \times h}$, and the output gate is $\mathbf{O}_t \in \mathbb{R}^{n \times h}$. They are calculated as follows:
+
+### Porte d'entrée, porte d'oubli et porte de sortie
+
+Tout comme dans les GRU,
+les données qui alimentent les portes LSTM sont
+l'entrée au pas de temps actuel et
+l'état caché du pas de temps précédent,
+comme illustré dans :numref:`fig_lstm_0` .
+Elles sont traitées par
+trois couches entièrement connectées avec une fonction d'activation sigmoïde pour calculer les valeurs de
+les portes d'entrée, d'oubli et de sortie.
+Par conséquent, les valeurs des trois portes
+sont comprises entre $(0, 1)$.
+
+![Computing the input gate, the forget gate, and the output gate in an LSTM model.](../img/lstm-0.svg) 
+ :label:`fig_lstm_0` 
+
+ Mathématiquement,
+supposons qu'il y ait $h$ unités cachées, que la taille du lot soit $n$, et que le nombre d'entrées soit $d$.
+Ainsi, l'entrée est $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ et l'état caché du pas de temps précédent est $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. En conséquence, les portes au pas de temps $t$
+ sont définies comme suit : la porte d'entrée est $\mathbf{I}_t \in \mathbb{R}^{n \times h}$, la porte d'oubli est $\mathbf{F}_t \in \mathbb{R}^{n \times h}$, et la porte de sortie est $\mathbf{O}_t \in \mathbb{R}^{n \times h}$. Elles sont calculées comme suit :
 
 $$
 \begin{aligned}
@@ -67,64 +67,64 @@ $$
 \end{aligned}
 $$
 
-where $\mathbf{W}_{xi}, \mathbf{W}_{xf}, \mathbf{W}_{xo} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hi}, \mathbf{W}_{hf}, \mathbf{W}_{ho} \in \mathbb{R}^{h \times h}$ are weight parameters and $\mathbf{b}_i, \mathbf{b}_f, \mathbf{b}_o \in \mathbb{R}^{1 \times h}$ are bias parameters.
+où $\mathbf{W}_{xi}, \mathbf{W}_{xf}, \mathbf{W}_{xo} \in \mathbb{R}^{d \times h}$ et $\mathbf{W}_{hi}, \mathbf{W}_{hf}, \mathbf{W}_{ho} \in \mathbb{R}^{h \times h}$ sont des paramètres de poids et $\mathbf{b}_i, \mathbf{b}_f, \mathbf{b}_o \in \mathbb{R}^{1 \times h}$ sont des paramètres de biais.
 
-### Candidate Memory Cell
+### Cellule de mémoire candidate
 
-Next we design the memory cell. Since we have not specified the action of the various gates yet, we first introduce the *candidate* memory cell $\tilde{\mathbf{C}}_t \in \mathbb{R}^{n \times h}$. Its computation is similar to that of the three gates described above, but using a $\tanh$ function with a value range for $(-1, 1)$ as the activation function. This leads to the following equation at time step $t$:
+Nous concevons ensuite la cellule de mémoire. Comme nous n'avons pas encore spécifié l'action des différentes portes, nous présentons d'abord la cellule mémoire *candidate* $\tilde{\mathbf{C}}_t \in \mathbb{R}^{n \times h}$. Son calcul est similaire à celui des trois portes décrites ci-dessus, mais en utilisant une fonction $\tanh$ avec une plage de valeurs pour $(-1, 1)$ comme fonction d'activation. Cela conduit à l'équation suivante au pas de temps $t$:
 
-$$\tilde{\mathbf{C}}_t = \text{tanh}(\mathbf{X}_t \mathbf{W}_{xc} + \mathbf{H}_{t-1} \mathbf{W}_{hc} + \mathbf{b}_c),$$
+$$\tilde{\mathbf{C}}_t = \text{tanh}(\mathbf{X}_t \mathbf{W}_{xc} + \mathbf{H}_{t-1} \mathbf{W}_{hc} + \mathbf{b}_c),$$ 
 
-where $\mathbf{W}_{xc} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hc} \in \mathbb{R}^{h \times h}$ are weight parameters and $\mathbf{b}_c \in \mathbb{R}^{1 \times h}$ is a bias parameter.
+ où $\mathbf{W}_{xc} \in \mathbb{R}^{d \times h}$ et $\mathbf{W}_{hc} \in \mathbb{R}^{h \times h}$ sont des paramètres de poids et $\mathbf{b}_c \in \mathbb{R}^{1 \times h}$ est un paramètre de biais.
 
-A quick illustration of the candidate memory cell is shown in :numref:`fig_lstm_1`.
+Une illustration rapide de la cellule mémoire candidate est présentée dans :numref:`fig_lstm_1` .
 
 ![Computing the candidate memory cell in an LSTM model.](../img/lstm-1.svg)
 :label:`fig_lstm_1`
 
-### Memory Cell
+### Cellule de mémoire
 
-In GRUs, we have a mechanism to govern input and forgetting (or skipping).
-Similarly,
-in LSTMs we have two dedicated gates for such purposes: the input gate $\mathbf{I}_t$ governs how much we take new data into account via $\tilde{\mathbf{C}}_t$ and the forget gate $\mathbf{F}_t$ addresses how much of the old memory cell content $\mathbf{C}_{t-1} \in \mathbb{R}^{n \times h}$ we retain. Using the same pointwise multiplication trick as before, we arrive at the following update equation:
+Dans les GRU, nous disposons d'un mécanisme pour régir l'entrée et l'oubli (ou le saut).
+De même,
+dans les LSTM, nous disposons de deux portes dédiées à ces fins : la porte d'entrée $\mathbf{I}_t$ régit le degré de prise en compte des nouvelles données via $\tilde{\mathbf{C}}_t$ et la porte d'oubli $\mathbf{F}_t$ traite du degré de conservation du contenu de l'ancienne cellule mémoire $\mathbf{C}_{t-1} \in \mathbb{R}^{n \times h}$. En utilisant la même astuce de multiplication ponctuelle que précédemment, nous obtenons l'équation de mise à jour suivante :
 
-$$\mathbf{C}_t = \mathbf{F}_t \odot \mathbf{C}_{t-1} + \mathbf{I}_t \odot \tilde{\mathbf{C}}_t.$$
+$$\mathbf{C}_t = \mathbf{F}_t \odot \mathbf{C}_{t-1} + \mathbf{I}_t \odot \tilde{\mathbf{C}}_t.$$ 
 
-If the forget gate is always approximately 1 and the input gate is always approximately 0, the past memory cells $\mathbf{C}_{t-1}$ will be saved over time and passed to the current time step.
-This design is introduced to alleviate the vanishing gradient problem and to better capture
-long range dependencies within sequences.
+ Si la porte d'oubli est toujours approximativement à 1 et la porte d'entrée toujours approximativement à 0, les cellules de mémoire passées $\mathbf{C}_{t-1}$ seront sauvegardées au fil du temps et transmises au pas de temps actuel.
+Cette conception est introduite pour atténuer le problème du gradient évanescent et pour mieux capturer
+les dépendances à long terme dans les séquences.
 
-We thus arrive at the flow diagram in :numref:`fig_lstm_2`.
+Nous arrivons ainsi au diagramme de flux dans :numref:`fig_lstm_2` .
 
 ![Computing the memory cell in an LSTM model.](../img/lstm-2.svg)
 
 :label:`fig_lstm_2`
 
 
-### Hidden State
+### État caché
 
-Last, we need to define how to compute the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times h}$. This is where the output gate comes into play. In LSTM it is simply a gated version of the $\tanh$ of the memory cell.
-This ensures that the values of $\mathbf{H}_t$ are always in the interval $(-1, 1)$.
+Enfin, nous devons définir comment calculer l'état caché $\mathbf{H}_t \in \mathbb{R}^{n \times h}$. C'est là que la porte de sortie entre en jeu. Dans le LSTM, il s'agit simplement d'une version à porte de $\tanh$ de la cellule mémoire.
+Cela garantit que les valeurs de $\mathbf{H}_t$ sont toujours dans l'intervalle $(-1, 1)$.
 
 $$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 
 
-Whenever the output gate approximates 1 we effectively pass all memory information through to the predictor, whereas for the output gate close to 0 we retain all the information only within the memory cell and perform no further processing.
+Chaque fois que la porte de sortie s'approche de 1, nous transmettons effectivement toutes les informations de la mémoire au prédicteur, tandis que pour la porte de sortie proche de 0, nous conservons toutes les informations uniquement dans la cellule de mémoire et n'effectuons aucun traitement supplémentaire.
 
 
 
-:numref:`fig_lstm_3` has a graphical illustration of the data flow.
+ :numref:`fig_lstm_3` a une illustration graphique du flux de données.
 
 ![Computing the hidden state in an LSTM model.](../img/lstm-3.svg)
 :label:`fig_lstm_3`
 
 
 
-## Implementation from Scratch
+## Implémentation à partir de zéro
 
-Now let's implement an LSTM from scratch.
-As same as the experiments in :numref:`sec_rnn-scratch`,
-we first load *The Time Machine* dataset.
+Implémentons maintenant un LSTM à partir de zéro.
+Comme pour les expériences de :numref:`sec_rnn-scratch` ,
+nous chargeons d'abord *The Time Machine* dataset.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -152,9 +152,9 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-### [**Initializing Model Parameters**]
+### [**Initialisation des paramètres du modèle**]
 
-Next we need to define and initialize the model parameters. As previously, the hyperparameter `num_hiddens` defines the number of hidden units. We initialize weights following a Gaussian distribution with 0.01 standard deviation, and we set the biases to 0.
+Ensuite, nous devons définir et initialiser les paramètres du modèle. Comme précédemment, l'hyperparamètre `num_hiddens` définit le nombre d'unités cachées. Nous initialisons les poids suivant une distribution gaussienne avec un écart type de 0,01, et nous fixons les biais à 0.
 
 ```{.python .input}
 %%tab all
@@ -185,7 +185,7 @@ class LSTMScratch(d2l.Module):  #@save
         self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell 
 ```
 
-[**The actual model**] is defined just like what we discussed before: providing three gates and an auxiliary memory cell. Note that only the hidden state is passed to the output layer. The memory cell $\mathbf{C}_t$ does not directly participate in the output computation.
+le modèle réel [**Le modèle réel**] est défini comme ce que nous avons discuté précédemment : fournir trois portes et une cellule mémoire auxiliaire. Notez que seul l'état caché est transmis à la couche de sortie. La cellule mémoire $\mathbf{C}_t$ ne participe pas directement au calcul de la sortie.
 
 ```{.python .input}
 %%tab all
@@ -210,9 +210,9 @@ def forward(self, inputs, H_C=None):
     return outputs, (H, C)
 ```
 
-### [**Training**] and Prediction
+### [**Training**] et Prediction
 
-Let's train an LSTM as same as what we did in :numref:`sec_gru`, by instantiating the `RNNLMScratch` class as introduced in :numref:`sec_rnn-scratch`.
+Entraînons un LSTM de la même manière que nous l'avons fait dans :numref:`sec_gru` , en instanciant la classe `RNNLMScratch` comme introduit dans :numref:`sec_rnn-scratch` .
 
 ```{.python .input}
 %%tab all
@@ -231,9 +231,9 @@ trainer.fit(model, data)
 
 ## [**Concise Implementation**]
 
-Using high-level APIs,
-we can directly instantiate an `LSTM` model.
-This encapsulates all the configuration details that we made explicit above. The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out in detail before.
+En utilisant des API de haut niveau,
+nous pouvons directement instancier un modèle `LSTM`.
+Celui-ci encapsule tous les détails de configuration que nous avons rendus explicites ci-dessus. Le code est nettement plus rapide car il utilise des opérateurs compilés plutôt que Python pour de nombreux détails que nous avons explicités auparavant.
 
 ```{.python .input}
 %%tab mxnet
@@ -300,25 +300,25 @@ model.predict('it has', 20, data.vocab, d2l.try_gpu())
 model.predict('it has', 20, data.vocab)
 ```
 
-LSTMs are the prototypical latent variable autoregressive model with nontrivial state control.
-Many variants thereof have been proposed over the years, e.g., multiple layers, residual connections, different types of regularization. However, training LSTMs and other sequence models (such as GRUs) are quite costly due to the long range dependency of the sequence.
-Later we will encounter alternative models such as transformers that can be used in some cases.
+Les LSTM sont le modèle autorégressif à variables latentes prototypique avec un contrôle d'état non trivial.
+De nombreuses variantes de ce modèle ont été proposées au fil des ans, par exemple, des couches multiples, des connexions résiduelles, différents types de régularisation. Cependant, l'entraînement des LSTM et d'autres modèles de séquence (tels que les GRU) est assez coûteux en raison de la dépendance à long terme de la séquence.
+Plus tard, nous rencontrerons des modèles alternatifs tels que les transformateurs qui peuvent être utilisés dans certains cas.
 
 
-## Summary
+## Résumé
 
-* LSTMs have three types of gates: input gates, forget gates, and output gates that control the flow of information.
-* The hidden layer output of LSTM includes the hidden state and the memory cell. Only the hidden state is passed into the output layer. The memory cell is entirely internal.
-* LSTMs can alleviate vanishing and exploding gradients.
+* Les LSTMs ont trois types de portes : les portes d'entrée, les portes d'oubli et les portes de sortie qui contrôlent le flux d'informations.
+* La sortie de la couche cachée du LSTM comprend l'état caché et la cellule mémoire. Seul l'état caché est transmis à la couche de sortie. La cellule de mémoire est entièrement interne.
+* Les LSTM peuvent atténuer les gradients évanescents et explosifs.
 
 
-## Exercises
+## Exercices
 
-1. Adjust the hyperparameters and analyze the their influence on running time, perplexity, and the output sequence.
-1. How would you need to change the model to generate proper words as opposed to sequences of characters?
-1. Compare the computational cost for GRUs, LSTMs, and regular RNNs for a given hidden dimension. Pay special attention to the training and inference cost.
-1. Since the candidate memory cell ensures that the value range is between $-1$ and $1$ by  using the $\tanh$ function, why does the hidden state need to use the $\tanh$ function again to ensure that the output value range is between $-1$ and $1$?
-1. Implement an LSTM model for time series prediction rather than character sequence prediction.
+1. Ajustez les hyperparamètres et analysez leur influence sur le temps d'exécution, la perplexité et la séquence de sortie.
+1. Comment devriez-vous modifier le modèle pour générer des mots propres par opposition à des séquences de caractères ?
+1. Comparez le coût de calcul des GRU, des LSTM et des RNN ordinaires pour une dimension cachée donnée. Portez une attention particulière aux coûts de formation et d'inférence.
+1. Puisque la cellule mémoire candidate garantit que la plage de valeurs est comprise entre $-1$ et $1$ en utilisant la fonction $\tanh$, pourquoi l'état caché doit-il utiliser à nouveau la fonction $\tanh$ pour garantir que la plage de valeurs de sortie est comprise entre $-1$ et $1$?
+1. Implémentez un modèle LSTM pour la prédiction de séries temporelles plutôt que pour la prédiction de séquences de caractères.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/343)

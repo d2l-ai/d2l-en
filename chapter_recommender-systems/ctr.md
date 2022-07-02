@@ -1,13 +1,13 @@
-# Feature-Rich Recommender Systems
+# Systèmes de recommandation riches en fonctionnalités
 
-Interaction data is the most basic indication of users' preferences and interests. It plays a critical role in former introduced models. Yet, interaction data is usually extremely sparse and can be noisy at times. To address this issue, we can integrate side information such as features of items, profiles of users, and even in which context that the interaction occurred into the recommendation model. Utilizing these features are helpful in making recommendations in that these features can be an effective predictor of users interests especially when interaction data is lacking. As such, it is essential for recommendation models also have the capability to deal with those features and give the model some content/context awareness. To demonstrate this type of recommendation models, we introduce another task on click-through rate (CTR) for online advertisement recommendations :cite:`McMahan.Holt.Sculley.ea.2013` and present an anonymous advertising dataset. Targeted advertisement services have attracted widespread attention and are often framed as recommendation engines. Recommending advertisements that match users' personal taste and interest is important for click-through rate improvement.
+Les données d'interaction constituent l'indication la plus fondamentale des préférences et des intérêts des utilisateurs. Elles jouent un rôle essentiel dans les anciens modèles présentés. Pourtant, les données d'interaction sont généralement très éparses et peuvent parfois être bruitées. Pour résoudre ce problème, nous pouvons intégrer dans le modèle de recommandation des informations secondaires telles que les caractéristiques des articles, les profils des utilisateurs et même le contexte dans lequel l'interaction a eu lieu. L'utilisation de ces caractéristiques est utile pour faire des recommandations, car elles peuvent être un prédicteur efficace des intérêts des utilisateurs, en particulier lorsque les données d'interaction font défaut. En tant que tel, il est essentiel que les modèles de recommandation aient également la capacité de traiter ces caractéristiques et de donner au modèle une certaine conscience du contenu/contexte. Pour démontrer ce type de modèles de recommandation, nous introduisons une autre tâche sur le taux de clics (CTR) pour les recommandations de publicité en ligne :cite:`McMahan.Holt.Sculley.ea.2013` et présentons un ensemble de données de publicité anonyme. Les services de publicité ciblée ont suscité une grande attention et sont souvent considérés comme des moteurs de recommandation. La recommandation de publicités qui correspondent aux goûts et aux intérêts personnels des utilisateurs est importante pour améliorer le taux de clics.
 
 
-Digital marketers use online advertising to display advertisements to customers. Click-through rate is a metric that measures the number of clicks advertisers receive on their ads per number of impressions and it is expressed as a percentage calculated with the formula: 
+Les spécialistes du marketing numérique utilisent la publicité en ligne pour afficher des annonces aux clients. Le taux de clics est un indicateur qui mesure le nombre de clics que les annonceurs reçoivent sur leurs publicités par rapport au nombre d'impressions et il est exprimé en pourcentage calculé avec la formule : 
 
 $$ \text{CTR} = \frac{\#\text{Clicks}} {\#\text{Impressions}} \times 100 \% .$$
 
-Click-through rate is an important signal that indicates the effectiveness of prediction algorithms. Click-through rate prediction is a task of predicting the likelihood that something on a website will be clicked. Models on CTR prediction can not only be employed in targeted advertising systems but also in general item (e.g., movies, news, products) recommender systems, email campaigns, and even search engines. It is also closely related to user satisfaction, conversion rate, and can be helpful in setting campaign goals as it can help advertisers to set realistic expectations.
+Le taux de clics est un signal important qui indique l'efficacité des algorithmes de prédiction. La prédiction du taux de clics est une tâche qui consiste à prédire la probabilité qu'un élément d'un site Web soit cliqué. Les modèles de prédiction du taux de clics peuvent être utilisés non seulement dans les systèmes de publicité ciblée, mais aussi dans les systèmes de recommandation d'articles généraux (par exemple, films, actualités, produits), les campagnes de courrier électronique et même les moteurs de recherche. Il est également étroitement lié à la satisfaction de l'utilisateur, au taux de conversion, et peut être utile pour définir les objectifs de la campagne, car il peut aider les annonceurs à fixer des attentes réalistes.
 
 ```{.python .input}
 #@tab mxnet
@@ -17,11 +17,11 @@ from mxnet import gluon, np
 import os
 ```
 
-## An Online Advertising Dataset
+## Un ensemble de données sur la publicité en ligne
 
-With the considerable advancements of Internet and mobile technology, online advertising has become an important income resource and generates vast majority of revenue in the Internet industry. It is important to display relevant advertisements or advertisements that pique users' interests so that casual visitors can be converted into paying customers. The dataset we introduced is an online advertising dataset. It consists of 34 fields, with the first column representing the target variable that indicates if an ad was clicked (1) or not (0). All the other columns are categorical features. The columns might represent the advertisement id, site or application id, device id, time, user profiles and so on. The real semantics of the features are undisclosed due to anonymization and privacy concern.
+Avec les progrès considérables de l'Internet et de la technologie mobile, la publicité en ligne est devenue une importante source de revenus et génère la grande majorité des recettes dans l'industrie de l'Internet. Il est important d'afficher des publicités pertinentes ou des publicités qui suscitent l'intérêt des utilisateurs afin que les visiteurs occasionnels puissent être convertis en clients payants. Le jeu de données que nous avons introduit est un jeu de données sur la publicité en ligne. Il se compose de 34 champs, la première colonne représentant la variable cible qui indique si une publicité a été cliquée (1) ou non (0). Toutes les autres colonnes sont des caractéristiques catégorielles. Les colonnes peuvent représenter l'identifiant de la publicité, l'identifiant du site ou de l'application, l'identifiant du dispositif, l'heure, les profils des utilisateurs, etc. La sémantique réelle des caractéristiques n'est pas divulguée pour des raisons d'anonymat et de confidentialité.
 
-The following code downloads the dataset from our server and saves it into the local data folder.
+Le code suivant télécharge l'ensemble de données depuis notre serveur et l'enregistre dans le dossier de données local.
 
 ```{.python .input  n=15}
 #@tab mxnet
@@ -32,11 +32,11 @@ d2l.DATA_HUB['ctr'] = (d2l.DATA_URL + 'ctr.zip',
 data_dir = d2l.download_extract('ctr')
 ```
 
-There are a training set and a test set, consisting of 15000 and 3000 samples/lines, respectively.
+Il y a un ensemble d'entraînement et un ensemble de test, composés de 15000 et 3000 échantillons/lignes, respectivement.
 
-## Dataset Wrapper
+## Enveloppeur de jeu de données
 
-For the convenience of data loading, we implement a `CTRDataset` which loads the advertising dataset from the CSV file and can be used by `DataLoader`.
+Pour faciliter le chargement des données, nous implémentons un `CTRDataset` qui charge le jeu de données publicitaires à partir du fichier CSV et peut être utilisé par `DataLoader`.
 
 ```{.python .input  n=13}
 #@tab mxnet
@@ -82,7 +82,7 @@ class CTRDataset(gluon.data.Dataset):
         return feat + self.offsets, self.data[idx]['y']
 ```
 
-The following example loads the training data and print out the first record.
+L'exemple suivant charge les données d'entraînement et imprime le premier enregistrement.
 
 ```{.python .input  n=16}
 #@tab mxnet
@@ -90,15 +90,15 @@ train_data = CTRDataset(os.path.join(data_dir, 'train.csv'))
 train_data[0]
 ```
 
-As can be seen, all the 34 fields are categorical features. Each value represents the one-hot index of the corresponding entry. The label $0$ means that it is not clicked. This `CTRDataset` can also be used to load other datasets such as the Criteo display advertising challenge [dataset](https://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/) and the Avazu click-through rate prediction [dataset](https://www.kaggle.com/c/avazu-ctr-prediction).  
+Comme on peut le voir, les 34 champs sont des caractéristiques catégorielles. Chaque valeur représente l'indice à un coup de l'entrée correspondante. L'étiquette $0$ signifie qu'elle n'est pas cliquée. Ce `CTRDataset` peut également être utilisé pour charger d'autres jeux de données tels que le défi de la publicité par affichage de Criteo [dataset](https://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/) et la prédiction du taux de clics d'Avazu [dataset](https://www.kaggle.com/c/avazu-ctr-prediction). 
 
-## Summary 
-* Click-through rate is an important metric that is used to measure the effectiveness of advertising systems and recommender systems.
-* Click-through rate prediction is usually converted to a binary classification problem. The target is to predict whether an ad/item will be clicked or not based on given features.
+## Résumé 
+* Le taux de clics est une mesure importante utilisée pour évaluer l'efficacité des systèmes publicitaires et des systèmes de recommandation.
+* La prédiction du taux de clics est généralement convertie en un problème de classification binaire. L'objectif est de prédire si une annonce/un élément sera cliqué ou non en fonction de caractéristiques données.
 
-## Exercises
+## Exercices
 
-* Can you load the Criteo and Avazu dataset with the provided `CTRDataset`. It is worth noting that the Criteo dataset consisting of real-valued features so you may have to revise the code a bit.
+* Pouvez-vous charger les jeux de données Criteo et Avazu avec le fichier fourni `CTRDataset`. Il est important de noter que le jeu de données Criteo est composé de caractéristiques à valeur réelle, il se peut donc que vous deviez réviser un peu le code.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/405)

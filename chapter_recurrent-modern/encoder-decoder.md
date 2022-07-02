@@ -3,52 +3,52 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-# Encoder-Decoder Architecture
-:label:`sec_encoder-decoder`
+# Architecture codeur-décodeur
+:label:`sec_encoder-decoder` 
 
-As we have discussed in 
-:numref:`sec_machine_translation`,
-machine translation
-is a major problem domain for sequence transduction models,
-whose input and output are
-both variable-length sequences.
-To handle this type of inputs and outputs,
-we can design an architecture with two major components.
-The first component is an *encoder*:
-it takes a variable-length sequence as input and transforms it into a state with a fixed shape.
-The second component is a *decoder*:
-it maps the encoded state of a fixed shape
-to a variable-length sequence.
-This is called an *encoder-decoder* architecture,
-which is depicted in :numref:`fig_encoder_decoder`.
+ Comme nous l'avons vu dans 
+:numref:`sec_machine_translation` ,
+la traduction automatique
+est un domaine problématique majeur pour les modèles de transduction de séquences,
+dont l'entrée et la sortie sont
+toutes deux des séquences de longueur variable.
+Pour traiter ce type d'entrées et de sorties,
+nous pouvons concevoir une architecture comportant deux composants principaux.
+Le premier composant est un *codeur* :
+il prend une séquence de longueur variable en entrée et la transforme en un état de forme fixe.
+Le deuxième composant est un *décodeur* :
+il transforme l'état codé de forme fixe
+en une séquence de longueur variable.
+C'est ce qu'on appelle une architecture d'*encodeur-décodeur*,
+qui est représentée sur :numref:`fig_encoder_decoder` .
 
 ![The encoder-decoder architecture.](../img/encoder-decoder.svg)
 :label:`fig_encoder_decoder`
 
-Let's take machine translation from English to French
-as an example.
-Given an input sequence in English:
+Prenons l'exemple de la traduction automatique de l'anglais au français
+.
+Étant donné une séquence d'entrée en anglais :
 "They", "are", "watching", ".",
-this encoder-decoder architecture
-first encodes the variable-length input into a state,
-then decodes the state 
-to generate the translated sequence token by token
-as output:
+cette architecture d'encodeur-décodeur
+encode d'abord l'entrée de longueur variable dans un état,
+puis décode l'état 
+pour générer la séquence traduite mot à mot
+en sortie :
 "Ils", "regardent", ".".
-Since the encoder-decoder architecture
-forms the basis
-of different sequence transduction models
-in subsequent sections,
-this section will convert this architecture
-into an interface that will be implemented later.
+Puisque l'architecture de l'encodeur-décodeur
+constitue la base
+de différents modèles de transduction de séquence
+dans les sections suivantes,
+cette section convertira cette architecture
+en une interface qui sera implémentée ultérieurement.
 
-## (**Encoder**)
+## (**Encodeur**)
 
-In the encoder interface,
-we just specify that
-the encoder takes variable-length sequences as input `X`.
-The implementation will be provided 
-by any model that inherits this base `Encoder` class.
+Dans l'interface de l'encodeur,
+nous spécifions simplement que
+l'encodeur prend en entrée des séquences de longueur variable `X`.
+L'implémentation sera fournie 
+par tout modèle qui hérite de cette classe de base `Encoder`.
 
 ```{.python .input}
 %%tab mxnet
@@ -100,20 +100,20 @@ class Encoder(tf.keras.layers.Layer):
 
 ## [**Decoder**]
 
-In the following decoder interface,
-we add an additional `init_state` function
-to convert the encoder output (`enc_outputs`)
-into the encoded state.
-Note that this step
-may need extra inputs such as 
-the valid length of the input,
-which was explained
-in :numref:`sec_machine_translation`.
-To generate a variable-length sequence token by token,
-every time the decoder
-may map an input (e.g., the generated token at the previous time step)
-and the encoded state
-into an output token at the current time step.
+Dans l'interface de décodeur suivante,
+nous ajoutons une fonction supplémentaire `init_state`
+ pour convertir la sortie de l'encodeur (`enc_outputs`)
+en état encodé.
+Notez que cette étape
+peut nécessiter des entrées supplémentaires telles que 
+la longueur valide de l'entrée,
+qui a été expliquée
+dans :numref:`sec_machine_translation` .
+Pour générer une séquence de longueur variable jeton par jeton,
+à chaque fois, le décodeur
+peut mettre en correspondance une entrée (par exemple, le jeton généré au pas de temps précédent)
+et l'état codé
+en un jeton de sortie au pas de temps actuel.
 
 ```{.python .input}
 %%tab mxnet
@@ -163,17 +163,17 @@ class Decoder(tf.keras.layers.Layer):
         raise NotImplementedError
 ```
 
-## [**Putting the Encoder and Decoder Together**]
+## [**Assemblage de l'encodeur et du décodeur**]
 
-In the end,
-the encoder-decoder architecture
-contains both an encoder and a decoder,
-with optionally extra arguments.
-In the forward propagation,
-the output of the encoder
-is used to produce the encoded state,
-and this state
-will be further used by the decoder as one of its input.
+Au final,
+l'architecture de l'encodeur-décodeur
+contient à la fois un encodeur et un décodeur,
+avec éventuellement des arguments supplémentaires.
+Dans la propagation vers l'avant,
+la sortie de l'encodeur
+est utilisée pour produire l'état codé,
+et cet état
+sera ensuite utilisé par le décodeur comme l'une de ses entrées.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -209,26 +209,26 @@ class EncoderDecoder(d2l.Classifier):
         return self.decoder(dec_X, dec_state, training=True)[0]
 ```
 
-The term "state" in the encoder-decoder architecture
-has probably inspired you to implement this
-architecture using neural networks with states.
-In the next section,
-we will see how to apply RNNs to design 
-sequence transduction models based on 
-this encoder-decoder architecture.
+Le terme " état " dans l'architecture codeur-décodeur
+vous a probablement inspiré la mise en œuvre de cette architecture
+à l'aide de réseaux neuronaux avec états.
+Dans la section suivante,
+, nous verrons comment appliquer les RNN pour concevoir 
+des modèles de transduction de séquence basés sur 
+cette architecture codeur-décodeur.
 
 
-## Summary
+## Résumé
 
-* The encoder-decoder architecture can handle inputs and outputs that are both variable-length sequences, thus is suitable for sequence transduction problems such as machine translation.
-* The encoder takes a variable-length sequence as input and transforms it into a state with a fixed shape.
-* The decoder maps the encoded state of a fixed shape to a variable-length sequence.
+* L'architecture encodeur-décodeur peut gérer des entrées et des sorties qui sont toutes deux des séquences de longueur variable, et convient donc aux problèmes de transduction de séquences tels que la traduction automatique.
+* L'encodeur prend une séquence de longueur variable en entrée et la transforme en un état de forme fixe.
+* Le décodeur transforme l'état codé de forme fixe en une séquence de longueur variable.
 
 
-## Exercises
+## Exercices
 
-1. Suppose that we use neural networks to implement the encoder-decoder architecture. Do the encoder and the decoder have to be the same type of neural network?  
-1. Besides machine translation, can you think of another application where the encoder-decoder architecture can be applied?
+1. Supposons que nous utilisions des réseaux neuronaux pour mettre en œuvre l'architecture de l'encodeur-décodeur. L'encodeur et le décodeur doivent-ils être du même type de réseau neuronal ? 
+1. Outre la traduction automatique, pouvez-vous imaginer une autre application pour laquelle l'architecture codeur-décodeur peut être utilisée ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/341)

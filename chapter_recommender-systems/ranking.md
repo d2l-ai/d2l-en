@@ -1,20 +1,20 @@
-# Personalized Ranking for Recommender Systems
+# Classement personnalisé pour les systèmes de recommandation
 
-In the former sections, only explicit feedback was considered and models were trained and tested on observed ratings.  There are two demerits of such methods: First, most feedback is not explicit but implicit in real-world scenarios, and explicit feedback can be more expensive to collect.  Second, non-observed user-item pairs which may be predictive for users' interests are totally ignored, making these methods unsuitable for cases where ratings are not missing at random but because of users' preferences.  Non-observed user-item pairs are a  mixture of real negative feedback (users are not interested in the items) and missing values (the user might interact with the items in the future). We simply ignore the non-observed pairs in matrix factorization and AutoRec. Clearly, these models are incapable of distinguishing between observed and non-observed pairs and are usually not suitable for personalized ranking tasks.
+Dans les sections précédentes, seuls les commentaires explicites ont été pris en compte et les modèles ont été formés et testés sur les évaluations observées.  Ces méthodes présentent deux inconvénients : Premièrement, la plupart des commentaires ne sont pas explicites mais implicites dans les scénarios du monde réel, et les commentaires explicites peuvent être plus coûteux à collecter.  Deuxièmement, les paires utilisateur-article non observées qui peuvent être prédictives des intérêts des utilisateurs sont totalement ignorées, ce qui rend ces méthodes inadaptées aux cas où les évaluations ne sont pas manquantes au hasard mais en raison des préférences des utilisateurs.  Les paires utilisateur-article non observées sont un mélange de commentaires négatifs réels (les utilisateurs ne sont pas intéressés par les articles) et de valeurs manquantes (l'utilisateur pourrait interagir avec les articles à l'avenir). Nous ignorons simplement les paires non observées dans la factorisation matricielle et AutoRec. Il est clair que ces modèles sont incapables de faire la distinction entre les paires observées et non observées et ne sont généralement pas adaptés aux tâches de classement personnalisé.
 
-To this end, a class of recommendation models targeting at generating ranked recommendation lists from implicit feedback have gained popularity. In general, personalized ranking models can be optimized with pointwise, pairwise or listwise approaches. Pointwise approaches considers a single interaction at a time and train a classifier or a regressor to predict individual preferences. Matrix factorization and AutoRec are optimized with pointwise objectives. Pairwise approaches consider a pair of items for each user and aim to approximate the optimal ordering for that pair. Usually, pairwise approaches are more suitable for the ranking task because predicting relative order is reminiscent to the nature of ranking. Listwise approaches approximate the ordering of the entire list of items, for example, direct optimizing the ranking measures such as Normalized Discounted Cumulative Gain ([NDCG](https://en.wikipedia.org/wiki/Discounted_cumulative_gain)). However, listwise approaches are more complex and compute-intensive than pointwise or pairwise approaches. In this section, we will introduce two pairwise objectives/losses, Bayesian Personalized Ranking loss and Hinge loss, and their respective implementations.
+À cette fin, une classe de modèles de recommandation visant à générer des listes de recommandations classées à partir de commentaires implicites a gagné en popularité. En général, les modèles de classement personnalisé peuvent être optimisés par des approches ponctuelles, par paires ou par listes. Les approches ponctuelles considèrent une seule interaction à la fois et entraînent un classificateur ou un régresseur pour prédire les préférences individuelles. La factorisation matricielle et AutoRec sont optimisés avec des objectifs ponctuels. Les approches par paire considèrent une paire d'éléments pour chaque utilisateur et visent à approximer l'ordre optimal pour cette paire. En général, les approches par paires sont plus adaptées à la tâche de classement car la prédiction de l'ordre relatif rappelle la nature du classement. Les approches par liste approchent l'ordre de la liste entière d'éléments, par exemple, en optimisant directement les mesures de classement telles que le gain cumulatif actualisé normalisé ([NDCG](https://en.wikipedia.org/wiki/Discounted_cumulative_gain)). Cependant, les approches par liste sont plus complexes et nécessitent plus de calculs que les approches par point ou par paire. Dans cette section, nous présenterons deux objectifs/pertes par paire, la perte de classement personnalisé bayésien et la perte de charnière, ainsi que leurs implémentations respectives.
 
-## Bayesian Personalized Ranking Loss and its Implementation
+## Perte de classement personnalisé bayésien et son implémentation
 
-Bayesian personalized ranking (BPR) :cite:`Rendle.Freudenthaler.Gantner.ea.2009` is a pairwise personalized ranking loss that is derived from the maximum posterior estimator. It has been widely used in many existing recommendation models. The training data of BPR consists of both positive and negative pairs (missing values). It assumes that the user prefers the positive item over all other non-observed items.
+Classement personnalisé bayésien (BPR) :cite:`Rendle.Freudenthaler.Gantner.ea.2009` est une perte de classement personnalisé par paire qui est dérivée de l'estimateur du maximum postérieur. Elle a été largement utilisée dans de nombreux modèles de recommandation existants. Les données d'apprentissage du BPR sont constituées de paires positives et négatives (valeurs manquantes). Il suppose que l'utilisateur préfère l'élément positif à tous les autres éléments non observés.
 
-In formal, the training data is constructed by tuples in the form of $(u, i, j)$, which represents that the user $u$ prefers the item $i$ over the item $j$. The Bayesian formulation of BPR which aims to maximize the posterior probability is given below:
+De manière formelle, les données d'apprentissage sont construites par des tuples sous la forme de $(u, i, j)$, qui représente le fait que l'utilisateur $u$ préfère l'élément $i$ à l'élément $j$. La formulation bayésienne de BPR qui vise à maximiser la probabilité postérieure est donnée ci-dessous :
 
 $$
 p(\Theta \mid >_u )  \propto  p(>_u \mid \Theta) p(\Theta)
 $$
 
-Where $\Theta$ represents the parameters of an arbitrary recommendation model, $>_u$ represents the desired personalized total ranking of all items for user $u$. We can formulate the maximum posterior estimator to derive the generic optimization criterion for the personalized ranking task.
+Où $\Theta$ représente les paramètres d'un modèle de recommandation arbitraire, $>_u$ représente le classement total personnalisé souhaité de tous les articles pour l'utilisateur $u$. Nous pouvons formuler l'estimateur du maximum de probabilité postérieure pour dériver le critère d'optimisation générique pour la tâche de classement personnalisé.
 
 $$
 \begin{aligned}
@@ -27,10 +27,10 @@ $$
 $$
 
 
-where $D := \{(u, i, j) \mid i \in I^+_u \wedge j \in I \backslash I^+_u \}$ is the training set, with $I^+_u$ denoting the items the user $u$ liked, $I$ denoting all items, and $I \backslash I^+_u$ indicating all other items excluding items the user liked. $\hat{y}_{ui}$ and $\hat{y}_{uj}$ are the predicted scores of the user $u$ to item $i$ and $j$, respectively. The prior $p(\Theta)$ is a normal distribution with zero mean and variance-covariance matrix $\Sigma_\Theta$. Here, we let $\Sigma_\Theta = \lambda_\Theta I$.
+où $D := \{(u, i, j) \mid i \in I^+_u \wedge j \in I \backslash I^+_u \}$ est l'ensemble d'apprentissage, $I^+_u$ désignant les articles que l'utilisateur $u$ a aimés, $I$ désignant tous les articles et $I \backslash I^+_u$ indiquant tous les autres articles à l'exclusion de ceux que l'utilisateur a aimés. $\hat{y}_{ui}$ et $\hat{y}_{uj}$ sont les scores prédits de l'utilisateur $u$ aux articles $i$ et $j$, respectivement. L'antériorité $p(\Theta)$ est une distribution normale avec une moyenne nulle et une matrice de variance-covariance $\Sigma_\Theta$. Ici, nous laissons $\Sigma_\Theta = \lambda_\Theta I$.
 
 ![Illustration of Bayesian Personalized Ranking](../img/rec-ranking.svg)
-We will implement the base class  `mxnet.gluon.loss.Loss` and override the `forward` method to construct the Bayesian personalized ranking loss. We begin by importing the Loss class and the np module.
+Nous allons implémenter la classe de base `mxnet.gluon.loss.Loss` et remplacer la méthode `forward` pour construire la perte bayésienne de classement personnalisé. Nous commençons par importer la classe Loss et le module np.
 
 ```{.python .input  n=5}
 #@tab mxnet
@@ -38,7 +38,7 @@ from mxnet import gluon, np, npx
 npx.set_np()
 ```
 
-The implementation of BPR loss is as follows.
+L'implémentation de la perte BPR est la suivante.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -53,15 +53,15 @@ class BPRLoss(gluon.loss.Loss):
         return loss
 ```
 
-## Hinge Loss and its Implementation
+## Perte charnière et son implémentation
 
-The Hinge loss for ranking has different form to the [hinge loss](https://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.HingeLoss) provided within the gluon library that is often used in classifiers such as SVMs.  The loss used for ranking in recommender systems has the following form.
+La perte charnière pour le classement a une forme différente de la perte [hinge loss](https://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.HingeLoss) fournie par la bibliothèque gluon qui est souvent utilisée dans les classifieurs tels que les SVM.  La perte utilisée pour le classement dans les systèmes de recommandation a la forme suivante.
 
 $$
  \sum_{(u, i, j \in D)} \max( m - \hat{y}_{ui} + \hat{y}_{uj}, 0)
 $$
 
-where $m$ is the safety margin size. It aims to push negative items away from positive items. Similar to BPR, it aims to optimize for relevant distance between positive and negative samples instead of absolute outputs, making it well suited to recommender systems.
+où $m$ est la taille de la marge de sécurité. Elle vise à écarter les éléments négatifs des éléments positifs. Comme le BPR, elle vise à optimiser la distance pertinente entre les échantillons positifs et négatifs plutôt que les résultats absolus, ce qui la rend bien adaptée aux systèmes de recommandation.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -77,17 +77,17 @@ class HingeLossbRec(gluon.loss.Loss):
         return loss
 ```
 
-These two losses are interchangeable for personalized ranking in recommendation.
+Ces deux pertes sont interchangeables pour le classement personnalisé dans la recommandation.
 
-## Summary
+## Résumé
 
-- There are three types of ranking losses available for the personalized ranking task in recommender systems, namely, pointwise, pairwise and listwise methods.
-- The two pairwise loses, Bayesian personalized ranking loss and hinge loss, can be used interchangeably.
+- Il existe trois types de pertes de classement disponibles pour la tâche de classement personnalisé dans les systèmes de recommandation, à savoir les méthodes par point, par paire et par liste.
+- Les deux pertes par paire, la perte de classement personnalisé bayésien et la perte de charnière, peuvent être utilisées de manière interchangeable.
 
-## Exercises
+## Exercices
 
-- Are there any variants of BPR and hinge loss available?
-- Can you find any recommendation models that use BPR or hinge loss?
+- Existe-t-il des variantes de BPR et de la perte charnière ?
+- Pouvez-vous trouver des modèles de recommandation qui utilisent le BPR ou le hinge loss ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/402)

@@ -1,82 +1,82 @@
 # Gated Recurrent Units (GRU)
-:label:`sec_gru`
+:label:`sec_gru` 
 
-In :numref:`sec_bptt`,
-we discussed how gradients are calculated
-in RNNs.
-In particular we found that long products of matrices can lead
-to vanishing or exploding gradients.
-Let's briefly think about what such
-gradient anomalies mean in practice:
+ Dans :numref:`sec_bptt` ,
+nous avons examiné comment les gradients sont calculés
+dans les RNN.
+En particulier, nous avons découvert que les produits longs des matrices peuvent conduire
+à des gradients qui disparaissent ou explosent.
+Réfléchissons brièvement à ce que de telles anomalies de gradient
+signifient en pratique :
 
-* We might encounter a situation where an early observation is highly
-  significant for predicting all future observations. Consider the somewhat
-  contrived case where the first observation contains a checksum and the goal is
-  to discern whether the checksum is correct at the end of the sequence. In this
-  case, the influence of the first token is vital. We would like to have some
-  mechanisms for storing vital early information in a *memory cell*. Without such
-  a mechanism, we will have to assign a very large gradient to this observation,
-  since it affects all the subsequent observations.
-* We might encounter situations where some tokens carry no pertinent
-  observation. For instance, when parsing a web page there might be auxiliary
-  HTML code that is irrelevant for the purpose of assessing the sentiment
-  conveyed on the page. We would like to have some mechanism for *skipping* such
-  tokens in the latent state representation.
-* We might encounter situations where there is a logical break between parts of
-  a sequence. For instance, there might be a transition between chapters in a
-  book, or a transition between a bear and a bull market for securities. In
-  this case it would be nice to have a means of *resetting* our internal state
-  representation.
+* Nous pouvons rencontrer une situation dans laquelle une observation précoce est hautement
+ significative pour prédire toutes les observations futures. Considérons le cas quelque peu contourné
+ où la première observation contient une somme de contrôle et où le but est
+ de discerner si la somme de contrôle est correcte à la fin de la séquence. Dans ce cas
+, l'influence du premier jeton est vitale. Nous aimerions disposer de certains mécanismes
+ pour stocker les premières informations vitales dans une *cellule mémoire*. Sans un tel mécanisme
+, nous devrons attribuer un gradient très important à cette observation,
+ puisqu'il affecte toutes les observations suivantes.
+* Nous pouvons rencontrer des situations où certains tokens ne portent aucune observation pertinente
+. Par exemple, lors de l'analyse d'une page Web, il peut y avoir du code HTML auxiliaire
+ qui n'est pas pertinent pour évaluer le sentiment
+ véhiculé par la page. Nous aimerions disposer d'un mécanisme permettant de *sauter* de tels tokens
+ dans la représentation de l'état latent.
+* Nous pouvons rencontrer des situations où il existe une rupture logique entre les parties d'une séquence
+. Par exemple, il peut y avoir une transition entre les chapitres d'un livre
+, ou une transition entre un marché baissier et un marché haussier pour les titres. Dans ce cas,
+ il serait agréable de disposer d'un moyen de *réinitialiser* notre représentation de l'état interne
+.
 
-A number of methods have been proposed to address this. One of the earliest is long short-term memory :cite:`Hochreiter.Schmidhuber.1997` which we
-will discuss in :numref:`sec_lstm`. The gated recurrent unit (GRU)
-:cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` is a slightly more streamlined
-variant that often offers comparable performance and is significantly faster to
-compute  :cite:`Chung.Gulcehre.Cho.ea.2014`.
-Due to its simplicity, let's start with the GRU.
+Un certain nombre de méthodes ont été proposées pour résoudre ce problème. L'une des plus anciennes est la mémoire à long terme :cite:`Hochreiter.Schmidhuber.1997` dont nous parlerons dans
+ :numref:`sec_lstm` . L'unité récurrente gated (GRU)
+:cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` est une variante légèrement plus rationalisée
+qui offre souvent des performances comparables et qui est nettement plus rapide à calculer
+ :cite:`Chung.Gulcehre.Cho.ea.2014` .
+En raison de sa simplicité, commençons par la GRU.
 
 ## Gated Hidden State
 
-The key distinction between vanilla RNNs and GRUs
-is that the latter support gating of the hidden state.
-This means that we have dedicated mechanisms for
-when a hidden state should be *updated* and
-also when it should be *reset*.
-These mechanisms are learned and they address the concerns listed above.
-For instance, if the first token is of great importance
-we will learn not to update the hidden state after the first observation.
-Likewise, we will learn to skip irrelevant temporary observations.
-Last, we will learn to reset the latent state whenever needed.
-We discuss this in detail below.
+La principale distinction entre les RNNs classiques et les GRUs
+est que ces derniers supportent le gating de l'état caché.
+Cela signifie que nous avons des mécanismes dédiés pour
+quand un état caché doit être *mis à jour* et
+aussi quand il doit être *réinitialisé*.
+Ces mécanismes sont appris et ils répondent aux préoccupations énumérées ci-dessus.
+Par exemple, si le premier jeton est d'une grande importance
+, nous apprendrons à ne pas mettre à jour l'état caché après la première observation.
+De même, nous apprendrons à sauter les observations temporaires non pertinentes.
+Enfin, nous apprendrons à réinitialiser l'état latent chaque fois que nécessaire.
+Nous en parlons en détail ci-dessous.
 
 
-### Reset Gate and Update Gate
+#### Porte de réinitialisation et porte de mise à jour
 
-The first thing we need to introduce are
-the *reset gate* and the *update gate*.
-We engineer them to be vectors with entries in $(0, 1)$
-such that we can perform convex combinations.
-For instance,
-a reset gate would allow us to control how much of the previous state we might still want to remember.
-Likewise, an update gate would allow us to control how much of the new state is just a copy of the old state.
+La première chose que nous devons introduire est
+la *porte de réinitialisation* et la *porte de mise à jour*.
+Nous les concevons comme des vecteurs avec des entrées dans $(0, 1)$
+ de sorte que nous puissions effectuer des combinaisons convexes.
+Par exemple,
+une porte de réinitialisation nous permettrait de contrôler la quantité de l'état précédent que nous souhaitons encore mémoriser.
+De même, une porte de mise à jour nous permettrait de contrôler la part du nouvel état qui n'est qu'une copie de l'ancien.
 
-We begin by engineering these gates.
-:numref:`fig_gru_1` illustrates the inputs for both
-the reset and update gates in a GRU, given the input
-of the current time step
-and the hidden state of the previous time step.
-The outputs of two gates
-are given by two fully connected layers
-with a sigmoid activation function.
+Nous commençons par concevoir ces portes.
+:numref:`fig_gru_1` illustre les entrées pour
+les portes de réinitialisation et de mise à jour dans un GRU, étant donné l'entrée
+du pas de temps actuel
+et l'état caché du pas de temps précédent.
+Les sorties de deux portes
+sont données par deux couches entièrement connectées
+avec une fonction d'activation sigmoïde.
 
 ![Computing the reset gate and the update gate in a GRU model.](../img/gru-1.svg)
 :label:`fig_gru_1`
 
-Mathematically,
-for a given time step $t$,
-suppose that the input is
-a minibatch
-$\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$) and the hidden state of the previous time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$ (number of hidden units: $h$). Then, the reset gate $\mathbf{R}_t \in \mathbb{R}^{n \times h}$ and update gate $\mathbf{Z}_t \in \mathbb{R}^{n \times h}$ are computed as follows:
+Mathématiquement,
+pour un pas de temps donné $t$,
+supposons que l'entrée est
+un minibatch
+$\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (nombre d'exemples : $n$, nombre d'entrées : $d$) et l'état caché du pas de temps précédent est $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$ (nombre d'unités cachées : $h$). Ensuite, la porte de réinitialisation $\mathbf{R}_t \in \mathbb{R}^{n \times h}$ et la porte de mise à jour $\mathbf{Z}_t \in \mathbb{R}^{n \times h}$ sont calculées comme suit :
 
 $$
 \begin{aligned}
@@ -85,83 +85,83 @@ $$
 \end{aligned}
 $$
 
-where $\mathbf{W}_{xr}, \mathbf{W}_{xz} \in \mathbb{R}^{d \times h}$ and
-$\mathbf{W}_{hr}, \mathbf{W}_{hz} \in \mathbb{R}^{h \times h}$ are weight
-parameters and $\mathbf{b}_r, \mathbf{b}_z \in \mathbb{R}^{1 \times h}$ are
-biases.
-Note that broadcasting (see :numref:`subsec_broadcasting`) is triggered during the summation.
-We use sigmoid functions (as introduced in :numref:`sec_mlp`) to transform input values to the interval $(0, 1)$.
+où $\mathbf{W}_{xr}, \mathbf{W}_{xz} \in \mathbb{R}^{d \times h}$ et
+$\mathbf{W}_{hr}, \mathbf{W}_{hz} \in \mathbb{R}^{h \times h}$ sont des paramètres de poids
+et $\mathbf{b}_r, \mathbf{b}_z \in \mathbb{R}^{1 \times h}$ sont des biais
+.
+Notez que la diffusion (voir :numref:`subsec_broadcasting` ) est déclenchée pendant la sommation.
+Nous utilisons des fonctions sigmoïdes (introduites dans :numref:`sec_mlp` ) pour transformer les valeurs d'entrée dans l'intervalle $(0, 1)$.
 
-### Candidate Hidden State
+### État caché candidat
 
-Next, let's
-integrate the reset gate $\mathbf{R}_t$ with
-the regular latent state updating mechanism
-in :eqref:`rnn_h_with_state`.
-It leads to the following
-*candidate hidden state*
-$\tilde{\mathbf{H}}_t \in \mathbb{R}^{n \times h}$ at time step $t$:
+Ensuite, intégrons
+la porte de réinitialisation $\mathbf{R}_t$ avec
+le mécanisme régulier de mise à jour de l'état latent
+dans :eqref:`rnn_h_with_state` .
+Cela conduit à l'état caché candidat
+*suivant
+$\tilde{\mathbf{H}}_t \in \mathbb{R}^{n \times h}$ au pas de temps $t$:
 
-$$\tilde{\mathbf{H}}_t = \tanh(\mathbf{X}_t \mathbf{W}_{xh} + \left(\mathbf{R}_t \odot \mathbf{H}_{t-1}\right) \mathbf{W}_{hh} + \mathbf{b}_h),$$
-:eqlabel:`gru_tilde_H`
+$$\tilde{\mathbf{H}}_t = \tanh(\mathbf{X}_t \mathbf{W}_{xh} + \left(\mathbf{R}_t \odot \mathbf{H}_{t-1}\right) \mathbf{W}_{hh} + \mathbf{b}_h),$$ 
+ :eqlabel:`gru_tilde_H` 
 
-where $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$
-are weight parameters,
-$\mathbf{b}_h \in \mathbb{R}^{1 \times h}$
-is the bias,
-and the symbol $\odot$ is the Hadamard (elementwise) product operator.
-Here we use a nonlinearity in the form of tanh to ensure that the values in the candidate hidden state remain in the interval $(-1, 1)$.
+ où $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$ et $\mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$
+ sont des paramètres de poids,
+$\mathbf{b}_h \in \mathbb{R}^{1 \times h}$ 
+ est le biais,
+et le symbole $\odot$ est l'opérateur produit (par éléments) de Hadamard.
+Nous utilisons ici une non-linéarité sous la forme de tanh pour nous assurer que les valeurs de l'état caché candidat restent dans l'intervalle $(-1, 1)$.
 
-The result is a *candidate* since we still need to incorporate the action of the update gate.
-Comparing with :eqref:`rnn_h_with_state`,
-now the influence of the previous states
-can be reduced with the
-elementwise multiplication of
-$\mathbf{R}_t$ and $\mathbf{H}_{t-1}$
-in :eqref:`gru_tilde_H`.
-Whenever the entries in the reset gate $\mathbf{R}_t$ are close to 1, we recover a vanilla RNN such as in :eqref:`rnn_h_with_state`.
-For all entries of the reset gate $\mathbf{R}_t$ that are close to 0, the candidate hidden state is the result of an MLP with $\mathbf{X}_t$ as input. Any pre-existing hidden state is thus *reset* to defaults.
+Le résultat est un *candidat* puisque nous devons encore incorporer l'action de la porte de mise à jour.
 
-:numref:`fig_gru_2` illustrates the computational flow after applying the reset gate.
+Par rapport à :eqref:`rnn_h_with_state` ,
+, l'influence des états précédents
+peut maintenant être réduite grâce à la multiplication par éléments de
+$\mathbf{R}_t$ et $\mathbf{H}_{t-1}$
+ dans :eqref:`gru_tilde_H` .
+Lorsque les entrées de la porte de réinitialisation $\mathbf{R}_t$ sont proches de 1, nous récupérons un RNN vanille comme dans :eqref:`rnn_h_with_state` .
+Pour toutes les entrées de la porte de réinitialisation $\mathbf{R}_t$ qui sont proches de 0, l'état caché candidat est le résultat d'un MLP avec $\mathbf{X}_t$ comme entrée. Tout état caché préexistant est donc *réinitialisé* aux valeurs par défaut.
+
+:numref:`fig_gru_2` illustre le flux de calcul après l'application de la porte de réinitialisation.
 
 ![Computing the candidate hidden state in a GRU model.](../img/gru-2.svg)
 :label:`fig_gru_2`
 
 
-### Hidden State
+### État caché
 
-Finally, we need to incorporate the effect of the update gate $\mathbf{Z}_t$. This determines the extent to which the new hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times h}$ is just the old state $\mathbf{H}_{t-1}$ and by how much the new candidate state $\tilde{\mathbf{H}}_t$ is used.
-The update gate $\mathbf{Z}_t$ can be used for this purpose, simply by taking elementwise convex combinations between both $\mathbf{H}_{t-1}$ and $\tilde{\mathbf{H}}_t$.
-This leads to the final update equation for the GRU:
+Enfin, nous devons intégrer l'effet de la porte de mise à jour $\mathbf{Z}_t$. Celle-ci détermine dans quelle mesure le nouvel état caché $\mathbf{H}_t \in \mathbb{R}^{n \times h}$ est simplement l'ancien état $\mathbf{H}_{t-1}$ et dans quelle mesure le nouvel état candidat $\tilde{\mathbf{H}}_t$ est utilisé.
+La porte de mise à jour $\mathbf{Z}_t$ peut être utilisée à cette fin, simplement en prenant des combinaisons convexes par éléments entre $\mathbf{H}_{t-1}$ et $\tilde{\mathbf{H}}_t$.
+Cela conduit à l'équation de mise à jour finale pour le GRU :
 
-$$\mathbf{H}_t = \mathbf{Z}_t \odot \mathbf{H}_{t-1}  + (1 - \mathbf{Z}_t) \odot \tilde{\mathbf{H}}_t.$$
+$$\mathbf{H}_t = \mathbf{Z}_t \odot \mathbf{H}_{t-1}  + (1 - \mathbf{Z}_t) \odot \tilde{\mathbf{H}}_t.$$ 
+
+ 
+ Chaque fois que la porte de mise à jour $\mathbf{Z}_t$ est proche de 1, nous conservons simplement l'ancien état. Dans ce cas, les informations provenant de $\mathbf{X}_t$ sont essentiellement ignorées, ce qui permet de sauter l'étape $t$ dans la chaîne de dépendance. En revanche, lorsque $\mathbf{Z}_t$ est proche de 0, le nouvel état latent $\mathbf{H}_t$ se rapproche de l'état latent candidat $\tilde{\mathbf{H}}_t$. Ces conceptions peuvent nous aider à faire face au problème du gradient évanescent dans les RNN et à mieux capturer les dépendances pour les séquences avec de grandes distances de pas de temps.
+Par exemple,
+si la porte de mise à jour a été proche de 1
+pour tous les pas de temps d'une sous-séquence entière,
+l'ancien état caché au pas de temps de son début
+sera facilement conservé et transmis
+à sa fin,
+quelle que soit la longueur de la sous-séquence.
 
 
-Whenever the update gate $\mathbf{Z}_t$ is close to 1, we simply retain the old state. In this case the information from $\mathbf{X}_t$ is essentially ignored, effectively skipping time step $t$ in the dependency chain. In contrast, whenever $\mathbf{Z}_t$ is close to 0, the new latent state $\mathbf{H}_t$ approaches the candidate latent state $\tilde{\mathbf{H}}_t$. These designs can help us cope with the vanishing gradient problem in RNNs and better capture dependencies for sequences with large time step distances.
-For instance,
-if the update gate has been close to 1
-for all the time steps of an entire subsequence,
-the old hidden state at the time step of its beginning
-will be easily retained and passed
-to its end,
-regardless of the length of the subsequence.
 
-
-
-:numref:`fig_gru_3` illustrates the computational flow after the update gate is in action.
+ :numref:`fig_gru_3` illustre le flux de calcul après que la porte de mise à jour soit en action.
 
 ![Computing the hidden state in a GRU model.](../img/gru-3.svg)
 :label:`fig_gru_3`
 
 
-In summary, GRUs have the following two distinguishing features:
+En résumé, les GRU ont les deux caractéristiques suivantes :
 
-* Reset gates help capture short-term dependencies in sequences.
-* Update gates help capture long-term dependencies in sequences.
+* Les portes de réinitialisation aident à capturer les dépendances à court terme dans les séquences.
+* Les portes de mise à jour aident à capturer les dépendances à long terme dans les séquences.
 
-## Implementation from Scratch
+## Implémentation à partir de zéro
 
-To gain a better understanding of the GRU model, let's implement it from scratch.
+Pour mieux comprendre le modèle GRU, nous allons l'implémenter à partir de zéro.
 
 ```{.python .input  n=5}
 %load_ext d2lbook.tab
@@ -189,12 +189,12 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-### (**Initializing Model Parameters**)
+### (**Initialisation des paramètres du modèle**)
 
-The first step is to initialize the model parameters.
-We draw the weights from a Gaussian distribution
-with standard deviation to be `sigma` and set the bias to 0. The hyperparameter `num_hiddens` defines the number of hidden units.
-We instantiate all weights and biases relating to the update gate, the reset gate, and the candidate hidden state.
+La première étape consiste à initialiser les paramètres du modèle.
+Nous tirons les poids d'une distribution gaussienne
+dont l'écart-type est `sigma` et nous fixons le biais à 0. L'hyperparamètre `num_hiddens` définit le nombre d'unités cachées.
+Nous instancions tous les poids et biais relatifs à la porte de mise à jour, à la porte de réinitialisation et à l'état caché candidat.
 
 ```{.python .input}
 %%tab all
@@ -224,10 +224,10 @@ class GRUScratch(d2l.Module):
         self.W_xh, self.W_hh, self.b_h = triple()  # Candidate hidden state        
 ```
 
-### Defining the Model
+### Définition du modèle
 
-Now we are ready to [**define the GRU forward computation**].
-Its structure is the same as that of the basic RNN cell, except that the update equations are more complex.
+Nous sommes maintenant prêts à [**définir le calcul GRU forward**].
+Sa structure est la même que celle de la cellule RNN de base, sauf que les équations de mise à jour sont plus complexes.
 
 ```{.python .input}
 %%tab all
@@ -250,8 +250,8 @@ def forward(self, inputs, H=None):
 
 ### Training
 
-[**Training**] a language model on *The Time Machine* dataset
-works in exactly the same manner as in :numref:`sec_rnn-scratch`.
+[**Training**] un modèle de langage sur le jeu de données *The Time Machine*
+fonctionne exactement de la même manière que dans :numref:`sec_rnn-scratch` .
 
 ```{.python .input}
 %%tab all
@@ -270,10 +270,10 @@ trainer.fit(model, data)
 
 ## [**Concise Implementation**]
 
-In high-level APIs,
-we can directly
-instantiate a GPU model.
-This encapsulates all the configuration detail that we made explicit above.
+Dans les API de haut niveau,
+nous pouvons directement
+instancier un modèle GPU.
+Cela encapsule tous les détails de configuration que nous avons explicités ci-dessus.
 
 ```{.python .input}
 %%tab all
@@ -290,7 +290,7 @@ class GRU(d2l.RNN):
                                            return_state=True)
 ```
 
-The code is significantly faster in training as it uses compiled operators rather than Python for many details that we spelled out before.
+Le code est nettement plus rapide lors de l'apprentissage car il utilise des opérateurs compilés plutôt que Python pour de nombreux détails que nous avons explicités précédemment.
 
 ```{.python .input}
 %%tab all
@@ -303,10 +303,10 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-After training,
-we print out the perplexity on the training set
-and the predicted sequence following
-the provided prefix.
+Après l'apprentissage,
+nous imprimons la perplexité sur l'ensemble d'apprentissage
+et la séquence prédite suivant
+le préfixe fourni.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -318,20 +318,20 @@ model.predict('it has', 20, data.vocab, d2l.try_gpu())
 model.predict('it has', 20, data.vocab)
 ```
 
-## Summary
+## Résumé
 
-* Gated RNNs can better capture dependencies for sequences with large time step distances.
-* Reset gates help capture short-term dependencies in sequences.
-* Update gates help capture long-term dependencies in sequences.
-* GRUs contain basic RNNs as their extreme case whenever the reset gate is switched on. They can also skip subsequences by turning on the update gate.
+* Les RNN à porte peuvent mieux capturer les dépendances pour les séquences avec de grandes distances de pas de temps.
+* Les portes de réinitialisation aident à capturer les dépendances à court terme dans les séquences.
+* Les portes de mise à jour aident à capturer les dépendances à long terme dans les séquences.
+* Les GRUs contiennent des RNNs de base comme cas extrême lorsque la porte de réinitialisation est activée. Ils peuvent également sauter des sous-séquences en activant la porte de mise à jour.
 
 
-## Exercises
+## Exercices
 
-1. Assume that we only want to use the input at time step $t'$ to predict the output at time step $t > t'$. What are the best values for the reset and update gates for each time step?
-1. Adjust the hyperparameters and analyze the their influence on running time, perplexity, and the output sequence.
-1. Compare runtime, perplexity, and the output strings for `rnn.RNN` and `rnn.GRU` implementations with each other.
-1. What happens if you implement only parts of a GRU, e.g., with only a reset gate or only an update gate?
+1. Supposons que nous voulons uniquement utiliser l'entrée au pas de temps $t'$ pour prédire la sortie au pas de temps $t > t'$. Quelles sont les meilleures valeurs pour les portes de réinitialisation et de mise à jour pour chaque pas de temps ?
+1. Ajustez les hyperparamètres et analysez leur influence sur le temps d'exécution, la perplexité et la séquence de sortie.
+1. Comparez le temps d'exécution, la perplexité et les chaînes de sortie pour les implémentations `rnn.RNN` et `rnn.GRU` entre elles.
+1. Que se passe-t-il si vous n'implémentez qu'une partie d'un GRU, par exemple, avec seulement une porte de réinitialisation ou seulement une porte de mise à jour ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/342)

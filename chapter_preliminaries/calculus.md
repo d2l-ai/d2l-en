@@ -3,96 +3,96 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Calculus
-:label:`sec_calculus`
+# Calcul
+:label:`sec_calculus` 
 
-For a long time, how to calculate 
-the area of a circle remained a mystery.
-Then, the ancient Greek mathematician Archimedes
-came up with the clever idea 
-to inscribe a series of polygons 
-with increasing numbers of vertices
-on the inside of a circle
-(:numref:`fig_circle_area`). 
-For a polygon with $n$ vertices,
-we obtain $n$ triangles.
-The height of each triangle approaches the radius $r$ 
-as we partition the circle more finely. 
-At the same time, its base approaches $2 \pi r/n$, 
-since the ratio between arc and secant approaches 1 
-for a large number of vertices. 
-Thus, the area of the triangle approaches
-$n \cdot r \cdot \frac{1}{2} (2 \pi r/n) = \pi r^2$. 
+ Pendant longtemps, la façon de calculer 
+l'aire d'un cercle est restée un mystère.
+C'est alors que l'ancien mathématicien grec Archimède
+a eu l'idée astucieuse 
+d'inscrire une série de polygones 
+avec un nombre croissant de sommets
+à l'intérieur d'un cercle
+(:numref:`fig_circle_area` ). 
+Pour un polygone avec $n$ sommets,
+on obtient $n$ triangles.
+La hauteur de chaque triangle se rapproche du rayon $r$ 
+ au fur et à mesure que l'on partitionne le cercle plus finement. 
+En même temps, sa base se rapproche de $2 \pi r/n$, 
+puisque le rapport entre l'arc et la sécante se rapproche de 1 
+pour un grand nombre de sommets. 
+Ainsi, l'aire du triangle se rapproche de
+$n \cdot r \cdot \frac{1}{2} (2 \pi r/n) = \pi r^2$ . 
 
 ![Finding the area of a circle as a limit procedure.](../img/polygon-circle.svg)
 :label:`fig_circle_area`
 
-This limiting procedure leads to both 
-*differential calculus* and *integral calculus* 
-(:numref:`sec_integral_calculus`). 
-The former can tell us how to increase
-or decrease a function value by
-manipulating its arguments. 
-This comes in handy for the *optimization problems*
-that we face in deep learning,
-where we repeatedly update our parameters 
-in order to decrease the loss function.
-Optimization addresses how to fit our models to training data,
-and calculus is its key prerequisite.
-However, don't forget that our ultimate goal
-is to perform well on *previously unseen* data.
-That problem is called *generalization*
-and will be a key focus of other chapters.
+Cette procédure de limitation conduit à la fois au *calcul différentiel* 
+ et au *calcul intégral* 
+(:numref:`sec_integral_calculus` ). 
+Le premier peut nous indiquer comment augmenter
+ou diminuer la valeur d'une fonction en manipulant ses arguments
+. 
+Cela s'avère pratique pour les problèmes d'*optimisation*
+auxquels nous sommes confrontés en apprentissage profond,
+où nous mettons à jour nos paramètres de manière répétée 
+afin de diminuer la fonction de perte.
+L'optimisation porte sur la manière d'ajuster nos modèles aux données d'apprentissage,
+et le calcul en est la condition préalable essentielle.
+Toutefois, n'oubliez pas que notre objectif ultime
+est d'obtenir de bonnes performances sur des données *inédites*.
+Ce problème est appelé *généralisation*
+et fera l'objet d'autres chapitres.
 
 
 
-## Derivatives and Differentiation
+## Dérivées et différentiation
 
-Put simply, a *derivative* is the rate of change
-in a function with respect to changes in its arguments.
-Derivatives can tell us how rapidly a loss function
-would increase or decrease were we 
-to *increase* or *decrease* each parameter
-by an infinitesimally small amount.
-Formally, for functions $f: \mathbb{R} \rightarrow \mathbb{R}$,
-that map from scalars to scalars,
-[**the *derivative* of $f$ at a point $x$ is defined as**]
+En termes simples, une *dérivée* est le taux de changement
+d'une fonction par rapport aux changements de ses arguments.
+Les dérivées peuvent nous indiquer à quelle vitesse une fonction de perte
+augmenterait ou diminuerait si nous 
+*augmentions* ou *diminuions* chaque paramètre
+d'une quantité infinitésimale.
+Formellement, pour les fonctions $f: \mathbb{R} \rightarrow \mathbb{R}$,
+qui correspondent à des scalaires vers des scalaires,
+[**la *dérivée* de $f$ en un point $x$ est définie comme**]
 
 (**$$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h}.$$**)
-:eqlabel:`eq_derivative`
+:eqlabel:`eq_derivative` 
 
-This term on the right hand side is called a *limit* 
-and it tells us what happens 
-to the value of an expression
-as a specified variable 
-approaches a particular value.
-This limit tells us what 
-the ratio between a perturbation $h$
-and the change in the function value 
-$f(x + h) - f(x)$ converges to 
-as we shrink its size to zero.
+ Ce terme à droite est appelé une *limite* 
+et il nous indique ce qui arrive 
+à la valeur d'une expression
+lorsqu'une variable spécifiée 
+approche une valeur particulière.
+Cette limite nous indique ce que 
+le rapport entre une perturbation $h$
+ et le changement de la valeur de la fonction 
+$f(x + h) - f(x)$ converge vers 
+lorsque nous réduisons sa taille à zéro.
 
-When $f'(x)$ exists, $f$ is said 
-to be *differentiable* at $x$;
-and when $f'(x)$ exists for all $x$
-on a set, e.g., the interval $[a,b]$, 
-we say that $f$ is differentiable on this set.
-Not all functions are differentiable,
-including many that we wish to optimize,
-including accuracy and the area under the
-receiving operating characteristic (AUC).
-However, because computing the derivative of the loss 
-is a crucial step in nearly all 
-algorithms for training deep neural networks,
-we often optimize a differentiable *surrogate* instead.
+Lorsque $f'(x)$ existe, on dit que $f$ 
+ est *différentiable* à $x$;
+et lorsque $f'(x)$ existe pour tous $x$
+ sur un ensemble, par exemple l'intervalle $[a,b]$, 
+on dit que $f$ est différentiable sur cet ensemble.
+Toutes les fonctions ne sont pas différentiables,
+y compris de nombreuses fonctions que nous souhaitons optimiser,
+y compris la précision et l'aire sous la caractéristique opérationnelle de réception (AUC) de
+.
+Cependant, comme le calcul de la dérivée de la perte 
+est une étape cruciale dans presque tous les 
+algorithmes de formation de réseaux neuronaux profonds,
+nous optimisons souvent un *substitut* différentiable à la place.
 
 
-We can interpret the derivative 
-$f'(x)$
-as the *instantaneous* rate of change 
-of $f(x)$ with respect to $x$.
-Let's develop some intuition with an example.
-(**Define $u = f(x) = 3x^2-4x$.**)
+Nous pouvons interpréter la dérivée 
+$f'(x)$ 
+ comme le taux de variation *instantané* 
+de $f(x)$ par rapport à $x$.
+Développons un peu d'intuition avec un exemple.
+(**Définir $u = f(x) = 3x^2-4x$.**)
 
 ```{.python .input}
 %%tab mxnet
@@ -128,11 +128,11 @@ def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
-[**Setting $x=1$, $\frac{f(x+h) - f(x)}{h}$**] (**approaches $2$
-as $h$ approaches $0$.**)
-While this experiment lacks 
-the rigor of a mathematical proof,
-we will soon see that indeed $f'(1) = 2$.
+(**Définir $x=1$, $\frac{f(x+h) - f(x)}{h}$**)
+(**s'approche de $2$ comme $h$ s'approche de $0$.**)
+Bien que cette expérience n'ait pas 
+la rigueur d'une preuve mathématique,
+nous verrons bientôt qu'effectivement $f'(1) = 2$.
 
 ```{.python .input}
 %%tab all
@@ -140,49 +140,49 @@ for h in 10.0**np.arange(-1, -6, -1):
     print(f'h={h:.5f}, numerical limit={(f(1+h)-f(1))/h:.5f}')
 ```
 
-There are several equivalent notational conventions for derivatives.
-Given $y = f(x)$, the following expressions are equivalent:
+Il existe plusieurs conventions de notation équivalentes pour les dérivées.
+Étant donné $y = f(x)$, les expressions suivantes sont équivalentes :
 
-$$f'(x) = y' = \frac{dy}{dx} = \frac{df}{dx} = \frac{d}{dx} f(x) = Df(x) = D_x f(x),$$
+$$f'(x) = y' = \frac{dy}{dx} = \frac{df}{dx} = \frac{d}{dx} f(x) = Df(x) = D_x f(x),$$ 
 
-where the symbols $\frac{d}{dx}$ and $D$ are *differentiation operators*.
-Below, we present the derivatives of some common functions:
+ où les symboles $\frac{d}{dx}$ et $D$ sont des opérateurs de *différenciation*.
+Nous présentons ci-dessous les dérivées de quelques fonctions courantes :
 
 $$\begin{aligned} \frac{d}{dx} C & = 0 && \text{for any constant $C$} \\ \frac{d}{dx} x^n & = n x^{n-1} && \text{for } n \neq 0 \\ \frac{d}{dx} e^x & = e^x \\ \frac{d}{dx} \ln x & = x^{-1} \end{aligned}$$
 
-Functions composed from differentiable functions 
-are often themselves differentiable.
-The following rules come in handy 
-for working with compositions 
-of any differentiable functions 
-$f$ and $g$, and constant $C$.
+Les fonctions composées à partir de fonctions différentiables 
+sont souvent elles-mêmes différentiables.
+Les règles suivantes sont utiles 
+pour travailler avec des compositions 
+de fonctions différentiables quelconques 
+$f$ et $g$, et de constantes $C$.
 
 $$\begin{aligned} \frac{d}{dx} [C f(x)] & = C \frac{d}{dx} f(x) && \text{Constant multiple rule} \\ \frac{d}{dx} [f(x) + g(x)] & = \frac{d}{dx} f(x) + \frac{d}{dx} g(x) && \text{Sum rule} \\ \frac{d}{dx} [f(x) g(x)] & = f(x) \frac{d}{dx} g(x) + g(x) \frac{d}{dx} f(x) && \text{Product rule} \\ \frac{d}{dx} \frac{f(x)}{g(x)} & = \frac{g(x) \frac{d}{dx} f(x) - f(x) \frac{d}{dx} g(x)}{g^2(x)} && \text{Quotient rule} \end{aligned}$$
 
-Using this, we can apply the rules 
-to find the derivative of $3 x^2 - 4x$ via
+Grâce à cela, nous pouvons appliquer les règles 
+pour trouver la dérivée de $3 x^2 - 4x$ via
 
-$$\frac{d}{dx} [3 x^2 - 4x] = 3 \frac{d}{dx} x^2 - 4 \frac{d}{dx} x = 6x - 4.$$
+$$\frac{d}{dx} [3 x^2 - 4x] = 3 \frac{d}{dx} x^2 - 4 \frac{d}{dx} x = 6x - 4.$$ 
 
-Plugging in $x = 1$ shows that, indeed, 
-the derivative is $2$ at this location. 
-Note that derivatives tell us 
-the *slope* of a function 
-at a particular location.  
+ . En introduisant $x = 1$, on constate qu'effectivement, 
+la dérivée est $2$ à cet endroit. 
+Notez que les dérivées nous indiquent 
+la *pente* d'une fonction 
+à un endroit particulier. 
 
-## Visualization Utilities
+## Utilitaires de visualisation
 
-[**We can visualize the slopes of functions using the `matplotlib` library**].
-We need to define a few functions. 
-As its name indicates, `use_svg_display` 
-tells `matplotlib` to output graphics 
-in SVG format for crisper images. 
-The comment `#@save` is a special modifier 
-that allows us to save any function, 
-class, or other code block to the `d2l` package 
-so that we can invoke it later 
-without repeating the code, 
-e.g., via `d2l.use_svg_display()`.
+[**Nous pouvons visualiser les pentes des fonctions en utilisant la bibliothèque `matplotlib` **].
+Nous devons définir quelques fonctions. 
+Comme son nom l'indique, `use_svg_display` 
+ indique à `matplotlib` de sortir les graphiques 
+au format SVG pour des images plus nettes. 
+Le commentaire `#@save` est un modificateur spécial 
+qui nous permet d'enregistrer n'importe quelle fonction, 
+classe ou autre bloc de code dans le paquet `d2l` 
+ afin de pouvoir l'invoquer ultérieurement 
+sans répéter le code, 
+par exemple, via `d2l.use_svg_display()`.
 
 ```{.python .input}
 %%tab all
@@ -191,9 +191,9 @@ def use_svg_display():  #@save
     backend_inline.set_matplotlib_formats('svg')
 ```
 
-Conveniently, we can set figure sizes with `set_figsize`. 
-Since the import statement `from matplotlib import pyplot as plt` 
-was marked via `#@save` in the `d2l` package, we can call `d2l.plt`.
+De façon pratique, nous pouvons définir la taille des figures avec `set_figsize`. 
+Comme l'instruction d'importation `from matplotlib import pyplot as plt` 
+ a été marquée via `#@save` dans le paquet `d2l`, nous pouvons appeler `d2l.plt`.
 
 ```{.python .input}
 %%tab all
@@ -203,9 +203,9 @@ def set_figsize(figsize=(3.5, 2.5)):  #@save
     d2l.plt.rcParams['figure.figsize'] = figsize
 ```
 
-The `set_axes` function can associate axes
-with properties, including labels, ranges,
-and scales.
+La fonction `set_axes` peut associer les axes
+à des propriétés, notamment des étiquettes, des plages,
+et des échelles.
 
 ```{.python .input}
 %%tab all
@@ -220,10 +220,10 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     axes.grid()
 ```
 
-With these three functions, we can define a `plot` function 
-to overlay multiple curves. 
-Much of the code here is just ensuring 
-that the sizes and shapes of inputs match.
+Avec ces trois fonctions, nous pouvons définir une fonction `plot` 
+ pour superposer plusieurs courbes. 
+Une grande partie du code ici consiste simplement à s'assurer 
+que les tailles et les formes des entrées correspondent.
 
 ```{.python .input}
 %%tab all
@@ -253,8 +253,8 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 ```
 
-Now we can [**plot the function $u = f(x)$ and its tangent line $y = 2x - 3$ at $x=1$**],
-where the coefficient $2$ is the slope of the tangent line.
+Nous pouvons maintenant [**tracer la fonction $u = f(x)$ et sa ligne tangente $y = 2x - 3$ à $x=1$**],
+où le coefficient $2$ est la pente de la ligne tangente.
 
 ```{.python .input}
 %%tab all
@@ -262,154 +262,154 @@ x = np.arange(0, 3, 0.1)
 plot(x, [f(x), 2 * x - 3], 'x', 'f(x)', legend=['f(x)', 'Tangent line (x=1)'])
 ```
 
-## Partial Derivatives and Gradients
-:label:`subsec_calculus-grad`
+## Dérivées partielles et gradients
+:label:`subsec_calculus-grad` 
 
-Thus far, we have been differentiating
-functions of just one variable.
-In deep learning, we also need to work
-with functions of *many* variables.
-We briefly introduce notions of the derivative
-that apply to such *multivariate* functions.
-
-
-Let $y = f(x_1, x_2, \ldots, x_n)$ be a function with $n$ variables. 
-The *partial derivative* of $y$ 
-with respect to its $i^\mathrm{th}$ parameter $x_i$ is
-
-$$ \frac{\partial y}{\partial x_i} = \lim_{h \rightarrow 0} \frac{f(x_1, \ldots, x_{i-1}, x_i+h, x_{i+1}, \ldots, x_n) - f(x_1, \ldots, x_i, \ldots, x_n)}{h}.$$
+ Jusqu'à présent, nous avons différencié
+des fonctions d'une seule variable.
+En apprentissage profond, nous devons également travailler
+avec des fonctions de *nombreuses* variables.
+Nous présentons brièvement les notions de dérivée
+qui s'appliquent à de telles fonctions *multivariées*.
 
 
-To calculate $\frac{\partial y}{\partial x_i}$, 
-we can treat $x_1, \ldots, x_{i-1}, x_{i+1}, \ldots, x_n$ as constants 
-and calculate the derivative of $y$ with respect to $x_i$.
-The following notation conventions for partial derivatives 
-are all common and all mean the same thing:
+Soit $y = f(x_1, x_2, \ldots, x_n)$ une fonction avec $n$ variables. 
+La dérivée *partielle* de $y$ 
+ par rapport à son paramètre $i^\mathrm{th}$ $x_i$ est
 
-$$\frac{\partial y}{\partial x_i} = \frac{\partial f}{\partial x_i} = \partial_{x_i} f = \partial_i f = f_{x_i} = f_i = D_i f = D_{x_i} f.$$
+$$ \frac{\partial y}{\partial x_i} = \lim_{h \rightarrow 0} \frac{f(x_1, \ldots, x_{i-1}, x_i+h, x_{i+1}, \ldots, x_n) - f(x_1, \ldots, x_i, \ldots, x_n)}{h}.$$ 
 
-We can concatenate partial derivatives 
-of a multivariate function 
-with respect to all its variables 
-to obtain a vector that is called
-the *gradient* of the function.
-Suppose that the input of function 
+ 
+ Pour calculer $\frac{\partial y}{\partial x_i}$, 
+nous pouvons traiter $x_1, \ldots, x_{i-1}, x_{i+1}, \ldots, x_n$ comme des constantes 
+et calculer la dérivée de $y$ par rapport à $x_i$.
+Les conventions de notation suivantes pour les dérivées partielles 
+sont toutes communes et signifient toutes la même chose :
+
+$$\frac{\partial y}{\partial x_i} = \frac{\partial f}{\partial x_i} = \partial_{x_i} f = \partial_i f = f_{x_i} = f_i = D_i f = D_{x_i} f.$$ 
+
+ Nous pouvons concaténer les dérivées partielles 
+d'une fonction multivariable 
+par rapport à toutes ses variables 
+pour obtenir un vecteur appelé
+le *gradient* de la fonction.
+Supposons que l'entrée de la fonction 
 $f: \mathbb{R}^n \rightarrow \mathbb{R}$ 
-is an $n$-dimensional vector 
+ soit un vecteur $n$-dimensionnel 
 $\mathbf{x} = [x_1, x_2, \ldots, x_n]^\top$ 
-and the output is a scalar. 
-The gradient of the function $f$ 
-with respect to $\mathbf{x}$ 
-is a vector of $n$ partial derivatives:
+ et que la sortie soit un scalaire. 
+Le gradient de la fonction $f$ 
+ par rapport à $\mathbf{x}$ 
+ est un vecteur de dérivées partielles $n$:
 
 $$\nabla_{\mathbf{x}} f(\mathbf{x}) = \left[\partial_{x_1} f(\mathbf{x}), \partial_{x_2} f(\mathbf{x}), \ldots
 \partial_{x_n} f(\mathbf{x})\right]^\top.$$ 
 
-When there is no ambiguity,
+Lorsqu'il n'y a pas d'ambiguïté,
 $\nabla_{\mathbf{x}} f(\mathbf{x})$ 
-is typically replaced 
-by $\nabla f(\mathbf{x})$.
-The following rules come in handy 
-for differentiating multivariate functions:
+ est généralement remplacé 
+par $\nabla f(\mathbf{x})$.
+Les règles suivantes sont utiles 
+pour différencier des fonctions multivariées :
 
-* For all $\mathbf{A} \in \mathbb{R}^{m \times n}$ we have $\nabla_{\mathbf{x}} \mathbf{A} \mathbf{x} = \mathbf{A}^\top$ and $\nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{A}  = \mathbf{A}$.
-* For square matrices $\mathbf{A} \in \mathbb{R}^{n \times n}$ we have that $\nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{A} \mathbf{x}  = (\mathbf{A} + \mathbf{A}^\top)\mathbf{x}$ and in particular
-$\nabla_{\mathbf{x}} \|\mathbf{x} \|^2 = \nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{x} = 2\mathbf{x}$.
+* Pour tout $\mathbf{A} \in \mathbb{R}^{m \times n}$ on a $\nabla_{\mathbf{x}} \mathbf{A} \mathbf{x} = \mathbf{A}^\top$ et $\nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{A}  = \mathbf{A}$.
+* Pour les matrices carrées $\mathbf{A} \in \mathbb{R}^{n \times n}$ on a que $\nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{A} \mathbf{x}  = (\mathbf{A} + \mathbf{A}^\top)\mathbf{x}$ et en particulier
+$\nabla_{\mathbf{x}} \|\mathbf{x} \|^2 = \nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{x} = 2\mathbf{x}$ .
 
-Similarly, for any matrix $\mathbf{X}$, 
-we have $\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}$. 
+De même, pour toute matrice $\mathbf{X}$, 
+on a $\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}$. 
 
 
 
 ## Chain Rule
 
-In deep learning, the gradients of concern
-are often difficult to calculate
-because we are working with 
-deeply nested functions 
-(of functions (of functions...)).
-Fortunately, the *chain rule* takes care of this. 
-Returning to functions of a single variable,
-suppose that $y = f(g(x))$
-and that the underlying functions 
-$y=f(u)$ and $u=g(x)$ 
-are both differentiable.
-The chain rule states that 
+En apprentissage profond, les gradients de la préoccupation
+sont souvent difficiles à calculer
+parce que nous travaillons avec 
+des fonctions profondément imbriquées 
+(de fonctions (de fonctions...)).
+Heureusement, la *règle de la chaîne* s'en charge. 
+Pour en revenir aux fonctions d'une seule variable,
+supposons que $y = f(g(x))$
+ et que les fonctions sous-jacentes 
+$y=f(u)$ et $u=g(x)$ 
+ sont toutes deux différentiables.
+La règle de la chaîne indique que 
 
 
-$$\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}.$$
+ $$\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}.$$ 
 
+ 
 
+ Pour en revenir aux fonctions à plusieurs variables,
+supposons que $y = f(\mathbf{u})$ a des variables
+$u_1, u_2, \ldots, u_m$ , 
+où chaque $u_i = g_i(\mathbf{x})$ 
+ a des variables $x_1, x_2, \ldots, x_n$,
+c'est-à-dire $\mathbf{u} = g(\mathbf{x})$.
+La règle de la chaîne indique alors que
 
-Turning back to multivariate functions,
-suppose that $y = f(\mathbf{u})$ has variables
-$u_1, u_2, \ldots, u_m$, 
-where each $u_i = g_i(\mathbf{x})$ 
-has variables $x_1, x_2, \ldots, x_n$,
-i.e.,  $\mathbf{u} = g(\mathbf{x})$.
-Then the chain rule states that
+$$\frac{\partial y}{\partial x_{i}} = \frac{\partial y}{\partial u_{1}} \frac{\partial u_{1}}{\partial x_{i}} + \frac{\partial y}{\partial u_{2}} \frac{\partial u_{2}}{\partial x_{i}} + \ldots + \frac{\partial y}{\partial u_{m}} \frac{\partial u_{m}}{\partial x_{i}} \text{ and thus } \nabla_{\mathbf{x}} y =  \mathbf{A} \nabla_{\mathbf{u}} y,$$ 
 
-$$\frac{\partial y}{\partial x_{i}} = \frac{\partial y}{\partial u_{1}} \frac{\partial u_{1}}{\partial x_{i}} + \frac{\partial y}{\partial u_{2}} \frac{\partial u_{2}}{\partial x_{i}} + \ldots + \frac{\partial y}{\partial u_{m}} \frac{\partial u_{m}}{\partial x_{i}} \text{ and thus } \nabla_{\mathbf{x}} y =  \mathbf{A} \nabla_{\mathbf{u}} y,$$
-
-where $\mathbf{A} \in \mathbb{R}^{n \times m}$ is a *matrix*
-that contains the derivative of vector $\mathbf{u}$
-with respect to vector $\mathbf{x}$.
-Thus, evaluating the gradient requires 
-computing a vector-matrix product. 
-This is one of the key reasons why linear algebra 
-is such an integral building block 
-in building deep learning systems. 
+ où $\mathbf{A} \in \mathbb{R}^{n \times m}$ est une *matrice*
+qui contient la dérivée du vecteur $\mathbf{u}$
+ par rapport au vecteur $\mathbf{x}$.
+Ainsi, l'évaluation du gradient nécessite le calcul d'un produit vecteur-matrice sur 
+. 
+C'est l'une des principales raisons pour lesquelles l'algèbre linéaire 
+est un bloc de construction intégral 
+dans la construction de systèmes d'apprentissage profond. 
 
 
 
 ## Discussion
 
-While we have just scratched the surface of a deep topic,
-a number of concepts already come into focus: 
-first, the composition rules for differentiation
-can be applied mindlessly, enabling
-us to compute gradients *automatically*.
-This task requires no creativity and thus 
-we can focus our cognitive powers elsewhere.
-Second, computing the derivatives of vector-valued functions 
-requires us to multiply matrices as we trace 
-the dependency graph of variables from output to input. 
-In particular, this graph is traversed in a *forward* direction 
-when we evaluate a function 
-and in a *backwards* direction 
-when we compute gradients. 
-Later chapters will formally introduce backpropagation,
-a computational procedure for applying the chain rule.
+Bien que nous n'ayons fait qu'effleurer la surface d'un sujet profond,
+un certain nombre de concepts sont déjà mis en évidence : 
+tout d'abord, les règles de composition pour la différenciation
+peuvent être appliquées sans réfléchir, ce qui nous permet
+de calculer les gradients *automatiquement*.
+Cette tâche ne nécessite aucune créativité et 
+nous pouvons donc concentrer nos capacités cognitives ailleurs.
+Deuxièmement, le calcul des dérivées de fonctions à valeurs vectorielles 
+exige que nous multipliions des matrices lorsque nous traçons 
+le graphe de dépendance des variables de la sortie à l'entrée. 
+En particulier, ce graphe est traversé dans une direction *avant* 
+lorsque nous évaluons une fonction 
+et dans une direction *arrière* 
+lorsque nous calculons les gradients. 
+Les chapitres suivants présenteront formellement la rétropropagation,
+une procédure de calcul pour appliquer la règle de la chaîne.
 
-From the viewpoint of optimization, gradients allow us 
-to determine how to move the parameters of a model
-in order to lower the loss,
-and each step of the optimization algorithms used 
-throughout this book will require calculating the gradient.
+Du point de vue de l'optimisation, les gradients nous permettent 
+de déterminer comment déplacer les paramètres d'un modèle
+afin de réduire la perte,
+et chaque étape des algorithmes d'optimisation utilisés 
+tout au long de cet ouvrage nécessitera le calcul du gradient.
 
-## Exercises
+## Exercices
 
-1. So far we took the rules for derivatives for granted. 
-   Using the definition and limits prove the properties 
-   for (i) $f(x) = c$, (ii) $f(x) = x^n$, (iii) $f(x) = e^x$ and (iv) $f(x) = \log x$.
-1. In the same vein, prove the product, sum, and quotient rule from first principles. 
-1. Prove that the constant multiple rule follows as a special case of the product rule. 
-1. Calculate the derivative of $f(x) = x^x$. 
-1. What does it mean that $f'(x) = 0$ for some $x$? 
-   Give an example of a function $f$ 
-   and a location $x$ for which this might hold. 
-1. Plot the function $y = f(x) = x^3 - \frac{1}{x}$ 
-   and plot its tangent line at $x = 1$.
-1. Find the gradient of the function 
-   $f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$.
-1. What is the gradient of the function 
-   $f(\mathbf{x}) = \|\mathbf{x}\|_2$? What happens for $\mathbf{x} = \mathbf{0}$?
-1. Can you write out the chain rule for the case 
-   where $u = f(x, y, z)$ and $x = x(a, b)$, $y = y(a, b)$, and $z = z(a, b)$?
-1. Given a function $f(x)$ that is invertible, 
-   compute the derivative of its inverse $f^{-1}(x)$. 
-   Here we have that $f^{-1}(f(x)) = x$ and conversely $f(f^{-1}(y)) = y$. 
-   Hint: use these properties in your derivation. 
+1. Jusqu'à présent, nous avons considéré que les règles relatives aux dérivées étaient acquises. 
+   En utilisant la définition et les limites, prouvez les propriétés 
+ pour (i) $f(x) = c$, (ii) $f(x) = x^n$, (iii) $f(x) = e^x$ et (iv) $f(x) = \log x$.
+1. Dans la même veine, prouvez la règle du produit, de la somme et du quotient à partir des premiers principes. 
+1. Prouvez que la règle du multiple constant est un cas particulier de la règle du produit. 
+1. Calculez la dérivée de $f(x) = x^x$. 
+1. Que signifie $f'(x) = 0$ pour un certain $x$? 
+   Donnez un exemple d'une fonction $f$ 
+ et d'un lieu $x$ pour lesquels cela peut être vrai. 
+1. Tracez la fonction $y = f(x) = x^3 - \frac{1}{x}$ 
+ et tracez sa ligne tangente à $x = 1$.
+1. Trouvez le gradient de la fonction 
+ $f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$ .
+1. Quel est le gradient de la fonction 
+ $f(\mathbf{x}) = \|\mathbf{x}\|_2$ ? Que se passe-t-il pour $\mathbf{x} = \mathbf{0}$?
+1. Pouvez-vous écrire la règle de la chaîne pour le cas 
+ où $u = f(x, y, z)$ et $x = x(a, b)$, $y = y(a, b)$, et $z = z(a, b)$?
+1. Étant donné une fonction $f(x)$ qui est inversible, 
+ calculez la dérivée de son inverse $f^{-1}(x)$. 
+   Ici, nous avons que $f^{-1}(f(x)) = x$ et inversement $f(f^{-1}(y)) = y$. 
+   Conseil : utilisez ces propriétés dans votre dérivation 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/32)

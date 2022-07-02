@@ -1,15 +1,15 @@
-# Recommender Systems
-:label:`chap_recsys`
+# Systèmes de recommandation
+:label:`chap_recsys` 
+
+ 
+ **Shuai Zhang** (*Amazon*), **Aston Zhang** (*Amazon*), et **Yi Tay** (*Google*)
+
+Les systèmes de recommandation sont largement utilisés dans l'industrie et sont omniprésents dans notre vie quotidienne. Ces systèmes sont utilisés dans un certain nombre de domaines tels que les sites d'achat en ligne (par exemple, amazon.com), les sites de services de musique et de cinéma (par exemple, Netflix et Spotify), les magasins d'applications mobiles (par exemple, IOS app store et google play), la publicité en ligne, pour n'en citer que quelques-uns. 
+
+L'objectif principal des systèmes de recommandation est d'aider les utilisateurs à découvrir des éléments pertinents tels que des films à regarder, des textes à lire ou des produits à acheter, afin de créer une expérience utilisateur agréable. En outre, les systèmes de recommandation font partie des systèmes d'apprentissage automatique les plus puissants que les détaillants en ligne mettent en œuvre afin de générer des revenus supplémentaires. Les systèmes de recommandation remplacent les moteurs de recherche en réduisant les efforts de recherche proactive et en surprenant les utilisateurs avec des offres qu'ils n'ont jamais recherchées. De nombreuses entreprises ont réussi à se positionner devant leurs concurrents grâce à des systèmes de recommandation plus efficaces. En tant que tels, les systèmes de recommandation sont non seulement au cœur de notre vie quotidienne, mais aussi très indispensables dans certaines industries.
 
 
-**Shuai Zhang** (*Amazon*), **Aston Zhang** (*Amazon*), and **Yi Tay** (*Google*)
-
-Recommender systems are widely employed in industry and are ubiquitous in our daily lives. These systems are utilized in a number of areas such as online shopping sites (e.g., amazon.com), music/movie services site (e.g., Netflix and Spotify), mobile application stores (e.g., IOS app store and google play), online advertising, just to name a few. 
-
-The major goal of recommender systems is to help users discover relevant items such as movies to watch, text to read or products to buy, so as to create a delightful user experience. Moreover, recommender systems are among the most powerful machine learning systems that online retailers implement in order to drive incremental revenue. Recommender systems are replacements of search engines by reducing the efforts in proactive searches and surprising users with offers they never searched for. Many companies managed to position themselves ahead of their competitors with the help of more effective recommender systems. As such, recommender systems are central to not only our everyday lives but also highly indispensable in some industries.
-
-
-In this chapter, we will cover the fundamentals and advancements of recommender systems, along with exploring some common fundamental techniques for building recommender systems with different data sources available and their implementations. Specifically, you will learn how to predict the rating a user might give to a prospective item, how to generate a recommendation list of items and how to predict the click-through rate from abundant features. These tasks are commonplace in real-world applications. By studying this chapter, you will get hands-on experience pertaining to solving real world recommendation problems with not only classical methods but the more advanced deep learning based models as well.
+Dans ce chapitre, nous allons couvrir les principes fondamentaux et les avancées des systèmes de recommandation, tout en explorant certaines techniques fondamentales communes pour construire des systèmes de recommandation avec différentes sources de données disponibles et leurs implémentations. Plus précisément, vous apprendrez comment prédire la note qu'un utilisateur pourrait donner à un article potentiel, comment générer une liste d'articles recommandés et comment prédire le taux de clics à partir de caractéristiques abondantes. Ces tâches sont courantes dans les applications du monde réel. En étudiant ce chapitre, vous acquerrez une expérience pratique de la résolution de problèmes de recommandation dans le monde réel, non seulement avec des méthodes classiques, mais aussi avec des modèles plus avancés basés sur l'apprentissage profond.
 
 ```toc
 :maxdepth: 2

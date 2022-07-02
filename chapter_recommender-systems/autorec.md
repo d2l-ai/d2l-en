@@ -1,31 +1,31 @@
-# AutoRec: Rating Prediction with Autoencoders
+# AutoRec : Rating Prediction with Autoencoders
 
-Although the matrix factorization model achieves decent performance on the rating prediction task, it is essentially a linear model. Thus, such models are not capable of capturing complex nonlinear and intricate relationships that may be predictive of users' preferences. In this section, we introduce a nonlinear neural network collaborative filtering model, AutoRec :cite:`Sedhain.Menon.Sanner.ea.2015`. It identifies collaborative filtering (CF) with an autoencoder architecture and aims to integrate nonlinear transformations into CF on the basis of explicit feedback. Neural networks have been proven to be capable of approximating any continuous function, making it suitable to address the limitation of matrix factorization and enrich the expressiveness of matrix factorization.
+Bien que le modèle de factorisation matricielle atteigne une performance décente sur la tâche de prédiction de notation, il s'agit essentiellement d'un modèle linéaire. Ainsi, de tels modèles ne sont pas capables de capturer les relations complexes non linéaires et complexes qui peuvent être prédictives des préférences des utilisateurs. Dans cette section, nous présentons un modèle de filtrage collaboratif par réseau neuronal non linéaire, AutoRec :cite:`Sedhain.Menon.Sanner.ea.2015` . Il identifie le filtrage collaboratif (FC) avec une architecture d'autoencodeur et vise à intégrer des transformations non linéaires dans le FC sur la base d'un feedback explicite. Il a été prouvé que les réseaux neuronaux sont capables d'approximer n'importe quelle fonction continue, ce qui les rend aptes à traiter les limites de la factorisation matricielle et à en enrichir l'expressivité.
 
-On the one hand, AutoRec has the same structure as an autoencoder which consists of an input layer, a hidden layer, and a reconstruction (output) layer.  An autoencoder is a neural network that learns to copy its input to its output in order to code the inputs into the hidden (and usually low-dimensional) representations. In AutoRec, instead of explicitly embedding users/items into low-dimensional space, it uses the column/row of the interaction matrix as input, then reconstructs the interaction matrix in the output layer.
+D'une part, AutoRec a la même structure qu'un autoencodeur qui consiste en une couche d'entrée, une couche cachée et une couche de reconstruction (sortie).  Un autoencodeur est un réseau neuronal qui apprend à copier son entrée sur sa sortie afin de coder les entrées dans les représentations cachées (et généralement de faible dimension). Dans AutoRec, au lieu d'intégrer explicitement les utilisateurs/articles dans un espace de faible dimension, il utilise la colonne/rangée de la matrice d'interaction comme entrée, puis reconstruit la matrice d'interaction dans la couche de sortie.
 
-On the other hand, AutoRec differs from a traditional autoencoder: rather than learning the hidden representations, AutoRec focuses on learning/reconstructing the output layer. It uses a partially observed interaction matrix as input, aiming to reconstruct a completed rating matrix. In the meantime, the missing entries of the input are filled in the output layer via reconstruction for the purpose of recommendation.
+D'autre part, AutoRec diffère d'un auto-codeur traditionnel : plutôt que d'apprendre les représentations cachées, AutoRec se concentre sur l'apprentissage/la reconstruction de la couche de sortie. Il utilise une matrice d'interaction partiellement observée comme entrée, dans le but de reconstruire une matrice d'évaluation complète. Pendant ce temps, les entrées manquantes de l'entrée sont remplies dans la couche de sortie par reconstruction dans le but de faire des recommandations.
 
-There are two variants of AutoRec: user-based and item-based. For brevity, here we only introduce the item-based AutoRec. User-based AutoRec can be derived accordingly.
+Il existe deux variantes d'AutoRec : basée sur l'utilisateur et basée sur l'élément. Par souci de concision, nous ne présentons ici que l'AutoRec basé sur les éléments. L'AutoRec basé sur l'utilisateur peut être dérivé en conséquence.
 
 
-## Model
+## Modèle
 
-Let $\mathbf{R}_{*i}$ denote the $i^\mathrm{th}$ column of the rating matrix, where unknown ratings are set to zeros by default. The neural architecture is defined as:
+Soit $\mathbf{R}_{*i}$ la colonne $i^\mathrm{th}$ de la matrice d'évaluation, où les évaluations inconnues sont définies comme des zéros par défaut. L'architecture neuronale est définie comme suit
 
 $$
 h(\mathbf{R}_{*i}) = f(\mathbf{W} \cdot g(\mathbf{V} \mathbf{R}_{*i} + \mu) + b)
 $$
 
-where $f(\cdot)$ and $g(\cdot)$ represent activation functions, $\mathbf{W}$ and $\mathbf{V}$ are weight matrices, $\mu$ and $b$ are biases. Let $h( \cdot )$ denote the whole network of AutoRec. The output $h(\mathbf{R}_{*i})$ is the reconstruction of the $i^\mathrm{th}$ column of the rating matrix.
+où $f(\cdot)$ et $g(\cdot)$ représentent les fonctions d'activation, $\mathbf{W}$ et $\mathbf{V}$ sont les matrices de poids, $\mu$ et $b$ sont les biais. Soit $h( \cdot )$ pour désigner l'ensemble du réseau d'AutoRec. La sortie $h(\mathbf{R}_{*i})$ est la reconstruction de la colonne $i^\mathrm{th}$ de la matrice d'évaluation.
 
-The following objective function aims to minimize the reconstruction error:
+La fonction objective suivante vise à minimiser l'erreur de reconstruction :
 
 $$
 \underset{\mathbf{W},\mathbf{V},\mu, b}{\mathrm{argmin}} \sum_{i=1}^M{\parallel \mathbf{R}_{*i} - h(\mathbf{R}_{*i})\parallel_{\mathcal{O}}^2} +\lambda(\| \mathbf{W} \|_F^2 + \| \mathbf{V}\|_F^2)
 $$
 
-where $\| \cdot \|_{\mathcal{O}}$ means only the contribution of observed ratings are considered, that is, only weights that are associated with observed inputs are updated during back-propagation.
+où $\| \cdot \|_{\mathcal{O}}$ signifie que seule la contribution des évaluations observées est prise en compte, c'est-à-dire que seuls les poids qui sont associés aux entrées observées sont mis à jour pendant la rétropropagation.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -37,9 +37,9 @@ import mxnet as mx
 npx.set_np()
 ```
 
-## Implementing the Model
+## Implémentation du modèle
 
-A typical autoencoder consists of an encoder and a decoder. The encoder projects the input to hidden representations and the decoder maps the hidden layer to the reconstruction layer. We follow this practice and create the encoder and decoder with fully connected layers. The activation of encoder is set to `sigmoid` by default and no activation is applied for decoder. Dropout is included after the encoding transformation to reduce over-fitting. The gradients of unobserved inputs are masked out to ensure that only observed ratings contribute to the model learning process.
+Un auto-codeur typique consiste en un encodeur et un décodeur. L'encodeur projette l'entrée vers des représentations cachées et le décodeur fait correspondre la couche cachée à la couche de reconstruction. Nous suivons cette pratique et créons l'encodeur et le décodeur avec des couches entièrement connectées. L'activation de l'encodeur est fixée à `sigmoid` par défaut et aucune activation n'est appliquée au décodeur. Le Dropout est inclus après la transformation de l'encodage pour réduire l'over-fitting. Les gradients des entrées non observées sont masqués pour garantir que seules les évaluations observées contribuent au processus d'apprentissage du modèle.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -60,9 +60,9 @@ class AutoRec(nn.Block):
             return pred
 ```
 
-## Reimplementing the Evaluator
+## Réimplémentation de l'évaluateur
 
-Since the input and output have been changed, we need to reimplement the evaluation function, while we still use RMSE as the accuracy measure.
+L'entrée et la sortie ayant été modifiées, nous devons réimplémenter la fonction d'évaluation, tout en continuant à utiliser RMSE comme mesure de précision.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -78,9 +78,9 @@ def evaluator(network, inter_matrix, test_data, devices):
     return float(rmse)
 ```
 
-## Training and Evaluating the Model
+## Formation et évaluation du modèle
 
-Now, let's train and evaluate AutoRec on the MovieLens dataset. We can clearly see that the test RMSE is lower than the matrix factorization model, confirming the effectiveness of neural networks in the rating prediction task.
+Maintenant, formons et évaluons AutoRec sur le jeu de données MovieLens. Nous pouvons clairement voir que le RMSE de test est inférieur au modèle de factorisation matricielle, ce qui confirme l'efficacité des réseaux neuronaux dans la tâche de prédiction de classement.
 
 ```{.python .input  n=4}
 #@tab mxnet
@@ -109,18 +109,18 @@ d2l.train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                         devices, evaluator, inter_mat=test_inter_mat)
 ```
 
-## Summary
+## Résumé
 
-* We can frame the matrix factorization algorithm with autoencoders, while integrating non-linear layers and dropout regularization.
-* Experiments on the MovieLens 100K dataset show that AutoRec achieves superior performance than matrix factorization.
+* Nous pouvons encadrer l'algorithme de factorisation matricielle avec des autoencodeurs, tout en intégrant des couches non linéaires et une régularisation de type dropout.
+* Les expériences sur le jeu de données MovieLens 100K montrent qu'AutoRec atteint des performances supérieures à la factorisation matricielle.
 
 
 
-## Exercises
+## Exercices
 
-* Vary the hidden dimension of AutoRec to see its impact on the model performance.
-* Try to add more hidden layers. Is it helpful to improve the model performance?
-* Can you find a better combination of decoder and encoder activation functions?
+* Faites varier la dimension cachée d'AutoRec pour voir son impact sur les performances du modèle.
+* Essayez d'ajouter plus de couches cachées. Cela permet-il d'améliorer les performances du modèle ?
+* Pouvez-vous trouver une meilleure combinaison des fonctions d'activation du décodeur et de l'encodeur ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/401)

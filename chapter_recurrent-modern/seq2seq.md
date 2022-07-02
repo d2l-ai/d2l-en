@@ -3,106 +3,106 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-#  Sequence to Sequence Learning
-:label:`sec_seq2seq`
+# Apprentissage de séquence à séquence
+:label:`sec_seq2seq` 
 
-As we have seen in :numref:`sec_machine_translation`,
-in machine translation
-both the input and output are a variable-length sequence.
-To address this type of problem,
-we have designed a general encoder-decoder architecture
-in :numref:`sec_encoder-decoder`.
-In this section,
-we will
-use two RNNs to design
-the encoder and the decoder of
-this architecture
-and apply it to *sequence to sequence* learning
-for machine translation
-:cite:`Sutskever.Vinyals.Le.2014,Cho.Van-Merrienboer.Gulcehre.ea.2014`.
+ Comme nous l'avons vu dans :numref:`sec_machine_translation` ,
+dans la traduction automatique
+, l'entrée et la sortie sont toutes deux une séquence de longueur variable.
+Pour résoudre ce type de problème,
+nous avons conçu une architecture générale de codeur-décodeur
+dans :numref:`sec_encoder-decoder` .
+Dans cette section,
+nous allons
+utiliser deux RNN pour concevoir
+l'encodeur et le décodeur de
+cette architecture
+et l'appliquer à l'apprentissage *séquence à séquence*
+pour la traduction automatique
+:cite:`Sutskever.Vinyals.Le.2014,Cho.Van-Merrienboer.Gulcehre.ea.2014` .
 
-Following the design principle
-of the encoder-decoder architecture,
-the RNN encoder can
-take a variable-length sequence as input and transforms it into a fixed-shape hidden state.
-In other words,
-information of the input (source) sequence
-is *encoded* in the hidden state of the RNN encoder.
-To generate the output sequence token by token,
-a separate RNN decoder
-can predict the next token based on
-what tokens have been seen (such as in language modeling) or generated,
-together with the encoded information of the input sequence.
-:numref:`fig_seq2seq` illustrates
-how to use two RNNs
-for sequence to sequence learning
-in machine translation.
+Suivant le principe de conception
+de l'architecture codeur-décodeur,
+le codeur RNN peut
+prendre une séquence de longueur variable en entrée et la transformer en un état caché de forme fixe.
+En d'autres termes, l'information
+de la séquence d'entrée (source)
+est *codée* dans l'état caché du codeur RNN.
+Pour générer la séquence de sortie mot à mot,
+un décodeur RNN séparé
+peut prédire le mot suivant sur la base de
+ce que les mots ont vu (comme dans la modélisation du langage) ou généré,
+avec les informations codées de la séquence d'entrée.
+:numref:`fig_seq2seq` illustre
+comment utiliser deux RNN
+pour l'apprentissage de séquence à séquence
+dans la traduction automatique.
 
 
 ![Sequence to sequence learning with an RNN encoder and an RNN decoder.](../img/seq2seq.svg)
 :label:`fig_seq2seq`
 
-In :numref:`fig_seq2seq`,
-the special "&lt;eos&gt;" token
-marks the end of the sequence.
-The model can stop making predictions
-once this token is generated.
-At the initial time step of the RNN decoder,
-there are two special design decisions.
-First, the special beginning-of-sequence "&lt;bos&gt;" token is an input.
-Second,
-the final hidden state of the RNN encoder is used
-to initiate the hidden state of the decoder.
-In designs such as :cite:`Sutskever.Vinyals.Le.2014`,
-this is exactly
-how the encoded input sequence information
-is fed into the decoder for generating the output (target) sequence.
-In some other designs such as :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014`,
-the final hidden state of the encoder
-is also fed into the decoder as
-part of the inputs
-at every time step as shown in :numref:`fig_seq2seq`.
+Dans :numref:`fig_seq2seq` ,
+le jeton spécial "&lt;eos&gt;"
+marque la fin de la séquence.
+Le modèle peut arrêter de faire des prédictions
+une fois que ce jeton est généré.
+Au premier pas de temps du décodeur RNN,
+, deux décisions de conception particulières sont prises.
+Premièrement, le jeton spécial de début de séquence "&lt;bos&gt;" est une entrée.
+Deuxièmement,
+l'état caché final de l'encodeur RNN est utilisé
+pour initier l'état caché du décodeur.
+Dans des conceptions telles que :cite:`Sutskever.Vinyals.Le.2014` ,
+, c'est exactement
+la façon dont les informations de la séquence d'entrée codée
+sont introduites dans le décodeur pour générer la séquence de sortie (cible).
+Dans d'autres modèles tels que :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014` ,
+l'état caché final de l'encodeur
+est également introduit dans le décodeur en tant que
+partie des entrées
+à chaque pas de temps, comme le montre :numref:`fig_seq2seq` .
 
 
-## Teacher Forcing
+## Forçage par l'enseignant
 
-While the encoder input
-is just tokens from the source sequence,
-the decoder input and output
-are not so straightforward
-in encoder-decoder training.
-A common approach is *teacher forcing*,
-where the original target sequence (token labels)
-is fed into the decoder as input.
-More concretely,
-the special beginning-of-sequence token
-and the original target sequence excluding the final token 
-are concatenated as
-input to the decoder,
-while the decoder output (labels for training) is
-the original target sequence,
-shifted by one token:
+Alors que l'entrée de l'encodeur
+n'est constituée que d'éléments de la séquence source,
+l'entrée et la sortie du décodeur
+ne sont pas aussi simples
+dans l'apprentissage de l'encodeur-décodeur.
+Une approche courante est le *forçage de l'enseignant*,
+où la séquence cible originale (étiquettes de tokens)
+est introduite dans le décodeur comme entrée.
+Plus concrètement,
+le token spécial de début de séquence
+et la séquence cible originale à l'exclusion du token final 
+sont concaténés comme
+entrée du décodeur,
+tandis que la sortie du décodeur (étiquettes pour l'entraînement) est
+la séquence cible originale,
+décalée d'un token :
 "&lt;bos&gt;", "Ils", "regardent", "." $\rightarrow$
-"Ils", "regardent", ".", "&lt;eos&gt;" (:numref:`fig_seq2seq`).
+ "Ils", "regardent", ".", "&lt;eos&gt;" (:numref:`fig_seq2seq` ).
 
-Our implementation in
-:numref:`subsec_loading-seq-fixed-len`
-prepared training data for teacher forcing,
-where shifting tokens for self-supervised learning
-is similar to the training of language models in
-:numref:`sec_language-model`.
-An alternative approach is
-to feed the *predicted* token
-from the previous time step
-as the current input to the decoder.
+Notre mise en œuvre dans
+:numref:`subsec_loading-seq-fixed-len` 
+ a préparé des données de formation pour le forçage de l'enseignant,
+où le déplacement des jetons pour l'apprentissage auto-supervisé
+est similaire à la formation des modèles de langue dans
+:numref:`sec_language-model` .
+Une approche alternative consiste à
+alimenter le jeton *prédit*
+de l'étape temporelle précédente
+comme entrée actuelle du décodeur.
 
 
-In the following,
-we will explain the design of :numref:`fig_seq2seq`
-in greater detail.
-We will train this model for machine translation
-on the English-French dataset as introduced in
-:numref:`sec_machine_translation`.
+Dans la suite de cet article,
+, nous expliquerons plus en détail la conception de :numref:`fig_seq2seq` 
+ .
+Nous entraînerons ce modèle pour la traduction automatique
+sur le jeu de données anglais-français tel qu'il est présenté dans
+:numref:`sec_machine_translation` .
 
 ```{.python .input}
 %%tab mxnet
@@ -132,59 +132,59 @@ import math
 import tensorflow as tf
 ```
 
-## Encoder
+## Encodeur
 
-Technically speaking,
-the encoder transforms an input sequence of variable length into a fixed-shape *context variable* $\mathbf{c}$, and encodes the input sequence information in this context variable.
-As depicted in :numref:`fig_seq2seq`,
-we can use an RNN to design the encoder.
+Techniquement parlant,
+l'encodeur transforme une séquence d'entrée de longueur variable en une *variable de contexte* de forme fixe $\mathbf{c}$, et encode les informations de la séquence d'entrée dans cette variable de contexte.
+Comme illustré sur :numref:`fig_seq2seq` ,
+nous pouvons utiliser un RNN pour concevoir l'encodeur.
 
-Let's consider a sequence example (batch size: 1).
-Suppose that
-the input sequence is $x_1, \ldots, x_T$, such that $x_t$ is the $t^{\mathrm{th}}$ token in the input text sequence.
-At time step $t$, the RNN transforms
-the input feature vector $\mathbf{x}_t$ for $x_t$
-and the hidden state $\mathbf{h} _{t-1}$ from the previous time step
-into the current hidden state $\mathbf{h}_t$.
-We can use a function $f$ to express the transformation of the RNN's recurrent layer:
+Considérons un exemple de séquence (taille du lot : 1).
+Supposons que
+la séquence d'entrée soit $x_1, \ldots, x_T$, de sorte que $x_t$ soit le token $t^{\mathrm{th}}$ dans la séquence de texte d'entrée.
+Au pas de temps $t$, le RNN transforme
+le vecteur de caractéristiques d'entrée $\mathbf{x}_t$ pour $x_t$
+ et l'état caché $\mathbf{h} _{t-1}$ du pas de temps précédent
+en l'état caché actuel $\mathbf{h}_t$.
+Nous pouvons utiliser une fonction $f$ pour exprimer la transformation de la couche récurrente du RNN :
 
-$$\mathbf{h}_t = f(\mathbf{x}_t, \mathbf{h}_{t-1}). $$
+$$\mathbf{h}_t = f(\mathbf{x}_t, \mathbf{h}_{t-1}). $$ 
 
-In general,
-the encoder transforms the hidden states at
-all the time steps
-into the context variable through a customized function $q$:
+ En général,
+le codeur transforme les états cachés à
+tous les pas de temps
+en la variable de contexte par une fonction personnalisée $q$:
 
-$$\mathbf{c} =  q(\mathbf{h}_1, \ldots, \mathbf{h}_T).$$
+$$\mathbf{c} =  q(\mathbf{h}_1, \ldots, \mathbf{h}_T).$$ 
 
-For example, when choosing $q(\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$ such as in :numref:`fig_seq2seq`,
-the context variable is just the hidden state $\mathbf{h}_T$
-of the input sequence at the final time step.
+ Par exemple, en choisissant $q(\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$ comme dans :numref:`fig_seq2seq` ,
+la variable de contexte est juste l'état caché $\mathbf{h}_T$
+ de la séquence d'entrée au dernier pas de temps.
 
-So far we have used a unidirectional RNN
-to design the encoder,
-where
-a hidden state only depends on
-the input subsequence at and before the time step of the hidden state.
-We can also construct encoders using bidirectional RNNs. In this case, a hidden state depends on
-the subsequence before and after the time step (including the input at the current time step), which encodes the information of the entire sequence.
+Jusqu'à présent, nous avons utilisé un RNN unidirectionnel
+pour concevoir l'encodeur,
+où
+un état caché ne dépend que de
+la sous-séquence d'entrée à et avant le pas de temps de l'état caché.
+Nous pouvons également construire des codeurs en utilisant des RNN bidirectionnels. Dans ce cas, un état caché dépend de
+la sous-séquence avant et après le pas de temps (y compris l'entrée au pas de temps actuel), qui code l'information de la séquence entière.
 
 
-Now let's [**implement the RNN encoder**].
-Note that we use an *embedding layer*
-to obtain the feature vector for each token in the input sequence.
-The weight
-of an embedding layer
-is a matrix
-whose number of rows equals to the size of the input vocabulary (`vocab_size`)
-and number of columns equals to the feature vector's dimension (`embed_size`).
-For any input token index $i$,
-the embedding layer
-fetches the $i^{\mathrm{th}}$ row (starting from 0) of the weight matrix
-to return its feature vector.
-Besides,
-here we choose a multilayer GRU to
-implement the encoder.
+Implémentons maintenant [**l'encodeur RNN**].
+Notez que nous utilisons une *couche d'intégration*
+pour obtenir le vecteur caractéristique pour chaque token de la séquence d'entrée.
+Le poids
+d'une couche d'intégration
+est une matrice
+dont le nombre de lignes est égal à la taille du vocabulaire d'entrée (`vocab_size`)
+et le nombre de colonnes est égal à la dimension du vecteur de caractéristiques (`embed_size`).
+Pour tout index de token d'entrée $i$,
+la couche d'intégration
+récupère la ligne $i^{\mathrm{th}}$ (en partant de 0) de la matrice de poids
+pour retourner son vecteur de caractéristiques.
+De plus,
+nous choisissons ici un GRU multicouche pour
+implémenter l'encodeur.
 
 ```{.python .input}
 %%tab mxnet
@@ -257,22 +257,22 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
         return output, state
 ```
 
-The returned variables of recurrent layers
-have been explained in :numref:`sec_rnn-concise`.
-Let's still use a concrete example
-to [**illustrate the above encoder implementation.**]
-Below
-we instantiate a two-layer GRU encoder
-whose number of hidden units is 16.
-Given
-a minibatch of sequence inputs `X`
-(batch size: 4, number of time steps: 9),
-the hidden states of the last layer
-at all the time steps
-(`outputs` return by the encoder's recurrent layers)
-are a tensor
-of shape
-(number of time steps, batch size, number of hidden units).
+Les variables retournées des couches récurrentes
+ont été expliquées dans :numref:`sec_rnn-concise` .
+Utilisons encore un exemple concret
+pour [**illustrer l'implémentation de l'encodeur ci-dessus.**]
+Ci-dessous
+nous instancions un encodeur GRU à deux couches
+dont le nombre d'unités cachées est de 16.
+Étant donné
+un mini lot d'entrées de séquence `X`
+ (taille du lot : 4, nombre de pas de temps : 9),
+les états cachés de la dernière couche
+à tous les pas de temps
+(`outputs` retour par les couches récurrentes du codeur)
+sont un tenseur
+de forme
+(nombre de pas de temps, taille du lot, nombre d'unités cachées).
 
 ```{.python .input}
 %%tab all
@@ -286,11 +286,11 @@ outputs, state = encoder(X)
 d2l.check_shape(outputs, (num_steps, batch_size, num_hiddens))
 ```
 
-Since a GRU is employed here,
-the shape of the multilayer hidden states
-at the final time step
-is
-(number of hidden layers, batch size, number of hidden units).
+Puisqu'un GRU est employé ici,
+la forme des états cachés multicouches
+au dernier pas de temps
+est
+(nombre de couches cachées, taille du lot, nombre d'unités cachées).
 
 ```{.python .input}
 %%tab all
@@ -301,50 +301,50 @@ if tab.selected('tensorflow'):
     d2l.check_shape(state[0], (batch_size, num_hiddens))
 ```
 
-## [**Decoder**]
-:label:`sec_seq2seq_decoder`
+## [**Décodeur**]
+:label:`sec_seq2seq_decoder` 
 
-As we just mentioned,
-the context variable $\mathbf{c}$ of the encoder's output encodes the entire input sequence $x_1, \ldots, x_T$. Given the output sequence $y_1, y_2, \ldots, y_{T'}$ from the training dataset,
-for each time step $t'$
-(the symbol differs from the time step $t$ of input sequences or encoders),
-the probability of the decoder output $y_{t'}$
-is conditional
-on the previous output subsequence
-$y_1, \ldots, y_{t'-1}$ and
-the context variable $\mathbf{c}$, i.e., $P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$.
+ Comme nous venons de le mentionner,
+la variable contextuelle $\mathbf{c}$ de la sortie du codeur code la séquence d'entrée entière $x_1, \ldots, x_T$. Étant donné la séquence de sortie $y_1, y_2, \ldots, y_{T'}$ de l'ensemble de données d'apprentissage,
+pour chaque pas de temps $t'$
+ (le symbole diffère du pas de temps $t$ des séquences d'entrée ou des codeurs),
+la probabilité de la sortie du décodeur $y_{t'}$
+ est conditionnelle
+à la sous-séquence de sortie précédente
+$y_1, \ldots, y_{t'-1}$ et
+la variable contextuelle $\mathbf{c}$, c'est-à-dire $P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$.
 
-To model this conditional probability on sequences,
-we can use another RNN as the decoder.
-At any time step $t^\prime$ on the output sequence,
-the RNN takes the output $y_{t^\prime-1}$ from the previous time step
-and the context variable $\mathbf{c}$ as its input,
-then transforms
-them and
-the previous hidden state $\mathbf{s}_{t^\prime-1}$
-into the
-hidden state $\mathbf{s}_{t^\prime}$ at the current time step.
-As a result, we can use a function $g$ to express the transformation of the decoder's hidden layer:
+Pour modéliser cette probabilité conditionnelle sur les séquences,
+nous pouvons utiliser un autre RNN comme décodeur.
+A tout pas de temps $t^\prime$ sur la séquence de sortie,
+le RNN prend la sortie $y_{t^\prime-1}$ du pas de temps précédent
+et la variable de contexte $\mathbf{c}$ comme entrée,
+puis les transforme
+et
+l'état caché précédent $\mathbf{s}_{t^\prime-1}$
+ en l'état caché
+ $\mathbf{s}_{t^\prime}$ au pas de temps courant.
+Par conséquent, nous pouvons utiliser une fonction $g$ pour exprimer la transformation de la couche cachée du décodeur :
 
-$$\mathbf{s}_{t^\prime} = g(y_{t^\prime-1}, \mathbf{c}, \mathbf{s}_{t^\prime-1}).$$
-:eqlabel:`eq_seq2seq_s_t`
+$$\mathbf{s}_{t^\prime} = g(y_{t^\prime-1}, \mathbf{c}, \mathbf{s}_{t^\prime-1}).$$ 
+ :eqlabel:`eq_seq2seq_s_t` 
 
-After obtaining the hidden state of the decoder,
-we can use an output layer and the softmax operation to compute the conditional probability distribution
-$P(y_{t^\prime} \mid y_1, \ldots, y_{t^\prime-1}, \mathbf{c})$ for the output at time step $t^\prime$.
+ Après avoir obtenu l'état caché du décodeur,
+nous pouvons utiliser une couche de sortie et l'opération softmax pour calculer la distribution de probabilité conditionnelle
+$P(y_{t^\prime} \mid y_1, \ldots, y_{t^\prime-1}, \mathbf{c})$ pour la sortie au pas de temps $t^\prime$.
 
-Following :numref:`fig_seq2seq`,
-when implementing the decoder as follows,
-we directly use the hidden state at the final time step
-of the encoder
-to initialize the hidden state of the decoder.
-This requires that the RNN encoder and the RNN decoder have the same number of layers and hidden units.
-To further incorporate the encoded input sequence information,
-the context variable is concatenated
-with the decoder input at all the time steps.
-To predict the probability distribution of the output token,
-a fully connected layer is used to transform
-the hidden state at the final layer of the RNN decoder.
+En suivant :numref:`fig_seq2seq` ,
+lors de la mise en œuvre du décodeur comme suit,
+nous utilisons directement l'état caché à l'étape temporelle finale
+du codeur
+pour initialiser l'état caché du décodeur.
+Cela nécessite que l'encodeur RNN et le décodeur RNN aient le même nombre de couches et d'unités cachées.
+Pour intégrer davantage les informations de la séquence d'entrée codée,
+la variable contextuelle est concaténée
+avec l'entrée du décodeur à tous les pas de temps.
+Pour prédire la distribution de probabilité du jeton de sortie,
+une couche entièrement connectée est utilisée pour transformer
+l'état caché de la couche finale du décodeur RNN.
 
 ```{.python .input}
 %%tab mxnet
@@ -442,10 +442,10 @@ class Seq2SeqDecoder(d2l.Decoder):
         return outputs, state
 ```
 
-To [**illustrate the implemented decoder**],
-below we instantiate it with the same hyperparameters from the aforementioned encoder.
-As we can see, the output shape of the decoder becomes (batch size, number of time steps, vocabulary size),
-where the last dimension of the tensor stores the predicted token distribution.
+Pour [**illustrer le décodeur implémenté**],
+ci-dessous, nous l'instancions avec les mêmes hyperparamètres que l'encodeur susmentionné.
+Comme nous pouvons le voir, la forme de sortie du décodeur devient (taille du lot, nombre d'étapes temporelles, taille du vocabulaire),
+où la dernière dimension du tenseur stocke la distribution prédite des jetons.
 
 ```{.python .input}
 %%tab all
@@ -461,22 +461,22 @@ if tab.selected('tensorflow'):
     d2l.check_shape(state[0], (batch_size, num_hiddens))
 ```
 
-To summarize,
-the layers in the above RNN encoder-decoder model are illustrated in :numref:`fig_seq2seq_details`.
+Pour résumer,
+les couches dans le modèle d'encodeur-décodeur RNN ci-dessus sont illustrées dans :numref:`fig_seq2seq_details` .
 
 ![Layers in an RNN encoder-decoder model.](../img/seq2seq-details.svg)
 :label:`fig_seq2seq_details`
 
 
 
-## Encoder-Decoder for Sequence to Sequence Learning
+## Encodeur-décodeur pour l'apprentissage de séquence à séquence
 
 
-Based on the architecture described
-in :numref:`sec_encoder-decoder`,
-the RNN encoder-decoder
-model for sequence to sequence learning just puts 
-the RNN encoder and the RNN decoder together.
+ Sur la base de l'architecture décrite
+dans :numref:`sec_encoder-decoder` ,
+le modèle d'encodeur-décodeur RNN
+pour l'apprentissage de séquence à séquence met simplement 
+l'encodeur RNN et le décodeur RNN ensemble.
 
 ```{.python .input}
 %%tab all
@@ -500,28 +500,28 @@ class Seq2Seq(d2l.EncoderDecoder):  #@save
             return tf.keras.optimizers.Adam(learning_rate=self.lr)
 ```
 
-## Loss Function with Masking
+## Fonction de perte avec masquage
 
-At each time step, the decoder
-predicts a probability distribution for the output tokens.
-Similar to language modeling,
-we can apply softmax to obtain the distribution
-and calculate the cross-entropy loss for optimization.
-Recall :numref:`sec_machine_translation`
-that the special padding tokens
-are appended to the end of sequences
-so sequences of varying lengths
-can be efficiently loaded
-in minibatches of the same shape.
-However,
-prediction of padding tokens
-should be excluded from loss calculations.
-To this end,
-we can 
-[**mask irrelevant entries with zero values**]
-so that
-multiplication of any irrelevant prediction
-with zero equals to zero.
+A chaque pas de temps, le décodeur
+prédit une distribution de probabilité pour les tokens de sortie.
+Comme pour la modélisation du langage,
+nous pouvons appliquer la méthode softmax pour obtenir la distribution
+et calculer la perte d'entropie croisée pour l'optimisation.
+Rappelons que :numref:`sec_machine_translation` 
+ que les jetons de remplissage spéciaux
+sont ajoutés à la fin des séquences
+afin que les séquences de différentes longueurs
+puissent être chargées efficacement
+en minibatchs de même forme.
+Cependant, la prédiction des jetons de remplissage
+
+ doit être exclue des calculs de perte.
+À cette fin,
+nous pouvons 
+[**masquer les entrées non pertinentes avec des valeurs nulles**]
+de sorte que
+la multiplication de toute prédiction non pertinente
+avec zéro soit égale à zéro.
 
 ```{.python .input}
 %%tab all
@@ -533,10 +533,10 @@ def loss(self, Y_hat, Y):
 ```
 
 ## [**Training**]
-:label:`sec_seq2seq_training`
+:label:`sec_seq2seq_training` 
 
-Now we can [**create and train an RNN encoder-decoder model**]
-for sequence to sequence learning on the machine translation dataset.
+ Nous pouvons maintenant [**créer et entraîner un modèle RNN encodeur-décodeur**]
+pour l'apprentissage de séquence à séquence sur le jeu de données de traduction automatique.
 
 ```{.python .input}
 %%tab all
@@ -571,20 +571,20 @@ the predicted token from the previous
 time step is fed into the decoder as an input.
 Similar to training,
 at the initial time step
-the beginning-of-sequence ("&lt;bos&gt;") token
-is fed into the decoder.
-This prediction process
-is illustrated in :numref:`fig_seq2seq_predict`.
-When the end-of-sequence ("&lt;eos&gt;") token is predicted,
-the prediction of the output sequence is complete.
+the beginning-of-sequence ("&lt;bos&gt;") le jeton
+est introduit dans le décodeur.
+Ce processus de prédiction
+est illustré dans :numref:`fig_seq2seq_predict` .
+Lorsque le token de fin de séquence ("&lt;eos&gt;") est prédit,
+la prédiction de la séquence de sortie est terminée.
 
 
 ![Predicting the output sequence token by token using an RNN encoder-decoder.](../img/seq2seq-predict.svg)
 :label:`fig_seq2seq_predict`
 
-We will introduce different
-strategies for sequence generation in
-:numref:`sec_beam-search`.
+Nous présenterons différentes stratégies
+pour la génération de séquences dans
+:numref:`sec_beam-search` .
 
 ```{.python .input}
 %%tab all
@@ -612,62 +612,62 @@ def predict_step(self, batch, device, num_steps,
     return d2l.concat(outputs[1:], 1), attention_weights
 ```
 
-## Evaluation of Predicted Sequences
+## Évaluation des séquences prédites
 
-We can evaluate a predicted sequence
-by comparing it with the
-label sequence (the ground-truth).
-BLEU (Bilingual Evaluation Understudy),
-though originally proposed for evaluating
-machine translation results :cite:`Papineni.Roukos.Ward.ea.2002`,
-has been extensively used in measuring
-the quality of output sequences for different applications.
-In principle, for any $n$-grams in the predicted sequence,
-BLEU evaluates whether this $n$-grams appears
-in the label sequence.
+Nous pouvons évaluer une séquence prédite
+en la comparant à la séquence d'étiquettes
+(la vérité du terrain).
+Le test BLEU (Bilingual Evaluation Understudy),
+, bien qu'initialement proposé pour évaluer les résultats de la traduction automatique
+ :cite:`Papineni.Roukos.Ward.ea.2002` ,
+a été largement utilisé pour mesurer
+la qualité des séquences de sortie pour différentes applications.
+En principe, pour tout $n$-gramme dans la séquence prédite,
+BLEU évalue si ce $n$-gramme apparaît
+dans la séquence de l'étiquette.
 
-Denote by $p_n$
-the precision of $n$-grams,
-which is
-the ratio of
-the number of matched $n$-grams in
-the predicted and label sequences
-to
-the number of $n$-grams in the predicted sequence.
-To explain,
-given a label sequence $A$, $B$, $C$, $D$, $E$, $F$,
-and a predicted sequence $A$, $B$, $B$, $C$, $D$,
-we have $p_1 = 4/5$,  $p_2 = 3/4$, $p_3 = 1/3$, and $p_4 = 0$.
-Besides,
-let $\mathrm{len}_{\text{label}}$ and $\mathrm{len}_{\text{pred}}$
-be
-the numbers of tokens in the label sequence and the predicted sequence, respectively.
-Then, BLEU is defined as
+On désigne par $p_n$
+ la précision des $n$-grammes,
+qui est
+le rapport entre
+le nombre de $n$-grammes appariés dans
+la séquence prédite et la séquence d'étiquettes
+et
+le nombre de $n$-grammes dans la séquence prédite.
+Pour expliquer,
+étant donné une séquence d'étiquettes $A$, $B$, $C$, $D$, $E$, $F$,
+et une séquence prédite $A$, $B$, $B$, $C$, $D$,
+nous avons $p_1 = 4/5$, $p_2 = 3/4$, $p_3 = 1/3$, et $p_4 = 0$.
+ $\mathrm{len}_{\text{label}}$ En outre,
+et $\mathrm{len}_{\text{pred}}$
+ sont
+les nombres de tokens dans la séquence d'étiquettes et la séquence prédite, respectivement.
+Ensuite, BLEU est défini comme
 
-$$ \exp\left(\min\left(0, 1 - \frac{\mathrm{len}_{\text{label}}}{\mathrm{len}_{\text{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$
-:eqlabel:`eq_bleu`
+$$ \exp\left(\min\left(0, 1 - \frac{\mathrm{len}_{\text{label}}}{\mathrm{len}_{\text{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$ 
+ :eqlabel:`eq_bleu` 
 
-where $k$ is the longest $n$-grams for matching.
+ où $k$ est le plus long $n$-gramme pour la correspondance.
 
-Based on the definition of BLEU in :eqref:`eq_bleu`,
-whenever the predicted sequence is the same as the label sequence, BLEU is 1.
-Moreover,
-since matching longer $n$-grams is more difficult,
-BLEU assigns a greater weight
-to a longer $n$-gram precision.
-Specifically, when $p_n$ is fixed,
-$p_n^{1/2^n}$ increases as $n$ grows (the original paper uses $p_n^{1/n}$).
-Furthermore,
-since
-predicting shorter sequences
-tends to obtain a higher $p_n$ value,
-the coefficient before the multiplication term in :eqref:`eq_bleu`
-penalizes shorter predicted sequences.
-For example, when $k=2$,
-given the label sequence $A$, $B$, $C$, $D$, $E$, $F$ and the predicted sequence $A$, $B$,
-although $p_1 = p_2 = 1$, the penalty factor $\exp(1-6/2) \approx 0.14$ lowers the BLEU.
+Sur la base de la définition de BLEU dans :eqref:`eq_bleu` ,
+chaque fois que la séquence prédite est identique à la séquence de l'étiquette, BLEU est égal à 1.
+En outre,
+étant donné que la mise en correspondance des $n$-grammes les plus longs est plus difficile,
+BLEU attribue un poids plus important
+à la précision d'un $n$-gramme plus long.
+Plus précisément, lorsque $p_n$ est fixe,
+$p_n^{1/2^n}$ augmente avec $n$ (l'article original utilise $p_n^{1/n}$).
+En outre,
+étant donné que
+prédisant des séquences plus courtes
+a tendance à obtenir une valeur $p_n$ plus élevée,
+le coefficient avant le terme de multiplication dans :eqref:`eq_bleu` 
+ pénalise les séquences prédites plus courtes.
+Par exemple, lorsque $k=2$,
+donne la séquence d'étiquettes $A$, $B$, $C$, $D$, $E$, $F$ et la séquence prédite $A$, $B$,
+bien que $p_1 = p_2 = 1$, le facteur de pénalité $\exp(1-6/2) \approx 0.14$ fait baisser le BLEU.
 
-We [**implement the BLEU measure**] as follows.
+Nous [**mettons en œuvre la mesure BLEU**] comme suit.
 
 ```{.python .input}
 %%tab all
@@ -688,10 +688,10 @@ def bleu(pred_seq, label_seq, k):  #@save
     return score
 ```
 
-In the end,
-we use the trained RNN encoder-decoder
-to [**translate a few English sentences into French**]
-and compute the BLEU of the results.
+Enfin,
+nous utilisons le codeur-décodeur RNN entraîné
+pour [**traduire quelques phrases anglaises en français**]
+et calculons le BLEU des résultats.
 
 ```{.python .input}
 %%tab all
@@ -709,23 +709,23 @@ for en, fr, p in zip(engs, fras, preds):
           f'{bleu(" ".join(translation), fr, k=2):.3f}')
 ```
 
-## Summary
+## Résumé
 
-* Following the design of the encoder-decoder architecture, we can use two RNNs to design a model for sequence to sequence learning.
-* In encoder-decoder training, the teacher forcing approach feeds original output sequences (in contrast to predictions) into the decoder.
-* When implementing the encoder and the decoder, we can use multilayer RNNs.
-* We can use masks to filter out irrelevant computations, such as when calculating the loss.
-* BLEU is a popular measure for evaluating output sequences by matching $n$-grams between the predicted sequence and the label sequence.
+* En suivant la conception de l'architecture de l'encodeur-décodeur, nous pouvons utiliser deux RNN pour concevoir un modèle d'apprentissage de séquence à séquence.
+* Dans l'apprentissage de l'encodeur-décodeur, l'approche du forçage de l'enseignant alimente le décodeur en séquences de sortie originales (par opposition aux prédictions).
+* Lors de la mise en œuvre de l'encodeur et du décodeur, nous pouvons utiliser des RNN multicouches.
+* Nous pouvons utiliser des masques pour filtrer les calculs non pertinents, par exemple lors du calcul de la perte.
+* BLEU est une mesure populaire pour évaluer les séquences de sortie en faisant correspondre $n$-grammes entre la séquence prédite et la séquence d'étiquette.
 
 
-## Exercises
+## Exercices
 
-1. Can you adjust the hyperparameters to improve the translation results?
-1. Rerun the experiment without using masks in the loss calculation. What results do you observe? Why?
-1. If the encoder and the decoder differ in the number of layers or the number of hidden units, how can we initialize the hidden state of the decoder?
-1. In training, replace teacher forcing with feeding the prediction at the previous time step into the decoder. How does this influence the performance?
-1. Rerun the experiment by replacing GRU with LSTM.
-1. Are there any other ways to design the output layer of the decoder?
+1. Pouvez-vous ajuster les hyperparamètres pour améliorer les résultats de la traduction ?
+1. Relancez l'expérience sans utiliser les masques dans le calcul de la perte. Quels résultats observez-vous ? Pourquoi ?
+1. Si le codeur et le décodeur diffèrent par le nombre de couches ou le nombre d'unités cachées, comment pouvons-nous initialiser l'état caché du décodeur ?
+1. Lors de la formation, remplacez le forçage de l'enseignant par l'introduction de la prédiction du pas de temps précédent dans le décodeur. Comment cela influence-t-il les performances ?
+1. Refaites l'expérience en remplaçant GRU par LSTM.
+1. Existe-t-il d'autres façons de concevoir la couche de sortie du décodeur ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/345)

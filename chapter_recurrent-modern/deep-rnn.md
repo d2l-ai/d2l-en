@@ -1,73 +1,73 @@
-# Deep Recurrent Neural Networks
+# Réseaux neuronaux récurrents profonds
 
-:label:`sec_deep_rnn`
+:label:`sec_deep_rnn` 
 
-Up to now, we only discussed RNNs with a single unidirectional hidden layer.
-In it the specific functional form of how latent variables and observations interact is rather arbitrary.
-This is not a big problem as long as we have enough flexibility to model different types of interactions.
-With a single layer, however, this can be quite challenging.
-In the case of the linear models,
-we fixed this problem by adding more layers.
-Within RNNs this is a bit trickier, since we first need to decide how and where to add extra nonlinearity.
+ Jusqu'à présent, nous n'avons abordé que les RNN dotés d'une seule couche cachée unidirectionnelle.
+Dans ce cas, la forme fonctionnelle spécifique de l'interaction entre les variables latentes et les observations est plutôt arbitraire.
+Ce n'est pas un gros problème tant que nous avons suffisamment de flexibilité pour modéliser différents types d'interactions.
+Avec une seule couche, cependant, cela peut être assez difficile.
+Dans le cas des modèles linéaires,
+, nous avons résolu ce problème en ajoutant des couches supplémentaires.
+Avec les RNN, c'est un peu plus délicat, car nous devons d'abord décider comment et où ajouter une non-linéarité supplémentaire.
 
-In fact,
-we could stack multiple layers of RNNs on top of each other. This results in a flexible mechanism,
-due to the combination of several simple layers. In particular, data might be relevant at different levels of the stack. For instance, we might want to keep high-level data about financial market conditions (bear or bull market) available, whereas at a lower level we only record shorter-term temporal dynamics.
+En fait,
+, nous pouvons empiler plusieurs couches de RNN les unes sur les autres. Cela donne un mécanisme flexible,
+grâce à la combinaison de plusieurs couches simples. En particulier, les données peuvent être pertinentes à différents niveaux de la pile. Par exemple, nous pouvons vouloir conserver des données de haut niveau sur les conditions du marché financier (marché haussier ou baissier), alors qu'à un niveau inférieur, nous n'enregistrons que les dynamiques temporelles à court terme.
 
 
-Beyond all the above abstract discussion
-it is probably easiest to understand the family of models we are interested in by reviewing :numref:`fig_deep_rnn`. It describes a deep RNN with $L$ hidden layers.
-Each hidden state is continuously passed to both the next time step of the current layer and the current time step of the next layer.
+Au-delà de toute la discussion abstraite ci-dessus
+, il est probablement plus facile de comprendre la famille de modèles qui nous intéresse en examinant :numref:`fig_deep_rnn` . Il décrit un RNN profond avec $L$ couches cachées.
+Chaque état caché est continuellement transmis à la fois au prochain pas de temps de la couche actuelle et au pas de temps actuel de la couche suivante.
 
 ![Architecture of a deep RNN.](../img/deep-rnn.svg)
 :label:`fig_deep_rnn`
 
-## Functional Dependencies
+## Dépendances fonctionnelles
 
-We can formalize the
-functional dependencies
-within the  deep architecture
-of $L$ hidden layers
-depicted in :numref:`fig_deep_rnn`.
-Our following discussion focuses primarily on
-the vanilla RNN model,
-but it applies to other sequence models, too.
+Nous pouvons formaliser les dépendances fonctionnelles
 
-Suppose that we have a minibatch input
-$\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs in each example: $d$) at time step $t$.
-At the same time step,
-let
-the hidden state of the $l^\mathrm{th}$ hidden layer  ($l=1,\ldots,L$) be $\mathbf{H}_t^{(l)}  \in \mathbb{R}^{n \times h}$ (number of hidden units: $h$)
-and
-the output layer variable be $\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (number of outputs: $q$).
-Setting $\mathbf{H}_t^{(0)} = \mathbf{X}_t$,
-the hidden state of
-the $l^\mathrm{th}$ hidden layer
-that uses the activation function $\phi_l$
-is expressed as follows:
+ dans l'architecture profonde
+de $L$ couches cachées
+décrite dans :numref:`fig_deep_rnn` .
+La discussion suivante se concentre principalement sur
+le modèle RNN vanille,
+mais elle s'applique également à d'autres modèles de séquence.
 
-$$\mathbf{H}_t^{(l)} = \phi_l(\mathbf{H}_t^{(l-1)} \mathbf{W}_{xh}^{(l)} + \mathbf{H}_{t-1}^{(l)} \mathbf{W}_{hh}^{(l)}  + \mathbf{b}_h^{(l)}),$$
-:eqlabel:`eq_deep_rnn_H`
+Supposons que nous ayons une entrée de minilots
+$\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (nombre d'exemples : $n$, nombre d'entrées dans chaque exemple : $d$) au pas de temps $t$.
+Au même pas de temps,
+laisse
+l'état caché de la couche cachée $l^\mathrm{th}$ ($l=1,\ldots,L$) être $\mathbf{H}_t^{(l)}  \in \mathbb{R}^{n \times h}$ (nombre d'unités cachées : $h$)
+et
+la variable de la couche de sortie être $\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (nombre de sorties : $q$).
+En définissant $\mathbf{H}_t^{(0)} = \mathbf{X}_t$,
+l'état caché de
+la couche cachée $l^\mathrm{th}$
+ qui utilise la fonction d'activation $\phi_l$
+ est exprimée comme suit :
 
-where the weights $\mathbf{W}_{xh}^{(l)} \in \mathbb{R}^{h \times h}$ and $\mathbf{W}_{hh}^{(l)} \in \mathbb{R}^{h \times h}$, together with
-the bias $\mathbf{b}_h^{(l)} \in \mathbb{R}^{1 \times h}$, are the model parameters of
-the $l^\mathrm{th}$ hidden layer.
+$$\mathbf{H}_t^{(l)} = \phi_l(\mathbf{H}_t^{(l-1)} \mathbf{W}_{xh}^{(l)} + \mathbf{H}_{t-1}^{(l)} \mathbf{W}_{hh}^{(l)}  + \mathbf{b}_h^{(l)}),$$ 
+ :eqlabel:`eq_deep_rnn_H` 
 
-In the end,
-the calculation of the output layer is only based on the hidden state of the final $L^\mathrm{th}$ hidden layer:
+ où les poids $\mathbf{W}_{xh}^{(l)} \in \mathbb{R}^{h \times h}$ et $\mathbf{W}_{hh}^{(l)} \in \mathbb{R}^{h \times h}$, ainsi que
+le biais $\mathbf{b}_h^{(l)} \in \mathbb{R}^{1 \times h}$, sont les paramètres du modèle de
+la couche cachée $l^\mathrm{th}$.
 
-$$\mathbf{O}_t = \mathbf{H}_t^{(L)} \mathbf{W}_{hq} + \mathbf{b}_q,$$
+Au final,
+le calcul de la couche de sortie est uniquement basé sur l'état caché de la couche cachée finale $L^\mathrm{th}$:
 
-where the weight $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$ and the bias $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ are the model parameters of the output layer.
+$$\mathbf{O}_t = \mathbf{H}_t^{(L)} \mathbf{W}_{hq} + \mathbf{b}_q,$$ 
 
-Just as with MLPs, the number of hidden layers $L$ and the number of hidden units $h$ are hyperparameters.
-In other words, they can be tuned or specified by us.
-In addition, we can easily
-get a deep gated RNN
-by replacing
-the hidden state computation in
-:eqref:`eq_deep_rnn_H`
-with that from a GRU or an LSTM.
+ où le poids $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$ et le biais $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ sont les paramètres du modèle de la couche de sortie.
+
+Comme pour les MLP, le nombre de couches cachées $L$ et le nombre d'unités cachées $h$ sont des hyperparamètres.
+En d'autres termes, ils peuvent être réglés ou spécifiés par nous.
+En outre, nous pouvons facilement
+obtenir un RNN profond à déclenchement automatique
+en remplaçant
+le calcul de l'état caché dans
+:eqref:`eq_deep_rnn_H` 
+ par celui d'un GRU ou d'un LSTM.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -95,11 +95,11 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## Implementation from Scratch
+## Implémentation à partir de zéro
 
-To implement a multi-layer RNN from scratch,
-we can treat each layer as an `RNNScratch` instance
-with its own learnable parameters.
+Pour implémenter un RNN multicouche à partir de zéro,
+nous pouvons traiter chaque couche comme une instance `RNNScratch`
+ avec ses propres paramètres apprenables.
 
 ```{.python .input}
 %%tab mxnet, tensorflow
@@ -123,9 +123,9 @@ class StackedRNNScratch(d2l.Module):
                                     for i in range(num_layers)])
 ```
 
-The multi-layer forward computation
-simply performs forward computation
-layer by layer.
+Le calcul direct multicouche
+effectue simplement le calcul direct
+couche par couche.
 
 ```{.python .input}
 %%tab all
@@ -138,9 +138,9 @@ def forward(self, inputs, Hs=None):
     return outputs, Hs
 ```
 
-As an example, we train a deep GRU model on
-*The Time Machine* dataset (same as in :numref:`sec_rnn-scratch`).
-To keep things simple we set the number of layers to 2.
+À titre d'exemple, nous entraînons un modèle GRU profond sur le jeu de données
+*The Time Machine* (comme dans :numref:`sec_rnn-scratch` ).
+Pour garder les choses simples, nous fixons le nombre de couches à 2.
 
 ```{.python .input}
 %%tab all
@@ -159,12 +159,12 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-## Concise Implementation
+## Mise en œuvre concise
 
-Fortunately many of the logistical details required to implement multiple layers of an RNN are readily available in high-level APIs.
-Our concise implementation will use such built-in functionalities.
-The code generalizes the one we used previously in :numref:`sec_gru`,
-allowing specification of the number of layers explicitly rather than picking the default of a single layer.
+Heureusement, de nombreux détails logistiques nécessaires à la mise en œuvre de couches multiples d'un RNN sont facilement disponibles dans des API de haut niveau.
+Notre implémentation concise utilisera ces fonctionnalités intégrées.
+Le code généralise celui que nous avons utilisé précédemment dans :numref:`sec_gru` ,
+en permettant de spécifier explicitement le nombre de couches plutôt que de choisir par défaut une seule couche.
 
 ```{.python .input}
 %%tab mxnet
@@ -201,10 +201,10 @@ class GRU(d2l.RNN):  #@save
         return outputs, state
 ```
 
-The architectural decisions such as choosing hyperparameters are very similar to those of :numref:`sec_gru`.
-We pick the same number of inputs and outputs as we have distinct tokens, i.e., `vocab_size`.
-The number of hidden units is still 32.
-The only difference is that we now (**select a nontrivial number of hidden layers by specifying the value of `num_layers`.**)
+Les décisions architecturales, telles que le choix des hyperparamètres, sont très similaires à celles de :numref:`sec_gru` .
+Nous choisissons le même nombre d'entrées et de sorties que nous avons de tokens distincts, c'est-à-dire `vocab_size`.
+Le nombre d'unités cachées est toujours de 32.
+La seule différence est que nous (**sélectionnons maintenant un nombre non trivial de couches cachées en spécifiant la valeur de `num_layers`**)
 
 ```{.python .input}
 %%tab all
@@ -230,17 +230,17 @@ model.predict('it has', 20, data.vocab, d2l.try_gpu())
 model.predict('it has', 20, data.vocab)
 ```
 
-## Summary
+## Résumé
 
-* In deep RNNs, the hidden state information is passed to the next time step of the current layer and the current time step of the next layer.
-* There exist many different flavors of deep RNNs, such as LSTMs, GRUs, or vanilla RNNs. Conveniently these models are all available as parts of the high-level APIs of deep learning frameworks.
-* Initialization of models requires care. Overall, deep RNNs require considerable amount of work (such as learning rate and clipping) to ensure proper convergence.
+* Dans les RNN profonds, les informations sur l'état caché sont transmises au prochain pas de temps de la couche actuelle et au pas de temps actuel de la couche suivante.
+* Il existe de nombreux modèles de RNN profonds, tels que les LSTM, les GRU ou les RNN classiques. De manière pratique, ces modèles sont tous disponibles dans les API de haut niveau des cadres d'apprentissage profond.
+* L'initialisation des modèles nécessite une attention particulière. Dans l'ensemble, les RNN profonds nécessitent une quantité considérable de travail (comme le taux d'apprentissage et l'écrêtage) pour assurer une convergence correcte.
 
-## Exercises
+## Exercices
 
-1. Replace the GRU by an LSTM and compare the accuracy and training speed.
-1. Increase the training data to include multiple books. How low can you go on the perplexity scale?
-1. Would you want to combine sources of different authors when modeling text? Why is this a good idea? What could go wrong?
+1. Remplacez le GRU par un LSTM et comparez la précision et la vitesse d'apprentissage.
+1. Augmentez les données d'apprentissage pour inclure plusieurs livres. Jusqu'où pouvez-vous descendre sur l'échelle de perplexité ?
+1. Voudriez-vous combiner les sources de différents auteurs lors de la modélisation du texte ? Pourquoi est-ce une bonne idée ? Qu'est-ce qui pourrait mal tourner ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/340)
