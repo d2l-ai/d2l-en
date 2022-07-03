@@ -263,7 +263,7 @@ train(net, num_gpus=2, batch_size=512, lr=0.2)
 ## Résumé
 
 :begin_tab:`mxnet` 
- * Gluon fournit des primitives pour l'initialisation du modèle sur plusieurs dispositifs en fournissant une liste de contexte.
+* Gluon fournit des primitives pour l'initialisation du modèle sur plusieurs dispositifs en fournissant une liste de contexte.
 :end_tab:
 * Les données sont automatiquement évaluées sur les dispositifs où elles peuvent être trouvées.
 * Prenez soin d'initialiser les réseaux sur chaque dispositif avant d'essayer d'accéder aux paramètres sur ce dispositif. Sinon, vous rencontrerez une erreur.

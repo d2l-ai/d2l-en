@@ -12,7 +12,7 @@
 
 # 0 - chapter_notation
 
-- [ ] ./chapter_notation/index.md
+- [x] ./chapter_notation/index.md
 
 # 1 - chapter_introduction
 

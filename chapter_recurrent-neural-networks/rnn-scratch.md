@@ -446,11 +446,11 @@ et en le faisant fonctionner plus rapidement.
 1. Montrez que l'encodage à un coup est équivalent à choisir un encastrement différent pour chaque objet.
 1. Ajustez les hyperparamètres (par exemple, le nombre d'époques, le nombre d'unités cachées, le nombre d'étapes temporelles dans un minibatch et le taux d'apprentissage) pour améliorer la perplexité.
    * Jusqu'où pouvez-vous descendre ?
- * Remplacer le codage à un coup par des incorporations apprenables. Cela conduit-il à de meilleures performances ?
+* Remplacer le codage à un coup par des incorporations apprenables. Cela conduit-il à de meilleures performances ?
    * Comment cela fonctionnera-t-il sur d'autres livres de H. G. Wells, par exemple, [*The War of the Worlds*](http://www.gutenberg.org/ebooks/36)?
 1. Modifiez la fonction de prédiction de façon à utiliser l'échantillonnage plutôt que de choisir le prochain caractère le plus probable.
    * Que se passe-t-il ?
- * Orientez le modèle vers des sorties plus probables, par exemple en échantillonnant à partir de $q(x_t \mid x_{t-1}, \ldots, x_1) \propto P(x_t \mid x_{t-1}, \ldots, x_1)^\alpha$ pour $\alpha > 1$.
+* Orientez le modèle vers des sorties plus probables, par exemple en échantillonnant à partir de $q(x_t \mid x_{t-1}, \ldots, x_1) \propto P(x_t \mid x_{t-1}, \ldots, x_1)^\alpha$ pour $\alpha > 1$.
 1. Exécutez le code de cette section sans couper le gradient. Que se passe-t-il ?
 1. Remplacez la fonction d'activation utilisée dans cette section par ReLU et répétez les expériences de cette section. Avons-nous encore besoin d'écrêter le gradient ? Pourquoi ?
 

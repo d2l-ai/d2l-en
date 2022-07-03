@@ -222,7 +222,7 @@ Supposons que les durées de ces trois étapes sont respectivement $t_1, t_2$ et
 ## Résumé
 
 
- * Les cadres d'apprentissage profond peuvent découpler le frontend Python d'un backend d'exécution. Cela permet une insertion asynchrone rapide des commandes dans le backend et le parallélisme associé.
+* Les cadres d'apprentissage profond peuvent découpler le frontend Python d'un backend d'exécution. Cela permet une insertion asynchrone rapide des commandes dans le backend et le parallélisme associé.
 * L'asynchronisme conduit à un frontal plutôt réactif. Cependant, il faut faire attention à ne pas trop remplir la file d'attente des tâches, car cela peut entraîner une consommation excessive de mémoire. Il est recommandé de synchroniser pour chaque minibatch afin de garder le frontend et le backend approximativement synchronisés.
 * Les fournisseurs de puces offrent des outils d'analyse des performances sophistiqués permettant d'obtenir un aperçu beaucoup plus fin de l'efficacité de l'apprentissage profond.
 

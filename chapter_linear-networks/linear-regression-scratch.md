@@ -261,9 +261,9 @@ pour mettre à jour les paramètres du modèle.
 En résumé, nous exécuterons la boucle suivante :
 
 * Initialiser les paramètres $(\mathbf{w}, b)$
- * Répéter jusqu'à ce que cela soit fait
- * Calculer le gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} l(\mathbf{x}^{(i)}, y^{(i)}, \mathbf{w}, b)$
- * Mettre à jour les paramètres $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
+* Répéter jusqu'à ce que cela soit fait
+* Calculer le gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} l(\mathbf{x}^{(i)}, y^{(i)}, \mathbf{w}, b)$
+* Mettre à jour les paramètres $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
  
  Rappelons que l'ensemble de données de régression synthétique 
 que nous avons généré dans :numref:`` sec_synthetic-regression-data`` 

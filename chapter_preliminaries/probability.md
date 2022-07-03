@@ -420,12 +420,12 @@ proposés par :cite:`Kolmogorov.1933` ,
 peuvent être appliqués pour dériver rapidement un certain nombre de conséquences importantes.
 Par exemple, il s'ensuit immédiatement
 que la probabilité que tout événement $\mathcal{A}$
- *ou* son complément $\mathcal{A}'$ se produise est de 1 
+*ou* son complément $\mathcal{A}'$ se produise est de 1 
 (car $\mathcal{A} \cup \mathcal{A}' = \mathcal{S}$).
 Nous pouvons également prouver que $P(\emptyset) = 0$
  parce que $1 = P(\mathcal{S} \cup \mathcal{S}') = P(\mathcal{S} \cup \emptyset) = P(\mathcal{S}) + P(\emptyset) = 1 + P(\emptyset)$.
 Par conséquent, la probabilité que tout événement $\mathcal{A}$
- *et* son complément $\mathcal{A}'$ se produise simultanément 
+*et* son complément $\mathcal{A}'$ se produise simultanément 
 est $P(\mathcal{A} \cap \mathcal{A}') = 0$.
 De manière informelle, cela nous indique que les événements impossibles
 ont une probabilité nulle de se produire. 

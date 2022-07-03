@@ -894,10 +894,10 @@ Voyons combien de définitions d'algèbre linéaire
 que nous avons vues auparavant peuvent être exprimées dans cette notation tensorielle compacte :
 
 * $\mathbf{v} \cdot \mathbf{w} = \sum_i v_iw_i$
- * $\|\mathbf{v}\|_2^{2} = \sum_i v_iv_i$
- * $(\mathbf{A}\mathbf{v})_i = \sum_j a_{ij}v_j$
- * $(\mathbf{A}\mathbf{B})_{ik} = \sum_j a_{ij}b_{jk}$
- * $\mathrm{tr}(\mathbf{A}) = \sum_i a_{ii}$
+* $\|\mathbf{v}\|_2^{2} = \sum_i v_iv_i$
+* $(\mathbf{A}\mathbf{v})_i = \sum_j a_{ij}v_j$
+* $(\mathbf{A}\mathbf{B})_{ik} = \sum_j a_{ij}b_{jk}$
+* $\mathrm{tr}(\mathbf{A}) = \sum_i a_{ii}$
 
  De cette façon, nous pouvons remplacer une myriade de notations spécialisées par des expressions tensorielles courtes.
 
@@ -1042,9 +1042,9 @@ $$
 \end{bmatrix}.
 $$
 4. Lesquels des ensembles de vecteurs suivants sont linéairement indépendants ?
- * $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix}, \begin{pmatrix}2\\1\\-1\end{pmatrix}, \begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
- * $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix}, \begin{pmatrix}1\\1\\1\end{pmatrix}, \begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
- * $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix}, \begin{pmatrix}0\\1\\-1\end{pmatrix}, \begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
+* $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix}, \begin{pmatrix}2\\1\\-1\end{pmatrix}, \begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
+* $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix}, \begin{pmatrix}1\\1\\1\end{pmatrix}, \begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
+* $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix}, \begin{pmatrix}0\\1\\-1\end{pmatrix}, \begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
  5. Supposons que vous ayez une matrice écrite sous la forme $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ pour un certain choix de valeurs $a, b, c$, et $d$.  Vrai ou faux : le déterminant d'une telle matrice est toujours $0$?
 6. Les vecteurs $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ et $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ sont orthogonaux.  Quelle est la condition sur une matrice $A$ pour que $Ae_1$ et $Ae_2$ soient orthogonaux ?
 7. Comment pouvez-vous écrire $\mathrm{tr}(\mathbf{A}^4)$ en notation d'Einstein pour une matrice arbitraire $A$?

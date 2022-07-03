@@ -79,9 +79,9 @@ Après s'être connecté à Kaggle, nous pouvons cliquer sur l'onglet "Données"
 Après avoir décompressé le fichier téléchargé dans `../data`, et décompressé `train.7z` et `test.7z` à l'intérieur, vous trouverez l'ensemble des données dans les chemins suivants :
 
 * `../data/cifar-10/train/[1-50000].png`
- * `../data/cifar-10/test/[1-300000].png`
- * `../data/cifar-10/trainLabels.csv`
- * `../data/cifar-10/sampleSubmission.csv`
+* `../data/cifar-10/test/[1-300000].png`
+* `../data/cifar-10/trainLabels.csv`
+* `../data/cifar-10/sampleSubmission.csv`
 
  où les répertoires `train` et `test` contiennent respectivement les images d'entraînement et de test, `trainLabels.csv` fournit les étiquettes pour les images d'entraînement, et `sample_submission.csv` est un exemple de fichier de soumission.
 

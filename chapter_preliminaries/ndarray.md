@@ -775,8 +775,8 @@ a, a.item(), float(a), int(a)
 
 ## Résumé
 
- * La classe tenseur est l'interface principale pour le stockage et la manipulation des données dans les bibliothèques d'apprentissage profond.
- * Les tenseurs offrent une variété de fonctionnalités, notamment des routines de construction, l'indexation et le découpage en tranches, des opérations mathématiques de base, la diffusion, l'affectation efficace en mémoire et la conversion vers et depuis d'autres objets Python.
+* La classe tenseur est l'interface principale pour le stockage et la manipulation des données dans les bibliothèques d'apprentissage profond.
+* Les tenseurs offrent une variété de fonctionnalités, notamment des routines de construction, l'indexation et le découpage en tranches, des opérations mathématiques de base, la diffusion, l'affectation efficace en mémoire et la conversion vers et depuis d'autres objets Python.
 
 
 ## Exercices

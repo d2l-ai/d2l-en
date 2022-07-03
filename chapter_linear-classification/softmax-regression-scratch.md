@@ -60,7 +60,7 @@ en s'assurant que la somme du résultat est égale à 1.
 
 (**
 $$\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(\mathbf{X}_{ij})}{\sum_k \exp(\mathbf{X}_{ik})}.$$ 
- **)
+**)
 
 Le (logarithme du) dénominateur
 est appelé la (log) *fonction de partition*.

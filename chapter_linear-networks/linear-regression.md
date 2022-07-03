@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Régression linéaire
 :label:`sec_linear_regression` 
 
- *Les problèmes de régression* surgissent chaque fois que nous voulons prédire une valeur numérique.
+*Les problèmes de régression* surgissent chaque fois que nous voulons prédire une valeur numérique.
 Parmi les exemples courants, citons la prédiction des prix (des maisons, des actions, etc.),
 la prédiction de la durée de séjour (des patients à l'hôpital),
 la prévision de la demande (pour les ventes au détail), parmi d'innombrables autres.

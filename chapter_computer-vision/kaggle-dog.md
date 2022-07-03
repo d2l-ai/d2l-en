@@ -512,7 +512,7 @@ va générer un fichier `submission.csv`
 ## Résumé
 
 
- * Les images de l'ensemble de données ImageNet sont plus grandes (avec des dimensions variables) que les images CIFAR-10. Nous pouvons modifier les opérations d'augmentation d'image pour des tâches sur un jeu de données différent.
+* Les images de l'ensemble de données ImageNet sont plus grandes (avec des dimensions variables) que les images CIFAR-10. Nous pouvons modifier les opérations d'augmentation d'image pour des tâches sur un jeu de données différent.
 * Pour classer un sous-ensemble du jeu de données ImageNet, nous pouvons utiliser des modèles pré-entraînés sur l'ensemble du jeu de données ImageNet pour extraire des caractéristiques et n'entraîner qu'un réseau de sortie personnalisé à petite échelle. Cela permettra de réduire le temps de calcul et le coût de la mémoire.
 
 

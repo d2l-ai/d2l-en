@@ -280,7 +280,7 @@ dans les sections suivantes de ce chapitre.
 ## Résumé
 
 
- * Le R-CNN extrait de nombreuses propositions de régions de l'image d'entrée, utilise un CNN pour effectuer une propagation vers l'avant sur chaque proposition de région afin d'en extraire les caractéristiques, puis utilise ces caractéristiques pour prédire la classe et la boîte englobante de cette proposition de région.
+* Le R-CNN extrait de nombreuses propositions de régions de l'image d'entrée, utilise un CNN pour effectuer une propagation vers l'avant sur chaque proposition de région afin d'en extraire les caractéristiques, puis utilise ces caractéristiques pour prédire la classe et la boîte englobante de cette proposition de région.
 * L'une des principales améliorations du R-CNN rapide par rapport au R-CNN est que la propagation directe du CNN n'est effectuée que sur l'image entière. Il introduit également la couche de regroupement des régions d'intérêt, de sorte que les caractéristiques de la même forme peuvent être extraites pour les régions d'intérêt qui ont des formes différentes.
 * Le R-CNN plus rapide remplace la recherche sélective utilisée dans le R-CNN rapide par un réseau de propositions de régions entraîné conjointement, de sorte que le premier peut rester précis dans la détection d'objets avec un nombre réduit de propositions de régions.
 * Basé sur le R-CNN rapide, le R-CNN de masque introduit en plus un réseau entièrement convolutif, afin d'exploiter les étiquettes au niveau des pixels pour améliorer encore la précision de la détection des objets.

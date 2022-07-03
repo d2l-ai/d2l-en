@@ -487,9 +487,9 @@ sigma_hat = tf.math.reduce_std(samples)
 1. Soit $X_1, X_2, \ldots, X_n \overset{\text{iid}}{\sim} \mathrm{Unif}(0, \theta)$, où "iid" signifie *indépendant et identiquement distribué*. Considérez les estimateurs suivants de $\theta$:
 $$\hat{\theta} = \max \{X_1, X_2, \ldots, X_n \};$$ 
  $$\tilde{\theta} = 2 \bar{X_n} = \frac{2}{n} \sum_{i=1}^n X_i.$$ 
- * Trouvez le biais statistique, l'écart type et l'erreur quadratique moyenne de $\hat{\theta}.$
- * Trouvez le biais statistique, l'écart type et l'erreur quadratique moyenne de $\tilde{\theta}.$
- * Quel est le meilleur estimateur ?
+* Trouvez le biais statistique, l'écart type et l'erreur quadratique moyenne de $\hat{\theta}.$
+* Trouvez le biais statistique, l'écart type et l'erreur quadratique moyenne de $\tilde{\theta}.$
+* Quel est le meilleur estimateur ?
 1. Pour notre exemple de chimiste dans l'introduction, pouvez-vous dériver les 5 étapes pour effectuer un test d'hypothèse bilatéral ? Étant donné le niveau de signification statistique $\alpha = 0.05$ et la puissance statistique $1 - \beta = 0.8$.
 1. Exécutez le code d'intervalle de confiance avec $N=2$ et $\alpha = 0.5$ pour $100$, un ensemble de données généré indépendamment, et tracez les intervalles résultants (dans ce cas, `t_star = 1.0`).  Vous verrez plusieurs intervalles très courts qui sont très loin de contenir la vraie moyenne $0$.  Cela contredit-il l'interprétation de l'intervalle de confiance ?  Vous sentez-vous à l'aise d'utiliser des intervalles courts pour indiquer des estimations de haute précision ?
 

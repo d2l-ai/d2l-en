@@ -1100,7 +1100,7 @@ Pour récapituler :
 * Les normes capturent diverses notions de la magnitude d'un vecteur, 
  et sont généralement appliquées à la différence de deux vecteurs 
  pour mesurer leur distance.
- * Les normes vectorielles courantes comprennent les normes $\ell_1$ et $\ell_2$, 
+* Les normes vectorielles courantes comprennent les normes $\ell_1$ et $\ell_2$, 
  et les normes matricielles courantes comprennent les normes *spectrales* et *de Frobenius*.
 
 

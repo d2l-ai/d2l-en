@@ -297,7 +297,7 @@ Les propriétés que nous avions pour la variance peuvent être reformulées pou
 
 * Pour toute variable aléatoire $X$, $\sigma_{X} \ge 0$.
 * Pour toute variable aléatoire $X$ et les nombres $a$ et $b$, nous avons $\sigma_{aX+b} = |a|\sigma_{X}$
- * Si nous avons deux variables aléatoires *indépendantes* $X$ et $Y$, nous avons $\sigma_{X+Y} = \sqrt{\sigma_{X}^2 + \sigma_{Y}^2}$.
+* Si nous avons deux variables aléatoires *indépendantes* $X$ et $Y$, nous avons $\sigma_{X+Y} = \sqrt{\sigma_{X}^2 + \sigma_{Y}^2}$.
 
 Il est naturel à ce moment de se demander : " Si l'écart-type est dans les unités de notre variable aléatoire initiale, représente-t-il quelque chose que nous pouvons tirer en ce qui concerne cette variable aléatoire ? "  La réponse est un oui retentissant !  En effet, tout comme la moyenne nous a indiqué l'emplacement typique de notre variable aléatoire, l'écart-type donne la plage de variation typique de cette variable aléatoire.  Nous pouvons rendre cela rigoureux à l'aide de ce que l'on appelle l'inégalité de Chebyshev :
 

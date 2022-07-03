@@ -320,8 +320,8 @@ $$I(X, Y) = E_{x} E_{y} \left\{ p_{X, Y}(x, y) \log\frac{p_{X, Y}(x, y)}{p_X(x) 
  Nous pouvons résumer toutes ces relations dans l'image :numref:`fig_mutual_information` .  C'est un excellent test d'intuition que de voir pourquoi les affirmations suivantes sont toutes également équivalentes à $I(X, Y)$.
 
 * $H(X) - H(X \mid Y)$
- * $H(Y) - H(Y \mid X)$
- * $H(X) + H(Y) - H(X, Y)$
+* $H(Y) - H(Y \mid X)$
+* $H(X) + H(Y) - H(X, Y)$
 
  ![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual-information.svg) 
 :label:`fig_mutual_information` 
@@ -442,7 +442,7 @@ def kl_divergence(p, q):
 Examinons quelques propriétés de la divergence de KL :eqref:`eq_kl_def` .
 
 * La divergence KL est non symétrique, c'est-à-dire qu'il existe $P,Q$ tel que $$D_{\mathrm{KL}}(P\|Q) \neq D_{\mathrm{KL}}(Q\|P).$$
- * La divergence KL est non négative, c'est-à-dire que $$D_{\mathrm{KL}}(P\|Q) \geq 0.$$ Notez que l'égalité ne vaut que lorsque $P = Q$.
+* La divergence KL est non négative, c'est-à-dire que $$D_{\mathrm{KL}}(P\|Q) \geq 0.$$ Notez que l'égalité ne vaut que lorsque $P = Q$.
 * S'il existe un $x$ tel que $p(x) > 0$ et $q(x) = 0$, alors $D_{\mathrm{KL}}(P\|Q) = \infty$.
 * Il existe une relation étroite entre la divergence KL et l'information mutuelle. En plus de la relation montrée dans :numref:`fig_mutual_information` , $I(X, Y)$ est aussi numériquement équivalent avec les termes suivants :
    1. $D_{\mathrm{KL}}(P(X, Y)  \ \| \ P(X)P(Y))$;

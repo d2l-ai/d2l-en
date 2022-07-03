@@ -95,7 +95,7 @@ text[:60]
 ## Tokenization
 
 
- *Les tokens* sont les unités atomiques (indivisibles) du texte
+*Les tokens* sont les unités atomiques (indivisibles) du texte
 et ce qui constitue un token 
 (par exemple, des caractères ou des mots)
 est un choix de conception.

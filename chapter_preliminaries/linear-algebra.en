@@ -1115,7 +1115,7 @@ To recap:
 * Norms capture various notions of the magnitude of a vector, 
   and are commonly applied to the difference of two vectors 
   to measure their distance.
- * Common vector norms include the $\ell_1$ and $\ell_2$ norms, 
+* Common vector norms include the $\ell_1$ and $\ell_2$ norms, 
    and common matrix norms include the *spectral* and *Frobenius* norms.
 
 

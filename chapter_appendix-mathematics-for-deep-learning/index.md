@@ -1,7 +1,7 @@
 # Annexe : Mathématiques pour l'apprentissage profond
 :label:`chap_appendix_math` 
 
- **Brent Werness** (*Amazon*), **Rachel Hu** (*Amazon*), et auteurs de ce livre
+**Brent Werness** (*Amazon*), **Rachel Hu** (*Amazon*), et auteurs de ce livre
 
 
  L'un des aspects merveilleux de l'apprentissage profond moderne est le fait qu'une grande partie de celui-ci peut être comprise et utilisée sans une compréhension totale des mathématiques qui le sous-tendent.  C'est le signe que le domaine arrive à maturité.  De même que la plupart des développeurs de logiciels n'ont plus besoin de se préoccuper de la théorie des fonctions calculables, les praticiens de l'apprentissage profond ne devraient pas non plus avoir à se préoccuper des fondements théoriques de l'apprentissage par probabilité maximale.

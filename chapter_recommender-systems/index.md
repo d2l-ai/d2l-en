@@ -2,7 +2,7 @@
 :label:`chap_recsys` 
 
  
- **Shuai Zhang** (*Amazon*), **Aston Zhang** (*Amazon*), et **Yi Tay** (*Google*)
+**Shuai Zhang** (*Amazon*), **Aston Zhang** (*Amazon*), et **Yi Tay** (*Google*)
 
 Les systèmes de recommandation sont largement utilisés dans l'industrie et sont omniprésents dans notre vie quotidienne. Ces systèmes sont utilisés dans un certain nombre de domaines tels que les sites d'achat en ligne (par exemple, amazon.com), les sites de services de musique et de cinéma (par exemple, Netflix et Spotify), les magasins d'applications mobiles (par exemple, IOS app store et google play), la publicité en ligne, pour n'en citer que quelques-uns. 
 

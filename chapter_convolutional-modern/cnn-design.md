@@ -352,9 +352,9 @@ nous implémentons une variante RegNetX à 32 couches
 caractérisée par
 
 * $b_i = 1;$
- * $g_i = 16;$
- * $w_1 = 32, w_2=80;$
- * $d_1 = 4, d_2=6.$
+* $g_i = 16;$
+* $w_1 = 32, w_2=80;$
+* $d_1 = 4, d_2=6.$
 
 ```{.python .input}
 %%tab all

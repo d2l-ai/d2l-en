@@ -148,7 +148,7 @@ Bien qu'apparemment inoffensive, l'invocation de
 de `iter(data.train_dataloader())` 
  illustre la puissance de la conception orientée objet de Python. 
 Notez que nous avons ajouté une méthode à la classe `SyntheticRegressionData`
- *après* avoir créé l'objet `data`. 
+*après* avoir créé l'objet `data`. 
 Néanmoins, l'objet bénéficie de 
 l'ajout *ex post facto* de la fonctionnalité à la classe.
 

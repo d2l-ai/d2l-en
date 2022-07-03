@@ -1,7 +1,7 @@
 # Notation
 :label:`chap_notation` 
 
- Tout au long de cet ouvrage, nous respectons les conventions de notation suivantes.
+Tout au long de cet ouvrage, nous respectons les conventions de notation suivantes.
 Notez que certains de ces symboles sont des caractères de substitution,
 tandis que d'autres font référence à des objets spécifiques.
 En règle générale, 
@@ -30,36 +30,36 @@ des valeurs scalaires.
 ## Théorie des ensembles
 
 
- * $\mathcal{X}$: un ensemble
+* $\mathcal{X}$: un ensemble
 * $\mathbb{Z}$: l'ensemble des entiers
 * $\mathbb{Z}^+$: l'ensemble des entiers positifs
 * $\mathbb{R}$: l'ensemble des nombres réels
 * $\mathbb{R}^n$: l'ensemble des vecteurs $n$-dimensionnels des nombres réels
 * $\mathbb{R}^{a\times b}$: L'ensemble des matrices de nombres réels avec $a$ lignes et $b$ colonnes
 * $|\mathcal{X}|$: cardinalité (nombre d'éléments) de l'ensemble $\mathcal{X}$
- * $\mathcal{A}\cup\mathcal{B}$: union des ensembles $\mathcal{A}$ et $\mathcal{B}$
- * $\mathcal{A}\cap\mathcal{B}$: intersection des ensembles $\mathcal{A}$ et $\mathcal{B}$
- * $\mathcal{A}\setminus\mathcal{B}$: soustraction de l'ensemble $\mathcal{B}$ de $\mathcal{A}$ (ne contient que les éléments de $\mathcal{A}$ qui n'appartiennent pas à $\mathcal{B}$)
+* $\mathcal{A}\cup\mathcal{B}$: union des ensembles $\mathcal{A}$ et $\mathcal{B}$
+* $\mathcal{A}\cap\mathcal{B}$: intersection des ensembles $\mathcal{A}$ et $\mathcal{B}$
+* $\mathcal{A}\setminus\mathcal{B}$: soustraction de l'ensemble $\mathcal{B}$ de $\mathcal{A}$ (ne contient que les éléments de $\mathcal{A}$ qui n'appartiennent pas à $\mathcal{B}$)
 
 
 
 ## Fonctions et opérateurs
 
 
- * $f(\cdot)$: une fonction
+* $f(\cdot)$: une fonction
 * $\log(\cdot)$: le logarithme naturel (base $e$)
-* $\log_2(\cdot)$: logarithme avec base $2$
- * $\exp(\cdot)$: la fonction exponentielle
+* $\log_2(\cdot)$: logarithme de base $2$
+* $\exp(\cdot)$: la fonction exponentielle
 * $\mathbf{1}(\cdot)$: la fonction indicateur, évalue à $1$ si l'argument booléen est vrai et à $0$ sinon
 * $\mathbf{1}_{\mathcal{X}}(z)$: la fonction indicateur d'appartenance à un ensemble, évalue à $1$ si l'élément $z$ appartient à l'ensemble $\mathcal{X}$ et $0$ sinon
 * $\mathbf{(\cdot)}^\top$: transposée d'un vecteur ou d'une matrice
 * $\mathbf{X}^{-1}$: inverse de la matrice $\mathbf{X}$
- * $\odot$: Produit de Hadamard (par éléments)
+* $\odot$: Produit de Hadamard (par éléments)
 * $[\cdot, \cdot]$: concaténation
 * $\|\cdot\|_p$: $\ell_p$ norm
 * $\|\cdot\|$: $\ell_2$ norm
 * $\langle \mathbf{x}, \mathbf{y} \rangle$: produit scalaire de vecteurs $\mathbf{x}$ et $\mathbf{y}$
- * $\sum$: somme sur une collection d'éléments
+* $\sum$: somme sur une collection d'éléments
 * $\prod$: produit sur une collection d'éléments
 * $\stackrel{\mathrm{def}}{=}$: une égalité affirmée comme définition du symbole du côté gauche
 
@@ -80,18 +80,18 @@ des valeurs scalaires.
 * $X$: une variable aléatoire
 * $P$: une distribution de probabilité
 * $X \sim P$: la variable aléatoire $X$ a la distribution $P$
- * $P(X=x)$: la probabilité attribuée à l'événement où la variable aléatoire $X$ prend la valeur $x$
- * $P(X \mid Y)$: la distribution de probabilité conditionnelle de $X$ étant donné $Y$
- * $p(\cdot)$: une fonction de densité de probabilité (PDF) associée à la distribution P
+* $P(X=x)$: la probabilité attribuée à l'événement où la variable aléatoire $X$ prend la valeur $x$
+* $P(X \mid Y)$: la distribution de probabilité conditionnelle de $X$ étant donné $Y$
+* $p(\cdot)$: une fonction de densité de probabilité (PDF) associée à la distribution P
 * ${E}[X]$: espérance d'une variable aléatoire $X$
- * $X \perp Y$: les variables aléatoires $X$ et $Y$ sont indépendantes
+* $X \perp Y$: les variables aléatoires $X$ et $Y$ sont indépendantes
 * $X \perp Y \mid Z$: les variables aléatoires $X$ et $Y$ sont conditionnellement indépendantes étant donné $Z$
- * $\sigma_X$: l'écart-type de la variable aléatoire $X$
- * $\mathrm{Var}(X)$: la variance de la variable aléatoire $X$, égale à $\sigma^2_X$
- * $\mathrm{Cov}(X, Y)$: la covariance des variables aléatoires $X$ et $Y$
- * $\rho(X, Y)$: le coefficient de corrélation de Pearson entre $X$ et $Y$, égal à $\frac{\mathrm{Cov}(X, Y)}{\sigma_X \sigma_Y}$
- * $H(X)$: entropie de la variable aléatoire $X$
- * $D_{\mathrm{KL}}(P\|Q)$: la divergence KL (ou entropie relative) de la distribution $Q$ à la distribution $P$
+* $\sigma_X$: l'écart-type de la variable aléatoire $X$
+* $\mathrm{Var}(X)$: la variance de la variable aléatoire $X$, égale à $\sigma^2_X$
+* $\mathrm{Cov}(X, Y)$: la covariance des variables aléatoires $X$ et $Y$
+* $\rho(X, Y)$: le coefficient de corrélation de Pearson entre $X$ et $Y$, égal à $\frac{\mathrm{Cov}(X, Y)}{\sigma_X \sigma_Y}$
+* $H(X)$: entropie de la variable aléatoire $X$
+* $D_{\mathrm{KL}}(P\|Q)$: la divergence KL (ou entropie relative) de la distribution $Q$ à la distribution $P$
 
 
 
