@@ -116,7 +116,7 @@ $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(w^{(t+j)} \mid w^{(t)})
 
 où tout pas de temps inférieur à $1$ ou supérieur à $T$ peut être omis.
 
-### Formation
+### Entrainement
 
 Les paramètres du modèle de saut de programme sont le vecteur du mot central et le vecteur du mot contextuel pour chaque mot du vocabulaire.
 Lors de la formation, nous apprenons les paramètres du modèle en maximisant la fonction de vraisemblance (c'est-à-dire l'estimation de vraisemblance maximale). Cela équivaut à minimiser la fonction de perte suivante :
@@ -211,7 +211,7 @@ est la probabilité de générer tous les mots centraux
 
 $$ \prod_{t=1}^{T}  P(w^{(t)} \mid  w^{(t-m)}, \ldots, w^{(t-1)}, w^{(t+1)}, \ldots, w^{(t+m)}).$$ 
 
-### Formation
+### Entrainement
 
 l'entrainement des modèles de sac de mots continus
 est presque la même que l'entrainement des modèles de saut de programme

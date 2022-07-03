@@ -147,7 +147,7 @@ skip_gram(torch.ones((2, 1), dtype=torch.long),
           torch.ones((2, 4), dtype=torch.long), embed, embed).shape
 ```
 
-## Formation
+## Entrainement
 
 Avant de former le modèle de saut de programme avec échantillonnage négatif,
 définissons d'abord sa fonction de perte.

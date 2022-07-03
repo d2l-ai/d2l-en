@@ -239,7 +239,7 @@ def configure_optimizers(self):
         return SGD(self.lr)
 ```
 
-## Formation
+## Entrainement
 
 Maintenant que tous les éléments sont en place
 (paramètres, fonction de perte, modèle et optimiseur),

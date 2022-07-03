@@ -357,7 +357,7 @@ Le livre de Peters et al. en dit plus sur ce sujet
 Nous ne faisons qu'effleurer le sujet.
 
 
-## Formation
+## Entrainement
 
 <!-- fix -->
 Après avoir passé en revue de nombreux outils statistiques différents, essayons de les mettre en pratique.

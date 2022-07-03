@@ -692,7 +692,7 @@ def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
     return float((torch.abs((bbox_labels - bbox_preds) * bbox_masks)).sum())
 ```
 
-### [**Formation du modèle**]
+### [**Entrainement du modèle**]
 
 Lors de l'entrainement du modèle,
 nous devons générer des boîtes d'ancrage multi-échelles (`anchors`)

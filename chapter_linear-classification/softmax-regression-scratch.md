@@ -240,7 +240,7 @@ def loss(self, y_hat, y):
     return cross_entropy(y_hat, y)
 ```
 
-## Formation
+## Entrainement
 
 Nous réutilisons la méthode `fit` définie dans :numref:`sec_linear_scratch` pour [**former le modèle avec 10 époques.**]
 Notez que le nombre d'époques (`max_epochs`),

@@ -202,7 +202,7 @@ $$\begin{aligned}\hat{y} &= \mathrm{argmax}_ y \ p(y)\prod_{i=1}^d   p(x_t = t_i
 pour tout $y$. Ainsi, notre hypothèse d'indépendance conditionnelle a fait passer la complexité de notre modèle d'une dépendance exponentielle du nombre de caractéristiques $\mathcal{O}(2^dn)$ à une dépendance linéaire, qui est $\mathcal{O}(dn)$.
 
 
-## Formation
+## Entrainement
 
 Le problème maintenant est que nous ne connaissons pas $P_{xy}$ et $P_y$. Nous devons donc d'abord estimer leurs valeurs en fonction de certaines données d'entraînement. Il s'agit de l'*entraînement* du modèle. L'estimation de $P_y$ n'est pas trop difficile. Puisque nous ne traitons que des classes $10$, nous pouvons compter le nombre d'occurrences $n_y$ pour chacun des chiffres et le diviser par la quantité totale de données $n$. Par exemple, si le chiffre 8 apparaît $n_8 = 5,800$ fois et que nous avons un total de $n = 60,000$ images, l'estimation de la probabilité est $p(y=8) = 0.0967$.
 

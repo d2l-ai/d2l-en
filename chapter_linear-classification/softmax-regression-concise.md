@@ -157,7 +157,7 @@ def loss(self, Y_hat, Y, averaged=True):
         return fn(Y, Y_hat)
 ```
 
-## Formation
+## Entrainement
 
 Ensuite, nous formons notre modèle. Comme précédemment, nous utilisons les images Fashion-MNIST, aplaties en vecteurs de caractéristiques à 784 dimensions.
 

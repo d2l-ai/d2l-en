@@ -257,7 +257,7 @@ class DataModule(d2l.HyperParameters):  #@save
         return self.get_dataloader(train=False)
 ```
 
-## Formation
+## Entrainement
 :label:`oo-design-training` 
 
 La classe `Trainer` forme les paramètres apprenables de la classe `Module` avec les données spécifiées dans `DataModule`. La méthode clé est `fit`, qui accepte deux arguments :`model` une instance de `Module`, et `data`, une instance de `DataModule`. Elle itère ensuite sur l'ensemble complet de données `max_epochs` fois pour entraîner le modèle. Comme précédemment, nous reporterons l'implémentation de cette fonction à des chapitres ultérieurs.

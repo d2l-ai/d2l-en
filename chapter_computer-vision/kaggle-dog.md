@@ -432,7 +432,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           f' examples/sec on {str(devices)}')
 ```
 
-## [**Formation et validation du modèle**]
+## [**Entrainement et validation du modèle**]
 
 Nous pouvons maintenant former et valider le modèle.
 Les hyperparamètres suivants sont tous réglables.

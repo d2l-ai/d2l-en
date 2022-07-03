@@ -201,7 +201,7 @@ class ViT(d2l.Classifier):
         return self.head(X[:, 0])
 ```
 
-## Formation
+## Entrainement
 
 l'entrainement d'un transformateur de vision sur le jeu de données Fashion-MNIST se fait de la même manière que l'entrainement des CNN sur :numref:`chap_modern_cnn`.
 

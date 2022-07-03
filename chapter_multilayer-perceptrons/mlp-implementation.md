@@ -137,7 +137,7 @@ def forward(self, X):
     return d2l.matmul(H, self.W2) + self.b2
 ```
 
-### Formation
+### Entrainement
 
 Heureusement, [**la boucle de entrainement pour les MLP
 est exactement la même que pour la régression softmax.**] Nous définissons le modèle, les données, le formateur et enfin nous invoquons la fonction `fit` sur le modèle et les données.

@@ -472,7 +472,7 @@ x = tf.zeros((1, 64, 64, 3))
 net_D(x).shape
 ```
 
-## Formation
+## Entrainement
 
 Par rapport au GAN de base dans :numref:`sec_basic_gan`, nous utilisons le même taux d'apprentissage pour le générateur et le discriminateur car ils sont similaires l'un à l'autre. De plus, nous changeons $\beta_1$ dans Adam (:numref:`sec_adam` ) de $0.9$ à $0.5$. Cela diminue la douceur du momentum, la moyenne mobile pondérée exponentiellement des gradients passés, pour prendre en charge les gradients qui changent rapidement parce que le générateur et le discriminateur se battent entre eux. De plus, le bruit généré aléatoirement `Z` est un tenseur 4-D et nous utilisons le GPU pour accélérer le calcul.
 

@@ -202,7 +202,7 @@ augs = torchvision.transforms.Compose([
 apply(img, augs)
 ```
 
-## [**Formation avec l'augmentation d'image**]
+## [**Entrainement avec l'augmentation d'image**]
 
 Formons un modèle avec l'augmentation d'image.
 Nous utilisons ici le jeu de données CIFAR-10 au lieu du jeu de données Fashion-MNIST que nous avons utilisé précédemment. 

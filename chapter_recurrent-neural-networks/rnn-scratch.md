@@ -352,7 +352,7 @@ def clip_gradients(self, grad_clip_val, grads):
     return grads
 ```
 
-## Formation
+## Entrainement
 
 En utilisant le jeu de données *The Time Machine* (`data`),
 nous formons un modèle de langage au niveau des caractères (`model`)

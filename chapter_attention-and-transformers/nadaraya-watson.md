@@ -312,7 +312,7 @@ class NWKernelRegression(d2l.Module):
             return d2l.SGD(self.lr)
 ```
 
-### Formation
+### Entrainement
 
 Dans ce qui suit, nous [**transformons l'ensemble de données de formation
 en clés et valeurs**] pour former le modèle d'attention.
