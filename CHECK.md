@@ -16,7 +16,7 @@
 
 # 1 - chapter_introduction
 
-- [ ] ./chapter_introduction/index.md
+- [x] ./chapter_introduction/index.md
 
 # 2 - chapter_preliminaries
 

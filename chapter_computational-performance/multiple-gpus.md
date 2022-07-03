@@ -1,16 +1,16 @@
 # entrainement sur plusieurs GPU
 :label:`sec_multi_gpu` 
 
- Jusqu'à présent, nous avons vu comment former efficacement des modèles sur des CPU et des GPU. Nous avons même montré comment les cadres d'apprentissage profond permettent de paralléliser automatiquement le calcul et la communication entre eux dans :numref:`sec_auto_para` . Nous avons également montré dans :numref:`sec_use_gpu` comment lister tous les GPU disponibles sur un ordinateur à l'aide de la commande `nvidia-smi`.
+Jusqu'à présent, nous avons vu comment former efficacement des modèles sur des CPU et des GPU. Nous avons même montré comment les cadres d'apprentissage profond permettent de paralléliser automatiquement le calcul et la communication entre eux dans :numref:`sec_auto_para`. Nous avons également montré dans :numref:`sec_use_gpu` comment lister tous les GPU disponibles sur un ordinateur à l'aide de la commande `nvidia-smi`.
 Ce que nous n'avons *pas* abordé, c'est la manière de paralléliser réellement l'entrainement par apprentissage profond. 
-Au lieu de cela, nous avons laissé entendre en passant qu'il était possible de répartir les données sur plusieurs appareils et de faire en sorte que cela fonctionne. La présente section complète les détails et montre comment former un réseau en parallèle en partant de zéro. Les détails sur la façon de tirer parti des fonctionnalités des API de haut niveau sont relégués à :numref:`sec_multi_gpu_concise` .
-Nous supposons que vous êtes familier avec les algorithmes de descente de gradient stochastique par lots tels que ceux décrits dans :numref:`sec_minibatch_sgd` .
+Au lieu de cela, nous avons laissé entendre en passant qu'il était possible de répartir les données sur plusieurs appareils et de faire en sorte que cela fonctionne. La présente section complète les détails et montre comment former un réseau en parallèle en partant de zéro. Les détails sur la façon de tirer parti des fonctionnalités des API de haut niveau sont relégués à :numref:`sec_multi_gpu_concise`.
+Nous supposons que vous êtes familier avec les algorithmes de descente de gradient stochastique par lots tels que ceux décrits dans :numref:`sec_minibatch_sgd`.
 
 
 ## Fractionnement du problème
 
 Commençons par un problème de vision par ordinateur simple et un réseau légèrement archaïque, par exemple, avec plusieurs couches de convolutions, de mise en commun, et éventuellement quelques couches entièrement connectées à la fin. 
-Autrement dit, commençons par un réseau qui ressemble beaucoup à LeNet :cite:`LeCun.Bottou.Bengio.ea.1998` ou AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012` . 
+Autrement dit, commençons par un réseau qui ressemble beaucoup à LeNet :cite:`LeCun.Bottou.Bengio.ea.1998` ou AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`. 
 Avec plusieurs GPU (2 s'il s'agit d'un serveur de bureau, 4 sur une instance AWS g4dn.12xlarge, 8 sur un p3.16xlarge ou 16 sur un p2.16xlarge), nous voulons partitionner l'entraînement de manière à obtenir une bonne accélération tout en bénéficiant de choix de conception simples et reproductibles. Après tout, les GPU multiples augmentent à la fois la capacité de *mémoire* et de *calcul*. En bref, nous avons les choix suivants, étant donné un mini lot de données d'entraînement que nous voulons classer.
 
 Premièrement, nous pouvons partitionner le réseau sur plusieurs GPU. En d'autres termes, chaque GPU prend en entrée les données qui entrent dans une couche particulière, traite les données dans un certain nombre de couches ultérieures, puis envoie les données au GPU suivant.
@@ -51,7 +51,7 @@ Cependant, l'ajout de GPU ne nous permet pas d'entraîner des modèles plus gran
 :label:`fig_splitting`
 
 
-Une comparaison des différentes méthodes de parallélisation sur plusieurs GPU est présentée sur le site :numref:`fig_splitting` .
+Une comparaison des différentes méthodes de parallélisation sur plusieurs GPU est présentée sur le site :numref:`fig_splitting`.
 Dans l'ensemble, le parallélisme des données est la méthode la plus pratique, à condition d'avoir accès à des GPU dotés d'une mémoire suffisamment grande. Voir également :cite:`Li.Andersen.Park.ea.2014` pour une description détaillée du partitionnement pour l'entrainement distribuée. La mémoire des GPU était un problème au début de l'apprentissage profond. Aujourd'hui, cette question a été résolue pour tous les cas, sauf les plus inhabituels. Nous nous concentrons sur le parallélisme des données dans ce qui suit.
 
 ## Parallélisme des données

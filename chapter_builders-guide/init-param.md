@@ -2,7 +2,7 @@
 
 Maintenant que nous savons comment accéder aux paramètres,
 voyons comment les initialiser correctement.
-Nous avons discuté de la nécessité d'une initialisation correcte dans :numref:`sec_numerical_stability` .
+Nous avons discuté de la nécessité d'une initialisation correcte dans :numref:`sec_numerical_stability`.
 Le cadre d'apprentissage profond fournit des initialisations aléatoires par défaut à ses couches.
 Cependant, nous souhaitons souvent initialiser nos poids
 en fonction de divers autres protocoles. Le cadre fournit les protocoles les plus couramment utilisés
@@ -210,7 +210,7 @@ $$
 :begin_tab:`mxnet`
 Nous définissons ici une sous-classe de la classe `Initializer`.
 Habituellement, il suffit d'implémenter la fonction `_init_weight`
- qui prend un argument tensoriel (`data`)
+qui prend un argument tensoriel (`data`)
 et lui attribue les valeurs initialisées souhaitées.
 :end_tab:
 
@@ -219,8 +219,8 @@ Encore une fois, nous implémentons une fonction `my_init` à appliquer à `net`
 :end_tab: 
 
  :begin_tab:`tensorflow` 
- Ici, nous définissons une sous-classe de `Initializer` et implémentons la fonction `__call__`
- qui renvoie un tenseur souhaité en fonction de la forme et du type de données.
+Ici, nous définissons une sous-classe de `Initializer` et implémentons la fonction `__call__`
+qui renvoie un tenseur souhaité en fonction de la forme et du type de données.
 :end_tab:
 
 ```{.python .input  n=14}

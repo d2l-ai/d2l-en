@@ -1,7 +1,7 @@
 # Performances de calcul
 :label:`chap_performance` 
 
- En apprentissage profond, 
+En apprentissage profond, 
 les ensembles de données et les modèles sont généralement volumineux,
 ce qui implique des calculs lourds.
 Par conséquent, les performances de calcul ont une grande importance.

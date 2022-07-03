@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Le modèle de classification de base
 :label:`sec_classification` 
 
- Vous avez peut-être remarqué que les implémentations à partir de zéro et l'implémentation concise utilisant la fonctionnalité du framework étaient assez similaires dans le cas de la régression. Il en va de même pour la classification. Étant donné qu'un grand nombre de modèles de ce livre traitent de la classification, il est intéressant d'ajouter une fonctionnalité pour prendre en charge ce paramètre spécifique. Cette section fournit une classe de base pour les modèles de classification afin de simplifier le code futur.
+Vous avez peut-être remarqué que les implémentations à partir de zéro et l'implémentation concise utilisant la fonctionnalité du framework étaient assez similaires dans le cas de la régression. Il en va de même pour la classification. Étant donné qu'un grand nombre de modèles de ce livre traitent de la classification, il est intéressant d'ajouter une fonctionnalité pour prendre en charge ce paramètre spécifique. Cette section fournit une classe de base pour les modèles de classification afin de simplifier le code futur.
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -30,7 +30,7 @@ from IPython import display
 
 ## La classe `Classifier`
 
- Nous définissons la classe `Classifier` ci-dessous. Dans la classe `validation_step`, nous reportons à la fois la valeur de la perte et la précision de la classification sur un lot de validation. Nous tirons une mise à jour pour chaque lot de `num_val_batches`. Cela présente l'avantage de générer la perte et la précision moyennes sur l'ensemble des données de validation. Ces chiffres moyens ne sont pas exactement corrects si le dernier lot contient moins d'exemples, mais nous ignorons cette différence mineure pour garder le code simple.
+Nous définissons la classe `Classifier` ci-dessous. Dans la classe `validation_step`, nous reportons à la fois la valeur de la perte et la précision de la classification sur un lot de validation. Nous tirons une mise à jour pour chaque lot de `num_val_batches`. Cela présente l'avantage de générer la perte et la précision moyennes sur l'ensemble des données de validation. Ces chiffres moyens ne sont pas exactement corrects si le dernier lot contient moins d'exemples, mais nous ignorons cette différence mineure pour garder le code simple.
 
 ```{.python .input  n=5}
 %%tab all
@@ -81,7 +81,7 @@ Lorsque les prédictions sont cohérentes avec la classe d'étiquettes `y`, elle
 La précision de la classification est la fraction de toutes les prédictions qui sont correctes.
 Bien qu'il puisse être difficile d'optimiser la précision directement (elle n'est pas différentiable),
 c'est souvent la mesure de performance qui nous intéresse le plus. Elle est souvent *la*
-quantité pertinente dans les benchmarks. C'est pourquoi nous l'indiquons presque toujours lorsque nous formons des classifieur.
+quantité pertinente dans les benchmarks. C'est pourquoi nous l'indiquons presque toujours lorsque nous formons des classifieurs.
 
 La précision est calculée comme suit.
 Premièrement, si `y_hat` est une matrice,
@@ -127,7 +127,7 @@ def parameters(self):
 
 ## Résumé
 
-La classification est un problème suffisamment courant pour justifier ses propres fonctions pratiques. L'importance centrale de la classification est la *précision* du classificateur. Notez que, bien que la précision soit souvent au centre de nos préoccupations, nous formons des classifieur pour optimiser une variété d'autres objectifs pour des raisons statistiques et informatiques. Cependant, quelle que soit la fonction de perte minimisée pendant la formation, il est utile de disposer d'une méthode pratique pour évaluer empiriquement la précision de notre classificateur. 
+La classification est un problème suffisamment courant pour justifier ses propres fonctions pratiques. L'importance centrale de la classification est la *précision* du classifieur. Notez que, bien que la précision soit souvent au centre de nos préoccupations, nous formons des classifieurs pour optimiser une variété d'autres objectifs pour des raisons statistiques et informatiques. Cependant, quelle que soit la fonction de perte minimisée pendant la formation, il est utile de disposer d'une méthode pratique pour évaluer empiriquement la précision de notre classifieur. 
 
 
 ## Exercices

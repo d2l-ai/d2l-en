@@ -2,7 +2,7 @@
 :label:`sec_bbox` 
 
  
- Dans les sections précédentes (par exemple, :numref:`sec_alexnet` --:numref:`sec_googlenet` ),
+Dans les sections précédentes (par exemple, :numref:`sec_alexnet` --:numref:`sec_googlenet` ),
 nous avons présenté divers modèles de classification d'images.
 Dans les tâches de classification d'images,
 nous supposons qu'il n'y a qu'un *un*
@@ -26,7 +26,7 @@ pour détecter et localiser des objets d'intérêt
 tout au long de leur navigation dans un environnement.
 De plus, les systèmes de sécurité
 
- peuvent avoir besoin de détecter des objets anormaux, tels que des intrus ou des bombes.
+peuvent avoir besoin de détecter des objets anormaux, tels que des intrus ou des bombes.
 
 Dans les prochaines sections, nous allons présenter 
 plusieurs méthodes d'apprentissage profond pour la détection d'objets.
@@ -76,7 +76,7 @@ d2l.plt.imshow(img);
 ## Boîtes englobantes
 
 
- En détection d'objets,
+En détection d'objets,
 nous utilisons généralement une *boîte englobante* pour décrire l'emplacement spatial d'un objet.
 La boîte englobante est rectangulaire et est déterminée par les coordonnées $x$ et $y$ du coin supérieur gauche du rectangle et par les coordonnées du coin inférieur droit. 
 Une autre représentation couramment utilisée de la boîte englobante est constituée des coordonnées $(x, y)$-axe

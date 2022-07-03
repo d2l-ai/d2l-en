@@ -2,7 +2,7 @@
 :label:`sec_sentiment` 
 
  
- Avec la prolifération des médias sociaux en ligne
+Avec la prolifération des médias sociaux en ligne
 et des plateformes d'évaluation,
 une pléthore de
 données d'opinion
@@ -33,12 +33,12 @@ qui transforme une séquence de texte de longueur variable
 en une catégorie de texte de longueur fixe.
 Dans ce chapitre,
 nous utiliserons le logiciel [large movie review dataset](https://ai.stanford.edu/~)amaas/data/sentiment/)
- de Stanford pour l'analyse des sentiments. 
-Il se compose d'un ensemble d'entraînement et d'un ensemble de test, 
-, contenant chacun 25 000 critiques de films téléchargées depuis IMDb.
+de Stanford pour l'analyse des sentiments. 
+Il se compose d'un ensemble d'entraînement et d'un ensemble de test,
+contenant chacun 25 000 critiques de films téléchargées depuis IMDb.
  
- Dans les deux ensembles de données, 
-, il y a un nombre égal d'étiquettes "positives" et "négatives",
+Dans les deux ensembles de données,
+il y a un nombre égal d'étiquettes "positives" et "négatives",
 indiquant différentes polarités de sentiment.
 
 ```{.python .input}
@@ -127,7 +127,7 @@ nous fixons la longueur de chaque commentaire à 500 avec troncature et rempliss
 ce qui est similaire à 
 l'étape de prétraitement 
 pour le jeu de données de traduction automatique
-dans :numref:`sec_machine_translation` .
+dans :numref:`sec_machine_translation`.
 
 ```{.python .input}
 #@tab all

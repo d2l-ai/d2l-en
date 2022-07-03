@@ -1,7 +1,7 @@
 # Adadelta
 :label:`sec_adadelta` 
 
- Adadelta est encore une autre variante d'AdaGrad (:numref:`sec_adagrad` ). La principale différence réside dans le fait qu'il diminue la quantité par laquelle le taux d'apprentissage est adaptatif aux coordonnées. De plus, il est traditionnellement considéré comme n'ayant pas de taux d'apprentissage puisqu'il utilise la quantité de changement elle-même comme calibration pour le changement futur. L'algorithme a été proposé dans :cite:`Zeiler.2012` . Il est assez simple, étant donné la discussion des algorithmes précédents jusqu'à présent. 
+Adadelta est encore une autre variante d'AdaGrad (:numref:`sec_adagrad` ). La principale différence réside dans le fait qu'il diminue la quantité par laquelle le taux d'apprentissage est adaptatif aux coordonnées. De plus, il est traditionnellement considéré comme n'ayant pas de taux d'apprentissage puisqu'il utilise la quantité de changement elle-même comme calibration pour le changement futur. L'algorithme a été proposé dans :cite:`Zeiler.2012`. Il est assez simple, étant donné la discussion des algorithmes précédents jusqu'à présent. 
 
 ## L'algorithme
 

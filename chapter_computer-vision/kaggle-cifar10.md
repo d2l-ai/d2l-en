@@ -1,7 +1,7 @@
 # Classification d'images (CIFAR-10) sur Kaggle
 :label:`sec_kaggle_cifar10` 
 
- Jusqu'à présent, nous avons utilisé les API de haut niveau des cadres d'apprentissage profond pour obtenir directement des ensembles de données d'images au format tenseur.
+Jusqu'à présent, nous avons utilisé les API de haut niveau des cadres d'apprentissage profond pour obtenir directement des ensembles de données d'images au format tenseur.
 Cependant, les jeux de données d'images personnalisés
 se présentent souvent sous la forme de fichiers d'images.
 Dans cette section, nous allons partir de
@@ -9,7 +9,7 @@ fichiers d'images brutes,
 et les organiser, les lire, puis les transformer
 en format tenseur étape par étape.
 
-Nous avons expérimenté avec le jeu de données CIFAR-10 dans :numref:`sec_image_augmentation` ,
+Nous avons expérimenté avec le jeu de données CIFAR-10 dans :numref:`sec_image_augmentation`,
 qui est un jeu de données important en vision par ordinateur.
 Dans cette section,
 nous allons appliquer les connaissances acquises
@@ -83,7 +83,7 @@ Après avoir décompressé le fichier téléchargé dans `../data`, et décompre
 * `../data/cifar-10/trainLabels.csv`
 * `../data/cifar-10/sampleSubmission.csv`
 
- où les répertoires `train` et `test` contiennent respectivement les images d'entraînement et de test, `trainLabels.csv` fournit les étiquettes pour les images d'entraînement, et `sample_submission.csv` est un exemple de fichier de soumission.
+où les répertoires `train` et `test` contiennent respectivement les images d'entraînement et de test, `trainLabels.csv` fournit les étiquettes pour les images d'entraînement, et `sample_submission.csv` est un exemple de fichier de soumission.
 
 Pour faciliter la prise en main, [**nous fournissons un échantillon à petite échelle de l'ensemble de données qui
 contient les 1000 premières images d'entraînement et 5 images de test aléatoires.**]
@@ -333,9 +333,9 @@ test_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,
 ### Définition du [**Modèle**]
 
 :begin_tab:`mxnet` 
- Ici, nous construisons les blocs résiduels en fonction de la classe `HybridBlock`, ce qui est
+Ici, nous construisons les blocs résiduels en fonction de la classe `HybridBlock`, ce qui est
 légèrement différent de l'implémentation décrite dans
-:numref:`sec_resnet` .
+:numref:`sec_resnet`.
 Cela permet d'améliorer l'efficacité des calculs.
 :end_tab:
 
@@ -397,7 +397,7 @@ Nous utilisons l'initialisation de Xavier décrite dans :numref:`subsec_xavier` 
 
 :begin_tab:`pytorch`
 Nous définissons le modèle ResNet-18 décrit dans
-:numref:`sec_resnet` .
+:numref:`sec_resnet`.
 :end_tab:
 
 ```{.python .input}
@@ -575,7 +575,7 @@ dont le format
 répond aux exigences du concours Kaggle.
 La méthode
 pour soumettre les résultats à Kaggle
-est similaire à celle de :numref:`sec_kaggle_house` .
+est similaire à celle de :numref:`sec_kaggle_house`.
 
 ## Résumé
 

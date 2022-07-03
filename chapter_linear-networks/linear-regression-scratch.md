@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Implémentation de la régression linéaire à partir de zéro
 :label:`sec_linear_scratch` 
 
- Nous sommes maintenant prêts à travailler sur 
+Nous sommes maintenant prêts à travailler sur 
 une implémentation entièrement fonctionnelle 
 de la régression linéaire. 
 Dans cette section, 
@@ -17,7 +17,7 @@ et (iv) la fonction d'entraînement
 qui assemble tous ces éléments.**)
 Enfin, nous allons exécuter notre générateur de données synthétiques
 à partir de :numref:`sec_synthetic-regression-data` 
- et appliquer notre modèle
+et appliquer notre modèle
 sur le jeu de données résultant. 
 Bien que les cadres modernes d'apprentissage profond 
 puissent automatiser la quasi-totalité de ce travail,
@@ -93,7 +93,7 @@ Ensuite, nous devons [**définir notre modèle,
 en reliant son entrée et ses paramètres à sa sortie.**]
 Pour notre modèle linéaire, nous prenons simplement le produit matrice-vecteur
 des caractéristiques d'entrée $\mathbf{X}$ 
- et des poids du modèle $\mathbf{w}$,
+et des poids du modèle $\mathbf{w}$,
 et nous ajoutons le décalage $b$ à chaque exemple.
 $\mathbf{Xw}$ est un vecteur et $b$ un scalaire.
 En raison du mécanisme de diffusion 
@@ -102,7 +102,7 @@ lorsque nous ajoutons un vecteur et un scalaire,
 le scalaire est ajouté à chaque composante du vecteur.
 La fonction `forward` résultante 
 est enregistrée en tant que méthode dans la classe `LinearRegressionScratch`
- via `add_to_class` (introduit dans :numref:`oo-design-utilities` ).
+via `add_to_class` (introduit dans :numref:`oo-design-utilities` ).
 
 ```{.python .input  n=6}
 %%tab all
@@ -118,9 +118,9 @@ Puisque [**la mise à jour de notre modèle nécessite de prendre
 le gradient de notre fonction de perte,**]
 nous devons (**définir la fonction de perte en premier.**)
 Ici, nous utilisons la fonction de perte au carré
-dans :eqref:`eq_mse` .
+dans :eqref:`eq_mse`.
 Dans l'implémentation, nous devons transformer la valeur réelle `y`
- en la forme de la valeur prédite `y_hat`.
+en la forme de la valeur prédite `y_hat`.
 Le résultat renvoyé par la fonction suivante
 aura également la même forme que `y_hat`. 
 Nous retournons également la valeur de perte moyenne
@@ -136,7 +136,7 @@ def loss(self, y_hat, y):
 
 ## Définition de l'algorithme d'optimisation
 
-Comme nous l'avons vu dans :numref:`sec_linear_regression` ,
+Comme nous l'avons vu dans :numref:`sec_linear_regression`,
 la régression linéaire a une solution à forme fermée.
 Cependant, notre objectif ici est d'illustrer 
 comment former des réseaux neuronaux plus généraux,
@@ -153,8 +153,8 @@ dans la direction qui peut réduire la perte.
 
 Le code suivant applique la mise à jour, 
 étant donné un ensemble de paramètres, un taux d'apprentissage `lr`.
-Puisque notre perte est calculée comme une moyenne sur le minilot, 
-, nous n'avons pas besoin d'ajuster le taux d'apprentissage en fonction de la taille du lot. 
+Puisque notre perte est calculée comme une moyenne sur le minilot,
+nous n'avons pas besoin d'ajuster le taux d'apprentissage en fonction de la taille du lot. 
 Dans les chapitres suivants, nous étudierons 
 comment les taux d'apprentissage doivent être ajustés
 pour les très grands minibatchs, comme cela se produit 
@@ -265,7 +265,7 @@ En résumé, nous exécuterons la boucle suivante :
 * Calculer le gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} l(\mathbf{x}^{(i)}, y^{(i)}, \mathbf{w}, b)$
 * Mettre à jour les paramètres $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
  
- Rappelons que l'ensemble de données de régression synthétique 
+Rappelons que l'ensemble de données de régression synthétique 
 que nous avons généré dans :numref:`` sec_synthetic-regression-data`` 
 ne fournit pas d'ensemble de données de validation. 
 Dans la plupart des cas, cependant, 
@@ -275,7 +275,7 @@ Ici, nous passons le dataloader de validation
 une fois dans chaque époque pour mesurer la performance du modèle.
 Conformément à notre conception orientée objet,
 les fonctions `prepare_batch` et `fit_epoch`
- sont enregistrées en tant que méthodes de la classe `d2l.Trainer`
+sont enregistrées en tant que méthodes de la classe `d2l.Trainer`
  (présentée dans :numref:`oo-design-training` ).
 
 ```{.python .input  n=11}
@@ -351,10 +351,10 @@ def fit_epoch(self):
 Nous sommes presque prêts à entraîner le modèle,
 mais nous avons d'abord besoin de données pour l'entraînement.
 Ici, nous utilisons la classe `SyntheticRegressionData` 
- et nous lui passons quelques paramètres de base.
+et nous lui passons quelques paramètres de base.
 Ensuite, nous entraînons notre modèle avec 
 le taux d'apprentissage `lr=0.03` 
- et l'ensemble `max_epochs=3`. 
+et l'ensemble `max_epochs=3`. 
 Notez qu'en général, le nombre d'époques 
 et le taux d'apprentissage sont des hyperparamètres.
 En général, la définition des hyperparamètres est délicate
@@ -398,7 +398,7 @@ Cependant, dans le domaine de l'apprentissage automatique,
 nous sommes souvent moins préoccupés
 par la récupération des véritables paramètres sous-jacents,
 et plus préoccupés par les paramètres 
-qui conduisent à une prédiction très précise :cite:`Vapnik.1992` .
+qui conduisent à une prédiction très précise :cite:`Vapnik.1992`.
 Heureusement, même pour les problèmes d'optimisation difficiles,
 la descente de gradient stochastique peut souvent trouver des solutions remarquablement bonnes,
 en partie grâce au fait que, pour les réseaux profonds,
@@ -417,8 +417,8 @@ un modèle, une fonction de perte, une procédure d'optimisation,
 et un outil de visualisation et de surveillance. 
 Pour ce faire, nous avons composé un objet Python 
 qui contient tous les composants pertinents pour l'entrainement d'un modèle. 
-Bien qu'il ne s'agisse pas encore d'une implémentation de niveau professionnel
-, elle est parfaitement fonctionnelle et un code comme celui-ci 
+Bien qu'il ne s'agisse pas encore d'une implémentation de niveau professionnel,
+elle est parfaitement fonctionnelle et un code comme celui-ci 
 pourrait déjà vous aider à résoudre rapidement de petits problèmes.
 Dans les sections suivantes, nous verrons comment faire
 à la fois *plus concis* (en évitant le code passe-partout)
@@ -429,30 +429,30 @@ et *plus efficace* (en utilisant nos GPU à leur plein potentiel).
 ## Exercices
 
 1. Que se passerait-il si nous initialisions les poids à zéro. L'algorithme fonctionnerait-il toujours ? Que se passerait-il si nous
- initialisions les paramètres avec la variance $1,000$ plutôt que $0.01$?
+initialisions les paramètres avec la variance $1,000$ plutôt que $0.01$?
 1. Supposons que vous essayez de trouver [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm)
- un modèle pour les résistances qui relie la tension et le courant. Pouvez-vous utiliser la différenciation automatique
- pour apprendre les paramètres de votre modèle ?
+un modèle pour les résistances qui relie la tension et le courant. Pouvez-vous utiliser la différenciation automatique
+pour apprendre les paramètres de votre modèle ?
 1. Pouvez-vous utiliser [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) pour déterminer la température d'un objet
- en utilisant la densité spectrale d'énergie ? Pour référence, la densité spectrale $B$ du rayonnement émanant d'un corps noir est
- $B(\lambda, T) = \frac{2 hc^2}{\lambda^5} \cdot \left(\exp \frac{h c}{\lambda k T} - 1\right)^{-1}$ . Ici,
- $\lambda$ est la longueur d'onde, $T$ est la température, $c$ est la vitesse de la lumière, $h$ est le quantum de Planck et $k$ est la constante de Boltzmann
-. Vous mesurez l'énergie pour différentes longueurs d'onde $\lambda$ et vous devez maintenant adapter la courbe de densité spectrale
+en utilisant la densité spectrale d'énergie ? Pour référence, la densité spectrale $B$ du rayonnement émanant d'un corps noir est
+$B(\lambda, T) = \frac{2 hc^2}{\lambda^5} \cdot \left(\exp \frac{h c}{\lambda k T} - 1\right)^{-1}$ . Ici,
+$\lambda$ est la longueur d'onde, $T$ est la température, $c$ est la vitesse de la lumière, $h$ est le quantum de Planck et $k$ est la constante de Boltzmann.
+Vous mesurez l'énergie pour différentes longueurs d'onde $\lambda$ et vous devez maintenant adapter la courbe de densité spectrale
  à la loi de Planck.
 1. Quels sont les problèmes que vous pourriez rencontrer si vous vouliez calculer les dérivées secondes de la perte ? Comment
- pourriez-vous les résoudre ?
+pourriez-vous les résoudre ?
 1. Pourquoi la méthode `reshape` est-elle nécessaire dans la fonction `loss`?
 1. Faites des expériences en utilisant différents taux d'apprentissage pour déterminer à quelle vitesse la valeur de la fonction de perte diminue. Pouvez-vous réduire l'erreur
- en augmentant le nombre d'époques d'apprentissage ?
+en augmentant le nombre d'époques d'apprentissage ?
 1. Si le nombre d'exemples ne peut pas être divisé par la taille du lot, qu'arrive-t-il à `data_iter` à la fin d'une époque ?
 1. Essayez de mettre en œuvre une fonction de perte différente, telle que la perte de valeur absolue `(y_hat - d2l.reshape(y, y_hat.shape)).abs().sum()`.
    1. Vérifiez ce qui se passe pour les données régulières.
    1. Vérifiez s'il y a une différence de comportement si vous perturbez activement certaines entrées de $\mathbf{y}$,
- comme $y_5 = 10,000$.
+comme $y_5 = 10,000$.
  1. Pouvez-vous imaginer une solution bon marché pour combiner les meilleurs aspects de la perte au carré et de la perte en valeur absolue ?
       Conseil : comment éviter les valeurs de gradient vraiment importantes ?
 1. Pourquoi devons-nous remanier l'ensemble de données ? Pouvez-vous concevoir un cas où un ensemble de données malicieux briserait l'algorithme d'optimisation
- autrement ?
+autrement ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/42)

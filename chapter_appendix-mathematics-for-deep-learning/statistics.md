@@ -1,7 +1,7 @@
 # Statistiques
 :label:`sec_statistics` 
 
- Sans aucun doute, pour être un praticien de l'apprentissage profond de haut niveau, la capacité à former les modèles les plus avancés et les plus précis est cruciale.  Cependant, il est souvent difficile de savoir si les améliorations sont significatives ou si elles ne sont que le résultat de fluctuations aléatoires dans le processus de formation.  Pour être en mesure de discuter de l'incertitude des valeurs estimées, nous devons apprendre quelques statistiques.
+Sans aucun doute, pour être un praticien de l'apprentissage profond de haut niveau, la capacité à former les modèles les plus avancés et les plus précis est cruciale.  Cependant, il est souvent difficile de savoir si les améliorations sont significatives ou si elles ne sont que le résultat de fluctuations aléatoires dans le processus de formation.  Pour être en mesure de discuter de l'incertitude des valeurs estimées, nous devons apprendre quelques statistiques.
 
 
 La première référence aux *statistiques* remonte à un érudit arabe, Al-Kindi, au $9^{\mathrm{th}}$-siècle, qui a décrit en détail comment utiliser les statistiques et l'analyse de fréquence pour déchiffrer des messages cryptés. Après 800 ans, les statistiques modernes sont apparues en Allemagne dans les années 1700, lorsque les chercheurs se sont concentrés sur la collecte et l'analyse de données démographiques et économiques. Aujourd'hui, la statistique est un sujet scientifique qui concerne la collecte, le traitement, l'analyse, l'interprétation et la visualisation des données. De plus, la théorie de base de la statistique a été largement utilisée dans la recherche universitaire, industrielle et gouvernementale.
@@ -21,7 +21,7 @@ Dans cette section, nous présenterons trois types de méthodes d'inférence sta
 
 En statistique, un *estimateur* est une fonction d'échantillons donnés utilisée pour estimer le vrai paramètre $\theta$. Nous écrirons $\hat{\theta}_n = \hat{f}(x_1, \ldots, x_n)$ pour l'estimation de $\theta$ après observation des échantillons {$x_1, x_2, \ldots, x_n$}.
 
-Nous avons déjà vu des exemples simples d'estimateurs dans la section :numref:`sec_maximum_likelihood` .  Si vous disposez d'un certain nombre d'échantillons d'une variable aléatoire de Bernoulli, l'estimation du maximum de vraisemblance de la probabilité que la variable aléatoire soit égale à un peut être obtenue en comptant le nombre de uns observés et en le divisant par le nombre total d'échantillons.  De même, un exercice vous demandait de montrer que l'estimation du maximum de vraisemblance de la moyenne d'une gaussienne compte tenu d'un certain nombre d'échantillons est donnée par la valeur moyenne de tous les échantillons.  Ces estimateurs ne donneront presque jamais la vraie valeur du paramètre, mais idéalement, pour un grand nombre d'échantillons, l'estimation sera proche.
+Nous avons déjà vu des exemples simples d'estimateurs dans la section :numref:`sec_maximum_likelihood`.  Si vous disposez d'un certain nombre d'échantillons d'une variable aléatoire de Bernoulli, l'estimation du maximum de vraisemblance de la probabilité que la variable aléatoire soit égale à un peut être obtenue en comptant le nombre de uns observés et en le divisant par le nombre total d'échantillons.  De même, un exercice vous demandait de montrer que l'estimation du maximum de vraisemblance de la moyenne d'une gaussienne compte tenu d'un certain nombre d'échantillons est donnée par la valeur moyenne de tous les échantillons.  Ces estimateurs ne donneront presque jamais la vraie valeur du paramètre, mais idéalement, pour un grand nombre d'échantillons, l'estimation sera proche.
 
 À titre d'exemple, nous montrons ci-dessous la densité réelle d'une variable aléatoire gaussienne de moyenne zéro et de variance un, ainsi qu'une collection d'échantillons de cette gaussienne.  Nous avons construit la coordonnée $y$ pour que chaque point soit visible et que la relation avec la densité originale soit plus claire.
 
@@ -120,9 +120,9 @@ Il peut y avoir de nombreuses façons de calculer l'estimateur d'un paramètre $
 La métrique la plus simple utilisée pour évaluer les estimateurs est peut-être l'estimateur de l'erreur quadratique moyenne (EQM)* (ou perte $l_2$ ) qui peut être définie comme
 
 $$\mathrm{MSE} (\hat{\theta}_n, \theta) = E[(\hat{\theta}_n - \theta)^2].$$ 
- :eqlabel:`eq_mse_est` 
+:eqlabel:`eq_mse_est` 
 
- . Elle nous permet de quantifier l'écart quadratique moyen par rapport à la valeur réelle.  L'EQM est toujours non négatif. Si vous avez lu :numref:`sec_linear_regression` , vous reconnaîtrez qu'il s'agit de la fonction de perte de régression la plus couramment utilisée. En tant que mesure pour évaluer un estimateur, plus sa valeur est proche de zéro, plus l'estimateur est proche du vrai paramètre $\theta$.
+ . Elle nous permet de quantifier l'écart quadratique moyen par rapport à la valeur réelle.  L'EQM est toujours non négatif. Si vous avez lu :numref:`sec_linear_regression`, vous reconnaîtrez qu'il s'agit de la fonction de perte de régression la plus couramment utilisée. En tant que mesure pour évaluer un estimateur, plus sa valeur est proche de zéro, plus l'estimateur est proche du vrai paramètre $\theta$.
 
 
 ### Biais statistique
@@ -133,9 +133,9 @@ L'EQM constitue une mesure naturelle, mais nous pouvons facilement imaginer de m
 Tout d'abord, mesurons l'erreur systématique. Pour un estimateur $\hat{\theta}_n$, l'illustration mathématique du *biais statistique* peut être définie comme suit :
 
 $$\mathrm{bias}(\hat{\theta}_n) = E(\hat{\theta}_n - \theta) = E(\hat{\theta}_n) - \theta.$$ 
- :eqlabel:`eq_bias` 
+:eqlabel:`eq_bias` 
 
- Notez que lorsque $\mathrm{bias}(\hat{\theta}_n) = 0$, l'espérance de l'estimateur $\hat{\theta}_n$ est égale à la valeur réelle du paramètre.  Dans ce cas, nous disons que $\hat{\theta}_n$ est un estimateur sans biais.  En général, un estimateur non biaisé est meilleur qu'un estimateur biaisé puisque son espérance est égale à la vraie valeur du paramètre.
+Notez que lorsque $\mathrm{bias}(\hat{\theta}_n) = 0$, l'espérance de l'estimateur $\hat{\theta}_n$ est égale à la valeur réelle du paramètre.  Dans ce cas, nous disons que $\hat{\theta}_n$ est un estimateur sans biais.  En général, un estimateur non biaisé est meilleur qu'un estimateur biaisé puisque son espérance est égale à la vraie valeur du paramètre.
 
 
 Il faut cependant savoir que les estimateurs biaisés sont fréquemment utilisés dans la pratique.  Dans certains cas, il n'existe pas d'estimateur sans biais sans autres hypothèses, ou il est difficile à calculer.  Cela peut sembler être un défaut important pour un estimateur, mais la majorité des estimateurs rencontrés dans la pratique sont au moins asymptotiquement sans biais dans le sens où le biais tend vers zéro lorsque le nombre d'échantillons disponibles tend vers l'infini : $\lim_{n \rightarrow \infty} \mathrm{bias}(\hat{\theta}_n) = 0$.
@@ -143,12 +143,12 @@ Il faut cependant savoir que les estimateurs biaisés sont fréquemment utilisé
 
 ### Variance et écart-type
 
-Deuxièmement, mesurons le caractère aléatoire de l'estimateur.  Rappelez-vous que, d'après :numref:`sec_random_variables` , l'écart *type* (ou *erreur standard*) est défini comme la racine carrée de la variance.  Nous pouvons mesurer le degré de fluctuation d'un estimateur en mesurant l'écart-type ou la variance de cet estimateur.
+Deuxièmement, mesurons le caractère aléatoire de l'estimateur.  Rappelez-vous que, d'après :numref:`sec_random_variables`, l'écart *type* (ou *erreur standard*) est défini comme la racine carrée de la variance.  Nous pouvons mesurer le degré de fluctuation d'un estimateur en mesurant l'écart-type ou la variance de cet estimateur.
 
 $$\sigma_{\hat{\theta}_n} = \sqrt{\mathrm{Var} (\hat{\theta}_n )} = \sqrt{E[(\hat{\theta}_n - E(\hat{\theta}_n))^2]}.$$
 :eqlabel:`eq_var_est`
 
-Il est important de comparer :eqref:`eq_var_est` à :eqref:`eq_mse_est` . Dans cette équation, nous ne comparons pas à la valeur réelle de la population $\theta$, mais plutôt à $E(\hat{\theta}_n)$, la moyenne attendue de l'échantillon.  Ainsi, nous ne mesurons pas la distance qui sépare l'estimateur de la valeur réelle, mais plutôt la fluctuation de l'estimateur lui-même.
+Il est important de comparer :eqref:`eq_var_est` à :eqref:`eq_mse_est`. Dans cette équation, nous ne comparons pas à la valeur réelle de la population $\theta$, mais plutôt à $E(\hat{\theta}_n)$, la moyenne attendue de l'échantillon.  Ainsi, nous ne mesurons pas la distance qui sépare l'estimateur de la valeur réelle, mais plutôt la fluctuation de l'estimateur lui-même.
 
 
 ### Le compromis biais-variance
@@ -268,7 +268,7 @@ tf.square(tf.math.reduce_std(samples)) + tf.square(bias)
 ### Réalisation de tests d'hypothèses
 
 
- Le sujet le plus couramment rencontré en inférence statistique est le test d'hypothèses. Si les tests d'hypothèses ont été popularisés au début du 20e siècle, leur première utilisation remonte à John Arbuthnot dans les années 1700. John a suivi les registres des naissances sur 80 ans à Londres et a conclu que plus d'hommes que de femmes naissaient chaque année. Ensuite, le test de signification moderne est l'héritage de l'intelligence de Karl Pearson qui a inventé la valeur $p$ et le test du chi carré de Pearson, de William Gosset qui est le père de la distribution t de Student et de Ronald Fisher qui a paraphé l'hypothèse nulle et le test de signification.
+Le sujet le plus couramment rencontré en inférence statistique est le test d'hypothèses. Si les tests d'hypothèses ont été popularisés au début du 20e siècle, leur première utilisation remonte à John Arbuthnot dans les années 1700. John a suivi les registres des naissances sur 80 ans à Londres et a conclu que plus d'hommes que de femmes naissaient chaque année. Ensuite, le test de signification moderne est l'héritage de l'intelligence de Karl Pearson qui a inventé la valeur $p$ et le test du chi carré de Pearson, de William Gosset qui est le père de la distribution t de Student et de Ronald Fisher qui a paraphé l'hypothèse nulle et le test de signification.
 
 Un *test d'hypothèse* est un moyen d'évaluer certaines preuves par rapport à l'énoncé par défaut concernant une population. Nous appelons l'énoncé par défaut l'*hypothèse nulle* $H_0$, que nous essayons de rejeter en utilisant les données observées. Ici, nous utilisons $H_0$ comme point de départ pour le test de signification statistique. L'hypothèse *alternative* $H_A$ (ou $H_1$) est une affirmation contraire à l'hypothèse nulle. Une hypothèse nulle est souvent énoncée sous une forme déclarative qui postule une relation entre les variables. Elle doit refléter le mémoire de manière aussi explicite que possible, et être testable par la théorie des statistiques.
 
@@ -291,7 +291,7 @@ La *signification statistique* mesure la probabilité de rejeter par erreur l'hy
 
 $$ \text{statistical significance }= 1 - \alpha = 1 - P(\text{reject } H_0 \mid H_0 \text{ is true} ).$$ 
 
- Elle est également appelée erreur de *type I* ou *faux positif*. La valeur $\alpha$ est appelée le *niveau de signification* et sa valeur couramment utilisée est $5\%$, c'est-à-dire $1-\alpha = 95\%$. Le niveau de signification peut être expliqué comme le niveau de risque que nous sommes prêts à prendre, lorsque nous rejetons une hypothèse nulle vraie.
+Elle est également appelée erreur de *type I* ou *faux positif*. La valeur $\alpha$ est appelée le *niveau de signification* et sa valeur couramment utilisée est $5\%$, c'est-à-dire $1-\alpha = 95\%$. Le niveau de signification peut être expliqué comme le niveau de risque que nous sommes prêts à prendre, lorsque nous rejetons une hypothèse nulle vraie.
 
 :numref:`fig_statistical_significance` montre les valeurs des observations et la probabilité d'une distribution normale donnée dans un test d'hypothèse à deux échantillons. Si l'exemple de données d'observation est situé en dehors du seuil $95\%$, il s'agira d'une observation très improbable selon l'hypothèse nulle. Par conséquent, il y a peut-être quelque chose qui cloche avec l'hypothèse nulle et nous la rejetterons.
 
@@ -308,7 +308,7 @@ $$ \text{statistical power }= 1 - \beta = 1 - P(\text{ fail to reject } H_0  \mi
 Rappelons qu'une *erreur de type I* est une erreur causée par le rejet de l'hypothèse nulle alors qu'elle est vraie, tandis qu'une *erreur de type II* résulte de l'absence de rejet de l'hypothèse nulle alors qu'elle est fausse. Une erreur de type II est généralement désignée par $\beta$, et la puissance statistique correspondante est donc $1-\beta$.
 
 
- Intuitivement, la puissance statistique peut être interprétée comme la probabilité que notre test détecte un écart réel d'une certaine ampleur minimale à un niveau de signification statistique souhaité. $80\%$ est un seuil de puissance statistique couramment utilisé. Plus la puissance statistique est élevée, plus nous avons de chances de détecter de véritables différences.
+Intuitivement, la puissance statistique peut être interprétée comme la probabilité que notre test détecte un écart réel d'une certaine ampleur minimale à un niveau de signification statistique souhaité. $80\%$ est un seuil de puissance statistique couramment utilisé. Plus la puissance statistique est élevée, plus nous avons de chances de détecter de véritables différences.
 
 L'une des utilisations les plus courantes de la puissance statistique consiste à déterminer le nombre d'échantillons nécessaires.  La probabilité que vous rejetiez l'hypothèse nulle lorsqu'elle est fausse dépend du degré de fausseté (connu sous le nom de *taille de l'effet*) et du nombre d'échantillons dont vous disposez.  Comme vous pouvez vous y attendre, les petites tailles d'effet nécessitent un très grand nombre d'échantillons pour être détectables avec une forte probabilité.  Bien qu'il ne soit pas dans le cadre de cette brève annexe d'en donner les détails, à titre d'exemple, si nous voulons être en mesure de rejeter l'hypothèse nulle selon laquelle notre échantillon provient d'une gaussienne de moyenne zéro et de variance un, et que nous pensons que la moyenne de notre échantillon est en fait proche de un, nous pouvons le faire avec des taux d'erreur acceptables avec une taille d'échantillon de seulement $8$. Cependant, si nous pensons que la vraie moyenne de la population de notre échantillon est proche de $0.01$, il nous faudrait une taille d'échantillon de près de $80000$ pour détecter la différence.
 
@@ -328,7 +328,7 @@ La valeur $p$(ou la *valeur de probabilité*) est la probabilité que $T(X)$ soi
 
 $$ p\text{-value} = P_{H_0}(T(X) \geq T(x)).$$ 
 
- Si la valeur $p$ est inférieure ou égale à un niveau de signification statistique prédéfini et fixe $\alpha$, nous pouvons rejeter l'hypothèse nulle. Dans le cas contraire, nous conclurons que nous manquons de preuves pour rejeter l'hypothèse nulle. Pour une distribution de population donnée, la *région de rejet* sera l'intervalle contenant tous les points dont la valeur de $p$ est inférieure au niveau de signification statistique $\alpha$.
+Si la valeur $p$ est inférieure ou égale à un niveau de signification statistique prédéfini et fixe $\alpha$, nous pouvons rejeter l'hypothèse nulle. Dans le cas contraire, nous conclurons que nous manquons de preuves pour rejeter l'hypothèse nulle. Pour une distribution de population donnée, la *région de rejet* sera l'intervalle contenant tous les points dont la valeur de $p$ est inférieure au niveau de signification statistique $\alpha$.
 
 
 ### Test unilatéral et test bilatéral
@@ -354,7 +354,7 @@ Les tests d'hypothèse sont applicables dans une variété de scénarios tels qu
 ## Construction d'intervalles de confiance
 
 
- Lors de l'estimation de la valeur d'un paramètre $\theta$, les estimateurs ponctuels comme $\hat \theta$ sont d'une utilité limitée car ils ne contiennent aucune notion d'incertitude. Il serait plutôt préférable de pouvoir produire un intervalle qui contiendrait le véritable paramètre $\theta$ avec une forte probabilité.  Si vous étiez intéressé par ces idées il y a un siècle, vous auriez été enthousiasmé par la lecture de "Outline of a Theory of Statistical Estimation Based on the Classical Theory of Probability" de Jerzy Neyman :cite:`Neyman.1937` , qui a introduit pour la première fois le concept d'intervalle de confiance en 1937.
+Lors de l'estimation de la valeur d'un paramètre $\theta$, les estimateurs ponctuels comme $\hat \theta$ sont d'une utilité limitée car ils ne contiennent aucune notion d'incertitude. Il serait plutôt préférable de pouvoir produire un intervalle qui contiendrait le véritable paramètre $\theta$ avec une forte probabilité.  Si vous étiez intéressé par ces idées il y a un siècle, vous auriez été enthousiasmé par la lecture de "Outline of a Theory of Statistical Estimation Based on the Classical Theory of Probability" de Jerzy Neyman :cite:`Neyman.1937`, qui a introduit pour la première fois le concept d'intervalle de confiance en 1937.
 
 Pour être utile, un intervalle de confiance doit être aussi petit que possible pour un degré de certitude donné. Voyons comment le dériver.
 
@@ -364,9 +364,9 @@ Pour être utile, un intervalle de confiance doit être aussi petit que possible
 Mathématiquement, un *intervalle de confiance* pour le vrai paramètre $\theta$ est un intervalle $C_n$ qui est calculé à partir des données de l'échantillon de telle sorte que
 
 $$P_{\theta} (C_n \ni \theta) \geq 1 - \alpha, \forall \theta.$$ 
- :eqlabel:`eq_confidence` 
+:eqlabel:`eq_confidence` 
 
- Ici $\alpha \in (0, 1)$, et $1 - \alpha$ est appelé le *niveau de confiance* ou la *couverture* de l'intervalle. C'est le même $\alpha$ que le niveau de signification dont nous avons parlé plus haut.
+Ici $\alpha \in (0, 1)$, et $1 - \alpha$ est appelé le *niveau de confiance* ou la *couverture* de l'intervalle. C'est le même $\alpha$ que le niveau de signification dont nous avons parlé plus haut.
 
 Notez que :eqref:`eq_confidence` concerne la variable $C_n$, et non la variable fixe $\theta$. Pour le souligner, nous écrivons $P_{\theta} (C_n \ni \theta)$ plutôt que $P_{\theta} (\theta \in C_n)$.
 
@@ -374,7 +374,7 @@ Notez que :eqref:`eq_confidence` concerne la variable $C_n$, et non la variable 
 
 Il est très tentant d'interpréter un intervalle de confiance $95\%$ comme un intervalle dans lequel vous pouvez être $95\%$ sûr que le vrai paramètre se trouve, mais ce n'est malheureusement pas vrai.  Le vrai paramètre est fixe, et c'est l'intervalle qui est aléatoire.  Ainsi, une meilleure interprétation serait de dire que si vous générez un grand nombre d'intervalles de confiance par cette procédure, $95\%$ des intervalles générés contiendraient le vrai paramètre.
 
-Cela peut sembler pédant, mais cela peut avoir de réelles implications pour l'interprétation des résultats.  En particulier, nous pouvons satisfaire :eqref:`eq_confidence` en construisant des intervalles dont nous sommes *presque certains* qu'ils ne contiennent pas la vraie valeur, à condition de ne le faire qu'assez rarement.  Nous terminons cette section en fournissant trois affirmations tentantes mais fausses.  Vous trouverez une discussion approfondie de ces points sur :cite:`Morey.Hoekstra.Rouder.ea.2016` .
+Cela peut sembler pédant, mais cela peut avoir de réelles implications pour l'interprétation des résultats.  En particulier, nous pouvons satisfaire :eqref:`eq_confidence` en construisant des intervalles dont nous sommes *presque certains* qu'ils ne contiennent pas la vraie valeur, à condition de ne le faire qu'assez rarement.  Nous terminons cette section en fournissant trois affirmations tentantes mais fausses.  Vous trouverez une discussion approfondie de ces points sur :cite:`Morey.Hoekstra.Rouder.ea.2016`.
 
 * **Fallacy 1**. Des intervalles de confiance étroits signifient que nous pouvons estimer le paramètre avec précision.
 * **Erreur 2**. Les valeurs à l'intérieur de l'intervalle de confiance ont plus de chances d'être la vraie valeur que celles à l'extérieur de l'intervalle.
@@ -388,7 +388,7 @@ Examinons l'exemple le plus classique, l'intervalle de confiance pour la moyenne
 
 $$\hat\mu_n = \frac{1}{n}\sum_{i=1}^n x_i \;\text{and}\; \hat\sigma^2_n = \frac{1}{n-1}\sum_{i=1}^n (x_i - \hat\mu)^2.$$ 
 
- Si nous considérons maintenant la variable aléatoire
+Si nous considérons maintenant la variable aléatoire
 
 $$
 T = \frac{\hat\mu_n - \mu}{\hat\sigma_n/\sqrt{n}},
@@ -412,9 +412,9 @@ $$
 
 Nous savons donc que nous avons trouvé notre intervalle de confiance $95\%$:
 $$\left[\hat\mu_n - 1.96\frac{\hat\sigma_n}{\sqrt{n}}, \hat\mu_n + 1.96\frac{\hat\sigma_n}{\sqrt{n}}\right].$$ 
- :eqlabel:`eq_gauss_confidence` 
+:eqlabel:`eq_gauss_confidence` 
 
- On peut affirmer sans risque que :eqref:`eq_gauss_confidence` est l'une des formules les plus utilisées en statistiques.  Terminons notre discussion sur les statistiques en la mettant en œuvre.  Pour simplifier, nous supposons que nous sommes dans le régime asymptotique.  Les petites valeurs de $N$ doivent inclure la valeur correcte de `t_star` obtenue soit par programme, soit à partir d'une table $t$.
+On peut affirmer sans risque que :eqref:`eq_gauss_confidence` est l'une des formules les plus utilisées en statistiques.  Terminons notre discussion sur les statistiques en la mettant en œuvre.  Pour simplifier, nous supposons que nous sommes dans le régime asymptotique.  Les petites valeurs de $N$ doivent inclure la valeur correcte de `t_star` obtenue soit par programme, soit à partir d'une table $t$.
 
 ```{.python .input}
 #@tab mxnet
@@ -486,7 +486,7 @@ sigma_hat = tf.math.reduce_std(samples)
 
 1. Soit $X_1, X_2, \ldots, X_n \overset{\text{iid}}{\sim} \mathrm{Unif}(0, \theta)$, où "iid" signifie *indépendant et identiquement distribué*. Considérez les estimateurs suivants de $\theta$:
 $$\hat{\theta} = \max \{X_1, X_2, \ldots, X_n \};$$ 
- $$\tilde{\theta} = 2 \bar{X_n} = \frac{2}{n} \sum_{i=1}^n X_i.$$ 
+$$\tilde{\theta} = 2 \bar{X_n} = \frac{2}{n} \sum_{i=1}^n X_i.$$ 
 * Trouvez le biais statistique, l'écart type et l'erreur quadratique moyenne de $\hat{\theta}.$
 * Trouvez le biais statistique, l'écart type et l'erreur quadratique moyenne de $\tilde{\theta}.$
 * Quel est le meilleur estimateur ?

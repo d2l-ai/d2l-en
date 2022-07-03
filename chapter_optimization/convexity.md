@@ -6,7 +6,7 @@ Cela est dû en grande partie au fait qu'il est beaucoup plus facile d'analyser 
 En d'autres termes,
 si l'algorithme est peu performant même dans le cadre convexe,
 il ne faut généralement pas espérer obtenir de grands résultats dans le cas contraire. 
-En outre, même si les problèmes d'optimisation de l'apprentissage profond sont généralement non convexes, ils présentent souvent certaines propriétés des problèmes convexes à proximité des minima locaux. Cela peut conduire à de nouvelles variantes d'optimisation intéressantes telles que :cite:`Izmailov.Podoprikhin.Garipov.ea.2018` .
+En outre, même si les problèmes d'optimisation de l'apprentissage profond sont généralement non convexes, ils présentent souvent certaines propriétés des problèmes convexes à proximité des minima locaux. Cela peut conduire à de nouvelles variantes d'optimisation intéressantes telles que :cite:`Izmailov.Podoprikhin.Garipov.ea.2018`.
 
 ```{.python .input}
 #@tab mxnet
@@ -48,14 +48,14 @@ Les ensembles sont la base de la convexité. En termes simples, un ensemble $\ma
 
 $$\lambda  a + (1-\lambda)  b \in \mathcal{X} \text{ whenever } a, b \in \mathcal{X}.$$
 
-Cela semble un peu abstrait. Considérons :numref:`fig_pacman` . Le premier ensemble n'est pas convexe car il existe des segments de droite qui ne sont pas contenus dans cet ensemble.
+Cela semble un peu abstrait. Considérons :numref:`fig_pacman`. Le premier ensemble n'est pas convexe car il existe des segments de droite qui ne sont pas contenus dans cet ensemble.
 Les deux autres ensembles ne souffrent pas de ce problème.
 
 ![Le premier ensemble est non convexe et les deux autres sont convexes](../img/pacman.svg)
 :label:`fig_pacman` 
 
 Les définitions en elles-mêmes ne sont pas particulièrement utiles, sauf si vous pouvez en faire quelque chose.
-Dans ce cas, nous pouvons examiner les intersections, comme le montre :numref:`fig_convex_intersect` .
+Dans ce cas, nous pouvons examiner les intersections, comme le montre :numref:`fig_convex_intersect`.
 Supposons que $\mathcal{X}$ et $\mathcal{Y}$ soient des ensembles convexes. Alors $\mathcal{X} \cap \mathcal{Y}$ est également convexe. Pour s'en convaincre, on considère tout $a, b \in \mathcal{X} \cap \mathcal{Y}$. Puisque $\mathcal{X}$ et $\mathcal{Y}$ sont convexes, les segments de droite reliant $a$ et $b$ sont contenus à la fois dans $\mathcal{X}$ et $\mathcal{Y}$. Étant donné cela, ils doivent également être contenus dans $\mathcal{X} \cap \mathcal{Y}$, prouvant ainsi notre théorème.
 
 ![L'intersection entre deux ensembles convexes est convexe](../img/convex-intersect.svg)
@@ -246,7 +246,7 @@ est convexe si et seulement si pour tout $\mathbf{x}, \mathbf{y} \in \mathbb{R}^
 
 $$g(z) \stackrel{\mathrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y}) \text{ avec } z \in [0,1]$$ 
 
- est convexe.
+est convexe.
 
 Pour prouver que la convexité de $f$ implique que $g$ est convexe,
 nous pouvons montrer que pour tout $a, b, \lambda \in [0, 1]$ (donc
@@ -282,7 +282,7 @@ ceci est vrai si et seulement si
 $g'' = (\mathbf{x} - \mathbf{y})^\top \mathbf{H}(\mathbf{x} - \mathbf{y}) \geq 0$ ($\mathbf{H} \stackrel{\mathrm{def}}{=} \nabla^2f$)
 pour tous les $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$,
 ce qui est équivalent à $\mathbf{H} \succeq 0$
- selon la définition des matrices semi-définies positives.
+selon la définition des matrices semi-définies positives.
 
 
 ## Contraintes
@@ -309,20 +309,20 @@ peut être exprimé par le problème d'optimisation à point de selle suivant :
 
 $$L(\mathbf{x}, \alpha_1, \ldots, \alpha_n) = f(\mathbf{x}) + \sum_{i=1}^n \alpha_i c_i(\mathbf{x}) \text{ where } \alpha_i \geq 0.$$ 
 
- Ici, les variables $\alpha_i$ ($i=1,\ldots,n$) sont les *multiplicateurs de Lagrange* qui garantissent que les contraintes sont correctement appliquées. Elles sont choisies juste assez grandes pour garantir que $c_i(\mathbf{x}) \leq 0$ pour tout $i$. Par exemple, pour tout $\mathbf{x}$ où $c_i(\mathbf{x}) < 0$ naturellement, nous finirions par choisir $\alpha_i = 0$. De plus, il s'agit d'un problème d'optimisation à point de selle où l'on veut *maximiser* $L$ par rapport à tous les $\alpha_i$ et simultanément *minimiser* par rapport à $\mathbf{x}$. Il existe une abondante littérature expliquant comment arriver à la fonction $L(\mathbf{x}, \alpha_1, \ldots, \alpha_n)$. Pour nos besoins, il suffit de savoir que le point de selle de $L$ est l'endroit où le problème d'optimisation sous contrainte original est résolu de manière optimale.
+Ici, les variables $\alpha_i$ ($i=1,\ldots,n$) sont les *multiplicateurs de Lagrange* qui garantissent que les contraintes sont correctement appliquées. Elles sont choisies juste assez grandes pour garantir que $c_i(\mathbf{x}) \leq 0$ pour tout $i$. Par exemple, pour tout $\mathbf{x}$ où $c_i(\mathbf{x}) < 0$ naturellement, nous finirions par choisir $\alpha_i = 0$. De plus, il s'agit d'un problème d'optimisation à point de selle où l'on veut *maximiser* $L$ par rapport à tous les $\alpha_i$ et simultanément *minimiser* par rapport à $\mathbf{x}$. Il existe une abondante littérature expliquant comment arriver à la fonction $L(\mathbf{x}, \alpha_1, \ldots, \alpha_n)$. Pour nos besoins, il suffit de savoir que le point de selle de $L$ est l'endroit où le problème d'optimisation sous contrainte original est résolu de manière optimale.
 
 ### Pénalités
 
 Une façon de satisfaire les problèmes d'optimisation sous contraintes au moins *approximativement* est d'adapter le Lagrangien $L$. 
 Plutôt que de satisfaire $c_i(\mathbf{x}) \leq 0$, nous ajoutons simplement $\alpha_i c_i(\mathbf{x})$ à la fonction objectif $f(x)$. Cela garantit que les contraintes ne seront pas trop violées.
 
-En fait, nous utilisons cette astuce depuis le début. Considérons la décroissance du poids dans :numref:`sec_weight_decay` . Dans ce cas, nous ajoutons $\frac{\lambda}{2} \|\mathbf{w}\|^2$ à la fonction objectif pour nous assurer que $\mathbf{w}$ ne devient pas trop grand. Du point de vue de l'optimisation sous contrainte, nous pouvons voir que cela garantira que $\|\mathbf{w}\|^2 - r^2 \leq 0$ pour un certain rayon $r$. L'ajustement de la valeur de $\lambda$ nous permet de faire varier la taille de $\mathbf{w}$.
+En fait, nous utilisons cette astuce depuis le début. Considérons la décroissance du poids dans :numref:`sec_weight_decay`. Dans ce cas, nous ajoutons $\frac{\lambda}{2} \|\mathbf{w}\|^2$ à la fonction objectif pour nous assurer que $\mathbf{w}$ ne devient pas trop grand. Du point de vue de l'optimisation sous contrainte, nous pouvons voir que cela garantira que $\|\mathbf{w}\|^2 - r^2 \leq 0$ pour un certain rayon $r$. L'ajustement de la valeur de $\lambda$ nous permet de faire varier la taille de $\mathbf{w}$.
 
 En général, l'ajout de pénalités est un bon moyen de garantir la satisfaction approximative des contraintes. En pratique, cela s'avère être beaucoup plus robuste que la satisfaction exacte. En outre, pour les problèmes non convexes, de nombreuses propriétés qui rendent l'approche exacte si attrayante dans le cas convexe (par exemple, l'optimalité) ne tiennent plus.
 
 ### Projections
 
-Les projections constituent une autre stratégie de satisfaction des contraintes. Là encore, nous les avons déjà rencontrées, par exemple, lors du traitement de l'écrêtage du gradient dans :numref:`sec_rnn-scratch` . Dans ce cas, nous nous sommes assurés qu'un gradient avait une longueur limitée par $\theta$ via
+Les projections constituent une autre stratégie de satisfaction des contraintes. Là encore, nous les avons déjà rencontrées, par exemple, lors du traitement de l'écrêtage du gradient dans :numref:`sec_rnn-scratch`. Dans ce cas, nous nous sommes assurés qu'un gradient avait une longueur limitée par $\theta$ via
 
 $$\mathbf{g} \leftarrow \mathbf{g} \cdot \mathrm{min}(1, \theta/\|\mathbf{g}\|).$$ 
 
@@ -330,12 +330,12 @@ $$\mathbf{g} \leftarrow \mathbf{g} \cdot \mathrm{min}(1, \theta/\|\mathbf{g}\|).
 
 $$\mathrm{Proj}_\mathcal{X}(\mathbf{x}) = \mathop{\mathrm{argmin}}_{\mathbf{x}' \in \mathcal{X}} \|\mathbf{x} - \mathbf{x}'\|,$$ 
 
- qui est le point de $\mathcal{X}$ le plus proche de $\mathbf{x}$. 
+qui est le point de $\mathcal{X}$ le plus proche de $\mathbf{x}$. 
 
 ![Convex Projections.](../img/projections.svg) 
 :label:`fig_projections` 
 
- La définition mathématique des projections peut sembler un peu abstraite. :numref:`fig_projections` l'explique un peu plus clairement. Dans ce document, nous avons deux ensembles convexes, un cercle et un diamant. 
+La définition mathématique des projections peut sembler un peu abstraite. :numref:`fig_projections` l'explique un peu plus clairement. Dans ce document, nous avons deux ensembles convexes, un cercle et un diamant. 
 Les points à l'intérieur des deux ensembles (jaune) restent inchangés pendant les projections. 
 Les points à l'extérieur des deux ensembles (noirs) sont projetés sur 
 les points à l'intérieur des ensembles (rouges) qui sont proches des points originaux (noirs).
@@ -343,7 +343,7 @@ Bien que pour $\ell_2$ boules, la direction reste inchangée, ce n'est pas forc�
 
 
 L'une des utilisations des projections convexes consiste à calculer des vecteurs de poids épars. Dans ce cas, nous projetons les vecteurs de poids sur une boule $\ell_1$,
-qui est une version généralisée du cas du diamant dans :numref:`fig_projections` .
+qui est une version généralisée du cas du diamant dans :numref:`fig_projections`.
 
 
 ## Résumé
@@ -365,7 +365,7 @@ Dans le contexte de l'apprentissage profond, le principal objectif des fonctions
 1. Dénotez par $\mathcal{B}_p[r] \stackrel{\mathrm{def}}{=} \{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \text{ and } \|\mathbf{x}\|_p \leq r\}$ la boule de rayon $r$ en utilisant la norme $p$. Prouvez que $\mathcal{B}_p[r]$ est convexe pour tout $p \geq 1$.
 1. Étant donné les fonctions convexes $f$ et $g$, montrez que $\mathrm{max}(f, g)$ est également convexe. Prouvez que $\mathrm{min}(f, g)$ n'est pas convexe.
 1. Prouvez que la normalisation de la fonction softmax est convexe. Plus précisément, prouvez la convexité de
- $f(x) = \log \sum_i \exp(x_i)$ .
+$f(x) = \log \sum_i \exp(x_i)$ .
 1. Prouvez que les sous-espaces linéaires, c'est-à-dire $\mathcal{X} = \{\mathbf{x} | \mathbf{W} \mathbf{x} = \mathbf{b}\}$, sont des ensembles convexes.
 1. Prouvez que dans le cas de sous-espaces linéaires avec $\mathbf{b} = \mathbf{0}$, la projection $\mathrm{Proj}_\mathcal{X}$ peut être écrite sous la forme $\mathbf{M} \mathbf{x}$ pour une certaine matrice $\mathbf{M}$.
 1. Montrez que pour les fonctions convexes deux fois différentiables $f$, on peut écrire $f(x + \epsilon) = f(x) + \epsilon f'(x) + \frac{1}{2} \epsilon^2 f''(x + \xi)$ pour une certaine $\xi \in [0, \epsilon]$.

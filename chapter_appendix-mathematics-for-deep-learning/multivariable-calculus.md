@@ -1,15 +1,15 @@
 ## Calcul multivariable
 :label:`sec_multivariable_calculus` 
 
- Maintenant que nous avons une compréhension assez forte des dérivées d'une fonction d'une seule variable, revenons à notre question initiale où nous considérions une fonction de perte de potentiellement des milliards de poids.
+Maintenant que nous avons une compréhension assez forte des dérivées d'une fonction d'une seule variable, revenons à notre question initiale où nous considérions une fonction de perte de potentiellement des milliards de poids.
 
 ## Différenciation en dimension supérieure
 Ce que :numref:`sec_single_variable_calculus` nous dit, c'est que si nous changeons un seul de ces milliards de poids en laissant tous les autres fixes, nous savons ce qui va se passer !  Ce n'est rien de plus qu'une fonction d'une seule variable, nous pouvons donc écrire
 
 $$L(w_1+\epsilon_1, w_2, \ldots, w_N) \approx L(w_1, w_2, \ldots, w_N) + \epsilon_1 \frac{d}{dw_1} L(w_1, w_2, \ldots, w_N).$$ 
- :eqlabel:`eq_part_der` 
+:eqlabel:`eq_part_der` 
 
- Nous appellerons la dérivée dans une variable tout en fixant les autres variables la *dérivée partielle*, et nous utiliserons la notation $\frac{\partial}{\partial w_1}$ pour la dérivée dans :eqref:`eq_part_der` .
+Nous appellerons la dérivée dans une variable tout en fixant les autres variables la *dérivée partielle*, et nous utiliserons la notation $\frac{\partial}{\partial w_1}$ pour la dérivée dans :eqref:`eq_part_der`.
 
 Maintenant, prenons ceci et changeons un peu $w_2$ en $w_2 + \epsilon_2$:
 
@@ -26,7 +26,7 @@ L(w_1+\epsilon_1, w_2+\epsilon_2, \ldots, w_N) & \approx L(w_1, w_2+\epsilon_2, 
 \end{aligned}
 $$
 
-Nous avons à nouveau utilisé l'idée que $\epsilon_1\epsilon_2$ est un terme d'ordre supérieur que nous pouvons écarter de la même manière que nous avons pu écarter $\epsilon^{2}$ dans la section précédente, avec ce que nous avons vu dans :eqref:`eq_part_der` . En continuant de cette manière, nous pouvons écrire que
+Nous avons à nouveau utilisé l'idée que $\epsilon_1\epsilon_2$ est un terme d'ordre supérieur que nous pouvons écarter de la même manière que nous avons pu écarter $\epsilon^{2}$ dans la section précédente, avec ce que nous avons vu dans :eqref:`eq_part_der`. En continuant de cette manière, nous pouvons écrire que
 
 $$
 L(w_1+\epsilon_1, w_2+\epsilon_2, \ldots, w_N+\epsilon_N) \approx L(w_1, w_2, \ldots, w_N) + \sum_i \epsilon_i \frac{\partial}{\partial w_i} L(w_1, w_2, \ldots, w_N).
@@ -42,9 +42,9 @@ $$
 alors
 
 $$L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).$$ 
- :eqlabel:`eq_nabla_use` 
+:eqlabel:`eq_nabla_use` 
 
- Nous appellerons le vecteur $\nabla_{\mathbf{w}} L$ le *gradient* de $L$.
+Nous appellerons le vecteur $\nabla_{\mathbf{w}} L$ le *gradient* de $L$.
 
 L'équation :eqref:`eq_nabla_use` mérite que l'on s'y attarde un instant.  Elle a exactement le même format que celui que nous avons rencontré en une dimension, à ceci près que nous avons tout converti en vecteurs et produits scalaires.  Elle nous permet de dire approximativement comment la fonction $L$ changera en cas de perturbation de l'entrée.  Comme nous le verrons dans la section suivante, cela nous fournira un outil important pour comprendre géométriquement comment nous pouvons apprendre en utilisant les informations contenues dans le gradient.
 
@@ -144,14 +144,14 @@ $$
 L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).
 $$
 
-Supposons que je veuille l'utiliser pour aider à minimiser notre perte $L$.  Comprenons géométriquement l'algorithme de descente de gradient décrit pour la première fois dans :numref:`sec_autograd` . Voici ce que nous allons faire :
+Supposons que je veuille l'utiliser pour aider à minimiser notre perte $L$.  Comprenons géométriquement l'algorithme de descente de gradient décrit pour la première fois dans :numref:`sec_autograd`. Voici ce que nous allons faire :
 
 1. Commençons par un choix aléatoire des paramètres initiaux $\mathbf{w}$.
 2. Trouvez la direction $\mathbf{v}$ qui fait que $L$ diminue le plus rapidement à $\mathbf{w}$.
 3. Faites un petit pas dans cette direction : $\mathbf{w} \rightarrow \mathbf{w} + \epsilon\mathbf{v}$.
 4. Répétez.
 
-La seule chose que nous ne savons pas exactement comment faire est de calculer le vecteur $\mathbf{v}$ dans la deuxième étape.  Nous appellerons une telle direction la *direction de la descente la plus abrupte*.  En utilisant la compréhension géométrique des produits scalaires de :numref:`sec_geometry-linear-algebraic-ops` , nous voyons que nous pouvons réécrire :eqref:`eq_nabla_use` comme suit
+La seule chose que nous ne savons pas exactement comment faire est de calculer le vecteur $\mathbf{v}$ dans la deuxième étape.  Nous appellerons une telle direction la *direction de la descente la plus abrupte*.  En utilisant la compréhension géométrique des produits scalaires de :numref:`sec_geometry-linear-algebraic-ops`, nous voyons que nous pouvons réécrire :eqref:`eq_nabla_use` comme suit
 
 $$
 L(\mathbf{w} + \mathbf{v}) \approx L(\mathbf{w}) + \mathbf{v}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}) = L(\mathbf{w}) + \|\nabla_{\mathbf{w}} L(\mathbf{w})\|\cos(\theta).
@@ -227,9 +227,9 @@ Cela met en évidence un fait important à connaître lorsque l'on travaille de 
 Supposons que nous ayons une fonction de quatre variables ($w, x, y$ et $z$) que nous pouvons obtenir en composant de nombreux termes :
 
 $$\begin{aligned}f(u, v) & = (u+v)^{2} \\u(a, b) & = (a+b)^{2}, \qquad v(a, b) = (a-b)^{2}, \\a(w, x, y, z) & = (w+x+y+z)^{2}, \qquad b(w, x, y, z) = (w+x-y-z)^2.\end{aligned}$$ 
- :eqlabel:`eq_multi_func_def` 
+:eqlabel:`eq_multi_func_def` 
 
- De telles chaînes d'équations sont courantes lorsque l'on travaille avec des réseaux neuronaux ; il est donc essentiel de comprendre comment calculer les gradients de telles fonctions.  Nous pouvons commencer à voir des indices visuels de cette connexion dans :numref:`fig_chain-1` si nous examinons les variables directement liées les unes aux autres.
+De telles chaînes d'équations sont courantes lorsque l'on travaille avec des réseaux neuronaux ; il est donc essentiel de comprendre comment calculer les gradients de telles fonctions.  Nous pouvons commencer à voir des indices visuels de cette connexion dans :numref:`fig_chain-1` si nous examinons les variables directement liées les unes aux autres.
 
 ![The function relations above where nodes represent values and edges show functional dependence.](../img/chain-net1.svg)
 :label:`fig_chain-1`
@@ -271,7 +271,7 @@ $$
 
 Il est utile de réfléchir à la signification de ce processus. Nous essayons de comprendre comment une fonction de la forme $f(u(a, b), v(a, b))$ change de valeur en fonction d'une modification de $a$.  Il y a deux chemins par lesquels cela peut se produire : il y a le chemin où $a \rightarrow u \rightarrow f$ et celui où $a \rightarrow v \rightarrow f$.  Nous pouvons calculer ces deux contributions via la règle de la chaîne : $\frac{\partial w}{\partial u} \cdot \frac{\partial u}{\partial x}$ et $\frac{\partial w}{\partial v} \cdot \frac{\partial v}{\partial x}$ respectivement, et les additionner.
 
-Imaginons que nous ayons un autre réseau de fonctions où les fonctions de droite dépendent de celles qui sont connectées à celles de gauche, comme le montre :numref:`fig_chain-2` .
+Imaginons que nous ayons un autre réseau de fonctions où les fonctions de droite dépendent de celles qui sont connectées à celles de gauche, comme le montre :numref:`fig_chain-2`.
 
 ![Another more subtle example of the chain rule.](../img/chain-net2.svg)
 :label:`fig_chain-2`
@@ -494,9 +494,9 @@ $$
 Ceci est traditionnellement assemblé dans une matrice appelée le *Hessian* :
 
 $$\mathbf{H}_f = \begin{bmatrix} \frac{d^2f}{dx_1dx_1} & \cdots & \frac{d^2f}{dx_1dx_n} \\ \vdots & \ddots & \vdots \\ \frac{d^2f}{dx_ndx_1} & \cdots & \frac{d^2f}{dx_ndx_n} \\ \end{bmatrix}.$$ 
- :eqlabel:`eq_hess_def` 
+:eqlabel:`eq_hess_def` 
 
- Toutes les entrées de cette matrice ne sont pas indépendantes.  En effet, nous pouvons montrer que tant que les deux *dérivées partielles mixtes* (dérivées partielles par rapport à plus d'une variable) existent et sont continues, nous pouvons dire que pour tout $i$, et $j$,
+Toutes les entrées de cette matrice ne sont pas indépendantes.  En effet, nous pouvons montrer que tant que les deux *dérivées partielles mixtes* (dérivées partielles par rapport à plus d'une variable) existent et sont continues, nous pouvons dire que pour tout $i$, et $j$,
 
 $$
 \frac{d^2f}{dx_idx_j} = \frac{d^2f}{dx_jdx_i}.
@@ -506,7 +506,7 @@ Il suffit de considérer que l'on perturbe d'abord une fonction dans la directio
 
 Comme pour les variables simples, nous pouvons utiliser ces dérivées pour avoir une bien meilleure idée du comportement de la fonction près d'un point.  En particulier, nous pouvons les utiliser pour trouver la quadratique la mieux adaptée près d'un point $\mathbf{x}_0$, comme nous l'avons vu pour une variable unique.
 
-Voyons un exemple.  Supposons que $f(x_1, x_2) = a + b_1x_1 + b_2x_2 + c_{11}x_1^{2} + c_{12}x_1x_2 + c_{22}x_2^{2}$.  Il s'agit de la forme générale d'une quadratique à deux variables.  Si nous examinons la valeur de la fonction, son gradient et son hessien :eqref:`eq_hess_def` , tous situés au point zéro :
+Voyons un exemple.  Supposons que $f(x_1, x_2) = a + b_1x_1 + b_2x_2 + c_{11}x_1^{2} + c_{12}x_1x_2 + c_{22}x_2^{2}$.  Il s'agit de la forme générale d'une quadratique à deux variables.  Si nous examinons la valeur de la fonction, son gradient et son hessien :eqref:`eq_hess_def`, tous situés au point zéro :
 
 $$
 \begin{aligned}
@@ -622,7 +622,7 @@ ax.set_zlim(-1, 1)
 ax.dist = 12
 ```
 
-Ceci constitue la base de l'algorithme de Newton abordé sur :numref:`sec_gd` , où nous effectuons une optimisation numérique en trouvant par itération la quadratique la mieux adaptée, puis en minimisant exactement cette quadratique.
+Ceci constitue la base de l'algorithme de Newton abordé sur :numref:`sec_gd`, où nous effectuons une optimisation numérique en trouvant par itération la quadratique la mieux adaptée, puis en minimisant exactement cette quadratique.
 
 ## Un peu de calcul matriciel
 Les dérivées de fonctions impliquant des matrices s'avèrent particulièrement intéressantes.  Cette section peut devenir lourde en termes de notation, et peut donc être sautée lors d'une première lecture, mais il est utile de savoir comment les dérivées de fonctions impliquant des opérations matricielles courantes sont souvent beaucoup plus propres que ce que l'on pourrait initialement prévoir, en particulier compte tenu de l'importance des opérations matricielles dans les applications d'apprentissage profond.
@@ -682,7 +682,7 @@ Ceci illustre quelques facteurs concernant le calcul matriciel que nous contrero
 Pour continuer à développer l'intuition, essayons un calcul un peu plus difficile.  Supposons que nous disposions d'un vecteur colonne $\mathbf{x}$ et d'une matrice carrée $A$ et que nous voulions calculer
 
 $$\frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}).$$ 
- :eqlabel:`eq_mat_goal_1` 
+:eqlabel:`eq_mat_goal_1` 
 
  . Pour faciliter la manipulation de la notation, considérons ce problème en utilisant la notation d'Einstein.  Dans ce cas, nous pouvons écrire la fonction comme suit
 
@@ -745,9 +745,9 @@ De manière équivalente, $\frac{d}{dx}(ax^2) = 2ax = (a+a)x$.  Là encore, nous
 Essayons cela.  Supposons que $\mathbf{X}$ soit une matrice $n \times m$, $\mathbf{U}$ une matrice $n \times r$ et $\mathbf{V}$ une matrice $r \times m$. Essayons de calculer
 
 $$\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2} = \;?$$ 
- :eqlabel:`eq_mat_goal_2` 
+:eqlabel:`eq_mat_goal_2` 
 
- Ce calcul est important dans un domaine appelé factorisation de matrice.  Pour nous, cependant, il s'agit simplement d'une dérivée à calculer.  Essayons d'imaginer ce que ce serait pour les matrices $1\times1$.  Dans ce cas, nous obtenons l'expression
+Ce calcul est important dans un domaine appelé factorisation de matrice.  Pour nous, cependant, il s'agit simplement d'une dérivée à calculer.  Essayons d'imaginer ce que ce serait pour les matrices $1\times1$.  Dans ce cas, nous obtenons l'expression
 
 $$
 \frac{d}{dv} (x-uv)^{2}= -2(x-uv)u,

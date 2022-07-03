@@ -205,7 +205,7 @@ Les valeurs des pixels individuels sont en général très éloignées des valeu
 Ainsi, si l'on calcule la distance entre l'image originale et l'image plus sombre,
 la distance peut être grande.
 Cependant, pour la plupart des applications ML, le *contenu* est le même - il s'agit toujours de
-l'image d'un chat pour un classificateur chat/chien.
+l'image d'un chat pour un classifieur chat/chien.
 Cependant, si nous considérons l'angle, il n'est pas difficile de voir
 que pour tout vecteur $\mathbf{v}$, l'angle
 entre $\mathbf{v}$ et $0.1\cdot\mathbf{v}$ est nul.
@@ -499,7 +499,7 @@ Si nous suivons cette logique avec attention,
 par exemple en considérant la grille de toutes les paires de points entiers,
 nous constatons que la multiplication matricielle
 peut incliner, faire pivoter et mettre à l'échelle la grille,
-mais la structure de la grille doit rester telle que vous la voyez sur :numref:`fig_grid-transform` .
+mais la structure de la grille doit rester telle que vous la voyez sur :numref:`fig_grid-transform`.
 
 ![The matrix $\mathbf{A}$ acting on the given basis vectors.  Notice how the entire grid is transported along with it.](../img/grid-transform.svg)
 :label:`fig_grid-transform`
@@ -529,7 +529,7 @@ car nous ne saurons jamais d'où vient le vecteur $[1,2]^\top$ - est-ce que
 Bien que cette image concerne une matrice $2\times2$,
 rien ne nous empêche de transposer les leçons apprises à des dimensions supérieures.
 Si nous prenons des vecteurs de base similaires comme $[1,0, \ldots,0]$
- et que nous voyons où notre matrice les envoie,
+et que nous voyons où notre matrice les envoie,
 nous pouvons commencer à avoir une idée de la façon dont la multiplication matricielle
 déforme l'espace entier dans n'importe quel espace de dimension avec lequel nous travaillons.
 
@@ -548,13 +548,13 @@ La question qui se pose maintenant est la suivante : existe-t-il un moyen de dé
 simplement en regardant la matrice elle-même ?
 La réponse est qu'en effet, nous le pouvons.
 Prenons $\mathbf{b}_1 = [2,4]^\top$ et $\mathbf{b}_2 = [-1, -2]^\top$
- comme les deux colonnes de $\mathbf{B}$.
+comme les deux colonnes de $\mathbf{B}$.
 Rappelez-vous que nous pouvons écrire tout ce qui est transformé par la matrice $\mathbf{B}$
- comme une somme pondérée des colonnes de la matrice :
+comme une somme pondérée des colonnes de la matrice :
 comme $a_1\mathbf{b}_1 + a_2\mathbf{b}_2$.
 Nous appelons cela une *combinaison linéaire*.
 Le fait que $\mathbf{b}_1 = -2\cdot\mathbf{b}_2$
- signifie que nous pouvons écrire toute combinaison linéaire de ces deux colonnes
+signifie que nous pouvons écrire toute combinaison linéaire de ces deux colonnes
 entièrement en termes de disons $\mathbf{b}_2$ puisque
 
 $$
@@ -601,7 +601,7 @@ Dans la section précédente, nous avons noté qu'une dépendance linéaire
 témoigne de la compression de l'espace dans une dimension inférieure
 et nous pourrons donc utiliser cela pour définir la notion de rang.
 En particulier, le rang d'une matrice $\mathbf{A}$
- est le plus grand nombre de colonnes linéairement indépendantes
+est le plus grand nombre de colonnes linéairement indépendantes
 parmi tous les sous-ensembles de colonnes. Par exemple, la matrice
 
 $$
@@ -845,7 +845,7 @@ que $n\times n$ les matrices mettent à l'échelle $n$-dimensions.
 
 ## Tenseurs et opérations courantes d'algèbre linéaire
 
-Dans :numref:`sec_linear-algebra` , nous avons introduit le concept de tenseurs.
+Dans :numref:`sec_linear-algebra`, nous avons introduit le concept de tenseurs.
 Dans cette section, nous allons nous plonger plus profondément dans les contractions tensorielles
 (l'équivalent tensoriel de la multiplication matricielle),
 et voir comment elles peuvent fournir une vue unifiée
@@ -863,10 +863,10 @@ ou de manière équivalente
 
 $$ c_{i, j} = \sum_{k} a_{i, k}b_{k, j}.$$ 
 
- Nous pouvons répéter ce schéma pour les tenseurs.
+Nous pouvons répéter ce schéma pour les tenseurs.
 Pour les tenseurs, il n'y a pas de cas unique sur lequel
-additionner qui puisse être choisi universellement,
-. Nous devons donc spécifier exactement les indices sur lesquels nous voulons additionner.
+additionner qui puisse être choisi universellement.
+Nous devons donc spécifier exactement les indices sur lesquels nous voulons additionner.
 Par exemple, nous pourrions considérer
 
 $$
@@ -879,8 +879,8 @@ que la seule multiplication matricielle.
 
 Pour simplifier la notation,
 nous pouvons remarquer que la somme porte exactement sur les indices
-qui apparaissent plus d'une fois dans l'expression,
-. Les gens travaillent donc souvent avec la *notation d'Einstein*,
+qui apparaissent plus d'une fois dans l'expression.
+Les gens travaillent donc souvent avec la *notation d'Einstein*,
 où la somme porte implicitement sur tous les indices répétés.
 On obtient ainsi l'expression compacte :
 
@@ -899,11 +899,11 @@ que nous avons vues auparavant peuvent être exprimées dans cette notation tens
 * $(\mathbf{A}\mathbf{B})_{ik} = \sum_j a_{ij}b_{jk}$
 * $\mathrm{tr}(\mathbf{A}) = \sum_i a_{ii}$
 
- De cette façon, nous pouvons remplacer une myriade de notations spécialisées par des expressions tensorielles courtes.
+De cette façon, nous pouvons remplacer une myriade de notations spécialisées par des expressions tensorielles courtes.
 
 ### Expression dans le code
 Les tenseurs peuvent également être utilisés de manière flexible dans le code.
-Comme nous l'avons vu dans :numref:`sec_linear-algebra` ,
+Comme nous l'avons vu dans :numref:`sec_linear-algebra`,
 nous pouvons créer des tenseurs comme indiqué ci-dessous.
 
 ```{.python .input}
@@ -966,8 +966,8 @@ tf.einsum("ij, j -> i", A, v), tf.matmul(A, tf.reshape(v, (2, 1)))
 ```
 
 Il s'agit d'une notation très flexible.
-Par exemple, si nous voulons calculer
-, ce qui s'écrit traditionnellement comme suit
+Par exemple, si nous voulons calculer,
+ce qui s'écrit traditionnellement comme suit
 
 $$
 c_{kl} = \sum_{ij} \mathbf{b}_{ijk}\mathbf{a}_{il}v_j.

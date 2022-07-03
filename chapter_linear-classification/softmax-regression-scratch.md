@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Implémentation de la régression softmax à partir de zéro
 :label:`sec_softmax_scratch` 
 
- La régression softmax étant si fondamentale,
+La régression softmax étant si fondamentale,
 nous pensons que vous devez savoir
 comment l'implémenter vous-même.
 Ici, nous nous limitons à définir les aspects spécifiques à
@@ -41,7 +41,7 @@ le mappage des scalaires en probabilités.
 Pour vous rafraîchir la mémoire, rappelez-vous le fonctionnement de l'opérateur de somme
 le long de dimensions spécifiques dans un tenseur,
 comme nous l'avons vu dans :numref:`subsec_lin-alg-reduction` 
- et :numref:`subsec_lin-alg-non-reduction` .
+et :numref:`subsec_lin-alg-non-reduction`.
 [**Étant donné une matrice `X`, nous pouvons faire la somme de tous les éléments (par défaut) ou seulement
 des éléments du même axe.**]
 La variable `axis` nous permet de calculer les sommes de lignes et de colonnes :
@@ -118,10 +118,10 @@ doit être égal au nombre de classes.
 (**Puisque notre ensemble de données comporte 10 classes,
 notre réseau a une dimension de sortie de 10.**)
 Par conséquent, nos poids constituent une matrice $784 \times 10$
- plus un vecteur ligne de dimension $1 \times 10$ pour les biais.
+plus un vecteur ligne de dimension $1 \times 10$ pour les biais.
 Comme pour la régression linéaire,
 nous initialisons les poids `W`
- avec un bruit gaussien.
+avec un bruit gaussien.
 Les biais sont initialisés avec des zéros.
 
 ```{.python .input}
@@ -169,7 +169,7 @@ Le code ci-dessous définit comment le réseau
 fait correspondre chaque entrée à une sortie.
 Notez que nous aplatissons chaque image de $28 \times 28$ pixels dans le lot
 en un vecteur en utilisant `reshape`
- avant de faire passer les données dans notre modèle.
+avant de faire passer les données dans notre modèle.
 
 ```{.python .input}
 %%tab all
@@ -197,8 +197,8 @@ En particulier, le codage à un coup dans $\mathbf{y}$
 
 Pour voir cela en action, nous [**créons des données échantillons `y_hat` avec 2 exemples de probabilités prédites sur 3 classes et leurs étiquettes correspondantes `y`.**]
 Les étiquettes correctes sont respectivement $1$ et $2$.
-[**En utilisant `y` comme indices des probabilités dans `y_hat`,**]
-, nous pouvons sélectionner les termes efficacement.
+[**En utilisant `y` comme indices des probabilités dans `y_hat`,**],
+ nous pouvons sélectionner les termes efficacement.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -247,16 +247,16 @@ Notez que le nombre d'époques (`max_epochs`),
 la taille des minibatchs (`batch_size`),
 et le taux d'apprentissage (`lr`)
 sont des hyperparamètres ajustables.
-Cela signifie que, bien que ces valeurs ne soient pas apprises au cours de notre boucle d'apprentissage primaire (
-),
-elles influencent néanmoins les performances (
-) de notre modèle, par rapport à l'apprentissage (
-) et aux performances de généralisation.
+Cela signifie que, bien que ces valeurs ne soient pas apprises au cours de notre boucle d'apprentissage primaire ,
+
+elles influencent néanmoins les performances 
+de notre modèle, par rapport à l'apprentissage 
+et aux performances de généralisation.
 Dans la pratique, vous voudrez choisir ces valeurs
 en fonction de la répartition *validation* des données
 et évaluer ensuite votre modèle final
 sur la répartition *test*.
-Comme nous l'avons vu à l'adresse :numref:`subsec_generalization-model-selection` ,
+Comme nous l'avons vu à l'adresse :numref:`subsec_generalization-model-selection`,
 nous traiterons les données de test de Fashion-MNIST
 comme l'ensemble de validation, et nous rapporterons donc
 la perte de validation et la précision de validation
@@ -310,7 +310,7 @@ de manière beaucoup plus efficace.
 
 ## Exercices
 
-1. Dans cette section, nous avons directement implémenté la fonction softmax en nous basant sur la définition mathématique de l'opération softmax. Comme nous l'avons vu dans :numref:`sec_softmax` , cela peut provoquer des instabilités numériques.
+1. Dans cette section, nous avons directement implémenté la fonction softmax en nous basant sur la définition mathématique de l'opération softmax. Comme nous l'avons vu dans :numref:`sec_softmax`, cela peut provoquer des instabilités numériques.
    1. Testez si `softmax` fonctionne toujours correctement si une entrée a une valeur de $100$?
  1. Testez si `softmax` fonctionne toujours correctement si la plus grande de toutes les entrées est inférieure à $-100$?
  1. Implémentez un correctif en regardant la valeur relative à la plus grande entrée dans l'argument.

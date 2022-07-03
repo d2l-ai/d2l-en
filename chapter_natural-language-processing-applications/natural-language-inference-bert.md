@@ -2,21 +2,21 @@
 :label:`sec_natural-language-inference-bert` 
 
  
- Dans les sections précédentes de ce chapitre,
+Dans les sections précédentes de ce chapitre,
 nous avons conçu une architecture basée sur l'attention
 (dans :numref:`sec_natural-language-inference-attention` )
 pour la tâche d'inférence en langage naturel
 sur l'ensemble de données SNLI (comme décrit dans :numref:`sec_natural-language-inference-and-dataset` ).
 Nous revisitons maintenant cette tâche en ajustant BERT.
-Comme nous l'avons vu dans :numref:`sec_finetuning-bert` ,
+Comme nous l'avons vu dans :numref:`sec_finetuning-bert`,
 l'inférence en langage naturel est un problème de classification de paires de textes au niveau de la séquence,
 et le réglage fin de BERT ne nécessite qu'une architecture MLP supplémentaire,
-comme illustré dans :numref:`fig_nlp-map-nli-bert` .
+comme illustré dans :numref:`fig_nlp-map-nli-bert`.
 
 ![This section feeds pretrained BERT to an MLP-based architecture for natural language inference.](../img/nlp-map-nli-bert.svg) 
 :label:`fig_nlp-map-nli-bert` 
 
- Dans cette section,
+Dans cette section,
 nous allons télécharger une petite version pré-entraînée de BERT,
 puis la régler finement
 pour l'inférence en langage naturel sur le jeu de données SNLI.
@@ -48,7 +48,7 @@ import os
 Nous avons expliqué comment prétraîner BERT sur le jeu de données WikiText-2 dans
 :numref:`sec_bert-dataset` et :numref:`sec_bert-pretraining` 
  (notez que le modèle BERT original est prétraîné sur des corpus beaucoup plus importants).
-Comme nous l'avons vu dans :numref:`sec_bert-pretraining` ,
+Comme nous l'avons vu dans :numref:`sec_bert-pretraining`,
 le modèle original de BERT a des centaines de millions de paramètres.
 Dans ce qui suit,
 nous fournissons deux versions de BERT pré-entraîné :
@@ -130,7 +130,7 @@ Pour la tâche en aval d'inférence en langage naturel sur le jeu de données SN
 nous définissons une classe de jeu de données personnalisée `SNLIBERTDataset`.
 Dans chaque exemple,
 la prémisse et l'hypothèse forment une paire de séquences de texte
-et sont regroupées dans une séquence d'entrée BERT, comme illustré sur :numref:`fig_bert-two-seqs` .
+et sont regroupées dans une séquence d'entrée BERT, comme illustré sur :numref:`fig_bert-two-seqs`.
 Rappelons que :numref:`subsec_bert_input_rep` que les ID de segment
 sont utilisés pour distinguer la prémisse et l'hypothèse dans une séquence d'entrée d'ORET.
 Avec la longueur maximale prédéfinie d'une séquence d'entrée d'ORET (`max_len`),
@@ -284,7 +284,7 @@ test_iter = torch.utils.data.DataLoader(test_set, batch_size,
 
 ## Réglage fin de BERT
 
-Comme l'indique :numref:`fig_bert-two-seqs` ,
+Comme l'indique :numref:`fig_bert-two-seqs`,
 réglage fin de BERT pour l'inférence en langage naturel
 ne nécessite qu'un MLP supplémentaire composé de deux couches entièrement connectées
 (voir `self.hidden` et `self.output` dans la classe suivante `BERTClassifier` ).
@@ -344,16 +344,16 @@ net = BERTClassifier(bert)
 
 Rappelons que
 dans :numref:`sec_bert` 
- la classe `MaskLM` et la classe `NextSentencePred`
- ont des paramètres dans leurs MLP employés.
+la classe `MaskLM` et la classe `NextSentencePred`
+ont des paramètres dans leurs MLP employés.
 Ces paramètres font partie de ceux du modèle BERT pré-entraîné
-`bert` , et donc des paramètres de `net`.
+`bert`, et donc des paramètres de `net`.
 Cependant, ces paramètres servent uniquement à calculer
 la perte de modélisation du langage masqué
 et la perte de prédiction de la phrase suivante
 pendant le pré-entraînement.
-Ces deux fonctions de perte ne sont pas pertinentes pour le réglage fin des applications en aval,
-. Ainsi, les paramètres des MLP utilisés dans 
+Ces deux fonctions de perte ne sont pas pertinentes pour le réglage fin des applications en aval.
+Ainsi, les paramètres des MLP utilisés dans 
 `MaskLM` et `NextSentencePred` ne sont pas mis à jour lors du réglage fin de BERT.
 
 Pour autoriser les paramètres dont les gradients sont périmés,

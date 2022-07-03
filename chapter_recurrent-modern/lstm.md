@@ -1,10 +1,10 @@
 # Mémoire à long terme et à court terme (LSTM)
 :label:`sec_lstm` 
 
- Le défi de traiter la préservation des informations à long terme et le saut d'entrée à court terme
+Le défi de traiter la préservation des informations à long terme et le saut d'entrée à court terme
 dans les modèles de variables latentes existe depuis longtemps. L'une des premières approches
 à relever ce défi a été la mémoire à long terme (LSTM)
- :cite:`Hochreiter.Schmidhuber.1997` . Elle partage de nombreuses propriétés de l'URG
+ :cite:`Hochreiter.Schmidhuber.1997`. Elle partage de nombreuses propriétés de l'URG
 .
 Il est intéressant de noter que les LSTM ont une conception légèrement plus complexe
 que les GRU, mais qu'elles sont antérieures aux GRU de près de deux décennies.
@@ -20,8 +20,8 @@ qui a la même forme que l'état caché
 (certaines littératures considèrent la cellule mémoire
 comme un type spécial d'état caché),
 conçue pour enregistrer des informations supplémentaires.
-Pour contrôler la cellule mémoire
-, nous avons besoin d'un certain nombre de portes.
+Pour contrôler la cellule mémoire,
+ nous avons besoin d'un certain nombre de portes.
 Une porte est nécessaire pour lire les entrées de la cellule
 .
 Nous l'appellerons la porte de sortie * de
@@ -44,7 +44,7 @@ Tout comme dans les GRU,
 les données qui alimentent les portes LSTM sont
 l'entrée au pas de temps actuel et
 l'état caché du pas de temps précédent,
-comme illustré dans :numref:`fig_lstm_0` .
+comme illustré dans :numref:`fig_lstm_0`.
 Elles sont traitées par
 trois couches entièrement connectées avec une fonction d'activation sigmoïde pour calculer les valeurs de
 les portes d'entrée, d'oubli et de sortie.
@@ -54,10 +54,10 @@ sont comprises entre $(0, 1)$.
 ![Computing the input gate, the forget gate, and the output gate in an LSTM model.](../img/lstm-0.svg) 
 :label:`fig_lstm_0` 
 
- Mathématiquement,
+Mathématiquement,
 supposons qu'il y ait $h$ unités cachées, que la taille du lot soit $n$, et que le nombre d'entrées soit $d$.
 Ainsi, l'entrée est $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ et l'état caché du pas de temps précédent est $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. En conséquence, les portes au pas de temps $t$
- sont définies comme suit : la porte d'entrée est $\mathbf{I}_t \in \mathbb{R}^{n \times h}$, la porte d'oubli est $\mathbf{F}_t \in \mathbb{R}^{n \times h}$, et la porte de sortie est $\mathbf{O}_t \in \mathbb{R}^{n \times h}$. Elles sont calculées comme suit :
+sont définies comme suit : la porte d'entrée est $\mathbf{I}_t \in \mathbb{R}^{n \times h}$, la porte d'oubli est $\mathbf{F}_t \in \mathbb{R}^{n \times h}$, et la porte de sortie est $\mathbf{O}_t \in \mathbb{R}^{n \times h}$. Elles sont calculées comme suit :
 
 $$
 \begin{aligned}
@@ -75,9 +75,9 @@ Nous concevons ensuite la cellule de mémoire. Comme nous n'avons pas encore sp�
 
 $$\tilde{\mathbf{C}}_t = \text{tanh}(\mathbf{X}_t \mathbf{W}_{xc} + \mathbf{H}_{t-1} \mathbf{W}_{hc} + \mathbf{b}_c),$$ 
 
- où $\mathbf{W}_{xc} \in \mathbb{R}^{d \times h}$ et $\mathbf{W}_{hc} \in \mathbb{R}^{h \times h}$ sont des paramètres de poids et $\mathbf{b}_c \in \mathbb{R}^{1 \times h}$ est un paramètre de biais.
+où $\mathbf{W}_{xc} \in \mathbb{R}^{d \times h}$ et $\mathbf{W}_{hc} \in \mathbb{R}^{h \times h}$ sont des paramètres de poids et $\mathbf{b}_c \in \mathbb{R}^{1 \times h}$ est un paramètre de biais.
 
-Une illustration rapide de la cellule mémoire candidate est présentée dans :numref:`fig_lstm_1` .
+Une illustration rapide de la cellule mémoire candidate est présentée dans :numref:`fig_lstm_1`.
 
 ![Computing the candidate memory cell in an LSTM model.](../img/lstm-1.svg)
 :label:`fig_lstm_1`
@@ -90,11 +90,11 @@ dans les LSTM, nous disposons de deux portes dédiées à ces fins : la porte d'
 
 $$\mathbf{C}_t = \mathbf{F}_t \odot \mathbf{C}_{t-1} + \mathbf{I}_t \odot \tilde{\mathbf{C}}_t.$$ 
 
- Si la porte d'oubli est toujours approximativement à 1 et la porte d'entrée toujours approximativement à 0, les cellules de mémoire passées $\mathbf{C}_{t-1}$ seront sauvegardées au fil du temps et transmises au pas de temps actuel.
+Si la porte d'oubli est toujours approximativement à 1 et la porte d'entrée toujours approximativement à 0, les cellules de mémoire passées $\mathbf{C}_{t-1}$ seront sauvegardées au fil du temps et transmises au pas de temps actuel.
 Cette conception est introduite pour atténuer le problème du gradient évanescent et pour mieux capturer
 les dépendances à long terme dans les séquences.
 
-Nous arrivons ainsi au diagramme de flux dans :numref:`fig_lstm_2` .
+Nous arrivons ainsi au diagramme de flux dans :numref:`fig_lstm_2`.
 
 ![Computing the memory cell in an LSTM model.](../img/lstm-2.svg)
 
@@ -123,7 +123,7 @@ Chaque fois que la porte de sortie s'approche de 1, nous transmettons effectivem
 ## Implémentation à partir de zéro
 
 Implémentons maintenant un LSTM à partir de zéro.
-Comme pour les expériences de :numref:`sec_rnn-scratch` ,
+Comme pour les expériences de :numref:`sec_rnn-scratch`,
 nous chargeons d'abord *The Time Machine* dataset.
 
 ```{.python .input}
@@ -212,7 +212,7 @@ def forward(self, inputs, H_C=None):
 
 ### [**Training**] et Prediction
 
-Entraînons un LSTM de la même manière que nous l'avons fait dans :numref:`sec_gru` , en instanciant la classe `RNNLMScratch` comme introduit dans :numref:`sec_rnn-scratch` .
+Entraînons un LSTM de la même manière que nous l'avons fait dans :numref:`sec_gru`, en instanciant la classe `RNNLMScratch` comme introduit dans :numref:`sec_rnn-scratch`.
 
 ```{.python .input}
 %%tab all

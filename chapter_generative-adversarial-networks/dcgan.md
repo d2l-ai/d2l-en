@@ -1,9 +1,9 @@
 # Deep Convolutional Generative Adversarial Networks
 :label:`sec_dcgan` 
 
- Dans :numref:`sec_basic_gan` , nous avons présenté les idées de base sur le fonctionnement des GAN. Nous avons montré qu'ils peuvent tirer des échantillons d'une distribution simple et facile à échantillonner, comme une distribution uniforme ou normale, et les transformer en échantillons qui semblent correspondre à la distribution d'un ensemble de données. Et si notre exemple de correspondance avec une distribution gaussienne 2D a permis de faire passer le message, il n'est pas particulièrement passionnant.
+Dans :numref:`sec_basic_gan`, nous avons présenté les idées de base sur le fonctionnement des GAN. Nous avons montré qu'ils peuvent tirer des échantillons d'une distribution simple et facile à échantillonner, comme une distribution uniforme ou normale, et les transformer en échantillons qui semblent correspondre à la distribution d'un ensemble de données. Et si notre exemple de correspondance avec une distribution gaussienne 2D a permis de faire passer le message, il n'est pas particulièrement passionnant.
 
-Dans cette section, nous allons montrer comment vous pouvez utiliser les GAN pour générer des images photoréalistes. Nous baserons nos modèles sur les GANs convolutifs profonds (DCGAN) présentés sur :cite:`Radford.Metz.Chintala.2015` . Nous emprunterons l'architecture convolutive qui s'est avérée si efficace pour les problèmes discriminatifs de vision par ordinateur et montrerons comment, par le biais des GAN, elle peut être exploitée pour générer des images photoréalistes.
+Dans cette section, nous allons montrer comment vous pouvez utiliser les GAN pour générer des images photoréalistes. Nous baserons nos modèles sur les GANs convolutifs profonds (DCGAN) présentés sur :cite:`Radford.Metz.Chintala.2015`. Nous emprunterons l'architecture convolutive qui s'est avérée si efficace pour les problèmes discriminatifs de vision par ordinateur et montrerons comment, par le biais des GAN, elle peut être exploitée pour générer des images photoréalistes.
 
 ```{.python .input}
 #@tab mxnet
@@ -139,7 +139,7 @@ for X, y in data_iter.take(1):
 
 ## Le générateur
 
-Le générateur doit faire correspondre la variable de bruit $\mathbf z\in\mathbb R^d$, un vecteur de longueur$d$, à une image RVB dont la largeur et la hauteur sont $64\times 64$. Dans :numref:`sec_fcn` , nous avons présenté le réseau entièrement convolutif qui utilise une couche de convolution transposée (voir :numref:`sec_transposed_conv` ) pour agrandir la taille de l'entrée. Le bloc de base du générateur contient une couche de convolution transposée suivie d'une normalisation par lots et d'une activation ReLU.
+Le générateur doit faire correspondre la variable de bruit $\mathbf z\in\mathbb R^d$, un vecteur de longueur$d$, à une image RVB dont la largeur et la hauteur sont $64\times 64$. Dans :numref:`sec_fcn`, nous avons présenté le réseau entièrement convolutif qui utilise une couche de convolution transposée (voir :numref:`sec_transposed_conv` ) pour agrandir la taille de l'entrée. Le bloc de base du générateur contient une couche de convolution transposée suivie d'une normalisation par lots et d'une activation ReLU.
 
 ```{.python .input}
 #@tab mxnet
@@ -316,7 +316,7 @@ Le discriminateur est un réseau convolutif normal sauf qu'il utilise un ReLU fu
 
 $$\textrm{leaky ReLU}(x) = \begin{cases}x & \text{if}\ x > 0\\ \alpha x &\text{otherwise}\end{cases}.$$ 
 
- Comme on peut le voir, il s'agit d'une ReLU normale si $\alpha=0$, et d'une fonction d'identité si $\alpha=1$. Pour $\alpha \in (0, 1)$, la ReLU fuyante est une fonction non linéaire qui donne une sortie non nulle pour une entrée négative. Elle vise à résoudre le problème du "ReLU mourant", qui fait qu'un neurone peut toujours produire une valeur négative et ne peut donc pas progresser puisque le gradient de ReLU est égal à 0.
+Comme on peut le voir, il s'agit d'une ReLU normale si $\alpha=0$, et d'une fonction d'identité si $\alpha=1$. Pour $\alpha \in (0, 1)$, la ReLU fuyante est une fonction non linéaire qui donne une sortie non nulle pour une entrée négative. Elle vise à résoudre le problème du "ReLU mourant", qui fait qu'un neurone peut toujours produire une valeur négative et ne peut donc pas progresser puisque le gradient de ReLU est égal à 0.
 
 ```{.python .input}
 #@tab mxnet,pytorch
@@ -381,7 +381,7 @@ class D_block(tf.keras.layers.Layer):
         return self.activation(self.batch_norm(self.conv2d(X)))
 ```
 
-Un bloc de base avec des paramètres par défaut divisera par deux la largeur et la hauteur des entrées, comme nous l'avons démontré dans :numref:`sec_padding` . Par exemple, étant donné une forme d'entrée $n_h = n_w = 16$, avec une forme de noyau $k_h = k_w = 4$, une forme de bande $s_h = s_w = 2$, et une forme de remplissage $p_h = p_w = 1$, la forme de sortie sera :
+Un bloc de base avec des paramètres par défaut divisera par deux la largeur et la hauteur des entrées, comme nous l'avons démontré dans :numref:`sec_padding`. Par exemple, étant donné une forme d'entrée $n_h = n_w = 16$, avec une forme de noyau $k_h = k_w = 4$, une forme de bande $s_h = s_w = 2$, et une forme de remplissage $p_h = p_w = 1$, la forme de sortie sera :
 
 $$
 \begin{aligned}
@@ -474,7 +474,7 @@ net_D(x).shape
 
 ## Formation
 
-Par rapport au GAN de base dans :numref:`sec_basic_gan` , nous utilisons le même taux d'apprentissage pour le générateur et le discriminateur car ils sont similaires l'un à l'autre. De plus, nous changeons $\beta_1$ dans Adam (:numref:`sec_adam` ) de $0.9$ à $0.5$. Cela diminue la douceur du momentum, la moyenne mobile pondérée exponentiellement des gradients passés, pour prendre en charge les gradients qui changent rapidement parce que le générateur et le discriminateur se battent entre eux. De plus, le bruit généré aléatoirement `Z` est un tenseur 4-D et nous utilisons le GPU pour accélérer le calcul.
+Par rapport au GAN de base dans :numref:`sec_basic_gan`, nous utilisons le même taux d'apprentissage pour le générateur et le discriminateur car ils sont similaires l'un à l'autre. De plus, nous changeons $\beta_1$ dans Adam (:numref:`sec_adam` ) de $0.9$ à $0.5$. Cela diminue la douceur du momentum, la moyenne mobile pondérée exponentiellement des gradients passés, pour prendre en charge les gradients qui changent rapidement parce que le générateur et le discriminateur se battent entre eux. De plus, le bruit généré aléatoirement `Z` est un tenseur 4-D et nous utilisons le GPU pour accélérer le calcul.
 
 ```{.python .input}
 #@tab mxnet

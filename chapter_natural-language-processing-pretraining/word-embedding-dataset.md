@@ -1,12 +1,12 @@
 # Le jeu de données pour le pré-entraînement des incorporations de mots
 :label:`sec_word2vec_data` 
 
- Maintenant que nous connaissons les détails techniques de 
+Maintenant que nous connaissons les détails techniques de 
 les modèles word2vec et les méthodes d'entraînement approximatives,
 nous allons passer en revue leurs implémentations. 
 Plus précisément,
 nous prendrons comme exemple le modèle de saut de programme dans :numref:`sec_word2vec` 
- et l'échantillonnage négatif dans :numref:`sec_approx_train` 
+et l'échantillonnage négatif dans :numref:`sec_approx_train` 
  .
 Dans cette section,
 nous commençons par l'ensemble de données
@@ -90,8 +90,8 @@ ils peuvent même apparaître des milliards de fois dans
 de très grands corpus.
 Cependant,
 ces mots cooccurrent souvent
-avec de nombreux mots différents dans les fenêtres de contexte
-, fournissant ainsi peu de signaux utiles.
+avec de nombreux mots différents dans les fenêtres de contexte,
+fournissant ainsi peu de signaux utiles.
 Par exemple,
 considérons le mot "chip" dans une fenêtre de contexte :
 intuitivement,
@@ -102,17 +102,17 @@ la cooccurrence avec un mot à haute fréquence "a".
 En outre, l'apprentissage avec de grandes quantités de mots (à haute fréquence)
 est lent.
 Ainsi, lors de l'entrainement de modèles d'intégration de mots, 
-les mots à haute fréquence peuvent être *sous-échantillonnés* :cite:`Mikolov.Sutskever.Chen.ea.2013` .
+les mots à haute fréquence peuvent être *sous-échantillonnés* :cite:`Mikolov.Sutskever.Chen.ea.2013`.
 Plus précisément, 
 chaque mot indexé $w_i$ 
- dans l'ensemble de données sera écarté avec une probabilité de
+dans l'ensemble de données sera écarté avec une probabilité de
 
 
- $$ P(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$ 
+$$ P(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$ 
 
- où $f(w_i)$ est le rapport entre 
+où $f(w_i)$ est le rapport entre 
 le nombre de mots $w_i$
- et le nombre total de mots dans l'ensemble de données, 
+et le nombre total de mots dans l'ensemble de données, 
 et la constante $t$ est un hyperparamètre
 ($10^{-4}$ dans l'expérience). 
 Nous pouvons voir que ce n'est que lorsque
@@ -190,12 +190,12 @@ corpus[:3]
 ## Extraction des mots centraux et des mots de contexte
 
 
- La fonction suivante `get_centers_and_contexts`
- extrait tous les 
+La fonction suivante `get_centers_and_contexts`
+extrait tous les 
 mots centraux et leurs mots de contexte
 de `corpus`.
 Elle échantillonne uniformément un entier entre 1 et `max_window_size`
- au hasard comme taille de la fenêtre de contexte.
+au hasard comme taille de la fenêtre de contexte.
 Pour tout mot central,
 les mots 
 dont la distance par rapport à lui
@@ -280,7 +280,7 @@ class RandomGenerator:
 
 Par exemple, 
 nous pouvons tirer 10 variables aléatoires $X$
- parmi les indices 1, 2 et 3
+parmi les indices 1, 2 et 3
 avec des probabilités d'échantillonnage $P(X=1)=2/9, P(X=2)=3/9$, et $P(X=3)=4/9$ comme suit.
 
 ```{.python .input}
@@ -293,11 +293,11 @@ Pour une paire de mot central et de mot de contexte,
 nous échantillonnons aléatoirement `K` (5 dans l'expérience) mots de bruit. Conformément aux suggestions du document word2vec,
 la probabilité d'échantillonnage $P(w)$ de 
 un mot de bruit $w$
- est 
+est 
 fixé à sa fréquence relative 
 dans le dictionnaire
 élevé à 
-la puissance de 0,75 :cite:`Mikolov.Sutskever.Chen.ea.2013` .
+la puissance de 0,75 :cite:`Mikolov.Sutskever.Chen.ea.2013`.
 
 ```{.python .input}
 #@tab all
@@ -325,7 +325,7 @@ all_negatives = get_negatives(all_contexts, vocab, counter, 5)
 ## Chargement des exemples d'entraînement en minibatchs
 :label:`subsec_word2vec-minibatch-loading` 
 
- Après que
+Après que
 tous les mots centraux
 ainsi que leurs
 mots de contexte et mots de bruit échantillonnés aient été extraits,
@@ -342,8 +342,8 @@ et ses mots de contexte $n_i$ et mots de bruit $m_i$.
 En raison des différentes tailles de fenêtre de contexte,
 $n_i+m_i$ varie pour différents $i$.
 Ainsi,
-pour chaque exemple
-, nous concaténons ses mots de contexte et ses mots de bruit dans 
+pour chaque exemple,
+ nous concaténons ses mots de contexte et ses mots de bruit dans 
 la variable `contexts_negatives`,
 et remplissons de zéros jusqu'à ce que la longueur de concaténation
 atteigne $\max_i n_i+m_i$ (`max_len`).

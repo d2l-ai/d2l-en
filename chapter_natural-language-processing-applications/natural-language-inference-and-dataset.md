@@ -1,7 +1,7 @@
 # L'inférence en langage naturel et le jeu de données
 :label:`sec_natural-language-inference-and-dataset` 
 
- Dans :numref:`sec_sentiment` , nous avons abordé le problème de l'analyse des sentiments.
+Dans :numref:`sec_sentiment`, nous avons abordé le problème de l'analyse des sentiments.
 Cette tâche vise à classer une séquence de texte unique dans des catégories prédéfinies,
 telles qu'un ensemble de polarités de sentiments.
 Cependant, lorsqu'il est nécessaire de décider si une phrase peut être déduite d'une autre, 
@@ -48,7 +48,7 @@ Pour étudier ce problème, nous commencerons par examiner un ensemble de donné
 
 ## Le Stanford Natural Language Inference (SNLI) Dataset
 
-[**Stanford Natural Language Inference (SNLI) Corpus**] est une collection de plus de 500000 paires de phrases anglaises étiquetées :cite:`Bowman.Angeli.Potts.ea.2015` .
+[**Stanford Natural Language Inference (SNLI) Corpus**] est une collection de plus de 500000 paires de phrases anglaises étiquetées :cite:`Bowman.Angeli.Potts.ea.2015`.
 Nous téléchargeons et stockons le jeu de données SNLI extrait dans le chemin `../data/snli_1.0`.
 
 ```{.python .input}

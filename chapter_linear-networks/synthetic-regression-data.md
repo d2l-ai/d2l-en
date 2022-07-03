@@ -7,7 +7,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 :label:`sec_synthetic-regression-data` 
 
  
- L'apprentissage automatique consiste à extraire des informations des données.
+L'apprentissage automatique consiste à extraire des informations des données.
 Vous pourriez donc vous demander ce que nous pourrions apprendre des données synthétiques
 Bien que nous puissions ne pas nous soucier intrinsèquement des modèles 
 que nous avons nous-mêmes intégrés dans un modèle de génération de données artificielles,
@@ -50,7 +50,7 @@ L'extrait de code suivant génère 1000 exemples
 avec des caractéristiques bidimensionnelles tirées 
 d'une distribution normale standard.
 La matrice de conception résultante $\mathbf{X}$
- appartient à $\mathbb{R}^{1000 \times 2}$. 
+appartient à $\mathbb{R}^{1000 \times 2}$. 
 Nous générons chaque étiquette en appliquant 
 une fonction linéaire *vérité terrain*, 
 corrompue par un bruit additif $\epsilon$, 
@@ -60,9 +60,9 @@ tiré indépendamment et identiquement pour chaque exemple :
 
 Par commodité, nous supposons que $\epsilon$ est tiré 
 d'une distribution normale avec la moyenne $\mu= 0$ 
- et l'écart type $\sigma = 0.01$.
-Notez que pour une conception orientée objet
-, nous ajoutons le code à la méthode `__init__` d'une sous-classe de `d2l.DataModule` (présentée dans :numref:`oo-design-data` ). 
+et l'écart type $\sigma = 0.01$.
+Notez que pour une conception orientée objet,
+ nous ajoutons le code à la méthode `__init__` d'une sous-classe de `d2l.DataModule` (présentée dans :numref:`oo-design-data` ). 
 Une bonne pratique consiste à permettre la définition de tout hyperparamètre supplémentaire. 
 Nous y parvenons avec `save_hyperparameters()`. 
 L'adresse `batch_size` sera déterminée ultérieurement.
@@ -134,8 +134,8 @@ def get_dataloader(self, train):
             yield tf.gather(self.X, j), tf.gather(self.y, j)
 ```
 
-Pour construire une certaine intuition, inspectons le premier minibatch de données
-. Chaque mini lot de caractéristiques nous fournit à la fois sa taille et la dimensionnalité des caractéristiques d'entrée.
+Pour construire une certaine intuition, inspectons le premier minibatch de données.
+Chaque mini lot de caractéristiques nous fournit à la fois sa taille et la dimensionnalité des caractéristiques d'entrée.
 De même, notre minilot d'étiquettes aura une forme correspondante donnée par `batch_size`.
 
 ```{.python .input}
@@ -146,7 +146,7 @@ print('X shape:', X.shape, '\ny shape:', y.shape)
 
 Bien qu'apparemment inoffensive, l'invocation de 
 de `iter(data.train_dataloader())` 
- illustre la puissance de la conception orientée objet de Python. 
+illustre la puissance de la conception orientée objet de Python. 
 Notez que nous avons ajouté une méthode à la classe `SyntheticRegressionData`
 *après* avoir créé l'objet `data`. 
 Néanmoins, l'objet bénéficie de 
@@ -243,7 +243,7 @@ Nous allons en faire bon usage dans la section suivante.
 1. Que se passe-t-il si le nombre d'exemples ne peut pas être divisé par la taille du lot. Comment changer ce comportement en spécifiant un argument différent en utilisant l'API du framework ?
 1. Que se passe-t-il si nous voulons générer un énorme ensemble de données, où la taille du vecteur de paramètres `w` et le nombre d'exemples `num_examples` sont tous deux importants ? 
     1. Que se passe-t-il si nous ne pouvons pas contenir toutes les données en mémoire ?
-   1. Comment mélanger les données si elles sont stockées sur le disque ? Votre tâche consiste à concevoir un algorithme *efficace* qui ne nécessite pas trop de lectures ou d'écritures aléatoires. Conseil : [pseudorandom permutation generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) vous permet de concevoir un remaniement sans avoir besoin de stocker explicitement la table de permutation :cite:`Naor.Reingold.1999` . 
+   1. Comment mélanger les données si elles sont stockées sur le disque ? Votre tâche consiste à concevoir un algorithme *efficace* qui ne nécessite pas trop de lectures ou d'écritures aléatoires. Conseil : [pseudorandom permutation generators](https://en.wikipedia.org/wiki/Pseudorandom_permutation) vous permet de concevoir un remaniement sans avoir besoin de stocker explicitement la table de permutation :cite:`Naor.Reingold.1999`. 
 1. Implémentez un générateur de données qui produit de nouvelles données à la volée, chaque fois que l'itérateur est appelé. 
 1. Comment concevriez-vous un générateur de données aléatoires qui génère *les mêmes* données à chaque fois qu'il est appelé ?
 

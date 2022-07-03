@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Weight Decay
 :label:`sec_weight_decay` 
 
- Maintenant que nous avons caractérisé le problème de l'overfitting,
+Maintenant que nous avons caractérisé le problème de l'overfitting,
 nous pouvons introduire notre première technique de *régularisation*.
 Rappelons que nous pouvons toujours atténuer l'overfitting
 en collectant davantage de données d'entraînement.
@@ -27,18 +27,18 @@ En effet, la limitation du nombre de caractéristiques
 est une technique populaire pour atténuer l'overfitting.
 Cependant, le simple fait d'écarter les caractéristiques
 peut s'avérer un instrument trop brutal.
-Si l'on s'en tient à l'exemple de la régression polynomiale
-, examinons ce qui pourrait se passer
+Si l'on s'en tient à l'exemple de la régression polynomiale,
+examinons ce qui pourrait se passer
 avec des données d'entrée à haute dimension.
 Les extensions naturelles des polynômes
 aux données multivariées sont appelées *monomiales*,
 qui sont simplement des produits de puissances de variables.
 Le degré d'un monôme est la somme des puissances.
 Par exemple, $x_1^2 x_2$, et $x_3 x_5^2$
- sont tous deux des monômes de degré 3.
+sont tous deux des monômes de degré 3.
 
 Notez que le nombre de termes de degré $d$
- augmente rapidement lorsque $d$ devient plus grand.
+augmente rapidement lorsque $d$ devient plus grand.
 Étant donné $k$ variables, le nombre de monômes
 de degré $d$ (c'est-à-dire $k$ multichoose $d$) est ${k - 1 + d} \choose {k - 1}$.
 Même de petits changements de degré, par exemple de $2$ à $3$,
@@ -74,10 +74,10 @@ sont consacrées à l'étude de ces questions.
 Une interprétation simple pourrait être
 de mesurer la complexité d'une fonction linéaire
 $f(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}$ 
- par une certaine norme de son vecteur de poids, par exemple, $\| \mathbf{w} \|^2$.
+par une certaine norme de son vecteur de poids, par exemple, $\| \mathbf{w} \|^2$.
 Rappelons que nous avons introduit la norme $\ell_2$ et la norme $\ell_1$,
 qui sont des cas particuliers de la norme plus générale $\ell_p$
- dans :numref:`subsec_lin-algebra-norms` .
+dans :numref:`subsec_lin-algebra-norms`.
 La méthode la plus courante pour garantir un petit vecteur de poids
 consiste à ajouter sa norme comme terme de pénalité
 au problème de minimisation de la perte.
@@ -88,7 +88,7 @@ par un nouvel objectif,
 Maintenant, si notre vecteur de poids devient trop grand,
 notre algorithme d'apprentissage pourrait se concentrer
 sur la minimisation de la norme de poids $\| \mathbf{w} \|^2$
- plutôt que sur la minimisation de l'erreur de formation.
+plutôt que sur la minimisation de l'erreur de formation.
 C'est exactement ce que nous voulons.
 Pour illustrer les choses en code,
 nous reprenons notre exemple précédent
@@ -97,9 +97,9 @@ Dans cet exemple, notre perte était donnée par
 
 $$L(\mathbf{w}, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$ 
 
- Rappelez-vous que $\mathbf{x}^{(i)}$ sont les caractéristiques,
+Rappelez-vous que $\mathbf{x}^{(i)}$ sont les caractéristiques,
 $y^{(i)}$ est l'étiquette pour tout exemple de données $i$, et $(\mathbf{w}, b)$
- sont les paramètres de poids et de biais, respectivement.
+sont les paramètres de poids et de biais, respectivement.
 Pour pénaliser la taille du vecteur de poids,
 nous devons d'une manière ou d'une autre ajouter $\| \mathbf{w} \|^2$ à la fonction de perte,
 mais comment le modèle doit-il échanger la perte standard
@@ -112,7 +112,7 @@ que nous ajustons à l'aide de données de validation :
 $$L(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2.$$ 
 
  
- Pour $\lambda = 0$, nous récupérons notre fonction de perte originale.
+Pour $\lambda = 0$, nous récupérons notre fonction de perte originale.
 Pour $\lambda > 0$, nous limitons la taille de $\| \mathbf{w} \|$.
 Nous divisons par $2$ par convention :
 lorsque nous prenons la dérivée d'une fonction quadratique,
@@ -129,7 +129,7 @@ la somme des dérivées est égale à la dérivée de la somme.
 
 
 De plus, vous pourriez vous demander pourquoi nous travaillons avec la norme $\ell_2$
- en premier lieu et pas, disons, avec la norme $\ell_1$.
+en premier lieu et pas, disons, avec la norme $\ell_1$.
 En fait, d'autres choix sont valables et
 populaires dans les statistiques.
 Alors que les modèles linéaires régularisés $\ell_2$ constituent
@@ -138,7 +138,7 @@ $\ell_1$ la régression linéaire régularisée
 est une méthode tout aussi fondamentale en statistique, 
 communément appelée *régression lasso*.
 L'une des raisons de travailler avec la norme $\ell_2$
- est qu'elle impose une pénalité trop importante
+est qu'elle impose une pénalité trop importante
 sur les grandes composantes du vecteur de poids.
 Cela oriente notre algorithme d'apprentissage
 vers des modèles qui distribuent le poids de manière égale
@@ -154,7 +154,7 @@ Par exemple, si notre modèle ne repose que sur quelques caractéristiques,
 nous n'aurons peut-être pas besoin de collecter, stocker ou transmettre des données
 pour les autres caractéristiques (abandonnées). 
 
-En utilisant la même notation que dans :eqref:`eq_linreg_batch_update` ,
+En utilisant la même notation que dans :eqref:`eq_linreg_batch_update`,
 les mises à jour de la descente de gradient stochastique en minibatch
 pour $\ell_2$-suivre la régression régularisée :
 
@@ -175,9 +175,9 @@ pour ajuster la complexité d'une fonction.
 Les plus petites valeurs de $\lambda$ correspondent à
 à des $\mathbf{w}$,
 moins contraints, tandis que les plus grandes valeurs de $\lambda$
- contraignent $\mathbf{w}$ plus considérablement.
+contraignent $\mathbf{w}$ plus considérablement.
 L'inclusion ou non d'une pénalité de biais correspondante $b^2$ 
- peut varier selon les implémentations, 
+peut varier selon les implémentations, 
 et peut varier selon les couches d'un réseau neuronal.
 Souvent, nous ne régularisons pas le terme de biais.
 Par ailleurs,
@@ -229,7 +229,7 @@ avec une moyenne de zéro et un écart type de 0,01.
 À des fins d'illustration, 
 nous pouvons accentuer les effets de l'ajustement excessif,
 en augmentant la dimensionnalité de notre problème à $d = 200$
- et en travaillant avec un petit ensemble d'apprentissage de seulement 20 exemples.
+et en travaillant avec un petit ensemble d'apprentissage de seulement 20 exemples.
 
 ```{.python .input  n=5}
 %%tab all
@@ -273,7 +273,7 @@ def l2_penalty(w):
 ### Définition du modèle
 
 Dans le modèle final,
-la régression linéaire et la perte au carré n'ont pas changé depuis :numref:`sec_linear_scratch` ,
+la régression linéaire et la perte au carré n'ont pas changé depuis :numref:`sec_linear_scratch`,
 ; nous nous contenterons donc de définir une sous-classe de `d2l.LinearRegressionScratch`. Le seul changement ici est que notre perte inclut désormais le terme de pénalité.
 
 ```{.python .input  n=7}
@@ -348,8 +348,8 @@ l'hyperparamètre de décroissance de poids directement
 Par défaut, Gluon décompose simultanément les poids et les biais de
 .
 Notez que l'hyperparamètre `wd`
- sera multiplié par `wd_mult`
- lors de la mise à jour des paramètres du modèle.
+sera multiplié par `wd_mult`
+lors de la mise à jour des paramètres du modèle.
 Ainsi, si nous mettons `wd_mult` à zéro,
 le paramètre de biais $b$ ne se décomposera pas.
 :end_tab:

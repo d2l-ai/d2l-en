@@ -1,30 +1,30 @@
 # Utilisation de Jupyter Notebooks
 :label:`sec_jupyter` 
 
- Cette section décrit comment modifier et exécuter le code
+Cette section décrit comment modifier et exécuter le code
 dans chaque section de ce livre
 en utilisant le Jupyter Notebook. Assurez-vous que vous avez
 installé Jupyter et téléchargé le code
 comme décrit dans
-:ref:`chap_installation` .
+:ref:`chap_installation`.
 Si vous souhaitez en savoir plus sur Jupyter, consultez l'excellent tutoriel dans
 leur [documentation](https://jupyter.readthedocs.io/en/latest/).
 
 
 ## Editer et exécuter le code localement
 
-Supposons que le chemin local du code du livre soit `xx/yy/d2l-en/`. Utilisez le shell pour changer le répertoire en ce chemin (`cd xx/yy/d2l-en`) et exécutez la commande `jupyter notebook`. Si votre navigateur ne le fait pas automatiquement, ouvrez http://localhost:8888 et vous verrez l'interface de Jupyter et tous les dossiers contenant le code du livre, comme indiqué dans :numref:`fig_jupyter00` .
+Supposons que le chemin local du code du livre soit `xx/yy/d2l-en/`. Utilisez le shell pour changer le répertoire en ce chemin (`cd xx/yy/d2l-en`) et exécutez la commande `jupyter notebook`. Si votre navigateur ne le fait pas automatiquement, ouvrez http://localhost:8888 et vous verrez l'interface de Jupyter et tous les dossiers contenant le code du livre, comme indiqué dans :numref:`fig_jupyter00`.
 
 ![The folders containing the code of this book.](../img/jupyter00.png) 
- :width:`600px` 
+:width:`600px` 
 :label:`fig_jupyter00` 
 
  
- Vous pouvez accéder aux fichiers du notebook en cliquant sur le dossier affiché sur la page web.
+Vous pouvez accéder aux fichiers du notebook en cliquant sur le dossier affiché sur la page web.
 Ils portent généralement le suffixe ".ipynb".
 Pour des raisons de concision, nous créons un fichier temporaire "test.ipynb".
 Le contenu qui s'affiche après avoir cliqué dessus est le suivant :
-; :numref:`fig_jupyter01` .
+; :numref:`fig_jupyter01`.
 Ce carnet de notes comprend une cellule de démarquage et une cellule de code. Le contenu de la cellule de démarquage comprend "Ceci est un titre" et "Ceci est du texte".
 La cellule de code contient deux lignes de code Python.
 
@@ -34,42 +34,42 @@ La cellule de code contient deux lignes de code Python.
 
 
 Double-cliquez sur la cellule markdown pour passer en mode édition.
-Ajoutez une nouvelle chaîne de texte "Hello world." à la fin de la cellule, comme illustré dans :numref:`fig_jupyter02` .
+Ajoutez une nouvelle chaîne de texte "Hello world." à la fin de la cellule, comme illustré dans :numref:`fig_jupyter02`.
 
 ![Edit the markdown cell.](../img/jupyter02.png)
 :width:`600px`
 :label:`fig_jupyter02`
 
 
-Comme illustré dans :numref:`fig_jupyter03` ,
+Comme illustré dans :numref:`fig_jupyter03`,
 cliquez sur "Cellule" $\rightarrow$ "Exécuter les cellules" dans la barre de menu pour exécuter la cellule éditée.
 
 ![Run the cell.](../img/jupyter03.png)
 :width:`600px`
 :label:`fig_jupyter03`
 
-Après l'exécution, la cellule de démarquage est affichée dans :numref:`fig_jupyter04` .
+Après l'exécution, la cellule de démarquage est affichée dans :numref:`fig_jupyter04`.
 
 ![The markdown cell after running.](../img/jupyter04.png)
 :width:`600px`
 :label:`fig_jupyter04`
 
 
-Ensuite, cliquez sur la cellule de code. Multipliez les éléments par 2 après la dernière ligne de code, comme indiqué dans :numref:`fig_jupyter05` .
+Ensuite, cliquez sur la cellule de code. Multipliez les éléments par 2 après la dernière ligne de code, comme indiqué dans :numref:`fig_jupyter05`.
 
 ![Edit the code cell.](../img/jupyter05.png) 
- :width:`600px` 
+:width:`600px` 
 :label:`fig_jupyter05` 
 
  
- Vous pouvez également exécuter la cellule avec un raccourci ("Ctrl + Enter" par défaut) et obtenir le résultat de sortie de :numref:`fig_jupyter06` .
+Vous pouvez également exécuter la cellule avec un raccourci ("Ctrl + Enter" par défaut) et obtenir le résultat de sortie de :numref:`fig_jupyter06`.
 
 ![Run the code cell to obtain the output.](../img/jupyter06.png)
 :width:`600px`
 :label:`fig_jupyter06`
 
 
-Lorsqu'un cahier contient plus de cellules, nous pouvons cliquer sur "Kernel" $\rightarrow$ "Restart &amp; Run All" dans la barre de menu pour exécuter toutes les cellules du cahier entier. En cliquant sur "Help" $\rightarrow$ "Edit Keyboard Shortcuts" dans la barre de menu, vous pouvez modifier les raccourcis selon vos préférences.
+Lorsqu'un cahier contient plus de cellules, nous pouvons cliquer sur "Kernel" $\rightarrow$ "Restart &; Run All" dans la barre de menu pour exécuter toutes les cellules du cahier entier. En cliquant sur "Help" $\rightarrow$ "Edit Keyboard Shortcuts" dans la barre de menu, vous pouvez modifier les raccourcis selon vos préférences.
 
 ## Options avancées
 

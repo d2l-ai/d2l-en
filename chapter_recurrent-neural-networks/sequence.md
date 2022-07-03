@@ -195,7 +195,7 @@ ces modèles sont également appelés
 ![Un modèle autorégressif latent](../img/sequence-model.svg)
 :label:`fig_sequence-model` 
 
- Pour construire des données d'apprentissage à partir de données historiques, on 
+Pour construire des données d'apprentissage à partir de données historiques, on 
 crée généralement des exemples en échantillonnant des fenêtres de manière aléatoire.
 En général, nous ne nous attendons pas à ce que le temps s'arrête. 
 Cependant, nous supposons souvent que si 
@@ -209,7 +209,7 @@ Les statisticiens appellent les dynamiques qui ne changent pas *stationnaires*.
 ### Modèles de langage
 
 
- Parfois, en particulier lorsque l'on travaille avec le langage,
+Parfois, en particulier lorsque l'on travaille avec le langage,
 nous souhaitons estimer la probabilité conjointe 
 d'une séquence entière.
 Il s'agit d'une tâche courante lorsqu'on travaille avec des séquences
@@ -241,7 +241,7 @@ en appliquant la règle de la chaîne de probabilité :
 $$P(x_1, \ldots, x_T) = P(x_1) * \prod_{t=2}^T P(x_t \mid x_{t-1}, \ldots, x_1).$$
 
 Notez que si nous travaillons avec des signaux discrets tels que des mots,
-alors le modèle autorégressif doit être un classificateur probabiliste,
+alors le modèle autorégressif doit être un classifieur probabiliste,
 produisant une distribution de probabilité complète
 sur le vocabulaire pour savoir quel mot viendra ensuite,
 étant donné le contexte de gauche.
@@ -252,7 +252,7 @@ sur le vocabulaire pour savoir quel mot viendra ensuite,
 :label:`subsec_markov-models` 
 
  
- Supposons maintenant que nous souhaitions employer la stratégie mentionnée ci-dessus,
+Supposons maintenant que nous souhaitions employer la stratégie mentionnée ci-dessus,
 où nous ne conditionnons que les $\tau$ précédentes étapes de la séquence,
 c'est-à-dire, $x_{t-1}, \ldots, x_{t-\tau}$, plutôt que 
 l'historique complet de la séquence $x_{t-1}, \ldots, x_1$.
@@ -266,8 +266,8 @@ Lorsque $\tau = 1$, on dit que les données sont caractérisées
 par un *modèle de Markov de premier ordre*,
 et lorsque $\tau = k$, on dit que les données sont caractérisées
 par un modèle de Markov de $kième$ ordre.
-Car lorsque la condition de Markov du premier ordre est vérifiée$(\tau = 1$)
-, la factorisation de notre probabilité conjointe devient un produit
+Car lorsque la condition de Markov du premier ordre est vérifiée$(\tau = 1$),
+la factorisation de notre probabilité conjointe devient un produit
 des probabilités de chaque mot étant donné le *mot* précédent :
 
 $$P(x_1, \ldots, x_T) = \prod_{t=1}^T P(x_t \mid x_{t-1}) \text{ où } P(x_1 \mid x_0) = P(x_1).$$
@@ -281,8 +281,8 @@ Mais ces gains diminuent rapidement.
 C'est pourquoi nous faisons parfois des compromis, en évitant les difficultés informatiques et statistiques
 par l'entrainement de modèles dont la validité dépend 
 d'une condition de Markov d'ordre $k$.
-Même les modèles de langage massifs d'aujourd'hui, basés sur les RNN et les transformateurs 
-, intègrent rarement plus de mille mots de contexte.
+Même les modèles de langage massifs d'aujourd'hui, basés sur les RNN et les transformateurs ,
+intègrent rarement plus de mille mots de contexte.
 
 
 Avec des données discrètes, un véritable modèle de Markov
@@ -318,8 +318,8 @@ Après tout, nous lisons tous du texte tous les jours,
 et ce processus est guidé par notre capacité
 à anticiper les mots et les phrases 
 susceptibles de suivre.
-Pensez simplement au nombre de fois où vous avez complété la phrase de quelqu'un d'autre 
-. 
+Pensez simplement au nombre de fois où vous avez complété la phrase de quelqu'un d'autre .
+
 Ainsi, même si nous n'avions aucune autre raison de préférer de tels décodages dans l'ordre, 
 ils seraient utiles ne serait-ce que parce que nous avons de meilleures intuitions 
 de ce qui devrait être probable lorsque l'on prédit dans cet ordre. 
@@ -349,18 +349,18 @@ Dans certains contextes, il est donc plus facile de prédire $P(x_{t+1} \mid x_t
 que de prédire $P(x_t \mid x_{t+1})$. 
 Par exemple, dans certains cas, nous pouvons trouver $x_{t+1} = f(x_t) + \epsilon$ 
 pour un certain bruit additif $\epsilon$, 
-alors que l'inverse n'est pas vrai :cite:`Hoyer.Janzing.Mooij.ea.2009` . 
+alors que l'inverse n'est pas vrai :cite:`Hoyer.Janzing.Mooij.ea.2009`. 
 Il s'agit d'une excellente nouvelle, car c'est généralement la direction avant 
 qui nous intéresse pour l'estimation.
 Le livre de Peters et al. en dit plus sur ce sujet 
-:cite:`Peters.Janzing.Scholkopf.2017` .
+:cite:`Peters.Janzing.Scholkopf.2017`.
 Nous ne faisons qu'effleurer le sujet.
 
 
 ## Formation
 
 <!-- fix -->
- Après avoir passé en revue de nombreux outils statistiques différents, essayons de les mettre en pratique.
+Après avoir passé en revue de nombreux outils statistiques différents, essayons de les mettre en pratique.
 
 ```{.python .input  n=6}
 %load_ext d2lbook.tab
@@ -413,7 +413,7 @@ d2l.plot(data.time, data.x, 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 
 Ensuite, nous devons transformer une telle séquence en caractéristiques et en étiquettes 
 <!-- language -->
- sur lesquelles notre modèle peut s'entraîner.
+sur lesquelles notre modèle peut s'entraîner.
 Avec l'hypothèse de Markov selon laquelle $x_t$ dépend uniquement 
 des observations des $\tau$ derniers pas de temps,
 nous [**construisons des exemples avec des étiquettes $y_t = x_t$ et des caractéristiques 
@@ -594,7 +594,7 @@ tout ce qui est au-delà est presque inutile.
    Qu'est-ce qui pourrait mal tourner dans cette stratégie ?
 1. La causalité s'applique-t-elle également au texte ? Dans quelle mesure ?
 1. Donnez un exemple de cas où un modèle autorégressif latent 
- pourrait être nécessaire pour capturer la dynamique des données.
+pourrait être nécessaire pour capturer la dynamique des données.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/113)

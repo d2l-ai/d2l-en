@@ -1,7 +1,7 @@
 # Descente de gradient
 :label:`sec_gd` 
 
- Dans cette section, nous allons présenter les concepts de base qui sous-tendent la *descente de gradient*.
+Dans cette section, nous allons présenter les concepts de base qui sous-tendent la *descente de gradient*.
 Bien qu'elle soit rarement utilisée directement en apprentissage profond, la compréhension de la descente de gradient est essentielle pour comprendre les algorithmes de descente de gradient stochastique. 
 Par exemple, le problème d'optimisation peut diverger en raison d'un taux d'apprentissage trop élevé. Ce phénomène peut déjà être observé dans la descente de gradient. De même, le préconditionnement est une technique courante dans la descente de gradient et se retrouve dans des algorithmes plus avancés.
 Commençons par un cas particulier simple.
@@ -12,22 +12,22 @@ Commençons par un cas particulier simple.
 La descente de gradient en une dimension est un excellent exemple pour expliquer pourquoi l'algorithme de descente de gradient peut réduire la valeur de la fonction objectif. Considérons une fonction réelle continuellement différentiable $f: \mathbb{R} \rightarrow \mathbb{R}$. En utilisant une expansion de Taylor, nous obtenons
 
 $$f(x + \epsilon) = f(x) + \epsilon f'(x) + \mathcal{O}(\epsilon^2).$$ 
- :eqlabel:`gd-taylor` 
+:eqlabel:`gd-taylor` 
 
- C'est-à-dire que dans l'approximation du premier ordre, $f(x+\epsilon)$ est donné par la valeur de la fonction $f(x)$ et la première dérivée $f'(x)$ à $x$. Il n'est pas déraisonnable de supposer que pour de petites valeurs de $\epsilon$, un déplacement dans la direction du gradient négatif diminuera $f$. Pour garder les choses simples, nous choisissons une taille de pas fixe $\eta > 0$ et choisissons $\epsilon = -\eta f'(x)$. En intégrant ce résultat dans l'expansion de Taylor ci-dessus, nous obtenons
+C'est-à-dire que dans l'approximation du premier ordre, $f(x+\epsilon)$ est donné par la valeur de la fonction $f(x)$ et la première dérivée $f'(x)$ à $x$. Il n'est pas déraisonnable de supposer que pour de petites valeurs de $\epsilon$, un déplacement dans la direction du gradient négatif diminuera $f$. Pour garder les choses simples, nous choisissons une taille de pas fixe $\eta > 0$ et choisissons $\epsilon = -\eta f'(x)$. En intégrant ce résultat dans l'expansion de Taylor ci-dessus, nous obtenons
 
 $$f(x - \eta f'(x)) = f(x) - \eta f'^2(x) + \mathcal{O}(\eta^2 f'^2(x)).$$ 
- :eqlabel:`gd-taylor-2` 
+:eqlabel:`gd-taylor-2` 
 
- Si la dérivée $f'(x) \neq 0$ ne disparaît pas, nous progressons depuis $\eta f'^2(x)>0$. De plus, nous pouvons toujours choisir $\eta$ suffisamment petit pour que les termes d'ordre supérieur ne soient plus pertinents. Nous arrivons donc à
+Si la dérivée $f'(x) \neq 0$ ne disparaît pas, nous progressons depuis $\eta f'^2(x)>0$. De plus, nous pouvons toujours choisir $\eta$ suffisamment petit pour que les termes d'ordre supérieur ne soient plus pertinents. Nous arrivons donc à
 
 $$f(x - \eta f'(x)) \lessapprox f(x).$$ 
 
- Cela signifie que, si nous utilisons
+Cela signifie que, si nous utilisons
 
 $$x \leftarrow x - \eta f'(x)$$ 
 
- pour itérer $x$, la valeur de la fonction $f(x)$ pourrait diminuer. Par conséquent, dans la descente par gradient, nous choisissons d'abord une valeur initiale $x$ et une constante $\eta > 0$, puis nous les utilisons pour itérer continuellement $x$ jusqu'à ce que la condition d'arrêt soit atteinte, par exemple, lorsque l'amplitude du gradient $|f'(x)|$ est suffisamment faible ou que le nombre d'itérations a atteint une certaine valeur.
+pour itérer $x$, la valeur de la fonction $f(x)$ pourrait diminuer. Par conséquent, dans la descente par gradient, nous choisissons d'abord une valeur initiale $x$ et une constante $\eta > 0$, puis nous les utilisons pour itérer continuellement $x$ jusqu'à ce que la condition d'arrêt soit atteinte, par exemple, lorsque l'amplitude du gradient $|f'(x)|$ est suffisamment faible ou que le nombre d'itérations a atteint une certaine valeur.
 
 Par souci de simplicité, nous choisissons la fonction objectif $f(x)=x^2$ pour illustrer la mise en œuvre de la descente par gradient. Bien que nous sachions que $x=0$ est la solution pour minimiser $f(x)$, nous utilisons toujours cette fonction simple pour observer comment $x$ évolue.
 
@@ -97,7 +97,7 @@ show_trace(results, f)
 ### Taux d'apprentissage
 :label:`subsec_gd-learningrate` 
 
- Le taux d'apprentissage $\eta$ peut être fixé par le concepteur de l'algorithme. Si nous utilisons un taux d'apprentissage trop faible, $x$ se mettra à jour très lentement, ce qui nécessitera davantage d'itérations pour obtenir une meilleure solution. Pour montrer ce qui se passe dans un tel cas, considérons la progression du même problème d'optimisation pour $\eta = 0.05$. Comme nous pouvons le constater, même après 10 étapes, nous sommes encore très loin de la solution optimale.
+Le taux d'apprentissage $\eta$ peut être fixé par le concepteur de l'algorithme. Si nous utilisons un taux d'apprentissage trop faible, $x$ se mettra à jour très lentement, ce qui nécessitera davantage d'itérations pour obtenir une meilleure solution. Pour montrer ce qui se passe dans un tel cas, considérons la progression du même problème d'optimisation pour $\eta = 0.05$. Comme nous pouvons le constater, même après 10 étapes, nous sommes encore très loin de la solution optimale.
 
 ```{.python .input}
 #@tab all
@@ -134,16 +134,16 @@ Maintenant que nous avons une meilleure intuition du cas univarié, considérons
 
 $$\nabla f(\mathbf{x}) = \bigg[\frac{\partial f(\mathbf{x})}{\partial x_1}, \frac{\partial f(\mathbf{x})}{\partial x_2}, \ldots, \frac{\partial f(\mathbf{x})}{\partial x_d}\bigg]^\top.$$ 
 
- Chaque élément de dérivée partielle $\partial f(\mathbf{x})/\partial x_i$ dans le gradient indique le taux de variation de $f$ à $\mathbf{x}$ par rapport à l'entrée $x_i$. Comme précédemment dans le cas univarié, nous pouvons utiliser l'approximation de Taylor correspondante pour les fonctions multivariées pour avoir une idée de ce que nous devons faire. En particulier, nous avons que
+Chaque élément de dérivée partielle $\partial f(\mathbf{x})/\partial x_i$ dans le gradient indique le taux de variation de $f$ à $\mathbf{x}$ par rapport à l'entrée $x_i$. Comme précédemment dans le cas univarié, nous pouvons utiliser l'approximation de Taylor correspondante pour les fonctions multivariées pour avoir une idée de ce que nous devons faire. En particulier, nous avons que
 
 $$f(\mathbf{x} + \boldsymbol{\epsilon}) = f(\mathbf{x}) + \mathbf{\boldsymbol{\epsilon}}^\top \nabla f(\mathbf{x}) + \mathcal{O}(\|\boldsymbol{\epsilon}\|^2).$$ 
- :eqlabel:`gd-multi-taylor` 
+:eqlabel:`gd-multi-taylor` 
 
- En d'autres termes, jusqu'aux termes du second ordre dans $\boldsymbol{\epsilon}$ la direction de la descente la plus raide est donnée par le gradient négatif $-\nabla f(\mathbf{x})$. En choisissant un taux d'apprentissage approprié $\eta > 0$, on obtient l'algorithme prototype de descente par gradient :
+En d'autres termes, jusqu'aux termes du second ordre dans $\boldsymbol{\epsilon}$ la direction de la descente la plus raide est donnée par le gradient négatif $-\nabla f(\mathbf{x})$. En choisissant un taux d'apprentissage approprié $\eta > 0$, on obtient l'algorithme prototype de descente par gradient :
 
 $$\mathbf{x} \leftarrow \mathbf{x} - \eta \nabla f(\mathbf{x}).$$ 
 
- Pour voir comment l'algorithme se comporte en pratique, construisons une fonction objectif $f(\mathbf{x})=x_1^2+2x_2^2$ avec un vecteur bidimensionnel $\mathbf{x} = [x_1, x_2]^\top$ en entrée et un scalaire en sortie. Le gradient est donné par $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. Nous allons observer la trajectoire de $\mathbf{x}$ par descente de gradient à partir de la position initiale $[-5, -2]$. 
+Pour voir comment l'algorithme se comporte en pratique, construisons une fonction objectif $f(\mathbf{x})=x_1^2+2x_2^2$ avec un vecteur bidimensionnel $\mathbf{x} = [x_1, x_2]^\top$ en entrée et un scalaire en sortie. Le gradient est donné par $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. Nous allons observer la trajectoire de $\mathbf{x}$ par descente de gradient à partir de la position initiale $[-5, -2]$. 
 
 Pour commencer, nous avons besoin de deux autres fonctions d'aide. La première utilise une fonction de mise à jour et l'applique 20 fois à la valeur initiale. La deuxième fonction d'aide visualise la trajectoire de $\mathbf{x}$.
 
@@ -194,7 +194,7 @@ show_trace_2d(f_2d, train_2d(gd_2d, f_grad=f_2d_grad))
 
 ## Méthodes adaptatives
 
-Comme nous avons pu le voir sur :numref:`subsec_gd-learningrate` , il est difficile de trouver le taux d'apprentissage $\eta$ "juste". Si nous le choisissons trop petit, nous progressons peu. Si nous le choisissons trop grand, la solution oscille et, dans le pire des cas, elle peut même diverger. Que se passerait-il si nous pouvions déterminer $\eta$ automatiquement ou ne pas avoir à sélectionner un taux d'apprentissage du tout ? 
+Comme nous avons pu le voir sur :numref:`subsec_gd-learningrate`, il est difficile de trouver le taux d'apprentissage $\eta$ "juste". Si nous le choisissons trop petit, nous progressons peu. Si nous le choisissons trop grand, la solution oscille et, dans le pire des cas, elle peut même diverger. Que se passerait-il si nous pouvions déterminer $\eta$ automatiquement ou ne pas avoir à sélectionner un taux d'apprentissage du tout ? 
 Les méthodes du second ordre qui examinent non seulement la valeur et le gradient de la fonction objectif
 mais aussi sa *courbure* peuvent être utiles dans ce cas. Bien que ces méthodes ne puissent pas être appliquées directement à l'apprentissage profond en raison du coût de calcul, elles fournissent une intuition utile sur la façon de concevoir des algorithmes d'optimisation avancés qui imitent plusieurs des propriétés souhaitables des algorithmes décrits ci-dessous.
 
@@ -204,12 +204,12 @@ mais aussi sa *courbure* peuvent être utiles dans ce cas. Bien que ces méthode
 En examinant l'expansion de Taylor d'une certaine fonction $f: \mathbb{R}^d \rightarrow \mathbb{R}$, il n'est pas nécessaire de s'arrêter après le premier terme. En fait, nous pouvons l'écrire comme suit :
 
 $$f(\mathbf{x} + \boldsymbol{\epsilon}) = f(\mathbf{x}) + \boldsymbol{\epsilon}^\top \nabla f(\mathbf{x}) + \frac{1}{2} \boldsymbol{\epsilon}^\top \nabla^2 f(\mathbf{x}) \boldsymbol{\epsilon} + \mathcal{O}(\|\boldsymbol{\epsilon}\|^3).$$ 
- :eqlabel:`gd-hot-taylor` 
+:eqlabel:`gd-hot-taylor` 
 
- Pour éviter une notation trop lourde, nous définissons $\mathbf{H} \stackrel{\mathrm{def}}{=} \nabla^2 f(\mathbf{x})$ comme étant le Hessien de $f$, qui est une matrice $d \times d$. Pour les petites $d$ et les problèmes simples, $\mathbf{H}$ est facile à calculer. En revanche, pour les réseaux neuronaux profonds, la taille de $\mathbf{H}$ peut être prohibitive, en raison du coût de stockage des entrées de $\mathcal{O}(d^2)$. En outre, il peut être trop coûteux de le calculer par rétropropagation. Pour l'instant, ignorons ces considérations et examinons l'algorithme que nous obtiendrions.
+Pour éviter une notation trop lourde, nous définissons $\mathbf{H} \stackrel{\mathrm{def}}{=} \nabla^2 f(\mathbf{x})$ comme étant le Hessien de $f$, qui est une matrice $d \times d$. Pour les petites $d$ et les problèmes simples, $\mathbf{H}$ est facile à calculer. En revanche, pour les réseaux neuronaux profonds, la taille de $\mathbf{H}$ peut être prohibitive, en raison du coût de stockage des entrées de $\mathcal{O}(d^2)$. En outre, il peut être trop coûteux de le calculer par rétropropagation. Pour l'instant, ignorons ces considérations et examinons l'algorithme que nous obtiendrions.
 
 Après tout, le minimum de $f$ satisfait $\nabla f = 0$. 
-En suivant les règles de calcul de :numref:`subsec_calculus-grad` ,
+En suivant les règles de calcul de :numref:`subsec_calculus-grad`,
 en prenant les dérivées de :eqref:`gd-hot-taylor` par rapport à $\boldsymbol{\epsilon}$ et en ignorant les termes d'ordre supérieur, nous obtenons
 
 $$\nabla f(\mathbf{x}) + \mathbf{H} \boldsymbol{\epsilon} = 0 \text{ and hence }
@@ -285,21 +285,21 @@ Dénotez par $x^{(k)}$ la valeur de $x$ à l'itération $k^\mathrm{th}$ et laiss
 
 $$0 = f'(x^{(k)} - e^{(k)}) = f'(x^{(k)}) - e^{(k)} f''(x^{(k)}) + \frac{1}{2} (e^{(k)})^2 f'''(\xi^{(k)}),$$ 
 
- qui tient pour un certain $\xi^{(k)} \in [x^{(k)} - e^{(k)}, x^{(k)}]$. En divisant l'expansion ci-dessus par $f''(x^{(k)})$, on obtient
+qui tient pour un certain $\xi^{(k)} \in [x^{(k)} - e^{(k)}, x^{(k)}]$. En divisant l'expansion ci-dessus par $f''(x^{(k)})$, on obtient
 
 $$e^{(k)} - \frac{f'(x^{(k)})}{f''(x^{(k)})} = \frac{1}{2} (e^{(k)})^2 \frac{f'''(\xi^{(k)})}{f''(x^{(k)})}.$$ 
 
- Rappelons que nous avons la mise à jour $x^{(k+1)} = x^{(k)} - f'(x^{(k)}) / f''(x^{(k)})$. 
+Rappelons que nous avons la mise à jour $x^{(k+1)} = x^{(k)} - f'(x^{(k)}) / f''(x^{(k)})$. 
 En introduisant cette équation de mise à jour et en prenant la valeur absolue des deux côtés, nous obtenons
 
 $$\left|e^{(k+1)}\right| = \frac{1}{2}(e^{(k)})^2 \frac{\left|f'''(\xi^{(k)})\right|}{f''(x^{(k)})}.$$ 
 
- Par conséquent, chaque fois que nous nous trouvons dans une région limitée $\left|f'''(\xi^{(k)})\right| / (2f''(x^{(k)})) \leq c$, nous avons une erreur quadratiquement décroissante 
+Par conséquent, chaque fois que nous nous trouvons dans une région limitée $\left|f'''(\xi^{(k)})\right| / (2f''(x^{(k)})) \leq c$, nous avons une erreur quadratiquement décroissante 
 
 $$\left|e^{(k+1)}\right| \leq c (e^{(k)})^2.$$ 
 
  
- En passant, les chercheurs en optimisation appellent cela une convergence *linéaire*, alors qu'une condition telle que $\left|e^{(k+1)}\right| \leq \alpha \left|e^{(k)}\right|$ serait appelée un taux de convergence *constant*.
+En passant, les chercheurs en optimisation appellent cela une convergence *linéaire*, alors qu'une condition telle que $\left|e^{(k+1)}\right| \leq \alpha \left|e^{(k)}\right|$ serait appelée un taux de convergence *constant*.
 Notez que cette analyse s'accompagne d'un certain nombre de mises en garde. 
 Premièrement, nous n'avons pas vraiment de garantie quant au moment où nous atteindrons la région de convergence rapide. Au contraire, nous savons seulement qu'une fois que nous l'aurons atteinte, la convergence sera très rapide. Deuxièmement, cette analyse exige que $f$ se comporte bien jusqu'aux dérivées d'ordre supérieur. Il s'agit de s'assurer que $f$ n'a pas de propriétés "surprenantes" en ce qui concerne la façon dont il pourrait changer ses valeurs.
 

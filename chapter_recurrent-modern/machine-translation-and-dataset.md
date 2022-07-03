@@ -6,14 +6,14 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 # La traduction automatique et le jeu de données
 :label:`sec_machine_translation` 
 
- Nous avons utilisé les RNN pour concevoir des modèles de langage,
+Nous avons utilisé les RNN pour concevoir des modèles de langage,
 qui sont essentiels au traitement du langage naturel.
 Un autre repère phare est la *traduction automatique*,
 un domaine problématique central pour les modèles de *transduction de séquences*
 qui transforment les séquences d'entrée en séquences de sortie.
 Jouant un rôle crucial dans diverses applications modernes de l'IA, les modèles de transduction de séquence
 feront l'objet du reste de ce chapitre
-et :numref:`chap_attention` .
+et :numref:`chap_attention`.
 À cette fin,
 cette section présente le problème de la traduction automatique
 et son ensemble de données qui sera utilisé par la suite.
@@ -29,8 +29,8 @@ surtout si l'on considère l'utilisation des ordinateurs
 pour le craquage des codes linguistiques pendant la Seconde Guerre mondiale.
 Pendant des décennies, les approches statistiques
 
- ont été dominantes dans ce domaine :cite:`Brown.Cocke.Della-Pietra.ea.1988,Brown.Cocke.Della-Pietra.ea.1990` 
- avant l'essor
+ont été dominantes dans ce domaine :cite:`Brown.Cocke.Della-Pietra.ea.1988,Brown.Cocke.Della-Pietra.ea.1990` 
+avant l'essor
 de l'apprentissage de bout en bout
 utilisant
 les réseaux neuronaux.
@@ -48,9 +48,9 @@ Mettant l'accent sur l'apprentissage de bout en bout,
 ce livre se concentrera sur les méthodes de traduction automatique neuronale.
 Contrairement à notre problème de modèle de langue
 dans :numref:`sec_language-model` 
- dont le corpus est dans une seule langue, les ensembles de données de traduction automatique
+dont le corpus est dans une seule langue, les ensembles de données de traduction automatique
 
- sont composés de paires de séquences de texte
+sont composés de paires de séquences de texte
 qui sont dans
 la langue source et la langue cible, respectivement.
 Ainsi,
@@ -143,12 +143,12 @@ print(text[:80])
 ## [**Tokenization**]
 
 Différent de la tokenisation au niveau des caractères
-dans :numref:`sec_language-model` ,
+dans :numref:`sec_language-model`,
 pour la traduction automatique
 nous préférons ici la tokenisation au niveau des mots
 (les modèles de pointe peuvent utiliser des techniques de tokenisation plus avancées).
 La méthode suivante `_tokenize`
- tokenise les premières paires de séquences de texte `max_examples`,
+tokenise les premières paires de séquences de texte `max_examples`,
 où
 chaque token est soit un mot, soit un signe de ponctuation.
 Nous ajoutons le jeton spécial "&lt;eos&gt;"
@@ -211,13 +211,13 @@ show_list_len_pair_hist(['source', 'target'], '# tokens per sequence',
 ## Chargement de séquences de longueur fixe
 :label:`subsec_loading-seq-fixed-len` 
 
- Rappelons que dans la modélisation du langage
+Rappelons que dans la modélisation du langage
 [**chaque exemple de séquence**],
 soit un segment d'une phrase
 ou une étendue sur plusieurs phrases,
 (**a une longueur fixe.**))
 Cela a été spécifié par l'argument `num_steps`
- (nombre de pas de temps ou de tokens) dans :numref:`sec_language-model` .
+ (nombre de pas de temps ou de tokens) dans :numref:`sec_language-model`.
 Dans la traduction automatique, chaque exemple est
 une paire de séquences de texte source et cible,
 où chaque séquence de texte peut avoir des longueurs différentes.
@@ -301,7 +301,7 @@ def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
 ## [**Lire le jeu de données**]
 
 Enfin, nous définissons la méthode `get_dataloader`
- pour renvoyer l'itérateur de données.
+pour renvoyer l'itérateur de données.
 
 ```{.python .input  n=10}
 %%tab all

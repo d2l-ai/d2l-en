@@ -2,8 +2,8 @@
 :label:`sec_auto_para`
 
 
-Les cadres d'apprentissage profond (par exemple, MXNet et PyTorch) construisent automatiquement des graphes de calcul en arrière-plan. En utilisant un graphe de calcul
-, le système est conscient de toutes les dépendances,
+Les cadres d'apprentissage profond (par exemple, MXNet et PyTorch) construisent automatiquement des graphes de calcul en arrière-plan. En utilisant un graphe de calcul,
+le système est conscient de toutes les dépendances,
 et peut exécuter sélectivement plusieurs tâches non interdépendantes en parallèle pour
 améliorer la vitesse. Par exemple, :numref:`fig_asyncgraph` dans :numref:`sec_async` initialise deux variables indépendamment. Par conséquent, le système peut choisir de les exécuter en parallèle.
 
@@ -177,7 +177,7 @@ with d2l.Benchmark('Run on GPU1 and copy to CPU'):
 Le temps total requis pour les deux opérations est (comme prévu) inférieur à la somme de leurs parties.
 Notez que cette tâche est différente du calcul parallèle car elle utilise une ressource différente : le bus entre le CPU et les GPU. En fait, nous pourrions calculer sur les deux dispositifs et communiquer, le tout en même temps. Comme indiqué ci-dessus, il existe une dépendance entre le calcul et la communication :`y[i]` doit être calculé avant de pouvoir être copié sur le CPU. Heureusement, le système peut copier `y[i-1]` tout en calculant `y[i]` pour réduire le temps d'exécution total.
 
-Nous conclurons par une illustration du graphe de calcul et de ses dépendances pour un simple MLP à deux couches lors de l'entraînement sur un CPU et deux GPU, comme décrit dans :numref:`fig_twogpu` . Il serait assez pénible de programmer manuellement le programme parallèle qui en résulte. C'est là qu'il est avantageux d'avoir un backend de calcul basé sur le graphe pour l'optimisation.
+Nous conclurons par une illustration du graphe de calcul et de ses dépendances pour un simple MLP à deux couches lors de l'entraînement sur un CPU et deux GPU, comme décrit dans :numref:`fig_twogpu`. Il serait assez pénible de programmer manuellement le programme parallèle qui en résulte. C'est là qu'il est avantageux d'avoir un backend de calcul basé sur le graphe pour l'optimisation.
 
 ![Le graphe de calcul et ses dépendances d'un MLP à deux couches sur un CPU et deux GPU.](../img/twogpu.svg)
 :label:`fig_twogpu`

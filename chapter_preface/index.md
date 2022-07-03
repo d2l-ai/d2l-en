@@ -117,7 +117,7 @@ publiés sur le site [Distill](http://distill.pub), ou les blogs personnels,
 ils ne couvraient que certains sujets de l'apprentissage profond,
 et manquaient souvent de code associé.
 D'autre part, bien que plusieurs manuels d'apprentissage profond 
-aient vu le jour - par exemple, :cite:`Goodfellow.Bengio.Courville.2016` , 
+aient vu le jour - par exemple, :cite:`Goodfellow.Bengio.Courville.2016`, 
 qui offre une étude complète 
 sur les bases de l'apprentissage profond - ces ressources 
 n'associent pas les descriptions
@@ -138,7 +138,7 @@ pour devenir réellement un scientifique de l'apprentissage automatique appliqu�
 (iv) permettre des mises à jour rapides, à la fois par nous
 et par la communauté dans son ensemble ;
 et (v) être complété par un site [forum](http://discuss.d2l.ai)
- pour une discussion interactive des détails techniques et pour répondre aux questions.
+pour une discussion interactive des détails techniques et pour répondre aux questions.
 
 Ces objectifs étaient souvent en conflit.
 Les équations, les théorèmes et les citations 
@@ -152,7 +152,7 @@ sous forme de PDF téléchargeable, et sur Internet sous forme de site Web.
 parfaitement adapté à ces exigences, 
 nous avons donc dû assembler les nôtres.
 Nous décrivons notre approche en détail 
-dans :numref:`sec_how_to_contribute` .
+dans :numref:`sec_how_to_contribute`.
 Nous avons choisi GitHub pour partager la source 
 et faciliter les contributions de la communauté,
 les carnets Jupyter pour mélanger le code, les équations et le texte,
@@ -171,7 +171,7 @@ en utilisant un tel flux de travail intégré.
 
 De nombreux manuels présentent les concepts les uns après les autres, 
 couvrant chacun d'entre eux de manière exhaustive.
-Par exemple, l'excellent manuel de Chris Bishop :cite:`Bishop.2006` ,
+Par exemple, l'excellent manuel de Chris Bishop :cite:`Bishop.2006`,
 enseigne chaque sujet de manière si approfondie
 que le chapitre
 sur la régression linéaire nécessite 

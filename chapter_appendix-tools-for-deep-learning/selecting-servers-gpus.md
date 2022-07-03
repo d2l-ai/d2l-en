@@ -1,7 +1,7 @@
 # Sélection des serveurs et des GPU
 :label:`sec_buy_gpu` 
 
- L'apprentissage profond nécessite généralement de grandes quantités de calculs. Actuellement, les GPU sont les accélérateurs matériels les plus rentables pour l'apprentissage profond. En particulier, par rapport aux CPU, les GPU sont moins chers et offrent des performances supérieures, souvent de plus d'un ordre de grandeur. En outre, un seul serveur peut prendre en charge plusieurs GPU, jusqu'à 8 pour les serveurs haut de gamme. Les chiffres les plus courants sont jusqu'à 4 GPU pour une station de travail d'ingénierie, car les exigences en matière de chaleur, de refroidissement et d'alimentation augmentent rapidement au-delà de ce qu'un immeuble de bureaux peut supporter. Pour les déploiements plus importants, le cloud computing (par exemple, les instances [P3](https://aws.amazon.com/ec2/instance-types/p3/) et [G4](https://aws.amazon.com/blogs/aws/in-the-works-ec2-instances-g4-with-nvidia-t4-gpus/) d'Amazon) est une solution beaucoup plus pratique.
+L'apprentissage profond nécessite généralement de grandes quantités de calculs. Actuellement, les GPU sont les accélérateurs matériels les plus rentables pour l'apprentissage profond. En particulier, par rapport aux CPU, les GPU sont moins chers et offrent des performances supérieures, souvent de plus d'un ordre de grandeur. En outre, un seul serveur peut prendre en charge plusieurs GPU, jusqu'à 8 pour les serveurs haut de gamme. Les chiffres les plus courants sont jusqu'à 4 GPU pour une station de travail d'ingénierie, car les exigences en matière de chaleur, de refroidissement et d'alimentation augmentent rapidement au-delà de ce qu'un immeuble de bureaux peut supporter. Pour les déploiements plus importants, le cloud computing (par exemple, les instances [P3](https://aws.amazon.com/ec2/instance-types/p3/) et [G4](https://aws.amazon.com/blogs/aws/in-the-works-ec2-instances-g4-with-nvidia-t4-gpus/) d'Amazon) est une solution beaucoup plus pratique.
 
 
 ## Sélection des serveurs
@@ -55,7 +55,7 @@ Nous pouvons constater un certain nombre de choses :
 :label:`fig_wattvsprice` 
 
  
- :numref:`fig_wattvsprice` montre comment la consommation d'énergie évolue de façon linéaire avec la quantité de calculs. Deuxièmement, les générations ultérieures sont plus efficaces. Cela semble être contredit par le graphique correspondant à la série RTX 2000. Cependant, c'est une conséquence des TensorCores qui consomment une quantité disproportionnée d'énergie.
+:numref:`fig_wattvsprice` montre comment la consommation d'énergie évolue de façon linéaire avec la quantité de calculs. Deuxièmement, les générations ultérieures sont plus efficaces. Cela semble être contredit par le graphique correspondant à la série RTX 2000. Cependant, c'est une conséquence des TensorCores qui consomment une quantité disproportionnée d'énergie.
 
 
 ## Résumé

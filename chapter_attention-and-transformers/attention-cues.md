@@ -6,7 +6,7 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 # Les indices d'attention
 :label:`sec_attention-cues` 
 
- Merci de l'attention que vous portez à ce livre
+Merci de l'attention que vous portez à ce livre
 .
 L'attention est une ressource rare :
 en ce moment
@@ -65,7 +65,7 @@ Pour expliquer comment notre attention se déploie dans le monde visuel,
 un cadre à deux composantes a émergé
 et s'est répandu.
 Cette idée remonte à William James dans les années 1890,
-qui est considéré comme le "père de la psychologie américaine" :cite:`James.2007` .
+qui est considéré comme le "père de la psychologie américaine" :cite:`James.2007`.
 Dans ce cadre,
 les sujets dirigent sélectivement le point de mire de l'attention
 en utilisant à la fois le *repère non-volontaire* et le *repère volitif*.
@@ -73,27 +73,27 @@ en utilisant à la fois le *repère non-volontaire* et le *repère volitif*.
 L'indice non-volontaire est basé sur
 la saillance et la conspicuité des objets dans l'environnement.
 Imaginez que cinq objets se trouvent devant vous :
-un journal, un document de recherche, une tasse de café, un cahier et un livre, comme dans :numref:`fig_eye-coffee` .
+un journal, un document de recherche, une tasse de café, un cahier et un livre, comme dans :numref:`fig_eye-coffee`.
 Alors que tous les produits en papier sont imprimés en noir et blanc,
 la tasse de café est rouge.
 En d'autres termes,
 ce café est intrinsèquement saillant et ostensible dans
 cet environnement visuel,
 attirant automatiquement et involontairement l'attention.
-Vous amenez donc la fovéa (le centre de la macula, où l'acuité visuelle est la plus élevée) sur le café, comme le montre l'illustration :numref:`fig_eye-coffee` .
+Vous amenez donc la fovéa (le centre de la macula, où l'acuité visuelle est la plus élevée) sur le café, comme le montre l'illustration :numref:`fig_eye-coffee`.
 
 ![Using the nonvolitional cue based on saliency (red cup, non-paper) , l'attention est involontairement dirigée vers le café.](../img/eye-coffee.svg)
 :width:`400px` 
 :label:`fig_eye-coffee` 
 
- Après avoir bu du café,
+Après avoir bu du café,
 vous êtes en manque de caféine et
 vous avez envie de lire un livre.
 Vous tournez donc la tête, vous recentrez vos yeux,
-et vous regardez le livre comme indiqué dans :numref:`fig_eye-book` .
-À la différence de
-, le cas de :numref:`fig_eye-coffee` 
- où le café vous incite à
+et vous regardez le livre comme indiqué dans :numref:`fig_eye-book`.
+À la différence de,
+le cas de :numref:`fig_eye-coffee` 
+où le café vous incite à
 faire une sélection basée sur la saillance,
 dans ce cas dépendant de la tâche, vous sélectionnez le livre sous
 contrôle cognitif et volontaire.
@@ -125,8 +125,8 @@ ou même une mise en commun maximale ou moyenne non paramétrée
 Par conséquent,
 ce qui différencie les mécanismes d'attention
 des couches entièrement connectées
-ou des couches de mise en commun
-, c'est l'inclusion des indices volitifs.
+ou des couches de mise en commun,
+c'est l'inclusion des indices volitifs.
 Dans le contexte des mécanismes d'attention,
 nous nous référons aux indices volitifs comme des *requêtes*.
 Pour toute requête,
@@ -137,19 +137,19 @@ Ces entrées sensorielles sont appelées *valeurs* dans le contexte des mécanis
 Plus généralement,
 chaque valeur est associée à une *clé*,
 qui peut être considérée comme l'indice non-volatile de cette entrée sensorielle.
-Comme le montrent les exemples :numref:`fig_qkv` et
-, nous pouvons concevoir le regroupement de l'attention
+Comme le montrent les exemples :numref:`fig_qkv` et,
+ nous pouvons concevoir le regroupement de l'attention
 de manière à ce que la requête donnée (indice volitif) puisse interagir avec des clés (indices non volitifs),
 qui guident la sélection de biais sur les valeurs (entrées sensorielles).
 
 ![Attention mechanisms bias selection over values (sensory inputs) via la mise en commun de l'attention, qui intègre les requêtes (indices volitifs) et les clés (indices non volitifs)](../img/qkv.svg)
 :label:`fig_qkv` 
 
- Notez qu'il existe de nombreuses alternatives pour la conception des mécanismes d'attention.
+Notez qu'il existe de nombreuses alternatives pour la conception des mécanismes d'attention.
 Par exemple,
 nous pouvons concevoir un modèle d'attention non-différenciable
-qui peut être entraîné à l'aide de méthodes d'apprentissage par renforcement :cite:`Mnih.Heess.Graves.ea.2014` .
-Étant donné la prédominance du cadre de travail de :numref:`fig_qkv` ,
+qui peut être entraîné à l'aide de méthodes d'apprentissage par renforcement :cite:`Mnih.Heess.Graves.ea.2014`.
+Étant donné la prédominance du cadre de travail de :numref:`fig_qkv`,
 les modèles de ce cadre
 seront au centre de notre attention dans ce chapitre.
 

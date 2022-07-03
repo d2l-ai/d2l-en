@@ -1,7 +1,7 @@
 # Ajustement fin
 :label:`sec_fine_tuning` 
 
- Dans les chapitres précédents, nous avons expliqué comment entraîner des modèles sur le jeu de données d'entraînement Fashion-MNIST contenant seulement 60000 images. Nous avons également décrit ImageNet, le jeu de données d'images à grande échelle le plus utilisé dans le monde universitaire, qui contient plus de 10 millions d'images et 1000 objets. Cependant, la taille du jeu de données que nous rencontrons habituellement se situe entre celles de ces deux jeux de données.
+Dans les chapitres précédents, nous avons expliqué comment entraîner des modèles sur le jeu de données d'entraînement Fashion-MNIST contenant seulement 60000 images. Nous avons également décrit ImageNet, le jeu de données d'images à grande échelle le plus utilisé dans le monde universitaire, qui contient plus de 10 millions d'images et 1000 objets. Cependant, la taille du jeu de données que nous rencontrons habituellement se situe entre celles de ces deux jeux de données.
 
 
 Supposons que nous voulions reconnaître différents types de chaises à partir d'images, puis recommander des liens d'achat aux utilisateurs. 
@@ -35,7 +35,7 @@ Ces caractéristiques similaires peuvent
 ## Étapes
 
 
- Dans cette section, nous allons introduire une technique courante dans l'apprentissage par transfert : le *réglage fin*. Comme le montre le site :numref:`fig_finetune` , l'ajustement fin comprend les quatre étapes suivantes :
+Dans cette section, nous allons introduire une technique courante dans l'apprentissage par transfert : le *réglage fin*. Comme le montre le site :numref:`fig_finetune`, l'ajustement fin comprend les quatre étapes suivantes :
 
 
  1. Préentraîner un modèle de réseau neuronal, c'est-à-dire le *modèle source*, sur un jeu de données source (par exemple, le jeu de données ImageNet).
@@ -128,8 +128,8 @@ not_hotdogs = [train_imgs[-i - 1][0] for i in range(8)]
 d2l.show_images(hotdogs + not_hotdogs, 2, 8, scale=1.4);
 ```
 
-Pendant l'apprentissage, nous découpons d'abord une zone aléatoire de taille et de rapport hauteur/largeur aléatoires dans l'image
-, puis nous mettons à l'échelle cette zone
+Pendant l'apprentissage, nous découpons d'abord une zone aléatoire de taille et de rapport hauteur/largeur aléatoires dans l'image,
+puis nous mettons à l'échelle cette zone
 pour obtenir une image d'entrée $224 \times 224$. 
 Lors du test, nous mettons à l'échelle la hauteur et la largeur d'une image à 256 pixels, puis nous découpons une zone centrale $224 \times 224$ en entrée.
 En outre, 

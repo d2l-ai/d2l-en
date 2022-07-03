@@ -1,7 +1,7 @@
 # Calcul intégral
 :label:`sec_integral_calculus` 
 
- La différentiation ne constitue que la moitié du contenu d'un enseignement traditionnel du calcul.  L'autre pilier, l'intégration, semble au départ une question plutôt disjointe : "Quelle est l'aire sous cette courbe ?"  Bien qu'apparemment sans rapport, l'intégration est étroitement liée à la différenciation via ce que l'on appelle le *théorème fondamental du calcul*.
+La différentiation ne constitue que la moitié du contenu d'un enseignement traditionnel du calcul.  L'autre pilier, l'intégration, semble au départ une question plutôt disjointe : "Quelle est l'aire sous cette courbe ?"  Bien qu'apparemment sans rapport, l'intégration est étroitement liée à la différenciation via ce que l'on appelle le *théorème fondamental du calcul*.
 
 Au niveau de l'apprentissage automatique que nous abordons dans ce livre, nous n'aurons pas besoin d'une compréhension approfondie de l'intégration. Cependant, nous allons fournir une brève introduction afin de préparer le terrain pour toutes les autres applications que nous rencontrerons plus tard.
 
@@ -202,7 +202,7 @@ $$
 \int_a^b f(x) \;dx = F(b) - F(a).
 $$
 
-Il s'agit d'un encodage mathématique du fait que nous pouvons mesurer l'aire jusqu'au point d'extrémité éloigné, puis soustraire l'aire jusqu'au point d'extrémité proche, comme indiqué sur :numref:`fig_area-subtract` .
+Il s'agit d'un encodage mathématique du fait que nous pouvons mesurer l'aire jusqu'au point d'extrémité éloigné, puis soustraire l'aire jusqu'au point d'extrémité proche, comme indiqué sur :numref:`fig_area-subtract`.
 
 ![Visualizing why we may reduce the problem of computing the area under a curve between two points to computing the area to the left of a point.](../img/sub-area.svg)
 :label:`fig_area-subtract`
@@ -231,15 +231,15 @@ $$
 
 C'est le *théorème fondamental du calcul*.  Nous pouvons l'écrire sous forme développée comme suit :
 $$\frac{d}{dx}\int_0^x  f(y) \; dy = f(x).$$ 
- :eqlabel:`eq_ftc` 
+:eqlabel:`eq_ftc` 
 
- Il prend le concept de recherche d'aires (*a priori* plutôt difficile), et le réduit à un énoncé de dérivées (quelque chose de beaucoup plus complètement compris).  Un dernier commentaire que nous devons faire est que cela ne nous dit pas exactement ce qu'est $F(x)$.  En effet, $F(x) + C$ pour tout $C$ a la même dérivée.  C'est un fait de la vie dans la théorie de l'intégration.  Heureusement, remarquez que lorsque vous travaillez avec des intégrales définies, les constantes disparaissent et ne sont donc pas pertinentes pour le résultat.
+Il prend le concept de recherche d'aires (*a priori* plutôt difficile), et le réduit à un énoncé de dérivées (quelque chose de beaucoup plus complètement compris).  Un dernier commentaire que nous devons faire est que cela ne nous dit pas exactement ce qu'est $F(x)$.  En effet, $F(x) + C$ pour tout $C$ a la même dérivée.  C'est un fait de la vie dans la théorie de l'intégration.  Heureusement, remarquez que lorsque vous travaillez avec des intégrales définies, les constantes disparaissent et ne sont donc pas pertinentes pour le résultat.
 
 $$
 \int_a^b f(x) \; dx = (F(b) + C) - (F(a) + C) = F(b) - F(a).
 $$
 
-Cela peut sembler être un non-sens abstrait, mais prenons un moment pour apprécier le fait que cela nous a donné une toute nouvelle perspective sur le calcul des intégrales.  Notre objectif n'est plus d'effectuer une sorte de processus de découpage et d'addition pour essayer de récupérer l'aire, mais de trouver une fonction dont la dérivée est la fonction que nous avons !  C'est incroyable car nous pouvons maintenant énumérer de nombreuses intégrales assez difficiles en inversant simplement le tableau de :numref:`sec_derivative_table` .  Par exemple, nous savons que la dérivée de $x^{n}$ est $nx^{n-1}$.  Ainsi, nous pouvons dire en utilisant le théorème fondamental :eqref:`eq_ftc` que
+Cela peut sembler être un non-sens abstrait, mais prenons un moment pour apprécier le fait que cela nous a donné une toute nouvelle perspective sur le calcul des intégrales.  Notre objectif n'est plus d'effectuer une sorte de processus de découpage et d'addition pour essayer de récupérer l'aire, mais de trouver une fonction dont la dérivée est la fonction que nous avons !  C'est incroyable car nous pouvons maintenant énumérer de nombreuses intégrales assez difficiles en inversant simplement le tableau de :numref:`sec_derivative_table`.  Par exemple, nous savons que la dérivée de $x^{n}$ est $nx^{n-1}$.  Ainsi, nous pouvons dire en utilisant le théorème fondamental :eqref:`eq_ftc` que
 
 $$
 \int_0^{x} ny^{n-1} \; dy = x^n - 0^n = x^n.
@@ -256,7 +256,7 @@ De cette façon, nous pouvons développer toute la théorie de l'intégration en
 ## Changement de variables
 :label:`subsec_integral_example` 
 
- Tout comme pour la différentiation, il existe un certain nombre de règles qui rendent le calcul des intégrales plus facile.  En fait, chaque règle du calcul différentiel (comme la règle du produit, la règle de la somme et la règle de la chaîne) a une règle correspondante pour le calcul intégral (intégration par parties, linéarité de l'intégration et formule de changement de variables, respectivement).  Dans cette section, nous allons nous plonger dans ce qui est sans doute le plus important de la liste : la formule de changement de variables.
+Tout comme pour la différentiation, il existe un certain nombre de règles qui rendent le calcul des intégrales plus facile.  En fait, chaque règle du calcul différentiel (comme la règle du produit, la règle de la somme et la règle de la chaîne) a une règle correspondante pour le calcul intégral (intégration par parties, linéarité de l'intégration et formule de changement de variables, respectivement).  Dans cette section, nous allons nous plonger dans ce qui est sans doute le plus important de la liste : la formule de changement de variables.
 
 Tout d'abord, supposons que nous ayons une fonction qui est elle-même une intégrale :
 
@@ -282,14 +282,14 @@ $$
 \int_{u(0)}^{u(x)} f(y) \; dy = \int_0^x \frac{dF}{du}(u(y))\cdot \frac{du}{dy} \;dy.
 $$
 
-De même, le fait de rappeler que $F$ est une intégrale nous permet de reconnaître que $\frac{dF}{dx} = f$ en utilisant le théorème fondamental :eqref:`eq_ftc` , et nous pouvons donc conclure
+De même, le fait de rappeler que $F$ est une intégrale nous permet de reconnaître que $\frac{dF}{dx} = f$ en utilisant le théorème fondamental :eqref:`eq_ftc`, et nous pouvons donc conclure
 
 $$\int_{u(0)}^{u(x)} f(y) \; dy = \int_0^x f(u(y))\cdot \frac{du}{dy} \;dy.$$ 
- :eqlabel:`eq_change_var` 
+:eqlabel:`eq_change_var` 
 
- Ceci est la formule de *changement de variables*.
+Ceci est la formule de *changement de variables*.
 
-Pour une dérivation plus intuitive, considérez ce qui se passe lorsque nous prenons une intégrale de $f(u(x))$ entre $x$ et $x+\epsilon$. Pour un petit $\epsilon$, cette intégrale est approximativement $\epsilon f(u(x))$, l'aire du rectangle associé.  Maintenant, comparons cela avec l'intégrale de $f(y)$ entre $u(x)$ et $u(x+\epsilon)$. Nous savons que $u(x+\epsilon) \approx u(x) + \epsilon \frac{du}{dx}(x)$, donc l'aire de ce rectangle est approximativement $\epsilon \frac{du}{dx}(x)f(u(x))$.  Ainsi, pour que les aires de ces deux rectangles concordent, nous devons multiplier la première par $\frac{du}{dx}(x)$ comme illustré dans :numref:`fig_rect-transform` .
+Pour une dérivation plus intuitive, considérez ce qui se passe lorsque nous prenons une intégrale de $f(u(x))$ entre $x$ et $x+\epsilon$. Pour un petit $\epsilon$, cette intégrale est approximativement $\epsilon f(u(x))$, l'aire du rectangle associé.  Maintenant, comparons cela avec l'intégrale de $f(y)$ entre $u(x)$ et $u(x+\epsilon)$. Nous savons que $u(x+\epsilon) \approx u(x) + \epsilon \frac{du}{dx}(x)$, donc l'aire de ce rectangle est approximativement $\epsilon \frac{du}{dx}(x)f(u(x))$.  Ainsi, pour que les aires de ces deux rectangles concordent, nous devons multiplier la première par $\frac{du}{dx}(x)$ comme illustré dans :numref:`fig_rect-transform`.
 
 ![Visualizing the transformation of a single thin rectangle under the change of variables.](../img/rect-trans.svg)
 :label:`fig_rect-transform`
@@ -342,7 +342,7 @@ $$
 \int_0^{-1} (-1)\;dx =  1.
 $$
 
-Si cette discussion vous semble familière, c'est le cas !  Dans :numref:`sec_geometry-linear-algebraic-ops` , nous avons vu comment le déterminant représentait l'aire signée de la même manière.
+Si cette discussion vous semble familière, c'est le cas !  Dans :numref:`sec_geometry-linear-algebraic-ops`, nous avons vu comment le déterminant représentait l'aire signée de la même manière.
 
 ## Intégrales multiples
 Dans certains cas, nous devrons travailler dans des dimensions supérieures.  Par exemple, supposons que nous ayons une fonction de deux variables, comme $f(x, y)$ et que nous voulions connaître le volume sous $f$ lorsque $x$ s'étend sur $[a, b]$ et $y$ sur $[c, d]$.
@@ -428,7 +428,7 @@ $$
 \sum_{i, j} \epsilon^{2} f(\epsilon i, \epsilon j).
 $$
 
-Une fois que nous avons discrétisé le problème, nous pouvons additionner les valeurs sur ces carrés dans l'ordre que nous voulons, sans nous soucier de changer les valeurs.  Ceci est illustré sur :numref:`fig_sum-order` . En particulier, nous pouvons dire que
+Une fois que nous avons discrétisé le problème, nous pouvons additionner les valeurs sur ces carrés dans l'ordre que nous voulons, sans nous soucier de changer les valeurs.  Ceci est illustré sur :numref:`fig_sum-order`. En particulier, nous pouvons dire que
 
 $$
  \sum _ {j} \epsilon \left(\sum_{i} \epsilon f(\epsilon i, \epsilon j)\right).
@@ -437,7 +437,7 @@ $$
 ![Illustrating how to decompose a sum over many squares as a sum over first the columns (1)puis ajouter les sommes des colonnes ensemble (2).](../img/sum-order.svg)
 :label:`fig_sum-order` 
 
- La somme à l'intérieur est précisément la discrétisation de l'intégrale
+La somme à l'intérieur est précisément la discrétisation de l'intégrale
 
 $$
 G(\epsilon j) = \int _a^{b} f(x, \epsilon j) \; dx.
@@ -470,7 +470,7 @@ $$
 $$
 
 ## Changement de variables dans les intégrales multiples
-Comme pour les variables simples dans :eqref:`eq_change_var` , la possibilité de changer de variables dans une intégrale de dimension supérieure est un outil essentiel.  Résumons le résultat sans dérivation.
+Comme pour les variables simples dans :eqref:`eq_change_var`, la possibilité de changer de variables dans une intégrale de dimension supérieure est un outil essentiel.  Résumons le résultat sans dérivation.
 
 Nous avons besoin d'une fonction qui reparamétrise notre domaine d'intégration.  Nous pouvons considérer qu'il s'agit de $\phi : \mathbb{R}^n \rightarrow \mathbb{R}^n$, c'est-à-dire toute fonction qui prend en compte $n$ variables réelles et renvoie une autre $n$.  Pour garder les expressions propres, nous supposerons que $\phi$ est *injective*, c'est-à-dire qu'elle ne se replie jamais sur elle-même ($\phi(\mathbf{x}) = \phi(\mathbf{y}) \implies \mathbf{x} = \mathbf{y}$).
 
@@ -490,7 +490,7 @@ D\boldsymbol{\phi} = \begin{bmatrix}
 \end{bmatrix}.
 $$
 
-En regardant de plus près, nous voyons que cette règle est similaire à la règle de la chaîne à une variable :eqref:`eq_change_var` , sauf que nous avons remplacé le terme $\frac{du}{dx}(x)$ par $\left|\det(D\phi(\mathbf{x}))\right|$.  Voyons comment nous pouvons interpréter ce terme.  Rappelez-vous que le terme $\frac{du}{dx}(x)$ existait pour indiquer de combien nous avons étiré notre axe $x$ en appliquant $u$.  Le même processus dans les dimensions supérieures consiste à déterminer de combien nous étirons la surface (ou le volume, ou l'hyper-volume) d'un petit carré (ou d'un petit *hyper-cube*) en appliquant $\boldsymbol{\phi}$.  Si $\boldsymbol{\phi}$ était la multiplication par une matrice, alors nous savons comment le déterminant donne déjà la réponse.
+En regardant de plus près, nous voyons que cette règle est similaire à la règle de la chaîne à une variable :eqref:`eq_change_var`, sauf que nous avons remplacé le terme $\frac{du}{dx}(x)$ par $\left|\det(D\phi(\mathbf{x}))\right|$.  Voyons comment nous pouvons interpréter ce terme.  Rappelez-vous que le terme $\frac{du}{dx}(x)$ existait pour indiquer de combien nous avons étiré notre axe $x$ en appliquant $u$.  Le même processus dans les dimensions supérieures consiste à déterminer de combien nous étirons la surface (ou le volume, ou l'hyper-volume) d'un petit carré (ou d'un petit *hyper-cube*) en appliquant $\boldsymbol{\phi}$.  Si $\boldsymbol{\phi}$ était la multiplication par une matrice, alors nous savons comment le déterminant donne déjà la réponse.
 
 Avec un peu de travail, on peut montrer que le *Jacobien* fournit la meilleure approximation d'une fonction multivariable $\boldsymbol{\phi}$ en un point par une matrice de la même manière que nous pourrions l'approximer par des lignes ou des plans avec des dérivées et des gradients. Ainsi, le déterminant du jacobien reflète exactement le facteur d'échelle que nous avons identifié dans une dimension.
 
@@ -521,9 +521,9 @@ $$
 \int _ 0^\infty \int _ 0 ^ {2\pi} re^{-r^{2}} \;d\theta\;dr = 2\pi\int _ 0^\infty re^{-r^{2}} \;dr = \pi,
 $$
 
-où l'égalité finale est obtenue par le même calcul que celui utilisé dans la section :numref:`subsec_integral_example` .
+où l'égalité finale est obtenue par le même calcul que celui utilisé dans la section :numref:`subsec_integral_example`.
 
-Nous rencontrerons à nouveau cette intégrale lorsque nous étudierons les variables aléatoires continues dans :numref:`sec_random_variables` .
+Nous rencontrerons à nouveau cette intégrale lorsque nous étudierons les variables aléatoires continues dans :numref:`sec_random_variables`.
 
 ## Résumé
 

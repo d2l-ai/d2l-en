@@ -1,8 +1,8 @@
 # Segmentation sémantique et ensemble de données
 :label:`sec_semantic_segmentation` 
 
- Lorsque l'on aborde les tâches de détection d'objets
-dans :numref:`sec_bbox` --:numref:`sec_rcnn` ,
+Lorsque l'on aborde les tâches de détection d'objets
+dans :numref:`sec_bbox` --:numref:`sec_rcnn`,
 les boîtes de délimitation rectangulaires
 sont utilisées pour étiqueter et prédire les objets dans les images.
 Cette section aborde le problème de la *segmentation sémantique*,
@@ -63,8 +63,8 @@ import torchvision
 import os
 ```
 
-Le fichier tar de l'ensemble de données est d'environ 2 Go,
-. Le téléchargement du fichier peut donc prendre un certain temps.
+Le fichier tar de l'ensemble de données est d'environ 2 Go.
+Le téléchargement du fichier peut donc prendre un certain temps.
 L'ensemble de données extrait est situé à l'adresse `../data/VOCdevkit/VOC2012`.
 
 ```{.python .input}
@@ -81,7 +81,7 @@ nous pouvons voir les différents composants de l'ensemble de données.
 Le chemin `ImageSets/Segmentation` contient des fichiers texte
 qui spécifient les échantillons d'entraînement et de test,
 tandis que les chemins `JPEGImages` et `SegmentationClass`
- stockent l'image d'entrée et l'étiquette pour chaque exemple, respectivement.
+stockent l'image d'entrée et l'étiquette pour chaque exemple, respectivement.
 Ici, l'étiquette est également au format image,
 avec la même taille
 que son image d'entrée étiquetée.
@@ -173,10 +173,10 @@ Avec les deux constantes définies ci-dessus,
 nous pouvons facilement
 [**trouver l'indice de classe pour chaque pixel dans une étiquette**].
 Nous définissons la fonction `voc_colormap2label`
- pour construire le mappage des valeurs de couleur RVB ci-dessus
+pour construire le mappage des valeurs de couleur RVB ci-dessus
 aux indices de classe,
 et la fonction `voc_label_indices`
- pour mapper toute valeur RVB à ses indices de classe dans cet ensemble de données Pascal VOC2012.
+pour mapper toute valeur RVB à ses indices de classe dans cet ensemble de données Pascal VOC2012.
 
 ```{.python .input}
 #@tab mxnet
@@ -230,8 +230,8 @@ y[105:115, 130:140], VOC_CLASSES[1]
 
 ### Prétraitement des données
 
-Dans les expériences précédentes
-, comme dans :numref:`sec_alexnet` --:numref:`sec_googlenet` ,
+Dans les expériences précédentes,
+comme dans :numref:`sec_alexnet` --:numref:`sec_googlenet`,
 les images sont redimensionnées
 pour s'adapter à la forme d'entrée requise par le modèle.
 Cependant, dans le cadre de la segmentation sémantique,
@@ -413,7 +413,7 @@ for X, Y in train_iter:
 ### [**Putting All Things Together**]
 
 Enfin, nous définissons la fonction suivante `load_data_voc`
- pour télécharger et lire le jeu de données de segmentation sémantique Pascal VOC2012.
+pour télécharger et lire le jeu de données de segmentation sémantique Pascal VOC2012.
 Elle renvoie des itérateurs de données pour les ensembles de données d'entraînement et de test.
 
 ```{.python .input}
@@ -460,7 +460,7 @@ def load_data_voc(batch_size, crop_size):
 ## Exercices
 
 1. Comment la segmentation sémantique peut-elle être appliquée aux véhicules autonomes et aux diagnostics d'images médicales ? Pouvez-vous imaginer d'autres applications ?
-1. Rappelez-vous les descriptions de l'augmentation des données dans :numref:`sec_image_augmentation` . Parmi les méthodes d'augmentation des données utilisées dans la classification d'images, lesquelles ne pourraient pas être appliquées à la segmentation sémantique ?
+1. Rappelez-vous les descriptions de l'augmentation des données dans :numref:`sec_image_augmentation`. Parmi les méthodes d'augmentation des données utilisées dans la classification d'images, lesquelles ne pourraient pas être appliquées à la segmentation sémantique ?
 
 
 :begin_tab:`mxnet`

@@ -2,7 +2,7 @@
 :label:`sec_anchor` 
 
  
- Les algorithmes de détection d'objets échantillonnent généralement
+Les algorithmes de détection d'objets échantillonnent généralement
 un grand nombre de régions dans l'image d'entrée, déterminent si ces régions contiennent
 des objets intéressants et ajustent les limites
 des régions de manière à prédire plus précisément les boîtes d'ancrage
@@ -14,7 +14,7 @@ Nous présentons ici l'une de ces méthodes :
 elle génère plusieurs boîtes de délimitation avec des échelles et des rapports d'aspect variables centrées sur chaque pixel. 
 Ces boîtes de délimitation sont appelées *boîtes d'ancrage*.
 Nous allons concevoir un modèle de détection d'objets
-basé sur les boîtes d'ancrage dans :numref:`sec_ssd` .
+basé sur les boîtes d'ancrage dans :numref:`sec_ssd`.
 
 Tout d'abord, modifions la précision d'impression
 pour obtenir des résultats plus concis.
@@ -52,8 +52,8 @@ définissons une série d'échelles
 $s_1,\ldots, s_n$ et 
 une série de rapports d'aspect $r_1,\ldots, r_m$.
 En utilisant toutes les combinaisons de ces échelles et rapports d'aspect avec chaque pixel comme centre,
-l'image d'entrée aura un total de $whnm$ boîtes d'ancrage. Bien que ces boîtes d'ancrage puissent couvrir toutes les boîtes de délimitation de la vérité du sol
-, la complexité de calcul est facilement trop élevée.
+l'image d'entrée aura un total de $whnm$ boîtes d'ancrage. Bien que ces boîtes d'ancrage puissent couvrir toutes les boîtes de délimitation de la vérité du sol,
+la complexité de calcul est facilement trop élevée.
 En pratique,
 nous ne pouvons (**considérer que les combinaisons
 contenant**) $s_1$ ou $r_1$:
@@ -242,8 +242,8 @@ Nous savons que l'indice *Jaccard* peut mesurer la similarité entre deux ensemb
 $$J(\mathcal{A},\mathcal{B}) = \frac{\left|\mathcal{A} \cap \mathcal{B}\right|}{\left| \mathcal{A} \cup \mathcal{B}\right|}.$$ 
 
  
- En fait, nous pouvons considérer la surface des pixels de n'importe quelle boîte englobante comme un ensemble de pixels. 
-De cette façon, nous pouvons mesurer la similarité de deux boîtes englobantes par l'indice de Jaccard de leurs ensembles de pixels. Pour deux boîtes englobantes, nous désignons généralement leur indice de Jaccard par l'expression *intersection sur union* (*IoU*), qui est le rapport entre leur zone d'intersection et leur zone d'union, comme indiqué sur :numref:`fig_iou` .
+En fait, nous pouvons considérer la surface des pixels de n'importe quelle boîte englobante comme un ensemble de pixels. 
+De cette façon, nous pouvons mesurer la similarité de deux boîtes englobantes par l'indice de Jaccard de leurs ensembles de pixels. Pour deux boîtes englobantes, nous désignons généralement leur indice de Jaccard par l'expression *intersection sur union* (*IoU*), qui est le rapport entre leur zone d'intersection et leur zone d'union, comme indiqué sur :numref:`fig_iou`.
 L'intervalle d'un IoU est compris entre 0 et 1 :
 0 signifie que deux boîtes englobantes ne se chevauchent pas du tout,
 tandis que 1 indique que les deux boîtes englobantes sont égales.
@@ -304,7 +304,7 @@ def box_iou(boxes1, boxes2):
 :label:`subsec_labeling-anchor-boxes` 
 
  
- Dans un ensemble de données d'entraînement,
+Dans un ensemble de données d'entraînement,
 nous considérons chaque boîte d'ancrage comme un exemple d'entraînement.
 Afin d'entraîner un modèle de détection d'objets,
 nous avons besoin d'étiquettes de *classe* et de *décalage* pour chaque boîte d'ancrage,
@@ -425,10 +425,10 @@ la classe de la boîte d'ancrage $A$ sera étiquetée
 comme celle de $B$.
 D'autre part,
 le décalage de la boîte d'ancrage $A$ 
- sera étiqueté en fonction de la position relative 
+sera étiqueté en fonction de la position relative 
 entre
 les coordonnées centrales de $B$ et $A$
- ainsi que de la taille relative entre
+ainsi que de la taille relative entre
 ces deux boîtes.
 Étant donné les positions et les tailles variables
 des différentes boîtes de l'ensemble de données,
@@ -468,7 +468,7 @@ Si une boîte d'ancrage n'est pas associée à une boîte de délimitation de la
 Les boîtes d'ancrage dont la classe est l'arrière-plan sont souvent appelées boîtes d'ancrage *négatives*,
 et les autres sont appelées boîtes d'ancrage *positives*.
 Nous implémentons la fonction suivante `multibox_target`
- pour [**étiqueter les classes et les décalages pour les boîtes d'ancrage**] (l'argument `anchors` ) en utilisant des boîtes d'encombrement conformes à la réalité (l'argument `labels` ).
+pour [**étiqueter les classes et les décalages pour les boîtes d'ancrage**] (l'argument `anchors` ) en utilisant des boîtes d'encombrement conformes à la réalité (l'argument `labels` ).
 Cette fonction définit la classe d'arrière-plan à zéro et incrémente de un l'indice entier d'une nouvelle classe.
 
 ```{.python .input}
@@ -607,8 +607,8 @@ et de boîtes limites de vérité,
 l'IoU de la boîte d'ancrage $A_4$ et la boîte limite de vérité du chat sont les plus grandes. 
 Ainsi, la classe de $A_4$ est étiquetée comme étant le chat.
 Si l'on exclut les paires 
-contenant $A_4$ ou la boîte englobante de vérité du chat, parmi les autres 
-, la paire de la boîte d'ancrage $A_1$ et de la boîte englobante de vérité du chien a le plus grand IoU.
+contenant $A_4$ ou la boîte englobante de vérité du chat, parmi les autres ,
+la paire de la boîte d'ancrage $A_1$ et de la boîte englobante de vérité du chien a le plus grand IoU.
 La classe de $A_1$ est donc étiquetée comme étant celle du chien.
 Ensuite, nous devons parcourir les trois autres boîtes d'ancrage non étiquetées : $A_0$, $A_2$, et $A_3$.
 Pour $A_0$,
@@ -648,13 +648,13 @@ labels[0]
 ## Prédiction de boîtes englobantes avec suppression non maximale
 :label:`subsec_predicting-bounding-boxes-nms` 
 
- Pendant la prédiction,
+Pendant la prédiction,
 nous générons plusieurs boîtes d'ancrage pour l'image et prédisons les classes et les décalages pour chacune d'elles.
 Une *bounding box* prédite
 est ainsi obtenue en fonction de 
 une boîte d'ancrage avec son décalage prédit.
 Nous implémentons ci-dessous la fonction `offset_inverse`
- qui prend en entrée les boîtes d'ancrage et les prédictions de décalage
+qui prend en entrée les boîtes d'ancrage et les prédictions de décalage
 et [**applique des transformations de décalage inverses pour
 renvoyer les coordonnées prédites de la boîte englobante**].
 
@@ -674,7 +674,7 @@ def offset_inverse(anchors, offset_preds):
 Lorsqu'il existe de nombreuses boîtes d'ancrage,
 de nombreuses boîtes englobantes prédites similaires (avec un chevauchement important)
  
- peuvent potentiellement être produites pour entourer le même objet.
+peuvent potentiellement être produites pour entourer le même objet.
 Pour simplifier la sortie,
 nous pouvons fusionner les boîtes englobantes prédites similaires
 qui appartiennent au même objet
@@ -737,7 +737,7 @@ def nms(boxes, scores, iou_threshold):
 ```
 
 Nous définissons la fonction suivante `multibox_detection`
- pour [**appliquer une suppression non maximale
+pour [**appliquer une suppression non maximale
 à la prédiction des boîtes englobantes**].
 Ne vous inquiétez pas si vous trouvez l'implémentation
 un peu compliquée : nous montrerons comment cela fonctionne
@@ -843,7 +843,7 @@ show_bboxes(fig.axes, anchors * bbox_scale,
 ```
 
 Nous pouvons maintenant invoquer la fonction `multibox_detection`
- pour effectuer une suppression non maximale,
+pour effectuer une suppression non maximale,
 où le seuil est fixé à 0,5.
 Notez que nous ajoutons
 une dimension pour les exemples dans l'entrée tensorielle.
@@ -908,8 +908,8 @@ dans le résultat final.
 
 1. Modifiez les valeurs de `sizes` et `ratios` dans la fonction `multibox_prior`. Quels sont les changements apportés aux boîtes d'ancrage générées ?
 1. Construisez et visualisez deux boîtes englobantes avec un IoU de 0,5. Comment se chevauchent-elles ?
-1. Modifiez la variable `anchors` dans :numref:`subsec_labeling-anchor-boxes` et :numref:`subsec_predicting-bounding-boxes-nms` . Comment les résultats changent-ils ?
-1. La suppression non maximale est un algorithme gourmand qui supprime les boîtes englobantes prédites en les *supprimant*. Est-il possible que certaines de ces boîtes supprimées soient réellement utiles ? Comment peut-on modifier cet algorithme pour supprimer *mollement* ? Vous pouvez vous référer à Soft-NMS :cite:`Bodla.Singh.Chellappa.ea.2017` .
+1. Modifiez la variable `anchors` dans :numref:`subsec_labeling-anchor-boxes` et :numref:`subsec_predicting-bounding-boxes-nms`. Comment les résultats changent-ils ?
+1. La suppression non maximale est un algorithme gourmand qui supprime les boîtes englobantes prédites en les *supprimant*. Est-il possible que certaines de ces boîtes supprimées soient réellement utiles ? Comment peut-on modifier cet algorithme pour supprimer *mollement* ? Vous pouvez vous référer à Soft-NMS :cite:`Bodla.Singh.Chellappa.ea.2017`.
 1. Plutôt que d'être fabriquée à la main, la suppression non-maximale peut-elle être apprise ?
 
 :begin_tab:`mxnet`

@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Conception orientée objet pour l'implémentation
 :label:`sec_oo-design` 
 
- Dans notre introduction à la régression linéaire,
+Dans notre introduction à la régression linéaire,
 nous avons parcouru différents composants
 dont
 les données, le modèle, la fonction de perte,
@@ -17,8 +17,8 @@ l'un des modèles d'apprentissage automatique les plus simples.
 Sa formation,
 toutefois, fait appel à un grand nombre de composants identiques à ceux des autres modèles présentés dans cet ouvrage.
 Par conséquent, 
-avant de plonger dans les détails de la mise en œuvre
-, il est utile 
+avant de plonger dans les détails de la mise en œuvre,
+il est utile 
 de concevoir certaines des API
 utilisées tout au long de cet ouvrage. 
 En traitant les composants de l'apprentissage profond
@@ -69,7 +69,7 @@ import tensorflow as tf
 ## Utilitaires
 :label:`oo-design-utilities` 
 
- Nous avons besoin de quelques utilitaires pour simplifier la programmation orientée objet dans les carnets Jupyter. L'un des défis est que les définitions de classe ont tendance à être des blocs de code assez longs. La lisibilité des notebooks exige des fragments de code courts, entrecoupés d'explications, une exigence incompatible avec le style de programmation commun aux bibliothèques Python. La première fonction utilitaire
+Nous avons besoin de quelques utilitaires pour simplifier la programmation orientée objet dans les carnets Jupyter. L'un des défis est que les définitions de classe ont tendance à être des blocs de code assez longs. La lisibilité des notebooks exige des fragments de code courts, entrecoupés d'explications, une exigence incompatible avec le style de programmation commun aux bibliothèques Python. La première fonction utilitaire
 nous permet d'enregistrer des fonctions en tant que méthodes dans une classe *après* la création de la classe. En fait, nous pouvons le faire *même après* avoir créé des instances de la classe ! Cela nous permet de diviser l'implémentation d'une classe en plusieurs blocs de code.
 
 ```{.python .input}
@@ -111,7 +111,7 @@ class HyperParameters:  #@save
         raise NotImplemented
 ```
 
-Nous reportons son implémentation dans :numref:`sec_utils` . Pour l'utiliser, nous définissons notre classe qui hérite de `HyperParameters` et appelle `save_hyperparameters` dans la méthode `__init__`.
+Nous reportons son implémentation dans :numref:`sec_utils`. Pour l'utiliser, nous définissons notre classe qui hérite de `HyperParameters` et appelle `save_hyperparameters` dans la méthode `__init__`.
 
 ```{.python .input}
 %%tab all
@@ -125,7 +125,7 @@ class B(d2l.HyperParameters):
 b = B(a=1, b=2, c=3)
 ```
 
-Le dernier utilitaire nous permet de tracer la progression de l'expérience de manière interactive pendant qu'elle se déroule. En référence à [TensorBoard](https://www.tensorflow.org/tensorboard), beaucoup plus puissant (et complexe), nous le nommons `ProgressBoard`. L'implémentation est reportée à :numref:`sec_utils` . Pour l'instant, nous allons simplement la voir en action.
+Le dernier utilitaire nous permet de tracer la progression de l'expérience de manière interactive pendant qu'elle se déroule. En référence à [TensorBoard](https://www.tensorflow.org/tensorboard), beaucoup plus puissant (et complexe), nous le nommons `ProgressBoard`. L'implémentation est reportée à :numref:`sec_utils`. Pour l'instant, nous allons simplement la voir en action.
 
 La fonction `draw` trace un point `(x, y)` dans la figure, avec `label` spécifié dans la légende. L'option `every_n` lisse la ligne en ne montrant que les points $1/n$ dans la figure. Leurs valeurs sont calculées à partir de la moyenne des points voisins $n$ dans la figure originale.
 
@@ -156,7 +156,7 @@ for x in np.arange(0, 10, 0.1):
 ## Modèles
 :label:`oo-design-models` 
 
- La classe `Module` est la classe de base de tous les modèles que nous allons implémenter. Au minimum, nous devons définir trois méthodes. La méthode `__init__` stocke les paramètres apprenables, la méthode `training_step` accepte un lot de données pour renvoyer la valeur de perte, la méthode `configure_optimizers` renvoie la méthode d'optimisation, ou une liste de celles-ci, qui est utilisée pour mettre à jour les paramètres apprenables. En option, nous pouvons définir `validation_step` pour rapporter les mesures d'évaluation.
+La classe `Module` est la classe de base de tous les modèles que nous allons implémenter. Au minimum, nous devons définir trois méthodes. La méthode `__init__` stocke les paramètres apprenables, la méthode `training_step` accepte un lot de données pour renvoyer la valeur de perte, la méthode `configure_optimizers` renvoie la méthode d'optimisation, ou une liste de celles-ci, qui est utilisée pour mettre à jour les paramètres apprenables. En option, nous pouvons définir `validation_step` pour rapporter les mesures d'évaluation.
 Parfois, nous plaçons le code de calcul de la sortie dans une méthode distincte `forward` pour le rendre plus réutilisable.
 
 ```{.python .input}
@@ -218,23 +218,23 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 
 :begin_tab:`mxnet`
 Vous pouvez remarquer que `Module` est une sous-classe de `nn.Block`, la classe de base des réseaux neuronaux dans Gluon.
-Elle fournit des fonctionnalités pratiques pour la gestion des réseaux neuronaux. Par exemple, si nous définissons une méthode `forward`, comme `forward(self, X)`, pour une instance `a`, nous pouvons invoquer cette fonction par `a(X)`. Cela fonctionne puisqu'il appelle la méthode `forward` dans la méthode intégrée `__call__`. Vous trouverez plus de détails et d'exemples sur `nn.Block` dans :numref:`sec_model_construction` .
+Elle fournit des fonctionnalités pratiques pour la gestion des réseaux neuronaux. Par exemple, si nous définissons une méthode `forward`, comme `forward(self, X)`, pour une instance `a`, nous pouvons invoquer cette fonction par `a(X)`. Cela fonctionne puisqu'il appelle la méthode `forward` dans la méthode intégrée `__call__`. Vous trouverez plus de détails et d'exemples sur `nn.Block` dans :numref:`sec_model_construction`.
 :end_tab: 
 
  :begin_tab:`pytorch` 
- Vous avez peut-être remarqué que `Module` est une sous-classe de `nn.Module`, la classe de base des réseaux neuronaux dans PyTorch.
-Elle fournit des fonctionnalités pratiques pour manipuler les réseaux neuronaux. Par exemple, si nous définissons une méthode `forward`, comme `forward(self, X)`, pour une instance `a`, nous pouvons invoquer cette fonction par `a(X)`. Cela fonctionne puisqu'il appelle la méthode `forward` dans la méthode intégrée `__call__`. Vous trouverez plus de détails et d'exemples sur `nn.Module` dans :numref:`sec_model_construction` .
+Vous avez peut-être remarqué que `Module` est une sous-classe de `nn.Module`, la classe de base des réseaux neuronaux dans PyTorch.
+Elle fournit des fonctionnalités pratiques pour manipuler les réseaux neuronaux. Par exemple, si nous définissons une méthode `forward`, comme `forward(self, X)`, pour une instance `a`, nous pouvons invoquer cette fonction par `a(X)`. Cela fonctionne puisqu'il appelle la méthode `forward` dans la méthode intégrée `__call__`. Vous trouverez plus de détails et d'exemples sur `nn.Module` dans :numref:`sec_model_construction`.
 :end_tab: 
 
  :begin_tab:`tensorflow` 
- Vous remarquerez peut-être que `Module` est une sous-classe de `tf.keras.Model`, la classe de base des réseaux neuronaux dans TensorFlow.
+Vous remarquerez peut-être que `Module` est une sous-classe de `tf.keras.Model`, la classe de base des réseaux neuronaux dans TensorFlow.
 Elle fournit des fonctionnalités pratiques pour manipuler les réseaux neuronaux. Par exemple, elle invoque la méthode `call` dans la méthode intégrée `__call__`. Ici, nous redirigeons `call` vers la fonction `forward`, en enregistrant ses arguments comme un attribut de classe. Nous faisons cela pour rendre notre code plus similaire aux autres implémentations du framework.
 :end_tab:
 
 ## Données
 :label:`oo-design-data` 
 
- La classe `DataModule` est la classe de base pour les données. Très souvent, la méthode `__init__` est utilisée pour préparer les données. Cela inclut le téléchargement et le prétraitement si nécessaire. La méthode `train_dataloader` renvoie le chargeur de données pour l'ensemble de données d'apprentissage. Un chargeur de données est un générateur (Python) qui produit un lot de données à chaque fois qu'il est utilisé. Ce lot est ensuite introduit dans la méthode `training_step` de `Module` pour calculer la perte. Il existe une option `val_dataloader` pour renvoyer le chargeur de données de validation. Il se comporte de la même manière, sauf qu'il produit des lots de données pour la méthode `validation_step` dans `Module`.
+La classe `DataModule` est la classe de base pour les données. Très souvent, la méthode `__init__` est utilisée pour préparer les données. Cela inclut le téléchargement et le prétraitement si nécessaire. La méthode `train_dataloader` renvoie le chargeur de données pour l'ensemble de données d'apprentissage. Un chargeur de données est un générateur (Python) qui produit un lot de données à chaque fois qu'il est utilisé. Ce lot est ensuite introduit dans la méthode `training_step` de `Module` pour calculer la perte. Il existe une option `val_dataloader` pour renvoyer le chargeur de données de validation. Il se comporte de la même manière, sauf qu'il produit des lots de données pour la méthode `validation_step` dans `Module`.
 
 ```{.python .input}
 %%tab all
@@ -260,7 +260,7 @@ class DataModule(d2l.HyperParameters):  #@save
 ## Formation
 :label:`oo-design-training` 
 
- La classe `Trainer` forme les paramètres apprenables de la classe `Module` avec les données spécifiées dans `DataModule`. La méthode clé est `fit`, qui accepte deux arguments :`model` une instance de `Module`, et `data`, une instance de `DataModule`. Elle itère ensuite sur l'ensemble complet de données `max_epochs` fois pour entraîner le modèle. Comme précédemment, nous reporterons l'implémentation de cette fonction à des chapitres ultérieurs.
+La classe `Trainer` forme les paramètres apprenables de la classe `Module` avec les données spécifiées dans `DataModule`. La méthode clé est `fit`, qui accepte deux arguments :`model` une instance de `Module`, et `data`, une instance de `DataModule`. Elle itère ensuite sur l'ensemble complet de données `max_epochs` fois pour entraîner le modèle. Comme précédemment, nous reporterons l'implémentation de cette fonction à des chapitres ultérieurs.
 
 ```{.python .input}
 %%tab all

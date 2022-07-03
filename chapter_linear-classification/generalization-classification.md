@@ -4,7 +4,7 @@
 
  
 
- Jusqu'à présent, nous nous sommes concentrés sur la manière d'aborder les problèmes de classification multiclasse
+Jusqu'à présent, nous nous sommes concentrés sur la manière d'aborder les problèmes de classification multiclasse
 en formant des réseaux neuronaux (linéaires) à sorties multiples et des fonctions softmax.
 En interprétant les sorties de notre modèle comme des prédictions probabilistes,
 nous avons motivé et dérivé la fonction de perte d'entropie croisée,
@@ -29,10 +29,10 @@ et deviner au hasard chaque fois que nous rencontrerons de nouveaux exemples.
 
 Un certain nombre de questions brûlantes exigent une attention immédiate :
 1. De combien d'exemples de test avons-nous besoin pour estimer précisément
- la précision de nos classifieur sur la population sous-jacente ?
+la précision de nos classifieurs sur la population sous-jacente ?
 1. Que se passe-t-il si nous continuons à évaluer les modèles sur le même test à plusieurs reprises ?
 1. Pourquoi devrions-nous nous attendre à ce que l'adaptation de nos modèles linéaires à l'ensemble d'apprentissage
- donne de meilleurs résultats que notre schéma de mémorisation naïve ?
+donne de meilleurs résultats que notre schéma de mémorisation naïve ?
 
 
 Alors que :numref:`sec_generalization_basics` a présenté
@@ -46,12 +46,12 @@ pour de nombreux modèles,
 et pour toute limite supérieure souhaitée
 sur l'écart de généralisation $\epsilon$,
 nous pouvons souvent déterminer un certain nombre d'échantillons requis $n$
- de sorte que si notre ensemble d'apprentissage contient au moins $n$
+de sorte que si notre ensemble d'apprentissage contient au moins $n$
  échantillons, alors notre erreur empirique se situera
 dans les limites de $\epsilon$ de l'erreur réelle,
 *pour toute distribution générant des données*.
-Malheureusement, il s'avère également que
-, alors que ces types de garanties fournissent
+Malheureusement, il s'avère également que,
+alors que ces types de garanties fournissent
 un ensemble profond de blocs de construction intellectuelle,
 ils sont d'une utilité pratique limitée
 pour le praticien de l'apprentissage profond.
@@ -63,14 +63,14 @@ nécessite un nombre absurde d'exemples
 même lorsque nous constatons que sur les tâches qui nous intéressent
 que les réseaux neuronaux profonds généralisent généralement
 remarquablement bien avec beaucoup moins d'exemples (des milliers).
-C'est pourquoi les praticiens de l'apprentissage profond renoncent souvent à toute garantie a priori
-,
+C'est pourquoi les praticiens de l'apprentissage profond renoncent souvent à toute garantie a priori,
+
 employant plutôt des méthodes sur la base 
 qu'elles ont bien généralisé
 sur des problèmes similaires dans le passé,
 et certifiant la généralisation *post hoc*
 par des évaluations empiriques.
-Lorsque nous arriverons à :numref:`chap_perceptrons` ,
+Lorsque nous arriverons à :numref:`chap_perceptrons`,
 nous reviendrons sur la généralisation
 et fournirons une introduction légère
 à la vaste littérature scientifique
@@ -84,15 +84,15 @@ comme méthode de référence
 pour évaluer l'erreur de généralisation,
 commençons par discuter
 des propriétés de ces estimations d'erreur.
-Concentrons-nous sur un classificateur fixe $f$,
+Concentrons-nous sur un classifieur fixe $f$,
 sans nous soucier de la manière dont il a été obtenu.
 Supposons en outre que nous possédions
 un ensemble de données *fraîches* d'exemples $\mathcal{D} = {(\mathbf{x}^{(i)},y^{(i)})}_{i=1}^n$
- qui n'ont pas été utilisés pour entraîner le classificateur $f$.
-L'erreur *empirique* de notre classificateur $f$ sur $\mathcal{D}$
- est simplement la fraction d'instances
+qui n'ont pas été utilisés pour entraîner le classifieur $f$.
+L'erreur *empirique* de notre classifieur $f$ sur $\mathcal{D}$
+est simplement la fraction d'instances
 pour lesquelles la prédiction $f(\mathbf{x}^{(i)})$
- est en désaccord avec l'étiquette réelle $y^{(i)}$,
+est en désaccord avec l'étiquette réelle $y^{(i)}$,
 et est donnée par l'expression suivante :
 
 $$\epsilon_\mathcal{D}(f) = \frac{1}{n}\sum_{i=1}^n \mathbf{1}(f(\mathbf{x}^{(i)}) \neq y^{(i)}).$$
@@ -102,7 +102,7 @@ est la fraction *attendue*
 d'exemples dans la population sous-jacente
 (une certaine distribution $P(X,Y)$ caractérisée
 par une fonction de densité de probabilité $p(\mathbf{x},y)$
- pour laquelle notre classificateur est en désaccord
+pour laquelle notre classifieur est en désaccord
 avec la véritable étiquette :
 
 $$\epsilon(f) =  E_{(\mathbf{x}, y) \sim P} \mathbf{1}(f(\mathbf{x}) \neq y) =
@@ -115,22 +115,22 @@ la taille moyenne dans une grande population
 sans mesurer chaque personne.
 Nous ne pouvons qu'estimer cette quantité en nous basant sur des échantillons.
 Comme notre ensemble de test $\mathcal{D}$
- est statistiquement représentatif
+est statistiquement représentatif
 de la population sous-jacente,
 nous pouvons considérer $\epsilon_\mathcal{D}(f)$ comme un estimateur statistique
 de l'erreur de population $\epsilon(f)$.
 De plus, étant donné que notre quantité d'intérêt $\epsilon(f)$
- est une espérance (de la variable aléatoire $\mathbf{1}(f(X) \neq Y)$)
+est une espérance (de la variable aléatoire $\mathbf{1}(f(X) \neq Y)$)
 et que l'estimateur correspondant $\epsilon_\mathcal{D}(f)$
- est la moyenne de l'échantillon, 
+est la moyenne de l'échantillon, 
 l'estimation de l'erreur de population 
 est simplement le problème classique de l'estimation de la moyenne,
-dont vous vous souvenez peut-être de :numref:`sec_prob` .
+dont vous vous souvenez peut-être de :numref:`sec_prob`.
 
 Un important résultat classique de la théorie des probabilités
 appelé le *théorème central limite* garantit
 que lorsque nous possédons $n$ des échantillons aléatoires $a_1, ..., a_n$
- tirés d'une distribution quelconque avec une moyenne $\mu$ et un écart type $\sigma$,
+tirés d'une distribution quelconque avec une moyenne $\mu$ et un écart type $\sigma$,
 lorsque le nombre d'échantillons $n$ s'approche de l'infini,
 la moyenne de l'échantillon $\hat{\mu}$ tend approximativement
 vers une distribution normale centrée
@@ -138,25 +138,25 @@ sur la vraie moyenne et avec un écart type $\sigma/\sqrt{n}$.
 Cela nous apprend déjà quelque chose d'important :
 lorsque le nombre d'exemples augmente,
 notre erreur de test $\epsilon_\mathcal{D}(f)$
- devrait se rapprocher de l'erreur réelle $\epsilon(f)$
+devrait se rapprocher de l'erreur réelle $\epsilon(f)$
  à un rythme de $\mathcal{O}(1/\sqrt{n})$.
 Ainsi, pour estimer notre erreur de test avec deux fois plus de précision,
 nous devons collecter un ensemble de tests quatre fois plus grand.
 Pour réduire notre erreur de test d'un facteur cent,
 nous devons collecter un ensemble de tests dix mille fois plus grand.
 En général, un tel taux de $\mathcal{O}(1/\sqrt{n})$ 
- est souvent le meilleur que l'on puisse espérer en statistique.
+est souvent le meilleur que l'on puisse espérer en statistique.
 
 Maintenant que nous connaissons le taux asymptotique
 auquel notre erreur de test $\epsilon_\mathcal{D}(f)$ converge vers l'erreur réelle $\epsilon(f)$,
 nous pouvons nous concentrer sur certains détails importants.
 Rappelons que la variable aléatoire qui nous intéresse
 $\mathbf{1}(f(X) \neq Y)$ 
- ne peut prendre que les valeurs $0$ et $1$
- et qu'il s'agit donc d'une variable aléatoire de Bernoulli,
+ne peut prendre que les valeurs $0$ et $1$
+et qu'il s'agit donc d'une variable aléatoire de Bernoulli,
 caractérisée par un paramètre
 indiquant la probabilité qu'elle prenne la valeur $1$.
-Ici, $1$ signifie que notre classificateur a commis une erreur,
+Ici, $1$ signifie que notre classifieur a commis une erreur,
 donc le paramètre de notre variable aléatoire
 est en fait le taux d'erreur réel $\epsilon(f)$.
 La variance $\sigma^2$ d'une variable de Bernoulli
@@ -167,7 +167,7 @@ nous savons qu'il ne peut pas être supérieur à $1$.
 Une petite étude de cette fonction
 révèle que notre variance est la plus élevée
 lorsque le taux d'erreur réel est proche de $0.5$
- et peut être bien plus faible lorsqu'il est
+et peut être bien plus faible lorsqu'il est
 proche de $0$ ou proche de $1$.
 Cela nous indique que l'écart type asymptotique
 de notre estimation $\epsilon_\mathcal{D}(f)$ de l'erreur $\epsilon(f)$
@@ -178,8 +178,8 @@ Si nous ignorons le fait que ce taux caractérise le comportement de
 lorsque la taille de l'ensemble de test s'approche de l'infini
 plutôt que lorsque nous possédons des échantillons finis,
 cela nous indique que si nous voulons que notre erreur de test $\epsilon_\mathcal{D}(f)$
- se rapproche de l'erreur de la population $\epsilon(f)$
- de telle sorte qu'un écart-type corresponde
+se rapproche de l'erreur de la population $\epsilon(f)$
+de telle sorte qu'un écart-type corresponde
 à un intervalle de $\pm 0.01$,
 alors nous devons collecter environ 2500 échantillons.
 Si nous voulons ajuster deux écarts-types
@@ -209,14 +209,14 @@ $$P(\epsilon_\mathcal{D}(f) - \epsilon(f) \geq t) < \exp\left( - 2n t^2 \right).
 Résoudre la plus petite taille d'ensemble de données
 qui nous permettrait de conclure
 avec une confiance de 95 % que la distance $t$
- entre notre estimation $\epsilon_\mathcal{D}(f)$
- et le taux d'erreur réel $\epsilon(f)$
+entre notre estimation $\epsilon_\mathcal{D}(f)$
+et le taux d'erreur réel $\epsilon(f)$
  ne dépasse pas $0.01$,
 vous constaterez qu'environ $15000$ exemples sont nécessaires
 par rapport aux $10000$ exemples suggérés
 par l'analyse asymptotique ci-dessus.
-Si vous approfondissez les statistiques
-, vous constaterez que cette tendance est généralement valable.
+Si vous approfondissez les statistiques,
+vous constaterez que cette tendance est généralement valable.
 Les garanties qui tiennent même dans des échantillons finis
 sont généralement légèrement plus conservatrices.
 Notez que dans l'ordre des choses,
@@ -233,7 +233,7 @@ Dans un certain sens, vous êtes maintenant prêt à réussir
 Presque tous les modèles pratiques sont développés
 et validés sur la base des performances de l'ensemble de tests
 et vous êtes maintenant un maître de l'ensemble de tests.
-Pour tout classificateur fixe $f$,
+Pour tout classifieur fixe $f$,
 vous savez évaluer son erreur de test $\epsilon_\mathcal{D}(f)$,
 et savez précisément ce qui peut (et ne peut pas)
 être dit sur son erreur de population $\epsilon(f)$.
@@ -241,19 +241,19 @@ et savez précisément ce qui peut (et ne peut pas)
 Supposons que vous utilisiez ces connaissances
 et que vous vous prépariez à former votre premier modèle $f_1$.
 Sachant à quel point vous devez être confiant
-dans la performance du taux d'erreur de votre classificateur
+dans la performance du taux d'erreur de votre classifieur
 vous appliquez notre analyse ci-dessus pour déterminer
 un nombre approprié d'exemples
 à mettre de côté pour l'ensemble de test.
 De plus, supposons que vous ayez pris à cœur les leçons de
 :numref:`sec_generalization_basics` 
- et que vous ayez veillé à préserver le caractère sacré de l'ensemble de test
+et que vous ayez veillé à préserver le caractère sacré de l'ensemble de test
 en effectuant toute votre analyse préliminaire,
 le réglage des hyperparamètres et même la sélection
 parmi plusieurs architectures de modèle concurrentes
 sur un ensemble de validation.
 Enfin, vous évaluez votre modèle $f_1$
- sur l'ensemble de test et présentez une estimation sans biais
+sur l'ensemble de test et présentez une estimation sans biais
 de l'erreur de population
 avec un intervalle de confiance associé.
 
@@ -269,26 +269,26 @@ alors que vous vous préparez à l'évaluation finale.
 Vous n'avez pas de jeu de test !
 
 Même si le jeu de test original $\mathcal{D}$
- se trouve toujours sur votre serveur,
+se trouve toujours sur votre serveur,
 vous êtes maintenant confronté à deux problèmes majeurs.
 Tout d'abord, lorsque vous avez collecté votre ensemble de test,
 vous avez déterminé le niveau de précision requis
 en partant du principe que vous évaluiez
-un seul classificateur $f$.
+un seul classifieur $f$.
 
-Cependant, si vous vous lancez dans l'évaluation de plusieurs classifieur $f_1, ..., f_k$
- sur le même ensemble de test,
+Cependant, si vous vous lancez dans l'évaluation de plusieurs classifieurs $f_1, ..., f_k$
+sur le même ensemble de test,
 vous devez prendre en compte le problème de la fausse découverte.
 Auparavant, vous pouviez être sûr à 95%
 que $\epsilon_\mathcal{D}(f) \in \epsilon(f) \pm 0.01$
- pour un seul classificateur $f$
- et donc la probabilité d'un résultat erroné
+pour un seul classifieur $f$
+et donc la probabilité d'un résultat erroné
 était de seulement 5%.
-Avec $k$ classifieur dans le mélange,
+Avec $k$ classifieurs dans le mélange,
 il peut être difficile de garantir
 qu'il n'y en a même pas un parmi
 dont la performance du jeu de test est trompeuse.
-Avec 20 classifieur à l'étude,
+Avec 20 classifieurs à l'étude,
 il se peut que vous n'ayez aucune puissance
 pour exclure la possibilité
 qu'au moins l'un d'entre eux
@@ -302,7 +302,7 @@ Si cela ne suffit pas à vous inquiéter,
 il existe une raison particulière de se méfier
 des résultats obtenus lors des évaluations ultérieures.
 Rappelez-vous que notre analyse des performances de l'ensemble de test
-reposait sur l'hypothèse que le classificateur
+reposait sur l'hypothèse que le classifieur
 était choisi sans aucun contact avec l'ensemble de test
 et que nous pouvions donc considérer l'ensemble de test
 comme tiré au hasard de la population sous-jacente.
@@ -313,7 +313,7 @@ Une fois que des informations du jeu de test ont été divulguées au modélisat
 il ne peut plus jamais être un véritable jeu de test au sens strict.
 Ce problème est appelé *overfitting adaptatif* et a récemment émergé
 comme un sujet d'intérêt intense pour les théoriciens de l'apprentissage et les statisticiens
-:cite:`dwork2015preserving` .
+:cite:`dwork2015preserving`.
 Heureusement, bien qu'il soit possible
 de faire fuir toutes les informations d'un ensemble de retenue,
 et que les pires scénarios théoriques soient sombres,
@@ -340,14 +340,14 @@ et pourtant ce fait semble étrangement insatisfaisant.
 Tout d'abord, il est rare que nous possédions un *véritable ensemble de test*--sauf si
 c'est nous qui créons l'ensemble de données,
 quelqu'un d'autre a probablement déjà évalué
-son propre classificateur sur notre prétendu "ensemble de test".
+son propre classifieur sur notre prétendu "ensemble de test".
 Et même lorsque nous avons la primeur,
 nous nous retrouvons vite frustrés, souhaitant pouvoir
 évaluer nos tentatives de modélisation ultérieures
 sans le sentiment tenace
 que nous ne pouvons pas faire confiance à nos chiffres.
 De plus, même un véritable ensemble de test ne peut que nous dire *post hoc*
-si un classificateur a en fait généralisé à la population,
+si un classifieur a en fait généralisé à la population,
 et non si nous avons une raison de nous attendre *a priori*
 à ce qu'il généralise.
 
@@ -367,44 +367,44 @@ le nombre d'échantillons dans l'ensemble de données.
 
 Les théoriciens de l'apprentissage visent à limiter la différence
 entre l'erreur *empirique* $\epsilon_\mathcal{S}(f_\mathcal{S})$
- d'un classificateur appris $f_\mathcal{S}$,
+d'un classifieur appris $f_\mathcal{S}$,
 à la fois formé et évalué
 sur l'ensemble de entrainement $\mathcal{S}$,
 et l'erreur réelle $\epsilon(f_\mathcal{S})$
- de ce même classificateur sur la population sous-jacente.
+de ce même classifieur sur la population sous-jacente.
 Cela peut sembler similaire au problème d'évaluation
 que nous venons de traiter, mais il y a une différence majeure.
-Auparavant, le classificateur $f$ était fixe
+Auparavant, le classifieur $f$ était fixe
 et nous n'avions besoin d'un ensemble de données
 qu'à des fins d'évaluation.
-Et en effet, tout classifieur fixe se généralise :
+Et en effet, tout classifieurs fixe se généralise :
 son erreur sur un ensemble de données (non vues auparavant)
 est une estimation non biaisée de l'erreur de la population.
-Mais que pouvons-nous dire lorsqu'un classificateur
+Mais que pouvons-nous dire lorsqu'un classifieur
 est formé et évalué sur le même ensemble de données ?
 Pouvons-nous jamais être sûrs que l'erreur d'apprentissage
 sera proche de l'erreur de test ?
 
 
-Supposons que notre classificateur appris $f_\mathcal{S}$ doive être choisi
+Supposons que notre classifieur appris $f_\mathcal{S}$ doive être choisi
 parmi un ensemble pré-spécifié de fonctions $\mathcal{F}$.
 Rappelez-vous de notre discussion sur les ensembles de test
 que s'il est facile d'estimer
-l'erreur d'un seul classificateur,
+l'erreur d'un seul classifieur,
 les choses se compliquent lorsque nous commençons
-à considérer des collections de classifieur.
+à considérer des collections de classifieurs.
 Même si l'erreur empirique
-d'un classificateur (fixe)
+d'un classifieur (fixe)
 sera proche de son erreur réelle
 avec une forte probabilité,
-une fois que nous considérons une collection de classifieur,
+une fois que nous considérons une collection de classifieurs,
 nous devons nous inquiéter de la possibilité
-que *juste un* classificateur dans l'ensemble
+que *juste un* classifieur dans l'ensemble
 recevra une erreur mal estimée.
-Le problème est que si un seul classificateur
+Le problème est que si un seul classifieur
 de notre collection reçoit
-une erreur faussement faible
-, nous pourrions le choisir
+une erreur faussement faible,
+ nous pourrions le choisir
 et ainsi sous-estimer grossièrement
 l'erreur de la population.
 De plus, même pour les modèles linéaires,
@@ -416,14 +416,14 @@ Une solution ambitieuse au problème
 consiste à développer des outils analytiques
 pour prouver la convergence uniforme, c'est-à-dire
 qu'avec une forte probabilité,
-le taux d'erreur empirique de chaque classificateur de la classe $f\in\mathcal{F}$
- convergera *simultanément* vers son taux d'erreur réel.
+le taux d'erreur empirique de chaque classifieur de la classe $f\in\mathcal{F}$
+convergera *simultanément* vers son taux d'erreur réel.
 En d'autres termes, nous cherchons un principe théorique
 qui nous permettrait d'affirmer que
 avec une probabilité d'au moins $1-\delta$
  (pour une petite $\delta$)
-aucun taux d'erreur de classificateur $\epsilon(f)$
- (parmi tous les classifieur de la classe $\mathcal{F}$)
+aucun taux d'erreur de classifieur $\epsilon(f)$
+ (parmi tous les classifieurs de la classe $\mathcal{F}$)
 ne sera mal estimé par plus de
 qu'une petite quantité $\alpha$.
 Il est clair que nous ne pouvons pas faire de telles déclarations
@@ -435,7 +435,7 @@ sur la population sous-jacente.
 
 En un sens, la classe des machines à mémoriser est trop flexible.
 Un tel résultat de convergence uniforme ne pourrait pas exister.
-D'autre part, un classificateur fixe est inutile - il
+D'autre part, un classifieur fixe est inutile - il
 généralise parfaitement, mais ne s'adapte ni aux données d'apprentissage ni aux données de test
 .
 La question centrale de l'apprentissage
@@ -455,7 +455,7 @@ Vapnik et Chervonenkis ont étendu
 la théorie de la convergence
 des fréquences relatives
 à des classes plus générales de fonctions
-:cite:`VapChe64,VapChe68,VapChe71,VapChe74b,VapChe81,VapChe91` .
+:cite:`VapChe64,VapChe68,VapChe71,VapChe74b,VapChe81,VapChe91`.
 L'une des principales contributions de cette ligne de travail
 est la dimension Vapnik-Chervonenkis (VC),
 qui mesure (une notion de)
@@ -474,8 +474,8 @@ et $n$ est la taille de l'ensemble de données.
 Enfin, $c > 0$ est une constante qui ne dépend
 que de l'ampleur de la perte qui peut être encourue.
 Une utilisation de la limite pourrait consister à introduire les valeurs souhaitées de
- $\delta$ et $\alpha$
- pour déterminer le nombre d'échantillons à collecter.
+$\delta$ et $\alpha$
+pour déterminer le nombre d'échantillons à collecter.
 La dimension VC quantifie le plus grand
 nombre de points de données pour lesquels nous pouvons attribuer
 un étiquetage (binaire) arbitraire
@@ -535,8 +535,8 @@ ont développé des méthodes
 pour garantir une convergence uniforme sur une classe de modèles.
 Si, en effet, l'erreur empirique de chaque modèle
 converge simultanément vers son erreur réelle,
-alors nous sommes libres de choisir le modèle qui donne les meilleurs résultats
-, en minimisant l'erreur d'apprentissage,
+alors nous sommes libres de choisir le modèle qui donne les meilleurs résultats,
+en minimisant l'erreur d'apprentissage,
 en sachant qu'il donnera également de bons résultats
 sur les données retenues.
 Il est essentiel que chacun de ces résultats dépende
@@ -573,17 +573,17 @@ dans le contexte de l'apprentissage profond.
 
 1. Si nous souhaitons estimer l'erreur d'un modèle fixe $f$
  à l'intérieur de $0.0001$ avec une probabilité supérieure à 99,9 %,
- de combien d'échantillons avons-nous besoin ?
+de combien d'échantillons avons-nous besoin ?
 1. Supposons que quelqu'un d'autre possède un ensemble de tests étiquetés
- $\mathcal{D}$ et ne met à disposition que les entrées non étiquetées (caractéristiques).
+$\mathcal{D}$ et ne met à disposition que les entrées non étiquetées (caractéristiques).
   Supposons maintenant que vous ne puissiez accéder aux étiquettes de l'ensemble de test
- qu'en exécutant un modèle $f$ (aucune restriction sur la classe du modèle)
- sur chacune des entrées non étiquetées
- et en recevant l'erreur correspondante $\epsilon_\mathcal{D}(f)$.
+qu'en exécutant un modèle $f$ (aucune restriction sur la classe du modèle)
+sur chacune des entrées non étiquetées
+et en recevant l'erreur correspondante $\epsilon_\mathcal{D}(f)$.
   Combien de modèles devrez-vous évaluer
- avant d'avoir accès à l'ensemble de l'ensemble de test
- et de pouvoir ainsi donner l'impression d'avoir une erreur $0$,
- indépendamment de votre erreur réelle ?
+avant d'avoir accès à l'ensemble de l'ensemble de test
+et de pouvoir ainsi donner l'impression d'avoir une erreur $0$,
+indépendamment de votre erreur réelle ?
 1. Quelle est la dimension VC de la classe des polynômes d'ordre $5^\mathrm{th}$?
 1. Quelle est la dimension VC des rectangles alignés sur l'axe des données bidimensionnelles ?
 

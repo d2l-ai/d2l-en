@@ -1,7 +1,7 @@
 # Le jeu de données pour le pré-entraînement de BERT
 :label:`sec_bert-dataset` 
 
- Pour pré-entraîner le modèle BERT tel qu'il est implémenté dans :numref:`sec_bert` ,
+Pour pré-entraîner le modèle BERT tel qu'il est implémenté dans :numref:`sec_bert`,
 nous devons générer le jeu de données dans le format idéal pour faciliter
 les deux tâches de pré-entraînement :
 modélisation du langage masqué et prédiction de la phrase suivante.
@@ -14,9 +14,9 @@ le modèle BERT pré-entraîné prêt à l'emploi
 peut ne pas convenir à des applications dans des domaines spécifiques comme la médecine.
 C'est pourquoi il est de plus en plus courant de prétraîner BERT sur un jeu de données personnalisé.
 Pour faciliter la démonstration du pré-entraînement de BERT,
-nous utilisons un corpus plus petit WikiText-2 :cite:`Merity.Xiong.Bradbury.ea.2016` .
+nous utilisons un corpus plus petit WikiText-2 :cite:`Merity.Xiong.Bradbury.ea.2016`.
 
-En comparaison avec le jeu de données PTB utilisé pour le pré-entraînement de word2vec dans :numref:`sec_word2vec_data` ,
+En comparaison avec le jeu de données PTB utilisé pour le pré-entraînement de word2vec dans :numref:`sec_word2vec_data`,
 WikiText-2 (i) conserve la ponctuation originale, ce qui le rend approprié pour la prédiction de la phrase suivante ; (ii) conserve la casse et les nombres originaux ; (iii) est deux fois plus grand.
 
 ```{.python .input}
@@ -75,7 +75,7 @@ en un ensemble de données au format idéal pour le pré-entraînement de BERT.
 
 ### [**Générer la tâche de prédiction de la prochaine phrase**]
 
-Selon les descriptions de :numref:`subsec_nsp` ,
+Selon les descriptions de :numref:`subsec_nsp`,
 la fonction `_get_next_sentence` génère un exemple d'entraînement
 pour la tâche de classification binaire.
 
@@ -116,7 +116,7 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
 ### [**Génération de la tâche de modélisation du langage masqué**]
 :label:`subsec_prepare_mlm_data` 
 
- Afin de générer des exemples d'entraînement
+Afin de générer des exemples d'entraînement
 pour la tâche de modélisation du langage masqué
 à partir d'une séquence d'entrée BERT,
 nous définissons la fonction `_replace_mlm_tokens` suivante.
@@ -124,7 +124,7 @@ Dans ses entrées, `tokens` est une liste de tokens représentant une séquence 
 `candidate_pred_positions` est une liste d'indices de tokens de la séquence d'entrée BERT
 excluant ceux des tokens spéciaux (les tokens spéciaux ne sont pas prédits dans la tâche de modélisation du langage masqué),
 et `num_mlm_preds` indique le nombre de prédictions (rappel de 15% de tokens aléatoires à prédire).
-Suivant la définition de la tâche de modélisation du langage masqué dans :numref:`subsec_mlm` ,
+Suivant la définition de la tâche de modélisation du langage masqué dans :numref:`subsec_mlm`,
 à chaque position de prédiction, l'entrée peut être remplacée par
 un token spécial "&lt;mask&gt;" ou un token aléatoire, ou rester inchangée.
 Au final, la fonction renvoie les tokens d'entrée après un éventuel remplacement,
@@ -197,7 +197,7 @@ def _get_mlm_data_from_tokens(tokens, vocab):
 Nous sommes maintenant presque prêts à personnaliser une classe `Dataset` pour le pré-entraînement de BERT.
 Avant cela, 
 nous devons encore définir une fonction d'aide `_pad_bert_inputs`
- pour [**ajouter les tokens spéciaux "&lt;pad&gt;" aux entrées.**]
+pour [**ajouter les tokens spéciaux "&lt;pad&gt;" aux entrées.**]
 Son argument `examples` contient les sorties des fonctions d'aide `_get_nsp_data_from_paragraph` et `_get_mlm_data_from_tokens` pour les deux tâches de pré-entraînement.
 
 ```{.python .input}
@@ -269,9 +269,9 @@ En implémentant la fonction `__getitem__ `,
 nous pouvons accéder arbitrairement aux exemples de pré-entraînement (modélisation du langage masqué et prédiction de la phrase suivante) 
 générés à partir d'une paire de phrases du corpus WikiText-2.
 
-Le modèle original de BERT utilise des encastrements WordPiece dont la taille du vocabulaire est de 30000 :cite:`Wu.Schuster.Chen.ea.2016` .
+Le modèle original de BERT utilise des encastrements WordPiece dont la taille du vocabulaire est de 30000 :cite:`Wu.Schuster.Chen.ea.2016`.
 La méthode de tokenisation de WordPiece est une légère modification de
-l'algorithme original de codage de paires d'octets dans :numref:`subsec_Byte_Pair_Encoding` .
+l'algorithme original de codage de paires d'octets dans :numref:`subsec_Byte_Pair_Encoding`.
 Par souci de simplicité, nous utilisons la fonction `d2l.tokenize` pour la tokénisation.
 Les tokens peu fréquents qui apparaissent moins de cinq fois sont filtrés.
 

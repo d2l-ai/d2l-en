@@ -6,9 +6,9 @@ tab.interact_select(['pytorch'])
 # Transformateur de vision
 :label:`sec_vision-transformer` 
 
- L'architecture de transformateur a été initialement proposée pour l'apprentissage de séquence à séquence, comme pour la traduction automatique. 
+L'architecture de transformateur a été initialement proposée pour l'apprentissage de séquence à séquence, comme pour la traduction automatique. 
 D'une grande efficacité, les transformateurs
-sont ensuite devenus le modèle de choix dans diverses tâches de traitement du langage naturel :cite:`Radford.Narasimhan.Salimans.ea.2018,Radford.Wu.Child.ea.2019,brown2020language,Devlin.Chang.Lee.ea.2018,raffel2020exploring` . 
+sont ensuite devenus le modèle de choix dans diverses tâches de traitement du langage naturel :cite:`Radford.Narasimhan.Salimans.ea.2018,Radford.Wu.Child.ea.2019,brown2020language,Devlin.Chang.Lee.ea.2018,raffel2020exploring`. 
 Cependant, 
 dans le domaine de la vision par ordinateur
 l'architecture dominante
@@ -27,7 +27,7 @@ Sans contraintes spécifiques sur la taille des patchs,
 extraient les patchs des images
 et les alimentent dans un encodeur transformateur
 pour obtenir une représentation globale,
-qui sera finalement transformée pour la classification :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` .
+qui sera finalement transformée pour la classification :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
 Les transformateurs présentent notamment une meilleure évolutivité que les CNN :
 lors de l'apprentissage de modèles plus grands sur des ensembles de données plus importants,
 les transformateurs de vision surpassent les ResNets par une marge significative. À l'instar de la conception de l'architecture des réseaux dans le traitement du langage naturel, les transformateurs
@@ -59,8 +59,8 @@ dans une séquence de vecteurs $m+1$,
 additionnés avec des incorporations positionnelles apprenables.
 Le codeur transformateur multicouche
 transforme les vecteurs d'entrée $m+1$
- en une même quantité de représentations vectorielles de sortie de même longueur.
-Il fonctionne exactement de la même manière que le codeur transformateur original dans :numref:`fig_transformer` ,
+en une même quantité de représentations vectorielles de sortie de même longueur.
+Il fonctionne exactement de la même manière que le codeur transformateur original dans :numref:`fig_transformer`,
 à la seule différence de la position de normalisation.
 Puisque le jeton "&lt;cls&gt;" s'occupe de tous les patchs de l'image par auto-attention (voir :numref:`fig_cnn-rnn-self-attention` ),
 sa représentation de la sortie du codeur transformateur
@@ -74,7 +74,7 @@ from torch import nn
 
 ## Intégration de patchs
 
-Pour mettre en œuvre un transformateur de vision, commençons par l'intégration de patchs dans :numref:`fig_vit` . La division d'une image en patchs et la projection linéaire de ces patchs aplatis peuvent être simplifiées en une seule opération de convolution, où la taille du noyau et la taille du pas sont toutes deux fixées à la taille du patch.
+Pour mettre en œuvre un transformateur de vision, commençons par l'intégration de patchs dans :numref:`fig_vit`. La division d'une image en patchs et la projection linéaire de ces patchs aplatis peuvent être simplifiées en une seule opération de convolution, où la taille du noyau et la taille du pas sont toutes deux fixées à la taille du patch.
 
 ```{.python .input  n=2}
 class PatchEmbedding(nn.Module):
@@ -108,8 +108,8 @@ d2l.check_shape(patch_emb(X),
 ## Encodeur transformateur de vision
 :label:`subsec_vit-encoder` 
 
- Le MLP de l'encodeur transformateur de vision
-est légèrement différent du FFN positionnel de l'encodeur transformateur original (voir :numref:`subsec_positionwise-ffn` ). Tout d'abord, la fonction d'activation utilise ici l'unité linéaire d'erreur gaussienne (GELU), qui peut être considérée comme une version plus lisse de la ReLU :cite:`hendrycks2016gaussian` .
+Le MLP de l'encodeur transformateur de vision
+est légèrement différent du FFN positionnel de l'encodeur transformateur original (voir :numref:`subsec_positionwise-ffn` ). Tout d'abord, la fonction d'activation utilise ici l'unité linéaire d'erreur gaussienne (GELU), qui peut être considérée comme une version plus lisse de la ReLU :cite:`hendrycks2016gaussian`.
 Ensuite, le dropout est appliqué à la sortie de chaque couche entièrement connectée dans le MLP pour la régularisation.
 
 ```{.python .input}
@@ -128,10 +128,10 @@ class ViTMLP(nn.Module):
 ```
 
 L'implémentation du bloc codeur du transformateur de vision
-suit simplement la conception de la prénormalisation dans :numref:`fig_vit` ,
+suit simplement la conception de la prénormalisation dans :numref:`fig_vit`,
 où la normalisation est appliquée juste *avant* l'attention multi-têtes ou le MLP.
-Contrairement à la post-normalisation ("add &amp; norm" dans :numref:`fig_transformer` ), où la normalisation est placée juste *après* les connexions résiduelles, la pré-normalisation de
-conduit à une entrainement plus efficace ou efficiente pour les transformateurs :cite:`baevski2018adaptive,wang2019learning,xiong2020layer` .
+Contrairement à la post-normalisation ("add &; norm" dans :numref:`fig_transformer` ), où la normalisation est placée juste *après* les connexions résiduelles, la pré-normalisation de
+conduit à une entrainement plus efficace ou efficiente pour les transformateurs :cite:`baevski2018adaptive,wang2019learning,xiong2020layer`.
 
 ```{.python .input}
 class ViTBlock(nn.Module):
@@ -150,7 +150,7 @@ class ViTBlock(nn.Module):
             X + self.attention(X, X, X, valid_lens)))
 ```
 
-Comme dans :numref:`subsec_transformer-encoder` ,
+Comme dans :numref:`subsec_transformer-encoder`,
 tout bloc encodeur de transformateur de vision ne change pas sa forme d'entrée.
 
 ```{.python .input}
@@ -203,7 +203,7 @@ class ViT(d2l.Classifier):
 
 ## Formation
 
-l'entrainement d'un transformateur de vision sur le jeu de données Fashion-MNIST se fait de la même manière que l'entrainement des CNN sur :numref:`chap_modern_cnn` .
+l'entrainement d'un transformateur de vision sur le jeu de données Fashion-MNIST se fait de la même manière que l'entrainement des CNN sur :numref:`chap_modern_cnn`.
 
 ```{.python .input}
 img_size, patch_size = 96, 16
@@ -218,19 +218,19 @@ trainer.fit(model, data)
 
 ## Résumé et discussion
 
-Vous pouvez remarquer que pour les petits ensembles de données comme Fashion-MNIST, notre transformateur de vision implémenté ne surpasse pas le ResNet dans :numref:`sec_resnet` .
+Vous pouvez remarquer que pour les petits ensembles de données comme Fashion-MNIST, notre transformateur de vision implémenté ne surpasse pas le ResNet dans :numref:`sec_resnet`.
 Des observations similaires peuvent être faites même sur le jeu de données ImageNet (1,2 million d'images).
 Cela est dû au fait que les transformateurs *manquent* de ces principes utiles dans la convolution, tels que l'invariance de la traduction et la localité (:numref:`sec_why-conv` ).
 Cependant, le tableau change lorsqu'on entraîne des modèles plus grands sur des ensembles de données plus importants (par exemple, 300 millions d'images),
 où les transformateurs de vision surpassent les ResNets par une marge importante dans la classification d'images, démontrant
-la supériorité intrinsèque des transformateurs en matière d'évolutivité :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` .
+la supériorité intrinsèque des transformateurs en matière d'évolutivité :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
 L'introduction des transformateurs de vision
 a changé le paysage de la conception des réseaux pour la modélisation des données d'image.
-Ils se sont rapidement révélés efficaces sur le jeu de données ImageNet avec des stratégies d'entraînement efficaces en termes de données de DeiT :cite:`touvron2021training` .
+Ils se sont rapidement révélés efficaces sur le jeu de données ImageNet avec des stratégies d'entraînement efficaces en termes de données de DeiT :cite:`touvron2021training`.
 Vers un réseau dorsal polyvalent en vision par ordinateur,
 Les transformateurs de Swin ont résolu le problème de la complexité informatique quadratique par rapport à la taille de l'image (:numref:`subsec_cnn-rnn-self-attention` )
 et ont ajouté des priors de type convolution,
-étendant l'applicabilité des transformateurs à une gamme de tâches de vision par ordinateur au-delà de la classification d'images avec des résultats de pointe :cite:`liu2021swin` .
+étendant l'applicabilité des transformateurs à une gamme de tâches de vision par ordinateur au-delà de la classification d'images avec des résultats de pointe :cite:`liu2021swin`.
 
 
 ## Exercices

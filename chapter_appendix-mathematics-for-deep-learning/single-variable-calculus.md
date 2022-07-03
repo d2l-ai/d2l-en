@@ -1,7 +1,7 @@
 # Calcul à une variable
 :label:`sec_single_variable_calculus` 
 
- Dans :numref:`sec_calculus` , nous avons vu les éléments de base du calcul différentiel.  Cette section approfondit les principes de base du calcul différentiel et la manière dont nous pouvons les comprendre et les appliquer dans le contexte de l'apprentissage automatique.
+Dans :numref:`sec_calculus`, nous avons vu les éléments de base du calcul différentiel.  Cette section approfondit les principes de base du calcul différentiel et la manière dont nous pouvons les comprendre et les appliquer dans le contexte de l'apprentissage automatique.
 
 ## Calcul différentiel
 Le calcul différentiel est fondamentalement l'étude du comportement des fonctions sous de petits changements.  Pour comprendre pourquoi il est si essentiel à l'apprentissage profond, prenons un exemple.
@@ -140,7 +140,7 @@ Petite digression historique : au cours des premières décennies de recherche s
 Dans notre exemple, cette valeur $8$ est différente pour différentes valeurs de $x$, il est donc logique de la définir comme une fonction de $x$. Plus formellement, ce taux de changement dépendant de la valeur est appelé la *dérivée* qui s'écrit
 
 $$\frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon}.$$ 
- :eqlabel:`eq_der_def` 
+:eqlabel:`eq_der_def` 
 
  . Différents textes utilisent différentes notations pour la dérivée. Par exemple, toutes les notations ci-dessous indiquent la même chose :
 
@@ -156,19 +156,19 @@ $$
 Souvent, il est intuitivement utile de décortiquer à nouveau la définition de la dérivée :eqref:`eq_der_def` pour voir comment une fonction change lorsque nous apportons une petite modification à $x$:
 
 $$\begin{aligned} \frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon} & \implies \frac{df}{dx}(x) \approx \frac{f(x+\epsilon) - f(x)}{\epsilon} \\ & \implies \epsilon \frac{df}{dx}(x) \approx f(x+\epsilon) - f(x) \\ & \implies f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x). \end{aligned}$$ 
- :eqlabel:`eq_small_change` 
+:eqlabel:`eq_small_change` 
 
- La dernière équation mérite d'être explicitement mentionnée.  Elle nous indique que si vous prenez n'importe quelle fonction et que vous modifiez l'entrée d'une petite quantité, la sortie changera de cette petite quantité mise à l'échelle par la dérivée.
+La dernière équation mérite d'être explicitement mentionnée.  Elle nous indique que si vous prenez n'importe quelle fonction et que vous modifiez l'entrée d'une petite quantité, la sortie changera de cette petite quantité mise à l'échelle par la dérivée.
 
 De cette façon, nous pouvons comprendre la dérivée comme le facteur d'échelle qui nous indique l'ampleur du changement de la sortie à partir d'un changement de l'entrée.
 
 ## Règles de calcul
 :label:`sec_derivative_table` 
 
- Nous allons maintenant comprendre comment calculer la dérivée d'une fonction explicite.  Un traitement formel complet du calcul dériverait tout à partir des premiers principes.  Nous ne céderons pas à cette tentation ici, mais fournirons plutôt une compréhension des règles courantes rencontrées.
+Nous allons maintenant comprendre comment calculer la dérivée d'une fonction explicite.  Un traitement formel complet du calcul dériverait tout à partir des premiers principes.  Nous ne céderons pas à cette tentation ici, mais fournirons plutôt une compréhension des règles courantes rencontrées.
 
 ### Dérivées courantes
-Comme nous l'avons vu dans :numref:`sec_calculus` , lorsque l'on calcule des dérivées, on peut souvent utiliser une série de règles pour réduire le calcul à quelques fonctions de base.  Nous les répétons ici pour faciliter la référence.
+Comme nous l'avons vu dans :numref:`sec_calculus`, lorsque l'on calcule des dérivées, on peut souvent utiliser une série de règles pour réduire le calcul à quelques fonctions de base.  Nous les répétons ici pour faciliter la référence.
 
 * **Dérivée de constantes.** $\frac{d}{dx}c = 0$.
 * **Dérivée de fonctions linéaires.** $\frac{d}{dx}(ax) = a$.
@@ -177,7 +177,7 @@ Comme nous l'avons vu dans :numref:`sec_calculus` , lorsque l'on calcule des dé
 * **Dérivée du logarithme.** $\frac{d}{dx}\log(x) = \frac{1}{x}$.
 
 ### Règles de dérivation
-Si chaque dérivée devait être calculée séparément et stockée dans une table, le calcul différentiel serait presque impossible.  C'est un don des mathématiques que de pouvoir généraliser les dérivées ci-dessus et de calculer des dérivées plus complexes, comme la dérivée de $f(x) = \log\left(1+(x-1)^{10}\right)$. Comme nous l'avons mentionné dans :numref:`sec_calculus` , la clé pour y parvenir est de codifier ce qui se passe lorsque l'on prend des fonctions et qu'on les combine de différentes manières, la plus importante étant les sommes, les produits et les compositions.
+Si chaque dérivée devait être calculée séparément et stockée dans une table, le calcul différentiel serait presque impossible.  C'est un don des mathématiques que de pouvoir généraliser les dérivées ci-dessus et de calculer des dérivées plus complexes, comme la dérivée de $f(x) = \log\left(1+(x-1)^{10}\right)$. Comme nous l'avons mentionné dans :numref:`sec_calculus`, la clé pour y parvenir est de codifier ce qui se passe lorsque l'on prend des fonctions et qu'on les combine de différentes manières, la plus importante étant les sommes, les produits et les compositions.
 
 * **Règle de la somme.** $\frac{d}{dx}\left(g(x) + h(x)\right) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$.
 * **Règle du produit.** $\frac{d}{dx}\left(g(x)\cdot h(x)\right) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$.
@@ -318,19 +318,19 @@ $$
 
 Essayons de comprendre *pourquoi* cette notion est utile.  Ci-dessous, nous visualisons $f^{(2)}(x)$, $f^{(1)}(x)$, et $f(x)$. 
 
-Tout d'abord, considérons le cas où la dérivée seconde $f^{(2)}(x)$ est une constante positive.  Cela signifie que la pente de la dérivée première est positive.  Par conséquent, la dérivée première $f^{(1)}(x)$ peut commencer par être négative, devenir nulle à un moment donné, puis devenir positive à la fin. Cela nous indique que la pente de notre fonction originale $f$ et donc de la fonction $f$ elle-même diminue, s'aplatit, puis augmente.  En d'autres termes, la fonction $f$ se courbe vers le haut et possède un seul minimum, comme le montre :numref:`fig_positive-second` .
+Tout d'abord, considérons le cas où la dérivée seconde $f^{(2)}(x)$ est une constante positive.  Cela signifie que la pente de la dérivée première est positive.  Par conséquent, la dérivée première $f^{(1)}(x)$ peut commencer par être négative, devenir nulle à un moment donné, puis devenir positive à la fin. Cela nous indique que la pente de notre fonction originale $f$ et donc de la fonction $f$ elle-même diminue, s'aplatit, puis augmente.  En d'autres termes, la fonction $f$ se courbe vers le haut et possède un seul minimum, comme le montre :numref:`fig_positive-second`.
 
 ![If we assume the second derivative is a positive constant, then the fist derivative in increasing, which implies the function itself has a minimum.](../img/posSecDer.svg)
 :label:`fig_positive-second`
 
 
-Deuxièmement, si la dérivée seconde est une constante négative, cela signifie que la dérivée première est décroissante.  Cela implique que la dérivée première peut commencer par être positive, devenir nulle en un point, puis devenir négative. Par conséquent, la fonction $f$ augmente, s'aplatit, puis diminue.  En d'autres termes, la fonction $f$ se courbe vers le bas et présente un seul maximum, comme le montre :numref:`fig_negative-second` .
+Deuxièmement, si la dérivée seconde est une constante négative, cela signifie que la dérivée première est décroissante.  Cela implique que la dérivée première peut commencer par être positive, devenir nulle en un point, puis devenir négative. Par conséquent, la fonction $f$ augmente, s'aplatit, puis diminue.  En d'autres termes, la fonction $f$ se courbe vers le bas et présente un seul maximum, comme le montre :numref:`fig_negative-second`.
 
 ![If we assume the second derivative is a negative constant, then the fist derivative in decreasing, which implies the function itself has a maximum.](../img/negSecDer.svg)
 :label:`fig_negative-second`
 
 
-Troisièmement, si la dérivée seconde est toujours nulle, alors la dérivée première ne changera jamais - elle est constante !  Cela signifie que $f$ augmente (ou diminue) à un taux fixe, et que $f$ est lui-même une ligne droite comme le montre :numref:`fig_zero-second` .
+Troisièmement, si la dérivée seconde est toujours nulle, alors la dérivée première ne changera jamais - elle est constante !  Cela signifie que $f$ augmente (ou diminue) à un taux fixe, et que $f$ est lui-même une ligne droite comme le montre :numref:`fig_zero-second`.
 
 ![If we assume the second derivative is zero, then the fist derivative is constant, which implies the function itself is a straight line.](../img/zeroSecDer.svg)
 :label:`fig_zero-second`
@@ -397,7 +397,7 @@ Nous allons étendre cette idée à l'idée d'une *série de Taylor* dans la sec
 ### Série de Taylor
 
 
- La *série de Taylor* fournit une méthode d'approximation de la fonction $f(x)$ si l'on nous donne les valeurs des dérivées premières $n$ en un point $x_0$, c'est-à-dire $\left\{ f(x_0), f^{(1)}(x_0), f^{(2)}(x_0), \ldots, f^{(n)}(x_0) \right\}$. L'idée sera de trouver un polynôme de degré $n$ qui correspond à toutes les dérivées données à $x_0$.
+La *série de Taylor* fournit une méthode d'approximation de la fonction $f(x)$ si l'on nous donne les valeurs des dérivées premières $n$ en un point $x_0$, c'est-à-dire $\left\{ f(x_0), f^{(1)}(x_0), f^{(2)}(x_0), \ldots, f^{(n)}(x_0) \right\}$. L'idée sera de trouver un polynôme de degré $n$ qui correspond à toutes les dérivées données à $x_0$.
 
 Nous avons vu le cas de $n=2$ dans la section précédente et un peu d'algèbre montre que c'est
 
@@ -416,7 +416,7 @@ $$
 où le $6 = 3 \times 2 = 3!$ vient de la constante que nous obtenons devant si nous prenons trois dérivées de $x^3$.
 
 
- De plus, nous pouvons obtenir un polynôme de degré $n$ par 
+De plus, nous pouvons obtenir un polynôme de degré $n$ par 
 
 $$
 P_n(x) = \sum_{i = 0}^{n} \frac{f^{(i)}(x_0)}{i!}(x-x_0)^{i}.

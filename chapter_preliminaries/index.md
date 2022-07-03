@@ -1,7 +1,7 @@
 # Préliminaires
 :label:`chap_preliminaries` 
 
- Pour préparer votre plongée dans l'apprentissage profond,
+Pour préparer votre plongée dans l'apprentissage profond,
 vous aurez besoin de quelques compétences de survie :
 (i) des techniques de stockage et de manipulation des données ;
 (ii) des bibliothèques permettant d'ingérer 

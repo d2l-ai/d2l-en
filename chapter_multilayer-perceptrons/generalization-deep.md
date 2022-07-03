@@ -1,7 +1,7 @@
 # Généralisation dans l'apprentissage profond
 
 
- Dans :numref:`chap_linear` et :numref:`chap_classification` ,
+Dans :numref:`chap_linear` et :numref:`chap_classification`,
 nous avons abordé les problèmes de régression et de classification
 en adaptant des modèles linéaires aux données d'apprentissage.
 Dans les deux cas, nous avons fourni des algorithmes pratiques
@@ -93,15 +93,15 @@ le nombre de paramètres non nuls appris,
 ou la taille des paramètres tels que quantifiés.
 Rappelez-vous le graphique de la complexité du modèle en fonction de la perte
 (:numref:`fig_capacity_vs_error` )
-de :numref:`sec_generalization_basics` .
+de :numref:`sec_generalization_basics`.
 
 
- Cependant, l'apprentissage profond complique ce tableau de manière contre-intuitive.
+Cependant, l'apprentissage profond complique ce tableau de manière contre-intuitive.
 Tout d'abord, pour les problèmes de classification,
 nos modèles sont généralement assez expressifs
 pour s'adapter parfaitement à chaque exemple d'apprentissage,
 même dans des ensembles de données composés de millions de
-:cite:`zhang2021understanding` .
+:cite:`zhang2021understanding`.
 Dans l'image classique, nous pourrions penser
 que ce paramètre se situe à l'extrême droite
 de l'axe de complexité du modèle,
@@ -113,8 +113,8 @@ l'ensemble des valeurs que nos paramètres peuvent prendre.
 Mais c'est là que les choses commencent à devenir étranges.
 
 Étrangement, pour de nombreuses tâches d'apprentissage profond
-(par exemple, la reconnaissance d'images et la classification de textes)
-, nous choisissons généralement parmi des architectures de modèles,
+(par exemple, la reconnaissance d'images et la classification de textes),
+ nous choisissons généralement parmi des architectures de modèles,
 qui peuvent toutes atteindre une perte d'apprentissage arbitrairement faible
 (et une erreur d'apprentissage nulle).
 Puisque tous les modèles considérés atteignent une erreur d'apprentissage nulle,
@@ -131,7 +131,7 @@ dans la profondeur ou la largeur des réseaux)
 peut être non monotone,
 avec une plus grande complexité qui nuit au début
 mais qui aide ensuite dans un modèle dit de "double-descente"
-:cite:`nakkiran2021deep` .
+:cite:`nakkiran2021deep`.
 Ainsi, le praticien de l'apprentissage profond dispose d'un ensemble d'astuces,
 dont certaines semblent restreindre le modèle d'une certaine manière
 et d'autres qui semblent le rendre encore plus expressif,
@@ -189,16 +189,16 @@ l'algorithme des 1 plus proches voisins est cohérent
 Notez que l'algorithme du 1 plus proche voisin exige que nous spécifiions
 une certaine fonction de distance $d$, ou, de manière équivalente,
 une certaine fonction de base à valeur vectorielle $\phi(\mathbf{x})$
- pour caractériser nos données.
+pour caractériser nos données.
 Quel que soit le choix de la métrique de distance,
 nous obtiendrons une erreur d'apprentissage nulle
 et finirons par atteindre un prédicteur optimal,
 mais différentes métriques de distance $d$
- codent différents biais inductifs
+codent différents biais inductifs
 et avec une quantité finie de données disponibles
 produiront différents prédicteurs.
 Les différents choix de la métrique de distance $d$
- représentent différentes hypothèses sur les modèles sous-jacents
+représentent différentes hypothèses sur les modèles sous-jacents
 et les performances des différents prédicteurs
 dépendront de la compatibilité des hypothèses
 avec les données observées.
@@ -211,7 +211,7 @@ Des recherches théoriques plus récentes ont établi
 un lien profond entre les grands réseaux neuronaux
 et les méthodes non paramétriques, notamment les méthodes à noyau.
 En particulier, :cite:`Jacot.Grabriel.Hongler.2018` 
- ont démontré qu'à la limite, lorsque les perceptrons multicouches
+ont démontré qu'à la limite, lorsque les perceptrons multicouches
 avec des poids initialisés de manière aléatoire croissent à l'infini,
 ils deviennent équivalents aux méthodes à noyau (non paramétriques)
 pour un choix spécifique de la fonction de noyau
@@ -249,7 +249,7 @@ consiste à surveiller l'erreur de validation tout au long de la formation
 (généralement en vérifiant une fois après chaque époque)
 et à interrompre l'entrainement lorsque l'erreur de validation
 n'a pas diminué de plus d'une petite quantité $\epsilon$
- pendant un certain nombre d'époques.
+pendant un certain nombre d'époques.
 Ceci est parfois appelé un critère de *patience*.
 Outre le fait qu'il peut conduire à une meilleure généralisation,
 dans le cadre d'étiquettes bruyantes,
@@ -272,15 +272,15 @@ Former des modèles jusqu'à ce qu'ils interpolent des données bruyantes est g�
 
 ## Méthodes de régularisation classiques pour les réseaux profonds
 
-Dans :numref:`chap_linear` , nous avons décrit
+Dans :numref:`chap_linear`, nous avons décrit
 plusieurs techniques de régularisation classiques
 pour limiter la complexité de nos modèles.
 En particulier, :numref:`sec_weight_decay` 
- a présenté une méthode appelée weight decay,
+a présenté une méthode appelée weight decay,
 qui consiste à ajouter un terme de régularisation à la fonction de perte
 pour pénaliser les grandes valeurs des poids.
-Selon la norme de poids pénalisée
-, cette technique est connue sous le nom de régularisation ridge (pour la pénalité $\ell_2$ )
+Selon la norme de poids pénalisée,
+cette technique est connue sous le nom de régularisation ridge (pour la pénalité $\ell_2$ )
 ou de régularisation lasso (pour une pénalité $\ell_1$ ).
 Dans l'analyse classique de ces régularisateurs,
 on considère qu'ils restreignent les valeurs
@@ -291,7 +291,7 @@ Dans les implémentations d'apprentissage profond,
 la décroissance des poids reste un outil populaire.
 Cependant, les chercheurs ont remarqué
 que les forces typiques de la régularisation $\ell_2$
- sont insuffisantes pour empêcher les réseaux
+sont insuffisantes pour empêcher les réseaux
 d'interpoler les données
 (:cite:`zhang2021understanding` )
 et donc les avantages s'ils sont interprétés

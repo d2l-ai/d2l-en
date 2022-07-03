@@ -1,7 +1,7 @@
 # Réseaux neuronaux linéaires
 :label:`chap_linear` 
 
- Avant de nous soucier de rendre nos réseaux neuronaux profonds,
+Avant de nous soucier de rendre nos réseaux neuronaux profonds,
 il sera utile d'implémenter quelques réseaux neuronaux peu profonds,
 pour lesquels les entrées se connectent directement aux sorties.
 Cela s'avère important pour plusieurs raisons.

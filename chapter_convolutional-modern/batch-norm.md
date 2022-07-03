@@ -6,10 +6,10 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Normalisation par lots
 :label:`sec_batch_norm` 
 
- l'entrainement de réseaux neuronaux profonds est difficile.
+l'entrainement de réseaux neuronaux profonds est difficile.
 Les faire converger en un temps raisonnable peut s'avérer délicat.
 Dans cette section, nous décrivons la *normalisation par lots*, une technique populaire et efficace
-qui accélère systématiquement la convergence des réseaux profonds :cite:`Ioffe.Szegedy.2015` .
+qui accélère systématiquement la convergence des réseaux profonds :cite:`Ioffe.Szegedy.2015`.
 Avec les blocs résiduels - abordés plus loin dans :numref:`sec_resnet` - la normalisation par lots
 a permis aux praticiens d'entraîner régulièrement des réseaux de plus de 100 couches.
 Un avantage secondaire (fortuit) de la normalisation par lots est sa régularisation inhérente. 
@@ -19,9 +19,9 @@ Un avantage secondaire (fortuit) de la normalisation par lots est sa régularisa
 Lorsque nous travaillons avec des données, nous effectuons souvent un prétraitement avant la formation. 
 Les choix de prétraitement des données font souvent une énorme différence dans les résultats finaux.
 Rappelez-vous notre application des MLP à la prédiction des prix de l'immobilier (:numref:`sec_kaggle_house` ).
-Notre première étape, lorsque nous avons travaillé avec des données réelles
-, a été de normaliser nos caractéristiques d'entrée afin qu'elles aient 
-une moyenne nulle $\mathbf{\mu} = 0$ et une variance unitaire $\mathbf{\Sigma} = \mathbf{1}$ sur plusieurs observations :cite:`friedman1987exploratory` .
+Notre première étape, lorsque nous avons travaillé avec des données réelles,
+a été de normaliser nos caractéristiques d'entrée afin qu'elles aient 
+une moyenne nulle $\mathbf{\mu} = 0$ et une variance unitaire $\mathbf{\Sigma} = \mathbf{1}$ sur plusieurs observations :cite:`friedman1987exploratory`.
 Au minimum, il est fréquent de changer l'échelle de manière à ce que la diagonale soit égale à l'unité, c'est-à-dire $\Sigma_{ii} = 1$. 
 Une autre stratégie encore consiste à redimensionner les vecteurs à une longueur unitaire, éventuellement à une moyenne nulle *par observation*. 
 Cela peut donner de bons résultats, par exemple pour les données de capteurs spatiaux. Ces techniques de prétraitement et bien d'autres sont 
@@ -30,7 +30,7 @@ bénéfiques pour garder le problème de l'estimation bien maîtrisé. Voir, par
 Intuitivement, cette normalisation joue bien avec nos optimiseurs
 puisqu'elle place les paramètres *a priori* à une échelle similaire.
 En tant que tel, il est naturel de se demander si une étape de normalisation correspondante *à l'intérieur* d'un réseau profond
-ne serait pas bénéfique. Bien que ce ne soit pas tout à fait le raisonnement qui a conduit à l'invention de la normalisation par lot :cite:`Ioffe.Szegedy.2015` , c'est une façon utile de la comprendre, ainsi que sa cousine, la normalisation par couche :cite:`Ba.Kiros.Hinton.2016` , dans un cadre unifié. 
+ne serait pas bénéfique. Bien que ce ne soit pas tout à fait le raisonnement qui a conduit à l'invention de la normalisation par lot :cite:`Ioffe.Szegedy.2015`, c'est une façon utile de la comprendre, ainsi que sa cousine, la normalisation par couche :cite:`Ba.Kiros.Hinton.2016`, dans un cadre unifié. 
 
 Deuxièmement, pour un MLP ou CNN typique, lors de la formation,
 les variables (par exemple, les sorties de la transformation affine dans le MLP)
@@ -43,13 +43,13 @@ que cette dérive dans la distribution de ces variables pouvait entraver la conv
 Intuitivement, nous pourrions conjecturer que si une couche
 a des activations variables qui sont 100 fois supérieures à celles d'une autre couche,
 cela pourrait nécessiter des ajustements compensatoires dans les taux d'apprentissage. Les solveurs adaptatifs 
-tels que AdaGrad :cite:`Duchi.Hazan.Singer.2011` , Adam :cite:`Kingma.Ba.2014` , et Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018` visent à résoudre ce problème du point de vue de l'optimisation. 
+tels que AdaGrad :cite:`Duchi.Hazan.Singer.2011`, Adam :cite:`Kingma.Ba.2014`, et Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018` visent à résoudre ce problème du point de vue de l'optimisation. 
 L'alternative est d'empêcher le problème de se produire, simplement par une normalisation adaptative.
    
 Troisièmement, les réseaux plus profonds sont complexes et ont tendance à être plus facilement surajustés.
-Cela signifie que la régularisation devient plus critique. Une technique courante de régularisation est l'injection de bruit 
-. Cette technique est connue depuis longtemps, par exemple en ce qui concerne l'injection de bruit pour les entrées 
- :cite:`Bishop.1995` . Elle est également à la base du dropout :numref:`sec_dropout` . Il s'avère que, de manière tout à fait fortuite, la normalisation par lots présente ces trois avantages : prétraitement, stabilité numérique et régularisation. 
+Cela signifie que la régularisation devient plus critique. Une technique courante de régularisation est l'injection de bruit .
+Cette technique est connue depuis longtemps, par exemple en ce qui concerne l'injection de bruit pour les entrées 
+:cite:`Bishop.1995`. Elle est également à la base du dropout :numref:`sec_dropout`. Il s'avère que, de manière tout à fait fortuite, la normalisation par lots présente ces trois avantages : prétraitement, stabilité numérique et régularisation. 
 
 La normalisation par lots est appliquée à des couches individuelles ou, en option, à toutes les couches :
 Dans chaque itération d'apprentissage,
@@ -57,8 +57,8 @@ nous normalisons d'abord les entrées (de la normalisation par lots)
 en soustrayant leur moyenne et
 en les divisant par leur écart type,
 où les deux sont estimés sur la base des statistiques du mini-batch actuel.
-Ensuite, nous appliquons un coefficient d'échelle et un décalage pour récupérer les degrés de liberté perdus 
-. C'est précisément en raison de cette *normalisation* basée sur les statistiques du *lot*
+Ensuite, nous appliquons un coefficient d'échelle et un décalage pour récupérer les degrés de liberté perdus .
+C'est précisément en raison de cette *normalisation* basée sur les statistiques du *lot*
 que la *normalisation du lot* tire son nom.
 
 Notez que si nous essayions d'appliquer la normalisation par lot avec des minibatchs de taille 1,
@@ -75,12 +75,12 @@ une calibration appropriée est nécessaire car nous pourrions l'ajuster.
 Formellement, en désignant par $\mathbf{x} \in \mathcal{B}$ une entrée de normalisation par lot ($\mathrm{BN}$)
 qui provient d'un mini-lot $\mathcal{B}$,
 la normalisation par lot transforme $\mathbf{x}$
- selon l'expression suivante :
+selon l'expression suivante :
 
 $$\mathrm{BN}(\mathbf{x}) = \boldsymbol{\gamma} \odot \frac{\mathbf{x} - \hat{\boldsymbol{\mu}}_\mathcal{B}}{\hat{\boldsymbol{\sigma}}_\mathcal{B}} + \boldsymbol{\beta}.$$ 
- :eqlabel:`eq_batchnorm` 
+:eqlabel:`eq_batchnorm` 
 
- Dans :eqref:`eq_batchnorm` ,
+Dans :eqref:`eq_batchnorm`,
 $\hat{\boldsymbol{\mu}}_\mathcal{B}$ est la moyenne de l'échantillon
 et $\hat{\boldsymbol{\sigma}}_\mathcal{B}$ est l'écart type de l'échantillon du mini-lot $\mathcal{B}$.
 Après application de la normalisation,
@@ -90,7 +90,7 @@ Le choix de la variance unitaire
 (par rapport à un autre nombre magique) est un choix arbitraire. Nous récupérons ce degré de liberté
 en incluant un paramètre d'échelle *
 * $\boldsymbol{\gamma}$ et un paramètre de décalage * $\boldsymbol{\beta}$
- qui ont la même forme que $\mathbf{x}$. Ces deux paramètres sont des paramètres que 
+qui ont la même forme que $\mathbf{x}$. Ces deux paramètres sont des paramètres que 
 doit apprendre dans le cadre de l'apprentissage du modèle.
 
 Par conséquent, les amplitudes des variables
@@ -120,7 +120,7 @@ diverses sources de bruit dans l'optimisation
 conduisent souvent à un apprentissage plus rapide et à moins de surajustement :
 cette variation semble agir comme une forme de régularisation.
 :cite:`Teye.Azizpour.Smith.2018` et :cite:`Luo.Wang.Shao.ea.2018` 
- relient les propriétés de la normalisation par lots aux prieurs et pénalités bayésiens respectivement.
+relient les propriétés de la normalisation par lots aux prieurs et pénalités bayésiens respectivement.
 En particulier, cela permet d'éclaircir l'énigme
 de savoir pourquoi la normalisation par lots fonctionne mieux pour des minilots de taille modérée dans la gamme $50 \sim 100$. 
 Cette taille particulière de minibatch semble injecter juste la "bonne quantité" de bruit par couche : un 
@@ -142,11 +142,11 @@ Cependant, une fois le modèle formé,
 nous pouvons calculer les moyennes et les variances
 des variables de chaque couche sur la base de l'ensemble des données.
 Il s'agit en effet d'une pratique standard pour les modèles
-employant la normalisation par lots
-. Les couches de normalisation par lots fonctionnent donc différemment
+employant la normalisation par lots.
+Les couches de normalisation par lots fonctionnent donc différemment
 en mode *formation* (normalisation par statistiques de minibatchs)
 et en mode *prédiction* (normalisation par statistiques de jeux de données). 
-Sous cette forme, ils ressemblent beaucoup au comportement de la régularisation par abandon de :numref:`sec_dropout` ,
+Sous cette forme, ils ressemblent beaucoup au comportement de la régularisation par abandon de :numref:`sec_dropout`,
 où le bruit n'est injecté que pendant l'apprentissage. 
 
 
@@ -165,7 +165,7 @@ comme nous l'avons fait précédemment lors de l'introduction d'autres couches.
 Lors de l'application de la normalisation par lots aux couches entièrement connectées,
 l'article original insérait la normalisation par lots après la transformation affine
 et avant la fonction d'activation non linéaire. 
-Des applications ultérieures ont expérimenté l'insertion de la normalisation par lots juste après les fonctions d'activation :cite:`Ioffe.Szegedy.2015` .
+Des applications ultérieures ont expérimenté l'insertion de la normalisation par lots juste après les fonctions d'activation :cite:`Ioffe.Szegedy.2015`.
 En désignant l'entrée de la couche entièrement connectée par $\mathbf{x}$,
 la transformation affine
 par $\mathbf{W}\mathbf{x} + \mathbf{b}$ (avec le paramètre de poids $\mathbf{W}$ et le paramètre de biais $\mathbf{b}$),
@@ -207,9 +207,9 @@ Notez que dans le contexte des convolutions, la normalisation des lots est bien 
 des minis lots de taille 1 : après tout, nous avons tous les emplacements d'une image à moyenner. Par conséquent, la moyenne et la variance de 
 sont bien définies, même si ce n'est que pour une seule observation. Cette considération 
 a conduit :cite:`Ba.Kiros.Hinton.2016` à introduire la notion de *norme de couche*. Elle fonctionne exactement comme 
-une norme de lot, mais elle est appliquée à une image à la fois. Il existe des cas où la normalisation des couches améliore la précision d'un modèle 
-. Nous passons les détails et recommandons au lecteur intéressé de consulter l'article original 
-. 
+une norme de lot, mais elle est appliquée à une image à la fois. Il existe des cas où la normalisation des couches améliore la précision d'un modèle .
+Nous passons les détails et recommandons au lecteur intéressé de consulter l'article original .
+
 
 ### Normalisation par lots pendant la prédiction
 
@@ -462,7 +462,7 @@ class BatchNorm(tf.keras.layers.Layer):
         return output
 ```
 
-Notez que nous avons utilisé la variable `momentum` pour régir l'agrégation sur les estimations passées de la moyenne et de la variance. Il s'agit d'une appellation quelque peu erronée, car elle n'a absolument rien à voir avec le terme *momentum* d'optimisation dans :numref:`sec_momentum` . Néanmoins, c'est le nom communément adopté pour ce terme et, par respect pour la convention de dénomination de l'API, nous utilisons également le même nom de variable dans notre code.
+Notez que nous avons utilisé la variable `momentum` pour régir l'agrégation sur les estimations passées de la moyenne et de la variance. Il s'agit d'une appellation quelque peu erronée, car elle n'a absolument rien à voir avec le terme *momentum* d'optimisation dans :numref:`sec_momentum`. Néanmoins, c'est le nom communément adopté pour ce terme et, par respect pour la convention de dénomination de l'API, nous utilisons également le même nom de variable dans notre code.
 
 ## [**Applying Batch Normalization in LeNet**]
 
@@ -540,7 +540,7 @@ with d2l.try_gpu():
 ```
 
 Regardons [**le paramètre d'échelle `gamma`
- et le paramètre de décalage `beta`**] appris
+et le paramètre de décalage `beta`**] appris
 de la première couche de normalisation par lots.
 
 ```{.python .input}
@@ -673,8 +673,8 @@ Cependant, nous pensons qu'il est important
 de séparer ces intuitions directrices
 des faits scientifiques établis.
 À terme, lorsque vous maîtriserez cette matière
-et que vous commencerez à rédiger vos propres articles de recherche
-, vous voudrez être en mesure de délimiter clairement
+et que vous commencerez à rédiger vos propres articles de recherche,
+vous voudrez être en mesure de délimiter clairement
 entre les affirmations techniques et les intuitions.
 
 Après le succès de la normalisation par lots,
@@ -688,11 +688,11 @@ comme point central d'un argument assimilant
 la pratique moderne de l'apprentissage profond à l'alchimie.
 Par la suite, l'exemple a été repris en détail
 dans un document de synthèse décrivant
-les tendances troublantes de l'apprentissage automatique :cite:`Lipton.Steinhardt.2018` .
+les tendances troublantes de l'apprentissage automatique :cite:`Lipton.Steinhardt.2018`.
 D'autres auteurs
 ont proposé d'autres explications pour le succès de la normalisation par lots,
 certains affirmant que le succès de la normalisation par lots survient malgré un comportement
-qui est, à certains égards, opposé à ceux revendiqués dans l'article original :cite:`Santurkar.Tsipras.Ilyas.ea.2018` .
+qui est, à certains égards, opposé à ceux revendiqués dans l'article original :cite:`Santurkar.Tsipras.Ilyas.ea.2018`.
 
 Nous notons que le *décalage interne des covariables*
 n'est pas plus digne de critique que n'importe laquelle des
@@ -701,7 +701,7 @@ faites chaque année dans la littérature technique de l'apprentissage automatiq
 Il est probable que sa résonance en tant que point focal de ces débats
 est due à sa large reconnaissabilité par le public cible.
 La normalisation par lots s'est avérée être une méthode indispensable,
-appliquée dans presque tous les classifieur d'images déployés,
+appliquée dans presque tous les classifieurs d'images déployés,
 ce qui a valu à l'article qui a introduit cette technique
 des dizaines de milliers de citations. Nous pensons cependant que les principes directeurs 
 de régularisation par injection de bruit, d'accélération par remise à l'échelle et enfin de prétraitement
@@ -709,14 +709,14 @@ pourraient bien conduire à d'autres inventions de couches et de techniques à l
 
 D'un point de vue plus pratique, plusieurs aspects de la normalisation par lots méritent d'être rappelés : 
 * Pendant l'entrainement du modèle, la normalisation par lots ajuste en permanence la sortie intermédiaire du réseau 
- en utilisant la moyenne et l'écart type du minilot, de sorte que les valeurs 
- de la sortie intermédiaire de chaque couche du réseau neuronal sont plus stables.
+en utilisant la moyenne et l'écart type du minilot, de sorte que les valeurs 
+de la sortie intermédiaire de chaque couche du réseau neuronal sont plus stables.
 * La normalisation des lots pour les couches entièrement connectées et les couches convolutionnelles est légèrement différente. En fait, 
- pour les couches convolutives, la normalisation des couches peut parfois être utilisée comme alternative. 
+pour les couches convolutives, la normalisation des couches peut parfois être utilisée comme alternative. 
 * Comme une couche d'abandon, les couches de normalisation par lots ont des comportements différents 
- en mode entrainement et en mode prédiction.
+en mode entrainement et en mode prédiction.
 * La normalisation par lots est utile pour la régularisation et l'amélioration de la convergence dans l'optimisation. D'autre part, 
- la motivation initiale de réduction du décalage interne des covariables ne semble pas être une explication valable.
+la motivation initiale de réduction du décalage interne des covariables ne semble pas être une explication valable.
 
 ## Exercices
 
@@ -726,11 +726,11 @@ D'un point de vue plus pratique, plusieurs aspects de la normalisation par lots 
    1. Quelle taille pouvez-vous donner au taux d'apprentissage avant que l'optimisation n'échoue dans les deux cas ?
 1. Avons-nous besoin d'une normalisation par lot dans chaque couche ? Faites-en l'expérience ?
 1. Implémentez une version "allégée" de la normalisation par lots qui supprime uniquement la moyenne, ou alternativement une version qui 
- supprime uniquement la variance. Comment se comporte-t-elle ?
+supprime uniquement la variance. Comment se comporte-t-elle ?
 1. Fixez les paramètres `beta` et `gamma`, et observez et analysez les résultats.
 1. Pouvez-vous remplacer l'abandon par la normalisation par lots ? Comment le comportement change-t-il ?
 1. Consultez la documentation en ligne pour `BatchNorm` à partir des API de haut niveau pour voir 
- d'autres cas d'utilisation. 
+d'autres cas d'utilisation. 
 1. Recherchez des idées : pensez à d'autres transformations de normalisation que vous pouvez appliquer :
    1. Pouvez-vous appliquer la transformée intégrale de probabilité ? 
     1. Pouvez-vous utiliser une estimation de covariance de rang complet ? Pourquoi pas ?

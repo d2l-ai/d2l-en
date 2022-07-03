@@ -217,8 +217,8 @@ qui mesuraient $32 \times 32$ pixels. Cela a été fait principalement pour
 En revanche, la deuxième couche convolutive renonce au remplissage,
 et donc la hauteur et la largeur sont toutes deux réduites de 4 pixels.
 À mesure que l'on monte dans la pile de couches,
-le nombre de canaux augmente couche par couche
-, passant de 1 dans l'entrée à 6 après la première couche convolutive
+le nombre de canaux augmente couche par couche,
+passant de 1 dans l'entrée à 6 après la première couche convolutive
 et à 16 après la deuxième couche convolutive.
 Cependant, chaque couche de mise en commun réduit de moitié la hauteur et la largeur.
 Enfin, chaque couche entièrement connectée réduit la dimensionnalité,
@@ -268,7 +268,7 @@ with d2l.try_gpu():
 
 Dans ce chapitre, nous avons fait des progrès significatifs. Nous sommes passés des MLP des années 1980 aux CNN des années 1990 et du début des années 2000. Les architectures proposées, par exemple sous la forme de LeNet-5, restent significatives, même à ce jour. Il est intéressant de comparer les taux d'erreur sur Fashion-MNIST obtenus avec LeNet-5 aux meilleurs taux obtenus avec les MLP (:numref:`sec_mlp_scratch` ) et ceux obtenus avec des architectures beaucoup plus avancées comme ResNet (:numref:`sec_resnet` ). LeNet est beaucoup plus proche de ces dernières que des premières. L'une des principales différences, comme nous le verrons, est que de plus grandes quantités de calcul permettent des architectures beaucoup plus complexes.
 
-Une deuxième différence est la facilité relative avec laquelle nous avons pu implémenter LeNet. Ce qui était auparavant un défi d'ingénierie représentant des mois de code C++ et d'assemblage, d'ingénierie pour améliorer SN, un outil précoce d'apprentissage profond basé sur Lisp :cite:`Bottou.Le-Cun.1988` , et enfin l'expérimentation de modèles, peut maintenant être accompli en quelques minutes. C'est cet incroyable gain de productivité qui a considérablement démocratisé le développement de modèles d'apprentissage profond. Dans le chapitre suivant, nous allons suivre ce terrier de lapin pour voir où il nous mène.
+Une deuxième différence est la facilité relative avec laquelle nous avons pu implémenter LeNet. Ce qui était auparavant un défi d'ingénierie représentant des mois de code C++ et d'assemblage, d'ingénierie pour améliorer SN, un outil précoce d'apprentissage profond basé sur Lisp :cite:`Bottou.Le-Cun.1988`, et enfin l'expérimentation de modèles, peut maintenant être accompli en quelques minutes. C'est cet incroyable gain de productivité qui a considérablement démocratisé le développement de modèles d'apprentissage profond. Dans le chapitre suivant, nous allons suivre ce terrier de lapin pour voir où il nous mène.
 
 ## Exercices
 

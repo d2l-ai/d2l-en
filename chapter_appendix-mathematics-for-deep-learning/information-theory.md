@@ -1,9 +1,9 @@
 # Théorie de l'information
 :label:`sec_information_theory` 
 
- L'univers déborde d'informations. L'information fournit un langage commun par-delà les clivages disciplinaires : du sonnet de Shakespeare à l'article des chercheurs sur Cornell ArXiv, de l'impression Nuit étoilée de Van Gogh à la musique Symphonie n° 5 de Beethoven, du premier langage de programmation Plankalkül aux algorithmes d'apprentissage automatique les plus modernes. Tout doit suivre les règles de la théorie de l'information, quel que soit le format. Grâce à la théorie de l'information, nous pouvons mesurer et comparer la quantité d'informations présentes dans différents signaux. Dans cette section, nous allons étudier les concepts fondamentaux de la théorie de l'information et les applications de la théorie de l'information dans l'apprentissage automatique.
+L'univers déborde d'informations. L'information fournit un langage commun par-delà les clivages disciplinaires : du sonnet de Shakespeare à l'article des chercheurs sur Cornell ArXiv, de l'impression Nuit étoilée de Van Gogh à la musique Symphonie n° 5 de Beethoven, du premier langage de programmation Plankalkül aux algorithmes d'apprentissage automatique les plus modernes. Tout doit suivre les règles de la théorie de l'information, quel que soit le format. Grâce à la théorie de l'information, nous pouvons mesurer et comparer la quantité d'informations présentes dans différents signaux. Dans cette section, nous allons étudier les concepts fondamentaux de la théorie de l'information et les applications de la théorie de l'information dans l'apprentissage automatique.
 
-Avant de commencer, décrivons la relation entre l'apprentissage automatique et la théorie de l'information. L'apprentissage automatique vise à extraire des signaux intéressants des données et à faire des prédictions critiques.  D'autre part, la théorie de l'information étudie le codage, le décodage, la transmission et la manipulation de l'information. Par conséquent, la théorie de l'information fournit un langage fondamental pour discuter du traitement de l'information dans les systèmes d'apprentissage automatique. Par exemple, de nombreuses applications d'apprentissage automatique utilisent la perte d'entropie croisée décrite dans :numref:`sec_softmax` .  Cette perte peut être directement dérivée des considérations de la théorie de l'information.
+Avant de commencer, décrivons la relation entre l'apprentissage automatique et la théorie de l'information. L'apprentissage automatique vise à extraire des signaux intéressants des données et à faire des prédictions critiques.  D'autre part, la théorie de l'information étudie le codage, le décodage, la transmission et la manipulation de l'information. Par conséquent, la théorie de l'information fournit un langage fondamental pour discuter du traitement de l'information dans les systèmes d'apprentissage automatique. Par exemple, de nombreuses applications d'apprentissage automatique utilisent la perte d'entropie croisée décrite dans :numref:`sec_softmax`.  Cette perte peut être directement dérivée des considérations de la théorie de l'information.
 
 
 ## Information
@@ -35,11 +35,11 @@ Maintenant, supposons que pour toute série de codes, chaque $0$ ou $1$ se produ
 
 $$I(X) = - \log_2 (p),$$ 
 
- comme les *bits* d'information que nous avons reçus pour cet événement $X$. Notez que nous utiliserons toujours des logarithmes en base 2 dans cette section. Par souci de simplicité, le reste de cette section omettra l'indice 2 dans la notation logarithmique, c'est-à-dire que $\log(.)$ fait toujours référence à $\log_2(.)$. Par exemple, le code "0010" a une information propre
+comme les *bits* d'information que nous avons reçus pour cet événement $X$. Notez que nous utiliserons toujours des logarithmes en base 2 dans cette section. Par souci de simplicité, le reste de cette section omettra l'indice 2 dans la notation logarithmique, c'est-à-dire que $\log(.)$ fait toujours référence à $\log_2(.)$. Par exemple, le code "0010" a une information propre
 
 $$I(\text{"0010"}) = - \log (p(\text{"0010"})) = - \log \left( \frac{1}{2^4} \right) = 4 \text{ bits}.$$ 
 
- Nous pouvons calculer l'information propre comme indiqué ci-dessous. Avant cela, commençons par importer tous les paquets nécessaires dans cette section.
+Nous pouvons calculer l'information propre comme indiqué ci-dessous. Avant cela, commençons par importer tous les paquets nécessaires dans cette section.
 
 ```{.python .input}
 #@tab mxnet
@@ -93,7 +93,7 @@ Comme l'auto-information ne mesure que l'information d'un seul événement discr
 
 ### Motivation de l'entropie
 
-Essayons d'être précis sur ce que nous voulons.  Il s'agira d'un énoncé informel de ce que l'on appelle les *axiomes de l'entropie de Shannon*.  Il s'avérera que la collection suivante d'affirmations de bon sens nous contraint à une définition unique de l'information.  Une version formelle de ces axiomes, ainsi que de plusieurs autres, peut être trouvée dans :cite:`Csiszar.2008` .
+Essayons d'être précis sur ce que nous voulons.  Il s'agira d'un énoncé informel de ce que l'on appelle les *axiomes de l'entropie de Shannon*.  Il s'avérera que la collection suivante d'affirmations de bon sens nous contraint à une définition unique de l'information.  Une version formelle de ces axiomes, ainsi que de plusieurs autres, peut être trouvée dans :cite:`Csiszar.2008`.
 
 1. L'information que nous obtenons en observant une variable aléatoire ne dépend pas de ce que nous appelons les éléments, ni de la présence d'éléments supplémentaires qui ont une probabilité nulle.
 2.  L'information que nous obtenons en observant deux variables aléatoires n'est pas plus que la somme des informations que nous obtenons en les observant séparément.  Si elles sont indépendantes, alors c'est exactement la somme.
@@ -106,15 +106,15 @@ Bien que la preuve de ce fait dépasse le cadre de notre texte, il est important
 Pour toute variable aléatoire $X$ qui suit une distribution de probabilité $P$ avec une fonction de densité de probabilité (f.d.p.) ou une fonction de masse de probabilité (f.m.p.).) $p(x)$, nous mesurons la quantité d'information attendue par le biais de l'*entropie* (ou de l'*entropie de Shannon*)
 
 $$H(X) = - E_{x \sim P} [\log p(x)].$$ 
- :eqlabel:`eq_ent_def` 
+:eqlabel:`eq_ent_def` 
 
- Plus précisément, si $X$ est discrète, $$H(X) = - \sum_i p_i \log p_i \text{, where } p_i = P(X_i).$$
+Plus précisément, si $X$ est discrète, $$H(X) = - \sum_i p_i \log p_i \text{, where } p_i = P(X_i).$$
 
- Sinon, si $X$ est continue, nous appelons également l'entropie l'*entropie différentielle*
+Sinon, si $X$ est continue, nous appelons également l'entropie l'*entropie différentielle*
 
 $$H(X) = - \int_x p(x) \log p(x) \; dx.$$ 
 
- Nous pouvons définir l'entropie comme suit.
+Nous pouvons définir l'entropie comme suit.
 
 ```{.python .input}
 #@tab mxnet
@@ -148,7 +148,7 @@ entropy(tf.constant([0.1, 0.5, 0.1, 0.3]))
 
 ### Interprétations
 
-Vous êtes peut-être curieux : dans la définition de l'entropie :eqref:`eq_ent_def` , pourquoi utilisons-nous l'espérance d'un logarithme négatif ? Voici quelques intuitions.
+Vous êtes peut-être curieux : dans la définition de l'entropie :eqref:`eq_ent_def`, pourquoi utilisons-nous l'espérance d'un logarithme négatif ? Voici quelques intuitions.
 
 Tout d'abord, pourquoi utilisons-nous une fonction *logarithme* $\log$? Supposons que $p(x) = f_1(x) f_2(x) \ldots, f_n(x)$, où chaque fonction composante $f_i(x)$ est indépendante les unes des autres. Cela signifie que chaque $f_i(x)$ contribue indépendamment à l'information totale obtenue à partir de $p(x)$. Comme nous l'avons vu plus haut, nous voulons que la formule d'entropie soit additive sur des variables aléatoires indépendantes. Heureusement, $\log$ permet de transformer naturellement un produit de distributions de probabilité en une sommation des termes individuels.
 
@@ -162,7 +162,7 @@ $$H(S) = \sum_i {p_i \cdot I(s_i)} = - \sum_i {p_i \cdot \log p_i}.$$
 
 ### Propriétés de l'entropie
 
-Grâce aux exemples et interprétations ci-dessus, nous pouvons déduire les propriétés suivantes de l'entropie :eqref:`eq_ent_def` . Ici, nous désignons $X$ comme un événement et $P$ comme la distribution de probabilité de $X$.
+Grâce aux exemples et interprétations ci-dessus, nous pouvons déduire les propriétés suivantes de l'entropie :eqref:`eq_ent_def`. Ici, nous désignons $X$ comme un événement et $P$ comme la distribution de probabilité de $X$.
 
 * $H(X) \geq 0$ pour tous les événements discrets $X$ (l'entropie peut être négative pour les événements continus $X$).
 
@@ -180,20 +180,20 @@ Pour la discussion suivante, nous utilisons toujours $(X, Y)$ comme une paire de
 
 ### Entropie conjointe
 
-Comme l'entropie d'une variable aléatoire unique :eqref:`eq_ent_def` , nous définissons l'entropie *conjointe* $H(X, Y)$ d'une paire de variables aléatoires $(X, Y)$ comme
+Comme l'entropie d'une variable aléatoire unique :eqref:`eq_ent_def`, nous définissons l'entropie *conjointe* $H(X, Y)$ d'une paire de variables aléatoires $(X, Y)$ comme
 
 $$H(X, Y) = -E_{(x, y) \sim P} [\log p_{X, Y}(x, y)]. $$ 
- :eqlabel:`eq_joint_ent_def` 
+:eqlabel:`eq_joint_ent_def` 
 
- Précisément, d'une part, si $(X, Y)$ est une paire de variables aléatoires discrètes, alors
+Précisément, d'une part, si $(X, Y)$ est une paire de variables aléatoires discrètes, alors
 
 $$H(X, Y) = - \sum_{x} \sum_{y} p_{X, Y}(x, y) \log p_{X, Y}(x, y).$$ 
 
- D'autre part, si $(X, Y)$ est une paire de variables aléatoires continues, alors nous définissons l'entropie conjointe *différentielle* comme
+D'autre part, si $(X, Y)$ est une paire de variables aléatoires continues, alors nous définissons l'entropie conjointe *différentielle* comme
 
 $$H(X, Y) = - \int_{x, y} p_{X, Y}(x, y) \ \log p_{X, Y}(x, y) \;dx \;dy.$$ 
 
- Nous pouvons considérer que :eqref:`eq_joint_ent_def` nous indique le caractère aléatoire total de la paire de variables aléatoires.  A titre de paire d'extrêmes, si $X = Y$ sont deux variables aléatoires identiques, alors l'information dans la paire est exactement l'information dans l'une et nous avons $H(X, Y) = H(X) = H(Y)$.  À l'autre extrême, si $X$ et $Y$ sont indépendantes, alors $H(X, Y) = H(X) + H(Y)$.  En effet, nous aurons toujours que l'information contenue dans une paire de variables aléatoires n'est pas plus petite que l'entropie de l'une des deux variables aléatoires et pas plus grande que la somme des deux.
+Nous pouvons considérer que :eqref:`eq_joint_ent_def` nous indique le caractère aléatoire total de la paire de variables aléatoires.  A titre de paire d'extrêmes, si $X = Y$ sont deux variables aléatoires identiques, alors l'information dans la paire est exactement l'information dans l'une et nous avons $H(X, Y) = H(X) = H(Y)$.  À l'autre extrême, si $X$ et $Y$ sont indépendantes, alors $H(X, Y) = H(X) + H(Y)$.  En effet, nous aurons toujours que l'information contenue dans une paire de variables aléatoires n'est pas plus petite que l'entropie de l'une des deux variables aléatoires et pas plus grande que la somme des deux.
 
 $$
 H(X), H(Y) \le H(X, Y) \le H(X) + H(Y).
@@ -244,22 +244,22 @@ L'entropie conjointe définie ci-dessus représente la quantité d'informations 
 Dans la théorie des probabilités, nous avons vu la définition de la *probabilité conditionnelle* pour mesurer la relation entre les variables. Nous voulons maintenant définir de manière analogue l'entropie *conditionnelle* $H(Y \mid X)$.  Nous pouvons l'écrire comme suit :
 
 $$ H(Y \mid X) = - E_{(x, y) \sim P} [\log p(y \mid x)],$$ 
- :eqlabel:`eq_cond_ent_def` 
+:eqlabel:`eq_cond_ent_def` 
 
- où $p(y \mid x) = \frac{p_{X, Y}(x, y)}{p_X(x)}$ est la probabilité conditionnelle. Plus précisément, si $(X, Y)$ est une paire de variables aléatoires discrètes, alors
+où $p(y \mid x) = \frac{p_{X, Y}(x, y)}{p_X(x)}$ est la probabilité conditionnelle. Plus précisément, si $(X, Y)$ est une paire de variables aléatoires discrètes, alors
 
 $$H(Y \mid X) = - \sum_{x} \sum_{y} p(x, y) \log p(y \mid x).$$ 
 
- Si $(X, Y)$ est une paire de variables aléatoires continues, alors l'entropie conditionnelle *différentielle* est définie de manière similaire comme
+Si $(X, Y)$ est une paire de variables aléatoires continues, alors l'entropie conditionnelle *différentielle* est définie de manière similaire comme
 
 $$H(Y \mid X) = - \int_x \int_y p(x, y) \ \log p(y \mid x) \;dx \;dy.$$ 
 
  
- Il est maintenant naturel de se demander comment l'entropie *conditionnelle* $H(Y \mid X)$ est liée à l'entropie $H(X)$ et à l'entropie conjointe $H(X, Y)$  En utilisant les définitions ci-dessus, nous pouvons l'exprimer clairement :
+Il est maintenant naturel de se demander comment l'entropie *conditionnelle* $H(Y \mid X)$ est liée à l'entropie $H(X)$ et à l'entropie conjointe $H(X, Y)$  En utilisant les définitions ci-dessus, nous pouvons l'exprimer clairement :
 
 $$H(Y \mid X) = H(X, Y) - H(X).$$ 
 
- Cela a une interprétation intuitive : l'information dans $Y$ étant donné $X$ ($H(Y \mid X)$) est la même que l'information dans $X$ et $Y$ ensemble ($H(X, Y)$) moins l'information déjà contenue dans $X$.  Cela nous donne l'information contenue dans $Y$ qui n'est pas également représentée dans $X$.
+Cela a une interprétation intuitive : l'information dans $Y$ étant donné $X$ ($H(Y \mid X)$) est la même que l'information dans $X$ et $Y$ ensemble ($H(X, Y)$) moins l'information déjà contenue dans $X$.  Cela nous donne l'information contenue dans $Y$ qui n'est pas également représentée dans $X$.
 
 Maintenant, implémentons l'entropie conditionnelle :eqref:`eq_cond_ent_def` à partir de zéro.
 
@@ -314,20 +314,20 @@ $$
 En effet, il s'agit d'une définition valide de l'information mutuelle.  Si nous développons les définitions de ces termes et les combinons, un peu d'algèbre montre que cela équivaut à
 
 $$I(X, Y) = E_{x} E_{y} \left\{ p_{X, Y}(x, y) \log\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)} \right\}. $$ 
- :eqlabel:`eq_mut_ent_def` 
+:eqlabel:`eq_mut_ent_def` 
 
  
- Nous pouvons résumer toutes ces relations dans l'image :numref:`fig_mutual_information` .  C'est un excellent test d'intuition que de voir pourquoi les affirmations suivantes sont toutes également équivalentes à $I(X, Y)$.
+Nous pouvons résumer toutes ces relations dans l'image :numref:`fig_mutual_information`.  C'est un excellent test d'intuition que de voir pourquoi les affirmations suivantes sont toutes également équivalentes à $I(X, Y)$.
 
 * $H(X) - H(X \mid Y)$
 * $H(Y) - H(Y \mid X)$
 * $H(X) + H(Y) - H(X, Y)$
 
- ![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual-information.svg) 
+![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual-information.svg) 
 :label:`fig_mutual_information` 
 
  
- De bien des façons, nous pouvons considérer l'information mutuelle :eqref:`eq_mut_ent_def` comme une extension de principe du coefficient de corrélation que nous avons vu dans :numref:`sec_random_variables` .  Cela nous permet de demander non seulement les relations linéaires entre les variables, mais aussi l'information maximale partagée entre les deux variables aléatoires de n'importe quel type.
+De bien des façons, nous pouvons considérer l'information mutuelle :eqref:`eq_mut_ent_def` comme une extension de principe du coefficient de corrélation que nous avons vu dans :numref:`sec_random_variables`.  Cela nous permet de demander non seulement les relations linéaires entre les variables, mais aussi l'information maximale partagée entre les deux variables aléatoires de n'importe quel type.
 
 Maintenant, implémentons l'information mutuelle à partir de zéro.
 
@@ -372,7 +372,7 @@ mutual_information(tf.constant([[0.1, 0.5], [0.1, 0.3]]),
 
 ### Propriétés de l'information mutuelle
 
-Plutôt que de mémoriser la définition de l'information mutuelle :eqref:`eq_mut_ent_def` , il vous suffit de garder à l'esprit ses propriétés notables :
+Plutôt que de mémoriser la définition de l'information mutuelle :eqref:`eq_mut_ent_def`, il vous suffit de garder à l'esprit ses propriétés notables :
 
 * L'information mutuelle est symétrique, c'est-à-dire $I(X, Y) = I(Y, X)$.
 * L'information mutuelle est non négative, c'est-à-dire $I(X, Y) \geq 0$.
@@ -384,9 +384,9 @@ Plutôt que de mémoriser la définition de l'information mutuelle :eqref:`eq_mu
 Lorsque nous avons travaillé sur l'entropie au début de ce chapitre, nous avons été en mesure de fournir une interprétation de $-\log(p_X(x))$ comme étant le degré de *surprise* du résultat particulier.  Nous pouvons donner une interprétation similaire au terme logarithmique de l'information mutuelle, souvent appelée *information mutuelle ponctuelle* :
 
 $$\mathrm{pmi}(x, y) = \log\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)}.$$ 
- :eqlabel:`eq_pmi_def` 
+:eqlabel:`eq_pmi_def` 
 
- Nous pouvons considérer que :eqref:`eq_pmi_def` mesure le degré de probabilité de la combinaison spécifique des résultats $x$ et $y$ par rapport à ce que nous attendrions de résultats aléatoires indépendants.  S'il est grand et positif, alors ces deux résultats spécifiques se produisent beaucoup plus fréquemment qu'ils ne le feraient par rapport au hasard (*note* : le dénominateur est $p_X(x) p_Y(y)$ qui est la probabilité que les deux résultats soient indépendants), tandis que s'il est grand et négatif, il représente les deux résultats se produisant beaucoup moins que ce que nous attendrions par hasard.
+Nous pouvons considérer que :eqref:`eq_pmi_def` mesure le degré de probabilité de la combinaison spécifique des résultats $x$ et $y$ par rapport à ce que nous attendrions de résultats aléatoires indépendants.  S'il est grand et positif, alors ces deux résultats spécifiques se produisent beaucoup plus fréquemment qu'ils ne le feraient par rapport au hasard (*note* : le dénominateur est $p_X(x) p_Y(y)$ qui est la probabilité que les deux résultats soient indépendants), tandis que s'il est grand et négatif, il représente les deux résultats se produisant beaucoup moins que ce que nous attendrions par hasard.
 
 Cela nous permet d'interpréter l'information mutuelle :eqref:`eq_mut_ent_def` comme la quantité moyenne de surprise que nous avons eue à voir deux résultats se produire ensemble par rapport à ce que nous aurions attendu s'ils étaient indépendants.
 
@@ -399,7 +399,7 @@ Dans ce cas, l'information mutuelle peut nous aider à résoudre cette ambiguït
 
 ## Divergence de Kullback-Leibler
 
-Comme nous l'avons vu sur :numref:`sec_linear-algebra` , nous pouvons utiliser des normes pour mesurer la distance entre deux points dans un espace de n'importe quelle dimension.  Nous aimerions pouvoir effectuer une tâche similaire avec les distributions de probabilité.  Il existe de nombreuses façons d'y parvenir, mais la théorie de l'information en fournit une des plus belles.  Nous allons maintenant explorer la *divergence de Kullback-Leibler (KL)*, qui fournit un moyen de mesurer si deux distributions sont proches ou non.
+Comme nous l'avons vu sur :numref:`sec_linear-algebra`, nous pouvons utiliser des normes pour mesurer la distance entre deux points dans un espace de n'importe quelle dimension.  Nous aimerions pouvoir effectuer une tâche similaire avec les distributions de probabilité.  Il existe de nombreuses façons d'y parvenir, mais la théorie de l'information en fournit une des plus belles.  Nous allons maintenant explorer la *divergence de Kullback-Leibler (KL)*, qui fournit un moyen de mesurer si deux distributions sont proches ou non.
 
 
 ### Définition
@@ -407,9 +407,9 @@ Comme nous l'avons vu sur :numref:`sec_linear-algebra` , nous pouvons utiliser d
 Étant donné une variable aléatoire $X$ qui suit la distribution de probabilité $P$ avec une p.d.f. ou une p.m.f. $p(x)$, et nous estimons $P$ par une autre distribution de probabilité $Q$ avec une p.d.f. ou une p.m.f. $q(x)$. Alors la divergence * de Kullback-Leibler (KL)* (ou * entropie relative*) entre $P$ et $Q$ est
 
 $$D_{\mathrm{KL}}(P\|Q) = E_{x \sim P} \left[ \log \frac{p(x)}{q(x)} \right].$$ 
- :eqlabel:`eq_kl_def` 
+:eqlabel:`eq_kl_def` 
 
- Comme pour l'information mutuelle ponctuelle :eqref:`eq_pmi_def` , nous pouvons à nouveau fournir une interprétation du terme logarithmique :  $-\log \frac{q(x)}{p(x)} = -\log(q(x)) - (-\log(p(x)))$ sera grand et positif si nous voyons $x$ beaucoup plus souvent sous $P$ que nous ne nous y attendrions pour $Q$, et grand et négatif si nous voyons le résultat beaucoup moins que prévu.  De cette façon, nous pouvons l'interpréter comme notre surprise *relative* à observer le résultat par rapport à la surprise que nous aurions à l'observer à partir de notre distribution de référence.
+Comme pour l'information mutuelle ponctuelle :eqref:`eq_pmi_def`, nous pouvons à nouveau fournir une interprétation du terme logarithmique :  $-\log \frac{q(x)}{p(x)} = -\log(q(x)) - (-\log(p(x)))$ sera grand et positif si nous voyons $x$ beaucoup plus souvent sous $P$ que nous ne nous y attendrions pour $Q$, et grand et négatif si nous voyons le résultat beaucoup moins que prévu.  De cette façon, nous pouvons l'interpréter comme notre surprise *relative* à observer le résultat par rapport à la surprise que nous aurions à l'observer à partir de notre distribution de référence.
 
 Implémentons la divergence KL à partir de Scratch.
 
@@ -439,17 +439,17 @@ def kl_divergence(p, q):
 
 ### Propriétés de la divergence de KL
 
-Examinons quelques propriétés de la divergence de KL :eqref:`eq_kl_def` .
+Examinons quelques propriétés de la divergence de KL :eqref:`eq_kl_def`.
 
 * La divergence KL est non symétrique, c'est-à-dire qu'il existe $P,Q$ tel que $$D_{\mathrm{KL}}(P\|Q) \neq D_{\mathrm{KL}}(Q\|P).$$
 * La divergence KL est non négative, c'est-à-dire que $$D_{\mathrm{KL}}(P\|Q) \geq 0.$$ Notez que l'égalité ne vaut que lorsque $P = Q$.
 * S'il existe un $x$ tel que $p(x) > 0$ et $q(x) = 0$, alors $D_{\mathrm{KL}}(P\|Q) = \infty$.
-* Il existe une relation étroite entre la divergence KL et l'information mutuelle. En plus de la relation montrée dans :numref:`fig_mutual_information` , $I(X, Y)$ est aussi numériquement équivalent avec les termes suivants :
+* Il existe une relation étroite entre la divergence KL et l'information mutuelle. En plus de la relation montrée dans :numref:`fig_mutual_information`, $I(X, Y)$ est aussi numériquement équivalent avec les termes suivants :
    1. $D_{\mathrm{KL}}(P(X, Y)  \ \| \ P(X)P(Y))$;
  1. $E_Y \{ D_{\mathrm{KL}}(P(X \mid Y) \ \| \ P(X)) \}$;
  1. $E_X \{ D_{\mathrm{KL}}(P(Y \mid X) \ \| \ P(Y)) \}$.
 
- Pour le premier terme, nous interprétons l'information mutuelle comme la divergence KL entre $P(X, Y)$ et le produit de $P(X)$ et $P(Y)$, et c'est donc une mesure de la différence entre la distribution conjointe et la distribution si elles étaient indépendantes. Pour le deuxième terme, l'information mutuelle nous indique la réduction moyenne de l'incertitude sur $Y$ qui résulte de la connaissance de la valeur de la distribution de $X$. De même pour le troisième terme.
+Pour le premier terme, nous interprétons l'information mutuelle comme la divergence KL entre $P(X, Y)$ et le produit de $P(X)$ et $P(Y)$, et c'est donc une mesure de la différence entre la distribution conjointe et la distribution si elles étaient indépendantes. Pour le deuxième terme, l'information mutuelle nous indique la réduction moyenne de l'incertitude sur $Y$ qui résulte de la connaissance de la valeur de la distribution de $X$. De même pour le troisième terme.
 
 
 #### Exemple
@@ -523,7 +523,7 @@ kl_q2p, differ_percentage
 
 Si vous êtes curieux de connaître les applications de la théorie de l'information dans l'apprentissage profond, voici un exemple rapide. Nous définissons la distribution réelle $P$ avec la distribution de probabilité $p(x)$, et la distribution estimée $Q$ avec la distribution de probabilité $q(x)$, et nous les utiliserons dans le reste de cette section.
 
-Supposons que nous devions résoudre un problème de classification binaire sur la base d'exemples de données $n$ donnés {$x_1, \ldots, x_n$}. Supposons que nous encodions $1$ et $0$ comme étiquette de classe positive et négative $y_i$ respectivement, et que notre réseau neuronal soit paramétré par $\theta$. Si notre objectif est de trouver le meilleur $\theta$ pour que $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, il est naturel d'appliquer l'approche de la log-vraisemblance maximale, comme on l'a vu dans :numref:`sec_maximum_likelihood` . Plus précisément, pour les étiquettes vraies $y_i$ et les prédictions $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, la probabilité d'être classé comme positif est $\pi_i= p_{\theta}(y_i = 1 \mid x_i)$. Par conséquent, la fonction de log-vraisemblance est la suivante
+Supposons que nous devions résoudre un problème de classification binaire sur la base d'exemples de données $n$ donnés {$x_1, \ldots, x_n$}. Supposons que nous encodions $1$ et $0$ comme étiquette de classe positive et négative $y_i$ respectivement, et que notre réseau neuronal soit paramétré par $\theta$. Si notre objectif est de trouver le meilleur $\theta$ pour que $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, il est naturel d'appliquer l'approche de la log-vraisemblance maximale, comme on l'a vu dans :numref:`sec_maximum_likelihood`. Plus précisément, pour les étiquettes vraies $y_i$ et les prédictions $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, la probabilité d'être classé comme positif est $\pi_i= p_{\theta}(y_i = 1 \mid x_i)$. Par conséquent, la fonction de log-vraisemblance est la suivante
 
 $$
 \begin{aligned}
@@ -543,9 +543,9 @@ Tout ceci a été dérivé en travaillant du point de vue du maximum de vraisemb
 Tout comme la divergence KL, pour une variable aléatoire $X$, nous pouvons également mesurer la divergence entre la distribution d'estimation $Q$ et la distribution réelle $P$ via *l'entropie croisée*,
 
 $$\mathrm{CE}(P, Q) = - E_{x \sim P} [\log(q(x))].$$ 
- :eqlabel:`eq_ce_def` 
+:eqlabel:`eq_ce_def` 
 
- En utilisant les propriétés de l'entropie discutées ci-dessus, nous pouvons également l'interpréter comme la somme de l'entropie $H(P)$ et de la divergence KL entre $P$ et $Q$, c'est-à-dire,
+En utilisant les propriétés de l'entropie discutées ci-dessus, nous pouvons également l'interpréter comme la somme de l'entropie $H(P)$ et de la divergence KL entre $P$ et $Q$, c'est-à-dire,
 
 $$\mathrm{CE} (P, Q) = H(P) + D_{\mathrm{KL}}(P\|Q).$$
 
@@ -621,12 +621,12 @@ Pour commencer, supposons que l'on nous donne un ensemble de données contenant 
 
 $$ y_{ij} = \begin{cases}1 & j \in J; \\ 0 &\text{otherwise.}\end{cases}$$ 
 
- Par exemple, si un problème de classification multi-classes contient trois classes $A$, $B$ et $C$, les étiquettes $\mathbf{y}_i$ peuvent être codées dans {$A: (1, 0, 0); B: (0, 1, 0); C: (0, 0, 1)$}.
+Par exemple, si un problème de classification multi-classes contient trois classes $A$, $B$ et $C$, les étiquettes $\mathbf{y}_i$ peuvent être codées dans {$A: (1, 0, 0); B: (0, 1, 0); C: (0, 0, 1)$}.
 
 
 Supposons que notre réseau neuronal soit paramétré par $\theta$. Pour les vecteurs d'étiquettes vraies $\mathbf{y}_i$ et les prédictions $$\hat{\mathbf{y}}_i= p_{\theta}(\mathbf{y}_i \mid \mathbf{x}_i) = \sum_{j=1}^k y_{ij} p_{\theta} (y_{ij}  \mid  \mathbf{x}_i).$$
 
- Par conséquent, la *perte d'entropie croisée* est la suivante
+Par conséquent, la *perte d'entropie croisée* est la suivante
 
 $$
 \mathrm{CE}(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_{i=1}^n \mathbf{y}_i \log \hat{\mathbf{y}}_i
@@ -637,7 +637,7 @@ D'un autre côté, nous pouvons également aborder le problème par le biais de 
 $$\mathbf{p}^\mathbf{z} = \prod_{j=1}^k p_{j}^{z_{j}}.$$ 
 
  
- On peut voir que l'étiquette de chaque exemple de données, $\mathbf{y}_i$, suit une distribution multinoulli de classe $k$ avec des probabilités $\boldsymbol{\pi} =$ ($\pi_{1}, \ldots, \pi_{k}$). Par conséquent, la f.m.p. conjointe de chaque exemple de données $\mathbf{y}_i$ est $\mathbf{\pi}^{\mathbf{y}_i} = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
+On peut voir que l'étiquette de chaque exemple de données, $\mathbf{y}_i$, suit une distribution multinoulli de classe $k$ avec des probabilités $\boldsymbol{\pi} =$ ($\pi_{1}, \ldots, \pi_{k}$). Par conséquent, la f.m.p. conjointe de chaque exemple de données $\mathbf{y}_i$ est $\mathbf{\pi}^{\mathbf{y}_i} = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
  . Par conséquent, la fonction de log-vraisemblance est la suivante
 
 $$

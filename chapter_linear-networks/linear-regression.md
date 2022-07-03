@@ -35,11 +35,11 @@ sont appelées *caractéristiques* (ou *covariables*).
 *La régression linéaire* est peut-être à la fois la plus simple
 et la plus populaire des outils standard
 pour aborder les problèmes de régression.
-Datant de l'aube du 19ème siècle :cite:`Legendre.1805,Gauss.1809` ,
+Datant de l'aube du 19ème siècle :cite:`Legendre.1805,Gauss.1809`,
 la régression linéaire découle de quelques hypothèses simples.
 Premièrement, nous supposons que la relation
 entre les caractéristiques $\mathbf{x}$ et la cible $y$
- est approximativement linéaire,
+est approximativement linéaire,
 c'est-à-dire que la moyenne conditionnelle $E[Y|X=\mathbf{x}]$
 peut être exprimée comme une somme pondérée
 des caractéristiques $\mathbf{x}$.
@@ -59,7 +59,7 @@ et $x_j^{(i)}$ désigne sa $j$-ième coordonnée.
 ### Modèle
 :label:`subsec_linear_model` 
 
- Au cœur de chaque solution se trouve un modèle
+Au cœur de chaque solution se trouve un modèle
 qui décrit comment les caractéristiques peuvent être transformées
 en une estimation de la cible.
 L'hypothèse de linéarité signifie que
@@ -67,10 +67,10 @@ la valeur attendue de la cible (prix) peut être exprimée
 comme une somme pondérée des caractéristiques (surface et âge) :
 
 $$\mathrm{price} = w_{\mathrm{area}} \cdot \mathrm{area} + w_{\mathrm{age}} \cdot \mathrm{age} + b.$$ 
- :eqlabel:`eq_price-area` 
+:eqlabel:`eq_price-area` 
 
- Ici, $w_{\mathrm{area}}$ et $w_{\mathrm{age}}$
- sont appelés *poids*, et $b$ est appelé un *biais*
+Ici, $w_{\mathrm{area}}$ et $w_{\mathrm{age}}$
+sont appelés *poids*, et $b$ est appelé un *biais*
 (ou *offset* ou *intercept*).
 Les poids déterminent l'influence de chaque caractéristique sur notre prédiction.
 Le biais détermine la valeur de l'estimation lorsque toutes les caractéristiques sont nulles.
@@ -81,14 +81,14 @@ d'exprimer toutes les fonctions linéaires de nos caractéristiques
 Strictement parlant, :eqref:`eq_price-area` est une *transformation affine* des caractéristiques d'entrée, qui se caractérise par une *transformation linéaire* des caractéristiques via la somme pondérée, combinée à une *translation* via le biais ajouté.
 Étant donné un ensemble de données, notre objectif est de choisir
 les poids $\mathbf{w}$ et le biais $b$
- qui, en moyenne, font que les prédictions de notre modèle
+qui, en moyenne, font que les prédictions de notre modèle
 correspondent le plus possible aux prix réels observés dans les données.
 
 
 Dans les disciplines où il est courant de se concentrer
 sur des ensembles de données ne comportant que quelques caractéristiques,
 exprime explicitement les modèles en forme longue,
-comme dans :eqref:`eq_price-area` , est courant.
+comme dans :eqref:`eq_price-area`, est courant.
 Dans le domaine de l'apprentissage automatique, nous travaillons généralement
 avec des ensembles de données à haute dimension,
 où il est plus pratique d'employer
@@ -100,16 +100,16 @@ et exprimer notre prédiction $\hat{y}$
 
 $$\hat{y} = w_1  x_1 + ... + w_d  x_d + b.$$ 
 
- En rassemblant toutes les caractéristiques dans un vecteur $\mathbf{x} \in \mathbb{R}^d$
- et tous les poids dans un vecteur $\mathbf{w} \in \mathbb{R}^d$,
+En rassemblant toutes les caractéristiques dans un vecteur $\mathbf{x} \in \mathbb{R}^d$
+et tous les poids dans un vecteur $\mathbf{w} \in \mathbb{R}^d$,
 nous pouvons exprimer notre modèle de manière compacte via le produit scalaire
 entre $\mathbf{w}$ et $\mathbf{x}$:
 
 $$\hat{y} = \mathbf{w}^\top \mathbf{x} + b.$$
 :eqlabel:`eq_linreg-y`
 
-Dans :eqref:`eq_linreg-y` , le vecteur $\mathbf{x}$
- correspond aux caractéristiques d'un seul exemple.
+Dans :eqref:`eq_linreg-y`, le vecteur $\mathbf{x}$
+correspond aux caractéristiques d'un seul exemple.
 Nous trouverons souvent pratique
 de nous référer aux caractéristiques de notre ensemble de données de $n$ exemples
 via la *matrice de conception* $\mathbf{X} \in \mathbb{R}^{n \times d}$.
@@ -117,16 +117,16 @@ Ici, $\mathbf{X}$ contient une ligne pour chaque exemple
 et une colonne pour chaque caractéristique.
 Pour une collection de caractéristiques $\mathbf{X}$,
 les prédictions $\hat{\mathbf{y}} \in \mathbb{R}^n$
- peuvent être exprimées via le produit matrice-vecteur :
+peuvent être exprimées via le produit matrice-vecteur :
 
 $${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b,$$ 
 
- où la diffusion (:numref:`subsec_broadcasting` ) est appliquée pendant la sommation.
+où la diffusion (:numref:`subsec_broadcasting` ) est appliquée pendant la sommation.
 Étant donné les caractéristiques d'un ensemble de données d'apprentissage $\mathbf{X}$
- et les étiquettes correspondantes (connues) $\mathbf{y}$,
+et les étiquettes correspondantes (connues) $\mathbf{y}$,
 l'objectif de la régression linéaire est de trouver
 le vecteur de poids $\mathbf{w}$ et le terme de biais $b$
- qui, étant donné les caractéristiques d'un nouvel exemple de données
+qui, étant donné les caractéristiques d'un nouvel exemple de données
 échantillonné à partir de la même distribution que $\mathbf{X}$,
 l'étiquette du nouvel exemple sera (en principe)
 prédite avec l'erreur la plus faible.
@@ -135,7 +135,7 @@ Même si nous pensons que le meilleur modèle pour
 prédire $y$ à partir de $\mathbf{x}$ est linéaire,
 nous ne nous attendons pas à trouver un ensemble de données du monde réel de $n$ exemples où
 $y^{(i)}$ est exactement égal à $\mathbf{w}^\top \mathbf{x}^{(i)}+b$
- pour tous les $1 \leq i \leq n$.
+pour tous les $1 \leq i \leq n$.
 Par exemple, quels que soient les instruments que nous utilisons pour observer
 les caractéristiques $\mathbf{X}$ et les étiquettes $\mathbf{y}$
  , il se peut que l'erreur de mesure soit minime.
@@ -152,7 +152,7 @@ et (ii) une procédure de mise à jour du modèle pour améliorer sa qualité.
 ### Fonction de perte
 :label:`subsec_linear-regression-loss-function` 
 
- Naturellement, l'adaptation de notre modèle aux données nécessite
+Naturellement, l'adaptation de notre modèle aux données nécessite
 que nous nous mettions d'accord sur une certaine mesure de *fitness*
 (ou, de manière équivalente, de *unfitness*).
 *Les fonctions de perte* quantifient la distance
@@ -162,13 +162,13 @@ où les petites valeurs sont meilleures
 et les prédictions parfaites entraînent une perte de 0.
 Pour les problèmes de régression, la fonction de perte la plus courante est l'erreur quadratique.
 Lorsque notre prédiction pour un exemple $i$ est $\hat{y}^{(i)}$
- et que l'étiquette réelle correspondante est $y^{(i)}$,
+et que l'étiquette réelle correspondante est $y^{(i)}$,
 l'erreur quadratique * est donnée par :
 
 $$l^{(i)}(\mathbf{w}, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2.$$ 
- :eqlabel:`eq_mse` 
+:eqlabel:`eq_mse` 
 
- La constante $\frac{1}{2}$ ne fait aucune différence réelle
+La constante $\frac{1}{2}$ ne fait aucune différence réelle
 mais s'avère pratique d'un point de vue notationnel,
 puisqu'elle s'annule lorsque nous prenons la dérivée de la perte.
 Étant donné que l'ensemble de données d'apprentissage nous est donné,
@@ -181,12 +181,12 @@ dans un problème avec des entrées unidimensionnelles (:numref:`fig_fit_linreg`
 :label:`fig_fit_linreg`
 
 Notez que les grandes différences entre les estimations
- $\hat{y}^{(i)}$ et les cibles $y^{(i)}$
- entraînent des contributions encore plus importantes à la perte,
+$\hat{y}^{(i)}$ et les cibles $y^{(i)}$
+entraînent des contributions encore plus importantes à la perte,
 en raison de la forme quadratique de la perte
 (cela peut être une arme à double tranchant.
-Si elle encourage le modèle à éviter les erreurs importantes
-, elle peut également conduire à une sensibilité excessive aux données anormales).
+Si elle encourage le modèle à éviter les erreurs importantes,
+elle peut également conduire à une sensibilité excessive aux données anormales).
 Pour mesurer la qualité d'un modèle sur l'ensemble de l'ensemble de données des exemples $n$,
 nous faisons simplement la moyenne (ou l'équivalent, la somme)
 des pertes sur l'ensemble d'apprentissage :
@@ -207,14 +207,14 @@ En particulier, nous pouvons trouver les paramètres optimaux
 (tels qu'évalués sur les données d'entraînement)
 analytiquement en appliquant une formule simple comme suit.
 Tout d'abord, nous pouvons subsumer le biais $b$ dans le paramètre $\mathbf{w}$
- en ajoutant une colonne à la matrice de conception constituée de tous les uns.
+en ajoutant une colonne à la matrice de conception constituée de tous les uns.
 Notre problème de prédiction consiste alors à minimiser $\|\mathbf{y} - \mathbf{X}\mathbf{w}\|^2$.
 Tant que la matrice de conception $\mathbf{X}$ a un rang complet
 (aucune caractéristique ne dépend linéairement des autres),
 alors il n'y aura qu'un seul point critique sur la surface de perte
 et il correspond au minimum de la perte sur l'ensemble du domaine.
 En prenant la dérivée de la perte par rapport à $\mathbf{w}$
- et en la fixant à zéro, on obtient :
+et en la fixant à zéro, on obtient :
 
 $$\begin{aligned}
     \partial_{\mathbf{w}} \|\mathbf{y} - \mathbf{X}\mathbf{w}\|^2 =
@@ -232,7 +232,7 @@ $$\mathbf{w}^* = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf{y}$$
  ne sera unique
 que lorsque la matrice $\mathbf X^\top \mathbf X$ est inversible,
 c'est-à-dire lorsque les colonnes de la matrice de conception
-sont linéairement indépendantes :cite:`Golub.Van-Loan.1996` .
+sont linéairement indépendantes :cite:`Golub.Van-Loan.1996`.
 
 
 
@@ -264,14 +264,14 @@ qui est une moyenne des pertes calculées
 sur chaque exemple de l'ensemble de données.
 En pratique, cette méthode peut être extrêmement lente :
 nous devons passer en revue l'ensemble des données avant d'effectuer une seule mise à jour,
-même si les étapes de mise à jour peuvent être très puissantes :cite:`Liu.Nocedal.1989` .
+même si les étapes de mise à jour peuvent être très puissantes :cite:`Liu.Nocedal.1989`.
 Pire encore, s'il y a beaucoup de redondance dans les données d'apprentissage,
 l'avantage d'une mise à jour complète est encore plus faible.
 
 L'autre extrême consiste à ne considérer qu'un seul exemple à la fois et à effectuer les étapes de mise à jour
 sur la base d'une seule observation à la fois.
 L'algorithme qui en résulte, la *descente de gradient stochastique* (SGD)
-peut être une stratégie efficace :cite:`Bottou.2010` , même pour les grands ensembles de données.
+peut être une stratégie efficace :cite:`Bottou.2010`, même pour les grands ensembles de données.
 Malheureusement, la SGD présente des inconvénients, tant sur le plan informatique que statistique.
 L'un des problèmes vient du fait que les processeurs sont beaucoup plus rapides
 pour multiplier et additionner des nombres que
@@ -288,7 +288,7 @@ ne fonctionnent bien que lorsque nous avons accès
 
 La solution à ces deux problèmes consiste à choisir une stratégie intermédiaire :
 plutôt que de prendre un lot complet ou un seul échantillon à la fois,
-nous prenons un *minibatch* d'observations :cite:`Li.Zhang.Chen.ea.2014` .
+nous prenons un *minibatch* d'observations :cite:`Li.Zhang.Chen.ea.2014`.
 Le choix spécifique de la taille dudit minibatch dépend de nombreux facteurs,
 tels que la quantité de mémoire, le nombre d'accélérateurs,
 le choix des couches, et la taille totale de l'ensemble de données.
@@ -298,7 +298,7 @@ Cela nous conduit à la descente de gradient stochastique en *minibatch*.
 
 Dans sa forme la plus élémentaire, à chaque itération $t$,
 nous échantillonnons d'abord de manière aléatoire un mini-batch $\mathcal{B}_t$
- composé d'un nombre fixe $|\mathcal{B}|$ d'exemples d'apprentissage.
+composé d'un nombre fixe $|\mathcal{B}|$ d'exemples d'apprentissage.
 Nous calculons ensuite la dérivée (gradient) de la perte moyenne
 sur le minilot en fonction des paramètres du modèle.
 Enfin, nous multiplions le gradient
@@ -309,7 +309,7 @@ Nous pouvons exprimer la mise à jour comme suit :
 
 $$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \partial_{(\mathbf{w},b)} l^{(i)}(\mathbf{w},b).$$ 
 
- En résumé, la SGD par minibatchs se déroule comme suit :
+En résumé, la SGD par minibatchs se déroule comme suit :
 (i) initialiser les valeurs des paramètres du modèle, généralement de manière aléatoire ;
 (ii) échantillonner de manière itérative des minibatchs aléatoires à partir des données,
 en mettant à jour les paramètres dans la direction du gradient négatif.
@@ -317,15 +317,15 @@ Pour les pertes quadratiques et les transformations affines,
 il existe une expansion à forme fermée :
 
 $$\begin{aligned} \mathbf{w} & \leftarrow \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) && = \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)\\ b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \partial_b l^{(i)}(\mathbf{w}, b) &&  = b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right). \end{aligned}$$ 
- :eqlabel:`eq_linreg_batch_update` 
+:eqlabel:`eq_linreg_batch_update` 
 
- Puisque nous choisissons un minibatch $\mathcal{B}$
+Puisque nous choisissons un minibatch $\mathcal{B}$
  nous devons normaliser par sa taille $|\mathcal{B}|$.
 La taille des minibatchs et le taux d'apprentissage sont souvent définis par l'utilisateur.
 Ces paramètres réglables qui ne sont pas mis à jour
 dans la boucle d'apprentissage sont appelés *hyperparamètres*.
 Ils peuvent être réglés automatiquement par un certain nombre de techniques, telles que l'optimisation bayésienne
-:cite:`Frazier.2018` . Au final, la qualité de la solution est
+:cite:`Frazier.2018`. Au final, la qualité de la solution est
 généralement évaluée sur un *ensemble de données de validation* (ou *ensemble de validation*) distinct.
 
 Après un entraînement pendant un nombre prédéterminé d'itérations
@@ -334,10 +334,10 @@ nous enregistrons les paramètres estimés du modèle,
 désignés par $\hat{\mathbf{w}}, \hat{b}$.
 Notez que même si notre fonction est réellement linéaire et sans bruit,
 ces paramètres ne seront pas les minimisateurs exacts de la perte, ni même déterministes.
-Bien que l'algorithme converge lentement vers les minimiseurs
-, il ne peut généralement pas y parvenir exactement en un nombre fini d'étapes.
+Bien que l'algorithme converge lentement vers les minimiseurs,
+il ne peut généralement pas y parvenir exactement en un nombre fini d'étapes.
 De plus, les minibatchs $\mathcal{B}$
- utilisés pour mettre à jour les paramètres sont choisis au hasard.
+utilisés pour mettre à jour les paramètres sont choisis au hasard.
 Cela rompt le déterminisme.
 
 Il se trouve que la régression linéaire est un problème d'apprentissage
@@ -351,7 +351,7 @@ qui conduit à des prédictions précises (et donc à une faible perte).
 En pratique, les praticiens de l'apprentissage profond
 ont rarement du mal à trouver des paramètres
 qui minimisent la perte *sur les ensembles d'apprentissage*
-:cite:`Izmailov.Podoprikhin.Garipov.ea.2018,Frankle.Carbin.2018` .
+:cite:`Izmailov.Podoprikhin.Garipov.ea.2018,Frankle.Carbin.2018`.
 La tâche la plus redoutable est de trouver des paramètres
 qui conduisent à des prédictions précises sur des données inédites,
 un défi appelé *généralisation*.
@@ -363,8 +363,8 @@ Compte tenu du modèle $\hat{\mathbf{w}}^\top \mathbf{x} + \hat{b}$,
 nous pouvons maintenant faire des *prédictions* pour un nouvel exemple,
 par exemple, pour prédire le prix de vente d'une maison inédite
 compte tenu de sa superficie $x_1$ et de son âge $x_2$.
-Les praticiens de l'apprentissage profond ont pris l'habitude d'appeler la phase de prédiction *inférence*
-, mais il s'agit d'un terme quelque peu erroné---*inférence* fait référence de manière générale
+Les praticiens de l'apprentissage profond ont pris l'habitude d'appeler la phase de prédiction *inférence*,
+ mais il s'agit d'un terme quelque peu erroné---*inférence* fait référence de manière générale
 à toute conclusion tirée sur la base de preuves,
 y compris les valeurs des paramètres
 et l'étiquette probable pour une instance non vue.
@@ -470,10 +470,10 @@ ce qui réduit le risque d'erreurs et augmente la portabilité du code.
 ## La distribution normale et la perte au carré
 :label:`subsec_normal_distribution_and_squared_loss` 
 
- Jusqu'à présent, nous avons donné une motivation assez fonctionnelle
+Jusqu'à présent, nous avons donné une motivation assez fonctionnelle
 de l'objectif de perte au carré :
 les paramètres optimaux renvoient l'espérance conditionnelle $E[Y|X]$
- lorsque le modèle sous-jacent est vraiment linéaire,
+lorsque le modèle sous-jacent est vraiment linéaire,
 et la perte attribue des pénalités démesurées pour les valeurs aberrantes.
 Nous pouvons également fournir une motivation plus formelle
 pour l'objectif de perte au carré
@@ -495,7 +495,7 @@ est donnée par
 
 $$p(x) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (x - \mu)^2\right).$$ 
 
- Ci-dessous [**nous définissons une fonction pour calculer la distribution normale**].
+Ci-dessous [**nous définissons une fonction pour calculer la distribution normale**].
 
 ```{.python .input  n=3}
 %%tab all
@@ -542,20 +542,20 @@ où le bruit est normalement distribué comme suit :
 
 $$y = \mathbf{w}^\top \mathbf{x} + b + \epsilon \text{ where } \epsilon \sim \mathcal{N}(0, \sigma^2).$$ 
 
- Ainsi, nous pouvons maintenant écrire la *vraisemblance*
+Ainsi, nous pouvons maintenant écrire la *vraisemblance*
 de voir un $y$ particulier pour un $\mathbf{x}$ donné via
 
 $$P(y | \mathbf{x}) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (y - \mathbf{w}^\top \mathbf{x} - b)^2\right).$$ 
 
- En tant que telle, la vraisemblance se factorise.
+En tant que telle, la vraisemblance se factorise.
 Selon le *principe de la vraisemblance maximale*,
 les meilleures valeurs des paramètres $\mathbf{w}$ et $b$ sont celles
 qui maximisent la *vraisemblance* de l'ensemble des données :
 
 $$P(\mathbf y|\mathbf X) = \prod_{i=1}^{n} p(y^{(i)}|\mathbf{x}^{(i)}).$$ 
 
- L'égalité découle du fait que toutes les paires $(\mathbf{x}^{(i)}, y^{(i)})$
- ont été tirées indépendamment les unes des autres.
+L'égalité découle du fait que toutes les paires $(\mathbf{x}^{(i)}, y^{(i)})$
+ont été tirées indépendamment les unes des autres.
 Les estimateurs choisis selon le principe de la vraisemblance maximale
 sont appelés *estimateurs de vraisemblance maximale*.
 Bien que la maximisation du produit de plusieurs fonctions exponentielles,
@@ -570,7 +570,7 @@ que nous pouvons exprimer comme suit :
 
 $$-\log P(\mathbf y | \mathbf X) = \sum_{i=1}^n \frac{1}{2} \log(2 \pi \sigma^2) + \frac{1}{2 \sigma^2} \left(y^{(i)} - \mathbf{w}^\top \mathbf{x}^{(i)} - b\right)^2.$$ 
 
- Si nous supposons que $\sigma$ est fixe,
+Si nous supposons que $\sigma$ est fixe,
 nous pouvons ignorer le premier terme,
 car il ne dépend pas de $\mathbf{w}$ ou $b$.
 Le second terme est identique
@@ -594,8 +594,8 @@ tous étant connectés directement à la sortie.
 
 :numref:`fig_single_neuron` illustre
 la régression linéaire en tant que réseau neuronal.
-Le diagramme met en évidence le schéma de connectivité
-, par exemple la manière dont chaque entrée est connectée à la sortie,
+Le diagramme met en évidence le schéma de connectivité,
+par exemple la manière dont chaque entrée est connectée à la sortie,
 mais pas les valeurs spécifiques prises par les poids ou les biais.
 
 ![Linear regression is a single-layer neural network.](../img/singleneuron.svg)
@@ -626,7 +626,7 @@ lorsque les cybernéticiens et neurophysiologistes
 Warren McCulloch et Walter Pitts ont commencé à développer
 modèles de neurones artificiels.
 Considérons l'image caricaturale
-d'un neurone biologique dans :numref:`fig_Neuron` ,
+d'un neurone biologique dans :numref:`fig_Neuron`,
 composé de *dendrites* (bornes d'entrée),
 du *noyau* (unité centrale), de l'*axone* (fil de sortie),
 et des *terminaisons de l'axone* (bornes de sortie),
@@ -659,7 +659,7 @@ doit certainement à notre étude des systèmes neuronaux biologiques réels.
 Dans le même temps, la plupart des recherches menées aujourd'hui dans le domaine de l'apprentissage profond
 s'inspirent d'une source beaucoup plus large.
 Nous invoquons Stuart Russell et Peter Norvig :cite:`Russell.Norvig.2016` 
- qui ont fait remarquer que, bien que les avions aient pu être *inspirés* par des oiseaux,
+qui ont fait remarquer que, bien que les avions aient pu être *inspirés* par des oiseaux,
 l'ornithologie n'a pas été le principal moteur
 de l'innovation aéronautique depuis quelques siècles.
 De même, l'inspiration dans l'apprentissage profond de nos jours
@@ -714,7 +714,7 @@ et, finalement, évaluation sur des données inédites.
    1. Montrez que l'hypothèse du bruit gaussien additif n'est pas appropriée. Indice : peut-on avoir des prix négatifs ? Qu'en est-il des fluctuations ?
    1. Pourquoi la régression au logarithme du prix serait-elle bien meilleure, c'est-à-dire $y = \log \text{price}$?
  1. De quoi devez-vous vous préoccuper lorsque vous traitez des pennystock, c'est-à-dire des actions dont le prix est très bas ? Indice : pouvez-vous négocier à tous les prix possibles ? Pourquoi est-ce un problème plus important pour les actions bon marché ?
-   1. Pour plus d'informations, consultez le célèbre modèle de Black et Scholes pour l'évaluation des options :cite:`Black.Scholes.1973` .
+   1. Pour plus d'informations, consultez le célèbre modèle de Black et Scholes pour l'évaluation des options :cite:`Black.Scholes.1973`.
 1. Supposons que nous voulions utiliser la régression pour estimer le *nombre* de pommes vendues dans une épicerie.
    1. Quels sont les problèmes posés par un modèle de bruit additif gaussien ? Indice : vous vendez des pommes, pas du pétrole.
    1. Le modèle [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution) capture les distributions sur les comptages. Elle est donnée par $p(k|\lambda) = \lambda^k e^{-\lambda}/k!$. Ici, $\lambda$ est la fonction de taux et $k$ est le nombre d'événements que vous voyez. Prouvez que $\lambda$ est la valeur attendue des comptes $k$.

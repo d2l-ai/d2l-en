@@ -6,9 +6,9 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Canaux d'entrée et de sortie multiples
 :label:`sec_channels` 
 
- Bien que nous ayons décrit les canaux multiples
+Bien que nous ayons décrit les canaux multiples
 qui composent chaque image (par exemple, les images couleur ont les canaux RVB standard
-pour indiquer la quantité de rouge, vert et bleu) et les couches de convolution pour les canaux multiples dans :numref:`subsec_why-conv-channels` ,
+pour indiquer la quantité de rouge, vert et bleu) et les couches de convolution pour les canaux multiples dans :numref:`subsec_why-conv-channels`,
 jusqu'à présent, nous avons simplifié tous nos exemples numériques
 en travaillant avec un seul canal d'entrée et un seul canal de sortie.
 Cela nous a permis de considérer nos entrées, nos noyaux de convolution,
@@ -35,8 +35,8 @@ alors, lorsque $c_i=1$, nous pouvons considérer notre noyau de convolution
 comme un simple tenseur bidimensionnel de forme $k_h\times k_w$.
 
 Cependant, lorsque $c_i>1$, nous avons besoin d'un noyau
-qui contient un tenseur de forme $k_h\times k_w$ pour *chaque* canal d'entrée. En concaténant ces tenseurs $c_i$ ensemble
-, on obtient un noyau de convolution de forme $c_i\times k_h\times k_w$.
+qui contient un tenseur de forme $k_h\times k_w$ pour *chaque* canal d'entrée. En concaténant ces tenseurs $c_i$ ensemble,
+on obtient un noyau de convolution de forme $c_i\times k_h\times k_w$.
 Puisque l'entrée et le noyau de convolution ont chacun $c_i$ canaux,
 nous pouvons effectuer une opération de corrélation croisée
 sur le tenseur bidimensionnel de l'entrée
@@ -94,8 +94,8 @@ def corr2d_multi_in(X, K):
 ```
 
 Nous pouvons construire le tenseur d'entrée `X` et le tenseur de noyau `K`
- correspondant aux valeurs dans :numref:`fig_conv_multi_in` 
- pour (**valider la sortie**) de l'opération de corrélation croisée.
+correspondant aux valeurs dans :numref:`fig_conv_multi_in` 
+pour (**valider la sortie**) de l'opération de corrélation croisée.
 
 ```{.python .input}
 %%tab all
@@ -109,9 +109,9 @@ corr2d_multi_in(X, K)
 ## Canaux de sortie multiples
 :label:`subsec_multi-output-channels` 
 
- Quel que soit le nombre de canaux d'entrée,
+Quel que soit le nombre de canaux d'entrée,
 jusqu'à présent, nous nous sommes toujours retrouvés avec un seul canal de sortie.
-Cependant, comme nous l'avons vu dans :numref:`subsec_why-conv-channels` ,
+Cependant, comme nous l'avons vu dans :numref:`subsec_why-conv-channels`,
 il s'avère essentiel de disposer de plusieurs canaux à chaque couche.
 Dans les architectures de réseaux neuronaux les plus populaires,
 nous augmentons en fait la dimension des canaux
@@ -132,7 +132,7 @@ et laissez $k_h$ et $k_w$ être la hauteur et la largeur du noyau.
 Pour obtenir une sortie avec plusieurs canaux,
 nous pouvons créer un tenseur de noyau
 de forme $c_i\times k_h\times k_w$
- pour *chaque* canal de sortie.
+pour *chaque* canal de sortie.
 Nous les concaténons sur la dimension du canal de sortie,
 de sorte que la forme du noyau de convolution
 est $c_o\times c_i\times k_h\times k_w$.
@@ -167,7 +167,7 @@ sur le tenseur d'entrée `X` avec le tenseur du noyau `K`.
 La sortie contient maintenant 3 canaux.
 Le résultat du premier canal est cohérent
 avec le résultat du tenseur d'entrée précédent `X`
- et le noyau de canal à entrées multiples,
+et le noyau de canal à entrées multiples,
 à sortie unique.
 
 ```{.python .input}
@@ -178,7 +178,7 @@ corr2d_multi_in_out(X, K)
 ## $1\times 1$ Couche convolutionnelle
 :label:`subsec_1x1` 
 
- Au départ, un [**$1 \times 1$ convolution**], i.e., $k_h = k_w = 1$,
+Au départ, un [**$1 \times 1$ convolution**], i.e., $k_h = k_w = 1$,
 does not seem to make much sense.
 After all, a convolution correlates adjacent pixels.
 A $1 \times 1$ convolution obviously does not.
@@ -216,7 +216,7 @@ repliées dans d'autres convolutions
 
 Vérifions si cela fonctionne en pratique :
 nous implémentons une convolution $1 \times 1$
- en utilisant une couche entièrement connectée.
+en utilisant une couche entièrement connectée.
 La seule chose que nous devons faire est d'apporter quelques ajustements
 à la forme des données avant et après la multiplication de la matrice.
 
@@ -259,7 +259,7 @@ assert float(d2l.reduce_sum(d2l.abs(Y1 - Y2))) < 1e-6
 
 Les canaux nous permettent de combiner le meilleur des deux mondes : les MLP qui permettent des non-linéarités significatives et les convolutions qui permettent une analyse *localisée* des caractéristiques. En particulier, les canaux permettent au CNN de raisonner avec plusieurs caractéristiques, comme les détecteurs de bords et de formes en même temps. Ils offrent également un compromis pratique entre la réduction drastique des paramètres découlant de l'invariance de la traduction et de la localité, et le besoin de modèles expressifs et diversifiés en vision par ordinateur. 
 
-Notez toutefois que cette flexibilité a un prix. Pour une image de taille $(h \times w)$, le coût du calcul d'une convolution $k \times k$ est de $O(h \cdot w \cdot k^2)$. Pour les canaux d'entrée et de sortie $c_i$ et $c_o$ respectivement, ce coût passe à $O(h \cdot w \cdot k^2 \cdot c_i \cdot c_o)$. Pour une image de $256 \times 256$ pixels avec un noyau $5 \times 5$ et des canaux d'entrée et de sortie $128$ respectivement, cela représente plus de 53 milliards d'opérations (nous comptons les multiplications et les additions séparément). Plus tard, nous rencontrerons des stratégies efficaces pour réduire ce coût, par exemple en exigeant que les opérations par canal soient en diagonale de bloc, ce qui conduit à des architectures telles que ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017` . 
+Notez toutefois que cette flexibilité a un prix. Pour une image de taille $(h \times w)$, le coût du calcul d'une convolution $k \times k$ est de $O(h \cdot w \cdot k^2)$. Pour les canaux d'entrée et de sortie $c_i$ et $c_o$ respectivement, ce coût passe à $O(h \cdot w \cdot k^2 \cdot c_i \cdot c_o)$. Pour une image de $256 \times 256$ pixels avec un noyau $5 \times 5$ et des canaux d'entrée et de sortie $128$ respectivement, cela représente plus de 53 milliards d'opérations (nous comptons les multiplications et les additions séparément). Plus tard, nous rencontrerons des stratégies efficaces pour réduire ce coût, par exemple en exigeant que les opérations par canal soient en diagonale de bloc, ce qui conduit à des architectures telles que ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017`. 
 
 ## Exercices
 
@@ -269,18 +269,18 @@ Notez toutefois que cette flexibilité a un prix. Pour une image de taille $(h \
    1. Quelle est la dimensionnalité de la convolution unique équivalente ?
    1. L'inverse est-il vrai, c'est-à-dire qu'il est toujours possible de décomposer une convolution en deux convolutions plus petites ?
 1. Supposons une entrée de forme $c_i\times h\times w$ et un noyau de convolution de forme 
- $c_o\times c_i\times k_h\times k_w$ , padding de $(p_h, p_w)$, et stride de $(s_h, s_w)$.
+$c_o\times c_i\times k_h\times k_w$ , padding de $(p_h, p_w)$, et stride de $(s_h, s_w)$.
  1. Quel est le coût de calcul (multiplications et additions) pour la propagation vers l'avant ?
    1. Quelle est l'empreinte mémoire ?
    1. Quelle est l'empreinte mémoire pour le calcul en arrière ?
    1. Quel est le coût de calcul pour la rétropropagation ?
 1. De quel facteur le nombre de calculs augmente-t-il si nous doublons le nombre de canaux d'entrée 
- $c_i$ et le nombre de canaux de sortie $c_o$? Que se passe-t-il si on double le padding ?
+$c_i$ et le nombre de canaux de sortie $c_o$? Que se passe-t-il si on double le padding ?
 1. Les variables `Y1` et `Y2` dans le dernier exemple de cette section sont-elles exactement les mêmes ? Pourquoi ?
 1. Exprimer les convolutions comme une multiplication matricielle, même lorsque la fenêtre de convolution n'est pas $1 \times 1$? 
 1. Votre tâche consiste à mettre en œuvre des convolutions rapides avec un noyau $k \times k$. L'un des algorithmes candidats 
- consiste à balayer horizontalement la source, en lisant une bande large $k$ et en calculant la bande de sortie $1$-wide 
- une valeur à la fois. L'autre solution consiste à lire une bande large $k + \Delta$ et à calculer une bande de sortie large $\Delta$ 
+consiste à balayer horizontalement la source, en lisant une bande large $k$ et en calculant la bande de sortie $1$-wide 
+une valeur à la fois. L'autre solution consiste à lire une bande large $k + \Delta$ et à calculer une bande de sortie large $\Delta$ 
  . Pourquoi cette dernière solution est-elle préférable ? Y a-t-il une limite à la taille de la bande $\Delta$?
 1. Supposons que nous ayons une matrice $c \times c$. 
     1. Combien de fois est-il plus rapide de multiplier avec une matrice diagonale en bloc si la matrice est décomposée en blocs $b$?

@@ -321,7 +321,7 @@ train(net, data_iter, lr, num_epochs, x_max, alpha)
 ## Applying the GloVe Model
 
 GloVe model generates two sets of word vectors,
-`embed_v` and `embed_u` . `embed_v` and `embed_u` are
+`embed_v` and `embed_u`. `embed_v` and `embed_u` are
 equivalent and differ only
 as a result of their random initializations; the two sets of vectors should
 perform equivalently.Generally, we choose to use the sum `embed_v`+`embed_u` as

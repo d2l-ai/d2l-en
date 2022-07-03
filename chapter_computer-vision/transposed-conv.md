@@ -164,11 +164,11 @@ tconv(X)
 Dans la convolution transposée, les strides
 sont spécifiés pour les résultats intermédiaires (donc la sortie), et non pour l'entrée.
 En utilisant les mêmes tenseurs d'entrée et de noyau
-de :numref:`fig_trans_conv` ,
+de :numref:`fig_trans_conv`,
 changer le stride de 1 à 2
 augmente à la fois la hauteur et le poids
 des tenseurs intermédiaires, donc le tenseur de sortie
-dans :numref:`fig_trans_conv_stride2` .
+dans :numref:`fig_trans_conv_stride2`.
 
 
 ![Convolution transposée avec un noyau de $2\times 2$ avec un stride de 2. Les parties ombrées sont une partie d'un tenseur intermédiaire ainsi que les éléments du tenseur d'entrée et du noyau utilisés pour le calcul.](../img/trans_conv_stride2.svg)
@@ -176,7 +176,7 @@ dans :numref:`fig_trans_conv_stride2` .
 
 
 
-L'extrait de code suivant peut valider la sortie de la convolution transposée pour un stride de 2 dans :numref:`fig_trans_conv_stride2` .
+L'extrait de code suivant peut valider la sortie de la convolution transposée pour un stride de 2 dans :numref:`fig_trans_conv_stride2`.
 
 ```{.python .input}
 #@tab mxnet
@@ -232,13 +232,13 @@ tconv(conv(X)).shape == X.shape
 ## [**Connexion à la transposition de matrice**]
 :label:`subsec-connection-to-mat-transposition` 
 
- La convolution transposée porte le nom de
+La convolution transposée porte le nom de
 la transposition de matrice.
 Pour expliquer,
 voyons d'abord
 comment implémenter les convolutions
 en utilisant les multiplications matricielles.
-Dans l'exemple ci-dessous, nous définissons une entrée $3\times 3$ `X` et un noyau de convolution $2\times 2$ `K` , puis nous utilisons la fonction `corr2d` pour calculer la sortie de la convolution `Y`.
+Dans l'exemple ci-dessous, nous définissons une entrée $3\times 3$ `X` et un noyau de convolution $2\times 2$ `K`, puis nous utilisons la fonction `corr2d` pour calculer la sortie de la convolution `Y`.
 
 ```{.python .input}
 #@tab all
@@ -250,7 +250,7 @@ Y
 
 Ensuite, nous réécrivons le noyau de convolution `K` comme
 une matrice de poids clairsemée `W`
- contenant beaucoup de zéros. 
+contenant beaucoup de zéros. 
 La forme de la matrice de poids est ($4$, $9$),
 où les éléments non nuls proviennent de
 le noyau de convolution `K`.
@@ -285,7 +285,7 @@ ci-dessus
 comme entrée de la convolution transposée.
 Pour mettre en œuvre cette opération en multipliant des matrices,
 il nous suffit de transposer la matrice de poids `W`
- avec la nouvelle forme $(9, 4)$.
+avec la nouvelle forme $(9, 4)$.
 
 ```{.python .input}
 #@tab all
@@ -296,7 +296,7 @@ Z == d2l.matmul(W.T, d2l.reshape(Y, -1)).reshape(3, 3)
 Considérons l'implémentation de la convolution
 en multipliant des matrices.
 Étant donné un vecteur d'entrée $\mathbf{x}$
- et une matrice de poids $\mathbf{W}$,
+et une matrice de poids $\mathbf{W}$,
 la fonction de propagation vers l'avant de la convolution
 peut être implémentée
 en multipliant son entrée avec la matrice de poids
@@ -308,7 +308,7 @@ et $\nabla_{\mathbf{x}}\mathbf{y}=\mathbf{W}^\top$,
 la fonction de rétropropagation de la convolution
 peut être mise en œuvre
 en multipliant son entrée avec la matrice de poids transposée 
- $\mathbf{W}^\top$ .
+$\mathbf{W}^\top$ .
 Par conséquent, 
 la couche convolutionnelle transposée
 peut simplement échanger la fonction de propagation directe
@@ -328,7 +328,7 @@ $\mathbf{W}^\top$ et $\mathbf{W}$, respectivement.
 
 ## Exercices
 
-1. Dans :numref:`subsec-connection-to-mat-transposition` , l'entrée de convolution `X` et la sortie de convolution transposée `Z` ont la même forme. Ont-elles la même valeur ? Pourquoi ?
+1. Dans :numref:`subsec-connection-to-mat-transposition`, l'entrée de convolution `X` et la sortie de convolution transposée `Z` ont la même forme. Ont-elles la même valeur ? Pourquoi ?
 1. Est-il efficace d'utiliser des multiplications matricielles pour implémenter des convolutions ? Pourquoi ?
 
 :begin_tab:`mxnet`

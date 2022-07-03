@@ -20,7 +20,7 @@ Dans cette section, nous vous montrons comment.
 Pour commencer, nous construisons une couche personnalisée
 qui n'a pas de paramètres propres.
 Cela devrait vous sembler familier si vous vous souvenez de notre
-introduction au module dans :numref:`sec_model_construction` .
+introduction au module dans :numref:`sec_model_construction`.
 La classe `CenteredLayer` suivante
 soustrait simplement la moyenne de son entrée.
 Pour la construire, nous devons simplement hériter de
@@ -127,8 +127,8 @@ passons à la définition de couches avec des paramètres
 qui peuvent être ajustés par l'apprentissage.
 Nous pouvons utiliser les fonctions intégrées pour créer des paramètres, qui
 fournissent certaines fonctionnalités de base.
-En particulier, elles régissent l'accès, l'initialisation, le partage
-, la sauvegarde et le chargement des paramètres du modèle.
+En particulier, elles régissent l'accès, l'initialisation, le partage,
+la sauvegarde et le chargement des paramètres du modèle.
 De cette façon, entre autres avantages, nous n'aurons pas besoin d'écrire
 des routines de sérialisation personnalisées pour chaque couche personnalisée.
 
@@ -188,12 +188,12 @@ class MyDense(tf.keras.Model):
 
 :begin_tab:`mxnet, tensorflow`
 Ensuite, nous instançons la classe `MyDense`
- et accédons aux paramètres de son modèle.
+et accédons aux paramètres de son modèle.
 :end_tab:
 
 :begin_tab:`pytorch`
 Ensuite, nous instançons la classe `MyLinear`
- et accédons à ses paramètres de modèle.
+et accédons à ses paramètres de modèle.
 :end_tab:
 
 ```{.python .input}
@@ -267,7 +267,7 @@ net(tf.random.uniform((2, 64)))
 ## Exercices
 
 1. Concevez une couche qui prend une entrée et calcule une réduction tensorielle,
- c'est-à-dire qu'elle renvoie $y_k = \sum_{i, j} W_{ijk} x_i x_j$.
+c'est-à-dire qu'elle renvoie $y_k = \sum_{i, j} W_{ijk} x_i x_j$.
 1. Concevez une couche qui renvoie la moitié supérieure des coefficients de Fourier des données.
 
 :begin_tab:`mxnet`

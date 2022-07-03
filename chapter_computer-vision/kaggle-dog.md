@@ -9,7 +9,7 @@ Dans cette compétition,
 En fait,
 le jeu de données pour ce concours est
 un sous-ensemble du jeu de données ImageNet.
-Contrairement aux images du jeu de données CIFAR-10 dans :numref:`sec_kaggle_cifar10` ,
+Contrairement aux images du jeu de données CIFAR-10 dans :numref:`sec_kaggle_cifar10`,
 les images du jeu de données ImageNet sont à la fois plus hautes et plus larges dans différentes dimensions.
 :numref:`fig_kaggle_dog` montre les informations sur la page web du concours. Vous avez besoin d'un compte Kaggle
 pour soumettre vos résultats.
@@ -60,7 +60,7 @@ Après avoir décompressé le fichier téléchargé dans `../data`, vous trouver
 * .../data/dog-breed-identification/test
 
 Vous avez peut-être remarqué que la structure ci-dessus est
-similaire à celle du concours CIFAR-10 dans :numref:`sec_kaggle_cifar10` , où les dossiers `train/` et `test/` contiennent respectivement les images de chiens d'entraînement et de test, et `labels.csv` contient
+similaire à celle du concours CIFAR-10 dans :numref:`sec_kaggle_cifar10`, où les dossiers `train/` et `test/` contiennent respectivement les images de chiens d'entraînement et de test, et `labels.csv` contient
 les étiquettes des images d'entraînement.
 De même, pour faciliter la prise en main, [**nous fournissons un petit échantillon de l'ensemble de données**] mentionné ci-dessus :`train_valid_test_tiny.zip`.
 Si vous comptez utiliser le jeu de données complet pour le concours Kaggle, vous devez changer la variable `demo` ci-dessous en `False`.
@@ -82,7 +82,7 @@ else:
 
 ### [**Organiser l'ensemble de données**]
 
-Nous pouvons organiser l'ensemble de données de la même manière que nous l'avons fait dans :numref:`sec_kaggle_cifar10` , à savoir séparer
+Nous pouvons organiser l'ensemble de données de la même manière que nous l'avons fait dans :numref:`sec_kaggle_cifar10`, à savoir séparer
 un ensemble de validation de l'ensemble d'entraînement original, et déplacer les images dans des sous-dossiers regroupés par étiquettes.
 
 La fonction `reorg_dog_data` ci-dessous lit
@@ -107,7 +107,7 @@ Rappelons que cet ensemble de données sur les races de chiens
 est un sous-ensemble de l'ensemble de données ImageNet,
 dont les images
 sont plus grandes que celles de l'ensemble de données CIFAR-10
-dans :numref:`sec_kaggle_cifar10` .
+dans :numref:`sec_kaggle_cifar10`.
 La liste suivante
 énumère quelques opérations d'augmentation d'image
 qui pourraient être utiles pour des images relativement plus grandes.
@@ -181,7 +181,7 @@ transform_test = torchvision.transforms.Compose([
 
 ## [**Lire le jeu de données**]
 
-Comme dans :numref:`sec_kaggle_cifar10` ,
+Comme dans :numref:`sec_kaggle_cifar10`,
 nous pouvons lire le jeu de données organisé
 composé de fichiers d'images brutes.
 
@@ -206,7 +206,7 @@ valid_ds, test_ds = [torchvision.datasets.ImageFolder(
 
 Ci-dessous, nous créons des instances d'itérateurs de données
 de la même manière
-que dans :numref:`sec_kaggle_cifar10` .
+que dans :numref:`sec_kaggle_cifar10`.
 
 ```{.python .input}
 #@tab mxnet
@@ -242,7 +242,7 @@ Encore une fois,
 le jeu de données pour cette compétition est un sous-ensemble du jeu de données ImageNet.
 Par conséquent, nous pouvons utiliser l'approche décrite à l'adresse
 :numref:`sec_fine_tuning` 
- pour sélectionner un modèle pré-entraîné sur le jeu de données ImageNet complet
+pour sélectionner un modèle pré-entraîné sur le jeu de données ImageNet complet
 et l'utiliser pour extraire des caractéristiques d'image à introduire dans un réseau de sortie personnalisé à petite échelle
 .
 Les API de haut niveau des cadres d'apprentissage profond
@@ -259,10 +259,10 @@ qui peut être entraîné,
 tel que l'empilement de deux couches entièrement connectées
 .
 Contrairement à l'expérience menée sur
-:numref:`sec_fine_tuning` ,
+:numref:`sec_fine_tuning`,
 l'expérience suivante
-ne réentraîne pas le modèle pré-entraîné utilisé pour l'extraction des caractéristiques
-. Cela réduit le temps d'entraînement et la mémoire
+ne réentraîne pas le modèle pré-entraîné utilisé pour l'extraction des caractéristiques.
+Cela réduit le temps d'entraînement et la mémoire
 pour le stockage des gradients.
 
 Rappelez-vous que nous avons normalisé
@@ -458,7 +458,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
 ## [**Classifier l'ensemble de test**] et soumettre les résultats sur Kaggle
 
 
- Similaire à l'étape finale dans :numref:`sec_kaggle_cifar10` ,
+Similaire à l'étape finale dans :numref:`sec_kaggle_cifar10`,
 à la fin toutes les données étiquetées (y compris l'ensemble de validation) sont utilisées pour l'entraînement du modèle et la classification de l'ensemble de test.
 Nous utiliserons le réseau de sortie personnalisé formé
 pour la classification.
@@ -506,7 +506,7 @@ with open('submission.csv', 'w') as f:
 Le code ci-dessus
 va générer un fichier `submission.csv`
  à soumettre
-à Kaggle de la même manière que celle décrite dans :numref:`sec_kaggle_house` .
+à Kaggle de la même manière que celle décrite dans :numref:`sec_kaggle_house`.
 
 
 ## Résumé

@@ -1,9 +1,9 @@
 # Softmax Regression
 :label:`sec_softmax` 
 
- Dans :numref:`sec_linear_regression` , nous avons présenté la régression linéaire,
+Dans :numref:`sec_linear_regression`, nous avons présenté la régression linéaire,
 en travaillant sur des implémentations à partir de zéro dans :numref:`sec_linear_scratch` 
- et à nouveau en utilisant les API de haut niveau d'un cadre d'apprentissage profond
+et à nouveau en utilisant les API de haut niveau d'un cadre d'apprentissage profond
 dans :numref:`sec_linear_concise` pour faire le gros du travail.
 
 La régression est le marteau que nous utilisons lorsque
@@ -28,8 +28,8 @@ s'accompagne d'une foule d'autres complications qui sont traitées
 dans un sous-domaine spécialisé appelé *modélisation de survie*.
 
 
-L'objectif n'est pas de vous submerger, mais simplement de vous faire comprendre, à l'adresse
-, que l'estimation ne se limite pas à la simple minimisation des erreurs quadratiques.
+L'objectif n'est pas de vous submerger, mais simplement de vous faire comprendre, à l'adresse,
+que l'estimation ne se limite pas à la simple minimisation des erreurs quadratiques.
 Et plus largement, l'apprentissage supervisé ne se limite pas à la régression.
 Dans cette section, nous nous concentrons sur les problèmes de *classification*
 où nous mettons de côté les questions *combien ?*
@@ -39,7 +39,7 @@ et nous nous concentrons plutôt sur les questions *quelle catégorie ?*.
 
 * Cet email doit-il être placé dans le dossier spam ou dans la boîte de réception ?
 * Ce client est-il plus susceptible de s'inscrire
- ou de ne pas s'inscrire à un service d'abonnement ?
+ou de ne pas s'inscrire à un service d'abonnement ?
 * Cette image représente-t-elle un âne, un chien, un chat ou un coq ?
 * Quel film Aston est-il le plus susceptible de regarder ensuite ?
 * Quelle section du livre allez-vous lire ensuite ?
@@ -64,12 +64,12 @@ ne serait pas très utile.
 Ce problème est communément appelé [multi-label classification](https://en.wikipedia.org/wiki/Multi-label_classification).
 Voir :cite:`Tsoumakas.Katakis.2007` pour un aperçu
 et :cite:`Huang.Xu.Yu.2015` 
- pour un algorithme efficace lors du balisage des images.
+pour un algorithme efficace lors du balisage des images.
 
 ## Classification
 :label:`subsec_classification-problem` 
 
- Pour nous mettre dans le bain, commençons par
+Pour nous mettre dans le bain, commençons par
 un problème simple de classification d'images.
 Ici, chaque entrée consiste en une image en niveaux de gris $2\times2$.
 Nous pouvons représenter chaque valeur de pixel par un seul scalaire,
@@ -89,7 +89,7 @@ par exemple si nous essayions de prédire
 $\{\text{baby}, \text{toddler}, \text{adolescent}, \text{young adult}, \text{adult}, \text{geriatric}\}$ ,
 il pourrait même être logique de les présenter comme
 un problème [ordinal regression](https://en.wikipedia.org/wiki/Ordinal_regression)
- et de conserver les étiquettes dans ce format.
+et de conserver les étiquettes dans ce format.
 Voir :cite:`Moon.Smola.Chang.ea.2010` pour un aperçu
 des différents types de fonctions de perte de classement
 et :cite:`Beutel.Murray.Faloutsos.ea.2014` pour une approche bayésienne
@@ -135,7 +135,7 @@ o_3 &= x_1 w_{31} + x_2 w_{32} + x_3 w_{33} + x_4 w_{34} + b_3.
 $$
 
 Le diagramme de réseau neuronal correspondant
-est présenté dans :numref:`fig_softmaxreg` .
+est présenté dans :numref:`fig_softmaxreg`.
 Comme pour la régression linéaire,
 nous utilisons un réseau neuronal à une seule couche.
 Et comme le calcul de chaque sortie, $o_1, o_2$, et $o_3$,
@@ -154,7 +154,7 @@ $\mathbf{b} \in \mathbb{R}^3$ dans un vecteur.
 ### La Softmax
 :label:`subsec_softmax_operation` 
 
- En supposant une fonction de perte appropriée,
+En supposant une fonction de perte appropriée,
 nous pourrions essayer, directement, de minimiser la différence
 entre $\mathbf{o}$ et les étiquettes $\mathbf{y}$.
 S'il s'avère que le traitement de la classification
@@ -171,18 +171,18 @@ une dépendance linéaire positive
 entre le nombre de chambres et la probabilité
 qu'une personne achète une maison,
 la probabilité pourrait dépasser $1$
- lorsqu'il s'agit d'acheter un manoir !
+lorsqu'il s'agit d'acheter un manoir !
 Nous avons donc besoin d'un mécanisme pour "écraser" les sorties.
 
 Il existe de nombreuses façons d'atteindre cet objectif.
 Par exemple, nous pouvons supposer que les sorties
 $\mathbf{o}$ sont des versions corrompues de $\mathbf{y}$,
 où la corruption se produit par l'ajout de bruit $\mathbf{\epsilon}$
- tiré d'une distribution normale.
+tiré d'une distribution normale.
 En d'autres termes, $\mathbf{y} = \mathbf{o} + \mathbf{\epsilon}$,
 où $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$.
 Il s'agit de ce que l'on appelle [probit model](https://en.wikipedia.org/wiki/Probit_model),
-introduit pour la première fois par :cite:`Fechner.1860` .
+introduit pour la première fois par :cite:`Fechner.1860`.
 Bien que séduisante, elle ne fonctionne pas aussi bien
 et ne conduit pas à un problème d'optimisation particulièrement intéressant,
 par rapport à la méthode softmax.
@@ -195,16 +195,16 @@ selon laquelle la probabilité conditionnelle de classe
 augmente avec $o_i$, elle est monotone,
 et toutes les probabilités sont non négatives.
 Nous pouvons ensuite transformer ces valeurs de manière à ce que leur somme soit égale à $1$
- en divisant chacune d'elles par leur somme.
+en divisant chacune d'elles par leur somme.
 Ce processus est appelé *normalisation*.
-En assemblant ces deux éléments
-, nous obtenons la fonction *softmax* :
+En assemblant ces deux éléments,
+ nous obtenons la fonction *softmax* :
 
 $$\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o}) \quad \text{where}\quad \hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}.$$ 
- :eqlabel:`eq_softmax_y_and_o` 
+:eqlabel:`eq_softmax_y_and_o` 
 
- Notez que la plus grande coordonnée de $\mathbf{o}$
- correspond à la classe la plus probable selon $\hat{\mathbf{y}}$.
+Notez que la plus grande coordonnée de $\mathbf{o}$
+correspond à la classe la plus probable selon $\hat{\mathbf{y}}$.
 De plus, comme l'opération softmax
 préserve l'ordre entre ses arguments,
 nous n'avons pas besoin de calculer la softmax
@@ -216,7 +216,7 @@ $$
 
 
 L'idée d'une softmax remonte à Gibbs,
-qui a adapté des idées de la physique :cite:`Gibbs.1902` .
+qui a adapté des idées de la physique :cite:`Gibbs.1902`.
 Encore plus loin, Boltzmann,
 le père de la thermodynamique moderne,
 a utilisé cette astuce pour modéliser une distribution
@@ -230,22 +230,22 @@ $T$ est la température et $k$ est la constante de Boltzmann.
 Lorsque les statisticiens parlent d'augmenter ou de diminuer
 la "température" d'un système statistique,
 ils font référence à la modification de $T$
- afin de favoriser des états d'énergie inférieure ou supérieure.
+afin de favoriser des états d'énergie inférieure ou supérieure.
 Suivant l'idée de Gibbs, l'énergie équivaut à l'erreur.
 Les modèles basés sur l'énergie :cite:`Ranzato.Boureau.Chopra.ea.2007` 
- utilisent ce point de vue pour décrire
+utilisent ce point de vue pour décrire
 des problèmes d'apprentissage profond.
 
 ### Vectorisation
 :label:`subsec_softmax_vectorization` 
 
- Pour améliorer l'efficacité des calculs,
+Pour améliorer l'efficacité des calculs,
 nous vectorisons les calculs dans des minibatchs de données.
 Supposons que l'on nous donne un minibatch $\mathbf{X} \in \mathbb{R}^{n \times d}$
- de $n$ caractéristiques avec une dimensionnalité (nombre d'entrées) $d$.
+de $n$ caractéristiques avec une dimensionnalité (nombre d'entrées) $d$.
 De plus, supposons que nous avons $q$ catégories en sortie.
 Alors les poids satisfont $\mathbf{W} \in \mathbb{R}^{d \times q}$
- et le biais satisfait $\mathbf{b} \in \mathbb{R}^{1\times q}$.
+et le biais satisfait $\mathbf{b} \in \mathbb{R}^{1\times q}$.
 
 $$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}). \end{aligned} $$
 :eqlabel:`eq_minibatch_softmax_reg`
@@ -264,14 +264,14 @@ Les cadres d'apprentissage profond s'en chargent automatiquement.
 ## Fonction de perte
 :label:`subsec_softmax-regression-loss-func` 
 
- Maintenant que nous avons une correspondance entre les caractéristiques $\mathbf{x}$
- et les probabilités $\mathbf{\hat{y}}$,
+Maintenant que nous avons une correspondance entre les caractéristiques $\mathbf{x}$
+et les probabilités $\mathbf{\hat{y}}$,
 nous devons trouver un moyen d'optimiser la précision de cette correspondance.
 Nous nous appuierons sur l'estimation du maximum de vraisemblance,
 le même concept que nous avons rencontré
 lorsque nous avons fourni une justification probabiliste
 pour la perte de l'erreur quadratique moyenne dans
-:numref:`subsec_normal_distribution_and_squared_loss` .
+:numref:`subsec_normal_distribution_and_squared_loss`.
 
 ### Log-Vraisemblance
 
@@ -281,7 +281,7 @@ de chaque classe, étant donné toute entrée $\mathbf{x}$,
 telle que $\hat{y}_1$ = $P(y=\text{cat} | \mathbf{x})$.
 Dans ce qui suit, nous supposons que pour un ensemble de données
 avec des caractéristiques $\mathbf{X}$, les étiquettes $\mathbf{Y}$
- sont représentées à l'aide d'un vecteur d'étiquettes à codage à un coup.
+sont représentées à l'aide d'un vecteur d'étiquettes à codage à un coup.
 Nous pouvons comparer les estimations avec la réalité
 en vérifiant la probabilité que les classes réelles soient
 selon notre modèle, compte tenu des caractéristiques :
@@ -303,20 +303,20 @@ $$
 $$
 
 où pour toute paire d'étiquette $\mathbf{y}$
- et de prédiction de modèle $\hat{\mathbf{y}}$
- sur $q$ classes, la fonction de perte $l$ est
+et de prédiction de modèle $\hat{\mathbf{y}}$
+sur $q$ classes, la fonction de perte $l$ est
 
 $$ l(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_{j=1}^q y_j \log \hat{y}_j. $$ 
- :eqlabel:`eq_l_cross_entropy` 
+:eqlabel:`eq_l_cross_entropy` 
 
- Pour des raisons expliquées plus loin,
+Pour des raisons expliquées plus loin,
 la fonction de perte dans :eqref:`eq_l_cross_entropy` 
- est communément appelée la *perte d'entropie croisée*.
+est communément appelée la *perte d'entropie croisée*.
 Puisque $\mathbf{y}$ est un vecteur à un coup de longueur $q$,
 la somme de toutes ses coordonnées $j$ disparaît pour tous les termes sauf un.
 Notez que la perte $l(\mathbf{y}, \hat{\mathbf{y}})$
- est limitée par le bas par $0$
- chaque fois que $\hat{y}$ est un vecteur de probabilité :
+est limitée par le bas par $0$
+chaque fois que $\hat{y}$ est un vecteur de probabilité :
 aucune entrée n'est plus grande que $1$,
 donc leur logarithme négatif ne peut être inférieur à $0$;
 $l(\mathbf{y}, \hat{\mathbf{y}}) = 0$ seulement si nous prédisons
@@ -333,12 +333,12 @@ entraînerait une perte infinie ($-\log 0 = \infty$).
 ### Softmax et perte d'entropie croisée
 :label:`subsec_softmax_and_derivatives` 
 
- La fonction softmax
+La fonction softmax
 et la perte d'entropie croisée correspondante étant si courantes,
 il est utile de comprendre un peu mieux comment elles sont calculées.
 En plaçant :eqref:`eq_softmax_y_and_o` dans la définition de la perte
 dans :eqref:`eq_l_cross_entropy` 
- et en utilisant la définition de la fonction softmax, on obtient :
+et en utilisant la définition de la fonction softmax, on obtient :
 
 $$
 \begin{aligned}
@@ -372,30 +372,30 @@ Ce fait rend le calcul des gradients facile dans la pratique.
 Considérons maintenant le cas où nous n'observons pas seulement un résultat unique
 mais une distribution entière de résultats.
 Nous pouvons utiliser la même représentation que précédemment pour l'étiquette $\mathbf{y}$.
-La seule différence est qu'au lieu d'un vecteur contenant uniquement des entrées binaires (
-),
+La seule différence est qu'au lieu d'un vecteur contenant uniquement des entrées binaires ,
+
 ou $(0, 0, 1)$, nous avons maintenant un vecteur de probabilité générique (
 ou $(0.1, 0.2, 0.7)$).
 Les mathématiques que nous avons utilisées précédemment pour définir la perte $l$
- dans :eqref:`eq_l_cross_entropy` 
- fonctionnent toujours bien,
+dans :eqref:`eq_l_cross_entropy` 
+fonctionnent toujours bien,
 mais l'interprétation est légèrement plus générale.
 Il s'agit de la valeur attendue de la perte pour une distribution sur les étiquettes.
 Cette perte s'appelle la *perte d'entropie croisée* et c'est
 l'une des pertes les plus couramment utilisées pour les problèmes de classification.
 Nous pouvons démystifier son nom en introduisant simplement les bases de la théorie de l'information.
 En un mot, elle mesure le nombre de bits nécessaires pour coder ce que nous voyons $\mathbf{y}$
- par rapport à ce que nous prédisons qui devrait se produire $\hat{\mathbf{y}}$.
+par rapport à ce que nous prédisons qui devrait se produire $\hat{\mathbf{y}}$.
 Nous fournissons une explication très élémentaire dans ce qui suit. Pour plus de détails
 sur la théorie de l'information, voir 
-:cite:`Cover.Thomas.1999` ou :cite:`mackay2003information` .
+:cite:`Cover.Thomas.1999` ou :cite:`mackay2003information`.
 
 
 
 ## Bases de la théorie de l'information
 :label:`subsec_info_theory_basics` 
 
- De nombreux articles sur l'apprentissage profond utilisent des intuitions et des termes issus de la théorie de l'information.
+De nombreux articles sur l'apprentissage profond utilisent des intuitions et des termes issus de la théorie de l'information.
 Pour leur donner un sens, nous avons besoin d'un langage commun.
 Voici un guide de survie.
 *La théorie de l'information* traite du problème
@@ -410,11 +410,11 @@ Cela impose une limite à notre capacité à compresser les données.
 Pour une distribution $P$, son *entropie* est définie comme suit :
 
 $$H[P] = \sum_j - P(j) \log P(j).$$ 
- :eqlabel:`eq_softmax_reg_entropy` 
+:eqlabel:`eq_softmax_reg_entropy` 
 
- L'un des théorèmes fondamentaux de la théorie de l'information stipule
+L'un des théorèmes fondamentaux de la théorie de l'information stipule
 que pour coder des données tirées au hasard de la distribution $P$,
-il faut au moins $H[P]$ "nats" pour les coder :cite:`Shannon.1948` .
+il faut au moins $H[P]$ "nats" pour les coder :cite:`Shannon.1948`.
 Si vous vous demandez ce qu'est un "nat", c'est l'équivalent d'un bit
 mais en utilisant un code de base $e$ plutôt qu'un code de base 2.
 Ainsi, un nat est un bit $\frac{1}{\log(2)} \approx 1.44$.
@@ -439,10 +439,10 @@ Cependant, si nous ne pouvons pas prédire parfaitement chaque événement,
 alors nous pouvons parfois être surpris.
 Notre surprise est d'autant plus grande que nous avons attribué une probabilité plus faible à un événement.
 Claude Shannon a choisi $\log \frac{1}{P(j)} = -\log P(j)$
- pour quantifier la *surprise* d'une personne qui observe un événement $j$
- après lui avoir attribué une probabilité (subjective) $P(j)$.
+pour quantifier la *surprise* d'une personne qui observe un événement $j$
+après lui avoir attribué une probabilité (subjective) $P(j)$.
 L'entropie définie dans :eqref:`eq_softmax_reg_entropy` 
- est alors la *surprise* attendue
+est alors la *surprise* attendue
 lorsque l'on attribue les probabilités correctes
 qui correspondent réellement au processus de génération des données.
 
@@ -454,7 +454,7 @@ par quelqu'un qui connaît la vraie probabilité,
 alors vous pouvez vous demander ce qu'est l'entropie croisée ?
 L'entropie croisée *de* $P$ *à* $Q$, notée $H(P, Q)$,
 est la surprise attendue d'un observateur ayant des probabilités subjectives $Q$
- en voyant des données qui ont été réellement générées selon les probabilités $P$.
+en voyant des données qui ont été réellement générées selon les probabilités $P$.
 Elle est donnée par $H(P, Q) \stackrel{\mathrm{def}}{=} \sum_j - P(j) \log Q(j)$.
 L'entropie croisée la plus faible possible est atteinte lorsque $P=Q$.
 Dans ce cas, l'entropie croisée de $P$ à $Q$ est $H(P, P)= H(P)$.
@@ -474,14 +474,14 @@ Comme effet secondaire, nous avons rencontré le softmax,
 une fonction d'activation pratique qui transforme
 les sorties d'une couche de réseau neuronal ordinaire
 en distributions de probabilité discrètes valides.
-Nous avons vu que la dérivée de la perte d'entropie croisée
-, lorsqu'elle est combinée à la softmax
-, se comporte de manière très similaire
+Nous avons vu que la dérivée de la perte d'entropie croisée,
+lorsqu'elle est combinée à la softmax,
+se comporte de manière très similaire
 à la dérivée de l'erreur quadratique,
 à savoir en prenant la différence entre
 le comportement attendu et sa prédiction.
-Et, bien que nous n'ayons pu qu'effleurer
-,
+Et, bien que nous n'ayons pu qu'effleurer,
+
 nous avons rencontré des liens passionnants
 avec la physique statistique et la théorie de l'information.
 
@@ -493,18 +493,18 @@ Plus précisément, pour toute couche entièrement connectée avec $d$ entrées 
 le paramétrage et le coût de calcul sont $\mathcal{O}(dq)$,
 ce qui peut être prohibitif en pratique.
 Heureusement, ce coût de transformation des entrées $d$ en sorties $q$
- peut être réduit par approximation et compression.
+peut être réduit par approximation et compression.
 Par exemple, Deep Fried Convnets :cite:`Yang.Moczulski.Denil.ea.2015` 
- utilise une combinaison de permutations, de transformées de Fourier
+utilise une combinaison de permutations, de transformées de Fourier
 et de mise à l'échelle
 pour réduire le coût de quadratique à log-linéaire.
 Des techniques similaires fonctionnent pour des approximations de matrices structurelles plus avancées
- :cite:`sindhwani2015structured` .
+ :cite:`sindhwani2015structured`.
 Enfin, nous pouvons utiliser des décompositions de type quaternion
 pour réduire le coût à $\mathcal{O}(\frac{dq}{n})$,
 encore une fois si nous sommes prêts à échanger une petite quantité de précision
 contre un coût de calcul et de stockage :cite:`Zhang.Tay.Zhang.ea.2021` 
- basé sur un facteur de compression $n$.
+basé sur un facteur de compression $n$.
 Il s'agit d'un domaine de recherche actif.
 Le défi réside dans le fait que
 nous ne cherchons pas nécessairement
@@ -525,13 +525,13 @@ qui peut être exécutée le plus efficacement sur les GPU modernes.
 1. Le site [Bradley-Terry model](https://en.wikipedia.org/wiki/Bradley%E2%80%93Terry_model) utilise
 un modèle logistique pour saisir les préférences. Pour qu'un utilisateur puisse choisir entre des pommes et des oranges,
 suppose des scores $o_{\mathrm{apple}}$ et $o_{\mathrm{orange}}$. Nos exigences sont les suivantes : des scores plus élevés doivent conduire à une plus grande probabilité de choisir l'élément associé et
-l'élément avec le score le plus élevé est le plus susceptible d'être choisi :cite:`Bradley.Terry.1952` .
+l'élément avec le score le plus élevé est le plus susceptible d'être choisi :cite:`Bradley.Terry.1952`.
    1. Prouvez que le softmax satisfait à cette exigence.
    1. Que se passe-t-il si l'on veut permettre une option par défaut consistant à ne choisir ni les pommes ni les oranges ? Indice : l'utilisateur a maintenant trois choix.
 1. Softmax tire son nom de la correspondance suivante : $\mathrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$.
    1. Prouvez que $\mathrm{RealSoftMax}(a, b) > \mathrm{max}(a, b)$.
    1. Jusqu'à quel point pouvez-vous réduire la différence entre les deux fonctions ? Indice : sans perdre
- de sa généralité, vous pouvez définir $b = 0$ et $a \geq b$.
+de sa généralité, vous pouvez définir $b = 0$ et $a \geq b$.
  1. Prouvez que ceci est valable pour $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b)$, à condition que $\lambda > 0$.
    1. Montrez que pour $\lambda \to \infty$ nous avons $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b) \to \mathrm{max}(a, b)$.
    1. A quoi ressemble le soft-min ?

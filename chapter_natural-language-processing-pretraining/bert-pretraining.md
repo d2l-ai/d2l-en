@@ -1,8 +1,8 @@
 # Pré-entraînement de BERT
 :label:`sec_bert-pretraining` 
 
- Avec le modèle BERT implémenté dans :numref:`sec_bert` 
- et les exemples de pré-entraînement générés à partir du jeu de données WikiText-2 dans :numref:`sec_bert-dataset` , nous allons pré-entraîner BERT sur le jeu de données WikiText-2 dans cette section.
+Avec le modèle BERT implémenté dans :numref:`sec_bert` 
+et les exemples de pré-entraînement générés à partir du jeu de données WikiText-2 dans :numref:`sec_bert-dataset`, nous allons pré-entraîner BERT sur le jeu de données WikiText-2 dans cette section.
 
 ```{.python .input}
 #@tab mxnet
@@ -32,7 +32,7 @@ train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
 
 ## Préformation de BERT
 
-Le BERT original a deux versions de modèles de tailles différentes :cite:`Devlin.Chang.Lee.ea.2018` .
+Le BERT original a deux versions de modèles de tailles différentes :cite:`Devlin.Chang.Lee.ea.2018`.
 Le modèle de base ($\text{BERT}_{\text{BASE}}$) utilise 12 couches (blocs de transformateurs-codeurs)
 avec 768 unités cachées (taille cachée) et 12 têtes d'auto-attention.
 Le grand modèle ($\text{BERT}_{\text{LARGE}}$) utilise 24 couches
@@ -122,7 +122,7 @@ def _get_batch_loss_bert(net, loss, vocab_size, tokens_X,
 
 En invoquant les deux fonctions d'aide susmentionnées,
 la fonction suivante `train_bert`
- définit la procédure pour [**prétraîner BERT (`net`) sur le jeu de données WikiText-2 (`train_iter`)**].
+définit la procédure pour [**prétraîner BERT (`net`) sur le jeu de données WikiText-2 (`train_iter`)**].
 L'entraînement de BERT peut être très long.
 Au lieu de spécifier le nombre d'époques pour l'entraînement
 comme dans la fonction `train_ch13` (voir :numref:`sec_image_augmentation` ),
@@ -256,7 +256,7 @@ def get_bert_encoding(net, tokens_a, tokens_b=None):
 ```
 
 [**Considérons la phrase "une grue est en train de voler".**]
-Rappelons la représentation d'entrée de BERT telle que discutée dans :numref:`subsec_bert_input_rep` .
+Rappelons la représentation d'entrée de BERT telle que discutée dans :numref:`subsec_bert_input_rep`.
 Après avoir inséré les tokens spéciaux "&lt;cls&gt;" (utilisés pour la classification)
 et "&lt;sep&gt;" (utilisés pour la séparation),
 la séquence d'entrée de BERT a une longueur de six.
@@ -292,7 +292,7 @@ encoded_pair_crane = encoded_pair[:, 2, :]
 encoded_pair.shape, encoded_pair_cls.shape, encoded_pair_crane[0][:3]
 ```
 
-Dans :numref:`chap_nlp_app` , nous affinerons un modèle BERT pré-entraîné
+Dans :numref:`chap_nlp_app`, nous affinerons un modèle BERT pré-entraîné
 pour des applications de traitement du langage naturel en aval.
 
 

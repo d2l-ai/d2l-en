@@ -1,8 +1,8 @@
 # Mise en œuvre concise pour plusieurs GPU
 :label:`sec_multi_gpu_concise` 
 
- Mettre en œuvre le parallélisme à partir de zéro pour chaque nouveau modèle n'est pas une partie de plaisir. De plus, il y a un avantage significatif à optimiser les outils de synchronisation pour une haute performance. Dans ce qui suit, nous allons montrer comment le faire en utilisant les API de haut niveau des cadres d'apprentissage profond.
-Les mathématiques et les algorithmes sont les mêmes que dans :numref:`sec_multi_gpu` .
+Mettre en œuvre le parallélisme à partir de zéro pour chaque nouveau modèle n'est pas une partie de plaisir. De plus, il y a un avantage significatif à optimiser les outils de synchronisation pour une haute performance. Dans ce qui suit, nous allons montrer comment le faire en utilisant les API de haut niveau des cadres d'apprentissage profond.
+Les mathématiques et les algorithmes sont les mêmes que dans :numref:`sec_multi_gpu`.
 Sans surprise, vous aurez besoin d'au moins deux GPU pour exécuter le code de cette section.
 
 ```{.python .input}
@@ -23,7 +23,7 @@ from torch import nn
 ## [**A Toy Network**]
 
 Utilisons un réseau un peu plus significatif que le LeNet de :numref:`sec_multi_gpu` qui est encore suffisamment facile et rapide à entraîner.
-Nous choisissons une variante de ResNet-18 :cite:`He.Zhang.Ren.ea.2016` . Comme les images d'entrée sont minuscules, nous le modifions légèrement. En particulier, la différence avec :numref:`sec_resnet` est que nous utilisons un noyau de convolution, un stride et un padding plus petits au début.
+Nous choisissons une variante de ResNet-18 :cite:`He.Zhang.Ren.ea.2016`. Comme les images d'entrée sont minuscules, nous le modifions légèrement. En particulier, la différence avec :numref:`sec_resnet` est que nous utilisons un noyau de convolution, un stride et un padding plus petits au début.
 De plus, nous supprimons la couche de max-pooling.
 
 ```{.python .input}
@@ -89,13 +89,13 @@ def resnet18(num_classes, in_channels=1):
 ## Initialisation du réseau
 
 :begin_tab:`mxnet` 
- La fonction `initialize` nous permet d'initialiser les paramètres sur un dispositif de notre choix.
-Pour un rappel sur les méthodes d'initialisation, voir :numref:`sec_numerical_stability` . Ce qui est particulièrement pratique, c'est qu'elle nous permet également d'initialiser le réseau sur *plusieurs* périphériques simultanément. Voyons comment cela fonctionne en pratique.
+La fonction `initialize` nous permet d'initialiser les paramètres sur un dispositif de notre choix.
+Pour un rappel sur les méthodes d'initialisation, voir :numref:`sec_numerical_stability`. Ce qui est particulièrement pratique, c'est qu'elle nous permet également d'initialiser le réseau sur *plusieurs* périphériques simultanément. Voyons comment cela fonctionne en pratique.
 :end_tab:
 
 :begin_tab:`pytorch`
 Nous allons initialiser le réseau à l'intérieur de la boucle d'apprentissage.
-Pour un rappel sur les méthodes d'initialisation, voir :numref:`sec_numerical_stability` .
+Pour un rappel sur les méthodes d'initialisation, voir :numref:`sec_numerical_stability`.
 :end_tab:
 
 ```{.python .input}
@@ -116,7 +116,7 @@ devices = d2l.try_all_gpus()
 ```
 
 :begin_tab:`mxnet`
-À l'aide de la fonction `split_and_load` introduite dans :numref:`sec_multi_gpu` , nous pouvons diviser un minilot de données et en copier des portions dans la liste de périphériques fournie par la variable `devices`. L'instance de réseau *automatiquement* utilise le GPU approprié pour calculer la valeur de la propagation vers l'avant. Ici, nous générons 4 observations et les répartissons sur les GPU.
+À l'aide de la fonction `split_and_load` introduite dans :numref:`sec_multi_gpu`, nous pouvons diviser un minilot de données et en copier des portions dans la liste de périphériques fournie par la variable `devices`. L'instance de réseau *automatiquement* utilise le GPU approprié pour calculer la valeur de la propagation vers l'avant. Ici, nous générons 4 observations et les répartissons sur les GPU.
 :end_tab:
 
 ```{.python .input}
@@ -143,7 +143,7 @@ weight.data(devices[0])[0], weight.data(devices[1])[0]
 ```
 
 :begin_tab:`mxnet`
-Ensuite, remplaçons le code pour [**évaluer la précision**] par un code qui fonctionne (**en parallèle sur plusieurs périphériques**). Cette fonction remplace la fonction `evaluate_accuracy_gpu` de :numref:`sec_lenet` . La principale différence est que nous divisons un minibatch avant d'invoquer le réseau. Tout le reste est essentiellement identique.
+Ensuite, remplaçons le code pour [**évaluer la précision**] par un code qui fonctionne (**en parallèle sur plusieurs périphériques**). Cette fonction remplace la fonction `evaluate_accuracy_gpu` de :numref:`sec_lenet`. La principale différence est que nous divisons un minibatch avant d'invoquer le réseau. Tout le reste est essentiellement identique.
 :end_tab:
 
 ```{.python .input}
@@ -247,7 +247,7 @@ train(net, num_gpus=1, batch_size=256, lr=0.1)
 ```
 
 Ensuite, nous [**utilisons 2 GPU pour l'entraînement**]. Comparé à LeNet
-évalué dans :numref:`sec_multi_gpu` ,
+évalué dans :numref:`sec_multi_gpu`,
 le modèle de ResNet-18 est considérablement plus complexe. C'est là que la parallélisation montre son avantage. Le temps de calcul est significativement plus important que le temps de synchronisation des paramètres. Cela améliore l'extensibilité puisque l'overhead de la parallélisation est moins important.
 
 ```{.python .input}

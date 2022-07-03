@@ -5,26 +5,26 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 # Documentation
 :begin_tab:`mxnet` 
- Bien que nous ne puissions pas présenter chaque fonction et classe MXNet 
+Bien que nous ne puissions pas présenter chaque fonction et classe MXNet 
 (et les informations pourraient devenir rapidement obsolètes), 
 le [API documentation](https://mxnet.apache.org/versions/1.8.0/api) 
- et des [tutorials](https://mxnet.apache.org/versions/1.8.0/api/python/docs/tutorials/) et exemples supplémentaires 
+et des [tutorials](https://mxnet.apache.org/versions/1.8.0/api/python/docs/tutorials/) et exemples supplémentaires 
 fournissent une telle documentation. 
 Cette section fournit des conseils sur la manière d'explorer l'API MXNet.
 :end_tab:
 
 :begin_tab:`pytorch`
 Bien qu'il ne soit pas possible de présenter toutes les fonctions et classes de PyTorch 
-(les informations risquent d'être rapidement dépassées), 
-, [API documentation](https://pytorch.org/docs/stable/index.html), [tutorials](https://pytorch.org/tutorials/beginner/basics/intro.html) et des exemples supplémentaires 
+(les informations risquent d'être rapidement dépassées),
+[API documentation](https://pytorch.org/docs/stable/index.html), [tutorials](https://pytorch.org/tutorials/beginner/basics/intro.html) et des exemples supplémentaires 
 fournissent une telle documentation.
 Cette section fournit quelques conseils sur la façon d'explorer l'API de PyTorch.
 :end_tab:
 
 :begin_tab:`tensorflow`
 Bien qu'il ne soit pas possible de présenter chaque fonction et classe TensorFlow 
-(les informations risquent d'être rapidement dépassées), 
-, [API documentation](https://www.tensorflow.org/api_docs), [tutorials](https://www.tensorflow.org/tutorials) et les exemples 
+(les informations risquent d'être rapidement dépassées),
+[API documentation](https://www.tensorflow.org/api_docs), [tutorials](https://www.tensorflow.org/tutorials) et les exemples 
 fournissent une telle documentation. 
 Cette section fournit quelques conseils sur la façon d'explorer l'API TensorFlow.
 :end_tab:
@@ -84,7 +84,7 @@ help(tf.ones)
 ```
 
 D'après la documentation, nous pouvons voir que la fonction `ones` 
- crée un nouveau tenseur avec la forme spécifiée 
+crée un nouveau tenseur avec la forme spécifiée 
 et attribue la valeur 1 à tous les éléments. 
 Dans la mesure du possible, vous devriez (**exécuter un test rapide**) 
 pour confirmer votre interprétation :
@@ -104,8 +104,8 @@ torch.ones(4)
 tf.ones(4)
 ```
 
-Dans le carnet Jupyter, nous pouvons utiliser `?` pour afficher le document dans une autre fenêtre
-. Par exemple, `list?` créera un contenu
+Dans le carnet Jupyter, nous pouvons utiliser `?` pour afficher le document dans une autre fenêtre.
+Par exemple, `list?` créera un contenu
 qui est presque identique à `help(list)`,
 l'affichant dans une nouvelle fenêtre du navigateur.
 En outre, si nous utilisons deux points d'interrogation, comme `list??`,

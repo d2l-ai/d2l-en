@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Calcul
 :label:`sec_calculus` 
 
- Pendant longtemps, la façon de calculer 
+Pendant longtemps, la façon de calculer 
 l'aire d'un cercle est restée un mystère.
 C'est alors que l'ancien mathématicien grec Archimède
 a eu l'idée astucieuse 
@@ -17,7 +17,7 @@ avec un nombre croissant de sommets
 Pour un polygone avec $n$ sommets,
 on obtient $n$ triangles.
 La hauteur de chaque triangle se rapproche du rayon $r$ 
- au fur et à mesure que l'on partitionne le cercle plus finement. 
+au fur et à mesure que l'on partitionne le cercle plus finement. 
 En même temps, sa base se rapproche de $2 \pi r/n$, 
 puisque le rapport entre l'arc et la sécante se rapproche de 1 
 pour un grand nombre de sommets. 
@@ -28,11 +28,11 @@ $n \cdot r \cdot \frac{1}{2} (2 \pi r/n) = \pi r^2$ .
 :label:`fig_circle_area`
 
 Cette procédure de limitation conduit à la fois au *calcul différentiel* 
- et au *calcul intégral* 
+et au *calcul intégral* 
 (:numref:`sec_integral_calculus` ). 
 Le premier peut nous indiquer comment augmenter
-ou diminuer la valeur d'une fonction en manipulant ses arguments
-. 
+ou diminuer la valeur d'une fonction en manipulant ses arguments.
+
 Cela s'avère pratique pour les problèmes d'*optimisation*
 auxquels nous sommes confrontés en apprentissage profond,
 où nous mettons à jour nos paramètres de manière répétée 
@@ -61,21 +61,21 @@ qui correspondent à des scalaires vers des scalaires,
 (**$$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h}.$$**)
 :eqlabel:`eq_derivative` 
 
- Ce terme à droite est appelé une *limite* 
+Ce terme à droite est appelé une *limite* 
 et il nous indique ce qui arrive 
 à la valeur d'une expression
 lorsqu'une variable spécifiée 
 approche une valeur particulière.
 Cette limite nous indique ce que 
 le rapport entre une perturbation $h$
- et le changement de la valeur de la fonction 
+et le changement de la valeur de la fonction 
 $f(x + h) - f(x)$ converge vers 
 lorsque nous réduisons sa taille à zéro.
 
 Lorsque $f'(x)$ existe, on dit que $f$ 
- est *différentiable* à $x$;
+est *différentiable* à $x$;
 et lorsque $f'(x)$ existe pour tous $x$
- sur un ensemble, par exemple l'intervalle $[a,b]$, 
+sur un ensemble, par exemple l'intervalle $[a,b]$, 
 on dit que $f$ est différentiable sur cet ensemble.
 Toutes les fonctions ne sont pas différentiables,
 y compris de nombreuses fonctions que nous souhaitons optimiser,
@@ -89,7 +89,7 @@ nous optimisons souvent un *substitut* différentiable à la place.
 
 Nous pouvons interpréter la dérivée 
 $f'(x)$ 
- comme le taux de variation *instantané* 
+comme le taux de variation *instantané* 
 de $f(x)$ par rapport à $x$.
 Développons un peu d'intuition avec un exemple.
 (**Définir $u = f(x) = 3x^2-4x$.**)
@@ -145,7 +145,7 @@ Il existe plusieurs conventions de notation équivalentes pour les dérivées.
 
 $$f'(x) = y' = \frac{dy}{dx} = \frac{df}{dx} = \frac{d}{dx} f(x) = Df(x) = D_x f(x),$$ 
 
- où les symboles $\frac{d}{dx}$ et $D$ sont des opérateurs de *différenciation*.
+où les symboles $\frac{d}{dx}$ et $D$ sont des opérateurs de *différenciation*.
 Nous présentons ci-dessous les dérivées de quelques fonctions courantes :
 
 $$\begin{aligned} \frac{d}{dx} C & = 0 && \text{for any constant $C$} \\ \frac{d}{dx} x^n & = n x^{n-1} && \text{for } n \neq 0 \\ \frac{d}{dx} e^x & = e^x \\ \frac{d}{dx} \ln x & = x^{-1} \end{aligned}$$
@@ -175,12 +175,12 @@ la *pente* d'une fonction
 [**Nous pouvons visualiser les pentes des fonctions en utilisant la bibliothèque `matplotlib` **].
 Nous devons définir quelques fonctions. 
 Comme son nom l'indique, `use_svg_display` 
- indique à `matplotlib` de sortir les graphiques 
+indique à `matplotlib` de sortir les graphiques 
 au format SVG pour des images plus nettes. 
 Le commentaire `#@save` est un modificateur spécial 
 qui nous permet d'enregistrer n'importe quelle fonction, 
 classe ou autre bloc de code dans le paquet `d2l` 
- afin de pouvoir l'invoquer ultérieurement 
+afin de pouvoir l'invoquer ultérieurement 
 sans répéter le code, 
 par exemple, via `d2l.use_svg_display()`.
 
@@ -193,7 +193,7 @@ def use_svg_display():  #@save
 
 De façon pratique, nous pouvons définir la taille des figures avec `set_figsize`. 
 Comme l'instruction d'importation `from matplotlib import pyplot as plt` 
- a été marquée via `#@save` dans le paquet `d2l`, nous pouvons appeler `d2l.plt`.
+a été marquée via `#@save` dans le paquet `d2l`, nous pouvons appeler `d2l.plt`.
 
 ```{.python .input}
 %%tab all
@@ -221,7 +221,7 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
 ```
 
 Avec ces trois fonctions, nous pouvons définir une fonction `plot` 
- pour superposer plusieurs courbes. 
+pour superposer plusieurs courbes. 
 Une grande partie du code ici consiste simplement à s'assurer 
 que les tailles et les formes des entrées correspondent.
 
@@ -265,7 +265,7 @@ plot(x, [f(x), 2 * x - 3], 'x', 'f(x)', legend=['f(x)', 'Tangent line (x=1)'])
 ## Dérivées partielles et gradients
 :label:`subsec_calculus-grad` 
 
- Jusqu'à présent, nous avons différencié
+Jusqu'à présent, nous avons différencié
 des fonctions d'une seule variable.
 En apprentissage profond, nous devons également travailler
 avec des fonctions de *nombreuses* variables.
@@ -275,12 +275,12 @@ qui s'appliquent à de telles fonctions *multivariées*.
 
 Soit $y = f(x_1, x_2, \ldots, x_n)$ une fonction avec $n$ variables. 
 La dérivée *partielle* de $y$ 
- par rapport à son paramètre $i^\mathrm{th}$ $x_i$ est
+par rapport à son paramètre $i^\mathrm{th}$ $x_i$ est
 
 $$ \frac{\partial y}{\partial x_i} = \lim_{h \rightarrow 0} \frac{f(x_1, \ldots, x_{i-1}, x_i+h, x_{i+1}, \ldots, x_n) - f(x_1, \ldots, x_i, \ldots, x_n)}{h}.$$ 
 
  
- Pour calculer $\frac{\partial y}{\partial x_i}$, 
+Pour calculer $\frac{\partial y}{\partial x_i}$, 
 nous pouvons traiter $x_1, \ldots, x_{i-1}, x_{i+1}, \ldots, x_n$ comme des constantes 
 et calculer la dérivée de $y$ par rapport à $x_i$.
 Les conventions de notation suivantes pour les dérivées partielles 
@@ -288,26 +288,26 @@ sont toutes communes et signifient toutes la même chose :
 
 $$\frac{\partial y}{\partial x_i} = \frac{\partial f}{\partial x_i} = \partial_{x_i} f = \partial_i f = f_{x_i} = f_i = D_i f = D_{x_i} f.$$ 
 
- Nous pouvons concaténer les dérivées partielles 
+Nous pouvons concaténer les dérivées partielles 
 d'une fonction multivariable 
 par rapport à toutes ses variables 
 pour obtenir un vecteur appelé
 le *gradient* de la fonction.
 Supposons que l'entrée de la fonction 
 $f: \mathbb{R}^n \rightarrow \mathbb{R}$ 
- soit un vecteur $n$-dimensionnel 
+soit un vecteur $n$-dimensionnel 
 $\mathbf{x} = [x_1, x_2, \ldots, x_n]^\top$ 
- et que la sortie soit un scalaire. 
+et que la sortie soit un scalaire. 
 Le gradient de la fonction $f$ 
- par rapport à $\mathbf{x}$ 
- est un vecteur de dérivées partielles $n$:
+par rapport à $\mathbf{x}$ 
+est un vecteur de dérivées partielles $n$:
 
 $$\nabla_{\mathbf{x}} f(\mathbf{x}) = \left[\partial_{x_1} f(\mathbf{x}), \partial_{x_2} f(\mathbf{x}), \ldots
 \partial_{x_n} f(\mathbf{x})\right]^\top.$$ 
 
 Lorsqu'il n'y a pas d'ambiguïté,
 $\nabla_{\mathbf{x}} f(\mathbf{x})$ 
- est généralement remplacé 
+est généralement remplacé 
 par $\nabla f(\mathbf{x})$.
 Les règles suivantes sont utiles 
 pour différencier des fonctions multivariées :
@@ -331,31 +331,31 @@ des fonctions profondément imbriquées
 Heureusement, la *règle de la chaîne* s'en charge. 
 Pour en revenir aux fonctions d'une seule variable,
 supposons que $y = f(g(x))$
- et que les fonctions sous-jacentes 
+et que les fonctions sous-jacentes 
 $y=f(u)$ et $u=g(x)$ 
- sont toutes deux différentiables.
+sont toutes deux différentiables.
 La règle de la chaîne indique que 
 
 
- $$\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}.$$ 
+$$\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}.$$ 
 
  
 
- Pour en revenir aux fonctions à plusieurs variables,
+Pour en revenir aux fonctions à plusieurs variables,
 supposons que $y = f(\mathbf{u})$ a des variables
 $u_1, u_2, \ldots, u_m$ , 
 où chaque $u_i = g_i(\mathbf{x})$ 
- a des variables $x_1, x_2, \ldots, x_n$,
+a des variables $x_1, x_2, \ldots, x_n$,
 c'est-à-dire $\mathbf{u} = g(\mathbf{x})$.
 La règle de la chaîne indique alors que
 
 $$\frac{\partial y}{\partial x_{i}} = \frac{\partial y}{\partial u_{1}} \frac{\partial u_{1}}{\partial x_{i}} + \frac{\partial y}{\partial u_{2}} \frac{\partial u_{2}}{\partial x_{i}} + \ldots + \frac{\partial y}{\partial u_{m}} \frac{\partial u_{m}}{\partial x_{i}} \text{ and thus } \nabla_{\mathbf{x}} y =  \mathbf{A} \nabla_{\mathbf{u}} y,$$ 
 
- où $\mathbf{A} \in \mathbb{R}^{n \times m}$ est une *matrice*
+où $\mathbf{A} \in \mathbb{R}^{n \times m}$ est une *matrice*
 qui contient la dérivée du vecteur $\mathbf{u}$
- par rapport au vecteur $\mathbf{x}$.
-Ainsi, l'évaluation du gradient nécessite le calcul d'un produit vecteur-matrice sur 
-. 
+par rapport au vecteur $\mathbf{x}$.
+Ainsi, l'évaluation du gradient nécessite le calcul d'un produit vecteur-matrice sur .
+
 C'est l'une des principales raisons pour lesquelles l'algèbre linéaire 
 est un bloc de construction intégral 
 dans la construction de systèmes d'apprentissage profond. 
@@ -391,23 +391,23 @@ tout au long de cet ouvrage nécessitera le calcul du gradient.
 
 1. Jusqu'à présent, nous avons considéré que les règles relatives aux dérivées étaient acquises. 
    En utilisant la définition et les limites, prouvez les propriétés 
- pour (i) $f(x) = c$, (ii) $f(x) = x^n$, (iii) $f(x) = e^x$ et (iv) $f(x) = \log x$.
+pour (i) $f(x) = c$, (ii) $f(x) = x^n$, (iii) $f(x) = e^x$ et (iv) $f(x) = \log x$.
 1. Dans la même veine, prouvez la règle du produit, de la somme et du quotient à partir des premiers principes. 
 1. Prouvez que la règle du multiple constant est un cas particulier de la règle du produit. 
 1. Calculez la dérivée de $f(x) = x^x$. 
 1. Que signifie $f'(x) = 0$ pour un certain $x$? 
    Donnez un exemple d'une fonction $f$ 
- et d'un lieu $x$ pour lesquels cela peut être vrai. 
+et d'un lieu $x$ pour lesquels cela peut être vrai. 
 1. Tracez la fonction $y = f(x) = x^3 - \frac{1}{x}$ 
- et tracez sa ligne tangente à $x = 1$.
+et tracez sa ligne tangente à $x = 1$.
 1. Trouvez le gradient de la fonction 
- $f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$ .
+$f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$ .
 1. Quel est le gradient de la fonction 
- $f(\mathbf{x}) = \|\mathbf{x}\|_2$ ? Que se passe-t-il pour $\mathbf{x} = \mathbf{0}$?
+$f(\mathbf{x}) = \|\mathbf{x}\|_2$ ? Que se passe-t-il pour $\mathbf{x} = \mathbf{0}$?
 1. Pouvez-vous écrire la règle de la chaîne pour le cas 
- où $u = f(x, y, z)$ et $x = x(a, b)$, $y = y(a, b)$, et $z = z(a, b)$?
+où $u = f(x, y, z)$ et $x = x(a, b)$, $y = y(a, b)$, et $z = z(a, b)$?
 1. Étant donné une fonction $f(x)$ qui est inversible, 
- calculez la dérivée de son inverse $f^{-1}(x)$. 
+calculez la dérivée de son inverse $f^{-1}(x)$. 
    Ici, nous avons que $f^{-1}(f(x)) = x$ et inversement $f(f^{-1}(y)) = y$. 
    Conseil : utilisez ces propriétés dans votre dérivation 
 

@@ -128,7 +128,7 @@ Imaginez simplement écrire un programme pour répondre à un *mot clé*
 tel que "Alexa", "OK Google" et "Hey Siri".
 Essayez de le coder vous-même dans une pièce
 avec rien d'autre qu'un ordinateur et un éditeur de code,
-comme illustré dans :numref:`fig_wake_word` .
+comme illustré dans :numref:`fig_wake_word`.
 Comment écririez-vous un tel programme à partir des premiers principes ?
 Pensez-y... le problème est difficile.
 Chaque seconde, le microphone collecte environ 
@@ -136,7 +136,7 @@ Chaque seconde, le microphone collecte environ
 Chaque échantillon est une mesure de l'amplitude de l'onde sonore.
 Quelle règle pourrait permettre de passer de manière fiable d'un extrait de données audio brutes à des prédictions fiables 
 $\{\text{yes}, \text{no}\}$ 
- pour savoir si l'extrait contient le mot clé ?
+pour savoir si l'extrait contient le mot clé ?
 Si vous êtes bloqué, ne vous inquiétez pas.
 Nous ne savons pas non plus comment écrire un tel programme à partir de zéro.
 C'est pourquoi nous utilisons l'apprentissage automatique.
@@ -146,8 +146,8 @@ C'est pourquoi nous utilisons l'apprentissage automatique.
 
 
 Voici l'astuce.
-Souvent, même si nous ne savons pas comment indiquer explicitement à un ordinateur (
-) comment passer des entrées aux sorties,
+Souvent, même si nous ne savons pas comment indiquer explicitement à un ordinateur 
+comment passer des entrées aux sorties,
 nous sommes néanmoins capables de réaliser nous-mêmes l'exploit cognitif.
 En d'autres termes, même si vous ne savez pas
 comment programmer un ordinateur pour qu'il reconnaisse le mot "Alexa",
@@ -178,13 +178,13 @@ Avant d'engager l'algorithme d'apprentissage,
 nous devons définir précisément le problème,
 en déterminant la nature exacte des entrées et des sorties,
 et en choisissant une famille de modèles appropriée.
-Dans le cas présent, 
-, notre modèle reçoit un extrait audio comme *entrée*,
+Dans le cas présent,
+notre modèle reçoit un extrait audio comme *entrée*,
 et le modèle 
 génère une sélection parmi 
 $\{\text{yes}, \text{no}\}$ comme *sortie*.
-Si tout se passe comme prévu 
-, les suppositions du modèle
+Si tout se passe comme prévu ,
+les suppositions du modèle
 seront généralement correctes quant à 
 si l'extrait contient le mot clé.
 
@@ -212,7 +212,7 @@ par lequel nous découvrons le bon réglage des boutons
 qui contraint notre modèle à adopter le comportement souhaité.
 En d'autres termes,
 nous *formons* notre modèle avec des données.
-Comme le montre le site :numref:`fig_ml_loop` , le processus d'apprentissage se présente généralement comme suit :
+Comme le montre le site :numref:`fig_ml_loop`, le processus d'apprentissage se présente généralement comme suit :
 
 1. Commencez par un modèle initialisé de manière aléatoire qui ne peut rien faire d'utile.
 1. Récupérez certaines de vos données (par exemple, des extraits audio et les étiquettes correspondantes $\{\text{yes}, \text{no}\}$ ).
@@ -268,8 +268,8 @@ Nous pourrions perdre des centaines de pages à réfléchir à ce qui constitue 
 mais pour l'instant, nous allons privilégier le côté pratique
 et nous concentrer sur les principales propriétés à prendre en compte.
 En général, nous sommes concernés par une collection d'exemples.
-Pour travailler utilement avec des données, 
-, nous devons généralement
+Pour travailler utilement avec des données,
+nous devons généralement
 trouver une représentation numérique appropriée.
 Chaque *exemple* (ou *point de données*, *instance de données*, *échantillon*) est généralement constitué d'un ensemble
 d'attributs appelés *caractéristiques* (ou *covariables*),
@@ -286,7 +286,7 @@ chaque photographie individuelle pourrait constituer un exemple,
 chacune étant représentée par une liste ordonnée de valeurs numériques
 correspondant à la luminosité de chaque pixel.
 Une photographie couleur $200\times 200$ se composerait de $200\times200\times3=120000$
- valeurs numériques, correspondant à la luminosité
+valeurs numériques, correspondant à la luminosité
 des canaux rouge, vert et bleu pour chaque emplacement spatial.
 Dans une autre tâche traditionnelle, nous pourrions essayer de prédire
 si un patient va survivre ou non,
@@ -321,8 +321,8 @@ peuvent traiter des données de longueur variable *.
 En général, plus nous avons de données, plus notre travail est facile.
 Lorsque nous disposons de plus de données, nous pouvons former des modèles plus puissants
 et nous reposer moins sur des hypothèses préconçues.
-Le changement de régime, qui consiste à passer des données (comparativement) petites aux données volumineuses
-, contribue largement au succès de l'apprentissage profond moderne.
+Le changement de régime, qui consiste à passer des données (comparativement) petites aux données volumineuses,
+contribue largement au succès de l'apprentissage profond moderne.
 Pour enfoncer le clou, bon nombre des modèles les plus intéressants de l'apprentissage profond ne fonctionnent pas sans grands ensembles de données.
 D'autres fonctionnent dans le régime des petites données,
 mais ne sont pas meilleurs que les approches traditionnelles.
@@ -470,8 +470,8 @@ tels que les données, les modèles et les techniques d'apprentissage.
 
 ### Apprentissage supervisé
 
-L'apprentissage supervisé consiste à prédire des étiquettes à partir de caractéristiques d'entrée (
-).
+L'apprentissage supervisé consiste à
+prédire des étiquettes à partir de caractéristiques d'entrée .
 Chaque paire caractéristique-étiquette est appelée un exemple.
 Parfois, lorsque le contexte est clair, nous pouvons utiliser le terme *exemples*
 pour faire référence à une collection d'entrées,
@@ -507,8 +507,8 @@ d'une chose inconnue à partir d'un ensemble particulier de données disponibles
 * Prédire le prix d'une action le mois prochain, sur la base des données du rapport financier de ce mois.
 
 Même avec la description simple
-"prédire des étiquettes à partir de caractéristiques d'entrée"
-, l'apprentissage supervisé peut prendre de nombreuses formes
+"prédire des étiquettes à partir de caractéristiques d'entrée",
+l'apprentissage supervisé peut prendre de nombreuses formes
 et nécessiter de nombreuses décisions de modélisation,
 en fonction (entre autres considérations) du type, de la taille,
 et du nombre d'entrées et de sorties.
@@ -531,7 +531,7 @@ une fonction qui prend en entrée un ensemble de données
 et produit une autre fonction : le modèle appris.
 Enfin, nous pouvons introduire des entrées inédites dans le modèle appris,
 en utilisant ses sorties comme prédictions de l'étiquette correspondante.
-Le processus complet est décrit dans :numref:`fig_supervised_learning` .
+Le processus complet est décrit dans :numref:`fig_supervised_learning`.
 
 ![Supervised learning.](../img/supervised-learning.svg)
 :label:`fig_supervised_learning`
@@ -592,8 +592,8 @@ Il vous a ensuite envoyé une facture de 350 dollars.
 Imaginez maintenant que votre ami ait engagé le même entrepreneur pour 2 heures
 et qu'il ait reçu une facture de 250 dollars.
 Si quelqu'un vous demandait alors à combien il doit s'attendre à recevoir
-sur sa prochaine facture de nettoyage de canalisations
-, vous pourriez faire quelques suppositions raisonnables,
+sur sa prochaine facture de nettoyage de canalisations,
+vous pourriez faire quelques suppositions raisonnables,
 telles que plus d'heures travaillées coûtent plus de dollars.
 Vous pourriez également supposer qu'il existe un tarif de base
 et que l'entrepreneur facture ensuite à l'heure.
@@ -645,7 +645,7 @@ un problème que nous appelons *classification binaire*.
 Par exemple, notre jeu de données pourrait être constitué d'images d'animaux
 et nos étiquettes pourraient être les classes $\mathrm{\{cat, dog\}}$.
 Alors que dans la régression, nous cherchons un régresseur pour produire une valeur numérique,
-dans la classification, nous cherchons un classificateur, dont la sortie est l'affectation de classe prédite.
+dans la classification, nous cherchons un classifieur, dont la sortie est l'affectation de classe prédite.
 
 Pour des raisons que nous aborderons lorsque le livre deviendra plus technique,
 il peut être difficile d'optimiser un modèle qui ne peut fournir en sortie
@@ -657,10 +657,10 @@ notre modèle dans le langage des probabilités.
 notre modèle attribue une probabilité
 à chaque classe possible. 
 Revenons à notre exemple de classification des animaux
-où les classes sont $\mathrm{\{cat, dog\}}$,
-. Un classificateur peut voir une image et donner la probabilité
+où les classes sont $\mathrm{\{cat, dog\}}$.
+Un classifieur peut voir une image et donner la probabilité
 que l'image est un chat, soit 0,9.
-Nous pouvons interpréter ce chiffre en disant que le classificateur
+Nous pouvons interpréter ce chiffre en disant que le classifieur
 est sûr à 90 % que l'image représente un chat.
 L'ampleur de la probabilité pour la classe prédite
 transmet une notion d'incertitude.
@@ -680,18 +680,18 @@ via une introduction à la théorie de l'information dans les chapitres suivants
 Notez que la classe la plus probable n'est pas nécessairement
 celle que vous allez utiliser pour votre décision.
 Supposons que vous trouviez un magnifique champignon dans votre jardin
-comme illustré dans :numref:`fig_death_cap` .
+comme illustré dans :numref:`fig_death_cap`.
 
 ![Death cap---do not eat!](../img/death-cap.jpg)
 :width:`200px`
 :label:`fig_death_cap`
 
-Maintenant, supposons que vous ayez construit un classificateur et que vous l'ayez entraîné
+Maintenant, supposons que vous ayez construit un classifieur et que vous l'ayez entraîné
 à prédire si un champignon est toxique à partir d'une photographie.
-Supposons que notre classificateur de détection de poison indique à
+Supposons que notre classifieur de détection de poison indique à
 que la probabilité que
 :numref:`fig_death_cap` contienne un amanite tueuse est de 0,2.
-En d'autres termes, le classificateur est sûr à 80 %
+En d'autres termes, le classifieur est sûr à 80 %
 que notre champignon n'est pas un amanite tueuse.
 Pourtant, il faudrait être fou pour le manger.
 En effet, le bénéfice certain d'un délicieux dîner
@@ -735,25 +735,25 @@ mais confondre un serpent à sonnette avec une couleuvre peut être mortel.
 
 Certains problèmes de classification s'intègrent parfaitement
 dans les configurations de classification binaire ou multiclasse.
-Par exemple, nous pourrions entraîner un classificateur binaire normal
+Par exemple, nous pourrions entraîner un classifieur binaire normal
 pour distinguer les chats des chiens.
 Compte tenu de l'état actuel de la vision par ordinateur,
 nous pouvons le faire facilement, avec des outils disponibles dans le commerce.
 Néanmoins, quelle que soit la précision de notre modèle,
-nous pourrions nous trouver en difficulté lorsque le classificateur
+nous pourrions nous trouver en difficulté lorsque le classifieur
 rencontre une image des *Musiciens de la ville de Brême*,
 un conte de fées allemand populaire mettant en scène quatre animaux
-dans :numref:`fig_stackedanimals` .
+dans :numref:`fig_stackedanimals`.
 
 ![A donkey, a dog, a cat, and a rooster.](../img/stackedanimals.png)
 :width:`300px`
 :label:`fig_stackedanimals`
 
-Comme vous pouvez le voir, il y a un chat sur :numref:`fig_stackedanimals` ,
+Comme vous pouvez le voir, il y a un chat sur :numref:`fig_stackedanimals`,
 et un coq, un chien et un âne,
 avec des arbres en arrière-plan.
-En fonction de ce que nous voulons faire avec notre modèle
-, traiter ce problème comme un problème de classification binaire
+En fonction de ce que nous voulons faire avec notre modèle,
+traiter ce problème comme un problème de classification binaire
 peut ne pas avoir beaucoup de sens.
 Au lieu de cela, nous pourrions vouloir donner au modèle la possibilité de dire à
 que l'image représente un chat, un chien, un âne,
@@ -806,15 +806,15 @@ Même si l'ensemble de résultats est le même,
 l'ordre dans l'ensemble a de l'importance.
 
 Une solution possible à ce problème consiste à attribuer à chaque élément de l'ensemble
-un score de pertinence correspondant
-, puis à récupérer les éléments les mieux notés.
+un score de pertinence correspondant,
+puis à récupérer les éléments les mieux notés.
 [PageRank](https://en.wikipedia.org/wiki/PageRank) le moteur de recherche Google,
 la sauce secrète à l'origine du moteur de recherche Google,
 était un exemple précoce d'un tel système de notation, mais il était
 particulier en ce qu'il ne dépendait pas de la requête réelle.
 Il s'appuyait sur un simple filtre de pertinence
-pour identifier l'ensemble des éléments pertinents
-, puis sur le PageRank pour classer les résultats
+pour identifier l'ensemble des éléments pertinents,
+puis sur le PageRank pour classer les résultats
 qui contenaient le terme recherché.
 Aujourd'hui, les moteurs de recherche utilisent l'apprentissage automatique et les modèles comportementaux
 pour obtenir des scores de pertinence en fonction de la requête.
@@ -823,7 +823,7 @@ Des conférences universitaires entières sont consacrées à ce sujet.
 #### Systèmes de recommandation
 :label:`subsec_recommender_systems` 
 
- Les systèmes de recommandation constituent un autre problème
+Les systèmes de recommandation constituent un autre problème
 lié à la recherche et au classement.
 Les problèmes sont similaires dans la mesure où l'objectif
 est d'afficher un ensemble d'éléments pertinents à l'utilisateur.
@@ -850,8 +850,8 @@ tel qu'une note estimée
 ou la probabilité d'achat,
 pour un utilisateur et un article.
 
-Avec un tel modèle, 
-, pour un utilisateur donné,
+Avec un tel modèle,
+pour un utilisateur donné,
 nous pourrions récupérer l'ensemble des objets ayant les scores les plus élevés,
 qui pourraient alors être recommandés à l'utilisateur.
 Les systèmes de production sont considérablement plus avancés et prennent en compte
@@ -864,7 +864,7 @@ de livres d'apprentissage profond recommandés par Amazon sur la base d'algorith
 
 Malgré leur énorme valeur économique, les systèmes de recommandation
 
- construits naïvement sur des modèles prédictifs
+construits naïvement sur des modèles prédictifs
 présentent de graves défauts conceptuels.
 Pour commencer, nous n'observons que des commentaires *censurés* : les utilisateurs de
 notent de préférence les films qui leur tiennent à cœur.
@@ -1068,7 +1068,7 @@ Pour les images,
 nous pouvons entraîner des modèles
 pour déterminer la position relative
 entre deux régions rognées
-de la même image :cite:`Doersch.Gupta.Efros.2015` .
+de la même image :cite:`Doersch.Gupta.Efros.2015`.
 Dans ces deux exemples d'apprentissage auto-supervisé,
 l'entrainement de modèles pour prédire
 les mots possibles et les positions relatives
@@ -1079,8 +1079,8 @@ sont deux tâches de classification
 
 ### Interagir avec un environnement
 
-Jusqu'à présent, nous n'avons pas abordé la question de l'origine des données
-,
+Jusqu'à présent, nous n'avons pas abordé la question de l'origine des données,
+
 ou ce qui se passe réellement lorsqu'un modèle d'apprentissage automatique génère une sortie.
 Cela s'explique par le fait que l'apprentissage supervisé et l'apprentissage non supervisé
 n'abordent pas ces questions de manière très sophistiquée.
@@ -1091,7 +1091,7 @@ Comme tout l'apprentissage a lieu
 après que l'algorithme a été déconnecté de l'environnement,
 on parle parfois d'apprentissage *hors ligne*.
 Pour l'apprentissage supervisé,
-le processus en considérant la collecte de données d'un environnement ressemble à :numref:`fig_data_collection` .
+le processus en considérant la collecte de données d'un environnement ressemble à :numref:`fig_data_collection`.
 
 ![Collecting data for supervised learning from an environment.](../img/data-collection.svg)
 :label:`fig_data_collection`
@@ -1151,13 +1151,13 @@ et le programme AlphaGo qui a détrôné le champion du monde au jeu de sociét�
 
 L'apprentissage par renforcement donne un énoncé très général d'un problème,
 dans lequel un agent interagit avec un environnement au cours d'une série d'étapes temporelles.
-À chaque étape, 
-, l'agent reçoit une *observation* 
+À chaque étape,
+l'agent reçoit une *observation* 
 de l'environnement et doit choisir une *action*
 qui est ensuite renvoyée à l'environnement
 via un mécanisme (parfois appelé actionneur).
 Enfin, l'agent reçoit une récompense de l'environnement.
-Ce processus est illustré sur le site :numref:`fig_rl-environment` .
+Ce processus est illustré sur le site :numref:`fig_rl-environment`.
 L'agent reçoit ensuite une autre observation,
 et choisit une autre action, et ainsi de suite.
 Le comportement d'un agent d'apprentissage par renforcement est régi par une politique.
@@ -1186,8 +1186,8 @@ En général, nous obtenons simplement une certaine récompense.
 De plus, l'environnement peut même ne pas nous dire quelles actions ont conduit à la récompense.
 
 Prenons par exemple le jeu d'échecs.
-Le seul véritable signal de récompense intervient à la fin de la partie
-, lorsque nous gagnons, ce à quoi nous pouvons attribuer une récompense de 1,
+Le seul véritable signal de récompense intervient à la fin de la partie,
+lorsque nous gagnons, ce à quoi nous pouvons attribuer une récompense de 1,
 ou lorsque nous perdons, ce à quoi nous pouvons attribuer une récompense de -1.
 Les apprenants par renforcement doivent donc faire face au problème de l'*attribution de crédit* :
 déterminer les actions à créditer ou à blâmer pour un résultat.
@@ -1203,8 +1203,8 @@ C'est-à-dire que l'observation actuelle peut ne pas
 tout vous dire sur votre état actuel.
 Imaginons qu'un robot de nettoyage se retrouve piégé
 dans l'un des nombreux placards identiques d'une maison.
-Pour déduire l'emplacement précis (et donc l'état) du robot
-, il faudra peut-être tenir compte de ses observations précédentes avant d'entrer dans le placard.
+Pour déduire l'emplacement précis (et donc l'état) du robot,
+il faudra peut-être tenir compte de ses observations précédentes avant d'entrer dans le placard.
 
 Enfin, à tout moment, l'apprenant par renforcement
 peut connaître une bonne politique,
@@ -1252,8 +1252,8 @@ Par exemple, la distribution de Bernoulli porte le nom de
 [Jacob Bernoulli (1655--1705) ](https://en.wikipedia.org/wiki/Jacob_Bernoulli), et la distribution gaussienne a été découverte
 par [Carl Friedrich Gauss (1777--1855)](https://en.wikipedia.org/wiki/Carl_Friedrich_Gauss).
 Il a inventé, par exemple, l'algorithme des moindres carrés moyens,
-qui est encore utilisé aujourd'hui pour d'innombrables problèmes
-, du calcul des assurances au diagnostic médical.
+qui est encore utilisé aujourd'hui pour d'innombrables problèmes,
+du calcul des assurances au diagnostic médical.
 Ces outils ont donné naissance à une approche expérimentale
 dans les sciences naturelles - par exemple, la loi d'Ohm
 reliant le courant et la tension dans une résistance
@@ -1264,7 +1264,7 @@ Par exemple, le livre de géométrie de [Jacob Köbel (1460--1533)](https://www.
 en faisant la moyenne de la longueur des pieds de 16 hommes adultes pour obtenir la longueur moyenne des pieds.
 
 ![Estimating the length of a foot.](../img/koebel.jpg) 
- :width:`500px` 
+:width:`500px` 
 :label:`fig_koebel` 
 
  :numref:`fig_koebel` illustre le fonctionnement de cet estimateur.
@@ -1295,7 +1295,7 @@ dans l'industrie et les sciences naturelles.
 Une deuxième influence pour l'apprentissage automatique est venue de la théorie de l'information par
 [Claude Shannon (1916--2001) ](https://en.wikipedia.org/wiki/Claude_Shannon) et de la théorie du calcul par [Alan Turing (1912--1954)](https://en.wikipedia.org/wiki/Alan_Turing).
 Turing a posé la question "les machines peuvent-elles penser ?"
-dans son célèbre article *Computing Machinery and Intelligence* :cite:`Turing.1950` .
+dans son célèbre article *Computing Machinery and Intelligence* :cite:`Turing.1950`.
 Dans ce qu'il a décrit comme le test de Turing, une machine
 peut être considérée comme *intelligente* s'il est difficile
 pour un évaluateur humain de distinguer les réponses
@@ -1307,7 +1307,7 @@ Il est donc tout à fait raisonnable de se demander s'il est possible d'explique
 et, éventuellement, de procéder à une rétro-ingénierie de cette capacité.
 L'un des plus anciens algorithmes inspirés de cette manière
 a été formulé par [Donald Hebb (1904--1985)](https://en.wikipedia.org/wiki/Donald_O._Hebb).
-Dans son livre révolutionnaire *The Organization of Behavior* :cite:`Hebb.Hebb.1949` ,
+Dans son livre révolutionnaire *The Organization of Behavior* :cite:`Hebb.Hebb.1949`,
 il a postulé que les neurones apprennent par renforcement positif.
 Cette théorie est connue sous le nom de règle d'apprentissage de Hebbian.
 C'est le prototype de l'algorithme d'apprentissage par perceptron de Rosenblatt
@@ -1357,7 +1357,7 @@ un stockage de données bon marché (loi de Kryder),
 et un calcul bon marché (loi de Moore), en particulier sous la forme de GPU, conçus à l'origine pour les jeux vidéo.
 Soudain, des algorithmes et des modèles qui semblaient infaisables sur le plan informatique
 sont devenus pertinents (et vice versa).
-Ce phénomène est parfaitement illustré par le site :numref:`tab_intro_decade` .
+Ce phénomène est parfaitement illustré par le site :numref:`tab_intro_decade`.
 
 :Ensemble de données vs. mémoire et puissance de calcul des ordinateurs
 
@@ -1382,10 +1382,10 @@ Par conséquent, le point sensible de l'apprentissage automatique et des statist
 est passé des modèles linéaires (généralisés) et des méthodes à noyau aux réseaux neuronaux profonds.
 C'est également l'une des raisons pour lesquelles bon nombre des piliers
 de l'apprentissage profond, tels que les perceptrons multicouches
-:cite:`McCulloch.Pitts.1943` , les réseaux neuronaux convolutifs
-:cite:`LeCun.Bottou.Bengio.ea.1998` , la mémoire à long terme
-:cite:`Hochreiter.Schmidhuber.1997` ,
-et le Q-Learning :cite:`Watkins.Dayan.1992` ,
+:cite:`McCulloch.Pitts.1943`, les réseaux neuronaux convolutifs
+:cite:`LeCun.Bottou.Bengio.ea.1998`, la mémoire à long terme
+:cite:`Hochreiter.Schmidhuber.1997`,
+et le Q-Learning :cite:`Watkins.Dayan.1992`,
 ont été essentiellement "redécouverts" au cours de la dernière décennie,
 après avoir été relativement dormants pendant une période considérable.
 
@@ -1400,87 +1400,87 @@ au cours de la dernière décennie.
 
 
 * De nouvelles méthodes de contrôle de la capacité, telles que le *dropout*
- :cite:`Srivastava.Hinton.Krizhevsky.ea.2014` ,
- ont permis d'atténuer le danger de l'overfitting.
- On y est parvenu en appliquant l'injection de bruit :cite:`Bishop.1995` 
- dans tout le réseau neuronal, en remplaçant les poids par des variables aléatoires
+ :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`,
+ont permis d'atténuer le danger de l'overfitting.
+On y est parvenu en appliquant l'injection de bruit :cite:`Bishop.1995` 
+dans tout le réseau neuronal, en remplaçant les poids par des variables aléatoires
  à des fins de formation.
 * Les mécanismes d'attention ont résolu un deuxième problème
- qui tourmentait les statistiques depuis plus d'un siècle :
- comment augmenter la mémoire et la complexité d'un système sans
- augmenter le nombre de paramètres apprenables.
- Les chercheurs ont trouvé une solution élégante
- en utilisant ce qui ne peut être considéré que comme une structure de pointeurs apprenables :cite:`Bahdanau.Cho.Bengio.2014` .
- Au lieu de devoir mémoriser une séquence de texte entière, par exemple
- pour la traduction automatique dans une représentation à dimension fixe,
- il suffisait de stocker un pointeur vers l'état intermédiaire
- du processus de traduction. Cela a permis d'augmenter considérablement la précision de
- pour les longues séquences, puisque le modèle
+qui tourmentait les statistiques depuis plus d'un siècle :
+comment augmenter la mémoire et la complexité d'un système sans
+augmenter le nombre de paramètres apprenables.
+Les chercheurs ont trouvé une solution élégante
+en utilisant ce qui ne peut être considéré que comme une structure de pointeurs apprenables :cite:`Bahdanau.Cho.Bengio.2014`.
+Au lieu de devoir mémoriser une séquence de texte entière, par exemple
+pour la traduction automatique dans une représentation à dimension fixe,
+il suffisait de stocker un pointeur vers l'état intermédiaire
+du processus de traduction. Cela a permis d'augmenter considérablement la précision de
+pour les longues séquences, puisque le modèle
  n'avait plus besoin de se souvenir de la séquence entière avant
- de commencer la génération d'une nouvelle séquence. Construite uniquement sur des mécanismes d'attention, l'architecture de transformateur :cite:`Vaswani.Shazeer.Parmar.ea.2017` a démontré un succès incontestable dans un large éventail de domaines. Par exemple, un seul transformateur prétraité sur des modalités aussi diverses que du texte, des images, des couples d'articulations et des pressions sur des boutons peut jouer à Atari, légender des images, discuter et agir comme un robot :cite:`reed2022generalist` .
+de commencer la génération d'une nouvelle séquence. Construite uniquement sur des mécanismes d'attention, l'architecture de transformateur :cite:`Vaswani.Shazeer.Parmar.ea.2017` a démontré un succès incontestable dans un large éventail de domaines. Par exemple, un seul transformateur prétraité sur des modalités aussi diverses que du texte, des images, des couples d'articulations et des pressions sur des boutons peut jouer à Atari, légender des images, discuter et agir comme un robot :cite:`reed2022generalist`.
 * Les conceptions en plusieurs étapes, par exemple via les réseaux de mémoire 
- :cite:`Sukhbaatar.Weston.Fergus.ea.2015` et le programmeur-interprète neuronal :cite:`Reed.De-Freitas.2015` 
- ont permis aux modélisateurs statistiques de décrire des approches itératives du raisonnement. Ces outils permettent de modifier de manière répétée un état interne du réseau neuronal profond
-, réalisant ainsi les étapes suivantes
- dans une chaîne de raisonnement, de la même manière qu'un processeur
- peut modifier la mémoire pour un calcul.
+:cite:`Sukhbaatar.Weston.Fergus.ea.2015` et le programmeur-interprète neuronal :cite:`Reed.De-Freitas.2015` 
+ont permis aux modélisateurs statistiques de décrire des approches itératives du raisonnement. Ces outils permettent de modifier de manière répétée un état interne du réseau neuronal profond,
+réalisant ainsi les étapes suivantes
+dans une chaîne de raisonnement, de la même manière qu'un processeur
+peut modifier la mémoire pour un calcul.
 * Un autre développement clé a été l'invention des réseaux adversariens génératifs
- :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014` .
- Traditionnellement, les méthodes statistiques d'estimation de la densité
- et les modèles génératifs se concentraient sur la recherche de distributions de probabilité appropriées
- et d'algorithmes (souvent approximatifs) pour l'échantillonnage à partir de celles-ci.
- Par conséquent, ces algorithmes étaient largement limités par le manque de flexibilité
- inhérent aux modèles statistiques.
- L'innovation cruciale des réseaux adversariens génératifs a consisté à remplacer l'échantillonneur
- par un algorithme arbitraire dont les paramètres sont différentiables.
- Ces paramètres sont ensuite ajustés de manière à ce que le discriminateur
+ :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014`.
+Traditionnellement, les méthodes statistiques d'estimation de la densité
+et les modèles génératifs se concentraient sur la recherche de distributions de probabilité appropriées
+et d'algorithmes (souvent approximatifs) pour l'échantillonnage à partir de celles-ci.
+Par conséquent, ces algorithmes étaient largement limités par le manque de flexibilité
+inhérent aux modèles statistiques.
+L'innovation cruciale des réseaux adversariens génératifs a consisté à remplacer l'échantillonneur
+par un algorithme arbitraire dont les paramètres sont différentiables.
+Ces paramètres sont ensuite ajustés de manière à ce que le discriminateur
  (en fait un test à deux échantillons) ne puisse pas distinguer les fausses données des données réelles.
- Grâce à la possibilité d'utiliser des algorithmes arbitraires pour générer des données,
- a ouvert l'estimation de la densité à une grande variété de techniques.
- Les exemples de zèbres galopants :cite:`Zhu.Park.Isola.ea.2017` 
- et de faux visages de célébrités :cite:`Karras.Aila.Laine.ea.2017` 
- témoignent de ces progrès.
- Même les gribouilleurs amateurs peuvent produire
- des images photoréalistes à partir de simples croquis décrivant
- la disposition d'une scène :cite:`Park.Liu.Wang.ea.2019` .
+Grâce à la possibilité d'utiliser des algorithmes arbitraires pour générer des données,
+a ouvert l'estimation de la densité à une grande variété de techniques.
+Les exemples de zèbres galopants :cite:`Zhu.Park.Isola.ea.2017` 
+et de faux visages de célébrités :cite:`Karras.Aila.Laine.ea.2017` 
+témoignent de ces progrès.
+Même les gribouilleurs amateurs peuvent produire
+des images photoréalistes à partir de simples croquis décrivant
+la disposition d'une scène :cite:`Park.Liu.Wang.ea.2019`.
 * Dans de nombreux cas, un seul GPU est insuffisant pour traiter
- les grandes quantités de données disponibles pour la formation.
- Au cours de la dernière décennie, la capacité à construire des algorithmes de entrainement parallèles et distribués
- s'est considérablement améliorée.
- L'un des principaux défis de la conception d'algorithmes évolutifs
- est que le cheval de bataille de l'optimisation de l'apprentissage profond, la descente de gradient stochastique
-, repose sur le traitement de minibatchs de données relativement petits
+les grandes quantités de données disponibles pour la formation.
+Au cours de la dernière décennie, la capacité à construire des algorithmes de entrainement parallèles et distribués
+s'est considérablement améliorée.
+L'un des principaux défis de la conception d'algorithmes évolutifs
+est que le cheval de bataille de l'optimisation de l'apprentissage profond, la descente de gradient stochastique,
+repose sur le traitement de minibatchs de données relativement petits
 .
- En même temps, les petits lots limitent l'efficacité des GPU.
- Ainsi, l'entraînement sur 1024 GPU avec une taille de minilots de,
- disons 32 images par lot, équivaut à un minilots agrégé
- d'environ 32000 images. Des travaux récents, réalisés d'abord par :cite:`Li.2017` ,
- et ensuite par :cite:`You.Gitman.Ginsburg.2017` 
- et :cite:`Jia.Song.He.ea.2018` , ont porté la taille à 64 000 observations,
- réduisant le temps d'apprentissage du modèle ResNet-50 sur le jeu de données ImageNet à moins de 7 minutes.
+En même temps, les petits lots limitent l'efficacité des GPU.
+Ainsi, l'entraînement sur 1024 GPU avec une taille de minilots de,
+disons 32 images par lot, équivaut à un minilots agrégé
+d'environ 32000 images. Des travaux récents, réalisés d'abord par :cite:`Li.2017`,
+et ensuite par :cite:`You.Gitman.Ginsburg.2017` 
+et :cite:`Jia.Song.He.ea.2018`, ont porté la taille à 64 000 observations,
+réduisant le temps d'apprentissage du modèle ResNet-50 sur le jeu de données ImageNet à moins de 7 minutes.
  À titre de comparaison, les temps de entrainement initiaux étaient de l'ordre de plusieurs jours.
 * La capacité à paralléliser les calculs a également contribué de manière assez cruciale
- aux progrès de l'apprentissage par renforcement, du moins lorsque la simulation est une option
-. Cela a conduit à des progrès significatifs dans les ordinateurs atteignant
- des performances surhumaines au Go, aux jeux Atari, à Starcraft et aux simulations de physique
+aux progrès de l'apprentissage par renforcement, du moins lorsque la simulation est une option.
+Cela a conduit à des progrès significatifs dans les ordinateurs atteignant
+des performances surhumaines au Go, aux jeux Atari, à Starcraft et aux simulations de physique
  (par exemple, en utilisant MuJoCo). Voir, par exemple,
  :cite:`Silver.Huang.Maddison.ea.2016` pour une description
- de la manière dont AlphaGo y est parvenu. En bref,
- l'apprentissage par renforcement fonctionne mieux si de nombreux triplets (état, action, récompense) sont disponibles, c'est-à-dire lorsqu'il est possible d'essayer beaucoup de choses pour apprendre comment elles sont liées les unes aux autres
-. La simulation offre une telle possibilité.
+de la manière dont AlphaGo y est parvenu. En bref,
+l'apprentissage par renforcement fonctionne mieux si de nombreux triplets (état, action, récompense) sont disponibles, c'est-à-dire lorsqu'il est possible d'essayer beaucoup de choses pour apprendre comment elles sont liées les unes aux autres.
+La simulation offre une telle possibilité.
 * Les cadres d'apprentissage profond ont joué un rôle crucial
- dans la diffusion des idées. La première génération de cadres
- permettant une modélisation facile comprenait
+dans la diffusion des idées. La première génération de cadres
+permettant une modélisation facile comprenait
  [Caffe](https://github.com/BVLC/caffe) ,
  [Torch](https://github.com/torch) , et
  [Theano](https://github.com/Theano/Theano) .
- De nombreux articles fondamentaux ont été rédigés à l'aide de ces outils.
- Aujourd'hui, ils ont été remplacés par
+De nombreux articles fondamentaux ont été rédigés à l'aide de ces outils.
+Aujourd'hui, ils ont été remplacés par
  [TensorFlow](https://github.com/tensorflow/tensorflow) (souvent utilisé via son API de haut niveau [Keras](https://github.com/keras-team/keras)), [CNTK](https://github.com/Microsoft/CNTK), [Caffe 2](https://github.com/caffe2/caffe2), et [Apache MXNet](https://github.com/apache/incubator-mxnet). La troisième génération d'outils, à savoir les outils impératifs pour l'apprentissage profond,
- a sans doute été lancée par [Chainer](https://github.com/chainer/chainer),
- qui utilisait une syntaxe similaire à celle de Python NumPy pour décrire les modèles.
- Cette idée a été adoptée à la fois par [PyTorch](https://github.com/pytorch/pytorch),
- le [Gluon API](https://github.com/apache/incubator-mxnet) de MXNet, et [Jax](https://github.com/google/jax).
+a sans doute été lancée par [Chainer](https://github.com/chainer/chainer),
+qui utilisait une syntaxe similaire à celle de Python NumPy pour décrire les modèles.
+Cette idée a été adoptée à la fois par [PyTorch](https://github.com/pytorch/pytorch),
+le [Gluon API](https://github.com/apache/incubator-mxnet) de MXNet, et [Jax](https://github.com/google/jax).
 
 
 La division du travail entre les chercheurs en systèmes qui créent de meilleurs outils
@@ -1519,41 +1519,41 @@ considérés auparavant comme insolubles
 et qui sont directement liés aux consommateurs.
 Nombre de ces avancées sont attribuées à l'apprentissage profond.
 
-* Les assistants intelligents, tels que Siri d'Apple, Alexa d'Amazon et l'assistant de Google
-, sont capables de répondre à des questions orales avec un degré raisonnable de précision
-. Cela va des tâches subalternes telles que l'allumage des interrupteurs (une aubaine pour les personnes handicapées) à la prise de rendez-vous chez le coiffeur en passant par le dialogue téléphonique. Il s'agit probablement du signe le plus visible de l'influence de l'IA sur nos vies.
+* Les assistants intelligents, tels que Siri d'Apple, Alexa d'Amazon et l'assistant de Google,
+sont capables de répondre à des questions orales avec un degré raisonnable de précision.
+Cela va des tâches subalternes telles que l'allumage des interrupteurs (une aubaine pour les personnes handicapées) à la prise de rendez-vous chez le coiffeur en passant par le dialogue téléphonique. Il s'agit probablement du signe le plus visible de l'influence de l'IA sur nos vies.
 * Un ingrédient clé des assistants numériques est la capacité à reconnaître la parole
- avec précision. Progressivement, la précision de ces systèmes s'est accrue au point
- où ils atteignent la parité avec l'homme pour certaines applications
- :cite:`Xiong.Wu.Alleva.ea.2018` .
+avec précision. Progressivement, la précision de ces systèmes s'est accrue au point
+où ils atteignent la parité avec l'homme pour certaines applications
+ :cite:`Xiong.Wu.Alleva.ea.2018`.
 * La reconnaissance des objets a également fait des progrès considérables. Estimer l'objet dans une image
- était une tâche assez difficile en 2010. Sur le benchmark ImageNet, des chercheurs de NEC Labs et de l'Université de l'Illinois à Urbana-Champaign ont obtenu un taux d'erreur de 28 % dans le top 5 :cite:`Lin.Lv.Zhu.ea.2010` . En 2017,
- ce taux d'erreur a été réduit à 2,25 % :cite:`Hu.Shen.Sun.2018` . De même, des résultats étonnants
- ont été obtenus pour l'identification des oiseaux ou le diagnostic du cancer de la peau.
+ était une tâche assez difficile en 2010. Sur le benchmark ImageNet, des chercheurs de NEC Labs et de l'Université de l'Illinois à Urbana-Champaign ont obtenu un taux d'erreur de 28 % dans le top 5 :cite:`Lin.Lv.Zhu.ea.2010`. En 2017,
+ce taux d'erreur a été réduit à 2,25 % :cite:`Hu.Shen.Sun.2018`. De même, des résultats étonnants
+ont été obtenus pour l'identification des oiseaux ou le diagnostic du cancer de la peau.
 * Les jeux étaient autrefois un bastion de l'intelligence humaine.
  À partir de TD-Gammon, un programme permettant de jouer au backgammon en utilisant l'apprentissage par renforcement par différence temporelle, les progrès algorithmiques et informatiques ont conduit à des algorithmes
- pour un large éventail d'applications. Contrairement au backgammon, les échecs
- ont un espace d'état et un ensemble d'actions beaucoup plus complexes.
- DeepBlue a battu Garry Kasparov en utilisant un parallélisme massif, du matériel spécialisé
- et une recherche efficace dans l'arbre de jeu :cite:`Campbell.Hoane-Jr.Hsu.2002` .
- Le go est encore plus difficile, en raison de son énorme espace d'état.
- AlphaGo a atteint la parité humaine en 2015, en utilisant l'apprentissage profond combiné à l'échantillonnage d'arbres de Monte Carlo :cite:`Silver.Huang.Maddison.ea.2016` .
- Le défi au poker était que l'espace d'état est
- grand et qu'il n'est pas entièrement observé (nous ne connaissons pas les cartes des adversaires
+pour un large éventail d'applications. Contrairement au backgammon, les échecs
+ont un espace d'état et un ensemble d'actions beaucoup plus complexes.
+DeepBlue a battu Garry Kasparov en utilisant un parallélisme massif, du matériel spécialisé
+et une recherche efficace dans l'arbre de jeu :cite:`Campbell.Hoane-Jr.Hsu.2002`.
+Le go est encore plus difficile, en raison de son énorme espace d'état.
+AlphaGo a atteint la parité humaine en 2015, en utilisant l'apprentissage profond combiné à l'échantillonnage d'arbres de Monte Carlo :cite:`Silver.Huang.Maddison.ea.2016`.
+Le défi au poker était que l'espace d'état est
+grand et qu'il n'est pas entièrement observé (nous ne connaissons pas les cartes des adversaires
  ). Libratus a dépassé les performances humaines au poker en utilisant des stratégies efficacement structurées
- :cite:`Brown.Sandholm.2017` .
- Cela illustre les progrès impressionnants des jeux
- et le fait que des algorithmes avancés y ont joué un rôle crucial.
+ :cite:`Brown.Sandholm.2017`.
+Cela illustre les progrès impressionnants des jeux
+et le fait que des algorithmes avancés y ont joué un rôle crucial.
 * Une autre indication des progrès de l'IA est l'avènement des voitures
- et des camions à conduite autonome. Si l'autonomie totale n'est pas encore tout à fait à portée de main,
- d'excellents progrès ont été réalisés dans cette direction,
- avec des sociétés telles que Tesla, NVIDIA,
- et Waymo qui livrent des produits permettant une autonomie au moins partielle.
- Ce qui rend l'autonomie complète si difficile, c'est qu'une bonne conduite
- exige la capacité de percevoir, de raisonner et d'intégrer des règles
- dans un système. À l'heure actuelle, l'apprentissage profond est utilisé principalement
- dans l'aspect vision par ordinateur de ces problèmes.
- Le reste est fortement ajusté par les ingénieurs.
+et des camions à conduite autonome. Si l'autonomie totale n'est pas encore tout à fait à portée de main,
+d'excellents progrès ont été réalisés dans cette direction,
+avec des sociétés telles que Tesla, NVIDIA,
+et Waymo qui livrent des produits permettant une autonomie au moins partielle.
+Ce qui rend l'autonomie complète si difficile, c'est qu'une bonne conduite
+exige la capacité de percevoir, de raisonner et d'intégrer des règles
+dans un système. À l'heure actuelle, l'apprentissage profond est utilisé principalement
+dans l'aspect vision par ordinateur de ces problèmes.
+Le reste est fortement ajusté par les ingénieurs.
 
 
 
@@ -1573,8 +1573,8 @@ De manière plus frivole, nous pouvons demander à Alexa d'allumer la machine à
 
 Heureusement, nous sommes loin d'un système d'IA sensible
 prêt à manipuler ses créateurs humains (ou à brûler leur café).
-Tout d'abord, les systèmes d'IA sont conçus, formés et déployés d'une manière spécifique, orientée vers un but précis,
-. Si leur comportement peut donner l'illusion
+Tout d'abord, les systèmes d'IA sont conçus, formés et déployés d'une manière spécifique, orientée vers un but précis.
+Si leur comportement peut donner l'illusion
 d'une intelligence générale, c'est une combinaison de règles, d'heuristiques
 et de modèles statistiques qui sous-tend leur conception.
 Deuxièmement, à l'heure actuelle, il n'existe tout simplement pas d'outils d'intelligence générale *artificielle*
@@ -1612,7 +1612,7 @@ Comme nous l'avons décrit, l'apprentissage automatique peut
 utiliser des données pour apprendre des transformations entre les entrées et les sorties,
 comme la transformation de l'audio en texte dans la reconnaissance vocale.
 Ce faisant, il est souvent nécessaire de représenter les données d'une manière adaptée aux algorithmes qui transforment ces représentations en sortie.
- l'apprentissage *profond* est *profond* précisément dans le sens
+l'apprentissage *profond* est *profond* précisément dans le sens
 où ses modèles
 apprennent de nombreuses *couches* de transformations,
 où chaque couche offre la représentation
@@ -1682,6 +1682,6 @@ En tant qu'apprentissage de représentation multi-niveaux par l'apprentissage de
 1. Quelles parties du code que vous écrivez actuellement pourraient être "apprises", c'est-à-dire améliorées en apprenant et en déterminant automatiquement les choix de conception qui sont faits dans votre code ? Votre code inclut-il des choix de conception heuristiques ?
 1. Quels sont les problèmes que vous rencontrez et pour lesquels il existe de nombreux exemples de résolution, mais pas de moyen spécifique de les automatiser ? Ces problèmes peuvent être des candidats de choix pour l'utilisation de l'apprentissage profond.
 1. Si vous considérez le développement de l'IA comme une nouvelle révolution industrielle, quelle est la relation entre les algorithmes et les données ? Est-elle similaire à celle des moteurs à vapeur et du charbon ? Quelle est la différence fondamentale ?
-1. Où peut-on appliquer l'approche de l'entrainement de bout en bout, comme sur :numref:`fig_ml_loop` , en physique, en ingénierie et en économétrie ?
+1. Où peut-on appliquer l'approche de l'entrainement de bout en bout, comme sur :numref:`fig_ml_loop`, en physique, en ingénierie et en économétrie ?
 
 [Discussions](https://discuss.d2l.ai/t/22)

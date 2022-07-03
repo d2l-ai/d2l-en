@@ -1,7 +1,7 @@
 # Compilateurs et interprètes
 :label:`sec_hybridize` 
 
- Jusqu'à présent, ce livre s'est concentré sur la programmation impérative, qui utilise des instructions telles que `print`, `+` et `if` pour modifier l'état d'un programme. Considérons l'exemple suivant d'un programme impératif simple.
+Jusqu'à présent, ce livre s'est concentré sur la programmation impérative, qui utilise des instructions telles que `print`, `+` et `if` pour modifier l'état d'un programme. Considérons l'exemple suivant d'un programme impératif simple.
 
 ```{.python .input}
 #@tab all
@@ -89,7 +89,7 @@ Le paradigme de la programmation impérative est désormais la valeur par défau
 
 ## Hybridation de la classe `Sequential`
 
- La façon la plus simple de se faire une idée du fonctionnement de l'hybridation est de considérer des réseaux profonds à plusieurs couches. Conventionnellement, l'interpréteur Python devra exécuter le code de toutes les couches pour générer une instruction qui pourra ensuite être transmise à un CPU ou à un GPU. Pour un seul dispositif de calcul (rapide), cela ne pose pas de problème majeur. En revanche, si nous utilisons un serveur avancé à 8 GPU, comme une instance AWS P3dn.24xlarge, Python aura du mal à occuper tous les GPU. L'interpréteur Python monofilaire devient alors le goulot d'étranglement. Voyons comment nous pouvons résoudre ce problème pour des parties importantes du code en remplaçant `Sequential` par `HybridSequential`. Nous commençons par définir un MLP simple.
+La façon la plus simple de se faire une idée du fonctionnement de l'hybridation est de considérer des réseaux profonds à plusieurs couches. Conventionnellement, l'interpréteur Python devra exécuter le code de toutes les couches pour générer une instruction qui pourra ensuite être transmise à un CPU ou à un GPU. Pour un seul dispositif de calcul (rapide), cela ne pose pas de problème majeur. En revanche, si nous utilisons un serveur avancé à 8 GPU, comme une instance AWS P3dn.24xlarge, Python aura du mal à occuper tous les GPU. L'interpréteur Python monofilaire devient alors le goulot d'étranglement. Voyons comment nous pouvons résoudre ce problème pour des parties importantes du code en remplaçant `Sequential` par `HybridSequential`. Nous commençons par définir un MLP simple.
 
 ```{.python .input}
 #@tab mxnet
@@ -277,7 +277,7 @@ Comme on peut l'observer dans les résultats ci-dessus, après qu'une instance d
 ### Sérialisation
 
 :begin_tab:`mxnet` 
- L'un des avantages de la compilation des modèles est que nous pouvons sérialiser (enregistrer) le modèle et ses paramètres sur le disque. Cela nous permet de stocker un modèle d'une manière qui est indépendante du langage frontal de choix. Cela nous permet de déployer des modèles formés sur d'autres appareils et d'utiliser facilement d'autres langages de programmation frontaux. En même temps, le code est souvent plus rapide que ce qui peut être réalisé en programmation impérative. Voyons la fonction `export` en action.
+L'un des avantages de la compilation des modèles est que nous pouvons sérialiser (enregistrer) le modèle et ses paramètres sur le disque. Cela nous permet de stocker un modèle d'une manière qui est indépendante du langage frontal de choix. Cela nous permet de déployer des modèles formés sur d'autres appareils et d'utiliser facilement d'autres langages de programmation frontaux. En même temps, le code est souvent plus rapide que ce qui peut être réalisé en programmation impérative. Voyons la fonction `export` en action.
 :end_tab:
 
 :begin_tab:`pytorch`

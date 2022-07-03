@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Prédire les prix des maisons sur Kaggle
 :label:`sec_kaggle_house` 
 
- Maintenant que nous avons présenté quelques outils de base
+Maintenant que nous avons présenté quelques outils de base
 pour construire et former des réseaux profonds
 et les régulariser avec des techniques telles que
 weight decay and dropout,
@@ -16,14 +16,14 @@ La compétition de prédiction du prix des maisons
 est un excellent point de départ.
 Les données sont assez génériques et ne présentent pas de structure exotique
 qui pourrait nécessiter des modèles spécialisés (comme l'audio ou la vidéo).
-Cet ensemble de données, collecté par Bart de Cock en 2011 :cite:`De-Cock.2011` ,
+Cet ensemble de données, collecté par Bart de Cock en 2011 :cite:`De-Cock.2011`,
 couvre les prix des maisons à Ames, IA, sur la période 2006-2010.
 Il est considérablement plus important que le célèbre [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) de Harrison et Rubinfeld (1978),
 offrant à la fois plus d'exemples et plus de caractéristiques.
 
 
-Dans cette section, nous vous guiderons dans les détails du prétraitement des données de
-, de la conception du modèle et de la sélection des hyperparamètres.
+Dans cette section, nous vous guiderons dans les détails du prétraitement des données de,
+de la conception du modèle et de la sélection des hyperparamètres.
 Nous espérons qu'à travers une approche pratique,
 vous acquerrez certaines intuitions qui vous guideront
 dans votre carrière de scientifique des données.
@@ -35,7 +35,7 @@ Tout au long du livre, nous entraînerons et testerons des modèles
 sur divers ensembles de données téléchargés.
 Ici, nous (**implémentons deux fonctions utilitaires**)
 pour télécharger des fichiers et extraire des fichiers zip ou tar.
-Encore une fois, nous reportons leurs implémentations dans :numref:`sec_utils` .
+Encore une fois, nous reportons leurs implémentations dans :numref:`sec_utils`.
 
 ```{.python .input  n=2}
 %%tab all
@@ -73,7 +73,7 @@ vous devez d'abord créer un compte
 :label:`fig_kaggle`
 
 Sur la page du concours de prédiction du prix des logements, comme illustré par
-dans :numref:`fig_house_pricing` ,
+dans :numref:`fig_house_pricing`,
 vous pouvez trouver l'ensemble de données (sous l'onglet "Données"),
 soumettre des prédictions, et voir votre classement,
 L'URL est ici :
@@ -81,7 +81,7 @@ L'URL est ici :
 &gt; https://www.kaggle.com/c/house-prices-advanced-regression-techniques
 
 ![The house price prediction competition page.](../img/house-pricing.png) 
- :width:`400px` 
+:width:`400px` 
 :label:`fig_house_pricing` 
 
 ## Accéder au jeu de données et le lire
@@ -108,7 +108,7 @@ mais nous ne pourrons évaluer nos modèles que sur l'ensemble de test officiel
 après avoir téléchargé les prédictions sur Kaggle.
 L'onglet "Données" de l'onglet de la compétition
 dans :numref:`fig_house_pricing` 
- a des liens pour télécharger les données.
+a des liens pour télécharger les données.
 
 ```{.python .input  n=14}
 %%tab mxnet
@@ -139,7 +139,7 @@ import pandas as pd
 import numpy as np
 ```
 
-Pour commencer, nous allons [**lire et traiter les données en utilisant `pandas`**], que nous avons présenté dans :numref:`sec_pandas` .
+Pour commencer, nous allons [**lire et traiter les données en utilisant `pandas`**], que nous avons présenté dans :numref:`sec_pandas`.
 Pour plus de commodité, nous pouvons télécharger et mettre en cache
 l'ensemble de données sur les logements de Kaggle.
 Si un fichier correspondant à cet ensemble de données existe déjà dans le répertoire de cache et que son SHA-1 correspond à `sha1_hash`, notre code utilisera le fichier en cache pour éviter d'encombrer votre Internet avec des téléchargements redondants.
@@ -198,11 +198,11 @@ remettant à l'échelle les caractéristiques à moyenne nulle et variance unita
 
 $$x \leftarrow \frac{x - \mu}{\sigma},$$ 
 
- où $\mu$ et $\sigma$ désignent respectivement la moyenne et l'écart type.
+où $\mu$ et $\sigma$ désignent respectivement la moyenne et l'écart type.
 Pour vérifier que cela transforme effectivement
 notre caractéristique (variable) de sorte qu'elle ait une moyenne nulle et une variance unitaire,
 notez que $E[\frac{x-\mu}{\sigma}] = \frac{\mu - \mu}{\sigma} = 0$
- et que $E[(x-\mu)^2] = (\sigma^2 + \mu^2) - 2\mu^2+\mu^2 = \sigma^2$.
+et que $E[(x-\mu)^2] = (\sigma^2 + \mu^2) - 2\mu^2+\mu^2 = \sigma^2$.
 Intuitivement, nous normalisons les données
 pour deux raisons.
 Premièrement, cela s'avère pratique pour l'optimisation.
@@ -279,7 +279,7 @@ cela pourrait représenter une prédiction étonnamment précise
 En fait, c'est également la mesure d'erreur officielle
 utilisée par le concours pour évaluer la qualité des soumissions.
 Après tout, une petite valeur $\delta$ pour $|\log y - \log \hat{y}| \leq \delta$
- se traduit par $e^{-\delta} \leq \frac{\hat{y}}{y} \leq e^\delta$.
+se traduit par $e^{-\delta} \leq \frac{\hat{y}}{y} \leq e^\delta$.
 Cela conduit à l'erreur quadratique moyenne suivante entre le logarithme du prix prédit et le logarithme du prix de l'étiquette :
 
 $$\sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}.$$
@@ -301,7 +301,7 @@ def get_dataloader(self, train):
 ## $K$-Fold Cross-Validation
 
 Vous vous souvenez peut-être que nous avons introduit [**cross-validation**]
-dans :numref:`subsec_generalization-model-selection` , où nous avons discuté de la façon de traiter
+dans :numref:`subsec_generalization-model-selection`, où nous avons discuté de la façon de traiter
 avec la sélection de modèles.
 Nous allons en faire bon usage pour sélectionner la conception du modèle
 et pour ajuster les hyperparamètres.
@@ -309,12 +309,12 @@ Nous avons d'abord besoin d'une fonction qui renvoie
 le pli $i^\mathrm{th}$ des données
 dans une procédure de validation croisée $K$-fold.
 Elle procède par découpage du segment $i^\mathrm{th}$
- comme données de validation et renvoie le reste comme données de formation.
+comme données de validation et renvoie le reste comme données de formation.
 Notez que ce n'est pas la manière la plus efficace de traiter les données
 et nous ferions certainement quelque chose de beaucoup plus intelligent
 si notre ensemble de données était considérablement plus grand.
-Mais cette complexité supplémentaire pourrait obscurcir inutilement notre code
-. Nous pouvons donc l'omettre ici en toute sécurité en raison de la simplicité de notre problème.
+Mais cette complexité supplémentaire pourrait obscurcir inutilement notre code.
+Nous pouvons donc l'omettre ici en toute sécurité en raison de la simplicité de notre problème.
 
 ```{.python .input}
 %%tab all
@@ -356,8 +356,8 @@ Avec un ensemble de données suffisamment grand,
 et les types normaux d'hyperparamètres,
 $K$ -fold cross-validation tend à être
 raisonnablement résistant aux tests multiples.
-Cependant, si nous essayons un nombre déraisonnable d'options
-, nous pouvons avoir de la chance et constater que notre performance de validation
+Cependant, si nous essayons un nombre déraisonnable d'options,
+ nous pouvons avoir de la chance et constater que notre performance de validation
 n'est plus représentative de l'erreur réelle.
 
 ```{.python .input}
@@ -398,7 +398,7 @@ submission = pd.DataFrame({'Id':data.raw_val.Id,
 submission.to_csv('submission.csv', index=False)
 ```
 
-Ensuite, comme démontré dans :numref:`fig_kaggle_submit2` ,
+Ensuite, comme démontré dans :numref:`fig_kaggle_submit2`,
 nous pouvons soumettre nos prédictions sur Kaggle
 et voir comment elles se comparent aux prix réels des maisons (étiquettes)
 sur l'ensemble de test.

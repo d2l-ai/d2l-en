@@ -1,12 +1,12 @@
 # Réseaux entièrement convolutifs
 :label:`sec_fcn` 
 
- Comme nous l'avons vu dans :numref:`sec_semantic_segmentation` ,
+Comme nous l'avons vu dans :numref:`sec_semantic_segmentation`,
 la segmentation sémantique
 classe les images au niveau des pixels.
 Un réseau entièrement convolutif (FCN)
 utilise un réseau neuronal convolutif pour
-transformer les pixels de l'image en classes de pixels :cite:`Long.Shelhamer.Darrell.2015` .
+transformer les pixels de l'image en classes de pixels :cite:`Long.Shelhamer.Darrell.2015`.
 Contrairement aux CNN que nous avons rencontrés précédemment
 pour la classification d'images 
 ou la détection d'objets,
@@ -16,7 +16,7 @@ la hauteur et la largeur des cartes de caractéristiques intermédiaires
 pour les ramener à celles de l'image d'entrée :
 ceci est réalisé par
 la couche convolutive transposée
-introduite dans :numref:`sec_transposed_conv` .
+introduite dans :numref:`sec_transposed_conv`.
 Par conséquent,
 la sortie de classification
 et l'image d'entrée 
@@ -49,7 +49,7 @@ from torch.nn import functional as F
 ## Le modèle
 
 Nous décrivons ici la conception de base du modèle de réseau entièrement convolutif. 
-Comme indiqué dans :numref:`fig_fcn` ,
+Comme indiqué dans :numref:`fig_fcn`,
 ce modèle utilise d'abord un CNN pour extraire les caractéristiques de l'image,
 puis transforme le nombre de canaux en
 le nombre de classes
@@ -58,7 +58,7 @@ et enfin transforme la hauteur et la largeur de
 les cartes de caractéristiques
 en celles de
 de l'image d'entrée via
-la convolution transposée introduite dans :numref:`sec_transposed_conv` . 
+la convolution transposée introduite dans :numref:`sec_transposed_conv`. 
 Par conséquent,
 la sortie du modèle a la même hauteur et la même largeur que l'image d'entrée,
 où le canal de sortie contient les classes prédites
@@ -108,7 +108,7 @@ net = nn.Sequential(*list(pretrained_net.children())[:-2])
 
 Étant donné une entrée dont la hauteur et la largeur sont respectivement de 320 et 480,
 la propagation vers l'avant de `net`
- réduit la hauteur et la largeur de l'entrée à 1/32 de l'original, soit 10 et 15.
+réduit la hauteur et la largeur de l'entrée à 1/32 de l'original, soit 10 et 15.
 
 ```{.python .input}
 #@tab mxnet
@@ -125,7 +125,7 @@ net(X).shape
 Ensuite, nous [**utilisons une couche convolutive $1\times 1$ pour transformer le nombre de canaux de sortie en nombre de classes (21) du jeu de données Pascal VOC2012.**]
 Enfin, nous devons (**augmenter la hauteur et la largeur des cartes de caractéristiques de 32 fois**) pour les ramener à la hauteur et à la largeur de l'image d'entrée. 
 Rappelez-vous comment calculer 
-la forme de sortie d'une couche convolutive dans :numref:`sec_padding` . 
+la forme de sortie d'une couche convolutive dans :numref:`sec_padding`. 
 Depuis $(320-64+16\times2+32)/32=10$ et $(480-64+16\times2+32)/32=15$, nous construisons une couche convolutive transposée avec un pas de $32$, 
 en fixant
 la hauteur et la largeur du noyau
@@ -157,7 +157,7 @@ net.add_module('transpose_conv', nn.ConvTranspose2d(num_classes, num_classes,
 ## [**Initialisation des couches convolutionnelles transposées**]
 
 
- Nous savons déjà que
+Nous savons déjà que
 les couches convolutionnelles transposées peuvent augmenter
 la hauteur et la largeur des cartes de caractéristiques
 .
@@ -301,7 +301,7 @@ net.transpose_conv.weight.data.copy_(W);
 
 Nous lisons
 le jeu de données de segmentation sémantique
-tel que présenté dans :numref:`sec_semantic_segmentation` . 
+tel que présenté dans :numref:`sec_semantic_segmentation`. 
 La forme de l'image de sortie du recadrage aléatoire est
 spécifiée comme $320\times 480$: la hauteur et la largeur sont toutes deux divisibles par $32$.
 
@@ -314,8 +314,8 @@ train_iter, test_iter = d2l.load_data_voc(batch_size, crop_size)
 ## [**Training**]
 
 
- Nous pouvons maintenant entraîner notre réseau entièrement convolutif construit
-. 
+Nous pouvons maintenant entraîner notre réseau entièrement convolutif construit.
+
 La fonction de perte et le calcul de la précision ici
 ne sont pas essentiellement différents de ceux de la classification d'images des chapitres précédents. 
 Comme nous utilisons le canal de sortie de la couche convolutive transposée
@@ -349,7 +349,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ## [**Prédiction**]
 
 
- Lors de la prédiction, nous devons normaliser l'image d'entrée
+Lors de la prédiction, nous devons normaliser l'image d'entrée
 dans chaque canal et transformer l'image dans le format d'entrée quadridimensionnel requis par le CNN.
 
 ```{.python .input}
@@ -408,9 +408,9 @@ pour prédire la classe.
 
 Pour simplifier, nous ne lisons que quelques grandes images de test,
 et recadrons une zone $320\times480$ pour la prédiction en partant du coin supérieur gauche d'une image.
-Pour ces images de test, nous imprimons les zones rognées
-, les résultats de prédiction
-,
+Pour ces images de test, nous imprimons les zones rognées,
+les résultats de prédiction,
+
 et la vérité du sol ligne par ligne.
 
 ```{.python .input}
@@ -452,7 +452,7 @@ d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2);
 1. Si nous utilisons l'initialisation de Xavier pour la couche convolutionnelle transposée dans l'expérience, comment le résultat change-t-il ?
 1. Pouvez-vous améliorer davantage la précision du modèle en réglant les hyperparamètres ?
 1. Prédisez les classes de tous les pixels des images de test.
-1. L'article original sur les réseaux entièrement convolutifs utilise également les sorties de certaines couches CNN intermédiaires :cite:`Long.Shelhamer.Darrell.2015` . Essayez d'implémenter cette idée.
+1. L'article original sur les réseaux entièrement convolutifs utilise également les sorties de certaines couches CNN intermédiaires :cite:`Long.Shelhamer.Darrell.2015`. Essayez d'implémenter cette idée.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/377)

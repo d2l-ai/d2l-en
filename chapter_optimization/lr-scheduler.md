@@ -1,12 +1,12 @@
 # Taux d'apprentissage Planification
 :label:`sec_scheduler` 
 
- Jusqu'à présent, nous nous sommes principalement concentrés sur les *algorithmes d'optimisation* de la manière de mettre à jour les vecteurs de poids plutôt que sur le *taux* auquel ils sont mis à jour. Néanmoins, l'ajustement du taux d'apprentissage est souvent tout aussi important que l'algorithme lui-même. Plusieurs aspects sont à prendre en compte :
+Jusqu'à présent, nous nous sommes principalement concentrés sur les *algorithmes d'optimisation* de la manière de mettre à jour les vecteurs de poids plutôt que sur le *taux* auquel ils sont mis à jour. Néanmoins, l'ajustement du taux d'apprentissage est souvent tout aussi important que l'algorithme lui-même. Plusieurs aspects sont à prendre en compte :
 
 * De toute évidence, l'ampleur du taux d'apprentissage est importante. S'il est trop grand, l'optimisation diverge, s'il est trop petit, l'apprentissage prend trop de temps ou nous nous retrouvons avec un résultat sous-optimal. Nous avons vu précédemment que le nombre de conditions du problème est important (voir par exemple :numref:`sec_momentum` pour plus de détails). Intuitivement, il s'agit du rapport entre la quantité de changement dans la direction la moins sensible et la direction la plus sensible.
-* Deuxièmement, le taux de décroissance est tout aussi important. Si le taux d'apprentissage reste élevé, nous pouvons simplement finir par rebondir autour du minimum et donc ne pas atteindre l'optimalité. :numref:`sec_minibatch_sgd` en a discuté de manière assez détaillée et nous avons analysé les garanties de performance dans :numref:`sec_sgd` . En bref, nous voulons que le taux décroisse, mais probablement plus lentement que $\mathcal{O}(t^{-\frac{1}{2}})$ qui serait un bon choix pour les problèmes convexes.
+* Deuxièmement, le taux de décroissance est tout aussi important. Si le taux d'apprentissage reste élevé, nous pouvons simplement finir par rebondir autour du minimum et donc ne pas atteindre l'optimalité. :numref:`sec_minibatch_sgd` en a discuté de manière assez détaillée et nous avons analysé les garanties de performance dans :numref:`sec_sgd`. En bref, nous voulons que le taux décroisse, mais probablement plus lentement que $\mathcal{O}(t^{-\frac{1}{2}})$ qui serait un bon choix pour les problèmes convexes.
 * Un autre aspect tout aussi important est l'*initialisation*. Il s'agit à la fois de la façon dont les paramètres sont définis initialement (voir :numref:`sec_numerical_stability` pour plus de détails) et de la façon dont ils évoluent initialement. C'est ce qu'on appelle le *warmup*, c'est-à-dire la rapidité avec laquelle on commence à se rapprocher de la solution. De grandes étapes au début peuvent ne pas être bénéfiques, en particulier parce que l'ensemble initial de paramètres est aléatoire. Les directions de mise à jour initiales peuvent également être tout à fait insignifiantes.
-* Enfin, il existe un certain nombre de variantes d'optimisation qui effectuent un ajustement cyclique du taux d'apprentissage. Cela dépasse le cadre du présent chapitre. Nous recommandons au lecteur d'examiner les détails dans :cite:`Izmailov.Podoprikhin.Garipov.ea.2018` , par exemple, comment obtenir de meilleures solutions en faisant la moyenne sur un *chemin* entier de paramètres.
+* Enfin, il existe un certain nombre de variantes d'optimisation qui effectuent un ajustement cyclique du taux d'apprentissage. Cela dépasse le cadre du présent chapitre. Nous recommandons au lecteur d'examiner les détails dans :cite:`Izmailov.Podoprikhin.Garipov.ea.2018`, par exemple, comment obtenir de meilleures solutions en faisant la moyenne sur un *chemin* entier de paramètres.
 
 Étant donné que la gestion des taux d'apprentissage nécessite beaucoup de détails, la plupart des cadres d'apprentissage profond disposent d'outils permettant de traiter cette question automatiquement. Dans le présent chapitre, nous passerons en revue les effets que les différents horaires ont sur la précision et nous montrerons également comment cela peut être géré efficacement via un *planificateur de taux d'apprentissage*.
 
@@ -370,7 +370,7 @@ train(net, train_iter, test_iter, num_epochs, lr,
 
 ### Planificateur en cosinus
 
-Une heuristique plutôt déroutante a été proposée par :cite:`Loshchilov.Hutter.2016` . Elle s'appuie sur l'observation que nous ne voulons peut-être pas diminuer trop radicalement le taux d'apprentissage au début et, de plus, que nous voulons peut-être "affiner" la solution à la fin en utilisant un taux d'apprentissage très faible. Il en résulte un programme de type cosinus avec la forme fonctionnelle suivante pour des taux d'apprentissage dans la plage $t \in [0, T]$.
+Une heuristique plutôt déroutante a été proposée par :cite:`Loshchilov.Hutter.2016`. Elle s'appuie sur l'observation que nous ne voulons peut-être pas diminuer trop radicalement le taux d'apprentissage au début et, de plus, que nous voulons peut-être "affiner" la solution à la fin en utilisant un taux d'apprentissage très faible. Il en résulte un programme de type cosinus avec la forme fonctionnelle suivante pour des taux d'apprentissage dans la plage $t \in [0, T]$.
 
 $$\eta_t = \eta_T + \frac{\eta_0 - \eta_T}{2} \left(1 + \cos(\pi t/T)\right)$$
 
@@ -479,7 +479,7 @@ train(net, train_iter, test_iter, num_epochs, lr,
       custom_callback=LearningRateScheduler(scheduler))
 ```
 
-L'échauffement peut être appliqué à n'importe quel ordonnanceur (pas seulement le cosinus). Pour une discussion plus détaillée des ordonnanceurs de taux d'apprentissage et de nombreuses autres expériences, voir également :cite:`Gotmare.Keskar.Xiong.ea.2018` . Ils constatent notamment qu'une phase de réchauffement limite l'ampleur de la divergence des paramètres dans les réseaux très profonds. Cela est intuitivement logique puisque nous nous attendons à une divergence significative due à une initialisation aléatoire dans les parties du réseau qui prennent le plus de temps pour progresser au début.
+L'échauffement peut être appliqué à n'importe quel ordonnanceur (pas seulement le cosinus). Pour une discussion plus détaillée des ordonnanceurs de taux d'apprentissage et de nombreuses autres expériences, voir également :cite:`Gotmare.Keskar.Xiong.ea.2018`. Ils constatent notamment qu'une phase de réchauffement limite l'ampleur de la divergence des paramètres dans les réseaux très profonds. Cela est intuitivement logique puisque nous nous attendons à une divergence significative due à une initialisation aléatoire dans les parties du réseau qui prennent le plus de temps pour progresser au début.
 
 ## Résumé
 

@@ -2,15 +2,15 @@
 :label:`sec_language-model` 
 
  
- Dans :numref:`sec_text-sequence` , nous voyons comment mapper des séquences de texte en jetons, ces jetons pouvant être considérés comme une séquence d'observations discrètes, telles que des mots ou des caractères. Supposons que les tokens d'une séquence de texte de longueur $T$ soient à leur tour $x_1, x_2, \ldots, x_T$.
+Dans :numref:`sec_text-sequence`, nous voyons comment mapper des séquences de texte en jetons, ces jetons pouvant être considérés comme une séquence d'observations discrètes, telles que des mots ou des caractères. Supposons que les tokens d'une séquence de texte de longueur $T$ soient à leur tour $x_1, x_2, \ldots, x_T$.
 L'objectif des *modèles de langage*
 est d'estimer la probabilité conjointe de l'ensemble de la séquence :
 
 $$P(x_1, x_2, \ldots, x_T),$$ 
 
- où les outils statistiques
+où les outils statistiques
 dans :numref:`sec_sequence` 
- peuvent être appliqués.
+peuvent être appliqués.
 
 Les modèles de langage sont incroyablement utiles. Par exemple, un modèle de langage idéal serait capable de générer du texte naturel par lui-même, simplement en dessinant un jeton à la fois $x_t \sim P(x_t \mid x_{t-1}, \ldots, x_1)$.
 Contrairement au singe qui utilise une machine à écrire, tout texte issu d'un tel modèle passerait pour un langage naturel, par exemple un texte anglais. De plus, il serait suffisant pour générer un dialogue significatif, simplement en conditionnant le texte à des fragments de dialogue antérieurs.
@@ -20,8 +20,8 @@ Néanmoins, les modèles de langage sont d'une grande utilité, même sous leur 
 Par exemple, les expressions "reconnaître la parole" et "détruire une belle plage" se ressemblent beaucoup.
 Cela peut provoquer une ambiguïté dans la reconnaissance de la parole,
 qui est facilement résolue par un modèle de langage qui rejette la deuxième traduction comme étant farfelue.
-De même, dans un algorithme de résumé de documents
-, il est utile de savoir que "le chien mord l'homme" est beaucoup plus fréquent que "l'homme mord le chien", ou que "je veux manger grand-mère" est une déclaration plutôt inquiétante, alors que "je veux manger, grand-mère" est beaucoup plus bénin.
+De même, dans un algorithme de résumé de documents,
+il est utile de savoir que "le chien mord l'homme" est beaucoup plus fréquent que "l'homme mord le chien", ou que "je veux manger grand-mère" est une déclaration plutôt inquiétante, alors que "je veux manger, grand-mère" est beaucoup plus bénin.
 
 
 ## Apprendre des modèles de langage
@@ -32,14 +32,14 @@ Commençons par appliquer les règles de probabilité de base :
 
 $$P(x_1, x_2, \ldots, x_T) = \prod_{t=1}^T P(x_t  \mid  x_1, \ldots, x_{t-1}).$$ 
 
- Par exemple, 
+Par exemple, 
 la probabilité d'une séquence de texte contenant quatre mots serait donnée comme suit :
 
 $$P(\text{deep}, \text{learning}, \text{is}, \text{fun}) =  P(\text{deep}) P(\text{learning}  \mid  \text{deep}) P(\text{is}  \mid  \text{deep}, \text{learning}) P(\text{fun}  \mid  \text{deep}, \text{learning}, \text{is}).$$ 
 
 ### Modèles de Markov et $n$-grammes
 
-Parmi ces analyses de modèles de séquences dans :numref:`sec_sequence` ,
+Parmi ces analyses de modèles de séquences dans :numref:`sec_sequence`,
 appliquons les modèles de Markov à la modélisation du langage.
 Une distribution sur les séquences satisfait à la propriété de Markov du premier ordre si $P(x_{t+1} \mid x_t, \ldots, x_1) = P(x_{t+1} \mid x_t)$. Les ordres supérieurs correspondent à des dépendances plus longues. Cela conduit à un certain nombre d'approximations que nous pourrions appliquer pour modéliser une séquence :
 
@@ -75,12 +75,12 @@ de toute phrase commençant par le mot "deep". Une approche légèrement moins p
 consisterait à compter toutes les occurrences de
 le mot "deep" et à les diviser par le nombre total de mots dans
 le corpus.
-Cette méthode fonctionne assez bien, en particulier pour les mots fréquents
-. Ensuite, nous pourrions essayer d'estimer
+Cette méthode fonctionne assez bien, en particulier pour les mots fréquents.
+Ensuite, nous pourrions essayer d'estimer
 
 $$\hat{P}(\text{learning} \mid \text{deep}) = \frac{n(\text{deep, learning})}{n(\text{deep})},$$ 
 
- où $n(x)$ et $n(x, x')$ sont le nombre d'occurrences de singletons
+où $n(x)$ et $n(x, x')$ sont le nombre d'occurrences de singletons
 et de paires de mots consécutifs, respectivement.
 Malheureusement, 
 estimer la probabilité
@@ -88,7 +88,7 @@ d'une paire de mots est un peu plus difficile, car les occurrences
 de "deep learning" sont beaucoup moins fréquentes. 
 En particulier, pour certaines combinaisons de mots inhabituelles, il peut être difficile de trouver
 suffisamment d'occurrences pour obtenir des estimations précises.
-Comme le suggèrent les résultats empiriques de :numref:`subsec_natural-lang-stat` ,
+Comme le suggèrent les résultats empiriques de :numref:`subsec_natural-lang-stat`,
 les choses se gâtent pour les combinaisons de trois mots et plus.
 Il y aura de nombreuses combinaisons plausibles de trois mots que nous ne verrons probablement pas dans notre ensemble de données.
 À moins de trouver une solution pour attribuer à ces combinaisons de mots un nombre non nul, nous ne pourrons pas les utiliser dans un modèle de langage. Si l'ensemble de données est petit ou si les mots sont très rares, il se peut que nous ne trouvions même pas un seul d'entre eux.
@@ -115,13 +115,13 @@ lorsque $\epsilon_1 = 0$, aucun lissage n'est appliqué ;
 lorsque $\epsilon_1$ s'approche de l'infini positif,
 $\hat{P}(x)$ s'approche de la probabilité uniforme $1/m$. 
 Ce qui précède est une variante plutôt primitive de ce que
-d'autres techniques peuvent accomplir :cite:`Wood.Gasthaus.Archambeau.ea.2011` .
+d'autres techniques peuvent accomplir :cite:`Wood.Gasthaus.Archambeau.ea.2011`.
 
 
 Malheureusement, les modèles de ce type deviennent rapidement difficiles à manier
 pour les raisons suivantes. 
 Premièrement, 
-comme nous l'avons vu dans :numref:`subsec_natural-lang-stat` ,
+comme nous l'avons vu dans :numref:`subsec_natural-lang-stat`,
 de nombreux $n$-grammes se produisent très rarement, 
 rendant le lissage de Laplace plutôt inadapté à la modélisation du langage.
 Deuxièmement, nous devons stocker tous les comptes.
@@ -131,8 +131,8 @@ Il est assez difficile d'ajuster de tels modèles à des contextes supplémentai
 alors que les modèles de langage basés sur l'apprentissage profond sont bien adaptés pour
 prendre cela en compte.
 Enfin, il est presque certain que les longues séquences de mots
-sont nouvelles, et qu'un modèle qui se contente de compter la fréquence des séquences de mots déjà vues (
-) ne donnera pas de bons résultats.
+sont nouvelles, et qu'un modèle qui se contente de compter la fréquence des séquences de mots déjà vues 
+ne donnera pas de bons résultats.
 Par conséquent, nous nous concentrons sur l'utilisation des réseaux neuronaux pour la modélisation du langage
 dans le reste du chapitre.
 
@@ -140,7 +140,7 @@ dans le reste du chapitre.
 ## Perplexité
 :label:`subsec_perplexity` 
 
- Ensuite, voyons comment mesurer la qualité d'un modèle de langue, qui sera utilisée pour évaluer nos modèles dans les sections suivantes.
+Ensuite, voyons comment mesurer la qualité d'un modèle de langue, qui sera utilisée pour évaluer nos modèles dans les sections suivantes.
 L'un des moyens consiste à vérifier le caractère surprenant du texte.
 Un bon modèle de langage est capable de prédire avec
 des tokens de haute précision que ce que nous allons voir ensuite.
@@ -156,8 +156,8 @@ L'exemple 2 est considérablement plus mauvais, car il produit une extension qui
 
 Nous pourrions mesurer la qualité du modèle en calculant la vraisemblance de la séquence.
 Malheureusement, il s'agit d'un nombre difficile à comprendre et à comparer.
-Après tout, les séquences les plus courtes sont beaucoup plus susceptibles de se produire que les plus longues,
-. Ainsi, l'évaluation du modèle sur le magnum opus de Tolstoï
+Après tout, les séquences les plus courtes sont beaucoup plus susceptibles de se produire que les plus longues.
+Ainsi, l'évaluation du modèle sur le magnum opus de Tolstoï
 *Guerre et Paix* produira inévitablement une probabilité beaucoup plus faible que, par exemple, sur la novella de Saint-Exupéry *Le Petit Prince*. Ce qui manque, c'est l'équivalent d'une moyenne.
 
 La théorie de l'information est utile ici.
@@ -172,14 +172,14 @@ Nous pouvons donc la mesurer par la perte d'entropie croisée moyennée sur
 sur tous les tokens $n$ d'une séquence :
 
 $$\frac{1}{n} \sum_{t=1}^n -\log P(x_t \mid x_{t-1}, \ldots, x_1),$$ 
- :eqlabel:`eq_avg_ce_for_lm` 
+:eqlabel:`eq_avg_ce_for_lm` 
 
- où $P$ est donné par un modèle de langage et $x_t$ est le token réel observé au pas de temps $t$ de la séquence.
+où $P$ est donné par un modèle de langage et $x_t$ est le token réel observé au pas de temps $t$ de la séquence.
 Les performances sur des documents de longueurs différentes sont ainsi comparables. Pour des raisons historiques, les scientifiques du traitement du langage naturel préfèrent utiliser une quantité appelée *perplexité*. En bref, il s'agit de l'exponentielle de :eqref:`eq_avg_ce_for_lm` :
 
 $$\exp\left(-\frac{1}{n} \sum_{t=1}^n \log P(x_t \mid x_{t-1}, \ldots, x_1)\right).$$ 
 
- La perplexité peut être comprise comme la moyenne géométrique du nombre de choix réels qui s'offrent à nous lorsque nous décidons du prochain jeton à sélectionner. Examinons un certain nombre de cas :
+La perplexité peut être comprise comme la moyenne géométrique du nombre de choix réels qui s'offrent à nous lorsque nous décidons du prochain jeton à sélectionner. Examinons un certain nombre de cas :
 
 * Dans le meilleur des cas, le modèle estime toujours parfaitement la probabilité du jeton cible à 1. Dans ce cas, la perplexité du modèle est de 1.
 * Dans le pire des cas, le modèle prédit toujours la probabilité du jeton cible à 0. Dans cette situation, la perplexité est une infinité positive.
@@ -212,7 +212,7 @@ import tensorflow as tf
 ## Partitionnement des séquences
 :label:`subsec_partitioning-seqs` 
 
- Nous allons concevoir des modèles de langage à l'aide de réseaux neuronaux
+Nous allons concevoir des modèles de langage à l'aide de réseaux neuronaux
 et utiliser la perplexité pour évaluer 
 la capacité du modèle à 
 prédire le prochain token en fonction de l'ensemble actuel de tokens
@@ -250,7 +250,7 @@ Chaque sous-séquence sera utilisée comme une séquence d'entrée dans le modè
 Pour la modélisation du langage,
 le but est de prédire le prochain token sur la base des tokens que nous avons vus jusqu'à présent, donc les cibles (étiquettes) sont la séquence originale, décalée d'un token.
 La séquence cible pour toute séquence d'entrée $\mathbf x_t$
- est $\mathbf x_{t+1}$ avec la longueur $n$.
+est $\mathbf x_{t+1}$ avec la longueur $n$.
 
 ![Obtaining 5 pairs of input sequences and target sequences from partitioned length-5 subsequences.](../img/lang-model-data.svg) 
 :label:`fig_lang_model_data` 

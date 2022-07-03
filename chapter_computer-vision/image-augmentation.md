@@ -1,7 +1,7 @@
 # Image Augmentation
 :label:`sec_image_augmentation` 
 
- Dans :numref:`sec_alexnet` , 
+Dans :numref:`sec_alexnet`, 
 nous avons mentionné que de grands ensembles de données 
 sont une condition préalable
 pour le succès de
@@ -118,7 +118,7 @@ apply(img, torchvision.transforms.RandomVerticalFlip())
 ```
 
 Dans l'image d'exemple que nous avons utilisée, le chat se trouve au milieu de l'image, mais ce n'est peut-être pas le cas en général. 
-Dans :numref:`sec_pooling` , nous avons expliqué que la couche de mise en commun peut réduire la sensibilité d'une couche convolutive à la position de la cible.
+Dans :numref:`sec_pooling`, nous avons expliqué que la couche de mise en commun peut réduire la sensibilité d'une couche convolutive à la position de la cible.
 En outre, nous pouvons également recadrer l'image de manière aléatoire pour que les objets apparaissent à différentes positions dans l'image et à différentes échelles, ce qui peut également réduire la sensibilité d'un modèle à la position cible.
 
 Dans le code ci-dessous, nous [**recadrons de manière aléatoire**] une zone avec une surface de $10\% \sim 100\%$ de la zone d'origine à chaque fois, et le rapport entre la largeur et la hauteur de cette zone est choisi de manière aléatoire parmi $0.5 \sim 2$. Ensuite, la largeur et la hauteur de la région sont toutes deux mises à l'échelle à 200 pixels. 
@@ -253,16 +253,16 @@ La fonction `transform_first` fournie par les ensembles de données
 de Gluon applique l'augmentation d'image au premier élément de chaque exemple d'entraînement
 (image et étiquette), c'est-à-dire l'image. 
 Pour
-une introduction détaillée à `DataLoader`, veuillez vous référer à :numref:`sec_fashion_mnist` .
+une introduction détaillée à `DataLoader`, veuillez vous référer à :numref:`sec_fashion_mnist`.
 :end_tab: 
 
  :begin_tab:`pytorch` 
- Ensuite, nous [**définissons une fonction auxiliaire pour faciliter la lecture de l'image et
+Ensuite, nous [**définissons une fonction auxiliaire pour faciliter la lecture de l'image et
 l'application de l'augmentation d'image**]. 
 L'argument `transform` fourni par le jeu de données
 de PyTorch applique l'augmentation pour transformer les images.
 Pour
-une introduction détaillée à `DataLoader`, veuillez vous référer à :numref:`sec_fashion_mnist` .
+une introduction détaillée à `DataLoader`, veuillez vous référer à :numref:`sec_fashion_mnist`.
 :end_tab:
 
 ```{.python .input}
@@ -290,7 +290,7 @@ Nous entraînons le modèle ResNet-18 de
 :numref:`sec_resnet` sur le jeu de données
 CIFAR-10.
 Rappelez-vous l'introduction à l'entraînement multi-GPU de
-dans :numref:`sec_multi_gpu_concise` .
+dans :numref:`sec_multi_gpu_concise`.
 Dans ce qui suit,
 [**nous définissons une fonction pour entraîner et évaluer le modèle en utilisant plusieurs GPU**].
 

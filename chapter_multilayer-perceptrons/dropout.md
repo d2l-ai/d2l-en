@@ -39,7 +39,7 @@ et l'exigence qu'elle soit résiliente
 aux perturbations de l'entrée.
 
 Puis, en 2014, Srivastava et al. :cite:`Srivastava.Hinton.Krizhevsky.ea.2014` 
- ont développé une idée astucieuse pour appliquer l'idée de Bishop
+ont développé une idée astucieuse pour appliquer l'idée de Bishop
 également aux couches internes d'un réseau.
 Leur idée, appelée *dropout*, consiste à
 injecter du bruit tout en calculant
@@ -85,8 +85,8 @@ produisant un point perturbé \mathbf{x} $\mathbf{x}' = \mathbf{x} + \epsilon$.
 En espérance, $E[\mathbf{x}'] = \mathbf{x}$.
 
 Dans la régularisation par abandon standard,
-on élimine à zéro une certaine fraction des nœuds dans chaque couche
-, puis on *débiaise* chaque couche en normalisant
+on élimine à zéro une certaine fraction des nœuds dans chaque couche,
+puis on *débiaise* chaque couche en normalisant
 par la fraction de nœuds qui ont été conservés (non éliminés).
 En d'autres termes,
 avec une *probabilité d'abandon* $p$,
@@ -103,7 +103,7 @@ h' =
 \end{aligned}
 $$
 
- Par construction, l'espérance reste inchangée, c'est-à-dire que  $E[h'] = h$.
+Par construction, l'espérance reste inchangée, c'est-à-dire que  $E[h'] = h$.
 
 ## Dropout en pratique
 
@@ -113,7 +113,7 @@ Lorsque nous appliquons le dropout à une couche cachée,
 en mettant à zéro chaque unité cachée avec une probabilité $p$,
 le résultat peut être considéré comme un réseau
 contenant uniquement un sous-ensemble des neurones d'origine.
-Dans :numref:`fig_dropout2` , $h_2$ et $h_5$ sont supprimés.
+Dans :numref:`fig_dropout2`, $h_2$ et $h_5$ sont supprimés.
 Par conséquent, le calcul des sorties
 ne dépend plus de $h_2$ ou $h_5$
 et leur gradient respectif disparaît également
@@ -149,8 +149,8 @@ Ensuite, nous pouvons conserver les nœuds pour lesquels l'échantillon correspo
 est supérieur à $p$, en abandonnant les autres.
 
 Dans le code suivant, nous (**implémentons une fonction `dropout_layer`
- qui élimine les éléments de l'entrée du tenseur `X`
- avec la probabilité `dropout`**),
+qui élimine les éléments de l'entrée du tenseur `X`
+avec la probabilité `dropout`**),
 en remettant à l'échelle le reste comme décrit ci-dessus :
 en divisant les survivants par `1.0-dropout`.
 
@@ -303,7 +303,7 @@ trainer.fit(model, data)
 ### [**Mise en œuvre concise**]
 
 Avec des API de haut niveau, tout ce que nous avons à faire est d'ajouter une couche `Dropout`
- après chaque couche entièrement connectée,
+après chaque couche entièrement connectée,
 en passant la probabilité de décrochage
 comme seul argument à son constructeur.
 

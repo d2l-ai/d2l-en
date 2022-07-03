@@ -1,7 +1,7 @@
 # Séquences textuelles
 :label:`sec_text-sequence` 
 
- Nous avons examiné et évalué
+Nous avons examiné et évalué
 les outils statistiques
 et les défis de la prédiction
 pour les données de séquence.
@@ -100,9 +100,9 @@ et ce qui constitue un token
 (par exemple, des caractères ou des mots)
 est un choix de conception.
 Bien qu'il soit issu du traitement du langage naturel,
-le concept de token devient également populaire dans le domaine de la vision par ordinateur
-, 
-par exemple pour faire référence à des patchs d'images :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` .
+le concept de token devient également populaire dans le domaine de la vision par ordinateur,
+ 
+par exemple pour faire référence à des patchs d'images :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
 Ci-dessous, nous convertissons notre texte prétraité en caractères.
 
 ```{.python .input  n=7}
@@ -206,8 +206,8 @@ len(corpus), len(vocab)
 :label:`subsec_natural-lang-stat` 
 
  
- En utilisant le corpus réel et la classe `Vocab`
- définie ci-dessus,
+En utilisant le corpus réel et la classe `Vocab`
+définie ci-dessus,
 étudions également les statistiques des tokens de mots
 .
 Nous construisons un vocabulaire basé sur le corpus *The Time Machine* et imprimons les 10 mots les plus fréquents.
@@ -237,13 +237,13 @@ qui stipule que la fréquence $n_i$ du mot $i^\mathrm{th}$ le plus fréquent
 est :
 
 $$n_i \propto \frac{1}{i^\alpha},$$ 
- :eqlabel:`eq_zipf_law` 
+:eqlabel:`eq_zipf_law` 
 
- ce qui est équivalent à
+ce qui est équivalent à
 
 $$\log n_i = -\alpha \log i + c,$$ 
 
- où $\alpha$ est l'exposant qui caractérise la distribution et $c$ est une constante.
+où $\alpha$ est l'exposant qui caractérise la distribution et $c$ est une constante.
 Cela devrait déjà nous faire réfléchir si nous voulons modéliser les mots par des statistiques de comptage.
 Après tout, nous allons considérablement surestimer la fréquence de la queue, également connue sous le nom de mots peu fréquents. Mais [**qu'en est-il des autres combinaisons de mots, comme deux mots consécutifs (bigrammes), trois mots consécutifs (trigrammes)**], et au-delà ?
 Voyons si la fréquence des bigrammes se comporte de la même manière que la fréquence des mots simples (unigrammes).
@@ -277,7 +277,7 @@ d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token: x',
 ```
 
 Cette figure est très intéressante.
-Premièrement, au-delà des mots unigrammes, les séquences de mots semblent également suivre la loi de Zipf, bien qu'avec un exposant plus petit $\alpha$ in :eqref:`eq_zipf_law` , selon la longueur de la séquence.
+Premièrement, au-delà des mots unigrammes, les séquences de mots semblent également suivre la loi de Zipf, bien qu'avec un exposant plus petit $\alpha$ in :eqref:`eq_zipf_law`, selon la longueur de la séquence.
 Deuxièmement, le nombre de programmes distincts $n$ n'est pas très élevé. Cela nous permet d'espérer qu'il y a beaucoup de structure dans le langage.
 Troisièmement, de nombreux $n$-grammes apparaissent très rarement.
 Cela rend certaines méthodes inadaptées à la modélisation du langage et motive l'utilisation de modèles d'apprentissage profond.

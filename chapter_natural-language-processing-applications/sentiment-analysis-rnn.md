@@ -2,18 +2,18 @@
 :label:`sec_sentiment_rnn` 
 
  
- Comme pour les tâches de similarité et d'analogie de mots,
+Comme pour les tâches de similarité et d'analogie de mots,
 nous pouvons également appliquer des vecteurs de mots pré-entraînés
 à l'analyse des sentiments.
 Étant donné que l'ensemble de données de critiques IMDb
 dans :numref:`sec_sentiment` 
- n'est pas très grand,
+n'est pas très grand,
 l'utilisation de représentations textuelles
 qui ont été pré-entraînées
 sur des corpus à grande échelle
 peut réduire le surajustement du modèle.
 À titre d'exemple spécifique
-illustré dans :numref:`fig_nlp-map-sa-rnn` ,
+illustré dans :numref:`fig_nlp-map-sa-rnn`,
 nous représenterons chaque token
 en utilisant le modèle GloVe pré-entraîné,
 et nous introduirons ces représentations de token
@@ -21,7 +21,7 @@ dans un RNN bidirectionnel multicouche
 pour obtenir la représentation de la séquence textuelle,
 qui sera
 transformée en résultats d'analyse de sentiment 
- :cite:`Maas.Daly.Pham.ea.2011` .
+:cite:`Maas.Daly.Pham.ea.2011`.
 Pour la même application en aval,
 nous envisagerons plus tard un choix architectural différent
 .
@@ -183,7 +183,7 @@ embeds.shape
 
 Nous utilisons ces vecteurs de mots pré-entraînés
 
- pour représenter les tokens dans les revues
+pour représenter les tokens dans les revues
 et nous ne mettrons pas à jour
 ces vecteurs pendant la formation.
 

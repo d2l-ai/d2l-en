@@ -1,7 +1,7 @@
 # Couches et modules
 :label:`sec_model_construction` 
 
- Lors de notre première présentation des réseaux neuronaux,
+Lors de notre première présentation des réseaux neuronaux,
 nous nous sommes concentrés sur les modèles linéaires à sortie unique.
 Ici, le modèle entier est constitué d'un seul neurone.
 Notez qu'un neurone unique
@@ -18,8 +18,8 @@ Tout comme les neurones individuels, les couches
 et (iii) sont décrites par un ensemble de paramètres réglables.
 Lorsque nous avons travaillé sur la régression softmax,
 une seule couche constituait elle-même le modèle.
-Cependant, même lorsque nous avons ensuite introduit les MLP (
-),
+Cependant, même lorsque nous avons ensuite introduit les MLP ,
+
 nous pouvions toujours considérer que le modèle
 conservait cette même structure de base.
 
@@ -53,7 +53,7 @@ sont courants dans la pratique.
 L'architecture ResNet mentionnée ci-dessus
 a remporté les concours de vision par ordinateur ImageNet et COCO 2015
 pour la reconnaissance et la détection :cite:`He.Zhang.Ren.ea.2016` 
- et reste une architecture de référence pour de nombreuses tâches de vision.
+et reste une architecture de référence pour de nombreuses tâches de vision.
 Des architectures similaires dans lesquelles les couches sont disposées
 selon divers motifs répétitifs
 sont désormais omniprésentes dans d'autres domaines,
@@ -66,7 +66,7 @@ un composant composé de plusieurs couches,
 ou le modèle entier lui-même !
 L'un des avantages du travail avec l'abstraction des modules
 est qu'ils peuvent être combinés dans des artefacts plus grands,
-souvent de manière récursive. Ceci est illustré sur :numref:`fig_blocks` . En définissant un code pour générer à la demande des modules
+souvent de manière récursive. Ceci est illustré sur :numref:`fig_blocks`. En définissant un code pour générer à la demande des modules
 d'une complexité arbitraire,
 nous pouvons écrire un code étonnamment compact
 tout en implémentant des réseaux neuronaux complexes.
@@ -156,7 +156,7 @@ Elle maintient une liste ordonnée de composants `Block`s.
 La méthode `add` facilite simplement
 l'ajout de chaque `Block` successif à la liste.
 Notez que chaque couche est une instance de la classe `Dense`
- qui est elle-même une sous-classe de `Block`.
+qui est elle-même une sous-classe de `Block`.
 La méthode de propagation vers l'avant (`forward`) est également remarquablement simple :
 elle enchaîne chaque `Block` de la liste,
 en passant la sortie de chacun comme entrée au suivant.
@@ -175,7 +175,7 @@ En résumé, (**`nn.Sequential` définit un type spécial de `Module`**),
 la classe qui présente un module dans PyTorch.
 Elle maintient une liste ordonnée de modules constitutifs `Module`s.
 Notez que chacune des deux couches entièrement connectées est une instance de la classe `Linear`
- qui est elle-même une sous-classe de `Module`.
+qui est elle-même une sous-classe de `Module`.
 La méthode de propagation vers l'avant (`forward`) est également remarquablement simple :
 elle enchaîne chaque module de la liste,
 en passant la sortie de chacun en entrée du suivant.
@@ -192,7 +192,7 @@ En résumé, `Sequential` définit un type particulier de `keras.Model`,
 la classe qui présente un module dans Keras.
 Elle maintient une liste ordonnée de modules constitutifs `Model`s.
 Notez que chacune des deux couches entièrement connectées est une instance de la classe `Dense`
- qui est elle-même une sous-classe de `Model`.
+qui est elle-même une sous-classe de `Model`.
 La méthode de propagation vers l'avant (`call`) est également remarquablement simple :
 elle enchaîne chaque module de la liste,
 en passant la sortie de chacun en entrée du suivant.
@@ -217,7 +217,7 @@ que chaque module doit fournir :
 1. Générer une sortie en demandant à la méthode de propagation de renvoyer une valeur. Notez que la sortie peut avoir une forme différente de l'entrée. Par exemple, la première couche entièrement connectée de notre modèle ci-dessus ingère une entrée de dimension arbitraire mais renvoie une sortie de dimension 256.
 1. Calculez le gradient de sa sortie par rapport à son entrée, auquel vous pouvez accéder via sa méthode de rétropropagation. En général, cela se fait automatiquement.
 1. Stocker et fournir l'accès aux paramètres nécessaires
- pour exécuter le calcul de propagation vers l'avant.
+pour exécuter le calcul de propagation vers l'avant.
 1. Initialiser les paramètres du modèle si nécessaire.
 
 
@@ -297,8 +297,8 @@ des MLP dans le constructeur
 à chaque appel de la méthode de propagation vers l'avant.
 Notez quelques détails clés.
 Tout d'abord, notre méthode personnalisée `__init__`
- invoque la méthode `__init__`
- de la classe parente via `super().__init__()`
+invoque la méthode `__init__`
+de la classe parente via `super().__init__()`
  , ce qui nous évite d'avoir à reformuler le code passe-partout
 applicable à la plupart des modules.
 Nous instancions ensuite nos deux couches entièrement connectées,
@@ -392,13 +392,13 @@ class MySequential(tf.keras.Model):
 La méthode `add` ajoute un seul bloc
 au dictionnaire ordonné `_children`.
 Vous vous demandez peut-être pourquoi chaque Gluon `Block`
- possède un attribut `_children`
- et pourquoi nous l'avons utilisé plutôt que de définir nous-mêmes une liste Python
+possède un attribut `_children`
+et pourquoi nous l'avons utilisé plutôt que de définir nous-mêmes une liste Python
 .
 En bref, le principal avantage de `_children`
- est que, pendant l'initialisation des paramètres de notre bloc,
+est que, pendant l'initialisation des paramètres de notre bloc,
 Gluon sait qu'il doit regarder dans le dictionnaire `_children`
- pour trouver les sous-blocs dont les paramètres
+pour trouver les sous-blocs dont les paramètres
 doivent également être initialisés.
 :end_tab:
 
@@ -439,7 +439,7 @@ net(X).shape
 ```
 
 Notez que cette utilisation de `MySequential`
- est identique au code que nous avons précédemment écrit
+est identique au code que nous avons précédemment écrit
 pour la classe `Sequential`
  (comme décrit dans :numref:`sec_mlp` ).
 
@@ -561,7 +561,7 @@ notre modèle a fait quelque chose d'inhabituel.
 Nous avons exécuté une boucle while, en testant
 à la condition que sa norme $\ell_1$ soit supérieure à $1$,
 et en divisant notre vecteur de sortie par $2$
- jusqu'à ce qu'il satisfasse la condition.
+jusqu'à ce qu'il satisfasse la condition.
 Enfin, nous avons renvoyé la somme des entrées de `X`.
 À notre connaissance, aucun réseau neuronal standard
 n'effectue cette opération.

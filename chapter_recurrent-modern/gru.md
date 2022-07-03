@@ -1,7 +1,7 @@
 # Gated Recurrent Units (GRU)
 :label:`sec_gru` 
 
- Dans :numref:`sec_bptt` ,
+Dans :numref:`sec_bptt`,
 nous avons examiné comment les gradients sont calculés
 dans les RNN.
 En particulier, nous avons découvert que les produits longs des matrices peuvent conduire
@@ -10,29 +10,29 @@ Réfléchissons brièvement à ce que de telles anomalies de gradient
 signifient en pratique :
 
 * Nous pouvons rencontrer une situation dans laquelle une observation précoce est hautement
- significative pour prédire toutes les observations futures. Considérons le cas quelque peu contourné
- où la première observation contient une somme de contrôle et où le but est
- de discerner si la somme de contrôle est correcte à la fin de la séquence. Dans ce cas
-, l'influence du premier jeton est vitale. Nous aimerions disposer de certains mécanismes
- pour stocker les premières informations vitales dans une *cellule mémoire*. Sans un tel mécanisme
-, nous devrons attribuer un gradient très important à cette observation,
- puisqu'il affecte toutes les observations suivantes.
-* Nous pouvons rencontrer des situations où certains tokens ne portent aucune observation pertinente
-. Par exemple, lors de l'analyse d'une page Web, il peut y avoir du code HTML auxiliaire
- qui n'est pas pertinent pour évaluer le sentiment
- véhiculé par la page. Nous aimerions disposer d'un mécanisme permettant de *sauter* de tels tokens
- dans la représentation de l'état latent.
-* Nous pouvons rencontrer des situations où il existe une rupture logique entre les parties d'une séquence
-. Par exemple, il peut y avoir une transition entre les chapitres d'un livre
-, ou une transition entre un marché baissier et un marché haussier pour les titres. Dans ce cas,
- il serait agréable de disposer d'un moyen de *réinitialiser* notre représentation de l'état interne
+significative pour prédire toutes les observations futures. Considérons le cas quelque peu contourné
+où la première observation contient une somme de contrôle et où le but est
+de discerner si la somme de contrôle est correcte à la fin de la séquence. Dans ce cas,
+l'influence du premier jeton est vitale. Nous aimerions disposer de certains mécanismes
+pour stocker les premières informations vitales dans une *cellule mémoire*. Sans un tel mécanisme,
+ nous devrons attribuer un gradient très important à cette observation,
+puisqu'il affecte toutes les observations suivantes.
+* Nous pouvons rencontrer des situations où certains tokens ne portent aucune observation pertinente.
+Par exemple, lors de l'analyse d'une page Web, il peut y avoir du code HTML auxiliaire
+qui n'est pas pertinent pour évaluer le sentiment
+véhiculé par la page. Nous aimerions disposer d'un mécanisme permettant de *sauter* de tels tokens
+dans la représentation de l'état latent.
+* Nous pouvons rencontrer des situations où il existe une rupture logique entre les parties d'une séquence.
+Par exemple, il peut y avoir une transition entre les chapitres d'un livre,
+ou une transition entre un marché baissier et un marché haussier pour les titres. Dans ce cas,
+il serait agréable de disposer d'un moyen de *réinitialiser* notre représentation de l'état interne
 .
 
 Un certain nombre de méthodes ont été proposées pour résoudre ce problème. L'une des plus anciennes est la mémoire à long terme :cite:`Hochreiter.Schmidhuber.1997` dont nous parlerons dans
- :numref:`sec_lstm` . L'unité récurrente gated (GRU)
+ :numref:`sec_lstm`. L'unité récurrente gated (GRU)
 :cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` est une variante légèrement plus rationalisée
 qui offre souvent des performances comparables et qui est nettement plus rapide à calculer
- :cite:`Chung.Gulcehre.Cho.ea.2014` .
+ :cite:`Chung.Gulcehre.Cho.ea.2014`.
 En raison de sa simplicité, commençons par la GRU.
 
 ## Gated Hidden State
@@ -43,8 +43,8 @@ Cela signifie que nous avons des mécanismes dédiés pour
 quand un état caché doit être *mis à jour* et
 aussi quand il doit être *réinitialisé*.
 Ces mécanismes sont appris et ils répondent aux préoccupations énumérées ci-dessus.
-Par exemple, si le premier jeton est d'une grande importance
-, nous apprendrons à ne pas mettre à jour l'état caché après la première observation.
+Par exemple, si le premier jeton est d'une grande importance,
+ nous apprendrons à ne pas mettre à jour l'état caché après la première observation.
 De même, nous apprendrons à sauter les observations temporaires non pertinentes.
 Enfin, nous apprendrons à réinitialiser l'état latent chaque fois que nécessaire.
 Nous en parlons en détail ci-dessous.
@@ -55,7 +55,7 @@ Nous en parlons en détail ci-dessous.
 La première chose que nous devons introduire est
 la *porte de réinitialisation* et la *porte de mise à jour*.
 Nous les concevons comme des vecteurs avec des entrées dans $(0, 1)$
- de sorte que nous puissions effectuer des combinaisons convexes.
+de sorte que nous puissions effectuer des combinaisons convexes.
 Par exemple,
 une porte de réinitialisation nous permettrait de contrôler la quantité de l'état précédent que nous souhaitons encore mémoriser.
 De même, une porte de mise à jour nous permettrait de contrôler la part du nouvel état qui n'est qu'une copie de l'ancien.
@@ -97,29 +97,29 @@ Nous utilisons des fonctions sigmoïdes (introduites dans :numref:`sec_mlp` ) po
 Ensuite, intégrons
 la porte de réinitialisation $\mathbf{R}_t$ avec
 le mécanisme régulier de mise à jour de l'état latent
-dans :eqref:`rnn_h_with_state` .
+dans :eqref:`rnn_h_with_state`.
 Cela conduit à l'état caché candidat
 *suivant
 $\tilde{\mathbf{H}}_t \in \mathbb{R}^{n \times h}$ au pas de temps $t$:
 
 $$\tilde{\mathbf{H}}_t = \tanh(\mathbf{X}_t \mathbf{W}_{xh} + \left(\mathbf{R}_t \odot \mathbf{H}_{t-1}\right) \mathbf{W}_{hh} + \mathbf{b}_h),$$ 
- :eqlabel:`gru_tilde_H` 
+:eqlabel:`gru_tilde_H` 
 
- où $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$ et $\mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$
- sont des paramètres de poids,
+où $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$ et $\mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$
+sont des paramètres de poids,
 $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$ 
- est le biais,
+est le biais,
 et le symbole $\odot$ est l'opérateur produit (par éléments) de Hadamard.
 Nous utilisons ici une non-linéarité sous la forme de tanh pour nous assurer que les valeurs de l'état caché candidat restent dans l'intervalle $(-1, 1)$.
 
 Le résultat est un *candidat* puisque nous devons encore incorporer l'action de la porte de mise à jour.
 
-Par rapport à :eqref:`rnn_h_with_state` ,
+Par rapport à :eqref:`rnn_h_with_state`,
 l'influence des états précédents
 peut maintenant être réduite grâce à la multiplication par éléments de
 $\mathbf{R}_t$ et $\mathbf{H}_{t-1}$
- dans :eqref:`gru_tilde_H` .
-Lorsque les entrées de la porte de réinitialisation $\mathbf{R}_t$ sont proches de 1, nous récupérons un RNN vanille comme dans :eqref:`rnn_h_with_state` .
+dans :eqref:`gru_tilde_H`.
+Lorsque les entrées de la porte de réinitialisation $\mathbf{R}_t$ sont proches de 1, nous récupérons un RNN vanille comme dans :eqref:`rnn_h_with_state`.
 Pour toutes les entrées de la porte de réinitialisation $\mathbf{R}_t$ qui sont proches de 0, l'état caché candidat est le résultat d'un MLP avec $\mathbf{X}_t$ comme entrée. Tout état caché préexistant est donc *réinitialisé* aux valeurs par défaut.
 
 :numref:`fig_gru_2` illustre le flux de calcul après l'application de la porte de réinitialisation.
@@ -137,7 +137,7 @@ Cela conduit à l'équation de mise à jour finale pour le GRU :
 $$\mathbf{H}_t = \mathbf{Z}_t \odot \mathbf{H}_{t-1}  + (1 - \mathbf{Z}_t) \odot \tilde{\mathbf{H}}_t.$$ 
 
  
- Chaque fois que la porte de mise à jour $\mathbf{Z}_t$ est proche de 1, nous conservons simplement l'ancien état. Dans ce cas, les informations provenant de $\mathbf{X}_t$ sont essentiellement ignorées, ce qui permet de sauter l'étape $t$ dans la chaîne de dépendance. En revanche, lorsque $\mathbf{Z}_t$ est proche de 0, le nouvel état latent $\mathbf{H}_t$ se rapproche de l'état latent candidat $\tilde{\mathbf{H}}_t$. Ces conceptions peuvent nous aider à faire face au problème du gradient évanescent dans les RNN et à mieux capturer les dépendances pour les séquences avec de grandes distances de pas de temps.
+Chaque fois que la porte de mise à jour $\mathbf{Z}_t$ est proche de 1, nous conservons simplement l'ancien état. Dans ce cas, les informations provenant de $\mathbf{X}_t$ sont essentiellement ignorées, ce qui permet de sauter l'étape $t$ dans la chaîne de dépendance. En revanche, lorsque $\mathbf{Z}_t$ est proche de 0, le nouvel état latent $\mathbf{H}_t$ se rapproche de l'état latent candidat $\tilde{\mathbf{H}}_t$. Ces conceptions peuvent nous aider à faire face au problème du gradient évanescent dans les RNN et à mieux capturer les dépendances pour les séquences avec de grandes distances de pas de temps.
 Par exemple,
 si la porte de mise à jour a été proche de 1
 pour tous les pas de temps d'une sous-séquence entière,
@@ -251,7 +251,7 @@ def forward(self, inputs, H=None):
 ### Training
 
 [**Training**] un modèle de langage sur le jeu de données *The Time Machine*
-fonctionne exactement de la même manière que dans :numref:`sec_rnn-scratch` .
+fonctionne exactement de la même manière que dans :numref:`sec_rnn-scratch`.
 
 ```{.python .input}
 %%tab all

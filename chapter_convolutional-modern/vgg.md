@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Réseaux utilisant des blocs (VGG)
 :label:`sec_vgg` 
 
- Si AlexNet a offert des preuves empiriques que les CNN profonds
+Si AlexNet a offert des preuves empiriques que les CNN profonds
 peuvent obtenir de bons résultats, il n'a pas fourni de modèle général
 pour guider les chercheurs ultérieurs dans la conception de nouveaux réseaux.
 Dans les sections suivantes, nous allons présenter plusieurs concepts heuristiques
@@ -15,7 +15,7 @@ couramment utilisés pour concevoir des réseaux profonds.
 Les progrès réalisés dans ce domaine reflètent ceux de l'intégration à très grande échelle (VLSI) 
 dans la conception des puces
 où les ingénieurs sont passés du placement des transistors
-aux éléments logiques, puis aux blocs logiques :cite:`Mead.1980` .
+aux éléments logiques, puis aux blocs logiques :cite:`Mead.1980`.
 De même, la conception d'architectures de réseaux neuronaux
 est devenue progressivement plus abstraite,
 les chercheurs passant de la réflexion en termes de neurones individuels
@@ -25,21 +25,21 @@ et maintenant à des blocs, c'est-à-dire des motifs répétitifs de couches.
 L'idée d'utiliser des blocs est apparue pour la première fois sur le site
 [Visual Geometry Group](http://www.robots.ox.ac.uk/~)vgg/) (VGG)
 de l'université d'Oxford,
-dans leur réseau éponyme *VGG* :cite:`Simonyan.Zisserman.2014` .
+dans leur réseau éponyme *VGG* :cite:`Simonyan.Zisserman.2014`.
 Il est facile d'implémenter ces structures répétées dans le code
 avec n'importe quel cadre moderne d'apprentissage profond en utilisant des boucles et des sous-routines.
 
 ## (**VGG Blocks**)
 :label:`subsec_vgg-blocks` 
 
- Le bloc de construction de base des CNN
+Le bloc de construction de base des CNN
 est une séquence des éléments suivants :
 (i) une couche convolutive
 avec un remplissage pour maintenir la résolution,
 (ii) une non-linéarité telle qu'un ReLU,
 (iii) une couche de mise en commun telle que
-max-pooling pour réduire la résolution. L'un des problèmes de cette approche, 
-, est que la résolution spatiale diminue assez rapidement. En particulier, 
+max-pooling pour réduire la résolution. L'un des problèmes de cette approche,
+est que la résolution spatiale diminue assez rapidement. En particulier, 
 cela impose au réseau une limite stricte de couches convolutionnelles $\log_2 d$ avant que toutes les dimensions 
 ($d$) ne soient utilisées. Par exemple, dans le cas d'ImageNet, il serait impossible d'avoir 
 plus de 8 couches convolutives de cette manière. 
@@ -47,14 +47,14 @@ plus de 8 couches convolutives de cette manière.
 L'idée principale de Simonyan et Zisserman était d'utiliser des convolutions *multiples* entre le sous-échantillonnage de
 via le max-pooling sous la forme d'un bloc. Ils se sont principalement intéressés à la question de savoir si les réseaux profonds ou larges 
 donnent de meilleurs résultats. Par exemple, l'application successive de deux convolutions $3 \times 3$
- touche les mêmes pixels qu'une seule convolution $5 \times 5$. En même temps, cette dernière utilise environ 
+touche les mêmes pixels qu'une seule convolution $5 \times 5$. En même temps, cette dernière utilise environ 
 autant de paramètres ($25 \cdot c^2$) que trois convolutions $3 \times 3$ ($3 \cdot 9 \cdot c^2$). 
 Dans une analyse assez détaillée, ils ont montré que les réseaux profonds et étroits étaient nettement plus performants que leurs homologues peu profonds. L'apprentissage profond s'est ainsi lancé dans une quête de réseaux toujours plus profonds, avec plus de 100 couches pour les applications typiques.
 Alors que
 empilage $3 \times 3$ convolutions
 a été un standard d'or dans les réseaux profonds ultérieurs,
 implémentations de telles opérations
-ont également été efficaces sur les GPU :cite:`lavin2016fast` . 
+ont également été efficaces sur les GPU :cite:`lavin2016fast`. 
 
 
 
@@ -62,18 +62,18 @@ Revenons au VGG : un bloc VGG consiste en une *séquence* de convolutions avec $
 (conservant la hauteur et la largeur) suivi d'une couche de max-pooling $2 \times 2$ avec un stride de 2
 (divisant par deux la hauteur et la largeur après chaque bloc).
 Dans le code ci-dessous, nous définissons une fonction appelée `vgg_block`
- pour implémenter un bloc VGG.
+pour implémenter un bloc VGG.
 
 :begin_tab:`mxnet`
 La fonction ci-dessous prend deux arguments,
 correspondant au nombre de couches convolutionnelles `num_convs`
- et au nombre de canaux de sortie `num_channels`.
+et au nombre de canaux de sortie `num_channels`.
 :end_tab:
 
 :begin_tab:`pytorch`
 La fonction ci-dessous prend trois arguments correspondant au nombre
 de couches convolutives `num_convs`, au nombre de canaux d'entrée `in_channels`
- et au nombre de canaux de sortie `out_channels`.
+et au nombre de canaux de sortie `out_channels`.
 :end_tab:
 
 ```{.python .input}
@@ -219,7 +219,7 @@ pour le traitement par la partie entièrement connectée du réseau.
 [**Comme le VGG-11 est plus lourd en termes de calcul que l'AlexNet
 nous construisons un réseau avec un plus petit nombre de canaux.**]
 C'est plus que suffisant pour l'entraînement sur Fashion-MNIST.
-Le processus de [**formation du modèle**] est similaire à celui d'AlexNet dans :numref:`sec_alexnet` .
+Le processus de [**formation du modèle**] est similaire à celui d'AlexNet dans :numref:`sec_alexnet`.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -254,13 +254,13 @@ Très récemment, ParNet :cite:`Goyal.Bochkovskiy.Deng.ea.2021` a démontré qu'
    1. Comparez le nombre d'opérations en virgule flottante utilisées dans les couches convolutionnelles et dans les couches entièrement connectées. 
     1. Comment pourriez-vous réduire le coût de calcul créé par les couches entièrement connectées ?
 1. Lorsque l'on affiche les dimensions associées aux différentes couches du réseau, on ne voit que les informations 
- associées à 8 blocs (plus quelques transformations auxiliaires), alors que le réseau comporte 11 couches. Où sont passées les 3 couches restantes, 
+associées à 8 blocs (plus quelques transformations auxiliaires), alors que le réseau comporte 11 couches. Où sont passées les 3 couches restantes, 
 ?
-1. Le suréchantillonnage de la résolution dans Fashion-MNIST par un facteur de $8 \times 8$, de 28 à 224 dimensions, est très coûteux 
-. Essayez plutôt de modifier l'architecture du réseau et la conversion de la résolution, par exemple à 56 ou à 84 dimensions 
- pour son entrée. Pouvez-vous le faire sans réduire la précision du réseau ?
+1. Le suréchantillonnage de la résolution dans Fashion-MNIST par un facteur de $8 \times 8$, de 28 à 224 dimensions, est très coûteux .
+Essayez plutôt de modifier l'architecture du réseau et la conversion de la résolution, par exemple à 56 ou à 84 dimensions 
+pour son entrée. Pouvez-vous le faire sans réduire la précision du réseau ?
 1. Utilisez le tableau 1 du document VGG :cite:`Simonyan.Zisserman.2014` pour construire d'autres modèles courants, 
- tels que le VGG-16 ou le VGG-19.
+tels que le VGG-16 ou le VGG-19.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/77)

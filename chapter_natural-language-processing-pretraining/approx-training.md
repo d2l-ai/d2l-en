@@ -80,7 +80,7 @@ $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(D=1\mid w^{(t)}, w^{(t+
 
 Cependant,
 :eqref:`eq-negative-sample-pos` 
- ne prend en compte que les événements
+ne prend en compte que les événements
 qui impliquent des exemples positifs.
 Par conséquent,
 la probabilité conjointe dans
@@ -181,14 +181,14 @@ Soit $n(w,j)$ le $j^\mathrm{ième}$ nœud sur ce chemin,
 avec son vecteur de mot contextuel étant
 $\mathbf{u}_{n(w, j)}$.
 Par exemple,
-$L(w_3) = 4$ dans :numref:`fig_hi_softmax` .
+$L(w_3) = 4$ dans :numref:`fig_hi_softmax`.
 La méthode hiérarchique softmax approxime la probabilité conditionnelle dans :eqref:`eq_skip-gram-softmax` comme suit :
 
 
 $$P(w_o \mid w_c) = \prod_{j=1}^{L(w_o)-1} \sigma\left( [\![  n(w_o, j+1) = \text{leftChild}(n(w_o, j)) ]\!] \cdot \mathbf{u}_{n(w_o, j)}^\top \mathbf{v}_c\right),$$
 
 où la fonction $\sigma$
-est définie dans :eqref:`eq_sigma-f` ,
+est définie dans :eqref:`eq_sigma-f`,
 et \text{leftChild} $(n)$ est le nœud enfant gauche du nœud $n$: si $x$ est vrai, $[\![x]\!] = 1$; sinon $[\![x]\!] = -1$.
 
 Pour illustrer,
@@ -205,15 +205,15 @@ sur le chemin (le chemin en gras dans :numref:`fig_hi_softmax`) de la racine à 
 qui est parcouru à gauche, à droite, puis à gauche :
 
 
- $$P(w_3 \mid w_c) = \sigma(\mathbf{u}_{n(w_3, 1)}^\top \mathbf{v}_c) \cdot \sigma(-\mathbf{u}_{n(w_3, 2)}^\top \mathbf{v}_c) \cdot \sigma(\mathbf{u}_{n(w_3, 3)}^\top \mathbf{v}_c).$$ 
+$$P(w_3 \mid w_c) = \sigma(\mathbf{u}_{n(w_3, 1)}^\top \mathbf{v}_c) \cdot \sigma(-\mathbf{u}_{n(w_3, 2)}^\top \mathbf{v}_c) \cdot \sigma(\mathbf{u}_{n(w_3, 3)}^\top \mathbf{v}_c).$$ 
 
- Puisque $\sigma(x)+\sigma(-x) = 1$,
+Puisque $\sigma(x)+\sigma(-x) = 1$,
 il s'avère que
 les probabilités conditionnelles de
 générer tous les mots du dictionnaire
- $\mathcal{V}$ 
- sur la base de n'importe quel mot $w_c$
- sont égales à un :
+$\mathcal{V}$ 
+sur la base de n'importe quel mot $w_c$
+sont égales à un :
 
 $$\sum_{w \in \mathcal{V}} P(w \mid w_c) = 1.$$
 :eqlabel:`eq_hi-softmax-sum-one`

@@ -7,7 +7,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 :label:`sec_utils` 
 
  
- Cette section contient les implémentations des fonctions et classes utilitaires utilisées dans ce livre.
+Cette section contient les implémentations des fonctions et classes utilitaires utilisées dans ce livre.
 
 ```{.python .input}
 %%tab mxnet

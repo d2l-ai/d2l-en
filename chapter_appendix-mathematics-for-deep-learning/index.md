@@ -4,7 +4,7 @@
 **Brent Werness** (*Amazon*), **Rachel Hu** (*Amazon*), et auteurs de ce livre
 
 
- L'un des aspects merveilleux de l'apprentissage profond moderne est le fait qu'une grande partie de celui-ci peut être comprise et utilisée sans une compréhension totale des mathématiques qui le sous-tendent.  C'est le signe que le domaine arrive à maturité.  De même que la plupart des développeurs de logiciels n'ont plus besoin de se préoccuper de la théorie des fonctions calculables, les praticiens de l'apprentissage profond ne devraient pas non plus avoir à se préoccuper des fondements théoriques de l'apprentissage par probabilité maximale.
+L'un des aspects merveilleux de l'apprentissage profond moderne est le fait qu'une grande partie de celui-ci peut être comprise et utilisée sans une compréhension totale des mathématiques qui le sous-tendent.  C'est le signe que le domaine arrive à maturité.  De même que la plupart des développeurs de logiciels n'ont plus besoin de se préoccuper de la théorie des fonctions calculables, les praticiens de l'apprentissage profond ne devraient pas non plus avoir à se préoccuper des fondements théoriques de l'apprentissage par probabilité maximale.
 
 Mais nous ne sommes pas encore tout à fait au point.
 
@@ -14,7 +14,7 @@ Cette annexe vise à vous fournir le contexte mathématique dont vous avez besoi
 
 Nous développons ensuite la théorie du calcul différentiel jusqu'à ce que nous puissions comprendre pourquoi le gradient est la direction de la descente la plus raide, et pourquoi la rétro-propagation prend la forme qu'elle prend.  Le calcul intégral est ensuite abordé dans la mesure nécessaire pour soutenir notre sujet suivant, la théorie des probabilités.
 
-Les problèmes rencontrés dans la pratique ne sont souvent pas certains, et nous avons donc besoin d'un langage pour parler des choses incertaines.  Nous passons en revue la théorie des variables aléatoires et les distributions les plus courantes afin de pouvoir discuter des modèles de manière probabiliste.  Ceci constitue la base du classificateur naïf de Bayes, une technique de classification probabiliste.
+Les problèmes rencontrés dans la pratique ne sont souvent pas certains, et nous avons donc besoin d'un langage pour parler des choses incertaines.  Nous passons en revue la théorie des variables aléatoires et les distributions les plus courantes afin de pouvoir discuter des modèles de manière probabiliste.  Ceci constitue la base du classifieur naïf de Bayes, une technique de classification probabiliste.
 
 L'étude des statistiques est étroitement liée à la théorie des probabilités.  Bien que la statistique soit un domaine bien trop vaste pour qu'on puisse lui rendre justice dans une courte section, nous présenterons des concepts fondamentaux que tous les praticiens de l'apprentissage automatique devraient connaître, en particulier : l'évaluation et la comparaison des estimateurs, la réalisation de tests d'hypothèse et la construction d'intervalles de confiance.
 

@@ -6,8 +6,8 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Différenciation automatique
 :label:`sec_autograd` 
 
- Rappelez-vous de :numref:`sec_calculus` 
- que le calcul des dérivées est l'étape cruciale
+Rappelez-vous de :numref:`sec_calculus` 
+que le calcul des dérivées est l'étape cruciale
 de tous les algorithmes d'optimisation
 que nous utiliserons pour former des réseaux profonds.
 Bien que les calculs soient simples,
@@ -33,16 +33,16 @@ Alors que les bibliothèques autogrades sont devenues
 des préoccupations brûlantes au cours de la dernière décennie,
 elles ont une longue histoire. 
 En fait, les premières références à l'autograd
-remontent à plus d'un demi-siècle :cite:`Wengert.1964` .
+remontent à plus d'un demi-siècle :cite:`Wengert.1964`.
 Les idées fondamentales de la rétropropagation moderne
 remontent à une thèse de doctorat de 1980 :cite:`Speelpenning.1980` 
- et ont été développées à la fin des années 1980 :cite:`Griewank.1989` .
+et ont été développées à la fin des années 1980 :cite:`Griewank.1989`.
 Si la rétropropagation est devenue la méthode par défaut 
 pour le calcul des gradients, ce n'est pas la seule option. 
 Par exemple, le langage de programmation Julia utilise la propagation directe 
- :cite:`Revels.Lubin.Papamarkou.2016` . 
-Avant d'explorer les méthodes, 
-, maîtrisons d'abord le paquetage autograd.
+:cite:`Revels.Lubin.Papamarkou.2016`. 
+Avant d'explorer les méthodes,
+maîtrisons d'abord le paquetage autograd.
 
 
 ## Une fonction simple
@@ -88,7 +88,7 @@ des milliers ou des millions de fois,
 et nous risquons de manquer de mémoire.
 Notez que le gradient d'une fonction à valeur scalaire
 par rapport à un vecteur $\mathbf{x}$
- est à valeur vectorielle et a 
+est à valeur vectorielle et a 
 la même forme que $\mathbf{x}$.
 
 ```{.python .input  n=8}
@@ -144,7 +144,7 @@ via l'attribut `grad` de `x`.
 
 :begin_tab:`pytorch`
 [**Nous pouvons maintenant prendre le gradient de `y`
- par rapport à `x`**] en appelant 
+par rapport à `x`**] en appelant 
 sa méthode `backward`.
 Ensuite, nous pouvons accéder au gradient 
 via l'attribut `grad` de `x`.
@@ -152,7 +152,7 @@ via l'attribut `grad` de `x`.
 
 :begin_tab:`tensorflow`
 [**Nous pouvons maintenant calculer le gradient de `y`
- par rapport à `x`**] en appelant 
+par rapport à `x`**] en appelant 
 la fonction `gradient`.
 :end_tab:
 
@@ -174,7 +174,8 @@ x_grad = t.gradient(y, x)
 x_grad
 ```
 
-(**Nous savons déjà que le gradient de la fonction $y = 2\mathbf{x}^{\top}\mathbf{x}$ par rapport à $\mathbf{x}$ devrait être $4\mathbf{x}$.**)
+(**Nous savons déjà que le gradient de la fonction $y = 2\mathbf{x}^{\top}\mathbf{x}$ 
+par rapport à $\mathbf{x}$ devrait être $4\mathbf{x}$.**)
 Nous pouvons maintenant vérifier que le calcul automatique du gradient
 et le résultat attendu sont identiques.
 
@@ -196,7 +197,7 @@ x_grad == 4 * x
 :begin_tab:`mxnet`
 [**Maintenant, calculons 
 une autre fonction de `x`
- et prenons son gradient.**] 
+et prenons son gradient.**] 
 Notez que MXNet réinitialise le tampon de gradient 
 chaque fois que nous enregistrons un nouveau gradient. 
 :end_tab:
@@ -204,7 +205,7 @@ chaque fois que nous enregistrons un nouveau gradient.
 :begin_tab:`pytorch`
 [**Maintenant, calculons 
 une autre fonction de `x`
- et prenons son gradient.**]
+et prenons son gradient.**]
 Notez que PyTorch ne réinitialise pas automatiquement 
 le tampon de gradient 
 lorsque nous enregistrons un nouveau gradient. 
@@ -218,9 +219,9 @@ nous pouvons appeler `x.grad.zero()` comme suit:
 :end_tab:
 
 :begin_tab :`tensorflow`
- [**Calculons maintenant 
+[**Calculons maintenant 
 une autre fonction de `x`
- et prenons son gradient.**]
+et prenons son gradient.**]
 Notez que TensorFlow réinitialise la mémoire tampon des gradients 
 chaque fois que nous enregistrons un nouveau gradient 
 :end_tab:
@@ -253,19 +254,19 @@ t.gradient(y, x)  # Overwritten by the newly calculated gradient
 Lorsque `y` est un vecteur, 
 l'interprétation la plus naturelle 
 de la dérivée de `y`
- par rapport à un vecteur `x` 
- est une matrice appelée la *Jacobienne*
+par rapport à un vecteur `x` 
+est une matrice appelée la *Jacobienne*
 qui contient les dérivées partielles
 de chaque composante de `y` 
- par rapport à chaque composante de `x`.
+par rapport à chaque composante de `x`.
 De la même manière, pour les matrices d'ordre supérieur `y` et `x`,
 le résultat de la différenciation pourrait être un tenseur d'ordre encore plus élevé.
 
-Si les jacobiens sont utilisés dans certaines techniques avancées d'apprentissage automatique (
-),
+Si les jacobiens sont utilisés dans certaines techniques avancées d'apprentissage automatique ,
+
 le plus souvent, nous voulons additionner 
 les gradients de chaque composante de `y`
- par rapport au vecteur complet `x`,
+par rapport au vecteur complet `x`,
 pour obtenir un vecteur de la même forme que `x`.
 Par exemple, nous avons souvent un vecteur 
 représentant la valeur de notre fonction de perte
@@ -284,15 +285,15 @@ $\partial_{\mathbf{x}} \sum_i y_i$ .
 
 :begin_tab:`pytorch`
 Comme les cadres d'apprentissage profond varient 
-dans la façon dont ils interprètent les gradients des tenseurs non scalaires
-,
+dans la façon dont ils interprètent les gradients des tenseurs non scalaires,
+
 PyTorch prend certaines mesures pour éviter toute confusion.
-L'invocation de `backward` sur un tenseur non scalaire entraîne une erreur 
-, sauf si nous indiquons à PyTorch comment réduire l'objet à un scalaire. 
+L'invocation de `backward` sur un tenseur non scalaire entraîne une erreur ,
+sauf si nous indiquons à PyTorch comment réduire l'objet à un scalaire. 
 Plus formellement, nous devons fournir un vecteur $\mathbf{v}$ 
- tel que `backward` calculera 
+tel que `backward` calculera 
 $\mathbf{v}^\top \partial_{\mathbf{x}} \mathbf{y}$ 
- plutôt que $\partial_{\mathbf{x}} \mathbf{y}$. 
+plutôt que $\partial_{\mathbf{x}} \mathbf{y}$. 
 La partie suivante peut prêter à confusion,
 mais pour des raisons qui deviendront claires plus tard, 
 cet argument (représentant $\mathbf{v}$) est nommé `gradient`. 
@@ -343,16 +344,16 @@ le graphe d'influence de calcul respectif
 du résultat final. 
 L'exemple suivant permet d'y voir plus clair : 
 supposons que nous avons `z = x * y` et `y = x * x` 
- mais que nous voulons nous concentrer sur l'influence *directe* de `x` sur `z` 
- plutôt que sur l'influence véhiculée par `y`. 
+mais que nous voulons nous concentrer sur l'influence *directe* de `x` sur `z` 
+plutôt que sur l'influence véhiculée par `y`. 
 Dans ce cas, nous pouvons créer une nouvelle variable `u`
- qui prend la même valeur que `y` 
- mais dont la *provenance* (comment elle a été créée)
+qui prend la même valeur que `y` 
+mais dont la *provenance* (comment elle a été créée)
 a été effacée.
 Ainsi, `u` n'a pas d'ancêtres dans le graphe
 et les gradients ne passent pas de `u` à `x`.
-Par exemple, si l'on prend le gradient de `z = x * u`
- , on obtient le résultat `x`,
+Par exemple, si l'on prend le gradient de `z = x * u`,
+on obtient le résultat `x`,
 (et non `3 * x * x` comme on aurait pu s'y attendre de 
 puisque `z = x * x * x`).
 
@@ -394,7 +395,7 @@ Notez que pendant que cette procédure
 détache les ancêtres
 de `y` du graphe menant à `z`, 
 le graphe de calcul menant à `y` 
- persiste et nous pouvons donc calculer
+persiste et nous pouvons donc calculer
 le gradient de `y` par rapport à `x`.
 
 ```{.python .input}
@@ -429,8 +430,8 @@ est que [**même si**] la construction du graphe de calcul de
 (**nous pouvons toujours calculer le gradient de la variable résultante.**)
 Pour illustrer cela, considérons l'extrait de code suivant où 
 le nombre d'itérations de la boucle `while`
- et l'évaluation de l'instruction `if`
- dépendent tous deux de la valeur de l'entrée `a`.
+et l'évaluation de l'instruction `if`
+dépendent tous deux de la valeur de l'entrée `a`.
 
 ```{.python .input}
 %%tab mxnet
@@ -476,7 +477,7 @@ Comme l'entrée est une variable aléatoire,
 nous ne savons pas quelle forme 
 prendra le graphe de calcul.
 Cependant, chaque fois que nous exécutons `f(a)` 
- sur une entrée spécifique, nous réalisons 
+sur une entrée spécifique, nous réalisons 
 un graphe de calcul spécifique
 et pouvons ensuite exécuter `backward`.
 
@@ -509,7 +510,7 @@ Même si notre fonction `f` est un peu
 inventée à des fins de démonstration,
 sa dépendance à l'égard de l'entrée est assez simple : 
 c'est une fonction *linéaire* de `a` 
- avec une échelle définie par morceaux. 
+avec une échelle définie par morceaux. 
 En tant que telle, `f(a) / a` est un vecteur d'entrées constantes 
 et, de plus, `f(a) / a` doit correspondre à 
 le gradient de `f(a)` par rapport à `a`.
@@ -549,8 +550,8 @@ De plus, autograd nous permet de concevoir des modèles massifs
 pour lesquels les calculs de gradients par stylo et papier 
 prendraient un temps prohibitif.
 Il est intéressant de noter que si nous utilisons autograd pour *optimiser* les modèles
-(au sens statistique)
-, la *optimisation* des bibliothèques autograd elles-mêmes
+(au sens statistique),
+la *optimisation* des bibliothèques autograd elles-mêmes
 (au sens computationnel)
 est un sujet riche
 d'un intérêt vital pour les concepteurs de cadres.

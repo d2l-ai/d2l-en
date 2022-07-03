@@ -1,7 +1,7 @@
 # Algorithmes d'optimisation
 :label:`chap_optimization` 
 
- Si vous avez lu le livre dans l'ordre jusqu'à ce point, vous avez déjà utilisé un certain nombre d'algorithmes d'optimisation pour former des modèles d'apprentissage profond.
+Si vous avez lu le livre dans l'ordre jusqu'à ce point, vous avez déjà utilisé un certain nombre d'algorithmes d'optimisation pour former des modèles d'apprentissage profond.
 Ce sont les outils qui nous ont permis de continuer à mettre à jour les paramètres du modèle et de minimiser la valeur de la fonction de perte, telle qu'évaluée sur l'ensemble d'entraînement. En effet, quiconque se contente de traiter l'optimisation comme une boîte noire permettant de minimiser des fonctions objectives dans un cadre simple peut se contenter de savoir qu'il existe une panoplie d'incantations d'une telle procédure (avec des noms tels que "SGD" et "Adam").
 
 Pour bien faire, cependant, des connaissances plus approfondies sont nécessaires.

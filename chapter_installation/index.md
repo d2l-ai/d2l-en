@@ -209,7 +209,7 @@ jupyter notebook
 (il se peut qu'il se soit déjà ouvert automatiquement) dans votre navigateur Web.
 Ensuite, nous pouvons exécuter le code pour chaque section du livre.
 Veuillez toujours exécuter `conda activate d2l`
- pour activer l'environnement d'exécution
+pour activer l'environnement d'exécution
 avant d'exécuter le code du livre
 ou de mettre à jour le cadre d'apprentissage profond ou le paquet `d2l`.
 Pour quitter l'environnement,

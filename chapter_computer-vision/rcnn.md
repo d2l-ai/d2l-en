@@ -1,18 +1,18 @@
 # Les CNN basés sur les régions (R-CNN)
 :label:`sec_rcnn` 
 
- Outre la détection multi-boîtes à un seul coup
-décrite dans :numref:`sec_ssd` ,
+Outre la détection multi-boîtes à un seul coup
+décrite dans :numref:`sec_ssd`,
 les CNN basés sur les régions ou les régions avec des caractéristiques CNN (R-CNN)
 font également partie des nombreuses approches pionnières
 de 
 appliquant
 l'apprentissage profond à la détection d'objets
-:cite:`Girshick.Donahue.Darrell.ea.2014` .
+:cite:`Girshick.Donahue.Darrell.ea.2014`.
 Dans cette section, nous allons présenter
 le R-CNN et sa série d'améliorations : le R-CNN rapide
-:cite:`Girshick.2015` , le R-CNN plus rapide :cite:`Ren.He.Girshick.ea.2015` , et le R-CNN de masque
-:cite:`He.Gkioxari.Dollar.ea.2017` .
+:cite:`Girshick.2015`, le R-CNN plus rapide :cite:`Ren.He.Girshick.ea.2015`, et le R-CNN de masque
+:cite:`He.Gkioxari.Dollar.ea.2017`.
 En raison de l'espace limité, nous nous concentrerons uniquement sur la conception de ces modèles
 .
 
@@ -21,7 +21,7 @@ En raison de l'espace limité, nous nous concentrerons uniquement sur la concept
 ## R-CNNs
 
 
- Le *R-CNN* extrait d'abord
+Le *R-CNN* extrait d'abord
 de nombreuses (par exemple, 2000) *propositions de régions*
 de l'image d'entrée
 (par exemple, les boîtes d'ancrage peuvent également être considérées
@@ -37,12 +37,12 @@ prédire la classe et la boîte englobante
 de cette proposition de région.
 
 
- ![The R-CNN model.](../img/r-cnn.svg) 
+![The R-CNN model.](../img/r-cnn.svg) 
 :label:`fig_r-cnn` 
 
  :numref:`fig_r-cnn` montre le modèle R-CNN. Plus concrètement, le R-CNN comprend les quatre étapes suivantes :
 
-1. Effectuer une *recherche sélective* pour extraire plusieurs propositions de régions de haute qualité sur l'image d'entrée :cite:`Uijlings.Van-De-Sande.Gevers.ea.2013` . Ces régions proposées sont généralement sélectionnées à plusieurs échelles avec des formes et des tailles différentes. Chaque proposition de région sera étiquetée avec une classe et une boîte de délimitation de vérité.
+1. Effectuer une *recherche sélective* pour extraire plusieurs propositions de régions de haute qualité sur l'image d'entrée :cite:`Uijlings.Van-De-Sande.Gevers.ea.2013`. Ces régions proposées sont généralement sélectionnées à plusieurs échelles avec des formes et des tailles différentes. Chaque proposition de région sera étiquetée avec une classe et une boîte de délimitation de vérité.
 1. Choisissez un CNN pré-entraîné et tronquez-le avant la couche de sortie. Redimensionnez chaque proposition de région à la taille d'entrée requise par le réseau, et produisez les caractéristiques extraites pour la proposition de région par propagation directe. 
 1. Prenez les caractéristiques extraites et la classe étiquetée de chaque proposition de région comme exemple. Entraîner plusieurs machines à vecteurs de support pour classer les objets, où chaque machine à vecteurs de support détermine individuellement si l'exemple contient une classe spécifique.
 1. Prenez les caractéristiques extraites et la boîte de délimitation étiquetée de chaque proposition de région comme exemple. Entraînez un modèle de régression linéaire pour prédire le rectangle de délimitation de la vérité du terrain.
@@ -65,8 +65,8 @@ un R-CNN réside dans
 la propagation avant CNN indépendante
 pour chaque proposition de région, 
 sans partage des calculs.
-Comme ces régions ont généralement des chevauchements
-, les extractions de caractéristiques indépendantes
+Comme ces régions ont généralement des chevauchements,
+les extractions de caractéristiques indépendantes
 conduisent à
 beaucoup de calculs répétés.
 L'une des principales améliorations de 
@@ -74,7 +74,7 @@ le *R-CNN rapide* par rapport au R-CNN
 est que 
 la propagation vers l'avant du CNN
 est uniquement effectuée sur 
-l'image entière :cite:`Girshick.2015` . 
+l'image entière :cite:`Girshick.2015`. 
 
 ![The fast R-CNN model.](../img/fast-rcnn.svg) 
 :label:`fig_fast_r-cnn` 
@@ -88,7 +88,7 @@ l'image entière :cite:`Girshick.2015` .
 1. Prédire la classe et la boîte englobante pour chacune des propositions de régions $n$. Plus concrètement, dans la prédiction de la classe et de la zone limite, transformez la sortie de la couche entièrement connectée en une sortie de forme $n \times q$ ($q$ est le nombre de classes) et une sortie de forme $n \times 4$, respectivement. La prédiction de classe utilise la régression softmax.
 
 
-La couche de mise en commun de la région d'intérêt proposée dans le R-CNN rapide est différente de la couche de mise en commun introduite dans :numref:`sec_pooling` . 
+La couche de mise en commun de la région d'intérêt proposée dans le R-CNN rapide est différente de la couche de mise en commun introduite dans :numref:`sec_pooling`. 
 Dans la couche de mise en commun,
 nous contrôlons indirectement la forme de la sortie
 en spécifiant les tailles de
@@ -103,7 +103,7 @@ pour chaque région, respectivement $h_2$ et $w_2$.
 Pour toute fenêtre de région d'intérêt
 de forme $h \times w$,
 cette fenêtre est divisée en une grille $h_2 \times w_2$
- de sous-fenêtres,
+de sous-fenêtres,
 où la forme de chaque sous-fenêtre est approximativement 
 $(h/h_2) \times (w/w_2)$ .
 Dans la pratique,
@@ -113,7 +113,7 @@ même lorsque les régions d'intérêt ont des formes différentes.
 
 
 A titre d'exemple,
-dans :numref:`fig_roi` ,
+dans :numref:`fig_roi`,
 la région d'intérêt $3\times 3$ supérieure gauche 
 est sélectionnée sur une entrée $4 \times 4$.
 Pour cette région d'intérêt,
@@ -195,15 +195,15 @@ un grand nombre de propositions de régions dans la recherche sélective.
 Pour réduire les propositions de régions
 sans perte de précision,
 le *R-CNN plus rapide*
-propose de remplacer la recherche sélective par un *réseau de propositions de régions* :cite:`Ren.He.Girshick.ea.2015` .
+propose de remplacer la recherche sélective par un *réseau de propositions de régions* :cite:`Ren.He.Girshick.ea.2015`.
 
 
 
- ![The faster R-CNN model.](../img/faster-rcnn.svg) 
+![The faster R-CNN model.](../img/faster-rcnn.svg) 
 :label:`fig_faster_r-cnn` 
 
  
- :numref:`fig_faster_r-cnn` montre le modèle R-CNN plus rapide. Par rapport au modèle R-CNN rapide,
+:numref:`fig_faster_r-cnn` montre le modèle R-CNN plus rapide. Par rapport au modèle R-CNN rapide,
 le modèle R-CNN rapide ne modifie que
 la méthode de proposition de région
 de la recherche sélective à un réseau de proposition de région.
@@ -247,13 +247,13 @@ si les positions des objets au niveau des pixels
 sont également étiquetées sur les images, 
 le *masque R-CNN* peut efficacement exploiter
 ces étiquettes détaillées 
-pour améliorer encore la précision de la détection des objets :cite:`He.Gkioxari.Dollar.ea.2017` .
+pour améliorer encore la précision de la détection des objets :cite:`He.Gkioxari.Dollar.ea.2017`.
 
 
 ![The mask R-CNN model.](../img/mask-rcnn.svg)
 :label:`fig_mask_r-cnn`
 
-Comme le montre :numref:`fig_mask_r-cnn` , 
+Comme le montre :numref:`fig_mask_r-cnn`, 
 le masque R-CNN
 est modifié sur la base du R-CNN plus rapide. 
 Plus précisément,
@@ -288,8 +288,8 @@ dans les sections suivantes de ce chapitre.
 
 ## Exercices
 
-1. Peut-on concevoir la détection d'objets comme un problème de régression unique, tel que la prédiction des boîtes englobantes et des probabilités de classe ? Vous pouvez vous référer à la conception du modèle YOLO :cite:`Redmon.Divvala.Girshick.ea.2016` .
-1. Comparez la détection multiboxes à un seul coup avec les méthodes présentées dans cette section. Quelles sont leurs principales différences ? Vous pouvez vous référer à la figure 2 de :cite:`Zhao.Zheng.Xu.ea.2019` .
+1. Peut-on concevoir la détection d'objets comme un problème de régression unique, tel que la prédiction des boîtes englobantes et des probabilités de classe ? Vous pouvez vous référer à la conception du modèle YOLO :cite:`Redmon.Divvala.Girshick.ea.2016`.
+1. Comparez la détection multiboxes à un seul coup avec les méthodes présentées dans cette section. Quelles sont leurs principales différences ? Vous pouvez vous référer à la figure 2 de :cite:`Zhao.Zheng.Xu.ea.2019`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/374)

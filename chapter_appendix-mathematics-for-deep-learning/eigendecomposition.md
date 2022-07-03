@@ -1,7 +1,7 @@
 # Eigendecompositions
 :label:`sec_eigendecompositions` 
 
- Les valeurs propres sont souvent l'une des notions les plus utiles 
+Les valeurs propres sont souvent l'une des notions les plus utiles 
 que nous rencontrons lorsque nous étudions l'algèbre linéaire, 
 cependant, en tant que débutant, il est facile de négliger leur importance.
 Ci-dessous, nous présentons la décomposition des valeurs propres et 
@@ -24,7 +24,7 @@ puis le retourne dans la direction $y$.
 
 Cependant, il existe *certains* vecteurs pour lesquels quelque chose reste inchangé.
 A savoir $[1, 0]^\top$ est envoyé à $[2, 0]^\top$
- et $[0, 1]^\top$ est envoyé à $[0, -1]^\top$.
+et $[0, 1]^\top$ est envoyé à $[0, -1]^\top$.
 Ces vecteurs sont toujours sur la même ligne,
 et la seule modification est que la matrice les étire
 par un facteur de $2$ et $-1$ respectivement.
@@ -32,7 +32,7 @@ Nous appelons ces vecteurs *vecteurs propres*
 et le facteur par lequel ils sont étirés *valeurs propres*.
 
 En général, si nous pouvons trouver un nombre $\lambda$ 
- et un vecteur $\mathbf{v}$ tels que 
+et un vecteur $\mathbf{v}$ tels que 
 
 $$
 \mathbf{A}\mathbf{v} = \lambda \mathbf{v}.
@@ -46,16 +46,16 @@ puis en factorisant le vecteur,
 nous voyons que ce qui précède est équivalent à :
 
 $$(\mathbf{A} - \lambda \mathbf{I})\mathbf{v} = 0.$$ 
- :eqlabel:`eq_eigvalue_der` 
+:eqlabel:`eq_eigvalue_der` 
 
- Pour que _COPY9`eq_eigvalue_der` se produise, nous voyons que $(\mathbf{A} - \lambda \mathbf{I})$ 
- doit comprimer une certaine direction jusqu'à zéro, 
+Pour que _COPY9`eq_eigvalue_der` se produise, nous voyons que $(\mathbf{A} - \lambda \mathbf{I})$ 
+doit comprimer une certaine direction jusqu'à zéro, 
 ; il n'est donc pas inversible, et son déterminant est donc nul.
 Ainsi, nous pouvons trouver les *valeurs propres* 
 en trouvant pour quoi $\lambda$ est $\det(\mathbf{A}-\lambda \mathbf{I}) = 0$.
 Une fois que nous avons trouvé les valeurs propres, nous pouvons résoudre 
 $\mathbf{A}\mathbf{v} = \lambda \mathbf{v}$ 
- pour trouver le(s) *vecteur(s) propre(s)* associé(s).
+pour trouver le(s) *vecteur(s) propre(s)* associé(s).
 
 ### Un exemple
 Voyons cela avec une matrice plus difficile
@@ -155,9 +155,9 @@ La matrice $W$ est inversible, nous pouvons donc multiplier les deux côtés par
 nous voyons que nous pouvons écrire
 
 $$\mathbf{A} = \mathbf{W} \boldsymbol{\Sigma} \mathbf{W}^{-1}.$$ 
- :eqlabel:`eq_eig_decomp` 
+:eqlabel:`eq_eig_decomp` 
 
- Dans la section suivante, nous verrons quelques belles conséquences de ceci,
+Dans la section suivante, nous verrons quelques belles conséquences de ceci,
 mais pour l'instant nous avons seulement besoin de savoir qu'une telle décomposition 
 existera tant que nous pourrons trouver une collection complète 
 de vecteurs propres linéairement indépendants (de sorte que $W$ soit inversible).
@@ -173,19 +173,19 @@ $$
 
 Cela nous indique que pour toute puissance positive d'une matrice,
 la décomposition effective est obtenue en élevant simplement les valeurs propres à la même puissance.
-La même chose peut être montrée pour les puissances négatives,
-. Ainsi, si nous voulons inverser une matrice, il suffit de considérer
+La même chose peut être montrée pour les puissances négatives.
+Ainsi, si nous voulons inverser une matrice, il suffit de considérer
 
 $$
 \mathbf{A}^{-1} = \mathbf{W}\boldsymbol{\Sigma}^{-1} \mathbf{W}^{-1},
 $$
 
 ou, en d'autres termes, inverser simplement chaque valeur propre.
-Cela fonctionne tant que chaque valeur propre n'est pas nulle,
-. Nous voyons donc que l'inversion est synonyme d'absence de valeurs propres nulles. 
+Cela fonctionne tant que chaque valeur propre n'est pas nulle.
+Nous voyons donc que l'inversion est synonyme d'absence de valeurs propres nulles. 
 
 En effet, des travaux supplémentaires peuvent montrer que si $\lambda_1, \ldots, \lambda_n$ 
- sont les valeurs propres d'une matrice, alors le déterminant de cette matrice est
+sont les valeurs propres d'une matrice, alors le déterminant de cette matrice est
 
 $$
 \det(\mathbf{A}) = \lambda_1 \cdots \lambda_n,
@@ -266,14 +266,14 @@ Cela signifie que toutes nos valeurs propres se situeront dans l'une des plages 
 
 $$[a_{11}-r_1, a_{11}+r_1] = [0.7, 1.3], $$ 
 
- $$[a_{22}-r_2, a_{22}+r_2] = [2.4, 3.6], $$ 
+$$[a_{22}-r_2, a_{22}+r_2] = [2.4, 3.6], $$ 
 
- $$[a_{33}-r_3, a_{33}+r_3] = [4.2, 5.8], $$ 
+$$[a_{33}-r_3, a_{33}+r_3] = [4.2, 5.8], $$ 
 
- $$[a_{44}-r_4, a_{44}+r_4] = [8.1, 9.9]. $$ 
+$$[a_{44}-r_4, a_{44}+r_4] = [8.1, 9.9]. $$ 
 
  
- Le calcul numérique montre à 
+Le calcul numérique montre à 
 que les valeurs propres sont approximativement $0.99$, $2.97$, $4.95$, $9.08$,
 toutes confortablement situées dans les plages fournies.
 
@@ -371,9 +371,9 @@ A
 ```
 
 ### Comportement sur des données aléatoires
-Pour simplifier notre modèle-jouet, 
-, nous supposerons que le vecteur de données que nous introduisons dans $\mathbf{v}_{in}$ 
- est un vecteur gaussien aléatoire à cinq dimensions.
+Pour simplifier notre modèle-jouet,
+nous supposerons que le vecteur de données que nous introduisons dans $\mathbf{v}_{in}$ 
+est un vecteur gaussien aléatoire à cinq dimensions.
 Réfléchissons à ce que nous voulons qu'il se passe.
 Pour le contexte, pensons à un problème ML générique,
 où nous essayons de transformer des données d'entrée, comme une image, en une prédiction, 
@@ -393,7 +393,7 @@ Nous devons marcher sur la ligne étroite entre la croissance et la décroissanc
 pour nous assurer que notre sortie change en fonction de notre entrée, mais pas beaucoup !
 
 Voyons ce qui se passe lorsque nous multiplions de manière répétée notre matrice $\mathbf{A}$ 
- contre un vecteur d'entrée aléatoire, et que nous gardons trace de la norme.
+contre un vecteur d'entrée aléatoire, et que nous gardons trace de la norme.
 
 ```{.python .input}
 #@tab mxnet
@@ -517,17 +517,17 @@ print(f'norms of eigenvalues: {norm_eigs}')
 Nous voyons quelque chose d'un peu inattendu se produire ici : 
 ce nombre que nous avons identifié précédemment pour l'étirement à long terme 
 de notre matrice $\mathbf{A}$ 
- appliquée à un vecteur aléatoire est *exactement* 
+appliquée à un vecteur aléatoire est *exactement* 
 (précis à treize décimales près !) 
 la plus grande valeur propre de $\mathbf{A}$.
 Ce n'est clairement pas une coïncidence !
 
 Mais, si nous réfléchissons maintenant à ce qui se passe d'un point de vue géométrique,
 cela commence à avoir un sens. Considérons un vecteur aléatoire. 
-Ce vecteur aléatoire pointe un peu dans toutes les directions, 
-. En particulier, il pointe au moins un peu 
+Ce vecteur aléatoire pointe un peu dans toutes les directions.
+En particulier, il pointe au moins un peu 
 dans la même direction que le vecteur propre de $\mathbf{A}$
- associé à la plus grande valeur propre.
+associé à la plus grande valeur propre.
 Ce point est si important qu'il est appelé 
 la *valeur propre de principe* et le *vecteur propre de principe*.
 Après avoir appliqué $\mathbf{A}$, notre vecteur aléatoire 
@@ -544,7 +544,7 @@ l'alignement avec le vecteur propre principal devient de plus en plus proche jus
 en vecteur propre principal !
 En effet, cet algorithme est la base 
 de ce que l'on appelle l'itération *puissance*
-pour trouver la plus grande valeur propre et le plus grand vecteur propre d'une matrice. Pour plus de détails, voir, par exemple, :cite:`Van-Loan.Golub.1983` .
+pour trouver la plus grande valeur propre et le plus grand vecteur propre d'une matrice. Pour plus de détails, voir, par exemple, :cite:`Van-Loan.Golub.1983`.
 
 ### Correction de la normalisation
 
@@ -647,7 +647,7 @@ nous pouvons voir que la plus grande valeur propre
 d'une grande matrice aléatoire avec des entrées indépendantes de moyenne zéro,
 de variance une gaussienne est en moyenne d'environ $\sqrt{n}$,
 ou dans notre cas $\sqrt{5} \approx 2.2$,
-en raison d'un fait fascinant connu sous le nom de *loi circulaire* :cite:`Ginibre.1965` .
+en raison d'un fait fascinant connu sous le nom de *loi circulaire* :cite:`Ginibre.1965`.
 La relation entre les valeurs propres (et un objet connexe appelé valeurs singulières) des matrices aléatoires s'est avérée avoir des liens profonds avec l'initialisation appropriée des réseaux neuronaux, comme cela a été discuté dans :cite:`Pennington.Schoenholz.Ganguli.2017` et les travaux ultérieurs.
 
 ## Résumé

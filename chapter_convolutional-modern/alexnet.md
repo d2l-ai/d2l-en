@@ -7,26 +7,26 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 :label:`sec_alexnet` 
 
  
- Bien que les CNN soient bien connus
+Bien que les CNN soient bien connus
 dans les communautés de la vision par ordinateur et de l'apprentissage automatique
-après l'introduction de LeNet :cite:`LeCun.Jackel.Bottou.ea.1995` ,
+après l'introduction de LeNet :cite:`LeCun.Jackel.Bottou.ea.1995`,
 ils n'ont pas immédiatement dominé le domaine.
 Bien que LeNet ait obtenu de bons résultats sur les premiers petits ensembles de données,
 la performance et la faisabilité de l'entraînement des CNN
 sur des ensembles de données plus grands et plus réalistes n'avaient pas encore été établies.
 En fait, pendant la majeure partie du temps écoulé entre le début des années 1990
-et les résultats décisifs de 2012 :cite:`Krizhevsky.Sutskever.Hinton.2012` ,
+et les résultats décisifs de 2012 :cite:`Krizhevsky.Sutskever.Hinton.2012`,
 les réseaux neuronaux ont souvent été dépassés par d'autres méthodes d'apprentissage automatique,
-telles que les méthodes à noyau :cite:`Scholkopf.Smola.2002` , les méthodes d'ensemble :cite:`Freund.Schapire.ea.1996` ,
-et l'estimation structurée :cite:`Taskar.Guestrin.Koller.2004` .
+telles que les méthodes à noyau :cite:`Scholkopf.Smola.2002`, les méthodes d'ensemble :cite:`Freund.Schapire.ea.1996`,
+et l'estimation structurée :cite:`Taskar.Guestrin.Koller.2004`.
 
 Pour la vision par ordinateur, cette comparaison n'est peut-être pas juste.
 En effet, bien que les entrées des réseaux convolutifs
 soient constituées de valeurs de pixels brutes ou légèrement traitées (par exemple, par centrage), les praticiens n'introduisent jamais de pixels bruts dans les modèles traditionnels.
 Au lieu de cela, les pipelines de vision par ordinateur typiques
-consistaient en des pipelines d'extraction de caractéristiques conçus manuellement, tels que SIFT :cite:`Lowe.2004` , SURF :cite:`Bay.Tuytelaars.Van-Gool.2006` , et les sacs de mots visuels :cite:`Sivic.Zisserman.2003` .
+consistaient en des pipelines d'extraction de caractéristiques conçus manuellement, tels que SIFT :cite:`Lowe.2004`, SURF :cite:`Bay.Tuytelaars.Van-Gool.2006`, et les sacs de mots visuels :cite:`Sivic.Zisserman.2003`.
 Plutôt que d'*apprendre les caractéristiques*, les caractéristiques étaient *fabriquées*.
-La plupart des progrès ont été réalisés grâce à des idées plus ingénieuses pour les caractéristiques et à une connaissance approfondie de la géométrie :cite:`Hartley.Zisserman.2000` . L'algorithme d'apprentissage était souvent considéré comme une réflexion après coup.
+La plupart des progrès ont été réalisés grâce à des idées plus ingénieuses pour les caractéristiques et à une connaissance approfondie de la géométrie :cite:`Hartley.Zisserman.2000`. L'algorithme d'apprentissage était souvent considéré comme une réflexion après coup.
 
 Bien que certains accélérateurs de réseaux neuronaux aient été disponibles dans les années 1990,
 ils n'étaient pas encore suffisamment puissants pour réaliser
@@ -37,29 +37,29 @@ pour les opérations au-delà des jeux. Les accélérateurs d'aujourd'hui sont c
 où *FLOPs*
 sont des opérations en virgule flottante en nombre de multiplications-additions.
 En outre, les ensembles de données étaient encore relativement petits : L'OCR sur 60 000 images à basse résolution était considérée comme une tâche très difficile.
-En plus de ces obstacles, il manquait encore des astuces clés pour l'entraînement des réseaux neuronaux
-, notamment des heuristiques d'initialisation des paramètres :cite:`Glorot.Bengio.2010` ,
-des variantes intelligentes de la descente de gradient stochastique :cite:`Kingma.Ba.2014` ,
-des fonctions d'activation non écrasantes :cite:`Nair.Hinton.2010` ,
-et des techniques de régularisation efficaces :cite:`Srivastava.Hinton.Krizhevsky.ea.2014` .
+En plus de ces obstacles, il manquait encore des astuces clés pour l'entraînement des réseaux neuronaux,
+ notamment des heuristiques d'initialisation des paramètres :cite:`Glorot.Bengio.2010`,
+des variantes intelligentes de la descente de gradient stochastique :cite:`Kingma.Ba.2014`,
+des fonctions d'activation non écrasantes :cite:`Nair.Hinton.2010`,
+et des techniques de régularisation efficaces :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`.
 
 Ainsi, plutôt que de former des systèmes *de bout en bout* (du pixel à la classification),
 les pipelines classiques ressemblaient davantage à ceci :
 
 1. Obtenir un ensemble de données intéressant. Au début, ces jeux de données nécessitaient des capteurs coûteux. Par exemple, le site [Apple QuickTake 100](https://en.wikipedia.org/wiki/Apple_QuickTake) de 1994 affichait une résolution énorme de 0,3 mégapixel (VGA), capable de stocker jusqu'à 8 images, le tout pour le prix de \_ 224 \_fois 224 \_mois1$,000.
 1. Prétraiter l'ensemble des données avec des caractéristiques fabriquées à la main, en se basant sur des connaissances en optique, en géométrie, sur d'autres outils analytiques, et parfois sur les découvertes fortuites d'étudiants diplômés chanceux.
-1. Faites passer les données par un ensemble standard d'extracteurs de caractéristiques tels que le SIFT (scale-invariant feature transform) :cite:`Lowe.2004` , le SURF (speeded up robust features) :cite:`Bay.Tuytelaars.Van-Gool.2006` , ou un certain nombre d'autres pipelines réglés à la main.
-1. Introduisez les représentations résultantes dans votre classificateur préféré, probablement un modèle linéaire ou une méthode à noyau, pour entraîner un classificateur.
+1. Faites passer les données par un ensemble standard d'extracteurs de caractéristiques tels que le SIFT (scale-invariant feature transform) :cite:`Lowe.2004`, le SURF (speeded up robust features) :cite:`Bay.Tuytelaars.Van-Gool.2006`, ou un certain nombre d'autres pipelines réglés à la main.
+1. Introduisez les représentations résultantes dans votre classifieur préféré, probablement un modèle linéaire ou une méthode à noyau, pour entraîner un classifieur.
 
 Si vous avez parlé à des chercheurs en apprentissage automatique,
 ils pensaient que l'apprentissage automatique était à la fois important et beau.
-Des théories élégantes prouvaient les propriétés de divers classifieur :cite:`Boucheron.Bousquet.Lugosi.2005` et l'optimisation convexe
+Des théories élégantes prouvaient les propriétés de divers classifieurs :cite:`Boucheron.Bousquet.Lugosi.2005` et l'optimisation convexe
  :cite:`Boyd.Vandenberghe.2004` était devenue le pilier pour les obtenir.
 Le domaine de l'apprentissage automatique était florissant, rigoureux et éminemment utile. Cependant,
 si vous parliez à un chercheur en vision par ordinateur,
 vous entendriez une histoire très différente.
 La vérité crasse de la reconnaissance d'images, vous diraient-ils,
-est que les progrès sont dus aux caractéristiques, à la géométrie :cite:`Hartley.Zisserman.2000` , et à l'ingénierie,
+est que les progrès sont dus aux caractéristiques, à la géométrie :cite:`Hartley.Zisserman.2000`, et à l'ingénierie,
 plutôt qu'aux nouveaux algorithmes d'apprentissage.
 Les chercheurs en vision par ordinateur croyaient à juste titre
 qu'un ensemble de données légèrement plus grand ou plus propre
@@ -72,9 +72,9 @@ Une autre façon de présenter la situation est que
 la partie la plus importante du pipeline était la représentation.
 Et jusqu'en 2012, la représentation était calculée de manière essentiellement mécanique.
 En fait, l'ingénierie d'un nouvel ensemble de fonctions de caractéristiques, l'amélioration des résultats et la rédaction de la méthode constituaient un genre d'article important.
-SIFT :cite:`Lowe.2004` ,
-SURF :cite:`Bay.Tuytelaars.Van-Gool.2006` ,
-HOG (histogrammes de gradient orienté) :cite:`Dalal.Triggs.2005` ,
+SIFT :cite:`Lowe.2004`,
+SURF :cite:`Bay.Tuytelaars.Van-Gool.2006`,
+HOG (histogrammes de gradient orienté) :cite:`Dalal.Triggs.2005`,
 [bags of visual words] (https://en.wikipedia.org/wiki/Bag-of-words_model_in_computer_vision)
 et autres extracteurs de caractéristiques similaires ont dominé.
 
@@ -90,7 +90,7 @@ Dans le cas d'une image, les couches les plus basses pourraient venir
 pour détecter les bords, les couleurs et les textures, par analogie avec la façon dont le système visuel des animaux
 traite ses entrées.
 
-Le premier CNN moderne :cite:`Krizhevsky.Sutskever.Hinton.2012` , nommé
+Le premier CNN moderne :cite:`Krizhevsky.Sutskever.Hinton.2012`, nommé
 *AlexNet* d'après l'un de ses inventeurs, Alex Krizhevsky, est en grande partie une amélioration évolutive
 par rapport à LeNet. Il a obtenu d'excellentes performances lors du concours ImageNet 2012.
 
@@ -128,7 +128,7 @@ De nombreux articles ont traité de la collection de jeux de données de l'UCI,
 dont beaucoup ne contenaient que des centaines ou (quelques) milliers d'images
 capturées en basse résolution et souvent avec un arrière-plan artificiellement propre.
 
-En 2009, le jeu de données ImageNet a été publié sur :cite:`Deng.Dong.Socher.ea.2009` ,
+En 2009, le jeu de données ImageNet a été publié sur :cite:`Deng.Dong.Socher.ea.2009`,
 et a mis les chercheurs au défi d'apprendre des modèles à partir d'un million d'exemples,
 1000 chacun provenant de 1000 catégories d'objets distinctes. Les catégories elles-mêmes
 étaient basées sur les nœuds nominaux les plus populaires de WordNet :cite:`Miller.1995`.
@@ -161,8 +161,8 @@ optimisés de manière plus efficace.
 en rendant l'apprentissage profond possible.
 Ces puces ont été développées depuis longtemps pour accélérer le traitement graphique
 au profit des jeux vidéo.
-Elles ont notamment été optimisées pour les $$produits matrice-vecteur $ à$ haut débit 4 $\times 4$
-, nécessaires à de nombreuses tâches d'infographie.
+Elles ont notamment été optimisées pour les $$produits matrice-vecteur $ à$ haut débit 4 $\times 4$,
+ nécessaires à de nombreuses tâches d'infographie.
 Heureusement, les mathématiques sont étonnamment similaires
 à celles requises pour calculer les couches convolutionnelles.
 À cette époque, NVIDIA et ATI avaient commencé à optimiser les GPU
@@ -197,8 +197,8 @@ fonctionnant à une fréquence d'horloge d'environ 1 GHz,
 c'est le nombre total de ces cœurs qui rend les GPU plusieurs fois plus rapides que les CPU.
 Par exemple, la récente génération Ampere de NVIDIA offre plus de 300 TFLOPs par puce pour les multiplications matricielles spécialisées de précision 16 bits (BFLOAT16), et jusqu'à 20 TFLOPs pour les opérations à virgule flottante plus générales (FP32).
 Dans le même temps, les performances en virgule flottante des CPU dépassent rarement 1 TFLOP (le Graviton 2 d'AWS, par exemple, atteint 2 TFLOP en pointe pour les opérations de précision 16 bits).
-La raison pour laquelle cela est possible est en fait assez simple :
-. Tout d'abord, la consommation d'énergie a tendance à croître *quadratiquement* avec la fréquence d'horloge.
+La raison pour laquelle cela est possible est en fait assez simple :.
+Tout d'abord, la consommation d'énergie a tendance à croître *quadratiquement* avec la fréquence d'horloge.
 Par conséquent, pour le budget énergétique d'un cœur de CPU qui fonctionne 4 fois plus vite (un chiffre typique),
 vous pouvez utiliser 16 cœurs de GPU à \frac{1}{4} $$ la vitesse,
 ce qui donne $16 \times \frac{1}{4} = 4$ fois la performance.
@@ -227,12 +227,12 @@ les deux premières années du boom de l'apprentissage profond.
 
 AlexNet, qui employait un CNN à 8 couches,
 a remporté le ImageNet Large Scale Visual Recognition Challenge 2012
-par une large marge :cite:`Russakovsky.Deng.Huang.ea.2013` .
+par une large marge :cite:`Russakovsky.Deng.Huang.ea.2013`.
 Ce réseau a montré, pour la première fois,
 que les caractéristiques obtenues par apprentissage peuvent transcender les caractéristiques conçues manuellement, brisant ainsi le paradigme précédent en vision par ordinateur.
 
 Les architectures d'AlexNet et de LeNet sont étonnamment similaires,
-comme l'illustre :numref:`fig_alexnet` .
+comme l'illustre :numref:`fig_alexnet`.
 Notez que nous fournissons une version légèrement simplifiée d'AlexNet
 en supprimant certaines bizarreries de conception qui étaient nécessaires en 2012
 pour faire tenir le modèle sur deux petits GPU.
@@ -240,7 +240,7 @@ pour faire tenir le modèle sur deux petits GPU.
 ![De LeNet (gauche) à AlexNet (droite)](../img/alexnet.svg)
 :label:`fig_alexnet` 
 
- Il existe également des différences significatives entre AlexNet et LeNet.
+Il existe également des différences significatives entre AlexNet et LeNet.
 Tout d'abord, AlexNet est beaucoup plus profond que LeNet5, qui est relativement petit.
 AlexNet se compose de huit couches : cinq couches convolutionnelles,
 deux couches cachées entièrement connectées et une couche de sortie entièrement connectée.
@@ -268,15 +268,15 @@ En raison de la mémoire limitée des premiers GPU,
 l'AlexNet original utilisait une conception à double flux de données,
 afin que chacun de ses deux GPU puisse être responsable
 du stockage et du calcul de sa seule moitié du modèle.
-Heureusement, la mémoire des GPU est relativement abondante aujourd'hui,
-. Il est donc rare de devoir répartir les modèles entre les GPU aujourd'hui
+Heureusement, la mémoire des GPU est relativement abondante aujourd'hui.
+Il est donc rare de devoir répartir les modèles entre les GPU aujourd'hui
 (notre version du modèle AlexNet s'écarte
 de l'article original sur cet aspect).
 
 #### Fonctions d'activation
 
 En outre, AlexNet a remplacé la fonction d'activation sigmoïde par une fonction d'activation ReLU plus simple. D'une part, le calcul de la fonction d'activation ReLU est plus simple. Par exemple, elle ne comporte pas l'opération d'exponentiation présente dans la fonction d'activation sigmoïde.
- D'autre part, la fonction d'activation ReLU facilite l'apprentissage du modèle lors de l'utilisation de différentes méthodes d'initialisation des paramètres. En effet, lorsque la sortie de la fonction d'activation sigmoïde est très proche de 0 ou 1, le gradient de ces régions est presque nul, de sorte que la rétropropagation ne peut pas continuer à mettre à jour certains des paramètres du modèle. En revanche, le gradient de la fonction d'activation ReLU dans l'intervalle positif est toujours égal à 1 (:numref:$$`subsec_activation-functions` ). Par conséquent, si les paramètres du modèle ne sont pas correctement initialisés, la fonction sigmoïde peut obtenir un gradient de presque 0 dans l'intervalle positif, de sorte que le modèle ne peut pas être entraîné efficacement.
+D'autre part, la fonction d'activation ReLU facilite l'apprentissage du modèle lors de l'utilisation de différentes méthodes d'initialisation des paramètres. En effet, lorsque la sortie de la fonction d'activation sigmoïde est très proche de 0 ou 1, le gradient de ces régions est presque nul, de sorte que la rétropropagation ne peut pas continuer à mettre à jour certains des paramètres du modèle. En revanche, le gradient de la fonction d'activation ReLU dans l'intervalle positif est toujours égal à 1 (:numref:$$`subsec_activation-functions` ). Par conséquent, si les paramètres du modèle ne sont pas correctement initialisés, la fonction sigmoïde peut obtenir un gradient de presque 0 dans l'intervalle positif, de sorte que le modèle ne peut pas être entraîné efficacement.
 
 ### Contrôle de la capacité et prétraitement
 
@@ -287,7 +287,7 @@ Pour augmenter encore plus les données, la boucle d'apprentissage d'AlexNet
 a ajouté un grand nombre d'augmentations d'images,
 telles que des retournements, des coupures et des changements de couleur.
 Cela rend le modèle plus robuste et la taille plus importante de l'échantillon réduit efficacement le surajustement.
-Nous aborderons l'augmentation des données plus en détail dans :numref:`sec_image_augmentation` . Voir également :cite:`Buslaev.Iglovikov.Khvedchenya.ea.2020` pour un examen approfondi de ces étapes de prétraitement.
+Nous aborderons l'augmentation des données plus en détail dans :numref:`sec_image_augmentation`. Voir également :cite:`Buslaev.Iglovikov.Khvedchenya.ea.2020` pour un examen approfondi de ces étapes de prétraitement.
 
 ```{.python .input}
 %%tab mxnet
@@ -368,7 +368,7 @@ class AlexNet(d2l.Classifier):
                 tf.keras.layers.Dense(num_classes)])
 ```
 
-Nous [**construisons un exemple de données à canal unique**] avec une hauteur et une largeur de 224 (**pour observer la forme de la sortie de chaque couche**). Il correspond à l'architecture d'AlexNet dans :numref:`fig_alexnet` .
+Nous [**construisons un exemple de données à canal unique**] avec une hauteur et une largeur de 224 (**pour observer la forme de la sortie de chaque couche**). Il correspond à l'architecture d'AlexNet dans :numref:`fig_alexnet`.
 
 ```{.python .input}
 %%tab pytorch, mxnet
@@ -395,7 +395,7 @@ mais nous le faisons ici pour être fidèles à l'architecture d'AlexNet.
 Nous effectuons ce redimensionnement avec l'argument `resize` dans le constructeur `d2l.FashionMNIST`.
 
 Maintenant, nous pouvons [**commencer l'entraînement d'AlexNet.**]
-Par rapport à LeNet dans :numref:`sec_lenet` ,
+Par rapport à LeNet dans :numref:`sec_lenet`,
 le principal changement ici est l'utilisation d'un taux d'apprentissage plus faible
 et un entraînement beaucoup plus lent en raison du réseau plus profond et plus large,
 de la résolution d'image plus élevée, et des convolutions plus coûteuses.

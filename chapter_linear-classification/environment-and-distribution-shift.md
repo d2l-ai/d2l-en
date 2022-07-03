@@ -1,7 +1,7 @@
 # Environnement et décalage de distribution
 :label:`sec_environment-and-distribution-shift` 
 
- Dans les sections précédentes, nous avons travaillé sur
+Dans les sections précédentes, nous avons travaillé sur
 un certain nombre d'applications pratiques de l'apprentissage automatique,
 en adaptant des modèles à divers ensembles de données.
 Pourtant, nous n'avons jamais pris le temps de réfléchir à
@@ -14,9 +14,9 @@ sans prendre le temps de réfléchir à ces questions fondamentales.
 
 De nombreux déploiements d'apprentissage automatique qui ont échoué
 peuvent être attribués à ce modèle.
-Parfois, les modèles semblent fonctionner à merveille
-, comme le montre la précision des jeux de tests
-, mais échouent de manière catastrophique lors du déploiement
+Parfois, les modèles semblent fonctionner à merveille,
+comme le montre la précision des jeux de tests,
+ mais échouent de manière catastrophique lors du déploiement
 lorsque la distribution des données change soudainement.
 Plus insidieusement, le déploiement même d'un modèle
 peut parfois être le catalyseur qui perturbe la distribution des données.
@@ -70,8 +70,8 @@ d'exemples non étiquetés tirés de
 une distribution différente $p_T(\mathbf{x},y)$.
 Déjà, nous devons faire face à une réalité qui donne à réfléchir.
 En l'absence de toute hypothèse sur la façon dont $p_S$
- et $p_T$ sont liés les uns aux autres,
-l'apprentissage d'un classificateur robuste est impossible.
+et $p_T$ sont liés les uns aux autres,
+l'apprentissage d'un classifieur robuste est impossible.
 
 Considérons un problème de classification binaire,
 où nous souhaitons distinguer les chiens des chats.
@@ -92,7 +92,7 @@ Heureusement, sous certaines hypothèses restreintes
 sur la façon dont nos données pourraient changer à l'avenir,
 des algorithmes fondés sur des principes peuvent détecter le décalage
 et parfois même s'adapter à la volée,
-en améliorant la précision du classificateur original.
+en améliorant la précision du classifieur original.
 
 ### Décalage de covariation
 
@@ -111,13 +111,13 @@ est l'hypothèse naturelle à invoquer dans des contextes
 où nous pensons que $\mathbf{x}$ cause $y$.
 
 Considérons le défi consistant à distinguer les chats des chiens.
-Nos données d'apprentissage peuvent consister en des images du type de celles présentées sur :numref:`fig_cat-dog-train` .
+Nos données d'apprentissage peuvent consister en des images du type de celles présentées sur :numref:`fig_cat-dog-train`.
 
 ![Training data for distinguishing cats and dogs.](../img/cat-dog-train.svg)
 :label:`fig_cat-dog-train`
 
 
-Au moment du test, on nous demande de classer les images dans :numref:`fig_cat-dog-test` .
+Au moment du test, on nous demande de classer les images dans :numref:`fig_cat-dog-test`.
 
 ![Test data for distinguishing cats and dogs.](../img/cat-dog-test.svg)
 :label:`fig_cat-dog-test`
@@ -133,7 +133,7 @@ d'adaptation au nouveau domaine.
 
 *Label shift* décrit le problème inverse.
 Ici, nous supposons que l'étiquette marginale $P(y)$
- peut changer
+peut changer
 mais que la distribution conditionnelle de classe
 $P(\mathbf{x} \mid y)$ reste fixe entre les domaines.
 Le décalage d'étiquette est une hypothèse raisonnable à faire
@@ -171,13 +171,13 @@ Il s'avère que si nous naviguons autour des États-Unis,
 en déplaçant la source de nos données en fonction de la géographie,
 nous trouverons un changement de concept considérable concernant
 la distribution des noms de *boissons gazeuses*
-comme le montre :numref:`fig_popvssoda` .
+comme le montre :numref:`fig_popvssoda`.
 
 ![Concept shift on soft drink names in the United States.](../img/popvssoda.png) 
- :width:`400px` 
+:width:`400px` 
 :label:`fig_popvssoda` 
 
- Si nous devions construire un système de traduction automatique,
+Si nous devions construire un système de traduction automatique,
 la distribution $P(y \mid \mathbf{x})$ pourrait être différente
 en fonction de notre emplacement.
 Ce problème peut être difficile à détecter.
@@ -217,7 +217,7 @@ Pour compenser, la startup a sollicité
 des dons de sang auprès d'étudiants d'un campus universitaire
 pour servir de témoins sains dans le cadre de la mise au point de leur test.
 Ils ont ensuite demandé si nous pouvions les aider
-à construire un classificateur pour détecter la maladie.
+à construire un classifieur pour détecter la maladie.
 
 Comme nous leur avons expliqué,
 il serait en effet facile de distinguer
@@ -259,7 +259,7 @@ lorsqu'elle a essayé pour la première fois de détecter des chars dans la for�
 Ils ont pris des photos aériennes de la forêt sans chars,
 puis ont conduit les chars dans la forêt
 et ont pris une autre série de photos.
-Le classificateur semblait fonctionner *parfaitement*.
+Le classifieur semblait fonctionner *parfaitement*.
 Malheureusement, il avait simplement appris
 à distinguer les arbres avec ombres
 des arbres sans ombres - la première série de photos
@@ -282,7 +282,7 @@ Voici quelques cas typiques.
 
 * Nous construisons un détecteur de visage. Il fonctionne bien sur tous les benchmarks. Malheureusement, il échoue sur les données de test - les exemples incriminés sont des gros plans où le visage remplit toute l'image (aucune donnée de ce type ne figurait dans l'ensemble d'entraînement).
 * Nous construisons un moteur de recherche Web pour le marché américain et voulons le déployer au Royaume-Uni.
-* Nous formons un classificateur d'images en compilant un grand ensemble de données où chacune des classes est représentée de manière égale dans l'ensemble de données, par exemple 1000 catégories, représentées par 1000 images chacune. Ensuite, nous déployons le système dans le monde réel, où la distribution réelle des étiquettes des photographies est décidément non uniforme.
+* Nous formons un classifieur d'images en compilant un grand ensemble de données où chacune des classes est représentée de manière égale dans l'ensemble de données, par exemple 1000 catégories, représentées par 1000 images chacune. Ensuite, nous déployons le système dans le monde réel, où la distribution réelle des étiquettes des photographies est décidément non uniforme.
 
 
 
@@ -305,19 +305,19 @@ car ce matériel n'est pas un prérequis pour les concepts suivants.
 ### Risque empirique et risque
 :label:`subsec_empirical-risk-and-risk` 
 
- Réfléchissons d'abord à ce qui se passe exactement
+Réfléchissons d'abord à ce qui se passe exactement
 pendant l'apprentissage du modèle :
 nous itérons sur les caractéristiques et les étiquettes associées
 des données d'apprentissage
 $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ 
- et mettons à jour les paramètres d'un modèle $f$ après chaque minibatch.
-Pour des raisons de simplicité, nous ne tenons pas compte de la régularisation,
-. Nous minimisons donc largement la perte sur l'apprentissage :
+et mettons à jour les paramètres d'un modèle $f$ après chaque minibatch.
+Pour des raisons de simplicité, nous ne tenons pas compte de la régularisation.
+Nous minimisons donc largement la perte sur l'apprentissage :
 
 $$\mathop{\mathrm{minimize}}_f \frac{1}{n} \sum_{i=1}^n l(f(\mathbf{x}_i), y_i),$$ 
- :eqlabel:`eq_empirical-risk-min` 
+:eqlabel:`eq_empirical-risk-min` 
 
- où $l$ est la fonction de perte
+où $l$ est la fonction de perte
 qui mesure la "qualité" de la prédiction $f(\mathbf{x}_i)$ compte tenu de l'étiquette associée $y_i$.
 Les statisticiens appellent le terme de :eqref:`eq_empirical-risk-min` *risque empirique*.
 Le *risque empirique* est une perte moyenne sur les données d'apprentissage
@@ -327,11 +327,11 @@ de la perte sur la population entière de données tirées de leur vraie distrib
 $p(\mathbf{x},y)$ :
 
 $$E_{p(\mathbf{x}, y)} [l(f(\mathbf{x}), y)] = \int\int l(f(\mathbf{x}), y) p(\mathbf{x}, y) \;d\mathbf{x}dy.$$ 
- :eqlabel:`eq_true-risk` 
+:eqlabel:`eq_true-risk` 
 
- Cependant, en pratique, nous ne pouvons généralement pas obtenir la population entière de données.
+Cependant, en pratique, nous ne pouvons généralement pas obtenir la population entière de données.
 Ainsi, la minimisation du risque empirique *,
-qui consiste à minimiser le risque empirique dans :eqref:`eq_empirical-risk-min` ,
+qui consiste à minimiser le risque empirique dans :eqref:`eq_empirical-risk-min`,
 est une stratégie pratique pour l'apprentissage automatique,
 dans l'espoir d'approcher
 en minimisant le risque.
@@ -341,12 +341,12 @@ en minimisant le risque.
 ### Correction du décalage des covariables
 :label:`subsec_covariate-shift-correction` 
 
- Supposons que nous voulions estimer
+Supposons que nous voulions estimer
 une certaine dépendance $P(y \mid \mathbf{x})$
- pour laquelle nous disposons de données étiquetées $(\mathbf{x}_i, y_i)$.
+pour laquelle nous disposons de données étiquetées $(\mathbf{x}_i, y_i)$.
 Malheureusement, les observations $\mathbf{x}_i$ sont tirées
 d'une certaine *distribution source* $q(\mathbf{x})$
- plutôt que de la *distribution cible* $p(\mathbf{x})$.
+plutôt que de la *distribution cible* $p(\mathbf{x})$.
 Heureusement,
 l'hypothèse de dépendance signifie
 que la distribution conditionnelle ne change pas : $p(y \mid \mathbf{x}) = q(y \mid \mathbf{x})$.
@@ -363,7 +363,7 @@ $$
 En d'autres termes, nous devons repondérer chaque exemple de données
 par le rapport de la probabilité
 
- qu'il aurait été tiré de la distribution correcte à celle de la distribution erronée :
+qu'il aurait été tiré de la distribution correcte à celle de la distribution erronée :
 
 $$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(\mathbf{x}_i)}{q(\mathbf{x}_i)}.$$
 
@@ -373,11 +373,11 @@ chaque exemple de données $(\mathbf{x}_i, y_i)$
 *weighted empirical risk minimization* :
 
 $$\mathop{\mathrm{minimize}}_f \frac{1}{n} \sum_{i=1}^n \beta_i l(f(\mathbf{x}_i), y_i).$$ 
- :eqlabel:`eq_weighted-empirical-risk-min` 
+:eqlabel:`eq_weighted-empirical-risk-min` 
 
  
 
- Hélas, nous ne connaissons pas ce ratio,
+Hélas, nous ne connaissons pas ce ratio,
 donc avant de pouvoir faire quoi que ce soit d'utile nous devons l'estimer.
 De nombreuses méthodes sont disponibles,
 y compris certaines approches fantaisistes de la théorie des opérateurs
@@ -395,12 +395,12 @@ qui donnera des résultats presque aussi bons que l'originale : la régression l
 qui est un cas particulier de la régression softmax (voir :numref:`sec_softmax` )
 pour la classification binaire.
 C'est tout ce qui est nécessaire pour calculer les rapports de probabilité estimés.
-Nous apprenons un classificateur pour distinguer
+Nous apprenons un classifieur pour distinguer
 entre les données tirées de $p(\mathbf{x})$
- et les données tirées de $q(\mathbf{x})$.
+et les données tirées de $q(\mathbf{x})$.
 S'il est impossible de distinguer
-entre les deux distributions
-, cela signifie que les instances associées
+entre les deux distributions,
+cela signifie que les instances associées
 ont la même probabilité de provenir de
 l'une ou l'autre des deux distributions.
 D'autre part, toute instance
@@ -411,14 +411,14 @@ ou sous-pondérée en conséquence.
 Pour simplifier, supposons que nous avons
 un nombre égal d'instances provenant des deux distributions
 $p(\mathbf{x})$ 
- et $q(\mathbf{x})$, respectivement.
+et $q(\mathbf{x})$, respectivement.
 Désignons maintenant par $z$ les étiquettes qui sont $1$
- pour les données tirées de $p$ et $-1$ pour les données tirées de $q$.
+pour les données tirées de $p$ et $-1$ pour les données tirées de $q$.
 Alors la probabilité dans un ensemble de données mixte est donnée par
 
 $$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$ 
 
- Ainsi, si nous utilisons une approche de régression logistique,
+Ainsi, si nous utilisons une approche de régression logistique,
 où $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-h(\mathbf{x}))}$ ($h$ est une fonction paramétrée),
 il s'ensuit que
 
@@ -431,21 +431,21 @@ d'abord un problème de distinction entre
 les données tirées des deux distributions,
 et ensuite un problème de minimisation du risque empirique pondéré
 dans :eqref:`eq_weighted-empirical-risk-min` 
- où nous pondérons les termes par $\beta_i$.
+où nous pondérons les termes par $\beta_i$.
 
 Nous sommes maintenant prêts à décrire un algorithme de correction.
 Supposons que nous ayons un ensemble d'apprentissage $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ et un ensemble de test non étiqueté $\{\mathbf{u}_1, \ldots, \mathbf{u}_m\}$.
 Pour le décalage des covariables,
 nous supposons que $\mathbf{x}_i$ pour tout $1 \leq i \leq n$ sont tirés d'une certaine distribution source
 et $\mathbf{u}_i$ pour tout $1 \leq i \leq m$
- sont tirés de la distribution cible.
+sont tirés de la distribution cible.
 Voici un algorithme prototype
 pour corriger le décalage des covariables :
 
 1. Générer un ensemble d'apprentissage de classification binaire : $\{(\mathbf{x}_1, -1), \ldots, (\mathbf{x}_n, -1), (\mathbf{u}_1, 1), \ldots, (\mathbf{u}_m, 1)\}$.
-1. Entraîner un classificateur binaire en utilisant la régression logistique pour obtenir la fonction $h$.
+1. Entraîner un classifieur binaire en utilisant la régression logistique pour obtenir la fonction $h$.
 1. Peser les données d'entraînement en utilisant $\beta_i = \exp(h(\mathbf{x}_i))$ ou mieux $\beta_i = \min(\exp(h(\mathbf{x}_i)), c)$ pour une certaine constante $c$.
-1. Utilisez les poids $\beta_i$ pour l'entrainement sur $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ dans :eqref:`eq_weighted-empirical-risk-min` .
+1. Utilisez les poids $\beta_i$ pour l'entrainement sur $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ dans :eqref:`eq_weighted-empirical-risk-min`.
 
 Notez que l'algorithme ci-dessus repose sur une hypothèse cruciale.
 Pour que ce schéma fonctionne, il faut que chaque exemple de données
@@ -463,7 +463,7 @@ alors le poids d'importance correspondant doit être infini.
 
 Supposons que nous ayons affaire à une tâche de classification
 avec $k$ catégories.
-En utilisant la même notation que dans :numref:`subsec_covariate-shift-correction` ,
+En utilisant la même notation que dans :numref:`subsec_covariate-shift-correction`,
 $q$ et $p$ sont la distribution source (par exemple, le temps de formation) et la distribution cible (par exemple, le temps de test), respectivement.
 Supposons que la distribution des étiquettes se déplace dans le temps :
 $q(y) \neq p(y)$ , mais que la distribution conditionnelle de classe
@@ -487,9 +487,9 @@ $$
 Ici, nos poids d'importance correspondront aux rapports de vraisemblance de l'étiquette
 
 
- $$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(y_i)}{q(y_i)}.$$ 
+$$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(y_i)}{q(y_i)}.$$ 
 
- Un aspect intéressant du décalage de l'étiquette est que
+Un aspect intéressant du décalage de l'étiquette est que
 si nous avons un modèle raisonnablement bon
 sur la distribution source,
 alors nous pouvons obtenir des estimations cohérentes de ces poids
@@ -499,7 +499,7 @@ Dans le cadre de l'apprentissage profond, les entrées ont tendance à
 tandis que les étiquettes sont souvent des objets plus simples comme des catégories.
 
 Pour estimer la distribution des étiquettes cibles,
-nous prenons d'abord notre classificateur standard raisonnablement bon
+nous prenons d'abord notre classifieur standard raisonnablement bon
 (généralement formé sur les données de formation)
 et nous calculons sa matrice de confusion en utilisant l'ensemble de validation
 (également issu de la distribution de formation).
@@ -517,11 +517,11 @@ que nous voyons dans la nature,
 Ce que nous pouvons faire, cependant, c'est faire la moyenne de toutes les prédictions de nos modèles
 au moment du test, ce qui donne les sorties moyennes du modèle $\mu(\hat{\mathbf{y}}) \in \mathbb{R}^k$,
 dont l'élément $i^\mathrm{th}$ $\mu(\hat{y}_i)$ 
- est la fraction des prédictions totales sur l'ensemble de test
+est la fraction des prédictions totales sur l'ensemble de test
 où notre modèle a prédit $i$.
 
 Il s'avère que sous certaines conditions douces--- si
-notre classificateur était raisonnablement précis en premier lieu,
+notre classifieur était raisonnablement précis en premier lieu,
 et si les données cibles ne contiennent que des catégories
 que nous avons déjà vues,
 et si l'hypothèse de décalage d'étiquette se vérifie en premier lieu
@@ -531,9 +531,9 @@ en résolvant un système linéaire simple
 
 $$\mathbf{C} p(\mathbf{y}) = \mu(\hat{\mathbf{y}}),$$ 
 
- parce que, en tant qu'estimation, $\sum_{j=1}^k c_{ij} p(y_j) = \mu(\hat{y}_i)$ est valable pour tous les $1 \leq i \leq k$,
+parce que, en tant qu'estimation, $\sum_{j=1}^k c_{ij} p(y_j) = \mu(\hat{y}_i)$ est valable pour tous les $1 \leq i \leq k$,
 où $p(y_j)$ est l'élément $j^\mathrm{th}$ du vecteur de distribution des étiquettes $k$-dimensionnel $p(\mathbf{y})$.
-Si notre classificateur est suffisamment précis au départ,
+Si notre classifieur est suffisamment précis au départ,
 alors la matrice de confusion $\mathbf{C}$ sera inversible,
 et nous obtiendrons une solution $p(\mathbf{y}) = \mathbf{C}^{-1} \mu(\hat{\mathbf{y}})$.
 
@@ -541,9 +541,9 @@ Comme nous observons les étiquettes sur les données sources,
 il est facile d'estimer la distribution $q(y)$.
 Ensuite, pour tout exemple de entrainement $i$ avec l'étiquette $y_i$,
 nous pouvons prendre le rapport de nos estimations $p(y_i)/q(y_i)$
- pour calculer le poids $\beta_i$,
+pour calculer le poids $\beta_i$,
 et l'insérer dans la minimisation du risque empirique pondéré
-dans :eqref:`eq_weighted-empirical-risk-min` .
+dans :eqref:`eq_weighted-empirical-risk-min`.
 
 
 ### Correction du décalage de concept
@@ -604,7 +604,7 @@ Récemment, la théorie du contrôle
 (par exemple, les variantes PID) a également été utilisée
 pour régler automatiquement les hyperparamètres
 afin d'obtenir une meilleure qualité de démêlage et de reconstruction,
-et d'améliorer la diversité du texte généré et la qualité de reconstruction des images générées :cite:`Shao.Yao.Sun.ea.2020` .
+et d'améliorer la diversité du texte généré et la qualité de reconstruction des images générées :cite:`Shao.Yao.Sun.ea.2020`.
 
 
 
@@ -636,8 +636,8 @@ qui doivent être soigneusement examinées.
 Si nous déployons un système de diagnostic médical,
 nous devons savoir pour quelles populations
 il peut fonctionner et pour lesquelles il peut ne pas fonctionner.
-Si nous négligeons les risques prévisibles pour le bien-être d'une sous-population
-, nous pourrions administrer des soins de qualité inférieure.
+Si nous négligeons les risques prévisibles pour le bien-être d'une sous-population,
+ nous pourrions administrer des soins de qualité inférieure.
 En outre, dès lors que nous envisageons des systèmes de prise de décision,
 nous devons prendre du recul et reconsidérer la manière dont nous évaluons notre technologie.
 Entre autres conséquences de ce changement de perspective,
@@ -688,7 +688,7 @@ que vous pourriez rencontrer au cours d'une carrière dans l'apprentissage autom
 ## Exercices
 
 1. Que pourrait-il se passer si nous modifions le comportement d'un moteur de recherche ? Que pourraient faire les utilisateurs ? Qu'en est-il des annonceurs ?
-1. Implémentez un détecteur de décalage de covariables. Astuce : construisez un classificateur.
+1. Implémentez un détecteur de décalage de covariables. Astuce : construisez un classifieur.
 1. Implémentez un correcteur de décalage de covariables.
 1. Outre le décalage de la distribution, qu'est-ce qui pourrait affecter la façon dont le risque empirique se rapproche du risque ?
 

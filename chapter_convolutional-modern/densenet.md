@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Les réseaux densément connectés (DenseNet)
 :label:`sec_densenet` 
 
- ResNet a considérablement changé la vision de la manière de paramétrer les fonctions dans les réseaux profonds. *DenseNet* (dense convolutional network) est en quelque sorte l'extension logique de ce :cite:`Huang.Liu.Van-Der-Maaten.ea.2017` .
+ResNet a considérablement changé la vision de la manière de paramétrer les fonctions dans les réseaux profonds. *DenseNet* (dense convolutional network) est en quelque sorte l'extension logique de ce :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
 En conséquence,
 DenseNet 
 est caractérisé par
@@ -24,20 +24,20 @@ Rappelons l'expansion de Taylor pour les fonctions. Pour le point $x = 0$, elle 
 $$f(x) = f(0) + f'(0) x + \frac{f''(0)}{2!}  x^2 + \frac{f'''(0)}{3!}  x^3 + \ldots.$$ 
 
  
- Le point essentiel est qu'elle décompose une fonction en termes d'ordre de plus en plus élevé. Dans le même ordre d'idées, ResNet décompose les fonctions en
+Le point essentiel est qu'elle décompose une fonction en termes d'ordre de plus en plus élevé. Dans le même ordre d'idées, ResNet décompose les fonctions en
 
 $$f(\mathbf{x}) = \mathbf{x} + g(\mathbf{x}).$$ 
 
- C'est-à-dire que ResNet décompose $f$ en un terme linéaire simple et un terme non linéaire plus complexe
+C'est-à-dire que ResNet décompose $f$ en un terme linéaire simple et un terme non linéaire plus complexe
 .
 Que faire si nous voulons capturer (sans nécessairement ajouter) des informations au-delà de deux termes ?
 Une solution était
-DenseNet :cite:`Huang.Liu.Van-Der-Maaten.ea.2017` .
+DenseNet :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
 
 ![The main difference between ResNet (left) et DenseNet (à droite) dans les connexions entre couches : utilisation de l'addition et utilisation de la concaténation. ](../img/densenet-block.svg)
 :label:`fig_densenet_block` 
 
- Comme le montre :numref:`fig_densenet_block` , la principale différence entre ResNet et DenseNet est que dans ce dernier cas, les sorties sont *concaténées* (indiquées par $[,]$) plutôt qu'ajoutées.
+Comme le montre :numref:`fig_densenet_block`, la principale différence entre ResNet et DenseNet est que dans ce dernier cas, les sorties sont *concaténées* (indiquées par $[,]$) plutôt qu'ajoutées.
 Par conséquent, nous effectuons un mappage de $\mathbf{x}$ à ses valeurs après avoir appliqué une séquence de fonctions de plus en plus complexe :
 
 $$\mathbf{x} \to \left[
@@ -46,7 +46,7 @@ f_1(\mathbf{x}),
 f_2([\mathbf{x}, f_1(\mathbf{x})]), f_3([\mathbf{x}, f_1(\mathbf{x}), f_2([\mathbf{x}, f_1(\mathbf{x})])]), \ldots\right].$$
 
 Au final, toutes ces fonctions sont combinées dans le MLP pour réduire à nouveau le nombre de caractéristiques. En termes d'implémentation, c'est assez simple :
-plutôt que d'ajouter des termes, nous les concaténons. Le nom DenseNet vient du fait que le graphe de dépendance entre les variables devient assez dense. La dernière couche d'une telle chaîne est densément connectée à toutes les couches précédentes. Les connexions denses sont illustrées sur le site :numref:`fig_densenet` .
+plutôt que d'ajouter des termes, nous les concaténons. Le nom DenseNet vient du fait que le graphe de dépendance entre les variables devient assez dense. La dernière couche d'une telle chaîne est densément connectée à toutes les couches précédentes. Les connexions denses sont illustrées sur le site :numref:`fig_densenet`.
 
 ![Dense connections in DenseNet.](../img/densenet.svg)
 :label:`fig_densenet`
@@ -275,7 +275,7 @@ class DenseNet(d2l.Classifier):
 
 Ensuite, à l'instar des quatre modules constitués de blocs résiduels qu'utilise ResNet,
 DenseNet utilise quatre blocs denses.
-Comme dans ResNet, nous pouvons définir le nombre de couches convolutives utilisées dans chaque bloc dense. Ici, nous l'avons fixé à 4, en accord avec le modèle ResNet-18 dans :numref:`sec_resnet` . En outre, nous fixons le nombre de canaux (c'est-à-dire le taux de croissance) pour les couches convolutives dans le bloc dense à 32, de sorte que 128 canaux seront ajoutés à chaque bloc dense.
+Comme dans ResNet, nous pouvons définir le nombre de couches convolutives utilisées dans chaque bloc dense. Ici, nous l'avons fixé à 4, en accord avec le modèle ResNet-18 dans :numref:`sec_resnet`. En outre, nous fixons le nombre de canaux (c'est-à-dire le taux de croissance) pour les couches convolutives dans le bloc dense à 32, de sorte que 128 canaux seront ajoutés à chaque bloc dense.
 
 Dans ResNet, la hauteur et la largeur sont réduites entre chaque module par un bloc résiduel avec un stride de 2. Ici, nous utilisons la couche de transition pour diviser par deux la hauteur et la largeur et par deux le nombre de canaux. Comme pour ResNet, une couche de mise en commun globale et une couche entièrement connectée sont connectées à la fin pour produire la sortie.
 
@@ -367,7 +367,7 @@ Bien que ces opérations de concaténation
 réutilisent les caractéristiques pour obtenir une efficacité de calcul,
 elles entraînent malheureusement une forte consommation de mémoire du GPU.
 Par conséquent,
-l'application de DenseNet peut nécessiter des implémentations plus complexes et efficaces en termes de mémoire, ce qui peut augmenter le temps de entrainement :cite:`pleiss2017memory` .
+l'application de DenseNet peut nécessiter des implémentations plus complexes et efficaces en termes de mémoire, ce qui peut augmenter le temps de entrainement :cite:`pleiss2017memory`.
 
 
 ## Exercices
@@ -377,8 +377,8 @@ l'application de DenseNet peut nécessiter des implémentations plus complexes e
 1. Un des problèmes pour lequel DenseNet a été critiqué est sa forte consommation de mémoire.
    1. Est-ce vraiment le cas ? Essayez de changer la forme d'entrée en $224\times 224$ pour voir la consommation réelle de mémoire du GPU.
    1. Pouvez-vous penser à un autre moyen de réduire la consommation de mémoire ? Comment devriez-vous modifier le framework ?
-1. Implémentez les différentes versions de DenseNet présentées dans le tableau 1 de l'article sur DenseNet :cite:`Huang.Liu.Van-Der-Maaten.ea.2017` .
-1. Concevez un modèle MLP en appliquant l'idée de DenseNet. Appliquez-le à la tâche de prédiction du prix des logements dans :numref:`sec_kaggle_house` .
+1. Implémentez les différentes versions de DenseNet présentées dans le tableau 1 de l'article sur DenseNet :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
+1. Concevez un modèle MLP en appliquant l'idée de DenseNet. Appliquez-le à la tâche de prédiction du prix des logements dans :numref:`sec_kaggle_house`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/87)

@@ -1,7 +1,7 @@
 # Réseaux neuronaux récurrents bidirectionnels
 :label:`sec_bi_rnn` 
 
- Dans l'apprentissage séquentiel,
+Dans l'apprentissage séquentiel,
 nous avons supposé jusqu'à présent que notre objectif était de modéliser la sortie suivante en fonction de ce que nous avons vu jusqu'à présent, par exemple dans le contexte d'une série temporelle ou d'un modèle de langage. Bien que ce soit un scénario typique, ce n'est pas le seul que nous pouvons rencontrer. Pour illustrer le problème, considérons les trois tâches suivantes consistant à remplir les blancs dans une séquence de texte :
 
 * Je suis `___`.
@@ -24,7 +24,7 @@ mais ils aident à motiver l'utilisation de l'apprentissage profond et le choix 
 Si nous voulons résoudre le problème à l'aide de modèles graphiques probabilistes, nous pourrions par exemple concevoir un modèle à variables latentes comme suit.
 À chaque pas de temps $t$,
 nous supposons qu'il existe une variable latente $h_t$ qui régit notre émission observée $x_t$ via $P(x_t \mid h_t)$.
-De plus, toute transition $h_t \to h_{t+1}$ est donnée par une certaine probabilité de transition d'état $P(h_{t+1} \mid h_{t})$. Ce modèle graphique probabiliste est alors un *modèle de Markov caché* comme dans :numref:`fig_hmm` .
+De plus, toute transition $h_t \to h_{t+1}$ est donnée par une certaine probabilité de transition d'état $P(h_{t+1} \mid h_{t})$. Ce modèle graphique probabiliste est alors un *modèle de Markov caché* comme dans :numref:`fig_hmm`.
 
 ![A hidden Markov model.](../img/hmm.svg)
 :label:`fig_hmm`
@@ -33,10 +33,10 @@ Ainsi,
 pour une séquence d'observations $T$, nous avons la distribution de probabilité conjointe suivante sur les états observés et cachés :
 
 $$P(x_1, \ldots, x_T, h_1, \ldots, h_T) = \prod_{t=1}^T P(h_t \mid h_{t-1}) P(x_t \mid h_t), \text{ where } P(h_1 \mid h_0) = P(h_1).$$ 
- :eqlabel:`eq_hmm_jointP` 
+:eqlabel:`eq_hmm_jointP` 
 
  
- Supposons maintenant que nous observons tous les $x_i$ à l'exception de certains $x_j$ et que notre objectif est de calculer $P(x_j \mid x_{-j})$, où $x_{-j} = (x_1, \ldots, x_{j-1}, x_{j+1}, \ldots, x_{T})$.
+Supposons maintenant que nous observons tous les $x_i$ à l'exception de certains $x_j$ et que notre objectif est de calculer $P(x_j \mid x_{-j})$, où $x_{-j} = (x_1, \ldots, x_{j-1}, x_{j+1}, \ldots, x_{T})$.
 Puisqu'il n'y a pas de variable latente
 dans $P(x_j \mid x_{-j})$,
 nous envisageons d'additionner sur
@@ -46,7 +46,7 @@ Dans le cas où toute $h_i$ peut prendre $k$ valeurs distinctes (un nombre fini 
 Pour voir comment cela fonctionne,
 envisagez de faire la somme des variables latentes
 $h_1, \ldots, h_T$ à tour de rôle.
-D'après :eqref:`eq_hmm_jointP` ,
+D'après :eqref:`eq_hmm_jointP`,
 cela donne :
 
 $$\begin{aligned}
@@ -65,7 +65,7 @@ En général, nous avons la *récursion avant* comme
 
 $$\pi_{t+1}(h_{t+1}) = \sum_{h_t} \pi_t(h_t) P(x_t \mid h_t) P(h_{t+1} \mid h_t).$$ 
 
- La récursion est initialisée comme $\pi_1(h_1) = P(h_1)$. En termes abstraits, on peut l'écrire sous la forme $\pi_{t+1} = f(\pi_t, x_t)$, où $f$ est une fonction apprenable. Cela ressemble beaucoup à l'équation de mise à jour des modèles à variables latentes dont nous avons parlé jusqu'à présent dans le contexte des RNN !
+La récursion est initialisée comme $\pi_1(h_1) = P(h_1)$. En termes abstraits, on peut l'écrire sous la forme $\pi_{t+1} = f(\pi_t, x_t)$, où $f$ est une fonction apprenable. Cela ressemble beaucoup à l'équation de mise à jour des modèles à variables latentes dont nous avons parlé jusqu'à présent dans le contexte des RNN !
 
 De manière tout à fait analogue à la récursion avant,
 nous pouvons également
@@ -88,18 +88,18 @@ Nous pouvons donc écrire la *récursion arrière* comme suit :
 
 $$\rho_{t-1}(h_{t-1})= \sum_{h_{t}} P(h_{t} \mid h_{t-1}) P(x_{t} \mid h_{t}) \rho_{t}(h_{t}),$$ 
 
- avec initialisation $\rho_T(h_T) = 1$.
+avec initialisation $\rho_T(h_T) = 1$.
 Les récursions avant et arrière nous permettent de faire la somme des variables latentes $T$ en temps (linéaire) $\mathcal{O}(kT)$ sur toutes les valeurs de $(h_1, \ldots, h_T)$ plutôt qu'en temps exponentiel.
 C'est l'un des grands avantages de l'inférence probabiliste avec les modèles graphiques.
 C'est
 également une instance très spéciale de
-un algorithme général de passage de messages :cite:`Aji.McEliece.2000` .
+un algorithme général de passage de messages :cite:`Aji.McEliece.2000`.
 En combinant les récursions avant et arrière, nous sommes en mesure de calculer
 
 $$P(x_j \mid x_{-j}) \propto \sum_{h_j} \pi_j(h_j) \rho_j(h_j) P(x_j \mid h_j).$$ 
 
- Notez qu'en termes abstraits, la récursion arrière peut être écrite sous la forme $\rho_{t-1} = g(\rho_t, x_t)$, où $g$ est une fonction apprenable. Encore une fois, cela ressemble beaucoup à une équation de mise à jour, mais avec un retour en arrière, contrairement à ce que nous avons vu jusqu'à présent dans les RNN. En effet, les modèles de Markov cachés bénéficient de la connaissance des données futures lorsqu'elles sont disponibles. Les scientifiques spécialisés dans le traitement des signaux font la distinction entre les deux cas de connaissance et d'ignorance des observations futures : interpolation et extrapolation.
-Voir le chapitre d'introduction du livre sur les algorithmes séquentiels de Monte Carlo pour plus de détails :cite:`Doucet.De-Freitas.Gordon.2001` .
+Notez qu'en termes abstraits, la récursion arrière peut être écrite sous la forme $\rho_{t-1} = g(\rho_t, x_t)$, où $g$ est une fonction apprenable. Encore une fois, cela ressemble beaucoup à une équation de mise à jour, mais avec un retour en arrière, contrairement à ce que nous avons vu jusqu'à présent dans les RNN. En effet, les modèles de Markov cachés bénéficient de la connaissance des données futures lorsqu'elles sont disponibles. Les scientifiques spécialisés dans le traitement des signaux font la distinction entre les deux cas de connaissance et d'ignorance des observations futures : interpolation et extrapolation.
+Voir le chapitre d'introduction du livre sur les algorithmes séquentiels de Monte Carlo pour plus de détails :cite:`Doucet.De-Freitas.Gordon.2001`.
 
 
 ## Modèle bidirectionnel
@@ -119,8 +119,8 @@ Cette transition incarne bon nombre des principes qui guident la conception des 
 
 #### Définition
 
-Les RNN bidirectionnels ont été introduits par :cite:`Schuster.Paliwal.1997` .
-Pour une discussion détaillée des différentes architectures, voir également l'article :cite:`Graves.Schmidhuber.2005` .
+Les RNN bidirectionnels ont été introduits par :cite:`Schuster.Paliwal.1997`.
+Pour une discussion détaillée des différentes architectures, voir également l'article :cite:`Graves.Schmidhuber.2005`.
 Examinons les spécificités d'un tel réseau.
 
 
@@ -140,14 +140,14 @@ $$
 où les poids $\mathbf{W}_{xh}^{(f)} \in \mathbb{R}^{d \times h}, \mathbf{W}_{hh}^{(f)} \in \mathbb{R}^{h \times h}, \mathbf{W}_{xh}^{(b)} \in \mathbb{R}^{d \times h}, \text{ and } \mathbf{W}_{hh}^{(b)} \in \mathbb{R}^{h \times h}$, et les biais $\mathbf{b}_h^{(f)} \in \mathbb{R}^{1 \times h} \text{ and } \mathbf{b}_h^{(b)} \in \mathbb{R}^{1 \times h}$ sont tous les paramètres du modèle.
 
 Ensuite, nous concaténons les états cachés avant et arrière $\overrightarrow{\mathbf{H}}_t$ et $\overleftarrow{\mathbf{H}}_t$
- pour obtenir l'état caché $\mathbf{H}_t \in \mathbb{R}^{n \times 2h}$ à introduire dans la couche de sortie.
+pour obtenir l'état caché $\mathbf{H}_t \in \mathbb{R}^{n \times 2h}$ à introduire dans la couche de sortie.
 Dans les RNN bidirectionnels profonds avec plusieurs couches cachées,
 ces informations
 sont transmises comme *entrée* à la couche bidirectionnelle suivante. Enfin, la couche de sortie calcule la sortie $\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (nombre de sorties : $q$) :
 
 $$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{hq} + \mathbf{b}_q.$$ 
 
- Ici, la matrice de poids $\mathbf{W}_{hq} \in \mathbb{R}^{2h \times q}$ et le biais $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ sont les paramètres du modèle de la couche de sortie. En fait, les deux directions peuvent avoir un nombre différent d'unités cachées.
+Ici, la matrice de poids $\mathbf{W}_{hq} \in \mathbb{R}^{2h \times q}$ et le biais $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ sont les paramètres du modèle de la couche de sortie. En fait, les deux directions peuvent avoir un nombre différent d'unités cachées.
 
 ### Coût de calcul et applications
 
@@ -163,7 +163,7 @@ dans les couches bidirectionnelles
 et que la rétropropagation dépend des résultats de la propagation avant. Par conséquent, les gradients auront une très longue chaîne de dépendance.
 
 Dans la pratique, les couches bidirectionnelles sont utilisées très parcimonieusement et uniquement pour un ensemble étroit d'applications, telles que le remplissage de mots manquants, l'annotation de tokens (par exemple, pour la reconnaissance d'entités nommées) et l'encodage de séquences en gros comme étape d'un pipeline de traitement de séquences (par exemple, pour la traduction automatique).
-Dans :numref:`sec_bert` et :numref:`sec_sentiment_rnn` ,
+Dans :numref:`sec_bert` et :numref:`sec_sentiment_rnn`,
 nous présenterons comment utiliser les RNN bidirectionnels
 pour encoder des séquences de texte.
 
@@ -231,7 +231,7 @@ def forward(self, inputs, Hs=None):
 ```
 
 La procédure d'apprentissage est la même
-que dans :numref:`sec_rnn-scratch` .
+que dans :numref:`sec_rnn-scratch`.
 
 ```{.python .input}
 %%tab all
@@ -287,7 +287,7 @@ Le résultat est clairement insatisfaisant pour les raisons décrites ci-dessus.
 Pour une discussion sur
 des utilisations plus efficaces des RNN bidirectionnels, veuillez consulter l'application d'analyse de sentiments
 
- dans :numref:`sec_sentiment_rnn` .
+dans :numref:`sec_sentiment_rnn`.
 
 ## Résumé
 

@@ -6,18 +6,18 @@ En optimisation, une fonction de perte est souvent appelée la *fonction objecti
 
 ## But de l'optimisation
 
-Bien que l'optimisation fournisse un moyen de minimiser la fonction de perte pour l'apprentissage profond
-, les buts de l'optimisation et de l'apprentissage profond sont fondamentalement différents
+Bien que l'optimisation fournisse un moyen de minimiser la fonction de perte pour l'apprentissage profond,
+les buts de l'optimisation et de l'apprentissage profond sont fondamentalement différents
 .
 Le premier vise principalement à minimiser un objectif
 alors que le second vise à trouver un modèle approprié, compte tenu d'une quantité finie de données
 .
-Dans :numref:`sec_model_selection` ,
+Dans :numref:`sec_model_selection`,
 nous avons discuté en détail de la différence entre ces deux objectifs.
 Par exemple, l'erreur d'apprentissage
 et l'erreur de généralisation diffèrent généralement : puisque la fonction objective
-de l'algorithme d'optimisation est généralement une fonction de perte basée sur l'ensemble de données d'apprentissage
-, le but de l'optimisation est de réduire l'erreur d'apprentissage.
+de l'algorithme d'optimisation est généralement une fonction de perte basée sur l'ensemble de données d'apprentissage,
+le but de l'optimisation est de réduire l'erreur d'apprentissage.
 Cependant, l'objectif de l'apprentissage profond (ou plus largement de l'inférence statistique) est de
 réduire l'erreur de généralisation.
 Pour atteindre ce dernier objectif, nous devons prêter
@@ -55,7 +55,7 @@ Pour illustrer les différents objectifs susmentionnés,
 considérons 
 le risque empirique et le risque. 
 Comme décrit dans
-dans :numref:`subsec_empirical-risk-and-risk` ,
+dans :numref:`subsec_empirical-risk-and-risk`,
 le risque empirique
 est une perte moyenne
 sur l'ensemble de données d'apprentissage
@@ -63,7 +63,7 @@ tandis que le risque est la perte attendue
 sur la population entière de données.
 Nous définissons ci-dessous deux fonctions :
 la fonction de risque `f`
- et la fonction de risque empirique `g`.
+et la fonction de risque empirique `g`.
 Supposons que nous ne disposions que d'une quantité finie de données d'apprentissage.
 Par conséquent, ici, `g` est moins lisse que `f`.
 
@@ -93,14 +93,14 @@ annotate('min of risk', (1.1, -1.05), (0.95, -0.5))
 
 ## Défis de l'optimisation dans l'apprentissage profond
 
-Dans ce chapitre, nous allons nous concentrer spécifiquement sur la performance des algorithmes d'optimisation dans la minimisation de la fonction objectif, plutôt que sur l'erreur de généralisation d'un modèle
-. 
+Dans ce chapitre, nous allons nous concentrer spécifiquement sur la performance des algorithmes d'optimisation dans la minimisation de la fonction objectif, plutôt que sur l'erreur de généralisation d'un modèle.
+
 Dans :numref:`sec_linear_regression` 
- nous avons fait la distinction entre les solutions analytiques et les solutions numériques dans les problèmes d'optimisation
-. 
+nous avons fait la distinction entre les solutions analytiques et les solutions numériques dans les problèmes d'optimisation.
+
 Dans l'apprentissage profond, la plupart des fonctions objectives sont
-compliquées et n'ont pas de solutions analytiques. Nous devons donc utiliser des algorithmes d'optimisation numériques
-. 
+compliquées et n'ont pas de solutions analytiques. Nous devons donc utiliser des algorithmes d'optimisation numériques.
+
 Les algorithmes d'optimisation de ce chapitre
 entrent tous dans cette catégorie
 .
@@ -132,8 +132,8 @@ annotate('global minimum', (1.1, -0.95), (0.6, 0.8))
 
 La fonction objectif des modèles d'apprentissage profond comporte généralement de nombreux optima locaux. 
 Lorsque la solution numérique d'un problème d'optimisation est proche de l'optimum local, la solution numérique obtenue par l'itération finale peut ne minimiser la fonction objectif que *localement*, plutôt que *globalement*, car le gradient des solutions de la fonction objectif s'approche ou devient nul. 
-Seul un certain degré de bruit peut faire sortir le paramètre du minimum local. En fait, c'est l'une des propriétés bénéfiques de la descente de gradient stochastique par minibatchs
-, où la variation naturelle des gradients sur les minibatchs est capable de déloger les paramètres des minima locaux.
+Seul un certain degré de bruit peut faire sortir le paramètre du minimum local. En fait, c'est l'une des propriétés bénéfiques de la descente de gradient stochastique par minibatchs,
+où la variation naturelle des gradients sur les minibatchs est capable de déloger les paramètres des minima locaux.
 
 
 ### Points de selle
@@ -200,7 +200,7 @@ Pour les problèmes à haute dimension, la probabilité qu'au moins *certaines* 
 ### Gradients évanescents
 
 Le problème le plus insidieux à rencontrer est probablement le gradient évanescent.
-Rappelez-vous nos fonctions d'activation couramment utilisées et leurs dérivées dans :numref:`subsec_activation-functions` .
+Rappelez-vous nos fonctions d'activation couramment utilisées et leurs dérivées dans :numref:`subsec_activation-functions`.
 Par exemple, supposons que nous voulions minimiser la fonction $f(x) = \tanh(x)$ et que nous démarrions à $x = 4$. Comme nous pouvons le constater, le gradient de $f$ est proche de zéro.
 Plus précisément, $f'(x) = 1 - \tanh^2(x)$ et donc $f'(4) = 0.0013$.
 Par conséquent, l'optimisation sera bloquée pendant un long moment avant de progresser. C'est l'une des raisons pour lesquelles l'entrainement de modèles d'apprentissage profond était assez délicate avant l'introduction de la fonction d'activation ReLU.
@@ -226,9 +226,9 @@ Comme nous l'avons vu, l'optimisation pour l'apprentissage profond est pleine de
 
 1. Considérez un MLP simple avec une seule couche cachée de, disons, $d$ dimensions dans la couche cachée et une seule sortie. Montrez que pour tout minimum local, il existe au moins $d!$ solutions équivalentes qui se comportent de manière identique.
 1. Supposons que nous ayons une matrice aléatoire symétrique $\mathbf{M}$ où les entrées
- $M_{ij} = M_{ji}$ sont chacune tirées d'une certaine distribution de probabilité
- $p_{ij}$ . Supposons en outre que $p_{ij}(x) = p_{ij}(-x)$, c'est-à-dire que la distribution
- est symétrique (voir par exemple :cite:`Wigner.1958` pour plus de détails).
+$M_{ij} = M_{ji}$ sont chacune tirées d'une certaine distribution de probabilité
+$p_{ij}$ . Supposons en outre que $p_{ij}(x) = p_{ij}(-x)$, c'est-à-dire que la distribution
+est symétrique (voir par exemple :cite:`Wigner.1958` pour plus de détails).
    1. Prouvez que la distribution sur les valeurs propres est également symétrique. C'est-à-dire que, pour tout vecteur propre $\mathbf{v}$, la probabilité que la valeur propre associée $\lambda$ satisfasse à $P(\lambda > 0) = P(\lambda < 0)$.
    1. Pourquoi la formule *non* ci-dessus implique-t-elle $P(\lambda > 0) = 0.5$?
 1. Quels autres défis liés à l'optimisation de l'apprentissage profond pouvez-vous imaginer ?

@@ -1,7 +1,7 @@
 ## Adagrad
 :label:`sec_adagrad` 
 
- Commençons par examiner les problèmes d'apprentissage avec des caractéristiques qui apparaissent peu fréquemment.
+Commençons par examiner les problèmes d'apprentissage avec des caractéristiques qui apparaissent peu fréquemment.
 
 
 ## Caractéristiques éparses et taux d'apprentissage
@@ -19,11 +19,11 @@ Adagrad par :cite:`Duchi.Hazan.Singer.2011` aborde ce problème en remplaçant l
 
 Les problèmes d'optimisation convexe sont propices à l'analyse des caractéristiques des algorithmes. Après tout, pour la plupart des problèmes non convexes, il est difficile de dériver des garanties théoriques significatives, mais *l'intuition* et *la perspicacité* font souvent mouche.  Examinons le problème de la minimisation de $f(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top \mathbf{Q} \mathbf{x} + \mathbf{c}^\top \mathbf{x} + b$.
 
-Comme nous l'avons vu dans :numref:`sec_momentum` , il est possible de réécrire ce problème en termes de sa décomposition en eigences $\mathbf{Q} = \mathbf{U}^\top \boldsymbol{\Lambda} \mathbf{U}$ pour arriver à un problème beaucoup plus simple où chaque coordonnée peut être résolue individuellement :
+Comme nous l'avons vu dans :numref:`sec_momentum`, il est possible de réécrire ce problème en termes de sa décomposition en eigences $\mathbf{Q} = \mathbf{U}^\top \boldsymbol{\Lambda} \mathbf{U}$ pour arriver à un problème beaucoup plus simple où chaque coordonnée peut être résolue individuellement :
 
 $$f(\mathbf{x}) = \bar{f}(\bar{\mathbf{x}}) = \frac{1}{2} \bar{\mathbf{x}}^\top \boldsymbol{\Lambda} \bar{\mathbf{x}} + \bar{\mathbf{c}}^\top \bar{\mathbf{x}} + b.$$ 
 
- Nous avons utilisé ici $\bar{\mathbf{x}} = \mathbf{U} \mathbf{x}$ et par conséquent $\bar{\mathbf{c}} = \mathbf{U} \mathbf{c}$. Le problème modifié a pour minimiseur $\bar{\mathbf{x}} = -\boldsymbol{\Lambda}^{-1} \bar{\mathbf{c}}$ et pour valeur minimale $-\frac{1}{2} \bar{\mathbf{c}}^\top \boldsymbol{\Lambda}^{-1} \bar{\mathbf{c}} + b$. Cette dernière est beaucoup plus facile à calculer puisque $\boldsymbol{\Lambda}$ est une matrice diagonale contenant les valeurs propres de $\mathbf{Q}$.
+Nous avons utilisé ici $\bar{\mathbf{x}} = \mathbf{U} \mathbf{x}$ et par conséquent $\bar{\mathbf{c}} = \mathbf{U} \mathbf{c}$. Le problème modifié a pour minimiseur $\bar{\mathbf{x}} = -\boldsymbol{\Lambda}^{-1} \bar{\mathbf{c}}$ et pour valeur minimale $-\frac{1}{2} \bar{\mathbf{c}}^\top \boldsymbol{\Lambda}^{-1} \bar{\mathbf{c}} + b$. Cette dernière est beaucoup plus facile à calculer puisque $\boldsymbol{\Lambda}$ est une matrice diagonale contenant les valeurs propres de $\mathbf{Q}$.
 
 Si nous perturbons légèrement $\mathbf{c}$, nous pourrions espérer ne trouver que de légers changements dans le minimiseur de $f$. Malheureusement, ce n'est pas le cas. Si de légères modifications de $\mathbf{c}$ entraînent des modifications tout aussi légères de $\bar{\mathbf{c}}$, ce n'est pas le cas pour le minimiseur de $f$ (et de $\bar{f}$ respectivement). Lorsque les valeurs propres de $\boldsymbol{\Lambda}_i$ sont grandes, nous ne verrons que de petits changements dans $\bar{x}_i$ et dans le minimum de $\bar{f}$. Inversement, pour de petites valeurs de $\boldsymbol{\Lambda}_i$, les changements dans $\bar{x}_i$ peuvent être spectaculaires. Le rapport entre la plus grande et la plus petite valeur propre est appelé le nombre de conditions d'un problème d'optimisation.
 
@@ -43,7 +43,7 @@ Afin de comprendre pourquoi cela fonctionne, examinons $\bar{f}(\bar{\mathbf{x}}
 
 $$\partial_{\bar{\mathbf{x}}} \bar{f}(\bar{\mathbf{x}}) = \boldsymbol{\Lambda} \bar{\mathbf{x}} + \bar{\mathbf{c}} = \boldsymbol{\Lambda} \left(\bar{\mathbf{x}} - \bar{\mathbf{x}}_0\right),$$ 
 
- où $\bar{\mathbf{x}}_0$ est le minimiseur de $\bar{f}$. Par conséquent, la magnitude du gradient dépend à la fois de $\boldsymbol{\Lambda}$ et de la distance de l'optimalité. Si $\bar{\mathbf{x}} - \bar{\mathbf{x}}_0$ ne changeait pas, cela suffirait. Après tout, dans ce cas, la magnitude du gradient $\partial_{\bar{\mathbf{x}}} \bar{f}(\bar{\mathbf{x}})$ suffit. Comme AdaGrad est un algorithme de descente de gradient stochastique, nous verrons des gradients avec une variance non nulle même à l'optimalité. Par conséquent, nous pouvons utiliser sans risque la variance des gradients comme un indicateur bon marché de l'échelle du Hessian. Une analyse approfondie dépasse le cadre de cette section (elle ferait plusieurs pages). Nous renvoyons le lecteur à :cite:`Duchi.Hazan.Singer.2011` pour plus de détails.
+où $\bar{\mathbf{x}}_0$ est le minimiseur de $\bar{f}$. Par conséquent, la magnitude du gradient dépend à la fois de $\boldsymbol{\Lambda}$ et de la distance de l'optimalité. Si $\bar{\mathbf{x}} - \bar{\mathbf{x}}_0$ ne changeait pas, cela suffirait. Après tout, dans ce cas, la magnitude du gradient $\partial_{\bar{\mathbf{x}}} \bar{f}(\bar{\mathbf{x}})$ suffit. Comme AdaGrad est un algorithme de descente de gradient stochastique, nous verrons des gradients avec une variance non nulle même à l'optimalité. Par conséquent, nous pouvons utiliser sans risque la variance des gradients comme un indicateur bon marché de l'échelle du Hessian. Une analyse approfondie dépasse le cadre de cette section (elle ferait plusieurs pages). Nous renvoyons le lecteur à :cite:`Duchi.Hazan.Singer.2011` pour plus de détails.
 
 ## L'algorithme
 
@@ -63,7 +63,7 @@ Notez que l'accumulation des gradients au carré dans $\mathbf{s}_t$ signifie qu
 
 $$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$ 
 
- Nous allons mettre en œuvre Adagrad en utilisant le même taux d'apprentissage que précédemment, c'est-à-dire $\eta = 0.4$. Comme nous pouvons le constater, la trajectoire itérative de la variable indépendante est plus lisse. Cependant, en raison de l'effet cumulatif de $\boldsymbol{s}_t$, le taux d'apprentissage décroît continuellement, de sorte que la variable indépendante ne bouge pas autant au cours des étapes ultérieures de l'itération.
+Nous allons mettre en œuvre Adagrad en utilisant le même taux d'apprentissage que précédemment, c'est-à-dire $\eta = 0.4$. Comme nous pouvons le constater, la trajectoire itérative de la variable indépendante est plus lisse. Cependant, en raison de l'effet cumulatif de $\boldsymbol{s}_t$, le taux d'apprentissage décroît continuellement, de sorte que la variable indépendante ne bouge pas autant au cours des étapes ultérieures de l'itération.
 
 ```{.python .input}
 #@tab mxnet
@@ -164,7 +164,7 @@ def adagrad(params, grads, states, hyperparams):
         p[:].assign(p - hyperparams['lr'] * g / tf.math.sqrt(s + eps))
 ```
 
-Par rapport à l'expérience de :numref:`sec_minibatch_sgd` , nous utilisons un taux d'apprentissage
+Par rapport à l'expérience de :numref:`sec_minibatch_sgd`, nous utilisons un taux d'apprentissage
 plus élevé pour entraîner le modèle.
 
 ```{.python .input}
@@ -202,7 +202,7 @@ d2l.train_concise_ch11(trainer, {'learning_rate' : 0.1}, data_iter)
 * Le calcul de la dérivée seconde exacte est généralement irréalisable dans les problèmes d'apprentissage profond en raison des contraintes de mémoire et de calcul. Le gradient peut être un proxy utile.
 * Si le problème d'optimisation a une structure plutôt inégale, Adagrad peut aider à atténuer la distorsion.
 * Adagrad est particulièrement efficace pour les caractéristiques éparses où le taux d'apprentissage doit diminuer plus lentement pour les termes peu fréquents.
-* Sur les problèmes d'apprentissage profond, Adagrad peut parfois être trop agressif dans la réduction des taux d'apprentissage. Nous discuterons des stratégies pour atténuer ce problème dans le contexte de :numref:`sec_adam` .
+* Sur les problèmes d'apprentissage profond, Adagrad peut parfois être trop agressif dans la réduction des taux d'apprentissage. Nous discuterons des stratégies pour atténuer ce problème dans le contexte de :numref:`sec_adam`.
 
 ## Exercices
 

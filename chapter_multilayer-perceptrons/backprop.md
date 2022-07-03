@@ -1,7 +1,7 @@
 # Propagation vers l'avant, propagation vers l'arrière et graphes computationnels
 :label:`sec_backprop` 
 
- Jusqu'à présent, nous avons entraîné nos modèles
+Jusqu'à présent, nous avons entraîné nos modèles
 avec la descente de gradient stochastique en minibatch.
 Cependant, lorsque nous avons implémenté l'algorithme,
 nous nous sommes uniquement préoccupés des calculs impliqués
@@ -48,22 +48,22 @@ il faut " payer le prix pour être le patron ".
 
 Par souci de simplicité, supposons
 que l'exemple d'entrée est $\mathbf{x}\in \mathbb{R}^d$
- et que notre couche cachée ne comporte pas de terme de biais.
+et que notre couche cachée ne comporte pas de terme de biais.
 Ici, la variable intermédiaire est :
 
 $$\mathbf{z}= \mathbf{W}^{(1)} \mathbf{x},$$ 
 
- où $\mathbf{W}^{(1)} \in \mathbb{R}^{h \times d}$
- est le paramètre de poids de la couche cachée.
+où $\mathbf{W}^{(1)} \in \mathbb{R}^{h \times d}$
+est le paramètre de poids de la couche cachée.
 Après avoir fait passer la variable intermédiaire
 $\mathbf{z}\in \mathbb{R}^h$ par la fonction d'activation
- $\phi$ 
+$\phi$ 
  , nous obtenons notre vecteur d'activation caché de longueur $h$,
 
 $$\mathbf{h}= \phi (\mathbf{z}).$$ 
 
- La sortie de la couche cachée $\mathbf{h}$
- est également une variable intermédiaire.
+La sortie de la couche cachée $\mathbf{h}$
+est également une variable intermédiaire.
 En supposant que les paramètres de la couche de sortie
 possèdent uniquement un poids de
 $\mathbf{W}^{(2)} \in \mathbb{R}^{q \times h}$ ,
@@ -73,21 +73,21 @@ avec un vecteur de longueur $q$:
 $$\mathbf{o}= \mathbf{W}^{(2)} \mathbf{h}.$$
 
 En supposant que la fonction de perte est $l$
- et que l'étiquette de l'exemple est $y$,
+et que l'étiquette de l'exemple est $y$,
 nous pouvons alors calculer le terme de perte
 pour un seul exemple de données,
 
 $$L = l(\mathbf{o}, y).$$ 
 
- Selon la définition de la régularisation $\ell_2$
- que nous introduirons plus tard,
+Selon la définition de la régularisation $\ell_2$
+que nous introduirons plus tard,
 étant donné l'hyperparamètre $\lambda$,
 le terme de régularisation est
 
 $$s = \frac{\lambda}{2} \left(\|\mathbf{W}^{(1)}\|_F^2 + \|\mathbf{W}^{(2)}\|_F^2\right),$$ 
- :eqlabel:`eq_forward-s` 
+:eqlabel:`eq_forward-s` 
 
- où la norme de Frobenius de la matrice
+où la norme de Frobenius de la matrice
 est simplement la norme $\ell_2$ appliquée
 après avoir aplati la matrice en un vecteur.
 Enfin, la perte régularisée du modèle
@@ -95,7 +95,7 @@ sur un exemple de données donné est :
 
 $$J = L + s.$$ 
 
- Nous faisons référence à $J$ comme à la *fonction objective*
+Nous faisons référence à $J$ comme à la *fonction objective*
 dans la discussion suivante.
 
 
@@ -129,18 +129,18 @@ requises lors du calcul du gradient
 par rapport à certains paramètres.
 Supposons que nous ayons des fonctions
 $\mathsf{Y}=f(\mathsf{X})$ 
- et $\mathsf{Z}=g(\mathsf{Y})$,
+et $\mathsf{Z}=g(\mathsf{Y})$,
 dans lesquelles l'entrée et la sortie
 $\mathsf{X}, \mathsf{Y}, \mathsf{Z}$ 
- sont des tenseurs de formes arbitraires.
+sont des tenseurs de formes arbitraires.
 En utilisant la règle de la chaîne,
 nous pouvons calculer la dérivée
 de $\mathsf{Z}$ par rapport à $\mathsf{X}$ via
 
 $$\frac{\partial \mathsf{Z}}{\partial \mathsf{X}} = \text{prod}\left(\frac{\partial \mathsf{Z}}{\partial \mathsf{Y}}, \frac{\partial \mathsf{Y}}{\partial \mathsf{X}}\right).$$ 
 
- Ici, nous utilisons l'opérateur $\text{prod}$
- pour multiplier ses arguments
+Ici, nous utilisons l'opérateur $\text{prod}$
+pour multiplier ses arguments
 après avoir effectué les opérations nécessaires,
 telles que la transposition et la permutation des positions d'entrée,
 .
@@ -152,11 +152,11 @@ L'opérateur $\text{prod}$ masque toute la surcharge de notation.
 
 Rappelons que
 les paramètres du réseau simple à une couche cachée,
-dont le graphe de calcul est dans :numref:`fig_forward` ,
+dont le graphe de calcul est dans :numref:`fig_forward`,
 sont $\mathbf{W}^{(1)}$ et $\mathbf{W}^{(2)}$.
 L'objectif de la rétropropagation est de
 calculer les gradients $\partial J/\partial \mathbf{W}^{(1)}$
- et $\partial J/\partial \mathbf{W}^{(2)}$.
+et $\partial J/\partial \mathbf{W}^{(2)}$.
 Pour ce faire, nous appliquons la règle de la chaîne
 et calculons, à tour de rôle, le gradient de
 chaque variable et paramètre intermédiaire.
@@ -166,14 +166,14 @@ puisque nous devons commencer par le résultat du graphe de calcul
 et progresser vers les paramètres.
 La première étape consiste à calculer les gradients
 de la fonction objectif $J=L+s$
- par rapport au terme de perte $L$
- et au terme de régularisation $s$.
+par rapport au terme de perte $L$
+et au terme de régularisation $s$.
 
 $$\frac{\partial J}{\partial L} = 1 \; \text{and} \; \frac{\partial J}{\partial s} = 1.$$
 
 Ensuite, nous calculons le gradient de la fonction objectif
 par rapport à la variable de la couche de sortie $\mathbf{o}$
- selon la règle de la chaîne :
+selon la règle de la chaîne :
 
 $$
 \frac{\partial J}{\partial \mathbf{o}}
@@ -192,13 +192,13 @@ $$\frac{\partial s}{\partial \mathbf{W}^{(1)}} = \lambda \mathbf{W}^{(1)}
 
 Nous sommes maintenant en mesure de calculer le gradient
 $\partial J/\partial \mathbf{W}^{(2)} \in \mathbb{R}^{q \times h}$ 
- des paramètres du modèle les plus proches de la couche de sortie.
+des paramètres du modèle les plus proches de la couche de sortie.
 L'utilisation de la règle de la chaîne donne :
 
 $$\frac{\partial J}{\partial \mathbf{W}^{(2)}}= \text{prod}\left(\frac{\partial J}{\partial \mathbf{o}}, \frac{\partial \mathbf{o}}{\partial \mathbf{W}^{(2)}}\right) + \text{prod}\left(\frac{\partial J}{\partial s}, \frac{\partial s}{\partial \mathbf{W}^{(2)}}\right)= \frac{\partial J}{\partial \mathbf{o}} \mathbf{h}^\top + \lambda \mathbf{W}^{(2)}.$$ 
- :eqlabel:`eq_backprop-J-h` 
+:eqlabel:`eq_backprop-J-h` 
 
- Pour obtenir le gradient par rapport à $\mathbf{W}^{(1)}$
+Pour obtenir le gradient par rapport à $\mathbf{W}^{(1)}$
  , nous devons poursuivre la rétropropagation
 le long de la couche de sortie vers la couche cachée.
 Le gradient par rapport à la sortie de la couche cachée
@@ -213,7 +213,7 @@ $$
 
 Comme la fonction d'activation $\phi$ s'applique par éléments,
 le calcul du gradient $\partial J/\partial \mathbf{z} \in \mathbb{R}^h$
- de la variable intermédiaire $\mathbf{z}$
+de la variable intermédiaire $\mathbf{z}$
  nécessite l'utilisation de l'opérateur de multiplication par éléments,
 que nous désignons par $\odot$:
 
@@ -225,7 +225,7 @@ $$
 
 Enfin, nous pouvons obtenir le gradient
 $\partial J/\partial \mathbf{W}^{(1)} \in \mathbb{R}^{h \times d}$ 
- des paramètres du modèle les plus proches de la couche d'entrée.
+des paramètres du modèle les plus proches de la couche d'entrée.
 Selon la règle de la chaîne, nous obtenons
 
 $$
@@ -249,7 +249,7 @@ où l'ordre de calcul sur le graphe est inversé.
 Prenons l'exemple du réseau simple susmentionné pour l'illustrer.
 D'une part,
 le calcul du terme de régularisation :eqref:`eq_forward-s` 
- pendant la propagation en avant
+pendant la propagation en avant
 dépend des valeurs actuelles des paramètres du modèle $\mathbf{W}^{(1)}$ et $\mathbf{W}^{(2)}$.
 Elles sont données par l'algorithme d'optimisation selon la rétropropagation dans la dernière itération.
 D'autre part,

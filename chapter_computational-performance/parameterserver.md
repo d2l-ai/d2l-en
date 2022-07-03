@@ -1,24 +1,24 @@
 # Paramètre Serveurs
 :label:`sec_parameterserver` 
 
- Au fur et à mesure que nous passons d'un GPU unique à plusieurs GPU, puis à plusieurs serveurs contenant plusieurs GPU, éventuellement répartis sur plusieurs racks et commutateurs réseau,
+Au fur et à mesure que nous passons d'un GPU unique à plusieurs GPU, puis à plusieurs serveurs contenant plusieurs GPU, éventuellement répartis sur plusieurs racks et commutateurs réseau,
 nos algorithmes d'apprentissage distribué et parallèle doivent devenir beaucoup plus sophistiqués. Les détails ont leur importance puisque les différentes interconnexions ont une bande passante très différente (par exemple, NVLink peut offrir jusqu'à 100 Go/s sur 6 liens dans un cadre approprié, PCIe 4.0 (16 voies) offre 32 Go/s, tandis que même l'Ethernet 100GbE à haut débit n'atteint que 10 Go/s). En même temps, il n'est pas raisonnable d'attendre d'un modélisateur statistique qu'il soit un expert en réseaux et en systèmes.
 
-L'idée centrale du serveur de paramètres a été introduite dans :cite:`Smola.Narayanamurthy.2010` dans le contexte des modèles à variables latentes distribuées. Une description de la sémantique "push and pull" a suivi dans :cite:`Ahmed.Aly.Gonzalez.ea.2012` et une description du système et d'une bibliothèque open source a suivi dans :cite:`Li.Andersen.Park.ea.2014` . Dans ce qui suit, nous allons motiver les composants nécessaires à l'efficacité.
+L'idée centrale du serveur de paramètres a été introduite dans :cite:`Smola.Narayanamurthy.2010` dans le contexte des modèles à variables latentes distribuées. Une description de la sémantique "push and pull" a suivi dans :cite:`Ahmed.Aly.Gonzalez.ea.2012` et une description du système et d'une bibliothèque open source a suivi dans :cite:`Li.Andersen.Park.ea.2014`. Dans ce qui suit, nous allons motiver les composants nécessaires à l'efficacité.
 
 
 ## entrainement parallèle aux données
 
-Passons en revue l'approche de l'entrainement parallèle aux données pour l'entrainement distribuée. Nous l'utiliserons à l'exclusion de toutes les autres dans cette section car elle est nettement plus simple à mettre en œuvre dans la pratique. Il n'existe pratiquement aucun cas d'utilisation (en dehors de l'apprentissage profond sur les graphes) pour lequel une autre stratégie de parallélisme est préférable, car les GPU disposent aujourd'hui d'une mémoire abondante. :numref:`fig_parameterserver` décrit la variante du parallélisme des données que nous avons mise en œuvre dans :numref:`sec_multi_gpu` . L'aspect clé est que l'agrégation des gradients se produit sur le GPU 0 avant que les paramètres mis à jour ne soient rediffusés à tous les GPU.
+Passons en revue l'approche de l'entrainement parallèle aux données pour l'entrainement distribuée. Nous l'utiliserons à l'exclusion de toutes les autres dans cette section car elle est nettement plus simple à mettre en œuvre dans la pratique. Il n'existe pratiquement aucun cas d'utilisation (en dehors de l'apprentissage profond sur les graphes) pour lequel une autre stratégie de parallélisme est préférable, car les GPU disposent aujourd'hui d'une mémoire abondante. :numref:`fig_parameterserver` décrit la variante du parallélisme des données que nous avons mise en œuvre dans :numref:`sec_multi_gpu`. L'aspect clé est que l'agrégation des gradients se produit sur le GPU 0 avant que les paramètres mis à jour ne soient rediffusés à tous les GPU.
 
 ![Left: single GPU training. Right: a variant of multi-GPU training: (1) nous calculons la perte et le gradient, (2) tous les gradients sont agrégés sur un GPU, (3) la mise à jour des paramètres se produit et les paramètres sont rediffusés à tous les GPU.](../img/ps.svg)
 :label:`fig_parameterserver` 
 
- Rétrospectivement, la décision d'agréger sur le GPU 0 semble plutôt ad-hoc. Après tout, nous pourrions tout aussi bien agréger sur le CPU. En fait, nous pourrions même décider d'agréger certains des paramètres sur un GPU et d'autres sur un autre. À condition que l'algorithme d'optimisation le prenne en charge, il n'y a aucune raison réelle de ne pas le faire. Par exemple, si nous avons quatre vecteurs de paramètres avec des gradients associés $\mathbf{g}_1, \ldots, \mathbf{g}_4$, nous pourrions agréger les gradients sur un GPU pour chaque $\mathbf{g}_i$ ($i = 1, \ldots, 4$).
+Rétrospectivement, la décision d'agréger sur le GPU 0 semble plutôt ad-hoc. Après tout, nous pourrions tout aussi bien agréger sur le CPU. En fait, nous pourrions même décider d'agréger certains des paramètres sur un GPU et d'autres sur un autre. À condition que l'algorithme d'optimisation le prenne en charge, il n'y a aucune raison réelle de ne pas le faire. Par exemple, si nous avons quatre vecteurs de paramètres avec des gradients associés $\mathbf{g}_1, \ldots, \mathbf{g}_4$, nous pourrions agréger les gradients sur un GPU pour chaque $\mathbf{g}_i$ ($i = 1, \ldots, 4$).
 
 
-Ce raisonnement semble arbitraire et frivole. Après tout, les mathématiques sont les mêmes partout. Cependant, nous avons affaire à du matériel physique réel où les différents bus ont une largeur de bande différente, comme nous l'avons vu dans :numref:`sec_hardware` .
-Prenons l'exemple d'un véritable serveur GPU à 4 voies tel que décrit dans :numref:`fig_bw_hierarchy` . S'il est particulièrement bien connecté, il peut disposer d'une carte réseau de 100 GbE. Les chiffres les plus courants sont de l'ordre de 1 à 10 GbE, avec une bande passante effective de 100 Mo/s à 1 Go/s.
+Ce raisonnement semble arbitraire et frivole. Après tout, les mathématiques sont les mêmes partout. Cependant, nous avons affaire à du matériel physique réel où les différents bus ont une largeur de bande différente, comme nous l'avons vu dans :numref:`sec_hardware`.
+Prenons l'exemple d'un véritable serveur GPU à 4 voies tel que décrit dans :numref:`fig_bw_hierarchy`. S'il est particulièrement bien connecté, il peut disposer d'une carte réseau de 100 GbE. Les chiffres les plus courants sont de l'ordre de 1 à 10 GbE, avec une bande passante effective de 100 Mo/s à 1 Go/s.
 Étant donné que les CPU ont trop peu de couloirs PCIe pour se connecter directement à tous les GPU (par exemple, les CPU Intel grand public ont 24 couloirs), nous avons besoin de [multiplexer](https://www.broadcom.com/products/pcie-switches-bridges/pcie-switches). La bande passante du CPU sur une liaison Gen3 16x est de 16 Go/s. C'est également la vitesse à laquelle *chacun* des GPU est connecté au commutateur. Cela signifie qu'il est plus efficace de communiquer entre les appareils.
 
 ![A 4-way GPU server.](../img/bw-hierarchy.svg)
@@ -34,12 +34,12 @@ Notez que nous disposons d'un autre outil pour améliorer les performances : dan
 
 ## Synchronisation en anneau
 
-Lorsqu'il s'agit de synchronisation sur du matériel moderne d'apprentissage profond, nous rencontrons souvent une connectivité réseau très inégale. Par exemple, les instances AWS p3.16xlarge et NVIDIA DGX-2 partagent la structure de connectivité de :numref:`fig_nvlink` . Chaque GPU se connecte à un CPU hôte via un lien PCIe qui fonctionne au mieux à 16 Go/s. En outre, chaque GPU dispose également de 6 connexions NVLink, chacune d'entre elles étant capable de transférer 300 Gbit/s de manière bidirectionnelle. Cela représente environ 18 Go/s par liaison et par direction. En bref, la bande passante NVLink agrégée est nettement supérieure à la bande passante PCIe. La question est de savoir comment l'utiliser le plus efficacement possible.
+Lorsqu'il s'agit de synchronisation sur du matériel moderne d'apprentissage profond, nous rencontrons souvent une connectivité réseau très inégale. Par exemple, les instances AWS p3.16xlarge et NVIDIA DGX-2 partagent la structure de connectivité de :numref:`fig_nvlink`. Chaque GPU se connecte à un CPU hôte via un lien PCIe qui fonctionne au mieux à 16 Go/s. En outre, chaque GPU dispose également de 6 connexions NVLink, chacune d'entre elles étant capable de transférer 300 Gbit/s de manière bidirectionnelle. Cela représente environ 18 Go/s par liaison et par direction. En bref, la bande passante NVLink agrégée est nettement supérieure à la bande passante PCIe. La question est de savoir comment l'utiliser le plus efficacement possible.
 
 ![NVLink connectivity on 8  V100 GPU servers (image courtesy of NVIDIA) .](../img/nvlink.svg)
 :label:`fig_nvlink` 
 
- Il s'avère que la stratégie de synchronisation optimale consiste à décomposer le réseau en deux anneaux et à les utiliser pour synchroniser les données directement :cite:`Wang.Li.Liberty.ea.2018` . :numref:`fig_nvlink_twoloop` illustre que le réseau peut être décomposé en un anneau (1-2-3-4-5-6-7-8-1) avec une bande passante NVLink double et en un (1-4-6-3-5-8-2-7-1) avec une bande passante normale. Concevoir un protocole de synchronisation efficace dans ce cas n'est pas une mince affaire.
+Il s'avère que la stratégie de synchronisation optimale consiste à décomposer le réseau en deux anneaux et à les utiliser pour synchroniser les données directement :cite:`Wang.Li.Liberty.ea.2018`. :numref:`fig_nvlink_twoloop` illustre que le réseau peut être décomposé en un anneau (1-2-3-4-5-6-7-8-1) avec une bande passante NVLink double et en un (1-4-6-3-5-8-2-7-1) avec une bande passante normale. Concevoir un protocole de synchronisation efficace dans ce cas n'est pas une mince affaire.
 
 ![Decomposition of the NVLink network into two rings.](../img/nvlink-twoloop.svg)
 :label:`fig_nvlink_twoloop`
@@ -88,7 +88,7 @@ Sur plusieurs travailleurs et plusieurs GPU, le calcul du gradient $i$ peut êtr
 
 $$\mathbf{g}_{i} = \sum_{k \in \text{workers}} \sum_{j \in \text{GPUs}} \mathbf{g}_{ijk},$$ 
 
- où $\mathbf{g}_{ijk}$ est une partie du gradient $i$ divisé sur le GPU $j$ du travailleur $k$.
+où $\mathbf{g}_{ijk}$ est une partie du gradient $i$ divisé sur le GPU $j$ du travailleur $k$.
 L'aspect clé de cette opération est qu'il s'agit d'une réduction *commutative*, c'est-à-dire qu'elle transforme plusieurs vecteurs en un seul et que l'ordre dans lequel l'opération est appliquée n'a pas d'importance. Cela convient parfaitement à nos objectifs puisque nous n'avons pas (besoin d') avoir un contrôle fin sur le moment où le gradient est reçu. De plus, notez que cette opération est indépendante entre les différents $i$.
 
 Cela nous permet de définir les deux opérations suivantes : *push*, qui accumule les gradients, et *pull*, qui récupère les gradients agrégés. Puisque nous disposons de nombreux ensembles différents de gradients (après tout, nous avons de nombreuses couches), nous devons indexer les gradients avec une clé $i$. Cette similitude avec les magasins de clés et de valeurs, comme celui introduit dans Dynamo

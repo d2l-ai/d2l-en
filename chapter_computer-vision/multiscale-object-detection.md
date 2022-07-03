@@ -2,7 +2,7 @@
 :label:`sec_multiscale-object-detection` 
 
  
- Dans :numref:`sec_anchor` ,
+Dans :numref:`sec_anchor`,
 nous avons généré plusieurs boîtes d'ancrage centrées sur chaque pixel d'une image d'entrée. 
 Essentiellement, ces boîtes d'ancrage 
 représentent des échantillons de
@@ -19,7 +19,7 @@ plus de deux millions de boîtes d'ancrage ($561 \times 728 \times 5$) doivent �
 ## Boîtes d'ancrage multi-échelles
 :label:`subsec_multiscale-anchor-boxes` 
 
- Vous pouvez vous rendre compte que
+Vous pouvez vous rendre compte que
 il n'est pas difficile de réduire les boîtes d'ancrage sur une image.
 Par exemple, nous pouvons simplement 
 échantillonner uniformément une petite partie des pixels
@@ -34,8 +34,8 @@ les objets plus petits sont plus susceptibles
 d'apparaître sur une image que les objets plus grands.
 Par exemple, les objets
 $1 \times 1$ , $1 \times 2$, et $2 \times 2$ 
- peuvent apparaître sur une image $2 \times 2$
- de 4, 2 et 1 façons possibles, respectivement.
+peuvent apparaître sur une image $2 \times 2$
+de 4, 2 et 1 façons possibles, respectivement.
 Par conséquent, en utilisant des boîtes d'ancrage plus petites pour détecter des objets plus petits, nous pouvons échantillonner plus de régions,
 alors que pour des objets plus grands, nous pouvons échantillonner moins de régions.
 
@@ -68,7 +68,7 @@ h, w
 ```
 
 Rappelez-vous que dans :numref:`sec_conv_layer` 
- nous appelons un tableau bidimensionnel issu de 
+nous appelons un tableau bidimensionnel issu de 
 une couche convolutive une carte de caractéristiques.
 En définissant la forme de la carte de caractéristiques,
 nous pouvons déterminer les centres des boîtes d'ancrage échantillonnées uniformément sur n'importe quelle image.
@@ -77,7 +77,7 @@ nous pouvons déterminer les centres des boîtes d'ancrage échantillonnées uni
 La fonction `display_anchors` est définie ci-dessous.
 [**Nous générons des boîtes d'ancrage (`anchors`) sur la carte des caractéristiques (`fmap`), chaque unité (pixel) étant le centre de la boîte d'ancrage.**]
 Les valeurs des coordonnées de l'axe $(x, y)$
- dans les boîtes d'ancrage (`anchors`) ayant été divisées par la largeur et la hauteur de la carte des caractéristiques (`fmap`),
+dans les boîtes d'ancrage (`anchors`) ayant été divisées par la largeur et la hauteur de la carte des caractéristiques (`fmap`),
 ces valeurs sont comprises entre 0 et 1,
 ce qui indique les positions relatives des boîtes d'ancrage
 dans la carte des caractéristiques.
@@ -132,8 +132,8 @@ que les centres des boîtes d'ancrage dans 4 lignes et 4 colonnes sur l'image so
 display_anchors(fmap_w=4, fmap_h=4, s=[0.15])
 ```
 
-Nous passons à [**réduire de moitié la hauteur et la largeur de la carte de caractéristiques et utiliser des boîtes d'ancrage plus grandes pour détecter des objets plus grands**]. Lorsque l'échelle est fixée à 0,4, 
-, certaines boîtes d'ancrage se chevauchent les unes les autres.
+Nous passons à [**réduire de moitié la hauteur et la largeur de la carte de caractéristiques et utiliser des boîtes d'ancrage plus grandes pour détecter des objets plus grands**]. Lorsque l'échelle est fixée à 0,4,
+certaines boîtes d'ancrage se chevauchent les unes les autres.
 
 ```{.python .input}
 #@tab all
@@ -150,21 +150,21 @@ display_anchors(fmap_w=1, fmap_h=1, s=[0.8])
 ## Détection multi-échelle
 
 
- Puisque nous avons généré des boîtes d'ancrage multi-échelle,
+Puisque nous avons généré des boîtes d'ancrage multi-échelle,
 nous allons les utiliser pour détecter des objets de différentes tailles
 à différentes échelles.
-Dans ce qui suit
-, nous présentons une méthode de détection d'objets multi-échelle
+Dans ce qui suit,
+ nous présentons une méthode de détection d'objets multi-échelle
 basée sur CNN que nous mettrons en œuvre
-dans :numref:`sec_ssd` .
+dans :numref:`sec_ssd`.
 
 À une certaine échelle,
 disons que nous avons $c$ des cartes de caractéristiques de forme $h \times w$.
-En utilisant la méthode décrite dans :numref:`subsec_multiscale-anchor-boxes` ,
+En utilisant la méthode décrite dans :numref:`subsec_multiscale-anchor-boxes`,
 nous générons $hw$ ensembles de boîtes d'ancrage,
 où chaque ensemble a $a$ boîtes d'ancrage avec le même centre.
 Par exemple, 
-à la première échelle dans les expériences de :numref:`subsec_multiscale-anchor-boxes` ,
+à la première échelle dans les expériences de :numref:`subsec_multiscale-anchor-boxes`,
 étant donné dix (nombre de canaux) $4 \times 4$ cartes de caractéristiques,
 nous avons généré 16 ensembles de boîtes d'ancrage,
 où chaque ensemble contient 3 boîtes d'ancrage avec le même centre.
@@ -178,17 +178,17 @@ par la propagation avant CNN basée sur l'image d'entrée. Puisqu'il existe $hw$
 la même position spatiale peut être 
 considérée comme ayant $c$ unités.
 Selon la définition de
-du champ réceptif dans :numref:`sec_conv_layer` ,
+du champ réceptif dans :numref:`sec_conv_layer`,
 ces $c$ unités à la même position spatiale
 des cartes de caractéristiques
 ont le même champ réceptif sur l'image d'entrée :
 elles représentent les informations de l'image d'entrée
 dans le même champ réceptif.
 Par conséquent, nous pouvons transformer les unités $c$
- des cartes de caractéristiques à la même position spatiale
+des cartes de caractéristiques à la même position spatiale
 en classes et décalages
 des boîtes d'ancrage $a$
- générées en utilisant cette position spatiale.
+générées en utilisant cette position spatiale.
 En substance,
 nous utilisons les informations de l'image d'entrée dans un certain champ réceptif
 pour prédire les classes et les décalages des boîtes d'ancrage
@@ -209,7 +209,7 @@ les représentations en couches d'images à plusieurs niveaux
 par des réseaux neuronaux profonds
 pour la détection d'objets à plusieurs échelles.
 Nous allons montrer comment cela fonctionne à travers un exemple concret
-dans :numref:`sec_ssd` .
+dans :numref:`sec_ssd`.
 
 
 
@@ -224,7 +224,7 @@ dans :numref:`sec_ssd` .
 
 ## Exercices
 
-1. D'après nos discussions sur :numref:`sec_alexnet` , les réseaux neuronaux profonds apprennent des caractéristiques hiérarchiques avec des niveaux d'abstraction croissants pour les images. Dans la détection d'objets multi-échelles, les cartes de caractéristiques à différentes échelles correspondent-elles à différents niveaux d'abstraction ? Pourquoi ou pourquoi pas ?
+1. D'après nos discussions sur :numref:`sec_alexnet`, les réseaux neuronaux profonds apprennent des caractéristiques hiérarchiques avec des niveaux d'abstraction croissants pour les images. Dans la détection d'objets multi-échelles, les cartes de caractéristiques à différentes échelles correspondent-elles à différents niveaux d'abstraction ? Pourquoi ou pourquoi pas ?
 1. À la première échelle (`fmap_w=4, fmap_h=4`), les expériences présentées dans :numref:`subsec_multiscale-anchor-boxes` génèrent des boîtes d'ancrage uniformément distribuées qui peuvent se chevaucher.
 1. Étant donné une variable de carte de caractéristiques de forme $1 \times c \times h \times w$, où $c$, $h$ et $w$ sont le nombre de canaux, la hauteur et la largeur des cartes de caractéristiques, respectivement. Comment pouvez-vous transformer cette variable en classes et décalages de boîtes d'ancrage ? Quelle est la forme de la sortie ?
 

@@ -1,7 +1,7 @@
 # Similitude et analogie des mots
 :label:`sec_synonyms` 
 
- Dans :numref:`sec_word2vec_pretraining` , 
+Dans :numref:`sec_word2vec_pretraining`, 
 nous avons entraîné un modèle word2vec sur un petit ensemble de données, 
 et l'avons appliqué
 pour trouver des mots sémantiquement similaires 
@@ -12,7 +12,7 @@ sur de grands corpus peuvent être
 appliqués à des tâches de traitement du langage naturel
 en aval,
 qui seront traitées ultérieurement
-dans :numref:`chap_nlp_app` .
+dans :numref:`chap_nlp_app`.
 Pour démontrer de manière directe la sémantique de 
 des vecteurs de mots pré-entraînés
 à partir de grands corpus,
@@ -139,7 +139,7 @@ dans les tâches suivantes de similarité et d'analogie de mots.
 
 ### Similarité des mots
 
-Comme pour :numref:`subsec_apply-word-embed` ,
+Comme pour :numref:`subsec_apply-word-embed`,
 afin de trouver des mots sémantiquement similaires
 pour un mot d'entrée
 en se basant sur les similarités en cosinus entre
@@ -171,7 +171,7 @@ def knn(W, x, k):
 Ensuite, nous recherchons 
 des mots similaires
 en utilisant les vecteurs de mots préformés 
-de l'instance `TokenEmbedding` `embed` .
+de l'instance `TokenEmbedding` `embed`.
 
 ```{.python .input}
 #@tab all
@@ -184,8 +184,8 @@ def get_similar_tokens(query_token, k, embed):
 Le vocabulaire des vecteurs de mots pré-entraînés
 dans `glove_6b50d` contient 400 000 mots et un jeton inconnu spécial. 
 En excluant le mot d'entrée et le jeton inconnu,
-parmi ce vocabulaire
-, trouvons 
+parmi ce vocabulaire,
+trouvons 
 les trois mots les plus sémantiquement similaires
 au mot "chip".
 

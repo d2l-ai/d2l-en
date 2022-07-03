@@ -6,8 +6,8 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 # Architecture codeur-décodeur
 :label:`sec_encoder-decoder` 
 
- Comme nous l'avons vu dans 
-:numref:`sec_machine_translation` ,
+Comme nous l'avons vu dans 
+:numref:`sec_machine_translation`,
 la traduction automatique
 est un domaine problématique majeur pour les modèles de transduction de séquences,
 dont l'entrée et la sortie sont
@@ -20,7 +20,7 @@ Le deuxième composant est un *décodeur* :
 il transforme l'état codé de forme fixe
 en une séquence de longueur variable.
 C'est ce qu'on appelle une architecture d'*encodeur-décodeur*,
-qui est représentée sur :numref:`fig_encoder_decoder` .
+qui est représentée sur :numref:`fig_encoder_decoder`.
 
 ![The encoder-decoder architecture.](../img/encoder-decoder.svg)
 :label:`fig_encoder_decoder`
@@ -102,13 +102,13 @@ class Encoder(tf.keras.layers.Layer):
 
 Dans l'interface de décodeur suivante,
 nous ajoutons une fonction supplémentaire `init_state`
- pour convertir la sortie de l'encodeur (`enc_outputs`)
+pour convertir la sortie de l'encodeur (`enc_outputs`)
 en état encodé.
 Notez que cette étape
 peut nécessiter des entrées supplémentaires telles que 
 la longueur valide de l'entrée,
 qui a été expliquée
-dans :numref:`sec_machine_translation` .
+dans :numref:`sec_machine_translation`.
 Pour générer une séquence de longueur variable jeton par jeton,
 à chaque fois, le décodeur
 peut mettre en correspondance une entrée (par exemple, le jeton généré au pas de temps précédent)

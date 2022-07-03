@@ -2,7 +2,7 @@
 :label:`chap_appendix_tools` 
 
  
- Pour tirer le meilleur parti de *Dive into Deep Learning*,
+Pour tirer le meilleur parti de *Dive into Deep Learning*,
 nous vous parlerons de différents outils 
 dans cette annexe,
 tels que 

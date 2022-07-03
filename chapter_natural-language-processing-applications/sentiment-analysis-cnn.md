@@ -2,7 +2,7 @@
 :label:`sec_sentiment_cnn`
 
  
- Dans :numref:`chap_cnn`,
+Dans :numref:`chap_cnn`,
 nous avons étudié les mécanismes
 de traitement
 des données d'images bidimensionnelles
@@ -28,7 +28,7 @@ comment concevoir une architecture CNN
 pour représenter un texte unique :cite:`Kim.2014`.
 Par rapport à
 :numref:`fig_nlp-map-sa-rnn` 
- qui utilise une architecture RNN avec un pré-entraînement GloVe
+qui utilise une architecture RNN avec un pré-entraînement GloVe
 pour l'analyse des sentiments,
 la seule différence dans :numref:`fig_nlp-map-sa-cnn` 
 réside dans
@@ -70,7 +70,7 @@ basée sur l'opération de corrélation croisée.
 ![Opération de corrélation croisée unidimensionnelle. Les parties ombrées sont le premier élément de sortie ainsi que les éléments tensoriels d'entrée et de noyau utilisés pour le calcul de la sortie: $0\times1+1\times2=2$.](../img/conv1d.svg)
 :label:`fig_conv1d` 
 
- Comme indiqué dans :numref:`fig_conv1d`,
+Comme indiqué dans :numref:`fig_conv1d`,
 dans le cas unidimensionnel,
 la fenêtre de convolution
 glisse de gauche à droite
@@ -121,7 +121,7 @@ pour produire le tenseur de sortie unidimensionnel.
 
  
 Nous pouvons mettre en œuvre l'opération de corrélation croisée unidimensionnelle pour plusieurs canaux d'entrée
-et valider les résultats dans :numref:`fig_conv1d_channel` .
+et valider les résultats dans :numref:`fig_conv1d_channel`.
 
 ```{.python .input}
 #@tab all
@@ -137,7 +137,7 @@ K = d2l.tensor([[1, 2], [3, 4], [-1, -3]])
 corr1d_multi_in(X, K)
 ```
 
- Notez que
+Notez que
 les corrélations croisées unidimensionnelles à canaux d'entrée multiples
 sont équivalentes
 à
@@ -148,10 +148,10 @@ les corrélations croisées bidimensionnelles à canal d'entrée unique
 est une forme équivalente de
 la corrélation croisée unidimensionnelle à canaux multiples
 dans :numref:`fig_conv1d_channel` 
- est
+est
 la corrélation croisée bidimensionnelle à canal unique
 
- dans :numref:`fig_conv1d_2d` ,
+dans :numref:`fig_conv1d_2d`,
 où la hauteur du noyau de convolution
 doit être la même que celle du tenseur d'entrée.
 
@@ -159,8 +159,8 @@ doit être la même que celle du tenseur d'entrée.
 ![Opération de corrélation croisée bidimensionnelle avec un seul canal d'entrée.)$ Les$![parties ombrées sont le premier élément de sortie ainsi que les éléments du tenseur d'entrée et du noyau utilisés pour le calcul de la sortie : $2\times(-1+3\times$)$(-3)+1\times3+2\times4+0\times1+1\times2=2.](../img/conv1d-2d.svg)
 :label:`fig_conv1d_2d` 
 
- Les sorties de :numref:`fig_conv1d` et :numref:`fig_conv1d_channel` n'ont qu'un seul canal.
-Comme pour les convolutions bidimensionnelles avec plusieurs canaux de sortie décrites dans :numref:`subsec_multi-output-channels` ,
+Les sorties de :numref:`fig_conv1d` et :numref:`fig_conv1d_channel` n'ont qu'un seul canal.
+Comme pour les convolutions bidimensionnelles avec plusieurs canaux de sortie décrites dans :numref:`subsec_multi-output-channels`,
 nous pouvons également spécifier plusieurs canaux de sortie
 pour les convolutions unidimensionnelles.
 
@@ -174,7 +174,7 @@ en tant que caractéristique la plus importante
 Le *max-over-time pooling* utilisé dans textCNN
 fonctionne comme
 le max-pooling global unidimensionnel
-:cite:`Collobert.Weston.Bottou.ea.2011` .
+:cite:`Collobert.Weston.Bottou.ea.2011`.
 Pour une entrée multicanal
 où chaque canal stocke des valeurs
 à différents pas de temps,
@@ -191,8 +191,8 @@ sur différents canaux.
 À l'aide de la convolution unidimensionnelle
 et de la mise en commun max-over-time,
 le modèle textCNN
-prend en entrée les représentations individuelles pré-entraînées de tokens
-,
+prend en entrée les représentations individuelles pré-entraînées de tokens,
+
 puis obtient et transforme les représentations de séquences
 pour l'application en aval.
 
@@ -213,7 +213,7 @@ en sortie comme suit :
 :label:`fig_conv1d_textcnn` 
 
  :numref:`fig_conv1d_textcnn` 
- illustre l'architecture du modèle textCNN
+illustre l'architecture du modèle textCNN
 avec un exemple concret.
 L'entrée est une phrase comportant 11 tokens,
 où
@@ -225,7 +225,7 @@ de largeur 2 et 4,
 avec 4 et 5 canaux de sortie, respectivement.
 Ils produisent
 4 canaux de sortie de largeur $11-2+1=10$
- et 5 canaux de sortie de largeur $11-4+1=8$.
+et 5 canaux de sortie de largeur $11-4+1=8$.
 Malgré les différentes largeurs de ces 9 canaux,
 le pooling max-over-time
 donne un vecteur concaténé à 9 dimensions,
@@ -239,7 +239,7 @@ pour les prédictions de sentiments binaires.
 
 Nous implémentons le modèle textCNN dans la classe suivante.
 Par rapport au modèle RNN bidirectionnel dans
-:numref:`sec_sentiment_rnn` ,
+:numref:`sec_sentiment_rnn`,
 en plus de
 remplacer les couches récurrentes par des couches convolutionnelles,
 nous utilisons également deux couches d'intégration :
@@ -347,12 +347,12 @@ net.apply(init_weights);
 
 ### Chargement des vecteurs de mots pré-entraînés
 
-Comme pour :numref:`sec_sentiment_rnn` ,
+Comme pour :numref:`sec_sentiment_rnn`,
 nous chargeons des embeddings GloVe 100-dimensionnels pré-entraînés
 comme représentations de mots initialisées.
 Ces représentations de mots (poids d'incorporation)
 seront entraînées dans `embedding`
- et fixées dans `constant_embedding`.
+et fixées dans `constant_embedding`.
 
 ```{.python .input}
 #@tab mxnet

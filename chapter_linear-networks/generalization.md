@@ -2,7 +2,7 @@
 # Généralisation
 :label:`sec_generalization_basics` 
 
- Prenons l'exemple de deux étudiants de l'université qui se préparent assidûment à leur examen final.
+Prenons l'exemple de deux étudiants de l'université qui se préparent assidûment à leur examen final.
 En général, cette préparation consiste à
 s'entraîner et à tester leurs capacités
 en passant des examens administrés les années précédentes.
@@ -19,8 +19,8 @@ et pouvait donc se souvenir parfaitement de la réponse
 elle pourrait néanmoins se figer
 face à une nouvelle question (*précédemment non vue*).
 À titre de comparaison, imaginez une autre étudiante,
-Inductive Irene, dont les capacités de mémorisation sont comparativement faibles
-,
+Inductive Irene, dont les capacités de mémorisation sont comparativement faibles,
+
 mais qui a un don pour repérer les modèles.
 Notez que si l'examen se composait réellement de
 questions recyclées d'une année précédente,
@@ -72,7 +72,7 @@ contiennent des millions d'images.
 Et certaines collections d'images non étiquetées
 telles que l'ensemble de données Flickr YFC100M
 peuvent être encore plus grandes, contenant
-plus de 100 millions d'images :cite:`thomee2016yfcc100m` .
+plus de 100 millions d'images :cite:`thomee2016yfcc100m`.
 Cependant, même à cette échelle extrême,
 le nombre de points de données disponibles
 reste infiniment petit
@@ -106,16 +106,16 @@ sur des tâches d'intérêt pratique.
 ## Erreur de entrainement et erreur de généralisation
 
 
- Dans le cadre standard de l'apprentissage supervisé,
+Dans le cadre standard de l'apprentissage supervisé,
 nous supposons que les données de entrainement et les données de test
 sont tirées *indépendamment* de distributions *identiques*.
 C'est ce qu'on appelle communément l'hypothèse *IID*.
 Bien que cette hypothèse soit forte,
-il convient de noter qu'en l'absence d'une telle hypothèse
-, nous serions dans le pétrin.
+il convient de noter qu'en l'absence d'une telle hypothèse,
+ nous serions dans le pétrin.
 Pourquoi devrions-nous croire que les données de formation
 échantillonnées à partir de la distribution $P(X,Y)$
- devraient nous indiquer comment faire des prédictions sur
+devraient nous indiquer comment faire des prédictions sur
 des données de test générées par une *distribution différente* $Q(X,Y)$?
 Il s'avère que pour faire de tels sauts, il faut
 des hypothèses fortes sur la façon dont $P$ et $Q$ sont liés.
@@ -140,7 +140,7 @@ Formellement, l'erreur d'apprentissage est exprimée sous forme de *somme* (avec
 $$R_\text{emp}[\mathbf{X}, \mathbf{y}, f] = \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}^{(i)}, y^{(i)}, f(\mathbf{x}^{(i)})),$$ 
 
  
- tandis que l'erreur de généralisation est exprimée sous forme d'intégrale :
+tandis que l'erreur de généralisation est exprimée sous forme d'intégrale :
 
 $$R[p, f] = E_{(\mathbf{x}, y) \sim P} [l(\mathbf{x}, y, f(\mathbf{x}))] =
 \int \int l(\mathbf{x}, y, f(\mathbf{x})) p(\mathbf{x}, y) \;d\mathbf{x} dy.$$
@@ -154,14 +154,14 @@ En pratique, nous devons donc *estimer* l'erreur de généralisation
 en appliquant notre modèle à un ensemble de test indépendant
 constitué d'une sélection aléatoire d'exemples
 $\mathbf{X}'$ et d'étiquettes $\mathbf{y}'$
- qui ont été retenus dans notre ensemble d'apprentissage.
+qui ont été retenus dans notre ensemble d'apprentissage.
 Cela consiste à appliquer la même formule
 que pour le calcul de l'erreur d'apprentissage empirique
 mais à un ensemble de test $\mathbf{X}', \mathbf{y}'$.
 
 
-Il est important de noter que lorsque nous évaluons notre classificateur sur l'ensemble de test,
-nous travaillons avec un classificateur *fixe*
+Il est important de noter que lorsque nous évaluons notre classifieur sur l'ensemble de test,
+nous travaillons avec un classifieur *fixe*
 (il ne dépend pas de l'échantillon de l'ensemble de test),
 et donc l'estimation de son erreur
 est simplement le problème de l'estimation de la moyenne.
@@ -198,8 +198,8 @@ Pour autant que nous le sachions, notre erreur de généralisation
 pourrait ne pas être meilleure qu'une supposition aléatoire.
 
 En général, en l'absence de toute restriction sur la classe de notre modèle,
-nous ne pouvons pas conclure, sur la base de l'ajustement des données d'apprentissage uniquement
-, que notre modèle a découvert un modèle généralisable :cite:`vapnik1994measuring` .
+nous ne pouvons pas conclure, sur la base de l'ajustement des données d'apprentissage uniquement,
+que notre modèle a découvert un modèle généralisable :cite:`vapnik1994measuring`.
 D'autre part, si notre classe de modèle
 n'était pas capable de s'adapter à des étiquettes arbitraires,
 alors elle doit avoir découvert un modèle.
@@ -227,7 +227,7 @@ Cependant, cela n'est pas nécessairement vrai.
 Par exemple, les méthodes à noyau fonctionnent dans des espaces
 avec un nombre infini de paramètres,
 mais leur complexité est contrôlée
-par d'autres moyens :cite:`scholkopf2002learning` .
+par d'autres moyens :cite:`scholkopf2002learning`.
 Une notion de complexité qui s'avère souvent utile
 est la gamme de valeurs que peuvent prendre les paramètres.
 Dans ce cas, un modèle dont les paramètres sont autorisés
@@ -296,16 +296,16 @@ et nous ne pouvons progresser qu'en réduisant l'écart.
 ### Ajustement de courbes polynomiales
 :label:`subsec_polynomial-curve-fitting` 
 
- Pour illustrer certaines intuitions classiques
+Pour illustrer certaines intuitions classiques
 sur l'overfitting et la complexité des modèles,
 considérons ce qui suit :
 étant donné des données d'apprentissage composées d'une seule caractéristique $x$
- et d'une étiquette correspondante à valeur réelle $y$,
+et d'une étiquette correspondante à valeur réelle $y$,
 nous essayons de trouver le polynôme de degré $d$
 
- $$\hat{y}= \sum_{i=0}^d x^i w_i$$ 
+$$\hat{y}= \sum_{i=0}^d x^i w_i$$ 
 
- pour estimer l'étiquette $y$.
+pour estimer l'étiquette $y$.
 Il s'agit simplement d'un problème de régression linéaire
 où nos caractéristiques sont données par les puissances de $x$,
 ; les poids du modèle sont donnés par $w_i$,
@@ -328,7 +328,7 @@ une fonction polynomiale de degré
 égal au nombre d'exemples de données
 peut s'adapter parfaitement à l'ensemble d'apprentissage.
 Nous visualisons la relation entre le degré polynomial (complexité du modèle)
-et l'ajustement insuffisant par rapport à l'ajustement excessif dans :numref:`fig_capacity_vs_error` .
+et l'ajustement insuffisant par rapport à l'ajustement excessif dans :numref:`fig_capacity_vs_error`.
 
 ![Influence of model complexity on underfitting and overfitting](../img/capacity-vs-error.svg)
 :label:`fig_capacity_vs_error`
@@ -364,7 +364,7 @@ et de la numérisation généralisée de l'économie.
 ## Sélection de modèles
 :label:`subsec_generalization-model-selection` 
 
- Généralement, nous ne sélectionnons notre modèle final
+Généralement, nous ne sélectionnons notre modèle final
 qu'après avoir évalué plusieurs modèles
 qui diffèrent de diverses manières
 (différentes architectures, objectifs de formation,
@@ -402,7 +402,7 @@ Nous pouvons rarement nous permettre de créer un nouvel ensemble de tests pour 
 En fait, le recyclage des données de référence pendant des décennies
 peut avoir un impact significatif sur le développement des algorithmes,
 par exemple pour [image classification](https://paperswithcode.com/sota/image-classification-on-imagenet)
- et [optical character recognition](https://paperswithcode.com/sota/image-classification-on-mnist).
+et [optical character recognition](https://paperswithcode.com/sota/image-classification-on-mnist).
 
 La pratique courante pour résoudre le problème de la *formation sur l'ensemble de test*
 consiste à diviser nos données en trois,
@@ -410,9 +410,9 @@ en incorporant un *ensemble de validation*
 en plus des ensembles de données de entrainement et de test.
 Le résultat est une pratique obscure où les limites
 entre les données de validation et de test sont d'une ambiguïté inquiétante.
-Sauf indication contraire explicite, dans les expériences présentées dans ce livre
-, nous travaillons en réalité avec ce qu'il convient d'appeler des données de entrainement et des données de validation
-, sans véritables ensembles de test.
+Sauf indication contraire explicite, dans les expériences présentées dans ce livre,
+ nous travaillons en réalité avec ce qu'il convient d'appeler des données de entrainement et des données de validation,
+sans véritables ensembles de test.
 Par conséquent, la précision rapportée dans chaque expérience du livre est en réalité
 la précision de validation et non une véritable précision d'ensemble de test.
 

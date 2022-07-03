@@ -1,7 +1,7 @@
 # Distributions
 :label:`sec_distributions` 
 
- Maintenant que nous avons appris à travailler avec les probabilités dans le cadre discret et continu, apprenons à connaître certaines des distributions les plus courantes.  Selon le domaine de l'apprentissage automatique, il se peut que nous devions nous familiariser avec un nombre beaucoup plus important de ces distributions, voire aucune pour certains domaines de l'apprentissage profond.  Il s'agit toutefois d'une bonne liste de base à connaître.  Commençons par importer certaines bibliothèques courantes.
+Maintenant que nous avons appris à travailler avec les probabilités dans le cadre discret et continu, apprenons à connaître certaines des distributions les plus courantes.  Selon le domaine de l'apprentissage automatique, il se peut que nous devions nous familiariser avec un nombre beaucoup plus important de ces distributions, voire aucune pour certains domaines de l'apprentissage profond.  Il s'agit toutefois d'une bonne liste de base à connaître.  Commençons par importer certaines bibliothèques courantes.
 
 ```{.python .input}
 #@tab mxnet
@@ -61,7 +61,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Traçons maintenant la fonction de distribution cumulative :eqref:`eq_bernoulli_cdf` .
+Traçons maintenant la fonction de distribution cumulative :eqref:`eq_bernoulli_cdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -140,7 +140,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Traçons ensuite la fonction de distribution cumulative :eqref:`eq_discrete_uniform_cdf` .
+Traçons ensuite la fonction de distribution cumulative :eqref:`eq_discrete_uniform_cdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -205,14 +205,14 @@ $$
 La fonction de densité de probabilité est 
 
 $$p(x) = \begin{cases} \frac{1}{b-a} & x \in [a, b], \\ 0 & x \not\in [a, b].\end{cases}$$ 
- :eqlabel:`eq_cont_uniform_pdf` 
+:eqlabel:`eq_cont_uniform_pdf` 
 
- La fonction de distribution cumulative est 
+La fonction de distribution cumulative est 
 
 $$F(x) = \begin{cases} 0 & x < a, \\ \frac{x-a}{b-a} & x \in [a, b], \\ 1 & x >= b . \end{cases}$$
 :eqlabel:`eq_cont_uniform_cdf`
 
-Traçons d'abord la fonction de densité de probabilité :eqref:`eq_cont_uniform_pdf` .
+Traçons d'abord la fonction de densité de probabilité :eqref:`eq_cont_uniform_pdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -242,7 +242,7 @@ p = tf.cast(x > a, tf.float32) * tf.cast(x < b, tf.float32) / (b - a)
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-Traçons ensuite la fonction de distribution cumulative :eqref:`eq_cont_uniform_cdf` .
+Traçons ensuite la fonction de distribution cumulative :eqref:`eq_cont_uniform_cdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -370,7 +370,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Traçons ensuite la fonction de distribution cumulative :eqref:`eq_binomial_cdf` .
+Traçons ensuite la fonction de distribution cumulative :eqref:`eq_binomial_cdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -443,25 +443,25 @@ où $X^{(2)}$ est la somme totale, et $X^{(2)}_i \sim \mathrm{Bernoulli}(p/2)$. 
 Pourquoi s'arrêter là ?  Continuons à diviser cette minute en $n$ parties.  Par le même raisonnement que ci-dessus, nous voyons que
 
 $$X^{(n)} \sim \mathrm{Binomial}(n, p/n).$$ 
- :eqlabel:`eq_eq_poisson_approx` 
+:eqlabel:`eq_eq_poisson_approx` 
 
- Considérons ces variables aléatoires.  D'après la section précédente, nous savons que :eqref:`eq_eq_poisson_approx` a pour moyenne $\mu_{X^{(n)}} = n(p/n) = p$ et pour variance $\sigma_{X^{(n)}}^2 = n(p/n)(1-(p/n)) = p(1-p/n)$.  Si nous prenons $n \rightarrow \infty$, nous pouvons voir que ces nombres se stabilisent à $\mu_{X^{(\infty)}} = p$, et la variance $\sigma_{X^{(\infty)}}^2 = p$.  Cela indique qu'il *pourrait y avoir* une variable aléatoire que nous pouvons définir dans cette limite de subdivision infinie. 
+Considérons ces variables aléatoires.  D'après la section précédente, nous savons que :eqref:`eq_eq_poisson_approx` a pour moyenne $\mu_{X^{(n)}} = n(p/n) = p$ et pour variance $\sigma_{X^{(n)}}^2 = n(p/n)(1-(p/n)) = p(1-p/n)$.  Si nous prenons $n \rightarrow \infty$, nous pouvons voir que ces nombres se stabilisent à $\mu_{X^{(\infty)}} = p$, et la variance $\sigma_{X^{(\infty)}}^2 = p$.  Cela indique qu'il *pourrait y avoir* une variable aléatoire que nous pouvons définir dans cette limite de subdivision infinie. 
 
 Cela ne devrait pas trop nous surprendre, puisque dans le monde réel nous pouvons simplement compter le nombre d'arrivées de bus, mais il est agréable de voir que notre modèle mathématique est bien défini.  Cette discussion peut être formalisée comme la *loi des événements rares*.
 
 En suivant attentivement ce raisonnement, nous pouvons arriver au modèle suivant.  Nous dirons que $X \sim \mathrm{Poisson}(\lambda)$ s'il s'agit d'une variable aléatoire qui prend les valeurs $\{0,1,2, \ldots\}$ avec la probabilité
 
 $$p_k = \frac{\lambda^ke^{-\lambda}}{k!}.$$ 
- :eqlabel:`eq_poisson_mass` 
+:eqlabel:`eq_poisson_mass` 
 
- La valeur $\lambda > 0$ est appelée le *taux* (ou le *paramètre de forme*), et désigne le nombre moyen d'arrivées que nous attendons en une unité de temps. 
+La valeur $\lambda > 0$ est appelée le *taux* (ou le *paramètre de forme*), et désigne le nombre moyen d'arrivées que nous attendons en une unité de temps. 
 
 Nous pouvons additionner cette fonction de masse de probabilité pour obtenir la fonction de distribution cumulative.
 
 $$F(x) = \begin{cases} 0 & x < 0, \\ e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}{m!} & k \le x < k+1 \text{ with } 0 \le k. \end{cases}$$
 :eqlabel:`eq_poisson_cdf`
 
-Traçons d'abord la fonction de masse de probabilité :eqref:`eq_poisson_mass` .
+Traçons d'abord la fonction de masse de probabilité :eqref:`eq_poisson_mass`.
 
 ```{.python .input}
 #@tab mxnet
@@ -504,7 +504,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Traçons ensuite la fonction de distribution cumulative :eqref:`eq_poisson_cdf` .
+Traçons ensuite la fonction de distribution cumulative :eqref:`eq_poisson_cdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -640,9 +640,9 @@ $$
 où l'on dit qu'une variable aléatoire est normalement distribuée avec une moyenne $\mu$ et une variance $\sigma^2$ données, on écrit $X \sim \mathcal{N}(\mu, \sigma^2)$ si $X$ a une densité
 
 $$p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.$$ 
- :eqlabel:`eq_gaussian_pdf` 
+:eqlabel:`eq_gaussian_pdf` 
 
- Traçons d'abord la fonction de densité de probabilité :eqref:`eq_gaussian_pdf` .
+Traçons d'abord la fonction de densité de probabilité :eqref:`eq_gaussian_pdf`.
 
 ```{.python .input}
 #@tab mxnet
@@ -702,7 +702,7 @@ def phi(x):
 d2l.plot(x, [phi(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
 ```
 
-Les lecteurs attentifs reconnaîtront certains de ces termes.  En effet, nous avons rencontré cette intégrale dans :numref:`sec_integral_calculus` . En fait, nous avons exactement besoin de ce calcul pour voir que ce $p_X(x)$ a une aire totale de un et est donc une densité valide.
+Les lecteurs attentifs reconnaîtront certains de ces termes.  En effet, nous avons rencontré cette intégrale dans :numref:`sec_integral_calculus`. En fait, nous avons exactement besoin de ce calcul pour voir que ce $p_X(x)$ a une aire totale de un et est donc une densité valide.
 
 Notre choix de travailler avec des tirages à pile ou face a permis de raccourcir les calculs, mais ce choix n'a rien de fondamental.  En effet, si nous prenons n'importe quelle collection de variables aléatoires indépendantes identiquement distribuées $X_i$, et formons
 
@@ -720,7 +720,7 @@ sera approximativement gaussienne.  Des conditions supplémentaires sont nécess
 
 Le théorème central limite est la raison pour laquelle la gaussienne est fondamentale pour les probabilités, les statistiques et l'apprentissage automatique.  Chaque fois que nous pouvons dire que quelque chose que nous mesurons est une somme de nombreuses petites contributions indépendantes, nous pouvons supposer que la chose mesurée sera proche de la gaussienne. 
 
-Il existe de nombreuses autres propriétés fascinantes des gaussiennes, et nous aimerions en aborder une de plus ici.  La gaussienne est ce que l'on appelle une *distribution à entropie maximale*.  Nous approfondirons la question de l'entropie à l'adresse :numref:`sec_information_theory` , mais tout ce que nous devons savoir à ce stade, c'est qu'il s'agit d'une mesure du caractère aléatoire.  Dans un sens mathématique rigoureux, nous pouvons considérer la gaussienne comme le choix *le plus* aléatoire de variable aléatoire avec une moyenne et une variance fixes.  Ainsi, si nous savons que notre variable aléatoire a une certaine moyenne et une certaine variance, la gaussienne est en quelque sorte le choix de distribution le plus conservateur que nous puissions faire.
+Il existe de nombreuses autres propriétés fascinantes des gaussiennes, et nous aimerions en aborder une de plus ici.  La gaussienne est ce que l'on appelle une *distribution à entropie maximale*.  Nous approfondirons la question de l'entropie à l'adresse :numref:`sec_information_theory`, mais tout ce que nous devons savoir à ce stade, c'est qu'il s'agit d'une mesure du caractère aléatoire.  Dans un sens mathématique rigoureux, nous pouvons considérer la gaussienne comme le choix *le plus* aléatoire de variable aléatoire avec une moyenne et une variance fixes.  Ainsi, si nous savons que notre variable aléatoire a une certaine moyenne et une certaine variance, la gaussienne est en quelque sorte le choix de distribution le plus conservateur que nous puissions faire.
 
 Pour clore cette section, rappelons que si $X \sim \mathcal{N}(\mu, \sigma^2)$, alors :
 
@@ -747,19 +747,19 @@ tf.random.normal((10, 10), mu, sigma)
 ## Famille exponentielle
 :label:`subsec_exponential_family` 
 
- Une propriété commune à toutes les distributions énumérées ci-dessus est qu'elles appartiennent toutes 
+Une propriété commune à toutes les distributions énumérées ci-dessus est qu'elles appartiennent toutes 
 à ce que l'on appelle la *famille exponentielle*. La famille exponentielle 
 est un ensemble de distributions dont la densité peut être exprimée sous la forme suivante 
 :
 
 $$p(\mathbf{x} | \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \left( \boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$ 
- :eqlabel:`eq_exp_pdf` 
+:eqlabel:`eq_exp_pdf` 
 
- Cette définition pouvant être un peu subtile, examinons-la de près. 
+Cette définition pouvant être un peu subtile, examinons-la de près. 
 
-Tout d'abord, $h(\mathbf{x})$ est connue comme la *mesure sous-jacente* ou la *mesure de base* 
-.  Elle peut être considérée comme un choix original de mesure que nous modifions avec notre poids exponentiel sur 
-. 
+Tout d'abord, $h(\mathbf{x})$ est connue comme la *mesure sous-jacente* ou la *mesure de base* .
+ Elle peut être considérée comme un choix original de mesure que nous modifions avec notre poids exponentiel sur .
+
 
 Deuxièmement, nous avons le vecteur $\boldsymbol{\eta} = (\eta_1, \eta_2, ..., \eta_l) \in
 \mathbb{R}^l$ appelé les *paramètres naturels* ou *paramètres canoniques*.  Ces
@@ -775,7 +775,7 @@ n'est nécessaire.
 
 Troisièmement, nous avons $A(\boldsymbol{\eta})$, que l'on appelle la fonction *cumulante 
 *, qui garantit que la distribution ci-dessus :eqref:`eq_exp_pdf` 
- s'intègre à un, c'est-à-dire,
+s'intègre à un, c'est-à-dire,
 
 $$A(\boldsymbol{\eta})  = \log \left[\int h(\mathbf{x}) \cdot \mathrm{exp}
 \left(\boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) \right) d\mathbf{x} \right].$$
@@ -807,9 +807,9 @@ Il convient de noter que le choix exact de chacun des termes ci-dessus est quelq
 arbitraire.  En effet, la caractéristique importante est que la distribution peut être 
 exprimée sous cette forme, et non la forme exacte elle-même.
 
-Comme nous y faisons allusion dans :numref:`subsec_softmax_and_derivatives` , une technique largement utilisée 
-consiste à supposer que la sortie finale $\mathbf{y}$ suit une distribution de la famille exponentielle 
-. La famille exponentielle est une famille de distributions courante et 
+Comme nous y faisons allusion dans :numref:`subsec_softmax_and_derivatives`, une technique largement utilisée 
+consiste à supposer que la sortie finale $\mathbf{y}$ suit une distribution de la famille exponentielle .
+La famille exponentielle est une famille de distributions courante et 
 puissante que l'on rencontre fréquemment en apprentissage automatique.
 
 

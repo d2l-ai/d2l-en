@@ -1,7 +1,7 @@
 # Mise en commun de l'attention : Régression du noyau de Nadaraya-Watson
 :label:`sec_nadaraya-watson` 
 
- Vous connaissez maintenant les principales composantes des mécanismes d'attention dans le cadre de :numref:`fig_qkv` .
+Vous connaissez maintenant les principales composantes des mécanismes d'attention dans le cadre de :numref:`fig_qkv`.
 Pour récapituler,
 les interactions entre
 les requêtes (indices volitifs) et les clés (indices non volitifs)
@@ -56,7 +56,7 @@ Nous générons ici un ensemble de données artificielles selon la fonction non 
 
 $$y_i = 2\sin(x_i) + x_i^{0.8} + \epsilon,$$ 
 
- où $\epsilon$ obéit à une distribution normale avec une moyenne nulle et un écart type de 0,5.
+où $\epsilon$ obéit à une distribution normale avec une moyenne nulle et un écart type de 0,5.
 Nous générons 50 exemples d'apprentissage et 50 exemples de validation
 .
 Pour mieux visualiser le modèle d'attention par la suite, les entrées de entrainement sont triées.
@@ -104,9 +104,9 @@ Nous commençons par l'estimateur le plus " bête " du monde pour ce problème d
 en utilisant la mise en commun de la moyenne pour faire la moyenne de toutes les sorties de entrainement :
 
 $$f(x) = \frac{1}{n}\sum_{i=1}^n y_i,$$ 
- :eqlabel:`eq_avg-pooling` 
+:eqlabel:`eq_avg-pooling` 
 
- qui est représenté ci-dessous. Comme nous pouvons le voir, cet estimateur n'est pas si intelligent.
+qui est représenté ci-dessous. Comme nous pouvons le voir, cet estimateur n'est pas si intelligent.
 
 ```{.python .input}
 %%tab all
@@ -120,33 +120,33 @@ De toute évidence, la mise en commun de la moyenne de
 omet les entrées $x_i$.
 Une meilleure idée a été proposée
 par Nadaraya :cite:`Nadaraya.1964` 
- et Watson :cite:`Watson.1964` 
- pour pondérer les sorties $y_i$ en fonction de l'emplacement de leurs entrées :
+et Watson :cite:`Watson.1964` 
+pour pondérer les sorties $y_i$ en fonction de l'emplacement de leurs entrées :
 
 $$f(x) = \sum_{i=1}^n \frac{K(x - x_i)}{\sum_{j=1}^n K(x - x_j)} y_i,$$ 
- :eqlabel:`eq_nadaraya-watson` 
+:eqlabel:`eq_nadaraya-watson` 
 
- où $K$ est un *noyau*.
+où $K$ est un *noyau*.
 L'estimateur dans :eqref:`eq_nadaraya-watson` 
- est appelé *régression à noyau de Nadaraya-Watson*.
+est appelé *régression à noyau de Nadaraya-Watson*.
 Nous ne nous plongerons pas ici dans les détails des noyaux.
-Rappelons le cadre des mécanismes d'attention dans :numref:`fig_qkv` .
+Rappelons le cadre des mécanismes d'attention dans :numref:`fig_qkv`.
 Du point de vue de l'attention,
 nous pouvons réécrire :eqref:`eq_nadaraya-watson` 
- sous une forme plus généralisée de *mise en commun de l'attention* :
+sous une forme plus généralisée de *mise en commun de l'attention* :
 
 $$f(x) = \sum_{i=1}^n \alpha(x, x_i) y_i,$$ 
- :eqlabel:`eq_attn-pooling` 
+:eqlabel:`eq_attn-pooling` 
 
  
- où $x$ est la requête et $(x_i, y_i)$ la paire clé-valeur.
-En comparant :eqref:`eq_attn-pooling` et :eqref:`eq_avg-pooling` ,
+où $x$ est la requête et $(x_i, y_i)$ la paire clé-valeur.
+En comparant :eqref:`eq_attn-pooling` et :eqref:`eq_avg-pooling`,
 la mise en commun de l'attention ici
 est une moyenne pondérée des valeurs $y_i$.
 Le *poids d'attention* $\alpha(x, x_i)$
- dans :eqref:`eq_attn-pooling` 
- est attribué à la valeur correspondante $y_i$
- en fonction de l'interaction
+dans :eqref:`eq_attn-pooling` 
+est attribué à la valeur correspondante $y_i$
+en fonction de l'interaction
 entre la requête $x$ et la clé $x_i$
  modélisée par $\alpha$.
 Pour toute requête, ses poids d'attention sur toutes les paires clé-valeur sont une distribution de probabilité valide : ils sont non négatifs et leur somme est égale à un.
@@ -161,18 +161,18 @@ $$
 
 En introduisant le noyau gaussien dans
 :eqref:`eq_attn-pooling` et
-:eqref:`eq_nadaraya-watson` , on obtient
+:eqref:`eq_nadaraya-watson`, on obtient
 
 $$\begin{aligned} f(x) &=\sum_{i=1}^n \alpha(x, x_i) y_i\\ &= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}(x - x_i)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}(x - x_j)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}(x - x_i)^2\right) y_i. \end{aligned}$$ 
- :eqlabel:`eq_nadaraya-watson-gaussian` 
+:eqlabel:`eq_nadaraya-watson-gaussian` 
 
- Dans :eqref:`eq_nadaraya-watson-gaussian` ,
+Dans :eqref:`eq_nadaraya-watson-gaussian`,
 une clé $x_i$ qui est plus proche de la requête donnée $x$ recevra
 *plus d'attention* via un *poids d'attention plus grand* attribué à la valeur correspondante de la clé $y_i$.
 
 Notamment, la régression à noyau de Nadaraya-Watson est un modèle non paramétrique ;
 donc :eqref:`eq_nadaraya-watson-gaussian` 
- est un exemple de *mise en commun non paramétrique de l'attention*.
+est un exemple de *mise en commun non paramétrique de l'attention*.
 Dans ce qui suit, nous traçons la prédiction basée sur ce modèle d'attention non paramétrique
 .
 La ligne prédite est lisse et plus proche de la vérité de base que celle produite par le regroupement moyen.
@@ -217,24 +217,24 @@ bénéficie de l'avantage de la *cohérence* :
 Néanmoins,
 nous pouvons facilement intégrer des paramètres apprenables dans la mise en commun de l'attention.
 
-A titre d'exemple, légèrement différent de :eqref:`eq_nadaraya-watson-gaussian` ,
+A titre d'exemple, légèrement différent de :eqref:`eq_nadaraya-watson-gaussian`,
 dans ce qui suit
 la distance entre la requête $x$ et la clé $x_i$
- est multipliée par un paramètre apprenable $w$:
+est multipliée par un paramètre apprenable $w$:
 
 
- $$\begin{aligned}f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}((x - x_j)w)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i.\end{aligned}$$ 
- :eqlabel:`eq_nadaraya-watson-gaussian-para` 
+$$\begin{aligned}f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}((x - x_j)w)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i.\end{aligned}$$ 
+:eqlabel:`eq_nadaraya-watson-gaussian-para` 
 
- Dans le reste de la section,
+Dans le reste de la section,
 nous entraînerons ce modèle en apprenant le paramètre de
-la mise en commun de l'attention dans :eqref:`eq_nadaraya-watson-gaussian-para` .
+la mise en commun de l'attention dans :eqref:`eq_nadaraya-watson-gaussian-para`.
 
 
 ### Multiplication matricielle par lots
 :label:`subsec_batch_dot` 
 
- Pour calculer plus efficacement l'attention
+Pour calculer plus efficacement l'attention
 pour les minibatchs,
 nous pouvons exploiter les utilitaires de multiplication matricielle par lots
 fournis par les cadres d'apprentissage profond.
@@ -280,7 +280,7 @@ En utilisant la multiplication matricielle par minilots,
 nous définissons ci-dessous la version paramétrique
 de la régression à noyau de Nadaraya-Watson
 basée sur le [**regroupement paramétrique de l'attention**] dans
-:eqref:`eq_nadaraya-watson-gaussian-para` .
+:eqref:`eq_nadaraya-watson-gaussian-para`.
 
 ```{.python .input}
 %%tab all
@@ -317,8 +317,8 @@ class NWKernelRegression(d2l.Module):
 Dans ce qui suit, nous [**transformons l'ensemble de données de formation
 en clés et valeurs**] pour former le modèle d'attention.
 Dans la mise en commun paramétrique de l'attention,
-pour plus de simplicité
-, toute entrée d'entraînement prend simplement des paires clé-valeur de tous les exemples d'entraînement pour prédire sa sortie.
+pour plus de simplicité,
+toute entrée d'entraînement prend simplement des paires clé-valeur de tous les exemples d'entraînement pour prédire sa sortie.
 
 ```{.python .input}
 %%tab all

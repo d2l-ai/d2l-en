@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Pooling
 :label:`sec_pooling` 
 
- Dans de nombreux cas, notre tâche ultime pose une question globale sur l'image,
+Dans de nombreux cas, notre tâche ultime pose une question globale sur l'image,
 par exemple, *contient-elle un chat ?* Par conséquent, les unités de notre couche finale 
 doivent être sensibles à l'ensemble de l'entrée.
 En agrégeant progressivement les informations, en produisant des cartes de plus en plus grossières,
@@ -22,7 +22,7 @@ De plus, lors de la détection de caractéristiques de plus bas niveau, telles q
 (comme nous l'avons vu dans :numref:`sec_conv_layer` ),
 nous voulons souvent que nos représentations soient quelque peu invariantes à la translation.
 Par exemple, si nous prenons l'image `X`
- avec une délimitation nette entre le noir et le blanc
+avec une délimitation nette entre le noir et le blanc
 et que nous déplaçons l'ensemble de l'image d'un pixel vers la droite,
 c'est-à-dire `Z[i, j] = X[i, j + 1]`,
 le résultat pour la nouvelle image `Z` pourrait être très différent.
@@ -54,14 +54,14 @@ des éléments de la fenêtre de pooling.
 Ces opérations sont appelées respectivement *pooling maximal* (*max-pooling* pour faire court)
 et *average pooling*.
 
-L'*Average pooling* est essentiellement aussi vieux que les CNN. L'idée est semblable à celle de 
-, qui consiste à sous-échantillonner une image. Plutôt que de prendre simplement la valeur d'un pixel sur deux (ou sur trois) 
+L'*Average pooling* est essentiellement aussi vieux que les CNN. L'idée est semblable à celle de ,
+qui consiste à sous-échantillonner une image. Plutôt que de prendre simplement la valeur d'un pixel sur deux (ou sur trois) 
 pour l'image à faible résolution, nous pouvons faire la moyenne des pixels adjacents pour obtenir 
 une image avec un meilleur rapport signal/bruit puisque nous combinons les informations 
 de plusieurs pixels adjacents. *Le max-pooling* a été introduit à l'adresse 
 :cite:`Riesenhuber.Poggio.1999` dans le contexte des neurosciences cognitives pour décrire 
 comment l'agrégation des informations pourrait être hiérarchisée dans le but 
-de la reconnaissance des objets, et une version antérieure dans la reconnaissance de la parole :cite:$$`Yamaguchi.Sakamoto.Akabane.ea.1990` . Dans presque tous les cas, le max-pooling, comme on l'appelle aussi, 
+de la reconnaissance des objets, et une version antérieure dans la reconnaissance de la parole :cite:$$`Yamaguchi.Sakamoto.Akabane.ea.1990`. Dans presque tous les cas, le max-pooling, comme on l'appelle aussi, 
 est préférable. 
 
 Dans les deux cas, comme pour l'opérateur de corrélation croisée,
@@ -77,7 +77,7 @@ selon que le max pooling ou l'average pooling est employée.
 ![Max-pooling avec une forme de fenêtre de pooling de $2\times 2$. Les parties ombragées sont le premier élément de sortie ainsi que les éléments tenseurs d'entrée utilisés pour le calcul de la sortie : $\max(0, 1, 3, 4=4$)$.](../img/pooling.svg)
 :label:`fig_pooling` 
 
- Le tenseur de sortie dans :numref:`fig_pooling` a une hauteur de 2 et une largeur de 2.
+Le tenseur de sortie dans :numref:`fig_pooling` a une hauteur de 2 et une largeur de 2.
 Les quatre éléments sont dérivés de la valeur maximale dans chaque fenêtre de pooling :
 
 $$
@@ -87,7 +87,7 @@ $$
 \max(4, 5, 7, 8)=8.\\
 $$
 
- Plus généralement, nous pouvons définir une couche de pooling $p \times q$ en agrégeant sur 
+Plus généralement, nous pouvons définir une couche de pooling $p \times q$ en agrégeant sur 
 une région de ladite taille. Pour en revenir au problème de la détection des bords, 
 nous utilisons la sortie de la couche convolutionnelle
 comme entrée pour $2\times 2$ max-pooling.
@@ -102,7 +102,7 @@ ne se déplace pas de plus d'un élément en hauteur ou en largeur.
 Dans le code ci-dessous, nous (**implémentons la propagation vers l'avant
 de la couche de pooling**) dans la fonction `pool2d`.
 Cette fonction est similaire à la fonction `corr2d`
- dans :numref:`sec_conv_layer` .
+dans :numref:`sec_conv_layer`.
 Cependant, aucun noyau n'est nécessaire, et la sortie
 est calculée comme le maximum ou la moyenne de chaque région de l'entrée.
 
@@ -178,7 +178,7 @@ Nous construisons d'abord un tenseur d'entrée `X` dont la forme a quatre dimens
 où le nombre d'exemples (taille du lot) et le nombre de canaux sont tous deux égaux à 1.
 
 :begin_tab:`tensorflow` 
- Notez que contrairement à d'autres frameworks, TensorFlow préfère et est optimisé pour l'entrée *channels-last*.
+Notez que contrairement à d'autres frameworks, TensorFlow préfère et est optimisé pour l'entrée *channels-last*.
 
 :end_tab:
 
@@ -274,7 +274,7 @@ comme dans une couche convolutive.
 Cela signifie que le nombre de canaux de sortie pour la couche de pooling
 est le même que le nombre de canaux d'entrée.
 Ci-dessous, nous allons concaténer les tenseurs `X` et `X + 1`
- sur la dimension des canaux pour construire une entrée avec 2 canaux.
+sur la dimension des canaux pour construire une entrée avec 2 canaux.
 
 :begin_tab:`tensorflow`
 Notez que cela nécessitera une concaténation
@@ -327,7 +327,7 @@ donne les mêmes résultats que les autres implémentations.
 
 La pooling est une opération extrêmement simple. Elle fait exactement ce que son nom indique, agréger les résultats sur une fenêtre de valeurs. Toutes les sémantiques de convolution, comme les strides et le padding, s'appliquent de la même manière que précédemment. Notez que le pooling est indifférent aux canaux, c'est-à-dire qu'il laisse le nombre de canaux inchangé et s'applique à chaque canal séparément. Enfin, parmi les deux choix populaires de pooling, le max pooling est préférable a l'average pooling, car elle confère un certain degré d'invariance à la sortie. Un choix populaire consiste à choisir une taille de fenêtre de pooling de $2 \times 2$ pour diviser par quatre la résolution spatiale de la sortie. 
 
-Notez qu'il existe de nombreuses autres façons de réduire la résolution au-delà du pooling. Par exemple, dans le pooling stochastique :cite:`Zeiler.Fergus.2013` et le max-pooling fractionnel :cite:`Graham.2014` , l'agrégation est combinée à la randomisation. Cela peut améliorer légèrement la précision dans certains cas. Enfin, comme nous le verrons plus tard avec le mécanisme d'attention, il existe des moyens plus raffinés d'agréger sur les sorties, par exemple en utilisant l'alignement entre une requête et les vecteurs de représentation. 
+Notez qu'il existe de nombreuses autres façons de réduire la résolution au-delà du pooling. Par exemple, dans le pooling stochastique :cite:`Zeiler.Fergus.2013` et le max-pooling fractionnel :cite:`Graham.2014`, l'agrégation est combinée à la randomisation. Cela peut améliorer légèrement la précision dans certains cas. Enfin, comme nous le verrons plus tard avec le mécanisme d'attention, il existe des moyens plus raffinés d'agréger sur les sorties, par exemple en utilisant l'alignement entre une requête et les vecteurs de représentation. 
 
 
 ## Exercices

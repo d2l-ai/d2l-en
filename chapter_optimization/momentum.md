@@ -1,7 +1,7 @@
 # Momentum
 :label:`sec_momentum` 
 
- Dans :numref:`sec_sgd` , nous avons examiné ce qui se passe lors de la descente de gradient stochastique, c'est-à-dire lors de l'optimisation où seule une variante bruyante du gradient est disponible. En particulier, nous avons remarqué que pour les gradients bruyants, nous devons être très prudents lorsqu'il s'agit de choisir le taux d'apprentissage face au bruit. Si nous le diminuons trop rapidement, la convergence s'arrête. Si nous sommes trop indulgents, nous ne parvenons pas à converger vers une solution suffisamment bonne puisque le bruit continue à nous éloigner de l'optimalité.
+Dans :numref:`sec_sgd`, nous avons examiné ce qui se passe lors de la descente de gradient stochastique, c'est-à-dire lors de l'optimisation où seule une variante bruyante du gradient est disponible. En particulier, nous avons remarqué que pour les gradients bruyants, nous devons être très prudents lorsqu'il s'agit de choisir le taux d'apprentissage face au bruit. Si nous le diminuons trop rapidement, la convergence s'arrête. Si nous sommes trop indulgents, nous ne parvenons pas à converger vers une solution suffisamment bonne puisque le bruit continue à nous éloigner de l'optimalité.
 
 ### Notions de base
 
@@ -20,7 +20,7 @@ Il serait bien de pouvoir bénéficier de l'effet de la réduction de la varianc
 
 $$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + \mathbf{g}_{t, t-1}$$ 
 
- pour un certain $\beta \in (0, 1)$. Cela remplace effectivement le gradient instantané par un gradient qui a été moyenné sur plusieurs gradients *passés*. $\mathbf{v}$ est appelé *momentum*. Il accumule les gradients passés de la même manière qu'une boule lourde qui roule sur le terrain de la fonction objectif intègre les forces passées. Pour voir ce qui se passe plus en détail, développons récursivement $\mathbf{v}_t$ en
+pour un certain $\beta \in (0, 1)$. Cela remplace effectivement le gradient instantané par un gradient qui a été moyenné sur plusieurs gradients *passés*. $\mathbf{v}$ est appelé *momentum*. Il accumule les gradients passés de la même manière qu'une boule lourde qui roule sur le terrain de la fonction objectif intègre les forces passées. Pour voir ce qui se passe plus en détail, développons récursivement $\mathbf{v}_t$ en
 
 $$\begin{aligned}
 \mathbf{v}_t = \beta^2 \mathbf{v}_{t-2} + \beta \mathbf{g}_{t-1, t-2} + \mathbf{g}_{t, t-1}
@@ -31,7 +31,7 @@ Le grand $\beta$ équivaut à une moyenne à long terme, tandis que le petit $\b
 
 Le raisonnement ci-dessus a constitué la base de ce que l'on appelle aujourd'hui les méthodes de gradient *accélérées*, telles que les gradients avec momentum. Elles présentent l'avantage supplémentaire d'être beaucoup plus efficaces dans les cas où le problème d'optimisation est mal conditionné (c'est-à-dire lorsqu'il y a certaines directions où la progression est beaucoup plus lente que dans d'autres, comme dans un canyon étroit). En outre, ils nous permettent de faire une moyenne des gradients ultérieurs pour obtenir des directions de descente plus stables. En effet, l'aspect de l'accélération même pour les problèmes convexes sans bruit est l'une des principales raisons pour lesquelles le momentum fonctionne et pourquoi il fonctionne si bien.
 
-Comme on peut s'y attendre, en raison de son efficacité, le momentum est un sujet bien étudié en optimisation pour l'apprentissage profond et au-delà. Voir, par exemple, le magnifique [expository article](https://distill.pub/2017/momentum/) de :cite:`Goh.2017` pour une analyse approfondie et une animation interactive. Il a été proposé par :cite:`Polyak.1964` . :cite:`Nesterov.2018` présente une discussion théorique détaillée dans le contexte de l'optimisation convexe. On sait depuis longtemps que le momentum dans l'apprentissage profond est bénéfique. Voir, par exemple, la discussion de :cite:`Sutskever.Martens.Dahl.ea.2013` pour plus de détails.
+Comme on peut s'y attendre, en raison de son efficacité, le momentum est un sujet bien étudié en optimisation pour l'apprentissage profond et au-delà. Voir, par exemple, le magnifique [expository article](https://distill.pub/2017/momentum/) de :cite:`Goh.2017` pour une analyse approfondie et une animation interactive. Il a été proposé par :cite:`Polyak.1964`. :cite:`Nesterov.2018` présente une discussion théorique détaillée dans le contexte de l'optimisation convexe. On sait depuis longtemps que le momentum dans l'apprentissage profond est bénéfique. Voir, par exemple, la discussion de :cite:`Sutskever.Martens.Dahl.ea.2013` pour plus de détails.
 
 ### Un problème mal conditionné
 
@@ -39,7 +39,7 @@ Pour mieux comprendre les propriétés géométriques de la méthode de l'élan,
 
 $$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$ 
 
- Comme précédemment, $f$ a son minimum à $(0, 0)$. Cette fonction est *très* plate dans la direction de $x_1$. Voyons ce qui se passe lorsque nous exécutons la descente du gradient comme précédemment sur cette nouvelle fonction. Nous choisissons un taux d'apprentissage de $0.4$.
+Comme précédemment, $f$ a son minimum à $(0, 0)$. Cette fonction est *très* plate dans la direction de $x_1$. Voyons ce qui se passe lorsque nous exécutons la descente du gradient comme précédemment sur cette nouvelle fonction. Nous choisissons un taux d'apprentissage de $0.4$.
 
 ```{.python .input}
 #@tab mxnet
@@ -97,8 +97,8 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 
 ### La méthode des moments forts
 
-La méthode des moments forts nous permet de résoudre le problème de descente de gradient décrit ci-dessus
-. En regardant la trace d'optimisation ci-dessus, on pourrait penser que la moyenne des gradients sur le passé fonctionnerait bien. Après tout, dans la direction $x_1$, cela va agréger des gradients bien alignés, augmentant ainsi la distance que nous parcourons à chaque pas. À l'inverse, dans la direction $x_2$ où les gradients oscillent, un gradient agrégé réduira la taille des pas en raison des oscillations qui s'annulent.
+La méthode des moments forts nous permet de résoudre le problème de descente de gradient décrit ci-dessus.
+En regardant la trace d'optimisation ci-dessus, on pourrait penser que la moyenne des gradients sur le passé fonctionnerait bien. Après tout, dans la direction $x_1$, cela va agréger des gradients bien alignés, augmentant ainsi la distance que nous parcourons à chaque pas. À l'inverse, dans la direction $x_2$ où les gradients oscillent, un gradient agrégé réduira la taille des pas en raison des oscillations qui s'annulent.
 En utilisant $\mathbf{v}_t$ au lieu du gradient $\mathbf{g}_t$, on obtient les équations de mise à jour suivantes :
 
 $$
@@ -256,21 +256,21 @@ Considérons la fonction
 
 $$h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top \mathbf{Q} \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b.$$ 
 
- Il s'agit d'une fonction quadratique générale. Pour les matrices définies positives $\mathbf{Q} \succ 0$, c'est-à-dire pour les matrices avec des valeurs propres positives, cette fonction a un minimiseur à $\mathbf{x}^* = -\mathbf{Q}^{-1} \mathbf{c}$ avec une valeur minimale $b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}$. Nous pouvons donc réécrire $h$ comme suit :
+Il s'agit d'une fonction quadratique générale. Pour les matrices définies positives $\mathbf{Q} \succ 0$, c'est-à-dire pour les matrices avec des valeurs propres positives, cette fonction a un minimiseur à $\mathbf{x}^* = -\mathbf{Q}^{-1} \mathbf{c}$ avec une valeur minimale $b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}$. Nous pouvons donc réécrire $h$ comme suit :
 
 $$h(\mathbf{x}) = \frac{1}{2} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})^\top \mathbf{Q} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c}) + b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}.$$ 
 
- Le gradient est donné par $\partial_{\mathbf{x}} h(\mathbf{x}) = \mathbf{Q} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$. C'est-à-dire qu'il est donné par la distance entre $\mathbf{x}$ et le minimiseur, multipliée par $\mathbf{Q}$. Par conséquent, l'élan est également une combinaison linéaire de termes $\mathbf{Q} (\mathbf{x}_t - \mathbf{Q}^{-1} \mathbf{c})$.
+Le gradient est donné par $\partial_{\mathbf{x}} h(\mathbf{x}) = \mathbf{Q} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$. C'est-à-dire qu'il est donné par la distance entre $\mathbf{x}$ et le minimiseur, multipliée par $\mathbf{Q}$. Par conséquent, l'élan est également une combinaison linéaire de termes $\mathbf{Q} (\mathbf{x}_t - \mathbf{Q}^{-1} \mathbf{c})$.
 
 Puisque $\mathbf{Q}$ est définie positive, elle peut être décomposée en son système propre via $\mathbf{Q} = \mathbf{O}^\top \boldsymbol{\Lambda} \mathbf{O}$ pour une matrice orthogonale (rotation) $\mathbf{O}$ et une matrice diagonale $\boldsymbol{\Lambda}$ de valeurs propres positives. Cela nous permet d'effectuer un changement de variables de $\mathbf{x}$ à $\mathbf{z} := \mathbf{O} (\mathbf{x} - \mathbf{Q}^{-1} \mathbf{c})$ pour obtenir une expression beaucoup plus simple :
 
 $$h(\mathbf{z}) = \frac{1}{2} \mathbf{z}^\top \boldsymbol{\Lambda} \mathbf{z} + b'.$$ 
 
- Ici $b' = b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}$. Comme $\mathbf{O}$ n'est qu'une matrice orthogonale, cela ne perturbe pas les gradients de manière significative. Exprimée en termes de $\mathbf{z}$ la descente de gradient devient
+Ici $b' = b - \frac{1}{2} \mathbf{c}^\top \mathbf{Q}^{-1} \mathbf{c}$. Comme $\mathbf{O}$ n'est qu'une matrice orthogonale, cela ne perturbe pas les gradients de manière significative. Exprimée en termes de $\mathbf{z}$ la descente de gradient devient
 
 $$\mathbf{z}_t = \mathbf{z}_{t-1} - \boldsymbol{\Lambda} \mathbf{z}_{t-1} = (\mathbf{I} - \boldsymbol{\Lambda}) \mathbf{z}_{t-1}.$$ 
 
- Le fait important dans cette expression est que la descente de gradient *ne mélange pas* entre différents espaces propres. En d'autres termes, lorsqu'elle est exprimée en termes de système propre de $\mathbf{Q}$, le problème d'optimisation se déroule dans le sens des coordonnées. Ceci est également valable pour la quantité de mouvement.
+Le fait important dans cette expression est que la descente de gradient *ne mélange pas* entre différents espaces propres. En d'autres termes, lorsqu'elle est exprimée en termes de système propre de $\mathbf{Q}$, le problème d'optimisation se déroule dans le sens des coordonnées. Ceci est également valable pour la quantité de mouvement.
 
 $$\begin{aligned}
 \mathbf{v}_t & = \beta \mathbf{v}_{t-1} + \boldsymbol{\Lambda} \mathbf{z}_{t-1} \\
@@ -286,7 +286,7 @@ Compte tenu du résultat ci-dessus, voyons ce qui se passe lorsque nous minimiso
 
 $$x_{t+1} = x_t - \eta \lambda x_t = (1 - \eta \lambda) x_t.$$ 
 
- Chaque fois que $|1 - \eta \lambda| < 1$ cette optimisation converge à un taux exponentiel puisqu'après $t$ étapes nous avons $x_t = (1 - \eta \lambda)^t x_0$. Cela montre comment le taux de convergence s'améliore initialement à mesure que nous augmentons le taux d'apprentissage $\eta$ jusqu'à $\eta \lambda = 1$. Au-delà, les choses divergent et pour $\eta \lambda > 2$ le problème d'optimisation diverge.
+Chaque fois que $|1 - \eta \lambda| < 1$ cette optimisation converge à un taux exponentiel puisqu'après $t$ étapes nous avons $x_t = (1 - \eta \lambda)^t x_0$. Cela montre comment le taux de convergence s'améliore initialement à mesure que nous augmentons le taux d'apprentissage $\eta$ jusqu'à $\eta \lambda = 1$. Au-delà, les choses divergent et pour $\eta \lambda > 2$ le problème d'optimisation diverge.
 
 ```{.python .input}
 #@tab all

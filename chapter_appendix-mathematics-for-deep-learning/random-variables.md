@@ -1,7 +1,7 @@
 # Variables aléatoires
 :label:`sec_random_variables` 
 
- Dans :numref:`sec_prob` , nous avons vu les bases du travail avec les variables aléatoires discrètes, qui dans notre cas font référence aux variables aléatoires qui prennent soit un ensemble fini de valeurs possibles, soit les entiers.  Dans cette section, nous développons la théorie des *variables aléatoires continues*, qui sont des variables aléatoires pouvant prendre n'importe quelle valeur réelle.
+Dans :numref:`sec_prob`, nous avons vu les bases du travail avec les variables aléatoires discrètes, qui dans notre cas font référence aux variables aléatoires qui prennent soit un ensemble fini de valeurs possibles, soit les entiers.  Dans cette section, nous développons la théorie des *variables aléatoires continues*, qui sont des variables aléatoires pouvant prendre n'importe quelle valeur réelle.
 
 ## Variables aléatoires continues
 
@@ -36,9 +36,9 @@ $$
 Allons plus loin.  Nous avons pensé au point $2$ pendant tout ce temps, sans jamais penser à d'autres points.  Fondamentalement, rien n'y est différent, mais il est vrai que la valeur $p$ sera probablement différente.  Nous pourrions au moins espérer qu'un lanceur de fléchettes ait plus de chances de toucher un point proche du centre, comme $2\text{cm}$ plutôt que $20\text{cm}$. Ainsi, la valeur $p$ n'est pas fixe, mais devrait plutôt dépendre du point $x$.  Cela nous indique que nous devrions nous attendre à
 
 $$P(\text{distance is in an}\; \epsilon \text{-sized interval around}\; x ) \approx \epsilon \cdot p(x).$$ 
- :eqlabel:`eq_pdf_deriv` 
+:eqlabel:`eq_pdf_deriv` 
 
- En effet, :eqref:`eq_pdf_deriv` définit précisément la *fonction de densité de probabilité*.  Il s'agit d'une fonction $p(x)$ qui code la probabilité relative de toucher un point par rapport à un autre.  Visualisons à quoi pourrait ressembler une telle fonction.
+En effet, :eqref:`eq_pdf_deriv` définit précisément la *fonction de densité de probabilité*.  Il s'agit d'une fonction $p(x)$ qui code la probabilité relative de toucher un point par rapport à un autre.  Visualisons à quoi pourrait ressembler une telle fonction.
 
 ```{.python .input}
 #@tab mxnet
@@ -95,9 +95,9 @@ Les endroits où la valeur de la fonction est grande indiquent les régions où 
 Approfondissons maintenant cette question.  Nous avons déjà vu ce qu'est intuitivement une fonction de densité de probabilité pour une variable aléatoire $X$, à savoir que la fonction de densité est une fonction $p(x)$ telle que
 
 $$P(X \; \text{is in an}\; \epsilon \text{-sized interval around}\; x ) \approx \epsilon \cdot p(x).$$ 
- :eqlabel:`eq_pdf_def` 
+:eqlabel:`eq_pdf_def` 
 
- Mais qu'est-ce que cela implique pour les propriétés de $p(x)$?
+Mais qu'est-ce que cela implique pour les propriétés de $p(x)$?
 
 Tout d'abord, les probabilités ne sont jamais négatives, nous devrions donc nous attendre à ce que $p(x) \ge 0$ le soit également.
 
@@ -113,7 +113,7 @@ $$
 P(X\in\mathbb{R}) \approx \sum_i \epsilon \cdot p(\epsilon\cdot i).
 $$
 
-Ceci n'est rien d'autre que l'approximation d'une intégrale discutée dans :numref:`sec_integral_calculus` , nous pouvons donc dire que
+Ceci n'est rien d'autre que l'approximation d'une intégrale discutée dans :numref:`sec_integral_calculus`, nous pouvons donc dire que
 
 $$
 P(X\in\mathbb{R}) = \int_{-\infty}^{\infty} p(x) \; dx.
@@ -184,20 +184,20 @@ f'approximate Probability: {tf.reduce_sum(epsilon*p[300:800])}'
 Il s'avère que ces deux propriétés décrivent exactement l'espace des fonctions de densité de probabilité possibles (ou *f.d.p.* pour l'abréviation couramment utilisée).  Ce sont des fonctions non négatives $p(x) \ge 0$ telles que
 
 $$\int_{-\infty}^{\infty} p(x) \; dx = 1.$$ 
- :eqlabel:`eq_pdf_int_one` 
+:eqlabel:`eq_pdf_int_one` 
 
- Nous interprétons cette fonction en utilisant l'intégration pour obtenir la probabilité que notre variable aléatoire se trouve dans un intervalle spécifique :
+Nous interprétons cette fonction en utilisant l'intégration pour obtenir la probabilité que notre variable aléatoire se trouve dans un intervalle spécifique :
 
 $$P(X\in(a, b]) = \int _ {a}^{b} p(x) \; dx.$$ 
- :eqlabel:`eq_pdf_int_int` 
+:eqlabel:`eq_pdf_int_int` 
 
- Dans :numref:`sec_distributions` , nous verrons un certain nombre de distributions courantes, mais continuons à travailler dans l'abstrait.
+Dans :numref:`sec_distributions`, nous verrons un certain nombre de distributions courantes, mais continuons à travailler dans l'abstrait.
 
 ### Fonctions de distribution cumulatives
 
 Dans la section précédente, nous avons vu la notion de f.d.p. En pratique, il s'agit d'une méthode couramment rencontrée pour discuter des variables aléatoires continues, mais elle présente un écueil important : les valeurs de la f.d.p. ne sont pas elles-mêmes des probabilités, mais plutôt une fonction que nous devons intégrer pour obtenir des probabilités.  Il n'y a rien d'anormal à ce qu'une densité soit supérieure à $10$, à condition qu'elle ne soit pas supérieure à $10$ pendant plus d'un intervalle de longueur $1/10$.  Cela peut être contre-intuitif, c'est pourquoi les gens pensent souvent aussi en termes de *fonction de distribution cumulative*, ou f.d.c., qui *est* une probabilité.
 
-En particulier, en utilisant :eqref:`eq_pdf_int_int` , nous définissons la f.d.c. pour une variable aléatoire $X$ avec une densité $p(x)$ par
+En particulier, en utilisant :eqref:`eq_pdf_int_int`, nous définissons la f.d.c. pour une variable aléatoire $X$ avec une densité $p(x)$ par
 
 $$
 F(x) = \int _ {-\infty}^{x} p(x) \; dx = P(X \le x).
@@ -229,9 +229,9 @@ Supposons que nous ayons affaire à une variable aléatoire $X$.  La distributio
 La *moyenne* code la valeur moyenne d'une variable aléatoire.  Si nous avons une variable aléatoire discrète $X$, qui prend les valeurs $x_i$ avec les probabilités $p_i$, alors la moyenne est donnée par la moyenne pondérée : somme des valeurs multipliée par la probabilité que la variable aléatoire prenne cette valeur :
 
 $$\mu_X = E[X] = \sum_i x_i p_i.$$ 
- :eqlabel:`eq_exp_def` 
+:eqlabel:`eq_exp_def` 
 
- La façon dont nous devons interpréter la moyenne (bien qu'avec prudence) est qu'elle nous indique essentiellement où la variable aléatoire tend à se situer.
+La façon dont nous devons interpréter la moyenne (bien qu'avec prudence) est qu'elle nous indique essentiellement où la variable aléatoire tend à se situer.
 
 À titre d'exemple minimaliste que nous examinerons tout au long de cette section, considérons que $X$ est la variable aléatoire qui prend la valeur $a-2$ avec la probabilité $p$, $a+2$ avec la probabilité $p$ et $a$ avec la probabilité $1-2p$.  Nous pouvons calculer en utilisant :eqref:`eq_exp_def` que, pour tout choix possible de $a$ et $p$, la moyenne est de
 
@@ -257,9 +257,9 @@ Il est raisonnable d'essayer d'examiner $\left|X-\mu_X\right|$, ce qui conduit e
 En particulier, ils examinent $(X-\mu_X)^2.$ Si nous examinons la taille typique de cette quantité en prenant la moyenne, nous arrivons à la variance
 
 $$\sigma_X^2 = \mathrm{Var}(X) = E\left[(X-\mu_X)^2\right] = E[X^2] - \mu_X^2.$$ 
- :eqlabel:`eq_var_def` 
+:eqlabel:`eq_var_def` 
 
- La dernière égalité dans :eqref:`eq_var_def` tient en développant la définition au milieu, et en appliquant les propriétés de l'espérance.
+La dernière égalité dans :eqref:`eq_var_def` tient en développant la définition au milieu, et en appliquant les propriétés de l'espérance.
 
 Reprenons notre exemple où $X$ est la variable aléatoire qui prend la valeur $a-2$ avec la probabilité $p$, $a+2$ avec la probabilité $p$ et $a$ avec la probabilité $1-2p$.  Dans ce cas, $\mu_X = a$, tout ce dont nous avons besoin est de calculer $E\left[X^2\right]$.  Cela peut facilement être fait :
 
@@ -302,9 +302,9 @@ Les propriétés que nous avions pour la variance peuvent être reformulées pou
 Il est naturel à ce moment de se demander : " Si l'écart-type est dans les unités de notre variable aléatoire initiale, représente-t-il quelque chose que nous pouvons tirer en ce qui concerne cette variable aléatoire ? "  La réponse est un oui retentissant !  En effet, tout comme la moyenne nous a indiqué l'emplacement typique de notre variable aléatoire, l'écart-type donne la plage de variation typique de cette variable aléatoire.  Nous pouvons rendre cela rigoureux à l'aide de ce que l'on appelle l'inégalité de Chebyshev :
 
 $$P\left(X \not\in [\mu_X - \alpha\sigma_X, \mu_X + \alpha\sigma_X]\right) \le \frac{1}{\alpha^2}.$$ 
- :eqlabel:`eq_chebyshev` 
+:eqlabel:`eq_chebyshev` 
 
- Ou, pour l'exprimer verbalement dans le cas de $\alpha=10$, $99\%$ des échantillons de toute variable aléatoire se situent dans les limites de $10$ écarts types de la moyenne.  Cela donne une interprétation immédiate à nos statistiques sommaires standard.
+Ou, pour l'exprimer verbalement dans le cas de $\alpha=10$, $99\%$ des échantillons de toute variable aléatoire se situent dans les limites de $10$ écarts types de la moyenne.  Cela donne une interprétation immédiate à nos statistiques sommaires standard.
 
 Pour voir en quoi cette affirmation est plutôt subtile, reprenons notre exemple courant où $X$ est la variable aléatoire qui prend la valeur $a-2$ avec la probabilité $p$, $a+2$ avec la probabilité $p$ et $a$ avec la probabilité $1-2p$.  Nous avons vu que la moyenne était $a$ et que l'écart type était $2\sqrt{2p}$. Cela signifie que, si nous prenons l'inégalité de Chebyshev :eqref:`eq_chebyshev` avec $\alpha = 2$, nous voyons que l'expression est
 
@@ -439,7 +439,7 @@ $$
 \mu_X = \int_{-\infty}^\infty xp_X(x) \; dx.
 $$
 
-De même, en utilisant :eqref:`eq_var_def` , la variance peut être écrite comme suit
+De même, en utilisant :eqref:`eq_var_def`, la variance peut être écrite comme suit
 
 $$
 \sigma^2_X = E[X^2] - \mu_X^2 = \int_{-\infty}^\infty x^2p_X(x) \; dx - \left(\int_{-\infty}^\infty xp_X(x) \; dx\right)^2.
@@ -544,7 +544,7 @@ $$
 
 Cela signifie qu'elle n'a pas une variance finie bien définie.
 
-Cependant, en regardant de plus près, on obtient un résultat encore plus inquiétant.  Essayons de calculer la moyenne à l'aide de :eqref:`eq_exp_def` .  En utilisant la formule de changement de variables, nous voyons
+Cependant, en regardant de plus près, on obtient un résultat encore plus inquiétant.  Essayons de calculer la moyenne à l'aide de :eqref:`eq_exp_def`.  En utilisant la formule de changement de variables, nous voyons
 
 $$
 \mu_X = \int_{-\infty}^{\infty} \frac{x}{1+x^2} \; dx = \frac{1}{2}\int_1^\infty \frac{1}{u} \; du.
@@ -558,7 +558,7 @@ Les scientifiques de l'apprentissage automatique définissent leurs modèles de 
 
 Les travaux ci-dessus supposent tous que nous travaillons avec une seule variable aléatoire à valeur réelle.  Mais que se passe-t-il si nous avons affaire à deux ou plusieurs variables aléatoires potentiellement fortement corrélées ?  Cette circonstance est la norme en apprentissage automatique : imaginez des variables aléatoires comme $R_{i, j}$ qui codent la valeur rouge du pixel à la coordonnée $(i, j)$ dans une image, ou $P_t$ qui est une variable aléatoire donnée par le prix d'une action au moment $t$.  Les pixels proches ont tendance à avoir une couleur similaire, et les moments proches ont tendance à avoir des prix similaires.  Nous ne pouvons pas les traiter comme des variables aléatoires distinctes et espérer créer un modèle performant (nous verrons dans :numref:`sec_naive_bayes` un modèle peu performant en raison d'une telle hypothèse).  Nous devons développer le langage mathématique nécessaire pour traiter ces variables aléatoires continues corrélées.
 
-Heureusement, grâce aux intégrales multiples de :numref:`sec_integral_calculus` , nous pouvons développer un tel langage.  Supposons que nous ayons, pour simplifier, deux variables aléatoires $X, Y$ qui peuvent être corrélées.  Alors, comme dans le cas d'une variable unique, nous pouvons poser la question :
+Heureusement, grâce aux intégrales multiples de :numref:`sec_integral_calculus`, nous pouvons développer un tel langage.  Supposons que nous ayons, pour simplifier, deux variables aléatoires $X, Y$ qui peuvent être corrélées.  Alors, comme dans le cas d'une variable unique, nous pouvons poser la question :
 
 $$
 P(X \;\text{is in an}\; \epsilon \text{-sized interval around}\; x \; \text{and} \;Y \;\text{is in an}\; \epsilon \text{-sized interval around}\; y ).
@@ -607,11 +607,11 @@ $$
 ![By summing along the columns of our array of probabilities, we are able to obtain the marginal distribution for just the random variable represented along the $x$-axis.](../img/marginal.svg)
 :label:`fig_marginal`
 
-Cela nous dit d'additionner la valeur de la densité le long d'une série de carrés sur une ligne, comme indiqué sur :numref:`fig_marginal` . En effet, après avoir annulé un facteur d'epsilon des deux côtés, et en reconnaissant que la somme de droite est l'intégrale sur $y$, nous pouvons conclure que
+Cela nous dit d'additionner la valeur de la densité le long d'une série de carrés sur une ligne, comme indiqué sur :numref:`fig_marginal`. En effet, après avoir annulé un facteur d'epsilon des deux côtés, et en reconnaissant que la somme de droite est l'intégrale sur $y$, nous pouvons conclure que
 
 $$
 \begin{aligned}
- p _ X(x) &  \approx \sum _ {i} \epsilon p _ {X, Y}(x, \epsilon\cdot i) \\
+p _ X(x) &  \approx \sum _ {i} \epsilon p _ {X, Y}(x, \epsilon\cdot i) \\
  & \approx \int_{-\infty}^\infty p_{X, Y}(x, y) \; dy.
 \end{aligned}
 $$
@@ -631,9 +631,9 @@ Lorsque l'on a affaire à plusieurs variables aléatoires, il existe une statist
 Supposons que nous disposions de deux variables aléatoires $X$ et $Y$. Pour commencer, supposons qu'elles soient discrètes et prennent les valeurs $(x_i, y_j)$ avec une probabilité de $p_{ij}$.  Dans ce cas, la covariance est définie comme suit :
 
 $$\sigma_{XY} = \mathrm{Cov}(X, Y) = \sum_{i, j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij}. = E[XY] - E[X]E[Y].$$ 
- :eqlabel:`eq_cov_def` 
+:eqlabel:`eq_cov_def` 
 
- Pour y réfléchir de manière intuitive : considérez la paire de variables aléatoires suivante.  Supposons que $X$ prenne les valeurs $1$ et $3$, et que $Y$ prenne les valeurs $-1$ et $3$.  Supposons que nous ayons les probabilités suivantes
+Pour y réfléchir de manière intuitive : considérez la paire de variables aléatoires suivante.  Supposons que $X$ prenne les valeurs $1$ et $3$, et que $Y$ prenne les valeurs $-1$ et $3$.  Supposons que nous ayons les probabilités suivantes
 
 $$
 \begin{aligned}
@@ -744,7 +744,7 @@ Comme nous l'avons fait dans le cas des moyennes et des variances, considérons 
 Pour voir ce qui est logique, réalisons une expérience de pensée.  Supposons que nous convertissions nos variables aléatoires en pouces et dollars en pouces et cents.  Dans ce cas, la variable aléatoire $Y$ est multipliée par $100$.  Si nous travaillons sur la définition, cela signifie que $\mathrm{Cov}(X, Y)$ sera multiplié par $100$.  Nous constatons donc que, dans ce cas, un changement d'unité modifie la covariance par un facteur de $100$. Ainsi, pour trouver notre mesure de corrélation invariante par unité, nous devrons diviser par quelque chose d'autre qui sera également mis à l'échelle par $100$.  En effet, nous avons un candidat évident, l'écart-type !  En effet, si nous définissons le *coefficient de corrélation* comme étant
 
 $$\rho(X, Y) = \frac{\mathrm{Cov}(X, Y)}{\sigma_{X}\sigma_{Y}},$$ 
- :eqlabel:`eq_cor_def` 
+:eqlabel:`eq_cor_def` 
 
  , nous constatons qu'il s'agit d'une valeur sans unité.  Un peu de mathématiques permet de montrer que ce nombre se situe entre $-1$ et $1$, $1$ signifiant une corrélation positive maximale, tandis que $-1$ signifie une corrélation négative maximale.
 
@@ -760,9 +760,9 @@ Comme autre exemple, considérez $X$ comme une variable aléatoire quelconque, e
 
 $$\sigma_{Y} = \sigma_{aX+b} = |a|\sigma_{X},$$ 
 
- $$\mathrm{Cov}(X, Y) = \mathrm{Cov}(X, aX+b) = a\mathrm{Cov}(X, X) = a\mathrm{Var}(X),$$ 
+$$\mathrm{Cov}(X, Y) = \mathrm{Cov}(X, aX+b) = a\mathrm{Cov}(X, X) = a\mathrm{Var}(X),$$ 
 
- et donc par :eqref:`eq_cor_def` que
+et donc par :eqref:`eq_cor_def` que
 
 $$
 \rho(X, Y) = \frac{a\mathrm{Var}(X)}{|a|\sigma_{X}^2} = \frac{a}{|a|} = \mathrm{sign}(a).

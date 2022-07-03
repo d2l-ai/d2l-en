@@ -6,14 +6,14 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Prétraitement des données
 :label:`sec_pandas` 
 
- Jusqu'à présent, nous avons travaillé avec des données synthétiques
+Jusqu'à présent, nous avons travaillé avec des données synthétiques
 qui arrivaient dans des tenseurs prêts à l'emploi.
-Cependant, pour appliquer l'apprentissage profond dans la nature
-, nous devons extraire des données désordonnées 
+Cependant, pour appliquer l'apprentissage profond dans la nature,
+ nous devons extraire des données désordonnées 
 stockées dans des formats arbitraires,
 et les prétraiter pour répondre à nos besoins.
 Heureusement, le programme *pandas* [library](https://pandas.pydata.org/) 
- peut faire une grande partie de ce travail.
+peut faire une grande partie de ce travail.
 Cette section, bien qu'elle ne remplace pas 
 une *pandas* [tutorial](https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html),
 vous donnera un cours intensif
@@ -71,7 +71,7 @@ via une indexation basée sur l'emplacement des entiers (`iloc`).
 
 Vous avez peut-être remarqué que `pandas` a remplacé
 toutes les entrées CSV par la valeur `NA`
- par une valeur spéciale `NaN` (*not a number*). 
+par une valeur spéciale `NaN` (*not a number*). 
 Cela peut également se produire lorsqu'une entrée est vide,
 par exemple, "3,,,,270000".
 C'est ce qu'on appelle les *valeurs manquantes* 
@@ -149,7 +149,7 @@ X, y
 Vous savez maintenant comment partitionner des colonnes de données, 
 imputer des variables manquantes, 
 et charger `pandas` des données dans des tenseurs. 
-Dans :numref:`sec_kaggle_house` , vous allez
+Dans :numref:`sec_kaggle_house`, vous allez
 acquérir d'autres compétences en matière de traitement des données. 
 Bien que ce cours accéléré ait gardé les choses simples, le traitement des données
 peut être difficile.
@@ -170,12 +170,12 @@ Ces problèmes se poseront lorsque nous aborderons la vision par ordinateur
 et le traitement du langage naturel. 
 Enfin, nous devons prêter attention à la qualité des données.
 Les ensembles de données du monde réel sont souvent entachés 
-de valeurs aberrantes, de mesures erronées provenant de capteurs et d'erreurs d'enregistrement, 
-. Ces problèmes doivent être résolus avant 
+de valeurs aberrantes, de mesures erronées provenant de capteurs et d'erreurs d'enregistrement.
+Ces problèmes doivent être résolus avant 
 d'intégrer les données dans un modèle. 
 Les outils de visualisation de données tels que [seaborn](https://seaborn.pydata.org/), 
 [Bokeh](https://docs.bokeh.org/) , ou [matplotlib](https://matplotlib.org/)
- peuvent vous aider à inspecter manuellement les données 
+peuvent vous aider à inspecter manuellement les données 
 et à développer des intuitions sur 
 les problèmes que vous devrez peut-être résoudre.
 

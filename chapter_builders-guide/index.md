@@ -1,7 +1,7 @@
 # Builders' Guide
 :label:`chap_computation` 
 
- Outre les ensembles de données géants et le matériel puissant,
+Outre les ensembles de données géants et le matériel puissant,
 d'excellents outils logiciels ont joué un rôle indispensable
 dans la progression rapide de l'apprentissage profond.
 En commençant par la bibliothèque Theano, publiée en 2007,

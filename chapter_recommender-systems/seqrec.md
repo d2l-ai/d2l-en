@@ -2,7 +2,7 @@
 
 Dans les sections précédentes, nous avons abstrait la tâche de recommandation comme un problème de remplissage de matrice sans tenir compte des comportements à court terme des utilisateurs. Dans cette section, nous présentons un modèle de recommandation qui prend en compte les journaux d'interaction des utilisateurs ordonnés de manière séquentielle.  Il s'agit d'un recommandeur sensible à la séquence :cite:`Quadrana.Cremonesi.Jannach.2018` où l'entrée est une liste ordonnée et souvent horodatée des actions passées de l'utilisateur.  Un certain nombre d'ouvrages récents ont démontré l'utilité d'incorporer de telles informations pour modéliser les schémas comportementaux temporels des utilisateurs et découvrir leur dérive d'intérêt.
 
-Le modèle que nous allons présenter, Caser :cite:`Tang.Wang.2018` , abréviation de convolutional sequence embedding recommendation model, adopte des réseaux neuronaux à convolution pour capturer les influences dynamiques des activités récentes des utilisateurs. Le composant principal de Caser se compose d'un réseau convolutif horizontal et d'un réseau convolutif vertical, visant à découvrir les modèles de séquence au niveau de l'union et au niveau du point, respectivement.  Le modèle au niveau du point indique l'impact d'un seul élément de la séquence historique sur l'élément cible, tandis que le modèle au niveau de l'union implique les influences de plusieurs actions précédentes sur la cible suivante. Par exemple, l'achat simultané de lait et de beurre entraîne une probabilité plus élevée d'acheter de la farine que l'achat d'un seul de ces produits. En outre, les intérêts généraux des utilisateurs, ou leurs préférences à long terme, sont également modélisés dans les dernières couches entièrement connectées, ce qui permet une modélisation plus complète des intérêts des utilisateurs. Les détails du modèle sont décrits comme suit.
+Le modèle que nous allons présenter, Caser :cite:`Tang.Wang.2018`, abréviation de convolutional sequence embedding recommendation model, adopte des réseaux neuronaux à convolution pour capturer les influences dynamiques des activités récentes des utilisateurs. Le composant principal de Caser se compose d'un réseau convolutif horizontal et d'un réseau convolutif vertical, visant à découvrir les modèles de séquence au niveau de l'union et au niveau du point, respectivement.  Le modèle au niveau du point indique l'impact d'un seul élément de la séquence historique sur l'élément cible, tandis que le modèle au niveau de l'union implique les influences de plusieurs actions précédentes sur la cible suivante. Par exemple, l'achat simultané de lait et de beurre entraîne une probabilité plus élevée d'acheter de la farine que l'achat d'un seul de ces produits. En outre, les intérêts généraux des utilisateurs, ou leurs préférences à long terme, sont également modélisés dans les dernières couches entièrement connectées, ce qui permet une modélisation plus complète des intérêts des utilisateurs. Les détails du modèle sont décrits comme suit.
 
 ## Architectures du modèle
 
@@ -41,7 +41,7 @@ Le modèle peut être appris avec BPR ou la perte Hinge. L'architecture de Caser
 
 ![Illustration of the Caser Model](../img/rec-caser.svg) 
 
- Nous commençons par importer les bibliothèques nécessaires.
+Nous commençons par importer les bibliothèques nécessaires.
 
 ```{.python .input  n=3}
 #@tab mxnet
@@ -216,7 +216,7 @@ d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
 
 * Effectuez une étude d'ablation en supprimant l'un des réseaux convolutifs horizontaux et verticaux, quel composant est le plus important ?
 * Faites varier l'hyperparamètre $L$. Des interactions historiques plus longues apportent-elles une meilleure précision ?
-* Outre la tâche de recommandation basée sur la séquence que nous avons présentée ci-dessus, il existe un autre type de tâche de recommandation basée sur la séquence appelée recommandation basée sur la session :cite:`Hidasi.Karatzoglou.Baltrunas.ea.2015` . Pouvez-vous expliquer les différences entre ces deux tâches ?
+* Outre la tâche de recommandation basée sur la séquence que nous avons présentée ci-dessus, il existe un autre type de tâche de recommandation basée sur la séquence appelée recommandation basée sur la session :cite:`Hidasi.Karatzoglou.Baltrunas.ea.2015`. Pouvez-vous expliquer les différences entre ces deux tâches ?
 
 
 :begin_tab:`mxnet`

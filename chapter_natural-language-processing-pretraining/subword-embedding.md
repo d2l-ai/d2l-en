@@ -1,7 +1,7 @@
 # Subword Embedding
 :label:`sec_fasttext` 
 
- En anglais,
+En anglais,
 des mots tels que
 "helps", "helped", et "helping" sont 
 des formes infléchies du même mot "help".
@@ -37,7 +37,7 @@ sans paramètres partagés.
 Pour utiliser les informations morphologiques,
 le modèle *fastText*
 a proposé une approche d'intégration de *sous-mots*,
-où un sous-mot est un caractère $n$-gramme :cite:`Bojanowski.Grave.Joulin.ea.2017` .
+où un sous-mot est un caractère $n$-gramme :cite:`Bojanowski.Grave.Joulin.ea.2017`.
 Au lieu d'apprendre des représentations vectorielles au niveau des mots,
 fastText peut être considéré comme
 le saut-gramme au niveau des sous-mots,
@@ -56,20 +56,20 @@ nous obtenons tous les sous-mots de longueur 3 : "&lt;wh", "whe", "her", "ere", 
 
 Dans fastText, pour tout mot $w$,
 désigne par $\mathcal{G}_w$
- l'union de tous ses sous-mots de longueur comprise entre 3 et 6
+l'union de tous ses sous-mots de longueur comprise entre 3 et 6
 et son sous-mot spécial.
 Le vocabulaire 
 est l'union des sous-mots de tous les mots.
 En laissant $\mathbf{z}_g$
  être le vecteur du sous-mot $g$ dans le dictionnaire,
 le vecteur $\mathbf{v}_w$ pour le mot 
- $w$ comme mot central
+$w$ comme mot central
 dans le modèle skip-gram
 est la somme de ses vecteurs de sous-mots :
 
 $$\mathbf{v}_w = \sum_{g\in\mathcal{G}_w} \mathbf{z}_g.$$ 
 
- Le reste de fastText est le même que le modèle skip-gram. Par rapport au modèle de saut de programme, 
+Le reste de fastText est le même que le modèle skip-gram. Par rapport au modèle de saut de programme, 
 le vocabulaire dans fastText est plus large,
 ce qui entraîne un plus grand nombre de paramètres de modèle. 
 En outre, 
@@ -87,10 +87,10 @@ peuvent obtenir de meilleures représentations vectorielles dans fastText.
 ## Encodage des paires d'octets
 :label:`subsec_Byte_Pair_Encoding` 
 
- Dans fastText, tous les sous-mots extraits doivent avoir la longueur spécifiée, par exemple $3$ à $6$, et la taille du vocabulaire ne peut donc pas être prédéfinie.
+Dans fastText, tous les sous-mots extraits doivent avoir la longueur spécifiée, par exemple $3$ à $6$, et la taille du vocabulaire ne peut donc pas être prédéfinie.
 Pour permettre des sous-mots de longueur variable dans un vocabulaire de taille fixe,
 nous pouvons appliquer un algorithme de compression
-appelé *byte pair encoding* (BPE) pour extraire les sous-mots :cite:`Sennrich.Haddow.Birch.2015` .
+appelé *byte pair encoding* (BPE) pour extraire les sous-mots :cite:`Sennrich.Haddow.Birch.2015`.
 
 Le codage par paires d'octets effectue une analyse statistique de l'ensemble de données d'apprentissage pour découvrir les symboles communs dans un mot,
 tels que des caractères consécutifs de longueur arbitraire.
@@ -98,7 +98,7 @@ tels que des caractères consécutifs de longueur arbitraire.
 le codage par paires d'octets fusionne de manière itérative la paire la plus fréquente de symboles consécutifs pour produire de nouveaux symboles plus longs.
 Notez que pour des raisons d'efficacité, les paires traversant les limites des mots ne sont pas prises en compte.
 Au final, nous pouvons utiliser ces symboles comme des sous-mots pour segmenter les mots.
-L'encodage de paires d'octets et ses variantes ont été utilisés pour les représentations d'entrée dans des modèles de pré-entraînement de traitement du langage naturel populaires tels que GPT-2 :cite:`Radford.Wu.Child.ea.2019` et RoBERTa :cite:`Liu.Ott.Goyal.ea.2019` .
+L'encodage de paires d'octets et ses variantes ont été utilisés pour les représentations d'entrée dans des modèles de pré-entraînement de traitement du langage naturel populaires tels que GPT-2 :cite:`Radford.Wu.Child.ea.2019` et RoBERTa :cite:`Liu.Ott.Goyal.ea.2019`.
 Dans ce qui suit, nous allons illustrer le fonctionnement de l'encodage de paires d'octets.
 
 Tout d'abord, nous initialisons le vocabulaire de symboles comme étant tous les caractères minuscules anglais, un symbole spécial de fin de mot `'_'`, et un symbole spécial inconnu `'[UNK]'`.
@@ -232,7 +232,7 @@ print(segment_BPE(tokens, symbols))
 
 ## Exercices
 
-1. A titre d'exemple, il existe environ $3\times 10^8$ -grammes possibles $6$ en anglais. Quel est le problème lorsqu'il y a trop de sous-mots ? Comment résoudre ce problème ? Indice : reportez-vous à la fin de la section 3.2 du document fastText :cite:`Bojanowski.Grave.Joulin.ea.2017` .
+1. A titre d'exemple, il existe environ $3\times 10^8$ -grammes possibles $6$ en anglais. Quel est le problème lorsqu'il y a trop de sous-mots ? Comment résoudre ce problème ? Indice : reportez-vous à la fin de la section 3.2 du document fastText :cite:`Bojanowski.Grave.Joulin.ea.2017`.
 1. Comment concevoir un modèle d'intégration de sous-mots basé sur le modèle de sac de mots continu ?
 1. Pour obtenir un vocabulaire de taille $m$, combien d'opérations de fusion sont nécessaires lorsque la taille initiale du vocabulaire de symboles est $n$?
 1. Comment étendre l'idée de l'encodage de paires d'octets pour extraire des phrases ?

@@ -1,7 +1,7 @@
 # Réseaux neuronaux récurrents modernes
 :label:`chap_modern_rnn` 
 
- Nous avons présenté les bases des RNN,
+Nous avons présenté les bases des RNN,
 qui peuvent mieux traiter les données de séquence.
 À titre de démonstration,
 nous avons implémenté des modèles de langage
@@ -33,7 +33,7 @@ De telles expansions sont fréquemment adoptées
 dans les réseaux récurrents modernes.
 Lorsque nous expliquons ces variantes de RNN,
 nous continuons à considérer
-le même problème de modélisation du langage que celui présenté dans :numref:`chap_rnn` .
+le même problème de modélisation du langage que celui présenté dans :numref:`chap_rnn`.
 
 En fait, la modélisation du langage
 ne révèle qu'une petite fraction de ce dont 

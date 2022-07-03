@@ -6,12 +6,12 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 # Fonctions de notation de l'attention
 :label:`sec_attention-scoring-functions` 
 
- Dans :numref:`sec_nadaraya-watson` ,
+Dans :numref:`sec_nadaraya-watson`,
 nous avons utilisé un noyau gaussien pour modéliser
 les interactions entre les requêtes et les clés.
 En traitant l'exposant du noyau gaussien
 dans :eqref:`eq_nadaraya-watson-gaussian` 
- comme une *fonction de notation de l'attention* (ou *fonction de notation* pour faire court),
+comme une *fonction de notation de l'attention* (ou *fonction de notation* pour faire court),
 les résultats de cette fonction ont été
 essentiellement introduits dans
 une opération softmax.
@@ -27,10 +27,10 @@ basée sur ces poids d'attention.
 À un niveau élevé,
 nous pouvons utiliser l'algorithme ci-dessus
 pour instancier le cadre des mécanismes d'attention
-dans :numref:`fig_qkv` .
+dans :numref:`fig_qkv`.
 En désignant une fonction d'évaluation de l'attention par $a$,
 :numref:`fig_attention_output` 
- illustre la façon dont la sortie du regroupement de l'attention
+illustre la façon dont la sortie du regroupement de l'attention
 peut être calculée comme une somme pondérée de valeurs.
 Puisque les poids d'attention sont
 une distribution de probabilité,
@@ -45,17 +45,17 @@ une moyenne pondérée.
 Mathématiquement,
 suppose que nous avons
 une requête $\mathbf{q} \in \mathbb{R}^q$
- et $m$ des paires clé-valeur $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)$, où tout $\mathbf{k}_i \in \mathbb{R}^k$ et tout $\mathbf{v}_i \in \mathbb{R}^v$.
+et $m$ des paires clé-valeur $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)$, où tout $\mathbf{k}_i \in \mathbb{R}^k$ et tout $\mathbf{v}_i \in \mathbb{R}^v$.
 La mise en commun de l'attention $f$
- est instanciée comme une somme pondérée des valeurs :
+est instanciée comme une somme pondérée des valeurs :
 
 $$f(\mathbf{q}, (\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)) = \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$ 
- :eqlabel:`eq_attn-pooling-def` 
+:eqlabel:`eq_attn-pooling-def` 
 
- où
+où
 le poids de l'attention (scalaire) pour la requête $\mathbf{q}$
- et la clé $\mathbf{k}_i$
- est calculé par
+et la clé $\mathbf{k}_i$
+est calculé par
 l'opération softmax de
 une fonction de notation de l'attention $a$ qui fait correspondre deux vecteurs à un scalaire :
 
@@ -64,7 +64,7 @@ $$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i
 
 Comme nous pouvons le constater,
 différents choix de la fonction de notation de l'attention $a$
- conduisent à différents comportements de mise en commun de l'attention.
+conduisent à différents comportements de mise en commun de l'attention.
 Dans cette section,
 nous présentons deux fonctions de notation populaires
 que nous utiliserons plus tard pour développer des mécanismes d'attention plus
@@ -101,7 +101,7 @@ sortir une distribution de probabilité comme poids d'attention.
 Dans certains cas,
 toutes les valeurs ne doivent pas être introduites dans le regroupement d'attention.
 Par exemple,
-pour un traitement efficace des minilots dans :numref:`sec_machine_translation` ,
+pour un traitement efficace des minilots dans :numref:`sec_machine_translation`,
 certaines séquences de texte sont complétées par
 des tokens spéciaux qui ne sont pas porteurs de sens.
 Pour obtenir une mise en commun de l'attention
@@ -243,26 +243,26 @@ masked_softmax(tf.random.uniform((2, 2, 4)), tf.constant([[1, 3], [2, 4]]))
 ## [**Additive Attention**]
 :label:`subsec_additive-attention` 
 
- En général,
+En général,
 lorsque les requêtes et les clés sont des vecteurs de longueurs différentes,
 nous pouvons utiliser l'attention additive
 comme fonction de notation.
 Étant donné une requête $\mathbf{q} \in \mathbb{R}^q$
- et une clé $\mathbf{k} \in \mathbb{R}^k$,
+et une clé $\mathbf{k} \in \mathbb{R}^k$,
 la fonction de notation de l'attention *additive*
 
 $$a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R},$$ 
- :eqlabel:`eq_additive-attn` 
+:eqlabel:`eq_additive-attn` 
 
- où
+où
 paramètres apprenables
 $\mathbf W_q\in\mathbb R^{h\times q}$ , $\mathbf W_k\in\mathbb R^{h\times k}$, et $\mathbf w_v\in\mathbb R^{h}$.
-Comme pour :eqref:`eq_additive-attn` ,
+Comme pour :eqref:`eq_additive-attn`,
 la requête et la clé sont concaténées
 et introduites dans un MLP avec une seule couche cachée
 dont le nombre d'unités cachées est $h$, un hyperparamètre.
-En utilisant $\tanh$ comme fonction d'activation et en désactivant les termes de biais de
-,
+En utilisant $\tanh$ comme fonction d'activation et en désactivant les termes de biais de,
+
 nous mettons en œuvre l'attention additive de la manière suivante.
 
 ```{.python .input}
@@ -436,9 +436,9 @@ reste toujours égale quelle que soit la longueur du vecteur,
 la fonction de notation de l'attention *scaled dot-product
 
 
- $$a(\mathbf q, \mathbf k) = \mathbf{q}^\top \mathbf{k}  /\sqrt{d}$$ 
+$$a(\mathbf q, \mathbf k) = \mathbf{q}^\top \mathbf{k}  /\sqrt{d}$$ 
 
- divise le produit scalaire par $\sqrt{d}$.
+divise le produit scalaire par $\sqrt{d}$.
 Dans la pratique,
 nous pensons souvent en mini-batchs
 pour des raisons d'efficacité,
@@ -446,18 +446,18 @@ comme le calcul de l'attention
 pour
 $n$ requêtes et $m$ paires clé-valeur,
 où les requêtes et les clés sont de longueur $d$
- et les valeurs sont de longueur $v$.
+et les valeurs sont de longueur $v$.
 L'attention du produit scalaire du point
 des requêtes $\mathbf Q\in\mathbb R^{n\times d}$,
 des clés $\mathbf K\in\mathbb R^{m\times d}$,
 et des valeurs $\mathbf V\in\mathbb R^{m\times v}$
- est
+est
 
 
- $$ \mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \mathbf V \in \mathbb{R}^{n\times v}.$$ 
- :eqlabel:`eq_softmax_QK_V` 
+$$ \mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \mathbf V \in \mathbb{R}^{n\times v}.$$ 
+:eqlabel:`eq_softmax_QK_V` 
 
- Dans l'implémentation suivante de l'attention du produit scalaire du point, nous utilisons le dropout pour la régularisation du modèle.
+Dans l'implémentation suivante de l'attention du produit scalaire du point, nous utilisons le dropout pour la régularisation du modèle.
 
 ```{.python .input}
 %%tab mxnet

@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Réseau en réseau (NiN)
 :label:`sec_nin` 
 
- LeNet, AlexNet et VGG partagent tous un modèle de conception commun :
+LeNet, AlexNet et VGG partagent tous un modèle de conception commun :
 extraire des caractéristiques exploitant la structure *spatiale*
 via une séquence de convolutions et de couches de mise en commun
 et post-traiter les représentations via des couches entièrement connectées.
@@ -32,7 +32,7 @@ efficace, si ce n'était pour les non-linéarités ajoutées. Voyons cela en dé
 
 ## (**NiN Blocks**)
 
-Rappelons-nous :numref:`subsec_1x1` . Nous y avons vu que les entrées et les sorties des couches convolutionnelles
+Rappelons-nous :numref:`subsec_1x1`. Nous y avons vu que les entrées et les sorties des couches convolutionnelles
 sont constituées de tenseurs quadridimensionnels dont les axes
 correspondent à l'exemple, au canal, à la hauteur et à la largeur.
 Rappelons également que les entrées et sorties des couches entièrement connectées

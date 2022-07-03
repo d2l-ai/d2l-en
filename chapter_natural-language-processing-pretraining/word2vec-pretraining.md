@@ -2,9 +2,9 @@
 :label:`sec_word2vec_pretraining` 
 
  
- Nous poursuivons en implémentant le modèle de saut de programme
+Nous poursuivons en implémentant le modèle de saut de programme
 défini dans
-:numref:`sec_word2vec` .
+:numref:`sec_word2vec`.
 Ensuite,
 nous allons pré-entraîner word2vec en utilisant l'échantillonnage négatif
 sur le jeu de données PTB.
@@ -49,14 +49,14 @@ le fonctionnement des couches d'intégration.
 
 ### Couche d'incorporation
 
-Comme décrit dans :numref:`sec_seq2seq` ,
+Comme décrit dans :numref:`sec_seq2seq`,
 une couche d'incorporation
 fait correspondre l'index d'un token à son vecteur de caractéristiques.
 Le poids de cette couche
-est une matrice dont le nombre de lignes est égal à
-, la taille du dictionnaire (`input_dim`) et
-, le nombre de colonnes est égal à
-, la dimension du vecteur pour chaque token (`output_dim`).
+est une matrice dont le nombre de lignes est égal à,
+la taille du dictionnaire (`input_dim`) et,
+le nombre de colonnes est égal à,
+la dimension du vecteur pour chaque token (`output_dim`).
 Après l'entraînement d'un modèle d'intégration de mots,
 est le poids dont nous avons besoin.
 
@@ -100,13 +100,13 @@ Dans la propagation vers l'avant,
 l'entrée du modèle de saut de programme
 comprend
 les indices du mot central `center`
- de forme (taille du lot, 1)
+de forme (taille du lot, 1)
 et
 les indices concaténés du contexte et du mot de bruit `contexts_and_negatives`
- de forme (taille du lot, `max_len`),
+de forme (taille du lot, `max_len`),
 où `max_len`
- est défini
-dans :numref:`subsec_word2vec-minibatch-loading` .
+est défini
+dans :numref:`subsec_word2vec-minibatch-loading`.
 Ces deux variables sont d'abord transformées en vecteurs à partir des indices de jetons
 via la couche d'intégration,
 puis leur multiplication matricielle par lot
@@ -156,7 +156,7 @@ définissons d'abord sa fonction de perte.
 ### Perte d'entropie croisée binaire
 
 Selon la définition de la fonction de perte
-pour l'échantillonnage négatif dans :numref:`subsec_negative-sampling` , 
+pour l'échantillonnage négatif dans :numref:`subsec_negative-sampling`, 
 nous utiliserons 
 la perte d'entropie croisée binaire.
 
@@ -183,11 +183,11 @@ loss = SigmoidBCELoss()
 Rappelez-vous nos descriptions
 de la variable masque
 et de la variable étiquette dans
-:numref:`subsec_word2vec-minibatch-loading` .
+:numref:`subsec_word2vec-minibatch-loading`.
 Le tableau suivant
 calcule la perte d'entropie croisée binaire 
 
- pour les variables données.
+pour les variables données.
 
 ```{.python .input}
 #@tab all
@@ -202,7 +202,7 @@ comment les résultats ci-dessus sont calculés
 (de manière moins efficace)
 en utilisant la fonction d'activation sigmoïde
 
- dans la perte d'entropie croisée binaire.
+dans la perte d'entropie croisée binaire.
 Nous pouvons considérer 
 les deux sorties comme
 deux pertes normalisées
@@ -321,7 +321,7 @@ train(net, data_iter, lr, num_epochs)
 :label:`subsec_apply-word-embed` 
 
  
- Après avoir entraîné le modèle word2vec,
+Après avoir entraîné le modèle word2vec,
 nous pouvons utiliser la similarité en cosinus
 des vecteurs de mots du modèle entraîné
 pour 

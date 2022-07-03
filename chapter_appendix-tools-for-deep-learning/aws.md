@@ -1,7 +1,7 @@
 # Utiliser des instances AWS EC2
 :label:`sec_aws` 
 
- Dans cette section, nous allons vous montrer comment installer toutes les bibliothèques sur une machine Linux brute. Rappelez-vous que dans :numref:`sec_sagemaker` nous avons discuté de la façon d'utiliser Amazon SageMaker, alors que construire une instance par vous-même coûte moins cher sur AWS. La marche à suivre comprend trois étapes :
+Dans cette section, nous allons vous montrer comment installer toutes les bibliothèques sur une machine Linux brute. Rappelez-vous que dans :numref:`sec_sagemaker` nous avons discuté de la façon d'utiliser Amazon SageMaker, alors que construire une instance par vous-même coûte moins cher sur AWS. La marche à suivre comprend trois étapes :
 
 1. Demander une instance Linux GPU à AWS EC2.
 1. Installer CUDA (ou utiliser une image machine Amazon avec CUDA préinstallé).
@@ -36,7 +36,7 @@ Avant de choisir une instance, vérifiez s'il existe des restrictions de quantit
 en cliquant sur l'étiquette "Limites" dans la barre de gauche comme indiqué dans
 :numref:`fig_ec2`.
 :numref:`fig_limits` montre un exemple d'une telle limitation.
- Le compte ne peut actuellement pas ouvrir d'instance "p2.xlarge" par région. Si
+Le compte ne peut actuellement pas ouvrir d'instance "p2.xlarge" par région. Si
 vous avez besoin d'ouvrir une ou plusieurs instances, cliquez sur le lien "Request limit increase" pour
 demander un quota d'instance plus élevé.
 En général, il faut un jour ouvrable pour 
@@ -58,7 +58,7 @@ Nous commençons par sélectionner une image machine Amazon (AMI) appropriée. E
 :width:`700px` 
 :label:`fig_ubuntu` 
 
- EC2 propose de nombreuses configurations d'instances différentes. Cela peut parfois sembler écrasant pour un débutant. :numref:`tab_ec2` liste différentes machines appropriées.
+EC2 propose de nombreuses configurations d'instances différentes. Cela peut parfois sembler écrasant pour un débutant. :numref:`tab_ec2` liste différentes machines appropriées.
 
 :Différents types d'instances EC2
 
@@ -71,15 +71,15 @@ Nous commençons par sélectionner une image machine Amazon (AMI) appropriée. E
 | g4 | Turing T4 | inference optimized FP16/INT8 |
 :label:`tab_ec2` 
 
- Tous ces serveurs existent en plusieurs versions indiquant le nombre de GPU utilisés. Par exemple, un p2.xlarge possède 1 GPU et un p2.16xlarge possède 16 GPU et plus de mémoire. Pour plus de détails, consultez la [documentation AWS EC2](https://aws.amazon.com/ec2/instance-types/) ou une [page de résumé](https://www.ec2instances.info.) Pour les besoins de l'illustration, un p2.xlarge suffira (marqué dans le cadre rouge de :numref:`fig_p2x` ).
+Tous ces serveurs existent en plusieurs versions indiquant le nombre de GPU utilisés. Par exemple, un p2.xlarge possède 1 GPU et un p2.16xlarge possède 16 GPU et plus de mémoire. Pour plus de détails, consultez la [documentation AWS EC2](https://aws.amazon.com/ec2/instance-types/) ou une [page de résumé](https://www.ec2instances.info.) Pour les besoins de l'illustration, un p2.xlarge suffira (marqué dans le cadre rouge de :numref:`fig_p2x` ).
 
 ![Choisissez une instance](../img/p2x.png)
 :width:`700px` 
 :label:`fig_p2x` 
 
- Notez que vous devez utiliser une instance compatible avec le GPU avec des pilotes appropriés et un cadre d'apprentissage profond compatible avec le GPU. Sinon, vous ne verrez aucun avantage à utiliser les GPU.
+Notez que vous devez utiliser une instance compatible avec le GPU avec des pilotes appropriés et un cadre d'apprentissage profond compatible avec le GPU. Sinon, vous ne verrez aucun avantage à utiliser les GPU.
 
-Jusqu'à présent, nous avons terminé les deux premières des sept étapes de lancement d'une instance EC2, comme indiqué en haut de :numref:`fig_disk` . Dans cet exemple, nous conservons les configurations par défaut pour les étapes "3. Configure Instance", "5. Add Tags", et "6. Configure Security Group". Tapez sur "4. Add Storage" et augmentez la taille du disque dur par défaut à 64 GB (marqué dans la boîte rouge de :numref:`fig_disk` ). Notez que CUDA à lui seul occupe déjà 4 Go.
+Jusqu'à présent, nous avons terminé les deux premières des sept étapes de lancement d'une instance EC2, comme indiqué en haut de :numref:`fig_disk`. Dans cet exemple, nous conservons les configurations par défaut pour les étapes "3. Configure Instance", "5. Add Tags", et "6. Configure Security Group". Tapez sur "4. Add Storage" et augmentez la taille du disque dur par défaut à 64 GB (marqué dans la boîte rouge de :numref:`fig_disk` ). Notez que CUDA à lui seul occupe déjà 4 Go.
 
 ![Modifiez la taille du disque dur.](../img/disk.png)
 :width:`700px` 
@@ -99,7 +99,7 @@ lancer l'instance créée.
 :width:`500px` 
 :label:`fig_keypair` 
 
- Assurez-vous de télécharger la paire de clés et de la stocker dans un endroit sûr si vous
+Assurez-vous de télécharger la paire de clés et de la stocker dans un endroit sûr si vous
 en avez généré une nouvelle. C'est votre seul moyen de vous connecter en SSH au serveur. Cliquez sur l'ID de l'instance
 indiquée dans :numref:`fig_launching` pour afficher le statut de cette instance.
 
@@ -109,13 +109,13 @@ indiquée dans :numref:`fig_launching` pour afficher le statut de cette instance
 
 ### Connexion à l'instance
 
-Comme indiqué dans :numref:`fig_connect` , après que l'état de l'instance soit devenu vert, cliquez avec le bouton droit de la souris sur l'instance et sélectionnez `Connect` pour afficher la méthode d'accès à l'instance.
+Comme indiqué dans :numref:`fig_connect`, après que l'état de l'instance soit devenu vert, cliquez avec le bouton droit de la souris sur l'instance et sélectionnez `Connect` pour afficher la méthode d'accès à l'instance.
 
 ![View instance access method.](../img/connect.png)
 :width:`700px` 
 :label:`fig_connect` 
 
- S'il s'agit d'une nouvelle clé, elle ne doit pas être visible publiquement pour que SSH fonctionne. Allez dans le dossier où vous stockez `D2L_key.pem` et 
+S'il s'agit d'une nouvelle clé, elle ne doit pas être visible publiquement pour que SSH fonctionne. Allez dans le dossier où vous stockez `D2L_key.pem` et 
 ; exécutez la commande suivante 
 pour que la clé ne soit pas visible publiquement :
 
@@ -129,14 +129,14 @@ chmod 400 D2L_key.pem
 :label:`fig_chmod` 
 
  
- Maintenant, copiez la commande ssh dans le cadre rouge inférieur de :numref:`fig_chmod` et collez-la sur la ligne de commande :
+Maintenant, copiez la commande ssh dans le cadre rouge inférieur de :numref:`fig_chmod` et collez-la sur la ligne de commande :
 
 ```bash
 ssh -i "D2L_key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com
 ```
  
 
- Lorsque la ligne de commande vous demande "Are you sure you want to continue connecting (yes/no)", entrez "oui" et appuyez sur Entrée pour vous connecter à l'instance.
+Lorsque la ligne de commande vous demande "Are you sure you want to continue connecting (yes/no)", entrez "oui" et appuyez sur Entrée pour vous connecter à l'instance.
 
 Votre serveur est maintenant prêt.
 
@@ -156,7 +156,7 @@ Ici, nous téléchargeons CUDA 10.1. Visitez le [dépôt officiel de NVIDIA](htt
 :width:`500px` 
 :label:`fig_cuda` 
 
- Copiez les instructions et collez-les dans le terminal pour installer CUDA 10.1.
+Copiez les instructions et collez-les dans le terminal pour installer CUDA 10.1.
 
 ```bash
 # The link and file name are subject to changes
@@ -177,7 +177,7 @@ nvidia-smi
 ```
  
 
- Enfin, ajoutez CUDA au chemin de la bibliothèque pour aider les autres bibliothèques à le trouver.
+Enfin, ajoutez CUDA au chemin de la bibliothèque pour aider les autres bibliothèques à le trouver.
 
 ```bash
 echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda/lib64" >> ~/.bashrc
@@ -223,7 +223,7 @@ jupyter notebook
 :width:`700px` 
 :label:`fig_jupyter` 
 
- Puisque vous avez utilisé la redirection de port vers le port 8889,
+Puisque vous avez utilisé la redirection de port vers le port 8889,
 copier la dernière ligne dans la boîte rouge de :numref:`fig_jupyter`,
 remplacer "8888" par "8889" dans l'URL,
 et l'ouvrir dans votre navigateur local.
@@ -243,9 +243,9 @@ cliquez avec le bouton droit de la souris sur l'exemple dans :numref:`fig_connec
 fois que vous voudrez utiliser cette instance, vous pourrez suivre les étapes de cette section 
 pour créer une instance basée sur
 l'image sauvegardée. La seule différence est que, dans "1. Choose AMI" illustré dans
-:numref:`fig_ubuntu` , vous devez utiliser l'option "My AMIs" sur la gauche pour sélectionner votre
-image sauvegardée. L'instance créée conservera les informations stockées sur le disque dur de l'image
-. Par exemple, vous n'aurez pas à réinstaller CUDA et les autres 
+:numref:`fig_ubuntu`, vous devez utiliser l'option "My AMIs" sur la gauche pour sélectionner votre
+image sauvegardée. L'instance créée conservera les informations stockées sur le disque dur de l'image.
+Par exemple, vous n'aurez pas à réinstaller CUDA et les autres 
 environnements d'exécution.
 
 

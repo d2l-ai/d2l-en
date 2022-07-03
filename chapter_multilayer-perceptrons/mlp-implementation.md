@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Mise en œuvre 
 :label:`sec_mlp_scratch` 
 
- Les perceptrons multicouches (MLP) ne sont pas beaucoup plus complexes à mettre en œuvre que les modèles linéaires simples. La principale différence conceptuelle 
+Les perceptrons multicouches (MLP) ne sont pas beaucoup plus complexes à mettre en œuvre que les modèles linéaires simples. La principale différence conceptuelle 
 est que nous concaténons maintenant plusieurs couches.
 
 ```{.python .input  n=2}
@@ -38,10 +38,10 @@ Commençons par implémenter un tel réseau à partir de zéro.
 
 Rappelons que Fashion-MNIST contient 10 classes,
 et que chaque image consiste en une grille $28 \times 28 = 784$
- de valeurs de pixels en niveaux de gris.
+de valeurs de pixels en niveaux de gris.
 Comme précédemment, nous ne tiendrons pas compte de la structure spatiale
-entre les pixels pour le moment, 
-. Nous pouvons donc considérer ceci comme un ensemble de données de classification
+entre les pixels pour le moment.
+Nous pouvons donc considérer ceci comme un ensemble de données de classification
 avec 784 caractéristiques d'entrée et 10 classes.
 Pour commencer, nous allons [**implémenter un MLP
 avec une couche cachée et 256 unités cachées.**]

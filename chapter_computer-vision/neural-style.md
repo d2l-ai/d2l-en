@@ -20,7 +20,7 @@ aussi complexe que le réglage des hyperparamètres d'un modèle.
 Dans cette section, nous allons
 exploiter les représentations par couches d'un CNN
 pour appliquer automatiquement le style d'une image
-à une autre image, c'est-à-dire le *transfert de style* :cite:`Gatys.Ecker.Bethge.2016` .
+à une autre image, c'est-à-dire le *transfert de style* :cite:`Gatys.Ecker.Bethge.2016`.
 Cette tâche nécessite deux images d'entrée :
 l'une est l'image *de contenu* et
 l'autre est l'image *de style*.
@@ -55,7 +55,7 @@ Ce CNN profond utilise plusieurs couches
 pour extraire
 des caractéristiques hiérarchiques des images.
 Nous pouvons choisir la sortie de certaines de ces couches comme caractéristiques de contenu ou de style.
-Prenons l'exemple de :numref:`fig_style_transfer_model` .
+Prenons l'exemple de :numref:`fig_style_transfer_model`.
 Le réseau neuronal pré-entraîné comporte ici 3 couches convolutionnelles,
 où la deuxième couche produit les caractéristiques de contenu,
 et les première et troisième couches produisent les caractéristiques de style.
@@ -166,7 +166,7 @@ def postprocess(img):
 
 ## [**Extraction de caractéristiques**]
 
-Nous utilisons le modèle VGG-19 pré-entraîné sur le jeu de données ImageNet pour extraire les caractéristiques des images :cite:`Gatys.Ecker.Bethge.2016` .
+Nous utilisons le modèle VGG-19 pré-entraîné sur le jeu de données ImageNet pour extraire les caractéristiques des images :cite:`Gatys.Ecker.Bethge.2016`.
 
 ```{.python .input}
 #@tab mxnet
@@ -184,7 +184,7 @@ les détails de l'image de contenu dans l'image synthétisée,
 nous choisissons une couche VGG plus proche de la sortie comme *couche de contenu* pour sortir les caractéristiques de contenu de l'image.
 Nous sélectionnons également la sortie de différentes couches VGG pour extraire les caractéristiques de style locales et globales.
 Ces couches sont également appelées *couches de style*.
-Comme mentionné dans :numref:`sec_vgg` ,
+Comme mentionné dans :numref:`sec_vgg`,
 le réseau VGG utilise 5 blocs convolutifs.
 Dans l'expérience, nous choisissons la dernière couche convolutive du quatrième bloc convolutif comme couche de contenu, et la première couche convolutive de chaque bloc convolutif comme couche de style.
 Les indices de ces couches peuvent être obtenus en imprimant l'instance `pretrained_net`.
@@ -197,8 +197,8 @@ style_layers, content_layers = [0, 5, 10, 19, 28], [25]
 Lors de l'extraction de caractéristiques à l'aide de couches VGG,
 nous n'avons besoin d'utiliser que toutes celles
 de la couche d'entrée à la couche de contenu ou à la couche de style qui est la plus proche de la couche de sortie.
-Construisons une nouvelle instance de réseau `net`, qui ne retient que toutes les couches VGG à utiliser pour l'extraction de caractéristiques (
-).
+Construisons une nouvelle instance de réseau `net`, qui ne retient que toutes les couches VGG à utiliser pour l'extraction de caractéristiques 
+.
 
 ```{.python .input}
 #@tab mxnet
@@ -322,8 +322,8 @@ Ici, le vecteur $\mathbf{x}_i$ représente la caractéristique de style du canal
 Dans la *matrice de Gram* de ces vecteurs $\mathbf{X}\mathbf{X}^\top \in \mathbb{R}^{c \times c}$, l'élément $x_{ij}$ dans la ligne $i$ et la colonne $j$ est le produit scalaire des vecteurs $\mathbf{x}_i$ et $\mathbf{x}_j$.
 Il représente la corrélation des caractéristiques de style des canaux $i$ et $j$.
 Nous utilisons cette matrice de Gram pour représenter la sortie de style de toute couche de style.
-Notez que lorsque la valeur de $hw$ est plus grande que celle de
-, cela entraîne probablement des valeurs plus grandes dans la matrice de Gram.
+Notez que lorsque la valeur de $hw$ est plus grande que celle de,
+cela entraîne probablement des valeurs plus grandes dans la matrice de Gram.
 Notez également que la hauteur et la largeur de la matrice de Gram sont toutes deux le nombre de canaux $c$.
 Pour que la perte de style ne soit pas affectée
 par ces valeurs,
@@ -368,7 +368,7 @@ La réduction de la perte de variation totale
 
 $$\sum_{i, j} \left|x_{i, j} - x_{i+1, j}\right| + \left|x_{i, j} - x_{i, j+1}\right|$$ 
 
- rapproche les valeurs des pixels voisins sur l'image synthétisée.
+rapproche les valeurs des pixels voisins sur l'image synthétisée.
 
 ```{.python .input}
 #@tab all
@@ -459,7 +459,7 @@ def get_inits(X, device, lr, styles_Y):
 ## [**Training**]
 
 
- Lors de l'apprentissage du modèle de transfert de style,
+Lors de l'apprentissage du modèle de transfert de style,
 nous extrayons continuellement
 les caractéristiques de contenu et les caractéristiques de style de l'image synthétisée, et nous calculons la fonction de perte.
 La boucle d'apprentissage est définie ci-dessous.
@@ -560,7 +560,7 @@ Certains de ces blocs ont même la texture subtile des coups de pinceau.
 1. Comment la sortie change-t-elle lorsque vous sélectionnez différentes couches de contenu et de style ?
 1. Ajustez les hyperparamètres de poids dans la fonction de perte. La sortie retient-elle plus de contenu ou a-t-elle moins de bruit ?
 1. Utilisez des images de contenu et de style différents. Pouvez-vous créer des images synthétisées plus intéressantes ?
-1. Peut-on appliquer le transfert de style au texte ? Conseil : vous pouvez vous référer à l'étude de Hu et al. :cite:`Hu.Lee.Aggarwal.ea.2020` .
+1. Peut-on appliquer le transfert de style au texte ? Conseil : vous pouvez vous référer à l'étude de Hu et al. :cite:`Hu.Lee.Aggarwal.ea.2020`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/378)

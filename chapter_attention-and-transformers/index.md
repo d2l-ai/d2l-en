@@ -1,7 +1,7 @@
 # Attention et transformateurs
 :label:`chap_attention` 
 
- Le nerf optique du système visuel d'un primate
+Le nerf optique du système visuel d'un primate
 reçoit des entrées sensorielles massives,
 dépassant de loin ce que le cerveau peut traiter entièrement.
 Heureusement,
@@ -38,7 +38,7 @@ un modèle d'attention révolutionnaire dans l'apprentissage profond
 qui peut s'aligner de manière bidirectionnelle et est différentiable.
 
 
- Dotée de
+Dotée de
 les modèles plus récents d'*attention multi-têtes*
 et d'*auto-attention*,
 l'architecture du *transformateur* est uniquement

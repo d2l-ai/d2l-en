@@ -13,7 +13,7 @@ Soit $\mathbf{R} \in \mathbb{R}^{m \times n}$ la matrice d'interaction avec $m$ 
 
 $$\hat{\mathbf{R}} = \mathbf{PQ}^\top$$ 
 
- où $\hat{\mathbf{R}}\in \mathbb{R}^{m \times n}$ est la matrice des évaluations prédites qui a la même forme que $\mathbf{R}$. Un problème majeur de cette règle de prédiction est que les biais des utilisateurs et des articles ne peuvent pas être modélisés. Par exemple, certains utilisateurs ont tendance à donner des notes plus élevées ou certains articles obtiennent toujours des notes plus basses en raison de leur qualité inférieure. Ces biais sont courants dans les applications du monde réel. Pour capturer ces biais, des termes de biais spécifiques aux utilisateurs et aux éléments sont introduits. Plus précisément, l'évaluation prédite que l'utilisateur $u$ donne à l'élément $i$ est calculée comme suit
+où $\hat{\mathbf{R}}\in \mathbb{R}^{m \times n}$ est la matrice des évaluations prédites qui a la même forme que $\mathbf{R}$. Un problème majeur de cette règle de prédiction est que les biais des utilisateurs et des articles ne peuvent pas être modélisés. Par exemple, certains utilisateurs ont tendance à donner des notes plus élevées ou certains articles obtiennent toujours des notes plus basses en raison de leur qualité inférieure. Ces biais sont courants dans les applications du monde réel. Pour capturer ces biais, des termes de biais spécifiques aux utilisateurs et aux éléments sont introduits. Plus précisément, l'évaluation prédite que l'utilisateur $u$ donne à l'élément $i$ est calculée comme suit
 
 $$
 \hat{\mathbf{R}}_{ui} = \mathbf{p}_u\mathbf{q}^\top_i + b_u + b_i
@@ -35,7 +35,7 @@ Une illustration intuitive du modèle de factorisation matricielle est présent�
 
 ![Illustration of matrix factorization model](../img/rec-mf.svg) 
 
- Dans le reste de cette section, nous allons expliquer la mise en œuvre de la factorisation matricielle et entraîner le modèle sur le jeu de données MovieLens.
+Dans le reste de cette section, nous allons expliquer la mise en œuvre de la factorisation matricielle et entraîner le modèle sur le jeu de données MovieLens.
 
 ```{.python .input  n=2}
 #@tab mxnet
@@ -71,7 +71,7 @@ class MF(nn.Block):
 
 ### Mesures d'évaluation
 
-Nous implémentons ensuite la mesure RMSE (root-mean-square error), qui est couramment utilisée pour mesurer les différences entre les notes prédites par le modèle et les notes réellement observées (vérité terrain) :cite:`Gunawardana.Shani.2015` . La RMSE est définie comme suit
+Nous implémentons ensuite la mesure RMSE (root-mean-square error), qui est couramment utilisée pour mesurer les différences entre les notes prédites par le modèle et les notes réellement observées (vérité terrain) :cite:`Gunawardana.Shani.2015`. La RMSE est définie comme suit
 
 $$
 \mathrm{RMSE} = \sqrt{\frac{1}{|\mathcal{T}|}\sum_{(u, i) \in \mathcal{T}}(\mathbf{R}_{ui} -\hat{\mathbf{R}}_{ui})^2}
@@ -97,7 +97,7 @@ def evaluator(net, test_iter, devices):
 ## entrainement et évaluation du modèle
 
 
- Dans la fonction de formation, nous adoptons la perte $\ell_2$ avec décroissance du poids. Le mécanisme de décroissance du poids a le même effet que la régularisation $\ell_2$.
+Dans la fonction de formation, nous adoptons la perte $\ell_2$ avec décroissance du poids. Le mécanisme de décroissance du poids a le même effet que la régularisation $\ell_2$.
 
 ```{.python .input  n=4}
 #@tab mxnet

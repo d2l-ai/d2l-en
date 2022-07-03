@@ -212,7 +212,7 @@ Le nombre de canaux de sortie du deuxième bloc d'Inception
 est augmenté à $128+192+96+64=480$, ce qui donne un rapport de $128:192:96:64 = 4:6:3:2$. Comme précédemment,
 nous devons réduire le nombre de dimensions intermédiaires dans la deuxième et la troisième branche. Une échelle
 de $\frac{1}{2}$ et $\frac{1}{8}$ respectivement suffit, ce qui donne les canaux $128$ et $32$
- respectivement. Ceci est capturé par les arguments des constructeurs de blocs `Inception` suivants.
+respectivement. Ceci est capturé par les arguments des constructeurs de blocs `Inception` suivants.
 
 ```{.python .input}
 %%tab all
@@ -243,7 +243,7 @@ et $256+320+128+128=832$.
 Le nombre de canaux assignés à ces branches est similaire
 à celui du troisième module :
 la deuxième branche avec la couche convolutive $3\times 3$
- sort le plus grand nombre de canaux,
+sort le plus grand nombre de canaux,
 suivi de la première branche avec seulement la couche convolutive $1\times 1$,
 la troisième branche avec la couche convolutive $5\times 5$,
 et la quatrième branche avec la couche max-pooling $3\times 3$.
@@ -282,7 +282,7 @@ def b4(self):
 ```
 
 Le cinquième module possède deux blocs d'Inception avec $256+320+128+128=832$
- et $384+384+128+128=1024$ canaux de sortie.
+et $384+384+128+128=1024$ canaux de sortie.
 Le nombre de canaux attribués à chaque branche
 est le même que celui des troisième et quatrième modules,
 mais diffère par des valeurs spécifiques.
@@ -344,8 +344,8 @@ optimiser la conception des réseaux.
 Pour l'instant, la seule modification que nous allons effectuer est de
 [**réduire la hauteur et la largeur d'entrée de 224 à 96
 pour avoir un temps d'apprentissage raisonnable sur Fashion-MNIST.**]
-Cela simplifie le calcul. Examinons les changements de forme de la sortie entre les différents modules (
-).
+Cela simplifie le calcul. Examinons les changements de forme de la sortie entre les différents modules 
+.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -360,8 +360,8 @@ model = GoogleNet().layer_summary((1, 96, 96, 1))
 ## [**Training**]
 
 Comme précédemment, nous entraînons notre modèle en utilisant le jeu de données Fashion-MNIST.
- Nous le transformons en une résolution de $96 \times 96$ pixels
- avant d'invoquer la procédure d'entraînement.
+Nous le transformons en une résolution de $96 \times 96$ pixels
+avant d'invoquer la procédure d'entraînement.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -395,21 +395,21 @@ Au cours des sections suivantes, nous rencontrerons un certain nombre de choix d
 ## Exercices
 
 1. GoogLeNet a connu un tel succès qu'il est passé par un certain nombre d'itérations. Il existe plusieurs itérations
- de GoogLeNet qui ont progressivement amélioré la vitesse et la précision. Essayez d'implémenter et d'exécuter certaines d'entre elles.
+de GoogLeNet qui ont progressivement amélioré la vitesse et la précision. Essayez d'implémenter et d'exécuter certaines d'entre elles.
   Voici quelques-unes d'entre elles :
-  1. Ajout d'une couche de normalisation par lot :cite:`Ioffe.Szegedy.2015` , tel que décrit
- plus loin dans :numref:`sec_batch_norm` .
+  1. Ajout d'une couche de normalisation par lot :cite:`Ioffe.Szegedy.2015`, tel que décrit
+plus loin dans :numref:`sec_batch_norm`.
  1. Effectuez des ajustements au bloc Inception (largeur, choix et ordre des convolutions), comme décrit dans
- :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016` .
+ :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
   1. Utilisez le lissage des étiquettes pour la régularisation du modèle, comme décrit dans
- :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016` .
+ :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
   1. Effectuez d'autres ajustements au bloc Inception en ajoutant une connexion résiduelle
- :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017` , comme décrit ultérieurement dans
- :numref:`sec_resnet` .
+ :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017`, comme décrit ultérieurement dans
+ :numref:`sec_resnet`.
 1. Quelle est la taille minimale d'une image pour que GoogLeNet fonctionne ?
 1. Pouvez-vous concevoir une variante de GoogLeNet qui fonctionne sur la résolution native de Fashion-MNIST, soit $28 \times 28$ pixels ? Comment devriez-vous modifier la tige, le corps et la tête du réseau, le cas échéant ?
 1. Comparez la taille des paramètres des modèles AlexNet, VGG, NiN et GoogLeNet. Comment les deux dernières architectures de réseau
- réduisent-elles de manière significative la taille des paramètres du modèle ?
+réduisent-elles de manière significative la taille des paramètres du modèle ?
 1. Comparez la quantité de calculs nécessaires dans GoogLeNet et AlexNet. Comment cela affecte-t-il la conception d'une puce accélératrice, par exemple, en termes de taille de mémoire, de quantité de calcul et d'avantages des opérations spécialisées ?
 
 :begin_tab:`mxnet`

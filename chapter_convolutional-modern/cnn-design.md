@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Conception d'architectures de réseaux de convolution
 :label:`sec_cnn-design` 
 
- Les années 2010 ont été marquées par le passage
+Les années 2010 ont été marquées par le passage
 de l'ingénierie des *caractéristiques* à l'ingénierie des *réseaux*
 en vision par ordinateur.
 Depuis qu'AlexNet (:numref:`sec_alexnet` )
@@ -24,7 +24,7 @@ GoogLeNet (:numref:`sec_googlenet` )
 est un réseau multi-branches qui
 combine les avantages du réseau VGG
 
- et du réseau dans le réseau,
+et du réseau dans le réseau,
 où son bloc d'initialisation
 adopte la stratégie des transformations parallèles concaténées
 .
@@ -34,18 +34,18 @@ qui sont des sous-réseaux à deux branches
 utilisant le mappage d'identité dans une branche.
 Les DenseNets (:numref:`sec_densenet` )
 généralisent les architectures résiduelles.
-Parmi les autres architectures notables
-, citons
+Parmi les autres architectures notables,
+citons
 MobileNets, qui utilise l'apprentissage en réseau pour obtenir une précision élevée dans
-des contextes où les ressources sont limitées :cite:`Howard.Sandler.Chu.ea.2019` ,
+des contextes où les ressources sont limitées :cite:`Howard.Sandler.Chu.ea.2019`,
 les Squeeze-and-Excitation Networks (SENets) qui
 permettent un transfert d'informations efficace entre les canaux
-:cite:`Hu.Shen.Sun.2018` ,
+:cite:`Hu.Shen.Sun.2018`,
 et EfficientNets :cite:`tan2019efficientnet` 
- qui mettent les réseaux à l'échelle via la recherche d'une architecture neuronale.
+qui mettent les réseaux à l'échelle via la recherche d'une architecture neuronale.
 
 Plus précisément, la *recherche d'architecture neuronale* (NAS) :cite:`zoph2016neural,liu2018darts` 
- est le processus d'automatisation des architectures de réseaux neuronaux.
+est le processus d'automatisation des architectures de réseaux neuronaux.
 Étant donné un espace de recherche fixe,
 NAS utilise une stratégie de recherche
 pour sélectionner automatiquement
@@ -57,7 +57,7 @@ est une instance de réseau unique.
 Au lieu de se concentrer sur la conception de telles instances individuelles,
 une approche alternative
 consiste à *concevoir des espaces de conception de réseaux*
-qui caractérisent des populations de réseaux :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` .
+qui caractérisent des populations de réseaux :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`.
 Cette méthode
 combine la force de la conception manuelle et des NAS.
 Par le biais de procédures semi-automatiques (comme dans les SNA),
@@ -94,7 +94,7 @@ chaque bloc ResNeXt.
 :label:`fig_anynet`
 
 L'espace de conception AnyNet
-est illustré dans :numref:`fig_anynet` .
+est illustré dans :numref:`fig_anynet`.
 Ce réseau
 commence par une *tige*,
 suivie d'un *corps* avec $n$ étapes de transformation,
@@ -118,7 +118,7 @@ le corps du réseau
 se compose de $n$ étapes de transformation
 ($n$ est donné),
 où l'étape $i$
- se compose de $d_i$ blocs ResNeXt
+se compose de $d_i$ blocs ResNeXt
 avec des canaux de sortie $w_i$,
 et progressivement
 réduit de moitié la hauteur et la largeur via le premier bloc
@@ -129,11 +129,11 @@ le taux de goulot d'étranglement et
 le nombre de groupes (largeur de groupe) 
 dans
 chaque bloc ResNeXt pour l'étape $i$
- comme $b_i$ et $g_i$, respectivement.
+comme $b_i$ et $g_i$, respectivement.
 Globalement,
 malgré la structure simple du réseau,
 en variant $b_i$, $g_i$, $w_i$, et $d_i$
- résulte en
+résulte en
 un grand nombre de
 réseaux possibles dans l'espace de conception d'AnyNet.
 
@@ -269,8 +269,8 @@ def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
 Pour toute étape $i$ d'AnyNet,
 les choix de conception sont 
 le ratio de goulot d'étranglement $b_i$ 
- et le nombre de groupes $g_i$
- dans chaque bloc,
+et le nombre de groupes $g_i$
+dans chaque bloc,
 la largeur du bloc $w_i$,
 et la profondeur $d_i$.
 Le processus de conception des espaces de conception du réseau
@@ -283,7 +283,7 @@ Ensuite, ce processus
 échantillonne progressivement les modèles
 de l'espace de conception d'entrée
 pour évaluer la distribution des erreurs :cite:`radosavovic2019network` 
- comme indicateur de qualité
+comme indicateur de qualité
 pour produire un espace de conception
 plus contraint avec des modèles plus simples qui peuvent avoir
 une meilleure qualité. 
@@ -298,14 +298,14 @@ avec des erreurs $e_i$ inférieures à $e$:
 $$F(e) = \frac{1}{n}\sum_{i=1}^n \mathbf{1}(e_i < e).$$ 
 
  
- En partant de l'espace de conception AnyNet initial non contraint ($\text{AnyNetX}_A$ dans :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` ),
+En partant de l'espace de conception AnyNet initial non contraint ($\text{AnyNetX}_A$ dans :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` ),
 partageant le rapport de réseau de bouteilles $b_i = b$ pour toutes les étapes $i$ résulte en un espace de conception plus contraint $\text{AnyNetX}_B$.
 L'échantillonnage et l'entraînement des modèles $n=500$ à partir de $\text{AnyNetX}_A$ et $\text{AnyNetX}_B$ chacun,
 à gauche de :numref:`fig_regnet-paper-fig5` 
- montre que les deux espaces de conception ont une qualité similaire.
+montre que les deux espaces de conception ont une qualité similaire.
 Puisque plus c'est simple, mieux c'est,
 nous continuons à chercher à partir de $\text{AnyNetX}_B$
- en partageant en plus le nombre de groupes $g_i = g$.
+en partageant en plus le nombre de groupes $g_i = g$.
 Cela conduit à un espace de conception encore plus simplifié
 $\text{AnyNetX}_C$ avec pratiquement aucun changement
 dans les distributions d'erreurs (à droite de :numref:`fig_regnet-paper-fig5` ).
@@ -314,16 +314,16 @@ dans les distributions d'erreurs (à droite de :numref:`fig_regnet-paper-fig5` )
 :width:`600px` 
 :label:`fig_regnet-paper-fig5` 
 
- L'étude des bons et des mauvais modèles de $\text{AnyNetX}_C$ suggère qu'il peut être utile d'augmenter la largeur entre les étapes :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` .
+L'étude des bons et des mauvais modèles de $\text{AnyNetX}_C$ suggère qu'il peut être utile d'augmenter la largeur entre les étapes :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`.
 De manière empirique, la simplification de
 $\text{AnyNetX}_C$ en $\text{AnyNetX}_D$
- avec $w_{i} \leq w_{i+1}$
- améliore la qualité des espaces de conception (à gauche de :numref:`fig_regnet-paper-fig7` ).
+avec $w_{i} \leq w_{i+1}$
+améliore la qualité des espaces de conception (à gauche de :numref:`fig_regnet-paper-fig7` ).
 De même,
 en ajoutant d'autres contraintes de $d_{i} \leq d_{i+1}$
- pour augmenter la profondeur du réseau entre les étapes
+pour augmenter la profondeur du réseau entre les étapes
 donne un $\text{AnyNetX}_E$
- encore meilleur (à droite de :numref:`fig_regnet-paper-fig7` ).
+encore meilleur (à droite de :numref:`fig_regnet-paper-fig7` ).
 
 ![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Increasing network width across stages (from $\text{AnyNetX}_C$ to  $\text{AnyNetX}_D$) et l'augmentation de la profondeur du réseau entre les étapes (de $\text{AnyNetX}_D$ à $\text{AnyNetX}_E$) simplifie l'espace de conception avec des distributions d'erreurs améliorées (figure tirée de :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` ).](../img/regnet-paper-fig7.png)
 :width:`600px` 
@@ -346,7 +346,7 @@ Suivant ces principes de conception, :cite:`Radosavovic.Kosaraju.Girshick.ea.202
 $w_i$ et $d_i$ croissantes,
 conduisant à
 RegNetX utilisant les blocs ResNeXt
-et RegNetY qui utilise en plus les opérateurs de SENets :cite:`Hu.Shen.Sun.2018` .
+et RegNetY qui utilise en plus les opérateurs de SENets :cite:`Hu.Shen.Sun.2018`.
 A titre d'exemple,
 nous implémentons une variante RegNetX à 32 couches
 caractérisée par
@@ -408,18 +408,18 @@ pour la vision,
 CNNs ont été les architectures dominantes dans ce domaine.
 Récemment, les transformateurs
 (qui seront traités dans :numref:`sec_transformer` ) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training` 
- et les MLP :cite:`tolstikhin2021mlp` 
- ont également suscité des recherches au-delà de
+et les MLP :cite:`tolstikhin2021mlp` 
+ont également suscité des recherches au-delà de
 les architectures CNN bien établies pour la vision.
 Plus précisément,
-bien que dépourvus des biais inductifs inhérents aux CNN mentionnés plus haut
-,
+bien que dépourvus des biais inductifs inhérents aux CNN mentionnés plus haut,
+
 les transformateurs de vision
 ont atteint des performances de pointe
 dans la classification d'images à grande échelle au début des années 2020,
 montrant que
 *l'évolutivité l'emporte sur les biais inductifs*
-:cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` .
+:cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
 
 En d'autres termes,
 il est souvent possible d'entraîner de grands transformateurs
@@ -431,9 +431,9 @@ rend l'architecture des transformateurs
 moins adaptée aux images à haute résolution.
 Pour résoudre ce problème, les transformateurs de Swin
 
- introduisent des fenêtres décalées pour
+introduisent des fenêtres décalées pour
 atteindre des performances de pointe
-dans une gamme plus large de tâches de vision au-delà de la classification d'images :cite:`liu2021swin` .
+dans une gamme plus large de tâches de vision au-delà de la classification d'images :cite:`liu2021swin`.
 Inspiré par
 par le comportement supérieur de mise à l'échelle des transformateurs
 avec auto-attention multi-têtes (à couvrir dans :numref:`sec_multihead-attention` ),
@@ -441,10 +441,10 @@ le processus d'amélioration progressive
 d'une architecture ResNet standard
 vers la conception d'un transformateur de vision
 conduit à une famille de modèles CNN appelés ConvNeXts
-qui rivalisent favorablement avec les transformateurs Swin :cite:`liu2022convnet` .
+qui rivalisent favorablement avec les transformateurs Swin :cite:`liu2022convnet`.
 Nous renvoyons les lecteurs intéressés
 aux discussions sur la conception des CNN
-dans le document ConvNeXt :cite:`liu2022convnet` .
+dans le document ConvNeXt :cite:`liu2022convnet`.
 
 
 

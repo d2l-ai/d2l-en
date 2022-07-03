@@ -1,7 +1,7 @@
 # Maximum de vraisemblance
 :label:`sec_maximum_likelihood` 
 
- L'un des modes de pensée les plus couramment rencontrés en apprentissage automatique est le point de vue du maximum de vraisemblance.  Il s'agit du concept selon lequel, lorsque l'on travaille avec un modèle probabiliste dont les paramètres sont inconnus, les paramètres qui confèrent aux données la plus forte probabilité sont les plus probables.
+L'un des modes de pensée les plus couramment rencontrés en apprentissage automatique est le point de vue du maximum de vraisemblance.  Il s'agit du concept selon lequel, lorsque l'on travaille avec un modèle probabiliste dont les paramètres sont inconnus, les paramètres qui confèrent aux données la plus forte probabilité sont les plus probables.
 
 ## Le principe du maximum de vraisemblance
 
@@ -10,9 +10,9 @@ Il s'agit d'une interprétation bayésienne à laquelle il peut être utile de r
 Si nous voulons trouver la valeur la plus probable pour les paramètres de notre modèle, cela signifie que nous voulons trouver
 
 $$\mathop{\mathrm{argmax}} P(\boldsymbol{\theta}\mid X).$$ 
- :eqlabel:`eq_max_like` 
+:eqlabel:`eq_max_like` 
 
- Par la règle de Bayes, c'est la même chose que
+Par la règle de Bayes, c'est la même chose que
 
 $$
 \mathop{\mathrm{argmax}} \frac{P(X \mid \boldsymbol{\theta})P(\boldsymbol{\theta})}{P(X)}.
@@ -112,7 +112,7 @@ $$
 \log(P(X \mid \boldsymbol{\theta})).
 $$
 
-Comme la fonction $x \mapsto \log(x)$ est croissante, maximiser la vraisemblance est la même chose que maximiser la log-vraisemblance.  En effet, dans :numref:`sec_naive_bayes` , nous verrons ce raisonnement appliqué en travaillant avec l'exemple spécifique du classificateur de Bayes naïf.
+Comme la fonction $x \mapsto \log(x)$ est croissante, maximiser la vraisemblance est la même chose que maximiser la log-vraisemblance.  En effet, dans :numref:`sec_naive_bayes`, nous verrons ce raisonnement appliqué en travaillant avec l'exemple spécifique du classifieur de Bayes naïf.
 
 Nous travaillons souvent avec des fonctions de perte, où nous souhaitons minimiser la perte.  Nous pouvons transformer le maximum de vraisemblance en minimisation d'une perte en prenant $-\log(P(X \mid \boldsymbol{\theta}))$, qui est la *log-vraisemblance négative*.
 
@@ -223,7 +223,7 @@ $$
 
 Cela ne nécessite que $n$ diviseurs et $n-1$ sommes, et donc un temps linéaire dans les entrées.
 
-La troisième et dernière raison de considérer la log-vraisemblance négative est la relation avec la théorie de l'information, que nous aborderons en détail dans :numref:`sec_information_theory` .  Il s'agit d'une théorie mathématique rigoureuse qui donne un moyen de mesurer le degré d'information ou d'aléa d'une variable aléatoire.  L'objet d'étude clé dans ce domaine est l'entropie qui est 
+La troisième et dernière raison de considérer la log-vraisemblance négative est la relation avec la théorie de l'information, que nous aborderons en détail dans :numref:`sec_information_theory`.  Il s'agit d'une théorie mathématique rigoureuse qui donne un moyen de mesurer le degré d'information ou d'aléa d'une variable aléatoire.  L'objet d'étude clé dans ce domaine est l'entropie qui est 
 
 $$
 H(p) = -\sum_{i} p_i \log_2(p_i),

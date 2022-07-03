@@ -7,7 +7,7 @@ Une solution efficace consiste à utiliser des réseaux neuronaux profonds. Les 
 
 ## Architectures du modèle
 
-DeepFM se compose d'un composant FM et d'un composant profond qui sont intégrés dans une structure parallèle. La composante FM est la même que les machines de factorisation à deux voies qui sont utilisées pour modéliser les interactions de caractéristiques d'ordre inférieur. Le composant profond est un MLP qui est utilisé pour capturer les interactions de caractéristiques d'ordre supérieur et les non-linéarités. Ces deux composantes partagent les mêmes entrées/embeddings et leurs sorties sont additionnées pour former la prédiction finale. Il convient de souligner que l'esprit de DeepFM ressemble à celui de l'architecture Wide &amp; Deep qui peut capturer à la fois la mémorisation et la généralisation. L'avantage de DeepFM par rapport au modèle Wide \&amp; Deep est qu'il réduit l'effort d'ingénierie manuelle des caractéristiques en identifiant automatiquement les combinaisons de caractéristiques.
+DeepFM se compose d'un composant FM et d'un composant profond qui sont intégrés dans une structure parallèle. La composante FM est la même que les machines de factorisation à deux voies qui sont utilisées pour modéliser les interactions de caractéristiques d'ordre inférieur. Le composant profond est un MLP qui est utilisé pour capturer les interactions de caractéristiques d'ordre supérieur et les non-linéarités. Ces deux composantes partagent les mêmes entrées/embeddings et leurs sorties sont additionnées pour former la prédiction finale. Il convient de souligner que l'esprit de DeepFM ressemble à celui de l'architecture Wide &; Deep qui peut capturer à la fois la mémorisation et la généralisation. L'avantage de DeepFM par rapport au modèle Wide &; Deep est qu'il réduit l'effort d'ingénierie manuelle des caractéristiques en identifiant automatiquement les combinaisons de caractéristiques.
 
 Par souci de concision, nous omettons la description du composant FM et désignons la sortie par $\hat{y}^{(FM)}$. Le lecteur est invité à se reporter à la dernière section pour plus de détails. Soit $\mathbf{e}_i \in \mathbb{R}^{k}$, le vecteur de caractéristiques latentes du champ $i^\mathrm{th}$.  L'entrée de la composante profonde est la concaténation des enchâssements denses de tous les champs qui sont recherchés avec l'entrée des caractéristiques catégorielles éparses, désignée par :
 
@@ -30,7 +30,7 @@ $$
 où $\sigma$ est la fonction sigmoïde. L'architecture de DeepFM est illustrée ci-dessous.
 ![Illustration of the DeepFM model](../img/rec-deepfm.svg)
 
-Il est intéressant de noter que DeepFM n'est pas la seule façon de combiner des réseaux neuronaux profonds avec FM. Nous pouvons également ajouter des couches non linéaires sur les interactions de caractéristiques :cite:`He.Chua.2017` .
+Il est intéressant de noter que DeepFM n'est pas la seule façon de combiner des réseaux neuronaux profonds avec FM. Nous pouvons également ajouter des couches non linéaires sur les interactions de caractéristiques :cite:`He.Chua.2017`.
 
 ```{.python .input  n=2}
 #@tab mxnet

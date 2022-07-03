@@ -1,7 +1,7 @@
 # Le jeu de données de détection d'objets
 :label:`sec_object-detection-dataset` 
 
- Il n'existe pas de petit jeu de données tel que MNIST et Fashion-MNIST dans le domaine de la détection d'objets.
+Il n'existe pas de petit jeu de données tel que MNIST et Fashion-MNIST dans le domaine de la détection d'objets.
 Afin de démontrer rapidement les modèles de détection d'objets,
 [**nous avons collecté et étiqueté un petit jeu de données**].
 Tout d'abord, nous avons pris des photos de bananes gratuites dans notre bureau
@@ -49,11 +49,11 @@ d2l.DATA_HUB['banana-detection'] = (
 ## Lire le jeu de données
 
 Nous allons [**lire le jeu de données de détection des bananes**] dans la fonction `read_data_bananas`
- ci-dessous.
+ci-dessous.
 Le jeu de données comprend un fichier csv pour les étiquettes de classe d'objet
 et les coordonnées de la boîte de délimitation de terrain véridique
 
- aux coins supérieur gauche et inférieur droit.
+aux coins supérieur gauche et inférieur droit.
 
 ```{.python .input}
 #@tab mxnet

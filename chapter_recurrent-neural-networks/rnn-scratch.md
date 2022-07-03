@@ -1,14 +1,14 @@
 # Implémentation d'un réseau neuronal récurrent à partir de zéro
 :label:`sec_rnn-scratch` 
 
- Dans cette section, nous allons implémenter un RNN
+Dans cette section, nous allons implémenter un RNN
 à partir de zéro
 pour un modèle de langage au niveau des caractères,
 conformément à nos descriptions
-dans :numref:`sec_rnn` .
+dans :numref:`sec_rnn`.
 Un tel modèle
 sera entraîné sur le livre de H. G. Wells *The Time Machine*.
-Comme précédemment, nous commençons par lire l'ensemble de données, qui est présenté dans :numref:`sec_text-sequence` .
+Comme précédemment, nous commençons par lire l'ensemble de données, qui est présenté dans :numref:`sec_text-sequence`.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -45,7 +45,7 @@ import tensorflow as tf
 ## Modèle RNN
 
 En suivant les descriptions de
-:numref:`subsec_rnn_w_hidden_states` ,
+:numref:`subsec_rnn_w_hidden_states`,
 nous commençons par définir la classe pour le modèle RNN
 avec ses paramètres de modèle uniquement.
 Le nombre d'unités cachées `num_hiddens` est un hyperparamètre accordable.
@@ -79,12 +79,12 @@ class RNNScratch(d2l.Module):  #@save
 Notez que
 le modèle RNN
 boucle à travers la dimension la plus externe de `inputs`
- de sorte qu'il met à jour l'état caché d'un minilot,
+de sorte qu'il met à jour l'état caché d'un minilot,
 pas de temps par pas de temps.
 En outre,
 la fonction d'activation utilise ici la fonction $\tanh$.
 Comme
-décrit dans :numref:`sec_mlp` , la valeur moyenne
+décrit dans :numref:`sec_mlp`, la valeur moyenne
 de la fonction $\tanh$ est 0, lorsque les éléments sont uniformément
 distribués sur les nombres réels.
 
@@ -140,9 +140,9 @@ La classe `RNNLMScratch` suivante définit
 un modèle de langage basé sur RNN,
 où un RNN implémenté à partir de zéro
 est transmis via l'argument `rnn`
- de la méthode `__init__`.
+de la méthode `__init__`.
 Lors de l'apprentissage des modèles de langage, les entrées et les sorties proviennent du même vocabulaire. Par conséquent, ils ont la même dimension, qui est égale à la taille du vocabulaire.
-Notez que nous utilisons la perplexité pour évaluer le modèle. Comme nous l'avons vu dans :numref:`subsec_perplexity` , cela garantit que les séquences de différentes longueurs sont comparables.
+Notez que nous utilisons la perplexité pour évaluer le modèle. Comme nous l'avons vu dans :numref:`subsec_perplexity`, cela garantit que les séquences de différentes longueurs sont comparables.
 
 ```{.python .input}
 %%tab all
@@ -187,7 +187,7 @@ L'alimentation directe de ces indices à un réseau neuronal pourrait rendre dif
 Nous représentons souvent chaque token sous la forme d'un vecteur de caractéristiques plus expressif.
 La représentation la plus simple est appelée codage *à un coup*,
 qui est présenté
-dans :numref:`subsec_classification-problem` .
+dans :numref:`subsec_classification-problem`.
 
 En bref, nous faisons correspondre chaque indice à un vecteur unitaire différent : supposons que le nombre de tokens différents dans le vocabulaire est $N$ (`len(vocab)`) et que les indices des tokens vont de $0$ à $N-1$.
 Si l'indice d'un token est le nombre entier $i$, nous créons un vecteur de tous les 0 d'une longueur de $N$ et définissons l'élément à la position $i$ à 1.
@@ -267,7 +267,7 @@ d2l.check_shape(outputs, (batch_size, num_steps, num_inputs))
 
 Pour une séquence de longueur $T$,
 nous calculons les gradients sur ces $T$ pas de temps en une itération, ce qui donne une chaîne de produits matriciels de longueur $\mathcal{O}(T)$ pendant la rétropropagation.
-Comme mentionné dans :numref:`sec_numerical_stability` , cela peut entraîner une instabilité numérique, par exemple, les gradients peuvent exploser ou disparaître, lorsque $T$ est grand. Par conséquent, les modèles RNN ont souvent besoin d'une aide supplémentaire pour stabiliser la formation.
+Comme mentionné dans :numref:`sec_numerical_stability`, cela peut entraîner une instabilité numérique, par exemple, les gradients peuvent exploser ou disparaître, lorsque $T$ est grand. Par conséquent, les modèles RNN ont souvent besoin d'une aide supplémentaire pour stabiliser la formation.
 
 D'une manière générale,
 lors de la résolution d'un problème d'optimisation,
@@ -279,19 +279,19 @@ Par exemple,
 avec $\eta > 0$ comme taux d'apprentissage,
 dans une itération nous mettons à jour
 $\mathbf{x}$ 
- comme $\mathbf{x} - \eta \mathbf{g}$.
+comme $\mathbf{x} - \eta \mathbf{g}$.
 Supposons en outre que la fonction objectif $f$
- se comporte bien, c'est-à-dire qu'elle est *Lipschitz continue* avec une constante $L$.
+se comporte bien, c'est-à-dire qu'elle est *Lipschitz continue* avec une constante $L$.
 Autrement dit,
 pour tout $\mathbf{x}$ et $\mathbf{y}$, nous avons
 
 $$|f(\mathbf{x}) - f(\mathbf{y})| \leq L \|\mathbf{x} - \mathbf{y}\|.$$ 
 
- Dans ce cas, nous pouvons supposer sans risque que si nous actualisons le vecteur de paramètres par $\eta \mathbf{g}$, alors
+Dans ce cas, nous pouvons supposer sans risque que si nous actualisons le vecteur de paramètres par $\eta \mathbf{g}$, alors
 
 $$|f(\mathbf{x}) - f(\mathbf{x} - \eta\mathbf{g})| \leq L \eta\|\mathbf{g}\|,$$ 
 
- ce qui signifie que
+ce qui signifie que
 nous n'observerons pas de changement de plus de $L \eta \|\mathbf{g}\|$. C'est à la fois une malédiction et une bénédiction.
 Du côté de la malédiction,
 elle limite la vitesse de progression ;

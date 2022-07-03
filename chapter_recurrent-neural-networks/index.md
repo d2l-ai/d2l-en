@@ -1,14 +1,14 @@
 # Réseaux neuronaux récurrents
 :label:`chap_rnn` 
 
- Jusqu'à présent, nous nous sommes principalement concentrés sur les données de longueur fixe.
+Jusqu'à présent, nous nous sommes principalement concentrés sur les données de longueur fixe.
 Lors de l'introduction de la régression linéaire et logistique 
 dans :numref:`chap_linear` et :numref:`chap_classification` 
- et des perceptrons multicouches dans :numref:`chap_perceptrons` ,
+et des perceptrons multicouches dans :numref:`chap_perceptrons`,
 nous nous sommes contentés de supposer que chaque vecteur de caractéristiques $\mathbf{x}_i$
  était constitué d'un nombre fixe de composantes $x_1, \dots, x_d$, 
 où chaque caractéristique numérique $x_j$
- correspondait à un attribut particulier. 
+correspondait à un attribut particulier. 
 Ces ensembles de données sont parfois appelés *tabulaires*,
 car ils peuvent être organisés en tableaux, 
 où chaque exemple $i$ a sa propre ligne,
@@ -16,7 +16,7 @@ et chaque attribut sa propre colonne.
 Il est important de noter qu'avec les données tabulaires, nous supposons rarement 
 une structure particulière sur les colonnes. 
 
-Par la suite, dans :numref:`chap_cnn` , 
+Par la suite, dans :numref:`chap_cnn`, 
 nous sommes passés aux données d'image, où les entrées sont constituées 
 des valeurs brutes des pixels à chaque coordonnée dans une image. 
 Les données d'image ne correspondent pas à l'image 
@@ -27,10 +27,10 @@ Cependant, nos données étaient toujours de longueur fixe.
 Chaque image Fashion-MNIST est représentée 
 comme une grille $28 \times 28$ de valeurs de pixels.
 De plus, notre objectif était de développer un modèle
-qui n'examine qu'une seule image et qui produit ensuite une seule prédiction 
-. 
-Mais que faire face à une séquence d'images 
-, comme dans une vidéo, 
+qui n'examine qu'une seule image et qui produit ensuite une seule prédiction .
+
+Mais que faire face à une séquence d'images ,
+comme dans une vidéo, 
 ou lorsqu'il s'agit de produire 
 une prédiction structurée séquentiellement,
 comme dans le cas du sous-titrage d'images ? 
@@ -65,7 +65,7 @@ pour propager les activations de chaque couche
 à la couche suivante *au même pas de temps*,
 les connexions récurrentes sont *dynamiques*,
 transmettant des informations à travers des pas de temps adjacents. 
-Comme le révèle la vue dépliée de :numref:`fig_unfolded-rnn` ,
+Comme le révèle la vue dépliée de :numref:`fig_unfolded-rnn`,
 les RNN peuvent être considérés comme des réseaux neuronaux à anticipation
 où les paramètres de chaque couche (conventionnels et récurrents)
 sont partagés entre les pas de temps. 
@@ -86,9 +86,9 @@ ce livre adopte la perspective de l'apprentissage automatique,
 en se concentrant sur les RNN en tant qu'outils pratiques qui ont gagné 
 en popularité dans les années 2010 grâce à 
 des résultats révolutionnaires sur des tâches aussi diverses que 
-la reconnaissance de l'écriture manuscrite :cite:`graves2008novel` ,
-la traduction automatique :cite:`Sutskever.Vinyals.Le.2014` ,
-et la reconnaissance de diagnostics médicaux :cite:`Lipton.Kale.2016` . 
+la reconnaissance de l'écriture manuscrite :cite:`graves2008novel`,
+la traduction automatique :cite:`Sutskever.Vinyals.Le.2014`,
+et la reconnaissance de diagnostics médicaux :cite:`Lipton.Kale.2016`. 
 Nous indiquons au lecteur qui souhaite obtenir plus d'informations sur le sujet 
 qu'il peut consulter une revue complète :cite:`Lipton.Berkowitz.Elkan.2015` accessible au public
 .
@@ -98,7 +98,7 @@ peuvent être adaptés pour traiter des données de longueur variable,
 par exemple, des images de résolution variable.
 De plus, les RNN ont récemment cédé une part de marché considérable
 aux modèles transformateurs, 
-qui seront abordés dans :numref:`chap_attention` .
+qui seront abordés dans :numref:`chap_attention`.
 Cependant, les RNN se sont imposés comme les modèles par défaut
 pour le traitement de la structure séquentielle complexe dans l'apprentissage profond,
 et restent à ce jour les modèles de base de la modélisation séquentielle.
@@ -124,8 +124,8 @@ la recherche fondamentale dans ce domaine a été principalement motivée
 par les progrès réalisés dans les tâches de base du traitement du langage naturel (NLP).
 Ainsi, tout au long de ce chapitre, nous concentrerons 
 notre exposé et nos exemples sur les données textuelles.
-Si vous vous habituez à ces exemples, 
-, l'application de ces modèles à d'autres modalités de données 
+Si vous vous habituez à ces exemples,
+l'application de ces modèles à d'autres modalités de données 
 devrait être relativement simple. 
 Dans les sections suivantes, nous introduisons la notation de base
 pour les séquences et certaines mesures d'évaluation 
@@ -136,7 +136,7 @@ Enfin, nous décrivons la méthode de calcul des gradients
 lors de la rétropropagation à travers les RNN et explorons certains défis
 souvent rencontrés lors de l'entraînement de ces réseaux,
 motivant les architectures RNN modernes qui suivront 
-dans :numref:`chap_modern_rnn` .
+dans :numref:`chap_modern_rnn`.
 
 ```toc
 :maxdepth: 2

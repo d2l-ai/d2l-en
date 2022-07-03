@@ -103,8 +103,8 @@ net.layers[2].weights
 
 Nous pouvons voir que cette couche entièrement connectée
 contient deux paramètres,
-correspondant aux poids et aux biais de cette couche
-, respectivement.
+correspondant aux poids et aux biais de cette couche,
+respectivement.
 
 
 ### [**Paramètres ciblés**]

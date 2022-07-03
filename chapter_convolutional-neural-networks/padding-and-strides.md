@@ -228,11 +228,11 @@ il n'y a pas de sortie car l'élément d'entrée ne peut pas remplir la fenêtre
 :label:`img_conv_stride`
 
 En général, lorsque le pas pour la hauteur est $s_h$
- et le pas pour la largeur est $s_w$, la forme de sortie est
+et le pas pour la largeur est $s_w$, la forme de sortie est
 
 $$\lfloor(n_h-k_h+p_h+s_h)/s_h\rfloor \times \lfloor(n_w-k_w+p_w+s_w)/s_w\rfloor.$$ 
 
- Si nous définissons $p_h=k_h-1$ et $p_w=k_w-1$,
+Si nous définissons $p_h=k_h-1$ et $p_w=k_w-1$,
 alors la forme de sortie peut être simplifiée en
 $\lfloor(n_h+s_h-1)/s_h\rfloor \times \lfloor(n_w+s_w-1)/s_w\rfloor$ .
 En allant un peu plus loin, si la hauteur et la largeur d'entrée
@@ -293,7 +293,7 @@ Jusqu'à présent, tous les padding dont nous avons parlé ont simplement prolon
 ## Exercices
 
 1. Étant donné le dernier exemple de code de cette section avec la taille du noyau $(3, 5)$, le padding $(0, 1)$, et le stride $(3, 4)$, 
- calculez la forme de sortie pour vérifier si elle est cohérente avec le résultat expérimental.
+calculez la forme de sortie pour vérifier si elle est cohérente avec le résultat expérimental.
 1. Pour les signaux audio, à quoi correspond un stride de 2 ?
 1. Implémentez le padding miroir, c'est-à-dire le padding où les valeurs de bordure sont simplement mises en miroir pour étendre les tenseurs. 
 1. Quels sont les avantages informatiques d'un stride supérieur à 1 ?

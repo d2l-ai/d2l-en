@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Convolutions pour les images
 :label:`sec_conv_layer` 
 
- Maintenant que nous comprenons comment les couches convolutionnelles fonctionnent en théorie,
+Maintenant que nous comprenons comment les couches convolutionnelles fonctionnent en théorie,
 nous sommes prêts à voir comment elles fonctionnent en pratique.
 En nous appuyant sur notre motivation des réseaux de neurones convolutifs
 comme architectures efficaces pour explorer la structure des données d'image,
@@ -18,14 +18,14 @@ nous nous en tenons aux images comme exemple courant.
 Rappelons qu'à proprement parler, les couches convolutionnelles
 sont mal nommées, puisque les opérations qu'elles expriment
 sont plus précisément décrites comme des corrélations croisées.
-D'après nos descriptions des couches convolutionnelles dans :numref:`sec_why-conv` ,
+D'après nos descriptions des couches convolutionnelles dans :numref:`sec_why-conv`,
 dans une telle couche, un tenseur d'entrée
 et un tenseur de noyau sont combinés
 pour produire un tenseur de sortie par le biais d'une (**opération de corrélation croisée.**)
 
 Ignorons les canaux pour l'instant et voyons comment cela fonctionne
 avec des données bidimensionnelles et des représentations cachées.
-Dans :numref:`fig_correlation` ,
+Dans :numref:`fig_correlation`,
 l'entrée est un tenseur bidimensionnel
 avec une hauteur de 3 et une largeur de 3.
 Nous marquons la forme du tenseur comme $3 \times 3$ ou ($3$, $3$).
@@ -45,8 +45,8 @@ et la faisons glisser sur le tenseur d'entrée,
 Lorsque la fenêtre de convolution glisse vers une certaine position,
 le sous-tenseur d'entrée contenu dans cette fenêtre
 et le tenseur du noyau sont multipliés par éléments
-et le tenseur résultant est additionné
-, ce qui donne une seule valeur scalaire.
+et le tenseur résultant est additionné,
+ce qui donne une seule valeur scalaire.
 Ce résultat donne la valeur du tenseur de sortie
 à l'emplacement correspondant.
 Ici, le tenseur de sortie a une hauteur de 2 et une largeur de 2
@@ -67,18 +67,18 @@ nous ne pouvons calculer correctement la corrélation croisée
 que pour les endroits où le noyau s'inscrit entièrement dans l'image,
 la taille de sortie est donnée par la taille d'entrée $n_h \times n_w$
  moins la taille du noyau de convolution $k_h \times k_w$
- via
+via
 
 $$(n_h-k_h+1) \times (n_w-k_w+1).$$ 
 
- C'est le cas car nous avons besoin d'un espace suffisant
+C'est le cas car nous avons besoin d'un espace suffisant
 pour "déplacer" le noyau de convolution dans l'image.
 Nous verrons plus tard comment garder la taille inchangée
 en remplissant l'image de zéros autour de sa limite
 afin qu'il y ait suffisamment d'espace pour déplacer le noyau.
 Ensuite, nous implémentons ce processus dans la fonction `corr2d`,
 qui accepte un tenseur d'entrée `X` et un tenseur de noyau `K`
- et renvoie un tenseur de sortie `Y`.
+et renvoie un tenseur de sortie `Y`.
 
 ```{.python .input}
 %%tab mxnet
@@ -125,7 +125,7 @@ def corr2d(X, K):  #@save
 
 Nous pouvons construire le tenseur d'entrée `X` et le tenseur de noyau `K`
  à partir de :numref:`fig_correlation` 
- pour [**valider la sortie de l'implémentation ci-dessus**]
+pour [**valider la sortie de l'implémentation ci-dessus**]
 de l'opération de corrélation croisée bidimensionnelle.
 
 ```{.python .input}
@@ -199,7 +199,7 @@ ou un noyau de convolution $h \times w$,
 la hauteur et la largeur du noyau de convolution sont respectivement $h$ et $w$.
 Nous appelons également
 une couche convolutive avec un noyau de convolution $h \times w$
- simplement une couche convolutive $h \times w$.
+simplement une couche convolutive $h \times w$.
 
 
 ## Détection des bords d'objets dans les images
@@ -382,27 +382,27 @@ Continuons ici à considérer les couches convolutionnelles bidimensionnelles.
 Et si ces couches
 effectuaient des opérations de convolution strictes
 telles que définies dans :eqref:`eq_2d-conv-discrete` 
- au lieu des corrélations croisées ?
+au lieu des corrélations croisées ?
 Pour obtenir la sortie de l'opération de *convolution stricte*, il suffit de retourner le tenseur du noyau bidimensionnel à la fois horizontalement et verticalement, puis d'effectuer l'opération de *corrélation croisée* avec le tenseur d'entrée.
 
 Il convient de noter que, puisque les noyaux sont appris à partir des données dans l'apprentissage profond,
-les sorties des couches convolutionnelles ne sont pas affectées
-, peu importe que ces couches
+les sorties des couches convolutionnelles ne sont pas affectées,
+peu importe que ces couches
 effectuent
 les opérations de convolution stricte
 ou les opérations de corrélation croisée.
 
-Pour illustrer cela, supposons qu'une couche convolutionnelle effectue une *corrélation croisée* et apprend le noyau dans :numref:`fig_correlation` , qui est désigné ici comme la matrice $\mathbf{K}$.
+Pour illustrer cela, supposons qu'une couche convolutionnelle effectue une *corrélation croisée* et apprend le noyau dans :numref:`fig_correlation`, qui est désigné ici comme la matrice $\mathbf{K}$.
 En supposant que les autres conditions restent inchangées,
 lorsque cette couche effectue une *convolution* stricte à la place,
 le noyau appris $\mathbf{K}'$ sera le même que $\mathbf{K}$
- après que $\mathbf{K}'$ soit
+après que $\mathbf{K}'$ soit
 retourné à la fois horizontalement et verticalement.
 En d'autres termes,
 lorsque la couche convolutionnelle
 effectue une *convolution* stricte
 pour l'entrée dans :numref:`fig_correlation` 
- et $\mathbf{K}'$,
+et $\mathbf{K}'$,
 la même sortie dans :numref:`fig_correlation` 
  (corrélation croisée de l'entrée et $\mathbf{K}$)
 sera obtenue.
@@ -417,10 +417,10 @@ une entrée (ou composante) de tout tenseur représentant une représentation de
 
 ## Carte de caractéristiques et champ récepteur
 
-Comme décrit dans :numref:`subsec_why-conv-channels` ,
+Comme décrit dans :numref:`subsec_why-conv-channels`,
 la sortie de la couche de convolution dans
 :numref:`fig_correlation` 
- est parfois appelée une *carte de caractéristiques*,
+est parfois appelée une *carte de caractéristiques*,
 car elle peut être considérée comme
 les représentations apprises (caractéristiques)
 dans les dimensions spatiales (par exemple, la largeur et la hauteur)
@@ -430,7 +430,7 @@ pour tout élément $x$ d'une couche,
 son *champ réceptif* fait référence à
 tous les éléments (de toutes les couches précédentes)
 qui peuvent affecter le calcul de $x$
- pendant la propagation vers l'avant.
+pendant la propagation vers l'avant.
 Notez que le champ réceptif
 peut être plus grand que la taille réelle de l'entrée.
 
@@ -440,14 +440,14 @@ le champ réceptif de l'élément de sortie ombré (de valeur $19$)
 est
 les quatre éléments de la partie ombrée de l'entrée.
 Désignons maintenant la sortie de $2 \times 2$
- par $\mathbf{Y}$
- et considérons un CNN plus profond
+par $\mathbf{Y}$
+et considérons un CNN plus profond
 avec une couche de convolution supplémentaire $2 \times 2$ qui prend $\mathbf{Y}$
- comme entrée et sort
+comme entrée et sort
 un seul élément $z$.
 Dans ce cas,
 le champ réceptif de $z$
- sur $\mathbf{Y}$ comprend les quatre éléments de $\mathbf{Y}$,
+sur $\mathbf{Y}$ comprend les quatre éléments de $\mathbf{Y}$,
 tandis que
 le champ réceptif
 sur l'entrée comprend les neuf éléments d'entrée.
@@ -459,16 +459,16 @@ nous pouvons construire un réseau plus profond.
 
 Les champs réceptifs tirent leur nom de la neurophysiologie. Dans une série d'expériences :cite:`Hubel.Wiesel.1959,Hubel.Wiesel.1962,Hubel.Wiesel.1968` sur une série d'animaux 
 et différents stimuli, Hubel et Wiesel ont exploré la réponse de ce qu'on appelle le cortex visuel 
-auxdits stimuli. Dans l'ensemble, ils ont constaté que les niveaux inférieurs réagissent aux bords et aux formes connexes 
-. Plus tard, :cite:`Field.1987` ont illustré cet effet sur des images naturelles 
+auxdits stimuli. Dans l'ensemble, ils ont constaté que les niveaux inférieurs réagissent aux bords et aux formes connexes .
+Plus tard, :cite:`Field.1987` ont illustré cet effet sur des images naturelles 
 avec ce que l'on ne peut appeler que des noyaux convolutifs. 
 Nous reproduisons une figure clé de :numref:`field_visual` pour illustrer les similitudes frappantes 
 
 ![Figure and caption taken from :cite:`Field.1987`: An example of coding with six different channels. (Left) Exemples des six types de capteurs associés à chaque canal. (Droite) Convolution de l'image en (milieu) avec les six capteurs montrés en (gauche). La réponse de chaque capteur est déterminée en échantillonnant ces images filtrées à une distance proportionnelle à la taille du capteur (représentée par des points). Ce diagramme montre la réponse des capteurs symétriques pairs uniquement.](../img/field-visual.png)
 :label:`field_visual` 
 
- Il s'avère que cette relation est également valable pour les caractéristiques calculées par des couches plus profondes de réseaux formés à des tâches de classification d'images, comme le montre par exemple 
-dans :cite:`Kuzovkin.Vicente.Petton.ea.2018` . Il suffit de dire que les convolutions se sont avérées être un outil incroyablement puissant pour la vision par ordinateur, tant en biologie qu'en code. En tant que telles, il n'est pas surprenant (avec le recul) qu'elles aient annoncé les récents succès de l'apprentissage profond. 
+Il s'avère que cette relation est également valable pour les caractéristiques calculées par des couches plus profondes de réseaux formés à des tâches de classification d'images, comme le montre par exemple 
+dans :cite:`Kuzovkin.Vicente.Petton.ea.2018`. Il suffit de dire que les convolutions se sont avérées être un outil incroyablement puissant pour la vision par ordinateur, tant en biologie qu'en code. En tant que telles, il n'est pas surprenant (avec le recul) qu'elles aient annoncé les récents succès de l'apprentissage profond. 
 
 ## Résumé
 
@@ -484,9 +484,9 @@ En ce qui concerne les convolutions elles-mêmes, elles peuvent être utilisées
    1. Que se passe-t-il si vous transposez `K`?
 1. Concevez quelques noyaux manuellement.
    1. Étant donné un vecteur directionnel $\mathbf{v} = (v_1, v_2)$, dérivez un noyau de détection d'arêtes qui détecte les arêtes de 
- orthogonales à $\mathbf{v}$, c'est-à-dire les arêtes dans la direction $(v_2, -v_1)$. 
+orthogonales à $\mathbf{v}$, c'est-à-dire les arêtes dans la direction $(v_2, -v_1)$. 
     1. Déterminez un opérateur de différence finie pour la dérivée seconde. Quelle est la taille minimale 
- du noyau convolutif qui lui est associé ? Quelles sont les structures des images qui y répondent le plus fortement ?
+du noyau convolutif qui lui est associé ? Quelles sont les structures des images qui y répondent le plus fortement ?
    1. Comment concevriez-vous un noyau de flou ? Pourquoi voudriez-vous utiliser un tel noyau ?
    1. Quelle est la taille minimale d'un noyau pour obtenir une dérivée d'ordre $d$?
 1. Lorsque vous essayez de trouver automatiquement le gradient pour la classe `Conv2D` que nous avons créée, quel type de message d'erreur voyez-vous ?

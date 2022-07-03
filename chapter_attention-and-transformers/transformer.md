@@ -7,8 +7,8 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 :label:`sec_transformer` 
 
  
- Nous avons comparé les CNN, les RNN et l'auto-attention dans
-:numref:`subsec_cnn-rnn-self-attention` .
+Nous avons comparé les CNN, les RNN et l'auto-attention dans
+:numref:`subsec_cnn-rnn-self-attention`.
 Notamment, l'auto-attention
 
  bénéficie à la fois du calcul parallèle et
@@ -17,33 +17,33 @@ C'est pourquoi, naturellement,
 il est intéressant de concevoir des architectures profondes
 en utilisant l'auto-attention.
 Contrairement aux modèles d'auto-attention antérieurs
-qui reposent toujours sur des RNN pour les représentations d'entrée :cite:`Cheng.Dong.Lapata.2016,Lin.Feng.Santos.ea.2017,Paulus.Xiong.Socher.2017` ,
+qui reposent toujours sur des RNN pour les représentations d'entrée :cite:`Cheng.Dong.Lapata.2016,Lin.Feng.Santos.ea.2017,Paulus.Xiong.Socher.2017`,
 le modèle de transformation
 est uniquement basé sur les mécanismes d'attention
-sans aucune couche convolutive ou récurrente :cite:`Vaswani.Shazeer.Parmar.ea.2017` .
+sans aucune couche convolutive ou récurrente :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
 
 Bien qu'ils aient été proposés à l'origine
 pour l'apprentissage de séquence à séquence sur des données textuelles, les transformateurs
-ont été omniprésents dans un large éventail d'applications modernes d'apprentissage profond
-,
+ont été omniprésents dans un large éventail d'applications modernes d'apprentissage profond,
+
 notamment dans les domaines du langage, de la vision, du langage et de l'apprentissage par renforcement.
 
 ## Modèle
 
-En tant qu'instance de l'architecture de l'encodeur-décodeur
-,
+En tant qu'instance de l'architecture de l'encodeur-décodeur,
+
 l'architecture globale de
 le transformateur
-est présentée dans :numref:`fig_transformer` .
+est présentée dans :numref:`fig_transformer`.
 Comme on peut le voir,
 le transformateur est composé d'un encodeur et d'un décodeur.
-A la différence de
-, l'attention de Bahdanau
-pour l'apprentissage de séquence à séquence
-, dans :numref:`fig_s2s_attention_details` ,
+A la différence de,
+l'attention de Bahdanau
+pour l'apprentissage de séquence à séquence,
+dans :numref:`fig_s2s_attention_details`,
 les embeddings de séquence d'entrée (source) et de sortie (cible)
 
- sont ajoutés avec un encodage positionnel
+sont ajoutés avec un encodage positionnel
 avant d'être introduits dans
 l'encodeur et le décodeur
 qui empilent des modules basés sur l'auto-attention.
@@ -54,7 +54,7 @@ qui empilent des modules basés sur l'auto-attention.
 
 
 Nous donnons maintenant un aperçu de l'architecture du transformateur
-dans :numref:`fig_transformer` .
+dans :numref:`fig_transformer`.
 À un niveau élevé,
 le codeur transformateur est une pile de plusieurs couches identiques,
 où chaque couche
@@ -66,7 +66,7 @@ Plus précisément,
 dans l'auto-attention du codeur, les requêtes, les clés et les valeurs de
 proviennent toutes des sorties de
 de la couche précédente du codeur.
-Inspiré par la conception du ResNet dans :numref:`sec_resnet` ,
+Inspiré par la conception du ResNet dans :numref:`sec_resnet`,
 une connexion résiduelle est employée
 autour des deux sous-couches.
 Dans le transformateur,
@@ -74,7 +74,7 @@ pour toute entrée $\mathbf{x} \in \mathbb{R}^d$ à toute position de la séquen
 nous exigeons que $\mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ pour que
 la connexion résiduelle $\mathbf{x} + \mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ soit réalisable.
 Cette addition de la connexion résiduelle est immédiatement
-suivie d'une normalisation de la couche :cite:`Ba.Kiros.Hinton.2016` .
+suivie d'une normalisation de la couche :cite:`Ba.Kiros.Hinton.2016`.
 En conséquence, le codeur transformateur produit une représentation vectorielle $d$-dimensionnelle pour chaque position de la séquence d'entrée.
 
 Le décodeur de transformateur est également
@@ -104,7 +104,7 @@ garantissant que la prédiction ne dépend que des jetons de sortie qui ont ét�
 Nous avons déjà décrit et implémenté
 l'attention multi-têtes basée sur des produits scalaires de points
 dans :numref:`sec_multihead-attention` 
- et le codage positionnel dans :numref:`subsec_positional-encoding` .
+et le codage positionnel dans :numref:`subsec_positional-encoding`.
 Dans la suite,
 nous implémenterons le reste du modèle de transformation.
 
@@ -138,7 +138,7 @@ import tensorflow as tf
 ## [**Réseaux feed-forward par position**]
 :label:`subsec_positionwise-ffn` 
 
- Le réseau feed-forward par position
+Le réseau feed-forward par position
 transforme
 la représentation à toutes les positions de la séquence
 en utilisant le même MLP.
@@ -228,27 +228,27 @@ ffn(tf.ones((2, 3, 4)))[0]
 ## Connexion résiduelle et normalisation des couches
 
 Concentrons-nous maintenant sur
-la composante " add &amp; norm " de :numref:`fig_transformer` .
+la composante " add &; norm " de :numref:`fig_transformer`.
 Comme nous l'avons décrit au début
 de cette section,
 il s'agit d'une connexion résiduelle immédiatement
 suivie d'une normalisation de couche.
 Ces deux éléments sont essentiels à l'efficacité des architectures profondes.
 
-Dans :numref:`sec_batch_norm` ,
+Dans :numref:`sec_batch_norm`,
 nous avons expliqué comment la normalisation par lot
 recentre et redimensionne les exemples dans
 un minibatch.
-La normalisation par couche est identique à la normalisation par lot
-, sauf que la première
+La normalisation par couche est identique à la normalisation par lot,
+sauf que la première
 normalise à travers la dimension des caractéristiques.
 
 Malgré ses nombreuses applications
 dans le domaine de la vision par ordinateur, la normalisation par lot
 
- est généralement moins efficace, d'un point de vue empirique, que la normalisation par couche
-dans les tâches de traitement du langage naturel
-, dont les entrées sont souvent des séquences de longueur variable
+est généralement moins efficace, d'un point de vue empirique, que la normalisation par couche
+dans les tâches de traitement du langage naturel,
+dont les entrées sont souvent des séquences de longueur variable
 .
 
 L'extrait de code suivant
@@ -358,12 +358,12 @@ d2l.check_shape(add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)),
 ## Encodeur
 :label:`subsec_transformer-encoder` 
 
- Avec tous les composants essentiels pour assembler
+Avec tous les composants essentiels pour assembler
 l'encodeur transformateur,
 commençons par
 implémenter [**une couche unique dans l'encodeur**].
 La classe suivante `TransformerEncoderBlock`
- contient deux sous-couches : des réseaux d'auto-attention à têtes multiples et des réseaux feed-forward par position,
+contient deux sous-couches : des réseaux d'auto-attention à têtes multiples et des réseaux feed-forward par position,
 où une connexion résiduelle suivie d'une normalisation de couche est employée
 autour des deux sous-couches.
 
@@ -581,11 +581,11 @@ d2l.check_shape(encoder(tf.ones((2, 100)), valid_lens, training=False),
 
 ## Décodeur
 
-Comme indiqué sur :numref:`fig_transformer` ,
+Comme indiqué sur :numref:`fig_transformer`,
 [**le décodeur transformateur
 est composé de plusieurs couches identiques**].
 Chaque couche est mise en œuvre dans la classe suivante
-`TransformerDecoderBlock` ,
+`TransformerDecoderBlock`,
 qui contient trois sous-couches :
 attention du décodeur,
 attention du codeur-décodeur,
@@ -924,7 +924,7 @@ en suivant l'architecture du transformateur.
 Ici, nous spécifions que
 l'encodeur transformateur et le décodeur transformateur
 ont tous deux 2 couches utilisant une attention à 4 têtes.
-Comme pour :numref:`sec_seq2seq_training` ,
+Comme pour :numref:`sec_seq2seq_training`,
 nous formons le modèle de transformateur
 pour l'apprentissage de séquence à séquence sur le jeu de données de traduction automatique anglais-français.
 
@@ -1135,7 +1135,7 @@ pour différentes tâches d'apprentissage profond.
 1. Est-ce une bonne idée de remplacer l'attention du produit scalaire par une attention additive dans le transformateur ? Pourquoi ?
 1. Pour la modélisation du langage, devrions-nous utiliser le transformateur encodeur, décodeur, ou les deux ? Comment concevoir cette méthode ?
 1. Quels peuvent être les défis des transformateurs si les séquences d'entrée sont très longues ? Pourquoi ?
-1. Comment améliorer l'efficacité des transformateurs en termes de calcul et de mémoire ? Conseil : vous pouvez vous référer au document d'étude de Tay et al. :cite:`Tay.Dehghani.Bahri.ea.2020` .
+1. Comment améliorer l'efficacité des transformateurs en termes de calcul et de mémoire ? Conseil : vous pouvez vous référer au document d'étude de Tay et al. :cite:`Tay.Dehghani.Bahri.ea.2020`.
 
 
 :begin_tab:`mxnet`

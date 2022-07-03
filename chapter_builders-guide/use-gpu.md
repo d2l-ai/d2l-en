@@ -335,8 +335,8 @@ deux variables puissent déjà se trouver sur le même périphérique.
 Nous voulons donc faire une copie uniquement si les variables
 se trouvent actuellement sur des périphériques différents.
 Dans ce cas, nous pouvons appeler `as_in_ctx`.
-Si la variable se trouve déjà dans le périphérique spécifié
-, il n'y a rien à faire.
+Si la variable se trouve déjà dans le périphérique spécifié,
+il n'y a rien à faire.
 À moins que vous ne souhaitiez spécifiquement faire une copie,
 `as_in_ctx` est la méthode à privilégier.
 :end_tab:
@@ -510,32 +510,32 @@ En bref, tant que toutes les données et tous les paramètres sont sur le même 
 ## Résumé
 
 * Nous pouvons spécifier des dispositifs pour le stockage et le calcul, comme le CPU ou le GPU.
- Par défaut, les données sont créées dans la mémoire principale
- et utilisent ensuite le CPU pour les calculs.
+Par défaut, les données sont créées dans la mémoire principale
+et utilisent ensuite le CPU pour les calculs.
 * Le cadre d'apprentissage profond exige que toutes les données d'entrée pour le calcul
- soient sur le même périphérique,
- que ce soit le CPU ou le même GPU.
+soient sur le même périphérique,
+que ce soit le CPU ou le même GPU.
 * Vous pouvez perdre des performances importantes en déplaçant les données sans précaution.
- Une erreur typique est la suivante : calculer la perte
- pour chaque minibatch sur le GPU et la rapporter
+Une erreur typique est la suivante : calculer la perte
+pour chaque minibatch sur le GPU et la rapporter
  à l'utilisateur sur la ligne de commande (ou l'enregistrer dans un NumPy `ndarray`)
- déclenchera un verrouillage global de l'interpréteur qui bloquera tous les GPU.
- Il est bien mieux d'allouer de la mémoire
- pour la journalisation à l'intérieur du GPU et de ne déplacer que les journaux les plus importants.
+déclenchera un verrouillage global de l'interpréteur qui bloquera tous les GPU.
+Il est bien mieux d'allouer de la mémoire
+pour la journalisation à l'intérieur du GPU et de ne déplacer que les journaux les plus importants.
 
 ## Exercices
 
 1. Essayez une tâche de calcul plus importante, comme la multiplication de grandes matrices,
- et voyez la différence de vitesse entre le CPU et le GPU.
+et voyez la différence de vitesse entre le CPU et le GPU.
   Qu'en est-il d'une tâche comportant une petite quantité de calculs ?
 1. Comment devons-nous lire et écrire les paramètres du modèle sur le GPU ?
 1. Mesurez le temps nécessaire pour calculer 1000 multiplications matricielles
- de matrices $100 \times 100$
- et enregistrer la norme de Frobenius de la matrice de sortie, un résultat à la fois
- ou garder un journal sur le GPU et transférer uniquement le résultat final.
+de matrices $100 \times 100$
+et enregistrer la norme de Frobenius de la matrice de sortie, un résultat à la fois
+ou garder un journal sur le GPU et transférer uniquement le résultat final.
 1. Mesurez le temps nécessaire pour effectuer deux multiplications matricielles
- sur deux GPU en même temps par rapport à la séquence
- sur un GPU. Indice : vous devriez constater une mise à l'échelle presque linéaire.
+sur deux GPU en même temps par rapport à la séquence
+sur un GPU. Indice : vous devriez constater une mise à l'échelle presque linéaire.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/62)

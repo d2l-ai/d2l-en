@@ -1,14 +1,14 @@
 # Réglage fin de BERT pour les applications au niveau des séquences et des tokens
 :label:`sec_finetuning-bert` 
 
- Dans les sections précédentes de ce chapitre,
+Dans les sections précédentes de ce chapitre,
 nous avons conçu différents modèles pour les applications de traitement du langage naturel,
 tels que ceux basés sur les RNN, CNN, attention et MLP.
 Ces modèles sont utiles lorsqu'il y a une contrainte d'espace ou de temps,
 ; cependant,
 la conception d'un modèle spécifique pour chaque tâche de traitement du langage naturel
 est pratiquement irréalisable.
-Dans :numref:`sec_bert` ,
+Dans :numref:`sec_bert`,
 nous avons introduit un modèle de pré-entraînement, BERT,
 qui nécessite des modifications minimales de l'architecture
 pour un large éventail de tâches de traitement du langage naturel.
@@ -16,7 +16,7 @@ D'une part,
 au moment de sa proposition,
 BERT a amélioré l'état de l'art sur diverses tâches de traitement du langage naturel.
 D'autre part,
-comme indiqué dans :numref:`sec_bert-pretraining` ,
+comme indiqué dans :numref:`sec_bert-pretraining`,
 les deux versions du modèle original de BERT
 comportent 110 millions et 340 millions de paramètres.
 Ainsi, lorsque les ressources informatiques sont suffisantes,
@@ -48,7 +48,7 @@ tous les paramètres du modèle BERT pré-entraîné sont ajustés.
 Outre l'analyse des sentiments que nous avons étudiée dans ce chapitre,
 le Corpus of Linguistic Acceptability (CoLA)
 est également un jeu de données pour la classification de textes simples,
-permettant de juger si une phrase donnée est grammaticalement acceptable ou non :cite:`Warstadt.Singh.Bowman.2019` .
+permettant de juger si une phrase donnée est grammaticalement acceptable ou non :cite:`Warstadt.Singh.Bowman.2019`.
 Par exemple, "Je devrais étudier." est acceptable mais "Je devrais étudier." ne l'est pas.
 
 ![Fine-tuning BERT for single text classification applications, such as sentiment analysis and testing linguistic acceptability. Suppose that the input single text has six tokens.](../img/bert-one-seq.svg) 
@@ -60,7 +60,7 @@ où le jeton de classification spécial
 "&lt;cls&gt;" est utilisé pour la classification de la séquence et 
 où le jeton de classification spécial 
 "&lt;sep&gt;" marque la fin d'un texte unique ou sépare une paire de textes.
-Comme indiqué sur :numref:`fig_bert-one-seq` ,
+Comme indiqué sur :numref:`fig_bert-one-seq`,
 dans les applications de classification de texte unique,
 la représentation BERT du jeton de classification spécial 
 "&lt;cls&gt;" encode les informations de la séquence de texte d'entrée entière.
@@ -76,11 +76,11 @@ Elle appartient à la *classification de paires de textes*,
 un type d'application classifiant une paire de textes.
 
 En prenant une paire de textes en entrée mais en produisant une valeur continue,
- la *similarité textuelle sémantique* est une tâche populaire de *régression de paires de textes*.
+la *similarité textuelle sémantique* est une tâche populaire de *régression de paires de textes*.
 Cette tâche mesure la similarité sémantique des phrases.
 Par exemple, dans le jeu de données Semantic Textual Similarity Benchmark,
 le score de similarité d'une paire de phrases
-est une échelle ordinale allant de 0 (aucun chevauchement de sens) à 5 (équivalence de sens) :cite:`Cer.Diab.Agirre.ea.2017` .
+est une échelle ordinale allant de 0 (aucun chevauchement de sens) à 5 (équivalence de sens) :cite:`Cer.Diab.Agirre.ea.2017`.
 L'objectif est de prédire ces scores.
 Voici quelques exemples tirés du jeu de données Semantic Textual Similarity Benchmark (phrase 1, phrase 2, score de similarité) :
 
@@ -89,12 +89,12 @@ Voici quelques exemples tirés du jeu de données Semantic Textual Similarity Be
 * "Une femme est en train de danser.", "Un homme est en train de parler.", 0.000.
 
 
- ![Fine-tuning BERT for text pair classification or regression applications, such as natural language inference and semantic textual similarity. Suppose that the input text pair has two and three tokens.](../img/bert-two-seqs.svg) 
+![Fine-tuning BERT for text pair classification or regression applications, such as natural language inference and semantic textual similarity. Suppose that the input text pair has two and three tokens.](../img/bert-two-seqs.svg) 
 :label:`fig_bert-two-seqs` 
 
- Comparé à la classification de texte unique dans :numref:`fig_bert-one-seq` ,
+Comparé à la classification de texte unique dans :numref:`fig_bert-one-seq`,
 fine-tuning BERT pour la classification de paires de textes dans :numref:`fig_bert-two-seqs` 
- est différent dans la représentation d'entrée.
+est différent dans la représentation d'entrée.
 Pour les tâches de régression de paires de textes, telles que la similarité sémantique textuelle,
 des modifications triviales peuvent être appliquées, telles que la sortie d'une valeur d'étiquette continue
 et l'utilisation de la perte quadratique moyenne : elles sont courantes pour la régression.
@@ -117,8 +117,8 @@ devrait être balisée comme
 :label:`fig_bert-tagging`
 
 Le réglage fin de BERT pour les applications de balisage de texte
-est illustré dans :numref:`fig_bert-tagging` .
-Par rapport à :numref:`fig_bert-one-seq` ,
+est illustré dans :numref:`fig_bert-tagging`.
+Par rapport à :numref:`fig_bert-one-seq`,
 la seule différence réside dans le fait que
 dans le balisage de texte, la représentation BERT de *chaque token* du texte d'entrée
 est introduite dans les mêmes couches supplémentaires entièrement connectées pour produire l'étiquette du token,
@@ -134,7 +134,7 @@ Par exemple,
 le Stanford Question Answering Dataset (SQuAD v1.1)
 se compose de passages de lecture et de questions,
 où la réponse à chaque question
-est juste un segment de texte (span de texte) du passage sur lequel porte la question :cite:`Rajpurkar.Zhang.Lopyrev.ea.2016` .
+est juste un segment de texte (span de texte) du passage sur lequel porte la question :cite:`Rajpurkar.Zhang.Lopyrev.ea.2016`.
 Pour expliquer,
 considérons un passage
 "Certains experts rapportent que l'efficacité d'un masque n'est pas concluante. Cependant, les fabricants de masques insistent sur le fait que leurs produits, tels que les masques respiratoires N95, peuvent protéger contre le virus"
@@ -152,7 +152,7 @@ dans l'entrée de BERT.
 Pour prédire la position du début de la séquence de texte,
 la même couche additionnelle entièrement connectée transformera
 la représentation BERT de tout token du passage de la position $i$
- en un score scalaire $s_i$.
+en un score scalaire $s_i$.
 Ces scores de tous les jetons du passage
 sont ensuite transformés par l'opération softmax
 en une distribution de probabilité,
@@ -164,10 +164,10 @@ dans sa couche supplémentaire entièrement connectée
 sont indépendants de ceux de la prédiction du début.
 Lors de la prédiction de la fin,
 tout jeton de passage de la position $i$
- est transformé par la même couche entièrement connectée
+est transformé par la même couche entièrement connectée
 en un score scalaire $e_i$.
 :numref:`fig_bert-qa` 
- illustre le réglage fin de BERT pour la réponse aux questions.
+illustre le réglage fin de BERT pour la réponse aux questions.
 
 Pour répondre aux questions,
 l'objectif de entrainement de l'apprentissage supervisé est aussi simple que

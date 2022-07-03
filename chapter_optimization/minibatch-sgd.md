@@ -1,7 +1,7 @@
 # Minibatch Stochastic Gradient Descent
 :label:`sec_minibatch_sgd` 
 
- Jusqu'à présent, nous avons rencontré deux extrêmes dans l'approche de l'apprentissage par gradient : :numref:`sec_gd` utilise l'ensemble des données pour calculer les gradients et mettre à jour les paramètres, une passe à la fois. Inversement, :numref:`sec_sgd` traite un seul exemple d'entraînement à la fois pour progresser.
+Jusqu'à présent, nous avons rencontré deux extrêmes dans l'approche de l'apprentissage par gradient : :numref:`sec_gd` utilise l'ensemble des données pour calculer les gradients et mettre à jour les paramètres, une passe à la fois. Inversement, :numref:`sec_sgd` traite un seul exemple d'entraînement à la fois pour progresser.
 Chacune de ces méthodes présente ses propres inconvénients.
 La descente de gradient n'est pas particulièrement *efficace en termes de données* lorsque les données sont très similaires.
 La descente de gradient stochastique n'est pas particulièrement *efficace sur le plan du calcul* puisque les CPU et les GPU ne peuvent pas exploiter toute la puissance de la vectorisation.
@@ -21,7 +21,7 @@ Tout d'abord, un CPU de 2 GHz avec 16 cœurs et une vectorisation AVX-512 peut t
 
 Deuxièmement, il y a une surcharge importante pour le premier accès alors que l'accès séquentiel est relativement bon marché (c'est ce qu'on appelle souvent une lecture en rafale). Il y a beaucoup d'autres choses à garder à l'esprit, comme la mise en cache lorsque nous avons plusieurs sockets, chiplets et autres structures.
 Consultez le site [Wikipedia article](https://en.wikipedia.org/wiki/Cache_hierarchy) 
- pour une discussion plus approfondie.
+pour une discussion plus approfondie.
 
 La façon d'alléger ces contraintes est d'utiliser une hiérarchie de caches CPU qui sont réellement assez rapides pour alimenter le processeur en données. C'est la *force motrice du batching dans l'apprentissage profond. Pour simplifier les choses, considérons la multiplication matrice-matrice, disons $\mathbf{A} = \mathbf{B}\mathbf{C}$. Nous disposons d'un certain nombre d'options pour calculer $\mathbf{A}$. Par exemple, nous pouvons essayer ce qui suit :
 
@@ -216,15 +216,15 @@ print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
 
 :label:`sec_minibatches` 
 
- Dans le passé, nous avons considéré comme acquis le fait de lire des *minibatchs* de données plutôt que des observations uniques pour mettre à jour les paramètres. Nous en donnons maintenant une brève justification. Le traitement d'observations uniques nous oblige à effectuer de nombreuses multiplications matrice-vecteur (ou même vecteur-vecteur), ce qui est assez coûteux et entraîne une surcharge importante pour le cadre d'apprentissage profond sous-jacent. Cela s'applique à la fois à l'évaluation d'un réseau lorsqu'il est appliqué aux données (souvent appelé inférence) et au calcul des gradients pour mettre à jour les paramètres. C'est-à-dire que cela s'applique chaque fois que nous exécutons $\mathbf{w} \leftarrow \mathbf{w} - \eta_t \mathbf{g}_t$ où
+Dans le passé, nous avons considéré comme acquis le fait de lire des *minibatchs* de données plutôt que des observations uniques pour mettre à jour les paramètres. Nous en donnons maintenant une brève justification. Le traitement d'observations uniques nous oblige à effectuer de nombreuses multiplications matrice-vecteur (ou même vecteur-vecteur), ce qui est assez coûteux et entraîne une surcharge importante pour le cadre d'apprentissage profond sous-jacent. Cela s'applique à la fois à l'évaluation d'un réseau lorsqu'il est appliqué aux données (souvent appelé inférence) et au calcul des gradients pour mettre à jour les paramètres. C'est-à-dire que cela s'applique chaque fois que nous exécutons $\mathbf{w} \leftarrow \mathbf{w} - \eta_t \mathbf{g}_t$ où
 
 $$\mathbf{g}_t = \partial_{\mathbf{w}} f(\mathbf{x}_{t}, \mathbf{w})$$ 
 
- Nous pouvons augmenter l'efficacité *computationnelle* de cette opération en l'appliquant à un minibatch d'observations à la fois. En d'autres termes, nous remplaçons le gradient $\mathbf{g}_t$ sur une seule observation par un gradient sur un petit lot
+Nous pouvons augmenter l'efficacité *computationnelle* de cette opération en l'appliquant à un minibatch d'observations à la fois. En d'autres termes, nous remplaçons le gradient $\mathbf{g}_t$ sur une seule observation par un gradient sur un petit lot
 
 $$\mathbf{g}_t = \partial_{\mathbf{w}} \frac{1}{|\mathcal{B}_t|} \sum_{i \in \mathcal{B}_t} f(\mathbf{x}_{i}, \mathbf{w})$$ 
 
- Voyons ce que cela donne aux propriétés statistiques de $\mathbf{g}_t$: puisque $\mathbf{x}_t$ et tous les éléments du minilot $\mathcal{B}_t$ sont tirés uniformément au hasard de l'ensemble d'apprentissage, l'espérance du gradient reste inchangée. La variance, par contre, est réduite de manière significative. Puisque le gradient du minilot est composé de $b := |\mathcal{B}_t|$ gradients indépendants dont on fait la moyenne, son écart type est réduit par un facteur de $b^{-\frac{1}{2}}$. En soi, c'est une bonne chose, car cela signifie que les mises à jour sont alignées de manière plus fiable sur le gradient complet.
+Voyons ce que cela donne aux propriétés statistiques de $\mathbf{g}_t$: puisque $\mathbf{x}_t$ et tous les éléments du minilot $\mathcal{B}_t$ sont tirés uniformément au hasard de l'ensemble d'apprentissage, l'espérance du gradient reste inchangée. La variance, par contre, est réduite de manière significative. Puisque le gradient du minilot est composé de $b := |\mathcal{B}_t|$ gradients indépendants dont on fait la moyenne, son écart type est réduit par un facteur de $b^{-\frac{1}{2}}$. En soi, c'est une bonne chose, car cela signifie que les mises à jour sont alignées de manière plus fiable sur le gradient complet.
 
 Naïvement, cela pourrait indiquer que le choix d'un grand minibatch $\mathcal{B}_t$ serait universellement souhaitable. Hélas, après un certain point, la réduction supplémentaire de l'écart-type est minime par rapport à l'augmentation linéaire du coût de calcul. En pratique, nous choisissons un minibatch qui est suffisamment grand pour offrir une bonne efficacité de calcul tout en tenant dans la mémoire d'un GPU. Pour illustrer les économies réalisées, voyons un peu de code. Nous y effectuons la même multiplication matrice-matrice, mais cette fois-ci divisée en "minibatchs" de 64 colonnes à la fois.
 
@@ -255,7 +255,7 @@ timer.stop()
 print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
 
-Comme nous pouvons le voir, le calcul sur le minilot est essentiellement aussi efficace que sur la matrice complète. Une mise en garde s'impose. Dans :numref:`sec_batch_norm` , nous avons utilisé un type de régularisation qui dépendait fortement de la quantité de variance dans un minibatch. Lorsque nous augmentons cette dernière, la variance diminue et avec elle le bénéfice de l'injection de bruit due à la normalisation des lots. Voir, par exemple, :cite:`Ioffe.2017` pour plus de détails sur la façon de remettre à l'échelle et de calculer les termes appropriés.
+Comme nous pouvons le voir, le calcul sur le minilot est essentiellement aussi efficace que sur la matrice complète. Une mise en garde s'impose. Dans :numref:`sec_batch_norm`, nous avons utilisé un type de régularisation qui dépendait fortement de la quantité de variance dans un minibatch. Lorsque nous augmentons cette dernière, la variance diminue et avec elle le bénéfice de l'injection de bruit due à la normalisation des lots. Voir, par exemple, :cite:`Ioffe.2017` pour plus de détails sur la façon de remettre à l'échelle et de calculer les termes appropriés.
 
 ## Lecture du jeu de données
 
@@ -311,10 +311,10 @@ def get_data_ch11(batch_size=10, n=1500):
 
 ## Implémentation à partir de zéro
 
-Rappelez-vous l'implémentation de la descente de gradient stochastique en minibatch de :numref:`sec_linear_scratch` . Dans ce qui suit, nous fournissons une implémentation légèrement plus générale. Par commodité, elle a la même signature d'appel que les autres algorithmes d'optimisation présentés plus loin dans ce chapitre. Plus précisément, nous ajoutons l'état
+Rappelez-vous l'implémentation de la descente de gradient stochastique en minibatch de :numref:`sec_linear_scratch`. Dans ce qui suit, nous fournissons une implémentation légèrement plus générale. Par commodité, elle a la même signature d'appel que les autres algorithmes d'optimisation présentés plus loin dans ce chapitre. Plus précisément, nous ajoutons l'état
 à l'entrée `states` et plaçons l'hyperparamètre dans le dictionnaire `hyperparams`. En outre,
-nous calculons la moyenne de la perte de chaque exemple de minilots dans la fonction d'apprentissage
-, de sorte que le gradient dans l'algorithme d'optimisation n'a pas besoin d'être
+nous calculons la moyenne de la perte de chaque exemple de minilots dans la fonction d'apprentissage,
+de sorte que le gradient dans l'algorithme d'optimisation n'a pas besoin d'être
 divisé par la taille du lot.
 
 ```{.python .input}

@@ -1,7 +1,7 @@
 # Adam
 :label:`sec_adam` 
 
- Dans les discussions qui ont précédé cette section, nous avons rencontré un certain nombre de techniques d'optimisation efficace. Récapitulons-les en détail ici :
+Dans les discussions qui ont précédé cette section, nous avons rencontré un certain nombre de techniques d'optimisation efficace. Récapitulons-les en détail ici :
 
 * Nous avons vu que :numref:`sec_sgd` est plus efficace que la descente par gradient pour résoudre les problèmes d'optimisation, par exemple, en raison de sa résistance inhérente aux données redondantes. 
 * Nous avons vu que :numref:`sec_minibatch_sgd` offre une efficacité supplémentaire significative découlant de la vectorisation, en utilisant de plus grands ensembles d'observations dans un minibatch. C'est la clé de l'efficacité du traitement parallèle multi-machine, multi-GPU et global. 
@@ -24,17 +24,17 @@ Ici, $\beta_1$ et $\beta_2$ sont des paramètres de pondération non négatifs. 
 
 $$\hat{\mathbf{v}}_t = \frac{\mathbf{v}_t}{1 - \beta_1^t} \text{ and } \hat{\mathbf{s}}_t = \frac{\mathbf{s}_t}{1 - \beta_2^t}.$$ 
 
- Armés des estimations appropriées, nous pouvons maintenant écrire les équations de mise à jour. Tout d'abord, nous ré-échelonnons le gradient d'une manière très proche de celle de RMSProp pour obtenir
+Armés des estimations appropriées, nous pouvons maintenant écrire les équations de mise à jour. Tout d'abord, nous ré-échelonnons le gradient d'une manière très proche de celle de RMSProp pour obtenir
 
 $$\mathbf{g}_t' = \frac{\eta \hat{\mathbf{v}}_t}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon}.$$ 
 
- Contrairement à RMSProp, notre mise à jour utilise le momentum $\hat{\mathbf{v}}_t$ plutôt que le gradient lui-même. De plus, il y a une légère différence cosmétique car le changement d'échelle se fait en utilisant $\frac{1}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon}$ au lieu de $\frac{1}{\sqrt{\hat{\mathbf{s}}_t + \epsilon}}$. Le premier fonctionne sans doute un peu mieux en pratique, d'où la déviation par rapport à RMSProp. En général, nous choisissons $\epsilon = 10^{-6}$ pour un bon compromis entre stabilité et fidélité numériques. 
+Contrairement à RMSProp, notre mise à jour utilise le momentum $\hat{\mathbf{v}}_t$ plutôt que le gradient lui-même. De plus, il y a une légère différence cosmétique car le changement d'échelle se fait en utilisant $\frac{1}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon}$ au lieu de $\frac{1}{\sqrt{\hat{\mathbf{s}}_t + \epsilon}}$. Le premier fonctionne sans doute un peu mieux en pratique, d'où la déviation par rapport à RMSProp. En général, nous choisissons $\epsilon = 10^{-6}$ pour un bon compromis entre stabilité et fidélité numériques. 
 
 Nous avons maintenant toutes les pièces en place pour calculer les mises à jour. C'est un peu décevant et nous avons une simple mise à jour de la forme
 
 $$\mathbf{x}_t \leftarrow \mathbf{x}_{t-1} - \mathbf{g}_t'.$$ 
 
- En examinant la conception d'Adam, son inspiration est claire. Le momentum et l'échelle sont clairement visibles dans les variables d'état. Leur définition assez particulière nous oblige à débaptiser les termes (cela pourrait être corrigé par une condition d'initialisation et de mise à jour légèrement différente). Deuxièmement, la combinaison des deux termes est assez simple, étant donné RMSProp. Enfin, le taux d'apprentissage explicite $\eta$ nous permet de contrôler la longueur du pas pour résoudre les problèmes de convergence. 
+En examinant la conception d'Adam, son inspiration est claire. Le momentum et l'échelle sont clairement visibles dans les variables d'état. Leur définition assez particulière nous oblige à débaptiser les termes (cela pourrait être corrigé par une condition d'initialisation et de mise à jour légèrement différente). Deuxièmement, la combinaison des deux termes est assez simple, étant donné RMSProp. Enfin, le taux d'apprentissage explicite $\eta$ nous permet de contrôler la longueur du pas pour résoudre les problèmes de convergence. 
 
 ## Mise en œuvre 
 
@@ -146,11 +146,11 @@ L'un des problèmes d'Adam est qu'il peut échouer à converger même dans des p
 
 $$\mathbf{s}_t \leftarrow \mathbf{s}_{t-1} + (1 - \beta_2) \left(\mathbf{g}_t^2 - \mathbf{s}_{t-1}\right).$$ 
 
- Lorsque $\mathbf{g}_t^2$ a une variance élevée ou que les mises à jour sont rares, $\mathbf{s}_t$ peut oublier trop rapidement les valeurs passées. Une solution possible consiste à remplacer $\mathbf{g}_t^2 - \mathbf{s}_{t-1}$ par $\mathbf{g}_t^2 \odot \mathop{\mathrm{sgn}}(\mathbf{g}_t^2 - \mathbf{s}_{t-1})$. Maintenant, l'ampleur de la mise à jour ne dépend plus de l'importance de la déviation. Cela donne les mises à jour de Yogi
+Lorsque $\mathbf{g}_t^2$ a une variance élevée ou que les mises à jour sont rares, $\mathbf{s}_t$ peut oublier trop rapidement les valeurs passées. Une solution possible consiste à remplacer $\mathbf{g}_t^2 - \mathbf{s}_{t-1}$ par $\mathbf{g}_t^2 \odot \mathop{\mathrm{sgn}}(\mathbf{g}_t^2 - \mathbf{s}_{t-1})$. Maintenant, l'ampleur de la mise à jour ne dépend plus de l'importance de la déviation. Cela donne les mises à jour de Yogi
 
 $$\mathbf{s}_t \leftarrow \mathbf{s}_{t-1} + (1 - \beta_2) \mathbf{g}_t^2 \odot \mathop{\mathrm{sgn}}(\mathbf{g}_t^2 - \mathbf{s}_{t-1}).$$ 
 
- Les auteurs conseillent en outre d'initialiser le momentum sur un lot initial plus important plutôt que sur une simple estimation ponctuelle initiale. Nous omettons les détails car ils ne sont pas importants pour la discussion et car même sans cela, la convergence reste assez bonne.
+Les auteurs conseillent en outre d'initialiser le momentum sur un lot initial plus important plutôt que sur une simple estimation ponctuelle initiale. Nous omettons les détails car ils ne sont pas importants pour la discussion et car même sans cela, la convergence reste assez bonne.
 
 ```{.python .input}
 #@tab mxnet

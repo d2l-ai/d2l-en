@@ -1,7 +1,7 @@
 # `d2l` Document API
 :label:`sec_d2l` 
 
- Les implémentations des membres suivants du paquetage `d2l` et les sections où ils sont définis et expliqués peuvent être trouvés dans le [source file](https://github.com/d2l-ai/d2l-en/tree/master/d2l).
+Les implémentations des membres suivants du paquetage `d2l` et les sections où ils sont définis et expliqués peuvent être trouvés dans le [source file](https://github.com/d2l-ai/d2l-en/tree/master/d2l).
 
 
 :begin_tab:`mxnet`

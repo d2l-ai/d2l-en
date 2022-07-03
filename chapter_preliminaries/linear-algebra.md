@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Linear Algebra
 :label:`sec_linear-algebra` 
 
- Nous savons maintenant charger des ensembles de données dans des tenseurs
+Nous savons maintenant charger des ensembles de données dans des tenseurs
 et manipuler ces tenseurs 
 avec des opérations mathématiques de base.
 Pour commencer à construire des modèles sophistiqués,
@@ -21,19 +21,19 @@ et en progressant vers la multiplication matricielle.
 ## Scalars
 
 
- La plupart des mathématiques quotidiennes
+La plupart des mathématiques quotidiennes
 consistent à manipuler 
 des nombres, un par un.
 Formellement, nous appelons ces valeurs des *scalaires*.
 Par exemple, la température à Palo Alto 
 est un doux $72$ degrés Fahrenheit.
-Si vous vouliez convertir la température en degrés Celsius
-, vous évalueriez l'expression 
+Si vous vouliez convertir la température en degrés Celsius,
+vous évalueriez l'expression 
 $c = \frac{5}{9}(f - 32)$ , en fixant $f$ à $72$.
 Dans cette équation, les valeurs 
 $5$ , $9$ et $32$ sont des scalaires.
 Les variables $c$ et $f$ 
- représentent des scalaires inconnus.
+représentent des scalaires inconnus.
 
 Nous désignons les scalaires
 par les lettres minuscules ordinaires 
@@ -43,11 +43,11 @@ et l'espace de tous les scalaires (continus)
 Pour des raisons de commodité, nous passerons sur les définitions rigoureuses des *espaces* de
 .
 Retenez simplement que l'expression $x \in \mathbb{R}$
- est une façon formelle de dire que $x$ est un scalaire à valeurs réelles.
+est une façon formelle de dire que $x$ est un scalaire à valeurs réelles.
 Le symbole $\in$ (prononcé "in")
 dénote l'appartenance à un ensemble.
 Par exemple, $x, y \in \{0, 1\}$
- indique que $x$ et $y$ sont des variables
+indique que $x$ et $y$ sont des variables
 qui ne peuvent prendre que les valeurs $0$ ou $1$.
 
 (**Les scalaires sont implémentés comme des tenseurs qui ne contiennent qu'un seul élément.**)
@@ -211,14 +211,14 @@ au nombre de composants.
 ## Matrices
 
 Tout comme les scalaires sont des tenseurs d'ordre $0^{\mathrm{th}}$
- et les vecteurs des tenseurs d'ordre $1^{\mathrm{st}}$, les matrices
+et les vecteurs des tenseurs d'ordre $1^{\mathrm{st}}$, les matrices
 sont des tenseurs d'ordre $2^{\mathrm{nd}}$.
 Nous désignons les matrices par des lettres majuscules en gras
 (par exemple, $\mathbf{X}$, $\mathbf{Y}$, et $\mathbf{Z}$),
 et les représentons en code par des tenseurs à deux axes.
 L'expression $\mathbf{A} \in \mathbb{R}^{m \times n}$
- indique qu'une matrice $\mathbf{A}$ 
- contient $m \times n$ des scalaires à valeurs réelles,
+indique qu'une matrice $\mathbf{A}$ 
+contient $m \times n$ des scalaires à valeurs réelles,
 disposés en $m$ lignes et $n$ colonnes.
 Lorsque $m = n$, on dit qu'une matrice est *carrée*.
 Visuellement, nous pouvons illustrer toute matrice comme un tableau.
@@ -228,11 +228,11 @@ $a_{ij}$ est la valeur qui appartient à la ligne
 $i^{\mathrm{th}}$ et à la colonne $j^{\mathrm{th}}$ de $\mathbf{A}$:
 
 $$\mathbf{A}=\begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1n} \\ a_{21} & a_{22} & \cdots & a_{2n} \\ \vdots & \vdots & \ddots & \vdots \\ a_{m1} & a_{m2} & \cdots & a_{mn} \\ \end{bmatrix}.$$ 
- :eqlabel:`eq_matrix_def` 
+:eqlabel:`eq_matrix_def` 
 
  
- En code, nous représentons une matrice $\mathbf{A} \in \mathbb{R}^{m \times n}$
- par un tenseur d'ordre $2^{\mathrm{nd}}$ de forme ($m$, $n$).
+En code, nous représentons une matrice $\mathbf{A} \in \mathbb{R}^{m \times n}$
+par un tenseur d'ordre $2^{\mathrm{nd}}$ de forme ($m$, $n$).
 [**Nous pouvons convertir tout tenseur $m \times n$ de taille appropriée en une matrice $m \times n$**] 
 en passant la forme souhaitée à `reshape`:
 
@@ -258,10 +258,10 @@ Parfois, nous voulons inverser les axes.
 Lorsque nous échangeons les lignes et les colonnes d'une matrice,
 le résultat est appelé sa *transposée*.
 Formellement, nous désignons la transposition de la matrice $\mathbf{A}$ 
- par $\mathbf{A}^\top$ et si $\mathbf{B} = \mathbf{A}^\top$, 
+par $\mathbf{A}^\top$ et si $\mathbf{B} = \mathbf{A}^\top$, 
 alors $b_{ij} = a_{ji}$ pour tous $i$ et $j$.
 Ainsi, la transposée d'une matrice $m \times n$ 
- est une matrice $n \times m$:
+est une matrice $n \times m$:
 
 $$
 \mathbf{A}^\top =
@@ -341,7 +341,7 @@ suit naturellement celui des matrices.
 Les tenseurs deviendront plus importants 
 lorsque nous commencerons à travailler avec des images.
 Chaque image se présente comme un tenseur d'ordre $3^{\mathrm{rd}}$
- dont les axes correspondent à la hauteur, à la largeur et au *canal*.
+dont les axes correspondent à la hauteur, à la largeur et au *canal*.
 À chaque emplacement spatial, les intensités 
 de chaque couleur (rouge, vert et bleu)
 sont empilées le long du canal. 
@@ -458,7 +458,7 @@ a + X, (a * X).shape
 ## Réduction
 :label:`subsec_lin-alg-reduction` 
 
- Souvent, nous souhaitons calculer [**la somme des éléments d'un tenseur.**]
+Souvent, nous souhaitons calculer [**la somme des éléments d'un tenseur.**]
 Pour exprimer la somme des éléments d'un vecteur $\mathbf{x}$ de longueur $n$,
 nous écrivons $\sum_{i=1}^n x_i$. Il existe une fonction simple pour cela :
 
@@ -484,7 +484,7 @@ Pour exprimer [**sommes sur les éléments de tenseurs de forme arbitraire**],
 nous faisons simplement la somme sur tous ses axes. 
 Par exemple, la somme des éléments 
 d'une matrice $m \times n$ $\mathbf{A}$ 
- peut s'écrire $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
+peut s'écrire $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
 
 ```{.python .input}
 %%tab mxnet
@@ -604,7 +604,7 @@ tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 ## Somme sans réduction
 :label:`subsec_lin-alg-non-reduction` 
 
- Parfois, il peut être utile de [**garder le nombre d'axes inchangé**]
+Parfois, il peut être utile de [**garder le nombre d'axes inchangé**]
 lorsque l'on invoque la fonction de calcul de la somme ou de la moyenne. 
 C'est important lorsque l'on veut utiliser le mécanisme de diffusion.
 
@@ -716,10 +716,10 @@ tf.reduce_sum(x * y)
 Les produits scalaires sont utiles dans un grand nombre de contextes.
 Par exemple, pour un ensemble de valeurs,
 désigné par un vecteur $\mathbf{x}  \in \mathbb{R}^n$
- et un ensemble de poids désignés par $\mathbf{w} \in \mathbb{R}^n$,
+et un ensemble de poids désignés par $\mathbf{w} \in \mathbb{R}^n$,
 la somme pondérée des valeurs de $\mathbf{x}$
- en fonction des poids $\mathbf{w}$
- peut être exprimée par le produit scalaire $\mathbf{x}^\top \mathbf{w}$.
+en fonction des poids $\mathbf{w}$
+peut être exprimée par le produit scalaire $\mathbf{x}^\top \mathbf{w}$.
 Lorsque les poids sont non négatifs
 et que leur somme est égale à un, c'est-à-dire $\left(\sum_{i=1}^{n} {w_i} = 1\right)$,
 le produit scalaire exprime une *moyenne pondérée*.
@@ -733,7 +733,7 @@ Plus loin dans cette section, nous introduirons formellement cette notion de *lo
 Maintenant que nous savons comment calculer les produits scalaires,
 nous pouvons commencer à comprendre le *produit*
 entre une matrice $m \times n$ $\mathbf{A}$ 
- et un vecteur $n$-dimensionnel $\mathbf{x}$.
+et un vecteur $n$-dimensionnel $\mathbf{x}$.
 Pour commencer, nous visualisons notre matrice
 en fonction de ses vecteurs de lignes
 
@@ -746,8 +746,8 @@ $$\mathbf{A}=
 \end{bmatrix},$$
 
 où chaque $\mathbf{a}^\top_{i} \in \mathbb{R}^n$
- est un vecteur ligne représentant la ligne $i^\mathrm{th}$ 
- de la matrice $\mathbf{A}$.
+est un vecteur ligne représentant la ligne $i^\mathrm{th}$ 
+de la matrice $\mathbf{A}$.
 
 [**Le produit matrice-vecteur $\mathbf{A}\mathbf{x}$ est simplement un vecteur colonne de longueur $m$, dont l'élément $i^\mathrm{th}$ est le produit scalaire $\mathbf{a}^\top_i \mathbf{x}$ :**]
 
@@ -769,7 +769,7 @@ $$
 
 Nous pouvons considérer la multiplication avec une matrice
 $\mathbf{A}\in \mathbb{R}^{m \times n}$ 
- comme une transformation qui projette les vecteurs
+comme une transformation qui projette les vecteurs
 de $\mathbb{R}^{n}$ à $\mathbb{R}^{m}$.
 Ces transformations sont remarquablement utiles.
 Par exemple, nous pouvons représenter les rotations
@@ -796,7 +796,7 @@ Notez que la dimension de la colonne de `A`
  (sa longueur le long de l'axe 1)
 doit être la même que la dimension de `x` (sa longueur). 
 PyTorch possède un opérateur de commodité `@` 
- qui peut exécuter à la fois des produits matrice-vecteur
+qui peut exécuter à la fois des produits matrice-vecteur
 et matrice-matrice
 (en fonction de ses arguments). 
 Ainsi, nous pouvons écrire `A@x`.
@@ -832,13 +832,13 @@ la multiplication *matrice-matrice* devrait être simple.
 
 Disons que nous avons deux matrices 
 $\mathbf{A} \in \mathbb{R}^{n \times k}$ 
- et $\mathbf{B} \in \mathbb{R}^{k \times m}$:
+et $\mathbf{B} \in \mathbb{R}^{k \times m}$:
 
 $$\mathbf{A}=\begin{bmatrix}
- a_{11} & a_{12} & \cdots & a_{1k} \\
- a_{21} & a_{22} & \cdots & a_{2k} \\
+a_{11} & a_{12} & \cdots & a_{1k} \\
+a_{21} & a_{22} & \cdots & a_{2k} \\
 \vdots & \vdots & \ddots & \vdots \\
- a_{n1} & a_{n2} & \cdots & a_{nk} \\
+a_{n1} & a_{n2} & \cdots & a_{nk} \\
 \end{bmatrix},\quad
 \mathbf{B}=\begin{bmatrix}
  b_{11} & b_{12} & \cdots & b_{1m} \\
@@ -849,11 +849,11 @@ $$\mathbf{A}=\begin{bmatrix}
 
 
 Désignons par $\mathbf{a}^\top_{i} \in \mathbb{R}^k$ 
- le vecteur ligne représentant la ligne $i^\mathrm{th}$ 
- de la matrice $\mathbf{A}$
- et par $\mathbf{b}_{j} \in \mathbb{R}^k$ 
- le vecteur colonne de la colonne $j^\mathrm{th}$ 
- de la matrice $\mathbf{B}$:
+le vecteur ligne représentant la ligne $i^\mathrm{th}$ 
+de la matrice $\mathbf{A}$
+et par $\mathbf{b}_{j} \in \mathbb{R}^k$ 
+le vecteur colonne de la colonne $j^\mathrm{th}$ 
+de la matrice $\mathbf{B}$:
 
 $$\mathbf{A}=
 \begin{bmatrix}
@@ -870,9 +870,9 @@ $$
 
 Pour former le produit matriciel $\mathbf{C} \in \mathbb{R}^{n \times m}$,
 nous calculons simplement chaque élément $c_{ij}$
- comme le produit scalaire entre 
+comme le produit scalaire entre 
 la ligne $i^{\mathrm{th}}$ de $\mathbf{A}$
- et la ligne $j^{\mathrm{th}}$ de $\mathbf{B}$,
+et la ligne $j^{\mathrm{th}}$ de $\mathbf{B}$,
 c'est-à-dire $\mathbf{a}^\top_i \mathbf{b}_j$:
 
 $$\mathbf{C} = \mathbf{AB} = \begin{bmatrix}
@@ -926,7 +926,7 @@ et ne doit pas être confondu avec le produit Hadamard.
 ## Normes
 :label:`subsec_lin-algebra-norms` 
 
- Certains des opérateurs les plus utiles en algèbre linéaire sont les *normes*.
+Certains des opérateurs les plus utiles en algèbre linéaire sont les *normes*.
 De manière informelle, la norme d'un vecteur nous indique sa *taille*. 
 Par exemple, la norme $\\ell_2$ mesure
 la longueur (euclidienne) d'un vecteur.
@@ -937,13 +937,13 @@ Une norme est une fonction $\| \cdot \|$ qui fait correspondre un vecteur
 à un scalaire et qui satisfait aux trois propriétés suivantes :
 
 1. Étant donné un vecteur quelconque $\mathbf{x}$, si nous mettons à l'échelle (tous les éléments) du vecteur 
- par un scalaire $\alpha \in \mathbb{R}$, sa norme est mise à l'échelle en conséquence :
- $$\|\alpha \mathbf{x}\| = |\alpha| \|\mathbf{x}\|.$$
+par un scalaire $\alpha \in \mathbb{R}$, sa norme est mise à l'échelle en conséquence :
+$$\|\alpha \mathbf{x}\| = |\alpha| \|\mathbf{x}\|.$$
 2. Pour tout vecteur $\mathbf{x}$ et $\mathbf{y}$:
- les normes satisfont l'inégalité triangulaire :
- $$\|\mathbf{x} + \mathbf{y}\| \leq \|\mathbf{x}\| + \|\mathbf{y}\|.$$ 
+les normes satisfont l'inégalité triangulaire :
+$$\|\mathbf{x} + \mathbf{y}\| \leq \|\mathbf{x}\| + \|\mathbf{y}\|.$$ 
  3. La norme d'un vecteur est non négative et ne disparaît que si le vecteur est nul :
- $$\|\mathbf{x}\| > 0 \text{ for all } \mathbf{x} \neq 0.$$
+$$\|\mathbf{x}\| > 0 \text{ for all } \mathbf{x} \neq 0.$$
 
 De nombreuses fonctions sont des normes valides et différentes normes 
 codent différentes notions de taille. 
@@ -1006,12 +1006,12 @@ des normes plus générales $\ell_p$ *norms* :
 
 $$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$ 
 
- Dans le cas des matrices, les choses sont plus compliquées. 
+Dans le cas des matrices, les choses sont plus compliquées. 
 Après tout, les matrices peuvent être considérées à la fois comme des collections d'entrées individuelles 
 *et* comme des objets qui opèrent sur des vecteurs et les transforment en d'autres vecteurs. 
 Par exemple, nous pouvons nous demander de combien de temps 
 le produit matrice-vecteur $\mathbf{X} \mathbf{v}$ 
- pourrait être par rapport à $\mathbf{v}$. 
+pourrait être par rapport à $\mathbf{v}$. 
 Ce raisonnement conduit à une norme appelée norme *spectrale*. 
 Pour l'instant, nous introduisons [**la *norme de Frobenius*, qui est beaucoup plus facile à calculer**] et définie comme
 la racine carrée de la somme des carrés 
@@ -1082,26 +1082,26 @@ nous concluons cette section ici.
 Si vous êtes impatient d'en savoir plus sur l'algèbre linéaire,
 il existe de nombreux livres et ressources en ligne excellents.
 Pour un cours accéléré plus avancé, vous pouvez consulter
-:cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008` .
+:cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008`.
 
 Pour récapituler :
 
 * Les scalaires, les vecteurs, les matrices et les tenseurs sont 
- les objets mathématiques de base utilisés en algèbre linéaire 
- et ont respectivement zéro, un, deux et un nombre arbitraire d'axes.
+les objets mathématiques de base utilisés en algèbre linéaire 
+et ont respectivement zéro, un, deux et un nombre arbitraire d'axes.
 * Les tenseurs peuvent être découpés ou réduits le long d'axes spécifiques 
- via l'indexation, ou des opérations telles que `sum` et `mean`, respectivement.
+via l'indexation, ou des opérations telles que `sum` et `mean`, respectivement.
 * Les produits par éléments sont appelés produits de Hadamard. 
   En revanche, les produits par points, les produits matrice-vecteur et les produits matrice-matrice 
- ne sont pas des opérations par éléments et renvoient en général des objets 
- dont la forme est différente de celle des opérandes. 
+ne sont pas des opérations par éléments et renvoient en général des objets 
+dont la forme est différente de celle des opérandes. 
 * Par rapport aux produits Hadamard, les produits matrice-matrice 
- sont considérablement plus longs à calculer (temps cubique plutôt que quadratique).
+sont considérablement plus longs à calculer (temps cubique plutôt que quadratique).
 * Les normes capturent diverses notions de la magnitude d'un vecteur, 
- et sont généralement appliquées à la différence de deux vecteurs 
- pour mesurer leur distance.
+et sont généralement appliquées à la différence de deux vecteurs 
+pour mesurer leur distance.
 * Les normes vectorielles courantes comprennent les normes $\ell_1$ et $\ell_2$, 
- et les normes matricielles courantes comprennent les normes *spectrales* et *de Frobenius*.
+et les normes matricielles courantes comprennent les normes *spectrales* et *de Frobenius*.
 
 
 ## Exercices

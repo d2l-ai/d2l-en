@@ -1,8 +1,8 @@
 # Réseaux neuronaux linéaires pour la classification
 :label:`chap_classification` 
 
- Maintenant que vous avez maîtrisé tous les mécanismes
-, vous êtes prêt à appliquer ces compétences à des types de tâches plus larges.
+Maintenant que vous avez maîtrisé tous les mécanismes,
+vous êtes prêt à appliquer ces compétences à des types de tâches plus larges.
 Même si nous pivotons vers la classification,
 la plupart de la plomberie reste la même :
 charger les données, les faire passer dans le modèle,

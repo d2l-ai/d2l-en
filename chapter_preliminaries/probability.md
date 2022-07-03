@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Probabilité et statistiques
 :label:`sec_prob` 
 
- D'une manière ou d'une autre, 
+D'une manière ou d'une autre, 
 l'apprentissage automatique concerne l'incertitude.
 Dans l'apprentissage supervisé, nous voulons prédire 
 quelque chose d'inconnu (la *cible*)
@@ -62,7 +62,7 @@ sur la façon dont on doit mettre à jour ses croyances
 à la lumière de nouvelles preuves,
 elle permet à différents individus 
 de commencer avec différentes *croyances préalables*.
- les *statistiques* nous aident à raisonner à rebours,
+les *statistiques* nous aident à raisonner à rebours,
 en commençant par la collecte et l'organisation des données
 et en remontant jusqu'aux inférences 
 que nous pourrions tirer du processus 
@@ -84,12 +84,12 @@ dont vous avez besoin pour commencer à construire des modèles.
 Imaginez que nous prévoyons de lancer une pièce de monnaie
 et que nous voulons quantifier la probabilité
 de voir apparaître face (par rapport à pile).
-Si la pièce est *juste*, 
-, les deux résultats 
+Si la pièce est *juste*,
+les deux résultats 
 (pile et face), 
 sont également probables.
-De plus, si nous prévoyons de lancer la pièce $n$ plusieurs fois
-, la fraction de face 
+De plus, si nous prévoyons de lancer la pièce $n$ plusieurs fois,
+la fraction de face 
 que nous *espérons* voir
 devrait correspondre exactement à
 à la fraction de pile *attendue*.
@@ -115,7 +115,7 @@ un lancer donné sortira face.
 Les probabilités attribuent des notes comprises entre $0$ et $1$
  à des résultats intéressants, appelés *événements*.
 Ici, l'événement d'intérêt est $\textrm{heads}$
- et nous désignons la probabilité correspondante par $P(\textrm{heads})$.
+et nous désignons la probabilité correspondante par $P(\textrm{heads})$.
 Une probabilité de $1$ indique une certitude absolue 
 (imaginez une pièce de monnaie truquée dont les deux côtés sont face)
 et une probabilité de $0$ indique une impossibilité
@@ -125,7 +125,7 @@ mais plutôt des *statistiques*.
 Les probabilités sont des quantités *théoriques* 
 qui sous-tendent le processus de génération des données.
 Ici, la probabilité $1/2$ 
- est une propriété de la pièce elle-même.
+est une propriété de la pièce elle-même.
 En revanche, les statistiques sont des quantités *empiriques*
 qui sont calculées en tant que fonctions des données observées.
 Nos intérêts pour les quantités probabilistes et statistiques
@@ -196,10 +196,10 @@ nous pouvons faire appel à n'importe quel générateur de nombres aléatoires.
 Il existe des moyens simples de tirer des échantillons 
 d'un événement avec une probabilité $0.5$.
 Par exemple, le générateur de nombres aléatoires de Python `random.random`
- donne des nombres dans l'intervalle $[0,1]$
- où la probabilité de se trouver 
+donne des nombres dans l'intervalle $[0,1]$
+où la probabilité de se trouver 
 dans n'importe quel sous-intervalle $[a, b] \subset [0,1]$
- est égale à $b-a$.
+est égale à $b-a$.
 Ainsi, nous pouvons extraire `0` et `1` avec la probabilité `0.5` chaque
 en testant si le flottant retourné est supérieur à `0.5`
 
@@ -220,8 +220,8 @@ en définissant le premier argument
 comme le nombre de tirages
 et le second comme une liste de probabilités
 associées à chacun des résultats possibles.
-Pour simuler dix tirages d'une pièce de monnaie équitable, 
-, nous attribuons le vecteur de probabilité `[0.5, 0.5]`,
+Pour simuler dix tirages d'une pièce de monnaie équitable,
+nous attribuons le vecteur de probabilité `[0.5, 0.5]`,
 en interprétant l'indice 0 comme étant pile
 et l'indice 1 comme étant face.
 La fonction renvoie un vecteur 
@@ -253,8 +253,8 @@ tfd.Multinomial(100, fair_probs).sample()
 Chaque fois que vous exécutez ce processus d'échantillonnage,
 vous recevez une nouvelle valeur aléatoire 
 qui peut être différente du résultat précédent. 
-En divisant par le nombre de lancers
-, nous obtenons la *fréquence* 
+En divisant par le nombre de lancers,
+ nous obtenons la *fréquence* 
 de chaque résultat dans nos données.
 Notez que ces fréquences,
 comme les probabilités 
@@ -382,7 +382,7 @@ nous devrons être plus précis.
 
 Lorsqu'il est question d'aléatoire, 
 nous désignons l'ensemble des résultats possibles $\mathcal{S}$
- et l'appelons *espace d'échantillonnage* ou *espace des résultats*.
+et l'appelons *espace d'échantillonnage* ou *espace des résultats*.
 Ici, chaque élément est un *résultat possible distinct.
 Dans le cas du lancer d'une seule pièce de monnaie,
 $\mathcal{S} = \{\textrm{heads}, \textrm{tails}\}$ .
@@ -407,7 +407,7 @@ mais $\mathcal{B}$ oui.
 Une fonction de *probabilité* associe des événements 
 à des valeurs réelles ${P: \mathcal{A} \subseteq \mathcal{S} \rightarrow [0,1]}$.
 La probabilité d'un événement $\mathcal{A}$ 
- dans l'espace d'échantillonnage donné $\mathcal{S}$,
+dans l'espace d'échantillonnage donné $\mathcal{S}$,
 noté $P(\mathcal{A})$,
 satisfait aux propriétés suivantes :
 
@@ -416,14 +416,14 @@ satisfait aux propriétés suivantes :
 * Pour toute séquence dénombrable d'événements $\mathcal{A}_1, \mathcal{A}_2, \ldots$ qui sont *mutuellement exclusifs* ($\mathcal{A}_i \cap \mathcal{A}_j = \emptyset$ pour tout $i \neq j$), la probabilité que l'un d'entre eux se produise est égale à la somme de leurs probabilités individuelles, c'est-à-dire $P(\bigcup_{i=1}^{\infty} \mathcal{A}_i) = \sum_{i=1}^{\infty} P(\mathcal{A}_i)$.
 
 Ces axiomes de la théorie des probabilités,
-proposés par :cite:`Kolmogorov.1933` ,
+proposés par :cite:`Kolmogorov.1933`,
 peuvent être appliqués pour dériver rapidement un certain nombre de conséquences importantes.
 Par exemple, il s'ensuit immédiatement
 que la probabilité que tout événement $\mathcal{A}$
 *ou* son complément $\mathcal{A}'$ se produise est de 1 
 (car $\mathcal{A} \cup \mathcal{A}' = \mathcal{S}$).
 Nous pouvons également prouver que $P(\emptyset) = 0$
- parce que $1 = P(\mathcal{S} \cup \mathcal{S}') = P(\mathcal{S} \cup \emptyset) = P(\mathcal{S}) + P(\emptyset) = 1 + P(\emptyset)$.
+parce que $1 = P(\mathcal{S} \cup \mathcal{S}') = P(\mathcal{S} \cup \emptyset) = P(\mathcal{S}) + P(\emptyset) = 1 + P(\emptyset)$.
 Par conséquent, la probabilité que tout événement $\mathcal{A}$
 *et* son complément $\mathcal{A}'$ se produise simultanément 
 est $P(\mathcal{A} \cap \mathcal{A}') = 0$.
@@ -441,8 +441,8 @@ Formellement, les variables aléatoires sont des mappings
 d'un espace d'échantillonnage sous-jacent 
 vers un ensemble de valeurs (éventuellement nombreuses).
 Vous pouvez vous demander en quoi une variable aléatoire 
-est différente de l'espace d'échantillonnage
-, puisque tous deux sont des collections de résultats. 
+est différente de l'espace d'échantillonnage,
+puisque tous deux sont des collections de résultats. 
 Il est important de noter que les variables aléatoires peuvent être beaucoup plus grossières 
 que l'espace d'échantillonnage brut.
 Nous pouvons définir une variable aléatoire binaire comme "supérieure à 0,5"
@@ -463,7 +463,7 @@ nous pouvons soupçonner que la maison a probablement été cambriolée.
 Chaque valeur prise par une variable aléatoire correspond 
 à un sous-ensemble de l'espace d'échantillonnage sous-jacent.
 Ainsi, l'occurrence où la variable aléatoire $X$
- prend la valeur $v$, désignée par $X=v$, est un *événement*
+prend la valeur $v$, désignée par $X=v$, est un *événement*
 et $P(X=v)$ désigne sa probabilité.
 Parfois, cette notation peut devenir encombrante,
 et nous pouvons abuser de la notation lorsque le contexte est clair.
@@ -490,8 +490,8 @@ comme les tirages à pile ou face ou les lancers de dé,
 et les variables *continues*,
 comme le poids et la taille d'une personne
 échantillonnée au hasard dans la population.
-Dans ce cas, il est rare que la taille exacte d'une personne nous intéresse vraiment 
-. 
+Dans ce cas, il est rare que la taille exacte d'une personne nous intéresse vraiment .
+
 De plus, si nous prenions des mesures suffisamment précises,
 nous constaterions que deux personnes sur la planète 
 n'ont pas exactement la même taille. 
@@ -562,13 +562,13 @@ et renvoie simplement la probabilité attribuée
 de l'espace d'échantillonnage. 
 La probabilité *conjointe* attribuée à l'événement 
 où les variables aléatoires $A$ et $B$ 
- prennent les valeurs $a$ et $b$, respectivement,
+prennent les valeurs $a$ et $b$, respectivement,
 est désignée par $P(A = a, B = b)$,
 où la virgule indique "et". 
 Notez que pour toute valeur de $a$ et de $b$,
 il s'avère que
 $P(A=a, B=b) \leq P(A=a)$ 
- et $P(A=a, B=b) \leq P(B = b)$,
+et $P(A=a, B=b) \leq P(B = b)$,
 puisque pour que $A=a$ et $B=b$ se produisent,
 $A=a$ doit se produire *et* $B=b$ doit également se produire.
 Il est intéressant de noter que la probabilité conjointe
@@ -579,12 +579,12 @@ quantités utiles, y compris pour récupérer les
 distributions individuelles $P(A)$ et $P(B)$.
 Pour récupérer $P(A=a) $, il suffit de faire la somme de 
 $P(A=a, B=v)$ sur toutes les valeurs $v$ 
- que peut prendre la variable aléatoire $B$:
+que peut prendre la variable aléatoire $B$:
 $P(A=a) = \sum_v P(A=a, B=v)$ .
 
 
 Le rapport $\frac{P(A=a, B=b)}{P(A=a)} \leq 1$
- s'avère être extrêmement important.
+s'avère être extrêmement important.
 Il est appelé probabilité *conditionnelle*,
 et est désigné par le symbole "|",
 $P(B=b|A=a) = P(A=a,B=b)/P(A=a)$ .
@@ -610,13 +610,13 @@ $P(\mathcal{B} \cup \mathcal{B}'|A = a) = P(\mathcal{B}|A = a) + P(\mathcal{B}'|
 En utilisant la définition des probabilités conditionnelles, 
 nous pouvons dériver le célèbre résultat appelé *théorème de Bayes*.
 Par construction, nous avons que $P(A, B) = P(B|A) P(A)$ 
- et $P(A, B) = P(A|B) P(B)$. 
+et $P(A, B) = P(A|B) P(B)$. 
 En combinant les deux équations, on obtient 
 $P(B|A) P(A) = P(A|B) P(B)$ et donc 
 
 $$P(A|B) = \frac{P(B|A) P(A)}{P(B)}.$$ 
 
- Cette simple équation a de profondes implications car
+Cette simple équation a de profondes implications car
 elle nous permet d'inverser l'ordre du conditionnement.
 Si nous savons comment estimer $P(B|A)$, $P(A)$, et $P(B)$,
 nous pouvons alors estimer $P(A|B)$. 
@@ -632,12 +632,12 @@ Dans ce cas, une version simplifiée du théorème de Bayes s'avère utile :
 
 $$P(A|B) \propto P(B|A) P(A).$$ 
 
- Comme nous savons que $P(A|B)$ doit être normalisé à $1$, c'est-à-dire , $\sum_a P(A=a|B) = 1$
+Comme nous savons que $P(A|B)$ doit être normalisé à $1$, c'est-à-dire , $\sum_a P(A=a|B) = 1$
  nous pouvons l'utiliser pour calculer
 
 $$P(A|B) = \frac{P(B|A) P(A)}{\sum_b P(B=b|A) P(A)}.$$ 
 
- Dans les statistiques bayésiennes, nous considérons qu'un observateur 
+Dans les statistiques bayésiennes, nous considérons qu'un observateur 
 possède des croyances préalables (subjectives)
 sur la plausibilité des hypothèses disponibles 
 encodées dans le *préalable* $P(H)$,
@@ -647,7 +647,7 @@ pour chacune des hypothèses de la classe $P(E|H)$.
 Le théorème de Bayes est alors interprété comme nous indiquant
 comment mettre à jour le *prior* initial $P(H)$
  à la lumière des preuves disponibles $E$
- pour produire des croyances *posterior* 
+pour produire des croyances *posterior* 
 $P(H|E) = \frac{P(E|H) P(H)}{P(E)}$ .
 De manière informelle, cela peut être énoncé comme suit : 
 "postérieur est égal à antérieur multiplié par la probabilité, divisé par la preuve".
@@ -658,7 +658,7 @@ Notez que $\sum_a P(A=a|B) = 1$ nous permet également de *marginaliser* les var
 
 $$\sum_a P(A=a, B) = P(B) \sum_a P(A = a|B) = P(B).$$ 
 
- L'indépendance est un autre concept fondamental
+L'indépendance est un autre concept fondamental
 qui constitue la colonne vertébrale de 
 nombreuses idées importantes en statistiques.
 En bref, deux variables sont *indépendantes*
@@ -670,9 +670,9 @@ exige que $P(A|B) = P(A)$ et, par conséquent,
 que $P(A,B) = P(A|B) P(B) = P(A) P(B)$.
 L'indépendance est souvent une hypothèse appropriée.
 Par exemple, si la variable aléatoire $A$ 
- représente le résultat du lancer d'une pièce de monnaie équitable 
+représente le résultat du lancer d'une pièce de monnaie équitable 
 et la variable aléatoire $B$ 
- représente le résultat du lancer d'une autre pièce de monnaie,
+représente le résultat du lancer d'une autre pièce de monnaie,
 alors le fait de savoir si $A$ est tombé sur face
 ne devrait pas influencer la probabilité
 que $B$ tombe sur face.
@@ -698,10 +698,10 @@ Deux variables aléatoires $A$ et $B$ sont *conditionnellement indépendantes*
 Il est intéressant de noter que deux variables peuvent être indépendantes en général
 mais devenir dépendantes lorsqu'elles sont conditionnées par une troisième. 
 Cela se produit souvent lorsque les deux variables aléatoires $A$ et $B$
- correspondent aux causes d'une troisième variable $C$.
+correspondent aux causes d'une troisième variable $C$.
 Par exemple, les os cassés et le cancer du poumon peuvent être indépendants 
-dans la population générale, mais si nous conditionnons sur le fait d'être à l'hôpital
-, nous pouvons constater que les os cassés sont négativement corrélés au cancer du poumon. 
+dans la population générale, mais si nous conditionnons sur le fait d'être à l'hôpital,
+ nous pouvons constater que les os cassés sont négativement corrélés au cancer du poumon. 
 Cela s'explique par le fait que l'os cassé * explique pourquoi une personne est à l'hôpital
 et réduit donc la probabilité qu'elle ait un cancer du poumon. 
 
@@ -719,7 +719,7 @@ mais cette corrélation disparaît si nous conditionnons sur l'âge.
 ## Un exemple
 :label:`subsec_probability_hiv_app` 
 
- Mettons nos compétences à l'épreuve. 
+Mettons nos compétences à l'épreuve. 
 Supposons qu'un médecin administre un test de dépistage du VIH à un patient. 
 Ce test est assez précis et n'échoue qu'avec une probabilité de 1 % 
 si le patient est en bonne santé mais le signale comme malade. 
@@ -755,7 +755,7 @@ Cela nous conduit à
 
 $$P(H = 1|D_1 = 1) = \frac{P(D_1=1|H=1) P(H=1)}{P(D_1=1)} = 0.1306.$$ 
 
- En d'autres termes, il n'y a que 13,06 % de chances 
+En d'autres termes, il n'y a que 13,06 % de chances 
 que le patient soit réellement séropositif, 
 malgré l'utilisation d'un test très précis.
 Comme nous pouvons le constater, la probabilité peut être contre-intuitive.
@@ -807,10 +807,10 @@ il a tout de même amélioré notre estimation de manière significative.
 L'hypothèse selon laquelle les deux tests sont conditionnellement indépendants l'un de l'autre 
 a été cruciale pour notre capacité à générer une estimation plus précise.
 Prenons le cas extrême où nous exécutons deux fois le même test. 
-Dans cette situation, nous nous attendons à ce que le résultat soit le même dans les deux cas, 
-. Il n'y a donc rien de plus à tirer de la répétition du même test. 
+Dans cette situation, nous nous attendons à ce que le résultat soit le même dans les deux cas.
+Il n'y a donc rien de plus à tirer de la répétition du même test. 
 Le lecteur avisé aura peut-être remarqué que le diagnostic se comporte 
-comme un classificateur caché 
+comme un classifieur caché 
 où notre capacité à décider si un patient est en bonne santé 
 augmente à mesure que nous obtenons plus de caractéristiques (résultats du test).
 
@@ -818,8 +818,8 @@ augmente à mesure que nous obtenons plus de caractéristiques (résultats du te
 ## Attentes
 
 Souvent, pour prendre des décisions, il ne suffit pas d'examiner 
-les probabilités attribuées aux événements individuels
-, mais il faut les regrouper en agrégats utiles
+les probabilités attribuées aux événements individuels,
+ mais il faut les regrouper en agrégats utiles
 qui peuvent nous guider.
 Par exemple, lorsque les variables aléatoires prennent des valeurs scalaires continues,
 nous nous intéressons souvent à la valeur à laquelle nous devons nous attendre *en moyenne*.
@@ -841,19 +841,19 @@ $0.5 \cdot 0 + 0.4 \cdot 2 + 0.1 \cdot 10 = 1.8$ .
 Le rendement attendu est donc de 1,8$\times$.
 
 
- En général, l'espérance * (ou moyenne)
+En général, l'espérance * (ou moyenne)
 de la variable aléatoire $X$ est définie comme suit :
 
 $$E[X] = E_{x \sim P}[x] = \sum_{x} x P(X = x).$$ 
 
- De même, pour les densités, nous obtenons $E[X] = \int x \;dp(x)$. 
+De même, pour les densités, nous obtenons $E[X] = \int x \;dp(x)$. 
 Parfois, nous nous intéressons à la valeur attendue
 d'une certaine fonction de $x$.
 Nous pouvons calculer ces attentes sous la forme
 
 $$E_{x \sim P}[f(x)] = \sum_x f(x) P(x) \text{ and } E_{x \sim P}[f(x)] = \int f(x) p(x) \;dx$$ 
 
- pour les probabilités et les densités discrètes, respectivement. 
+pour les probabilités et les densités discrètes, respectivement. 
 Pour en revenir à l'exemple d'investissement ci-dessus, 
 $f$ pourrait être l'*utilité* (bonheur)
 associée au rendement. 
@@ -884,8 +884,8 @@ il serait préférable de garder l'argent à la banque.
 Pour les décisions financières, 
 nous pouvons également vouloir mesurer 
 le degré de *risque* d'un investissement. 
-Dans ce cas, nous ne nous intéressons pas seulement à la valeur attendue
-, mais à la mesure dans laquelle les valeurs réelles ont tendance à *varier*
+Dans ce cas, nous ne nous intéressons pas seulement à la valeur attendue,
+ mais à la mesure dans laquelle les valeurs réelles ont tendance à *varier*
 par rapport à cette valeur. 
 Notez que nous ne pouvons pas simplement prendre 
 l'espérance de la différence 
@@ -900,9 +900,9 @@ la valeur attendue des écarts *au carré* :
 
 $$\mathrm{Var}[X] = E\left[(X - E[X])^2\right] = E[X^2] - E[X]^2.$$ 
 
- Ici, l'égalité découle de l'expansion de 
+Ici, l'égalité découle de l'expansion de 
 $(X - E[X])^2 = X^2 - 2 X E[X] + E[X]^2$ 
- et de la prise en compte des attentes pour chaque terme. 
+et de la prise en compte des attentes pour chaque terme. 
 La racine carrée de la variance est une autre 
 quantité utile appelée *écart-type*. 
 Alors que la variance et l'écart-type
@@ -918,7 +918,7 @@ est définie de manière analogue comme suit :
 
 $$\mathrm{Var}_{x \sim P}[f(x)] = E_{x \sim P}[f^2(x)] - E_{x \sim P}[f(x)]^2.$$ 
 
- Pour revenir à notre exemple d'investissement,
+Pour revenir à notre exemple d'investissement,
 nous pouvons maintenant calculer la variance de l'investissement. 
 Elle est donnée par $0.5 \cdot 0 + 0.4 \cdot 2^2 + 0.1 \cdot 10^2 - 1.8^2 = 8.36$. 
 À toutes fins utiles, il s'agit d'un investissement risqué. 
@@ -932,7 +932,7 @@ et la variance pour les variables aléatoires *scalaires*,
 nous pouvons le faire pour les variables vectorielles. 
 Les espérances sont faciles, car nous pouvons les appliquer par éléments. 
 Par exemple, $\boldsymbol{\mu} \stackrel{\mathrm{def}}{=} E_{\mathbf{x} \sim P}[\mathbf{x}]$ 
- a pour coordonnées $\mu_i = E_{\mathbf{x} \sim P}[x_i]$.
+a pour coordonnées $\mu_i = E_{\mathbf{x} \sim P}[x_i]$.
 Les covariances sont plus compliquées. 
 Nous résolvons le problème en prenant les attentes du *produit extérieur* 
 de la différence entre les variables aléatoires et leur moyenne. 
@@ -941,14 +941,14 @@ $$\boldsymbol{\Sigma} \stackrel{\mathrm{def}}{=} \mathrm{Cov}_{\mathbf{x} \sim P
 
 Cette matrice $\boldsymbol{\Sigma}$ est appelée matrice de covariance. 
 Une façon simple de voir son effet est de considérer un vecteur $\mathbf{v}$ 
- de la même taille que $\mathbf{x}$. 
+de la même taille que $\mathbf{x}$. 
 Il s'ensuit que 
 
 $$\mathbf{v}^\top \boldsymbol{\Sigma} \mathbf{v} = E_{\mathbf{x} \sim P}\left[\mathbf{v}^\top(\mathbf{x} - \boldsymbol{\mu}) (\mathbf{x} - \boldsymbol{\mu})^\top \mathbf{v}\right] = \mathrm{Var}_{x \sim P}[\mathbf{v}^\top \mathbf{x}].$$ 
 
  . Ainsi, $\boldsymbol{\Sigma}$ nous permet de calculer la variance 
 pour toute fonction linéaire de $\mathbf{x}$
- par une simple multiplication matricielle. 
+par une simple multiplication matricielle. 
 Les éléments hors diagonale nous indiquent dans quelle mesure les coordonnées sont corrélées :
 une valeur de 0 signifie qu'il n'y a pas de corrélation, 
 où une valeur positive plus grande 
@@ -991,18 +991,18 @@ Nous avons vu que l'échantillonnage de données à partir d'une certaine distri
 peut nous fournir des informations qui peuvent être utilisées pour estimer
 les paramètres de la distribution générant les données.
 Cela dit, la vitesse à laquelle cela est possible peut être assez lente. 
-Dans notre exemple de lancer de pièce de monnaie (et bien d'autres) 
-, nous ne pouvons pas faire mieux que de concevoir des estimateurs
+Dans notre exemple de lancer de pièce de monnaie (et bien d'autres) ,
+ nous ne pouvons pas faire mieux que de concevoir des estimateurs
 qui convergent à un taux de $1/\sqrt{n}$,
 où $n$ est la taille de l'échantillon (par exemple, le nombre de lancers). 
-Cela signifie qu'en passant de 10 à 1000 observations (une tâche généralement très réalisable) 
-, nous constatons une réduction de l'incertitude par dix, 
+Cela signifie qu'en passant de 10 à 1000 observations (une tâche généralement très réalisable) ,
+ nous constatons une réduction de l'incertitude par dix, 
 alors que les 1000 observations suivantes sont comparativement peu utiles, 
 offrant seulement une réduction de 1,41 fois. 
 Il s'agit d'une caractéristique persistante de l'apprentissage automatique : 
 alors que les gains sont souvent faciles, il faut une très grande quantité de données, 
 et souvent une énorme quantité de calculs pour obtenir des gains encore plus importants. 
-Pour un examen empirique de ce fait pour les modèles de langage à grande échelle, voir :cite:`Revels.Lubin.Papamarkou.2016` . 
+Pour un examen empirique de ce fait pour les modèles de langage à grande échelle, voir :cite:`Revels.Lubin.Papamarkou.2016`. 
 
 Nous avons également affiné notre langage et nos outils de modélisation statistique. 
 Ce faisant, nous avons appris à connaître les probabilités conditionnelles 
@@ -1025,13 +1025,13 @@ pour une distribution de probabilité,
 ces deux-là fournissent déjà une bonne partie des connaissances 
 sur le comportement possible de la distribution. 
 Par exemple, [Chebyshev's inequality](https://en.wikipedia.org/wiki/Chebyshev%27s_inequality)
- indique que $P(|X - \mu| \geq k \sigma) \leq 1/k^2$, 
+indique que $P(|X - \mu| \geq k \sigma) \leq 1/k^2$, 
 où $\mu$ est l'espérance, $\sigma^2$ est la variance de la distribution,
 et $k > 1$ est un paramètre de confiance de notre choix. 
 Elle nous indique que les tirages d'une distribution se situent 
 avec une probabilité d'au moins 50 % 
 à l'intérieur d'un intervalle $[-\sqrt{2} \sigma, \sqrt{2} \sigma]$
- centré sur l'espérance.
+centré sur l'espérance.
 
 
 
@@ -1047,7 +1047,7 @@ avec une probabilité d'au moins 50 %
 1. Supposez que nous tirions $n$ échantillons $x_i$ d'une distribution de probabilité de moyenne nulle et de variance unitaire. Calculez les moyennes $z_m \stackrel{\mathrm{def}}{=} m^{-1} \sum_{i=1}^m x_i$. Pouvons-nous appliquer l'inégalité de Chebyshev pour chaque $z_m$ indépendamment ? Pourquoi pas ?
 1. Étant donné deux événements avec une probabilité de $P(\mathcal{A})$ et $P(\mathcal{B})$, calculez les limites supérieures et inférieures de $P(\mathcal{A} \cup \mathcal{B})$ et $P(\mathcal{A} \cap \mathcal{B})$. Conseil : représentez la situation par un graphique [Venn diagram](https://en.wikipedia.org/wiki/Venn_diagram).
 1. Supposez que nous ayons une séquence de variables aléatoires, disons $A$, $B$ et $C$, où $B$ ne dépend que de $A$, et $C$ ne dépend que de $B$, pouvez-vous simplifier la probabilité conjointe $P(A, B, C)$? Indice : il s'agit d'un [Markov chain](https://en.wikipedia.org/wiki/Markov_chain).
-1. Dans :numref:`subsec_probability_hiv_app` , supposez que les résultats des deux tests ne sont pas indépendants. En particulier, supposez que l'un ou l'autre des tests a, à lui seul, un taux de faux positifs de 10 % et un taux de faux négatifs de 1 %. Autrement dit, supposons que $P(D =1|H=0) = 0.1$ et que $P(D = 0|H=1) = 0.01$. En outre, supposons que pour $H = 1$ (infecté), les résultats des tests sont conditionnellement indépendants, c'est-à-dire que $P(D_1, D_2|H=1) = P(D_1|H=1) P(D_2|H=1)$ mais que pour les patients sains, les résultats sont couplés via $P(D_1 = D_2 = 1|H=0) = 0.02$. 
+1. Dans :numref:`subsec_probability_hiv_app`, supposez que les résultats des deux tests ne sont pas indépendants. En particulier, supposez que l'un ou l'autre des tests a, à lui seul, un taux de faux positifs de 10 % et un taux de faux négatifs de 1 %. Autrement dit, supposons que $P(D =1|H=0) = 0.1$ et que $P(D = 0|H=1) = 0.01$. En outre, supposons que pour $H = 1$ (infecté), les résultats des tests sont conditionnellement indépendants, c'est-à-dire que $P(D_1, D_2|H=1) = P(D_1|H=1) P(D_2|H=1)$ mais que pour les patients sains, les résultats sont couplés via $P(D_1 = D_2 = 1|H=0) = 0.02$. 
     1. Sur la base des informations dont vous disposez jusqu'à présent, élaborez la table de probabilité conjointe pour $D_1$ et $D_2$, étant donné $H=0$.
    1. Déterminez la probabilité que le patient soit positif ($H=1$) après qu'un test soit positif. Vous pouvez supposer la même probabilité de base $P(H=1) = 0.0015$ que précédemment. 
     1. Déterminez la probabilité que le patient soit positif ($H=1$) lorsque les deux tests sont positifs.
@@ -1055,7 +1055,7 @@ avec une probabilité d'au moins 50 %
    1. Calculez le rendement attendu d'un portefeuille donné $\boldsymbol{\alpha}$.
    1. Si vous vouliez maximiser le rendement du portefeuille, comment devriez-vous choisir vos investissements ?
    1. Calculez la *variance* du portefeuille. 
-    1. Formulez un problème d'optimisation pour maximiser le rendement tout en maintenant la variance dans une limite supérieure. Il s'agit du prix Nobel [Markovitz portfolio](https://en.wikipedia.org/wiki/Markowitz_model) :cite:`Mangram.2013` . Pour le résoudre, vous aurez besoin d'un solveur de programmation quadratique, ce qui dépasse largement le cadre de ce livre.
+    1. Formulez un problème d'optimisation pour maximiser le rendement tout en maintenant la variance dans une limite supérieure. Il s'agit du prix Nobel [Markovitz portfolio](https://en.wikipedia.org/wiki/Markowitz_model) :cite:`Mangram.2013`. Pour le résoudre, vous aurez besoin d'un solveur de programmation quadratique, ce qui dépasse largement le cadre de ce livre.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/36)

@@ -1,7 +1,7 @@
 # Représentations d'encodeurs bidirectionnels à partir de transformateurs (BERT)
 :label:`sec_bert` 
 
- Nous avons présenté plusieurs modèles d'intégration de mots pour la compréhension du langage naturel.
+Nous avons présenté plusieurs modèles d'intégration de mots pour la compréhension du langage naturel.
 Après un pré-entraînement, la sortie peut être considérée comme une matrice
 où chaque ligne est un vecteur qui représente un mot d'un vocabulaire prédéfini.
 En fait, ces modèles d'intégration de mots sont tous *indépendants du contexte*.
@@ -10,10 +10,10 @@ Commençons par illustrer cette propriété.
 
 ## From Context-Independent to Context-Sensitive
 
-Rappelez-vous les expériences menées dans :numref:`sec_word2vec_pretraining` et :numref:`sec_synonyms` .
+Rappelez-vous les expériences menées dans :numref:`sec_word2vec_pretraining` et :numref:`sec_synonyms`.
 Par exemple, word2vec et GloVe attribuent tous deux le même vecteur pré-formé au même mot, quel que soit le contexte du mot (le cas échéant).
 Formellement, une représentation indépendante du contexte de tout token $x$
- est une fonction $f(x)$ qui ne prend que $x$ comme entrée.
+est une fonction $f(x)$ qui ne prend que $x$ comme entrée.
 Étant donné l'abondance de la polysémie et de la sémantique complexe dans les langues naturelles, les représentations indépendantes du contexte
 ont des limites évidentes.
 Par exemple, le mot "grue" dans les contextes
@@ -23,11 +23,11 @@ ainsi, le même mot peut se voir attribuer des représentations différentes sel
 Cela motive le développement de représentations de mots *sensibles au contexte*,
 où les représentations des mots dépendent de leurs contextes.
 Par conséquent, une représentation contextuelle d'un jeton $x$ est une fonction $f(x, c(x))$
- qui dépend à la fois de $x$ et de son contexte $c(x)$.
-Parmi les représentations contextuelles populaires
-, citons TagLM (Language-model-augmented sequence tagger) :cite:`Peters.Ammar.Bhagavatula.ea.2017` ,
-CoVe (Context Vectors) :cite:`McCann.Bradbury.Xiong.ea.2017` ,
-et ELMo (Embeddings from Language Models) :cite:`Peters.Neumann.Iyyer.ea.2018` .
+qui dépend à la fois de $x$ et de son contexte $c(x)$.
+Parmi les représentations contextuelles populaires,
+citons TagLM (Language-model-augmented sequence tagger) :cite:`Peters.Ammar.Bhagavatula.ea.2017`,
+CoVe (Context Vectors) :cite:`McCann.Bradbury.Xiong.ea.2017`,
+et ELMo (Embeddings from Language Models) :cite:`Peters.Neumann.Iyyer.ea.2018`.
 
 Par exemple, en prenant la séquence entière comme entrée,
 ELMo est une fonction qui attribue une représentation à chaque mot de la séquence d'entrée.
@@ -51,7 +51,7 @@ Bien que ELMo ait considérablement amélioré les solutions à un ensemble dive
 chaque solution repose toujours sur une architecture *spécifique à la tâche*.
 Cependant, il est pratiquement impossible de concevoir une architecture spécifique pour chaque tâche de traitement du langage naturel.
 Le modèle GPT (Generative Pre-Training) représente un effort de conception de
-un modèle général *agnostique* pour les représentations sensibles au contexte :cite:`Radford.Narasimhan.Salimans.ea.2018` .
+un modèle général *agnostique* pour les représentations sensibles au contexte :cite:`Radford.Narasimhan.Salimans.ea.2018`.
 Construit sur un décodeur transformateur,
 GPT pré-entraîne un modèle de langage qui sera utilisé pour représenter des séquences de texte.
 Lorsqu'on applique GPT à une tâche en aval,
@@ -81,7 +81,7 @@ alors que GPT est agnostique aux tâches mais encode le contexte de gauche à dr
 Combinant le meilleur des deux mondes,
 BERT (Bidirectional Encoder Representations from Transformers)
 encode le contexte de manière bidirectionnelle et nécessite des modifications minimales de l'architecture
-pour un large éventail de tâches de traitement du langage naturel :cite:`Devlin.Chang.Lee.ea.2018` .
+pour un large éventail de tâches de traitement du langage naturel :cite:`Devlin.Chang.Lee.ea.2018`.
 À l'aide d'un encodeur de transformateur pré-entraîné,
 BERT est capable de représenter n'importe quel token en fonction de son contexte bidirectionnel.
 Pendant l'apprentissage supervisé de tâches en aval,
@@ -107,7 +107,7 @@ conceptuellement simple mais empiriquement puissant pré-entraînement de repré
 
 Dans la suite de ce chapitre,
 nous allons nous plonger dans le pré-entraînement de BERT.
-Lorsque les applications de traitement du langage naturel seront expliquées dans :numref:`chap_nlp_app` ,
+Lorsque les applications de traitement du langage naturel seront expliquées dans :numref:`chap_nlp_app`,
 nous illustrerons le réglage fin de BERT pour les applications en aval.
 
 ```{.python .input}
@@ -129,7 +129,7 @@ from torch import nn
 ## [**Input Representation**]
 :label:`subsec_bert_input_rep` 
 
- Dans le traitement du langage naturel,
+Dans le traitement du langage naturel,
 certaines tâches (par exemple, l'analyse des sentiments) prennent un seul texte en entrée,
 alors que dans d'autres tâches (par exemple, l'inférence du langage naturel),
 l'entrée est une paire de séquences de texte.
@@ -149,7 +149,7 @@ Par exemple, une *séquence d'entrée BERT* peut inclure soit une *séquence de 
 
 Pour distinguer les paires de textes,
 les incorporations de segments apprises $\mathbf{e}_A$ et $\mathbf{e}_B$
- sont ajoutées aux incorporations de jetons de la première séquence et de la deuxième séquence, respectivement.
+sont ajoutées aux incorporations de jetons de la première séquence et de la deuxième séquence, respectivement.
 Pour les entrées de texte unique, seul $\mathbf{e}_A$ est utilisé.
 
 La fonction suivante `get_tokens_and_segments` prend une ou deux phrases
@@ -184,7 +184,7 @@ of the token embeddings, segment embeddings, and positional embeddings.](../img/
 :label:`fig_bert-input`
 
 La [**`BERTEncoder` classe**] suivante est similaire à la classe `TransformerEncoder`
- telle qu'implémentée dans :numref:`sec_transformer` .
+telle qu'implémentée dans :numref:`sec_transformer`.
 À la différence de `TransformerEncoder`, `BERTEncoder` utilise
 embeddings de segment et embeddings de position apprenables.
 
@@ -270,7 +270,7 @@ encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
 Nous définissons `tokens` comme étant 2 séquences d'entrée BERT de longueur 8,
 où chaque token est un index du vocabulaire.
 L'inférence directe de `BERTEncoder` avec l'entrée `tokens`
- renvoie le résultat codé où chaque token est représenté par un vecteur
+renvoie le résultat codé où chaque token est représenté par un vecteur
 dont la longueur est prédéfinie par l'hyperparamètre `num_hiddens`.
 Cet hyperparamètre est généralement appelé la *taille cachée*
 (nombre d'unités cachées) de l'encodeur transformateur.
@@ -294,7 +294,7 @@ encoded_X.shape
 ## Tâches de pré-formation
 :label:`subsec_bert_pretraining_tasks` 
 
- L'inférence directe de `BERTEncoder` donne la représentation BERT
+L'inférence directe de `BERTEncoder` donne la représentation BERT
 de chaque token du texte d'entrée et des tokens spéciaux insérés
 "&lt;cls&gt;" et "&lt;seq&gt;".
 Ensuite, nous allons utiliser ces représentations pour calculer la fonction de perte
@@ -305,7 +305,7 @@ modélisation du langage masqué et prédiction de la phrase suivante.
 ### [**Masked Language Modeling**]
 :label:`subsec_mlm` 
 
- Comme illustré dans :numref:`sec_language-model` ,
+Comme illustré dans :numref:`sec_language-model`,
 un modèle de langage prédit un token en utilisant le contexte à sa gauche.
 Pour encoder le contexte de manière bidirectionnelle pour représenter chaque token,
 BERT masque aléatoirement les tokens et utilise les tokens du contexte bidirectionnel pour
@@ -437,7 +437,7 @@ mlm_l.shape
 ### [**Next Sentence Prediction**]
 :label:`subsec_nsp` 
 
- Bien que la modélisation du langage masqué soit capable d'encoder le contexte bidirectionnel
+Bien que la modélisation du langage masqué soit capable d'encoder le contexte bidirectionnel
 pour représenter les mots, elle ne modélise pas explicitement la relation logique
 entre les paires de textes.
 Pour aider à comprendre la relation entre deux séquences de texte,
@@ -452,7 +452,7 @@ dans la séquence d'entrée de BERT.
 En raison de l'auto-attention dans l'encodeur transformateur,
 la représentation BERT du token spécial "&lt;cls&gt;"
 encode les deux phrases de l'entrée.
-Par conséquent, la couche de sortie (`self.output`) du classificateur MLP prend `X` comme entrée,
+Par conséquent, la couche de sortie (`self.output`) du classifieur MLP prend `X` comme entrée,
 où `X` est la sortie de la couche cachée MLP dont l'entrée est le token "&lt;cls&gt;" encodé.
 
 ```{.python .input}
@@ -524,7 +524,7 @@ nsp_l.shape
 Il est à noter que toutes les étiquettes dans les deux tâches de pré-entraînement susmentionnées
 peuvent être obtenues trivialement à partir du corpus de pré-entraînement sans effort d'étiquetage manuel.
 Le BERT original a été pré-entraîné sur la concaténation du BookCorpus :cite:`Zhu.Kiros.Zemel.ea.2015` 
- et du Wikipedia anglais.
+et du Wikipedia anglais.
 Ces deux corpus de textes sont énormes :
 ils comptent respectivement 800 millions et 2,5 milliards de mots.
 
@@ -534,7 +534,7 @@ ils comptent respectivement 800 millions et 2,5 milliards de mots.
 Lors du pré-entraînement de BERT, la fonction de perte finale est une combinaison linéaire des deux fonctions de perte
 pour la modélisation du langage masqué et la prédiction de la phrase suivante.
 Nous pouvons maintenant définir la classe `BERTModel` en instanciant les trois classes
-`BERTEncoder` , `MaskLM`, et `NextSentencePred`.
+`BERTEncoder`, `MaskLM`, et `NextSentencePred`.
 L'inférence directe renvoie les représentations BERT codées `encoded_X`,
 les prédictions de la modélisation du langage masqué `mlm_Y_hat`,
 et les prédictions de la phrase suivante `nsp_Y_hat`.

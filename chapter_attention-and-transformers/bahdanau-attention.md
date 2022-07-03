@@ -7,8 +7,8 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 
 :label:`sec_seq2seq_attention` 
 
- Nous avons étudié le problème de la traduction automatique
-dans :numref:`sec_seq2seq` ,
+Nous avons étudié le problème de la traduction automatique
+dans :numref:`sec_seq2seq`,
 où nous avons conçu
 une architecture encodeur-décodeur basée sur deux RNN
 pour l'apprentissage de séquence à séquence.
@@ -32,10 +32,10 @@ Dans un défi distinct mais connexe
 de la génération d'écriture manuscrite pour une séquence de texte donnée,
 Graves a conçu un modèle d'attention différentiable
 pour aligner les caractères du texte avec le tracé beaucoup plus long du stylo,
-où l'alignement ne se déplace que dans une seule direction :cite:`Graves.2013` .
+où l'alignement ne se déplace que dans une seule direction :cite:`Graves.2013`.
 Inspirés par l'idée d'apprendre à aligner,
 Bahdanau et al. ont proposé un modèle d'attention différenciable
-sans la sévère limitation de l'alignement unidirectionnel :cite:`Bahdanau.Cho.Bengio.2014` .
+sans la sévère limitation de l'alignement unidirectionnel :cite:`Bahdanau.Cho.Bengio.2014`.
 Lors de la prédiction d'un token,
 si tous les tokens d'entrée ne sont pas pertinents,
 le modèle aligne (ou assiste)
@@ -49,43 +49,43 @@ Lorsque nous décrirons
 l'attention Bahdanau
 pour l'encodeur-décodeur RNN ci-dessous,
 nous suivrons la même notation dans
-:numref:`sec_seq2seq` .
+:numref:`sec_seq2seq`.
 Le nouveau modèle basé sur l'attention
 est le même que celui de
 dans :numref:`sec_seq2seq` 
- sauf que
+sauf que
 la variable de contexte
 $\mathbf{c}$ 
- dans
+dans
 :eqref:`eq_seq2seq_s_t` 
- est remplacée par
+est remplacée par
 $\mathbf{c}_{t'}$ 
  à tout pas de temps de décodage $t'$.
 Supposons que
 il y ait $T$ tokens dans la séquence d'entrée,
 la variable de contexte au pas de temps de décodage $t'$
- est la sortie du pooling d'attention :
+est la sortie du pooling d'attention :
 
 $$\mathbf{c}_{t'} = \sum_{t=1}^T \alpha(\mathbf{s}_{t' - 1}, \mathbf{h}_t) \mathbf{h}_t,$$
 
 où l'état caché du décodeur
 $\mathbf{s}_{t' - 1}$ au pas de temps $t' - 1$
- est la requête,
+est la requête,
 et les états cachés du codeur $\mathbf{h}_t$
- sont à la fois les clés et les valeurs,
+sont à la fois les clés et les valeurs,
 et le poids de l'attention $\alpha$
- est calculé comme dans
+est calculé comme dans
 :eqref:`eq_attn-scoring-alpha` 
- en utilisant la fonction de notation additive de l'attention
+en utilisant la fonction de notation additive de l'attention
 définie par
-:eqref:`eq_additive-attn` .
+:eqref:`eq_additive-attn`.
 
-Légèrement différente de
-, l'architecture d'encodeur-décodeur RNN vanille
-dans :numref:`fig_seq2seq_details` ,
+Légèrement différente de,
+l'architecture d'encodeur-décodeur RNN vanille
+dans :numref:`fig_seq2seq_details`,
 la même architecture
 avec l'attention de Bahdanau est représentée dans
-:numref:`fig_s2s_attention_details` .
+:numref:`fig_s2s_attention_details`.
 
 ![Layers in an RNN encoder-decoder model with Bahdanau attention.](../img/seq2seq-attention-details.svg)
 :label:`fig_s2s_attention_details`
@@ -118,7 +118,7 @@ avec l'attention de Bahdanau,
 il suffit de redéfinir le décodeur.
 Pour visualiser les poids d'attention appris de manière plus pratique,
 la classe suivante `AttentionDecoder`
- définit [**l'interface de base pour
+définit [**l'interface de base pour
 décodeurs avec mécanismes d'attention**].
 
 ```{.python .input}
@@ -332,7 +332,7 @@ d2l.check_shape(state[1][0], (batch_size, num_hiddens))
 
 ## [**Training**]
 
-Similaire à :numref:`sec_seq2seq_training` ,
+Similaire à :numref:`sec_seq2seq_training`,
 ici nous spécifions les hyperparamètres,
 instancions
 un encodeur et un décodeur avec l'attention de Bahdanau,

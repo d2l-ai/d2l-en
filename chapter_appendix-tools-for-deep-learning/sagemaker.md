@@ -1,7 +1,7 @@
 # Utilisation d'Amazon SageMaker
 :label:`sec_sagemaker` 
 
- Les applications d'apprentissage profond
+Les applications d'apprentissage profond
 peuvent demander tellement de ressources informatiques
 qu'elles dépassent facilement
 ce que votre machine locale peut offrir.
@@ -35,7 +35,7 @@ puis cliquez dessus pour ouvrir le panneau SageMaker.
 
 ## Création d'une instance SageMaker
 
-Ensuite, créons une instance de notebook comme décrit dans :numref:`fig_sagemaker-create` .
+Ensuite, créons une instance de notebook comme décrit dans :numref:`fig_sagemaker-create`.
 
 ![Create a SageMaker instance.](../img/sagemaker-create.png)
 :width:`400px`
@@ -44,7 +44,7 @@ Ensuite, créons une instance de notebook comme décrit dans :numref:`fig_sagema
 SageMaker propose plusieurs instances [instance types](https://aws.amazon.com/sagemaker/pricing/instance-types/) dont la puissance de calcul et le prix varient.
 Lors de la création d'une instance de notebook,
 nous pouvons spécifier son nom et son type.
-Dans :numref:`fig_sagemaker-create-2` , nous choisissons `ml.p3.2xlarge`: avec un GPU Tesla V100 et un CPU à 8 cœurs, cette instance est suffisamment puissante pour la majeure partie du livre.
+Dans :numref:`fig_sagemaker-create-2`, nous choisissons `ml.p3.2xlarge`: avec un GPU Tesla V100 et un CPU à 8 cœurs, cette instance est suffisamment puissante pour la majeure partie du livre.
 
 ![Choose the instance type.](../img/sagemaker-create-2.png)
 :width:`400px`
@@ -92,15 +92,15 @@ ne soit facturé davantage (:numref:`fig_sagemaker-stop` ).
 ## Mise à jour des notebooks
 
 :begin_tab:`mxnet` 
- Les notebooks de ce livre open-source seront régulièrement mis à jour dans le dépôt [d2l-ai/d2l-en-sagemaker](https://github.com/d2l-ai/d2l-en-sagemaker)
- sur GitHub.
+Les notebooks de ce livre open-source seront régulièrement mis à jour dans le dépôt [d2l-ai/d2l-en-sagemaker](https://github.com/d2l-ai/d2l-en-sagemaker)
+sur GitHub.
 Pour mettre à jour la dernière version,
 vous pouvez ouvrir un terminal sur l'instance SageMaker (:numref:`fig_sagemaker-terminal` ).
 :end_tab:
 
 :begin_tab:`pytorch`
 Les notebooks de ce livre open-source seront régulièrement mis à jour dans le dépôt [d2l-ai/d2l-pytorch-sagemaker](https://github.com/d2l-ai/d2l-pytorch-sagemaker)
- sur GitHub.
+sur GitHub.
 Pour mettre à jour la dernière version,
 vous pouvez ouvrir un terminal sur l'instance SageMaker (:numref:`fig_sagemaker-terminal` ).
 :end_tab:
@@ -108,7 +108,7 @@ vous pouvez ouvrir un terminal sur l'instance SageMaker (:numref:`fig_sagemaker-
 
 :begin_tab:`tensorflow`
 Les notebooks de ce livre open-source seront régulièrement mis à jour dans le dépôt [d2l-ai/d2l-tensorflow-sagemaker](https://github.com/d2l-ai/d2l-tensorflow-sagemaker)
- sur GitHub.
+sur GitHub.
 Pour mettre à jour la dernière version,
 vous pouvez ouvrir un terminal sur l'instance SageMaker (:numref:`fig_sagemaker-terminal` ).
 :end_tab:

@@ -6,12 +6,12 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 # Apprentissage de séquence à séquence
 :label:`sec_seq2seq` 
 
- Comme nous l'avons vu dans :numref:`sec_machine_translation` ,
-dans la traduction automatique
-, l'entrée et la sortie sont toutes deux une séquence de longueur variable.
+Comme nous l'avons vu dans :numref:`sec_machine_translation`,
+dans la traduction automatique,
+l'entrée et la sortie sont toutes deux une séquence de longueur variable.
 Pour résoudre ce type de problème,
 nous avons conçu une architecture générale de codeur-décodeur
-dans :numref:`sec_encoder-decoder` .
+dans :numref:`sec_encoder-decoder`.
 Dans cette section,
 nous allons
 utiliser deux RNN pour concevoir
@@ -19,7 +19,7 @@ l'encodeur et le décodeur de
 cette architecture
 et l'appliquer à l'apprentissage *séquence à séquence*
 pour la traduction automatique
-:cite:`Sutskever.Vinyals.Le.2014,Cho.Van-Merrienboer.Gulcehre.ea.2014` .
+:cite:`Sutskever.Vinyals.Le.2014,Cho.Van-Merrienboer.Gulcehre.ea.2014`.
 
 Suivant le principe de conception
 de l'architecture codeur-décodeur,
@@ -42,7 +42,7 @@ dans la traduction automatique.
 ![Sequence to sequence learning with an RNN encoder and an RNN decoder.](../img/seq2seq.svg)
 :label:`fig_seq2seq`
 
-Dans :numref:`fig_seq2seq` ,
+Dans :numref:`fig_seq2seq`,
 le jeton spécial "&lt;eos&gt;"
 marque la fin de la séquence.
 Le modèle peut arrêter de faire des prédictions
@@ -53,15 +53,15 @@ Premièrement, le jeton spécial de début de séquence "&lt;bos&gt;" est une en
 Deuxièmement,
 l'état caché final de l'encodeur RNN est utilisé
 pour initier l'état caché du décodeur.
-Dans des conceptions telles que :cite:`Sutskever.Vinyals.Le.2014` ,
+Dans des conceptions telles que :cite:`Sutskever.Vinyals.Le.2014`,
 c'est exactement
 la façon dont les informations de la séquence d'entrée codée
 sont introduites dans le décodeur pour générer la séquence de sortie (cible).
-Dans d'autres modèles tels que :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014` ,
+Dans d'autres modèles tels que :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014`,
 l'état caché final de l'encodeur
 est également introduit dans le décodeur en tant que
 partie des entrées
-à chaque pas de temps, comme le montre :numref:`fig_seq2seq` .
+à chaque pas de temps, comme le montre :numref:`fig_seq2seq`.
 
 
 ## Forçage par l'enseignant
@@ -87,10 +87,10 @@ décalée d'un token :
 
 Notre mise en œuvre dans
 :numref:`subsec_loading-seq-fixed-len` 
- a préparé des données de entrainement pour le forçage de l'enseignant,
+a préparé des données de entrainement pour le forçage de l'enseignant,
 où le déplacement des jetons pour l'apprentissage auto-supervisé
 est similaire à l'entrainement des modèles de langue dans
-:numref:`sec_language-model` .
+:numref:`sec_language-model`.
 Une approche alternative consiste à
 alimenter le jeton *prédit*
 de l'étape temporelle précédente
@@ -102,7 +102,7 @@ nous expliquerons plus en détail la conception de :numref:`fig_seq2seq`
  .
 Nous entraînerons ce modèle pour la traduction automatique
 sur le jeu de données anglais-français tel qu'il est présenté dans
-:numref:`sec_machine_translation` .
+:numref:`sec_machine_translation`.
 
 ```{.python .input}
 %%tab mxnet
@@ -136,7 +136,7 @@ import tensorflow as tf
 
 Techniquement parlant,
 l'encodeur transforme une séquence d'entrée de longueur variable en une *variable de contexte* de forme fixe $\mathbf{c}$, et encode les informations de la séquence d'entrée dans cette variable de contexte.
-Comme illustré sur :numref:`fig_seq2seq` ,
+Comme illustré sur :numref:`fig_seq2seq`,
 nous pouvons utiliser un RNN pour concevoir l'encodeur.
 
 Considérons un exemple de séquence (taille du lot : 1).
@@ -144,22 +144,22 @@ Supposons que
 la séquence d'entrée soit $x_1, \ldots, x_T$, de sorte que $x_t$ soit le token $t^{\mathrm{th}}$ dans la séquence de texte d'entrée.
 Au pas de temps $t$, le RNN transforme
 le vecteur de caractéristiques d'entrée $\mathbf{x}_t$ pour $x_t$
- et l'état caché $\mathbf{h} _{t-1}$ du pas de temps précédent
+et l'état caché $\mathbf{h} _{t-1}$ du pas de temps précédent
 en l'état caché actuel $\mathbf{h}_t$.
 Nous pouvons utiliser une fonction $f$ pour exprimer la transformation de la couche récurrente du RNN :
 
 $$\mathbf{h}_t = f(\mathbf{x}_t, \mathbf{h}_{t-1}). $$ 
 
- En général,
+En général,
 le codeur transforme les états cachés à
 tous les pas de temps
 en la variable de contexte par une fonction personnalisée $q$:
 
 $$\mathbf{c} =  q(\mathbf{h}_1, \ldots, \mathbf{h}_T).$$ 
 
- Par exemple, en choisissant $q(\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$ comme dans :numref:`fig_seq2seq` ,
+Par exemple, en choisissant $q(\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$ comme dans :numref:`fig_seq2seq`,
 la variable de contexte est juste l'état caché $\mathbf{h}_T$
- de la séquence d'entrée au dernier pas de temps.
+de la séquence d'entrée au dernier pas de temps.
 
 Jusqu'à présent, nous avons utilisé un RNN unidirectionnel
 pour concevoir l'encodeur,
@@ -258,7 +258,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
 ```
 
 Les variables retournées des couches récurrentes
-ont été expliquées dans :numref:`sec_rnn-concise` .
+ont été expliquées dans :numref:`sec_rnn-concise`.
 Utilisons encore un exemple concret
 pour [**illustrer l'implémentation de l'encodeur ci-dessus.**]
 Ci-dessous
@@ -304,12 +304,12 @@ if tab.selected('tensorflow'):
 ## [**Décodeur**]
 :label:`sec_seq2seq_decoder` 
 
- Comme nous venons de le mentionner,
+Comme nous venons de le mentionner,
 la variable contextuelle $\mathbf{c}$ de la sortie du codeur code la séquence d'entrée entière $x_1, \ldots, x_T$. Étant donné la séquence de sortie $y_1, y_2, \ldots, y_{T'}$ de l'ensemble de données d'apprentissage,
 pour chaque pas de temps $t'$
  (le symbole diffère du pas de temps $t$ des séquences d'entrée ou des codeurs),
 la probabilité de la sortie du décodeur $y_{t'}$
- est conditionnelle
+est conditionnelle
 à la sous-séquence de sortie précédente
 $y_1, \ldots, y_{t'-1}$ et
 la variable contextuelle $\mathbf{c}$, c'est-à-dire $P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$.
@@ -322,18 +322,18 @@ et la variable de contexte $\mathbf{c}$ comme entrée,
 puis les transforme
 et
 l'état caché précédent $\mathbf{s}_{t^\prime-1}$
- en l'état caché
- $\mathbf{s}_{t^\prime}$ au pas de temps courant.
+en l'état caché
+$\mathbf{s}_{t^\prime}$ au pas de temps courant.
 Par conséquent, nous pouvons utiliser une fonction $g$ pour exprimer la transformation de la couche cachée du décodeur :
 
 $$\mathbf{s}_{t^\prime} = g(y_{t^\prime-1}, \mathbf{c}, \mathbf{s}_{t^\prime-1}).$$ 
- :eqlabel:`eq_seq2seq_s_t` 
+:eqlabel:`eq_seq2seq_s_t` 
 
- Après avoir obtenu l'état caché du décodeur,
+Après avoir obtenu l'état caché du décodeur,
 nous pouvons utiliser une couche de sortie et l'opération softmax pour calculer la distribution de probabilité conditionnelle
 $P(y_{t^\prime} \mid y_1, \ldots, y_{t^\prime-1}, \mathbf{c})$ pour la sortie au pas de temps $t^\prime$.
 
-En suivant :numref:`fig_seq2seq` ,
+En suivant :numref:`fig_seq2seq`,
 lors de la mise en œuvre du décodeur comme suit,
 nous utilisons directement l'état caché à l'étape temporelle finale
 du codeur
@@ -462,7 +462,7 @@ if tab.selected('tensorflow'):
 ```
 
 Pour résumer,
-les couches dans le modèle d'encodeur-décodeur RNN ci-dessus sont illustrées dans :numref:`fig_seq2seq_details` .
+les couches dans le modèle d'encodeur-décodeur RNN ci-dessus sont illustrées dans :numref:`fig_seq2seq_details`.
 
 ![Layers in an RNN encoder-decoder model.](../img/seq2seq-details.svg)
 :label:`fig_seq2seq_details`
@@ -472,8 +472,8 @@ les couches dans le modèle d'encodeur-décodeur RNN ci-dessus sont illustrées 
 ## Encodeur-décodeur pour l'apprentissage de séquence à séquence
 
 
- Sur la base de l'architecture décrite
-dans :numref:`sec_encoder-decoder` ,
+Sur la base de l'architecture décrite
+dans :numref:`sec_encoder-decoder`,
 le modèle d'encodeur-décodeur RNN
 pour l'apprentissage de séquence à séquence met simplement 
 l'encodeur RNN et le décodeur RNN ensemble.
@@ -508,14 +508,14 @@ Comme pour la modélisation du langage,
 nous pouvons appliquer la méthode softmax pour obtenir la distribution
 et calculer la perte d'entropie croisée pour l'optimisation.
 Rappelons que :numref:`sec_machine_translation` 
- que les jetons de remplissage spéciaux
+que les jetons de remplissage spéciaux
 sont ajoutés à la fin des séquences
 afin que les séquences de différentes longueurs
 puissent être chargées efficacement
 en minibatchs de même forme.
 Cependant, la prédiction des jetons de remplissage
 
- doit être exclue des calculs de perte.
+doit être exclue des calculs de perte.
 À cette fin,
 nous pouvons 
 [**masquer les entrées non pertinentes avec des valeurs nulles**]
@@ -535,7 +535,7 @@ def loss(self, Y_hat, Y):
 ## [**Training**]
 :label:`sec_seq2seq_training` 
 
- Nous pouvons maintenant [**créer et entraîner un modèle RNN encodeur-décodeur**]
+Nous pouvons maintenant [**créer et entraîner un modèle RNN encodeur-décodeur**]
 pour l'apprentissage de séquence à séquence sur le jeu de données de traduction automatique.
 
 ```{.python .input}
@@ -574,7 +574,7 @@ at the initial time step
 the beginning-of-sequence ("&lt;bos&gt;") le jeton
 est introduit dans le décodeur.
 Ce processus de prédiction
-est illustré dans :numref:`fig_seq2seq_predict` .
+est illustré dans :numref:`fig_seq2seq_predict`.
 Lorsque le token de fin de séquence ("&lt;eos&gt;") est prédit,
 la prédiction de la séquence de sortie est terminée.
 
@@ -584,7 +584,7 @@ la prédiction de la séquence de sortie est terminée.
 
 Nous présenterons différentes stratégies
 pour la génération de séquences dans
-:numref:`sec_beam-search` .
+:numref:`sec_beam-search`.
 
 ```{.python .input}
 %%tab all
@@ -619,7 +619,7 @@ en la comparant à la séquence d'étiquettes
 (la vérité du terrain).
 Le test BLEU (Bilingual Evaluation Understudy),
 bien qu'initialement proposé pour évaluer les résultats de la traduction automatique
- :cite:`Papineni.Roukos.Ward.ea.2002` ,
+ :cite:`Papineni.Roukos.Ward.ea.2002`,
 a été largement utilisé pour mesurer
 la qualité des séquences de sortie pour différentes applications.
 En principe, pour tout $n$-gramme dans la séquence prédite,
@@ -627,7 +627,7 @@ BLEU évalue si ce $n$-gramme apparaît
 dans la séquence de l'étiquette.
 
 On désigne par $p_n$
- la précision des $n$-grammes,
+la précision des $n$-grammes,
 qui est
 le rapport entre
 le nombre de $n$-grammes appariés dans
@@ -638,18 +638,18 @@ Pour expliquer,
 étant donné une séquence d'étiquettes $A$, $B$, $C$, $D$, $E$, $F$,
 et une séquence prédite $A$, $B$, $B$, $C$, $D$,
 nous avons $p_1 = 4/5$, $p_2 = 3/4$, $p_3 = 1/3$, et $p_4 = 0$.
- $\mathrm{len}_{\text{label}}$ En outre,
+$\mathrm{len}_{\text{label}}$ En outre,
 et $\mathrm{len}_{\text{pred}}$
- sont
+sont
 les nombres de tokens dans la séquence d'étiquettes et la séquence prédite, respectivement.
 Ensuite, BLEU est défini comme
 
 $$ \exp\left(\min\left(0, 1 - \frac{\mathrm{len}_{\text{label}}}{\mathrm{len}_{\text{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$ 
- :eqlabel:`eq_bleu` 
+:eqlabel:`eq_bleu` 
 
- où $k$ est le plus long $n$-gramme pour la correspondance.
+où $k$ est le plus long $n$-gramme pour la correspondance.
 
-Sur la base de la définition de BLEU dans :eqref:`eq_bleu` ,
+Sur la base de la définition de BLEU dans :eqref:`eq_bleu`,
 chaque fois que la séquence prédite est identique à la séquence de l'étiquette, BLEU est égal à 1.
 En outre,
 étant donné que la mise en correspondance des $n$-grammes les plus longs est plus difficile,
@@ -662,7 +662,7 @@ En outre,
 prédisant des séquences plus courtes
 a tendance à obtenir une valeur $p_n$ plus élevée,
 le coefficient avant le terme de multiplication dans :eqref:`eq_bleu` 
- pénalise les séquences prédites plus courtes.
+pénalise les séquences prédites plus courtes.
 Par exemple, lorsque $k=2$,
 donne la séquence d'étiquettes $A$, $B$, $C$, $D$, $E$, $F$ et la séquence prédite $A$, $B$,
 bien que $p_1 = p_2 = 1$, le facteur de pénalité $\exp(1-6/2) \approx 0.14$ fait baisser le BLEU.

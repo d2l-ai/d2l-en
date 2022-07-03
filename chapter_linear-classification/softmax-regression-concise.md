@@ -8,7 +8,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
  
 
- Tout comme les cadres d'apprentissage profond de haut niveau
+Tout comme les cadres d'apprentissage profond de haut niveau
 ont facilité la mise en œuvre de la régression linéaire
 (voir :numref:`sec_linear_concise` ),
 ils sont tout aussi pratiques ici.
@@ -37,16 +37,16 @@ import tensorflow as tf
 
 ### Définition du modèle
 
-Comme dans :numref:`sec_linear_concise` , 
+Comme dans :numref:`sec_linear_concise`, 
 nous construisons notre couche entièrement connectée 
 en utilisant la couche intégrée. 
 La méthode intégrée `__call__` invoque ensuite `forward` 
- chaque fois que nous devons appliquer le réseau à une entrée.
+chaque fois que nous devons appliquer le réseau à une entrée.
 
 :begin_tab:`mxnet`
 Même si l'entrée `X` est un tenseur d'ordre 4, 
 la couche intégrée `Dense` 
- convertira automatiquement `X` en un tenseur d'ordre 2 
+convertira automatiquement `X` en un tenseur d'ordre 2 
 en gardant la dimensionnalité le long du premier axe inchangée.
 :end_tab:
 
@@ -58,7 +58,7 @@ en gardant la dimensionnalité le long du premier axe inchangée.
 
 :begin_tab:`tensorflow`
 Nous utilisons une couche `Flatten` pour convertir le tenseur d'ordre 4 `X` 
- en gardant la dimension le long du premier axe inchangée.
+en gardant la dimension le long du premier axe inchangée.
 :end_tab:
 
 ```{.python .input}
@@ -85,7 +85,7 @@ class SoftmaxRegression(d2l.Classifier):
 ## Softmax Revisited
 :label:`subsec_softmax-implementation-revisited` 
 
- Dans :numref:`sec_softmax_scratch` nous avons calculé la sortie de notre modèle
+Dans :numref:`sec_softmax_scratch` nous avons calculé la sortie de notre modèle
 et appliqué la perte d'entropie croisée. Bien que cette méthode soit parfaitement
 raisonnable d'un point de vue mathématique, elle est risquée d'un point de vue informatique, en raison d'un débordement et d'un sous-débordement numérique dans l'exponentiation de
 .
@@ -96,9 +96,9 @@ Si certains des $o_k$ sont très grands, c'est-à-dire très positifs,
 alors $\exp(o_k)$ pourrait être plus grand que le plus grand nombre
 que nous pouvons avoir pour certains types de données. C'est ce qu'on appelle un *débordement*. De même,
 si tous les arguments sont très négatifs, nous obtiendrons *underflow*.
-Par exemple, les nombres à virgule flottante en simple précision, approximativement
-, couvrent la plage de $10^{-38}$ à $10^{38}$. Par conséquent, si le plus grand terme de $\mathbf{o}$
- se trouve en dehors de l'intervalle $[-90, 90]$, le résultat ne sera pas stable.
+Par exemple, les nombres à virgule flottante en simple précision, approximativement,
+couvrent la plage de $10^{-38}$ à $10^{38}$. Par conséquent, si le plus grand terme de $\mathbf{o}$
+se trouve en dehors de l'intervalle $[-90, 90]$, le résultat ne sera pas stable.
 Une solution à ce problème consiste à soustraire $\bar{o} \stackrel{\mathrm{def}}{=} \max_k o_k$ de
 toutes les entrées :
 
@@ -108,8 +108,8 @@ $$
 \frac{\exp(o_j - \bar{o})}{\sum_k \exp (o_k - \bar{o})}.
 $$
 
-Par construction, nous savons que $o_j - \bar{o} \leq 0$ pour tous les $j$. Ainsi, pour un problème de classification $q$-classe
-, le dénominateur est contenu dans l'intervalle $[1, q]$. De plus, le numérateur de
+Par construction, nous savons que $o_j - \bar{o} \leq 0$ pour tous les $j$. Ainsi, pour un problème de classification $q$-classe,
+le dénominateur est contenu dans l'intervalle $[1, q]$. De plus, le numérateur de
 ne dépasse jamais $1$, ce qui empêche tout dépassement numérique. Le dépassement de capacité numérique
 ne se produit que lorsque $\exp(o_j - \bar{o})$ est évalué numériquement comme $0$. Néanmoins, quelques étapes plus loin
 nous pourrions nous trouver en difficulté lorsque nous voulons calculer $\log \hat{y}_j$ comme $\log 0$.

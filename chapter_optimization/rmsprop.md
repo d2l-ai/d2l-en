@@ -2,7 +2,7 @@
 :label:`sec_rmsprop` 
 
  
- L'un des problèmes clés de :numref:`sec_adagrad` est que le taux d'apprentissage diminue selon un calendrier prédéfini de manière efficace $\mathcal{O}(t^{-\frac{1}{2}})$. Bien que cela soit généralement approprié pour les problèmes convexes, ce n'est peut-être pas idéal pour les problèmes non convexes, tels que ceux rencontrés dans l'apprentissage profond. Pourtant, l'adaptabilité coordonnée d'Adagrad est hautement souhaitable en tant que préconditionneur.
+L'un des problèmes clés de :numref:`sec_adagrad` est que le taux d'apprentissage diminue selon un calendrier prédéfini de manière efficace $\mathcal{O}(t^{-\frac{1}{2}})$. Bien que cela soit généralement approprié pour les problèmes convexes, ce n'est peut-être pas idéal pour les problèmes non convexes, tels que ceux rencontrés dans l'apprentissage profond. Pourtant, l'adaptabilité coordonnée d'Adagrad est hautement souhaitable en tant que préconditionneur.
 
 :cite:`Tieleman.Hinton.2012` a proposé l'algorithme RMSProp comme solution simple pour découpler l'ordonnancement des taux d'apprentissage adaptatifs coordonnés. Le problème est qu'Adagrad accumule les carrés du gradient $\mathbf{g}_t$ dans un vecteur d'état $\mathbf{s}_t = \mathbf{s}_{t-1} + \mathbf{g}_t^2$. En conséquence, $\mathbf{s}_t$ continue de croître sans limite en raison de l'absence de normalisation, essentiellement de manière linéaire lorsque l'algorithme converge.
 
@@ -64,7 +64,7 @@ d2l.plt.xlabel('time');
 
 ## Mise en œuvre à partir de zéro
 
-Comme précédemment, nous utilisons la fonction quadratique $f(\mathbf{x})=0.1x_1^2+2x_2^2$ pour observer la trajectoire de RMSProp. Rappelez-vous que dans :numref:`sec_adagrad` , lorsque nous avons utilisé Adagrad avec un taux d'apprentissage de 0,4, les variables n'ont bougé que très lentement dans les derniers stades de l'algorithme car le taux d'apprentissage a diminué trop rapidement. Comme $\eta$ est contrôlé séparément, cela ne se produit pas avec RMSProp.
+Comme précédemment, nous utilisons la fonction quadratique $f(\mathbf{x})=0.1x_1^2+2x_2^2$ pour observer la trajectoire de RMSProp. Rappelez-vous que dans :numref:`sec_adagrad`, lorsque nous avons utilisé Adagrad avec un taux d'apprentissage de 0,4, les variables n'ont bougé que très lentement dans les derniers stades de l'algorithme car le taux d'apprentissage a diminué trop rapidement. Comme $\eta$ est contrôlé séparément, cela ne se produit pas avec RMSProp.
 
 ```{.python .input}
 #@tab all

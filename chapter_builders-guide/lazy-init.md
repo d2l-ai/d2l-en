@@ -1,18 +1,18 @@
 # Lazy Initialization
 :label:`sec_lazy_init` 
 
- Jusqu'à présent, il pourrait sembler que nous nous en sommes sortis
+Jusqu'à présent, il pourrait sembler que nous nous en sommes sortis
 en étant négligents dans la configuration de nos réseaux.
 Plus précisément, nous avons fait les choses peu intuitives suivantes,
 qui peuvent sembler ne pas devoir fonctionner :
 
 * Nous avons défini les architectures de réseau
- sans spécifier la dimensionnalité d'entrée.
+sans spécifier la dimensionnalité d'entrée.
 * Nous avons ajouté des couches sans spécifier
- la dimension de sortie de la couche précédente.
+la dimension de sortie de la couche précédente.
 * Nous avons même "initialisé" ces paramètres
- avant de fournir suffisamment d'informations pour déterminer
- le nombre de paramètres que nos modèles devraient contenir.
+avant de fournir suffisamment d'informations pour déterminer
+le nombre de paramètres que nos modèles devraient contenir.
 
 Vous pourriez être surpris que notre code fonctionne.
 Après tout, il n'y a aucun moyen pour le cadre d'apprentissage profond
@@ -102,7 +102,7 @@ la dimension d'entrée de chaque couche est listée comme -1.
 MXNet utilise la valeur spéciale -1 pour indiquer
 que la dimension du paramètre reste inconnue.
 À ce stade, toute tentative d'accès à `net[0].weight.data()`
- déclencherait une erreur d'exécution indiquant que le réseau
+déclencherait une erreur d'exécution indiquant que le réseau
 doit être initialisé avant de pouvoir accéder aux paramètres.
 Voyons maintenant ce qui se passe lorsque nous tentons d'initialiser les paramètres
 via la méthode `initialize`.

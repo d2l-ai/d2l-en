@@ -6,7 +6,7 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 # Auto-attention et encodage positionnel
 :label:`sec_self-attention-and-positional-encoding` 
 
- En apprentissage profond,
+En apprentissage profond,
 nous utilisons souvent des CNN ou des RNN pour encoder une séquence.
 Maintenant, avec les mécanismes d'attention,
 imaginez que nous introduisons une séquence d'éléments verbaux
@@ -20,7 +20,7 @@ et génère une sortie d'attention.
 Puisque les requêtes, les clés et les valeurs
 proviennent du même endroit,
 réalise
- une *auto-attention* :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017` , qui est également appelée *intra-attention* :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017` .
+une *auto-attention* :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017`, qui est également appelée *intra-attention* :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017`.
 Dans cette section,
 nous discuterons du codage de séquence utilisant l'auto-attention,
 y compris l'utilisation d'informations supplémentaires pour l'ordre de la séquence.
@@ -60,8 +60,8 @@ où
 
 $$\mathbf{y}_i = f(\mathbf{x}_i, (\mathbf{x}_1, \mathbf{x}_1), \ldots, (\mathbf{x}_n, \mathbf{x}_n)) \in \mathbb{R}^d$$ 
 
- selon la définition de la mise en commun de l'attention $f$ dans
-:eqref:`eq_attn-pooling-def` .
+selon la définition de la mise en commun de l'attention $f$ dans
+:eqref:`eq_attn-pooling-def`.
 En utilisant l'attention multi-têtes,
 l'extrait de code suivant
 calcule l'auto-attention d'un tenseur
@@ -108,27 +108,27 @@ d2l.check_shape(attention(X, X, X, valid_lens, training=False),
 ## Comparaison des CNN, des RNN et de l'auto-attention
 :label:`subsec_cnn-rnn-self-attention` 
 
- Comparons les architectures permettant de mettre en correspondance
+Comparons les architectures permettant de mettre en correspondance
 une séquence de $n$ tokens
 avec une autre séquence de longueur égale,
 où chaque token d'entrée ou de sortie est représenté par
 un vecteur $d$-dimensionnel.
 Plus précisément,
 nous considérerons les CNN, les RNN et l'auto-attention.
-Nous comparerons leur complexité de calcul
-, les opérations séquentielles 
-,
+Nous comparerons leur complexité de calcul,
+les opérations séquentielles ,
+
 et les longueurs maximales des chemins.
 Notez que les opérations séquentielles empêchent le calcul parallèle,
 alors qu'un chemin plus court entre
 toute combinaison de positions de séquence
-facilite l'apprentissage des dépendances à longue portée au sein de la séquence :cite:`Hochreiter.Bengio.Frasconi.ea.2001` .
+facilite l'apprentissage des dépendances à longue portée au sein de la séquence :cite:`Hochreiter.Bengio.Frasconi.ea.2001`.
 
 
 ![Comparing CNN (padding tokens are omitted) les architectures RNN, RNN et auto-attention](../img/cnn-rnn-self-attention.svg)
 :label:`fig_cnn-rnn-self-attention` 
 
- Considérons une couche convolutive dont la taille du noyau est $k$.
+Considérons une couche convolutive dont la taille du noyau est $k$.
 Nous fournirons plus de détails sur le traitement des séquences
 à l'aide des CNN dans les chapitres suivants.
 Pour l'instant,
@@ -136,22 +136,22 @@ nous avons seulement besoin de savoir que
 puisque la longueur de la séquence est $n$,
 le nombre de canaux d'entrée et de sortie est $d$,
 la complexité de calcul de la couche convolutionnelle est $\mathcal{O}(knd^2)$.
-Comme le montre :numref:`fig_cnn-rnn-self-attention` ,
+Comme le montre :numref:`fig_cnn-rnn-self-attention`,
 les CNN sont hiérarchiques donc 
 il y a $\mathcal{O}(1)$ opérations séquentielles
 et la longueur maximale du chemin est $\mathcal{O}(n/k)$.
 Par exemple, $\mathbf{x}_1$ et $\mathbf{x}_5$
- sont dans le champ réceptif d'un CNN à deux couches
-avec un noyau de taille 3 dans :numref:`fig_cnn-rnn-self-attention` .
+sont dans le champ réceptif d'un CNN à deux couches
+avec un noyau de taille 3 dans :numref:`fig_cnn-rnn-self-attention`.
 
 Lors de la mise à jour de l'état caché des RNN,
 la multiplication de la matrice de poids $d \times d$
- et de l'état caché $d$-dimensionnel a 
+et de l'état caché $d$-dimensionnel a 
 une complexité de calcul de $\mathcal{O}(d^2)$.
 La longueur de la séquence étant $n$,
 la complexité de calcul de la couche récurrente
 est $\mathcal{O}(nd^2)$.
-Selon :numref:`fig_cnn-rnn-self-attention` ,
+Selon :numref:`fig_cnn-rnn-self-attention`,
 il existe $\mathcal{O}(n)$ des opérations séquentielles
 qui ne peuvent pas être parallélisées
 et la longueur maximale du chemin est également $\mathcal{O}(n)$.
@@ -160,7 +160,7 @@ Dans l'auto-attention,
 les requêtes, les clés et les valeurs 
 sont toutes des matrices $n \times d$.
 Considérons l'attention par produit scalaire dans
-:eqref:`eq_softmax_QK_V` ,
+:eqref:`eq_softmax_QK_V`,
 où une matrice $n \times d$ est multipliée par
 une matrice $d \times n$,
 puis la matrice de sortie $n \times n$ est multipliée
@@ -168,7 +168,7 @@ par une matrice $n \times d$.
 Par conséquent,
 l'auto-attention
 a une complexité computationnelle de $\mathcal{O}(n^2d)$.
-Comme nous pouvons le voir sur :numref:`fig_cnn-rnn-self-attention` ,
+Comme nous pouvons le voir sur :numref:`fig_cnn-rnn-self-attention`,
 chaque jeton est directement connecté
 à tout autre jeton via l'auto-attention.
 Par conséquent, le calcul de
@@ -189,7 +189,7 @@ rend l'auto-attention prohibitivement lente pour les très longues séquences.
 :label:`subsec_positional-encoding` 
 
  
- Contrairement aux RNN qui traitent de manière récurrente
+Contrairement aux RNN qui traitent de manière récurrente
 les tokens d'une séquence un par un,
 l'auto-attention abandonne
 les opérations séquentielles en faveur de 
@@ -198,27 +198,27 @@ Pour utiliser les informations sur l'ordre des séquences,
 nous pouvons injecter
 des informations positionnelles absolues ou relatives
 
- en ajoutant un *codage positionnel*
+en ajoutant un *codage positionnel*
 aux représentations d'entrée.
 Les codages positionnels peuvent être 
 soit appris, soit fixés.
 Dans ce qui suit, 
 nous décrivons un codage positionnel fixe
-basé sur les fonctions sinus et cosinus :cite:`Vaswani.Shazeer.Parmar.ea.2017` .
+basé sur les fonctions sinus et cosinus :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
 
 Supposons que
 la représentation d'entrée $\mathbf{X} \in \mathbb{R}^{n \times d}$ contienne les enchâssements $d$-dimensionnels pour $n$ les tokens d'une séquence.
 Le codage positionnel produit
 $\mathbf{X} + \mathbf{P}$ 
- en utilisant une matrice d'enchâssement positionnel $\mathbf{P} \in \mathbb{R}^{n \times d}$ de même forme,
+en utilisant une matrice d'enchâssement positionnel $\mathbf{P} \in \mathbb{R}^{n \times d}$ de même forme,
 dont l'élément sur la ligne $i^\mathrm{th}$ 
- et la colonne $(2j)^\mathrm{th}$
- ou $(2j + 1)^\mathrm{th}$ est
+et la colonne $(2j)^\mathrm{th}$
+ou $(2j + 1)^\mathrm{th}$ est
 
 $$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),\\p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).\end{aligned}$$ 
- :eqlabel:`eq_positional-encoding-def` 
+:eqlabel:`eq_positional-encoding-def` 
 
- Au premier abord,
+Au premier abord,
 cette conception de la fonction trigonométrique
 semble bizarre.
 Avant d'expliquer cette conception,
@@ -292,12 +292,12 @@ et les colonnes représentent différentes dimensions d'encodage positionnel**].
 Dans l'exemple ci-dessous,
 nous pouvons voir que
 les colonnes $6^{\mathrm{th}}$ et $7^{\mathrm{th}}$
- de la matrice d'encastrement positionnel 
+de la matrice d'encastrement positionnel 
 ont une fréquence plus élevée que 
 les colonnes $8^{\mathrm{th}}$ et $9^{\mathrm{th}}$
  .
-Le décalage entre les colonnes 
-, $6^{\mathrm{th}}$ et $7^{\mathrm{th}}$ (idem pour les colonnes $8^{\mathrm{th}}$ et $9^{\mathrm{th}}$)
+Le décalage entre les colonnes ,
+$6^{\mathrm{th}}$ et $7^{\mathrm{th}}$ (idem pour les colonnes $8^{\mathrm{th}}$ et $9^{\mathrm{th}}$)
 est dû à l'alternance des fonctions sinus et cosinus.
 
 ```{.python .input}
@@ -387,7 +387,7 @@ un modèle d'apprendre facilement à assister à des positions relatives.
 En effet,
 pour tout décalage de position fixe $\delta$,
 le codage positionnel à la position $i + \delta$
- peut être représenté par une projection linéaire
+peut être représenté par une projection linéaire
 de celui à la position $i$.
 
 
@@ -396,10 +396,10 @@ mathématiquement.
 En désignant
 $\omega_j = 1/10000^{2j/d}$ ,
 toute paire de $(p_{i, 2j}, p_{i, 2j+1})$ 
- dans :eqref:`eq_positional-encoding-def` 
- peut 
+dans :eqref:`eq_positional-encoding-def` 
+peut 
 être projetée linéairement vers $(p_{i+\delta, 2j}, p_{i+\delta, 2j+1})$
- pour tout décalage fixe $\delta$:
+pour tout décalage fixe $\delta$:
 
 $$\begin{aligned}
 &\begin{bmatrix} \cos(\delta \omega_j) & \sin(\delta \omega_j) \\  -\sin(\delta \omega_j) & \cos(\delta \omega_j) \\ \end{bmatrix}
@@ -423,7 +423,7 @@ où la matrice de projection $2\times 2$ ne dépend d'aucun indice de position $
 
 1. Supposons que nous concevions une architecture profonde pour représenter une séquence en empilant des couches d'auto-attention avec un encodage positionnel. Quels pourraient être les problèmes ?
 1. Pouvez-vous concevoir une méthode d'encodage positionnel apprenable ?
-1. Pouvons-nous attribuer différents encastrements appris en fonction des différents décalages entre les requêtes et les clés qui sont comparées dans l'auto-attention ? Indice : vous pouvez vous référer aux encastrements de position relative :cite:`shaw2018self,huang2018music` .
+1. Pouvons-nous attribuer différents encastrements appris en fonction des différents décalages entre les requêtes et les clés qui sont comparées dans l'auto-attention ? Indice : vous pouvez vous référer aux encastrements de position relative :cite:`shaw2018self,huang2018music`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/1651)

@@ -1,9 +1,9 @@
 # Naive Bayes
 :label:`sec_naive_bayes` 
 
- Tout au long des sections précédentes, nous avons appris la théorie des probabilités et des variables aléatoires.  Pour mettre cette théorie en pratique, nous allons présenter le classificateur *Bayes naïf*.  Celui-ci n'utilise rien d'autre que les bases probabilistes pour nous permettre d'effectuer la classification de chiffres.
+Tout au long des sections précédentes, nous avons appris la théorie des probabilités et des variables aléatoires.  Pour mettre cette théorie en pratique, nous allons présenter le classifieur *Bayes naïf*.  Celui-ci n'utilise rien d'autre que les bases probabilistes pour nous permettre d'effectuer la classification de chiffres.
 
-L'apprentissage consiste à faire des hypothèses. Si nous voulons classer un nouvel exemple de données que nous n'avons jamais vu auparavant, nous devons faire quelques hypothèses sur les exemples de données qui sont similaires les uns aux autres. Le classificateur Bayes naïf, un algorithme populaire et remarquablement clair, suppose que toutes les caractéristiques sont indépendantes les unes des autres afin de simplifier le calcul. Dans cette section, nous allons appliquer ce modèle pour reconnaître des caractères dans des images.
+L'apprentissage consiste à faire des hypothèses. Si nous voulons classer un nouvel exemple de données que nous n'avons jamais vu auparavant, nous devons faire quelques hypothèses sur les exemples de données qui sont similaires les uns aux autres. Le classifieur Bayes naïf, un algorithme populaire et remarquablement clair, suppose que toutes les caractéristiques sont indépendantes les unes des autres afin de simplifier le calcul. Dans cette section, nous allons appliquer ce modèle pour reconnaître des caractères dans des images.
 
 ```{.python .input}
 #@tab mxnet
@@ -160,31 +160,31 @@ d2l.show_images(images, 2, 9);
 
 Dans une tâche de classification, nous faisons correspondre un exemple à une catégorie. Ici, un exemple est une image en niveaux de gris $28\times 28$, et une catégorie est un chiffre. (Reportez-vous à :numref:`sec_softmax` pour une explication plus détaillée.)
 Une façon naturelle d'exprimer la tâche de classification est de poser la question probabiliste suivante : quelle est l'étiquette la plus probable étant donné les caractéristiques (c'est-à-dire les pixels de l'image) ? On désigne par $\mathbf x\in\mathbb R^d$ les caractéristiques de l'exemple et par $y\in\mathbb R$ l'étiquette. Les caractéristiques sont ici des pixels d'image, où nous pouvons transformer une image à $2$ dimensions en un vecteur de sorte que $d=28^2=784$, et les étiquettes sont des chiffres.
-La probabilité de l'étiquette compte tenu des caractéristiques est $p(y  \mid  \mathbf{x})$. Si nous sommes en mesure de calculer ces probabilités, qui sont $p(y  \mid  \mathbf{x})$ pour $y=0, \ldots,9$ dans notre exemple, alors le classificateur produira la prédiction $\hat{y}$ donnée par l'expression :
+La probabilité de l'étiquette compte tenu des caractéristiques est $p(y  \mid  \mathbf{x})$. Si nous sommes en mesure de calculer ces probabilités, qui sont $p(y  \mid  \mathbf{x})$ pour $y=0, \ldots,9$ dans notre exemple, alors le classifieur produira la prédiction $\hat{y}$ donnée par l'expression :
 
 $$\hat{y} = \mathrm{argmax} \> p(y  \mid  \mathbf{x}).$$ 
 
- Malheureusement, cela exige que nous estimions $p(y  \mid  \mathbf{x})$ pour chaque valeur de $\mathbf{x} = x_1, ..., x_d$. Imaginez que chaque caractéristique puisse prendre l'une des valeurs $2$. Par exemple, la caractéristique $x_1 = 1$ pourrait signifier que le mot pomme apparaît dans un document donné et $x_1 = 0$ signifierait qu'il n'apparaît pas. Si nous disposons de $30$ caractéristiques binaires de ce type, cela signifie que nous devons être prêts à classer n'importe laquelle des $2^{30}$ (plus d'un milliard !) valeurs possibles du vecteur d'entrée $\mathbf{x}$.
+Malheureusement, cela exige que nous estimions $p(y  \mid  \mathbf{x})$ pour chaque valeur de $\mathbf{x} = x_1, ..., x_d$. Imaginez que chaque caractéristique puisse prendre l'une des valeurs $2$. Par exemple, la caractéristique $x_1 = 1$ pourrait signifier que le mot pomme apparaît dans un document donné et $x_1 = 0$ signifierait qu'il n'apparaît pas. Si nous disposons de $30$ caractéristiques binaires de ce type, cela signifie que nous devons être prêts à classer n'importe laquelle des $2^{30}$ (plus d'un milliard !) valeurs possibles du vecteur d'entrée $\mathbf{x}$.
 
 En outre, où est l'apprentissage ? Si nous devons voir chaque exemple possible afin de prédire l'étiquette correspondante, nous n'apprenons pas vraiment un modèle, mais nous nous contentons de mémoriser l'ensemble des données.
 
-## Le classificateur Naive Bayes
+## Le classifieur Naive Bayes
 
-Heureusement, en faisant quelques hypothèses sur l'indépendance conditionnelle, nous pouvons introduire un biais inductif et construire un modèle capable de généraliser à partir d'une sélection relativement modeste d'exemples d'apprentissage. Pour commencer, utilisons le théorème de Bayes, pour exprimer le classificateur comme suit :
+Heureusement, en faisant quelques hypothèses sur l'indépendance conditionnelle, nous pouvons introduire un biais inductif et construire un modèle capable de généraliser à partir d'une sélection relativement modeste d'exemples d'apprentissage. Pour commencer, utilisons le théorème de Bayes, pour exprimer le classifieur comme suit :
 
 $$\hat{y} = \mathrm{argmax}_y \> p(y  \mid  \mathbf{x}) = \mathrm{argmax}_y \> \frac{p( \mathbf{x}  \mid  y) p(y)}{p(\mathbf{x})}.$$ 
 
- Notez que le dénominateur est le terme de normalisation $p(\mathbf{x})$ qui ne dépend pas de la valeur de l'étiquette $y$. Par conséquent, nous devons uniquement nous préoccuper de la comparaison du numérateur entre différentes valeurs de $y$. Même si le calcul du dénominateur s'avérait difficile, nous pourrions l'ignorer, tant que nous pouvons évaluer le numérateur. Heureusement, même si nous voulions récupérer la constante de normalisation, nous le pourrions.  Nous pouvons toujours récupérer le terme de normalisation puisque $\sum_y p(y  \mid  \mathbf{x}) = 1$.
+Notez que le dénominateur est le terme de normalisation $p(\mathbf{x})$ qui ne dépend pas de la valeur de l'étiquette $y$. Par conséquent, nous devons uniquement nous préoccuper de la comparaison du numérateur entre différentes valeurs de $y$. Même si le calcul du dénominateur s'avérait difficile, nous pourrions l'ignorer, tant que nous pouvons évaluer le numérateur. Heureusement, même si nous voulions récupérer la constante de normalisation, nous le pourrions.  Nous pouvons toujours récupérer le terme de normalisation puisque $\sum_y p(y  \mid  \mathbf{x}) = 1$.
 
 Maintenant, concentrons-nous sur $p( \mathbf{x}  \mid  y)$. En utilisant la règle de probabilité en chaîne, nous pouvons exprimer le terme $p( \mathbf{x}  \mid  y)$ comme suit :
 
 $$p(x_1  \mid y) \cdot p(x_2  \mid  x_1, y) \cdot ... \cdot p( x_d  \mid  x_1, ..., x_{d-1}, y).$$ 
 
- En soi, cette expression ne nous fait pas avancer. Nous devons toujours estimer approximativement les paramètres de $2^d$. Cependant, si nous supposons que * les caractéristiques sont conditionnellement indépendantes les unes des autres, étant donné l'étiquette *, nous sommes soudainement en bien meilleure posture, car ce terme se simplifie en $\prod_i p(x_i  \mid  y)$, ce qui nous donne le prédicteur
+En soi, cette expression ne nous fait pas avancer. Nous devons toujours estimer approximativement les paramètres de $2^d$. Cependant, si nous supposons que * les caractéristiques sont conditionnellement indépendantes les unes des autres, étant donné l'étiquette *, nous sommes soudainement en bien meilleure posture, car ce terme se simplifie en $\prod_i p(x_i  \mid  y)$, ce qui nous donne le prédicteur
 
 $$\hat{y} = \mathrm{argmax}_y \> \prod_{i=1}^d p(x_i  \mid  y) p(y).$$ 
 
- Si nous pouvons estimer $p(x_i=1  \mid  y)$ pour chaque $i$ et $y$, et enregistrer sa valeur dans $P_{xy}[i, y]$, où $P_{xy}$ est une matrice $d\times n$ avec $n$ étant le nombre de classes et $y\in\{1, \ldots, n\}$, alors nous pouvons également l'utiliser pour estimer $p(x_i = 0 \mid y)$, c'est-à-dire ,
+Si nous pouvons estimer $p(x_i=1  \mid  y)$ pour chaque $i$ et $y$, et enregistrer sa valeur dans $P_{xy}[i, y]$, où $P_{xy}$ est une matrice $d\times n$ avec $n$ étant le nombre de classes et $y\in\{1, \ldots, n\}$, alors nous pouvons également l'utiliser pour estimer $p(x_i = 0 \mid y)$, c'est-à-dire ,
 
 $$ 
 p(x_i = t_i \mid y) = 
@@ -197,9 +197,9 @@ $$
 En outre, nous estimons $p(y)$ pour chaque $y$ et l'enregistrons dans $P_y[y]$, $P_y$ étant un vecteur de longueur $n$. Ensuite, pour tout nouvel exemple $\mathbf t = (t_1, t_2, \ldots, t_d)$, nous pouvons calculer
 
 $$\begin{aligned}\hat{y} &= \mathrm{argmax}_ y \ p(y)\prod_{i=1}^d   p(x_t = t_i \mid y) \\ &= \mathrm{argmax}_y \ P_y[y]\prod_{i=1}^d \ P_{xy}[i, y]^{t_i}\, \left(1 - P_{xy}[i, y]\right)^{1-t_i}\end{aligned}$$ 
- :eqlabel:`eq_naive_bayes_estimation` 
+:eqlabel:`eq_naive_bayes_estimation` 
 
- pour tout $y$. Ainsi, notre hypothèse d'indépendance conditionnelle a fait passer la complexité de notre modèle d'une dépendance exponentielle du nombre de caractéristiques $\mathcal{O}(2^dn)$ à une dépendance linéaire, qui est $\mathcal{O}(dn)$.
+pour tout $y$. Ainsi, notre hypothèse d'indépendance conditionnelle a fait passer la complexité de notre modèle d'une dépendance exponentielle du nombre de caractéristiques $\mathcal{O}(2^dn)$ à une dépendance linéaire, qui est $\mathcal{O}(dn)$.
 
 
 ## Formation
@@ -314,7 +314,7 @@ image, label = train_images[0], train_labels[0]
 bayes_pred(image)
 ```
 
-Cela s'est très mal passé ! Pour savoir pourquoi, examinons les probabilités par pixel. Il s'agit généralement de nombres compris entre $0.001$ et $1$. Nous les multiplions par $784$. À ce stade, il convient de préciser que nous calculons ces chiffres sur un ordinateur, donc avec une plage fixe pour l'exposant. Ce qui se passe, c'est que nous subissons un *débordement numérique *, c'est-à-dire que la multiplication de tous les petits nombres conduit à quelque chose d'encore plus petit jusqu'à ce qu'il soit arrondi à zéro.  Nous avons abordé ce problème d'un point de vue théorique sur :numref:`sec_maximum_likelihood` , mais nous constatons clairement ce phénomène dans la pratique.
+Cela s'est très mal passé ! Pour savoir pourquoi, examinons les probabilités par pixel. Il s'agit généralement de nombres compris entre $0.001$ et $1$. Nous les multiplions par $784$. À ce stade, il convient de préciser que nous calculons ces chiffres sur un ordinateur, donc avec une plage fixe pour l'exposant. Ce qui se passe, c'est que nous subissons un *débordement numérique *, c'est-à-dire que la multiplication de tous les petits nombres conduit à quelque chose d'encore plus petit jusqu'à ce qu'il soit arrondi à zéro.  Nous avons abordé ce problème d'un point de vue théorique sur :numref:`sec_maximum_likelihood`, mais nous constatons clairement ce phénomène dans la pratique.
 
 Comme indiqué dans cette section, nous corrigeons ce problème en utilisant le fait que $\log a b = \log a + \log b$, c'est-à-dire que nous passons à la sommation des logarithmes.
 Même si $a$ et $b$ sont de petits nombres, les valeurs logarithmiques devraient se situer dans une plage appropriée.
@@ -344,7 +344,7 @@ Comme le logarithme est une fonction croissante, nous pouvons réécrire :eqref:
 
 $$ \hat{y} = \mathrm{argmax}_y \ \log P_y[y] + \sum_{i=1}^d \Big[t_i\log P_{xy}[x_i, y] + (1-t_i) \log (1 - P_{xy}[x_i, y]) \Big].$$ 
 
- Nous pouvons implémenter la version stable suivante :
+Nous pouvons implémenter la version stable suivante :
 
 ```{.python .input}
 #@tab mxnet
@@ -413,7 +413,7 @@ py.argmax(dim=0) == label
 tf.argmax(py, axis=0, output_type = tf.int32) == label
 ```
 
-Si nous prédisons maintenant quelques exemples de validation, nous pouvons constater que le classificateur de Bayes
+Si nous prédisons maintenant quelques exemples de validation, nous pouvons constater que le classifieur de Bayes
 fonctionne assez bien.
 
 ```{.python .input}
@@ -451,7 +451,7 @@ preds = predict(X)
 d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
 
-Enfin, calculons la précision globale du classificateur.
+Enfin, calculons la précision globale du classifieur.
 
 ```{.python .input}
 #@tab mxnet
@@ -477,17 +477,17 @@ preds = tf.constant(predict(X), dtype=tf.int32)
 tf.reduce_sum(tf.cast(preds == y, tf.float32)).numpy() / len(y)
 ```
 
-Les réseaux profonds modernes atteignent des taux d'erreur inférieurs à $0.01$. Cette performance relativement faible est due aux hypothèses statistiques incorrectes que nous avons faites dans notre modèle : nous avons supposé que chaque pixel est généré *indépendamment*, en fonction uniquement de l'étiquette. Ce n'est clairement pas la façon dont les humains écrivent les chiffres, et cette hypothèse erronée a conduit à la chute de notre classificateur (Bayes) trop naïf.
+Les réseaux profonds modernes atteignent des taux d'erreur inférieurs à $0.01$. Cette performance relativement faible est due aux hypothèses statistiques incorrectes que nous avons faites dans notre modèle : nous avons supposé que chaque pixel est généré *indépendamment*, en fonction uniquement de l'étiquette. Ce n'est clairement pas la façon dont les humains écrivent les chiffres, et cette hypothèse erronée a conduit à la chute de notre classifieur (Bayes) trop naïf.
 
 ## Résumé
-* En utilisant la règle de Bayes, un classificateur peut être réalisé en supposant que toutes les caractéristiques observées sont indépendantes. 
-* Ce classifieur peut être entraîné sur un ensemble de données en comptant le nombre d'occurrences de combinaisons d'étiquettes et de valeurs de pixels.
-* Ce classificateur a été la référence pendant des décennies pour des tâches telles que la détection de spam.
+* En utilisant la règle de Bayes, un classifieur peut être réalisé en supposant que toutes les caractéristiques observées sont indépendantes. 
+* Ce classifieurs peut être entraîné sur un ensemble de données en comptant le nombre d'occurrences de combinaisons d'étiquettes et de valeurs de pixels.
+* Ce classifieur a été la référence pendant des décennies pour des tâches telles que la détection de spam.
 
 ## Exercices
-1. Considérons l'ensemble de données $[[0,0], [0,1], [1,0], [1,1]]$ avec des étiquettes données par le XOR des deux éléments $[0,1,1,0]$.  Quelles sont les probabilités pour un classificateur Naive Bayes construit sur ce jeu de données.  Est-ce qu'il réussit à classer nos points ?  Si non, quelles hypothèses sont violées ?
+1. Considérons l'ensemble de données $[[0,0], [0,1], [1,0], [1,1]]$ avec des étiquettes données par le XOR des deux éléments $[0,1,1,0]$.  Quelles sont les probabilités pour un classifieur Naive Bayes construit sur ce jeu de données.  Est-ce qu'il réussit à classer nos points ?  Si non, quelles hypothèses sont violées ?
 1. Supposons que nous n'ayons pas utilisé le lissage de Laplace lors de l'estimation des probabilités et qu'un exemple de données contenant une valeur jamais observée lors de l'entrainement arrive au moment du test.  Quel serait le résultat du modèle ?
-1. Le classificateur de Bayes naïf est un exemple spécifique de réseau bayésien, où la dépendance des variables aléatoires est codée par une structure de graphe.  Bien que la théorie complète dépasse le cadre de cette section (voir :cite:`Koller.Friedman.2009` pour plus de détails), expliquez pourquoi le fait d'autoriser une dépendance explicite entre les deux variables d'entrée dans le modèle XOR permet de créer un classificateur efficace.
+1. Le classifieur de Bayes naïf est un exemple spécifique de réseau bayésien, où la dépendance des variables aléatoires est codée par une structure de graphe.  Bien que la théorie complète dépasse le cadre de cette section (voir :cite:`Koller.Friedman.2009` pour plus de détails), expliquez pourquoi le fait d'autoriser une dépendance explicite entre les deux variables d'entrée dans le modèle XOR permet de créer un classifieur efficace.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/418)

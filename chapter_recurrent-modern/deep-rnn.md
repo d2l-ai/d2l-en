@@ -2,7 +2,7 @@
 
 :label:`sec_deep_rnn` 
 
- Jusqu'à présent, nous n'avons abordé que les RNN dotés d'une seule couche cachée unidirectionnelle.
+Jusqu'à présent, nous n'avons abordé que les RNN dotés d'une seule couche cachée unidirectionnelle.
 Dans ce cas, la forme fonctionnelle spécifique de l'interaction entre les variables latentes et les observations est plutôt arbitraire.
 Ce n'est pas un gros problème tant que nous avons suffisamment de flexibilité pour modéliser différents types d'interactions.
 Avec une seule couche, cependant, cela peut être assez difficile.
@@ -15,8 +15,8 @@ nous pouvons empiler plusieurs couches de RNN les unes sur les autres. Cela donn
 grâce à la combinaison de plusieurs couches simples. En particulier, les données peuvent être pertinentes à différents niveaux de la pile. Par exemple, nous pouvons vouloir conserver des données de haut niveau sur les conditions du marché financier (marché haussier ou baissier), alors qu'à un niveau inférieur, nous n'enregistrons que les dynamiques temporelles à court terme.
 
 
-Au-delà de toute la discussion abstraite ci-dessus
-, il est probablement plus facile de comprendre la famille de modèles qui nous intéresse en examinant :numref:`fig_deep_rnn` . Il décrit un RNN profond avec $L$ couches cachées.
+Au-delà de toute la discussion abstraite ci-dessus,
+il est probablement plus facile de comprendre la famille de modèles qui nous intéresse en examinant :numref:`fig_deep_rnn`. Il décrit un RNN profond avec $L$ couches cachées.
 Chaque état caché est continuellement transmis à la fois au prochain pas de temps de la couche actuelle et au pas de temps actuel de la couche suivante.
 
 ![Architecture of a deep RNN.](../img/deep-rnn.svg)
@@ -26,9 +26,9 @@ Chaque état caché est continuellement transmis à la fois au prochain pas de t
 
 Nous pouvons formaliser les dépendances fonctionnelles
 
- dans l'architecture profonde
+dans l'architecture profonde
 de $L$ couches cachées
-décrite dans :numref:`fig_deep_rnn` .
+décrite dans :numref:`fig_deep_rnn`.
 La discussion suivante se concentre principalement sur
 le modèle RNN vanille,
 mais elle s'applique également à d'autres modèles de séquence.
@@ -43,13 +43,13 @@ la variable de la couche de sortie être $\mathbf{O}_t \in \mathbb{R}^{n \times 
 En définissant $\mathbf{H}_t^{(0)} = \mathbf{X}_t$,
 l'état caché de
 la couche cachée $l^\mathrm{th}$
- qui utilise la fonction d'activation $\phi_l$
- est exprimée comme suit :
+qui utilise la fonction d'activation $\phi_l$
+est exprimée comme suit :
 
 $$\mathbf{H}_t^{(l)} = \phi_l(\mathbf{H}_t^{(l-1)} \mathbf{W}_{xh}^{(l)} + \mathbf{H}_{t-1}^{(l)} \mathbf{W}_{hh}^{(l)}  + \mathbf{b}_h^{(l)}),$$ 
- :eqlabel:`eq_deep_rnn_H` 
+:eqlabel:`eq_deep_rnn_H` 
 
- où les poids $\mathbf{W}_{xh}^{(l)} \in \mathbb{R}^{h \times h}$ et $\mathbf{W}_{hh}^{(l)} \in \mathbb{R}^{h \times h}$, ainsi que
+où les poids $\mathbf{W}_{xh}^{(l)} \in \mathbb{R}^{h \times h}$ et $\mathbf{W}_{hh}^{(l)} \in \mathbb{R}^{h \times h}$, ainsi que
 le biais $\mathbf{b}_h^{(l)} \in \mathbb{R}^{1 \times h}$, sont les paramètres du modèle de
 la couche cachée $l^\mathrm{th}$.
 
@@ -58,7 +58,7 @@ le calcul de la couche de sortie est uniquement basé sur l'état caché de la c
 
 $$\mathbf{O}_t = \mathbf{H}_t^{(L)} \mathbf{W}_{hq} + \mathbf{b}_q,$$ 
 
- où le poids $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$ et le biais $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ sont les paramètres du modèle de la couche de sortie.
+où le poids $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$ et le biais $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ sont les paramètres du modèle de la couche de sortie.
 
 Comme pour les MLP, le nombre de couches cachées $L$ et le nombre d'unités cachées $h$ sont des hyperparamètres.
 En d'autres termes, ils peuvent être réglés ou spécifiés par nous.
@@ -67,7 +67,7 @@ obtenir un RNN profond à déclenchement automatique
 en remplaçant
 le calcul de l'état caché dans
 :eqref:`eq_deep_rnn_H` 
- par celui d'un GRU ou d'un LSTM.
+par celui d'un GRU ou d'un LSTM.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -99,7 +99,7 @@ import tensorflow as tf
 
 Pour implémenter un RNN multicouche à partir de zéro,
 nous pouvons traiter chaque couche comme une instance `RNNScratch`
- avec ses propres paramètres apprenables.
+avec ses propres paramètres apprenables.
 
 ```{.python .input}
 %%tab mxnet, tensorflow
@@ -163,7 +163,7 @@ trainer.fit(model, data)
 
 Heureusement, de nombreux détails logistiques nécessaires à la mise en œuvre de couches multiples d'un RNN sont facilement disponibles dans des API de haut niveau.
 Notre implémentation concise utilisera ces fonctionnalités intégrées.
-Le code généralise celui que nous avons utilisé précédemment dans :numref:`sec_gru` ,
+Le code généralise celui que nous avons utilisé précédemment dans :numref:`sec_gru`,
 en permettant de spécifier explicitement le nombre de couches plutôt que de choisir par défaut une seule couche.
 
 ```{.python .input}
@@ -201,7 +201,7 @@ class GRU(d2l.RNN):  #@save
         return outputs, state
 ```
 
-Les décisions architecturales, telles que le choix des hyperparamètres, sont très similaires à celles de :numref:`sec_gru` .
+Les décisions architecturales, telles que le choix des hyperparamètres, sont très similaires à celles de :numref:`sec_gru`.
 Nous choisissons le même nombre d'entrées et de sorties que nous avons de tokens distincts, c'est-à-dire `vocab_size`.
 Le nombre d'unités cachées est toujours de 32.
 La seule différence est que nous (**sélectionnons maintenant un nombre non trivial de couches cachées en spécifiant la valeur de `num_layers`**)

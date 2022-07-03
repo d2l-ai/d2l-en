@@ -1,7 +1,7 @@
 # Calcul asynchrone
 :label:`sec_async` 
 
- Les ordinateurs d'aujourd'hui sont des systèmes hautement parallèles, composés de plusieurs cœurs de CPU (souvent plusieurs threads par cœur), de plusieurs éléments de traitement par GPU et souvent de plusieurs GPU par appareil. En bref, nous pouvons traiter beaucoup de choses différentes en même temps, souvent sur des appareils différents. Malheureusement, Python n'est pas un excellent moyen d'écrire du code parallèle et asynchrone, du moins pas sans aide supplémentaire. Après tout, Python est monofilaire et il est peu probable que cela change à l'avenir. Les cadres d'apprentissage profond tels que MXNet et TensorFlow adoptent un modèle de programmation *asynchrone* pour améliorer les performances,
+Les ordinateurs d'aujourd'hui sont des systèmes hautement parallèles, composés de plusieurs cœurs de CPU (souvent plusieurs threads par cœur), de plusieurs éléments de traitement par GPU et souvent de plusieurs GPU par appareil. En bref, nous pouvons traiter beaucoup de choses différentes en même temps, souvent sur des appareils différents. Malheureusement, Python n'est pas un excellent moyen d'écrire du code parallèle et asynchrone, du moins pas sans aide supplémentaire. Après tout, Python est monofilaire et il est peu probable que cela change à l'avenir. Les cadres d'apprentissage profond tels que MXNet et TensorFlow adoptent un modèle de programmation *asynchrone* pour améliorer les performances,
 tandis que PyTorch utilise le propre planificateur de Python, ce qui conduit à un compromis différent en matière de performances.
 Pour PyTorch, par défaut, les opérations GPU sont asynchrones. Lorsque vous appelez une fonction qui utilise le GPU, les opérations sont mises en file d'attente sur le périphérique particulier, mais ne sont pas nécessairement exécutées avant plus tard. Cela nous permet d'exécuter plus de calculs en parallèle, y compris des opérations sur le CPU ou d'autres GPU.
 
@@ -27,7 +27,7 @@ from torch import nn
 ## Asynchronie via le backend
 
 :begin_tab:`mxnet` 
- Pour s'échauffer, considérons le petit problème suivant : nous voulons générer une matrice aléatoire et la multiplier. Faisons-le à la fois dans NumPy et dans `mxnet.np` pour voir la différence.
+Pour s'échauffer, considérons le petit problème suivant : nous voulons générer une matrice aléatoire et la multiplier. Faisons-le à la fois dans NumPy et dans `mxnet.np` pour voir la différence.
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -103,13 +103,13 @@ with d2l.Benchmark():
 
 :begin_tab:`mxnet`
 De manière générale, MXNet possède un frontal pour les interactions directes avec les utilisateurs, par exemple via Python, ainsi qu'un backend utilisé par le système pour effectuer les calculs. 
-Comme le montre le site :numref:`fig_frontends` , les utilisateurs peuvent écrire des programmes MXNet dans différents langages frontaux, tels que Python, R, Scala et C++. Quel que soit le langage de programmation frontal utilisé, l'exécution des programmes MXNet se fait principalement dans le backend des implémentations C++. Les opérations émises par le langage frontal sont transmises au backend pour exécution. 
+Comme le montre le site :numref:`fig_frontends`, les utilisateurs peuvent écrire des programmes MXNet dans différents langages frontaux, tels que Python, R, Scala et C++. Quel que soit le langage de programmation frontal utilisé, l'exécution des programmes MXNet se fait principalement dans le backend des implémentations C++. Les opérations émises par le langage frontal sont transmises au backend pour exécution. 
 Le backend gère ses propres threads qui collectent et exécutent continuellement les tâches en file d'attente. Notez que pour que cela fonctionne, le backend doit être capable de garder la trace des dépendances entre les différentes étapes du graphe de calcul. Par conséquent, il n'est pas possible de paralléliser les opérations qui dépendent les unes des autres.
 :end_tab:
 
 :begin_tab:`pytorch`
 D'une manière générale, PyTorch dispose d'un front-end pour l'interaction directe avec les utilisateurs, par exemple via Python, ainsi que d'un back-end utilisé par le système pour effectuer le calcul. 
-Comme le montre le site :numref:`fig_frontends` , les utilisateurs peuvent écrire des programmes PyTorch dans différents langages frontaux, tels que Python et C++. Quel que soit le langage de programmation frontal utilisé, l'exécution des programmes PyTorch se fait principalement dans le backend des implémentations C++. Les opérations émises par le langage frontal sont transmises au backend pour être exécutées.
+Comme le montre le site :numref:`fig_frontends`, les utilisateurs peuvent écrire des programmes PyTorch dans différents langages frontaux, tels que Python et C++. Quel que soit le langage de programmation frontal utilisé, l'exécution des programmes PyTorch se fait principalement dans le backend des implémentations C++. Les opérations émises par le langage frontal sont transmises au backend pour être exécutées.
 Le backend gère ses propres threads qui collectent et exécutent continuellement les tâches en file d'attente.
 Notez que pour que cela fonctionne, le backend doit être capable de garder la trace des dépendances
 entre les différentes étapes du graphe de calcul.
@@ -143,7 +143,7 @@ z
 
 
 
-L'extrait de code ci-dessus est également illustré sur :numref:`fig_asyncgraph` .
+L'extrait de code ci-dessus est également illustré sur :numref:`fig_asyncgraph`.
 Chaque fois que le thread Python du frontend exécute l'une des trois premières instructions, il renvoie simplement la tâche à la file d'attente du backend. Lorsque les résultats de la dernière instruction doivent être *imprimés*, le thread frontal Python attendra que le thread backend C++ ait fini de calculer le résultat de la variable `z`. L'un des avantages de cette conception est que le frontend thread Python n'a pas besoin d'effectuer de calculs réels. Ainsi, il y a peu d'impact sur la performance globale du programme, quelle que soit la performance de Python. :numref:`fig_threading` illustre comment le frontend et le backend interagissent.
 
 ![Interactions of the frontend and backend.](../img/threading.svg)
@@ -155,7 +155,7 @@ Chaque fois que le thread Python du frontend exécute l'une des trois premières
 ## Obstacles et bloqueurs
 
 :begin_tab:`mxnet` 
- Il existe un certain nombre d'opérations qui obligent Python à attendre l'achèvement :
+Il existe un certain nombre d'opérations qui obligent Python à attendre l'achèvement :
 
 * Le plus évident est que `npx.waitall()` attend que tous les calculs soient terminés, quel que soit le moment où les instructions de calcul ont été émises. Dans la pratique, il est déconseillé d'utiliser cet opérateur sauf en cas de nécessité absolue, car il peut entraîner des performances médiocres.
 * Si nous voulons simplement attendre qu'une variable spécifique soit disponible, nous pouvons appeler `z.wait_to_read()`. Dans ce cas, les blocs MXNet retournent à Python jusqu'à ce que la variable `z` ait été calculée. D'autres calculs peuvent se poursuivre ensuite.
@@ -194,7 +194,7 @@ with d2l.Benchmark('scalar conversion'):
 ## Amélioration du calcul
 
 :begin_tab:`mxnet` 
- Sur un système fortement multithreadé (même les ordinateurs portables ordinaires ont 4 threads ou plus et sur les serveurs multi-socket, ce nombre peut dépasser 256), la surcharge des opérations d'ordonnancement peut devenir significative. C'est pourquoi il est hautement souhaitable que le calcul et l'ordonnancement se fassent de manière asynchrone et en parallèle. Pour illustrer les avantages de cette approche, voyons ce qui se passe si nous incrémentons une variable de 1 plusieurs fois, en séquence ou de manière asynchrone. Nous simulons une exécution synchrone en insérant une barrière `wait_to_read` entre chaque addition.
+Sur un système fortement multithreadé (même les ordinateurs portables ordinaires ont 4 threads ou plus et sur les serveurs multi-socket, ce nombre peut dépasser 256), la surcharge des opérations d'ordonnancement peut devenir significative. C'est pourquoi il est hautement souhaitable que le calcul et l'ordonnancement se fassent de manière asynchrone et en parallèle. Pour illustrer les avantages de cette approche, voyons ce qui se passe si nous incrémentons une variable de 1 plusieurs fois, en séquence ou de manière asynchrone. Nous simulons une exécution synchrone en insérant une barrière `wait_to_read` entre chaque addition.
 :end_tab:
 
 ```{.python .input}

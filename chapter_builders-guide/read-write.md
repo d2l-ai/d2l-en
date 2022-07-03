@@ -18,7 +18,7 @@ Cette section aborde les deux questions.
 
 Pour les tenseurs individuels, nous pouvons directement
 invoquer les fonctions `load` et `save`
- pour les lire et les écrire respectivement.
+pour les lire et les écrire respectivement.
 Les deux fonctions exigent que nous fournissions un nom,
 et `save` exige comme entrée la variable à sauvegarder.
 

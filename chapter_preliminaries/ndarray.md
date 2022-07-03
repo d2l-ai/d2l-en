@@ -6,20 +6,20 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Manipulation des données
 :label:`sec_ndarray` 
 
- Afin d'accomplir quoi que ce soit, 
+Afin d'accomplir quoi que ce soit, 
 nous avons besoin d'un moyen de stocker et de manipuler les données.
 En général, il y a deux choses importantes 
 que nous devons faire avec les données : 
 (i) les acquérir ; 
 et (ii) les traiter une fois qu'elles sont dans l'ordinateur. 
 Il est inutile d'acquérir des données 
-sans pouvoir les stocker, 
-. Pour commencer, nous allons donc nous salir les mains
+sans pouvoir les stocker.
+Pour commencer, nous allons donc nous salir les mains
 avec $n$ des tableaux à plusieurs dimensions, 
 que nous appelons aussi *tenseurs*.
-Si vous connaissez déjà le package de calcul scientifique NumPy 
-, 
-, ce sera un jeu d'enfant.
+Si vous connaissez déjà le package de calcul scientifique NumPy ,
+ ,
+ce sera un jeu d'enfant.
 Pour tous les cadres modernes d'apprentissage profond,
 la classe des *tenseurs* (`ndarray` dans MXNet, 
 `Tensor` dans PyTorch et TensorFlow) 
@@ -38,7 +38,7 @@ Ces propriétés rendent les réseaux neuronaux
 ## Mise en route
 
 :begin_tab:`mxnet` 
- Pour commencer, nous importons les modules `np` (`numpy`) et
+Pour commencer, nous importons les modules `np` (`numpy`) et
 `npx` (`numpy_extension`) de MXNet.
 Ici, le module `np` comprend 
 fonctions supportées par NumPy,
@@ -56,7 +56,7 @@ par d'autres composants de MXNet.
 :end_tab: 
 
  :begin_tab:`tensorflow` 
- Pour commencer, nous importons `tensorflow`. 
+Pour commencer, nous importons `tensorflow`. 
 Par souci de concision, les praticiens de 
 attribuent souvent l'alias `tf`.
 :end_tab:
@@ -203,7 +203,7 @@ Ce nouveau tenseur conserve tous les éléments
 mais les reconfigure en une matrice.
 Remarquez que les éléments de notre vecteur
 sont disposés une ligne à la fois et donc
-`x[3] == X[0, 3]` .
+`x[3] == X[0, 3]`.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -222,7 +222,7 @@ Notez que le fait de spécifier chaque composant de forme
 Puisque nous connaissons déjà la taille de notre tenseur,
 nous pouvons calculer une composante de la forme à partir des autres.
 Par exemple, avec un tenseur de taille $n$
- et une forme cible ($h$, $w$),
+et une forme cible ($h$, $w$),
 nous savons que $w = n/h$.
 Pour déduire automatiquement un composant de la forme,
 nous pouvons placer un `-1` pour le composant de la forme
@@ -410,8 +410,8 @@ par la signature
 $f: \mathbb{R} \rightarrow \mathbb{R}$ .
 Cela signifie simplement que la fonction fait passer
 d'un nombre réel quelconque à un autre nombre réel.
-La plupart des opérateurs standard peuvent être appliqués par éléments
-, y compris les opérateurs unaires comme $e^x$.
+La plupart des opérateurs standard peuvent être appliqués par éléments,
+y compris les opérateurs unaires comme $e^x$.
 
 ```{.python .input}
 %%tab mxnet
@@ -434,15 +434,15 @@ en un (seul) nombre réel
 via la signature 
 $f: \mathbb{R}, \mathbb{R} \rightarrow \mathbb{R}$ .
 Étant donné deux vecteurs quelconques $\mathbf{u}$ 
- et $\mathbf{v}$ *de même forme*,
+et $\mathbf{v}$ *de même forme*,
 et un opérateur binaire $f$, nous pouvons produire un vecteur
 $\mathbf{c} = F(\mathbf{u},\mathbf{v})$ 
- en fixant $c_i \gets f(u_i, v_i)$ pour tous les $i$,
+en fixant $c_i \gets f(u_i, v_i)$ pour tous les $i$,
 où $c_i, u_i$, et $v_i$ sont les éléments $i^\mathrm{th}$
- des vecteurs $\mathbf{c}, \mathbf{u}$, et $\mathbf{v}$.
+des vecteurs $\mathbf{c}, \mathbf{u}$, et $\mathbf{v}$.
 Ici, nous avons produit la valeur vectorielle
 $F: \mathbb{R}^d, \mathbb{R}^d \rightarrow \mathbb{R}^d$ 
- en *élevant* la fonction scalaire
+en *élevant* la fonction scalaire
 à une opération vectorielle par éléments.
 Les opérateurs arithmétiques standard courants
 pour l'addition (`+`), la soustraction (`-`), 
@@ -476,7 +476,7 @@ En plus des calculs par éléments,
 nous pouvons également effectuer des opérations d'algèbre linéaire,
 telles que les produits scalaires et les multiplications matricielles.
 Nous développerons ces opérations prochainement
-dans :numref:`sec_linear-algebra` .
+dans :numref:`sec_linear-algebra`.
 
 Nous pouvons également [**concaténer* plusieurs tenseurs ensemble,**]
 en les empilant bout à bout pour former un tenseur plus grand.
@@ -538,7 +538,7 @@ tf.reduce_sum(X)
 ## Diffusion
 :label:`subsec_broadcasting` 
 
- A présent, vous savez comment effectuer 
+A présent, vous savez comment effectuer 
 des opérations binaires par éléments
 sur deux tenseurs de même forme. 
 Sous certaines conditions,
@@ -575,7 +575,7 @@ a, b
 ```
 
 Comme `a` et `b` sont des matrices $3\times1$ 
- et $1\times2$, respectivement,
+et $1\times2$, respectivement,
 leurs formes ne correspondent pas.
 La diffusion produit une matrice $3\times2$ plus grande 
 en répliquant la matrice `a` le long des colonnes
@@ -627,7 +627,7 @@ ou de faire référence par inadvertance à des paramètres périmés.
 Heureusement, (**effectuer des opérations in-place**) est facile.
 Nous pouvons affecter le résultat d'une opération
 à un tableau précédemment alloué `Y`
- en utilisant la notation de tranche `Y[:] = <expression>`.
+en utilisant la notation de tranche `Y[:] = <expression>`.
 Pour illustrer ce concept, 
 nous écrasons les valeurs du tenseur `Z`,
 après l'avoir initialisé, en utilisant `zeros_like`,
@@ -641,7 +641,7 @@ Nous pouvons affecter le résultat d'une opération
 à un `Variable` avec `assign`.
 Pour illustrer ce concept, 
 nous écrasons les valeurs de `Variable` `Z` 
- après l'avoir initialisé, en utilisant `zeros_like`,
+après l'avoir initialisé, en utilisant `zeros_like`,
 pour avoir la même forme que `Y`.
 :end_tab:
 
@@ -674,7 +674,7 @@ print('id(Z):', id(Z))
 :end_tab: 
 
  :begin_tab:`tensorflow` 
- Même après avoir stocké l'état de manière persistante dans un `Variable`, 
+Même après avoir stocké l'état de manière persistante dans un `Variable`, 
 vous pouvez vouloir réduire davantage votre utilisation de la mémoire en évitant les allocations excessives
 pour les tenseurs qui ne sont pas les paramètres de votre modèle.
 Étant donné que les tenseurs TensorFlow `Tensors` sont immuables 
@@ -683,7 +683,7 @@ TensorFlow ne fournit pas de moyen explicite d'exécuter
 une opération individuelle in-place.
 
 Cependant, TensorFlow fournit le décorateur `tf.function` 
- pour envelopper le calcul dans un graphe TensorFlow 
+pour envelopper le calcul dans un graphe TensorFlow 
 qui est compilé et optimisé avant l'exécution.
 Cela permet à TensorFlow d'élaguer les valeurs inutilisées, 
 et de réutiliser les allocations antérieures qui ne sont plus nécessaires. 

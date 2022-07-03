@@ -1,16 +1,16 @@
 # Single Shot Multibox Detection
 :label:`sec_ssd` 
 
- Dans :numref:`sec_bbox` --:numref:`sec_object-detection-dataset` ,
+Dans :numref:`sec_bbox` --:numref:`sec_object-detection-dataset`,
 nous avons présenté les boîtes englobantes, les boîtes d'ancrage,
 la détection d'objets multi-échelle, et le jeu de données pour la détection d'objets.
 Nous sommes maintenant prêts à utiliser ces connaissances de base
 pour concevoir un modèle de détection d'objets :
 single shot multibox detection
-(SSD) :cite:`Liu.Anguelov.Erhan.ea.2016` .
+(SSD) :cite:`Liu.Anguelov.Erhan.ea.2016`.
 Ce modèle est simple, rapide et largement utilisé.
-Bien qu'il ne s'agisse que d'un des nombreux modèles de détection d'objets
-,
+Bien qu'il ne s'agisse que d'un des nombreux modèles de détection d'objets,
+
 certains des principes de conception
 et des détails de mise en œuvre de cette section
 sont également applicables à d'autres modèles.
@@ -30,10 +30,10 @@ et peut donc utiliser un CNN profond.
 Par exemple,
 l'article original sur la détection de boîtes multiples à un seul coup
 adopte un réseau VGG tronqué avant la couche de classification
- :cite:`Liu.Anguelov.Erhan.ea.2016` ,
+ :cite:`Liu.Anguelov.Erhan.ea.2016`,
 tandis que ResNet a également été couramment utilisé.
-Grâce à notre conception
-, nous pouvons faire en sorte que le réseau de base produise
+Grâce à notre conception,
+ nous pouvons faire en sorte que le réseau de base produise
 des cartes de caractéristiques plus grandes
 afin de générer plus de boîtes d'ancrage
 pour détecter des objets plus petits.
@@ -51,10 +51,10 @@ Rappelons la conception
 de la détection d'objets multi-échelle
 par le biais de représentations en couches des images par
 des réseaux neuronaux profonds
-dans :numref:`sec_multiscale-object-detection` .
+dans :numref:`sec_multiscale-object-detection`.
 Étant donné que les cartes de caractéristiques multi-échelles
 plus proches du sommet de :numref:`fig_ssd` 
- sont plus petites mais ont des champs réceptifs plus grands,
+sont plus petites mais ont des champs réceptifs plus grands,
 elles conviennent pour détecter
 des objets moins nombreux mais plus grands.
 
@@ -74,7 +74,7 @@ il s'agit donc d'un modèle de détection d'objets multi-échelles.
 
 Dans ce qui suit,
 nous décrivons les détails de la mise en œuvre
-de différents blocs dans :numref:`fig_ssd` . Pour commencer, nous verrons comment implémenter
+de différents blocs dans :numref:`fig_ssd`. Pour commencer, nous verrons comment implémenter
 la prédiction de classe et de boîte englobante.
 
 
@@ -95,7 +95,7 @@ Cela rend souvent la classification avec des couches entièrement connectées in
 .
 Rappelez-vous comment nous avons utilisé les canaux des couches convolutionnelles
 
- pour prédire les classes dans :numref:`sec_nin` .
+pour prédire les classes dans :numref:`sec_nin`.
 La détection multi-boîtes à un coup utilise la même technique
 pour réduire la complexité du modèle.
 
@@ -115,9 +115,9 @@ pour toutes les cases d'ancrage centrées sur
 ($x$, $y$) des cartes de caractéristiques d'entrée.
 Pour produire des prédictions valides,
 il doit y avoir des canaux de sortie $a(q+1)$,
-où, pour la même position spatiale
-, le canal de sortie avec l'indice $i(q+1) + j$
- représente la prédiction de
+où, pour la même position spatiale,
+le canal de sortie avec l'indice $i(q+1) + j$
+représente la prédiction de
 la classe $j$ ($0 \leq j \leq q$)
 pour la boîte d'ancrage $i$ ($0 \leq i < a$).
 
@@ -191,7 +191,7 @@ nous construisons des cartes de caractéristiques à deux échelles différentes
 `Y1` et `Y2`,
 pour le même mini-lot,
 où la hauteur et la largeur de `Y2`
- sont la moitié de celles de `Y1`.
+sont la moitié de celles de `Y1`.
 Prenons la prédiction de classe comme exemple.
 Supposons que
 5 et 3 boîtes d'ancrage
@@ -199,7 +199,7 @@ soient générées pour chaque unité de `Y1` et `Y2`, respectivement.
 Supposons en outre que
 le nombre de classes d'objets est de 10.
 Pour les cartes de caractéristiques `Y1` et `Y2`
- le nombre de canaux dans les sorties de prédiction de classe
+le nombre de canaux dans les sorties de prédiction de classe
 est respectivement $5\times(10+1)=55$ et $3\times(10+1)=33$,
 où la forme de l'une ou l'autre sortie est
 (taille du lot, nombre de canaux, hauteur, largeur).
@@ -277,7 +277,7 @@ nous définissons le bloc de sous-échantillonnage suivant `down_sample_blk` qui
 divise par deux la hauteur et la largeur des cartes de caractéristiques d'entrée.
 En fait,
 ce bloc applique la conception des blocs VGG
-dans :numref:`subsec_vgg-blocks` .
+dans :numref:`subsec_vgg-blocks`.
 Plus concrètement,
 chaque bloc de sous-échantillonnage se compose de
 deux $3\times3$ couches convolutionnelles avec un padding de 1
@@ -366,7 +366,7 @@ forward(torch.zeros((2, 3, 256, 256)), base_net()).shape
 
  [**Le modèle complet de détection multiboxes à un seul coup
 
- se compose de cinq blocs.**]
+se compose de cinq blocs.**]
 Les cartes de caractéristiques produites par chaque bloc
 sont utilisées à la fois pour
 (i) générer des boîtes d'ancrage
@@ -384,7 +384,7 @@ Techniquement,
 les deuxième à cinquième blocs
 sont tous
 ces blocs de cartes de caractéristiques multi-échelles
-dans :numref:`fig_ssd` .
+dans :numref:`fig_ssd`.
 
 ```{.python .input}
 #@tab mxnet
@@ -444,15 +444,15 @@ def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):
 
 Rappelez-vous que
 dans :numref:`fig_ssd` 
- un bloc de carte de caractéristiques multi-échelle
+un bloc de carte de caractéristiques multi-échelle
 qui est plus proche du sommet
 est destiné à détecter des objets plus grands ;
 doit donc générer des boîtes d'ancrage plus grandes.
 Dans la propagation vers l'avant ci-dessus,
-à chaque bloc de carte de caractéristiques multi-échelle
-, nous transmettons une liste de deux valeurs d'échelle
+à chaque bloc de carte de caractéristiques multi-échelle,
+ nous transmettons une liste de deux valeurs d'échelle
 via l'argument `sizes`
- de la fonction `multibox_prior` invoquée (décrite dans :numref:`sec_anchor` ).
+de la fonction `multibox_prior` invoquée (décrite dans :numref:`sec_anchor` ).
 Dans ce qui suit,
 l'intervalle entre 0,2 et 1,05
 est divisé uniformément
@@ -533,7 +533,7 @@ class TinySSD(nn.Module):
 
 Nous [**créons une instance de modèle
 et l'utilisons pour effectuer une propagation directe**]
-sur un minibatch d'images $256 \times 256$ `X` .
+sur un minibatch d'images $256 \times 256$ `X`.
 
 Comme nous l'avons montré précédemment dans cette section,
 le premier bloc produit des cartes de caractéristiques $32 \times 32$.
@@ -544,8 +544,8 @@ et que le cinquième bloc utilise la mise en commun globale.
 Étant donné que 4 boîtes d'ancrage
 sont générées pour chaque unité le long des dimensions spatiales
 des cartes de caractéristiques,
-aux cinq échelles
-, un total de $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ boîtes d'ancrage est généré pour chaque image.
+aux cinq échelles,
+un total de $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ boîtes d'ancrage est généré pour chaque image.
 
 ```{.python .input}
 #@tab mxnet
@@ -582,7 +582,7 @@ pour la détection d'objets.
 Pour commencer,
 [**lisons
 le jeu de données de détection de bananes**]
-décrit dans :numref:`sec_object-detection-dataset` .
+décrit dans :numref:`sec_object-detection-dataset`.
 
 ```{.python .input}
 #@tab all
@@ -622,7 +622,7 @@ il s'agit d'un problème de régression.
 Pour ce problème de régression,
 cependant,
 ici nous n'utilisons pas la perte au carré
-décrite dans :numref:`subsec_normal_distribution_and_squared_loss` .
+décrite dans :numref:`subsec_normal_distribution_and_squared_loss`.
 Au lieu de cela,
 nous utilisons la perte normalisée $\ell_1$,
 la valeur absolue de la différence entre
@@ -929,12 +929,12 @@ d2l.plt.legend();
 En outre, dans l'expérience, nous avons utilisé la perte d'entropie croisée pour la prédiction de classe :
 désignant par $p_j$ la probabilité prédite pour la classe de vérité du sol $j$, la perte d'entropie croisée est $-\log p_j$. Nous pouvons également utiliser la perte focale
 :cite:`Lin.Goyal.Girshick.ea.2017` : étant donné les hyperparamètres $\gamma > 0$
- et $\alpha > 0$, cette perte est définie comme suit :
+et $\alpha > 0$, cette perte est définie comme suit :
 
 $$ - \alpha (1-p_j)^{\gamma} \log p_j.$$ 
 
- Comme nous pouvons le constater, l'augmentation de $\gamma$
- peut réduire efficacement la perte relative
+Comme nous pouvons le constater, l'augmentation de $\gamma$
+peut réduire efficacement la perte relative
 pour les exemples bien classés (par exemple, $p_j > 0.5$)
 de sorte que la formation
 peut se concentrer davantage sur les exemples difficiles qui sont mal classés.
@@ -966,7 +966,7 @@ d2l.plt.legend();
    1. Lorsqu'un objet est beaucoup plus petit que l'image, le modèle pourrait redimensionner l'image d'entrée.
    1. Il y a généralement un grand nombre de boîtes d'ancrage négatives. Pour rendre la distribution des classes plus équilibrée, nous pourrions réduire l'échantillonnage des boîtes d'ancrage négatives.
    1. Dans la fonction de perte, attribuez des hyperparamètres de poids différents à la perte de classe et à la perte de décalage.
-   1. Utilisez d'autres méthodes pour évaluer le modèle de détection d'objets, telles que celles présentées dans l'article sur la détection multiboxes à un seul coup :cite:`Liu.Anguelov.Erhan.ea.2016` .
+   1. Utilisez d'autres méthodes pour évaluer le modèle de détection d'objets, telles que celles présentées dans l'article sur la détection multiboxes à un seul coup :cite:`Liu.Anguelov.Erhan.ea.2016`.
 
 
 

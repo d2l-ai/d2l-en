@@ -1,9 +1,9 @@
 # Inférence en langage naturel : Using Attention
 :label:`sec_natural-language-inference-attention` 
 
- Nous avons présenté la tâche d'inférence du langage naturel et le jeu de données SNLI dans :numref:`sec_natural-language-inference-and-dataset` . Au vu des nombreux modèles basés sur des architectures complexes et profondes, Parikh et al. ont proposé d'aborder l'inférence du langage naturel avec des mécanismes d'attention et l'ont appelé un " modèle d'attention décomposable " :cite:`Parikh.Tackstrom.Das.ea.2016` .
+Nous avons présenté la tâche d'inférence du langage naturel et le jeu de données SNLI dans :numref:`sec_natural-language-inference-and-dataset`. Au vu des nombreux modèles basés sur des architectures complexes et profondes, Parikh et al. ont proposé d'aborder l'inférence du langage naturel avec des mécanismes d'attention et l'ont appelé un " modèle d'attention décomposable " :cite:`Parikh.Tackstrom.Das.ea.2016`.
 Il en résulte un modèle sans couches récurrentes ou convolutionnelles, qui obtient le meilleur résultat à l'époque sur le jeu de données SNLI avec beaucoup moins de paramètres.
-Dans cette section, nous allons décrire et mettre en œuvre cette méthode basée sur l'attention (avec des MLP) pour l'inférence en langage naturel, comme illustré dans :numref:`fig_nlp-map-nli-attention` .
+Dans cette section, nous allons décrire et mettre en œuvre cette méthode basée sur l'attention (avec des MLP) pour l'inférence en langage naturel, comme illustré dans :numref:`fig_nlp-map-nli-attention`.
 
 ![This section feeds pretrained GloVe to an architecture based on attention and MLPs for natural language inference.](../img/nlp-map-nli-attention.svg)
 :label:`fig_nlp-map-nli-attention`
@@ -58,15 +58,15 @@ Pour faciliter la démonstration, :numref:`fig_nli_attention` montre un tel alig
 
 Nous décrivons maintenant plus en détail l'alignement doux utilisant les mécanismes d'attention.
 Désignons par $\mathbf{A} = (\mathbf{a}_1, \ldots, \mathbf{a}_m)$
- et $\mathbf{B} = (\mathbf{b}_1, \ldots, \mathbf{b}_n)$ la prémisse et l'hypothèse,
+et $\mathbf{B} = (\mathbf{b}_1, \ldots, \mathbf{b}_n)$ la prémisse et l'hypothèse,
 dont le nombre de tokens est $m$ et $n$, respectivement,
 où $\mathbf{a}_i, \mathbf{b}_j \in \mathbb{R}^{d}$ ($i = 1, \ldots, m, j = 1, \ldots, n$) est un vecteur de mots de dimension $d$.
 Pour l'alignement souple, nous calculons les poids d'attention $e_{ij} \in \mathbb{R}$ comme
 
 $$e_{ij} = f(\mathbf{a}_i)^\top f(\mathbf{b}_j),$$ 
- :eqlabel:`eq_nli_e` 
+:eqlabel:`eq_nli_e` 
 
- où la fonction $f$ est un MLP défini dans la fonction suivante `mlp`.
+où la fonction $f$ est un MLP défini dans la fonction suivante `mlp`.
 La dimension de sortie de $f$ est spécifiée par l'argument `num_hiddens` de `mlp`.
 
 ```{.python .input}
@@ -98,12 +98,12 @@ def mlp(num_inputs, num_hiddens, flatten):
 ```
 
 Il convient de souligner que, dans :eqref:`eq_nli_e` 
- $f$ prend les entrées $\mathbf{a}_i$ et $\mathbf{b}_j$ séparément plutôt que de prendre une paire d'entre elles ensemble comme entrée.
+$f$ prend les entrées $\mathbf{a}_i$ et $\mathbf{b}_j$ séparément plutôt que de prendre une paire d'entre elles ensemble comme entrée.
 Cette astuce de *décomposition* conduit uniquement à des applications $m + n$ (complexité linéaire) de $f$ plutôt qu'à des applications $mn$
  (complexité quadratique).
 
 
-En normalisant les poids d'attention dans :eqref:`eq_nli_e` ,
+En normalisant les poids d'attention dans :eqref:`eq_nli_e`,
 nous calculons la moyenne pondérée de tous les vecteurs de jeton dans l'hypothèse
 pour obtenir la représentation de l'hypothèse qui est alignée de manière douce avec le jeton indexé par $i$ dans la prémisse :
 
@@ -189,7 +189,7 @@ $$\mathbf{v}_{A,i} = g([\mathbf{a}_i, \boldsymbol{\beta}_i]), i = 1, \ldots, m\\
 :eqlabel:`eq_nli_v_ab`
 
 
-Dans :eqref:`eq_nli_v_ab` , $\mathbf{v}_{A,i}$ est la comparaison entre le token $i$ dans la prémisse et tous les tokens de l'hypothèse qui sont légèrement alignés avec le token $i$;
+Dans :eqref:`eq_nli_v_ab`, $\mathbf{v}_{A,i}$ est la comparaison entre le token $i$ dans la prémisse et tous les tokens de l'hypothèse qui sont légèrement alignés avec le token $i$;
 tandis que $\mathbf{v}_{B,j}$ est la comparaison entre le token $j$ dans l'hypothèse et tous les tokens de la prémisse qui sont légèrement alignés avec le token $j$.
 La classe suivante `Compare` définit une telle étape de comparaison.
 
@@ -327,7 +327,7 @@ Nous commençons par lire le jeu de données.
 
 ### Lecture du jeu de données
 
-Nous téléchargeons et lisons le jeu de données SNLI à l'aide de la fonction définie dans :numref:`sec_natural-language-inference-and-dataset` . La taille du lot et la longueur de la séquence sont fixées à $256$ et $50$, respectivement.
+Nous téléchargeons et lisons le jeu de données SNLI à l'aide de la fonction définie dans :numref:`sec_natural-language-inference-and-dataset`. La taille du lot et la longueur de la séquence sont fixées à $256$ et $50$, respectivement.
 
 ```{.python .input}
 #@tab all

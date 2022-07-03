@@ -1,7 +1,7 @@
 # Mise en œuvre concise des réseaux neuronaux récurrents
 :label:`sec_rnn-concise` 
 
- Bien que :numref:`sec_rnn-scratch` ait été instructif de voir comment les RNN sont mis en œuvre,
+Bien que :numref:`sec_rnn-scratch` ait été instructif de voir comment les RNN sont mis en œuvre,
 ce n'est ni pratique ni rapide.
 Cette section montre comment implémenter le même modèle de langage plus efficacement
 en utilisant des fonctions fournies par les API de haut niveau
@@ -99,7 +99,7 @@ class RNN(d2l.Module):  #@save
         return outputs, H
 ```
 
-Héritant de la classe `RNNLMScratch` dans :numref:`sec_rnn-scratch` , 
+Héritant de la classe `RNNLMScratch` dans :numref:`sec_rnn-scratch`, 
 la classe suivante `RNNLM` définit un modèle de langage complet basé sur un RNN.
 Notez que nous devons créer une couche de sortie séparée entièrement connectée.
 
@@ -150,7 +150,7 @@ if tab.selected('tensorflow'):
 trainer.fit(model, data)
 ```
 
-Comparé à :numref:`sec_rnn-scratch` ,
+Comparé à :numref:`sec_rnn-scratch`,
 ce modèle atteint une perplexité comparable,
 bien que dans un délai plus court, en raison de l'optimisation du code par
 les API de haut niveau du cadre d'apprentissage profond.

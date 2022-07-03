@@ -6,28 +6,28 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Concise Implementation of Linear Regression
 :label:`sec_linear_concise` 
 
- L'apprentissage profond a connu une sorte d'explosion cambrienne
+L'apprentissage profond a connu une sorte d'explosion cambrienne
 au cours de la dernière décennie.
-Le nombre de techniques, d'applications et d'algorithmes dépasse de loin les progrès accomplis au cours des décennies précédentes (
-). 
+Le nombre de techniques, d'applications et d'algorithmes dépasse de loin les progrès accomplis au cours des décennies précédentes .
+
 Cela est dû à une combinaison fortuite de multiples facteurs,
 dont l'un est les puissants outils gratuits
 offerts par un certain nombre de cadres d'apprentissage profond open source.
-Theano :cite:`Bergstra.Breuleux.Bastien.ea.2010` ,
-DistBelief :cite:`Dean.Corrado.Monga.ea.2012` ,
+Theano :cite:`Bergstra.Breuleux.Bastien.ea.2010`,
+DistBelief :cite:`Dean.Corrado.Monga.ea.2012`,
 et Caffe :cite:`Jia.Shelhamer.Donahue.ea.2014` 
- représentent sans doute la
+représentent sans doute la
 première génération de ces modèles 
 qui a été largement adoptée.
 Contrairement aux travaux antérieurs (séminaux) comme
-SN2 (Simulateur Neuristique) :cite:`Bottou.Le-Cun.1988` ,
+SN2 (Simulateur Neuristique) :cite:`Bottou.Le-Cun.1988`,
 qui offraient une expérience de programmation de type Lisp,
 les cadres modernes offrent une différenciation automatique
 et la commodité de Python.
 Ces cadres nous permettent d'automatiser et de modulariser
 le travail répétitif de mise en œuvre des algorithmes d'apprentissage basés sur le gradient.
 
-Dans :numref:`sec_linear_scratch` , nous nous sommes uniquement appuyés sur
+Dans :numref:`sec_linear_scratch`, nous nous sommes uniquement appuyés sur
 (i) les tenseurs pour le stockage des données et l'algèbre linéaire ;
 et (ii) la différenciation automatique pour le calcul des gradients.
 En pratique, comme les itérateurs de données, les fonctions de perte, les optimiseurs,
@@ -63,7 +63,7 @@ import tensorflow as tf
 ### Définition du modèle
 
 Lorsque nous avons implémenté la régression linéaire à partir de zéro
-dans :numref:`sec_linear_scratch` ,
+dans :numref:`sec_linear_scratch`,
 nous avons défini les paramètres de notre modèle de manière explicite
 et codé les calculs pour produire la sortie
 en utilisant des opérations d'algèbre linéaire de base.
@@ -82,7 +82,7 @@ ce qui nous permet de nous concentrer
 sur les couches utilisées pour construire le modèle
 plutôt que de nous soucier de leur mise en œuvre.
 Rappelons l'architecture d'un réseau à couche unique
-telle que décrite dans :numref:`fig_single_neuron` .
+telle que décrite dans :numref:`fig_single_neuron`.
 La couche est dite *entièrement connectée*,
 puisque chacune de ses entrées est connectée
 à chacune de ses sorties
@@ -166,7 +166,7 @@ def forward(self, X):
 ### Définition de la fonction de perte
 
 :begin_tab:`mxnet` 
- Le module `loss` définit de nombreuses fonctions de perte utiles.
+Le module `loss` définit de nombreuses fonctions de perte utiles.
 Pour des raisons de rapidité et de commodité, nous renonçons à implémenter notre propre
 et choisissons plutôt la fonction intégrée `loss.L2Loss`.
 Étant donné que l'adresse `loss` qu'il renvoie est
@@ -203,14 +203,14 @@ def loss(self, y_hat, y):
 ## Définition de l'algorithme d'optimisation
 
 :begin_tab:`mxnet` 
- Minibatch SGD est un outil standard
+Minibatch SGD est un outil standard
 pour l'optimisation des réseaux neuronaux
 et donc Gluon le supporte ainsi qu'un certain nombre de
 variations de cet algorithme par le biais de sa classe `Trainer`.
 Notez que la classe `Trainer` de Gluon représente
 l'algorithme d'optimisation,
 alors que la classe `Trainer` que nous avons créée dans :numref:`sec_oo-design` 
- contient la fonction d'entraînement,
+contient la fonction d'entraînement,
 c'est-à-dire l'appel répété de l'optimiseur
 pour mettre à jour les paramètres du modèle.
 Lorsque nous instancions `Trainer`,
@@ -267,7 +267,7 @@ Maintenant que tous les éléments de base sont en place,
 que celle que nous avons implémentée à partir de zéro.**]
 Il nous suffit donc d'appeler la méthode `fit` (introduite dans :numref:`oo-design-training` ),
 qui s'appuie sur l'implémentation de la méthode `fit_epoch`
- dans :numref:`sec_linear_scratch` ,
+dans :numref:`sec_linear_scratch`,
 pour entraîner notre modèle.
 
 ```{.python .input}
@@ -313,9 +313,9 @@ d'un réseau profond (dans ce livre)
 pour exploiter les commodités offertes
 par les frameworks modernes d'apprentissage profond,
 tels que Gluon `Chen.Li.Li.ea.2015`, 
-JAX :cite:`Frostig.Johnson.Leary.2018` , 
-PyTorch :cite:`Paszke.Gross.Massa.ea.2019` , 
-et Tensorflow :cite:`Abadi.Barham.Chen.ea.2016` .
+JAX :cite:`Frostig.Johnson.Leary.2018`, 
+PyTorch :cite:`Paszke.Gross.Massa.ea.2019`, 
+et Tensorflow :cite:`Abadi.Barham.Chen.ea.2016`.
 Nous avons utilisé les valeurs par défaut du framework pour charger les données, définir une couche,
 une fonction de perte, un optimiseur et une boucle d'apprentissage.
 Lorsque le framework fournit toutes les fonctionnalités nécessaires,
@@ -366,10 +366,10 @@ La dimensionnalité et le stockage des réseaux sont automatiquement déduits
 ## Exercices
 
 1. Comment devrez-vous modifier le taux d'apprentissage si vous remplacez la perte globale sur le minibatch
- par une moyenne sur la perte sur le minibatch ?
+par une moyenne sur la perte sur le minibatch ?
 1. Consultez la documentation du framework pour voir quelles fonctions de perte sont fournies. En particulier,
- remplacez la perte au carré par la fonction de perte robuste de Huber. Autrement dit, utilisez la fonction de perte
- $$l(y,y') = \begin{cases}|y-y'| -\frac{\sigma}{2} & \text{ if } |y-y'| > \sigma \\ \frac{1}{2 \sigma} (y-y')^2 & \text{ otherwise}\end{cases}$$ 
+remplacez la perte au carré par la fonction de perte robuste de Huber. Autrement dit, utilisez la fonction de perte
+$$l(y,y') = \begin{cases}|y-y'| -\frac{\sigma}{2} & \text{ if } |y-y'| > \sigma \\ \frac{1}{2 \sigma} (y-y')^2 & \text{ otherwise}\end{cases}$$ 
  1. Comment accéder au gradient des poids du modèle ?
 1. Comment la solution change-t-elle si vous modifiez le taux d'apprentissage et le nombre d'époques ? Continue-t-elle à s'améliorer ?
 1. Comment la solution change-t-elle si vous modifiez la quantité de données générées ?

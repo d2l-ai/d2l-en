@@ -7,9 +7,9 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 :label:`sec_multihead-attention` 
 
  
- En pratique,
-étant donné le même ensemble de requêtes, de clés et de valeurs
-, nous pouvons souhaiter que notre modèle
+En pratique,
+étant donné le même ensemble de requêtes, de clés et de valeurs,
+ nous pouvons souhaiter que notre modèle
 combine les connaissances provenant de
 différents comportements du même mécanisme d'attention,
 tels que la capture des dépendances de diverses plages (par exemple, plage courte contre plage longue)
@@ -37,11 +37,11 @@ pour produire la sortie finale.
 Cette conception
 est appelée *attention multi-tête*,
 où chacune des sorties de mise en commun de l'attention $h$
- est une *tête* :cite:`Vaswani.Shazeer.Parmar.ea.2017` .
+est une *tête* :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
 En utilisant des couches entièrement connectées
 pour effectuer des transformations linéaires apprenables,
 :numref:`fig_multi-head-attention` 
- décrit l'attention multi-têtes.
+décrit l'attention multi-têtes.
 
 ![Multi-head attention, where multiple heads are concatenated then linearly transformed.](../img/multi-head-attention.svg)
 :label:`fig_multi-head-attention`
@@ -61,24 +61,24 @@ est calculée comme
 
 $$\mathbf{h}_i = f(\mathbf W_i^{(q)}\mathbf q, \mathbf W_i^{(k)}\mathbf k,\mathbf W_i^{(v)}\mathbf v) \in \mathbb R^{p_v},$$ 
 
- où les paramètres apprenables
+où les paramètres apprenables
 $\mathbf W_i^{(q)}\in\mathbb R^{p_q\times d_q}$ ,
 $\mathbf W_i^{(k)}\in\mathbb R^{p_k\times d_k}$ 
- et $\mathbf W_i^{(v)}\in\mathbb R^{p_v\times d_v}$,
+et $\mathbf W_i^{(v)}\in\mathbb R^{p_v\times d_v}$,
 et
 $f$ est la mise en commun de l'attention,
 comme
 l'attention additive et l'attention du produit scalaire
-dans :numref:`sec_attention-scoring-functions` .
+dans :numref:`sec_attention-scoring-functions`.
 La sortie de l'attention multi-têtes
 est une autre transformation linéaire via 
 paramètres apprenables
 $\mathbf W_o\in\mathbb R^{p_o\times h p_v}$ 
- de la concaténation des têtes $h$:
+de la concaténation des têtes $h$:
 
 $$\mathbf W_o \begin{bmatrix}\mathbf h_1\\\vdots\\\mathbf h_h\end{bmatrix} \in \mathbb{R}^{p_o}.$$ 
 
- Sur la base de cette conception,
+Sur la base de cette conception,
 chaque tête peut s'occuper de différentes parties de l'entrée.
 Des fonctions plus sophistiquées que la simple moyenne pondérée
 peuvent être exprimées.
@@ -116,7 +116,7 @@ du coût de calcul et du coût de paramétrage,
 nous fixons
 $p_q = p_k = p_v = p_o / h$ .
 Notez que les têtes $h$
- peuvent être calculées en parallèle
+peuvent être calculées en parallèle
 si nous fixons
 le nombre de sorties de transformations linéaires
 pour la requête, la clé et la valeur

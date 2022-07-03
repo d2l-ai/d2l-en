@@ -1,7 +1,7 @@
 # Contribuer à ce livre
 :label:`sec_how_to_contribute` 
 
- Les contributions de [readers](https://github.com/d2l-ai/d2l-en/graphs/contributors) nous aident à améliorer ce livre. Si vous trouvez une coquille, un lien périmé, un élément pour lequel vous pensez que nous avons manqué une citation, un code qui n'a pas l'air élégant ou une explication qui n'est pas claire, veuillez contribuer et nous aider à aider nos lecteurs. Alors que dans les livres ordinaires, le délai entre les tirages (et donc entre les corrections de fautes de frappe) peut se mesurer en années, il faut généralement quelques heures ou quelques jours pour intégrer une amélioration dans ce livre. Tout cela est possible grâce au contrôle des versions et aux tests d'intégration continue (IC). Pour ce faire, vous devez soumettre une [pull request](https://github.com/d2l-ai/d2l-en/pulls) au dépôt GitHub. Lorsque votre demande de retrait est fusionnée dans le dépôt de code par les auteurs, vous devenez un contributeur.
+Les contributions de [readers](https://github.com/d2l-ai/d2l-en/graphs/contributors) nous aident à améliorer ce livre. Si vous trouvez une coquille, un lien périmé, un élément pour lequel vous pensez que nous avons manqué une citation, un code qui n'a pas l'air élégant ou une explication qui n'est pas claire, veuillez contribuer et nous aider à aider nos lecteurs. Alors que dans les livres ordinaires, le délai entre les tirages (et donc entre les corrections de fautes de frappe) peut se mesurer en années, il faut généralement quelques heures ou quelques jours pour intégrer une amélioration dans ce livre. Tout cela est possible grâce au contrôle des versions et aux tests d'intégration continue (IC). Pour ce faire, vous devez soumettre une [pull request](https://github.com/d2l-ai/d2l-en/pulls) au dépôt GitHub. Lorsque votre demande de retrait est fusionnée dans le dépôt de code par les auteurs, vous devenez un contributeur.
 
 ## Soumission de modifications mineures
 
@@ -17,14 +17,14 @@ Une fois que vous avez terminé, remplissez la description de vos modifications 
 
 Si vous envisagez de mettre à jour une grande partie du texte ou du code, vous devez en savoir un peu plus sur le format utilisé par ce livre. Le fichier source est basé sur le [markdown format](https://daringfireball.net/projects/markdown/syntax) avec un ensemble d'extensions par le biais du paquet [d2lbook](http://book.d2l.ai/user/markdown.html) comme la référence aux équations, aux images, aux chapitres et aux citations. Vous pouvez utiliser n'importe quel éditeur markdown pour ouvrir ces fichiers et y apporter vos modifications.
 
-Si vous souhaitez modifier le code, nous vous recommandons d'utiliser le Jupyter Notebook pour ouvrir ces fichiers markdown comme décrit dans :numref:`sec_jupyter` . Ainsi, vous pourrez exécuter et tester vos modifications. N'oubliez pas d'effacer toutes les sorties avant de soumettre vos modifications, notre système CI exécutera les sections que vous avez mises à jour pour générer des sorties.
+Si vous souhaitez modifier le code, nous vous recommandons d'utiliser le Jupyter Notebook pour ouvrir ces fichiers markdown comme décrit dans :numref:`sec_jupyter`. Ainsi, vous pourrez exécuter et tester vos modifications. N'oubliez pas d'effacer toutes les sorties avant de soumettre vos modifications, notre système CI exécutera les sections que vous avez mises à jour pour générer des sorties.
 
 Certaines sections peuvent supporter plusieurs implémentations du framework.
 Si vous ajoutez un nouveau bloc de code qui n'est pas destiné à l'implémentation par défaut, qui est MXNet, veuillez utiliser `#@tab` pour marquer ce bloc sur la ligne de début. Par exemple, `#@tab pytorch` pour un bloc de code PyTorch, `#@tab tensorflow` pour un bloc de code TensorFlow, ou `#@tab all` un bloc de code partagé pour toutes les implémentations. Vous pouvez vous référer au [`d2lbook`](http://book.d2l.ai/user/code_tabs.html) pour plus d'informations.
 
 ## Soumettre des changements majeurs
 
-Nous vous suggérons d'utiliser le processus Git standard pour soumettre un changement majeur. En résumé, le processus fonctionne comme décrit dans :numref:`fig_contribute` .
+Nous vous suggérons d'utiliser le processus Git standard pour soumettre un changement majeur. En résumé, le processus fonctionne comme décrit dans :numref:`fig_contribute`.
 
 ![Contributing to the book.](../img/contribute.svg)
 :label:`fig_contribute`
@@ -37,14 +37,14 @@ Le livre open source Git décrit [how to install Git](https://git-scm.com/book/e
 
 ### Connexion à GitHub
 
-Saisissez l'adresse [address](https://github.com/d2l-ai/d2l-en/) du dépôt de code du livre dans votre navigateur. Cliquez sur le bouton `Fork` dans le cadre rouge en haut à droite de :numref:`fig_git_fork` , pour faire une copie du dépôt de ce livre. C'est maintenant *votre copie* et vous pouvez la modifier comme bon vous semble.
+Saisissez l'adresse [address](https://github.com/d2l-ai/d2l-en/) du dépôt de code du livre dans votre navigateur. Cliquez sur le bouton `Fork` dans le cadre rouge en haut à droite de :numref:`fig_git_fork`, pour faire une copie du dépôt de ce livre. C'est maintenant *votre copie* et vous pouvez la modifier comme bon vous semble.
 
 ![The code repository page.](../img/git-fork.png)
 :width:`700px`
 :label:`fig_git_fork`
 
 
-Maintenant, le dépôt de code de ce livre sera bifurqué (c.-à-d. copié) vers votre nom d'utilisateur, tel que `astonzhang/d2l-en` montré en haut à gauche de :numref:`fig_git_forked` .
+Maintenant, le dépôt de code de ce livre sera bifurqué (c.-à-d. copié) vers votre nom d'utilisateur, tel que `astonzhang/d2l-en` montré en haut à gauche de :numref:`fig_git_forked`.
 
 ![The forked code repository.](../img/git-forked.png)
 :width:`700px`
@@ -66,7 +66,7 @@ git clone https://github.com/your_github_username/d2l-en.git
 
 ### Editer et pousser
 
-Il est maintenant temps d'éditer le livre. Il est préférable de l'éditer dans le Jupyter Notebook en suivant les instructions de :numref:`sec_jupyter` . Effectuez les modifications et vérifiez qu'elles sont correctes. Supposons que nous ayons modifié une coquille dans le fichier `~/d2l-en/chapter_appendix_tools/how-to-contribute.md`.
+Il est maintenant temps d'éditer le livre. Il est préférable de l'éditer dans le Jupyter Notebook en suivant les instructions de :numref:`sec_jupyter`. Effectuez les modifications et vérifiez qu'elles sont correctes. Supposons que nous ayons modifié une coquille dans le fichier `~/d2l-en/chapter_appendix_tools/how-to-contribute.md`.
 Vous pouvez alors vérifier quels fichiers vous avez modifiés.
 
 À ce stade, Git vous indiquera que le fichier `chapter_appendix_tools/how-to-contribute.md` a été modifié.
@@ -97,14 +97,14 @@ Le code modifié se trouvera alors dans votre fork personnel du référentiel. P
 
 ### Soumission de demandes de retrait
 
-Comme indiqué dans :numref:`fig_git_newpr` , allez dans votre fork du dépôt sur GitHub et sélectionnez "New pull request". Cela ouvrira un écran qui vous montrera les changements entre vos éditions et ce qui est en cours dans le dépôt principal du livre.
+Comme indiqué dans :numref:`fig_git_newpr`, allez dans votre fork du dépôt sur GitHub et sélectionnez "New pull request". Cela ouvrira un écran qui vous montrera les changements entre vos éditions et ce qui est en cours dans le dépôt principal du livre.
 
 ![New pull request.](../img/git-newpr.png)
 :width:`700px`
 :label:`fig_git_newpr`
 
 
-Enfin, soumettez une demande de retrait en cliquant sur le bouton comme indiqué sur :numref:`fig_git_createpr` . Veillez à décrire les modifications que vous avez apportées dans la demande de retrait.
+Enfin, soumettez une demande de retrait en cliquant sur le bouton comme indiqué sur :numref:`fig_git_createpr`. Veillez à décrire les modifications que vous avez apportées dans la demande de retrait.
 Il sera ainsi plus facile pour les auteurs de l'examiner et de la fusionner avec le livre. En fonction des modifications, la demande peut être acceptée immédiatement, rejetée ou, plus probablement, vous recevrez des commentaires sur les modifications. Une fois que vous les avez incorporés, vous êtes prêt à partir.
 
 ![Create pull request.](../img/git-createpr.png)
