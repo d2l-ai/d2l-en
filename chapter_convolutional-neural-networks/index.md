@@ -45,7 +45,7 @@ dans les systèmes de recommandation.
 
 Tout d'abord, nous allons nous plonger plus profondément dans la motivation des réseaux neuronaux convolutifs
 . Nous passerons ensuite en revue les opérations de base
-qui constituent l'épine dorsale de tous les réseaux convolutifs.
+qui constituent la colonne vertébrale de tous les réseaux convolutifs.
 Il s'agit notamment des couches convolutionnelles elles-mêmes,
 des détails de détail tels que le padding et le stride,
 des couches de mise en commun utilisées pour agréger les informations

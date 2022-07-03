@@ -1,6 +1,6 @@
 # Préface
 
-Il y a quelques années à peine, il n'y avait pas légions de scientifiques spécialisés dans l'apprentissage profond
+Il y a quelques années à peine, il n'y avait légions de scientifiques spécialisés dans l'apprentissage profond
 développant des produits et services intelligents dans les grandes entreprises et les startups.
 Lorsque nous sommes entrés dans ce domaine, l'apprentissage automatique 
 ne faisait pas les gros titres des journaux quotidiens.
@@ -43,7 +43,7 @@ et jouant un rôle croissant dans les sciences fondamentales - de l'astrophysiqu
 
 
 
-### À propos de ce livre
+## À propos de ce livre
 
 Ce livre représente notre tentative de rendre l'apprentissage profond accessible,
 en vous enseignant les *concepts*, le *contexte* et le *code*.
@@ -70,14 +70,14 @@ en partie grâce au développement de cadres puissants et bien documentés.
 Tester le potentiel de l'apprentissage profond présente des défis uniques
 car toute application unique fait appel à diverses disciplines.
 L'application de l'apprentissage profond exige de comprendre simultanément
-(i) les motivations qui poussent à formuler un problème d'une manière particulière ;
-(ii) la forme mathématique d'un modèle donné ;
-(iii) les algorithmes d'optimisation pour adapter les modèles aux données ;
+(i) les motivations qui poussent à formuler un problème d'une manière particulière; 
+(ii) la forme mathématique d'un modèle donné; 
+(iii) les algorithmes d'optimisation pour adapter les modèles aux données; 
 (iv) les principes statistiques qui nous disent 
 quand nous devons nous attendre à ce que nos modèles 
 se généralisent à des données inédites
 et les méthodes pratiques pour certifier 
-qu'ils se sont effectivement généralisés ;
+qu'ils se sont effectivement généralisés;
 et (v) les techniques d'ingénierie
 nécessaires pour former des modèles de manière efficace,
 naviguer dans les pièges du calcul numérique
@@ -134,7 +134,7 @@ Nous avons entrepris de créer une ressource qui pourrait
 pour fournir un point de départ sur le chemin
 pour devenir réellement un scientifique de l'apprentissage automatique appliqué ;
 (iii) inclure du code exécutable, montrant aux lecteurs
-*comment* résoudre des problèmes dans la pratique ;
+*comment* résoudre des problèmes dans la pratique;
 (iv) permettre des mises à jour rapides, à la fois par nous
 et par la communauté dans son ensemble ;
 et (v) être complété par un site [forum](http://discuss.d2l.ai)
@@ -167,7 +167,7 @@ le premier publié
 en utilisant un tel flux de travail intégré.
 
 
-#### Learning by Doing
+### Apprendre par la pratique
 
 De nombreux manuels présentent les concepts les uns après les autres, 
 couvrant chacun d'entre eux de manière exhaustive.
@@ -205,8 +205,8 @@ Il suffit de copier un notebook et de commencer à le modifier.
 
 Nous entrelacerons le code exécutable avec du matériel de base si nécessaire.
 En général, nous préférons souvent rendre les outils
-disponibles avant de les expliquer complètement (et nous poursuivrons en expliquant le contexte plus tard à l'adresse
-).
+disponibles avant de les expliquer complètement (et nous poursuivrons en 
+expliquant le contexte plus tard à l'adresse).
 Par exemple, nous pouvons utiliser la *descente de gradient stochastique*
 avant d'expliquer en détail son utilité ou son fonctionnement.
 Cela permet de donner aux praticiens les munitions nécessaires
@@ -246,7 +246,7 @@ et les applications (:numref:`fig_book_org` ).
 * La première partie couvre les bases et les préliminaires.
 :numref:`chap_introduction` offre 
 une introduction à l'apprentissage profond.
-Puis, dans :numref:`chap_preliminaries` ,
+Puis, dans :numref:`chap_preliminaries`,
 nous vous présentons rapidement 
 les conditions préalables requises
 pour l'apprentissage profond pratique, 
@@ -254,56 +254,100 @@ telles que le stockage et la manipulation des données,
 et l'application de diverses opérations numériques 
 basées sur les concepts de base de l'algèbre linéaire, 
 du calcul et des probabilités.
-:numref:`chap_linear` et   couvrent les concepts et techniques les plus fondamentaux de l'apprentissage profond, notamment la régression et la classification ; les modèles linéaires et les perceptrons multicouches ; et l'overfitting et la régularisation. * Les six chapitres suivants sont consacrés aux techniques modernes d'apprentissage profond.   décrit les principaux composants informatiques des systèmes d'apprentissage profond et pose les bases pour nos implémentations ultérieures de modèles plus complexes. Ensuite,  et  , présentent les réseaux de neurones convolutifs (CNN), des outils puissants qui constituent l'épine dorsale de la plupart des systèmes modernes de vision par ordinateur. De même,  et   présentent les réseaux neuronaux récurrents (RNN), modèles qui exploitent la structure séquentielle (par exemple, temporelle) des données et sont couramment utilisés pour le traitement du langage naturel et la prédiction des séries temporelles. Dans  , nous présentons une classe relativement nouvelle de modèles basés sur des mécanismes dits d'attention qui ont remplacé les RNN comme architecture dominante pour la plupart des tâches de traitement du langage naturel. Ces sections vous permettront de vous familiariser avec les outils les plus puissants et les plus généraux qui sont largement utilisés par les praticiens de l'apprentissage profond. * La troisième partie traite de l'évolutivité, de l'efficacité et des applications. Tout d'abord, dans  , nous abordons plusieurs algorithmes d'optimisation courants utilisés pour former des modèles d'apprentissage profond. Le chapitre suivant,  , examine plusieurs facteurs clés qui influencent les performances de calcul de votre code d'apprentissage profond. Dans  , nous illustrons les principales applications de l'apprentissage profond en vision par ordinateur. Dans  et  , nous montrons comment pré-entraîner des modèles de représentation du langage et les appliquer à des tâches de traitement du langage naturel.### Code    La plupart des sections de ce livre comportent du code exécutable. Nous pensons que certaines intuitions se développent mieux par essais et erreurs, en modifiant légèrement le code et en observant les résultats. Idéalement, une théorie mathématique élégante pourrait nous indiquer précisément comment modifier notre code pour obtenir le résultat souhaité. Cependant, aujourd'hui, les praticiens de l'apprentissage profond doivent souvent s'aventurer là où aucune théorie convaincante ne peut les guider fermement. Malgré tous nos efforts, les explications formelles de l'efficacité des différentes techniques font toujours défaut, à la fois parce que les mathématiques permettant de caractériser ces modèles peuvent être très difficiles et aussi parce que les recherches sérieuses sur ces sujets n'ont été lancées que récemment. Nous espérons qu'au fur et à mesure que la théorie de l'apprentissage profond progresse, les futures éditions de ce livre pourront fournir des informations qui éclipseront celles actuellement disponibles. Pour éviter les répétitions inutiles, nous encapsulons certaines de nos fonctions et classes les plus fréquemment importées et référencées dans le package . Pour indiquer un bloc de code, tel qu'une fonction, une classe ou une collection d'instructions d'importation, , qui sera ensuite accessible via le paquet , , nous le marquerons avec . Nous offrons un aperçu détaillé de ces fonctions et classes dans  . Le paquetage est léger et ne nécessite que les dépendances suivantes : :numref:`chap_perceptrons`
+:numref:`chap_linear` et :numref:`chap_perceptrons` 
+couvrent les concepts et techniques les plus fondamentaux de l'apprentissage profond, 
+notamment la régression et la classification;
+les modèles linéaires et les perceptrons multicouches; 
+et l'overfitting et la régularisation. 
+
+* Les six chapitres suivants sont consacrés aux techniques modernes d'apprentissage profond.   
+:numref:`chap_computation` décrit
+les principaux composants informatiques des systèmes 
+d'apprentissage profond et pose les bases 
+pour nos implémentations ultérieures 
+de modèles plus complexes. 
+Ensuite, :numref:`chap_cnn` et :numref:`chap_modern_cnn`,
+présentent les réseaux de neurones convolutifs (CNN),
+des outils puissants qui constituent la colonne vertébrale
+de la plupart des systèmes modernes de
+vision par ordinateur.
+De même, :numref:`chap_rnn` et :numref:`chap_modern_rnn`
+présentent les réseaux neuronaux récurrents (RNN),
+modèles qui exploitent la structure séquentielle (par exemple, temporelle)
+des données et sont couramment utilisés 
+pour le traitement du langage naturel 
+et la prédiction des séries temporelles.
+Dans :numref:`chap_attention`,
+nous présentons une classe relativement nouvelle de modèles
+basés sur des mécanismes dits d'attention
+qui ont remplacé les RNN comme architecture dominante
+pour la plupart des tâches de traitement du langage naturel (NLP).
+Ces sections vous permettront de vous familiariser
+avec les outils les plus puissants et les plus généraux
+qui sont largement utilisés par les praticiens de l'apprentissage profond. 
+
+* La troisième partie traite de l'évolutivité, de l'efficacité et des applications. 
+Tout d'abord, dans :numref:`chap_optimization`,
+nous abordons plusieurs algorithmes d'optimisation courants
+utilisés pour former des modèles d'apprentissage profond.
+Le chapitre suivant, :numref:`chap_performance`,
+examine plusieurs facteurs clés
+qui influence les performances de calcul 
+de votre code d'apprentissage profond. 
+Dans :numref:`chap_cv`,
+nous illustrons les principales applications 
+de l'apprentissage profond en vision par ordinateur. 
+Dans :numref:`chap_nlp_pretrain` et :numref:`chap_nlp_app`,
+nous montrons comment pré-entraîner des modèles de représentation du langage
+et les appliquer à des tâches de traitement du langage naturel.
 
 
-
-
-
-
-:numref:`chap_computation` 
- 
-
-
-
-
- :numref:`chap_cnn` :numref:`chap_modern_cnn`
- 
- 
-
- :numref:`chap_rnn` :numref:`chap_modern_rnn`
- 
- 
-
- 
-
- :numref:`chap_attention` 
-
-
-
-
- 
-
-
-
-
- :numref:`chap_optimization`
-
-
- :numref:`chap_performance`
-
- 
-
- :numref:`chap_cv`
- 
-
- :numref:`chap_nlp_pretrain` :numref:`chap_nlp_app`
- 
-
-
-
-
+### Code
 :label:`sec_code`
+La plupart des sections de ce livre comportent du code exécutable. 
+Nous pensons que certaines intuitions se développent mieux
+par essais et erreurs,
+en modifiant légèrement le code et en observant les résultats.
+Idéalement, une théorie mathématique élégante pourrait nous indiquer
+précisément comment modifier notre code pour obtenir le résultat souhaité. 
+Cependant, aujourd'hui, les praticiens de l'apprentissage profond
+doivent souvent s'aventurer là où aucune théorie convaincante
+ne peut les guider fermement.
+Malgré tous nos efforts, les explications formelles de l'efficacité 
+des différentes techniques font toujours défaut,
+à la fois parce que les mathématiques permettant de caractériser 
+ces modèles peuvent être très difficiles
+et aussi parce que les recherches sérieuses sur ces 
+sujets n'ont été lancées que récemment.
+Nous espérons qu'au fur et à mesure que
+la théorie de l'apprentissage profond progresse,
+les futures éditions de ce livre
+pourront fournir des informations qui éclipseront
+celles actuellement disponibles. 
+
+To avoid unnecessary repetition, we encapsulate 
+Pour éviter les répétitions inutiles, nous encapsulons
+certaines de nos fonctions et classes les plus fréquemment 
+importées et référencées dans la librarie `d2l`.
+Pour indiquer un bloc de code, tel qu'une fonction,
+une classe, ou une collection d'instructions d'importation,
+qui sera ensuite accessible via la librarie `d2l`,
+nous le marquerons avec `#@save`.
+Nous offrons un aperçu détaillé
+de ces fonctions et classes dans :numref:`sec_d2l`.
+La librarie `d2l` est léger et ne nécessite que
+les dépendances suivantes :
+
+ 
+ 
+
+ 
+ 
+
+
+
+
+
 
 
 
@@ -327,14 +371,6 @@ du calcul et des probabilités.
 
  
  
- `d2l`
- 
-
- `d2l` 
- `#@save` 
- 
- :numref:`sec_d2l`
- `d2l`
 
 
 ```{.python .input}
@@ -363,7 +399,7 @@ d2l = sys.modules[__name__]
 
 :begin_tab:`mxnet`
 La plupart du code de ce livre est basé sur Apache MXNet,
-un cadre open-source pour l'apprentissage profond
+un framework open-source pour l'apprentissage profond
 qui est le choix préféré 
 d'AWS (Amazon Web Services),
 ainsi que de nombreux collèges et entreprises.
@@ -375,14 +411,14 @@ peuvent ne pas fonctionner correctement dans les futures versions de MXNet.
 Nous prévoyons de maintenir la version en ligne à jour.
 Si vous rencontrez des problèmes,
 veuillez consulter :ref:`chap_installation` 
- pour mettre à jour votre code et votre environnement d'exécution.
+pour mettre à jour votre code et votre environnement d'exécution.
 
 Voici comment nous importons les modules de MXNet.
 :end_tab:
 
 :begin_tab:`pytorch`
 La plupart du code de ce livre est basé sur PyTorch,
-un cadre open-source extrêmement populaire
+un framework open-source extrêmement populaire
 qui a été adopté avec enthousiasme 
 par la communauté de recherche en apprentissage profond.
 L'ensemble du code de ce livre a passé les tests 
@@ -393,14 +429,14 @@ peuvent ne pas fonctionner correctement dans les futures versions de PyTorch.
 Nous prévoyons de maintenir la version en ligne à jour.
 Si vous rencontrez des problèmes,
 veuillez consulter :ref:`chap_installation` 
- pour mettre à jour votre code et votre environnement d'exécution.
+pour mettre à jour votre code et votre environnement d'exécution.
 
 Voici comment nous importons les modules de PyTorch.
 :end_tab:
 
 :begin_tab:`tensorflow`
 La plupart du code de ce livre est basé sur TensorFlow,
-un cadre open-source pour l'apprentissage profond
+un framework open-source pour l'apprentissage profond
 qui est largement adopté dans l'industrie
 et populaire parmi les chercheurs.
 L'ensemble du code de ce livre a passé les tests 
@@ -411,7 +447,7 @@ peuvent ne pas fonctionner correctement dans les futures versions de TensorFlow.
 Nous prévoyons de maintenir la version en ligne à jour.
 Si vous rencontrez des problèmes,
 veuillez consulter :ref:`chap_installation` 
- pour mettre à jour votre code et votre environnement d'exécution.
+pour mettre à jour votre code et votre environnement d'exécution.
 
 Voici comment nous importons les modules de TensorFlow.
 :end_tab:
@@ -445,8 +481,8 @@ import tensorflow as tf
 
 ### Public cible
 
-Ce livre s'adresse aux étudiants (de premier et deuxième cycles), aux ingénieurs
-et aux chercheurs qui souhaitent acquérir une solide maîtrise
+Ce livre s'adresse aux étudiants (de premier et deuxième cycles),
+aux ingénieurs et aux chercheurs qui souhaitent acquérir une solide maîtrise
 des techniques pratiques de l'apprentissage profond.
 Comme nous expliquons chaque concept à partir de zéro,
 aucune connaissance préalable en apprentissage profond ou en apprentissage automatique n'est requise.
@@ -466,12 +502,12 @@ Si vous souhaitez approfondir ces bases
 au-delà des conditions préalables à la compréhension de notre livre,
 nous vous recommandons volontiers d'autres ressources formidables :
 Linear Analysis de Bela Bollobas :cite:`Bollobas.1999` 
- couvre l'algèbre linéaire et l'analyse fonctionnelle de manière très approfondie.
+couvre l'algèbre linéaire et l'analyse fonctionnelle de manière très approfondie.
 All of Statistics :cite:`Wasserman.2013` 
- constitue une merveilleuse introduction aux statistiques.
+constitue une merveilleuse introduction aux statistiques.
 Les ouvrages de Joe Blitzstein [books](https://www.amazon.com/Introduction-Probability-Chapman-Statistical-Science/dp/1138369918) 
- et [courses](https://projects.iq.harvard.edu/stat110/home) 
- sur les probabilités et l'inférence sont des joyaux pédagogiques.
+et [courses](https://projects.iq.harvard.edu/stat110/home) 
+sur les probabilités et l'inférence sont des joyaux pédagogiques.
 Et si vous n'avez jamais utilisé Python auparavant,
 vous voudrez peut-être parcourir ce [Python tutorial](http://learnpython.org/).
 
@@ -510,7 +546,7 @@ ati-ozgur, qbaza, dchoi77, Adam Gerson, Phuc Le, Mark Atwood, christabella, vn09
 Haibin Lin, jjangga0214, RichyChen, noelo, hansent, Giel Dops, dvincent1337, WhiteD3vil,
 Peter Kulits, codypenta, joseppinilla, ahmaurya, karolszk, heytitle, Peter Goetz, rigtorp,
 Tiep Vu, sfilip, mlxd, Kale-ab Tessera, Sanjar Adilov, MatteoFerrara, hsneto,
-Katarzyna Biesialska, Gregory Bruss, Duy-Thanh Doan, paulaurel, graytowne, Duc Pham,
+Katarzyna Biesialska, Gregory Bruss, Duy–Thanh Doan, paulaurel, graytowne, Duc Pham,
 sl7423, Jaedong Hwang, Yida Wang, cys4, clhm, Jean Kaddour, austinmw, trebeljahr, tbaums,
 Cuong V. Nguyen, pavelkomarov, vzlamal, NotAnotherSystem, J-Arun-Mani, jancio, eldarkurtic,
 the-great-shazbot, doctorcolossus, gducharme, cclauss, Daniel-Mietchen, hoonose, biagiom,

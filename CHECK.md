@@ -4,7 +4,7 @@
 
 # 0 - chapter_preface
 
-- [ ] ./chapter_preface/index.md
+- [x] ./chapter_preface/index.md
 
 # 0 - chapter_installation
 

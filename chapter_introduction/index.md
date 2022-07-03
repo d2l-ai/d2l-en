@@ -1505,7 +1505,7 @@ C'est, après tout, la source du célèbre jeu de données MNIST de chiffres man
 Il en va de même pour la lecture des chèques pour les dépôts bancaires et le scoring
 de la solvabilité des candidats.
 Les transactions financières sont vérifiées automatiquement pour détecter les fraudes.
-Cela constitue l'épine dorsale de nombreux systèmes de paiement du commerce électronique,
+Cela constitue la colonne vertébrale de nombreux systèmes de paiement du commerce électronique,
 tels que PayPal, Stripe, AliPay, WeChat, Apple, Visa et MasterCard.
 Les programmes informatiques pour les échecs sont compétitifs depuis des décennies.
 L'apprentissage automatique alimente la recherche, la recommandation, la personnalisation,

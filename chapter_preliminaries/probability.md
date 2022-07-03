@@ -659,7 +659,7 @@ Notez que $\sum_a P(A=a|B) = 1$ nous permet également de *marginaliser* les var
 $$\sum_a P(A=a, B) = P(B) \sum_a P(A = a|B) = P(B).$$ 
 
  L'indépendance est un autre concept fondamental
-qui constitue l'épine dorsale de 
+qui constitue la colonne vertébrale de 
 nombreuses idées importantes en statistiques.
 En bref, deux variables sont *indépendantes*
 si le conditionnement de la valeur de $A$ n'entraîne pas
