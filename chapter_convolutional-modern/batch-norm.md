@@ -701,7 +701,7 @@ faites chaque année dans la littérature technique de l'apprentissage automatiq
 Il est probable que sa résonance en tant que point focal de ces débats
 est due à sa large reconnaissabilité par le public cible.
 La normalisation par lots s'est avérée être une méthode indispensable,
-appliquée dans presque tous les classificateurs d'images déployés,
+appliquée dans presque tous les classifieur d'images déployés,
 ce qui a valu à l'article qui a introduit cette technique
 des dizaines de milliers de citations. Nous pensons cependant que les principes directeurs 
 de régularisation par injection de bruit, d'accélération par remise à l'échelle et enfin de prétraitement

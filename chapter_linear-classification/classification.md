@@ -81,7 +81,7 @@ Lorsque les prédictions sont cohérentes avec la classe d'étiquettes `y`, elle
 La précision de la classification est la fraction de toutes les prédictions qui sont correctes.
 Bien qu'il puisse être difficile d'optimiser la précision directement (elle n'est pas différentiable),
 c'est souvent la mesure de performance qui nous intéresse le plus. Elle est souvent *la*
-quantité pertinente dans les benchmarks. C'est pourquoi nous l'indiquons presque toujours lorsque nous formons des classificateurs.
+quantité pertinente dans les benchmarks. C'est pourquoi nous l'indiquons presque toujours lorsque nous formons des classifieur.
 
 La précision est calculée comme suit.
 Premièrement, si `y_hat` est une matrice,
@@ -127,7 +127,7 @@ def parameters(self):
 
 ## Résumé
 
-La classification est un problème suffisamment courant pour justifier ses propres fonctions pratiques. L'importance centrale de la classification est la *précision* du classificateur. Notez que, bien que la précision soit souvent au centre de nos préoccupations, nous formons des classificateurs pour optimiser une variété d'autres objectifs pour des raisons statistiques et informatiques. Cependant, quelle que soit la fonction de perte minimisée pendant la formation, il est utile de disposer d'une méthode pratique pour évaluer empiriquement la précision de notre classificateur. 
+La classification est un problème suffisamment courant pour justifier ses propres fonctions pratiques. L'importance centrale de la classification est la *précision* du classificateur. Notez que, bien que la précision soit souvent au centre de nos préoccupations, nous formons des classifieur pour optimiser une variété d'autres objectifs pour des raisons statistiques et informatiques. Cependant, quelle que soit la fonction de perte minimisée pendant la formation, il est utile de disposer d'une méthode pratique pour évaluer empiriquement la précision de notre classificateur. 
 
 
 ## Exercices

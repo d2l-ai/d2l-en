@@ -11,7 +11,7 @@ la régression softmax (:numref:`sec_softmax` ),
 en mettant en œuvre l'algorithme à partir de zéro
 (:numref:`sec_softmax_scratch` ) et en utilisant des API de haut niveau
 (:numref:`sec_softmax_concise` ). Cela nous a permis d'entraîner 
-des classificateurs capables de reconnaître
+des classifieur capables de reconnaître
 10 catégories de vêtements à partir d'images à faible résolution.
 En cours de route, nous avons appris à manipuler les données,
 à contraindre nos sorties à une distribution de probabilité valide,

@@ -29,7 +29,7 @@ et deviner au hasard chaque fois que nous rencontrerons de nouveaux exemples.
 
 Un certain nombre de questions brûlantes exigent une attention immédiate :
 1. De combien d'exemples de test avons-nous besoin pour estimer précisément
- la précision de nos classificateurs sur la population sous-jacente ?
+ la précision de nos classifieur sur la population sous-jacente ?
 1. Que se passe-t-il si nous continuons à évaluer les modèles sur le même test à plusieurs reprises ?
 1. Pourquoi devrions-nous nous attendre à ce que l'adaptation de nos modèles linéaires à l'ensemble d'apprentissage
  donne de meilleurs résultats que notre schéma de mémorisation naïve ?
@@ -276,7 +276,7 @@ vous avez déterminé le niveau de précision requis
 en partant du principe que vous évaluiez
 un seul classificateur $f$.
 
-Cependant, si vous vous lancez dans l'évaluation de plusieurs classificateurs $f_1, ..., f_k$
+Cependant, si vous vous lancez dans l'évaluation de plusieurs classifieur $f_1, ..., f_k$
  sur le même ensemble de test,
 vous devez prendre en compte le problème de la fausse découverte.
 Auparavant, vous pouviez être sûr à 95%
@@ -284,11 +284,11 @@ que $\epsilon_\mathcal{D}(f) \in \epsilon(f) \pm 0.01$
  pour un seul classificateur $f$
  et donc la probabilité d'un résultat erroné
 était de seulement 5%.
-Avec $k$ classificateurs dans le mélange,
+Avec $k$ classifieur dans le mélange,
 il peut être difficile de garantir
 qu'il n'y en a même pas un parmi
 dont la performance du jeu de test est trompeuse.
-Avec 20 classificateurs à l'étude,
+Avec 20 classifieur à l'étude,
 il se peut que vous n'ayez aucune puissance
 pour exclure la possibilité
 qu'au moins l'un d'entre eux
@@ -392,12 +392,12 @@ Rappelez-vous de notre discussion sur les ensembles de test
 que s'il est facile d'estimer
 l'erreur d'un seul classificateur,
 les choses se compliquent lorsque nous commençons
-à considérer des collections de classificateurs.
+à considérer des collections de classifieur.
 Même si l'erreur empirique
 d'un classificateur (fixe)
 sera proche de son erreur réelle
 avec une forte probabilité,
-une fois que nous considérons une collection de classificateurs,
+une fois que nous considérons une collection de classifieur,
 nous devons nous inquiéter de la possibilité
 que *juste un* classificateur dans l'ensemble
 recevra une erreur mal estimée.
@@ -423,7 +423,7 @@ qui nous permettrait d'affirmer que
 avec une probabilité d'au moins $1-\delta$
  (pour une petite $\delta$)
 aucun taux d'erreur de classificateur $\epsilon(f)$
- (parmi tous les classificateurs de la classe $\mathcal{F}$)
+ (parmi tous les classifieur de la classe $\mathcal{F}$)
 ne sera mal estimé par plus de
 qu'une petite quantité $\alpha$.
 Il est clair que nous ne pouvons pas faire de telles déclarations

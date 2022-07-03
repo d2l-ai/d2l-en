@@ -53,7 +53,7 @@ les pipelines classiques ressemblaient davantage à ceci :
 
 Si vous avez parlé à des chercheurs en apprentissage automatique,
 ils pensaient que l'apprentissage automatique était à la fois important et beau.
-Des théories élégantes prouvaient les propriétés de divers classificateurs :cite:`Boucheron.Bousquet.Lugosi.2005` et l'optimisation convexe
+Des théories élégantes prouvaient les propriétés de divers classifieur :cite:`Boucheron.Bousquet.Lugosi.2005` et l'optimisation convexe
  :cite:`Boyd.Vandenberghe.2004` était devenue le pilier pour les obtenir.
 Le domaine de l'apprentissage automatique était florissant, rigoureux et éminemment utile. Cependant,
 si vous parliez à un chercheur en vision par ordinateur,
