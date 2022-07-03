@@ -20,7 +20,7 @@ de nombreux verbes ont plus de 40 formes infléchies,
 tandis qu'en finnois,
 un nom peut avoir jusqu'à 15 cas.
 En linguistique,
-la morphologie étudie la formation des mots et leurs relations.
+la morphologie étudie l'entrainement des mots et leurs relations.
 Cependant,
 la structure interne des mots
 n'a été explorée ni dans word2vec

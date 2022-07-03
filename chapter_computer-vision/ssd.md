@@ -694,7 +694,7 @@ def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
 
 ### [**Formation du modèle**]
 
-Lors de la formation du modèle,
+Lors de l'entrainement du modèle,
 nous devons générer des boîtes d'ancrage multi-échelles (`anchors`)
 et prédire leurs classes (`cls_preds`) et leurs décalages (`bbox_preds`) dans la propagation vers l'avant.
 Ensuite, nous étiquetons les classes (`cls_labels`) et les décalages (`bbox_labels`) de ces boîtes d'ancrage générées

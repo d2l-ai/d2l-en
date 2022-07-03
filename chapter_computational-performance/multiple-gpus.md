@@ -1,8 +1,8 @@
-# Formation sur plusieurs GPU
+# entrainement sur plusieurs GPU
 :label:`sec_multi_gpu` 
 
  Jusqu'à présent, nous avons vu comment former efficacement des modèles sur des CPU et des GPU. Nous avons même montré comment les cadres d'apprentissage profond permettent de paralléliser automatiquement le calcul et la communication entre eux dans :numref:`sec_auto_para` . Nous avons également montré dans :numref:`sec_use_gpu` comment lister tous les GPU disponibles sur un ordinateur à l'aide de la commande `nvidia-smi`.
-Ce que nous n'avons *pas* abordé, c'est la manière de paralléliser réellement la formation par apprentissage profond. 
+Ce que nous n'avons *pas* abordé, c'est la manière de paralléliser réellement l'entrainement par apprentissage profond. 
 Au lieu de cela, nous avons laissé entendre en passant qu'il était possible de répartir les données sur plusieurs appareils et de faire en sorte que cela fonctionne. La présente section complète les détails et montre comment former un réseau en parallèle en partant de zéro. Les détails sur la façon de tirer parti des fonctionnalités des API de haut niveau sont relégués à :numref:`sec_multi_gpu_concise` .
 Nous supposons que vous êtes familier avec les algorithmes de descente de gradient stochastique par lots tels que ceux décrits dans :numref:`sec_minibatch_sgd` .
 
@@ -52,13 +52,13 @@ Cependant, l'ajout de GPU ne nous permet pas d'entraîner des modèles plus gran
 
 
 Une comparaison des différentes méthodes de parallélisation sur plusieurs GPU est présentée sur le site :numref:`fig_splitting` .
-Dans l'ensemble, le parallélisme des données est la méthode la plus pratique, à condition d'avoir accès à des GPU dotés d'une mémoire suffisamment grande. Voir également :cite:`Li.Andersen.Park.ea.2014` pour une description détaillée du partitionnement pour la formation distribuée. La mémoire des GPU était un problème au début de l'apprentissage profond. Aujourd'hui, cette question a été résolue pour tous les cas, sauf les plus inhabituels. Nous nous concentrons sur le parallélisme des données dans ce qui suit.
+Dans l'ensemble, le parallélisme des données est la méthode la plus pratique, à condition d'avoir accès à des GPU dotés d'une mémoire suffisamment grande. Voir également :cite:`Li.Andersen.Park.ea.2014` pour une description détaillée du partitionnement pour l'entrainement distribuée. La mémoire des GPU était un problème au début de l'apprentissage profond. Aujourd'hui, cette question a été résolue pour tous les cas, sauf les plus inhabituels. Nous nous concentrons sur le parallélisme des données dans ce qui suit.
 
 ## Parallélisme des données
 
 Supposons qu'il y ait $k$ GPU sur une machine. Étant donné le modèle à entraîner, chaque GPU maintiendra un ensemble complet de paramètres du modèle indépendamment, bien que les valeurs des paramètres entre les GPU soient identiques et synchronisées. 
 À titre d'exemple,
-:numref:`fig_data_parallel` illustre la formation de 
+:numref:`fig_data_parallel` illustre l'entrainement de 
 avec
 parallélisme des données lorsque $k=2$.
 
@@ -66,7 +66,7 @@ parallélisme des données lorsque $k=2$.
 ![Calculation of minibatch stochastic gradient descent using data parallelism on two GPUs.](../img/data-parallel.svg)
 :label:`fig_data_parallel`
 
-En général, la formation se déroule comme suit :
+En général, l'entrainement se déroule comme suit :
 
 * Dans toute itération de la formation, étant donné un mini lot aléatoire, nous divisons les exemples du lot en portions $k$ et les distribuons de manière égale entre les GPU.
 * Chaque GPU calcule la perte et le gradient des paramètres du modèle en fonction du sous-ensemble de minilots qui lui a été attribué.
@@ -79,7 +79,7 @@ En général, la formation se déroule comme suit :
 
 Notez qu'en pratique, nous *augmentons* la taille du minibatch $k$-fold lors de l'entraînement sur $k$ GPU de sorte que chaque GPU a la même quantité de travail à faire que si nous nous entraînions sur un seul GPU. Sur un serveur à 16 GPU, cela peut augmenter considérablement la taille des minibatchs et nous devrons peut-être augmenter le taux d'apprentissage en conséquence.
 Notez également que la normalisation des lots dans :numref:`sec_batch_norm` doit être ajustée, par exemple en conservant un coefficient de normalisation des lots distinct par GPU.
-Dans ce qui suit, nous utiliserons un petit réseau pour illustrer la formation multi-GPU.
+Dans ce qui suit, nous utiliserons un petit réseau pour illustrer l'entrainement multi-GPU.
 
 ```{.python .input}
 #@tab mxnet
@@ -172,7 +172,7 @@ loss = nn.CrossEntropyLoss(reduction='none')
 
 ## Synchronisation des données
 
-Pour une formation multi-GPU efficace, nous avons besoin de deux opérations de base. 
+Pour une entrainement multi-GPU efficace, nous avons besoin de deux opérations de base. 
 Tout d'abord, nous devons être en mesure de [**distribuer une liste de paramètres à plusieurs dispositifs**] et d'attacher des gradients (`get_params`). Sans paramètres, il est impossible d'évaluer le réseau sur un GPU.
 Deuxièmement, nous devons pouvoir additionner les paramètres entre plusieurs dispositifs, c'est-à-dire qu'il nous faut une fonction `allreduce`.
 

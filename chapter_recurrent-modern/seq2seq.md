@@ -87,9 +87,9 @@ décalée d'un token :
 
 Notre mise en œuvre dans
 :numref:`subsec_loading-seq-fixed-len` 
- a préparé des données de formation pour le forçage de l'enseignant,
+ a préparé des données de entrainement pour le forçage de l'enseignant,
 où le déplacement des jetons pour l'apprentissage auto-supervisé
-est similaire à la formation des modèles de langue dans
+est similaire à l'entrainement des modèles de langue dans
 :numref:`sec_language-model` .
 Une approche alternative consiste à
 alimenter le jeton *prédit*

@@ -203,7 +203,7 @@ Le problème le plus insidieux à rencontrer est probablement le gradient évane
 Rappelez-vous nos fonctions d'activation couramment utilisées et leurs dérivées dans :numref:`subsec_activation-functions` .
 Par exemple, supposons que nous voulions minimiser la fonction $f(x) = \tanh(x)$ et que nous démarrions à $x = 4$. Comme nous pouvons le constater, le gradient de $f$ est proche de zéro.
 Plus précisément, $f'(x) = 1 - \tanh^2(x)$ et donc $f'(4) = 0.0013$.
-Par conséquent, l'optimisation sera bloquée pendant un long moment avant de progresser. C'est l'une des raisons pour lesquelles la formation de modèles d'apprentissage profond était assez délicate avant l'introduction de la fonction d'activation ReLU.
+Par conséquent, l'optimisation sera bloquée pendant un long moment avant de progresser. C'est l'une des raisons pour lesquelles l'entrainement de modèles d'apprentissage profond était assez délicate avant l'introduction de la fonction d'activation ReLU.
 
 ```{.python .input}
 #@tab all

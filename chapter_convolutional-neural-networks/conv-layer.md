@@ -141,7 +141,7 @@ Une couche convolutive effectue une corrélation croisée entre l'entrée et le 
 et ajoute un biais scalaire pour produire une sortie.
 Les deux paramètres d'une couche convolutive
 sont le noyau et le biais scalaire.
-Lors de la formation de modèles basés sur des couches convolutionnelles,
+Lors de l'entrainement de modèles basés sur des couches convolutionnelles,
 nous initialisons généralement les noyaux de manière aléatoire,
 comme nous le ferions avec une couche entièrement connectée.
 

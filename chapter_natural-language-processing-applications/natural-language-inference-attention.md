@@ -362,7 +362,7 @@ embeds = glove_embedding[vocab.idx_to_token]
 net.embedding.weight.data.copy_(embeds);
 ```
 
-### Formation et évaluation du modèle
+### entrainement et évaluation du modèle
 
 Contrairement à la fonction `split_batch` dans :numref:`sec_multi_gpu` qui prend des entrées uniques telles que des séquences de texte (ou des images),
 nous définissons une fonction `split_batch_multi_inputs` pour prendre des entrées multiples telles que des prémisses et des hypothèses dans des minibatchs.

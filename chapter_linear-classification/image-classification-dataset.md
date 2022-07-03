@@ -96,7 +96,7 @@ class FashionMNIST(d2l.DataModule):  #@save
 Fashion-MNIST se compose d'images de 10 catégories, chacune représentée
 par 6 000 images dans l'ensemble de données d'entraînement et par 1 000 dans l'ensemble de données de test.
 Un *ensemble de données de test* est utilisé pour évaluer les performances du modèle (il ne doit pas être utilisé pour la formation).
-Par conséquent, l'ensemble de formation et l'ensemble de test
+Par conséquent, l'ensemble de entrainement et l'ensemble de test
 contiennent respectivement 60 000 et 10 000 images.
 
 ```{.python .input  n=8}
@@ -181,7 +181,7 @@ X, y = next(iter(data.train_dataloader()))
 print(X.shape, X.dtype, y.shape, y.dtype)
 ```
 
-Regardons le temps qu'il faut pour lire les images. Bien qu'il s'agisse d'un chargeur intégré, il n'est pas très rapide. Néanmoins, c'est suffisant puisque le traitement des images avec un réseau profond prend un peu plus de temps. C'est donc suffisant pour que la formation d'un réseau ne soit pas une contrainte d'IO.
+Regardons le temps qu'il faut pour lire les images. Bien qu'il s'agisse d'un chargeur intégré, il n'est pas très rapide. Néanmoins, c'est suffisant puisque le traitement des images avec un réseau profond prend un peu plus de temps. C'est donc suffisant pour que l'entrainement d'un réseau ne soit pas une contrainte d'IO.
 
 ```{.python .input  n=16}
 %%tab all

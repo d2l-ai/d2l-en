@@ -71,7 +71,7 @@ d2l.DATA_HUB['aclImdb'] = (d2l.DATA_URL + 'aclImdb_v1.tar.gz',
 data_dir = d2l.download_extract('aclImdb', 'aclImdb')
 ```
 
-Ensuite, lisez les jeux de données de formation et de test. Chaque exemple est une critique et son étiquette : 1 pour "positif" et 0 pour "négatif".
+Ensuite, lisez les jeux de données de entrainement et de test. Chaque exemple est une critique et son étiquette : 1 pour "positif" et 0 pour "négatif".
 
 ```{.python .input}
 #@tab all
@@ -221,7 +221,7 @@ en une catégorie de texte de longueur fixe.
 ## Exercices
 
 
- 1. Quels hyperparamètres de cette section pouvons-nous modifier pour accélérer la formation des modèles d'analyse de sentiments ?
+ 1. Quels hyperparamètres de cette section pouvons-nous modifier pour accélérer l'entrainement des modèles d'analyse de sentiments ?
 1. Pouvez-vous implémenter une fonction pour charger le jeu de données de [Amazon reviews](https://snap.stanford.edu/data/web-Amazon.html) dans des itérateurs de données et des étiquettes pour l'analyse des sentiments ?
 
 

@@ -600,7 +600,7 @@ dans l'auto-attention du décodeur multi-tête masqué
 (la première sous-couche),
 les requêtes, les clés et les valeurs
 proviennent toutes des sorties de la couche décodeur précédente.
-Lors de la formation des modèles de séquence à séquence,
+Lors de l'entrainement des modèles de séquence à séquence,
 les tokens à toutes les positions (pas de temps)
 de la séquence de sortie
 sont connus.

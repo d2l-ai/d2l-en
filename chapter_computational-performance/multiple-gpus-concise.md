@@ -167,14 +167,14 @@ def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
 
 ## [**Training**]
 
-Comme précédemment, le code de formation doit exécuter plusieurs fonctions de base pour un parallélisme efficace :
+Comme précédemment, le code de entrainement doit exécuter plusieurs fonctions de base pour un parallélisme efficace :
 
 * Les paramètres du réseau doivent être initialisés sur tous les appareils.
 * Lors de l'itération sur le jeu de données, les minibatchs doivent être répartis sur tous les appareils.
 * Nous calculons la perte et son gradient en parallèle sur tous les dispositifs.
 * Les gradients sont agrégés et les paramètres sont mis à jour en conséquence.
 
-À la fin, nous calculons la précision (encore une fois en parallèle) pour rendre compte de la performance finale du réseau. La routine de formation est assez similaire aux implémentations des chapitres précédents, sauf que nous devons diviser et agréger les données.
+À la fin, nous calculons la précision (encore une fois en parallèle) pour rendre compte de la performance finale du réseau. La routine de entrainement est assez similaire aux implémentations des chapitres précédents, sauf que nous devons diviser et agréger les données.
 
 ```{.python .input}
 #@tab mxnet
@@ -276,7 +276,7 @@ train(net, num_gpus=2, batch_size=512, lr=0.2)
 :begin_tab:`mxnet` 
  1. Cette section utilise ResNet-18. Essayez différentes époques, tailles de lots et taux d'apprentissage. Utilisez plus de GPU pour le calcul. Que se passe-t-il si vous essayez avec 16 GPU (par exemple, sur une instance AWS p2.16xlarge) ?
 1. Parfois, différents dispositifs fournissent une puissance de calcul différente. Nous pourrions utiliser les GPU et le CPU en même temps. Comment devrions-nous diviser le travail ? Le jeu en vaut-il la chandelle ? Pourquoi ? Pourquoi pas ?
-1. Que se passe-t-il si nous abandonnons `npx.waitall()`? Comment modifieriez-vous la formation de manière à obtenir un chevauchement de deux étapes au maximum pour le parallélisme ?
+1. Que se passe-t-il si nous abandonnons `npx.waitall()`? Comment modifieriez-vous l'entrainement de manière à obtenir un chevauchement de deux étapes au maximum pour le parallélisme ?
 :end_tab:
 
 :begin_tab:`pytorch`

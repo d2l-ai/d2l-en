@@ -87,7 +87,7 @@ import os
 Ce jeu de données est composé de
 1400 images de classe positive contenant des hot dogs,
 et autant d'images de classe négative contenant d'autres aliments.
-1000 images des deux classes sont utilisées pour la formation et le reste pour les tests.
+1000 images des deux classes sont utilisées pour l'entrainement et le reste pour les tests.
 
 
 Après avoir décompressé le jeu de données téléchargé,
@@ -103,7 +103,7 @@ d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL + 'hotdog.zip',
 data_dir = d2l.download_extract('hotdog')
 ```
 
-Nous créons deux instances pour lire tous les fichiers d'images dans les ensembles de données de formation et de test, respectivement.
+Nous créons deux instances pour lire tous les fichiers d'images dans les ensembles de données de entrainement et de test, respectivement.
 
 ```{.python .input}
 #@tab mxnet
@@ -333,7 +333,7 @@ car les valeurs initiales de ses paramètres sont plus efficaces.
 
 * L'apprentissage par transfert transfère les connaissances acquises de l'ensemble de données source à l'ensemble de données cible. Le réglage fin est une technique courante pour l'apprentissage par transfert.
 * Le modèle cible copie tous les modèles et leurs paramètres du modèle source, à l'exception de la couche de sortie, et ajuste ces paramètres en fonction de l'ensemble de données cible. En revanche, la couche de sortie du modèle cible doit être formée à partir de zéro.
-* En général, l'ajustement fin des paramètres utilise un taux d'apprentissage plus faible, tandis que la formation de la couche de sortie à partir de zéro peut utiliser un taux d'apprentissage plus élevé.
+* En général, l'ajustement fin des paramètres utilise un taux d'apprentissage plus faible, tandis que l'entrainement de la couche de sortie à partir de zéro peut utiliser un taux d'apprentissage plus élevé.
 
 
 ## Exercices

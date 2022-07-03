@@ -36,7 +36,7 @@ d2l.use_svg_display()
 
 ## Reconnaissance optique de caractères
 
-MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` est l'un des jeux de données les plus utilisés. Il contient 60 000 images pour la formation et 10 000 images pour la validation. Chaque image contient un chiffre écrit à la main de 0 à 9. La tâche consiste à classer chaque image dans le chiffre correspondant.
+MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` est l'un des jeux de données les plus utilisés. Il contient 60 000 images pour l'entrainement et 10 000 images pour la validation. Chaque image contient un chiffre écrit à la main de 0 à 9. La tâche consiste à classer chaque image dans le chiffre correspondant.
 
 Gluon fournit une classe `MNIST` dans le module `data.vision` pour
 récupérer automatiquement l'ensemble de données sur Internet.
@@ -486,7 +486,7 @@ Les réseaux profonds modernes atteignent des taux d'erreur inférieurs à $0.01
 
 ## Exercices
 1. Considérons l'ensemble de données $[[0,0], [0,1], [1,0], [1,1]]$ avec des étiquettes données par le XOR des deux éléments $[0,1,1,0]$.  Quelles sont les probabilités pour un classificateur Naive Bayes construit sur ce jeu de données.  Est-ce qu'il réussit à classer nos points ?  Si non, quelles hypothèses sont violées ?
-1. Supposons que nous n'ayons pas utilisé le lissage de Laplace lors de l'estimation des probabilités et qu'un exemple de données contenant une valeur jamais observée lors de la formation arrive au moment du test.  Quel serait le résultat du modèle ?
+1. Supposons que nous n'ayons pas utilisé le lissage de Laplace lors de l'estimation des probabilités et qu'un exemple de données contenant une valeur jamais observée lors de l'entrainement arrive au moment du test.  Quel serait le résultat du modèle ?
 1. Le classificateur de Bayes naïf est un exemple spécifique de réseau bayésien, où la dépendance des variables aléatoires est codée par une structure de graphe.  Bien que la théorie complète dépasse le cadre de cette section (voir :cite:`Koller.Friedman.2009` pour plus de détails), expliquez pourquoi le fait d'autoriser une dépendance explicite entre les deux variables d'entrée dans le modèle XOR permet de créer un classificateur efficace.
 
 :begin_tab:`mxnet`

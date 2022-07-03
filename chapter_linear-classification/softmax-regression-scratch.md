@@ -272,7 +272,7 @@ trainer.fit(model, data)
 
 ## Prédiction
 
-Maintenant que la formation est terminée,
+Maintenant que l'entrainement est terminée,
 notre modèle est prêt à [**classer certaines images.**]
 
 ```{.python .input}

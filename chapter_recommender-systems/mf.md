@@ -94,7 +94,7 @@ def evaluator(net, test_iter, devices):
     return float(np.mean(np.array(rmse_list)))
 ```
 
-## Formation et évaluation du modèle
+## entrainement et évaluation du modèle
 
 
  Dans la fonction de formation, nous adoptons la perte $\ell_2$ avec décroissance du poids. Le mécanisme de décroissance du poids a le même effet que la régularisation $\ell_2$.

@@ -7,9 +7,9 @@ nos algorithmes d'apprentissage distribué et parallèle doivent devenir beaucou
 L'idée centrale du serveur de paramètres a été introduite dans :cite:`Smola.Narayanamurthy.2010` dans le contexte des modèles à variables latentes distribuées. Une description de la sémantique "push and pull" a suivi dans :cite:`Ahmed.Aly.Gonzalez.ea.2012` et une description du système et d'une bibliothèque open source a suivi dans :cite:`Li.Andersen.Park.ea.2014` . Dans ce qui suit, nous allons motiver les composants nécessaires à l'efficacité.
 
 
-## Formation parallèle aux données
+## entrainement parallèle aux données
 
-Passons en revue l'approche de la formation parallèle aux données pour la formation distribuée. Nous l'utiliserons à l'exclusion de toutes les autres dans cette section car elle est nettement plus simple à mettre en œuvre dans la pratique. Il n'existe pratiquement aucun cas d'utilisation (en dehors de l'apprentissage profond sur les graphes) pour lequel une autre stratégie de parallélisme est préférable, car les GPU disposent aujourd'hui d'une mémoire abondante. :numref:`fig_parameterserver` décrit la variante du parallélisme des données que nous avons mise en œuvre dans :numref:`sec_multi_gpu` . L'aspect clé est que l'agrégation des gradients se produit sur le GPU 0 avant que les paramètres mis à jour ne soient rediffusés à tous les GPU.
+Passons en revue l'approche de l'entrainement parallèle aux données pour l'entrainement distribuée. Nous l'utiliserons à l'exclusion de toutes les autres dans cette section car elle est nettement plus simple à mettre en œuvre dans la pratique. Il n'existe pratiquement aucun cas d'utilisation (en dehors de l'apprentissage profond sur les graphes) pour lequel une autre stratégie de parallélisme est préférable, car les GPU disposent aujourd'hui d'une mémoire abondante. :numref:`fig_parameterserver` décrit la variante du parallélisme des données que nous avons mise en œuvre dans :numref:`sec_multi_gpu` . L'aspect clé est que l'agrégation des gradients se produit sur le GPU 0 avant que les paramètres mis à jour ne soient rediffusés à tous les GPU.
 
 ![Left: single GPU training. Right: a variant of multi-GPU training: (1) nous calculons la perte et le gradient, (2) tous les gradients sont agrégés sur un GPU, (3) la mise à jour des paramètres se produit et les paramètres sont rediffusés à tous les GPU.](../img/ps.svg)
 :label:`fig_parameterserver` 
@@ -55,10 +55,10 @@ Si nous reprenons le même exemple de synchronisation de 160 Mo sur 8 GPU V100, 
 
 Notez que l'on croit souvent à tort que la synchronisation en anneau est fondamentalement différente des autres algorithmes de synchronisation. La seule différence est que le chemin de synchronisation est un peu plus élaboré par rapport à un simple arbre.
 
-## Formation sur plusieurs machines
+## entrainement sur plusieurs machines
 
-La formation distribuée sur plusieurs machines ajoute un défi supplémentaire : nous devons communiquer avec des serveurs qui ne sont connectés qu'à travers un réseau à bande passante relativement faible, qui peut être plus d'un ordre de grandeur plus lent dans certains cas. 
-La synchronisation entre les appareils est délicate. Après tout, des machines différentes exécutant du code d'entraînement auront des vitesses subtilement différentes. Nous devons donc les *synchroniser* si nous voulons utiliser l'optimisation distribuée synchrone. :numref:`fig_ps_multimachine` illustre comment se déroule la formation parallèle distribuée.
+l'entrainement distribuée sur plusieurs machines ajoute un défi supplémentaire : nous devons communiquer avec des serveurs qui ne sont connectés qu'à travers un réseau à bande passante relativement faible, qui peut être plus d'un ordre de grandeur plus lent dans certains cas. 
+La synchronisation entre les appareils est délicate. Après tout, des machines différentes exécutant du code d'entraînement auront des vitesses subtilement différentes. Nous devons donc les *synchroniser* si nous voulons utiliser l'optimisation distribuée synchrone. :numref:`fig_ps_multimachine` illustre comment se déroule l'entrainement parallèle distribuée.
 
 1. Un lot (différent) de données est lu sur chaque machine, réparti sur plusieurs GPU et transféré dans la mémoire du GPU. Là, les prédictions et les gradients sont calculés sur chaque lot de GPU séparément.
 2. Les gradients de tous les GPU locaux sont agrégés sur un GPU (ou certaines parties sont agrégées sur différents GPU).
@@ -80,7 +80,7 @@ En particulier, il n'est pas facile de s'assurer que plusieurs machines travaill
 
 ## Key--Value Stores
 
-La mise en œuvre des étapes requises pour la formation distribuée multi-GPU dans la pratique n'est pas triviale. 
+La mise en œuvre des étapes requises pour l'entrainement distribuée multi-GPU dans la pratique n'est pas triviale. 
 C'est pourquoi il est utile d'utiliser une abstraction commune, à savoir celle d'un *key--value store* avec une sémantique de mise à jour redéfinie. 
 
 

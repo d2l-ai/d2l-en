@@ -452,7 +452,7 @@ train_with_data_aug(train_augs, test_augs, net)
 ## Exercices
 
 1. Entraînez le modèle sans utiliser l'augmentation d'image :`train_with_data_aug(test_augs, test_augs)`. Comparez la précision de l'entraînement et du test en utilisant et en n'utilisant pas l'augmentation d'image. Cette expérience comparative peut-elle soutenir l'argument selon lequel l'augmentation d'image peut atténuer l'overfitting ? Pourquoi ?
-1. Combinez plusieurs méthodes d'augmentation d'image différentes dans la formation du modèle sur l'ensemble de données CIFAR-10. Cela améliore-t-il la précision du test ? 
+1. Combinez plusieurs méthodes d'augmentation d'image différentes dans l'entrainement du modèle sur l'ensemble de données CIFAR-10. Cela améliore-t-il la précision du test ? 
 1. Reportez-vous à la documentation en ligne du cadre d'apprentissage profond. Quelles sont les autres méthodes d'augmentation de l'image qu'il propose ?
 
 :begin_tab:`mxnet`

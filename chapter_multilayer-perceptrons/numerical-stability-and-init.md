@@ -142,7 +142,7 @@ les gradients du produit global peuvent disparaître.
 Lorsque notre réseau comporte de nombreuses couches,
 si nous ne faisons pas attention, le gradient
 sera probablement coupé à une certaine couche.
-En effet, ce problème était autrefois un fléau pour la formation des réseaux profonds.
+En effet, ce problème était autrefois un fléau pour l'entrainement des réseaux profonds.
 Par conséquent, les ReLU, qui sont plus stables
 (mais moins plausibles sur le plan neuronal),
 sont devenus le choix par défaut des praticiens.

@@ -50,7 +50,7 @@ nous déployons des tâches sur plusieurs serveurs.
 En assignant intelligemment les tableaux aux contextes,
 nous pouvons minimiser le temps passé
 transfert de données entre les périphériques.
-Par exemple, lors de la formation de réseaux neuronaux sur un serveur avec un GPU,
+Par exemple, lors de l'entrainement de réseaux neuronaux sur un serveur avec un GPU,
 nous préférons généralement que les paramètres du modèle se trouvent sur le GPU.
 
 Ensuite, nous devons confirmer que
@@ -76,7 +76,7 @@ nous déployons des tâches sur plusieurs serveurs.
 En assignant intelligemment les tableaux aux contextes,
 nous pouvons minimiser le temps passé
 transfert de données entre les périphériques.
-Par exemple, lors de la formation de réseaux neuronaux sur un serveur avec un GPU,
+Par exemple, lors de l'entrainement de réseaux neuronaux sur un serveur avec un GPU,
 nous préférons généralement que les paramètres du modèle soient stockés sur le GPU.
 :end_tab:
 

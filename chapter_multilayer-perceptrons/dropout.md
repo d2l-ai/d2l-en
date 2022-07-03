@@ -12,7 +12,7 @@ attendons d'un bon modèle prédictif.
 Nous voulons qu'il soit performant sur des données non vues.
 La théorie classique de la généralisation
 suggère que pour combler l'écart entre
-les performances de la formation et du test,
+les performances de l'entrainement et du test,
 nous devons viser un modèle simple.
 La simplicité peut prendre la forme
 d'un petit nombre de dimensions.
@@ -45,7 +45,7 @@ Leur idée, appelée *dropout*, consiste à
 injecter du bruit tout en calculant
 chaque couche interne pendant la propagation vers l'avant,
 et elle est devenue une technique standard
-pour la formation des réseaux neuronaux.
+pour l'entrainement des réseaux neuronaux.
 La méthode est appelée *dropout* parce que nous
 *dropout* littéralement certains neurones pendant la formation.
 Tout au long de la formation, à chaque itération,

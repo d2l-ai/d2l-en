@@ -279,7 +279,7 @@ Avec des documents textuels réels, nous continuons à gagner des informations
 à mesure que nous incluons de plus en plus de contexte vers la gauche.
 Mais ces gains diminuent rapidement.
 C'est pourquoi nous faisons parfois des compromis, en évitant les difficultés informatiques et statistiques
-par la formation de modèles dont la validité dépend 
+par l'entrainement de modèles dont la validité dépend 
 d'une condition de Markov d'ordre $k$.
 Même les modèles de langage massifs d'aujourd'hui, basés sur les RNN et les transformateurs 
 , intègrent rarement plus de mille mots de contexte.

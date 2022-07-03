@@ -206,7 +206,7 @@ class SNLIDataset(torch.utils.data.Dataset):
 
 ### [**Putting All Things Together**]
 
-Nous pouvons maintenant invoquer la fonction `read_snli` et la classe `SNLIDataset` pour télécharger l'ensemble de données SNLI et renvoyer `DataLoader` instances pour les ensembles de formation et de test, ainsi que le vocabulaire de l'ensemble de formation.
+Nous pouvons maintenant invoquer la fonction `read_snli` et la classe `SNLIDataset` pour télécharger l'ensemble de données SNLI et renvoyer `DataLoader` instances pour les ensembles de entrainement et de test, ainsi que le vocabulaire de l'ensemble de formation.
 Il convient de noter que nous devons utiliser le vocabulaire construit à partir de l'ensemble d'apprentissage
 comme celui de l'ensemble de test. 
 Par conséquent, tout nouveau token provenant de l'ensemble de test sera inconnu du modèle formé sur l'ensemble de formation.

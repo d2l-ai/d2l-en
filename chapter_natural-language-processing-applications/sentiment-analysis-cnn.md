@@ -372,7 +372,7 @@ net.constant_embedding.weight.data.copy_(embeds)
 net.constant_embedding.weight.requires_grad = False
 ```
 
-### Formation et évaluation du modèle
+### entrainement et évaluation du modèle
 
 Nous pouvons maintenant former le modèle textCNN pour l'analyse des sentiments.
 

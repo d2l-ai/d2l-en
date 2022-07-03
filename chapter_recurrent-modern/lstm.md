@@ -316,7 +316,7 @@ Plus tard, nous rencontrerons des modèles alternatifs tels que les transformate
 
 1. Ajustez les hyperparamètres et analysez leur influence sur le temps d'exécution, la perplexité et la séquence de sortie.
 1. Comment devriez-vous modifier le modèle pour générer des mots propres par opposition à des séquences de caractères ?
-1. Comparez le coût de calcul des GRU, des LSTM et des RNN ordinaires pour une dimension cachée donnée. Portez une attention particulière aux coûts de formation et d'inférence.
+1. Comparez le coût de calcul des GRU, des LSTM et des RNN ordinaires pour une dimension cachée donnée. Portez une attention particulière aux coûts de entrainement et d'inférence.
 1. Puisque la cellule mémoire candidate garantit que la plage de valeurs est comprise entre $-1$ et $1$ en utilisant la fonction $\tanh$, pourquoi l'état caché doit-il utiliser à nouveau la fonction $\tanh$ pour garantir que la plage de valeurs de sortie est comprise entre $-1$ et $1$?
 1. Implémentez un modèle LSTM pour la prédiction de séries temporelles plutôt que pour la prédiction de séquences de caractères.
 

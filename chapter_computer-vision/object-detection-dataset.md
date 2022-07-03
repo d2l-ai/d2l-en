@@ -141,7 +141,7 @@ class BananasDataset(torch.utils.data.Dataset):
 
 Enfin, nous définissons
 la fonction `load_data_bananas` pour [**renvoyer deux instances
-d'itérateur de données pour les ensembles de formation et de test.**]
+d'itérateur de données pour les ensembles de entrainement et de test.**]
 Pour l'ensemble de données de test,
 il n'est pas nécessaire de le lire dans un ordre aléatoire.
 

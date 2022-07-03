@@ -140,7 +140,7 @@ Cette échelle était sans précédent, dépassant les autres par plus d'un ordr
 (par exemple, CIFAR-100 compte 60 000 images). $Un$autre aspect était que les images étaient à
 une résolution assez élevée de $224 \times 224$ pixels, contrairement à l'ensemble de données TinyImages
 de 80 millions de pixels :cite:`Torralba.Fergus.Freeman.2008`, composé de$ vignettes de $32 \times 32$ pixels.
-Cela a permis la formation de caractéristiques de plus haut niveau.
+Cela a permis l'entrainement de caractéristiques de plus haut niveau.
 Le concours associé, baptisé ImageNet Large Scale Visual Recognition
 Challenge ([ILSVRC](https://www.image-net.org/challenges/LSVRC/))
 a fait avancer la recherche sur la vision par ordinateur et l'apprentissage automatique,
@@ -384,7 +384,7 @@ AlexNet().layer_summary((1, 224, 224, 1))
 
 Bien qu'AlexNet ait été formé sur ImageNet dans :cite:`Krizhevsky.Sutskever.Hinton.2012`,
 nous utilisons ici Fashion-MNIST
-car la formation d'un modèle ImageNet jusqu'à convergence peut prendre des heures ou des jours
+car l'entrainement d'un modèle ImageNet jusqu'à convergence peut prendre des heures ou des jours
 même sur un GPU moderne.
 L'un des problèmes liés à l'application directe d'AlexNet sur [**Fashion-MNIST**]
 est que ses (**images ont une résolution**) inférieure ($28 \times 28$ pixels)
@@ -430,7 +430,7 @@ En examinant l'architecture, on constate qu'AlexNet a un talon d'Achille en mati
    1. Calculez le coût de calcul pour les convolutions et les couches entièrement connectées.
    1. Comment la bande passante de la mémoire affecte-t-elle le calcul ?
 1. En tant que concepteur de puces, vous devez trouver un compromis entre le calcul et la largeur de bande de la mémoire. Par exemple, une puce plus rapide nécessite plus de surface et plus d'énergie, et une plus grande largeur de bande de mémoire nécessite plus de broches et de logique de contrôle, donc également plus de surface. Comment l'optimiser ?
-1. Essayez d'augmenter le nombre d'époques lors de la formation d'AlexNet. Par rapport à LeNet, en quoi les résultats diffèrent-ils ? Pourquoi ?
+1. Essayez d'augmenter le nombre d'époques lors de l'entrainement d'AlexNet. Par rapport à LeNet, en quoi les résultats diffèrent-ils ? Pourquoi ?
 1. AlexNet est peut-être trop complexe pour le jeu de données Fashion-MNIST, notamment en raison de la faible résolution des images initiales.
    1. Essayez de simplifier le modèle pour rendre l'entraînement plus rapide, tout en vous assurant que la précision ne baisse pas de manière significative.
    1. Concevoir un meilleur modèle qui fonctionne directement sur $28 \fois 28$images.

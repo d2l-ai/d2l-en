@@ -210,7 +210,7 @@ Le résumé de :numref:`table_latency_numbers` et :numref:`table_latency_numbers
 * Adaptez vos algorithmes au matériel (par exemple, l'empreinte mémoire et la bande passante). De grandes accélérations (ordres de grandeur) peuvent être obtenues en intégrant les paramètres dans les caches.
 * Nous vous recommandons d'esquisser les performances d'un nouvel algorithme sur papier avant de vérifier les résultats expérimentaux. Des écarts d'un ordre de grandeur ou plus sont des raisons de s'inquiéter.
 * Utilisez des profileurs pour déboguer les goulots d'étranglement des performances.
-* Les matériels de formation et d'inférence ont des points forts différents en termes de prix et de performances.
+* Les matériels de entrainement et d'inférence ont des points forts différents en termes de prix et de performances.
 
 ## Exercices
 

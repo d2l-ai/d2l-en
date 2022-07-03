@@ -390,7 +390,7 @@ qui affecte la stabilité numérique.
 Étant donné que la rétropropagation dans le temps
 est l'application de la rétropropagation dans les RNN,
 comme nous l'avons expliqué dans :numref:`sec_backprop` ,
-la formation des RNN
+l'entrainement des RNN
 alterne la propagation vers l'avant avec
 la rétropropagation dans le temps.
 

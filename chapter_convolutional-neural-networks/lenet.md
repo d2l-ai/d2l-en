@@ -280,7 +280,7 @@ Une deuxième différence est la facilité relative avec laquelle nous avons pu 
    1. Ajustez le nombre de canaux de sortie.
    1. Ajustez le nombre de couches de convolution.
    1. Ajustez le nombre de couches entièrement connectées.
-   1. Ajustez les taux d'apprentissage et d'autres détails de formation (par exemple, l'initialisation et le nombre d'époques).
+   1. Ajustez les taux d'apprentissage et d'autres détails de entrainement (par exemple, l'initialisation et le nombre d'époques).
 1. Essayez le réseau amélioré sur l'ensemble de données MNIST original.
 1. Affichez les activations de la première et de la deuxième couche de LeNet pour différentes entrées (par exemple, des pulls et des manteaux).
 1. Qu'arrive-t-il aux activations lorsque vous introduisez des images très différentes dans le réseau (par exemple, des chats, des voitures, ou même du bruit aléatoire) ?

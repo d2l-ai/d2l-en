@@ -131,7 +131,7 @@ L'implémentation du bloc codeur du transformateur de vision
 suit simplement la conception de la prénormalisation dans :numref:`fig_vit` ,
 où la normalisation est appliquée juste *avant* l'attention multi-têtes ou le MLP.
 Contrairement à la post-normalisation ("add &amp; norm" dans :numref:`fig_transformer` ), où la normalisation est placée juste *après* les connexions résiduelles, la pré-normalisation de
-conduit à une formation plus efficace ou efficiente pour les transformateurs :cite:`baevski2018adaptive,wang2019learning,xiong2020layer` .
+conduit à une entrainement plus efficace ou efficiente pour les transformateurs :cite:`baevski2018adaptive,wang2019learning,xiong2020layer` .
 
 ```{.python .input}
 class ViTBlock(nn.Module):
@@ -203,7 +203,7 @@ class ViT(d2l.Classifier):
 
 ## Formation
 
-La formation d'un transformateur de vision sur le jeu de données Fashion-MNIST se fait de la même manière que la formation des CNN sur :numref:`chap_modern_cnn` .
+l'entrainement d'un transformateur de vision sur le jeu de données Fashion-MNIST se fait de la même manière que l'entrainement des CNN sur :numref:`chap_modern_cnn` .
 
 ```{.python .input}
 img_size, patch_size = 96, 16
@@ -235,7 +235,7 @@ et ont ajouté des priors de type convolution,
 
 ## Exercices
 
-1. Comment la valeur de `img_size` affecte-t-elle le temps de formation ?
+1. Comment la valeur de `img_size` affecte-t-elle le temps de entrainement ?
 1. Au lieu de projeter la représentation du token "&lt;cls&gt;" sur la sortie, comment projeter les représentations moyennes des patchs ? Implémentez ce changement et voyez comment il affecte la précision.
 1. Pouvez-vous modifier les hyperparamètres pour améliorer la précision du transformateur de vision ?
 

@@ -140,7 +140,7 @@ This scale was unprecedented, exceeding others by over an order of magnitude
 (e.g., CIFAR-100 has 60,000 images). Another aspect was that the images were at
 fairly high resolution of $224 \times 224$ pixels, unlike the 80 million sized
 TinyImages dataset :cite:`Torralba.Fergus.Freeman.2008`, consisting of $32 \times 32$ pixel thumbnails.
-This allowed for the formation of higher-level features.
+This allowed for the entrainement of higher-level features.
 The associated competition, dubbed the ImageNet Large Scale Visual Recognition
 Challenge ([ILSVRC](https://www.image-net.org/challenges/LSVRC/))
 pushed computer vision and machine learning research forward,

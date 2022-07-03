@@ -47,7 +47,7 @@ L'outil [word2vec](https://code.google.com/archive/p/word2vec/) a été proposé
 Il fait correspondre chaque mot à un vecteur de longueur fixe, et ces vecteurs peuvent mieux exprimer la relation de similarité et d'analogie entre différents mots.
 L'outil word2vec contient deux modèles, à savoir *skip-gram* :cite:`Mikolov.Sutskever.Chen.ea.2013` et *continuous bag of words* (CBOW) :cite:`Mikolov.Chen.Corrado.ea.2013` .
 Pour les représentations sémantiquement significatives,
-leur formation repose sur
+leur entrainement repose sur
 des probabilités conditionnelles
 qui peuvent être considérées comme la prédiction de
 certains mots à l'aide de certains de leurs mots environnants
@@ -213,8 +213,8 @@ est la probabilité de générer tous les mots centraux
 
 ### Formation
 
-La formation des modèles de sac de mots continus
-est presque la même que la formation des modèles de saut de programme
+l'entrainement des modèles de sac de mots continus
+est presque la même que l'entrainement des modèles de saut de programme
 .
 L'estimation par maximum de vraisemblance du modèle de sac de mots continu
 est équivalente à la minimisation de la fonction de perte suivante :

@@ -166,9 +166,9 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
     return np.mean(np.array(hit_rate)), np.mean(np.array(auc))
 ```
 
-## Formation et évaluation du modèle
+## entrainement et évaluation du modèle
 
-La fonction de formation est définie ci-dessous. Nous entraînons le modèle par paire.
+La fonction de entrainement est définie ci-dessous. Nous entraînons le modèle par paire.
 
 ```{.python .input  n=6}
 #@tab mxnet

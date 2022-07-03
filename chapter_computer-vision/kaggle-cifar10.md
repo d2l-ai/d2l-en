@@ -128,8 +128,8 @@ print('# training examples:', len(labels))
 print('# classes:', len(set(labels.values())))
 ```
 
-Ensuite, nous définissons la fonction `reorg_train_valid` pour [**séparer l'ensemble de validation de l'ensemble de formation original.**]
-L'argument `valid_ratio` de cette fonction est le rapport entre le nombre d'exemples de l'ensemble de validation et le nombre d'exemples de l'ensemble de formation original.
+Ensuite, nous définissons la fonction `reorg_train_valid` pour [**séparer l'ensemble de validation de l'ensemble de entrainement original.**]
+L'argument `valid_ratio` de cette fonction est le rapport entre le nombre d'exemples de l'ensemble de validation et le nombre d'exemples de l'ensemble de entrainement original.
 Plus concrètement,
 laisse $n$ être le nombre d'images de la classe ayant le moins d'exemples, et $r$ être le ratio.
 L'ensemble de validation répartira les images

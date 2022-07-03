@@ -83,7 +83,7 @@ y compris la précision et l'aire sous la caractéristique opérationnelle de r�
 .
 Cependant, comme le calcul de la dérivée de la perte 
 est une étape cruciale dans presque tous les 
-algorithmes de formation de réseaux neuronaux profonds,
+algorithmes de entrainement de réseaux neuronaux profonds,
 nous optimisons souvent un *substitut* différentiable à la place.
 
 

@@ -66,7 +66,7 @@ d2l.plt.show()
 
 ## Division de l'ensemble de données
 
-Nous divisons l'ensemble de données en ensembles de formation et de test. La fonction suivante propose deux modes de fractionnement :`random` et `seq-aware`. Dans le mode `random`, la fonction fractionne les 100 000 interactions de manière aléatoire sans tenir compte de l'horodatage et utilise par défaut 90 % des données comme échantillons d'entraînement et les 10 % restants comme échantillons de test. Dans le mode `seq-aware`, nous laissons de côté l'élément qu'un utilisateur a évalué le plus récemment pour le test, et les interactions historiques des utilisateurs comme ensemble de formation.  Les interactions historiques des utilisateurs sont triées du plus ancien au plus récent en fonction de l'horodatage. Ce mode sera utilisé dans la section sur la recommandation sensible aux séquences.
+Nous divisons l'ensemble de données en ensembles de entrainement et de test. La fonction suivante propose deux modes de fractionnement :`random` et `seq-aware`. Dans le mode `random`, la fonction fractionne les 100 000 interactions de manière aléatoire sans tenir compte de l'horodatage et utilise par défaut 90 % des données comme échantillons d'entraînement et les 10 % restants comme échantillons de test. Dans le mode `seq-aware`, nous laissons de côté l'élément qu'un utilisateur a évalué le plus récemment pour le test, et les interactions historiques des utilisateurs comme ensemble de formation.  Les interactions historiques des utilisateurs sont triées du plus ancien au plus récent en fonction de l'horodatage. Ce mode sera utilisé dans la section sur la recommandation sensible aux séquences.
 
 ```{.python .input  n=5}
 #@tab mxnet
@@ -99,7 +99,7 @@ Notez qu'il est bon d'utiliser un ensemble de validation dans la pratique, en pl
 
 ## Chargement des données
 
-Après avoir divisé l'ensemble de données, nous allons convertir l'ensemble de formation et l'ensemble de test en listes et dictionnaires/matrices pour des raisons de commodité. La fonction suivante lit le cadre de données ligne par ligne et énumère l'index des utilisateurs/articles à partir de zéro. La fonction renvoie ensuite des listes d'utilisateurs, d'articles, d'évaluations et un dictionnaire/matrice qui enregistre les interactions. Nous pouvons spécifier le type de rétroaction à `explicit` ou `implicit`.
+Après avoir divisé l'ensemble de données, nous allons convertir l'ensemble de entrainement et l'ensemble de test en listes et dictionnaires/matrices pour des raisons de commodité. La fonction suivante lit le cadre de données ligne par ligne et énumère l'index des utilisateurs/articles à partir de zéro. La fonction renvoie ensuite des listes d'utilisateurs, d'articles, d'évaluations et un dictionnaire/matrice qui enregistre les interactions. Nous pouvons spécifier le type de rétroaction à `explicit` ou `implicit`.
 
 ```{.python .input  n=6}
 #@tab mxnet
@@ -120,7 +120,7 @@ def load_data_ml100k(data, num_users, num_items, feedback='explicit'):
     return users, items, scores, inter
 ```
 
-Ensuite, nous assemblons les étapes ci-dessus et elles seront utilisées dans la section suivante. Les résultats sont enveloppés dans `Dataset` et `DataLoader`. Notez que le `last_batch` de `DataLoader` pour les données de formation est réglé sur le mode `rollover` (Les échantillons restants sont reportés à l'époque suivante.) et les ordres sont mélangés.
+Ensuite, nous assemblons les étapes ci-dessus et elles seront utilisées dans la section suivante. Les résultats sont enveloppés dans `Dataset` et `DataLoader`. Notez que le `last_batch` de `DataLoader` pour les données de entrainement est réglé sur le mode `rollover` (Les échantillons restants sont reportés à l'époque suivante.) et les ordres sont mélangés.
 
 ```{.python .input  n=7}
 #@tab mxnet

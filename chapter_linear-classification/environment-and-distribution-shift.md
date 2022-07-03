@@ -292,7 +292,7 @@ Voici quelques cas typiques.
 ## Correction du décalage de distribution
 
 Comme nous l'avons vu, il existe de nombreux cas
-où les distributions de formation et de test
+où les distributions de entrainement et de test
 $P(\mathbf{x}, y)$ sont différentes.
 Dans certains cas, nous avons de la chance et les modèles fonctionnent
 malgré le changement de covariable, d'étiquette ou de concept.
@@ -445,7 +445,7 @@ pour corriger le décalage des covariables :
 1. Générer un ensemble d'apprentissage de classification binaire : $\{(\mathbf{x}_1, -1), \ldots, (\mathbf{x}_n, -1), (\mathbf{u}_1, 1), \ldots, (\mathbf{u}_m, 1)\}$.
 1. Entraîner un classificateur binaire en utilisant la régression logistique pour obtenir la fonction $h$.
 1. Peser les données d'entraînement en utilisant $\beta_i = \exp(h(\mathbf{x}_i))$ ou mieux $\beta_i = \min(\exp(h(\mathbf{x}_i)), c)$ pour une certaine constante $c$.
-1. Utilisez les poids $\beta_i$ pour la formation sur $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ dans :eqref:`eq_weighted-empirical-risk-min` .
+1. Utilisez les poids $\beta_i$ pour l'entrainement sur $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ dans :eqref:`eq_weighted-empirical-risk-min` .
 
 Notez que l'algorithme ci-dessus repose sur une hypothèse cruciale.
 Pour que ce schéma fonctionne, il faut que chaque exemple de données
@@ -539,7 +539,7 @@ et nous obtiendrons une solution $p(\mathbf{y}) = \mathbf{C}^{-1} \mu(\hat{\math
 
 Comme nous observons les étiquettes sur les données sources,
 il est facile d'estimer la distribution $q(y)$.
-Ensuite, pour tout exemple de formation $i$ avec l'étiquette $y_i$,
+Ensuite, pour tout exemple de entrainement $i$ avec l'étiquette $y_i$,
 nous pouvons prendre le rapport de nos estimations $p(y_i)/q(y_i)$
  pour calculer le poids $\beta_i$,
 et l'insérer dans la minimisation du risque empirique pondéré
@@ -564,7 +564,7 @@ les anciens produits deviennent moins populaires. Cela signifie que la distribut
 * Les lentilles des caméras de circulation se dégradent progressivement en raison de l'usure environnementale, ce qui affecte progressivement la qualité de l'image.
 * Le contenu des informations change progressivement (la plupart des informations restent inchangées mais de nouvelles histoires apparaissent).
 
-Dans ce cas, nous pouvons utiliser la même approche que celle utilisée pour la formation des réseaux afin qu'ils s'adaptent au changement des données. En d'autres termes, nous utilisons les poids du réseau existant et effectuons simplement quelques étapes de mise à jour avec les nouvelles données plutôt que de former à partir de zéro.
+Dans ce cas, nous pouvons utiliser la même approche que celle utilisée pour l'entrainement des réseaux afin qu'ils s'adaptent au changement des données. En d'autres termes, nous utilisons les poids du réseau existant et effectuons simplement quelques étapes de mise à jour avec les nouvelles données plutôt que de former à partir de zéro.
 
 
 ### Une taxonomie des problèmes d'apprentissage
@@ -574,7 +574,7 @@ Armés de connaissances sur la façon de traiter les changements dans les distri
 
 ### Apprentissage par lots
 
-Dans le cadre de l'apprentissage par lots *, nous avons accès à des caractéristiques et à des étiquettes de formation $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$, que nous utilisons pour former un modèle $f(\mathbf{x})$. Plus tard, nous déployons ce modèle pour évaluer de nouvelles données $(\mathbf{x}, y)$ tirées de la même distribution. Il s'agit de l'hypothèse par défaut pour tous les problèmes que nous abordons ici. Par exemple, nous pouvons entraîner un détecteur de chats à partir de nombreuses photos de chats et de chiens. Une fois que nous l'avons formé, nous l'intégrons à un système de vision artificielle de porte à chat intelligente qui ne laisse entrer que les chats. Ce système est ensuite installé au domicile d'un client et n'est plus jamais mis à jour (sauf circonstances extrêmes).
+Dans le cadre de l'apprentissage par lots *, nous avons accès à des caractéristiques et à des étiquettes de entrainement $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$, que nous utilisons pour former un modèle $f(\mathbf{x})$. Plus tard, nous déployons ce modèle pour évaluer de nouvelles données $(\mathbf{x}, y)$ tirées de la même distribution. Il s'agit de l'hypothèse par défaut pour tous les problèmes que nous abordons ici. Par exemple, nous pouvons entraîner un détecteur de chats à partir de nombreuses photos de chats et de chiens. Une fois que nous l'avons formé, nous l'intégrons à un système de vision artificielle de porte à chat intelligente qui ne laisse entrer que les chats. Ce système est ensuite installé au domicile d'un client et n'est plus jamais mis à jour (sauf circonstances extrêmes).
 
 
 #### Apprentissage en ligne
@@ -680,7 +680,7 @@ que vous pourriez rencontrer au cours d'une carrière dans l'apprentissage autom
 
 ## Résumé
 
-* Dans de nombreux cas, les ensembles de formation et de test ne proviennent pas de la même distribution. C'est ce qu'on appelle le changement de distribution.
+* Dans de nombreux cas, les ensembles de entrainement et de test ne proviennent pas de la même distribution. C'est ce qu'on appelle le changement de distribution.
 * Le risque est l'espérance de la perte sur l'ensemble de la population de données tirées de leur vraie distribution. Cependant, cette population entière n'est généralement pas disponible. Le risque empirique est une perte moyenne sur les données d'entraînement pour approcher le risque. En pratique, nous effectuons une minimisation du risque empirique.
 * Sous les hypothèses correspondantes, le décalage des covariables et des étiquettes peut être détecté et corrigé au moment du test. Le fait de ne pas prendre en compte ce biais peut devenir problématique au moment du test.
 * Dans certains cas, l'environnement peut se souvenir des actions automatisées et répondre de manière surprenante. Nous devons tenir compte de cette possibilité lors de la construction des modèles et continuer à surveiller les systèmes en direct, en restant ouverts à la possibilité que nos modèles et l'environnement s'entremêlent de manière imprévue.

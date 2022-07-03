@@ -78,7 +78,7 @@ def evaluator(network, inter_matrix, test_data, devices):
     return float(rmse)
 ```
 
-## Formation et évaluation du modèle
+## entrainement et évaluation du modèle
 
 Maintenant, formons et évaluons AutoRec sur le jeu de données MovieLens. Nous pouvons clairement voir que le RMSE de test est inférieur au modèle de factorisation matricielle, ce qui confirme l'efficacité des réseaux neuronaux dans la tâche de prédiction de classement.
 

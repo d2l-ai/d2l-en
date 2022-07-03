@@ -170,7 +170,7 @@ en un score scalaire $e_i$.
  illustre le réglage fin de BERT pour la réponse aux questions.
 
 Pour répondre aux questions,
-l'objectif de formation de l'apprentissage supervisé est aussi simple que
+l'objectif de entrainement de l'apprentissage supervisé est aussi simple que
 maximiser les log-vraisemblances des positions de début et de fin de la vérité du terrain.
 Lors de la prédiction de la portée,
 nous pouvons calculer le score $s_i + e_j$ pour une portée valide
@@ -187,7 +187,7 @@ et sortir la portée avec le score le plus élevé.
 ## Exercices
 
 1. Concevons un algorithme de moteur de recherche pour les articles d'actualité. Lorsque le système reçoit une requête (par exemple, "industrie pétrolière pendant l'épidémie de coronavirus"), il doit renvoyer une liste classée d'articles d'actualité les plus pertinents pour la requête. Supposons que nous disposions d'un énorme réservoir d'articles d'actualité et d'un grand nombre de requêtes. Pour simplifier le problème, supposons que l'article le plus pertinent a été étiqueté pour chaque requête. Comment pouvons-nous appliquer l'échantillonnage négatif (voir :numref:`subsec_negative-sampling` ) et BERT dans la conception de l'algorithme ?
-1. Comment pouvons-nous tirer parti de BERT dans la formation des modèles de langage ?
+1. Comment pouvons-nous tirer parti de BERT dans l'entrainement des modèles de langage ?
 1. Peut-on utiliser BERT pour la traduction automatique ?
 
 [Discussions](https://discuss.d2l.ai/t/396)

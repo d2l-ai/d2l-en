@@ -243,9 +243,9 @@ def configure_optimizers(self):
 
 Maintenant que tous les éléments sont en place
 (paramètres, fonction de perte, modèle et optimiseur),
-nous sommes prêts à [**mettre en œuvre la boucle de formation principale.**]
+nous sommes prêts à [**mettre en œuvre la boucle de entrainement principale.**]
 Il est essentiel que vous compreniez bien ce code
-car vous utiliserez des boucles de formation similaires
+car vous utiliserez des boucles de entrainement similaires
 pour tous les autres modèles d'apprentissage profond
 abordés dans ce livre.
 À chaque *époque*, nous itérons à travers 
@@ -416,7 +416,7 @@ Dans ce processus, nous avons construit un chargeur de données,
 un modèle, une fonction de perte, une procédure d'optimisation,
 et un outil de visualisation et de surveillance. 
 Pour ce faire, nous avons composé un objet Python 
-qui contient tous les composants pertinents pour la formation d'un modèle. 
+qui contient tous les composants pertinents pour l'entrainement d'un modèle. 
 Bien qu'il ne s'agisse pas encore d'une implémentation de niveau professionnel
 , elle est parfaitement fonctionnelle et un code comme celui-ci 
 pourrait déjà vous aider à résoudre rapidement de petits problèmes.

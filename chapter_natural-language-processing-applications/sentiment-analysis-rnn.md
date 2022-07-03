@@ -199,7 +199,7 @@ net.embedding.weight.data.copy_(embeds)
 net.embedding.weight.requires_grad = False
 ```
 
-## Formation et évaluation du modèle
+## entrainement et évaluation du modèle
 
 Nous pouvons maintenant former le RNN bidirectionnel pour l'analyse des sentiments.
 

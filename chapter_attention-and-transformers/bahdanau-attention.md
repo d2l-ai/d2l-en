@@ -430,7 +430,7 @@ d2l.show_heatmaps(attention_weights[:, :, :, :len(engs[-1].split()) + 1],
 ## Exercices
 
 1. Remplacez GRU par LSTM dans l'expérience.
-1. Modifiez l'expérience pour remplacer la fonction de notation additive de l'attention par le produit scalaire du point. Comment cela influence-t-il l'efficacité de la formation ?
+1. Modifiez l'expérience pour remplacer la fonction de notation additive de l'attention par le produit scalaire du point. Comment cela influence-t-il l'efficacité de l'entrainement ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/347)

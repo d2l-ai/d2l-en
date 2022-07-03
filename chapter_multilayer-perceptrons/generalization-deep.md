@@ -17,7 +17,7 @@ Les chercheurs en apprentissage automatique sont des *consommateurs* d'algorithm
 Parfois, nous devons même développer de nouveaux algorithmes d'optimisation.
 Mais en fin de compte, l'optimisation n'est qu'un moyen pour atteindre une fin.
 À la base, l'apprentissage automatique est une discipline statistique
-et nous ne souhaitons optimiser la perte de formation que dans la mesure où
+et nous ne souhaitons optimiser la perte de entrainement que dans la mesure où
 un certain principe statistique (connu ou inconnu)
 conduit les modèles résultants à généraliser au-delà de l'ensemble de formation.
 
@@ -48,7 +48,7 @@ les théoriciens adoptant de nouvelles stratégies
 pour expliquer ce qui se passe,
 alors même que les praticiens continuent
 d'innover à un rythme effréné,
-construisant des arsenaux d'heuristiques pour la formation des réseaux profonds
+construisant des arsenaux d'heuristiques pour l'entrainement des réseaux profonds
 et un ensemble d'intuitions et de connaissances populaires
 qui fournissent des conseils pour décider
 des techniques à appliquer dans telle ou telle situation.
@@ -74,8 +74,8 @@ de l'état de la recherche et de la pratique.
 
 ## Réexamen de l'overfitting et de la régularisation
 
-Rappelons que notre approche de la formation des modèles d'apprentissage automatique
-se compose généralement de deux phases : (i) ajustement des données de formation ;
+Rappelons que notre approche de l'entrainement des modèles d'apprentissage automatique
+se compose généralement de deux phases : (i) ajustement des données de entrainement ;
 et (ii) estimation de l'erreur de *généralisation*
 (l'erreur réelle sur la population sous-jacente)
 en évaluant le modèle sur des données d'attente.
@@ -205,7 +205,7 @@ avec les données observées.
 
 Dans un sens, comme les réseaux neuronaux sont sur-paramétrés,
 possédant beaucoup plus de paramètres que nécessaire pour s'adapter aux données de formation,
-ils ont tendance à *interpoler* les données de formation (en les adaptant parfaitement)
+ils ont tendance à *interpoler* les données de entrainement (en les adaptant parfaitement)
 et se comportent donc, d'une certaine manière, davantage comme des modèles non paramétriques.
 Des recherches théoriques plus récentes ont établi
 un lien profond entre les grands réseaux neuronaux
@@ -247,7 +247,7 @@ on contraint le nombre d'époques d'apprentissage.
 La méthode la plus courante pour déterminer le critère d'arrêt
 consiste à surveiller l'erreur de validation tout au long de la formation
 (généralement en vérifiant une fois après chaque époque)
-et à interrompre la formation lorsque l'erreur de validation
+et à interrompre l'entrainement lorsque l'erreur de validation
 n'a pas diminué de plus d'une petite quantité $\epsilon$
  pendant un certain nombre d'époques.
 Ceci est parfois appelé un critère de *patience*.

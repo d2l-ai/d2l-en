@@ -17,7 +17,7 @@ En outre, les statistiques du corpus global
 
  de ces cooccurrences
 peuvent être précalculées :
-cela peut conduire à une formation plus efficace.
+cela peut conduire à une entrainement plus efficace.
 Afin d'exploiter les informations statistiques
 de l'ensemble du corpus
 pour l'intégration des mots,
@@ -146,7 +146,7 @@ et prendre le logarithme des deux, de sorte que le terme de perte au carré est 
 2. Ajouter deux paramètres scalaires du modèle pour chaque mot $w_i$: le biais du mot central $b_i$ et le biais du mot contextuel $c_i$.
 3. Remplacez le poids de chaque terme de perte par la fonction de poids $h(x_{ij})$, où $h(x)$ est croissant dans l'intervalle $[0, 1]$.
 
-En mettant tout cela ensemble, la formation de GloVe consiste à minimiser la fonction de perte suivante :
+En mettant tout cela ensemble, l'entrainement de GloVe consiste à minimiser la fonction de perte suivante :
 
 $$\sum_{i\in\mathcal{V}} \sum_{j\in\mathcal{V}} h(x_{ij}) \left(\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j - \log\,x_{ij}\right)^2.$$ 
  :eqlabel:`eq_glove-loss` 

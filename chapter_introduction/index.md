@@ -1,7 +1,7 @@
 # Introduction
 :label:`chap_introduction` 
 
- Jusqu'à récemment, presque tous les programmes informatiques 
+Jusqu'à récemment, presque tous les programmes informatiques 
 avec lesquels vous pouviez interagir au cours d'une journée ordinaire
 étaient codés sous la forme d'un ensemble rigide de règles 
 spécifiant précisément comment ils devaient se comporter.
@@ -42,7 +42,7 @@ du premier coup
 (il faut parfois quelques essais pour régler les problèmes),
 la plupart du temps, nous pouvons écrire de tels programmes 
 et les lancer en toute confiance 
-*avant de rencontrer un vrai client.
+*avant* de rencontrer un vrai client.
 Notre capacité à concevoir manuellement des systèmes automatisés
 qui pilotent des produits et des systèmes fonctionnels, 
 souvent dans des situations inédites,
@@ -124,7 +124,7 @@ nos interactions quotidiennes avec un smartphone
 peuvent faire intervenir plusieurs modèles d'apprentissage automatique.
 
 
-Imaginez simplement écrire un programme pour répondre à un *mot d'éveil*
+Imaginez simplement écrire un programme pour répondre à un *mot clé*
 tel que "Alexa", "OK Google" et "Hey Siri".
 Essayez de le coder vous-même dans une pièce
 avec rien d'autre qu'un ordinateur et un éditeur de code,
@@ -136,7 +136,7 @@ Chaque seconde, le microphone collecte environ
 Chaque échantillon est une mesure de l'amplitude de l'onde sonore.
 Quelle règle pourrait permettre de passer de manière fiable d'un extrait de données audio brutes à des prédictions fiables 
 $\{\text{yes}, \text{no}\}$ 
- pour savoir si l'extrait contient le mot d'éveil ?
+ pour savoir si l'extrait contient le mot clé ?
 Si vous êtes bloqué, ne vous inquiétez pas.
 Nous ne savons pas non plus comment écrire un tel programme à partir de zéro.
 C'est pourquoi nous utilisons l'apprentissage automatique.
@@ -155,7 +155,7 @@ vous êtes vous-même capable de le reconnaître.
 Armés de cette capacité, nous pouvons collecter un énorme ensemble de *données*
 contenant des exemples de sons 
 et étiqueter ceux qui contiennent
-et ceux qui ne contiennent pas le mot d'éveil.
+et ceux qui ne contiennent pas le mot clé.
 Dans l'approche de l'apprentissage automatique, 
 nous ne cherchons pas à concevoir un système
 *explicitement* pour reconnaître les mots d'éveil.
@@ -186,7 +186,7 @@ $\{\text{yes}, \text{no}\}$ comme *sortie*.
 Si tout se passe comme prévu 
 , les suppositions du modèle
 seront généralement correctes quant à 
-si l'extrait contient le mot d'éveil.
+si l'extrait contient le mot clé.
 
 Si nous choisissons la bonne famille de modèles,
 il devrait exister un réglage des boutons
@@ -261,7 +261,7 @@ qui nous suivront partout, quel que soit le type de problème d'apprentissage au
 1. Une *fonction objective* qui quantifie la qualité (ou la faiblesse) du modèle.
 1. Un *algorithme* pour ajuster les paramètres du modèle afin d'optimiser la fonction objectif.
 
-#### Data
+### Data
 
 Il va sans dire que vous ne pouvez pas faire de la science des données sans données.
 Nous pourrions perdre des centaines de pages à réfléchir à ce qui constitue précisément des données,
@@ -355,7 +355,7 @@ Notez que tout cela peut se produire sans que le scientifique des données
 conspire activement, ou même soit conscient.
 
 
-#### Modèles
+### Modèles
 
 La plupart de l'apprentissage automatique implique une transformation des données dans un certain sens.
 Nous pourrions vouloir construire un système qui ingère des photos et prédit le caractère souriant.
@@ -378,7 +378,7 @@ qui sont enchaînées de haut en bas, d'où le nom d'*apprentissage profond*.
 Dans le cadre de notre discussion sur les modèles profonds,
 nous aborderons également certaines méthodes plus traditionnelles.
 
-#### Fonctions objectives
+### Fonctions objectives
 
 Plus tôt, nous avons présenté l'apprentissage automatique comme un apprentissage à partir de l'expérience.
 Par *apprentissage* ici,
@@ -468,7 +468,7 @@ Nous ferons constamment référence à
 aux concepts susmentionnés 
 tels que les données, les modèles et les techniques d'apprentissage.
 
-#### Apprentissage supervisé
+### Apprentissage supervisé
 
 L'apprentissage supervisé consiste à prédire des étiquettes à partir de caractéristiques d'entrée (
 ).
@@ -1070,14 +1070,14 @@ pour déterminer la position relative
 entre deux régions rognées
 de la même image :cite:`Doersch.Gupta.Efros.2015` .
 Dans ces deux exemples d'apprentissage auto-supervisé,
-la formation de modèles pour prédire
+l'entrainement de modèles pour prédire
 les mots possibles et les positions relatives
 sont deux tâches de classification
 (de l'apprentissage supervisé).
 
 
 
-#### Interagir avec un environnement
+### Interagir avec un environnement
 
 Jusqu'à présent, nous n'avons pas abordé la question de l'origine des données
 ,
@@ -1126,7 +1126,7 @@ En voici quelques exemples.
 * L'environnement a-t-il une dynamique changeante ? Par exemple, les données futures ressemblent-elles toujours au passé ou les modèles changent-ils avec le temps, soit naturellement, soit en réponse à nos outils automatisés ?
 
 Cette dernière question soulève le problème du *décalage de la distribution*,
-lorsque les données de formation et de test sont différentes.
+lorsque les données de entrainement et de test sont différentes.
 C'est un problème que la plupart d'entre nous ont connu
 en passant des examens rédigés par un professeur,
 alors que les devoirs étaient composés par ses assistants pédagogiques.
@@ -1179,7 +1179,7 @@ du problème d'apprentissage supervisé d'origine.
 Cela dit, l'apprentissage par renforcement peut également résoudre de nombreux problèmes
 que l'apprentissage supervisé ne peut pas résoudre.
 Par exemple, dans l'apprentissage supervisé, nous attendons toujours
-que l'entrée de formation soit associée à l'étiquette correcte.
+que l'entrée de entrainement soit associée à l'étiquette correcte.
 Mais dans l'apprentissage par renforcement, nous ne supposons pas que pour chaque observation 
 l'environnement nous indique l'action optimale.
 En général, nous obtenons simplement une certaine récompense.
@@ -1330,7 +1330,7 @@ que l'on retrouve aujourd'hui dans la plupart des réseaux :
 Après des progrès initiaux rapides, la recherche sur les réseaux neuronaux
 a langui entre 1995 et 2005 environ.
 Cela est dû principalement à deux raisons.
-Premièrement, la formation d'un réseau est très coûteuse en termes de calcul.
+Premièrement, l'entrainement d'un réseau est très coûteuse en termes de calcul.
 Si la mémoire vive était abondante à la fin du siècle dernier,
 la puissance de calcul était rare.
 Deuxièmement, les ensembles de données étaient relativement petits.
@@ -1371,7 +1371,7 @@ Ce phénomène est parfaitement illustré par le site :numref:`tab_intro_decade`
 |2020|1 T (réseau social)|100 GB|1 PF (Nvidia DGX-2)|
 :label:`tab_intro_decade` 
 
- Il est évident que la mémoire vive n'a pas suivi le rythme de la croissance des données.
+Il est évident que la mémoire vive n'a pas suivi le rythme de la croissance des données.
 Dans le même temps, l'augmentation de la puissance de calcul
 a dépassé celle des données disponibles.
 Cela signifie que les modèles statistiques doivent devenir plus efficaces en termes de mémoire
@@ -1445,7 +1445,7 @@ au cours de la dernière décennie.
  la disposition d'une scène :cite:`Park.Liu.Wang.ea.2019` .
 * Dans de nombreux cas, un seul GPU est insuffisant pour traiter
  les grandes quantités de données disponibles pour la formation.
- Au cours de la dernière décennie, la capacité à construire des algorithmes de formation parallèles et distribués
+ Au cours de la dernière décennie, la capacité à construire des algorithmes de entrainement parallèles et distribués
  s'est considérablement améliorée.
  L'un des principaux défis de la conception d'algorithmes évolutifs
  est que le cheval de bataille de l'optimisation de l'apprentissage profond, la descente de gradient stochastique
@@ -1458,7 +1458,7 @@ au cours de la dernière décennie.
  et ensuite par :cite:`You.Gitman.Ginsburg.2017` 
  et :cite:`Jia.Song.He.ea.2018` , ont porté la taille à 64 000 observations,
  réduisant le temps d'apprentissage du modèle ResNet-50 sur le jeu de données ImageNet à moins de 7 minutes.
- À titre de comparaison, les temps de formation initiaux étaient de l'ordre de plusieurs jours.
+ À titre de comparaison, les temps de entrainement initiaux étaient de l'ordre de plusieurs jours.
 * La capacité à paralléliser les calculs a également contribué de manière assez cruciale
  aux progrès de l'apprentissage par renforcement, du moins lorsque la simulation est une option
 . Cela a conduit à des progrès significatifs dans les ordinateurs atteignant
@@ -1639,7 +1639,7 @@ d'apprentissage automatique
 Il s'avère que ces modèles à plusieurs couches
 sont capables de traiter des données perceptives de bas niveau
 d'une manière que les outils précédents ne pouvaient pas.
-Le point commun le plus important des méthodes d'apprentissage profond est sans doute l'utilisation d'une formation *de bout en bout*. 
+Le point commun le plus important des méthodes d'apprentissage profond est sans doute l'utilisation d'une entrainement *de bout en bout*. 
 En d'autres termes, plutôt que d'assembler un système basé sur des composants qui sont réglés individuellement, on construit le système et on règle ensuite leurs performances conjointement.
 Par exemple, dans le domaine de la vision par ordinateur, les scientifiques avaient l'habitude de séparer le processus d'ingénierie des caractéristiques * du processus de construction des modèles d'apprentissage automatique. Le détecteur de contours de Canny :cite:`Canny.1987` et l'extracteur de caractéristiques SIFT de Lowe :cite:`Lowe.2004` ont régné en maître pendant plus d'une décennie en tant qu'algorithmes de mappage des images en vecteurs de caractéristiques.
 Autrefois, la partie cruciale de l'application de l'apprentissage automatique à ces problèmes
@@ -1660,7 +1660,7 @@ qui séparaient auparavant la vision par ordinateur, la reconnaissance vocale,
 le traitement du langage naturel, l'informatique médicale et d'autres domaines d'application,
 offrant ainsi un ensemble unifié d'outils pour résoudre divers problèmes.
 
-Au-delà de la formation de bout en bout, 
+Au-delà de l'entrainement de bout en bout, 
 nous assistons à une transition des descriptions statistiques paramétriques vers des modèles entièrement non paramétriques. Lorsque les données sont rares, il faut s'appuyer sur des hypothèses simplificatrices concernant la réalité afin d'obtenir des modèles utiles. Lorsque les données sont abondantes, ces hypothèses peuvent être remplacées par des modèles non paramétriques qui correspondent mieux à la réalité. Dans une certaine mesure, cela reflète les progrès que la physique a connus au milieu du siècle dernier avec la disponibilité des ordinateurs. Plutôt que de résoudre à la main des approximations paramétriques du comportement des électrons, on peut désormais recourir à des simulations numériques des équations différentielles partielles associées. Cela a conduit à des modèles beaucoup plus précis, bien que souvent au détriment de l'explicabilité.
 
 Une autre différence par rapport aux travaux précédents est l'acceptation de solutions sous-optimales, le traitement de problèmes d'optimisation non linéaire non convexes et la volonté d'essayer des choses avant de les prouver. Ce nouvel empirisme dans le traitement des problèmes statistiques, combiné à un afflux rapide de talents, a permis de faire progresser rapidement les algorithmes pratiques, même si dans de nombreux cas, il a fallu modifier et réinventer des outils qui existaient depuis des décennies.
@@ -1682,6 +1682,6 @@ En tant qu'apprentissage de représentation multi-niveaux par l'apprentissage de
 1. Quelles parties du code que vous écrivez actuellement pourraient être "apprises", c'est-à-dire améliorées en apprenant et en déterminant automatiquement les choix de conception qui sont faits dans votre code ? Votre code inclut-il des choix de conception heuristiques ?
 1. Quels sont les problèmes que vous rencontrez et pour lesquels il existe de nombreux exemples de résolution, mais pas de moyen spécifique de les automatiser ? Ces problèmes peuvent être des candidats de choix pour l'utilisation de l'apprentissage profond.
 1. Si vous considérez le développement de l'IA comme une nouvelle révolution industrielle, quelle est la relation entre les algorithmes et les données ? Est-elle similaire à celle des moteurs à vapeur et du charbon ? Quelle est la différence fondamentale ?
-1. Où peut-on appliquer l'approche de la formation de bout en bout, comme sur :numref:`fig_ml_loop` , en physique, en ingénierie et en économétrie ?
+1. Où peut-on appliquer l'approche de l'entrainement de bout en bout, comme sur :numref:`fig_ml_loop` , en physique, en ingénierie et en économétrie ?
 
 [Discussions](https://discuss.d2l.ai/t/22)

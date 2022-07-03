@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Normalisation par lots
 :label:`sec_batch_norm` 
 
- La formation de réseaux neuronaux profonds est difficile.
+ l'entrainement de réseaux neuronaux profonds est difficile.
 Les faire converger en un temps raisonnable peut s'avérer délicat.
 Dans cette section, nous décrivons la *normalisation par lots*, une technique populaire et efficace
 qui accélère systématiquement la convergence des réseaux profonds :cite:`Ioffe.Szegedy.2015` .
@@ -14,7 +14,7 @@ Avec les blocs résiduels - abordés plus loin dans :numref:`sec_resnet` - la no
 a permis aux praticiens d'entraîner régulièrement des réseaux de plus de 100 couches.
 Un avantage secondaire (fortuit) de la normalisation par lots est sa régularisation inhérente. 
 
-## Formation de réseaux profonds
+## entrainement de réseaux profonds
 
 Lorsque nous travaillons avec des données, nous effectuons souvent un prétraitement avant la formation. 
 Les choix de prétraitement des données font souvent une énorme différence dans les résultats finaux.
@@ -131,7 +131,7 @@ de prétraitement et de filtrage, on peut encore aboutir à d'autres types de r�
 En fixant un modèle entraîné, on pourrait penser
 que nous préférerions utiliser l'ensemble des données
 pour estimer la moyenne et la variance.
-Une fois la formation terminée, pourquoi voudrions-nous que
+Une fois l'entrainement terminée, pourquoi voudrions-nous que
 la même image soit classée différemment,
 en fonction du lot dans lequel elle se trouve ?
 Pendant la formation, un tel calcul exact est infaisable
@@ -214,7 +214,7 @@ une norme de lot, mais elle est appliquée à une image à la fois. Il existe de
 ### Normalisation par lots pendant la prédiction
 
 Comme nous l'avons mentionné précédemment, la normalisation par lots se comporte généralement différemment
-en mode formation et en mode prédiction.
+en mode entrainement et en mode prédiction.
 Tout d'abord, le bruit dans la moyenne et la variance de l'échantillon
 provenant de l'estimation de chacun sur des minis lots
 n'est plus souhaitable une fois que nous avons formé le modèle.
@@ -226,7 +226,7 @@ nous pouvons avoir besoin d'appliquer notre modèle pour faire une prédiction �
 En général, après la formation, nous utilisons l'ensemble des données
 pour calculer des estimations stables des statistiques des variables
 et les fixer ensuite au moment de la prédiction.
-Par conséquent, la normalisation par lot se comporte différemment pendant la formation et au moment du test.
+Par conséquent, la normalisation par lot se comporte différemment pendant l'entrainement et au moment du test.
 Rappelons que le dropout présente également cette caractéristique.
 
 ## (**Implémentation à partir de zéro**)
@@ -708,13 +708,13 @@ de régularisation par injection de bruit, d'accélération par remise à l'éch
 pourraient bien conduire à d'autres inventions de couches et de techniques à l'avenir. 
 
 D'un point de vue plus pratique, plusieurs aspects de la normalisation par lots méritent d'être rappelés : 
-* Pendant la formation du modèle, la normalisation par lots ajuste en permanence la sortie intermédiaire du réseau 
+* Pendant l'entrainement du modèle, la normalisation par lots ajuste en permanence la sortie intermédiaire du réseau 
  en utilisant la moyenne et l'écart type du minilot, de sorte que les valeurs 
  de la sortie intermédiaire de chaque couche du réseau neuronal sont plus stables.
 * La normalisation des lots pour les couches entièrement connectées et les couches convolutionnelles est légèrement différente. En fait, 
  pour les couches convolutives, la normalisation des couches peut parfois être utilisée comme alternative. 
 * Comme une couche d'abandon, les couches de normalisation par lots ont des comportements différents 
- en mode formation et en mode prédiction.
+ en mode entrainement et en mode prédiction.
 * La normalisation par lots est utile pour la régularisation et l'amélioration de la convergence dans l'optimisation. D'autre part, 
  la motivation initiale de réduction du décalage interne des covariables ne semble pas être une explication valable.
 

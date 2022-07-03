@@ -250,7 +250,7 @@ scheduler = SquareRootScheduler(lr=0.1)
 d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
-Voyons maintenant comment cela se passe pour la formation sur Fashion-MNIST. Nous fournissons simplement le planificateur comme un argument supplémentaire à l'algorithme d'apprentissage.
+Voyons maintenant comment cela se passe pour l'entrainement sur Fashion-MNIST. Nous fournissons simplement le planificateur comme un argument supplémentaire à l'algorithme d'apprentissage.
 
 ```{.python .input}
 #@tab mxnet
@@ -483,7 +483,7 @@ L'échauffement peut être appliqué à n'importe quel ordonnanceur (pas seuleme
 
 ## Résumé
 
-* La diminution du taux d'apprentissage pendant la formation peut conduire à une amélioration de la précision et (ce qui laisse le plus perplexe) à une réduction du surajustement du modèle.
+* La diminution du taux d'apprentissage pendant l'entrainement peut conduire à une amélioration de la précision et (ce qui laisse le plus perplexe) à une réduction du surajustement du modèle.
 * Une diminution par morceaux du taux d'apprentissage chaque fois que la progression atteint un plateau est efficace dans la pratique. Essentiellement, cela garantit que nous convergeons efficacement vers une solution appropriée et que nous réduisons ensuite la variance inhérente des paramètres en réduisant le taux d'apprentissage.
 * Les ordonnanceurs Cosinus sont populaires pour certains problèmes de vision par ordinateur. Voir par exemple, [GluonCV](http://gluon-cv.mxnet.io) pour les détails d'un tel ordonnanceur.
 * Une période de réchauffement avant l'optimisation peut empêcher la divergence.
@@ -493,7 +493,7 @@ L'échauffement peut être appliqué à n'importe quel ordonnanceur (pas seuleme
 
 1. Expérimentez le comportement d'optimisation pour un taux d'apprentissage fixe donné. Quel est le meilleur modèle que vous pouvez obtenir de cette manière ?
 1. Comment la convergence change-t-elle si vous modifiez l'exposant de la diminution du taux d'apprentissage ? Utilisez `PolyScheduler` pour vous faciliter la tâche dans les expériences.
-1. Appliquez l'ordonnanceur cosinus à de gros problèmes de vision par ordinateur, par exemple, la formation d'ImageNet. Comment affecte-t-il les performances par rapport aux autres ordonnanceurs ?
+1. Appliquez l'ordonnanceur cosinus à de gros problèmes de vision par ordinateur, par exemple, l'entrainement d'ImageNet. Comment affecte-t-il les performances par rapport aux autres ordonnanceurs ?
 1. Combien de temps doit durer l'échauffement ?
 1. Pouvez-vous relier l'optimisation et l'échantillonnage ? Commencez par utiliser les résultats de :cite:`Welling.Teh.2011` sur la dynamique de Langevin à gradient stochastique.
 

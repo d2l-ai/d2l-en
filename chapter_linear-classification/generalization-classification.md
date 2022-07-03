@@ -369,7 +369,7 @@ Les théoriciens de l'apprentissage visent à limiter la différence
 entre l'erreur *empirique* $\epsilon_\mathcal{S}(f_\mathcal{S})$
  d'un classificateur appris $f_\mathcal{S}$,
 à la fois formé et évalué
-sur l'ensemble de formation $\mathcal{S}$,
+sur l'ensemble de entrainement $\mathcal{S}$,
 et l'erreur réelle $\epsilon(f_\mathcal{S})$
  de ce même classificateur sur la population sous-jacente.
 Cela peut sembler similaire au problème d'évaluation

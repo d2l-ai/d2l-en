@@ -51,7 +51,7 @@ par ordre chronologique, en partie pour donner un sens à l'histoire
 afin que vous puissiez vous forger vos propres intuitions sur l'orientation du domaine
 et peut-être développer vos propres architectures.  Par exemple, la normalisation des lots
 et les connexions résiduelles décrites dans ce chapitre
-ont offert deux idées populaires pour la formation et la conception de modèles profonds,
+ont offert deux idées populaires pour l'entrainement et la conception de modèles profonds,
 toutes deux ayant depuis été appliquées à des architectures autres que la vision par ordinateur
 également.
 

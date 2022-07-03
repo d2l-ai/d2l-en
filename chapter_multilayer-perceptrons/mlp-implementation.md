@@ -139,7 +139,7 @@ def forward(self, X):
 
 ### Formation
 
-Heureusement, [**la boucle de formation pour les MLP
+Heureusement, [**la boucle de entrainement pour les MLP
 est exactement la même que pour la régression softmax.**] Nous définissons le modèle, les données, le formateur et enfin nous invoquons la fonction `fit` sur le modèle et les données.
 
 ```{.python .input  n=12}
@@ -214,7 +214,7 @@ trainer.fit(model, data)
 
 ## Résumé
 
-Maintenant que nous avons plus de pratique dans la conception de réseaux profonds, le passage d'une couche unique à plusieurs couches de réseaux profonds ne pose plus un défi aussi important. En particulier, nous pouvons réutiliser l'algorithme de formation et le chargeur de données. Notez cependant que l'implémentation de MLP à partir de zéro est néanmoins désordonnée : nommer et garder la trace des paramètres du modèle rend difficile l'extension des modèles. Par exemple, imaginons que l'on veuille insérer une autre couche entre les couches 42 et 43. Il pourrait s'agir maintenant de la couche 42b, à moins que nous ne soyons prêts à effectuer un renommage séquentiel. De plus, si nous implémentons le réseau à partir de zéro, il est beaucoup plus difficile pour le framework d'effectuer des optimisations de performance significatives. 
+Maintenant que nous avons plus de pratique dans la conception de réseaux profonds, le passage d'une couche unique à plusieurs couches de réseaux profonds ne pose plus un défi aussi important. En particulier, nous pouvons réutiliser l'algorithme de entrainement et le chargeur de données. Notez cependant que l'implémentation de MLP à partir de zéro est néanmoins désordonnée : nommer et garder la trace des paramètres du modèle rend difficile l'extension des modèles. Par exemple, imaginons que l'on veuille insérer une autre couche entre les couches 42 et 43. Il pourrait s'agir maintenant de la couche 42b, à moins que nous ne soyons prêts à effectuer un renommage séquentiel. De plus, si nous implémentons le réseau à partir de zéro, il est beaucoup plus difficile pour le framework d'effectuer des optimisations de performance significatives. 
 
 Néanmoins, vous avez maintenant atteint l'état de l'art de la fin des années 1980, lorsque les réseaux profonds entièrement connectés étaient la méthode de choix pour la modélisation des réseaux neuronaux. Notre prochaine étape conceptuelle consistera à considérer les images. Avant de le faire, nous devons revoir un certain nombre de bases statistiques et de détails sur la façon de calculer des modèles de manière efficace. 
 

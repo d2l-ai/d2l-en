@@ -236,9 +236,9 @@ $$
 
 
 
-## Formation des réseaux neuronaux
+## entrainement des réseaux neuronaux
 
-Lors de la formation des réseaux neuronaux,
+Lors de l'entrainement des réseaux neuronaux,
 la propagation avant et arrière dépendent l'une de l'autre.
 En particulier, pour la propagation en avant,
 nous traversons le graphe de calcul dans le sens des dépendances
@@ -259,7 +259,7 @@ dépend de la valeur actuelle de la sortie de la couche cachée $\mathbf{h}$,
 qui est donnée par la propagation vers l'avant.
 
 
-Par conséquent, lors de la formation des réseaux de neurones, après l'initialisation des paramètres du modèle,
+Par conséquent, lors de l'entrainement des réseaux de neurones, après l'initialisation des paramètres du modèle,
 nous alternons la propagation directe avec la rétropropagation,
 mettant à jour les paramètres du modèle à l'aide des gradients donnés par la rétropropagation.
 Notez que la rétropropagation réutilise les valeurs intermédiaires stockées de la propagation directe pour éviter les calculs en double.
@@ -278,7 +278,7 @@ conduit plus facilement à des erreurs *out of memory*.
 
 * La propagation directe calcule et stocke séquentiellement les variables intermédiaires dans le graphe de calcul défini par le réseau neuronal. Elle procède de la couche d'entrée à la couche de sortie.
 * La propagation inverse calcule et stocke séquentiellement les gradients des variables et paramètres intermédiaires au sein du réseau neuronal dans l'ordre inverse.
-* Lors de la formation de modèles d'apprentissage profond, la propagation en avant et la propagation en arrière sont interdépendantes.
+* Lors de l'entrainement de modèles d'apprentissage profond, la propagation en avant et la propagation en arrière sont interdépendantes.
 * L'entraînement nécessite beaucoup plus de mémoire que la prédiction.
 
 
@@ -288,7 +288,7 @@ conduit plus facilement à des erreurs *out of memory*.
 1. Ajoutez un biais à la couche cachée du modèle décrit dans cette section (vous n'avez pas besoin d'inclure le biais dans le terme de régularisation).
    1. Dessinez le graphe de calcul correspondant.
    1. Dérivez les équations de propagation avant et arrière.
-1. Calculez l'empreinte mémoire pour la formation et la prédiction dans le modèle décrit dans cette section.
+1. Calculez l'empreinte mémoire pour l'entrainement et la prédiction dans le modèle décrit dans cette section.
 1. Supposons que vous souhaitiez calculer les dérivées secondes. Qu'arrive-t-il au graphe de calcul ? Combien de temps pensez-vous que le calcul prendra ?
 1. Supposons que le graphe de calcul soit trop grand pour votre GPU.
    1. Pouvez-vous le partitionner sur plus d'un GPU ?

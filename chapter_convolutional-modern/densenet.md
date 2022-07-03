@@ -367,7 +367,7 @@ Bien que ces opérations de concaténation
 réutilisent les caractéristiques pour obtenir une efficacité de calcul,
 elles entraînent malheureusement une forte consommation de mémoire du GPU.
 Par conséquent,
-l'application de DenseNet peut nécessiter des implémentations plus complexes et efficaces en termes de mémoire, ce qui peut augmenter le temps de formation :cite:`pleiss2017memory` .
+l'application de DenseNet peut nécessiter des implémentations plus complexes et efficaces en termes de mémoire, ce qui peut augmenter le temps de entrainement :cite:`pleiss2017memory` .
 
 
 ## Exercices

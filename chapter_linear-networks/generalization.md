@@ -103,11 +103,11 @@ sur des tâches d'intérêt pratique.
 
 
 
-## Erreur de formation et erreur de généralisation
+## Erreur de entrainement et erreur de généralisation
 
 
  Dans le cadre standard de l'apprentissage supervisé,
-nous supposons que les données de formation et les données de test
+nous supposons que les données de entrainement et les données de test
 sont tirées *indépendamment* de distributions *identiques*.
 C'est ce qu'on appelle communément l'hypothèse *IID*.
 Bien que cette hypothèse soit forte,
@@ -181,10 +181,10 @@ soit proche de l'erreur de la population
 
 Dans la théorie classique, lorsque nous disposons de
 modèles simples et de données abondantes,
-les erreurs de formation et de généralisation ont tendance à être proches.
+les erreurs de entrainement et de généralisation ont tendance à être proches.
 Cependant, lorsque nous travaillons avec
 des modèles plus complexes et/ou moins d'exemples,
-nous nous attendons à ce que l'erreur de formation diminue
+nous nous attendons à ce que l'erreur de entrainement diminue
 mais que l'écart de généralisation augmente.
 Cela ne devrait pas être surprenant.
 Imaginez une classe de modèles si expressive que
@@ -289,7 +289,7 @@ En fin de compte, nous nous intéressons généralement à
 pour réduire l'erreur de généralisation,
 et ne nous préoccupons de l'écart que dans la mesure où
 devient un obstacle à cette fin.
-Notez que si l'erreur de formation est nulle,
+Notez que si l'erreur de entrainement est nulle,
 l'écart de généralisation est précisément égal à l'erreur de généralisation
 et nous ne pouvons progresser qu'en réduisant l'écart.
 
@@ -407,11 +407,11 @@ par exemple pour [image classification](https://paperswithcode.com/sota/image-cl
 La pratique courante pour résoudre le problème de la *formation sur l'ensemble de test*
 consiste à diviser nos données en trois,
 en incorporant un *ensemble de validation*
-en plus des ensembles de données de formation et de test.
+en plus des ensembles de données de entrainement et de test.
 Le résultat est une pratique obscure où les limites
 entre les données de validation et de test sont d'une ambiguïté inquiétante.
 Sauf indication contraire explicite, dans les expériences présentées dans ce livre
-, nous travaillons en réalité avec ce qu'il convient d'appeler des données de formation et des données de validation
+, nous travaillons en réalité avec ce qu'il convient d'appeler des données de entrainement et des données de validation
 , sans véritables ensembles de test.
 Par conséquent, la précision rapportée dans chaque expérience du livre est en réalité
 la précision de validation et non une véritable précision d'ensemble de test.
@@ -423,11 +423,11 @@ il se peut que nous ne puissions même pas nous permettre de conserver
 suffisamment de données pour constituer un ensemble de validation adéquat.
 Une solution populaire à ce problème consiste à employer
 $K$ *-fold cross-validation*.
-Dans ce cas, les données de formation originales sont divisées en sous-ensembles non chevauchants $K$.
-Ensuite, la formation et la validation du modèle sont exécutées $K$ fois,
+Dans ce cas, les données de entrainement originales sont divisées en sous-ensembles non chevauchants $K$.
+Ensuite, l'entrainement et la validation du modèle sont exécutées $K$ fois,
 chaque fois en formant sur $K-1$ sous-ensembles et en validant
-sur un sous-ensemble différent (celui qui n'a pas été utilisé pour la formation dans ce tour).
-Enfin, les erreurs de formation et de validation sont estimées
+sur un sous-ensemble différent (celui qui n'a pas été utilisé pour l'entrainement dans ce tour).
+Enfin, les erreurs de entrainement et de validation sont estimées
 en faisant la moyenne des résultats des expériences $K$.
 
 
@@ -449,7 +449,7 @@ Nous vous laissons avec quelques règles de base :
 1. Les modèles plus complexes nécessitent souvent plus de données ;
 1. Les notions pertinentes de complexité comprennent à la fois le nombre de paramètres et la gamme de valeurs qu'ils sont autorisés à prendre ;
 1. Toutes choses égales par ailleurs, plus de données conduit presque toujours à une meilleure généralisation ;
-1. Toute cette discussion sur la généralisation est fondée sur l'hypothèse IID. Si nous assouplissons cette hypothèse, en permettant aux distributions de se déplacer entre les périodes de formation et de test, nous ne pouvons rien dire sur la généralisation sans une autre hypothèse (peut-être plus légère).
+1. Toute cette discussion sur la généralisation est fondée sur l'hypothèse IID. Si nous assouplissons cette hypothèse, en permettant aux distributions de se déplacer entre les périodes de entrainement et de test, nous ne pouvons rien dire sur la généralisation sans une autre hypothèse (peut-être plus légère).
 
 
 ## Exercices

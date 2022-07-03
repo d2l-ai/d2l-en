@@ -152,7 +152,7 @@ mais dépend linéairement de $K$.
 En fixant l'hyperparamètre $K$
 à une valeur plus petite,
 le coût de calcul des gradients
-à chaque étape de formation avec un échantillonnage négatif
+à chaque étape de entrainement avec un échantillonnage négatif
 est plus petit.
 
 
@@ -160,7 +160,7 @@ est plus petit.
 
 ## Softmax hiérarchique
 
-Comme autre méthode de formation approximative,
+Comme autre méthode de entrainement approximative,
 *hierarchical softmax*
 utilise l'arbre binaire,
 une structure de données
@@ -220,9 +220,9 @@ $$\sum_{w \in \mathcal{V}} P(w \mid w_c) = 1.$$
 
 Heureusement, puisque $L(w_o)-1$ est de l'ordre de $\mathcal{O}(\text{log}_2|\mathcal{V}|)$ en raison de la structure d'arbre binaire,
 lorsque la taille du dictionnaire $\mathcal{V}$ est énorme,
-le coût de calcul pour chaque étape de formation utilisant la méthode softmax hiérarchique
+le coût de calcul pour chaque étape de entrainement utilisant la méthode softmax hiérarchique
 est considérablement réduit par rapport à celui de
-sans formation approximative.
+sans entrainement approximative.
 
 ## Résumé
 

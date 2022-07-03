@@ -36,10 +36,10 @@ Inspiré par des bibliothèques open-source telles que [PyTorch Lightning](https
 à un haut niveau
 nous souhaitons avoir trois classes : 
 (i) `Module` contient les modèles, les pertes et les méthodes d'optimisation ; 
-(ii) `DataModule` fournit des chargeurs de données pour la formation et la validation ; 
+(ii) `DataModule` fournit des chargeurs de données pour l'entrainement et la validation ; 
 (iii) les deux classes sont combinées à l'aide de la classe `Trainer`, qui nous permet de
 former des modèles sur une variété de plateformes matérielles. 
-La plupart des codes de ce livre adaptent `Module` et `DataModule`. Nous n'aborderons la classe `Trainer` que lorsque nous parlerons des GPU, des CPU, de la formation parallèle et des algorithmes d'optimisation.
+La plupart des codes de ce livre adaptent `Module` et `DataModule`. Nous n'aborderons la classe `Trainer` que lorsque nous parlerons des GPU, des CPU, de l'entrainement parallèle et des algorithmes d'optimisation.
 
 ```{.python .input}
 %%tab mxnet

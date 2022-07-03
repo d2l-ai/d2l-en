@@ -110,7 +110,7 @@ en l'enregistrant comme méthode dans la classe `SyntheticRegressionData` via `a
 Elle (**prend une taille de lot, une matrice de caractéristiques,
 et un vecteur d'étiquettes, et génère des minilots de taille `batch_size`.**)
 Ainsi, chaque minilot est constitué d'un tuple de caractéristiques et d'étiquettes. 
-Notez que nous devons tenir compte du fait que nous sommes en mode formation ou validation : 
+Notez que nous devons tenir compte du fait que nous sommes en mode entrainement ou validation : 
 dans le premier cas, nous voudrons lire les données dans un ordre aléatoire, 
 alors que dans le second cas, la possibilité de lire les données dans un ordre prédéfini 
 peut être importante à des fins de débogage.

@@ -101,7 +101,7 @@ que
 la cooccurrence avec un mot à haute fréquence "a".
 En outre, l'apprentissage avec de grandes quantités de mots (à haute fréquence)
 est lent.
-Ainsi, lors de la formation de modèles d'intégration de mots, 
+Ainsi, lors de l'entrainement de modèles d'intégration de mots, 
 les mots à haute fréquence peuvent être *sous-échantillonnés* :cite:`Mikolov.Sutskever.Chen.ea.2013` .
 Plus précisément, 
 chaque mot indexé $w_i$ 

@@ -59,7 +59,7 @@ $$y_i = 2\sin(x_i) + x_i^{0.8} + \epsilon,$$
  où $\epsilon$ obéit à une distribution normale avec une moyenne nulle et un écart type de 0,5.
 Nous générons 50 exemples d'apprentissage et 50 exemples de validation
 .
-Pour mieux visualiser le modèle d'attention par la suite, les entrées de formation sont triées.
+Pour mieux visualiser le modèle d'attention par la suite, les entrées de entrainement sont triées.
 
 ```{.python .input}
 %%tab all
@@ -101,7 +101,7 @@ def plot_kernel_reg(y_hat):
 ## Mise en commun de la moyenne
 
 Nous commençons par l'estimateur le plus " bête " du monde pour ce problème de régression :
-en utilisant la mise en commun de la moyenne pour faire la moyenne de toutes les sorties de formation :
+en utilisant la mise en commun de la moyenne pour faire la moyenne de toutes les sorties de entrainement :
 
 $$f(x) = \frac{1}{n}\sum_{i=1}^n y_i,$$ 
  :eqlabel:`eq_avg-pooling` 
@@ -197,7 +197,7 @@ plot_kernel_reg(y_hat)
 ```
 
 Examinons maintenant les [**poids d'attention**].
-Ici, les entrées de validation sont des requêtes tandis que les entrées de formation sont des clés.
+Ici, les entrées de validation sont des requêtes tandis que les entrées de entrainement sont des clés.
 Puisque les deux entrées sont triées,
 nous pouvons voir que plus la paire requête-clé est proche,
 plus le poids d'attention est élevé dans le regroupement d'attention.
