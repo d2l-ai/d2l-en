@@ -22,7 +22,7 @@ et que chaque mot corresponde à
 un nombre entier différent (index) de $0$ à $N-1$.
 Pour obtenir la représentation vectorielle à un coup
 pour tout mot d'indice $i$,
-, nous créons un vecteur de longueur$N$ avec tous les 0
+nous créons un vecteur de longueur$N$ avec tous les 0
 et définissons l'élément en position $i$ à 1.
 De cette façon, chaque mot est représenté comme un vecteur de longueur $N$, et il
 peut être utilisé directement par les réseaux neuronaux.
@@ -82,7 +82,7 @@ peut être réécrite comme suit :
 $$P(\textrm{"the"}\mid\textrm{"loves"})\cdot P(\textrm{"man"}\mid\textrm{"loves"})\cdot P(\textrm{"his"}\mid\textrm{"loves"})\cdot P(\textrm{"son"}\mid\textrm{"loves"}).$$ 
 
  ![The skip-gram model considers the conditional probability of generating the surrounding context words given a center word.](../img/skip-gram.svg) 
- :label:`fig_skip_gram` 
+:label:`fig_skip_gram` 
 
  Dans le modèle de saut de programme, chaque mot
 a deux représentations vectorielles $d$-dimensionnelles
@@ -175,12 +175,12 @@ la probabilité conditionnelle de générer le mot central "aime" sur la base de
 $$P(\textrm{"loves"}\mid\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}).$$ 
 
  ![The continuous bag of words model considers the conditional probability of generating the center word given its surrounding context words.](../img/cbow.svg) 
- :label:`fig_cbow` 
+:label:`fig_cbow` 
 
  
  Étant donné qu'il existe plusieurs mots contextuels
 dans le modèle de sac de mots continu,
-, la moyenne de ces vecteurs de mots contextuels est calculée sur
+la moyenne de ces vecteurs de mots contextuels est calculée sur
 dans le calcul de la probabilité conditionnelle.
 Plus précisément,
 pour tout mot ayant l'index $i$ dans le dictionnaire,
@@ -211,7 +211,7 @@ est la probabilité de générer tous les mots centraux
 
  $$ \prod_{t=1}^{T}  P(w^{(t)} \mid  w^{(t-m)}, \ldots, w^{(t-1)}, w^{(t+1)}, \ldots, w^{(t+m)}).$$ 
 
- ### Formation
+### Formation
 
 La formation des modèles de sac de mots continus
 est presque la même que la formation des modèles de saut de programme

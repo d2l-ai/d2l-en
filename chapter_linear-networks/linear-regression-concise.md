@@ -122,7 +122,7 @@ chaque fois que nous le pourrons.
 :begin_tab:`tensorflow`
 Dans Keras, la couche entièrement connectée est définie dans la classe `Dense`.
 Puisque nous ne voulons générer qu'une seule sortie scalaire,
-, nous fixons ce nombre à 1.
+nous fixons ce nombre à 1.
 Il convient de noter que, pour des raisons de commodité,
 Keras ne nous demande pas de spécifier
 la forme de l'entrée pour chaque couche.

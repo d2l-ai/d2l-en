@@ -24,7 +24,7 @@ nous pouvons envisager
 d'affiner le modèle BERT pour les applications de traitement du langage naturel en aval.
 
 Dans ce qui suit,
-, nous généralisons un sous-ensemble d'applications de traitement du langage naturel
+nous généralisons un sous-ensemble d'applications de traitement du langage naturel
 au niveau de la séquence et au niveau du jeton.
 Au niveau de la séquence,
 nous présentons comment transformer la représentation BERT du texte d'entrée
@@ -46,13 +46,13 @@ tous les paramètres du modèle BERT pré-entraîné sont ajustés.
 
 *La classification d'un seul texte* prend une seule séquence de texte en entrée et sort son résultat de classification.
 Outre l'analyse des sentiments que nous avons étudiée dans ce chapitre,
-, le Corpus of Linguistic Acceptability (CoLA)
+le Corpus of Linguistic Acceptability (CoLA)
 est également un jeu de données pour la classification de textes simples,
 permettant de juger si une phrase donnée est grammaticalement acceptable ou non :cite:`Warstadt.Singh.Bowman.2019` .
 Par exemple, "Je devrais étudier." est acceptable mais "Je devrais étudier." ne l'est pas.
 
 ![Fine-tuning BERT for single text classification applications, such as sentiment analysis and testing linguistic acceptability. Suppose that the input single text has six tokens.](../img/bert-one-seq.svg) 
- :label:`fig_bert-one-seq` 
+:label:`fig_bert-one-seq` 
 
  :numref:`sec_bert` décrit la représentation d'entrée de BERT.
 La séquence d'entrée de BERT représente sans ambiguïté un texte unique et des paires de textes,
@@ -65,7 +65,7 @@ dans les applications de classification de texte unique,
 la représentation BERT du jeton de classification spécial 
 "&lt;cls&gt;" encode les informations de la séquence de texte d'entrée entière.
 La représentation du texte unique d'entrée,
-, sera introduite dans un petit MLP composé de couches entièrement connectées (denses)
+sera introduite dans un petit MLP composé de couches entièrement connectées (denses)
 pour produire la distribution de toutes les valeurs d'étiquettes discrètes.
 
 
@@ -90,7 +90,7 @@ Voici quelques exemples tirés du jeu de données Semantic Textual Similarity Be
 
 
  ![Fine-tuning BERT for text pair classification or regression applications, such as natural language inference and semantic textual similarity. Suppose that the input text pair has two and three tokens.](../img/bert-two-seqs.svg) 
- :label:`fig_bert-two-seqs` 
+:label:`fig_bert-two-seqs` 
 
  Comparé à la classification de texte unique dans :numref:`fig_bert-one-seq` ,
 fine-tuning BERT pour la classification de paires de textes dans :numref:`fig_bert-two-seqs` 
@@ -119,7 +119,7 @@ devrait être balisée comme
 Le réglage fin de BERT pour les applications de balisage de texte
 est illustré dans :numref:`fig_bert-tagging` .
 Par rapport à :numref:`fig_bert-one-seq` ,
-, la seule différence réside dans le fait que
+la seule différence réside dans le fait que
 dans le balisage de texte, la représentation BERT de *chaque token* du texte d'entrée
 est introduite dans les mêmes couches supplémentaires entièrement connectées pour produire l'étiquette du token,
 telle qu'une étiquette de partie de la parole.

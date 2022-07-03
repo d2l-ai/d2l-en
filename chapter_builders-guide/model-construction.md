@@ -304,7 +304,7 @@ applicable à la plupart des modules.
 Nous instancions ensuite nos deux couches entièrement connectées,
 en les assignant à `self.hidden` et `self.out`.
 Notez qu'à moins d'implémenter une nouvelle couche,
-, nous n'avons pas à nous soucier de la méthode de rétropropagation
+nous n'avons pas à nous soucier de la méthode de rétropropagation
 ou de l'initialisation des paramètres.
 Le système générera ces méthodes automatiquement.
 Essayons cela.
@@ -410,7 +410,7 @@ et il initialisera correctement les paramètres de chaque module.
 :end_tab:
 
 Lorsque notre méthode de propagation vers l'avant `MySequential` est invoquée,
-, chaque module ajouté est exécuté
+chaque module ajouté est exécuté
 dans l'ordre dans lequel il a été ajouté.
 Nous pouvons maintenant réimplémenter un MLP
 en utilisant notre classe `MySequential`.

@@ -3,109 +3,109 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Padding and Stride
+# Padding et Stride
 :label:`sec_padding`
 
-Recall the example of a convolution in :numref:`fig_correlation`. 
-The input had both a height and width of 3
-and the convolution kernel had both a height and width of 2,
-yielding an output representation with dimension $2\times2$.
-Assuming that the input shape is $n_h\times n_w$
-and the convolution kernel shape is $k_h\times k_w$,
-the output shape will be $(n_h-k_h+1) \times (n_w-k_w+1)$: 
-we can only shift the convolution kernel so far until it runs out
-of pixels to apply the convolution to. 
+Rappelez-vous l'exemple d'une convolution dans :numref:`fig_correlation`. 
+L'entrée avait à la fois une hauteur et une largeur de 3
+et le noyau de convolution avait une hauteur et une largeur de 2,
+ce qui donne une représentation de sortie de dimension $2\times2$.
+Si l'on suppose que la forme de l'entrée est $n_h\times n_w$.
+et que la forme du noyau de convolution est $k_h\times k_w$,
+la forme de la sortie sera $(n_h-k_h+1) \times (n_w-k_w+1)$ : 
+on ne peut que décaler le noyau de convolution jusqu'à ce qu'il manque
+de pixels auxquels appliquer la convolution. 
 
-In the following we will explore a number of techniques, 
-including padding and strided convolutions,
-that offer more control over the size of the output. 
-As motivation, note that since kernels generally
-have width and height greater than $1$,
-after applying many successive convolutions,
-we tend to wind up with outputs that are
-considerably smaller than our input.
-If we start with a $240 \times 240$ pixel image,
-$10$ layers of $5 \times 5$ convolutions
-reduce the image to $200 \times 200$ pixels,
-slicing off $30 \%$ of the image and with it
-obliterating any interesting information
-on the boundaries of the original image.
-*Padding* is the most popular tool for handling this issue.
-In other cases, we may want to reduce the dimensionality drastically,
-e.g., if we find the original input resolution to be unwieldy.
-*Strided convolutions* are a popular technique that can help in these instances.
+Dans ce qui suit, nous allons explorer un certain nombre de techniques, 
+y compris le remplissage et les convolutions stridentes,
+qui offrent un meilleur contrôle sur la taille de la sortie. 
+En guise de motivation, notez que puisque les noyaux ont généralement
+ont une largeur et une hauteur supérieures à $1$,
+après avoir appliqué de nombreuses convolutions successives,
+nous avons tendance à nous retrouver avec des sorties qui sont
+considérablement plus petites que notre entrée.
+Si nous commençons avec une image de 240 \times 240$ pixels,
+10$ couches de 5$ \times 5$ convolutions
+réduisent l'image à 200 pixels,
+coupant 30 % de l'image et, par la même occasion.
+oblitérant toute information intéressante
+sur les limites de l'image originale.
+*Le calage est l'outil le plus populaire pour traiter ce problème.
+Dans d'autres cas, nous pouvons vouloir réduire radicalement la dimensionnalité,
+par exemple, si nous trouvons que la résolution de l'entrée originale est difficile à manier.
+Les *convolutions stridentes* sont une technique populaire qui peut aider dans ces cas.
 
 ## Padding
 
-As described above, one tricky issue when applying convolutional layers
-is that we tend to lose pixels on the perimeter of our image. Consider :numref:`img_conv_reuse` that depicts the pixel utilization as a function of the convolution kernel size and the position within the image. The pixels in the corners are hardly used at all. 
+Comme décrit ci-dessus, un problème délicat lors de l'application de couches convolutives
+est que nous avons tendance à perdre des pixels sur le périmètre de notre image. Considérez :numref:`img_conv_reuse` qui décrit l'utilisation des pixels en fonction de la taille du noyau de convolution et de la position dans l'image. Les pixels dans les coins sont à peine utilisés. 
 
-![Pixel utilization for convolutions of size $1 \times 1$, $2 \times 2$, and $3 \times 3$ respectively.](../img/conv-reuse.svg)
+![Utilisation des pixels pour des convolutions de taille 1 \times 1$, 2 \times 2$, et 3 \times 3$ respectivement.](../img/conv-reuse.svg)
 :label:`img_conv_reuse`
 
-Since we typically use small kernels,
-for any given convolution,
-we might only lose a few pixels,
-but this can add up as we apply
-many successive convolutional layers.
-One straightforward solution to this problem
-is to add extra pixels of filler around the boundary of our input image,
-thus increasing the effective size of the image.
-Typically, we set the values of the extra pixels to zero.
-In :numref:`img_conv_pad`, we pad a $3 \times 3$ input,
-increasing its size to $5 \times 5$.
-The corresponding output then increases to a $4 \times 4$ matrix.
-The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times0+0\times1+0\times2+0\times3=0$.
+Puisque nous utilisons typiquement de petits noyaux,
+pour toute convolution donnée,
+on peut ne perdre que quelques pixels,
+mais cela peut s'additionner lorsque nous appliquons
+de nombreuses couches convolutionnelles successives.
+Une solution directe à ce problème
+est d'ajouter des pixels supplémentaires de remplissage autour de la limite de notre image d'entrée,
+augmentant ainsi la taille effective de l'image.
+Typiquement, nous fixons les valeurs des pixels supplémentaires à zéro.
+Dans :numref:`img_conv_pad`, nous remplissons une entrée de 3$ \times 3$,
+ce qui porte sa taille à 5 $.
+La sortie correspondante passe alors à une matrice de 4$ \times 4$.
+Les parties ombrées sont le premier élément de sortie ainsi que les éléments tensoriels d'entrée et de noyau utilisés pour le calcul de la sortie : $0\times0+0\times1+0\times2+0\times3=0$.
 
-![Two-dimensional cross-correlation with padding.](../img/conv-pad.svg)
+![Corrélation croisée bidimensionnelle avec padding.](../img/conv-pad.svg)
 :label:`img_conv_pad`
 
-In general, if we add a total of $p_h$ rows of padding
-(roughly half on top and half on bottom)
-and a total of $p_w$ columns of padding
-(roughly half on the left and half on the right),
-the output shape will be
+En général, si nous ajoutons un total de $p_h$ rangées de padding
+(à peu près la moitié en haut et la moitié en bas)
+et un total de $p_w$ colonnes de remplissage
+(environ la moitié à gauche et la moitié à droite),
+la forme de sortie sera
 
 $$(n_h-k_h+p_h+1)\times(n_w-k_w+p_w+1).$$
 
-This means that the height and width of the output
-will increase by $p_h$ and $p_w$, respectively.
+Cela signifie que la hauteur et la largeur de la sortie
+augmenteront respectivement de $p_h$ et $p_w$.
 
-In many cases, we will want to set $p_h=k_h-1$ and $p_w=k_w-1$
-to give the input and output the same height and width.
-This will make it easier to predict the output shape of each layer
-when constructing the network.
-Assuming that $k_h$ is odd here,
-we will pad $p_h/2$ rows on both sides of the height.
-If $k_h$ is even, one possibility is to
-pad $\lceil p_h/2\rceil$ rows on the top of the input
-and $\lfloor p_h/2\rfloor$ rows on the bottom.
-We will pad both sides of the width in the same way.
+Dans de nombreux cas, nous souhaitons définir $p_h=k_h-1$ et $p_w=k_w-1$.
+pour que l'entrée et la sortie aient la même hauteur et la même largeur.
+Il sera ainsi plus facile de prédire la forme de la sortie de chaque couche lors de la construction du réseau.
+lors de la construction du réseau.
+En supposant que $k_h$ est impair ici,
+nous ajouterons $p_h/2$ lignes de part et d'autre de la hauteur.
+Si $k_h$ est pair, une possibilité est de
+de remplir $\lceil p_h/2\rceil$ lignes sur le haut de l'entrée
+et $\lfloor p_h/2\rfloor$ lignes sur le bas.
+Nous allons remplir les deux côtés de la largeur de la même manière.
 
-CNNs commonly use convolution kernels
-with odd height and width values, such as 1, 3, 5, or 7.
-Choosing odd kernel sizes has the benefit
-that we can preserve the dimensionality
-while padding with the same number of rows on top and bottom,
-and the same number of columns on left and right.
+Les CNN utilisent généralement des noyaux de convolution
+avec des valeurs de hauteur et de largeur impaires, telles que 1, 3, 5 ou 7.
+Le choix de tailles de noyau impaires présente l'avantage
+que nous pouvons préserver la dimensionnalité
+tout en ayant le même nombre de lignes en haut et en bas,
+et le même nombre de colonnes à gauche et à droite.
 
-Moreover, this practice of using odd kernels
-and padding to precisely preserve dimensionality
-offers a clerical benefit.
-For any two-dimensional tensor `X`,
-when the kernel's size is odd
-and the number of padding rows and columns
-on all sides are the same,
-producing an output with the same height and width as the input,
-we know that the output `Y[i, j]` is calculated
-by cross-correlation of the input and convolution kernel
-with the window centered on `X[i, j]`.
+De plus, cette pratique consistant à utiliser des noyaux impairs
+et le remplissage pour préserver précisément la dimensionnalité
+offre un avantage administratif.
+Pour tout tenseur bidimensionnel `X`,
+lorsque la taille du noyau est impaire
+et que le nombre de lignes et de colonnes de remplissage
+sur tous les côtés sont les mêmes,
+produisant une sortie avec la même hauteur et largeur que l'entrée,
+on sait que la sortie `Y[i, j]` est calculée
+par corrélation croisée de l'entrée et du noyau de convolution
+avec la fenêtre centrée sur `X[i, j]`.
 
-In the following example, we create a two-dimensional convolutional layer
-with a height and width of 3
-and (**apply 1 pixel of padding on all sides.**)
-Given an input with a height and width of 8,
-we find that the height and width of the output is also 8.
+Dans l'exemple suivant, nous créons une couche convolutionnelle bidimensionnelle
+avec une hauteur et une largeur de 3
+et (**appliquer 1 pixel de remplissage sur tous les côtés.**)
+Étant donné une entrée avec une hauteur et une largeur de 8,
+nous constatons que la hauteur et la largeur de la sortie sont également de 8.
 
 ```{.python .input}
 %%tab mxnet
@@ -169,9 +169,9 @@ X = tf.random.uniform(shape=(8, 8))
 comp_conv2d(conv2d, X).shape
 ```
 
-When the height and width of the convolution kernel are different,
-we can make the output and input have the same height and width
-by [**setting different padding numbers for height and width.**]
+Lorsque la hauteur et la largeur du noyau de convolution sont différentes,
+nous pouvons faire en sorte que la sortie et l'entrée aient la même hauteur et largeur
+en [**définissant des nombres de remplissage différents pour la hauteur et la largeur.**].
 
 ```{.python .input}
 %%tab mxnet
@@ -200,12 +200,12 @@ comp_conv2d(conv2d, X).shape
 ## Stride
 
 Lors du calcul de la corrélation croisée,
-, nous commençons par la fenêtre de convolution
+nous commençons par la fenêtre de convolution
 au coin supérieur gauche du tenseur d'entrée,
-, puis nous la faisons glisser sur tous les emplacements vers le bas et vers la droite.
+puis nous la faisons glisser sur tous les emplacements vers le bas et vers la droite.
 Dans les exemples précédents, nous avons choisi par défaut de faire glisser un élément à la fois.
-Cependant, parfois, soit pour des raisons d'efficacité de calcul
-, soit parce que nous souhaitons réduire l'échantillonnage,
+Cependant, parfois, soit pour des raisons d'efficacité de calcul,
+soit parce que nous souhaitons réduire l'échantillonnage,
 nous déplaçons notre fenêtre de plus d'un élément à la fois,
 en sautant les emplacements intermédiaires. Ceci est particulièrement utile si le noyau de convolution 
 est grand, car il capture une grande partie de l'image sous-jacente.
@@ -237,7 +237,7 @@ alors la forme de sortie peut être simplifiée en
 $\lfloor(n_h+s_h-1)/s_h\rfloor \times \lfloor(n_w+s_w-1)/s_w\rfloor$ .
 En allant un peu plus loin, si la hauteur et la largeur d'entrée
 sont divisibles par les strides de la hauteur et de la largeur,
-, la forme de sortie sera $(n_h/s_h) \times (n_w/s_w)$.
+la forme de sortie sera $(n_h/s_h) \times (n_w/s_w)$.
 
 Ci-dessous, nous [**fixons les pas sur la hauteur et la largeur à 2**],
 divisant ainsi par deux la hauteur et la largeur d'entrée.
@@ -285,7 +285,7 @@ comp_conv2d(conv2d, X).shape
 
 Le remplissage peut augmenter la hauteur et la largeur de la sortie. Il est souvent utilisé pour donner à la sortie la même hauteur et la même largeur que l'entrée afin d'éviter un rétrécissement indésirable de la sortie. De plus, il permet de s'assurer que tous les pixels sont utilisés avec la même fréquence. En général, nous choisissons un remplissage symétrique des deux côtés de la hauteur et de la largeur de l'entrée. Dans ce cas, nous faisons référence au remplissage de $(p_h, p_w)$. Le plus souvent, nous définissons $p_h = p_w$, auquel cas nous indiquons simplement que nous choisissons le remplissage $p$. 
 
-Une convention similaire s'applique aux enjambements. Lorsque le stride horizontal $s_h$ et le stride vertical $s_w$ correspondent, nous parlons simplement de stride $s$. Le stride peut réduire la résolution de la sortie, par exemple en réduisant la hauteur et la largeur de la sortie à seulement $1/n$ de la hauteur et de la largeur de l'entrée pour $n > 1$. Par défaut, le padding est égal à 0 et le stride à 1. 
+Une convention similaire s'applique aux stride. Lorsque le stride horizontal $s_h$ et le stride vertical $s_w$ correspondent, nous parlons simplement de stride $s$. Le stride peut réduire la résolution de la sortie, par exemple en réduisant la hauteur et la largeur de la sortie à seulement $1/n$ de la hauteur et de la largeur de l'entrée pour $n > 1$. Par défaut, le padding est égal à 0 et le stride à 1. 
 
 Jusqu'à présent, tous les padding dont nous avons parlé ont simplement prolongé les images par des zéros. Cela présente un avantage significatif en termes de calcul, car c'est trivial à réaliser. De plus, les opérateurs peuvent être conçus pour tirer profit de ce remplissage de manière implicite sans avoir besoin d'allouer de la mémoire supplémentaire. En même temps, cela permet aux CNN de coder des informations de position implicites dans une image, simplement en apprenant où se trouve l'"espace blanc". Il existe de nombreuses alternatives à l'espacement zéro. :cite:`Alsallakh.Kokhlikyan.Miglani.ea.2020` fournit une vue d'ensemble des alternatives (bien qu'il n'y ait pas d'argument clair en faveur de l'utilisation d'espacements non nuls, sauf si des artefacts se produisent). 
 

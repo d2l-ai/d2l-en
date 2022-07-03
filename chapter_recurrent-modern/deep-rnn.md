@@ -7,11 +7,11 @@ Dans ce cas, la forme fonctionnelle spécifique de l'interaction entre les varia
 Ce n'est pas un gros problème tant que nous avons suffisamment de flexibilité pour modéliser différents types d'interactions.
 Avec une seule couche, cependant, cela peut être assez difficile.
 Dans le cas des modèles linéaires,
-, nous avons résolu ce problème en ajoutant des couches supplémentaires.
+nous avons résolu ce problème en ajoutant des couches supplémentaires.
 Avec les RNN, c'est un peu plus délicat, car nous devons d'abord décider comment et où ajouter une non-linéarité supplémentaire.
 
 En fait,
-, nous pouvons empiler plusieurs couches de RNN les unes sur les autres. Cela donne un mécanisme flexible,
+nous pouvons empiler plusieurs couches de RNN les unes sur les autres. Cela donne un mécanisme flexible,
 grâce à la combinaison de plusieurs couches simples. En particulier, les données peuvent être pertinentes à différents niveaux de la pile. Par exemple, nous pouvons vouloir conserver des données de haut niveau sur les conditions du marché financier (marché haussier ou baissier), alors qu'à un niveau inférieur, nous n'enregistrons que les dynamiques temporelles à court terme.
 
 

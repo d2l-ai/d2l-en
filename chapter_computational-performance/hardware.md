@@ -67,7 +67,7 @@ Le stockage en nuage offre une gamme configurable de performances. En d'autres t
 Les unités centrales de traitement (CPUs) sont la pièce maîtresse de tout ordinateur. Elles sont constituées d'un certain nombre de composants clés : des *cœurs de processeur* capables d'exécuter du code machine, un *bus* les reliant (la topologie spécifique diffère considérablement selon les modèles, les générations et les fournisseurs de processeurs), et des *caches* permettant un accès à la mémoire à plus grande largeur de bande et à plus faible latence que ce qui est possible en lisant la mémoire principale. Enfin, presque tous les processeurs modernes contiennent des *unités de traitement vectoriel* pour faciliter l'algèbre linéaire et les convolutions à haute performance, qui sont courantes dans le traitement des médias et l'apprentissage automatique.
 
 ![Intel Skylake consumer quad-core CPU.](../img/skylake.svg) 
- :label:`fig_skylake` 
+:label:`fig_skylake` 
 
  :numref:`fig_skylake` représente un processeur quadricœur Intel Skylake de qualité grand public. Il dispose d'un GPU intégré, de caches et d'un bus circulaire reliant les quatre cœurs. Les périphériques, tels que Ethernet, WiFi, Bluetooth, le contrôleur SSD et USB, font partie du chipset ou sont directement reliés (PCIe) au CPU.
 
@@ -107,7 +107,7 @@ L'ajout de caches est une arme à double tranchant. D'une part, ils garantissent
 ![False sharing (image courtesy of Intel) .](../img/falsesharing.svg)
 :label:`fig_falsesharing` 
 
- ### GPU et autres accélérateurs
+### GPU et autres accélérateurs
 
 Il n'est pas exagéré d'affirmer que l'apprentissage profond n'aurait pas réussi sans les GPU. De même, il est tout à fait raisonnable d'affirmer que la fortune des fabricants de GPU a considérablement augmenté grâce à l'apprentissage profond. Cette coévolution du matériel et des algorithmes a conduit à une situation où, pour le meilleur ou pour le pire, l'apprentissage profond est le paradigme de modélisation statistique à privilégier. Il est donc utile de comprendre les avantages spécifiques des GPU et des accélérateurs connexes tels que le TPU :cite:`Jouppi.Young.Patil.ea.2017` .
 
@@ -120,19 +120,19 @@ Ensuite, que se passerait-il si nous ajoutions beaucoup plus de cœurs ? En un m
 
 ![NVIDIA Turing processing block (image courtesy of NVIDIA) .](../img/turing-processing-block.png)
 :width:`150px` 
- :label:`fig_turing_processing_block` 
+:label:`fig_turing_processing_block` 
 
  Ensuite, 12 multiprocesseurs de streaming sont regroupés en clusters de traitement graphique qui constituent les processeurs TU102 haut de gamme. De nombreux canaux de mémoire et un cache L2 complètent la configuration. :numref:`fig_turing` contient les détails pertinents. L'une des raisons de la conception d'un tel dispositif est que des blocs individuels peuvent être ajoutés ou retirés selon les besoins pour obtenir des puces plus compactes et pour faire face aux problèmes de rendement (les modules défectueux peuvent ne pas être activés). Heureusement, la programmation de tels dispositifs est bien cachée au chercheur occasionnel en apprentissage profond, sous des couches de code CUDA et de framework. En particulier, plusieurs programmes peuvent être exécutés simultanément sur le GPU, à condition que des ressources soient disponibles. Néanmoins, il est utile d'être conscient des limites des dispositifs pour éviter de choisir des modèles qui ne tiennent pas dans la mémoire du dispositif.
 
 ![NVIDIA Turing architecture (image courtesy of NVIDIA)](../img/turing.png)
 :width:`350px` 
- :label:`fig_turing` 
+:label:`fig_turing` 
 
  Un dernier aspect qui mérite d'être mentionné plus en détail sont les *cœurs tenseurs*. Ils sont un exemple de la récente tendance à ajouter des circuits plus optimisés et spécifiquement efficaces pour l'apprentissage profond. Par exemple, le TPU a ajouté un réseau systolique :cite:`Kung.1988` pour la multiplication rapide de matrices. Là, la conception était de prendre en charge un très petit nombre (un pour la première génération de TPU) de grandes opérations. Les cœurs tensoriels se situent à l'autre extrémité. Ils sont optimisés pour les petites opérations impliquant entre $4 \times 4$ et $16 \times 16$ matrices, en fonction de leur précision numérique. :numref:`fig_tensorcore` donne une vue d'ensemble des optimisations.
 
 ![NVIDIA tensor cores in Turing (image courtesy of NVIDIA) .](../img/tensorcore.jpg)
 :width:`400px` 
- :label:`fig_tensorcore` 
+:label:`fig_tensorcore` 
 
  Il est évident que lorsque l'on optimise les calculs, on finit par faire certains compromis. L'un d'eux est que les GPU ne sont pas très bons pour gérer les interruptions et les données éparses. Bien qu'il y ait des exceptions notables, comme [Gunrock](https://github.com/gunrock/gunrock) :cite:`Wang.Davidson.Pan.ea.2016` , le modèle d'accès des matrices et des vecteurs épars ne va pas bien avec les opérations de lecture en rafale à large bande passante où les GPU excellent. L'atteinte de ces deux objectifs fait l'objet de recherches actives. Voir, par exemple, [DGL](http://dgl.ai), une bibliothèque adaptée à l'apprentissage profond sur les graphes.
 
@@ -201,7 +201,7 @@ Le résumé de :numref:`table_latency_numbers` et :numref:`table_latency_numbers
 | Transfert de 1 Mo vers/depuis le GPU PCI-E GPU | 80 μs | ~)12GB/s sur PCI-Express x16 link |
 :label:`table_latency_numbers_tesla` 
 
- ## Résumé
+## Résumé
 
 * Les périphériques ont des frais généraux pour les opérations. Il est donc important de viser un petit nombre de gros transferts plutôt que de nombreux petits. Ceci s'applique à la RAM, aux SSD, aux réseaux et aux GPU.
 * La vectorisation est essentielle pour les performances. Assurez-vous de connaître les capacités spécifiques de votre accélérateur. Par exemple, certains CPU Intel Xeon sont particulièrement bons pour les opérations INT8, les GPU NVIDIA Volta excellent dans les opérations matricielles FP16 et NVIDIA Turing brille dans les opérations FP16, INT8 et INT4.

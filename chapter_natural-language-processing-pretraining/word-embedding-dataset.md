@@ -238,7 +238,7 @@ for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
 ```
 
 Lors de l'entraînement sur le jeu de données PTB,
-, nous fixons la taille maximale de la fenêtre de contexte à 5. 
+nous fixons la taille maximale de la fenêtre de contexte à 5. 
 Ce qui suit extrait tous les mots centraux et leurs mots contextuels dans l'ensemble de données.
 
 ```{.python .input}
@@ -352,7 +352,7 @@ dans le calcul de la perte,
 nous définissons une variable masque `masks`.
 Il existe une correspondance biunivoque
 entre les éléments de `masks` et les éléments de `contexts_negatives`,
-, où les zéros (sinon les uns) de `masks` correspondent aux remplissages de `contexts_negatives`.
+où les zéros (sinon les uns) de `masks` correspondent aux remplissages de `contexts_negatives`.
 
 
 Pour distinguer les exemples positifs des exemples négatifs,

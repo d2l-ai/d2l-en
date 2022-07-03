@@ -34,7 +34,7 @@ Sur les services de streaming musical ou vidéo,
 nous prêtons attention à leurs publicités
 ou nous payons pour les cacher.
 Pour se développer dans le monde des jeux en ligne,
-, soit nous prêtons attention à
+soit nous prêtons attention à
 participer à des batailles, qui attirent de nouveaux joueurs,
 soit nous payons de l'argent pour devenir instantanément puissant.
 Rien n'est gratuit.
@@ -65,7 +65,7 @@ Pour expliquer comment notre attention se déploie dans le monde visuel,
 un cadre à deux composantes a émergé
 et s'est répandu.
 Cette idée remonte à William James dans les années 1890,
-, qui est considéré comme le "père de la psychologie américaine" :cite:`James.2007` .
+qui est considéré comme le "père de la psychologie américaine" :cite:`James.2007` .
 Dans ce cadre,
 les sujets dirigent sélectivement le point de mire de l'attention
 en utilisant à la fois le *repère non-volontaire* et le *repère volitif*.
@@ -84,7 +84,7 @@ Vous amenez donc la fovéa (le centre de la macula, où l'acuité visuelle est l
 
 ![Using the nonvolitional cue based on saliency (red cup, non-paper) , l'attention est involontairement dirigée vers le café.](../img/eye-coffee.svg)
 :width:`400px` 
- :label:`fig_eye-coffee` 
+:label:`fig_eye-coffee` 
 
  Après avoir bu du café,
 vous êtes en manque de caféine et
@@ -103,10 +103,10 @@ Elle est également plus puissante grâce à l'effort volontaire du sujet.
 
 ![Using the volitional cue (want to read a book) qui est dépendant de la tâche, l'attention est dirigée vers le livre sous contrôle volitif.](../img/eye-book.svg)
 :width:`400px` 
- :label:`fig_eye-book` 
+:label:`fig_eye-book` 
 
  
- ## Requêtes, clés et valeurs
+## Requêtes, clés et valeurs
 
 Inspirés par les indices d'attention non volitifs et volitifs qui expliquent le déploiement attentionnel,
 dans ce qui suit, nous allons
@@ -140,7 +140,7 @@ qui peut être considérée comme l'indice non-volatile de cette entrée sensori
 Comme le montrent les exemples :numref:`fig_qkv` et
 , nous pouvons concevoir le regroupement de l'attention
 de manière à ce que la requête donnée (indice volitif) puisse interagir avec des clés (indices non volitifs),
-, qui guident la sélection de biais sur les valeurs (entrées sensorielles).
+qui guident la sélection de biais sur les valeurs (entrées sensorielles).
 
 ![Attention mechanisms bias selection over values (sensory inputs) via la mise en commun de l'attention, qui intègre les requêtes (indices volitifs) et les clés (indices non volitifs)](../img/qkv.svg)
 :label:`fig_qkv` 

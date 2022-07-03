@@ -41,7 +41,7 @@ A la différence de
 , l'attention de Bahdanau
 pour l'apprentissage de séquence à séquence
 , dans :numref:`fig_s2s_attention_details` ,
-, les embeddings de séquence d'entrée (source) et de sortie (cible)
+les embeddings de séquence d'entrée (source) et de sortie (cible)
 
  sont ajoutés avec un encodage positionnel
 avant d'être introduits dans
@@ -1004,7 +1004,7 @@ d2l.check_shape(enc_attention_weights,
 ```
 
 Dans l'auto-attention du codeur,
-, les requêtes et les clés proviennent de la même séquence d'entrée.
+les requêtes et les clés proviennent de la même séquence d'entrée.
 Comme les jetons de remplissage ne sont pas porteurs de sens,
 avec une longueur valide spécifiée de la séquence d'entrée,
 aucune requête ne s'intéresse aux positions des jetons de remplissage.

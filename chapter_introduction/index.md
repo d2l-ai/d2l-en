@@ -223,8 +223,8 @@ Comme le montre le site :numref:`fig_ml_loop` , le processus d'apprentissage se 
 :label:`fig_ml_loop`
 
 En résumé, plutôt que de coder un programme de reconnaissance des mots d'éveil,
-, nous codons un programme qui peut *apprendre à reconnaître les mots d'éveil,
-, si nous lui présentons un grand ensemble de données étiquetées.
+nous codons un programme qui peut *apprendre à reconnaître les mots d'éveil,
+si nous lui présentons un grand ensemble de données étiquetées.
 Vous pouvez considérer cette action consistant à déterminer le comportement d'un programme
 en lui présentant un ensemble de données comme de la *programmation avec des données*.
 En d'autres termes,
@@ -376,7 +376,7 @@ principalement par l'ensemble des modèles puissants sur lesquels il se concentr
 Ces modèles consistent en de nombreuses transformations successives des données
 qui sont enchaînées de haut en bas, d'où le nom d'*apprentissage profond*.
 Dans le cadre de notre discussion sur les modèles profonds,
-, nous aborderons également certaines méthodes plus traditionnelles.
+nous aborderons également certaines méthodes plus traditionnelles.
 
 #### Fonctions objectives
 
@@ -389,9 +389,9 @@ et que certaines personnes pourraient ne pas être d'accord sur le fait que la m
 constitue une amélioration ou un déclin.
 
 Afin de développer un système mathématique formel d'apprentissage automatique,
-, nous devons disposer de mesures formelles de la qualité (ou de la faiblesse) de nos modèles.
+nous devons disposer de mesures formelles de la qualité (ou de la faiblesse) de nos modèles.
 Dans le domaine de l'apprentissage automatique, et de l'optimisation en général,
-, nous appelons cela des *fonctions objectives*.
+nous appelons cela des *fonctions objectives*.
 Par convention, nous définissons généralement les fonctions objectives
 de manière à ce que les valeurs les plus basses soient les meilleures.
 Il s'agit simplement d'une convention. 
@@ -404,7 +404,7 @@ Parce que plus bas est meilleur, ces fonctions sont parfois appelées
 
 Lorsqu'on essaie de prédire des valeurs numériques,
 la fonction de perte la plus courante est l'erreur quadratique *,
-, c'est-à-dire le carré de la différence entre la prédiction et la vérité du terrain.
+c'est-à-dire le carré de la différence entre la prédiction et la vérité du terrain.
 Pour la classification, l'objectif le plus courant est de minimiser le taux d'erreur,
 c'est-à-dire la fraction d'exemples sur lesquels
 nos prédictions sont en désaccord avec la vérité terrain.
@@ -563,7 +563,7 @@ Vous pourriez vouloir estimer la juste valeur marchande d'une maison,
 compte tenu de certaines caractéristiques comme ci-dessus.
 L'étiquette, le prix de vente, est une valeur numérique.
 Lorsque les étiquettes prennent des valeurs numériques arbitraires,
-, nous appelons cela un problème de *régression*.
+nous appelons cela un problème de *régression*.
 Notre objectif est de produire un modèle dont les prédictions
 sont très proches des valeurs réelles des étiquettes.
 
@@ -764,7 +764,7 @@ mutuellement exclusives est appelé classification *multi-label*.
 Les problèmes d'étiquetage automatique sont généralement mieux décrits
 comme des problèmes de classification multi-labels.
 Pensez aux étiquettes que les gens peuvent appliquer aux articles d'un blog technique,
-, par exemple, "apprentissage automatique", "technologie", "gadgets",
+par exemple, "apprentissage automatique", "technologie", "gadgets",
 "langages de programmation", "Linux", "informatique en nuage", "AWS".
 Un article typique peut avoir 5 à 10 balises appliquées
 car ces concepts sont corrélés.
@@ -778,7 +778,7 @@ car il permet aux chercheurs d'effectuer des analyses exhaustives de la littéra
 À la National Library of Medicine, un certain nombre d'annotateurs professionnels
 passent en revue chaque article indexé dans PubMed
 pour l'associer aux termes pertinents du MeSH,
-, une collection d'environ 28 000 étiquettes.
+une collection d'environ 28 000 étiquettes.
 Ce processus prend beaucoup de temps et les annotateurs
 ont généralement un an de décalage entre l'archivage et l'étiquetage.
 L'apprentissage automatique peut être utilisé ici pour fournir des étiquettes provisoires
@@ -809,8 +809,8 @@ Une solution possible à ce problème consiste à attribuer à chaque élément 
 un score de pertinence correspondant
 , puis à récupérer les éléments les mieux notés.
 [PageRank](https://en.wikipedia.org/wiki/PageRank) le moteur de recherche Google,
-, la sauce secrète à l'origine du moteur de recherche Google,
-, était un exemple précoce d'un tel système de notation, mais il était
+la sauce secrète à l'origine du moteur de recherche Google,
+était un exemple précoce d'un tel système de notation, mais il était
 particulier en ce qu'il ne dépendait pas de la requête réelle.
 Il s'appuyait sur un simple filtre de pertinence
 pour identifier l'ensemble des éléments pertinents
@@ -852,8 +852,8 @@ pour un utilisateur et un article.
 
 Avec un tel modèle, 
 , pour un utilisateur donné,
-, nous pourrions récupérer l'ensemble des objets ayant les scores les plus élevés,
-, qui pourraient alors être recommandés à l'utilisateur.
+nous pourrions récupérer l'ensemble des objets ayant les scores les plus élevés,
+qui pourraient alors être recommandés à l'utilisateur.
 Les systèmes de production sont considérablement plus avancés et prennent en compte
 l'activité détaillée de l'utilisateur et les caractéristiques des objets
 lors du calcul de ces scores. :numref:`fig_deeplearning_amazon` est un exemple
@@ -1102,7 +1102,7 @@ nous pouvons nous préoccuper de la reconnaissance des formes
 de manière isolée, sans être distraits par ces autres problèmes.
 Mais l'inconvénient est que la formulation du problème est assez limitée.
 Si vous êtes plus ambitieux, ou si vous avez grandi en lisant la série des Robots d'Asimov,
-, vous pouvez imaginer des robots artificiellement intelligents capables
+vous pouvez imaginer des robots artificiellement intelligents capables
 non seulement de faire des prédictions, mais aussi 
 d'agir dans le monde.
 Nous voulons penser à des *agents* intelligents, pas seulement à des modèles prédictifs.
@@ -1208,7 +1208,7 @@ Pour déduire l'emplacement précis (et donc l'état) du robot
 
 Enfin, à tout moment, l'apprenant par renforcement
 peut connaître une bonne politique,
-, mais il peut y avoir beaucoup d'autres meilleures politiques
+mais il peut y avoir beaucoup d'autres meilleures politiques
 que l'agent n'a jamais essayées.
 L'apprenant par renforcement doit constamment choisir
 s'il doit *exploiter* la meilleure stratégie actuellement connue comme politique,
@@ -1252,7 +1252,7 @@ Par exemple, la distribution de Bernoulli porte le nom de
 [Jacob Bernoulli (1655--1705) ](https://en.wikipedia.org/wiki/Jacob_Bernoulli), et la distribution gaussienne a été découverte
 par [Carl Friedrich Gauss (1777--1855)](https://en.wikipedia.org/wiki/Carl_Friedrich_Gauss).
 Il a inventé, par exemple, l'algorithme des moindres carrés moyens,
-, qui est encore utilisé aujourd'hui pour d'innombrables problèmes
+qui est encore utilisé aujourd'hui pour d'innombrables problèmes
 , du calcul des assurances au diagnostic médical.
 Ces outils ont donné naissance à une approche expérimentale
 dans les sciences naturelles - par exemple, la loi d'Ohm
@@ -1265,7 +1265,7 @@ en faisant la moyenne de la longueur des pieds de 16 hommes adultes pour obtenir
 
 ![Estimating the length of a foot.](../img/koebel.jpg) 
  :width:`500px` 
- :label:`fig_koebel` 
+:label:`fig_koebel` 
 
  :numref:`fig_koebel` illustre le fonctionnement de cet estimateur.
 On a demandé aux 16 hommes adultes de se mettre en rang, à la sortie de l'église.
@@ -1288,7 +1288,7 @@ même l'ensemble de données Iris
 que Fisher a publié en 1936 est encore parfois utilisé
 pour illustrer les algorithmes d'apprentissage automatique.
 Il était également partisan de l'eugénisme,
-, ce qui devrait nous rappeler que l'utilisation moralement douteuse de la science des données
+ce qui devrait nous rappeler que l'utilisation moralement douteuse de la science des données
 a une histoire aussi longue et durable que son utilisation productive
 dans l'industrie et les sciences naturelles.
 

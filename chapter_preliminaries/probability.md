@@ -192,7 +192,7 @@ from tensorflow_probability import distributions as tfd
 Supposons maintenant que la pièce soit en fait juste,
 c'est-à-dire $P(\textrm{heads}) = 0.5$.
 Pour simuler les tirages d'une pièce de monnaie équitable,
-, nous pouvons faire appel à n'importe quel générateur de nombres aléatoires.
+nous pouvons faire appel à n'importe quel générateur de nombres aléatoires.
 Il existe des moyens simples de tirer des échantillons 
 d'un événement avec une probabilité $0.5$.
 Par exemple, le générateur de nombres aléatoires de Python `random.random`
@@ -480,7 +480,7 @@ pour toutes les $i,j$ il est vrai que $P(X=i \textrm{ and } Y=j) = P(X=i)P(Y=j)$
 D'autres fois, nous abusons de la notation en écrivant
 $P(v)$ lorsque la variable aléatoire est claire d'après le contexte. 
 Étant donné que, dans la théorie des probabilités, un événement est un ensemble d'issues de l'espace d'échantillonnage,
-, nous pouvons spécifier une plage de valeurs pour une variable aléatoire.
+nous pouvons spécifier une plage de valeurs pour une variable aléatoire.
 Par exemple, $P(1 \leq X \leq 3)$ désigne la probabilité de l'événement $\{1 \leq X \leq 3\}$.
 
 
@@ -508,7 +508,7 @@ Dans ce cas, nous travaillons avec des *densités de probabilité*.
 La taille d'exactement 1,80 mètre 
 n'a pas de probabilité, mais une densité non nulle. 
 Pour obtenir la probabilité attribuée à un intervalle,
-, nous devons prendre une *intégrale* de la densité 
+nous devons prendre une *intégrale* de la densité 
 sur cet intervalle. 
 
 
@@ -619,12 +619,12 @@ $$P(A|B) = \frac{P(B|A) P(A)}{P(B)}.$$
  Cette simple équation a de profondes implications car
 elle nous permet d'inverser l'ordre du conditionnement.
 Si nous savons comment estimer $P(B|A)$, $P(A)$, et $P(B)$,
-, nous pouvons alors estimer $P(A|B)$. 
+nous pouvons alors estimer $P(A|B)$. 
 Il est souvent plus facile d'estimer directement un terme 
 mais pas l'autre et le théorème de Bayes peut venir à la rescousse dans ce cas.
 Par exemple, si nous connaissons la prévalence des symptômes d'une maladie donnée,
 et les prévalences globales de la maladie et des symptômes, respectivement,
-, nous pouvons déterminer la probabilité qu'une personne 
+nous pouvons déterminer la probabilité qu'une personne 
 soit atteinte de la maladie sur la base de ses symptômes.
 Dans certains cas, nous n'avons pas d'accès direct à $P(B)$, 
 comme la prévalence des symptômes. 

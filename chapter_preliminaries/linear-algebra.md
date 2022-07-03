@@ -223,7 +223,7 @@ disposés en $m$ lignes et $n$ colonnes.
 Lorsque $m = n$, on dit qu'une matrice est *carrée*.
 Visuellement, nous pouvons illustrer toute matrice comme un tableau.
 Pour faire référence à un élément individuel,
-, nous mettons en indice à la fois la ligne et la colonne, par exemple,
+nous mettons en indice à la fois la ligne et la colonne, par exemple,
 $a_{ij}$ est la valeur qui appartient à la ligne
 $i^{\mathrm{th}}$ et à la colonne $j^{\mathrm{th}}$ de $\mathbf{A}$:
 
@@ -715,9 +715,9 @@ tf.reduce_sum(x * y)
 
 Les produits scalaires sont utiles dans un grand nombre de contextes.
 Par exemple, pour un ensemble de valeurs,
-, désigné par un vecteur $\mathbf{x}  \in \mathbb{R}^n$
+désigné par un vecteur $\mathbf{x}  \in \mathbb{R}^n$
  et un ensemble de poids désignés par $\mathbf{w} \in \mathbb{R}^n$,
-, la somme pondérée des valeurs de $\mathbf{x}$
+la somme pondérée des valeurs de $\mathbf{x}$
  en fonction des poids $\mathbf{w}$
  peut être exprimée par le produit scalaire $\mathbf{x}^\top \mathbf{w}$.
 Lorsque les poids sont non négatifs
@@ -828,7 +828,7 @@ A.shape, x.shape, tf.linalg.matvec(A, x)
 ## Multiplication matrice-matrice
 
 Si vous avez appris à utiliser les produits scalaires et les produits matrice-vecteur,
-, la multiplication *matrice-matrice* devrait être simple.
+la multiplication *matrice-matrice* devrait être simple.
 
 Disons que nous avons deux matrices 
 $\mathbf{A} \in \mathbb{R}^{n \times k}$ 
@@ -1080,7 +1080,7 @@ d'introduire plus de mathématiques ultérieurement,
 nous concluons cette section ici.
 
 Si vous êtes impatient d'en savoir plus sur l'algèbre linéaire,
-, il existe de nombreux livres et ressources en ligne excellents.
+il existe de nombreux livres et ressources en ligne excellents.
 Pour un cours accéléré plus avancé, vous pouvez consulter
 :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008` .
 

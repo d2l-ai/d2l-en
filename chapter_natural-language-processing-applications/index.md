@@ -9,13 +9,13 @@ les chapitres précédents ont déjà abordé certaines applications de traiteme
 *sans pré-entraînement*,
 juste pour expliquer les architectures d'apprentissage profond.
 Par exemple, dans :numref:`chap_rnn` ,
-, nous nous sommes appuyés sur les RNN pour concevoir des modèles de langage permettant de générer des textes de type roman.
+nous nous sommes appuyés sur les RNN pour concevoir des modèles de langage permettant de générer des textes de type roman.
 Dans :numref:`chap_modern_rnn` et :numref:`chap_attention` ,
-, nous avons également conçu des modèles basés sur les RNN et des mécanismes d'attention pour la traduction automatique.
+nous avons également conçu des modèles basés sur les RNN et des mécanismes d'attention pour la traduction automatique.
 
 Cependant, ce livre n'a pas pour objectif de couvrir toutes ces applications de manière exhaustive.
 Au lieu de cela,
-, nous nous concentrons sur *la manière d'appliquer l'apprentissage (profond) de la représentation des langues pour résoudre les problèmes de traitement du langage naturel*.
+nous nous concentrons sur *la manière d'appliquer l'apprentissage (profond) de la représentation des langues pour résoudre les problèmes de traitement du langage naturel*.
 Compte tenu des représentations de texte pré-entraînées,
 ce chapitre explorera deux 
 tâches de traitement du langage naturel populaires et représentatives
@@ -34,7 +34,7 @@ Plus précisément, nous allons explorer les architectures populaires basées su
 Pour l'inférence en langage naturel, nous choisissons l'attention et les MLP pour démontrer comment analyser les paires de textes.
 Enfin, nous présentons la manière d'affiner un modèle BERT pré-entraîné
 pour un large éventail d'applications de traitement du langage naturel,
-, notamment au niveau de la séquence (classification d'un seul texte et classification de paires de textes)
+notamment au niveau de la séquence (classification d'un seul texte et classification de paires de textes)
 et au niveau du token (étiquetage de textes et réponse à des questions).
 Comme cas empirique concret,
 nous allons affiner BERT pour l'inférence en langage naturel.

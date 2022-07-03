@@ -1,150 +1,150 @@
 # Geometry and Linear Algebraic Operations
 :label:`sec_geometry-linear-algebraic-ops`
 
-In :numref:`sec_linear-algebra`, we encountered the basics of linear algebra
-and saw how it could be used to express common operations for transforming our data.
-Linear algebra is one of the key mathematical pillars
-underlying much of the work that we do in deep learning
-and in machine learning more broadly.
-While :numref:`sec_linear-algebra` contained enough machinery
-to communicate the mechanics of modern deep learning models,
-there is a lot more to the subject.
-In this section, we will go deeper,
-highlighting some geometric interpretations of linear algebra operations,
-and introducing a few fundamental concepts, including of eigenvalues and eigenvectors.
+Dans :numref:`sec_linear-algebra`, nous avons rencontré les bases de l'algèbre linéaire.
+et vu comment elle pouvait être utilisée pour exprimer des opérations courantes de transformation de nos données.
+L'algèbre linéaire est l'un des principaux piliers mathématiques
+qui sous-tend une grande partie du travail que nous faisons dans l'apprentissage profond
+et, plus largement, dans l'apprentissage automatique.
+Alors que :numref:`sec_linear-algebra` contenait suffisamment de machines
+pour communiquer les mécanismes des modèles modernes d'apprentissage profond,
+le sujet est bien plus vaste.
+Dans cette section, nous allons aller plus loin,
+en mettant en évidence certaines interprétations géométriques des opérations d'algèbre linéaire,
+et en introduisant quelques concepts fondamentaux, notamment les valeurs propres et les vecteurs propres.
 
-## Geometry of Vectors
-First, we need to discuss the two common geometric interpretations of vectors,
-as either points or directions in space.
-Fundamentally, a vector is a list of numbers such as the Python list below.
+## Représentation géométrique des vecteurs
+Tout d'abord, nous devons discuter des deux interprétations géométriques courantes des vecteurs,
+soit comme des points, soit comme des directions dans l'espace.
+Fondamentalement, un vecteur est une liste de nombres, comme la liste Python ci-dessous.
 
 ```{.python .input}
 #@tab all
 v = [1, 7, 0, 1]
 ```
 
-Mathematicians most often write this as either a *column* or *row* vector, which is to say either as
+Les mathématiciens l'écrivent le plus souvent sous la forme d'un vecteur *colonne* ou *ligne*, c'est-à-dire soit sous forme de
 
 $$
 \mathbf{x} = \begin{bmatrix}1\\7\\0\\1\end{bmatrix},
 $$
 
-or
+ou
 
 $$
 \mathbf{x}^\top = \begin{bmatrix}1 & 7 & 0 & 1\end{bmatrix}.
 $$
 
-These often have different interpretations,
-where data examples are column vectors
-and weights used to form weighted sums are row vectors.
-However, it can be beneficial to be flexible.
-As we have described in :numref:`sec_linear-algebra`,
-though a single vector's default orientation is a column vector,
-for any matrix representing a tabular dataset,
-treating each data example as a row vector
-in the matrix
-is more conventional.
+Ceux-ci ont souvent des interprétations différentes,
+où les exemples de données sont des vecteurs colonnes
+et les pondérations utilisées pour former des sommes pondérées sont des vecteurs de lignes.
+Cependant, il peut être bénéfique d'être flexible.
+Comme nous l'avons décrit dans :numref:`sec_linear-algebra`,
+bien que l'orientation par défaut d'un vecteur simple soit un vecteur colonne,
+pour toute matrice représentant un ensemble de données tabulaires,
+traiter chaque exemple de données comme un vecteur ligne
+dans la matrice
+est plus conventionnel.
 
-Given a vector, the first interpretation
-that we should give it is as a point in space.
-In two or three dimensions, we can visualize these points
-by using the components of the vectors to define
-the location of the points in space compared
-to a fixed reference called the *origin*.  This can be seen in :numref:`fig_grid`.
+Étant donné un vecteur, la première interprétation
+que l'on doit lui donner est celle d'un point dans l'espace.
+En deux ou trois dimensions, nous pouvons visualiser ces points
+en utilisant les composantes des vecteurs pour définir
+l'emplacement des points dans l'espace par rapport
+à une référence fixe appelée *origine*.  Ceci peut être vu dans :numref:`fig_grid`.
 
-![An illustration of visualizing vectors as points in the plane.  The first component of the vector gives the $x$-coordinate, the second component gives the $y$-coordinate.  Higher dimensions are analogous, although much harder to visualize.](../img/grid-points.svg)
+![Une illustration de la visualisation des vecteurs comme des points dans le plan.  La première composante du vecteur donne la coordonnée $x$, la deuxième composante donne la coordonnée $y$.  Les dimensions supérieures sont analogues, bien que beaucoup plus difficiles à visualiser.](../img/grid-points.svg)
 :label:`fig_grid`
 
-This geometric point of view allows us to consider the problem on a more abstract level.
-No longer faced with some insurmountable seeming problem
-like classifying pictures as either cats or dogs,
-we can start considering tasks abstractly
-as collections of points in space and picturing the task
-as discovering how to separate two distinct clusters of points.
+Ce point de vue géométrique nous permet de considérer le problème à un niveau plus abstrait.
+Nous ne sommes plus confrontés à un problème apparemment insurmontable.
+comme classer des images en tant que chats ou chiens,
+nous pouvons commencer à considérer les tâches de manière abstraite
+comme des collections de points dans l'espace et en imaginant la tâche
+comme découvrir comment séparer deux groupes distincts de points.
 
-In parallel, there is a second point of view
-that people often take of vectors: as directions in space.
-Not only can we think of the vector $\mathbf{v} = [3,2]^\top$
-as the location $3$ units to the right and $2$ units up from the origin,
-we can also think of it as the direction itself
-to take $3$ steps to the right and $2$ steps up.
-In this way, we consider all the vectors in figure :numref:`fig_arrow` the same.
+En parallèle, il y a un deuxième point de vue
+que les gens prennent souvent des vecteurs : comme des directions dans l'espace.
+Non seulement on peut penser au vecteur $\mathbf{v} = [3,2]^\top$
+comme la position à 3$ unités à droite et à 2$ unités vers le haut de l'origine,
+on peut aussi le considérer comme la direction elle-même.
+pour faire 3$ pas vers la droite et 2$ pas vers le haut.
+De cette façon, nous considérons que tous les vecteurs de la figure :numref:`fig_arrow` sont identiques.
 
-![Any vector can be visualized as an arrow in the plane.  In this case, every vector drawn is a representation of the vector $(3,2)^\top$.](../img/par-vec.svg)
+![Tout vecteur peut être visualisé comme une flèche dans le plan.  Dans ce cas, chaque vecteur dessiné est une représentation du vecteur $(3,2)^\top$.](../img/par-vec.svg)
 :label:`fig_arrow`
 
-One of the benefits of this shift is that
-we can make visual sense of the act of vector addition.
-In particular, we follow the directions given by one vector,
-and then follow the directions given by the other, as is seen in :numref:`fig_add-vec`.
+L'un des avantages de ce changement est que
+nous pouvons donner un sens visuel à l'acte d'addition de vecteurs.
+En particulier, nous suivons les directions données par un vecteur,
+puis on suit les directions données par l'autre, comme on le voit dans :numref:`fig_add-vec`.
 
 ![We can visualize vector addition by first following one vector, and then another.](../img/vec-add.svg)
 :label:`fig_add-vec`
 
-Vector subtraction has a similar interpretation.
-By considering the identity that $\mathbf{u} = \mathbf{v} + (\mathbf{u}-\mathbf{v})$,
-we see that the vector $\mathbf{u}-\mathbf{v}$ is the direction
-that takes us from the point $\mathbf{v}$ to the point $\mathbf{u}$.
+La soustraction vectorielle a une interprétation similaire.
+En considérant l'identité que $\mathbf{u} = \mathbf{v} + (\mathbf{u}-\mathbf{v})$,
+nous voyons que le vecteur $\mathbf{u}-\mathbf{v}$ est la direction
+qui nous mène du point $\mathbf{v}$ au point $\mathbf{u}$.
 
 
 ## Dot Products and Angles
-As we saw in :numref:`sec_linear-algebra`,
-if we take two column vectors $\mathbf{u}$ and $\mathbf{v}$,
-we can form their dot product by computing:
+Comme nous l'avons vu dans :numref:`sec_linear-algebra`,
+si l'on prend deux vecteurs colonnes $\mathbf{u}$ et $\mathbf{v}$,
+nous pouvons former leur produit scalaire en calculant :
 
 $$\mathbf{u}^\top\mathbf{v} = \sum_i u_i\cdot v_i.$$
 :eqlabel:`eq_dot_def`
 
-Because :eqref:`eq_dot_def` is symmetric, we will mirror the notation
-of classical multiplication and write
+Puisque :eqref:`eq_dot_def` est symétrique, nous refléterons la notation
+de la multiplication classique et nous écrirons
 
 $$
 \mathbf{u}\cdot\mathbf{v} = \mathbf{u}^\top\mathbf{v} = \mathbf{v}^\top\mathbf{u},
 $$
 
-to highlight the fact that exchanging the order of the vectors will yield the same answer.
+pour souligner le fait qu'en échangeant l'ordre des vecteurs, on obtient la même réponse.
 
-The dot product :eqref:`eq_dot_def` also admits a geometric interpretation: it is closely related to the angle between two vectors.  Consider the angle shown in :numref:`fig_angle`.
+Le produit scalaire :eqref:`eq_dot_def` admet également une interprétation géométrique : il est étroitement lié à l'angle entre deux vecteurs.  Considérons l'angle représenté dans :numref:`fig_angle`.
 
-![Between any two vectors in the plane there is a well defined angle $\theta$.  We will see this angle is intimately tied to the dot product.](../img/vec-angle.svg)
+![Entre deux vecteurs quelconques dans le plan, il existe un angle bien défini $\theta$.  Nous verrons que cet angle est intimement lié au produit scalaire.](../img/vec-angle.svg)
 :label:`fig_angle`
 
-To start, let's consider two specific vectors:
+Pour commencer, considérons deux vecteurs particuliers :
 
 $$
 \mathbf{v} = (r,0) \; \text{and} \; \mathbf{w} = (s\cos(\theta), s \sin(\theta)).
 $$
 
-The vector $\mathbf{v}$ is length $r$ and runs parallel to the $x$-axis,
-and the vector $\mathbf{w}$ is of length $s$ and at angle $\theta$ with the $x$-axis.
-If we compute the dot product of these two vectors, we see that
+Le vecteur $\mathbf{v}$ est de longueur $r$ et est parallèle à l'axe $x$,
+et le vecteur $\mathbf{w}$ est de longueur $s$ et fait un angle $\theta$ avec l'axe $x$.
+Si l'on calcule le produit scalaire de ces deux vecteurs, on constate que
 
 $$
 \mathbf{v}\cdot\mathbf{w} = rs\cos(\theta) = \|\mathbf{v}\|\|\mathbf{w}\|\cos(\theta).
 $$
 
-With some simple algebraic manipulation, we can rearrange terms to obtain
+Avec quelques manipulations algébriques simples, nous pouvons réarranger les termes pour obtenir
 
 $$
 \theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}\right).
 $$
 
-In short, for these two specific vectors,
-the dot product combined with the norms tell us the angle between the two vectors. This same fact is true in general. We will not derive the expression here, however,
-if we consider writing $\|\mathbf{v} - \mathbf{w}\|^2$ in two ways:
-one with the dot product, and the other geometrically using the law of cosines,
-we can obtain the full relationship.
-Indeed, for any two vectors $\mathbf{v}$ and $\mathbf{w}$,
-the angle between the two vectors is
+En bref, pour ces deux vecteurs spécifiques,
+le produit scalaire combiné aux normes nous donne l'angle entre les deux vecteurs. Ce même fait est vrai en général. Cependant, nous ne dériverons pas l'expression ici,
+si nous envisageons d'écrire $\|\mathbf{v} - \mathbf{w}\|^2$ de deux façons :
+l'une avec le produit scalaire, et l'autre géométriquement en utilisant la loi des cosinus,
+nous pouvons obtenir la relation complète.
+En effet, pour deux vecteurs quelconques $\mathbf{v}$ et $\mathbf{w}$,
+l'angle entre ces deux vecteurs est
 
 $$\theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}\right).$$
 :eqlabel:`eq_angle_forumla`
 
-This is a nice result since nothing in the computation references two-dimensions.
-Indeed, we can use this in three or three million dimensions without issue.
+C'est un bon résultat puisque rien dans le calcul ne fait référence aux deux dimensions.
+En effet, nous pouvons l'utiliser en trois ou trois millions de dimensions sans problème.
 
-As a simple example, let's see how to compute the angle between a pair of vectors:
+A titre d'exemple simple, voyons comment calculer l'angle entre une paire de vecteurs :
 
 ```{.python .input}
 #@tab mxnet
@@ -188,121 +188,120 @@ def angle(v, w):
 angle(tf.constant([0, 1, 2], dtype=tf.float32), tf.constant([2.0, 3, 4]))
 ```
 
-We will not use it right now, but it is useful to know
-that we will refer to vectors for which the angle is $\pi/2$
-(or equivalently $90^{\circ}$) as being *orthogonal*.
-By examining the equation above, we see that this happens when $\theta = \pi/2$,
-which is the same thing as $\cos(\theta) = 0$.
-The only way this can happen is if the dot product itself is zero,
-and two vectors are orthogonal if and only if $\mathbf{v}\cdot\mathbf{w} = 0$.
-This will prove to be a helpful formula when understanding objects geometrically.
+Nous ne l'utiliserons pas pour l'instant, mais il est utile de savoir
+que nous ferons référence à des vecteurs pour lesquels l'angle est de $\pi/2$.
+(ou équivalent à $90^{\circ}$) comme étant *orthogonaux*.
+En examinant l'équation ci-dessus, nous voyons que cela se produit lorsque $\theta = \pi/2$,
+ce qui revient à dire que $\cos(\theta) = 0$.
+Le seul moyen pour que cela se produise est que le produit scalaire lui-même soit nul,
+et deux vecteurs sont orthogonaux si et seulement si $\mathbf{v}\cdot\mathbf{w} = 0$.
+Cette formule s'avérera utile pour comprendre les objets sur le plan géométrique.
 
-It is reasonable to ask: why is computing the angle useful?
-The answer comes in the kind of invariance we expect data to have.
-Consider an image, and a duplicate image,
-where every pixel value is the same but $10\%$ the brightness.
-The values of the individual pixels are in general far from the original values.
-Thus, if one computed the distance between the original image and the darker one,
-the distance can be large.
-However, for most ML applications, the *content* is the same---it is still
-an image of a cat as far as a cat/dog classifier is concerned.
-However, if we consider the angle, it is not hard to see
-that for any vector $\mathbf{v}$, the angle
-between $\mathbf{v}$ and $0.1\cdot\mathbf{v}$ is zero.
-This corresponds to the fact that scaling vectors
-keeps the same direction and just changes the length.
-The angle considers the darker image identical.
+Il est raisonnable de demander : pourquoi le calcul de l'angle est-il utile ?
+La réponse se trouve dans le type d'invariance que nous attendons des données.
+Considérons une image, et une image dupliquée,
+où chaque valeur de pixel est la même, mais 10 % de la luminosité.
+Les valeurs des pixels individuels sont en général très éloignées des valeurs d'origine.
+Ainsi, si l'on calcule la distance entre l'image originale et l'image plus sombre,
+la distance peut être grande.
+Cependant, pour la plupart des applications ML, le *contenu* est le même - il s'agit toujours de
+l'image d'un chat pour un classificateur chat/chien.
+Cependant, si nous considérons l'angle, il n'est pas difficile de voir
+que pour tout vecteur $\mathbf{v}$, l'angle
+entre $\mathbf{v}$ et $0.1\cdot\mathbf{v}$ est nul.
+Cela correspond au fait que la mise à l'échelle des vecteurs
+conserve la même direction et ne modifie que la longueur.
+L'angle considère que l'image la plus sombre est identique.
 
-Examples like this are everywhere.
-In text, we might want the topic being discussed
-to not change if we write twice as long of document that says the same thing.
-For some encoding (such as counting the number of occurrences of words in some vocabulary), this corresponds to a doubling of the vector encoding the document,
-so again we can use the angle.
+Des exemples comme celui-ci sont partout.
+Dans un texte, nous pourrions vouloir que le sujet discuté
+ne change pas si nous écrivons un document deux fois plus long qui dit la même chose.
+Pour certains codages (comme le comptage du nombre d'occurrences de mots dans un certain vocabulaire), cela correspond à un doublement du vecteur codant le document,
+donc encore une fois, on peut utiliser l'angle.
 
-### Cosine Similarity
-In ML contexts where the angle is employed
-to measure the closeness of two vectors,
-practitioners adopt the term *cosine similarity*
-to refer to the portion
+### Similitude Cosinus
+Dans les contextes ML où l'angle est employé
+pour mesurer la proximité de deux vecteurs,
+les praticiens adoptent le terme de *similarité cosinus*.
+pour faire référence à la partie
 $$
 \cos(\theta) = \frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}.
 $$
 
-The cosine takes a maximum value of $1$
-when the two vectors point in the same direction,
-a minimum value of $-1$ when they point in opposite directions,
-and a value of $0$ when the two vectors are orthogonal.
-Note that if the components of high-dimensional vectors
-are sampled randomly with mean $0$,
-their cosine will nearly always be close to $0$.
+Le cosinus prend une valeur maximale de 1$$.
+lorsque les deux vecteurs pointent dans la même direction,
+une valeur minimale de $1$ lorsqu'ils pointent dans des directions opposées,
+et une valeur de $0$ lorsque les deux vecteurs sont orthogonaux.
+Notez que si les composantes des vecteurs à haute dimension
+sont échantillonnées aléatoirement avec une moyenne de $0$,
+leur cosinus sera presque toujours proche de 0 $.
 
 
-## Hyperplanes
+## Hyperplans
 
-In addition to working with vectors, another key object
-that you must understand to go far in linear algebra
-is the *hyperplane*, a generalization to higher dimensions
-of a line (two dimensions) or of a plane (three dimensions).
-In an $d$-dimensional vector space, a hyperplane has $d-1$ dimensions
-and divides the space into two half-spaces.
+Outre le fait de travailler avec des vecteurs, un autre objet clé
+que vous devez comprendre pour aller loin en algèbre linéaire
+est l'*hyperplan*, une généralisation à des dimensions supérieures
+d'une ligne (deux dimensions) ou d'un plan (trois dimensions).
+Dans un espace vectoriel de $d$ dimensions, un hyperplan a $d-1$ dimensions
+et divise l'espace en deux demi-espaces.
 
-Let's start with an example.
-Suppose that we have a column vector $\mathbf{w}=[2,1]^\top$. We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"
-By recalling the connection between dot products and angles above :eqref:`eq_angle_forumla`,
-we can see that this is equivalent to
+Commençons par un exemple.
+Supposons que nous ayons un vecteur colonne $\mathbf{w}=[2,1]^\top$. Nous voulons savoir, "quels sont les points $\mathbf{v}$ avec $\mathbf{w}\cdot\mathbf{v} = 1$ ?"
+En rappelant la connexion entre les produits scalaires et les angles ci-dessus :eqref:`eq_angle_forumla`,
+nous pouvons voir que ceci est équivalent à
 $$
 \|\mathbf{v}\|\|\mathbf{w}\|\cos(\theta) = 1 \; \iff \; \|\mathbf{v}\|\cos(\theta) = \frac{1}{\|\mathbf{w}\|} = \frac{1}{\sqrt{5}}.
 $$
 
-![Recalling trigonometry, we see the formula $\|\mathbf{v}\|\cos(\theta)$ is the length of the projection of the vector $\mathbf{v}$ onto the direction of $\mathbf{w}$](../img/proj-vec.svg)
+![En rappelant la trigonométrie, on voit que la formule ${\mathbf{v}{\i1}cos(\theta)} est la longueur de la projection du vecteur ${\mathbf{v}$ sur la direction de ${\mathbf{w}$.](../img/proj-vec.svg)
 :label:`fig_vector-project`
 
-If we consider the geometric meaning of this expression,
-we see that this is equivalent to saying
-that the length of the projection of $\mathbf{v}$
-onto the direction of $\mathbf{w}$ is exactly $1/\|\mathbf{w}\|$, as is shown in :numref:`fig_vector-project`.
-The set of all points where this is true is a line
-at right angles to the vector $\mathbf{w}$.
-If we wanted, we could find the equation for this line
-and see that it is $2x + y = 1$ or equivalently $y = 1 - 2x$.
+Si nous considérons la signification géométrique de cette expression,
+nous voyons que cela revient à dire
+que la longueur de la projection de ${{mathbf{v}}
+sur la direction de $\mathbf{w}$ est exactement $1/\|\mathbf{w}\|$, comme le montre :numref:`fig_vector-project`.
+L'ensemble de tous les points où ceci est vrai est une ligne
+à angle droit avec le vecteur $\mathbf{w}$.
+Si on le souhaite, on peut trouver l'équation de cette droite
+et voir qu'elle est $2x + y = 1$ ou encore $y = 1 - 2x$.
 
-If we now look at what happens when we ask about the set of points with
-$\mathbf{w}\cdot\mathbf{v} > 1$ or $\mathbf{w}\cdot\mathbf{v} < 1$,
-we can see that these are cases where the projections
-are longer or shorter than $1/\|\mathbf{w}\|$, respectively.
-Thus, those two inequalities define either side of the line.
-In this way, we have found a way to cut our space into two halves,
-where all the points on one side have dot product below a threshold,
-and the other side above as we see in :numref:`fig_space-division`.
+Si nous regardons maintenant ce qui se passe lorsque nous posons la question de l'ensemble des points avec
+$\mathbf{w}\cdot\mathbf{v} > 1$ ou $\mathbf{w}\cdot\mathbf{v} < 1$,
+on peut voir que ce sont des cas où les projections
+sont plus longues ou plus courtes que $1/\|\mathbf{w}\|$, respectivement.
+Ainsi, ces deux inégalités définissent chaque côté de la ligne.
+De cette façon, nous avons trouvé un moyen de couper notre espace en deux moitiés,
+où tous les points d'un côté ont un produit scalaire inférieur à un seuil,
+et l'autre côté au-dessus comme nous le voyons dans :numref:`fig_space-division`.
 
-![If we now consider the inequality version of the expression, we see that our hyperplane (in this case: just a line) separates the space into two halves.](../img/space-division.svg)
+!Si l'on considère maintenant la version inégalitaire de l'expression, on voit que notre hyperplan (dans ce cas : juste une ligne) sépare l'espace en deux moitiés](../img/space-division.svg)
 :label:`fig_space-division`
 
-The story in higher dimension is much the same.
-If we now take $\mathbf{w} = [1,2,3]^\top$
-and ask about the points in three dimensions with $\mathbf{w}\cdot\mathbf{v} = 1$,
-we obtain a plane at right angles to the given vector $\mathbf{w}$.
-The two inequalities again define the two sides of the plane as is shown in :numref:`fig_higher-division`.
+L'histoire en dimension supérieure est à peu près la même.
+Si l'on prend maintenant $\mathbf{w} = [1,2,3]^\top$
+et que nous nous interrogeons sur les points en trois dimensions avec $\mathbf{w}\cdot\mathbf{v} = 1$,
+nous obtenons un plan à angle droit par rapport au vecteur donné $\mathbf{w}$.
+Les deux inégalités définissent à nouveau les deux côtés du plan comme le montre :numref:`fig_higher-division`.
 
-![Hyperplanes in any dimension separate the space into two halves.](../img/space-division-3d.svg)
+!Les hyperplans de n'importe quelle dimension séparent l'espace en deux moitiés.](../img/space-division-3d.svg)
 :label:`fig_higher-division`
 
-While our ability to visualize runs out at this point,
-nothing stops us from doing this in tens, hundreds, or billions of dimensions.
-This occurs often when thinking about machine learned models.
-For instance, we can understand linear classification models
-like those from :numref:`sec_softmax`,
-as methods to find hyperplanes that separate the different target classes.
-In this context, such hyperplanes are often referred to as *decision planes*.
-The majority of deep learned classification models end
-with a linear layer fed into a softmax,
-so one can interpret the role of the deep neural network
-to be to find a non-linear embedding such that the target classes
-can be separated cleanly by hyperplanes.
+Bien que notre capacité de visualisation s'épuise à ce stade,
+rien ne nous empêche de le faire dans des dizaines, des centaines ou des milliards de dimensions.
+Cela se produit souvent lorsque l'on pense à des modèles appris par machine.
+Par exemple, nous pouvons comprendre les modèles de classification linéaire
+comme ceux de :numref:`sec_softmax`,
+comme des méthodes permettant de trouver des hyperplans qui séparent les différentes classes cibles.
+Dans ce contexte, de tels hyperplans sont souvent appelés *plans de décision*.
+La majorité des modèles de classification appris en profondeur se terminent
+avec une couche linéaire alimentée par un softmax,
+On peut donc interpréter le rôle du réseau neuronal profond
+de trouver un encastrement non-linéaire tel que les classes cibles puissent être
+puissent être séparées proprement par des hyperplans.
 
-To give a hand-built example, notice that we can produce a reasonable model
-to classify tiny images of t-shirts and trousers from the Fashion-MNIST dataset
-(seen in :numref:`sec_fashion_mnist`)
+Pour donner un exemple concret, remarquez que nous pouvons produire un modèle raisonnable
+pour classer de petites images de t-shirts et de pantalons provenant de l'ensemble de données Fashion-MNIST (:numref:`sec_fashion_mnist`)
 en prenant simplement le vecteur entre leurs moyennes pour définir le plan de décision
 et fixer à vue un seuil grossier.  Tout d'abord, nous allons charger les données et calculer les moyennes.
 
@@ -497,10 +496,10 @@ nous voyons qu'il s'agit de $2\cdot[1,0]^\top + -1\cdot[0,1]^\top$,
 et donc nous savons que la matrice $A$ enverra ceci à
 $2(\mathbf{A}[1,0]^\top) + -1(\mathbf{A}[0,1])^\top = 2[1, -1]^\top - [2,3]^\top = [0, -5]^\top$.
 Si nous suivons cette logique avec attention,
-, par exemple en considérant la grille de toutes les paires de points entiers,
-, nous constatons que la multiplication matricielle
+par exemple en considérant la grille de toutes les paires de points entiers,
+nous constatons que la multiplication matricielle
 peut incliner, faire pivoter et mettre à l'échelle la grille,
-, mais la structure de la grille doit rester telle que vous la voyez sur :numref:`fig_grid-transform` .
+mais la structure de la grille doit rester telle que vous la voyez sur :numref:`fig_grid-transform` .
 
 ![The matrix $\mathbf{A}$ acting on the given basis vectors.  Notice how the entire grid is transported along with it.](../img/grid-transform.svg)
 :label:`fig_grid-transform`
@@ -818,7 +817,7 @@ $$
 $$
 
 Si nous calculons le déterminant de cette matrice,
-, nous obtenons $2\cdot(-2 ) - 4\cdot(-1) = 0$.
+nous obtenons $2\cdot(-2 ) - 4\cdot(-1) = 0$.
 Étant donné ce que nous avons compris ci-dessus, cela a du sens.
 $\mathbf{B}$ compresse le carré de l'image originale
 en un segment de ligne, qui a une surface nulle.
@@ -879,7 +878,7 @@ Elle peut représenter une famille de transformations bien plus flexible
 que la seule multiplication matricielle.
 
 Pour simplifier la notation,
-, nous pouvons remarquer que la somme porte exactement sur les indices
+nous pouvons remarquer que la somme porte exactement sur les indices
 qui apparaissent plus d'une fois dans l'expression,
 . Les gens travaillent donc souvent avec la *notation d'Einstein*,
 où la somme porte implicitement sur tous les indices répétés.
@@ -944,7 +943,7 @@ La sommation d'Einstein a été implémentée directement.
 Les indices qui se produisent dans la sommation d'Einstein peuvent être passés comme une chaîne,
 suivie des tenseurs sur lesquels on agit.
 Par exemple, pour implémenter la multiplication de matrices,
-, nous pouvons considérer la sommation d'Einstein vue ci-dessus
+nous pouvons considérer la sommation d'Einstein vue ci-dessus
 ($\mathbf{A}\mathbf{v} = a_{ij}v_j$)
 et supprimer les indices eux-mêmes pour obtenir l'implémentation :
 

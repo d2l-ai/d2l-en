@@ -15,7 +15,7 @@ ou le nombre de jours d'hospitalisation d'un patient
 avant sa sortie,
 alors vous recherchez probablement un modèle de régression.
 Cependant, même au sein des modèles de régression,
-, il existe des distinctions importantes.
+il existe des distinctions importantes.
 Par exemple, le prix d'une maison
 ne sera jamais négatif et les changements peuvent souvent être *relatifs* à son prix de base.
 À ce titre, il peut être plus efficace de régresser
@@ -73,7 +73,7 @@ et :cite:`Huang.Xu.Yu.2015`
 un problème simple de classification d'images.
 Ici, chaque entrée consiste en une image en niveaux de gris $2\times2$.
 Nous pouvons représenter chaque valeur de pixel par un seul scalaire,
-, ce qui nous donne quatre caractéristiques $x_1, x_2, x_3, x_4$.
+ce qui nous donne quatre caractéristiques $x_1, x_2, x_3, x_4$.
 De plus, supposons que chaque image appartient à une
 des catégories "chat", "poulet" et "chien".
 
@@ -85,9 +85,9 @@ où les entiers représentent respectivement
 $\{\text{dog}, \text{cat}, \text{chicken}\}$ .
 C'est un excellent moyen de *stocker* de telles informations sur un ordinateur.
 Si les catégories avaient un ordre naturel entre elles,
-, par exemple si nous essayions de prédire
+par exemple si nous essayions de prédire
 $\{\text{baby}, \text{toddler}, \text{adolescent}, \text{young adult}, \text{adult}, \text{geriatric}\}$ ,
-, il pourrait même être logique de les présenter comme
+il pourrait même être logique de les présenter comme
 un problème [ordinal regression](https://en.wikipedia.org/wiki/Ordinal_regression)
  et de conserver les étiquettes dans ce format.
 Voir :cite:`Moon.Smola.Chang.ea.2010` pour un aperçu
@@ -109,7 +109,7 @@ et $(0, 0, 1)$ à "chien" :
 
 $$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}.$$ 
 
- ### Modèle linéaire
+### Modèle linéaire
 
 Afin d'estimer les probabilités conditionnelles
 associées à toutes les classes possibles,
@@ -140,7 +140,7 @@ Comme pour la régression linéaire,
 nous utilisons un réseau neuronal à une seule couche.
 Et comme le calcul de chaque sortie, $o_1, o_2$, et $o_3$,
 dépend de toutes les entrées, $x_1$, $x_2$, $x_3$, et $x_4$,
-, la couche de sortie peut également être décrite comme une couche *entièrement connectée*.
+la couche de sortie peut également être décrite comme une couche *entièrement connectée*.
 
 ![Softmax regression is a single-layer neural network.](../img/softmaxreg.svg)
 :label:`fig_softmaxreg`
@@ -182,7 +182,7 @@ où la corruption se produit par l'ajout de bruit $\mathbf{\epsilon}$
 En d'autres termes, $\mathbf{y} = \mathbf{o} + \mathbf{\epsilon}$,
 où $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$.
 Il s'agit de ce que l'on appelle [probit model](https://en.wikipedia.org/wiki/Probit_model),
-, introduit pour la première fois par :cite:`Fechner.1860` .
+introduit pour la première fois par :cite:`Fechner.1860` .
 Bien que séduisante, elle ne fonctionne pas aussi bien
 et ne conduit pas à un problème d'optimisation particulièrement intéressant,
 par rapport à la méthode softmax.
@@ -266,7 +266,7 @@ Les cadres d'apprentissage profond s'en chargent automatiquement.
 
  Maintenant que nous avons une correspondance entre les caractéristiques $\mathbf{x}$
  et les probabilités $\mathbf{\hat{y}}$,
-, nous devons trouver un moyen d'optimiser la précision de cette correspondance.
+nous devons trouver un moyen d'optimiser la précision de cette correspondance.
 Nous nous appuierons sur l'estimation du maximum de vraisemblance,
 le même concept que nous avons rencontré
 lorsque nous avons fourni une justification probabiliste
@@ -326,7 +326,7 @@ car prendre une sortie softmax vers $1$
  nécessite de prendre l'entrée correspondante $o_i$ à l'infini
 (ou toutes les autres sorties $o_j$ pour $j \neq i$ à l'infini négatif).
 Même si notre modèle pouvait attribuer une probabilité de sortie de $0$,
-, toute erreur commise lors de l'attribution d'une confiance aussi élevée à
+toute erreur commise lors de l'attribution d'une confiance aussi élevée à
 entraînerait une perte infinie ($-\log 0 = \infty$).
 
 

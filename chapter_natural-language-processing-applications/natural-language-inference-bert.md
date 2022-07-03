@@ -14,7 +14,7 @@ et le réglage fin de BERT ne nécessite qu'une architecture MLP supplémentaire
 comme illustré dans :numref:`fig_nlp-map-nli-bert` .
 
 ![This section feeds pretrained BERT to an MLP-based architecture for natural language inference.](../img/nlp-map-nli-bert.svg) 
- :label:`fig_nlp-map-nli-bert` 
+:label:`fig_nlp-map-nli-bert` 
 
  Dans cette section,
 nous allons télécharger une petite version pré-entraînée de BERT,
@@ -129,7 +129,7 @@ bert, vocab = load_pretrained_model(
 Pour la tâche en aval d'inférence en langage naturel sur le jeu de données SNLI,
 nous définissons une classe de jeu de données personnalisée `SNLIBERTDataset`.
 Dans chaque exemple,
-, la prémisse et l'hypothèse forment une paire de séquences de texte
+la prémisse et l'hypothèse forment une paire de séquences de texte
 et sont regroupées dans une séquence d'entrée BERT, comme illustré sur :numref:`fig_bert-two-seqs` .
 Rappelons que :numref:`subsec_bert_input_rep` que les ID de segment
 sont utilisés pour distinguer la prémisse et l'hypothèse dans une séquence d'entrée d'ORET.
@@ -328,7 +328,7 @@ Dans ce qui suit,
 le modèle BERT pré-entraîné `bert` est introduit dans l'instance `BERTClassifier` `net` pour
 l'application en aval.
 Dans les implémentations courantes de l'ajustement fin de BERT,
-, seuls les paramètres de la couche de sortie du MLP supplémentaire (`net.output`) seront appris à partir de zéro.
+seuls les paramètres de la couche de sortie du MLP supplémentaire (`net.output`) seront appris à partir de zéro.
 Tous les paramètres de l'encodeur BERT pré-entraîné (`net.encoder`) et de la couche cachée du MLP supplémentaire (`net.hidden`) seront affinés.
 
 ```{.python .input}
@@ -357,7 +357,7 @@ Ces deux fonctions de perte ne sont pas pertinentes pour le réglage fin des app
 `MaskLM` et `NextSentencePred` ne sont pas mis à jour lors du réglage fin de BERT.
 
 Pour autoriser les paramètres dont les gradients sont périmés,
-, l'indicateur `ignore_stale_grad=True` est activé dans la fonction `step` de `d2l.train_batch_ch13`.
+l'indicateur `ignore_stale_grad=True` est activé dans la fonction `step` de `d2l.train_batch_ch13`.
 Nous utilisons cette fonction pour former et évaluer le modèle `net` en utilisant l'ensemble de formation
 (`train_iter`) et l'ensemble de test (`test_iter`) de SNLI.
 En raison des ressources de calcul limitées, [**la précision de l'entraînement**] et du test

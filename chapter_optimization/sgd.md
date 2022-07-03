@@ -155,7 +155,7 @@ Il existe de nombreuses autres possibilités pour définir le taux d'apprentissa
 
 
 
- ## Analyse de convergence pour les objectifs convexes
+## Analyse de convergence pour les objectifs convexes
 
 L'analyse suivante de la convergence de la descente de gradient stochastique pour les fonctions objectifs convexes
 est facultative et sert principalement à transmettre plus d'intuition sur le problème.

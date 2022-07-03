@@ -253,7 +253,7 @@ tandis que 1 indique que les deux boîtes englobantes sont égales.
 
 Dans le reste de cette section, nous utiliserons IoU pour mesurer la similarité entre les boîtes d'ancrage et les boîtes de délimitation de la vérité du sol, ainsi qu'entre différentes boîtes d'ancrage.
 Étant donné deux listes de boîtes d'ancrage ou de boîtes englobantes,
-, le tableau suivant `box_iou` calcule leur IoU par paire
+le tableau suivant `box_iou` calcule leur IoU par paire
 sur ces deux listes.
 
 ```{.python .input}
@@ -329,7 +329,7 @@ Pour étiqueter une *boîte d'ancrage* générée,
 fait référence à l'emplacement et à la classe étiquetés
 de sa *boîte d'ancrage de terrain assignée* la plus proche de la boîte d'ancrage.
 Dans ce qui suit,
-, nous décrivons un algorithme permettant d'attribuer
+nous décrivons un algorithme permettant d'attribuer
 aux boîtes d'ancrage les boîtes limites les plus proches de la vérité du terrain. 
 
 ### [**Assigning Ground-Truth Bounding Boxes to Anchor Boxes**]
@@ -604,7 +604,7 @@ Analysons les étiquettes de classe renvoyées ci-dessous en fonction de la posi
 et des boîtes de délimitation de la vérité du sol dans l'image.
 Premièrement, parmi toutes les paires de boîtes d'ancrage
 et de boîtes limites de vérité,
-, l'IoU de la boîte d'ancrage $A_4$ et la boîte limite de vérité du chat sont les plus grandes. 
+l'IoU de la boîte d'ancrage $A_4$ et la boîte limite de vérité du chat sont les plus grandes. 
 Ainsi, la classe de $A_4$ est étiquetée comme étant le chat.
 Si l'on exclut les paires 
 contenant $A_4$ ou la boîte englobante de vérité du chat, parmi les autres 
@@ -612,9 +612,9 @@ contenant $A_4$ ou la boîte englobante de vérité du chat, parmi les autres
 La classe de $A_1$ est donc étiquetée comme étant celle du chien.
 Ensuite, nous devons parcourir les trois autres boîtes d'ancrage non étiquetées : $A_0$, $A_2$, et $A_3$.
 Pour $A_0$,
-, la classe de la boîte d'ancrage de vérité du sol avec le plus grand IoU est le chien,
+la classe de la boîte d'ancrage de vérité du sol avec le plus grand IoU est le chien,
 mais l'IoU est inférieur au seuil prédéfini (0.5),
-, la classe est donc étiquetée comme étant l'arrière-plan ;
+la classe est donc étiquetée comme étant l'arrière-plan ;
 pour $A_2$,
 la classe de la boîte englobante de vérité avec la plus grande IoU est le chat et l'IoU dépasse le seuil, la classe est donc étiquetée comme étant le chat ;
 pour $A_3$,
@@ -688,7 +688,7 @@ En désignant par $p$ la probabilité prédite la plus élevée,
 la classe correspondant à cette probabilité est la classe prédite pour $B$.
 Plus précisément, nous appelons $p$ la *confiance* (score) de la boîte englobante prédite $B$.
 Sur la même image,
-, toutes les boîtes englobantes sans arrière-plan prédites 
+toutes les boîtes englobantes sans arrière-plan prédites 
 sont triées par confiance en ordre décroissant
 pour générer une liste $L$.
 Ensuite, nous manipulons la liste triée $L$ selon les étapes suivantes :
@@ -821,7 +821,7 @@ Pour simplifier, nous supposons que les décalages prédits de
 sont tous des zéros.
 Cela signifie que les boîtes de délimitation prédites sont des boîtes d'ancrage. 
 Pour chaque classe parmi le fond, le chien et le chat,
-, nous définissons également sa vraisemblance prédite.
+nous définissons également sa vraisemblance prédite.
 
 ```{.python .input}
 #@tab all

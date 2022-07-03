@@ -111,7 +111,7 @@ nous supposons que les données de formation et les données de test
 sont tirées *indépendamment* de distributions *identiques*.
 C'est ce qu'on appelle communément l'hypothèse *IID*.
 Bien que cette hypothèse soit forte,
-, il convient de noter qu'en l'absence d'une telle hypothèse
+il convient de noter qu'en l'absence d'une telle hypothèse
 , nous serions dans le pétrin.
 Pourquoi devrions-nous croire que les données de formation
 échantillonnées à partir de la distribution $P(X,Y)$
@@ -264,7 +264,7 @@ est appelée l'erreur de validation *.
 ## Sous-adaptation ou sur-adaptation ?
 
 Lorsque nous comparons les erreurs d'apprentissage et de validation,
-, nous devons être attentifs à deux situations courantes.
+nous devons être attentifs à deux situations courantes.
 Tout d'abord, nous voulons faire attention aux cas
 où l'erreur d'apprentissage et l'erreur de validation sont toutes deux substantielles
 mais où il y a un petit écart entre elles.
@@ -290,7 +290,7 @@ pour réduire l'erreur de généralisation,
 et ne nous préoccupons de l'écart que dans la mesure où
 devient un obstacle à cette fin.
 Notez que si l'erreur de formation est nulle,
-, l'écart de généralisation est précisément égal à l'erreur de généralisation
+l'écart de généralisation est précisément égal à l'erreur de généralisation
 et nous ne pouvons progresser qu'en réduisant l'écart.
 
 ### Ajustement de courbes polynomiales
@@ -376,10 +376,10 @@ Le choix entre plusieurs modèles est judicieusement appelé
 En principe, nous ne devrions pas toucher à notre jeu de test
 avant d'avoir choisi tous nos hyperparamètres.
 Si nous utilisons les données de test dans le processus de sélection du modèle,
-, nous risquons de les surajuster.
+nous risquons de les surajuster.
 Nous aurions alors de sérieux problèmes.
 Si nous adaptons trop nos données d'apprentissage,
-, il y a toujours l'évaluation sur les données de test pour nous garder honnêtes.
+il y a toujours l'évaluation sur les données de test pour nous garder honnêtes.
 Mais si nous adaptons trop les données de test, comment le saurions-nous ?
 Voir :cite:`ong2005learning` pour voir comment
 cela peut conduire à des résultats absurdes, même pour les modèles dont la complexité

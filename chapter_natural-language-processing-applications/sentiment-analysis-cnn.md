@@ -1,42 +1,42 @@
-# Sentiment Analysis: Using Convolutional Neural Networks
-:label:`sec_sentiment_cnn` 
+# Analyse des sentiments : Avec des CNN
+:label:`sec_sentiment_cnn`
+
+ 
+ Dans :numref:`chap_cnn`,
+nous avons étudié les mécanismes
+de traitement
+des données d'images bidimensionnelles
+avec des CNN bidimensionnels,
+qui ont été appliqués à
+des caractéristiques locales telles que les pixels adjacents.
+Bien que conçus à l'origine
+pour la vision par ordinateur,
+les CNN sont également largement utilisés 
+pour le traitement du langage naturel.
+Pour faire simple,
+il suffit de considérer toute séquence de texte
+comme une image unidimensionnelle.
+De cette manière,
+CNN unidimensionnels
+peuvent traiter des caractéristiques locales
+telles que les $n$-grammes dans le texte.
+
+Dans cette section,
+nous utiliserons le modèle *textCNN*
+pour démontrer
+comment concevoir une architecture CNN
+pour représenter un texte unique :cite:`Kim.2014`.
+Par rapport à
+:numref:`fig_nlp-map-sa-rnn` 
+ qui utilise une architecture RNN avec un pré-entraînement GloVe
+pour l'analyse des sentiments,
+la seule différence dans :numref:`fig_nlp-map-sa-cnn` 
+réside dans
+le choix de l'architecture.
 
 
-In :numref:`chap_cnn`,
-we investigated mechanisms
-for processing
-two-dimensional image data
-with two-dimensional CNNs,
-which were applied to
-local features such as adjacent pixels.
-Though originally
-designed for computer vision,
-CNNs are also widely used
-for natural language processing.
-Simply put,
-just think of any text sequence
-as a one-dimensional image.
-In this way,
-one-dimensional CNNs
-can process local features
-such as $n$-grams in text.
-
-In this section,
-we will use the *textCNN* model
-to demonstrate
-how to design a CNN architecture
-for representing single text :cite:`Kim.2014`.
-Compared with
-:numref:`fig_nlp-map-sa-rnn`
-that uses an RNN architecture with GloVe pretraining
-for sentiment analysis,
-the only difference in :numref:`fig_nlp-map-sa-cnn`
-lies in
-the choice of the architecture.
-
-
-![This section feeds pretrained GloVe to a CNN-based architecture for sentiment analysis.](../img/nlp-map-sa-cnn.svg)
-:label:`fig_nlp-map-sa-cnn`
+![Cette section alimente GloVe pré-entraîné à une architecture basée sur CNN pour l'analyse des sentiments.](../img/nlp-map-sa-cnn.svg)
+:label:`fig_nlp-map-sa-cnn` 
 
 ```{.python .input}
 #@tab mxnet
@@ -58,35 +58,35 @@ from torch import nn
 batch_size = 64
 train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
 ```
+ 
+## Convolutions unidimensionnelles
 
-## One-Dimensional Convolutions
+Avant de présenter le modèle,
+voyons comment fonctionne une convolution unidimensionnelle.
+Gardez à l'esprit qu'il s'agit simplement d'un cas particulier
+d'une convolution bidimensionnelle
+basée sur l'opération de corrélation croisée.
 
-Before introducing the model,
-let's see how a one-dimensional convolution works.
-Bear in mind that it is just a special case
-of a two-dimensional convolution
-based on the cross-correlation operation.
+![Opération de corrélation croisée unidimensionnelle. Les parties ombrées sont le premier élément de sortie ainsi que les éléments tensoriels d'entrée et de noyau utilisés pour le calcul de la sortie: $0\times1+1\times2=2$.](../img/conv1d.svg)
+:label:`fig_conv1d` 
 
-![One-dimensional cross-correlation operation. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times1+1\times2=2$.](../img/conv1d.svg)
-:label:`fig_conv1d`
+ Comme indiqué dans :numref:`fig_conv1d`,
+dans le cas unidimensionnel,
+la fenêtre de convolution
+glisse de gauche à droite
+sur le tenseur d'entrée.
+Pendant le glissement,
+le sous-tenseur d'entrée (par exemple, $0$ et $1$ dans :numref:`fig_conv1d` ) contenu dans la fenêtre de convolution
+à une certaine position
+et le tenseur du noyau (par exemple, $1$ et $2$ dans :numref:`fig_conv1d` ) sont multipliés par éléments.
+La somme de ces multiplications
+donne la valeur scalaire unique (par exemple, $0\times1+1\times2=2$ dans :numref:`fig_conv1d` )
+à la position correspondante du tenseur de sortie.
 
-As shown in :numref:`fig_conv1d`,
-in the one-dimensional case,
-the convolution window
-slides from left to right
-across the input tensor.
-During sliding,
-the input subtensor (e.g., $0$ and $1$ in :numref:`fig_conv1d`) contained in the convolution window
-at a certain position
-and the kernel tensor (e.g., $1$ and $2$ in :numref:`fig_conv1d`) are multiplied elementwise.
-The sum of these multiplications
-gives the single scalar value (e.g., $0\times1+1\times2=2$ in :numref:`fig_conv1d`)
-at the corresponding position of the output tensor.
-
-We implement one-dimensional cross-correlation in the following `corr1d` function.
-Given an input tensor `X`
-and a kernel tensor `K`,
-it returns the output tensor `Y`.
+Nous implémentons la corrélation croisée unidimensionnelle dans la fonction suivante `corr1d`.
+Étant donné un tenseur d'entrée `X`
+et un tenseur de noyau `K`,
+elle renvoie le tenseur de sortie `Y`.
 
 ```{.python .input}
 #@tab all
@@ -98,7 +98,7 @@ def corr1d(X, K):
     return Y
 ```
 
-We can construct the input tensor `X` and the kernel tensor `K` from :numref:`fig_conv1d` to validate the output of the above one-dimensional cross-correlation implementation.
+Nous pouvons construire le tenseur d'entrée `X` et le tenseur noyau `K` à partir de :numref:`fig_conv1d` pour valider la sortie de l'implémentation de la corrélation croisée unidimensionnelle ci-dessus.
 
 ```{.python .input}
 #@tab all
@@ -106,22 +106,22 @@ X, K = d2l.tensor([0, 1, 2, 3, 4, 5, 6]), d2l.tensor([1, 2])
 corr1d(X, K)
 ```
 
-For any
-one-dimensional input with multiple channels,
-the convolution kernel
-needs to have the same number of input channels.
-Then for each channel,
-perform a cross-correlation operation on the one-dimensional tensor of the input and the one-dimensional tensor of the convolution kernel,
-summing the results over all the channels
-to produce the one-dimensional output tensor.
-:numref:`fig_conv1d_channel` shows a one-dimensional cross-correlation operation with 3 input channels.
+Pour toute entrée unidimensionnelle
+avec plusieurs canaux,
+le noyau de convolution
+doit avoir le même nombre de canaux d'entrée.
+Ensuite, pour chaque canal,
+effectue une opération de corrélation croisée sur le tenseur unidimensionnel de l'entrée et le tenseur unidimensionnel du noyau de convolution,
+en additionnant les résultats sur tous les canaux
+pour produire le tenseur de sortie unidimensionnel.
+:numref:`fig_conv1d_channel` montre une opération de corrélation croisée unidimensionnelle avec 3 canaux d'entrée.
 
-![One-dimensional cross-correlation operation with 3 input channels. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times1+1\times2+1\times3+2\times4+2\times(-1)+3\times(-3)=2$.](../img/conv1d-channel.svg)
-:label:`fig_conv1d_channel`
+!Opération de corrélation croisée unidimensionnelle avec 3 canaux d'entrée. Les parties ombragées sont le premier élément de sortie ainsi que les éléments du tenseur d'entrée et du noyau utilisés pour le calcul de la sortie: $0\times1+1\times2+1\times3+2\times4+2\times(-1)+3\times(-3)=2$.](../img/conv1d-channel.svg)
+:label:`fig_conv1d_channel` 
 
-
-We can implement the one-dimensional cross-correlation operation for multiple input channels
-and validate the results in :numref:`fig_conv1d_channel`.
+ 
+Nous pouvons mettre en œuvre l'opération de corrélation croisée unidimensionnelle pour plusieurs canaux d'entrée
+et valider les résultats dans :numref:`fig_conv1d_channel` .
 
 ```{.python .input}
 #@tab all
@@ -137,26 +137,26 @@ K = d2l.tensor([[1, 2], [3, 4], [-1, -3]])
 corr1d_multi_in(X, K)
 ```
 
-Note that
-multi-input-channel one-dimensional cross-correlations
-are equivalent
-to
-single-input-channel
-two-dimensional cross-correlations.
-To illustrate,
-an equivalent form of
-the multi-input-channel one-dimensional cross-correlation
-in :numref:`fig_conv1d_channel`
-is
-the
-single-input-channel
-two-dimensional cross-correlation
-in :numref:`fig_conv1d_2d`,
-where the height of the convolution kernel
-has to be the same as that of the input tensor.
+ Notez que
+les corrélations croisées unidimensionnelles à canaux d'entrée multiples
+sont équivalentes
+à
+les corrélations croisées bidimensionnelles à canal d'entrée unique
+.
+
+À titre d'exemple,
+est une forme équivalente de
+la corrélation croisée unidimensionnelle à canaux multiples
+dans :numref:`fig_conv1d_channel` 
+ est
+la corrélation croisée bidimensionnelle à canal unique
+
+ dans :numref:`fig_conv1d_2d` ,
+où la hauteur du noyau de convolution
+doit être la même que celle du tenseur d'entrée.
 
 
-![Two-dimensional cross-correlation operation with a single input channel. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $2\times(-1)+3\times(-3)+1\times3+2\times4+0\times1+1\times2=2$.](../img/conv1d-2d.svg)
+![Opération de corrélation croisée bidimensionnelle avec un seul canal d'entrée.)$ Les$![parties ombrées sont le premier élément de sortie ainsi que les éléments du tenseur d'entrée et du noyau utilisés pour le calcul de la sortie : $2\times(-1+3\times$)$(-3)+1\times3+2\times4+0\times1+1\times2=2.](../img/conv1d-2d.svg)
 :label:`fig_conv1d_2d` 
 
  Les sorties de :numref:`fig_conv1d` et :numref:`fig_conv1d_channel` n'ont qu'un seul canal.
@@ -210,7 +210,7 @@ en sortie comme suit :
 1. Transformer le vecteur concaténé en catégories de sortie en utilisant la couche entièrement connectée. Le Dropout peut être utilisé pour réduire l'overfitting.
 
 ![The model architecture of textCNN.](../img/textcnn.svg) 
- :label:`fig_conv1d_textcnn` 
+:label:`fig_conv1d_textcnn` 
 
  :numref:`fig_conv1d_textcnn` 
  illustre l'architecture du modèle textCNN
@@ -420,8 +420,8 @@ d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/393)
-:end_tab:
+:end_tab: 
 
-:begin_tab:`pytorch`
+ :begin_tab:`pytorch` 
 [Discussions](https://discuss.d2l.ai/t/1425)
 :end_tab:

@@ -217,7 +217,7 @@ qui mesuraient $32 \times 32$ pixels. Cela a été fait principalement pour
 En revanche, la deuxième couche convolutive renonce au remplissage,
 et donc la hauteur et la largeur sont toutes deux réduites de 4 pixels.
 À mesure que l'on monte dans la pile de couches,
-, le nombre de canaux augmente couche par couche
+le nombre de canaux augmente couche par couche
 , passant de 1 dans l'entrée à 6 après la première couche convolutive
 et à 16 après la deuxième couche convolutive.
 Cependant, chaque couche de mise en commun réduit de moitié la hauteur et la largeur.

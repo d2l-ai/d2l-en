@@ -52,7 +52,7 @@ Par conséquent, les valeurs des trois portes
 sont comprises entre $(0, 1)$.
 
 ![Computing the input gate, the forget gate, and the output gate in an LSTM model.](../img/lstm-0.svg) 
- :label:`fig_lstm_0` 
+:label:`fig_lstm_0` 
 
  Mathématiquement,
 supposons qu'il y ait $h$ unités cachées, que la taille du lot soit $n$, et que le nombre d'entrées soit $d$.

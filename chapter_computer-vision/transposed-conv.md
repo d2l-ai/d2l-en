@@ -1,32 +1,32 @@
 # Transposed Convolution
 :label:`sec_transposed_conv`
 
-The CNN layers we have seen so far,
-such as convolutional layers (:numref:`sec_conv_layer`) and pooling layers (:numref:`sec_pooling`),
-typically reduce (downsample) the spatial dimensions (height and width) of the input,
-or keep them unchanged.
-In semantic segmentation
-that classifies at pixel-level,
-it will be convenient if
-the spatial dimensions of the
-input and output are the same.
-For example,
-the channel dimension at one output pixel 
-can hold the classification results
-for the input pixel at the same spatial position.
+Les couches CNN que nous avons vues jusqu'à présent,
+comme les couches convolutionnelles (:numref:`sec_conv_layer`) et les couches de pooling (:numref:`sec_pooling`),
+réduisent typiquement (downsample) les dimensions spatiales (hauteur et largeur) de l'entrée,
+ou les gardent inchangées.
+Dans la segmentation sémantique
+qui classifie au niveau du pixel,
+il sera pratique si
+les dimensions spatiales de l'entrée
+entrée et de la sortie sont les mêmes.
+Par exemple
+la dimension du canal à un pixel de sortie 
+peut contenir les résultats de la classification
+pour le pixel d'entrée à la même position spatiale.
 
 
-To achieve this, especially after 
-the spatial dimensions are reduced by CNN layers,
-we can use another type
-of CNN layers
-that can increase (upsample) the spatial dimensions
-of intermediate feature maps.
-In this section,
-we will introduce 
-*transposed convolution*, which is also called *fractionally-strided convolution* :cite:`Dumoulin.Visin.2016`, 
-for reversing downsampling operations
-by the convolution.
+Pour y parvenir, surtout après 
+les dimensions spatiales sont réduites par les couches CNN,
+nous pouvons utiliser un autre type
+de couches CNN
+qui peuvent augmenter (upsample) les dimensions spatiales
+des cartes de caractéristiques intermédiaires.
+Dans cette section,
+nous allons introduire 
+la *convolution transposée*, qui est aussi appelée *convolution à stries fractionnées* :cite:`Dumoulin.Visin.2016`, 
+pour inverser les opérations de déséchantillonnage
+par la convolution.
 
 ```{.python .input}
 #@tab mxnet
@@ -44,47 +44,47 @@ from torch import nn
 from d2l import torch as d2l
 ```
 
-## Basic Operation
+## Opération basique
 
-Ignoring channels for now,
-let's begin with
-the basic transposed convolution operation
-with stride of 1 and no padding.
-Suppose that
-we are given a 
-$n_h \times n_w$ input tensor
-and a $k_h \times k_w$ kernel.
-Sliding the kernel window with stride of 1
-for $n_w$ times in each row
-and $n_h$ times in each column
-yields 
-a total of $n_h n_w$ intermediate results.
-Each intermediate result is
-a $(n_h + k_h - 1) \times (n_w + k_w - 1)$
-tensor that are initialized as zeros.
-To compute each intermediate tensor,
-each element in the input tensor
-is multiplied by the kernel
-so that the resulting $k_h \times k_w$ tensor
-replaces a portion in
-each intermediate tensor.
-Note that
-the position of the replaced portion in each
-intermediate tensor corresponds to the position of the element
-in the input tensor used for the computation.
-In the end, all the intermediate results
-are summed over to produce the output.
+Ignorant les chaînes pour l'instant,
+commençons par
+l'opération de convolution transposée de base
+avec un stride de 1 et sans padding.
+Supposons que
+on nous donne un 
+$n_h \times n_w$ tenseur d'entrée
+et un noyau de $k_h \times k_w$.
+On fait glisser la fenêtre du noyau avec un pas de 1
+pour $n_w$ fois dans chaque ligne
+et $n_h$ fois dans chaque colonne
+donne 
+un total de $n_h n_w$ résultats intermédiaires.
+Chaque résultat intermédiaire est
+un tenseur $(n_h + k_h - 1) \times (n_w + k_w - 1)$.
+qui sont initialisés comme des zéros.
+Pour calculer chaque tenseur intermédiaire,
+chaque élément du tenseur d'entrée
+est multiplié par le noyau
+de sorte que le tenseur $k_h \times k_w$ résultant
+remplace une partie dans
+chaque tenseur intermédiaire.
+Notez que
+la position de la partie remplacée dans chaque
+dans chaque tenseur intermédiaire correspond à la position de l'élément
+dans le tenseur d'entrée utilisé pour le calcul.
+A la fin, tous les résultats intermédiaires
+sont additionnés pour produire la sortie.
 
-As an example,
-:numref:`fig_trans_conv` illustrates
-how transposed convolution with a $2\times 2$ kernel is computed for a $2\times 2$ input tensor.
+A titre d'exemple,
+:numref:`fig_trans_conv` illustre
+comment la convolution transposée avec un noyau de $2\times 2$ est calculée pour un tenseur d'entrée de $2\times 2$.
 
 
-![Transposed convolution with a $2\times 2$ kernel. The shaded portions are a portion of an intermediate tensor as well as the input and kernel tensor elements used for the  computation.](../img/trans_conv.svg)
+![Convolution transposée avec un noyau de $2\times 2$. Les parties ombrées sont une partie d'un tenseur intermédiaire ainsi que les éléments du tenseur d'entrée et du noyau utilisés pour le calcul.](../img/trans_conv.svg)
 :label:`fig_trans_conv`
 
 
-We can (**implement this basic transposed convolution operation**) `trans_conv` for a input matrix `X` and a kernel matrix `K`.
+Nous pouvons (**implémenter cette opération de convolution transposée de base**) `trans_conv` pour une matrice d'entrée `X` et une matrice noyau `K`.
 
 ```{.python .input}
 #@tab all
@@ -97,14 +97,14 @@ def trans_conv(X, K):
     return Y
 ```
 
-In contrast to the regular convolution (in :numref:`sec_conv_layer`) that *reduces* input elements
-via the kernel,
-the transposed convolution
-*broadcasts* input elements 
-via the kernel, thereby
-producing an output
-that is larger than the input.
-We can construct the input tensor `X` and the kernel tensor `K` from :numref:`fig_trans_conv` to [**validate the output of the above implementation**] of the basic two-dimensional transposed convolution operation.
+Contrairement à la convolution régulière (dans :numref:`sec_conv_layer`) qui *réduit* les éléments d'entrée
+via le noyau,
+la convolution transposée
+*diffuse* les éléments d'entrée 
+via le noyau, produisant ainsi
+produisant ainsi une sortie
+qui est plus grande que l'entrée.
+Nous pouvons construire le tenseur d'entrée `X` et le tenseur du noyau `K` à partir de :numref:`fig_trans_conv` pour [**valider la sortie de l'implémentation ci-dessus**] de l'opération de base de convolution transposée bidimensionnelle.
 
 ```{.python .input}
 #@tab all
@@ -113,10 +113,10 @@ K = d2l.tensor([[0.0, 1.0], [2.0, 3.0]])
 trans_conv(X, K)
 ```
 
-Alternatively,
-when the input `X` and kernel `K` are both
-four-dimensional tensors,
-we can [**use high-level APIs to obtain the same results**].
+Alternativement,
+lorsque l'entrée `X` et le noyau `K` sont tous deux
+tenseurs à quatre dimensions,
+on peut [**utiliser des API de haut niveau pour obtenir les mêmes résultats**].
 
 ```{.python .input}
 #@tab mxnet
@@ -136,16 +136,16 @@ tconv(X)
 
 ## [**Padding, Strides, and Multiple Channels**]
 
-Different from in the regular convolution
-where padding is applied to input,
-it is applied to output
-in the transposed convolution.
-For example,
-when specifying the padding number
-on either side of the height and width 
-as 1,
-the first and last rows and columns
-will be removed from the transposed convolution output.
+Différent de la convolution régulière
+où le remplissage est appliqué à l'entrée,
+il est appliqué à la sortie
+dans la convolution transposée.
+Par exemple
+en spécifiant le nombre de remplissage
+de part et d'autre de la hauteur et de la largeur 
+comme 1,
+les première et dernière lignes et colonnes
+seront supprimées de la sortie de la convolution transposée.
 
 ```{.python .input}
 #@tab mxnet
@@ -171,7 +171,7 @@ des tenseurs intermédiaires, donc le tenseur de sortie
 dans :numref:`fig_trans_conv_stride2` .
 
 
-![Transposed convolution with a $2\times 2$ kernel with stride of 2. The shaded portions are a portion of an intermediate tensor as well as the input and kernel tensor elements used for the  computation.](../img/trans_conv_stride2.svg)
+![Convolution transposée avec un noyau de $2\times 2$ avec un stride de 2. Les parties ombrées sont une partie d'un tenseur intermédiaire ainsi que les éléments du tenseur d'entrée et du noyau utilisés pour le calcul.](../img/trans_conv_stride2.svg)
 :label:`fig_trans_conv_stride2`
 
 

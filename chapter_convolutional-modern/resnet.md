@@ -65,13 +65,13 @@ construire des réseaux neuronaux profonds.
  Concentrons-nous sur une partie locale d'un réseau neuronal, comme illustré dans :numref:`fig_residual_block` . Désignons l'entrée par $\mathbf{x}$.
 Nous supposons que la cartographie sous-jacente souhaitée que nous voulons obtenir par apprentissage est $f(\mathbf{x})$, et qu'elle sera utilisée comme entrée de la fonction d'activation en haut.
 À gauche,
-, la partie située dans la boîte en pointillés
+la partie située dans la boîte en pointillés
 doit apprendre directement le mappage $f(\mathbf{x})$.
 À droite,
-, la partie située dans la boîte en pointillés
+la partie située dans la boîte en pointillés
 doit
 apprendre le mappage *résiduel* $f(\mathbf{x}) - \mathbf{x}$,
-, d'où le nom du bloc résiduel.
+d'où le nom du bloc résiduel.
 Si la cartographie d'identité $f(\mathbf{x}) = \mathbf{x}$ est la cartographie sous-jacente souhaitée,
 la cartographie résiduelle est plus facile à apprendre :
 il suffit de mettre à zéro les poids et les biais
@@ -336,7 +336,7 @@ Il y a 4 couches convolutives dans chaque module (à l'exception de la couche co
 En configurant différents nombres de canaux et de blocs résiduels dans le module, nous pouvons créer différents modèles ResNet, tels que le plus profond ResNet-152 à 152 couches. Bien que l'architecture principale de ResNet soit similaire à celle de GoogLeNet, la structure de ResNet est plus simple et plus facile à modifier. Tous ces facteurs ont permis l'utilisation rapide et répandue de ResNet. :numref:`fig_resnet18` représente le ResNet-18 complet.
 
 ![The ResNet-18 architecture.](../img/resnet18.svg) 
- :label:`fig_resnet18` 
+:label:`fig_resnet18` 
 
  Avant d'entraîner ResNet, observons [**comment la forme de l'entrée change à travers les différents modules de ResNet**]. Comme dans toutes les architectures précédentes, la résolution diminue tandis que le nombre de canaux augmente jusqu'au point où une couche de mise en commun de la moyenne globale agrège toutes les caractéristiques.
 

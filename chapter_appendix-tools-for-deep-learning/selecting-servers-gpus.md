@@ -52,7 +52,7 @@ Nous pouvons constater un certain nombre de choses :
 3. Pour la série RTX 2000, la performance (en GFLOPs) est une fonction *affine* du prix.
 
 ![Floating-point compute power and energy consumption. ](../img/wattvsprice.svg) 
- :label:`fig_wattvsprice` 
+:label:`fig_wattvsprice` 
 
  
  :numref:`fig_wattvsprice` montre comment la consommation d'énergie évolue de façon linéaire avec la quantité de calculs. Deuxièmement, les générations ultérieures sont plus efficaces. Cela semble être contredit par le graphique correspondant à la série RTX 2000. Cependant, c'est une conséquence des TensorCores qui consomment une quantité disproportionnée d'énergie.

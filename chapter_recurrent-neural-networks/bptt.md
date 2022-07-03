@@ -145,7 +145,7 @@ $$\frac{\partial h_t}{\partial w_h}=\frac{\partial f(x_{t},h_{t-1},w_h)}{\partia
 
  Bien que nous puissions utiliser la règle de la chaîne pour calculer $\partial h_t/\partial w_h$ de manière récursive, cette chaîne peut devenir très longue lorsque $t$ est grand. Examinons un certain nombre de stratégies pour résoudre ce problème.
 
-### Calcul complet ### 
+### Calcul complet### 
 
 Évidemment,
 nous pouvons simplement calculer la somme complète dans
@@ -170,7 +170,7 @@ $\partial h_{t-\tau}/\partial w_h$ .
 En pratique, cela fonctionne assez bien. C'est ce que l'on appelle communément la rétropropagation tronquée dans le temps :cite:`Jaeger.2002` .
 L'une des conséquences de cette méthode est que le modèle se concentre principalement sur l'influence à court terme plutôt que sur les conséquences à long terme. C'est en fait *souhaitable*, car cela oriente l'estimation vers des modèles plus simples et plus stables.
 
-### Troncature aléatoire ### 
+### Troncature aléatoire### 
 
 Enfin, nous pouvons remplacer $\partial h_t/\partial w_h$
  par une variable aléatoire qui est correcte dans l'attente mais qui tronque la séquence.
@@ -195,7 +195,7 @@ Cette idée a été proposée par Tallec et Ollivier
 ### Comparaison des stratégies
 
 ![Comparing strategies for computing gradients in RNNs. From top to bottom: randomized truncation, regular truncation, and full computation.](../img/truncated-bptt.svg) 
- :label:`fig_truncated_bptt` 
+:label:`fig_truncated_bptt` 
 
  
  :numref:`fig_truncated_bptt` illustre les trois stratégies lors de l'analyse des premiers caractères du livre *The Time Machine* en utilisant la rétropropagation dans le temps pour les RNN :
@@ -228,7 +228,7 @@ dont la fonction d'activation
  dans la couche cachée
 utilise la correspondance d'identité ($\phi(x)=x$).
 Pour le pas de temps $t$,
-, l'entrée et la cible de l'exemple unique sont respectivement
+l'entrée et la cible de l'exemple unique sont respectivement
 $\mathbf{x}_t \in \mathbb{R}^d$ et $y_t$. 
 L'état caché $\mathbf{h}_t \in \mathbb{R}^h$ 
  et la sortie $\mathbf{o}_t \in \mathbb{R}^q$

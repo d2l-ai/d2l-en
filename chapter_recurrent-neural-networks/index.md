@@ -76,7 +76,7 @@ sont partagés entre les pas de temps.
 
 
 À l'instar des réseaux neuronaux au sens large,
-, les RNN ont une longue histoire qui s'étend sur plusieurs disciplines,
+les RNN ont une longue histoire qui s'étend sur plusieurs disciplines,
 ayant pour origine les modèles du cerveau popularisés
 par les spécialistes des sciences cognitives et adoptés par la suite
 comme outils de modélisation pratiques employés 

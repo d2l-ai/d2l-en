@@ -142,13 +142,13 @@ et ajoute un biais scalaire pour produire une sortie.
 Les deux paramètres d'une couche convolutive
 sont le noyau et le biais scalaire.
 Lors de la formation de modèles basés sur des couches convolutionnelles,
-, nous initialisons généralement les noyaux de manière aléatoire,
+nous initialisons généralement les noyaux de manière aléatoire,
 comme nous le ferions avec une couche entièrement connectée.
 
 Nous sommes maintenant prêts à [**implémenter une couche convolutionnelle bidimensionnelle**]
 basée sur la fonction `corr2d` définie ci-dessus.
 Dans la méthode du constructeur `__init__`,
-, nous déclarons `weight` et `bias` comme étant les deux paramètres du modèle.
+nous déclarons `weight` et `bias` comme étant les deux paramètres du modèle.
 La fonction de propagation avant
 appelle la fonction `corr2d` et ajoute le biais.
 

@@ -4,7 +4,7 @@
  
  Dans :numref:`sec_language-model` nous avons décrit des modèles de Markov et $n$-grammes pour la modélisation du langage, où la probabilité conditionnelle d'un token $x_t$ au pas de temps $t$ ne dépend que des $n-1$ tokens précédents.
 Si nous voulons intégrer l'effet possible des jetons antérieurs à l'étape temporelle $t-(n-1)$ sur $x_t$,
-, nous devons augmenter $n$.
+nous devons augmenter $n$.
 Cependant, le nombre de paramètres du modèle augmenterait également de manière exponentielle, car nous devons stocker les numéros de $|\mathcal{V}|^n$ pour un ensemble de vocabulaire $\mathcal{V}$.
 Par conséquent, plutôt que de modéliser $P(x_t \mid x_{t-1}, \ldots, x_{t-n+1})$, il est préférable d'utiliser un modèle à variables latentes :
 
@@ -71,7 +71,7 @@ $$\mathbf{H}_t = \phi(\mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1} \mathbf{W}
  Par rapport à :eqref:`rnn_h_without_state` , :eqref:`rnn_h_with_state` ajoute un terme supplémentaire $\mathbf{H}_{t-1} \mathbf{W}_{hh}$ et donc
 instancie :eqref:`eq_ht_xt` .
 D'après la relation entre les sorties de couche cachée $\mathbf{H}_t$ et $\mathbf{H}_{t-1}$ des pas de temps adjacents,
-, nous savons que ces variables ont capturé et conservé les informations historiques de la séquence jusqu'à leur pas de temps actuel, tout comme l'état ou la mémoire du pas de temps actuel du réseau neuronal. Par conséquent, une telle sortie de couche cachée est appelée un *état caché*.
+nous savons que ces variables ont capturé et conservé les informations historiques de la séquence jusqu'à leur pas de temps actuel, tout comme l'état ou la mémoire du pas de temps actuel du réseau neuronal. Par conséquent, une telle sortie de couche cachée est appelée un *état caché*.
 Comme l'état caché utilise la même définition du pas de temps précédent dans le pas de temps actuel, le calcul de :eqref:`rnn_h_with_state` est *récurrent*. Par conséquent, comme nous l'avons dit, les réseaux neuronaux à états cachés
 basés sur le calcul récurrent sont appelés
 *réseaux neuronaux récurrents*.
@@ -205,7 +205,7 @@ et considérons un modèle de langage au niveau des caractères *.
 :label:`fig_rnn_train`
 
 Au cours du processus de formation,
-, nous exécutons une opération softmax sur la sortie de la couche de sortie pour chaque pas de temps, puis nous utilisons la perte d'entropie croisée pour calculer l'erreur entre la sortie du modèle et la cible.
+nous exécutons une opération softmax sur la sortie de la couche de sortie pour chaque pas de temps, puis nous utilisons la perte d'entropie croisée pour calculer l'erreur entre la sortie du modèle et la cible.
 En raison du calcul récurrent de l'état caché dans la couche cachée, la sortie du pas de temps 3 dans :numref:`fig_rnn_train` ,
 $\mathbf{O}_3$ , est déterminée par la séquence de texte "m", "a" et "c". Comme le caractère suivant de la séquence dans les données d'apprentissage est "h", la perte de l'étape temporelle 3 dépendra de la distribution de probabilité du caractère suivant généré sur la base de la séquence de caractéristiques "m", "a", "c" et de la cible "h" de cette étape temporelle.
 

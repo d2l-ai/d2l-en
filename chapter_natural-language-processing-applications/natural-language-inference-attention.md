@@ -20,7 +20,7 @@ l'alignement des tokens entre les prémisses et les hypothèses
 peut être accompli de manière simple par les mécanismes d'attention.
 
 ![Natural language inference using attention mechanisms.](../img/nli-attention.svg) 
- :label:`fig_nli_attention` 
+:label:`fig_nli_attention` 
 
  :numref:`fig_nli_attention` décrit la méthode d'inférence en langage naturel utilisant les mécanismes d'attention.
 À un niveau élevé, elle se compose de trois étapes entraînées conjointement : l'attention, la comparaison et l'agrégation.

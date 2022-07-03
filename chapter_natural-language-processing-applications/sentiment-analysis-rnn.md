@@ -23,7 +23,7 @@ qui sera
 transformée en résultats d'analyse de sentiment 
  :cite:`Maas.Daly.Pham.ea.2011` .
 Pour la même application en aval,
-, nous envisagerons plus tard un choix architectural différent
+nous envisagerons plus tard un choix architectural différent
 .
 
 ![This section feeds pretrained GloVe to an RNN-based architecture for sentiment analysis.](../img/nlp-map-sa-rnn.svg)

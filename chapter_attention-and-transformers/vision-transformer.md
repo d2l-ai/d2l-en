@@ -61,7 +61,7 @@ Le codeur transformateur multicouche
 transforme les vecteurs d'entrée $m+1$
  en une même quantité de représentations vectorielles de sortie de même longueur.
 Il fonctionne exactement de la même manière que le codeur transformateur original dans :numref:`fig_transformer` ,
-, à la seule différence de la position de normalisation.
+à la seule différence de la position de normalisation.
 Puisque le jeton "&lt;cls&gt;" s'occupe de tous les patchs de l'image par auto-attention (voir :numref:`fig_cnn-rnn-self-attention` ),
 sa représentation de la sortie du codeur transformateur
 sera transformée en étiquette de sortie.

@@ -110,7 +110,7 @@ vous pouvez ouvrir un terminal sur l'instance SageMaker (:numref:`fig_sagemaker-
 Les notebooks de ce livre open-source seront régulièrement mis à jour dans le dépôt [d2l-ai/d2l-tensorflow-sagemaker](https://github.com/d2l-ai/d2l-tensorflow-sagemaker)
  sur GitHub.
 Pour mettre à jour la dernière version,
-, vous pouvez ouvrir un terminal sur l'instance SageMaker (:numref:`fig_sagemaker-terminal` ).
+vous pouvez ouvrir un terminal sur l'instance SageMaker (:numref:`fig_sagemaker-terminal` ).
 :end_tab:
 
 

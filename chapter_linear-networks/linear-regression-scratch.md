@@ -349,7 +349,7 @@ def fit_epoch(self):
 ```
 
 Nous sommes presque prêts à entraîner le modèle,
-, mais nous avons d'abord besoin de données pour l'entraînement.
+mais nous avons d'abord besoin de données pour l'entraînement.
 Ici, nous utilisons la classe `SyntheticRegressionData` 
  et nous lui passons quelques paramètres de base.
 Ensuite, nous entraînons notre modèle avec 

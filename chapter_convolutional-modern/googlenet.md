@@ -6,38 +6,38 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Multi-Branch Networks  (GoogLeNet)
 :label:`sec_googlenet`
 
-In 2014, *GoogLeNet*
-won the ImageNet Challenge :cite:`Szegedy.Liu.Jia.ea.2015`, using a structure
-that combined the strengths of NiN :cite:`Lin.Chen.Yan.2013`, repeated blocks :cite:`Simonyan.Zisserman.2014`,
-and a cocktail of convolution kernels. It is arguably also the first network that exhibits a clear distinction among the stem, body, and head in a CNN. This design pattern has persisted ever since in the design of deep networks: the *stem* is given by the first 2-3 convolutions that operate on the image. They extract low-level features from the underlying images. This is followed by a *body* of convolutional blocks. Finally, the *head* maps the features obtained so far to the required classification, segmentation, detection, or tracking problem at hand.
+En 2014, *GoogLeNet*
+a remporté le défi ImageNet :cite:`Szegedy.Liu.Jia.ea.2015`, en utilisant une structure
+qui combinait les forces de *NiN* :cite:`Lin.Chen.Yan.2013`, des blocs répétés :cite:`Simonyan.Zisserman.2014`,
+et un cocktail de noyaux de convolution. C'est sans doute aussi le premier réseau qui présente une distinction claire entre la tige, le corps et la tête d'un CNN. Ce modèle de conception a persisté depuis lors dans la conception des réseaux profonds : la *tige* est donnée par les 2-3 premières convolutions qui opèrent sur l'image. Elles extraient des caractéristiques de bas niveau des images sous-jacentes. Vient ensuite un *corps* de blocs convolutifs. Enfin, la *tête* associe les caractéristiques obtenues jusqu'alors au problème de classification, de segmentation, de détection ou de suivi à résoudre.
 
-The key contribution in GoogLeNet was the design of the network body. It solved the problem of selecting
-convolution kernels in an ingenious way. While other works tried to identify which convolution, ranging from $1 \times 1$ to $11 \times 11$ would be best, it simply *concatenated* multi-branch convolutions.
-In what follows we introduce a slightly simplified version of GoogLeNet. The simplifications are due to the fact that  tricks to stabilize training, in particular intermediate loss functions, are no longer needed due to the availability of improved training algorithms.
+La principale contribution de GoogLeNet a été la conception du corps du réseau. Il a résolu le problème de la sélection
+de sélection des noyaux de convolution d'une manière ingénieuse. Alors que d'autres travaux ont essayé d'identifier quelle convolution, allant de 1 \times 1$ à 11 \times 11$ serait la meilleure, il a simplement *concaténé* des convolutions multi-branches.
+Dans ce qui suit, nous présentons une version légèrement simplifiée de GoogLeNet. Les simplifications sont dues au fait que les astuces pour stabiliser l'apprentissage, en particulier les fonctions de perte intermédiaires, ne sont plus nécessaires en raison de la disponibilité d'algorithmes d'apprentissage améliorés.
 
 ## (**Inception Blocks**)
 
-The basic convolutional block in GoogLeNet is called an *Inception block*,
-stemming from the meme "we need to go deeper" of the movie *Inception*.
-
+Le bloc convolutif de base de GoogLeNet s'appelle un *Inception Block*,
+qui vient du mème "we need to go deeper" du film *Inception*.
 ![Structure of the Inception block.](../img/inception.svg)
+
 :label:`fig_inception`
 
-As depicted in :numref:`fig_inception`,
-the inception block consists of four parallel branches.
-The first three branches use convolutional layers
-with window sizes of $1\times 1$, $3\times 3$, and $5\times 5$
-to extract information from different spatial sizes.
-The middle two branches also add a $1\times 1$ convolution of the input
-to reduce the number of channels, reducing the model's complexity.
-The fourth branch uses a $3\times 3$ max-pooling layer,
-followed by a $1\times 1$ convolutional layer
-to change the number of channels.
-The four branches all use appropriate padding to give the input and output the same height and width.
-Finally, the outputs along each branch are concatenated
-along the channel dimension and comprise the block's output.
-The commonly-tuned hyperparameters of the Inception block
-are the number of output channels per layer.
+Comme indiqué dans :numref:`fig_inception`,
+le bloc d'inception est constitué de quatre branches parallèles.
+Les trois premières branches utilisent des couches convolutionnelles
+avec des fenêtres de 1$, 3$ et 5$.
+pour extraire des informations de différentes tailles spatiales.
+Les deux branches du milieu ajoutent également une convolution de l'entrée de 1$ fois 1$ pour réduire le nombre de canaux.
+pour réduire le nombre de canaux, ce qui réduit la complexité du modèle.
+La quatrième branche utilise une couche de max-pooling de $3\times 3$,
+suivie d'une couche convolutive de 1$\times 1$.
+pour modifier le nombre de canaux.
+Les quatre branches utilisent toutes un remplissage approprié pour que l'entrée et la sortie aient la même hauteur et la même largeur.
+Enfin, les sorties le long de chaque branche sont concaténées
+le long de la dimension du canal et constituent la sortie du bloc.
+Les hyperparamètres couramment utilisés pour le bloc Inception
+sont le nombre de canaux de sortie par couche.
 
 ```{.python .input}
 %%tab mxnet
@@ -130,27 +130,27 @@ class Inception(tf.keras.Model):
         return tf.keras.layers.Concatenate()([b1, b2, b3, b4])
 ```
 
-To gain some intuition for why this network works so well,
-consider the combination of the filters.
-They explore the image in a variety of filter sizes.
-This means that details at different extents
-can be recognized efficiently by filters of different sizes.
-At the same time, we can allocate different amounts of parameters
-for different filters.
+Pour avoir une idée de la raison pour laquelle ce réseau fonctionne si bien,
+considérez la combinaison des filtres.
+Ils explorent l'image dans une variété de tailles de filtres.
+Cela signifie que les détails à différentes étendues
+peuvent être reconnus efficacement par des filtres de différentes tailles.
+En même temps, nous pouvons allouer différentes quantités de paramètres
+aux différents filtres.
 
 
 ## [**GoogLeNet Model**]
 
-As shown in :numref:`fig_inception_full`, GoogLeNet uses a stack of a total of 9 inception blocks, arranged into 3 groups with max-pooling in between,
-and global average pooling in its head to generate its estimates.
-Max-pooling between inception blocks reduces the dimensionality.
-At its stem, the first module is similar to AlexNet and LeNet.
+Comme le montre :numref:`fig_inception_full`, GoogLeNet utilise une pile d'un total de 9 blocs d'inception, disposés en 3 groupes avec un max-pooling entre les deux,
+et un pooling moyen global dans sa tête pour générer ses estimations.
+Le max-pooling entre les blocs de départ réduit la dimensionnalité.
+À sa base, le premier module est similaire à AlexNet et LeNet.
 
-![The GoogLeNet architecture.](../img/inception-full.svg)
+![L'architecture de GoogLeNet.](../img/inception-full.svg)
 :label:`fig_inception_full`
 
-We can now implement GoogLeNet piece by piece. Let's begin with the stem.
-The first module uses a 64-channel $7\times 7$ convolutional layer.
+Nous pouvons maintenant implémenter GoogLeNet morceau par morceau. Commençons par la tige.
+Le premier module utilise une couche convolutive à 64 canaux de $7\times 7$.
 
 ```{.python .input}
 %%tab all

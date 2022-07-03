@@ -191,7 +191,7 @@ GloVe les additionne en tant que vecteur de sortie.
  Nous pouvons également interpréter le modèle GloVe d'un autre point de vue. 
 En utilisant la même notation que dans 
 :numref:`subsec_skipgram-global` ,
-, laissez $p_{ij} \stackrel{\mathrm{def}}{=} P(w_j \mid w_i)$ être la probabilité conditionnelle de générer le mot contextuel $w_j$ étant donné $w_i$ comme mot central dans le corpus. 
+laissez $p_{ij} \stackrel{\mathrm{def}}{=} P(w_j \mid w_i)$ être la probabilité conditionnelle de générer le mot contextuel $w_j$ étant donné $w_i$ comme mot central dans le corpus. 
 :numref:`tab_glove`
 liste plusieurs probabilités de cooccurrence
 avec les mots "ice" et "steam"
@@ -245,7 +245,7 @@ $f$ soit une fonction scalaire, telle que
 $f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) = f\left((\mathbf{u}_j - \mathbf{u}_k)^\top {\mathbf{v}}_i\right)$ . 
 En permutant les indices de mots
 $j$ et $k$ dans :eqref:`eq_glove-f` ,
-, il faut que
+il faut que
 $f(x)f(-x)=1$ ,
 donc une possibilité est $f(x)=\exp(x)$,
 c'est-à-dire 

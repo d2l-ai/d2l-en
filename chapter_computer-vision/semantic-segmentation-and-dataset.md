@@ -235,7 +235,7 @@ Dans les expériences précédentes
 les images sont redimensionnées
 pour s'adapter à la forme d'entrée requise par le modèle.
 Cependant, dans le cadre de la segmentation sémantique,
-, cette opération
+cette opération
 nécessite de redimensionner les classes de pixels prédites
 pour les ramener à la forme originale de l'image d'entrée.
 Une telle remise à l'échelle peut être inexacte,

@@ -176,7 +176,7 @@ peut être parallèle à $\mathcal{O}(1)$ opérations séquentielles
 et la longueur maximale du chemin est également $\mathcal{O}(1)$.
 
 Dans l'ensemble,
-, les CNN et l'auto-attention bénéficient tous deux d'un calcul parallèle
+les CNN et l'auto-attention bénéficient tous deux d'un calcul parallèle
 et l'auto-attention présente la longueur de chemin maximale la plus courte.
 Cependant, la complexité de calcul quadratique par rapport à la longueur de la séquence
 rend l'auto-attention prohibitivement lente pour les très longues séquences.

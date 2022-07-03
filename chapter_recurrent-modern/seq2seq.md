@@ -48,13 +48,13 @@ marque la fin de la séquence.
 Le modèle peut arrêter de faire des prédictions
 une fois que ce jeton est généré.
 Au premier pas de temps du décodeur RNN,
-, deux décisions de conception particulières sont prises.
+deux décisions de conception particulières sont prises.
 Premièrement, le jeton spécial de début de séquence "&lt;bos&gt;" est une entrée.
 Deuxièmement,
 l'état caché final de l'encodeur RNN est utilisé
 pour initier l'état caché du décodeur.
 Dans des conceptions telles que :cite:`Sutskever.Vinyals.Le.2014` ,
-, c'est exactement
+c'est exactement
 la façon dont les informations de la séquence d'entrée codée
 sont introduites dans le décodeur pour générer la séquence de sortie (cible).
 Dans d'autres modèles tels que :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014` ,
@@ -98,7 +98,7 @@ comme entrée actuelle du décodeur.
 
 
 Dans la suite de cet article,
-, nous expliquerons plus en détail la conception de :numref:`fig_seq2seq` 
+nous expliquerons plus en détail la conception de :numref:`fig_seq2seq` 
  .
 Nous entraînerons ce modèle pour la traduction automatique
 sur le jeu de données anglais-français tel qu'il est présenté dans
@@ -618,7 +618,7 @@ Nous pouvons évaluer une séquence prédite
 en la comparant à la séquence d'étiquettes
 (la vérité du terrain).
 Le test BLEU (Bilingual Evaluation Understudy),
-, bien qu'initialement proposé pour évaluer les résultats de la traduction automatique
+bien qu'initialement proposé pour évaluer les résultats de la traduction automatique
  :cite:`Papineni.Roukos.Ward.ea.2002` ,
 a été largement utilisé pour mesurer
 la qualité des séquences de sortie pour différentes applications.

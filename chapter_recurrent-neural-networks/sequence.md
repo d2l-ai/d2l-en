@@ -1,366 +1,366 @@
 # Working with Sequences
-:label:`sec_sequence`
+:label:`sec_sequence` 
 
 
 
-Up until now, we've focused on models whose inputs 
-consisted of a single feature vector $\mathbf{x} \in \mathbb{R}^d$.
-The main change of perspective when developing models
-capable of processing sequences is that we now 
-focus on inputs that consist of an ordered list 
-of feature vectors $\mathbf{x}_1, \dots, \mathbf{x}_T$,
-where each feature vector $x_t$
-indexed by a sequence step $t \in \mathbb{Z}^+$
-lies in $\mathbb{R}^d$.
+Jusqu'à présent, nous nous sommes concentrés sur les modèles dont les entrées 
+consistaient en un seul vecteur de caractéristiques $\mathbf{x} \ dans \mathbb{R}^d$.
+Le principal changement de perspective lors du développement de modèles
+capables de traiter des séquences est que nous nous concentrons désormais 
+sur des entrées qui consistent en une liste ordonnée 
+de vecteurs de caractéristiques $\mathbf{x}_1, \dots, \mathbf{x}_T$,
+où chaque vecteur de caractéristiques $x_t$
+indexé par un pas de séquence $t \in \mathbb{Z}^+$
+se trouve dans $\mathbb{R}^d$.
 
-Some datasets consist of a single massive sequence.
-Consider, for example, the extremely long streams
-of sensor readings that might be available to climate scientists. 
-In such cases, we might create training datasets
-by randomly sampling subsequences of some predetermined length.
-More often, our data arrive as a collection of sequences.
-Consider the following examples: 
-(i) a collection of documents,
-each represented as its own sequence of words,
-and each having its own length $T_i$;
-(ii) sequence representation of 
-patient stays in the hospital,
-where each stay consists of a number of events
-and the sequence length depends roughly 
-on the length of the stay.
-
-
-Previously, when dealing with individual inputs,
-we assumed that they were sampled independently 
-from the same underlying distribution $P(X)$.
-While we still assume that entire sequences 
-(e.g., entire documents or patient trajectories)
-are sampled independently,
-we cannot assume that the data arriving 
-at each sequence step are independent of each other. 
-For example, what words are likely to appear later in a document
-depends heavily on what words occurred earlier in the document. 
-What medicine a patient is likely to receive 
-on the 10th day of a hospital visit 
-depends heavily on what transpired 
-in the previous nine days. 
-
-This should come as no surprise.
-If we didn't believe that the elements in a sequence were related,
-we wouldn't have bothered to model them as a sequence in the first place. 
-Consider the usefulness of the auto-fill features
-that are popular on search tools and modern email clients.
-They are useful precisely because it is often possible 
-to predict (imperfectly, but better than random guessing)
-what likely continuations of a sequence might be,
-given some initial prefix. 
-For most sequence models,
-we don't require independence,
-or even stationarity, of our sequences. 
-Instead, we require only that 
-the sequences themselves are sampled 
-from some fixed underlying distribution 
-over entire sequences. 
-
-This flexible approach, allows for such phenomena
-as (i) documents looking significantly different 
-at the beginning than at the end,
-or (ii) patient status evolving either 
-towards recovery or towards death 
-over the course of a hospital stay;
-and (iii) customer taste evolving in predictable ways
-over course of continued interaction with a recommender system.
+Certains ensembles de données sont constitués d'une seule séquence massive.
+Considérons, par exemple, les flux extrêmement longs
+de relevés de capteurs dont peuvent disposer les climatologues. 
+Dans ce cas, nous pouvons créer des ensembles de données d'entraînement
+en échantillonnant de manière aléatoire des sous-séquences d'une longueur prédéterminée.
+Plus souvent, nos données arrivent sous la forme d'une collection de séquences.
+Prenons les exemples suivants : 
+(i) une collection de documents,
+chacun étant représenté comme sa propre séquence de mots,
+et chacun ayant sa propre longueur $T_i$;
+(ii) une représentation séquentielle de 
+séjours de patients à l'hôpital,
+où chaque séjour est constitué d'un certain nombre d'événements
+et la longueur de la séquence dépend approximativement 
+de la durée du séjour.
 
 
-We sometimes wish to predict a fixed target $y$
-given sequentially structured input
-(e.g., sentiment classification based on a movie review). 
-At other times, we wish to predict a sequentially structured target
+Auparavant, lorsque nous traitions des entrées individuelles,
+nous supposions qu'elles étaient échantillonnées indépendamment 
+à partir de la même distribution sous-jacente $P(X)$.
+Si nous supposons toujours que des séquences entières 
+(par exemple, des documents entiers ou des trajectoires de patients)
+sont échantillonnées indépendamment,
+nous ne pouvons pas supposer que les données arrivant 
+à chaque étape de la séquence sont indépendantes les unes des autres. 
+Par exemple, les mots qui sont susceptibles d'apparaître plus tard dans un document
+dépendent fortement des mots qui sont apparus plus tôt dans le document. 
+Le médicament qu'un patient est susceptible de recevoir 
+le 10e jour d'une visite à l'hôpital 
+dépend fortement de ce qui s'est passé 
+au cours des neuf jours précédents. 
+
+Cela ne devrait pas être une surprise.
+Si nous ne pensions pas que les éléments d'une séquence étaient liés,
+nous n'aurions pas pris la peine de les modéliser sous forme de séquence. 
+Considérez l'utilité des fonctions de remplissage automatique
+qui sont populaires sur les outils de recherche et les clients de messagerie modernes.
+Elles sont utiles précisément parce qu'il est souvent possible 
+de prédire (imparfaitement, mais mieux qu'une supposition aléatoire)
+quelles pourraient être les continuations probables d'une séquence,
+étant donné un certain préfixe initial. 
+Pour la plupart des modèles de séquence,
+nous n'exigeons pas l'indépendance,
+ou même la stationnarité, de nos séquences. 
+Au lieu de cela, nous exigeons seulement que 
+les séquences elles-mêmes soient échantillonnées 
+à partir d'une distribution sous-jacente fixe 
+sur les séquences entières. 
+
+ 
+Cette approche flexible permet de prendre en compte des phénomènes tels que
+(i) des documents dont l'aspect est sensiblement différent 
+au début et à la fin,
+ou (ii) l'état d'un patient évoluant soit vers la guérison, soit vers la mort 
+au cours d'un séjour à l'hôpital ;
+et (iii) les goûts des clients évoluant de manière prévisible
+au cours d'une interaction continue avec un système de recommandation.
+
+
+Nous souhaitons parfois prédire une cible fixe $y$
+à partir d'une entrée structurée de manière séquentielle
+(par exemple, la classification de sentiments basée sur une critique de film). 
+À d'autres moments, nous souhaitons prédire une cible structurée séquentiellement
 ($y_1, \cdots, y_T$)
-given a fixed input (e.g., image captioning).
-Still other times, out goal is to predict sequentially structured targets
-based on sequentially structured inputs 
-(e.g., machine translation or video captioning).
-Such sequence-to-sequence tasks take two forms:
-(a) **aligned:** where the input at each sequence step
-aligns with a corresponding target (e.g., part of speech taggin);
-(b) **unaligned** where the input and target 
-do not necessarily exhibit a step-for-step correspondence
-(e.g. machine translation). 
+étant donné une entrée fixe (par exemple, le sous-titrage d'une image).
+D'autres fois encore, notre objectif est de prédire des cibles structurées séquentiellement
+à partir d'entrées structurées séquentiellement 
+(par exemple, traduction automatique ou sous-titrage vidéo).
+Ces tâches de séquence à séquence peuvent prendre deux formes :
+(a) **aligned :** où l'entrée à chaque étape de la séquence
+s'aligne sur une cible correspondante (par exemple, le marquage des parties du discours) ;
+(b) **unaligned** où l'entrée et la cible 
+ne présentent pas nécessairement une correspondance étape par étape
+(par exemple, la traduction automatique). 
 
-But before we worry about handling targets of any kind,
-we can tackle the most straightforward problem: 
-unsupervised density modeling (also called *sequence modeling*).
-Here, given a collection of sequences, 
-our goal is to estimate the probability mass function
-that tells us how likely we are to see any given sequence,
-i.e. $p(\mathbf{x}_1, \cdots, \mathbf{x}_T)$.
-
-
-
-
-
-## Basic Tools
-
-Before introducing specialized specialized neural networks 
-designed to handle sequentially structured data,
-let's take a look at some actual sequence data
-and build up some basic intuitions and statistical tools.
-In particular, we will focus on stock price data 
-from the FTSE 100 index (:numref:`fig_ftse100`).
-At each *time step* $t \in \mathbb{Z}^+$, we observe 
-the price of the index at that time, denoted by $x_t$.
-
-
-![FTSE 100 index over about 30 years.](../img/ftse100.png)
-:width:`400px`
-:label:`fig_ftse100`
-
-
-Now suppose that a trader would like to make short term trades,
-strategically getting into or out of the index, 
-depending on whether they believe 
-that it will rise or decline
-in the subsequent time step. 
-Absent any other features 
-(news, financial reporting data, etc),
-the only available signal for predicting
-the subsequent value is the history of prices to date. 
+Mais avant de nous préoccuper de la manipulation de cibles de toute sorte,
+nous pouvons nous attaquer au problème le plus simple : 
+modélisation de densité non supervisée (également appelée *modélisation de séquence*).
+Ici, étant donné une collection de séquences, 
+notre objectif est d'estimer la fonction de masse de probabilité
+qui nous indique la probabilité de voir une séquence donnée,
+c'est-à-dire $p(\mathbf{x}_1, \cdots, \mathbf{x}_T)$.
 
 
 
 
-### Autoregressive Models
 
-The trader is thus interested in knowing 
-the probability distribution 
+## Outils de base
+
+Avant de présenter les réseaux neuronaux spécialisés 
+conçus pour traiter des données structurées de manière séquentielle,
+examinons quelques données de séquence réelles
+et mettons en place quelques intuitions et outils statistiques de base.
+Nous nous concentrerons plus particulièrement sur les données de cours de bourse 
+de l'indice FTSE 100 (:numref:`fig_ftse100` ).
+À chaque *pas de temps* $t \in \mathbb{Z}^+$, nous observons 
+le prix de l'indice à ce moment-là, noté $x_t$.
+
+
+![Indice FTSE 100 sur environ 30 ans](../img/ftse100.png)
+:width:`400px` 
+:label:`fig_ftse100` 
+
+ 
+Supposons maintenant qu'un trader souhaite effectuer des transactions à court terme,
+en entrant ou en sortant stratégiquement de l'indice, 
+selon qu'il pense 
+qu'il va augmenter ou baisser
+au cours du pas de temps suivant. 
+En l'absence de toute autre caractéristique 
+(actualités, données financières, etc.),
+le seul signal disponible pour prédire
+la valeur ultérieure est l'historique des prix à ce jour. 
+
+
+
+
+### Modèles autorégressifs
+
+Le trader souhaite donc connaître 
+la distribution de probabilité 
 $$P(x_t \mid x_{t-1}, \ldots, x_1).$$ 
-over prices that the index might take 
-in the subsequent time step.
-While estimating the entire distribution 
-over a continuous-valued random variable 
-can be difficult, the trader would be happy
-to focus on a few key statistics of the distribution,
-particularly the expected value and the variance.
-One simple strategy for estimating the conditional expectation
+sur les prix que l'indice pourrait prendre 
+au cours du pas de temps suivant.
+Bien que l'estimation de l'ensemble de la distribution 
+sur une variable aléatoire à valeur continue 
+puisse être difficile, le trader sera heureux
+de se concentrer sur quelques statistiques clés de la distribution,
+en particulier la valeur attendue et la variance.
+Une stratégie simple pour estimer l'espérance conditionnelle
 
 $$ \mathbb{E}[(x_t \mid x_{t-1}, \ldots, x_1)],$$
 
-would be to apply a linear regression model,
-(recall :numref:`sec_linear_concise`).
-Such models that regress the value of a signal
-on the previous values of that same signal 
-are naturally called *autoregressive models*.
-There is just one major problem; the number of inputs, 
-$x_{t-1}, \ldots, x_1$ varies, depending on $t$.
-Namely, the number of inputs increases  
-with the amount of data that we encounter.
-Thus if we want to treat our historical data 
-as a training set, we are left with the problem 
-that each example has a different number of features.
-Much of what follows in this chapter 
-will revolve around techniques 
-for overcoming these challenges 
-when engaging in such *autoregressive* modeling problems
-where the object of interest is 
+consiste à appliquer un modèle de régression linéaire,
+(rappel :numref:`sec_linear_concise` ).
+De tels modèles qui font régresser la valeur d'un signal
+sur les valeurs précédentes de ce même signal 
+sont naturellement appelés *modèles autorégressifs*.
+Il n'y a qu'un seul problème majeur : le nombre d'entrées, 
+$x_{t-1}, \ldots, x_1$ varie en fonction de $t$.
+Plus précisément, le nombre d'entrées augmente 
+avec la quantité de données que nous rencontrons.
+Ainsi, si nous voulons traiter nos données historiques 
+comme un ensemble d'apprentissage, nous nous retrouvons avec le problème 
+que chaque exemple possède un nombre différent de caractéristiques.
+Une grande partie de ce qui suit dans ce chapitre 
+tournera autour des techniques 
+permettant de surmonter ces difficultés 
+lorsque nous nous engageons dans de tels problèmes de modélisation *autorégressive*
+où l'objet d'intérêt est 
 $P(x_t \mid x_{t-1}, \ldots, x_1)$
-or some statistic(s) of this distribution. 
+ou une ou plusieurs statistiques de cette distribution. 
 
-A few strategies recur frequently. 
-First, we might believe that although long sequences
-$x_{t-1}, \ldots, x_1$ are available,
-it may not be necessary 
-to look back so far in the history 
-when predicting the near future. 
-In this case we might content ourselves 
-to condition on some window of length $\tau$ 
-and only use $x_{t-1}, \ldots, x_{t-\tau}$ observations. 
-The immediate benefit is that now the number of arguments 
-is always the same, at least for $t > \tau$. 
-This allows us to train any linear model or deep network 
-that requires fixed-length vectors as inputs.
-Second, we might develop models that maintain
-some summary $h_t$ of the past observations
-(see :numref:`fig_sequence-model`)
-and at the same time update $h_t$ 
-in addition to the prediction $\hat{x}_t$.
-This leads to models that estimate $x_t$ 
-with $\hat{x}_t = P(x_t \mid h_{t})$ 
-and moreover updates of the form  
+Quelques stratégies reviennent fréquemment. 
+Tout d'abord, nous pouvons penser que, bien que de longues séquences
+$x_{t-1}, \ldots, x_1$ soient disponibles,
+il n'est peut-être pas nécessaire 
+de remonter aussi loin dans l'histoire 
+pour prédire le futur proche. 
+Dans ce cas, nous pourrions nous contenter 
+de conditionner sur une certaine fenêtre de longueur $\tau$ 
+et n'utiliser que les observations $x_{t-1}, \ldots, x_{t-\tau}$. 
+L'avantage immédiat est que maintenant le nombre d'arguments 
+est toujours le même, au moins pour $t &gt; \tau$. 
+Cela nous permet d'entraîner n'importe quel modèle linéaire ou réseau profond 
+qui nécessite des vecteurs de longueur fixe comme entrées.
+Deuxièmement, nous pourrions développer des modèles qui maintiennent
+un certain résumé $h_t$ des observations passées
+(voir :numref:`fig_sequence-model` )
+et qui, en même temps, mettent à jour $h_t$ 
+en plus de la prédiction $\hat{x}_t$.
+Cela conduit à des modèles qui estiment $x_t$ 
+avec $\hat{x}_t = P(x_t \mid h_{t})$ 
+et en outre à des mises à jour de la forme 
 $h_t = g(h_{t-1}, x_{t-1})$. 
-Since $h_t$ is never observed, 
-these models are also called 
-*latent autoregressive models*.
+Comme $h_t$ n'est jamais observé, 
+ces modèles sont également appelés 
+*modèles autorégressifs latents*.
 
-![A latent autoregressive model.](../img/sequence-model.svg)
-:label:`fig_sequence-model`
+![Un modèle autorégressif latent](../img/sequence-model.svg)
+:label:`fig_sequence-model` 
 
-To construct training data from historical data, one 
-typically creates examples by sampling windows randomly.
-In general, we do not expect time to stand still. 
-However, we often assume that while 
-the specific values of $x_t$ might change,
-the dynamics according to which each subsequent 
-observation is generated given the previous observations do not. 
-Statisticians call dynamics that do not change *stationary*.
-
-
-
-## Language Models
+ Pour construire des données d'apprentissage à partir de données historiques, on 
+crée généralement des exemples en échantillonnant des fenêtres de manière aléatoire.
+En général, nous ne nous attendons pas à ce que le temps s'arrête. 
+Cependant, nous supposons souvent que si 
+les valeurs spécifiques de $x_t$ peuvent changer,
+la dynamique selon laquelle chaque observation suivante 
+est générée compte tenu des observations précédentes ne change pas. 
+Les statisticiens appellent les dynamiques qui ne changent pas *stationnaires*.
 
 
-Sometimes, especially when working with language,
-we wish to estimate the joint probability 
-of an entire sequence.
-This is a common task when working with sequences
-composed of discrete tokens, such as words. 
-Generally, these estimated functions are called *sequence models* 
-and for natural language data, they are called *language models*.
-The field of sequence modeling has been driven so much by NLP,
-that we often describe sequence models as "language models",
-even when dealing with non-language data. 
-Language models prove useful for all sorts of reasons.
-Sometimes we want to evaluate the likelihood of sentences.
-For example, we might wish to compare 
-the naturalness of two candidate outputs 
-generated by a machine translation systems
-or by a speech recognition system.
-But language modeling gives us not only 
-the capacity to *evaluate* likelihood,
-but the ability to *sample* sequences,
-and even to optimize for the most likely sequences.
 
-While language modeling might not look, at first glance,
-like an autoregressive problem,
-we can reduce language modeling to autogregressive prediction
-by decomposing the joint density  of a sequence $p(x_t| x_1, \ldots, x_T)$
-into the product of conditional densities 
-in a left-to-right fashion
-by applying the chain rule of probability:
+### Modèles de langage
+
+
+ Parfois, en particulier lorsque l'on travaille avec le langage,
+nous souhaitons estimer la probabilité conjointe 
+d'une séquence entière.
+Il s'agit d'une tâche courante lorsqu'on travaille avec des séquences
+composées de tokens discrets, tels que des mots. 
+En général, ces fonctions estimées sont appelées *modèles de séquence* 
+et pour les données en langage naturel, elles sont appelées *modèles de langage*.
+Le domaine de la modélisation de séquences a été tellement influencé par le TAL,
+que nous décrivons souvent les modèles de séquences comme des "modèles de langage",
+même lorsqu'il s'agit de données non linguistiques. 
+Les modèles linguistiques s'avèrent utiles pour toutes sortes de raisons.
+Parfois, nous voulons évaluer la vraisemblance des phrases.
+Par exemple, nous pouvons souhaiter comparer 
+le caractère naturel de deux sorties candidates 
+générées par un système de traduction automatique
+ou par un système de reconnaissance vocale.
+Mais la modélisation du langage nous donne non seulement 
+la capacité d'*évaluer* la vraisemblance,
+mais aussi la capacité d'*échantillonner* des séquences,
+et même d'optimiser pour les séquences les plus probables.
+
+Bien que la modélisation du langage ne ressemble pas, à première vue,
+à un problème autorégressif,
+nous pouvons réduire la modélisation du langage à une prédiction autorégressive
+en décomposant la densité conjointe d'une séquence $p(x_t| x_1, \ldots, x_T)$
+en un produit de densités conditionnelles 
+de gauche à droite
+en appliquant la règle de la chaîne de probabilité :
 
 $$P(x_1, \ldots, x_T) = P(x_1) * \prod_{t=2}^T P(x_t \mid x_{t-1}, \ldots, x_1).$$
 
-Note that if we are working with discrete signals like words,
-then the autoregressive model must be a probabilistic classifier,
-outputting a full probability distribution
-over the vocabulary for what word will come next,
-given the leftwards context.
+Notez que si nous travaillons avec des signaux discrets tels que des mots,
+alors le modèle autorégressif doit être un classificateur probabiliste,
+produisant une distribution de probabilité complète
+sur le vocabulaire pour savoir quel mot viendra ensuite,
+étant donné le contexte de gauche.
 
 
 
-### Markov Models
-:label:`subsec_markov-models`
+### Modèles de Markov
+:label:`subsec_markov-models` 
+
+ 
+ Supposons maintenant que nous souhaitions employer la stratégie mentionnée ci-dessus,
+où nous ne conditionnons que les $\tau$ précédentes étapes de la séquence,
+c'est-à-dire, $x_{t-1}, \ldots, x_{t-\tau}$, plutôt que 
+l'historique complet de la séquence $x_{t-1}, \ldots, x_1$.
+Chaque fois que nous pouvons nous débarrasser de l'historique 
+au-delà des précieux $\tau$ pas 
+sans aucune perte de pouvoir prédictif,
+nous disons que la séquence satisfait une *condition de Markov*,
+c'est-à-dire, *que le futur est conditionnellement indépendant du passé,
+étant donné l'histoire récente*. 
+Lorsque $\tau = 1$, on dit que les données sont caractérisées 
+par un *modèle de Markov de premier ordre*,
+et lorsque $\tau = k$, on dit que les données sont caractérisées
+par un modèle de Markov de $kième$ ordre.
+Car lorsque la condition de Markov du premier ordre est vérifiée$(\tau = 1$)
+, la factorisation de notre probabilité conjointe devient un produit
+des probabilités de chaque mot étant donné le *mot* précédent :
+
+$$P(x_1, \ldots, x_T) = \prod_{t=1}^T P(x_t \mid x_{t-1}) \text{ où } P(x_1 \mid x_0) = P(x_1).$$
+
+Nous trouvons souvent utile de travailler avec des modèles qui procèdent 
+comme si une condition de Markov était satisfaite,
+même lorsque nous savons que ce n'est qu'*approximativement* vrai. 
+Avec des documents textuels réels, nous continuons à gagner des informations
+à mesure que nous incluons de plus en plus de contexte vers la gauche.
+Mais ces gains diminuent rapidement.
+C'est pourquoi nous faisons parfois des compromis, en évitant les difficultés informatiques et statistiques
+par la formation de modèles dont la validité dépend 
+d'une condition de Markov d'ordre $k$.
+Même les modèles de langage massifs d'aujourd'hui, basés sur les RNN et les transformateurs 
+, intègrent rarement plus de mille mots de contexte.
 
 
-Now suppose that we wish to employ the strategy mentioned above,
-where we condition only on the $\tau$ previous sequence steps,
-i.e., $x_{t-1}, \ldots, x_{t-\tau}$, rather than 
-the entire sequence history $x_{t-1}, \ldots, x_1$.
-Whenever we can throw away the history 
-beyond the precious $\tau$ steps 
-without any loss in predictive power,
-we say that the sequence satisfies a *Markov condition*,
-i.e., *that the future is conditionally independent of the past,
-given the recent history*. 
-When $\tau = 1$, we say that the data is characterized 
-by a *first-order Markov model*,
-and when $\tau = k$, we say that the data is characterized
-by a $k$-th order Markov model.
-For when the first-order Markov condition holds ($\tau = 1$)
-the factorization of our joint probability becomes a product
-of probabilities of each word given the previous *word*:
-
-$$P(x_1, \ldots, x_T) = \prod_{t=1}^T P(x_t \mid x_{t-1}) \text{ where } P(x_1 \mid x_0) = P(x_1).$$
-
-We often find it useful to work with models that proceed 
-as though a Markov condition were satisfied,
-even when we know that this is only *approximately* true. 
-With real text documents we continue to gain information
-as we include more and more leftwards context.
-But these gains diminish rapidly.
-Thus, sometimes we compromise, obviating computational and statistical difficulties
-by training models whose validity depends 
-on a $k$-th order Markov condition.
-Even today's massive RNNs- and Transformer-based language models 
-seldom incorporate more than a thousand words of context.
+Avec des données discrètes, un véritable modèle de Markov
+compte simplement le nombre de fois 
+où chaque mot est apparu dans chaque contexte, produisant 
+l'estimation de la fréquence relative de $P(x_t \mid x_{t-1})$.
+Lorsque les données ne prennent que des valeurs discrètes 
+(comme dans le langage),
+la séquence de mots la plus probable peut être calculée efficacement
+en utilisant la programmation dynamique. 
 
 
-With discrete data, a true Markov model
-simply counts the number of times 
-that each word has occurred in each context, producing 
-the relative frequency estimate of $P(x_t \mid x_{t-1})$.
-Whenever the data assume only discrete values 
-(as in language),
-the most likely sequence of words can be computed efficiently
-using dynamic programming. 
+### L'ordre de décodage
 
-
-### The Order of Decoding
-
-You might be wondering, why did we have to represent 
-the factorization of a text sequence $P(x_1, \ldots, x_T)$
-as a left-to-right chain of conditional probabilities.
-Why not right-to-left or some other, seemingly random order?
-In principle, there is nothing wrong with unfolding 
-$P(x_1, \ldots, x_T)$ in reverse order. 
-The result is a valid factorization:
+Vous vous demandez peut-être pourquoi nous avons dû représenter 
+la factorisation d'une séquence de texte $P(x_1, \ldots, x_T)$
+comme une chaîne de probabilités conditionnelles de gauche à droite.
+Pourquoi pas de droite à gauche ou dans un autre ordre, apparemment aléatoire ?
+En principe, il n'y a rien de mal à déplier 
+$P(x_1, \ldots, x_T)$ dans l'ordre inverse. 
+Le résultat est une factorisation valide :
 
 $$P(x_1, \ldots, x_T) = \prod_{t=T}^1 P(x_t \mid x_{t+1}, \ldots, x_T).$$
 
 
-However, there are many reasons why factorizing text
-in the same directions as we read it 
-(left-to-right for most languages,
-but right-to-left for Arabic and Hebrew)
-is preferred for the task of language modeling.
-First, this is just a more natural direction for us to think about.
-After all we all read text every day, 
-and this process is guided by our ability
-to anticipate what words and phrases 
-are likely to come next.
-Just think of how many times you have completed 
-someone else's sentence. 
-Thus, even if we had no other reason to prefer such in-order decodings, 
-they would be useful if only because we have better intuitions 
-for what should be likely when predicting in this order. 
+Cependant, il existe de nombreuses raisons pour lesquelles la factorisation du texte
+dans le même sens que nous le lisons 
+(de gauche à droite pour la plupart des langues,
+mais de droite à gauche pour l'arabe et l'hébreu)
+est préférable pour la tâche de modélisation du langage.
+Tout d'abord, il s'agit simplement d'une direction plus naturelle pour nous.
+Après tout, nous lisons tous du texte tous les jours, 
+et ce processus est guidé par notre capacité
+à anticiper les mots et les phrases 
+susceptibles de suivre.
+Pensez simplement au nombre de fois où vous avez complété la phrase de quelqu'un d'autre 
+. 
+Ainsi, même si nous n'avions aucune autre raison de préférer de tels décodages dans l'ordre, 
+ils seraient utiles ne serait-ce que parce que nous avons de meilleures intuitions 
+de ce qui devrait être probable lorsque l'on prédit dans cet ordre. 
 
-Second, by factorizing in order, 
-we can assign probabilities to arbitrarily long sequences
-using the same language model. 
-To convert a probability over steps $1$ through $t$ 
-into one that extends to word $t+1$ we simply
-multiply by the conditional probability 
+Deuxièmement, en factorisant dans l'ordre, 
+nous pouvons attribuer des probabilités à des séquences arbitrairement longues
+en utilisant le même modèle de langage. 
+Pour convertir une probabilité sur les étapes $1$ à $t$ 
+en une probabilité qui s'étend au mot $t+1$, il suffit de
+multiplier par la probabilité conditionnelle 
 $P(x_{t+1} \mid x_{t+1}, \ldots, x_T)$.
 
-Third, we have stronger predictive models 
-for predicting adjacent words versus 
-words at arbitrary other locations. 
-While all orders of factorization are valid,
-they do not necessarily all represent equally easy
-predictive modeling problems. 
-This is true not only for language,
-but for other kinds of data as well,
-e.g., when the data are causally structured.
-For example, we believe that future events cannot influence the past. 
-Hence, if we change $x_t$, we may be able to influence 
-what happens for $x_{t+1}$ going forward but not the converse. 
-That is, if we change $x_t$, the distribution over past events will not change. 
-In some contexts, this makes it easier to predict $P(x_{t+1} \mid x_t)$ 
-than to predict $P(x_t \mid x_{t+1})$. 
-For instance, in some cases, we can find $x_{t+1} = f(x_t) + \epsilon$ 
-for some additive noise $\epsilon$, 
-whereas the converse is not true :cite:`Hoyer.Janzing.Mooij.ea.2009`. 
-This is great news, since it is typically the forward direction 
-that we are interested in estimating.
-The book by Peters et al. has explained more on this topic 
-:cite:`Peters.Janzing.Scholkopf.2017`.
-We are barely scratching the surface of it.
+Troisièmement, nous disposons de modèles prédictifs plus puissants 
+pour prédire les mots adjacents par rapport aux mots 
+situés à d'autres emplacements arbitraires. 
+Bien que tous les ordres de factorisation soient valables,
+ils ne représentent pas nécessairement tous des problèmes de 
+modélisation prédictive aussi faciles. 
+Cela est vrai non seulement pour le langage,
+mais aussi pour d'autres types de données,
+par exemple, lorsque les données sont structurées de manière causale.
+Par exemple, nous pensons que les événements futurs ne peuvent pas influencer le passé. 
+Par conséquent, si nous modifions $x_t$, nous pouvons être en mesure d'influencer 
+ce qui se passe pour $x_{t+1}$ dans le futur, mais pas l'inverse. 
+Autrement dit, si nous changeons $x_t$, la distribution des événements passés ne changera pas. 
+Dans certains contextes, il est donc plus facile de prédire $P(x_{t+1} \mid x_t)$ 
+que de prédire $P(x_t \mid x_{t+1})$. 
+Par exemple, dans certains cas, nous pouvons trouver $x_{t+1} = f(x_t) + \epsilon$ 
+pour un certain bruit additif $\epsilon$, 
+alors que l'inverse n'est pas vrai :cite:`Hoyer.Janzing.Mooij.ea.2009` . 
+Il s'agit d'une excellente nouvelle, car c'est généralement la direction avant 
+qui nous intéresse pour l'estimation.
+Le livre de Peters et al. en dit plus sur ce sujet 
+:cite:`Peters.Janzing.Scholkopf.2017` .
+Nous ne faisons qu'effleurer le sujet.
 
 
-## Training
+## Formation
 
 <!-- fix -->
-After reviewing many different statistical tools, let's try this out in practice.
+ Après avoir passé en revue de nombreux outils statistiques différents, essayons de les mettre en pratique.
 
 ```{.python .input  n=6}
 %load_ext d2lbook.tab
@@ -391,10 +391,10 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-We begin by generating some data.
-To keep things simple we 
-(**generate our sequence data by using a sine function
-with some additive noise for time steps $1, 2, \ldots, 1000$.**)
+Nous commençons par générer quelques données.
+Pour garder les choses simples, nous 
+(**générons nos données de séquence en utilisant une fonction sinus
+avec un certain bruit additif pour les pas de temps $1, 2, \ldots, 1000$.**)
 
 ```{.python .input  n=10}
 %%tab all
@@ -411,23 +411,23 @@ data = Data()
 d2l.plot(data.time, data.x, 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
-Next, we need to turn such a sequence into features and labels 
+Ensuite, nous devons transformer une telle séquence en caractéristiques et en étiquettes 
 <!-- language -->
-that our model can train on.
-With a Markov assumption that $x_t$ only depends 
-on observations at the past $\tau$ time steps,
-we [**construct examples with labels $y_t = x_t$ and features 
+ sur lesquelles notre modèle peut s'entraîner.
+Avec l'hypothèse de Markov selon laquelle $x_t$ dépend uniquement 
+des observations des $\tau$ derniers pas de temps,
+nous [**construisons des exemples avec des étiquettes $y_t = x_t$ et des caractéristiques 
 $\mathbf{x}_t = [x_{t-\tau}, \ldots, x_{t-1}]$.**]
-The astute reader might have noticed that 
-this gives us $\tau$ fewer data examples,
-since we do not have sufficient history for $y_1, \ldots, y_\tau$. 
-While we could pad the first $\tau$ sequences with zeros,
-to keep things simple, we drop them for now. 
-The resulting dataset contains $T - \tau$ examples,
-where each input to the model
-has sequence length $\tau$.
-We (**create a data iterator on the first 600 examples**),
-covering a period of the sine function.
+Le lecteur avisé aura peut-être remarqué que 
+cela nous donne $\tau$ moins d'exemples de données,
+puisque nous n'avons pas suffisamment d'historique pour $y_1, \ldots, y_\tau$. 
+Bien que nous puissions remplir les premières séquences $\tau$ avec des zéros,
+pour garder les choses simples, nous les abandonnons pour le moment. 
+L'ensemble de données résultant contient $T - \tau$ exemples,
+où chaque entrée du modèle
+a une longueur de séquence $\tau$.
+Nous (**créons un itérateur de données sur les 600 premiers exemples**),
+couvrant une période de la fonction sinus.
 
 ```{.python .input}
 %%tab all
@@ -440,7 +440,7 @@ def get_dataloader(self, train):
     return self.get_tensorloader([self.features, self.labels], train, i)
 ```
 
-The model to train is simple: just linear regression.
+Le modèle à entraîner est simple : juste une régression linéaire.
 
 ```{.python .input}
 %%tab all
@@ -449,12 +449,12 @@ trainer = d2l.Trainer(max_epochs=5)
 trainer.fit(model, data)
 ```
 
-## Prediction
+## Prédiction
 
-Let's see how well the model predicts. 
-The first thing to check is 
+Voyons comment le modèle prédit. 
+La première chose à vérifier est 
 [**predicting what happens just in the next time step**],
-namely the *one-step-ahead prediction*.
+à savoir la *one-step-ahead prediction*.
 
 ```{.python .input}
 %%tab all
@@ -463,15 +463,15 @@ d2l.plot(data.time[data.tau:], [data.labels, onestep_preds], 'time', 'x',
          legend=['labels', '1-step preds'], figsize=(6, 3))
 ```
 
-The one-step-ahead predictions look nice. 
-Even near the end $t=1000$ the predictions still look trustworthy.
-However, there is just one little problem to this:
-if we observe sequence data only until time step 604 (`n_train + tau`), 
-we cannot hope to receive the inputs 
-for all the future one-step-ahead predictions.
-Instead, we need to use earlier predictions 
-as input to our model for these future predictions, 
-one step at a time:
+Les prédictions à un pas de temps ont l'air bien. 
+Même vers la fin de la période $t=1000$, les prédictions semblent toujours dignes de confiance.
+Cependant, il y a un petit problème :
+si nous n'observons les données de la séquence que jusqu'à l'étape 604 (`n_train + tau`), 
+nous ne pouvons pas espérer recevoir les données d'entrée 
+pour toutes les futures prédictions à une étape.
+Au lieu de cela, nous devons utiliser les prédictions antérieures 
+comme entrées de notre modèle pour ces prédictions futures, 
+une étape à la fois :
 
 $$
 \hat{x}_{605} = f(x_{601}, x_{602}, x_{603}, x_{604}), \\
@@ -482,15 +482,14 @@ $$
 \ldots
 $$
 
-Generally, for an observed sequence $x_1, \ldots, x_t$, 
-its predicted output $\hat{x}_{t+k}$ at time step $t+k$ 
-is called the $k$*-step-ahead prediction*. 
-Since we have observed up to $x_{604}$, 
-its $k$-step-ahead prediction is $\hat{x}_{604+k}$.
-In other words, we will have to 
-keep on using our own predictions
-to make multistep-ahead predictions.
-Let's see how well this goes.
+Généralement, pour une séquence observée $x_1, \ldots, x_t$, 
+sa sortie prédite $\hat{x}_{t+k}$ au pas de temps $t+k$ 
+est appelée la prédiction $k$*-step-ahead*. 
+Comme nous avons observé jusqu'à $x_{604}$, 
+sa prédiction $k-step-ahead$ est $\hat{x}_{604+k}$.
+En d'autres termes, nous devrons continuer à utiliser nos propres prédictions 
+pour faire des prédictions multi-étapes-ahead.
+Voyons comment cela se passe.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -518,24 +517,24 @@ d2l.plot([data.time[data.tau:], data.time[data.num_train+data.tau:]],
          'x', legend=['1-step preds', 'multistep preds'], figsize=(6, 3))
 ```
 
-As the above example shows, this is a spectacular failure. 
-The predictions decay to a constant 
-pretty quickly after a few prediction steps.
-Why did the algorithm work so poorly?
-This is ultimately due to the fact that the errors build up.
-Let's say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$.
-Now the *input* for step 2 is perturbed by $\epsilon_1$,
-hence we suffer some error in the order of 
-$\epsilon_2 = \bar\epsilon + c \epsilon_1$ for some constant $c$, and so on. 
-The error can diverge rather rapidly from the true observations. 
-This is a common phenomenon. 
-For instance, weather forecasts for the next 24 hours tend to be pretty accurate 
-but beyond that the accuracy declines rapidly. 
-We will discuss methods for improving this 
-throughout this chapter and beyond.
+Comme le montre l'exemple ci-dessus, c'est un échec spectaculaire. 
+Les prédictions tombent à une constante 
+assez rapidement après quelques étapes de prédiction.
+Pourquoi l'algorithme a-t-il si mal fonctionné ?
+Cela est finalement dû au fait que les erreurs s'accumulent.
+Disons qu'après l'étape 1, nous avons une erreur $\epsilon_1 = \bar\epsilon$.
+Maintenant, l'*entrée* de l'étape 2 est perturbée par $\epsilon_1$,
+ainsi nous souffrons donc d'une erreur de l'ordre de 
+$\epsilon_2 = \bar\epsilon + c \epsilon_1$ pour une certaine constante $c$, et ainsi de suite. 
+L'erreur peut diverger assez rapidement des véritables observations. 
+Il s'agit d'un phénomène courant. 
+Par exemple, les prévisions météorologiques pour les 24 heures à venir ont tendance à être assez précises 
+mais au-delà, la précision diminue rapidement. 
+Nous discuterons des méthodes permettant d'améliorer cette précision 
+tout au long de ce chapitre et au-delà.
 
-Let's [**take a closer look at the difficulties in $k$-step-ahead predictions**]
-by computing predictions on the entire sequence for $k = 1, 4, 16, 64$.
+Examinons [**de plus près les difficultés des prévisions à $k$ étapes avant la prédiction**]
+en calculant des prévisions sur la séquence entière pour $k = 1, 4, 16, 64$.
 
 ```{.python .input}
 %%tab all
@@ -559,52 +558,52 @@ d2l.plot(data.time[data.tau+steps[-1]-1:],
          legend=[f'{k}-step preds' for k in steps], figsize=(6, 3))
 ```
 
-This clearly illustrates how the quality of the prediction changes 
-as we try to predict further into the future.
-While the 4-step-ahead predictions still look good, 
-anything beyond that is almost useless.
+Cela illustre clairement comment la qualité de la prédiction change 
+lorsque nous essayons de prédire plus loin dans le futur.
+Alors que les prédictions à 4 pas à l'avance semblent toujours bonnes, 
+tout ce qui est au-delà est presque inutile.
 
-## Summary
+## Résumé
 
-* There is quite a difference in difficulty between interpolation and extrapolation. 
-  Consequently, if you have a sequence, always respect 
-  the temporal order of the data when training, 
-  i.e., never train on future data.
-* Sequence models require specialized statistical tools for estimation. 
-  Two popular choices are autoregressive models 
-  and latent-variable autoregressive models.
-* For causal models (e.g., time going forward), 
-  estimating the forward direction is typically 
-  a lot easier than the reverse direction.
-* For an observed sequence up to time step $t$, 
-  its predicted output at time step $t+k$ 
-  is the $k$*-step-ahead prediction*. 
-  As we predict further in time by increasing $k$, 
-  the errors accumulate and the quality of the prediction degrades,
-  often dramatically.
+* Il y a une grande différence de difficulté entre l'interpolation et l'extrapolation. 
+  Par conséquent, si vous avez une séquence, respectez toujours 
+  l'ordre temporel des données lors de la formation, 
+  c'est-à-dire ne vous entraînez jamais sur des données futures.
+* Les modèles de séquence nécessitent des outils statistiques spécialisés pour l'estimation. 
+  Deux choix populaires sont les modèles autorégressifs 
+  et les modèles autorégressifs à variables latentes.
+* Pour les modèles causaux (par exemple, le temps qui avance), 
+  l'estimation de la direction avant est généralement 
+  beaucoup plus facile que la direction arrière.
+* Pour une séquence observée jusqu'au pas de temps $t$, 
+  sa sortie prédite au pas de temps $t+k$ 
+  est la prédiction $k$*-step-ahead*. 
+  Lorsque l'on prédit plus loin dans le temps en augmentant $k$, 
+  les erreurs s'accumulent et la qualité de la prédiction se dégrade,
+  souvent de façon spectaculaire.
 
-## Exercises
+## Exercices
 
-1. Improve the model in the experiment of this section.
-    1. Incorporate more than the past 4 observations? How many do you really need?
-    1. How many past observations would you need if there was no noise? Hint: you can write $\sin$ and $\cos$ as a differential equation.
-    1. Can you incorporate older observations while keeping the total number of features constant? Does this improve accuracy? Why?
-    1. Change the neural network architecture and evaluate the performance. You may train the new model with more epochs. What do you observe?
-1. An investor wants to find a good security to buy. 
-   He looks at past returns to decide which one is likely to do well. 
-   What could possibly go wrong with this strategy?
-1. Does causality also apply to text? To which extent?
-1. Give an example for when a latent autoregressive model 
-   might be needed to capture the dynamic of the data.
+1. Améliorez le modèle dans l'expérience de cette section.
+   1. Incorporez-vous plus que les 4 dernières observations ? Combien en avez-vous vraiment besoin ?
+   1. De combien d'observations passées auriez-vous besoin s'il n'y avait pas de bruit ? Conseil : vous pouvez écrire $\sin$ et $\cos$ comme une équation différentielle.
+   1. Pouvez-vous incorporer des observations plus anciennes tout en maintenant constant le nombre total de caractéristiques ? Cela améliore-t-il la précision ? Pourquoi ?
+ 1. Modifiez l'architecture du réseau neuronal et évaluez les performances. Vous pouvez entraîner le nouveau modèle avec plus d'époques. Qu'observez-vous ?
+1. Un investisseur souhaite trouver un bon titre à acheter. 
+   Il examine les rendements passés pour décider lequel est susceptible de bien se comporter. 
+   Qu'est-ce qui pourrait mal tourner dans cette stratégie ?
+1. La causalité s'applique-t-elle également au texte ? Dans quelle mesure ?
+1. Donnez un exemple de cas où un modèle autorégressif latent 
+ pourrait être nécessaire pour capturer la dynamique des données.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/113)
 :end_tab:
 
-:begin_tab:`pytorch`
+ :begin_tab:`pytorch` 
 [Discussions](https://discuss.d2l.ai/t/114)
 :end_tab:
 
-:begin_tab:`tensorflow`
+ :begin_tab:`tensorflow` 
 [Discussions](https://discuss.d2l.ai/t/1048)
 :end_tab:

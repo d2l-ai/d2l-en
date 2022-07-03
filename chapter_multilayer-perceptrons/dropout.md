@@ -4,94 +4,94 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
 # Dropout
-:label:`sec_dropout`
+:label:`sec_dropout` 
+
+ 
+Réfléchissons brièvement à ce que nous
+attendons d'un bon modèle prédictif.
+Nous voulons qu'il soit performant sur des données non vues.
+La théorie classique de la généralisation
+suggère que pour combler l'écart entre
+les performances de la formation et du test,
+nous devons viser un modèle simple.
+La simplicité peut prendre la forme
+d'un petit nombre de dimensions.
+Nous avons exploré ce point lors de l'examen des fonctions de base monomiales
+des modèles linéaires
+dans :numref:`sec_model_selection`.
+En outre, comme nous l'avons vu lors de l'examen de la décroissance du poids
+($\ell_2$ régularisation) dans :numref:`sec_weight_decay`,
+la norme (inverse) des paramètres
+représente également une mesure utile de la simplicité.
+Une autre notion utile de la simplicité est la régularité,
+c'est-à-dire que la fonction ne doit pas être sensible
+à de petites modifications de ses entrées.
+Par exemple, lorsque nous classons des images,
+nous nous attendons à ce que l'ajout d'un bruit aléatoire
+aux pixels soit pratiquement inoffensif.
+
+En 1995, Christopher Bishop a formalisé
+cette idée en prouvant que l'entraînement avec du bruit en entrée
+est équivalent à une régularisation de Tikhonov :cite:`Bishop.1995`.
+Ce travail a établi un lien mathématique clair
+entre l'exigence qu'une fonction soit lisse (et donc simple),
+et l'exigence qu'elle soit résiliente
+aux perturbations de l'entrée.
+
+Puis, en 2014, Srivastava et al. :cite:`Srivastava.Hinton.Krizhevsky.ea.2014` 
+ ont développé une idée astucieuse pour appliquer l'idée de Bishop
+également aux couches internes d'un réseau.
+Leur idée, appelée *dropout*, consiste à
+injecter du bruit tout en calculant
+chaque couche interne pendant la propagation vers l'avant,
+et elle est devenue une technique standard
+pour la formation des réseaux neuronaux.
+La méthode est appelée *dropout* parce que nous
+*dropout* littéralement certains neurones pendant la formation.
+Tout au long de la formation, à chaque itération,
+le dropout standard consiste à remettre à zéro
+une certaine fraction des nœuds de chaque couche
+avant de calculer la couche suivante.
+
+Pour être clair, nous imposons
+notre propre récit avec le lien à Bishop.
+L'article original sur le dropout
+offre une intuition grâce à une analogie surprenante
+avec la reproduction sexuelle.
+Les auteurs affirment que la suradaptation des réseaux neuronaux
+est caractérisée par un état dans lequel
+chaque couche repose sur un modèle spécifique
+d'activations dans la couche précédente,
+appelant cette condition *co-adaptation*.
+dropout, affirment-ils, brise la co-adaptation
+tout comme la reproduction sexuelle est censée
+briser les gènes co-adaptés.
+Si l'explication de cette théorie est certainement sujette à débat,
+la technique du dropout elle-même s'est avérée durable,
+et diverses formes de dropout sont implémentées
+dans la plupart des bibliothèques d'apprentissage profond. 
 
 
-Let's think briefly about what we
-expect from a good predictive model.
-We want it to peform well on unseen data.
-Classical generalization theory
-suggests that to close the gap between
-train and test performance,
-we should aim for a simple model.
-Simplicity can come in the form
-of a small number of dimensions.
-We explored this when discussing the
-monomial basis functions of linear models
-in :numref:`sec_model_selection`.
-Additionally, as we saw when discussing weight decay
-($\ell_2$ regularization) in :numref:`sec_weight_decay`,
-the (inverse) norm of the parameters also
-represents a useful measure of simplicity.
-Another useful notion of simplicity is smoothness,
-i.e., that the function should not be sensitive
-to small changes to its inputs.
-For instance, when we classify images,
-we would expect that adding some random noise
-to the pixels should be mostly harmless.
+Le principal défi est de savoir comment injecter ce bruit.
+Une idée consiste à injecter le bruit de manière *non biaisée*
+de sorte que la valeur attendue de chaque couche - tout en fixant
+les autres - soit égale à la valeur qu'elle aurait prise en l'absence de bruit.
+Dans les travaux de Bishop, il a ajouté un bruit gaussien
+aux entrées d'un modèle linéaire.
+À chaque itération d'apprentissage, il ajoute le bruit
+échantillonné à partir d'une distribution de moyenne zéro
+$\epsilon \sim \mathcal{N}(0,\sigma^2)$ à l'entrée \mathbf{x},
+produisant un point perturbé \mathbf{x} $\mathbf{x}' = \mathbf{x} + \epsilon$.
+En espérance, $E[\mathbf{x}'] = \mathbf{x}$.
 
-In 1995, Christopher Bishop formalized
-this idea when he proved that training with input noise
-is equivalent to Tikhonov regularization :cite:`Bishop.1995`.
-This work drew a clear mathematical connection
-between the requirement that a function be smooth (and thus simple),
-and the requirement that it be resilient
-to perturbations in the input.
-
-Then, in 2014, Srivastava et al. :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`
-developed a clever idea for how to apply Bishop's idea
-to the internal layers of a network, too.
-Their idea, called *dropout*, involves
-injecting noise while computing
-each internal layer during forward propagation,
-and it has become a standard technique
-for training neural networks.
-The method is called *dropout* because we literally
-*drop out* some neurons during training.
-Throughout training, on each iteration,
-standard dropout consists of zeroing out
-some fraction of the nodes in each layer
-before calculating the subsequent layer.
-
-To be clear, we are imposing
-our own narrative with the link to Bishop.
-The original paper on dropout
-offers intuition through a surprising
-analogy to sexual reproduction.
-The authors argue that neural network overfitting
-is characterized by a state in which
-each layer relies on a specific
-pattern of activations in the previous layer,
-calling this condition *co-adaptation*.
-dropout, they claim, breaks up co-adaptation
-just as sexual reproduction is argued to
-break up co-adapted genes.
-While the explanatory of this theory is certainly up for debate,
-the dropout technique itself has proved enduring,
-and various forms of dropout are implemented
-in most deep learning libraries. 
-
-
-The key challenge is how to inject this noise.
-One idea is to inject the noise in an *unbiased* manner
-so that the expected value of each layer---while fixing
-the others---equals to the value it would have taken absent noise.
-In Bishop's work, he added Gaussian noise
-to the inputs to a linear model.
-At each training iteration, he added noise
-sampled from a distribution with mean zero
-$\epsilon \sim \mathcal{N}(0,\sigma^2)$ to the input $\mathbf{x}$,
-yielding a perturbed point $\mathbf{x}' = \mathbf{x} + \epsilon$.
-In expectation, $E[\mathbf{x}'] = \mathbf{x}$.
-
-In standard dropout regularization,
-one zeros out some fraction of the nodes in each layer
-and then *debiases* each layer by normalizing
-by the fraction of nodes that were retained (not dropped out).
-In other words,
-with *dropout probability* $p$,
-each intermediate activation $h$ is replaced by
-a random variable $h'$ as follows:
+Dans la régularisation par abandon standard,
+on élimine à zéro une certaine fraction des nœuds dans chaque couche
+, puis on *débiaise* chaque couche en normalisant
+par la fraction de nœuds qui ont été conservés (non éliminés).
+En d'autres termes,
+avec une *probabilité d'abandon* $p$,
+chaque activation intermédiaire $h$ est remplacée par
+une variable aléatoire $h'$ comme suit :
 
 $$
 \begin{aligned}
@@ -103,43 +103,43 @@ h' =
 \end{aligned}
 $$
 
-By design, the expectation remains unchanged, i.e., $E[h'] = h$.
+ Par construction, l'espérance reste inchangée, c'est-à-dire que  $E[h'] = h$.
 
-## Dropout in Practice
+## Dropout en pratique
 
-Recall the MLP with a hidden layer and 5 hidden units
-in :numref:`fig_mlp`.
-When we apply dropout to a hidden layer,
-zeroing out each hidden unit with probability $p$,
-the result can be viewed as a network
-containing only a subset of the original neurons.
-In :numref:`fig_dropout2`, $h_2$ and $h_5$ are removed.
-Consequently, the calculation of the outputs
-no longer depends on $h_2$ or $h_5$
-and their respective gradient also vanishes
-when performing backpropagation.
-In this way, the calculation of the output layer
-cannot be overly dependent on any
-one element of $h_1, \ldots, h_5$.
+Rappelez-vous le MLP avec une couche cachée et 5 unités cachées
+dans :numref:`fig_mlp`.
+Lorsque nous appliquons le dropout à une couche cachée,
+en mettant à zéro chaque unité cachée avec une probabilité $p$,
+le résultat peut être considéré comme un réseau
+contenant uniquement un sous-ensemble des neurones d'origine.
+Dans :numref:`fig_dropout2` , $h_2$ et $h_5$ sont supprimés.
+Par conséquent, le calcul des sorties
+ne dépend plus de $h_2$ ou $h_5$
+et leur gradient respectif disparaît également
+lors de la rétropropagation.
 
-![MLP before and after dropout.](../img/dropout2.svg)
+De cette façon, le calcul de la couche de sortie
+ne peut pas être trop dépendant d'un élément quelconque de $h_1, \ldots, h_5$.
+
+![MLP avant et après dropout.](../img/dropout2.svg)
 :label:`fig_dropout2`
 
-Typically, we disable dropout at test time.
-Given a trained model and a new example,
-we do not drop out any nodes
-and thus do not need to normalize.
-However, there are some exceptions:
-some researchers use dropout at test time as a heuristic
-for estimating the *uncertainty* of neural network predictions:
-if the predictions agree across many different dropout masks,
-then we might say that the network is more confident.
+En général, nous désactivons le dropout au moment du test.
+Étant donné un modèle entraîné et un nouvel exemple,
+nous ne supprimons aucun nœud
+et n'avons donc pas besoin de normaliser.
+Il existe toutefois quelques exceptions :
+certains chercheurs utilisent le dropout au moment du test comme une heuristique
+pour estimer l'*incertitude* des prédictions du réseau neuronal :
+si les prédictions concordent avec de nombreux masques de dropout différents,
+nous pouvons alors dire que le réseau est plus confiant.
 
-## Implementation from Scratch
+## Implémentation from Scratch
 
-To implement the dropout function for a single layer,
-we must draw as many samples
-from a Bernoulli (binary) variable aléatoire
+Pour implémenter la fonction de dropout pour une seule couche,
+nous devons tirer autant d'échantillons
+d'un Bernoulli (binaire) variable aléatoire
 comme notre couche a des dimensions,
 où la variable aléatoire prend la valeur $1$ (conserver)
 avec la probabilité $1-p$ et $0$ (abandonner) avec la probabilité $p$.
@@ -385,12 +385,12 @@ trainer.fit(model, data)
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/100)
-:end_tab:
+:end_tab: 
 
-:begin_tab:`pytorch`
+ :begin_tab:`pytorch` 
 [Discussions](https://discuss.d2l.ai/t/101)
-:end_tab:
+:end_tab: 
 
-:begin_tab:`tensorflow`
+ :begin_tab:`tensorflow` 
 [Discussions](https://discuss.d2l.ai/t/261)
 :end_tab:

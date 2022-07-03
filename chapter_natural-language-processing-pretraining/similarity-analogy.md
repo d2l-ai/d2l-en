@@ -268,7 +268,7 @@ get_analogy('bad', 'worst', 'big', glove_6b50d)
 
 Pour montrer la notion capturée
 de passé dans les vecteurs de mots prétraités,
-, nous pouvons tester la syntaxe en utilisant l'analogie "présent-passé"
+nous pouvons tester la syntaxe en utilisant l'analogie "présent-passé"
 : "faire":“did”::“go”: "aller".
 
 ```{.python .input}

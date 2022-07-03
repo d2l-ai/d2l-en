@@ -264,7 +264,7 @@ def _pad_bert_inputs(examples, max_len, vocab):
 En combinant les fonctions d'aide pour
 générant des exemples d'entraînement pour les deux tâches de pré-entraînement,
 et la fonction d'aide pour le remplissage des entrées,
-, nous personnalisons la classe `_WikiTextDataset` suivante comme [**le jeu de données WikiText-2 pour le pré-entraînement de BERT**].
+nous personnalisons la classe `_WikiTextDataset` suivante comme [**le jeu de données WikiText-2 pour le pré-entraînement de BERT**].
 En implémentant la fonction `__getitem__ `,
 nous pouvons accéder arbitrairement aux exemples de pré-entraînement (modélisation du langage masqué et prédiction de la phrase suivante) 
 générés à partir d'une paire de phrases du corpus WikiText-2.

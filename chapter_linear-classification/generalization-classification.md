@@ -143,7 +143,7 @@ notre erreur de test $\epsilon_\mathcal{D}(f)$
 Ainsi, pour estimer notre erreur de test avec deux fois plus de précision,
 nous devons collecter un ensemble de tests quatre fois plus grand.
 Pour réduire notre erreur de test d'un facteur cent,
-, nous devons collecter un ensemble de tests dix mille fois plus grand.
+nous devons collecter un ensemble de tests dix mille fois plus grand.
 En général, un tel taux de $\mathcal{O}(1/\sqrt{n})$ 
  est souvent le meilleur que l'on puisse espérer en statistique.
 
@@ -193,7 +193,7 @@ Vous serez peut-être surpris d'apprendre que des milliers
 d'articles sur l'apprentissage profond appliqué sont publiés chaque année
 et que les améliorations du taux d'erreur de $0.01$ ou moins font l'objet d'une grande attention.
 Bien sûr, lorsque les taux d'erreur sont beaucoup plus proches de $0$,
-, une amélioration de $0.01$ peut effectivement être un gros problème.
+une amélioration de $0.01$ peut effectivement être un gros problème.
 
 
 L'une des caractéristiques de notre analyse jusqu'à présent
@@ -289,7 +289,7 @@ il peut être difficile de garantir
 qu'il n'y en a même pas un parmi
 dont la performance du jeu de test est trompeuse.
 Avec 20 classificateurs à l'étude,
-, il se peut que vous n'ayez aucune puissance
+il se peut que vous n'ayez aucune puissance
 pour exclure la possibilité
 qu'au moins l'un d'entre eux
 ait reçu un score trompeur.
@@ -325,7 +325,7 @@ lors de la communication des intervalles de confiance,
 et à redoubler de vigilance
 lorsque les enjeux sont importants et que la taille de votre ensemble de données est réduite.
 Lors de l'exécution d'une série de défis de référence,
-, il est souvent judicieux de conserver
+il est souvent judicieux de conserver
 plusieurs ensembles de test afin qu'après chaque tour,
 l'ancien ensemble de test puisse être rétrogradé en ensemble de validation.
 

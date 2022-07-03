@@ -565,7 +565,7 @@ Pour [**démontrer la classe `DotProductAttention` **],
 nous utilisons les mêmes clés, valeurs et longueurs valides que dans l'exemple précédent
 pour l'attention additive.
 Pour l'opération du produit scalaire,
-, nous faisons en sorte que la taille des caractéristiques des requêtes
+nous faisons en sorte que la taille des caractéristiques des requêtes
 soit la même que celle des clés.
 
 ```{.python .input}

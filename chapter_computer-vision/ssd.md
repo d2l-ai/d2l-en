@@ -28,7 +28,7 @@ Le réseau de base
 sert à extraire les caractéristiques de l'image d'entrée,
 et peut donc utiliser un CNN profond.
 Par exemple,
-, l'article original sur la détection de boîtes multiples à un seul coup
+l'article original sur la détection de boîtes multiples à un seul coup
 adopte un réseau VGG tronqué avant la couche de classification
  :cite:`Liu.Anguelov.Erhan.ea.2016` ,
 tandis que ResNet a également été couramment utilisé.
@@ -85,7 +85,7 @@ Soit le nombre de classes d'objets $q$.
 Les boîtes d'ancrage ont alors $q+1$ classes,
 où la classe 0 est le fond.
 À une certaine échelle,
-, supposons que la hauteur et la largeur des cartes de caractéristiques
+supposons que la hauteur et la largeur des cartes de caractéristiques
 soient respectivement $h$ et $w$.
 Lorsque $a$ boîtes d'ancrage
 sont générées avec
@@ -114,7 +114,7 @@ représentent des prédictions de classe
 pour toutes les cases d'ancrage centrées sur
 ($x$, $y$) des cartes de caractéristiques d'entrée.
 Pour produire des prédictions valides,
-, il doit y avoir des canaux de sortie $a(q+1)$,
+il doit y avoir des canaux de sortie $a(q+1)$,
 où, pour la même position spatiale
 , le canal de sortie avec l'indice $i(q+1) + j$
  représente la prédiction de
@@ -226,7 +226,7 @@ Y1.shape, Y2.shape
 ```
 
 Comme nous pouvons le constater, à l'exception de la dimension de la taille du lot,
-, les trois autres dimensions ont toutes des tailles différentes.
+les trois autres dimensions ont toutes des tailles différentes.
 Afin de concaténer ces deux sorties de prédiction pour un calcul plus efficace,
 nous allons transformer ces tenseurs dans un format plus cohérent.
 
@@ -580,7 +580,7 @@ pour la détection d'objets.
 ### Lecture du jeu de données et initialisation du modèle
 
 Pour commencer,
-, [**lisons
+[**lisons
 le jeu de données de détection de bananes**]
 décrit dans :numref:`sec_object-detection-dataset` .
 

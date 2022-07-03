@@ -213,7 +213,7 @@ Le terme " état " dans l'architecture codeur-décodeur
 vous a probablement inspiré la mise en œuvre de cette architecture
 à l'aide de réseaux neuronaux avec états.
 Dans la section suivante,
-, nous verrons comment appliquer les RNN pour concevoir 
+nous verrons comment appliquer les RNN pour concevoir 
 des modèles de transduction de séquence basés sur 
 cette architecture codeur-décodeur.
 

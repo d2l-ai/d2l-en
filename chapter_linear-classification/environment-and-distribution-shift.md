@@ -175,7 +175,7 @@ comme le montre :numref:`fig_popvssoda` .
 
 ![Concept shift on soft drink names in the United States.](../img/popvssoda.png) 
  :width:`400px` 
- :label:`fig_popvssoda` 
+:label:`fig_popvssoda` 
 
  Si nous devions construire un système de traduction automatique,
 la distribution $P(y \mid \mathbf{x})$ pourrait être différente
@@ -331,7 +331,7 @@ $$E_{p(\mathbf{x}, y)} [l(f(\mathbf{x}), y)] = \int\int l(f(\mathbf{x}), y) p(\m
 
  Cependant, en pratique, nous ne pouvons généralement pas obtenir la population entière de données.
 Ainsi, la minimisation du risque empirique *,
-, qui consiste à minimiser le risque empirique dans :eqref:`eq_empirical-risk-min` ,
+qui consiste à minimiser le risque empirique dans :eqref:`eq_empirical-risk-min` ,
 est une stratégie pratique pour l'apprentissage automatique,
 dans l'espoir d'approcher
 en minimisant le risque.
@@ -499,7 +499,7 @@ Dans le cadre de l'apprentissage profond, les entrées ont tendance à
 tandis que les étiquettes sont souvent des objets plus simples comme des catégories.
 
 Pour estimer la distribution des étiquettes cibles,
-, nous prenons d'abord notre classificateur standard raisonnablement bon
+nous prenons d'abord notre classificateur standard raisonnablement bon
 (généralement formé sur les données de formation)
 et nous calculons sa matrice de confusion en utilisant l'ensemble de validation
 (également issu de la distribution de formation).
@@ -538,7 +538,7 @@ alors la matrice de confusion $\mathbf{C}$ sera inversible,
 et nous obtiendrons une solution $p(\mathbf{y}) = \mathbf{C}^{-1} \mu(\hat{\mathbf{y}})$.
 
 Comme nous observons les étiquettes sur les données sources,
-, il est facile d'estimer la distribution $q(y)$.
+il est facile d'estimer la distribution $q(y)$.
 Ensuite, pour tout exemple de formation $i$ avec l'étiquette $y_i$,
 nous pouvons prendre le rapport de nos estimations $p(y_i)/q(y_i)$
  pour calculer le poids $\beta_i$,

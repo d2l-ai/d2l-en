@@ -75,7 +75,7 @@ chaque fois que nous devons produire une prédiction difficile.
 En effet, de nombreuses applications exigent que nous fassions un choix.
 Par exemple, Gmail doit classer un courriel dans les catégories suivantes : " primaire ", " social ", " mises à jour ", " forums " ou " spam ".
 Il peut estimer les probabilités en interne,
-, mais au bout du compte, il doit choisir une des classes.
+mais au bout du compte, il doit choisir une des classes.
 
 Lorsque les prédictions sont cohérentes avec la classe d'étiquettes `y`, elles sont correctes.
 La précision de la classification est la fraction de toutes les prédictions qui sont correctes.

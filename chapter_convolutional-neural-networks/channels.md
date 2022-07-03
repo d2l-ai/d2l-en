@@ -112,7 +112,7 @@ corr2d_multi_in(X, K)
  Quel que soit le nombre de canaux d'entrée,
 jusqu'à présent, nous nous sommes toujours retrouvés avec un seul canal de sortie.
 Cependant, comme nous l'avons vu dans :numref:`subsec_why-conv-channels` ,
-, il s'avère essentiel de disposer de plusieurs canaux à chaque couche.
+il s'avère essentiel de disposer de plusieurs canaux à chaque couche.
 Dans les architectures de réseaux neuronaux les plus populaires,
 nous augmentons en fait la dimension des canaux
 à mesure que nous pénétrons plus profondément dans le réseau neuronal,

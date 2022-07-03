@@ -313,7 +313,7 @@ def get_data_ch11(batch_size=10, n=1500):
 
 Rappelez-vous l'implémentation de la descente de gradient stochastique en minibatch de :numref:`sec_linear_scratch` . Dans ce qui suit, nous fournissons une implémentation légèrement plus générale. Par commodité, elle a la même signature d'appel que les autres algorithmes d'optimisation présentés plus loin dans ce chapitre. Plus précisément, nous ajoutons l'état
 à l'entrée `states` et plaçons l'hyperparamètre dans le dictionnaire `hyperparams`. En outre,
-, nous calculons la moyenne de la perte de chaque exemple de minilots dans la fonction d'apprentissage
+nous calculons la moyenne de la perte de chaque exemple de minilots dans la fonction d'apprentissage
 , de sorte que le gradient dans l'algorithme d'optimisation n'a pas besoin d'être
 divisé par la taille du lot.
 

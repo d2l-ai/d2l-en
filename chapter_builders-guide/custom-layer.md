@@ -134,7 +134,7 @@ des routines de sérialisation personnalisées pour chaque couche personnalisée
 
 Implémentons maintenant notre propre version de la couche entièrement connectée.
 Rappelons que cette couche nécessite deux paramètres,
-, l'un pour représenter le poids et l'autre pour le biais.
+l'un pour représenter le poids et l'autre pour le biais.
 Dans cette implémentation, nous intégrons l'activation ReLU par défaut.
 Cette couche requiert deux arguments d'entrée :`in_units` et `units`, dont
 représente le nombre d'entrées et de sorties, respectivement.

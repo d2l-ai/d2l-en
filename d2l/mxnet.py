@@ -11,7 +11,7 @@ from mxnet.gluon.data.vision import transforms
 
 nn_Module = nn.Block
 
-#################   WARNING   ################
+#################   WARNING  ################
 # The below part is generated automatically through:
 #    d2lbook build lib
 # Don't edit it directly

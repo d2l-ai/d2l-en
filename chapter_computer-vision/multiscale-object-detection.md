@@ -71,7 +71,7 @@ Rappelez-vous que dans :numref:`sec_conv_layer`
  nous appelons un tableau bidimensionnel issu de 
 une couche convolutive une carte de caractéristiques.
 En définissant la forme de la carte de caractéristiques,
-, nous pouvons déterminer les centres des boîtes d'ancrage échantillonnées uniformément sur n'importe quelle image.
+nous pouvons déterminer les centres des boîtes d'ancrage échantillonnées uniformément sur n'importe quelle image.
 
 
 La fonction `display_anchors` est définie ci-dessous.

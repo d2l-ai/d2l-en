@@ -68,7 +68,7 @@ $$\pi_{t+1}(h_{t+1}) = \sum_{h_t} \pi_t(h_t) P(x_t \mid h_t) P(h_{t+1} \mid h_t)
  La récursion est initialisée comme $\pi_1(h_1) = P(h_1)$. En termes abstraits, on peut l'écrire sous la forme $\pi_{t+1} = f(\pi_t, x_t)$, où $f$ est une fonction apprenable. Cela ressemble beaucoup à l'équation de mise à jour des modèles à variables latentes dont nous avons parlé jusqu'à présent dans le contexte des RNN !
 
 De manière tout à fait analogue à la récursion avant,
-, nous pouvons également
+nous pouvons également
 faire la somme sur le même ensemble de variables latentes avec une récursion arrière. Cela donne :
 
 $$\begin{aligned}

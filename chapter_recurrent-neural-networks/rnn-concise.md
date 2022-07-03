@@ -43,7 +43,7 @@ par des API de haut niveau.
 
 :begin_tab:`mxnet`
 Plus précisément, pour initialiser l'état caché,
-, nous invoquons la méthode membre `begin_state`.
+nous invoquons la méthode membre `begin_state`.
 Celle-ci renvoie une liste
 qui contient
 un état caché initial

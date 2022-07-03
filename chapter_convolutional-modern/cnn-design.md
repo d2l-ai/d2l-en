@@ -312,7 +312,7 @@ dans les distributions d'erreurs (à droite de :numref:`fig_regnet-paper-fig5` )
 
 ![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Sharing bottleneck ratio (from $\text{AnyNetX}_A$ to  $\text{AnyNetX}_B$) et le partage du nombre de groupes (de $\text{AnyNetX}_B$ à $\text{AnyNetX}_C$) simplifient l'espace de conception sans pratiquement aucun changement dans les distributions d'erreurs (figure tirée de :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` ).](../img/regnet-paper-fig5.png)
 :width:`600px` 
- :label:`fig_regnet-paper-fig5` 
+:label:`fig_regnet-paper-fig5` 
 
  L'étude des bons et des mauvais modèles de $\text{AnyNetX}_C$ suggère qu'il peut être utile d'augmenter la largeur entre les étapes :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` .
 De manière empirique, la simplification de
@@ -327,11 +327,11 @@ donne un $\text{AnyNetX}_E$
 
 ![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Increasing network width across stages (from $\text{AnyNetX}_C$ to  $\text{AnyNetX}_D$) et l'augmentation de la profondeur du réseau entre les étapes (de $\text{AnyNetX}_D$ à $\text{AnyNetX}_E$) simplifie l'espace de conception avec des distributions d'erreurs améliorées (figure tirée de :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` ).](../img/regnet-paper-fig7.png)
 :width:`600px` 
- :label:`fig_regnet-paper-fig7` 
+:label:`fig_regnet-paper-fig7` 
 
  
 
- ## RegNet
+## RegNet
 
 L'espace de conception $\text{AnyNetX}_E$ résultant
 se compose de réseaux simples

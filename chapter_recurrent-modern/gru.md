@@ -115,7 +115,7 @@ Nous utilisons ici une non-linéarité sous la forme de tanh pour nous assurer q
 Le résultat est un *candidat* puisque nous devons encore incorporer l'action de la porte de mise à jour.
 
 Par rapport à :eqref:`rnn_h_with_state` ,
-, l'influence des états précédents
+l'influence des états précédents
 peut maintenant être réduite grâce à la multiplication par éléments de
 $\mathbf{R}_t$ et $\mathbf{H}_{t-1}$
  dans :eqref:`gru_tilde_H` .

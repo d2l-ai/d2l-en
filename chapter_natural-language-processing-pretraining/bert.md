@@ -87,7 +87,7 @@ BERT est capable de représenter n'importe quel token en fonction de son context
 Pendant l'apprentissage supervisé de tâches en aval,
 BERT est similaire à GPT sous deux aspects.
 Premièrement, les représentations de BERT seront introduites dans une couche de sortie supplémentaire,
-, avec des modifications minimales de l'architecture du modèle en fonction de la nature des tâches,
+avec des modifications minimales de l'architecture du modèle en fonction de la nature des tâches,
 telles que la prédiction pour chaque token ou la prédiction pour la séquence entière.
 Deuxièmement,
 tous les paramètres du codeur transformateur pré-entraîné sont affinés,

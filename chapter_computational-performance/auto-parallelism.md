@@ -1,16 +1,16 @@
-# Automatic Parallelism
+# Parallélisation automatique
 :label:`sec_auto_para`
 
 
-Deep learning frameworks (e.g., MXNet and PyTorch) automatically construct computational graphs at the backend. Using a
-computational graph, the system is aware of all the dependencies,
-and can selectively execute multiple non-interdependent tasks in parallel to
-improve speed. For instance, :numref:`fig_asyncgraph` in :numref:`sec_async` initializes two variables independently. Consequently the system can choose to execute them in parallel.
+Les cadres d'apprentissage profond (par exemple, MXNet et PyTorch) construisent automatiquement des graphes de calcul en arrière-plan. En utilisant un graphe de calcul
+, le système est conscient de toutes les dépendances,
+et peut exécuter sélectivement plusieurs tâches non interdépendantes en parallèle pour
+améliorer la vitesse. Par exemple, :numref:`fig_asyncgraph` dans :numref:`sec_async` initialise deux variables indépendamment. Par conséquent, le système peut choisir de les exécuter en parallèle.
 
 
-Typically, a single operator will use all the computational resources on all CPUs or on a single GPU. For example, the `dot` operator will use all cores (and threads) on all CPUs, even if there are multiple CPU processors on a single machine. The same applies to a single GPU. Hence parallelization is not quite so useful for single-device computers. With multiple devices things matter more. While parallelization is typically most relevant between multiple GPUs, adding the local CPU will increase performance slightly. For example, see :cite:`Hadjis.Zhang.Mitliagkas.ea.2016` that focuses on training computer vision models combining a GPU and a CPU. With the convenience of an automatically parallelizing framework we can accomplish the same goal in a few lines of Python code. More broadly, our discussion of automatic parallel computation focuses on parallel computation using both CPUs and GPUs, as well as the parallelization of computation and communication.
+Généralement, un seul opérateur utilisera toutes les ressources de calcul de tous les CPU ou d'un seul GPU. Par exemple, l'opérateur `dot` utilisera tous les cœurs (et threads) de tous les CPU, même s'il y a plusieurs processeurs CPU sur une seule machine. Il en va de même pour un seul GPU. Par conséquent, la parallélisation n'est pas aussi utile pour les ordinateurs à périphérique unique. Avec plusieurs appareils, les choses sont plus importantes. Alors que la parallélisation est généralement plus pertinente entre plusieurs GPU, l'ajout du CPU local augmentera légèrement les performances. Par exemple, consultez :cite:`Hadjis.Zhang.Mitliagkas.ea.2016` qui se concentre sur l'entraînement de modèles de vision par ordinateur en combinant un GPU et un CPU. Grâce à la commodité d'un cadre de parallélisation automatique, nous pouvons atteindre le même objectif en quelques lignes de code Python. Plus largement, notre discussion sur le calcul parallèle automatique se concentre sur le calcul parallèle utilisant à la fois les CPU et les GPU, ainsi que sur la parallélisation du calcul et de la communication.
 
-Note that we need at least two GPUs to run the experiments in this section.
+Notez que nous avons besoin d'au moins deux GPU pour exécuter les expériences de cette section.
 
 ```{.python .input}
 #@tab mxnet
@@ -25,9 +25,9 @@ from d2l import torch as d2l
 import torch
 ```
 
-## Parallel Computation on GPUs
+## Calcul parallèle sur GPUs
 
-Let's start by defining a reference workload to test: the `run` function below performs 10 matrix-matrix multiplications on the device of our choice using data allocated into two variables:`x_gpu1` and `x_gpu2`.
+Commençons par définir une charge de travail de référence à tester : la fonction `run` ci-dessous effectue 10 multiplications matricielles sur le périphérique de notre choix en utilisant des données allouées dans deux variables :`x_gpu1` et `x_gpu2`.
 
 ```{.python .input}
 #@tab mxnet
@@ -50,11 +50,11 @@ x_gpu2 = torch.rand(size=(4000, 4000), device=devices[1])
 ```
 
 :begin_tab:`mxnet`
-Now we apply the function to the data. To ensure that caching does not play a role in the results we warm up the devices by performing a single pass on either of them prior to measuring.
+Nous appliquons maintenant la fonction aux données. Pour s'assurer que la mise en cache ne joue pas un rôle dans les résultats, nous chauffons les dispositifs en effectuant une seule passe sur l'un d'entre eux avant de procéder à la mesure.
 :end_tab:
 
 :begin_tab:`pytorch`
-Now we apply the function to the data. To ensure that caching does not play a role in the results we warm up the devices by performing a single pass on either of them prior to measuring. `torch.cuda.synchronize()` waits for all kernels in all streams on a CUDA device to complete. It takes in a `device` argument, the device for which we need to synchronize. It uses the current device, given by `current_device()`, if the device argument is `None` (default).
+Nous appliquons maintenant la fonction aux données. Pour s'assurer que la mise en cache ne joue pas de rôle dans les résultats, nous réchauffons les périphériques en effectuant un seul passage sur l'un d'entre eux avant de procéder à la mesure. `torch.cuda.synchronize()` attend que tous les noyaux de tous les flux sur un périphérique CUDA soient terminés. Elle prend un argument `device`, le périphérique pour lequel nous devons nous synchroniser. Elle utilise le périphérique actuel, donné par `current_device()`, si l'argument du périphérique est `None` (par défaut).
 :end_tab:
 
 ```{.python .input}
@@ -89,11 +89,11 @@ with d2l.Benchmark('GPU2 time'):
 ```
 
 :begin_tab:`mxnet`
-If we remove the `waitall` statement between both tasks the system is free to parallelize computation on both devices automatically.
+Si nous supprimons l'instruction `waitall` entre les deux tâches, le système est libre de paralléliser automatiquement le calcul sur les deux périphériques.
 :end_tab:
 
 :begin_tab:`pytorch`
-If we remove the `synchronize` statement between both tasks the system is free to parallelize computation on both devices automatically.
+Si nous supprimons l'instruction `synchronize` entre les deux tâches, le système est libre de paralléliser automatiquement le calcul sur les deux dispositifs.
 :end_tab:
 
 ```{.python .input}
@@ -112,15 +112,15 @@ with d2l.Benchmark('GPU1 & GPU2'):
     torch.cuda.synchronize()
 ```
 
-In the above case the total execution time is less than the sum of its parts, since the deep learning framework automatically schedules computation on both GPU devices without the need for sophisticated code on behalf of the user.
+Dans le cas ci-dessus, le temps d'exécution total est inférieur à la somme de ses parties, car le cadre d'apprentissage profond planifie automatiquement le calcul sur les deux GPU sans que l'utilisateur ait besoin d'un code sophistiqué.
 
 
 
-## Parallel Computation and Communication
+## Calcul et Communication en parallèle
 
-In many cases we need to move data between different devices, say between the CPU and GPU, or between different GPUs. 
-For instance,
-this occurs when we want to perform distributed optimization where we need to aggregate the gradients over multiple accelerator cards. Let's simulate this by computing on the GPU and then copying the results back to the CPU.
+Dans de nombreux cas, nous devons déplacer des données entre différents dispositifs, par exemple entre le CPU et le GPU, ou entre différents GPU. 
+Par exemple,
+cela se produit lorsque nous voulons effectuer une optimisation distribuée où nous devons agréger les gradients sur plusieurs cartes accélératrices. Simulons cela en calculant sur le GPU, puis en recopiant les résultats sur le CPU.
 
 ```{.python .input}
 #@tab mxnet
@@ -151,11 +151,11 @@ with d2l.Benchmark('Copy to CPU'):
 ```
 
 :begin_tab:`mxnet`
-This is somewhat inefficient. Note that we could already start copying parts of `y` to the CPU while the remainder of the list is still being computed. This situation occurs, e.g., when we compute the gradient on a minibatch. The gradients of some of the parameters will be available earlier than that of others. Hence it works to our advantage to start using PCI-Express bus bandwidth while the GPU is still running. Removing `waitall` between both parts allows us to simulate this scenario.
+Cette méthode est quelque peu inefficace. Notez que nous pourrions déjà commencer à copier des parties de `y` vers le CPU alors que le reste de la liste est toujours en cours de calcul. Cette situation se produit, par exemple, lorsque nous calculons le gradient sur un minibatch. Les gradients de certains des paramètres seront disponibles plus tôt que ceux des autres. Il est donc avantageux pour nous de commencer à utiliser la largeur de bande du bus PCI-Express pendant que le GPU est encore en fonctionnement. La suppression de `waitall` entre les deux parties nous permet de simuler ce scénario.
 :end_tab:
 
 :begin_tab:`pytorch`
-This is somewhat inefficient. Note that we could already start copying parts of `y` to the CPU while the remainder of the list is still being computed. This situation occurs, e.g., when we compute the (backprop) gradient on a minibatch. The gradients of some of the parameters will be available earlier than that of others. Hence it works to our advantage to start using PCI-Express bus bandwidth while the GPU is still running. In PyTorch, several functions such as `to()` and `copy_()` admit an explicit `non_blocking` argument, which lets the caller bypass synchronization when it is unnecessary. Setting `non_blocking=True` allows us to simulate this scenario.
+C'est quelque peu inefficace. Notez que nous pourrions déjà commencer à copier des parties de `y` vers le CPU alors que le reste de la liste est toujours en cours de calcul. Cette situation se produit, par exemple, lorsque nous calculons le gradient (backprop) sur un minibatch. Les gradients de certains des paramètres seront disponibles plus tôt que ceux des autres. Il est donc avantageux de commencer à utiliser la bande passante du bus PCI-Express pendant que le GPU est encore en fonctionnement. Dans PyTorch, plusieurs fonctions telles que `to()` et `copy_()` admettent un argument explicite `non_blocking`, qui permet à l'appelant de contourner la synchronisation lorsqu'elle est inutile. Le réglage de `non_blocking=True` nous permet de simuler ce scénario.
 :end_tab:
 
 ```{.python .input}
@@ -174,19 +174,19 @@ with d2l.Benchmark('Run on GPU1 and copy to CPU'):
     torch.cuda.synchronize()
 ```
 
-The total time required for both operations is (as expected) less than the sum of their parts.
-Note that this task is different from parallel computation as it uses a different resource: the bus between the CPU and GPUs. In fact, we could compute on both devices and communicate, all at the same time. As noted above, there is a dependency between computation and communication:`y[i]` must be computed before it can be copied to the CPU. Fortunately, the system can copy `y[i-1]` while computing `y[i]` to reduce the total running time.
+Le temps total requis pour les deux opérations est (comme prévu) inférieur à la somme de leurs parties.
+Notez que cette tâche est différente du calcul parallèle car elle utilise une ressource différente : le bus entre le CPU et les GPU. En fait, nous pourrions calculer sur les deux dispositifs et communiquer, le tout en même temps. Comme indiqué ci-dessus, il existe une dépendance entre le calcul et la communication :`y[i]` doit être calculé avant de pouvoir être copié sur le CPU. Heureusement, le système peut copier `y[i-1]` tout en calculant `y[i]` pour réduire le temps d'exécution total.
 
-We conclude with an illustration of the computational graph and its dependencies for a simple two-layer MLP when training on a CPU and two GPUs, as depicted in :numref:`fig_twogpu`. It would be quite painful to schedule the parallel program resulting from this manually. This is where it is advantageous to have a graph-based computing backend for optimization.
+Nous conclurons par une illustration du graphe de calcul et de ses dépendances pour un simple MLP à deux couches lors de l'entraînement sur un CPU et deux GPU, comme décrit dans :numref:`fig_twogpu` . Il serait assez pénible de programmer manuellement le programme parallèle qui en résulte. C'est là qu'il est avantageux d'avoir un backend de calcul basé sur le graphe pour l'optimisation.
 
-![The computational graph and its dependencies of a two-layer MLP on a CPU and two GPUs.](../img/twogpu.svg)
+![Le graphe de calcul et ses dépendances d'un MLP à deux couches sur un CPU et deux GPU.](../img/twogpu.svg)
 :label:`fig_twogpu`
 
 
-## Summary
+## Résumé
 
-* Modern systems have a variety of devices, such as multiple GPUs and CPUs. They can be used in parallel, asynchronously. 
-* Modern systems also have a variety of resources for communication, such as PCI Express, storage (typically solid-state drives or via networks)et la bande passante du réseau. Ils peuvent être utilisés en parallèle pour une efficacité maximale. 
+* Les systèmes modernes possèdent une variété de dispositifs, tels que plusieurs GPU et CPU. Ils peuvent être utilisés en parallèle, de manière asynchrone. 
+* Les systèmes modernes disposent également d'une variété de ressources pour la communication, comme PCI Express, le stockage (généralement des disques durs solides ou via des réseauxet)la bande passante du réseau. Ils peuvent être utilisés en parallèle pour une efficacité maximale. 
 * Le backend peut améliorer les performances grâce à des calculs et des communications parallèles automatiques. 
 
 ## Exercices

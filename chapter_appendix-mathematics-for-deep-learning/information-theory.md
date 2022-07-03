@@ -160,7 +160,7 @@ $$H(S) = \sum_i {p_i \cdot I(s_i)} = - \sum_i {p_i \cdot \log p_i}.$$
 
  
 
- ### Propriétés de l'entropie
+### Propriétés de l'entropie
 
 Grâce aux exemples et interprétations ci-dessus, nous pouvons déduire les propriétés suivantes de l'entropie :eqref:`eq_ent_def` . Ici, nous désignons $X$ comme un événement et $P$ comme la distribution de probabilité de $X$.
 
@@ -324,7 +324,7 @@ $$I(X, Y) = E_{x} E_{y} \left\{ p_{X, Y}(x, y) \log\frac{p_{X, Y}(x, y)}{p_X(x) 
  * $H(X) + H(Y) - H(X, Y)$
 
  ![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual-information.svg) 
- :label:`fig_mutual_information` 
+:label:`fig_mutual_information` 
 
  
  De bien des façons, nous pouvons considérer l'information mutuelle :eqref:`eq_mut_ent_def` comme une extension de principe du coefficient de corrélation que nous avons vu dans :numref:`sec_random_variables` .  Cela nous permet de demander non seulement les relations linéaires entre les variables, mais aussi l'information maximale partagée entre les deux variables aléatoires de n'importe quel type.
@@ -379,7 +379,7 @@ Plutôt que de mémoriser la définition de l'information mutuelle :eqref:`eq_mu
 * $I(X, Y) = 0$ si et seulement si $X$ et $Y$ sont indépendants. Par exemple, si $X$ et $Y$ sont indépendants, alors le fait de connaître $Y$ ne donne aucune information sur $X$ et vice versa, leur information mutuelle est donc nulle.
 * Par ailleurs, si $X$ est une fonction inversible de $Y$, alors $Y$ et $X$ partagent toutes les informations et $$I(X, Y) = H(Y) = H(X).$$
 
- ### Information mutuelle ponctuelle
+### Information mutuelle ponctuelle
 
 Lorsque nous avons travaillé sur l'entropie au début de ce chapitre, nous avons été en mesure de fournir une interprétation de $-\log(p_X(x))$ comme étant le degré de *surprise* du résultat particulier.  Nous pouvons donner une interprétation similaire au terme logarithmique de l'information mutuelle, souvent appelée *information mutuelle ponctuelle* :
 

@@ -37,7 +37,7 @@ via une seule transformation affine,
 suivie d'une opération softmax.
 Si nos étiquettes étaient réellement liées
 aux données d'entrée par une simple transformation affine,
-, cette approche serait suffisante.
+cette approche serait suffisante.
 Cependant, la linéarité (dans les transformations affines) est une hypothèse *forte*.
 
 ### Limites des modèles linéaires
@@ -190,7 +190,7 @@ De plus, notre modèle linéaire était déjà
 capable de représenter toute fonction affine.
 
 Pour le voir formellement, il suffit de supprimer la couche cachée dans la définition ci-dessus,
-, ce qui donne un modèle équivalent à une seule couche avec les paramètres
+ce qui donne un modèle équivalent à une seule couche avec les paramètres
 $\mathbf{W} = \mathbf{W}^{(1)}\mathbf{W}^{(2)}$ et $\mathbf{b} = \mathbf{b}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)}$:
 
 $$
@@ -390,7 +390,7 @@ même lorsque l'argument est négatif :
 
 $$\operatorname{pReLU}(x) = \max(0, x) + \alpha \min(0, x).$$ 
 
- ### Fonction Sigmoïde
+### Fonction Sigmoïde
 
 [**La *fonction sigmoïde* transforme ses entrées**],
 pour lesquelles les valeurs se situent dans le domaine $\mathbb{R}$,

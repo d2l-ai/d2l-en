@@ -167,10 +167,10 @@ l'article original insérait la normalisation par lots après la transformation 
 et avant la fonction d'activation non linéaire. 
 Des applications ultérieures ont expérimenté l'insertion de la normalisation par lots juste après les fonctions d'activation :cite:`Ioffe.Szegedy.2015` .
 En désignant l'entrée de la couche entièrement connectée par $\mathbf{x}$,
-, la transformation affine
+la transformation affine
 par $\mathbf{W}\mathbf{x} + \mathbf{b}$ (avec le paramètre de poids $\mathbf{W}$ et le paramètre de biais $\mathbf{b}$),
 et la fonction d'activation par $\phi$,
-, nous pouvons exprimer le calcul d'une sortie de couche entièrement connectée
+nous pouvons exprimer le calcul d'une sortie de couche entièrement connectée
 avec normalisation par lots $\mathbf{h}$ comme suit :
 
 $$\mathbf{h} = \phi(\mathrm{BN}(\mathbf{W}\mathbf{x} + \mathbf{b}) ).$$
@@ -331,7 +331,7 @@ les moyennes mobiles des moyennes et des variances
 pour une utilisation ultérieure pendant la prédiction du modèle.
 
 En laissant de côté les détails algorithmiques,
-, notez le modèle de conception qui sous-tend notre mise en œuvre de la couche.
+notez le modèle de conception qui sous-tend notre mise en œuvre de la couche.
 En général, nous définissons les mathématiques dans une fonction distincte, par exemple `batch_norm`.
 Nous intégrons ensuite cette fonctionnalité dans une couche personnalisée,
 dont le code traite principalement des questions de comptabilité,
@@ -702,7 +702,7 @@ Il est probable que sa résonance en tant que point focal de ces débats
 est due à sa large reconnaissabilité par le public cible.
 La normalisation par lots s'est avérée être une méthode indispensable,
 appliquée dans presque tous les classificateurs d'images déployés,
-, ce qui a valu à l'article qui a introduit cette technique
+ce qui a valu à l'article qui a introduit cette technique
 des dizaines de milliers de citations. Nous pensons cependant que les principes directeurs 
 de régularisation par injection de bruit, d'accélération par remise à l'échelle et enfin de prétraitement
 pourraient bien conduire à d'autres inventions de couches et de techniques à l'avenir. 

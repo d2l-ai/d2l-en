@@ -135,8 +135,8 @@ laisse $n$ être le nombre d'images de la classe ayant le moins d'exemples, et $
 L'ensemble de validation répartira les images
 $\max(\lfloor nr\rfloor,1)$ pour chaque classe.
 Prenons l'exemple de `valid_ratio=0.1`. Étant donné que l'ensemble d'entraînement original comporte 50 000 images,
-, 45 000 images seront utilisées pour l'entraînement dans le chemin `train_valid_test/train`,
-, tandis que les 5 000 autres images seront réparties dans
+45 000 images seront utilisées pour l'entraînement dans le chemin `train_valid_test/train`,
+tandis que les 5 000 autres images seront réparties dans
 comme ensemble de validation dans le chemin `train_valid_test/valid`. Après avoir organisé l'ensemble de données, les images de la même classe seront placées dans le même dossier.
 
 ```{.python .input}

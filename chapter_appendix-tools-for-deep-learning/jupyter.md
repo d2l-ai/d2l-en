@@ -17,7 +17,7 @@ Supposons que le chemin local du code du livre soit `xx/yy/d2l-en/`. Utilisez le
 
 ![The folders containing the code of this book.](../img/jupyter00.png) 
  :width:`600px` 
- :label:`fig_jupyter00` 
+:label:`fig_jupyter00` 
 
  
  Vous pouvez accéder aux fichiers du notebook en cliquant sur le dossier affiché sur la page web.
@@ -59,7 +59,7 @@ Ensuite, cliquez sur la cellule de code. Multipliez les éléments par 2 après 
 
 ![Edit the code cell.](../img/jupyter05.png) 
  :width:`600px` 
- :label:`fig_jupyter05` 
+:label:`fig_jupyter05` 
 
  
  Vous pouvez également exécuter la cellule avec un raccourci ("Ctrl + Enter" par défaut) et obtenir le résultat de sortie de :numref:`fig_jupyter06` .

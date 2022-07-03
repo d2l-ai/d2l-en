@@ -147,7 +147,7 @@ telles que la transposition et la permutation des positions d'entrée,
 Pour les vecteurs, c'est simple :
 il s'agit simplement d'une multiplication matrice-matrice.
 Pour les tenseurs de dimension supérieure,
-, nous utilisons la contrepartie appropriée.
+nous utilisons la contrepartie appropriée.
 L'opérateur $\text{prod}$ masque toute la surcharge de notation.
 
 Rappelons que

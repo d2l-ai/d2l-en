@@ -38,7 +38,7 @@ de cette proposition de région.
 
 
  ![The R-CNN model.](../img/r-cnn.svg) 
- :label:`fig_r-cnn` 
+:label:`fig_r-cnn` 
 
  :numref:`fig_r-cnn` montre le modèle R-CNN. Plus concrètement, le R-CNN comprend les quatre étapes suivantes :
 
@@ -77,7 +77,7 @@ est uniquement effectuée sur
 l'image entière :cite:`Girshick.2015` . 
 
 ![The fast R-CNN model.](../img/fast-rcnn.svg) 
- :label:`fig_fast_r-cnn` 
+:label:`fig_fast_r-cnn` 
 
  :numref:`fig_fast_r-cnn` décrit le modèle R-CNN rapide. Ses principaux calculs sont les suivants :
 
@@ -117,7 +117,7 @@ dans :numref:`fig_roi` ,
 la région d'intérêt $3\times 3$ supérieure gauche 
 est sélectionnée sur une entrée $4 \times 4$.
 Pour cette région d'intérêt,
-, nous utilisons une couche de regroupement de régions d'intérêt $2\times 2$ pour obtenir
+nous utilisons une couche de regroupement de régions d'intérêt $2\times 2$ pour obtenir
 et $2\times 2$ en sortie.
 Notez que 
 chacune des quatre sous-fenêtres divisées
@@ -200,7 +200,7 @@ propose de remplacer la recherche sélective par un *réseau de propositions de 
 
 
  ![The faster R-CNN model.](../img/faster-rcnn.svg) 
- :label:`fig_faster_r-cnn` 
+:label:`fig_faster_r-cnn` 
 
  
  :numref:`fig_faster_r-cnn` montre le modèle R-CNN plus rapide. Par rapport au modèle R-CNN rapide,
@@ -269,7 +269,7 @@ pour toutes les régions d'intérêt.
 Ces cartes sont utilisées à l'adresse
 pour prédire à l'adresse 
 non seulement la classe et la boîte englobante de chaque région d'intérêt,
-, mais aussi la position de l'objet au niveau du pixel grâce à un réseau supplémentaire entièrement convolutif.
+mais aussi la position de l'objet au niveau du pixel grâce à un réseau supplémentaire entièrement convolutif.
 Plus de détails sur l'utilisation d'un réseau entièrement convolutif pour prédire la sémantique d'une image au niveau du pixel 
 seront fournis
 dans les sections suivantes de ce chapitre.

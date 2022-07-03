@@ -42,7 +42,7 @@ Notez que le nombre de termes de degré $d$
 Étant donné $k$ variables, le nombre de monômes
 de degré $d$ (c'est-à-dire $k$ multichoose $d$) est ${k - 1 + d} \choose {k - 1}$.
 Même de petits changements de degré, par exemple de $2$ à $3$,
-, augmentent considérablement la complexité de notre modèle.
+augmentent considérablement la complexité de notre modèle.
 Nous avons donc souvent besoin d'un outil plus fin
 pour ajuster la complexité de la fonction.
 
@@ -101,8 +101,8 @@ $$L(\mathbf{w}, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \m
 $y^{(i)}$ est l'étiquette pour tout exemple de données $i$, et $(\mathbf{w}, b)$
  sont les paramètres de poids et de biais, respectivement.
 Pour pénaliser la taille du vecteur de poids,
-, nous devons d'une manière ou d'une autre ajouter $\| \mathbf{w} \|^2$ à la fonction de perte,
-, mais comment le modèle doit-il échanger la perte standard
+nous devons d'une manière ou d'une autre ajouter $\| \mathbf{w} \|^2$ à la fonction de perte,
+mais comment le modèle doit-il échanger la perte standard
 contre cette nouvelle pénalité additive ?
 En pratique, nous caractérisons ce compromis
 via la *constante de régularisation* $\lambda$,
@@ -151,11 +151,11 @@ en ramenant les autres poids à zéro.
 Cela nous donne une méthode efficace de *sélection des caractéristiques*,
 qui peut être souhaitable pour d'autres raisons.
 Par exemple, si notre modèle ne repose que sur quelques caractéristiques,
-, nous n'aurons peut-être pas besoin de collecter, stocker ou transmettre des données
+nous n'aurons peut-être pas besoin de collecter, stocker ou transmettre des données
 pour les autres caractéristiques (abandonnées). 
 
 En utilisant la même notation que dans :eqref:`eq_linreg_batch_update` ,
-, les mises à jour de la descente de gradient stochastique en minibatch
+les mises à jour de la descente de gradient stochastique en minibatch
 pour $\ell_2$-suivre la régression régularisée :
 
 $$\begin{aligned}
@@ -273,7 +273,7 @@ def l2_penalty(w):
 ### Définition du modèle
 
 Dans le modèle final,
-, la régression linéaire et la perte au carré n'ont pas changé depuis :numref:`sec_linear_scratch` ,
+la régression linéaire et la perte au carré n'ont pas changé depuis :numref:`sec_linear_scratch` ,
 ; nous nous contenterons donc de définir une sous-classe de `d2l.LinearRegressionScratch`. Le seul changement ici est que notre perte inclut désormais le terme de pénalité.
 
 ```{.python .input  n=7}

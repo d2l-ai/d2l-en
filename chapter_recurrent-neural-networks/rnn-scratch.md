@@ -294,9 +294,9 @@ $$|f(\mathbf{x}) - f(\mathbf{x} - \eta\mathbf{g})| \leq L \eta\|\mathbf{g}\|,$$
  ce qui signifie que
 nous n'observerons pas de changement de plus de $L \eta \|\mathbf{g}\|$. C'est à la fois une malédiction et une bénédiction.
 Du côté de la malédiction,
-, elle limite la vitesse de progression ;
+elle limite la vitesse de progression ;
 tandis que du côté de la bénédiction,
-, elle limite la mesure dans laquelle les choses peuvent mal tourner si nous allons dans la mauvaise direction.
+elle limite la mesure dans laquelle les choses peuvent mal tourner si nous allons dans la mauvaise direction.
 
 Parfois, les gradients peuvent être très importants et l'algorithme d'optimisation peut ne pas converger. Nous pourrions remédier à ce problème en réduisant le taux d'apprentissage $\eta$. Mais que se passe-t-il si nous n'obtenons que *rarement* de grands gradients ? Dans ce cas, une telle approche peut sembler totalement injustifiée. Une alternative populaire consiste à écrêter le gradient $\mathbf{g}$ en le projetant dans une boule de rayon donné, disons $\theta$ via
 
@@ -428,7 +428,7 @@ model.predict('it has', 20, data.vocab)
 
 Bien que l'implémentation du modèle RNN ci-dessus à partir de zéro soit instructive, elle n'est pas pratique.
 Dans la section suivante, nous verrons comment améliorer le modèle RNN,
-, notamment en facilitant l'implémentation de
+notamment en facilitant l'implémentation de
 et en le faisant fonctionner plus rapidement.
 
 

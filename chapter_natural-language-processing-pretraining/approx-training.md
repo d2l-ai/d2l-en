@@ -1,139 +1,138 @@
 # Approximate Training
-:label:`sec_approx_train`
+:label:`sec_approx_train` 
 
-Recall our discussions in :numref:`sec_word2vec`.
-The main idea of the skip-gram model is
-using softmax operations to calculate
-the conditional probability of
-generating a context word $w_o$
-based on the given center word $w_c$
-in :eqref:`eq_skip-gram-softmax`,
-whose corresponding logarithmic loss is given by
-the opposite of :eqref:`eq_skip-gram-log`.
-
-
-
-Due to the nature of the softmax operation,
-since a context word may be anyone in the
-dictionary $\mathcal{V}$,
-the opposite of :eqref:`eq_skip-gram-log`
-contains the summation
-of items as many as the entire size of the vocabulary.
-Consequently,
-the gradient calculation
-for the skip-gram model
-in :eqref:`eq_skip-gram-grad`
-and that
-for the continuous bag-of-words model
-in :eqref:`eq_cbow-gradient`
-both contain
-the summation.
-Unfortunately,
-the computational cost
-for such gradients
-that sum over
-a large dictionary
-(often with
-hundreds of thousands or millions of words)
-is huge!
-
-In order to reduce the aforementioned computational complexity, this section will introduce two approximate training methods:
-*negative sampling* and *hierarchical softmax*.
-Due to the similarity
-between the skip-gram model and
-the continuous bag of words model,
-we will just take the skip-gram model as an example
-to describe these two approximate training methods.
-
-## Negative Sampling
-:label:`subsec_negative-sampling`
+Rappelez-vous nos discussions dans :numref:`sec_word2vec`.
+L'idée principale du modèle de saut de programme est
+l'utilisation d'opérations softmax pour calculer
+la probabilité conditionnelle de
+générer un mot de contexte $w_o$
+basé sur le mot central donné $w_c$
+dans :eqref:`eq_skip-gram-softmax`,
+dont la perte logarithmique correspondante est donnée par
+le contraire de :eqref:`eq_skip-gram-log`.
 
 
-Negative sampling modifies the original objective function.
-Given the context window of a center word $w_c$,
-the fact that any (context) word $w_o$
-comes from this context window
-is considered as an event with the probability
-modeled by
+
+En raison de la nature de l'opération softmax,
+étant donné qu'un mot contextuel peut être n'importe qui dans le 
+dictionnaire \mathcal{V},
+l'opposé de :eqref:`eq_skip-gram-log` 
+contient la somme
+d'éléments aussi nombreux que la taille totale du vocabulaire.
+Par conséquent,
+le calcul du gradient
+pour le modèle de saut de programme
+dans :eqref:`eq_skip-gram-grad` 
+et celui
+pour le modèle de sac de mots continu
+dans :eqref:`eq_cbow-gradient` 
+contiennent tous deux
+la sommation.
+Malheureusement,
+le coût de calcul
+pour de tels gradients
+qui font la somme sur
+un grand dictionnaire
+(souvent avec
+des centaines de milliers ou des millions de mots)
+est énorme !
+
+Afin de réduire la complexité de calcul susmentionnée, cette section présente deux méthodes d'apprentissage approximatives :
+*negative sampling* et *hierarchical softmax*.
+En raison de la similitude
+entre le modèle de saut de programme et
+le modèle de sac de mots continu,
+nous prendrons simplement le modèle de saut de programme comme exemple
+pour décrire ces deux méthodes d'apprentissage approximatives.
+
+### Echantillonnage négatif
+:label:`subsec_negative-sampling` 
+
+ 
+L'échantillonnage négatif modifie la fonction objectif originale.
+Étant donné la fenêtre de contexte d'un mot central $w_c$,
+le fait que tout mot (de contexte) $w_o$
+provienne de cette fenêtre de contexte
+est considéré comme un événement avec la probabilité
+modélisée par
 
 
 $$P(D=1\mid w_c, w_o) = \sigma(\mathbf{u}_o^\top \mathbf{v}_c),$$
 
-where $\sigma$ uses the definition of the sigmoid activation function:
+où \sigma utilise la définition de la fonction d'activation sigmoïde :
 
 $$\sigma(x) = \frac{1}{1+\exp(-x)}.$$
 :eqlabel:`eq_sigma-f`
 
-Let's begin by
-maximizing the joint probability of
-all such events in text sequences
-to train word embeddings.
-Specifically,
-given a text sequence of length $T$,
-denote by $w^{(t)}$ the word at time step $t$
-and let the context window size be $m$,
-consider maximizing the joint probability
-
+Commençons par
+maximiser la probabilité conjointe de
+tous les événements de ce type dans les séquences de texte
+pour former les embeddings des mots.
+Plus précisément,
+étant donné une séquence de texte de longueur $T$,
+désignant par $w^{(t)}$ le mot au pas de temps $t$
+et la taille de la fenêtre de contexte étant $m$,
+considérons la maximisation de la probabilité conjointe
 
 $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(D=1\mid w^{(t)}, w^{(t+j)}).$$
 :eqlabel:`eq-negative-sample-pos`
 
 
-However,
-:eqref:`eq-negative-sample-pos`
-only considers those events
-that involve positive examples.
-As a result,
-the joint probability in
-:eqref:`eq-negative-sample-pos`
-is maximized to 1
-only if all the word vectors are equal to infinity.
-Of course,
-such results are meaningless.
-To make the objective function
-more meaningful,
-*negative sampling*
-adds negative examples sampled
-from a predefined distribution.
+Cependant,
+:eqref:`eq-negative-sample-pos` 
+ ne prend en compte que les événements
+qui impliquent des exemples positifs.
+Par conséquent,
+la probabilité conjointe dans
+:eqref:`eq-negative-sample-pos` 
+est maximisée en 1
+seulement si tous les vecteurs de mots sont égaux à l'infini.
+Bien entendu,
+de tels résultats sont dénués de sens.
+Pour rendre la fonction objectif
+plus significative,
+*échantillonnage négatif*
+ajoute des exemples négatifs échantillonnés
+à partir d'une distribution prédéfinie.
 
-Denote by $S$
-the event that
-a context word $w_o$ comes from
-the context window of a center word $w_c$.
-For this event involving $w_o$,
-from a predefined distribution $P(w)$
-sample $K$ *noise words*
-that are not from this context window.
-Denote by $N_k$
-the event that
-a noise word $w_k$ ($k=1, \ldots, K$)
-does not come from
-the context window of $w_c$.
-Assume that
-these events involving
-both the positive example and negative examples
-$S, N_1, \ldots, N_K$ are mutually independent.
-Negative sampling
-rewrites the joint probability (involving only positive examples)
-in :eqref:`eq-negative-sample-pos`
-as
+Dénotez par $S$
+l'événement selon lequel
+un mot contextuel $w_o$ provient de
+la fenêtre contextuelle d'un mot central $w_c$.
+Pour cet événement impliquant $w_o$,
+à partir d'une distribution prédéfinie $P(w)$
+échantillonnent $K$ mots de *bruit*
+qui ne proviennent pas de cette fenêtre de contexte.
+Désignez par $N_k$
+l'événement selon lequel
+un mot de bruit $w_k$ ($k=1, \ldots, K$)
+ne provient pas de
+la fenêtre de contexte de $w_c$.
+Supposons que
+ces événements impliquant
+l'exemple positif et les exemples négatifs
+$S, N_1, \ldots, N_K$ sont mutuellement indépendants.
+L'échantillonnage négatif
+réécrit la probabilité conjointe (impliquant uniquement des exemples positifs)
+en :eqref:`eq-negative-sample-pos`
+comme
 
 $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(w^{(t+j)} \mid w^{(t)}),$$
 
-where the conditional probability is approximated through
-events $S, N_1, \ldots, N_K$:
+où la probabilité conditionnelle est approximée par
+les événements $S, N_1, \ldots, N_K$:
 
 $$ P(w^{(t+j)} \mid w^{(t)}) =P(D=1\mid w^{(t)}, w^{(t+j)})\prod_{k=1,\ w_k \sim P(w)}^K P(D=0\mid w^{(t)}, w_k).$$
 :eqlabel:`eq-negative-sample-conditional-prob`
 
-Denote by
-$i_t$ and $h_k$
-the indices of
-a word $w^{(t)}$ at time step $t$
-of a text sequence
-and a noise word $w_k$,
-respectively.
-The logarithmic loss with respect to the conditional probabilities in :eqref:`eq-negative-sample-conditional-prob` is
+Dénotez par
+$i_t$ et $h_k$
+les indices de
+un mot $w^{(t)}$ au pas de temps $t$
+d'une séquence de texte
+et un mot de bruit $w_k$,
+respectivement.
+La perte logarithmique par rapport aux probabilités conditionnelles dans :eqref:`eq-negative-sample-conditional-prob` est
 
 $$
 \begin{aligned}
@@ -144,65 +143,65 @@ $$
 \end{aligned}
 $$
 
-
-We can see that
-now the computational cost for gradients
-at each training step
-has nothing to do with the dictionary size,
-but linearly depends on $K$.
-When setting the hyperparameter $K$
-to a smaller value,
-the computational cost for gradients
-at each training step with negative sampling
-is smaller.
-
-
+ 
+Nous pouvons voir que
+maintenant le coût de calcul des gradients
+à chaque étape de formation
+n'a rien à voir avec la taille du dictionnaire,
+mais dépend linéairement de $K$.
+En fixant l'hyperparamètre $K$
+à une valeur plus petite,
+le coût de calcul des gradients
+à chaque étape de formation avec un échantillonnage négatif
+est plus petit.
 
 
-## Hierarchical Softmax
 
-As an alternative approximate training method,
+
+## Softmax hiérarchique
+
+Comme autre méthode de formation approximative,
 *hierarchical softmax*
-uses the binary tree,
-a data structure
-illustrated in :numref:`fig_hi_softmax`,
-where each leaf node
-of the tree represents
-a word in dictionary $\mathcal{V}$.
+utilise l'arbre binaire,
+une structure de données
+illustrée dans :numref:`fig_hi_softmax`,
+où chaque nœud feuille
+de l'arbre représente
+un mot du dictionnaire \mathcal{V}.
 
-![Hierarchical softmax for approximate training, where each leaf node of the tree represents a word in the dictionary.](../img/hi-softmax.svg)
-:label:`fig_hi_softmax`
+![Softmax hiérarchique pour l'apprentissage approximatif, où chaque nœud feuille de l'arbre représente un mot du dictionnaire.](../img/hi-softmax.svg)
+:label:`fig_hi_softmax` 
 
-Denote by $L(w)$
-the number of nodes (including both ends)
-on the path
-from the root node to the leaf node representing word $w$
-in the binary tree.
-Let $n(w,j)$ be the $j^\mathrm{th}$ node on this path,
-with its context word vector being
+Soit $L(w)$
+le nombre de nœuds (y compris les deux extrémités)
+sur le chemin
+du nœud racine au nœud feuille représentant le mot $w$
+dans l'arbre binaire.
+Soit $n(w,j)$ le $j^\mathrm{ième}$ nœud sur ce chemin,
+avec son vecteur de mot contextuel étant
 $\mathbf{u}_{n(w, j)}$.
-For example,
-$L(w_3) = 4$ in  :numref:`fig_hi_softmax`.
-Hierarchical softmax approximates the conditional probability in :eqref:`eq_skip-gram-softmax` as
+Par exemple,
+$L(w_3) = 4$ dans :numref:`fig_hi_softmax` .
+La méthode hiérarchique softmax approxime la probabilité conditionnelle dans :eqref:`eq_skip-gram-softmax` comme suit :
 
 
 $$P(w_o \mid w_c) = \prod_{j=1}^{L(w_o)-1} \sigma\left( [\![  n(w_o, j+1) = \text{leftChild}(n(w_o, j)) ]\!] \cdot \mathbf{u}_{n(w_o, j)}^\top \mathbf{v}_c\right),$$
 
-where function $\sigma$
-is defined in :eqref:`eq_sigma-f`,
-and $\text{leftChild}(n)$ is the left child node of node $n$: if $x$ is true, $[\![x]\!] = 1$; otherwise $[\![x]\!] = -1$.
+où la fonction $\sigma$
+est définie dans :eqref:`eq_sigma-f` ,
+et \text{leftChild} $(n)$ est le nœud enfant gauche du nœud $n$: si $x$ est vrai, $[\![x]\!] = 1$; sinon $[\![x]\!] = -1$.
 
-To illustrate,
-let's calculate
-the conditional probability
-of generating word $w_3$
-given word $w_c$ in :numref:`fig_hi_softmax`.
-This requires dot products
-between the word vector
-$\mathbf{v}_c$ of $w_c$
-and
-non-leaf node vectors
-on the path (the path in bold in :numref:`fig_hi_softmax`) de la racine à $w_3$,
+Pour illustrer,
+calculons
+la probabilité conditionnelle
+de générer le mot $w_3$
+étant donné le mot $w_c$ dans :numref:`fig_hi_softmax`.
+Cela nécessite des produits scalaires
+entre le vecteur de mot
+$\mathbf{v}_c$ de $w_c$
+et
+les vecteurs de nœuds non feu
+sur le chemin (le chemin en gras dans :numref:`fig_hi_softmax`) de la racine à $w_3$,
 qui est parcouru à gauche, à droite, puis à gauche :
 
 

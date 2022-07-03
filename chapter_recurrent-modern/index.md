@@ -32,7 +32,7 @@ avec des calculs récurrents en avant et en arrière.
 De telles expansions sont fréquemment adoptées
 dans les réseaux récurrents modernes.
 Lorsque nous expliquons ces variantes de RNN,
-, nous continuons à considérer
+nous continuons à considérer
 le même problème de modélisation du langage que celui présenté dans :numref:`chap_rnn` .
 
 En fait, la modélisation du langage

@@ -1,162 +1,162 @@
-# Using AWS EC2 Instances
-:label:`sec_aws`
+# Utiliser des instances AWS EC2
+:label:`sec_aws` 
 
-In this section, we will show you how to install all libraries on a raw Linux machine. Recall that in :numref:`sec_sagemaker` we discussed how to use Amazon SageMaker, while building an instance by yourself costs less on AWS. The walkthrough includes three steps:
+ Dans cette section, nous allons vous montrer comment installer toutes les bibliothèques sur une machine Linux brute. Rappelez-vous que dans :numref:`sec_sagemaker` nous avons discuté de la façon d'utiliser Amazon SageMaker, alors que construire une instance par vous-même coûte moins cher sur AWS. La marche à suivre comprend trois étapes :
 
-1. Request for a GPU Linux instance from AWS EC2.
-1. Install CUDA (or use an Amazon Machine Image with preinstalled CUDA).
-1. Install the deep learning framework and other libraries for running the code of the book.
+1. Demander une instance Linux GPU à AWS EC2.
+1. Installer CUDA (ou utiliser une image machine Amazon avec CUDA préinstallé).
+1. Installer le cadre d'apprentissage profond et d'autres bibliothèques pour exécuter le code du livre.
 
-This process applies to other instances (and other clouds), too, albeit with some minor modifications. Before going forward, you need to create an AWS account, see :numref:`sec_sagemaker` for more details.
-
-
-## Creating and Running an EC2 Instance
-
-After logging into your AWS account, click "EC2" (marked by the red box in :numref:`fig_aws`) to go to the EC2 panel.
-
-![Open the EC2 console.](../img/aws.png)
-:width:`400px`
-:label:`fig_aws`
-
-:numref:`fig_ec2` shows the EC2 panel with sensitive account information greyed out.
-
-![EC2 panel.](../img/ec2.png)
-:width:`700px`
-:label:`fig_ec2`
-
-### Presetting Location
-Select a nearby data center to reduce latency, e.g., "Oregon" (marked by the red box in the top-right of :numref:`fig_ec2`). If you are located in China,
-you can select a nearby Asia Pacific region, such as Seoul or Tokyo. Please note
-that some data centers may not have GPU instances.
+Ce processus s'applique également à d'autres instances (et d'autres nuages), mais avec quelques modifications mineures. Avant de poursuivre, vous devez créer un compte AWS, voir :numref:`sec_sagemaker` pour plus de détails.
 
 
-### Increasing Limits
+## Créer et exécuter une instance EC2
 
-Before choosing an instance, check if there are quantity
-restrictions by clicking the "Limits" label in the bar on the left as shown in
-:numref:`fig_ec2`. 
-:numref:`fig_limits` shows an example of such a
-limitation. The account currently cannot open "p2.xlarge" instance per region. If
-you need to open one or more instances, click on the "Request limit increase" link to
-apply for a higher instance quota.
-Generally, it takes one business day to
-process an application.
+Après vous être connecté à votre compte AWS, cliquez sur "EC2" (marqué par la case rouge dans :numref:`fig_aws` ) pour accéder au panneau EC2.
 
-![Instance quantity restrictions.](../img/limits.png)
-:width:`700px`
-:label:`fig_limits`
+![Ouvrez la console EC2.](../img/aws.png)
+:width:`400px` 
+:label:`fig_aws` 
 
+ :numref:`fig_ec2` montre le panneau EC2 avec les informations sensibles du compte en grisé.
 
-### Launching an Instance
+![Panneau EC2](../img/ec2.png)
+:width:`700px` 
+:label:`fig_ec2` 
 
-Next, click the "Launch Instance" button marked by the red box in :numref:`fig_ec2` to launch your instance.
-
-We begin by selecting a suitable Amazon Machine Image (AMI). Enter "Ubuntu" in the search box (marked by the red box in :numref:`fig_ubuntu`).
+### Préréglage de l'emplacement
+Sélectionnez un centre de données proche pour réduire la latence, par exemple, "Oregon" (marqué par la case rouge en haut à droite de :numref:`fig_ec2`). Si vous êtes situé en Chine,
+vous pouvez sélectionner une région Asie-Pacifique proche, comme Séoul ou Tokyo. Veuillez noter
+que certains centres de données peuvent ne pas disposer d'instances de GPU.
 
 
-![Choose an AMI.](../img/ubuntu-new.png)
-:width:`700px`
-:label:`fig_ubuntu`
+### Augmentation des limites
 
-EC2 provides many different instance configurations to choose from. This can sometimes feel overwhelming to a beginner. :numref:`tab_ec2` lists different suitable machines.
+Avant de choisir une instance, vérifiez s'il existe des restrictions de quantité
+en cliquant sur l'étiquette "Limites" dans la barre de gauche comme indiqué dans
+:numref:`fig_ec2`.
+:numref:`fig_limits` montre un exemple d'une telle limitation.
+ Le compte ne peut actuellement pas ouvrir d'instance "p2.xlarge" par région. Si
+vous avez besoin d'ouvrir une ou plusieurs instances, cliquez sur le lien "Request limit increase" pour
+demander un quota d'instance plus élevé.
+En général, il faut un jour ouvrable pour 
+traiter une demande.
 
-:Different EC2 instance types
+![Restrictions de quantité d'instance](../img/limits.png)
+:width:`700px` 
+:label:`fig_limits` 
 
-| Name | GPU         | Notes                         |
+ 
+### Lancement d'une instance
+
+Ensuite, cliquez sur le bouton "Lancer une instance" marqué par la boîte rouge dans :numref:`fig_ec2` pour lancer votre instance.
+
+Nous commençons par sélectionner une image machine Amazon (AMI) appropriée. Entrez "Ubuntu" dans le champ de recherche (marqué par la boîte rouge dans :numref:`fig_ubuntu`).
+
+
+![Choisissez une AMI.](../img/ubuntu-new.png)
+:width:`700px` 
+:label:`fig_ubuntu` 
+
+ EC2 propose de nombreuses configurations d'instances différentes. Cela peut parfois sembler écrasant pour un débutant. :numref:`tab_ec2` liste différentes machines appropriées.
+
+:Différents types d'instances EC2
+
+| Nom | GPU | Notes |
 |------|-------------|-------------------------------|
-| g2   | Grid K520   | ancient                       |
-| p2   | Kepler K80  | old but often cheap as spot   |
-| g3   | Maxwell M60 | good trade-off                |
-| p3   | Volta V100  | high performance for FP16     |
-| g4   | Turing T4   | inference optimized FP16/INT8 |
-:label:`tab_ec2`
+| g2 | Grid K520 | ancien |
+| p2 | Kepler K80 | ancien mais souvent bon marché |
+| g3 | Maxwell M60 | bon échange-off |
+| p3 | Volta V100 | haute performance pour FP16 |
+| g4 | Turing T4 | inference optimized FP16/INT8 |
+:label:`tab_ec2` 
 
-All these servers come in multiple flavors indicating the number of GPUs used. For example, a p2.xlarge has 1 GPU and a p2.16xlarge has 16 GPUs and more memory. For more details, see the [AWS EC2 documentation](https://aws.amazon.com/ec2/instance-types/) or a [summary page](https://www.ec2instances.info). For the purpose of illustration, a p2.xlarge will suffice (marked in the red box of :numref:`fig_p2x`).
+ Tous ces serveurs existent en plusieurs versions indiquant le nombre de GPU utilisés. Par exemple, un p2.xlarge possède 1 GPU et un p2.16xlarge possède 16 GPU et plus de mémoire. Pour plus de détails, consultez la [documentation AWS EC2](https://aws.amazon.com/ec2/instance-types/) ou une [page de résumé](https://www.ec2instances.info.) Pour les besoins de l'illustration, un p2.xlarge suffira (marqué dans le cadre rouge de :numref:`fig_p2x` ).
 
-![Choose an instance.](../img/p2x.png)
-:width:`700px`
-:label:`fig_p2x`
+![Choisissez une instance](../img/p2x.png)
+:width:`700px` 
+:label:`fig_p2x` 
 
-Note that you should use a GPU-enabled instance with suitable drivers and a GPU-enabled deep learning framework. Otherwise you will not see any benefit from using GPUs.
+ Notez que vous devez utiliser une instance compatible avec le GPU avec des pilotes appropriés et un cadre d'apprentissage profond compatible avec le GPU. Sinon, vous ne verrez aucun avantage à utiliser les GPU.
 
-So far, we have finished the first two of seven steps for launching an EC2 instance, as shown on the top of :numref:`fig_disk`. In this example, we keep the default configurations for the steps "3. Configure Instance", "5. Add Tags", and "6. Configure Security Group". Tap on "4. Add Storage" and increase the default hard disk size to 64 GB (marked in the red box of :numref:`fig_disk`). Note that CUDA by itself already takes up 4 GB.
+Jusqu'à présent, nous avons terminé les deux premières des sept étapes de lancement d'une instance EC2, comme indiqué en haut de :numref:`fig_disk` . Dans cet exemple, nous conservons les configurations par défaut pour les étapes "3. Configure Instance", "5. Add Tags", et "6. Configure Security Group". Tapez sur "4. Add Storage" et augmentez la taille du disque dur par défaut à 64 GB (marqué dans la boîte rouge de :numref:`fig_disk` ). Notez que CUDA à lui seul occupe déjà 4 Go.
 
-![Modify the hard disk size.](../img/disk.png)
-:width:`700px`
-:label:`fig_disk`
+![Modifiez la taille du disque dur.](../img/disk.png)
+:width:`700px` 
+:label:`fig_disk` 
 
+ 
 
+Enfin, allez à "7. Review" et cliquez sur "Launch" pour lancer l'instance configurée.
+Le système vous invite maintenant à sélectionner la paire de clés utilisée pour accéder à
+l'instance. Si vous n'avez pas de paire de clés, sélectionnez "Create a new key pair" dans
+le premier menu déroulant de :numref:`fig_keypair` pour générer une paire de clés. Par la suite,
+vous pouvez sélectionner "Choose an existing key pair" pour ce menu et ensuite sélectionner la paire de clés
+précédemment générée. Cliquez sur "Launch Instances" pour 
+lancer l'instance créée.
 
-Finally, go to "7. Review" and click "Launch" to launch the configured
-instance. The system will now prompt you to select the key pair used to access
-the instance. If you do not have a key pair, select "Create a new key pair" in
-the first drop-down menu in :numref:`fig_keypair` to generate a key pair. Subsequently,
-you can select "Choose an existing key pair" for this menu and then select the
-previously generated key pair. Click "Launch Instances" to launch the created
-instance.
+![Sélectionnez une paire de clés](../img/keypair.png)
+:width:`500px` 
+:label:`fig_keypair` 
 
-![Select a key pair.](../img/keypair.png)
-:width:`500px`
-:label:`fig_keypair`
+ Assurez-vous de télécharger la paire de clés et de la stocker dans un endroit sûr si vous
+en avez généré une nouvelle. C'est votre seul moyen de vous connecter en SSH au serveur. Cliquez sur l'ID de l'instance
+indiquée dans :numref:`fig_launching` pour afficher le statut de cette instance.
 
-Make sure that you download the key pair and store it in a safe location if you
-generated a new one. This is your only way to SSH into the server. Click the
-instance ID shown in :numref:`fig_launching` to view the status of this instance.
+![Cliquez sur l'ID de l'instance](../img/launching.png)
+:width:`700px` 
+:label:`fig_launching` 
 
-![Click the instance ID.](../img/launching.png)
-:width:`700px`
-:label:`fig_launching`
+### Connexion à l'instance
 
-### Connecting to the Instance
-
-As shown in :numref:`fig_connect`, after the instance state turns green, right-click the instance and select `Connect` to view the instance access method.
+Comme indiqué dans :numref:`fig_connect` , après que l'état de l'instance soit devenu vert, cliquez avec le bouton droit de la souris sur l'instance et sélectionnez `Connect` pour afficher la méthode d'accès à l'instance.
 
 ![View instance access method.](../img/connect.png)
-:width:`700px`
-:label:`fig_connect`
+:width:`700px` 
+:label:`fig_connect` 
 
-If this is a new key, it must not be publicly viewable for SSH to work. Go to the folder where you store `D2L_key.pem` and 
-execute the following command 
-to make the key not publicly viewable:
+ S'il s'agit d'une nouvelle clé, elle ne doit pas être visible publiquement pour que SSH fonctionne. Allez dans le dossier où vous stockez `D2L_key.pem` et 
+; exécutez la commande suivante 
+pour que la clé ne soit pas visible publiquement :
 
 ```bash
 chmod 400 D2L_key.pem
 ```
+ 
 
+![Instance et de démarrage de l'instance.](../img/chmod.png)
+:width:`400px` 
+:label:`fig_chmod` 
 
-![View instance access and startup method.](../img/chmod.png)
-:width:`400px`
-:label:`fig_chmod`
-
-
-Now, copy the ssh command in the lower red box of :numref:`fig_chmod` and paste onto the command line:
+ 
+ Maintenant, copiez la commande ssh dans le cadre rouge inférieur de :numref:`fig_chmod` et collez-la sur la ligne de commande :
 
 ```bash
 ssh -i "D2L_key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com
 ```
+ 
+
+ Lorsque la ligne de commande vous demande "Are you sure you want to continue connecting (yes/no)", entrez "oui" et appuyez sur Entrée pour vous connecter à l'instance.
+
+Votre serveur est maintenant prêt.
 
 
-When the command line prompts "Are you sure you want to continue connecting (yes/no)", enter "yes" and press Enter to log into the instance.
+## Installation de CUDA
 
-Your server is ready now.
-
-
-## Installing CUDA
-
-Before installing CUDA, be sure to update the instance with the latest drivers.
+Avant d'installer CUDA, assurez-vous de mettre à jour l'instance avec les derniers pilotes.
 
 ```bash
 sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
 
 
-Here we download CUDA 10.1. Visit NVIDIA's [official repository](https://developer.nvidia.com/cuda-toolkit-archive) to find the download link as shown in :numref:`fig_cuda`.
+Ici, nous téléchargeons CUDA 10.1. Visitez le [dépôt officiel de NVIDIA](https://developer.nvidia.com/cuda-toolkit-archive) pour trouver le lien de téléchargement comme indiqué dans :numref:`fig_cuda`.
 
-![Find the CUDA 10.1 download address.](../img/cuda101.png)
-:width:`500px`
-:label:`fig_cuda`
+![Trouvez l'adresse de téléchargement de CUDA 10.1.](../img/cuda101.png)
+:width:`500px` 
+:label:`fig_cuda` 
 
-Copy the instructions and paste them onto the terminal to install CUDA 10.1.
+ Copiez les instructions et collez-les dans le terminal pour installer CUDA 10.1.
 
 ```bash
 # The link and file name are subject to changes
@@ -170,97 +170,97 @@ sudo apt-get -y install cuda
 ```
 
 
-After installing the program, run the following command to view the GPUs:
+Après l'installation, exécutez la commande suivante pour visualiser les GPU :
 
 ```bash
 nvidia-smi
 ```
+ 
 
-
-Finally, add CUDA to the library path to help other libraries find it.
+ Enfin, ajoutez CUDA au chemin de la bibliothèque pour aider les autres bibliothèques à le trouver.
 
 ```bash
-echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda/lib64" >> ~)/.bashrc
+echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda/lib64" >> ~/.bashrc
 ```
 
 
-## Installing Libraries for Running the Code
+## Installation des bibliothèques pour l'exécution du code
 
-To run the code of this book,
-just follow steps in :ref:`chap_installation`
-for Linux users on the EC2 instance
-and use the following tips 
-for working on a remote Linux server:
+Pour exécuter le code de ce livre,
+il suffit de suivre les étapes de :ref:`chap_installation` 
+pour les utilisateurs Linux sur l'instance EC2
+et d'utiliser les conseils suivants 
+pour travailler sur un serveur Linux distant :
 
-* To download the bash script on the Miniconda installation page, right click the download link and select "Copy Link Address", then execute `wget [copied link address]`.
-* After running `~)/miniconda3/bin/conda init`, you may execute `source ~)/.bashrc` instead of closing and reopening your current shell.
+* Pour télécharger le script bash sur la page d'installation de Miniconda, faites un clic droit sur le lien de téléchargement et sélectionnez "Copy Link Address", puis exécutez `wget [copied link address]`.
+* Après avoir exécuté `~/miniconda3/bin/conda init`, vous pouvez exécuter `source ~/.bashrc` au lieu de fermer et rouvrir votre shell actuel.
 
 
-## Running the Jupyter Notebook remotely
+## Exécution du carnet de notes Jupyter à distance
 
-To run the Jupyter Notebook remotely you need to use SSH port forwarding. After all, the server in the cloud does not have a monitor or keyboard. For this, log into your server from your desktop (or laptop) as follows:
+Pour exécuter le carnet de notes Jupyter à distance, vous devez utiliser le transfert de port SSH. Après tout, le serveur dans le nuage ne dispose pas d'un écran ou d'un clavier. Pour cela, connectez-vous à votre serveur à partir de votre ordinateur de bureau (ou portable) comme suit :
 
 ```
 # This command must be run in the local command line
 ssh -i "/path/to/key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com -L 8889:localhost:8888
 ```
+ 
 
-
-Next, go to the location 
-of the downloaded code of this book
-on the EC2 instance,
-then run:
+Ensuite, allez à l'emplacement 
+du code téléchargé de ce livre
+sur l'instance EC2,
+puis exécutez :
 
 ```
 conda activate d2l
 jupyter notebook
 ```
+ 
+
+ :numref:`fig_jupyter` montre la sortie possible après avoir exécuté le Jupyter Notebook. La dernière ligne est l'URL du port 8888.
+
+![Sortie après l'exécution du Jupyter Notebook. La dernière ligne est l'URL du port 8888.](../img/jupyter.png)
+:width:`700px` 
+:label:`fig_jupyter` 
+
+ Puisque vous avez utilisé la redirection de port vers le port 8889,
+copier la dernière ligne dans la boîte rouge de :numref:`fig_jupyter`,
+remplacer "8888" par "8889" dans l'URL,
+et l'ouvrir dans votre navigateur local.
 
 
-:numref:`fig_jupyter` shows the possible output after you run the Jupyter Notebook. The last row is the URL for port 8888.
+## Fermeture des instances non utilisées
 
-![Output after running the Jupyter Notebook. The last row is the URL for port 8888.](../img/jupyter.png)
-:width:`700px`
-:label:`fig_jupyter`
+Les services de cloud computing étant facturés au temps d'utilisation, vous devez fermer les instances qui ne sont pas utilisées. Notez qu'il existe des alternatives :
 
-Since you used port forwarding to port 8889,
-copy the last row in the red box of :numref:`fig_jupyter`,
-replace "8888" with "8889" in the URL,
-and open it in your local browser.
+* "Stopping" une instance signifie que vous pourrez la redémarrer. Cela revient à couper l'alimentation de votre serveur normal. Cependant, les instances arrêtées seront toujours facturées un petit montant pour l'espace disque dur conservé. 
+* "Terminating" une instance supprimera toutes les données qui lui sont associées. Cela inclut le disque, et vous ne pourrez donc pas la redémarrer. Ne le faites que si vous savez que vous n'en aurez plus besoin à l'avenir.
 
-
-## Closing Unused Instances
-
-As cloud services are billed by the time of use, you should close instances that are not being used. Note that there are alternatives:
-
-* "Stopping" an instance means that you will be able to start it again. This is akin to switching off the power for your regular server. However, stopped instances will still be billed a small amount for the hard disk space retained. 
-* "Terminating" an instance will delete all data associated with it. This includes the disk, hence you cannot start it again. Only do this if you know that you will not need it in the future.
-
-If you want to use the instance as a template for many more instances,
-right-click on the example in :numref:`fig_connect` and select "Image" $\rightarrow$
-"Create" to create an image of the instance. Once this is complete, select
-"Instance State" $\N- Flèche droite$ "Terminate" to terminate the instance. The next
-time you want to use this instance, you can follow the steps in this section 
-to create an instance based on
-the saved image. The only difference is that, in "1. Choose AMI" shown in
-:numref:`fig_ubuntu`, you must use the "My AMIs" option on the left to select your saved
-image. The created instance will retain the information stored on the image hard
-disk. For example, you will not have to reinstall CUDA and other runtime
-environments.
+Si vous souhaitez utiliser l'instance comme modèle pour de nombreuses autres instances,
+cliquez avec le bouton droit de la souris sur l'exemple dans :numref:`fig_connect` et sélectionnez "Image" $\rightarrow$
+"Create" pour créer une image de l'instance. Une fois cette opération terminée, sélectionnez
+"Instance State" $\rightarrow$ "Terminate" pour terminer l'instance. La prochaine
+fois que vous voudrez utiliser cette instance, vous pourrez suivre les étapes de cette section 
+pour créer une instance basée sur
+l'image sauvegardée. La seule différence est que, dans "1. Choose AMI" illustré dans
+:numref:`fig_ubuntu` , vous devez utiliser l'option "My AMIs" sur la gauche pour sélectionner votre
+image sauvegardée. L'instance créée conservera les informations stockées sur le disque dur de l'image
+. Par exemple, vous n'aurez pas à réinstaller CUDA et les autres 
+environnements d'exécution.
 
 
-## Summary
+## Résumé
 
-* We can launch and stop instances on demand without having to buy and build our own computer.
-* We need to install CUDA before using the GPU-enabled deep learning framework.
-* We can use port forwarding to run the Jupyter Notebook on a remote server.
+* Nous pouvons lancer et arrêter des instances à la demande sans avoir à acheter et construire notre propre ordinateur.
+* Nous devons installer CUDA avant d'utiliser le cadre d'apprentissage profond activé par le GPU.
+* Nous pouvons utiliser la redirection de port pour exécuter le Jupyter Notebook sur un serveur distant.
 
 
-## Exercises
+## Exercices
 
-1. The cloud offers convenience, but it does not come cheap. Find out how to launch [spot instances](https://aws.amazon.com/ec2/spot/) to see how to reduce costs.
-1. Experiment with different GPU servers. How fast are they?
-1. Experiment with multi-GPU servers. How well can you scale things up?
+1. Le cloud est pratique, mais il n'est pas bon marché. Découvrez comment lancer des [instances ponctuelles](https://aws.amazon.com/ec2/spot/) pour voir comment réduire les coûts.
+1. Expérimentez différents serveurs GPU. Quelle est leur vitesse ?
+1. Expérimentez avec des serveurs multi-GPU. Dans quelle mesure pouvez-vous faire évoluer les choses ?
 
 
 [Discussions](https://discuss.d2l.ai/t/423)

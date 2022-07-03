@@ -245,7 +245,7 @@ et une régularisation appropriée peuvent encore améliorer la stabilité.
 ### Initialisation par défaut
 
 Dans les sections précédentes, par exemple dans :numref:`sec_linear_concise` ,
-, nous avons utilisé une distribution normale
+nous avons utilisé une distribution normale
 pour initialiser les valeurs de nos poids.
 Si nous ne spécifions pas la méthode d'initialisation, le framework utilisera
 une méthode d'initialisation aléatoire par défaut, qui fonctionne souvent bien en pratique
@@ -293,7 +293,7 @@ Une façon de garder la variance fixée
 est de fixer $n_\mathrm{in} \sigma^2 = 1$.
 Considérons maintenant la rétropropagation.
 Nous sommes confrontés à un problème similaire,
-, mais les gradients sont propagés à partir des couches les plus proches de la sortie.
+mais les gradients sont propagés à partir des couches les plus proches de la sortie.
 En utilisant le même raisonnement que pour la propagation en avant,
 nous voyons que la variance des gradients peut faire exploser
 à moins que $n_\mathrm{out} \sigma^2 = 1$,

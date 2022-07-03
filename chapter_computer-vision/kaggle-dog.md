@@ -260,7 +260,7 @@ tel que l'empilement de deux couches entièrement connectées
 .
 Contrairement à l'expérience menée sur
 :numref:`sec_fine_tuning` ,
-, l'expérience suivante
+l'expérience suivante
 ne réentraîne pas le modèle pré-entraîné utilisé pour l'extraction des caractéristiques
 . Cela réduit le temps d'entraînement et la mémoire
 pour le stockage des gradients.

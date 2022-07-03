@@ -6,7 +6,7 @@ import tensorflow as tf
 
 nn_Module = tf.keras.Model
 
-#################   WARNING   ################
+#################   WARNING  ################
 # The below part is generated automatically through:
 #    d2lbook build lib
 # Don't edit it directly

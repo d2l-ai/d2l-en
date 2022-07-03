@@ -37,7 +37,7 @@ la probabilité d'une séquence de texte contenant quatre mots serait donnée co
 
 $$P(\text{deep}, \text{learning}, \text{is}, \text{fun}) =  P(\text{deep}) P(\text{learning}  \mid  \text{deep}) P(\text{is}  \mid  \text{deep}, \text{learning}) P(\text{fun}  \mid  \text{deep}, \text{learning}, \text{is}).$$ 
 
- ### Modèles de Markov et $n$-grammes
+### Modèles de Markov et $n$-grammes
 
 Parmi ces analyses de modèles de séquences dans :numref:`sec_sequence` ,
 appliquons les modèles de Markov à la modélisation du langage.
@@ -89,7 +89,7 @@ de "deep learning" sont beaucoup moins fréquentes.
 En particulier, pour certaines combinaisons de mots inhabituelles, il peut être difficile de trouver
 suffisamment d'occurrences pour obtenir des estimations précises.
 Comme le suggèrent les résultats empiriques de :numref:`subsec_natural-lang-stat` ,
-, les choses se gâtent pour les combinaisons de trois mots et plus.
+les choses se gâtent pour les combinaisons de trois mots et plus.
 Il y aura de nombreuses combinaisons plausibles de trois mots que nous ne verrons probablement pas dans notre ensemble de données.
 À moins de trouver une solution pour attribuer à ces combinaisons de mots un nombre non nul, nous ne pourrons pas les utiliser dans un modèle de langage. Si l'ensemble de données est petit ou si les mots sont très rares, il se peut que nous ne trouvions même pas un seul d'entre eux.
 
@@ -126,7 +126,7 @@ de nombreux $n$-grammes se produisent très rarement,
 rendant le lissage de Laplace plutôt inadapté à la modélisation du langage.
 Deuxièmement, nous devons stocker tous les comptes.
 Troisièmement, cela ne tient absolument pas compte du sens des mots. Par exemple,
-, "chat" et "félin" devraient apparaître dans des contextes connexes.
+"chat" et "félin" devraient apparaître dans des contextes connexes.
 Il est assez difficile d'ajuster de tels modèles à des contextes supplémentaires,
 alors que les modèles de langage basés sur l'apprentissage profond sont bien adaptés pour
 prendre cela en compte.
@@ -253,7 +253,7 @@ La séquence cible pour toute séquence d'entrée $\mathbf x_t$
  est $\mathbf x_{t+1}$ avec la longueur $n$.
 
 ![Obtaining 5 pairs of input sequences and target sequences from partitioned length-5 subsequences.](../img/lang-model-data.svg) 
- :label:`fig_lang_model_data` 
+:label:`fig_lang_model_data` 
 
  :numref:`fig_lang_model_data` montre un exemple d'obtention de 5 paires de séquences d'entrée et de séquences cibles avec $n=5$ et $d=2$.
 

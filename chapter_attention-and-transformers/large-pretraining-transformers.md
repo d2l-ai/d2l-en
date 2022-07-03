@@ -19,7 +19,7 @@ Comme cette représentation dépend de tous les jetons d'entrée, elle est ensui
 ### Pré-entraînement de BERT
 
 ![Left: Pretraining BERT with masked language modeling. Prediction of the masked "love" token depends on all input tokens before and after "love". Right: Attention pattern in the transformer encoder. Each token along the vertical axis attends to all input tokens along the horizontal axis.](../img/bert-encoder-only.svg) 
- :label:`fig_bert-encoder-only` 
+:label:`fig_bert-encoder-only` 
 
  BERT est pré-entraîné sur des séquences de texte à l'aide de la *modélisation du langage masqué* : un texte d'entrée avec des tokens masqués de manière aléatoire est introduit dans un encodeur transformateur pour prédire les tokens masqués. Comme illustré sur :numref:`fig_bert-encoder-only` , une séquence de texte originale "I", "love", "this", "red", "car" est précédée du jeton "&lt;cls&gt;", et le jeton "&lt;mask&gt;" remplace aléatoirement "love" ; la perte d'entropie croisée entre le jeton masqué "love" et sa prédiction doit être minimisée pendant le pré-entraînement. Notez qu'il n'y a pas de contrainte dans le schéma d'attention des encodeurs transformateurs (à droite de :numref:`fig_bert-encoder-only` ), de sorte que tous les jetons peuvent s'occuper les uns des autres. Ainsi, la prédiction de "love" dépend des tokens d'entrée qui le précèdent et le suivent dans la séquence. C'est pourquoi BERT est un "codeur bidirectionnel". 
 Sans avoir besoin d'étiquetage manuel, des données textuelles à grande échelle provenant de livres et de Wikipedia peuvent être utilisées pour le pré-entraînement de BERT. 
@@ -30,7 +30,7 @@ Sans avoir besoin d'étiquetage manuel, des données textuelles à grande échel
 Le BERT pré-entraîné peut être *ajusté finement* pour des tâches d'encodage en aval impliquant un seul texte ou des paires de textes. Pendant le réglage fin, des couches supplémentaires peuvent être ajoutées à BERT avec des paramètres aléatoires : ces paramètres et ceux de BERT prétraîné seront *mis à jour* pour s'adapter aux données d'entraînement des tâches en aval. 
 
 ![Fine-tuning BERT for sentiment analysis.](../img/bert-finetune-classification.svg) 
- :label:`fig_bert-finetune-classification` 
+:label:`fig_bert-finetune-classification` 
 
  :numref:`fig_bert-finetune-classification` illustre le réglage fin de BERT pour l'analyse des sentiments. Le codeur transformateur est un BERT pré-entraîné, qui prend une séquence de texte en entrée et alimente la représentation "&lt;cls&gt;" (représentation globale de l'entrée) dans une couche supplémentaire entièrement connectée pour prédire le sentiment. Pendant le réglage fin, la perte d'entropie croisée entre la prédiction et l'étiquette sur les données d'analyse des sentiments est minimisée par des algorithmes basés sur le gradient, où la couche supplémentaire est formée à partir de zéro tandis que les paramètres pré-entraînés de BERT sont mis à jour.
 BERT fait plus que de l'analyse de sentiments. Les représentations générales du langage apprises par le BERT à 350 millions de paramètres à partir de 250 milliards de tokens d'entraînement ont fait progresser l'état de l'art pour les tâches de langage naturel telles que la classification d'un seul texte, la classification ou la régression de paires de textes, le balisage de textes et la réponse aux questions.
@@ -73,7 +73,7 @@ Dans le T5, la prédiction de l'empan consécutif est également appelée recons
 Comme pour BERT, T5 doit être ajusté (mise à jour des paramètres de T5) sur des données d'entraînement spécifiques à la tâche afin de réaliser cette tâche. Les principales différences par rapport au réglage fin de BERT sont les suivantes : (i) l'entrée de T5 comprend des descriptions de tâches ; (ii) T5 peut générer des séquences de longueur arbitraire avec son décodeur transformateur ; (iii) aucune couche supplémentaire n'est nécessaire. 
 
 ![Fine-tuning T5 for text summarization. Both the task description and article tokens are fed into the transformer encoder for predicting the summary.](../img/t5-finetune-summarization.svg) 
- :label:`fig_t5-finetune-summarization` 
+:label:`fig_t5-finetune-summarization` 
 
  :numref:`fig_t5-finetune-summarization` explique le réglage fin de T5 en utilisant le résumé de texte comme exemple. Dans cette tâche en aval, les tokens de description de tâche "Summarize", " :" suivis des tokens d'article sont entrés dans l'encodeur. 
 
@@ -82,10 +82,10 @@ est entré dans un codeur T5 gelé (T5-XXL) avec 4,6 milliards de paramètres :c
 
 ![Text-to-image examples by the Imagen model, whose text encoder is from T5 (figures taken from :cite:`saharia2022photorealistic`).](../img/imagen.png)
 :width:`700px` 
- :label:`fig_imagen` 
+:label:`fig_imagen` 
 
  
- ## Décodeur seul 
+## Décodeur seul 
 
 
  Nous avons examiné les transformateurs codeur seul et codeur-décodeur. Les transformateurs de décodeur uniquement suppriment l'ensemble du codeur et la sous-couche de décodeur avec l'attention croisée codeur-décodeur de l'architecture originale codeur-décodeur décrite dans :numref:`fig_transformer` . Aujourd'hui, les transformateurs de décodeur seul sont devenus l'architecture de facto de la modélisation du langage à grande échelle (:numref:`sec_language-model` ), qui exploite les abondants corpus de textes non étiquetés du monde entier par le biais de l'apprentissage auto-supervisé.
@@ -120,7 +120,7 @@ GPT-2 a démontré la possibilité d'utiliser le même modèle de langage pour d
 
 ![Aggregate performance of GPT-3 for all 42 accuracy-denominated benchmarks (caption adapted and figure taken from :cite:`brown2020language`)](../img/gpt3-xshot-scaling.png)
 :width:`400px` 
- :label:`fig_gpt3-xshot-scaling` 
+:label:`fig_gpt3-xshot-scaling` 
 
  Ces trois paramètres ont été testés dans GPT-3 :cite:`brown2020language` , dont la plus grande version utilise des données et un modèle de taille environ deux ordres de grandeur supérieurs à ceux de GPT-2. GPT-3 utilise la même architecture de décodeur transformateur que son prédécesseur direct, GPT-2, sauf que les modèles d'attention (à droite sur :numref:`fig_gpt-decoder-only` ) sont plus épars dans les couches alternées. Pré-entraîné avec 300 milliards de tokens, le GPT-3 est plus performant avec une taille de modèle plus importante, où la performance des "few-shots" augmente le plus rapidement (:numref:`fig_gpt3-xshot-scaling` ). Bien que bénéficiant d'une efficacité de calcul, l'apprentissage few-shot de GPT-3 est moins performant que les modèles de pointe à réglage fin qui nécessitent des mises à jour du modèle. Néanmoins, GPT-3 a alimenté un large éventail d'applications en aval [across the Web](https://gpt3demo.com/): il générait 4,5 milliards de mots par jour environ neuf mois après son lancement [API](https://openai.com/api/).
 
@@ -130,13 +130,13 @@ GPT-2 a démontré la possibilité d'utiliser le même modèle de langage pour d
 
 ![Transformer language model performance improves smoothly as we increase the model size, dataset size, and amount of compute used for training. For optimal performance all three factors must be scaled up in tandem. Empirical performance has a power-law relationship with each individual factor when not bottlenecked by the other two (caption adapted and figure taken from :cite:`kaplan2020scaling`).](../img/scaling-power-law.png)
 :width:`700px` 
- :label:`fig_scaling-power-law3` 
+:label:`fig_scaling-power-law3` 
 
  Comme le montre :numref:`fig_scaling-power-law3` , on peut observer une mise à l'échelle précise * en fonction de la taille du modèle (nombre de paramètres, à l'exclusion des couches d'intégration), de la taille de l'ensemble de données (nombre de jetons d'entraînement) et de la quantité de calculs d'entraînement (PetaFLOP/jours, à l'exclusion des couches d'intégration). En général, l'augmentation de ces trois facteurs en tandem conduit à de meilleures performances. Cependant, *comment* les augmenter en tandem reste un sujet de débat :cite:`hoffmann2022training` .
 
 ![Transformer language model training runs (figure taken from :cite:`kaplan2020scaling`).](../img/scaling-sample-conv.png)
 :width:`700px` 
- :label:`fig_scaling-sample-conv` 
+:label:`fig_scaling-sample-conv` 
 
  Outre l'amélioration des performances, les grands modèles bénéficient également d'une meilleure efficacité d'échantillonnage que les petits modèles. :numref:`fig_scaling-sample-conv` montre que les grands modèles ont besoin de moins d'échantillons d'entraînement (tokens traités) pour atteindre le même niveau de performance que les petits modèles, et que les performances sont mises à l'échelle de façon régulière avec le calcul. 
 
@@ -145,7 +145,7 @@ GPT-2 a démontré la possibilité d'utiliser le même modèle de langage pour d
  ![GPT-3 performance (cross-entropy validation loss) suit une tendance de type loi de puissance avec la quantité de calcul utilisée pour l'entraînement. Le comportement de loi de puissance observé dans :cite:`kaplan2020scaling` se poursuit pour deux ordres de grandeur supplémentaires avec seulement de faibles écarts par rapport à la courbe prédite dans
 . Les paramètres d'intégration sont exclus du calcul et du décompte des paramètres (légende adaptée et figure tirée de :cite:`brown2020language` ).](../img/scaling-gpt3.png)
 :width:`400px` 
- :label:`fig_scaling-gpt3` 
+:label:`fig_scaling-gpt3` 
 
  
  Les comportements empiriques de mise à l'échelle dans :cite:`kaplan2020scaling` ont été testés dans des modèles de grands transformateurs ultérieurs. Par exemple, GPT-3 a confirmé cette hypothèse avec deux ordres de grandeur supplémentaires dans :numref:`fig_scaling-gpt3` .
@@ -161,7 +161,7 @@ Les transformateurs ont été pré-entraînés en tant que codeur seulement (par
 un Parti plus grand est plus capable de générer des images de haute fidélité et de comprendre des textes riches en contenu (:numref:`fig_parti` ).
 
 
-![Image examples generated from the same text by the Parti model of increasing sizes (350M, 750M, 3B, 20B) (exemples tirés de  ).](../img/parti.png)         ## Exercices 1. Est-il possible de régler finement T5 en utilisant un minilot composé de différentes tâches ? Pourquoi ou pourquoi pas ? Qu'en est-il pour GPT-2 ? 1. Étant donné un modèle de langage puissant, à quelles applications pouvez-vous penser ? 1. Supposons qu'on vous demande d'affiner un modèle de langage pour effectuer une classification de texte en ajoutant des couches supplémentaires. Où allez-vous les ajouter ? Pourquoi ? 1. Considérez les problèmes de séquence à séquence (par exemple, la traduction automatique) où la séquence d'entrée est toujours disponible pendant la prédiction de la séquence cible. Quelles pourraient être les limites de la modélisation avec des transformateurs de décodeur seulement ? Pourquoi ? :cite:`yu2022scaling`
+![Image examples generated from the same text by the Parti model of increasing sizes (350M, 750M, 3B, 20B) (exemples tirés de  ).](../img/parti.png)        ## Exercices 1. Est-il possible de régler finement T5 en utilisant un minilot composé de différentes tâches ? Pourquoi ou pourquoi pas ? Qu'en est-il pour GPT-2 ? 1. Étant donné un modèle de langage puissant, à quelles applications pouvez-vous penser ? 1. Supposons qu'on vous demande d'affiner un modèle de langage pour effectuer une classification de texte en ajoutant des couches supplémentaires. Où allez-vous les ajouter ? Pourquoi ? 1. Considérez les problèmes de séquence à séquence (par exemple, la traduction automatique) où la séquence d'entrée est toujours disponible pendant la prédiction de la séquence cible. Quelles pourraient être les limites de la modélisation avec des transformateurs de décodeur seulement ? Pourquoi ? :cite:`yu2022scaling`
 :width:`700px`
 :label:`fig_parti`
 

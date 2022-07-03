@@ -124,7 +124,7 @@ $${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b,$$
  où la diffusion (:numref:`subsec_broadcasting` ) est appliquée pendant la sommation.
 Étant donné les caractéristiques d'un ensemble de données d'apprentissage $\mathbf{X}$
  et les étiquettes correspondantes (connues) $\mathbf{y}$,
-, l'objectif de la régression linéaire est de trouver
+l'objectif de la régression linéaire est de trouver
 le vecteur de poids $\mathbf{w}$ et le terme de biais $b$
  qui, étant donné les caractéristiques d'un nouvel exemple de données
 échantillonné à partir de la même distribution que $\mathbf{X}$,
@@ -198,7 +198,7 @@ qui minimisent la perte totale sur tous les exemples d'apprentissage :
 
 $$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).$$ 
 
- ### Solution analytique
+### Solution analytique
 
 Contrairement à la plupart des modèles que nous allons aborder,
 la régression linéaire nous présente
@@ -559,7 +559,7 @@ $$P(\mathbf y|\mathbf X) = \prod_{i=1}^{n} p(y^{(i)}|\mathbf{x}^{(i)}).$$
 Les estimateurs choisis selon le principe de la vraisemblance maximale
 sont appelés *estimateurs de vraisemblance maximale*.
 Bien que la maximisation du produit de plusieurs fonctions exponentielles,
-, puisse sembler difficile,
+puisse sembler difficile,
 nous pouvons simplifier les choses de manière significative, sans changer l'objectif,
 en maximisant plutôt le logarithme de la vraisemblance.
 Pour des raisons historiques, les optimisations sont plus souvent exprimées

@@ -220,12 +220,12 @@ X
 Notez que le fait de spécifier chaque composant de forme
 à `reshape` est redondant.
 Puisque nous connaissons déjà la taille de notre tenseur,
-, nous pouvons calculer une composante de la forme à partir des autres.
+nous pouvons calculer une composante de la forme à partir des autres.
 Par exemple, avec un tenseur de taille $n$
  et une forme cible ($h$, $w$),
 nous savons que $w = n/h$.
 Pour déduire automatiquement un composant de la forme,
-, nous pouvons placer un `-1` pour le composant de la forme
+nous pouvons placer un `-1` pour le composant de la forme
 qui devrait être déduit automatiquement.
 Dans notre cas, au lieu d'appeler `x.reshape(3, 4)`,
 nous aurions pu appeler `x.reshape(-1, 4)` ou `x.reshape(3, -1)`.
@@ -591,7 +591,7 @@ a + b
 
 [**L'exécution d'opérations peut entraîner l'allocation d'une nouvelle mémoire pour accueillir les résultats.**]
 Par exemple, si nous écrivons `Y = X + Y`,
-, nous déréférençons le tenseur que `Y` utilisait pour pointer vers
+nous déréférençons le tenseur que `Y` utilisait pour pointer vers
 et pointons `Y` vers la mémoire nouvellement allouée.
 Nous pouvons démontrer ce problème avec la fonction `id()` de Python,
 qui nous donne l'adresse exacte 

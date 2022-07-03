@@ -112,7 +112,7 @@ Examinons-les.
 ### Minima locaux
 
 Pour toute fonction objective $f(x)$,
-, si la valeur de $f(x)$ à $x$ est inférieure aux valeurs de $f(x)$ à tout autre point à proximité de $x$, alors $f(x)$ pourrait être un minimum local.
+si la valeur de $f(x)$ à $x$ est inférieure aux valeurs de $f(x)$ à tout autre point à proximité de $x$, alors $f(x)$ pourrait être un minimum local.
 Si la valeur de $f(x)$ à $x$ est le minimum de la fonction objectif sur l'ensemble du domaine,
 alors $f(x)$ est le minimum global.
 

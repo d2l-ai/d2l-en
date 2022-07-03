@@ -198,8 +198,8 @@ les valeurs des coordonnées ($x$, $y$)
 du coin supérieur gauche et du coin inférieur droit
 de la boîte englobante (la plage est comprise entre 0 et 1).
 Pour l'ensemble de données sur les bananes,
-, comme il n'y a qu'une seule boîte englobante sur chaque image,
-, nous avons $m=1$.
+comme il n'y a qu'une seule boîte englobante sur chaque image,
+nous avons $m=1$.
 
 ```{.python .input}
 #@tab all

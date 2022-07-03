@@ -1,12 +1,12 @@
-# Convexity
-:label:`sec_convexity`
+# Convexité
+:label:`sec_convexity` 
 
-Convexity plays a vital role in the design of optimization algorithms. 
-This is largely due to the fact that it is much easier to analyze and test algorithms in such a context. 
-In other words,
-if the algorithm performs poorly even in the convex setting,
-typically we should not hope to see great results otherwise. 
-Furthermore, even though the optimization problems in deep learning are generally nonconvex, they often exhibit some properties of convex ones near local minima. This can lead to exciting new optimization variants such as :cite:`Izmailov.Podoprikhin.Garipov.ea.2018`.
+La convexité joue un rôle essentiel dans la conception des algorithmes d'optimisation. 
+Cela est dû en grande partie au fait qu'il est beaucoup plus facile d'analyser et de tester les algorithmes dans un tel contexte. 
+En d'autres termes,
+si l'algorithme est peu performant même dans le cadre convexe,
+il ne faut généralement pas espérer obtenir de grands résultats dans le cas contraire. 
+En outre, même si les problèmes d'optimisation de l'apprentissage profond sont généralement non convexes, ils présentent souvent certaines propriétés des problèmes convexes à proximité des minima locaux. Cela peut conduire à de nouvelles variantes d'optimisation intéressantes telles que :cite:`Izmailov.Podoprikhin.Garipov.ea.2018` .
 
 ```{.python .input}
 #@tab mxnet
@@ -35,51 +35,51 @@ from mpl_toolkits import mplot3d
 import tensorflow as tf
 ```
 
-## Definitions
+## Définitions
 
-Before convex analysis,
-we need to define *convex sets* and *convex functions*.
-They lead to mathematical tools that are commonly applied to machine learning.
+Avant de procéder à une analyse convexe,
+nous devons définir les *ensembles convexes* et les *fonctions convexes*.
+Elles conduisent à des outils mathématiques qui sont couramment appliqués à l'apprentissage automatique.
 
 
-### Convex Sets
+### Ensembles convexes
 
-Sets are the basis of convexity. Simply put, a set $\mathcal{X}$ in a vector space is *convex* if for any $a, b \in \mathcal{X}$ the line segment connecting $a$ and $b$ is also in $\mathcal{X}$. In mathematical terms this means that for all $\lambda \in [0, 1]$ we have
+Les ensembles sont la base de la convexité. En termes simples, un ensemble $\mathcal{X}$ dans un espace vectoriel est *convexe* si pour tout $a, b \ dans \mathcal{X}$ le segment de droite reliant $a$ et $b$ est également dans $\mathcal{X}$. En termes mathématiques, cela signifie que pour tout $\lambda \in [0, 1])$, nous avons
 
 $$\lambda  a + (1-\lambda)  b \in \mathcal{X} \text{ whenever } a, b \in \mathcal{X}.$$
 
-This sounds a bit abstract. Consider :numref:`fig_pacman`. The first set is not convex since there exist line segments that are not contained in it.
-The other two sets suffer no such problem.
+Cela semble un peu abstrait. Considérons :numref:`fig_pacman` . Le premier ensemble n'est pas convexe car il existe des segments de droite qui ne sont pas contenus dans cet ensemble.
+Les deux autres ensembles ne souffrent pas de ce problème.
 
-![The first set is nonconvex and the other two are convex.](../img/pacman.svg)
-:label:`fig_pacman`
+![Le premier ensemble est non convexe et les deux autres sont convexes](../img/pacman.svg)
+:label:`fig_pacman` 
 
-Definitions on their own are not particularly useful unless you can do something with them.
-In this case we can look at intersections as shown in :numref:`fig_convex_intersect`.
-Assume that $\mathcal{X}$ and $\mathcal{Y}$ are convex sets. Then $\mathcal{X} \cap \mathcal{Y}$ is also convex. To see this, consider any $a, b \in \mathcal{X} \cap \mathcal{Y}$. Since $\mathcal{X}$ and $\mathcal{Y}$ are convex, the line segments connecting $a$ and $b$ are contained in both $\mathcal{X}$ and $\mathcal{Y}$. Given that, they also need to be contained in $\mathcal{X} \cap \mathcal{Y}$, thus proving our theorem.
+Les définitions en elles-mêmes ne sont pas particulièrement utiles, sauf si vous pouvez en faire quelque chose.
+Dans ce cas, nous pouvons examiner les intersections, comme le montre :numref:`fig_convex_intersect` .
+Supposons que $\mathcal{X}$ et $\mathcal{Y}$ soient des ensembles convexes. Alors $\mathcal{X} \cap \mathcal{Y}$ est également convexe. Pour s'en convaincre, on considère tout $a, b \in \mathcal{X} \cap \mathcal{Y}$. Puisque $\mathcal{X}$ et $\mathcal{Y}$ sont convexes, les segments de droite reliant $a$ et $b$ sont contenus à la fois dans $\mathcal{X}$ et $\mathcal{Y}$. Étant donné cela, ils doivent également être contenus dans $\mathcal{X} \cap \mathcal{Y}$, prouvant ainsi notre théorème.
 
-![The intersection between two convex sets is convex.](../img/convex-intersect.svg)
-:label:`fig_convex_intersect`
+![L'intersection entre deux ensembles convexes est convexe](../img/convex-intersect.svg)
+:label:`fig_convex_intersect` 
 
-We can strengthen this result with little effort: given convex sets $\mathcal{X}_i$, their intersection $\cap_{i} \mathcal{X}_i$ is convex.
-To see that the converse is not true, consider two disjoint sets $\mathcal{X} \cap \mathcal{Y} = \emptyset$. Now pick $a \in \mathcal{X}$ and $b \in \mathcal{Y}$. The line segment in :numref:`fig_nonconvex` connecting $a$ and $b$ needs to contain some part that is neither in $\mathcal{X}$ nor in $\mathcal{Y}$, since we assumed that $\mathcal{X} \cap \mathcal{Y} = \emptyset$. Hence the line segment is not in $\mathcal{X} \cup \mathcal{Y}$ either, thus proving that in general unions of convex sets need not be convex.
+Nous pouvons renforcer ce résultat avec peu d'effort : étant donné les ensembles convexes $\mathcal{X}_i$, leur intersection $\cap_{i} \mathcal{X}_i$ est convexe.
+Pour voir que l'inverse n'est pas vrai, considérez deux ensembles disjoints : $\mathcal{X} \cap \mathcal{Y} = \emptyset$. Choisissez maintenant $a \in \mathcal{X}$ et $b \in \mathcal{Y}$. Le segment de droite dans :numref:`fig_nonconvex` reliant $a$ et $b$ doit contenir une partie qui n'est ni dans $\mathcal{X}$ ni dans $\mathcal{Y}$, puisque nous avons supposé que $\mathcal{X} \cap \mathcal{Y} = \emptyset$. Par conséquent, le segment de droite n'est pas non plus dans $\mathcal{X} \cup \mathcal{Y}$, ce qui prouve qu'en général, les unions d'ensembles convexes ne sont pas nécessairement convexes.
 
-![The union of two convex sets need not be convex.](../img/nonconvex.svg)
-:label:`fig_nonconvex`
+![L'union de deux ensembles convexes n'est pas nécessairement convexe](../img/nonconvex.svg)
+:label:`fig_nonconvex` 
 
-Typically the problems in deep learning are defined on convex sets. For instance, $\mathbb{R}^d$,
-the set of $d$-dimensional vectors of real numbers,
-is a convex set (after all, the line between any two points in $\mathbb{R}^d$ remains in $\mathbb{R}^d$). In some cases we work with variables of bounded length, such as balls of radius $r$ as defined by $\{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \text{ and } \|\mathbf{x}\| \leq r\}$.
+Généralement, les problèmes d'apprentissage profond sont définis sur des ensembles convexes. Par exemple, $\mathbb{R}^d$,
+l'ensemble des vecteurs à $d$ dimensions des nombres réels,
+est un ensemble convexe (après tout, la ligne entre deux points quelconques de $\mathbb{R}^d$ reste dans $\mathbb{R}^d$. Dans certains cas, nous travaillons avec des variables de longueur limitée, telles que des boules de rayon $r$ définies par $\{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \text{ and } \|\mathbf{x}\| \leq r\}$.
 
-### Convex Functions
+### Fonctions convexes
 
-Now that we have convex sets we can introduce *convex functions* $f$.
-Given a convex set $\mathcal{X}$, a function $f: \mathcal{X} \to \mathbb{R}$ is *convex* if for all $x, x' \in \mathcal{X}$ and for all $\lambda \in [0, 1]$ we have
+Maintenant que nous avons des ensembles convexes, nous pouvons introduire les *fonctions convexes* $f$.
+Étant donné un ensemble convexe $\mathcal{X}$, une fonction $f: \mathcal{X} \to \mathbb{R}$ est *convexe* si pour tout $x, x' \in \mathcal{X}$ et pour tout $\lambda \in [0, 1]$ nous avons
 
 $$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
-To illustrate this let's plot a few functions and check which ones satisfy the requirement.
-Below we define a few functions, both convex and nonconvex.
+Pour illustrer cela, traçons quelques fonctions et vérifions celles qui satisfont à la condition.
+Nous définissons ci-dessous quelques fonctions, à la fois convexes et non convexes.
 
 ```{.python .input}
 #@tab all
@@ -94,61 +94,61 @@ for ax, func in zip(axes, [f, g, h]):
     d2l.plot([x, segment], [func(x), func(segment)], axes=ax)
 ```
 
-As expected, the cosine function is *nonconvex*, whereas the parabola and the exponential function are. Note that the requirement that $\mathcal{X}$ is a convex set is necessary for the condition to make sense. Otherwise the outcome of $f(\lambda x + (1-\lambda) x')$ might not be well defined.
+Comme prévu, la fonction cosinus est *non convexe*, alors que la parabole et la fonction exponentielle le sont. Notez que l'exigence selon laquelle $\mathcal{X}$ est un ensemble convexe est nécessaire pour que la condition ait un sens. Sinon, le résultat de $f(\lambda x + (1-\lambda) x')$ pourrait ne pas être bien défini.
 
 
-### Jensen's Inequality
+### Inégalité de Jensen
 
-Given a convex function $f$,
-one of the most useful mathematical tools
-is *Jensen's inequality*.
-It amounts to a generalization of the definition of convexity:
+Étant donné une fonction convexe $f$,
+l'un des outils mathématiques les plus utiles
+est l'inégalité de *Jensen*.
+Elle revient à une généralisation de la définition de la convexité :
 
 $$\sum_i \alpha_i f(x_i)  \geq f\left(\sum_i \alpha_i x_i\right)    \text{ and }    E_X[f(X)]  \geq f\left(E_X[X]\right),$$
 :eqlabel:`eq_jensens-inequality`
 
-where $\alpha_i$ are nonnegative real numbers such that $\sum_i \alpha_i = 1$ and $X$ is a random variable.
-In other words, the expectation of a convex function is no less than the convex function of an expectation, where the latter is usually a simpler expression. 
-To prove the first inequality we repeatedly apply the definition of convexity to one term in the sum at a time.
+où $\alpha_i$ sont des nombres réels non négatifs tels que $\sum_i \alpha_i = 1$ et $X$ est une variable aléatoire.
+En d'autres termes, l'espérance d'une fonction convexe n'est pas inférieure à la fonction convexe d'une espérance, cette dernière étant généralement une expression plus simple. 
+Pour prouver la première inégalité, nous appliquons de manière répétée la définition de la convexité à un terme de la somme à la fois.
 
 
-One of the common applications of Jensen's inequality is
-to bound a more complicated expression by a simpler one.
-For example,
-its application can be
-with regard to the log-likelihood of partially observed random variables. That is, we use
+L'une des applications courantes de l'inégalité de Jensen est
+pour lier une expression plus compliquée par une expression plus simple.
+Par exemple,
+son application peut être
+en ce qui concerne la log-vraisemblance de variables aléatoires partiellement observées. C'est-à-dire que nous utilisons
 
 $$E_{Y \sim P(Y)}[-\log P(X \mid Y)] \geq -\log P(X),$$
 
-since $\int P(Y) P(X \mid Y) dY = P(X)$.
-This can be used in variational methods. Here $Y$ is typically the unobserved random variable, $P(Y)$ is the best guess of how it might be distributed, and $P(X)$ is the distribution with $Y$ integrated out. For instance, in clustering $Y$ might be the cluster labels and $P(X \mid Y)$ is the generative model when applying cluster labels.
+puisque $\int P(Y) P(X \mid Y) dY = P(X)$.
+Ceci peut être utilisé dans les méthodes variationnelles. Ici, $Y$ est généralement la variable aléatoire non observée, $P(Y)$ est la meilleure estimation de la façon dont elle pourrait être distribuée, et $P(X)$ est la distribution avec $Y$ intégré. Par exemple, dans le clustering, $Y$ peut être les étiquettes de cluster et $P(X \mid Y)$ est le modèle génératif lors de l'application des étiquettes de cluster.
 
 
 
-## Properties
+## Propriétés
 
-Convex functions have many useful properties. We describe a few commonly-used ones below.
+Les fonctions convexes ont de nombreuses propriétés utiles. Nous décrivons ci-dessous quelques-unes de celles qui sont couramment utilisées.
 
 
-### Local Minima Are Global Minima
+### Les minima locaux sont des minima globaux
 
-First and foremost, the local minima of convex functions are also the global minima. 
-We can prove it by contradiction as follows.
+Tout d'abord, les minima locaux des fonctions convexes sont également les minima globaux. 
+Nous pouvons le prouver par contradiction comme suit.
 
-Consider a convex function $f$ defined on a convex set $\mathcal{X}$.
-Suppose that $x^{\ast} \in \mathcal{X}$ is a local minimum:
-there exists a small positive value $p$ so that for $x \in \mathcal{X}$ that satisfies $0 < |x - x^{\ast}| \leq p$ we have $f(x^{\ast}) < f(x)$.
+Considérons une fonction convexe $f$ définie sur un ensemble convexe $\mathcal{X}$.
+Supposons que $x^{\ast} \in \mathcal{X}$  soit un minimum local :
+il existe une petite valeur positive $p$ telle que pour $x \in \mathcal{X}$ qui satisfait $0 < |x - x^{\ast}| \leq p$ nous avons $f(x^{\ast}) < f(x)$.
 
-Assume that the local minimum $x^{\ast}$
-is not the global minumum of $f$:
-there exists $x' \in \mathcal{X}$ for which $f(x') < f(x^{\ast})$. 
-There also exists 
+Supposons que le minimum local $x^{\ast}$
+ne soit pas le minimum global de $f$:
+il existe $x' \in \mathcal{X}$ for which $f(x') < f(x^{\ast})$. 
+Il existe également 
 $\lambda \in [0, 1)$ such as $\lambda = 1 - \frac{p}{|x^{\ast} - x'|}$
-so that
+de sorte que
 $0 < |\lambda x^{\ast} + (1-\lambda) x' - x^{\ast}| \leq p$. 
 
-However,
-according to the definition of convex functions, we have
+Cependant,
+selon la définition des fonctions convexes, on a
 
 $$\begin{aligned}
     f(\lambda x^{\ast} + (1-\lambda) x') &\leq \lambda f(x^{\ast}) + (1-\lambda) f(x') \\
@@ -156,10 +156,10 @@ $$\begin{aligned}
     &= f(x^{\ast}),
 \end{aligned}$$
 
-which contradicts with our statement that $x^{\ast}$ is a local minimum.
-Therefore, there does not exist $x' \in \mathcal{X}$ for which $f(x') < f(x^{\ast})$. The local minimum $x^{\ast}$ is also the global minimum.
+ce qui est en contradiction avec notre affirmation que $x^{\ast}$ est un minimum local.
+Par conséquent, il n'existe pas $x' \in \mathcal{X}$ pour lequel $f(x') < f(x^{\ast})$. Le minimum local $x^{\ast}$ est aussi le minimum global.
 
-For instance, the convex function $f(x) = (x-1)^2$ has a local minimum at $x=1$, which is also the global minimum.
+Par exemple, la fonction convexe $f(x) = (x-1)^2$ a un minimum local en $x=1$, qui est aussi le minimum global.
 
 ```{.python .input}
 #@tab all
@@ -168,83 +168,83 @@ d2l.set_figsize()
 d2l.plot([x, segment], [f(x), f(segment)], 'x', 'f(x)')
 ```
 
-The fact that the local minima for convex functions are also the global minima is very convenient. 
-It means that if we minimize functions we cannot "get stuck". 
-Note, though, that this does not mean that there cannot be more than one global minimum or that there might even exist one. For instance, the function $f(x) = \mathrm{max}(|x|-1, 0)$ attains its minimum value over the interval $[-1, 1]$. Conversely, the function $f(x) = \exp(x)$ does not attain a minimum value on $\mathbb{R}$: for $x \to -\infty$ it asymptotes to $0$, but there is no $x$ for which $f(x) = 0$.
+Le fait que les minima locaux des fonctions convexes soient également les minima globaux est très pratique. 
+Cela signifie que si nous minimisons des fonctions, nous ne pouvons pas "rester coincés". 
+Notez cependant que cela ne signifie pas qu'il ne peut pas y avoir plus d'un minimum global ou qu'il peut même en exister un. Par exemple, la fonction $f(x) = \mathrm{max}(|x|-1, 0)$ atteint sa valeur minimale sur l'intervalle $[-1, 1]$. Inversement, la fonction $f(x) = \exp(x)$ n'atteint pas une valeur minimale sur \mathbb{R} : pour $x \to -\infty$ elle s'asymptote à $0$, mais il n'existe pas de $x$ pour lequel $f(x) = 0$.
 
-### Below Sets of Convex Functions Are Convex
+### Les ensembles inférieurs de fonctions convexes sont convexes
 
-We can conveniently 
-define convex sets 
-via *below sets* of convex functions.
-Concretely,
-given a convex function $f$ defined on a convex set $\mathcal{X}$,
-any below set
+Nous pouvons commodément 
+définir les ensembles convexes 
+via les *ensembles inférieurs* de fonctions convexes.
+Concrètement,
+étant donné une fonction convexe $f$ définie sur un ensemble convexe \mathcal{X},
+tout ensemble inférieur
 
-$$\mathcal{S}_b := \{x | x \in \mathcal{X} \text{ and } f(x) \leq b\}$$
+$$\mathcal{S}_b := \{x | x \in \mathcal{X} \text{ et } f(x) \leq b\}$$
 
-is convex. 
+est convexe. 
 
-Let's prove this quickly. Recall that for any $x, x' \in \mathcal{S}_b$ we need to show that $\lambda x + (1-\lambda) x' \in \mathcal{S}_b$ as long as $\lambda \in [0, 1]$. 
-Since $f(x) \leq b$ and $f(x') \leq b$,
-by the definition of convexity we have 
+Prouvons cela rapidement. Rappelons que pour tout $x, x' \in \mathcal{S}_b$, nous devons montrer que $\lambda x + (1-\lambda) x' \in \mathcal{S}_b$ tant que $\lambda \in [0, 1]$. 
+Puisque $f(x) \leq b$ et $f(x') \leq b$,
+par la définition de la convexité nous avons 
 
 $$f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b.$$
 
 
-### Convexity and Second Derivatives
+### Convexité et dérivées secondes
 
-Whenever the second derivative of a function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ exists it is very easy to check whether $f$ is convex. 
-All we need to do is check whether the Hessian of $f$ is positive semidefinite: $\nabla^2f \succeq 0$, i.e., 
-denoting the Hessian matrix $\nabla^2f$ by $\mathbf{H}$,
+Quelle que soit la dérivée seconde d'une fonction $f: \mathbb{R}^n \rightarrow \mathbb{R}$ existe, il est très facile de vérifier si $f$ est convexe. 
+Tout ce que nous avons à faire est de vérifier si le Hessien de $f$ est semi-défini positif : $\nabla^2f \succeq 0$, c'est-à-dire, 
+en désignant la matrice hessienne $\nabla^2f$ par $\mathbf{H}$,
 $\mathbf{x}^\top \mathbf{H} \mathbf{x} \geq 0$
-for all $\mathbf{x} \in \mathbb{R}^n$.
-For instance, the function $f(\mathbf{x}) = \frac{1}{2} \|\mathbf{x}\|^2$ is convex since $\nabla^2 f = \mathbf{1}$, i.e., its Hessian is an identity matrix.
+pour tout $\mathbf{x} \in \mathbb{R}^n$.
+Par exemple, la fonction $f(\mathbf{x}) = \frac{1}{2} \|\mathbf{x}\|^2$ est convexe puisque $\nabla^2 f = \mathbf{1}$, ie.e.,sa Hessienne est la matrice identité.
 
 
-Formally, a twice-differentiable one-dimensional function $f: \mathbb{R} \rightarrow \mathbb{R}$ is convex
-if and only if its second derivative $f'' \geq 0$. For any twice-differentiable multi-dimensional function $f: \mathbb{R}^{n} \rightarrow \mathbb{R}$,
-it is convex if and only if its Hessian $\nabla^2f \succeq 0$.
+Formellement, une fonction unidimensionnelle deux fois différentiable $f: \mathbb{R} \rightarrow \mathbb{R}$ est convexe
+si et seulement si sa dérivée seconde $f'' \geq 0$. Pour toute fonction multidimensionnelle deux fois différentiable $f: \mathbb{R}^{n} \rightarrow \mathbb{R}$,
+elle est convexe si et seulement si son hessien $\nabla^2f \succeq 0$.
 
-First, we need to prove the one-dimensional case.
-To see that 
-convexity of $f$ implies 
-$f'' \geq 0$  we use the fact that
+Tout d'abord, nous devons prouver le cas unidimensionnel.
+Pour voir que 
+la convexité de $f$ implique 
+$f'' \geq 0$, nous utilisons le fait que
 
 $$\frac{1}{2} f(x + \epsilon) + \frac{1}{2} f(x - \epsilon) \geq f\left(\frac{x + \epsilon}{2} + \frac{x - \epsilon}{2}\right) = f(x).$$
 
-Since the second derivative is given by the limit over finite differences it follows that
+Comme la dérivée seconde est donnée par la limite sur les différences finies, il s'ensuit que
 
 $$f''(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) + f(x - \epsilon) - 2f(x)}{\epsilon^2} \geq 0.$$
 
-To see that 
-$f'' \geq 0$ implies that $f$ is convex
-we use the fact that $f'' \geq 0$ implies that $f'$ is a monotonically nondecreasing function. Let $a < x < b$ be three points in $\mathbb{R}$,
-where $x = (1-\lambda)a + \lambda b$ and $\lambda \in (0, 1)$.
-According to the mean value theorem,
-there exist $\alpha \in [a, x]$ and $\beta \in [x, b]$
-such that
+Pour voir que 
+$f'' \geq 0$ implique que $f$ est convexe
+nous utilisons le fait que $f'' \geq 0$ implique que $f'$ est une fonction monotone non décroissante. Soit  $a < x < b$ trois points dans $\mathbb{R}$,
+où $x = (1-\lambda)a + \lambda b$ et $\lambda \in (0, 1)$.
+Selon le Théorème des accroissements finis
+il existe $\alpha \in [a, x]$ et $\beta \in [x, b]$
+tels que
 
-$$f'(\alpha) = \frac{f(x) - f(a)}{x-a} \text{ and } f'(\beta) = \frac{f(b) - f(x)}{b-x}.$$
+$$f'(\alpha) = \frac{f(x) - f(a)}{x-a} \text{ et } f'(\beta) = \frac{f(b) - f(x)}{b-x}.$$
 
 
-By monotonicity $f'(\beta) \geq f'(\alpha)$, hence
+Par monotonicité, $f'(\beta) \geq f'(\alpha)$, donc
 
 $$\frac{x-a}{b-a}f(b) + \frac{b-x}{b-a}f(a) \geq f(x).$$
 
-Since $x = (1-\lambda)a + \lambda b$,
-we have
+Puisque $x = (1-\lambda)a + \lambda b$,
+nous avons
 
 $$\lambda f(b) + (1-\lambda)f(a) \geq f((1-\lambda)a + \lambda b),$$
 
-thus proving convexity.
+prouvant ainsi la convexité.
 
-Second, we need a lemma before 
-proving the multi-dimensional case:
+Deuxièmement, nous avons besoin d'un lemme avant de 
+prouver le cas multidimensionnel:
 $f: \mathbb{R}^n \rightarrow \mathbb{R}$
 est convexe si et seulement si pour tout $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$
 
- $$g(z) \stackrel{\mathrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y}) \text{ where } z \in [0,1]$$ 
+$$g(z) \stackrel{\mathrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y}) \text{ avec } z \in [0,1]$$ 
 
  est convexe.
 
@@ -333,7 +333,7 @@ $$\mathrm{Proj}_\mathcal{X}(\mathbf{x}) = \mathop{\mathrm{argmin}}_{\mathbf{x}' 
  qui est le point de $\mathcal{X}$ le plus proche de $\mathbf{x}$. 
 
 ![Convex Projections.](../img/projections.svg) 
- :label:`fig_projections` 
+:label:`fig_projections` 
 
  La définition mathématique des projections peut sembler un peu abstraite. :numref:`fig_projections` l'explique un peu plus clairement. Dans ce document, nous avons deux ensembles convexes, un cercle et un diamant. 
 Les points à l'intérieur des deux ensembles (jaune) restent inchangés pendant les projections. 

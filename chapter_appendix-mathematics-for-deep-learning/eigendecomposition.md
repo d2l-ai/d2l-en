@@ -42,8 +42,8 @@ Nous disons que $\mathbf{v}$ est un vecteur propre de $A$ et que $\lambda$ est u
 
 ## Trouver les valeurs propres
 Voyons comment les trouver. :eqref: En soustrayant $\lambda \mathbf{v}$ des deux côtés,
-, puis en factorisant le vecteur,
-, nous voyons que ce qui précède est équivalent à :
+puis en factorisant le vecteur,
+nous voyons que ce qui précède est équivalent à :
 
 $$(\mathbf{A} - \lambda \mathbf{I})\mathbf{v} = 0.$$ 
  :eqlabel:`eq_eigvalue_der` 
@@ -172,7 +172,7 @@ $$
 $$
 
 Cela nous indique que pour toute puissance positive d'une matrice,
-, la décomposition effective est obtenue en élevant simplement les valeurs propres à la même puissance.
+la décomposition effective est obtenue en élevant simplement les valeurs propres à la même puissance.
 La même chose peut être montrée pour les puissances négatives,
 . Ainsi, si nous voulons inverser une matrice, il suffit de considérer
 
@@ -639,7 +639,7 @@ d2l.plot(tf.range(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 
 Nous voyons maintenant exactement ce que nous espérions !
 Après avoir normalisé les matrices par la valeur propre principale,
-, nous constatons que les données aléatoires n'explosent pas comme avant,
+nous constatons que les données aléatoires n'explosent pas comme avant,
 mais finissent par s'équilibrer à une valeur spécifique.
 Ce serait bien de pouvoir faire ces choses à partir des premiers principes,
 et il s'avère que si nous examinons en profondeur les mathématiques,

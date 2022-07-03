@@ -18,7 +18,7 @@ où les ingénieurs sont passés du placement des transistors
 aux éléments logiques, puis aux blocs logiques :cite:`Mead.1980` .
 De même, la conception d'architectures de réseaux neuronaux
 est devenue progressivement plus abstraite,
-, les chercheurs passant de la réflexion en termes de neurones individuels
+les chercheurs passant de la réflexion en termes de neurones individuels
 à des couches entières,
 et maintenant à des blocs, c'est-à-dire des motifs répétitifs de couches. 
 

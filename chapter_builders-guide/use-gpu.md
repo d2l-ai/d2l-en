@@ -6,27 +6,27 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # GPUs
 :label:`sec_use_gpu`
 
-In :numref:`tab_intro_decade`, we discussed the rapid growth
-of computation over the past two decades.
-In a nutshell, GPU performance has increased
-by a factor of 1000 every decade since 2000.
-This offers great opportunities but it also suggests
-a significant need to provide such performance.
+Dans :numref:`tab_intro_decade`, nous avons abordé la croissance rapide de la
+du calcul au cours des deux dernières décennies.
+En un mot, les performances des GPU ont augmenté
+par un facteur de 1000 chaque décennie depuis 2000.
+Cela offre de grandes opportunités, mais cela suggère également
+un besoin important de fournir de telles performances.
 
 
-In this section, we begin to discuss how to harness
-this computational performance for your research.
-First by using single GPUs and at a later point,
-how to use multiple GPUs and multiple servers (with multiple GPUs).
+Dans cette section, nous commençons à discuter de la façon d'exploiter ces performances de calcul pour vos recherches.
+cette performance de calcul pour votre recherche.
+Tout d'abord en utilisant des GPU uniques et plus tard,
+comment utiliser plusieurs GPU et plusieurs serveurs (avec plusieurs GPU).
 
-Specifically, we will discuss how
-to use a single NVIDIA GPU for calculations.
-First, make sure you have at least one NVIDIA GPU installed.
-Then, download the [NVIDIA driver and CUDA](https://developer.nvidia.com/cuda-downloads)
-and follow the prompts to set the appropriate path.
-Once these preparations are complete,
-the `nvidia-smi` command can be used
-to (**view the graphics card information**).
+Plus précisément, nous allons voir comment
+d'utiliser un seul GPU NVIDIA pour les calculs.
+Tout d'abord, vérifiez que vous avez au moins un GPU NVIDIA installé.
+Ensuite, téléchargez le [pilote NVIDIA et CUDA](https://developer.nvidia.com/cuda-downloads)
+et suivez les instructions pour définir le chemin d'accès approprié.
+Une fois ces préparatifs terminés,
+la commande `nvidia-smi' peut être utilisée
+pour (**voir les informations de la carte graphique**).
 
 ```{.python .input}
 %%tab all
@@ -34,93 +34,93 @@ to (**view the graphics card information**).
 ```
 
 :begin_tab:`mxnet`
-You might have noticed that a MXNet tensor
-looks almost identical to a NumPy `ndarray`.
-But there are a few crucial differences.
-One of the key features that distinguishes MXNet
-from NumPy is its support for diverse hardware devices.
+Vous avez peut-être remarqué qu'un tenseur MXNet
+est presque identique à un `ndarray` de NumPy.
+Mais il y a quelques différences cruciales.
+L'une des principales caractéristiques qui distingue MXNet
+de NumPy est son support de divers dispositifs matériels.
 
-In MXNet, every array has a context.
-So far, by default, all variables
-and associated computation
-have been assigned to the CPU.
-Typically, other contexts might be various GPUs.
-Things can get even hairier when
-we deploy jobs across multiple servers.
-By assigning arrays to contexts intelligently,
-we can minimize the time spent
-transferring data between devices.
-For example, when training neural networks on a server with a GPU,
-we typically prefer for the model's parameters to live on the GPU.
+Dans MXNet, chaque tableau a un contexte.
+Jusqu'à présent, par défaut, toutes les variables
+et les calculs associés
+ont été assignés au CPU.
+Typiquement, d'autres contextes pourraient être divers GPUs.
+Les choses peuvent devenir encore plus difficiles lorsque
+nous déployons des tâches sur plusieurs serveurs.
+En assignant intelligemment les tableaux aux contextes,
+nous pouvons minimiser le temps passé
+transfert de données entre les périphériques.
+Par exemple, lors de la formation de réseaux neuronaux sur un serveur avec un GPU,
+nous préférons généralement que les paramètres du modèle se trouvent sur le GPU.
 
-Next, we need to confirm that
-the GPU version of MXNet is installed.
-If a CPU version of MXNet is already installed,
-we need to uninstall it first.
-For example, use the `pip uninstall mxnet` command,
-then install the corresponding MXNet version
-according to your CUDA version.
-Assuming you have CUDA 10.0 installed,
-you can install the MXNet version
-that supports CUDA 10.0 via `pip install mxnet-cu100`.
+Ensuite, nous devons confirmer que
+la version GPU de MXNet est installée.
+Si une version CPU de MXNet est déjà installée,
+nous devons d'abord la désinstaller.
+Par exemple, utilisez la commande `pip uninstall mxnet`,
+puis installez la version correspondante de MXNet
+en fonction de votre version CUDA.
+En supposant que vous avez CUDA 10.0 installé,
+vous pouvez installer la version de MXNet
+qui prend en charge CUDA 10.0 via la commande `pip install mxnet-cu100`.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, every array has a device, we often refer it as a context.
-So far, by default, all variables
-and associated computation
-have been assigned to the CPU.
-Typically, other contexts might be various GPUs.
-Things can get even hairier when
-we deploy jobs across multiple servers.
-By assigning arrays to contexts intelligently,
-we can minimize the time spent
-transferring data between devices.
-For example, when training neural networks on a server with a GPU,
-we typically prefer for the model's parameters to live on the GPU.
+Dans PyTorch, chaque tableau a un dispositif, nous l'appelons souvent un contexte.
+Jusqu'à présent, par défaut, toutes les variables
+et les calculs associés
+ont été assignés au CPU.
+Typiquement, d'autres contextes pourraient être divers GPUs.
+Les choses peuvent devenir encore plus compliquées lorsque
+nous déployons des tâches sur plusieurs serveurs.
+En assignant intelligemment les tableaux aux contextes,
+nous pouvons minimiser le temps passé
+transfert de données entre les périphériques.
+Par exemple, lors de la formation de réseaux neuronaux sur un serveur avec un GPU,
+nous préférons généralement que les paramètres du modèle soient stockés sur le GPU.
 :end_tab:
 
-To run the programs in this section,
-you need at least two GPUs.
-Note that this might be extravagant for most desktop computers
-but it is easily available in the cloud, e.g.,
-by using the AWS EC2 multi-GPU instances.
-Almost all other sections do *not* require multiple GPUs.
-Instead, this is simply to illustrate
-how data flow between different devices.
+Pour exécuter les programmes de cette section,
+vous avez besoin d'au moins deux GPU.
+Notez que cela peut être extravagant pour la plupart des ordinateurs de bureau
+mais c'est facilement disponible dans le cloud, par ex,
+en utilisant les instances multi-GPU d'AWS EC2.
+Presque toutes les autres sections ne nécessitent *pas* de GPU multiples.
+Il s'agit simplement d'illustrer
+comment les données circulent entre les différents périphériques.
 
 ## [**Computing Devices**]
 
-We can specify devices, such as CPUs and GPUs,
-for storage and calculation.
-By default, tensors are created in the main memory
-and then use the CPU to calculate it.
+Nous pouvons spécifier des périphériques, tels que les CPU et les GPU,
+pour le stockage et le calcul.
+Par défaut, les tenseurs sont créés dans la mémoire principale
+et utilisent ensuite le CPU pour les calculer.
 
 :begin_tab:`mxnet`
-In MXNet, the CPU and GPU can be indicated by `cpu()` and `gpu()`.
-It should be noted that `cpu()`
-(or any integer in the parentheses)
-means all physical CPUs and memory.
-This means that MXNet's calculations
-will try to use all CPU cores.
-However, `gpu()` only represents one card
-and the corresponding memory.
-If there are multiple GPUs, we use `gpu(i)`
-to represent the $i^\mathrm{th}$ GPU ($i$ starts from 0).
-Also, `gpu(0)` and `gpu()` are equivalent.
+Dans MXNet, le CPU et le GPU peuvent être indiqués par `cpu()` et `gpu()`.
+Il est à noter que `cpu()`
+(ou tout autre nombre entier entre parenthèses)
+signifie tous les processeurs physiques et la mémoire.
+Cela signifie que les calculs de MXNet
+essaieront d'utiliser tous les cœurs du CPU.
+Cependant, `gpu()` ne représente qu'une seule carte
+et la mémoire correspondante.
+S'il y a plusieurs GPUs, nous utilisons `gpu(i)`
+pour représenter le $i^\mathrm{th}$ GPU ($i$ commence à 0).
+Aussi, `gpu(0)` et `gpu()` sont équivalents.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the CPU and GPU can be indicated by `torch.device('cpu')` and `torch.device('cuda')`.
-It should be noted that the `cpu` device
-means all physical CPUs and memory.
-This means that PyTorch's calculations
-will try to use all CPU cores.
-However, a `gpu` device only represents one card
-and the corresponding memory.
-If there are multiple GPUs, we use `torch.device(f'cuda:{i}')`
-to represent the $i^\mathrm{th}$ GPU ($i$ starts from 0).
-Also, `gpu:0` and `gpu` are equivalent.
+Dans PyTorch, le CPU et le GPU peuvent être indiqués par `torch.device('cpu')` et `torch.device('cuda')`.
+Il est à noter que le dispositif `cpu` désigne tous les processeurs physiques et la mémoire.
+désigne tous les processeurs physiques et la mémoire.
+Cela signifie que les calculs de PyTorch vont essayer
+essaieront d'utiliser tous les cœurs du CPU.
+Cependant, un périphérique `gpu` représente seulement une carte
+et la mémoire correspondante.
+S'il y a plusieurs GPUs, nous utilisons `torch.device(f'cuda:{i}')`
+pour représenter le $i^\mathrm{th}$ GPU ($i$ commence à 0).
+Aussi, `gpu:0` et `gpu` sont équivalents.
 :end_tab:
 
 ```{.python .input}
@@ -165,7 +165,7 @@ def gpu(i=0):  #@save
 cpu(), gpu(), gpu(1)
 ```
 
-We can (**query the number of available GPUs.**)
+Nous pouvons (**interroger le nombre de GPUs disponibles.**)
 
 ```{.python .input}
 %%tab all
@@ -180,8 +180,7 @@ def num_gpus():  #@save
 num_gpus()
 ```
 
-Now we [**define two convenient functions that allow us
-to run code even if the requested GPUs do not exist.**]
+Maintenant, nous [**définissons deux fonctions pratiques qui nous permettent d'exécuter du code même si les GPU demandés n'existent pas.**].
 
 ```{.python .input}
 %%tab all
@@ -200,8 +199,8 @@ try_gpu(), try_gpu(10), try_all_gpus()
 
 ## Tensors and GPUs
 
-By default, tensors are created on the CPU.
-We can [**query the device where the tensor is located.**]
+Par défaut, les tenseurs sont créés sur le CPU.
+Nous pouvons [**interroger le périphérique où se trouve le tenseur.**]
 
 ```{.python .input}
 %%tab mxnet
@@ -221,23 +220,23 @@ x = tf.constant([1, 2, 3])
 x.device
 ```
 
-It is important to note that whenever we want
-to operate on multiple terms,
-they need to be on the same device.
-For instance, if we sum two tensors,
-we need to make sure that both arguments
-live on the same device---otherwise the framework
-would not know where to store the result
-or even how to decide where to perform the computation.
+Il est important de noter que chaque fois que nous voulons
+opérer sur plusieurs termes,
+ils doivent être sur le même dispositif.
+Par exemple, si nous additionnons deux tenseurs,
+nous devons nous assurer que les deux arguments
+se trouvent sur le même dispositif, sinon l'infrastructure
+ne saurait pas où stocker le résultat
+ou même comment décider où effectuer le calcul.
 
-### Storage on the GPU
+### Stockage sur le GPU
 
-There are several ways to [**store a tensor on the GPU.**]
-For example, we can specify a storage device when creating a tensor.
-Next, we create the tensor variable `X` on the first `gpu`.
-The tensor created on a GPU only consumes the memory of this GPU.
-We can use the `nvidia-smi` command to view GPU memory usage.
-In general, we need to make sure that we do not create data that exceeds the GPU memory limit.
+Il existe plusieurs façons de [**stocker un tenseur sur le GPU**].
+Par exemple, nous pouvons spécifier un périphérique de stockage lors de la création d'un tenseur.
+Ensuite, nous créons la variable tensorielle `X` sur le premier `gpu`.
+Le tenseur créé sur un GPU ne consomme que la mémoire de ce GPU.
+Nous pouvons utiliser la commande `nvidia-smi` pour visualiser l'utilisation de la mémoire du GPU.
+En général, nous devons nous assurer que nous ne créons pas de données qui dépassent la limite de mémoire du GPU.
 
 ```{.python .input}
 %%tab mxnet
@@ -258,7 +257,7 @@ with try_gpu():
 X
 ```
 
-Assuming that you have at least two GPUs, the following code will (**create a random tensor on the second GPU.**)
+En supposant que vous avez au moins deux GPU, le code suivant va (**créer un tenseur aléatoire sur le deuxième GPU.**)
 
 ```{.python .input}
 %%tab mxnet
@@ -281,19 +280,18 @@ Y
 
 ### Copying
 
-[**If we want to compute `X + Y`,
-we need to decide where to perform this operation.**]
-For instance, as shown in :numref:`fig_copyto`,
-we can transfer `X` to the second GPU
-and perform the operation there.
-*Do not* simply add `X` and `Y`,
-since this will result in an exception.
-The runtime engine would not know what to do:
-it cannot find data on the same device and it fails.
-Since `Y` lives on the second GPU,
-we need to move `X` there before we can add the two.
+[**Si nous voulons calculer "X + Y", nous devons décider où effectuer cette opération. **]
+Par exemple, comme indiqué dans :numref:`fig_copyto`,
+nous pouvons transférer `X` vers le second GPU
+et y effectuer l'opération.
+*Ne vous contentez pas* d'additionner `X` et `Y`,
+car cela entraînerait une exception.
+Le moteur d'exécution ne saurait pas quoi faire :
+il ne trouverait pas de données sur le même périphérique et il échouerait.
+Puisque `Y` se trouve sur le second GPU,
+nous devons y déplacer `X` avant de pouvoir ajouter les deux.
 
-![Copy data to perform an operation on the same device.](../img/copyto.svg)
+![Copier des données pour effectuer une opération sur la même device.](../img/copyto.svg)
 :label:`fig_copyto`
 
 ```{.python .input}

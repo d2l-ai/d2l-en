@@ -23,7 +23,7 @@ des valeurs scalaires.
 * $\mathsf{X}$: un tenseur général
 * $\mathbf{I}$: une matrice d'identité---carrée, avec $1$ sur toutes les entrées diagonales et $0$ sur toutes les entrées hors-diagonales
 * $x_i$, $[\mathbf{x}]_i$: l'élément $i^\mathrm{th}$ du vecteur $\mathbf{x}$
- * $x_{ij}$, $x_{i,j}$,$[\mathbf{X}]_{ij}$, $[\mathbf{X}]_{i,j}$: l'élément de la matrice $\mathbf{X}$ à la ligne $i$ et à la colonne $j$.
+* $x_{ij}$, $x_{i,j}$,$[\mathbf{X}]_{ij}$, $[\mathbf{X}]_{i,j}$: l'élément de la matrice $\mathbf{X}$ à la ligne $i$ et à la colonne $j$.
 
 
 
@@ -43,7 +43,7 @@ des valeurs scalaires.
 
 
 
- ## Fonctions et opérateurs
+## Fonctions et opérateurs
 
 
  * $f(\cdot)$: une fonction
@@ -65,17 +65,17 @@ des valeurs scalaires.
 
 
 
- ## Calcul
+## Calcul différentiel
 
 * $\frac{dy}{dx}$: dérivée de $y$ par rapport à $x$
- * $\frac{\partial y}{\partial x}$: dérivée partielle de $y$ par rapport à $x$
- * $\nabla_{\mathbf{x}} y$: gradient de $y$ par rapport à $\mathbf{x}$
- * $\int_a^b f(x) \;dx$: intégrale définie de $f$ de $a$ à $b$ par rapport à $x$
- * $\int f(x) \;dx$: intégrale indéfinie de $f$ par rapport à $x$
+* $\frac{\partial y}{\partial x}$: dérivée partielle de $y$ par rapport à $x$
+* $\nabla_{\mathbf{x}} y$: gradient de $y$ par rapport à $\mathbf{x}$
+* $\int_a^b f(x) \;dx$: intégrale définie de $f$ de $a$ à $b$ par rapport à $x$
+* $\int f(x) \;dx$: intégrale indéfinie de $f$ par rapport à $x$
 
  
 
- ## Probabilité et théorie de l'information
+## Probabilité et théorie de l'information
 
 * $X$: une variable aléatoire
 * $P$: une distribution de probabilité

@@ -109,7 +109,7 @@ Dans le carnet Jupyter, nous pouvons utiliser `?` pour afficher le document dans
 qui est presque identique à `help(list)`,
 l'affichant dans une nouvelle fenêtre du navigateur.
 En outre, si nous utilisons deux points d'interrogation, comme `list??`,
-, le code Python implémentant la fonction sera également affiché.
+le code Python implémentant la fonction sera également affiché.
 
 La documentation officielle fournit de nombreuses descriptions et exemples qui dépassent le cadre de cet ouvrage. 
 Nous mettons l'accent sur la couverture des cas d'utilisation importants 

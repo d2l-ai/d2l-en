@@ -65,7 +65,7 @@ qui facilite les comparaisons quantitatives directes
 entre les approches concurrentes ainsi que le partage du code
 afin que chacun puisse apprendre ce qui a fonctionné et ce qui n'a pas fonctionné, présente également un intérêt considérable.
 Si vous souhaitez participer à un concours Kaggle,
-, vous devez d'abord créer un compte
+vous devez d'abord créer un compte
 (voir :numref:`fig_kaggle` ).
 
 ![The Kaggle website.](../img/kaggle.png)
@@ -82,9 +82,9 @@ L'URL est ici :
 
 ![The house price prediction competition page.](../img/house-pricing.png) 
  :width:`400px` 
- :label:`fig_house_pricing` 
+:label:`fig_house_pricing` 
 
- ## Accéder au jeu de données et le lire
+## Accéder au jeu de données et le lire
 
 Notez que les données du concours sont séparées
 en jeux d'entraînement et de test.
@@ -104,7 +104,7 @@ pour l'ensemble d'entraînement uniquement
 (il s'agit d'un concours après tout).
 Nous voudrons partitionner l'ensemble d'entraînement
 pour créer un ensemble de validation,
-, mais nous ne pourrons évaluer nos modèles que sur l'ensemble de test officiel
+mais nous ne pourrons évaluer nos modèles que sur l'ensemble de test officiel
 après avoir téléchargé les prédictions sur Kaggle.
 L'onglet "Données" de l'onglet de la compétition
 dans :numref:`fig_house_pricing` 

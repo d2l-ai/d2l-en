@@ -54,7 +54,7 @@ Lorsque les jeux de données cibles sont beaucoup plus petits que les jeux de do
 Démontrons l'ajustement fin par un cas concret :
 reconnaissance de hot-dogs. 
 Nous allons affiner un modèle ResNet sur un petit jeu de données,
-, qui a été pré-entraîné sur le jeu de données ImageNet.
+qui a été pré-entraîné sur le jeu de données ImageNet.
 Ce petit jeu de données est composé de
 milliers d'images avec et sans hot-dogs.
 Nous utiliserons le modèle affiné pour reconnaître 
@@ -91,7 +91,7 @@ et autant d'images de classe négative contenant d'autres aliments.
 
 
 Après avoir décompressé le jeu de données téléchargé,
-, nous obtenons deux dossiers `hotdog/train` et `hotdog/test`. Les deux dossiers ont des sous-dossiers `hotdog` et `not-hotdog`, chacun d'entre eux contenant des images de
+nous obtenons deux dossiers `hotdog/train` et `hotdog/test`. Les deux dossiers ont des sous-dossiers `hotdog` et `not-hotdog`, chacun d'entre eux contenant des images de
 la classe correspondante.
 
 ```{.python .input}

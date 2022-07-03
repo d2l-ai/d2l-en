@@ -8,7 +8,7 @@ Pour exécuter le code d'une section sur Colab, il suffit de cliquer sur le bout
 
 ![Run the code of a section on Colab](../img/colab.png) 
  :width:`300px` 
- :label:`fig_colab` 
+:label:`fig_colab` 
 
  
  Si c'est la première fois que vous exécutez une cellule de code,
