@@ -66,7 +66,7 @@ git clone https://github.com/your_github_username/d2l-en.git
 
 ### Editer et pousser
 
-Il est maintenant temps d'éditer le livre. Il est préférable de l'éditer dans le Jupyter Notebook en suivant les instructions de :numref:`sec_jupyter` . Effectuez les modifications et vérifiez qu'elles sont correctes. Supposons que nous ayons modifié une coquille dans le fichier `~)/d2l-en/chapter_appendix_tools/how-to-contribute.md`.
+Il est maintenant temps d'éditer le livre. Il est préférable de l'éditer dans le Jupyter Notebook en suivant les instructions de :numref:`sec_jupyter` . Effectuez les modifications et vérifiez qu'elles sont correctes. Supposons que nous ayons modifié une coquille dans le fichier `~/d2l-en/chapter_appendix_tools/how-to-contribute.md`.
 Vous pouvez alors vérifier quels fichiers vous avez modifiés.
 
 À ce stade, Git vous indiquera que le fichier `chapter_appendix_tools/how-to-contribute.md` a été modifié.

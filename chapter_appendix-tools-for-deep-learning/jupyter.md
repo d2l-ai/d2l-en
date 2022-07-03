@@ -106,7 +106,7 @@ jupyter notebook --generate-config
 ```
 
 
-Ensuite, ajoutez la ligne suivante à la fin du fichier de configuration Jupyter Notebook (pour Linux/macOS, généralement dans le chemin `~)/.jupyter/jupyter_notebook_config.py`) :
+Ensuite, ajoutez la ligne suivante à la fin du fichier de configuration Jupyter Notebook (pour Linux/macOS, généralement dans le chemin `~/.jupyter/jupyter_notebook_config.py`) :
 
 ```
 c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager'

@@ -8,7 +8,7 @@
 
 # 0 - chapter_installation
 
-- [ ] ./chapter_installation/index.md
+- [x] ./chapter_installation/index.md
 
 # 0 - chapter_notation
 

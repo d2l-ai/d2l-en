@@ -1,7 +1,7 @@
 # Installation
 :label:`chap_installation` 
 
- Afin d'être opérationnel,
+Afin d'être opérationnel,
 nous aurons besoin d'un environnement pour exécuter Python,
 le Jupyter Notebook, les bibliothèques pertinentes,
 et le code nécessaire pour exécuter le livre lui-même.
@@ -45,7 +45,7 @@ sh Miniconda3-py38_4.10.3-Linux-x86_64.sh -b
 Ensuite, initialisez le shell afin que nous puissions exécuter directement `conda`.
 
 ```bash
-~)/miniconda3/bin/conda init
+~/miniconda3/bin/conda init
 ```
 
 
@@ -67,7 +67,7 @@ conda activate d2l
 
 ## Installation du cadre d'apprentissage profond et du paquet `d2l`
 
- Avant d'installer un cadre d'apprentissage profond,
+Avant d'installer un cadre d'apprentissage profond,
 veuillez d'abord vérifier si
 vous disposez ou non de GPU appropriés sur votre machine
 (les GPU qui alimentent l'écran
@@ -88,7 +88,7 @@ avant d'exécuter des modèles plus importants.
 Pour installer une version de MXNet compatible avec les GPU,
 nous devons savoir quelle version de CUDA vous avez installée.
 Vous pouvez le vérifier en exécutant `nvcc --version`
- ou `cat /usr/local/cuda/version.txt`.
+ou `cat /usr/local/cuda/version.txt`.
 Supposons que vous ayez installé CUDA 10.1,
 puis exécutez la commande suivante :
 
@@ -105,7 +105,7 @@ Vous pouvez changer les derniers chiffres en fonction de votre version de CUDA, 
 CUDA 10.0 et `cu90` pour CUDA 9.0.
 
 
- Si votre machine ne possède pas de GPU NVIDIA 
+Si votre machine ne possède pas de GPU NVIDIA 
 ou CUDA,
 vous pouvez installer la version CPU
 comme suit :
