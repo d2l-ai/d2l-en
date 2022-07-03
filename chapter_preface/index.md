@@ -1,6 +1,6 @@
 # Préface
 
-Il y a quelques années à peine, il n'y avait pas de légions de scientifiques spécialisés dans l'apprentissage profond
+Il y a quelques années à peine, il n'y avait pas légions de scientifiques spécialisés dans l'apprentissage profond
 développant des produits et services intelligents dans les grandes entreprises et les startups.
 Lorsque nous sommes entrés dans ce domaine, l'apprentissage automatique 
 ne faisait pas les gros titres des journaux quotidiens.
@@ -43,12 +43,12 @@ et jouant un rôle croissant dans les sciences fondamentales - de l'astrophysiqu
 
 
 
-### A propos de ce livre
+### À propos de ce livre
 
 Ce livre représente notre tentative de rendre l'apprentissage profond accessible,
 en vous enseignant les *concepts*, le *contexte* et le *code*.
 
-### Un support combinant code, mathématiques et HTML
+### Un support combinant Code, Mathématiques et HTML
 
 Pour qu'une technologie informatique atteigne son plein impact,
 elle doit être bien comprise, bien documentée et soutenue par
