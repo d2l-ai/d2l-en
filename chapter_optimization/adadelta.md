@@ -5,7 +5,7 @@ Adadelta est encore une autre variante d'AdaGrad (:numref:`sec_adagrad` ). La pr
 
 ## L'algorithme
 
-En résumé, Adadelta utilise deux variables d'état, $\mathbf{s}_t$ pour stocker une moyenne de fuite du second moment du gradient et $\Delta\mathbf{x}_t$ pour stocker une moyenne de fuite du second moment du changement des paramètres du modèle lui-même. Notez que nous utilisons la notation et la dénomination originales des auteurs pour des raisons de compatibilité avec d'autres publications et implémentations (il n'y a pas d'autre raison réelle pour laquelle on devrait utiliser des variables grecques différentes pour indiquer un paramètre servant le même but dans momentum, Adagrad, RMSProp, et Adadelta). 
+En résumé, Adadelta utilise deux variables d'état, $\mathbf{s}_t$ pour stocker une  leaky average du second moment du gradient et $\Delta\mathbf{x}_t$ pour stocker une  leaky average du second moment du changement des paramètres du modèle lui-même. Notez que nous utilisons la notation et la dénomination originales des auteurs pour des raisons de compatibilité avec d'autres publications et implémentations (il n'y a pas d'autre raison réelle pour laquelle on devrait utiliser des variables grecques différentes pour indiquer un paramètre servant le même but dans momentum, Adagrad, RMSProp, et Adadelta). 
 
 Voici les détails techniques d'Adadelta. Étant donné que le paramètre du jour est $\rho$, nous obtenons les mises à jour fuyantes suivantes de manière similaire à :numref:`sec_rmsprop` :
 

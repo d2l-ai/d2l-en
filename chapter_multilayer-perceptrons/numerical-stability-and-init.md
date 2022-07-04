@@ -75,9 +75,9 @@ rendant l'apprentissage impossible car les paramètres
 bougent à peine à chaque mise à jour.
 
 
-### (**Vanishing Gradients**)
+### (**Gradients évanescents**)
 
-Un coupable fréquent à l'origine du problème du gradient de fuite
+Un coupable fréquent à l'origine du problème de l'évanescents du gradient
 est le choix de la fonction d'activation $\sigma$
 qui est ajoutée à la suite des opérations linéaires de chaque couche.
 Historiquement, la fonction sigmoïde
