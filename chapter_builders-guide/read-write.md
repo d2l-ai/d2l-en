@@ -102,10 +102,10 @@ x2, y2 = np.load('xy-files.npy', allow_pickle=True)
 (x2, y2)
 ```
 
-Nous pouvons même [**écrire et lire un dictionnaire qui fait correspondre
-des chaînes de caractères aux tenseurs.**]
+Nous pouvons même [**écrire et lire un dictionnaire qui fait correspondre des chaînes de caractères aux tenseurs.**]
 Ceci est pratique lorsque nous voulons
 lire ou écrire tous les poids d'un modèle.
+
 
 ```{.python .input}
 %%tab mxnet

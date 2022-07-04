@@ -438,7 +438,7 @@ qui peuvent conduire à
 des décalages
 plus uniformément distribués et plus faciles à ajuster.
 Nous décrivons ici une transformation courante.
-[**Étant donné les coordonnées centrales de $A$ et $B$ comme $(x_a, y_a)$ et $(x_b, y_b)$, 
+Étant donné les coordonnées centrales de $A$ et $B$ comme $(x_a, y_a)$ et $(x_b, y_b)$, 
 leurs largeurs comme $w_a$ et $w_b$, 
 et leurs hauteurs comme $h_a$ et $h_b$, respectivement. 
 Nous pouvons étiqueter le décalage de $A$ comme
@@ -447,7 +447,7 @@ $$\left( \frac{ \frac{x_b - x_a}{w_a} - \mu_x }{\sigma_x},
 \frac{ \frac{y_b - y_a}{h_a} - \mu_y }{\sigma_y},
 \frac{ \log \frac{w_b}{w_a} - \mu_w }{\sigma_w},
 \frac{ \log \frac{h_b}{h_a} - \mu_h }{\sigma_h}\right),$$
-**]
+
 où les valeurs par défaut des constantes sont $\mu_x = \mu_y = \mu_w = \mu_h = 0, \sigma_x=\sigma_y=0.1$, et $\sigma_w=\sigma_h=0.2$.
 Cette transformation est mise en œuvre ci-dessous dans la fonction `offset_boxes`.
 
@@ -559,9 +559,9 @@ Nous construisons également cinq boîtes d'ancrage à étiqueter
 en utilisant les coordonnées de
 au coin supérieur gauche et au coin inférieur droit :
 $A_0, \ldots, A_4$ (l'indice commence à 0).
-Ensuite, nous [**traçons ces boîtes limites de vérité du sol 
-et ces boîtes d'ancrage 
-dans l'image.**]
+Ensuite, nous [**traçons ces boîtes limites de vérité du sol et ces boîtes d'ancrage dans l'image.**]
+
+
 
 ```{.python .input}
 #@tab all
@@ -577,13 +577,13 @@ show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
 ```
 
 À l'aide de la fonction `multibox_target` définie ci-dessus,
-nous pouvons [**étiqueter les classes et les décalages
-de ces boîtes d'ancrage sur la base de
-les boîtes limites de vérité du sol**] pour le chien et le chat.
+nous pouvons [**étiqueter les classes et les décalages de ces boîtes d'ancrage sur la base de les boîtes limites de vérité du sol**]
+pour le chien et le chat.
 Dans cet exemple, les indices de
 les classes d'arrière-plan, de chien et de chat
 sont 0, 1 et 2, respectivement. 
 Nous ajoutons ci-dessous une dimension pour des exemples de boîtes d'ancrage et de boîtes limites de vérité fondamentale.
+
 
 ```{.python .input}
 #@tab mxnet
@@ -655,8 +655,8 @@ est ainsi obtenue en fonction de
 une boîte d'ancrage avec son décalage prédit.
 Nous implémentons ci-dessous la fonction `offset_inverse`
 qui prend en entrée les boîtes d'ancrage et les prédictions de décalage
-et [**applique des transformations de décalage inverses pour
-renvoyer les coordonnées prédites de la boîte englobante**].
+et [**applique des transformations de décalage inverses pour renvoyer les coordonnées prédites de la boîte englobante**].
+
 
 ```{.python .input}
 #@tab all
@@ -737,11 +737,11 @@ def nms(boxes, scores, iou_threshold):
 ```
 
 Nous définissons la fonction suivante `multibox_detection`
-pour [**appliquer une suppression non maximale
-à la prédiction des boîtes englobantes**].
+pour [**appliquer une suppression non maximale à la prédiction des boîtes englobantes**].
 Ne vous inquiétez pas si vous trouvez l'implémentation
 un peu compliquée : nous montrerons comment cela fonctionne
 avec un exemple concret juste après l'implémentation.
+
 
 ```{.python .input}
 #@tab mxnet
@@ -815,8 +815,7 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
     return d2l.stack(out)
 ```
 
-Appliquons maintenant [**les implémentations ci-dessus
-à un exemple concret avec quatre boîtes d'ancrage**].
+Appliquons maintenant [**les implémentations ci-dessus à un exemple concret avec quatre boîtes d'ancrage**].
 Pour simplifier, nous supposons que les décalages prédits de
 sont tous des zéros.
 Cela signifie que les boîtes de délimitation prédites sont des boîtes d'ancrage. 
@@ -877,8 +876,7 @@ output
 
 Après avoir supprimé les boîtes englobantes prédites
 de classe -1, 
-nous pouvons [**produire la boîte englobante prédite finale
-conservée par suppression non maximale**].
+nous pouvons [**produire la boîte englobante prédite finale conservée par suppression non maximale**].
 
 ```{.python .input}
 #@tab all

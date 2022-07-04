@@ -280,7 +280,7 @@ Y
 
 ### Copying
 
-[**Si nous voulons calculer "X + Y", nous devons décider où effectuer cette opération. **]
+[**Si nous voulons calculer "X + Y", nous devons décider où effectuer cette opération.**]
 Par exemple, comme indiqué dans :numref:`fig_copyto`,
 nous pouvons transférer `X` vers le second GPU
 et y effectuer l'opération.
@@ -316,9 +316,9 @@ print(X)
 print(Z)
 ```
 
-Maintenant que [**les données sont sur le même GPU
-( `Z` et `Y` le sont tous les deux),
-nous pouvons les additionner.**]
+Maintenant que [**les données sont sur le même GPU ( `Z` et `Y` le sont tous les deux), nous pouvons les additionner.**]
+
+
 
 ```{.python .input}
 %%tab all

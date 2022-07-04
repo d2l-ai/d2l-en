@@ -72,7 +72,7 @@ def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
 ### Retournement et recadrage
 
 :begin_tab:`mxnet` 
- [**Retourner l'image à gauche et à droite**] ne change généralement pas la catégorie de l'objet. 
+[**Retourner l'image à gauche et à droite**] ne change généralement pas la catégorie de l'objet. 
 C'est l'une des premières méthodes d'augmentation de l'image et l'une des plus utilisées.
 Ensuite, nous utilisons le module `transforms` pour créer l'instance `RandomFlipLeftRight`, qui retourne
 une image à gauche et à droite avec une chance sur deux.
@@ -257,13 +257,13 @@ une introduction détaillée à `DataLoader`, veuillez vous référer à :numref
 :end_tab: 
 
  :begin_tab:`pytorch` 
-Ensuite, nous [**définissons une fonction auxiliaire pour faciliter la lecture de l'image et
-l'application de l'augmentation d'image**]. 
+Ensuite, nous [**définissons une fonction auxiliaire pour faciliter la lecture de l'image et l'application de l'augmentation d'image**].
 L'argument `transform` fourni par le jeu de données
 de PyTorch applique l'augmentation pour transformer les images.
 Pour
 une introduction détaillée à `DataLoader`, veuillez vous référer à :numref:`sec_fashion_mnist`.
 :end_tab:
+
 
 ```{.python .input}
 #@tab mxnet

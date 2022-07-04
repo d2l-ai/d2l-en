@@ -287,8 +287,7 @@ class PositionalEncoding(tf.keras.layers.Layer):
 ```
 
 Dans la matrice d'encastrement positionnel $\mathbf{P}$,
-[**les lignes correspondent à des positions dans une séquence
-et les colonnes représentent différentes dimensions d'encodage positionnel**].
+[**les lignes correspondent à des positions dans une séquence et les colonnes représentent différentes dimensions d'encodage positionnel**].
 Dans l'exemple ci-dessous,
 nous pouvons voir que
 les colonnes $6^{\mathrm{th}}$ et $7^{\mathrm{th}}$
@@ -349,8 +348,7 @@ Dans les représentations binaires,
 un bit supérieur a une fréquence plus faible qu'un bit inférieur.
 De même,
 comme le montre la carte thermique ci-dessous,
-[**le codage positionnel diminue
-les fréquences le long de la dimension de codage**]
+[**le codage positionnel diminue les fréquences le long de la dimension de codage**]
 en utilisant des fonctions trigonométriques.
 Comme les sorties sont des nombres flottants,
 de telles représentations continues

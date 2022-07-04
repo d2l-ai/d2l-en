@@ -10,11 +10,11 @@ Nous sommes maintenant prêts à travailler sur
 une implémentation entièrement fonctionnelle 
 de la régression linéaire. 
 Dans cette section, 
-(**nous implémenterons l'ensemble de la méthode à partir de zéro,
-y compris (i) le modèle ; (ii) la fonction de perte ;
+nous implémenterons l'ensemble de la méthode à partir de zéro,
+y compris (i) le modèle; (ii) la fonction de perte ;
 (iii) un optimiseur stochastique de descente de gradient en minibatch ;
 et (iv) la fonction d'entraînement 
-qui assemble tous ces éléments.**)
+qui assemble tous ces éléments.
 Enfin, nous allons exécuter notre générateur de données synthétiques
 à partir de :numref:`sec_synthetic-regression-data` 
 et appliquer notre modèle
@@ -115,7 +115,7 @@ def forward(self, X):
 ## Définition de la fonction de perte
 
 Puisque [**la mise à jour de notre modèle nécessite de prendre
-le gradient de notre fonction de perte,**]
+le gradient de notre fonction de perte**],
 nous devons (**définir la fonction de perte en premier.**)
 Ici, nous utilisons la fonction de perte au carré
 dans :eqref:`eq_mse`.

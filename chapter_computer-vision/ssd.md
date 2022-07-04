@@ -364,13 +364,13 @@ forward(torch.zeros((2, 3, 256, 256)), base_net()).shape
 ### Le modèle complet
 
 
- [**Le modèle complet de détection multiboxes à un seul coup
-
-se compose de cinq blocs.**]
+ [**Le modèle complet de détection multiboxes à un seul coup se compose de cinq blocs.**]
 Les cartes de caractéristiques produites par chaque bloc
 sont utilisées à la fois pour
 (i) générer des boîtes d'ancrage
 et (ii) prédire les classes et les décalages de ces boîtes d'ancrage.
+
+
 
 Parmi ces cinq blocs,
 le premier
@@ -834,8 +834,7 @@ output = predict(X)
 ```
 
 Enfin, nous [**affichons
-toutes les boîtes englobantes prédites avec un niveau de confiance de 0,9 ou plus pour
-**]
+toutes les boîtes englobantes prédites avec un niveau de confiance de 0,9 ou plus**]
 comme résultat.
 
 ```{.python .input}

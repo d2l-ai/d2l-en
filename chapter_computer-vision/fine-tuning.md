@@ -309,7 +309,7 @@ train_fine_tuning(finetune_net, 0.01)
 train_fine_tuning(finetune_net, 5e-5)
 ```
 
-[**Pour comparaison,**] nous définissons un modèle identique, mais (**initialisons tous ses paramètres de modèle à des valeurs aléatoires**). Puisque le modèle entier doit être entraîné à partir de zéro, nous pouvons utiliser un taux d'apprentissage plus élevé.
+[**Pour comparaison**], nous définissons un modèle identique, mais (**initialisons tous ses paramètres de modèle à des valeurs aléatoires**). Puisque le modèle entier doit être entraîné à partir de zéro, nous pouvons utiliser un taux d'apprentissage plus élevé.
 
 ```{.python .input}
 #@tab mxnet

@@ -166,7 +166,7 @@ class DenseBlock(tf.keras.layers.Layer):
 ```
 
 Dans l'exemple suivant,
-nous [**définissons une instance `DenseBlock` **] avec 2 blocs de convolution de 10 canaux de sortie.
+nous [**définissons une instance `DenseBlock`**] avec 2 blocs de convolution de 10 canaux de sortie.
 En utilisant une entrée avec 3 canaux, nous obtiendrons une sortie avec $3+2\times 10=23$ canaux. Le nombre de canaux des blocs de convolution contrôle la croissance du nombre de canaux de sortie par rapport au nombre de canaux d'entrée. Ceci est également appelé le *taux de croissance*.
 
 ```{.python .input}

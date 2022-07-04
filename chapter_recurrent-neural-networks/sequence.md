@@ -453,7 +453,7 @@ trainer.fit(model, data)
 
 Voyons comment le modèle prédit. 
 La première chose à vérifier est 
-[**predicting what happens just in the next time step**],
+[**la prédiction de ce qui se passe juste au prochain pas de temps**],
 à savoir la *one-step-ahead prediction*.
 
 ```{.python .input}

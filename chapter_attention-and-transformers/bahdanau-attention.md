@@ -134,8 +134,7 @@ class AttentionDecoder(d2l.Decoder):
         raise NotImplementedError
 ```
 
-Implémentons maintenant [**
-le décodeur RNN avec attention Bahdanau**]
+Implémentons maintenant [**le décodeur RNN avec attention Bahdanau**]
 dans la classe `Seq2SeqAttentionDecoder` suivante.
 L'état du décodeur
 est initialisé avec
@@ -301,8 +300,8 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         return self._attention_weights
 ```
 
-Dans ce qui suit, nous [**testons le décodeur
-implémenté**] avec l'attention Bahdanau
+Dans ce qui suit, nous [**testons le décodeur implémenté**]
+avec l'attention Bahdanau
 en utilisant un minibatch de 4 entrées de séquence
 de 7 pas de temps.
 

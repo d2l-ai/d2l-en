@@ -17,8 +17,7 @@ sans pouvoir les stocker.
 Pour commencer, nous allons donc nous salir les mains
 avec $n$ des tableaux à plusieurs dimensions, 
 que nous appelons aussi *tenseurs*.
-Si vous connaissez déjà le package de calcul scientifique NumPy ,
- ,
+Si vous connaissez déjà le package de calcul scientifique NumPy,
 ce sera un jeu d'enfant.
 Pour tous les cadres modernes d'apprentissage profond,
 la classe des *tenseurs* (`ndarray` dans MXNet, 
@@ -52,7 +51,8 @@ par d'autres composants de MXNet.
 :end_tab:
 
 :begin_tab:`pytorch`
-(**Pour commencer, nous importons la bibliothèque PyTorch. Notez que le nom du paquet est `torch`.**)
+Pour commencer, nous importons la bibliothèque PyTorch. 
+Notez que le nom du paquet est `torch`.
 :end_tab: 
 
  :begin_tab:`tensorflow` 
@@ -182,7 +182,7 @@ x.numel()
 tf.size(x)
 ```
 
-Nous pouvons accéder à la *forme d'un tenseur 
+Nous pouvons accéder à la *dimension d'un tenseur*
 (la longueur le long de chaque axe)
 en inspectant son attribut `shape`.
 Comme nous avons affaire ici à un vecteur,
@@ -194,11 +194,11 @@ et est identique à la taille.
 x.shape
 ```
 
-Nous pouvons [**changer la forme d'un tenseur sans modifier sa taille ou ses valeurs**],
+Nous pouvons [**changer la dimension d'un tenseur sans modifier sa taille ou ses valeurs**],
 en invoquant `reshape`.
 Par exemple, nous pouvons transformer 
-notre vecteur `x` dont la forme est (12,) 
-en une matrice `X` de forme (3, 4).
+notre vecteur `x` dont la dimension est (12,) 
+en une matrice `X` de dimension (3, 4).
 Ce nouveau tenseur conserve tous les éléments
 mais les reconfigure en une matrice.
 Remarquez que les éléments de notre vecteur
@@ -233,7 +233,7 @@ nous aurions pu appeler `x.reshape(-1, 4)` ou `x.reshape(3, -1)`.
 Les praticiens ont souvent besoin de travailler avec des tenseurs
 initialisés pour contenir tous les zéros ou les uns.
 [**Nous pouvons construire un tenseur dont tous les éléments sont fixés à zéro**] (~~ou un~~)
-et dont la forme est (2, 3, 4) via la fonction `zeros`.
+et dont la dimension est (2, 3, 4) via la fonction `zeros`.
 
 ```{.python .input}
 %%tab mxnet
@@ -390,7 +390,7 @@ X_var
 ## Opérations
 
 Maintenant que nous savons comment construire des tenseurs
-et comment lire et écrire dans leurs éléments,
+et comment lire et écrire dans leurs composantes,
 nous pouvons commencer à les manipuler
 avec diverses opérations mathématiques.
 Parmi les outils les plus utiles 
@@ -478,7 +478,7 @@ telles que les produits scalaires et les multiplications matricielles.
 Nous développerons ces opérations prochainement
 dans :numref:`sec_linear-algebra`.
 
-Nous pouvons également [**concaténer* plusieurs tenseurs ensemble,**]
+Nous pouvons également [**concaténer plusieurs tenseurs ensemble**],
 en les empilant bout à bout pour former un tenseur plus grand.
 Il suffit de fournir une liste de tenseurs
 et d'indiquer au système selon quel axe concaténer.

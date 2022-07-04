@@ -120,12 +120,12 @@ def display_anchors(fmap_w, fmap_h, s):
                     anchors[0] * bbox_scale)
 ```
 
-Tout d'abord, examinons [**
-la détection de petits objets**].
+Tout d'abord, examinons [**la détection de petits objets**].
 Afin de faciliter la distinction lors de l'affichage, les boîtes d'ancrage avec des centres différents ne se chevauchent pas :
 l'échelle de la boîte d'ancrage est fixée à 0,15
 et la hauteur et la largeur de la carte de caractéristiques sont fixées à 4. Nous pouvons voir
 que les centres des boîtes d'ancrage dans 4 lignes et 4 colonnes sur l'image sont uniformément répartis.
+
 
 ```{.python .input}
 #@tab all

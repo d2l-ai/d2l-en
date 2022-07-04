@@ -464,7 +464,7 @@ class BatchNorm(tf.keras.layers.Layer):
 
 Notez que nous avons utilisé la variable `momentum` pour régir l'agrégation sur les estimations passées de la moyenne et de la variance. Il s'agit d'une appellation quelque peu erronée, car elle n'a absolument rien à voir avec le terme *momentum* d'optimisation dans :numref:`sec_momentum`. Néanmoins, c'est le nom communément adopté pour ce terme et, par respect pour la convention de dénomination de l'API, nous utilisons également le même nom de variable dans notre code.
 
-## [**Applying Batch Normalization in LeNet**]
+## [**Application de la BatchNorm dans LeNet**]
 
 Pour voir comment appliquer `BatchNorm` dans son contexte,
 ci-dessous l'applique à un modèle LeNet traditionnel (:numref:`sec_lenet` ).

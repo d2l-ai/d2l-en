@@ -120,7 +120,7 @@ tokens = data._tokenize(text)
 Alors que ces tokens sont toujours des chaînes de caractères,
 nos modèles nécessitent des entrées numériques.
 [**Ainsi, nous aurons besoin d'une classe
-pour construire un *vocabulaire*
+pour construire un vocabulaire
 qui attribue un index unique 
 à chaque token distinct.**]
 À cette fin,

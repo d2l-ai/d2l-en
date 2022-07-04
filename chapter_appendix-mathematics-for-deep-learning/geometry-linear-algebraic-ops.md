@@ -23,7 +23,7 @@ Fondamentalement, un vecteur est une liste de nombres, comme la liste Python ci-
 v = [1, 7, 0, 1]
 ```
 
-Les mathématiciens l'écrivent le plus souvent sous la forme d'un vecteur *colonne* ou *ligne*, c'est-à-dire soit sous forme de
+Les mathématiciens l'écrivent le plus souvent sous la dimension d'un vecteur *colonne* ou *ligne*, c'est-à-dire soit sous forme de
 
 $$
 \mathbf{x} = \begin{bmatrix}1\\7\\0\\1\end{bmatrix},

@@ -6,89 +6,89 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Convolutional Neural Networks (LeNet)
 :label:`sec_lenet`
 
-We now have all the ingredients required to assemble
-a fully-functional CNN.
-In our earlier encounter with image data, we applied
-a linear model with softmax regression (:numref:`sec_softmax_scratch`)
-and an MLP (:numref:`sec_mlp_scratch`)
-to pictures of clothing in the Fashion-MNIST dataset.
-To make such data amenable we first flattened each image from a $28\times28$ matrix
-into a fixed-length $784$-dimensional vector,
-and thereafter processed them in fully connected layers.
-Now that we have a handle on convolutional layers,
-we can retain the spatial structure in our images.
-As an additional benefit of replacing fully connected layers with convolutional layers,
-we will enjoy more parsimonious models that require far fewer parameters.
+Nous avons maintenant tous les ingrédients nécessaires pour assembler
+un CNN entièrement fonctionnel.
+Dans notre rencontre précédente avec des données d'image, nous avons appliqué
+un modèle linéaire avec régression softmax (:numref:`sec_softmax_scratch`)
+et un MLP (:numref:`sec_mlp_scratch`)
+à des images de vêtements dans l'ensemble de données Fashion-MNIST.
+Pour rendre ces données exploitables, nous avons d'abord aplati chaque image à partir d'une matrice de 28\times28$.
+en un vecteur de longueur fixe de 784$ dimensions,
+et nous les avons ensuite traitées dans des couches entièrement connectées.
+Maintenant que nous maîtrisons les couches convolutionnelles,
+nous pouvons conserver la structure spatiale de nos images.
+Un avantage supplémentaire du remplacement des couches entièrement connectées par des couches convolutives,
+nous bénéficierons de modèles plus parcimonieux qui nécessitent beaucoup moins de paramètres.
 
-In this section, we will introduce *LeNet*,
-among the first published CNNs
-to capture wide attention for its performance on computer vision tasks.
-The model was introduced by (and named for) Yann LeCun,
-then a researcher at AT&T Bell Labs,
-for the purpose of recognizing handwritten digits in images :cite:`LeCun.Bottou.Bengio.ea.1998`.
-This work represented the culmination
-of a decade of research developing the technology.
-In 1989, LeCun's team published the first study to successfully
-train CNNs via backpropagation :cite:`LeCun.Boser.Denker.ea.1989`.
+Dans cette section, nous allons présenter *LeNet*,
+parmi les premiers CNNs publiés
+publié qui a attiré l'attention pour ses performances dans les tâches de vision par ordinateur.
+Le modèle a été introduit par (et nommé pour) Yann LeCun,
+alors chercheur chez AT&T Bell Labs,
+dans le but de reconnaître des chiffres manuscrits dans des images :cite:`LeCun.Bottou.Bengio.ea.1998`.
+Ce travail représentait l'aboutissement
+d'une décennie de recherche pour développer cette technologie.
+En 1989, l'équipe de LeCun a publié la première étude visant à former avec succès des CNN par rétro-propagation.
+former des CNN par rétropropagation :cite:`LeCun.Boser.Denker.ea.1989`.
 
-At the time LeNet achieved outstanding results
-matching the performance of support vector machines,
-then a dominant approach in supervised learning, achieving an error rate of less than 1% per digit.
-LeNet was eventually adapted to recognize digits
-for processing deposits in ATM machines.
-To this day, some ATMs still run the code
-that Yann LeCun and his colleague Leon Bottou wrote in the 1990s!
+A l'époque, LeNet a obtenu des résultats exceptionnels
+égalant les performances des machines à vecteurs de support,
+alors une approche dominante dans l'apprentissage supervisé, atteignant un taux d'erreur de moins de 1% par chiffre.
+LeNet a finalement été adapté pour reconnaître les chiffres
+pour le traitement des dépôts dans les guichets automatiques.
+À ce jour, certains guichets automatiques utilisent encore le code
+que Yann LeCun et son collègue Leon Bottou ont écrit dans les années 1990 !
 
 
 ## LeNet
 
-At a high level, (**LeNet (LeNet-5) consists of two parts:
-(i) a convolutional encoder consisting of two convolutional layers; and
-(ii) a dense block consisting of three fully connected layers**);
-The architecture is summarized in :numref:`img_lenet`.
+À un niveau élevé, (**LeNet (LeNet-5) se compose de deux parties:
+(i) un codeur convolutif composé de deux couches convolutives; et
+(ii) un bloc dense composé de trois couches entièrement connectées**);
+L'architecture est résumée dans :numref:`img_lenet`.
 
 ![Data flow in LeNet. The input is a handwritten digit, the output a probability over 10 possible outcomes.](../img/lenet.svg)
 :label:`img_lenet`
 
-The basic units in each convolutional block
-are a convolutional layer, a sigmoid activation function,
-and a subsequent average pooling operation.
-Note that while ReLUs and max-pooling work better,
-these discoveries had not yet been made at the time.
-Each convolutional layer uses a $5\times 5$ kernel
-and a sigmoid activation function.
-These layers map spatially arranged inputs
-to a number of two-dimensional feature maps, typically
-increasing the number of channels.
-The first convolutional layer has 6 output channels,
-while the second has 16.
-Each $2\times2$ pooling operation (stride 2)
-reduces dimensionality by a factor of $4$ via spatial downsampling.
-The convolutional block emits an output with shape given by
-(batch size, number of channel, height, width).
+Les unités de base dans chaque bloc convolutif
+sont une couche convolutive, une fonction d'activation sigmoïde,
+et une opération ultérieure de mise en commun des moyennes.
+Notez que bien que les ReLUs et le max-pooling fonctionnent mieux,
+ces découvertes n'avaient pas encore été faites à l'époque.
+Chaque couche convolutionnelle utilise un noyau de 5\fois 5
+et une fonction d'activation sigmoïde.
+Ces couches transforment les entrées disposées dans l'espace
+à un certain nombre de cartes de caractéristiques bidimensionnelles, augmentant typiquement
+en augmentant le nombre de canaux.
+La première couche convolutive a 6 canaux de sortie,
+tandis que la seconde en a 16.
+Chaque opération de mise en commun $2\times2$ (stride 2)
+réduit la dimensionnalité par un facteur de 4$ via un sous-échantillonnage spatial.
+Le bloc convolutif émet une sortie dont la forme est donnée par
+(taille du lot, nombre de canaux, hauteur, largeur).
 
-In order to pass output from the convolutional block
-to the dense block,
-we must flatten each example in the minibatch.
-In other words, we take this four-dimensional input and transform it
-into the two-dimensional input expected by fully connected layers:
-as a reminder, the two-dimensional representation that we desire uses the first dimension to index examples in the minibatch
-and the second to give the flat vector representation of each example.
-LeNet's dense block has three fully connected layers,
-with 120, 84, and 10 outputs, respectively.
-Because we are still performing classification,
-the 10-dimensional output layer corresponds
-to the number of possible output classes.
+Afin de passer la sortie du bloc convolutif
+au bloc dense,
+nous devons aplatir chaque exemple dans le minibatch.
+En d'autres termes, nous prenons cette entrée quadridimensionnelle et la transformons
+en une entrée bidimensionnelle attendue par les couches entièrement connectées :
+pour rappel, la représentation bidimensionnelle que nous désirons utilise la première dimension pour indexer les exemples dans le minibatch
+et la seconde pour donner la représentation vectorielle plate de chaque exemple.
+Le bloc dense de LeNet a trois couches entièrement connectées,
+avec 120, 84, et 10 sorties, respectivement.
+Comme nous effectuons toujours une classification,
+la couche de sortie à 10 dimensions correspond
+au nombre de classes de sortie possibles.
 
-While getting to the point where you truly understand
-what is going on inside LeNet may have taken a bit of work,
-hopefully the following code snippet will convince you
-that implementing such models with modern deep learning frameworks
-is remarkably simple.
-We need only to instantiate a `Sequential` block
-and chain together the appropriate layers,
-using Xavier initialization as
-introduced in :numref:`subsec_xavier`.
+Même si arriver au point où vous comprenez vraiment
+ce qui se passe dans LeNet peut avoir demandé un peu de travail,
+j'espère que l'extrait de code suivant vous convaincra
+que la mise en œuvre de tels modèles avec les cadres d'apprentissage profond modernes
+est remarquablement simple.
+Il suffit d'instancier un bloc `Sequential`.
+et enchaîner les couches appropriées,
+en utilisant l'initialisation de Xavier comme
+introduite dans :numref:`subsec_xavier`.
 
 ```{.python .input}
 %%tab mxnet
@@ -161,18 +161,18 @@ class LeNet(d2l.Classifier):
                 tf.keras.layers.Dense(num_classes)])
 ```
 
-We take some liberty in the reproduction of LeNet insofar as we replace the Gaussian activation layer by
-a softmax layer. This greatly simplifies the implementation, not the least due to the
-fact that the Gaussian decoder is rarely used nowadays. Other than that, this network matches
-the original LeNet-5 architecture.
+Nous prenons quelques libertés dans la reproduction de LeNet dans la mesure où nous remplaçons la couche d'activation gaussienne par
+une couche softmax. Cela simplifie grandement l'implémentation, notamment en raison du fait que le décodeur gaussien est rarement utilisé de nos jours.
+fait que le décodeur gaussien est rarement utilisé de nos jours. Pour le reste, ce réseau correspond à
+l'architecture originale de LeNet-5.
 
-Let's see what happens inside the network. By passing a
-single-channel (black and white)
-$28 \times 28$ image through the network
-and printing the output shape at each layer,
-we can [**inspect the model**] to make sure
-that its operations line up with
-what we expect from :numref:`img_lenet_vert`.
+Voyons ce qui se passe à l'intérieur du réseau. En passant un
+un seul canal (noir et blanc)
+28$ \times 28$ image à travers le réseau
+et en imprimant la forme de sortie à chaque couche,
+on peut [**inspecter le modèle**] pour s'assurer
+que ses opérations correspondent à
+ce que nous attendons de :numref:`img_lenet_vert`.
 
 ![Compressed notation for LeNet-5.](../img/lenet-vert.svg)
 :label:`img_lenet_vert`

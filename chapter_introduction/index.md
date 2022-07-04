@@ -158,7 +158,7 @@ et étiqueter ceux qui contiennent
 et ceux qui ne contiennent pas le mot clé.
 Dans l'approche de l'apprentissage automatique, 
 nous ne cherchons pas à concevoir un système
-*explicitement* pour reconnaître les mots d'éveil.
+*explicitement* pour reconnaître les mots clés.
 Au lieu de cela, nous définissons un programme flexible
 dont le comportement est déterminé par un certain nombre de *paramètres*.
 Nous utilisons ensuite l'ensemble de données pour déterminer le meilleur jeu de paramètres possible, 
@@ -222,8 +222,8 @@ Comme le montre le site :numref:`fig_ml_loop`, le processus d'apprentissage se p
 ![A typical training process.](../img/ml-loop.svg)
 :label:`fig_ml_loop`
 
-En résumé, plutôt que de coder un programme de reconnaissance des mots d'éveil,
-nous codons un programme qui peut *apprendre à reconnaître les mots d'éveil,
+En résumé, plutôt que de coder un programme de reconnaissance des mots clés,
+nous codons un programme qui peut *apprendre à reconnaître les mots clés,
 si nous lui présentons un grand ensemble de données étiquetées.
 Vous pouvez considérer cette action consistant à déterminer le comportement d'un programme
 en lui présentant un ensemble de données comme de la *programmation avec des données*.

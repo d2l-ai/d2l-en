@@ -82,8 +82,8 @@ layer = CenteredLayer()
 layer(d2l.tensor([1.0, 2, 3, 4, 5]))
 ```
 
-Nous pouvons maintenant [**incorporer notre couche comme composant
-dans la construction de modèles plus complexes.**]
+Nous pouvons maintenant [**incorporer notre couche comme composant dans la construction de modèles plus complexes.**]
+
 
 ```{.python .input}
 %%tab mxnet

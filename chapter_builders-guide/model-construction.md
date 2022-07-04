@@ -89,14 +89,14 @@ lors de la définition de notre propre module,
 nous ne devons nous préoccuper que des paramètres
 et de la méthode de rétro propagation.
 
-[**Pour commencer, nous revisitons le code
-que nous avons utilisé pour implémenter les MLP**]
+[**Pour commencer, nous revisitons le code que nous avons utilisé pour implémenter les MLP**]
 (:numref:`sec_mlp` ).
 Le code suivant génère un réseau
 avec une couche cachée entièrement connectée
 avec 256 unités et une activation ReLU,
 suivie d'une couche de sortie entièrement connectée
 avec 10 unités (pas de fonction d'activation).
+
 
 ```{.python .input  n=1}
 %load_ext d2lbook.tab

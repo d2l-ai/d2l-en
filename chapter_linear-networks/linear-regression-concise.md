@@ -77,7 +77,7 @@ mais vous seriez un piètre développeur web
 si vous passiez un mois à réinventer la roue.
 
 Pour les opérations standard,
-nous pouvons [**utiliser les couches prédéfinies d'un framework,**]
+nous pouvons [**utiliser les couches prédéfinies d'un framework**],
 ce qui nous permet de nous concentrer
 sur les couches utilisées pour construire le modèle
 plutôt que de nous soucier de leur mise en œuvre.
@@ -226,7 +226,7 @@ Minibatch SGD est un outil standard
 pour l'optimisation des réseaux neuronaux
 et PyTorch le prend donc en charge ainsi qu'un certain nombre de variations
 de cet algorithme dans le module `optim`.
-Lorsque nous (**instantions une instance `SGD`,**)
+Lorsque nous (**instantions une instance `SGD`**),
 nous spécifions les paramètres à optimiser,
 que nous pouvons obtenir de notre modèle via `self.parameters()`,
 et le taux d'apprentissage (`self.lr`)

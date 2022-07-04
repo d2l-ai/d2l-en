@@ -136,7 +136,7 @@ au cas où nous voudrions évaluer les probabilités de sortie de notre modèle.
 Mais au lieu de passer les probabilités de la softmax dans notre nouvelle fonction de perte,
 nous avons juste
 [**passer les logits et calculer la softmax et son log
-en une seule fois dans la fonction de perte d'entropie croisée,**]
+en une seule fois dans la fonction de perte d'entropie croisée**],
 qui fait des choses intelligentes comme le ["LogSumExp trick"](https://en.wikipedia.org/wiki/LogSumExp).
 
 ```{.python .input  n=3}

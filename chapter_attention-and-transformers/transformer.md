@@ -196,8 +196,8 @@ class PositionWiseFFN(tf.keras.layers.Layer):
 ```
 
 L'exemple suivant
-montre que [**la dimension la plus intérieure
-d'un tenseur change**] en
+montre que [**la dimension la plus intérieure d'un tenseur change**]
+en
 le nombre de sorties dans
 le réseau feed-forward positionnel.
 Puisque le même MLP transforme
@@ -252,8 +252,8 @@ dont les entrées sont souvent des séquences de longueur variable
 .
 
 L'extrait de code suivant
-[**compare la normalisation à travers différentes dimensions
-par la normalisation par couche et la normalisation par lot**].
+[**compare la normalisation à travers différentes dimensions par la normalisation par couche et la normalisation par lot**].
+
 
 ```{.python .input}
 %%tab mxnet
@@ -427,8 +427,8 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):
 ```
 
 Comme on peut le constater,
-[**toute couche dans le codeur transformateur
-ne change pas la forme de son entrée.**]
+[**toute couche dans le codeur transformateur ne change pas la forme de son entrée.**]
+
 
 ```{.python .input}
 %%tab mxnet
@@ -582,8 +582,8 @@ d2l.check_shape(encoder(tf.ones((2, 100)), valid_lens, training=False),
 ## Décodeur
 
 Comme indiqué sur :numref:`fig_transformer`,
-[**le décodeur transformateur
-est composé de plusieurs couches identiques**].
+[**le décodeur transformateur est composé de plusieurs couches identiques**].
+
 Chaque couche est mise en œuvre dans la classe suivante
 `TransformerDecoderBlock`,
 qui contient trois sous-couches :
@@ -765,8 +765,8 @@ class TransformerDecoderBlock(tf.keras.layers.Layer):
 Pour faciliter les opérations de produit scalaire
 dans l'attention codeur-décodeur
 et les opérations d'addition dans les connexions résiduelles,
-[**la dimension caractéristique (`num_hiddens`) du décodeur est
-la même que celle du codeur.**]
+[**la dimension caractéristique (`num_hiddens`) du décodeur est la même que celle du codeur.**]
+
 
 ```{.python .input}
 %%tab mxnet
@@ -1029,8 +1029,8 @@ d2l.show_heatmaps(
     figsize=(7, 3.5))
 ```
 
-[**Pour visualiser à la fois les poids d'auto-attention du décodeur et les poids d'attention du codeur-décodeur,
-nous avons besoin de plus de manipulations de données.**]
+[**Pour visualiser à la fois les poids d'auto-attention du décodeur et les poids d'attention du codeur-décodeur, nous avons besoin de plus de manipulations de données.**]
+
 Par exemple,
 nous remplissons les poids d'attention masqués avec zéro.
 Notez que
@@ -1102,8 +1102,8 @@ d2l.show_heatmaps(
 
 Comme dans le cas de l'auto-attention du codeur,
 via la longueur valide spécifiée de la séquence d'entrée,
-[**no query from the output sequence
-attend to those padding tokens from the input sequence.**]
+[**aucune requête de la séquence de sortie ne participe aux tokens de padding de la séquence d'entrée.**]
+
 
 ```{.python .input}
 %%tab all

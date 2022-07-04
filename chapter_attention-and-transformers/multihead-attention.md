@@ -109,8 +109,8 @@ import tensorflow as tf
 ## Mise en œuvre
 
 Dans notre mise en œuvre,
-nous [**choisissons l'attention du produit scalaire
-pour chaque tête**] de l'attention multi-têtes.
+nous [**choisissons l'attention du produit scalaire pour chaque tête**]
+de l'attention multi-têtes.
 Pour éviter une croissance significative
 du coût de calcul et du coût de paramétrage,
 nous fixons

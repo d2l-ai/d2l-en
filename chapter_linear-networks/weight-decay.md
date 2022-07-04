@@ -259,7 +259,7 @@ est notre optimiseur,
 il nous suffit d'ajouter la pénalité $\ell_2$ au carré
 à la fonction de perte originale.
 
-### (**Defining $\ell_2$ Norm Penalty**)
+### (**Définition de la Pénalité $\ell_2$**)
 
 La façon la plus pratique d'implémenter cette pénalité
 est peut-être de mettre au carré tous les termes en place et de les additionner.

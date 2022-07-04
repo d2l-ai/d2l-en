@@ -410,7 +410,7 @@ for X, Y in train_iter:
     break
 ```
 
-### [**Putting All Things Together**]
+### [**Mise en œuvre**]
 
 Enfin, nous définissons la fonction suivante `load_data_voc`
 pour télécharger et lire le jeu de données de segmentation sémantique Pascal VOC2012.

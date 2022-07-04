@@ -78,7 +78,7 @@ def softmax(X):
 
 Pour toute entrée `X`, [**nous transformons chaque élément
 en un nombre non négatif.
-La somme de chaque ligne est égale à 1,**]
+La somme de chaque ligne est égale à 1**],
 comme pour une probabilité. Attention : le code ci-dessus n'est *pas* robuste contre les arguments très grands ou très petits. Bien que cela soit suffisant pour illustrer ce qui se passe, vous ne devriez *pas* utiliser ce code mot à mot dans un but sérieux. Les cadres d'apprentissage profond ont de telles protections intégrées et nous utiliserons le softmax intégré à l'avenir.
 
 ```{.python .input}
@@ -197,8 +197,8 @@ En particulier, le codage à un coup dans $\mathbf{y}$
 
 Pour voir cela en action, nous [**créons des données échantillons `y_hat` avec 2 exemples de probabilités prédites sur 3 classes et leurs étiquettes correspondantes `y`.**]
 Les étiquettes correctes sont respectivement $1$ et $2$.
-[**En utilisant `y` comme indices des probabilités dans `y_hat`,**],
- nous pouvons sélectionner les termes efficacement.
+[**En utilisant `y` comme indices des probabilités dans `y_hat`**],
+nous pouvons sélectionner les termes efficacement.
 
 ```{.python .input}
 %%tab mxnet, pytorch

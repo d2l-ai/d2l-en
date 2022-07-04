@@ -184,7 +184,7 @@ class RNNLMScratch(d2l.Classifier):  #@save
 Rappelons que chaque token est représenté par un indice numérique dans le vocabulaire.
 L'alimentation directe de ces indices à un réseau neuronal pourrait rendre difficile l'apprentissage de
 .
-Nous représentons souvent chaque token sous la forme d'un vecteur de caractéristiques plus expressif.
+Nous représentons souvent chaque token sous la dimension d'un vecteur de caractéristiques plus expressif.
 La représentation la plus simple est appelée codage *à un coup*,
 qui est présenté
 dans :numref:`subsec_classification-problem`.
@@ -209,7 +209,7 @@ tf.one_hot(tf.constant([0, 2]), 5)
 ```
 
 (**La forme du minilot**) que nous échantillonnons à chaque fois (**est (taille du lot, nombre de pas de temps).
-La méthode `one_hot` transforme un tel mini-batch en un tenseur tridimensionnel dont la dernière dimension est égale à la taille du vocabulaire (`len(vocab)`).**))
+La méthode `one_hot` transforme un tel mini-batch en un tenseur tridimensionnel dont la dernière dimension est égale à la taille du vocabulaire (`len(vocab)`).**)
 Nous transposons souvent l'entrée de manière à obtenir une sortie
 de forme
 (nombre de pas de temps, taille du lot, taille du vocabulaire).

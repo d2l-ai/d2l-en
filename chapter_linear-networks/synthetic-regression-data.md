@@ -105,7 +105,7 @@ L'apprentissage de modèles d'apprentissage automatique nécessite souvent de mu
 en saisissant un mini-batch d'exemples à la fois. 
 Ces données sont ensuite utilisées pour mettre à jour le modèle. 
 Pour illustrer ce fonctionnement, nous 
-[**implémentons la fonction `get_dataloader`,**] 
+[**implémentons la fonction `get_dataloader`**], 
 en l'enregistrant comme méthode dans la classe `SyntheticRegressionData` via `add_to_class` (introduite dans :numref:`oo-design-utilities` ).
 Elle (**prend une taille de lot, une matrice de caractéristiques,
 et un vecteur d'étiquettes, et génère des minilots de taille `batch_size`.**)

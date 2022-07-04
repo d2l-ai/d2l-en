@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Underfitting and Overfitting 
 :label:`sec_polynomial`
 
-In this section we test out some of the concepts that we saw previously. To keep matters simple, we use polynomial regression as our toy example.
+Dans cette section, nous testons certains des concepts que nous avons vus précédemment. Pour rester simple, nous utiliserons la régression polynomiale comme exemple.
 
 ```{.python .input  n=3}
 %%tab mxnet
@@ -32,21 +32,21 @@ import tensorflow as tf
 import math
 ```
 
-### Generating the Dataset
+### Génération du Dataset
 
-First we need data. Given $x$, we will [**use the following cubic polynomial to generate the labels**] on training and test data:
+Tout d'abord, nous avons besoin de données. Étant donné $x$, nous allons [**utiliser le polynôme cubique suivant pour générer les étiquettes**] sur les données de formation et de test :
 
 (**$$y = 5 + 1.2x - 3.4\frac{x^2}{2!} + 5.6 \frac{x^3}{3!} + \epsilon \text{ where }
 \epsilon \sim \mathcal{N}(0, 0.1^2).$$**)
 
-The noise term $\epsilon$ obeys a normal distribution
-with a mean of 0 and a standard deviation of 0.1.
-For optimization, we typically want to avoid
-very large values of gradients or losses.
-This is why the *features*
-are rescaled from $x^i$ to $\frac{x^i}{i!}$.
-It allows us to avoid very large values for large exponents $i$.
-We will synthesize 100 samples each for the training set and test set.
+Le terme de bruit $\epsilon$ obéit à une distribution normale
+avec une moyenne de 0 et un écart-type de 0,1.
+Pour l'optimisation, nous voulons généralement éviter
+de très grandes valeurs de gradients ou de pertes.
+C'est pourquoi les *caractéristiques*
+sont rééchelonnées de $x^i$ à $\frac{x^i}{i!}$.
+Cela nous permet d'éviter les très grandes valeurs pour les grands exposants $i$.
+Nous allons synthétiser 100 échantillons chacun pour l'ensemble d'entraînement et l'ensemble de test.
 
 ```{.python .input  n=6}
 %%tab all
@@ -70,19 +70,19 @@ class Data(d2l.DataModule):
         return self.get_tensorloader([self.X, self.y], train, i)
 ```
 
-Again, monomials stored in `poly_features`
-are rescaled by the gamma function,
-where $\Gamma(n)=(n-1)!$.
-[**Take a look at the first 2 samples**] from the generated dataset.
-The value 1 is technically a feature,
-namely the constant feature corresponding to the bias.
+Encore une fois, les monômes stockés dans `poly_features`
+sont remis à l'échelle par la fonction gamma,
+où $\Gamma(n)=(n-1)!$.
+[**Regardez les 2 premiers échantillons**] de l'ensemble de données généré.
+La valeur 1 est techniquement une caractéristique,
+à savoir la caractéristique constante correspondant au biais.
 
-### [**Third-Order Polynomial Function Fitting (Normal)**]
+### [**Régression Polynomial du Troisième Ordre (Normal)**]
 
-We will begin by first using a third-order polynomial function, which is the same order as that of the data generation function.
-The results show that this model's training and test losses can be both effectively reduced.
-The learned model parameters are also close
-to the true values $w = [1.2, -3.4, 5.6], b=5$.
+Nous commencerons par utiliser une fonction polynomiale du troisième ordre, qui est du même ordre que celui de la fonction de génération de données.
+Les résultats montrent que les pertes d'apprentissage et de test de ce modèle peuvent toutes deux être efficacement réduites.
+Les paramètres du modèle appris sont également proches
+des valeurs réelles $w = [1.2, -3.4, 5.6], b=5$.
 
 ```{.python .input  n=7}
 %%tab all
@@ -100,65 +100,65 @@ def train(p):
 train(p=3)
 ```
 
-### [**Linear Function Fitting (Underfitting)**]
+### [**Régression linéaire (Underfitting)**]
 
-Let's take another look at linear function fitting.
-After the decline in early epochs,
-it becomes difficult to further decrease
-this model's training loss.
-After the last epoch iteration has been completed,
-the training loss is still high.
-When used to fit nonlinear patterns
-(like the third-order polynomial function here)
-linear models are liable to underfit.
+Regardons à nouveau l'ajustement de la fonction linéaire.
+Après la diminution dans les premières époques,
+il devient difficile de diminuer davantage
+la perte d'apprentissage de ce modèle.
+Après que la dernière itération d'époque ait été complétée,
+la perte d'apprentissage est toujours élevée.
+Lorsqu'il est utilisé pour ajuster des modèles non linéaires
+(comme la fonction polynomiale du troisième ordre ici)
+les modèles linéaires sont susceptibles d'être sous-adaptés.
 
 ```{.python .input  n=8}
 %%tab all
 train(p=1)
 ```
 
-### [**Higher-Order Polynomial Function Fitting  (Overfitting)**]
+### [**Régression Polynomial d'Ordre Supérieur (Overfitting)**]
 
-Now let's try to train the model
-using a polynomial of too high degree.
-Here, there is insufficient data to learn that
-the higher-degree coefficients should have values close to zero.
-As a result, our overly-complex model
-is so susceptible that it is being influenced
-by noise in the training data.
-Though the training loss can be effectively reduced,
-the test loss is still much higher.
-It shows that
-the complex model overfits the data.
+Essayons maintenant d'entraîner le modèle
+en utilisant un polynôme de degré trop élevé.
+Ici, il n'y a pas assez de données pour apprendre que
+les coefficients de degré supérieur devraient avoir des valeurs proches de zéro.
+En conséquence, notre modèle trop complexe
+est si sensible qu'il est influencé
+par le bruit dans les données d'apprentissage.
+Bien que la perte d'apprentissage puisse être efficacement réduite,
+la perte de test est toujours beaucoup plus élevée.
+Cela montre que
+le modèle complexe s'adapte trop aux données.
 
 ```{.python .input  n=9}
 %%tab all
 train(p=10)
 ```
 
-In the subsequent sections, we will continue
-to discuss overfitting problems
-and methods for dealing with them,
-such as weight decay and dropout.
+Dans les sections suivantes, nous continuerons
+à discuter des problèmes d'overfitting
+et des méthodes pour les traiter,
+tels que la décroissance et l'abandon des poids.
 
 
-## Summary
+## Résumé
 
-* Since the generalization error cannot be estimated based on the training error, simply minimizing the training error will not necessarily mean a reduction in the generalization error. Machine learning models need to be careful to safeguard against overfitting so as to minimize the generalization error.
-* A validation set can be used for model selection, provided that it is not used too liberally.
-* Underfitting means that a model is not able to reduce the training error. When training error is much lower than validation error, there is overfitting.
-* We should choose an appropriately complex model and avoid using insufficient training samples.
+* Comme l'erreur de généralisation ne peut pas être estimée à partir de l'erreur d'apprentissage, le fait de minimiser l'erreur d'apprentissage ne signifie pas nécessairement une réduction de l'erreur de généralisation. Les modèles d'apprentissage automatique doivent faire attention à ne pas être surajustés afin de minimiser l'erreur de généralisation.
+* Un ensemble de validation peut être utilisé pour la sélection du modèle, à condition qu'il ne soit pas utilisé trop librement.
+* Le sous-adaptation signifie qu'un modèle n'est pas en mesure de réduire l'erreur d'apprentissage. Lorsque l'erreur de formation est beaucoup plus faible que l'erreur de validation, il y a sur-ajustement.
+* Nous devons choisir un modèle suffisamment complexe et éviter d'utiliser des échantillons d'entraînement insuffisants.
 
 
 ## Exercises
 
-1. Can you solve the polynomial regression problem exactly? Hint: use linear algebra.
-1. Consider model selection for polynomials:
-    1. Plot the training loss vs. model complexity (degree of the polynomial). What do you observe? What degree of polynomial do you need to reduce the training loss to 0?
-    1. Plot the test loss in this case.
-    1. Generate the same plot as a function of the amount of data.
-1. What happens if you drop the normalization ($1/i!$) of the polynomial features $x^i$? Can you fix this in some other way?
-1. Can you ever expect to see zero generalization error?
+1. Pouvez-vous résoudre exactement le problème de la régression polynomiale ? Indice : utilisez l'algèbre linéaire.
+1. Considérez la sélection de modèle pour les polynômes :
+    1. Tracez la perte d'apprentissage en fonction de la complexité du modèle (degré du polynôme). Qu'observez-vous ? De quel degré de polynôme avez-vous besoin pour réduire la perte d'apprentissage à 0 ?
+    1. Tracez la perte de test dans ce cas.
+    1. Créez le même graphique en fonction de la quantité de données.
+1. Que se passe-t-il si vous laissez tomber la normalisation ($1/i!$) des caractéristiques polynomiales $x^i$ ? Pouvez-vous corriger cela d'une autre manière ?
+1. Pouvez-vous un jour vous attendre à voir une erreur de généralisation nulle ?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/96)
