@@ -381,7 +381,7 @@ Dans ce qui suit, nous nous en tiendrons à *prédiction* chaque fois que possib
 
 Lors de l'apprentissage de nos modèles, nous voulons généralement traiter
 des minibatchs entiers d'exemples simultanément.
-Pour y parvenir efficacement, (**nous**) (~)~)devrions~)~))
+Pour y parvenir efficacement, (**nous**) devrions
 (**vectoriser les calculs et exploiter
 des bibliothèques d'algèbre linéaire rapides
 plutôt que d'écrire des boucles for coûteuses en Python.**)

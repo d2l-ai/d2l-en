@@ -138,7 +138,7 @@ nous *normalisons* leurs valeurs canal par canal.
 Concrètement,
 la valeur moyenne d'un canal est soustraite de chaque valeur de ce canal, puis le résultat est divisé par l'écart-type de ce canal.
 
-[~)~)Augmentations des données~)~)]
+Augmentations des données
 
 ```{.python .input}
 #@tab mxnet

@@ -23,7 +23,7 @@ les chercheurs passant de la réflexion en termes de neurones individuels
 et maintenant à des blocs, c'est-à-dire des motifs répétitifs de couches. 
 
 L'idée d'utiliser des blocs est apparue pour la première fois sur le site
-[Visual Geometry Group](http://www.robots.ox.ac.uk/~)vgg/) (VGG)
+[Visual Geometry Group](http://www.robots.ox.ac.uk/~vgg/) (VGG)
 de l'université d'Oxford,
 dans leur réseau éponyme *VGG* :cite:`Simonyan.Zisserman.2014`.
 Il est facile d'implémenter ces structures répétées dans le code

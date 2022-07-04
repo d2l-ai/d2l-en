@@ -151,7 +151,7 @@ lr = polynomial_lr
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50, f_grad=f_grad))
 ```
 
-Il existe de nombreuses autres possibilités pour définir le taux d'apprentissage. Par exemple, nous pouvons commencer avec un taux faible, puis l'augmenter rapidement et le diminuer à nouveau, mais plus lentement. Nous pourrions même alterner entre des taux d'apprentissage plus petits et plus grands. Il existe une grande variété de programmes de ce type. Pour l'instant, nous nous concentrons sur les programmes de taux d'apprentissage pour lesquels une analyse théorique complète est possible, c'est-à-dire sur les taux d'apprentissage dans un cadre convexe. Pour les problèmes non convexes généraux, il est très difficile d'obtenir des garanties de convergence significatives, car en général, la minimisation des problèmes non linéaires non convexes est NP difficile. Pour un aperçu, voir par exemple l'excellent [lecture notes](https://www.stat.cmu.edu/~)ryantibs/convexopt-F15/lectures/26-nonconvex.pdf) de Tibshirani 2015.
+Il existe de nombreuses autres possibilités pour définir le taux d'apprentissage. Par exemple, nous pouvons commencer avec un taux faible, puis l'augmenter rapidement et le diminuer à nouveau, mais plus lentement. Nous pourrions même alterner entre des taux d'apprentissage plus petits et plus grands. Il existe une grande variété de programmes de ce type. Pour l'instant, nous nous concentrons sur les programmes de taux d'apprentissage pour lesquels une analyse théorique complète est possible, c'est-à-dire sur les taux d'apprentissage dans un cadre convexe. Pour les problèmes non convexes généraux, il est très difficile d'obtenir des garanties de convergence significatives, car en général, la minimisation des problèmes non linéaires non convexes est NP difficile. Pour un aperçu, voir par exemple l'excellent [lecture notes](https://www.stat.cmu.edu/~ryantibs/convexopt-F15/lectures/26-nonconvex.pdf) de Tibshirani 2015.
 
 
 
@@ -249,7 +249,7 @@ pour certaines fonctions $\delta_{x_i}$ et $\delta_{y_i}$
 
 Cependant, ce n'est pas vraiment ce que nous avons fait. Dans les exemples jouets de la section actuelle, nous avons simplement ajouté du bruit à un gradient autrement non stochastique, c'est-à-dire que nous avons prétendu avoir des paires $(x_i, y_i)$. Il s'avère que cela est justifié ici (voir les exercices pour une discussion détaillée). Le plus troublant est que dans toutes les discussions précédentes, nous n'avons clairement pas fait cela. Au lieu de cela, nous avons itéré sur toutes les instances *exactement une fois*. Pour comprendre pourquoi cela est préférable, considérons l'inverse, à savoir que nous échantillonnons $n$ observations de la distribution discrète *avec remplacement*. La probabilité de choisir un élément $i$ au hasard est $1/n$. Ainsi, la probabilité de le choisir *au moins* une fois est
 
-$$P(\mathrm{choose~)} i) = 1 - P(\mathrm{omit~)} i) = 1 - (1-1/n)^n \approx 1-e^{-1} \approx 0.63.$$ 
+$$P(\mathrm{choose~} i) = 1 - P(\mathrm{omit~} i) = 1 - (1-1/n)^n \approx 1-e^{-1} \approx 0.63.$$ 
 
 Un raisonnement similaire montre que la probabilité de choisir un certain échantillon (c'est-à-dire un exemple d'entraînement) *exactement une fois* est donnée par
 

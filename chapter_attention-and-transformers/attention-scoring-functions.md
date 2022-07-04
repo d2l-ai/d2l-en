@@ -147,7 +147,7 @@ def masked_softmax(X, valid_lens):
         maxlen = X.size(1)
         mask = torch.arange((maxlen), dtype=torch.float32,
                             device=X.device)[None, :] < valid_len[:, None]
-        X[~)mask] = value
+        X[~mask] = value
         return X
     
     if valid_lens is None:

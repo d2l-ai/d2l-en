@@ -32,7 +32,7 @@ comme une tâche de classification de texte,
 qui transforme une séquence de texte de longueur variable
 en une catégorie de texte de longueur fixe.
 Dans ce chapitre,
-nous utiliserons le logiciel [large movie review dataset](https://ai.stanford.edu/~)amaas/data/sentiment/)
+nous utiliserons le logiciel [large movie review dataset](https://ai.stanford.edu/~amaas/data/sentiment/)
 de Stanford pour l'analyse des sentiments. 
 Il se compose d'un ensemble d'entraînement et d'un ensemble de test,
 contenant chacun 25 000 critiques de films téléchargées depuis IMDb.

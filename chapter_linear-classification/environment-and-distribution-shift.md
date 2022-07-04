@@ -583,12 +583,12 @@ Imaginons maintenant que les données $(\mathbf{x}_i, y_i)$ arrivent un échanti
 De nombreux problèmes réels entrent dans cette catégorie. Par exemple, nous devons prédire le cours de l'action de demain, cela nous permet d'effectuer des transactions sur la base de cette estimation et, à la fin de la journée, nous découvrons si notre estimation nous a permis de réaliser un bénéfice. En d'autres termes, dans l'apprentissage *en ligne*, nous avons le cycle suivant où nous améliorons continuellement notre modèle en fonction de nouvelles observations.
 
 $$
-\mathrm{model} ~) f_t \longrightarrow
-\mathrm{data} ~) \mathbf{x}_t \longrightarrow
-\mathrm{estimate} ~) f_t(\mathbf{x}_t) \longrightarrow
-\mathrm{observation} ~) y_t \longrightarrow
-\mathrm{loss} ~) l(y_t, f_t(\mathbf{x}_t)) \longrightarrow
-\mathrm{model} ~) f_{t+1}
+\mathrm{model} ~ f_t \longrightarrow
+\mathrm{data} ~ \mathbf{x}_t \longrightarrow
+\mathrm{estimate} ~ f_t(\mathbf{x}_t) \longrightarrow
+\mathrm{observation} ~ y_t \longrightarrow
+\mathrm{loss} ~ l(y_t, f_t(\mathbf{x}_t)) \longrightarrow
+\mathrm{model} ~ f_{t+1}
 $$
 
 #### Bandits

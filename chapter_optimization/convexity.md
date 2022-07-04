@@ -289,7 +289,7 @@ selon la définition des matrices semi-définies positives.
 
 L'une des propriétés intéressantes de l'optimisation convexe est qu'elle nous permet de gérer efficacement les contraintes. C'est-à-dire qu'elle nous permet de résoudre des problèmes d'optimisation *sous contraintes* de la forme :
 
-$$\begin{aligned} \mathop{\mathrm{minimize~)}}_{\mathbf{x}} & f(\mathbf{x}) \\
+$$\begin{aligned} \mathop{\mathrm{minimize~}}_{\mathbf{x}} & f(\mathbf{x}) \\
     \text{ subject to } & c_i(\mathbf{x}) \leq 0 \text{ for all } i \in \{1, \ldots, n\},
 \end{aligned}$$
 

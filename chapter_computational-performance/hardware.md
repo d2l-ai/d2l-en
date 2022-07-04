@@ -7,8 +7,8 @@ Nous commencerons par examiner les ordinateurs. Puis nous ferons un zoom avant p
 ![Latency Numbers that every programmer should know.](../img/latencynumbers.png)
 :label:`fig_latencynumbers`
 
-Les lecteurs impatients pourront se contenter du site :numref:`fig_latencynumbers`. Il est tiré de l'ouvrage de Colin Scott [interactive post](https://people.eecs.berkeley.edu/~)rcs/research/interactive_latency.html) qui donne un bon aperçu des progrès réalisés au cours de la dernière décennie. Les chiffres originaux sont dus à Jeff Dean ( [Stanford talk from 2010](https://static.googleusercontent.com/media/research.google.com/en//people/jeff/Stanford-DL-Nov-2010.pdf)).
-La discussion ci-dessous explique en partie la raison d'être de ces chiffres et comment ils peuvent nous guider dans la conception d'algorithmes. La discussion ci-dessous est de très haut niveau et superficielle. Elle ne remplace évidemment pas un cours approprié, mais vise plutôt à fournir suffisamment d'informations pour qu'un modélisateur statistique puisse prendre des décisions de conception appropriées. Pour un aperçu approfondi de l'architecture des ordinateurs, nous renvoyons le lecteur à :cite:`Hennessy.Patterson.2011` ou à un cours récent sur le sujet, tel que celui de [Arste Asanovic](http://inst.eecs.berkeley.edu/~)cs152/sp19/).
+Les lecteurs impatients pourront se contenter du site :numref:`fig_latencynumbers`. Il est tiré de l'ouvrage de Colin Scott [interactive post](https://people.eecs.berkeley.edu/~rcs/research/interactive_latency.html) qui donne un bon aperçu des progrès réalisés au cours de la dernière décennie. Les chiffres originaux sont dus à Jeff Dean ( [Stanford talk from 2010](https://static.googleusercontent.com/media/research.google.com/en//people/jeff/Stanford-DL-Nov-2010.pdf)).
+La discussion ci-dessous explique en partie la raison d'être de ces chiffres et comment ils peuvent nous guider dans la conception d'algorithmes. La discussion ci-dessous est de très haut niveau et superficielle. Elle ne remplace évidemment pas un cours approprié, mais vise plutôt à fournir suffisamment d'informations pour qu'un modélisateur statistique puisse prendre des décisions de conception appropriées. Pour un aperçu approfondi de l'architecture des ordinateurs, nous renvoyons le lecteur à :cite:`Hennessy.Patterson.2011` ou à un cours récent sur le sujet, tel que celui de [Arste Asanovic](http://inst.eecs.berkeley.edu/~cs152/sp19/).
 
 ## Ordinateurs
 
@@ -35,7 +35,7 @@ A la base, la mémoire sert à stocker des données qui doivent être facilement
 Si ces chiffres sont impressionnants, en effet, ils ne racontent qu'une partie de l'histoire. Lorsque nous voulons lire une partie de la mémoire, nous devons d'abord indiquer au module de mémoire où l'information peut être trouvée. Autrement dit, nous devons d'abord envoyer l'*adresse* à la RAM. Une fois cette opération effectuée, nous pouvons choisir de lire un seul enregistrement de 64 bits ou une longue séquence d'enregistrements. Ce dernier cas est appelé *burst read*. En bref, l'envoi d'une adresse à la mémoire et l'établissement du transfert prennent environ 100 ns (les détails dépendent des coefficients de synchronisation spécifiques des puces mémoire utilisées), chaque transfert ultérieur ne prend que 0,2 ns. En bref, la première lecture est 500 fois plus coûteuse que les suivantes ! Notez que nous pourrions effectuer jusqu'à 10.000.000 de lectures aléatoires par seconde. Cela suggère d'éviter autant que possible les accès aléatoires à la mémoire et d'utiliser plutôt les lectures (et les écritures) en rafale.
 
 Les choses sont un peu plus complexes lorsque nous prenons en compte le fait que nous avons plusieurs *banques*. Chaque banque peut lire la mémoire de manière largement indépendante. Cela signifie deux choses. 
-D'une part, le nombre effectif de lectures aléatoires est jusqu'à 4 fois plus élevé, à condition qu'elles soient réparties uniformément sur la mémoire. Cela signifie également que c'est toujours une mauvaise idée d'effectuer des lectures aléatoires puisque les lectures en rafale sont également 4 fois plus rapides. D'autre part, en raison de l'alignement de la mémoire sur les limites de 64 bits, il est judicieux d'aligner toutes les structures de données sur les mêmes limites. Les compilateurs le font pratiquement à l'adresse [automatically](https://en.wikipedia.org/wiki/Data_structure_alignment) lorsque les drapeaux appropriés sont activés. Les lecteurs curieux sont invités à consulter un cours sur les DRAM, comme celui de [Zeshan Chishti](http://web.cecs.pdx.edu/~)zeshan/ece585_lec5.pdf).
+D'une part, le nombre effectif de lectures aléatoires est jusqu'à 4 fois plus élevé, à condition qu'elles soient réparties uniformément sur la mémoire. Cela signifie également que c'est toujours une mauvaise idée d'effectuer des lectures aléatoires puisque les lectures en rafale sont également 4 fois plus rapides. D'autre part, en raison de l'alignement de la mémoire sur les limites de 64 bits, il est judicieux d'aligner toutes les structures de données sur les mêmes limites. Les compilateurs le font pratiquement à l'adresse [automatically](https://en.wikipedia.org/wiki/Data_structure_alignment) lorsque les drapeaux appropriés sont activés. Les lecteurs curieux sont invités à consulter un cours sur les DRAM, comme celui de [Zeshan Chishti](http://web.cecs.pdx.edu/~zeshan/ece585_lec5.pdf).
 
 La mémoire des GPU est soumise à des exigences de bande passante encore plus élevées, car ils possèdent beaucoup plus d'éléments de traitement que les CPU. Dans l'ensemble, il existe deux options pour y répondre. La première consiste à élargir considérablement le bus mémoire. Par exemple, la RTX 2080 Ti de NVIDIA possède un bus de 352 bits. Cela permet de transférer beaucoup plus d'informations en même temps. Deuxièmement, les GPU utilisent une mémoire spécifique de haute performance. Les appareils grand public, tels que les séries RTX et Titan de NVIDIA, utilisent généralement les puces [GDDR6](https://en.wikipedia.org/wiki/GDDR6_SDRAM) avec une bande passante globale de plus de 500 Go/s. Une alternative consiste à utiliser des modules HBM (mémoire à large bande passante). Ils utilisent une interface très différente et se connectent directement aux GPU sur une tranche de silicium dédiée. Ils sont donc très coûteux et leur utilisation est généralement limitée aux puces de serveur haut de gamme, comme les accélérateurs de la série NVIDIA Volta V100. Comme on pouvait s'y attendre, la mémoire des GPU est généralement *beaucoup* plus petite que celle des CPU en raison du coût plus élevé de la première. En ce qui nous concerne, leurs caractéristiques de performance sont généralement similaires, mais elles sont beaucoup plus rapides. Nous pouvons ignorer les détails dans le cadre de ce livre. Ils n'ont d'importance que lors du réglage des noyaux GPU pour un débit élevé.
 
@@ -159,13 +159,13 @@ Le résumé de :numref:`table_latency_numbers` et :numref:`table_latency_numbers
 | :----------------------------------------- | ----- : | :---------------------------------------------- |
 | Référence/attaque dans le cache L1 | 1,5 ns | 4 cycles |
 | Addition en virgule flottante/mult/FMA | 1.5 ns | 4 cycles |
-| Référence au cache L2 / hit | 5 ns | 12 ~) 17 cycles |
-| Erreur de prédiction de branche | 6 ns | 15 ~) 20 cycles |
+| Référence au cache L2 / hit | 5 ns | 12 ~ 17 cycles |
+| Erreur de prédiction de branche | 6 ns | 15 ~ 20 cycles |
 | Hit du cache L3 (cache non partagé) | 16 ns | 42 cycles |
 | Hit du cache L3 (partagé dans un autre cœur) | 25 ns | 65 cycles                                       |
 | Verrouillage/déverrouillage Mutex | 25 ns |
 | Cache L3 atteint (modifié dans un autre noyau) | 29 ns | 75 cycles |
-| Cache L3 atteint (sur un socket de CPU distant) | 40 ns | 100 ~) 300 cycles (40 ~) 116 ns) |
+| Cache L3 atteint (sur un socket de CPU distant) | 40 ns | 100 ~ 300 cycles (40 ~ 116 ns) |
 | Saut QPI vers un autre CPU (par saut) | 40 ns | |
 | Réf. mémoire 64MB. (CPU local) | 46 ns | TinyMemBench sur Broadwell E5-2690v4 |
 | Mémoire de 64MB ref. (CPU distant) | 70 ns | TinyMemBench sur Broadwell E5-2690v4 |
@@ -177,15 +177,15 @@ Le résumé de :numref:`table_latency_numbers` et :numref:`table_latency_numbers
 | Compression de 1 Ko avec Google Snappy | 3 μs | |
 | Envoi de 4 Ko sur Ethernet 10 Gbps | 10 μs |
 | Écriture aléatoire de 4 Ko sur un SSD NVMe | 30 μs | SSD NVMe DC P3608 (QOS 99 % est de 500μs) |
-| Transfert de 1 Mo vers/depuis un GPU NVLink | 30 μs | ~)33 Go/s sur NVIDIA 40 Go NVLink |
-| Transfert de 1 Mo vers/depuis un GPU PCI-E GPU | 80 μs | ~)12GB/s sur PCIe 3.0 x16 link |
+| Transfert de 1 Mo vers/depuis un GPU NVLink | 30 μs | ~33 Go/s sur NVIDIA 40 Go NVLink |
+| Transfert de 1 Mo vers/depuis un GPU PCI-E GPU | 80 μs | ~12GB/s sur PCIe 3.0 x16 link |
 | Lire 4 Ko de manière aléatoire depuis un SSD NVMe | 120 μs | DC P3608 NVMe SSD (QOS 99%) |
-| Lire 1 Mo de manière séquentielle depuis un SSD NVMe | 208 μs | ~)4.8GB/s DC P3608 NVMe SSD |
+| Lire 1 Mo de manière séquentielle depuis un SSD NVMe | 208 μs | ~4.8GB/s DC P3608 NVMe SSD |
 | Ecriture aléatoire de 4KB sur le SATA SSD | 500 μs | DC S3510 SATA SSD (QOS 99,9%) |
 | Lecture aléatoire de 4KB depuis le SATA SSD | 500 μs | DC S3510 SATA SSD (QOS 99.9%) |
-| Aller-retour dans le même centre de données | 500 μs | Le ping unidirectionnel est de ~)250μs |
-| Lire 1MB séquentiellement à partir du SATA SSD | 2 ms | ~)550MB/s DC S3510 SATA SSD |
-| Lire 1MB séquentiellement à partir du disque | 5 ms | ~)200MB/s serveur HDD |
+| Aller-retour dans le même centre de données | 500 μs | Le ping unidirectionnel est de ~250μs |
+| Lire 1MB séquentiellement à partir du SATA SSD | 2 ms | ~550MB/s DC S3510 SATA SSD |
+| Lire 1MB séquentiellement à partir du disque | 5 ms | ~200MB/s serveur HDD |
 | Accès aléatoire au disque (recherche+rotation) | 10 ms | |
 | Envoyer un paquet CA-..&gt;Pays-Bas-&gt;CA | 150 ms | |
 :label:`table_latency_numbers` 
@@ -194,11 +194,11 @@ Le résumé de :numref:`table_latency_numbers` et :numref:`table_latency_numbers
 
 | Action | Temps | Notes |
 | :------------------------------ | ----- : | :---------------------------------------- |
-| Accès à la mémoire partagée du GPU | 30 ns | 30~)90 cycles (les conflits de banques ajoutent de la latence) |
-| Accès à la mémoire globale du GPU | 200 ns | 200~)800 cycles |
+| Accès à la mémoire partagée du GPU | 30 ns | 30~90 cycles (les conflits de banques ajoutent de la latence) |
+| Accès à la mémoire globale du GPU | 200 ns | 200~800 cycles |
 | Lancement du noyau CUDA sur le GPU | 10 μs | Le CPU de l'hôte demande au GPU de lancer le noyau |
-| Transfert de 1 Mo vers/depuis le GPU NVLink | 30 μs | ~)33 Go/s sur NVIDIA 40 Go NVLink |
-| Transfert de 1 Mo vers/depuis le GPU PCI-E GPU | 80 μs | ~)12GB/s sur PCI-Express x16 link |
+| Transfert de 1 Mo vers/depuis le GPU NVLink | 30 μs | ~33 Go/s sur NVIDIA 40 Go NVLink |
+| Transfert de 1 Mo vers/depuis le GPU PCI-E GPU | 80 μs | ~12GB/s sur PCI-Express x16 link |
 :label:`table_latency_numbers_tesla` 
 
 ## Résumé

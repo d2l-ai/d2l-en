@@ -676,7 +676,7 @@ leur *produit scalaire* $\mathbf{x}^\top \mathbf{y}$ (ou $\langle \mathbf{x}, \m
 est une somme sur les produits des éléments à la même position : 
 $\mathbf{x}^\top \mathbf{y} = \sum_{i=1}^{d} x_i y_i$ .
 
-[~~Le *produit scalaire* de deux vecteurs est une somme des produits des éléments à la même position~~]
+Le *produit scalaire* de deux vecteurs est une somme des produits des éléments à la même position
 
 ```{.python .input}
 %%tab mxnet

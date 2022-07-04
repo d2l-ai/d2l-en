@@ -232,7 +232,7 @@ nous aurions pu appeler `x.reshape(-1, 4)` ou `x.reshape(3, -1)`.
 
 Les praticiens ont souvent besoin de travailler avec des tenseurs
 initialisés pour contenir tous les zéros ou les uns.
-[**Nous pouvons construire un tenseur dont tous les éléments sont fixés à zéro**] (~~ou un~~)
+[**Nous pouvons construire un tenseur dont tous les éléments sont fixés à zéro**] (~~ou un~~
 et dont la dimension est (2, 3, 4) via la fonction `zeros`.
 
 ```{.python .input}

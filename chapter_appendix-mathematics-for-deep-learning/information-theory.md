@@ -20,7 +20,7 @@ Ensuite, ils retournent une carte et disent : "Voici le $3$ de pique."  Il s'agi
 
 Poussons la logique à l'extrême.  Supposons qu'ils retournent finalement toutes les cartes du jeu et lisent la séquence complète du jeu mélangé.  Il existe $52!$ ordres différents pour le jeu de cartes, tous aussi probables les uns que les autres, et nous avons donc besoin de beaucoup d'informations pour savoir lequel c'est.
 
-Toute notion d'information que nous développons doit se conformer à cette intuition.  En effet, dans les sections suivantes, nous apprendrons à calculer que ces événements ont respectivement $0\text{ bits}$, $2\text{ bits}$, $~)5.7\text{ bits}$ et $~)225.6\text{ bits}$ d'information.
+Toute notion d'information que nous développons doit se conformer à cette intuition.  En effet, dans les sections suivantes, nous apprendrons à calculer que ces événements ont respectivement $0\text{ bits}$, $2\text{ bits}$, $~5.7\text{ bits}$ et $~225.6\text{ bits}$ d'information.
 
 Si nous lisons ces expériences de pensée, nous voyons une idée naturelle.  Pour commencer, plutôt que de nous soucier de la connaissance, nous pouvons partir de l'idée que l'information représente le degré de surprise ou la possibilité abstraite de l'événement. Par exemple, si nous voulons décrire un événement inhabituel, nous avons besoin de beaucoup d'informations. Pour un événement commun, nous n'aurons peut-être pas besoin de beaucoup d'informations.
 
@@ -61,7 +61,7 @@ from torch.nn import NLLLoss
 
 def nansum(x):
     # Define nansum, as pytorch doesn't offer it inbuilt.
-    return x[~)torch.isnan(x)].sum()
+    return x[~torch.isnan(x)].sum()
 
 def self_information(p):
     return -torch.log2(torch.tensor(p)).item()

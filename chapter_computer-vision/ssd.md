@@ -462,7 +462,7 @@ Ensuite, leurs valeurs à plus grande échelle
 sont données par
 $\sqrt{0.2 \times 0.37} = 0.272$ , $\sqrt{0.37 \times 0.54} = 0.447$, et ainsi de suite.
 
-[~)~)Hyperparamètres pour chaque bloc~)~)]
+Hyperparamètres pour chaque bloc
 
 ```{.python .input}
 #@tab all
