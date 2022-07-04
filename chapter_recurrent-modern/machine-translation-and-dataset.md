@@ -215,7 +215,7 @@ Rappelons que dans la modélisation du langage
 [**chaque exemple de séquence**],
 soit un segment d'une phrase
 ou une étendue sur plusieurs phrases,
-(**a une longueur fixe.**))
+(**a une longueur fixe.**)
 Cela a été spécifié par l'argument `num_steps`
  (nombre de pas de temps ou de tokens) dans :numref:`sec_language-model`.
 Dans la traduction automatique, chaque exemple est
