@@ -61,12 +61,13 @@ We will start with a simple toy problem, searching for the learning rate of the 
 like batch size or number of epochs are also worth tuning, we focus on learning
 rate alone for simplicity.
 
-```{.python .input  n=2}
+```{.python .input  n=13}
+%%tab pytorch, mxnet, tensorflow
 from d2l import torch as d2l
 
 from torch import nn
 
-class SoftmaxClassification(d2l.Classification):
+class SoftmaxClassification(d2l.Classification): #@save
     def __init__(self, num_outputs, lr):
         super().__init__()
         self.save_hyperparameters()
@@ -74,6 +75,16 @@ class SoftmaxClassification(d2l.Classification):
                                  nn.LazyLinear(num_outputs))
     def forward(self, X):
         return self.net(X)
+```
+
+```{.json .output n=13}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
 ```
 
 Before we can run HPO, we first need to define two ingredients: the objective function and the search space
@@ -99,13 +110,14 @@ from d2l import torch as d2l
 import torch
 from torch import nn
 
-def validate(trainer, model):
+@d2l.add_to_class(Trainer) #@save
+def validate(self, model):
     model.eval()
     accuracy = 0
     val_batch_idx = 0
-    for batch in trainer.val_dataloader:
+    for batch in self.val_dataloader:
         with torch.no_grad():
-            x, y = trainer.prepare_batch(batch)
+            x, y = self.prepare_batch(batch)
             y_hat = model(x)
             accuracy += model.accuracy(y_hat, y)
         val_batch_idx += 1
@@ -115,19 +127,28 @@ def validate(trainer, model):
 We optimize validation error with respect to the hyperparameter configuration `config`, consisting of the `learning_rate`. For each evaluation, we train our model
 for `max_epochs` epochs, then compute and return its validation error:
 
-```{.python .input  n=9}
-# %%tab all
+```{.python .input  n=14}
+%%tab pytorch, mxnet, tensorflow
+from d2l import torch as d2l
 
-#@save
-def hpo_objective_softmax_classification(config, max_epochs=10):
+def hpo_objective_softmax_classification(config, max_epochs=10):  #@save 
     learning_rate = config['learning_rate']
     trainer = d2l.Trainer(max_epochs=max_epochs)
-    
     data = d2l.FashionMNIST(batch_size=16)
-    model = SoftmaxClassification(num_outputs=10, lr=learning_rate)
+    model = d2l.SoftmaxClassification(num_outputs=10, lr=learning_rate)
     trainer.fit(model=model, data=data)
-    validation_error = validate(trainer, model=model)
+    validation_error = trainer.validate(model=model)
     return validation_error.numpy()
+```
+
+```{.json .output n=14}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
 ```
 
 ### The Search Space
