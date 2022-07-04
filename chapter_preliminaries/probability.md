@@ -263,7 +263,7 @@ tfd.Multinomial(100, fair_probs).sample()
 ```{.python .input}
 %%tab jax
 fair_probs = [0.5, 0.5]
-# jax.random does have multinomial distribution implemented
+# jax.random does not have multinomial distribution implemented
 np.random.multinomial(100, fair_probs)
 ```
 
