@@ -21,7 +21,7 @@ le but de l'optimisation est de réduire l'erreur d'apprentissage.
 Cependant, l'objectif de l'apprentissage profond (ou plus largement de l'inférence statistique) est de
 réduire l'erreur de généralisation.
 Pour atteindre ce dernier objectif, nous devons prêter
-attention au surajustement en plus d'utiliser l'algorithme d'optimisation pour
+attention au surajustement (overfitting) en plus d'utiliser l'algorithme d'optimisation pour
 réduire l'erreur d'apprentissage.
 
 ```{.python .input}

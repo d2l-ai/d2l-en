@@ -314,7 +314,7 @@ $$
 \int_0^{1} ye^{-y^2}\; dy = \frac{1-e^{-1}}{2}.
 $$
 
-## A Comment on Sign Conventions
+## Un commentaire sur les conventions de signes
 
 Les lecteurs attentifs remarqueront quelque chose d'étrange dans les calculs ci-dessus.  En effet, des calculs comme
 

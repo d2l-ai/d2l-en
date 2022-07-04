@@ -15,7 +15,7 @@ sont calculés dans les réseaux profonds.
 Nous serons alors prêts à
 discuter des questions relatives à la stabilité numérique et à l'initialisation des paramètres
 qui sont essentielles pour réussir l'entraînement des réseaux profonds.
-Lorsque nous formons des modèles à haute capacité, nous courons le risque d'un surajustement. Ainsi, nous allons
+Lorsque nous formons des modèles à haute capacité, nous courons le risque d'un surajustement (overfitting). Ainsi, nous allons
 revisiter la régularisation et la généralisation
 pour les réseaux profonds.
 Tout au long de ce chapitre, notre objectif est de vous donner une bonne maîtrise non seulement des concepts mais aussi de la pratique de l'utilisation des réseaux profonds 

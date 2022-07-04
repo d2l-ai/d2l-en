@@ -1,4 +1,4 @@
-# AutoRec : Rating Prediction with Autoencoders
+# AutoRec : Prédiction des notes avec des autoencodeurs
 
 Bien que le modèle de factorisation matricielle atteigne une performance décente sur la tâche de prédiction de notation, il s'agit essentiellement d'un modèle linéaire. Ainsi, de tels modèles ne sont pas capables de capturer les relations complexes non linéaires et complexes qui peuvent être prédictives des préférences des utilisateurs. Dans cette section, nous présentons un modèle de filtrage collaboratif par réseau neuronal non linéaire, AutoRec :cite:`Sedhain.Menon.Sanner.ea.2015`. Il identifie le filtrage collaboratif (FC) avec une architecture d'autoencodeur et vise à intégrer des transformations non linéaires dans le FC sur la base d'un feedback explicite. Il a été prouvé que les réseaux neuronaux sont capables d'approximer n'importe quelle fonction continue, ce qui les rend aptes à traiter les limites de la factorisation matricielle et à en enrichir l'expressivité.
 

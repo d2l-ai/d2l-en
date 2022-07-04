@@ -181,7 +181,7 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr,
     return net
 ```
 
-Voyons ce qui se passe si nous invoquons cet algorithme avec les paramètres par défaut, tels qu'un taux d'apprentissage de $0.3$ et un entraînement pendant $30$ itérations. Notez comment la précision de l'apprentissage continue d'augmenter alors que la progression en termes de précision du test stagne au-delà d'un point. L'écart entre les deux courbes indique un surajustement.
+Voyons ce qui se passe si nous invoquons cet algorithme avec les paramètres par défaut, tels qu'un taux d'apprentissage de $0.3$ et un entraînement pendant $30$ itérations. Notez comment la précision de l'apprentissage continue d'augmenter alors que la progression en termes de précision du test stagne au-delà d'un point. L'écart entre les deux courbes indique un surajustement (overfitting).
 
 ```{.python .input}
 #@tab mxnet
@@ -483,7 +483,7 @@ L'échauffement peut être appliqué à n'importe quel ordonnanceur (pas seuleme
 
 ## Résumé
 
-* La diminution du taux d'apprentissage pendant l'entrainement peut conduire à une amélioration de la précision et (ce qui laisse le plus perplexe) à une réduction du surajustement du modèle.
+* La diminution du taux d'apprentissage pendant l'entrainement peut conduire à une amélioration de la précision et (ce qui laisse le plus perplexe) à une réduction du surajustement (overfitting) du modèle.
 * Une diminution par morceaux du taux d'apprentissage chaque fois que la progression atteint un plateau est efficace dans la pratique. Essentiellement, cela garantit que nous convergeons efficacement vers une solution appropriée et que nous réduisons ensuite la variance inhérente des paramètres en réduisant le taux d'apprentissage.
 * Les ordonnanceurs Cosinus sont populaires pour certains problèmes de vision par ordinateur. Voir par exemple, [GluonCV](http://gluon-cv.mxnet.io) pour les détails d'un tel ordonnanceur.
 * Une période de réchauffement avant l'optimisation peut empêcher la divergence.

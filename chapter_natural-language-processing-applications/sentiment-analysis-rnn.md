@@ -11,7 +11,7 @@ n'est pas très grand,
 l'utilisation de représentations textuelles
 qui ont été pré-entraînées
 sur des corpus à grande échelle
-peut réduire le surajustement du modèle.
+peut réduire le surajustement (overfitting) du modèle.
 À titre d'exemple spécifique
 illustré dans :numref:`fig_nlp-map-sa-rnn`,
 nous représenterons chaque token

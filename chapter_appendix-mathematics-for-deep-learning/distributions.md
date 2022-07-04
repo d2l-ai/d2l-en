@@ -115,9 +115,9 @@ Nous pouvons échantillonner un tableau de forme arbitraire à partir d'une vari
 tf.cast(tf.random.uniform((10, 10)) < p, dtype=tf.float32)
 ```
 
-## Uniforme discret
+## Loi Uniforme discrète
 
-La prochaine variable aléatoire couramment rencontrée est un uniforme discret.  Pour notre discussion ici, nous supposerons qu'elle est supportée par les entiers $\{1, 2, \ldots, n\}$, mais tout autre ensemble de valeurs peut être choisi librement.  La signification du mot *uniforme* dans ce contexte est que toutes les valeurs possibles ont la même probabilité.  La probabilité de chaque valeur $i \in \{1, 2, 3, \ldots, n\}$ est $p_i = \frac{1}{n}$.  Nous désignerons une variable aléatoire $X$ avec cette distribution comme suit
+La prochaine variable aléatoire couramment rencontrée est un uniforme discrète.  Pour notre discussion ici, nous supposerons qu'elle est supportée par les entiers $\{1, 2, \ldots, n\}$, mais tout autre ensemble de valeurs peut être choisi librement.  La signification du mot *uniforme* dans ce contexte est que toutes les valeurs possibles ont la même probabilité.  La probabilité de chaque valeur $i \in \{1, 2, 3, \ldots, n\}$ est $p_i = \frac{1}{n}$.  Nous désignerons une variable aléatoire $X$ avec cette distribution comme suit
 
 $$
 X \sim U(n).
@@ -194,7 +194,7 @@ torch.randint(1, n, size=(10, 10))
 tf.random.uniform((10, 10), 1, n, dtype=tf.int32)
 ```
 
-## Uniforme continu
+## Loi Uniforme continue
 
 Voyons maintenant la distribution uniforme continue. L'idée qui sous-tend cette variable aléatoire est que si nous augmentons la valeur de $n$ dans la distribution uniforme discrète, puis que nous la mettons à l'échelle pour qu'elle s'inscrive dans l'intervalle $[a, b]$, nous nous rapprochons d'une variable aléatoire continue qui choisit une valeur arbitraire dans $[a, b]$ avec une probabilité égale.  Nous désignerons cette distribution par
 
@@ -290,7 +290,7 @@ Nous pouvons échantillonner un tableau de forme arbitraire à partir d'une vari
 (b - a) * tf.random.uniform((10, 10)) + a
 ```
 
-## Binomiale
+#Loi Binomiale
 
 Rendons les choses un peu plus complexes et examinons la variable aléatoire *binomiale*.  Cette variable aléatoire provient de la réalisation d'une séquence de $n$ expériences indépendantes, dont chacune a la probabilité $p$ de réussir, et de la question de savoir combien de réussites nous attendons.
 
@@ -429,7 +429,7 @@ m = tfp.distributions.Binomial(n, p)
 m.sample(sample_shape=(10, 10))
 ```
 
-## Poisson
+## Loi de Poisson
 Réalisons maintenant une expérience de pensée.  Nous nous trouvons à un arrêt de bus et nous voulons savoir combien de bus vont arriver dans la prochaine minute.  Commençons par considérer $X^{(1)} \sim \mathrm{Bernoulli}(p)$ qui est simplement la probabilité qu'un bus arrive dans la fenêtre d'une minute.  Pour les arrêts de bus éloignés d'un centre urbain, cela peut être une assez bonne approximation.  Il se peut que nous ne voyions jamais plus d'un bus en une minute.
 
 Cependant, si nous nous trouvons dans une zone très fréquentée, il est possible, voire probable, que deux bus arrivent.  Nous pouvons modéliser cela en divisant notre variable aléatoire en deux parties pour les 30 premières secondes, ou les 30 secondes suivantes.  Dans ce cas, nous pouvons écrire
@@ -560,7 +560,7 @@ m = tfp.distributions.Poisson(lam)
 m.sample((10, 10))
 ```
 
-## Gaussien
+## Loi Gaussien
 Essayons maintenant une expérience différente, mais connexe.  Disons que nous effectuons à nouveau $n$ mesures indépendantes $\mathrm{Bernoulli}(p)$ $X_i$ .  La distribution de la somme de ces mesures est $X^{(n)} \sim \mathrm{Binomial}(n, p)$.  Plutôt que de prendre une limite lorsque $n$ augmente et $p$ diminue, fixons $p$, puis envoyons $n \rightarrow \infty$.  Dans ce cas, $\mu_{X^{(n)}} = np \rightarrow \infty$ et $\sigma_{X^{(n)}}^2 = np(1-p) \rightarrow \infty$, il n'y a donc aucune raison de penser que cette limite devrait être bien définie.
 
 Cependant, tout espoir n'est pas perdu !  Faisons en sorte que la moyenne et la variance se comportent bien en définissant

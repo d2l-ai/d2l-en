@@ -28,7 +28,7 @@ $$
 $$
 
 où $\lambda$ désigne le taux de régularisation. Le terme de régularisation $\lambda (\| \mathbf{P} \|^2_F + \| \mathbf{Q}
-\|^2_F + b_u^2 + b_i^2 )$ est utilisé pour éviter le surajustement en pénalisant l'amplitude des paramètres. Les paires $(u, i)$ pour lesquelles $\mathbf{R}_{ui}$ est connu sont stockées dans l'ensemble
+\|^2_F + b_u^2 + b_i^2 )$ est utilisé pour éviter le surajustement (overfitting) en pénalisant l'amplitude des paramètres. Les paires $(u, i)$ pour lesquelles $\mathbf{R}_{ui}$ est connu sont stockées dans l'ensemble
 $\mathcal{K}=\{(u, i) \mid \mathbf{R}_{ui} \text{ is known}\}$ . Les paramètres du modèle peuvent être appris à l'aide d'un algorithme d'optimisation, tel que la descente de gradient stochastique et Adam.
 
 Une illustration intuitive du modèle de factorisation matricielle est présentée ci-dessous :
@@ -94,7 +94,7 @@ def evaluator(net, test_iter, devices):
     return float(np.mean(np.array(rmse_list)))
 ```
 
-## entrainement et évaluation du modèle
+## Entrainement et évaluation du modèle
 
 
 Dans la fonction de formation, nous adoptons la perte $\ell_2$ avec décroissance du poids. Le mécanisme de décroissance du poids a le même effet que la régularisation $\ell_2$.

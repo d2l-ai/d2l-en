@@ -145,7 +145,7 @@ $$\frac{\partial h_t}{\partial w_h}=\frac{\partial f(x_{t},h_{t-1},w_h)}{\partia
 
 Bien que nous puissions utiliser la règle de la chaîne pour calculer $\partial h_t/\partial w_h$ de manière récursive, cette chaîne peut devenir très longue lorsque $t$ est grand. Examinons un certain nombre de stratégies pour résoudre ce problème.
 
-### Calcul complet### 
+### Calcul complet
 
 Évidemment,
 nous pouvons simplement calculer la somme complète dans
@@ -157,7 +157,7 @@ En d'autres termes, nous pourrions assister à des phénomènes similaires à l'
 Ceci est en fait assez indésirable en termes du modèle que nous voulons estimer.
 Après tout, nous recherchons des estimateurs robustes qui se généralisent bien. Cette stratégie n'est donc presque jamais utilisée dans la pratique.
 
-### Tronquer les pas de temps###
+### Tronquer les pas de temps
 
 Alternativement,
 nous pouvons tronquer la somme en
@@ -170,7 +170,7 @@ $\partial h_{t-\tau}/\partial w_h$ .
 En pratique, cela fonctionne assez bien. C'est ce que l'on appelle communément la rétropropagation tronquée dans le temps :cite:`Jaeger.2002`.
 L'une des conséquences de cette méthode est que le modèle se concentre principalement sur l'influence à court terme plutôt que sur les conséquences à long terme. C'est en fait *souhaitable*, car cela oriente l'estimation vers des modèles plus simples et plus stables.
 
-### Troncature aléatoire### 
+### Troncature aléatoire
 
 Enfin, nous pouvons remplacer $\partial h_t/\partial w_h$
 par une variable aléatoire qui est correcte dans l'attente mais qui tronque la séquence.

@@ -286,7 +286,7 @@ alors que LeNet n'utilise que la décroissance des poids.
 Pour augmenter encore plus les données, la boucle d'apprentissage d'AlexNet
 a ajouté un grand nombre d'augmentations d'images,
 telles que des retournements, des coupures et des changements de couleur.
-Cela rend le modèle plus robuste et la taille plus importante de l'échantillon réduit efficacement le surajustement.
+Cela rend le modèle plus robuste et la taille plus importante de l'échantillon réduit efficacement le surajustement (overfitting).
 Nous aborderons l'augmentation des données plus en détail dans :numref:`sec_image_augmentation`. Voir également :cite:`Buslaev.Iglovikov.Khvedchenya.ea.2020` pour un examen approfondi de ces étapes de prétraitement.
 
 ```{.python .input}

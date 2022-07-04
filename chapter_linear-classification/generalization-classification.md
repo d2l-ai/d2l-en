@@ -443,7 +443,7 @@ a donc été historiquement formulée comme un compromis
 entre des classes de modèles plus flexibles (variance plus élevée)
 qui s'adaptent mieux aux données d'apprentissage mais risquent d'être surajustées,
 et des classes de modèles plus rigides (biais plus élevé)
-qui généralisent bien mais risquent d'être sous-ajustées.
+qui généralisent bien mais risquent d'être sous-ajustées (underfitting).
 Une question centrale dans la théorie de l'apprentissage
 a été de développer l'analyse mathématique
 appropriée pour quantifier

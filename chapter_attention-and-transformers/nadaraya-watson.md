@@ -314,7 +314,7 @@ class NWKernelRegression(d2l.Module):
 
 ### Entrainement
 
-Dans ce qui suit, nous [**transformons l'ensemble de données de formation en clés et valeurs**]
+Dans ce qui suit, nous [**transformons l'ensemble de données d'entrainement en clés et valeurs**]
 pour former le modèle d'attention.
 Dans la mise en commun paramétrique de l'attention,
 pour plus de simplicité,

@@ -372,8 +372,8 @@ même si le nombre d'erreurs sur $K$-fold cross-validation
 est considérablement plus élevé.
 Cela indique que l'ajustement est excessif.
 Tout au long de la formation, vous voudrez surveiller ces deux chiffres.
-Un surajustement moindre pourrait indiquer que nos données peuvent supporter un modèle plus puissant.
-Un surajustement massif pourrait suggérer que nous pouvons gagner
+Un surajustement (overfitting) moindre pourrait indiquer que nos données peuvent supporter un modèle plus puissant.
+Un surajustement (overfitting) massif pourrait suggérer que nous pouvons gagner
 en incorporant des techniques de régularisation.
 
 ## [**Soumettre des prédictions sur Kaggle**]

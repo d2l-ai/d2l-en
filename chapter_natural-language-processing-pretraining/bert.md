@@ -8,7 +8,7 @@ En fait, ces modèles d'intégration de mots sont tous *indépendants du context
 Commençons par illustrer cette propriété.
 
 
-## From Context-Independent to Context-Sensitive
+## De la Context-Independent à la Context-Sensitive
 
 Rappelez-vous les expériences menées dans :numref:`sec_word2vec_pretraining` et :numref:`sec_synonyms`.
 Par exemple, word2vec et GloVe attribuent tous deux le même vecteur pré-formé au même mot, quel que soit le contexte du mot (le cas échéant).
@@ -45,7 +45,7 @@ analyse des sentiments, inférence du langage naturel,
 reconnaissance des entités nommées et réponse aux questions.
 
 
-## From Task-Specific to Task-Agnostic
+## De la Task-Specific à la Task-Agnostic
 
 Bien que ELMo ait considérablement amélioré les solutions à un ensemble diversifié de tâches de traitement du langage naturel,
 chaque solution repose toujours sur une architecture *spécifique à la tâche*.
@@ -291,7 +291,7 @@ encoded_X = encoder(tokens, segments, None)
 encoded_X.shape
 ```
 
-## Tâches de pré-formation
+## Tâches de pré-entrainement
 :label:`subsec_bert_pretraining_tasks` 
 
 L'inférence directe de `BERTEncoder` donne la représentation BERT
@@ -529,7 +529,7 @@ Ces deux corpus de textes sont énormes :
 ils comptent respectivement 800 millions et 2,5 milliards de mots.
 
 
-## [**Putting All Things Together**]
+## [**Mise en commun**]
 
 Lors du pré-entraînement de BERT, la fonction de perte finale est une combinaison linéaire des deux fonctions de perte
 pour la modélisation du langage masqué et la prédiction de la phrase suivante.

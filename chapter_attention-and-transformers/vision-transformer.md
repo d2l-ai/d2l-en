@@ -160,7 +160,7 @@ encoder_blk.eval()
 d2l.check_shape(encoder_blk(X), X.shape)
 ```
 
-## Putting All Things Together
+## Mise en commun
 
 Le passage en avant des transformateurs de vision ci-dessous est simple.
 Tout d'abord, les images d'entrée sont introduites dans une instance de `PatchEmbedding`,

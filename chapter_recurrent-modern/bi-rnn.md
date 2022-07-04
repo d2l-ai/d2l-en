@@ -193,7 +193,7 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## (**Training a Bidirectional RNN for a Wrong Application**)
+## (**Entrainement d'un RNN bidirectionnel pour une application erronée**)
 
 Si nous devions ignorer tous les conseils concernant le fait que les RNN bidirectionnels utilisent des données passées et futures et les appliquer simplement aux modèles de langage, nous obtiendrions des estimations avec une perplexité acceptable. Néanmoins, la capacité du modèle à prédire les tokens futurs est gravement compromise, comme l'illustre l'expérience ci-dessous. Malgré une perplexité raisonnable, il ne génère que du charabia, même après de nombreuses itérations. Nous incluons le code ci-dessous à titre d'exemple pour éviter de l'utiliser dans un mauvais contexte.
 

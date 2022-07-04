@@ -1,4 +1,4 @@
-# Eigendecompositions
+# Décomposition spectrale
 :label:`sec_eigendecompositions` 
 
 Les valeurs propres sont souvent l'une des notions les plus utiles 
@@ -208,7 +208,7 @@ la décomposition en fragments peut simplifier de nombreux calculs d'algèbre li
 et est une opération fondamentale qui sous-tend de nombreux algorithmes numériques
 et une grande partie de l'analyse que nous faisons en algèbre linéaire. 
 
-## Eigendecompositions of Symmetric Matrices
+## Valeurs propres de matrices symétriques
 Il n'est pas toujours possible de trouver suffisamment de vecteurs propres linéairement indépendants 
 pour que le processus ci-dessus fonctionne. Par exemple, la matrice
 

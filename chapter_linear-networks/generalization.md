@@ -342,7 +342,7 @@ la taille de l'ensemble de données est une autre considération importante
 En fixant notre modèle, moins nous avons d'échantillons
 dans l'ensemble de données d'apprentissage,
 plus nous sommes susceptibles (et plus sévèrement)
-de rencontrer un surajustement.
+de rencontrer un surajustement (overfitting).
 Lorsque nous augmentons la quantité de données d'apprentissage,
 l'erreur de généralisation diminue généralement.
 De plus, en général, un plus grand nombre de données ne fait jamais de mal.

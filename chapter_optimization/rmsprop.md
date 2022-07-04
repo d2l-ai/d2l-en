@@ -17,7 +17,7 @@ $$\begin{aligned}
     \mathbf{x}_t & \leftarrow \mathbf{x}_{t-1} - \frac{\eta}{\sqrt{\mathbf{s}_t + \epsilon}} \odot \mathbf{g}_t.
 \end{aligned}$$
 
-La constante $\epsilon > 0$ est généralement fixée à $10^{-6}$ pour s'assurer que nous ne souffrons pas de division par zéro ou de tailles de pas trop importantes. Compte tenu de cette expansion, nous sommes maintenant libres de contrôler le taux d'apprentissage $\eta$ indépendamment de la mise à l'échelle qui est appliquée sur une base par coordonnée. En termes de moyennes fuyantes, nous pouvons appliquer le même raisonnement que celui appliqué précédemment dans le cas de la méthode des moments. En élargissant la définition de $\mathbf{s}_t$, on obtient
+La constante $\epsilon > 0$ est généralement fixée à $10^{-6}$ pour s'assurer que nous ne souffrons pas de division par zéro ou de tailles de pas trop importantes. Compte tenu de cette expansion, nous sommes maintenant libres de contrôler le taux d'apprentissage $\eta$ indépendamment de la mise à l'échelle qui est appliquée sur une base par coordonnée. En termes de Leaky Averages, nous pouvons appliquer le même raisonnement que celui appliqué précédemment dans le cas de la méthode des moments. En élargissant la définition de $\mathbf{s}_t$, on obtient
 
 $$
 \begin{aligned}

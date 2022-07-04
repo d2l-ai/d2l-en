@@ -135,7 +135,7 @@ mais qui aide ensuite dans un modèle dit de "double-descente"
 Ainsi, le praticien de l'apprentissage profond dispose d'un ensemble d'astuces,
 dont certaines semblent restreindre le modèle d'une certaine manière
 et d'autres qui semblent le rendre encore plus expressif,
-et qui, dans un certain sens, sont toutes appliquées pour atténuer le surajustement.
+et qui, dans un certain sens, sont toutes appliquées pour atténuer le surajustement (overfitting).
 
 Pour compliquer encore les choses,
 alors que les garanties fournies par la théorie classique de l'apprentissage

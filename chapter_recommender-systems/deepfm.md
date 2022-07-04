@@ -74,7 +74,7 @@ class DeepFM(nn.Block):
         return x
 ```
 
-## entrainement et évaluation du modèle
+## Entrainement et évaluation du modèle
 Le processus de chargement des données est le même que celui de FM. Nous définissons le composant MLP de DeepFM comme un réseau dense à trois couches avec une structure pyramidale (30-20-10). Tous les autres hyperparamètres restent les mêmes que ceux de FM.
 
 ```{.python .input  n=4}

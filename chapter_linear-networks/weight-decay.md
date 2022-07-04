@@ -307,7 +307,7 @@ Nous exécutons maintenant ce code avec `lambd = 0`,
 en désactivant la décroissance du poids.
 Notez que nous surajustons fortement,
 diminuant l'erreur d'apprentissage mais pas l'erreur de validation
-- un cas d'école de surajustement.
+- un cas d'école de surajustement (overfitting).
 
 ```{.python .input  n=9}
 %%tab all

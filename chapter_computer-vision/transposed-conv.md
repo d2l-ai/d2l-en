@@ -134,7 +134,7 @@ tconv.weight.data = K
 tconv(X)
 ```
 
-## [**Padding, Strides, and Multiple Channels**]
+## [**Padding, Strides, et Canaux multiples**]
 
 Différent de la convolution régulière
 où le remplissage est appliqué à l'entrée,
@@ -277,8 +277,8 @@ nous avons juste implémenté des convolutions en utilisant des multiplications 
 Y == d2l.matmul(W, d2l.reshape(X, -1)).reshape(2, 2)
 ```
 
-De même, nous pouvons implémenter des convolutions transposées en utilisant des multiplications de matrices
-.
+De même, nous pouvons implémenter des convolutions transposées
+en utilisant des multiplications de matrices.
 Dans l'exemple suivant,
 nous prenons la sortie $2 \times 2$ `Y` de la convolution régulière
 ci-dessus

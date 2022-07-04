@@ -256,7 +256,7 @@ pour des problèmes de taille modérée.
 
 
 
-### Xavier Initialisation
+### Initialisation Xavier
 :label:`subsec_xavier` 
 
 Examinons la distribution d'échelle de

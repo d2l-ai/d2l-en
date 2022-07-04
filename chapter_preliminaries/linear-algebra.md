@@ -3,7 +3,7 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Linear Algebra
+# Algèbre linéaire
 :label:`sec_linear-algebra` 
 
 Nous savons maintenant charger des ensembles de données dans des tenseurs
@@ -18,7 +18,7 @@ et en progressant vers la multiplication matricielle.
 
 
 
-## Scalars
+## Scalaires
 
 
 La plupart des mathématiques quotidiennes

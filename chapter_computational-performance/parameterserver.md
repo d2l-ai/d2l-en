@@ -78,7 +78,7 @@ En particulier, il n'est pas facile de s'assurer que plusieurs machines travaill
 ![Top: a single parameter server is a bottleneck since its bandwidth is finite. Bottom: multiple parameter servers store parts of the parameters with aggregate bandwidth.](../img/ps-multips.svg)
 :label:`fig_ps_multips`
 
-## Key--Value Stores
+## Stockage KV (Key-Value)
 
 La mise en œuvre des étapes requises pour l'entrainement distribuée multi-GPU dans la pratique n'est pas triviale. 
 C'est pourquoi il est utile d'utiliser une abstraction commune, à savoir celle d'un *key--value store* avec une sémantique de mise à jour redéfinie. 

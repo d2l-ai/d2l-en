@@ -88,7 +88,7 @@ nous voyons que le vecteur $\mathbf{u}-\mathbf{v}$ est la direction
 qui nous mène du point $\mathbf{v}$ au point $\mathbf{u}$.
 
 
-## Dot Products and Angles
+## Produits scalaires et angles
 Comme nous l'avons vu dans :numref:`sec_linear-algebra`,
 si l'on prend deux vecteurs colonnes $\mathbf{u}$ et $\mathbf{v}$,
 nous pouvons former leur produit scalaire en calculant :

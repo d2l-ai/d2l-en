@@ -630,7 +630,7 @@ train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 ## Résumé
 
 * L'architecture DCGAN a quatre couches convolutives pour le Discriminateur et quatre couches convolutives "fractionally-strided" pour le Générateur.
-* Le Discriminateur est une convolution stridée à 4 couches avec normalisation par lot (sauf sa couche d'entrée) et activations ReLU fuyantes.
+* Le Discriminateur est une convolution stridée à 4 couches avec normalisation par lot (sauf sa couche d'entrée) et activations leaky ReLU.
 * Le leaky ReLU est une fonction non linéaire qui donne une sortie non nulle pour une entrée négative. Elle vise à résoudre le problème du "ReLU mourant" et permet aux gradients de circuler plus facilement dans l'architecture.
 
 

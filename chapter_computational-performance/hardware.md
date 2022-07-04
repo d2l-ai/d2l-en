@@ -58,7 +58,7 @@ Les Solid State Drives (SSD) utilisent la mémoire flash pour stocker les inform
 * Les cellules de mémoire des SSD s'usent relativement vite (souvent déjà après quelques milliers d'écritures). Les algorithmes de protection contre l'usure sont capables de répartir la dégradation sur de nombreuses cellules. Cela dit, il n'est pas recommandé d'utiliser les SSD pour échanger des fichiers ou pour de grandes agrégations de fichiers journaux.
 * Enfin, l'augmentation massive de la bande passante a obligé les concepteurs d'ordinateurs à connecter les SSD directement au bus PCIe. Les disques capables de gérer cela, appelés NVMe (Non Volatile Memory enhanced), peuvent utiliser jusqu'à 4 voies PCIe. Cela représente jusqu'à 8 Go/s sur PCIe 4.0.
 
-### Cloud Storage
+### Stockage Cloud
 
 Le stockage en nuage offre une gamme configurable de performances. En d'autres termes, l'affectation du stockage aux machines virtuelles est dynamique, tant en termes de quantité que de vitesse, au choix des utilisateurs. Nous recommandons aux utilisateurs d'augmenter le nombre d'IOP provisionnés lorsque la latence est trop élevée, par exemple, lors de l'entraînement avec de nombreux petits enregistrements.
 

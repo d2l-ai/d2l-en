@@ -117,7 +117,7 @@ Or, il s'avère qu'elle est en fait bénéfique.
 Il s'agit d'un thème récurrent dans l'apprentissage profond.
 Pour des raisons qui ne sont pas encore bien caractérisées sur le plan théorique,
 diverses sources de bruit dans l'optimisation
-conduisent souvent à un apprentissage plus rapide et à moins de surajustement :
+conduisent souvent à un apprentissage plus rapide et à moins de surajustement (overfitting) :
 cette variation semble agir comme une forme de régularisation.
 :cite:`Teye.Azizpour.Smith.2018` et :cite:`Luo.Wang.Shao.ea.2018` 
 relient les propriétés de la normalisation par lots aux prieurs et pénalités bayésiens respectivement.

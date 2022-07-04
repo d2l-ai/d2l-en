@@ -1,4 +1,4 @@
-# Subword Embedding
+# Subword Embedding (Embedding de sous-mots)
 :label:`sec_fasttext` 
 
 En anglais,

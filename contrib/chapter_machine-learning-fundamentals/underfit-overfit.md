@@ -34,7 +34,7 @@ import math
 
 ### Génération du Dataset
 
-Tout d'abord, nous avons besoin de données. Étant donné $x$, nous allons [**utiliser le polynôme cubique suivant pour générer les étiquettes**] sur les données de formation et de test :
+Tout d'abord, nous avons besoin de données. Étant donné $x$, nous allons [**utiliser le polynôme cubique suivant pour générer les étiquettes**] sur les données d'entrainement et de test :
 
 (**$$y = 5 + 1.2x - 3.4\frac{x^2}{2!} + 5.6 \frac{x^3}{3!} + \epsilon \text{ where }
 \epsilon \sim \mathcal{N}(0, 0.1^2).$$**)
@@ -146,7 +146,7 @@ tels que la décroissance et l'abandon des poids.
 
 * Comme l'erreur de généralisation ne peut pas être estimée à partir de l'erreur d'apprentissage, le fait de minimiser l'erreur d'apprentissage ne signifie pas nécessairement une réduction de l'erreur de généralisation. Les modèles d'apprentissage automatique doivent faire attention à ne pas être surajustés afin de minimiser l'erreur de généralisation.
 * Un ensemble de validation peut être utilisé pour la sélection du modèle, à condition qu'il ne soit pas utilisé trop librement.
-* Le sous-adaptation signifie qu'un modèle n'est pas en mesure de réduire l'erreur d'apprentissage. Lorsque l'erreur de formation est beaucoup plus faible que l'erreur de validation, il y a sur-ajustement.
+* Le sous-adaptation signifie qu'un modèle n'est pas en mesure de réduire l'erreur d'apprentissage. Lorsque l'erreur d'entrainement est beaucoup plus faible que l'erreur de validation, il y a sur-ajustement.
 * Nous devons choisir un modèle suffisamment complexe et éviter d'utiliser des échantillons d'entraînement insuffisants.
 
 

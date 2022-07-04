@@ -8,7 +8,7 @@ Dans :numref:`sec_sgd`, nous avons examiné ce qui se passe lors de la descente 
 Dans cette section, nous allons explorer des algorithmes d'optimisation plus efficaces, notamment pour certains types de problèmes d'optimisation courants dans la pratique.
 
 
-### Moyennes fuyantes
+### Leaky Averages
 
 Dans la section précédente, nous avons abordé la SGD par minilots comme moyen d'accélérer les calculs. Cette méthode a également eu pour effet secondaire de réduire la variance en calculant la moyenne des gradients. La descente de gradient stochastique par minilots peut être calculée par :
 
@@ -95,9 +95,9 @@ eta = 0.6
 d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ```
 
-### La méthode des moments forts
+### La méthode des moments
 
-La méthode des moments forts nous permet de résoudre le problème de descente de gradient décrit ci-dessus.
+La méthode des moments nous permet de résoudre le problème de descente de gradient décrit ci-dessus.
 En regardant la trace d'optimisation ci-dessus, on pourrait penser que la moyenne des gradients sur le passé fonctionnerait bien. Après tout, dans la direction $x_1$, cela va agréger des gradients bien alignés, augmentant ainsi la distance que nous parcourons à chaque pas. À l'inverse, dans la direction $x_2$ où les gradients oscillent, un gradient agrégé réduira la taille des pas en raison des oscillations qui s'annulent.
 En utilisant $\mathbf{v}_t$ au lieu du gradient $\mathbf{g}_t$, on obtient les équations de mise à jour suivantes :
 
