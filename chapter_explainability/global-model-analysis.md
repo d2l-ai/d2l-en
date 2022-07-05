@@ -49,7 +49,7 @@ def plot_error_map(x_axis, y_axis, fsize=(2.5, 1.5)):
 A confusion matrix provides insights into the error patterns and how the model is confused when making predictions. It can be used to answer ***Q1***. Let's plot the confusion matrix below.
 
 ```{.python .input}
-feat_of_interest = {'sex', 'age', 'cp', 'chol'}
+feat_of_interest = ['sex', 'age', 'cp', 'chol']
 error = error_analysis(model, data, feat_of_interest)
 plot_error_map(error.Predicted_Label, error.Actual_Label)
 ```
