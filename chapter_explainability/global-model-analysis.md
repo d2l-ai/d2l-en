@@ -18,10 +18,10 @@ trainer = d2l.Trainer(max_epochs=50)
 trainer.fit(model, data)
 ```
 
-This classifier obtains a decent accuracy score on the validation set. Yet, instead of stopping at this point, we can further scrutinize our model by asking: ***Q1***: What type of errors have been made by the classification model? ***Q2***: How does the model perform on different subgroups? ***Q3***: How does each feature contribute to the model performance? ***Q4***: What is the relationship between target and the features of interest? We will utilize the three global model analysis methods to address these questions.
+This classifier obtains a decent accuracy score on the validation set. Yet, instead of stopping at this point, we can further scrutinize our model by asking: **Q1**: What type of errors have been made by the classification model? **Q2**: How does the model perform on different subgroups? **Q3**: How does each feature contribute to the model performance? **Q4**: What is the relationship between target and the features of interest? We will utilize the three global model analysis methods to address these questions.
 
 ## Error Analysis
-To answer ***Q1*** and ***Q2***, we need to analyze the errors made in the model. Usual aggregate metrics (e.g., accuracy, mean squared error) for evaluation enable us to understand a model's overall performance but do not reflect the specifics of the errors. For instance, accuracies across different subgroups can be non-uniform, and there might exist cases where the model fails more frequently. To pinpoint such cases, we will conduct error analysis.
+To answer **Q1** and **Q2**, we need to analyze the errors made in the model. Usual aggregate metrics (e.g., accuracy, mean squared error) for evaluation enable us to understand a model's overall performance but do not reflect the specifics of the errors. For instance, accuracies across different subgroups can be non-uniform, and there might exist cases where the model fails more frequently. To pinpoint such cases, we will conduct error analysis.
 
 Now, we write two functions below, one for error analysis and the other for error map plotting.
 
@@ -46,7 +46,7 @@ def plot_error_map(x_axis, y_axis, fsize=(2.5, 1.5)):
 ```
 
 ### Confusion Matrix
-A confusion matrix provides insights into the error patterns and how the model is confused when making predictions. It can be used to answer ***Q1***. Let's plot the confusion matrix below.
+A confusion matrix provides insights into the error patterns and how the model is confused when making predictions. It can be used to answer **Q1**. Let's plot the confusion matrix below.
 
 ```{.python .input}
 feat_of_interest = ['sex', 'age', 'cp', 'chol']
@@ -57,7 +57,7 @@ plot_error_map(error.Predicted_Label, error.Actual_Label)
 Confusion matrices can help identify the most promising direction to improve model performance. In particular, among all the misclassifications, we can check if it is false negatives or false positives that account for the majority of the error cases. Spending more effort in inspecting the majority can be more rewarding.
 
 ### Errors Distribution across Cohorts
-To unveil the erroneous cases across cohorts (to answer ***Q2***), we need to stratify them based on the features of interest and specific values of these features. Error stratification can help discover cohorts for which the model underperforms and reveal potential model biases.
+To unveil the erroneous cases across cohorts (to answer **Q2**), we need to stratify them based on the features of interest and specific values of these features. Error stratification can help discover cohorts for which the model underperforms and reveal potential model biases.
 
 In the following, we stratify the erroneous cases across gender groups below (female=0, male=1) to check if gender bias has unintentionally sneaked into the classifier or not.
 
@@ -83,7 +83,7 @@ Stratifying cases can be laborious sometimes. For example, you may have to manua
 
 Ablation study has its roots in the field of experimental neuropsychology, where parts of animals’ brains were removed to study the effect that this had on their behavior. In the context of machine learning, ablation study has been widely adopted to describe the procedure where certain features (components of a model) are removed to understand their influence on the model behavior.  
 
-Details of ablation study vary depending on the application and types of model. Here, we will use feature ablation as an example to demonstrate the process of ablation experiment (We leave model component ablation as an exercise). To goal of feature ablation is to evaluate the influence of features on a model's performance, which can be used to obtain a set of feature importance scores (to answer ***Q3***). With a dataset of $p$ features, the procedure goes as follows:
+Details of ablation study vary depending on the application and types of model. Here, we will use feature ablation as an example to demonstrate the process of ablation experiment (We leave model component ablation as an exercise). To goal of feature ablation is to evaluate the influence of features on a model's performance, which can be used to obtain a set of feature importance scores (to answer **Q3**). With a dataset of $p$ features, the procedure goes as follows:
 1. Train the model on the entire training set and obtain an accuracy score $s$ (or other scoring metrics) on the validation set.
 1. For each feature $i$, $i \in p$, remove it from the training set, then retrain the model and get another score $s_i$ on the validation set.
 1. Calculate the global feature importance of feature $i$ using $s-s_i$, which means that the importance scores can be positive, negative, or even zero. In general, the higher the score is, the more important the feature is.
@@ -139,7 +139,7 @@ Note that it is quite common to get different results using feature ablation and
 
 ## Partial Dependence Plot
 
-Feature importance scores are helpful in identifying the main drivers, but they don't provide insights about the relationship between input features and predictions. To answer ***Q4***, partial dependence plot (PDP) :cite:`friedman2001greedy` comes to the rescue. PDP is an effective tool to illustrate how the model’s predictions change depending on the values of input features of interest, marginalizing over all other features.  For example, it can show whether the probability of having heart disease increases linearly with age.
+Feature importance scores are helpful in identifying the main drivers, but they don't provide insights about the relationship between input features and predictions. To answer **Q4**, partial dependence plot (PDP) :cite:`friedman2001greedy` comes to the rescue. PDP is an effective tool to illustrate how the model’s predictions change depending on the values of input features of interest, marginalizing over all other features.  For example, it can show whether the probability of having heart disease increases linearly with age.
 
 Formally, the partial dependence $pd_{x_T}$ between feature $x_T$ and the model's prediction is defined as
 
