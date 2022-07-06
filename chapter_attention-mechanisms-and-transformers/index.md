@@ -1,5 +1,5 @@
-# Attention and Transformers
-:label:`chap_attention`
+# Attention Mechanisms and Transformers
+:label:`chap_attention-and-transformers`
 
 The optic nerve of a primate's visual system
 receives massive sensory input,

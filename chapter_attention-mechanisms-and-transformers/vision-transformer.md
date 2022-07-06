@@ -3,7 +3,7 @@
 tab.interact_select(['pytorch'])
 ```
 
-# Vision Transformer
+# Transformers for Vision
 :label:`sec_vision-transformer`
 
 The transformer architecture was initially proposed for sequence to sequence learning, such as for machine translation. 

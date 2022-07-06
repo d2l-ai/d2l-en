@@ -1417,7 +1417,7 @@ over the past decade.
   of the translation process. This allowed for significantly
   increased accuracy for long sequences, since the model
   no longer needed to remember the entire sequence before
-  commencing the generation of a new sequence.
+  commencing the generation of a new sequence. Built solely on attention mechanisms, the transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017` has demonstrated compelling success in a wide range of areas. For example, a single transformer pretrained on modalities as diverse as text, images, joint torques, and button presses can play Atari, caption images, chat, and act as a robot :cite:`reed2022generalist`.
 * Multi-stage designs, e.g., via the memory networks 
   :cite:`Sukhbaatar.Weston.Fergus.ea.2015` and the neural programmer-interpreter :cite:`Reed.De-Freitas.2015`
   allowed statistical modelers to describe iterative approaches to reasoning. These tools allow for an internal state of the deep neural network
@@ -1670,13 +1670,12 @@ It is in this spirit that the notebooks forming this book are freely available f
 
 
 
+
+
 ## Summary
 
-* Machine learning studies how computer systems can leverage experience (often data) to improve performance at specific tasks. It combines ideas from statistics, data mining, and optimization. Often, it is used as a means of implementing AI solutions.
-* As a class of machine learning, representational learning focuses on how to automatically find the appropriate way to represent data. Deep learning is multi-level representation learning through learning many layers of transformations.
-* Deep learning replaces not only the shallow models at the end of traditional machine learning pipelines, but also the labor-intensive process of feature engineering. 
-* Much of the recent progress in deep learning has been triggered by an abundance of data arising from cheap sensors and Internet-scale applications, and by significant progress in computation, mostly through GPUs.
-* Whole system optimization is a key component in obtaining high performance. The availability of efficient deep learning frameworks has made design and implementation of this significantly easier.
+Machine learning studies how computer systems can leverage experience (often data) to improve performance at specific tasks. It combines ideas from statistics, data mining, and optimization. Often, it is used as a means of implementing AI solutions. As a class of machine learning, representational learning focuses on how to automatically find the appropriate way to represent data. 
+As multi-level representation learning through learning many layers of transformations, deep learning replaces not only the shallow models at the end of traditional machine learning pipelines, but also the labor-intensive process of feature engineering. Much of the recent progress in deep learning has been triggered by an abundance of data arising from cheap sensors and Internet-scale applications, and by significant progress in computation, mostly through GPUs. Besides, the availability of efficient deep learning frameworks has made design and implementation of whole system optimization significantly easier, which is a key component in obtaining high performance.
 
 ## Exercises
 

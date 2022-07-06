@@ -91,14 +91,14 @@ Our goal in this book is to present a unified resource
 to bring would-be practitioners up to speed.
 
 When we started this book project,
-there were no resources that simultaneously
-(i) were up to date; (ii) covered the full breadth
-of modern machine learning with substantial technical depth;
-and (iii) interleaved exposition 
-of the quality one expects 
-from an engaging textbook 
+there were no resources that simultaneously 
+(a) remained up to date;
+(b) covered the breadth of modern machine learning practices 
+with sufficient technical depth;
+and (c) interleaved exposition of 
+the quality one expects of a textbook 
 with the clean runnable code
-that one expects to find in hands-on tutorials.
+that one expects of a hands-on tutorial.
 We found plenty of code examples for
 how to use a given deep learning framework
 (e.g., how to do basic numerical computing with matrices in TensorFlow)
@@ -148,22 +148,18 @@ And webpages are native in HTML and JavaScript.
 Furthermore, we want the content to be
 accessible both as executable code, as a physical book,
 as a downloadable PDF, and on the Internet as a website.
-At present there exist no tools and no workflow
-perfectly suited to these demands, 
-so we had to assemble our own.
-We describe our approach in detail 
-in :numref:`sec_how_to_contribute`.
+No workflows seemed suited to these demands, 
+so we decided to assemble our own (:numref:`sec_how_to_contribute`).
 We settled on GitHub to share the source 
-and to facilitate community contributions,
-Jupyter notebooks for mixing code, equations and text,
-Sphinx as a rendering engine 
-to generate multiple outputs,
-and Discourse for the forum.
-While our system is not yet perfect,
-these choices provide a good compromise 
+and to facilitate community contributions;
+Jupyter notebooks for mixing code, equations and text;
+Sphinx as a rendering engine; 
+and Discourse as a discussion platform.
+While our system is not perfect,
+these choices strike a compromise 
 among the competing concerns.
-We believe that this might be 
-the first book published
+We believe that *Dive into Deep Learning*
+might be the first book published
 using such an integrated workflow.
 
 
@@ -181,19 +177,19 @@ precisely for its thoroughness,
 for true beginners, this property limits 
 its usefulness as an introductory text.
 
-In this book, we will teach most concepts *just in time*.
+In this book, we teach most concepts *just in time*.
 In other words, you will learn concepts at the very moment
 that they are needed to accomplish some practical end.
 While we take some time at the outset to teach
 fundamental preliminaries, like linear algebra and probability,
 we want you to taste the satisfaction of training your first model
-before worrying about more esoteric probability distributions.
+before worrying about more esoteric concepts.
 
 Aside from a few preliminary notebooks that provide a crash course
 in the basic mathematical background,
 each subsequent chapter introduces both a reasonable number of new concepts
-and provides single self-contained working examples---using real datasets.
-This presents an organizational challenge.
+and provides several self-contained working examples, using real datasets.
+This presented an organizational challenge.
 Some models might logically be grouped together in a single notebook.
 And some ideas might be best taught 
 by executing several models in succession.
@@ -203,47 +199,52 @@ This makes it as easy as possible for you to
 start your own research projects by leveraging our code.
 Just copy a notebook and start modifying it.
 
-We will interleave the runnable code with background material as needed.
-In general, we will often err on the side of making tools
-available before explaining them fully (and we will follow up by
-explaining the background later).
+Throughout, we interleave the runnable code
+with background material as needed.
+In general, we err on the side of making tools
+available before explaining them fully
+(often filling in the background later).
 For instance, we might use *stochastic gradient descent*
-before fully explaining why it is useful or why it works.
+before explaining why it is useful 
+or offering intuitions for why it works.
 This helps to give practitioners the necessary
 ammunition to solve problems quickly,
 at the expense of requiring the reader
 to trust us with some curatorial decisions.
 
-This book will teach deep learning concepts from scratch.
-Sometimes, we want to delve into fine details about the models
-that would typically be hidden from the user
-by deep learning frameworks' advanced abstractions.
+This book teaches deep learning concepts from scratch.
+Sometimes, we delve into fine details about models
+that would typically be hidden from users
+by modern deep learning frameworks.
 This comes up especially in the basic tutorials,
 where we want you to understand everything
 that happens in a given layer or optimizer.
-In these cases, we will often present two versions of the example:
+In these cases, we often present 
+two versions of the example:
 one where we implement everything from scratch,
 relying only on NumPy-like functionality
 and automatic differentiation,
-and another, more practical example,
-where we write succinct code using 
-the high-level APIs of deep learning frameworks.
-Once we have taught you how some component works,
-we can just use the high-level APIs in subsequent tutorials.
+and a more practical example,
+where we write succinct code 
+using the high-level APIs of deep learning frameworks.
+After explaining how some component works,
+we rely on the high-level API in subsequent tutorials.
 
 
 ### Content and Structure
 
-The book can be roughly divided into three parts,
-focusing on preliminaries, deep learning techniques,
-and advanced topics focused on real systems 
+The book can be divided into roughly three parts,
+focusing on preliminaries, 
+deep learning techniques,
+and advanced topics
+focused on real systems
 and applications (:numref:`fig_book_org`).
 
 ![Book structure](../img/book-org.svg)
 :label:`fig_book_org`
 
 
-* The first part covers basics and preliminaries.
+* **Part 1: Basics and Preliminaries.**
 :numref:`chap_introduction` offers 
 an introduction to deep learning.
 Then, in :numref:`chap_preliminaries`,
@@ -254,20 +255,20 @@ such as how to store and manipulate data,
 and how to apply various numerical operations 
 based on basic concepts from linear algebra, 
 calculus, and probability.
-:numref:`chap_linear` and :numref:`chap_perceptrons`
+:numref:`chap_regression` and :numref:`chap_perceptrons`
 cover the most basic concepts and techniques in deep learning,
 including regression and classification;
-linear models and multilayer perceptrons;
+linear models; multilayer perceptrons;
 and overfitting and regularization.
 
-* The next six chapters focus on modern deep learning techniques.
-:numref:`chap_computation` describes 
-the key computational components 
+* **Part 2: Modern Deep Learning Techniques.**
+:numref:`chap_computation` describes
+the key computational components
 of deep learning systems
 and lays the groundwork
 for our subsequent implementations
 of more complex models.
-Next, :numref:`chap_cnn` and :numref:`chap_modern_cnn`,
+Next, :numref:`chap_cnn` and :numref:`chap_modern_cnn`
 introduce convolutional neural networks (CNNs), 
 powerful tools that form the backbone 
 of most modern computer vision systems.
@@ -277,28 +278,28 @@ models that exploit sequential (e.g., temporal)
 structure in data and are commonly used
 for natural language processing 
 and time series prediction.
-In :numref:`chap_attention`, 
+In :numref:`chap_attention-and-transformers`, 
 we introduce a relatively new class of models
-based on so-called attention mechanisms
+based on so-called *attention mechanisms*
 that has displaced RNNs as the dominant architecture
 for most natural language processing tasks.
 These sections will bring you up to speed 
 on the most powerful and general tools
 that are widely used by deep learning practitioners.
 
-* Part three discusses scalability, efficiency, and applications.
-First, in :numref:`chap_optimization`,
+* **Part 3: Scalability, Efficiency, and Applications.**
+In :numref:`chap_optimization`,
 we discuss several common optimization algorithms
 used to train deep learning models.
-The next chapter, :numref:`chap_performance`,
-examines several key factors
+Next, in :numref:`chap_performance`,
+we examine several key factors
 that influence the computational performance 
-of your deep learning code.
-In :numref:`chap_cv`,
+of deep learning code.
+Then, in :numref:`chap_cv`,
 we illustrate major applications 
 of deep learning in computer vision.
-In :numref:`chap_nlp_pretrain` and :numref:`chap_nlp_app`,
-we show how to pretrain language representation models 
+Finally, in :numref:`chap_nlp_pretrain` and :numref:`chap_nlp_app`,
+we demonstrate how to pretrain language representation models 
 and apply them to natural language processing tasks.
 
 
@@ -312,26 +313,27 @@ tweaking the code in small ways and observing the results.
 Ideally, an elegant mathematical theory might tell us
 precisely how to tweak our code to achieve a desired result.
 However, deep learning practitioners today
-must often tread where no cogent theory 
-can provide firm guidance. 
+must often tread where no solid theory provides guidance. 
 Despite our best attempts, formal explanations 
 for the efficacy of various techniques are still lacking,
 both because the mathematics to characterize these models
-can be so difficult and also because 
-serious inquiry on these topics
-has only just recently kicked into high gear.
+can be so difficult,
+because the explanation likely depends on properties 
+of the data that currently lack clear definitions,
+and because serious inquiry on these topics
+has just recently kicked into high gear.
 We are hopeful that as the theory of deep learning progresses,
-future editions of this book 
-can provide insights that eclipse
-those presently available.
+each future edition of this book will provide insights 
+that eclipse those presently available.
 
-To avoid unnecessary repetition, we encapsulate 
-some of our most frequently imported and referred-to 
+To avoid unnecessary repetition, we encapsulate
+some of our most frequently imported and used
 functions and classes in the `d2l` package.
-To indicate a block of code, such as a function, 
-class, or collection of import statements,
-that will be subsequently accessed via the `d2l` package, 
-we will mark it with `#@save`. 
+Throughout, we mark blocks of code
+(such as functions, classes,
+or collection of import statements) with `#@save`
+to indicate that they will be accessed later
+via the `d2l` package.
 We offer a detailed overview 
 of these functions and classes in :numref:`sec_d2l`.
 The `d2l` package is lightweight and only requires
@@ -539,11 +541,23 @@ and continuous encouragement, this book would not have happened.
 
 ## Summary
 
-* Deep learning has revolutionized pattern recognition, introducing technology that now powers a wide range of  technologies, including computer vision, natural language processing, automatic speech recognition.
-* To successfully apply deep learning, you must understand how to cast a problem, the mathematics of modeling, the algorithms for fitting your models to data, and the engineering techniques to implement it all.
-* This book presents a comprehensive resource, including prose, figures, mathematics, and code, all in one place.
-* To answer questions related to this book, visit our forum at https://discuss.d2l.ai/.
-* All notebooks are available for download on GitHub.
+Deep learning has revolutionized pattern recognition, 
+introducing technology that now powers a wide range of  technologies, 
+in such diverse fields as computer vision,
+natural language processing,
+and automatic speech recognition.
+To successfully apply deep learning, 
+you must understand how to cast a problem,
+the basic mathematics of modeling,
+the algorithms for fitting your models to data,
+and the engineering techniques to implement it all.
+This book presents a comprehensive resource, 
+including prose, figures, mathematics, and code, all in one place.
+To ask (or answer) questions related to this book,
+visit our forum at https://discuss.d2l.ai/.
+All of our notebooks are available for download
+on the [d2l.ai website](https://d2l.ai)
+and on [GitHub](https://github.com/d2l-ai/d2l-en).
 
 
 ## Exercises

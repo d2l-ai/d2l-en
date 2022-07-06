@@ -22,7 +22,7 @@ chapter_notation/index
 
 chapter_introduction/index
 chapter_preliminaries/index
-chapter_linear-networks/index
+chapter_linear-regression/index
 chapter_linear-classification/index
 chapter_multilayer-perceptrons/index
 chapter_builders-guide/index
@@ -30,7 +30,7 @@ chapter_convolutional-neural-networks/index
 chapter_convolutional-modern/index
 chapter_recurrent-neural-networks/index
 chapter_recurrent-modern/index
-chapter_attention-and-transformers/index
+chapter_attention-mechanisms-and-transformers/index
 chapter_optimization/index
 chapter_computational-performance/index
 chapter_computer-vision/index

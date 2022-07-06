@@ -1,5 +1,5 @@
-# Linear Neural Networks
-:label:`chap_linear`
+# Linear Neural Networks for Regression
+:label:`chap_regression`
 
 Before we worry about making our neural networks deep,
 it will be helpful to implement some shallow neural networks,
