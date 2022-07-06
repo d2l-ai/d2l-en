@@ -1,0 +1,158 @@
+% myriad-pt1.sty
+% 2010/07/04, v1.00
+
+% copyright (c) 2010 ali woollatt
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{myriad-pt1}[2010/07/04, v1.00 Myriad Pro PT1 font support]
+\RequirePackage[LY1,T1]{fontenc}
+
+%%%\def\set@mathchar#1#2#3#4{%
+%%%  \typeout{\global\mathcode`#2="\mathchar@type#3\hexnumber@#1#4\relax}%
+%%%  \global\mathcode`#2="\mathchar@type#3\hexnumber@#1#4\relax}
+
+%%%\def\set@mathsymbol#1#2#3#4{%
+%%%  \typeout{\global\mathchardef#2"\mathchar@type#3\hexnumber@#1#4\relax}%
+%%%  \global\mathchardef#2"\mathchar@type#3\hexnumber@#1#4\relax}
+
+\let\mc@d\mathcode
+
+% Myriad Condensed
+
+\DeclareSymbolFont{myriad@cn@ops}{LY1}{pmyx}{c}{n}
+\xdef\myr@mg{\hexnumber@\symmyriad@cn@ops} % This MUST be directly after the \DeclareSymbolFont!
+\SetSymbolFont{myriad@cn@ops}{normal}{LY1}{pmyx}{c}{n}
+\SetSymbolFont{myriad@cn@ops}{bold}  {LY1}{pmyx}{bc}{n}
+
+\DeclareSymbolFont{myriad@cn@ltr}{LY1}{pmyx}{c}{it}
+\xdef\myr@mgl{\hexnumber@\symmyriad@cn@ltr} % This MUST be directly after the \DeclareSymbolFont!
+\SetSymbolFont{myriad@cn@ltr}{normal}{LY1}{pmyx}{c}{it}
+\SetSymbolFont{myriad@cn@ltr}{bold}  {LY1}{pmyx}{bc}{it}
+
+% Myriad Semibold-Condensed
+
+\DeclareSymbolFont{myriad@sbc@ops}{LY1}{pmyx}{sbc}{n}
+\xdef\myrsb@mg{\hexnumber@\symmyriad@sbc@ops} % This MUST be directly after the \DeclareSymbolFont!
+\SetSymbolFont{myriad@sbc@ops}{normal}{LY1}{pmyx}{sbc}{n}
+%%%\SetSymbolFont{myriad@sbc@ops}{bold}  {LY1}{pmyx}{sbc}{n}
+
+\DeclareSymbolFont{myriad@sbc@ltr}{LY1}{pmyx}{sbc}{it}
+\xdef\myrsb@mgl{\hexnumber@\symmyriad@sbc@ltr} % This MUST be directly after the \DeclareSymbolFont!
+\SetSymbolFont{myriad@sbc@ltr}{normal}{LY1}{pmyx}{sbc}{it}
+%%%\SetSymbolFont{myriad@sbc@ltr}{bold}  {LY1}{pmyx}{sbc}{it}
+
+\def\myriadsetup#1#2{\fontencoding{LY1}\fontfamily{pmyx}%
+  \def\mg@d{#1}\def\mg@l{#2}%
+% define digits 0-9 to come from Myriad in math mode.
+  \mc@d`0="7\mg@d30 \mc@d`1="7\mg@d31 \mc@d`2="7\mg@d32
+  \mc@d`3="7\mg@d33 \mc@d`4="7\mg@d34 \mc@d`5="7\mg@d35
+  \mc@d`6="7\mg@d36 \mc@d`7="7\mg@d37 \mc@d`8="7\mg@d38
+  \mc@d`9="7\mg@d39
+% define letters a-z, A-Z to come from Myriad italic in math mode.
+  \mc@d`a="7\mg@l61 \mc@d`a="7\mg@l61 \mc@d`b="7\mg@l62
+  \mc@d`c="7\mg@l63 \mc@d`d="7\mg@l64 \mc@d`e="7\mg@l65
+  \mc@d`f="7\mg@l66 \mc@d`g="7\mg@l67 \mc@d`h="7\mg@l68
+  \mc@d`i="7\mg@l69 \mc@d`j="7\mg@l6A \mc@d`k="7\mg@l6B
+  \mc@d`l="7\mg@l6C \mc@d`m="7\mg@l6D \mc@d`n="7\mg@l6E
+  \mc@d`o="7\mg@l6F \mc@d`p="7\mg@l70 \mc@d`q="7\mg@l71
+  \mc@d`r="7\mg@l72 \mc@d`s="7\mg@l73 \mc@d`t="7\mg@l74
+  \mc@d`u="7\mg@l75 \mc@d`v="7\mg@l76 \mc@d`w="7\mg@l77
+  \mc@d`x="7\mg@l78 \mc@d`y="7\mg@l79 \mc@d`z="7\mg@l7A
+  \mc@d`A="7\mg@l41 \mc@d`B="7\mg@l42 \mc@d`C="7\mg@l43
+  \mc@d`D="7\mg@l44 \mc@d`E="7\mg@l45 \mc@d`F="7\mg@l46
+  \mc@d`G="7\mg@l47 \mc@d`H="7\mg@l48 \mc@d`I="7\mg@l49
+  \mc@d`J="7\mg@l4A \mc@d`K="7\mg@l4B \mc@d`L="7\mg@l4C
+  \mc@d`M="7\mg@l4D \mc@d`N="7\mg@l4E \mc@d`O="7\mg@l4F
+  \mc@d`P="7\mg@l50 \mc@d`Q="7\mg@l51 \mc@d`R="7\mg@l52
+  \mc@d`S="7\mg@l53 \mc@d`T="7\mg@l54 \mc@d`U="7\mg@l55
+  \mc@d`V="7\mg@l56 \mc@d`W="7\mg@l57 \mc@d`X="7\mg@l58
+  \mc@d`Y="7\mg@l59 \mc@d`Z="7\mg@l5A\relax
+}
+
+\def\MyriadProCond{%
+  \myriadsetup{\myr@mg}{\myr@mgl}\def\bfdefault{bc}\fontseries{c}\fontshape{n}\selectfont
+}
+
+\def\MyriadProSemiBoldCond{\myriadsetup{\myrsb@mg}{\myrsb@mgl}%
+  \def\bfdefault{sbc}\fontseries{sbc}\fontshape{n}\selectfont
+}
+
+\endinput
+
+
+
+
+
+
+
+\DeclareSymbolFont{myriad@cn@ops}{LY1}{pmyx}{c}{n}
+\SetSymbolFont{myriad@cn@ops}{normal}{LY1}{pmyx}{c}{n}
+\SetSymbolFont{myriad@cn@ops}{bold}  {LY1}{pmyx}{bc}{n}
+%  \MyDeclareMathSymbol{0}{\mathalpha}{myriad@cn@ops}{`0}%
+%  \SetMathAlphabet{\mathbf}{normal}{LY1}{\rmdefault}{c}{n}
+%  \SetMathAlphabet{\mathrm}{normal}{LY1}{\rmdefault}{bc}{n}
+%  \SetMathAlphabet{\mathit}{normal}{LY1}{\rmdefault}{c}{it}
+
+\DeclareMathSymbol{0}{\mathalpha}{myriad@cn@ops}{`0}
+\DeclareMathSymbol{1}{\mathalpha}{myriad@cn@ops}{`1}
+\DeclareMathSymbol{2}{\mathalpha}{myriad@cn@ops}{`2}
+\DeclareMathSymbol{3}{\mathalpha}{myriad@cn@ops}{`3}
+\DeclareMathSymbol{4}{\mathalpha}{myriad@cn@ops}{`4}
+\DeclareMathSymbol{5}{\mathalpha}{myriad@cn@ops}{`5}
+\DeclareMathSymbol{6}{\mathalpha}{myriad@cn@ops}{`6}
+\DeclareMathSymbol{7}{\mathalpha}{myriad@cn@ops}{`7}
+\DeclareMathSymbol{8}{\mathalpha}{myriad@cn@ops}{`8}
+\DeclareMathSymbol{9}{\mathalpha}{myriad@cn@ops}{`9}
+\DeclareMathSymbol{a}{\mathalpha}{myriad@cn@ops}{`a}
+\DeclareMathSymbol{a}{\mathalpha}{myriad@cn@ops}{`a}
+\DeclareMathSymbol{b}{\mathalpha}{myriad@cn@ops}{`b}
+\DeclareMathSymbol{c}{\mathalpha}{myriad@cn@ops}{`c}
+\DeclareMathSymbol{d}{\mathalpha}{myriad@cn@ops}{`d}
+\DeclareMathSymbol{e}{\mathalpha}{myriad@cn@ops}{`e}
+\DeclareMathSymbol{f}{\mathalpha}{myriad@cn@ops}{`f}
+\DeclareMathSymbol{g}{\mathalpha}{myriad@cn@ops}{`g}
+\DeclareMathSymbol{h}{\mathalpha}{myriad@cn@ops}{`h}
+\DeclareMathSymbol{i}{\mathalpha}{myriad@cn@ops}{`i}
+\DeclareMathSymbol{j}{\mathalpha}{myriad@cn@ops}{`j}
+\DeclareMathSymbol{k}{\mathalpha}{myriad@cn@ops}{`k}
+\DeclareMathSymbol{l}{\mathalpha}{myriad@cn@ops}{`l}
+\DeclareMathSymbol{m}{\mathalpha}{myriad@cn@ops}{`m}
+\DeclareMathSymbol{n}{\mathalpha}{myriad@cn@ops}{`n}
+\DeclareMathSymbol{o}{\mathalpha}{myriad@cn@ops}{`o}
+\DeclareMathSymbol{p}{\mathalpha}{myriad@cn@ops}{`p}
+\DeclareMathSymbol{q}{\mathalpha}{myriad@cn@ops}{`q}
+\DeclareMathSymbol{r}{\mathalpha}{myriad@cn@ops}{`r}
+\DeclareMathSymbol{s}{\mathalpha}{myriad@cn@ops}{`s}
+\DeclareMathSymbol{t}{\mathalpha}{myriad@cn@ops}{`t}
+\DeclareMathSymbol{u}{\mathalpha}{myriad@cn@ops}{`u}
+\DeclareMathSymbol{v}{\mathalpha}{myriad@cn@ops}{`v}
+\DeclareMathSymbol{w}{\mathalpha}{myriad@cn@ops}{`w}
+\DeclareMathSymbol{x}{\mathalpha}{myriad@cn@ops}{`x}
+\DeclareMathSymbol{y}{\mathalpha}{myriad@cn@ops}{`y}
+\DeclareMathSymbol{z}{\mathalpha}{myriad@cn@ops}{`z}
+\DeclareMathSymbol{A}{\mathalpha}{myriad@cn@ops}{`A}
+\DeclareMathSymbol{B}{\mathalpha}{myriad@cn@ops}{`B}
+\DeclareMathSymbol{C}{\mathalpha}{myriad@cn@ops}{`C}
+\DeclareMathSymbol{D}{\mathalpha}{myriad@cn@ops}{`D}
+\DeclareMathSymbol{E}{\mathalpha}{myriad@cn@ops}{`E}
+\DeclareMathSymbol{F}{\mathalpha}{myriad@cn@ops}{`F}
+\DeclareMathSymbol{G}{\mathalpha}{myriad@cn@ops}{`G}
+\DeclareMathSymbol{H}{\mathalpha}{myriad@cn@ops}{`H}
+\DeclareMathSymbol{I}{\mathalpha}{myriad@cn@ops}{`I}
+\DeclareMathSymbol{J}{\mathalpha}{myriad@cn@ops}{`J}
+\DeclareMathSymbol{K}{\mathalpha}{myriad@cn@ops}{`K}
+\DeclareMathSymbol{L}{\mathalpha}{myriad@cn@ops}{`L}
+\DeclareMathSymbol{M}{\mathalpha}{myriad@cn@ops}{`M}
+\DeclareMathSymbol{N}{\mathalpha}{myriad@cn@ops}{`N}
+\DeclareMathSymbol{O}{\mathalpha}{myriad@cn@ops}{`O}
+\DeclareMathSymbol{P}{\mathalpha}{myriad@cn@ops}{`P}
+\DeclareMathSymbol{Q}{\mathalpha}{myriad@cn@ops}{`Q}
+\DeclareMathSymbol{R}{\mathalpha}{myriad@cn@ops}{`R}
+\DeclareMathSymbol{S}{\mathalpha}{myriad@cn@ops}{`S}
+\DeclareMathSymbol{T}{\mathalpha}{myriad@cn@ops}{`T}
+\DeclareMathSymbol{U}{\mathalpha}{myriad@cn@ops}{`U}
+\DeclareMathSymbol{V}{\mathalpha}{myriad@cn@ops}{`V}
+\DeclareMathSymbol{W}{\mathalpha}{myriad@cn@ops}{`W}
+\DeclareMathSymbol{X}{\mathalpha}{myriad@cn@ops}{`X}
+\DeclareMathSymbol{Y}{\mathalpha}{myriad@cn@ops}{`Y}
+\DeclareMathSymbol{Z}{\mathalpha}{myriad@cn@ops}{`Z}

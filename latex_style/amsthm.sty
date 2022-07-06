@@ -1,0 +1,448 @@
+%%
+%% This is file `amsthm.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% amsclass.dtx  (with options: `amsthm')
+%% 
+%%% ====================================================================
+%%% @LaTeX-file{
+%%%   filename  = "amsclass.dtx",
+%%%   version   = "2.20",
+%%%   date      = "2004/08/06",
+%%%   time      = "13:03:53 EDT",
+%%%   checksum  = "53558 5204 20497 185872",
+%%%   author    = "American Mathematical Society",
+%%%   copyright = "Copyright 1995, 1999, 2004
+%%%                American Mathematical Society,
+%%%                all rights reserved.  Copying of this file is
+%%%                authorized only if either:
+%%%                (1) you make absolutely no changes to your copy,
+%%%                including name; OR
+%%%                (2) if you do make changes, you first rename it
+%%%                to some other name.",
+%%%   address   = "American Mathematical Society,
+%%%                Technical Support,
+%%%                Publications Technical Group,
+%%%                201 Charles Street,
+%%%                Providence, RI 02904,
+%%%                USA",
+%%%   telephone = "401-455-4080 or (in the USA and Canada)
+%%%                800-321-4AMS (321-4267)",
+%%%   FAX       = "401-331-3842",
+%%%   email     = "tech-support@ams.org (Internet)",
+%%%   codetable = "ISO/ASCII",
+%%%   keywords  = "latex, AMS, documentclass, theorem",
+%%%   supported = "yes",
+%%%   abstract  = "This is the source for the amsthm package and three
+%%%                AMS document classes: amsart, amsproc, and amsbook.
+%%%                They are designed for use with LaTeX.",
+%%%   docstring = "The checksum field above contains a CRC-16 checksum
+%%%                as the first value, followed by the equivalent of
+%%%                the standard UNIX wc (word count) utility output of
+%%%                lines, words, and characters.  This is produced by
+%%%                Robert Solovay's checksum utility.",
+%%% }
+%%% ====================================================================
+\NeedsTeXFormat{LaTeX2e}% LaTeX 2.09 can't be used (nor non-LaTeX)
+[1995/06/01]% LaTeX date must be June 1995 or later
+\ProvidesPackage{amsthm}[2004/08/06 v2.20]
+\let\@xp=\expandafter
+\let\@nx=\noexpand
+\def\@oparg#1[#2]{\@ifnextchar[{#1}{#1[#2]}}
+\long\def\@ifempty#1{\@xifempty#1@@..\@nil}
+\long\def\@xifempty#1#2@#3#4#5\@nil{%
+  \ifx#3#4\@xp\@firstoftwo\else\@xp\@secondoftwo\fi}
+\long\def\@ifnotempty#1{\@ifempty{#1}{}}
+\def\setboxz@h{\setbox\z@\hbox}
+\def\@addpunct#1{%
+  \relax\ifhmode
+    \ifnum\spacefactor>\@m \else#1\fi
+  \fi}
+\def\nopunct{\spacefactor 1007 }
+\def\frenchspacing{\sfcode`\.1006\sfcode`\?1005\sfcode`\!1004%
+  \sfcode`\:1003\sfcode`\;1002\sfcode`\,1001 }
+\DeclareOption*{\input{\CurrentOption .thm}}
+\ProcessOptions
+
+\newcommand{\theoremstyle}[1]{%
+  \@ifundefined{th@#1}{%
+    \PackageWarning{amsthm}{Unknown theoremstyle `#1'}%
+    \thm@style{plain}%
+  }{%
+    \thm@style{#1}%
+  }%
+}
+\newtoks\thm@style
+\thm@style{plain}
+\newtoks\thm@bodyfont  \thm@bodyfont{\itshape}
+\newtoks\thm@headfont  \thm@headfont{\bfseries}
+\newtoks\thm@notefont  \thm@notefont{}
+\newtoks\thm@headpunct \thm@headpunct{.}
+\newskip\thm@preskip \newskip\thm@postskip
+\def\thm@space@setup{%
+  \thm@preskip=\topsep \thm@postskip=\thm@preskip
+}
+\renewcommand{\newtheorem}{\@ifstar{\@xnthm *}{\@xnthm \relax}}
+\def\@xnthm#1#2{%
+  \let\@tempa\relax
+  \@xp\@ifdefinable\csname #2\endcsname{%
+    \global\@xp\let\csname end#2\endcsname\@endtheorem
+    \ifx *#1% unnumbered, need to get one more mandatory arg
+      \edef\@tempa##1{%
+        \gdef\@xp\@nx\csname#2\endcsname{%
+          \@nx\@thm{\@xp\@nx\csname th@\the\thm@style\endcsname}%
+            {}{##1}}}%
+    \else % numbered theorem, need to check for optional arg
+      \def\@tempa{\@oparg{\@ynthm{#2}}[]}%
+    \fi
+  }%
+  \@tempa
+}
+\def\@ynthm#1[#2]#3{%
+  \ifx\relax#2\relax
+    \def\@tempa{\@oparg{\@xthm{#1}{#3}}[]}%
+  \else
+    \@ifundefined{c@#2}{%
+      \def\@tempa{\@nocounterr{#2}}%
+    }{%
+      \@xp\xdef\csname the#1\endcsname{\@xp\@nx\csname the#2\endcsname}%
+      \toks@{#3}%
+      \@xp\xdef\csname#1\endcsname{%
+        \@nx\@thm{%
+          \let\@nx\thm@swap
+            \if S\thm@swap\@nx\@firstoftwo\else\@nx\@gobble\fi
+          \@xp\@nx\csname th@\the\thm@style\endcsname}%
+            {#2}{\the\toks@}}%
+      \let\@tempa\relax
+    }%
+  \fi
+  \@tempa
+}
+\def\@xthm#1#2[#3]{%
+  \ifx\relax#3\relax
+    \newcounter{#1}%
+  \else
+    \newcounter{#1}[#3]%
+    \@xp\xdef\csname the#1\endcsname{\@xp\@nx\csname the#3\endcsname
+      \@thmcountersep\@thmcounter{#1}}%
+  \fi
+  \toks@{#2}%
+  \@xp\xdef\csname#1\endcsname{%
+    \@nx\@thm{%
+      \let\@nx\thm@swap
+        \if S\thm@swap\@nx\@firstoftwo\else\@nx\@gobble\fi
+      \@xp\@nx\csname th@\the\thm@style\endcsname}%
+      {#1}{\the\toks@}}%
+}
+\def\@thm#1#2#3{%
+  \ifhmode\unskip\unskip\par\fi
+  \normalfont
+  \trivlist
+  \let\thmheadnl\relax
+  \let\thm@swap\@gobble
+  \thm@notefont{\fontseries\mddefault\upshape}%
+  \thm@headpunct{.}% add period after heading
+  \thm@headsep 5\p@ plus\p@ minus\p@\relax
+  \thm@space@setup
+  #1% style overrides
+  \@topsep \thm@preskip               % used by thm head
+  \@topsepadd \thm@postskip           % used by \@endparenv
+  \def\@tempa{#2}\ifx\@empty\@tempa
+    \def\@tempa{\@oparg{\@begintheorem{#3}{}}[]}%
+  \else
+    \refstepcounter{#2}%
+    \def\@tempa{\@oparg{\@begintheorem{#3}{\csname the#2\endcsname}}[]}%
+  \fi
+  \@tempa
+}
+\def\@restorelabelsep{\relax}
+\let\@ythm\relax
+\let\thmname\@iden \let\thmnote\@iden \let\thmnumber\@iden
+\providecommand\@upn{\textup}
+\def\thmhead@plain#1#2#3{%
+  \thmname{#1}\thmnumber{\@ifnotempty{#1}{ }\@upn{#2}}%
+  \thmnote{ {\the\thm@notefont(#3)}}}
+\let\thmhead\thmhead@plain
+\def\swappedhead#1#2#3{%
+  \thmnumber{#2}%
+  \thmname{\@ifnotempty{#2}{~}#1}%
+  \thmnote{ {\the\thm@notefont(#3)}}}
+\let\swappedhead@plain=\swappedhead
+\let\thmheadnl\relax
+\let\thm@indent\noindent
+\let\thm@swap\@gobble
+\def\@begintheorem#1#2[#3]{%
+  \deferred@thm@head{\the\thm@headfont \thm@indent
+    \@ifempty{#1}{\let\thmname\@gobble}{\let\thmname\@iden}%
+    \@ifempty{#2}{\let\thmnumber\@gobble}{\let\thmnumber\@iden}%
+    \@ifempty{#3}{\let\thmnote\@gobble}{\let\thmnote\@iden}%
+    \thm@swap\swappedhead\thmhead{#1}{#2}{#3}%
+    \the\thm@headpunct
+    \thmheadnl % possibly a newline.
+    \hskip\thm@headsep
+  }%
+  \ignorespaces}
+\newskip\thm@headsep
+\thm@headsep=5pt plus1pt minus1pt\relax
+\let\adjust@parskip@nobreak=\@nbitem
+\newtoks\dth@everypar
+\dth@everypar={%
+  \@minipagefalse \global\@newlistfalse
+  \@noparitemfalse
+  \if@inlabel
+    \global\@inlabelfalse
+    \begingroup \setbox\z@\lastbox
+     \ifvoid\z@ \kern-\itemindent \fi
+    \endgroup
+    \unhbox\@labels
+  \fi
+  \if@nobreak \@nobreakfalse \clubpenalty\@M
+  \else \clubpenalty\@clubpenalty \everypar{}%
+  \fi
+}%
+\def\deferred@thm@head#1{%
+  \if@inlabel \indent \par \fi % eject a section head if one is pending
+  \if@nobreak
+    \adjust@parskip@nobreak
+  \else
+    \addpenalty\@beginparpenalty
+    \addvspace\@topsep
+    \addvspace{-\parskip}%
+  \fi
+  \global\@inlabeltrue
+  \everypar\dth@everypar
+  \sbox\@labels{\normalfont#1}%
+  \ignorespaces
+}
+\def\nonslanted{\relax
+  \@xp\let\@xp\@tempa\csname\f@shape shape\endcsname
+  \ifx\@tempa\itshape\upshape
+  \else\ifx\@tempa\slshape\upshape\fi\fi}
+\def\swapnumbers{\edef\thm@swap{\if S\thm@swap N\else S\fi}}
+\def\thm@swap{N}%
+\let\@opargbegintheorem\relax
+\def\th@plain{%
+%%  \let\thm@indent\noindent % no indent
+%%  \thm@headfont{\bfseries}% heading font is bold
+%%  \thm@notefont{}% same as heading font
+%%  \thm@headpunct{.}% add period after heading
+%%  \let\thm@swap\@gobble
+%%  \thm@preskip\topsep
+%%  \thm@postskip\theorempreskipamount
+  \itshape % body font
+}
+\def\th@definition{%
+  \normalfont % body font
+}
+\def\th@remark{%
+  \thm@headfont{\itshape}%
+  \normalfont % body font
+  \thm@preskip\topsep \divide\thm@preskip\tw@
+  \thm@postskip\thm@preskip
+}
+\def\@endtheorem{\endtrivlist\@endpefalse }
+\newcommand{\newtheoremstyle}[9]{%
+  \@ifempty{#5}{\dimen@\z@skip}{\dimen@#5\relax}%
+  \ifdim\dimen@=\z@
+    \toks@{#4\let\thm@indent\noindent}%
+  \else
+    \toks@{#4\def\thm@indent{\noindent\hbox to#5{}}}%
+  \fi
+  \def\@tempa{#8}\ifx\space\@tempa
+    \toks@\@xp{\the\toks@ \thm@headsep\fontdimen\tw@\font\relax}%
+  \else
+    \def\@tempb{\newline}%
+    \ifx\@tempb\@tempa
+      \toks@\@xp{\the\toks@ \thm@headsep\z@skip
+        \def\thmheadnl{\newline}}%
+    \else
+      \toks@\@xp{\the\toks@ \thm@headsep#8\relax}%
+    \fi
+  \fi
+  \begingroup
+  \thm@space@setup
+  \@defaultunits\@tempskipa#2\thm@preskip\relax\@nnil
+  \@defaultunits\@tempskipb#3\thm@postskip\relax\@nnil
+  \xdef\@gtempa{\thm@preskip\the\@tempskipa
+    \thm@postskip\the\@tempskipb\relax}%
+  \endgroup
+  \@temptokena\@xp{\@gtempa
+    \thm@headfont{#6}\thm@headpunct{#7}%
+  }%
+  \@ifempty{#9}{%
+    \let\thmhead\thmhead@plain
+  }{%
+    \@namedef{thmhead@#1}##1##2##3{#9}%
+    \@temptokena\@xp{\the\@temptokena
+      \@xp\let\@xp\thmhead\csname thmhead@#1\endcsname}%
+  }%
+  \@xp\xdef\csname th@#1\endcsname{\the\toks@ \the\@temptokena}%
+}
+\DeclareRobustCommand{\qed}{%
+  \ifmmode \mathqed
+  \else
+    \leavevmode\unskip\penalty9999 \hbox{}\nobreak\hfill
+    \quad\hbox{\qedsymbol}%
+  \fi
+}
+\let\QED@stack\@empty
+\let\qed@elt\relax
+\newcommand{\pushQED}[1]{%
+  \toks@{\qed@elt{#1}}\@temptokena\expandafter{\QED@stack}%
+  \xdef\QED@stack{\the\toks@\the\@temptokena}%
+}
+\newcommand{\popQED}{%
+  \begingroup\let\qed@elt\popQED@elt \QED@stack\relax\relax\endgroup
+}
+\def\popQED@elt#1#2\relax{#1\gdef\QED@stack{#2}}
+\newcommand{\qedhere}{%
+  \begingroup \let\mathqed\math@qedhere
+    \let\qed@elt\setQED@elt \QED@stack\relax\relax \endgroup
+}
+\newif\ifmeasuring@
+\newif\iffirstchoice@ \firstchoice@true
+\def\setQED@elt#1#2\relax{%
+  \ifmeasuring@
+  \else \iffirstchoice@ \gdef\QED@stack{\qed@elt{}#2}\fi
+  \fi
+  #1%
+}
+\def\qed@warning{%
+  \PackageWarning{amsthm}{The \@nx\qedhere command may not work
+    correctly here}%
+}
+\newcommand{\mathqed}{\quad\hbox{\qedsymbol}}
+\def\linebox@qed{\hfil\hbox{\qedsymbol}\hfilneg}
+\@ifpackageloaded{amsmath}{%
+  \def\math@qedhere{%
+    \@ifundefined{\@currenvir @qed}{%
+      \qed@warning\quad\hbox{\qedsymbol}%
+    }{%
+      \@xp\aftergroup\csname\@currenvir @qed\endcsname
+    }%
+  }
+  \def\displaymath@qed{%
+    \relax
+    \ifmmode
+      \ifinner \aftergroup\linebox@qed
+      \else
+        \eqno
+        \let\eqno\relax \let\leqno\relax \let\veqno\relax
+        \hbox{\qedsymbol}%
+      \fi
+    \else
+       \aftergroup\linebox@qed
+    \fi
+  }
+  \@xp\let\csname equation*@qed\endcsname\displaymath@qed
+  \def\equation@qed{%
+    \iftagsleft@
+      \hbox{\phantom{\quad\qedsymbol}}%
+      \gdef\alt@tag{%
+        \rlap{\hbox to\displaywidth{\hfil\qedsymbol}}%
+        \global\let\alt@tag\@empty
+      }%
+    \else
+      \gdef\alt@tag{%
+        \global\let\alt@tag\@empty
+        \vtop{\ialign{\hfil####\cr
+                \tagform@\theequation\cr
+                \qedsymbol\cr}}%
+        \setbox\z@
+      }%
+    \fi
+  }
+  \def\qed@tag{%
+    \global\tag@true \nonumber
+    &\omit\setboxz@h {\strut@ \qedsymbol}\tagsleft@false
+    \place@tag@gather
+    \kern-\tabskip
+    \ifst@rred \else \global\@eqnswtrue \fi \global\advance\row@\@ne \cr
+  }
+  \def\split@qed{%
+    \def\endsplit{\crcr\egroup \egroup \ctagsplit@false \rendsplit@
+      \aftergroup\align@qed
+    }%
+  }
+  \def\align@qed{%
+    \ifmeasuring@ \tag*{\qedsymbol}%
+    \else \let\math@cr@@@\qed@tag
+    \fi
+  }
+  \@xp\let\csname align*@qed\endcsname\align@qed
+  \@xp\let\csname gather*@qed\endcsname\align@qed
+%% Needs some patching up for amsmath 1.2
+}{% end of amsmath branch, start plain LaTeX branch
+  \def\math@qedhere{%
+    \@ifundefined{\@currenvir @qed}{%
+      \qed@warning \aftergroup\displaymath@qed
+    }{%
+      \@xp\aftergroup\csname\@currenvir @qed\endcsname
+    }%
+  }
+  \def\displaymath@qed{%
+    \relax
+    \ifmmode
+      \ifinner \aftergroup\aftergroup\aftergroup\linebox@qed
+      \else
+        \eqno \def\@badmath{$$}%
+        \let\eqno\relax \let\leqno\relax \let\veqno\relax
+        \hbox{\qedsymbol}%
+      \fi
+    \else
+       \aftergroup\linebox@qed
+    \fi
+  }
+  \@ifundefined{ver@leqno.clo}{%
+    \def\equation@qed{\displaymath@qed \quad}%
+  }{%
+    \def\equation@qed{\displaymath@qed}%
+  }
+  \def\@tempa#1$#2#3\@nil{%
+    \def\[{#1$#2\def\@currenvir{displaymath}#3}%
+  }%
+  \expandafter\@tempa\[\@nil
+}
+\@ifpackageloaded{amstex}{%
+  \def\@tempa{TT}%
+}{%
+  \@ifpackageloaded{amsmath}{%
+    \def\@tempb#1 v#2.#3\@nil{#2}%
+    \ifnum\@xp\@xp\@xp\@tempb\csname ver@amsmath.sty\endcsname v0.0\@nil
+       <\tw@
+      \def\@tempa{TT}%
+    \else
+      \def\@tempa{TF}%
+    \fi
+  }{%
+    \def\@tempa{TF}
+  }%
+}
+\if\@tempa
+  \renewcommand{\math@qedhere}{\quad\hbox{\qedsymbol}}%
+\fi
+\newcommand{\openbox}{\leavevmode
+  \hbox to.77778em{%
+  \hfil\vrule
+  \vbox to.675em{\hrule width.6em\vfil\hrule}%
+  \vrule\hfil}}
+\DeclareRobustCommand{\textsquare}{%
+  \begingroup \usefont{U}{msa}{m}{n}\thr@@\endgroup
+}
+\providecommand{\qedsymbol}{\openbox}
+\newenvironment{proof}[1][\proofname]{\par
+  \pushQED{\qed}%
+  \normalfont \topsep6\p@\@plus6\p@\relax
+  \trivlist
+  \item[\hskip\labelsep
+        \itshape
+    #1\@addpunct{.}]\ignorespaces
+}{%
+  \popQED\endtrivlist\@endpefalse
+}
+\providecommand{\proofname}{Proof}
+\endinput
+%%
+%% End of file `amsthm.sty'.

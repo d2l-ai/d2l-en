@@ -1,0 +1,175 @@
+%% floatpag.sty
+%% Copyright 1999 V. Statulevi\v cius
+%% VTeX Ltd., Akademijos 4, Vilnius, Lithuania
+%% e-mail vytas@vtex.lt
+%% http://www.vtex.lt/tex/download/macros/
+%%
+% This program can redistributed and/or modified under the terms
+% of the LaTeX Project Public License Distributed from CTAN
+% archives in directory macros/latex/base/lppl.txt; either
+% version 1 of the License, or (at your option) any later version.
+%
+% PURPOSE: provides commands to apply different pagestyles
+%          to the full page floats.
+%
+% USAGE:
+% \floatpagestyle{foo}     will apply pagestyle 'foo' to all pages
+%                          occupied by full page floats.
+%
+% \rotfloatpagestyle{foo}  will apply pagestyle 'foo' to all pages
+%                          occupied by sideways figures and tables
+%                          produced with the help of 'rotating.sty'
+%                          package (Sebastian Rahtz and Leonor Barroca)         
+%
+% \thisfloatpagestyle{foo} will apply pagestyle 'foo' to a page where
+%                          this command was used inside figure or table
+%                          environment
+%
+% DEFAULT:
+% \floatpagestyle{headings}
+% \rotfloatpagestyle{plain}
+%
+% The macros, developed by Sigitas Tolusis <sigitas@vtex.lt>,
+% were used in this package.
+%
+% The following commands from the LaTeX2e kernel were redefined:
+% \@xfloat, \@vtryfc
+% The following command from the rotating.sty  was redefined:
+% \@xrotfloat
+%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{floatpag}
+             [1999/04/29
+                 FLOAT PAGESTYLE]
+\def\floatpagestyle#1{\gdef\at@float@page{\thispagestyle{#1}}}
+\def\rotfloatpagestyle#1{\gdef\@r@f@pagestyle{#1}\gdef\at@rotfloat@page{\thispagestyle{#1}}}
+\floatpagestyle{headings}
+\rotfloatpagestyle{plain}
+%
+\def\thisfloatpagestyle#1{%
+       \expandafter\expandafter\expandafter\gdef\expandafter
+        \csname\number\@currbox @float\endcsname{\thispagestyle{#1}}\relax}
+%
+% Perrabibreziame \x@float - paprasti float'ai
+\def\@xfloat #1[#2]{%
+  \@nodocument
+  \def \@captype {#1}%
+   \def \@fps {#2}%
+   \@onelevel@sanitize \@fps
+   \def \reserved@b {!}%
+   \ifx \reserved@b \@fps
+     \@fpsadddefault
+   \else
+     \ifx \@fps \@empty
+       \@fpsadddefault
+     \fi
+   \fi
+   \ifhmode
+     \@bsphack
+     \@floatpenalty -\@Mii
+   \else
+     \@floatpenalty-\@Miii
+   \fi
+  \ifinner
+     \@parmoderr\@floatpenalty\z@
+  \else
+    \@next\@currbox\@freelist
+      {%
+       \@tempcnta \sixt@@n
+       \expandafter \@tfor \expandafter \reserved@a
+         \expandafter :\expandafter =\@fps
+         \do
+          {%
+           \if \reserved@a h%
+             \ifodd \@tempcnta
+             \else
+               \advance \@tempcnta \@ne
+             \fi
+           \fi
+           \if \reserved@a t%
+             \@setfpsbit \tw@
+           \fi
+           \if \reserved@a b%
+             \@setfpsbit 4%
+           \fi
+           \if \reserved@a p%
+             \@setfpsbit 8%
+           \fi
+           \if \reserved@a !%
+             \ifnum \@tempcnta>15
+               \advance\@tempcnta -\sixt@@n\relax
+             \fi
+           \fi
+           }%
+       \@tempcntb \csname ftype@\@captype \endcsname
+       \multiply \@tempcntb \@xxxii
+       \advance \@tempcnta \@tempcntb
+       \global \count\@currbox \@tempcnta
+       \expandafter\expandafter\expandafter\gdef\expandafter
+        \csname\number\@currbox @float\endcsname{\at@float@page}\relax
+       }%
+    \@fltovf
+  \fi
+  \global \setbox\@currbox
+    \color@vbox
+      \normalcolor
+      \vbox \bgroup
+        \hsize\columnwidth
+        \@parboxrestore
+        \@floatboxreset
+}%
+%
+% 2e rotating.sty v. 2.10: 
+\def\e@xrotfloat#1[#2]{%
+  \@float{#1}[#2]%
+  \thisfloatpagestyle{\@r@f@pagestyle}%
+  \begin{lrbox}\rot@float@box
+  \begin{minipage}\textheight
+ }
+
+% 2.09 rotating.sty v. 1.6
+\def\n@xrotfloat#1[#2]{\ifhmode \@bsphack\@floatpenalty -\@Mii\else
+   \@floatpenalty-\@Miii\fi\def\@captype{#1}\ifinner
+      \@parmoderr\@floatpenalty\z@
+    \else\@next\@currbox\@freelist{\@tempcnta\csname ftype@#1\endcsname
+       \multiply\@tempcnta\@xxxii\advance\@tempcnta\sixt@@n
+       \@tfor \@tempa :=#2\do
+                        {\if\@tempa h\advance\@tempcnta \@ne\fi
+                         \if\@tempa t\advance\@tempcnta \tw@\fi
+                         \if\@tempa b\advance\@tempcnta 4\relax\fi
+                         \if\@tempa p\advance\@tempcnta 8\relax\fi
+         }\global\count\@currbox\@tempcnta}\@fltovf\fi
+        \expandafter\expandafter\expandafter\gdef\expandafter\csname\number\@currbox 
+                @float\endcsname{\at@rotfloat@page}\relax
+     \global\setbox\@currbox\vbox\bgroup
+  \hsize\textheight \@parboxrestore
+}%
+%
+% Tikrinam, kokia rotating versija: 2e ar 209:
+% 1999.02.08 Tikriname dokumento pradzioje, t.y. neaisku
+% kada rotating stilius buvo pakrautas:
+\AtBeginDocument{%
+\@ifpackageloaded{rotating}%
+{\let\@xrotfloat\e@xrotfloat\let\n@xrotfloat\relax}%
+{\let\@xrotfloat\n@xrotfloat\let\e@xrotfloat\relax}}%
+%
+%% "Kablys" output proceduroje ivykdantis komanda
+\def\spec@float #1{\expandafter\csname\number#1@float\endcsname
+        \expandafter\expandafter\expandafter\gdef\expandafter\csname\number#1@float\endcsname{}}
+
+\def\@vtryfc #1{%
+  \global\setbox\@outputbox\vbox{}%
+  \let\@elt\@wtryfc
+  \@flsucceed
+  \let\@elt\spec@float
+  \@flsucceed
+  \global\setbox\@outputbox \vbox to\@colht{%
+    \vskip \@fptop
+    \vskip -\@fpsep
+    \unvbox \@outputbox
+    \vskip \@fpbot}%
+  \let\@elt\relax
+  \xdef #1{\@failedlist\@flfail}%
+  \xdef\@freelist{\@freelist\@flsucceed}}
+
+\endinput

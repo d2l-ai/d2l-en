@@ -1,0 +1,269 @@
+%%
+%% This is file `rotating.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% rotating.dtx  (with options: `package')
+%% Copyright (C) 1994 Sebastian Rahtz and Leonor Barroca. All
+%% rights reserved.  Permission is granted to to customize the
+%% declarations in this file to serve the needs of your installation.
+%% However, no permission is granted to distribute a modified version of
+%% this file under its original name.
+%% 
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{rotating}%
+    [2008/10/05 v2.15c
+  rotated objects in LaTeX%
+        ]% $Id: rotating.dtx,v 1.15 2008/10/05 18:31:01 rf10 Exp $
+\DeclareOption{clockwise}{%
+ \AtBeginDocument{\setkeys{Grot}{units=360}}%
+}
+\DeclareOption{counterclockwise}{%
+ \AtBeginDocument{\setkeys{Grot}{units=-360}}%
+}
+\DeclareOption{anticlockwise}{\ds@counterclockwise}
+\DeclareOption{figuresleft}{%
+  \@rot@twosidefalse
+  \def\rot@LR{0}%
+}
+\DeclareOption{figuresright}{%
+ \@rot@twosidefalse
+ \def\rot@LR{-1}%
+}
+\newif\ifrot@messages
+\DeclareOption{quiet}{%
+  \rot@messagesfalse
+  \let\rot@message\@gobble % pro tem -- should suppress altogether
+}
+\DeclareOption{log}{%
+  \rot@messagestrue
+  \def\rot@message{\PackageInfo{rotating}}%
+}
+\DeclareOption{chatter}{%
+  \rot@messagestrue
+  \def\rot@message{\PackageWarning{rotating}}%
+}
+\newif\if@rot@twoside
+\if@twoside
+  \@rot@twosidetrue
+\else
+  \@rot@twosidefalse
+\fi
+\def\rot@LR{-1}
+\DeclareOption*{\PassOptionsToPackage{\CurrentOption}{graphicx}}
+\ExecuteOptions{clockwise,quiet}
+\ProcessOptions
+\RequirePackage{graphicx}
+\RequirePackage{ifthen}
+\def\rotdriver#1{\makeatletter\input{#1.def}\makeatother}
+\newcounter{r@tfl@t}
+\setcounter{r@tfl@t}{0}
+\newskip\rotFPtop \rotFPtop=\@fptop
+\newskip\rotFPbot \rotFPbot=\@fpbot
+\def\sideways{%
+  \Grot@setangle{90}%
+  \setbox\z@\hbox\bgroup\ignorespaces}
+\def\endsideways{%
+  \unskip\egroup
+  \Grot@x\z@
+  \Grot@y\z@
+  \Grot@box
+}
+\def\turn#1{%
+  \Grot@setangle{#1}%
+  \setbox\z@\hbox\bgroup\ignorespaces}
+\def\endturn{%
+  \unskip\egroup
+  \Grot@x\z@
+  \Grot@y\z@
+  \Grot@box
+}
+\def\rotate#1{%
+  \Grot@setangle{#1}%
+  \setbox\z@\hbox\bgroup\ignorespaces}
+\def\endrotate{%
+  \unskip\egroup
+  \Grot@x\z@
+  \Grot@y\z@
+  \wd0\z@\dp0\z@\ht0\z@
+  \Grot@box
+}
+\def\turnbox#1#2{%
+  \Grot@setangle{#1}%
+  \setbox\z@\hbox{{#2}}%
+  \Grot@x\z@\Grot@y\z@
+  \wd0\z@\dp0\z@\ht0\z@
+  \Grot@box
+}
+\newsavebox\rot@float@box
+\def\@rotfloat#1{%
+  \@ifnextchar[%
+    {\@xrotfloat{#1}}%
+    {\edef\@tempa{\noexpand\@xrotfloat{#1}[\csname fps@#1\endcsname]}\@tempa}%
+}
+\def\@xrotfloat#1[#2]{%
+  \@float{#1}[#2]%
+  \begin{lrbox}\rot@float@box
+  \begin{minipage}\textheight
+ }
+\def\end@rotfloat{%
+   \end{minipage}\end{lrbox}%
+   \stepcounter{r@tfl@t}%
+   \rot@label{RF\ther@tfl@t}%
+   \rot@pageref{RF\ther@tfl@t}{\R@@page}%
+   \edef\@tempa{Adding sideways \@captype\space on page \R@@page\space}
+   \rot@mess@toks\expandafter{\@tempa}
+   \wd\rot@float@box\z@
+   \ht\rot@float@box\z@
+   \dp\rot@float@box\z@
+   \vbox to \textheight{%
+    \setkeys{Grot}{units=360}%
+    \if@rot@twoside
+    \else
+      \let\R@@page\rot@LR
+    \fi
+    \ifthenelse{\isodd{\R@@page}}{%
+      \if@rot@twoside
+        \rot@mess@toks\expandafter{\the\rot@mess@toks (right hand page)}%
+      \fi
+      \vfill
+      \@@line{%
+        \hskip\rotFPtop
+        \rotatebox{90}{\box\rot@float@box}%
+        \hskip\rotFPbot
+      }%
+    }{%
+      \if@rot@twoside
+        \rot@mess@toks\expandafter{\the\rot@mess@toks (left hand page)}%
+      \fi
+      \@@line{%
+        \hskip\rotFPbot
+        \rotatebox{-90}{\box\rot@float@box}%
+        \hskip\rotFPtop
+      }%
+      \vfill
+    }%
+    \rot@message{\the\rot@mess@toks}
+  }%
+  \end@float
+}
+\def\sidewaysfigure{\@rotfloat{figure}}
+\let\endsidewaysfigure\end@rotfloat
+\def\sidewaystable{\@rotfloat{table}}
+\let\endsidewaystable\end@rotfloat
+\def\@rotdblfloat{%
+  \if@twocolumn\expandafter\@rotdbflt\else\expandafter\@rotfloat\fi
+}
+\def\@rotdbflt#1{\@ifnextchar[{\@rotxdblfloat{#1}}{\@rotxdblfloat{#1}[tp]}}
+\def\@rotxdblfloat#1[#2]{%
+  \@float{#1}[#2]%
+  \hsize\textwidth\linewidth\textwidth
+  \begin{lrbox}\rot@float@box
+  \begin{minipage}\textheight
+}
+\def\end@rotdblfloat{%
+  \end{minipage}\end{lrbox}%
+  \stepcounter{r@tfl@t}%
+  \rot@label{RF\ther@tfl@t}%
+  \rot@pageref{RF\ther@tfl@t}{\R@@page}%
+  \edef\@tempa{Adding sideways \@captype\space on page \R@@page\space}
+  \rot@mess@toks\expandafter{\@tempa}
+  \@tempdima\ht\rot@float@box
+  \advance\@tempdima by \dp\rot@float@box
+  \wd\rot@float@box\z@
+  \ht\rot@float@box\z@
+  \dp\rot@float@box\z@
+  \vbox to \textheight{%
+    \setkeys{Grot}{units=360}%
+    \if@rot@twoside
+    \else
+      \let\R@@page\rot@LR
+    \fi
+    \ifthenelse{\isodd{\R@@page}}{%
+      \ifrot@messages
+        \if@rot@twoside
+  \rot@mess@toks\expandafter{\the\rot@mess@toks (right hand page)}%
+\fi
+      \fi
+      \vfill
+      \@@line{%
+        \hskip\rotFPtop
+        \rotatebox{90}{\box\rot@float@box}%
+        \hskip\rotFPbot
+      }%
+    }{%
+      \ifrot@messages
+        \if@rot@twoside
+  \rot@mess@toks\expandafter{\the\rot@mess@toks (left hand page)}%
+\fi
+      \fi%
+      \@@line{%
+        \hskip\rotFPbot
+        \rotatebox{-90}{\box\rot@float@box}%
+        \hskip\rotFPtop
+      }%
+      \vfill
+    }%
+    \rot@message{\the\rot@mess@toks}%
+  }%
+  \end@dblfloat
+}
+\newenvironment{sidewaystable*}
+               {\@rotdblfloat{table}}
+               {\end@rotdblfloat}
+\newenvironment{sidewaysfigure*}
+               {\@rotdblfloat{figure}}
+               {\end@rotdblfloat}
+
+\def\rot@thepage{\@arabic\c@page}
+\def\rot@label#1{\@bsphack
+  \rot@protected@write{\@auxout}{}%
+         {\string\newlabel{#1}{\rot@thepage}}%
+  \@esphack}
+\def\rot@pageref#1#2{%
+  \expandafter\ifx\csname r@#1\endcsname\relax
+    \global\@rot@refundefinedtrue
+    \def#2{0}%
+  \else
+    \edef#2{\csname r@#1\endcsname}%
+  \fi
+}
+\long\def\rot@protected@write#1#2#3{%
+  \begingroup
+    \let\rot@thepage\relax
+    #2%
+    \let\protect\@unexpandable@protect
+    \edef\reserved@a{\write#1{#3}}%
+    \reserved@a
+  \endgroup
+  \if@nobreak\ifvmode\nobreak\fi\fi
+}
+\newif\if@rot@refundefined
+\global\@rot@refundefinedfalse
+\newtoks\rot@mess@toks
+\def\rotcaption{\refstepcounter\@captype\@dblarg{\@rotcaption\@captype}}
+\long\def\@rotcaption#1[#2]#3{%
+  \addcontentsline{\csname ext@#1\endcsname}{#1}{%
+    \protect\numberline{\csname the#1\endcsname}{\ignorespaces #2}}%
+  \par
+  \begingroup
+    \@parboxrestore
+    \normalsize
+    \@makerotcaption{\csname fnum@#1\endcsname}{#3}%
+  \endgroup}
+  \long\def\@makerotcaption#1#2{%
+    \setbox\@tempboxa\hbox{#1: #2}%
+    \ifdim \wd\@tempboxa > .8\vsize
+      \rotatebox{90}{%
+        \begin{minipage}{.8\textheight}#1: #2\end{minipage}%
+      }%
+    \else%
+      \rotatebox{90}{\box\@tempboxa}%
+    \fi
+  \nobreak
+  \hspace{12pt}%
+}
+\endinput
+%%
+%% End of file `rotating.sty'.
