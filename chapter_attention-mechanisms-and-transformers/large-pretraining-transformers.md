@@ -80,7 +80,7 @@ Similar to BERT, T5 needs to be fine-tuned (updating T5 parameters) on task-spec
 After fine-tuning, the 11-billion-parameter T5 (T5-11B) achieved state-of-the-art results on multiple encoding (e.g., classification) and generation (e.g., summarization) benchmarks. Since released, T5 has been extensively used in later research. For example, switch transformers are designed based off T5 to activate a subset of the parameters for better computational efficiency :cite:`fedus2022switch`. In a text-to-image model called Imagen,
 text is input to a frozen T5 encoder (T5-XXL) with 4.6 billion  parameters :cite:`saharia2022photorealistic`. The photorealistic text-to-image examples in :numref:`fig_imagen` suggest that the T5 encoder alone may effectively represent text even without fine-tuning.
 
-![Text-to-image examples by the Imagen model, whose text encoder is from T5 (figures taken from :cite:`saharia2022photorealistic`).](../img/imagen.png)
+![Text-to-image examples by the Imagen model, whose text encoder is from T5 (figures taken from :cite:p:`saharia2022photorealistic`).](../img/imagen.png)
 :width:`700px`
 :label:`fig_imagen`
 
@@ -118,23 +118,23 @@ GPT-2 demonstrated potential of using the same language model for multiple tasks
 Before explaining the more computationally efficient use of language models without parameter update, recall :numref:`sec_rnn-scratch` that a language model can be trained to generate a text sequence conditional on some prefix text sequence. Thus, a pretrained language model may generate the task output as a sequence *without parameter update*, conditional on an input sequence with the task description, task-specific input-output examples, and a prompt (task input). This learning paradigm can be further categorized into *zero-shot*, *one-shot*, and *few-shot*, when there is no, one, or a few task-specific input-output examples, respectively (:numref:`fig_gpt-3-xshot`).
 
 
-![Aggregate performance of GPT-3 for all 42 accuracy-denominated benchmarks (caption adapted and figure taken from :cite:`brown2020language`)](../img/gpt3-xshot-scaling.png)
+![Aggregate performance of GPT-3 for all 42 accuracy-denominated benchmarks (caption adapted and figure taken from :cite:p:`brown2020language`).](../img/gpt3-xshot-scaling.png)
 :width:`400px`
 :label:`fig_gpt3-xshot-scaling`
 
-These three settings were tested in GPT-3 :cite:`brown2020language`, whose largest version uses data and model size about two orders of magnitude larger than those in GPT-2. GPT-3 uses the same transformer decoder architecture in its direct predecessor GPT-2 except that attention patterns (right of :numref:`fig_gpt-decoder-only`) are sparser at alternating layers. Pretrained with 300 billion tokens, GPT-3 performs better with larger model size, where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`). Although enjoying computational efficiency, GPT-3 few-shot learning underperformed the state-of-the-art fine-tuned models that require model updates. Nonetheless, GPT-3 has powered a wide range of downstream applications [across the Web](https://gpt3demo.com/): it was generating 4.5 billions words every day around nine months of its [API](https://openai.com/api/) release.
+These three settings were tested in GPT-3 :cite:p:`brown2020language`, whose largest version uses data and model size about two orders of magnitude larger than those in GPT-2. GPT-3 uses the same transformer decoder architecture in its direct predecessor GPT-2 except that attention patterns (right of :numref:`fig_gpt-decoder-only`) are sparser at alternating layers. Pretrained with 300 billion tokens, GPT-3 performs better with larger model size, where few-shot performance increases most rapidly (:numref:`fig_gpt3-xshot-scaling`). Although enjoying computational efficiency, GPT-3 few-shot learning underperformed the state-of-the-art fine-tuned models that require model updates. Nonetheless, GPT-3 has powered a wide range of downstream applications [across the Web](https://gpt3demo.com/): it was generating 4.5 billions words every day around nine months of its [API](https://openai.com/api/) release.
 
 ## Scalability
 
 :numref:`fig_gpt3-xshot-scaling` empirically demonstrates scalability of transformers in the GPT-3 language model. For language modeling, more comprehensive empirical studies on scalability of transformers had suggested training larger transformers with more data and compute :cite:`kaplan2020scaling`. 
 
-![Transformer language model performance improves smoothly as we increase the model size, dataset size, and amount of compute used for training. For optimal performance all three factors must be scaled up in tandem. Empirical performance has a power-law relationship with each individual factor when not bottlenecked by the other two (caption adapted and figure taken from :cite:`kaplan2020scaling`).](../img/scaling-power-law.png)
+![Transformer language model performance improves smoothly as we increase the model size, dataset size, and amount of compute used for training. For optimal performance all three factors must be scaled up in tandem. Empirical performance has a power-law relationship with each individual factor when not bottlenecked by the other two (caption adapted and figure taken from :cite:p:`kaplan2020scaling`).](../img/scaling-power-law.png)
 :width:`700px`
 :label:`fig_scaling-power-law3`
 
 As shown in :numref:`fig_scaling-power-law3`, precise *power-law scaling* can be observed in the performance with respect to the model size (number of parameters, excluding embedding layers), dataset size (number of training tokens), and amount of training compute (PetaFLOP/s-days, excluding embedding layers). In general, increasing all these three factors in tandem leads to better performance. However, *how* to increase them in tandem still remains a matter of debate :cite:`hoffmann2022training`.
 
-![Transformer language model training runs (figure taken from :cite:`kaplan2020scaling`).](../img/scaling-sample-conv.png)
+![Transformer language model training runs (figure taken from :cite:p:`kaplan2020scaling`).](../img/scaling-sample-conv.png)
 :width:`700px`
 :label:`fig_scaling-sample-conv`
 
@@ -142,8 +142,7 @@ Besides increased performance, large models also enjoy better sample efficiency 
 
 
 
-![GPT-3 performance (cross-entropy validation loss) follows a power-law trend with the amount of compute used for training. The power-law behavior observed in :cite:`kaplan2020scaling` continues for an additional two orders of magnitude with only small deviations from the
-predicted curve. Embedding parameters are excluded from compute and parameter counts (caption adapted and figure taken from :cite:`brown2020language`).](../img/scaling-gpt3.png)
+![GPT-3 performance (cross-entropy validation loss) follows a power-law trend with the amount of compute used for training. The power-law behavior observed in :cite:p:`kaplan2020scaling` continues for an additional two orders of magnitude with only small deviations from the predicted curve. Embedding parameters are excluded from compute and parameter counts (caption adapted and figure taken from :cite:p:`brown2020language`).](../img/scaling-gpt3.png)
 :width:`400px`
 :label:`fig_scaling-gpt3`
 
@@ -161,7 +160,7 @@ Transformers have been pretrained as encoder-only (e.g., BERT), encoder-decoder 
 a larger Parti is more capable of high-fidelity image generation and content-rich text understanding (:numref:`fig_parti`).
 
 
-![Image examples generated from the same text by the Parti model of increasing sizes (350M, 750M, 3B, 20B) (examples taken from :cite:`yu2022scaling`).](../img/parti.png)
+![Image examples generated from the same text by the Parti model of increasing sizes (350M, 750M, 3B, 20B) (examples taken from :cite:p:`yu2022scaling`).](../img/parti.png)
 :width:`700px`
 :label:`fig_parti`
 

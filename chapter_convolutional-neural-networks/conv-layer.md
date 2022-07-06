@@ -464,7 +464,7 @@ shapes. Later on, :cite:`Field.1987` illustrated this effect on natural
 images with, what can only be called, convolutional kernels. 
 We reprint a key figure in :numref:`field_visual` to illustrate the striking similarities. 
 
-![Figure and caption taken from :cite:`Field.1987`: An example of coding with six different channels. (Left) Examples of the six types of sensor associated with each channel. (Right) Convolution of the image in (Middle) with the six sensors shown in (Left). The response of the individual sensors is determined by sampling these filtered images at a distance proportional to the size of the sensor (shown with dots). This diagram shows the response of only the even symmetric sensors.](../img/field-visual.png)
+![Figure and caption taken from :cite:p:`Field.1987`: An example of coding with six different channels. (Left) Examples of the six types of sensor associated with each channel. (Right) Convolution of the image in (Middle) with the six sensors shown in (Left). The response of the individual sensors is determined by sampling these filtered images at a distance proportional to the size of the sensor (shown with dots). This diagram shows the response of only the even symmetric sensors.](../img/field-visual.png)
 :label:`field_visual`
 
 As it turns out, this relation even holds for the features computed by deeper layers of networks trained on image classification tasks, as demonstrated e.g., 

@@ -310,7 +310,7 @@ This leads to a further simplified design space
 $\text{AnyNetX}_C$ with virtually no change
 in error distributions (right of :numref:`fig_regnet-paper-fig5`).
 
-![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Sharing bottleneck ratio (from $\text{AnyNetX}_A$ to  $\text{AnyNetX}_B$) and sharing the number of groups (from $\text{AnyNetX}_B$ to $\text{AnyNetX}_C$) simplify the design space with virtually no change in error distributions (figure taken from :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig5.png)
+![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Sharing bottleneck ratio (from $\text{AnyNetX}_A$ to  $\text{AnyNetX}_B$) and sharing the number of groups (from $\text{AnyNetX}_B$ to $\text{AnyNetX}_C$) simplify the design space with virtually no change in error distributions (figure taken from :cite:p:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig5.png)
 :width:`600px`
 :label:`fig_regnet-paper-fig5`
 
@@ -325,7 +325,7 @@ to increase network depth across stages
 gives an even better $\text{AnyNetX}_E$
 (right of :numref:`fig_regnet-paper-fig7`).
 
-![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Increasing network width across stages (from $\text{AnyNetX}_C$ to  $\text{AnyNetX}_D$) and increasing network depth across stages (from $\text{AnyNetX}_D$ to $\text{AnyNetX}_E$) simplify the design space with improved  error distributions (figure taken from :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig7.png)
+![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Increasing network width across stages (from $\text{AnyNetX}_C$ to  $\text{AnyNetX}_D$) and increasing network depth across stages (from $\text{AnyNetX}_D$ to $\text{AnyNetX}_E$) simplify the design space with improved  error distributions (figure taken from :cite:p:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig7.png)
 :width:`600px`
 :label:`fig_regnet-paper-fig7`
 
