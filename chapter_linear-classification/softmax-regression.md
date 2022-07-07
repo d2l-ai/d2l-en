@@ -182,7 +182,7 @@ drawn from a normal distribution.
 In other words, $\mathbf{y} = \mathbf{o} + \mathbf{\epsilon}$,
 where $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$.
 This is the so-called [probit model](https://en.wikipedia.org/wiki/Probit_model),
-first introduced by :cite:t:`Fechner.1860`.
+first introduced by :citet:`Fechner.1860`.
 While appealing, it doesn't work quite as well
 or lead to a particularly nice optimization problem,
 when compared to the softmax.
@@ -216,7 +216,7 @@ $$
 
 
 The idea of a softmax dates back to Gibbs,
-who adapted ideas from physics :cite:p:`Gibbs.1902`.
+who adapted ideas from physics :citep:`Gibbs.1902`.
 Dating even further back, Boltzmann,
 the father of modern thermodynamics,
 used this trick to model a distribution

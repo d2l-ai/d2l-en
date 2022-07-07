@@ -94,7 +94,7 @@ The first modern CNN :cite:`Krizhevsky.Sutskever.Hinton.2012`, named
 *AlexNet* after one of its inventors, Alex Krizhevsky, is largely an evolutionary improvement
 over LeNet. It achieved excellent performance in the 2012 ImageNet challenge.
 
-![Image filters learned by the first layer of AlexNet (reproduced from :cite:p:`Krizhevsky.Sutskever.Hinton.2012`).](../img/filters.png)
+![Image filters learned by the first layer of AlexNet (reproduced from :citep:`Krizhevsky.Sutskever.Hinton.2012`).](../img/filters.png)
 :width:`400px`
 :label:`fig_filters`
 
