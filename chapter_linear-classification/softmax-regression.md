@@ -216,7 +216,7 @@ $$
 
 
 The idea of a softmax dates back to Gibbs,
-who adapted ideas from physics :citep:`Gibbs.1902`.
+who adapted ideas from physics :cite:`Gibbs.1902`.
 Dating even further back, Boltzmann,
 the father of modern thermodynamics,
 used this trick to model a distribution
