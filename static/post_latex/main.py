@@ -90,6 +90,40 @@ def _delete_discussions_title(lines):
             deletes.append(i)
     return delete_lines(lines, deletes)
 
+# Within \caption{} or \sphinxcaption{}: \hyperlink -> \protect\hyperlink
+def _protect_hyperlink_in_caption(lines):
+    def _get_num_extra_left_braces(l, num_extra_left_braces):
+        num = num_extra_left_braces
+        for char in l:
+            if char == '{':
+                num += 1
+            elif char == '}':
+                num -= 1
+                if num == 0:
+                    return 0
+        return num
+
+    i = 0
+    while i < len(lines):
+        if lines[i].startswith('\\caption{') or lines[i].startswith('\\sphinxcaption{'):
+            num_extra_left_braces = _get_num_extra_left_braces(lines[i], 0)
+            if num_extra_left_braces == 0:
+                j = i
+            else:
+                j = i + 1
+                while j < len(lines):
+                    num_extra_left_braces = _get_num_extra_left_braces(
+                            lines[j], num_extra_left_braces)
+                    if num_extra_left_braces == 0:
+                        break
+                    j += 1
+            # lines[i] -- lines[j] are within \caption{} or \sphinxcaption{}
+            for index in range(i, j + 1):
+                lines[index] = lines[index].replace('\\hyperlink', '\\protect\\hyperlink')
+            i = j + 1
+        else:
+            i += 1
+
 
 def main():
     tex_file = sys.argv[1]
@@ -99,6 +133,7 @@ def main():
     _unnumber_chaps_and_secs(lines)
     _sec_to_chap(lines)
     #lines = _delete_discussions_title(lines)
+    _protect_hyperlink_in_caption(lines)
 
     with open(tex_file, 'w') as f:
         f.write('\n'.join(lines))
