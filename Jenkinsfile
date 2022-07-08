@@ -65,20 +65,14 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       d2lbook build pdf --tab pytorch
       """
-      
-      if (env.BRANCH_NAME == 'release') {
+
+      if (env.BRANCH_NAME == 'classic') {
         sh label:"Release", script:"""set -ex
         conda activate ${ENV_NAME}
         d2lbook build pkg
-        d2lbook deploy html pdf pkg colab sagemaker slides --s3 s3://${LANG}.d2l.ai/
+        d2lbook deploy html pdf pkg colab sagemaker slides --s3 s3://classic.d2l.ai/
         """
 
-        sh label:"Release d2l", script:"""set -ex
-        conda activate ${ENV_NAME}
-        pip install setuptools wheel twine
-        python setup.py bdist_wheel
-        # twine upload dist/*
-        """
       } else {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
