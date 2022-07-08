@@ -6,7 +6,7 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 # Attention Scoring Functions
 :label:`sec_attention-scoring-functions`
 
-In :numref:`sec_nadaraya-watson`,
+In :numref:`sec_attention-pooling`,
 we used a Gaussian kernel to model
 interactions between queries and keys.
 Treating the exponent of the Gaussian kernel

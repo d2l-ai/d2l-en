@@ -18,7 +18,7 @@ Simplicity can come in the form
 of a small number of dimensions.
 We explored this when discussing the
 monomial basis functions of linear models
-in :numref:`sec_model_selection`.
+in :numref:`sec_generalization_basics`.
 Additionally, as we saw when discussing weight decay
 ($\ell_2$ regularization) in :numref:`sec_weight_decay`,
 the (inverse) norm of the parameters also

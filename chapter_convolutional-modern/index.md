@@ -28,9 +28,9 @@ convolves whole neural networks patch-wise over inputs
 multi-branch convolutions :cite:`Szegedy.Liu.Jia.ea.2015`; the residual
 network (ResNet) :cite:`He.Zhang.Ren.ea.2016`, which remains some of
 the most popular off-the-shelf architectures in computer vision;
-ResNeXt blocks :cite:`Xie.Girshick.Dollar.ea.2017` 
+ResNeXt blocks :cite:`Xie.Girshick.Dollar.ea.2017`
 for sparser connections;
-and 
+and
 the DenseNet
 :cite:`Huang.Liu.Van-Der-Maaten.ea.2017` for a generalization of the
 residual architecture.
@@ -39,7 +39,7 @@ assuming standard and fixed blocks,
 we progressively simplify design spaces with better models,
 leading
 to the RegNet
-:cite:`Radosavovic.Kosaraju.Girshick.ea.2020`. 
+:cite:`Radosavovic.Kosaraju.Girshick.ea.2020`.
 
 
 While the idea of *deep* neural networks is quite simple (stack
