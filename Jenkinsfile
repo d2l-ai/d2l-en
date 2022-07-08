@@ -57,7 +57,7 @@ stage("Build and Publish") {
 
       sh label:"Build PDF", script:"""set -ex
       conda activate ${ENV_NAME}
-      d2lbook build pdf --style cambridge
+      d2lbook build pdf
       """
 
       sh label:"Build MXNet PDF", script:"""set -ex
