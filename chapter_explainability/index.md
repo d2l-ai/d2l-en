@@ -7,5 +7,6 @@
 
 explainability-overview
 explainability-linear
+global-model-analysis
 ```
 
