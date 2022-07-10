@@ -405,7 +405,7 @@ for i in range(1, 100):
     v_in = A.dot(v_in)
     norm_list.append(np.linalg.norm(v_in))
 
-d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
+d2l.plot(np.arange(0, 100), np.array(norm_list), 'Iteration', 'Value')
 ```
 
 ```{.python .input}
