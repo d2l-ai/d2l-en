@@ -23,41 +23,40 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # What is Hyperparameter Optimization?
 :label:`sec_what_is_hpo`
 
-A deep neural network comes with a large number of weight and bias parameters, which
-are determined automatically by stochastic gradient descent (see Chapter :ref:`sec_sgd`).
+A deep neural network comes with a large number of weight and bias parameters. These parameters are learned (that is, estimated) during training. As we have seen in Chapter :ref:`sec_sgd`, stochastic gradient is a widely adopted algorithm suitable for this task.
 On top of these, every neural networks has additional **hyperparameters** that need to be configured by the user.
-For example, to ensure that stochastic gradient descent converges to a local optimum :ref:`chap_optimization`, we have to adjust the learning rate and batch size. To avoid overfitting on the training dataset :ref:`sec_polynomial`, we might have to set regularization parameters, such as weight decay :ref:`sec_weight_decay` or dropout :ref:`sec_dropout`. We can define the capacity and inductive bias of the model by setting the number of layers and number of units or filters per layer (i.e., the effective number
+For example, to ensure that stochastic gradient descent converges to a local optimum of the training loss :ref:`chap_optimization`, we have to adjust the learning rate and batch size. To avoid overfitting on the training dataset :ref:`sec_polynomial`, we might have to set regularization parameters, such as weight decay :ref:`sec_weight_decay` or dropout :ref:`sec_dropout`. We can define the capacity and inductive bias of the model by setting the number of layers and number of units or filters per layer (i.e., the effective number
 of weights).
 
 Unfortunately, we cannot simply adjust these hyperparameters by minimizing the training loss, because this would lead to overfitting on the training data. For example, setting regularization parameters, such as dropout :ref:`sec_dropout` or weight decay :ref:`sec_weight_decay` to zero leads to a small training loss, but might hurt the generalization performance.
 
 Without a different form of automation, hyperparameters have to be set manually in a
 trial-and-error fashion, in what amounts to a time-consuming and difficult part of machine
-learning workflows :cite:`hpo`. For example, consider training a ResNet :ref:`sec_resnet` on CIFAR-10, which takes on an Amazon Elastic Cloud Compute (EC2) g4dn.xlarge instance more than 2 hours. Even if we manually try only a small set of hyperparameters configurations (~10), this would already take us roughly one day. To make matters worse, hyperparameters are usually not directly transferable
+learning workflows :cite:`hpo`. For example, consider training a ResNet :ref:`sec_resnet` on CIFAR-10, which takes on an Amazon Elastic Cloud Compute (EC2) g4dn.xlarge instance more than 2 hours. Even if we manually try only a small set of hyperparameters configurations (~10) in sequence, this would already take us roughly one day. To make matters worse, hyperparameters are usually not directly transferable
 across architectures and datasets :cite:`feurer-arxiv22`,`wistuba-ml18`,`bardenet-icml13a`,
 and need to be re-optimized for every new task. Also, for most hyperparameters,
 there are no rule-of-thumbs, and expert knowledge is required to find sensible values.
 
 Hyperparameter optimization (HPO) algorithms are designed to tackle this problem in 
 a principled and automated fashion :cite:`feurer-automlbook18a`, by framing it as a global optimization problem.
-The default objective is an error metric on a hold-out validation dataset, but could
+The default objective is the error on a hold-out validation dataset, but could
 in principle be any other business metric. It can be combined with or constrained by
-secondary objectives such as training time, inference time, or model complexity. 
+secondary objectives (see :ref:'sec_hpo_advanced'), such as training time, inference time, or model complexity. 
 
 
-More recently, hyperparameter optimization has been extended to **neural architecture
+Recently, hyperparameter optimization has been extended to **neural architecture
 search (NAS)** :cite:`elsken-arxiv18a`,`wistuba-arxiv19`, where the goal is to find
 entirely new neural network architectures. Compared to classical HPO, NAS is even more
-expensive in terms of computation nd requires additional efforts to remain feasible in
-practice. Both HPO and NAS can be considered as sub-fields of 
+expensive in terms of computation and requires additional efforts to remain feasible in
+practice. Both, HPO and NAS can be considered as sub-fields of 
 AutoML :cite:`hutter-book19a`, which aims to automated the entire ML pipeline.
 
-In this section we will introduce HPO and show how we can automatically find the best hyperparameters of an logistic regression example, introduced in :ref:`sec_softmax_concise`, which minimize the classification error on the hold-out validation dataset. 
+In this section we will introduce HPO and show how we can automatically find the best hyperparameters of the logistic regression example introduced in :ref:`sec_softmax_concise`. 
 
 ##  The Optimization Problem
 :label:`sec_definition_hpo`
 
-We will start with a simple toy problem, searching for the learning rate of the multi-class logistic regression model from :ref:sec_sgd to minimizes the validation error on the Fashion MNIST dataset. While other hyperparameters
+We will start with a simple toy problem: searching for the learning rate of the multi-class logistic regression model from :ref:sec_sgd to minimize the validation error on the Fashion MNIST dataset. While other hyperparameters
 like batch size or number of epochs are also worth tuning, we focus on learning
 rate alone for simplicity.
 
@@ -87,12 +86,12 @@ class SoftmaxClassification(d2l.Classification): #@save
 ]
 ```
 
-Before we can run HPO, we first need to define two ingredients: the objective function and the search space
+Before we can run HPO, we first need to define two ingredients: the objective function and the search space.
 
 ### The Objective Function
 
 
-The performance of a learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from the hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation error. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning model, which can be time and compute intensive in the case of deep neural networks trained on large datasets. Now, given our criterion $f(\mathbf{x})$ our goal is to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. 
+The performance of a learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from the hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation loss. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning model, which can be time and compute intensive in the case of deep neural networks trained on large datasets. Now, given our criterion $f(\mathbf{x})$ our goal is to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. 
 
 There is no simple way to compute gradients of $f$ with respect to $\mathbf{x}$, because it would require to propagate the gradient through the entire training process. While there is recent work :cite:`maclaurin-icml15`,`franceschi-icml17a` to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here. Furthermore, the computational burden of evaluating $f$ requires HPO algorithms to approach the global optimum with as few samples as possible.
 
@@ -101,7 +100,7 @@ The training of neural networks is stochastic (e.g., weights are randomly initia
 Faced with all these challenges, we usually try to identify a small set of well performing hyperparameter configurations quickly, instead of hitting the global optima exactly. However, due to large computational demands of most neural networks models, even this can take days or weeks of compute. We will explore in further sections :ref:`sec_mf_hpo`, how we can speed-up the optimization process by either distributing the search or using cheaper-to-evaluate approximations of the objective function.
 
 
-Now, since we would like to optimize the validation error, we need to add a function computing this metric.
+Now, since we would like to optimize the validation error, we need to add a function computing this quantity.
 
 ```{.python .input  n=3}
 %%tab all
@@ -168,7 +167,7 @@ search_space = {
 ```
 
 Each hyperparameter has a data type, such as `float` for `learning_rate`, as well as a closed bounded range
-(i.e., lower and upper bounds). We usually also assign a prior distribution (e.g normal) to each hyperparameter. Some positive parameters, such as `learning_rate`, are best represented on a logarithmic scale as optimal values can differ by several orders of magnitude, while others come with linear scale.
+(i.e., lower and upper bounds). We usually also assign a prior distribution (e.g uniform or log-uniform) to each hyperparameter. Some positive parameters, such as `learning_rate`, are best represented on a logarithmic scale as optimal values can differ by several orders of magnitude, while others come with linear scale.
 
 Below we show a simple example search spaces consisting of typical hyperparameters of feed-forward neural networks including their type and standard ranges.
 
@@ -185,7 +184,7 @@ The search spaces plays an important role for hyperparameter optimization, since
 ## Random Search
 
 Now, we look at the first algorithm to solve our hyperparameter optimization problem: random search. 
-The main idea of random search is to independently sample configurations from the search space until a predefined budget (e.g maximum number of iterations) is exhausted. The evaluation can be executed sequentially (as we do here) or in parallel (see Section :ref:`sec_rs`).
+The main idea of random search is to independently sample configurations from the search space until a predefined budget (e.g maximum number of iterations) is exhausted and to return the best observed configuration. The evaluation can be executed sequentially (as we do here) or in parallel (see Section :ref:`sec_rs`).
 
 We sample the learning rate from log uniform distribution, since it usually changes on a logarithmic scale.
 
@@ -325,7 +324,7 @@ print(f'optimal learning rate = {values[best_idx]}')
 
 Arguably because of its simplicity, random search is one of the most frequently used HPO algorithms. It doesn't require any sophisticated implementation and can be applied to any hyperparameter type.
 
-Below we plot the validation error of each hyperparameter configuration we just evaluated. We can see
+Below we plot the validation error of each hyperparameter configuration we just evaluated.
 
 ```{.python .input  n=8}
 import matplotlib.pyplot as plt
@@ -353,9 +352,9 @@ plt.show()
 ]
 ```
 
-Unfortunately random search comes with a few shortcomings. First, it does not adapt the sampling distribution based on the observed data points. Hence, it is equally likely to sample a poorly performing configurations again than a better performing configuration. Second, the same amount of resources are spend for all configurations, even though they are less likely to outperform previously seen configurations.
+Unfortunately random search comes with a few shortcomings. First, it does not adapt the sampling distribution based on the previous observations it collected. Hence, it is equally likely to sample a poorly performing configurations  than a better performing configuration. Second, the same amount of resources are spend for all configurations, even though they are less likely to outperform previously seen configurations.
 
-In the next sections we will look at more sample efficient hyperparameter optimization algorithms that overcome the shortcomings of random search by using a model that guides the search. We will also look at algorithms that exploit auxiliary signals to speed up the expensive optimization process substantially.
+In the next sections we will look at more sample efficient hyperparameter optimization algorithms that overcome the shortcomings of random search by using a model to guide the search. We will also look at algorithms that automatically stop the evaluation process of poorly performing configurations.
 
 # Summary
 
