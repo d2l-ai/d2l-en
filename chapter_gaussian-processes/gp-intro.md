@@ -28,6 +28,21 @@ The plot looks somewhat cleaner if we remove the posterior samples, simply visua
 
 ![datafitcredibleset](https://user-images.githubusercontent.com/6753639/178249137-23af70e9-0753-4491-9215-7a757ff60652.png)
 
+The properties of the Gaussian process that we used to fit the data are strongly controlled by what's called a _covariance function_, also known as a _kernel_. The covariance function we used is called the _RBF (Radial Basis Function) kernel_, which has the form
+$$ k_{\text{RBF}}(x,x') = \text{cov}(f(x),f(x')) = a^2 \exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right) $$
+
+The _hyperparameters_ of this kernel are interpretable. The _amplitude_ parameter $a$ controls the vertical scale over which the function is varying, and the _length-scale_ parameter $\ell$ controls the rate of variation (the wiggliness) of the function. Larger $a$ means larger function values, and larger $\ell$ means more slowly varying functions. Let's see what happens to our sample prior and posterior functions as we vary $a$ and $\ell$. 
+
+The _length-scale_ has a particularly pronounced effect on the predictions and uncertainty of a GP. At $||x-x'|| = \ell$, the covariance between a pair of function values is $a^2\exp(-0.5)$. At larger distances than $\ell$, the values of the function values becomes nearly uncorrelated. This means that if we want to make a prediction at a point $x_*$, then function values with inputs $x$ such that $||x-x'||>\ell$ will not have a strong effect on our predictions. 
+
+Let's see how changing the lengthscale affects sample prior and posterior functions, and credible sets. The above fits use a length-scale of $2$. Let's now consider $\ell = 0.1, 0.5, 2, 5, 10$. A length-scale of $0.1$ is very small relative to the range of the input domain we are considering, $25$. For example, the values of the function at $x=5$ and $x=10$ will have essentially no correlation at such a length-scale. On the other hand, for a length-scale of $10$, the function values at these inputs will be highly correlated. 
+
+
+
+
+
+
+
 
 
 
