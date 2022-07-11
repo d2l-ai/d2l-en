@@ -444,7 +444,7 @@ norm_ratio_list = []
 for i in range(1, 100):
     norm_ratio_list.append(norm_list[i]/norm_list[i - 1])
 
-d2l.plot(np.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
+d2l.plot(np.arange(1, 100), np.array(norm_ratio_list), 'Iteration', 'Ratio')
 ```
 
 ```{.python .input}
@@ -568,7 +568,7 @@ for i in range(1, 100):
     v_in = A.dot(v_in)
     norm_list.append(np.linalg.norm(v_in))
 
-d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
+d2l.plot(np.arange(0, 100), np.array(norm_list), 'Iteration', 'Value')
 ```
 
 ```{.python .input}
@@ -612,7 +612,7 @@ norm_ratio_list = []
 for i in range(1, 100):
     norm_ratio_list.append(norm_list[i]/norm_list[i-1])
 
-d2l.plot(np.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
+d2l.plot(np.arange(1, 100), np.array(norm_ratio_list), 'Iteration', 'Ratio')
 ```
 
 ```{.python .input}
