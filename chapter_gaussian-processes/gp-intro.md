@@ -96,18 +96,16 @@ $$
 \begin{bmatrix}
 f(x) \\ 
 f(x_1) \\
-f(x_2) \\ 
 \vdots \\ 
 f(x_n)
 \end{bmatrix}
 \sim
 \mathcal{N}\left(\mu, 
 \begin{bmatrix}
-k(x,x_1) & k(x, x_2) & \dots & k(x,x_n) \\
-k(x_1,x_1) & k(x_1,x_2) & \dots & k(x_1,x_n) \\
-k(x_2,x_1) & k(x_2,x_2) & \dots & k(x_2,x_n) \\
+k(x,x) & k(x, x_1) & \dots & k(x,x_n) \\
+k(x_1,x) & k(x_1,x_1) & \dots & k(x_1,x_n) \\
 \vdots & \vdots & \ddots & \vdots \\
-k(x_n, x_1) & k(x_n, x_2) & \dots & k(x_n,x_n)
+k(x_n, x) & k(x_n, x_1) & \dots & k(x_n,x_n)
 \end{bmatrix}
 \right)
 $$
