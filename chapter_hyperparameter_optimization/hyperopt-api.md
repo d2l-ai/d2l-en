@@ -183,7 +183,7 @@ def bookkeeping(self, config, error, runtime):
 ### Example: Optimizing the Hyperparameters of a Convolutional Neural Network
 
 
-We now use our new implementation of random search to optimize the **batch size** and **learning rate** of a convolutional neural networks from :ref:`sec_alexnet`. For that, we first have to d
+We now use our new implementation of random search to optimize the *batch size* and *learning rate* of a convolutional neural networks from :ref:`sec_alexnet`. For that, we first have to define the objective function:
 
 ```{.python .input  n=18}
 from d2l import torch as d2l
@@ -199,7 +199,7 @@ def objective(config, max_epochs=8):
     return validation_error    
 ```
 
-The search space is defines by:
+and the search space:
 
 ```{.python .input  n=15}
 from scipy import stats
@@ -209,6 +209,8 @@ search_space = {
    "batch_size": stats.randint(8, 128),
 } 
 ```
+
+Now we can start our random search:
 
 ```{.python .input}
 from d2l import torch as d2l
@@ -221,7 +223,7 @@ tuner = d2l.HPOTuner(scheduler=scheduler, objective=objective)
 tuner.run(number_of_trials=5)
 ```
 
-Now we can plot the optimization trajectory of the incumbent to get the any-time
+Below we plot the optimization trajectory of the incumbent to get the any-time
 performance of random search:
 
 ```{.python .input  n=11}
@@ -262,7 +264,3 @@ To illustrate this, we compare random search (see :ref:'sec_rs') and Bayesian op
 ## Summary
 
 ## Exercise
-
-```{.python .input}
-
-```
