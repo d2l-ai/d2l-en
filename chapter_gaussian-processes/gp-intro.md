@@ -2,7 +2,7 @@
 
 In many cases, machine learning amounts to estimating parameters from data. These parameters are often numerous and  relatively uninterpretable --- such as the weights of a neural network. Gaussian processes, by contrast, provide a mechanism for directly reasoning about the high-level properties of functions that could fit our data. For example, we may have a sense of whether the functions that fit our data are quickly varying, periodic, involve conditional independencies, or translation invariance. Gaussian processes enable us to easily incorporate these properties into our model, by directly specifying a Gaussian distribution over the function values that could fit our data. 
 
-Let's get a feel for how Gaussian processes, by working with some examples.
+Let's get a feel for how Gaussian processes operate, by starting with some examples.
 
 Suppose we observe the following dataset, of regression targets (outputs), y, indexed by inputs, x. As an example, the targets could be changes in carbon dioxide concentrations, and the inputs could be the times at which these targets have been recorded. What are some features of the data? How quickly does it seem to varying? Do we have data points collected at regular intervals, or are there missing inputs? How would you imagine filling in the missing regions, or forecasting up until x=25?
 
