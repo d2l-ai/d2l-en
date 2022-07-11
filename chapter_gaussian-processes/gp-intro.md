@@ -86,7 +86,11 @@ Now, let's vary the amplitude parameter, holding the length-scale fixed at $2$. 
 
 We see the amplitude parameter affects the scale of the function, but not the rate of variation. At this point, we also have the sense that the generalization performance of our procedure will depend on having reasonable values for these hyperparameters. Values of $\ell=2$ and $a=1$ appeared to provide reasonable fits, while some of the other values did not. Fortunately, there is a robust and automatic way to specify these hyperparameters, using what is called the _marginal likelihood_, which we will return to in the notebook on inference. 
 
-So what is a GP, really? As we started, a GP simply says that any collection of function values $f(x_1),\dots,f(x_n)$, indexed by any collection of inputs $x_1,\dots,x_n$ has a joint multivariate Gaussian distribution. The mean vector $\mu$ of this distribution is given by a _mean function_, which is typically taken to be a constant or zero. The covariance matrix of this distribution is given by the _kernel_ evaluated at all pairs of the inputs $x$. 
+So what is a GP, really? As we started, a GP simply says that any collection of function values 
+$f(x_1),\dots,f(x_n)$, 
+indexed by any collection of inputs 
+$x_1,\dots,x_n$ 
+has a joint multivariate Gaussian distribution. The mean vector $\mu$ of this distribution is given by a _mean function_, which is typically taken to be a constant or zero. The covariance matrix of this distribution is given by the _kernel_ evaluated at all pairs of the inputs $x$. 
 
 $$
 \begin{bmatrix}
