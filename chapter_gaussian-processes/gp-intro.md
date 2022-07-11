@@ -71,7 +71,42 @@ Now, let's vary the amplitude parameter, holding the length-scale fixed at $2$. 
 ![priora16](https://user-images.githubusercontent.com/6753639/178252311-b9a5c51f-a0f8-4d65-ba5e-1f8b917c0d7c.png)
 ![posta16](https://user-images.githubusercontent.com/6753639/178252339-db99413b-78f7-41f7-8c6b-92fe10d634a4.png)
 
+We see the amplitude parameter affects the scale of the function, but not the rate of variation. At this point, we also have the sense that the generalization performance of our procedure will depend on having reasonable values for these hyperparameters. Values of $\ell=2$ and $a=1$ appeared to provide reasonable fits, while some of the other values did not. Fortunately, there is a robust and automatic way to specify these hyperparameters, using what is called the _marginal likelihood_, which we will return to in the notebook on inference. 
 
+So what is a GP, really? As we started, a GP simply says that any collection of function values $f(x_1),\dots,f(x_n)$, indexed by any collection of inputs $x_1,\dots,x_n$ has a joint multivariate Gaussian distribution. The mean vector $\mu$ of this distribution is given by a _mean function_, which is typically taken to be a constant or zero. The covariance matrix of this distribution is given by the _kernel_ evaluated at all pairs of the inputs $x$. 
+
+$$
+\begin{bmatrix}
+f(x) \\ 
+f(x_1) \\
+f(x_2) \\ 
+\vdots \\ 
+f(x_n)
+\end{bmatrix}
+\sim
+\mathcal{N}\left(\mu, 
+\begin{bmatrix}
+k(x,x_1) & k(x, x_2) & \dots & k(x,x_n) \\
+k(x_1,x_1) & k(x_1,x_2) & \dots & k(x_1,x_n) \\
+k(x_2,x_1) & k(x_2,x_2) & \dots & k(x_2,x_n) \\
+\vdots & \vdots & \ddots & \vdots \\
+k(x_n, x_1) & k(x_n, x_2) & \dots & k(x_n,x_n)
+\end{bmatrix}
+\right)
+$$
+
+The above equation specifies a GP prior. We can compute the conditional distribution of $f(x)$ for any $x$ given $f(x_1), \dots, f(x_n)$, the function values we have observed. This conditional distribution is called the _posterior_, and it is what we use to make predictions.
+
+In particular, 
+$f(x) | f(x_1), \dots, f(x_n) \sim \mathcal{N}(m,s^2)$  where
+$m = k(x,x_{1:n}) k(x_{1:n},x_{1:n})^{-1} f(x_{1:n})$ and 
+$v^2 = k(x,x) - k(x,x_{1:n})k(x_{1:n},x_{1:n})^{-1}k(x,x_{1:n})$. $k(x,x_{1:n})$ is a $1 \times n$ vector formed by evaluating $k(x,x_{i})$ for $i=1,\dots,n$ and $k(x_{1:n},x_{1:n})$ is an $n \times n$ matrix formed by evaluating $k(x_i,x_j)$ for $i,j = 1,\dots,n$. $m$ is what we can use as a point predictor for any $x$, and $s^2$ is what we use for uncertainty: if we want to create an interval with a 95% probability that $f(x)$ is in the interval, we would use $m \pm 2s$. 
+
+<Add example of how we can sequentially condition on a growing set of data-points and update the Gaussian process distribution over functions>
+
+In this introductory notebook, we have been considering _noise free_ observations. As we will see, it easy to include observation noise. If we assume that the data are generated from a latent noise free function $f(x)$ plus iid Gaussian noise $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$ with variance $\sigma^2$, then our covariance function simply becomes $k(x,x') \to k(x,x') + \delta_{ij}\sigma^2$, where $\delta_{ij} = 1$ if $i=j$ and $0$ otherwise.
+
+We've already started getting some intuition about how we can use a Gaussian process to specify a prior and posterior over solutions, and how the kernel function affects the properties of these solutions. In the following notebooks, we'll precisely show how to specify a Gaussian process prior, introduce and derive various kernel functions, and then go through the mechanics of how to automatically learn kernel hyperparameters, and form a Gaussian process posterior to make predictions. While it takes time and practice to get used to concepts such as a "distributions over functions", the actual mechanics of finding the GP predictive equations is actually quite simple --- making it easy to get practice to form an intuitive understanding of these concepts.
 
 
 
