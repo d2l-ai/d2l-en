@@ -102,7 +102,7 @@ $f(x) | f(x_1), \dots, f(x_n) \sim \mathcal{N}(m,s^2)$  where
 $m = k(x,x_{1:n}) k(x_{1:n},x_{1:n})^{-1} f(x_{1:n})$ and 
 $v^2 = k(x,x) - k(x,x_{1:n})k(x_{1:n},x_{1:n})^{-1}k(x,x_{1:n})$. $k(x,x_{1:n})$ is a $1 \times n$ vector formed by evaluating $k(x,x_{i})$ for $i=1,\dots,n$ and $k(x_{1:n},x_{1:n})$ is an $n \times n$ matrix formed by evaluating $k(x_i,x_j)$ for $i,j = 1,\dots,n$. $m$ is what we can use as a point predictor for any $x$, and $s^2$ is what we use for uncertainty: if we want to create an interval with a 95% probability that $f(x)$ is in the interval, we would use $m \pm 2s$. 
 
-<Add example of how we can sequentially condition on a growing set of data-points and update the Gaussian process distribution over functions>
+(Add example of how we can sequentially condition on a growing set of data-points and update the Gaussian process distribution over functions)
 
 In this introductory notebook, we have been considering _noise free_ observations. As we will see, it easy to include observation noise. If we assume that the data are generated from a latent noise free function $f(x)$ plus iid Gaussian noise $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$ with variance $\sigma^2$, then our covariance function simply becomes $k(x,x') \to k(x,x') + \delta_{ij}\sigma^2$, where $\delta_{ij} = 1$ if $i=j$ and $0$ otherwise.
 
