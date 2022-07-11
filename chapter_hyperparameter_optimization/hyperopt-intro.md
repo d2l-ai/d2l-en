@@ -325,7 +325,7 @@ print(f'optimal learning rate = {values[best_idx]}')
 
 Arguably because of its simplicity, random search is one of the most frequently used HPO algorithms. It doesn't require any sophisticated implementation and can be applied to any hyperparameter type.
 
-Below we plot the validation error of each hyperparameter configuration we just evaluated. We can see 
+Below we plot the validation error of each hyperparameter configuration we just evaluated. We can see
 
 ```{.python .input  n=8}
 import matplotlib.pyplot as plt
