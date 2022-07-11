@@ -13,7 +13,7 @@ a central problem domain for *sequence transduction* models
 that transform input sequences into output sequences.
 Playing a crucial role in various modern AI applications,
 sequence transduction models will form the focus of the remainder of this chapter
-and :numref:`chap_attention`.
+and :numref:`chap_attention-and-transformers`.
 To this end,
 this section introduces the machine translation problem
 and its dataset that will be used later.

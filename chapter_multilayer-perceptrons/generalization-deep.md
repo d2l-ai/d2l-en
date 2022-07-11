@@ -1,7 +1,7 @@
 # Generalization in Deep Learning
 
 
-In :numref:`chap_linear` and :numref:`chap_classification`,
+In :numref:`chap_regression` and :numref:`chap_classification`,
 we tackled regression and classification problems
 by fitting linear models to training data.
 In both cases, we provided practical algorithms
@@ -170,7 +170,7 @@ tend to have a level of complexity that grows
 as the amount of available data grows.
 
 Perhaps the simplest example of a nonparametric model
-is the $k$-nearest neighbor algorithm (we will cover more nonparametric models later, such as in :numref:`sec_nadaraya-watson`).
+is the $k$-nearest neighbor algorithm (we will cover more nonparametric models later, such as in :numref:`sec_attention-pooling`).
 Here, at training time,
 the learner simply memorizes the dataset.
 Then, at prediction time,
@@ -272,7 +272,7 @@ Training models until they interpolate noisy data is typically a bad idea.
 
 ## Classical Regularization Methods for Deep Networks
 
-In :numref:`chap_linear`, we described
+In :numref:`chap_regression`, we described
 several  classical regularization techniques
 for constraining the complexity of our models.
 In particular, :numref:`sec_weight_decay`

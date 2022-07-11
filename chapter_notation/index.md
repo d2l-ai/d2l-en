@@ -1,17 +1,20 @@
 # Notation
 :label:`chap_notation`
 
-Throughout this book, we adhere to the following notational conventions.
+Throughout this book, we adhere 
+to the following notational conventions.
 Note that some of these symbols are placeholders,
 while others refer to specific objects.
 As a general rule of thumb, 
-the indefinite article "a" indicates
+the indefinite article "a" often indicates
 that the symbol is a placeholder
 and that similarly formatted symbols
 can denote other objects of the same type.
 For example, "$x$: a scalar" means 
 that lowercased letters generally
-represent scalar values.
+represent scalar values,
+but "$\mathbb{Z}$: the set of integers"
+refers specifically to the symbol $\mathbb{Z}$.
 
 
 
@@ -21,7 +24,7 @@ represent scalar values.
 * $\mathbf{x}$: a vector
 * $\mathbf{X}$: a matrix
 * $\mathsf{X}$: a general tensor
-* $\mathbf{I}$: an identity matrix---square, with $1$ on all diagonal entries and $0$ on all off-diagonals
+* $\mathbf{I}$: the identity matrix (of some given dimension), i.e., a square matrix with $1$ on all diagonal entries and $0$ on all off-diagonals
 * $x_i$, $[\mathbf{x}]_i$: the $i^\mathrm{th}$ element of vector $\mathbf{x}$
 * $x_{ij}$, $x_{i,j}$,$[\mathbf{X}]_{ij}$, $[\mathbf{X}]_{i,j}$: the element of matrix $\mathbf{X}$ at row $i$ and column $j$.
 
@@ -79,7 +82,7 @@ represent scalar values.
 
 * $X$: a random variable
 * $P$: a probability distribution
-* $X \sim P$: the random variable $X$ has distribution $P$
+* $X \sim P$: the random variable $X$ follows distribution $P$
 * $P(X=x)$: the probability assigned to the event where random variable $X$ takes value $x$
 * $P(X \mid Y)$: the conditional probability distribution of $X$ given $Y$
 * $p(\cdot)$: a probability density function (PDF) associated with distribution P

@@ -457,24 +457,24 @@ needs a larger receptive field
 to detect input features over a broader area,
 we can build a deeper network.
 
-Receptive fields derive their name from neurophysiology. In a series of experiments :cite:`Hubel.Wiesel.1959,Hubel.Wiesel.1962,Hubel.Wiesel.1968` on a range of animals 
-and different stimuli, Hubel and Wiesel explored the response of what is called the visual 
-cortex on said stimuli. By and large they found that lower levels respond to edges and related 
-shapes. Later on, :cite:`Field.1987` illustrated this effect on natural 
-images with, what can only be called, convolutional kernels. 
-We reprint a key figure in :numref:`field_visual` to illustrate the striking similarities. 
+Receptive fields derive their name from neurophysiology. In a series of experiments :cite:`Hubel.Wiesel.1959,Hubel.Wiesel.1962,Hubel.Wiesel.1968` on a range of animals
+and different stimuli, Hubel and Wiesel explored the response of what is called the visual
+cortex on said stimuli. By and large they found that lower levels respond to edges and related
+shapes. Later on, :citet:`Field.1987` illustrated this effect on natural
+images with, what can only be called, convolutional kernels.
+We reprint a key figure in :numref:`field_visual` to illustrate the striking similarities.
 
 ![Figure and caption taken from :cite:`Field.1987`: An example of coding with six different channels. (Left) Examples of the six types of sensor associated with each channel. (Right) Convolution of the image in (Middle) with the six sensors shown in (Left). The response of the individual sensors is determined by sampling these filtered images at a distance proportional to the size of the sensor (shown with dots). This diagram shows the response of only the even symmetric sensors.](../img/field-visual.png)
 :label:`field_visual`
 
-As it turns out, this relation even holds for the features computed by deeper layers of networks trained on image classification tasks, as demonstrated e.g., 
-in :cite:`Kuzovkin.Vicente.Petton.ea.2018`. Suffice it to say, convolutions have proven to be an incredibly powerful tool for computer vision, both in biology and in code. As such, it is not surprising (in hindsight) that they heralded the recent success in deep learning. 
+As it turns out, this relation even holds for the features computed by deeper layers of networks trained on image classification tasks, as demonstrated e.g.,
+in :cite:`Kuzovkin.Vicente.Petton.ea.2018`. Suffice it to say, convolutions have proven to be an incredibly powerful tool for computer vision, both in biology and in code. As such, it is not surprising (in hindsight) that they heralded the recent success in deep learning.
 
 ## Summary
 
-The core computation required for a convolutional layer is a cross-correlation operation. We saw that a simple nested for-loop is all that is required to compute its value. If we have multiple input and multiple output channels, we are  performing a matrix-matrix operation between channels. As can be seen, the computation is straightforward and, most importantly, highly *local*. This affords significant hardware optimization and many recent results in computer vision are only possible due to that. After all, it means that chip designers can invest into fast computation rather than memory, when it comes to optimizing for convolutions. While this may not lead to optimal designs for other applications, it opens the door to ubiquitous and affordable computer vision. 
+The core computation required for a convolutional layer is a cross-correlation operation. We saw that a simple nested for-loop is all that is required to compute its value. If we have multiple input and multiple output channels, we are  performing a matrix-matrix operation between channels. As can be seen, the computation is straightforward and, most importantly, highly *local*. This affords significant hardware optimization and many recent results in computer vision are only possible due to that. After all, it means that chip designers can invest into fast computation rather than memory, when it comes to optimizing for convolutions. While this may not lead to optimal designs for other applications, it opens the door to ubiquitous and affordable computer vision.
 
-In terms of convolutions themselves, they can be used for many purposes such as to detect edges and lines, to blur images, or to sharpen them. Most importantly, it is not necessary that the statistician (or engineer) invents suitable filters. Instead, we can simply *learn* them from data. This replaces feature engineering heuristics by evidence-based statistics. Lastly, and quite delightfully, these filters are not just advantageous for building deep networks but they also correspond to receptive fields and feature maps in the brain. This gives us confidence that we are on the right track. 
+In terms of convolutions themselves, they can be used for many purposes such as to detect edges and lines, to blur images, or to sharpen them. Most importantly, it is not necessary that the statistician (or engineer) invents suitable filters. Instead, we can simply *learn* them from data. This replaces feature engineering heuristics by evidence-based statistics. Lastly, and quite delightfully, these filters are not just advantageous for building deep networks but they also correspond to receptive fields and feature maps in the brain. This gives us confidence that we are on the right track.
 
 ## Exercises
 
@@ -483,9 +483,9 @@ In terms of convolutions themselves, they can be used for many purposes such as 
     1. What happens if you transpose `X`?
     1. What happens if you transpose `K`?
 1. Design some kernels manually.
-    1. Given a directional vector $\mathbf{v} = (v_1, v_2)$, derive an edge-detection kernel that detects 
-       edges orthogonal to $\mathbf{v}$, i.e., edges in the direction $(v_2, -v_1)$. 
-    1. Derive a finite difference operator for the second derivative. What is the minimum 
+    1. Given a directional vector $\mathbf{v} = (v_1, v_2)$, derive an edge-detection kernel that detects
+       edges orthogonal to $\mathbf{v}$, i.e., edges in the direction $(v_2, -v_1)$.
+    1. Derive a finite difference operator for the second derivative. What is the minimum
        size of the convolutional kernel associate with it? Which structures in images respond most strongly to it?
     1. How would you design a blur kernel? Why might you want to use such a kernel?
     1. What is the minimum size of a kernel to obtain a derivative of order $d$?

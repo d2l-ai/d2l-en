@@ -3,7 +3,7 @@
 tab.interact_select(['pytorch'])
 ```
 
-# Vision Transformer
+# Transformers for Vision
 :label:`sec_vision-transformer`
 
 The transformer architecture was initially proposed for sequence to sequence learning, such as for machine translation. 
@@ -106,6 +106,7 @@ d2l.check_shape(patch_emb(X),
 ```
 
 ## Vision Transformer Encoder
+:label:`subsec_vit-encoder`
 
 The MLP of the vision transformer encoder
 is slightly different from the position-wise FFN of the original transformer encoder (see :numref:`subsec_positionwise-ffn`). First, here the activation function uses the Gaussian error linear unit (GELU), which can be considered as a smoother version of the ReLU :cite:`hendrycks2016gaussian`.

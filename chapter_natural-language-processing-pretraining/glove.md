@@ -2,7 +2,7 @@
 :label:`sec_glove`
 
 
-Word-word co-occurrences 
+Word-word co-occurrences
 within context windows
 may carry rich semantic information.
 For example,
@@ -39,12 +39,12 @@ we have
 
 $$q_{ij}=\frac{\exp(\mathbf{u}_j^\top \mathbf{v}_i)}{ \sum_{k \in \mathcal{V}} \text{exp}(\mathbf{u}_k^\top \mathbf{v}_i)},$$
 
-where 
+where
 for any index $i$
 vectors $\mathbf{v}_i$ and $\mathbf{u}_i$
 represent word $w_i$
 as the center word and context word,
-respectively, and $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$ 
+respectively, and $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$
 is the index set of the vocabulary.
 
 Consider word $w_i$
@@ -63,21 +63,21 @@ suppose that word $w_i$ occurs twice in the corpus
 and indices of the context words
 that take $w_i$ as their center word
 in the two context windows
-are 
+are
 $k, j, m, k$ and $k, l, k, j$.
-Thus, multiset $\mathcal{C}_i = \{j, j, k, k, k, k, l, m\}$, where 
+Thus, multiset $\mathcal{C}_i = \{j, j, k, k, k, k, l, m\}$, where
 multiplicities of elements $j, k, l, m$
 are 2, 4, 1, 1, respectively.
 
 Now let's denote the multiplicity of element $j$ in
 multiset $\mathcal{C}_i$ as $x_{ij}$.
-This is the global co-occurrence count 
+This is the global co-occurrence count
 of word $w_j$ (as the context word)
 and word $w_i$ (as the center word)
 in the same context window
 in the entire corpus.
 Using such global corpus statistics,
-the loss function of the skip-gram model 
+the loss function of the skip-gram model
 is equivalent to
 
 $$-\sum_{i\in\mathcal{V}}\sum_{j\in\mathcal{V}} x_{ij} \log\,q_{ij}.$$
@@ -100,7 +100,7 @@ $$-\sum_{i\in\mathcal{V}} x_i \sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}.$$
 :eqlabel:`eq_skipgram-p_ij`
 
 In :eqref:`eq_skipgram-p_ij`, $-\sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}$ calculates
-the cross-entropy 
+the cross-entropy
 of
 the conditional distribution $p_{ij}$
 of global corpus statistics
@@ -110,7 +110,7 @@ conditional distribution $q_{ij}$
 of model predictions.
 This loss
 is also weighted by $x_i$ as explained above.
-Minimizing the loss function in 
+Minimizing the loss function in
 :eqref:`eq_skipgram-p_ij`
 will allow
 the predicted conditional distribution
@@ -122,13 +122,13 @@ from the global corpus statistics.
 Though being commonly used
 for measuring the distance
 between probability distributions,
-the cross-entropy loss function may not be a good choice here. 
-On the one hand, as we mentioned in :numref:`sec_approx_train`, 
+the cross-entropy loss function may not be a good choice here.
+On the one hand, as we mentioned in :numref:`sec_approx_train`,
 the cost of properly normalizing $q_{ij}$
 results in the sum over the entire vocabulary,
 which can be computationally expensive.
-On the other hand, 
-a large number of rare 
+On the other hand,
+a large number of rare
 events from a large corpus
 are often modeled by the cross-entropy loss
 to be assigned with
@@ -140,7 +140,7 @@ In view of this,
 the *GloVe* model makes three changes
 to the skip-gram model based on squared loss :cite:`Pennington.Socher.Manning.2014`:
 
-1. Use variables $p'_{ij}=x_{ij}$ and $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$ 
+1. Use variables $p'_{ij}=x_{ij}$ and $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$
 that are not probability distributions
 and take the logarithm of both, so the squared loss term is $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
 2. Add two scalar model parameters for each word $w_i$: the center word bias $b_i$ and the context word bias $c_i$.
@@ -151,33 +151,33 @@ Putting all things together, training GloVe is to minimize the following loss fu
 $$\sum_{i\in\mathcal{V}} \sum_{j\in\mathcal{V}} h(x_{ij}) \left(\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j - \log\,x_{ij}\right)^2.$$
 :eqlabel:`eq_glove-loss`
 
-For the weight function, a suggested choice is: 
+For the weight function, a suggested choice is:
 $h(x) = (x/c) ^\alpha$ (e.g $\alpha = 0.75$) if $x < c$ (e.g., $c = 100$); otherwise $h(x) = 1$.
 In this case,
 because $h(0)=0$,
 the squared loss term for any $x_{ij}=0$ can be omitted
 for computational efficiency.
 For example,
-when using minibatch stochastic gradient descent for training, 
+when using minibatch stochastic gradient descent for training,
 at each iteration
-we randomly sample a minibatch of *non-zero* $x_{ij}$ 
+we randomly sample a minibatch of *non-zero* $x_{ij}$
 to calculate gradients
-and update the model parameters. 
-Note that these non-zero $x_{ij}$ are precomputed 
+and update the model parameters.
+Note that these non-zero $x_{ij}$ are precomputed
 global corpus statistics;
 thus, the model is called GloVe
 for *Global Vectors*.
 
 It should be emphasized that
-if word $w_i$ appears in the context window of 
-word $w_j$, then *vice versa*. 
-Therefore, $x_{ij}=x_{ji}$. 
+if word $w_i$ appears in the context window of
+word $w_j$, then *vice versa*.
+Therefore, $x_{ij}=x_{ji}$.
 Unlike word2vec
 that fits the asymmetric conditional probability
 $p_{ij}$,
 GloVe fits the symmetric $\log \, x_{ij}$.
 Therefore, the center word vector and
-the context word vector of any word are mathematically equivalent in the GloVe model. 
+the context word vector of any word are mathematically equivalent in the GloVe model.
 However in practice, owing to different initialization values,
 the same word may still get different values
 in these two vectors after training:
@@ -188,17 +188,17 @@ GloVe sums them up as the output vector.
 ## Interpreting GloVe from the Ratio of Co-occurrence Probabilities
 
 
-We can also interpret the GloVe model from another perspective. 
-Using the same notation in 
+We can also interpret the GloVe model from another perspective.
+Using the same notation in
 :numref:`subsec_skipgram-global`,
-let $p_{ij} \stackrel{\mathrm{def}}{=} P(w_j \mid w_i)$ be the conditional probability of generating the context word $w_j$ given $w_i$ as the center word in the corpus. 
+let $p_{ij} \stackrel{\mathrm{def}}{=} P(w_j \mid w_i)$ be the conditional probability of generating the context word $w_j$ given $w_i$ as the center word in the corpus.
 :numref:`tab_glove`
 lists several co-occurrence probabilities
 given words "ice" and "steam"
 and their ratios based on  statistics from a large corpus.
 
 
-:Word-word co-occurrence probabilities and their ratios from a large corpus (adapted from Table 1 in :cite:`Pennington.Socher.Manning.2014`:)
+:Word-word co-occurrence probabilities and their ratios from a large corpus (adapted from Table 1 in :cite:`Pennington.Socher.Manning.2014`)
 
 
 |$w_k$=|solid|gas|water|fashion|
@@ -222,7 +222,7 @@ We can observe the following from :numref:`tab_glove`:
 It can be seen that the ratio
 of co-occurrence probabilities
 can intuitively express
-the relationship between words. 
+the relationship between words.
 Thus, we can design a function
 of three word vectors
 to fit this ratio.
@@ -242,20 +242,20 @@ Since the ratio of co-occurrence probabilities
 is a scalar,
 we require that
 $f$ be a scalar function, such as
-$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) = f\left((\mathbf{u}_j - \mathbf{u}_k)^\top {\mathbf{v}}_i\right)$. 
+$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) = f\left((\mathbf{u}_j - \mathbf{u}_k)^\top {\mathbf{v}}_i\right)$.
 Switching word indices
 $j$ and $k$ in :eqref:`eq_glove-f`,
 it must hold that
 $f(x)f(-x)=1$,
 so one possibility is $f(x)=\exp(x)$,
-i.e., 
+i.e.,
 
 $$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) = \frac{\exp\left(\mathbf{u}_j^\top {\mathbf{v}}_i\right)}{\exp\left(\mathbf{u}_k^\top {\mathbf{v}}_i\right)} \approx \frac{p_{ij}}{p_{ik}}.$$
 
 Now let's pick
 $\exp\left(\mathbf{u}_j^\top {\mathbf{v}}_i\right) \approx \alpha p_{ij}$,
 where $\alpha$ is a constant.
-Since $p_{ij}=x_{ij}/x_i$, after taking the logarithm on both sides we get $\mathbf{u}_j^\top {\mathbf{v}}_i \approx \log\,\alpha + \log\,x_{ij} - \log\,x_i$. 
+Since $p_{ij}=x_{ij}/x_i$, after taking the logarithm on both sides we get $\mathbf{u}_j^\top {\mathbf{v}}_i \approx \log\,\alpha + \log\,x_{ij} - \log\,x_i$.
 We may use additional bias terms to fit $- \log\, \alpha + \log\, x_i$, such as the center word bias $b_i$ and the context word bias $c_j$:
 
 $$\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j \approx \log\, x_{ij}.$$
