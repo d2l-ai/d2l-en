@@ -44,7 +44,7 @@ and *self-attention* designs,
 the *transformer* architecture is solely
 based on attention mechanisms.
 We will go on to describe its original encoder-decoder design for machine translation.
-Then we will show how its encoder can 
+Then we will show how its encoder can
 represent images, leading to the development of vision transformers.
 When training very large models on very large datasets (e.g., 300 million images),
 vision transformers outperform ResNets significantly in image classification, demonstrating superior scalability of transformers.
@@ -60,7 +60,7 @@ suggests that better performance benefits from larger models, more training data
 :maxdepth: 2
 
 attention-cues
-nadaraya-watson
+attention-pooling
 attention-scoring-functions
 bahdanau-attention
 multihead-attention

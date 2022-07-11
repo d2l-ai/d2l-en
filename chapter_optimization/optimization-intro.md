@@ -12,7 +12,7 @@ fundamentally different.
 The former is primarily concerned with minimizing an
 objective whereas the latter is concerned with finding a suitable model, given a
 finite amount of data.
-In :numref:`sec_model_selection`,
+In :numref:`sec_generalization_basics`,
 we discussed the difference between these two goals in detail.
 For instance,
 training error and generalization error generally differ: since the objective

@@ -118,7 +118,7 @@ GPT-2 demonstrated potential of using the same language model for multiple tasks
 Before explaining the more computationally efficient use of language models without parameter update, recall :numref:`sec_rnn-scratch` that a language model can be trained to generate a text sequence conditional on some prefix text sequence. Thus, a pretrained language model may generate the task output as a sequence *without parameter update*, conditional on an input sequence with the task description, task-specific input-output examples, and a prompt (task input). This learning paradigm can be further categorized into *zero-shot*, *one-shot*, and *few-shot*, when there is no, one, or a few task-specific input-output examples, respectively (:numref:`fig_gpt-3-xshot`).
 
 
-![Aggregate performance of GPT-3 for all 42 accuracy-denominated benchmarks (caption adapted and figure taken from :cite:`brown2020language`)](../img/gpt3-xshot-scaling.png)
+![Aggregate performance of GPT-3 for all 42 accuracy-denominated benchmarks (caption adapted and figure taken from :cite:`brown2020language`).](../img/gpt3-xshot-scaling.png)
 :width:`400px`
 :label:`fig_gpt3-xshot-scaling`
 
@@ -142,15 +142,15 @@ Besides increased performance, large models also enjoy better sample efficiency 
 
 
 
-![GPT-3 performance (cross-entropy validation loss) follows a power-law trend with the amount of compute used for training. The power-law behavior observed in :cite:`kaplan2020scaling` continues for an additional two orders of magnitude with only small deviations from the
-predicted curve. Embedding parameters are excluded from compute and parameter counts (caption adapted and figure taken from :cite:`brown2020language`).](../img/scaling-gpt3.png)
+![GPT-3 performance (cross-entropy validation loss) follows a power-law trend with the amount of compute used for training. The power-law behavior observed in :cite:`kaplan2020scaling` continues for an additional two orders of magnitude with only small deviations from the predicted curve. Embedding parameters are excluded from compute and parameter counts (caption adapted and figure taken from :cite:`brown2020language`).](../img/scaling-gpt3.png)
 :width:`400px`
 :label:`fig_scaling-gpt3`
 
 
 The empirical scaling behaviors in :cite:`kaplan2020scaling` have been tested in subsequent large transformer models. For example, GPT-3 supported this hypothesis with two more orders of magnitude in :numref:`fig_scaling-gpt3`.
 
-The scalability of transformers in the GPT series have inspired subsequent transformer language models. While the transformer decoder in GPT-3 was largely followed in OPT (Open Pretrained Transformers) :cite:`zhang2022opt` using only 1/7th the carbon footprint of the former, the GPT-2 transformer decoder was used in training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens achieved state-of-the-art performance across the majority on about 150 diverse tasks. Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks. To continue the scaling line of language modeling, PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`.
+The scalability of transformers in the GPT series have inspired subsequent transformer language models. While the transformer decoder in GPT-3 was largely followed in OPT (Open Pretrained Transformers) :cite:`zhang2022opt` using only 1/7th the carbon footprint of the former, the GPT-2 transformer decoder was used in training the 530-billion-parameter Megatron-Turing NLG :cite:`smith2022using` with 270 billion training tokens. Following the GPT-2 design, the 280-billion-parameter Gopher :cite:`rae2021scaling` pretrained with 300 billion tokens achieved state-of-the-art performance across the majority on about 150 diverse tasks. Inheriting the same architecture and using the same compute budget of Gopher, Chinchilla :cite:`hoffmann2022training` is a substantially smaller (70 billion parameters) model that trains much longer (1.4 trillion training tokens), outperforming Gopher on many tasks. To continue the scaling line of language modeling, PaLM (Pathway Language Model) :cite:`chowdhery2022palm`, a 540-billion-parameter transformer decoder with modified designs pretrained on 780 billion tokens, outperformed average human performance on the BIG-Bench benchmark :cite:`srivastava2022beyond`. Further training PaLM on 38.5 billion tokens containing scientific and mathematical content results in Minerva :cite:`lewkowycz2022solving`, a large language model that can answer nearly a third of 
+undergraduate-level problems that require quantitative reasoning, such as in physics, chemistry, biology, and economics.
 
 
 ## Summary and Discussions

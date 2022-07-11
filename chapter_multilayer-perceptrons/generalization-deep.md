@@ -170,7 +170,7 @@ tend to have a level of complexity that grows
 as the amount of available data grows.
 
 Perhaps the simplest example of a nonparametric model
-is the $k$-nearest neighbor algorithm (we will cover more nonparametric models later, such as in :numref:`sec_nadaraya-watson`).
+is the $k$-nearest neighbor algorithm (we will cover more nonparametric models later, such as in :numref:`sec_attention-pooling`).
 Here, at training time,
 the learner simply memorizes the dataset.
 Then, at prediction time,
