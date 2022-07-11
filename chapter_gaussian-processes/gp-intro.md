@@ -161,7 +161,7 @@ $$s^2 = k(x,x) - k(x,x_{1:3})k(x_{1:3},x_{1:3})^{-1}k(x,x_{1:3})$$
 In this introductory notebook, we have been considering _noise free_ observations. As we will see, it easy to include observation noise. If we assume that the data are generated from a latent noise free function $f(x)$ plus iid Gaussian noise 
 $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$
 with variance $\sigma^2$, then our covariance function simply becomes 
-$k(x,x') \to k(x,x') + \delta_{ij}\sigma^2$,
+$k(x_i,x_j) \to k(x_i,x_j) + \delta_{ij}\sigma^2$,
 where $\delta_{ij} = 1$ if $i=j$ and $0$ otherwise.
 
 We've already started getting some intuition about how we can use a Gaussian process to specify a prior and posterior over solutions, and how the kernel function affects the properties of these solutions. In the following notebooks, we'll precisely show how to specify a Gaussian process prior, introduce and derive various kernel functions, and then go through the mechanics of how to automatically learn kernel hyperparameters, and form a Gaussian process posterior to make predictions. While it takes time and practice to get used to concepts such as a "distributions over functions", the actual mechanics of finding the GP predictive equations is actually quite simple --- making it easy to get practice to form an intuitive understanding of these concepts.
