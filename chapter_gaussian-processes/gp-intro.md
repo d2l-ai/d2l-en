@@ -37,6 +37,22 @@ The _length-scale_ has a particularly pronounced effect on the predictions and u
 
 Let's see how changing the lengthscale affects sample prior and posterior functions, and credible sets. The above fits use a length-scale of $2$. Let's now consider $\ell = 0.1, 0.5, 2, 5, 10$. A length-scale of $0.1$ is very small relative to the range of the input domain we are considering, $25$. For example, the values of the function at $x=5$ and $x=10$ will have essentially no correlation at such a length-scale. On the other hand, for a length-scale of $10$, the function values at these inputs will be highly correlated. 
 
+![priorpoint1](https://user-images.githubusercontent.com/6753639/178250594-d2032bcd-f5bc-4938-8cfa-aa1658c18425.png)
+![postpoint1](https://user-images.githubusercontent.com/6753639/178250619-121ad67f-45f4-47ae-9637-c5f367afd211.png)
+
+![priorpoint5](https://user-images.githubusercontent.com/6753639/178250705-1f0ec480-235e-4ad7-a3c6-a282d8d4e60b.png)
+![postpoint5](https://user-images.githubusercontent.com/6753639/178250716-9238a419-e43e-405e-b1e3-857790ce52c3.png)
+
+![prior2](https://user-images.githubusercontent.com/6753639/178250738-dd0708de-c008-4708-9a3c-5466b0ac6504.png)
+![post2](https://user-images.githubusercontent.com/6753639/178250763-066698cc-4b93-496f-8a01-c2b1f1d6815c.png)
+
+![prior5](https://user-images.githubusercontent.com/6753639/178250780-e5c522b7-f9c7-416c-8017-3cb921ff14b2.png)
+![post5](https://user-images.githubusercontent.com/6753639/178250794-89470592-cdb3-4e63-b0d8-d66f002fc593.png)
+
+![prior10](https://user-images.githubusercontent.com/6753639/178250805-080a5c66-69ec-456d-ade5-e0664874782f.png)
+![post10](https://user-images.githubusercontent.com/6753639/178250815-588fccee-bfcd-4d46-87af-7429596ddc6e.png)
+
+
 
 
 
