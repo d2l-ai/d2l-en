@@ -100,9 +100,34 @@ The above equation specifies a GP prior. We can compute the conditional distribu
 In particular, 
 $f(x) | f(x_1), \dots, f(x_n) \sim \mathcal{N}(m,s^2)$  where
 $m = k(x,x_{1:n}) k(x_{1:n},x_{1:n})^{-1} f(x_{1:n})$ and 
-$v^2 = k(x,x) - k(x,x_{1:n})k(x_{1:n},x_{1:n})^{-1}k(x,x_{1:n})$. $k(x,x_{1:n})$ is a $1 \times n$ vector formed by evaluating $k(x,x_{i})$ for $i=1,\dots,n$ and $k(x_{1:n},x_{1:n})$ is an $n \times n$ matrix formed by evaluating $k(x_i,x_j)$ for $i,j = 1,\dots,n$. $m$ is what we can use as a point predictor for any $x$, and $s^2$ is what we use for uncertainty: if we want to create an interval with a 95% probability that $f(x)$ is in the interval, we would use $m \pm 2s$. 
+$s^2 = k(x,x) - k(x,x_{1:n})k(x_{1:n},x_{1:n})^{-1}k(x,x_{1:n})$. $k(x,x_{1:n})$ is a $1 \times n$ vector formed by evaluating $k(x,x_{i})$ for $i=1,\dots,n$ and $k(x_{1:n},x_{1:n})$ is an $n \times n$ matrix formed by evaluating $k(x_i,x_j)$ for $i,j = 1,\dots,n$. $m$ is what we can use as a point predictor for any $x$, and $s^2$ is what we use for uncertainty: if we want to create an interval with a 95% probability that $f(x)$ is in the interval, we would use $m \pm 2s$. 
 
-(Add example of how we can sequentially condition on a growing set of data-points and update the Gaussian process distribution over functions)
+Let's suppose we observe a single datapoint, $f(x_1)$, and we want to determine the value of $f(x)$ at some $x$. Because $f(x)$ is described by a Gaussian process, we know the joint distribution over $(f(x_1), f(x))$ is Gaussian: 
+$$
+\begin{bmatrix}
+f(x) \\ 
+f(x_1) \\
+\end{bmatrix}
+\sim
+\mathcal{N}\left(\mu, 
+\begin{bmatrix}
+k(x,x) & k(x, x_1) \\
+k(x_1,x) & k(x_1,x_1)
+\end{bmatrix}
+\right)
+$$
+The off-diagonal expression $k(x,x_1) = k(x_1,x)$ tells us how correlated the function values will be --- how strongly determined $f(x)$ will be from $f(x_1)$. We've seen already that if we use a large length-scale, relative to the distance between $x$ and $x'$, $||x-x'||$, then the function values will be highly correlated. We can visualize the process of determining $f(x')$ from $f(x_1)$ both in the space of functions, and in the joint distribution over $f(x_1, x)$. Let's initially consider an $x$ such that $k(x,x_1) = 0.7$, and $k(x,x)=1$, meaning that the value of $f(x)$ is moderately correlated with the value of $f(x_1)$. In the joint distribution, the contours of constant probability will be relatively narrow ellipses.
+
+Suppose we observe $f(x_1)$ = 1.2. To condition on this value of $f(x_1)$, we can draw a horizontal line at $1.2$ on our plot of the density, and see that the value of $f(x)$ is mostly constrained to $[0.8,1.4]$. We have also drawn this plot in function space. 
+
+Now suppose we have a stronger correlation, $k(x,x_1) = 0.9$. Now the ellipses have narrowed further, and the value of $f(x)$ is even more strongly correlated with $f(x_1)$. Drawing a horizontal line at $1.2$, we see the contours for $f(x)$ support values mostly within $[1.15, 1.25]$. 
+
+This procedure can give us a posterior on $f(x)$ for any $x$, for any number of points we have observed. Suppose we observe $f(x_1), f(x_2)$. We now visualize the posterior for $f(x)$ at a particular $x=x'$ in function space. The exact distribution for $f(x)$ is given by the above equations. $f(x)$ is Gaussian distributed, with mean 
+$$m = k(x,x_{1:3}) k(x_{1:3},x_{1:3})^{-1} f(x_{1:3})$$
+and variance 
+$$s^2 = k(x,x) - k(x,x_{1:3})k(x_{1:3},x_{1:3})^{-1}k(x,x_{1:3})$$
+
+(Contour density and function-space plots for the above example are in progress).
 
 In this introductory notebook, we have been considering _noise free_ observations. As we will see, it easy to include observation noise. If we assume that the data are generated from a latent noise free function $f(x)$ plus iid Gaussian noise $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$ with variance $\sigma^2$, then our covariance function simply becomes $k(x,x') \to k(x,x') + \delta_{ij}\sigma^2$, where $\delta_{ij} = 1$ if $i=j$ and $0$ otherwise.
 
