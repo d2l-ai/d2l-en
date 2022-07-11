@@ -118,9 +118,15 @@ k(x_1,x) & k(x_1,x_1)
 $$
 The off-diagonal expression $k(x,x_1) = k(x_1,x)$ tells us how correlated the function values will be --- how strongly determined $f(x)$ will be from $f(x_1)$. We've seen already that if we use a large length-scale, relative to the distance between $x$ and $x'$, $||x-x'||$, then the function values will be highly correlated. We can visualize the process of determining $f(x')$ from $f(x_1)$ both in the space of functions, and in the joint distribution over $f(x_1, x)$. Let's initially consider an $x$ such that $k(x,x_1) = 0.7$, and $k(x,x)=1$, meaning that the value of $f(x)$ is moderately correlated with the value of $f(x_1)$. In the joint distribution, the contours of constant probability will be relatively narrow ellipses.
 
-Suppose we observe $f(x_1)$ = 1.2. To condition on this value of $f(x_1)$, we can draw a horizontal line at $1.2$ on our plot of the density, and see that the value of $f(x)$ is mostly constrained to $[0.8,1.4]$. We have also drawn this plot in function space. 
+Suppose we observe $f(x_1) = 1.2$. 
+To condition on this value of $f(x_1)$, 
+we can draw a horizontal line at $1.2$ on our plot of the density, and see that the value of $f(x)$ 
+is mostly constrained to $[0.8,1.4]$. We have also drawn this plot in function space. 
 
-Now suppose we have a stronger correlation, $k(x,x_1) = 0.9$. Now the ellipses have narrowed further, and the value of $f(x)$ is even more strongly correlated with $f(x_1)$. Drawing a horizontal line at $1.2$, we see the contours for $f(x)$ support values mostly within $[1.15, 1.25]$. 
+Now suppose we have a stronger correlation, $k(x,x_1) = 0.9$. 
+Now the ellipses have narrowed further, and the value of $f(x)$ 
+is even more strongly determined by $f(x_1)$. Drawing a horizontal line at $1.2$, we see the contours for $f(x)$
+support values mostly within $[1.15, 1.25]$. 
 
 This procedure can give us a posterior on $f(x)$ for any $x$, for any number of points we have observed. Suppose we observe $f(x_1), f(x_2)$. We now visualize the posterior for $f(x)$ at a particular $x=x'$ in function space. The exact distribution for $f(x)$ is given by the above equations. $f(x)$ is Gaussian distributed, with mean 
 $$m = k(x,x_{1:3}) k(x_{1:3},x_{1:3})^{-1} f(x_{1:3})$$
@@ -132,11 +138,3 @@ $$s^2 = k(x,x) - k(x,x_{1:3})k(x_{1:3},x_{1:3})^{-1}k(x,x_{1:3})$$
 In this introductory notebook, we have been considering _noise free_ observations. As we will see, it easy to include observation noise. If we assume that the data are generated from a latent noise free function $f(x)$ plus iid Gaussian noise $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$ with variance $\sigma^2$, then our covariance function simply becomes $k(x,x') \to k(x,x') + \delta_{ij}\sigma^2$, where $\delta_{ij} = 1$ if $i=j$ and $0$ otherwise.
 
 We've already started getting some intuition about how we can use a Gaussian process to specify a prior and posterior over solutions, and how the kernel function affects the properties of these solutions. In the following notebooks, we'll precisely show how to specify a Gaussian process prior, introduce and derive various kernel functions, and then go through the mechanics of how to automatically learn kernel hyperparameters, and form a Gaussian process posterior to make predictions. While it takes time and practice to get used to concepts such as a "distributions over functions", the actual mechanics of finding the GP predictive equations is actually quite simple --- making it easy to get practice to form an intuitive understanding of these concepts.
-
-
-
-
-
-
-
-
