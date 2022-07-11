@@ -122,7 +122,9 @@ $k(x,x_{1:n})$ is a $1 \times n$ vector formed by evaluating $k(x,x_{i})$ for $i
 $f(x_1), \dots, f(x_n)$
 and chose a fine grained set of $x$ points to make predictions.
 
-Let's suppose we observe a single datapoint, $f(x_1)$, and we want to determine the value of $f(x)$ at some $x$. Because $f(x)$ is described by a Gaussian process, we know the joint distribution over $(f(x_1), f(x))$ is Gaussian: 
+Let's suppose we observe a single datapoint, $f(x_1)$, and we want to determine the value of $f(x)$ at some $x$. Because $f(x)$ is described by a Gaussian process, we know the joint distribution over 
+$(f(x), f(x_1))$ 
+is Gaussian: 
 
 $$
 \begin{bmatrix}
