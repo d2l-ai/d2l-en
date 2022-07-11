@@ -35,7 +35,7 @@ The _hyperparameters_ of this kernel are interpretable. The _amplitude_ paramete
 
 The _length-scale_ has a particularly pronounced effect on the predictions and uncertainty of a GP. At $||x-x'|| = \ell$, the covariance between a pair of function values is $a^2\exp(-0.5)$. At larger distances than $\ell$, the values of the function values becomes nearly uncorrelated. This means that if we want to make a prediction at a point $x_*$, then function values with inputs $x$ such that $||x-x'||>\ell$ will not have a strong effect on our predictions. 
 
-Let's see how changing the lengthscale affects sample prior and posterior functions, and credible sets. The above fits use a length-scale of $2$. Let's now consider $\ell = 0.1, 0.5, 2, 5, 10$. A length-scale of $0.1$ is very small relative to the range of the input domain we are considering, $25$. For example, the values of the function at $x=5$ and $x=10$ will have essentially no correlation at such a length-scale. On the other hand, for a length-scale of $10$, the function values at these inputs will be highly correlated. 
+Let's see how changing the lengthscale affects sample prior and posterior functions, and credible sets. The above fits use a length-scale of $2$. Let's now consider $\ell = 0.1, 0.5, 2, 5, 10$. A length-scale of $0.1$ is very small relative to the range of the input domain we are considering, $25$. For example, the values of the function at $x=5$ and $x=10$ will have essentially no correlation at such a length-scale. On the other hand, for a length-scale of $10$, the function values at these inputs will be highly correlated. Note that the vertical scale changes in the following figures.
 
 ![priorpoint1](https://user-images.githubusercontent.com/6753639/178250594-d2032bcd-f5bc-4938-8cfa-aa1658c18425.png)
 ![postpoint1](https://user-images.githubusercontent.com/6753639/178250619-121ad67f-45f4-47ae-9637-c5f367afd211.png)
@@ -52,7 +52,24 @@ Let's see how changing the lengthscale affects sample prior and posterior functi
 ![prior10](https://user-images.githubusercontent.com/6753639/178250805-080a5c66-69ec-456d-ade5-e0664874782f.png)
 ![post10](https://user-images.githubusercontent.com/6753639/178250815-588fccee-bfcd-4d46-87af-7429596ddc6e.png)
 
+Notice as the length-scale increases the 'wiggliness' of the functions decrease, and our uncertainty decreases. If the length-scale is small, the uncertainty will quickly increase as we move away from the data, as the datapoints become less informative about teh function values. 
 
+Now, let's vary the amplitude parameter, holding the length-scale fixed at $2$. Note the vertical scale is held fixed for the prior samples, and varies for the posterior samples, so you can clearly see both the increasing scale of the function, and the fits to the data.
+
+![priorap1](https://user-images.githubusercontent.com/6753639/178252126-8a984a0c-56f8-409c-b817-68b21af98582.png)
+![postapoint1](https://user-images.githubusercontent.com/6753639/178252136-868dd45a-b21e-4311-8164-a60ea41c221c.png)
+
+![priora2](https://user-images.githubusercontent.com/6753639/178252163-c9ac2360-6bee-44fe-985c-731101d8c575.png)
+![posta2](https://user-images.githubusercontent.com/6753639/178252195-c325e446-4c61-4851-a841-b547bbab2e2d.png)
+
+![priora4](https://user-images.githubusercontent.com/6753639/178252214-eca6fe2a-0af0-4a13-a71f-4851c02dc4d7.png)
+![posta4](https://user-images.githubusercontent.com/6753639/178252232-38e229a9-bf48-4a67-9883-3cf494f8ff6a.png)
+
+![priora8](https://user-images.githubusercontent.com/6753639/178252271-ccabde74-8ec3-44d1-9842-6309444c4ab5.png)
+![posta8](https://user-images.githubusercontent.com/6753639/178252284-b59daae3-2648-4ef6-bc09-7c0b4d9a4f02.png)
+
+![priora16](https://user-images.githubusercontent.com/6753639/178252311-b9a5c51f-a0f8-4d65-ba5e-1f8b917c0d7c.png)
+![posta16](https://user-images.githubusercontent.com/6753639/178252339-db99413b-78f7-41f7-8c6b-92fe10d634a4.png)
 
 
 
