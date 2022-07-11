@@ -31,11 +31,24 @@ The plot looks somewhat cleaner if we remove the posterior samples, simply visua
 The properties of the Gaussian process that we used to fit the data are strongly controlled by what's called a _covariance function_, also known as a _kernel_. The covariance function we used is called the _RBF (Radial Basis Function) kernel_, which has the form
 $$ k_{\text{RBF}}(x,x') = \text{cov}(f(x),f(x')) = a^2 \exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right) $$
 
-The _hyperparameters_ of this kernel are interpretable. The _amplitude_ parameter $a$ controls the vertical scale over which the function is varying, and the _length-scale_ parameter $\ell$ controls the rate of variation (the wiggliness) of the function. Larger $a$ means larger function values, and larger $\ell$ means more slowly varying functions. Let's see what happens to our sample prior and posterior functions as we vary $a$ and $\ell$. 
+The _hyperparameters_ of this kernel are interpretable. The _amplitude_ parameter $a$ controls the vertical scale over which the function is varying, and the _length-scale_ parameter
+$\ell$
+controls the rate of variation (the wiggliness) of the function. Larger $a$ means larger function values, and larger 
+$\ell$ 
+means more slowly varying functions. Let's see what happens to our sample prior and posterior functions as we vary $a$ and 
+$\ell$. 
 
-The _length-scale_ has a particularly pronounced effect on the predictions and uncertainty of a GP. At $||x-x'|| = \ell$, the covariance between a pair of function values is $a^2\exp(-0.5)$. At larger distances than $\ell$, the values of the function values becomes nearly uncorrelated. This means that if we want to make a prediction at a point $x_*$, then function values with inputs $x$ such that $||x-x'||>\ell$ will not have a strong effect on our predictions. 
+The _length-scale_ has a particularly pronounced effect on the predictions and uncertainty of a GP. At 
+$||x-x'|| = \ell$
+, the covariance between a pair of function values is $a^2\exp(-0.5)$. At larger distances than 
+$\ell$
+, the values of the function values becomes nearly uncorrelated. This means that if we want to make a prediction at a point $x_*$, then function values with inputs $x$ such that 
+$||x-x'||>\ell$
+will not have a strong effect on our predictions. 
 
-Let's see how changing the lengthscale affects sample prior and posterior functions, and credible sets. The above fits use a length-scale of $2$. Let's now consider $\ell = 0.1, 0.5, 2, 5, 10$. A length-scale of $0.1$ is very small relative to the range of the input domain we are considering, $25$. For example, the values of the function at $x=5$ and $x=10$ will have essentially no correlation at such a length-scale. On the other hand, for a length-scale of $10$, the function values at these inputs will be highly correlated. Note that the vertical scale changes in the following figures.
+Let's see how changing the lengthscale affects sample prior and posterior functions, and credible sets. The above fits use a length-scale of $2$. Let's now consider 
+$\ell = 0.1, 0.5, 2, 5, 10$
+. A length-scale of $0.1$ is very small relative to the range of the input domain we are considering, $25$. For example, the values of the function at $x=5$ and $x=10$ will have essentially no correlation at such a length-scale. On the other hand, for a length-scale of $10$, the function values at these inputs will be highly correlated. Note that the vertical scale changes in the following figures.
 
 ![priorpoint1](https://user-images.githubusercontent.com/6753639/178250594-d2032bcd-f5bc-4938-8cfa-aa1658c18425.png)
 ![postpoint1](https://user-images.githubusercontent.com/6753639/178250619-121ad67f-45f4-47ae-9637-c5f367afd211.png)
@@ -103,6 +116,7 @@ $m = k(x,x_{1:n}) k(x_{1:n},x_{1:n})^{-1} f(x_{1:n})$ and
 $s^2 = k(x,x) - k(x,x_{1:n})k(x_{1:n},x_{1:n})^{-1}k(x,x_{1:n})$. $k(x,x_{1:n})$ is a $1 \times n$ vector formed by evaluating $k(x,x_{i})$ for $i=1,\dots,n$ and $k(x_{1:n},x_{1:n})$ is an $n \times n$ matrix formed by evaluating $k(x_i,x_j)$ for $i,j = 1,\dots,n$. $m$ is what we can use as a point predictor for any $x$, and $s^2$ is what we use for uncertainty: if we want to create an interval with a 95% probability that $f(x)$ is in the interval, we would use $m \pm 2s$. 
 
 Let's suppose we observe a single datapoint, $f(x_1)$, and we want to determine the value of $f(x)$ at some $x$. Because $f(x)$ is described by a Gaussian process, we know the joint distribution over $(f(x_1), f(x))$ is Gaussian: 
+
 $$
 \begin{bmatrix}
 f(x) \\ 
@@ -116,7 +130,12 @@ k(x_1,x) & k(x_1,x_1)
 \end{bmatrix}
 \right)
 $$
-The off-diagonal expression $k(x,x_1) = k(x_1,x)$ tells us how correlated the function values will be --- how strongly determined $f(x)$ will be from $f(x_1)$. We've seen already that if we use a large length-scale, relative to the distance between $x$ and $x'$, $||x-x'||$, then the function values will be highly correlated. We can visualize the process of determining $f(x')$ from $f(x_1)$ both in the space of functions, and in the joint distribution over $f(x_1, x)$. Let's initially consider an $x$ such that $k(x,x_1) = 0.7$, and $k(x,x)=1$, meaning that the value of $f(x)$ is moderately correlated with the value of $f(x_1)$. In the joint distribution, the contours of constant probability will be relatively narrow ellipses.
+
+The off-diagonal expression $k(x,x_1) = k(x_1,x)$ 
+tells us how correlated the function values will be --- how strongly determined $f(x)$
+will be from $f(x_1)$. 
+We've seen already that if we use a large length-scale, relative to the distance between $x$ and $x'$, 
+$||x-x'||$, then the function values will be highly correlated. We can visualize the process of determining $f(x')$ from $f(x_1)$ both in the space of functions, and in the joint distribution over $f(x_1, x)$. Let's initially consider an $x$ such that $k(x,x_1) = 0.7$, and $k(x,x)=1$, meaning that the value of $f(x)$ is moderately correlated with the value of $f(x_1)$. In the joint distribution, the contours of constant probability will be relatively narrow ellipses.
 
 Suppose we observe $f(x_1) = 1.2$. 
 To condition on this value of $f(x_1)$, 
@@ -135,6 +154,10 @@ $$s^2 = k(x,x) - k(x,x_{1:3})k(x_{1:3},x_{1:3})^{-1}k(x,x_{1:3})$$
 
 (Contour density and function-space plots for the above example are in progress).
 
-In this introductory notebook, we have been considering _noise free_ observations. As we will see, it easy to include observation noise. If we assume that the data are generated from a latent noise free function $f(x)$ plus iid Gaussian noise $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$ with variance $\sigma^2$, then our covariance function simply becomes $k(x,x') \to k(x,x') + \delta_{ij}\sigma^2$, where $\delta_{ij} = 1$ if $i=j$ and $0$ otherwise.
+In this introductory notebook, we have been considering _noise free_ observations. As we will see, it easy to include observation noise. If we assume that the data are generated from a latent noise free function $f(x)$ plus iid Gaussian noise 
+$\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$
+with variance $\sigma^2$, then our covariance function simply becomes 
+$k(x,x') \to k(x,x') + \delta_{ij}\sigma^2$,
+where $\delta_{ij} = 1$ if $i=j$ and $0$ otherwise.
 
 We've already started getting some intuition about how we can use a Gaussian process to specify a prior and posterior over solutions, and how the kernel function affects the properties of these solutions. In the following notebooks, we'll precisely show how to specify a Gaussian process prior, introduce and derive various kernel functions, and then go through the mechanics of how to automatically learn kernel hyperparameters, and form a Gaussian process posterior to make predictions. While it takes time and practice to get used to concepts such as a "distributions over functions", the actual mechanics of finding the GP predictive equations is actually quite simple --- making it easy to get practice to form an intuitive understanding of these concepts.
