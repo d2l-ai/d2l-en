@@ -161,7 +161,7 @@ $$s^2 = k(x,x) - k(x,x_{1:3})k(x_{1:3},x_{1:3})^{-1}k(x,x_{1:3})$$
 
 (Contour density and function-space plots for the above example are in progress).
 
-In this introductory notebook, we have been considering _noise free_ observations. As we will see, it easy to include observation noise. If we assume that the data are generated from a latent noise free function $f(x)$ plus iid Gaussian noise 
+In this introductory notebook, we have been considering _noise free_ observations. As we will see, it is easy to include observation noise. If we assume that the data are generated from a latent noise free function $f(x)$ plus iid Gaussian noise 
 $\epsilon(x) \sim \mathcal{N}(0,\sigma^2)$
 with variance $\sigma^2$, then our covariance function simply becomes 
 $k(x_i,x_j) \to k(x_i,x_j) + \delta_{ij}\sigma^2$,
