@@ -1481,7 +1481,6 @@ def load_data_fashion_mnist(batch_size, resize=None):
 
 class TrainCallback(tf.keras.callbacks.Callback):
     """A callback to visiualize the training progress.
-    
     Defined in :numref:`sec_utils`"""
     def __init__(self, net, train_iter, test_iter, num_epochs, device_name):
         self.timer = d2l.Timer()
