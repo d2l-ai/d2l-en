@@ -141,8 +141,8 @@ $$
 The off-diagonal expression $k(x,x_1) = k(x_1,x)$ 
 tells us how correlated the function values will be --- how strongly determined $f(x)$
 will be from $f(x_1)$. 
-We've seen already that if we use a large length-scale, relative to the distance between $x$ and $x'$, 
-$||x-x'||$, then the function values will be highly correlated. We can visualize the process of determining $f(x')$ from $f(x_1)$ both in the space of functions, and in the joint distribution over $f(x_1, x)$. Let's initially consider an $x$ such that $k(x,x_1) = 0.7$, and $k(x,x)=1$, meaning that the value of $f(x)$ is moderately correlated with the value of $f(x_1)$. In the joint distribution, the contours of constant probability will be relatively narrow ellipses.
+We've seen already that if we use a large length-scale, relative to the distance between $x$ and $x_1$, 
+$||x-x_1||$, then the function values will be highly correlated. We can visualize the process of determining $f(x)$ from $f(x_1)$ both in the space of functions, and in the joint distribution over $f(x_1), f(x)$. Let's initially consider an $x$ such that $k(x,x_1) = 0.7$, and $k(x,x)=1$, meaning that the value of $f(x)$ is moderately correlated with the value of $f(x_1)$. In the joint distribution, the contours of constant probability will be relatively narrow ellipses.
 
 Suppose we observe $f(x_1) = 1.2$. 
 To condition on this value of $f(x_1)$, 
