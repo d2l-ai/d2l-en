@@ -133,9 +133,7 @@ the subsequent value is the history of prices to date.
 ### Autoregressive Models
 
 The trader is thus interested in knowing
-the probability distribution
-$$P(x_t \mid x_{t-1}, \ldots, x_1).$$
-over prices that the index might take
+the probability distribution $$P(x_t \mid x_{t-1}, \ldots, x_1)$$ over prices that the index might take
 in the subsequent time step.
 While estimating the entire distribution
 over a continuous-valued random variable
