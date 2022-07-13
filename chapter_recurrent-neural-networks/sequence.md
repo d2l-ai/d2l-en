@@ -144,7 +144,7 @@ to focus on a few key statistics of the distribution,
 particularly the expected value and the variance.
 One simple strategy for estimating the conditional expectation
 
-$$ \mathbb{E}[(x_t \mid x_{t-1}, \ldots, x_1)],$$
+$$\mathbb{E}[(x_t \mid x_{t-1}, \ldots, x_1)],$$
 
 would be to apply a linear regression model,
 (recall :numref:`sec_linear_concise`).
