@@ -1481,6 +1481,7 @@ def load_data_fashion_mnist(batch_size, resize=None):
 
 class TrainCallback(tf.keras.callbacks.Callback):
     """A callback to visiualize the training progress.
+
     Defined in :numref:`sec_utils`"""
     def __init__(self, net, train_iter, test_iter, num_epochs, device_name):
         self.timer = d2l.Timer()
@@ -1492,12 +1493,10 @@ class TrainCallback(tf.keras.callbacks.Callback):
         self.test_iter = test_iter
         self.num_epochs = num_epochs
         self.device_name = device_name
-        self.num_batches = len(train_iter)
-        self.epoch = 0
     def on_epoch_begin(self, epoch, logs=None):
-        metrics = d2l.Accumulator(3)
-        self.epoch = epoch
+        self.timer.start()
     def on_epoch_end(self, epoch, logs):
+        self.timer.stop()
         test_acc = self.net.evaluate(
             self.test_iter, verbose=0, return_dict=True)['accuracy']
         metrics = (logs['loss'], logs['accuracy'], test_acc)
@@ -1510,13 +1509,6 @@ class TrainCallback(tf.keras.callbacks.Callback):
                   f'test acc {metrics[2]:.3f}')
             print(f'{num_examples / self.timer.avg():.1f} examples/sec on '
                   f'{str(self.device_name)}')
-    def on_train_batch_start(self, batch, logs):
-        self.timer.start()
-    def on_train_batch_end(self, batch, logs):
-        self.timer.stop()
-        metrics = (logs['loss'], logs['accuracy'], None)
-        if (batch + 1) % (self.num_batches // 5) == 0:
-                self.animator.add(self.epoch + (batch + 1) / self.num_batches, metrics)
 
 def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, device):
     """Train a model with a GPU (defined in Chapter 6).
