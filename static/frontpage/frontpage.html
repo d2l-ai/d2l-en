@@ -170,6 +170,23 @@ a {
     transition: max-height 0.2s ease-out;
 }
 
+.cover h2 {
+  font-size: 34px;
+  margin-bottom: 0px;
+  padding-bottom: 20px;
+}
+
+.cover p.version {
+  font-size: 18px;
+  padding: 0 0 9px 0;
+}
+
+.cover p {
+  margin: 0;
+  padding:  20px 0 0px 0;
+  font-size: 20px;
+}
+
 </style>
 </head>
 
@@ -180,10 +197,12 @@ a {
   </div>
   <div class = "mdl-cell mdl-cell--1-col">
   </div>
-  <div class = "mdl-cell mdl-cell--5-col mdl-cell--middle">
+  <div class = "mdl-cell mdl-cell--5-col mdl-cell--middle cover">
     <h2>Dive into Deep Learning</h2>
+    <p class="version">With New API</p>
+    <p class="version">Jump to <a href="https://classic.d2l.ai/">Classic API</a></p>
     <p><b>Interactive</b> deep learning book with code, math, and discussions <br><br>
-        Implemented with <b>NumPy/MXNet</b>, <b>PyTorch</b>, and <b>TensorFlow</b><br><br>
+        Implemented with <b>PyTorch</b>, <b>NumPy/MXNet</b>, and <b>TensorFlow</b><br><br>
         Adopted at 300 universities from 55 countries<br><br>
     <a class="github-button" href="https://github.com/d2l-ai/d2l-en" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star d2l-ai/d2l-en on GitHub">Star</a>
    </p>
@@ -195,13 +214,24 @@ a {
     <h3>Announcements</h3>
     <div align="left">
     <ul>
-      <li> [Dec 2021] We added a new option to <a href="#jupyter">run this book</a> for free: check out <a href="https://studiolab.sagemaker.aws/import/github/d2l-ai/d2l-pytorch-sagemaker-studio-lab/blob/main/GettingStarted-D2L.ipynb">SageMaker Studio Lab</a>.
-      </li>
-      <li> [Jul 2021] We have improved the content and added TensorFlow implementations up to Chapter 11.
+        <li> [Jul 2022] Check out our <a href="https://d2l.ai/chapter_linear-regression/oo-design.html">new API</a> for implementation
+            and new topics like
+            generalization in <a href="https://d2l.ai/chapter_linear-classification/generalization-classification.html">classification</a> and
+            <a href="https://d2l.ai/chapter_multilayer-perceptrons/generalization-deep.html">deep learning</a>,
+            <a href="https://d2l.ai/chapter_convolutional-modern/resnet.html">ResNeXt</a>,
+            <a href="https://d2l.ai/chapter_convolutional-modern/cnn-design.html">CNN design space</a>, and
+            transformers for <a href="https://d2l.ai/chapter_attention-mechanisms-and-transformers/vision-transformer.html">vision</a>
+            and <a href="https://d2l.ai/chapter_attention-mechanisms-and-transformers/large-pretraining-transformers.html">large-scale pretraining</a>.
           To keep track of the latest updates, just follow D2L's <a href="https://github.com/d2l-ai/d2l-en">open-source project</a>.
       </li>
-      <li> [Jan 2021] Check out the brand-new <a href="https://d2l.ai/chapter_attention-mechanisms/index.html">Chapter: Attention Mechanisms</a>.
-          We have also added PyTorch implementations.
+      <li> [May 2022] Join <a href="https://github.com/d2l-ai">us</a> to improve ongoing translations
+          in <a href="https://pt.d2l.ai/">Portuguese</a>,
+          <a href="https://tr.d2l.ai/">Turkish</a>,
+          <a href="https://d2l.aivivn.com/">Vietnamese</a>,
+          <a href="https://ko.d2l.ai/">Korean</a>,
+          and <a href="https://ja.d2l.ai/">Japanese</a>.</li>
+      <li> [Dec 2021] We added a new option to <a href="#jupyter">run this book</a> for free: check out <a href="https://studiolab.sagemaker.aws/import/github/d2l-ai/d2l-pytorch-sagemaker-studio-lab/blob/main/GettingStarted-D2L.ipynb">SageMaker Studio Lab</a>.
+      </li>
       </li>
       <li> [Apr 2020] We have revamped
         <a href="chapter_natural-language-processing-pretraining/index.html">Chapter: NLP pretraining</a>
