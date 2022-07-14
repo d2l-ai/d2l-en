@@ -114,7 +114,7 @@ y_hat = d2l.repeat(d2l.reduce_mean(data.y_train), n)
 plot_kernel_reg(y_hat)
 ```
 
-## Nonparametric Attention Pooling
+## [**Nonparametric Attention Pooling**]
 
 Obviously,
 average pooling omits the inputs $x_i$.
@@ -209,7 +209,7 @@ d2l.show_heatmaps([[attention_weights]],
                   ylabel='Sorted validation inputs')
 ```
 
-## Parametric Attention Pooling
+## [**Parametric Attention Pooling**]
 
 Nonparametric Nadaraya-Watson kernel regression
 enjoys the *consistency* benefit:
