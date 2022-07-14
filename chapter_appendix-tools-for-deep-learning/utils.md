@@ -73,17 +73,17 @@ def draw(self, x, y, label, every_n=1):
     if len(points) != every_n:
         return    
     mean = lambda x: sum(x) / len(x)
-    line.append(Point(mean([p.x for p in points]), 
+    line.append(Point(mean([p.x for p in points]),
                       mean([p.y for p in points])))
     points.clear()
-    if not self.display: 
+    if not self.display:
         return
     d2l.use_svg_display()
     if self.fig is None:
         self.fig = d2l.plt.figure(figsize=self.figsize)
     plt_lines, labels = [], []
     for (k, v), ls, color in zip(self.data.items(), self.ls, self.colors):        
-        plt_lines.append(d2l.plt.plot([p.x for p in v], [p.y for p in v], 
+        plt_lines.append(d2l.plt.plot([p.x for p in v], [p.y for p in v],
                                       linestyle=ls, color=color)[0])
         labels.append(k)        
     axes = self.axes if self.axes else d2l.plt.gca()
@@ -186,7 +186,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
           f'test acc {test_acc:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
           f'on {str(device)}')
-    
+
 def grad_clipping(net, theta):  #@save
     """Clip the gradient."""
     if isinstance(net, gluon.Block):
@@ -356,10 +356,12 @@ class TrainCallback(tf.keras.callbacks.Callback):  #@save
         self.test_iter = test_iter
         self.num_epochs = num_epochs
         self.device_name = device_name
+        self.num_batches = len(train_iter)
+        self.epoch = 0
     def on_epoch_begin(self, epoch, logs=None):
-        self.timer.start()
+        metrics = d2l.Accumulator(3)
+        self.epoch = epoch
     def on_epoch_end(self, epoch, logs):
-        self.timer.stop()
         test_acc = self.net.evaluate(
             self.test_iter, verbose=0, return_dict=True)['accuracy']
         metrics = (logs['loss'], logs['accuracy'], test_acc)
@@ -372,6 +374,13 @@ class TrainCallback(tf.keras.callbacks.Callback):  #@save
                   f'test acc {metrics[2]:.3f}')
             print(f'{num_examples / self.timer.avg():.1f} examples/sec on '
                   f'{str(self.device_name)}')
+    def on_train_batch_start(self, batch, logs):
+        self.timer.start()
+    def on_train_batch_end(self, batch, logs):
+        self.timer.stop()
+        metrics = (logs['loss'], logs['accuracy'], None)
+        if (batch + 1) % (self.num_batches // 5) == 0:
+                self.animator.add(self.epoch + (batch + 1) / self.num_batches, metrics)
 
 #@save
 def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, device):
@@ -473,7 +482,7 @@ class Animator:  #@save
         self.config_axes()
         display.display(self.fig)
         display.clear_output(wait=True)
-        
+
 #@tab all
 class Accumulator:  #@save
     """For accumulating sums over `n` variables."""
@@ -488,8 +497,8 @@ class Accumulator:  #@save
 
     def __getitem__(self, idx):
         return self.data[idx]        
-    
-    
+
+
 #@tab all
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
@@ -675,7 +684,7 @@ def tokenize_nmt(text, num_examples=None):
             target.append(parts[1].split(' '))
     return source, target
 
-    
+
 #@save
 def truncate_pad(line, num_steps, padding_token):
     """Truncate or pad sequences."""
@@ -714,7 +723,7 @@ def load_data_nmt(batch_size, num_steps, num_examples=600):
 
 ```{.python .input}
 %%tab mxnet
-    
+
 #@save
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     """The softmax cross-entropy loss with masks."""
@@ -801,7 +810,7 @@ def sequence_mask(X, valid_len, value=0):
     X[~mask] = value
     return X
 
-    
+
 #@save
 class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
     """The softmax cross-entropy loss with masks."""
@@ -816,7 +825,7 @@ class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
             pred.permute(0, 2, 1), label)
         weighted_loss = (unweighted_loss * weights).mean(dim=1)
         return weighted_loss
-    
+
 #@save
 def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
     """Train a model for sequence to sequence."""
@@ -855,7 +864,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
             animator.add(epoch + 1, (metric[0] / metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
           f'tokens/sec on {str(device)}')
-    
+
 
 #@save
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
@@ -901,20 +910,20 @@ def sequence_mask(X, valid_len, value=0):
     maxlen = X.shape[1]
     mask = tf.range(start=0, limit=maxlen, dtype=tf.float32)[
         None, :] < tf.cast(valid_len[:, None], dtype=tf.float32)
-    
+
     if len(X.shape) == 3:
         return tf.where(tf.expand_dims(mask, axis=-1), X, value)
     else:
         return tf.where(mask, X, value)
 
-    
+
 #@save
 class MaskedSoftmaxCELoss(tf.keras.losses.Loss):
     """The softmax cross-entropy loss with masks."""
     def __init__(self, valid_len):
         super().__init__(reduction='none')
         self.valid_len = valid_len
-    
+
     # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
     # `label` shape: (`batch_size`, `num_steps`)
     # `valid_len` shape: (`batch_size`,)
@@ -926,7 +935,7 @@ class MaskedSoftmaxCELoss(tf.keras.losses.Loss):
             from_logits=True, reduction='none')(label_one_hot, pred)
         weighted_loss = tf.reduce_mean((unweighted_loss*weights), axis=1)
         return weighted_loss
-    
+
 #@save
 def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
     """Train a model for sequence to sequence."""
@@ -953,7 +962,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
             animator.add(epoch + 1, (metric[0] / metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
           f'tokens/sec on {str(device._device_name)}')
-    
+
 #@save
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
                     save_attention_weights=False):
