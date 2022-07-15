@@ -52,7 +52,7 @@ import random
 ## Reading the Dataset
 
 Here, we'll work with H. G. Wells' 
-[*The Time Machine*](http://www.gutenberg.org/ebooks/35),
+*[The Time Machine](http://www.gutenberg.org/ebooks/35)*,
 a book containing just over 30000 words.
 While real applications will typically 
 involve significantly larger datasets,
@@ -133,7 +133,7 @@ Rare vocabulary elements are often dropped for convenience.
 Whenever we encounter a token at training or test time
 that had not been previously seen or was dropped from the vocabulary,
 we represent it by a special "&lt;unk&gt;" token, 
-signifying that this is an *unknown* value. 
+signifying that this is an *unknown* value.
 
 ```{.python .input  n=8}
 %%tab all
@@ -328,9 +328,7 @@ We will discuss this in the next section.
 
 * Text is among the most common forms of sequence data encountered in deep learning.
 * Common choices for what constitutes a "token" are characters words, and word pieces, which will be covered in subsequent chapters. 
-* To preprocess text, we usually (i) split text into tokens; 
-  (ii) build a vocabulary to map token strings to numerical indices;
-  and (iii) convert text data into token indices for models to manipulate.
+* To preprocess text, we usually (i) split text into tokens; (ii) build a vocabulary to map token strings to numerical indices; and (iii) convert text data into token indices for models to manipulate.
 * The frequency of words tends to follow Zipf's law. This is true not just for individual words (unigrams), but also for $n$-grams.
 
 
