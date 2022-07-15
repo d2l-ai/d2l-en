@@ -123,8 +123,7 @@ pip install mxnet==1.7.0.post1
 You can install PyTorch with either CPU or GPU support as follows:
 
 ```bash
-pip install torch==1.8.1
-pip install torchvision==0.9.1
+pip install torch torchvision
 ```
 
 
@@ -134,8 +133,7 @@ pip install torchvision==0.9.1
 You can install TensorFlow with either CPU or GPU support as follows:
 
 ```bash
-pip install tensorflow==2.3.1
-pip install tensorflow-probability==0.11.1
+pip install tensorflow tensorflow-probability
 ```
 
 
