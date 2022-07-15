@@ -577,7 +577,7 @@ random variables in a probabilistic sense,
 and can be used to derive many other
 useful quantities, including recovering the 
 individual distributions $P(A)$ and $P(B)$.
-To recover $P(A=a) $we simply sum up 
+To recover $P(A=a)$ we simply sum up 
 $P(A=a, B=v)$ over all values $v$ 
 that the random variable $B$ can take:
 $P(A=a) = \sum_v P(A=a, B=v)$.
@@ -730,8 +730,8 @@ and $H \in \{0, 1\}$ to denote the HIV status.
 
 | Conditional probability | $H=1$ | $H=0$ |
 |:------------------------|------:|------:|
-| $P(D_1 = 1 | H)$        |     1 |  0.01 |
-| $P(D_1 = 0 | H)$        |     0 |  0.99 |
+| $P(D_1 = 1 \mid H)$        |     1 |  0.01 |
+| $P(D_1 = 0 \mid H)$        |     0 |  0.99 |
 
 Note that the column sums are all 1 (but the row sums don't), 
 since they are conditional probabilities.
@@ -767,8 +767,8 @@ and it is not as good as the first one.
 
 | Conditional probability | $H=1$ | $H=0$ |
 |:------------------------|------:|------:|
-| $P(D_2 = 1|H)$          |  0.98 |  0.03 |
-| $P(D_2 = 0|H)$          |  0.02 |  0.97 |
+| $P(D_2 = 1 \mid H)$          |  0.98 |  0.03 |
+| $P(D_2 = 0 \mid H)$          |  0.02 |  0.97 |
 
 Unfortunately, the second test comes back positive, too.
 Let's calculate the requisite probabilities to invoke Bayes' theorem

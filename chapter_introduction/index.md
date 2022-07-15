@@ -706,7 +706,7 @@ the one that you are going to use for your decision.
 Assume that you find a beautiful mushroom in your backyard
 as shown in :numref:`fig_death_cap`.
 
-![Death cap---do not eat!](../img/death-cap.jpg)
+![Death cap - do not eat!](../img/death-cap.jpg)
 :width:`200px`
 :label:`fig_death_cap`
 
