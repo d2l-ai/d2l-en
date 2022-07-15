@@ -184,10 +184,13 @@ def bookkeeping(self, config, error, runtime):
 
 We now use our new implementation of random search to optimize the *batch size* and *learning rate* of a convolutional neural networks from :ref:`sec_alexnet`. For that, we first have to define the objective function.
 
-```{.python .input  n=18}
+```{.python .input  n=1}
+%%tab all
+
 from d2l import torch as d2l
 
-def objective(config, max_epochs=8):
+
+def objective(config, max_epochs=8): #@save
     batch_size = config['batch_size']
     learning_rate = config['learning_rate']
     model = d2l.AlexNet(lr=learning_rate)
@@ -196,6 +199,16 @@ def objective(config, max_epochs=8):
     trainer.fit(model=model, data=data)
     validation_error = trainer.evaluate()
     return validation_error    
+```
+
+```{.json .output n=1}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "UsageError: Cell magic `%%tab` not found.\n"
+ }
+]
 ```
 
 We also define need to define the search space.
