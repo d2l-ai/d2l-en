@@ -105,7 +105,7 @@ You may change the last digits according to your CUDA version, e.g., `cu100` for
 CUDA 10.0 and `cu90` for CUDA 9.0.
 
 
-If your machine has no NVIDIA GPUs 
+If your machine has no NVIDIA GPUs
 or CUDA,
 you can install the CPU version
 as follows:
@@ -149,17 +149,17 @@ frequently used functions and classes
 found throughout this book:
 
 ```bash
-pip install d2l
+pip install d2l==1.0.0a0
 ```
 
 
 ## Downloading and Running the Code
 
-Next, you will want to download the notebooks 
-so that you can run each of the book's code blocks. 
-Simply click on the "Notebooks" tab at the top 
+Next, you will want to download the notebooks
+so that you can run each of the book's code blocks.
+Simply click on the "Notebooks" tab at the top
 of any HTML page on [the D2L.ai website](https://d2l.ai/)
-to download the code and then unzip it. 
+to download the code and then unzip it.
 Alternatively, you can fetch the notebooks
 from the command line as follows:
 
@@ -215,7 +215,7 @@ Whenever you open a new command line window,
 you will need to execute `conda activate d2l`
 to activate the runtime environment
 before running the D2L notebooks,
-or updating your packages 
+or updating your packages
 (either the deep learning framework
 or the `d2l` package).
 To exit the environment,
