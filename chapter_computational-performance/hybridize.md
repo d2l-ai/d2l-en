@@ -22,7 +22,7 @@ Python is an *interpreted language*. When evaluating the above `fancy_func` func
 ![Data flow in an imperative program.](../img/computegraph.svg)
 :label:`fig_compute_graph`
 
-Although imperative programming is convenient, it may be inefficient. On one hand, even if the `add` function is repeatedly called throughout `fancy_func`, Python will execute the three function calls individually. If these are executed, say, on a GPU (or even on multiple GPUs), the overhead arising from the Python interpreter can become overwhelming. Moreover, it will need to save the variable values of `e` and `f` until all the statements in `fancy_func` have been executed. This is because we do not know whether the variables `e` and `f` will be used by other parts of the program after the statements `e = add(a, b)` and `f = add(c, d)` are executed.
+Although imperative programming is convenient, it may be inefficient. On the one hand, even if the `add` function is repeatedly called throughout `fancy_func`, Python will execute the three function calls individually. If these are executed, say, on a GPU (or even on multiple GPUs), the overhead arising from the Python interpreter can become overwhelming. Moreover, it will need to save the variable values of `e` and `f` until all the statements in `fancy_func` have been executed. This is because we do not know whether the variables `e` and `f` will be used by other parts of the program after the statements `e = add(a, b)` and `f = add(c, d)` are executed.
 
 ## Symbolic Programming
 
@@ -89,9 +89,10 @@ The imperative programming paradigm is now the default in Tensorflow 2, a welcom
 
 ## Hybridizing the `Sequential` Class
 
-The easiest way to get a feel for how hybridization works is to consider deep networks with multiple layers. Conventionally the Python interpreter will need to execute the code for all layers to generate an instruction that can then be forwarded to a CPU or a GPU. For a single (fast) computing device this does not cause any major issues. On the other hand, if we use an advanced 8-GPU server such as an AWS P3dn.24xlarge instance Python will struggle to keep all GPUs busy. The single-threaded Python interpreter becomes the bottleneck here. Let us see how we can address this for significant parts of the code by replacing `Sequential` with `HybridSequential`. We begin by defining a simple MLP.
+The easiest way to get a feel for how hybridization works is to consider deep networks with multiple layers. Conventionally the Python interpreter will need to execute the code for all layers to generate an instruction that can then be forwarded to a CPU or a GPU. For a single (fast) computing device this does not cause any major issues. On the other hand, if we use an advanced 8-GPU server such as an AWS P3dn.24xlarge instance Python will struggle to keep all GPUs busy. The single-threaded Python interpreter becomes the bottleneck here. Let's see how we can address this for significant parts of the code by replacing `Sequential` with `HybridSequential`. We begin by defining a simple MLP.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
@@ -164,6 +165,7 @@ We cen re-enable this functionality with tf.function. tf.function is more common
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 net.hybridize()
 net(x)
 ```
@@ -195,7 +197,7 @@ Explicitly adding the `jit_compile = True` flag to the `tf.function()` call enab
 
 ### Acceleration by Hybridization
 
-To demonstrate the performance improvement gained by compilation we compare the time needed to evaluate `net(x)` before and after hybridization. Let us define a class to measure this time first. It will come handy throughout the chapter as we set out to measure (and improve) performance.
+To demonstrate the performance improvement gained by compilation we compare the time needed to evaluate `net(x)` before and after hybridization. Let's define a class to measure this time first. It will come handy throughout the chapter as we set out to measure (and improve) performance.
 
 ```{.python .input}
 #@tab all
@@ -226,6 +228,7 @@ Now we can invoke the network three times, once executed eagerly, once with grap
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 net = get_net()
 with Benchmark('Without hybridization'):
     for i in range(1000): net(x)
@@ -274,11 +277,11 @@ As is observed in the above results, after a `tf.keras.Sequential` instance is s
 ### Serialization
 
 :begin_tab:`mxnet`
-One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time the code is often faster than what can be achieved in imperative programming. Let us see the `export` function in action.
+One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time the code is often faster than what can be achieved in imperative programming. Let's see the `export` function in action.
 :end_tab:
 
 :begin_tab:`pytorch`
-One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time the code is often faster than what can be achieved in imperative programming. Let us see the `save` function in action.
+One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time the code is often faster than what can be achieved in imperative programming. Let's see the `save` function in action.
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -288,6 +291,7 @@ Let's see the `saved_model` instance in action.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 net.export('my_mlp')
 !ls -lh my_mlp*
 ```
@@ -306,10 +310,11 @@ tf.saved_model.save(net, 'my_mlp')
 ```
 
 :begin_tab:`mxnet`
-The model is decomposed into a (large binary) parameter file and a JSON description of the program required to execute the model computation. The files can be read by other front-end languages supported by Python or MXNet, such as C++, R, Scala, and Perl. Let us have a look at the first few lines in the model description.
+The model is decomposed into a (large binary) parameter file and a JSON description of the program required to execute the model computation. The files can be read by other front-end languages supported by Python or MXNet, such as C++, R, Scala, and Perl. Let's have a look at the first few lines in the model description.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 !head my_mlp-symbol.json
 ```
 
@@ -320,6 +325,7 @@ Besides, contrary to the `Block` instance, which needs to use the `forward` func
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 class HybridNet(nn.HybridBlock):
     def __init__(self, **kwargs):
         super(HybridNet, self).__init__(**kwargs)
@@ -339,6 +345,7 @@ The code above implements a simple network with 4 hidden units and 2 outputs. Th
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 net = HybridNet()
 net.initialize()
 x = np.random.normal(size=(1, 3))
@@ -346,10 +353,11 @@ net(x)
 ```
 
 :begin_tab:`mxnet`
-Repeating the forward computation will lead to the same output (we omit details). Now let us see what happens if we invoke the `hybridize` function.
+Repeating the forward computation will lead to the same output (we omit details). Now let's see what happens if we invoke the `hybridize` function.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 net.hybridize()
 net(x)
 ```
@@ -359,6 +367,7 @@ Instead of using `ndarray` we now use the `symbol` module for `F`. Moreover, eve
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 net(x)
 ```
 

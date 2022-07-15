@@ -16,10 +16,11 @@ These bounding boxes are called *anchor boxes*.
 We will design an object detection model
 based on anchor boxes in :numref:`sec_ssd`.
 
-First, let us modify the printing accuracy
+First, let's modify the printing accuracy
 just for more concise outputs.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import gluon, image, np, npx
@@ -47,7 +48,7 @@ Then [**the width and height of the anchor box are $ws\sqrt{r}$ and $hs/\sqrt{r}
 Note that when the center position is given, an anchor box with known width and height is determined.
 
 To generate multiple anchor boxes with different shapes,
-let us set a series of scales
+let's set a series of scales
 $s_1,\ldots, s_n$ and 
 a series of aspect ratios $r_1,\ldots, r_m$.
 When using all the combinations of these scales and aspect ratios with each pixel as the center,
@@ -64,6 +65,7 @@ That is to say, the number of anchor boxes centered on the same pixel is $n+m-1$
 The above method of generating anchor boxes is implemented in the following `multibox_prior` function. We specify the input image, a list of scales, and a list of aspect ratios, then this function will return all the anchor boxes.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def multibox_prior(data, sizes, ratios):
     """Generate anchor boxes with different shapes centered on each pixel."""
@@ -148,6 +150,7 @@ We can see that [**the shape of the returned anchor box variable `Y`**] is
 (batch size, number of anchor boxes, 4).
 
 ```{.python .input}
+#@tab mxnet
 img = image.imread('../img/catdog.jpg').asnumpy()
 h, w = img.shape[:2]
 
@@ -254,6 +257,7 @@ the following `box_iou` computes their pairwise IoU
 across these two lists.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def box_iou(boxes1, boxes2):
     """Compute pairwise IoU across two lists of anchor or bounding boxes."""
@@ -332,14 +336,14 @@ closest ground-truth bounding boxes to anchor boxes.
 
 Given an image,
 suppose that the anchor boxes are $A_1, A_2, \ldots, A_{n_a}$ and the ground-truth bounding boxes are $B_1, B_2, \ldots, B_{n_b}$, where $n_a \geq n_b$.
-Let us define a matrix $\mathbf{X} \in \mathbb{R}^{n_a \times n_b}$, whose element $x_{ij}$ in the $i^\mathrm{th}$ row and $j^\mathrm{th}$ column is the IoU of the anchor box $A_i$ and the ground-truth bounding box $B_j$. The algorithm consists of the following steps:
+Let's define a matrix $\mathbf{X} \in \mathbb{R}^{n_a \times n_b}$, whose element $x_{ij}$ in the $i^\mathrm{th}$ row and $j^\mathrm{th}$ column is the IoU of the anchor box $A_i$ and the ground-truth bounding box $B_j$. The algorithm consists of the following steps:
 
 1. Find the largest element in matrix $\mathbf{X}$ and denote its row and column indices as $i_1$ and $j_1$, respectively. Then the ground-truth bounding box $B_{j_1}$ is assigned to the anchor box $A_{i_1}$. This is quite intuitive because $A_{i_1}$ and $B_{j_1}$ are the closest among all the pairs of anchor boxes and ground-truth bounding boxes. After the first assignment, discard all the elements in the ${i_1}^\mathrm{th}$ row and the ${j_1}^\mathrm{th}$ column in matrix $\mathbf{X}$. 
 1. Find the largest of the remaining elements in matrix $\mathbf{X}$ and denote its row and column indices as $i_2$ and $j_2$, respectively. We assign ground-truth bounding box $B_{j_2}$ to anchor box $A_{i_2}$ and discard all the elements in the ${i_2}^\mathrm{th}$ row and the ${j_2}^\mathrm{th}$ column in matrix $\mathbf{X}$.
 1. At this point, elements in two rows and two columns in  matrix $\mathbf{X}$ have been discarded. We proceed until all elements in $n_b$ columns in matrix $\mathbf{X}$ are discarded. At this time, we have assigned a ground-truth bounding box to each of $n_b$ anchor boxes.
 1. Only traverse through the remaining $n_a - n_b$ anchor boxes. For example, given any anchor box $A_i$, find the ground-truth bounding box $B_j$ with the largest IoU with $A_i$ throughout the $i^\mathrm{th}$ row of matrix $\mathbf{X}$, and assign $B_j$ to $A_i$ only if this IoU is greater than a predefined threshold.
 
-Let us illustrate the above algorithm using a concrete
+Let's illustrate the above algorithm using a concrete
 example.
 As shown in :numref:`fig_anchor_label` (left), assuming that the maximum value in matrix $\mathbf{X}$ is $x_{23}$, we assign the ground-truth bounding box $B_3$ to the anchor box $A_2$.
 Then, we discard all the elements in row 2 and column 3 of the matrix, find the largest $x_{71}$ in the remaining  elements (shaded area), and assign the ground-truth bounding box $B_1$ to the anchor box $A_7$. 
@@ -354,6 +358,7 @@ the remaining anchor boxes $A_1, A_3, A_4, A_6, A_8$ and determine whether to as
 This algorithm is implemented in the following `assign_anchor_to_bbox` function.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     """Assign closest ground-truth bounding boxes to anchor boxes."""
@@ -366,8 +371,8 @@ def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     anchors_bbox_map = np.full((num_anchors,), -1, dtype=np.int32, ctx=device)
     # Assign ground-truth bounding boxes according to the threshold
     max_ious, indices = np.max(jaccard, axis=1), np.argmax(jaccard, axis=1)
-    anc_i = np.nonzero(max_ious >= 0.5)[0]
-    box_j = indices[max_ious >= 0.5]
+    anc_i = np.nonzero(max_ious >= iou_threshold)[0]
+    box_j = indices[max_ious >= iou_threshold]
     anchors_bbox_map[anc_i] = box_j
     col_discard = np.full((num_anchors,), -1)
     row_discard = np.full((num_gt_boxes,), -1)
@@ -396,8 +401,8 @@ def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
                                   device=device)
     # Assign ground-truth bounding boxes according to the threshold
     max_ious, indices = torch.max(jaccard, dim=1)
-    anc_i = torch.nonzero(max_ious >= 0.5).reshape(-1)
-    box_j = indices[max_ious >= 0.5]
+    anc_i = torch.nonzero(max_ious >= iou_threshold).reshape(-1)
+    box_j = indices[max_ious >= iou_threshold]
     anchors_bbox_map[anc_i] = box_j
     col_discard = torch.full((num_anchors,), -1)
     row_discard = torch.full((num_gt_boxes,), -1)
@@ -415,7 +420,7 @@ def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
 
 Now we can label the class and offset for each anchor box. Suppose that an anchor box $A$ is assigned
 a ground-truth bounding box $B$. 
-On one hand,
+On the one hand,
 the class of the anchor box $A$ will be
 labeled as that of $B$.
 On the other hand,
@@ -467,6 +472,7 @@ to [**label classes and offsets for anchor boxes**] (the `anchors` argument) usi
 This function sets the background class to zero and increments the integer index of a new class by one.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def multibox_target(anchors, labels):
     """Label anchor boxes using ground-truth bounding boxes."""
@@ -542,7 +548,7 @@ def multibox_target(anchors, labels):
 
 ### An Example
 
-Let us illustrate anchor box labeling
+Let's illustrate anchor box labeling
 via a concrete example.
 We define ground-truth bounding boxes for the dog and cat in the loaded image,
 where the first element is the class (0 for dog and 1 for cat) and the remaining four elements are the
@@ -580,6 +586,7 @@ are 0, 1, and 2, respectively.
 Below we add an dimension for examples of anchor boxes and ground-truth bounding boxes.
 
 ```{.python .input}
+#@tab mxnet
 labels = multibox_target(np.expand_dims(anchors, axis=0),
                          np.expand_dims(ground_truth, axis=0))
 ```
@@ -593,7 +600,7 @@ labels = multibox_target(anchors.unsqueeze(dim=0),
 There are three items in the returned result, all of which are in the tensor format.
 The third item contains the labeled classes of the input anchor boxes.
 
-Let us analyze the returned class labels below based on
+Let's analyze the returned class labels below based on
 anchor box and ground-truth bounding box positions in the image.
 First, among all the pairs of anchor boxes
 and ground-truth bounding boxes,
@@ -694,6 +701,7 @@ Then we manipulate the sorted list $L$ in the following steps:
 [**The following `nms` function sorts confidence scores in descending order and returns their indices.**]
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def nms(boxes, scores, iou_threshold):
     """Sort confidence scores of predicted bounding boxes."""
@@ -736,6 +744,7 @@ a bit complicated: we will show how it works
 with a concrete example right after the implementation.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
                        pos_threshold=0.009999999):
@@ -806,7 +815,7 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
     return d2l.stack(out)
 ```
 
-Now let us [**apply the above implementations
+Now let's [**apply the above implementations
 to a concrete example with four anchor boxes**].
 For simplicity, we assume that the
 predicted offsets are all zeros.
@@ -849,6 +858,7 @@ The remaining four elements are the $(x, y)$-axis coordinates of the upper-left 
 the lower-right corner of the predicted bounding box, respectively (range is between 0 and 1).
 
 ```{.python .input}
+#@tab mxnet
 output = multibox_detection(np.expand_dims(cls_probs, axis=0),
                             np.expand_dims(offset_preds, axis=0),
                             np.expand_dims(anchors, axis=0),

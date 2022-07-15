@@ -84,8 +84,8 @@ the entire image :cite:`Girshick.2015`.
 
 1. Compared with the R-CNN, in the fast R-CNN the input of the CNN for feature extraction is the entire image, rather than individual region proposals. Moreover, this CNN is trainable. Given an input image, let the shape of the CNN output be $1 \times c \times h_1  \times w_1$.
 1. Suppose that selective search generates $n$ region proposals. These region proposals (of different shapes) mark regions of interest (of different shapes) on the CNN output. Then these regions of interest further extract features of the same shape (say height $h_2$ and width $w_2$ are specified) in order to be easily concatenated. To achieve this, the fast R-CNN introduces the *region of interest (RoI) pooling* layer: the CNN output and region proposals are input into this layer, outputting concatenated features of shape $n \times c \times h_2 \times w_2$ that are further extracted for all the region proposals.
-1. Using a fully-connected layer, transform the concatenated features into an output of shape $n \times d$, where $d$ depends on the model design.
-1. Predict the class and bounding box for each of the $n$ region proposals. More concretely, in class and bounding box prediction, transform the fully-connected layer output into an output of shape $n \times q$ ($q$ is the number of classes) and an output of shape $n \times 4$, respectively. The class prediction uses softmax regression.
+1. Using a fully connected layer, transform the concatenated features into an output of shape $n \times d$, where $d$ depends on the model design.
+1. Predict the class and bounding box for each of the $n$ region proposals. More concretely, in class and bounding box prediction, transform the fully connected layer output into an output of shape $n \times q$ ($q$ is the number of classes) and an output of shape $n \times 4$, respectively. The class prediction uses softmax regression.
 
 
 The region of interest pooling layer proposed in the fast R-CNN is different from the pooling layer introduced in :numref:`sec_pooling`. 
@@ -97,7 +97,7 @@ In contrast,
 we can directly specify the output shape
 in the region of interest pooling layer.
 
-For example, let us specify
+For example, let's specify
 the output height and width 
 for each region as $h_2$ and $w_2$, respectively.
 For any region of interest window
@@ -107,7 +107,7 @@ of subwindows,
 where the shape of each subwindow is approximately 
 $(h/h_2) \times (w/w_2)$.
 In practice,
-the height and width of any subwindow shall be rounded up, and the largest element shall be used as the output of the subwindow.
+the height and width of any subwindow shall be rounded up, and the largest element shall be used as output of the subwindow.
 Therefore, the region of interest pooling layer can extract features of the same shape 
 even when regions of interest have different shapes.
 
@@ -133,6 +133,7 @@ and 10.
 Below we demonstrate the computation of the region of interest pooling layer. Suppose that the height and width of the CNN-extracted features `X` are both 4, and there is only a single channel.
 
 ```{.python .input}
+#@tab mxnet
 from mxnet import np, npx
 
 npx.set_np()
@@ -150,13 +151,14 @@ X = torch.arange(16.).reshape(1, 1, 4, 4)
 X
 ```
 
-Let us further suppose
+Let's further suppose
 that  the height and width of the input image are both 40 pixels and that selective search generates two region proposals on this image.
 Each region proposal
 is expressed as five elements:
 its object class followed by the $(x, y)$-coordinates of its upper-left and lower-right corners.
 
 ```{.python .input}
+#@tab mxnet
 rois = np.array([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])
 ```
 
@@ -175,6 +177,7 @@ into a grid of sub-windows to
 further extract features of the same shape $2\times 2$.
 
 ```{.python .input}
+#@tab mxnet
 npx.roi_pooling(X, rois, pooled_size=(2, 2), spatial_scale=0.1)
 ```
 

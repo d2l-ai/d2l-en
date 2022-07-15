@@ -16,10 +16,10 @@ the basic knowledge of natural language processing.
 
 ## One-Hot Vectors Are a Bad Choice
 
-We used one-hot vectors to represent words (characters are words) in :numref:`sec_rnn_scratch`.
+We used one-hot vectors to represent words (characters are words) in :numref:`sec_rnn-scratch`.
 Suppose that the number of different words in the dictionary (the dictionary size) is $N$,
 and each word corresponds to
-a different integer (index) from $0$ to $N−1$.
+a different integer (index) from $0$ to $N-1$.
 To obtain the one-hot vector representation
 for any word with index $i$,
 we create a length-$N$ vector with all 0s
@@ -64,7 +64,7 @@ In the following, we will introduce these two models and their training methods.
 
 The *skip-gram* model assumes that a word can be used to generate its surrounding words in a text sequence.
 Take the text sequence "the", "man", "loves", "his", "son" as an example.
-Let us choose "loves" as the *center word* and set the context window size to 2.
+Let's choose "loves" as the *center word* and set the context window size to 2.
 As shown in :numref:`fig_skip_gram`,
 given the center word "loves",
 the skip-gram model considers
@@ -175,7 +175,7 @@ the conditional probability of generating the center word "loves" based on the c
 $$P(\textrm{"loves"}\mid\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}).$$
 
 ![The continuous bag of words model considers the conditional probability of generating the center word given its surrounding context words.](../img/cbow.svg)
-:eqlabel:`fig_cbow`
+:label:`fig_cbow`
 
 
 Since there are multiple context words
@@ -194,11 +194,11 @@ center word $w_c$ (with index $c$ in the dictionary) given its surrounding conte
 
 
 
-$$P(w_c \mid w_{o_1}, \ldots, w_{o_{2m}}) = \frac{\text{exp}\left(\frac{1}{2m}\mathbf{u}_c^\top (\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}}) \right)}{ \sum_{i \in \mathcal{V}} \text{exp}\left(\frac{1}{2m}\mathbf{u}_i^\top (\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}}) \right)}.$$
+$$P(w_c \mid w_{o_1}, \ldots, w_{o_{2m}}) = \frac{\text{exp}\left(\frac{1}{2m}\mathbf{u}_c^\top (\mathbf{v}_{o_1} + \ldots + \mathbf{v}_{o_{2m}}) \right)}{ \sum_{i \in \mathcal{V}} \text{exp}\left(\frac{1}{2m}\mathbf{u}_i^\top (\mathbf{v}_{o_1} + \ldots + \mathbf{v}_{o_{2m}}) \right)}.$$
 :eqlabel:`fig_cbow-full`
 
 
-For brevity, let $\mathcal{W}_o= \{w_{o_1}, \ldots, w_{o_{2m}}\}$ and $\bar{\mathbf{v}}_o = \left(\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}} \right)/(2m)$. Then :eqref:`fig_cbow-full` can be simplified as
+For brevity, let $\mathcal{W}_o= \{w_{o_1}, \ldots, w_{o_{2m}}\}$ and $\bar{\mathbf{v}}_o = \left(\mathbf{v}_{o_1} + \ldots + \mathbf{v}_{o_{2m}} \right)/(2m)$. Then :eqref:`fig_cbow-full` can be simplified as
 
 $$P(w_c \mid \mathcal{W}_o) = \frac{\exp\left(\mathbf{u}_c^\top \bar{\mathbf{v}}_o\right)}{\sum_{i \in \mathcal{V}} \exp\left(\mathbf{u}_i^\top \bar{\mathbf{v}}_o\right)}.$$
 
@@ -257,6 +257,6 @@ uses context word vectors as the word representations.
 
 1. What is the computational complexity for calculating each gradient? What could be the issue if the dictionary size is huge?
 1. Some fixed phrases in English consist of multiple words, such as "new york". How to train their word vectors? Hint: see Section 4 in the word2vec paper :cite:`Mikolov.Sutskever.Chen.ea.2013`.
-1. Let us reflect on the word2vec design by taking the skip-gram model as an example. What is the relationship between the dot product of two word vectors in the skip-gram model and the cosine similarity? For a pair of words with similar semantics, why may the cosine similarity of their word vectors (trained by the skip-gram model) be high?
+1. Let's reflect on the word2vec design by taking the skip-gram model as an example. What is the relationship between the dot product of two word vectors in the skip-gram model and the cosine similarity? For a pair of words with similar semantics, why may the cosine similarity of their word vectors (trained by the skip-gram model) be high?
 
 [Discussions](https://discuss.d2l.ai/t/381)

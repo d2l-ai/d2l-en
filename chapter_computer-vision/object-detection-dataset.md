@@ -18,6 +18,7 @@ The banana detection dataset with all the image and
 csv label files can be downloaded directly from the Internet.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import gluon, image, np, npx
@@ -55,6 +56,7 @@ ground-truth bounding box coordinates
 at the upper-left and lower-right corners.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def read_data_bananas(is_train=True):
     """Read the banana detection dataset images and labels."""
@@ -103,6 +105,7 @@ will allow us to [**create a customized `Dataset` instance**]
 for loading the banana detection dataset.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 class BananasDataset(gluon.data.Dataset):
     """A customized dataset to load the banana detection dataset."""
@@ -143,6 +146,7 @@ For the test dataset,
 there is no need to read it in random order.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def load_data_bananas(batch_size):
     """Load the banana detection dataset."""
@@ -165,7 +169,7 @@ def load_data_bananas(batch_size):
     return train_iter, val_iter
 ```
 
-Let us [**read a minibatch and print the shapes of
+Let's [**read a minibatch and print the shapes of
 both images and labels**] in this minibatch.
 The shape of the image minibatch,
 (batch size, number of channels, height, width),
@@ -207,23 +211,24 @@ batch[0].shape, batch[1].shape
 
 ## [**Demonstration**]
 
-Let us demonstrate ten images with their labeled ground-truth bounding boxes.
+Let's demonstrate ten images with their labeled ground-truth bounding boxes.
 We can see that the rotations, sizes, and positions of bananas vary across all these images.
 Of course, this is just a simple artificial dataset.
 In practice, real-world datasets are usually much more complicated.
 
 ```{.python .input}
-imgs = (batch[0][0:10].transpose(0, 2, 3, 1)) / 255
+#@tab mxnet
+imgs = (batch[0][:10].transpose(0, 2, 3, 1)) / 255
 axes = d2l.show_images(imgs, 2, 5, scale=2)
-for ax, label in zip(axes, batch[1][0:10]):
+for ax, label in zip(axes, batch[1][:10]):
     d2l.show_bboxes(ax, [label[0][1:5] * edge_size], colors=['w'])
 ```
 
 ```{.python .input}
 #@tab pytorch
-imgs = (batch[0][0:10].permute(0, 2, 3, 1)) / 255
+imgs = (batch[0][:10].permute(0, 2, 3, 1)) / 255
 axes = d2l.show_images(imgs, 2, 5, scale=2)
-for ax, label in zip(axes, batch[1][0:10]):
+for ax, label in zip(axes, batch[1][:10]):
     d2l.show_bboxes(ax, [label[0][1:5] * edge_size], colors=['w'])
 ```
 

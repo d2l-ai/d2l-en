@@ -10,7 +10,7 @@ One way of fixing this problem would be to use $\mathbf{s}_t / t$. For reasonabl
 
 ## The Algorithm
 
-Let us write out the equations in detail.
+Let's write out the equations in detail.
 
 $$\begin{aligned}
     \mathbf{s}_t & \leftarrow \gamma \mathbf{s}_{t-1} + (1 - \gamma) \mathbf{g}_t^2, \\
@@ -26,9 +26,10 @@ $$
 \end{aligned}
 $$
 
-As before in :numref:`sec_momentum` we use $1 + \gamma + \gamma^2 + \ldots, = \frac{1}{1-\gamma}$. Hence the sum of weights is normalized to $1$ with a half-life time of an observation of $\gamma^{-1}$. Let us visualize the weights for the past 40 time steps for various choices of $\gamma$.
+As before in :numref:`sec_momentum` we use $1 + \gamma + \gamma^2 + \ldots, = \frac{1}{1-\gamma}$. Hence the sum of weights is normalized to $1$ with a half-life time of an observation of $\gamma^{-1}$. Let's visualize the weights for the past 40 time steps for various choices of $\gamma$.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
@@ -101,6 +102,7 @@ def init_rmsprop_states(feature_dim):
 ```
 
 ```{.python .input}
+#@tab mxnet
 def rmsprop(params, states, hyperparams):
     gamma, eps = hyperparams['gamma'], 1e-6
     for p, s in zip(params, states):
@@ -142,6 +144,7 @@ d2l.train_ch11(rmsprop, init_rmsprop_states(feature_dim),
 Since RMSProp is a rather popular algorithm it is also available in the `Trainer` instance. All we need to do is instantiate it using an algorithm named `rmsprop`, assigning $\gamma$ to the parameter `gamma1`.
 
 ```{.python .input}
+#@tab mxnet
 d2l.train_concise_ch11('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
                        data_iter)
 ```

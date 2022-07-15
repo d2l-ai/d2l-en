@@ -27,6 +27,7 @@ holds the classification results
 for the input pixel at the same spatial position.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import gluon, image, init, np, npx
@@ -71,11 +72,12 @@ Below, we [**use a ResNet-18 model pretrained on the ImageNet dataset to extract
 and denote the model instance as `pretrained_net`.
 The last few layers of this model
 include a global average pooling layer
-and a fully-connected layer:
+and a fully connected layer:
 they are not needed
 in the fully convolutional network.
 
 ```{.python .input}
+#@tab mxnet
 pretrained_net = gluon.model_zoo.vision.resnet18_v2(pretrained=True)
 pretrained_net.features[-3:], pretrained_net.output
 ```
@@ -89,10 +91,11 @@ list(pretrained_net.children())[-3:]
 Next, we [**create the fully convolutional network instance `net`**].
 It copies all the pretrained layers in the ResNet-18
 except for the final global average pooling layer
-and the fully-connected layer that are closest
+and the fully connected layer that are closest
 to the output.
 
 ```{.python .input}
+#@tab mxnet
 net = nn.HybridSequential()
 for layer in pretrained_net.features[:-2]:
     net.add(layer)
@@ -108,6 +111,7 @@ the forward propagation of `net`
 reduces the input height and width to 1/32 of the original, namely 10 and 15.
 
 ```{.python .input}
+#@tab mxnet
 X = np.random.uniform(size=(1, 3, 320, 480))
 net(X).shape
 ```
@@ -135,6 +139,7 @@ the transposed convolution will increase
 the height and width of the input by $s$ times.
 
 ```{.python .input}
+#@tab mxnet
 num_classes = 21
 net.add(nn.Conv2D(num_classes, kernel_size=1),
         nn.Conv2DTranspose(
@@ -171,7 +176,7 @@ of the upsampled output image.
 In order to calculate the pixel of the output image
 at coordinate $(x, y)$, 
 first map $(x, y)$ to coordinate $(x', y')$ on the input image, for example, according to the ratio of the input size to the output size. 
-Note that the mapped $x′$ and $y′$ are real numbers. 
+Note that the mapped $x'$ and $y'$ are real numbers. 
 Then, find the four pixels closest to coordinate
 $(x', y')$ on the input image. 
 Finally, the pixel of the output image at coordinate $(x, y)$ is calculated based on these four closest pixels
@@ -184,6 +189,7 @@ Due to space limitations, we only provide the implementation of the `bilinear_ke
 without discussions on its algorithm design.
 
 ```{.python .input}
+#@tab mxnet
 def bilinear_kernel(in_channels, out_channels, kernel_size):
     factor = (kernel_size + 1) // 2
     if kernel_size % 2 == 1:
@@ -217,13 +223,14 @@ def bilinear_kernel(in_channels, out_channels, kernel_size):
     return weight
 ```
 
-Let us [**experiment with upsampling of bilinear interpolation**] 
+Let's [**experiment with upsampling of bilinear interpolation**] 
 that is implemented by a transposed convolutional layer. 
 We construct a transposed convolutional layer that 
 doubles the height and weight,
 and initialize its kernel with the `bilinear_kernel` function.
 
 ```{.python .input}
+#@tab mxnet
 conv_trans = nn.Conv2DTranspose(3, kernel_size=4, padding=1, strides=2)
 conv_trans.initialize(init.Constant(bilinear_kernel(3, 3, 4)))
 ```
@@ -238,6 +245,7 @@ conv_trans.weight.data.copy_(bilinear_kernel(3, 3, 4));
 Read the image `X` and assign the upsampling output to `Y`. In order to print the image, we need to adjust the position of the channel dimension.
 
 ```{.python .input}
+#@tab mxnet
 img = image.imread('../img/catdog.jpg')
 X = np.expand_dims(img.astype('float32').transpose(2, 0, 1), axis=0) / 255
 Y = conv_trans(X)
@@ -257,6 +265,7 @@ Except for the different scales in coordinates,
 the image scaled up by bilinear interpolation and the original image printed in :numref:`sec_bbox` look the same.
 
 ```{.python .input}
+#@tab mxnet
 d2l.set_figsize()
 print('input image shape:', img.shape)
 d2l.plt.imshow(img.asnumpy());
@@ -276,6 +285,7 @@ d2l.plt.imshow(out_img);
 In a fully convolutional network, we [**initialize the transposed convolutional layer with upsampling of bilinear interpolation. For the $1\times 1$ convolutional layer, we use Xavier initialization.**]
 
 ```{.python .input}
+#@tab mxnet
 W = bilinear_kernel(num_classes, num_classes, 64)
 net[-1].initialize(init.Constant(W))
 net[-2].initialize(init=init.Xavier())
@@ -317,6 +327,7 @@ based on correctness
 of the predicted class for all the pixels.
 
 ```{.python .input}
+#@tab mxnet
 num_epochs, lr, wd, devices = 5, 0.1, 1e-3, d2l.try_all_gpus()
 loss = gluon.loss.SoftmaxCrossEntropyLoss(axis=1)
 net.collect_params().reset_ctx(devices)
@@ -341,8 +352,8 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 When predicting, we need to standardize the input image
 in each channel and transform the image into the four-dimensional input format required by the CNN.
 
-
 ```{.python .input}
+#@tab mxnet
 def predict(img):
     X = test_iter._dataset.normalize_image(img)
     X = np.expand_dims(X.transpose(2, 0, 1), axis=0)
@@ -361,6 +372,7 @@ def predict(img):
 To [**visualize the predicted class**] of each pixel, we map the predicted class back to its label color in the dataset.
 
 ```{.python .input}
+#@tab mxnet
 def label2image(pred):
     colormap = np.array(d2l.VOC_COLORMAP, ctx=devices[0], dtype='uint8')
     X = pred.astype('int32')
@@ -402,6 +414,7 @@ prediction results,
 and ground-truth row by row.
 
 ```{.python .input}
+#@tab mxnet
 voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
 test_images, test_labels = d2l.read_voc_images(voc_dir, False)
 n, imgs = 4, []

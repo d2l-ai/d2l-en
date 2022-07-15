@@ -12,6 +12,7 @@ whose corresponding logarithmic loss is given by
 the opposite of :eqref:`eq_skip-gram-log`.
 
 
+
 Due to the nature of the softmax operation,
 since a context word may be anyone in the
 dictionary $\mathcal{V}$,
@@ -63,7 +64,7 @@ where $\sigma$ uses the definition of the sigmoid activation function:
 $$\sigma(x) = \frac{1}{1+\exp(-x)}.$$
 :eqlabel:`eq_sigma-f`
 
-Let us begin by
+Let's begin by
 maximizing the joint probability of
 all such events in text sequences
 to train word embeddings.
@@ -192,7 +193,7 @@ is defined in :eqref:`eq_sigma-f`,
 and $\text{leftChild}(n)$ is the left child node of node $n$: if $x$ is true, $[\![x]\!] = 1$; otherwise $[\![x]\!] = -1$.
 
 To illustrate,
-let us calculate
+let's calculate
 the conditional probability
 of generating word $w_3$
 given word $w_c$ in :numref:`fig_hi_softmax`.

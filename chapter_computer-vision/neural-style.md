@@ -84,6 +84,7 @@ From their printed coordinate axes,
 we can tell that these images have different sizes.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, image, init, np, npx
@@ -110,6 +111,7 @@ d2l.plt.imshow(content_img);
 ```
 
 ```{.python .input}
+#@tab mxnet
 style_img = image.imread('../img/autumn-oak.jpg')
 d2l.plt.imshow(style_img.asnumpy());
 ```
@@ -130,6 +132,7 @@ Since the image printing function requires that each pixel has a floating point 
 we replace any value smaller than 0 or greater than 1 with 0 or 1, respectively.
 
 ```{.python .input}
+#@tab mxnet
 rgb_mean = np.array([0.485, 0.456, 0.406])
 rgb_std = np.array([0.229, 0.224, 0.225])
 
@@ -166,6 +169,7 @@ def postprocess(img):
 We use the VGG-19 model pretrained on the ImageNet dataset to extract image features :cite:`Gatys.Ecker.Bethge.2016`.
 
 ```{.python .input}
+#@tab mxnet
 pretrained_net = gluon.model_zoo.vision.vgg19(pretrained=True)
 ```
 
@@ -193,10 +197,11 @@ style_layers, content_layers = [0, 5, 10, 19, 28], [25]
 When extracting features using VGG layers,
 we only need to use all those
 from the input layer to the content layer or style layer that is closest to the output layer.
-Let us construct a new network instance `net`, which only retains all the VGG layers to be
+Let's construct a new network instance `net`, which only retains all the VGG layers to be
 used for feature extraction.
 
 ```{.python .input}
+#@tab mxnet
 net = nn.Sequential()
 for i in range(max(content_layers + style_layers) + 1):
     net.add(pretrained_net.features[i])
@@ -240,6 +245,7 @@ for style transfer,
 we can only extract the content and style features of the synthesized image by calling the `extract_features` function during training.
 
 ```{.python .input}
+#@tab mxnet
 def get_contents(image_shape, device):
     content_X = preprocess(content_img, image_shape).copyto(device)
     contents_Y, _ = extract_features(content_X, content_layers, style_layers)
@@ -281,6 +287,7 @@ are both
 outputs of the content layer computed by the `extract_features` function.
 
 ```{.python .input}
+#@tab mxnet
 def content_loss(Y_hat, Y):
     return np.square(Y_hat - Y).mean()
 ```
@@ -338,6 +345,7 @@ the synthesized image and the style image.
 It is assumed here that the Gram matrix `gram_Y` based on the style image has been precomputed.
 
 ```{.python .input}
+#@tab mxnet
 def style_loss(Y_hat, gram_Y):
     return np.square(gram(Y_hat) - gram_Y).mean()
 ```
@@ -402,6 +410,7 @@ Thus, we can define a simple model, `SynthesizedImage`, and treat the synthesize
 In this model, forward propagation just returns the model parameters.
 
 ```{.python .input}
+#@tab mxnet
 class SynthesizedImage(nn.Block):
     def __init__(self, img_shape, **kwargs):
         super(SynthesizedImage, self).__init__(**kwargs)
@@ -427,6 +436,7 @@ This function creates a synthesized image model instance and initializes it to t
 Gram matrices for the style image at various style layers, `styles_Y_gram`, are computed prior to training.
 
 ```{.python .input}
+#@tab mxnet
 def get_inits(X, device, lr, styles_Y):
     gen_img = SynthesizedImage(X.shape)
     gen_img.initialize(init.Constant(X), ctx=device, force_reinit=True)
@@ -455,6 +465,7 @@ content features and style features of the synthesized image, and calculate the 
 Below defines the training loop.
 
 ```{.python .input}
+#@tab mxnet
 def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
     X, styles_Y_gram, trainer = get_inits(X, device, lr, styles_Y)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
@@ -508,6 +519,7 @@ We rescale the height and width of the content and style images to 300 by 450 pi
 We use the content image to initialize the synthesized image.
 
 ```{.python .input}
+#@tab mxnet
 device, image_shape = d2l.try_gpu(), (450, 300)
 net.collect_params().reset_ctx(device)
 content_X, contents_Y = get_contents(image_shape, device)

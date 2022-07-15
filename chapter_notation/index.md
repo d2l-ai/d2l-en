@@ -1,17 +1,20 @@
 # Notation
 :label:`chap_notation`
 
-Throughout this book, we adhere to the following notational conventions.
+Throughout this book, we adhere 
+to the following notational conventions.
 Note that some of these symbols are placeholders,
 while others refer to specific objects.
 As a general rule of thumb, 
-the indefinite article "a" indicates
+the indefinite article "a" often indicates
 that the symbol is a placeholder
 and that similarly formatted symbols
 can denote other objects of the same type.
 For example, "$x$: a scalar" means 
 that lowercased letters generally
-represent scalar values.
+represent scalar values,
+but "$\mathbb{Z}$: the set of integers"
+refers specifically to the symbol $\mathbb{Z}$.
 
 
 
@@ -21,10 +24,9 @@ represent scalar values.
 * $\mathbf{x}$: a vector
 * $\mathbf{X}$: a matrix
 * $\mathsf{X}$: a general tensor
-* $\mathbf{I}$: an identity matrix---square, with $1$ on all diagonal entries and $0$ on all off-diagonals
+* $\mathbf{I}$: the identity matrix (of some given dimension), i.e., a square matrix with $1$ on all diagonal entries and $0$ on all off-diagonals
 * $x_i$, $[\mathbf{x}]_i$: the $i^\mathrm{th}$ element of vector $\mathbf{x}$
 * $x_{ij}$, $x_{i,j}$,$[\mathbf{X}]_{ij}$, $[\mathbf{X}]_{i,j}$: the element of matrix $\mathbf{X}$ at row $i$ and column $j$.
-
 
 
 
@@ -43,6 +45,7 @@ represent scalar values.
 * $\mathcal{A}\setminus\mathcal{B}$: set subtraction of $\mathcal{B}$ from $\mathcal{A}$ (contains only those elements of $\mathcal{A}$ that do not belong to $\mathcal{B}$)
 
 
+
 ## Functions and Operators
 
 
@@ -56,12 +59,13 @@ represent scalar values.
 * $\mathbf{X}^{-1}$: inverse of matrix $\mathbf{X}$
 * $\odot$: Hadamard (elementwise) product
 * $[\cdot, \cdot]$: concatenation
-* $\|\cdot\|_p$: $L_p$ norm
-* $\|\cdot\|$: $L_2$ norm
+* $\|\cdot\|_p$: $\ell_p$ norm
+* $\|\cdot\|$: $\ell_2$ norm
 * $\langle \mathbf{x}, \mathbf{y} \rangle$: dot product of vectors $\mathbf{x}$ and $\mathbf{y}$
 * $\sum$: summation over a collection of elements
 * $\prod$: product over a collection of elements
 * $\stackrel{\mathrm{def}}{=}$: an equality asserted as a definition of the symbol on the left-hand side
+
 
 
 ## Calculus
@@ -72,11 +76,13 @@ represent scalar values.
 * $\int_a^b f(x) \;dx$: definite integral of $f$ from $a$ to $b$ with respect to $x$
 * $\int f(x) \;dx$: indefinite integral of $f$ with respect to $x$
 
+
+
 ## Probability and Information Theory
 
 * $X$: a random variable
 * $P$: a probability distribution
-* $X \sim P$: the random variable $X$ has distribution $P$
+* $X \sim P$: the random variable $X$ follows distribution $P$
 * $P(X=x)$: the probability assigned to the event where random variable $X$ takes value $x$
 * $P(X \mid Y)$: the conditional probability distribution of $X$ given $Y$
 * $p(\cdot)$: a probability density function (PDF) associated with distribution P
@@ -89,6 +95,7 @@ represent scalar values.
 * $\rho(X, Y)$: the Pearson correlation coefficient between $X$ and $Y$, equals $\frac{\mathrm{Cov}(X, Y)}{\sigma_X \sigma_Y}$
 * $H(X)$: entropy of random variable $X$
 * $D_{\mathrm{KL}}(P\|Q)$: the KL-divergence (or relative entropy) from distribution $Q$ to distribution $P$
+
 
 
 [Discussions](https://discuss.d2l.ai/t/25)

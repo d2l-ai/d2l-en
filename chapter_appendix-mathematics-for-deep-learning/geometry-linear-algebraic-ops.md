@@ -110,7 +110,7 @@ The dot product :eqref:`eq_dot_def` also admits a geometric interpretation: it i
 ![Between any two vectors in the plane there is a well defined angle $\theta$.  We will see this angle is intimately tied to the dot product.](../img/vec-angle.svg)
 :label:`fig_angle`
 
-To start, let us consider two specific vectors:
+To start, let's consider two specific vectors:
 
 $$
 \mathbf{v} = (r,0) \; \text{and} \; \mathbf{w} = (s\cos(\theta), s \sin(\theta)).
@@ -144,9 +144,10 @@ $$\theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf
 This is a nice result since nothing in the computation references two-dimensions.
 Indeed, we can use this in three or three million dimensions without issue.
 
-As a simple example, let us see how to compute the angle between a pair of vectors:
+As a simple example, let's see how to compute the angle between a pair of vectors:
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -245,7 +246,7 @@ of a line (two dimensions) or of a plane (three dimensions).
 In an $d$-dimensional vector space, a hyperplane has $d-1$ dimensions
 and divides the space into two half-spaces.
 
-Let us start with an example.
+Let's start with an example.
 Suppose that we have a column vector $\mathbf{w}=[2,1]^\top$. We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"
 By recalling the connection between dot products and angles above :eqref:`eq_angle_forumla`,
 we can see that this is equivalent to
@@ -300,12 +301,13 @@ to be to find a non-linear embedding such that the target classes
 can be separated cleanly by hyperplanes.
 
 To give a hand-built example, notice that we can produce a reasonable model
-to classify tiny images of t-shirts and trousers from the Fashion MNIST dataset
+to classify tiny images of t-shirts and trousers from the Fashion-MNIST dataset
 (seen in :numref:`sec_fashion_mnist`)
 by just taking the vector between their means to define the decision plane
 and eyeball a crude threshold.  First we will load the data and compute the averages.
 
 ```{.python .input}
+#@tab mxnet
 # Load in the dataset
 train = gluon.data.vision.FashionMNIST(train=True)
 test = gluon.data.vision.FashionMNIST(train=False)
@@ -368,7 +370,7 @@ ave_0 = tf.reduce_mean(X_train_0, axis=0)
 ave_1 = tf.reduce_mean(X_train_1, axis=0)
 ```
 
-It can be informative to examine these averages in detail, so let us plot what they look like.  In this case, we see that the average indeed resembles a blurry image of a t-shirt.
+It can be informative to examine these averages in detail, so let's plot what they look like.  In this case, we see that the average indeed resembles a blurry image of a t-shirt.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -405,6 +407,7 @@ d2l.plt.show()
 In a fully machine learned solution, we would learn the threshold from the dataset.  In this case, I simply eyeballed a threshold that looked good on the training data by hand.
 
 ```{.python .input}
+#@tab mxnet
 # Print test set accuracy with eyeballed threshold
 w = (ave_1 - ave_0).T
 predictions = X_test.reshape(2000, -1).dot(w.flatten()) > -1500000
@@ -480,7 +483,7 @@ These vectors are an example a *basis*,
 where we can write any vector in our space
 as a weighted sum of these *basis vectors*.
 
-Let us draw what happens when we use the specific matrix
+Let's draw what happens when we use the specific matrix
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -545,7 +548,7 @@ This compresses the entire plane down to live on the single line $y = 2x$.
 The question now arises: is there some way we can detect this
 just looking at the matrix itself?
 The answer is that indeed we can.
-Let us take $\mathbf{b}_1 = [2,4]^\top$ and $\mathbf{b}_2 = [-1, -2]^\top$
+Let's take $\mathbf{b}_1 = [2,4]^\top$ and $\mathbf{b}_2 = [-1, -2]^\top$
 be the two columns of $\mathbf{B}$.
 Remember that we can write everything transformed by the matrix $\mathbf{B}$
 as a weighted sum of the columns of the matrix:
@@ -687,6 +690,7 @@ We can test to see this by seeing that multiplying
 by the inverse given by the formula above works in practice.
 
 ```{.python .input}
+#@tab mxnet
 M = np.array([[1, 2], [1, 4]])
 M_inv = np.array([[2, -1], [-0.5, 0.5]])
 M_inv.dot(M)
@@ -779,9 +783,10 @@ we can see with some computation that the area
 of the resulting parallelogram is $ad-bc$.
 This area is referred to as the *determinant*.
 
-Let us check this quickly with some example code.
+Let's check this quickly with some example code.
 
 ```{.python .input}
+#@tab mxnet
 import numpy as np
 np.linalg.det(np.array([[1, -1], [2, 3]]))
 ```
@@ -802,9 +807,9 @@ For the negative term, this is a matter of convention
 taken generally in mathematics:
 if the matrix flips the figure,
 we say the area is negated.
-Let us see now that when the determinant is zero, we learn more.
+Let's see now that when the determinant is zero, we learn more.
 
-Let us consider
+Let's consider
 
 $$
 \mathbf{B} = \begin{bmatrix}
@@ -886,7 +891,7 @@ $$
 
 ### Common Examples from Linear Algebra
 
-Let us see how many of the linear algebraic definitions
+Let's see how many of the linear algebraic definitions
 we have seen before can be expressed in this compressed tensor notation:
 
 * $\mathbf{v} \cdot \mathbf{w} = \sum_i v_iw_i$
@@ -903,6 +908,7 @@ As seen in :numref:`sec_linear-algebra`,
 we can create tensors as is shown below.
 
 ```{.python .input}
+#@tab mxnet
 # Define tensors
 B = np.array([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
 A = np.array([[1, 2], [3, 4]])
@@ -943,6 +949,7 @@ we can consider the Einstein summation seen above
 and strip out the indices themselves to get the implementation:
 
 ```{.python .input}
+#@tab mxnet
 # Reimplement matrix multiplication
 np.einsum("ij, j -> i", A, v), A.dot(v)
 ```
@@ -970,6 +977,7 @@ $$
 it can be implemented via Einstein summation as:
 
 ```{.python .input}
+#@tab mxnet
 np.einsum("ijk, il, j -> kl", B, A, v)
 ```
 
@@ -991,6 +999,7 @@ by providing integer indices for each tensor.
 For example, the same tensor contraction can also be written as:
 
 ```{.python .input}
+#@tab mxnet
 np.einsum(B, [0, 1, 2], A, [0, 3], v, [1], [2, 3])
 ```
 

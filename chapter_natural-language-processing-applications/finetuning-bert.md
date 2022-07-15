@@ -12,7 +12,7 @@ In :numref:`sec_bert`,
 we introduced a pretraining model, BERT,
 that requires minimal architecture changes
 for a wide range of natural language processing tasks.
-One one hand,
+On the one hand,
 at the time of its proposal,
 BERT improved the state of the art on various natural language processing tasks.
 On the other hand,
@@ -36,7 +36,7 @@ such as text tagging and question answering
 and shed light on how BERT can represent their inputs and get transformed into output labels.
 During fine-tuning,
 the "minimal architecture changes" required by BERT across different applications
-are the extra fully-connected layers.
+are the extra fully connected layers.
 During supervised learning of a downstream application,
 parameters of the extra layers are learned from scratch while
 all the parameters in the pretrained BERT model are fine-tuned.
@@ -44,7 +44,7 @@ all the parameters in the pretrained BERT model are fine-tuned.
 
 ## Single Text Classification
 
-*Single text classification* takes a single text sequence as the input and outputs its classification result.
+*Single text classification* takes a single text sequence as input and outputs its classification result.
 Besides sentiment analysis that we have studied in this chapter,
 the Corpus of Linguistic Acceptability (CoLA)
 is also a dataset for single text classification,
@@ -65,7 +65,7 @@ in single text classification applications,
 the BERT representation of the special classification token 
 “&lt;cls&gt;” encodes the information of the entire input text sequence.
 As the representation of the input single text,
-it will be fed into a small MLP consisting of fully-connected (dense) layers
+it will be fed into a small MLP consisting of fully connected (dense) layers
 to output the distribution of all the discrete label values.
 
 
@@ -75,7 +75,7 @@ We have also examined natural language inference in this chapter.
 It belongs to *text pair classification*,
 a type of application classifying a pair of text.
 
-Taking a pair of text as the input but outputting a continuous value,
+Taking a pair of text as input but outputting a continuous value,
 *semantic textual similarity* is a popular *text pair regression* task.
 This task measures semantic similarity of sentences.
 For instance, in the Semantic Textual Similarity Benchmark dataset,
@@ -102,7 +102,7 @@ and using the mean squared loss: they are common for regression.
 
 ## Text Tagging
 
-Now let us consider token-level tasks, such as *text tagging*,
+Now let's consider token-level tasks, such as *text tagging*,
 where each token is assigned a label.
 Among text tagging tasks,
 *part-of-speech tagging* assigns each word a part-of-speech tag (e.g., adjective and determiner)
@@ -121,7 +121,7 @@ is illustrated in :numref:`fig_bert-tagging`.
 Comparing with :numref:`fig_bert-one-seq`,
 the only distinction lies in that
 in text tagging, the BERT representation of *every token* of the input text
-is fed into the same extra fully-connected layers to output the label of the token,
+is fed into the same extra fully connected layers to output the label of the token,
 such as a part-of-speech tag.
 
 
@@ -150,7 +150,7 @@ the question and passage are packed as
 the first and second text sequence, respectively,
 in the input of BERT.
 To predict the position of the start of the text span,
-the same additional fully-connected layer will transform
+the same additional fully connected layer will transform
 the BERT representation of any token from the passage of position $i$
 into a scalar score $s_i$.
 Such scores of all the passage tokens
@@ -160,11 +160,11 @@ so that each token position $i$ in the passage is assigned
 a probability $p_i$ of being the start of the text span.
 Predicting the end of the text span
 is the same as above, except that
-parameters in its additional fully-connected layer
+parameters in its additional fully connected layer
 are independent from those for predicting the start.
 When predicting the end,
 any passage token of position $i$
-is transformed by the same fully-connected layer
+is transformed by the same fully connected layer
 into a scalar score $e_i$.
 :numref:`fig_bert-qa`
 depicts fine-tuning BERT for question answering.
@@ -180,14 +180,13 @@ and output the span with the highest score.
 
 ## Summary
 
-* BERT requires minimal architecture changes (extra fully-connected layers) for sequence-level and token-level natural language processing applications, such as single text classification (e.g., sentiment analysis and testing linguistic acceptability), text pair classification or regression (e.g., natural language inference and semantic textual similarity), text tagging (e.g., part-of-speech tagging), and question answering.
+* BERT requires minimal architecture changes (extra fully connected layers) for sequence-level and token-level natural language processing applications, such as single text classification (e.g., sentiment analysis and testing linguistic acceptability), text pair classification or regression (e.g., natural language inference and semantic textual similarity), text tagging (e.g., part-of-speech tagging), and question answering.
 * During supervised learning of a downstream application, parameters of the extra layers are learned from scratch while all the parameters in the pretrained BERT model are fine-tuned.
-
 
 
 ## Exercises
 
-1. Let us design a search engine algorithm for news articles. When the system receives an query (e.g., "oil industry during the coronavirus outbreak"), it should return a ranked list of news articles that are most relevant to the query. Suppose that we have a huge pool of news articles and a large number of queries. To simplify the problem, suppose that the most relevant article has been labeled for each query. How can we apply negative sampling (see :numref:`subsec_negative-sampling`) and BERT in the algorithm design?
+1. Let's design a search engine algorithm for news articles. When the system receives an query (e.g., "oil industry during the coronavirus outbreak"), it should return a ranked list of news articles that are most relevant to the query. Suppose that we have a huge pool of news articles and a large number of queries. To simplify the problem, suppose that the most relevant article has been labeled for each query. How can we apply negative sampling (see :numref:`subsec_negative-sampling`) and BERT in the algorithm design?
 1. How can we leverage BERT in training language models?
 1. Can we leverage BERT in machine translation?
 

@@ -9,8 +9,8 @@ We assume that you are familiar with minibatch stochastic gradient descent algor
 
 ## Splitting the Problem
 
-Let us start with a simple computer vision problem and a slightly archaic network, e.g., with multiple layers of convolutions, pooling, and possibly a few fully-connected layers in the end. 
-That is, let us start with a network that looks quite similar to LeNet :cite:`LeCun.Bottou.Bengio.ea.1998` or AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`. 
+Let's start with a simple computer vision problem and a slightly archaic network, e.g., with multiple layers of convolutions, pooling, and possibly a few fully connected layers in the end. 
+That is, let's start with a network that looks quite similar to LeNet :cite:`LeCun.Bottou.Bengio.ea.1998` or AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`. 
 Given multiple GPUs (2 if it is a desktop server, 4 on an AWS g4dn.12xlarge instance, 8 on a p3.16xlarge, or 16 on a p2.16xlarge), we want to partition training in a manner as to achieve good speedup while simultaneously benefitting from simple and reproducible design choices. Multiple GPUs, after all, increase both *memory* and *computation* ability. In a nutshell, we have the following choices, given a minibatch of training data that we want to classify.
 
 First, we could partition the network across multiple GPUs. That is, each GPU takes as input the data flowing into a particular layer, processes data across a number of subsequent layers and then sends the data to the next GPU.
@@ -27,8 +27,7 @@ Moreover, compute-intensive, yet sequential operations are nontrivial to partiti
 
 
 Second, we could split the work layerwise. For instance, rather than computing 64 channels on a single GPU we could split up the problem across 4 GPUs, each of which generates data for 16 channels.
-Likewise, for a fully-connected layer we could split the number of output units.
-:numref:`fig_alexnet_original` (taken from :cite:`Krizhevsky.Sutskever.Hinton.2012`)
+Likewise, for a fully connected layer we could split the number of output units. :numref:`fig_alexnet_original` (taken from :cite:`Krizhevsky.Sutskever.Hinton.2012`)
 illustrates this design, where this strategy was used to deal with GPUs that had a very small memory footprint (2 GB at the time).
 This allows for good scaling in terms of computation, provided that the number of channels (or units) is not too small.
 Besides,
@@ -83,6 +82,7 @@ Also note that batch normalization in :numref:`sec_batch_norm` needs to be adjus
 In what follows we will use a toy network to illustrate multi-GPU training.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
@@ -103,6 +103,7 @@ from torch.nn import functional as F
 We use LeNet as introduced in :numref:`sec_lenet` (with slight modifications). We define it from scratch to illustrate parameter exchange and synchronization in detail.
 
 ```{.python .input}
+#@tab mxnet
 # Initialize model parameters
 scale = 0.01
 W1 = np.random.normal(scale=scale, size=(20, 1, 3, 3))
@@ -176,6 +177,7 @@ First we need to have the ability to [**distribute a list of parameters to multi
 Second, we need the ability to sum parameters across multiple devices, i.e., we need an `allreduce` function.
 
 ```{.python .input}
+#@tab mxnet
 def get_params(params, device):
     new_params = [p.copyto(device) for p in params]
     for p in new_params:
@@ -192,7 +194,7 @@ def get_params(params, device):
     return new_params
 ```
 
-Let us try it out by copying the model parameters to one GPU.
+Let's try it out by copying the model parameters to one GPU.
 
 ```{.python .input}
 #@tab all
@@ -202,9 +204,10 @@ print('b1 grad:', new_params[1].grad)
 ```
 
 Since we did not perform any computation yet, the gradient with regard to the bias parameter is still zero.
-Now let us assume that we have a vector distributed across multiple GPUs. The following [**`allreduce` function adds up all vectors and broadcasts the result back to all GPUs**]. Note that for this to work we need to copy the data to the device accumulating the results.
+Now let's assume that we have a vector distributed across multiple GPUs. The following [**`allreduce` function adds up all vectors and broadcasts the result back to all GPUs**]. Note that for this to work we need to copy the data to the device accumulating the results.
 
 ```{.python .input}
+#@tab mxnet
 def allreduce(data):
     for i in range(1, len(data)):
         data[0][:] += data[i].copyto(data[0].ctx)
@@ -221,9 +224,10 @@ def allreduce(data):
         data[i][:] = data[0].to(data[i].device)
 ```
 
-Let us test this by creating vectors with different values on different devices and aggregate them.
+Let's test this by creating vectors with different values on different devices and aggregate them.
 
 ```{.python .input}
+#@tab mxnet
 data = [np.ones((1, 2), ctx=d2l.try_gpu(i)) * (i + 1) for i in range(2)]
 print('before allreduce:\n', data[0], '\n', data[1])
 allreduce(data)
@@ -244,6 +248,7 @@ We need a simple utility function to [**distribute a minibatch evenly across mul
 Since it is more convenient and more concise, we use the built-in function from the deep learning framework to try it out on a $4 \times 5$ matrix.
 
 ```{.python .input}
+#@tab mxnet
 data = np.arange(20).reshape(4, 5)
 devices = [npx.gpu(0), npx.gpu(1)]
 split = gluon.utils.split_and_load(data, devices)
@@ -265,6 +270,7 @@ print('output:', split)
 For later reuse we define a `split_batch` function that splits both data and labels.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def split_batch(X, y, devices):
     """Split `X` and `y` into multiple devices."""
@@ -288,6 +294,7 @@ def split_batch(X, y, devices):
 Now we can implement [**multi-GPU training on a single minibatch**]. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, `allreduce` and `split_and_load`, to synchronize the data among multiple GPUs. Note that we do not need to write any specific code to achieve parallelism. Since the computational graph does not have any dependencies across devices within a minibatch, it is executed in parallel *automatically*.
 
 ```{.python .input}
+#@tab mxnet
 def train_batch(X, y, device_params, devices, lr):
     X_shards, y_shards = split_batch(X, y, devices)
     with autograd.record():  # Loss is calculated separately on each GPU
@@ -327,6 +334,7 @@ Now, we can define [**the training function**]. It is slightly different from th
 Obviously each batch is processed using the `train_batch` function to deal with multiple GPUs. For convenience (and conciseness of code) we compute the accuracy on a single GPU, though this is *inefficient* since the other GPUs are idle.
 
 ```{.python .input}
+#@tab mxnet
 def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     devices = [d2l.try_gpu(i) for i in range(num_gpus)]
@@ -373,7 +381,7 @@ def train(num_gpus, batch_size, lr):
           f'on {str(devices)}')
 ```
 
-Let us see how well this works [**on a single GPU**].
+Let's see how well this works [**on a single GPU**].
 We first use a batch size of 256 and a learning rate of 0.2.
 
 ```{.python .input}
@@ -384,7 +392,7 @@ train(num_gpus=1, batch_size=256, lr=0.2)
 By keeping the batch size and learning rate unchanged and [**increasing the number of GPUs to 2**], we can see that the test accuracy roughly stays the same compared with
 the previous experiment.
 In terms of the optimization algorithms, they are identical. Unfortunately there is no meaningful speedup to be gained here: the model is simply too small; moreover we only have a small dataset, where our slightly unsophisticated approach to implementing multi-GPU training suffered from significant Python overhead. We will encounter more complex models and more sophisticated ways of parallelization going forward.
-Let us see what happens nonetheless for Fashion-MNIST.
+Let's see what happens nonetheless for Fashion-MNIST.
 
 ```{.python .input}
 #@tab all
@@ -395,7 +403,7 @@ train(num_gpus=2, batch_size=256, lr=0.2)
 
 * There are multiple ways to split deep network training over multiple GPUs. We could split them between layers, across layers, or across data. The former two require tightly choreographed data transfers. Data parallelism is the simplest strategy.
 * Data parallel training is straightforward. However, it increases the effective minibatch size to be efficient.
-* In data parallelism, data are split across multiple GPUs, where each GPU executes its own forward and backward operation and subsequently gradients are aggregated and results are broadcast back to the GPUs.
+* In data parallelism, data is split across multiple GPUs, where each GPU executes its own forward and backward operation and subsequently gradients are aggregated and results are broadcast back to the GPUs.
 * We may use slightly increased learning rates for larger minibatches.
 
 ## Exercises

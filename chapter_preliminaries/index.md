@@ -1,50 +1,27 @@
 #  Preliminaries
 :label:`chap_preliminaries`
 
-To get started with deep learning,
-we will need to develop a few basic skills.
-All machine learning is concerned
-with extracting information from data.
-So we will begin by learning the practical skills
-for storing, manipulating, and preprocessing data.
+To prepare for your dive into deep learning,
+you will need a few survival skills:
+(i) techniques for storing and manipulating data;
+(ii) libraries for ingesting 
+and preprocessing data from a variety of sources;
+(iii) knowledge of the basic linear algebraic operations
+that we apply to high-dimensional data elements;
+(iv) just enough calculus to determine
+which direction to adjust each parameter
+in order to decrease the loss function;
+(v) the ability to automatically compute derivatives
+so that you can forget much of 
+the calculus you just learned;
+(vi) some basic fluency in probability,
+our primary language for reasoning under uncertainty;
+and (vii) some aptitude for finding answers 
+in the official documentation when you get stuck.
 
-Moreover, machine learning typically requires
-working with large datasets, which we can think of as tables,
-where the rows correspond to examples
-and the columns correspond to attributes.
-Linear algebra gives us a powerful set of techniques
-for working with tabular data.
-We will not go too far into the weeds but rather focus on the basic
-of matrix operations and their implementation.
-
-Additionally, deep learning is all about optimization.
-We have a model with some parameters and
-we want to find those that fit our data *the best*.
-Determining which way to move each parameter at each step of an algorithm
-requires a little bit of calculus, which will be briefly introduced.
-Fortunately, the `autograd` package automatically computes differentiation for us,
-and we will cover it next.
-
-Next, machine learning is concerned with making predictions:
-what is the likely value of some unknown attribute,
-given the information that we observe?
-To reason rigorously under uncertainty
-we will need to invoke the language of probability.
-
-In the end, the official documentation provides
-plenty of descriptions and examples that are beyond this book.
-To conclude the chapter, we will show you how to look up documentation for
-the needed information.
-
-This book has kept the mathematical content to the minimum necessary
-to get a proper understanding of deep learning.
-However, it does not mean that
-this book is mathematics free.
-Thus, this chapter provides a rapid introduction to
-basic and frequently-used mathematics to allow anyone to understand
-at least *most* of the mathematical content of the book.
-If you wish to understand *all* of the mathematical content,
-further reviewing the [online appendix on mathematics](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/index.html) should be sufficient.
+In short, this chapter provides a rapid introduction 
+to the basics that you will need to follow 
+*most* of the technical content in this book.
 
 ```toc
 :maxdepth: 2

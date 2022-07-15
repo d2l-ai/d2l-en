@@ -44,7 +44,7 @@ the subword-level skip-gram,
 where each *center word* is represented by the sum of 
 its subword vectors.
 
-Let us illustrate how to obtain 
+Let's illustrate how to obtain 
 subwords for each center word in fastText
 using the word "where".
 First, add special characters “&lt;” and “&gt;” 
@@ -241,4 +241,8 @@ print(segment_BPE(tokens, symbols))
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/386)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/4587)
 :end_tab:

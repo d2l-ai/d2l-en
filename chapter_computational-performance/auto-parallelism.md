@@ -13,6 +13,7 @@ Typically, a single operator will use all the computational resources on all CPU
 Note that we need at least two GPUs to run the experiments in this section.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
@@ -26,9 +27,10 @@ import torch
 
 ## Parallel Computation on GPUs
 
-Let us start by defining a reference workload to test: the `run` function below performs 10 matrix-matrix multiplications on the device of our choice using data allocated into two variables: `x_gpu1` and `x_gpu2`.
+Let's start by defining a reference workload to test: the `run` function below performs 10 matrix-matrix multiplications on the device of our choice using data allocated into two variables: `x_gpu1` and `x_gpu2`.
 
 ```{.python .input}
+#@tab mxnet
 devices = d2l.try_all_gpus()
 def run(x):
     return [x.dot(x) for _ in range(50)]
@@ -56,6 +58,7 @@ Now we apply the function to the data. To ensure that caching does not play a ro
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 run(x_gpu1)  # Warm-up both devices
 run(x_gpu2)
 npx.waitall()  
@@ -94,6 +97,7 @@ If we remove the `synchronize` statement between both tasks the system is free t
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark('GPU1 & GPU2'):
     run(x_gpu1)
     run(x_gpu2)
@@ -116,9 +120,10 @@ In the above case the total execution time is less than the sum of its parts, si
 
 In many cases we need to move data between different devices, say between the CPU and GPU, or between different GPUs. 
 For instance,
-this occurs when we want to perform distributed optimization where we need to aggregate the gradients over multiple accelerator cards. Let us simulate this by computing on the GPU and then copying the results back to the CPU.
+this occurs when we want to perform distributed optimization where we need to aggregate the gradients over multiple accelerator cards. Let's simulate this by computing on the GPU and then copying the results back to the CPU.
 
 ```{.python .input}
+#@tab mxnet
 def copy_to_cpu(x):
     return [y.copyto(npx.cpu()) for y in x]
 
@@ -154,6 +159,7 @@ This is somewhat inefficient. Note that we could already start copying parts of 
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark('Run on GPU1 and copy to CPU'):
     y = run(x_gpu1)
     y_cpu = copy_to_cpu(y)

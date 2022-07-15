@@ -9,6 +9,7 @@ First, import the
 packages and modules required for the experiment, and load the PTB dataset.
 
 ```{.python .input  n=1}
+#@tab mxnet
 from collections import defaultdict
 from d2l import mxnet as d2l
 from functools import partial
@@ -20,6 +21,7 @@ npx.set_np()
 ```
 
 ```{.python .input  n=2}
+#@tab mxnet
 def compute_subword(token):
     if token[0] != '<' and token[-1] != '>':
         token = '<' + token + '>'
@@ -34,6 +36,7 @@ def compute_subword(token):
 ```
 
 ```{.python .input  n=3}
+#@tab mxnet
 def get_subword_map(vocab):
     tokenid_to_subword, subword_to_idx = defaultdict(list), defaultdict(int)
     for token, tokenid in vocab.token_to_idx.items():
@@ -46,6 +49,7 @@ def get_subword_map(vocab):
 ```
 
 ```{.python .input  n=4}
+#@tab mxnet
 def token_transform(tokens, vocab, subword_map):
     if not isinstance(tokens, (list, tuple)):
         return d2l.truncate_pad(subword_map[tokens],
@@ -54,6 +58,7 @@ def token_transform(tokens, vocab, subword_map):
 ```
 
 ```{.python .input  n=5}
+#@tab mxnet
 def batchify(data, vocab, subword_map):
     max_len = max(len(c) + len(n) for _, c, n in data)
     centers, contexts_negatives, masks, labels = [], [], [], []
@@ -69,6 +74,7 @@ def batchify(data, vocab, subword_map):
 ```
 
 ```{.python .input  n=6}
+#@tab mxnet
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
     num_workers = d2l.get_dataloader_workers()
     sentences = d2l.read_ptb()
@@ -88,11 +94,13 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
 ```
 
 ```{.python .input  n=7}
+#@tab mxnet
 batch_size, max_window_size, num_noise_words = 512, 5, 5
 data_iter, vocab, subword_to_idx = load_data_ptb(batch_size, max_window_size, num_noise_words)
 ```
 
 ```{.python .input  n=8}
+#@tab mxnet
 names = ['centers', 'contexts_negatives', 'masks', 'labels']
 for batch in data_iter:
     for name, data in zip(names, batch):
@@ -115,6 +123,7 @@ vector (`output_dim`). We set the dictionary size to $20$ and the word vector
 dimension to $4$.
 
 ```{.python .input  n=9}
+#@tab mxnet
 embed = nn.Embedding(input_dim=20, output_dim=4)
 embed.initialize()
 embed.weight
@@ -134,6 +143,7 @@ product of the central target word vector and the context word vector or noise
 word vector.
 
 ```{.python .input  n=10}
+#@tab mxnet
 def skip_gram(center, contexts_and_negatives, embed_v, embed_u, padding):
     v_embedding = embed_v(center)
     v_mask = (center!=padding).astype('float32')
@@ -148,6 +158,7 @@ def skip_gram(center, contexts_and_negatives, embed_v, embed_u, padding):
 Verify that the output shape should be (batch size, 1, `max_len`).
 
 ```{.python .input  n=12}
+#@tab mxnet
 skip_gram(np.ones((2, 1, 64)), np.ones((2, 6, 64)), embed, embed, vocab['<pad>']).shape
 ```
 
@@ -163,6 +174,7 @@ to the definition of the loss function in negative sampling, we can directly use
 Gluon's binary cross-entropy loss function `SigmoidBinaryCrossEntropyLoss`.
 
 ```{.python .input  n=13}
+#@tab mxnet
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
 ```
 
@@ -179,6 +191,7 @@ Given two identical examples, different masks lead to
 different loss values.
 
 ```{.python .input  n=14}
+#@tab mxnet
 pred = np.array([[.5]*4]*2)
 label = np.array([[1, 0, 1, 0]]*2)
 mask = np.array([[1, 1, 1, 1], [1, 1, 0, 0]])
@@ -189,6 +202,7 @@ We can normalize the loss in each example due to various lengths in each
 example.
 
 ```{.python .input  n=15}
+#@tab mxnet
 loss(pred, label, mask) / mask.sum(axis=1) * mask.shape[1]
 ```
 
@@ -199,6 +213,7 @@ central and context words, respectively, and set the hyperparameter word vector
 dimension `embed_size` to 100.
 
 ```{.python .input  n=16}
+#@tab mxnet
 embed_size = 100
 net = nn.Sequential()
 net.add(nn.Embedding(input_dim=len(subword_to_idx), output_dim=embed_size),
@@ -212,6 +227,7 @@ of padding, the calculation of the loss function is slightly different compared
 to the previous training functions.
 
 ```{.python .input  n=17}
+#@tab mxnet
 def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
     net.initialize(ctx=ctx, force_reinit=True)
     trainer = gluon.Trainer(net.collect_params(), 'adam',
@@ -242,11 +258,13 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
 Now, we can train a skip-gram model using negative sampling.
 
 ```{.python .input  n=20}
+#@tab mxnet
 lr, num_epochs = 0.01, 5
 train(net, data_iter, lr, num_epochs)
 ```
 
 ```{.python .input}
+#@tab mxnet
 def get_similar_tokens(query_token, k, embed, vocab, subword_to_idx):
     W = embed.weight.data()
     x = W[vocab[query_token]]
@@ -264,5 +282,6 @@ def get_similar_tokens(query_token, k, embed, vocab, subword_to_idx):
 ```
 
 ```{.python .input}
+#@tab mxnet
 get_similar_tokens('chip', 3, net[0], vocab, subword_to_idx)
 ```

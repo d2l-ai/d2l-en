@@ -3,7 +3,7 @@
 
 Now that we know the technical details of 
 the word2vec models and approximate training methods,
-let us walk through their implementations. 
+let's walk through their implementations. 
 Specifically,
 we will take the skip-gram model in :numref:`sec_word2vec`
 and negative sampling in :numref:`sec_approx_train`
@@ -17,6 +17,8 @@ into minibatches
 that can be iterated over during training.
 
 ```{.python .input}
+#@tab mxnet
+import collections
 from d2l import mxnet as d2l
 import math
 from mxnet import gluon, np
@@ -26,6 +28,7 @@ import random
 
 ```{.python .input}
 #@tab pytorch
+import collections
 from d2l import torch as d2l
 import math
 import torch
@@ -55,7 +58,7 @@ d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
 def read_ptb():
     """Load the PTB dataset into a list of text lines."""
     data_dir = d2l.download_extract('ptb')
-    # Read the training set.
+    # Read the training set
     with open(os.path.join(data_dir, 'ptb.train.txt')) as f:
         raw_text = f.read()
     return [line.split() for line in raw_text.split('\n')]
@@ -123,10 +126,11 @@ the greater the probability of being discarded.
 #@save
 def subsample(sentences, vocab):
     """Subsample high-frequency words."""
-    # Exclude unknown tokens '<unk>'
+    # Exclude unknown tokens ('<unk>')
     sentences = [[token for token in line if vocab[token] != vocab.unk]
                  for line in sentences]
-    counter = d2l.count_corpus(sentences)
+    counter = collections.Counter([
+        token for line in sentences for token in line])
     num_tokens = sum(counter.values())
 
     # Return True if `token` is kept during subsampling
@@ -280,6 +284,7 @@ among indices 1, 2, and 3
 with sampling probabilities $P(X=1)=2/9, P(X=2)=3/9$, and $P(X=3)=4/9$ as follows.
 
 ```{.python .input}
+#@tab mxnet
 generator = RandomGenerator([2, 3, 4])
 [generator.draw() for _ in range(10)]
 ```
@@ -386,7 +391,7 @@ def batchify(data):
         contexts_negatives), d2l.tensor(masks), d2l.tensor(labels))
 ```
 
-Let us test this function using a minibatch of two examples.
+Let's test this function using a minibatch of two examples.
 
 ```{.python .input}
 #@tab all
@@ -404,6 +409,7 @@ for name, data in zip(names, batch):
 Last, we define the `load_data_ptb` function that reads the PTB dataset and returns the data iterator and the vocabulary.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
     """Download the PTB dataset and then load it into memory."""
@@ -460,7 +466,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     return data_iter, vocab
 ```
 
-Let us print the first minibatch of the data iterator.
+Let's print the first minibatch of the data iterator.
 
 ```{.python .input}
 #@tab all
@@ -483,8 +489,6 @@ for batch in data_iter:
 1. How does the running time of code in this section changes if not using subsampling?
 1. The `RandomGenerator` class caches `k` random sampling results. Set `k` to other values and see how it affects the data loading speed.
 1. What other hyperparameters in the code of this section may affect the data loading speed?
-
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/383)

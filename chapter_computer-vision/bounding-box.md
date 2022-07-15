@@ -34,6 +34,7 @@ We will begin with an introduction
 to *positions* (or *locations*) of objects.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import image, npx, np
@@ -59,6 +60,7 @@ We will load the sample image to be used in this section. We can see that there 
 They are the two major objects in this image.
 
 ```{.python .input}
+#@tab mxnet
 d2l.set_figsize()
 img = image.imread('../img/catdog.jpg').asnumpy()
 d2l.plt.imshow(img);
@@ -134,7 +136,7 @@ boxes = d2l.tensor((dog_bbox, cat_bbox))
 box_center_to_corner(box_corner_to_center(boxes)) == boxes
 ```
 
-Let us [**draw the bounding boxes in the image**] to check if they are accurate.
+Let's [**draw the bounding boxes in the image**] to check if they are accurate.
 Before drawing, we will define a helper function `bbox_to_rect`. It represents the bounding box in the bounding box format of the  `matplotlib` package.
 
 ```{.python .input}

@@ -1,36 +1,48 @@
 # Minibatch Stochastic Gradient Descent
 :label:`sec_minibatch_sgd`
 
-So far we encountered two extremes in the approach to gradient based learning: :numref:`sec_gd` uses the full dataset to compute gradients and to update parameters, one pass at a time. Conversely :numref:`sec_sgd` processes one observation at a time to make progress. Each of them has its own drawbacks. Gradient Descent is not particularly *data efficient* whenever data is very similar. Stochastic Gradient Descent is not particularly *computationally efficient* since CPUs and GPUs cannot exploit the full power of vectorization. This suggests that there might be a happy medium, and in fact, that's what we have been using so far in the examples we discussed.
+So far we encountered two extremes in the approach to gradient-based learning: :numref:`sec_gd` uses the full dataset to compute gradients and to update parameters, one pass at a time. Conversely :numref:`sec_sgd` processes one training example at a time to make progress.
+Either of them has its own drawbacks.
+Gradient descent is not particularly *data efficient* whenever data is very similar.
+Stochastic gradient descent is not particularly *computationally efficient* since CPUs and GPUs cannot exploit the full power of vectorization.
+This suggests that there might be something in between,
+and in fact, that is what we have been using so far in the examples we discussed.
 
 ## Vectorization and Caches
 
-At the heart of the decision to use minibatches is computational efficiency. This is most easily understood when considering parallelization to multiple GPUs and multiple servers. In this case we need to send at least one image to each GPU. With 8 GPUs per server and 16 servers we already arrive at a minibatch size of 128.
+At the heart of the decision to use minibatches is computational efficiency. This is most easily understood when considering parallelization to multiple GPUs and multiple servers. In this case we need to send at least one image to each GPU. With 8 GPUs per server and 16 servers we already arrive at a minibatch size no smaller than 128.
 
-Things are a bit more subtle when it comes to single GPUs or even CPUs. These devices have multiple types of memory, often multiple type of compute units and different bandwidth constraints between them. For instance, a CPU has a small number of registers and then L1, L2 and in some cases even L3 cache (which is shared between the different processor cores). These caches are of increasing size and latency (and at the same time they are of decreasing bandwidth). Suffice it to say, the processor is capable of performing many more operations than what the main memory interface is able to provide.
+Things are a bit more subtle when it comes to single GPUs or even CPUs. These devices have multiple types of memory, often multiple types of computational units and different bandwidth constraints between them.
+For instance, a CPU has a small number of registers and then the L1, L2, and in some cases even L3 cache (which is shared among different processor cores).
+These caches are of increasing size and latency (and at the same time they are of decreasing bandwidth).
+Suffice to say, the processor is capable of performing many more operations than what the main memory interface is able to provide.
 
-* A 2GHz CPU with 16 cores and AVX-512 vectorization can process up to $2 \cdot 10^9 \cdot 16 \cdot 32 = 10^{12}$ bytes per second. The capability of GPUs easily exceeds this number by a factor of 100. On the other hand, a midrange server processor might not have much more than 100 GB/s bandwidth, i.e., less than one tenth of what would be required to keep the processor fed. To make matters worse, not all memory access is created equal: first, memory interfaces are typically 64 bit wide or wider (e.g., on GPUs up to 384 bit), hence reading a single byte incurs the cost of a much wider access.
-* There is significant overhead for the first access whereas sequential access is relatively cheap (this is often called a burst read). There are many more things to keep in mind, such as caching when we have multiple sockets, chiplets and other structures. A detailed discussion of this is beyond the scope of this section. See e.g., this [Wikipedia article](https://en.wikipedia.org/wiki/Cache_hierarchy) for a more in-depth discussion.
+First, a 2GHz CPU with 16 cores and AVX-512 vectorization can process up to $2 \cdot 10^9 \cdot 16 \cdot 32 = 10^{12}$ bytes per second. The capability of GPUs easily exceeds this number by a factor of 100. On the other hand, a midrange server processor might not have much more than 100 GB/s bandwidth, i.e., less than one tenth of what would be required to keep the processor fed. To make matters worse, not all memory access is created equal: memory interfaces are typically 64 bit wide or wider (e.g., on GPUs up to 384 bit), hence reading a single byte incurs the cost of a much wider access.
 
-The way to alleviate these constraints is to use a hierarchy of CPU caches which are actually fast enough to supply the processor with data. This is *the* driving force behind batching in deep learning. To keep matters simple, consider matrix-matrix multiplication, say $\mathbf{A} = \mathbf{B}\mathbf{C}$. We have a number of options for calculating $\mathbf{A}$. For instance we could try the following:
+Second, there is significant overhead for the first access whereas sequential access is relatively cheap (this is often called a burst read). There are many more things to keep in mind, such as caching when we have multiple sockets, chiplets, and other structures.
+See this [Wikipedia article](https://en.wikipedia.org/wiki/Cache_hierarchy) 
+for a more in-depth discussion.
+
+The way to alleviate these constraints is to use a hierarchy of CPU caches that are actually fast enough to supply the processor with data. This is *the* driving force behind batching in deep learning. To keep matters simple, consider matrix-matrix multiplication, say $\mathbf{A} = \mathbf{B}\mathbf{C}$. We have a number of options for calculating $\mathbf{A}$. For instance, we could try the following:
 
 1. We could compute $\mathbf{A}_{ij} = \mathbf{B}_{i,:} \mathbf{C}_{:,j}^\top$, i.e., we could compute it elementwise by means of dot products.
 1. We could compute $\mathbf{A}_{:,j} = \mathbf{B} \mathbf{C}_{:,j}^\top$, i.e., we could compute it one column at a time. Likewise we could compute $\mathbf{A}$ one row $\mathbf{A}_{i,:}$ at a time.
 1. We could simply compute $\mathbf{A} = \mathbf{B} \mathbf{C}$.
 1. We could break $\mathbf{B}$ and $\mathbf{C}$ into smaller block matrices and compute $\mathbf{A}$ one block at a time.
 
-If we follow the first option, we will need to copy one row and one column vector into the CPU each time we want to compute an element $\mathbf{A}_{ij}$. Even worse, due to the fact that matrix elements are aligned sequentially we are thus required to access many disjoint locations for one of the two vectors as we read them from memory. The second option is much more favorable. In it, we are able to keep the column vector $\mathbf{C}_{:,j}$ in the CPU cache while we keep on traversing through $B$. This halves the memory bandwidth requirement with correspondingly faster access. Of course, option 3 is most desirable. Unfortunately, most matrices might not entirely fit into cache (this is what we are discussing after all). However, option 4 offers a practically useful alternative: we can move blocks of the matrix into cache and multiply them locally. Optimized libraries take care of this for us. Let us have a look at how efficient these operations are in practice.
+If we follow the first option, we will need to copy one row and one column vector into the CPU each time we want to compute an element $\mathbf{A}_{ij}$. Even worse, due to the fact that matrix elements are aligned sequentially we are thus required to access many disjoint locations for one of the two vectors as we read them from memory. The second option is much more favorable. In it, we are able to keep the column vector $\mathbf{C}_{:,j}$ in the CPU cache while we keep on traversing through $\mathbf{B}$. This halves the memory bandwidth requirement with correspondingly faster access. Of course, option 3 is most desirable. Unfortunately, most matrices might not entirely fit into cache (this is what we are discussing after all). However, option 4 offers a practically useful alternative: we can move blocks of the matrix into cache and multiply them locally. Optimized libraries take care of this for us. Let's have a look at how efficient these operations are in practice.
 
 Beyond computational efficiency, the overhead introduced by Python and by the deep learning framework itself is considerable. Recall that each time we execute a command the Python interpreter sends a command to the MXNet engine which needs to insert it into the computational graph and deal with it during scheduling. Such overhead can be quite detrimental. In short, it is highly advisable to use vectorization (and matrices) whenever possible.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
+import time
 npx.set_np()
 
-timer = d2l.Timer()
 A = np.zeros((256, 256))
 B = np.random.normal(0, 1, (256, 256))
 C = np.random.normal(0, 1, (256, 256))
@@ -40,11 +52,11 @@ C = np.random.normal(0, 1, (256, 256))
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
+import numpy as np
+import time
 import torch
 from torch import nn
-import numpy as np
 
-timer = d2l.Timer()
 A = torch.zeros(256, 256)
 B = torch.randn(256, 256)
 C = torch.randn(256, 256)
@@ -54,18 +66,53 @@ C = torch.randn(256, 256)
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
+import time
 
-timer = d2l.Timer()
 A = tf.Variable(d2l.zeros((256, 256)))
 B = tf.Variable(d2l.normal([256, 256], 0, 1))
 C = tf.Variable(d2l.normal([256, 256], 0, 1))
 ```
 
+Since we will benchmark the running time frequently in the rest of the book, let's define a timer.
+
+```{.python .input}
+#@tab all
+class Timer:  #@save
+    """Record multiple running times."""
+    def __init__(self):
+        self.times = []
+        self.start()
+
+    def start(self):
+        """Start the timer."""
+        self.tik = time.time()
+
+    def stop(self):
+        """Stop the timer and record the time in a list."""
+        self.times.append(time.time() - self.tik)
+        return self.times[-1]
+
+    def avg(self):
+        """Return the average time."""
+        return sum(self.times) / len(self.times)
+
+    def sum(self):
+        """Return the sum of time."""
+        return sum(self.times)
+
+    def cumsum(self):
+        """Return the accumulated time."""
+        return np.array(self.times).cumsum().tolist()
+    
+timer = Timer()
+```
+
 Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
 
 ```{.python .input}
+#@tab mxnet
 # Compute A = BC one element at a time
 timer.start()
 for i in range(256):
@@ -98,6 +145,7 @@ timer.stop()
 A faster strategy is to perform column-wise assignment.
 
 ```{.python .input}
+#@tab mxnet
 # Compute A = BC one column at a time
 timer.start()
 for j in range(256):
@@ -123,9 +171,10 @@ for j in range(256):
 timer.stop()
 ```
 
-Last, the most effective manner is to perform the entire operation in one block. Let us see what the respective speed of the operations is.
+Last, the most effective manner is to perform the entire operation in one block. Let's see what the respective speed of the operations is.
 
 ```{.python .input}
+#@tab mxnet
 # Compute A = BC in one go
 timer.start()
 A = np.dot(B, C)
@@ -175,11 +224,12 @@ We can increase the *computational* efficiency of this operation by applying it 
 
 $$\mathbf{g}_t = \partial_{\mathbf{w}} \frac{1}{|\mathcal{B}_t|} \sum_{i \in \mathcal{B}_t} f(\mathbf{x}_{i}, \mathbf{w})$$
 
-Let us see what this does to the statistical properties of $\mathbf{g}_t$: since both $\mathbf{x}_t$ and also all elements of the minibatch $\mathcal{B}_t$ are drawn uniformly at random from the training set, the expectation of the gradient remains unchanged. The variance, on the other hand, is reduced significantly. Since the minibatch gradient is composed of $b := |\mathcal{B}_t|$ independent gradients which are being averaged, its standard deviation is reduced by a factor of $b^{-\frac{1}{2}}$. This, by itself, is a good thing, since it means that the updates are more reliably aligned with the full gradient.
+Let's see what this does to the statistical properties of $\mathbf{g}_t$: since both $\mathbf{x}_t$ and also all elements of the minibatch $\mathcal{B}_t$ are drawn uniformly at random from the training set, the expectation of the gradient remains unchanged. The variance, on the other hand, is reduced significantly. Since the minibatch gradient is composed of $b := |\mathcal{B}_t|$ independent gradients which are being averaged, its standard deviation is reduced by a factor of $b^{-\frac{1}{2}}$. This, by itself, is a good thing, since it means that the updates are more reliably aligned with the full gradient.
 
-Naively this would indicate that choosing a large minibatch $\mathcal{B}_t$ would be universally desirable. Alas, after some point, the additional reduction in standard deviation is minimal when compared to the linear increase in computational cost. In practice we pick a minibatch that is large enough to offer good computational efficiency while still fitting into the memory of a GPU. To illustrate the savings let us have a look at some code. In it we perform the same matrix-matrix multiplication, but this time broken up into "minibatches" of 64 columns at a time.
+Naively this would indicate that choosing a large minibatch $\mathcal{B}_t$ would be universally desirable. Alas, after some point, the additional reduction in standard deviation is minimal when compared to the linear increase in computational cost. In practice we pick a minibatch that is large enough to offer good computational efficiency while still fitting into the memory of a GPU. To illustrate the savings let's have a look at some code. In it we perform the same matrix-matrix multiplication, but this time broken up into "minibatches" of 64 columns at a time.
 
 ```{.python .input}
+#@tab mxnet
 timer.start()
 for j in range(0, 256, 64):
     A[:, j:j+64] = np.dot(B, C[:, j:j+64])
@@ -209,9 +259,10 @@ As we can see, the computation on the minibatch is essentially as efficient as o
 
 ## Reading the Dataset
 
-Let us have a look at how minibatches are efficiently generated from data. In the following we use a dataset developed by NASA to test the wing [noise from different aircraft](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) to compare these optimization algorithms. For convenience we only use the first $1,500$ examples. The data is whitened for preprocessing, i.e., we remove the mean and rescale the variance to $1$ per coordinate.
+Let's have a look at how minibatches are efficiently generated from data. In the following we use a dataset developed by NASA to test the wing [noise from different aircraft](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) to compare these optimization algorithms. For convenience we only use the first $1,500$ examples. The data is whitened for preprocessing, i.e., we remove the mean and rescale the variance to $1$ per coordinate.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
                            '76e5be1548fd8222e5074cf0faae75edff8cf93f')
@@ -267,6 +318,7 @@ function, so the gradient in the optimization algorithm does not need to be
 divided by the batch size.
 
 ```{.python .input}
+#@tab mxnet
 def sgd(params, states, hyperparams):
     for p in params:
         p[:] -= hyperparams['lr'] * p.grad
@@ -290,6 +342,7 @@ def sgd(params, grads, states, hyperparams):
 Next, we implement a generic training function to facilitate the use of the other optimization algorithms introduced later in this chapter. It initializes a linear regression model and can be used to train the model with minibatch stochastic gradient descent and other algorithms introduced subsequently.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def train_ch11(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
@@ -383,7 +436,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
     return timer.cumsum(), animator.Y[0]
 ```
 
-Let us see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e., to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls.
+Let's see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e., to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls.
 
 ```{.python .input}
 #@tab all
@@ -432,6 +485,7 @@ d2l.plt.gca().set_xscale('log')
 In Gluon, we can use the `Trainer` class to call optimization algorithms. This is used to implement a generic training function. We will use this throughout the current chapter.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
     # Initialization
@@ -464,9 +518,9 @@ def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     # Initialization
     net = nn.Sequential(nn.Linear(5, 1))
-    def init_weights(m):
-        if type(m) == nn.Linear:
-            torch.nn.init.normal_(m.weight, std=0.01)
+    def init_weights(module):
+        if type(module) == nn.Linear:
+            torch.nn.init.normal_(module.weight, std=0.01)
     net.apply(init_weights)
 
     optimizer = trainer_fn(net.parameters(), **hyperparams)
@@ -529,6 +583,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
 Using Gluon to repeat the last experiment shows identical behavior.
 
 ```{.python .input}
+#@tab mxnet
 data_iter, _ = get_data_ch11(10)
 train_concise_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 ```
@@ -570,7 +625,6 @@ train_concise_ch11(trainer, {'learning_rate': 0.05}, data_iter)
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1068)
 :end_tab:
-
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1069)

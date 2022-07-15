@@ -8,6 +8,7 @@ For PyTorch, by default, GPU operations are asynchronous. When you call a functi
 Hence, understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and mutual dependencies. This allows us to reduce memory overhead and increase processor utilization.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 import numpy, os, subprocess
 from mxnet import autograd, gluon, np, npx
@@ -26,15 +27,16 @@ from torch import nn
 ## Asynchrony via Backend
 
 :begin_tab:`mxnet`
-For a warmup consider the following toy problem: we want to generate a random matrix and multiply it. Let us do that both in NumPy and in `mxnet.np` to see the difference.
+For a warmup consider the following toy problem: we want to generate a random matrix and multiply it. Let's do that both in NumPy and in `mxnet.np` to see the difference.
 :end_tab:
 
 :begin_tab:`pytorch`
-For a warmup consider the following toy problem: we want to generate a random matrix and multiply it. Let us do that both in NumPy and in PyTorch tensor to see the difference.
+For a warmup consider the following toy problem: we want to generate a random matrix and multiply it. Let's do that both in NumPy and in PyTorch tensor to see the difference.
 Note that PyTorch `tensor` is defined on a GPU.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark('numpy'):
     for _ in range(10):
         a = numpy.random.normal(size=(1000, 1000))
@@ -82,6 +84,7 @@ while the frontend returns control to Python.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark():
     for _ in range(10):
         a = np.random.normal(size=(1000, 1000))
@@ -117,9 +120,10 @@ Hence, it is not possible to parallelize operations that depend on each other.
 :width:`300px`
 :label:`fig_frontends`
 
-Let us look at another toy example to understand the dependency graph a bit better.
+Let's look at another toy example to understand the dependency graph a bit better.
 
 ```{.python .input}
+#@tab mxnet
 x = np.ones((1, 2))
 y = np.ones((1, 2))
 z = x * y + 2
@@ -156,10 +160,11 @@ There are a number of operations that will force Python to wait for completion:
 * Most obviously `npx.waitall()` waits until all computation has completed, regardless of when the compute instructions were issued. In practice it is a bad idea to use this operator unless absolutely necessary since it can lead to poor performance.
 * If we just want to wait until a specific variable is available we can call `z.wait_to_read()`. In this case MXNet blocks return to Python until the variable `z` has been computed. Other computation may well continue afterwards.
 
-Let us see how this works in practice.
+Let's see how this works in practice.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark('waitall'):
     b = np.dot(a, a)
     npx.waitall()
@@ -176,6 +181,7 @@ Copying small amounts of data frequently from MXNet's scope to NumPy and back ca
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark('numpy conversion'):
     b = np.dot(a, a)
     b.asnumpy()
@@ -188,10 +194,11 @@ with d2l.Benchmark('scalar conversion'):
 ## Improving Computation
 
 :begin_tab:`mxnet`
-On a heavily multithreaded system (even regular laptops have 4 threads or more and on multi-socket servers this number can exceed 256) the overhead of scheduling operations can become significant. This is why it is highly desirable to have computation and scheduling occur asynchronously and in parallel. To illustrate the benefit of doing so let us see what happens if we increment a variable by 1 multiple times, both in sequence or asynchronously. We simulate synchronous execution by inserting a `wait_to_read` barrier in between each addition.
+On a heavily multithreaded system (even regular laptops have 4 threads or more and on multi-socket servers this number can exceed 256) the overhead of scheduling operations can become significant. This is why it is highly desirable to have computation and scheduling occur asynchronously and in parallel. To illustrate the benefit of doing so let's see what happens if we increment a variable by 1 multiple times, both in sequence or asynchronously. We simulate synchronous execution by inserting a `wait_to_read` barrier in between each addition.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark('synchronous'):
     for _ in range(10000):
         y = x + 1

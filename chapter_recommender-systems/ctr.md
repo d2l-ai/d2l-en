@@ -1,6 +1,6 @@
 # Feature-Rich Recommender Systems
 
-Interaction data is the most basic indication of users' preferences and interests. It plays a critical role in former introduced models. Yet, interaction data is usually extremely sparse and can be noisy at times. To address this issue, we can integrate side information such as features of items, profiles of users, and even in which context that the interaction occurred into the recommendation model. Utilizing these features are helpful in making recommendations in that these features can be an effective predictor of users interests especially when interaction data is lacking. As such, it is essential for recommendation models also have the capability to deal with those features and give the model some content/context awareness. To demonstrate this type of recommendation models, we introduce another task on click-through rate (CTR) for online advertisement recommendations :cite:`McMahan.Holt.Sculley.ea.2013` and present an anonymous advertising data. Targeted advertisement services have attracted widespread attention and are often framed as recommendation engines. Recommending advertisements that match users' personal taste and interest is important for click-through rate improvement.
+Interaction data is the most basic indication of users' preferences and interests. It plays a critical role in former introduced models. Yet, interaction data is usually extremely sparse and can be noisy at times. To address this issue, we can integrate side information such as features of items, profiles of users, and even in which context that the interaction occurred into the recommendation model. Utilizing these features are helpful in making recommendations in that these features can be an effective predictor of users interests especially when interaction data is lacking. As such, it is essential for recommendation models also have the capability to deal with those features and give the model some content/context awareness. To demonstrate this type of recommendation models, we introduce another task on click-through rate (CTR) for online advertisement recommendations :cite:`McMahan.Holt.Sculley.ea.2013` and present an anonymous advertising dataset. Targeted advertisement services have attracted widespread attention and are often framed as recommendation engines. Recommending advertisements that match users' personal taste and interest is important for click-through rate improvement.
 
 
 Digital marketers use online advertising to display advertisements to customers. Click-through rate is a metric that measures the number of clicks advertisers receive on their ads per number of impressions and it is expressed as a percentage calculated with the formula: 
@@ -10,6 +10,7 @@ $$ \text{CTR} = \frac{\#\text{Clicks}} {\#\text{Impressions}} \times 100 \% .$$
 Click-through rate is an important signal that indicates the effectiveness of prediction algorithms. Click-through rate prediction is a task of predicting the likelihood that something on a website will be clicked. Models on CTR prediction can not only be employed in targeted advertising systems but also in general item (e.g., movies, news, products) recommender systems, email campaigns, and even search engines. It is also closely related to user satisfaction, conversion rate, and can be helpful in setting campaign goals as it can help advertisers to set realistic expectations.
 
 ```{.python .input}
+#@tab mxnet
 from collections import defaultdict
 from d2l import mxnet as d2l
 from mxnet import gluon, np
@@ -23,6 +24,7 @@ With the considerable advancements of Internet and mobile technology, online adv
 The following code downloads the dataset from our server and saves it into the local data folder.
 
 ```{.python .input  n=15}
+#@tab mxnet
 #@save
 d2l.DATA_HUB['ctr'] = (d2l.DATA_URL + 'ctr.zip',
                        'e18327c48c8e8e5c23da714dd614e390d369843f')
@@ -37,6 +39,7 @@ There are a training set and a test set, consisting of 15000 and 3000 samples/li
 For the convenience of data loading, we implement a `CTRDataset` which loads the advertising dataset from the CSV file and can be used by `DataLoader`.
 
 ```{.python .input  n=13}
+#@tab mxnet
 #@save
 class CTRDataset(gluon.data.Dataset):
     def __init__(self, data_path, feat_mapper=None, defaults=None,
@@ -82,11 +85,12 @@ class CTRDataset(gluon.data.Dataset):
 The following example loads the training data and print out the first record.
 
 ```{.python .input  n=16}
+#@tab mxnet
 train_data = CTRDataset(os.path.join(data_dir, 'train.csv'))
 train_data[0]
 ```
 
-As can be seen, all the 34 fields are categorical features. Each value represents the one-hot index of the corresponding entry. The label $0$ means that it is not clicked. This `CTRDataset` can also be used to load other datasets such as the Criteo display advertising challenge [Dataset](https://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/) and the Avazu click-through rate prediction [Dataset](https://www.kaggle.com/c/avazu-ctr-prediction).  
+As can be seen, all the 34 fields are categorical features. Each value represents the one-hot index of the corresponding entry. The label $0$ means that it is not clicked. This `CTRDataset` can also be used to load other datasets such as the Criteo display advertising challenge [dataset](https://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/) and the Avazu click-through rate prediction [dataset](https://www.kaggle.com/c/avazu-ctr-prediction).  
 
 ## Summary 
 * Click-through rate is an important metric that is used to measure the effectiveness of advertising systems and recommender systems.

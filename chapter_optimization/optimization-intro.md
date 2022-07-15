@@ -12,7 +12,7 @@ fundamentally different.
 The former is primarily concerned with minimizing an
 objective whereas the latter is concerned with finding a suitable model, given a
 finite amount of data.
-In :numref:`sec_model_selection`,
+In :numref:`sec_generalization_basics`,
 we discussed the difference between these two goals in detail.
 For instance,
 training error and generalization error generally differ: since the objective
@@ -25,6 +25,7 @@ attention to overfitting in addition to using the optimization algorithm to
 reduce the training error.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mpl_toolkits import mplot3d
@@ -51,7 +52,7 @@ import tensorflow as tf
 ```
 
 To illustrate the aforementioned different goals,
-let us consider 
+let's consider 
 the empirical risk and the risk. 
 As described
 in :numref:`subsec_empirical-risk-and-risk`,
@@ -105,7 +106,7 @@ all fall into this
 category.
 
 There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points, and vanishing gradients. 
-Let us have a look at them.
+Let's have a look at them.
 
 
 ### Local Minima
@@ -154,6 +155,7 @@ Saddle points in higher dimensions are even more insidious, as the example below
 x, y = d2l.meshgrid(
     d2l.linspace(-1.0, 1.0, 101), d2l.linspace(-1.0, 1.0, 101))
 z = x**2 - y**2
+
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x.asnumpy(), y.asnumpy(), z.asnumpy(),
                   **{'rstride': 10, 'cstride': 10})
@@ -184,8 +186,7 @@ d2l.plt.ylabel('y');
 ```
 
 We assume that the input of a function is a $k$-dimensional vector and its
-output is a scalar, so its Hessian matrix will have $k$ eigenvalues
-(refer to the [online appendix on eigendecompositions](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/eigendecomposition.html)).
+output is a scalar, so its Hessian matrix will have $k$ eigenvalues.
 The solution of the
 function could be a local minimum, a local maximum, or a saddle point at a
 position where the function gradient is zero:

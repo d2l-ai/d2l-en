@@ -27,6 +27,7 @@ you need to register a Kaggle account.
 :label:`fig_kaggle_cifar10`
 
 ```{.python .input}
+#@tab mxnet
 import collections
 from d2l import mxnet as d2l
 import math
@@ -107,7 +108,7 @@ else:
 ### [**Organizing the Dataset**]
 
 We need to organize datasets to facilitate model training and testing.
-Let us first read the labels from the csv file.
+Let's first read the labels from the csv file.
 The following function returns a dictionary that maps
 the non-extension part of the filename to its label.
 
@@ -133,7 +134,7 @@ More concretely,
 let $n$ be the number of images of the class with the least examples, and $r$ be the ratio.
 The validation set will split out
 $\max(\lfloor nr\rfloor,1)$ images for each class.
-Let us use `valid_ratio=0.1` as an example. Since the original training set has 50000 images,
+Let's use `valid_ratio=0.1` as an example. Since the original training set has 50000 images,
 there will be 45000 images used for training in the path `train_valid_test/train`,
 while the other 5000 images will be split out
 as validation set in the path `train_valid_test/valid`. After organizing the dataset, images of the same class will be placed under the same folder.
@@ -214,6 +215,7 @@ For example, images can be flipped horizontally at random during training.
 We can also perform standardization for the three RGB channels of color images. Below lists some of these operations that you can tweak.
 
 ```{.python .input}
+#@tab mxnet
 transform_train = gluon.data.vision.transforms.Compose([
     # Scale the image up to a square of 40 pixels in both height and width
     gluon.data.vision.transforms.Resize(40),
@@ -254,6 +256,7 @@ so as to
 remove randomness in the evaluation results.
 
 ```{.python .input}
+#@tab mxnet
 transform_test = gluon.data.vision.transforms.Compose([
     gluon.data.vision.transforms.ToTensor(),
     gluon.data.vision.transforms.Normalize([0.4914, 0.4822, 0.4465],
@@ -273,6 +276,7 @@ transform_test = torchvision.transforms.Compose([
 Next, we [**read the organized dataset consisting of raw image files**]. Each example includes an image and a label.
 
 ```{.python .input}
+#@tab mxnet
 train_ds, valid_ds, train_valid_ds, test_ds = [
     gluon.data.vision.ImageFolderDataset(
         os.path.join(data_dir, 'train_valid_test', folder))
@@ -299,6 +303,7 @@ Before final prediction,
 we train the model on the combined training set and validation set to make full use of all the labeled data.
 
 ```{.python .input}
+#@tab mxnet
 train_iter, train_valid_iter = [gluon.data.DataLoader(
     dataset.transform_first(transform_train), batch_size, shuffle=True,
     last_batch='discard') for dataset in (train_ds, train_valid_ds)]
@@ -335,6 +340,7 @@ This is for improving computational efficiency.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 class Residual(nn.HybridBlock):
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
         super(Residual, self).__init__(**kwargs)
@@ -362,6 +368,7 @@ Next, we define the ResNet-18 model.
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 def resnet18(num_classes):
     net = nn.HybridSequential()
     net.add(nn.Conv2D(64, kernel_size=3, strides=1, padding=1),
@@ -394,6 +401,7 @@ We define the ResNet-18 model described in
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 def get_net(devices):
     num_classes = 10
     net = resnet18(num_classes)
@@ -419,6 +427,7 @@ We will select models and tune hyperparameters according to the model's performa
 In the following, we define the model training function `train`.
 
 ```{.python .input}
+#@tab mxnet
 def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           lr_decay):
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
@@ -504,6 +513,7 @@ When `lr_period` and `lr_decay` are set to 4 and 0.9, respectively, the learning
 we only train 20 epochs here.
 
 ```{.python .input}
+#@tab mxnet
 devices, num_epochs, lr, wd = d2l.try_all_gpus(), 20, 0.02, 5e-4
 lr_period, lr_decay, net = 4, 0.9, get_net(devices)
 net.hybridize()
@@ -515,6 +525,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
 #@tab pytorch
 devices, num_epochs, lr, wd = d2l.try_all_gpus(), 20, 2e-4, 5e-4
 lr_period, lr_decay, net = 4, 0.9, get_net()
+net(next(iter(train_iter))[0])
 train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
@@ -525,6 +536,7 @@ After obtaining a promising model with hyperparameters,
 we use all the labeled data (including the validation set) to retrain the model and classify the testing set.
 
 ```{.python .input}
+#@tab mxnet
 net, preds = get_net(devices), []
 net.hybridize()
 train(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,
@@ -543,6 +555,7 @@ df.to_csv('submission.csv', index=False)
 ```{.python .input}
 #@tab pytorch
 net, preds = get_net(), []
+net(next(iter(train_valid_iter))[0])
 train(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 

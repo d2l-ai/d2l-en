@@ -29,6 +29,7 @@ for reversing downsampling operations
 by the convolution.
 
 ```{.python .input}
+#@tab mxnet
 from mxnet import np, npx, init
 from mxnet.gluon import nn
 from d2l import mxnet as d2l
@@ -46,7 +47,7 @@ from d2l import torch as d2l
 ## Basic Operation
 
 Ignoring channels for now,
-let us begin with
+let's begin with
 the basic transposed convolution operation
 with stride of 1 and no padding.
 Suppose that
@@ -118,6 +119,7 @@ four-dimensional tensors,
 we can [**use high-level APIs to obtain the same results**].
 
 ```{.python .input}
+#@tab mxnet
 X, K = X.reshape(1, 1, 2, 2), K.reshape(1, 1, 2, 2)
 tconv = nn.Conv2DTranspose(1, kernel_size=2)
 tconv.initialize(init.Constant(K))
@@ -146,6 +148,7 @@ the first and last rows and columns
 will be removed from the transposed convolution output.
 
 ```{.python .input}
+#@tab mxnet
 tconv = nn.Conv2DTranspose(1, kernel_size=2, padding=1)
 tconv.initialize(init.Constant(K))
 tconv(X)
@@ -176,6 +179,7 @@ in :numref:`fig_trans_conv_stride2`.
 The following code snippet can validate the transposed convolution output for stride of 2 in :numref:`fig_trans_conv_stride2`.
 
 ```{.python .input}
+#@tab mxnet
 tconv = nn.Conv2DTranspose(1, kernel_size=2, strides=2)
 tconv.initialize(init.Constant(K))
 tconv(X)
@@ -208,6 +212,7 @@ then $g(Y)$ will have the same shape as $\mathsf{X}$.
 This can be illustrated in the following example.
 
 ```{.python .input}
+#@tab mxnet
 X = np.random.uniform(size=(1, 10, 16, 16))
 conv = nn.Conv2D(20, kernel_size=5, padding=2, strides=3)
 tconv = nn.Conv2DTranspose(10, kernel_size=5, padding=2, strides=3)
@@ -230,7 +235,7 @@ tconv(conv(X)).shape == X.shape
 The transposed convolution is named after
 the matrix transposition.
 To explain,
-let us first
+let's first
 see how to implement convolutions
 using matrix multiplications.
 In the example below, we define a $3\times 3$ input `X` and a $2\times 2$ convolution kernel `K`, and then use the `corr2d` function to compute the convolution output `Y`.
@@ -277,7 +282,7 @@ matrix multiplications.
 In the following example,
 we take the $2 \times 2$ output `Y` from the above
 regular convolution
-as the input to the transposed convolution.
+as input to the transposed convolution.
 To implement this operation by multiplying matrices,
 we only need to transpose the weight matrix `W`
 with the new shape $(9, 4)$.

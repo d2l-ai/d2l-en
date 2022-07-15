@@ -6,7 +6,7 @@ we discussed how gradients are calculated
 in RNNs.
 In particular we found that long products of matrices can lead
 to vanishing or exploding gradients.
-Let us briefly think about what such
+Let's briefly think about what such
 gradient anomalies mean in practice:
 
 * We might encounter a situation where an early observation is highly
@@ -33,7 +33,7 @@ will discuss in :numref:`sec_lstm`. The gated recurrent unit (GRU)
 :cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` is a slightly more streamlined
 variant that often offers comparable performance and is significantly faster to
 compute  :cite:`Chung.Gulcehre.Cho.ea.2014`.
-Due to its simplicity, let us start with the GRU.
+Due to its simplicity, let's start with the GRU.
 
 ## Gated Hidden State
 
@@ -66,7 +66,7 @@ the reset and update gates in a GRU, given the input
 of the current time step
 and the hidden state of the previous time step.
 The outputs of two gates
-are given by two fully-connected layers
+are given by two fully connected layers
 with a sigmoid activation function.
 
 ![Computing the reset gate and the update gate in a GRU model.](../img/gru-1.svg)
@@ -94,7 +94,7 @@ We use sigmoid functions (as introduced in :numref:`sec_mlp`) to transform input
 
 ### Candidate Hidden State
 
-Next, let us
+Next, let's
 integrate the reset gate $\mathbf{R}_t$ with
 the regular latent state updating mechanism
 in :eqref:`rnn_h_with_state`.
@@ -120,7 +120,7 @@ elementwise multiplication of
 $\mathbf{R}_t$ and $\mathbf{H}_{t-1}$
 in :eqref:`gru_tilde_H`.
 Whenever the entries in the reset gate $\mathbf{R}_t$ are close to 1, we recover a vanilla RNN such as in :eqref:`rnn_h_with_state`.
-For all entries of the reset gate $\mathbf{R}_t$ that are close to 0, the candidate hidden state is the result of an MLP with $\mathbf{X}_t$ as the input. Any pre-existing hidden state is thus *reset* to defaults.
+For all entries of the reset gate $\mathbf{R}_t$ that are close to 0, the candidate hidden state is the result of an MLP with $\mathbf{X}_t$ as input. Any pre-existing hidden state is thus *reset* to defaults.
 
 :numref:`fig_gru_2` illustrates the computational flow after applying the reset gate.
 
@@ -161,218 +161,111 @@ In summary, GRUs have the following two distinguishing features:
 
 ## Implementation from Scratch
 
-To gain a better understanding of the GRU model, let us implement it from scratch. We begin by reading the time machine dataset that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below.
+To gain a better understanding of the GRU model, let's implement it from scratch.
 
-```{.python .input}
+```{.python .input  n=5}
+%load_ext d2lbook.tab
+tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+```
+
+```{.python .input  n=6}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import rnn
 npx.set_np()
-
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-```{.python .input}
-#@tab pytorch
+```{.python .input  n=7}
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
-
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-```{.python .input}
-#@tab tensorflow
+```{.python .input  n=8}
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
-
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 ### (**Initializing Model Parameters**)
 
-The next step is to initialize the model parameters.
+The first step is to initialize the model parameters.
 We draw the weights from a Gaussian distribution
-with standard deviation to be 0.01 and set the bias to 0. The hyperparameter `num_hiddens` defines the number of hidden units.
-We instantiate all weights and biases relating to the update gate, the reset gate, the candidate hidden state,
-and the output layer.
+with standard deviation to be `sigma` and set the bias to 0. The hyperparameter `num_hiddens` defines the number of hidden units.
+We instantiate all weights and biases relating to the update gate, the reset gate, and the candidate hidden state.
 
 ```{.python .input}
-def get_params(vocab_size, num_hiddens, device):
-    num_inputs = num_outputs = vocab_size
-
-    def normal(shape):
-        return np.random.normal(scale=0.01, size=shape, ctx=device)
-
-    def three():
-        return (normal((num_inputs, num_hiddens)),
-                normal((num_hiddens, num_hiddens)),
-                np.zeros(num_hiddens, ctx=device))
-
-    W_xz, W_hz, b_z = three()  # Update gate parameters
-    W_xr, W_hr, b_r = three()  # Reset gate parameters
-    W_xh, W_hh, b_h = three()  # Candidate hidden state parameters
-    # Output layer parameters
-    W_hq = normal((num_hiddens, num_outputs))
-    b_q = np.zeros(num_outputs, ctx=device)
-    # Attach gradients
-    params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]
-    for param in params:
-        param.attach_grad()
-    return params
-```
-
-```{.python .input}
-#@tab pytorch
-def get_params(vocab_size, num_hiddens, device):
-    num_inputs = num_outputs = vocab_size
-
-    def normal(shape):
-        return torch.randn(size=shape, device=device)*0.01
-
-    def three():
-        return (normal((num_inputs, num_hiddens)),
-                normal((num_hiddens, num_hiddens)),
-                d2l.zeros(num_hiddens, device=device))
-
-    W_xz, W_hz, b_z = three()  # Update gate parameters
-    W_xr, W_hr, b_r = three()  # Reset gate parameters
-    W_xh, W_hh, b_h = three()  # Candidate hidden state parameters
-    # Output layer parameters
-    W_hq = normal((num_hiddens, num_outputs))
-    b_q = d2l.zeros(num_outputs, device=device)
-    # Attach gradients
-    params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]
-    for param in params:
-        param.requires_grad_(True)
-    return params
-```
-
-```{.python .input}
-#@tab tensorflow
-def get_params(vocab_size, num_hiddens):
-    num_inputs = num_outputs = vocab_size
-
-    def normal(shape):
-        return d2l.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32)
-
-    def three():
-        return (tf.Variable(normal((num_inputs, num_hiddens)), dtype=tf.float32),
-                tf.Variable(normal((num_hiddens, num_hiddens)), dtype=tf.float32),
-                tf.Variable(d2l.zeros(num_hiddens), dtype=tf.float32))
-
-    W_xz, W_hz, b_z = three()  # Update gate parameters
-    W_xr, W_hr, b_r = three()  # Reset gate parameters
-    W_xh, W_hh, b_h = three()  # Candidate hidden state parameters
-    # Output layer parameters
-    W_hq = tf.Variable(normal((num_hiddens, num_outputs)), dtype=tf.float32)
-    b_q = tf.Variable(d2l.zeros(num_outputs), dtype=tf.float32)
-    params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]
-    return params
+%%tab all
+class GRUScratch(d2l.Module):
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        
+        if tab.selected('mxnet'):
+            init_weight = lambda *shape: d2l.randn(*shape) * sigma
+            triple = lambda: (init_weight(num_inputs, num_hiddens),
+                              init_weight(num_hiddens, num_hiddens),
+                              d2l.zeros(num_hiddens))            
+        if tab.selected('pytorch'):
+            init_weight = lambda *shape: nn.Parameter(d2l.randn(*shape) * sigma)
+            triple = lambda: (init_weight(num_inputs, num_hiddens),
+                              init_weight(num_hiddens, num_hiddens),
+                              nn.Parameter(d2l.zeros(num_hiddens)))
+        if tab.selected('tensorflow'):
+            init_weight = lambda *shape: tf.Variable(d2l.normal(shape) * sigma)
+            triple = lambda: (init_weight(num_inputs, num_hiddens),
+                              init_weight(num_hiddens, num_hiddens),
+                              tf.Variable(d2l.zeros(num_hiddens)))            
+            
+        self.W_xz, self.W_hz, self.b_z = triple()  # Update gate
+        self.W_xr, self.W_hr, self.b_r = triple()  # Reset gate
+        self.W_xh, self.W_hh, self.b_h = triple()  # Candidate hidden state        
 ```
 
 ### Defining the Model
 
-Now we will define [**the hidden state initialization function**] `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn_scratch`, this function returns a tensor with a shape (batch size, number of hidden units) whose values are all zeros.
-
-```{.python .input}
-def init_gru_state(batch_size, num_hiddens, device):
-    return (np.zeros(shape=(batch_size, num_hiddens), ctx=device), )
-```
-
-```{.python .input}
-#@tab pytorch
-def init_gru_state(batch_size, num_hiddens, device):
-    return (torch.zeros((batch_size, num_hiddens), device=device), )
-```
-
-```{.python .input}
-#@tab tensorflow
-def init_gru_state(batch_size, num_hiddens):
-    return (d2l.zeros((batch_size, num_hiddens)), )
-```
-
-Now we are ready to [**define the GRU model**].
+Now we are ready to [**define the GRU forward computation**].
 Its structure is the same as that of the basic RNN cell, except that the update equations are more complex.
 
 ```{.python .input}
-def gru(inputs, state, params):
-    W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params
-    H, = state
+%%tab all
+@d2l.add_to_class(GRUScratch)
+def forward(self, inputs, H=None):
+    matmul_H = lambda A, B: d2l.matmul(A, B) if H is not None else 0
     outputs = []
     for X in inputs:
-        Z = npx.sigmoid(np.dot(X, W_xz) + np.dot(H, W_hz) + b_z)
-        R = npx.sigmoid(np.dot(X, W_xr) + np.dot(H, W_hr) + b_r)
-        H_tilda = np.tanh(np.dot(X, W_xh) + np.dot(R * H, W_hh) + b_h)
+        Z = d2l.sigmoid(d2l.matmul(X, self.W_xz) + (
+            d2l.matmul(H, self.W_hz) if H is not None else 0) + self.b_z)
+        if H is None: H = d2l.zeros_like(Z)
+        R = d2l.sigmoid(d2l.matmul(X, self.W_xr) + 
+                        d2l.matmul(H, self.W_hr) + self.b_r)
+        H_tilda = d2l.tanh(d2l.matmul(X, self.W_xh) + 
+                           d2l.matmul(R * H, self.W_hh) + self.b_h)
         H = Z * H + (1 - Z) * H_tilda
-        Y = np.dot(H, W_hq) + b_q
-        outputs.append(Y)
-    return np.concatenate(outputs, axis=0), (H,)
+        outputs.append(H)
+    return outputs, (H, )
 ```
 
-```{.python .input}
-#@tab pytorch
-def gru(inputs, state, params):
-    W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params
-    H, = state
-    outputs = []
-    for X in inputs:
-        Z = torch.sigmoid((X @ W_xz) + (H @ W_hz) + b_z)
-        R = torch.sigmoid((X @ W_xr) + (H @ W_hr) + b_r)
-        H_tilda = torch.tanh((X @ W_xh) + ((R * H) @ W_hh) + b_h)
-        H = Z * H + (1 - Z) * H_tilda
-        Y = H @ W_hq + b_q
-        outputs.append(Y)
-    return torch.cat(outputs, dim=0), (H,)
-```
+### Training
+
+[**Training**] a language model on *The Time Machine* dataset
+works in exactly the same manner as in :numref:`sec_rnn-scratch`.
 
 ```{.python .input}
-#@tab tensorflow
-def gru(inputs, state, params):
-    W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params
-    H, = state
-    outputs = []
-    for X in inputs:
-        X = tf.reshape(X,[-1,W_xh.shape[0]])
-        Z = tf.sigmoid(tf.matmul(X, W_xz) + tf.matmul(H, W_hz) + b_z)
-        R = tf.sigmoid(tf.matmul(X, W_xr) + tf.matmul(H, W_hr) + b_r)
-        H_tilda = tf.tanh(tf.matmul(X, W_xh) + tf.matmul(R * H, W_hh) + b_h)
-        H = Z * H + (1 - Z) * H_tilda
-        Y = tf.matmul(H, W_hq) + b_q
-        outputs.append(Y)
-    return tf.concat(outputs, axis=0), (H,)
-```
-
-### Training and Predicting
-
-[**Training**] and prediction work in exactly the same manner as in :numref:`sec_rnn_scratch`.
-After training,
-we print out the perplexity on the training set
-and the predicted sequence following
-the provided prefixes "time traveller" and "traveller", respectively.
-
-```{.python .input}
-#@tab mxnet, pytorch
-vocab_size, num_hiddens, device = len(vocab), 256, d2l.try_gpu()
-num_epochs, lr = 500, 1
-model = d2l.RNNModelScratch(len(vocab), num_hiddens, device, get_params,
-                            init_gru_state, gru)
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
-```
-
-```{.python .input}
-#@tab tensorflow
-vocab_size, num_hiddens, device_name = len(vocab), 256, d2l.try_gpu()._device_name
-# defining tensorflow training strategy
-strategy = tf.distribute.OneDeviceStrategy(device_name)
-num_epochs, lr = 500, 1
-with strategy.scope():
-    model = d2l.RNNModelScratch(len(vocab), num_hiddens, init_gru_state, gru, get_params)
-
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
+%%tab all
+data = d2l.TimeMachine(batch_size=1024, num_steps=32)
+if tab.selected('mxnet', 'pytorch'):
+    gru = GRUScratch(num_inputs=len(data.vocab), num_hiddens=32)
+    model = d2l.RNNLMScratch(gru, vocab_size=len(data.vocab), lr=4)
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        gru = GRUScratch(num_inputs=len(data.vocab), num_hiddens=32)
+        model = d2l.RNNLMScratch(gru, vocab_size=len(data.vocab), lr=4)
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1)
+trainer.fit(model, data)
 ```
 
 ## [**Concise Implementation**]
@@ -381,36 +274,48 @@ In high-level APIs,
 we can directly
 instantiate a GPU model.
 This encapsulates all the configuration detail that we made explicit above.
-The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out before.
 
 ```{.python .input}
-gru_layer = rnn.GRU(num_hiddens)
-model = d2l.RNNModel(gru_layer, len(vocab))
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
+%%tab all
+class GRU(d2l.RNN):
+    def __init__(self, num_inputs, num_hiddens):
+        d2l.Module.__init__(self)
+        self.save_hyperparameters()
+        if tab.selected('mxnet'):
+            self.rnn = rnn.GRU(num_hiddens)
+        if tab.selected('pytorch'):
+            self.rnn = nn.GRU(num_inputs, num_hiddens)
+        if tab.selected('tensorflow'):
+            self.rnn = tf.keras.layers.GRU(num_hiddens, return_sequences=True, 
+                                           return_state=True)
+```
+
+The code is significantly faster in training as it uses compiled operators rather than Python for many details that we spelled out before.
+
+```{.python .input}
+%%tab all
+gru = GRU(num_inputs=len(data.vocab), num_hiddens=32)
+if tab.selected('mxnet', 'pytorch'):
+    model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=4)
+if tab.selected('tensorflow'):
+    with d2l.try_gpu():
+        model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=4)
+trainer.fit(model, data)
+```
+
+After training,
+we print out the perplexity on the training set
+and the predicted sequence following
+the provided prefix.
+
+```{.python .input}
+%%tab mxnet, pytorch
+model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 
 ```{.python .input}
-#@tab pytorch
-num_inputs = vocab_size
-gru_layer = nn.GRU(num_inputs, num_hiddens)
-model = d2l.RNNModel(gru_layer, len(vocab))
-model = model.to(device)
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
-```
-
-```{.python .input}
-#@tab tensorflow
-gru_cell = tf.keras.layers.GRUCell(num_hiddens,
-    kernel_initializer='glorot_uniform')
-gru_layer = tf.keras.layers.RNN(gru_cell, time_major=True,
-    return_sequences=True, return_state=True)
-
-device_name = d2l.try_gpu()._device_name
-strategy = tf.distribute.OneDeviceStrategy(device_name)
-with strategy.scope():
-    model = d2l.RNNModel(gru_layer, vocab_size=len(vocab))
-
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
+%%tab tensorflow
+model.predict('it has', 20, data.vocab)
 ```
 
 ## Summary
@@ -428,11 +333,14 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 1. Compare runtime, perplexity, and the output strings for `rnn.RNN` and `rnn.GRU` implementations with each other.
 1. What happens if you implement only parts of a GRU, e.g., with only a reset gate or only an update gate?
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/342)
 :end_tab:
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1056)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/3860)
 :end_tab:
