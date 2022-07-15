@@ -265,7 +265,7 @@ no matter what kind of machine learning problem we take on:
 
 It might go without saying that you cannot do data science without data.
 We could lose hundreds of pages pondering what precisely data *is*,
-but for now, we'll focus on the key properties 
+but for now, we will focus on the key properties 
 of the datasets that we will be concerned with.
 Generally, we are concerned with a collection of examples.
 In order to work with data usefully, we typically
@@ -301,7 +301,7 @@ including age, vital signs, comorbidities,
 current medications, and recent procedures.
 The label available for training would be a binary value
 indicating whether each patient in the historical data
-survived within the 30 day window.
+survived within the 30-day window.
 
 In such cases, when every example is characterized
 by the same number of numerical features,
@@ -323,7 +323,7 @@ We risk losing information in the cropped out portions.
 Moreover, text data resists fixed-length 
 representations even more stubbornly.
 Consider the customer reviews left 
-on e-commerce sites such as Amazon, IMDB, and TripAdvisor.
+on e-commerce sites such as Amazon, IMDb, and TripAdvisor.
 Some are short: "it stinks!". 
 Others ramble for pages.
 One major advantage of deep learning over traditional methods
@@ -444,7 +444,7 @@ consisting of some number of examples collected for training.
 However, doing well on the training data
 does not guarantee that we will do well on unseen data.
 So we will typically want to split the available data into two partitions:
-the *training dataset* (or *training set*), for fitting model parameters;
+the *training dataset* (or *training set*), for learning model parameters;
 and the *test dataset* (or *test set*), which is held out for evaluation.
 At the end of the day, we typically report
 how our models perform on both partitions.
@@ -740,7 +740,7 @@ is actually a death cap.
 Classification can get much more complicated than just
 binary or multiclass classification.
 For instance, there are some variants of classification
-address hierarchically structured classes.
+addressing hierarchically structured classes.
 In such cases not all errors are equal---if 
 we must err, we might prefer to misclassify 
 to a related class rather than a distant class.
@@ -802,7 +802,7 @@ and posts about "machine learning" are likely to mention "GPUs".
 
 Sometimes such tagging problems
 draw on enormous label sets.
-At the National Library of Medicine
+The National Library of Medicine
 employs many professional annotators
 who associate each article to be indexed in PubMed
 with a set of tags drawn from the
@@ -844,7 +844,7 @@ and then used PageRank to prioritize
 the more authoritative pages. 
 Nowadays, search engines use machine learning and behavioral models
 to obtain query-dependent relevance scores.
-Entire academic conferences are devoted to this subject.
+There are entire academic conferences devoted to this subject.
 
 #### Recommender Systems
 :label:`subsec_recommender_systems`
@@ -947,7 +947,7 @@ These problems also occur in medicine.
 We might want a model to monitor patients in the intensive care unit
 and to fire off alerts whenever their risk of dying in the next 24 hours
 exceeds some threshold.
-Here, we wouldn't to throw away everything 
+Here, we wouldn't throw away everything 
 that we know about the patient history every hour,
 making predictions based only 
 on the most recent measurements.
@@ -957,7 +957,7 @@ exciting applications of machine learning
 and they are instances of *sequence learning*.
 They require a model to either ingest sequences of inputs
 or to emit sequences of outputs (or both).
-Specifically, *sequence-to-sequence (seq2seq) learning* considers problems 
+Specifically, *sequence-to-sequence learning* considers problems 
 where inputs and outputs both consist of variable-length sequences.
 Examples include machine translation 
 and speech-to-text transcription.
@@ -971,13 +971,13 @@ Here, the inputs and outputs are *aligned*,
 i.e., they are of the same number
 and occur in a corresponding order.
 For instance, in *part-of-speech (PoS) tagging*,
-we annotate every word in a sentences
+we annotate every word in a sentence
 with the corresponding part of speech,
 i.e., "noun" or "direct object".
 Alternatively, we might want to know 
 which groups of contiguous words refer to named entities,
 like *people*, *places*, or *organizations*.
-In a the cartoonishly simple example below, 
+In the cartoonishly simple example below, 
 we might just want to indicate,
 for every word in a sentence, 
 whether it is part of a named entity (tagged as "Ent").
@@ -1131,7 +1131,7 @@ For images, we may train models
 to tell the relative position
 between two cropped regions
 of the same image :cite:`Doersch.Gupta.Efros.2015`,
-two predict an occluded part of an image
+to predict an occluded part of an image
 based on the remaining portions of the image,
 or to predict whether two examples 
 are perturbed versions of the same underlying image.
@@ -1365,7 +1365,7 @@ contributed significantly to its theory
 and also its applications in genetics.
 Many of his algorithms (such as linear discriminant analysis)
 and formulas (such as the Fisher information matrix)
-are still hold a prominent place 
+still hold a prominent place 
 in the foundations of modern statistics.
 Even his data resources had a lasting impact.
 The Iris dataset that Fisher released in 1936 
@@ -1571,7 +1571,7 @@ over the past decade.
   This has led to significant progress in computers achieving
   superhuman performance on tasks like Go, Atari games, 
   Starcraft, and in physics simulations (e.g., using MuJoCo),
-  Where envirnment simulators are available. 
+  Where environment simulators are available. 
   See, e.g., :citet:`Silver.Huang.Maddison.ea.2016` for a description
   of how to achieve this in AlphaGo. In a nutshell,
   reinforcement learning works best 
@@ -1696,7 +1696,7 @@ Many of such advances are attributed to deep learning.
 
 
 This barely scratches the surface 
-for implactful applications of machine learning. 
+for impactful applications of machine learning. 
 For instance, robotics, logistics, computational biology,
 particle physics, and astronomy
 owe some of their most impressive recent advances 
@@ -1721,7 +1721,7 @@ More frivolously, we can ask Alexa to switch on the coffee machine.
 Fortunately, we are far from a sentient AI system
 that could deliberately manipulate its human creators.
 First, AI systems are engineered, 
-trained and deployed 
+trained, and deployed 
 in a specific, goal-oriented manner.
 While their behavior might give the illusion
 of general intelligence, it is a combination of rules, heuristics
