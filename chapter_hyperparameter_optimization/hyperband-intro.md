@@ -64,9 +64,9 @@ discard a fraction of the worst performing trials and train the remaining ones
 for longer. Iterating this process, less and less trials run for longer and
 longer, until at least one trial reaches $r_{max}$ epochs.
 
-More formally, consider a minimum budget $r_{min}$, a maximum budget $r_{max}$, and a halving constant
+More formally, consider a minimum budget $r_{min}$, for example 1 epoch, a maximum budget $r_{max}$, equal to `max_epochs` in our previous example, and a halving constant
 $\eta\in\{2, 3, \dots\}$. For simplicity, assume that $r_{max} = r_{min} \eta^K$,
-where $r_{max}$ is equal to `max_epochs` in our previous example. Moreover, set the initial number of configurations to $N = \eta^K$. Let us
+with $K \in \mathbb{I}$ . Moreover, set the initial number of configurations to $N = \eta^K$. Let us
 define *rung levels* $\mathcal{R} = \{ r_{min}, r_{min}\eta, r_{min}\eta^2,
 \dots, r_{max} \}$. In general, a trial is trained until reaching a rung level,
 then evaluated there, and the validation errors of all trials at a rung level
@@ -78,15 +78,13 @@ The surviving
 trials are trained for $r_{min}\eta$ epochs (next rung level), and the process
 is repeated. In each round, a $1 / \eta$ fraction of trials
 survives and finds it budget to be multiplied by $\eta$. With this particular
-choice of $N$, only a single trial will be trained to the full budget of
-`max_epochs` epochs. Finally, such traversals over all rung levels are
-repeated in an outer loop until the total experiment budget is spent.
+choice of $N$, only a single trial will be trained to the full budget $r_{max}$. Finally, once we finished one round of SH, we continue with a new round with a new set of initial configurations until the total budget is spent.
 
-To implement SH, we use the HPOScheduler base class from the last Section. As we will discuss in Section :ref:`sec_mf_bo`, we can combine SH with Bayesian optimization, because of that, we will use a generic searcher object to sample configurations. Additionally, we assume the minimum resource $r_{min}$, the maximum resource $r_{max}$ and $\eta$ as input. We will also add an optional parameter $s$, which we need later to implement Hyperband.
+To implement SH, we use the HPOScheduler base class from the last Section. As we will discuss in Section :ref:`sec_mf_bo`, we can combine SH with Bayesian optimization, because of that, we will use a generic searcher object to sample configurations. Additionally, we assume the minimum resource $r_{min}$, the maximum resource $r_{max}$ and $\eta$ as input. We will also add an optional parameter $s$ that is multiplied to the number of configurations, which we need later to implement Hyperband.
 
 Inside our scheduler we maintain a queue of configurations that need to be evaluated for the current rung level $r_i$. We update the queue every time we jump to the next rung level.
 
-```{.python .input  n=2}
+```{.python .input  n=9}
 import numpy as np
 
 from d2l import torch as d2l
@@ -100,28 +98,40 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):#@save
         
         self.save_hyperparameters()
 
+        self.s = s  # only used for Hyperband later
+        
+        # compute K, which is later used to determine the number of configurations
         self.K = int(np.log(r_max / r_min) / np.log(eta))
+        
+        # define the rung levels
         self.rung_levels = [r_min * eta ** k for k in range(self.K + 1)]
+        
+        # bookkeeping
         self.observed_error_at_rungs = defaultdict(list)
-        self.s = s
+        
+        # our processing queue
         self.queue = []
 ```
 
-In the beginning our queue is empty and we fill it with $N = s * \eta^{K}$ configurations, which are first evaluated on the smallest rung level $r_{min}$. The effect of $s$ will become important later if we look at Hyperband, for now let's just assume $s=1$. Now, every time resources become available and we query the suggest function, we return an element from the queue. Once we finish one round of SH - we evaluated all surviving configuration on the highest resource level $r_{max}$ - we reset the queue and start the entire process again with a new set of configurations.
+In the beginning our queue is empty and we fill it with $N = s * \eta^{K}$ configurations, which are first evaluated on the smallest rung level $r_{min}$. The effect of $s$ will become important later if we look at Hyperband, for now let's just assume $s=1$. Now, every time resources become available and the HPOTuner object queries the suggest function, we return an element from the queue. Once we finish one round of SH - which means that we evaluated all surviving configuration on the highest resource level $r_{max}$ and our queue is empty - we start the entire process again with a new set of configurations.
 
-```{.python .input  n=3}
+```{.python .input  n=8}
 @d2l.add_to_class(SuccessiveHalvingScheduler) #@save
 def suggest(self):
 
-    if len(self.queue) == 0:
-        self.observed_error_at_rungs = defaultdict(list)
+    if len(self.queue) == 0:  # our queue is empty, which means we start a new round of SH
+        
+        # we track the error of all configuration at the rung levels, 
+        # to sort them later for the promotion on the next rung level
+        self.observed_error_at_rungs = defaultdict(list)  
 
-        N = int(self.s * self.eta ** self.K)
+        N = int(self.s * self.eta ** self.K)  # the number of configurations for the first rung level
         for i in range(N):
             config = searcher.sample_configuration()
-            config['max_epochs'] = self.r_min
+            config['max_epochs'] = self.r_min  # set r = r_min
             self.queue.append(config)
 
+    # return an element from the queue
     c = self.queue.pop()
     return c
 ```
@@ -131,12 +141,22 @@ When we collected a new data point, we first update the searcher module. Afterwa
 ```{.python .input  n=4}
 @d2l.add_to_class(SuccessiveHalvingScheduler) #@save
 def update(self, config, error, info=None):
+    
+    # determine the rung level r_i
     ri = config['max_epochs']
+    
+    # bookkeeping
     self.observed_error_at_rungs[ri].append((config, error))
+    
+    # update our searcher, e.g if we use Bayesian optimization later
     self.searcher.update(config, error, additional_info=info)     
 
+    # determine how many configurations should be evaluated on this rung level
     ki = self.K - self.rung_levels.index(ri)
     n = int(self.s * self.eta ** ki)
+    
+    # if we observed all configuration on this rung level r_i, we estimate the top 1 / eta configuration and 
+    # add them to queue and promote them for the next rung level r_i+1
     if len(self.observed_error_at_rungs[ri]) == n and ri < self.r_max:
         best_performing_configurations = self.get_top_n_configurations(ri, n // self.eta)
 
@@ -168,11 +188,33 @@ search_space = {
 } 
 ```
 
-```{.python .input  n=14}
+```{.python .input  n=6}
 searcher = d2l.RandomSearcher(search_space)
 scheduler = SuccessiveHalvingScheduler(searcher=searcher, eta=2, r_min=1, r_max=16)
 tuner = d2l.HPOTuner(scheduler=scheduler, objective=d2l.objective)
 tuner.run(number_of_trials=31)
+```
+
+```{.json .output n=6}
+[
+ {
+  "ename": "KeyboardInterrupt",
+  "evalue": "",
+  "output_type": "error",
+  "traceback": [
+   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+   "\u001b[0;31mKeyboardInterrupt\u001b[0m                         Traceback (most recent call last)",
+   "\u001b[0;32m/var/folders/ld/vzcn3j2d7yg493b1c6m0ypprdqgxkm/T/ipykernel_20129/1124683928.py\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m      2\u001b[0m \u001b[0mscheduler\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mSuccessiveHalvingScheduler\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0msearcher\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0msearcher\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0meta\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m2\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mr_min\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mr_max\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m16\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0mtuner\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mHPOTuner\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mscheduler\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mscheduler\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mobjective\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0md2l\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mobjective\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 4\u001b[0;31m \u001b[0mtuner\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mrun\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mnumber_of_trials\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m31\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+   "\u001b[0;32m~/git/d2l-en/d2l/torch.py\u001b[0m in \u001b[0;36mrun\u001b[0;34m(self, number_of_trials)\u001b[0m\n\u001b[1;32m   2616\u001b[0m             \u001b[0mconfig\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mscheduler\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msuggest\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   2617\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 2618\u001b[0;31m             \u001b[0merror\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mobjective\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mconfig\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   2619\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   2620\u001b[0m             \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mscheduler\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mupdate\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mconfig\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0merror\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;32m~/git/d2l-en/d2l/torch.py\u001b[0m in \u001b[0;36mobjective\u001b[0;34m(config, max_epochs)\u001b[0m\n\u001b[1;32m   2645\u001b[0m     \u001b[0mtrainer\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mTrainer\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mmax_epochs\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mmax_epochs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mnum_gpus\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m0\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   2646\u001b[0m     \u001b[0mdata\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mFashionMNIST\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mbatch_size\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mbatch_size\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mresize\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;36m224\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;36m224\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 2647\u001b[0;31m     \u001b[0mtrainer\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfit\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mmodel\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mmodel\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mdata\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mdata\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   2648\u001b[0m     \u001b[0mvalidation_error\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mtrainer\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mevaluate\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   2649\u001b[0m     \u001b[0;32mreturn\u001b[0m \u001b[0mvalidation_error\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;32m~/git/d2l-en/d2l/torch.py\u001b[0m in \u001b[0;36mfit\u001b[0;34m(self, model, data)\u001b[0m\n\u001b[1;32m    310\u001b[0m         \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mval_batch_idx\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;36m0\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    311\u001b[0m         \u001b[0;32mfor\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mepoch\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mrange\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mmax_epochs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 312\u001b[0;31m             \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfit_epoch\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    313\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    314\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0mfit_epoch\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;32m~/git/d2l-en/d2l/torch.py\u001b[0m in \u001b[0;36mfit_epoch\u001b[0;34m(self)\u001b[0m\n\u001b[1;32m    326\u001b[0m             \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0moptim\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mzero_grad\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    327\u001b[0m             \u001b[0;32mwith\u001b[0m \u001b[0mtorch\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mno_grad\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 328\u001b[0;31m                 \u001b[0mloss\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mbackward\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    329\u001b[0m                 \u001b[0;32mif\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgradient_clip_val\u001b[0m \u001b[0;34m>\u001b[0m \u001b[0;36m0\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    330\u001b[0m                     \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mclip_gradients\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgradient_clip_val\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mmodel\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;32m~/opt/anaconda3/envs/d2l/lib/python3.8/site-packages/torch/tensor.py\u001b[0m in \u001b[0;36mbackward\u001b[0;34m(self, gradient, retain_graph, create_graph, inputs)\u001b[0m\n\u001b[1;32m    243\u001b[0m                 \u001b[0mcreate_graph\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mcreate_graph\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    244\u001b[0m                 inputs=inputs)\n\u001b[0;32m--> 245\u001b[0;31m         \u001b[0mtorch\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mautograd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mbackward\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mgradient\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mretain_graph\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcreate_graph\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minputs\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0minputs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    246\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    247\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0mregister_hook\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mhook\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;32m~/opt/anaconda3/envs/d2l/lib/python3.8/site-packages/torch/autograd/__init__.py\u001b[0m in \u001b[0;36mbackward\u001b[0;34m(tensors, grad_tensors, retain_graph, create_graph, grad_variables, inputs)\u001b[0m\n\u001b[1;32m    143\u001b[0m         \u001b[0mretain_graph\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcreate_graph\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    144\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 145\u001b[0;31m     Variable._execution_engine.run_backward(\n\u001b[0m\u001b[1;32m    146\u001b[0m         \u001b[0mtensors\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mgrad_tensors_\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mretain_graph\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcreate_graph\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minputs\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    147\u001b[0m         allow_unreachable=True, accumulate_grad=True)  # allow_unreachable flag\n",
+   "\u001b[0;31mKeyboardInterrupt\u001b[0m: "
+  ]
+ }
+]
 ```
 
 We can visualize the learning curves of all configuration that we evaluated. Most of the configurations are stopped early and only the better performing configurations survive until $r_{max}$. Compare this to vanilla random search which would allocate $r_{max}$ to every configuration.
@@ -229,6 +271,8 @@ def update(self, config, error, info=None):
     self.brackets[self.s].append((config['max_epochs'], error))
     self.successive_halving.update(config, error, info=info)
 
+    # if the queue of successive halving is empty, than we finished this round and start with
+    # a new round with different r_min and N
     if len(self.successive_halving.queue) == 0:
         self.s -= 1
         if self.s < 0:
