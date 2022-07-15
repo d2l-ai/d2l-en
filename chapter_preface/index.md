@@ -92,10 +92,10 @@ to bring would-be practitioners up to speed.
 
 When we started this book project,
 there were no resources that simultaneously 
-(a) remained up to date;
-(b) covered the breadth of modern machine learning practices 
+(i) remained up to date;
+(ii) covered the breadth of modern machine learning practices 
 with sufficient technical depth;
-and (c) interleaved exposition of 
+and (iii) interleaved exposition of 
 the quality one expects of a textbook 
 with the clean runnable code
 that one expects of a hands-on tutorial.
@@ -103,7 +103,7 @@ We found plenty of code examples for
 how to use a given deep learning framework
 (e.g., how to do basic numerical computing with matrices in TensorFlow)
 or for implementing particular techniques
-(e.g., code snippets for LeNet, AlexNet, ResNets, etc.)
+(e.g., code snippets for LeNet, AlexNet, ResNet, etc.)
 scattered across various blog posts and GitHub repositories.
 However, these examples typically focused on
 *how* to implement a given approach,
@@ -301,6 +301,7 @@ of deep learning in computer vision.
 Finally, in :numref:`chap_nlp_pretrain` and :numref:`chap_nlp_app`,
 we demonstrate how to pretrain language representation models 
 and apply them to natural language processing tasks.
+This part is available [online](https://d2l.ai).
 
 
 ### Code
@@ -556,7 +557,7 @@ including prose, figures, mathematics, and code, all in one place.
 To ask (or answer) questions related to this book,
 visit our forum at https://discuss.d2l.ai/.
 All of our notebooks are available for download
-on the [d2l.ai website](https://d2l.ai)
+on the [D2L.ai website](https://d2l.ai)
 and on [GitHub](https://github.com/d2l-ai/d2l-en).
 
 

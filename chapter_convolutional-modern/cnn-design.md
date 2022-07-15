@@ -431,7 +431,7 @@ the process of gradually
 improving from a standard ResNet architecture
 toward the design of a vision transformer
 leads to a family of CNNs called the ConvNeXt models
-that compete favorably with Swin transformers :cite:`liu2022convnet`.
+that compete favorably with transformers for vision :cite:`liu2022convnet`.
 We refer the interested readers
 to CNN design discussions
 in the ConvNeXt paper :cite:`liu2022convnet`.
