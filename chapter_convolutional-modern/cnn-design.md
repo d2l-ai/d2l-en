@@ -407,14 +407,14 @@ With desirable properties like locality and translation invariance (:numref:`sec
 for vision,
 CNNs have been the dominant architectures in this area.
 Recently,
-transformers (to be covered in :numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training`
+transformers (:numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training`
 and MLPs :cite:`tolstikhin2021mlp`
 have also sparked research beyond
 the well-established CNN architectures for vision.
 Specifically,
 although lacking of the aforementioned
 inductive biases inherent to CNNs,
-vision transformers
+vision transformers (:numref:`sec_vision-transformer`)
 attained state-of-the-art performance
 in large-scale image classification in early 2020s,
 showing that
@@ -424,24 +424,14 @@ In other words,
 it is often possible to
 train large transformers
 to outperform large CNNs on large datasets.
-However,
-quadratic complexity
-of self-attention (to be covered in :numref:`sec_self-attention-and-positional-encoding`)
-makes the transformer architecture
-less suitable for higher-resolution images.
-To address this issue,
-Swin transformers
-introduce shifted windows to
-achieve state-of-the-art performance
-in a broader range of vision tasks beyond image classification :cite:`liu2021swin`.
 Inspired
 by the superior scaling behavior of
-transformers with multi-head self-attention (to be covered in :numref:`sec_multihead-attention`),
+transformers (:numref:`sec_large-pretraining-transformers`) with multi-head self-attention (:numref:`sec_multihead-attention`),
 the process of gradually
 improving from a standard ResNet architecture
 toward the design of a vision transformer
-leads to a family of CNN models called ConvNeXts
-that compete favorably with Swin transformers :cite:`liu2022convnet`.
+leads to a family of CNNs called the ConvNeXt models
+that compete favorably with transformers for vision :cite:`liu2022convnet`.
 We refer the interested readers
 to CNN design discussions
 in the ConvNeXt paper :cite:`liu2022convnet`.

@@ -333,7 +333,7 @@ d2l.check_shape(state[1][0], (batch_size, num_hiddens))
 ## [**Training**]
 
 Similar to :numref:`sec_seq2seq_training`,
-here we specify hyperparemeters,
+here we specify hyperparameters,
 instantiate
 an encoder and a decoder with Bahdanau attention,
 and train this model for machine translation.

@@ -158,7 +158,7 @@ pip install d2l
 Next, you will want to download the notebooks 
 so that you can run each of the book's code blocks. 
 Simply click on the "Notebooks" tab at the top 
-of any HTML page on [the d2l.ai website](https://d2l.ai/)
+of any HTML page on [the D2L.ai website](https://d2l.ai/)
 to download the code and then unzip it. 
 Alternatively, you can fetch the notebooks
 from the command line as follows:
@@ -214,7 +214,7 @@ Then we can run the code for each section of the book.
 Whenever you open a new command line window,
 you will need to execute `conda activate d2l`
 to activate the runtime environment
-before running the d2l notebooks,
+before running the D2L notebooks,
 or updating your packages 
 (either the deep learning framework
 or the `d2l` package).

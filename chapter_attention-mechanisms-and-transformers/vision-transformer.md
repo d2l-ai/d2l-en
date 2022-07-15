@@ -227,10 +227,20 @@ intrinsic superiority of transformers in scalability :cite:`Dosovitskiy.Beyer.Ko
 The introduction of vision transformers
 has changed the landscape of network design for modeling image data.
 They were soon shown effective on the ImageNet dataset with data-efficient training strategies of DeiT :cite:`touvron2021training`.
+However,
+quadratic complexity
+of self-attention (:numref:`sec_self-attention-and-positional-encoding`)
+makes the transformer architecture
+less suitable for higher-resolution images.
 Towards a general-purpose backbone network in computer vision,
 Swin transformers addressed the quadratic computational complexity with respect to image size (:numref:`subsec_cnn-rnn-self-attention`)
 and added back convolution-like priors,
 extending the applicability of transformers to a range of computer vision tasks beyond image classification with state-of-the-art results :cite:`liu2021swin`.
+
+
+
+
+
 
 
 ## Exercises

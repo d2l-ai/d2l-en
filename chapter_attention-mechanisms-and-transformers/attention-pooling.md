@@ -209,7 +209,7 @@ d2l.show_heatmaps([[attention_weights]],
                   ylabel='Sorted validation inputs')
 ```
 
-## **Parametric Attention Pooling**
+## [**Parametric Attention Pooling**]
 
 Nonparametric Nadaraya-Watson kernel regression
 enjoys the *consistency* benefit:
