@@ -265,8 +265,8 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
         # standardization
         X_hat = (X - mean) / np.sqrt(var + eps)
         # Update the mean and variance using moving average
-        moving_mean = momentum * moving_mean + (1.0 - momentum) * mean
-        moving_var = momentum * moving_var + (1.0 - momentum) * var
+        moving_mean = (1.0 - momentum) * moving_mean + momentum * mean
+        moving_var = (1.0 - momentum) * moving_var + momentum * var
     Y = gamma * X_hat + beta  # Scale and shift
     return Y, moving_mean, moving_var
 ```
@@ -302,8 +302,8 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
         # standardization
         X_hat = (X - mean) / torch.sqrt(var + eps)
         # Update the mean and variance using moving average
-        moving_mean = momentum * moving_mean + (1.0 - momentum) * mean
-        moving_var = momentum * moving_var + (1.0 - momentum) * var
+        moving_mean = (1.0 - momentum) * moving_mean + momentum * mean
+        moving_var = (1.0 - momentum) * moving_var + momentum * var
     Y = gamma * X_hat + beta  # Scale and shift
     return Y, moving_mean.data, moving_var.data
 ```
