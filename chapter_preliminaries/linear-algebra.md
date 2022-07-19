@@ -203,7 +203,7 @@ x.shape
 
 Oftentimes, the word "dimension" gets overloaded
 to mean both the number of axes 
-and the length along a articular axis.
+and the length along a particular axis.
 To avoid this confusion, 
 we use *order* to refer to the number of axes
 and *dimensionality* exclusively to refer 
