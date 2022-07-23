@@ -245,7 +245,7 @@ they were most often filtered out.
 However, they carry meaning and
 it's not necessary to filter them out
 when working with modern RNN- and
-Transformer-based neural NLP models.
+transformer-based neural natural language processing models.
 If you look further down the list,
 you will notice
 that word frequency decays quickly.

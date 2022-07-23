@@ -121,7 +121,7 @@ Videos can be represented as varying-length sequences of still images.
 
 While sequence models have popped up in countless application areas,
 basic research in the area has been driven predominantly
-by advances on core tasks in natural language processing (NLP).
+by advances on core tasks in natural language processing.
 Thus, throughout this chapter, we will focus
 our exposition and examples on text data.
 If you get the hang of these examples,
