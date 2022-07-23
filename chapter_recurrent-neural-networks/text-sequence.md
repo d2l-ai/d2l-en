@@ -91,7 +91,7 @@ text[:60]
 ## Tokenization
 
 *Tokens* are the atomic (indivisible) units of text.
-Each sequence step corresponds to 1 token,
+Each time step corresponds to 1 token,
 but what precisely constitutes a token is a design choice.
 For example, we could represent the sentence
 "Baby needs a new pair of shoes"

@@ -23,13 +23,13 @@ Applying backpropagation in RNNs
 is called *Backpropagation through time* (:cite:`Werbos.1990`).
 This procedure requires us to expand (or *unroll*) 
 the computational graph of an RNN
-one sequence step at a time.
+one time step at a time.
 The unrolled RNN is essentially 
 a feedforward neural network 
 with the special property 
 that the same parameters 
 are repeated throughout the unrolled network,
-appearing at each sequence step.
+appearing at each time step.
 Then, just as in any feedforward neural network,
 we can apply the chain rule, 
 backpropagating gradients through the unrolled net.

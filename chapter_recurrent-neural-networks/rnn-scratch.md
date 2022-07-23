@@ -77,13 +77,13 @@ class RNNScratch(d2l.Module):  #@save
 ```
 
 [**The `forward` method defines how to compute 
-the output and hidden state at any sequence step,
+the output and hidden state at any time step,
 given the current input and the state of the model
-at the previous sequence step.**]
+at the previous time step.**]
 Note that the RNN model loops through 
 the outermost dimension of `inputs`
 updating the hidden state 
-one sequence step at a time.
+one time step at a time.
 The model here uses a $\tanh$ activation function,
 which has a sigmoid-like shape but takes
 value $0$ for input $0$ and takes values
@@ -194,7 +194,7 @@ by a numerical index indicating the
 position in the vocabulary of the 
 corresponding word/character/word-piece.
 You might be tempted to build a neural network
-with a single input node (at each sequence step),
+with a single input node (at each time step),
 where the index could be fed in as a scalar value.
 This works when we're dealing with numerical inputs 
 like price or temperature, where any two values
@@ -234,7 +234,7 @@ tf.one_hot(tf.constant([0, 2]), 5)
 ```
 
 (**The minibatches that we sample at each iteration
-will take the shape (batch size, number of sequence steps).
+will take the shape (batch size, number of time steps).
 Once representing each input as a one-hot vector,
 we can think of each minibatch as a three-dimensional tensor, 
 where the length along the third axis 
@@ -295,16 +295,16 @@ d2l.check_shape(outputs, (batch_size, num_steps, num_inputs))
 While you're already used to thinking of neural networks
 as "deep" in the sense that many layers
 separate the input and output 
-even within a single sequence step,
+even within a single time step,
 the length of the sequence introduces
 a new notion of depth.
 In addition to the passing through the network
 in the input-to-output direction,
 inputs at the first time steps 
 must pass through a chain of $T$ layers
-along the sequence steps in order 
+along the time steps in order 
 to influence the output of the model
-at the final sequence step.
+at the final time step.
 Taking the backwards view, in each iteration,
 we backpropagate gradients through time,
 resulting in a chain of matrix-products 
@@ -509,7 +509,7 @@ This is called the *warm-up* period.
 After ingesting the prefix, we are now
 ready to begin emitting the subsequent characters,
 each of which will be fed back into the model 
-as the input at the subsequent sequence step.
+as the input at the subsequent time step.
 
 ```{.python .input}
 %%tab all

@@ -9,8 +9,8 @@ The main change of perspective when developing models
 capable of processing sequences is that we now
 focus on inputs that consist of an ordered list
 of feature vectors $\mathbf{x}_1, \dots, \mathbf{x}_T$,
-where each feature vector $x_t$
-indexed by a sequence step $t \in \mathbb{Z}^+$
+where each feature vector $\mathbf{x}_t$
+indexed by a time step $t \in \mathbb{Z}^+$
 lies in $\mathbb{R}^d$.
 
 Some datasets consist of a single massive sequence.
@@ -18,7 +18,7 @@ Consider, for example, the extremely long streams
 of sensor readings that might be available to climate scientists.
 In such cases, we might create training datasets
 by randomly sampling subsequences of some predetermined length.
-More often, our data arrive as a collection of sequences.
+More often, our data arrives as a collection of sequences.
 Consider the following examples:
 (i) a collection of documents,
 each represented as its own sequence of words,
@@ -37,7 +37,7 @@ While we still assume that entire sequences
 (e.g., entire documents or patient trajectories)
 are sampled independently,
 we cannot assume that the data arriving
-at each sequence step are independent of each other.
+at each time step are independent of each other.
 For example, what words are likely to appear later in a document
 depends heavily on what words occurred earlier in the document.
 What medicine a patient is likely to receive
@@ -82,7 +82,7 @@ Still other times, out goal is to predict sequentially structured targets
 based on sequentially structured inputs
 (e.g., machine translation or video captioning).
 Such sequence-to-sequence tasks take two forms:
-(a) **aligned:** where the input at each sequence step
+(a) **aligned:** where the input at each time step
 aligns with a corresponding target (e.g., part of speech taggin);
 (b) **unaligned** where the input and target
 do not necessarily exhibit a step-for-step correspondence
@@ -250,7 +250,7 @@ given the leftwards context.
 
 
 Now suppose that we wish to employ the strategy mentioned above,
-where we condition only on the $\tau$ previous sequence steps,
+where we condition only on the $\tau$ previous time steps,
 i.e., $x_{t-1}, \ldots, x_{t-\tau}$, rather than
 the entire sequence history $x_{t-1}, \ldots, x_1$.
 Whenever we can throw away the history
@@ -477,7 +477,7 @@ We can address this problem by plugging in
 our earlier predictions as inputs to our model
 for making subsequent predictions,
 projecting forward, one step at a time,
-until reaching the desired sequence step:
+until reaching the desired time step:
 
 $$
 \hat{x}_{605} = f(x_{601}, x_{602}, x_{603}, x_{604}), \\
