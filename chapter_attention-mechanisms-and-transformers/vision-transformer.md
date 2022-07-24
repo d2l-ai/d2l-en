@@ -160,7 +160,7 @@ encoder_blk.eval()
 d2l.check_shape(encoder_blk(X), X.shape)
 ```
 
-## Putting All Things Together
+## Putting It All Together
 
 The forward pass of vision transformers below is straightforward.
 First, input images are fed into an `PatchEmbedding` instance,

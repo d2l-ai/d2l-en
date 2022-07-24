@@ -271,7 +271,7 @@ class Aggregate(nn.Module):
         return Y_hat
 ```
 
-### Putting All Things Together
+### Putting It All Together
 
 By putting the attending, comparing, and aggregating steps together,
 we define the decomposable attention model to jointly train these three steps.

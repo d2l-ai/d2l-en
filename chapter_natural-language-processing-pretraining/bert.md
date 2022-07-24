@@ -529,7 +529,7 @@ These two text corpora are huge:
 they have 800 million words and 2.5 billion words, respectively.
 
 
-## [**Putting All Things Together**]
+## [**Putting It All Together**]
 
 When pretraining BERT, the final loss function is a linear combination of
 both the loss functions for masked language modeling and next sentence prediction.
