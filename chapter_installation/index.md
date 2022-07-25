@@ -105,7 +105,7 @@ You may change the last digits according to your CUDA version, e.g., `cu100` for
 CUDA 10.0 and `cu90` for CUDA 9.0.
 
 
-If your machine has no NVIDIA GPUs 
+If your machine has no NVIDIA GPUs
 or CUDA,
 you can install the CPU version
 as follows:
@@ -123,8 +123,7 @@ pip install mxnet==1.7.0.post1
 You can install PyTorch with either CPU or GPU support as follows:
 
 ```bash
-pip install torch==1.8.1
-pip install torchvision==0.9.1
+pip install torch torchvision
 ```
 
 
@@ -134,8 +133,7 @@ pip install torchvision==0.9.1
 You can install TensorFlow with either CPU or GPU support as follows:
 
 ```bash
-pip install tensorflow==2.3.1
-pip install tensorflow-probability==0.11.1
+pip install tensorflow tensorflow-probability
 ```
 
 
@@ -149,18 +147,19 @@ frequently used functions and classes
 found throughout this book:
 
 ```bash
-pip install d2l
+pip install d2l==1.0.0a0
 ```
 
 
 ## Downloading and Running the Code
 
-Next, we need to download the code of this book.
-You can click the "Notebooks" tab
-on the top of any HTML page of this book
-to download and unzip the code.
-Alternatively, if you have `unzip`
-(otherwise run `sudo apt-get install unzip`) available:
+Next, you will want to download the notebooks
+so that you can run each of the book's code blocks.
+Simply click on the "Notebooks" tab at the top
+of any HTML page on [the D2L.ai website](https://d2l.ai/)
+to download the code and then unzip it.
+Alternatively, you can fetch the notebooks
+from the command line as follows:
 
 :begin_tab:`mxnet`
 
@@ -195,9 +194,11 @@ curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 cd tensorflow
 ```
+
+
 :end_tab:
 
-
+If you don't already have `unzip` installed, first run `sudo apt-get install unzip`.
 Now we can start the Jupyter Notebook server by running:
 
 ```bash
@@ -208,10 +209,13 @@ jupyter notebook
 At this point, you can open http://localhost:8888
 (it may have already opened automatically) in your Web browser.
 Then we can run the code for each section of the book.
-Please always execute `conda activate d2l`
+Whenever you open a new command line window,
+you will need to execute `conda activate d2l`
 to activate the runtime environment
-before running the code of the book
-or updating the deep learning framework or the `d2l` package.
+before running the D2L notebooks,
+or updating your packages
+(either the deep learning framework
+or the `d2l` package).
 To exit the environment,
 run `conda deactivate`.
 

@@ -1,12 +1,22 @@
 # Concise Implementation of Recurrent Neural Networks
 :label:`sec_rnn-concise`
 
-While :numref:`sec_rnn-scratch` was instructive to see how RNNs are implemented,
-this is not convenient or fast.
-This section will show how to implement the same language model more efficiently
-using functions provided by high-level APIs
-of a deep learning framework.
-We begin as before by reading *The Time Machine* dataset.
+Like most of our from-scratch implementations,
+:numref:`sec_rnn-scratch` was designed 
+to provide insight into how each component works.
+But when you're using RNNs every day 
+or writing production code,
+you'll want to rely more on libraries
+that cut down on both implementation time 
+(by supplying library code for common models and functions)
+and computation time 
+(by optimizing the heck out of these library implementations).
+This section will show you how to implement 
+the same language model more efficiently
+using the high-level API provided 
+by your deep learning framework.
+We begin, as before, by loading 
+the *The Time Machine* dataset.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -44,17 +54,14 @@ by high-level APIs.
 :begin_tab:`mxnet`
 Specifically, to initialize the hidden state,
 we invoke the member method `begin_state`.
-This returns a list
-that contains
+This returns a list that contains
 an initial hidden state
 for each example in the minibatch,
 whose shape is
 (number of hidden layers, batch size, number of hidden units).
-For some models
-to be introduced later
+For some models to be introduced later
 (e.g., long short-term memory),
-such a list also
-contains other information.
+this list will also contains other information.
 :end_tab:
 
 ```{.python .input}
@@ -124,8 +131,10 @@ class RNNLM(d2l.RNNLMScratch):  #@save
 
 ## Training and Predicting
 
-Before training the model, let's [**make a prediction with the a model that has random weights.**]
-Given that we have not trained the network, it will generate nonsensical predictions.
+Before training the model, let's [**make a prediction 
+with a model initialized with random weights.**]
+Given that we have not trained the network, 
+it will generate nonsensical predictions.
 
 ```{.python .input}
 %%tab all
@@ -138,7 +147,7 @@ model = RNNLM(rnn, vocab_size=len(data.vocab), lr=1)
 model.predict('it has', 20, data.vocab)
 ```
 
-As is quite obvious, this model does not work at all. Next, we [**train our model with high-level APIs**].
+Next, we [**train our model, leveraging the high-level API**].
 
 ```{.python .input}
 %%tab all
@@ -152,9 +161,9 @@ trainer.fit(model, data)
 
 Compared with :numref:`sec_rnn-scratch`,
 this model achieves comparable perplexity,
-albeit within a shorter period of time, due to the code being more optimized by
-high-level APIs of the deep learning framework.
-We can also generate predicted tokens following the specified prefix string.
+but runs faster due to the optimized implementations.
+As before, we can generate predicted tokens 
+following the specified prefix string.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -168,8 +177,11 @@ model.predict('it has', 20, data.vocab)
 
 ## Summary
 
-* High-level APIs of the deep learning framework provides an implementation of RNNs.
-* Using high-level APIs leads to faster RNN training than using its implementation from scratch.
+* High-level APIs in deep learning frameworks provide implementations of standard RNNs.
+* These libraries help you to avoid wasting time reimplementing standard models.
+* Framework implementations are often highly optimized, 
+  leading to significant (computational) performance gains 
+  as compared to implementations from scratch.
 
 ## Exercises
 

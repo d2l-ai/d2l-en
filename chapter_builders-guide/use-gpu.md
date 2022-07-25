@@ -78,17 +78,6 @@ we can minimize the time spent
 transferring data between devices.
 For example, when training neural networks on a server with a GPU,
 we typically prefer for the model's parameters to live on the GPU.
-
-Next, we need to confirm that
-the GPU version of PyTorch is installed.
-If a CPU version of PyTorch is already installed,
-we need to uninstall it first.
-For example, use the `pip uninstall torch` command,
-then install the corresponding PyTorch version
-according to your CUDA version.
-Assuming you have CUDA 10.0 installed,
-you can install the PyTorch version
-that supports CUDA 10.0 via `pip install torch-cu100`.
 :end_tab:
 
 To run the programs in this section,
@@ -187,7 +176,7 @@ def num_gpus():  #@save
         return torch.cuda.device_count()
     if tab.selected('tensorflow'):
         return len(tf.config.experimental.list_physical_devices('GPU'))
-    
+
 num_gpus()
 ```
 
@@ -498,13 +487,13 @@ def set_scratch_params_device(self, device):
 def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
     self.save_hyperparameters()
     self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
-    
+
 @d2l.add_to_class(d2l.Trainer)  #@save
 def prepare_batch(self, batch):
     if self.gpus:
         batch = [d2l.to(a, self.gpus[0]) for a in batch]
     return batch
-    
+
 @d2l.add_to_class(d2l.Trainer)  #@save
 def prepare_model(self, model):
     model.trainer = self
@@ -561,3 +550,5 @@ In short, as long as all data and parameters are on the same device, we can lear
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/270)
 :end_tab:
+
+

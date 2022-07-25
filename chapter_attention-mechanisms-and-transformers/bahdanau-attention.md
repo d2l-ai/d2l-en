@@ -333,7 +333,7 @@ d2l.check_shape(state[1][0], (batch_size, num_hiddens))
 ## [**Training**]
 
 Similar to :numref:`sec_seq2seq_training`,
-here we specify hyperparemeters,
+here we specify hyperparameters,
 instantiate
 an encoder and a decoder with Bahdanau attention,
 and train this model for machine translation.
@@ -348,7 +348,7 @@ if tab.selected('mxnet', 'pytorch'):
     decoder = Seq2SeqAttentionDecoder(
         len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
     model = d2l.Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
-                        lr=0.001)
+                        lr=0.005)
     trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
@@ -357,7 +357,7 @@ if tab.selected('tensorflow'):
         decoder = Seq2SeqAttentionDecoder(
             len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
         model = d2l.Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
-                            lr=0.001)
+                            lr=0.005)
     trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
@@ -426,7 +426,6 @@ d2l.show_heatmaps(attention_weights[:, :, :, :len(engs[-1].split()) + 1],
 
 * When predicting a token, if not all the input tokens are relevant, the RNN encoder-decoder with Bahdanau attention selectively aggregates different parts of the input sequence. This is achieved by treating the context variable as an output of additive attention pooling.
 * In the RNN encoder-decoder, Bahdanau attention treats the decoder hidden state at the previous time step as the query, and the encoder hidden states at all the time steps as both the keys and values.
-
 
 ## Exercises
 

@@ -140,7 +140,7 @@ def f(x):
 ```
 
 [**Setting $x=1$, $\frac{f(x+h) - f(x)}{h}$**] (**approaches $2$
-as as $h$ approaches $0$.**)
+as $h$ approaches $0$.**)
 While this experiment lacks 
 the rigor of a mathematical proof,
 we will soon see that indeed $f'(1) = 2$.

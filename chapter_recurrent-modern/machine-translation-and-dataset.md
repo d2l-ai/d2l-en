@@ -13,7 +13,7 @@ a central problem domain for *sequence transduction* models
 that transform input sequences into output sequences.
 Playing a crucial role in various modern AI applications,
 sequence transduction models will form the focus of the remainder of this chapter
-and :numref:`chap_attention`.
+and :numref:`chap_attention-and-transformers`.
 To this end,
 this section introduces the machine translation problem
 and its dataset that will be used later.
@@ -148,7 +148,7 @@ for machine translation
 we prefer word-level tokenization here
 (state-of-the-art models may use more advanced tokenization techniques).
 The following `_tokenize` method
-tokenizes the the first `max_examples` text sequence pairs,
+tokenizes the first `max_examples` text sequence pairs,
 where
 each token is either a word or a punctuation mark.
 We append the special “&lt;eos&gt;” token

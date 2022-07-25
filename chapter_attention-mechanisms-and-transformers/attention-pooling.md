@@ -1,5 +1,5 @@
-# Attention Pooling: Nadaraya-Watson Kernel Regression
-:label:`sec_nadaraya-watson`
+# Attention Pooling
+:label:`sec_attention-pooling`
 
 Now you know the major components of attention mechanisms under the framework in :numref:`fig_qkv`.
 To recapitulate,
@@ -64,7 +64,7 @@ To better visualize the pattern of attention later, the training inputs are sort
 ```{.python .input}
 %%tab all
 class NonlinearData(d2l.DataModule):
-    def __init__(self, n, batch_size):        
+    def __init__(self, n, batch_size):
         self.save_hyperparameters()
         f = lambda x: 2 * d2l.sin(x) + x**0.8
         if tab.selected('pytorch'):
@@ -72,18 +72,18 @@ class NonlinearData(d2l.DataModule):
             self.y_train = f(self.x_train) + d2l.randn(n)
         if tab.selected('mxnet'):
             self.x_train = np.sort(d2l.rand(n) * 5)
-            self.y_train = f(self.x_train) + d2l.randn(n)            
+            self.y_train = f(self.x_train) + d2l.randn(n)
         if tab.selected('tensorflow'):
             self.x_train = tf.sort(d2l.rand((n,1)) * 5, 0)
-            self.y_train = f(self.x_train) + d2l.normal((n,1))        
+            self.y_train = f(self.x_train) + d2l.normal((n,1))
         self.x_val = d2l.arange(0, 5, 5.0/n)
         self.y_val = f(self.x_val)
-        
+
     def get_dataloader(self, train):
         arrays = (self.x_train, self.y_train) if train else (self.x_val, self.y_val)
-        return self.get_tensorloader(arrays, train)    
-    
-n = 50    
+        return self.get_tensorloader(arrays, train)
+
+n = 50
 data = NonlinearData(n, batch_size=10)
 ```
 
@@ -182,7 +182,7 @@ The predicted line is smooth and closer to the ground-truth than that produced b
 def diff(queries, keys):
     return d2l.reshape(queries, (-1, 1)) - d2l.reshape(keys, (1, -1))
 
-def attention_pool(query_key_diffs, values):    
+def attention_pool(query_key_diffs, values):
     if tab.selected('mxnet'):
         attention_weights = npx.softmax(- query_key_diffs**2 / 2, axis=1)
     if tab.selected('pytorch'):
@@ -209,7 +209,7 @@ d2l.show_heatmaps([[attention_weights]],
                   ylabel='Sorted validation inputs')
 ```
 
-## **Parametric Attention Pooling**
+## [**Parametric Attention Pooling**]
 
 Nonparametric Nadaraya-Watson kernel regression
 enjoys the *consistency* benefit:
@@ -290,17 +290,17 @@ class NWKernelRegression(d2l.Module):
         self.save_hyperparameters()
         if tab.selected('mxnet'):
             self.w = d2l.ones(1)
-            self.w.attach_grad()            
+            self.w.attach_grad()
         if tab.selected('pytorch'):
             self.w = d2l.ones(1, requires_grad=True)
         if tab.selected('tensorflow'):
             self.w = tf.Variable(d2l.ones(1), trainable=True)
-                        
+
     def forward(self, queries):
         y_hat, self.attention_weights = attention_pool(
             diff(queries, self.keys) * self.w, self.values)
         return y_hat
-    
+
     def loss(self, y_hat, y):
         l = (d2l.reshape(y_hat, -1) - d2l.reshape(y, -1)) ** 2 / 2
         return d2l.reduce_mean(l)

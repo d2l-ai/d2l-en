@@ -10,7 +10,7 @@ We now have all the ingredients required to assemble
 a fully-functional CNN.
 In our earlier encounter with image data, we applied
 a linear model with softmax regression (:numref:`sec_softmax_scratch`)
-and an MLP (:numref:`sec_mlp_scratch`)
+and an MLP (:numref:`sec_mlp-implementation`)
 to pictures of clothing in the Fashion-MNIST dataset.
 To make such data amenable we first flattened each image from a $28\times28$ matrix
 into a fixed-length $784$-dimensional vector,
@@ -248,8 +248,8 @@ and we minimize it via minibatch stochastic gradient descent.
 ```{.python .input}
 %%tab pytorch, mxnet
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
-data = d2l.FashionMNIST(batch_size=256)
-model = LeNet(lr=0.9)
+data = d2l.FashionMNIST(batch_size=128)
+model = LeNet(lr=0.1)
 if tab.selected('pytorch'):
     model.apply_init([next(iter(data.get_dataloader(True)))[0]], init_cnn)
 trainer.fit(model, data)
@@ -258,15 +258,15 @@ trainer.fit(model, data)
 ```{.python .input}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
-data = d2l.FashionMNIST(batch_size=256)
+data = d2l.FashionMNIST(batch_size=128)
 with d2l.try_gpu():
-    model = LeNet(lr=0.9)
+    model = LeNet(lr=0.1)
     trainer.fit(model, data)
 ```
 
 ## Summary
 
-In this chapter we made significant progress. We moved from the MLPs of the 1980s to the CNNs of the 1990s and early 2000s. The architectures proposed, e.g., in the form of LeNet-5 remain meaningful, even to this day. It is worth comparing the error rates on Fashion-MNIST achievable with LeNet-5 both to the very best possible with MLPs (:numref:`sec_mlp_scratch`) and those with significantly more advanced architectures such as ResNet (:numref:`sec_resnet`). LeNet is much more similar to the latter than to the former. One of the primary differences, as we shall see, is that greater amounts of computation afforded significantly more complex architectures.
+In this chapter we made significant progress. We moved from the MLPs of the 1980s to the CNNs of the 1990s and early 2000s. The architectures proposed, e.g., in the form of LeNet-5 remain meaningful, even to this day. It is worth comparing the error rates on Fashion-MNIST achievable with LeNet-5 both to the very best possible with MLPs (:numref:`sec_mlp-implementation`) and those with significantly more advanced architectures such as ResNet (:numref:`sec_resnet`). LeNet is much more similar to the latter than to the former. One of the primary differences, as we shall see, is that greater amounts of computation afforded significantly more complex architectures.
 
 A second difference is the relative ease with which we were able to implement LeNet. What used to be an engineering challenge worth months of C++ and assembly code, engineering to improve SN, an early Lisp based deep learning tool :cite:`Bottou.Le-Cun.1988`, and finally experimentation with models can now be accomplished in minutes. It is this incredible productivity boost that has democratized deep learning model development tremendously. In the next chapter we will follow down this rabbit to hole to see where it takes us.
 

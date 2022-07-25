@@ -7,6 +7,13 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 :label:`sec_densenet`
 
 ResNet significantly changed the view of how to parametrize the functions in deep networks. *DenseNet* (dense convolutional network) is to some extent the logical extension of this :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
+As a result,
+DenseNet 
+is characterized by
+both the connectivity pattern where
+each layer connects to all the preceding layers
+and the concatenation operation (rather than the addition operator in ResNet) to preserve and reuse features
+from earlier layers.
 To understand how to arrive at it, let's take a small detour to mathematics.
 
 
@@ -337,26 +344,31 @@ Since we are using a deeper network here, in this section, we will reduce the in
 
 ```{.python .input}
 %%tab mxnet, pytorch
-model = DenseNet(lr=0.1)
+model = DenseNet(lr=0.01)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
-data = d2l.FashionMNIST(batch_size=256, resize=(96, 96))
+data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 trainer.fit(model, data)
 ```
 
 ```{.python .input}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
-data = d2l.FashionMNIST(batch_size=256, resize=(96, 96))
+data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 with d2l.try_gpu():
-    model = DenseNet(lr=0.1)
+    model = DenseNet(lr=0.01)
     trainer.fit(model, data)
 ```
 
-## Summary
+## Summary and Discussion
 
-* In terms of cross-layer connections, unlike ResNet, where inputs and outputs are added together, DenseNet concatenates inputs and outputs on the channel dimension.
-* The main components that compose DenseNet are dense blocks and transition layers.
-* We need to keep the dimensionality under control when composing the network by adding transition layers that shrink the number of channels again.
+The main components that compose DenseNet are dense blocks and transition layers. For the latter, we need to keep the dimensionality under control when composing the network by adding transition layers that shrink the number of channels again.
+In terms of cross-layer connections, unlike ResNet, where inputs and outputs are added together, DenseNet concatenates inputs and outputs on the channel dimension.
+Although these concatenation operations
+reuse features to achieve computational efficiency,
+unfortunately they lead to heavy GPU memory consumption.
+As a result,
+applying DenseNet may require more complex memory-efficient implementations that may increase training time :cite:`pleiss2017memory`.
+
 
 ## Exercises
 

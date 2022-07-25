@@ -490,6 +490,7 @@ d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of sigmoid',
 ```
 
 ### Tanh Function
+:label:`subsec_tanh`
 
 Like the sigmoid function, [**the tanh (hyperbolic tangent)
 function also squashes its inputs**],

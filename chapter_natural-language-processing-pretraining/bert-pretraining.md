@@ -44,7 +44,7 @@ we define [**a small BERT, using 2 layers, 128 hidden units, and 2 self-attentio
 ```{.python .input}
 #@tab mxnet
 net = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=256,
-                    num_heads=2, num_layers=2, dropout=0.2)
+                    num_heads=2, num_blks=2, dropout=0.2)
 devices = d2l.try_all_gpus()
 net.initialize(init.Xavier(), ctx=devices)
 loss = gluon.loss.SoftmaxCELoss()
@@ -52,9 +52,8 @@ loss = gluon.loss.SoftmaxCELoss()
 
 ```{.python .input}
 #@tab pytorch
-net = d2l.BERTModel(len(vocab), num_hiddens=128, norm_shape=[128],
-                    ffn_num_hiddens=256, num_heads=2,
-                    num_layers=2, dropout=0.2)
+net = d2l.BERTModel(len(vocab), num_hiddens=128, 
+                    ffn_num_hiddens=256, num_heads=2, num_blks=2, dropout=0.2)
 devices = d2l.try_all_gpus()
 loss = nn.CrossEntropyLoss()
 ```
@@ -302,6 +301,7 @@ for downstream natural language processing applications.
 * The original BERT has two versions, where the base model has 110 million parameters and the large model has 340 million parameters.
 * After pretraining BERT, we can use it to represent single text, text pairs, or any token in them.
 * In the experiment, the same token has different BERT representation when their contexts are different. This supports that BERT representations are context-sensitive.
+
 
 ## Exercises
 

@@ -1,12 +1,12 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
 # Designing Convolution Network Architectures
 :label:`sec_cnn-design`
 
-The last decade has witnessed shift
+The 2010s has witnessed shift
 from *feature engineering* to *network engineering*
 in computer vision.
 Since AlexNet (:numref:`sec_alexnet`)
@@ -67,181 +67,8 @@ from the initial *AnyNet* design space.
 It then proceeds to discover design principles (like in manual design)
 that lead to simple and regular networks: *RegNets*.
 Before shedding light on these design principles,
-we need to define
-the initial AnyNet design space.
-It starts with networks with
-standard, fixed network blocks:
-ResNeXt blocks.
-
-
-
-## ResNeXt Blocks
-
-ResNeXt blocks extend the residual block design (:numref:`subsec_residual-blks`)
-by adding
-concatenated parallel transformations
-:cite:`Xie.Girshick.Dollar.ea.2017`.
-Different from a variety of transformations
-in multi-branch Inception blocks,
-ResNeXt adopts the same transformation in all branches,
-thus minimizing manual design efforts in each branch.
-
-![The ResNeXt block. It is a bottleneck (when $b < c$) residual block with group convolution ($g$ groups).](../img/resnext-block.svg)
-:label:`fig_resnext_block`
-
-The left dotted box in
-:numref:`fig_resnext_block`
-depicts the added concatenated parallel transformation
-strategy in ResNeXt.
-More concretely,
-an input with $c$ channels
-is first split into $g$ groups
-via $g$ branches of $1 \times 1$ convolutions
-followed by $3 \times 3$ convolutions,
-all with $b/g$ output channels.
-Concatenating these $g$ outputs
-results in $b$ output channels,
-leading to "bottlenecked" (when $b < c$) network width
-inside the dashed box.
-This output
-will restore the original $c$ channels of the input
-via the final $1 \times 1$ convolution
-right before sum with the residual connection.
-Notably,
-the left dotted box is equivalent to
-the much *simplified* right dotted box in :numref:`fig_resnext_block`,
-where we only need to specify
-that the $3 \times 3$ convolution is a *group convolution*
-with $g$ groups.
-In fact,
-the group convolution dates back
-to the idea of distributing the AlexNet
-model over two GPUs due to limited GPU memory at that time :cite:`Krizhevsky.Sutskever.Hinton.2012`.
-
-The following implementation of the `ResNeXtBlock` class
-treats `groups` ($b/g$ in :numref:`fig_resnext_block`) as an argument
-so that given `bot_channels` ($b$ in :numref:`fig_resnext_block`) bottleneck channels,
-the $3 \times 3$ group convolution will
-have `bot_channels//groups` groups.
-Similar to
-the residual block implementation in
-:numref:`subsec_residual-blks`,
-the residual connection
-is generalized
-with a $1 \times 1$ convolution (`conv4`),
-where setting `use_1x1conv=True, strides=2`
-halves the input height and width.
-
-```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-from mxnet import np, npx, init
-from mxnet.gluon import nn
-npx.set_np()
-
-class ResNeXtBlock(nn.Block):
-    """The ResNeXt block."""
-    def __init__(self, num_channels, groups, bot_mul,
-                 use_1x1conv=False, strides=1, **kwargs):
-        super().__init__(**kwargs)
-        bot_channels = int(round(num_channels * bot_mul))
-        self.conv1 = nn.Conv2D(bot_channels, kernel_size=1, padding=0,
-                               strides=1)
-        self.conv2 = nn.Conv2D(bot_channels, kernel_size=3, padding=1,
-                               strides=strides,
-                               groups=bot_channels//groups)
-        self.conv3 = nn.Conv2D(num_channels, kernel_size=1, padding=0,
-                               strides=1)
-        self.bn1 = nn.BatchNorm()
-        self.bn2 = nn.BatchNorm()
-        self.bn3 = nn.BatchNorm()
-        if use_1x1conv:
-            self.conv4 = nn.Conv2D(num_channels, kernel_size=1,
-                                   strides=strides)
-            self.bn4 = nn.BatchNorm()
-        else:
-            self.conv4 = None
-
-    def forward(self, X):
-        Y = npx.relu(self.bn1(self.conv1(X)))
-        Y = npx.relu(self.bn2(self.conv2(Y)))
-        Y = self.bn3(self.conv3(Y))
-        if self.conv4:
-            X = self.bn4(self.conv4(X))
-        return npx.relu(Y + X)
-```
-
-```{.python .input}
-%%tab pytorch
-from d2l import torch as d2l
-import torch
-from torch import nn
-from torch.nn import functional as F
-
-class ResNeXtBlock(nn.Module):
-    """The ResNeXt block."""
-    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False, 
-                 strides=1):
-        super().__init__()
-        bot_channels = int(round(num_channels * bot_mul))
-        self.conv1 = nn.LazyConv2d(bot_channels, kernel_size=1,
-                               stride=1)
-        self.conv2 = nn.LazyConv2d(bot_channels, kernel_size=3,
-                               stride=strides, padding=1,
-                               groups=bot_channels//groups)
-        self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1,
-                               stride=1)
-        self.bn1 = nn.LazyBatchNorm2d()
-        self.bn2 = nn.LazyBatchNorm2d()
-        self.bn3 = nn.LazyBatchNorm2d()
-        if use_1x1conv:
-            self.conv4 = nn.LazyConv2d(num_channels, kernel_size=1, 
-                                       stride=strides)
-            self.bn4 = nn.LazyBatchNorm2d()
-        else:
-            self.conv4 = None
-
-    def forward(self, X):
-        Y = F.relu(self.bn1(self.conv1(X)))
-        Y = F.relu(self.bn2(self.conv2(Y)))
-        Y = self.bn3(self.conv3(Y))
-        if self.conv4:
-            X = self.bn4(self.conv4(X))
-        return F.relu(Y + X)
-```
-
-In the following case (`use_1x1conv=False, strides=1`), the input and output are of the same shape.
-
-```{.python .input}
-%%tab all
-blk = ResNeXtBlock(32, 16, 1)
-if tab.selected('mxnet'):
-    blk.initialize()
-X = d2l.randn(4, 32, 96, 96)
-blk(X).shape
-```
-
-Alternatively, setting `use_1x1conv=True, strides=2`
-halves the output height and width.
-
-```{.python .input}
-%%tab all
-blk = ResNeXtBlock(32, 16, 1, use_1x1conv=True, strides=2)
-if tab.selected('mxnet'):
-    blk.initialize()
-blk(X).shape
-```
-
-A key advantage of the ResNeXt design
-is that increasing groups
-leads to sparser connections (i.e., lower computational complexity) within the block,
-thus enabling an increase of network width
-to achieve a better tradeoff between
-FLOPs and accuracy.
-Thus, ResNeXt-ification
-is appealing in convolution network design
-and the following AnyNet design space
-will be based on the ResNeXt block.
+let's start with
+the initial design space.
 
 ## The AnyNet Design Space
 
@@ -249,7 +76,7 @@ The initial design space is called *AnyNet*,
 a relatively unconstrained design space,
 where we can focus on
 exploring network structure
-assuming standard, fixed blocks such as ResNeXt.
+assuming standard, fixed blocks such as ResNeXt (:numref:`subsec_resnext`).
 Specifically,
 the network structure
 includes
@@ -295,12 +122,20 @@ consists of $d_i$ ResNeXt blocks
 with $w_i$ output channels,
 and progressively
 halves height and width via the first block
-(setting `use_1x1conv=True, strides=2` in `ResNeXtBlock` above).
+(setting `use_1x1conv=True, strides=2` in `d2l.ResNeXtBlock` in :numref:`subsec_resnext`).
+Let's further
+denote
+the bottleneck ratio and
+the number of groups (group width) 
+within
+each ResNeXt block for stage $i$
+as $b_i$ and $g_i$, respectively.
 Overall,
 despite of the straightforward network structure,
-there is a vast number of
-possible networks (e.g., by varying $d_i$ and $w_i$) in the AnyNet design space.
-
+varying $b_i$, $g_i$, $w_i$, and $d_i$
+results in
+a vast number of
+possible networks in the AnyNet design space.
 
 
 To implement AnyNet,
@@ -308,6 +143,11 @@ we first define its network stem.
 
 ```{.python .input}
 %%tab mxnet
+from d2l import mxnet as d2l
+from mxnet import np, npx, init
+from mxnet.gluon import nn
+npx.set_np()
+
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
         net = nn.Sequential()
@@ -318,11 +158,30 @@ class AnyNet(d2l.Classifier):
 
 ```{.python .input}
 %%tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+from torch.nn import functional as F
+
 class AnyNet(d2l.Classifier):
     def stem(self, num_channels):
         return nn.Sequential(
             nn.LazyConv2d(num_channels, kernel_size=3, stride=2, padding=1),
             nn.LazyBatchNorm2d(), nn.ReLU())
+```
+
+```{.python .input}
+%%tab tensorflow
+import tensorflow as tf
+from d2l import tensorflow as d2l
+
+class AnyNet(d2l.Classifier):
+    def stem(self, num_channels):
+        return tf.keras.models.Sequential([
+            tf.keras.layers.Conv2D(num_channels, kernel_size=3, strides=2,
+                                   padding='same'),
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Activation('relu')])
 ```
 
 Each stage consists of `depth` ResNeXt blocks,
@@ -336,10 +195,10 @@ def stage(self, depth, num_channels, groups, bot_mul):
     net = nn.Sequential()
     for i in range(depth):
         if i == 0:
-            net.add(ResNeXtBlock(
+            net.add(d2l.ResNeXtBlock(
                 num_channels, groups, bot_mul, use_1x1conv=True, strides=2))
         else:
-            net.add(ResNeXtBlock(
+            net.add(d2l.ResNeXtBlock(
                 num_channels, num_channels, groups, bot_mul))
     return net
 ```
@@ -351,11 +210,25 @@ def stage(self, depth, num_channels, groups, bot_mul):
     blk = []
     for i in range(depth):
         if i == 0:
-            blk.append(ResNeXtBlock(num_channels, groups, bot_mul,
+            blk.append(d2l.ResNeXtBlock(num_channels, groups, bot_mul,
                 use_1x1conv=True, strides=2))
         else:
-            blk.append(ResNeXtBlock(num_channels, groups, bot_mul))
+            blk.append(d2l.ResNeXtBlock(num_channels, groups, bot_mul))
     return nn.Sequential(*blk)
+```
+
+```{.python .input}
+%%tab tensorflow
+@d2l.add_to_class(AnyNet)
+def stage(self, depth, num_channels, groups, bot_mul):
+    net = tf.keras.models.Sequential()
+    for i in range(depth):
+        if i == 0:
+            net.add(d2l.ResNeXtBlock(num_channels, groups, bot_mul,
+                use_1x1conv=True, strides=2))
+        else:
+            net.add(d2l.ResNeXtBlock(num_channels, groups, bot_mul))
+    return net
 ```
 
 Putting the network stem, body, and head together,
@@ -382,19 +255,29 @@ def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
             nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(),
             nn.LazyLinear(num_classes)))
         self.net.apply(d2l.init_cnn)
+    if tab.selected('tensorflow'):
+        self.net = tf.keras.models.Sequential(self.stem(stem_channels))
+        for i, s in enumerate(arch):
+            self.net.add(self.stage(*s))
+        self.net.add(tf.keras.models.Sequential([
+            tf.keras.layers.GlobalAvgPool2D(),
+            tf.keras.layers.Dense(units=num_classes)]))
 ```
 
-## The RegNet Design Space
+## Constraining Design Spaces with Lower Error Distributions
 
 For any stage $i$ of AnyNet,
-the design choices are depth $d_i$,
+the design choices are 
+the bottleneck ratio $b_i$ 
+and the number of groups $g_i$
+within each block,
 block width $w_i$,
-and the number of groups $g_i$ and bottleneck ratio $b_i$ within each block.
+and depth $d_i$.
 The designing network design spaces
 process starts
 from relatively unconstrained
 network structure characterized
-by ($d_i$, $w_i$, $g_i$, $b_i$)
+by ($b_i$, $g_i$, $w_i$, $d_i$)
 in the initial AnyNet design space.
 Then this process
 progressively samples models
@@ -402,12 +285,56 @@ from the input design space
 to evaluate the error distribution :cite:`radosavovic2019network`
 as a quality indicator
 to output a more constrained
-design space with simpler models that have
-better quality.
-As a result,
-this human-in-the-loop methodology
-leads to the *RegNet* design space
-consisting of simple, regular networks
+design space with simpler models that may have
+better quality. 
+
+Let's detail
+this quality indicator for design spaces.
+Given $n$ models sampled from some design space,
+the *error empirical distribution function* $F(e)$
+measures the fraction of models
+with errors $e_i$ lower than $e$:
+
+$$F(e) = \frac{1}{n}\sum_{i=1}^n \mathbf{1}(e_i < e).$$
+
+
+Starting from the initial unconstrained AnyNet design space ($\text{AnyNetX}_A$ in :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`),
+sharing the bottle network ratio $b_i = b$ for all stages $i$ results in a more constrained design space $\text{AnyNetX}_B$.
+Sampling and training $n=500$ models from $\text{AnyNetX}_A$ and $\text{AnyNetX}_B$ each,
+left of :numref:`fig_regnet-paper-fig5`
+shows that both design spaces have similar quality.
+Since simpler is better,
+we continue to search from $\text{AnyNetX}_B$
+by additionally sharing the number of groups $g_i = g$.
+This leads to a further simplified design space
+$\text{AnyNetX}_C$ with virtually no change
+in error distributions (right of :numref:`fig_regnet-paper-fig5`).
+
+![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Sharing bottleneck ratio (from $\text{AnyNetX}_A$ to  $\text{AnyNetX}_B$) and sharing the number of groups (from $\text{AnyNetX}_B$ to $\text{AnyNetX}_C$) simplify the design space with virtually no change in error distributions (figure taken from :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig5.png)
+:width:`600px`
+:label:`fig_regnet-paper-fig5`
+
+Investigating good and bad models from $\text{AnyNetX}_C$ suggests that it may be useful to increase width across stages :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`.
+Empirically, simplifying
+$\text{AnyNetX}_C$ to $\text{AnyNetX}_D$
+with $w_{i} \leq w_{i+1}$
+improves the quality of design spaces (left of  :numref:`fig_regnet-paper-fig7`).
+Similarly,
+adding further constraints of $d_{i} \leq d_{i+1}$
+to increase network depth across stages
+gives an even better $\text{AnyNetX}_E$
+(right of :numref:`fig_regnet-paper-fig7`).
+
+![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Increasing network width across stages (from $\text{AnyNetX}_C$ to  $\text{AnyNetX}_D$) and increasing network depth across stages (from $\text{AnyNetX}_D$ to $\text{AnyNetX}_E$) simplify the design space with improved  error distributions (figure taken from :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig7.png)
+:width:`600px`
+:label:`fig_regnet-paper-fig7`
+
+
+
+## RegNet
+
+The resulting $\text{AnyNetX}_E$ design space
+consists of simple networks
 following easy-to-interpret design principles:
 
 * Share the bottle network ratio $b_i = b$ for all stages $i$;
@@ -415,11 +342,12 @@ following easy-to-interpret design principles:
 * Increase network width across stages: $w_{i} \leq w_{i+1}$;
 * Increase network depth across stages: $d_{i} \leq d_{i+1}$.
 
-The original RegNet paper :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`
-investigated various architectures,
-such as RegNetX using ResNeXt blocks
+Following these design principles, :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` proposed quantized linear constraints to
+$w_i$ and $d_i$ increasing,
+leading to
+RegNetX using ResNeXt blocks
 and RegNetY that additionally uses operators from SENets :cite:`Hu.Shen.Sun.2018`.
-In the following,
+As an example,
 we implement a 32-layer RegNetX variant
 characterized by
 
@@ -443,8 +371,13 @@ class RegNet32(AnyNet):
 We can see that each RegNet stage progressively reduces resolution and increases output channels.
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
 RegNet32().layer_summary((1, 1, 96, 96))
+```
+
+```{.python .input}
+%%tab tensorflow
+RegNet32().layer_summary((1, 96, 96, 1))
 ```
 
 ## Training
@@ -452,27 +385,36 @@ RegNet32().layer_summary((1, 1, 96, 96))
 Training the 32-layer RegNet on the Fashion-MNIST dataset is just like before.
 
 ```{.python .input}
-%%tab all
+%%tab mxnet, pytorch
 model = RegNet32(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 trainer.fit(model, data)
 ```
 
-## Discussions and Summary
+```{.python .input}
+%%tab tensorflow
+trainer = d2l.Trainer(max_epochs=10)
+data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
+with d2l.try_gpu():
+    model = RegNet32(lr=0.01)
+    trainer.fit(model, data)
+```
+
+## Discussion
 
 With desirable properties like locality and translation invariance (:numref:`sec_why-conv`)
 for vision,
 CNNs have been the dominant architectures in this area.
 Recently,
-transformers (to be covered in :numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training`
+transformers (:numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training`
 and MLPs :cite:`tolstikhin2021mlp`
 have also sparked research beyond
 the well-established CNN architectures for vision.
 Specifically,
 although lacking of the aforementioned
 inductive biases inherent to CNNs,
-vision transformers
+vision transformers (:numref:`sec_vision-transformer`)
 attained state-of-the-art performance
 in large-scale image classification in early 2020s,
 showing that
@@ -482,24 +424,14 @@ In other words,
 it is often possible to
 train large transformers
 to outperform large CNNs on large datasets.
-However,
-quadratic complexity
-of self-attention (to be covered in :numref:`sec_self-attention-and-positional-encoding`)
-makes the transformer architecture
-less suitable for higher-resolution images.
-To address this issue,
-hierarchical vision transformers (Swin transformers)
-introduce shifted windows to
-achieve state-of-the-art performance
-in a broader range of vision tasks beyond image classification :cite:`liu2021swin`.
 Inspired
 by the superior scaling behavior of
-transformers with multi-head self-attention (to be covered in :numref:`sec_multihead-attention`),
+transformers (:numref:`sec_large-pretraining-transformers`) with multi-head self-attention (:numref:`sec_multihead-attention`),
 the process of gradually
 improving from a standard ResNet architecture
 toward the design of a vision transformer
-leads to a family of CNN models called ConvNeXts
-that compete favorably with hierarchical vision transformers :cite:`liu2022convnet`.
+leads to a family of CNNs called the ConvNeXt models
+that compete favorably with transformers for vision :cite:`liu2022convnet`.
 We refer the interested readers
 to CNN design discussions
 in the ConvNeXt paper :cite:`liu2022convnet`.
@@ -518,4 +450,8 @@ in the ConvNeXt paper :cite:`liu2022convnet`.
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/7463)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/8738)
 :end_tab:

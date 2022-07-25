@@ -404,7 +404,7 @@ for name, data in zip(names, batch):
     print(name, '=', data)
 ```
 
-## Putting All Things Together
+## Putting It All Together
 
 Last, we define the `load_data_ptb` function that reads the PTB dataset and returns the data iterator and the vocabulary.
 

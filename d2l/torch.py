@@ -49,20 +49,17 @@ from torchvision import transforms
 
 def use_svg_display():
     """Use the svg format to display a plot in Jupyter.
-
     Defined in :numref:`sec_calculus`"""
     backend_inline.set_matplotlib_formats('svg')
 
 def set_figsize(figsize=(3.5, 2.5)):
     """Set the figure size for matplotlib.
-
     Defined in :numref:`sec_calculus`"""
     use_svg_display()
     d2l.plt.rcParams['figure.figsize'] = figsize
 
 def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     """Set the axes for matplotlib.
-
     Defined in :numref:`sec_calculus`"""
     axes.set_xlabel(xlabel), axes.set_ylabel(ylabel)
     axes.set_xscale(xscale), axes.set_yscale(yscale)
@@ -75,7 +72,6 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
          ylim=None, xscale='linear', yscale='linear',
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
     """Plot data points.
-
     Defined in :numref:`sec_calculus`"""
 
     def has_one_axis(X):  # True if `X` (tensor or list) has 1 axis
@@ -110,7 +106,6 @@ class HyperParameters:
 
 class ProgressBoard(d2l.HyperParameters):
     """Plot data points in animation.
-
     Defined in :numref:`sec_oo-design`"""
     def __init__(self, xlabel=None, ylabel=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear',
@@ -387,7 +382,6 @@ class FashionMNIST(d2l.DataModule):
 
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images.
-
     Defined in :numref:`sec_fashion_mnist`"""
     raise NotImplementedError
 
@@ -427,7 +421,6 @@ def num_gpus():
 
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu().
-
     Defined in :numref:`sec_use_gpu`"""
     if num_gpus() >= i + 1:
         return gpu(i)
@@ -435,7 +428,6 @@ def try_gpu(i=0):
 
 def try_all_gpus():
     """Return all available GPUs, or [cpu(),] if no GPU exists.
-
     Defined in :numref:`sec_use_gpu`"""
     return [gpu(i) for i in range(num_gpus())]# Alias defined in config.ini
 nn_Module = nn.Module
@@ -480,4 +472,3 @@ reduce_mean = lambda x, *args, **kwargs: x.mean(*args, **kwargs)
 expand_dims = lambda x, *args, **kwargs: x.unsqueeze(*args, **kwargs)
 swapaxes = lambda x, *args, **kwargs: x.swapaxes(*args, **kwargs)
 repeat = lambda x, *args, **kwargs: x.repeat(*args, **kwargs)
-

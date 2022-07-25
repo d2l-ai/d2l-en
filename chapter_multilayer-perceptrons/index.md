@@ -24,7 +24,6 @@ At the end of this chapter, we apply what we have introduced so far to a real ca
 prediction. We punt matters relating to the computational performance, scalability, and efficiency
 of our models to subsequent chapters.
 
-
 ```toc
 :maxdepth: 2
 

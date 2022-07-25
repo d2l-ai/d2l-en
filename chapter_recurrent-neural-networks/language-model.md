@@ -302,10 +302,8 @@ for X, Y in data.train_dataloader():
 
 ## Summary
 
-* Language models estimate the joint probability of a text sequence.
-* $n$-grams provide a convenient model for dealing with long sequences by truncating the dependence.
-* There is a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via Laplace smoothing.
-* To train language models, we can randomly sample pairs of input sequences and target sequences in minibatches.
+Language models estimate the joint probability of a text sequence. For long sequences, $n$-grams provide a convenient model by truncating the dependence. However, there is a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via Laplace smoothing. Thus, we will focus on neural language modeling in subsequent sections.
+To train language models, we can randomly sample pairs of input sequences and target sequences in minibatches. After training, we will use perplexity to measure the language model quality.
 
 
 ## Exercises
