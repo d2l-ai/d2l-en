@@ -24,9 +24,11 @@ from matplotlib_inline import backend_inline
 
 d2l = sys.modules[__name__]
 
+import flax
 import jax
 import jax.numpy as jnp
 import numpy as np
+from flax import linen as nn
 from jax import grad, random, vmap
 
 def use_svg_display():
@@ -81,6 +83,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
 
 
 # Alias defined in config.ini
+nn_Module = nn.Module
 
 ones_like = jnp.ones_like
 ones = jnp.ones

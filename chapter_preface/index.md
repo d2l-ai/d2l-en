@@ -473,8 +473,10 @@ import tensorflow as tf
 import numpy as np
 import jax
 import jax.numpy as jnp
+import flax
 from jax import random
 from jax import grad, vmap
+from flax import linen as nn
 ```
 
 ### Target Audience

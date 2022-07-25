@@ -12,3 +12,4 @@ dependencies:
     - tensorflow-probability==0.17.0
     - jaxlib
     - jax
+    - flax
