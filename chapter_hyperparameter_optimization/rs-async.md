@@ -54,12 +54,9 @@ def objective(learning_rate, batch_size, max_epochs):
     trainer = d2l.Trainer(max_epochs=1, num_gpus=1)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     report = Reporter() 
-    import numpy as np
-    validation_error = np.e ** - max_epochs
     for epoch in range(1, max_epochs + 1):
-#         trainer.fit(model=model, data=data)
-#         validation_error = trainer.evaluate()
-        validation_error = np.e ** - max_epochs
+        trainer.fit(model=model, data=data)
+        validation_error = trainer.validate(model=model)
         report(epoch=epoch, validation_error=validation_error)
 ```
 
