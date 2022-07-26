@@ -37,7 +37,7 @@ Instead of implementing the complex machinery of distributed job execution, we w
 You can install it via:
 
 ```
-pip install syne-tune
+!pip install syne-tune
 
 ```
 
@@ -56,8 +56,8 @@ def objective(learning_rate, batch_size, max_epochs):
     report = Reporter() 
     for epoch in range(1, max_epochs + 1):
         trainer.fit(model=model, data=data)
-        validation_error = trainer.validate(model=model)
-        report(epoch=epoch, validation_error=validation_error)
+        validation_error = trainer.validate(model=model).cpu().numpy()
+        report(epoch=epoch, validation_error=float(validation_error))
 ```
 
 ## Asynchronous Scheduler
