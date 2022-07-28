@@ -60,11 +60,6 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       d2lbook build pdf
       """
-
-      sh label:"Build MXNet PDF", script:"""set -ex
-      conda activate ${ENV_NAME}
-      d2lbook build pdf --tab mxnet
-      """
       
       if (env.BRANCH_NAME == 'release') {
         sh label:"Release", script:"""set -ex
