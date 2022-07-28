@@ -58,14 +58,14 @@ to the deep learning practitioner.
 In short, these guarantees suggest
 that ensuring generalization
 of deep neural networks *a priori*
-requires an absurd number of examples 
+requires an absurd number of examples
 (perhaps trillions or more),
 even when we find that on the tasks we care about
 that deep neural networks typically to generalize
 remarkably well with far fewer examples (thousands).
 Thus deep learning practitioners often forgo
 a priori guarantees altogether,
-instead employing methods on the basis 
+instead employing methods on the basis
 that they have generalized well
 on similar problems in the past,
 and certifying generalization *post hoc*
@@ -122,8 +122,8 @@ estimator of the population error $\epsilon(f)$.
 Moreover, because our quantity of interest $\epsilon(f)$
 is an expectation (of the random variable $\mathbf{1}(f(X) \neq Y)$)
 and the corresponding estimator $\epsilon_\mathcal{D}(f)$
-is the sample average, 
-estimating the popullation error 
+is the sample average,
+estimating the popullation error
 is simply the classic problem of mean estimation,
 which you may recall from :numref:`sec_prob`.
 
@@ -144,7 +144,7 @@ Thus, to estimate our test error twice as precisely,
 we must collect four times as large a test set.
 To reduce our test error by a factor of one hundred,
 we must collect ten thousand times as large a test set.
-In general, such a rate of $\mathcal{O}(1/\sqrt{n})$ 
+In general, such a rate of $\mathcal{O}(1/\sqrt{n})$
 is often the best we can hope for in statistics.
 
 Now that we know something about the asymptotic rate
@@ -553,7 +553,7 @@ at $\mathcal{O}(1/\sqrt{n})$ rates.
 Following the revolutionary discovery of VC dimension,
 numerous alternative complexity measures have been proposed,
 each facilitating an analogous generalization guarantee.
-See :cite:`boucheron2005theory` for a detailed discussion
+See :citet:`boucheron2005theory` for a detailed discussion
 of several advanced ways of measuring function complexity.
 Unfortunately, while these complexity measures
 have become broadly useful tools in statistical theory,

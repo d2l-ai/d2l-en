@@ -162,7 +162,7 @@ for X, y in train_iter:
 print('# batches:', len(train_iter))
 ```
 
-## Putting All Things Together
+## Putting It All Together
 
 Last, we wrap up the above steps into the `load_data_imdb` function.
 It returns training and test data iterators and the vocabulary of the IMDb review dataset.

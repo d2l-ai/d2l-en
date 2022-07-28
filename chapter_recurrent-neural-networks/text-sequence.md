@@ -5,7 +5,7 @@ Throughout this book,
 we will often work with text data
 represented as sequences
 of words, characters, or word-pieces.
-To get going, we'll need some basic
+To get going, we will need some basic
 tools for converting raw text
 into sequences of the appropriate form.
 Typical preprocessing pipelines
@@ -51,15 +51,14 @@ import random
 
 ## Reading the Dataset
 
-Here, we'll work with H. G. Wells'
+Here, we will work with H. G. Wells'
 [The Time Machine](http://www.gutenberg.org/ebooks/35),
 a book containing just over 30000 words.
 While real applications will typically
 involve significantly larger datasets,
 this is sufficient to demonstrate
 the preprocessing pipeline.
-
-The following function
+The following `_download` method
 (**reads the raw text into a string**).
 
 ```{.python .input  n=5}
@@ -91,7 +90,7 @@ text[:60]
 ## Tokenization
 
 *Tokens* are the atomic (indivisible) units of text.
-Each sequence step corresponds to 1 token,
+Each time step corresponds to 1 token,
 but what precisely constitutes a token is a design choice.
 For example, we could represent the sentence
 "Baby needs a new pair of shoes"
@@ -125,7 +124,7 @@ of numerical inputs.
 [**Next, we introduce a class
 for constructing *vocabularies*,
 i.e., objects that associate
-each each distinct token value
+each distinct token value
 with a unique index.**]
 First, we determine the set of unique tokens in our training *corpus*.
 We then assign a numerical index to each unique token.
@@ -186,7 +185,7 @@ print('indices:', indices)
 print('words:', vocab.to_tokens(indices))
 ```
 
-## Putting it all Together
+## Putting It All Together
 
 Using the above classes and methods,
 we [**package everything into the following
@@ -229,7 +228,7 @@ vocab.token_freqs[:10]
 ```
 
 Note that (**the ten most frequent words**)
-aren't all that descriptive.
+are not all that descriptive.
 You might even imagine that
 we might see a very similar list
 if we had chosen any book at random.
@@ -243,9 +242,9 @@ in previous generations of text classifiers
 based on bag-of-words representations,
 they were most often filtered out.
 However, they carry meaning and
-it's not necessary to filter them out
+it is not necessary to filter them out
 when working with modern RNN- and
-Transformer-based neural NLP models.
+transformer-based neural models.
 If you look further down the list,
 you will notice
 that word frequency decays quickly.
@@ -326,18 +325,18 @@ We will discuss this in the next section.
 
 ## Summary
 
-* Text is among the most common forms of sequence data encountered in deep learning.
-* Common choices for what constitutes a "token" are characters words, and word pieces, which will be covered in subsequent chapters.
-* To preprocess text, we usually (i) split text into tokens; (ii) build a vocabulary to map token strings to numerical indices; and (iii) convert text data into token indices for models to manipulate.
-* The frequency of words tends to follow Zipf's law. This is true not just for individual words (unigrams), but also for $n$-grams.
+Text is among the most common forms of sequence data encountered in deep learning.
+Common choices for what constitutes a token are characters, words, and word pieces.
+To preprocess text, we usually (i) split text into tokens; (ii) build a vocabulary to map token strings to numerical indices; and (iii) convert text data into token indices for models to manipulate.
+In practice, the frequency of words tends to follow Zipf's law. This is true not just for individual words (unigrams), but also for $n$-grams.
 
 
 ## Exercises
 
 1. In the experiment of this section, tokenize text into words and vary the `min_freq` argument value of the `Vocab` instance. Qualitatively characterize how changes in `min_freq` impact the size of the resulting vocabulary.
 1. Estimate the exponent of Zipfian distribution for unigrams, bigrams, and trigrams in this corpus.
-1. Find some other sources of data (download a standard ML dataset, pick another public domain book,
-   scrape a web site, etc). For each, tokenize the data at both the word and character levels. How do the vocabulary sizes compare to the *Time Machine* corpus at equivalent values of `min_freq`. Estimate the exponent of the Zipfian distribution corresponding to the unigram and bigram distributions for these corpora. How do they compare with the values that you observed for the *Time Machine* corpus?
+1. Find some other sources of data (download a standard machine learning dataset, pick another public domain book,
+   scrape a website, etc). For each, tokenize the data at both the word and character levels. How do the vocabulary sizes compare with *The Time Machine* corpus at equivalent values of `min_freq`. Estimate the exponent of the Zipfian distribution corresponding to the unigram and bigram distributions for these corpora. How do they compare with the values that you observed for *The Time Machine* corpus?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/117)

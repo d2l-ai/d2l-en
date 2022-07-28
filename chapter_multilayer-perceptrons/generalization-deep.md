@@ -318,7 +318,7 @@ in classical regularization contexts,
 such as adding noise to model inputs.
 In the next section we will introduce
 the famous dropout technique
-(invented by :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`),
+(invented by :citet:`Srivastava.Hinton.Krizhevsky.ea.2014`),
 which has become a mainstay of deep learning,
 even as the theoretical basis for its efficacy
 remains similarly mysterious.
