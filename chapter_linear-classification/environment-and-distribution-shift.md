@@ -80,7 +80,7 @@ then our setup permits the pathological case
 in which the distribution over inputs remains
 constant: $p_S(\mathbf{x}) = p_T(\mathbf{x})$,
 but the labels are all flipped:
-$p_S(y | \mathbf{x}) = 1 - p_T(y | \mathbf{x})$.
+$p_S(y \mid \mathbf{x}) = 1 - p_T(y \mid \mathbf{x})$.
 In other words, if God can suddenly decide
 that in the future all "cats" are now dogs
 and what we previously called "dogs" are now cats---without

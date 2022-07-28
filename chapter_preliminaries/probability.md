@@ -586,8 +586,8 @@ $P(A=a) = \sum_v P(A=a, B=v)$.
 The ratio $\frac{P(A=a, B=b)}{P(A=a)} \leq 1$
 turns out to be extremely important.
 It is called the *conditional probability*,
-and is denoted via the "|" symbol,
-$P(B=b|A=a) = P(A=a,B=b)/P(A=a)$.
+and is denoted via the "$\mid$" symbol,
+$P(B=b \mid A=a) = P(A=a,B=b)/P(A=a)$.
 It tells us the new probability
 associated with the event $B=b$,
 once we condition on the fact $A=a$ took place.
@@ -604,22 +604,22 @@ on the same event and thus
 restrict attention to the same sample space. 
 For instance, for disjoint events 
 $\mathcal{B}$ and $\mathcal{B}'$, we have that 
-$P(\mathcal{B} \cup \mathcal{B}'|A = a) = P(\mathcal{B}|A = a) + P(\mathcal{B}'|A = a)$. 
+$P(\mathcal{B} \cup \mathcal{B}' \mid A = a) = P(\mathcal{B} \mid A = a) + P(\mathcal{B}' \mid A = a)$. 
 
 
 Using the definition of conditional probabilities, 
 we can derive the famous result called *Bayes' theorem*.
-By construction, we have that $P(A, B) = P(B|A) P(A)$ 
-and $P(A, B) = P(A|B) P(B)$. 
+By construction, we have that $P(A, B) = P(B\mid A) P(A)$ 
+and $P(A, B) = P(A\mid B) P(B)$. 
 Combining both equations yields 
-$P(B|A) P(A) = P(A|B) P(B)$ and hence 
+$P(B\mid A) P(A) = P(A\mid B) P(B)$ and hence 
 
-$$P(A|B) = \frac{P(B|A) P(A)}{P(B)}.$$
+$$P(A \mid B) = \frac{P(B\mid A) P(A)}{P(B)}.$$
 
 This simple equation has profound implications because
 it allows us to reverse the order of conditioning.
-If we know how to estimate $P(B|A)$, $P(A)$, and $P(B)$,
-then we can estimate $P(A|B)$. 
+If we know how to estimate $P(B\mid A)$, $P(A)$, and $P(B)$,
+then we can estimate $P(A\mid B)$. 
 We often find it easier to estimate one term directly 
 but not the other and Bayes' theorem can come to the rescue here.
 For instance, if we know the prevalence of symptoms for a given disease,
@@ -630,12 +630,12 @@ In some cases we might not have direct access to $P(B)$,
 such as the prevalence of symptoms. 
 In this case a simplified version of Bayes' theorem comes in handy:
 
-$$P(A|B) \propto P(B|A) P(A).$$
+$$P(A \mid B) \propto P(B \mid A) P(A).$$
 
-Since we know that $P(A|B)$ must be normalized to $1$, i.e., $\sum_a P(A=a|B) = 1$,
+Since we know that $P(A \mid B)$ must be normalized to $1$, i.e., $\sum_a P(A=a \mid B) = 1$,
 we can use it to compute
 
-$$P(A|B) = \frac{P(B|A) P(A)}{\sum_b P(B=b|A) P(A)}.$$
+$$P(A \mid B) = \frac{P(B \mid A) P(A)}{\sum_b P(B=b \mid A) P(A)}.$$
 
 In Bayesian statistics, we think of an observer 
 as possessing some (subjective) prior beliefs
@@ -643,20 +643,20 @@ about the plausibility of the available hypotheses
 encoded in the *prior* $P(H)$,
 and a *likelihood function* that says how likely 
 one is to observe any value of the collected evidence 
-for each of the hypotheses in the class $P(E|H)$.
+for each of the hypotheses in the class $P(E \mid H)$.
 Bayes' theorem is then interpreted as telling us
 how to update the initial *prior* $P(H)$
 in light of the available evidence $E$
 to produce *posterior* beliefs 
-$P(H|E) = \frac{P(E|H) P(H)}{P(E)}$.
+$P(H \mid E) = \frac{P(E \mid H) P(H)}{P(E)}$.
 Informally, this can be stated as 
 "posterior equals prior times likelihood, divided by the evidence".
 Now, because the evidence $P(E)$ is the same for all hypotheses,
 we can get away with simply normalizing over the hypotheses.
 
-Note that $\sum_a P(A=a|B) = 1$ also allows us to *marginalize* over random variables. That is, we can drop variables from a joint distribution such as $P(A, B)$. After all, we have that 
+Note that $\sum_a P(A=a \mid B) = 1$ also allows us to *marginalize* over random variables. That is, we can drop variables from a joint distribution such as $P(A, B)$. After all, we have that 
 
-$$\sum_a P(A=a, B) = P(B) \sum_a P(A = a|B) = P(B).$$
+$$\sum_a P(A=a, B) = P(B) \sum_a P(A = a \mid B) = P(B).$$
 
 Independence is another fundamentally important concept
 that forms the backbone of 
@@ -666,8 +666,8 @@ if conditioning on the value of $A$ does not
 cause any change to the probability distribution
 associated with $B$ and vice versa.
 More formally, independence, denoted $A \perp B$, 
-requires that $P(A|B) = P(A)$ and, consequently, 
-that $P(A,B) = P(A|B) P(B) = P(A) P(B)$.
+requires that $P(A \mid B) = P(A)$ and, consequently, 
+that $P(A,B) = P(A \mid B) P(B) = P(A) P(B)$.
 Independence is often an appropriate assumption.
 For example, if the random variable $A$ 
 represents the outcome from tossing one fair coin 
@@ -694,7 +694,7 @@ that diseases and symptoms are *not* independent.
 Note that because conditional probabilities are proper probabilities,
 the concepts of independence and dependence also apply to them. 
 Two random variables $A$ and $B$ are *conditionally independent* 
-given a third variable $C$ if and only if $P(A, B|C) = P(A|C)P(B|C)$.
+given a third variable $C$ if and only if $P(A, B \mid C) = P(A \mid C)P(B \mid C)$.
 Interestingly, two variables can be independent in general
 but become dependent when conditioning on a third. 
 This often occurs when the two random variables $A$ and $B$
@@ -736,7 +736,7 @@ and $H \in \{0, 1\}$ to denote the HIV status.
 Note that the column sums are all 1 (but the row sums don't), 
 since they are conditional probabilities.
 Let's compute the probability of the patient having HIV 
-if the test comes back positive, i.e., $P(H = 1|D_1 = 1)$. 
+if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. 
 Intuitively this is going to depend on how common the disease is,
 since it affects the number of false alarms. 
 Assume that the population is fairly healthy, e.g., $P(H=1) = 0.0015$. 
@@ -746,14 +746,14 @@ to determine
 $$\begin{aligned}
 P(D_1 = 1) 
 =& P(D_1=1, H=0) + P(D_1=1, H=1)  \\
-=& P(D_1=1|H=0) P(H=0) + P(D_1=1|H=1) P(H=1) \\
+=& P(D_1=1 \mid H=0) P(H=0) + P(D_1=1 \mid H=1) P(H=1) \\
 =& 0.011485.
 \end{aligned}
 $$
 
 This leads us to 
 
-$$P(H = 1|D_1 = 1) = \frac{P(D_1=1|H=1) P(H=1)}{P(D_1=1)} = 0.1306.$$
+$$P(H = 1 \mid D_1 = 1) = \frac{P(D_1=1 \mid H=1) P(H=1)}{P(D_1=1)} = 0.1306.$$
 
 In other words, there is only a 13.06% chance 
 that the patient actually has HIV, 
@@ -775,11 +775,11 @@ Let's calculate the requisite probabilities to invoke Bayes' theorem
 by assuming conditional independence:
 
 $$\begin{aligned}
-P(D_1 = 1, D_2 = 1|H = 0) 
-& = P(D_1 = 1|H = 0) P(D_2 = 1|H = 0)  
+P(D_1 = 1, D_2 = 1 \mid H = 0) 
+& = P(D_1 = 1 \mid H = 0) P(D_2 = 1 \mid H = 0)  
 =& 0.0003, \\
-P(D_1 = 1, D_2 = 1|H = 1) 
-& = P(D_1 = 1|H = 1) P(D_2 = 1|H = 1)  
+P(D_1 = 1, D_2 = 1 \mid H = 1) 
+& = P(D_1 = 1 \mid H = 1) P(D_2 = 1 \mid H = 1)  
 =& 0.98.
 \end{aligned}
 $$
@@ -790,15 +790,15 @@ that both tests come back positive:
 $$\begin{aligned}
 P(D_1 = 1, D_2 = 1) 
 =& P(D_1 = 1, D_2 = 1, H = 0) + P(D_1 = 1, D_2 = 1, H = 1)  \\
-=& P(D_1 = 1, D_2 = 1| H = 0)P(H=0) + P(D_1 = 1, D_2 = 1|H = 1)P(H=1)\\
+=& P(D_1 = 1, D_2 = 1 \mid H = 0)P(H=0) + P(D_1 = 1, D_2 = 1 \mid H = 1)P(H=1)\\
 =& 0.00176955.
 \end{aligned}
 $$
 
 Finally, the probability of the patient having HIV given both tests being positive is
 
-$$P(H = 1| D_1 = 1, D_2 = 1)
-= \frac{P(D_1 = 1, D_2 = 1|H=1) P(H=1)}{P(D_1 = 1, D_2 = 1)}
+$$P(H = 1 \mid D_1 = 1, D_2 = 1)
+= \frac{P(D_1 = 1, D_2 = 1 \mid H=1) P(H=1)}{P(D_1 = 1, D_2 = 1)}
 = 0.8307.$$
 
 That is, the second test allowed us to gain much higher confidence that not all is well.
@@ -1008,7 +1008,7 @@ We also sharpened our language and tools for statistical modeling.
 In the process of that we learned about conditional probabilities 
 and about one of the most important equations in statistics---Bayes' theorem. 
 It is an effective tool for decoupling information conveyed by data 
-through a likelihood term $P(B|A)$ that addresses 
+through a likelihood term $P(B \mid A)$ that addresses 
 how well observations $B$ match a choice of parameters $A$,
 and a prior probability $P(A)$ which governs how plausible 
 a particular choice of $A$ was in the first place.
@@ -1047,7 +1047,7 @@ interval centered on the expectation.
 1. Assume that we draw $n$ samples $x_i$ from a probability distribution with zero mean and unit variance. Compute the averages $z_m \stackrel{\mathrm{def}}{=} m^{-1} \sum_{i=1}^m x_i$. Can we apply Chebyshev's inequality for every $z_m$ independently? Why not?
 1. Given two events with probability $P(\mathcal{A})$ and $P(\mathcal{B})$, compute upper and lower bounds on $P(\mathcal{A} \cup \mathcal{B})$ and $P(\mathcal{A} \cap \mathcal{B})$. Hint: graph the situation using a [Venn diagram](https://en.wikipedia.org/wiki/Venn_diagram).
 1. Assume that we have a sequence of random variables, say $A$, $B$, and $C$, where $B$ only depends on $A$, and $C$ only depends on $B$, can you simplify the joint probability $P(A, B, C)$? Hint: this is a [Markov chain](https://en.wikipedia.org/wiki/Markov_chain).
-1. In :numref:`subsec_probability_hiv_app`, assume that the outcomes of the two tests are not independent. In particular assume that either test on its own has a false positive rate of 10% and a false negative rate of 1%. That is, assume that $P(D =1|H=0) = 0.1$ and that $P(D = 0|H=1) = 0.01$. Moreover, assume that for $H = 1$ (infected) the test outcomes are conditionally independent, i.e., that $P(D_1, D_2|H=1) = P(D_1|H=1) P(D_2|H=1)$ but that for healthy patients the outcomes are coupled via $P(D_1 = D_2 = 1|H=0) = 0.02$. 
+1. In :numref:`subsec_probability_hiv_app`, assume that the outcomes of the two tests are not independent. In particular assume that either test on its own has a false positive rate of 10% and a false negative rate of 1%. That is, assume that $P(D =1 \mid H=0) = 0.1$ and that $P(D = 0 \mid H=1) = 0.01$. Moreover, assume that for $H = 1$ (infected) the test outcomes are conditionally independent, i.e., that $P(D_1, D_2 \mid H=1) = P(D_1 \mid H=1) P(D_2 \mid H=1)$ but that for healthy patients the outcomes are coupled via $P(D_1 = D_2 = 1 \mid H=0) = 0.02$. 
     1. Work out the joint probability table for $D_1$ and $D_2$, given $H=0$ based on the information you have so far.
     1. Derive the probability of the patient being positive ($H=1$) after one test returns positive. You can assume the same baseline probability $P(H=1) = 0.0015$ as before. 
     1. Derive the probability of the patient being positive ($H=1$) after both tests return positive.

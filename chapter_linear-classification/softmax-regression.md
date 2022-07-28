@@ -278,7 +278,7 @@ for the mean squared error loss in
 The softmax function gives us a vector $\hat{\mathbf{y}}$,
 which we can interpret as (estimated) conditional probabilities
 of each class, given any input $\mathbf{x}$,
-such as $\hat{y}_1$ = $P(y=\text{cat} | \mathbf{x})$.
+such as $\hat{y}_1$ = $P(y=\text{cat} \mid \mathbf{x})$.
 In the following we assume that for a dataset
 with features $\mathbf{X}$ the labels $\mathbf{Y}$
 are represented using a one-hot encoding label vector.
@@ -287,18 +287,18 @@ by checking how probable the actual classes are
 according to our model, given the features:
 
 $$
-P(\mathbf{Y} | \mathbf{X}) = \prod_{i=1}^n P(\mathbf{y}^{(i)} | \mathbf{x}^{(i)}).
+P(\mathbf{Y} \mid \mathbf{X}) = \prod_{i=1}^n P(\mathbf{y}^{(i)} \mid \mathbf{x}^{(i)}).
 $$
 
 We are allowed to use the factorization
 since we assume that each label is drawn independently
-from its respective distribution $P(\mathbf{y}|\mathbf{x}^{(i)})$.
+from its respective distribution $P(\mathbf{y}\mid\mathbf{x}^{(i)})$.
 Since maximizing the product of terms is awkward,
 we take the negative logarithm to obtain the equivalent problem
 of minimizing the negative log-likelihood:
 
 $$
--\log P(\mathbf{Y} | \mathbf{X}) = \sum_{i=1}^n -\log P(\mathbf{y}^{(i)} | \mathbf{x}^{(i)})
+-\log P(\mathbf{Y} \mid \mathbf{X}) = \sum_{i=1}^n -\log P(\mathbf{y}^{(i)} \mid \mathbf{x}^{(i)})
 = \sum_{i=1}^n l(\mathbf{y}^{(i)}, \hat{\mathbf{y}}^{(i)}),
 $$
 
