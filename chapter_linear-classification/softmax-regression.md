@@ -62,8 +62,8 @@ but not the topics of medicine or sports.
 Thus, categorizing it into one of the above categories
 on their own would not be very useful.
 This problem is commonly known as [multi-label classification](https://en.wikipedia.org/wiki/Multi-label_classification).
-See :cite:`Tsoumakas.Katakis.2007` for an overview
-and :cite:`Huang.Xu.Yu.2015`
+See :citet:`Tsoumakas.Katakis.2007` for an overview
+and :citet:`Huang.Xu.Yu.2015`
 for an effective algorithm when tagging images.
 
 ## Classification
@@ -90,9 +90,9 @@ $\{\text{baby}, \text{toddler}, \text{adolescent}, \text{young adult}, \text{adu
 then it might even make sense to cast this as
 an [ordinal regression](https://en.wikipedia.org/wiki/Ordinal_regression) problem
 and keep the labels in this format.
-See :cite:`Moon.Smola.Chang.ea.2010` for an overview
+See :citet:`Moon.Smola.Chang.ea.2010` for an overview
 of different types of ranking loss functions
-and :cite:`Beutel.Murray.Faloutsos.ea.2014` for a Bayesian approach
+and :citet:`Beutel.Murray.Faloutsos.ea.2014` for a Bayesian approach
 that addresses responses with more than one mode.
 
 In general, classification problems do not come
@@ -387,7 +387,7 @@ We can demystify the name by introducing just the basics of information theory.
 In a nutshell, it measures the number of bits to encode what we see $\mathbf{y}$
 relative to what we predict that should happen $\hat{\mathbf{y}}$.
 We provide a very basic explanation in the following. For further
-details on information theory see 
+details on information theory see
 :cite:`Cover.Thomas.1999` or :cite:`mackay2003information`.
 
 

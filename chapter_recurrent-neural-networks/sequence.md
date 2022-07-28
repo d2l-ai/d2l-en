@@ -125,9 +125,9 @@ Absent any other features
 the only available signal for predicting
 the subsequent value is the history of prices to date.
 The trader is thus interested in knowing
-the probability distribution 
+the probability distribution
 
-$$P(x_t \mid x_{t-1}, \ldots, x_1)$$ 
+$$P(x_t \mid x_{t-1}, \ldots, x_1)$$
 
 over prices that the index might take
 in the subsequent time step.

@@ -3,7 +3,7 @@
 
 In :numref:`sec_basic_gan`, we introduced the basic ideas behind how GANs work. We showed that they can draw samples from some simple, easy-to-sample distribution, like a uniform or normal distribution, and transform them into samples that appear to match the distribution of some dataset. And while our example of matching a 2D Gaussian distribution got the point across, it is not especially exciting.
 
-In this section, we will demonstrate how you can use GANs to generate photorealistic images. We will be basing our models on the deep convolutional GANs (DCGAN) introduced in :cite:`Radford.Metz.Chintala.2015`. We will borrow the convolutional architecture that have proven so successful for discriminative computer vision problems and show how via GANs, they can be leveraged to generate photorealistic images.
+In this section, we will demonstrate how you can use GANs to generate photorealistic images. We will be basing our models on the deep convolutional GANs (DCGAN) introduced in :citet:`Radford.Metz.Chintala.2015`. We will borrow the convolutional architecture that have proven so successful for discriminative computer vision problems and show how via GANs, they can be leveraged to generate photorealistic images.
 
 ```{.python .input}
 #@tab mxnet
@@ -181,7 +181,7 @@ class G_block(tf.keras.layers.Layer):
             out_channels, kernel_size, strides, padding, use_bias=False)
         self.batch_norm = tf.keras.layers.BatchNormalization()
         self.activation = tf.keras.layers.ReLU()
-        
+
     def call(self, X):
         return self.activation(self.batch_norm(self.conv2d_trans(X)))
 ```
@@ -268,7 +268,7 @@ net_G = nn.Sequential(
     G_block(in_channels=n_G*8, out_channels=n_G*4), # Output: (64 * 4, 8, 8)
     G_block(in_channels=n_G*4, out_channels=n_G*2), # Output: (64 * 2, 16, 16)
     G_block(in_channels=n_G*2, out_channels=n_G),   # Output: (64, 32, 32)
-    nn.ConvTranspose2d(in_channels=n_G, out_channels=3, 
+    nn.ConvTranspose2d(in_channels=n_G, out_channels=3,
                        kernel_size=4, stride=2, padding=1, bias=False),
     nn.Tanh())  # Output: (3, 64, 64)
 ```
@@ -285,7 +285,7 @@ net_G = tf.keras.Sequential([
     # Output: (64, 64, 3)
     tf.keras.layers.Conv2DTranspose(
         3, kernel_size=4, strides=2, padding="same", use_bias=False,
-        activation="tanh") 
+        activation="tanh")
 ])
 ```
 
@@ -376,7 +376,7 @@ class D_block(tf.keras.layers.Layer):
                                              strides, padding, use_bias=False)
         self.batch_norm = tf.keras.layers.BatchNormalization()
         self.activation = tf.keras.layers.LeakyReLU(alpha)
-        
+
     def call(self, X):
         return self.activation(self.batch_norm(self.conv2d(X)))
 ```
@@ -568,21 +568,21 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
           device=d2l.try_gpu()):
     loss = tf.keras.losses.BinaryCrossentropy(
         from_logits=True, reduction=tf.keras.losses.Reduction.SUM)
-    
+
     for w in net_D.trainable_variables:
         w.assign(tf.random.normal(mean=0, stddev=0.02, shape=w.shape))
     for w in net_G.trainable_variables:
         w.assign(tf.random.normal(mean=0, stddev=0.02, shape=w.shape))
-    
+
     optimizer_hp = {"lr": lr, "beta_1": 0.5, "beta_2": 0.999}
     optimizer_D = tf.keras.optimizers.Adam(**optimizer_hp)
     optimizer_G = tf.keras.optimizers.Adam(**optimizer_hp)
-    
+
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], nrows=2, figsize=(5, 5),
                             legend=['discriminator', 'generator'])
     animator.fig.subplots_adjust(hspace=0.3)
-    
+
     for epoch in range(1, num_epochs + 1):
         # Train one epoch
         timer = d2l.Timer()
@@ -594,13 +594,13 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
             metric.add(d2l.update_D(X, Z, net_D, net_G, loss, optimizer_D),
                        d2l.update_G(Z, net_D, net_G, loss, optimizer_G),
                        batch_size)
-            
+
         # Show generated examples
         Z = tf.random.normal(mean=0, stddev=1, shape=(21, 1, 1, latent_dim))
         # Normalize the synthetic data to N(0, 1)
         fake_x = net_G(Z) / 2 + 0.5
         imgs = tf.concat([tf.concat([fake_x[i * 7 + j] for j in range(7)],
-                                    axis=1) 
+                                    axis=1)
                           for i in range(len(fake_x) // 7)], axis=0)
         animator.axes[1].cla()
         animator.axes[1].imshow(imgs)
