@@ -1213,7 +1213,7 @@ for video games.
 deep learning to reinforcement learning problems,
 has surged in popularity.
 The breakthrough deep Q-network that beat humans
-at Atari games using only the visual input :cite:`Mnih.2015`,
+at Atari games using only the visual input :cite:`mnih2015human`,
 and the AlphaGo program that dethroned the world champion
 at the board game Go :cite:`Silver.Huang.Maddison.ea.2016`
 are two prominent examples.
