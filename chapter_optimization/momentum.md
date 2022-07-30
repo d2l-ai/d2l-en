@@ -317,7 +317,7 @@ We used $\mathbf{R}$ to denote the $2 \times 2$ governing convergence behavior. 
 * Momentum prevents stalling of the optimization process that is much more likely to occur for stochastic gradient descent.
 * The effective number of gradients is given by $\frac{1}{1-\beta}$ due to exponentiated downweighting of past data.
 * In the case of convex quadratic problems this can be analyzed explicitly in detail.
-* Implementation is quite straightforward but it requires us to store an additional state vector (momentum $\mathbf{v}$).
+* Implementation is quite straightforward but it requires us to store an additional state vector (velocity $\mathbf{v}$).
 
 ## Exercises
 
