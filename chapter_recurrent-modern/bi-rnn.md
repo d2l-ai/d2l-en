@@ -119,8 +119,8 @@ This transition epitomizes many of the principles guiding the design of modern d
 
 ### Definition
 
-Bidirectional RNNs were introduced by :cite:`Schuster.Paliwal.1997`.
-For a detailed discussion of the various architectures see also the paper :cite:`Graves.Schmidhuber.2005`.
+Bidirectional RNNs were introduced by :citet:`Schuster.Paliwal.1997`.
+For a detailed discussion of the various architectures see also :citet:`Graves.Schmidhuber.2005`.
 Let's look at the specifics of such a network.
 
 

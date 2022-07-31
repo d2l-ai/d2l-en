@@ -198,7 +198,7 @@ given words "ice" and "steam"
 and their ratios based on  statistics from a large corpus.
 
 
-:Word-word co-occurrence probabilities and their ratios from a large corpus (adapted from Table 1 in :cite:`Pennington.Socher.Manning.2014`)
+:Word-word co-occurrence probabilities and their ratios from a large corpus (adapted from Table 1 in :citet:`Pennington.Socher.Manning.2014`)
 
 
 |$w_k$=|solid|gas|water|fashion|

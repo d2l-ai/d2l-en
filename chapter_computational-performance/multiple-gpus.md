@@ -2,15 +2,15 @@
 :label:`sec_multi_gpu`
 
 So far we discussed how to train models efficiently on CPUs and GPUs. We even showed how deep learning frameworks allow one to parallelize computation and communication automatically between them in :numref:`sec_auto_para`. We also showed in :numref:`sec_use_gpu` how to list all the available GPUs on a computer using the `nvidia-smi` command.
-What we did *not* discuss is how to actually parallelize deep learning training. 
+What we did *not* discuss is how to actually parallelize deep learning training.
 Instead, we implied in passing that one would somehow split the data across multiple devices and make it work. The present section fills in the details and shows how to train a network in parallel when starting from scratch. Details on how to take advantage of functionality in high-level APIs is relegated to :numref:`sec_multi_gpu_concise`.
 We assume that you are familiar with minibatch stochastic gradient descent algorithms such as the ones described in :numref:`sec_minibatch_sgd`.
 
 
 ## Splitting the Problem
 
-Let's start with a simple computer vision problem and a slightly archaic network, e.g., with multiple layers of convolutions, pooling, and possibly a few fully connected layers in the end. 
-That is, let's start with a network that looks quite similar to LeNet :cite:`LeCun.Bottou.Bengio.ea.1998` or AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`. 
+Let's start with a simple computer vision problem and a slightly archaic network, e.g., with multiple layers of convolutions, pooling, and possibly a few fully connected layers in the end.
+That is, let's start with a network that looks quite similar to LeNet :cite:`LeCun.Bottou.Bengio.ea.1998` or AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`.
 Given multiple GPUs (2 if it is a desktop server, 4 on an AWS g4dn.12xlarge instance, 8 on a p3.16xlarge, or 16 on a p2.16xlarge), we want to partition training in a manner as to achieve good speedup while simultaneously benefitting from simple and reproducible design choices. Multiple GPUs, after all, increase both *memory* and *computation* ability. In a nutshell, we have the following choices, given a minibatch of training data that we want to classify.
 
 First, we could partition the network across multiple GPUs. That is, each GPU takes as input the data flowing into a particular layer, processes data across a number of subsequent layers and then sends the data to the next GPU.
@@ -23,11 +23,11 @@ The interface between layers also
 requires large amounts of data transfer,
 such as activations and gradients.
 This may overwhelm the bandwidth of the GPU buses.
-Moreover, compute-intensive, yet sequential operations are nontrivial to partition. See e.g., :cite:`Mirhoseini.Pham.Le.ea.2017` for a best effort in this regard. It remains a difficult problem and it is unclear whether it is possible to achieve good (linear) scaling on nontrivial problems. We do not recommend it unless there is excellent framework or operating system support for chaining together multiple GPUs.
+Moreover, compute-intensive, yet sequential operations are nontrivial to partition. See e.g., :citet:`Mirhoseini.Pham.Le.ea.2017` for a best effort in this regard. It remains a difficult problem and it is unclear whether it is possible to achieve good (linear) scaling on nontrivial problems. We do not recommend it unless there is excellent framework or operating system support for chaining together multiple GPUs.
 
 
 Second, we could split the work layerwise. For instance, rather than computing 64 channels on a single GPU we could split up the problem across 4 GPUs, each of which generates data for 16 channels.
-Likewise, for a fully connected layer we could split the number of output units. :numref:`fig_alexnet_original` (taken from :cite:`Krizhevsky.Sutskever.Hinton.2012`)
+Likewise, for a fully connected layer we could split the number of output units. :numref:`fig_alexnet_original` (taken from :citet:`Krizhevsky.Sutskever.Hinton.2012`)
 illustrates this design, where this strategy was used to deal with GPUs that had a very small memory footprint (2 GB at the time).
 This allows for good scaling in terms of computation, provided that the number of channels (or units) is not too small.
 Besides,
@@ -39,7 +39,7 @@ multiple GPUs can process increasingly larger networks since the available memor
 However,
 we need a *very large* number of synchronization or barrier operations since each layer depends on the results from all the other layers.
 Moreover, the amount of data that needs to be transferred is potentially even larger than when distributing layers across GPUs. Thus, we do not recommend this approach due to its bandwidth cost and complexity.
-    
+
 Last, we could partition data across multiple GPUs. This way all GPUs perform the same type of work, albeit on different observations. Gradients are aggregated across GPUs after each minibatch of training data.
 This is the simplest approach and it can be applied in any situation.
 We only need to synchronize after each minibatch. That said, it is highly desirable to start exchanging gradients parameters already while others are still being computed.
@@ -56,9 +56,9 @@ By and large, data parallelism is the most convenient way to proceed, provided t
 
 ## Data Parallelism
 
-Assume that there are $k$ GPUs on a machine. Given the model to be trained, each GPU will maintain a complete set of model parameters independently though parameter values across the GPUs are identical and synchronized. 
+Assume that there are $k$ GPUs on a machine. Given the model to be trained, each GPU will maintain a complete set of model parameters independently though parameter values across the GPUs are identical and synchronized.
 As an example,
-:numref:`fig_data_parallel` illustrates 
+:numref:`fig_data_parallel` illustrates
 training with
 data parallelism when $k=2$.
 
@@ -172,7 +172,7 @@ loss = nn.CrossEntropyLoss(reduction='none')
 
 ## Data Synchronization
 
-For efficient multi-GPU training we need two basic operations. 
+For efficient multi-GPU training we need two basic operations.
 First we need to have the ability to [**distribute a list of parameters to multiple devices**] and to attach gradients (`get_params`). Without parameters it is impossible to evaluate the network on a GPU.
 Second, we need the ability to sum parameters across multiple devices, i.e., we need an `allreduce` function.
 
