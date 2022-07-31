@@ -374,7 +374,7 @@ class BatchNorm(nn.Block):
         # Save the updated `moving_mean` and `moving_var`
         Y, self.moving_mean, self.moving_var = batch_norm(
             X, self.gamma.data(), self.beta.data(), self.moving_mean,
-            self.moving_var, eps=1e-12, momentum=0.9)
+            self.moving_var, eps=1e-12, momentum=0.1)
         return Y
 ```
 
@@ -407,7 +407,7 @@ class BatchNorm(nn.Module):
         # Save the updated `moving_mean` and `moving_var`
         Y, self.moving_mean, self.moving_var = batch_norm(
             X, self.gamma, self.beta, self.moving_mean,
-            self.moving_var, eps=1e-5, momentum=0.9)
+            self.moving_var, eps=1e-5, momentum=0.1)
         return Y
 ```
 
@@ -435,7 +435,7 @@ class BatchNorm(tf.keras.layers.Layer):
         super(BatchNorm, self).build(input_shape)
 
     def assign_moving_average(self, variable, value):
-        momentum = 0.9
+        momentum = 0.1
         delta = variable * momentum + value * (1 - momentum)
         return variable.assign(delta)
 
