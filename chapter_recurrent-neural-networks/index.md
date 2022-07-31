@@ -58,7 +58,7 @@ After all, it is the feedforward nature of neural networks
 that makes the order of computation unambiguous.
 However, recurrent edges are defined in a precise way
 that ensures that no such ambiguity can arise.
-Recurrent neural networks are *unrolled* across sequence steps,
+Recurrent neural networks are *unrolled* across time steps (or sequence steps),
 with the *same* underlying parameters applied at each step.
 While the standard connections are applied *synchronously*
 to propagate each layer's activations
@@ -71,7 +71,7 @@ where each layer's parameters (both conventional and recurrent)
 are shared across time steps.
 
 
-![On the left recurrent connections are depicted via cyclic edges. On the right, we unfold the RNN over sequence steps. Here, recurrent edges span adjacent sequence steps, while conventional connections are computed synchronously.](../img/unfolded-rnn.svg)
+![On the left recurrent connections are depicted via cyclic edges. On the right, we unfold the RNN over time steps. Here, recurrent edges span adjacent time steps, while conventional connections are computed synchronously.](../img/unfolded-rnn.svg)
 :label:`fig_unfolded-rnn`
 
 
@@ -121,7 +121,7 @@ Videos can be represented as varying-length sequences of still images.
 
 While sequence models have popped up in countless application areas,
 basic research in the area has been driven predominantly
-by advances on core tasks in natural language processing (NLP).
+by advances on core tasks in natural language processing.
 Thus, throughout this chapter, we will focus
 our exposition and examples on text data.
 If you get the hang of these examples,

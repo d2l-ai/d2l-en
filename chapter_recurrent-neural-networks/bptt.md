@@ -5,31 +5,29 @@ If you completed the exercises in :numref:`sec_rnn-scratch`,
 you would have seen that gradient clipping is vital 
 to prevent the occasional massive gradients
 from destabilizing training.
-While we hinted that the exploding gradients
+We hinted that the exploding gradients
 stem from backpropagating across long sequences.
 Before introducing a slew of modern RNN architectures,
 let's take a closer look at how *backpropagation*
 works in sequence models in mathematical detail.
-Hopefully, this discussion bring some precision 
-to the notion of *vanishing* and *exploding* gradients 
-and explain why we need to *detach the gradient* for RNNs
-in :numref:`sec_rnn-scratch`.
+Hopefully, this discussion will bring some precision 
+to the notion of *vanishing* and *exploding* gradients.
 If you recall our discussion of forward and backward 
 propagation through computational graphs
 when we introduced MLPs in :numref:`sec_backprop`,
 then forward propagation in RNNs
 should be relatively straightforward.
 Applying backpropagation in RNNs 
-is called *Backpropagation through time* (:cite:`Werbos.1990`).
-This procedure requires us to expand (or *unroll*) 
+is called *backpropagation through time* :cite:`Werbos.1990`.
+This procedure requires us to expand (or unroll) 
 the computational graph of an RNN
-one sequence step at a time.
+one time step at a time.
 The unrolled RNN is essentially 
 a feedforward neural network 
 with the special property 
 that the same parameters 
 are repeated throughout the unrolled network,
-appearing at each sequence step.
+appearing at each time step.
 Then, just as in any feedforward neural network,
 we can apply the chain rule, 
 backpropagating gradients through the unrolled net.
@@ -42,13 +40,13 @@ from our chapters on convolutional neural networks.
 
 Complications arise because sequences
 can be rather long.
-It' not unusual to work with text sequences
+It's not unusual to work with text sequences
 consisting of over a thousand tokens. 
 Note that this poses problems both from 
 a computational (too much memory)
 and optimization (numerical instability)
 standpoint. 
-Inputs from the first step passes through
+Input from the first step passes through
 over 1000 matrix products before arriving at the output, 
 and another 1000 matrix products 
 are required to compute the gradient. 
@@ -73,7 +71,7 @@ at time step $t$.
 Recall our discussions in
 :numref:`subsec_rnn_w_hidden_states`
 that the input and the hidden state
-can be concatenated to before being multiplied 
+can be concatenated before being multiplied 
 by one weight variable in the hidden layer.
 Thus, we use $w_h$ and $w_o$ to indicate the weights 
 of the hidden layer and the output layer, respectively.
@@ -169,8 +167,7 @@ Alternatively,
 we can truncate the sum in
 :eqref:`eq_bptt_partial_ht_wh_gen`
 after $\tau$ steps. 
-This is what we have been discussing so far,
-such as when we detached the gradients in :numref:`sec_rnn-scratch`. 
+This is what we have been discussing so far. 
 This leads to an *approximation* of the true gradient,
 simply by terminating the sum at $\partial h_{t-\tau}/\partial w_h$. 
 In practice this works quite well. 
@@ -206,8 +203,8 @@ Whenever $\xi_t = 0$ the recurrent computation
 terminates at that time step $t$.
 This leads to a weighted sum of sequences of varying lengths,
 where long sequences are rare but appropriately overweighted. 
-This idea was proposed by Tallec and Ollivier
-:cite:`Tallec.Ollivier.2017`.
+This idea was proposed by 
+:citet:`Tallec.Ollivier.2017`.
 
 ### Comparing Strategies
 
@@ -368,7 +365,7 @@ and exploding gradients.
 One way to address this is to truncate the time steps
 at a computationally convenient size 
 as discussed in :numref:`subsec_bptt_analysis`. 
-In practice, this truncation is effected 
+In practice, this truncation can also be effected 
 by detaching the gradient after a given number of time steps.
 Later on, we will see how more sophisticated sequence models 
 such as long short-term memory can alleviate this further. 
@@ -416,13 +413,10 @@ and $\partial L / \partial \mathbf{W}_{hh}$.
 
 ## Summary
 
-* Backpropagation through time is merely an application of backpropagation 
-  to sequence models with a hidden state.
-* Truncation is needed for computational convenience and numerical stability, 
-  such as regular truncation and randomized truncation.
-* High powers of matrices can lead to divergent or vanishing eigenvalues. 
-  This manifests itself in the form of exploding or vanishing gradients.
-* For efficient computation, intermediate values are cached during backpropagation through time.
+Backpropagation through time is merely an application of backpropagation to sequence models with a hidden state.
+Truncation is needed for computational convenience and numerical stability, such as regular truncation and randomized truncation.
+High powers of matrices can lead to divergent or vanishing eigenvalues. This manifests itself in the form of exploding or vanishing gradients.
+For efficient computation, intermediate values are cached during backpropagation through time.
 
 
 

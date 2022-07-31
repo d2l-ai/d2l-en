@@ -299,7 +299,7 @@ In the following,
 #@save
 def train_batch_ch13(net, features, labels, loss, trainer, devices,
                      split_f=d2l.split_batch):
-    """Train for a minibatch with mutiple GPUs (defined in Chapter 13)."""
+    """Train for a minibatch with multiple GPUs (defined in Chapter 13)."""
     X_shards, y_shards = split_f(features, labels, devices)
     with autograd.record():
         pred_shards = [net(X_shard) for X_shard in X_shards]
@@ -320,7 +320,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, devices,
 #@tab pytorch
 #@save
 def train_batch_ch13(net, X, y, loss, trainer, devices):
-    """Train for a minibatch with mutiple GPUs (defined in Chapter 13)."""
+    """Train for a minibatch with multiple GPUs (defined in Chapter 13)."""
     if isinstance(X, list):
         # Required for BERT fine-tuning (to be covered later)
         X = [x.to(devices[0]) for x in X]
@@ -343,7 +343,7 @@ def train_batch_ch13(net, X, y, loss, trainer, devices):
 #@save
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                devices=d2l.try_all_gpus(), split_f=d2l.split_batch):
-    """Train a model with mutiple GPUs (defined in Chapter 13)."""
+    """Train a model with multiple GPUs (defined in Chapter 13)."""
     timer, num_batches = d2l.Timer(), len(train_iter)
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
@@ -374,7 +374,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
 #@save
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                devices=d2l.try_all_gpus()):
-    """Train a model with mutiple GPUs (defined in Chapter 13)."""
+    """Train a model with multiple GPUs (defined in Chapter 13)."""
     timer, num_batches = d2l.Timer(), len(train_iter)
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])

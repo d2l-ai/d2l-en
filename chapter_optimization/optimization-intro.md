@@ -52,14 +52,14 @@ import tensorflow as tf
 ```
 
 To illustrate the aforementioned different goals,
-let's consider 
-the empirical risk and the risk. 
+let's consider
+the empirical risk and the risk.
 As described
 in :numref:`subsec_empirical-risk-and-risk`,
 the empirical risk
 is an average loss
 on the training dataset
-while the risk is the expected loss 
+while the risk is the expected loss
 on the entire population of data.
 Below we define two functions:
 the risk function `f`
@@ -94,18 +94,18 @@ annotate('min of risk', (1.1, -1.05), (0.95, -0.5))
 ## Optimization Challenges in Deep Learning
 
 In this chapter, we are going to focus specifically on the performance of optimization algorithms in minimizing the objective function, rather than a
-model's generalization error. 
+model's generalization error.
 In :numref:`sec_linear_regression`
 we distinguished between analytical solutions and numerical solutions in
-optimization problems. 
+optimization problems.
 In deep learning, most objective functions are
 complicated and do not have analytical solutions. Instead, we must use numerical
-optimization algorithms. 
+optimization algorithms.
 The optimization algorithms in this chapter
 all fall into this
 category.
 
-There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points, and vanishing gradients. 
+There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points, and vanishing gradients.
 Let's have a look at them.
 
 
@@ -130,15 +130,15 @@ annotate('local minimum', (-0.3, -0.25), (-0.77, -1.0))
 annotate('global minimum', (1.1, -0.95), (0.6, 0.8))
 ```
 
-The objective function of deep learning models usually has many local optima. 
-When the numerical solution of an optimization problem is near the local optimum, the numerical solution obtained by the final iteration may only minimize the objective function *locally*, rather than *globally*, as the gradient of the objective function's solutions approaches or becomes zero. 
+The objective function of deep learning models usually has many local optima.
+When the numerical solution of an optimization problem is near the local optimum, the numerical solution obtained by the final iteration may only minimize the objective function *locally*, rather than *globally*, as the gradient of the objective function's solutions approaches or becomes zero.
 Only some degree of noise might knock the parameter out of the local minimum. In fact, this is one of the beneficial properties of
 minibatch stochastic gradient descent where the natural variation of gradients over minibatches is able to dislodge the parameters from local minima.
 
 
 ### Saddle Points
 
-Besides local minima, saddle points are another reason for gradients to vanish. A *saddle point* is any location where all gradients of a function vanish but which is neither a global nor a local minimum. 
+Besides local minima, saddle points are another reason for gradients to vanish. A *saddle point* is any location where all gradients of a function vanish but which is neither a global nor a local minimum.
 Consider the function $f(x) = x^3$. Its first and second derivative vanish for $x=0$. Optimization might stall at this point, even though it is not a minimum.
 
 ```{.python .input}
@@ -228,7 +228,7 @@ As we saw, optimization for deep learning is full of challenges. Fortunately the
 1. Assume that we have a symmetric random matrix $\mathbf{M}$ where the entries
    $M_{ij} = M_{ji}$ are each drawn from some probability distribution
    $p_{ij}$. Furthermore assume that $p_{ij}(x) = p_{ij}(-x)$, i.e., that the
-   distribution is symmetric (see e.g., :cite:`Wigner.1958` for details).
+   distribution is symmetric (see e.g., :citet:`Wigner.1958` for details).
     1. Prove that the distribution over eigenvalues is also symmetric. That is, for any eigenvector $\mathbf{v}$ the probability that the associated eigenvalue $\lambda$ satisfies $P(\lambda > 0) = P(\lambda < 0)$.
     1. Why does the above *not* imply $P(\lambda > 0) = 0.5$?
 1. What other challenges involved in deep learning optimization can you think of?

@@ -9,8 +9,8 @@ The main change of perspective when developing models
 capable of processing sequences is that we now
 focus on inputs that consist of an ordered list
 of feature vectors $\mathbf{x}_1, \dots, \mathbf{x}_T$,
-where each feature vector $x_t$
-indexed by a sequence step $t \in \mathbb{Z}^+$
+where each feature vector $\mathbf{x}_t$
+indexed by a time step $t \in \mathbb{Z}^+$
 lies in $\mathbb{R}^d$.
 
 Some datasets consist of a single massive sequence.
@@ -18,7 +18,7 @@ Consider, for example, the extremely long streams
 of sensor readings that might be available to climate scientists.
 In such cases, we might create training datasets
 by randomly sampling subsequences of some predetermined length.
-More often, our data arrive as a collection of sequences.
+More often, our data arrives as a collection of sequences.
 Consider the following examples:
 (i) a collection of documents,
 each represented as its own sequence of words,
@@ -37,7 +37,7 @@ While we still assume that entire sequences
 (e.g., entire documents or patient trajectories)
 are sampled independently,
 we cannot assume that the data arriving
-at each sequence step are independent of each other.
+at each time step are independent of each other.
 For example, what words are likely to appear later in a document
 depends heavily on what words occurred earlier in the document.
 What medicine a patient is likely to receive
@@ -76,33 +76,31 @@ We sometimes wish to predict a fixed target $y$
 given sequentially structured input
 (e.g., sentiment classification based on a movie review).
 At other times, we wish to predict a sequentially structured target
-($y_1, \cdots, y_T$)
+($y_1, \ldots, y_T$)
 given a fixed input (e.g., image captioning).
 Still other times, out goal is to predict sequentially structured targets
 based on sequentially structured inputs
 (e.g., machine translation or video captioning).
 Such sequence-to-sequence tasks take two forms:
-(a) **aligned:** where the input at each sequence step
-aligns with a corresponding target (e.g., part of speech taggin);
-(b) **unaligned** where the input and target
+(i) **aligned**: where the input at each time step
+aligns with a corresponding target (e.g., part of speech tagging);
+(ii) **unaligned**: where the input and target
 do not necessarily exhibit a step-for-step correspondence
-(e.g. machine translation).
+(e.g., machine translation).
 
-But before we worry about handling targets of any kind,
+Before we worry about handling targets of any kind,
 we can tackle the most straightforward problem:
 unsupervised density modeling (also called *sequence modeling*).
 Here, given a collection of sequences,
 our goal is to estimate the probability mass function
 that tells us how likely we are to see any given sequence,
-i.e. $p(\mathbf{x}_1, \cdots, \mathbf{x}_T)$.
+i.e., $p(\mathbf{x}_1, \ldots, \mathbf{x}_T)$.
 
 
+## Autoregressive Models
 
 
-
-## Basic Tools
-
-Before introducing specialized specialized neural networks
+Before introducing specialized neural networks
 designed to handle sequentially structured data,
 let's take a look at some actual sequence data
 and build up some basic intuitions and statistical tools.
@@ -123,17 +121,15 @@ depending on whether they believe
 that it will rise or decline
 in the subsequent time step.
 Absent any other features
-(news, financial reporting data, etc),
+(news, financial reporting data, etc.),
 the only available signal for predicting
 the subsequent value is the history of prices to date.
-
-
-
-
-### Autoregressive Models
-
 The trader is thus interested in knowing
-the probability distribution $$P(x_t \mid x_{t-1}, \ldots, x_1)$$ over prices that the index might take
+the probability distribution
+
+$$P(x_t \mid x_{t-1}, \ldots, x_1)$$
+
+over prices that the index might take
 in the subsequent time step.
 While estimating the entire distribution
 over a continuous-valued random variable
@@ -144,12 +140,12 @@ One simple strategy for estimating the conditional expectation
 
 $$\mathbb{E}[(x_t \mid x_{t-1}, \ldots, x_1)],$$
 
-would be to apply a linear regression model,
-(recall :numref:`sec_linear_concise`).
+would be to apply a linear regression model
+(recall :numref:`sec_linear_regression`).
 Such models that regress the value of a signal
 on the previous values of that same signal
 are naturally called *autoregressive models*.
-There is just one major problem; the number of inputs,
+There is just one major problem: the number of inputs,
 $x_{t-1}, \ldots, x_1$ varies, depending on $t$.
 Namely, the number of inputs increases
 with the amount of data that we encounter.
@@ -210,17 +206,17 @@ Sometimes, especially when working with language,
 we wish to estimate the joint probability
 of an entire sequence.
 This is a common task when working with sequences
-composed of discrete tokens, such as words.
+composed of discrete *tokens*, such as words.
 Generally, these estimated functions are called *sequence models*
 and for natural language data, they are called *language models*.
-The field of sequence modeling has been driven so much by NLP,
+The field of sequence modeling has been driven so much by natural language processing,
 that we often describe sequence models as "language models",
 even when dealing with non-language data.
 Language models prove useful for all sorts of reasons.
 Sometimes we want to evaluate the likelihood of sentences.
 For example, we might wish to compare
 the naturalness of two candidate outputs
-generated by a machine translation systems
+generated by a machine translation system
 or by a speech recognition system.
 But language modeling gives us not only
 the capacity to *evaluate* likelihood,
@@ -229,13 +225,13 @@ and even to optimize for the most likely sequences.
 
 While language modeling might not look, at first glance,
 like an autoregressive problem,
-we can reduce language modeling to autogregressive prediction
-by decomposing the joint density  of a sequence $p(x_t| x_1, \ldots, x_T)$
+we can reduce language modeling to autoregressive prediction
+by decomposing the joint density  of a sequence $p(x_t \mid x_1, \ldots, x_T)$
 into the product of conditional densities
 in a left-to-right fashion
 by applying the chain rule of probability:
 
-$$P(x_1, \ldots, x_T) = P(x_1) * \prod_{t=2}^T P(x_t \mid x_{t-1}, \ldots, x_1).$$
+$$P(x_1, \ldots, x_T) = P(x_1) \prod_{t=2}^T P(x_t \mid x_{t-1}, \ldots, x_1).$$
 
 Note that if we are working with discrete signals like words,
 then the autoregressive model must be a probabilistic classifier,
@@ -250,7 +246,7 @@ given the leftwards context.
 
 
 Now suppose that we wish to employ the strategy mentioned above,
-where we condition only on the $\tau$ previous sequence steps,
+where we condition only on the $\tau$ previous time steps,
 i.e., $x_{t-1}, \ldots, x_{t-\tau}$, rather than
 the entire sequence history $x_{t-1}, \ldots, x_1$.
 Whenever we can throw away the history
@@ -267,7 +263,7 @@ For when the first-order Markov condition holds ($\tau = 1$)
 the factorization of our joint probability becomes a product
 of probabilities of each word given the previous *word*:
 
-$$P(x_1, \ldots, x_T) = \prod_{t=1}^T P(x_t \mid x_{t-1}) \text{ where } P(x_1 \mid x_0) = P(x_1).$$
+$$P(x_1, \ldots, x_T) = P(x_1) \prod_{t=2}^T P(x_t \mid x_{t-1}).$$
 
 We often find it useful to work with models that proceed
 as though a Markov condition were satisfied,
@@ -278,15 +274,15 @@ But these gains diminish rapidly.
 Thus, sometimes we compromise, obviating computational and statistical difficulties
 by training models whose validity depends
 on a $k$-th order Markov condition.
-Even today's massive RNNs- and Transformer-based language models
-seldom incorporate more than a thousand words of context.
+Even today's massive RNN- and transformer-based language models
+seldom incorporate more than thousands of words of context.
 
 
 With discrete data, a true Markov model
 simply counts the number of times
 that each word has occurred in each context, producing
 the relative frequency estimate of $P(x_t \mid x_{t-1})$.
-Whenever the data assume only discrete values
+Whenever the data assumes only discrete values
 (as in language),
 the most likely sequence of words can be computed efficiently
 using dynamic programming.
@@ -338,7 +334,7 @@ they do not necessarily all represent equally easy
 predictive modeling problems.
 This is true not only for language,
 but for other kinds of data as well,
-e.g., when the data are causally structured.
+e.g., when the data is causally structured.
 For example, we believe that future events cannot influence the past.
 Hence, if we change $x_t$, we may be able to influence
 what happens for $x_{t+1}$ going forward but not the converse.
@@ -350,14 +346,13 @@ for some additive noise $\epsilon$,
 whereas the converse is not true :cite:`Hoyer.Janzing.Mooij.ea.2009`.
 This is great news, since it is typically the forward direction
 that we are interested in estimating.
-The book by Peters et al. has explained more on this topic
-:cite:`Peters.Janzing.Scholkopf.2017`.
+The book by :citet:`Peters.Janzing.Scholkopf.2017` has explained more on this topic.
 We are barely scratching the surface of it.
 
 
 ## Training
 
-Before we focus our attentions on text data,
+Before we focus our attention on text data,
 let's first try this out with some
 continuous-valued synthetic data.
 
@@ -392,9 +387,11 @@ import tensorflow as tf
 
 (**Here, our 1000 synthetic data will follow
 the trigonometric `sin` function,
-applied to .01 times the time step.
+applied to 0.01 times the time step.
 To make the problem a little more interesting,
 we corrupt each sample with additive noise.**)
+From this sequence we extract training examples,
+each consisting of features and a label.
 
 ```{.python .input  n=10}
 %%tab all
@@ -411,17 +408,14 @@ data = Data()
 d2l.plot(data.time, data.x, 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
-From this sequence we extract training examples,
-each consisting of features and a label.
-
 To begin, we try a model that acts as though
 the data satisfied a $\tau$-order Markov condition,
 and thus predicts $x_t$ using only the past $\tau$ observations.
-[**Thus for each timestep we have an example
+[**Thus for each time step we have an example
 with label $y  = x_t$ and features
 $\mathbf{x}_t = [x_{t-\tau}, \ldots, x_{t-1}]$.**]
 The astute reader might have noticed that
-this results in 1000-$\tau$ examples,
+this results in $1000-\tau$ examples,
 since we lack sufficient history for $y_1, \ldots, y_\tau$.
 While we could pad the first $\tau$ sequences with zeros,
 to keep things simple, we drop them for now.
@@ -453,7 +447,7 @@ trainer.fit(model, data)
 ## Prediction
 
 [**To evaluate our model, we first check
-How well our model performs at one-step-ahead prediction**].
+how well our model performs at one-step-ahead prediction**].
 
 ```{.python .input}
 %%tab all
@@ -462,10 +456,10 @@ d2l.plot(data.time[data.tau:], [data.labels, onestep_preds], 'time', 'x',
          legend=['labels', '1-step preds'], figsize=(6, 3))
 ```
 
-The one-step-ahead predictions look good.
+The one-step-ahead predictions look good,
 even near the end $t=1000$.
 
-Now consider, what if we only observe sequence data
+Now consider, what if we only observed sequence data
 up until time step 604 (`n_train + tau`)
 but wished to make predictions several steps
 into the future.
@@ -477,7 +471,7 @@ We can address this problem by plugging in
 our earlier predictions as inputs to our model
 for making subsequent predictions,
 projecting forward, one step at a time,
-until reaching the desired sequence step:
+until reaching the desired time step:
 
 $$
 \hat{x}_{605} = f(x_{601}, x_{602}, x_{603}, x_{604}), \\
@@ -578,23 +572,24 @@ anything beyond that is almost useless.
 
 ## Summary
 
-* There is quite a difference in difficulty
-  between interpolation and extrapolation.
-  Consequently, if you have a sequence, always respect
-  the temporal order of the data when training,
-  i.e., never train on future data.
-* Sequence models require specialized statistical tools for estimation.
-  Two popular choices are autoregressive models
-  and latent-variable autoregressive models.
-* For causal models (e.g., time going forward),
-  estimating the forward direction is typically
-  a lot easier than the reverse direction.
-* For an observed sequence up to time step $t$,
-  its predicted output at time step $t+k$
-  is the $k$*-step-ahead prediction*.
-  As we predict further in time by increasing $k$,
-  the errors accumulate and the quality of the prediction degrades,
-  often dramatically.
+There is quite a difference in difficulty
+between interpolation and extrapolation.
+Consequently, if you have a sequence, always respect
+the temporal order of the data when training,
+i.e., never train on future data.
+Given this kind of data,
+sequence models require specialized statistical tools for estimation.
+Two popular choices are autoregressive models
+and latent-variable autoregressive models.
+For causal models (e.g., time going forward),
+estimating the forward direction is typically
+a lot easier than the reverse direction.
+For an observed sequence up to time step $t$,
+its predicted output at time step $t+k$
+is the $k$*-step-ahead prediction*.
+As we predict further in time by increasing $k$,
+the errors accumulate and the quality of the prediction degrades,
+often dramatically.
 
 ## Exercises
 

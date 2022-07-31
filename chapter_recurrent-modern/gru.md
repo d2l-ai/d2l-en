@@ -241,9 +241,9 @@ def forward(self, inputs, H=None):
         if H is None: H = d2l.zeros_like(Z)
         R = d2l.sigmoid(d2l.matmul(X, self.W_xr) + 
                         d2l.matmul(H, self.W_hr) + self.b_r)
-        H_tilda = d2l.tanh(d2l.matmul(X, self.W_xh) + 
+        H_tilde = d2l.tanh(d2l.matmul(X, self.W_xh) + 
                            d2l.matmul(R * H, self.W_hh) + self.b_h)
-        H = Z * H + (1 - Z) * H_tilda
+        H = Z * H + (1 - Z) * H_tilde
         outputs.append(H)
     return outputs, (H, )
 ```

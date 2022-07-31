@@ -13,7 +13,7 @@ and post-process the representations via fully connected layers.
 The improvements upon LeNet by AlexNet and VGG mainly lie
 in how these later networks widen and deepen these two modules.
 
-This design poses two major challenges. 
+This design poses two major challenges.
 First, the fully connected layers at the end
 of the architecture consume tremendous numbers of parameters. For instance, even a simple
 model such as VGG-11 requires a monstrous $25088 \times 4096$ matrix, occupying almost
@@ -22,7 +22,7 @@ mobile and embedded devices. Second, it is equally impossible to add fully conne
 earlier in the network to increase the degree of nonlinearity: doing so would destroy the
 spatial structure and require potentially even more memory.
 
-The *network in network* (*NiN*) blocks of :cite:`Lin.Chen.Yan.2013` offer an alternative,
+The *network in network* (*NiN*) blocks of :citet:`Lin.Chen.Yan.2013` offer an alternative,
 capable of solving both problems in one simple strategy.
 They were proposed based on a very simple insight: (i) use $1 \times 1$ convolutions to add
 local nonlinearities across the channel activations and (ii) use global average pooling to integrate

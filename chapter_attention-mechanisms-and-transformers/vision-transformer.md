@@ -20,7 +20,7 @@ This question has sparked immense interest
 in the computer vision community.
 :cite:`ramachandran2019stand` proposed to replace convolution with self-attention. 
 However, its use of specialized patterns in attention makes it hard to scale up models on hardware accelerators.
-:cite:`cordonnier2020relationship` theoretically proved that self-attention can learn to behave similarly to convolution. Empirically, $2 \times 2$ patches were taken from images as input, but the small patch size makes the model only applicable to image data with low resolutions.
+:cite:`cordonnier2020relationship` theoretically proved that self-attention can learn to behave similarly to convolution. Empirically, $2 \times 2$ patches were taken from images as inputs, but the small patch size makes the model only applicable to image data with low resolutions.
 
 Without specific constraints on patch size,
 *vision transformers* (ViTs)
@@ -95,7 +95,7 @@ class PatchEmbedding(nn.Module):
         return self.conv(X).flatten(2).transpose(1, 2)
 ```
 
-In the following example, taking images with height and width of `img_size` as input, the patch embedding outputs `(img_size//patch_size)**2` patches that are linearly projected to vectors of length `num_hiddens`.
+In the following example, taking images with height and width of `img_size` as inputs, the patch embedding outputs `(img_size//patch_size)**2` patches that are linearly projected to vectors of length `num_hiddens`.
 
 ```{.python .input  n=9}
 img_size, patch_size, num_hiddens, batch_size = 96, 16, 512, 4
@@ -160,7 +160,7 @@ encoder_blk.eval()
 d2l.check_shape(encoder_blk(X), X.shape)
 ```
 
-## Putting All Things Together
+## Putting It All Together
 
 The forward pass of vision transformers below is straightforward.
 First, input images are fed into an `PatchEmbedding` instance,

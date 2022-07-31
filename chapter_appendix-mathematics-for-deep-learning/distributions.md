@@ -752,7 +752,7 @@ belong to which is known as the *exponential family*. The exponential family
 is a set of distributions whose density can be expressed in the following 
 form:
 
-$$p(\mathbf{x} | \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \left( \boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$
+$$p(\mathbf{x} \mid \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \left( \boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$
 :eqlabel:`eq_exp_pdf`
 
 As this definition can be a little subtle, let's examine it closely.  
@@ -785,7 +785,7 @@ an univariate variable, we saw that it had a density of
 
 $$
 \begin{aligned}
-p(x | \mu, \sigma) &= \frac{1}{\sqrt{2 \pi \sigma^2}} \cdot \mathrm{exp} 
+p(x \mid \mu, \sigma) &= \frac{1}{\sqrt{2 \pi \sigma^2}} \cdot \mathrm{exp} 
 \left\{ \frac{-(x-\mu)^2}{2 \sigma^2} \right\} \\
 &= \frac{1}{\sqrt{2 \pi}} \cdot \mathrm{exp} \left\{ \frac{\mu}{\sigma^2}x
 -\frac{1}{2 \sigma^2} x^2 - \left( \frac{1}{2 \sigma^2} \mu^2

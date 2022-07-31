@@ -1,7 +1,7 @@
 # Recurrent Neural Network Implementation from Scratch
 :label:`sec_rnn-scratch`
 
-We're now ready to implement an RNN from scratch.
+We are now ready to implement an RNN from scratch.
 In particular, we will train this RNN to function
 as a character-level language model
 (see :numref:`sec_rnn`)
@@ -76,19 +76,15 @@ class RNNScratch(d2l.Module):  #@save
             self.b_h = tf.Variable(d2l.zeros(num_hiddens))
 ```
 
-[**The `forward` method defines how to compute 
-the output and hidden state at any sequence step,
+[**The `forward` method below defines how to compute 
+the output and hidden state at any time step,
 given the current input and the state of the model
-at the previous sequence step.**]
+at the previous time step.**]
 Note that the RNN model loops through 
-the outermost dimension of `inputs`
+the outermost dimension of `inputs`,
 updating the hidden state 
-one sequence step at a time.
-The model here uses a $\tanh$ activation function,
-which has a sigmoid-like shape but takes
-value $0$ for input $0$ and takes values
-approaching $-1$ (for highly negative inputs)
-and approaching $1$ (for highly positive inputs).
+one time step at a time.
+The model here uses a $\tanh$ activation function (:numref:`subsec_tanh`).
 
 ```{.python .input}
 %%tab all
@@ -194,14 +190,14 @@ by a numerical index indicating the
 position in the vocabulary of the 
 corresponding word/character/word-piece.
 You might be tempted to build a neural network
-with a single input node (at each sequence step),
+with a single input node (at each time step),
 where the index could be fed in as a scalar value.
-This works when we're dealing with numerical inputs 
+This works when we are dealing with numerical inputs 
 like price or temperature, where any two values
 sufficiently close together
 should be treated similarly.
 But this doesn't quite make sense. 
-The $45^{th}$ and $46^{th}$ words 
+The $45^{\mathrm{th}}$ and $46^{\mathrm{th}}$ words 
 in our vocabulary happen to be "their" and "said",
 whose meanings are not remotely similar.
 
@@ -209,12 +205,12 @@ When dealing with such categorical data,
 the most common strategy is to represent
 each item by a *one-hot encoding*
 (recall from :numref:`subsec_classification-problem`).
-A one-encoding is a vector whose length
+A one-hot encoding is a vector whose length
 is given by the size of the vocabulary $N$,
 where all entries are set to $0$,
 except for the entry corresponding 
 to our token, which is set to $1$.
-For example, the the vocabulary had $5% elements,
+For example, if the vocabulary had 5 elements,
 then the one-hot vectors corresponding 
 to indices 0 and 2 would be the following.
 
@@ -234,7 +230,7 @@ tf.one_hot(tf.constant([0, 2]), 5)
 ```
 
 (**The minibatches that we sample at each iteration
-will take the shape (batch size, number of sequence steps).
+will take the shape (batch size, number of time steps).
 Once representing each input as a one-hot vector,
 we can think of each minibatch as a three-dimensional tensor, 
 where the length along the third axis 
@@ -292,19 +288,19 @@ d2l.check_shape(outputs, (batch_size, num_steps, num_inputs))
 ## [**Gradient Clipping**]
 
 
-While you're already used to thinking of neural networks
+While you are already used to thinking of neural networks
 as "deep" in the sense that many layers
 separate the input and output 
-even within a single sequence step,
+even within a single time step,
 the length of the sequence introduces
 a new notion of depth.
 In addition to the passing through the network
 in the input-to-output direction,
-inputs at the first time steps 
+inputs at the first time step
 must pass through a chain of $T$ layers
-along the sequence steps in order 
+along the time steps in order 
 to influence the output of the model
-at the final sequence step.
+at the final time step.
 Taking the backwards view, in each iteration,
 we backpropagate gradients through time,
 resulting in a chain of matrix-products 
@@ -318,7 +314,7 @@ Dealing with vanishing and exploding gradients
 is a fundamental problem when designing RNNs
 and has inspired some of the biggest advances
 in modern neural network architectures.
-In the next chapter, we'll talk about
+In the next chapter, we will talk about
 specialized architectures that were designed
 in hopes of mitigating the vanishing gradient problem.
 However, even modern RNNs still often suffer
@@ -348,11 +344,10 @@ meaning that for any $\mathbf{x}$ and $\mathbf{y}$, we have
 
 $$|f(\mathbf{x}) - f(\mathbf{y})| \leq L \|\mathbf{x} - \mathbf{y}\|.$$
 
-As you can see, when we update the parameter vector  
-by subtracting $\eta \mathbf{g}$,
+As you can see, when we update the parameter vector by subtracting $\eta \mathbf{g}$,
 the change in the value of the objective
 depends on the learning rate,
-the norm of the gradient and L as follows:
+the norm of the gradient and $L$ as follows:
 
 $$|f(\mathbf{x}) - f(\mathbf{x} - \eta\mathbf{g})| \leq L \eta\|\mathbf{g}\|.$$
 
@@ -362,14 +357,14 @@ Having a small value for this upper bound
 might be viewed as a good thing or a bad thing.
 On the downside, we are limiting the speed
 at which we can reduce the value of the objective.
-On the bright side, this limit just how much
+On the bright side, this limits just how much
 we can go wrong in any one gradient step.
 
 
 When we say that gradients explode, 
 we mean that $\|\mathbf{g}\|$ 
 becomes excessively large.
-In this worst cases, we might do so much
+In this worst case, we might do so much
 damage in a single gradient step that we
 could undo all of the progress made over
 the course of thousands of training iterations.
@@ -409,7 +404,9 @@ and is widely adopted in RNN implementations
 in most deep learning frameworks.
 
 
-Below we define a function to clip gradients.
+Below we define a method to clip gradients,
+which is invoked by the `fit_epoch` method of
+the `d2l.Trainer` class (see :numref:`sec_linear_scratch`).
 Note that when computing the gradient norm,
 we are concatenating all model parameters,
 treating them as a single giant parameter vector.
@@ -461,7 +458,7 @@ based on the RNN (`rnn`) implemented from scratch.
 Note that we first calculate the gradients,
 then clip them, and finally 
 update the model parameters
-using the clipped gradients. 
+using the clipped gradients.
 
 ```{.python .input}
 %%tab all
@@ -509,7 +506,7 @@ This is called the *warm-up* period.
 After ingesting the prefix, we are now
 ready to begin emitting the subsequent characters,
 each of which will be fed back into the model 
-as the input at the subsequent sequence step.
+as the input at the subsequent time step.
 
 ```{.python .input}
 %%tab all
@@ -554,18 +551,9 @@ by relying on highly optimized library functions.
 
 ## Summary
 
-* We can train RNN-based language models to generate text 
-  following the user-provided text prefix.
-* A simple RNN language model consists of input encoding, 
-  RNN modeling, and output generation.
-* We implemented a simple RNN language model and trained 
-  it on sequences of text, tokenized at the character level.
-* Gradient clipping can mitigate the problem
-  of exploding gradients but does not address
-  the problem of vanishing gradients.
-* By conditioning on a prefix, we can use a language model
-  to generate likely continuations, which proves useful
-  in many applications, e.g., autocomplete features.
+We can train RNN-based language models to generate text following the user-provided text prefix. 
+A simple RNN language model consists of input encoding, RNN modeling, and output generation.
+During training, gradient clipping can mitigate the problem of exploding gradients but does not address the problem of vanishing gradients. In the experiment, we implemented a simple RNN language model and trained it with gradient clipping on sequences of text, tokenized at the character level. By conditioning on a prefix, we can use a language model to generate likely continuations, which proves useful in many applications, e.g., autocomplete features.
 
 
 ## Exercises
@@ -577,7 +565,7 @@ by relying on highly optimized library functions.
 1. Replace one-hot encoding with learnable embeddings. Does this lead to better performance?
 1. Conduct an experiment to determine how well this language model 
    trained on *The Time Machine* works on other books by H. G. Wells,
-   e.g., [*The War of the Worlds*](http://www.gutenberg.org/ebooks/36).
+   e.g., [The War of the Worlds](http://www.gutenberg.org/ebooks/36).
 1. Conduct another experiment to evaluate the perplexity of this model
    on books written by other authors. 
 1. Modify the prediction function such as to use sampling 
