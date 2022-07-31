@@ -436,7 +436,7 @@ class BatchNorm(tf.keras.layers.Layer):
 
     def assign_moving_average(self, variable, value):
         momentum = 0.1
-        delta = variable * momentum + value * (1 - momentum)
+        delta = (1 - momentum) * variable + value * momentum
         return variable.assign(delta)
 
     @tf.function
