@@ -21,7 +21,7 @@ Choices regarding data preprocessing often make an enormous difference in the fi
 Recall our application of MLPs to predicting house prices (:numref:`sec_kaggle_house`).
 Our first step when working with real data
 was to standardize our input features to have
-zero mean $\mathbf{\mu} = 0$ and unit variance $\mathbf{\Sigma} = \mathbf{1}$ across multiple observations :cite:`friedman1987exploratory`.
+zero mean $\boldsymbol{\mu} = 0$ and unit variance $\boldsymbol{\Sigma} = \mathbf{1}$ across multiple observations :cite:`friedman1987exploratory`.
 At a mimimum, one frequently rescales it such that the diagonal is unity, i.e., $\Sigma_{ii} = 1$.
 Yet another strategy is to rescale vectors to unit length, possibly zero mean *per observation*.
 This can work well, e.g., for spatial sensor data. These preprocessing techniques and many more are
