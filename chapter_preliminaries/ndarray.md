@@ -6,32 +6,12 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Data Manipulation
 :label:`sec_ndarray`
 
-In order to get anything done,
-we need some way to store and manipulate data.
-Generally, there are two important things
-we need to do with data:
-(i) acquire them;
-and (ii) process them once they are inside the computer.
-There is no point in acquiring data
-without some way to store it,
-so to start, let's get our hands dirty
-with $n$-dimensional arrays,
-which we also call *tensors*.
-If you already know the NumPy
-scientific computing package,
-this will be a breeze.
-For all modern deep learning frameworks,
-the *tensor class* (`ndarray` in MXNet,
-`Tensor` in PyTorch and TensorFlow)
-resembles NumPy's `ndarray`,
-with a few killer features added.
-First, the tensor class
-supports automatic differentiation.
-Second, it leverages GPUs
-to accelerate numerical computation,
-whereas NumPy only runs on CPUs.
-These properties make neural networks
-both easy to code and fast to run.
+The photorealistic text-to-image examples in :numref:`fig_imagen` suggest that the T5 encoder alone may effectively represent text even without fine-tuning.
+
+![Text-to-image examples by the Imagen model, whose text encoder is from T5 (figures taken from :citet:`saharia2022photorealistic`).](../img/imagen.png)
+:width:`700px`
+:label:`fig_imagen`
+
 
 
 
