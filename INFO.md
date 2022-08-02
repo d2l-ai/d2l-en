@@ -3,11 +3,11 @@
 ## Installation for Developers
 
 ```
-wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh  # For py3.9, wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
-sh Miniconda3-py38_4.12.0-Linux-x86_64.sh -b  # For py3.9: sh Miniconda3-py39_4.12.0-Linux-x86_64.sh -b
+wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh  # For py3.8, wget  https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
+sh Miniconda3-py39_4.12.0-Linux-x86_64.sh -b  # For py3.8: sh Miniconda3-py38_4.12.0-Linux-x86_64.sh -b
 ~/miniconda3/bin/conda init
 . ~/.bashrc
-conda create --name d2l python=3.8 -y  # For py3.9: conda create --name d2l python=3.9 -y
+conda create --name d2l python=3.9 -y  # For py3.8: conda create --name d2l python=3.8 -y
 conda activate d2l
 pip install torch torchvision
 pip install d2l==1.0.0a0
