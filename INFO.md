@@ -36,7 +36,8 @@ sudo apt-get install librsvg2-bin
 sudo apt-get install pandoc  # If not working, conda install pandoc
 
 # To import d2l
-python setup.py develop
+cd d2l-en
+pip install -e . 
 
 # Build PDF
 d2lbook build pdf
@@ -53,7 +54,7 @@ sudo bash install_fonts.sh
 ## Building HTML
 
 ```
-d2lbook build html
+bash static/build_html.sh
 ```
 
 ## Install Fonts
