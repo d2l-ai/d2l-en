@@ -19,6 +19,15 @@ cd d2l-en
 jupyter notebook
 ```
 
+Optional: using `jupyter_contrib_nbextensions`
+
+```
+pip install jupyter_contrib_nbextensions 
+jupyter contrib nbextension install --user 
+# jupyter nbextension enable execute_time/ExecuteTime
+```
+
+
 
 ## Building without Evaluation
 
