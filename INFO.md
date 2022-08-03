@@ -11,11 +11,10 @@ conda create --name d2l python=3.9 -y  # For py3.8: conda create --name d2l pyth
 conda activate d2l
 pip install torch torchvision
 pip install d2l==1.0.0a0
+pip install d2lbook
 git clone https://github.com/d2l-ai/d2l-en.git
-pip install mu-notedown
 jupyter notebook --generate-config
 # Add c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager' to the bottom of ~/.jupyter/jupyter_notebook_config.py
-pip install d2lbook
 cd d2l-en
 jupyter notebook
 ```
