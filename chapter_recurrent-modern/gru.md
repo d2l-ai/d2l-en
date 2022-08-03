@@ -234,7 +234,7 @@ Its structure is the same as that of the basic RNN cell, except that the update 
 @d2l.add_to_class(GRUScratch)
 def forward(self, inputs, H=None):
     outputs = []
-    if H is None: H = torch.zeros(inputs.shape[1], self.num_hiddens)
+    if H is None: H = torch.zeros(inputs.shape[1], self.num_hiddens, device=inputs.device)
     for X in inputs:
         Z = torch.sigmoid(torch.matmul(X, self.W_xz) +
                         torch.matmul(H, self.W_hz) + self.b_z)
