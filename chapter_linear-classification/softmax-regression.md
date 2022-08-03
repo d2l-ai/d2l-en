@@ -62,8 +62,8 @@ but not the topics of medicine or sports.
 Thus, categorizing it into one of the above categories
 on their own would not be very useful.
 This problem is commonly known as [multi-label classification](https://en.wikipedia.org/wiki/Multi-label_classification).
-See :cite:`Tsoumakas.Katakis.2007` for an overview
-and :cite:`Huang.Xu.Yu.2015`
+See :citet:`Tsoumakas.Katakis.2007` for an overview
+and :citet:`Huang.Xu.Yu.2015`
 for an effective algorithm when tagging images.
 
 ## Classification
@@ -90,9 +90,9 @@ $\{\text{baby}, \text{toddler}, \text{adolescent}, \text{young adult}, \text{adu
 then it might even make sense to cast this as
 an [ordinal regression](https://en.wikipedia.org/wiki/Ordinal_regression) problem
 and keep the labels in this format.
-See :cite:`Moon.Smola.Chang.ea.2010` for an overview
+See :citet:`Moon.Smola.Chang.ea.2010` for an overview
 of different types of ranking loss functions
-and :cite:`Beutel.Murray.Faloutsos.ea.2014` for a Bayesian approach
+and :citet:`Beutel.Murray.Faloutsos.ea.2014` for a Bayesian approach
 that addresses responses with more than one mode.
 
 In general, classification problems do not come
@@ -278,7 +278,7 @@ for the mean squared error loss in
 The softmax function gives us a vector $\hat{\mathbf{y}}$,
 which we can interpret as (estimated) conditional probabilities
 of each class, given any input $\mathbf{x}$,
-such as $\hat{y}_1$ = $P(y=\text{cat} | \mathbf{x})$.
+such as $\hat{y}_1$ = $P(y=\text{cat} \mid \mathbf{x})$.
 In the following we assume that for a dataset
 with features $\mathbf{X}$ the labels $\mathbf{Y}$
 are represented using a one-hot encoding label vector.
@@ -287,18 +287,18 @@ by checking how probable the actual classes are
 according to our model, given the features:
 
 $$
-P(\mathbf{Y} | \mathbf{X}) = \prod_{i=1}^n P(\mathbf{y}^{(i)} | \mathbf{x}^{(i)}).
+P(\mathbf{Y} \mid \mathbf{X}) = \prod_{i=1}^n P(\mathbf{y}^{(i)} \mid \mathbf{x}^{(i)}).
 $$
 
 We are allowed to use the factorization
 since we assume that each label is drawn independently
-from its respective distribution $P(\mathbf{y}|\mathbf{x}^{(i)})$.
+from its respective distribution $P(\mathbf{y}\mid\mathbf{x}^{(i)})$.
 Since maximizing the product of terms is awkward,
 we take the negative logarithm to obtain the equivalent problem
 of minimizing the negative log-likelihood:
 
 $$
--\log P(\mathbf{Y} | \mathbf{X}) = \sum_{i=1}^n -\log P(\mathbf{y}^{(i)} | \mathbf{x}^{(i)})
+-\log P(\mathbf{Y} \mid \mathbf{X}) = \sum_{i=1}^n -\log P(\mathbf{y}^{(i)} \mid \mathbf{x}^{(i)})
 = \sum_{i=1}^n l(\mathbf{y}^{(i)}, \hat{\mathbf{y}}^{(i)}),
 $$
 
@@ -387,7 +387,7 @@ We can demystify the name by introducing just the basics of information theory.
 In a nutshell, it measures the number of bits to encode what we see $\mathbf{y}$
 relative to what we predict that should happen $\hat{\mathbf{y}}$.
 We provide a very basic explanation in the following. For further
-details on information theory see 
+details on information theory see
 :cite:`Cover.Thomas.1999` or :cite:`mackay2003information`.
 
 

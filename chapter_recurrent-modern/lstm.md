@@ -162,12 +162,12 @@ class LSTMScratch(d2l.Module):  #@save
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        
+
         if tab.selected('mxnet'):
             init_weight = lambda *shape: d2l.randn(*shape) * sigma
             triple = lambda: (init_weight(num_inputs, num_hiddens),
                               init_weight(num_hiddens, num_hiddens),
-                              d2l.zeros(num_hiddens))            
+                              d2l.zeros(num_hiddens))
         if tab.selected('pytorch'):
             init_weight = lambda *shape: nn.Parameter(d2l.randn(*shape) * sigma)
             triple = lambda: (init_weight(num_inputs, num_hiddens),
@@ -177,12 +177,12 @@ class LSTMScratch(d2l.Module):  #@save
             init_weight = lambda *shape: tf.Variable(d2l.normal(shape) * sigma)
             triple = lambda: (init_weight(num_inputs, num_hiddens),
                               init_weight(num_hiddens, num_hiddens),
-                              tf.Variable(d2l.zeros(num_hiddens)))            
+                              tf.Variable(d2l.zeros(num_hiddens)))
 
-        self.W_xi, self.W_hi, self.b_i = triple()  # Input gate 
-        self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate 
-        self.W_xo, self.W_ho, self.b_o = triple()  # Output gate 
-        self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell 
+        self.W_xi, self.W_hi, self.b_i = triple()  # Input gate
+        self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
+        self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
+        self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell
 ```
 
 [**The actual model**] is defined just like what we discussed before: providing three gates and an auxiliary memory cell. Note that only the hidden state is passed to the output layer. The memory cell $\mathbf{C}_t$ does not directly participate in the output computation.
@@ -198,13 +198,13 @@ def forward(self, inputs, H_C=None):
             d2l.matmul(H, self.W_hi) if H is not None else 0) + self.b_i)
         if H is None:
             H, C = d2l.zeros_like(I), d2l.zeros_like(I)
-        F = d2l.sigmoid(d2l.matmul(X, self.W_xf) + 
+        F = d2l.sigmoid(d2l.matmul(X, self.W_xf) +
                         d2l.matmul(H, self.W_hf) + self.b_f)
-        O = d2l.sigmoid(d2l.matmul(X, self.W_xo) + 
+        O = d2l.sigmoid(d2l.matmul(X, self.W_xo) +
                         d2l.matmul(H, self.W_ho) + self.b_o)
-        C_tilda = d2l.tanh(d2l.matmul(X, self.W_xc) + 
+        C_tilde = d2l.tanh(d2l.matmul(X, self.W_xc) +
                            d2l.matmul(H, self.W_hc) + self.b_c)
-        C = F * C + I * C_tilda
+        C = F * C + I * C_tilde
         H = O * d2l.tanh(C)
         outputs.append(H)
     return outputs, (H, C)
@@ -240,13 +240,13 @@ This encapsulates all the configuration details that we made explicit above. The
 class LSTM(d2l.RNN):
     def __init__(self, num_hiddens):
         d2l.Module.__init__(self)
-        self.save_hyperparameters()        
-        self.rnn = rnn.LSTM(num_hiddens)    
-            
+        self.save_hyperparameters()
+        self.rnn = rnn.LSTM(num_hiddens)
+
     def forward(self, inputs, H_C=None):
         if H_C is None: H_C = self.rnn.begin_state(
             inputs.shape[1], ctx=inputs.ctx)
-        return self.rnn(inputs, H_C)    
+        return self.rnn(inputs, H_C)
 ```
 
 ```{.python .input}
@@ -254,11 +254,11 @@ class LSTM(d2l.RNN):
 class LSTM(d2l.RNN):
     def __init__(self, num_inputs, num_hiddens):
         d2l.Module.__init__(self)
-        self.save_hyperparameters()        
-        self.rnn = nn.LSTM(num_inputs, num_hiddens)        
-            
+        self.save_hyperparameters()
+        self.rnn = nn.LSTM(num_inputs, num_hiddens)
+
     def forward(self, inputs, H_C=None):
-        return self.rnn(inputs, H_C)        
+        return self.rnn(inputs, H_C)
 ```
 
 ```{.python .input}
@@ -266,11 +266,11 @@ class LSTM(d2l.RNN):
 class LSTM(d2l.RNN):
     def __init__(self, num_hiddens):
         d2l.Module.__init__(self)
-        self.save_hyperparameters()        
+        self.save_hyperparameters()
         self.rnn = tf.keras.layers.LSTM(
-                num_hiddens, return_sequences=True, 
+                num_hiddens, return_sequences=True,
                 return_state=True, time_major=True)
-            
+
     def forward(self, inputs, H_C=None):
         outputs, *H_C = self.rnn(inputs, H_C)
         return outputs, H_C

@@ -26,7 +26,7 @@ we might try finding it by solving the following optimization problem:
 $$f^*_\mathcal{F} \stackrel{\mathrm{def}}{=} \mathop{\mathrm{argmin}}_f L(\mathbf{X}, \mathbf{y}, f) \text{ subject to } f \in \mathcal{F}.$$
 
 We know that regularization :cite:`tikhonov1977solutions,morozov2012methods` may control complexity of $\mathcal{F}$
-and achieve consistency, so a larger size of training data 
+and achieve consistency, so a larger size of training data
 generally leads to better $f^*_\mathcal{F}$.
 It is only reasonable to assume that if we design a different and more powerful architecture $\mathcal{F}'$ we should arrive at a better outcome. In other words, we would expect that $f^*_{\mathcal{F}'}$ is "better" than $f^*_{\mathcal{F}}$. However, if $\mathcal{F} \not\subseteq \mathcal{F}'$ there is no guarantee that this should even happen. In fact, $f^*_{\mathcal{F}'}$ might well be worse.
 As illustrated by :numref:`fig_functionclasses`,
@@ -140,11 +140,11 @@ class Residual(nn.Module):  #@save
     """The Residual block of ResNet."""
     def __init__(self, num_channels, use_1x1conv=False, strides=1):
         super().__init__()
-        self.conv1 = nn.LazyConv2d(num_channels, kernel_size=3, padding=1, 
+        self.conv1 = nn.LazyConv2d(num_channels, kernel_size=3, padding=1,
                                    stride=strides)
         self.conv2 = nn.LazyConv2d(num_channels, kernel_size=3, padding=1)
         if use_1x1conv:
-            self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1, 
+            self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1,
                                        stride=strides)
         else:
             self.conv3 = None
@@ -384,7 +384,7 @@ with d2l.try_gpu():
 ## ResNeXt
 :label:`subsec_resnext`
 
-Recall :numref:`fig_resnet_block` 
+Recall :numref:`fig_resnet_block`
 that each ResNet block simply stacks layers between residual connections.
 This design can be varied
 by replacing stacked layers with
@@ -480,7 +480,7 @@ class ResNeXtBlock(nn.Block):  #@save
 %%tab pytorch
 class ResNeXtBlock(nn.Module):  #@save
     """The ResNeXt block."""
-    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False, 
+    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False,
                  strides=1):
         super().__init__()
         bot_channels = int(round(num_channels * bot_mul))
@@ -495,7 +495,7 @@ class ResNeXtBlock(nn.Module):  #@save
         self.bn2 = nn.LazyBatchNorm2d()
         self.bn3 = nn.LazyBatchNorm2d()
         if use_1x1conv:
-            self.conv4 = nn.LazyConv2d(num_channels, kernel_size=1, 
+            self.conv4 = nn.LazyConv2d(num_channels, kernel_size=1,
                                        stride=strides)
             self.bn4 = nn.LazyBatchNorm2d()
         else:
@@ -513,8 +513,8 @@ class ResNeXtBlock(nn.Module):  #@save
 ```{.python .input}
 %%tab tensorflow
 class ResNeXtBlock(tf.keras.Model):  #@save
-    """The ResNeXt block.""" 
-    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False, 
+    """The ResNeXt block."""
+    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False,
                  strides=1):
         super().__init__()
         bot_channels = int(round(num_channels * bot_mul))
@@ -527,12 +527,12 @@ class ResNeXtBlock(tf.keras.Model):  #@save
         self.bn2 = tf.keras.layers.BatchNormalization()
         self.bn3 = tf.keras.layers.BatchNormalization()
         if use_1x1conv:
-            self.conv4 = tf.keras.layers.Conv2D(num_channels, 1, 
+            self.conv4 = tf.keras.layers.Conv2D(num_channels, 1,
                                        strides=strides)
             self.bn4 = tf.keras.layers.BatchNormalization()
         else:
             self.conv4 = None
-        
+
     def call(self, X):
         Y = tf.keras.activations.relu(self.bn1(self.conv1(X)))
         Y = tf.keras.activations.relu(self.bn2(self.conv2(Y)))
@@ -595,7 +595,7 @@ Residual connections had a major influence on the design of subsequent deep neur
 As we will introduce later,
 the transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017`
 adopts residual connections (together with other design choices) and is pervasive
-in areas as diverse as 
+in areas as diverse as
 language, vision, speech, and reinforcement learning.
 A key advantage of the ResNeXt design
 is that increasing groups
@@ -624,7 +624,7 @@ We will apply the ResNeXt block later in this chapter.
 1. In subsequent versions of ResNet, the authors changed the "convolution, batch
    normalization, and activation" structure to the "batch normalization,
    activation, and convolution" structure. Make this improvement
-   yourself. See Figure 1 in :cite:`He.Zhang.Ren.ea.2016*1`
+   yourself. See Figure 1 in :citet:`He.Zhang.Ren.ea.2016*1`
    for details.
 1. Why can't we just increase the complexity of functions without bound, even if the function classes are nested?
 

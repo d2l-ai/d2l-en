@@ -1,5 +1,25 @@
 # Building
 
+## Installation for Developers
+
+```
+wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh  # For py3.8, wget  https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
+sh Miniconda3-py39_4.12.0-Linux-x86_64.sh -b  # For py3.8: sh Miniconda3-py38_4.12.0-Linux-x86_64.sh -b
+~/miniconda3/bin/conda init
+. ~/.bashrc
+conda create --name d2l python=3.9 -y  # For py3.8: conda create --name d2l python=3.8 -y
+conda activate d2l
+pip install torch torchvision
+pip install d2l==1.0.0a0
+pip install d2lbook
+git clone https://github.com/d2l-ai/d2l-en.git
+jupyter notebook --generate-config
+# Add c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager' to the bottom of ~/.jupyter/jupyter_notebook_config.py
+cd d2l-en
+jupyter notebook
+```
+
+
 ## Building without Evaluation
 
 Change `eval_notebook = True` to `eval_notebook = False` in `config.ini`.

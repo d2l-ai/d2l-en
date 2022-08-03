@@ -8,7 +8,7 @@ and can selectively execute multiple non-interdependent tasks in parallel to
 improve speed. For instance, :numref:`fig_asyncgraph` in :numref:`sec_async` initializes two variables independently. Consequently the system can choose to execute them in parallel.
 
 
-Typically, a single operator will use all the computational resources on all CPUs or on a single GPU. For example, the `dot` operator will use all cores (and threads) on all CPUs, even if there are multiple CPU processors on a single machine. The same applies to a single GPU. Hence parallelization is not quite so useful for single-device computers. With multiple devices things matter more. While parallelization is typically most relevant between multiple GPUs, adding the local CPU will increase performance slightly. For example, see :cite:`Hadjis.Zhang.Mitliagkas.ea.2016` that focuses on training computer vision models combining a GPU and a CPU. With the convenience of an automatically parallelizing framework we can accomplish the same goal in a few lines of Python code. More broadly, our discussion of automatic parallel computation focuses on parallel computation using both CPUs and GPUs, as well as the parallelization of computation and communication.
+Typically, a single operator will use all the computational resources on all CPUs or on a single GPU. For example, the `dot` operator will use all cores (and threads) on all CPUs, even if there are multiple CPU processors on a single machine. The same applies to a single GPU. Hence parallelization is not quite so useful for single-device computers. With multiple devices things matter more. While parallelization is typically most relevant between multiple GPUs, adding the local CPU will increase performance slightly. For example, see :citet:`Hadjis.Zhang.Mitliagkas.ea.2016` that focuses on training computer vision models combining a GPU and a CPU. With the convenience of an automatically parallelizing framework we can accomplish the same goal in a few lines of Python code. More broadly, our discussion of automatic parallel computation focuses on parallel computation using both CPUs and GPUs, as well as the parallelization of computation and communication.
 
 Note that we need at least two GPUs to run the experiments in this section.
 
@@ -61,7 +61,7 @@ Now we apply the function to the data. To ensure that caching does not play a ro
 #@tab mxnet
 run(x_gpu1)  # Warm-up both devices
 run(x_gpu2)
-npx.waitall()  
+npx.waitall()
 
 with d2l.Benchmark('GPU1 time'):
     run(x_gpu1)
@@ -118,7 +118,7 @@ In the above case the total execution time is less than the sum of its parts, si
 
 ## Parallel Computation and Communication
 
-In many cases we need to move data between different devices, say between the CPU and GPU, or between different GPUs. 
+In many cases we need to move data between different devices, say between the CPU and GPU, or between different GPUs.
 For instance,
 this occurs when we want to perform distributed optimization where we need to aggregate the gradients over multiple accelerator cards. Let's simulate this by computing on the GPU and then copying the results back to the CPU.
 
@@ -185,16 +185,16 @@ We conclude with an illustration of the computational graph and its dependencies
 
 ## Summary
 
-* Modern systems have a variety of devices, such as multiple GPUs and CPUs. They can be used in parallel, asynchronously. 
-* Modern systems also have a variety of resources for communication, such as PCI Express, storage (typically solid-state drives or via networks), and network bandwidth. They can be used in parallel for peak efficiency. 
-* The backend can improve performance through automatic parallel computation and communication. 
+* Modern systems have a variety of devices, such as multiple GPUs and CPUs. They can be used in parallel, asynchronously.
+* Modern systems also have a variety of resources for communication, such as PCI Express, storage (typically solid-state drives or via networks), and network bandwidth. They can be used in parallel for peak efficiency.
+* The backend can improve performance through automatic parallel computation and communication.
 
 ## Exercises
 
 1. Eight operations were performed in the `run` function defined in this section. There are no dependencies between them. Design an experiment to see if the deep learning framework will automatically execute them in parallel.
-1. When the workload of an individual operator is sufficiently small, parallelization can help even on a single CPU or GPU. Design an experiment to verify this. 
+1. When the workload of an individual operator is sufficiently small, parallelization can help even on a single CPU or GPU. Design an experiment to verify this.
 1. Design an experiment that uses parallel computation on CPUs, GPUs, and communication between both devices.
-1. Use a debugger such as NVIDIA's [Nsight](https://developer.nvidia.com/nsight-compute-2019_5) to verify that your code is efficient. 
+1. Use a debugger such as NVIDIA's [Nsight](https://developer.nvidia.com/nsight-compute-2019_5) to verify that your code is efficient.
 1. Designing computation tasks that include more complex data dependencies, and run experiments to see if you can obtain the correct results while improving performance.
 
 :begin_tab:`mxnet`

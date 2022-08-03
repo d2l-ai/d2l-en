@@ -94,13 +94,13 @@ The first modern CNN :cite:`Krizhevsky.Sutskever.Hinton.2012`, named
 *AlexNet* after one of its inventors, Alex Krizhevsky, is largely an evolutionary improvement
 over LeNet. It achieved excellent performance in the 2012 ImageNet challenge.
 
-![Image filters learned by the first layer of AlexNet (reproduced from :cite:`Krizhevsky.Sutskever.Hinton.2012`).](../img/filters.png)
+![Image filters learned by the first layer of AlexNet (reproduced from :citet:`Krizhevsky.Sutskever.Hinton.2012`).](../img/filters.png)
 :width:`400px`
 :label:`fig_filters`
 
 Interestingly in the lowest layers of the network,
 the model learned feature extractors that resembled some traditional filters.
-:numref:`fig_filters` 
+:numref:`fig_filters`
 shows lower-level image descriptors.
 Higher layers in the network might build upon these representations
 to represent larger structures, like eyes, noses, blades of grass, and so on.
