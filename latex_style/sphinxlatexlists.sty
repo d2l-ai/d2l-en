@@ -8,6 +8,8 @@
 
 % Dependencies: the \spx@opt@maxlistdepth from sphinx.sty
 
+% Customization begins
+% Disable the last argument to resolve a bug in exercise.
 \newcommand\sphinxsetlistlabels[5]
 {% #1 = style, #2 = enum, #3 = enumnext, #4 = prefix, #5 = suffix
  % #2 and #3 are counters used by enumerate environment e.g. enumi, enumii.
@@ -17,7 +19,7 @@
  \@namedef{label#2}{#4\@nameuse{the#2}}%
  \@namedef{p@#3}{\@nameuse{p@#2}#4\@nameuse{the#2}}%
 }%
-
+% Customization ends
 
 %% MAXLISTDEPTH
 %
