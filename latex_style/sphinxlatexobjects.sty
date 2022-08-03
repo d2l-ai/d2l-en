@@ -1,7 +1,7 @@
 %% MODULE RELEASE DATA AND OBJECT DESCRIPTIONS
 %
 % change this info string if making any custom modification
-\ProvidesFile{sphinxlatexobjects.sty}[2021/12/05 documentation environments]
+\ProvidesFile{sphinxlatexobjects.sty}[2022/01/13 documentation environments]
 
 % Provides support for this output mark-up from Sphinx latex writer:
 %
@@ -29,7 +29,12 @@
 % release to specify the release that is documented.
 %
 \newcommand{\py@release}{\releasename\space\version}
+
+% Customization begins
+% We need to remove this definition to avoid conflicts with PT1
 %\newcommand{\version}{}% part of \py@release, used by title page and headers
+% Customization ends
+
 % \releaseinfo is used on titlepage (sphinxmanual.cls, sphinxhowto.cls)
 \newcommand{\releaseinfo}{}
 \newcommand{\setreleaseinfo}[1]{\renewcommand{\releaseinfo}{#1}}
@@ -77,56 +82,90 @@
 
 % Signatures, possibly multi-line
 %
+% For legacy reasons Sphinx uses LaTeX \list and \item's for signatures
+% This is delicate:
+% - the actual item label is not typeset immediately by \item but later as part
+% of the \everypar which will be triggered by either next paragraph or a manual
+% \leavevmode, or if nothing in-between by the next \item,
+% - \begingroup <set-up>\item[foo] <setup>\endgroup leads to errors,
+% - vertical space depends on \parskip and \itemsep values in somewhat
+% subtle manners.
+%
+% Since the 2022/01/13 version things are simpler as \parskip is simply set
+% to zero during execution of \pysigline/\pysiglinewithargsret
+%
+% Parameter for separation via \itemsep of multiple signatures with common desc
+\newlength\sphinxsignaturesep
+\setlength\sphinxsignaturesep{\smallskipamount}
+% latex.py outputs mark-up like this:
+% \pysigstartsignatures <signatures> \pysigstopsignatures <actual desc>
+\newcommand{\pysigstartsignatures}{%
+   % store current \parskip and \itemsep
+   \edef\pysig@restore@itemsep@and@parskip{%
+       \itemsep\the\itemsep\relax
+       \parskip\the\parskip\relax
+   }%
+   % set them to control the spacing between signatures sharing common desc
+   \parskip\z@skip
+   \itemsep\sphinxsignaturesep
+}
+\newcommand{\pysigstopsignatures}{%
+% 1) encourage a pagebreak in an attempt to try to avoid last
+% signature ending up separated from description (due to voodoo next)
+\penalty-100
+% 2) some voodoo to separate last signature from description in a manner
+% robust with respect to the latter being itself a LaTeX list object
+\leavevmode\par\kern-\baselineskip\item[\strut]
+%
+   \leavevmode
+   % it is important \leavevmode was issued before the \parskip reset, and
+   % it is also needed for the case of an object desc itself a LaTeX \list
+   % now restore \itemsep and \parskip
+   \pysig@restore@itemsep@and@parskip
+}
+%
+% Use a \parbox to accomodate long argument list in signatures
+% LaTeX did not imagine that an \item label could need multi-line rendering
 \newlength{\py@argswidth}
 \newcommand{\py@sigparams}[2]{%
-  % The \py@argswidth has been computed in \pysiglinewithargsret to make this
-  % occupy full available width on line.
+  % The \py@argswidth has been computed in \pysiglinewithargsret to make the
+  % argument list use full available width
   \parbox[t]{\py@argswidth}{\raggedright #1\sphinxcode{)}#2\strut}%
-  % final strut is to help get correct vertical separation in case of multi-line
-  % box with the item contents. 
+  % final strut is to help get correct vertical separation
 }
 \newcommand{\pysigline}[1]{%
-% the \py@argswidth is available we use it despite its name (no "args" here)
-% the \relax\relax is because \py@argswidth is a "skip" variable and the first
-% \relax only ends its "dimen" part
+  % as \py@argswidth is available, we use it but no "args" here
+  % the \relax\relax is because \py@argswidth is a "skip" variable
+  % this will make the label occupy the full available linewidth
   \py@argswidth=\dimexpr\linewidth+\labelwidth\relax\relax
   \item[{\parbox[t]{\py@argswidth}{\raggedright #1\strut}}]
-  \futurelet\sphinx@token\pysigline@preparevspace@i
+  \pysigadjustitemsep
 }
 \newcommand{\pysiglinewithargsret}[3]{%
+  % as #1 may contain a footnote using \label we need to make \label
+  % a no-op here to avoid LaTeX complaining about duplicates
+\let\spx@label\label\let\label\@gobble
   \settowidth{\py@argswidth}{#1\sphinxcode{(}}%
+\let\label\spx@label
   \py@argswidth=\dimexpr\linewidth+\labelwidth-\py@argswidth\relax\relax
   \item[{#1\sphinxcode{(}\py@sigparams{#2}{#3}\strut}]
-  \futurelet\sphinx@token\pysigline@preparevspace@i
+  \pysigadjustitemsep
 }
-\def\pysigline@preparevspace@i{%
-  \ifx\sphinx@token\@sptoken
-   \expandafter\pysigline@preparevspace@again
-   \else\expandafter\pysigline@preparevspace@ii
-  \fi
-}
-\@firstofone{\def\pysigline@preparevspace@again} {\futurelet\sphinx@token\pysigline@preparevspace@i}
-\long\def\pysigline@preparevspace@ii#1{%
-  \ifx\sphinx@token\bgroup\expandafter\@firstoftwo
+\newcommand{\pysigadjustitemsep}{%
+  % adjust \itemsep to control the separation with the next signature
+  % sharing common description
+  \ifsphinxsigismultiline
+  % inside a multiline signature, no extra vertical spacing
+  % ("multiline" here does not refer to possibly long
+  %  list of arguments, but to a cpp domain feature)
+      \itemsep\z@skip
   \else
-    \ifx\sphinx@token\phantomsection
-    \else
-% this strange incantation is because at its root LaTeX in fact did not
-% imagine a multi-line label, it is always wrapped in a horizontal box at core
-% LaTeX level and we have to find tricks to get correct interline distances.
-% It interacts badly with a follow-up \phantomsection hence the test above
-    \leavevmode\par\nobreak\vskip-\parskip\prevdepth\dp\strutbox
-    \fi
-    \expandafter\@secondoftwo
+      \itemsep\sphinxsignaturesep
   \fi
-  {{#1}}{#1}%
 }
-\newcommand{\pysigstartmultiline}{%
- \def\pysigstartmultiline{\vskip\smallskipamount\parskip\z@skip\itemsep\z@skip}%
- \edef\pysigstopmultiline
-     {\noexpand\leavevmode\parskip\the\parskip\relax\itemsep\the\itemsep\relax}%
- \parskip\z@skip\itemsep\z@skip
-}
+\newif\ifsphinxsigismultiline
+\newcommand{\pysigstartmultiline}{\sphinxsigismultilinetrue}%
+\newcommand{\pysigstopmultiline}{\sphinxsigismultilinefalse\itemsep\sphinxsignaturesep}%
 
 % Production lists
 %
