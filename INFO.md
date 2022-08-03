@@ -22,8 +22,8 @@ jupyter notebook
 Optional: using `jupyter_contrib_nbextensions`
 
 ```
-pip install jupyter_contrib_nbextensions 
-jupyter contrib nbextension install --user 
+pip install jupyter_contrib_nbextensions
+jupyter contrib nbextension install --user
 # jupyter nbextension enable execute_time/ExecuteTime
 ```
 
@@ -46,7 +46,7 @@ sudo apt-get install pandoc  # If not working, conda install pandoc
 
 # To import d2l
 cd d2l-en
-pip install -e . 
+pip install -e .
 
 # Build PDF
 d2lbook build pdf

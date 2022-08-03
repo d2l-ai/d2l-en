@@ -73,11 +73,11 @@ When a notebook contains more cells, we can click "Kernel" $\rightarrow$ "Restar
 
 ## Advanced Options
 
-Beyond local editing two things are quite important: editing the notebooks in the markdown format and running Jupyter remotely. 
-The latter matters when we want to run the code on a faster server. 
-The former matters since Jupyter's native ipynb format stores a lot of auxiliary data that is 
+Beyond local editing two things are quite important: editing the notebooks in the markdown format and running Jupyter remotely.
+The latter matters when we want to run the code on a faster server.
+The former matters since Jupyter's native ipynb format stores a lot of auxiliary data that is
 irrelevant to the content,
-mostly related to how and where the code is run. 
+mostly related to how and where the code is run.
 This is confusing for Git, making
 reviewing contributions very difficult.
 Fortunately there is an alternative---native editing in the markdown format.
@@ -93,7 +93,7 @@ can modify notebooks in the md format directly in Jupyter.
 First, install the notedown plugin, run the Jupyter Notebook, and load the plugin:
 
 ```
-pip install mu-notedown  # You may need to uninstall the original notedown.
+pip install d2l-notedown  # You may need to uninstall the original notedown.
 jupyter notebook --NotebookApp.contents_manager_class='notedown.NotedownContentsManager'
 ```
 
