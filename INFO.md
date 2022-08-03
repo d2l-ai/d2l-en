@@ -14,7 +14,7 @@ pip install d2l==1.0.0a0
 pip install d2lbook
 git clone https://github.com/d2l-ai/d2l-en.git
 jupyter notebook --generate-config
-# Add c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager' to the bottom of ~/.jupyter/jupyter_notebook_config.py
+echo "c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager'" >> ~/.jupyter/jupyter_notebook_config.py
 cd d2l-en
 jupyter notebook
 ```
