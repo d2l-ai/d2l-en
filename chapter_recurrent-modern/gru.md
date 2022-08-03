@@ -230,20 +230,21 @@ Now we are ready to [**define the GRU forward computation**].
 Its structure is the same as that of the basic RNN cell, except that the update equations are more complex.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch
 @d2l.add_to_class(GRUScratch)
 def forward(self, inputs, H=None):
-    matmul_H = lambda A, B: d2l.matmul(A, B) if H is not None else 0
     outputs = []
+    if H is None: H = torch.zeros(inputs.shape[1], self.num_hiddens, device=inputs.device)
     for X in inputs:
-        Z = d2l.sigmoid(d2l.matmul(X, self.W_xz) + (
-            d2l.matmul(H, self.W_hz) if H is not None else 0) + self.b_z)
-        if H is None: H = d2l.zeros_like(Z)
-        R = d2l.sigmoid(d2l.matmul(X, self.W_xr) + 
-                        d2l.matmul(H, self.W_hr) + self.b_r)
-        H_tilde = d2l.tanh(d2l.matmul(X, self.W_xh) + 
-                           d2l.matmul(R * H, self.W_hh) + self.b_h)
-        H = Z * H + (1 - Z) * H_tilde
+        Z = torch.sigmoid(torch.matmul(X, self.W_xz) +
+                        torch.matmul(H, self.W_hz) + self.b_z)
+
+        R = torch.sigmoid(torch.matmul(X, self.W_xr) +
+                        torch.matmul(H, self.W_hr) + self.b_r)
+                        
+        H_tilda = torch.tanh(torch.matmul(X, self.W_xh) +
+                           torch.matmul(R * H, self.W_hh) + self.b_h)
+        H = Z * H + (1 - Z) * H_tilda
         outputs.append(H)
     return outputs, (H, )
 ```
