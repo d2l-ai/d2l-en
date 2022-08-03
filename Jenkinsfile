@@ -16,7 +16,7 @@ stage("Build and Publish") {
       sh label: "Build Environment", script: """set -ex
       conda env update -n ${ENV_NAME} -f static/build.yml
       conda activate ${ENV_NAME}
-      pip install git+https://github.com/cheungdaven/d2l-book
+      pip install git+https://github.com/d2l-ai/d2l-book
       pip list
       nvidia-smi
       """
