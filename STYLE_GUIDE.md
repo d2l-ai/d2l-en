@@ -78,7 +78,7 @@
 
 ## Code
 
-* Each line must have <=78 characters (limited by page width)
+* Each line must have <=78 characters (limited by page width). For [the cambridge style](https://github.com/d2l-ai/d2l-en/pull/2187), each line must have <=79 characters.
 * Python
     * PEP8
         * e.g., (https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or-after-a-binary-operator)
