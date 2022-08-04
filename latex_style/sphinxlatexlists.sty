@@ -1,12 +1,43 @@
 %% ALPHANUMERIC LIST ITEMS
 %
 % change this info string if making any custom modification
-\ProvidesFile{sphinxlatexlists.sty}[2021/01/27 lists]
-
+\ProvidesFile{sphinxlatexlists.sty}[2021/12/20 lists]
 % Provides support for this output mark-up from Sphinx latex writer:
 % - \sphinxsetlistlabels
-
+% - \sphinxlineitem
+% and for the maxlistdepth key of sphinxsetup
 % Dependencies: the \spx@opt@maxlistdepth from sphinx.sty
+% We need some helpers macros
+\newtoks\spx@lineitemlabel
+\long\def\sphinx@gobto@sphinxlineitem#1\sphinxlineitem{}
+% TeX/LaTeX has no (easy to use) built-in "peek-ahead" mechanism, but
+% we would like to know if next token is another \sphinxlineitem (this
+% can happen in glossary entries with multiple terms for same definition)
+% so we simply grab next token (assuming it is not {tokens} originally)
+\newcommand\sphinxlineitem[2]{%
+  % safe test of whether #2 is \sphinxlineitem
+  \sphinx@gobto@sphinxlineitem#2\@gobbletwo\sphinxlineitem\unless
+  \iftrue
+    % case with sphinxlineitem immediately followed by another \sphinxlineitem:
+    % accumulate successive terms until actual definition or sub-list is found
+    \spx@lineitemlabel\expandafter{\the\spx@lineitemlabel\strut#1\\}%
+  \else
+    % now issue the \item command with possibly multi-line contents
+    % these weird incantations with \kern are related to how LaTeX
+    % handles \item generally
+    \item[\kern\labelwidth\kern-\itemindent\kern-\leftmargin
+          {\parbox[t]{\dimexpr\linewidth+\leftmargin\relax}{%
+          \raggedright
+          \the\spx@lineitemlabel% accumulated terms before this one, CR separated
+          \strut#1}}% due to LaTeX internals no \par token allowed here,
+                    % but the \parbox will insert one tacitly at end
+          \kern-\labelsep]%
+    \spx@lineitemlabel{}%
+    % this causes the label to be typeset (filling up the line), clearing up
+    % things in case a nested list follows.
+    \leavevmode
+  \fi #2%
+}%
 
 % Customization begins
 % Disable the last argument to resolve a bug in exercise.
