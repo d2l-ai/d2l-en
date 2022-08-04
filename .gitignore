@@ -29,3 +29,4 @@ build/
 .idea
 .vscode
 .pytest_cache
+latex_style/PT1*
