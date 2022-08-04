@@ -394,7 +394,8 @@ class BatchNorm(nn.Module):
         # initialized to 1 and 0, respectively
         self.gamma = nn.Parameter(torch.ones(shape))
         self.beta = nn.Parameter(torch.zeros(shape))
-        # The variables that are not model parameters are initialized to 0 and 1
+        # The variables that are not model parameters are initialized to 0 and
+        # 1
         self.moving_mean = torch.zeros(shape)
         self.moving_var = torch.ones(shape)
 

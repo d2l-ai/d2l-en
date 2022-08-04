@@ -82,7 +82,7 @@ this visual environment,
 automatically and involuntarily drawing attention.
 So you bring the fovea (the center of the macula where visual acuity is highest) onto the coffee as shown in :numref:`fig_eye-coffee`.
 
-![Using the nonvolitional cue based on saliency (red cup, non-paper), attention is involuntarily directed to the coffee.](../img/eye-coffee.svg)
+![Using the nonvolitional cue based on saliency (red cup, non-paper), attention is involuntarily directed to the coffee.](../img/eye-coffee.png)
 :width:`400px`
 :label:`fig_eye-coffee`
 
@@ -101,7 +101,7 @@ Using the volitional cue based on variable selection criteria,
 this form of attention is more deliberate.
 It is also more powerful with the subject's voluntary effort.
 
-![Using the volitional cue (want to read a book) that is task-dependent, attention is directed to the book under volitional control.](../img/eye-book.svg)
+![Using the volitional cue (want to read a book) that is task-dependent, attention is directed to the book under volitional control.](../img/eye-book.png)
 :width:`400px`
 :label:`fig_eye-book`
 
