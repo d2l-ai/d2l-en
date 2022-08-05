@@ -18,7 +18,7 @@ In fact, for much of the intervening time between the early 1990s
 and the watershed results of 2012 :cite:`Krizhevsky.Sutskever.Hinton.2012`,
 neural networks were often surpassed by other machine learning methods,
 such as kernel methods :cite:`Scholkopf.Smola.2002`, ensemble methods :cite:`Freund.Schapire.ea.1996`,
-and structued estimation :cite:`Taskar.Guestrin.Koller.2004`.
+and structured estimation :cite:`Taskar.Guestrin.Koller.2004`.
 
 For computer vision, this comparison is perhaps not fair.
 That is although the inputs to convolutional networks
