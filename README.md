@@ -17,14 +17,14 @@
   <img width="200"  src="static/frontpage/_images/notebook.gif">
 </p>
 
-This open-source book represents our attempt to make deep learning approachable, teaching you the concepts, the context, and the code. The entire book is drafted in Jupyter notebooks, seamlessly integrating exposition figures, math, and interactive examples with self-contained code.
+This open-source book represents our attempt to make deep learning approachable and teach concepts, context, and code. The entire book is drafted in Jupyter notebooks, seamlessly integrating exposition figures, math, and interactive examples with self-contained code.
 
 Our goal is to offer a resource that could
 1. be freely available for everyone;
 1. offer sufficient technical depth to provide a starting point on the path to actually becoming an applied machine learning scientist;
 1. include runnable code, showing readers how to solve problems in practice;
 1. allow for rapid updates, both by us and also by the community at large;
-1. be complemented by a forum for interactive discussion of technical details and to answer questions.
+1. be complemented by a forum for interactive discussions of technical details and to answer questions.
 
 ## Universities Using D2L
 <p align="center">
