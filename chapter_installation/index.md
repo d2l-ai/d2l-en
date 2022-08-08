@@ -21,13 +21,10 @@ For example, if you are using macOS and Python 3.x
 you would download the bash script
 whose name contains the strings "Miniconda3" and "MacOSX",
 navigate to the download location,
-and execute the installation as follows:
+and execute the installation as follows (taking Intel Macs as an example):
 
 ```bash
-# Intel Macs
 sh Miniconda3-py39_4.12.0-MacOSX-x86_64.sh -b
-# M1 Macs
-sh Miniconda3-py39_4.12.0-MacOSX-arm64.sh -b
 ```
 
 
