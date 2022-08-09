@@ -89,7 +89,7 @@ net[0].weight.data()[0]
 ```{.python .input  n=6}
 %%tab pytorch
 def init_normal(module):
-    if type(module) == nn.LazyLinear:
+    if type(module) == nn.Linear:
         nn.init.normal_(module.weight, mean=0, std=0.01)
         nn.init.zeros_(module.bias)
 net.apply(init_normal)
@@ -122,7 +122,7 @@ net[0].weight.data()[0]
 ```{.python .input  n=9}
 %%tab pytorch
 def init_constant(module):
-    if type(module) == nn.LazyLinear:
+    if type(module) == nn.Linear:
         nn.init.constant_(module.weight, 1)
         nn.init.zeros_(module.bias)
 net.apply(init_constant)
@@ -161,10 +161,10 @@ print(net[1].weight.data())
 ```{.python .input  n=12}
 %%tab pytorch
 def init_xavier(module):
-    if type(module) == nn.LazyLinear:
+    if type(module) == nn.Linear:
         nn.init.xavier_uniform_(module.weight)
 def init_42(module):
-    if type(module) == nn.LazyLinear:
+    if type(module) == nn.Linear:
         nn.init.constant_(module.weight, 42)
 
 net[0].apply(init_xavier)
@@ -238,7 +238,7 @@ net[0].weight.data()[:2]
 ```{.python .input  n=15}
 %%tab pytorch
 def my_init(module):
-    if type(module) == nn.LazyLinear:
+    if type(module) == nn.Linear:
         print("Init", *[(name, param.shape)
                         for name, param in module.named_parameters()][0])
         nn.init.uniform_(module.weight, -10, 10)

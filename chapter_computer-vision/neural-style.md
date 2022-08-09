@@ -388,7 +388,7 @@ and noise reduction on the synthesized image.
 
 ```{.python .input}
 #@tab all
-content_weight, style_weight, tv_weight = 1, 1e3, 10
+content_weight, style_weight, tv_weight = 1, 1e4, 10
 
 def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
     # Calculate the content, style, and total variance losses respectively
@@ -398,7 +398,7 @@ def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
         styles_Y_hat, styles_Y_gram)]
     tv_l = tv_loss(X) * tv_weight
     # Add up all the losses
-    l = sum(10 * styles_l + contents_l + [tv_l])
+    l = sum(styles_l + contents_l + [tv_l])
     return contents_l, styles_l, tv_l, l
 ```
 

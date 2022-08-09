@@ -21,7 +21,7 @@ Choices regarding data preprocessing often make an enormous difference in the fi
 Recall our application of MLPs to predicting house prices (:numref:`sec_kaggle_house`).
 Our first step when working with real data
 was to standardize our input features to have
-zero mean $\mathbf{\mu} = 0$ and unit variance $\mathbf{\Sigma} = \mathbf{1}$ across multiple observations :cite:`friedman1987exploratory`.
+zero mean $\boldsymbol{\mu} = 0$ and unit variance $\boldsymbol{\Sigma} = \mathbf{1}$ across multiple observations :cite:`friedman1987exploratory`.
 At a mimimum, one frequently rescales it such that the diagonal is unity, i.e., $\Sigma_{ii} = 1$.
 Yet another strategy is to rescale vectors to unit length, possibly zero mean *per observation*.
 This can work well, e.g., for spatial sensor data. These preprocessing techniques and many more are
@@ -394,7 +394,8 @@ class BatchNorm(nn.Module):
         # initialized to 1 and 0, respectively
         self.gamma = nn.Parameter(torch.ones(shape))
         self.beta = nn.Parameter(torch.zeros(shape))
-        # The variables that are not model parameters are initialized to 0 and 1
+        # The variables that are not model parameters are initialized to 0 and
+        # 1
         self.moving_mean = torch.zeros(shape)
         self.moving_var = torch.ones(shape)
 

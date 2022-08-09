@@ -23,7 +23,7 @@ individual neurons to whole layers,
 and now to blocks, repeating patterns of layers. 
 
 The idea of using blocks first emerged from the
-[Visual Geometry Group](http://www.robots.ox.ac.uk/~vgg/) (VGG)
+[Visual Geometry Group](http://www.robots.ox.ac.uk/%7Evgg/) (VGG)
 at Oxford University,
 in their eponymously-named *VGG* network :cite:`Simonyan.Zisserman.2014`.
 It is easy to implement these repeated structures in code

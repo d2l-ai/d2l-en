@@ -32,7 +32,7 @@ as a text classification task,
 which transforms a varying-length text sequence
 into a fixed-length text category.
 In this chapter,
-we will use Stanford's [large movie review dataset](https://ai.stanford.edu/~amaas/data/sentiment/)
+we will use Stanford's [large movie review dataset](https://ai.stanford.edu/%7Eamaas/data/sentiment/)
 for sentiment analysis. 
 It consists of a training set and a testing set, 
 either containing 25000 movie reviews downloaded from IMDb.
