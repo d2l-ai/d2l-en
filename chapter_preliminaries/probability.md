@@ -577,7 +577,7 @@ random variables in a probabilistic sense,
 and can be used to derive many other
 useful quantities, including recovering the
 individual distributions $P(A)$ and $P(B)$.
-To recover $P(A=a) $we simply sum up
+To recover $P(A=a)$ we simply sum up
 $P(A=a, B=v)$ over all values $v$
 that the random variable $B$ can take:
 $P(A=a) = \sum_v P(A=a, B=v)$.
