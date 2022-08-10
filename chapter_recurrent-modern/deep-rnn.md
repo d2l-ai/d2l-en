@@ -2,71 +2,93 @@
 
 :label:`sec_deep_rnn`
 
-Up to now, we only discussed RNNs with a single unidirectional hidden layer.
-In it the specific functional form of how latent variables and observations interact is rather arbitrary.
-This is not a big problem as long as we have enough flexibility to model different types of interactions.
-With a single layer, however, this can be quite challenging.
-In the case of the linear models,
-we fixed this problem by adding more layers.
-Within RNNs this is a bit trickier, since we first need to decide how and where to add extra nonlinearity.
+Up until now, we have focused on defining networks 
+consisting of a sequence input, 
+a single hidden RNN layer,
+and an output layer. 
+Despite having just one hidden layer 
+between the input at any time step
+and the corresponding output,
+there is a sense in which these networks are deep.
+Inputs from the first time step can influence
+the outputs at the final time step $T$ 
+(often 100s or 1000s of steps later).
+These inputs pass through $T$ applications
+of the recurrent layer before reaching 
+the final output. 
+However, we often also wish to retain the ability
+to express complex relationships 
+between the inputs at a given time step
+and the outputs at that same time step.
+Thus we often construct RNN's that are deep
+not only in the time direction 
+but also in the input-to-output direction.
+This is precisely the notion of depth
+that we have already encountered 
+in our development of multilayer perceptrons
+and deep convolutional neural networks.
 
-In fact,
-we could stack multiple layers of RNNs on top of each other. This results in a flexible mechanism,
-due to the combination of several simple layers. In particular, data might be relevant at different levels of the stack. For instance, we might want to keep high-level data about financial market conditions (bear or bull market) available, whereas at a lower level we only record shorter-term temporal dynamics.
 
-
-Beyond all the above abstract discussion
-it is probably easiest to understand the family of models we are interested in by reviewing :numref:`fig_deep_rnn`. It describes a deep RNN with $L$ hidden layers.
-Each hidden state is continuously passed to both the next time step of the current layer and the current time step of the next layer.
+The standard method for building this sort of deep RNN 
+is strikingly simple: we stack the RNNs on top of each other. 
+Given a sequence of length $T$, the first RNN produces 
+a sequence of outputs, also of length $T$.
+These, in turn, constitute the inputs to the next RNN layer. 
+In this short section, we illustrate this design pattern
+and present a simple example for how to code up such stacked RNNs.
+Below, in :numref:`fig_deep_rnn`, we illustrate
+a deep RNN with $L$ hidden layers.
+Each hidden state operates on a sequentual input
+and produces a sequential output.
+Moreover each RNN cell at each time step
+depends on both the same layer's 
+value at the previous time step
+and the previous layer's value 
+at the same time step. 
 
 ![Architecture of a deep RNN.](../img/deep-rnn.svg)
 :label:`fig_deep_rnn`
 
-## Functional Dependencies
-
-We can formalize the
-functional dependencies
-within the  deep architecture
-of $L$ hidden layers
-depicted in :numref:`fig_deep_rnn`.
-Our following discussion focuses primarily on
-the vanilla RNN model,
-but it applies to other sequence models, too.
-
-Suppose that we have a minibatch input
-$\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs in each example: $d$) at time step $t$.
-At the same time step,
-let
-the hidden state of the $l^\mathrm{th}$ hidden layer  ($l=1,\ldots,L$) be $\mathbf{H}_t^{(l)}  \in \mathbb{R}^{n \times h}$ (number of hidden units: $h$)
-and
-the output layer variable be $\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (number of outputs: $q$).
+Formally, suppose that we have a minibatch input
+$\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
+(number of examples: $n$, number of inputs in each example: $d$) at time step $t$.
+At the same time step, 
+let the hidden state of the $l^\mathrm{th}$ hidden layer  
+($l=1,\ldots,L$) be $\mathbf{H}_t^{(l)} \in \mathbb{R}^{n \times h}$ 
+(number of hidden units: $h$)
+and the output layer variable be 
+$\mathbf{O}_t \in \mathbb{R}^{n \times q}$ 
+(number of outputs: $q$).
 Setting $\mathbf{H}_t^{(0)} = \mathbf{X}_t$,
 the hidden state of
 the $l^\mathrm{th}$ hidden layer
 that uses the activation function $\phi_l$
-is expressed as follows:
+is calculated as follows:
 
 $$\mathbf{H}_t^{(l)} = \phi_l(\mathbf{H}_t^{(l-1)} \mathbf{W}_{xh}^{(l)} + \mathbf{H}_{t-1}^{(l)} \mathbf{W}_{hh}^{(l)}  + \mathbf{b}_h^{(l)}),$$
 :eqlabel:`eq_deep_rnn_H`
 
 where the weights $\mathbf{W}_{xh}^{(l)} \in \mathbb{R}^{h \times h}$ and $\mathbf{W}_{hh}^{(l)} \in \mathbb{R}^{h \times h}$, together with
-the bias $\mathbf{b}_h^{(l)} \in \mathbb{R}^{1 \times h}$, are the model parameters of
-the $l^\mathrm{th}$ hidden layer.
+the bias $\mathbf{b}_h^{(l)} \in \mathbb{R}^{1 \times h}$, 
+are the model parameters of the $l^\mathrm{th}$ hidden layer.
 
-In the end,
-the calculation of the output layer is only based on the hidden state of the final $L^\mathrm{th}$ hidden layer:
+In the end, the calculation of the output layer 
+is only based on the hidden state 
+of the final $L^\mathrm{th}$ hidden layer:
 
 $$\mathbf{O}_t = \mathbf{H}_t^{(L)} \mathbf{W}_{hq} + \mathbf{b}_q,$$
 
-where the weight $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$ and the bias $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ are the model parameters of the output layer.
+where the weight $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$ 
+and the bias $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ 
+are the model parameters of the output layer.
 
-Just as with MLPs, the number of hidden layers $L$ and the number of hidden units $h$ are hyperparameters.
-In other words, they can be tuned or specified by us.
-In addition, we can easily
-get a deep gated RNN
-by replacing
-the hidden state computation in
-:eqref:`eq_deep_rnn_H`
+Just as with MLPs, the number of hidden layers $L$ 
+and the number of hidden units $h$ are hyperparameters
+that we can tune.
+Common RNN layer widths are in the range (64,2056),
+and common depths are in the range (1, 8). 
+In addition, we can easily get a deep gated RNN
+by replacing the hidden state computation in :eqref:`eq_deep_rnn_H`
 with that from a GRU or an LSTM.
 
 ```{.python .input}
@@ -161,10 +183,13 @@ trainer.fit(model, data)
 
 ## Concise Implementation
 
-Fortunately many of the logistical details required to implement multiple layers of an RNN are readily available in high-level APIs.
+Fortunately many of the logistical details required
+to implement multiple layers of an RNN 
+are readily available in high-level APIs.
 Our concise implementation will use such built-in functionalities.
 The code generalizes the one we used previously in :numref:`sec_gru`,
-allowing specification of the number of layers explicitly rather than picking the default of a single layer.
+allowing specification of the number of layers explicitly 
+rather than picking the default of a single layer.
 
 ```{.python .input}
 %%tab mxnet
@@ -201,10 +226,14 @@ class GRU(d2l.RNN):  #@save
         return outputs, state
 ```
 
-The architectural decisions such as choosing hyperparameters are very similar to those of :numref:`sec_gru`.
-We pick the same number of inputs and outputs as we have distinct tokens, i.e., `vocab_size`.
+The architectural decisions such as choosing hyperparameters 
+are very similar to those of :numref:`sec_gru`.
+We pick the same number of inputs and outputs 
+as we have distinct tokens, i.e., `vocab_size`.
 The number of hidden units is still 32.
-The only difference is that we now (**select a nontrivial number of hidden layers by specifying the value of `num_layers`.**)
+The only difference is that we now 
+(**select a nontrivial number of hidden layers 
+by specifying the value of `num_layers`.**)
 
 ```{.python .input}
 %%tab all
@@ -232,9 +261,16 @@ model.predict('it has', 20, data.vocab)
 
 ## Summary
 
-* In deep RNNs, the hidden state information is passed to the next time step of the current layer and the current time step of the next layer.
-* There exist many different flavors of deep RNNs, such as LSTMs, GRUs, or vanilla RNNs. Conveniently these models are all available as parts of the high-level APIs of deep learning frameworks.
-* Initialization of models requires care. Overall, deep RNNs require considerable amount of work (such as learning rate and clipping) to ensure proper convergence.
+In deep RNNs, the hidden state information is passed 
+to the next time step of the current layer 
+and the current time step of the next layer.
+There exist many different flavors of deep RNNs, such as LSTMs, GRUs, or vanilla RNNs. 
+Conveniently, these models are all available 
+as parts of the high-level APIs of deep learning frameworks.
+Initialization of models requires care. 
+Overall, deep RNNs require considerable amount of work 
+(such as learning rate and clipping) 
+to ensure proper convergence.
 
 ## Exercises
 
