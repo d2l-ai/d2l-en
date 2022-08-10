@@ -197,11 +197,8 @@ trainer.fit(model, data)
 model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```
 
-The output is clearly unsatisfactory for the reasons described above.
-For a
-discussion of more effective uses of bidirectional RNNs, please see the sentiment
-analysis application
-in :numref:`sec_sentiment_rnn`.
+For a discussion of more effective uses of bidirectional RNNs, 
+please see the sentiment analysis application in :numref:`sec_sentiment_rnn`.
 
 ## Summary
 
