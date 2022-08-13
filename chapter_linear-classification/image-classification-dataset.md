@@ -216,7 +216,7 @@ def visualize(self, batch, nrows=1, ncols=8, labels=[]):
     if tab.selected('mxnet') or tab.selected('pytorch'):
         d2l.show_images(X.squeeze(1), nrows, ncols, titles=labels)
     if tab.selected('tensorflow'):
-        d2l.show_images(X, nrows, ncols, titles=labels)
+        d2l.show_images(tf.squeeze(X), nrows, ncols, titles=labels)
 
 batch = next(iter(data.val_dataloader()))
 data.visualize(batch)

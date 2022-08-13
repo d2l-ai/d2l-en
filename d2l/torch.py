@@ -1425,7 +1425,7 @@ def resnet18(num_classes, in_channels=1):
     return net
 
 def train_batch_ch13(net, X, y, loss, trainer, devices):
-    """Train for a minibatch with mutiple GPUs (defined in Chapter 13).
+    """Train for a minibatch with multiple GPUs (defined in Chapter 13).
 
     Defined in :numref:`sec_image_augmentation`"""
     if isinstance(X, list):
@@ -1446,7 +1446,7 @@ def train_batch_ch13(net, X, y, loss, trainer, devices):
 
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                devices=d2l.try_all_gpus()):
-    """Train a model with mutiple GPUs (defined in Chapter 13).
+    """Train a model with multiple GPUs (defined in Chapter 13).
 
     Defined in :numref:`sec_image_augmentation`"""
     timer, num_batches = d2l.Timer(), len(train_iter)
@@ -1530,7 +1530,7 @@ def multibox_prior(data, sizes, ratios):
     # Generate all center points for the anchor boxes
     center_h = (torch.arange(in_height, device=device) + offset_h) * steps_h
     center_w = (torch.arange(in_width, device=device) + offset_w) * steps_w
-    shift_y, shift_x = torch.meshgrid(center_h, center_w)
+    shift_y, shift_x = torch.meshgrid(center_h, center_w, indexing='ij')
     shift_y, shift_x = shift_y.reshape(-1), shift_x.reshape(-1)
 
     # Generate `boxes_per_pixel` number of heights and widths that are later
@@ -3072,7 +3072,10 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
         if pred == tgt_vocab['<eos>']:
             break
         output_seq.append(pred)
-    return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq# Alias defined in config.ini
+    return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq
+
+
+# Alias defined in config.ini
 nn_Module = nn.Module
 
 ones_like = torch.ones_like
