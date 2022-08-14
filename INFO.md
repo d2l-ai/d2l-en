@@ -14,10 +14,19 @@ pip install d2l==1.0.0a0
 pip install d2lbook
 git clone https://github.com/d2l-ai/d2l-en.git
 jupyter notebook --generate-config
-# Add c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager' to the bottom of ~/.jupyter/jupyter_notebook_config.py
+echo "c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager'" >> ~/.jupyter/jupyter_notebook_config.py
 cd d2l-en
 jupyter notebook
 ```
+
+Optional: using `jupyter_contrib_nbextensions`
+
+```
+pip install jupyter_contrib_nbextensions
+jupyter contrib nbextension install --user
+# jupyter nbextension enable execute_time/ExecuteTime
+```
+
 
 
 ## Building without Evaluation
@@ -36,7 +45,8 @@ sudo apt-get install librsvg2-bin
 sudo apt-get install pandoc  # If not working, conda install pandoc
 
 # To import d2l
-python setup.py develop
+cd d2l-en
+pip install -e .
 
 # Build PDF
 d2lbook build pdf
@@ -53,7 +63,7 @@ sudo bash install_fonts.sh
 ## Building HTML
 
 ```
-d2lbook build html
+bash static/build_html.sh
 ```
 
 ## Install Fonts

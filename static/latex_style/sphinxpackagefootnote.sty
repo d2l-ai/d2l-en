@@ -1,0 +1,116 @@
+% Customization begins
+% For footnote, we only keep the necessary code, and remove most of code that may cause conflicts with PT1.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{sphinxpackagefootnote}%
+ [2021/02/04 v1.1d footnotehyper adapted to sphinx (Sphinx team)]
+% Provides support for this output mark-up from Sphinx latex writer:
+% - footnote environment
+% - savenotes environment (table templates)
+% - \sphinxfootnotemark
+%
+%%
+%% Package: sphinxpackagefootnote
+%% Version: based on footnotehyper.sty 2021/02/04 v1.1d
+%% as available at https://www.ctan.org/pkg/footnotehyper
+%% License: the one applying to Sphinx
+%%
+%% Refer to the PDF documentation  at https://www.ctan.org/pkg/footnotehyper for
+%% the code comments.
+%%
+%% Differences:
+%% 1. a partial tabulary compatibility layer added (enough for Sphinx mark-up),
+%% 2. use of \spx@opt@BeforeFootnote from sphinx.sty,
+%% 3. use of \sphinxunactivateextrasandspace from sphinx.sty,
+%% 4. macro definition \sphinxfootnotemark,
+%% 5. macro definition \sphinxlongtablepatch
+%% 6. replaced some \undefined by \@undefined
+\newif\iffootnotehyperparse\footnotehyperparsetrue
+\DeclareOption*{\PackageWarning{sphinxpackagefootnote}{Option `\CurrentOption' is unknown}}%
+\ProcessOptions\relax
+\newbox\FNH@notes
+\newtoks\FNH@toks % 1.1c
+\newdimen\FNH@width
+\let\FNH@colwidth\columnwidth
+\newif\ifFNH@savingnotes
+\AtBeginDocument {%
+    \newenvironment{savenotes}
+        {\FNH@savenotes\ignorespaces}{\FNH@spewnotes\ignorespacesafterend}%
+}%
+
+\def\FNH@spewnotes {%
+  \if@endpe\ifx\par\@@par\FNH@toks{}\else
+     \FNH@toks\expandafter{\expandafter
+              \def\expandafter\par\expandafter{\par}\@endpetrue}%
+     \expandafter\expandafter\expandafter
+     \FNH@toks
+     \expandafter\expandafter\expandafter
+     {\expandafter\the\expandafter\FNH@toks
+      \expandafter\def\expandafter\@par\expandafter{\@par}}%
+     \expandafter\expandafter\expandafter
+     \FNH@toks
+     \expandafter\expandafter\expandafter
+     {\expandafter\the\expandafter\FNH@toks
+      \expandafter\everypar\expandafter{\the\everypar}}\fi
+  \else\FNH@toks{}\fi
+  \expandafter
+  \endgroup\the\FNH@toks
+  \ifFNH@savingnotes\else
+   \ifvoid\FNH@notes\else
+    \begingroup
+     \let\@makefntext\@empty
+     \let\@finalstrut\@gobble
+     \let\rule\@gobbletwo
+     \ifx\@footnotetext\@mpfootnotetext
+        \expandafter\FNH@H@@mpfootnotetext
+     \else
+        \expandafter\FNH@H@@footnotetext
+     \fi{\unvbox\FNH@notes}%
+    \endgroup
+   \fi
+  \fi
+}%
+
+\def\FNH@savenotes{%
+  \begingroup
+  \ifFNH@savingnotes\else
+    \FNH@savingnotestrue
+    \let\@footnotetext    \FNH@hyper@fntext
+    \let\@mpfootnotetext  \FNH@hyper@fntext
+    \let\H@@mpfootnotetext\FNH@nohyp@fntext
+    \FNH@width\columnwidth
+    \let\FNH@colwidth\FNH@width
+    \global\setbox\FNH@notes\box\voidb@x
+    \let\FNH@thempfn\thempfn
+    \let\FNH@mpfn\@mpfn
+    \ifx\@minipagerestore\relax\let\@minipagerestore\@empty\fi
+    \expandafter\def\expandafter\@minipagerestore\expandafter{%
+      \@minipagerestore
+      \let\thempfn\FNH@thempfn
+      \let\@mpfn\FNH@mpfn
+    }%
+  \fi
+}%
+
+\def\FNH@msne@ii[#1]#2{%
+  \expandafter\edef\csname#1\endcsname{%
+    \noexpand\savenotes
+    \expandafter\noexpand\csname#2\endcsname
+  }%
+  \expandafter\edef\csname end#1\endcsname{%
+    \expandafter\noexpand\csname end#2\endcsname
+    \noexpand\expandafter
+    \noexpand\spewnotes
+    \noexpand\if@endpe\noexpand\@endpetrue\noexpand\fi
+  }%
+}%
+
+\AtBeginDocument{%
+   % let hyperref less complain
+   \pdfstringdefDisableCommands{\def\sphinxfootnotemark [#1]{}}%
+   % to obtain hyperlinked footnotes in longtable environment we must replace
+   % hyperref's patch of longtable's patch of \@footnotetext by our own
+   \let\LT@p@ftntext\FNH@hyper@fntext
+   % this *requires* longtable to be used always wrapped in savenotes environment
+}%
+\endinput
+% Customization ends
