@@ -61,7 +61,7 @@ like batch size or number of epochs are also worth tuning, we focus on learning
 rate alone for simplicity.
 
 ```{.python .input  n=13}
-%%tab pytorch, mxnet, tensorflow
+%%tab all
 from d2l import torch as d2l
 
 from torch import nn
@@ -109,7 +109,7 @@ from d2l import torch as d2l
 import torch
 from torch import nn
 
-@d2l.add_to_class(Trainer) #@save
+@d2l.add_to_class(d2l.Trainer) #@save
 def validate(self, model):
     model.eval()
     accuracy = 0
@@ -127,7 +127,7 @@ We optimize validation error with respect to the hyperparameter configuration `c
 for `max_epochs` epochs, then compute and return its validation error:
 
 ```{.python .input  n=14}
-%%tab pytorch, mxnet, tensorflow
+%%tab all
 from d2l import torch as d2l
 
 def hpo_objective_softmax_classification(config, max_epochs=10):  #@save 
