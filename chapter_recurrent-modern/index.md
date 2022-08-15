@@ -63,8 +63,6 @@ in sequence-to-sequence tasks,
 introducing machine translation
 along with key ideas such as *encoder-decoder* architectures and *beam search*.
 
-
-
 ```toc
 :maxdepth: 2
 
