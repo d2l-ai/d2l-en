@@ -78,3 +78,39 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
     for x, y, fmt in zip(X, Y, fmts):
         axes.plot(x,y,fmt) if len(x) else axes.plot(y,fmt)
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
+
+
+# Alias defined in config.ini
+
+ones_like = jnp.ones_like
+ones = jnp.ones
+zeros_like = jnp.zeros_like
+zeros = jnp.zeros
+arange = jnp.arange
+meshgrid = jnp.meshgrid
+sin = jnp.sin
+sinh = jnp.sinh
+cos = jnp.cos
+cosh = jnp.cosh
+tanh = jnp.tanh
+linspace = jnp.linspace
+exp = jnp.exp
+log = jnp.log
+tensor = jnp.array
+expand_dims = jnp.expand_dims
+matmul = jnp.matmul
+int32 = jnp.int32
+int64 = jnp.int64
+float32 = jnp.float32
+concat = jnp.concatenate
+stack = jnp.stack
+abs = jnp.abs
+eye = jnp.eye
+reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
+reduce_sum = lambda x, *args, **kwargs: x.sum(*args, **kwargs)
+argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
+astype = lambda x, *args, **kwargs: x.astype(*args, **kwargs)
+reduce_mean = lambda x, *args, **kwargs: x.mean(*args, **kwargs)
+swapaxes = lambda x, *args, **kwargs: x.swapaxes(*args, **kwargs)
+repeat = lambda x, *args, **kwargs: x.repeat(*args, **kwargs)
+
