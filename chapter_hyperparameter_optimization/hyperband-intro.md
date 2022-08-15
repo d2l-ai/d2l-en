@@ -90,22 +90,16 @@ import numpy as np
 from collections import defaultdict
 
 class SuccessiveHalvingScheduler(d2l.HPOScheduler):#@save
-    def __init__(
-            self, searcher, eta, r_min, r_max, s=1):
-        
+    def __init__(self, searcher, eta, r_min, r_max, s=1):
         self.save_hyperparameters()
-
-        self.s = s  # only used for Hyperband later
-        
+        # only used for Hyperband later
+        self.s = s 
         # compute K, which is later used to determine the number of configurations
         self.K = int(np.log(r_max / r_min) / np.log(eta))
-        
         # define the rung levels
         self.rung_levels = [r_min * eta ** k for k in range(self.K + 1)]
-        
         # bookkeeping
         self.observed_error_at_rungs = defaultdict(list)
-        
         # our processing queue
         self.queue = []
 ```
@@ -116,19 +110,15 @@ In the beginning our queue is empty and we fill it with $N = s * \eta^{K}$ confi
 %%tab all
 @d2l.add_to_class(SuccessiveHalvingScheduler) #@save
 def suggest(self):
-
     if len(self.queue) == 0:  # our queue is empty, which means we start a new round of SH
-        
         # we track the error of all configuration at the rung levels, 
         # to sort them later for the promotion on the next rung level
         self.observed_error_at_rungs = defaultdict(list)  
-
         N = int(self.s * self.eta ** self.K)  # the number of configurations for the first rung level
         for i in range(N):
             config = searcher.sample_configuration()
             config['max_epochs'] = self.r_min  # set r = r_min
             self.queue.append(config)
-
     # return an element from the queue
     c = self.queue.pop()
     return c
@@ -140,38 +130,29 @@ When we collected a new data point, we first update the searcher module. Afterwa
 %%tab all
 @d2l.add_to_class(SuccessiveHalvingScheduler) #@save
 def update(self, config, error, info=None):
-    
     # determine the rung level r_i
     ri = config['max_epochs']
-    
     # bookkeeping
     self.observed_error_at_rungs[ri].append((config, error))
-    
     # update our searcher, e.g if we use Bayesian optimization later
     self.searcher.update(config, error, additional_info=info)     
-
     # determine how many configurations should be evaluated on this rung level
     ki = self.K - self.rung_levels.index(ri)
     n = int(self.s * self.eta ** ki)
-    
     # if we observed all configuration on this rung level r_i, we estimate the top 1 / eta configuration and 
     # add them to queue and promote them for the next rung level r_i+1
     if len(self.observed_error_at_rungs[ri]) == n and ri < self.r_max:
         best_performing_configurations = self.get_top_n_configurations(ri, n // self.eta)
-
         for config in best_performing_configurations:
             config['max_epochs'] = ri * self.eta
             self.queue.append(config)
-
         
 @d2l.add_to_class(SuccessiveHalvingScheduler) #@save
 def get_top_n_configurations(self, rung_level, n):
     rung = self.observed_error_at_rungs[rung_level]
     if not rung:
         return []
-
     configs, errors = zip(*rung)
-
     indices = [np.argsort(errors)[i] for i in range(n)]
     return [configs[i] for i in indices]        
 ```
@@ -231,11 +212,9 @@ class HyperbandScheduler(d2l.HPOScheduler): #@save
         self.save_hyperparameters()
         self.s_max = int(np.ceil((np.log(r_max) - np.log(r_min)) / np.log(eta)))
         self.s = self.s_max
-        
         self.successive_halving = SuccessiveHalvingScheduler(
             searcher=self.searcher, eta=self.eta, r_min=self.r_min,
             r_max=self.r_max, s=(self.s_max +1 ) / (self.s + 1))
-        
         self.brackets = defaultdict(list)
 
     def suggest(self):
@@ -246,10 +225,8 @@ class HyperbandScheduler(d2l.HPOScheduler): #@save
 %%tab all
 @d2l.add_to_class(HyperbandScheduler) #@save
 def update(self, config, error, info=None):
-
     self.brackets[self.s].append((config['max_epochs'], error))
     self.successive_halving.update(config, error, info=info)
-
     # if the queue of successive halving is empty, than we finished this round and start with
     # a new round with different r_min and N
     if len(self.successive_halving.queue) == 0:
