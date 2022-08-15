@@ -235,7 +235,7 @@ $$\mathbf{A}=\begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1n} \\ a_{21} & a_{22
 
 In code, we represent a matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$
 by a $2^{\mathrm{nd}}$-order tensor with shape ($m$, $n$).
-[**We can convert any appropriately size $m \times n$ tensor 
+[**We can convert any appropriately sized $m \times n$ tensor 
 into an $m \times n$ matrix**] 
 by passing the desired shape to `reshape`:
 

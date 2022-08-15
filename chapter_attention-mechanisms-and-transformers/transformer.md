@@ -49,7 +49,7 @@ the encoder and the decoder
 that stack modules based on self-attention.
 
 ![The transformer architecture.](../img/transformer.svg)
-:width:`500px`
+:width:`400px`
 :label:`fig_transformer`
 
 

@@ -18,14 +18,14 @@ In fact, for much of the intervening time between the early 1990s
 and the watershed results of 2012 :cite:`Krizhevsky.Sutskever.Hinton.2012`,
 neural networks were often surpassed by other machine learning methods,
 such as kernel methods :cite:`Scholkopf.Smola.2002`, ensemble methods :cite:`Freund.Schapire.ea.1996`,
-and structued estimation :cite:`Taskar.Guestrin.Koller.2004`.
+and structured estimation :cite:`Taskar.Guestrin.Koller.2004`.
 
 For computer vision, this comparison is perhaps not fair.
-That is although the inputs to convolutional networks
+That is, although the inputs to convolutional networks
 consist of raw or lightly-processed (e.g., by centering) pixel values, practitioners would never feed raw pixels into traditional models.
 Instead, typical computer vision pipelines
 consisted of manually engineering feature extraction pipelines, such as SIFT :cite:`Lowe.2004`, SURF :cite:`Bay.Tuytelaars.Van-Gool.2006`, and bags of visual words :cite:`Sivic.Zisserman.2003`.
-Rather than *learn the features*, the features were *crafted*.
+Rather than *learning* the features, the features were *crafted*.
 Most of the progress came from having more clever ideas for features and deep insight into geometry :cite:`Hartley.Zisserman.2000`. The learning algorithm was often considered an afterthought.
 
 Although some neural network accelerators were available in the 1990s,
@@ -35,7 +35,7 @@ with a large number of parameters. For instance, NVIDIA's GeForce 256 from 1999
 was able to process at most 480 million operations per second, without any meaningful
 programming framework for operations beyond games. Today's accelerators are able to perform in excess of 300 TFLOPs per device (NVIDIA's Ampere A100),
 where *FLOPs*
-are floating-point operations in number of multiply-adds.
+are floating-point operations in the number of multiply-adds.
 Moreover, datasets were still relatively small: OCR on 60,000 low-resolution images was considered a highly challenging task.
 Added to these obstacles, key tricks for training neural networks
 including parameter initialization heuristics :cite:`Glorot.Bengio.2010`,
@@ -46,7 +46,7 @@ and effective regularization techniques :cite:`Srivastava.Hinton.Krizhevsky.ea.2
 Thus, rather than training *end-to-end* (pixel to classification) systems,
 classical pipelines looked more like this:
 
-1. Obtain an interesting dataset. In early days, these datasets required expensive sensors. For instance, the [Apple QuickTake 100](https://en.wikipedia.org/wiki/Apple_QuickTake) of 1994 sported a whopping 0.3 Megapixel (VGA) resolution, capable of storing up to 8 images, all for the price of \$1,000.
+1. Obtain an interesting dataset. In the early days, these datasets required expensive sensors. For instance, the [Apple QuickTake 100](https://en.wikipedia.org/wiki/Apple_QuickTake) of 1994 sported a whopping 0.3 Megapixel (VGA) resolution, capable of storing up to 8 images, all for the price of \$1,000.
 1. Preprocess the dataset with hand-crafted features based on some knowledge of optics, geometry, other analytic tools, and occasionally on the serendipitous discoveries of lucky graduate students.
 1. Feed the data through a standard set of feature extractors such as the SIFT (scale-invariant feature transform) :cite:`Lowe.2004`, the SURF (speeded up robust features) :cite:`Bay.Tuytelaars.Van-Gool.2006`, or any number of other hand-tuned pipelines.
 1. Dump the resulting representations into your favorite classifier, likely a linear model or kernel method, to train a classifier.
@@ -110,9 +110,9 @@ Ultimately, the final hidden state learns a compact representation
 of the image that summarizes its contents
 such that data belonging to different categories can be easily separated.
 
-AlexNet (2012) and its precursor LeNet (1995) share many architectural elements. This begs the question why it took so long.
-A key difference is that over the past two decades both data and computation had increased significantly. As such AlexNet was much larger:
-it was trained on much more data, and on much faster GPUs, compared to the CPUs available in 1995.
+AlexNet (2012) and its precursor LeNet (1995) share many architectural elements. This begs the question: why did it take so long?
+A key difference is that over the past two decades, the amount of data and computing power available had increased significantly. 
+As such AlexNet was much larger: it was trained on much more data, and on much faster GPUs, compared to the CPUs available in 1995.
 
 ### Missing Ingredient: Data
 
@@ -138,7 +138,7 @@ the Amazon Mechanical Turk crowdsourcing pipeline
 to confirm for each image whether it belonged to the associated category.
 This scale was unprecedented, exceeding others by over an order of magnitude
 (e.g., CIFAR-100 has 60,000 images). Another aspect was that the images were at
-fairly high resolution of $224 \times 224$ pixels, unlike the 80 million sized
+relatively high resolution of $224 \times 224$ pixels, unlike the 80 million sized
 TinyImages dataset :cite:`Torralba.Fergus.Freeman.2008`, consisting of $32 \times 32$ pixel thumbnails.
 This allowed for the formation of higher-level features.
 The associated competition, dubbed the ImageNet Large Scale Visual Recognition
@@ -189,7 +189,7 @@ high-speed interconnects, and so on. CPUs are
 comparatively bad at any single task when compared to dedicated hardware.
 Modern laptops have 4--8 cores,
 and even high-end servers rarely exceed 64 cores per socket,
-simply because it is not cost effective.
+simply because it is not cost-effective.
 
 By comparison, GPUs can consist of thousands of small processing elements (NIVIDA's latest Ampere chips have up to 6912 CUDA cores), often grouped into larger groups (NVIDIA calls them warps).
 The details differ somewhat between NVIDIA, AMD, ARM and other chip vendors. While each core is relatively weak,
@@ -261,7 +261,7 @@ the network adds max-pooling layers
 with a window shape of $3\times3$ and a stride of 2.
 Moreover, AlexNet has ten times more convolution channels than LeNet.
 
-After the last convolutional layer there are two fully connected layers
+After the last convolutional layer, there are two fully connected layers
 with 4096 outputs.
 These two huge fully connected layers produce model parameters of nearly 1 GB.
 Due to the limited memory in early GPUs,

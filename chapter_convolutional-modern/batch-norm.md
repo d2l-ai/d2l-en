@@ -265,8 +265,8 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
         # standardization
         X_hat = (X - mean) / np.sqrt(var + eps)
         # Update the mean and variance using moving average
-        moving_mean = momentum * moving_mean + (1.0 - momentum) * mean
-        moving_var = momentum * moving_var + (1.0 - momentum) * var
+        moving_mean = (1.0 - momentum) * moving_mean + momentum * mean
+        moving_var = (1.0 - momentum) * moving_var + momentum * var
     Y = gamma * X_hat + beta  # Scale and shift
     return Y, moving_mean, moving_var
 ```
@@ -302,8 +302,8 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
         # standardization
         X_hat = (X - mean) / torch.sqrt(var + eps)
         # Update the mean and variance using moving average
-        moving_mean = momentum * moving_mean + (1.0 - momentum) * mean
-        moving_var = momentum * moving_var + (1.0 - momentum) * var
+        moving_mean = (1.0 - momentum) * moving_mean + momentum * mean
+        moving_var = (1.0 - momentum) * moving_var + momentum * var
     Y = gamma * X_hat + beta  # Scale and shift
     return Y, moving_mean.data, moving_var.data
 ```
@@ -374,7 +374,7 @@ class BatchNorm(nn.Block):
         # Save the updated `moving_mean` and `moving_var`
         Y, self.moving_mean, self.moving_var = batch_norm(
             X, self.gamma.data(), self.beta.data(), self.moving_mean,
-            self.moving_var, eps=1e-12, momentum=0.9)
+            self.moving_var, eps=1e-12, momentum=0.1)
         return Y
 ```
 
@@ -394,7 +394,8 @@ class BatchNorm(nn.Module):
         # initialized to 1 and 0, respectively
         self.gamma = nn.Parameter(torch.ones(shape))
         self.beta = nn.Parameter(torch.zeros(shape))
-        # The variables that are not model parameters are initialized to 0 and 1
+        # The variables that are not model parameters are initialized to 0 and
+        # 1
         self.moving_mean = torch.zeros(shape)
         self.moving_var = torch.ones(shape)
 
@@ -407,7 +408,7 @@ class BatchNorm(nn.Module):
         # Save the updated `moving_mean` and `moving_var`
         Y, self.moving_mean, self.moving_var = batch_norm(
             X, self.gamma, self.beta, self.moving_mean,
-            self.moving_var, eps=1e-5, momentum=0.9)
+            self.moving_var, eps=1e-5, momentum=0.1)
         return Y
 ```
 
@@ -435,8 +436,8 @@ class BatchNorm(tf.keras.layers.Layer):
         super(BatchNorm, self).build(input_shape)
 
     def assign_moving_average(self, variable, value):
-        momentum = 0.9
-        delta = variable * momentum + value * (1 - momentum)
+        momentum = 0.1
+        delta = variable * (1 - momentum) + value * momentum
         return variable.assign(delta)
 
     @tf.function
