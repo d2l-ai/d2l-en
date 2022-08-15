@@ -200,7 +200,7 @@ make a decision (call of `scheduler.suggest`). In the sequel, we will plot
 found by an optimizer works, but also how quickly an optimizer is able to find it.
 
 ```{.python .input  n=7}
-%%tab all
+%%tab pytorch
 
 @d2l.add_to_class(HPOTuner) #@save
 def bookkeeping(self, config, error, runtime): 
