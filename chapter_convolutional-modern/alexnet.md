@@ -20,7 +20,7 @@ neural networks were often surpassed by other machine learning methods,
 such as kernel methods :cite:`Scholkopf.Smola.2002`, ensemble methods :cite:`Freund.Schapire.ea.1996`,
 and structured estimation :cite:`Taskar.Guestrin.Koller.2004`.
 
-For computer vision, this comparison is perhaps not fair.
+For computer vision, this comparison is perhaps not entirely accurate.
 That is, although the inputs to convolutional networks
 consist of raw or lightly-processed (e.g., by centering) pixel values, practitioners would never feed raw pixels into traditional models.
 Instead, typical computer vision pipelines
@@ -32,9 +32,9 @@ Although some neural network accelerators were available in the 1990s,
 they were not yet sufficiently powerful to make
 deep multichannel, multilayer CNNs
 with a large number of parameters. For instance, NVIDIA's GeForce 256 from 1999
-was able to process at most 480 million operations per second, without any meaningful
-programming framework for operations beyond games. Today's accelerators are able to perform in excess of 300 TFLOPs per device (NVIDIA's Ampere A100),
-where *FLOPs*
+was able to process at most 480 million operations per second (MFLOPs), without any meaningful
+programming framework for operations beyond games. Today's accelerators are able to perform in excess of 300 TFLOPs per device (NVIDIA's Ampere A100). 
+Note that *FLOPs*
 are floating-point operations such as multiplications and additions.
 Moreover, datasets were still relatively small: OCR on 60,000 low-resolution 28x28 pixel images was considered a highly challenging task.
 Added to these obstacles, key tricks for training neural networks
@@ -48,7 +48,7 @@ classical pipelines looked more like this:
 
 1. Obtain an interesting dataset. In the early days, these datasets required expensive sensors. For instance, the [Apple QuickTake 100](https://en.wikipedia.org/wiki/Apple_QuickTake) of 1994 sported a whopping 0.3 Megapixel (VGA) resolution, capable of storing up to 8 images, all for the price of \$1,000.
 1. Preprocess the dataset with hand-crafted features based on some knowledge of optics, geometry, other analytic tools, and occasionally on the serendipitous discoveries of lucky graduate students.
-1. Feed the data through a standard set of feature extractors such as the SIFT (scale-invariant feature transform) :cite:`Lowe.2004`, the SURF (speeded up robust features) :cite:`Bay.Tuytelaars.Van-Gool.2006`, or any number of other hand-tuned pipelines. For instance, OpenCV still uses SIFT extractors. 
+1. Feed the data through a standard set of feature extractors such as the SIFT (scale-invariant feature transform) :cite:`Lowe.2004`, the SURF (speeded up robust features) :cite:`Bay.Tuytelaars.Van-Gool.2006`, or any number of other hand-tuned pipelines. OpenCV still provides SIFT extractors to this day! 
 1. Dump the resulting representations into your favorite classifier, likely a linear model or kernel method, to train a classifier.
 
 If you spoke to machine learning researchers,
@@ -75,7 +75,7 @@ In fact, engineering a new set of feature functions, improving results, and writ
 SIFT :cite:`Lowe.2004`,
 SURF :cite:`Bay.Tuytelaars.Van-Gool.2006`,
 HOG (histograms of oriented gradient) :cite:`Dalal.Triggs.2005`,
-[bags of visual words](https://en.wikipedia.org/wiki/Bag-of-words_model_in_computer_vision)
+Bags of Visual Words :cite:`Sivic.Zisserman.2003`
 and similar feature extractors ruled the roost.
 
 Another group of researchers,
@@ -97,7 +97,7 @@ The first modern CNN :cite:`Krizhevsky.Sutskever.Hinton.2012`, named
 *AlexNet* after one of its inventors, Alex Krizhevsky, is largely an evolutionary improvement
 over LeNet. It achieved excellent performance in the 2012 ImageNet challenge.
 
-![Image filters learned by the first layer of AlexNet (reproduced from :citet:`Krizhevsky.Sutskever.Hinton.2012`).](../img/filters.png)
+![Image filters learned by the first layer of AlexNet. Reproduction courtesy of  :cite:`Krizhevsky.Sutskever.Hinton.2012`.](../img/filters.png)
 :width:`400px`
 :label:`fig_filters`
 
@@ -144,7 +144,7 @@ relatively high resolution of $224 \times 224$ pixels, unlike the 80 million siz
 TinyImages dataset :cite:`Torralba.Fergus.Freeman.2008`, consisting of $32 \times 32$ pixel thumbnails.
 This allowed for the formation of higher-level features.
 The associated competition, dubbed the ImageNet Large Scale Visual Recognition
-Challenge ([ILSVRC](https://www.image-net.org/challenges/LSVRC/))
+Challenge :cite:`russakovsky2015imagenet`, 
 pushed computer vision and machine learning research forward,
 challenging researchers to identify which models performed best
 at a greater scale than academics had previously considered. The largest vision datasets, such as LAION-5B 
@@ -199,17 +199,16 @@ The details differ somewhat between NVIDIA, AMD, ARM and other chip vendors. Whi
 running at about 1GHz clock frequency,
 it is the total number of such cores that makes GPUs orders of magnitude faster than CPUs.
 For instance, NVIDIA's recent Ampere A100 GPU offers over 300 TFLOPs per chip for specialized 16 bit precision (BFLOAT16) matrix-matrix multiplications, and up to 20 TFLOPs for more general-purpose floating point operations (FP32).
-At the same time, floating point performance of CPUs rarely exceeds 1 TFLOPs (AWS' Graviton 3, for instance, reaches 2 TFLOPs peak performance for 16 bit precision operations, a number similar to the GPU performance of Apple's M1 processor).
-The reason for why this is possible is actually quite simple:
+At the same time, floating point performance of CPUs rarely exceeds 1 TFLOPs (Amazon's Graviton 3, for instance, reaches 2 TFLOPs peak performance for 16 bit precision operations, a number similar to the GPU performance of Apple's M1 processor). There are many reasons why GPUs are much faster than CPUs in terms of FLOPs. 
 First, power consumption tends to grow *quadratically* with clock frequency.
 Hence, for the power budget of a CPU core that runs 4 times faster (a typical number),
 you can use 16 GPU cores at $\frac{1}{4}$ the speed,
 which yields $16 \times \frac{1}{4} = 4$ times the performance.
-Furthermore, GPU cores are much simpler
+Secondly, GPU cores are much simpler
 (in fact, for a long time they were not even *able*
 to execute general-purpose code),
-which makes them more energy efficient.
-Last, many operations in deep learning require high memory bandwidth.
+which makes them more energy efficient. For instance, they tend not to support speculative evaluation, it typically isn't possible to program each processing element individually, and the caches per core tend to be much smaller. 
+Lastly, many operations in deep learning require high memory bandwidth.
 Again, GPUs shine here with buses that are at least 10 times as wide as many CPUs.
 
 Back to 2012. A major breakthrough came
@@ -221,7 +220,7 @@ convolutions and matrix multiplications,
 are all operations that could be parallelized in hardware.
 Using two NVIDIA GTX 580s with 3GB of memory, either of which was capable of 1.5 TFLOPs (still a challenge for most CPUs a decade later),
 they implemented fast convolutions.
-The code [cuda-convnet](https://code.google.com/archive/p/cuda-convnet/)
+The [cuda-convnet](https://code.google.com/archive/p/cuda-convnet/) code
 was good enough that for several years
 it was the industry standard and powered
 the first couple years of the deep learning boom.

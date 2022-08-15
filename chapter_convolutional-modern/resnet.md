@@ -357,7 +357,7 @@ ResNet18().layer_summary((1, 96, 96, 1))
 
 ## [**Training**]
 
-We train ResNet on the Fashion-MNIST dataset, just like before. ResNet is quite a powerful and flexible architecture. The plot capturing training and validation loss illustrates a significant gap between both graphs, with the training loss being significantly lower. For a network of this flexibility, more training data would offer significant benefit in closing the gap and improving accuracy. 
+We train ResNet on the Fashion-MNIST dataset, just like before. ResNet is quite a powerful and flexible architecture. The plot capturing training and validation loss illustrates a significant gap between both graphs, with the training loss being significantly lower. For a network of this flexibility, more training data would offer significant benefit in closing the gap and improving accuracy.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -411,8 +411,8 @@ class ResNeXtBlock(nn.Block):  #@save
         super().__init__(**kwargs)
         bot_channels = int(round(num_channels * bot_mul))
         self.conv1 = nn.Conv2D(bot_channels, kernel_size=1, padding=0, strides=1)
-        self.conv2 = nn.Conv2D(bot_channels, kernel_size=3, padding=1, strides=strides,
-                               groups=bot_channels//groups)
+        self.conv2 = nn.Conv2D(bot_channels, kernel_size=3, padding=1, 
+                               strides=strides, groups=bot_channels//groups)
         self.conv3 = nn.Conv2D(num_channels, kernel_size=1, padding=0, strides=1)
         self.bn1 = nn.BatchNorm()
         self.bn2 = nn.BatchNorm()
@@ -448,7 +448,8 @@ class ResNeXtBlock(nn.Module):  #@save
         self.bn2 = nn.LazyBatchNorm2d()
         self.bn3 = nn.LazyBatchNorm2d()
         if use_1x1conv:
-            self.conv4 = nn.LazyConv2d(num_channels, kernel_size=1, stride=strides)
+            self.conv4 = nn.LazyConv2d(num_channels, kernel_size=1, 
+                                       stride=strides)
             self.bn4 = nn.LazyBatchNorm2d()
         else:
             self.conv4 = None
@@ -562,7 +563,3 @@ A common feature of the designs we've discussed so far is that the network desig
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/8737)
 :end_tab:
-
-```{.python .input}
-
-```

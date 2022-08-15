@@ -19,7 +19,7 @@ which has served as a barometer of progress on supervised learning in
 computer vision since 2010. It is only recently that Transformers have begun
 to displace CNNs, starting with :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` and 
 followed by the SWIN Transformer :cite:`liu2021swin`. We will cover this development later 
-in Chapter :ref:`chap_attention-and-transformers`. 
+in the chapter on :ref:`chap_attention-and-transformers`. 
 
 While the idea of *deep* neural networks is quite simple (stack
 together a bunch of layers), performance can vary wildly across
@@ -34,8 +34,7 @@ have offered two popular ideas for training and designing deep models,
 both of which have since been applied to architectures beyond computer
 vision, too.
 
-We begin our tour of modern CNNs with  
-AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`,
+We begin our tour of modern CNNs with AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`,
 the first large-scale network deployed to beat conventional computer
 vision methods on a large-scale vision challenge; the VGG network
 :cite:`Simonyan.Zisserman.2014`, which makes use of a number of
@@ -60,7 +59,7 @@ the ingenuity of an experimenter in the search for efficient design spaces. Of n
 also the work of :cite:`liu2022convnet` as it shows that data prep and training recipes 
 play a pivotal role in improving accuracy. It also shows that long-held assumptions, such as 
 the size of a convolutional window, may need to be revisited, given the increase in 
-computation and data. We will cover this and many more questions in due course throughout this chapter. 
+computation and data. We will cover this and many more questions in due course throughout this chapter.
 
 ```toc
 :maxdepth: 2

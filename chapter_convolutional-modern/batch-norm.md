@@ -12,7 +12,7 @@ In this section, we describe *batch normalization*, a popular and effective tech
 that consistently accelerates the convergence of deep networks :cite:`Ioffe.Szegedy.2015`.
 Together with residual blocks---covered later in :numref:`sec_resnet`---batch normalization
 has made it possible for practitioners to routinely train networks with over 100 layers.
-A secondary (serendipitous) benefit of batch normalization is its inherent regularization.
+A secondary (serendipitous) benefit of batch normalization lies in its inherent regularization.
 
 ## Training Deep Networks
 
@@ -25,7 +25,7 @@ zero mean $\boldsymbol{\mu} = 0$ and unit variance $\boldsymbol{\Sigma} = \bolds
 At a mimimum, one frequently rescales it such that the diagonal is unity, i.e., $\Sigma_{ii} = 1$.
 Yet another strategy is to rescale vectors to unit length, possibly zero mean *per observation*.
 This can work well, e.g., for spatial sensor data. These preprocessing techniques and many more are
-beneficial to keep the estimation problem well controlled. See e.g., the articles in :citet:`guyon2008feature` for a review of feature selection and extraction techniques. Standardizing vectors also has the nice side-effect of constraining the function complexity of functions that act upon it. For instance, the celebrated radius-margin bound :cite:`Vapnik95` in Support Vector Machines and the Perceptron Convergence Theorem :cite:`Novikoff62` rely on inputs of bounded norm. 
+beneficial to keep the estimation problem well controlled. See e.g., the articles in :cite:`guyon2008feature` for a review of feature selection and extraction techniques. Standardizing vectors also has the nice side-effect of constraining the function complexity of functions that act upon it. For instance, the celebrated radius-margin bound :cite:`Vapnik95` in Support Vector Machines and the Perceptron Convergence Theorem :cite:`Novikoff62` rely on inputs of bounded norm. 
 
 Intuitively, this standardization plays nicely with our optimizers
 since it puts the parameters *a priori* at a similar scale.
@@ -43,7 +43,7 @@ that this drift in the distribution of such variables could hamper the convergen
 Intuitively, we might conjecture that if one
 layer has variable activations that are 100 times that of another layer,
 this might necessitate compensatory adjustments in the learning rates. Adaptive solvers
-such as AdaGrad :cite:`Duchi.Hazan.Singer.2011`, Adam :cite:`Kingma.Ba.2014`, Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018` or Distributed Shampoo :cite:`anil2020scalable` aim to address this from the viewpoint of optimization.
+such as AdaGrad :cite:`Duchi.Hazan.Singer.2011`, Adam :cite:`Kingma.Ba.2014`, Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018` or Distributed Shampoo :cite:`anil2020scalable` aim to address this from the viewpoint of optimization, e.g., by adding aspects of second order methods. 
 The alternative is to prevent the problem from occurring, simply by adaptive normalization.
 
 Third, deeper networks are complex and tend to be more easily capable of overfitting.
@@ -519,7 +519,7 @@ class BNLeNetScratch(d2l.Classifier):
 ```
 
 As before, we will [**train our network on the Fashion-MNIST dataset**].
-This code is virtually identical to that when we first trained LeNet (:numref:`sec_lenet`).
+This code is virtually identical to that when we first trained LeNet.
 
 ```{.python .input}
 %%tab mxnet, pytorch

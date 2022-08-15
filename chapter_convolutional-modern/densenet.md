@@ -44,9 +44,8 @@ f_2\left(\left[\mathbf{x}, f_1\left(\mathbf{x}\right)\right]\right), f_3\left(\l
 In the end, all these functions are combined in MLP to reduce the number of features again. In terms of implementation this is quite simple:
 rather than adding terms, we concatenate them. The name DenseNet arises from the fact that the dependency graph between variables becomes quite dense. The last layer of such a chain is densely connected to all previous layers. The dense connections are shown in :numref:`fig_densenet`.
 
-![Dense connections in DenseNet.](../img/densenet.svg)
+![Dense connections in DenseNet. Note how the dimensionality increases with depth.](../img/densenet.svg)
 :label:`fig_densenet`
-
 
 The main components that compose a DenseNet are *dense blocks* and *transition layers*. The former define how the inputs and outputs are concatenated, while the latter control the number of channels so that it is not too large, 
 since the expansion $\mathbf{x} \to \left[\mathbf{x}, f_1(\mathbf{x}),
@@ -109,7 +108,7 @@ class ConvBlock(tf.keras.layers.Layer):
         return y
 ```
 
-A *dense block* consists of multiple convolution blocks, each using the same number of output channels. In the forward propagation, however, we concatenate the input and output of each convolution block on the channel dimension. Lazy evaluation allows us to adjust the dimensionality automatically. 
+A *dense block* consists of multiple convolution blocks, each using the same number of output channels. In the forward propagation, however, we concatenate the input and output of each convolution block on the channel dimension. Lazy evaluation allows us to adjust the dimensionality automatically.
 
 ```{.python .input}
 %%tab mxnet
@@ -123,7 +122,7 @@ class DenseBlock(nn.Block):
     def forward(self, X):
         for blk in self.net:
             Y = blk(X)
-            # Concatenate input and output of each block on the channel dimension
+            # Concatenate input and output of each block along the channels
             X = np.concatenate((X, Y), axis=1)
         return X
 ```
@@ -141,7 +140,7 @@ class DenseBlock(nn.Module):
     def forward(self, X):
         for blk in self.net:
             Y = blk(X)
-            # Concatenate input and output of each block on the channel dimension
+            # Concatenate input and output of each block along the channels
             X = torch.cat((X, Y), dim=1)
         return X
 ```
@@ -336,7 +335,7 @@ def __init__(self, num_channels=64, growth_rate=32, arch=(4, 4, 4, 4),
 
 ## [**Training**]
 
-Since we are using a deeper network here, in this section, we will reduce the input height and width from 224 to 96 to simplify the computation. 
+Since we are using a deeper network here, in this section, we will reduce the input height and width from 224 to 96 to simplify the computation.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -387,7 +386,3 @@ applying DenseNet may require more memory-efficient implementations that may inc
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/331)
 :end_tab:
-
-```{.python .input}
-
-```

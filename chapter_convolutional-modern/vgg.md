@@ -26,8 +26,7 @@ albeit related, tasks. Such large pretrained models are typically called
 Foundation Models :cite:`bommasani2021opportunities`. 
 
 Back to network design. The idea of using blocks first emerged from the
-[Visual Geometry Group](http://www.robots.ox.ac.uk/%7Evgg/) (VGG)
-at Oxford University,
+Visual Geometry Group (VGG) at Oxford University,
 in their eponymously-named *VGG* network :cite:`Simonyan.Zisserman.2014`.
 It is easy to implement these repeated structures in code
 with any modern deep learning framework by using loops and subroutines.
@@ -47,7 +46,7 @@ this imposes a hard limit of $\log_2 d$ convolutional layers on the network befo
 dimensions ($d$) are used up. For instance, in the case of ImageNet, it would be impossible to have 
 more than 8 convolutional layers in this way. 
 
-The key idea by Simonyan and Zisserman was to use *multiple* convolutions in between downsampling
+The key idea of Simonyan and Zisserman was to use *multiple* convolutions in between downsampling
 via max-pooling in the form of a block. They were primarily interested in whether deep or 
 wide networks perform better. For instance, the successive application of two $3 \times 3$ convolutions
 touches the same pixels as a single $5 \times 5$ convolution does. At the same time, the latter uses approximately 
@@ -221,7 +220,7 @@ we construct a network with a smaller number of channels.**]
 This is more than sufficient for training on Fashion-MNIST.
 The [**model training**] process is similar to that of AlexNet in :numref:`sec_alexnet`. 
 Again observe the close match between validation and training loss, 
-suggesting only a small amount of overfitting. 
+suggesting only a small amount of overfitting.
 
 ```{.python .input  n=8}
 %%tab mxnet, pytorch
@@ -276,7 +275,3 @@ Very recently ParNet :cite:`Goyal.Bochkovskiy.Deng.ea.2021` demonstrated that it
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/277)
 :end_tab:
-
-```{.python .input}
-
-```

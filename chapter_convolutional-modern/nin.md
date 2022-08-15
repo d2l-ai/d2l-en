@@ -18,13 +18,13 @@ First, the fully connected layers at the end
 of the architecture consume tremendous numbers of parameters. For instance, even a simple
 model such as VGG-11 requires a monstrous $25088 \times 4096$ matrix, occupying almost
 400MB of RAM in single precision (FP32). This is a significant impediment to computation, in particular on
-mobile and embedded devices. After all, high end mobile phones only have 2-8GB of RAM. At the time VGG was invented, this was an order of magnitude less. As such, it would have been difficult to justify spending over 50% of memory on an image classifier. 
+mobile and embedded devices. After all, even high end mobile phones sport no more than 8GB of RAM. At the time VGG was invented, this was an order of magnitude less (the iPhone 4s had 512MB). As such, it would have been difficult to justify spending the majority of memory on an image classifier. 
 
 Second, it is equally impossible to add fully connected layers
 earlier in the network to increase the degree of nonlinearity: doing so would destroy the
 spatial structure and require potentially even more memory.
 
-The *network in network* (*NiN*) blocks of :citet:`Lin.Chen.Yan.2013` offer an alternative,
+The *network in network* (*NiN*) blocks :cite:`Lin.Chen.Yan.2013` offer an alternative,
 capable of solving both problems in one simple strategy.
 They were proposed based on a very simple insight: (i) use $1 \times 1$ convolutions to add
 local nonlinearities across the channel activations and (ii) use global average pooling to integrate
@@ -208,7 +208,7 @@ Choosing fewer convolutions with wide kernels and replacing them by $1 \times 1$
 ## Exercises
 
 1. Why are there two $1\times 1$ convolutional layers per NiN block? Increase their number to three. Reduce their number to one. What changes?
-1. What changes if you replace the $1 \times 1$ convolutions by $3 \times 3$ \convolutions? 
+1. What changes if you replace the $1 \times 1$ convolutions by $3 \times 3$ convolutions? 
 1. What happens if you replace the global average pooling by a fully connected layer (speed, accuracy, number of parameters)?
 1. Calculate the resource usage for NiN.
     1. What is the number of parameters?
@@ -225,3 +225,7 @@ Choosing fewer convolutions with wide kernels and replacing them by $1 \times 1$
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/80)
 :end_tab:
+
+```{.python .input}
+
+```
