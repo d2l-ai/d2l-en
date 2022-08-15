@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -26,7 +26,7 @@ consist of raw or lightly-processed (e.g., by centering) pixel values, practitio
 Instead, typical computer vision pipelines
 consisted of manually engineering feature extraction pipelines, such as SIFT :cite:`Lowe.2004`, SURF :cite:`Bay.Tuytelaars.Van-Gool.2006`, and bags of visual words :cite:`Sivic.Zisserman.2003`.
 Rather than *learning* the features, the features were *crafted*.
-Most of the progress came from having more clever ideas for features and deep insight into geometry :cite:`Hartley.Zisserman.2000`. The learning algorithm was often considered an afterthought.
+Most of the progress came from having more clever ideas for features extraction on the one hand and deep insight into geometry :cite:`Hartley.Zisserman.2000` on the other hand. The learning algorithm was often considered an afterthought.
 
 Although some neural network accelerators were available in the 1990s,
 they were not yet sufficiently powerful to make
@@ -35,8 +35,8 @@ with a large number of parameters. For instance, NVIDIA's GeForce 256 from 1999
 was able to process at most 480 million operations per second, without any meaningful
 programming framework for operations beyond games. Today's accelerators are able to perform in excess of 300 TFLOPs per device (NVIDIA's Ampere A100),
 where *FLOPs*
-are floating-point operations in the number of multiply-adds.
-Moreover, datasets were still relatively small: OCR on 60,000 low-resolution images was considered a highly challenging task.
+are floating-point operations such as multiplications and additions.
+Moreover, datasets were still relatively small: OCR on 60,000 low-resolution 28x28 pixel images was considered a highly challenging task.
 Added to these obstacles, key tricks for training neural networks
 including parameter initialization heuristics :cite:`Glorot.Bengio.2010`,
 clever variants of stochastic gradient descent :cite:`Kingma.Ba.2014`,
@@ -48,7 +48,7 @@ classical pipelines looked more like this:
 
 1. Obtain an interesting dataset. In the early days, these datasets required expensive sensors. For instance, the [Apple QuickTake 100](https://en.wikipedia.org/wiki/Apple_QuickTake) of 1994 sported a whopping 0.3 Megapixel (VGA) resolution, capable of storing up to 8 images, all for the price of \$1,000.
 1. Preprocess the dataset with hand-crafted features based on some knowledge of optics, geometry, other analytic tools, and occasionally on the serendipitous discoveries of lucky graduate students.
-1. Feed the data through a standard set of feature extractors such as the SIFT (scale-invariant feature transform) :cite:`Lowe.2004`, the SURF (speeded up robust features) :cite:`Bay.Tuytelaars.Van-Gool.2006`, or any number of other hand-tuned pipelines.
+1. Feed the data through a standard set of feature extractors such as the SIFT (scale-invariant feature transform) :cite:`Lowe.2004`, the SURF (speeded up robust features) :cite:`Bay.Tuytelaars.Van-Gool.2006`, or any number of other hand-tuned pipelines. For instance, OpenCV still uses SIFT extractors. 
 1. Dump the resulting representations into your favorite classifier, likely a linear model or kernel method, to train a classifier.
 
 If you spoke to machine learning researchers,
@@ -59,14 +59,14 @@ The field of machine learning was thriving, rigorous, and eminently useful. Howe
 if you spoke to a computer vision researcher,
 you would hear a very different story.
 The dirty truth of image recognition, they would tell you,
-is that features, geometry :cite:`Hartley.Zisserman.2000`, and engineering,
+is that features, geometry :cite:`Hartley.Zisserman.2000,hartley2009global`, and engineering,
 rather than novel learning algorithms, drove progress.
 Computer vision researchers justifiably believed
 that a slightly bigger or cleaner dataset
 or a slightly improved feature-extraction pipeline
 mattered far more to the final accuracy than any learning algorithm.
 
-## Learning Representations
+## Representation Learning
 
 Another way to cast the state of affairs is that
 the most important part of the pipeline was the representation.
@@ -88,7 +88,10 @@ the features ought to be hierarchically composed
 with multiple jointly learned layers, each with learnable parameters.
 In the case of an image, the lowest layers might come
 to detect edges, colors, and textures, in analogy to how the visual system in animals
-processes its input.
+processes its input. In particular, the automatic design of visual features such as those obtained
+by sparse coding :cite:`olshausen1996emergence` remained an open challenge until the advent of modern CNNs. 
+It was not until :cite:`dean2012large,le2013building` that the idea of generating features 
+from image data automatically gained significant traction.
 
 The first modern CNN :cite:`Krizhevsky.Sutskever.Hinton.2012`, named
 *AlexNet* after one of its inventors, Alex Krizhevsky, is largely an evolutionary improvement
@@ -111,8 +114,7 @@ of the image that summarizes its contents
 such that data belonging to different categories can be easily separated.
 
 AlexNet (2012) and its precursor LeNet (1995) share many architectural elements. This begs the question: why did it take so long?
-A key difference is that over the past two decades, the amount of data and computing power available had increased significantly. 
-As such AlexNet was much larger: it was trained on much more data, and on much faster GPUs, compared to the CPUs available in 1995.
+A key difference is that over the past two decades, the amount of data and computing power available had increased significantly. As such AlexNet was much larger: it was trained on much more data, and on much faster GPUs, compared to the CPUs available in 1995.
 
 ### Missing Ingredient: Data
 
@@ -124,7 +126,7 @@ However, given the limited storage capacity of computers,
 the relative expense of (imaging) sensors,
 and the comparatively tighter research budgets in the 1990s,
 most research relied on tiny datasets.
-Numerous papers addressed the UCI collection of datasets,
+Numerous papers relied on the UCI collection of datasets,
 many of which contained only hundreds or (a few) thousands of images
 captured in low resolution and often with an artificially clean background.
 
@@ -145,7 +147,8 @@ The associated competition, dubbed the ImageNet Large Scale Visual Recognition
 Challenge ([ILSVRC](https://www.image-net.org/challenges/LSVRC/))
 pushed computer vision and machine learning research forward,
 challenging researchers to identify which models performed best
-at a greater scale than academics had previously considered.
+at a greater scale than academics had previously considered. The largest vision datasets, such as LAION-5B 
+:cite:`schuhmannlaion` contain billions of images with additional metadata.
 
 ### Missing Ingredient: Hardware
 
@@ -195,8 +198,8 @@ By comparison, GPUs can consist of thousands of small processing elements (NIVID
 The details differ somewhat between NVIDIA, AMD, ARM and other chip vendors. While each core is relatively weak,
 running at about 1GHz clock frequency,
 it is the total number of such cores that makes GPUs orders of magnitude faster than CPUs.
-For instance, NVIDIA's recent Ampere generation offers over 300 TFLOPs per chip for specialized 16 bit precision (BFLOAT16) matrix-matrix multiplications, and up to 20 TFLOPs for more general-purpose floating point operations (FP32).
-At the same time, floating point performance of CPUs rarely exceeds 1 TFLOPs (AWS' Graviton 2, for instance, reaches 2 TFLOPs peak performance for 16 bit precision operations).
+For instance, NVIDIA's recent Ampere A100 GPU offers over 300 TFLOPs per chip for specialized 16 bit precision (BFLOAT16) matrix-matrix multiplications, and up to 20 TFLOPs for more general-purpose floating point operations (FP32).
+At the same time, floating point performance of CPUs rarely exceeds 1 TFLOPs (AWS' Graviton 3, for instance, reaches 2 TFLOPs peak performance for 16 bit precision operations, a number similar to the GPU performance of Apple's M1 processor).
 The reason for why this is possible is actually quite simple:
 First, power consumption tends to grow *quadratically* with clock frequency.
 Hence, for the power budget of a CPU core that runs 4 times faster (a typical number),
@@ -216,7 +219,7 @@ that could run on GPUs.
 They realized that the computational bottlenecks in CNNs,
 convolutions and matrix multiplications,
 are all operations that could be parallelized in hardware.
-Using two NVIDIA GTX 580s with 3GB of memory, either of which was capable of 1.5 TFLOPs,
+Using two NVIDIA GTX 580s with 3GB of memory, either of which was capable of 1.5 TFLOPs (still a challenge for most CPUs a decade later),
 they implemented fast convolutions.
 The code [cuda-convnet](https://code.google.com/archive/p/cuda-convnet/)
 was good enough that for several years
@@ -261,9 +264,9 @@ the network adds max-pooling layers
 with a window shape of $3\times3$ and a stride of 2.
 Moreover, AlexNet has ten times more convolution channels than LeNet.
 
-After the last convolutional layer, there are two fully connected layers
+After the last convolutional layer, there are two huge fully connected layers
 with 4096 outputs.
-These two huge fully connected layers produce model parameters of nearly 1 GB.
+These layers require nearly 1GB model parameters.
 Due to the limited memory in early GPUs,
 the original AlexNet used a dual data stream design,
 so that each of their two GPUs could be responsible
@@ -289,7 +292,7 @@ such as flipping, clipping, and color changes.
 This makes the model more robust and the larger sample size effectively reduces overfitting.
 We will discuss data augmentation in greater detail in :numref:`sec_image_augmentation`. See also :cite:`Buslaev.Iglovikov.Khvedchenya.ea.2020` for an in-depth review of such preprocessing steps.
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, init, npx
@@ -297,20 +300,20 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab all
 class AlexNet(d2l.Classifier):
     def __init__(self, lr=0.1, num_classes=10):
@@ -370,12 +373,12 @@ class AlexNet(d2l.Classifier):
 
 We [**construct a single-channel data example**] with both height and width of 224 (**to observe the output shape of each layer**). It matches the AlexNet architecture in :numref:`fig_alexnet`.
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab pytorch, mxnet
 AlexNet().layer_summary((1, 1, 224, 224))
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab tensorflow
 AlexNet().layer_summary((1, 224, 224, 1))
 ```
@@ -390,8 +393,8 @@ One of the problems with applying AlexNet directly on [**Fashion-MNIST**]
 is that its (**images have lower resolution**) ($28 \times 28$ pixels)
 (**than ImageNet images.**)
 To make things work, (**we upsample them to $224 \times 224$**).
-This is generally not a smart practice,
-but we do it here to be faithful to the AlexNet architecture.
+This is generally not a smart practice, as it simply increases the computational 
+complexity without adding information. Nonetheless, we do it here to be faithful to the AlexNet architecture.
 We perform this resizing with the `resize` argument in the `d2l.FashionMNIST` constructor.
 
 Now, we can [**start training AlexNet.**]
@@ -400,7 +403,7 @@ the main change here is the use of a smaller learning rate
 and much slower training due to the deeper and wider network,
 the higher image resolution, and the more costly convolutions.
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab pytorch, mxnet
 model = AlexNet(lr=0.01)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
@@ -408,7 +411,7 @@ trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 trainer.fit(model, data)
 ```
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
@@ -421,21 +424,25 @@ with d2l.try_gpu():
 
 AlexNet's structure bears a striking resemblance to LeNet, with a number of critical improvements, both for accuracy (dropout) and for ease of training (ReLU). What is equally striking is the amount of progress that has been made in terms of deep learning tooling. What was several months of work in 2012 can now be accomplished in a dozen lines of code using any modern framework.
 
-Reviewing the architecture, we see that AlexNet has an Achilles heel when it comes to efficiency: the last two hidden layers require matrices of size $6400 \times 4096$ and $4096 \times 4096$, respectively. This corresponds to 164 MB of memory and 81 MFLOPs of computation, both of which are a nontrivial outlay, especially on smaller devices, such as mobile phones. This is one of the reasons why AlexNet has been surpassed by much more effective architectures that we will cover in the following sections. Nonetheless, it is a key step from shallow to deep networks that are used nowadays. Although it seems that there are only a few more lines in AlexNet's implementation than in LeNet's, it took the academic community many years to embrace this conceptual change and take advantage of its excellent experimental results. This was also due to the lack of efficient computational tools. At the time neither DistBelief :cite:`Dean.Corrado.Monga.ea.2012` nor Caffe :cite:`Jia.Shelhamer.Donahue.ea.2014` existed, and Theano :cite:`Bergstra.Breuleux.Bastien.ea.2010` still lacked many distinguishing features. It is only the availability of TensorFlow :cite:`Abadi.Barham.Chen.ea.2016` that changed this situation dramatically.
+Reviewing the architecture, we see that AlexNet has an Achilles heel when it comes to efficiency: the last two hidden layers require matrices of size $6400 \times 4096$ and $4096 \times 4096$, respectively. This corresponds to 164 MB of memory and 81 MFLOPs of computation, both of which are a nontrivial outlay, especially on smaller devices, such as mobile phones. This is one of the reasons why AlexNet has been surpassed by much more effective architectures that we will cover in the following sections. Nonetheless, it is a key step from shallow to deep networks that are used nowadays. Note that even though the number of parameters by far exceeds the amount of training data in our experiments (the last two layers have more than 40 million parameters, trained on a datasets of 60 thousand images), there is hardly any overfitting: training and validation loss are virtually identical throughout training. This is due to the improved regularization, such as Dropout, inherent in modern Deep Network designs. 
+
+Although it seems that there are only a few more lines in AlexNet's implementation than in LeNet's, it took the academic community many years to embrace this conceptual change and take advantage of its excellent experimental results. This was also due to the lack of efficient computational tools. At the time neither DistBelief :cite:`Dean.Corrado.Monga.ea.2012` nor Caffe :cite:`Jia.Shelhamer.Donahue.ea.2014` existed, and Theano :cite:`Bergstra.Breuleux.Bastien.ea.2010` still lacked many distinguishing features. It is only the availability of TensorFlow :cite:`Abadi.Barham.Chen.ea.2016` that changed this situation dramatically.
 
 ## Exercises
 
-1. Following up on the discussion above, analyze computational performance of AlexNet.
+1. Following up on the discussion above, analyze the computational properties of AlexNet.
     1. Compute the memory footprint for convolutions and fully connected layers, respectively. Which one dominates?
     1. Calculate the computational cost for the convolutions and the fully connected layers.
-    1. How does the memory bandwidth affect computation?
-1. You are a chip designer and need to trade off computation and memory bandwidth. For example, a faster chip requires more chip area and more power, and more memory bandwidth requires more pins and control logic, thus also more area. How do you optimize?
+    1. How does the memory (read and write bandwidth, latency, size) affect computation? Is there any difference in its effects for training and inference?
+1. You are a chip designer and need to trade off computation and memory bandwidth. For example, a faster chip requires more power and possibly a larger chip area. More memory bandwidth requires more pins and control logic, thus also more area. How do you optimize?
+1. Why do engineers no longer report performance benchmarks on AlexNet?
 1. Try increasing the number of epochs when training AlexNet. Compared with LeNet, how do the results differ? Why?
 1. AlexNet may be too complex for the Fashion-MNIST dataset, in particular due to the low resolution of the initial images.
     1. Try simplifying the model to make the training faster, while ensuring that the accuracy does not drop significantly.
     1. Design a better model that works directly on $28 \times 28$ images.
 1. Modify the batch size, and observe the changes in throughput (images/s), accuracy, and GPU memory.
 1. Apply dropout and ReLU to LeNet-5. Does it improve? Can you improve things further by preprocessing to take advantage of the invariances inherent in the images?
+1. Can you make AlexNet overfit? Which feature do you need to remove/change to break training? 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/75)
