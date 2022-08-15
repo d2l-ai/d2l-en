@@ -42,7 +42,7 @@ DistilBERT (lightweight via knowledge distillation) :cite:`sanh2019distilbert`,
 and
 ELECTRA (replaced token detection) :cite:`clark2019electra`.
 Moreover, BERT inspired transformer pretraining in computer vision, such as with vision transformers
-:cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`, Swin transformers :cite:`liu2021swin`, and MAE (masked autoencoders) `he2022masked`.
+:cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`, Swin transformers :cite:`liu2021swin`, and MAE (masked autoencoders) :cite:`he2022masked`.
 
 ## Encoder-Decoder
 
