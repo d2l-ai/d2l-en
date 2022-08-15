@@ -161,7 +161,7 @@ Finally, we need a component that runs the scheduler / searcher and does some bo
 of the results. The following code implements a sequential execution of the HPO trials that evaluates one training job after the next and will serve as a basic example. We will later use **Syne Tune** for more sophisticated distributed HPO cases.
 
 ```{.python .input  n=6}
-%%tab all
+%%tab pytorch
 
 class HPOTuner(d2l.HyperParameters): #@save
     def __init__(self, scheduler, objective):
@@ -184,7 +184,7 @@ class HPOTuner(d2l.HyperParameters): #@save
             self.scheduler.update(config, error)
         
             runtime = time.time() - start_time
-            self.bookkeeping(config, error, runtime)        
+            self.bookkeeping(config, error.cpu().numpy(), runtime)        
 ```
 
 ### Bookkeeping the Performance of HPO Algorithms
