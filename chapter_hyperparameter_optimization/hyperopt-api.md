@@ -1,14 +1,14 @@
-```{.python .input  n=1}
+```{.python .input  n=2}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-```{.json .output n=1}
+```{.json .output n=2}
 [
  {
   "data": {
    "application/vnd.jupyter.widget-view+json": {
-    "model_id": "6fc3cf57de684d478ab428c518c983ce",
+    "model_id": "9faddeb5140545a59f32bd5ee63a6176",
     "version_major": 2,
     "version_minor": 0
    },
@@ -24,7 +24,6 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 :label:`sec_api_hpo`
 
 
-
 Before we dive into different techniques, we will first discuss a basic code structure that allows us to efficiently implement various HPO algorithms. In general, all HPO
 algorithms considered here need to implement two decision making primitives, **searching** and **scheduling**. First, they need to sample new hyperparameter configurations, which often involves some kind of search over the configuration space. Additional, for each configuration an HPO algorithm needs to schedule its evaluation and how much resources should be allocated to it.
 Once we started to evaluate a configurations, we will refer to it as a **trial**. We map these decisions to two classes,
@@ -37,11 +36,53 @@ This concept of scheduler and searcher is also implemented in popular HPO librar
 Below we define a base class for searchers, which provides a new candidate
 configuration through the `sample_configuration` function. A trivial way to to implement this function, would be to sample configuration uniformly at random, as we did for Random Search in the previous Section :ref:`sec_what_is_hpo`. More sophisticated algorithms, such as Bayesian optimization :ref:`sec_bo` will make these decisions based on the performance of previous trials. As a result, these more sophisticated algorithms do not sample uniformly at random, but are able to sample more promising candidates over time. To update the history of previous trials, such that we can exploit these observation to adjust our sample distribution, we add the `update` function.
 
+```{.python .input  n=3}
+%%tab mxnet
+from d2l import mxnet as d2l
+```
+
+```{.json .output n=3}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
+```
+
+```{.python .input  n=4}
+%%tab pytorch
+from d2l import torch as d2l
+```
+
+```{.json .output n=4}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
+```
+
+```{.python .input  n=5}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+```
+
+```{.json .output n=5}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
+```
+
 ```{.python .input  n=2}
 %%tab all
-
-from d2l import torch as d2l
-
 
 class HPOSearcher(d2l.HyperParameters): #@save
     def sample_configuration():
@@ -53,9 +94,7 @@ class HPOSearcher(d2l.HyperParameters): #@save
 The following code shows how to implement our random search optimizer from the previous section in this API:
 
 ```{.python .input  n=3}
-%%tab pytorch, mxnet, tensorflow
-
-from d2l import torch as d2l
+%%tab all
 
 class RandomSearcher(d2l.HPOSearcher): #@save
     def __init__(self, search_space):
@@ -187,9 +226,6 @@ We now use our new implementation of random search to optimize the *batch size* 
 ```{.python .input  n=1}
 %%tab all
 
-from d2l import torch as d2l
-
-
 def objective(config, max_epochs=8): #@save
     batch_size = config['batch_size']
     learning_rate = config['learning_rate']
@@ -225,9 +261,6 @@ search_space = {
 Now we can start our random search:
 
 ```{.python .input}
-from d2l import torch as d2l
-
-
 searcher = d2l.RandomSearcher(search_space)
 scheduler = BasicScheduler(searcher=searcher)
 tuner = d2l.HPOTuner(scheduler=scheduler, objective=objective)
