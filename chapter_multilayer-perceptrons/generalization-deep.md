@@ -224,7 +224,7 @@ underscores the usefulness of nonparametric modeling
 for understanding the behavior of over-parameterized deep networks.
 
 
-## Early Learning and Early Stopping
+## Early Stopping
 
 While deep neural networks are capable of fitting arbitrary labels,
 even when labels are assigned incorrectly or randomly
