@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Synthetic Regression Data
@@ -42,6 +42,16 @@ import tensorflow as tf
 import random
 ```
 
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax
+import jax.numpy as jnp
+import numpy as np
+import random
+```
+
 ## Generating the Dataset
 
 For this example, we will work low-dimensional
@@ -80,7 +90,12 @@ class SyntheticRegressionData(d2l.DataModule):  #@save
             noise = d2l.randn(n, 1) * noise
         if tab.selected('tensorflow'):
             self.X = tf.random.normal((n, w.shape[0]))
-            noise = tf.random.normal((n, 1)) * noise            
+            noise = tf.random.normal((n, 1)) * noise
+        if tab.selected('jax'):
+            key = jax.random.PRNGKey(0)
+            key1, key2 = jax.random.split(key)
+            self.X = jax.random.normal(key1, (n, w.shape[0]))
+            noise = jax.random.normal(key2, (n, 1)) * noise
         self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 ```
 
@@ -126,7 +141,7 @@ def get_dataloader(self, train):
     else:
         indices = list(range(self.num_train, self.num_train+self.num_val))
     for i in range(0, len(indices), self.batch_size):
-        if tab.selected('mxnet') or tab.selected('pytorch'):
+        if tab.selected('mxnet') or tab.selected('pytorch') or tab.selected('jax'):
             batch_indices = d2l.tensor(indices[i: i+self.batch_size])
             yield self.X[batch_indices], self.y[batch_indices]
         if tab.selected('tensorflow'):
@@ -173,6 +188,15 @@ As before, we need a dataset with features `X` and labels `y`.
 Beyond that, we set `batch_size` in the built-in data loader 
 and let it take care of shuffling examples  efficiently.
 
+:begin_tab:`jax`
+JAX is laser-focused on program transformations and
+accelerator-backed NumPy, so it doesn’t include data loading or munging
+in the JAX library. There are already a lot of great data loaders out
+there, and jax suggests using them instead of reinventing anything.
+Here we'll grab PyTorch’s data loader, and modify it slightly to make
+it work with NumPy arrays.
+:end_tab:
+
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(d2l.DataModule)  #@save
@@ -186,6 +210,35 @@ def get_tensorloader(self, tensors, train, indices=slice(0, None)):
         dataset = torch.utils.data.TensorDataset(*tensors)
         return torch.utils.data.DataLoader(dataset, self.batch_size,
                                            shuffle=train)
+    if tab.selected('jax'):
+        # Use PyTorch Dataset and Dataloader
+        # JAX or Flax do not provide any dataloading functionality
+        from torch.utils import data
+
+        def jax_collate(batch):
+            if isinstance(batch[0], np.ndarray):
+                return jnp.stack(batch)
+            elif isinstance(batch[0], (tuple,list)):
+                transposed = zip(*batch)
+                return [jax_collate(samples) for samples in transposed]
+            else:
+                return jnp.array(batch)
+
+        class JaxDataset(data.Dataset):
+            def __init__(self, train, seed=0):
+                super().__init__()
+
+            def __getitem__(self, index):
+                return (np.asarray(tensors[0][index]),
+                        np.asarray(tensors[1][index]))
+
+            def __len__(self):
+                return len(tensors[0])
+
+        dataset = JaxDataset(*tensors)
+        return data.DataLoader(dataset, self.batch_size,
+                               shuffle=train, collate_fn=jax_collate)
+
     if tab.selected('tensorflow'):
         shuffle_buffer = tensors[0].shape[0] if train else 1
         return tf.data.Dataset.from_tensor_slices(tensors).shuffle(

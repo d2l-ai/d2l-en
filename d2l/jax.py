@@ -238,6 +238,38 @@ class DataModule(d2l.HyperParameters):
     def val_dataloader(self):
         return self.get_dataloader(train=False)
 
+    def get_tensorloader(self, tensors, train, indices=slice(0, None)):
+        """Defined in :numref:`sec_synthetic-regression-data`"""
+        tensors = tuple(a[indices] for a in tensors)
+        # Use PyTorch Dataset and Dataloader
+        # JAX or Flax do not provide any dataloading functionality
+        from torch.utils import data
+    
+        def jax_collate(batch):
+            if isinstance(batch[0], np.ndarray):
+                return jnp.stack(batch)
+            elif isinstance(batch[0], (tuple,list)):
+                transposed = zip(*batch)
+                return [jax_collate(samples) for samples in transposed]
+            else:
+                return jnp.array(batch)
+    
+        class JaxDataset(data.Dataset):
+            def __init__(self, train, seed=0):
+                super().__init__()
+    
+            def __getitem__(self, index):
+                return (np.asarray(tensors[0][index]),
+                        np.asarray(tensors[1][index]))
+    
+            def __len__(self):
+                return len(tensors[0])
+    
+        dataset = JaxDataset(*tensors)
+        return data.DataLoader(dataset, self.batch_size,
+                               shuffle=train, collate_fn=jax_collate)
+    
+
 class Trainer(d2l.HyperParameters):
     """Defined in :numref:`sec_oo-design`"""
     def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
@@ -283,6 +315,24 @@ class Trainer(d2l.HyperParameters):
 
     def fit_epoch(self):
         raise NotImplementedError
+
+class SyntheticRegressionData(d2l.DataModule):
+    """Defined in :numref:`sec_synthetic-regression-data`"""
+    def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
+                 batch_size=32):
+        super().__init__()
+        self.save_hyperparameters()
+        n = num_train + num_val
+        key = jax.random.PRNGKey(0)
+        key1, key2 = jax.random.split(key)
+        self.X = jax.random.normal(key1, (n, w.shape[0]))
+        noise = jax.random.normal(key2, (n, 1)) * noise
+        self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
+
+    def get_dataloader(self, train):
+        """Defined in :numref:`sec_synthetic-regression-data`"""
+        i = slice(0, self.num_train) if train else slice(self.num_train, None)
+        return self.get_tensorloader((self.X, self.y), train, i)
 
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
