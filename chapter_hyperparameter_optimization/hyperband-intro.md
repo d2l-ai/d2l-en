@@ -4,6 +4,8 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
 # Multi-fidelity Hyperparameter Optimization
+:label:`sec_mf_hpo`
+
 
 Training neural network models can be expensive even for moderate size datasets. For example, training a ResNet-50 on a rather small dataset set, such as CIFAR10 might take 2 hours on a Amazon Elastic Cloud Compute (EC2) g4dn.xlarge instance. Hence, without a massively parallel compute budget,
 random search will often be too slow to be of real use in practice for modest to large size neural networks trained on massive data sets.
@@ -67,13 +69,25 @@ To implement SH, we use the HPOScheduler base class from the last Section. As we
 
 Inside our scheduler we maintain a queue of configurations that need to be evaluated for the current rung level $r_i$. We update the queue every time we jump to the next rung level.
 
-```{.python .input  n=2}
-import numpy as np
+```{.python .input}
+%%tab mxnet
+from d2l import mxnet as d2l
+```
 
+```{.python .input}
+%%tab pytorch
 from d2l import torch as d2l
+```
 
+```{.python .input}
+%%tab tensorflow
+from d2l import tensorflow as d2l
+```
+
+```{.python .input  n=2}
+%%tab all
+import numpy as np
 from collections import defaultdict
-
 
 class SuccessiveHalvingScheduler(d2l.HPOScheduler):#@save
     def __init__(
@@ -99,6 +113,7 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):#@save
 In the beginning our queue is empty and we fill it with $N = s * \eta^{K}$ configurations, which are first evaluated on the smallest rung level $r_{min}$. The effect of $s$ will become important later if we look at Hyperband, for now let's just assume $s=1$. Now, every time resources become available and the HPOTuner object queries the suggest function, we return an element from the queue. Once we finish one round of SH - which means that we evaluated all surviving configuration on the highest resource level $r_{max}$ and our queue is empty - we start the entire process again with a new set of configurations.
 
 ```{.python .input  n=12}
+%%tab all
 @d2l.add_to_class(SuccessiveHalvingScheduler) #@save
 def suggest(self):
 
@@ -122,6 +137,7 @@ def suggest(self):
 When we collected a new data point, we first update the searcher module. Afterwards we check if we already collect enough data points $n_i = \eta^{K - i}$ on the current rung level. If so, we sort all configurations based on their performance and estimate the top $\frac{1}{\eta}$ configuration and append them to the queue, which should be empty at this point.
 
 ```{.python .input  n=4}
+%%tab all
 @d2l.add_to_class(SuccessiveHalvingScheduler) #@save
 def update(self, config, error, info=None):
     
@@ -206,10 +222,11 @@ Now for each bracket $s \in \{s_{max}, ..., 0\}$, we call SH with $r_{min} = \et
 We implement a new scheduler, that maintains a SuccessiveHalvingScheduler object.
 
 ```{.python .input  n=8}
+%%tab all
 import numpy as np
 import copy
 
-class HyperbandScheduler(d2l.HPOScheduler):
+class HyperbandScheduler(d2l.HPOScheduler): #@save
     def __init__(self, searcher, eta, r_min, r_max):
         self.save_hyperparameters()
         self.s_max = int(np.ceil((np.log(r_max) - np.log(r_min)) / np.log(eta)))
@@ -226,6 +243,7 @@ class HyperbandScheduler(d2l.HPOScheduler):
 ```
 
 ```{.python .input  n=9}
+%%tab all
 @d2l.add_to_class(HyperbandScheduler) #@save
 def update(self, config, error, info=None):
 
