@@ -406,7 +406,7 @@ class FashionMNIST(d2l.DataModule):
         X, y = batch
         if not labels:
             labels = self.text_labels(y)
-        d2l.show_images(X, nrows, ncols, titles=labels)
+        d2l.show_images(tf.squeeze(X), nrows, ncols, titles=labels)
 
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images.
@@ -1908,7 +1908,10 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
         if pred == tgt_vocab['<eos>']:
             break
         output_seq.append(pred.numpy())
-    return ' '.join(tgt_vocab.to_tokens(tf.reshape(output_seq, shape = -1).numpy().tolist())), attention_weight_seq# Alias defined in config.ini
+    return ' '.join(tgt_vocab.to_tokens(tf.reshape(output_seq, shape = -1).numpy().tolist())), attention_weight_seq
+
+
+# Alias defined in config.ini
 size = lambda a: tf.size(a).numpy()
 
 reshape = tf.reshape
