@@ -234,7 +234,7 @@ def update(self, config, error, info=None):
         if self.s < 0:
             self.s = self.s_max
         self.successive_halving = SuccessiveHalvingScheduler(
-            searcher=self.searcher, eta=self.eta, r_min=self.r_max * self.eta ** (-self.s),
+            searcher=self.searcher, eta=self.eta, r_min=int(self.r_max * self.eta ** (-self.s)),
             r_max=self.r_max, s=(self.s_max +1 ) / (self.s + 1))
 ```
 
