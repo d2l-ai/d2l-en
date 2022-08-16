@@ -225,7 +225,7 @@ class HyperbandScheduler(d2l.HPOScheduler): #@save
 %%tab all
 @d2l.add_to_class(HyperbandScheduler) #@save
 def update(self, config, error, info=None):
-    self.brackets[self.s].append((config['max_epochs'], error.cpu().numpy())
+    self.brackets[self.s].append((config['max_epochs'], error.cpu().numpy()))
     self.successive_halving.update(config, error, info=info)
     # if the queue of successive halving is empty, than we finished this round and start with
     # a new round with different r_min and N
