@@ -160,7 +160,7 @@ class BasicScheduler(HPOScheduler): #@save
 Finally, we need a component that runs the scheduler / searcher and does some book-keeping
 of the results. The following code implements a sequential execution of the HPO trials that evaluates one training job after the next and will serve as a basic example. We will later use **Syne Tune** for more sophisticated distributed HPO cases.
 
-```{.python .input  n=6}
+```{.python .input  n=7}
 %%tab pytorch
 
 class HPOTuner(d2l.HyperParameters): #@save
@@ -179,12 +179,22 @@ class HPOTuner(d2l.HyperParameters): #@save
             start_time = time.time()
             config = self.scheduler.suggest()
         
-            error = self.objective(config)
+            error = self.objective(**config)
         
             self.scheduler.update(config, error)
         
             runtime = time.time() - start_time
             self.bookkeeping(config, error.cpu().numpy(), runtime)        
+```
+
+```{.json .output n=7}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "Ignored to run as it is not marked as a \"None\" cell."
+ }
+]
 ```
 
 ### Bookkeeping the Performance of HPO Algorithms
@@ -223,7 +233,7 @@ def bookkeeping(self, config, error, runtime):
 
 We now use our new implementation of random search to optimize the *batch size* and *learning rate* of a convolutional neural networks from :ref:`sec_alexnet`. For that, we first have to define the objective function.
 
-```{.python .input  n=1}
+```{.python .input  n=6}
 %%tab all
 
 def objective(batch_size, learning_rate, max_epochs=8): #@save
@@ -233,16 +243,6 @@ def objective(batch_size, learning_rate, max_epochs=8): #@save
     trainer.fit(model=model, data=data)
     validation_error = trainer.validate(model=model)
     return validation_error    
-```
-
-```{.json .output n=1}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "UsageError: Cell magic `%%tab` not found.\n"
- }
-]
 ```
 
 We also define need to define the search space.
