@@ -144,7 +144,7 @@ def update(self, config, error, info=None):
     if len(self.observed_error_at_rungs[ri]) == n and ri < self.r_max:
         best_performing_configurations = self.get_top_n_configurations(ri, n // self.eta)
         for config in best_performing_configurations:
-            config['max_epochs'] = ri * self.eta
+            config['max_epochs'] = int(ri * self.eta)
             self.queue.append(config)
         
 @d2l.add_to_class(SuccessiveHalvingScheduler) #@save
@@ -225,7 +225,7 @@ class HyperbandScheduler(d2l.HPOScheduler): #@save
 %%tab all
 @d2l.add_to_class(HyperbandScheduler) #@save
 def update(self, config, error, info=None):
-    self.brackets[self.s].append((config['max_epochs'], error))
+    self.brackets[self.s].append((config['max_epochs'], error.cpu().numpy())
     self.successive_halving.update(config, error, info=info)
     # if the queue of successive halving is empty, than we finished this round and start with
     # a new round with different r_min and N
