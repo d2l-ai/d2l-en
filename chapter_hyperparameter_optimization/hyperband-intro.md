@@ -243,7 +243,7 @@ Let us see how this is doing.
 ```{.python .input  n=21}
 searcher = d2l.RandomSearcher(search_space)
 scheduler = HyperbandScheduler(searcher=searcher, eta=2, r_min=1, r_max=16)
-tuner = d2l.HPOTuner(scheduler=scheduler, objective=objective_with_resource)
+tuner = d2l.HPOTuner(scheduler=scheduler, objective=d2l.objective)
 tuner.run(number_of_trials=100)
 ```
 
