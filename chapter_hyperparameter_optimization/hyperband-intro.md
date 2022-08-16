@@ -162,6 +162,9 @@ Let us see how this is doing on our example.
 ```{.python .input  n=5}
 from scipy import stats
 
+min_number_of_epochs = 1
+max_number_of_epochs = 4
+
 search_space = {
    "learning_rate": stats.loguniform(1e-4, 1),
    "batch_size": stats.randint(8, 128),
@@ -170,7 +173,8 @@ search_space = {
 
 ```{.python .input  n=14}
 searcher = d2l.RandomSearcher(search_space)
-scheduler = SuccessiveHalvingScheduler(searcher=searcher, eta=2, r_min=1, r_max=16)
+scheduler = SuccessiveHalvingScheduler(searcher=searcher, eta=2,
+                                       r_min=min_number_of_epochs, r_max=max_number_of_epochs)
 tuner = d2l.HPOTuner(scheduler=scheduler, objective=d2l.objective)
 tuner.run(number_of_trials=31)
 ```
@@ -182,7 +186,10 @@ import matplotlib.pyplot as plt
 for rung_index, rung in scheduler.observed_error_at_rungs.items():
     errors = [xi[1] for xi in rung]   
     plt.scatter([rung_index] * len(errors), errors)
-    plt.xlim(0, 17)
+
+plt.xlim(min_number_of_epochs-0.5, max_number_of_epochs+0.5)
+plt.xticks(np.arange(min_number_of_epochs, max_number_of_epochs+1),
+               np.arange(min_number_of_epochs, max_number_of_epo
 plt.ylabel('validation error')
 plt.xlabel('epochs')        
 ```
@@ -242,7 +249,8 @@ Let us see how this is doing.
 
 ```{.python .input  n=21}
 searcher = d2l.RandomSearcher(search_space)
-scheduler = HyperbandScheduler(searcher=searcher, eta=2, r_min=1, r_max=16)
+scheduler = HyperbandScheduler(searcher=searcher, eta=2,
+                               r_min=min_number_of_epochs, r_max=max_number_of_epochs)
 tuner = d2l.HPOTuner(scheduler=scheduler, objective=d2l.objective)
 tuner.run(number_of_trials=100)
 ```
@@ -255,7 +263,10 @@ for bi, bracket in scheduler.brackets.items():
     errors = [xi[1] for xi in bracket]
     plt.scatter(rung_levels, errors)
 
-    plt.xlim(0, 17)
+    plt.xlim(min_number_of_epochs-0.5, max_number_of_epochs+0.5)
+    plt.xticks(np.arange(min_number_of_epochs, max_number_of_epochs+1),
+               np.arange(min_number_of_epochs, max_number_of_epochs+1))
+
     plt.title(f'bracket s={bi}')
     plt.ylabel('objective function')
     plt.xlabel('epochs')        
