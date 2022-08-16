@@ -36,11 +36,9 @@ Instead of implementing the complex machinery of distributed job execution, we w
 
 You can install it via:
 
-```
+```{.python .input}
 !pip install syne-tune
-
 ```
-
 
 ## Objective Function
 
