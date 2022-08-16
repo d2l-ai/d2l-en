@@ -64,7 +64,7 @@ First, we define the number of workers that evaluate trials concurrently. We als
 
 ```{.python .input  n=37}
 n_workers = 4
-max_wallclock_time = 60
+max_wallclock_time = 600
 ```
 
 Next, we define specify the path to our training script, which metric we want to optimize and whether we want to minimize of maximize this metric. Namely, `metric` needs
