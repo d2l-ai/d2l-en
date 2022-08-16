@@ -226,9 +226,7 @@ We now use our new implementation of random search to optimize the *batch size* 
 ```{.python .input  n=1}
 %%tab all
 
-def objective(config, max_epochs=8): #@save
-    batch_size = config['batch_size']
-    learning_rate = config['learning_rate']
+def objective(batch_size, learning_rate, max_epochs=8): #@save
     model = d2l.AlexNet(lr=learning_rate)
     trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=1)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
