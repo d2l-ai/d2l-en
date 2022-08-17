@@ -7,10 +7,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 :label:`sec_densenet`
 
 ResNet significantly changed the view of how to parametrize the functions in deep networks. *DenseNet* (dense convolutional network) is to some extent the logical extension of this :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
-As a result,
-DenseNet 
-is characterized by
-both the connectivity pattern where
+DenseNet is characterized by both the connectivity pattern where
 each layer connects to all the preceding layers
 and the concatenation operation (rather than the addition operator in ResNet) to preserve and reuse features
 from earlier layers.
@@ -21,7 +18,7 @@ To understand how to arrive at it, let's take a small detour to mathematics.
 
 Recall the Taylor expansion for functions. For the point $x = 0$ it can be written as
 
-$$f(x) = f(0) + f'(0) x + \frac{f''(0)}{2!}  x^2 + \frac{f'''(0)}{3!}  x^3 + \ldots.$$
+$$f(x) = f(0) + x \cdot \left[f'(0) + x \cdot \left[\frac{f''(0)}{2!}  + x \cdot \left[\frac{f'''(0)}{3!}  + \ldots \right]\right]\right].$$
 
 
 The key point is that it decomposes a function into increasingly higher order terms. In a similar vein, ResNet decomposes functions into
@@ -30,9 +27,8 @@ $$f(\mathbf{x}) = \mathbf{x} + g(\mathbf{x}).$$
 
 That is, ResNet decomposes $f$ into a simple linear term and a more complex
 nonlinear one.
-What if we want to capture (not necessarily add) information beyond two terms?
-One solution was
-DenseNet :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
+What if we wanted to capture (not necessarily add) information beyond two terms?
+One such solution is DenseNet :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
 
 ![The main difference between ResNet (left) and DenseNet (right) in cross-layer connections: use of addition and use of concatenation. ](../img/densenet-block.svg)
 :label:`fig_densenet_block`
@@ -43,16 +39,17 @@ As a result, we perform a mapping from $\mathbf{x}$ to its values after applying
 $$\mathbf{x} \to \left[
 \mathbf{x},
 f_1(\mathbf{x}),
-f_2([\mathbf{x}, f_1(\mathbf{x})]), f_3([\mathbf{x}, f_1(\mathbf{x}), f_2([\mathbf{x}, f_1(\mathbf{x})])]), \ldots\right].$$
+f_2\left(\left[\mathbf{x}, f_1\left(\mathbf{x}\right)\right]\right), f_3\left(\left[\mathbf{x}, f_1\left(\mathbf{x}\right), f_2\left(\left[\mathbf{x}, f_1\left(\mathbf{x}\right)\right]\right)\right]\right), \ldots\right].$$
 
 In the end, all these functions are combined in MLP to reduce the number of features again. In terms of implementation this is quite simple:
 rather than adding terms, we concatenate them. The name DenseNet arises from the fact that the dependency graph between variables becomes quite dense. The last layer of such a chain is densely connected to all previous layers. The dense connections are shown in :numref:`fig_densenet`.
 
-![Dense connections in DenseNet.](../img/densenet.svg)
+![Dense connections in DenseNet. Note how the dimensionality increases with depth.](../img/densenet.svg)
 :label:`fig_densenet`
 
-
-The main components that compose a DenseNet are *dense blocks* and *transition layers*. The former define how the inputs and outputs are concatenated, while the latter control the number of channels so that it is not too large.
+The main components that compose a DenseNet are *dense blocks* and *transition layers*. The former define how the inputs and outputs are concatenated, while the latter control the number of channels so that it is not too large, 
+since the expansion $\mathbf{x} \to \left[\mathbf{x}, f_1(\mathbf{x}),
+f_2\left(\left[\mathbf{x}, f_1\left(\mathbf{x}\right)\right]\right), \ldots \right]$ can be quite high-dimensional.
 
 
 ## [**Dense Blocks**]
@@ -111,7 +108,7 @@ class ConvBlock(tf.keras.layers.Layer):
         return y
 ```
 
-A *dense block* consists of multiple convolution blocks, each using the same number of output channels. In the forward propagation, however, we concatenate the input and output of each convolution block on the channel dimension.
+A *dense block* consists of multiple convolution blocks, each using the same number of output channels. In the forward propagation, however, we concatenate the input and output of each convolution block on the channel dimension. Lazy evaluation allows us to adjust the dimensionality automatically.
 
 ```{.python .input}
 %%tab mxnet
@@ -125,8 +122,7 @@ class DenseBlock(nn.Block):
     def forward(self, X):
         for blk in self.net:
             Y = blk(X)
-            # Concatenate the input and output of each block on the channel
-            # dimension
+            # Concatenate input and output of each block along the channels
             X = np.concatenate((X, Y), axis=1)
         return X
 ```
@@ -144,8 +140,7 @@ class DenseBlock(nn.Module):
     def forward(self, X):
         for blk in self.net:
             Y = blk(X)
-            # Concatenate the input and output of each block on the channel
-            # dimension
+            # Concatenate input and output of each block along the channels
             X = torch.cat((X, Y), dim=1)
         return X
 ```
@@ -167,7 +162,7 @@ class DenseBlock(tf.keras.layers.Layer):
 
 In the following example,
 we [**define a `DenseBlock` instance**] with 2 convolution blocks of 10 output channels.
-When using an input with 3 channels, we will get an output with  $3+2\times 10=23$ channels. The number of convolution block channels controls the growth in the number of output channels relative to the number of input channels. This is also referred to as the *growth rate*.
+When using an input with 3 channels, we will get an output with  $3 + 10 + 10=23$ channels. The number of convolution block channels controls the growth in the number of output channels relative to the number of input channels. This is also referred to as the *growth rate*.
 
 ```{.python .input}
 %%tab all
@@ -185,7 +180,7 @@ Y.shape
 
 ## [**Transition Layers**]
 
-Since each dense block will increase the number of channels, adding too many of them will lead to an excessively complex model. A *transition layer* is used to control the complexity of the model. It reduces the number of channels by using the $1\times 1$ convolutional layer and halves the height and width of the average pooling layer with a stride of 2, further reducing the complexity of the model.
+Since each dense block will increase the number of channels, adding too many of them will lead to an excessively complex model. A *transition layer* is used to control the complexity of the model. It reduces the number of channels by using an $1\times 1$ convolution. Moreover, it halves the height and width via average pooling with a stride of 2.
 
 ```{.python .input}
 %%tab mxnet
@@ -367,7 +362,7 @@ Although these concatenation operations
 reuse features to achieve computational efficiency,
 unfortunately they lead to heavy GPU memory consumption.
 As a result,
-applying DenseNet may require more complex memory-efficient implementations that may increase training time :cite:`pleiss2017memory`.
+applying DenseNet may require more memory-efficient implementations that may increase training time :cite:`pleiss2017memory`.
 
 
 ## Exercises
@@ -375,7 +370,7 @@ applying DenseNet may require more complex memory-efficient implementations that
 1. Why do we use average pooling rather than max-pooling in the transition layer?
 1. One of the advantages mentioned in the DenseNet paper is that its model parameters are smaller than those of ResNet. Why is this the case?
 1. One problem for which DenseNet has been criticized is its high memory consumption.
-    1. Is this really the case? Try to change the input shape to $224\times 224$ to see the actual GPU memory consumption.
+    1. Is this really the case? Try to change the input shape to $224\times 224$ to see the actual GPU memory consumption empirically.
     1. Can you think of an alternative means of reducing the memory consumption? How would you need to change the framework?
 1. Implement the various DenseNet versions presented in Table 1 of the DenseNet paper :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
 1. Design an MLP-based model by applying the DenseNet idea. Apply it to the housing price prediction task in :numref:`sec_kaggle_house`.
