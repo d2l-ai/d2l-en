@@ -201,7 +201,6 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         self.board.draw(x, d2l.numpy(d2l.to(value, d2l.cpu())),
                         ('train_' if train else 'val_') + key,
                         every_n=int(n))
-
     def training_step(self, batch):
         l = self.loss(self(*batch[:-1]), batch[-1])
         self.plot('loss', l, train=True)

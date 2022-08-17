@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Object-Oriented Design for Implementation
@@ -64,6 +64,17 @@ import time
 import numpy as np
 from d2l import torch as d2l
 import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from dataclasses import field
+import time
+import numpy as np
+from d2l import jax as d2l
+import jax
+import jax.numpy as jnp
+from flax.training.train_state import TrainState
 ```
 
 ## Utilities
@@ -162,25 +173,48 @@ Sometimes we put the code to compute the output into a separate `forward` method
 ```{.python .input}
 %%tab all
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
-    def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
-        super().__init__()
-        self.save_hyperparameters()
-        self.board = ProgressBoard()
+    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+        def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
+            super().__init__()
+            self.save_hyperparameters()
+            self.board = ProgressBoard()
         if tab.selected('tensorflow'):
             self.training = None
+
+    if tab.selected('jax'):
+        # No need for save_hyperparam when using python dataclass
+        # python dataclasses do not work perfectly well with inheritance
+        plot_train_per_epoch: int = field(default=2, init=False)
+        plot_valid_per_epoch: int = field(default=1, init=False)
+        # Use default_factory to make sure new plots are generated on each run
+        board: ProgressBoard = field(default_factory=lambda: ProgressBoard(),
+                                     init=False)
+        training: bool = field(default=None, init=False)
 
     def loss(self, y_hat, y):
         raise NotImplementedError
 
-    def forward(self, X):
-        assert hasattr(self, 'net'), 'Neural network is defined'
-        return self.net(X)
+    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+        def forward(self, X):
+            assert hasattr(self, 'net'), 'Neural network is defined'
+            return self.net(X)
 
     if tab.selected('tensorflow'):
         def call(self, X, *args, **kwargs):
             if kwargs and "training" in kwargs:
                 self.training = kwargs['training']
             return self.forward(X, *args)
+
+    if tab.selected('jax'):
+        # JAX & Flax don't have a forward method like syntax
+        # Flax uses setup and built-in __call__ magic methods for forward pass
+        # Adding here for consistency
+        def forward(self, X, *args, **kwargs):
+            assert hasattr(self, 'net'), 'Neural network is defined'
+            return self.net(X, *args, **kwargs)
+
+        def __call__(self, X, *args, **kwargs):
+            return self.forward(X, *args, **kwargs)
 
     def plot(self, key, value, train):
         """Plot a point in animation."""
@@ -202,15 +236,31 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
             self.board.draw(x, d2l.numpy(d2l.to(value, d2l.cpu())),
                             ('train_' if train else 'val_') + key,
                             every_n=int(n))
+        if tab.selected('jax'):
+            self.board.draw(x, d2l.to(value, d2l.cpu()),
+                            ('train_' if train else 'val_') + key,
+                            every_n=int(n))
 
-    def training_step(self, batch):
-        l = self.loss(self(*batch[:-1]), batch[-1])
-        self.plot('loss', l, train=True)
-        return l
+    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+        def training_step(self, batch):
+            l = self.loss(self(*batch[:-1]), batch[-1])
+            self.plot('loss', l, train=True)
+            return l
 
-    def validation_step(self, batch):
-        l = self.loss(self(*batch[:-1]), batch[-1])
-        self.plot('loss', l, train=False)
+        def validation_step(self, batch):
+            l = self.loss(self(*batch[:-1]), batch[-1])
+            self.plot('loss', l, train=False)
+
+    if tab.selected('jax'):
+        def training_step(self, params, batch):
+            l, grads = jax.value_and_grad(self.loss)(params, *batch[:-1],
+                                                     batch[-1])
+            self.plot("loss", l, train=True)
+            return l, grads
+
+        def validation_step(self, params, batch):
+            l = self.loss(params, *batch[:-1], batch[-1])
+            self.plot("loss", l, train=False)
 
     def configure_optimizers(self):
         raise NotImplementedError
@@ -239,7 +289,7 @@ The `DataModule` class is the base class for data. Quite frequently the `__init_
 ```{.python .input}
 %%tab all
 class DataModule(d2l.HyperParameters):  #@save
-    if tab.selected('mxnet', 'pytorch'):
+    if tab.selected('mxnet', 'pytorch', 'jax'):
         def __init__(self, root='../data', num_workers=4):
             self.save_hyperparameters()
 
@@ -281,15 +331,42 @@ class Trainer(d2l.HyperParameters):  #@save
         model.board.xlim = [0, self.max_epochs]
         self.model = model
 
-    def fit(self, model, data):
-        self.prepare_data(data)
-        self.prepare_model(model)
-        self.optim = model.configure_optimizers()
-        self.epoch = 0
-        self.train_batch_idx = 0
-        self.val_batch_idx = 0
-        for self.epoch in range(self.max_epochs):
-            self.fit_epoch()
+    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+        def fit(self, model, data):
+            self.prepare_data(data)
+            self.prepare_model(model)
+            self.optim = model.configure_optimizers()
+            self.epoch = 0
+            self.train_batch_idx = 0
+            self.val_batch_idx = 0
+            for self.epoch in range(self.max_epochs):
+                self.fit_epoch()
+
+    if tab.selected('jax'):
+        def apply_init(self, **kwargs):
+            if kwargs and 'key' in kwargs and (kwargs['key'] is not None):
+                self.key = kwargs['key']
+            else:
+                self.key = jax.random.PRNGKey(0)  # Avoid, but use as fallback
+            input_shape = next(iter(self.train_dataloader))[0].shape
+            dummy_input = jnp.zeros(input_shape)
+            params = self.model.init(self.key, dummy_input)
+            return params
+
+        def fit(self, model, data, key=None):
+            self.prepare_data(data)
+            self.prepare_model(model)
+            self.params = self.apply_init(key=key)
+            self.optim = model.configure_optimizers()
+            # Flax uses optax under the hood for a single state obj TrainState
+            self.state = TrainState.create(apply_fn=model.apply,
+                                           params=self.apply_init(key=key),
+                                           tx=model.configure_optimizers())
+            self.epoch = 0
+            self.train_batch_idx = 0
+            self.val_batch_idx = 0
+            for self.epoch in range(self.max_epochs):
+                self.fit_epoch()
 
     def fit_epoch(self):
         raise NotImplementedError

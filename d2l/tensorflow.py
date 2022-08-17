@@ -447,7 +447,6 @@ class Classifier(d2l.Module):
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
     return tf.device('/CPU:0')
-
 def gpu(i=0):
     """Defined in :numref:`sec_use_gpu`"""
     return tf.device(f'/GPU:{i}')
