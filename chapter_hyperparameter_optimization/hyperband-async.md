@@ -50,9 +50,8 @@ def objective(learning_rate, batch_size, max_epochs):
     import numpy as np
     validation_error = np.e ** - max_epochs
     for epoch in range(1, max_epochs + 1):
-#         trainer.fit(model=model, data=data)
-#         validation_error = trainer.evaluate()
-        validation_error = np.e ** - max_epochs + np.random.randn() * 1e-3
+        trainer.fit(model=model, data=data)
+        validation_error = trainer.validate(model=model).cpu().numpy()
         report(epoch=epoch, validation_error=validation_error)
 ```
 
@@ -61,7 +60,7 @@ We also use the same search space as before
 ```{.python .input  n=55}
 from syne_tune.config_space import randint, loguniform
 
-max_epochs = 27
+max_epochs = 4
 
 search_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
@@ -107,7 +106,7 @@ from syne_tune.backend.python_backend import PythonBackend
 trial_backend = PythonBackend(tune_function=objective, config_space=search_space)
 
 stop_criterion = StoppingCriterion(
-    max_wallclock_time=100
+    max_wallclock_time=600
 )
 tuner = Tuner(
     trial_backend=trial_backend,
@@ -191,7 +190,6 @@ for trial_id in results.trial_id.unique():
  }
 ]
 ```
-
 
 ## Summary
 
