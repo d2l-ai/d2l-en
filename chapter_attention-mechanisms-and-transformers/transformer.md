@@ -13,7 +13,7 @@ Notably,
 self-attention
 enjoys both parallel computation and
 the shortest maximum path length.
-Therefore natually,
+Therefore naturally,
 it is appealing to design deep architectures
 by using self-attention.
 Unlike earlier self-attention models
