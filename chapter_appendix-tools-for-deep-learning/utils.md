@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Utility Functions and Classes
@@ -37,6 +37,15 @@ from IPython import display
 import collections
 from d2l import tensorflow as d2l
 import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+import inspect
+from IPython import display
+import collections
+from d2l import jax as d2l
+import jax
 ```
 
 Hyperparameters.
@@ -400,7 +409,7 @@ def evaluate_accuracy(net, data_iter):  #@save
 ```
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 
 def linreg(X, w, b):  #@save
     """The linear regression model."""
@@ -433,7 +442,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
             ax.set_title(titles[i])
     return axes
 
-#@tab all
+#@tab pytorch, mxnet, tensorflow
 class Animator:  #@save
     """For plotting data in animation."""
     def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
@@ -473,8 +482,8 @@ class Animator:  #@save
         self.config_axes()
         display.display(self.fig)
         display.clear_output(wait=True)
-        
-#@tab all
+
+#@tab pytorch, mxnet, tensorflow
 class Accumulator:  #@save
     """For accumulating sums over `n` variables."""
     def __init__(self, n):
@@ -487,10 +496,10 @@ class Accumulator:  #@save
         self.data = [0.0] * len(self.data)
 
     def __getitem__(self, idx):
-        return self.data[idx]        
-    
-    
-#@tab all
+        return self.data[idx]
+
+
+#@tab pytorch, mxnet, tensorflow
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
@@ -500,7 +509,7 @@ def accuracy(y_hat, y):  #@save
 ```
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 
 import os
 import requests
@@ -548,7 +557,7 @@ def extract(filename, folder=None):  #@save
 ```
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 
 def download_extract(name, folder=None):  #@save
     """Download and extract a zip/tar file."""
@@ -636,7 +645,7 @@ def grad_clipping(grads, theta):  #@save
 More for the attention chapter.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 #@save
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
