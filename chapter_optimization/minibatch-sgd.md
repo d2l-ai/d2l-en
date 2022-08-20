@@ -207,7 +207,7 @@ A.assign(tf.tensordot(B, C, axes=1))
 timer.stop()
 
 # Multiply and add count as separate operations (fused in practice)
-gigaflops = [2/i for i in timer.times]
+gigaflops = [0.02/i for i in timer.times]
 print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
