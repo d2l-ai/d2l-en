@@ -5,18 +5,34 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 # Asynchronous Successive Halving
 
+As we have seen in Section :ref:`sec_rs_async`, we can accelerate the HPO process
+by distributing the evaluation of hyperparameter configurations across either
+multiple instances or multiples CPUs / GPUs on a single instance. However, compared
+to random search, it is not straightforward to run SH asynchronously in a
+distributed setting. Before we can decide which configuration to run next, we first
+have to collect all observations on the current rung level. This leads to
+synchronization points at each rung level. For example, for the lowest rung level
+$r_{min}$, we first have to evaluate all $N = \eta^K$ configurations, before we
+can promote the $\frac{1}{\eta}$ of them to the next rung level.
 
-As we have seen in Section :ref:`sec_rs_async`, we can accelerate the HPO process by distributing the evaluation of hyperparameter configurations across either multiple instances or multiples CPUs / GPUs on a single instance.
-However, compared to random search, it is not straight forward to run SH asynchronously in a distributed setting.
-Before we can decide which configuration to run next, we first have to collect all observations on the current rung level. This leads to synchronization points at each rung level.
-For example, for the lowest rung level $r_{min}$, we first have to evaluate all $N = \eta^K$ configurations, 
-before we can promote the $\frac{1}{\eta}$ of them to the next rung level.
+If every trial consumed the same amount of wall-clock time, synchronization would
+not be a problem, since all results come in at the same time. However, in practice,
+we often have a high variations in training time across hyperparameter configurations.
+For example, assuming the number of filter per layer as a hyperparameter, networks
+with smaller filter sizes require less time to train for a fix amount of epochs than
+networks with larger filter sizes. Especially in the case of stragglers, this might
+lead to large idling times of workers.
 
-If every trial would consume the same amount of wall-clock time, synchronization wouldn't be a problem, since all results come in at the same time. However, in practice, we often have a high variations in training time across hyperparameter configurations. For example, assuming the number of filter per layer as a hyperparameter, networks with smaller filter sizes require less time to train for a fix amount of epochs than networks with larger filter sizes. Especially in the case of stragglers, this might lead to large idling times of workers. 
+Asynchronous successive halving (ASHA) :cite:`li-arxiv18` adapts SH to the asynchronous
+parallel scenario. The main idea of ASHA is to promote configurations to the next rung
+level as soon as we collected at least $\eta$ observations on the current rung level.
+This rule may lead to suboptimal promotions: configurations can be promoted to the
+next rung level, which in hindsight do not compare favourably against most others
+at the same rung level. On the other hand, we get rid of all synchronization points
+this way. If a worker is free, but no configuration can be promoted, we start a new
+configuration with $r = r_{min}$.
 
-Asynchronous successive halving (ASHA) :cite:`li-arxiv18` adapts SH to the asynchronous parallel scenario. The main idea of ASHA is to promote configurations to the next rung level as soon as we collected at least $\eta$ observations on the current rung level. While this potential leads to incorrect promotions, i.e configurations are promoted to the next rung level, that would have been promoted if we evaluated all configurations on the current rung level, in removes any synchronization points. If a resources become free and we have less than $\eta$ configurations, we start a new configuration on the first rung level $r_0$. 
-
-As for asynchronous random search, we will use **Syne Tune** once more, to use asynchronous scheduling.
+As for asynchronous random search, we will use **Syne Tune** once more.
 
 ## Objective Function
 
@@ -36,14 +52,14 @@ def objective(learning_rate, batch_size, max_epochs):
         report(epoch=epoch, validation_error=float(validation_error))
 ```
 
-We also use the same search space as before
+We also use the same configuration space as before
 
 ```{.python .input  n=55}
 from syne_tune.config_space import randint, loguniform
 
 max_epochs = 4
 
-search_space = {
+config_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
    "batch_size": randint(8, 128),
    "max_epochs": max_epochs,
@@ -51,7 +67,9 @@ search_space = {
 ```
 
 ```{.python .input}
-n_workers = 4 # We have to set this number equal to the number of GPUs that are in the machine to run this notebook
+# We have to set this number equal to the number of GPUs that are in the machine
+# to run this notebook
+n_workers = 4
 max_wallclock_time = 900
 ```
 
@@ -64,21 +82,21 @@ variation of what we did for asynchronous random search.
 from syne_tune.optimizer.baselines import ASHA
 
 scheduler = ASHA(
-    search_space,
+    config_space,
     metric="validation_error",
     resource_attr="epoch",
-    max_t=max_epochs,
+    max_resource_attr="max_epochs",
     mode="min",
-    type='promotion',
+    type="promotion",
     grace_period=1,  # this corresponds to r_min 
-    reduction_factor=2  # this corresponds to eta
-    max_resource_attr='max_epochs'
+    reduction_factor=2,  # this corresponds to eta
 )  
 ```
 
 Here, `metric` and `resource_attr` specify the key names used with the `report`
-callback, and `max_resource_attr` denotes which input to the objective function corresponds to $r_i$.
-Moreover, `grace_period` provides $r_{min}$, and `reduction_factor` is $\eta$.
+callback, and `max_resource_attr` denotes which input to the objective function
+corresponds to $r_{max}$. Moreover, `grace_period` provides $r_{min}$, and
+`reduction_factor` is $\eta$.
 
 Now, we can run Syne Tune as before:
 
@@ -90,7 +108,7 @@ logging.basicConfig(level=logging.INFO)
 from syne_tune import Tuner, StoppingCriterion
 from syne_tune.backend.python_backend import PythonBackend
 
-trial_backend = PythonBackend(tune_function=objective, config_space=search_space)
+trial_backend = PythonBackend(tune_function=objective, config_space=config_space)
 
 stop_criterion = StoppingCriterion(
     max_wallclock_time=max_wallclock_time
@@ -114,7 +132,13 @@ e.plot()
 
 ## Visualize the Optimization Process
 
-We visualize again the learning curves of every trial. Compares this to asynchronous random search in Section :ref:`sec_rs_async`. As we have seen for successive halving in Section :ref:`sec_mf_hpo`, most of the trials are stopped at 1 or 2 epochs, i.e $r_{min}$ or $\eta * r_{min}$. However, trials do not stop at the same point, because they require different amount of time per epoch. If we would run standard successive halving instead of ASHA, we would need to synchronize our workers, before we can promote configurations to the next rung level. 
+Once more, we visualize the learning curves of every trial. Compares this to
+asynchronous random search in Section :ref:`sec_rs_async`. As we have seen for
+successive halving in Section :ref:`sec_mf_hpo`, most of the trials are stopped
+at 1 or 2 epochs ($r_{min}$ or $\eta * r_{min}$). However, trials do not stop
+at the same point, because they require different amount of time per epoch. If
+we ran standard successive halving instead of ASHA, we would need to synchronize
+our workers, before we can promote configurations to the next rung level. 
 
 ```{.python .input  n=60}
 import matplotlib.pyplot as plt
@@ -122,7 +146,12 @@ import matplotlib.pyplot as plt
 results = e.results
 for trial_id in results.trial_id.unique():
     df = results[results['trial_id'] == trial_id]
-    plt.plot(df['st_tuner_time'], df['validation_error'], marker='o', label=f'trial {trial_id}')
+    plt.plot(
+        df['st_tuner_time'],
+        df['validation_error'],
+        marker='o',
+        label=f'trial {trial_id}'
+    )
 plt.xlabel('wall-clock time')
 plt.ylabel('objective function')
 plt.legend()

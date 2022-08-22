@@ -115,6 +115,9 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):#@save
         self.K = int(np.log(r_max / r_min) / np.log(eta))
         # define the rung levels
         self.rung_levels = [r_min * eta ** k for k in range(self.K + 1)]
+        if r_max not in self.rung_levels:
+            self.rung_levels.append(r_max)
+            self.K += 1
         # bookkeeping
         self.observed_error_at_rungs = defaultdict(list)
         # our processing queue
@@ -158,8 +161,7 @@ def update(self, config, error, info=None):
     ri = config['max_epochs']  # rung level r_i
     # update our searcher, e.g if we use Bayesian optimization later
     self.searcher.update(config, error, additional_info=info)     
-    is_rung_level = ri in self.rung_levels  # could be r_max as well
-    if is_rung_level and ri < r_max:
+    if ri < r_max:
         # bookkeeping
         self.observed_error_at_rungs[ri].append((config, error.cpu().numpy()))
         # determine how many configurations should be evaluated on this rung level
