@@ -26,7 +26,7 @@ consist of raw or lightly-processed (e.g., by centering) pixel values, practitio
 Instead, typical computer vision pipelines
 consisted of manually engineering feature extraction pipelines, such as SIFT :cite:`Lowe.2004`, SURF :cite:`Bay.Tuytelaars.Van-Gool.2006`, and bags of visual words :cite:`Sivic.Zisserman.2003`.
 Rather than *learning* the features, the features were *crafted*.
-Most of the progress came from having more clever ideas for features extraction on the one hand and deep insight into geometry :cite:`Hartley.Zisserman.2000` on the other hand. The learning algorithm was often considered an afterthought.
+Most of the progress came from having more clever ideas for feature extraction on the one hand and deep insight into geometry :cite:`Hartley.Zisserman.2000` on the other hand. The learning algorithm was often considered an afterthought.
 
 Although some neural network accelerators were available in the 1990s,
 they were not yet sufficiently powerful to make
@@ -36,7 +36,7 @@ was able to process at most 480 million operations per second (MFLOPs), without 
 programming framework for operations beyond games. Today's accelerators are able to perform in excess of 300 TFLOPs per device (NVIDIA's Ampere A100). 
 Note that *FLOPs*
 are floating-point operations such as multiplications and additions.
-Moreover, datasets were still relatively small: OCR on 60,000 low-resolution 28x28 pixel images was considered a highly challenging task.
+Moreover, datasets were still relatively small: OCR on 60,000 low-resolution $28 \times 28$ pixel images was considered a highly challenging task.
 Added to these obstacles, key tricks for training neural networks
 including parameter initialization heuristics :cite:`Glorot.Bengio.2010`,
 clever variants of stochastic gradient descent :cite:`Kingma.Ba.2014`,
@@ -75,7 +75,7 @@ In fact, engineering a new set of feature functions, improving results, and writ
 SIFT :cite:`Lowe.2004`,
 SURF :cite:`Bay.Tuytelaars.Van-Gool.2006`,
 HOG (histograms of oriented gradient) :cite:`Dalal.Triggs.2005`,
-Bags of Visual Words :cite:`Sivic.Zisserman.2003`
+bags of visual words :cite:`Sivic.Zisserman.2003`,
 and similar feature extractors ruled the roost.
 
 Another group of researchers,
@@ -90,14 +90,14 @@ In the case of an image, the lowest layers might come
 to detect edges, colors, and textures, in analogy to how the visual system in animals
 processes its input. In particular, the automatic design of visual features such as those obtained
 by sparse coding :cite:`olshausen1996emergence` remained an open challenge until the advent of modern CNNs. 
-It was not until :cite:`dean2012large,le2013building` that the idea of generating features 
+It was not until :citet:`dean2012large,le2013building` that the idea of generating features 
 from image data automatically gained significant traction.
 
 The first modern CNN :cite:`Krizhevsky.Sutskever.Hinton.2012`, named
 *AlexNet* after one of its inventors, Alex Krizhevsky, is largely an evolutionary improvement
 over LeNet. It achieved excellent performance in the 2012 ImageNet challenge.
 
-![Image filters learned by the first layer of AlexNet. Reproduction courtesy of  :cite:`Krizhevsky.Sutskever.Hinton.2012`.](../img/filters.png)
+![Image filters learned by the first layer of AlexNet. Reproduction courtesy of :citet:`Krizhevsky.Sutskever.Hinton.2012`.](../img/filters.png)
 :width:`400px`
 :label:`fig_filters`
 
@@ -199,16 +199,18 @@ The details differ somewhat between NVIDIA, AMD, ARM and other chip vendors. Whi
 running at about 1GHz clock frequency,
 it is the total number of such cores that makes GPUs orders of magnitude faster than CPUs.
 For instance, NVIDIA's recent Ampere A100 GPU offers over 300 TFLOPs per chip for specialized 16 bit precision (BFLOAT16) matrix-matrix multiplications, and up to 20 TFLOPs for more general-purpose floating point operations (FP32).
-At the same time, floating point performance of CPUs rarely exceeds 1 TFLOPs (Amazon's Graviton 3, for instance, reaches 2 TFLOPs peak performance for 16 bit precision operations, a number similar to the GPU performance of Apple's M1 processor). There are many reasons why GPUs are much faster than CPUs in terms of FLOPs. 
+At the same time, floating point performance of CPUs rarely exceeds 1 TFLOPs. For instance, Amazon's Graviton 3  reaches 2 TFLOPs peak performance for 16 bit precision operations, a number similar to the GPU performance of Apple's M1 processor. 
+
+There are many reasons why GPUs are much faster than CPUs in terms of FLOPs. 
 First, power consumption tends to grow *quadratically* with clock frequency.
 Hence, for the power budget of a CPU core that runs 4 times faster (a typical number),
 you can use 16 GPU cores at $\frac{1}{4}$ the speed,
 which yields $16 \times \frac{1}{4} = 4$ times the performance.
-Secondly, GPU cores are much simpler
+Second, GPU cores are much simpler
 (in fact, for a long time they were not even *able*
 to execute general-purpose code),
-which makes them more energy efficient. For instance, they tend not to support speculative evaluation, it typically isn't possible to program each processing element individually, and the caches per core tend to be much smaller. 
-Lastly, many operations in deep learning require high memory bandwidth.
+which makes them more energy efficient. For instance, they tend not to support speculative evaluation (it typically isn't possible to program each processing element individually), and the caches per core tend to be much smaller. 
+Last, many operations in deep learning require high memory bandwidth.
 Again, GPUs shine here with buses that are at least 10 times as wide as many CPUs.
 
 Back to 2012. A major breakthrough came
@@ -423,7 +425,7 @@ with d2l.try_gpu():
 
 AlexNet's structure bears a striking resemblance to LeNet, with a number of critical improvements, both for accuracy (dropout) and for ease of training (ReLU). What is equally striking is the amount of progress that has been made in terms of deep learning tooling. What was several months of work in 2012 can now be accomplished in a dozen lines of code using any modern framework.
 
-Reviewing the architecture, we see that AlexNet has an Achilles heel when it comes to efficiency: the last two hidden layers require matrices of size $6400 \times 4096$ and $4096 \times 4096$, respectively. This corresponds to 164 MB of memory and 81 MFLOPs of computation, both of which are a nontrivial outlay, especially on smaller devices, such as mobile phones. This is one of the reasons why AlexNet has been surpassed by much more effective architectures that we will cover in the following sections. Nonetheless, it is a key step from shallow to deep networks that are used nowadays. Note that even though the number of parameters by far exceeds the amount of training data in our experiments (the last two layers have more than 40 million parameters, trained on a datasets of 60 thousand images), there is hardly any overfitting: training and validation loss are virtually identical throughout training. This is due to the improved regularization, such as Dropout, inherent in modern Deep Network designs. 
+Reviewing the architecture, we see that AlexNet has an Achilles heel when it comes to efficiency: the last two hidden layers require matrices of size $6400 \times 4096$ and $4096 \times 4096$, respectively. This corresponds to 164 MB of memory and 81 MFLOPs of computation, both of which are a nontrivial outlay, especially on smaller devices, such as mobile phones. This is one of the reasons why AlexNet has been surpassed by much more effective architectures that we will cover in the following sections. Nonetheless, it is a key step from shallow to deep networks that are used nowadays. Note that even though the number of parameters by far exceeds the amount of training data in our experiments (the last two layers have more than 40 million parameters, trained on a datasets of 60 thousand images), there is hardly any overfitting: training and validation loss are virtually identical throughout training. This is due to the improved regularization, such as Dropout, inherent in modern deep network designs. 
 
 Although it seems that there are only a few more lines in AlexNet's implementation than in LeNet's, it took the academic community many years to embrace this conceptual change and take advantage of its excellent experimental results. This was also due to the lack of efficient computational tools. At the time neither DistBelief :cite:`Dean.Corrado.Monga.ea.2012` nor Caffe :cite:`Jia.Shelhamer.Donahue.ea.2014` existed, and Theano :cite:`Bergstra.Breuleux.Bastien.ea.2010` still lacked many distinguishing features. It is only the availability of TensorFlow :cite:`Abadi.Barham.Chen.ea.2016` that changed this situation dramatically.
 
@@ -441,7 +443,7 @@ Although it seems that there are only a few more lines in AlexNet's implementati
     1. Design a better model that works directly on $28 \times 28$ images.
 1. Modify the batch size, and observe the changes in throughput (images/s), accuracy, and GPU memory.
 1. Apply dropout and ReLU to LeNet-5. Does it improve? Can you improve things further by preprocessing to take advantage of the invariances inherent in the images?
-1. Can you make AlexNet overfit? Which feature do you need to remove/change to break training? 
+1. Can you make AlexNet overfit? Which feature do you need to remove or change to break training? 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/75)

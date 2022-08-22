@@ -513,15 +513,13 @@ class ResNeXtBlock(tf.keras.Model):
         bot_channels = int(round(num_channels * bot_mul))
         self.conv1 = tf.keras.layers.Conv2D(bot_channels, 1, strides=1)
         self.conv2 = tf.keras.layers.Conv2D(bot_channels, 3, strides=strides,
-                                            padding="same",
-                                            groups=bot_channels//groups)
+                                            padding="same",  groups=bot_channels//groups)
         self.conv3 = tf.keras.layers.Conv2D(num_channels, 1, strides=1)
         self.bn1 = tf.keras.layers.BatchNormalization()
         self.bn2 = tf.keras.layers.BatchNormalization()
         self.bn3 = tf.keras.layers.BatchNormalization()
         if use_1x1conv:
-            self.conv4 = tf.keras.layers.Conv2D(num_channels, 1,
-                                       strides=strides)
+            self.conv4 = tf.keras.layers.Conv2D(num_channels, 1, strides=strides)
             self.bn4 = tf.keras.layers.BatchNormalization()
         else:
             self.conv4 = None

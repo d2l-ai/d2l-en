@@ -16,9 +16,9 @@ deployed systems were built.  Each of these networks was briefly a
 dominant architecture and many were winners or runners-up in the
 [ImageNet competition](https://www.image-net.org/challenges/LSVRC/)
 which has served as a barometer of progress on supervised learning in
-computer vision since 2010. It is only recently that Transformers have begun
-to displace CNNs, starting with :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` and 
-followed by the SWIN Transformer :cite:`liu2021swin`. We will cover this development later 
+computer vision since 2010. It is only recently that transformers have begun
+to displace CNNs, starting with :citet:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` and 
+followed by the swin transformer :cite:`liu2021swin`. We will cover this development later 
 in the chapter on :ref:`chap_attention-and-transformers`. 
 
 While the idea of *deep* neural networks is quite simple (stack
@@ -52,13 +52,13 @@ residual architecture. Over time many special optimizations for efficient
 networks were developed, such as coordinate shifts (ShiftNet) :cite:`wu2018shift`. This 
 culminated in the automatic search for efficient architectures such as 
 MobileNet v3 :cite:`Howard.Sandler.Chu.ea.2019`. It also includes the 
-semi-automatic design exploration of :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`
-that led to the RegNetX and RegNetY which we will discuss later in this chapter. 
+semi-automatic design exploration of :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`
+that led to the RegNetX/Y which we will discuss later in this chapter. 
 The work is instructive insofar as it offers a path to marry brute force computation with 
 the ingenuity of an experimenter in the search for efficient design spaces. Of note is
-also the work of :cite:`liu2022convnet` as it shows that data prep and training recipes 
+also the work of :citet:`liu2022convnet` as it shows that training techniques (e.g., optimizers, data augmentation, and regularization)
 play a pivotal role in improving accuracy. It also shows that long-held assumptions, such as 
-the size of a convolutional window, may need to be revisited, given the increase in 
+the size of a convolution window, may need to be revisited, given the increase in 
 computation and data. We will cover this and many more questions in due course throughout this chapter.
 
 ```toc

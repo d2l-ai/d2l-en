@@ -554,13 +554,10 @@ class ResNeXtBlock(nn.Module):
                  strides=1):
         super().__init__()
         bot_channels = int(round(num_channels * bot_mul))
-        self.conv1 = nn.LazyConv2d(bot_channels, kernel_size=1,
-                               stride=1)
-        self.conv2 = nn.LazyConv2d(bot_channels, kernel_size=3,
-                               stride=strides, padding=1,
-                               groups=bot_channels//groups)
-        self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1,
-                               stride=1)
+        self.conv1 = nn.LazyConv2d(bot_channels, kernel_size=1, stride=1)
+        self.conv2 = nn.LazyConv2d(bot_channels, kernel_size=3, stride=strides,
+                                   padding=1, groups=bot_channels//groups)
+        self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1, stride=1)
         self.bn1 = nn.LazyBatchNorm2d()
         self.bn2 = nn.LazyBatchNorm2d()
         self.bn3 = nn.LazyBatchNorm2d()

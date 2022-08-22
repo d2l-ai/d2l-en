@@ -23,7 +23,7 @@ individual neurons to whole layers,
 and now to blocks, repeating patterns of layers. A decade later, this has now
 progressed to researchers using entire trained models to repurpose them for different, 
 albeit related, tasks. Such large pretrained models are typically called 
-Foundation Models :cite:`bommasani2021opportunities`. 
+*foundation models* :cite:`bommasani2021opportunities`. 
 
 Back to network design. The idea of using blocks first emerged from the
 Visual Geometry Group (VGG) at Oxford University,
@@ -46,7 +46,7 @@ this imposes a hard limit of $\log_2 d$ convolutional layers on the network befo
 dimensions ($d$) are used up. For instance, in the case of ImageNet, it would be impossible to have 
 more than 8 convolutional layers in this way. 
 
-The key idea of Simonyan and Zisserman was to use *multiple* convolutions in between downsampling
+The key idea of :citet:`Simonyan.Zisserman.2014` was to use *multiple* convolutions in between downsampling
 via max-pooling in the form of a block. They were primarily interested in whether deep or 
 wide networks perform better. For instance, the successive application of two $3 \times 3$ convolutions
 touches the same pixels as a single $5 \times 5$ convolution does. At the same time, the latter uses approximately 
@@ -54,7 +54,7 @@ as many parameters ($25 \cdot c^2$) as three $3 \times 3$ convolutions do ($3 \c
 In a rather detailed analysis they showed that deep and narrow networks significantly outperform their shallow counterparts. This set deep learning on a quest for ever deeper networks with over 100 layers for typical applications.
 Stacking $3 \times 3$ convolutions
 has become a gold standard in later deep networks (a design decision only to be revisited recently by 
-:cite:`liu2022convnet`). Consequently, fast implementations for small convolutions have become a staple on GPUs :cite:`lavin2016fast`. 
+:citet:`liu2022convnet`). Consequently, fast implementations for small convolutions have become a staple on GPUs :cite:`lavin2016fast`. 
 
 Back to VGG: a VGG block consists of a *sequence* of convolutions with $3\times3$ kernels with padding of 1 
 (keeping height and width) followed by a $2 \times 2$ max-pooling layer with stride of 2
@@ -62,16 +62,9 @@ Back to VGG: a VGG block consists of a *sequence* of convolutions with $3\times3
 In the code below, we define a function called `vgg_block`
 to implement one VGG block.
 
-:begin_tab:`mxnet`
 The function below takes two arguments,
 corresponding to the number of convolutional layers `num_convs`
 and the number of output channels `num_channels`.
-:end_tab:
-
-:begin_tab:`pytorch`
-The function below takes two arguments corresponding to the number
-of convolutional layers `num_convs` and the number of output channels `out_channels`.
-:end_tab:
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -209,7 +202,7 @@ As you can see, we halve height and width at each block,
 finally reaching a height and width of 7
 before flattening the representations
 for processing by the fully connected part of the network. 
-:cite:`Simonyan.Zisserman.2014` describe several other variants of VGG. 
+:citet:`Simonyan.Zisserman.2014` described several other variants of VGG. 
 In fact, it has become the norm to propose *families* of networks with 
 different speed-accuracy trade-off when introducing a new architecture. 
 
@@ -254,15 +247,9 @@ Very recently ParNet :cite:`Goyal.Bochkovskiy.Deng.ea.2021` demonstrated that it
     1. Compare the number of parameters needed for AlexNet and VGG.
     1. Compare the number of floating point operations used in the convolutional layers and in the fully connected layers. 
     1. How could you reduce the computational cost created by the fully connected layers?
-1. When displaying the dimensions associated with the various layers of the network, we only see the information 
-   associated with 8 blocks (plus some auxiliary transforms), even though the network has 11 layers. Where did 
-   the remaining 3 layers go?
-1. Use Table 1 in the VGG paper :cite:`Simonyan.Zisserman.2014` to construct other common models, 
-   such as VGG-16 or VGG-19.
-1. Upsampling the resolution in Fashion-MNIST by a factor of $8$ from $28 \times 28$ to $224 \times 224$ 
-   dimensions is very wasteful. Try modifying the network architecture and resolution conversion, 
-   e.g., to 56 or to 84 dimensions for its input instead. Can you do so without reducing the accuracy of the network? 
-   Consider the VGG paper for ideas on adding more nonlinearities prior to downsampling.
+1. When displaying the dimensions associated with the various layers of the network, we only see the information associated with 8 blocks (plus some auxiliary transforms), even though the network has 11 layers. Where did the remaining 3 layers go?
+1. Use Table 1 in the VGG paper :cite:`Simonyan.Zisserman.2014` to construct other common models, such as VGG-16 or VGG-19.
+1. Upsampling the resolution in Fashion-MNIST by a factor of $8$ from $28 \times 28$ to $224 \times 224$ dimensions is very wasteful. Try modifying the network architecture and resolution conversion, e.g., to 56 or to 84 dimensions for its input instead. Can you do so without reducing the accuracy of the network? Consider the VGG paper :cite:`Simonyan.Zisserman.2014` for ideas on adding more nonlinearities prior to downsampling.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/77)

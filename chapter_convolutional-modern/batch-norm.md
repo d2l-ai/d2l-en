@@ -25,7 +25,7 @@ zero mean $\boldsymbol{\mu} = 0$ and unit variance $\boldsymbol{\Sigma} = \bolds
 At a mimimum, one frequently rescales it such that the diagonal is unity, i.e., $\Sigma_{ii} = 1$.
 Yet another strategy is to rescale vectors to unit length, possibly zero mean *per observation*.
 This can work well, e.g., for spatial sensor data. These preprocessing techniques and many more are
-beneficial to keep the estimation problem well controlled. See e.g., the articles in :cite:`guyon2008feature` for a review of feature selection and extraction techniques. Standardizing vectors also has the nice side-effect of constraining the function complexity of functions that act upon it. For instance, the celebrated radius-margin bound :cite:`Vapnik95` in Support Vector Machines and the Perceptron Convergence Theorem :cite:`Novikoff62` rely on inputs of bounded norm. 
+beneficial to keep the estimation problem well controlled. See e.g., the articles by :citet:`guyon2008feature` for a review of feature selection and extraction techniques. Standardizing vectors also has the nice side-effect of constraining the function complexity of functions that act upon it. For instance, the celebrated radius-margin bound :cite:`Vapnik95` in support vector machines and the Perceptron Convergence Theorem :cite:`Novikoff62` rely on inputs of bounded norm. 
 
 Intuitively, this standardization plays nicely with our optimizers
 since it puts the parameters *a priori* at a similar scale.
@@ -43,7 +43,7 @@ that this drift in the distribution of such variables could hamper the convergen
 Intuitively, we might conjecture that if one
 layer has variable activations that are 100 times that of another layer,
 this might necessitate compensatory adjustments in the learning rates. Adaptive solvers
-such as AdaGrad :cite:`Duchi.Hazan.Singer.2011`, Adam :cite:`Kingma.Ba.2014`, Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018` or Distributed Shampoo :cite:`anil2020scalable` aim to address this from the viewpoint of optimization, e.g., by adding aspects of second order methods. 
+such as AdaGrad :cite:`Duchi.Hazan.Singer.2011`, Adam :cite:`Kingma.Ba.2014`, Yogi :cite:`Zaheer.Reddi.Sachan.ea.2018`, or Distributed Shampoo :cite:`anil2020scalable` aim to address this from the viewpoint of optimization, e.g., by adding aspects of second-order methods. 
 The alternative is to prevent the problem from occurring, simply by adaptive normalization.
 
 Third, deeper networks are complex and tend to be more easily capable of overfitting.
@@ -73,7 +73,7 @@ even more significant than without batch normalization, or at least,
 suitable calibration is needed as we might adjust it.
 
 Denote by $\mathcal{B}$ a minibatch and let $\mathbf{x} \in \mathcal{B}$ be an input to 
-batch normalization ($\mathrm{BN}$). In this case the batch norm is defined as follows:
+batch normalization ($\mathrm{BN}$). In this case the batch normalization is defined as follows:
 
 $$\mathrm{BN}(\mathbf{x}) = \boldsymbol{\gamma} \odot \frac{\mathbf{x} - \hat{\boldsymbol{\mu}}_\mathcal{B}}{\hat{\boldsymbol{\sigma}}_\mathcal{B}} + \boldsymbol{\beta}.$$
 :eqlabel:`eq_batchnorm`
@@ -179,7 +179,7 @@ on which the transformation is applied.
 
 Similarly, with convolutional layers,
 we can apply batch normalization after the convolution
-and before the nonlinear activation function. The key difference to batch normalization
+and before the nonlinear activation function. The key difference from batch normalization
 in fully connected layers is that we apply the operation on a per-channel basis
 *across all locations*. This is compatible with our assumption of translation
 invariance that led to convolutions: we assumed that the specific location of a pattern
@@ -199,24 +199,26 @@ to normalize the value at each spatial location.
 Each channel has its own scale and shift parameters,
 both of which are scalars.
 
-### Layer Norms
+### Layer Normalization
+:label:`subsec_layer-normalization-in-bn`
 
 Note that in the context of convolutions the batch normalization is well-defined even for
 minibatches of size 1: after all, we have all the locations across an image to average. Consequently,
 mean and variance are well defined, even if it's just within a single observation. This consideration
-led :cite:`Ba.Kiros.Hinton.2016` to introduce the notion of a *layer norm*. It works just like
+led :citet:`Ba.Kiros.Hinton.2016` to introduce the notion of *layer normalization*. It works just like
 a batch norm, only that it is applied to one observation at a time. Consequently both the offset and the scaling factor are scalars. Given an $n$-dimensional vector $\mathbf{x}$ layer norms are given by 
 
-$$\mathbf{x} \rightarrow \mathrm{LN}(\mathbf{x}) = \hat\sigma^{-1} (\mathbf{x} - \hat{\mu})$$
+$$\mathbf{x} \rightarrow \mathrm{LN}(\mathbf{x}) =  \frac{\mathbf{x} - \hat{\mu}}{\hat\sigma},$$
 
-Here scaling and offset are applied coefficient-wise. Moreover, the scaling terms are given by 
+where scaling and offset are applied coefficient-wise
+and given by 
 
 $$\hat{\mu} := \frac{1}{n} \sum_{i=1}^n x_i \text{ and }
 \hat{\sigma}^2 := \frac{1}{n} \sum_{i=1}^n (x_i - \hat{\mu})^2 + \epsilon.$$
 
-As before we add a small offset $\epsilon > 0$ to prevent division by zero. One of the major benefits of using layer normalization is that it prevents divergence. After all, ignoring $\epsilon$, the output of the layer norm is scale independent. That is, we have $\mathrm{LN}(\mathbf{x}) \approx \mathrm{LN}(\alpha \mathbf{x})$ for any choice of $\alpha \neq 0$. This becomes an equality for $|\alpha| \to \infty$ (the approximate equality is due to the offset $\epsilon$ for the variance). 
+As before we add a small offset $\epsilon > 0$ to prevent division by zero. One of the major benefits of using layer normalization is that it prevents divergence. After all, ignoring $\epsilon$, the output of the layer normalization is scale independent. That is, we have $\mathrm{LN}(\mathbf{x}) \approx \mathrm{LN}(\alpha \mathbf{x})$ for any choice of $\alpha \neq 0$. This becomes an equality for $|\alpha| \to \infty$ (the approximate equality is due to the offset $\epsilon$ for the variance). 
 
-One of the advantages of the layer norm is that it doesn't depend on the minibatch size. It is also independent of whether we are in training or test regime. In other words, it is simply a deterministic transform that standardizes the activations to a given scale. This can be very beneficial in preventing divergence in optimization. We skip further details and recommend the interested reader to consult the original paper.
+Another advantage of the layer normalization is that it doesn't depend on the minibatch size. It is also independent of whether we are in training or test regime. In other words, it is simply a deterministic transformation that standardizes the activations to a given scale. This can be very beneficial in preventing divergence in optimization. We skip further details and recommend the interested reader to consult the original paper.
 
 ### Batch Normalization During Prediction
 
@@ -248,9 +250,9 @@ from mxnet.gluon import nn
 npx.set_np()
 
 def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
-    # Use `autograd` to determine whether we're in training mode
+    # Use `autograd` to determine whether we are in training mode
     if not autograd.is_training():
-        # In prediction mode use mean and variance obtained by moving average
+        # In prediction mode, use mean and variance obtained by moving average
         X_hat = (X - moving_mean) / np.sqrt(moving_var + eps)
     else:
         assert len(X.shape) in (2, 4)
@@ -282,9 +284,9 @@ import torch
 from torch import nn
 
 def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
-    # Use `is_grad_enabled` to determine whether we're in training mode
+    # Use `is_grad_enabled` to determine whether we are in training mode
     if not torch.is_grad_enabled():
-        # In prediction mode use mean and variance obtained by moving average
+        # In prediction mode, use mean and variance obtained by moving average
         X_hat = (X - moving_mean) / torch.sqrt(moving_var + eps)
     else:
         assert len(X.shape) in (2, 4)
@@ -362,7 +364,8 @@ class BatchNorm(nn.Block):
         # initialized to 1 and 0, respectively
         self.gamma = self.params.get('gamma', shape=shape, init=init.One())
         self.beta = self.params.get('beta', shape=shape, init=init.Zero())
-        # The variables that are not model parameters are initialized to 0 and 1
+        # The variables that are not model parameters are initialized to 0 and
+        # 1
         self.moving_mean = np.zeros(shape)
         self.moving_var = np.ones(shape)
 
@@ -395,7 +398,8 @@ class BatchNorm(nn.Module):
         # initialized to 1 and 0, respectively
         self.gamma = nn.Parameter(torch.ones(shape))
         self.beta = nn.Parameter(torch.zeros(shape))
-        # The variables that are not model parameters are initialized to 0 and 1
+        # The variables that are not model parameters are initialized to 0 and
+        # 1
         self.moving_mean = torch.zeros(shape)
         self.moving_var = torch.ones(shape)
 
@@ -465,7 +469,7 @@ class BatchNorm(tf.keras.layers.Layer):
 
 We used `momentum` to govern the aggregation over past mean and variance estimates. This is somewhat of a misnomer as it has nothing whatsoever to do with the *momentum* term of optimization in :numref:`sec_momentum`. Nonetheless, it is the commonly adopted name for this term and in deference to API naming convention we use the same variable name in our code, too.
 
-## [**LeNet with Batch Norm**]
+## [**LeNet with Batch Normalization**]
 
 To see how to apply `BatchNorm` in context,
 below we apply it to a traditional LeNet model (:numref:`sec_lenet`).
@@ -654,8 +658,7 @@ Even with dropout and weight decay,
 they remain so flexible that their ability to generalize to unseen data
 likely needs significantly more refined learning-theoretic generalization guarantees.
 
-In the original paper proposing batch normalization,
-:cite:`Ioffe.Szegedy.2015`, in addition to introducing a powerful and useful tool,
+In the original paper proposing batch normalization :cite:`Ioffe.Szegedy.2015`, in addition to introducing a powerful and useful tool,
 offered an explanation for why it works:
 by reducing *internal covariate shift*.
 Presumably by *internal covariate shift* the authors

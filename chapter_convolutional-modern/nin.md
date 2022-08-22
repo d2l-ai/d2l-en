@@ -18,7 +18,7 @@ First, the fully connected layers at the end
 of the architecture consume tremendous numbers of parameters. For instance, even a simple
 model such as VGG-11 requires a monstrous $25088 \times 4096$ matrix, occupying almost
 400MB of RAM in single precision (FP32). This is a significant impediment to computation, in particular on
-mobile and embedded devices. After all, even high end mobile phones sport no more than 8GB of RAM. At the time VGG was invented, this was an order of magnitude less (the iPhone 4s had 512MB). As such, it would have been difficult to justify spending the majority of memory on an image classifier. 
+mobile and embedded devices. After all, even high-end mobile phones sport no more than 8GB of RAM. At the time VGG was invented, this was an order of magnitude less (the iPhone 4S had 512MB). As such, it would have been difficult to justify spending the majority of memory on an image classifier. 
 
 Second, it is equally impossible to add fully connected layers
 earlier in the network to increase the degree of nonlinearity: doing so would destroy the
@@ -35,7 +35,7 @@ be effective, were it not for the added nonlinearities. Let's dive into this in 
 ## (**NiN Blocks**)
 
 Recall :numref:`subsec_1x1`. In it we discussed that the inputs and outputs of convolutional layers
-consisting of four-dimensional tensors with axes
+consist of four-dimensional tensors with axes
 corresponding to the example, channel, height, and width.
 Also recall that the inputs and outputs of fully connected layers
 are typically two-dimensional tensors corresponding to the example and feature.
@@ -61,7 +61,8 @@ npx.set_np()
 
 def nin_block(num_channels, kernel_size, strides, padding):
     blk = nn.Sequential()
-    blk.add(nn.Conv2D(num_channels, kernel_size, strides, padding, activation='relu'),
+    blk.add(nn.Conv2D(num_channels, kernel_size, strides, padding,
+                      activation='relu'),
             nn.Conv2D(num_channels, kernel_size=1, activation='relu'),
             nn.Conv2D(num_channels, kernel_size=1, activation='relu'))
     return blk
@@ -87,7 +88,8 @@ from d2l import tensorflow as d2l
 
 def nin_block(out_channels, kernel_size, strides, padding):
     return tf.keras.models.Sequential([
-    tf.keras.layers.Conv2D(out_channels, kernel_size, strides=strides, padding=padding),
+    tf.keras.layers.Conv2D(out_channels, kernel_size, strides=strides,
+                           padding=padding),
     tf.keras.layers.Activation('relu'),
     tf.keras.layers.Conv2D(out_channels, 1),
     tf.keras.layers.Activation('relu'),
@@ -201,7 +203,7 @@ with d2l.try_gpu():
 
 ## Summary
 
-NiN has dramatically fewer parameters than AlexNet and VGG. This stems primarily from the fact that it needs no giant fully connected layers. Instead, it uses global average pooling to aggregate across all image locations after the last stage of the convnet part of the network. This obviates the need for expensive (learned) reduction operations and replaces them by a simple average. What was surprising at the time is the fact that this averaging operation did not harm accuracy. Note that averaging across a low-resolution (in terms of image dimensions) representation (with many channels) also adds to the amount of translation invariance that the network can handle. 
+NiN has dramatically fewer parameters than AlexNet and VGG. This stems primarily from the fact that it needs no giant fully connected layers. Instead, it uses global average pooling to aggregate across all image locations after the last stage of the network body. This obviates the need for expensive (learned) reduction operations and replaces them by a simple average. What was surprising at the time is the fact that this averaging operation did not harm accuracy. Note that averaging across a low-resolution representation (with many channels) also adds to the amount of translation invariance that the network can handle. 
 
 Choosing fewer convolutions with wide kernels and replacing them by $1 \times 1$ convolutions aids the quest for fewer parameters further. It affords for a significant amount of nonlinearity across channels within any given location. Both $1 \times 1$ convolutions and global average pooling significantly influenced subsequent CNN designs. 
 
@@ -225,7 +227,3 @@ Choosing fewer convolutions with wide kernels and replacing them by $1 \times 1$
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/80)
 :end_tab:
-
-```{.python .input}
-
-```
