@@ -3,36 +3,46 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-#  Sequence to Sequence Learning
+#  Applying Encoder-Decoder Seq2Seq Models to Machine Translation
 :label:`sec_seq2seq`
 
-As we have seen in :numref:`sec_machine_translation`,
-in machine translation
-both the input and output are a variable-length sequence.
-To address this type of problem,
-we have designed a general encoder-decoder architecture
-in :numref:`sec_encoder-decoder`.
+In so-called seq2seq problems like machine translation
+(as discussed in :numref:`sec_machine_translation`),
+where inputs and outputs both consist 
+of variable-length unaligned sequences,
+we generally rely on encoder-decoder architectures
+(:numref:`sec_encoder-decoder`).
 In this section,
-we will
-use two RNNs to design
-the encoder and the decoder of
-this architecture
-and apply it to *sequence to sequence* learning
-for machine translation
+we will demonstrate the application 
+of an encoder-decoder architecture,
+where both the encoder and decoder 
+are implemented as RNNs 
+to the task of machine translation
 :cite:`Sutskever.Vinyals.Le.2014,Cho.Van-Merrienboer.Gulcehre.ea.2014`.
 
-Following the design principle
-of the encoder-decoder architecture,
-the RNN encoder can
-take a variable-length sequence as input and transforms it into a fixed-shape hidden state.
-In other words,
-information of the input (source) sequence
-is *encoded* in the hidden state of the RNN encoder.
-To generate the output sequence token by token,
-a separate RNN decoder
-can predict the next token based on
-what tokens have been seen (such as in language modeling) or generated,
-together with the encoded information of the input sequence.
+Here, the encoder RNN will take a variable-length sequence as input 
+and transform it into a fixed-shape hidden state.
+Later, in :numref:`chap_attention-and-transformers`,
+we will introduce attention mechanisms, 
+which allow us to access encoded inputs
+without having to compress the entire input
+into a single fixed-length represntation.
+
+Then to generate the output sequence, 
+one token at a time,
+the decoder model, 
+consisting of separate RNN,
+will predict each successive target token
+given both the input sequence
+and the preceding tokens in the output.
+During training, the decoder will typically
+be conditioned upon the preceding tokens
+in the official "ground-truth" label. 
+However, at test time, we will want to condition
+each output of the decoder on the tokens already predicted. 
+Note that if we ignore the encoder,
+the decoder in a seq2seq architecture 
+behaves just like a normal language model.
 :numref:`fig_seq2seq` illustrates
 how to use two RNNs
 for sequence to sequence learning
@@ -45,40 +55,36 @@ in machine translation.
 In :numref:`fig_seq2seq`,
 the special "&lt;eos&gt;" token
 marks the end of the sequence.
-The model can stop making predictions
+Our model can stop making predictions
 once this token is generated.
 At the initial time step of the RNN decoder,
-there are two special design decisions.
-First, the special beginning-of-sequence "&lt;bos&gt;" token is an input.
-Second,
-the final hidden state of the RNN encoder is used
+there are two special design decisions to be aware of:
+First, we begin every input with a special 
+beginning-of-sequence "&lt;bos&gt;" token.
+Second, we use the final hidden state of the RNN
 to initiate the hidden state of the decoder.
-In designs such as :cite:`Sutskever.Vinyals.Le.2014`,
-this is exactly
-how the encoded input sequence information
-is fed into the decoder for generating the output (target) sequence.
-In some other designs such as :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014`,
+This follows the original seq2seq breakthroughs
+in :cite:`Sutskever.Vinyals.Le.2014`,
+In some other designs, such as :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014`,
 the final hidden state of the encoder
-is also fed into the decoder as
-part of the inputs
-at every time step as shown in :numref:`fig_seq2seq`.
+is fed into the decoder not only at the first decoding step
+but at every single decoding time step (see :numref:`fig_seq2seq`).
 
 
 ## Teacher Forcing
 
-While the encoder input
-is just tokens from the source sequence,
-the decoder input and output
-are not so straightforward
-in encoder-decoder training.
-A common approach is *teacher forcing*,
-where the original target sequence (token labels)
+While running the encoder on the input sequence
+is relatively straightforward,
+how to handle the input and output 
+of the decoder requires more care. 
+The most common approach is sometimes called *teacher forcing*.
+Here, the original target sequence (token labels)
 is fed into the decoder as input.
 More concretely,
 the special beginning-of-sequence token
-and the original target sequence excluding the final token 
-are concatenated as
-input to the decoder,
+and the original target sequence,
+excluding the final token,
+are concatenated as input to the decoder,
 while the decoder output (labels for training) is
 the original target sequence,
 shifted by one token:
@@ -97,8 +103,8 @@ from the previous time step
 as the current input to the decoder.
 
 
-In the following,
-we will explain the design of :numref:`fig_seq2seq`
+In the following, we explain the design 
+depicted in :numref:`fig_seq2seq`
 in greater detail.
 We will train this model for machine translation
 on the English-French dataset as introduced in
@@ -134,57 +140,57 @@ import tensorflow as tf
 
 ## Encoder
 
-Technically speaking,
-the encoder transforms an input sequence of variable length into a fixed-shape *context variable* $\mathbf{c}$, and encodes the input sequence information in this context variable.
-As depicted in :numref:`fig_seq2seq`,
-we can use an RNN to design the encoder.
+Recall that the encoder transforms an input sequence of variable length
+into a fixed-shape *context variable* $\mathbf{c}$ (see :numref:`fig_seq2seq`).
 
-Let's consider a sequence example (batch size: 1).
-Suppose that
-the input sequence is $x_1, \ldots, x_T$, such that $x_t$ is the $t^{\mathrm{th}}$ token in the input text sequence.
+
+Consider a single sequence example (batch size 1).
+Suppose that the input sequence is $x_1, \ldots, x_T$, 
+such that $x_t$ is the $t^{\mathrm{th}}$ token.
 At time step $t$, the RNN transforms
 the input feature vector $\mathbf{x}_t$ for $x_t$
-and the hidden state $\mathbf{h} _{t-1}$ from the previous time step
+and the hidden state $\mathbf{h} _{t-1}$ 
+from the previous time step 
 into the current hidden state $\mathbf{h}_t$.
-We can use a function $f$ to express the transformation of the RNN's recurrent layer:
+We can use a function $f$ to express 
+the transformation of the RNN's recurrent layer:
 
 $$\mathbf{h}_t = f(\mathbf{x}_t, \mathbf{h}_{t-1}). $$
 
-In general,
-the encoder transforms the hidden states at
-all the time steps
-into the context variable through a customized function $q$:
+In general, the encoder transforms 
+the hidden states at all time steps
+into a context variable through a customized function $q$:
 
 $$\mathbf{c} =  q(\mathbf{h}_1, \ldots, \mathbf{h}_T).$$
 
-For example, when choosing $q(\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$ such as in :numref:`fig_seq2seq`,
+For example, in :numref:`fig_seq2seq`,
 the context variable is just the hidden state $\mathbf{h}_T$
-of the input sequence at the final time step.
+corresponding to the encoder RNN's representation
+after processing the final token of the input sequence.
 
-So far we have used a unidirectional RNN
+In this example, we have used a unidirectional RNN
 to design the encoder,
-where
-a hidden state only depends on
-the input subsequence at and before the time step of the hidden state.
-We can also construct encoders using bidirectional RNNs. In this case, a hidden state depends on
-the subsequence before and after the time step (including the input at the current time step), which encodes the information of the entire sequence.
+where the hidden state only depends on the input subsequence 
+at and before the time step of the hidden state.
+We can also construct encoders using bidirectional RNNs.
+In this case, a hidden state depends on the subsequence before and after the time step 
+(including the input at the current time step), 
+which encodes the information of the entire sequence.
 
 
 Now let's [**implement the RNN encoder**].
 Note that we use an *embedding layer*
 to obtain the feature vector for each token in the input sequence.
-The weight
-of an embedding layer
-is a matrix
-whose number of rows equals to the size of the input vocabulary (`vocab_size`)
-and number of columns equals to the feature vector's dimension (`embed_size`).
+The weight of an embedding layer is a matrix,
+where the number of rows corresponds to 
+the size of the input vocabulary (`vocab_size`)
+and number of columns corresponds to 
+the feature vector's dimension (`embed_size`).
 For any input token index $i$,
-the embedding layer
-fetches the $i^{\mathrm{th}}$ row (starting from 0) of the weight matrix
+the embedding layer fetches the $i^{\mathrm{th}}$ row 
+(starting from 0) of the weight matrix
 to return its feature vector.
-Besides,
-here we choose a multilayer GRU to
-implement the encoder.
+Here we implement the encoder with a multilayer GRU.
 
 ```{.python .input}
 %%tab mxnet
@@ -261,17 +267,14 @@ The returned variables of recurrent layers
 have been explained in :numref:`sec_rnn-concise`.
 Let's still use a concrete example
 to [**illustrate the above encoder implementation.**]
-Below
-we instantiate a two-layer GRU encoder
+Below, we instantiate a two-layer GRU encoder
 whose number of hidden units is 16.
-Given
-a minibatch of sequence inputs `X`
+Given a minibatch of sequence inputs `X`
 (batch size: 4, number of time steps: 9),
 the hidden states of the last layer
 at all the time steps
 (`outputs` return by the encoder's recurrent layers)
-are a tensor
-of shape
+are a tensor of shape
 (number of time steps, batch size, number of hidden units).
 
 ```{.python .input}
@@ -286,10 +289,9 @@ outputs, state = encoder(X)
 d2l.check_shape(outputs, (num_steps, batch_size, num_hiddens))
 ```
 
-Since a GRU is employed here,
+Since we are using a GRU here,
 the shape of the multilayer hidden states
-at the final time step
-is
+at the final time step is
 (number of hidden layers, batch size, number of hidden units).
 
 ```{.python .input}
@@ -304,47 +306,48 @@ if tab.selected('tensorflow'):
 ## [**Decoder**]
 :label:`sec_seq2seq_decoder`
 
-As we just mentioned,
-the context variable $\mathbf{c}$ of the encoder's output encodes the entire input sequence $x_1, \ldots, x_T$. Given the output sequence $y_1, y_2, \ldots, y_{T'}$ from the training dataset,
+Given a target output sequence $y_1, y_2, \ldots, y_{T'}$
 for each time step $t'$
-(the symbol differs from the time step $t$ of input sequences or encoders),
-the probability of the decoder output $y_{t'}$
-is conditional
-on the previous output subsequence
-$y_1, \ldots, y_{t'-1}$ and
-the context variable $\mathbf{c}$, i.e., $P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$.
+(we use $t^\prime$ to differentiate from the input sequence time steps),
+the the decoder assigns a predicted probability
+to each possible token occurring at step $y_{t'+1}$
+conditioned upon the previous tokens in the target
+$y_1, \ldots, y_{t'}$ 
+and the context variable 
+$\mathbf{c}$, i.e., $P(y_{t'+1} \mid y_1, \ldots, y_{t'}, \mathbf{c})$.
 
-To model this conditional probability on sequences,
-we can use another RNN as the decoder.
-At any time step $t^\prime$ on the output sequence,
-the RNN takes the output $y_{t^\prime-1}$ from the previous time step
+To predict the subsequent token $t^\prime+1$ in the target sequence,
+the decoder RNN takes the previous steps' target token $y_{t^\prime}$ 
+the hidden RNN state from the previous time step $\mathbf{s}_{t^\prime-1}$,
 and the context variable $\mathbf{c}$ as its input,
-then transforms
-them and
-the previous hidden state $\mathbf{s}_{t^\prime-1}$
-into the
-hidden state $\mathbf{s}_{t^\prime}$ at the current time step.
-As a result, we can use a function $g$ to express the transformation of the decoder's hidden layer:
+and transforms them into the hidden state 
+$\mathbf{s}_{t^\prime}$ at the current time step.
+We can use a function $g$ to express 
+the transformation of the decoder's hidden layer:
 
 $$\mathbf{s}_{t^\prime} = g(y_{t^\prime-1}, \mathbf{c}, \mathbf{s}_{t^\prime-1}).$$
 :eqlabel:`eq_seq2seq_s_t`
 
 After obtaining the hidden state of the decoder,
-we can use an output layer and the softmax operation to compute the conditional probability distribution
-$P(y_{t^\prime} \mid y_1, \ldots, y_{t^\prime-1}, \mathbf{c})$ for the output at time step $t^\prime$.
+we can use an output layer and the softmax operation 
+to compute the predictive distribution
+$p(y_{t^{\prime+1}} \mid y_1, \ldots, y_{t^\prime}, \mathbf{c})$ 
+over the subsequent output token ${t^\prime+1}$.
 
 Following :numref:`fig_seq2seq`,
 when implementing the decoder as follows,
 we directly use the hidden state at the final time step
 of the encoder
 to initialize the hidden state of the decoder.
-This requires that the RNN encoder and the RNN decoder have the same number of layers and hidden units.
+This requires that the RNN encoder and the RNN decoder 
+have the same number of layers and hidden units.
 To further incorporate the encoded input sequence information,
 the context variable is concatenated
 with the decoder input at all the time steps.
 To predict the probability distribution of the output token,
-a fully connected layer is used to transform
-the hidden state at the final layer of the RNN decoder.
+we use a fully connected layer
+to transform the hidden state 
+at the final layer of the RNN decoder.
 
 ```{.python .input}
 %%tab mxnet
@@ -461,8 +464,8 @@ if tab.selected('tensorflow'):
     d2l.check_shape(state[0], (batch_size, num_hiddens))
 ```
 
-To summarize,
-the layers in the above RNN encoder-decoder model are illustrated in :numref:`fig_seq2seq_details`.
+To summarize, the layers in the above RNN encoder-decoder model 
+are illustrated in :numref:`fig_seq2seq_details`.
 
 ![Layers in an RNN encoder-decoder model.](../img/seq2seq-details.svg)
 :label:`fig_seq2seq_details`
@@ -472,11 +475,7 @@ the layers in the above RNN encoder-decoder model are illustrated in :numref:`fi
 ## Encoder-Decoder for Sequence to Sequence Learning
 
 
-Based on the architecture described
-in :numref:`sec_encoder-decoder`,
-the RNN encoder-decoder
-model for sequence to sequence learning just puts 
-the RNN encoder and the RNN decoder together.
+Putting it all together in coder yields the following:
 
 ```{.python .input}
 %%tab all
@@ -502,10 +501,11 @@ class Seq2Seq(d2l.EncoderDecoder):  #@save
 
 ## Loss Function with Masking
 
-At each time step, the decoder
-predicts a probability distribution for the output tokens.
-Similar to language modeling,
-we can apply softmax to obtain the distribution
+At each time step, the decoder predicts 
+a probability distribution for the output tokens.
+As with language modeling, 
+we can apply softmax 
+to obtain the distribution
 and calculate the cross-entropy loss for optimization.
 Recall :numref:`sec_machine_translation`
 that the special padding tokens
@@ -513,14 +513,12 @@ are appended to the end of sequences
 so sequences of varying lengths
 can be efficiently loaded
 in minibatches of the same shape.
-However,
-prediction of padding tokens
+However, prediction of padding tokens
 should be excluded from loss calculations.
-To this end,
-we can 
+To this end, we can 
 [**mask irrelevant entries with zero values**]
-so that
-multiplication of any irrelevant prediction
+so that multiplication 
+of any irrelevant prediction
 with zero equals to zero.
 
 ```{.python .input}
@@ -565,26 +563,28 @@ trainer.fit(model, data)
 ## [**Prediction**]
 
 To predict the output sequence
-token by token,
-at each decoder time step
+at each step, 
 the predicted token from the previous
 time step is fed into the decoder as an input.
-Similar to training,
-at the initial time step
+As in training, at the initial time step
 the beginning-of-sequence ("&lt;bos&gt;") token
 is fed into the decoder.
 This prediction process
 is illustrated in :numref:`fig_seq2seq_predict`.
 When the end-of-sequence ("&lt;eos&gt;") token is predicted,
 the prediction of the output sequence is complete.
+However, we must now decide which token 
+to feed in to the model at the subsequent time step.
+One simple strategy is to sample whichever token
+the decoder has assigned the highest probability.
 
 
 ![Predicting the output sequence token by token using an RNN encoder-decoder.](../img/seq2seq-predict.svg)
 :label:`fig_seq2seq_predict`
 
-We will introduce different
-strategies for sequence generation in
-:numref:`sec_beam-search`.
+In the next section, we will introduce 
+more sophisticated strategies 
+based on beam search (:numref:`sec_beam-search`).
 
 ```{.python .input}
 %%tab all
@@ -617,6 +617,14 @@ def predict_step(self, batch, device, num_steps,
 We can evaluate a predicted sequence
 by comparing it with the
 label sequence (the ground-truth).
+But what precisely is the appropriate metric 
+for comparing similarity between two sequences?
+And how does it complicated matters 
+that for many seq2seq tasks, 
+the "ground truth" is just one 
+among many valid target sequences.
+
+
 BLEU (Bilingual Evaluation Understudy),
 though originally proposed for evaluating
 machine translation results :cite:`Papineni.Roukos.Ward.ea.2002`,
@@ -626,22 +634,17 @@ In principle, for any $n$-grams in the predicted sequence,
 BLEU evaluates whether this $n$-grams appears
 in the label sequence.
 
-Denote by $p_n$
-the precision of $n$-grams,
-which is
-the ratio of
-the number of matched $n$-grams in
+Denote by $p_n$ the precision of $n$-grams,
+which is the ratio 
+of the number of matched $n$-grams in
 the predicted and label sequences
-to
-the number of $n$-grams in the predicted sequence.
-To explain,
-given a label sequence $A$, $B$, $C$, $D$, $E$, $F$,
+to the number of $n$-grams in the predicted sequence.
+To explain, given a label sequence $A$, $B$, $C$, $D$, $E$, $F$,
 and a predicted sequence $A$, $B$, $B$, $C$, $D$,
 we have $p_1 = 4/5$,  $p_2 = 3/4$, $p_3 = 1/3$, and $p_4 = 0$.
-Besides,
-let $\mathrm{len}_{\text{label}}$ and $\mathrm{len}_{\text{pred}}$
-be
-the numbers of tokens in the label sequence and the predicted sequence, respectively.
+Besides, let $\mathrm{len}_{\text{label}}$ and $\mathrm{len}_{\text{pred}}$
+be the numbers of tokens in the label sequence 
+and the predicted sequence, respectively.
 Then, BLEU is defined as
 
 $$ \exp\left(\min\left(0, 1 - \frac{\mathrm{len}_{\text{label}}}{\mathrm{len}_{\text{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$
@@ -711,11 +714,11 @@ for en, fr, p in zip(engs, fras, preds):
 
 ## Summary
 
-* Following the design of the encoder-decoder architecture, we can use two RNNs to design a model for sequence to sequence learning.
-* In encoder-decoder training, the teacher forcing approach feeds original output sequences (in contrast to predictions) into the decoder.
-* When implementing the encoder and the decoder, we can use multilayer RNNs.
-* We can use masks to filter out irrelevant computations, such as when calculating the loss.
-* BLEU is a popular measure for evaluating output sequences by matching $n$-grams between the predicted sequence and the label sequence.
+Following the design of the encoder-decoder architecture, we can use two RNNs to design a model for sequence to sequence learning.
+In encoder-decoder training, the teacher forcing approach feeds original output sequences (in contrast to predictions) into the decoder.
+When implementing the encoder and the decoder, we can use multilayer RNNs.
+We can use masks to filter out irrelevant computations, such as when calculating the loss.
+BLEU is a popular measure for evaluating output sequences by matching $n$-grams between the predicted sequence and the label sequence.
 
 
 ## Exercises

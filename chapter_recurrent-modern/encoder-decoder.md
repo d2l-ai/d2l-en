@@ -6,38 +6,35 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 # Encoder-Decoder Architecture
 :label:`sec_encoder-decoder`
 
-As we have discussed in 
-:numref:`sec_machine_translation`,
-machine translation
-is a major problem domain for sequence transduction models,
-whose input and output are
-both variable-length sequences.
-To handle this type of inputs and outputs,
-we can design an architecture with two major components.
-The first component is an *encoder*:
-it takes a variable-length sequence as input and transforms it into a state with a fixed shape.
-The second component is a *decoder*:
-it maps the encoded state of a fixed shape
-to a variable-length sequence.
-This is called an *encoder-decoder* architecture,
-which is depicted in :numref:`fig_encoder_decoder`.
+In general seq2seq problems 
+like machine translation 
+(:numref:`sec_machine_translation`),
+inputs and outputs of varying length
+that are unaligned. 
+The standard approach to handling this sort of data
+is to design an *encoder-decoder* architecture (:numref:`fig_encoder_decoder`)
+consisting of two major components:
+an *encoder* that takes a variable-length sequence as input,
+and a *decoder* that acts as a conditional language model,
+taking in the encoded input 
+and the leftwards context of the target sequence 
+and predicting the subsequent token in the target sequence. 
+
 
 ![The encoder-decoder architecture.](../img/encoder-decoder.svg)
 :label:`fig_encoder_decoder`
 
-Let's take machine translation from English to French
-as an example.
+Let's take machine translation from English to French as an example.
 Given an input sequence in English:
 "They", "are", "watching", ".",
 this encoder-decoder architecture
 first encodes the variable-length input into a state,
 then decodes the state 
-to generate the translated sequence token by token
-as output:
+to generate the translated sequence,
+token by token, as output:
 "Ils", "regardent", ".".
 Since the encoder-decoder architecture
-forms the basis
-of different sequence transduction models
+forms the basis of different seq2seq models
 in subsequent sections,
 this section will convert this architecture
 into an interface that will be implemented later.
@@ -105,14 +102,14 @@ we add an additional `init_state` function
 to convert the encoder output (`enc_outputs`)
 into the encoded state.
 Note that this step
-may need extra inputs such as 
-the valid length of the input,
+may require extra inputs,
+such as the valid length of the input,
 which was explained
 in :numref:`sec_machine_translation`.
 To generate a variable-length sequence token by token,
-every time the decoder
-may map an input (e.g., the generated token at the previous time step)
-and the encoded state
+every time the decoder may map an input 
+(e.g., the generated token at the previous time step)
+and the encoded state 
 into an output token at the current time step.
 
 ```{.python .input}
@@ -165,15 +162,11 @@ class Decoder(tf.keras.layers.Layer):
 
 ## [**Putting the Encoder and Decoder Together**]
 
-In the end,
-the encoder-decoder architecture
-contains both an encoder and a decoder,
-with optionally extra arguments.
 In the forward propagation,
 the output of the encoder
 is used to produce the encoded state,
-and this state
-will be further used by the decoder as one of its input.
+and this state will be further used
+by the decoder as one of its input.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -209,10 +202,7 @@ class EncoderDecoder(d2l.Classifier):
         return self.decoder(dec_X, dec_state, training=True)[0]
 ```
 
-The term "state" in the encoder-decoder architecture
-has probably inspired you to implement this
-architecture using neural networks with states.
-In the next section,
+In the next section, 
 we will see how to apply RNNs to design 
 sequence transduction models based on 
 this encoder-decoder architecture.
@@ -220,9 +210,15 @@ this encoder-decoder architecture.
 
 ## Summary
 
-* The encoder-decoder architecture can handle inputs and outputs that are both variable-length sequences, thus is suitable for sequence transduction problems such as machine translation.
-* The encoder takes a variable-length sequence as input and transforms it into a state with a fixed shape.
-* The decoder maps the encoded state of a fixed shape to a variable-length sequence.
+Encoder-decoder architectures
+can handle inputs and outputs 
+that both consist of variable-length sequences
+and thus are suitable for seq2seq problems 
+such as machine translation.
+The encoder takes a variable-length sequence as input 
+and transforms it into a state with a fixed shape.
+The decoder maps the encoded state of a fixed shape
+to a variable-length sequence.
 
 
 ## Exercises
