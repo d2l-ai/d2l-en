@@ -382,20 +382,20 @@ with d2l.try_gpu():
 ## ResNeXt
 :label:`subsec_resnext`
 
-One of the challenges one encounters in the design of ResNet is the trade-off between nonlinearity and dimensionality within a given block. That is, we could add more nonlinearity by increasing the number of layers, or by increasing the width of the convolutions. An alternative strategy is to increase the number of channels that can carry information between blocks. Unfortunately, the latter comes with a quadratic penalty since the computational cost of ingesting $c$ channels and emitting $b$ channels is $O(cb)$. 
+One of the challenges one encounters in the design of ResNet is the trade-off between nonlinearity and dimensionality within a given block. That is, we could add more nonlinearity by increasing the number of layers, or by increasing the width of the convolutions. An alternative strategy is to increase the number of channels that can carry information between blocks. Unfortunately, the latter comes with a quadratic penalty since the computational cost of ingesting $c$ channels and emitting $b$ channels is $\mathcal{O}(cb)$. 
 
 We can take some inspiration from the Inception block of :numref:`fig_inception` which has information flowing through the block in separate groups. Applying the idea of multiple independent groups to the ResNet block of :numref:`fig_resnet_block` led to the design of ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017`.
 Different from the smorgasbord of transformations in Inception, 
 ResNeXt adopts the *same* transformation in all branches,
 thus minimizing the need for manual tuning of each branch. 
 
-![The ResNeXt block. The use of group convolution with $g$ groups is $g$ times faster than a dense convolution. It is a bottleneck residual block when the number of intermediate channels $b$ is less than $c$.](../img/resnext-block-simplified.svg)
+![The ResNeXt block. The use of group convolution with $g$ groups is $g$ times faster than a dense convolution. It is a bottleneck residual block when the number of intermediate channels $b$ is less than $c$.](../img/resnext-block.svg)
 :label:`fig_resnext_block`
 
-Breaking up a convolution from $c$ to $b$ channels into one of $g$ groups of size $c/g$ generating $g$ outputs of size $b/g$ is called, quite fittingly, a *group convolution*. The computational cost is reduced from $O(c \cdot b)$ to $O(g \cdot (c/g) \cdot (b/g)) = O(c \cdot b / g)$, i.e. it is $g$ times faster. Even better, the number of parameters needed to generate the output is also reduced from a $c \times b$ matrix to $g$ smaller matrices of size $(c/g) \times (b/g)$, again a $g$ times reduction. In what follows we assume that both $b$ and $c$ are divisible by $g$. 
+Breaking up a convolution from $c$ to $b$ channels into one of $g$ groups of size $c/g$ generating $g$ outputs of size $b/g$ is called, quite fittingly, a *group convolution*. The computational cost is reduced from $\mathcal{O}(c \cdot b)$ to $\mathcal{O}(g \cdot (c/g) \cdot (b/g)) = \mathcal{O}(c \cdot b / g)$, i.e. it is $g$ times faster. Even better, the number of parameters needed to generate the output is also reduced from a $c \times b$ matrix to $g$ smaller matrices of size $(c/g) \times (b/g)$, again a $g$ times reduction. In what follows we assume that both $b$ and $c$ are divisible by $g$. 
 
 The only challenge in this design is that no information is exchanged between the $g$ groups. The ResNeXt block of 
-:numref:`fig_resnext_block` amends this in two ways: the group convolution with a $3 \times 3$ kernel is sandwiched in between two $1 \times 1$ convolutions. The second one serves double duty in changing the dimensionality from $b$ to $c$ again. The benefit is that we only pay the $O(c \times b)$ cost for $1 \times 1$ kernels and can make do with an $O(c \times b / g)$ cost for $3 \times 3$ kernels. Similar to the residual block implementation in
+:numref:`fig_resnext_block` amends this in two ways: the group convolution with a $3 \times 3$ kernel is sandwiched in between two $1 \times 1$ convolutions. The second one serves double duty in changing the dimensionality from $b$ to $c$ again. The benefit is that we only pay the $\mathcal{O}(c \times b)$ cost for $1 \times 1$ kernels and can make do with an $\mathcal{O}(c \times b / g)$ cost for $3 \times 3$ kernels. Similar to the residual block implementation in
 :numref:`subsec_residual-blks`, the residual connection is replaced (thus generalized) by a $1 \times 1$ convolution.
 
 The right figure in :numref:`fig_resnext_block` provides a much more concise summary of the resulting network. It will also play a major role in the design of generic modern CNNs in :numref:`sec_cnn-design`. Note that the idea of group convolutions dates back to the implementation of AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`. When distributing the network across two GPUs with limited memory, the implementation treated each GPU as its own channel with no ill effects. 
