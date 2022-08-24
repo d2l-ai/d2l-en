@@ -113,6 +113,12 @@ $$
 
 where $\mathbf{W}_{xi}, \mathbf{W}_{xf}, \mathbf{W}_{xo} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hi}, \mathbf{W}_{hf}, \mathbf{W}_{ho} \in \mathbb{R}^{h \times h}$ are weight parameters 
 and $\mathbf{b}_i, \mathbf{b}_f, \mathbf{b}_o \in \mathbb{R}^{1 \times h}$ are bias parameters.
+Note that broadcasting 
+(see :numref:`subsec_broadcasting`)
+is triggered during the summation.
+We use sigmoid functions 
+(as introduced in :numref:`sec_mlp`) 
+to map the input values to the interval $(0, 1)$.
 
 
 ### Input Node
@@ -141,7 +147,7 @@ In LSTMs, the input gate $\mathbf{I}_t$ governs
 how much we take new data into account via $\tilde{\mathbf{C}}_t$ 
 and the forget gate $\mathbf{F}_t$ addresses 
 how much of the old cell internal state $\mathbf{C}_{t-1} \in \mathbb{R}^{n \times h}$ we retain. 
-Using the same pointwise multiplication as before, 
+Using the Hadamard (elementwise) product operator $\odot$
 we arrive at the following update equation:
 
 $$\mathbf{C}_t = \mathbf{F}_t \odot \mathbf{C}_{t-1} + \mathbf{I}_t \odot \tilde{\mathbf{C}}_t.$$
