@@ -22,7 +22,7 @@ Recall our application of MLPs to predicting house prices (:numref:`sec_kaggle_h
 Our first step when working with real data
 was to standardize our input features to have
 zero mean $\boldsymbol{\mu} = 0$ and unit variance $\boldsymbol{\Sigma} = \boldsymbol{1}$ across multiple observations :cite:`friedman1987exploratory`.
-At a mimimum, one frequently rescales it such that the diagonal is unity, i.e., $\Sigma_{ii} = 1$.
+At a minimum, one frequently rescales it such that the diagonal is unity, i.e., $\Sigma_{ii} = 1$.
 Yet another strategy is to rescale vectors to unit length, possibly zero mean *per observation*.
 This can work well, e.g., for spatial sensor data. These preprocessing techniques and many more are
 beneficial to keep the estimation problem well controlled. See e.g., the articles by :citet:`guyon2008feature` for a review of feature selection and extraction techniques. Standardizing vectors also has the nice side-effect of constraining the function complexity of functions that act upon it. For instance, the celebrated radius-margin bound :cite:`Vapnik95` in support vector machines and the Perceptron Convergence Theorem :cite:`Novikoff62` rely on inputs of bounded norm. 
