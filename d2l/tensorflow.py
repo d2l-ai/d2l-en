@@ -726,7 +726,7 @@ class LSTMScratch(d2l.Module):
         self.W_xi, self.W_hi, self.b_i = triple()  # Input gate
         self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
         self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
-        self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell
+        self.W_xc, self.W_hc, self.b_c = triple()  # Input node
 
 class GRU(d2l.RNN):
     """Defined in :numref:`sec_deep_rnn`"""
