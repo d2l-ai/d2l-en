@@ -382,7 +382,7 @@ with d2l.try_gpu():
 ## ResNeXt
 :label:`subsec_resnext`
 
-One of the challenges one encounters in the design of ResNet is the trade-off between nonlinearity and dimensionality within a given block. That is, we could add more nonlinearity by increasing the number of layers, or by increasing the width of the convolutions. An alternative strategy is to increase the number of channels that can carry information between blocks. Unfortunately, the latter comes with a quadratic penalty since the computational cost of ingesting $c$ channels and emitting $b$ channels is $\mathcal{O}(cb)$. 
+One of the challenges one encounters in the design of ResNet is the trade-off between nonlinearity and dimensionality within a given block. That is, we could add more nonlinearity by increasing the number of layers, or by increasing the width of the convolutions. An alternative strategy is to increase the number of channels that can carry information between blocks. Unfortunately, the latter comes with a quadratic penalty since the computational cost of ingesting $c_i$ channels and emitting $c_o$ channels is proportional to $\mathcal{O}(c_i \cdot c_o)$ (see our discussion in :numref:`sec_channels`). 
 
 We can take some inspiration from the Inception block of :numref:`fig_inception` which has information flowing through the block in separate groups. Applying the idea of multiple independent groups to the ResNet block of :numref:`fig_resnet_block` led to the design of ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017`.
 Different from the smorgasbord of transformations in Inception, 
@@ -392,16 +392,16 @@ thus minimizing the need for manual tuning of each branch.
 ![The ResNeXt block. The use of grouped convolution with $g$ groups is $g$ times faster than a dense convolution. It is a bottleneck residual block when the number of intermediate channels $b$ is less than $c$.](../img/resnext-block.svg)
 :label:`fig_resnext_block`
 
-Breaking up a convolution from $c$ to $b$ channels into one of $g$ groups of size $c/g$ generating $g$ outputs of size $b/g$ is called, quite fittingly, a *grouped convolution*. The computational cost is reduced from $\mathcal{O}(c \cdot b)$ to $\mathcal{O}(g \cdot (c/g) \cdot (b/g)) = \mathcal{O}(c \cdot b / g)$, i.e. it is $g$ times faster. Even better, the number of parameters needed to generate the output is also reduced from a $c \times b$ matrix to $g$ smaller matrices of size $(c/g) \times (b/g)$, again a $g$ times reduction. In what follows we assume that both $b$ and $c$ are divisible by $g$. 
+Breaking up a convolution from $c_i$ to $c_o$ channels into one of $g$ groups of size $c_i/g$ generating $g$ outputs of size $c_o/g$ is called, quite fittingly, a *grouped convolution*. The computational cost (proportionally) is reduced from $\mathcal{O}(c_i \cdot c_o)$ to $\mathcal{O}(g \cdot (c_i/g) \cdot (c_o/g)) = \mathcal{O}(c_i \cdot c_o / g)$, i.e., it is $g$ times faster. Even better, the number of parameters needed to generate the output is also reduced from a $c_i \times c_o$ matrix to $g$ smaller matrices of size $(c_i/g) \times (c_o/g)$, again a $g$ times reduction. In what follows we assume that both $c_i$ and $c_o$ are divisible by $g$. 
 
 The only challenge in this design is that no information is exchanged between the $g$ groups. The ResNeXt block of 
-:numref:`fig_resnext_block` amends this in two ways: the grouped convolution with a $3 \times 3$ kernel is sandwiched in between two $1 \times 1$ convolutions. The second one serves double duty in changing the dimensionality from $b$ to $c$ again. The benefit is that we only pay the $\mathcal{O}(c \times b)$ cost for $1 \times 1$ kernels and can make do with an $\mathcal{O}(c \times b / g)$ cost for $3 \times 3$ kernels. Similar to the residual block implementation in
+:numref:`fig_resnext_block` amends this in two ways: the grouped convolution with a $3 \times 3$ kernel is sandwiched in between two $1 \times 1$ convolutions. The second one serves double duty in changing the number of channels back. The benefit is that we only pay the $\mathcal{O}(c \cdot b)$ cost for $1 \times 1$ kernels and can make do with an $\mathcal{O}(b^2 / g)$ cost for $3 \times 3$ kernels. Similar to the residual block implementation in
 :numref:`subsec_residual-blks`, the residual connection is replaced (thus generalized) by a $1 \times 1$ convolution.
 
-The right figure in :numref:`fig_resnext_block` provides a much more concise summary of the resulting network. It will also play a major role in the design of generic modern CNNs in :numref:`sec_cnn-design`. Note that the idea of grouped convolutions dates back to the implementation of AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`. When distributing the network across two GPUs with limited memory, the implementation treated each GPU as its own channel with no ill effects. 
+The right figure in :numref:`fig_resnext_block` provides a much more concise summary of the resulting network block. It will also play a major role in the design of generic modern CNNs in :numref:`sec_cnn-design`. Note that the idea of grouped convolutions dates back to the implementation of AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`. When distributing the network across two GPUs with limited memory, the implementation treated each GPU as its own channel with no ill effects. 
 
-The following implementation of the `ResNeXtBlock` class takes as argument `groups` $g$, with 
-`bot_channels` $b$ intermediate (bottleneck) channels. Lastly, when we need to reduce the height and width of the representation, we add a stride of $2$ by setting `use_1x1conv=True, strides=2`.
+The following implementation of the `ResNeXtBlock` class takes as argument `groups` ($g$), with 
+`bot_channels` ($b$) intermediate (bottleneck) channels. Lastly, when we need to reduce the height and width of the representation, we add a stride of $2$ by setting `use_1x1conv=True, strides=2`.
 
 ```{.python .input}
 %%tab mxnet
@@ -411,15 +411,18 @@ class ResNeXtBlock(nn.Block):  #@save
                  use_1x1conv=False, strides=1, **kwargs):
         super().__init__(**kwargs)
         bot_channels = int(round(num_channels * bot_mul))
-        self.conv1 = nn.Conv2D(bot_channels, kernel_size=1, padding=0, strides=1)
+        self.conv1 = nn.Conv2D(bot_channels, kernel_size=1, padding=0,
+                               strides=1)
         self.conv2 = nn.Conv2D(bot_channels, kernel_size=3, padding=1, 
                                strides=strides, groups=bot_channels//groups)
-        self.conv3 = nn.Conv2D(num_channels, kernel_size=1, padding=0, strides=1)
+        self.conv3 = nn.Conv2D(num_channels, kernel_size=1, padding=0,
+                               strides=1)
         self.bn1 = nn.BatchNorm()
         self.bn2 = nn.BatchNorm()
         self.bn3 = nn.BatchNorm()
         if use_1x1conv:
-            self.conv4 = nn.Conv2D(num_channels, kernel_size=1, strides=strides)
+            self.conv4 = nn.Conv2D(num_channels, kernel_size=1,
+                                   strides=strides)
             self.bn4 = nn.BatchNorm()
         else:
             self.conv4 = None
@@ -442,8 +445,9 @@ class ResNeXtBlock(nn.Module):  #@save
         super().__init__()
         bot_channels = int(round(num_channels * bot_mul))
         self.conv1 = nn.LazyConv2d(bot_channels, kernel_size=1, stride=1)
-        self.conv2 = nn.LazyConv2d(bot_channels, kernel_size=3, stride=strides, 
-                                   padding=1, groups=bot_channels//groups)
+        self.conv2 = nn.LazyConv2d(bot_channels, kernel_size=3,
+                                   stride=strides, padding=1,
+                                   groups=bot_channels//groups)
         self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1, stride=1)
         self.bn1 = nn.LazyBatchNorm2d()
         self.bn2 = nn.LazyBatchNorm2d()
@@ -474,13 +478,15 @@ class ResNeXtBlock(tf.keras.Model):  #@save
         bot_channels = int(round(num_channels * bot_mul))
         self.conv1 = tf.keras.layers.Conv2D(bot_channels, 1, strides=1)
         self.conv2 = tf.keras.layers.Conv2D(bot_channels, 3, strides=strides,
-                                            padding="same",  groups=bot_channels//groups)
+                                            padding="same",
+                                            groups=bot_channels//groups)
         self.conv3 = tf.keras.layers.Conv2D(num_channels, 1, strides=1)
         self.bn1 = tf.keras.layers.BatchNormalization()
         self.bn2 = tf.keras.layers.BatchNormalization()
         self.bn3 = tf.keras.layers.BatchNormalization()
         if use_1x1conv:
-            self.conv4 = tf.keras.layers.Conv2D(num_channels, 1, strides=strides)
+            self.conv4 = tf.keras.layers.Conv2D(num_channels, 1,
+                                                strides=strides)
             self.bn4 = tf.keras.layers.BatchNormalization()
         else:
             self.conv4 = None
@@ -525,7 +531,7 @@ bypassing paths with gating units were introduced
 to effectively train highway networks with over 100 layers
 :cite:`srivastava2015highway`.
 Using identity functions as bypassing paths,
-ResNets performed remarkably well
+ResNet performed remarkably well
 on multiple computer vision tasks.
 Residual connections had a major influence on the design of subsequent deep neural networks, both for convolutional and sequential nature.
 As we will introduce later,
@@ -534,23 +540,17 @@ adopts residual connections (together with other design choices) and is pervasiv
 in areas as diverse as
 language, vision, speech, and reinforcement learning.
 
-ResNeXt is an example for how the design of convolutional neural networks has evolved over time: by being more frugal with computation and trading it off with the size of the activations (number of channels), it allows for faster and more accurate networks at lower cost. An alternative way of viewing grouped convolutions is to think of a block-diagonal matrix for the convolutional weights. Note that there are quite a few such 'tricks' that lead to more efficient networks. For instance, ShiftNet :cite:`wu2018shift` mimicks the effects of a $3 \times 3$ convolution, simply by adding shifted activations to the channels, offering increased function complexity, this time without any computational cost. 
+ResNeXt is an example for how the design of convolutional neural networks has evolved over time: by being more frugal with computation and trading it off with the size of the activations (number of channels), it allows for faster and more accurate networks at lower cost. An alternative way of viewing grouped convolutions is to think of a block-diagonal matrix for the convolutional weights. Note that there are quite a few such "tricks" that lead to more efficient networks. For instance, ShiftNet :cite:`wu2018shift` mimicks the effects of a $3 \times 3$ convolution, simply by adding shifted activations to the channels, offering increased function complexity, this time without any computational cost. 
 
-A common feature of the designs we've discussed so far is that the network design is fairly manual, primarily relying on the ingenuity of the designer to find the 'right' network parameters. While clearly feasible, it is also very costly in terms of human time and there's no guarantee that the outcome is optimal in any sense. In Chapter :ref:`sec_cnn-design` we will discuss a number of strategies for obtaining high quality networks in a more automated fashion. In particular, we will review the notion of Network Design Spaces that led to the RegNetX/Y models
-:cite:`Radosavovic.Kosaraju.Girshick.ea.2020` and the ConvNeXt architecture :cite:`liu2022convnet`.
+A common feature of the designs we have discussed so far is that the network design is fairly manual, primarily relying on the ingenuity of the designer to find the "right" network hyperparameters. While clearly feasible, it is also very costly in terms of human time and there is no guarantee that the outcome is optimal in any sense. In :numref:`sec_cnn-design` we will discuss a number of strategies for obtaining high quality networks in a more automated fashion. In particular, we will review the notion of *network design spaces* that led to the RegNetX/Y models
+:cite:`Radosavovic.Kosaraju.Girshick.ea.2020`.
 
 ## Exercises
 
-1. What are the major differences between the Inception block in :numref:`fig_inception` and the residual block? How do they compare in terms of computation, accuracy, and the classes of functions they can describe. 
-1. Refer to Table 1 in the ResNet paper :cite:`He.Zhang.Ren.ea.2016` to
-   implement different variants of the network. 
-1. For deeper networks, ResNet introduces a "bottleneck" architecture to reduce
-   model complexity. Try to implement it.
-1. In subsequent versions of ResNet, the authors changed the "convolution, batch
-   normalization, and activation" structure to the "batch normalization,
-   activation, and convolution" structure. Make this improvement
-   yourself. See Figure 1 in :citet:`He.Zhang.Ren.ea.2016*1`
-   for details.
+1. What are the major differences between the Inception block in :numref:`fig_inception` and the residual block? How do they compare in terms of computation, accuracy, and the classes of functions they can describe?
+1. Refer to Table 1 in the ResNet paper :cite:`He.Zhang.Ren.ea.2016` to implement different variants of the network. 
+1. For deeper networks, ResNet introduces a "bottleneck" architecture to reduce model complexity. Try to implement it.
+1. In subsequent versions of ResNet, the authors changed the "convolution, batch normalization, and activation" structure to the "batch normalization, activation, and convolution" structure. Make this improvement yourself. See Figure 1 in :citet:`He.Zhang.Ren.ea.2016*1` for details.
 1. Why can't we just increase the complexity of functions without bound, even if the function classes are nested?
 
 :begin_tab:`mxnet`
