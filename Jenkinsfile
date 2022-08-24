@@ -52,7 +52,7 @@ stage("Build and Publish") {
 
       sh label:"Build HTML", script:"""set -ex
       conda activate ${ENV_NAME}
-      ./static/build_html.sh
+      ./static/build_html.sh ${env.BRANCH_NAME} ${JOB_NAME}
       """
 
       sh label:"Build PDF", script:"""set -ex
