@@ -182,7 +182,7 @@ A.wait_to_read()
 timer.stop()
 
 # Multiply and add count as separate operations (fused in practice)
-gigaflops = [2/i for i in timer.times]
+gigaflops = [0.02*2/i for i in timer.times]
 print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
@@ -195,7 +195,7 @@ A = torch.mm(B, C)
 timer.stop()
 
 # Multiply and add count as separate operations (fused in practice)
-gigaflops = [2/i for i in timer.times]
+gigaflops = [0.02*2/i for i in timer.times]
 print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
@@ -207,7 +207,7 @@ A.assign(tf.tensordot(B, C, axes=1))
 timer.stop()
 
 # Multiply and add count as separate operations (fused in practice)
-gigaflops = [0.02/i for i in timer.times]
+gigaflops = [0.02*2/i for i in timer.times]
 print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
@@ -234,7 +234,7 @@ timer.start()
 for j in range(0, 256, 64):
     A[:, j:j+64] = np.dot(B, C[:, j:j+64])
 timer.stop()
-print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
+print(f'performance in Gigaflops: block {0.02*2 / timer.times[3]:.3f}')
 ```
 
 ```{.python .input}
@@ -243,7 +243,7 @@ timer.start()
 for j in range(0, 256, 64):
     A[:, j:j+64] = torch.mm(B, C[:, j:j+64])
 timer.stop()
-print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
+print(f'performance in Gigaflops: block {0.02*2 / timer.times[3]:.3f}')
 ```
 
 ```{.python .input}
@@ -252,7 +252,7 @@ timer.start()
 for j in range(0, 256, 64):
     A[:, j:j+64].assign(tf.tensordot(B, C[:, j:j+64], axes=1))
 timer.stop()
-print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
+print(f'performance in Gigaflops: block {0.02*2 / timer.times[3]:.3f}')
 ```
 
 As we can see, the computation on the minibatch is essentially as efficient as on the full matrix. A word of caution is in order. In :numref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g., :citet:`Ioffe.2017` for details on how to rescale and compute the appropriate terms.
