@@ -316,6 +316,26 @@ class Trainer(d2l.HyperParameters):
     def fit_epoch(self):
         raise NotImplementedError
 
+    def prepare_batch(self, batch):
+        """Defined in :numref:`sec_linear_scratch`"""
+        return batch
+
+    def fit_epoch(self):
+        """Defined in :numref:`sec_linear_scratch`"""
+        self.model.training = True
+        for batch in self.train_dataloader:
+            _, grads = self.model.training_step(self.state.params,
+                                                self.prepare_batch(batch))
+            self.state = self.state.apply_gradients(grads=grads)
+            self.train_batch_idx += 1
+        if self.val_dataloader is None:
+            return
+        self.model.training = False
+        for batch in self.val_dataloader:
+            self.model.validation_step(self.state.params,
+                                       self.prepare_batch(batch))
+            self.val_batch_idx += 1
+
 class SyntheticRegressionData(d2l.DataModule):
     """Defined in :numref:`sec_synthetic-regression-data`"""
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
@@ -333,6 +353,61 @@ class SyntheticRegressionData(d2l.DataModule):
         """Defined in :numref:`sec_synthetic-regression-data`"""
         i = slice(0, self.num_train) if train else slice(self.num_train, None)
         return self.get_tensorloader((self.X, self.y), train, i)
+
+class LinearRegressionScratch(d2l.Module):
+    """Defined in :numref:`sec_linear_scratch`"""
+    num_inputs: int
+    lr: float
+    sigma: float = 0.01
+
+    def setup(self):
+        self.w = self.param('w', nn.initializers.normal(self.sigma),
+                            (self.num_inputs, 1))
+        self.b = self.param('b', nn.initializers.zeros, (1))
+
+    def forward(self, X):
+        """The linear regression model.
+    
+        Defined in :numref:`sec_linear_scratch`"""
+        return d2l.matmul(X, self.w) + self.b
+
+    def loss(self, params, X, y):
+        """Defined in :numref:`sec_linear_scratch`"""
+        y_hat = self.apply(params, X)
+        l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+        return d2l.reduce_mean(l)
+
+    def configure_optimizers(self):
+        """Defined in :numref:`sec_linear_scratch`"""
+        return SGD(self.lr)
+
+class SGD(d2l.HyperParameters):
+    """Defined in :numref:`sec_linear_scratch`"""
+    def __init__(self, lr):
+        """
+        Minibatch stochastic gradient descent.
+        The key transformation of Optax is the `GradientTransformation`
+        defined by two functions, the `init` and the `update`.
+        The `init` initializes the state and the `update` transforms
+        the gradients.
+        https://github.com/deepmind/optax/blob/master/optax/_src/transform.py
+        """
+        self.save_hyperparameters()
+
+    def init(self, params):
+        # params not used
+        del params
+        return optax.EmptyState
+
+    def update(self, updates, state, params=None):
+        del params
+        # apply_gradients through flax's train_state is called, which then
+        # calls optax.apply_updates adding the params to the update defined
+        updates = jax.tree_util.tree_map(lambda g: -self.lr * g, updates)
+        return updates, state
+
+    def __call__():
+        return optax.GradientTransformation(self.init, self.update)
 
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
