@@ -301,7 +301,7 @@ They can also skip subsequences by turning on the update gate.
 ## Exercises
 
 1. Assume that we only want to use the input at time step $t'$ to predict the output at time step $t > t'$. What are the best values for the reset and update gates for each time step?
-1. Adjust the hyperparameters and analyze the their influence on running time, perplexity, and the output sequence.
+1. Adjust the hyperparameters and analyze their influence on running time, perplexity, and the output sequence.
 1. Compare runtime, perplexity, and the output strings for `rnn.RNN` and `rnn.GRU` implementations with each other.
 1. What happens if you implement only parts of a GRU, e.g., with only a reset gate or only an update gate?
 
