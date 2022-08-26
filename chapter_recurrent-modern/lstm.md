@@ -424,7 +424,7 @@ LSTMs can alleviate vanishing and exploding gradients.
 
 ## Exercises
 
-1. Adjust the hyperparameters and analyze the their influence on running time, perplexity, and the output sequence.
+1. Adjust the hyperparameters and analyze their influence on running time, perplexity, and the output sequence.
 1. How would you need to change the model to generate proper words as opposed to sequences of characters?
 1. Compare the computational cost for GRUs, LSTMs, and regular RNNs for a given hidden dimension. Pay special attention to the training and inference cost.
 1. Since the candidate memory cell ensures that the value range is between $-1$ and $1$ by  using the $\tanh$ function, why does the hidden state need to use the $\tanh$ function again to ensure that the output value range is between $-1$ and $1$?
