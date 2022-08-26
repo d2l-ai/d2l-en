@@ -3,7 +3,7 @@
 
 So far, our working example of a sequence learning task has been language modeling,
 where we aim to predict the next token given all previous tokens in a sequence. 
-In this scenario, we wish only to condition upon the left-ward context,
+In this scenario, we wish only to condition upon the leftward context,
 and thus the unidirectional chaining of a standard RNN seems appropriate. 
 However, there are many other sequence learning tasks contexts 
 where it's perfectly fine to condition the prediction at every time step
@@ -29,10 +29,10 @@ but "not" seems incompatible with the third sentences.
 
 
 Fortunately, a simple technique transforms any unidirectional RNN 
-into a bidrectional RNN.
+into a bidrectional RNN :cite:`Schuster.Paliwal.1997`.
 We simply implement two unidirectional RNN layers
 chained together in opposite directions 
-and acting on the same input.
+and acting on the same input (:numref:`fig_birnn`).
 For the first RNN layer,
 the first input is $\mathbf{x}_1$
 and the last input is $\mathbf{x}_T$,
@@ -67,7 +67,7 @@ $$
 \end{aligned}
 $$
 
-where the weights $\mathbf{W}_{xh}^{(f)} \in \mathbb{R}^{d \times h}, \mathbf{W}_{hh}^{(f)} \in \mathbb{R}^{h \times h}, \mathbf{W}_{xh}^{(b)} \in \mathbb{R}^{d \times h}, \text{ and } \mathbf{W}_{hh}^{(b)} \in \mathbb{R}^{h \times h}$, and biases $\mathbf{b}_h^{(f)} \in \mathbb{R}^{1 \times h} \text{ and } \mathbf{b}_h^{(b)} \in \mathbb{R}^{1 \times h}$ are all the model parameters.
+where the weights $\mathbf{W}_{xh}^{(f)} \in \mathbb{R}^{d \times h}, \mathbf{W}_{hh}^{(f)} \in \mathbb{R}^{h \times h}, \mathbf{W}_{xh}^{(b)} \in \mathbb{R}^{d \times h}, \text{ and } \mathbf{W}_{hh}^{(b)} \in \mathbb{R}^{h \times h}$, and biases $\mathbf{b}_h^{(f)} \in \mathbb{R}^{1 \times h}$ and $\mathbf{b}_h^{(b)} \in \mathbb{R}^{1 \times h}$ are all the model parameters.
 
 Next, we concatenate the forward and backward hidden states
 $\overrightarrow{\mathbf{H}}_t$ and $\overleftarrow{\mathbf{H}}_t$
@@ -144,24 +144,6 @@ def forward(self, inputs, Hs=None):
     return outputs, (f_H, b_H)
 ```
 
-The training procedure is the same
-as in :numref:`sec_rnn-scratch`.
-
-```{.python .input}
-%%tab all
-data = d2l.TimeMachine(batch_size=1024, num_steps=32)
-if tab.selected('mxnet', 'pytorch'):
-    birnn = BiRNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
-    model = d2l.RNNLMScratch(birnn, vocab_size=len(data.vocab), lr=2)
-    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
-if tab.selected('tensorflow'):
-    with d2l.try_gpu():
-        birnn = BiRNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
-        model = d2l.RNNLMScratch(birnn, vocab_size=len(data.vocab), lr=2)
-    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1)
-trainer.fit(model, data)
-```
-
 ### Concise Implementation
 
 Using the high-level APIs,
@@ -181,28 +163,9 @@ class BiGRU(d2l.RNN):
         self.num_hiddens *= 2
 ```
 
-```{.python .input}
-%%tab mxnet, pytorch
-gru = BiGRU(num_inputs=len(data.vocab), num_hiddens=32)
-if tab.selected('mxnet', 'pytorch'):
-    model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=2)
-if tab.selected('tensorflow'):
-    with d2l.try_gpu():
-        model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=2)
-trainer.fit(model, data)
-```
-
-```{.python .input}
-%%tab mxnet, pytorch
-model.predict('it has', 20, data.vocab, d2l.try_gpu())
-```
-
-For a discussion of more effective uses of bidirectional RNNs, 
-please see the sentiment analysis application in :numref:`sec_sentiment_rnn`.
-
 ## Summary
 
-In bidirectional RNNs, the hidden state for each time step is simultaneously determined by the data prior to and after the current time step. Bidirectional RNNs bear a striking resemblance with the forward-backward algorithm in probabilistic graphical models. Bidirectional RNNs are mostly useful for sequence encoding and the estimation of observations given bidirectional context. Bidirectional RNNs are very costly to train due to long gradient chains.
+In bidirectional RNNs, the hidden state for each time step is simultaneously determined by the data prior to and after the current time step. Bidirectional RNNs are mostly useful for sequence encoding and the estimation of observations given bidirectional context. Bidirectional RNNs are very costly to train due to long gradient chains.
 
 ## Exercises
 
