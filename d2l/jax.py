@@ -409,6 +409,33 @@ class SGD(d2l.HyperParameters):
     def __call__():
         return optax.GradientTransformation(self.init, self.update)
 
+class LinearRegression(d2l.Module):
+    """Defined in :numref:`sec_linear_concise`"""
+    lr: float
+
+    def setup(self):
+        self.net = nn.Dense(1, kernel_init=nn.initializers.normal(0.01))
+
+    def __call__(self, X):
+        """The linear regression model.
+    
+        Defined in :numref:`sec_linear_concise`"""
+        return self.net(X)
+
+    def loss(self, params, X, y):
+        """Defined in :numref:`sec_linear_concise`"""
+        y_hat = self.apply(params, X)
+        return d2l.reduce_mean(optax.l2_loss(y_hat, y))
+
+    def configure_optimizers(self):
+        """Defined in :numref:`sec_linear_concise`"""
+        return optax.sgd(self.lr)
+
+    def get_w_b(self, state):
+        """Defined in :numref:`sec_linear_concise`"""
+        net = state.params['params']['net']
+        return net['kernel'], net['bias']
+
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
     return jax.devices('cpu')[0]
