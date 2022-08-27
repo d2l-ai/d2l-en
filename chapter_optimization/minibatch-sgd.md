@@ -25,8 +25,8 @@ for a more in-depth discussion.
 
 The way to alleviate these constraints is to use a hierarchy of CPU caches that are actually fast enough to supply the processor with data. This is *the* driving force behind batching in deep learning. To keep matters simple, consider matrix-matrix multiplication, say $\mathbf{A} = \mathbf{B}\mathbf{C}$. We have a number of options for calculating $\mathbf{A}$. For instance, we could try the following:
 
-1. We could compute $\mathbf{A}_{ij} = \mathbf{B}_{i,:} \mathbf{C}_{:,j}^\top$, i.e., we could compute it elementwise by means of dot products.
-1. We could compute $\mathbf{A}_{:,j} = \mathbf{B} \mathbf{C}_{:,j}^\top$, i.e., we could compute it one column at a time. Likewise we could compute $\mathbf{A}$ one row $\mathbf{A}_{i,:}$ at a time.
+1. We could compute $\mathbf{A}_{ij} = \mathbf{B}_{i,:} \mathbf{C}_{:,j}$, i.e., we could compute it elementwise by means of dot products.
+1. We could compute $\mathbf{A}_{:,j} = \mathbf{B} \mathbf{C}_{:,j}$, i.e., we could compute it one column at a time. Likewise we could compute $\mathbf{A}$ one row $\mathbf{A}_{i,:}$ at a time.
 1. We could simply compute $\mathbf{A} = \mathbf{B} \mathbf{C}$.
 1. We could break $\mathbf{B}$ and $\mathbf{C}$ into smaller block matrices and compute $\mathbf{A}$ one block at a time.
 
@@ -171,7 +171,12 @@ for j in range(256):
 timer.stop()
 ```
 
-Last, the most effective manner is to perform the entire operation in one block. Let's see what the respective speed of the operations is.
+Last, the most effective manner is to perform the entire operation in one block. 
+Note that multiplying any two matrices $\mathbf{B} \in \mathbb{R}^{m \times n}$ and $\mathbf{C} \in \mathbb{R}^{n \times p}$ takes approximately $2mnp$ floating point operations,
+when scalar multiplication and addition are counted as separate operations (fused in practice).
+Thus, multiplying two $256 \times 256$ matrices
+takes $0.03$ billion floating point operations.
+Let's see what the respective speed of the operations is.
 
 ```{.python .input}
 #@tab mxnet
@@ -181,8 +186,7 @@ A = np.dot(B, C)
 A.wait_to_read()
 timer.stop()
 
-# Multiply and add count as separate operations (fused in practice)
-gigaflops = [2/i for i in timer.times]
+gigaflops = [0.03 / i for i in timer.times]
 print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
@@ -194,8 +198,7 @@ timer.start()
 A = torch.mm(B, C)
 timer.stop()
 
-# Multiply and add count as separate operations (fused in practice)
-gigaflops = [2/i for i in timer.times]
+gigaflops = [0.03 / i for i in timer.times]
 print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
@@ -206,8 +209,7 @@ timer.start()
 A.assign(tf.tensordot(B, C, axes=1))
 timer.stop()
 
-# Multiply and add count as separate operations (fused in practice)
-gigaflops = [2/i for i in timer.times]
+gigaflops = [0.03 / i for i in timer.times]
 print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
@@ -234,7 +236,7 @@ timer.start()
 for j in range(0, 256, 64):
     A[:, j:j+64] = np.dot(B, C[:, j:j+64])
 timer.stop()
-print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
+print(f'performance in Gigaflops: block {0.03 / timer.times[3]:.3f}')
 ```
 
 ```{.python .input}
@@ -243,7 +245,7 @@ timer.start()
 for j in range(0, 256, 64):
     A[:, j:j+64] = torch.mm(B, C[:, j:j+64])
 timer.stop()
-print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
+print(f'performance in Gigaflops: block {0.03 / timer.times[3]:.3f}')
 ```
 
 ```{.python .input}
@@ -252,7 +254,7 @@ timer.start()
 for j in range(0, 256, 64):
     A[:, j:j+64].assign(tf.tensordot(B, C[:, j:j+64], axes=1))
 timer.stop()
-print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
+print(f'performance in Gigaflops: block {0.03 / timer.times[3]:.3f}')
 ```
 
 As we can see, the computation on the minibatch is essentially as efficient as on the full matrix. A word of caution is in order. In :numref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g., :citet:`Ioffe.2017` for details on how to rescale and compute the appropriate terms.

@@ -20,13 +20,13 @@ However, we often also wish to retain the ability
 to express complex relationships 
 between the inputs at a given time step
 and the outputs at that same time step.
-Thus we often construct RNN's that are deep
+Thus we often construct RNNs that are deep
 not only in the time direction 
 but also in the input-to-output direction.
 This is precisely the notion of depth
 that we have already encountered 
-in our development of multilayer perceptrons
-and deep convolutional neural networks.
+in our development of MLPs
+and deep CNNs.
 
 
 The standard method for building this sort of deep RNN 
@@ -38,9 +38,9 @@ In this short section, we illustrate this design pattern
 and present a simple example for how to code up such stacked RNNs.
 Below, in :numref:`fig_deep_rnn`, we illustrate
 a deep RNN with $L$ hidden layers.
-Each hidden state operates on a sequentual input
+Each hidden state operates on a sequential input
 and produces a sequential output.
-Moreover each RNN cell at each time step
+Moreover, any RNN cell (white box in :numref:`fig_deep_rnn`) at each time step
 depends on both the same layer's 
 value at the previous time step
 and the previous layer's value 
@@ -53,8 +53,7 @@ Formally, suppose that we have a minibatch input
 $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
 (number of examples: $n$, number of inputs in each example: $d$) at time step $t$.
 At the same time step, 
-let the hidden state of the $l^\mathrm{th}$ hidden layer  
-($l=1,\ldots,L$) be $\mathbf{H}_t^{(l)} \in \mathbb{R}^{n \times h}$ 
+let the hidden state of the $l^\mathrm{th}$ hidden layer ($l=1,\ldots,L$) be $\mathbf{H}_t^{(l)} \in \mathbb{R}^{n \times h}$ 
 (number of hidden units: $h$)
 and the output layer variable be 
 $\mathbf{O}_t \in \mathbb{R}^{n \times q}$ 
@@ -85,11 +84,11 @@ are the model parameters of the output layer.
 Just as with MLPs, the number of hidden layers $L$ 
 and the number of hidden units $h$ are hyperparameters
 that we can tune.
-Common RNN layer widths are in the range (64,2056),
-and common depths are in the range (1, 8). 
+Common RNN layer widths ($h$) are in the range $(64, 2056)$,
+and common depths ($L$) are in the range $(1, 8)$. 
 In addition, we can easily get a deep gated RNN
 by replacing the hidden state computation in :eqref:`eq_deep_rnn_H`
-with that from a GRU or an LSTM.
+with that from an LSTM or a GRU.
 
 ```{.python .input}
 %load_ext d2lbook.tab

@@ -6,10 +6,10 @@ Shortly after the first Elman-style RNNs were trained using backpropagation
 :cite:`elman1990finding`, the problems of learning long-term dependencies
 (owing to vanishing and exploding gradients)
 became salient, with Bengio and Hochreiter 
-discussing the problem in 1994
+discussing the problem
 :cite:`bengio1994learning` :cite:`Hochreiter.Bengio.Frasconi.ea.2001`.
 Hochreiter had articulated this problem as early 
-as his 1991 masters thesis, although the results 
+as in his 1991 masters thesis, although the results 
 were not widely known because the thesis was written in German.
 While gradient clipping helps with exploding gradients, 
 handling vanishing gradients appears 
@@ -20,7 +20,7 @@ came in the form of the long short-term memory (LSTM) model
 due to :citet:`Hochreiter.Schmidhuber.1997`. 
 LSTMs resemble standard recurrent neural networks 
 but here each ordinary recurrent node
-is replaced by a \emph{memory cell}.
+is replaced by a *memory cell*.
 Each memory cell contains an *internal state*,
 i.e., a node with a self-connected recurrent edge of fixed weight 1,
 ensuring that the gradient can pass across many time steps 
@@ -54,7 +54,7 @@ should be allowed to impact the cell's output (the *output* gate).
 
 ### Gated Hidden State
 
-The key distinction between vanilla RNNs and GRUs
+The key distinction between vanilla RNNs and LSTMs
 is that the latter support gating of the hidden state.
 This means that we have dedicated mechanisms for
 when a hidden state should be *updated* and
@@ -81,10 +81,10 @@ Additionally, we require an *input node*,
 typically computed with a *tanh* activation function. 
 Intuitively, the *input gate* determines how much
 of the input node's value should be added 
-to the memory cell's current internal state.
+to the current memory cell internal state.
 The *forget gate* determines whether to keep
 the current value of the memory or flush it. 
-And the output gate determines whether 
+And the *output gate* determines whether 
 the memory cell should influence the output
 at the current time step. 
 
@@ -113,9 +113,15 @@ $$
 
 where $\mathbf{W}_{xi}, \mathbf{W}_{xf}, \mathbf{W}_{xo} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hi}, \mathbf{W}_{hf}, \mathbf{W}_{ho} \in \mathbb{R}^{h \times h}$ are weight parameters 
 and $\mathbf{b}_i, \mathbf{b}_f, \mathbf{b}_o \in \mathbb{R}^{1 \times h}$ are bias parameters.
+Note that broadcasting 
+(see :numref:`subsec_broadcasting`)
+is triggered during the summation.
+We use sigmoid functions 
+(as introduced in :numref:`sec_mlp`) 
+to map the input values to the interval $(0, 1)$.
 
 
-### Candidate Memory Cell
+### Input Node
 
 Next we design the memory cell. 
 Since we have not specified the action of the various gates yet, 
@@ -129,28 +135,28 @@ $$\tilde{\mathbf{C}}_t = \text{tanh}(\mathbf{X}_t \mathbf{W}_{xc} + \mathbf{H}_{
 
 where $\mathbf{W}_{xc} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hc} \in \mathbb{R}^{h \times h}$ are weight parameters and $\mathbf{b}_c \in \mathbb{R}^{1 \times h}$ is a bias parameter.
 
-A quick illustration of the candidate memory cell is shown in :numref:`fig_lstm_1`.
+A quick illustration of the input node is shown in :numref:`fig_lstm_1`.
 
-![Computing the candidate memory cell in an LSTM model.](../img/lstm-1.svg)
+![Computing the input node in an LSTM model.](../img/lstm-1.svg)
 :label:`fig_lstm_1`
 
 
-### Memory Cell
+### Memory Cell Internal State
 
 In LSTMs, the input gate $\mathbf{I}_t$ governs 
 how much we take new data into account via $\tilde{\mathbf{C}}_t$ 
 and the forget gate $\mathbf{F}_t$ addresses 
-how much of the old memory cell content $\mathbf{C}_{t-1} \in \mathbb{R}^{n \times h}$ we retain. 
-Using the same pointwise multiplication as before, 
+how much of the old cell internal state $\mathbf{C}_{t-1} \in \mathbb{R}^{n \times h}$ we retain. 
+Using the Hadamard (elementwise) product operator $\odot$
 we arrive at the following update equation:
 
 $$\mathbf{C}_t = \mathbf{F}_t \odot \mathbf{C}_{t-1} + \mathbf{I}_t \odot \tilde{\mathbf{C}}_t.$$
 
 If the forget gate is always 1 and the input gate is always 0, 
-the memory cell's state $\mathbf{C}_{t-1}$
+the memory cell internal state $\mathbf{C}_{t-1}$
 will remain constant forever, 
 passing unchanged to each subsequent time step.
-However, input gates and forget gates,
+However, input gates and forget gates
 give the model the flexibility to learn 
 when to keep this value unchanged
 and when to perturb it in response 
@@ -161,7 +167,7 @@ especially when facing datasets with long sequence lengths.
 
 We thus arrive at the flow diagram in :numref:`fig_lstm_2`.
 
-![Computing the memory cell in an LSTM model.](../img/lstm-2.svg)
+![Computing the memory cell internal state in an LSTM model.](../img/lstm-2.svg)
 
 :label:`fig_lstm_2`
 
@@ -169,10 +175,9 @@ We thus arrive at the flow diagram in :numref:`fig_lstm_2`.
 ### Hidden State
 
 Last, we need to define how to compute the output
-of the memory cell as seen by other layers
-$\mathbf{H}_t \in \mathbb{R}^{n \times h}$. 
+of the memory cell, i.e., the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times h}$, as seen by other layers. 
 This is where the output gate comes into play.
-In LSTMs, we first apply $\tanh$ to the memory cell
+In LSTMs, we first apply $\tanh$ to the memory cell internal state
 and then apply another point-wise multiplication,
 this time with the output gate.
 This ensures that the values of $\mathbf{H}_t$ 
@@ -182,9 +187,9 @@ $$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 
 
 Whenever the output gate is close to 1, 
-we allow the memory to impact the subsequent layers uninhibited,
+we allow the memory cell internal state to impact the subsequent layers uninhibited,
 whereas for output gate values close to 0,
-we prevent the current memory state from impacting other layers of the network
+we prevent the current memory from impacting other layers of the network
 at the current time step. 
 Note that a memory cell can accrue information 
 across many time steps without impacting the rest of the network
@@ -269,11 +274,11 @@ class LSTMScratch(d2l.Module):  #@save
         self.W_xi, self.W_hi, self.b_i = triple()  # Input gate
         self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
         self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
-        self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell
+        self.W_xc, self.W_hc, self.b_c = triple()  # Input node
 ```
 
 [**The actual model**] is defined as described above,
-consisting of three gates and a an input node. 
+consisting of three gates and an input node. 
 Note that only the hidden state is passed to the output layer.
 
 ```{.python .input}
@@ -301,7 +306,7 @@ def forward(self, inputs, H_C=None):
 
 ### [**Training**] and Prediction
 
-Let's train an LSTM by instantiating the `RNNLMScratch` class as introduced in :numref:`sec_rnn-scratch`.
+Let's train an LSTM model by instantiating the `RNNLMScratch` class as introduced in :numref:`sec_rnn-scratch`.
 
 ```{.python .input}
 %%tab all
@@ -321,12 +326,12 @@ trainer.fit(model, data)
 ## [**Concise Implementation**]
 
 Using high-level APIs,
-we can directly instantiate an `LSTM` model.
+we can directly instantiate an LSTM model.
 This encapsulates all the configuration details 
 that we made explicit above. 
 The code is significantly faster as it uses 
 compiled operators rather than Python
-for many details that we spelled out in detail before.
+for many details that we spelled out before.
 
 ```{.python .input}
 %%tab mxnet
@@ -404,22 +409,22 @@ While LSTMs were published in 1997,
 they rose to greater prominence 
 with some victories in prediction competitions in the mid-2000s,
 and became the dominant models for sequence learning from 2011 
-until more recently with the rise of Transformer models, starting in 2017.
-Even Tranformers owe some of their key ideas 
+until more recently with the rise of transformer models, starting in 2017.
+Even tranformers owe some of their key ideas 
 to architecture design innovations introduced by the LSTM.
 LSTMs have three types of gates: 
 input gates, forget gates, and output gates 
 that control the flow of information.
-The hidden layer output of LSTM includes the hidden state and the memory cell. 
-Only the hidden state is passed into the output layer. 
-The memory cell is entirely internal.
+The hidden layer output of LSTM includes the hidden state and the memory cell internal state. 
+Only the hidden state is passed into the output layer while 
+the memory cell internal state is entirely internal.
 LSTMs can alleviate vanishing and exploding gradients.
 
 
 
 ## Exercises
 
-1. Adjust the hyperparameters and analyze the their influence on running time, perplexity, and the output sequence.
+1. Adjust the hyperparameters and analyze their influence on running time, perplexity, and the output sequence.
 1. How would you need to change the model to generate proper words as opposed to sequences of characters?
 1. Compare the computational cost for GRUs, LSTMs, and regular RNNs for a given hidden dimension. Pay special attention to the training and inference cost.
 1. Since the candidate memory cell ensures that the value range is between $-1$ and $1$ by  using the $\tanh$ function, why does the hidden state need to use the $\tanh$ function again to ensure that the output value range is between $-1$ and $1$?

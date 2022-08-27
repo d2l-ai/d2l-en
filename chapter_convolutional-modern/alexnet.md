@@ -209,7 +209,7 @@ which yields $16 \times \frac{1}{4} = 4$ times the performance.
 Second, GPU cores are much simpler
 (in fact, for a long time they were not even *able*
 to execute general-purpose code),
-which makes them more energy efficient. For instance, they tend not to support speculative evaluation (it typically isn't possible to program each processing element individually), and the caches per core tend to be much smaller. 
+which makes them more energy efficient. For instance, (i) they tend not to support speculative evaluation, (ii) it typically isn't possible to program each processing element individually, and (iii) the caches per core tend to be much smaller.
 Last, many operations in deep learning require high memory bandwidth.
 Again, GPUs shine here with buses that are at least 10 times as wide as many CPUs.
 

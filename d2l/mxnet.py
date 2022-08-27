@@ -563,15 +563,18 @@ class ResNeXtBlock(nn.Block):
                  use_1x1conv=False, strides=1, **kwargs):
         super().__init__(**kwargs)
         bot_channels = int(round(num_channels * bot_mul))
-        self.conv1 = nn.Conv2D(bot_channels, kernel_size=1, padding=0, strides=1)
+        self.conv1 = nn.Conv2D(bot_channels, kernel_size=1, padding=0,
+                               strides=1)
         self.conv2 = nn.Conv2D(bot_channels, kernel_size=3, padding=1,
                                strides=strides, groups=bot_channels//groups)
-        self.conv3 = nn.Conv2D(num_channels, kernel_size=1, padding=0, strides=1)
+        self.conv3 = nn.Conv2D(num_channels, kernel_size=1, padding=0,
+                               strides=1)
         self.bn1 = nn.BatchNorm()
         self.bn2 = nn.BatchNorm()
         self.bn3 = nn.BatchNorm()
         if use_1x1conv:
-            self.conv4 = nn.Conv2D(num_channels, kernel_size=1, strides=strides)
+            self.conv4 = nn.Conv2D(num_channels, kernel_size=1,
+                                   strides=strides)
             self.bn4 = nn.BatchNorm()
         else:
             self.conv4 = None
@@ -774,7 +777,7 @@ class LSTMScratch(d2l.Module):
         self.W_xi, self.W_hi, self.b_i = triple()  # Input gate
         self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
         self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
-        self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell
+        self.W_xc, self.W_hc, self.b_c = triple()  # Input node
 
 class GRU(d2l.RNN):
     """Defined in :numref:`sec_deep_rnn`"""

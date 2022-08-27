@@ -2,17 +2,17 @@
 :label:`sec_gru`
 
 
-As RNNs and particularly the LSTM architecture due to :numref:`sec_lstm`
+As RNNs and particularly the LSTM architecture (:numref:`sec_lstm`)
 rapidly gained popularity during the 2010s,
 a number of papers began to experiment 
 with simplified architectures in hopes 
 of retaining the key idea of incorporating
-an an internal state and multiplicative gating mechanisms
+an internal state and multiplicative gating mechanisms
 but with the aim of speeding up computation.
 The gated recurrent unit (GRU) :cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` 
-offered a streamlined version of the LSTM cell
+offered a streamlined version of the LSTM memory cell
 that often achieves comparable performance
-but as the advantage of being faster 
+but with the advantage of being faster 
 to compute :cite:`Chung.Gulcehre.Cho.ea.2014`.
 
 
@@ -57,13 +57,8 @@ $$
 where $\mathbf{W}_{xr}, \mathbf{W}_{xz} \in \mathbb{R}^{d \times h}$ 
 and $\mathbf{W}_{hr}, \mathbf{W}_{hz} \in \mathbb{R}^{h \times h}$ 
 are weight parameters and $\mathbf{b}_r, \mathbf{b}_z \in \mathbb{R}^{1 \times h}$ 
-are biases.
-Note that broadcasting 
-(see :numref:`subsec_broadcasting`)
-is triggered during the summation.
-We use sigmoid functions 
-(as introduced in :numref:`sec_mlp`) 
-to map the input values to the interval $(0, 1)$.
+are bias parameters.
+
 
 ### Candidate Hidden State
 
@@ -108,7 +103,7 @@ Any pre-existing hidden state is thus *reset* to defaults.
 
 Finally, we need to incorporate the effect of the update gate $\mathbf{Z}_t$.
 This determines the extent to which the new hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times h}$ 
-matches the old state $\mathbf{H}_{t-1}$ versys how much 
+matches the old state $\mathbf{H}_{t-1}$ versus how much 
 it resembles the new candidate state $\tilde{\mathbf{H}}_t$.
 The update gate $\mathbf{Z}_t$ can be used for this purpose, 
 simply by taking elementwise convex combinations 
@@ -268,7 +263,7 @@ class GRU(d2l.RNN):
 ```
 
 The code is significantly faster in training as it uses compiled operators 
-rather than Python for many details that we spelled out before.
+rather than Python.
 
 ```{.python .input}
 %%tab all
@@ -296,8 +291,8 @@ model.predict('it has', 20, data.vocab)
 
 ## Summary
 
-Compared to LSTMs, GRUs acheive similar performance but tend to be lighter computationally.
-Generally, compared to simple RNNs, gated RNNs like LSTMs and GRUs
+Compared with LSTMs, GRUs achieve similar performance but tend to be lighter computationally.
+Generally, compared with simple RNNs, gated RNNs like LSTMs and GRUs
 can better capture dependencies for sequences with large time step distances.
 GRUs contain basic RNNs as their extreme case whenever the reset gate is switched on. 
 They can also skip subsequences by turning on the update gate.
@@ -306,7 +301,7 @@ They can also skip subsequences by turning on the update gate.
 ## Exercises
 
 1. Assume that we only want to use the input at time step $t'$ to predict the output at time step $t > t'$. What are the best values for the reset and update gates for each time step?
-1. Adjust the hyperparameters and analyze the their influence on running time, perplexity, and the output sequence.
+1. Adjust the hyperparameters and analyze their influence on running time, perplexity, and the output sequence.
 1. Compare runtime, perplexity, and the output strings for `rnn.RNN` and `rnn.GRU` implementations with each other.
 1. What happens if you implement only parts of a GRU, e.g., with only a reset gate or only an update gate?
 
