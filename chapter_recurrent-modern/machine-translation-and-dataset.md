@@ -6,62 +6,44 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 # Machine Translation and the Dataset
 :label:`sec_machine_translation`
 
-We have used RNNs to design language models,
-which are key to natural language processing.
-Another flagship benchmark is *machine translation*,
-a central problem domain for *sequence transduction* models
-that transform input sequences into output sequences.
-Playing a crucial role in various modern AI applications,
-sequence transduction models will form the focus of the remainder of this chapter
-and :numref:`chap_attention-and-transformers`.
-To this end,
-this section introduces the machine translation problem
-and its dataset that will be used later.
+Among the major breakthroughs that prompted 
+widespread interest in modern RNNs
+was a major advance in the applied field of 
+statistical  *machine translation*.
+Here, the model is presented with a sentence in one language
+and must predict the corresponding sentence in another language. 
+Note that here the sentences may not be of different lengths,
+and that corresponding words in the two sentences 
+may not occur in the same order, 
+owing to differences in differences 
+in the two language's grammatical structure. 
 
 
-*Machine translation* refers to the
-automatic translation of a sequence
-from one language to another.
-In fact, this field
-may date back to 1940s
-soon after digital computers were invented,
-especially by considering the use of computers
-for cracking language codes in World War II.
-For decades,
-statistical approaches
-had been dominant in this field :cite:`Brown.Cocke.Della-Pietra.ea.1988,Brown.Cocke.Della-Pietra.ea.1990`
-before the rise
-of
-end-to-end learning using
-neural networks.
-The latter
-is often called
-*neural machine translation*
-to distinguish itself from
-*statistical machine translation*
-that involves statistical analysis
-in components such as
-the translation model and the language model.
+Many problems have this flavor of mapping 
+between two such "unaligned" sequences.
+Examples include mapping 
+from dialog prompts to replies
+or from questions to answers.
+Broadly, such problems are called 
+sequence-to-sequence (seq2seq) problems 
+and they are our focus for 
+both the remainder of this chapter
+and much of :numref:`chap_attention-and-transformers`.
+
+In this section, we introduce the machine translation problem
+and an example dataset that we will use in the subsequent examples.
+For decades, statistical formulations of translation between languages
+had been popular :cite:`Brown.Cocke.Della-Pietra.ea.1988,Brown.Cocke.Della-Pietra.ea.1990`,
+even before researchers got neural network approaches working
+(methods often lumped together under the term *neural machine translation*).
 
 
-Emphasizing end-to-end learning,
-this book will focus on neural machine translation methods.
-Different from our language model problem
-in :numref:`sec_language-model`
-whose corpus is in one single language,
-machine translation datasets
-are composed of pairs of text sequences
-that are in
-the source language and the target language, respectively.
-Thus,
-instead of reusing the preprocessing routine
-for language modeling,
-we need a different way to preprocess
-machine translation datasets.
-In the following,
-we show how to
-load the preprocessed data
-into minibatches for training.
+First we will need some new code to process our data.
+Unlike the language modeling that we saw in :numref:`sec_language-model`,
+here each example consists of two separate text sequences,
+one in the source language and another (the translation) in the target language.
+The following code snippets will show how 
+to load the preprocessed data into minibatches for training.
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -87,19 +69,18 @@ import os
 
 ## [**Downloading and Preprocessing the Dataset**]
 
-To begin with,
-we download an English-French dataset
+To begin, we download an English-French dataset
 that consists of [bilingual sentence pairs from the Tatoeba Project](http://www.manythings.org/anki/).
-Each line in the dataset
-is a tab-delimited pair
-of an English text sequence
+Each line in the dataset is a tab-delimited pair 
+consisting of an English text sequence 
 and the translated French text sequence.
 Note that each text sequence
-can be just one sentence or a paragraph of multiple sentences.
+can be just one sentence,
+or a paragraph of multiple sentences.
 In this machine translation problem
 where English is translated into French,
-English is the *source language*
-and French is the *target language*.
+English is called the *source language*
+and French is called the *target language*.
 
 ```{.python .input  n=5}
 %%tab all
@@ -119,8 +100,7 @@ print(raw_text[:75])
 After downloading the dataset,
 we [**proceed with several preprocessing steps**]
 for the raw text data.
-For instance,
-we replace non-breaking space with space,
+For instance, we replace non-breaking space with space,
 convert uppercase letters to lowercase ones,
 and insert space between words and punctuation marks.
 
@@ -142,31 +122,27 @@ print(text[:80])
 
 ## [**Tokenization**]
 
-Different from character-level tokenization
+Unlike the character-level tokenization
 in :numref:`sec_language-model`,
 for machine translation
 we prefer word-level tokenization here
-(state-of-the-art models may use more advanced tokenization techniques).
+(today's state-of-the-art models use 
+more complex tokenization techniques).
 The following `_tokenize` method
 tokenizes the first `max_examples` text sequence pairs,
-where
-each token is either a word or a punctuation mark.
+where each token is either a word or a punctuation mark.
 We append the special “&lt;eos&gt;” token
 to the end of every sequence to indicate the
 end of the sequence.
 When a model is predicting
-by
-generating a sequence token after token,
-the generation
-of the “&lt;eos&gt;” token
-can suggest that
-the output sequence is complete.
-In the end,
-the method below returns
+by generating a sequence token after token,
+the generation of the “&lt;eos&gt;” token
+can suggest that the output sequence is complete.
+In the end, the method below returns
 two lists of token lists: `src` and `tgt`.
-Specifically,
-`src[i]` is a list of tokens from the
-$i^\mathrm{th}$ text sequence in the source language (English here) and `tgt[i]` is that in the target language (French here).
+Specifically, `src[i]` is a list of tokens from the
+$i^\mathrm{th}$ text sequence in the source language (English here) 
+and `tgt[i]` is that in the target language (French here).
 
 ```{.python .input  n=7}
 %%tab all
@@ -212,15 +188,15 @@ show_list_len_pair_hist(['source', 'target'], '# tokens per sequence',
 :label:`subsec_loading-seq-fixed-len`
 
 Recall that in language modeling
-[**each sequence example**],
+[**each example sequence**],
 either a segment of one sentence
 or a span over multiple sentences,
-(**has a fixed length.**)
+(**had a fixed length.**)
 This was specified by the `num_steps`
 (number of time steps or tokens) argument in :numref:`sec_language-model`.
 In machine translation, each example is
 a pair of source and target text sequences,
-where each text sequence may have different lengths.
+where the two text sequence may have different lengths.
 
 For computational efficiency,
 we can still process a minibatch of text sequences
@@ -230,12 +206,10 @@ should have the same length `num_steps`.
 If a text sequence has fewer than `num_steps` tokens,
 we will keep appending the special "&lt;pad&gt;" token
 to its end until its length reaches `num_steps`.
-Otherwise,
-we will truncate the text sequence
+Otherwise, we will truncate the text sequence
 by only taking its first `num_steps` tokens
 and discarding the remaining.
-In this way,
-every text sequence
+In this way, every text sequence
 will have the same length
 to be loaded in minibatches of the same shape.
 Besides, we also record length of the source sequence excluding padding tokens.
@@ -254,15 +228,12 @@ To alleviate this,
 here we treat infrequent tokens
 that appear less than 2 times
 as the same unknown ("&lt;unk&gt;") token.
-As we will explain 
-later (:numref:`fig_seq2seq`),
+As we will explain later (:numref:`fig_seq2seq`),
 when training with target sequences,
 the decoder output (label tokens)
 can be the same decoder input (target tokens),
 shifted by one token;
-and
-the special beginning-of-sequence
-"&lt;bos&gt;" token
+and the special beginning-of-sequence "&lt;bos&gt;" token
 will be used as the first input token
 for predicting the target sequence (:numref:`fig_seq2seq_predict`).
 
@@ -347,9 +318,7 @@ print('target:', data.tgt_vocab.to_tokens(d2l.astype(tgt[0], d2l.int32)))
 
 ## Summary
 
-* Machine translation refers to the automatic translation of a sequence from one language to another.
-* Using word-level tokenization, the vocabulary size will be significantly larger than that using character-level tokenization. To alleviate this, we can treat infrequent tokens as the same unknown token.
-* We can truncate and pad text sequences so that all of them will have the same length to be loaded in minibatches.
+In NLP, *machine translation* refers to the task of automatically mapping from a sequence representing a string of text in a *source* language to a string representing a plausible translation in a *target* language. Using word-level tokenization, the vocabulary size will be significantly larger than that using character-level tokenization, but the sequence lengths will be much shorter. To mitigate the large vocabulary size, we can treat infrequent tokens as some "unknown" token. We can truncate and pad text sequences so that all of them will have the same length to be loaded in minibatches. Modern implementations often bucket sequences with similar lengths to avoid wasting excessive computation on padding. 
 
 
 ## Exercises

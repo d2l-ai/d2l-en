@@ -1,8 +1,8 @@
 # Modern Convolutional Neural Networks
 :label:`chap_modern_cnn`
 
-Now that we understand the basics of wiring together CNNs, we will
-take you through a tour of modern CNN architectures. This tour is, by
+Now that we understand the basics of wiring together CNNs, let's take
+a tour of modern CNN architectures. This tour is, by
 necessity, incomplete, thanks to the plethora of exciting new designs
 being added. Their importance derives from the fact that not only can
 they be used directly for vision tasks, but they also serve as basic
@@ -16,31 +16,10 @@ deployed systems were built.  Each of these networks was briefly a
 dominant architecture and many were winners or runners-up in the
 [ImageNet competition](https://www.image-net.org/challenges/LSVRC/)
 which has served as a barometer of progress on supervised learning in
-computer vision since 2010.
-
-These models include the AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`,
-the first large-scale network deployed to beat conventional computer
-vision methods on a large-scale vision challenge; the VGG network
-:cite:`Simonyan.Zisserman.2014`, which makes use of a number of
-repeating blocks of elements; the network in network (NiN) that
-convolves whole neural networks patch-wise over inputs
-:cite:`Lin.Chen.Yan.2013`; the GoogLeNet that uses networks with
-multi-branch convolutions :cite:`Szegedy.Liu.Jia.ea.2015`; the residual
-network (ResNet) :cite:`He.Zhang.Ren.ea.2016`, which remains some of
-the most popular off-the-shelf architectures in computer vision;
-ResNeXt blocks :cite:`Xie.Girshick.Dollar.ea.2017`
-for sparser connections;
-and
-the DenseNet
-:cite:`Huang.Liu.Van-Der-Maaten.ea.2017` for a generalization of the
-residual architecture.
-In addition to that,
-assuming standard and fixed blocks,
-we progressively simplify design spaces with better models,
-leading
-to the RegNet
-:cite:`Radosavovic.Kosaraju.Girshick.ea.2020`.
-
+computer vision since 2010. It is only recently that transformers have begun
+to displace CNNs, starting with :citet:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` and 
+followed by the swin transformer :cite:`liu2021swin`. We will cover this development later 
+in the chapter on :ref:`chap_attention-and-transformers`. 
 
 While the idea of *deep* neural networks is quite simple (stack
 together a bunch of layers), performance can vary wildly across
@@ -54,6 +33,33 @@ batch normalization and residual connections described in this chapter
 have offered two popular ideas for training and designing deep models,
 both of which have since been applied to architectures beyond computer
 vision, too.
+
+We begin our tour of modern CNNs with AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`,
+the first large-scale network deployed to beat conventional computer
+vision methods on a large-scale vision challenge; the VGG network
+:cite:`Simonyan.Zisserman.2014`, which makes use of a number of
+repeating blocks of elements; the network in network (NiN) that
+convolves whole neural networks patch-wise over inputs
+:cite:`Lin.Chen.Yan.2013`; GoogLeNet that uses networks with
+multi-branch convolutions :cite:`Szegedy.Liu.Jia.ea.2015`; the residual
+network (ResNet) :cite:`He.Zhang.Ren.ea.2016`, which remains some of
+the most popular off-the-shelf architectures in computer vision;
+ResNeXt blocks :cite:`Xie.Girshick.Dollar.ea.2017`
+for sparser connections;
+and DenseNet
+:cite:`Huang.Liu.Van-Der-Maaten.ea.2017` for a generalization of the
+residual architecture. Over time many special optimizations for efficient 
+networks were developed, such as coordinate shifts (ShiftNet) :cite:`wu2018shift`. This 
+culminated in the automatic search for efficient architectures such as 
+MobileNet v3 :cite:`Howard.Sandler.Chu.ea.2019`. It also includes the 
+semi-automatic design exploration of :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`
+that led to the RegNetX/Y which we will discuss later in this chapter. 
+The work is instructive insofar as it offers a path to marry brute force computation with 
+the ingenuity of an experimenter in the search for efficient design spaces. Of note is
+also the work of :citet:`liu2022convnet` as it shows that training techniques (e.g., optimizers, data augmentation, and regularization)
+play a pivotal role in improving accuracy. It also shows that long-held assumptions, such as 
+the size of a convolution window, may need to be revisited, given the increase in 
+computation and data. We will cover this and many more questions in due course throughout this chapter.
 
 ```toc
 :maxdepth: 2

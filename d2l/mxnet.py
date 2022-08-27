@@ -566,8 +566,7 @@ class ResNeXtBlock(nn.Block):
         self.conv1 = nn.Conv2D(bot_channels, kernel_size=1, padding=0,
                                strides=1)
         self.conv2 = nn.Conv2D(bot_channels, kernel_size=3, padding=1,
-                               strides=strides,
-                               groups=bot_channels//groups)
+                               strides=strides, groups=bot_channels//groups)
         self.conv3 = nn.Conv2D(num_channels, kernel_size=1, padding=0,
                                strides=1)
         self.bn1 = nn.BatchNorm()
@@ -778,7 +777,7 @@ class LSTMScratch(d2l.Module):
         self.W_xi, self.W_hi, self.b_i = triple()  # Input gate
         self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
         self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
-        self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell
+        self.W_xc, self.W_hc, self.b_c = triple()  # Input node
 
 class GRU(d2l.RNN):
     """Defined in :numref:`sec_deep_rnn`"""
@@ -1436,7 +1435,7 @@ def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
 
 def train_batch_ch13(net, features, labels, loss, trainer, devices,
                      split_f=d2l.split_batch):
-    """Train for a minibatch with mutiple GPUs (defined in Chapter 13).
+    """Train for a minibatch with multiple GPUs (defined in Chapter 13).
 
     Defined in :numref:`sec_image_augmentation`"""
     X_shards, y_shards = split_f(features, labels, devices)
@@ -1456,7 +1455,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, devices,
 
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                devices=d2l.try_all_gpus(), split_f=d2l.split_batch):
-    """Train a model with mutiple GPUs (defined in Chapter 13).
+    """Train a model with multiple GPUs (defined in Chapter 13).
 
     Defined in :numref:`sec_image_augmentation`"""
     timer, num_batches = d2l.Timer(), len(train_iter)
@@ -3275,7 +3274,10 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
         if pred == tgt_vocab['<eos>']:
             break
         output_seq.append(pred)
-    return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq# Alias defined in config.ini
+    return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq
+
+
+# Alias defined in config.ini
 size = lambda a: a.size
 transpose = lambda a: a.T
 nn_Module = nn.Block

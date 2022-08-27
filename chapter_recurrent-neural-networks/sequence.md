@@ -78,7 +78,7 @@ given sequentially structured input
 At other times, we wish to predict a sequentially structured target
 ($y_1, \ldots, y_T$)
 given a fixed input (e.g., image captioning).
-Still other times, out goal is to predict sequentially structured targets
+Still other times, our goal is to predict sequentially structured targets
 based on sequentially structured inputs
 (e.g., machine translation or video captioning).
 Such sequence-to-sequence tasks take two forms:

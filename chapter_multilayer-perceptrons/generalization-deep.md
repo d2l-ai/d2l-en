@@ -224,13 +224,13 @@ underscores the usefulness of nonparametric modeling
 for understanding the behavior of over-parameterized deep networks.
 
 
-## Early Learning and Early Stopping
+## Early Stopping
 
 While deep neural networks are capable of fitting arbitrary labels,
 even when labels are assigned incorrectly or randomly
-(:cite:`zhang2021understanding`),
+:cite:`zhang2021understanding`,
 this ability only emerges over many iterations of training.
-A new line of work (:cite:`Rolnick.Veit.Belongie.Shavit.2017`)
+A new line of work :cite:`Rolnick.Veit.Belongie.Shavit.2017`
 has revealed that in the setting of label noise,
 neural networks tend to fit cleanly labeled data first
 and only subsequently to interpolate the mislabeled data.
@@ -238,7 +238,7 @@ Moreover, it's been established that this phenomenon
 translates directly into a guarantee on generalization:
 whenever a model has fitted the cleanly labeled data
 but not randomly labeled examples included in the training set,
-it has in fact generalized (:cite:`Garg.Balakrishnan.Kolter.Lipton.2021`).
+it has in fact generalized :cite:`Garg.Balakrishnan.Kolter.Lipton.2021`.
 
 Together these findings help to motivate *early stopping*,
 a classic technique for regularizing deep neural networks.
@@ -293,7 +293,7 @@ However, researchers have noted
 that typical strengths of $\ell_2$ regularization
 are insufficient to prevent the networks
 from interpolating the data
-(:cite:`zhang2021understanding`)
+:cite:`zhang2021understanding`
 and thus the benefits if interpreted
 as regularization might only make sense
 in combination with the early stopping criteria.
