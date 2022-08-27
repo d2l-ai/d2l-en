@@ -106,7 +106,7 @@ We will describe how this works in more detail later.
 
 :begin_tab:`pytorch`
 In PyTorch, the fully connected layer is defined in `Linear` and `LazyLinear` (available since version 1.8.0) classes. 
-The later
+The latter
 allows users to *only* specify
 the output dimension,
 while the former
@@ -182,7 +182,7 @@ It is faster (and easier to use) than implementing our own.
 
 :begin_tab:`tensorflow`
 The `MeanSquaredError` class computes the mean squared error (without the $1/2$ factor in :eqref:`eq_mse`).
-By default it returns the average loss over examples.
+By default, it returns the average loss over examples.
 :end_tab:
 
 ```{.python .input  n=3}
