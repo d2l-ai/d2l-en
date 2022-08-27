@@ -344,7 +344,7 @@ Linear regression happens to be a learning problem
 with a global minimum
 (whenever $\mathbf{X}$ is full rank, or equivalently,
 whenever $\mathbf{X}^\top \mathbf{X}$ is invertible).
-However, the lost surfaces for deep networks contain many saddle points and minima.
+However, the loss surfaces for deep networks contain many saddle points and minima.
 Fortunately, we typically don't care about finding
 an exact set of parameters but merely any set of parameters
 that leads to accurate predictions (and thus low loss).
@@ -463,7 +463,7 @@ f'{time.time() - t:.5f} sec'
 The second method is dramatically faster than the first.
 Vectorizing code often yields order-of-magnitude speedups.
 Moreover, we push more of the mathematics to the library
-and need not write as many calculations ourselves,
+without the need to write as many calculations ourselves,
 reducing the potential for errors and increasing portability of the code.
 
 

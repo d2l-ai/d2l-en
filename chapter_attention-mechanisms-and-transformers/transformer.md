@@ -13,7 +13,7 @@ Notably,
 self-attention
 enjoys both parallel computation and
 the shortest maximum path length.
-Therefore natually,
+Therefore naturally,
 it is appealing to design deep architectures
 by using self-attention.
 Unlike earlier self-attention models
@@ -239,9 +239,11 @@ In :numref:`sec_batch_norm`,
 we explained how batch normalization
 recenters and rescales across the examples within
 a minibatch.
-Layer normalization is the same as batch normalization
+As discussed in :numref:`subsec_layer-normalization-in-bn`,
+layer normalization is the same as batch normalization
 except that the former
-normalizes across the feature dimension.
+normalizes across the feature dimension,
+thus enjoying benefits of scale independence and batch size independence.
 Despite its pervasive applications
 in computer vision,
 batch normalization

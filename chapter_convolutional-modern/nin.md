@@ -17,12 +17,14 @@ This design poses two major challenges.
 First, the fully connected layers at the end
 of the architecture consume tremendous numbers of parameters. For instance, even a simple
 model such as VGG-11 requires a monstrous $25088 \times 4096$ matrix, occupying almost
-400MB of RAM. This is a significant impediment to speedy computation, in particular on
-mobile and embedded devices. Second, it is equally impossible to add fully connected layers
+400MB of RAM in single precision (FP32). This is a significant impediment to computation, in particular on
+mobile and embedded devices. After all, even high-end mobile phones sport no more than 8GB of RAM. At the time VGG was invented, this was an order of magnitude less (the iPhone 4S had 512MB). As such, it would have been difficult to justify spending the majority of memory on an image classifier. 
+
+Second, it is equally impossible to add fully connected layers
 earlier in the network to increase the degree of nonlinearity: doing so would destroy the
 spatial structure and require potentially even more memory.
 
-The *network in network* (*NiN*) blocks of :citet:`Lin.Chen.Yan.2013` offer an alternative,
+The *network in network* (*NiN*) blocks :cite:`Lin.Chen.Yan.2013` offer an alternative,
 capable of solving both problems in one simple strategy.
 They were proposed based on a very simple insight: (i) use $1 \times 1$ convolutions to add
 local nonlinearities across the channel activations and (ii) use global average pooling to integrate
@@ -46,7 +48,7 @@ a fully connected layer acting independently on each pixel location.
 differences between VGG and NiN, and their blocks.
 Note both the difference in the NiN blocks (the initial convolution is followed by $1 \times 1$ convolutions, whereas VGG retains $3 \times 3$ convolutions) and in the end where we no longer require a giant fully connected layer.
 
-![Comparing architectures of VGG and NiN, and their blocks.](../img/nin.svg)
+![Comparing the architectures of VGG and NiN, and of their blocks.](../img/nin.svg)
 :width:`600px`
 :label:`fig_nin`
 
@@ -74,8 +76,7 @@ from torch import nn
 
 def nin_block(out_channels, kernel_size, strides, padding):
     return nn.Sequential(
-        nn.LazyConv2d(out_channels, kernel_size, strides, padding),
-        nn.ReLU(),
+        nn.LazyConv2d(out_channels, kernel_size, strides, padding), nn.ReLU(),
         nn.LazyConv2d(out_channels, kernel_size=1), nn.ReLU(),
         nn.LazyConv2d(out_channels, kernel_size=1), nn.ReLU())
 ```
@@ -178,8 +179,8 @@ for layer in model.net.layers:
 
 ## [**Training**]
 
-As before we use Fashion-MNIST to train the model.
-NiN's training is similar to that for AlexNet and VGG.
+As before we use Fashion-MNIST to train the model using the same 
+optimizer that we used for AlexNet and VGG.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -202,11 +203,14 @@ with d2l.try_gpu():
 
 ## Summary
 
-NiN has dramatically fewer parameters than AlexNet and VGG. This stems from the fact that it needs no giant fully connected layers and fewer convolutions with wide kernels. Instead, it uses local $1 \times 1$ convolutions and global average pooling. These design choices influenced many subsequent CNN designs.
+NiN has dramatically fewer parameters than AlexNet and VGG. This stems primarily from the fact that it needs no giant fully connected layers. Instead, it uses global average pooling to aggregate across all image locations after the last stage of the network body. This obviates the need for expensive (learned) reduction operations and replaces them by a simple average. What was surprising at the time is the fact that this averaging operation did not harm accuracy. Note that averaging across a low-resolution representation (with many channels) also adds to the amount of translation invariance that the network can handle. 
+
+Choosing fewer convolutions with wide kernels and replacing them by $1 \times 1$ convolutions aids the quest for fewer parameters further. It affords for a significant amount of nonlinearity across channels within any given location. Both $1 \times 1$ convolutions and global average pooling significantly influenced subsequent CNN designs. 
 
 ## Exercises
 
-1. Why are there two $1\times 1$ convolutional layers per NiN block? What happens if you add one? What happens if you reduce this to one?
+1. Why are there two $1\times 1$ convolutional layers per NiN block? Increase their number to three. Reduce their number to one. What changes?
+1. What changes if you replace the $1 \times 1$ convolutions by $3 \times 3$ convolutions? 
 1. What happens if you replace the global average pooling by a fully connected layer (speed, accuracy, number of parameters)?
 1. Calculate the resource usage for NiN.
     1. What is the number of parameters?
