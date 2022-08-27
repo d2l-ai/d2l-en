@@ -135,8 +135,8 @@ theta = np.array(0.5)
 theta.attach_grad()
 
 # Perform gradient descent
-lr = 0.00000000001
-for iter in range(10000):
+lr = 1e-6
+for iter in range(100):
     with autograd.record():
         loss = -(n_H * np.log(theta) + n_T * np.log(1 - theta))
     loss.backward()
@@ -156,8 +156,8 @@ n_T = 256245
 theta = torch.tensor(0.5, requires_grad=True)
 
 # Perform gradient descent
-lr = 0.00000000001
-for iter in range(10000):
+lr = 1e-6
+for iter in range(100):
     loss = -(n_H * torch.log(theta) + n_T * torch.log(1 - theta))
     loss.backward()
     with torch.no_grad():
@@ -178,8 +178,8 @@ n_T = 256245
 theta = tf.Variable(tf.constant(0.5))
 
 # Perform gradient descent
-lr = 0.00000000001
-for iter in range(10000):
+lr = 1e-6
+for iter in range(100):
     with tf.GradientTape() as t:
         loss = -(n_H * tf.math.log(theta) + n_T * tf.math.log(1 - theta))
     theta.assign_sub(lr * t.gradient(loss, theta))
