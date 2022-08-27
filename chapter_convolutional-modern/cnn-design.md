@@ -1,4 +1,4 @@
-```{.python .input}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -6,71 +6,38 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Designing Convolution Network Architectures
 :label:`sec_cnn-design`
 
-The 2010s has witnessed shift
-from *feature engineering* to *network engineering*
-in computer vision.
+The past sections took us on a tour of modern network design for computer vision. Common to all the work we covered was that it heavily relied on the intuition of scientists. Many of the architectures are heavily informed by human creativity and to a much lesser extent by systematic exploration of the design space that deep nets offer. Nonetheless, this *network engineering* approach has been tremendously successful. 
+
 Since AlexNet (:numref:`sec_alexnet`)
 beat conventional computer vision models on ImageNet,
-constructing very deep networks
-by stacking the same blocks,
-especially $3 \times 3$ convolutions,
-has been popularized by VGG networks (:numref:`sec_vgg`).
-The network in network (:numref:`sec_nin`)
-adds local nonlinearities via $1 \times 1$ convolutions
-and uses global average pooling
-to aggregate information
-across all locations.
-GoogLeNet (:numref:`sec_googlenet`)
-is a multi-branch network that
-combines the advantages from the
-VGG network
-and the network in network,
-where its Inception block
-adopts the strategy of
-concatenated parallel transformations.
-ResNets (:numref:`sec_resnet`)
-stack residual blocks,
-which are two-branch subnetworks
-using identity mapping in one branch.
-DenseNets (:numref:`sec_densenet`)
-generalize the residual architectures.
-Other notable architectures
-include
-MobileNets that use network learning to achieve high accuracy in
-resource-constrained settings :cite:`Howard.Sandler.Chu.ea.2019`,
-the Squeeze-and-Excitation Networks (SENets) that
-allow for efficient information transfer between channels
-:cite:`Hu.Shen.Sun.2018`,
-and EfficientNets :cite:`tan2019efficientnet`
-that scale up networks via neural architecture search.
+it became popular to construct very deep networks
+by stacking blocks of convolutions, all designed by the same pattern. 
+In particular, $3 \times 3$ convolutions were 
+popularized by VGG networks (:numref:`sec_vgg`).
+NiN (:numref:`sec_nin`) showed that even $1 \times 1$ convolutions could 
+be beneficial by adding local nonlinearities. 
+Moreover, NiN solved the problem of aggregating information at the head of a network 
+by aggregation across all locations. 
+GoogLeNet (:numref:`sec_googlenet`) added multiple branches of different convolution width, 
+combining the advantages of VGG and NiN in its Inception block. 
+ResNets (:numref:`sec_resnet`) changed the inductive bias towards the identity mapping (from $f(x) = 0$). This allowed for very deep networks. Almost a decade later, the ResNet design is still popular, a testament to its design. Lastly, ResNeXt (:numref:`sec_resnext`) added grouped convolutions, offering a better trade-off between parameters and computation. A precursor to Transformers for vision, the Squeeze-and-Excitation Networks (SENets) allow for efficient information transfer between locations. 
+:cite:`Hu.Shen.Sun.2018`. They accomplish this by computing a per-channel global attention function. 
 
-Specifically, *neural architecture search* (NAS) :cite:`zoph2016neural,liu2018darts`
-is the process of automating neural network architectures.
-Given a fixed search space,
-NAS uses a search strategy
-to automatically select
-an architecture within the search space
-based on the returned performance estimation.
+So far we omitted networks obtained via *neural architecture search* (NAS) :cite:`zoph2016neural,liu2018darts`. We chose to do so since their cost is usually enormous, relying on brute force search, genetic algorithms, reinforcement learning, or some other form of hyperparameter optimization. Given a fixed search space,
+NAS uses a search strategy to automatically select
+an architecture based on the returned performance estimation.
 The outcome of NAS
-is a single network instance.
+is a single network instance. EfficientNets are a notable outcome of this search :cite:`tan2019efficientnet`.
 
-Instead of focusing on designing such individual instances,
-an alternative approach
-is to *design network design spaces*
-that characterize populations of networks :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`.
-This method
-combines the strength of manual design and NAS.
-Through semi-automatic procedures (like in NAS),
-designing network design spaces
-explores the structure aspect of network design
-from the initial *AnyNet* design space.
-It then proceeds to discover design principles (like in manual design)
-that lead to simple and regular networks: *RegNets*.
-Before shedding light on these design principles,
-let's start with
-the initial design space.
+In the following we discuss an idea that is quite different to the quest for the *single best network*. It is computationally relatively inexpensive, it leads to scientific insights on the way, and it is quite effective in terms of the quality of outcomes. Let's review the strategy by :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` to *design network design spaces*. The strategy combines the strength of manual design and NAS. It accomplishes this by operating on *distributions of networks* and optimizing the distributions in a way to obtain good performance for entire families of networks. The outcome of it are *RegNets*, specifically RegNetX and RegNetY, plus a range of guiding principles for the design of performant Convnets. 
 
 ## The AnyNet Design Space
+
+The description below closely follows the reasoning in :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` with some abbreviations to make it fit in the scope of the book. We recommend the interested reader to peruse the original publication for further detail. We need a template for the family of networks to explore. One of the commonalities of the designs in this chapter is that the networks consist of a *stem*, a *body* and a *head*. The stem performs initial image processing, often through convolutions with a larger window size. The body consists of multiple blocks, carrying out the bulk of the transformations needed to go from raw images to object representations. Lastly, the *head* converts this into the desired outputs, such as via a logistic regressor for multiclass classification. 
+The body, in turn, consists of multiple stages, operating on the image at decreasing resolutions. In fact, both the stem and each subsequent stage quarter the spatial resolution. Lastly, each stage consists of one or more blocks. This pattern is common to all networks, from VGG to ResNeXt. Indeed, for the design of generic AnyNet networks, :citet:`Radosavovic.Kosaraju.Girshick.ea.2020` use the ResNeXt block of :numref:`fig_resnext_block`. 
+
+![The AnyNet design space. Besides the number of groups and bottleneck ratio within each block, design choices include depth $d_i$ and the number of output channels $w_i$ for any stage $i$.](../img/anynet-full.svg)
+:label:`fig_anynet_full`
 
 The initial design space is called *AnyNet*,
 a relatively unconstrained design space,
@@ -141,7 +108,7 @@ possible networks in the AnyNet design space.
 To implement AnyNet,
 we first define its network stem.
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx, init
@@ -156,7 +123,7 @@ class AnyNet(d2l.Classifier):
         return net
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -170,7 +137,7 @@ class AnyNet(d2l.Classifier):
             nn.LazyBatchNorm2d(), nn.ReLU())
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 %%tab tensorflow
 import tensorflow as tf
 from d2l import tensorflow as d2l
@@ -188,7 +155,7 @@ Each stage consists of `depth` ResNeXt blocks,
 where `num_channels` specifies the block width.
 Note that the first block halves the height and width of input images.
 
-```{.python .input}
+```{.python .input  n=5}
 %%tab mxnet
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, num_channels, groups, bot_mul):
@@ -203,7 +170,7 @@ def stage(self, depth, num_channels, groups, bot_mul):
     return net
 ```
 
-```{.python .input}
+```{.python .input  n=6}
 %%tab pytorch
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, num_channels, groups, bot_mul):
@@ -217,7 +184,7 @@ def stage(self, depth, num_channels, groups, bot_mul):
     return nn.Sequential(*blk)
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 %%tab tensorflow
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, num_channels, groups, bot_mul):
@@ -234,7 +201,7 @@ def stage(self, depth, num_channels, groups, bot_mul):
 Putting the network stem, body, and head together,
 we complete the implementation of AnyNet.
 
-```{.python .input}
+```{.python .input  n=8}
 %%tab all
 @d2l.add_to_class(AnyNet)
 def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
@@ -356,7 +323,7 @@ characterized by
 * $w_1 = 32, w_2=80;$
 * $d_1 = 4, d_2=6.$
 
-```{.python .input}
+```{.python .input  n=9}
 %%tab all
 class RegNet32(AnyNet):
     def __init__(self, lr=0.1, num_classes=10):
@@ -370,12 +337,12 @@ class RegNet32(AnyNet):
 
 We can see that each RegNet stage progressively reduces resolution and increases output channels.
 
-```{.python .input}
+```{.python .input  n=10}
 %%tab mxnet, pytorch
 RegNet32().layer_summary((1, 1, 96, 96))
 ```
 
-```{.python .input}
+```{.python .input  n=11}
 %%tab tensorflow
 RegNet32().layer_summary((1, 96, 96, 1))
 ```
@@ -384,7 +351,7 @@ RegNet32().layer_summary((1, 96, 96, 1))
 
 Training the 32-layer RegNet on the Fashion-MNIST dataset is just like before.
 
-```{.python .input}
+```{.python .input  n=12}
 %%tab mxnet, pytorch
 model = RegNet32(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
@@ -392,7 +359,7 @@ data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 trainer.fit(model, data)
 ```
 
-```{.python .input}
+```{.python .input  n=13}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
