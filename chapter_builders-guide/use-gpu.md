@@ -198,7 +198,7 @@ Now we [**define two convenient functions that allow us
 to run code even if the requested GPUs do not exist.**]
 
 ```{.python .input}
-%%tab pytorch, mxnet, tensorflow
+%%tab all
 def try_gpu(i=0):  #@save
     """Return gpu(i) if exists, otherwise return cpu()."""
     if num_gpus() >= i + 1:
@@ -301,7 +301,7 @@ X
 ```{.python .input}
 %%tab jax
 # By default jax puts arrays to GPUs or TPUs if available
-X = jax.device_put(jnp.ones((2, 3), try_gpu())
+X = jax.device_put(jnp.ones((2, 3)), try_gpu())
 X
 ```
 
@@ -373,7 +373,7 @@ print(Z)
 ```
 
 ```{.python .input}
-%%tab tensorflow
+%%tab jax
 Z = jax.device_put(X, try_gpu(1))
 print(X)
 print(Z)

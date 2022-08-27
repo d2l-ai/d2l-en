@@ -451,10 +451,10 @@ later.
 model = LinearRegressionScratch(2, lr=0.03)
 data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 trainer = d2l.Trainer(max_epochs=3)
-if tab.selected(jax):
+if tab.selected('jax'):
     key = jax.random.PRNGKey(6)
     trainer.fit(model, data, key)
-else:
+if tab.selected('pytorch', 'mxnet', 'tensorflow'):
     trainer.fit(model, data)
 ```
 

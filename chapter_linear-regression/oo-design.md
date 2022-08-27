@@ -74,6 +74,7 @@ import numpy as np
 from d2l import jax as d2l
 import jax
 import jax.numpy as jnp
+from flax import linen as nn
 from flax.training.train_state import TrainState
 ```
 
