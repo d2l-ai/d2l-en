@@ -84,6 +84,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
 
 # Alias defined in config.ini
 nn_Module = nn.Module
+to = jax.device_put
 
 ones_like = jnp.ones_like
 ones = jnp.ones
