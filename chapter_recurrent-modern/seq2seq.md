@@ -3,7 +3,7 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-#  Applying Encoder-Decoder Seq2Seq Models to Machine Translation
+#  Encoder-Decoder Seq2Seq for Machine Translation
 :label:`sec_seq2seq`
 
 In so-called seq2seq problems like machine translation
@@ -16,7 +16,7 @@ In this section,
 we will demonstrate the application 
 of an encoder-decoder architecture,
 where both the encoder and decoder 
-are implemented as RNNs 
+are implemented as RNNs,
 to the task of machine translation
 :cite:`Sutskever.Vinyals.Le.2014,Cho.Van-Merrienboer.Gulcehre.ea.2014`.
 
@@ -26,12 +26,12 @@ Later, in :numref:`chap_attention-and-transformers`,
 we will introduce attention mechanisms, 
 which allow us to access encoded inputs
 without having to compress the entire input
-into a single fixed-length represntation.
+into a single fixed-length representation.
 
 Then to generate the output sequence, 
 one token at a time,
 the decoder model, 
-consisting of separate RNN,
+consisting of a separate RNN,
 will predict each successive target token
 given both the input sequence
 and the preceding tokens in the output.
@@ -61,14 +61,17 @@ At the initial time step of the RNN decoder,
 there are two special design decisions to be aware of:
 First, we begin every input with a special 
 beginning-of-sequence "&lt;bos&gt;" token.
-Second, we use the final hidden state of the RNN
-to initiate the hidden state of the decoder.
-This follows the original seq2seq breakthroughs
-in :cite:`Sutskever.Vinyals.Le.2014`,
-In some other designs, such as :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014`,
+Second, we may feed
 the final hidden state of the encoder
-is fed into the decoder not only at the first decoding step
-but at every single decoding time step (see :numref:`fig_seq2seq`).
+into the decoder
+at every single decoding time step :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014`.
+In some other designs,
+such as :citet:`Sutskever.Vinyals.Le.2014`,
+the final hidden state of the RNN encoder
+is used
+to initiate the hidden state of the decoder
+only at the first decoding step.
+
 
 
 ## Teacher Forcing
@@ -263,9 +266,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
         return output, state
 ```
 
-The returned variables of recurrent layers
-have been explained in :numref:`sec_rnn-concise`.
-Let's still use a concrete example
+Let's use a concrete example
 to [**illustrate the above encoder implementation.**]
 Below, we instantiate a two-layer GRU encoder
 whose number of hidden units is 16.
@@ -273,7 +274,7 @@ Given a minibatch of sequence inputs `X`
 (batch size: 4, number of time steps: 9),
 the hidden states of the last layer
 at all the time steps
-(`outputs` return by the encoder's recurrent layers)
+(`outputs` returned by the encoder's recurrent layers)
 are a tensor of shape
 (number of time steps, batch size, number of hidden units).
 
@@ -309,7 +310,7 @@ if tab.selected('tensorflow'):
 Given a target output sequence $y_1, y_2, \ldots, y_{T'}$
 for each time step $t'$
 (we use $t^\prime$ to differentiate from the input sequence time steps),
-the the decoder assigns a predicted probability
+the decoder assigns a predicted probability
 to each possible token occurring at step $y_{t'+1}$
 conditioned upon the previous tokens in the target
 $y_1, \ldots, y_{t'}$ 
@@ -317,7 +318,7 @@ and the context variable
 $\mathbf{c}$, i.e., $P(y_{t'+1} \mid y_1, \ldots, y_{t'}, \mathbf{c})$.
 
 To predict the subsequent token $t^\prime+1$ in the target sequence,
-the decoder RNN takes the previous steps' target token $y_{t^\prime}$ 
+the RNN decoder takes the previous step's target token $y_{t^\prime}$,
 the hidden RNN state from the previous time step $\mathbf{s}_{t^\prime-1}$,
 and the context variable $\mathbf{c}$ as its input,
 and transforms them into the hidden state 
@@ -331,7 +332,7 @@ $$\mathbf{s}_{t^\prime} = g(y_{t^\prime-1}, \mathbf{c}, \mathbf{s}_{t^\prime-1})
 After obtaining the hidden state of the decoder,
 we can use an output layer and the softmax operation 
 to compute the predictive distribution
-$p(y_{t^{\prime+1}} \mid y_1, \ldots, y_{t^\prime}, \mathbf{c})$ 
+$p(y_{t^{\prime}+1} \mid y_1, \ldots, y_{t^\prime}, \mathbf{c})$ 
 over the subsequent output token ${t^\prime+1}$.
 
 Following :numref:`fig_seq2seq`,
@@ -475,7 +476,7 @@ are illustrated in :numref:`fig_seq2seq_details`.
 ## Encoder-Decoder for Sequence to Sequence Learning
 
 
-Putting it all together in coder yields the following:
+Putting it all together in code yields the following:
 
 ```{.python .input}
 %%tab all
@@ -566,6 +567,9 @@ To predict the output sequence
 at each step, 
 the predicted token from the previous
 time step is fed into the decoder as an input.
+One simple strategy is to sample whichever token
+the decoder has assigned the highest probability
+when predicting at each step.
 As in training, at the initial time step
 the beginning-of-sequence ("&lt;bos&gt;") token
 is fed into the decoder.
@@ -573,10 +577,6 @@ This prediction process
 is illustrated in :numref:`fig_seq2seq_predict`.
 When the end-of-sequence ("&lt;eos&gt;") token is predicted,
 the prediction of the output sequence is complete.
-However, we must now decide which token 
-to feed in to the model at the subsequent time step.
-One simple strategy is to sample whichever token
-the decoder has assigned the highest probability.
 
 
 ![Predicting the output sequence token by token using an RNN encoder-decoder.](../img/seq2seq-predict.svg)
@@ -616,13 +616,9 @@ def predict_step(self, batch, device, num_steps,
 
 We can evaluate a predicted sequence
 by comparing it with the
-label sequence (the ground-truth).
-But what precisely is the appropriate metric 
+target sequence (the ground-truth).
+But what precisely is the appropriate measure 
 for comparing similarity between two sequences?
-And how does it complicated matters 
-that for many seq2seq tasks, 
-the "ground truth" is just one 
-among many valid target sequences.
 
 
 BLEU (Bilingual Evaluation Understudy),
@@ -632,18 +628,18 @@ has been extensively used in measuring
 the quality of output sequences for different applications.
 In principle, for any $n$-grams in the predicted sequence,
 BLEU evaluates whether this $n$-grams appears
-in the label sequence.
+in the target sequence.
 
 Denote by $p_n$ the precision of $n$-grams,
 which is the ratio 
 of the number of matched $n$-grams in
-the predicted and label sequences
+the predicted and target sequences
 to the number of $n$-grams in the predicted sequence.
-To explain, given a label sequence $A$, $B$, $C$, $D$, $E$, $F$,
+To explain, given a target sequence $A$, $B$, $C$, $D$, $E$, $F$,
 and a predicted sequence $A$, $B$, $B$, $C$, $D$,
 we have $p_1 = 4/5$,  $p_2 = 3/4$, $p_3 = 1/3$, and $p_4 = 0$.
 Besides, let $\mathrm{len}_{\text{label}}$ and $\mathrm{len}_{\text{pred}}$
-be the numbers of tokens in the label sequence 
+be the numbers of tokens in the target sequence 
 and the predicted sequence, respectively.
 Then, BLEU is defined as
 
@@ -653,7 +649,7 @@ $$ \exp\left(\min\left(0, 1 - \frac{\mathrm{len}_{\text{label}}}{\mathrm{len}_{\
 where $k$ is the longest $n$-grams for matching.
 
 Based on the definition of BLEU in :eqref:`eq_bleu`,
-whenever the predicted sequence is the same as the label sequence, BLEU is 1.
+whenever the predicted sequence is the same as the target sequence, BLEU is 1.
 Moreover,
 since matching longer $n$-grams is more difficult,
 BLEU assigns a greater weight
@@ -667,7 +663,7 @@ tends to obtain a higher $p_n$ value,
 the coefficient before the multiplication term in :eqref:`eq_bleu`
 penalizes shorter predicted sequences.
 For example, when $k=2$,
-given the label sequence $A$, $B$, $C$, $D$, $E$, $F$ and the predicted sequence $A$, $B$,
+given the target sequence $A$, $B$, $C$, $D$, $E$, $F$ and the predicted sequence $A$, $B$,
 although $p_1 = p_2 = 1$, the penalty factor $\exp(1-6/2) \approx 0.14$ lowers the BLEU.
 
 We [**implement the BLEU measure**] as follows.
@@ -718,7 +714,8 @@ Following the design of the encoder-decoder architecture, we can use two RNNs to
 In encoder-decoder training, the teacher forcing approach feeds original output sequences (in contrast to predictions) into the decoder.
 When implementing the encoder and the decoder, we can use multilayer RNNs.
 We can use masks to filter out irrelevant computations, such as when calculating the loss.
-BLEU is a popular measure for evaluating output sequences by matching $n$-grams between the predicted sequence and the label sequence.
+As for evaluating output sequences,
+BLEU is a popular measure by matching $n$-grams between the predicted sequence and the target sequence.
 
 
 ## Exercises

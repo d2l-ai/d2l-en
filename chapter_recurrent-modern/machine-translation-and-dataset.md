@@ -12,10 +12,10 @@ was a major advance in the applied field of
 statistical  *machine translation*.
 Here, the model is presented with a sentence in one language
 and must predict the corresponding sentence in another language. 
-Note that here the sentences may not be of different lengths,
+Note that here the sentences may be of different lengths,
 and that corresponding words in the two sentences 
 may not occur in the same order, 
-owing to differences in differences 
+owing to differences 
 in the two language's grammatical structure. 
 
 
@@ -25,7 +25,7 @@ Examples include mapping
 from dialog prompts to replies
 or from questions to answers.
 Broadly, such problems are called 
-sequence-to-sequence (seq2seq) problems 
+*sequence-to-sequence* (seq2seq) problems 
 and they are our focus for 
 both the remainder of this chapter
 and much of :numref:`chap_attention-and-transformers`.
@@ -196,7 +196,7 @@ This was specified by the `num_steps`
 (number of time steps or tokens) argument in :numref:`sec_language-model`.
 In machine translation, each example is
 a pair of source and target text sequences,
-where the two text sequence may have different lengths.
+where the two text sequences may have different lengths.
 
 For computational efficiency,
 we can still process a minibatch of text sequences
@@ -318,7 +318,7 @@ print('target:', data.tgt_vocab.to_tokens(d2l.astype(tgt[0], d2l.int32)))
 
 ## Summary
 
-In NLP, *machine translation* refers to the task of automatically mapping from a sequence representing a string of text in a *source* language to a string representing a plausible translation in a *target* language. Using word-level tokenization, the vocabulary size will be significantly larger than that using character-level tokenization, but the sequence lengths will be much shorter. To mitigate the large vocabulary size, we can treat infrequent tokens as some "unknown" token. We can truncate and pad text sequences so that all of them will have the same length to be loaded in minibatches. Modern implementations often bucket sequences with similar lengths to avoid wasting excessive computation on padding. 
+In natural language processing, *machine translation* refers to the task of automatically mapping from a sequence representing a string of text in a *source* language to a string representing a plausible translation in a *target* language. Using word-level tokenization, the vocabulary size will be significantly larger than that using character-level tokenization, but the sequence lengths will be much shorter. To mitigate the large vocabulary size, we can treat infrequent tokens as some "unknown" token. We can truncate and pad text sequences so that all of them will have the same length to be loaded in minibatches. Modern implementations often bucket sequences with similar lengths to avoid wasting excessive computation on padding. 
 
 
 ## Exercises
