@@ -8,12 +8,13 @@ JOB_NAME=$2
 
 STABLE_BASE_PATH="https://d2l.ai"
 PREVIEW_BASE_PATH="http://preview.d2l.ai/$JOB_NAME"
+PREVIEW_BASE_PATH_RELEASE="${PREVIEW_BASE_PATH/release/master}"
 
 # Generate Headers
 if [[ "$BRANCH_NAME" == "release" ]]; then
     echo "Use release headers"
     alternate_text="Preview Version"
-    alternate_base=$PREVIEW_BASE_PATH
+    alternate_base=$PREVIEW_BASE_PATH_RELEASE
     current_base=$STABLE_BASE_PATH
 else
     echo "Use ${JOB_NAME} headers"
