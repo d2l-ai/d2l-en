@@ -116,6 +116,7 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):#@save
         # define the rung levels
         self.rung_levels = [r_min * eta ** k for k in range(self.K + 1)]
         if r_max not in self.rung_levels:
+            # The final rung level should be r_max
             self.rung_levels.append(r_max)
             self.K += 1
         # bookkeeping
