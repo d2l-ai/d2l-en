@@ -5,22 +5,21 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 # Asynchronous Successive Halving
 
-As we have seen in Section :ref:`sec_rs_async`, we can accelerate the HPO process
-by distributing the evaluation of hyperparameter configurations across either
+:label:`sec_sh_async`
+
+As we have seen in Section :ref:`sec_rs_async`, we can accelerate HPO by distributing the evaluation of hyperparameter configurations across either
 multiple instances or multiples CPUs / GPUs on a single instance. However, compared
 to random search, it is not straightforward to run SH asynchronously in a
 distributed setting. Before we can decide which configuration to run next, we first
-have to collect all observations on the current rung level. This leads to
-synchronization points at each rung level. For example, for the lowest rung level
+have to collect all observations on the current rung level. This requires to synchronize at each rung level. For example, for the lowest rung level
 $r_{min}$, we first have to evaluate all $N = \eta^K$ configurations, before we
 can promote the $\frac{1}{\eta}$ of them to the next rung level.
 
 If every trial consumed the same amount of wall-clock time, synchronization would
 not be a problem, since all results come in at the same time. However, in practice,
 we often have a high variations in training time across hyperparameter configurations.
-For example, assuming the number of filter per layer as a hyperparameter, networks
-with smaller filter sizes require less time to train for a fix amount of epochs than
-networks with larger filter sizes. Especially in the case of stragglers, this might
+For example, assuming the number of filter per layer is a hyperparameter, than networks
+with smaller filter sizes require train faster in terms of runing than networks with larger filter sizes given the same amount of epochs. Especially in the case of stragglers, this might
 lead to large idling times of workers.
 
 Asynchronous successive halving (ASHA) :cite:`li-arxiv18` adapts SH to the asynchronous
@@ -29,7 +28,7 @@ level as soon as we collected at least $\eta$ observations on the current rung l
 This rule may lead to suboptimal promotions: configurations can be promoted to the
 next rung level, which in hindsight do not compare favourably against most others
 at the same rung level. On the other hand, we get rid of all synchronization points
-this way. If a worker is free, but no configuration can be promoted, we start a new
+this way. In practice, these suboptimal promotions have only a modest impact on performance, because the ranking of hyperparameter configurations is often consistent across rung levels. If a worker is free, but no configuration can be promoted, we start a new
 configuration with $r = r_{min}$.
 
 As for asynchronous random search, we will use **Syne Tune** once more.

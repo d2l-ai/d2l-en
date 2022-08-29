@@ -15,8 +15,9 @@ GPUs on the same machine, or across multiple machines. Random search exhibits a 
 speed-up, in that a certain performance is reached $K$ times faster if $K$ trials can
 be run in parallel. Also, there is no need to synchronize trials. Instead we can
 immediately sample a new configuration once an evaluation finished, without waiting
-on pending configurations. This is called asynchronous scheduling.
+on pending configurations. This is called asynchronous scheduling. 
 
+In this notebook, we will look at asynchronous random search that, compared to the previous notebook, evaluates multiple hyperparameter configurations in parallel on single instance instead of evaluating them sequentially.  
 Instead of implementing the complex machinery of distributed job execution, we will use
 **Syne Tune** which provides us with a simple interface for asynchronous HPO.
 
@@ -28,7 +29,7 @@ You can install it via:
 
 ## Objective Function
 
-First, we have to modify our objective function slightly and return the performance back
+First, we have to define a new objective function such that it now returns the performance back
 to Syne Tune via the `report(...)` function.
 
 ```{.python .input  n=34}
@@ -80,7 +81,7 @@ config_space = {
 
 Next, we need to specify the back-end for job executions. The simplest choice in Syne
 Tune is the local back-end, which runs on the given instance and executes parallel jobs
-as sub-processes. For larger workloads, Syne Tune also provides a SageMaker back-end,
+as sub-processes. For larger workloads, Syne Tune supports a SageMaker back-end,
 which can execute trials on separate instances, but this feature will not be used here.
 
 ```{.python .input  n=40}
