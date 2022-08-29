@@ -7,7 +7,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 :label:`sec_mf_hpo`
 
 
-Training neural network models can be expensive even for moderate size datasets.
+Training neural networks can be expensive even for moderate size datasets.
 For example, training a ResNet-50 on a rather small dataset set, such as CIFAR10
 might take 2 hours on a Amazon Elastic Cloud Compute (EC2) g4dn.xlarge instance.
 Random search will often be too slow to be of real use in practice for modest to
@@ -77,7 +77,7 @@ round with a new set of initial configurations, until the total budget is spent.
 
 To implement SH, we use the `HPOScheduler` base class from the previous Section.
 Since SH can be combined with Bayesian optimization (see Section :ref:`sec_mf_bo`),
-we allow for a generic searcher object to sample configurations. Additionally, the
+we allow for a generic `HPOSearcher` object to sample configurations. Additionally, the
 user has to input the minimum resource $r_{min}$, the maximum resource $r_{max}$
 and $\eta$.
 
@@ -267,6 +267,8 @@ $N = \lceil \frac{s_{max} + 1}{s+1} * \eta^s \rceil$. Note that the last bracket
 $s=0$ evaluates all configurations on $r_{min} = r_{max}$, which means that we
 effectively run random search. In practice we execute brackets in an round robin
 fashion, which means we start with $s=s_{max}$ again once we finished the loop.
+Given enough resources, we could also run all brackets in parallel because configurations are sampled at random.
+We will discuss this case in more detail in Section :ref:`sec_sh_async`.
 
 We implement a new scheduler, that maintains a `SuccessiveHalvingScheduler` object.
 
