@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import d2l
 
 requirements = [
-    'ipython>=7.23',
+    'matplotlib-inline',
     'jupyter',
     'numpy',
     'matplotlib',
