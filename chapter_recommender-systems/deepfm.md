@@ -42,7 +42,7 @@ import os
 npx.set_np()
 ```
 
-## Implemenation of DeepFM
+## Implementation of DeepFM
 The implementation of DeepFM is similar to that of FM. We keep the FM part unchanged and use an MLP block with `relu` as the activation function. Dropout is also used to regularize the model. The number of neurons of the MLP can be adjusted with the `mlp_dims` hyperparameter.
 
 ```{.python .input  n=2}

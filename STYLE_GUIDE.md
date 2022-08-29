@@ -78,7 +78,7 @@
 
 ## Code
 
-* Each line must have <=78 characters (limited by page width)
+* Each line must have <=78 characters (limited by page width). For [the cambridge style](https://github.com/d2l-ai/d2l-en/pull/2187), each line must have <=79 characters.
 * Python
     * PEP8
         * e.g., (https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or-after-a-binary-operator)
@@ -127,6 +127,14 @@
 
 * Refer to [d2lbook](https://book.d2l.ai/user/markdown.html#cross-references) on how to add references for figure, table and equations.
 
+
+## URL
+
+When setting `style = cambridge`, URLs will be converted into QR code, which requires replacing special characters with [URL encoding](https://www.urlencoder.io/learn/). For example:
+
+`Stanford's [large movie review dataset](https://ai.stanford.edu/~amaas/data/sentiment/)`
+->
+`Stanford's [large movie review dataset](https://ai.stanford.edu/%7Eamaas/data/sentiment/)`
 
 
 ## Citations

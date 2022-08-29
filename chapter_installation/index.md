@@ -17,17 +17,18 @@ if your machine already has conda installed.
 Visit the Miniconda website and determine
 the appropriate version for your system
 based on your Python 3.x version and machine architecture.
-Suppose that your Python version is 3.8
+Suppose that your Python version is 3.9
 (our tested version).
 If you are using macOS,
 you would download the bash script
 whose name contains the strings "MacOSX",
 navigate to the download location,
-and execute the installation as follows:
+and execute the installation as follows
+(taking Intel Macs as an example):
 
 ```bash
 # The file name is subject to changes
-sh Miniconda3-py38_4.10.3-MacOSX-x86_64.sh -b
+sh Miniconda3-py39_4.12.0-MacOSX-x86_64.sh -b
 ```
 
 
@@ -38,7 +39,7 @@ and execute the following at the download location:
 
 ```bash
 # The file name is subject to changes
-sh Miniconda3-py38_4.10.3-Linux-x86_64.sh -b
+sh Miniconda3-py39_4.12.0-Linux-x86_64.sh -b
 ```
 
 
@@ -54,7 +55,7 @@ You should be able to create
 a new environment as follows:
 
 ```bash
-conda create --name d2l python=3.8 -y
+conda create --name d2l python=3.9 -y
 ```
 
 
@@ -89,20 +90,20 @@ To install a GPU-enabled version of MXNet,
 we need to find out what version of CUDA you have installed.
 You can check this by running `nvcc --version`
 or `cat /usr/local/cuda/version.txt`.
-Assume that you have installed CUDA 10.1,
+Assume that you have installed CUDA 10.2,
 then execute the following command:
 
 ```bash
 # For macOS and Linux users
-pip install mxnet-cu101==1.7.0
+pip install mxnet-cu102==1.7.0
 
 # For Windows users
-pip install mxnet-cu101==1.7.0 -f https://dist.mxnet.io/python
+pip install mxnet-cu102==1.7.0 -f https://dist.mxnet.io/python
 ```
 
 
-You may change the last digits according to your CUDA version, e.g., `cu100` for
-CUDA 10.0 and `cu90` for CUDA 9.0.
+You may change the last digits according to your CUDA version, e.g., `cu101` for
+CUDA 10.1 and `cu90` for CUDA 9.0.
 
 
 If your machine has no NVIDIA GPUs
@@ -147,7 +148,7 @@ frequently used functions and classes
 found throughout this book:
 
 ```bash
-pip install d2l==1.0.0a0
+pip install d2l==1.0.0a1
 ```
 
 

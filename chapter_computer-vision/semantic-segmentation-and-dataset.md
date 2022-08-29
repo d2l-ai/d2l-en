@@ -410,7 +410,7 @@ for X, Y in train_iter:
     break
 ```
 
-### [**Putting All Things Together**]
+### [**Putting It All Together**]
 
 Finally, we define the following `load_data_voc` function
 to download and read the Pascal VOC2012 semantic segmentation dataset.

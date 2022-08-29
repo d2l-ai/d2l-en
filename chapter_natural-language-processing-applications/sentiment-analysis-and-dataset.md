@@ -32,7 +32,7 @@ as a text classification task,
 which transforms a varying-length text sequence
 into a fixed-length text category.
 In this chapter,
-we will use Stanford's [large movie review dataset](https://ai.stanford.edu/~amaas/data/sentiment/)
+we will use Stanford's [large movie review dataset](https://ai.stanford.edu/%7Eamaas/data/sentiment/)
 for sentiment analysis. 
 It consists of a training set and a testing set, 
 either containing 25000 movie reviews downloaded from IMDb.
@@ -162,7 +162,7 @@ for X, y in train_iter:
 print('# batches:', len(train_iter))
 ```
 
-## Putting All Things Together
+## Putting It All Together
 
 Last, we wrap up the above steps into the `load_data_imdb` function.
 It returns training and test data iterators and the vocabulary of the IMDb review dataset.

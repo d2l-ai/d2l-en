@@ -89,7 +89,7 @@ than to the underlying distribution is called *overfitting*,
 and techniques for combatting overfitting
 are often called *regularization* methods.
 While there is no substitute for a proper introduction
-to statistical learning theory (see :cite:`Vapnik98,boucheron2005theory`),
+to statistical learning theory (see :citet:`Vapnik98,boucheron2005theory`),
 we will give you just enough intuition to get going.
 We will revisit generalization in many chapters
 throughout the book,
@@ -253,7 +253,7 @@ low training error alone is not enough
 to certify low generalization error.
 Deep neural networks turn out to be just such models:
 while they generalize well in practice,
-they too powerful to allow us to conclude
+they are too powerful to allow us to conclude
 much on the basis of training error alone.
 In these cases we must rely more heavily
 on our holdout data to certify generalization
@@ -322,8 +322,8 @@ Fixing the training dataset,
 higher-order polynomial functions should always
 achieve lower (at worst, equal) training error
 relative to lower degree polynomials.
-In fact, whenever the data examples
-each have a distinct value of $x$,
+In fact, whenever each data example
+has a distinct value of $x$,
 a polynomial function with degree
 equal to the number of data examples
 can fit the training set perfectly.
@@ -381,7 +381,7 @@ Then we would be in serious trouble.
 If we overfit our training data,
 there is always the evaluation on test data to keep us honest.
 But if we overfit the test data, how would we ever know?
-See :cite:`ong2005learning` for an example how
+See :citet:`ong2005learning` for an example how
 this can lead to absurd results even for models where the complexity
 can be tightly controlled.
 

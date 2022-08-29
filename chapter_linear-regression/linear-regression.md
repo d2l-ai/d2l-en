@@ -40,7 +40,7 @@ linear regression flows from a few simple assumptions.
 First, we assume that the relationship
 between features $\mathbf{x}$ and target $y$
 is approximately linear,
-i.e., that the conditional mean $E[Y|X=\mathbf{x}]$
+i.e., that the conditional mean $E[Y \mid X=\mathbf{x}]$
 can be expressed as a weighted sum
 of the features $\mathbf{x}$.
 This setup allows that the target value
@@ -344,7 +344,7 @@ Linear regression happens to be a learning problem
 with a global minimum
 (whenever $\mathbf{X}$ is full rank, or equivalently,
 whenever $\mathbf{X}^\top \mathbf{X}$ is invertible).
-However, the lost surfaces for deep networks contain many saddle points and minima.
+However, the loss surfaces for deep networks contain many saddle points and minima.
 Fortunately, we typically don't care about finding
 an exact set of parameters but merely any set of parameters
 that leads to accurate predictions (and thus low loss).
@@ -463,7 +463,7 @@ f'{time.time() - t:.5f} sec'
 The second method is dramatically faster than the first.
 Vectorizing code often yields order-of-magnitude speedups.
 Moreover, we push more of the mathematics to the library
-and need not write as many calculations ourselves,
+without the need to write as many calculations ourselves,
 reducing the potential for errors and increasing portability of the code.
 
 
@@ -472,7 +472,7 @@ reducing the potential for errors and increasing portability of the code.
 
 So far we've given a fairly functional motivation
 of the squared loss objective:
-the optimal parameters return the conditional expectation $E[Y|X]$
+the optimal parameters return the conditional expectation $E[Y\mid X]$
 whenever the underlying pattern is truly linear,
 and the loss assigns outsize penalties for outliers.
 We can also provide a more formal motivation
@@ -545,14 +545,14 @@ $$y = \mathbf{w}^\top \mathbf{x} + b + \epsilon \text{ where } \epsilon \sim \ma
 Thus, we can now write out the *likelihood*
 of seeing a particular $y$ for a given $\mathbf{x}$ via
 
-$$P(y | \mathbf{x}) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (y - \mathbf{w}^\top \mathbf{x} - b)^2\right).$$
+$$P(y \mid \mathbf{x}) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (y - \mathbf{w}^\top \mathbf{x} - b)^2\right).$$
 
 As such, the likelihood factorizes.
 According to *the principle of maximum likelihood*,
 the best values of parameters $\mathbf{w}$ and $b$ are those
 that maximize the *likelihood* of the entire dataset:
 
-$$P(\mathbf y|\mathbf X) = \prod_{i=1}^{n} p(y^{(i)}|\mathbf{x}^{(i)}).$$
+$$P(\mathbf y \mid \mathbf X) = \prod_{i=1}^{n} p(y^{(i)} \mid \mathbf{x}^{(i)}).$$
 
 The equality follows since all pairs $(\mathbf{x}^{(i)}, y^{(i)})$
 were drawn independently of each other.
@@ -568,7 +568,7 @@ So, without changing anything,
 we can *minimize* the *negative log-likelihood*,
 which we can express as follows:
 
-$$-\log P(\mathbf y | \mathbf X) = \sum_{i=1}^n \frac{1}{2} \log(2 \pi \sigma^2) + \frac{1}{2 \sigma^2} \left(y^{(i)} - \mathbf{w}^\top \mathbf{x}^{(i)} - b\right)^2.$$
+$$-\log P(\mathbf y \mid \mathbf X) = \sum_{i=1}^n \frac{1}{2} \log(2 \pi \sigma^2) + \frac{1}{2 \sigma^2} \left(y^{(i)} - \mathbf{w}^\top \mathbf{x}^{(i)} - b\right)^2.$$
 
 If we assume that $\sigma$ is fixed,
 we can ignore the first term,
@@ -717,7 +717,7 @@ and ultimately, evaluation on previously unseen data.
     1. For more information review the celebrated Black-Scholes model for option pricing :cite:`Black.Scholes.1973`.
 1. Suppose we want to use regression to estimate the *number* of apples sold in a grocery store.
     1. What are the problems with a Gaussian additive noise model? Hint: you are selling apples, not oil.
-    1. The [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution) captures distributions over counts. It is given by $p(k|\lambda) = \lambda^k e^{-\lambda}/k!$. Here $\lambda$ is the rate function and $k$ is the number of events you see. Prove that $\lambda$ is the expected value of counts $k$.
+    1. The [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution) captures distributions over counts. It is given by $p(k \mid \lambda) = \lambda^k e^{-\lambda}/k!$. Here $\lambda$ is the rate function and $k$ is the number of events you see. Prove that $\lambda$ is the expected value of counts $k$.
     1. Design a loss function associated with the Poisson distribution.
     1. Design a loss function for estimating $\log \lambda$ instead.
 

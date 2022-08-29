@@ -10,7 +10,7 @@ In :numref:`chap_classification`, we introduced
 softmax regression (:numref:`sec_softmax`),
 implementing the algorithm from scratch
 (:numref:`sec_softmax_scratch`) and using high-level APIs
-(:numref:`sec_softmax_concise`). This allowed us to 
+(:numref:`sec_softmax_concise`). This allowed us to
 train classifiers capable of recognizing
 10 categories of clothing from low-resolution images.
 Along the way, we learned how to wrangle data,
@@ -27,7 +27,7 @@ with which this book is primarily concerned.
 ## Hidden Layers
 
 We described affine transformations in
-:numref:`subsec_linear_model` as 
+:numref:`subsec_linear_model` as
 linear transformations with added bias.
 To begin, recall the model architecture
 corresponding to our softmax regression example,
@@ -52,7 +52,7 @@ or always cause a decrease in our model's output
 Sometimes that makes sense.
 For example, if we were trying to predict
 whether an individual will repay a loan,
-we might reasonably assume that all other things being equal, 
+we might reasonably assume that all other things being equal,
 an applicant with a higher income
 would always be more likely to repay
 than one with a lower income.
@@ -62,21 +62,21 @@ repayment. An increase in income from \\$0 to \\$50,000
 likely corresponds to a bigger increase
 in likelihood of repayment
 than an increase from \\$1 million to \\$1.05 million.
-One way to handle this might be to post-process our outcome 
+One way to handle this might be to post-process our outcome
 such that linearity becomes more plausible,
-by using the logistic map (and thus the logarithm of the probability of outcome). 
+by using the logistic map (and thus the logarithm of the probability of outcome).
 
 Note that we can easily come up with examples
 that violate monotonicity.
-Say for example that we want to predict health as a function 
-of body temperature. 
+Say for example that we want to predict health as a function
+of body temperature.
 For individuals with a body temperature
 above 37°C (98.6°F),
 higher temperatures indicate greater risk.
 However, for individuals with body temperatures
 below 37°C, lower temperatures indicate greater risk!
 Again, we might resolve the problem
-with some clever preprocessing, such as using the distance from 37°C 
+with some clever preprocessing, such as using the distance from 37°C
 as a feature.
 
 
@@ -108,17 +108,17 @@ With deep neural networks, we used observational data
 to jointly learn both a representation via hidden layers
 and a linear predictor that acts upon that representation.
 
-This problem of nonlinearity has been studied for at least a 
+This problem of nonlinearity has been studied for at least a
 century :cite:`Fisher.1928`. For instance, decision trees
-in their most basic form use a sequence of binary decisions to 
-decide upon class membership :cite:`quinlan2014c4`. Likewise, kernel 
-methods have been used for many decades to model nonlinear dependencies 
-:cite:`Aronszajn.1950`. This has found its way, e.g., into 
+in their most basic form use a sequence of binary decisions to
+decide upon class membership :cite:`quinlan2014c4`. Likewise, kernel
+methods have been used for many decades to model nonlinear dependencies
+:cite:`Aronszajn.1950`. This has found its way, e.g., into
 nonparametric spline models :cite:`Wahba.1990` and kernel methods
-:cite:`Scholkopf.Smola.2002`. It is also something that the brain solves 
-quite naturally. After all, neurons feed into other neurons which, 
-in turn, feed into other neurons again :cite:`Cajal.Azoulay.1894`. 
-Consequently we have a sequence of relatively simple transformations. 
+:cite:`Scholkopf.Smola.2002`. It is also something that the brain solves
+quite naturally. After all, neurons feed into other neurons which,
+in turn, feed into other neurons again :cite:`Cajal.Azoulay.1894`.
+Consequently we have a sequence of relatively simple transformations.
 
 ### Incorporating Hidden Layers
 
@@ -149,7 +149,7 @@ Note that both layers are fully connected.
 Every input influences every neuron in the hidden layer,
 and each of these in turn influences
 every neuron in the output layer. Alas, we are not quite
-done yet. 
+done yet.
 
 ### From Linear to Nonlinear
 
@@ -203,7 +203,7 @@ nonlinear *activation function* $\sigma$
 to be applied to each hidden unit
 following the affine transformation. For instance, a popular
 choice is the ReLU (Rectified Linear Unit) activation function :cite:`Nair.Hinton.2010`
-$\sigma(x) = \mathrm{max}(0, x)$ operating on its arguments element-wise. 
+$\sigma(x) = \mathrm{max}(0, x)$ operating on its arguments element-wise.
 The outputs of activation functions $\sigma(\cdot)$
 are called *activations*.
 In general, with activation functions in place,
@@ -222,7 +222,7 @@ $\sigma$ to apply to its inputs in a row-wise fashion,
 i.e., one example at a time.
 Note that we used the same notation for softmax
 when we denoted a row-wise operation in :numref:`subsec_softmax_vectorization`.
-Quite frequently the activation functions we use apply not merely row-wise but 
+Quite frequently the activation functions we use apply not merely row-wise but
 element-wise. That means that after computing the linear portion of the layer,
 we can calculate each activation
 without looking at the values taken by the other hidden units.
@@ -235,11 +235,11 @@ one atop another, yielding ever more expressive models.
 
 ### Universal Approximators
 
-We know that the brain is capable of very sophisticated statistical analysis. As such, 
+We know that the brain is capable of very sophisticated statistical analysis. As such,
 it is worth asking, just *how powerful* a deep network could be. This question
-has been answered multiple times, e.g., in :cite:`Cybenko.1989` in the context 
-of MLPs, and in :cite:`micchelli1984interpolation` in the context of reproducing kernel 
-Hilbert spaces in a way that could be seen as radial basis function (RBF) networks with a single hidden layer. 
+has been answered multiple times, e.g., in :citet:`Cybenko.1989` in the context
+of MLPs, and in :citet:`micchelli1984interpolation` in the context of reproducing kernel
+Hilbert spaces in a way that could be seen as radial basis function (RBF) networks with a single hidden layer.
 These (and related results) suggest that even with a single-hidden-layer network,
 given enough nodes (possibly absurdly many),
 and the right set of weights,
@@ -256,9 +256,9 @@ Moreover, just because a single-hidden-layer network
 *can* learn any function
 does not mean that you should try
 to solve all of your problems
-with single-hidden-layer networks. In fact, in this case kernel methods 
-are way more effective, since they are capable of solving the problem 
-*exactly* even in infinite dimensional spaces :cite:`Kimeldorf.Wahba.1971,Scholkopf.Herbrich.Smola.2001`. 
+with single-hidden-layer networks. In fact, in this case kernel methods
+are way more effective, since they are capable of solving the problem
+*exactly* even in infinite dimensional spaces :cite:`Kimeldorf.Wahba.1971,Scholkopf.Herbrich.Smola.2001`.
 In fact, we can approximate many functions
 much more compactly by using deeper (vs. wider) networks :cite:`Simonyan.Zisserman.2014`.
 We will touch upon more rigorous arguments in subsequent chapters.
@@ -346,12 +346,12 @@ when the input takes value precisely equal to 0.
 In these cases, we default to the left-hand-side
 derivative and say that the derivative is 0 when the input is 0.
 We can get away with this because
-the input may never actually be zero (mathematicians would 
+the input may never actually be zero (mathematicians would
 say that it's nondifferentiable on a set of measure zero).
 There is an old adage that if subtle boundary conditions matter,
 we are probably doing (*real*) mathematics, not engineering.
-That conventional wisdom may apply here, or at least, the fact that 
-we are not performing constrained optimization :cite:`Mangasarian.1965,Rockafellar.1970`. 
+That conventional wisdom may apply here, or at least, the fact that
+we are not performing constrained optimization :cite:`Mangasarian.1965,Rockafellar.1970`.
 We plot the derivative of the ReLU function plotted below.
 
 ```{.python .input}
@@ -423,10 +423,10 @@ when we want to interpret the outputs as probabilities
 for binary classification problems: you can think of the sigmoid as a special case of the softmax.
 However, the sigmoid has mostly been replaced
 by the simpler and more easily trainable ReLU
-for most use in hidden layers. Much of this has to do 
+for most use in hidden layers. Much of this has to do
 with the fact that the sigmoid poses challenges for optimization
-:cite:`LeCun.Bottou.Orr.ea.1998` since its gradient vanishes for large positive *and* negative arguments. 
-This can lead to plateaus that are difficult to escape from. 
+:cite:`LeCun.Bottou.Orr.ea.1998` since its gradient vanishes for large positive *and* negative arguments.
+This can lead to plateaus that are difficult to escape from.
 Nonetheless sigmoids are important. In later chapters (e.g., :numref:`sec_lstm`) on recurrent neural networks,
 we will describe architectures that leverage sigmoid units
 to control the flow of information across time.
@@ -490,6 +490,7 @@ d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of sigmoid',
 ```
 
 ### Tanh Function
+:label:`subsec_tanh`
 
 Like the sigmoid function, [**the tanh (hyperbolic tangent)
 function also squashes its inputs**],
@@ -565,31 +566,31 @@ open-source deep learning frameworks
 to build models rapidly, using only a few lines of code.
 Previously, training these networks
 required researchers to code up layers and derivatives
-explicitly in C, Fortran, or even Lisp (in the case of LeNet). 
+explicitly in C, Fortran, or even Lisp (in the case of LeNet).
 
 A secondary benefit is that ReLU is significantly more amenable to
-optimization than the sigmoid or the tanh function. One could argue 
+optimization than the sigmoid or the tanh function. One could argue
 that this was one of the key innovations that helped the resurgence
-of deep learning over the past decade. Note, though, that research in 
-activation functions has not stopped. For instance, the Swish activation 
+of deep learning over the past decade. Note, though, that research in
+activation functions has not stopped. For instance, the Swish activation
 function $\sigma(x) = x \operatorname{sigmoid}(\beta x)$ as proposed in
-:cite:`Ramachandran.Zoph.Le.2017` can yield better accuracy 
+:cite:`Ramachandran.Zoph.Le.2017` can yield better accuracy
 in many cases.
 
 ## Exercises
 
-1. Show that adding layers to a *linear* deep network, i.e., a network without 
-   nonlinearity $\sigma$ can never increase the expressive power of the network. 
-   Give an example where it actively reduces it. 
+1. Show that adding layers to a *linear* deep network, i.e., a network without
+   nonlinearity $\sigma$ can never increase the expressive power of the network.
+   Give an example where it actively reduces it.
 1. Compute the derivative of the pReLU activation function.
-1. Compute the derivative of the Swish activation function $x \operatorname{sigmoid}(\beta x)$. 
-1. Show that an MLP using only ReLU (or pReLU) constructs a 
+1. Compute the derivative of the Swish activation function $x \operatorname{sigmoid}(\beta x)$.
+1. Show that an MLP using only ReLU (or pReLU) constructs a
    continuous piecewise linear function.
-1. Sigmoid and tanh are very similar. 
+1. Sigmoid and tanh are very similar.
     1. Show that $\operatorname{tanh}(x) + 1 = 2 \operatorname{sigmoid}(2x)$.
     1. Prove that the function classes parametrized by both nonlinearities are identical. Hint: affine layers have bias terms, too.
 1. Assume that we have a nonlinearity that applies to one minibatch at a time, such as the batch normalization :cite:`Ioffe.Szegedy.2015`. What kinds of problems do you expect this to cause?
-1. Provide an example where the gradients vanish for the sigmoid activation function. 
+1. Provide an example where the gradients vanish for the sigmoid activation function.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/90)

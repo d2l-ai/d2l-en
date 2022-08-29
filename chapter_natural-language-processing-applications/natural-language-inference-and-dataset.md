@@ -204,7 +204,7 @@ class SNLIDataset(torch.utils.data.Dataset):
         return len(self.premises)
 ```
 
-### [**Putting All Things Together**]
+### [**Putting It All Together**]
 
 Now we can invoke the `read_snli` function and the `SNLIDataset` class to download the SNLI dataset and return `DataLoader` instances for both training and testing sets, together with the vocabulary of the training set.
 It is noteworthy that we must use the vocabulary constructed from the training set

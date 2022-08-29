@@ -16,7 +16,7 @@ the same language model more efficiently
 using the high-level API provided 
 by your deep learning framework.
 We begin, as before, by loading 
-the *The Time Machine* dataset.
+*The Time Machine* dataset.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -61,7 +61,7 @@ whose shape is
 (number of hidden layers, batch size, number of hidden units).
 For some models to be introduced later
 (e.g., long short-term memory),
-this list will also contains other information.
+this list will also contain other information.
 :end_tab:
 
 ```{.python .input}
@@ -177,9 +177,10 @@ model.predict('it has', 20, data.vocab)
 
 ## Summary
 
-* High-level APIs in deep learning frameworks provide implementations of standard RNNs.
-* These libraries help you to avoid wasting time reimplementing standard models.
-* Framework implementations are often highly optimized, 
+High-level APIs in deep learning frameworks provide implementations of standard RNNs.
+These libraries help you to avoid wasting time reimplementing standard models.
+Moreover,
+framework implementations are often highly optimized, 
   leading to significant (computational) performance gains 
   as compared to implementations from scratch.
 

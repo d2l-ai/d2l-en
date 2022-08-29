@@ -406,7 +406,7 @@ class FashionMNIST(d2l.DataModule):
         X, y = batch
         if not labels:
             labels = self.text_labels(y)
-        d2l.show_images(X, nrows, ncols, titles=labels)
+        d2l.show_images(tf.squeeze(X), nrows, ncols, titles=labels)
 
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images.
@@ -521,7 +521,7 @@ class ResNeXtBlock(tf.keras.Model):
         self.bn3 = tf.keras.layers.BatchNormalization()
         if use_1x1conv:
             self.conv4 = tf.keras.layers.Conv2D(num_channels, 1,
-                                       strides=strides)
+                                                strides=strides)
             self.bn4 = tf.keras.layers.BatchNormalization()
         else:
             self.conv4 = None
@@ -726,7 +726,7 @@ class LSTMScratch(d2l.Module):
         self.W_xi, self.W_hi, self.b_i = triple()  # Input gate
         self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
         self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
-        self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell
+        self.W_xc, self.W_hc, self.b_c = triple()  # Input node
 
 class GRU(d2l.RNN):
     """Defined in :numref:`sec_deep_rnn`"""
@@ -1908,7 +1908,10 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
         if pred == tgt_vocab['<eos>']:
             break
         output_seq.append(pred.numpy())
-    return ' '.join(tgt_vocab.to_tokens(tf.reshape(output_seq, shape = -1).numpy().tolist())), attention_weight_seq# Alias defined in config.ini
+    return ' '.join(tgt_vocab.to_tokens(tf.reshape(output_seq, shape = -1).numpy().tolist())), attention_weight_seq
+
+
+# Alias defined in config.ini
 size = lambda a: tf.size(a).numpy()
 
 reshape = tf.reshape

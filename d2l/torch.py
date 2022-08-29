@@ -288,7 +288,7 @@ class Trainer(d2l.HyperParameters):
             self.optim.zero_grad()
             with torch.no_grad():
                 loss.backward()
-                if self.gradient_clip_val > 0:
+                if self.gradient_clip_val > 0:  # To be discussed later
                     self.clip_gradients(self.gradient_clip_val, self.model)
                 self.optim.step()
             self.train_batch_idx += 1
@@ -554,13 +554,11 @@ class ResNeXtBlock(nn.Module):
                  strides=1):
         super().__init__()
         bot_channels = int(round(num_channels * bot_mul))
-        self.conv1 = nn.LazyConv2d(bot_channels, kernel_size=1,
-                               stride=1)
+        self.conv1 = nn.LazyConv2d(bot_channels, kernel_size=1, stride=1)
         self.conv2 = nn.LazyConv2d(bot_channels, kernel_size=3,
-                               stride=strides, padding=1,
-                               groups=bot_channels//groups)
-        self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1,
-                               stride=1)
+                                   stride=strides, padding=1,
+                                   groups=bot_channels//groups)
+        self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1, stride=1)
         self.bn1 = nn.LazyBatchNorm2d()
         self.bn2 = nn.LazyBatchNorm2d()
         self.bn3 = nn.LazyBatchNorm2d()
@@ -765,7 +763,7 @@ class LSTMScratch(d2l.Module):
         self.W_xi, self.W_hi, self.b_i = triple()  # Input gate
         self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
         self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
-        self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell
+        self.W_xc, self.W_hc, self.b_c = triple()  # Input node
 
 class GRU(d2l.RNN):
     """Defined in :numref:`sec_deep_rnn`"""
@@ -1425,7 +1423,7 @@ def resnet18(num_classes, in_channels=1):
     return net
 
 def train_batch_ch13(net, X, y, loss, trainer, devices):
-    """Train for a minibatch with mutiple GPUs (defined in Chapter 13).
+    """Train for a minibatch with multiple GPUs (defined in Chapter 13).
 
     Defined in :numref:`sec_image_augmentation`"""
     if isinstance(X, list):
@@ -1446,7 +1444,7 @@ def train_batch_ch13(net, X, y, loss, trainer, devices):
 
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                devices=d2l.try_all_gpus()):
-    """Train a model with mutiple GPUs (defined in Chapter 13).
+    """Train a model with multiple GPUs (defined in Chapter 13).
 
     Defined in :numref:`sec_image_augmentation`"""
     timer, num_batches = d2l.Timer(), len(train_iter)
@@ -1530,7 +1528,7 @@ def multibox_prior(data, sizes, ratios):
     # Generate all center points for the anchor boxes
     center_h = (torch.arange(in_height, device=device) + offset_h) * steps_h
     center_w = (torch.arange(in_width, device=device) + offset_w) * steps_w
-    shift_y, shift_x = torch.meshgrid(center_h, center_w)
+    shift_y, shift_x = torch.meshgrid(center_h, center_w, indexing='ij')
     shift_y, shift_x = shift_y.reshape(-1), shift_x.reshape(-1)
 
     # Generate `boxes_per_pixel` number of heights and widths that are later
@@ -3072,7 +3070,10 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
         if pred == tgt_vocab['<eos>']:
             break
         output_seq.append(pred)
-    return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq# Alias defined in config.ini
+    return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq
+
+
+# Alias defined in config.ini
 nn_Module = nn.Module
 
 ones_like = torch.ones_like
