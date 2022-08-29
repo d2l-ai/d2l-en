@@ -2,10 +2,10 @@ from setuptools import setup, find_packages
 import d2l
 
 requirements = [
-    'matplotlib-inline',
     'jupyter',
     'numpy',
     'matplotlib',
+    'matplotlib-inline',
     'requests',
     'pandas',
     'gym'
