@@ -97,13 +97,13 @@ The following code shows how to implement our random search optimizer from the p
 %%tab all
 
 class RandomSearcher(d2l.HPOSearcher): #@save
-    def __init__(self, search_space):
+    def __init__(self, config_space):
         self.save_hyperparameters()
 
     def sample_configuration(self):
         return {
             name: domain.rvs()
-            for name, domain in self.search_space.items()
+            for name, domain in self.config_space.items()
         }
 ```
 
@@ -245,12 +245,12 @@ def objective(batch_size, learning_rate, max_epochs=8): #@save
     return validation_error    
 ```
 
-We also define need to define the search space.
+We also define need to define the configuration space.
 
 ```{.python .input  n=15}
 from scipy import stats
 
-search_space = {
+config_space = {
    "learning_rate": stats.loguniform(1e-4, 1),
    "batch_size": stats.randint(8, 128),
 } 
@@ -259,7 +259,7 @@ search_space = {
 Now we can start our random search:
 
 ```{.python .input}
-searcher = d2l.RandomSearcher(search_space)
+searcher = d2l.RandomSearcher(config_space)
 scheduler = BasicScheduler(searcher=searcher)
 tuner = d2l.HPOTuner(scheduler=scheduler, objective=objective)
 

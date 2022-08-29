@@ -10,12 +10,15 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 For random search, each new configuration is chosen independently of all others, and
 in particular without exploiting observations from any prior evaluation. This means we can
-easily parallelize random search by running trials concurrently, either by using multiple GPUs on the same machine, or across
-multiple machines. Random search exhibits a linear speed-up, in that a certain
-performance is reached $K$ times faster if $K$ trials can be run in parallel. Also,
-there is no need to synchronize trials. Instead we can immediately sample a new configuration once an evaluation finished, without waiting on pending configurations. This is called asynchronous scheduling.
+easily parallelize random search by running trials concurrently, either by using multiple
+GPUs on the same machine, or across multiple machines. Random search exhibits a linear
+speed-up, in that a certain performance is reached $K$ times faster if $K$ trials can
+be run in parallel. Also, there is no need to synchronize trials. Instead we can
+immediately sample a new configuration once an evaluation finished, without waiting
+on pending configurations. This is called asynchronous scheduling.
 
-Instead of implementing the complex machinery of distributed job execution, we will use **Syne Tune** which provides us with a simple interface for asynchronous HPO.
+Instead of implementing the complex machinery of distributed job execution, we will use
+**Syne Tune** which provides us with a simple interface for asynchronous HPO.
 
 You can install it via:
 
@@ -25,7 +28,8 @@ You can install it via:
 
 ## Objective Function
 
-First, we have to modify our objective function slightly and return the performance back to Syne Tune via the `report(...)` function.
+First, we have to modify our objective function slightly and return the performance back
+to Syne Tune via the `report(...)` function.
 
 ```{.python .input  n=34}
 def objective(learning_rate, batch_size, max_epochs):
@@ -43,23 +47,24 @@ def objective(learning_rate, batch_size, max_epochs):
 
 ## Asynchronous Scheduler
 
-First, we define the number of workers that evaluate trials concurrently. We also need to specify how long we want to run Random Search, by defining a limited on the total wall-clock time.
+First, we define the number of workers that evaluate trials concurrently. We also need to specify
+how long we want to run Random Search, by defining an upper limit on the total wall-clock time.
 
 ```{.python .input  n=37}
 n_workers = 4 # We have to set this number equal to the number of GPUs that are in the machine to run this notebook
 max_wallclock_time = 900
 ```
 
-Next, we define specify the path to our training script, which metric we want to optimize and whether we want to minimize of maximize this metric. Namely, `metric` needs
-to correspond to the argument name passed to the `report` callback.
+Next, we state which metric we want to optimize and whether we want to minimize or
+maximize this metric. Namely, `metric` needs to correspond to the argument name
+passed to the `report` callback.
 
 ```{.python .input  n=38}
 mode = "min"
 metric = "validation_error"
 ```
 
-We also use the same
-the search space from our previous example. Note that in **Syne Tune**, the search space
+We use the configuration space from our previous example. In **Syne Tune**, this
 dictionary can also be used to pass constant attributes to the training script.
 We make use of this feature in order to pass `max_epochs`.
 
@@ -84,17 +89,17 @@ from syne_tune.backend.python_backend import PythonBackend
 backend = PythonBackend(tune_function=objective, config_space=config_space)
 ```
 
-Now we define how we want to schedule hyperparameter configurations. For random search,
-we will use the `FIFOScheduler`, which is similar in behaviour to our *BasicScheduler* from the previous Section.
+We can now create the scheduler for asynchronous random search, which is similar in
+behaviour to our `BasicScheduler` from the previous Section.
 
 ```{.python .input  n=41}
-from syne_tune.optimizer.schedulers.fifo import FIFOScheduler
+from syne_tune.optimizer.baselines import RandomSearch
 
-scheduler = FIFOScheduler(
+scheduler = RandomSearch(
     config_space,
-    searcher='random',
     metric=metric,
-    mode=mode)
+    mode=mode,
+)
 ```
 
 Syne Tune also features a `Tuner`, where the main experiment loop and book-keeping is
@@ -113,14 +118,13 @@ tuner = Tuner(
 )
 ```
 
-We can now
-run our distributed HPO experiment.
+Let us run our distributed HPO experiment.
 
 ```{.python .input  n=43}
 tuner.run()
 ```
 
-The logs of all evaluated hyperparameter configuratons are stored for further
+The logs of all evaluated hyperparameter configurations are stored for further
 analysis. At any time during the tuning job, we can easily get the results
 obtained so far and plot the incumbent trajectory.
 
@@ -131,9 +135,13 @@ tuning_experiment = load_experiment(tuner.name)
 tuning_experiment.plot()
 ```
 
-## Visualize the Optimization Process
+## Visualize the Asynchronous Optimization Process
 
-Below we visualize how the learning curves of every trial evolves during the optimization process. At any point in time there are as many trials running concurrently as we have workers. Once a trial finishes, we immediately start the next trial without waiting for the other trials to finish in order to synchronize workers, which would cause idling times for workers.
+Below we visualize how the learning curves of every trial evolves during the
+asynchronous optimization process. At any point in time there are as many trials
+running  concurrently as we have workers. Once a trial finishes, we immediately
+start the next trial, without waiting for the other trials to finish. Idle time
+of workers is reduced to a minimum with asynchronous scheduling.
 
 ```{.python .input  n=45}
 import matplotlib.pyplot as plt
@@ -141,7 +149,12 @@ results = tuning_experiment.results
 
 for trial_id in results.trial_id.unique():
     df = results[results['trial_id'] == trial_id]
-    plt.plot(df['st_tuner_time'], df['validation_error'], marker='o', label=f'trial {trial_id}')
+    plt.plot(
+        df['st_tuner_time'],
+        df['validation_error'],
+        marker='o',
+        label=f'trial {trial_id}'
+    )
     
 plt.xlabel('wall-clock time')
 plt.ylabel('objective function')

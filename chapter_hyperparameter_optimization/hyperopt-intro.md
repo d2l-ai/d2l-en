@@ -100,7 +100,7 @@ class SoftmaxClassification(d2l.Classification): #@save
 ]
 ```
 
-Before we can run HPO, we first need to define two ingredients: the objective function and the search space.
+Before we can run HPO, we first need to define two ingredients: the objective function and the configuration space.
 
 ### The Objective Function
 
@@ -167,18 +167,18 @@ def hpo_objective_softmax_classification(config, max_epochs=10):  #@save
     return validation_error.numpy()
 ```
 
-### The Search Space
+### The Configuration Space
 
-:label:`sec_intro_search_spaces`
+:label:`sec_intro_config_spaces`
 
 Along with the objective function $f(\mathbf{x})$, we also need to define the feasible set
-$\mathbf{x} \in \mathcal{X}$ to optimize over, known as *search space* or *configuration
+$\mathbf{x} \in \mathcal{X}$ to optimize over, known as *configuration space* or *search
 space*. For our logistic regression example, we will use:
 
 ```{.python .input  n=6}
 from scipy import stats
 
-search_space = {
+config_space = {
    "learning_rate": stats.loguniform(1e-4, 1)
 } 
 ```
@@ -186,22 +186,22 @@ search_space = {
 Each hyperparameter has a data type, such as `float` for `learning_rate`, as well as a closed bounded range
 (i.e., lower and upper bounds). We usually also assign a prior distribution (e.g uniform or log-uniform) to each hyperparameter. Some positive parameters, such as `learning_rate`, are best represented on a logarithmic scale as optimal values can differ by several orders of magnitude, while others come with linear scale.
 
-Below we show a simple example search spaces consisting of typical hyperparameters of feed-forward neural networks including their type and standard ranges.
+Below we show a simple example of a configuration space consisting of typical hyperparameters of feed-forward neural networks including their type and standard ranges.
 
-![Example search space for a simple neural network architecture](img/example_search_space.png)
+![Example configuration space for a simple neural network architecture](img/example_search_space.png)
 :width:`40px`
-:label:`example_search_spacee`
+:label:`example_search_space`
 
 
-In general, the structure of the search space $\mathcal{X}$ can be complex and it can be quite different from $\mathbb{R}^d$. In practice, some hyperparameters may depend on the value of others. For example, if we try to tune both the number of layers and widths per layer for a multi-layer perceptron,
+In general, the structure of the configuration space $\mathcal{X}$ can be complex and it can be quite different from $\mathbb{R}^d$. In practice, some hyperparameters may depend on the value of others. For example, if we try to tune both the number of layers and widths per layer for a multi-layer perceptron,
 the width of the $l$-th layer is relevant only if the network has at least $l+1$ layers. These advanced HPO problems are beyond the scope of this chapter. We refer the interested reader to :cite:`hutter-lion11a`,`jenatton-icml17a`, `baptista-icml18a`.
 
-The search spaces plays an important role for hyperparameter optimization, since no algorithms can find something that is not included in the search space. On the other hand, if the ranges are too large, the time to find a well performing configurations might become infeasible.
+The configuration spaces plays an important role for hyperparameter optimization, since no algorithms can find something that is not included in the configuration space. On the other hand, if the ranges are too large, the time to find a well performing configurations might become infeasible.
 
 ## Random Search
 
 Now, we look at the first algorithm to solve our hyperparameter optimization problem: random search. 
-The main idea of random search is to independently sample configurations from the search space until a predefined budget (e.g maximum number of iterations) is exhausted and to return the best observed configuration. The evaluation can be executed sequentially (as we do here) or in parallel (see Section :ref:`sec_rs`).
+The main idea of random search is to independently sample from the configuration space until a predefined budget (e.g maximum number of iterations) is exhausted and to return the best observed configuration. The evaluation can be executed sequentially (as we do here) or in parallel (see Section :ref:`sec_rs`).
 
 We sample the learning rate from log uniform distribution, since it usually changes on a logarithmic scale.
 
@@ -212,7 +212,7 @@ errors, values = [], []
 num_iterations = 10
 
 for iteration in range(num_iterations):
-    learning_rate = search_space['learning_rate'].rvs()
+    learning_rate = config_space['learning_rate'].rvs()
     y = hpo_objective_softmax_classification({'learning_rate': learning_rate})
     values.append(learning_rate)
     errors.append(y)
