@@ -5,17 +5,15 @@ set -e
 # Read arguments
 BRANCH_NAME=$1
 JOB_NAME=$2
-REPO_NAME=$3
 
 STABLE_BASE_PATH="https://d2l.ai"
 PREVIEW_BASE_PATH="http://preview.d2l.ai/$JOB_NAME"
-alternate_base="http://preview.d2l.ai/$REPO_NAME/master"
 
 # Generate Headers
 if [[ "$BRANCH_NAME" == "release" ]]; then
     echo "Use release headers"
     alternate_text="Preview Version"
-    alternate_base="${PREVIEW_BASE_PATH/release/master}"
+    alternate_base="${PREVIEW_BASE_PATH/release/master}"  # Substitute "release" with "master"
     current_base=$STABLE_BASE_PATH
 else
     echo "Use ${JOB_NAME} headers"
