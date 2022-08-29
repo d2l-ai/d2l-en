@@ -15,6 +15,7 @@ alternate_base="http://preview.d2l.ai/$REPO_NAME/master"
 if [[ "$BRANCH_NAME" == "release" ]]; then
     echo "Use release headers"
     alternate_text="Preview Version"
+    alternate_base="${PREVIEW_BASE_PATH/release/master}"
     current_base=$STABLE_BASE_PATH
 else
     echo "Use ${JOB_NAME} headers"
