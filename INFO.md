@@ -10,7 +10,7 @@ sh Miniconda3-py39_4.12.0-Linux-x86_64.sh -b  # For py3.8: sh Miniconda3-py38_4.
 conda create --name d2l python=3.9 -y  # For py3.8: conda create --name d2l python=3.8 -y
 conda activate d2l
 pip install torch torchvision
-pip install d2l==1.0.0a0
+pip install d2l==1.0.0a1
 pip install d2lbook
 git clone https://github.com/d2l-ai/d2l-en.git
 jupyter notebook --generate-config
