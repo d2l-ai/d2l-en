@@ -360,8 +360,6 @@ the weight decay hyperparameter directly
 through `weight_decay` when instantiating our optimizer.
 By default, PyTorch decays both
 weights and biases simultaneously.
-Here, we only set `weight_decay` for
-the weight, so the bias parameter $b$ will not decay.
 :end_tab:
 
 :begin_tab:`tensorflow`
