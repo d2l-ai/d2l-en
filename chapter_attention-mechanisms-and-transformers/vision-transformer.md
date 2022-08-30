@@ -145,7 +145,7 @@ class ViTBlock(nn.Module):
         self.mlp = ViTMLP(mlp_num_hiddens, num_hiddens, dropout)
 
     def forward(self, X, valid_lens=None):
-        sum1 = X + self.attention(*([self.ln1(X)]*3), valid_lens)
+        X = X + self.attention(*([self.ln1(X)] * 3), valid_lens)
         return sum1 + self.mlp(self.ln2(sum1))
 ```
 
