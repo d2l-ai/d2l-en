@@ -146,7 +146,7 @@ class ViTBlock(nn.Module):
 
     def forward(self, X, valid_lens=None):
         X = X + self.attention(*([self.ln1(X)] * 3), valid_lens)
-        return sum1 + self.mlp(self.ln2(sum1))
+        return X + self.mlp(self.ln2(X))
 ```
 
 Same as in :numref:`subsec_transformer-encoder`,
