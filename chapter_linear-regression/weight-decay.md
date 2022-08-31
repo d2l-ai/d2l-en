@@ -222,7 +222,7 @@ import tensorflow as tf
 %matplotlib inline
 from d2l import jax as d2l
 import jax
-import jax.numpy as jnp
+from jax import numpy as jnp
 import optax
 ```
 
@@ -254,7 +254,7 @@ class Data(d2l.DataModule):
             noise = d2l.normal((n, 1)) * 0.01
         if tab.selected('jax'):
             self.X = jax.random.normal(jax.random.PRNGKey(0), (n, num_inputs))
-            noise = jax.random.normal(jax.random.PRNGKey(0),(n, 1)) * 0.01
+            noise = jax.random.normal(jax.random.PRNGKey(0), (n, 1)) * 0.01
         w, b = d2l.ones((num_inputs, 1)) * 0.01, 0.05
         self.y = d2l.matmul(self.X, w) + b + noise
 
@@ -320,12 +320,10 @@ trainer = d2l.Trainer(max_epochs=10)
 def train_scratch(lambd):    
     model = WeightDecayScratch(num_inputs=200, lambd=lambd, lr=0.01)
     model.board.yscale='log'
+    trainer.fit(model, data)
     if tab.selected('pytorch', 'mxnet', 'tensorflow'):
-        trainer.fit(model, data)
         print('L2 norm of w:', float(l2_penalty(model.w)))
     if tab.selected('jax'):
-        key = jax.random.PRNGKey(24)
-        trainer.fit(model, data, key)
         print('L2 norm of w:',
               float(l2_penalty(trainer.state.params['params']['w'])))
 ```
@@ -448,7 +446,7 @@ class WeightDecay(d2l.LinearRegression):
     wd: int = 0
     
     def configure_optimizers(self):
-        # weight_decay is not available within `optax.sgd`, but
+        # Weight Decay is not available directly within `optax.sgd`, but
         # optax allows chaining several transformations together
         return optax.chain(optax.additive_weight_decay(self.wd),
                            optax.sgd(self.lr))
@@ -466,13 +464,11 @@ and this work becomes more routine.
 %%tab all
 model = WeightDecay(wd=3, lr=0.01)
 model.board.yscale='log'
+trainer.fit(model, data)
 
 if tab.selected('jax'):
-    key = jax.random.PRNGKey(2)
-    trainer.fit(model, data, key)
     print('L2 norm of w:', float(l2_penalty(model.get_w_b(trainer.state)[0])))
 if tab.selected('pytorch', 'mxnet', 'tensorflow'):
-    trainer.fit(model, data)
     print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0])))
 ```
 

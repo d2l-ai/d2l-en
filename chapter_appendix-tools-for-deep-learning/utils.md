@@ -409,22 +409,7 @@ def evaluate_accuracy(net, data_iter):  #@save
 ```
 
 ```{.python .input}
-%%tab pytorch, mxnet, tensorflow
-
-def linreg(X, w, b):  #@save
-    """The linear regression model."""
-    return d2l.matmul(X, w) + b
-
-def squared_loss(y_hat, y):  #@save
-    """Squared loss."""
-    return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
-
-def get_fashion_mnist_labels(labels):  #@save
-    """Return text labels for the Fashion-MNIST dataset."""
-    text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
-                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
-    return [text_labels[int(i)] for i in labels]
-
+%%tab all
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
@@ -441,6 +426,24 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
         if titles:
             ax.set_title(titles[i])
     return axes
+```
+
+```{.python .input}
+%%tab pytorch, mxnet, tensorflow
+
+def linreg(X, w, b):  #@save
+    """The linear regression model."""
+    return d2l.matmul(X, w) + b
+
+def squared_loss(y_hat, y):  #@save
+    """Squared loss."""
+    return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+
+def get_fashion_mnist_labels(labels):  #@save
+    """Return text labels for the Fashion-MNIST dataset."""
+    text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
+                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
+    return [text_labels[int(i)] for i in labels]
 
 #@tab pytorch, mxnet, tensorflow
 class Animator:  #@save

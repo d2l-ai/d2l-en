@@ -47,7 +47,7 @@ import random
 %matplotlib inline
 from d2l import jax as d2l
 import jax
-import jax.numpy as jnp
+from jax import numpy as jnp
 import numpy as np
 import random
 ```
@@ -189,12 +189,11 @@ Beyond that, we set `batch_size` in the built-in data loader
 and let it take care of shuffling examples  efficiently.
 
 :begin_tab:`jax`
-JAX is laser-focused on program transformations and
-accelerator-backed NumPy, so it doesn’t include data loading or munging
-in the JAX library. There are already a lot of great data loaders out
-there, and jax suggests using them instead of reinventing anything.
-Here we'll grab PyTorch’s data loader, and modify it slightly to make
-it work with NumPy arrays.
+JAX is all about NumPy like API with device acceleration and the functional
+transformations, so atleast the current version doesn’t include data loading
+methods. With other  libraries we already have great data loaders out there,
+and JAX suggests using them instead. Here we will grab PyTorch’s data loader,
+and modify it slightly to make it work with JAX.
 :end_tab:
 
 ```{.python .input}
@@ -218,7 +217,7 @@ def get_tensorloader(self, tensors, train, indices=slice(0, None)):
         def jax_collate(batch):
             if isinstance(batch[0], np.ndarray):
                 return jnp.stack(batch)
-            elif isinstance(batch[0], (tuple,list)):
+            elif isinstance(batch[0], (tuple, list)):
                 transposed = zip(*batch)
                 return [jax_collate(samples) for samples in transposed]
             else:

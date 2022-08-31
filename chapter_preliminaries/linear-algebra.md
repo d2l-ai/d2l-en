@@ -89,7 +89,7 @@ x + y, x * y, x / y, x**y
 
 ```{.python .input}
 %%tab jax
-import jax.numpy as jnp
+from jax import numpy as jnp
 
 x = jnp.array(3.0)
 y = jnp.array(2.0)

@@ -58,9 +58,9 @@ import tensorflow as tf
 %%tab jax
 %matplotlib inline
 from d2l import jax as d2l
-import jax
-import jax.numpy as jnp
 from flax import linen as nn
+import jax
+from jax import numpy as jnp
 import optax
 ```
 
@@ -101,7 +101,7 @@ class LinearRegressionScratch(d2l.Module):  #@save
 
 ```{.python .input}
 %%tab jax
-class LinearRegressionScratch(d2l.Module):  # @save
+class LinearRegressionScratch(d2l.Module):  #@save
     num_inputs: int
     lr: float
     sigma: float = 0.01
@@ -265,23 +265,24 @@ class SGD(d2l.HyperParameters):  #@save
     def __init__(self, lr):
         """
         Minibatch stochastic gradient descent.
-        The key transformation of Optax is the `GradientTransformation`
-        defined by two functions, the `init` and the `update`.
-        The `init` initializes the state and the `update` transforms
+        The key transformation of Optax is the GradientTransformation
+        defined by two methods, the init and the update.
+        The init initializes the state and the update transforms
         the gradients.
         https://github.com/deepmind/optax/blob/master/optax/_src/transform.py
         """
         self.save_hyperparameters()
 
     def init(self, params):
-        # params not used
+        # Delete unused params
         del params
         return optax.EmptyState
 
     def update(self, updates, state, params=None):
         del params
-        # apply_gradients through flax's train_state is called, which then
-        # calls optax.apply_updates adding the params to the update defined
+        # When state.apply_gradients method is called to update flax's
+        # train_state object, it internally calls optax.apply_updates method
+        # adding the params to the update equation defined below.
         updates = jax.tree_util.tree_map(lambda g: -self.lr * g, updates)
         return updates, state
 
@@ -451,11 +452,7 @@ later.
 model = LinearRegressionScratch(2, lr=0.03)
 data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 trainer = d2l.Trainer(max_epochs=3)
-if tab.selected('jax'):
-    key = jax.random.PRNGKey(6)
-    trainer.fit(model, data, key)
-if tab.selected('pytorch', 'mxnet', 'tensorflow'):
-    trainer.fit(model, data)
+trainer.fit(model, data)
 ```
 
 Because we synthesized the dataset ourselves,

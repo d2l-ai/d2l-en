@@ -45,7 +45,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import numpy as np
@@ -53,20 +53,19 @@ import torch
 from torch import nn
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import numpy as np
 import tensorflow as tf
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 %%tab jax
 from d2l import jax as d2l
+from flax import linen as nn
 import jax
 from jax import numpy as jnp
-from jax import grad
-from flax import linen as nn
 import optax
 ```
 
@@ -165,7 +164,7 @@ class LinearRegression(d2l.Module):  #@save
 
 ```{.python .input}
 %%tab jax
-class LinearRegression(d2l.Module):  # @save
+class LinearRegression(d2l.Module):  #@save
     lr: float
 
     def setup(self):
@@ -174,7 +173,7 @@ class LinearRegression(d2l.Module):  # @save
 
 In the `forward` method, we just invoke the built-in `__call__` function of the predefined layers to compute the outputs.
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(LinearRegression)  #@save
 def forward(self, X):
@@ -182,10 +181,10 @@ def forward(self, X):
     return self.net(X)
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab jax
 @d2l.add_to_class(LinearRegression)  #@save
-def __call__(self, X):
+def forward(self, X):
     """The linear regression model."""
     return self.net(X)
 ```
@@ -212,7 +211,7 @@ The `MeanSquaredError` class computes the mean squared error (without the $1/2$ 
 By default it returns the average loss over examples.
 :end_tab:
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(LinearRegression)  #@save
 def loss(self, y_hat, y):
@@ -227,7 +226,7 @@ def loss(self, y_hat, y):
         return fn(y, y_hat)
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab jax
 @d2l.add_to_class(LinearRegression)  #@save
 def loss(self, params, X, y):
@@ -275,7 +274,7 @@ and thus Keras supports it alongside a number of
 variations on this algorithm in the `optimizers` module.
 :end_tab:
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab all
 @d2l.add_to_class(LinearRegression)  #@save
 def configure_optimizers(self):
@@ -312,11 +311,7 @@ to train our model.
 model = LinearRegression(lr=0.03)
 data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 trainer = d2l.Trainer(max_epochs=3)
-if tab.selected('jax'):
-    key = jax.random.PRNGKey(42)
-    trainer.fit(model, data, key)
-if tab.selected('pytorch', 'mxnet', 'tensorflow'):
-    trainer.fit(model, data)
+trainer.fit(model, data)
 ```
 
 Below, we

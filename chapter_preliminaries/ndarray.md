@@ -81,7 +81,7 @@ import tensorflow as tf
 ```{.python .input}
 %%tab jax
 import jax
-import jax.numpy as jnp
+from jax import numpy as jnp
 ```
 
 [**A tensor represents a (possibly multi-dimensional) array of numerical values.**]

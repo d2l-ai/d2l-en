@@ -69,13 +69,13 @@ import tensorflow as tf
 ```{.python .input}
 %%tab jax
 from dataclasses import field
-import time
-import numpy as np
 from d2l import jax as d2l
-import jax
-import jax.numpy as jnp
 from flax import linen as nn
 from flax.training.train_state import TrainState
+from jax import numpy as jnp
+import numpy as np
+import jax
+import time
 ```
 
 ## Utilities
@@ -171,6 +171,13 @@ for x in np.arange(0, 10, 0.1):
 The `Module` class  is the base class of all models we will implement. At a minimum we need to define three methods. The `__init__` method stores the learnable parameters, the `training_step` method accepts a data batch to return the loss value, the `configure_optimizers` method returns the optimization method, or a list of them, that is used to update the learnable parameters. Optionally we can define `validation_step` to report the evaluation measures.
 Sometimes we put the code to compute the output into a separate `forward` method to make it more reusable.
 
+:begin_tab:`jax`
+With the introduction of [dataclasses](https://docs.python.org/3/library/dataclasses.html)
+in Python 3.7, classes decorated with `@dataclass` automatically add magic
+methods such as `__init__` and `__repr__`. The member variables are defined
+using type annotations. All Flax modules are Python 3.7 dataclasses.
+:end_tab:
+
 ```{.python .input}
 %%tab all
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
@@ -183,8 +190,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
             self.training = None
 
     if tab.selected('jax'):
-        # No need for save_hyperparam when using python dataclass
-        # python dataclasses do not work perfectly well with inheritance
+        # No need for save_hyperparam when using Python dataclass
         plot_train_per_epoch: int = field(default=2, init=False)
         plot_valid_per_epoch: int = field(default=1, init=False)
         # Use default_factory to make sure new plots are generated on each run
@@ -207,9 +213,9 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
             return self.forward(X, *args)
 
     if tab.selected('jax'):
-        # JAX & Flax don't have a forward method like syntax
-        # Flax uses setup and built-in __call__ magic methods for forward pass
-        # Adding here for consistency
+        # JAX & Flax don't have a forward-method-like syntax. Flax uses setup
+        # and built-in __call__ magic methods for forward pass. Adding here
+        # for consistency
         def forward(self, X, *args, **kwargs):
             assert hasattr(self, 'net'), 'Neural network is defined'
             return self.net(X, *args, **kwargs)
@@ -261,7 +267,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 
         def validation_step(self, params, batch):
             l = self.loss(params, *batch[:-1], batch[-1])
-            self.plot("loss", l, train=False)
+            self.plot('loss', l, train=False)
 
     def configure_optimizers(self):
         raise NotImplementedError
@@ -348,7 +354,7 @@ class Trainer(d2l.HyperParameters):  #@save
             if kwargs and 'key' in kwargs and (kwargs['key'] is not None):
                 self.key = kwargs['key']
             else:
-                self.key = jax.random.PRNGKey(0)  # Avoid, but use as fallback
+                self.key = jax.random.PRNGKey(d2l.get_seed())
             input_shape = next(iter(self.train_dataloader))[0].shape
             dummy_input = jnp.zeros(input_shape)
             params = self.model.init(self.key, dummy_input)
@@ -357,7 +363,6 @@ class Trainer(d2l.HyperParameters):  #@save
         def fit(self, model, data, key=None):
             self.prepare_data(data)
             self.prepare_model(model)
-            self.params = self.apply_init(key=key)
             self.optim = model.configure_optimizers()
             # Flax uses optax under the hood for a single state obj TrainState
             self.state = TrainState.create(apply_fn=model.apply,

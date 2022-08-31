@@ -195,7 +195,7 @@ from tensorflow_probability import distributions as tfd
 from d2l import jax as d2l
 import random
 import jax
-import jax.numpy as jnp
+from jax import numpy as jnp
 import numpy as np
 ```
 

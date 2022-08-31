@@ -147,9 +147,9 @@ import tensorflow as tf
 ```{.python .input}
 %%tab jax
 from d2l import jax as d2l
-import jax
-import jax.numpy as jnp
 from flax import linen as nn
+import jax
+from jax import numpy as jnp
 ```
 
 ```{.python .input}
@@ -234,8 +234,6 @@ By default, tensors are created on the GPU/TPU if they are available,
 else CPU is used if not available.
 We can [**query the device where the tensor is located.**]
 :end_tab:
-
-
 
 ```{.python .input}
 %%tab mxnet

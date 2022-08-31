@@ -419,8 +419,8 @@ import time
 %%tab jax
 %matplotlib inline
 from d2l import jax as d2l
+from jax import numpy as jnp
 import math
-import jax.numpy as jnp
 import time
 ```
 
@@ -462,9 +462,8 @@ f'{time.time() - t:.5f} sec'
 
 ```{.python .input}
 %%tab jax
-# JAX arrays are immutable, meaning that once
-# created their contents cannot be changed
-# For updating individual elements, JAX provides
+# JAX arrays are immutable, meaning that once created their contents
+# cannot be changed. For updating individual elements, JAX provides
 # an indexed update syntax that returns an updated copy
 c = d2l.zeros(n)
 t = time.time()
@@ -533,7 +532,7 @@ We can now (**visualize the normal distributions**).
 
 ```{.python .input}
 %%tab mxnet
-# Use numpy again for visualization
+# Use NumPy again for visualization
 x = np.arange(-7, 7, 0.01)
 
 # Mean and standard deviation pairs
@@ -546,10 +545,10 @@ d2l.plot(x.asnumpy(), [normal(x, mu, sigma).asnumpy() for mu, sigma in params], 
 ```{.python .input}
 %%tab pytorch, tensorflow, jax
 if tab.selected('jax'):
-    # Use jax numpy for visualization
+    # Use JAX NumPy for visualization
     x = jnp.arange(-7, 7, 0.01)
 if tab.selected('pytorch', 'mxnet', 'tensorflow'):
-    # Use numpy again for visualization
+    # Use NumPy again for visualization
     x = np.arange(-7, 7, 0.01)
 
 # Mean and standard deviation pairs

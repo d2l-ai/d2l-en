@@ -471,15 +471,16 @@ import tensorflow as tf
 #@tab jax
 #@save
 from dataclasses import field
-import numpy as np
-import jax
-import jax.numpy as jnp
 import flax
-from jax import random
-from jax import grad, vmap
 from flax import linen as nn
 from flax.training.train_state import TrainState
+import jax
+from jax import numpy as jnp
+from jax import grad, vmap
+import numpy as np
 import optax
+import torch  # Used for dataloading
+import torchvision  # Used for dataloading
 ```
 
 ### Target Audience

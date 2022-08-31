@@ -80,7 +80,7 @@ x
 
 ```{.python .input}
 %%tab jax
-import jax.numpy as jnp
+from jax import numpy as jnp
 
 x = jnp.arange(4.0)
 x

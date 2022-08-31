@@ -3,8 +3,11 @@ DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
 import jax
 import flax
-import jax.numpy as jnp
+from jax import numpy as jnp
 from flax import linen as nn
+import random
+
+get_seed = lambda: random.randint(0, 1e6)
 
 nn_Module = nn.Module
 
@@ -38,12 +41,15 @@ d2l = sys.modules[__name__]
 from dataclasses import field
 import flax
 import jax
-import jax.numpy as jnp
 import numpy as np
 import optax
+import torch  # Used for dataloading
+import torchvision  # Used for dataloading
 from flax import linen as nn
 from flax.training.train_state import TrainState
-from jax import grad, random, vmap
+from jax import grad
+from jax import numpy as jnp
+from jax import vmap
 
 def use_svg_display():
     """Use the svg format to display a plot in Jupyter.
@@ -172,8 +178,7 @@ class ProgressBoard(d2l.HyperParameters):
 
 class Module(d2l.nn_Module, d2l.HyperParameters):
     """Defined in :numref:`sec_oo-design`"""
-    # No need for save_hyperparam when using python dataclass
-    # python dataclasses do not work perfectly well with inheritance
+    # No need for save_hyperparam when using Python dataclass
     plot_train_per_epoch: int = field(default=2, init=False)
     plot_valid_per_epoch: int = field(default=1, init=False)
     # Use default_factory to make sure new plots are generated on each run
@@ -184,9 +189,9 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
     def loss(self, y_hat, y):
         raise NotImplementedError
 
-    # JAX & Flax don't have a forward method like syntax
-    # Flax uses setup and built-in __call__ magic methods for forward pass
-    # Adding here for consistency
+    # JAX & Flax don't have a forward-method-like syntax. Flax uses setup
+    # and built-in __call__ magic methods for forward pass. Adding here
+    # for consistency
     def forward(self, X, *args, **kwargs):
         assert hasattr(self, 'net'), 'Neural network is defined'
         return self.net(X, *args, **kwargs)
@@ -219,7 +224,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
 
     def validation_step(self, params, batch):
         l = self.loss(params, *batch[:-1], batch[-1])
-        self.plot("loss", l, train=False)
+        self.plot('loss', l, train=False)
 
     def configure_optimizers(self):
         raise NotImplementedError
@@ -248,7 +253,7 @@ class DataModule(d2l.HyperParameters):
         def jax_collate(batch):
             if isinstance(batch[0], np.ndarray):
                 return jnp.stack(batch)
-            elif isinstance(batch[0], (tuple,list)):
+            elif isinstance(batch[0], (tuple, list)):
                 transposed = zip(*batch)
                 return [jax_collate(samples) for samples in transposed]
             else:
@@ -292,7 +297,7 @@ class Trainer(d2l.HyperParameters):
         if kwargs and 'key' in kwargs and (kwargs['key'] is not None):
             self.key = kwargs['key']
         else:
-            self.key = jax.random.PRNGKey(0)  # Avoid, but use as fallback
+            self.key = jax.random.PRNGKey(d2l.get_seed())
         input_shape = next(iter(self.train_dataloader))[0].shape
         dummy_input = jnp.zeros(input_shape)
         params = self.model.init(self.key, dummy_input)
@@ -301,7 +306,6 @@ class Trainer(d2l.HyperParameters):
     def fit(self, model, data, key=None):
         self.prepare_data(data)
         self.prepare_model(model)
-        self.params = self.apply_init(key=key)
         self.optim = model.configure_optimizers()
         # Flax uses optax under the hood for a single state obj TrainState
         self.state = TrainState.create(apply_fn=model.apply,
@@ -386,23 +390,24 @@ class SGD(d2l.HyperParameters):
     def __init__(self, lr):
         """
         Minibatch stochastic gradient descent.
-        The key transformation of Optax is the `GradientTransformation`
-        defined by two functions, the `init` and the `update`.
-        The `init` initializes the state and the `update` transforms
+        The key transformation of Optax is the GradientTransformation
+        defined by two methods, the init and the update.
+        The init initializes the state and the update transforms
         the gradients.
         https://github.com/deepmind/optax/blob/master/optax/_src/transform.py
         """
         self.save_hyperparameters()
 
     def init(self, params):
-        # params not used
+        # Delete unused params
         del params
         return optax.EmptyState
 
     def update(self, updates, state, params=None):
         del params
-        # apply_gradients through flax's train_state is called, which then
-        # calls optax.apply_updates adding the params to the update defined
+        # When state.apply_gradients method is called to update flax's
+        # train_state object, it internally calls optax.apply_updates method
+        # adding the params to the update equation defined below.
         updates = jax.tree_util.tree_map(lambda g: -self.lr * g, updates)
         return updates, state
 
@@ -416,7 +421,7 @@ class LinearRegression(d2l.Module):
     def setup(self):
         self.net = nn.Dense(1, kernel_init=nn.initializers.normal(0.01))
 
-    def __call__(self, X):
+    def forward(self, X):
         """The linear regression model.
     
         Defined in :numref:`sec_linear_concise`"""
@@ -447,6 +452,39 @@ def gpu(i=0):
 def num_gpus():
     """Defined in :numref:`sec_use_gpu`"""
     return jax.device_count('gpu')
+
+def try_gpu(i=0):
+    """Return gpu(i) if exists, otherwise return cpu().
+
+    Defined in :numref:`sec_use_gpu`"""
+    if num_gpus() >= i + 1:
+        return gpu(i)
+    return cpu()
+
+def try_all_gpus():
+    """Return all available GPUs, or [cpu(),] if no GPU exists.
+
+    Defined in :numref:`sec_use_gpu`"""
+    return [gpu(i) for i in range(num_gpus())]
+
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
+    """Plot a list of images.
+
+    Defined in :numref:`sec_utils`"""
+    figsize = (num_cols * scale, num_rows * scale)
+    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
+    axes = axes.flatten()
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        try:
+            img = d2l.numpy(img)
+        except:
+            pass
+        ax.imshow(img)
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        if titles:
+            ax.set_title(titles[i])
+    return axes
 
 
 # Alias defined in config.ini
