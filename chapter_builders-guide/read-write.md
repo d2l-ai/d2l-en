@@ -256,9 +256,9 @@ Y_clone == Y
 
 ## Summary
 
-* The `save` and `load` functions can be used to perform file I/O for tensor objects.
-* We can save and load the entire sets of parameters for a network via a parameter dictionary.
-* Saving the architecture has to be done in code rather than in parameters.
+The `save` and `load` functions can be used to perform file I/O for tensor objects.
+We can save and load the entire sets of parameters for a network via a parameter dictionary.
+Saving the architecture has to be done in code rather than in parameters.
 
 ## Exercises
 

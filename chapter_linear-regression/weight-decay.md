@@ -444,10 +444,10 @@ to all layers of a deep network.
 
 ## Summary
 
-* Regularization is a common method for dealing with overfitting. Classical regularization techniques add a penalty term to the loss function (when training) to reduce the complexity of the learned model.
-* One particular choice for keeping the model simple is using an $\ell_2$ penalty. This leads to weight decay in the update steps of the minibatch stochastic gradient descent algorithm.
-* The weight decay functionality is provided in optimizers from deep learning frameworks.
-* Different sets of parameters can have different update behaviors within the same training loop.
+Regularization is a common method for dealing with overfitting. Classical regularization techniques add a penalty term to the loss function (when training) to reduce the complexity of the learned model.
+One particular choice for keeping the model simple is using an $\ell_2$ penalty. This leads to weight decay in the update steps of the minibatch stochastic gradient descent algorithm.
+In practice, the weight decay functionality is provided in optimizers from deep learning frameworks.
+Different sets of parameters can have different update behaviors within the same training loop.
 
 
 

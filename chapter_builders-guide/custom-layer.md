@@ -259,9 +259,9 @@ net(tf.random.uniform((2, 64)))
 
 ## Summary
 
-* We can design custom layers via the basic layer class. This allows us to define flexible new layers that behave differently from any existing layers in the library.
-* Once defined, custom layers can be invoked in arbitrary contexts and architectures.
-* Layers can have local parameters, which can be created through built-in functions.
+We can design custom layers via the basic layer class. This allows us to define flexible new layers that behave differently from any existing layers in the library.
+Once defined, custom layers can be invoked in arbitrary contexts and architectures.
+Layers can have local parameters, which can be created through built-in functions.
 
 
 ## Exercises
