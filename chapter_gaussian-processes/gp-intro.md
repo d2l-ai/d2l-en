@@ -62,9 +62,6 @@ $\ell = 0.1, 0.5, 2, 5, 10$
 ![prior5](https://user-images.githubusercontent.com/6753639/178250780-e5c522b7-f9c7-416c-8017-3cb921ff14b2.png)
 ![post5](https://user-images.githubusercontent.com/6753639/178250794-89470592-cdb3-4e63-b0d8-d66f002fc593.png)
 
-![prior10](https://user-images.githubusercontent.com/6753639/178250805-080a5c66-69ec-456d-ade5-e0664874782f.png)
-![post10](https://user-images.githubusercontent.com/6753639/178250815-588fccee-bfcd-4d46-87af-7429596ddc6e.png)
-
 Notice as the length-scale increases the 'wiggliness' of the functions decrease, and our uncertainty decreases. If the length-scale is small, the uncertainty will quickly increase as we move away from the data, as the datapoints become less informative about the function values. 
 
 Now, let's vary the amplitude parameter, holding the length-scale fixed at $2$. Note the vertical scale is held fixed for the prior samples, and varies for the posterior samples, so you can clearly see both the increasing scale of the function, and the fits to the data.
