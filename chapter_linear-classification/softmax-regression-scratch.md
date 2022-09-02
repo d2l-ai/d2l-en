@@ -197,7 +197,7 @@ allows us to select the matching terms in $\hat{\mathbf{y}}$.
 
 To see this in action we [**create sample data `y_hat`
 with 2 examples of predicted probabilities over 3 classes and their corresponding labels `y`.**]
-The correct labels are $1$ and $2$ respectively.
+The correct labels are $0$ and $2$ respectively (i.e., the first and third class).
 [**Using `y` as the indices of the probabilities in `y_hat`,**]
 we can pick out terms efficiently.
 

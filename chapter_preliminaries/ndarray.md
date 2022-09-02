@@ -784,8 +784,8 @@ a, a.item(), float(a), int(a)
 
 ## Summary
 
- * The tensor class is the main interface for storing and manipulating data in deep learning libraries.
- * Tensors provide a variety of functionalities including construction routines; indexing and slicing; basic mathematics operations; broadcasting; memory-efficient assignment; and conversion to and from other Python objects.
+The tensor class is the main interface for storing and manipulating data in deep learning libraries.
+Tensors provide a variety of functionalities including construction routines; indexing and slicing; basic mathematics operations; broadcasting; memory-efficient assignment; and conversion to and from other Python objects.
 
 
 ## Exercises

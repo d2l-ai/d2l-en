@@ -186,8 +186,8 @@ $$\hat{y} = \mathrm{argmax}_y \> \prod_{i=1}^d p(x_i  \mid  y) p(y).$$
 
 If we can estimate $p(x_i=1  \mid  y)$ for every $i$ and $y$, and save its value in $P_{xy}[i, y]$, here $P_{xy}$ is a $d\times n$ matrix with $n$ being the number of classes and $y\in\{1, \ldots, n\}$, then we can also use this to estimate $p(x_i = 0 \mid y)$, i.e.,
 
-$$ 
-p(x_i = t_i \mid y) = 
+$$
+p(x_i = t_i \mid y) =
 \begin{cases}
     P_{xy}[i, y] & \text{for } t_i=1 ;\\
     1 - P_{xy}[i, y] & \text{for } t_i = 0 .
@@ -429,7 +429,7 @@ d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```{.python .input}
 #@tab pytorch
 def predict(X):
-    return [bayes_pred_stable(x).argmax(dim=0).type(torch.int32).item() 
+    return [bayes_pred_stable(x).argmax(dim=0).type(torch.int32).item()
             for x in X]
 
 X = torch.stack([mnist_test[i][0] for i in range(18)], dim=0)
@@ -480,14 +480,14 @@ tf.reduce_sum(tf.cast(preds == y, tf.float32)).numpy() / len(y)
 Modern deep networks achieve error rates of less than $0.01$. The relatively poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier.
 
 ## Summary
-* Using Bayes' rule, a classifier can be made by assuming all observed features are independent.  
+* Using Bayes' rule, a classifier can be made by assuming all observed features are independent.
 * This classifier can be trained on a dataset by counting the number of occurrences of combinations of labels and pixel values.
 * This classifier was the gold standard for decades for tasks such as spam detection.
 
 ## Exercises
 1. Consider the dataset $[[0,0], [0,1], [1,0], [1,1]]$ with labels given by the XOR of the two elements $[0,1,1,0]$.  What are the probabilities for a Naive Bayes classifier built on this dataset.  Does it successfully classify our points?  If not, what assumptions are violated?
 1. Suppose that we did not use Laplace smoothing when estimating probabilities and a data example arrived at testing time which contained a value never observed in training.  What would the model output?
-1. The naive Bayes classifier is a specific example of a Bayesian network, where the dependence of random variables are encoded with a graph structure.  While the full theory is beyond the scope of this section (see :cite:`Koller.Friedman.2009` for full details), explain why allowing explicit dependence between the two input variables in the XOR model allows for the creation of a successful classifier.
+1. The naive Bayes classifier is a specific example of a Bayesian network, where the dependence of random variables are encoded with a graph structure.  While the full theory is beyond the scope of this section (see :citet:`Koller.Friedman.2009` for full details), explain why allowing explicit dependence between the two input variables in the XOR model allows for the creation of a successful classifier.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/418)

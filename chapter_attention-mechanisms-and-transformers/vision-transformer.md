@@ -20,7 +20,7 @@ This question has sparked immense interest
 in the computer vision community.
 :cite:`ramachandran2019stand` proposed to replace convolution with self-attention. 
 However, its use of specialized patterns in attention makes it hard to scale up models on hardware accelerators.
-:cite:`cordonnier2020relationship` theoretically proved that self-attention can learn to behave similarly to convolution. Empirically, $2 \times 2$ patches were taken from images as input, but the small patch size makes the model only applicable to image data with low resolutions.
+:cite:`cordonnier2020relationship` theoretically proved that self-attention can learn to behave similarly to convolution. Empirically, $2 \times 2$ patches were taken from images as inputs, but the small patch size makes the model only applicable to image data with low resolutions.
 
 Without specific constraints on patch size,
 *vision transformers* (ViTs)
@@ -95,7 +95,7 @@ class PatchEmbedding(nn.Module):
         return self.conv(X).flatten(2).transpose(1, 2)
 ```
 
-In the following example, taking images with height and width of `img_size` as input, the patch embedding outputs `(img_size//patch_size)**2` patches that are linearly projected to vectors of length `num_hiddens`.
+In the following example, taking images with height and width of `img_size` as inputs, the patch embedding outputs `(img_size//patch_size)**2` patches that are linearly projected to vectors of length `num_hiddens`.
 
 ```{.python .input  n=9}
 img_size, patch_size, num_hiddens, batch_size = 96, 16, 512, 4
@@ -145,9 +145,8 @@ class ViTBlock(nn.Module):
         self.mlp = ViTMLP(mlp_num_hiddens, num_hiddens, dropout)
 
     def forward(self, X, valid_lens=None):
-        X = self.ln1(X)
-        return X + self.mlp(self.ln2(
-            X + self.attention(X, X, X, valid_lens)))
+        X = X + self.attention(*([self.ln1(X)] * 3), valid_lens)
+        return X + self.mlp(self.ln2(X))
 ```
 
 Same as in :numref:`subsec_transformer-encoder`,
@@ -160,7 +159,7 @@ encoder_blk.eval()
 d2l.check_shape(encoder_blk(X), X.shape)
 ```
 
-## Putting All Things Together
+## Putting It All Together
 
 The forward pass of vision transformers below is straightforward.
 First, input images are fed into an `PatchEmbedding` instance,
@@ -227,10 +226,20 @@ intrinsic superiority of transformers in scalability :cite:`Dosovitskiy.Beyer.Ko
 The introduction of vision transformers
 has changed the landscape of network design for modeling image data.
 They were soon shown effective on the ImageNet dataset with data-efficient training strategies of DeiT :cite:`touvron2021training`.
+However,
+quadratic complexity
+of self-attention (:numref:`sec_self-attention-and-positional-encoding`)
+makes the transformer architecture
+less suitable for higher-resolution images.
 Towards a general-purpose backbone network in computer vision,
 Swin transformers addressed the quadratic computational complexity with respect to image size (:numref:`subsec_cnn-rnn-self-attention`)
 and added back convolution-like priors,
 extending the applicability of transformers to a range of computer vision tasks beyond image classification with state-of-the-art results :cite:`liu2021swin`.
+
+
+
+
+
 
 
 ## Exercises

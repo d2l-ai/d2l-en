@@ -126,7 +126,7 @@ halves height and width via the first block
 Let's further
 denote
 the bottleneck ratio and
-the number of groups (group width) 
+the number of groups (group width)
 within
 each ResNeXt block for stage $i$
 as $b_i$ and $g_i$, respectively.
@@ -267,8 +267,8 @@ def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
 ## Constraining Design Spaces with Lower Error Distributions
 
 For any stage $i$ of AnyNet,
-the design choices are 
-the bottleneck ratio $b_i$ 
+the design choices are
+the bottleneck ratio $b_i$
 and the number of groups $g_i$
 within each block,
 block width $w_i$,
@@ -286,7 +286,7 @@ to evaluate the error distribution :cite:`radosavovic2019network`
 as a quality indicator
 to output a more constrained
 design space with simpler models that may have
-better quality. 
+better quality.
 
 Let's detail
 this quality indicator for design spaces.
@@ -298,7 +298,7 @@ with errors $e_i$ lower than $e$:
 $$F(e) = \frac{1}{n}\sum_{i=1}^n \mathbf{1}(e_i < e).$$
 
 
-Starting from the initial unconstrained AnyNet design space ($\text{AnyNetX}_A$ in :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`),
+Starting from the initial unconstrained AnyNet design space ($\text{AnyNetX}_A$ in :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`),
 sharing the bottle network ratio $b_i = b$ for all stages $i$ results in a more constrained design space $\text{AnyNetX}_B$.
 Sampling and training $n=500$ models from $\text{AnyNetX}_A$ and $\text{AnyNetX}_B$ each,
 left of :numref:`fig_regnet-paper-fig5`
@@ -310,7 +310,7 @@ This leads to a further simplified design space
 $\text{AnyNetX}_C$ with virtually no change
 in error distributions (right of :numref:`fig_regnet-paper-fig5`).
 
-![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Sharing bottleneck ratio (from $\text{AnyNetX}_A$ to  $\text{AnyNetX}_B$) and sharing the number of groups (from $\text{AnyNetX}_B$ to $\text{AnyNetX}_C$) simplify the design space with virtually no change in error distributions (figure taken from :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig5.png)
+![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Sharing bottleneck ratio (from $\text{AnyNetX}_A$ to  $\text{AnyNetX}_B$) and sharing the number of groups (from $\text{AnyNetX}_B$ to $\text{AnyNetX}_C$) simplify the design space with virtually no change in error distributions (figure taken from :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig5.png)
 :width:`600px`
 :label:`fig_regnet-paper-fig5`
 
@@ -325,7 +325,7 @@ to increase network depth across stages
 gives an even better $\text{AnyNetX}_E$
 (right of :numref:`fig_regnet-paper-fig7`).
 
-![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Increasing network width across stages (from $\text{AnyNetX}_C$ to  $\text{AnyNetX}_D$) and increasing network depth across stages (from $\text{AnyNetX}_D$ to $\text{AnyNetX}_E$) simplify the design space with improved  error distributions (figure taken from :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig7.png)
+![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Increasing network width across stages (from $\text{AnyNetX}_C$ to  $\text{AnyNetX}_D$) and increasing network depth across stages (from $\text{AnyNetX}_D$ to $\text{AnyNetX}_E$) simplify the design space with improved  error distributions (figure taken from :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig7.png)
 :width:`600px`
 :label:`fig_regnet-paper-fig7`
 
@@ -407,14 +407,14 @@ With desirable properties like locality and translation invariance (:numref:`sec
 for vision,
 CNNs have been the dominant architectures in this area.
 Recently,
-transformers (to be covered in :numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training`
+transformers (:numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training`
 and MLPs :cite:`tolstikhin2021mlp`
 have also sparked research beyond
 the well-established CNN architectures for vision.
 Specifically,
 although lacking of the aforementioned
 inductive biases inherent to CNNs,
-vision transformers
+vision transformers (:numref:`sec_vision-transformer`)
 attained state-of-the-art performance
 in large-scale image classification in early 2020s,
 showing that
@@ -424,24 +424,14 @@ In other words,
 it is often possible to
 train large transformers
 to outperform large CNNs on large datasets.
-However,
-quadratic complexity
-of self-attention (to be covered in :numref:`sec_self-attention-and-positional-encoding`)
-makes the transformer architecture
-less suitable for higher-resolution images.
-To address this issue,
-Swin transformers
-introduce shifted windows to
-achieve state-of-the-art performance
-in a broader range of vision tasks beyond image classification :cite:`liu2021swin`.
 Inspired
 by the superior scaling behavior of
-transformers with multi-head self-attention (to be covered in :numref:`sec_multihead-attention`),
+transformers (:numref:`sec_large-pretraining-transformers`) with multi-head self-attention (:numref:`sec_multihead-attention`),
 the process of gradually
 improving from a standard ResNet architecture
 toward the design of a vision transformer
-leads to a family of CNN models called ConvNeXts
-that compete favorably with Swin transformers :cite:`liu2022convnet`.
+leads to a family of CNNs called the ConvNeXt models
+that compete favorably with transformers for vision :cite:`liu2022convnet`.
 We refer the interested readers
 to CNN design discussions
 in the ConvNeXt paper :cite:`liu2022convnet`.
