@@ -75,14 +75,8 @@ Now, let's vary the amplitude parameter, holding the length-scale fixed at $2$. 
 ![priora2](https://user-images.githubusercontent.com/6753639/178252163-c9ac2360-6bee-44fe-985c-731101d8c575.png)
 ![posta2](https://user-images.githubusercontent.com/6753639/178252195-c325e446-4c61-4851-a841-b547bbab2e2d.png)
 
-![priora4](https://user-images.githubusercontent.com/6753639/178252214-eca6fe2a-0af0-4a13-a71f-4851c02dc4d7.png)
-![posta4](https://user-images.githubusercontent.com/6753639/178252232-38e229a9-bf48-4a67-9883-3cf494f8ff6a.png)
-
 ![priora8](https://user-images.githubusercontent.com/6753639/178252271-ccabde74-8ec3-44d1-9842-6309444c4ab5.png)
 ![posta8](https://user-images.githubusercontent.com/6753639/178252284-b59daae3-2648-4ef6-bc09-7c0b4d9a4f02.png)
-
-![priora16](https://user-images.githubusercontent.com/6753639/178252311-b9a5c51f-a0f8-4d65-ba5e-1f8b917c0d7c.png)
-![posta16](https://user-images.githubusercontent.com/6753639/178252339-db99413b-78f7-41f7-8c6b-92fe10d634a4.png)
 
 We see the amplitude parameter affects the scale of the function, but not the rate of variation. At this point, we also have the sense that the generalization performance of our procedure will depend on having reasonable values for these hyperparameters. Values of $\ell=2$ and $a=1$ appeared to provide reasonable fits, while some of the other values did not. Fortunately, there is a robust and automatic way to specify these hyperparameters, using what is called the _marginal likelihood_, which we will return to in the notebook on inference. 
 
