@@ -244,7 +244,7 @@ trainer.fit(model, data)
 
 ## [**Concise Implementation**]
 
-In high-level APIs, we can directly instantiate a GPU model.
+In high-level APIs, we can directly instantiate a GRU model.
 This encapsulates all the configuration detail that we made explicit above.
 
 ```{.python .input}
