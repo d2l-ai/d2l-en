@@ -490,6 +490,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
 # Alias defined in config.ini
 nn_Module = nn.Module
 to = jax.device_put
+numpy = np.asarray
 
 ones_like = jnp.ones_like
 ones = jnp.ones
