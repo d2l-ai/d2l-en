@@ -50,6 +50,7 @@ import jax
 from jax import numpy as jnp
 import numpy as np
 import random
+import torch
 ```
 
 ## Generating the Dataset
@@ -190,7 +191,7 @@ and let it take care of shuffling examples  efficiently.
 
 :begin_tab:`jax`
 JAX is all about NumPy like API with device acceleration and the functional
-transformations, so atleast the current version doesn’t include data loading
+transformations, so at least the current version doesn’t include data loading
 methods. With other  libraries we already have great data loaders out there,
 and JAX suggests using them instead. Here we will grab PyTorch’s data loader,
 and modify it slightly to make it work with JAX.
@@ -212,7 +213,6 @@ def get_tensorloader(self, tensors, train, indices=slice(0, None)):
     if tab.selected('jax'):
         # Use PyTorch Dataset and Dataloader
         # JAX or Flax do not provide any dataloading functionality
-        from torch.utils import data
 
         def jax_collate(batch):
             if isinstance(batch[0], np.ndarray):
@@ -223,7 +223,7 @@ def get_tensorloader(self, tensors, train, indices=slice(0, None)):
             else:
                 return jnp.array(batch)
 
-        class JaxDataset(data.Dataset):
+        class JaxDataset(torch.utils.data.Dataset):
             def __init__(self, train, seed=0):
                 super().__init__()
 
@@ -235,8 +235,9 @@ def get_tensorloader(self, tensors, train, indices=slice(0, None)):
                 return len(tensors[0])
 
         dataset = JaxDataset(*tensors)
-        return data.DataLoader(dataset, self.batch_size,
-                               shuffle=train, collate_fn=jax_collate)
+        return torch.utils.data.DataLoader(dataset, self.batch_size,
+                                           shuffle=train,
+                                           collate_fn=jax_collate)
 
     if tab.selected('tensorflow'):
         shuffle_buffer = tensors[0].shape[0] if train else 1
