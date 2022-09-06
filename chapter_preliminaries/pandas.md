@@ -146,7 +146,7 @@ X, y
 
 ```{.python .input}
 %%tab jax
-import jax.numpy as jnp
+from jax import numpy as jnp
 
 X, y = jnp.array(inputs.values), jnp.array(targets.values)
 X, y

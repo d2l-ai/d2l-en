@@ -1,6 +1,6 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Weight Decay
@@ -193,7 +193,7 @@ still holds true.
 We can illustrate the benefits of weight decay 
 through a simple synthetic example.
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
@@ -202,7 +202,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -210,11 +210,20 @@ import torch
 from torch import nn
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+import optax
 ```
 
 First, we [**generate some data as before**]:
@@ -231,7 +240,7 @@ we can make the effects of overfitting pronounced,
 by increasing the dimensionality of our problem to $d = 200$
 and working with a small training set with only 20 examples.
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab all
 class Data(d2l.DataModule):
     def __init__(self, num_train, num_val, num_inputs, batch_size):
@@ -243,6 +252,9 @@ class Data(d2l.DataModule):
         if tab.selected('tensorflow'):
             self.X = d2l.normal((n, num_inputs))
             noise = d2l.normal((n, 1)) * 0.01
+        if tab.selected('jax'):
+            self.X = jax.random.normal(jax.random.PRNGKey(0), (n, num_inputs))
+            noise = jax.random.normal(jax.random.PRNGKey(0), (n, 1)) * 0.01
         w, b = d2l.ones((num_inputs, 1)) * 0.01, 0.05
         self.y = d2l.matmul(self.X, w) + b + noise
 
@@ -264,7 +276,7 @@ to the original loss function.
 Perhaps the most convenient way to implement this penalty
 is to square all terms in place and sum them up.
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab all
 def l2_penalty(w):
     return d2l.reduce_sum(w**2) / 2
@@ -276,20 +288,31 @@ In the final model,
 the linear regression and the squared loss have not changed since :numref:`sec_linear_scratch`,
 so we will just define a subclass of `d2l.LinearRegressionScratch`. The only change here is that our loss now includes the penalty term.
 
-```{.python .input  n=7}
-%%tab all
+```{.python .input}
+%%tab pytorch, mxnet, tensorflow
 class WeightDecayScratch(d2l.LinearRegressionScratch):
     def __init__(self, num_inputs, lambd, lr, sigma=0.01):
         super().__init__(num_inputs, lr, sigma)
         self.save_hyperparameters()
         
     def loss(self, y_hat, y):
-        return super().loss(y_hat, y) + self.lambd * l2_penalty(self.w)        
+        return (super().loss(y_hat, y) +
+                self.lambd * l2_penalty(self.w))
+```
+
+```{.python .input}
+%%tab jax
+class WeightDecayScratch(d2l.LinearRegressionScratch):
+    lambd: int = 0
+        
+    def loss(self, params, X, y):
+        return (super().loss(params, X, y) +
+                self.lambd * l2_penalty(params['params']['w']))
 ```
 
 The following code fits our model on the training set with 20 examples and evaluates it on the validation set with 100 examples.
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab all
 data = Data(num_train=20, num_val=100, num_inputs=200, batch_size=5)
 trainer = d2l.Trainer(max_epochs=10)
@@ -298,7 +321,11 @@ def train_scratch(lambd):
     model = WeightDecayScratch(num_inputs=200, lambd=lambd, lr=0.01)
     model.board.yscale='log'
     trainer.fit(model, data)
-    print('L2 norm of w:', float(l2_penalty(model.w)))
+    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+        print('L2 norm of w:', float(l2_penalty(model.w)))
+    if tab.selected('jax'):
+        print('L2 norm of w:',
+              float(l2_penalty(trainer.state.params['params']['w'])))
 ```
 
 ### [**Training without Regularization**]
@@ -309,7 +336,7 @@ Note that we overfit badly,
 decreasing the training error but not the
 validation error---a textbook case of overfitting.
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab all
 train_scratch(0)
 ```
@@ -322,7 +349,7 @@ but the validation error decreases.
 This is precisely the effect
 we expect from regularization.
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab all
 train_scratch(3)
 ```
@@ -370,7 +397,7 @@ the weight decay hyperparameter `wd` and apply it to the layer's weights
 through the `kernel_regularizer` argument.
 :end_tab:
 
-```{.python .input  n=11}
+```{.python .input}
 %%tab mxnet
 class WeightDecay(d2l.LinearRegression):
     def __init__(self, wd, lr):
@@ -385,7 +412,7 @@ class WeightDecay(d2l.LinearRegression):
                              {'learning_rate': self.lr, 'wd': self.wd})
 ```
 
-```{.python .input  n=12}
+```{.python .input}
 %%tab pytorch
 class WeightDecay(d2l.LinearRegression):
     def __init__(self, wd, lr):
@@ -398,7 +425,7 @@ class WeightDecay(d2l.LinearRegression):
                                lr=self.lr, weight_decay=self.wd)
 ```
 
-```{.python .input  n=13}
+```{.python .input}
 %%tab tensorflow
 class WeightDecay(d2l.LinearRegression):
     def __init__(self, wd, lr):
@@ -413,6 +440,18 @@ class WeightDecay(d2l.LinearRegression):
         return super().loss(y_hat, y) + self.net.losses
 ```
 
+```{.python .input}
+%%tab jax
+class WeightDecay(d2l.LinearRegression):
+    wd: int = 0
+    
+    def configure_optimizers(self):
+        # Weight Decay is not available directly within `optax.sgd`, but
+        # optax allows chaining several transformations together
+        return optax.chain(optax.additive_weight_decay(self.wd),
+                           optax.sgd(self.lr))
+```
+
 [**The plot looks similar to that when
 we implemented weight decay from scratch**].
 However, this version runs faster
@@ -421,12 +460,16 @@ benefits that will become more
 pronounced as you address larger problems
 and this work becomes more routine.
 
-```{.python .input  n=14}
+```{.python .input}
 %%tab all
 model = WeightDecay(wd=3, lr=0.01)
 model.board.yscale='log'
 trainer.fit(model, data)
-print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0])))
+
+if tab.selected('jax'):
+    print('L2 norm of w:', float(l2_penalty(model.get_w_b(trainer.state)[0])))
+if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0])))
 ```
 
 So far, we only touched upon one notion of
