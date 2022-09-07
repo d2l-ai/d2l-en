@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Concise Implementation of Softmax Regression
@@ -35,6 +35,15 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+import optax
+```
+
 ## Defining the Model
 
 As in :numref:`sec_linear_concise`, 
@@ -62,7 +71,7 @@ by keeping the dimension along the first axis unchanged.
 :end_tab:
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class SoftmaxRegression(d2l.Classifier):
     def __init__(self, num_outputs, lr):
         super().__init__()
@@ -80,6 +89,19 @@ class SoftmaxRegression(d2l.Classifier):
 
     def forward(self, X):
         return self.net(X)
+```
+
+```{.python .input}
+%%tab jax
+class SoftmaxRegression(d2l.Classifier):
+    num_outputs: int
+    lr: float
+
+    @nn.compact
+    def __call__(self, X):
+        X = X.reshape((X.shape[0], -1))  # flatten
+        X = nn.Dense(self.num_outputs)(X)
+        return X
 ```
 
 ## Softmax Revisited
@@ -139,8 +161,8 @@ we just
 all at once inside the cross-entropy loss function,**]
 which does smart things like the ["LogSumExp trick"](https://en.wikipedia.org/wiki/LogSumExp).
 
-```{.python .input  n=3}
-%%tab all
+```{.python .input}
+%%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(d2l.Classifier)  #@save
 def loss(self, Y_hat, Y, averaged=True):
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
@@ -155,6 +177,16 @@ def loss(self, Y_hat, Y, averaged=True):
     if tab.selected('tensorflow'):
         fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         return fn(Y, Y_hat)
+```
+
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(d2l.Classifier)  #@save
+def loss(self, params, X, Y, averaged=True):
+    Y_hat = self.apply(params, X)
+    Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+    fn = optax.softmax_cross_entropy_with_integer_labels
+    return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
 ```
 
 ## Training

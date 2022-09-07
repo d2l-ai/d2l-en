@@ -520,6 +520,13 @@ class Classifier(d2l.Module):
         compare = d2l.astype(preds == d2l.reshape(Y, -1), d2l.float32)
         return d2l.reduce_mean(compare) if averaged else compare
 
+    def loss(self, params, X, Y, averaged=True):
+        """Defined in :numref:`sec_softmax_concise`"""
+        Y_hat = self.apply(params, X)
+        Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+        fn = optax.softmax_cross_entropy_with_integer_labels
+        return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
+
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
     return jax.devices('cpu')[0]
