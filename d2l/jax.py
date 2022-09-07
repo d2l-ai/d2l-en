@@ -446,6 +446,7 @@ class ToArray:
     def __init__(self):
         """Defined in :numref:`sec_fashion_mnist`"""
         pass
+
     def __call__(self, img):
         return np.asarray(img) / 255  # Normalize arrays
 

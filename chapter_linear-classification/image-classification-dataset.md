@@ -60,7 +60,6 @@ import jax
 from jax import numpy as jnp
 import numpy as np
 import time
-# Use for dataset
 import torch
 import torchvision
 
@@ -114,6 +113,7 @@ class ToArray:  #@save
     """Convert a PIL Image to numpy.ndarray."""
     def __init__(self):
         pass
+
     def __call__(self, img):
         return np.asarray(img) / 255  # Normalize arrays
 ```
