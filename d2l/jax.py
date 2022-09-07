@@ -229,6 +229,10 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
     def configure_optimizers(self):
         raise NotImplementedError
 
+    def configure_optimizers(self):
+        """Defined in :numref:`sec_classification`"""
+        return optax.sgd(self.lr)
+
 class DataModule(d2l.HyperParameters):
     """Defined in :numref:`sec_oo-design`"""
     def __init__(self, root='../data', num_workers=4):
@@ -248,7 +252,6 @@ class DataModule(d2l.HyperParameters):
         tensors = tuple(a[indices] for a in tensors)
         # Use PyTorch Dataset and Dataloader
         # JAX or Flax do not provide any dataloading functionality
-        from torch.utils import data
     
         def jax_collate(batch):
             if isinstance(batch[0], np.ndarray):
@@ -259,7 +262,7 @@ class DataModule(d2l.HyperParameters):
             else:
                 return jnp.array(batch)
     
-        class JaxDataset(data.Dataset):
+        class JaxDataset(torch.utils.data.Dataset):
             def __init__(self, train, seed=0):
                 super().__init__()
     
@@ -271,8 +274,9 @@ class DataModule(d2l.HyperParameters):
                 return len(tensors[0])
     
         dataset = JaxDataset(*tensors)
-        return data.DataLoader(dataset, self.batch_size,
-                               shuffle=train, collate_fn=jax_collate)
+        return torch.utils.data.DataLoader(dataset, self.batch_size,
+                                           shuffle=train,
+                                           collate_fn=jax_collate)
     
 
 class Trainer(d2l.HyperParameters):
@@ -497,6 +501,24 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
 
     Defined in :numref:`sec_fashion_mnist`"""
     raise NotImplementedError
+
+class Classifier(d2l.Module):
+    """Defined in :numref:`sec_classification`"""
+    def validation_step(self, params, batch):
+        self.plot('loss', self.loss(params, *batch[:-1], batch[-1]),
+                  train=False)
+        self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1]),
+                  train=False)
+
+    def accuracy(self, params, X, Y, averaged=True):
+        """Compute the number of correct predictions.
+    
+        Defined in :numref:`sec_classification`"""
+        Y_hat = self.apply(params, X)
+        Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+        preds = d2l.astype(d2l.argmax(Y_hat, axis=1), Y.dtype)
+        compare = d2l.astype(preds == d2l.reshape(Y, -1), d2l.float32)
+        return d2l.reduce_mean(compare) if averaged else compare
 
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
