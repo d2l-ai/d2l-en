@@ -441,6 +441,63 @@ class LinearRegression(d2l.Module):
         net = state.params['params']['net']
         return net['kernel'], net['bias']
 
+class ToArray:
+    """Convert a PIL Image to numpy.ndarray."""
+    def __init__(self):
+        """Defined in :numref:`sec_fashion_mnist`"""
+        pass
+
+    def __call__(self, img):
+        return np.asarray(img) / 255  # Normalize arrays
+
+class FashionMNIST(d2l.DataModule):
+    """Defined in :numref:`sec_fashion_mnist`"""
+    def __init__(self, batch_size=64, resize=(28, 28)):
+        super().__init__()
+        self.save_hyperparameters()
+        trans = torchvision.transforms.Compose(
+                                    [torchvision.transforms.Resize(resize),
+                                     ToArray()])
+        self.train = torchvision.datasets.FashionMNIST(
+            root=self.root, train=True, transform=trans, download=True)
+        self.val = torchvision.datasets.FashionMNIST(
+            root=self.root, train=False, transform=trans, download=True)
+
+    def text_labels(self, indices):
+        """Return text labels.
+    
+        Defined in :numref:`sec_fashion_mnist`"""
+        labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
+                  'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
+        return [labels[int(i)] for i in indices]
+
+    def get_dataloader(self, train):
+        """Defined in :numref:`sec_fashion_mnist`"""
+        def jax_collate(batch):
+            if isinstance(batch[0], np.ndarray):
+                return jnp.stack(batch)
+            elif isinstance(batch[0], (tuple, list)):
+                transposed = zip(*batch)
+                return [jax_collate(samples) for samples in transposed]
+            else:
+                return jnp.array(batch)
+        data = self.train if train else self.val
+        return torch.utils.data.DataLoader(data, self.batch_size, shuffle=train,
+                                           collate_fn=jax_collate, num_workers=0)
+
+    def visualize(self, batch, nrows=1, ncols=8, labels=[]):
+        """Defined in :numref:`sec_fashion_mnist`"""
+        X, y = batch
+        if not labels:
+            labels = self.text_labels(y)
+        d2l.show_images(jnp.squeeze(X), nrows, ncols, titles=labels)
+
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
+    """Plot a list of images.
+
+    Defined in :numref:`sec_fashion_mnist`"""
+    raise NotImplementedError
+
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
     return jax.devices('cpu')[0]
