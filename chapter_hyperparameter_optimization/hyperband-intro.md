@@ -7,38 +7,30 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 :label:`sec_mf_hpo`
 
 
-Training neural networks can be expensive even for moderate size datasets.
+Training neural networks can be expensive even on moderate size datasets.
 For example, training a ResNet-50 on a rather small dataset set, such as CIFAR10
 might take 2 hours on a Amazon Elastic Cloud Compute (EC2) g4dn.xlarge instance.
-Random search will often be too slow to be of real use in practice for modest to
-large size neural networks trained on massive data sets.
+Depending on the search space, hyperparameter optimization usually requires ten to hundrets
+of function evaluations to converge.
+Even though we can significanly speed up the overall time we have to wait for our HPO process by distributing
+it across multiple workers :numref:`sec_rs_async`, this will not reduce the amount of compute that we have to invest. 
 
-The question that springs to mind is the following: in order to distinguish poorly
-performing from promosing hyperparameter configurations, do we have to train all
-of them for the full number of epochs? A lot of time could be saved by first
-evaluating configurations for a few epochs only, stopping the worst ones early.
-In this section, we will develop some competitive algorithms based on this **early
-stopping** idea.
-
-## Early Stopping Hyperparameter Configurations
-
+*Can we speed up the evaluation of hyperparameter configurations?* Methods such as random search allocate the exact same amount or resources, for example number of epocsh, training data points, etc to each hyperparameter configuration.
 The figure below depicts learning curves of a set of neural networks with different
 hyperparameter configurations trained for the same number of epochs. After a few
 epochs we are already able to visually distinguish between the well-performing and
 the poorly performing ones. However, the ordering is not perfect, and we might
 still require  the full amount of 100 epochs to identify the best performing configuration.
 
-<!-- ![Learning curves of random hyperparameter configurations](../../img/samples_lc.pdf) -->
-![Learning curves of random hyperparameter configurations](img/samples_lc.png)
+<!-- ![Learning curves of random hyperparameter configurations](../../img/samples_lc.svg) -->
+![Learning curves of random hyperparameter configurations](img/samples_lc.svg)
 :width:`400px`
 :label:`img_samples_lc`
 
-The idea of early stopping based HPO methods is to free up compute resources by
-early stopping the evaluation of poorly performing configurations and allocate
-them to more promising ones. This speeds up the optimization process, since we
+The idea of multi-fidelity hyperparameter optimization is to allocate more resources to promising configurations and early stop the evaluation of poorly performing ones. This speeds up the optimization process, since we
 have a higher throughput of configurations that we can try.
 
-More formally, we expand our definition in Section :ref:sec_definition_hpo,
+More formally, we expand our definition in Section :numref:`sec_definition_hpo`,
 such that our objective function $f(\mathbf{x}, r)$ gets an additional input
 $r \in [r_{min}, r_{max}]$ that specifies the amount of resource that we are
 willing to spend for the evaluation of $\mathbf{x}$. We assume that both the
@@ -75,8 +67,13 @@ this particular choice of $N$, only a single trial will be trained to the full
 budget $r_{max}$. Finally, once we finished one round of SH, we start the next
 round with a new set of initial configurations, until the total budget is spent.
 
+<!-- ![Learning curves of random hyperparameter configurations](../../img/sh.svg) -->
+![Learning curves of random hyperparameter configurations](img/sh.svg)
+:width:`400px`
+:label:`sh`
+
 To implement SH, we use the `HPOScheduler` base class from the previous Section.
-Since SH can be combined with Bayesian optimization (see Section :ref:`sec_mf_bo`),
+Since SH can be combined with Bayesian optimization (see Section :numref:`sec_mf_bo`),
 we allow for a generic `HPOSearcher` object to sample configurations. Additionally, the
 user has to input the minimum resource $r_{min}$, the maximum resource $r_{max}$
 and $\eta$.
@@ -109,19 +106,19 @@ from operator import itemgetter
 class SuccessiveHalvingScheduler(d2l.HPOScheduler):#@save
     def __init__(self, searcher, eta, r_min, r_max, prefact=1):
         self.save_hyperparameters()
-        # only used for Hyperband later
+        # Only used for Hyperband later
         self.prefact = prefact
-        # compute K, which is later used to determine the number of configurations
+        # Compute K, which is later used to determine the number of configurations
         self.K = int(np.log(r_max / r_min) / np.log(eta))
-        # define the rung levels
+        # Define the rung levels
         self.rung_levels = [r_min * eta ** k for k in range(self.K + 1)]
         if r_max not in self.rung_levels:
             # The final rung level should be r_max
             self.rung_levels.append(r_max)
             self.K += 1
-        # bookkeeping
+        # Bookkeeping
         self.observed_error_at_rungs = defaultdict(list)
-        # our processing queue
+        # Our processing queue
         self.queue = []
 ```
 
@@ -146,7 +143,7 @@ def suggest(self):
             config = searcher.sample_configuration()
             config['max_epochs'] = self.r_min  # set r = r_min
             self.queue.append(config)
-    # return an element from the queue
+    # Return an element from the queue
     return self.queue.pop()
 ```
 
@@ -160,15 +157,15 @@ configurations into the queue.
 @d2l.add_to_class(SuccessiveHalvingScheduler) #@save
 def update(self, config, error, info=None):
     ri = config['max_epochs']  # rung level r_i
-    # update our searcher, e.g if we use Bayesian optimization later
+    # Update our searcher, e.g if we use Bayesian optimization later
     self.searcher.update(config, error, additional_info=info)     
     if ri < r_max:
-        # bookkeeping
+        # Bookkeeping
         self.observed_error_at_rungs[ri].append((config, error.cpu().numpy()))
-        # determine how many configurations should be evaluated on this rung level
+        # Determine how many configurations should be evaluated on this rung level
         ki = self.K - self.rung_levels.index(ri)
         ni = int(self.prefact * self.eta ** ki)
-        # if we observed all configuration on this rung level r_i, we estimate the
+        # If we observed all configuration on this rung level r_i, we estimate the
         # top 1 / eta configuration, add them to queue and promote them for the
         # next rung level r_{i+1}
         if len(self.observed_error_at_rungs[ri]) >= ni:
@@ -178,7 +175,7 @@ def update(self, config, error, info=None):
                 rung_level=ri, n=niplus1
             )
             riplus1 = self.rung_levels[self.K - kiplus1]  # r_{i+1}
-            # queue may not be empty: insert new entries at the beginning
+            # Queue may not be empty: insert new entries at the beginning
             self.queue = [
                 dict(config, max_epochs=riplus1)
                 for config in best_performing_configurations
@@ -194,7 +191,7 @@ def get_top_n_configurations(self, rung_level, n):
     return [x[0] for x in sorted_rung[:n]]
 ```
 
-Let us see how this is doing on our example.
+Let us see how successive halving is doing on our neural network example.
 
 ```{.python .input  n=5}
 from scipy import stats
@@ -268,11 +265,14 @@ $s=0$ evaluates all configurations on $r_{min} = r_{max}$, which means that we
 effectively run random search. In practice we execute brackets in an round robin
 fashion, which means we start with $s=s_{max}$ again once we finished the loop.
 Given enough resources, we could also run all brackets in parallel because configurations are sampled at random.
-We will discuss this case in more detail in Section :ref:`sec_sh_async`.
+We will discuss this case in more detail in Section :numref:`sec_sh_async`.
 
-We implement a new scheduler, that maintains a `SuccessiveHalvingScheduler` object.
+<!-- ![Learning curves of random hyperparameter configurations](../../img/hb.svg) -->
+![Learning curves of random hyperparameter configurations](img/hb.svg)
+:width:`400px`
+:label:`hb`
 
-```{.python .input  n=8}
+We implement a new scheduler, that maintains a `SuccessiveHalvingScheduler` object.```{.python .input  n=8}
 %%tab all
 import numpy as np
 import copy
@@ -301,7 +301,7 @@ class HyperbandScheduler(d2l.HPOScheduler): #@save
 def update(self, config, error, info=None):
     self.brackets[self.s].append((config['max_epochs'], error.cpu().numpy()))
     self.successive_halving.update(config, error, info=info)
-    # if the queue of successive halving is empty, than we finished this round and start with
+    # If the queue of successive halving is empty, than we finished this round and start with
     # a new round with different r_min and N
     if len(self.successive_halving.queue) == 0:
         self.s -= 1
@@ -316,7 +316,7 @@ def update(self, config, error, info=None):
         )
 ```
 
-Let us see how this is doing.
+Let see how Hyperband is performing on our neural network example.
 
 ```{.python .input  n=21}
 searcher = d2l.RandomSearcher(search_space)
