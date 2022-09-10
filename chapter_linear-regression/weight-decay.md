@@ -359,7 +359,12 @@ In the following code, we specify
 the weight decay hyperparameter directly
 through `weight_decay` when instantiating our optimizer.
 By default, PyTorch decays both
-weights and biases simultaneously.
+weights and biases simultaneously, but
+we can configure the optimizer to handle different parameters
+according to different policies.
+Here, we only set `weight_decay` for
+the weights (the `net.weight` parameters), hence the 
+bias (the `net.b` parameter) will not decay.
 :end_tab:
 
 :begin_tab:`tensorflow`
