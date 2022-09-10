@@ -112,7 +112,7 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-### Implementation from Scratch
+## Implementation from Scratch
 
 To implement a bidirectional RNN from scratch, we can
 include two unidirectional `RNNScratch` instances
@@ -144,7 +144,7 @@ def forward(self, inputs, Hs=None):
     return outputs, (f_H, b_H)
 ```
 
-### Concise Implementation
+## Concise Implementation
 
 Using the high-level APIs,
 we can implement bidirectional RNNs more concisely.

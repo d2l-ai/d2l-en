@@ -6,7 +6,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # The Base Classification Model
 :label:`sec_classification`
 
-You may have noticed that the implementations from scratch and the concise implementation using framework functionality were quite similar in the case of regression. The same is true for classification. Since a great many models in this book deal with classification, it is worth adding some functionality to support this setting specifically. This section provides a base class for classification models to simplify future code.
+You may have noticed that the implementations from scratch and the concise implementation using framework functionality were quite similar in the case of regression. The same is true for classification. Since many models in this book deal with classification, it is worth adding functionalities to support this setting specifically. This section provides a base class for classification models to simplify future code.
 
 ```{.python .input  n=2}
 %%tab mxnet

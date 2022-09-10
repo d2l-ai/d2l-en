@@ -420,11 +420,16 @@ The steps are quite simple:
 
 ## Summary
 
-* Real data often contains a mix of different data types and need to be preprocessed.
-* Rescaling real-valued data to zero mean and unit variance is a good default. So is replacing missing values with their mean.
-* Transforming categorical features into indicator features allows us to treat them like one-hot vectors.
-* We can use $K$-fold cross-validation to select the model and adjust the hyperparameters.
-* Logarithms are useful for relative errors.
+Real data often contains a mix of different data types and needs to be preprocessed.
+Rescaling real-valued data to zero mean and unit variance is a good default. So is replacing missing values with their mean.
+Besides, transforming categorical features into indicator features allows us to treat them like one-hot vectors.
+When we tend to care more about
+the relative error than about the absolute error,
+we can 
+measure the discrepancy in the logarithm of the prediction.
+To select the model and adjust the hyperparameters,
+we can use $K$-fold cross-validation .
+
 
 
 ## Exercises

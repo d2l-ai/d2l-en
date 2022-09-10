@@ -204,8 +204,8 @@ def grad_clipping(net, theta):  #@save
 
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data iterator."""
-    dataset = data.TensorDataset(*data_arrays)
-    return data.DataLoader(dataset, batch_size, shuffle=is_train)
+    dataset = torch.utils.data.TensorDataset(*data_arrays)
+    return torch.utils.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = Xw + b + noise."""
@@ -235,10 +235,10 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
         root="../data", train=True, transform=trans, download=True)
     mnist_test = torchvision.datasets.FashionMNIST(
         root="../data", train=False, transform=trans, download=True)
-    return (data.DataLoader(mnist_train, batch_size, shuffle=True,
-                            num_workers=get_dataloader_workers()),
-            data.DataLoader(mnist_test, batch_size, shuffle=False,
-                            num_workers=get_dataloader_workers()))
+    return (torch.utils.data.DataLoader(mnist_train, batch_size, shuffle=True,
+                                        num_workers=get_dataloader_workers()),
+            torch.utils.data.DataLoader(mnist_test, batch_size, shuffle=False,
+                                        num_workers=get_dataloader_workers()))
 
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     """Compute the accuracy for a model on a dataset using a GPU."""

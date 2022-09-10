@@ -368,9 +368,10 @@ trainer.fit(model, data)
 
 ## Summary
 
-* Beyond controlling the number of dimensions and the size of the weight vector, dropout is yet another tool to avoid overfitting. Often they are used jointly.
-* Dropout replaces an activation $h$ with a random variable with expected value $h$.
-* Dropout is only used during training.
+Beyond controlling the number of dimensions and the size of the weight vector, dropout is yet another tool to avoid overfitting. Often they are used jointly.
+Note that dropout is
+used only during training:
+it replaces an activation $h$ with a random variable with expected value $h$.
 
 
 ## Exercises

@@ -189,8 +189,8 @@ def apply_init(self, inputs, init=None):
 
 ## Summary
 
-* Lazy initialization can be convenient, allowing the framework to infer parameter shapes automatically, making it easy to modify architectures and eliminating one common source of errors.
-* We can pass data through the model to make the framework finally initialize parameters.
+Lazy initialization can be convenient, allowing the framework to infer parameter shapes automatically, making it easy to modify architectures and eliminating one common source of errors.
+We can pass data through the model to make the framework finally initialize parameters.
 
 
 ## Exercises

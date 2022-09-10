@@ -145,9 +145,8 @@ class ViTBlock(nn.Module):
         self.mlp = ViTMLP(mlp_num_hiddens, num_hiddens, dropout)
 
     def forward(self, X, valid_lens=None):
-        X = self.ln1(X)
-        return X + self.mlp(self.ln2(
-            X + self.attention(X, X, X, valid_lens)))
+        X = X + self.attention(*([self.ln1(X)] * 3), valid_lens)
+        return X + self.mlp(self.ln2(X))
 ```
 
 Same as in :numref:`subsec_transformer-encoder`,
