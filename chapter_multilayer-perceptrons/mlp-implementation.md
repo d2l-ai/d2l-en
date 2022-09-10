@@ -239,7 +239,7 @@ class MLP(d2l.Classifier):
 
     @nn.compact
     def __call__(self, X):
-        X = X.reshape((X.shape[0], -1)) # flatten
+        X = X.reshape((X.shape[0], -1))  # Flatten
         X = nn.Dense(self.num_hiddens)(X)
         X = nn.relu(X)
         X = nn.Dense(self.num_outputs)(X)

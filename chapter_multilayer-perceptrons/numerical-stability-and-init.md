@@ -209,11 +209,11 @@ print('after multiplying 100 matrices\n', M.numpy())
 
 ```{.python .input}
 %%tab jax
-get_new_key = lambda: jax.random.PRNGKey(d2l.get_seed())  # generate PRNG keys
+get_key = lambda: jax.random.PRNGKey(d2l.get_seed())  # Generate PRNG keys
 M = jax.random.normal(get_new_key(), (4, 4))
 print('a single matrix \n', M)
 for i in range(100):
-    M = jnp.matmul(M, jax.random.normal(get_new_key(), (4, 4)))
+    M = jnp.matmul(M, jax.random.normal(get_key(), (4, 4)))
 
 print('after multiplying 100 matrices\n', M)
 ```
