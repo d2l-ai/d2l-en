@@ -1,6 +1,6 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Implementation of Multilayer Perceptrons
@@ -9,7 +9,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 Multilayer perceptrons (MLPs) are not much more complex to implement than simple linear models. The key conceptual
 difference is that we now concatenate multiple layers.
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -17,17 +17,25 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
 ```
 
 ## Implementation from Scratch
@@ -57,7 +65,7 @@ one weight matrix and one bias vector.
 As always, we allocate memory
 for the gradients of the loss with respect to these parameters.
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab mxnet
 class MLPScratch(d2l.Classifier):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
@@ -71,7 +79,7 @@ class MLPScratch(d2l.Classifier):
             param.attach_grad()
 ```
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab pytorch
 class MLPScratch(d2l.Classifier):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
@@ -83,7 +91,7 @@ class MLPScratch(d2l.Classifier):
         self.b2 = nn.Parameter(torch.zeros(num_outputs))
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab tensorflow
 class MLPScratch(d2l.Classifier):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
@@ -97,29 +105,53 @@ class MLPScratch(d2l.Classifier):
         self.b2 = tf.Variable(tf.zeros(num_outputs))
 ```
 
+```{.python .input}
+%%tab jax
+class MLPScratch(d2l.Classifier):
+    num_inputs: int
+    num_outputs: int
+    num_hiddens: int
+    lr: float
+    sigma: float = 0.01
+
+    def setup(self):
+        self.W1 = self.param('W1', nn.initializers.normal(self.sigma),
+                             (self.num_inputs, self.num_hiddens))
+        self.b1 = self.param('b1', nn.initializers.zeros, self.num_hiddens)
+        self.W2 = self.param('W2', nn.initializers.normal(self.sigma),
+                             (self.num_hiddens, self.num_outputs))
+        self.b2 = self.param('b2', nn.initializers.zeros, self.num_outputs)
+```
+
 ### Model
 
 To make sure we know how everything works,
 we will [**implement the ReLU activation**] ourselves
 rather than invoking the built-in `relu` function directly.
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab mxnet
 def relu(X):
     return np.maximum(X, 0)
 ```
 
-```{.python .input  n=9}
+```{.python .input}
 %%tab pytorch
 def relu(X):
     a = torch.zeros_like(X)
     return torch.max(X, a)
 ```
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab tensorflow
 def relu(X):
     return tf.math.maximum(X, 0)
+```
+
+```{.python .input}
+%%tab jax
+def relu(X):
+    return jnp.maximum(X, 0)
 ```
 
 Since we are disregarding spatial structure,
@@ -128,7 +160,7 @@ a flat vector of length  `num_inputs`.
 Finally, we (**implement our model**)
 with just a few lines of code. Since we use the framework built-in autograd this is all that it takes.
 
-```{.python .input  n=11}
+```{.python .input}
 %%tab all
 @d2l.add_to_class(MLPScratch)
 def forward(self, X):
@@ -142,7 +174,7 @@ def forward(self, X):
 Fortunately, [**the training loop for MLPs
 is exactly the same as for softmax regression.**] We define the model, data, trainer and finally invoke the `fit` function on model and data.
 
-```{.python .input  n=12}
+```{.python .input}
 %%tab all
 model = MLPScratch(num_inputs=784, num_outputs=10, num_hiddens=256, lr=0.1)
 data = d2l.FashionMNIST(batch_size=256)
@@ -196,6 +228,22 @@ class MLP(d2l.Classifier):
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(num_hiddens, activation='relu'),
             tf.keras.layers.Dense(num_outputs)])
+```
+
+```{.python .input}
+%%tab jax
+class MLP(d2l.Classifier):
+    num_outputs: int
+    num_hiddens: int
+    lr: float
+
+    @nn.compact
+    def __call__(self, X):
+        X = X.reshape((X.shape[0], -1))  # Flatten
+        X = nn.Dense(self.num_hiddens)(X)
+        X = nn.relu(X)
+        X = nn.Dense(self.num_outputs)(X)
+        return X
 ```
 
 ### Training
