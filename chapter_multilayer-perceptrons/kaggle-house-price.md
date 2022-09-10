@@ -143,6 +143,7 @@ import pandas as pd
 from d2l import jax as d2l
 import jax
 from jax import numpy as jnp
+import numpy as np
 import pandas as pd
 ```
 
