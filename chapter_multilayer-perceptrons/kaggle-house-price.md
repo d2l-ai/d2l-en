@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Predicting House Prices on Kaggle
@@ -127,7 +127,6 @@ from d2l import torch as d2l
 import torch
 from torch import nn
 import pandas as pd
-import numpy as np
 ```
 
 ```{.python .input}
@@ -136,7 +135,16 @@ import numpy as np
 from d2l import tensorflow as d2l
 import tensorflow as tf
 import pandas as pd
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
 import numpy as np
+import pandas as pd
 ```
 
 To get started, we will [**read in and process the data
@@ -394,8 +402,13 @@ The following code will generate a file called `submission.csv`.
 
 ```{.python .input}
 %%tab all
-preds = [model(d2l.tensor(data.val.values, dtype=d2l.float32))
-         for model in models]
+if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    preds = [model(d2l.tensor(data.val.values, dtype=d2l.float32))
+             for model in models]
+if tab.selected('jax'):
+    preds = [model.apply(trainer.state.params,
+             d2l.tensor(data.val.values, dtype=d2l.float32))
+             for model in models]
 # Taking exponentiation of predictions in the logarithm scale
 ensemble_preds = d2l.reduce_mean(d2l.exp(d2l.concat(preds, 1)), 1)
 submission = pd.DataFrame({'Id':data.raw_val.Id,
