@@ -512,7 +512,7 @@ def accuracy(y_hat, y):  #@save
 ```
 
 ```{.python .input}
-%%tab pytorch, mxnet, tensorflow
+%%tab all
 
 import os
 import requests
