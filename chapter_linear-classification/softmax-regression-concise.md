@@ -70,6 +70,14 @@ We use a `Flatten` layer to convert the 4th order tensor `X`
 by keeping the dimension along the first axis unchanged.
 :end_tab:
 
+:begin_tab:`jax`
+Flax allows users to write the network class in a more compact way
+using `@nn.compact` dectorator. With `@nn.compact`, one
+can simply write all network logic inside a single “forward pass”
+method, without needing to define the standard `setup` method in
+the dataclass.
+:end_tab:
+
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
 class SoftmaxRegression(d2l.Classifier):
