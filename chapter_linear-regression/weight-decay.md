@@ -397,7 +397,6 @@ class WeightDecay(d2l.LinearRegression):
         self.wd = wd
 
     def configure_optimizers(self):
-        """Defined in :numref:`sec_linear_concise`"""
         return torch.optim.SGD([
             {'params': self.net.weight, 'weight_decay': self.wd},
             {'params': self.net.bias}], lr=self.lr)
