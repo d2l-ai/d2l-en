@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Numerical Stability and Initialization
@@ -133,6 +133,21 @@ d2l.plot(x.numpy(), [y.numpy(), t.gradient(y, x).numpy()],
          legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 ```
 
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+from jax import grad, vmap
+
+x = jnp.arange(-8.0, 8.0, 0.1)
+y = jax.nn.sigmoid(x)
+grad_sigmoid = vmap(grad(jax.nn.sigmoid))
+d2l.plot(x, [y, grad_sigmoid(x)],
+         legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
+```
+
 As you can see, (**the sigmoid's gradient vanishes
 both when its inputs are large and when they are small**).
 Moreover, when backpropagating through many layers,
@@ -190,6 +205,17 @@ for i in range(100):
     M = tf.matmul(M, tf.random.normal((4, 4)))
 
 print('after multiplying 100 matrices\n', M.numpy())
+```
+
+```{.python .input}
+%%tab jax
+get_new_key = lambda: jax.random.PRNGKey(d2l.get_seed())  # generate PRNG keys
+M = jax.random.normal(get_new_key(), (4, 4))
+print('a single matrix \n', M)
+for i in range(100):
+    M = jnp.matmul(M, jax.random.normal(get_new_key(), (4, 4)))
+
+print('after multiplying 100 matrices\n', M)
 ```
 
 ### Breaking the Symmetry
