@@ -390,10 +390,16 @@ class WeightDecay(d2l.LinearRegression):
         super().__init__(lr)
         self.save_hyperparameters()
         self.wd = wd
-    
-    def configure_optimizers(self):
-        return torch.optim.SGD(self.net.parameters(), 
-                               lr=self.lr, weight_decay=self.wd)
+
+   def configure_optimizers(self):
+        """Defined in :numref:`sec_linear_concise`"""
+        return torch.optim.SGD(
+            [
+                {"params": self.net.weight, "weight_decay": self.wd},
+                {"params": self.net.bias},
+            ],
+            lr=self.lr,
+        )
 ```
 
 ```{.python .input  n=13}
