@@ -364,7 +364,7 @@ we can configure the optimizer to handle different parameters
 according to different policies.
 Here, we only set `weight_decay` for
 the weights (the `net.weight` parameters), hence the 
-bias (the `net.b` parameter) will not decay.
+bias (the `net.bias` parameter) will not decay.
 :end_tab:
 
 :begin_tab:`tensorflow`
