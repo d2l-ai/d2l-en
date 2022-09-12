@@ -9,8 +9,7 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 
 We have compared CNNs, RNNs, and self-attention in
 :numref:`subsec_cnn-rnn-self-attention`.
-Notably,
-self-attention
+Notably, self-attention
 enjoys both parallel computation and
 the shortest maximum path length.
 Therefore naturally,
@@ -75,10 +74,11 @@ we require that $\mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ so that
 the residual connection $\mathbf{x} + \mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ is feasible.
 This addition from the residual connection is immediately
 followed by layer normalization :cite:`Ba.Kiros.Hinton.2016`.
-As a result, the transformer encoder outputs a $d$-dimensional vector representation for each position of the input sequence.
+As a result, the transformer encoder outputs a $d$-dimensional vector representation 
+for each position of the input sequence.
 
-The transformer decoder is also
-a stack of multiple identical layers with residual connections and layer normalizations.
+The transformer decoder is also a stack of multiple identical layers 
+with residual connections and layer normalizations.
 Besides the two sublayers described in
 the encoder, the decoder inserts
 a third sublayer, known as
@@ -92,21 +92,21 @@ from the transformer encoder outputs.
 In the decoder self-attention,
 queries, keys, and values are all from the
 outputs of the previous decoder layer.
-However,
-each position in the decoder is
+However, each position in the decoder is
 allowed to only attend to all positions in the decoder
 up to that position.
 This *masked* attention
 preserves the auto-regressive property,
-ensuring that the prediction only depends on those output tokens that have been generated.
+ensuring that the prediction only depends 
+on those output tokens that have been generated.
 
 
 We have already described and implemented
 multi-head attention based on scaled dot-products
 in :numref:`sec_multihead-attention`
 and positional encoding in :numref:`subsec_positional-encoding`.
-In the following,
-we will implement the rest of the transformer model.
+In the following, we will implement
+the rest of the transformer model.
 
 ```{.python .input}
 %%tab mxnet
@@ -138,14 +138,14 @@ import tensorflow as tf
 ## [**Positionwise Feed-Forward Networks**]
 :label:`subsec_positionwise-ffn`
 
-The positionwise feed-forward network
-transforms
+The positionwise feed-forward network transforms
 the representation at all the sequence positions
 using the same MLP.
 This is why we call it *positionwise*.
 In the implementation below,
 the input `X` with shape
-(batch size, number of time steps or sequence length in tokens, number of hidden units or feature dimension)
+(batch size, number of time steps or sequence length in tokens,
+number of hidden units or feature dimension)
 will be transformed by a two-layer MLP into
 an output tensor of shape
 (batch size, number of time steps, `ffn_num_outputs`).
@@ -227,10 +227,8 @@ ffn(tf.ones((2, 3, 4)))[0]
 
 ## Residual Connection and Layer Normalization
 
-Now let's focus on
-the "add & norm" component in :numref:`fig_transformer`.
-As we described at the beginning
-of this section,
+Now let's focus on the "add & norm" component in :numref:`fig_transformer`.
+As we described at the beginning of this section,
 this is a residual connection immediately
 followed by layer normalization.
 Both are key to effective deep architectures.
@@ -1126,10 +1124,15 @@ for different deep learning tasks.
 
 ## Summary
 
-* The transformer is an instance of the encoder-decoder architecture, though either the encoder or the decoder can be used individually in practice.
-* In the transformer, multi-head self-attention is used for representing the input sequence and the output sequence, though the decoder has to preserve the auto-regressive property via a masked version.
-* Both the residual connections and the layer normalization in the transformer are important for training a very deep model.
-* The positionwise feed-forward network in the transformer model transforms the representation at all the sequence positions using the same MLP.
+The transformer is an instance of the encoder-decoder architecture, 
+though either the encoder or the decoder can be used individually in practice.
+In the transformer, multi-head self-attention is used 
+for representing the input sequence and the output sequence, 
+though the decoder has to preserve the auto-regressive property via a masked version.
+Both the residual connections and the layer normalization in the transformer
+are important for training a very deep model.
+The positionwise feed-forward network in the transformer model 
+transforms the representation at all the sequence positions using the same MLP.
 
 ## Exercises
 
