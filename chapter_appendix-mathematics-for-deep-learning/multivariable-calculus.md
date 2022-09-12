@@ -69,6 +69,7 @@ $$
 We can test this in code to see how good the approximation is.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -197,6 +198,7 @@ $$
 The only possible location of minima are at $x = -1, 0, 2$, where the function takes the values $-5,0, -32$ respectively, and thus we can conclude that we minimize our function when $x = 2$.  A quick plot confirms this.
 
 ```{.python .input}
+#@tab mxnet
 x = np.arange(-2, 3, 0.01)
 f = (3 * x**4) - (4 * x**3) - (12 * x**2)
 
@@ -399,6 +401,7 @@ This is precisely what every deep learning algorithm implements to allow the com
 To see how to encapsulated this, let's take a quick look at this example.
 
 ```{.python .input}
+#@tab mxnet
 # Initialize as ndarrays, then attach gradients
 w, x, y, z = np.array(-1), np.array(0), np.array(-2), np.array(1)
 
@@ -543,6 +546,7 @@ f(x, y) \approx e^{-1}\left(-1 - (x+1) +(x+1)^2+y^2\right).
 $$
 
 ```{.python .input}
+#@tab mxnet
 # Construct grid and compute function
 x, y = np.meshgrid(np.linspace(-2, 2, 101),
                    np.linspace(-2, 2, 101), indexing='ij')
@@ -553,8 +557,10 @@ w = np.exp(-1)*(-1 - (x + 1) + (x + 1)**2 + y**2)
 
 # Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
-ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
-ax.plot_wireframe(x, y, w, **{'rstride': 10, 'cstride': 10}, color='purple')
+ax.plot_wireframe(x.asnumpy(), y.asnumpy(), z.asnumpy(),
+                  **{'rstride': 10, 'cstride': 10})
+ax.plot_wireframe(x.asnumpy(), y.asnumpy(), w.asnumpy(),
+                  **{'rstride': 10, 'cstride': 10}, color='purple')
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
 d2l.set_figsize()
@@ -741,7 +747,7 @@ Let's try this out.  Suppose that $\mathbf{X}$ is a $n \times m$ matrix, $\mathb
 $$\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2} = \;?$$
 :eqlabel:`eq_mat_goal_2`
 
-This computation is important in an area called matrix factorization.  For us, however, it is just a derivative to compute.  Let's try to imaging what this would be for $1\times1$ matrices.  In that case, we get the expression
+This computation is important in an area called matrix factorization.  For us, however, it is just a derivative to compute.  Let's try to imagine what this would be for $1\times1$ matrices.  In that case, we get the expression
 
 $$
 \frac{d}{dv} (x-uv)^{2}= -2(x-uv)u,

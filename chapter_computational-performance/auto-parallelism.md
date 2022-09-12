@@ -8,11 +8,12 @@ and can selectively execute multiple non-interdependent tasks in parallel to
 improve speed. For instance, :numref:`fig_asyncgraph` in :numref:`sec_async` initializes two variables independently. Consequently the system can choose to execute them in parallel.
 
 
-Typically, a single operator will use all the computational resources on all CPUs or on a single GPU. For example, the `dot` operator will use all cores (and threads) on all CPUs, even if there are multiple CPU processors on a single machine. The same applies to a single GPU. Hence parallelization is not quite so useful for single-device computers. With multiple devices things matter more. While parallelization is typically most relevant between multiple GPUs, adding the local CPU will increase performance slightly. For example, see :cite:`Hadjis.Zhang.Mitliagkas.ea.2016` that focuses on training computer vision models combining a GPU and a CPU. With the convenience of an automatically parallelizing framework we can accomplish the same goal in a few lines of Python code. More broadly, our discussion of automatic parallel computation focuses on parallel computation using both CPUs and GPUs, as well as the parallelization of computation and communication.
+Typically, a single operator will use all the computational resources on all CPUs or on a single GPU. For example, the `dot` operator will use all cores (and threads) on all CPUs, even if there are multiple CPU processors on a single machine. The same applies to a single GPU. Hence parallelization is not quite so useful for single-device computers. With multiple devices things matter more. While parallelization is typically most relevant between multiple GPUs, adding the local CPU will increase performance slightly. For example, see :citet:`Hadjis.Zhang.Mitliagkas.ea.2016` that focuses on training computer vision models combining a GPU and a CPU. With the convenience of an automatically parallelizing framework we can accomplish the same goal in a few lines of Python code. More broadly, our discussion of automatic parallel computation focuses on parallel computation using both CPUs and GPUs, as well as the parallelization of computation and communication.
 
 Note that we need at least two GPUs to run the experiments in this section.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
@@ -29,6 +30,7 @@ import torch
 Let's start by defining a reference workload to test: the `run` function below performs 10 matrix-matrix multiplications on the device of our choice using data allocated into two variables: `x_gpu1` and `x_gpu2`.
 
 ```{.python .input}
+#@tab mxnet
 devices = d2l.try_all_gpus()
 def run(x):
     return [x.dot(x) for _ in range(50)]
@@ -56,9 +58,10 @@ Now we apply the function to the data. To ensure that caching does not play a ro
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 run(x_gpu1)  # Warm-up both devices
 run(x_gpu2)
-npx.waitall()  
+npx.waitall()
 
 with d2l.Benchmark('GPU1 time'):
     run(x_gpu1)
@@ -94,6 +97,7 @@ If we remove the `synchronize` statement between both tasks the system is free t
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark('GPU1 & GPU2'):
     run(x_gpu1)
     run(x_gpu2)
@@ -114,11 +118,12 @@ In the above case the total execution time is less than the sum of its parts, si
 
 ## Parallel Computation and Communication
 
-In many cases we need to move data between different devices, say between the CPU and GPU, or between different GPUs. 
+In many cases we need to move data between different devices, say between the CPU and GPU, or between different GPUs.
 For instance,
 this occurs when we want to perform distributed optimization where we need to aggregate the gradients over multiple accelerator cards. Let's simulate this by computing on the GPU and then copying the results back to the CPU.
 
 ```{.python .input}
+#@tab mxnet
 def copy_to_cpu(x):
     return [y.copyto(npx.cpu()) for y in x]
 
@@ -154,6 +159,7 @@ This is somewhat inefficient. Note that we could already start copying parts of 
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 with d2l.Benchmark('Run on GPU1 and copy to CPU'):
     y = run(x_gpu1)
     y_cpu = copy_to_cpu(y)
@@ -179,16 +185,16 @@ We conclude with an illustration of the computational graph and its dependencies
 
 ## Summary
 
-* Modern systems have a variety of devices, such as multiple GPUs and CPUs. They can be used in parallel, asynchronously. 
-* Modern systems also have a variety of resources for communication, such as PCI Express, storage (typically solid-state drives or via networks), and network bandwidth. They can be used in parallel for peak efficiency. 
-* The backend can improve performance through automatic parallel computation and communication. 
+* Modern systems have a variety of devices, such as multiple GPUs and CPUs. They can be used in parallel, asynchronously.
+* Modern systems also have a variety of resources for communication, such as PCI Express, storage (typically solid-state drives or via networks), and network bandwidth. They can be used in parallel for peak efficiency.
+* The backend can improve performance through automatic parallel computation and communication.
 
 ## Exercises
 
 1. Eight operations were performed in the `run` function defined in this section. There are no dependencies between them. Design an experiment to see if the deep learning framework will automatically execute them in parallel.
-1. When the workload of an individual operator is sufficiently small, parallelization can help even on a single CPU or GPU. Design an experiment to verify this. 
+1. When the workload of an individual operator is sufficiently small, parallelization can help even on a single CPU or GPU. Design an experiment to verify this.
 1. Design an experiment that uses parallel computation on CPUs, GPUs, and communication between both devices.
-1. Use a debugger such as NVIDIA's [Nsight](https://developer.nvidia.com/nsight-compute-2019_5) to verify that your code is efficient. 
+1. Use a debugger such as NVIDIA's [Nsight](https://developer.nvidia.com/nsight-compute-2019_5) to verify that your code is efficient.
 1. Designing computation tasks that include more complex data dependencies, and run experiments to see if you can obtain the correct results while improving performance.
 
 :begin_tab:`mxnet`

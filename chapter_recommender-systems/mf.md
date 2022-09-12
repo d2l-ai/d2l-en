@@ -1,7 +1,7 @@
 # Matrix Factorization
 
 Matrix Factorization :cite:`Koren.Bell.Volinsky.2009` is a well-established algorithm in the recommender systems literature. The first version of matrix factorization model is proposed by Simon Funk in a famous [blog
-post](https://sifter.org/~simon/journal/20061211.html) in which he described the idea of factorizing the interaction matrix. It then became widely known due to the Netflix contest which was held in 2006. At that time, Netflix, a media-streaming and video-rental company, announced a contest to improve its recommender system performance. The best team that can improve on the Netflix baseline, i.e., Cinematch), by 10 percent would win a one million USD prize.  As such, this contest attracted
+post](https://sifter.org/%7Esimon/journal/20061211.html) in which he described the idea of factorizing the interaction matrix. It then became widely known due to the Netflix contest which was held in 2006. At that time, Netflix, a media-streaming and video-rental company, announced a contest to improve its recommender system performance. The best team that can improve on the Netflix baseline, i.e., Cinematch), by 10 percent would win a one million USD prize.  As such, this contest attracted
 a lot of attention to the field of recommender system research. Subsequently, the grand prize was won by the BellKor's Pragmatic Chaos team, a combined team of BellKor, Pragmatic Theory, and BigChaos (you do not need to worry about these algorithms now). Although the final score was the result of an ensemble solution (i.e., a combination of many algorithms), the matrix factorization algorithm played a critical role in the final blend. The technical report of the Netflix Grand Prize solution :cite:`Toscher.Jahrer.Bell.2009` provides a detailed introduction to the adopted model. In this section, we will dive into the details of the matrix factorization model and its implementation.
 
 
@@ -38,6 +38,7 @@ An intuitive illustration of the matrix factorization model is shown below:
 In the rest of this section, we will explain the implementation of matrix factorization and train the model on the MovieLens dataset.
 
 ```{.python .input  n=2}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
@@ -50,6 +51,7 @@ npx.set_np()
 First, we implement the matrix factorization model described above. The user and item latent factors can be created with the `nn.Embedding`. The `input_dim` is the number of items/users and the (`output_dim`) is the dimension of the latent factors ($k$).  We can also use `nn.Embedding` to create the user/item biases by setting the `output_dim` to one. In the `forward` function, user and item ids are used to look up the embeddings.
 
 ```{.python .input  n=4}
+#@tab mxnet
 class MF(nn.Block):
     def __init__(self, num_factors, num_users, num_items, **kwargs):
         super(MF, self).__init__(**kwargs)
@@ -78,6 +80,7 @@ $$
 where $\mathcal{T}$ is the set consisting of pairs of users and items that you want to evaluate on. $|\mathcal{T}|$ is the size of this set. We can use the RMSE function provided by `mx.metric`.
 
 ```{.python .input  n=3}
+#@tab mxnet
 def evaluator(net, test_iter, devices):
     rmse = mx.metric.RMSE()  # Get the RMSE
     rmse_list = []
@@ -97,6 +100,7 @@ def evaluator(net, test_iter, devices):
 In the training function, we adopt the $\ell_2$ loss with weight decay. The weight decay mechanism has the same effect as the $\ell_2$ regularization.
 
 ```{.python .input  n=4}
+#@tab mxnet
 #@save
 def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                         devices=d2l.try_all_gpus(), evaluator=None,
@@ -112,7 +116,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
             values = values if isinstance(values, list) else [values]
             for v in values:
                 input_data.append(gluon.utils.split_and_load(v, devices))
-            train_feat = input_data[0:-1] if len(values) > 1 else input_data
+            train_feat = input_data[:-1] if len(values) > 1 else input_data
             train_label = input_data[-1]
             with autograd.record():
                 preds = [net(*t) for t in zip(*train_feat)]
@@ -138,6 +142,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
 Finally, let's put all things together and train the model. Here, we set the latent factor dimension to 30.
 
 ```{.python .input  n=5}
+#@tab mxnet
 devices = d2l.try_all_gpus()
 num_users, num_items, train_iter, test_iter = d2l.split_and_load_ml100k(
     test_ratio=0.1, batch_size=512)
@@ -154,6 +159,7 @@ train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
 Below, we use the trained model to predict the rating that a user (ID 20) might give to an item (ID 30).
 
 ```{.python .input  n=6}
+#@tab mxnet
 scores = net(np.array([20], dtype='int', ctx=devices[0]),
              np.array([30], dtype='int', ctx=devices[0]))
 scores

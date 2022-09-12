@@ -174,7 +174,7 @@ print('after multiplying 100 matrices', M)
 
 ```{.python .input}
 %%tab pytorch
-M = torch.normal(0, 1, size=(4,4))
+M = torch.normal(0, 1, size=(4, 4))
 print('a single matrix \n',M)
 for i in range(100):
     M = M @ torch.normal(0, 1, size=(4, 4))
@@ -357,11 +357,11 @@ a clever idea and contribute an implementation to deep learning frameworks.
 
 ## Summary
 
-* Vanishing and exploding gradients are common issues in deep networks. Great care in parameter initialization is required to ensure that gradients and parameters remain well controlled.
-* Initialization heuristics are needed to ensure that the initial gradients are neither too large nor too small.
-* ReLU activation functions mitigate the vanishing gradient problem. This can accelerate convergence.
-* Random initialization is key to ensure that symmetry is broken before optimization.
-* Xavier initialization suggests that, for each layer, variance of any output is not affected by the number of inputs, and variance of any gradient is not affected by the number of outputs.
+Vanishing and exploding gradients are common issues in deep networks. Great care in parameter initialization is required to ensure that gradients and parameters remain well controlled.
+Initialization heuristics are needed to ensure that the initial gradients are neither too large nor too small.
+Random initialization is key to ensure that symmetry is broken before optimization.
+Xavier initialization suggests that, for each layer, variance of any output is not affected by the number of inputs, and variance of any gradient is not affected by the number of outputs.
+ReLU activation functions mitigate the vanishing gradient problem. This can accelerate convergence.
 
 ## Exercises
 

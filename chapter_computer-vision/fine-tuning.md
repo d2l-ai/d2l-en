@@ -61,6 +61,7 @@ We will use the fine-tuned model to recognize
 hot dogs from images.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import gluon, init, np, npx
@@ -105,6 +106,7 @@ data_dir = d2l.download_extract('hotdog')
 We create two instances to read all the image files in the training and testing datasets, respectively.
 
 ```{.python .input}
+#@tab mxnet
 train_imgs = gluon.data.vision.ImageFolderDataset(
     os.path.join(data_dir, 'train'))
 test_imgs = gluon.data.vision.ImageFolderDataset(
@@ -139,6 +141,7 @@ the mean value of a channel is subtracted from each value of that channel and th
 [~~Data augmentations~~]
 
 ```{.python .input}
+#@tab mxnet
 # Specify the means and standard deviations of the three RGB channels to
 # standardize each channel
 normalize = gluon.data.vision.transforms.Normalize(
@@ -184,6 +187,7 @@ If this model is used for the first time,
 Internet connection is required for download.
 
 ```{.python .input}
+#@tab mxnet
 pretrained_net = gluon.model_zoo.vision.resnet18_v2(pretrained=True)
 ```
 
@@ -203,6 +207,7 @@ The main purpose of this division is to facilitate the fine-tuning of model para
 :end_tab:
 
 ```{.python .input}
+#@tab mxnet
 pretrained_net.output
 ```
 
@@ -226,6 +231,7 @@ In contrast, model parameters in the output layer are randomly initialized and g
 Letting the base learning rate be $\eta$, a learning rate of $10\eta$ will be used to iterate the model parameters in the output layer.
 
 ```{.python .input}
+#@tab mxnet
 finetune_net = gluon.model_zoo.vision.resnet18_v2(classes=2)
 finetune_net.features = pretrained_net.features
 finetune_net.output.initialize(init.Xavier())
@@ -246,6 +252,7 @@ nn.init.xavier_uniform_(finetune_net.fc.weight);
 First, we define a training function `train_fine_tuning` that uses fine-tuning so it can be called multiple times.
 
 ```{.python .input}
+#@tab mxnet
 def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5):
     train_iter = gluon.data.DataLoader(
         train_imgs.transform_first(train_augs), batch_size, shuffle=True)
@@ -293,6 +300,7 @@ We [**set the base learning rate to a small value**]
 in order to *fine-tune* the model parameters obtained via pretraining. Based on the previous settings, we will train the output layer parameters of the target model from scratch using a learning rate ten times greater.
 
 ```{.python .input}
+#@tab mxnet
 train_fine_tuning(finetune_net, 0.01)
 ```
 
@@ -304,6 +312,7 @@ train_fine_tuning(finetune_net, 5e-5)
 [**For comparison,**] we define an identical model, but (**initialize all of its model parameters to random values**). Since the entire model needs to be trained from scratch, we can use a larger learning rate.
 
 ```{.python .input}
+#@tab mxnet
 scratch_net = gluon.model_zoo.vision.resnet18_v2(classes=2)
 scratch_net.initialize(init=init.Xavier())
 train_fine_tuning(scratch_net, 0.1)
@@ -334,6 +343,7 @@ because its initial parameter values are more effective.
 3. Set the parameters before the output layer of `finetune_net` to those of the source model and do *not* update them during training. How does the accuracy of the model change? You can use the following code.
 
 ```{.python .input}
+#@tab mxnet
 finetune_net.features.collect_params().setattr('grad_req', 'null')
 ```
 
@@ -346,6 +356,7 @@ for param in finetune_net.parameters():
 4. In fact, there is a "hotdog" class in the `ImageNet` dataset. Its corresponding weight parameter in the output layer can be obtained via the following code. How can we leverage this weight parameter?
 
 ```{.python .input}
+#@tab mxnet
 weight = pretrained_net.output.weight
 hotdog_w = np.split(weight.data(), 1000, axis=0)[713]
 hotdog_w.shape
@@ -354,7 +365,7 @@ hotdog_w.shape
 ```{.python .input}
 #@tab pytorch
 weight = pretrained_net.fc.weight
-hotdog_w = torch.split(weight.data, 1, dim=0)[713]
+hotdog_w = torch.split(weight.data, 1, dim=0)[934]
 hotdog_w.shape
 ```
 

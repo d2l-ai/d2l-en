@@ -17,6 +17,7 @@ into minibatches
 that can be iterated over during training.
 
 ```{.python .input}
+#@tab mxnet
 import collections
 from d2l import mxnet as d2l
 import math
@@ -283,6 +284,7 @@ among indices 1, 2, and 3
 with sampling probabilities $P(X=1)=2/9, P(X=2)=3/9$, and $P(X=3)=4/9$ as follows.
 
 ```{.python .input}
+#@tab mxnet
 generator = RandomGenerator([2, 3, 4])
 [generator.draw() for _ in range(10)]
 ```
@@ -402,11 +404,12 @@ for name, data in zip(names, batch):
     print(name, '=', data)
 ```
 
-## Putting All Things Together
+## Putting It All Together
 
 Last, we define the `load_data_ptb` function that reads the PTB dataset and returns the data iterator and the vocabulary.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
     """Download the PTB dataset and then load it into memory."""

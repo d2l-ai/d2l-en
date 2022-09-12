@@ -6,15 +6,16 @@ In :numref:`sec_calculus`, we saw the basic elements of differential calculus.  
 ## Differential Calculus
 Differential calculus is fundamentally the study of how functions behave under small changes.  To see why this is so core to deep learning, let's consider an example.
 
-Suppose that we have a deep neural network where the weights are, for convenience, concatenated into a single vector $\mathbf{w} = (w_1, \ldots, w_n)$.  Given a training dataset, we consider the loss of our neural network on this dataset, which we will write as $\mathcal{L}(\mathbf{w})$.  
+Suppose that we have a deep neural network where the weights are, for convenience, concatenated into a single vector $\mathbf{w} = (w_1, \ldots, w_n)$.  Given a training dataset, we consider the loss of our neural network on this dataset, which we will write as $\mathcal{L}(\mathbf{w})$.
 
 This function is extraordinarily complex, encoding the performance of all possible models of the given architecture on this dataset, so it is nearly impossible to tell what set of weights $\mathbf{w}$ will minimize the loss. Thus, in practice, we often start by initializing our weights *randomly*, and then iteratively take small steps in the direction which makes the loss decrease as rapidly as possible.
 
-The question then becomes something that on the surface is no easier: how do we find the direction which makes the weights decrease as quickly as possible?  To dig into this, let's first examine the case with only a single weight: $L(\mathbf{w}) = L(x)$ for a single real value $x$. 
+The question then becomes something that on the surface is no easier: how do we find the direction which makes the weights decrease as quickly as possible?  To dig into this, let's first examine the case with only a single weight: $L(\mathbf{w}) = L(x)$ for a single real value $x$.
 
 Let's take $x$ and try to understand what happens when we change it by a small amount to $x + \epsilon$. If you wish to be concrete, think a number like $\epsilon = 0.0000001$.  To help us visualize what happens, let's graph an example function, $f(x) = \sin(x^x)$, over the $[0, 3]$.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -58,6 +59,7 @@ d2l.plot(x_big, ys, 'x', 'f(x)')
 At this large scale, the function's behavior is not simple. However, if we reduce our range to something smaller like $[1.75,2.25]$, we see that the graph becomes much simpler.
 
 ```{.python .input}
+#@tab mxnet
 # Plot a the same function in a tiny range
 x_med = np.arange(1.75, 2.25, 0.001)
 ys = np.sin(x_med**x_med)
@@ -83,6 +85,7 @@ d2l.plot(x_med, ys, 'x', 'f(x)')
 Taking this to an extreme, if we zoom into a tiny segment, the behavior becomes far simpler: it is just a straight line.
 
 ```{.python .input}
+#@tab mxnet
 # Plot a the same function in a tiny range
 x_small = np.arange(2.0, 2.01, 0.0001)
 ys = np.sin(x_small**x_small)
@@ -132,7 +135,7 @@ $$
 \lim_{\epsilon \rightarrow 0}\frac{L(4+\epsilon) - L(4)}{\epsilon} = 8.
 $$
 
-As a bit of a historical digression: in the first few decades of neural network research, scientists used this algorithm (the *method of finite differences*) to evaluate how a loss function changed under small perturbation: just change the weights and see how the loss changed.  This is computationally inefficient, requiring two evaluations of the loss function to see how a single change of one variable influenced the loss.  If we tried to do this with even a paltry few thousand parameters, it would require several thousand evaluations of the network over the entire dataset!  It was not solved until 1986 that the *backpropagation algorithm* introduced in :cite:`Rumelhart.Hinton.Williams.ea.1988` provided a way to calculate how *any* change of the weights together would change the loss in the same computation time as a single prediction of the network over the dataset.
+As a bit of a historical digression: in the first few decades of neural network research, scientists used this algorithm (the *method of finite differences*) to evaluate how a loss function changed under small perturbation: just change the weights and see how the loss changed.  This is computationally inefficient, requiring two evaluations of the loss function to see how a single change of one variable influenced the loss.  If we tried to do this with even a paltry few thousand parameters, it would require several thousand evaluations of the network over the entire dataset!  It was not solved until 1986 that the *backpropagation algorithm* introduced in :citet:`Rumelhart.Hinton.Williams.ea.1988` provided a way to calculate how *any* change of the weights together would change the loss in the same computation time as a single prediction of the network over the dataset.
 
 Back in our example, this value $8$ is different for different values of $x$, so it makes sense to define it as a function of $x$.  More formally, this value dependent rate of change is referred to as the *derivative* which is written as
 
@@ -254,7 +257,7 @@ Two things should be clear after doing this example:
 Thankfully, these two facts together hint towards a way forward: this is a perfect candidate for mechanization!  Indeed backpropagation, which we will revisit later in this section, is exactly that.
 
 ### Linear Approximation
-When working with derivatives, it is often useful to geometrically interpret the approximation used above.  In particular, note that the equation 
+When working with derivatives, it is often useful to geometrically interpret the approximation used above.  In particular, note that the equation
 
 $$
 f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x),
@@ -263,6 +266,7 @@ $$
 approximates the value of $f$ by a line which passes through the point $(x, f(x))$ and has slope $\frac{df}{dx}(x)$.  In this way we say that the derivative gives a linear approximation to the function $f$, as illustrated below:
 
 ```{.python .input}
+#@tab mxnet
 # Compute sin
 xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
@@ -282,7 +286,7 @@ plots = [torch.sin(xs)]
 
 # Compute some linear approximations. Use d(sin(x))/dx = cos(x)
 for x0 in [-1.5, 0.0, 2.0]:
-    plots.append(torch.sin(torch.tensor(x0)) + (xs - x0) * 
+    plots.append(torch.sin(torch.tensor(x0)) + (xs - x0) *
                  torch.cos(torch.tensor(x0)))
 
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
@@ -296,7 +300,7 @@ plots = [tf.sin(xs)]
 
 # Compute some linear approximations. Use d(sin(x))/dx = cos(x)
 for x0 in [-1.5, 0.0, 2.0]:
-    plots.append(tf.sin(tf.constant(x0)) + (xs - x0) * 
+    plots.append(tf.sin(tf.constant(x0)) + (xs - x0) *
                  tf.cos(tf.constant(x0)))
 
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
@@ -306,13 +310,13 @@ d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 
 Let's now do something that may on the surface seem strange.  Take a function $f$ and compute the derivative $\frac{df}{dx}$.  This gives us the rate of change of $f$ at any point.
 
-However, the derivative, $\frac{df}{dx}$, can be viewed as a function itself, so nothing stops us from computing the derivative of $\frac{df}{dx}$ to get $\frac{d^2f}{dx^2} = \frac{df}{dx}\left(\frac{df}{dx}\right)$.  We will call this the second derivative of $f$.  This function is the rate of change of the rate of change of $f$, or in other words, how the rate of change is changing. We may apply the derivative any number of times to obtain what is called the $n$-th derivative. To keep the notation clean, we will denote the $n$-th derivative as 
+However, the derivative, $\frac{df}{dx}$, can be viewed as a function itself, so nothing stops us from computing the derivative of $\frac{df}{dx}$ to get $\frac{d^2f}{dx^2} = \frac{df}{dx}\left(\frac{df}{dx}\right)$.  We will call this the second derivative of $f$.  This function is the rate of change of the rate of change of $f$, or in other words, how the rate of change is changing. We may apply the derivative any number of times to obtain what is called the $n$-th derivative. To keep the notation clean, we will denote the $n$-th derivative as
 
 $$
 f^{(n)}(x) = \frac{d^{n}f}{dx^{n}} = \left(\frac{d}{dx}\right)^{n} f.
 $$
 
-Let's try to understand *why* this is a useful notion.  Below, we visualize $f^{(2)}(x)$, $f^{(1)}(x)$, and $f(x)$.  
+Let's try to understand *why* this is a useful notion.  Below, we visualize $f^{(2)}(x)$, $f^{(1)}(x)$, and $f(x)$.
 
 First, consider the case that the second derivative $f^{(2)}(x)$ is a positive constant.  This means that the slope of the first derivative is positive.  As a result, the first derivative $f^{(1)}(x)$ may start out negative, becomes zero at a point, and then becomes positive in the end. This tells us the slope of our original function $f$ and therefore, the function $f$ itself decreases, flattens out, then increases.  In other words, the function $f$ curves up, and has a single minimum as is shown in :numref:`fig_positive-second`.
 
@@ -345,6 +349,7 @@ $$
 If we have some original function $f(x)$ in mind, we may compute the first two derivatives and find the values for $a, b$, and $c$ that make them match this computation.  Similarly to the previous section where we saw that the first derivative gave the best approximation with a straight line, this construction provides the best approximation by a quadratic.  Let's visualize this for $f(x) = \sin(x)$.
 
 ```{.python .input}
+#@tab mxnet
 # Compute sin
 xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
@@ -365,7 +370,7 @@ plots = [torch.sin(xs)]
 
 # Compute some quadratic approximations. Use d(sin(x)) / dx = cos(x)
 for x0 in [-1.5, 0.0, 2.0]:
-    plots.append(torch.sin(torch.tensor(x0)) + (xs - x0) * 
+    plots.append(torch.sin(torch.tensor(x0)) + (xs - x0) *
                  torch.cos(torch.tensor(x0)) - (xs - x0)**2 *
                  torch.sin(torch.tensor(x0)) / 2)
 
@@ -380,14 +385,14 @@ plots = [tf.sin(xs)]
 
 # Compute some quadratic approximations. Use d(sin(x)) / dx = cos(x)
 for x0 in [-1.5, 0.0, 2.0]:
-    plots.append(tf.sin(tf.constant(x0)) + (xs - x0) * 
+    plots.append(tf.sin(tf.constant(x0)) + (xs - x0) *
                  tf.cos(tf.constant(x0)) - (xs - x0)**2 *
                  tf.sin(tf.constant(x0)) / 2)
 
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
 
-We will extend this idea to the idea of a *Taylor series* in the next section. 
+We will extend this idea to the idea of a *Taylor series* in the next section.
 
 ### Taylor Series
 
@@ -411,13 +416,13 @@ $$
 where the $6 = 3 \times 2 = 3!$ comes from the constant we get in front if we take three derivatives of $x^3$.
 
 
-Furthermore, we can get a degree $n$ polynomial by 
+Furthermore, we can get a degree $n$ polynomial by
 
 $$
 P_n(x) = \sum_{i = 0}^{n} \frac{f^{(i)}(x_0)}{i!}(x-x_0)^{i}.
 $$
 
-where the notation 
+where the notation
 
 $$
 f^{(n)}(x) = \frac{d^{n}f}{dx^{n}} = \left(\frac{d}{dx}\right)^{n} f.
@@ -441,6 +446,7 @@ $$
 Let's see how this works in code and observe how increasing the degree of the Taylor approximation brings us closer to the desired function $e^x$.
 
 ```{.python .input}
+#@tab mxnet
 # Compute the exponential function
 xs = np.arange(0, 3, 0.01)
 ys = np.exp(xs)
@@ -491,7 +497,7 @@ Taylor series have two primary applications:
 
 1. *Theoretical applications*: Often when we try to understand a too complex function, using Taylor series enables us to turn it into a polynomial that we can work with directly.
 
-2. *Numerical applications*: Some functions like $e^{x}$ or $\cos(x)$ are  difficult for machines to compute.  They can store tables of values at a fixed precision (and this is often done), but it still leaves open questions like "What is the 1000-th digit of $\cos(1)$?"  Taylor series are often helpful to answer such questions.  
+2. *Numerical applications*: Some functions like $e^{x}$ or $\cos(x)$ are  difficult for machines to compute.  They can store tables of values at a fixed precision (and this is often done), but it still leaves open questions like "What is the 1000-th digit of $\cos(1)$?"  Taylor series are often helpful to answer such questions.
 
 
 ## Summary

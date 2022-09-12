@@ -12,6 +12,7 @@ The implementations of the following members of the `d2l` package and sections w
 
 ```
 
+
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -22,6 +23,7 @@ The implementations of the following members of the `d2l` package and sections w
 
 ```
 
+
 :begin_tab:`tensorflow`
 
 ```eval_rst
@@ -29,6 +31,7 @@ The implementations of the following members of the `d2l` package and sections w
 .. currentmodule:: d2l.torch
 
 ```
+
 
 :end_tab:
 
@@ -45,10 +48,11 @@ The implementations of the following members of the `d2l` package and sections w
 .. autoclass:: LinearRegression
    :members:    
 
-.. autoclass:: Classification
+.. autoclass:: Classifier
    :members:
 
 ```
+
 
 ## Data
 
@@ -65,6 +69,7 @@ The implementations of the following members of the `d2l` package and sections w
 
 ```
 
+
 ## Trainer
 
 ```eval_rst 
@@ -76,6 +81,7 @@ The implementations of the following members of the `d2l` package and sections w
    :members: 
 
 ```
+
 
 ## Utilities
 
@@ -96,3 +102,4 @@ The implementations of the following members of the `d2l` package and sections w
    :members:    
 
 ```
+

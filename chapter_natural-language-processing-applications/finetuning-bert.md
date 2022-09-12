@@ -44,7 +44,7 @@ all the parameters in the pretrained BERT model are fine-tuned.
 
 ## Single Text Classification
 
-*Single text classification* takes a single text sequence as the input and outputs its classification result.
+*Single text classification* takes a single text sequence as input and outputs its classification result.
 Besides sentiment analysis that we have studied in this chapter,
 the Corpus of Linguistic Acceptability (CoLA)
 is also a dataset for single text classification,
@@ -75,7 +75,7 @@ We have also examined natural language inference in this chapter.
 It belongs to *text pair classification*,
 a type of application classifying a pair of text.
 
-Taking a pair of text as the input but outputting a continuous value,
+Taking a pair of text as input but outputting a continuous value,
 *semantic textual similarity* is a popular *text pair regression* task.
 This task measures semantic similarity of sentences.
 For instance, in the Semantic Textual Similarity Benchmark dataset,
@@ -182,7 +182,6 @@ and output the span with the highest score.
 
 * BERT requires minimal architecture changes (extra fully connected layers) for sequence-level and token-level natural language processing applications, such as single text classification (e.g., sentiment analysis and testing linguistic acceptability), text pair classification or regression (e.g., natural language inference and semantic textual similarity), text tagging (e.g., part-of-speech tagging), and question answering.
 * During supervised learning of a downstream application, parameters of the extra layers are learned from scratch while all the parameters in the pretrained BERT model are fine-tuned.
-
 
 
 ## Exercises

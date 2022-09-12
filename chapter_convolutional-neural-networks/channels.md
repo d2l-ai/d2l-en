@@ -60,7 +60,7 @@ $(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$
 
 To make sure we really understand what is going on here,
 we can (**implement cross-correlation operations with multiple input channels**) ourselves.
-Notice that all we are doing is perform a cross-correlation operation
+Notice that all we are doing is performing a cross-correlation operation
 per channel and then adding up the results.
 
 ```{.python .input}
@@ -208,7 +208,7 @@ Because this is still a convolutional layer,
 the weights are tied across pixel location.
 Thus the $1\times 1$ convolutional layer requires $c_o\times c_i$ weights
 (plus the bias). Also note that convolutional layers are typically followed 
-by a nonlinearity. This ensures that $1 \times 1$ convolutions cannot simply be 
+by nonlinearities. This ensures that $1 \times 1$ convolutions cannot simply be 
 folded into other convolutions. 
 
 ![The cross-correlation computation uses the $1\times 1$ convolution kernel with 3 input channels and 2 output channels. The input and output have the same height and width.](../img/conv-1x1.svg)
@@ -257,9 +257,9 @@ assert float(d2l.reduce_sum(d2l.abs(Y1 - Y2))) < 1e-6
 
 ## Discussion
 
-Channels allow us to combine the best of both worlds: MLPs that allow for significant nonlinearities and convolutions that allow for *localized* analysis of features. In particular, channels allow the CNN to reason with multiple features, such as edge and shape detectors at the same time. They also offer a practical trade-off between the drastic parameter reduction arising from translation invariance and locality and the need for expressive and diverse models in computer vision. 
+Channels allow us to combine the best of both worlds: MLPs that allow for significant nonlinearities and convolutions that allow for *localized* analysis of features. In particular, channels allow the CNN to reason with multiple features, such as edge and shape detectors at the same time. They also offer a practical trade-off between the drastic parameter reduction arising from translation invariance and locality, and the need for expressive and diverse models in computer vision. 
 
-Note, though, that this flexibility comes at a price. Given an image of size $(h \times w)$, the cost for computing a $k \times k$ convolution is $O(h \cdot w \cdot k^2)$. For $c_i$ and $c_o$ input and output channels respectively this increases to $O(h \cdot w \cdot k^2 \cdot c_i \cdot c_o)$. For a $256 \times 256$ pixel image with a $5 \times 5$ kernel and $128$ input and output channels respectively this amounts to over 53 billion operations (we count multiplications and additions separately). Later on we will encounter effective strategies to cut down on the cost, e.g., by requiring the channel-wise operations to be block-diagonal, leading to architectures such as ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017`. 
+Note, though, that this flexibility comes at a price. Given an image of size $(h \times w)$, the cost for computing a $k \times k$ convolution is $\mathcal{O}(h \cdot w \cdot k^2)$. For $c_i$ and $c_o$ input and output channels respectively this increases to $\mathcal{O}(h \cdot w \cdot k^2 \cdot c_i \cdot c_o)$. For a $256 \times 256$ pixel image with a $5 \times 5$ kernel and $128$ input and output channels respectively this amounts to over 53 billion operations (we count multiplications and additions separately). Later on we will encounter effective strategies to cut down on the cost, e.g., by requiring the channel-wise operations to be block-diagonal, leading to architectures such as ResNeXt :cite:`Xie.Girshick.Dollar.ea.2017`. 
 
 ## Exercises
 

@@ -20,6 +20,7 @@ Comparing with the PTB dataset used for pretraining word2vec in :numref:`sec_wor
 WikiText-2 (i) retains the original punctuation, making it suitable for next sentence prediction; (ii) retains the original case and numbers; (iii) is over twice larger.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 import os
@@ -134,8 +135,8 @@ the token indices where predictions take place and labels for these predictions.
 #@save
 def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
                         vocab):
-    # Make a new copy of tokens for the input of a masked language model,
-    # where the input may contain replaced '<mask>' or random tokens
+    # For the input of a masked language model, make a new copy of tokens and
+    # replace some of them by '<mask>' or random tokens
     mlm_input_tokens = [token for token in tokens]
     pred_positions_and_labels = []
     # Shuffle for getting 15% random tokens for prediction in the masked
@@ -196,10 +197,11 @@ def _get_mlm_data_from_tokens(tokens, vocab):
 Now we are almost ready to customize a `Dataset` class for pretraining BERT.
 Before that, 
 we still need to define a helper function `_pad_bert_inputs`
-to [**append the special “&lt;mask&gt;” tokens to the inputs.**]
+to [**append the special “&lt;pad&gt;” tokens to the inputs.**]
 Its argument `examples` contain the outputs from the helper functions `_get_nsp_data_from_paragraph` and `_get_mlm_data_from_tokens` for the two pretraining tasks.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def _pad_bert_inputs(examples, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
@@ -274,6 +276,7 @@ For simplicity, we use the `d2l.tokenize` function for tokenization.
 Infrequent tokens that appear less than five times are filtered out.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 class _WikiTextDataset(gluon.data.Dataset):
     def __init__(self, paragraphs, max_len):
@@ -355,6 +358,7 @@ we define the following `load_data_wiki` to [**download and WikiText-2 dataset
 and generate pretraining examples**] from it.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def load_data_wiki(batch_size, max_len):
     """Load the WikiText-2 dataset."""
@@ -412,6 +416,7 @@ len(vocab)
 
 * Comparing with the PTB dataset, the WikiText-2 dateset retains the original punctuation, case and numbers, and is over twice larger.
 * We can arbitrarily access the pretraining (masked language modeling and next sentence prediction) examples generated from a pair of sentences from the WikiText-2 corpus.
+
 
 
 ## Exercises

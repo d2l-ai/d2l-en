@@ -20,6 +20,7 @@ First, let's modify the printing accuracy
 just for more concise outputs.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import gluon, image, np, npx
@@ -64,6 +65,7 @@ That is to say, the number of anchor boxes centered on the same pixel is $n+m-1$
 The above method of generating anchor boxes is implemented in the following `multibox_prior` function. We specify the input image, a list of scales, and a list of aspect ratios, then this function will return all the anchor boxes.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def multibox_prior(data, sizes, ratios):
     """Generate anchor boxes with different shapes centered on each pixel."""
@@ -122,7 +124,7 @@ def multibox_prior(data, sizes, ratios):
     # Generate all center points for the anchor boxes
     center_h = (torch.arange(in_height, device=device) + offset_h) * steps_h
     center_w = (torch.arange(in_width, device=device) + offset_w) * steps_w
-    shift_y, shift_x = torch.meshgrid(center_h, center_w)
+    shift_y, shift_x = torch.meshgrid(center_h, center_w, indexing='ij')
     shift_y, shift_x = shift_y.reshape(-1), shift_x.reshape(-1)
 
     # Generate `boxes_per_pixel` number of heights and widths that are later
@@ -148,6 +150,7 @@ We can see that [**the shape of the returned anchor box variable `Y`**] is
 (batch size, number of anchor boxes, 4).
 
 ```{.python .input}
+#@tab mxnet
 img = image.imread('../img/catdog.jpg').asnumpy()
 h, w = img.shape[:2]
 
@@ -254,6 +257,7 @@ the following `box_iou` computes their pairwise IoU
 across these two lists.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def box_iou(boxes1, boxes2):
     """Compute pairwise IoU across two lists of anchor or bounding boxes."""
@@ -354,6 +358,7 @@ the remaining anchor boxes $A_1, A_3, A_4, A_6, A_8$ and determine whether to as
 This algorithm is implemented in the following `assign_anchor_to_bbox` function.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     """Assign closest ground-truth bounding boxes to anchor boxes."""
@@ -467,6 +472,7 @@ to [**label classes and offsets for anchor boxes**] (the `anchors` argument) usi
 This function sets the background class to zero and increments the integer index of a new class by one.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def multibox_target(anchors, labels):
     """Label anchor boxes using ground-truth bounding boxes."""
@@ -580,6 +586,7 @@ are 0, 1, and 2, respectively.
 Below we add an dimension for examples of anchor boxes and ground-truth bounding boxes.
 
 ```{.python .input}
+#@tab mxnet
 labels = multibox_target(np.expand_dims(anchors, axis=0),
                          np.expand_dims(ground_truth, axis=0))
 ```
@@ -694,6 +701,7 @@ Then we manipulate the sorted list $L$ in the following steps:
 [**The following `nms` function sorts confidence scores in descending order and returns their indices.**]
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def nms(boxes, scores, iou_threshold):
     """Sort confidence scores of predicted bounding boxes."""
@@ -736,6 +744,7 @@ a bit complicated: we will show how it works
 with a concrete example right after the implementation.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
                        pos_threshold=0.009999999):
@@ -849,6 +858,7 @@ The remaining four elements are the $(x, y)$-axis coordinates of the upper-left 
 the lower-right corner of the predicted bounding box, respectively (range is between 0 and 1).
 
 ```{.python .input}
+#@tab mxnet
 output = multibox_detection(np.expand_dims(cls_probs, axis=0),
                             np.expand_dims(offset_preds, axis=0),
                             np.expand_dims(anchors, axis=0),

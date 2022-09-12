@@ -204,8 +204,8 @@ def grad_clipping(net, theta):  #@save
 
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data iterator."""
-    dataset = data.TensorDataset(*data_arrays)
-    return data.DataLoader(dataset, batch_size, shuffle=is_train)
+    dataset = torch.utils.data.TensorDataset(*data_arrays)
+    return torch.utils.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = Xw + b + noise."""
@@ -235,10 +235,10 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
         root="../data", train=True, transform=trans, download=True)
     mnist_test = torchvision.datasets.FashionMNIST(
         root="../data", train=False, transform=trans, download=True)
-    return (data.DataLoader(mnist_train, batch_size, shuffle=True,
-                            num_workers=get_dataloader_workers()),
-            data.DataLoader(mnist_test, batch_size, shuffle=False,
-                            num_workers=get_dataloader_workers()))
+    return (torch.utils.data.DataLoader(mnist_train, batch_size, shuffle=True,
+                                        num_workers=get_dataloader_workers()),
+            torch.utils.data.DataLoader(mnist_test, batch_size, shuffle=False,
+                                        num_workers=get_dataloader_workers()))
 
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     """Compute the accuracy for a model on a dataset using a GPU."""
@@ -509,13 +509,13 @@ import tarfile
 import hashlib
 
 def download(url, folder='../data', sha1_hash=None):  #@save
+    """Download a file to folder and return the local filepath."""
     if not url.startswith('http'):
-        # back compatability
+        # For back compatability
         url, sha1_hash = DATA_HUB[url]
-
     os.makedirs(folder, exist_ok=True)
     fname = os.path.join(folder, url.split('/')[-1])
-    # check if hit cache
+    # Check if hit cache
     if os.path.exists(fname) and sha1_hash:
         sha1 = hashlib.sha1()
         with open(fname, 'rb') as f:
@@ -526,7 +526,7 @@ def download(url, folder='../data', sha1_hash=None):  #@save
                 sha1.update(data)
         if sha1.hexdigest() == sha1_hash:
             return fname
-    # download
+    # Download
     print(f'Downloading {fname} from {url}...')
     r = requests.get(url, stream=True, verify=True)
     with open(fname, 'wb') as f:
@@ -534,7 +534,7 @@ def download(url, folder='../data', sha1_hash=None):  #@save
     return fname
 
 def extract(filename, folder=None):  #@save
-    """Download and extract a zip/tar file."""
+    """Extract a zip/tar file into folder."""
     base_dir = os.path.dirname(filename)
     _, ext = os.path.splitext(filename)
     assert ext in ('.zip', '.tar', '.gz'), 'Only support zip/tar files.'
@@ -545,7 +545,6 @@ def extract(filename, folder=None):  #@save
     if folder is None:
         folder = base_dir
     fp.extractall(folder)
-    
 ```
 
 ```{.python .input}
@@ -676,17 +675,6 @@ def tokenize_nmt(text, num_examples=None):
             target.append(parts[1].split(' '))
     return source, target
 
-#@save
-def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
-    """Plot the histogram for list length pairs."""
-    d2l.set_figsize()
-    _, _, patches = d2l.plt.hist(
-        [[len(l) for l in xlist], [len(l) for l in ylist]])
-    d2l.plt.xlabel(xlabel)
-    d2l.plt.ylabel(ylabel)
-    for patch in patches[1].patches:
-        patch.set_hatch('/')
-    d2l.plt.legend(legend)
     
 #@save
 def truncate_pad(line, num_steps, padding_token):
@@ -722,46 +710,10 @@ def load_data_nmt(batch_size, num_steps, num_examples=600):
     data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
     data_iter = d2l.load_array(data_arrays, batch_size)
     return data_iter, src_vocab, tgt_vocab
-
-def bleu(pred_seq, label_seq, k):  #@save
-    """Compute the BLEU."""
-    pred_tokens, label_tokens = pred_seq.split(' '), label_seq.split(' ')
-    len_pred, len_label = len(pred_tokens), len(label_tokens)
-    score = math.exp(min(0, 1 - len_label / len_pred))
-    for n in range(1, k + 1):
-        num_matches, label_subs = 0, collections.defaultdict(int)
-        for i in range(len_label - n + 1):
-            label_subs[''.join(label_tokens[i: i + n])] += 1
-        for i in range(len_pred - n + 1):
-            if label_subs[''.join(pred_tokens[i: i + n])] > 0:
-                num_matches += 1
-                label_subs[''.join(pred_tokens[i: i + n])] -= 1
-        score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
-    return score
 ```
 
 ```{.python .input}
 %%tab mxnet
-#@save
-class Seq2SeqEncoderOld(d2l.Encoder):
-    """The RNN encoder for sequence to sequence learning."""
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqEncoderOld, self).__init__(**kwargs)
-        # Embedding layer
-        self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
-
-    def forward(self, X, *args):
-        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
-        X = self.embedding(X)
-        # In RNN models, the first axis corresponds to time steps
-        X = X.swapaxes(0, 1)
-        state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
-        output, state = self.rnn(X, state)
-        # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
-        # `state[0]` shape: (`num_layers`, `batch_size`, `num_hiddens`)
-        return output, state
     
 #@save
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
@@ -823,7 +775,7 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
     output_seq, attention_weight_seq = [], []
     for _ in range(num_steps):
         Y, dec_state = net.decoder(dec_X, dec_state)
-        # We use the token with the highest prediction likelihood as the input
+        # We use the token with the highest prediction likelihood as input
         # of the decoder at the next time step
         dec_X = Y.argmax(axis=2)
         pred = dec_X.squeeze(axis=0).astype('int32').item()
@@ -841,26 +793,14 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
 ```{.python .input}
 %%tab pytorch
 #@save
-class Seq2SeqEncoderOld(d2l.Encoder):
-    """The RNN encoder for sequence to sequence learning."""
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqEncoderOld, self).__init__(**kwargs)
-        # Embedding layer
-        self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = nn.GRU(embed_size, num_hiddens, num_layers,
-                          dropout=dropout)
+def sequence_mask(X, valid_len, value=0):
+    """Mask irrelevant entries in sequences."""
+    maxlen = X.size(1)
+    mask = torch.arange((maxlen), dtype=torch.float32,
+                        device=X.device)[None, :] < valid_len[:, None]
+    X[~mask] = value
+    return X
 
-    def forward(self, X, *args):
-        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
-        X = self.embedding(X)
-        # In RNN models, the first axis corresponds to time steps
-        X = X.permute(1, 0, 2)
-        # When state is not mentioned, it defaults to zeros
-        output, state = self.rnn(X)
-        # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
-        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`)
-        return output, state
     
 #@save
 class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
@@ -916,14 +856,6 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
           f'tokens/sec on {str(device)}')
     
-#@save
-def sequence_mask(X, valid_len, value=0):
-    """Mask irrelevant entries in sequences."""
-    maxlen = X.size(1)
-    mask = torch.arange((maxlen), dtype=torch.float32,
-                        device=X.device)[None, :] < valid_len[:, None]
-    X[~mask] = value
-    return X
 
 #@save
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
@@ -946,7 +878,7 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
     output_seq, attention_weight_seq = [], []
     for _ in range(num_steps):
         Y, dec_state = net.decoder(dec_X, dec_state)
-        # We use the token with the highest prediction likelihood as the input
+        # We use the token with the highest prediction likelihood as input
         # of the decoder at the next time step
         dec_X = Y.argmax(dim=2)
         pred = dec_X.squeeze(dim=0).type(torch.int32).item()
@@ -964,24 +896,17 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
 ```{.python .input}
 %%tab tensorflow
 #@save
-class Seq2SeqEncoderOld(d2l.Encoder):
-    """The RNN encoder for sequence to sequence learning."""
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers, dropout=0, **kwargs): 
-        super().__init__(*kwargs)
-        # Embedding layer
-        self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
-        self.rnn = tf.keras.layers.RNN(tf.keras.layers.StackedRNNCells(
-            [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)
-             for _ in range(num_layers)]), return_sequences=True,
-                                       return_state=True)
+def sequence_mask(X, valid_len, value=0):
+    """Mask irrelevant entries in sequences."""
+    maxlen = X.shape[1]
+    mask = tf.range(start=0, limit=maxlen, dtype=tf.float32)[
+        None, :] < tf.cast(valid_len[:, None], dtype=tf.float32)
     
-    def call(self, X, *args, **kwargs):
-        # The input `X` shape: (`batch_size`, `num_steps`)
-        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
-        X = self.embedding(X)
-        output = self.rnn(X, **kwargs)
-        state = output[1:]
-        return output[0], state
+    if len(X.shape) == 3:
+        return tf.where(tf.expand_dims(mask, axis=-1), X, value)
+    else:
+        return tf.where(mask, X, value)
+
     
 #@save
 class MaskedSoftmaxCELoss(tf.keras.losses.Loss):
@@ -1027,19 +952,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
         if (epoch + 1) % 10 == 0:
             animator.add(epoch + 1, (metric[0] / metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
-          f'tokens/sec on {str(device)}')
-    
-#@save
-def sequence_mask(X, valid_len, value=0):
-    """Mask irrelevant entries in sequences."""
-    maxlen = X.shape[1]
-    mask = tf.range(start=0, limit=maxlen, dtype=tf.float32)[
-        None, :] < tf.cast(valid_len[:, None], dtype=tf.float32)
-    
-    if len(X.shape) == 3:
-        return tf.where(tf.expand_dims(mask, axis=-1), X, value)
-    else:
-        return tf.where(mask, X, value)
+          f'tokens/sec on {str(device._device_name)}')
     
 #@save
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
@@ -1058,7 +971,7 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
     output_seq, attention_weight_seq = [], []
     for _ in range(num_steps):
         Y, dec_state = net.decoder(dec_X, dec_state, training=False)
-        # We use the token with the highest prediction likelihood as the input
+        # We use the token with the highest prediction likelihood as input
         # of the decoder at the next time step
         dec_X = tf.argmax(Y, axis=2)
         pred = tf.squeeze(dec_X, axis=0)

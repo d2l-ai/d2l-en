@@ -22,6 +22,7 @@ then fine-tune it
 for natural language inference on the SNLI dataset.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 import json
 import multiprocessing
@@ -55,6 +56,7 @@ we provide two versions of pretrained BERT:
 while "bert.small" is a small version to facilitate demonstration.
 
 ```{.python .input}
+#@tab mxnet
 d2l.DATA_HUB['bert.base'] = (d2l.DATA_URL + 'bert.base.zip',
                              '7b3820b35da691042e5d34c0971ac3edbd80d3f4')
 d2l.DATA_HUB['bert.small'] = (d2l.DATA_URL + 'bert.small.zip',
@@ -74,8 +76,9 @@ and a "pretrained.params" file of the pretrained parameters.
 We implement the following `load_pretrained_model` function to [**load pretrained BERT parameters**].
 
 ```{.python .input}
+#@tab mxnet
 def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
-                          num_heads, num_layers, dropout, max_len, devices):
+                          num_heads, num_blks, dropout, max_len, devices):
     data_dir = d2l.download_extract(pretrained_model)
     # Define an empty vocabulary to load the predefined vocabulary
     vocab = d2l.Vocab()
@@ -83,7 +86,7 @@ def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
     vocab.token_to_idx = {token: idx for idx, token in enumerate(
         vocab.idx_to_token)}
     bert = d2l.BERTModel(len(vocab), num_hiddens, ffn_num_hiddens, num_heads, 
-                         num_layers, dropout, max_len)
+                         num_blks, dropout, max_len)
     # Load pretrained BERT parameters
     bert.load_parameters(os.path.join(data_dir, 'pretrained.params'),
                          ctx=devices)
@@ -93,19 +96,16 @@ def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
 ```{.python .input}
 #@tab pytorch
 def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
-                          num_heads, num_layers, dropout, max_len, devices):
+                          num_heads, num_blks, dropout, max_len, devices):
     data_dir = d2l.download_extract(pretrained_model)
     # Define an empty vocabulary to load the predefined vocabulary
     vocab = d2l.Vocab()
     vocab.idx_to_token = json.load(open(os.path.join(data_dir, 'vocab.json')))
     vocab.token_to_idx = {token: idx for idx, token in enumerate(
         vocab.idx_to_token)}
-    bert = d2l.BERTModel(len(vocab), num_hiddens, norm_shape=[256],
-                         ffn_num_input=256, ffn_num_hiddens=ffn_num_hiddens,
-                         num_heads=4, num_layers=2, dropout=0.2,
-                         max_len=max_len, key_size=256, query_size=256,
-                         value_size=256, hid_in_features=256,
-                         mlm_in_features=256, nsp_in_features=256)
+    bert = d2l.BERTModel(
+        len(vocab), num_hiddens, ffn_num_hiddens=ffn_num_hiddens, num_heads=4,
+        num_blks=2, dropout=0.2, max_len=max_len)
     # Load pretrained BERT parameters
     bert.load_state_dict(torch.load(os.path.join(data_dir,
                                                  'pretrained.params')))
@@ -121,7 +121,7 @@ In the exercise, we will show how to fine-tune the much larger "bert.base" to si
 devices = d2l.try_all_gpus()
 bert, vocab = load_pretrained_model(
     'bert.small', num_hiddens=256, ffn_num_hiddens=512, num_heads=4,
-    num_layers=2, dropout=0.1, max_len=512, devices=devices)
+    num_blks=2, dropout=0.1, max_len=512, devices=devices)
 ```
 
 ## [**The Dataset for Fine-Tuning BERT**]
@@ -141,6 +141,7 @@ for fine-tuning BERT,
 we use 4 worker processes to generate training or testing examples in parallel.
 
 ```{.python .input}
+#@tab mxnet
 class SNLIBERTDataset(gluon.data.Dataset):
     def __init__(self, dataset, max_len, vocab=None):
         all_premise_hypothesis_tokens = [[
@@ -254,6 +255,7 @@ Such examples will be read in minibatches during training and testing
 of natural language inference.
 
 ```{.python .input}
+#@tab mxnet
 # Reduce `batch_size` if there is an out of memory error. In the original BERT
 # model, `max_len` = 512
 batch_size, max_len, num_workers = 512, 128, d2l.get_dataloader_workers()
@@ -293,6 +295,7 @@ which encodes the information of both the premise and the hypothesis,
 entailment, contradiction, and neutral.
 
 ```{.python .input}
+#@tab mxnet
 class BERTClassifier(nn.Block):
     def __init__(self, bert):
         super(BERTClassifier, self).__init__()
@@ -313,7 +316,7 @@ class BERTClassifier(nn.Module):
         super(BERTClassifier, self).__init__()
         self.encoder = bert.encoder
         self.hidden = bert.hidden
-        self.output = nn.Linear(256, 3)
+        self.output = nn.LazyLinear(3)
 
     def forward(self, inputs):
         tokens_X, segments_X, valid_lens_x = inputs
@@ -329,6 +332,7 @@ only the parameters of the output layer of the additional MLP (`net.output`) wil
 All the parameters of the pretrained BERT encoder (`net.encoder`) and the hidden layer of the additional MLP (`net.hidden`) will be fine-tuned.
 
 ```{.python .input}
+#@tab mxnet
 net = BERTClassifier(bert)
 net.output.initialize(ctx=devices)
 ```
@@ -360,6 +364,7 @@ Due to the limited computational resources, [**the training**] and testing accur
 can be further improved: we leave its discussions in the exercises.
 
 ```{.python .input}
+#@tab mxnet
 lr, num_epochs = 1e-4, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -372,6 +377,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices,
 lr, num_epochs = 1e-4, 5
 trainer = torch.optim.Adam(net.parameters(), lr=lr)
 loss = nn.CrossEntropyLoss(reduction='none')
+net(next(iter(train_iter))[0])
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
@@ -381,9 +387,10 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 * During fine-tuning, the BERT model becomes part of the model for the downstream application. Parameters that are only related to pretraining loss will not be updated during fine-tuning. 
 
 
+
 ## Exercises
 
-1. Fine-tune a much larger pretrained BERT model that is about as big as the original BERT base model if your computational resource allows. Set arguments in the `load_pretrained_model` function as: replacing 'bert.small' with 'bert.base', increasing values of `num_hiddens=256`, `ffn_num_hiddens=512`, `num_heads=4`, and `num_layers=2` to 768, 3072, 12, and 12, respectively. By increasing fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.86?
+1. Fine-tune a much larger pretrained BERT model that is about as big as the original BERT base model if your computational resource allows. Set arguments in the `load_pretrained_model` function as: replacing 'bert.small' with 'bert.base', increasing values of `num_hiddens=256`, `ffn_num_hiddens=512`, `num_heads=4`, and `num_blks=2` to 768, 3072, 12, and 12, respectively. By increasing fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.86?
 1. How to truncate a pair of sequences according to their ratio of length? Compare this pair truncation method and the one used in the `SNLIBERTDataset` class. What are their pros and cons?
 
 :begin_tab:`mxnet`

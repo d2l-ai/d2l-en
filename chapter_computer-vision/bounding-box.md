@@ -34,6 +34,7 @@ We will begin with an introduction
 to *positions* (or *locations*) of objects.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import image, npx, np
@@ -59,6 +60,7 @@ We will load the sample image to be used in this section. We can see that there 
 They are the two major objects in this image.
 
 ```{.python .input}
+#@tab mxnet
 d2l.set_figsize()
 img = image.imread('../img/catdog.jpg').asnumpy()
 d2l.plt.imshow(img);

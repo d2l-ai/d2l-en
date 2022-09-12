@@ -147,6 +147,7 @@ Indeed, we can use this in three or three million dimensions without issue.
 As a simple example, let's see how to compute the angle between a pair of vectors:
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -300,12 +301,13 @@ to be to find a non-linear embedding such that the target classes
 can be separated cleanly by hyperplanes.
 
 To give a hand-built example, notice that we can produce a reasonable model
-to classify tiny images of t-shirts and trousers from the Fashion MNIST dataset
+to classify tiny images of t-shirts and trousers from the Fashion-MNIST dataset
 (seen in :numref:`sec_fashion_mnist`)
 by just taking the vector between their means to define the decision plane
 and eyeball a crude threshold.  First we will load the data and compute the averages.
 
 ```{.python .input}
+#@tab mxnet
 # Load in the dataset
 train = gluon.data.vision.FashionMNIST(train=True)
 test = gluon.data.vision.FashionMNIST(train=False)
@@ -405,6 +407,7 @@ d2l.plt.show()
 In a fully machine learned solution, we would learn the threshold from the dataset.  In this case, I simply eyeballed a threshold that looked good on the training data by hand.
 
 ```{.python .input}
+#@tab mxnet
 # Print test set accuracy with eyeballed threshold
 w = (ave_1 - ave_0).T
 predictions = X_test.reshape(2000, -1).dot(w.flatten()) > -1500000
@@ -421,7 +424,7 @@ w = (ave_1 - ave_0).T
 predictions = X_test.reshape(2000, -1) @ (w.flatten()) > -1500000
 
 # Accuracy
-torch.mean(predictions.type(y_test.dtype) == y_test, dtype=torch.float64)
+torch.mean((predictions.type(y_test.dtype) == y_test).float(), dtype=torch.float64)
 ```
 
 ```{.python .input}
@@ -687,6 +690,7 @@ We can test to see this by seeing that multiplying
 by the inverse given by the formula above works in practice.
 
 ```{.python .input}
+#@tab mxnet
 M = np.array([[1, 2], [1, 4]])
 M_inv = np.array([[2, -1], [-0.5, 0.5]])
 M_inv.dot(M)
@@ -782,6 +786,7 @@ This area is referred to as the *determinant*.
 Let's check this quickly with some example code.
 
 ```{.python .input}
+#@tab mxnet
 import numpy as np
 np.linalg.det(np.array([[1, -1], [2, 3]]))
 ```
@@ -903,6 +908,7 @@ As seen in :numref:`sec_linear-algebra`,
 we can create tensors as is shown below.
 
 ```{.python .input}
+#@tab mxnet
 # Define tensors
 B = np.array([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
 A = np.array([[1, 2], [3, 4]])
@@ -943,6 +949,7 @@ we can consider the Einstein summation seen above
 and strip out the indices themselves to get the implementation:
 
 ```{.python .input}
+#@tab mxnet
 # Reimplement matrix multiplication
 np.einsum("ij, j -> i", A, v), A.dot(v)
 ```
@@ -970,6 +977,7 @@ $$
 it can be implemented via Einstein summation as:
 
 ```{.python .input}
+#@tab mxnet
 np.einsum("ijk, il, j -> kl", B, A, v)
 ```
 
@@ -991,6 +999,7 @@ by providing integer indices for each tensor.
 For example, the same tensor contraction can also be written as:
 
 ```{.python .input}
+#@tab mxnet
 np.einsum(B, [0, 1, 2], A, [0, 3], v, [1], [2, 3])
 ```
 

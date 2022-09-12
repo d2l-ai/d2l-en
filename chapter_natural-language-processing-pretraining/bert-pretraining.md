@@ -5,6 +5,7 @@ With the BERT model implemented in :numref:`sec_bert`
 and the pretraining examples generated from the WikiText-2 dataset in :numref:`sec_bert-dataset`, we will pretrain BERT on the WikiText-2 dataset in this section.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 
@@ -41,8 +42,9 @@ For demonstration with ease,
 we define [**a small BERT, using 2 layers, 128 hidden units, and 2 self-attention heads**].
 
 ```{.python .input}
+#@tab mxnet
 net = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=256,
-                    num_heads=2, num_layers=2, dropout=0.2)
+                    num_heads=2, num_blks=2, dropout=0.2)
 devices = d2l.try_all_gpus()
 net.initialize(init.Xavier(), ctx=devices)
 loss = gluon.loss.SoftmaxCELoss()
@@ -50,11 +52,8 @@ loss = gluon.loss.SoftmaxCELoss()
 
 ```{.python .input}
 #@tab pytorch
-net = d2l.BERTModel(len(vocab), num_hiddens=128, norm_shape=[128],
-                    ffn_num_input=128, ffn_num_hiddens=256, num_heads=2,
-                    num_layers=2, dropout=0.2, key_size=128, query_size=128,
-                    value_size=128, hid_in_features=128, mlm_in_features=128,
-                    nsp_in_features=128)
+net = d2l.BERTModel(len(vocab), num_hiddens=128, 
+                    ffn_num_hiddens=256, num_heads=2, num_blks=2, dropout=0.2)
 devices = d2l.try_all_gpus()
 loss = nn.CrossEntropyLoss()
 ```
@@ -68,6 +67,7 @@ is just the sum of both the masked language modeling loss
 and the next sentence prediction loss.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def _get_batch_loss_bert(net, loss, vocab_size, tokens_X_shards,
                          segments_X_shards, valid_lens_x_shards,
@@ -130,6 +130,7 @@ the input `num_steps` of the following function
 specifies the number of iteration steps for training.
 
 ```{.python .input}
+#@tab mxnet
 def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': 0.01})
@@ -175,6 +176,7 @@ def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):
 ```{.python .input}
 #@tab pytorch
 def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):
+    net(*next(iter(train_iter))[:4])
     net = nn.DataParallel(net, device_ids=devices).to(devices[0])
     trainer = torch.optim.Adam(net.parameters(), lr=0.01)
     step, timer = 0, d2l.Timer()
@@ -231,6 +233,7 @@ The following function returns the BERT (`net`) representations for all tokens
 in `tokens_a` and `tokens_b`.
 
 ```{.python .input}
+#@tab mxnet
 def get_bert_encoding(net, tokens_a, tokens_b=None):
     tokens, segments = d2l.get_tokens_and_segments(tokens_a, tokens_b)
     token_ids = np.expand_dims(np.array(vocab[tokens], ctx=devices[0]),
@@ -298,6 +301,7 @@ for downstream natural language processing applications.
 * The original BERT has two versions, where the base model has 110 million parameters and the large model has 340 million parameters.
 * After pretraining BERT, we can use it to represent single text, text pairs, or any token in them.
 * In the experiment, the same token has different BERT representation when their contexts are different. This supports that BERT representations are context-sensitive.
+
 
 ## Exercises
 

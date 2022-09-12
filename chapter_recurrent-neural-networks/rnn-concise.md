@@ -1,19 +1,29 @@
 # Concise Implementation of Recurrent Neural Networks
 :label:`sec_rnn-concise`
 
-While :numref:`sec_rnn-scratch` was instructive to see how RNNs are implemented,
-this is not convenient or fast.
-This section will show how to implement the same language model more efficiently
-using functions provided by high-level APIs
-of a deep learning framework.
-We begin as before by reading *The Time Machine* dataset.
+Like most of our from-scratch implementations,
+:numref:`sec_rnn-scratch` was designed 
+to provide insight into how each component works.
+But when you're using RNNs every day 
+or writing production code,
+you'll want to rely more on libraries
+that cut down on both implementation time 
+(by supplying library code for common models and functions)
+and computation time 
+(by optimizing the heck out of these library implementations).
+This section will show you how to implement 
+the same language model more efficiently
+using the high-level API provided 
+by your deep learning framework.
+We begin, as before, by loading 
+*The Time Machine* dataset.
 
-```{.python .input  n=40}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -21,7 +31,7 @@ from mxnet.gluon import nn, rnn
 npx.set_np()
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -29,7 +39,7 @@ from torch import nn
 from torch.nn import functional as F
 ```
 
-```{.python .input  n=41}
+```{.python .input}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -41,21 +51,17 @@ We define the following class
 using the RNN implemented
 by high-level APIs.
 
-
 :begin_tab:`mxnet`
 Specifically, to initialize the hidden state,
 we invoke the member method `begin_state`.
-This returns a list
-that contains
+This returns a list that contains
 an initial hidden state
 for each example in the minibatch,
 whose shape is
 (number of hidden layers, batch size, number of hidden units).
-For some models
-to be introduced later
+For some models to be introduced later
 (e.g., long short-term memory),
-such a list also
-contains other information.
+this list will also contain other information.
 :end_tab:
 
 ```{.python .input}
@@ -112,7 +118,7 @@ class RNNLM(d2l.RNNLMScratch):  #@save
             self.linear = nn.Dense(self.vocab_size, flatten=False)
             self.initialize()
         if tab.selected('pytorch'):
-            self.linear = nn.Linear(self.rnn.num_hiddens, self.vocab_size)
+            self.linear = nn.LazyLinear(self.vocab_size)
         if tab.selected('tensorflow'):
             self.linear = tf.keras.layers.Dense(self.vocab_size)
         
@@ -125,8 +131,10 @@ class RNNLM(d2l.RNNLMScratch):  #@save
 
 ## Training and Predicting
 
-Before training the model, let's [**make a prediction with the a model that has random weights.**]
-Given that we have not trained the network, it will generate nonsensical predictions.
+Before training the model, let's [**make a prediction 
+with a model initialized with random weights.**]
+Given that we have not trained the network, 
+it will generate nonsensical predictions.
 
 ```{.python .input}
 %%tab all
@@ -139,9 +147,9 @@ model = RNNLM(rnn, vocab_size=len(data.vocab), lr=1)
 model.predict('it has', 20, data.vocab)
 ```
 
-As is quite obvious, this model does not work at all. Next, we [**train our model with high-level APIs**].
+Next, we [**train our model, leveraging the high-level API**].
 
-```{.python .input  n=1}
+```{.python .input}
 %%tab all
 if tab.selected('mxnet', 'pytorch'):
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
@@ -153,9 +161,9 @@ trainer.fit(model, data)
 
 Compared with :numref:`sec_rnn-scratch`,
 this model achieves comparable perplexity,
-albeit within a shorter period of time, due to the code being more optimized by
-high-level APIs of the deep learning framework.
-We can also generate predicted tokens following the specified prefix string.
+but runs faster due to the optimized implementations.
+As before, we can generate predicted tokens 
+following the specified prefix string.
 
 ```{.python .input}
 %%tab mxnet, pytorch
@@ -169,8 +177,12 @@ model.predict('it has', 20, data.vocab)
 
 ## Summary
 
-* High-level APIs of the deep learning framework provides an implementation of RNNs.
-* Using high-level APIs leads to faster RNN training than using its implementation from scratch.
+High-level APIs in deep learning frameworks provide implementations of standard RNNs.
+These libraries help you to avoid wasting time reimplementing standard models.
+Moreover,
+framework implementations are often highly optimized, 
+  leading to significant (computational) performance gains 
+  as compared to implementations from scratch.
 
 ## Exercises
 

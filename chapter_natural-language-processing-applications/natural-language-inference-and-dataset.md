@@ -52,6 +52,7 @@ To study this problem, we will begin by investigating a popular natural language
 We download and store the extracted SNLI dataset in the path `../data/snli_1.0`.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 import os
@@ -142,6 +143,7 @@ tokens after the first `num_steps` ones in longer sequence are trimmed, while sp
 By implementing the `__getitem__` function, we can arbitrarily access the premise, hypothesis, and label with the index `idx`.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 class SNLIDataset(gluon.data.Dataset):
     """A customized dataset to load the SNLI dataset."""
@@ -202,7 +204,7 @@ class SNLIDataset(torch.utils.data.Dataset):
         return len(self.premises)
 ```
 
-### [**Putting All Things Together**]
+### [**Putting It All Together**]
 
 Now we can invoke the `read_snli` function and the `SNLIDataset` class to download the SNLI dataset and return `DataLoader` instances for both training and testing sets, together with the vocabulary of the training set.
 It is noteworthy that we must use the vocabulary constructed from the training set
@@ -210,6 +212,7 @@ as that of the testing set.
 As a result, any new token from the testing set will be unknown to the model trained on the training set.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def load_data_snli(batch_size, num_steps=50):
     """Download the SNLI dataset and return data iterators and vocabulary."""

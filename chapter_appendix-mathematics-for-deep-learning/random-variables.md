@@ -27,7 +27,7 @@ $$
 
 The value $p$ essentially encodes what happens with the first few digits, and the $10^{-k}$ handles the rest.
 
-Notice that if we know the position accurate to $k=4$ digits after the decimal. that means we know the value falls within the interval say $[(1.99995,2.00005]$ which is an interval of length $2.00005-1.99995 = 10^{-4}$.  Thus, if we call the length of this interval $\epsilon$, we can say
+Notice that if we know the position accurate to $k=4$ digits after the decimal, that means we know the value falls within the interval say $[1.99995,2.00005]$ which is an interval of length $2.00005-1.99995 = 10^{-4}$.  Thus, if we call the length of this interval $\epsilon$, we can say
 
 $$
 P(\text{distance is in an}\; \epsilon\text{-sized interval around}\; 2 ) \approx \epsilon \cdot p.
@@ -41,6 +41,7 @@ $$P(\text{distance is in an}\; \epsilon \text{-sized interval around}\; x ) \app
 Indeed, :eqref:`eq_pdf_deriv` precisely defines the *probability density function*.  It is a function $p(x)$ which encodes the relative probability of hitting near one point vs. another.  Let's visualize what such a function might look like.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -133,6 +134,7 @@ $$
 We may approximate this in code by using the same discrete approximation methods as before.  In this case we can approximate the probability of falling in the blue region.
 
 ```{.python .input}
+#@tab mxnet
 # Approximate probability using numerical integration
 epsilon = 0.01
 x = np.arange(-5, 5, 0.01)
@@ -315,6 +317,7 @@ This means that $75\%$ of the time, this random variable will fall within this i
 Let's visualize this.  We will show the probability of getting the three values as three vertical bars with height proportional to the probability.  The interval will be drawn as a horizontal line in the middle.  The first plot shows what happens for $p > 1/8$ where the interval safely contains all points.
 
 ```{.python .input}
+#@tab mxnet
 # Define a helper to plot these figures
 def plot_chebyshev(a, p):
     d2l.set_figsize()
@@ -382,6 +385,7 @@ plot_chebyshev(0.0, tf.constant(0.2))
 The second shows that at $p = 1/8$, the interval exactly touches the two points.  This shows that the inequality is *sharp*, since no smaller interval could be taken while keeping the inequality true.
 
 ```{.python .input}
+#@tab mxnet
 # Plot interval when p = 1/8
 plot_chebyshev(0.0, 0.125)
 ```
@@ -401,6 +405,7 @@ plot_chebyshev(0.0, tf.constant(0.125))
 The third shows that for $p < 1/8$ the interval only contains the center.  This does not invalidate the inequality since we only needed to ensure that no more than $1/4$ of the probability falls outside the interval, which means that once $p < 1/8$, the two points at $a-2$ and $a+2$ can be discarded.
 
 ```{.python .input}
+#@tab mxnet
 # Plot interval when p < 1/8
 plot_chebyshev(0.0, 0.05)
 ```
@@ -468,6 +473,7 @@ p(x) = \frac{1}{1+x^2}.
 $$
 
 ```{.python .input}
+#@tab mxnet
 # Plot the Cauchy distribution p.d.f.
 x = np.arange(-5, 5, 0.01)
 p = 1 / (1 + x**2)
@@ -504,6 +510,7 @@ $$
 The function on the inside looks like this:
 
 ```{.python .input}
+#@tab mxnet
 # Plot the integrand needed to compute the variance
 x = np.arange(-20, 20, 0.01)
 p = x**2 / (1 + x**2)
@@ -660,6 +667,7 @@ $$
 For visualization, let's take a look at a collection of random variables with tunable covariance.
 
 ```{.python .input}
+#@tab mxnet
 # Plot a few random variables adjustable covariance
 covs = [-0.9, 0.0, 1.2]
 d2l.plt.figure(figsize=(12, 3))
@@ -765,6 +773,7 @@ Thus we see that the correlation is $+1$ for any $a > 0$, and $-1$ for any $a < 
 Let's again plot a collection of random variables with tunable correlation.
 
 ```{.python .input}
+#@tab mxnet
 # Plot a few random variables adjustable correlations
 cors = [-0.9, 0.0, 1.0]
 d2l.plt.figure(figsize=(12, 3))

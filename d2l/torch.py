@@ -1,24 +1,6 @@
 DATA_HUB = dict()
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
-import collections
-import hashlib
-import inspect
-import math
-import os
-import random
-import re
-import shutil
-import sys
-import tarfile
-import time
-import zipfile
-from collections import defaultdict
-import pandas as pd
-import requests
-from IPython import display
-from matplotlib import pyplot as plt
-
 import numpy as np
 import torch
 import torchvision
@@ -28,7 +10,6 @@ from torch.nn import functional as F
 from torch.utils import data
 from torchvision import transforms
 
-d2l = sys.modules[__name__]
 nn_Module = nn.Module
 
 #################   WARNING   ################
@@ -53,6 +34,7 @@ import pandas as pd
 import requests
 from IPython import display
 from matplotlib import pyplot as plt
+from matplotlib_inline import backend_inline
 
 d2l = sys.modules[__name__]
 
@@ -62,14 +44,13 @@ import torchvision
 from PIL import Image
 from torch import nn
 from torch.nn import functional as F
-from torch.utils import data
 from torchvision import transforms
 
 def use_svg_display():
     """Use the svg format to display a plot in Jupyter.
 
     Defined in :numref:`sec_calculus`"""
-    display.set_matplotlib_formats('svg')
+    backend_inline.set_matplotlib_formats('svg')
 
 def set_figsize(figsize=(3.5, 2.5)):
     """Set the figure size for matplotlib.
@@ -115,43 +96,15 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
         axes.plot(x,y,fmt) if len(x) else axes.plot(y,fmt)
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 
-class Timer:
-    """Record multiple running times."""
-    def __init__(self):
-        """Defined in :numref:`subsec_normal_distribution_and_squared_loss`"""
-        self.times = []
-        self.start()
-
-    def start(self):
-        """Start the timer."""
-        self.tik = time.time()
-
-    def stop(self):
-        """Stop the timer and record the time in a list."""
-        self.times.append(time.time() - self.tik)
-        return self.times[-1]
-
-    def avg(self):
-        """Return the average time."""
-        return sum(self.times) / len(self.times)
-
-    def sum(self):
-        """Return the sum of time."""
-        return sum(self.times)
-
-    def cumsum(self):
-        """Return the accumulated time."""
-        return np.array(self.times).cumsum().tolist()
-
 def add_to_class(Class):
-    """Defined in :numref:`sec_d2l_apis`"""
+    """Defined in :numref:`sec_oo-design`"""
     def wrapper(obj):
         setattr(Class, obj.__name__, obj)
     return wrapper
 
 class HyperParameters:
     def save_hyperparameters(self, ignore=[]):
-        """Defined in :numref:`sec_d2l_apis`"""
+        """Defined in :numref:`sec_oo-design`"""
         raise NotImplemented
 
     def save_hyperparameters(self, ignore=[]):
@@ -168,7 +121,7 @@ class HyperParameters:
 class ProgressBoard(d2l.HyperParameters):
     """Plot data points in animation.
 
-    Defined in :numref:`sec_d2l_apis`"""
+    Defined in :numref:`sec_oo-design`"""
     def __init__(self, xlabel=None, ylabel=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear',
                  ls=['-', '--', '-.', ':'], colors=['C0', 'C1', 'C2', 'C3'],
@@ -219,7 +172,7 @@ class ProgressBoard(d2l.HyperParameters):
         display.clear_output(wait=True)
 
 class Module(d2l.nn_Module, d2l.HyperParameters):
-    """Defined in :numref:`sec_d2l_apis`"""
+    """Defined in :numref:`sec_oo-design`"""
     def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
         super().__init__()
         self.save_hyperparameters()
@@ -233,7 +186,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
 
     def plot(self, key, value, train):
         """Plot a point in animation."""
-        assert hasattr(self, 'trainer'), 'trainer is not inited'
+        assert hasattr(self, 'trainer'), 'Trainer is not inited'
         self.board.xlabel = 'epoch'
         if train:
             x = self.trainer.train_batch_idx / \
@@ -264,8 +217,14 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         """Defined in :numref:`sec_classification`"""
         return torch.optim.SGD(self.parameters(), lr=self.lr)
 
+    def apply_init(self, inputs, init=None):
+        """Defined in :numref:`sec_lazy_init`"""
+        self.forward(*inputs)
+        if init is not None:
+            self.net.apply(init)
+
 class DataModule(d2l.HyperParameters):
-    """Defined in :numref:`sec_d2l_apis`"""
+    """Defined in :numref:`sec_oo-design`"""
     def __init__(self, root='../data', num_workers=4):
         self.save_hyperparameters()
 
@@ -278,13 +237,15 @@ class DataModule(d2l.HyperParameters):
     def val_dataloader(self):
         return self.get_dataloader(train=False)
 
-    def get_tensorloader(self, tensors, train, indices=slice(0,None)):
+    def get_tensorloader(self, tensors, train, indices=slice(0, None)):
+        """Defined in :numref:`sec_synthetic-regression-data`"""
         tensors = tuple(a[indices] for a in tensors)
         dataset = torch.utils.data.TensorDataset(*tensors)
-        return torch.utils.data.DataLoader(dataset, self.batch_size, shuffle=train)
+        return torch.utils.data.DataLoader(dataset, self.batch_size,
+                                           shuffle=train)
 
 class Trainer(d2l.HyperParameters):
-    """Defined in :numref:`sec_d2l_apis`"""
+    """Defined in :numref:`sec_oo-design`"""
     def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'No GPU support yet'
@@ -326,7 +287,7 @@ class Trainer(d2l.HyperParameters):
             self.optim.zero_grad()
             with torch.no_grad():
                 loss.backward()
-                if self.gradient_clip_val > 0:
+                if self.gradient_clip_val > 0:  # To be discussed later
                     self.clip_gradients(self.gradient_clip_val, self.model)
                 self.optim.step()
             self.train_batch_idx += 1
@@ -368,6 +329,7 @@ class Trainer(d2l.HyperParameters):
                 param.grad[:] *= grad_clip_val / norm
 
 class SyntheticRegressionData(d2l.DataModule):
+    """Defined in :numref:`sec_synthetic-regression-data`"""
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
                  batch_size=32):
         super().__init__()
@@ -378,6 +340,7 @@ class SyntheticRegressionData(d2l.DataModule):
         self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 
     def get_dataloader(self, train):
+        """Defined in :numref:`sec_synthetic-regression-data`"""
         i = slice(0, self.num_train) if train else slice(self.num_train, None)
         return self.get_tensorloader((self.X, self.y), train, i)
 
@@ -386,7 +349,7 @@ class LinearRegressionScratch(d2l.Module):
     def __init__(self, num_inputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.w = d2l.randn(num_inputs, 1, requires_grad=True)
+        self.w = d2l.normal(0, sigma, (num_inputs, 1), requires_grad=True)
         self.b = d2l.zeros(1, requires_grad=True)
 
     def forward(self, X):
@@ -421,10 +384,12 @@ class SGD(d2l.HyperParameters):
 
 class LinearRegression(d2l.Module):
     """Defined in :numref:`sec_linear_concise`"""
-    def __init__(self, num_inputs, lr):
+    def __init__(self, lr):
         super().__init__()
         self.save_hyperparameters()
-        self.net = nn.Linear(num_inputs, 1)
+        self.net = nn.LazyLinear(1)
+        self.net.weight.data.normal_(0, 0.01)
+        self.net.bias.data.fill_(0)
 
     def forward(self, X):
         """The linear regression model.
@@ -447,7 +412,7 @@ class LinearRegression(d2l.Module):
 
 class FashionMNIST(d2l.DataModule):
     """Defined in :numref:`sec_fashion_mnist`"""
-    def __init__(self, batch_size=64, resize=(28,28)):
+    def __init__(self, batch_size=64, resize=(28, 28)):
         super().__init__()
         self.save_hyperparameters()
         trans = transforms.Compose([transforms.Resize(resize),
@@ -484,7 +449,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     Defined in :numref:`sec_fashion_mnist`"""
     raise NotImplementedError
 
-class Classification(d2l.Module):
+class Classifier(d2l.Module):
     """Defined in :numref:`sec_classification`"""
     def validation_step(self, batch):
         Y_hat = self(*batch[:-1])
@@ -504,7 +469,8 @@ class Classification(d2l.Module):
         """Defined in :numref:`sec_softmax_concise`"""
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         Y = d2l.reshape(Y, (-1,))
-        return F.cross_entropy(Y_hat, Y, reduction='mean' if averaged else 'none')
+        return F.cross_entropy(
+            Y_hat, Y, reduction='mean' if averaged else 'none')
 
     def layer_summary(self, X_shape):
         """Defined in :numref:`sec_lenet`"""
@@ -549,22 +515,27 @@ def corr2d(X, K):
             Y[i, j] = d2l.reduce_sum((X[i: i + h, j: j + w] * K))
     return Y
 
+def init_cnn(module):
+    """Initialize weights for CNNs.
+
+    Defined in :numref:`sec_lenet`"""
+    if type(module) == nn.Linear or type(module) == nn.Conv2d:
+        nn.init.xavier_uniform_(module.weight)
+
 class Residual(nn.Module):
     """The Residual block of ResNet."""
-    def __init__(self, input_channels, num_channels,
-                 use_1x1conv=False, strides=1):
+    def __init__(self, num_channels, use_1x1conv=False, strides=1):
         super().__init__()
-        self.conv1 = nn.Conv2d(input_channels, num_channels,
-                               kernel_size=3, padding=1, stride=strides)
-        self.conv2 = nn.Conv2d(num_channels, num_channels,
-                               kernel_size=3, padding=1)
+        self.conv1 = nn.LazyConv2d(num_channels, kernel_size=3, padding=1,
+                                   stride=strides)
+        self.conv2 = nn.LazyConv2d(num_channels, kernel_size=3, padding=1)
         if use_1x1conv:
-            self.conv3 = nn.Conv2d(input_channels, num_channels,
-                                   kernel_size=1, stride=strides)
+            self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1,
+                                       stride=strides)
         else:
             self.conv3 = None
-        self.bn1 = nn.BatchNorm2d(num_channels)
-        self.bn2 = nn.BatchNorm2d(num_channels)
+        self.bn1 = nn.LazyBatchNorm2d()
+        self.bn2 = nn.LazyBatchNorm2d()
 
     def forward(self, X):
         Y = F.relu(self.bn1(self.conv1(X)))
@@ -573,6 +544,37 @@ class Residual(nn.Module):
             X = self.conv3(X)
         Y += X
         return F.relu(Y)
+
+class ResNeXtBlock(nn.Module):
+    """The ResNeXt block.
+
+    Defined in :numref:`subsec_residual-blks`"""
+    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False,
+                 strides=1):
+        super().__init__()
+        bot_channels = int(round(num_channels * bot_mul))
+        self.conv1 = nn.LazyConv2d(bot_channels, kernel_size=1, stride=1)
+        self.conv2 = nn.LazyConv2d(bot_channels, kernel_size=3,
+                                   stride=strides, padding=1,
+                                   groups=bot_channels//groups)
+        self.conv3 = nn.LazyConv2d(num_channels, kernel_size=1, stride=1)
+        self.bn1 = nn.LazyBatchNorm2d()
+        self.bn2 = nn.LazyBatchNorm2d()
+        self.bn3 = nn.LazyBatchNorm2d()
+        if use_1x1conv:
+            self.conv4 = nn.LazyConv2d(num_channels, kernel_size=1,
+                                       stride=strides)
+            self.bn4 = nn.LazyBatchNorm2d()
+        else:
+            self.conv4 = None
+
+    def forward(self, X):
+        Y = F.relu(self.bn1(self.conv1(X)))
+        Y = F.relu(self.bn2(self.conv2(Y)))
+        Y = self.bn3(self.conv3(Y))
+        if self.conv4:
+            X = self.bn4(self.conv4(X))
+        return F.relu(Y + X)
 
 class TimeMachine(d2l.DataModule):
     """Defined in :numref:`sec_text-sequence`"""
@@ -654,7 +656,7 @@ class RNNScratch(d2l.Module):
         self.W_xh = nn.Parameter(
             d2l.randn(num_inputs, num_hiddens) * sigma)
         self.W_hh = nn.Parameter(
-            d2l.rand(num_hiddens, num_hiddens) * sigma)
+            d2l.randn(num_hiddens, num_hiddens) * sigma)
         self.b_h = nn.Parameter(d2l.zeros(num_hiddens))
 
     def forward(self, inputs, state=None):
@@ -678,7 +680,7 @@ def check_shape(a, shape):
     assert a.shape == shape, \
             f'tensor\'s shape {a.shape} != expected shape {shape}'
 
-class RNNLMScratch(d2l.Classification):
+class RNNLMScratch(d2l.Classifier):
     """Defined in :numref:`sec_rnn-scratch`"""
     def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
@@ -743,7 +745,7 @@ class RNN(d2l.Module):
 class RNNLM(d2l.RNNLMScratch):
     """Defined in :numref:`sec_rnn-concise`"""
     def init_params(self):
-        self.linear = nn.Linear(self.rnn.num_hiddens, self.vocab_size)
+        self.linear = nn.LazyLinear(self.vocab_size)
     def output_layer(self, hiddens):
         return d2l.swapaxes(self.linear(hiddens), 0, 1)
 
@@ -760,14 +762,15 @@ class LSTMScratch(d2l.Module):
         self.W_xi, self.W_hi, self.b_i = triple()  # Input gate
         self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
         self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
-        self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell
+        self.W_xc, self.W_hc, self.b_c = triple()  # Input node
 
 class GRU(d2l.RNN):
     """Defined in :numref:`sec_deep_rnn`"""
     def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0):
         d2l.Module.__init__(self)
         self.save_hyperparameters()
-        self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers, dropout=dropout)
+        self.rnn = nn.GRU(num_inputs, num_hiddens, num_layers,
+                          dropout=dropout)
 
 class MTFraEng(d2l.DataModule):
     """Defined in :numref:`sec_machine_translation`"""
@@ -797,50 +800,71 @@ class MTFraEng(d2l.DataModule):
             if len(parts) == 2:
                 # Skip empty tokens
                 src.append([t for t in f'{parts[0]} <eos>'.split(' ') if t])
-                tgt.append([t for t in f'<bos> {parts[1]} <eos>'.split(' ') if t])
+                tgt.append([t for t in f'{parts[1]} <eos>'.split(' ') if t])
         return src, tgt
 
-    def __init__(self, batch_size, num_steps, num_train=1000, num_val=1000):
+    def __init__(self, batch_size, num_steps=9, num_train=512, num_val=128):
         """Defined in :numref:`sec_machine_translation`"""
         super(MTFraEng, self).__init__()
         self.save_hyperparameters()
         self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
             self._download())
     
+    
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
         """Defined in :numref:`sec_machine_translation`"""
-        def _build_one(sentences, vocab):
-            pad_or_trim = lambda s, n: (
-                s[:n] if len(s) > n else s + ['<pad>'] * (n - len(s)))
-            sentences = [pad_or_trim(seq, self.num_steps) for seq in sentences]
-            if vocab is None: vocab = d2l.Vocab(sentences, min_freq=2)
-            array = d2l.tensor([vocab[sent] for sent in sentences])
-            return array, vocab
+        def _build_array(sentences, vocab, is_tgt=False):
+            pad_or_trim = lambda seq, t: (
+                seq[:t] if len(seq) > t else seq + ['<pad>'] * (t - len(seq)))
+            sentences = [pad_or_trim(s, self.num_steps) for s in sentences]
+            if is_tgt:
+                sentences = [['<bos>'] + s for s in sentences]
+            if vocab is None:
+                vocab = d2l.Vocab(sentences, min_freq=2)
+            array = d2l.tensor([vocab[s] for s in sentences])
+            valid_len = d2l.reduce_sum(
+                d2l.astype(array != vocab['<pad>'], d2l.int32), 1)
+            return array, vocab, valid_len
         src, tgt = self._tokenize(self._preprocess(raw_text),
                                   self.num_train + self.num_val)
-        src_array, src_vocab = _build_one(src, src_vocab)
-        tgt_array, tgt_vocab = _build_one(tgt, tgt_vocab)
-        return (src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab, tgt_vocab
+        src_array, src_vocab, src_valid_len = _build_array(src, src_vocab)
+        tgt_array, tgt_vocab, _ = _build_array(tgt, tgt_vocab, True)
+        return ((src_array, tgt_array[:,:-1], src_valid_len, tgt_array[:,1:]),
+                src_vocab, tgt_vocab)
 
     def get_dataloader(self, train):
-        """Defined in :numref:`sec_machine_translation`"""
+        """Defined in :numref:`subsec_loading-seq-fixed-len`"""
         idx = slice(0, self.num_train) if train else slice(self.num_train, None)
         return self.get_tensorloader(self.arrays, train, idx)
 
     def build(self, src_sentences, tgt_sentences):
-        """Defined in :numref:`sec_machine_translation`"""
-        raw_text = '\n'.join([src+'\t'+tgt for src, tgt in zip(
+        """Defined in :numref:`subsec_loading-seq-fixed-len`"""
+        raw_text = '\n'.join([src + '\t' + tgt for src, tgt in zip(
             src_sentences, tgt_sentences)])
         arrays, _, _ = self._build_arrays(
             raw_text, self.src_vocab, self.tgt_vocab)
         return arrays
 
+def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
+    """Plot the histogram for list length pairs.
+
+    Defined in :numref:`sec_machine_translation`"""
+    d2l.set_figsize()
+    _, _, patches = d2l.plt.hist(
+        [[len(l) for l in xlist], [len(l) for l in ylist]])
+    d2l.plt.xlabel(xlabel)
+    d2l.plt.ylabel(ylabel)
+    for patch in patches[1].patches:
+        patch.set_hatch('/')
+    d2l.plt.legend(legend)
+
 class Encoder(nn.Module):
     """The base encoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Encoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
+    # Later there can be additional arguments (e.g., length excluding padding)
     def forward(self, X, *args):
         raise NotImplementedError
 
@@ -848,30 +872,59 @@ class Decoder(nn.Module):
     """The base decoder interface for the encoder-decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
-    def __init__(self, **kwargs):
-        super(Decoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
+    # Later there can be additional arguments (e.g., length excluding padding)
     def init_state(self, enc_outputs, *args):
         raise NotImplementedError
 
     def forward(self, X, state):
         raise NotImplementedError
 
-class EncoderDecoder(nn.Module):
+class EncoderDecoder(d2l.Classifier):
     """The base class for the encoder-decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoder, self).__init__(**kwargs)
+    def __init__(self, encoder, decoder):
+        super().__init__()
         self.encoder = encoder
         self.decoder = decoder
 
     def forward(self, enc_X, dec_X, *args):
         enc_outputs = self.encoder(enc_X, *args)
         dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state)
+        # Return decoder output only
+        return self.decoder(dec_X, dec_state)[0]
 
-class Seq2SeqEncoder(d2l.Module):
+    def predict_step(self, batch, device, num_steps,
+                     save_attention_weights=False):
+        """Defined in :numref:`sec_seq2seq_training`"""
+        batch = [d2l.to(a, device) for a in batch]
+        src, tgt, src_valid_len, _ = batch
+        enc_outputs = self.encoder(src, src_valid_len)
+        dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
+        outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
+        for _ in range(num_steps):
+            Y, dec_state = self.decoder(outputs[-1], dec_state)
+            outputs.append(d2l.argmax(Y, 2))
+            # Save attention weights (to be covered later)
+            if save_attention_weights:
+                attention_weights.append(self.decoder.attention_weights)
+        return d2l.concat(outputs[1:], 1), attention_weights
+
+def init_seq2seq(module):
+    """Initialize weights for Seq2Seq.
+
+    Defined in :numref:`sec_seq2seq`"""
+    if type(module) == nn.Linear:
+         nn.init.xavier_uniform_(module.weight)
+    if type(module) == nn.GRU:
+        for param in module._flat_weights_names:
+            if "weight" in param:
+                nn.init.xavier_uniform_(module._parameters[param])
+
+class Seq2SeqEncoder(d2l.Encoder):
     """The RNN encoder for sequence to sequence learning.
 
     Defined in :numref:`sec_seq2seq`"""
@@ -880,7 +933,9 @@ class Seq2SeqEncoder(d2l.Module):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(embed_size, num_hiddens, num_layers, dropout)
-    def forward(self, X):
+        self.apply(init_seq2seq)
+
+    def forward(self, X, *args):
         # X shape: (batch_size, num_steps)
         embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int64))
         # embs shape: (num_steps, batch_size, embed_size)
@@ -889,25 +944,19 @@ class Seq2SeqEncoder(d2l.Module):
         # state shape: (num_layers, batch_size, num_hiddens)
         return output, state
 
-class Seq2Seq(d2l.Classification):
+class Seq2Seq(d2l.EncoderDecoder):
     """Defined in :numref:`sec_seq2seq_decoder`"""
     def __init__(self, encoder, decoder, tgt_pad, lr):
-        super().__init__()
+        super().__init__(encoder, decoder)
         self.save_hyperparameters()
 
-    def forward(self, src, tgt):
-        return self.decoder(tgt, self.encoder(src)[1])[0]
+    def validation_step(self, batch):
+        Y_hat = self(*batch[:-1])
+        self.plot('loss', self.loss(Y_hat, batch[-1]), train=False)
 
-    def predict_step(self, batch):
-        """Defined in :numref:`sec_seq2seq_training`"""
-        src, tgt, _ = batch
-        enc_state = self.encoder(src)[1]
-        dec_state = None
-        outputs = [d2l.expand_dims(tgt[:,0], 1), ]
-        for _ in range(tgt.shape[1]):
-            Y, dec_state = self.decoder(outputs[-1], enc_state, dec_state)
-            outputs.append(d2l.argmax(Y, 2))
-        return d2l.concat(outputs[1:], 1)
+    def configure_optimizers(self):
+        # Adam optimizer is used here
+        return torch.optim.Adam(self.parameters(), lr=self.lr)
 
 def bleu(pred_seq, label_seq, k):
     """Compute the BLEU.
@@ -916,7 +965,7 @@ def bleu(pred_seq, label_seq, k):
     pred_tokens, label_tokens = pred_seq.split(' '), label_seq.split(' ')
     len_pred, len_label = len(pred_tokens), len(label_tokens)
     score = math.exp(min(0, 1 - len_label / len_pred))
-    for n in range(1, k + 1):
+    for n in range(1, min(k, len_pred) + 1):
         num_matches, label_subs = 0, collections.defaultdict(int)
         for i in range(len_label - n + 1):
             label_subs[' '.join(label_tokens[i: i + n])] += 1
@@ -951,7 +1000,14 @@ def masked_softmax(X, valid_lens):
     """Perform softmax operation by masking elements on the last axis.
 
     Defined in :numref:`sec_attention-scoring-functions`"""
-    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    # X: 3D tensor, valid_lens: 1D or 2D tensor
+    def _sequence_mask(X, valid_len, value=0):
+        maxlen = X.size(1)
+        mask = torch.arange((maxlen), dtype=torch.float32,
+                            device=X.device)[None, :] < valid_len[:, None]
+        X[~mask] = value
+        return X
+
     if valid_lens is None:
         return nn.functional.softmax(X, dim=-1)
     else:
@@ -962,35 +1018,33 @@ def masked_softmax(X, valid_lens):
             valid_lens = valid_lens.reshape(-1)
         # On the last axis, replace masked elements with a very large negative
         # value, whose exponentiation outputs 0
-        X = d2l.sequence_mask(X.reshape(-1, shape[-1]), valid_lens,
-                              value=-1e6)
+        X = _sequence_mask(X.reshape(-1, shape[-1]), valid_lens, value=-1e6)
         return nn.functional.softmax(X.reshape(shape), dim=-1)
 
 class AdditiveAttention(nn.Module):
     """Additive attention.
 
     Defined in :numref:`sec_attention-scoring-functions`"""
-    def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
+    def __init__(self, num_hiddens, dropout, **kwargs):
         super(AdditiveAttention, self).__init__(**kwargs)
-        self.W_k = nn.Linear(key_size, num_hiddens, bias=False)
-        self.W_q = nn.Linear(query_size, num_hiddens, bias=False)
-        self.w_v = nn.Linear(num_hiddens, 1, bias=False)
+        self.W_k = nn.LazyLinear(num_hiddens, bias=False)
+        self.W_q = nn.LazyLinear(num_hiddens, bias=False)
+        self.w_v = nn.LazyLinear(1, bias=False)
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, queries, keys, values, valid_lens):
         queries, keys = self.W_q(queries), self.W_k(keys)
-        # After dimension expansion, shape of `queries`: (`batch_size`, no. of
-        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,
-        # no. of key-value pairs, `num_hiddens`). Sum them up with
-        # broadcasting
+        # After dimension expansion, shape of queries: (batch_size, no. of
+        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1, no. of
+        # key-value pairs, num_hiddens). Sum them up with broadcasting
         features = queries.unsqueeze(2) + keys.unsqueeze(1)
         features = torch.tanh(features)
-        # There is only one output of `self.w_v`, so we remove the last
-        # one-dimensional entry from the shape. Shape of `scores`:
-        # (`batch_size`, no. of queries, no. of key-value pairs)
+        # There is only one output of self.w_v, so we remove the last
+        # one-dimensional entry from the shape. Shape of scores: (batch_size,
+        # no. of queries, no. of key-value pairs)
         scores = self.w_v(features).squeeze(-1)
         self.attention_weights = masked_softmax(scores, valid_lens)
-        # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+        # Shape of values: (batch_size, no. of key-value pairs, value
         # dimension)
         return torch.bmm(self.dropout(self.attention_weights), values)
 
@@ -998,19 +1052,31 @@ class DotProductAttention(nn.Module):
     """Scaled dot product attention.
 
     Defined in :numref:`subsec_additive-attention`"""
-    def __init__(self, dropout, **kwargs):
-        super(DotProductAttention, self).__init__(**kwargs)
+    def __init__(self, dropout, num_heads=None):
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
+        self.num_heads = num_heads  # To be covered later
 
-    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
-    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
-    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
-    # dimension)
-    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)
-    def forward(self, queries, keys, values, valid_lens=None):
+    # Shape of queries: (batch_size, no. of queries, d)
+    # Shape of keys: (batch_size, no. of key-value pairs, d)
+    # Shape of values: (batch_size, no. of key-value pairs, value dimension)
+    # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
+    def forward(self, queries, keys, values, valid_lens=None,
+                window_mask=None):
         d = queries.shape[-1]
-        # Swap the last two dimensions of `keys` with `keys.transpose(1,2)`
-        scores = torch.bmm(queries, keys.transpose(1,2)) / math.sqrt(d)
+        # Swap the last two dimensions of keys with keys.transpose(1, 2)
+        scores = torch.bmm(queries, keys.transpose(1, 2)) / math.sqrt(d)
+        if window_mask is not None:  # To be covered later
+            num_windows = window_mask.shape[0]
+            n, num_queries, num_kv_pairs = scores.shape
+            # Shape of window_mask: (num_windows, no. of queries,
+            # no. of key-value pairs)
+            scores = d2l.reshape(
+                scores, (n//(num_windows*self.num_heads), num_windows,
+                         self.num_heads, num_queries, num_kv_pairs
+                        )) + d2l.expand_dims(
+                d2l.expand_dims(window_mask, 1), 0)
+            scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
         self.attention_weights = masked_softmax(scores, valid_lens)
         return torch.bmm(self.dropout(self.attention_weights), values)
 
@@ -1018,92 +1084,83 @@ class AttentionDecoder(d2l.Decoder):
     """The base attention-based decoder interface.
 
     Defined in :numref:`sec_seq2seq_attention`"""
-    def __init__(self, **kwargs):
-        super(AttentionDecoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
     @property
     def attention_weights(self):
         raise NotImplementedError
 
-class MultiHeadAttention(nn.Module):
+class MultiHeadAttention(d2l.Module):
     """Multi-head attention.
 
     Defined in :numref:`sec_multihead-attention`"""
-    def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 num_heads, dropout, bias=False, **kwargs):
-        super(MultiHeadAttention, self).__init__(**kwargs)
+    def __init__(self, num_hiddens, num_heads, dropout, bias=False, **kwargs):
+        super().__init__()
         self.num_heads = num_heads
-        self.attention = d2l.DotProductAttention(dropout)
-        self.W_q = nn.Linear(query_size, num_hiddens, bias=bias)
-        self.W_k = nn.Linear(key_size, num_hiddens, bias=bias)
-        self.W_v = nn.Linear(value_size, num_hiddens, bias=bias)
-        self.W_o = nn.Linear(num_hiddens, num_hiddens, bias=bias)
+        self.attention = d2l.DotProductAttention(dropout, num_heads)
+        self.W_q = nn.LazyLinear(num_hiddens, bias=bias)
+        self.W_k = nn.LazyLinear(num_hiddens, bias=bias)
+        self.W_v = nn.LazyLinear(num_hiddens, bias=bias)
+        self.W_o = nn.LazyLinear(num_hiddens, bias=bias)
 
-    def forward(self, queries, keys, values, valid_lens):
-        # Shape of `queries`, `keys`, or `values`:
-        # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`)
-        # Shape of `valid_lens`:
-        # (`batch_size`,) or (`batch_size`, no. of queries)
-        # After transposing, shape of output `queries`, `keys`, or `values`:
-        # (`batch_size` * `num_heads`, no. of queries or key-value pairs,
-        # `num_hiddens` / `num_heads`)
-        queries = transpose_qkv(self.W_q(queries), self.num_heads)
-        keys = transpose_qkv(self.W_k(keys), self.num_heads)
-        values = transpose_qkv(self.W_v(values), self.num_heads)
+    def forward(self, queries, keys, values, valid_lens, window_mask=None):
+        # Shape of queries, keys, or values:
+        # (batch_size, no. of queries or key-value pairs, num_hiddens)
+        # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
+        # After transposing, shape of output queries, keys, or values:
+        # (batch_size * num_heads, no. of queries or key-value pairs,
+        # num_hiddens / num_heads)
+        queries = self.transpose_qkv(self.W_q(queries))
+        keys = self.transpose_qkv(self.W_k(keys))
+        values = self.transpose_qkv(self.W_v(values))
 
         if valid_lens is not None:
-            # On axis 0, copy the first item (scalar or vector) for
-            # `num_heads` times, then copy the next item, and so on
+            # On axis 0, copy the first item (scalar or vector) for num_heads
+            # times, then copy the next item, and so on
             valid_lens = torch.repeat_interleave(
                 valid_lens, repeats=self.num_heads, dim=0)
 
-        # Shape of `output`: (`batch_size` * `num_heads`, no. of queries,
-        # `num_hiddens` / `num_heads`)
-        output = self.attention(queries, keys, values, valid_lens)
-
-        # Shape of `output_concat`:
-        # (`batch_size`, no. of queries, `num_hiddens`)
-        output_concat = transpose_output(output, self.num_heads)
+        # Shape of output: (batch_size * num_heads, no. of queries,
+        # num_hiddens / num_heads)
+        output = self.attention(queries, keys, values, valid_lens,
+                                window_mask)
+        # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
+        output_concat = self.transpose_output(output)
         return self.W_o(output_concat)
 
-def transpose_qkv(X, num_heads):
-    """Transposition for parallel computation of multiple attention heads.
+    def transpose_qkv(self, X):
+        """Transposition for parallel computation of multiple attention heads.
+    
+        Defined in :numref:`sec_multihead-attention`"""
+        # Shape of input X: (batch_size, no. of queries or key-value pairs,
+        # num_hiddens). Shape of output X: (batch_size, no. of queries or
+        # key-value pairs, num_heads, num_hiddens / num_heads)
+        X = X.reshape(X.shape[0], X.shape[1], self.num_heads, -1)
+        # Shape of output X: (batch_size, num_heads, no. of queries or key-value
+        # pairs, num_hiddens / num_heads)
+        X = X.permute(0, 2, 1, 3)
+        # Shape of output: (batch_size * num_heads, no. of queries or key-value
+        # pairs, num_hiddens / num_heads)
+        return X.reshape(-1, X.shape[2], X.shape[3])
+    
 
-    Defined in :numref:`sec_multihead-attention`"""
-    # Shape of input `X`:
-    # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`).
-    # Shape of output `X`:
-    # (`batch_size`, no. of queries or key-value pairs, `num_heads`,
-    # `num_hiddens` / `num_heads`)
-    X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
-
-    # Shape of output `X`:
-    # (`batch_size`, `num_heads`, no. of queries or key-value pairs,
-    # `num_hiddens` / `num_heads`)
-    X = X.permute(0, 2, 1, 3)
-
-    # Shape of `output`:
-    # (`batch_size` * `num_heads`, no. of queries or key-value pairs,
-    # `num_hiddens` / `num_heads`)
-    return X.reshape(-1, X.shape[2], X.shape[3])
-
-
-def transpose_output(X, num_heads):
-    """Reverse the operation of `transpose_qkv`.
-
-    Defined in :numref:`sec_multihead-attention`"""
-    X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
-    X = X.permute(0, 2, 1, 3)
-    return X.reshape(X.shape[0], X.shape[1], -1)
+    def transpose_output(self, X):
+        """Reverse the operation of transpose_qkv.
+    
+        Defined in :numref:`sec_multihead-attention`"""
+        X = X.reshape(-1, self.num_heads, X.shape[1], X.shape[2])
+        X = X.permute(0, 2, 1, 3)
+        return X.reshape(X.shape[0], X.shape[1], -1)
 
 class PositionalEncoding(nn.Module):
     """Positional encoding.
 
     Defined in :numref:`sec_self-attention-and-positional-encoding`"""
     def __init__(self, num_hiddens, dropout, max_len=1000):
-        super(PositionalEncoding, self).__init__()
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
-        # Create a long enough `P`
+        # Create a long enough P
         self.P = d2l.zeros((1, max_len, num_hiddens))
         X = d2l.arange(max_len, dtype=torch.float32).reshape(
             -1, 1) / torch.pow(10000, torch.arange(
@@ -1119,12 +1176,11 @@ class PositionWiseFFN(nn.Module):
     """Positionwise feed-forward network.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, ffn_num_input, ffn_num_hiddens, ffn_num_outputs,
-                 **kwargs):
-        super(PositionWiseFFN, self).__init__(**kwargs)
-        self.dense1 = nn.Linear(ffn_num_input, ffn_num_hiddens)
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs):
+        super().__init__()
+        self.dense1 = nn.LazyLinear(ffn_num_hiddens)
         self.relu = nn.ReLU()
-        self.dense2 = nn.Linear(ffn_num_hiddens, ffn_num_outputs)
+        self.dense2 = nn.LazyLinear(ffn_num_outputs)
 
     def forward(self, X):
         return self.dense2(self.relu(self.dense1(X)))
@@ -1132,30 +1188,27 @@ class PositionWiseFFN(nn.Module):
 class AddNorm(nn.Module):
     """Residual connection followed by layer normalization.
 
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, normalized_shape, dropout, **kwargs):
-        super(AddNorm, self).__init__(**kwargs)
+    Defined in :numref:`subsec_positionwise-ffn`"""
+    def __init__(self, norm_shape, dropout):
+        super().__init__()
         self.dropout = nn.Dropout(dropout)
-        self.ln = nn.LayerNorm(normalized_shape)
+        self.ln = nn.LayerNorm(norm_shape)
 
     def forward(self, X, Y):
         return self.ln(self.dropout(Y) + X)
 
-class EncoderBlock(nn.Module):
+class TransformerEncoderBlock(nn.Module):
     """Transformer encoder block.
 
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
-                 dropout, use_bias=False, **kwargs):
-        super(EncoderBlock, self).__init__(**kwargs)
-        self.attention = d2l.MultiHeadAttention(
-            key_size, query_size, value_size, num_hiddens, num_heads, dropout,
-            use_bias)
-        self.addnorm1 = AddNorm(norm_shape, dropout)
-        self.ffn = PositionWiseFFN(
-            ffn_num_input, ffn_num_hiddens, num_hiddens)
-        self.addnorm2 = AddNorm(norm_shape, dropout)
+    Defined in :numref:`subsec_positionwise-ffn`"""
+    def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
+                 use_bias=False):
+        super().__init__()
+        self.attention = d2l.MultiHeadAttention(num_hiddens, num_heads,
+                                                dropout, use_bias)
+        self.addnorm1 = AddNorm(num_hiddens, dropout)
+        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
+        self.addnorm2 = AddNorm(num_hiddens, dropout)
 
     def forward(self, X, valid_lens):
         Y = self.addnorm1(X, self.attention(X, X, X, valid_lens))
@@ -1164,22 +1217,19 @@ class EncoderBlock(nn.Module):
 class TransformerEncoder(d2l.Encoder):
     """Transformer encoder.
 
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, vocab_size, key_size, query_size, value_size,
-                 num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
-                 num_heads, num_layers, dropout, use_bias=False, **kwargs):
-        super(TransformerEncoder, self).__init__(**kwargs)
+    Defined in :numref:`subsec_transformer-encoder`"""
+    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
+                 num_heads, num_blks, dropout, use_bias=False):
+        super().__init__()
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
         self.blks = nn.Sequential()
-        for i in range(num_layers):
-            self.blks.add_module("block"+str(i),
-                EncoderBlock(key_size, query_size, value_size, num_hiddens,
-                             norm_shape, ffn_num_input, ffn_num_hiddens,
-                             num_heads, dropout, use_bias))
+        for i in range(num_blks):
+            self.blks.add_module("block"+str(i), TransformerEncoderBlock(
+                num_hiddens, ffn_num_hiddens, num_heads, dropout, use_bias))
 
-    def forward(self, X, valid_lens, *args):
+    def forward(self, X, valid_lens):
         # Since positional encoding values are between -1 and 1, the embedding
         # values are multiplied by the square root of the embedding dimension
         # to rescale before they are summed up
@@ -1199,7 +1249,7 @@ def train_2d(trainer, steps=20, f_grad=None):
     """Optimize a 2D objective function with a customized trainer.
 
     Defined in :numref:`subsec_gd-learningrate`"""
-    # `s1` and `s2` are internal state variables that will be used later
+    # `s1` and `s2` are internal state variables that will be used in Momentum, adagrad, RMSProp
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
     for i in range(steps):
@@ -1222,6 +1272,34 @@ def show_trace_2d(f, results):
     d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
     d2l.plt.xlabel('x1')
     d2l.plt.ylabel('x2')
+
+class Timer:
+    """Record multiple running times."""
+    def __init__(self):
+        """Defined in :numref:`sec_minibatch_sgd`"""
+        self.times = []
+        self.start()
+
+    def start(self):
+        """Start the timer."""
+        self.tik = time.time()
+
+    def stop(self):
+        """Stop the timer and record the time in a list."""
+        self.times.append(time.time() - self.tik)
+        return self.times[-1]
+
+    def avg(self):
+        """Return the average time."""
+        return sum(self.times) / len(self.times)
+
+    def sum(self):
+        """Return the sum of time."""
+        return sum(self.times)
+
+    def cumsum(self):
+        """Return the accumulated time."""
+        return np.array(self.times).cumsum().tolist()
 
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
                            '76e5be1548fd8222e5074cf0faae75edff8cf93f')
@@ -1265,17 +1343,13 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     """Defined in :numref:`sec_minibatches`"""
     # Initialization
     net = nn.Sequential(nn.Linear(5, 1))
-    def init_weights(m):
-        if type(m) == nn.Linear:
-            torch.nn.init.normal_(m.weight, std=0.01)
+    def init_weights(module):
+        if type(module) == nn.Linear:
+            torch.nn.init.normal_(module.weight, std=0.01)
     net.apply(init_weights)
 
     optimizer = trainer_fn(net.parameters(), **hyperparams)
-
-    loss = nn.MSELoss()
-    # Note: L2 Loss = 1/2 * MSE Loss. PyTorch has MSE Loss which is slightly
-    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
-    # value to get L2Loss in PyTorch
+    loss = nn.MSELoss(reduction='none')
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()
@@ -1284,14 +1358,15 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
             optimizer.zero_grad()
             out = net(X)
             y = y.reshape(out.shape)
-            l = loss(out, y)/2
-            l.backward()
+            l = loss(out, y)
+            l.mean().backward()
             optimizer.step()
             n += X.shape[0]
             if n % 200 == 0:
                 timer.stop()
+                # `MSELoss` computes squared error without the 1/2 factor
                 animator.add(n/X.shape[0]/len(data_iter),
-                             (d2l.evaluate_loss(net, data_iter, loss)/2,))
+                             (d2l.evaluate_loss(net, data_iter, loss) / 2,))
                 timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 
@@ -1325,14 +1400,14 @@ def resnet18(num_classes, in_channels=1):
         blk = []
         for i in range(num_residuals):
             if i == 0 and not first_block:
-                blk.append(d2l.Residual(in_channels, out_channels,
-                                        use_1x1conv=True, strides=2))
+                blk.append(d2l.Residual(out_channels, use_1x1conv=True,
+                                        strides=2))
             else:
-                blk.append(d2l.Residual(out_channels, out_channels))
+                blk.append(d2l.Residual(out_channels))
         return nn.Sequential(*blk)
 
     # This model uses a smaller convolution kernel, stride, and padding and
-    # removes the maximum pooling layer
+    # removes the max-pooling layer
     net = nn.Sequential(
         nn.Conv2d(in_channels, 64, kernel_size=3, stride=1, padding=1),
         nn.BatchNorm2d(64),
@@ -1347,7 +1422,7 @@ def resnet18(num_classes, in_channels=1):
     return net
 
 def train_batch_ch13(net, X, y, loss, trainer, devices):
-    """Train for a minibatch with mutiple GPUs (defined in Chapter 13).
+    """Train for a minibatch with multiple GPUs (defined in Chapter 13).
 
     Defined in :numref:`sec_image_augmentation`"""
     if isinstance(X, list):
@@ -1368,7 +1443,7 @@ def train_batch_ch13(net, X, y, loss, trainer, devices):
 
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                devices=d2l.try_all_gpus()):
-    """Train a model with mutiple GPUs (defined in Chapter 13).
+    """Train a model with multiple GPUs (defined in Chapter 13).
 
     Defined in :numref:`sec_image_augmentation`"""
     timer, num_batches = d2l.Timer(), len(train_iter)
@@ -1452,7 +1527,7 @@ def multibox_prior(data, sizes, ratios):
     # Generate all center points for the anchor boxes
     center_h = (torch.arange(in_height, device=device) + offset_h) * steps_h
     center_w = (torch.arange(in_width, device=device) + offset_w) * steps_w
-    shift_y, shift_x = torch.meshgrid(center_h, center_w)
+    shift_y, shift_x = torch.meshgrid(center_h, center_w, indexing='ij')
     shift_y, shift_x = shift_y.reshape(-1), shift_x.reshape(-1)
 
     # Generate `boxes_per_pixel` number of heights and widths that are later
@@ -1780,7 +1855,7 @@ class VOCSegDataset(torch.utils.data.Dataset):
         print('read ' + str(len(self.features)) + ' examples')
 
     def normalize_image(self, img):
-        return self.transform(img.float()/255)
+        return self.transform(img.float() / 255)
 
     def filter(self, imgs):
         return [img for img in imgs if (
@@ -2069,18 +2144,15 @@ class BERTEncoder(nn.Module):
     """BERT encoder.
 
     Defined in :numref:`subsec_bert_input_rep`"""
-    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_input,
-                 ffn_num_hiddens, num_heads, num_layers, dropout,
-                 max_len=1000, key_size=768, query_size=768, value_size=768,
-                 **kwargs):
+    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
+                 num_blks, dropout, max_len=1000, **kwargs):
         super(BERTEncoder, self).__init__(**kwargs)
         self.token_embedding = nn.Embedding(vocab_size, num_hiddens)
         self.segment_embedding = nn.Embedding(2, num_hiddens)
         self.blks = nn.Sequential()
-        for i in range(num_layers):
-            self.blks.add_module(f"{i}", d2l.EncoderBlock(
-                key_size, query_size, value_size, num_hiddens, norm_shape,
-                ffn_num_input, ffn_num_hiddens, num_heads, dropout, True))
+        for i in range(num_blks):
+            self.blks.add_module(f"{i}", d2l.TransformerEncoderBlock(
+                num_hiddens, ffn_num_hiddens, num_heads, dropout, True))
         # In BERT, positional embeddings are learnable, thus we create a
         # parameter of positional embeddings that are long enough
         self.pos_embedding = nn.Parameter(torch.randn(1, max_len,
@@ -2090,7 +2162,7 @@ class BERTEncoder(nn.Module):
         # Shape of `X` remains unchanged in the following code snippet:
         # (batch size, max sequence length, `num_hiddens`)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
-        X = X + self.pos_embedding.data[:, :X.shape[1], :]
+        X = X + self.pos_embedding[:, :X.shape[1], :]
         for blk in self.blks:
             X = blk(X, valid_lens)
         return X
@@ -2099,12 +2171,12 @@ class MaskLM(nn.Module):
     """The masked language model task of BERT.
 
     Defined in :numref:`subsec_bert_input_rep`"""
-    def __init__(self, vocab_size, num_hiddens, num_inputs=768, **kwargs):
+    def __init__(self, vocab_size, num_hiddens, **kwargs):
         super(MaskLM, self).__init__(**kwargs)
-        self.mlp = nn.Sequential(nn.Linear(num_inputs, num_hiddens),
+        self.mlp = nn.Sequential(nn.LazyLinear(num_hiddens),
                                  nn.ReLU(),
                                  nn.LayerNorm(num_hiddens),
-                                 nn.Linear(num_hiddens, vocab_size))
+                                 nn.LazyLinear(vocab_size))
 
     def forward(self, X, pred_positions):
         num_pred_positions = pred_positions.shape[1]
@@ -2123,9 +2195,9 @@ class NextSentencePred(nn.Module):
     """The next sentence prediction task of BERT.
 
     Defined in :numref:`subsec_mlm`"""
-    def __init__(self, num_inputs, **kwargs):
+    def __init__(self, **kwargs):
         super(NextSentencePred, self).__init__(**kwargs)
-        self.output = nn.Linear(num_inputs, 2)
+        self.output = nn.LazyLinear(2)
 
     def forward(self, X):
         # `X` shape: (batch size, `num_hiddens`)
@@ -2135,20 +2207,16 @@ class BERTModel(nn.Module):
     """The BERT model.
 
     Defined in :numref:`subsec_nsp`"""
-    def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_input,
-                 ffn_num_hiddens, num_heads, num_layers, dropout,
-                 max_len=1000, key_size=768, query_size=768, value_size=768,
-                 hid_in_features=768, mlm_in_features=768,
-                 nsp_in_features=768):
+    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
+                 num_heads, num_blks, dropout, max_len=1000):
         super(BERTModel, self).__init__()
-        self.encoder = BERTEncoder(vocab_size, num_hiddens, norm_shape,
-                    ffn_num_input, ffn_num_hiddens, num_heads, num_layers,
-                    dropout, max_len=max_len, key_size=key_size,
-                    query_size=query_size, value_size=value_size)
-        self.hidden = nn.Sequential(nn.Linear(hid_in_features, num_hiddens),
+        self.encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens,
+                                   num_heads, num_blks, dropout,
+                                   max_len=max_len)
+        self.hidden = nn.Sequential(nn.LazyLinear(num_hiddens),
                                     nn.Tanh())
-        self.mlm = MaskLM(vocab_size, num_hiddens, mlm_in_features)
-        self.nsp = NextSentencePred(nsp_in_features)
+        self.mlm = MaskLM(vocab_size, num_hiddens)
+        self.nsp = NextSentencePred()
 
     def forward(self, tokens, segments, valid_lens=None, pred_positions=None):
         encoded_X = self.encoder(tokens, segments, valid_lens)
@@ -2202,8 +2270,8 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
 def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
                         vocab):
     """Defined in :numref:`sec_bert-dataset`"""
-    # Make a new copy of tokens for the input of a masked language model,
-    # where the input may contain replaced '<mask>' or random tokens
+    # For the input of a masked language model, make a new copy of tokens and
+    # replace some of them by '<mask>' or random tokens
     mlm_input_tokens = [token for token in tokens]
     pred_positions_and_labels = []
     # Shuffle for getting 15% random tokens for prediction in the masked
@@ -2342,9 +2410,8 @@ def _get_batch_loss_bert(net, loss, vocab_size, tokens_X,
     l = mlm_l + nsp_l
     return mlm_l, nsp_l, l
 
-d2l.DATA_HUB['aclImdb'] = (
-    'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',
-    '01ada507287d82875905620988597833ad4e0903')
+d2l.DATA_HUB['aclImdb'] = (d2l.DATA_URL + 'aclImdb_v1.tar.gz',
+                          '01ada507287d82875905620988597833ad4e0903')
 
 def read_imdb(data_dir, is_train):
     """Read the IMDb review dataset text sequences and labels.
@@ -2516,8 +2583,8 @@ def load_array(data_arrays, batch_size, is_train=True):
     """Construct a PyTorch data iterator.
 
     Defined in :numref:`sec_utils`"""
-    dataset = data.TensorDataset(*data_arrays)
-    return data.DataLoader(dataset, batch_size, shuffle=is_train)
+    dataset = torch.utils.data.TensorDataset(*data_arrays)
+    return torch.utils.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 def synthetic_data(w, b, num_examples):
     """Generate y = Xw + b + noise.
@@ -2555,10 +2622,10 @@ def load_data_fashion_mnist(batch_size, resize=None):
         root="../data", train=True, transform=trans, download=True)
     mnist_test = torchvision.datasets.FashionMNIST(
         root="../data", train=False, transform=trans, download=True)
-    return (data.DataLoader(mnist_train, batch_size, shuffle=True,
-                            num_workers=get_dataloader_workers()),
-            data.DataLoader(mnist_test, batch_size, shuffle=False,
-                            num_workers=get_dataloader_workers()))
+    return (torch.utils.data.DataLoader(mnist_train, batch_size, shuffle=True,
+                                        num_workers=get_dataloader_workers()),
+            torch.utils.data.DataLoader(mnist_test, batch_size, shuffle=False,
+                                        num_workers=get_dataloader_workers()))
 
 def evaluate_accuracy_gpu(net, data_iter, device=None):
     """Compute the accuracy for a model on a dataset using a GPU.
@@ -2731,14 +2798,15 @@ def accuracy(y_hat, y):
     return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
 def download(url, folder='../data', sha1_hash=None):
-    """Defined in :numref:`sec_utils`"""
-    if not url.startswith('http'):
-        # back compatability
-        url, sha1_hash = DATA_HUB[url]
+    """Download a file to folder and return the local filepath.
 
+    Defined in :numref:`sec_utils`"""
+    if not url.startswith('http'):
+        # For back compatability
+        url, sha1_hash = DATA_HUB[url]
     os.makedirs(folder, exist_ok=True)
     fname = os.path.join(folder, url.split('/')[-1])
-    # check if hit cache
+    # Check if hit cache
     if os.path.exists(fname) and sha1_hash:
         sha1 = hashlib.sha1()
         with open(fname, 'rb') as f:
@@ -2749,7 +2817,7 @@ def download(url, folder='../data', sha1_hash=None):
                 sha1.update(data)
         if sha1.hexdigest() == sha1_hash:
             return fname
-    # download
+    # Download
     print(f'Downloading {fname} from {url}...')
     r = requests.get(url, stream=True, verify=True)
     with open(fname, 'wb') as f:
@@ -2757,7 +2825,7 @@ def download(url, folder='../data', sha1_hash=None):
     return fname
 
 def extract(filename, folder=None):
-    """Download and extract a zip/tar file.
+    """Extract a zip/tar file into folder.
 
     Defined in :numref:`sec_utils`"""
     base_dir = os.path.dirname(filename)
@@ -2860,18 +2928,6 @@ def tokenize_nmt(text, num_examples=None):
             target.append(parts[1].split(' '))
     return source, target
 
-def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
-    """Plot the histogram for list length pairs.
-
-    Defined in :numref:`sec_utils`"""
-    d2l.set_figsize()
-    _, _, patches = d2l.plt.hist(
-        [[len(l) for l in xlist], [len(l) for l in ylist]])
-    d2l.plt.xlabel(xlabel)
-    d2l.plt.ylabel(ylabel)
-    for patch in patches[1].patches:
-        patch.set_hatch('/')
-    d2l.plt.legend(legend)
 
 def truncate_pad(line, num_steps, padding_token):
     """Truncate or pad sequences.
@@ -2911,46 +2967,16 @@ def load_data_nmt(batch_size, num_steps, num_examples=600):
     data_iter = d2l.load_array(data_arrays, batch_size)
     return data_iter, src_vocab, tgt_vocab
 
-def bleu(pred_seq, label_seq, k):
-    """Compute the BLEU.
+def sequence_mask(X, valid_len, value=0):
+    """Mask irrelevant entries in sequences.
 
     Defined in :numref:`sec_utils`"""
-    pred_tokens, label_tokens = pred_seq.split(' '), label_seq.split(' ')
-    len_pred, len_label = len(pred_tokens), len(label_tokens)
-    score = math.exp(min(0, 1 - len_label / len_pred))
-    for n in range(1, k + 1):
-        num_matches, label_subs = 0, collections.defaultdict(int)
-        for i in range(len_label - n + 1):
-            label_subs[''.join(label_tokens[i: i + n])] += 1
-        for i in range(len_pred - n + 1):
-            if label_subs[''.join(pred_tokens[i: i + n])] > 0:
-                num_matches += 1
-                label_subs[''.join(pred_tokens[i: i + n])] -= 1
-        score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
-    return score
+    maxlen = X.size(1)
+    mask = torch.arange((maxlen), dtype=torch.float32,
+                        device=X.device)[None, :] < valid_len[:, None]
+    X[~mask] = value
+    return X
 
-class Seq2SeqEncoderOld(d2l.Encoder):
-    """The RNN encoder for sequence to sequence learning.
-
-    Defined in :numref:`sec_utils`"""
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqEncoderOld, self).__init__(**kwargs)
-        # Embedding layer
-        self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = nn.GRU(embed_size, num_hiddens, num_layers,
-                          dropout=dropout)
-
-    def forward(self, X, *args):
-        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
-        X = self.embedding(X)
-        # In RNN models, the first axis corresponds to time steps
-        X = X.permute(1, 0, 2)
-        # When state is not mentioned, it defaults to zeros
-        output, state = self.rnn(X)
-        # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
-        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`)
-        return output, state
 
 class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
     """The softmax cross-entropy loss with masks.
@@ -3008,15 +3034,6 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
           f'tokens/sec on {str(device)}')
 
-def sequence_mask(X, valid_len, value=0):
-    """Mask irrelevant entries in sequences.
-
-    Defined in :numref:`sec_utils`"""
-    maxlen = X.size(1)
-    mask = torch.arange((maxlen), dtype=torch.float32,
-                        device=X.device)[None, :] < valid_len[:, None]
-    X[~mask] = value
-    return X
 
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device, save_attention_weights=False):
@@ -3040,7 +3057,7 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
     output_seq, attention_weight_seq = [], []
     for _ in range(num_steps):
         Y, dec_state = net.decoder(dec_X, dec_state)
-        # We use the token with the highest prediction likelihood as the input
+        # We use the token with the highest prediction likelihood as input
         # of the decoder at the next time step
         dec_X = Y.argmax(dim=2)
         pred = dec_X.squeeze(dim=0).type(torch.int32).item()
@@ -3052,7 +3069,10 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
         if pred == tgt_vocab['<eos>']:
             break
         output_seq.append(pred)
-    return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq# Alias defined in config.ini
+    return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq
+
+
+# Alias defined in config.ini
 nn_Module = nn.Module
 
 ones_like = torch.ones_like

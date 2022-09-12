@@ -2,6 +2,33 @@
 
 set -e
 
+# Read arguments
+BRANCH_NAME=$1
+JOB_NAME=$2
+
+STABLE_BASE_PATH="https://d2l.ai"
+PREVIEW_BASE_PATH="http://preview.d2l.ai/$JOB_NAME"
+
+# Generate Headers
+if [[ "$BRANCH_NAME" == "release" ]]; then
+    echo "Use release headers"
+    alternate_text="Preview Version"
+    alternate_base="${PREVIEW_BASE_PATH/release/master}"  # Substitute "release" with "master"
+    current_base=$STABLE_BASE_PATH
+else
+    echo "Use ${JOB_NAME} headers"
+    alternate_text="Stable Version"
+    alternate_base=$STABLE_BASE_PATH
+    current_base=$PREVIEW_BASE_PATH
+fi
+
+
+# Replace placeholders in ../config.ini
+sed -i -e "s@###_ALTERNATE_VERSION_###@$alternate_text@g" ./config.ini
+sed -i -e "s@###_ALTERNATE_VERSION_BASE_LINK_###@$alternate_base@g" ./config.ini
+sed -i -e "s@###_CURRENT_VERSION_BASE_LINK_###@$current_base@g" ./config.ini
+
+
 rm -rf _build/rst _build/html
 d2lbook build rst --tab all
 cp static/frontpage/frontpage.html _build/rst_all/

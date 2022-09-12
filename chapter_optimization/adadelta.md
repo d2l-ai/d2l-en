@@ -1,11 +1,11 @@
 # Adadelta
 :label:`sec_adadelta`
 
-Adadelta is yet another variant of AdaGrad (:numref:`sec_adagrad`). The main difference lies in the fact that it decreases the amount by which the learning rate is adaptive to coordinates. Moreover, traditionally it referred to as not having a learning rate since it uses the amount of change itself as calibration for future change. The algorithm was proposed in :cite:`Zeiler.2012`. It is fairly straightforward, given the discussion of previous algorithms so far. 
+Adadelta is yet another variant of AdaGrad (:numref:`sec_adagrad`). The main difference lies in the fact that it decreases the amount by which the learning rate is adaptive to coordinates. Moreover, traditionally it referred to as not having a learning rate since it uses the amount of change itself as calibration for future change. The algorithm was proposed in :citet:`Zeiler.2012`. It is fairly straightforward, given the discussion of previous algorithms so far.
 
 ## The Algorithm
 
-In a nutshell, Adadelta uses two state variables, $\mathbf{s}_t$ to store a leaky average of the second moment of the gradient and $\Delta\mathbf{x}_t$ to store a leaky average of the second moment of the change of parameters in the model itself. Note that we use the original notation and naming of the authors for compatibility with other publications and implementations (there is no other real reason why one should use different Greek variables to indicate a parameter serving the same purpose in momentum, Adagrad, RMSProp, and Adadelta). 
+In a nutshell, Adadelta uses two state variables, $\mathbf{s}_t$ to store a leaky average of the second moment of the gradient and $\Delta\mathbf{x}_t$ to store a leaky average of the second moment of the change of parameters in the model itself. Note that we use the original notation and naming of the authors for compatibility with other publications and implementations (there is no other real reason why one should use different Greek variables to indicate a parameter serving the same purpose in momentum, Adagrad, RMSProp, and Adadelta).
 
 Here are the technical details of Adadelta. Given the parameter du jour is $\rho$, we obtain the following leaky updates similarly to :numref:`sec_rmsprop`:
 
@@ -40,6 +40,7 @@ and $\epsilon$ (a small value such as $10^{-5}$) is added to maintain numerical 
 Adadelta needs to maintain two state variables for each variable, $\mathbf{s}_t$ and $\Delta\mathbf{x}_t$. This yields the following implementation.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -117,6 +118,7 @@ d2l.train_ch11(adadelta, init_adadelta_states(feature_dim),
 For a concise implementation we simply use the `adadelta` algorithm from the `Trainer` class. This yields the following one-liner for a much more compact invocation.
 
 ```{.python .input}
+#@tab mxnet
 d2l.train_concise_ch11('adadelta', {'rho': 0.9}, data_iter)
 ```
 
@@ -136,9 +138,9 @@ d2l.train_concise_ch11(trainer, {'learning_rate':5.0, 'rho': 0.9}, data_iter)
 
 ## Summary
 
-* Adadelta has no learning rate parameter. Instead, it uses the rate of change in the parameters itself to adapt the learning rate. 
-* Adadelta requires two state variables to store the second moments of gradient and the change in parameters. 
-* Adadelta uses leaky averages to keep a running estimate of the appropriate statistics. 
+* Adadelta has no learning rate parameter. Instead, it uses the rate of change in the parameters itself to adapt the learning rate.
+* Adadelta requires two state variables to store the second moments of gradient and the change in parameters.
+* Adadelta uses leaky averages to keep a running estimate of the appropriate statistics.
 
 ## Exercises
 

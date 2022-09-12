@@ -3,11 +3,11 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Implementation 
-:label:`sec_mlp_scratch`
+# Implementation of Multilayer Perceptrons
+:label:`sec_mlp-implementation`
 
-Multilayer Perceptrons are not much more complex to implement than simple linear models. The key conceptual 
-difference is that we now concatenate multiple layers. Let's begin again by implementing such a network from scratch.
+Multilayer perceptrons (MLPs) are not much more complex to implement than simple linear models. The key conceptual
+difference is that we now concatenate multiple layers.
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -32,21 +32,23 @@ import tensorflow as tf
 
 ## Implementation from Scratch
 
+Let's begin again by implementing such a network from scratch.
+
 ### Initializing Model Parameters
 
 Recall that Fashion-MNIST contains 10 classes,
 and that each image consists of a $28 \times 28 = 784$
 grid of grayscale pixel values.
 As before we will disregard the spatial structure
-among the pixels for now, 
+among the pixels for now,
 so we can think of this as a classification dataset
 with 784 input features and 10 classes.
 To begin, we will [**implement an MLP
 with one hidden layer and 256 hidden units.**]
-Both the number of layers and their width are adjustable 
-(they're considered hyperparameters). 
-Typically, we choose the layer widths to be divisible by larger powers of 2. 
-This is computationally efficient due to the way 
+Both the number of layers and their width are adjustable
+(they are considered hyperparameters).
+Typically, we choose the layer widths to be divisible by larger powers of 2.
+This is computationally efficient due to the way
 memory is allocated and addressed in hardware.
 
 Again, we will represent our parameters with several tensors.
@@ -57,7 +59,7 @@ for the gradients of the loss with respect to these parameters.
 
 ```{.python .input  n=5}
 %%tab mxnet
-class MLPScratch(d2l.Classification):
+class MLPScratch(d2l.Classifier):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -71,7 +73,7 @@ class MLPScratch(d2l.Classification):
 
 ```{.python .input  n=6}
 %%tab pytorch
-class MLPScratch(d2l.Classification):
+class MLPScratch(d2l.Classifier):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -83,7 +85,7 @@ class MLPScratch(d2l.Classification):
 
 ```{.python .input  n=7}
 %%tab tensorflow
-class MLPScratch(d2l.Classification):
+class MLPScratch(d2l.Classifier):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
@@ -164,7 +166,7 @@ the second is the output layer.
 
 ```{.python .input}
 %%tab mxnet
-class MLP(d2l.Classification):
+class MLP(d2l.Classifier):
     def __init__(self, num_outputs, num_hiddens, lr):
         super().__init__()
         self.save_hyperparameters()
@@ -176,26 +178,24 @@ class MLP(d2l.Classification):
 
 ```{.python .input}
 %%tab pytorch
-class MLP(d2l.Classification):
-    def __init__(self, num_inputs, num_outputs, num_hiddens, lr):
+class MLP(d2l.Classifier):
+    def __init__(self, num_outputs, num_hiddens, lr):
         super().__init__()
         self.save_hyperparameters()
-        self.net = nn.Sequential(nn.Flatten(),
-                                 nn.Linear(num_inputs, num_hiddens),
-                                 nn.ReLU(),
-                                 nn.Linear(num_hiddens, num_outputs))
+        self.net = nn.Sequential(nn.Flatten(), nn.LazyLinear(num_hiddens),
+                                 nn.ReLU(), nn.LazyLinear(num_outputs))
 ```
 
 ```{.python .input}
 %%tab tensorflow
-class MLP(d2l.Classification):
+class MLP(d2l.Classifier):
     def __init__(self, num_outputs, num_hiddens, lr):
         super().__init__()
         self.save_hyperparameters()
         self.net = tf.keras.models.Sequential([
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(num_hiddens, activation='relu'),
-            tf.keras.layers.Dense(num_outputs)])  
+            tf.keras.layers.Dense(num_outputs)])
 ```
 
 ### Training
@@ -208,34 +208,31 @@ from orthogonal considerations.
 
 ```{.python .input}
 %%tab all
-if tab.selected(['mxnet', 'tensorflow']):
-    model = MLP(num_outputs=10, num_hiddens=256, lr=0.1)
-if tab.selected(['pytorch']):
-    model = MLP(num_inputs=784, num_outputs=10, num_hiddens=256, lr=0.1)
+model = MLP(num_outputs=10, num_hiddens=256, lr=0.1)
 trainer.fit(model, data)
 ```
 
 ## Summary
 
-Now that we have more practice in designing deep networks, the step from a single to multiple layers of deep networks doesn't pose such a significant challenge any longer. In particular, we can re-use the training algorithm and data loader. Note, though, that implementing MLPs from scratch is nonetheless messy: Naming and keeping track of the model parameters makes it difficult to extend models. For instance, imagine wanting to insert another layer between layers 42 and 43. This might now be layer 42b, unless we are willing to perform sequential renaming. Moreover, if we implement the network from scratch, it is much more difficult for the framework to perform meaningful performance optimizations. 
+Now that we have more practice in designing deep networks, the step from a single to multiple layers of deep networks doesn't pose such a significant challenge any longer. In particular, we can reuse the training algorithm and data loader. Note, though, that implementing MLPs from scratch is nonetheless messy: naming and keeping track of the model parameters makes it difficult to extend models. For instance, imagine wanting to insert another layer between layers 42 and 43. This might now be layer 42b, unless we are willing to perform sequential renaming. Moreover, if we implement the network from scratch, it is much more difficult for the framework to perform meaningful performance optimizations.
 
-Nonetheless, you have now reached the state of the art of the late 1980s when fully connected deep networks were the method of choice for neural network modeling. Our next conceptual step will be to consider images. Before we do so, we need to review a number of statistical basics and details on how to compute models efficiently. 
+Nonetheless, you have now reached the state of the art of the late 1980s when fully connected deep networks were the method of choice for neural network modeling. Our next conceptual step will be to consider images. Before we do so, we need to review a number of statistical basics and details on how to compute models efficiently.
 
 
 ## Exercises
 
-1. Change the number of hidden units `num_hiddens` and plot how its number affects the accuracy of the model. What is the best value of this hyperparameter. 
+1. Change the number of hidden units `num_hiddens` and plot how its number affects the accuracy of the model. What is the best value of this hyperparameter?
 1. Try adding a hidden layer to see how it affects the results.
 1. Why is it a bad idea to insert a hidden layer with a single neuron? What could go wrong?
 1. How does changing the learning rate alter your results? With all other parameters fixed, which learning rate gives you the best results? How does this relate to the number of epochs?
-1. Let's optimize over all hyperparameters jointly, i.e. learning rate, number of epochs, number of hidden layers, and number of hidden units per layer. 
+1. Let's optimize over all hyperparameters jointly, i.e., learning rate, number of epochs, number of hidden layers, and number of hidden units per layer.
     1. What is the best result you can get by optimizing over all of them?
     1. Why it is much more challenging to deal with multiple hyperparameters?
-    1. Describe an efficient strategy for optimizing over multiple parameters jointly. 
+    1. Describe an efficient strategy for optimizing over multiple parameters jointly.
 1. Compare the speed of the framework and the from-scratch implementation for a challenging problem. How does it change with the complexity of the network?
-1. Measure the speed of tensor-matrix multiplications for well-aligned and misaligned matrices. For instance, test for matrices with dimension 1024, 1025, 1026, 1028 and 1032.
-    1. How does this change between GPUs and CPUs.
-    1. Determine the memory bus width of your CPU and GPU. 
+1. Measure the speed of tensor-matrix multiplications for well-aligned and misaligned matrices. For instance, test for matrices with dimension 1024, 1025, 1026, 1028, and 1032.
+    1. How does this change between GPUs and CPUs?
+    1. Determine the memory bus width of your CPU and GPU.
 1. Try out different activation functions. Which one works best?
 1. Is there a difference between weight initializations of the network? Does it matter?
 

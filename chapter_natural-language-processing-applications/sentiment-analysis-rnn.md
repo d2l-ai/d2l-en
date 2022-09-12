@@ -1,5 +1,5 @@
 # Sentiment Analysis: Using Recurrent Neural Networks
-:label:`sec_sentiment_rnn`
+:label:`sec_sentiment_rnn` 
 
 
 Like word similarity and analogy tasks,
@@ -30,6 +30,7 @@ choice later.
 :label:`fig_nlp-map-sa-rnn`
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn, rnn
@@ -75,6 +76,7 @@ by a fully connected layer (`self.decoder`)
 with two outputs ("positive" and "negative").
 
 ```{.python .input}
+#@tab mxnet
 class BiRNN(nn.Block):
     def __init__(self, vocab_size, embed_size, num_hiddens,
                  num_layers, **kwargs):
@@ -128,13 +130,10 @@ class BiRNN(nn.Module):
         # steps. The shape of `outputs` is (no. of time steps, batch size,
         # 2 * no. of hidden units)
         outputs, _ = self.encoder(embeddings)
-        # Concatenate the hidden states of the initial time step and final
-        # time step to use as the input of the fully connected layer. Its
-        # shape is (batch size, 4 * no. of hidden units)
-        encoding = torch.cat((outputs[0], outputs[-1]), dim=1)
         # Concatenate the hidden states at the initial and final time steps as
         # the input of the fully connected layer. Its shape is (batch size,
         # 4 * no. of hidden units)
+        encoding = torch.cat((outputs[0], outputs[-1]), dim=1) 
         outs = self.decoder(encoding)
         return outs
 ```
@@ -148,18 +147,19 @@ net = BiRNN(len(vocab), embed_size, num_hiddens, num_layers)
 ```
 
 ```{.python .input}
+#@tab mxnet
 net.initialize(init.Xavier(), ctx=devices)
 ```
 
 ```{.python .input}
 #@tab pytorch
-def init_weights(m):
-    if type(m) == nn.Linear:
-        nn.init.xavier_uniform_(m.weight)
-    if type(m) == nn.LSTM:
-        for param in m._flat_weights_names:
+def init_weights(module):
+    if type(module) == nn.Linear:
+        nn.init.xavier_uniform_(module.weight)
+    if type(module) == nn.LSTM:
+        for param in module._flat_weights_names:
             if "weight" in param:
-                nn.init.xavier_uniform_(m._parameters[param])
+                nn.init.xavier_uniform_(module._parameters[param])
 net.apply(init_weights);
 ```
 
@@ -188,6 +188,7 @@ and will not update
 these vectors during training.
 
 ```{.python .input}
+#@tab mxnet
 net.embedding.weight.set_data(embeds)
 net.embedding.collect_params().setattr('grad_req', 'null')
 ```
@@ -203,6 +204,7 @@ net.embedding.weight.requires_grad = False
 Now we can train the bidirectional RNN for sentiment analysis.
 
 ```{.python .input}
+#@tab mxnet
 lr, num_epochs = 0.01, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -220,6 +222,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 We define the following function to predict the sentiment of a text sequence using the trained model `net`.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def predict_sentiment(net, vocab, sequence):
     """Predict the sentiment of a text sequence."""

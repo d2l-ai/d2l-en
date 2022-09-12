@@ -1,67 +1,49 @@
-# Machine Translation and the Dataset
-:label:`sec_machine_translation`
-
-We have used RNNs to design language models,
-which are key to natural language processing.
-Another flagship benchmark is *machine translation*,
-a central problem domain for *sequence transduction* models
-that transform input sequences into output sequences.
-Playing a crucial role in various modern AI applications,
-sequence transduction models will form the focus of the remainder of this chapter
-and :numref:`chap_attention`.
-To this end,
-this section introduces the machine translation problem
-and its dataset that will be used later.
-
-
-*Machine translation* refers to the
-automatic translation of a sequence
-from one language to another.
-In fact, this field
-may date back to 1940s
-soon after digital computers were invented,
-especially by considering the use of computers
-for cracking language codes in World War II.
-For decades,
-statistical approaches
-had been dominant in this field :cite:`Brown.Cocke.Della-Pietra.ea.1988,Brown.Cocke.Della-Pietra.ea.1990`
-before the rise
-of
-end-to-end learning using
-neural networks.
-The latter
-is often called
-*neural machine translation*
-to distinguish itself from
-*statistical machine translation*
-that involves statistical analysis
-in components such as
-the translation model and the language model.
-
-
-Emphasizing end-to-end learning,
-this book will focus on neural machine translation methods.
-Different from our language model problem
-in :numref:`sec_language_model`
-whose corpus is in one single language,
-machine translation datasets
-are composed of pairs of text sequences
-that are in
-the source language and the target language, respectively.
-Thus,
-instead of reusing the preprocessing routine
-for language modeling,
-we need a different way to preprocess
-machine translation datasets.
-In the following,
-we show how to
-load the preprocessed data
-into minibatches for training.
-
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
+
+# Machine Translation and the Dataset
+:label:`sec_machine_translation`
+
+Among the major breakthroughs that prompted 
+widespread interest in modern RNNs
+was a major advance in the applied field of 
+statistical  *machine translation*.
+Here, the model is presented with a sentence in one language
+and must predict the corresponding sentence in another language. 
+Note that here the sentences may be of different lengths,
+and that corresponding words in the two sentences 
+may not occur in the same order, 
+owing to differences 
+in the two language's grammatical structure. 
+
+
+Many problems have this flavor of mapping 
+between two such "unaligned" sequences.
+Examples include mapping 
+from dialog prompts to replies
+or from questions to answers.
+Broadly, such problems are called 
+*sequence-to-sequence* (seq2seq) problems 
+and they are our focus for 
+both the remainder of this chapter
+and much of :numref:`chap_attention-and-transformers`.
+
+In this section, we introduce the machine translation problem
+and an example dataset that we will use in the subsequent examples.
+For decades, statistical formulations of translation between languages
+had been popular :cite:`Brown.Cocke.Della-Pietra.ea.1988,Brown.Cocke.Della-Pietra.ea.1990`,
+even before researchers got neural network approaches working
+(methods often lumped together under the term *neural machine translation*).
+
+
+First we will need some new code to process our data.
+Unlike the language modeling that we saw in :numref:`sec_language-model`,
+here each example consists of two separate text sequences,
+one in the source language and another (the translation) in the target language.
+The following code snippets will show how 
+to load the preprocessed data into minibatches for training.
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -87,19 +69,18 @@ import os
 
 ## [**Downloading and Preprocessing the Dataset**]
 
-To begin with,
-we download an English-French dataset
+To begin, we download an English-French dataset
 that consists of [bilingual sentence pairs from the Tatoeba Project](http://www.manythings.org/anki/).
-Each line in the dataset
-is a tab-delimited pair
-of an English text sequence
+Each line in the dataset is a tab-delimited pair 
+consisting of an English text sequence 
 and the translated French text sequence.
 Note that each text sequence
-can be just one sentence or a paragraph of multiple sentences.
+can be just one sentence,
+or a paragraph of multiple sentences.
 In this machine translation problem
 where English is translated into French,
-English is the *source language*
-and French is the *target language*.
+English is called the *source language*
+and French is called the *target language*.
 
 ```{.python .input  n=5}
 %%tab all
@@ -113,14 +94,13 @@ class MTFraEng(d2l.DataModule):  #@save
             
 data = MTFraEng() 
 raw_text = data._download()
-raw_text[:60]
+print(raw_text[:75])
 ```
 
 After downloading the dataset,
 we [**proceed with several preprocessing steps**]
 for the raw text data.
-For instance,
-we replace non-breaking space with space,
+For instance, we replace non-breaking space with space,
 convert uppercase letters to lowercase ones,
 and insert space between words and punctuation marks.
 
@@ -137,25 +117,32 @@ def _preprocess(self, text):
     return ''.join(out)
 
 text = data._preprocess(raw_text)
-text[:60]
+print(text[:80])
 ```
 
 ## [**Tokenization**]
 
-Different from character-level tokenization
-in :numref:`sec_language_model`,
+Unlike the character-level tokenization
+in :numref:`sec_language-model`,
 for machine translation
 we prefer word-level tokenization here
-(state-of-the-art models may use more advanced tokenization techniques).
-The following `tokenize_nmt` function
-tokenizes the the first `num_examples` text sequence pairs,
-where
-each token is either a word or a punctuation mark.
-This function returns
-two lists of token lists: `source` and `target`.
-Specifically,
-`source[i]` is a list of tokens from the
-$i^\mathrm{th}$ text sequence in the source language (English here) and `target[i]` is that in the target language (French here).
+(today's state-of-the-art models use 
+more complex tokenization techniques).
+The following `_tokenize` method
+tokenizes the first `max_examples` text sequence pairs,
+where each token is either a word or a punctuation mark.
+We append the special “&lt;eos&gt;” token
+to the end of every sequence to indicate the
+end of the sequence.
+When a model is predicting
+by generating a sequence token after token,
+the generation of the “&lt;eos&gt;” token
+can suggest that the output sequence is complete.
+In the end, the method below returns
+two lists of token lists: `src` and `tgt`.
+Specifically, `src[i]` is a list of tokens from the
+$i^\mathrm{th}$ text sequence in the source language (English here) 
+and `tgt[i]` is that in the target language (French here).
 
 ```{.python .input  n=7}
 %%tab all
@@ -168,11 +155,11 @@ def _tokenize(self, text, max_examples=None):
         if len(parts) == 2:
             # Skip empty tokens
             src.append([t for t in f'{parts[0]} <eos>'.split(' ') if t])
-            tgt.append([t for t in f'<bos> {parts[1]} <eos>'.split(' ') if t])
+            tgt.append([t for t in f'{parts[1]} <eos>'.split(' ') if t])
     return src, tgt
 
 src, tgt = data._tokenize(text)
-src[:4], tgt[:4]
+src[:6], tgt[:6]
 ```
 
 Let's [**plot the histogram of the number of tokens per text sequence.**]
@@ -181,27 +168,35 @@ most of the text sequences have fewer than 20 tokens.
 
 ```{.python .input  n=8}
 %%tab all
-d2l.set_figsize((4.5, 2.5))
-_, _, patches = d2l.plt.hist([[len(l) for l in src], 
-                              [len(l) for l in tgt]])
-d2l.plt.xlabel('# tokens per sequence'), d2l.plt.ylabel('count')
-d2l.plt.xlim([0, 20])
-for patch in patches[1].patches: patch.set_hatch('-')
-_ = d2l.plt.legend(['source', 'target'])
+#@save
+def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
+    """Plot the histogram for list length pairs."""
+    d2l.set_figsize()
+    _, _, patches = d2l.plt.hist(
+        [[len(l) for l in xlist], [len(l) for l in ylist]])
+    d2l.plt.xlabel(xlabel)
+    d2l.plt.ylabel(ylabel)
+    for patch in patches[1].patches:
+        patch.set_hatch('/')
+    d2l.plt.legend(legend)
+
+show_list_len_pair_hist(['source', 'target'], '# tokens per sequence',
+                        'count', src, tgt);
 ```
 
-## Fixed Length Examples
+## Loading Sequences of Fixed Length
+:label:`subsec_loading-seq-fixed-len`
 
 Recall that in language modeling
-[**each sequence example**],
+[**each example sequence**],
 either a segment of one sentence
 or a span over multiple sentences,
-(**has a fixed length.**)
+(**had a fixed length.**)
 This was specified by the `num_steps`
-(number of time steps or tokens) argument in :numref:`sec_language_model`.
+(number of time steps or tokens) argument in :numref:`sec_language-model`.
 In machine translation, each example is
 a pair of source and target text sequences,
-where each text sequence may have different lengths.
+where the two text sequences may have different lengths.
 
 For computational efficiency,
 we can still process a minibatch of text sequences
@@ -211,35 +206,15 @@ should have the same length `num_steps`.
 If a text sequence has fewer than `num_steps` tokens,
 we will keep appending the special "&lt;pad&gt;" token
 to its end until its length reaches `num_steps`.
-Otherwise,
-we will truncate the text sequence
+Otherwise, we will truncate the text sequence
 by only taking its first `num_steps` tokens
 and discarding the remaining.
-In this way,
-every text sequence
+In this way, every text sequence
 will have the same length
 to be loaded in minibatches of the same shape.
+Besides, we also record length of the source sequence excluding padding tokens.
+This information will be needed by some models that we will cover later.
 
-Now we define a function to [**transform
-text sequences into minibatches for training.**]
-We append the special “&lt;eos&gt;” token
-to the end of every sequence to indicate the
-end of the sequence.
-When a model is predicting
-by
-generating a sequence token after token,
-the generation
-of the “&lt;eos&gt;” token
-can suggest that
-the output sequence is complete.
-Besides,
-we also record the length
-of each text sequence excluding the padding tokens.
-This information will be needed by
-some models that
-we will cover later.
-
-## [**Vocabulary**]
 
 Since the machine translation dataset
 consists of pairs of languages,
@@ -253,44 +228,51 @@ To alleviate this,
 here we treat infrequent tokens
 that appear less than 2 times
 as the same unknown ("&lt;unk&gt;") token.
-Besides that,
-we specify additional special tokens
-such as for padding ("&lt;pad&gt;") sequences to the same length in minibatches,
-and for marking the beginning ("&lt;bos&gt;") or end ("&lt;eos&gt;") of sequences.
-Such special tokens are commonly used in
-natural language processing tasks.
-
-## [**Putting All Things Together**]
-
-Finally, we define the `load_data_nmt` function
-to return the data iterator, together with
-the vocabularies for both the source language and the target language.
+As we will explain later (:numref:`fig_seq2seq`),
+when training with target sequences,
+the decoder output (label tokens)
+can be the same decoder input (target tokens),
+shifted by one token;
+and the special beginning-of-sequence "&lt;bos&gt;" token
+will be used as the first input token
+for predicting the target sequence (:numref:`fig_seq2seq_predict`).
 
 ```{.python .input  n=9}
 %%tab all
 @d2l.add_to_class(MTFraEng)  #@save
-def __init__(self, batch_size, num_steps, num_train=1000, num_val=1000):
+def __init__(self, batch_size, num_steps=9, num_train=512, num_val=128):
     super(MTFraEng, self).__init__()
     self.save_hyperparameters()
     self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
         self._download())
-    
+
+
 @d2l.add_to_class(MTFraEng)  #@save
 def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
-    def _build_one(sentences, vocab):
-        pad_or_trim = lambda s, n: (
-            s[:n] if len(s) > n else s + ['<pad>'] * (n - len(s)))
-        sentences = [pad_or_trim(seq, self.num_steps) for seq in sentences]
-        if vocab is None: vocab = d2l.Vocab(sentences, min_freq=2)
-        array = d2l.tensor([vocab[sent] for sent in sentences])
-        return array, vocab
+    def _build_array(sentences, vocab, is_tgt=False):
+        pad_or_trim = lambda seq, t: (
+            seq[:t] if len(seq) > t else seq + ['<pad>'] * (t - len(seq)))
+        sentences = [pad_or_trim(s, self.num_steps) for s in sentences]
+        if is_tgt:
+            sentences = [['<bos>'] + s for s in sentences]
+        if vocab is None:
+            vocab = d2l.Vocab(sentences, min_freq=2)
+        array = d2l.tensor([vocab[s] for s in sentences])
+        valid_len = d2l.reduce_sum(
+            d2l.astype(array != vocab['<pad>'], d2l.int32), 1)
+        return array, vocab, valid_len
     src, tgt = self._tokenize(self._preprocess(raw_text), 
                               self.num_train + self.num_val)
-    src_array, src_vocab = _build_one(src, src_vocab)
-    tgt_array, tgt_vocab = _build_one(tgt, tgt_vocab)
-    return (src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab, tgt_vocab
-
+    src_array, src_vocab, src_valid_len = _build_array(src, src_vocab)
+    tgt_array, tgt_vocab, _ = _build_array(tgt, tgt_vocab, True)
+    return ((src_array, tgt_array[:,:-1], src_valid_len, tgt_array[:,1:]),
+            src_vocab, tgt_vocab)
 ```
+
+## [**Reading the Dataset**]
+
+Finally, we define the `get_dataloader` method
+to return the data iterator.
 
 ```{.python .input  n=10}
 %%tab all
@@ -304,41 +286,44 @@ Let's [**read the first minibatch from the English-French dataset.**]
 
 ```{.python .input  n=11}
 %%tab all
-data = MTFraEng(batch_size=3, num_steps=6)
-src, tgt, label = next(iter(data.train_dataloader()))
+data = MTFraEng(batch_size=3)
+src, tgt, src_valid_len, label = next(iter(data.train_dataloader()))
 print('source:', d2l.astype(src, d2l.int32))
-print('target:', d2l.astype(tgt, d2l.int32))
+print('decoder input:', d2l.astype(tgt, d2l.int32))
+print('source len excluding pad:', d2l.astype(src_valid_len, d2l.int32))
 print('label:', d2l.astype(label, d2l.int32))
 ```
+
+Below we show a pair of source and target sequences
+that are processed by the above `_build_arrays` method
+(in the string format).
 
 ```{.python .input  n=12}
 %%tab all
 @d2l.add_to_class(MTFraEng)  #@save
 def build(self, src_sentences, tgt_sentences):
-    raw_text = '\n'.join([src+'\t'+tgt for src, tgt in zip(
+    raw_text = '\n'.join([src + '\t' + tgt for src, tgt in zip(
         src_sentences, tgt_sentences)])
     arrays, _, _ = self._build_arrays(
         raw_text, self.src_vocab, self.tgt_vocab)
     return arrays
 ```
 
-```{.python .input  n=14}
+```{.python .input  n=13}
 %%tab all
-src, tgt, _ = data.build(['hi .'], ['salut .'])
+src, tgt, _,  _ = data.build(['hi .'], ['salut .'])
 print('source:', data.src_vocab.to_tokens(d2l.astype(src[0], d2l.int32)))
 print('target:', data.tgt_vocab.to_tokens(d2l.astype(tgt[0], d2l.int32)))
 ```
 
 ## Summary
 
-* Machine translation refers to the automatic translation of a sequence from one language to another.
-* Using word-level tokenization, the vocabulary size will be significantly larger than that using character-level tokenization. To alleviate this, we can treat infrequent tokens as the same unknown token.
-* We can truncate and pad text sequences so that all of them will have the same length to be loaded in minibatches.
+In natural language processing, *machine translation* refers to the task of automatically mapping from a sequence representing a string of text in a *source* language to a string representing a plausible translation in a *target* language. Using word-level tokenization, the vocabulary size will be significantly larger than that using character-level tokenization, but the sequence lengths will be much shorter. To mitigate the large vocabulary size, we can treat infrequent tokens as some "unknown" token. We can truncate and pad text sequences so that all of them will have the same length to be loaded in minibatches. Modern implementations often bucket sequences with similar lengths to avoid wasting excessive computation on padding. 
 
 
 ## Exercises
 
-1. Try different values of the `num_examples` argument in the `load_data_nmt` function. How does this affect the vocabulary sizes of the source language and the target language?
+1. Try different values of the `max_examples` argument in the `_tokenize` method. How does this affect the vocabulary sizes of the source language and the target language?
 1. Text in some languages such as Chinese and Japanese does not have word boundary indicators (e.g., space). Is word-level tokenization still a good idea for such cases? Why or why not?
 
 :begin_tab:`mxnet`

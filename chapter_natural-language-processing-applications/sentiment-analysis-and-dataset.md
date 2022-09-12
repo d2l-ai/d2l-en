@@ -32,7 +32,7 @@ as a text classification task,
 which transforms a varying-length text sequence
 into a fixed-length text category.
 In this chapter,
-we will use Stanford's [large movie review dataset](https://ai.stanford.edu/~amaas/data/sentiment/)
+we will use Stanford's [large movie review dataset](https://ai.stanford.edu/%7Eamaas/data/sentiment/)
 for sentiment analysis. 
 It consists of a training set and a testing set, 
 either containing 25000 movie reviews downloaded from IMDb.
@@ -42,6 +42,7 @@ there are equal number of
 indicating different sentiment polarities.
 
 ```{.python .input}
+#@tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx
 import os
@@ -64,9 +65,8 @@ in the path `../data/aclImdb`.
 ```{.python .input}
 #@tab all
 #@save
-d2l.DATA_HUB['aclImdb'] = (
-    'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',
-    '01ada507287d82875905620988597833ad4e0903')
+d2l.DATA_HUB['aclImdb'] = (d2l.DATA_URL + 'aclImdb_v1.tar.gz', 
+                          '01ada507287d82875905620988597833ad4e0903')
 
 data_dir = d2l.download_extract('aclImdb', 'aclImdb')
 ```
@@ -92,7 +92,7 @@ def read_imdb(data_dir, is_train):
 train_data = read_imdb(data_dir, is_train=True)
 print('# trainings:', len(train_data[0]))
 for x, y in zip(train_data[0][:3], train_data[1][:3]):
-    print('label:', y, 'review:', x[0:60])
+    print('label:', y, 'review:', x[:60])
 ```
 
 ## Preprocessing the Dataset
@@ -143,6 +143,7 @@ Now we can create data iterators.
 At each iteration, a minibatch of examples are returned.
 
 ```{.python .input}
+#@tab mxnet
 train_iter = d2l.load_array((train_features, train_data[1]), 64)
 
 for X, y in train_iter:
@@ -161,12 +162,13 @@ for X, y in train_iter:
 print('# batches:', len(train_iter))
 ```
 
-## Putting All Things Together
+## Putting It All Together
 
 Last, we wrap up the above steps into the `load_data_imdb` function.
 It returns training and test data iterators and the vocabulary of the IMDb review dataset.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def load_data_imdb(batch_size, num_steps=500):
     """Return data iterators and the vocabulary of the IMDb review dataset."""

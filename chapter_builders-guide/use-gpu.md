@@ -78,17 +78,6 @@ we can minimize the time spent
 transferring data between devices.
 For example, when training neural networks on a server with a GPU,
 we typically prefer for the model's parameters to live on the GPU.
-
-Next, we need to confirm that
-the GPU version of PyTorch is installed.
-If a CPU version of PyTorch is already installed,
-we need to uninstall it first.
-For example, use the `pip uninstall torch` command,
-then install the corresponding PyTorch version
-according to your CUDA version.
-Assuming you have CUDA 10.0 installed,
-you can install the PyTorch version
-that supports CUDA 10.0 via `pip install torch-cu100`.
 :end_tab:
 
 To run the programs in this section,
@@ -187,7 +176,7 @@ def num_gpus():  #@save
         return torch.cuda.device_count()
     if tab.selected('tensorflow'):
         return len(tf.config.experimental.list_physical_devices('GPU'))
-    
+
 num_gpus()
 ```
 
@@ -433,7 +422,7 @@ net.initialize(ctx=try_gpu())
 
 ```{.python .input}
 %%tab pytorch
-net = nn.Sequential(nn.Linear(3, 1))
+net = nn.Sequential(nn.LazyLinear(1))
 net = net.to(device=try_gpu())
 ```
 
@@ -473,7 +462,7 @@ net[0].weight.data.device
 net.layers[0].weights[0].device, net.layers[0].weights[1].device
 ```
 
-Let the trainer to support GPU.
+Let the trainer support GPU.
 
 ```{.python .input}
 %%tab mxnet
@@ -498,13 +487,13 @@ def set_scratch_params_device(self, device):
 def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
     self.save_hyperparameters()
     self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
-    
+
 @d2l.add_to_class(d2l.Trainer)  #@save
 def prepare_batch(self, batch):
     if self.gpus:
         batch = [d2l.to(a, self.gpus[0]) for a in batch]
     return batch
-    
+
 @d2l.add_to_class(d2l.Trainer)  #@save
 def prepare_model(self, model):
     model.trainer = self
@@ -522,13 +511,13 @@ In short, as long as all data and parameters are on the same device, we can lear
 
 ## Summary
 
-* We can specify devices for storage and calculation, such as the CPU or GPU.
+We can specify devices for storage and calculation, such as the CPU or GPU.
   By default, data is created in the main memory
   and then uses the CPU for calculations.
-* The deep learning framework requires all input data for calculation
+The deep learning framework requires all input data for calculation
   to be on the same device,
   be it CPU or the same GPU.
-* You can lose significant performance by moving data without care.
+You can lose significant performance by moving data without care.
   A typical mistake is as follows: computing the loss
   for every minibatch on the GPU and reporting it back
   to the user on the command line (or logging it in a NumPy `ndarray`)

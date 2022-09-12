@@ -7,7 +7,7 @@ stage("Build and Publish") {
   def TARGET_BRANCH = env.CHANGE_TARGET ? env.CHANGE_TARGET : env.BRANCH_NAME
   // such as d2l-en-master
   def TASK = REPO_NAME + '-' + TARGET_BRANCH
-  node {
+  node('d2l-worker') {
     ws("workspace/${TASK}") {
       checkout scm
       // conda environment
@@ -16,7 +16,6 @@ stage("Build and Publish") {
       sh label: "Build Environment", script: """set -ex
       conda env update -n ${ENV_NAME} -f static/build.yml
       conda activate ${ENV_NAME}
-      pip uninstall -y d2lbook
       pip install git+https://github.com/d2l-ai/d2l-book
       pip list
       nvidia-smi
@@ -31,15 +30,15 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       ./static/cache.sh restore _build/eval/data
       d2lbook build eval
+      d2lbook build slides --tab pytorch
       ./static/cache.sh store _build/eval/data
       """
 
-      sh label: "Execute Notebooks [PyTorch]", script: """set -ex
+      sh label: "Execute Notebooks [MXNet]", script: """set -ex
       conda activate ${ENV_NAME}
-      ./static/cache.sh restore _build/eval_pytorch/data
-      d2lbook build eval --tab pytorch
-      d2lbook build slides --tab pytorch
-      ./static/cache.sh store _build/eval_pytorch/data
+      ./static/cache.sh restore _build/eval_mxnet/data
+      d2lbook build eval --tab mxnet
+      ./static/cache.sh store _build/eval_mxnet/data
       """
 
       sh label: "Execute Notebooks [TensorFlow]", script: """set -ex
@@ -53,7 +52,7 @@ stage("Build and Publish") {
 
       sh label:"Build HTML", script:"""set -ex
       conda activate ${ENV_NAME}
-      ./static/build_html.sh
+      ./static/build_html.sh ${env.BRANCH_NAME} ${JOB_NAME}
       """
 
       sh label:"Build PDF", script:"""set -ex
@@ -61,9 +60,9 @@ stage("Build and Publish") {
       d2lbook build pdf
       """
 
-      sh label:"Build Pytorch PDF", script:"""set -ex
+      sh label:"Build MXNet PDF", script:"""set -ex
       conda activate ${ENV_NAME}
-      d2lbook build pdf --tab pytorch
+      d2lbook build pdf --tab mxnet
       """
       
       if (env.BRANCH_NAME == 'release') {
@@ -77,12 +76,11 @@ stage("Build and Publish") {
         conda activate ${ENV_NAME}
         pip install setuptools wheel twine
         python setup.py bdist_wheel
-        # twine upload dist/*
         """
       } else {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
-        d2lbook deploy html pdf slides --s3 s3://preview.d2l.ai/${JOB_NAME}/
+        d2lbook deploy html pdf --s3 s3://preview.d2l.ai/${JOB_NAME}/
         """
         if (env.BRANCH_NAME.startsWith("PR-")) {
             pullRequest.comment("Job ${JOB_NAME}/${BUILD_NUMBER} is complete. \nCheck the results at http://preview.d2l.ai/${JOB_NAME}/")

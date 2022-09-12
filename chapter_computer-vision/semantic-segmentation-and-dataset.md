@@ -45,6 +45,7 @@ In the following,
 we will take a look at this dataset.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import gluon, image, np, npx
@@ -89,6 +90,7 @@ pixels with the same color in any label image belong to the same semantic class.
 The following defines the `read_voc_images` function to [**read all the input images and labels into the memory**].
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def read_voc_images(voc_dir, is_train=True):
     """Read all VOC feature and label images."""
@@ -132,15 +134,16 @@ We [**draw the first five input images and their labels**].
 In the label images, white and black represent borders and  background, respectively, while the other colors correspond to different classes.
 
 ```{.python .input}
+#@tab mxnet
 n = 5
-imgs = train_features[0:n] + train_labels[0:n]
+imgs = train_features[:n] + train_labels[:n]
 d2l.show_images(imgs, 2, n);
 ```
 
 ```{.python .input}
 #@tab pytorch
 n = 5
-imgs = train_features[0:n] + train_labels[0:n]
+imgs = train_features[:n] + train_labels[:n]
 imgs = [img.permute(1,2,0) for img in imgs]
 d2l.show_images(imgs, 2, n);
 ```
@@ -176,6 +179,7 @@ and the `voc_label_indices` function
 to map any RGB values to their class indices in this Pascal VOC2012 dataset.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def voc_colormap2label():
     """Build the mapping from RGB to class indices for VOC labels."""
@@ -240,6 +244,7 @@ we crop the image to a *fixed* shape instead of rescaling. Specifically, [**usin
 the input image and the label**].
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def voc_rand_crop(feature, label, height, width):
     """Randomly crop both feature and label images."""
@@ -261,6 +266,7 @@ def voc_rand_crop(feature, label, height, width):
 ```
 
 ```{.python .input}
+#@tab mxnet
 imgs = []
 for _ in range(n):
     imgs += voc_rand_crop(train_features[0], train_labels[0], 200, 300)
@@ -292,6 +298,7 @@ define the `normalize_image` function to
 standardize the values of the three RGB channels of input images.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 class VOCSegDataset(gluon.data.Dataset):
     """A customized dataset to load the VOC dataset."""
@@ -380,6 +387,7 @@ Let's print the shape of the first minibatch.
 Different from in image classification or object detection, labels here are three-dimensional tensors.
 
 ```{.python .input}
+#@tab mxnet
 batch_size = 64
 train_iter = gluon.data.DataLoader(voc_train, batch_size, shuffle=True,
                                    last_batch='discard',
@@ -402,13 +410,14 @@ for X, Y in train_iter:
     break
 ```
 
-### [**Putting All Things Together**]
+### [**Putting It All Together**]
 
 Finally, we define the following `load_data_voc` function
 to download and read the Pascal VOC2012 semantic segmentation dataset.
 It returns data iterators for both the training and test datasets.
 
 ```{.python .input}
+#@tab mxnet
 #@save
 def load_data_voc(batch_size, crop_size):
     """Load the VOC semantic segmentation dataset."""
@@ -444,7 +453,7 @@ def load_data_voc(batch_size, crop_size):
 ## Summary
 
 * Semantic segmentation recognizes and understands what are in an image in pixel level by dividing the image into regions belonging to different semantic classes.
-* On of the most important semantic segmentation dataset is Pascal VOC2012.
+* One of the most important semantic segmentation dataset is Pascal VOC2012.
 * In semantic segmentation, since the input image and  label correspond one-to-one on the pixel, the input image is randomly cropped to a fixed shape rather than rescaled.
 
 

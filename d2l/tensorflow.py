@@ -1,28 +1,9 @@
 DATA_HUB = dict()
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
-import collections
-import hashlib
-import inspect
-import math
-import os
-import random
-import re
-import shutil
-import sys
-import tarfile
-import time
-import zipfile
-from collections import defaultdict
-import pandas as pd
-import requests
-from IPython import display
-from matplotlib import pyplot as plt
-
 import numpy as np
 import tensorflow as tf
 
-d2l = sys.modules[__name__]
 nn_Module = tf.keras.Model
 
 #################   WARNING   ################
@@ -47,6 +28,7 @@ import pandas as pd
 import requests
 from IPython import display
 from matplotlib import pyplot as plt
+from matplotlib_inline import backend_inline
 
 d2l = sys.modules[__name__]
 
@@ -57,7 +39,7 @@ def use_svg_display():
     """Use the svg format to display a plot in Jupyter.
 
     Defined in :numref:`sec_calculus`"""
-    display.set_matplotlib_formats('svg')
+    backend_inline.set_matplotlib_formats('svg')
 
 def set_figsize(figsize=(3.5, 2.5)):
     """Set the figure size for matplotlib.
@@ -103,43 +85,15 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
         axes.plot(x,y,fmt) if len(x) else axes.plot(y,fmt)
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 
-class Timer:
-    """Record multiple running times."""
-    def __init__(self):
-        """Defined in :numref:`subsec_normal_distribution_and_squared_loss`"""
-        self.times = []
-        self.start()
-
-    def start(self):
-        """Start the timer."""
-        self.tik = time.time()
-
-    def stop(self):
-        """Stop the timer and record the time in a list."""
-        self.times.append(time.time() - self.tik)
-        return self.times[-1]
-
-    def avg(self):
-        """Return the average time."""
-        return sum(self.times) / len(self.times)
-
-    def sum(self):
-        """Return the sum of time."""
-        return sum(self.times)
-
-    def cumsum(self):
-        """Return the accumulated time."""
-        return np.array(self.times).cumsum().tolist()
-
 def add_to_class(Class):
-    """Defined in :numref:`sec_d2l_apis`"""
+    """Defined in :numref:`sec_oo-design`"""
     def wrapper(obj):
         setattr(Class, obj.__name__, obj)
     return wrapper
 
 class HyperParameters:
     def save_hyperparameters(self, ignore=[]):
-        """Defined in :numref:`sec_d2l_apis`"""
+        """Defined in :numref:`sec_oo-design`"""
         raise NotImplemented
 
     def save_hyperparameters(self, ignore=[]):
@@ -156,7 +110,7 @@ class HyperParameters:
 class ProgressBoard(d2l.HyperParameters):
     """Plot data points in animation.
 
-    Defined in :numref:`sec_d2l_apis`"""
+    Defined in :numref:`sec_oo-design`"""
     def __init__(self, xlabel=None, ylabel=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear',
                  ls=['-', '--', '-.', ':'], colors=['C0', 'C1', 'C2', 'C3'],
@@ -207,7 +161,7 @@ class ProgressBoard(d2l.HyperParameters):
         display.clear_output(wait=True)
 
 class Module(d2l.nn_Module, d2l.HyperParameters):
-    """Defined in :numref:`sec_d2l_apis`"""
+    """Defined in :numref:`sec_oo-design`"""
     def __init__(self, plot_train_per_epoch=2, plot_valid_per_epoch=1):
         super().__init__()
         self.save_hyperparameters()
@@ -221,14 +175,14 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         assert hasattr(self, 'net'), 'Neural network is defined'
         return self.net(X)
 
-    def call(self, X, *args, training=None):
-        if training is not None:
-            self.training = training
+    def call(self, X, *args, **kwargs):
+        if kwargs and "training" in kwargs:
+            self.training = kwargs['training']
         return self.forward(X, *args)
 
     def plot(self, key, value, train):
         """Plot a point in animation."""
-        assert hasattr(self, 'trainer'), 'trainer is not inited'
+        assert hasattr(self, 'trainer'), 'Trainer is not inited'
         self.board.xlabel = 'epoch'
         if train:
             x = self.trainer.train_batch_idx / \
@@ -240,7 +194,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
             n = self.trainer.num_val_batches / \
                 self.plot_valid_per_epoch
         self.board.draw(x, d2l.numpy(value), (
-            'train_' if train else 'val_') + key,every_n=int(n))
+            'train_' if train else 'val_') + key, every_n=int(n))
     def training_step(self, batch):
         l = self.loss(self(*batch[:-1]), batch[-1])
         self.plot('loss', l, train=True)
@@ -258,7 +212,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         return tf.keras.optimizers.SGD(self.lr)
 
 class DataModule(d2l.HyperParameters):
-    """Defined in :numref:`sec_d2l_apis`"""
+    """Defined in :numref:`sec_oo-design`"""
     def __init__(self, root='../data'):
         self.save_hyperparameters()
 
@@ -271,7 +225,8 @@ class DataModule(d2l.HyperParameters):
     def val_dataloader(self):
         return self.get_dataloader(train=False)
 
-    def get_tensorloader(self, tensors, train, indices=slice(0,None)):
+    def get_tensorloader(self, tensors, train, indices=slice(0, None)):
+        """Defined in :numref:`sec_synthetic-regression-data`"""
         tensors = tuple(a[indices] for a in tensors)
         shuffle_buffer = tensors[0].shape[0] if train else 1
         return tf.data.Dataset.from_tensor_slices(tensors).shuffle(
@@ -279,7 +234,7 @@ class DataModule(d2l.HyperParameters):
     
 
 class Trainer(d2l.HyperParameters):
-    """Defined in :numref:`sec_d2l_apis`"""
+    """Defined in :numref:`sec_oo-design`"""
     def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'No GPU support yet'
@@ -344,6 +299,7 @@ class Trainer(d2l.HyperParameters):
         return grads
 
 class SyntheticRegressionData(d2l.DataModule):
+    """Defined in :numref:`sec_synthetic-regression-data`"""
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
                  batch_size=32):
         super().__init__()
@@ -354,6 +310,7 @@ class SyntheticRegressionData(d2l.DataModule):
         self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 
     def get_dataloader(self, train):
+        """Defined in :numref:`sec_synthetic-regression-data`"""
         i = slice(0, self.num_train) if train else slice(self.num_train, None)
         return self.get_tensorloader((self.X, self.y), train, i)
 
@@ -362,7 +319,7 @@ class LinearRegressionScratch(d2l.Module):
     def __init__(self, num_inputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        w = tf.random.normal((num_inputs, 1)) * sigma
+        w = tf.random.normal((num_inputs, 1), mean=0, stddev=0.01)
         b = tf.zeros(1)
         self.w = tf.Variable(w, trainable=True)
         self.b = tf.Variable(b, trainable=True)
@@ -397,7 +354,8 @@ class LinearRegression(d2l.Module):
     def __init__(self, lr):
         super().__init__()
         self.save_hyperparameters()
-        self.net = tf.keras.layers.Dense(1)
+        initializer = tf.initializers.RandomNormal(stddev=0.01)
+        self.net = tf.keras.layers.Dense(1, kernel_initializer=initializer)
 
     def forward(self, X):
         """The linear regression model.
@@ -448,7 +406,7 @@ class FashionMNIST(d2l.DataModule):
         X, y = batch
         if not labels:
             labels = self.text_labels(y)
-        d2l.show_images(X, nrows, ncols, titles=labels)
+        d2l.show_images(tf.squeeze(X), nrows, ncols, titles=labels)
 
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images.
@@ -456,7 +414,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     Defined in :numref:`sec_fashion_mnist`"""
     raise NotImplementedError
 
-class Classification(d2l.Module):
+class Classifier(d2l.Module):
     """Defined in :numref:`sec_classification`"""
     def validation_step(self, batch):
         Y_hat = self(*batch[:-1])
@@ -544,6 +502,37 @@ class Residual(tf.keras.Model):
             X = self.conv3(X)
         Y += X
         return tf.keras.activations.relu(Y)
+
+class ResNeXtBlock(tf.keras.Model):
+    """The ResNeXt block.
+
+    Defined in :numref:`subsec_residual-blks`"""
+    def __init__(self, num_channels, groups, bot_mul, use_1x1conv=False,
+                 strides=1):
+        super().__init__()
+        bot_channels = int(round(num_channels * bot_mul))
+        self.conv1 = tf.keras.layers.Conv2D(bot_channels, 1, strides=1)
+        self.conv2 = tf.keras.layers.Conv2D(bot_channels, 3, strides=strides,
+                                            padding="same",
+                                            groups=bot_channels//groups)
+        self.conv3 = tf.keras.layers.Conv2D(num_channels, 1, strides=1)
+        self.bn1 = tf.keras.layers.BatchNormalization()
+        self.bn2 = tf.keras.layers.BatchNormalization()
+        self.bn3 = tf.keras.layers.BatchNormalization()
+        if use_1x1conv:
+            self.conv4 = tf.keras.layers.Conv2D(num_channels, 1,
+                                                strides=strides)
+            self.bn4 = tf.keras.layers.BatchNormalization()
+        else:
+            self.conv4 = None
+
+    def call(self, X):
+        Y = tf.keras.activations.relu(self.bn1(self.conv1(X)))
+        Y = tf.keras.activations.relu(self.bn2(self.conv2(Y)))
+        Y = self.bn3(self.conv3(Y))
+        if self.conv4:
+            X = self.bn4(self.conv4(X))
+        return tf.keras.activations.relu(Y + X)
 
 class TimeMachine(d2l.DataModule):
     """Defined in :numref:`sec_text-sequence`"""
@@ -650,7 +639,7 @@ def check_shape(a, shape):
     assert a.shape == shape, \
             f'tensor\'s shape {a.shape} != expected shape {shape}'
 
-class RNNLMScratch(d2l.Classification):
+class RNNLMScratch(d2l.Classifier):
     """Defined in :numref:`sec_rnn-scratch`"""
     def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
@@ -737,7 +726,7 @@ class LSTMScratch(d2l.Module):
         self.W_xi, self.W_hi, self.b_i = triple()  # Input gate
         self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
         self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
-        self.W_xc, self.W_hc, self.b_c = triple()  # Candidate memory cell
+        self.W_xc, self.W_hc, self.b_c = triple()  # Input node
 
 class GRU(d2l.RNN):
     """Defined in :numref:`sec_deep_rnn`"""
@@ -781,81 +770,119 @@ class MTFraEng(d2l.DataModule):
             if len(parts) == 2:
                 # Skip empty tokens
                 src.append([t for t in f'{parts[0]} <eos>'.split(' ') if t])
-                tgt.append([t for t in f'<bos> {parts[1]} <eos>'.split(' ') if t])
+                tgt.append([t for t in f'{parts[1]} <eos>'.split(' ') if t])
         return src, tgt
 
-    def __init__(self, batch_size, num_steps, num_train=1000, num_val=1000):
+    def __init__(self, batch_size, num_steps=9, num_train=512, num_val=128):
         """Defined in :numref:`sec_machine_translation`"""
         super(MTFraEng, self).__init__()
         self.save_hyperparameters()
         self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
             self._download())
     
+    
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
         """Defined in :numref:`sec_machine_translation`"""
-        def _build_one(sentences, vocab):
-            pad_or_trim = lambda s, n: (
-                s[:n] if len(s) > n else s + ['<pad>'] * (n - len(s)))
-            sentences = [pad_or_trim(seq, self.num_steps) for seq in sentences]
-            if vocab is None: vocab = d2l.Vocab(sentences, min_freq=2)
-            array = d2l.tensor([vocab[sent] for sent in sentences])
-            return array, vocab
+        def _build_array(sentences, vocab, is_tgt=False):
+            pad_or_trim = lambda seq, t: (
+                seq[:t] if len(seq) > t else seq + ['<pad>'] * (t - len(seq)))
+            sentences = [pad_or_trim(s, self.num_steps) for s in sentences]
+            if is_tgt:
+                sentences = [['<bos>'] + s for s in sentences]
+            if vocab is None:
+                vocab = d2l.Vocab(sentences, min_freq=2)
+            array = d2l.tensor([vocab[s] for s in sentences])
+            valid_len = d2l.reduce_sum(
+                d2l.astype(array != vocab['<pad>'], d2l.int32), 1)
+            return array, vocab, valid_len
         src, tgt = self._tokenize(self._preprocess(raw_text),
                                   self.num_train + self.num_val)
-        src_array, src_vocab = _build_one(src, src_vocab)
-        tgt_array, tgt_vocab = _build_one(tgt, tgt_vocab)
-        return (src_array, tgt_array[:,:-1], tgt_array[:,1:]), src_vocab, tgt_vocab
+        src_array, src_vocab, src_valid_len = _build_array(src, src_vocab)
+        tgt_array, tgt_vocab, _ = _build_array(tgt, tgt_vocab, True)
+        return ((src_array, tgt_array[:,:-1], src_valid_len, tgt_array[:,1:]),
+                src_vocab, tgt_vocab)
 
     def get_dataloader(self, train):
-        """Defined in :numref:`sec_machine_translation`"""
+        """Defined in :numref:`subsec_loading-seq-fixed-len`"""
         idx = slice(0, self.num_train) if train else slice(self.num_train, None)
         return self.get_tensorloader(self.arrays, train, idx)
 
     def build(self, src_sentences, tgt_sentences):
-        """Defined in :numref:`sec_machine_translation`"""
-        raw_text = '\n'.join([src+'\t'+tgt for src, tgt in zip(
+        """Defined in :numref:`subsec_loading-seq-fixed-len`"""
+        raw_text = '\n'.join([src + '\t' + tgt for src, tgt in zip(
             src_sentences, tgt_sentences)])
         arrays, _, _ = self._build_arrays(
             raw_text, self.src_vocab, self.tgt_vocab)
         return arrays
 
+def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
+    """Plot the histogram for list length pairs.
+
+    Defined in :numref:`sec_machine_translation`"""
+    d2l.set_figsize()
+    _, _, patches = d2l.plt.hist(
+        [[len(l) for l in xlist], [len(l) for l in ylist]])
+    d2l.plt.xlabel(xlabel)
+    d2l.plt.ylabel(ylabel)
+    for patch in patches[1].patches:
+        patch.set_hatch('/')
+    d2l.plt.legend(legend)
+
 class Encoder(tf.keras.layers.Layer):
     """The base encoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Encoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
-    def call(self, X, *args, **kwargs):
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def call(self, X, *args):
         raise NotImplementedError
 
 class Decoder(tf.keras.layers.Layer):
     """The base decoder interface for the encoder-decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
-    def __init__(self, **kwargs):
-        super(Decoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
+    # Later there can be additional arguments (e.g., length excluding padding)
     def init_state(self, enc_outputs, *args):
         raise NotImplementedError
 
-    def call(self, X, state, **kwargs):
+    def call(self, X, state):
         raise NotImplementedError
 
-class EncoderDecoder(tf.keras.Model):
+class EncoderDecoder(d2l.Classifier):
     """The base class for the encoder-decoder architecture.
 
     Defined in :numref:`sec_encoder-decoder`"""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoder, self).__init__(**kwargs)
+    def __init__(self, encoder, decoder):
+        super().__init__()
         self.encoder = encoder
         self.decoder = decoder
 
-    def call(self, enc_X, dec_X, *args, **kwargs):
-        enc_outputs = self.encoder(enc_X, *args, **kwargs)
+    def call(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args, training=True)
         dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state, **kwargs)
+        # Return decoder output only
+        return self.decoder(dec_X, dec_state, training=True)[0]
 
-class Seq2SeqEncoder(d2l.Module):
+    def predict_step(self, batch, device, num_steps,
+                     save_attention_weights=False):
+        """Defined in :numref:`sec_seq2seq_training`"""
+        src, tgt, src_valid_len, _ = batch
+        enc_outputs = self.encoder(src, src_valid_len, training=False)
+        dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
+        outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
+        for _ in range(num_steps):
+            Y, dec_state = self.decoder(outputs[-1], dec_state, training=False)
+            outputs.append(d2l.argmax(Y, 2))
+            # Save attention weights (to be covered later)
+            if save_attention_weights:
+                attention_weights.append(self.decoder.attention_weights)
+        return d2l.concat(outputs[1:], 1), attention_weights
+
+class Seq2SeqEncoder(d2l.Encoder):
     """The RNN encoder for sequence to sequence learning.
 
     Defined in :numref:`sec_seq2seq`"""
@@ -865,7 +892,7 @@ class Seq2SeqEncoder(d2l.Module):
         self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
         self.rnn = d2l.GRU(num_hiddens, num_layers, dropout)
 
-    def forward(self, X):
+    def call(self, X, *args):
         # X shape: (batch_size, num_steps)
         embs = self.embedding(d2l.transpose(X))
         # embs shape: (num_steps, batch_size, embed_size)
@@ -874,25 +901,19 @@ class Seq2SeqEncoder(d2l.Module):
         # state shape: (num_layers, batch_size, num_hiddens)
         return output, state
 
-class Seq2Seq(d2l.Classification):
+class Seq2Seq(d2l.EncoderDecoder):
     """Defined in :numref:`sec_seq2seq_decoder`"""
     def __init__(self, encoder, decoder, tgt_pad, lr):
-        super().__init__()
+        super().__init__(encoder, decoder)
         self.save_hyperparameters()
 
-    def forward(self, src, tgt):
-        return self.decoder(tgt, self.encoder(src)[1])[0]
+    def validation_step(self, batch):
+        Y_hat = self(*batch[:-1])
+        self.plot('loss', self.loss(Y_hat, batch[-1]), train=False)
 
-    def predict_step(self, batch):
-        """Defined in :numref:`sec_seq2seq_training`"""
-        src, tgt, _ = batch
-        enc_state = self.encoder(src)[1]
-        dec_state = None
-        outputs = [d2l.expand_dims(tgt[:,0], 1), ]
-        for _ in range(tgt.shape[1]):
-            Y, dec_state = self.decoder(outputs[-1], enc_state, dec_state)
-            outputs.append(d2l.argmax(Y, 2))
-        return d2l.concat(outputs[1:], 1)
+    def configure_optimizers(self):
+        # Adam optimizer is used here
+        return tf.keras.optimizers.Adam(learning_rate=self.lr)
 
 def bleu(pred_seq, label_seq, k):
     """Compute the BLEU.
@@ -901,7 +922,7 @@ def bleu(pred_seq, label_seq, k):
     pred_tokens, label_tokens = pred_seq.split(' '), label_seq.split(' ')
     len_pred, len_label = len(pred_tokens), len(label_tokens)
     score = math.exp(min(0, 1 - len_label / len_pred))
-    for n in range(1, k + 1):
+    for n in range(1, min(k, len_pred) + 1):
         num_matches, label_subs = 0, collections.defaultdict(int)
         for i in range(len_label - n + 1):
             label_subs[' '.join(label_tokens[i: i + n])] += 1
@@ -936,7 +957,17 @@ def masked_softmax(X, valid_lens):
     """Perform softmax operation by masking elements on the last axis.
 
     Defined in :numref:`sec_attention-scoring-functions`"""
-    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    # X: 3D tensor, valid_lens: 1D or 2D tensor
+    def _sequence_mask(X, valid_len, value=0):
+        maxlen = X.shape[1]
+        mask = tf.range(start=0, limit=maxlen, dtype=tf.float32)[
+            None, :] < tf.cast(valid_len[:, None], dtype=tf.float32)
+
+        if len(X.shape) == 3:
+            return tf.where(tf.expand_dims(mask, axis=-1), X, value)
+        else:
+            return tf.where(mask, X, value)
+
     if valid_lens is None:
         return tf.nn.softmax(X, axis=-1)
     else:
@@ -948,7 +979,8 @@ def masked_softmax(X, valid_lens):
             valid_lens = tf.reshape(valid_lens, shape=-1)
         # On the last axis, replace masked elements with a very large negative
         # value, whose exponentiation outputs 0
-        X = d2l.sequence_mask(tf.reshape(X, shape=(-1, shape[-1])), valid_lens, value=-1e6)
+        X = _sequence_mask(tf.reshape(X, shape=(-1, shape[-1])), valid_lens,
+                           value=-1e6)
         return tf.nn.softmax(tf.reshape(X, shape=shape), axis=-1)
 
 class AdditiveAttention(tf.keras.layers.Layer):
@@ -964,19 +996,18 @@ class AdditiveAttention(tf.keras.layers.Layer):
 
     def call(self, queries, keys, values, valid_lens, **kwargs):
         queries, keys = self.W_q(queries), self.W_k(keys)
-        # After dimension expansion, shape of `queries`: (`batch_size`, no. of
-        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,
-        # no. of key-value pairs, `num_hiddens`). Sum them up with
-        # broadcasting
+        # After dimension expansion, shape of queries: (batch_size, no. of
+        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1, no. of
+        # key-value pairs, num_hiddens). Sum them up with broadcasting
         features = tf.expand_dims(queries, axis=2) + tf.expand_dims(
             keys, axis=1)
         features = tf.nn.tanh(features)
-        # There is only one output of `self.w_v`, so we remove the last
-        # one-dimensional entry from the shape. Shape of `scores`:
-        # (`batch_size`, no. of queries, no. of key-value pairs)
+        # There is only one output of self.w_v, so we remove the last
+        # one-dimensional entry from the shape. Shape of scores: (batch_size,
+        # no. of queries, no. of key-value pairs)
         scores = tf.squeeze(self.w_v(features), axis=-1)
         self.attention_weights = masked_softmax(scores, valid_lens)
-        # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+        # Shape of values: (batch_size, no. of key-value pairs, value
         # dimension)
         return tf.matmul(self.dropout(
             self.attention_weights, **kwargs), values)
@@ -985,19 +1016,31 @@ class DotProductAttention(tf.keras.layers.Layer):
     """Scaled dot product attention.
 
     Defined in :numref:`subsec_additive-attention`"""
-    def __init__(self, dropout, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, dropout, num_heads=None):
+        super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
+        self.num_heads = num_heads  # To be covered later
 
-    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
-    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
-    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
-    # dimension)
-    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)
-    def call(self, queries, keys, values, valid_lens, **kwargs):
+    # Shape of queries: (batch_size, no. of queries, d)
+    # Shape of keys: (batch_size, no. of key-value pairs, d)
+    # Shape of values: (batch_size, no. of key-value pairs, value dimension)
+    # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
+    def call(self, queries, keys, values, valid_lens=None, window_mask=None,
+             **kwargs):
         d = queries.shape[-1]
         scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
             tf.cast(d, dtype=tf.float32))
+        if window_mask is not None:  # To be covered later
+            num_windows = window_mask.shape[0]
+            n, num_queries, num_kv_pairs = scores.shape
+            # Shape of window_mask: (num_windows, no. of queries,
+            # no. of key-value pairs)
+            scores = d2l.reshape(
+                scores, (n//(num_windows*self.num_heads), num_windows,
+                         self.num_heads, num_queries, num_kv_pairs
+                        )) + d2l.expand_dims(
+                d2l.expand_dims(window_mask, 1), 0)
+            scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
         self.attention_weights = masked_softmax(scores, valid_lens)
         return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)
 
@@ -1005,80 +1048,76 @@ class AttentionDecoder(d2l.Decoder):
     """The base attention-based decoder interface.
 
     Defined in :numref:`sec_seq2seq_attention`"""
-    def __init__(self, **kwargs):
-        super(AttentionDecoder, self).__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
     @property
     def attention_weights(self):
         raise NotImplementedError
 
-class MultiHeadAttention(tf.keras.layers.Layer):
+class MultiHeadAttention(d2l.Module):
     """Multi-head attention.
 
     Defined in :numref:`sec_multihead-attention`"""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  num_heads, dropout, bias=False, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         self.num_heads = num_heads
-        self.attention = d2l.DotProductAttention(dropout)
+        self.attention = d2l.DotProductAttention(dropout, num_heads)
         self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
         self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
         self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
         self.W_o = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
 
-    def call(self, queries, keys, values, valid_lens, **kwargs):
-        # Shape of `queries`, `keys`, or `values`:
-        # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`)
-        # Shape of `valid_lens`:
-        # (`batch_size`,) or (`batch_size`, no. of queries)
-        # After transposing, shape of output `queries`, `keys`, or `values`:
-        # (`batch_size` * `num_heads`, no. of queries or key-value pairs,
-        # `num_hiddens` / `num_heads`)
-        queries = transpose_qkv(self.W_q(queries), self.num_heads)
-        keys = transpose_qkv(self.W_k(keys), self.num_heads)
-        values = transpose_qkv(self.W_v(values), self.num_heads)
+    def call(self, queries, keys, values, valid_lens, window_mask=None,
+             **kwargs):
+        # Shape of queries, keys, or values:
+        # (batch_size, no. of queries or key-value pairs, num_hiddens)
+        # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
+        # After transposing, shape of output queries, keys, or values:
+        # (batch_size * num_heads, no. of queries or key-value pairs,
+        # num_hiddens / num_heads)
+        queries = self.transpose_qkv(self.W_q(queries))
+        keys = self.transpose_qkv(self.W_k(keys))
+        values = self.transpose_qkv(self.W_v(values))
 
         if valid_lens is not None:
-            # On axis 0, copy the first item (scalar or vector) for
-            # `num_heads` times, then copy the next item, and so on
+            # On axis 0, copy the first item (scalar or vector) for num_heads
+            # times, then copy the next item, and so on
             valid_lens = tf.repeat(valid_lens, repeats=self.num_heads, axis=0)
 
-        # Shape of `output`: (`batch_size` * `num_heads`, no. of queries, `num_hiddens` / `num_heads`)
-        output = self.attention(queries, keys, values, valid_lens, **kwargs)
+        # Shape of output: (batch_size * num_heads, no. of queries,
+        # num_hiddens / num_heads)
+        output = self.attention(queries, keys, values, valid_lens,
+                                window_mask, **kwargs)
 
-        # Shape of `output_concat`: (`batch_size`, no. of queries, `num_hiddens`)
-        output_concat = transpose_output(output, self.num_heads)
+        # Shape of output_concat: (batch_size, no. of queries, num_hiddens)
+        output_concat = self.transpose_output(output)
         return self.W_o(output_concat)
 
-def transpose_qkv(X, num_heads):
-    """Transposition for parallel computation of multiple attention heads.
+    def transpose_qkv(self, X):
+        """Transposition for parallel computation of multiple attention heads.
+    
+        Defined in :numref:`sec_multihead-attention`"""
+        # Shape of input X: (batch_size, no. of queries or key-value pairs,
+        # num_hiddens). Shape of output X: (batch_size, no. of queries or
+        # key-value pairs, num_heads, num_hiddens / num_heads)
+        X = tf.reshape(X, shape=(X.shape[0], X.shape[1], self.num_heads, -1))
+        # Shape of output X: (batch_size, num_heads, no. of queries or key-value
+        # pairs, num_hiddens / num_heads)
+        X = tf.transpose(X, perm=(0, 2, 1, 3))
+        # Shape of output: (batch_size * num_heads, no. of queries or key-value
+        # pairs, num_hiddens / num_heads)
+        return tf.reshape(X, shape=(-1, X.shape[2], X.shape[3]))
+    
 
-    Defined in :numref:`sec_multihead-attention`"""
-    # Shape of input `X`:
-    # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`).
-    # Shape of output `X`:
-    # (`batch_size`, no. of queries or key-value pairs, `num_heads`,
-    # `num_hiddens` / `num_heads`)
-    X = tf.reshape(X, shape=(X.shape[0], X.shape[1], num_heads, -1))
-
-    # Shape of output `X`:
-    # (`batch_size`, `num_heads`, no. of queries or key-value pairs,
-    # `num_hiddens` / `num_heads`)
-    X = tf.transpose(X, perm=(0, 2, 1, 3))
-
-    # Shape of `output`:
-    # (`batch_size` * `num_heads`, no. of queries or key-value pairs,
-    # `num_hiddens` / `num_heads`)
-    return tf.reshape(X, shape=(-1, X.shape[2], X.shape[3]))
-
-
-def transpose_output(X, num_heads):
-    """Reverse the operation of `transpose_qkv`.
-
-    Defined in :numref:`sec_multihead-attention`"""
-    X = tf.reshape(X, shape=(-1, num_heads, X.shape[1], X.shape[2]))
-    X = tf.transpose(X, perm=(0, 2, 1, 3))
-    return tf.reshape(X, shape=(X.shape[0], X.shape[1], -1))
+    def transpose_output(self, X):
+        """Reverse the operation of transpose_qkv.
+    
+        Defined in :numref:`sec_multihead-attention`"""
+        X = tf.reshape(X, shape=(-1, self.num_heads, X.shape[1], X.shape[2]))
+        X = tf.transpose(X, perm=(0, 2, 1, 3))
+        return tf.reshape(X, shape=(X.shape[0], X.shape[1], -1))
 
 class PositionalEncoding(tf.keras.layers.Layer):
     """Positional encoding.
@@ -1087,7 +1126,7 @@ class PositionalEncoding(tf.keras.layers.Layer):
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
-        # Create a long enough `P`
+        # Create a long enough P
         self.P = np.zeros((1, max_len, num_hiddens))
         X = np.arange(max_len, dtype=np.float32).reshape(
             -1,1)/np.power(10000, np.arange(
@@ -1103,8 +1142,8 @@ class PositionWiseFFN(tf.keras.layers.Layer):
     """Positionwise feed-forward network.
 
     Defined in :numref:`sec_transformer`"""
-    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
-        super().__init__(*kwargs)
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs):
+        super().__init__()
         self.dense1 = tf.keras.layers.Dense(ffn_num_hiddens)
         self.relu = tf.keras.layers.ReLU()
         self.dense2 = tf.keras.layers.Dense(ffn_num_outputs)
@@ -1115,47 +1154,49 @@ class PositionWiseFFN(tf.keras.layers.Layer):
 class AddNorm(tf.keras.layers.Layer):
     """Residual connection followed by layer normalization.
 
-    Defined in :numref:`sec_transformer`"""
-    def __init__(self, normalized_shape, dropout, **kwargs):
-        super().__init__(**kwargs)
+    Defined in :numref:`subsec_positionwise-ffn`"""
+    def __init__(self, norm_shape, dropout):
+        super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
-        self.ln = tf.keras.layers.LayerNormalization(normalized_shape)
+        self.ln = tf.keras.layers.LayerNormalization(norm_shape)
 
     def call(self, X, Y, **kwargs):
         return self.ln(self.dropout(Y, **kwargs) + X)
 
-class EncoderBlock(tf.keras.layers.Layer):
+class TransformerEncoderBlock(tf.keras.layers.Layer):
     """Transformer encoder block.
 
-    Defined in :numref:`sec_transformer`"""
+    Defined in :numref:`subsec_positionwise-ffn`"""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False, **kwargs):
-        super().__init__(**kwargs)
-        self.attention = d2l.MultiHeadAttention(key_size, query_size, value_size, num_hiddens,
-                                                num_heads, dropout, bias)
+                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False):
+        super().__init__()
+        self.attention = d2l.MultiHeadAttention(
+            key_size, query_size, value_size, num_hiddens, num_heads, dropout,
+            bias)
         self.addnorm1 = AddNorm(norm_shape, dropout)
         self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(norm_shape, dropout)
 
     def call(self, X, valid_lens, **kwargs):
-        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens, **kwargs), **kwargs)
+        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens, **kwargs),
+                          **kwargs)
         return self.addnorm2(Y, self.ffn(Y), **kwargs)
 
 class TransformerEncoder(d2l.Encoder):
     """Transformer encoder.
 
-    Defined in :numref:`sec_transformer`"""
+    Defined in :numref:`subsec_transformer-encoder`"""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, bias=False, **kwargs):
-        super().__init__(**kwargs)
+                 num_blks, dropout, bias=False):
+        super().__init__()
         self.num_hiddens = num_hiddens
         self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
-        self.blks = [EncoderBlock(
+        self.blks = [TransformerEncoderBlock(
             key_size, query_size, value_size, num_hiddens, norm_shape,
             ffn_num_hiddens, num_heads, dropout, bias) for _ in range(
-            num_layers)]
+            num_blks)]
 
     def call(self, X, valid_lens, **kwargs):
         # Since positional encoding values are between -1 and 1, the embedding
@@ -1178,7 +1219,7 @@ def train_2d(trainer, steps=20, f_grad=None):
     """Optimize a 2D objective function with a customized trainer.
 
     Defined in :numref:`subsec_gd-learningrate`"""
-    # `s1` and `s2` are internal state variables that will be used later
+    # `s1` and `s2` are internal state variables that will be used in Momentum, adagrad, RMSProp
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
     for i in range(steps):
@@ -1201,6 +1242,34 @@ def show_trace_2d(f, results):
     d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
     d2l.plt.xlabel('x1')
     d2l.plt.ylabel('x2')
+
+class Timer:
+    """Record multiple running times."""
+    def __init__(self):
+        """Defined in :numref:`sec_minibatch_sgd`"""
+        self.times = []
+        self.start()
+
+    def start(self):
+        """Start the timer."""
+        self.tik = time.time()
+
+    def stop(self):
+        """Stop the timer and record the time in a list."""
+        self.times.append(time.time() - self.tik)
+        return self.times[-1]
+
+    def avg(self):
+        """Return the average time."""
+        return sum(self.times) / len(self.times)
+
+    def sum(self):
+        """Return the sum of time."""
+        return sum(self.times)
+
+    def cumsum(self):
+        """Return the accumulated time."""
+        return np.array(self.times).cumsum().tolist()
 
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
                            '76e5be1548fd8222e5074cf0faae75edff8cf93f')
@@ -1254,9 +1323,6 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
             kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
     optimizer = trainer_fn(**hyperparams)
     loss = tf.keras.losses.MeanSquaredError()
-    # Note: L2 Loss = 1/2 * MSE Loss. TensorFlow has MSE Loss which is
-    # slightly different from MXNet's L2Loss by a factor of 2. Hence we halve
-    # the loss value to get L2Loss in TensorFlow
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()
@@ -1264,7 +1330,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
         for X, y in data_iter:
             with tf.GradientTape() as g:
                 out = net(X)
-                l = loss(y, out)/2
+                l = loss(y, out)
                 params = net.trainable_variables
                 grads = g.gradient(l, params)
             optimizer.apply_gradients(zip(grads, params))
@@ -1273,7 +1339,9 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
                 timer.stop()
                 p = n/X.shape[0]
                 q = p/tf.data.experimental.cardinality(data_iter).numpy()
-                r = (d2l.evaluate_loss(net, data_iter, loss)/2,)
+                # `MeanSquaredError` computes squared error without the 1/2
+                # factor
+                r = (d2l.evaluate_loss(net, data_iter, loss) / 2,)
                 animator.add(q, r)
                 timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
@@ -1573,14 +1641,15 @@ def accuracy(y_hat, y):
     return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
 def download(url, folder='../data', sha1_hash=None):
-    """Defined in :numref:`sec_utils`"""
-    if not url.startswith('http'):
-        # back compatability
-        url, sha1_hash = DATA_HUB[url]
+    """Download a file to folder and return the local filepath.
 
+    Defined in :numref:`sec_utils`"""
+    if not url.startswith('http'):
+        # For back compatability
+        url, sha1_hash = DATA_HUB[url]
     os.makedirs(folder, exist_ok=True)
     fname = os.path.join(folder, url.split('/')[-1])
-    # check if hit cache
+    # Check if hit cache
     if os.path.exists(fname) and sha1_hash:
         sha1 = hashlib.sha1()
         with open(fname, 'rb') as f:
@@ -1591,7 +1660,7 @@ def download(url, folder='../data', sha1_hash=None):
                 sha1.update(data)
         if sha1.hexdigest() == sha1_hash:
             return fname
-    # download
+    # Download
     print(f'Downloading {fname} from {url}...')
     r = requests.get(url, stream=True, verify=True)
     with open(fname, 'wb') as f:
@@ -1599,7 +1668,7 @@ def download(url, folder='../data', sha1_hash=None):
     return fname
 
 def extract(filename, folder=None):
-    """Download and extract a zip/tar file.
+    """Extract a zip/tar file into folder.
 
     Defined in :numref:`sec_utils`"""
     base_dir = os.path.dirname(filename)
@@ -1708,18 +1777,6 @@ def tokenize_nmt(text, num_examples=None):
             target.append(parts[1].split(' '))
     return source, target
 
-def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
-    """Plot the histogram for list length pairs.
-
-    Defined in :numref:`sec_utils`"""
-    d2l.set_figsize()
-    _, _, patches = d2l.plt.hist(
-        [[len(l) for l in xlist], [len(l) for l in ylist]])
-    d2l.plt.xlabel(xlabel)
-    d2l.plt.ylabel(ylabel)
-    for patch in patches[1].patches:
-        patch.set_hatch('/')
-    d2l.plt.legend(legend)
 
 def truncate_pad(line, num_steps, padding_token):
     """Truncate or pad sequences.
@@ -1759,44 +1816,19 @@ def load_data_nmt(batch_size, num_steps, num_examples=600):
     data_iter = d2l.load_array(data_arrays, batch_size)
     return data_iter, src_vocab, tgt_vocab
 
-def bleu(pred_seq, label_seq, k):
-    """Compute the BLEU.
+def sequence_mask(X, valid_len, value=0):
+    """Mask irrelevant entries in sequences.
 
     Defined in :numref:`sec_utils`"""
-    pred_tokens, label_tokens = pred_seq.split(' '), label_seq.split(' ')
-    len_pred, len_label = len(pred_tokens), len(label_tokens)
-    score = math.exp(min(0, 1 - len_label / len_pred))
-    for n in range(1, k + 1):
-        num_matches, label_subs = 0, collections.defaultdict(int)
-        for i in range(len_label - n + 1):
-            label_subs[''.join(label_tokens[i: i + n])] += 1
-        for i in range(len_pred - n + 1):
-            if label_subs[''.join(pred_tokens[i: i + n])] > 0:
-                num_matches += 1
-                label_subs[''.join(pred_tokens[i: i + n])] -= 1
-        score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
-    return score
+    maxlen = X.shape[1]
+    mask = tf.range(start=0, limit=maxlen, dtype=tf.float32)[
+        None, :] < tf.cast(valid_len[:, None], dtype=tf.float32)
 
-class Seq2SeqEncoderOld(d2l.Encoder):
-    """The RNN encoder for sequence to sequence learning.
+    if len(X.shape) == 3:
+        return tf.where(tf.expand_dims(mask, axis=-1), X, value)
+    else:
+        return tf.where(mask, X, value)
 
-    Defined in :numref:`sec_utils`"""
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers, dropout=0, **kwargs):
-        super().__init__(*kwargs)
-        # Embedding layer
-        self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
-        self.rnn = tf.keras.layers.RNN(tf.keras.layers.StackedRNNCells(
-            [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)
-             for _ in range(num_layers)]), return_sequences=True,
-                                       return_state=True)
-
-    def call(self, X, *args, **kwargs):
-        # The input `X` shape: (`batch_size`, `num_steps`)
-        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
-        X = self.embedding(X)
-        output = self.rnn(X, **kwargs)
-        state = output[1:]
-        return output[0], state
 
 class MaskedSoftmaxCELoss(tf.keras.losses.Loss):
     """The softmax cross-entropy loss with masks.
@@ -1844,20 +1876,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
         if (epoch + 1) % 10 == 0:
             animator.add(epoch + 1, (metric[0] / metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
-          f'tokens/sec on {str(device)}')
-
-def sequence_mask(X, valid_len, value=0):
-    """Mask irrelevant entries in sequences.
-
-    Defined in :numref:`sec_utils`"""
-    maxlen = X.shape[1]
-    mask = tf.range(start=0, limit=maxlen, dtype=tf.float32)[
-        None, :] < tf.cast(valid_len[:, None], dtype=tf.float32)
-
-    if len(X.shape) == 3:
-        return tf.where(tf.expand_dims(mask, axis=-1), X, value)
-    else:
-        return tf.where(mask, X, value)
+          f'tokens/sec on {str(device._device_name)}')
 
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
                     save_attention_weights=False):
@@ -1877,7 +1896,7 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
     output_seq, attention_weight_seq = [], []
     for _ in range(num_steps):
         Y, dec_state = net.decoder(dec_X, dec_state, training=False)
-        # We use the token with the highest prediction likelihood as the input
+        # We use the token with the highest prediction likelihood as input
         # of the decoder at the next time step
         dec_X = tf.argmax(Y, axis=2)
         pred = tf.squeeze(dec_X, axis=0)
@@ -1889,7 +1908,10 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
         if pred == tgt_vocab['<eos>']:
             break
         output_seq.append(pred.numpy())
-    return ' '.join(tgt_vocab.to_tokens(tf.reshape(output_seq, shape = -1).numpy().tolist())), attention_weight_seq# Alias defined in config.ini
+    return ' '.join(tgt_vocab.to_tokens(tf.reshape(output_seq, shape = -1).numpy().tolist())), attention_weight_seq
+
+
+# Alias defined in config.ini
 size = lambda a: tf.size(a).numpy()
 
 reshape = tf.reshape

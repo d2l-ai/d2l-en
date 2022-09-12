@@ -4,7 +4,7 @@
 As we move from a single GPU to multiple GPUs and then to multiple servers containing multiple GPUs, possibly all spread out across multiple racks and network switches,
 our algorithms for distributed and parallel training need to become much more sophisticated. Details matter since different interconnects have very different bandwidth (e.g., NVLink can offer up to 100 GB/s across 6 links in an appropriate setting, PCIe 4.0 (16-lane) offers 32 GB/s, while even high speed 100GbE Ethernet only amounts to 10 GB/s). At the same time it is unreasonable to expect that a statistical modeler be an expert in networking and systems.
 
-The core idea of the parameter server was introduced in :cite:`Smola.Narayanamurthy.2010` in the context of distributed latent variable models. A description of the push and pull semantics then followed in :cite:`Ahmed.Aly.Gonzalez.ea.2012` and a description of the system and an open source library followed in :cite:`Li.Andersen.Park.ea.2014`. In the following we will motivate the components needed for efficiency.
+The core idea of the parameter server was introduced in :citet:`Smola.Narayanamurthy.2010` in the context of distributed latent variable models. A description of the push and pull semantics then followed in :citet:`Ahmed.Aly.Gonzalez.ea.2012` and a description of the system and an open source library followed in :citet:`Li.Andersen.Park.ea.2014`. In the following we will motivate the components needed for efficiency.
 
 
 ## Data-Parallel Training
@@ -30,7 +30,7 @@ If we send all data to the CPU we incur a penalty of 40 ms since *each* of the f
 ![Parameter synchronization strategies.](../img/ps-distributed.svg)
 :label:`fig_ps_distributed`
 
-Note that we have yet another tool at our disposal when it comes to improving performance: in a deep network it takes some time to compute all gradients from the top to the bottom. We can begin synchronizing gradients for some parameter groups even while we are still busy computing them for others. See e.g., :cite:`Sergeev.Del-Balso.2018` for details on how to do this in [Horovod](https://github.com/horovod/horovod).
+Note that we have yet another tool at our disposal when it comes to improving performance: in a deep network it takes some time to compute all gradients from the top to the bottom. We can begin synchronizing gradients for some parameter groups even while we are still busy computing them for others. See e.g., :citet:`Sergeev.Del-Balso.2018` for details on how to do this in [Horovod](https://github.com/horovod/horovod).
 
 ## Ring Synchronization
 
@@ -51,13 +51,13 @@ Since each chunk is of size $1/n$ the total time is now $(n-1)/n \approx 1$. In 
 ![Ring synchronization across 4 nodes. Each node starts transmitting parts of gradients to its left neighbor until the assembled gradient can be found in its right neighbor.](../img/ringsync.svg)
 :label:`fig_ringsync`
 
-If we use the same example of synchronizing 160 MB across 8 V100 GPUs we arrive at approximately $2 \cdot 160 \mathrm{MB} / (3 \cdot 18 \mathrm{GB/s}) \approx 6 \mathrm{ms}$. This is better than using the PCIe bus, even though we are now using 8 GPUs. Note that in practice these numbers are a bit worse, since deep learning frameworks often fail to assemble communication into large burst transfers. 
+If we use the same example of synchronizing 160 MB across 8 V100 GPUs we arrive at approximately $2 \cdot 160 \mathrm{MB} / (3 \cdot 18 \mathrm{GB/s}) \approx 6 \mathrm{ms}$. This is better than using the PCIe bus, even though we are now using 8 GPUs. Note that in practice these numbers are a bit worse, since deep learning frameworks often fail to assemble communication into large burst transfers.
 
 Note that there is a common misconception that ring synchronization is fundamentally different from other synchronization algorithms. The only difference is that the synchronization path is somewhat more elaborate when compared with a simple tree.
 
 ## Multi-Machine Training
 
-Distributed training on multiple machines adds a further challenge: we need to communicate with servers that are only connected across a comparatively lower bandwidth fabric that can be over an order of magnitude slower in some cases. 
+Distributed training on multiple machines adds a further challenge: we need to communicate with servers that are only connected across a comparatively lower bandwidth fabric that can be over an order of magnitude slower in some cases.
 Synchronization across devices is tricky. After all, different machines running training code will have subtly different speed. Hence we need to *synchronize* them if we want to use synchronous distributed optimization. :numref:`fig_ps_multimachine` illustrates how distributed parallel training occurs.
 
 1. A (different) batch of data is read on each machine, split across multiple GPUs and transferred to GPU memory. There predictions and gradients are computed on each GPU batch separately.
@@ -71,8 +71,8 @@ Synchronization across devices is tricky. After all, different machines running 
 ![Multi-machine multi-GPU distributed parallel training.](../img/ps-multimachine.svg)
 :label:`fig_ps_multimachine`
 
-Each of these operations seems rather straightforward. And, indeed, they can be carried out efficiently *within* a single machine. Once we look at multiple machines, though, we can see that the central parameter server becomes the bottleneck. After all, the bandwidth per server is limited, hence for $m$ workers the time it takes to send all gradients to the server is $\mathcal{O}(m)$. We can break through this barrier by increasing the number of servers to $n$. At this point each server only needs to store $\mathcal{O}(1/n)$ of the parameters, hence the total time for updates and optimization becomes $\mathcal{O}(m/n)$. 
-Matching both numbers yields constant scaling regardless of how many workers we are dealing with. In practice we use the *same* machines both as workers and as servers. :numref:`fig_ps_multips` illustrates the design (see also :cite:`Li.Andersen.Park.ea.2014` for details). 
+Each of these operations seems rather straightforward. And, indeed, they can be carried out efficiently *within* a single machine. Once we look at multiple machines, though, we can see that the central parameter server becomes the bottleneck. After all, the bandwidth per server is limited, hence for $m$ workers the time it takes to send all gradients to the server is $\mathcal{O}(m)$. We can break through this barrier by increasing the number of servers to $n$. At this point each server only needs to store $\mathcal{O}(1/n)$ of the parameters, hence the total time for updates and optimization becomes $\mathcal{O}(m/n)$.
+Matching both numbers yields constant scaling regardless of how many workers we are dealing with. In practice we use the *same* machines both as workers and as servers. :numref:`fig_ps_multips` illustrates the design (see also :cite:`Li.Andersen.Park.ea.2014` for details).
 In particular, ensuring that multiple machines work without unreasonable delays is nontrivial. We omit details on barriers and will only briefly touch on synchronous and asynchronous updates below.
 
 ![Top: a single parameter server is a bottleneck since its bandwidth is finite. Bottom: multiple parameter servers store parts of the parameters with aggregate bandwidth.](../img/ps-multips.svg)
@@ -80,8 +80,8 @@ In particular, ensuring that multiple machines work without unreasonable delays 
 
 ## Key--Value Stores
 
-Implementing the steps required for distributed multi-GPU training in practice is nontrivial. 
-This is why it pays to use a common abstraction, namely that of a *key--value store* with redefined update semantics. 
+Implementing the steps required for distributed multi-GPU training in practice is nontrivial.
+This is why it pays to use a common abstraction, namely that of a *key--value store* with redefined update semantics.
 
 
 Across many workers and many GPUs the computation for gradient $i$ can be defined as

@@ -6,7 +6,7 @@ So far we primarily focused on optimization *algorithms* for how to update the w
 * Most obviously the *magnitude* of the learning rate matters. If it is too large, optimization diverges, if it is too small, it takes too long to train or we end up with a suboptimal result. We saw previously that the condition number of the problem matters (see e.g., :numref:`sec_momentum` for details). Intuitively it is the ratio of the amount of change in the least sensitive direction vs. the most sensitive one.
 * Secondly, the rate of decay is just as important. If the learning rate remains large we may simply end up bouncing around the minimum and thus not reach optimality. :numref:`sec_minibatch_sgd` discussed this in some detail and we analyzed performance guarantees in :numref:`sec_sgd`. In short, we want the rate to decay, but probably more slowly than $\mathcal{O}(t^{-\frac{1}{2}})$ which would be a good choice for convex problems.
 * Another aspect that is equally important is *initialization*. This pertains both to how the parameters are set initially (review :numref:`sec_numerical_stability` for details) and also how they evolve initially. This goes under the moniker of *warmup*, i.e., how rapidly we start moving towards the solution initially. Large steps in the beginning might not be beneficial, in particular since the initial set of parameters is random. The initial update directions might be quite meaningless, too.
-* Lastly, there are a number of optimization variants that perform cyclical learning rate adjustment. This is beyond the scope of the current chapter. We recommend the reader to review details in :cite:`Izmailov.Podoprikhin.Garipov.ea.2018`, e.g., how to obtain better solutions by averaging over an entire *path* of parameters.
+* Lastly, there are a number of optimization variants that perform cyclical learning rate adjustment. This is beyond the scope of the current chapter. We recommend the reader to review details in :citet:`Izmailov.Podoprikhin.Garipov.ea.2018`, e.g., how to obtain better solutions by averaging over an entire *path* of parameters.
 
 Given the fact that there is a lot of detail needed to manage learning rates, most deep learning frameworks have tools to deal with this automatically. In the current chapter we will review the effects that different schedules have on accuracy and also show how this can be managed efficiently via a *learning rate scheduler*.
 
@@ -15,6 +15,7 @@ Given the fact that there is a lot of detail needed to manage learning rates, mo
 We begin with a toy problem that is cheap enough to compute easily, yet sufficiently nontrivial to illustrate some of the key aspects. For that we pick a slightly modernized version of LeNet (`relu` instead of `sigmoid` activation, MaxPooling rather than AveragePooling), as applied to Fashion-MNIST. Moreover, we hybridize the network for performance. Since most of the code is standard we just introduce the basics without further detailed discussion. See :numref:`chap_cnn` for a refresher as needed.
 
 ```{.python .input}
+#@tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, lr_scheduler, np, npx
@@ -36,7 +37,7 @@ device = d2l.try_gpu()
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
-# The code is almost identical to `d2l.train_ch6` defined in the 
+# The code is almost identical to `d2l.train_ch6` defined in the
 # lenet section of chapter convolutional neural networks
 def train(net, train_iter, test_iter, num_epochs, loss, trainer, device):
     net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
@@ -91,9 +92,9 @@ device = d2l.try_gpu()
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
-# The code is almost identical to `d2l.train_ch6` defined in the 
+# The code is almost identical to `d2l.train_ch6` defined in the
 # lenet section of chapter convolutional neural networks
-def train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
+def train(net, train_iter, test_iter, num_epochs, loss, trainer, device,
           scheduler=None):
     net.to(device)
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
@@ -116,10 +117,10 @@ def train(net, train_iter, test_iter, num_epochs, loss, trainer, device,
             if (i + 1) % 50 == 0:
                 animator.add(epoch + i / len(train_iter),
                              (train_loss, train_acc, None))
-        
+
         test_acc = d2l.evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
-    
+
         if scheduler:
             if scheduler.__module__ == lr_scheduler.__name__:
                 # Using PyTorch In-Built scheduler
@@ -158,7 +159,7 @@ def net():
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
-# The code is almost identical to `d2l.train_ch6` defined in the 
+# The code is almost identical to `d2l.train_ch6` defined in the
 # lenet section of chapter convolutional neural networks
 def train(net_fn, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu(), custom_callback = False):
@@ -172,7 +173,7 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr,
     callback = d2l.TrainCallback(net, train_iter, test_iter, num_epochs,
                              device_name)
     if custom_callback is False:
-        net.fit(train_iter, epochs=num_epochs, verbose=0, 
+        net.fit(train_iter, epochs=num_epochs, verbose=0,
                 callbacks=[callback])
     else:
          net.fit(train_iter, epochs=num_epochs, verbose=0,
@@ -183,6 +184,7 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr,
 Let's have a look at what happens if we invoke this algorithm with default settings, such as a learning rate of $0.3$ and train for $30$ iterations. Note how the training accuracy keeps on increasing while progress in terms of test accuracy stalls beyond a point. The gap between both curves indicates overfitting.
 
 ```{.python .input}
+#@tab mxnet
 lr, num_epochs = 0.3, 30
 net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
@@ -208,6 +210,7 @@ train(net, train_iter, test_iter, num_epochs, lr)
 One way of adjusting the learning rate is to set it explicitly at each step. This is conveniently achieved by the `set_learning_rate` method. We could adjust it downward after every epoch (or even after every minibatch), e.g., in a dynamic manner in response to how optimization is progressing.
 
 ```{.python .input}
+#@tab mxnet
 trainer.set_learning_rate(0.1)
 print(f'learning rate is now {trainer.learning_rate:.2f}')
 ```
@@ -250,6 +253,7 @@ d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 Now let's see how this plays out for training on Fashion-MNIST. We simply provide the scheduler as an additional argument to the training algorithm.
 
 ```{.python .input}
+#@tab mxnet
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
@@ -259,7 +263,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 #@tab pytorch
 net = net_fn()
 trainer = torch.optim.SGD(net.parameters(), lr)
-train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device,
       scheduler)
 ```
 
@@ -302,6 +306,7 @@ This can also be accomplished by a built-in scheduler in MXNet via the `lr_sched
 A common strategy for training deep networks is to keep the learning rate piecewise constant and to decrease it by a given amount every so often. That is, given a set of times when to decrease the rate, such as $s = \{5, 10, 20\}$ decrease $\eta_{t+1} \leftarrow \eta_t \cdot \alpha$ whenever $t \in s$. Assuming that the values are halved at each step we can implement this as follows.
 
 ```{.python .input}
+#@tab mxnet
 scheduler = lr_scheduler.MultiFactorScheduler(step=[15, 30], factor=0.5,
                                               base_lr=0.5)
 d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
@@ -319,7 +324,7 @@ def get_lr(trainer, scheduler):
     scheduler.step()
     return lr
 
-d2l.plot(d2l.arange(num_epochs), [get_lr(trainer, scheduler) 
+d2l.plot(d2l.arange(num_epochs), [get_lr(trainer, scheduler)
                                   for t in range(num_epochs)])
 ```
 
@@ -330,7 +335,7 @@ class MultiFactorScheduler:
         self.step = step
         self.factor = factor
         self.base_lr = base_lr
-  
+
     def __call__(self, epoch):
         if epoch in self.step:
             self.base_lr = self.base_lr * self.factor
@@ -345,6 +350,7 @@ d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 The intuition behind this piecewise constant learning rate schedule is that one lets optimization proceed until a stationary point has been reached in terms of the distribution of weight vectors. Then (and only then) do we decrease the rate such as to obtain a higher quality proxy to a good local minimum. The example below shows how this can produce ever slightly better solutions.
 
 ```{.python .input}
+#@tab mxnet
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
@@ -352,7 +358,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 
 ```{.python .input}
 #@tab pytorch
-train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device,
       scheduler)
 ```
 
@@ -364,7 +370,7 @@ train(net, train_iter, test_iter, num_epochs, lr,
 
 ### Cosine Scheduler
 
-A rather perplexing heuristic was proposed by :cite:`Loshchilov.Hutter.2016`. It relies on the observation that we might not want to decrease the learning rate too drastically in the beginning and moreover, that we might want to "refine" the solution in the end using a very small learning rate. This results in a cosine-like schedule with the following functional form for learning rates in the range $t \in [0, T]$.
+A rather perplexing heuristic was proposed by :citet:`Loshchilov.Hutter.2016`. It relies on the observation that we might not want to decrease the learning rate too drastically in the beginning and moreover, that we might want to "refine" the solution in the end using a very small learning rate. This results in a cosine-like schedule with the following functional form for learning rates in the range $t \in [0, T]$.
 
 $$\eta_t = \eta_T + \frac{\eta_0 - \eta_T}{2} \left(1 + \cos(\pi t/T)\right)$$
 
@@ -372,6 +378,7 @@ $$\eta_t = \eta_T + \frac{\eta_0 - \eta_T}{2} \left(1 + \cos(\pi t/T)\right)$$
 Here $\eta_0$ is the initial learning rate, $\eta_T$ is the target rate at time $T$. Furthermore, for $t > T$ we simply pin the value to $\eta_T$ without increasing it again. In the following example, we set the max update step $T = 20$.
 
 ```{.python .input}
+#@tab mxnet
 scheduler = lr_scheduler.CosineScheduler(max_update=20, base_lr=0.3,
                                          final_lr=0.01)
 d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
@@ -388,7 +395,7 @@ class CosineScheduler:
         self.warmup_steps = warmup_steps
         self.warmup_begin_lr = warmup_begin_lr
         self.max_steps = self.max_update - self.warmup_steps
-  
+
     def get_warmup_lr(self, epoch):
         increase = (self.base_lr_orig - self.warmup_begin_lr) \
                        * float(epoch) / float(self.warmup_steps)
@@ -410,6 +417,7 @@ d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 In the context of computer vision this schedule *can* lead to improved results. Note, though, that such improvements are not guaranteed (as can be seen below).
 
 ```{.python .input}
+#@tab mxnet
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
@@ -419,7 +427,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 #@tab pytorch
 net = net_fn()
 trainer = torch.optim.SGD(net.parameters(), lr=0.3)
-train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device,
       scheduler)
 ```
 
@@ -431,11 +439,12 @@ train(net, train_iter, test_iter, num_epochs, lr,
 
 ### Warmup
 
-In some cases initializing the parameters is not sufficient to guarantee a good solution. This particularly a problem for some advanced network designs that may lead to unstable optimization problems. We could address this by choosing a sufficiently small learning rate to prevent divergence in the beginning. Unfortunately this means that progress is slow. Conversely, a large learning rate initially leads to divergence.
+In some cases initializing the parameters is not sufficient to guarantee a good solution. This is particularly a problem for some advanced network designs that may lead to unstable optimization problems. We could address this by choosing a sufficiently small learning rate to prevent divergence in the beginning. Unfortunately this means that progress is slow. Conversely, a large learning rate initially leads to divergence.
 
 A rather simple fix for this dilemma is to use a warmup period during which the learning rate *increases* to its initial maximum and to cool down the rate until the end of the optimization process. For simplicity one typically uses a linear increase for this purpose. This leads to a schedule of the form indicated below.
 
 ```{.python .input}
+#@tab mxnet
 scheduler = lr_scheduler.CosineScheduler(20, warmup_steps=5, base_lr=0.3,
                                          final_lr=0.01)
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
@@ -450,6 +459,7 @@ d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 Note that the network converges better initially (in particular observe the performance during the first 5 epochs).
 
 ```{.python .input}
+#@tab mxnet
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
@@ -459,7 +469,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 #@tab pytorch
 net = net_fn()
 trainer = torch.optim.SGD(net.parameters(), lr=0.3)
-train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device,
       scheduler)
 ```
 
@@ -485,7 +495,7 @@ Warmup can be applied to any scheduler (not just cosine). For a more detailed di
 1. How does convergence change if you change the exponent of the decrease in the learning rate? Use `PolyScheduler` for your convenience in the experiments.
 1. Apply the cosine scheduler to large computer vision problems, e.g., training ImageNet. How does it affect performance relative to other schedulers?
 1. How long should warmup last?
-1. Can you connect optimization and sampling? Start by using results from :cite:`Welling.Teh.2011` on Stochastic Gradient Langevin Dynamics.
+1. Can you connect optimization and sampling? Start by using results from :citet:`Welling.Teh.2011` on Stochastic Gradient Langevin Dynamics.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/359)

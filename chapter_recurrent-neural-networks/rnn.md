@@ -40,7 +40,7 @@ $$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h).$$
 
 In :eqref:`rnn_h_without_state`, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$, the bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer.
 Thus, broadcasting (see :numref:`subsec_broadcasting`) is applied during the summation.
-Next, the hidden layer output $\mathbf{H}$ is used as the input of the output layer. The output layer is given by
+Next, the hidden layer output $\mathbf{H}$ is used as input of the output layer. The output layer is given by
 
 $$\mathbf{O} = \mathbf{H} \mathbf{W}_{hq} + \mathbf{b}_q,$$
 
@@ -211,21 +211,15 @@ $\mathbf{O}_3$, is determined by the text sequence "m", "a", and "c". Since the 
 
 In practice, each token is represented by a $d$-dimensional vector, and we use a batch size $n>1$. Therefore, the input $\mathbf X_t$ at time step $t$ will be a $n\times d$ matrix, which is identical to what we discussed in :numref:`subsec_rnn_w_hidden_states`.
 
-
-
-
 In the following sections, we will implement RNNs
-for character-level language models and use perplexity
-to evaluate such models.
+for character-level language models.
 
 
 ## Summary
 
-* A neural network that uses recurrent computation for hidden states is called a recurrent neural network (RNN).
-* The hidden state of an RNN can capture historical information of the sequence up to the current time step.
-* The number of RNN model parameters does not grow as the number of time steps increases.
-* We can create character-level language models using an  RNN.
-* We can use perplexity to evaluate the quality of language models.
+A neural network that uses recurrent computation for hidden states is called a recurrent neural network (RNN).
+The hidden state of an RNN can capture historical information of the sequence up to the current time step. With recurrent computation, the number of RNN model parameters does not grow as the number of time steps increases. As for applications, an RNN can be used to create character-level language models.
+
 
 ## Exercises
 
