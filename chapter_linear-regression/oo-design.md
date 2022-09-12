@@ -196,7 +196,6 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
         # Use default_factory to make sure new plots are generated on each run
         board: ProgressBoard = field(default_factory=lambda: ProgressBoard(),
                                      init=False)
-        training: bool = field(default=None, init=False)
 
     def loss(self, y_hat, y):
         raise NotImplementedError

@@ -184,7 +184,6 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
     # Use default_factory to make sure new plots are generated on each run
     board: ProgressBoard = field(default_factory=lambda: ProgressBoard(),
                                  init=False)
-    training: bool = field(default=None, init=False)
 
     def loss(self, y_hat, y):
         raise NotImplementedError
@@ -520,12 +519,14 @@ class Classifier(d2l.Module):
         compare = d2l.astype(preds == d2l.reshape(Y, -1), d2l.float32)
         return d2l.reduce_mean(compare) if averaged else compare
 
-    def loss(self, params, X, Y, averaged=True):
+    def loss(self, params, X, Y, averaged=True, rngs=None):
         """Defined in :numref:`sec_softmax_concise`"""
-        Y_hat = self.apply(params, X)
+        Y_hat = self.apply(params, X, rngs=rngs)
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         fn = optax.softmax_cross_entropy_with_integer_labels
         return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
+
+get_key = lambda: jax.random.PRNGKey(d2l.get_seed())
 
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
