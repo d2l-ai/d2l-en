@@ -19,11 +19,11 @@ if it might be possible to do better
 by adapting transformer models to image data.
 This question sparked immense interest
 in the computer vision community.
-Recently, :cite:`ramachandran2019stand` proposed 
+Recently, :citet:`ramachandran2019stand` proposed 
 a scheme for replacing convolution with self-attention. 
 However, its use of specialized patterns in attention 
 makes it hard to scale up models on hardware accelerators.
-Then, :cite:`cordonnier2020relationship` theoretically proved 
+Then, :citet:`cordonnier2020relationship` theoretically proved 
 that self-attention can learn to behave similarly to convolution. 
 Empirically, $2 \times 2$ patches were taken from images as inputs, 
 but the small patch size makes the model 
