@@ -1140,7 +1140,7 @@ transforms the representation at all the sequence positions using the same MLP.
 1. Is it a good idea to replace scaled dot-product attention with additive attention in the transformer? Why?
 1. For language modeling, should we use the transformer encoder, decoder, or both? How to design this method?
 1. What can be challenges to transformers if input sequences are very long? Why?
-1. How to improve computational and memory efficiency of transformers? Hint: you may refer to the survey paper by Tay et al. :cite:`Tay.Dehghani.Bahri.ea.2020`.
+1. How to improve computational and memory efficiency of transformers? Hint: you may refer to the survey paper by :citet:`Tay.Dehghani.Bahri.ea.2020`.
 
 
 :begin_tab:`mxnet`

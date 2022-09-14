@@ -343,9 +343,9 @@ Among these are heuristics specialized for
 tied (shared) parameters, super-resolution,
 sequence models, and other situations.
 For instance,
-Xiao et al. demonstrated the possibility of training
+:citet:`Xiao.Bahri.Sohl-Dickstein.ea.2018` demonstrated the possibility of training
 10000-layer neural networks without architectural tricks
-by using a carefully-designed initialization method :cite:`Xiao.Bahri.Sohl-Dickstein.ea.2018`.
+by using a carefully-designed initialization method.
 
 If the topic interests you we suggest
 a deep dive into this module's offerings,
