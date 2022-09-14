@@ -22,12 +22,12 @@ is still used at each decoding step.
 
 In a separate but related challenge 
 of handwriting generation for a given text sequence,
-Alex Graves designed a differentiable attention model
+:citet:`Graves.2013` designed a differentiable attention model
 to align text characters with the much longer pen trace,
-where the alignment moves only in one direction :cite:`Graves.2013`.
+where the alignment moves only in one direction.
 Inspired by the idea of learning to align,
-Bahdanau et al. proposed a differentiable attention model
-without the severe unidirectional alignment limitation :cite:`Bahdanau.Cho.Bengio.2014`.
+:citet:`Bahdanau.Cho.Bengio.2014` proposed a differentiable attention model
+without the severe unidirectional alignment limitation.
 When predicting a token,
 if not all the input tokens are relevant,
 the model aligns (or attends)
@@ -93,7 +93,7 @@ import tensorflow as tf
 ## Defining the Decoder with Attention
 
 To implement the RNN encoder-decoder 
-with Bahdanau-style attention,
+with Bahdanau attention,
 we only need to redefine the decoder.
 To visualize the learned attention weights more conveniently,
 the following `AttentionDecoder` class
