@@ -28,7 +28,7 @@ from the base layer class and implement the forward propagation function.
 
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 ```{.python .input}
@@ -70,8 +70,20 @@ class CenteredLayer(tf.keras.Model):
     def __init__(self):
         super().__init__()
 
-    def call(self, inputs):
-        return inputs - tf.reduce_mean(inputs)
+    def call(self, X):
+        return X - tf.reduce_mean(X)
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+
+class CenteredLayer(nn.Module):
+    def __call__(self, X):
+        return X - X.mean()
 ```
 
 Let's verify that our layer works as intended by feeding some data through it.
@@ -102,11 +114,22 @@ net = nn.Sequential(nn.LazyLinear(128), CenteredLayer())
 net = tf.keras.Sequential([tf.keras.layers.Dense(128), CenteredLayer()])
 ```
 
+```{.python .input}
+%%tab jax
+net = nn.Sequential([nn.Dense(128), CenteredLayer()])
+```
+
 As an extra sanity check, we can send random data
 through the network and check that the mean is in fact 0.
 Because we are dealing with floating point numbers,
 we may still see a very small nonzero number
 due to quantization.
+
+:begin_tab:`jax`
+Here we utilize the method `init_with_output` which returns both the output of
+the network as well as the parameters. In this case we only focus on the
+output.
+:end_tab:
 
 ```{.python .input}
 %%tab pytorch, mxnet
@@ -118,6 +141,14 @@ Y.mean()
 %%tab tensorflow
 Y = net(tf.random.uniform((4, 8)))
 tf.reduce_mean(Y)
+```
+
+```{.python .input}
+%%tab jax
+Y, _ = net.init_with_output(jax.random.PRNGKey(d2l.get_seed()),
+                            jax.random.uniform(jax.random.PRNGKey(d2l.get_seed()),
+                            (4, 8)))
+Y.mean()
 ```
 
 ## [**Layers with Parameters**]
@@ -186,7 +217,23 @@ class MyDense(tf.keras.Model):
         return tf.nn.relu(linear)
 ```
 
-:begin_tab:`mxnet, tensorflow`
+```{.python .input}
+%%tab jax
+class MyDense(nn.Module):
+    in_units: int
+    units: int
+
+    def setup(self):
+        self.weight = self.param('weight', nn.initializers.normal(stddev=1),
+                                 (self.in_units, self.units))
+        self.bias = self.param('bias', nn.initializers.zeros, self.units)
+
+    def __call__(self, X):
+        linear = jnp.matmul(X, self.weight) + self.bias
+        return nn.relu(linear)
+```
+
+:begin_tab:`mxnet, tensorflow, jax`
 Next, we instantiate the `MyDense` class
 and access its model parameters.
 :end_tab:
@@ -215,6 +262,13 @@ dense(tf.random.uniform((2, 5)))
 dense.get_weights()
 ```
 
+```{.python .input}
+%%tab jax
+dense = MyDense(5, 3)
+params = dense.init(jax.random.PRNGKey(d2l.get_seed()), jnp.zeros((3, 5)))
+params
+```
+
 We can [**directly carry out forward propagation calculations using custom layers.**]
 
 ```{.python .input}
@@ -231,6 +285,12 @@ linear(torch.rand(2, 5))
 ```{.python .input}
 %%tab tensorflow
 dense(tf.random.uniform((2, 5)))
+```
+
+```{.python .input}
+%%tab jax
+dense.apply(params, jax.random.uniform(jax.random.PRNGKey(d2l.get_seed()),
+                                        (2, 5)))
 ```
 
 We can also (**construct models using custom layers.**)
@@ -255,6 +315,15 @@ net(torch.rand(2, 64))
 %%tab tensorflow
 net = tf.keras.models.Sequential([MyDense(8), MyDense(1)])
 net(tf.random.uniform((2, 64)))
+```
+
+```{.python .input}
+%%tab jax
+net = nn.Sequential([MyDense(64, 8), MyDense(8, 1)])
+Y, _ = net.init_with_output(jax.random.PRNGKey(d2l.get_seed()),
+                            jax.random.uniform(jax.random.PRNGKey(d2l.get_seed()),
+                                               (2, 64)))
+Y
 ```
 
 ## Summary
