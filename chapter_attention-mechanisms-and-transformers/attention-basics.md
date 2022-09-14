@@ -16,7 +16,7 @@ a *query* vector.
 This *query* vector is then typically compared with a number of 
 *key* vectors (one per input). 
 Based on some notion of compatibility between the query and the key,
-a probability distribution over the available inputs is computed,
+a probability distribution over the available inputs (e.g., input tokens) is computed,
 assigning high weights to especially compatible inputs 
 and low weights to incompatible inputs. 
 Finally, using these weights, 

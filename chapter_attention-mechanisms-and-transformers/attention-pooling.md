@@ -1,10 +1,11 @@
-# Attention Pooling and Kernel Regression
+# Attention Pooling
+
 :label:`sec_attention-pooling`
 
 You now know the major components of attention mechanisms.
 The interactions between queries and keys 
 induce an *attention pooling* over values.
-In the next section, we will describe attention pooling in greater detail
+In this section, we will describe attention pooling in greater detail
 to give you a high-level view of how modern attention mechanisms work in practice.
 
 
@@ -25,13 +26,13 @@ This is precisely the behavior of the Nadaraya-Watson kernel regression model,
 proposed in 1964.
 Note that the crucial difference here is that 
 in kernel regression, the weighting is computed
-over the training *instances*
+over the training *examples*
 whereas in attention mechanisms, the weighting
-is computed over the input tokens. 
+is computed over the inputs (e.g., input tokens of one training example). 
 
 To build your intuition, we briefly implement
 the classic Nadaraya-Watson kernel regression model,
-using computing similarities according to a Gaussian kernel. 
+computing similarities according to a Gaussian kernel.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -67,7 +68,7 @@ To keep things simple, let's consider
 the following regression problem:
 given a dataset of input-output pairs 
 $\{(x_1, y_1), \ldots, (x_n, y_n)\}$,
-we with to learn a function $f$ 
+we wish to learn a function $f$ 
 that can accurately predict 
 the target $y$ for any new input $x$.
 
@@ -141,8 +142,8 @@ plot_kernel_reg(y_hat)
 Average pooling isn't very useful because 
 it fails to output different predictions
 depending on the inputs $x_i$.
-Thus, the method due to Nadaraya :cite:`Nadaraya.1964`
-and Watson :cite:`Watson.1964`
+Thus, the method due to :citet:`Nadaraya.1964`
+and :citet:`Watson.1964`
 weighs the outputs $y_i$ according to their input locations:
 
 $$f(x) = \sum_{i=1}^n \frac{K(x - x_i)}{\sum_{j=1}^n K(x - x_j)} y_i,$$
