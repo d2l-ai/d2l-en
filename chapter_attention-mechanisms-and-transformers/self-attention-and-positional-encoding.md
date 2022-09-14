@@ -14,13 +14,13 @@ such that at each step,
 each token has its own query, keys, and values.
 Here, when computing the value of a token's representation at the next layer,
 the token can attend (via its query vector) to each other token 
-(matching based on their key vecotrs).
+(matching based on their key vectors).
 Using the full set of query-key compatibility scores,
 we can compute, for each token, a representation
 by building the appropriate weighted sum
 over the other tokens. 
 Because each token is attending to each other token
-(unlike the case were decoder steps attend to encoder steps),
+(unlike the case where decoder steps attend to encoder steps),
 such architectures are typically described as *self-attention* models :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017`, 
 and elsewhere described as *intra-attention* model :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017`.
 In this section, we will discuss sequence encoding using self-attention,
@@ -198,7 +198,7 @@ parallel computation.
 Note, however, that self-attention by itself
 does not preserve the order of the sequence. 
 What do we do if it really matters 
-that the model know in which order
+that the model knows in which order
 the input sequence arrived?
 
 The dominant approach for preserving 
