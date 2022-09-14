@@ -1126,7 +1126,7 @@ for different deep learning tasks.
 
 The transformer is an instance of the encoder-decoder architecture, 
 though either the encoder or the decoder can be used individually in practice.
-In the transformer, multi-head self-attention is used 
+In the transformer architecture, multi-head self-attention is used 
 for representing the input sequence and the output sequence, 
 though the decoder has to preserve the auto-regressive property via a masked version.
 Both the residual connections and the layer normalization in the transformer
