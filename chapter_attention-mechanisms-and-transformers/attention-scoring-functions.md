@@ -244,8 +244,8 @@ the *additive attention* scoring function
 $$a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R},$$
 :eqlabel:`eq_additive-attn`
 
-where learnable parameters $\mathbf W_q\in\mathbb R^{h\times q}$, $\mathbf W_k\in\mathbb R^{h\times k}$, 
-and $\mathbf w_v\in\mathbb R^{h}$.
+where $\mathbf W_q\in\mathbb R^{h\times q}$, $\mathbf W_k\in\mathbb R^{h\times k}$, 
+and $\mathbf w_v\in\mathbb R^{h}$ are the learnable parameters.
 Equivalent to :eqref:`eq_additive-attn`,
 the query and the key are concatenated
 and fed into an MLP with a single hidden layer

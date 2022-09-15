@@ -1126,7 +1126,7 @@ for different deep learning tasks.
 
 The transformer is an instance of the encoder-decoder architecture, 
 though either the encoder or the decoder can be used individually in practice.
-In the transformer, multi-head self-attention is used 
+In the transformer architecture, multi-head self-attention is used 
 for representing the input sequence and the output sequence, 
 though the decoder has to preserve the auto-regressive property via a masked version.
 Both the residual connections and the layer normalization in the transformer
@@ -1140,7 +1140,7 @@ transforms the representation at all the sequence positions using the same MLP.
 1. Is it a good idea to replace scaled dot-product attention with additive attention in the transformer? Why?
 1. For language modeling, should we use the transformer encoder, decoder, or both? How to design this method?
 1. What can be challenges to transformers if input sequences are very long? Why?
-1. How to improve computational and memory efficiency of transformers? Hint: you may refer to the survey paper by Tay et al. :cite:`Tay.Dehghani.Bahri.ea.2020`.
+1. How to improve computational and memory efficiency of transformers? Hint: you may refer to the survey paper by :citet:`Tay.Dehghani.Bahri.ea.2020`.
 
 
 :begin_tab:`mxnet`

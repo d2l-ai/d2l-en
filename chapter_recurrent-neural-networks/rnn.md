@@ -192,8 +192,8 @@ we aim to predict the next token based on
 the current and past tokens,
 thus we shift the original sequence by one token
 as the targets (labels).
-Bengio et al. first proposed
-to use a neural network for language modeling :cite:`Bengio.Ducharme.Vincent.ea.2003`.
+:citet:`Bengio.Ducharme.Vincent.ea.2003` first proposed
+to use a neural network for language modeling.
 In the following we illustrate how RNNs can be used to build a language model.
 Let the minibatch size be one, and the sequence of the text be "machine".
 To simplify training in subsequent sections,

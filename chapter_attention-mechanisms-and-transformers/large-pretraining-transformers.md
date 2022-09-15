@@ -56,7 +56,7 @@ are encoder-only, converting a sequence of input image patches into
 the representation of a special “&lt;cls&gt;” token.
 Since this representation depends on all input tokens, 
 it is further projected into classification labels. 
-This design was inspired by an earlier encoder-only transformer 
+This design was inspired by an earlier encoder-only transformer
 pretrained on text: BERT (Bidirectional Encoder Representations from Transformers) :cite:`Devlin.Chang.Lee.ea.2018`.
 
 
@@ -98,7 +98,8 @@ and feeds the “&lt;cls&gt;” representation
 into an additional fully connected layer
 to predict the sentiment. 
 During fine-tuning, the cross-entropy loss 
-between the prediction and the label 
+between the prediction and the label
+on sentiment analysis data
 is minimized via gradient-based algorithms, 
 where the additional layer is trained from scratch 
 while pretrained parameters of BERT are updated.
@@ -132,7 +133,7 @@ Since a transformer encoder converts a sequence of input tokens
 into the same number of output representations, 
 the encoder-only mode cannot generate a sequence of arbitrary length like in machine translation. 
 As originally proposed for machine translation, 
-the transformer architecture can be outfittd with a decoder 
+the transformer architecture can be outfitted with a decoder 
 that autoregressively predicts the target sequence 
 of arbitrary length, token by token, 
 conditional on both encoder output and decoder output:

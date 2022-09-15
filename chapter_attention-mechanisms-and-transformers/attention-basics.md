@@ -13,24 +13,24 @@ by which to *choose* which inputs to focus on.
 Typically in order to control the attention, 
 the relevant part of the model must produce 
 a *query* vector.
-This *query* vector is then typically compared to a number of 
-*key* vectors (one per input token). 
+This *query* vector is then typically compared with a number of 
+*key* vectors (one per input). 
 Based on some notion of compatibility between the query and the key,
-a probability distribution over the available tokens is computed,
-assigning high weight to especially compatible tokens 
-and low weight to incompatible tokens. 
+a probability distribution over the available inputs (e.g., input tokens) is computed,
+assigning high weights to especially compatible inputs 
+and low weights to incompatible inputs. 
 Finally, using these weights, 
 we compute a weighted average 
 of the representations (i.e., the *values*)
-corresponding to each input token.
+corresponding to each input.
 This weighted summation is often called *attention pooling*.
 As shown in :numref:`fig_qkv`,
 in an attention mechanisms, 
-a given *query* must somehow interact each key
-to produce a set of weights, 
+a given *query* must somehow interact with each key
+to produce a set of weights.
 
 ![Attention mechanisms conduct a weighted average over values via attention pooling,
-where weights are derived according to the compatibility of queries and keys.](../img/qkv.svg)
+where weights are derived according to the compatibility of a query and keys.](../img/qkv.svg)
 :label:`fig_qkv`
 
 Note that there are many variations on attention mechanisms.
@@ -111,10 +111,10 @@ we will often invoke this function to visualize attention weights.
 
 Attention mechanisms provide a differentiable means of control, 
 by which a neural network can "decide" which tokens 
-to assign higher vs lower weights when constructing 
+to assign higher vs. lower weights when constructing 
 a weighted sum over a sequence of representations. 
-Attention mechanisms compute a weighted some over *values*,
-where the weights are determined by the *queries* and *keys*.
+Attention mechanisms compute a weighted sum over *values*,
+where the weights are determined by the given *query* and *keys*.
 Practitioners often attempt to derive intuitions and insights
 by visualizing attention weights between queries and keys.
 
