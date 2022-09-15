@@ -49,9 +49,10 @@ Meanwhile, the vision transformer has emerged
 as a default model for diverse vision tasks,
 including image recognition, object detection,
 semantic segmentation, and superresolution :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,liu2021swin`. 
-Transformers are also showing up as competitive methods 
-in research papers on graph neural networks,
-electronic health records, and drug discovery.
+Transformers also showed up as competitive methods 
+for speech recognition :cite:`gulati2020conformer`,
+reinforcement learning :cite:`chen2021decision`,
+and graph neural networks :cite:`dwivedi2020generalization`.
 
 The core idea behind the transformer model is the *attention mechanism*,
 an innovation that was originally envisioned as an enhancement 
