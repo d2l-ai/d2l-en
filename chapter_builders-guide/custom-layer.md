@@ -126,7 +126,7 @@ we may still see a very small nonzero number
 due to quantization.
 
 :begin_tab:`jax`
-Here we utilize the method `init_with_output` which returns both the output of
+Here we utilize the `init_with_output` method which returns both the output of
 the network as well as the parameters. In this case we only focus on the
 output.
 :end_tab:
@@ -290,7 +290,7 @@ dense(tf.random.uniform((2, 5)))
 ```{.python .input}
 %%tab jax
 dense.apply(params, jax.random.uniform(jax.random.PRNGKey(d2l.get_seed()),
-                                        (2, 5)))
+                                       (2, 5)))
 ```
 
 We can also (**construct models using custom layers.**)
