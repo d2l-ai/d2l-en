@@ -76,6 +76,7 @@ net(X).shape
 ```
 
 ## [**Parameter Access**]
+:label:`subsec_param-access`
 
 Let's start with how to access parameters
 from the models that you already know.

@@ -94,7 +94,7 @@ We confirm by attempting to access the parameters below.
 :end_tab:
 
 :begin_tab:`jax`
-As mentioned previously, parameters and the network definition are decoupled
+As mentioned in :numref:`subsec_param-access`, parameters and the network definition are decoupled
 in Jax and Flax, and the user handles both manually. Flax models are stateless
 hence there is no `parameters` attribute.
 :end_tab:
