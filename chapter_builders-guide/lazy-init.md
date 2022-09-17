@@ -95,8 +95,8 @@ We confirm by attempting to access the parameters below.
 
 :begin_tab:`jax`
 As mentioned previously, parameters and the network definition are decoupled
-in Jax and Flax, the user handles both manually. Flax models are stateless
-hence there is no parameters attribute.
+in Jax and Flax, and the user handles both manually. Flax models are stateless
+hence there is no `parameters` attribute.
 :end_tab:
 
 ```{.python .input}
@@ -204,7 +204,7 @@ It will be used later when default random initializations are not desired.
 :end_tab:
 
 :begin_tab:`jax`
-Parameter Initialization in Flax is always done manually and handled by the
+Parameter initialization in Flax is always done manually and handled by the
 user. The following method sets a PRNG Key and passes in a dummy input to
 initialize the model parameters and return the parameters.
 We have been using it under the hood in the previous sections as well.
