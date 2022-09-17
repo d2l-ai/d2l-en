@@ -30,9 +30,9 @@ TensorFlow provides a variety of initialization methods both in the root module 
 :begin_tab:`jax`
 By default, Flax initializes weights using `jax.nn.initializers.lecun_normal`,
 i.e by drawing samples from a truncated normal distribution centered on 0 with
-the standard deviation set as the squared root of $1 / fan\_in$ where `fan_in`
-is the number of input units in the weight tensor. The bias parameters
-are all set to zero.
+the standard deviation set as the squared root of $1 / \text{fan}_{\text{in}}$
+where `fan_in` is the number of input units in the weight tensor. The bias
+parameters are all set to zero.
 Jax's `nn.initializers` module provides a variety
 of preset initialization methods.
 :end_tab:
@@ -286,8 +286,8 @@ function that return a desired tensor given the shape and data type.
 :end_tab:
 
 :begin_tab:`jax`
-Jax initialization functions take as arguments the `PRNG Key`, `shape` and
-`dtype`. Here we implement the function `my_init` that return a desired
+Jax initialization functions take as arguments the `PRNGKey`, `shape` and
+`dtype`. Here we implement the function `my_init` that returns a desired
 tensor given the shape and data type.
 :end_tab:
 
@@ -355,10 +355,10 @@ of setting parameters directly.
 :end_tab:
 
 :begin_tab:`jax`
-When initializing parameters in JAX and Flax, the parameters dict returned
-has a `flax.core.frozen_dict.FrozenDict` type. It is not advisable in the Jax
-ecosystem to directly alter the values of an array, hence the datatypes are
-generally immutable. One might use `params.unfreeze()` to make changes.
+When initializing parameters in JAX and Flax, the the dictionary of parameters
+returned has a `flax.core.frozen_dict.FrozenDict` type. It is not advisable in
+the Jax ecosystem to directly alter the values of an array, hence the datatypes
+are generally immutable. One might use `params.unfreeze()` to make changes.
 :end_tab:
 
 ```{.python .input}
