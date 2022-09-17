@@ -107,8 +107,8 @@ Flax and JAX decouple the model and the parameters as you
 might have observed in the models defined previously.
 When a model is defined via the `Sequential` class,
 we first need to initialize the network to generate
-the parameters dict. In the parameters dict, we can access
-any layer's parameters through keys of the dictionary.
+the parameters dictionary. We can access
+any layer's parameters through the keys of this dictionary.
 :end_tab:
 
 We can inspect the parameters of the second fully connected layer as follows.
@@ -183,9 +183,9 @@ In addition to the value, each parameter also allows us to access the gradient. 
 
 :begin_tab:`jax`
 Unlike the other frameworks, JAX doesn't keep a track of the gradients over the
-neural network parameters, instead the params and the network are decoupled.
+neural network parameters, instead the parameters and the network are decoupled.
 It allows the user to express their computation as a
-Python function, and use the grad() transformation for the same purpose.
+Python function, and use the `grad` transformation for the same purpose.
 :end_tab:
 
 ```{.python .input}
