@@ -29,7 +29,7 @@ TensorFlow provides a variety of initialization methods both in the root module 
 
 :begin_tab:`jax`
 By default, Flax initializes weights using `jax.nn.initializers.lecun_normal`,
-i.e by drawing samples from a truncated normal distribution centered on 0 with
+i.e., by drawing samples from a truncated normal distribution centered on 0 with
 the standard deviation set as the squared root of $1 / \text{fan}_{\text{in}}$
 where `fan_in` is the number of input units in the weight tensor. The bias
 parameters are all set to zero.
