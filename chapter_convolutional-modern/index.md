@@ -18,7 +18,7 @@ dominant architecture and many were winners or runners-up in the
 which has served as a barometer of progress on supervised learning in
 computer vision since 2010. It is only recently that Transformers have begun
 to displace CNNs, starting with :citet:`Dosovitskiy.Beyer.Kolesnikov.ea.2021` and 
-followed by the swin Transformer :cite:`liu2021swin`. We will cover this development later 
+followed by the Swin Transformer :cite:`liu2021swin`. We will cover this development later 
 in the chapter on :ref:`chap_attention-and-transformers`. 
 
 While the idea of *deep* neural networks is quite simple (stack
