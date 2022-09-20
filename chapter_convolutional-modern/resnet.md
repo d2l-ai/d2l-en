@@ -55,7 +55,7 @@ contain the identity function as one of its elements.
 These considerations are rather profound but they led to a surprisingly simple
 solution, a *residual block*.
 With it, ResNet won the ImageNet Large Scale Visual Recognition Challenge in 2015. The design had a profound influence on how to
-build deep neural networks. For instance, residual blocks have been added to recurrent networks :cite:`prakash2016neural,kim2017residual`. Likewise, transformers :cite:`Vaswani.Shazeer.Parmar.ea.2017` use them to stack many layers of networks efficiently. It is also used in graph neural networks :cite:`Kipf.Welling.2016` and, as a basic concept, it has been used extensively in computer vision :cite:`Redmon.Farhadi.2018,Ren.He.Girshick.ea.2015`. 
+build deep neural networks. For instance, residual blocks have been added to recurrent networks :cite:`prakash2016neural,kim2017residual`. Likewise, Transformers :cite:`Vaswani.Shazeer.Parmar.ea.2017` use them to stack many layers of networks efficiently. It is also used in graph neural networks :cite:`Kipf.Welling.2016` and, as a basic concept, it has been used extensively in computer vision :cite:`Redmon.Farhadi.2018,Ren.He.Girshick.ea.2015`. 
 Note that residual networks are predated by highway networks :cite:`srivastava2015highway` that share some of the motivation, albeit without the elegant parametrization around the identity function.
 
 
@@ -535,7 +535,7 @@ ResNet performed remarkably well
 on multiple computer vision tasks.
 Residual connections had a major influence on the design of subsequent deep neural networks, both for convolutional and sequential nature.
 As we will introduce later,
-the transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017`
+the Transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017`
 adopts residual connections (together with other design choices) and is pervasive
 in areas as diverse as
 language, vision, speech, and reinforcement learning.

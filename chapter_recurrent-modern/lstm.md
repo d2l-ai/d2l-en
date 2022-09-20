@@ -400,7 +400,7 @@ model.predict('it has', 20, data.vocab)
 
 LSTMs are the prototypical latent variable autoregressive model with nontrivial state control.
 Many variants thereof have been proposed over the years, e.g., multiple layers, residual connections, different types of regularization. However, training LSTMs and other sequence models (such as GRUs) are quite costly due to the long range dependency of the sequence.
-Later we will encounter alternative models such as transformers that can be used in some cases.
+Later we will encounter alternative models such as Transformers that can be used in some cases.
 
 
 ## Summary
@@ -409,7 +409,7 @@ While LSTMs were published in 1997,
 they rose to greater prominence 
 with some victories in prediction competitions in the mid-2000s,
 and became the dominant models for sequence learning from 2011 
-until more recently with the rise of transformer models, starting in 2017.
+until more recently with the rise of Transformer models, starting in 2017.
 Even tranformers owe some of their key ideas 
 to architecture design innovations introduced by the LSTM.
 LSTMs have three types of gates: 

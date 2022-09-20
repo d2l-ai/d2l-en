@@ -407,14 +407,14 @@ With desirable properties like locality and translation invariance (:numref:`sec
 for vision,
 CNNs have been the dominant architectures in this area.
 Recently,
-transformers (:numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training`
+Transformers (:numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training`
 and MLPs :cite:`tolstikhin2021mlp`
 have also sparked research beyond
 the well-established CNN architectures for vision.
 Specifically,
 although lacking of the aforementioned
 inductive biases inherent to CNNs,
-vision transformers (:numref:`sec_vision-transformer`)
+vision Transformers (:numref:`sec_vision-transformer`)
 attained state-of-the-art performance
 in large-scale image classification in early 2020s,
 showing that
@@ -422,16 +422,16 @@ showing that
 :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
 In other words,
 it is often possible to
-train large transformers
+train large Transformers
 to outperform large CNNs on large datasets.
 Inspired
 by the superior scaling behavior of
-transformers (:numref:`sec_large-pretraining-transformers`) with multi-head self-attention (:numref:`sec_multihead-attention`),
+Transformers (:numref:`sec_large-pretraining-transformers`) with multi-head self-attention (:numref:`sec_multihead-attention`),
 the process of gradually
 improving from a standard ResNet architecture
-toward the design of a vision transformer
+toward the design of a vision Transformer
 leads to a family of CNNs called the ConvNeXt models
-that compete favorably with transformers for vision :cite:`liu2022convnet`.
+that compete favorably with Transformers for vision :cite:`liu2022convnet`.
 We refer the interested readers
 to CNN design discussions
 in the ConvNeXt paper :cite:`liu2022convnet`.
