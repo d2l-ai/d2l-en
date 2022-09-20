@@ -47,7 +47,7 @@ before being fed into
 the encoder and the decoder
 that stack modules based on self-attention.
 
-![The Transformer architecture.](../img/Transformer.svg)
+![The Transformer architecture.](../img/transformer.svg)
 :width:`400px`
 :label:`fig_transformer`
 
