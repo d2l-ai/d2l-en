@@ -34,9 +34,9 @@ a sea change in the landscape of dominant architectures.
 
 At the present moment, the dominant models 
 for nearly all natural language processing tasks
-are based on the transformer architecture.
+are based on the Transformer architecture.
 Given any new task in natural language processing, the default first-pass approach
-is to grab a large transformer-based pretrained model,
+is to grab a large Transformer-based pretrained model,
 (e.g., BERT :cite:`Devlin.Chang.Lee.ea.2018`, ELECTRA :cite:`clark2019electra`, RoBERTa :cite:`liu2019roberta`, or Longformer :cite:`beltagy2020longformer`)
 adapting the output layers as necessary, 
 and fine-tuning the model on the available 
@@ -44,8 +44,8 @@ data for the downstream task.
 If you've been paying attention to the last few years
 of breathless news coverage centered on OpenAI's
 large language models, then you've been tracking a conversation 
-centered on the GPT-2 and GPT-3 transformer-based models :cite:`Radford.Wu.Child.ea.2019,brown2020language`.
-Meanwhile, the vision transformer has emerged 
+centered on the GPT-2 and GPT-3 Transformer-based models :cite:`Radford.Wu.Child.ea.2019,brown2020language`.
+Meanwhile, the vision Transformer has emerged 
 as a default model for diverse vision tasks,
 including image recognition, object detection,
 semantic segmentation, and superresolution :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,liu2021swin`. 
@@ -54,7 +54,7 @@ for speech recognition :cite:`gulati2020conformer`,
 reinforcement learning :cite:`chen2021decision`,
 and graph neural networks :cite:`dwivedi2020generalization`.
 
-The core idea behind the transformer model is the *attention mechanism*,
+The core idea behind the Transformer model is the *attention mechanism*,
 an innovation that was originally envisioned as an enhancement 
 for encoder-decoder RNNs applied to sequence-to-sequence applications,
 like machine translations :cite:`Bahdanau.Cho.Bengio.2014`.
@@ -104,12 +104,12 @@ However, attention mechanisms soon emerged as more significant concerns,
 beyond their usefulness as an enhancement for encoder-decoder recurrent neural networks
 and their putative usefulness for picking out salient inputs. 
 In 2017, :citet:`Vaswani.Shazeer.Parmar.ea.2017` proposed 
-the transformer architecture for machine translation, 
+the Transformer architecture for machine translation, 
 dispensing with recurrent connections together,
 and instead relying on cleverly arranged attention mechanisms
 to capture all relationships among input and output tokens. 
 The architecture performed remarkably well, 
-and by 2018 the transformer began showing up
+and by 2018 the Transformer began showing up
 in the majority of state-of-the-art natural language processing systems. 
 Moreover, at the same time, the dominant practice in natural language processing
 became to pretrain large-scale models 
@@ -117,9 +117,9 @@ on enormous generic background corpora
 to optimize some self-supervised pretraining objective,
 and then to fine-tune these models 
 using the available downstream data. 
-Thew gap between transformers and tradition architectures
+Thew gap between Transformers and tradition architectures
 grew especially wide when applied in this pretraining paradigm,
-and thus the ascendance of transformers coincided 
+and thus the ascendance of Transformers coincided 
 with the ascendence of such large-scale pretrained models,
 now sometimes called "foundation models" :cite:`bommasani2021opportunities`.
 
@@ -127,9 +127,9 @@ now sometimes called "foundation models" :cite:`bommasani2021opportunities`.
 In this chapter, we introduce attention models, 
 starting with the most basic intuitions 
 and the simplest instantiations of the idea.
-We then work our way up to the transformer architecture, 
-the visual transformer, and the landscape 
-of modern transformer-based pretrained models.
+We then work our way up to the Transformer architecture, 
+the visual Transformer, and the landscape 
+of modern Transformer-based pretrained models.
 
 ```toc
 :maxdepth: 2
@@ -140,7 +140,7 @@ attention-scoring-functions
 bahdanau-attention
 multihead-attention
 self-attention-and-positional-encoding
-transformer
+Transformer
 vision-transformer
 large-pretraining-transformers
 ```

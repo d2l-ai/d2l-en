@@ -1514,9 +1514,9 @@ over the past decade.
   no longer needed to remember the entire sequence before
   commencing the generation of a new sequence.
   Built solely on attention mechanisms,
-  the transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017`
+  the Transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017`
   has demonstrated compelling success in a wide range of areas.
-  For example, a single transformer pretrained on modalities
+  For example, a single Transformer pretrained on modalities
   as diverse as text, images, joint torques, and button presses
   can play Atari, caption images, chat,
   and control a robot :cite:`reed2022generalist`.

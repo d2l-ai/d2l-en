@@ -244,7 +244,7 @@ they were most often filtered out.
 However, they carry meaning and
 it is not necessary to filter them out
 when working with modern RNN- and
-transformer-based neural models.
+Transformer-based neural models.
 If you look further down the list,
 you will notice
 that word frequency decays quickly.

@@ -70,25 +70,25 @@ We resize each image into $64\times 64$. The `ToTensor` transformation will proj
 ```{.python .input}
 #@tab mxnet
 batch_size = 256
-transformer = gluon.data.vision.transforms.Compose([
+Transformer = gluon.data.vision.transforms.Compose([
     gluon.data.vision.transforms.Resize(64),
     gluon.data.vision.transforms.ToTensor(),
     gluon.data.vision.transforms.Normalize(0.5, 0.5)
 ])
 data_iter = gluon.data.DataLoader(
-    pokemon.transform_first(transformer), batch_size=batch_size,
+    pokemon.transform_first(Transformer), batch_size=batch_size,
     shuffle=True, num_workers=d2l.get_dataloader_workers())
 ```
 
 ```{.python .input}
 #@tab pytorch
 batch_size = 256
-transformer = torchvision.transforms.Compose([
+Transformer = torchvision.transforms.Compose([
     torchvision.transforms.Resize((64, 64)),
     torchvision.transforms.ToTensor(),
     torchvision.transforms.Normalize(0.5, 0.5)
 ])
-pokemon.transform = transformer
+pokemon.transform = Transformer
 data_iter = torch.utils.data.DataLoader(
     pokemon, batch_size=batch_size,
     shuffle=True, num_workers=d2l.get_dataloader_workers())
