@@ -68,7 +68,7 @@ summed with learnable positional embeddings.
 The multi-layer Transformer encoder
 transforms $m+1$ input vectors
 into the same amount of output vector representations of the same length.
-It works exactly the same way as the original Transformer encoder in :numref:`fig_Transformer`,
+It works exactly the same way as the original Transformer encoder in :numref:`fig_transformer`,
 only differing in the position of normalization.
 Since the “&lt;cls&gt;” token attends to all the image patches 
 via self-attention (see :numref:`fig_cnn-rnn-self-attention`),
@@ -149,7 +149,7 @@ class ViTMLP(nn.Module):
 The vision Transformer encoder block implementation
 just follows the pre-normalization design in :numref:`fig_vit`,
 where normalization is applied right *before* multi-head attention or the MLP.
-In contrast to post-normalization ("add & norm" in :numref:`fig_Transformer`),
+In contrast to post-normalization ("add & norm" in :numref:`fig_transformer`),
 where normalization is placed right *after* residual connections,
 pre-normalization leads to more effective or efficient training for Transformers :cite:`baevski2018adaptive,wang2019learning,xiong2020layer`.
 

@@ -33,7 +33,7 @@ As an instance of the encoder-decoder
 architecture,
 the overall architecture of
 the Transformer
-is presented in :numref:`fig_Transformer`.
+is presented in :numref:`fig_transformer`.
 As we can see,
 the Transformer is composed of an encoder and a decoder.
 Different from
@@ -49,11 +49,11 @@ that stack modules based on self-attention.
 
 ![The Transformer architecture.](../img/Transformer.svg)
 :width:`400px`
-:label:`fig_Transformer`
+:label:`fig_transformer`
 
 
 Now we provide an overview of the
-Transformer architecture in :numref:`fig_Transformer`.
+Transformer architecture in :numref:`fig_transformer`.
 On a high level,
 the Transformer encoder is a stack of multiple identical layers,
 where each layer
@@ -227,7 +227,7 @@ ffn(tf.ones((2, 3, 4)))[0]
 
 ## Residual Connection and Layer Normalization
 
-Now let's focus on the "add & norm" component in :numref:`fig_Transformer`.
+Now let's focus on the "add & norm" component in :numref:`fig_transformer`.
 As we described at the beginning of this section,
 this is a residual connection immediately
 followed by layer normalization.
@@ -581,7 +581,7 @@ d2l.check_shape(encoder(tf.ones((2, 100)), valid_lens, training=False),
 
 ## Decoder
 
-As shown in :numref:`fig_Transformer`,
+As shown in :numref:`fig_transformer`,
 [**the Transformer decoder
 is composed of multiple identical layers**].
 Each layer is implemented in the following

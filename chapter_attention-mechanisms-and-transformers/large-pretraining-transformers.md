@@ -34,7 +34,7 @@ or image patches (:numref:`sec_vision-transformer`) by Transformers.
 Before compelling success of pretraining Transformers for multi-modal data,
 Transformers were extensively pretrained  with a wealth of text.
 Originally proposed for machine translation,
-the Transformer architecture in :numref:`fig_Transformer` 
+the Transformer architecture in :numref:`fig_transformer` 
 consists of an encoder for representing input sequences 
 and a decoder for generating target sequences. 
 Primarily, Transformers can be used in three different modes: 
@@ -138,13 +138,13 @@ that autoregressively predicts the target sequence
 of arbitrary length, token by token, 
 conditional on both encoder output and decoder output:
 (i) for conditioning on encoder output, encoder-decoder cross-attention 
-(multi-head attention of decoder in :numref:`fig_Transformer`) 
+(multi-head attention of decoder in :numref:`fig_transformer`) 
 allows target tokens to attend to *all* input tokens;
 (ii) conditioning on decoder output is achieved 
 by a so-called *causal* attention
 (this name is common in the literature but is misleading 
 as it has little connection to the proper study of causality)
-pattern (masked multi-head attention of decoder in :numref:`fig_Transformer`),
+pattern (masked multi-head attention of decoder in :numref:`fig_transformer`),
 where any target token can only attend to *past* and *present* tokens in the target sequence.
 
 To pretrain encoder-decoder Transformers beyond human-labeled machine translation data,
@@ -250,7 +250,7 @@ Alternatively, decoder-only Transformers
 remove the entire encoder and the decoder sublayer 
 with the encoder-decoder cross-attention 
 from the original encoder-decoder architecture
-depicted in :numref:`fig_Transformer`. 
+depicted in :numref:`fig_transformer`. 
 Nowadays, decoder-only Transformers have been the de facto architecture 
 in large-scale language modeling (:numref:`sec_language-model`), 
 which leverages the world's abundant unlabeled text corpora via self-supervised learning.
