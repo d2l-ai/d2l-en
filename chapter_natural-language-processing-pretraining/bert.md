@@ -184,7 +184,7 @@ of the token embeddings, segment embeddings, and positional embeddings.](../img/
 :label:`fig_bert-input`
 
 The following [**`BERTEncoder` class**] is similar to the `TransformerEncoder` class
-as implemented in :numref:`sec_Transformer`.
+as implemented in :numref:`sec_transformer`.
 Different from `TransformerEncoder`, `BERTEncoder` uses
 segment embeddings and learnable positional embeddings.
 

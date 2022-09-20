@@ -407,7 +407,7 @@ With desirable properties like locality and translation invariance (:numref:`sec
 for vision,
 CNNs have been the dominant architectures in this area.
 Recently,
-Transformers (:numref:`sec_Transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training`
+Transformers (:numref:`sec_transformer`) :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021,touvron2021training`
 and MLPs :cite:`tolstikhin2021mlp`
 have also sparked research beyond
 the well-established CNN architectures for vision.

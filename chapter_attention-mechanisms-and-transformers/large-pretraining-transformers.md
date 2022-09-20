@@ -5,7 +5,7 @@ So far in our image classification and machine translation experiments,
 models were trained on datasets with input-output examples 
 *from scratch* to perform specific tasks. 
 For example, a Transformer was trained 
-with English-French pairs (:numref:`sec_Transformer`) 
+with English-French pairs (:numref:`sec_transformer`) 
 so that this model can translate input English text into French. 
 As a result, each model becomes a *specific expert* 
 that is sensitive to even slight shift in data distribution 
@@ -28,7 +28,7 @@ More recent success stories include Gato, a *generalist* model
 that can play Atari, caption images, chat, and act as a robot :cite:`reed2022generalist`. Gato is a single  Transformer that scales well when pretrained on diverse modalities,
 including text, images, joint torques, and button presses. 
 Notably, all such multi-modal data is serialized into a flat sequence of tokens, 
-which can be processed akin to text tokens (:numref:`sec_Transformer`)
+which can be processed akin to text tokens (:numref:`sec_transformer`)
 or image patches (:numref:`sec_vision-transformer`) by Transformers.
 
 Before compelling success of pretraining Transformers for multi-modal data,

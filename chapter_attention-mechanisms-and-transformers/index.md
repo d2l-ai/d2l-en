@@ -140,7 +140,7 @@ attention-scoring-functions
 bahdanau-attention
 multihead-attention
 self-attention-and-positional-encoding
-Transformer
+transformer
 vision-transformer
 large-pretraining-transformers
 ```

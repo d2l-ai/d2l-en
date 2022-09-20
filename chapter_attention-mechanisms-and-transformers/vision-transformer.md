@@ -169,7 +169,7 @@ class ViTBlock(nn.Module):
         return X + self.mlp(self.ln2(X))
 ```
 
-Same as in :numref:`subsec_Transformer-encoder`,
+Same as in :numref:`subsec_transformer-encoder`,
 any vision Transformer encoder block does not change its input shape.
 
 ```{.python .input}

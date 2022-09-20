@@ -4,7 +4,7 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
 # The Transformer Architecture
-:label:`sec_Transformer`
+:label:`sec_transformer`
 
 
 We have compared CNNs, RNNs, and self-attention in
@@ -356,7 +356,7 @@ d2l.check_shape(add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)),
 ```
 
 ## Encoder
-:label:`subsec_Transformer-encoder`
+:label:`subsec_transformer-encoder`
 
 With all the essential components to assemble
 the Transformer encoder,
