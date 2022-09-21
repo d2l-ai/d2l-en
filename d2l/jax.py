@@ -226,12 +226,25 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         l = self.loss(params, *batch[:-1], batch[-1])
         self.plot('loss', l, train=False)
 
+    def apply_init(self, dummy_input, **kwargs):
+        """To be defined later in :numref:`sec_lazy_init`"""
+        raise NotImplementedError
+
     def configure_optimizers(self):
         raise NotImplementedError
 
     def configure_optimizers(self):
         """Defined in :numref:`sec_classification`"""
         return optax.sgd(self.lr)
+
+    def apply_init(self, dummy_input, **kwargs):
+        """Defined in :numref:`sec_lazy_init`"""
+        if kwargs and 'key' in kwargs and (kwargs['key'] is not None):
+            self.key = kwargs['key']
+        else:
+            self.key = jax.random.PRNGKey(d2l.get_seed())
+        params = self.init(self.key, dummy_input)
+        return params
 
 class DataModule(d2l.HyperParameters):
     """Defined in :numref:`sec_oo-design`"""
@@ -297,23 +310,14 @@ class Trainer(d2l.HyperParameters):
         model.board.xlim = [0, self.max_epochs]
         self.model = model
 
-    def apply_init(self, **kwargs):
-        if kwargs and 'key' in kwargs and (kwargs['key'] is not None):
-            self.key = kwargs['key']
-        else:
-            self.key = jax.random.PRNGKey(d2l.get_seed())
-        input_shape = next(iter(self.train_dataloader))[0].shape
-        dummy_input = jnp.zeros(input_shape)
-        params = self.model.init(self.key, dummy_input)
-        return params
-
     def fit(self, model, data, key=None):
         self.prepare_data(data)
         self.prepare_model(model)
         self.optim = model.configure_optimizers()
+        dummy_input = next(iter(self.train_dataloader))[0]
         # Flax uses optax under the hood for a single state obj TrainState
         self.state = TrainState.create(apply_fn=model.apply,
-                                       params=self.apply_init(key=key),
+                                       params=model.apply_init(dummy_input, key=key),
                                        tx=model.configure_optimizers())
         self.epoch = 0
         self.train_batch_idx = 0
