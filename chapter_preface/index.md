@@ -492,7 +492,10 @@ at the end of each notebook.
 We are indebted to the hundreds of contributors for both
 the English and the Chinese drafts.
 They helped improve the content and offered valuable feedback.
-Specifically, we thank every contributor of this English draft
+We thank Anirudh Dagar and Yuan Tang for adapting part of early MXNet code into PyTorch and TensorFlow implementations, respectively.
+We thank a team from Baidu for adapting more recent PyTorch code into PaddlePaddle implementations in the Chinese draft.
+We thank Shuai Zhang for integrating the LaTeX style from the press into the PDF building.
+On GitHub, we thank every contributor of this English draft
 for making it better for everyone.
 Their GitHub IDs or names are (in no particular order):
 alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat,
