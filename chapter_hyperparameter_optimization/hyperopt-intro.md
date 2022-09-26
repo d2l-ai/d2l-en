@@ -23,9 +23,8 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # What is Hyperparameter Optimization?
 :label:`sec_what_is_hpo`
 
-A deep neural network comes with a large number of weight and bias parameters. These parameters are learned (that is, estimated) during training. As we have seen in Chapter :ref:`sec_sgd`, stochastic gradient is a widely adopted algorithm suitable for this task.
-On top of these, every neural networks has additional **hyperparameters** that need to be configured by the user.
-For example, to ensure that stochastic gradient descent converges to a local optimum of the training loss :ref:`chap_optimization`, we have to adjust the learning rate and batch size. To avoid overfitting on the training dataset :ref:`sec_polynomial`, we might have to set regularization parameters, such as weight decay :ref:`sec_weight_decay` or dropout :ref:`sec_dropout`. We can define the capacity and inductive bias of the model by setting the number of layers and number of units or filters per layer (i.e., the effective number
+As we have seen in the previous chapters, deep neural networks come with a large number parameters or weights that are learned during training. On top of these, every neural network has additional **hyperparameters** that need to be configured by the user.
+For example, to ensure that stochastic gradient descent converges to a local optimum of the training loss :ref:`chap_optimization`, we have to adjust the learning rate and batch size. To avoid overfitting on the training dataset :ref:`sec_polynomial`, we might have to set regularization parameters, such as weight decay : ref:`sec_weight_decay` or dropout : ref:`sec_dropout`. We can define the capacity and inductive bias of the model by setting the number of layers and number of units or filters per layer (i.e., the effective number
 of weights).
 
 Unfortunately, we cannot simply adjust these hyperparameters by minimizing the training loss, because this would lead to overfitting on the training data. For example, setting regularization parameters, such as dropout :ref:`sec_dropout` or weight decay :ref:`sec_weight_decay` to zero leads to a small training loss, but might hurt the generalization performance.
@@ -41,7 +40,7 @@ Hyperparameter optimization (HPO) algorithms are designed to tackle this problem
 a principled and automated fashion :cite:`feurer-automlbook18a`, by framing it as a global optimization problem.
 The default objective is the error on a hold-out validation dataset, but could
 in principle be any other business metric. It can be combined with or constrained by
-secondary objectives (see :ref:'sec_hpo_advanced'), such as training time, inference time, or model complexity. 
+secondary objectives (see : numref:`sec_hpo_advanced`), such as training time, inference time, or model complexity. 
 
 
 Recently, hyperparameter optimization has been extended to **neural architecture
@@ -111,7 +110,7 @@ There is no simple way to compute gradients of $f$ with respect to $\mathbf{x}$,
 
 The training of neural networks is stochastic (e.g., weights are randomly initialized, mini-batches are randomly sampled), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
 
-Faced with all these challenges, we usually try to identify a small set of well performing hyperparameter configurations quickly, instead of hitting the global optima exactly. However, due to large computational demands of most neural networks models, even this can take days or weeks of compute. We will explore in further sections :ref:`sec_mf_hpo`, how we can speed-up the optimization process by either distributing the search or using cheaper-to-evaluate approximations of the objective function.
+Faced with all these challenges, we usually try to identify a small set of well performing hyperparameter configurations quickly, instead of hitting the global optima exactly. However, due to large computational demands of most neural networks models, even this can take days or weeks of compute. We will explore in Section :numref:`sec_mf_hpo`, how we can speed-up the optimization process by either distributing the search or using cheaper-to-evaluate approximations of the objective function.
 
 
 Now, since we would like to optimize the validation error, we need to add a function computing this quantity.
@@ -184,7 +183,7 @@ config_space = {
 ```
 
 Each hyperparameter has a data type, such as `float` for `learning_rate`, as well as a closed bounded range
-(i.e., lower and upper bounds). We usually also assign a prior distribution (e.g uniform or log-uniform) to each hyperparameter. Some positive parameters, such as `learning_rate`, are best represented on a logarithmic scale as optimal values can differ by several orders of magnitude, while others come with linear scale.
+(i.e., lower and upper bounds). We usually assign a prior distribution (e.g uniform or log-uniform) to each hyperparameter. Some positive parameters, such as `learning_rate`, are best represented on a logarithmic scale as optimal values can differ by several orders of magnitude, while others, such as momentum, come with linear scale.
 
 Below we show a simple example of a configuration space consisting of typical hyperparameters of feed-forward neural networks including their type and standard ranges.
 
@@ -201,9 +200,8 @@ The configuration spaces plays an important role for hyperparameter optimization
 ## Random Search
 
 Now, we look at the first algorithm to solve our hyperparameter optimization problem: random search. 
-The main idea of random search is to independently sample from the configuration space until a predefined budget (e.g maximum number of iterations) is exhausted and to return the best observed configuration. The evaluation can be executed sequentially (as we do here) or in parallel (see Section :ref:`sec_rs`).
+The main idea of random search is to independently sample from the configuration space until a predefined budget (e.g maximum number of iterations) is exhausted and to return the best observed configuration. The evaluation can be executed sequentially (as we do here) or in parallel (see Section :numref:`sec_rs`).
 
-We sample the learning rate from log uniform distribution, since it usually changes on a logarithmic scale.
 
 ```{.python .input  n=7}
 import numpy as np
@@ -218,22 +216,7 @@ for iteration in range(num_iterations):
     errors.append(y)
 ```
 
-```{.json .output n=7}
-[
- {
-  "ename": "AttributeError",
-  "evalue": "module 'd2l.torch' has no attribute 'SoftmaxClassification'",
-  "output_type": "error",
-  "traceback": [
-   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
-   "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
-   "\u001b[0;32m/var/folders/ld/vzcn3j2d7yg493b1c6m0ypprdqgxkm/T/ipykernel_94597/2308979264.py\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m      6\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0miteration\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mrange\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mnum_iterations\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      7\u001b[0m     \u001b[0mlearning_rate\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0msearch_space\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m'learning_rate'\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mrvs\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 8\u001b[0;31m     \u001b[0my\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mhpo_objective_softmax_classification\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m{\u001b[0m\u001b[0;34m'learning_rate'\u001b[0m\u001b[0;34m:\u001b[0m \u001b[0mlearning_rate\u001b[0m\u001b[0;34m}\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      9\u001b[0m     \u001b[0mvalues\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mappend\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mlearning_rate\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     10\u001b[0m     \u001b[0merrors\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mappend\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0my\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;32m/var/folders/ld/vzcn3j2d7yg493b1c6m0ypprdqgxkm/T/ipykernel_94597/3098096573.py\u001b[0m in \u001b[0;36mhpo_objective_softmax_classification\u001b[0;34m(config, max_epochs)\u001b[0m\n\u001b[1;32m      5\u001b[0m     \u001b[0mtrainer\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mTrainer\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mmax_epochs\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mmax_epochs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      6\u001b[0m     \u001b[0mdata\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mFashionMNIST\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mbatch_size\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m16\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 7\u001b[0;31m     \u001b[0mmodel\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mSoftmaxClassification\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mnum_outputs\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m10\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mlr\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mlearning_rate\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      8\u001b[0m     \u001b[0mtrainer\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfit\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mmodel\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mmodel\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mdata\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mdata\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      9\u001b[0m     \u001b[0mvalidation_error\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mtrainer\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mvalidate\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mmodel\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mmodel\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;31mAttributeError\u001b[0m: module 'd2l.torch' has no attribute 'SoftmaxClassification'"
-  ]
- }
-]
-```
+The best learning rate is then simply the one with the lowest validation error.
 
 ```{.python .input  n=7}
 import numpy as np
@@ -243,18 +226,6 @@ print(f'optimal learning rate = {values[best_idx]}')
 
 Arguably because of its simplicity, random search is one of the most frequently used HPO algorithms. It doesn't require any sophisticated implementation and can be applied to any hyperparameter type.
 
-Below we plot the validation error of each hyperparameter configuration we just evaluated.
-
-```{.python .input  n=8}
-import matplotlib.pyplot as plt
-
-plt.figure(dpi=200)
-plt.scatter(values, errors)
-plt.xscale('log')
-plt.ylabel('validation error')
-plt.xlabel('learning rate')
-plt.show()
-```
 
 Unfortunately random search comes with a few shortcomings. First, it does not adapt the sampling distribution based on the previous observations it collected. Hence, it is equally likely to sample a poorly performing configurations  than a better performing configuration. Second, the same amount of resources are spend for all configurations, even though they are less likely to outperform previously seen configurations.
 
