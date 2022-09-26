@@ -30,8 +30,8 @@ on random guessing whenever we encounter new examples.
 A number of burning questions demand immediate attention:
 1. How many test examples do we need to precisely estimate
    the accuracy of our classifiers on the underlying population?
-1. What happens if we keep evaluating models on the same test repeatedly?
-1. Why should we expect that fitting our linear models to the training set
+2. What happens if we keep evaluating models on the same test repeatedly?
+3. Why should we expect that fitting our linear models to the training set
    should fare any better than our naive memorization scheme?
 
 
