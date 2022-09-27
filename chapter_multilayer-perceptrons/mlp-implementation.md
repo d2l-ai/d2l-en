@@ -234,7 +234,6 @@ In other words, the `Sequential()` API abstracts the forward process
 enabling us to focus on the transformations.
 
 
-
 ### Training
 
 [**The training loop**] is exactly the same
