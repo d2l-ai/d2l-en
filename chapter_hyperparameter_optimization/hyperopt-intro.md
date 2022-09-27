@@ -2,24 +2,6 @@
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
-
-```{.json .output n=2}
-[
- {
-  "data": {
-   "application/vnd.jupyter.widget-view+json": {
-    "model_id": "afe7cbb4e15c441290b51d5debc66594",
-    "version_major": 2,
-    "version_minor": 0
-   },
-   "text/plain": "interactive(children=(Dropdown(description='tab', options=('mxnet', 'pytorch', 'tensorflow'), value=None), Out\u2026"
-  },
-  "metadata": {},
-  "output_type": "display_data"
- }
-]
-```
-
 # What is Hyperparameter Optimization?
 :label:`sec_what_is_hpo`
 
@@ -28,6 +10,10 @@ For example, to ensure that stochastic gradient descent converges to a local opt
 of weights).
 
 Unfortunately, we cannot simply adjust these hyperparameters by minimizing the training loss, because this would lead to overfitting on the training data. For example, setting regularization parameters, such as dropout :ref:`sec_dropout` or weight decay :ref:`sec_weight_decay` to zero leads to a small training loss, but might hurt the generalization performance.
+
+![Typical workflow in machine leanring that consists of training the model multiple times with different hyperparameters](img/ml_workflow.svg)
+:width:`40px`
+:label:`ml_workflow`
 
 Without a different form of automation, hyperparameters have to be set manually in a
 trial-and-error fashion, in what amounts to a time-consuming and difficult part of machine
@@ -89,16 +75,6 @@ class SoftmaxClassification(d2l.Classification): #@save
         return self.net(X)
 ```
 
-```{.json .output n=9}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"None\" cell."
- }
-]
-```
-
 Before we can run HPO, we first need to define two ingredients: the objective function and the configuration space.
 
 ### The Objective Function
@@ -132,22 +108,6 @@ def validate(self, model):
         val_batch_idx += 1
     
     return 1 -  accuracy / val_batch_idx
-```
-
-```{.json .output n=8}
-[
- {
-  "ename": "NameError",
-  "evalue": "name 'Trainer' is not defined",
-  "output_type": "error",
-  "traceback": [
-   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
-   "\u001b[0;31mNameError\u001b[0m                                 Traceback (most recent call last)",
-   "\u001b[0;32m/var/folders/ld/vzcn3j2d7yg493b1c6m0ypprdqgxkm/T/ipykernel_94597/2202539186.py\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0;34m@\u001b[0m\u001b[0md2l\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0madd_to_class\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mTrainer\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;31m#@save\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      2\u001b[0m \u001b[0;32mdef\u001b[0m \u001b[0mvalidate\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mmodel\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m     \u001b[0mmodel\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0meval\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m     \u001b[0maccuracy\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;36m0\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m     \u001b[0mval_batch_idx\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;36m0\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;31mNameError\u001b[0m: name 'Trainer' is not defined"
-  ]
- }
-]
 ```
 
 We optimize validation error with respect to the hyperparameter configuration `config`, consisting of the `learning_rate`. For each evaluation, we train our model
