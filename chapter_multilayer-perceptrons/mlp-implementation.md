@@ -217,9 +217,8 @@ class MLP(d2l.Classifier):
 Notice the use of the `Sequential()` API and
 the lack of definition of `forward()`.
 
-Until now, we coded `forward()` to
-define how to transform an input `X`
-by mean of the network parameters.
+Until now, we defined a `forward` method to transform the inputs
+using the network parameters.
 However, those operations are essentially a pipeline:
 you take an input and
 apply a transformation (e.g.,
