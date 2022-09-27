@@ -65,7 +65,7 @@ and then enable gradient tracking.
 :begin_tab:`pytorch`
 In the code below we use [`nn.Parameter()`](https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html)
 from the `torch` standard library to automatically register
-a class attribute as a parameter to be tracked by `autograd`.
+a class attribute as a parameter to be tracked by [`autograd`](https://pytorch.org/docs/stable/autograd.html).
 :end_tab:
 
 :begin_tab:`tensorflow`
