@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Pooling
@@ -122,6 +122,14 @@ from torch import nn
 ```
 
 ```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
+```{.python .input}
 %%tab mxnet, pytorch
 def pool2d(X, pool_size, mode='max'):
     p_h, p_w = pool_size
@@ -132,6 +140,20 @@ def pool2d(X, pool_size, mode='max'):
                 Y[i, j] = X[i: i + p_h, j: j + p_w].max()
             elif mode == 'avg':
                 Y[i, j] = X[i: i + p_h, j: j + p_w].mean()
+    return Y
+```
+
+```{.python .input}
+%%tab jax
+def pool2d(X, pool_size, mode='max'):
+    p_h, p_w = pool_size
+    Y = jnp.zeros((X.shape[0] - p_h + 1, X.shape[1] - p_w + 1))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            if mode == 'max':
+                Y = Y.at[i, j].set(X[i: i + p_h, j: j + p_w].max())
+            elif mode == 'avg':
+                Y = Y.at[i, j].set(X[i: i + p_h, j: j + p_w].mean())
     return Y
 ```
 
@@ -189,7 +211,7 @@ X
 ```
 
 ```{.python .input}
-%%tab tensorflow
+%%tab tensorflow, jax
 X = d2l.reshape(d2l.arange(16, dtype=d2l.float32), (1, 4, 4, 1))
 X
 ```
@@ -218,6 +240,12 @@ pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3])
 pool2d(X)
 ```
 
+```{.python .input}
+%%tab jax
+# Pooling has no model parameters, hence it needs no initialization
+nn.max_pool(X, window_shape=(3, 3), strides=(3, 3))
+```
+
 As expected, [**the stride and padding can be manually specified**] to override framework defaults if needed.
 
 ```{.python .input}
@@ -239,6 +267,12 @@ X_padded = tf.pad(X, paddings, "CONSTANT")
 pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3], padding='valid',
                                    strides=2)
 pool2d(X_padded)
+```
+
+```{.python .input}
+%%tab jax
+X_padded = jnp.pad(X, ((0, 0), (1, 0), (1, 0), (0, 0)), mode='constant')
+nn.max_pool(X_padded, window_shape=(3, 3), padding='VALID', strides=(2, 2))
 ```
 
 Of course, we can specify an arbitrary rectangular pooling window with arbitrary height and width respectively, as the example below shows.
@@ -265,6 +299,13 @@ pool2d = tf.keras.layers.MaxPool2D(pool_size=[2, 3], padding='valid',
 pool2d(X_padded)
 ```
 
+```{.python .input}
+%%tab jax
+
+X_padded = jnp.pad(X, ((0, 0), (0, 0), (1, 1), (0, 0)), mode='constant')
+nn.max_pool(X_padded, window_shape=(2, 3), strides=(2, 3), padding='VALID')
+```
+
 ## Multiple Channels
 
 When processing multi-channel input data,
@@ -288,8 +329,9 @@ X
 ```
 
 ```{.python .input}
-%%tab tensorflow
-X = tf.concat([X, X + 1], 3)  # Concatenate along `dim=3` due to channels-last syntax
+%%tab tensorflow, jax
+X = d2l.concat([X, X + 1], 3)  # Concatenate along `dim=3` due to channels-last syntax
+X
 ```
 
 As we can see, the number of output channels is still 2 after pooling.
@@ -314,6 +356,12 @@ pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3], padding='valid',
                                    strides=2)
 pool2d(X_padded)
 
+```
+
+```{.python .input}
+%%tab jax
+X_padded = jnp.pad(X, ((0, 0), (1, 0), (1, 0), (0, 0)), mode='constant')
+nn.max_pool(X_padded, window_shape=(3, 3), padding='VALID', strides=(2, 2))
 ```
 
 :begin_tab:`tensorflow`
