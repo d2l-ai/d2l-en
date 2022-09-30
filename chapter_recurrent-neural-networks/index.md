@@ -97,7 +97,7 @@ For example, the CNNs that we already introduced
 can be adapted to handle data of varying length,
 e.g., images of varying resolution.
 Moreover, RNNs have recently ceded considerable
-market share to transformer models,
+market share to Transformer models,
 which will be covered in :numref:`chap_attention-and-transformers`.
 However, RNNs rose to prominence as the default models
 for handling complex sequential structure in deep learning,

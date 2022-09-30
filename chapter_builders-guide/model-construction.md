@@ -641,12 +641,13 @@ chimera(X)
 
 ## Summary
 
-* Layers are modules.
-* Many layers can comprise a module.
-* Many modules can comprise a module.
-* A module can contain code.
-* Modules take care of lots of housekeeping, including parameter initialization and backpropagation.
-* Sequential concatenations of layers and modules are handled by the `Sequential` module.
+Layers are modules.
+Many layers can comprise a module.
+Many modules can comprise a module.
+
+A module can contain code.
+Modules take care of lots of housekeeping, including parameter initialization and backpropagation.
+Sequential concatenations of layers and modules are handled by the `Sequential` module.
 
 
 ## Exercises

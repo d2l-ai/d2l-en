@@ -9,8 +9,7 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 
 We have compared CNNs, RNNs, and self-attention in
 :numref:`subsec_cnn-rnn-self-attention`.
-Notably,
-self-attention
+Notably, self-attention
 enjoys both parallel computation and
 the shortest maximum path length.
 Therefore naturally,
@@ -18,12 +17,12 @@ it is appealing to design deep architectures
 by using self-attention.
 Unlike earlier self-attention models
 that still rely on RNNs for input representations :cite:`Cheng.Dong.Lapata.2016,Lin.Feng.Santos.ea.2017,Paulus.Xiong.Socher.2017`,
-the transformer model
+the Transformer model
 is solely based on attention mechanisms
 without any convolutional or recurrent layer :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
 Though originally proposed
 for sequence to sequence learning on text data,
-transformers have been
+Transformers have been
 pervasive in a wide range of
 modern deep learning applications,
 such as in areas of language, vision, speech, and reinforcement learning.
@@ -33,10 +32,10 @@ such as in areas of language, vision, speech, and reinforcement learning.
 As an instance of the encoder-decoder
 architecture,
 the overall architecture of
-the transformer
+the Transformer
 is presented in :numref:`fig_transformer`.
 As we can see,
-the transformer is composed of an encoder and a decoder.
+the Transformer is composed of an encoder and a decoder.
 Different from
 Bahdanau attention
 for sequence to sequence learning
@@ -48,15 +47,15 @@ before being fed into
 the encoder and the decoder
 that stack modules based on self-attention.
 
-![The transformer architecture.](../img/transformer.svg)
+![The Transformer architecture.](../img/transformer.svg)
 :width:`400px`
 :label:`fig_transformer`
 
 
 Now we provide an overview of the
-transformer architecture in :numref:`fig_transformer`.
+Transformer architecture in :numref:`fig_transformer`.
 On a high level,
-the transformer encoder is a stack of multiple identical layers,
+the Transformer encoder is a stack of multiple identical layers,
 where each layer
 has two sublayers (either is denoted as $\mathrm{sublayer}$).
 The first
@@ -69,16 +68,17 @@ outputs of the previous encoder layer.
 Inspired by the ResNet design in :numref:`sec_resnet`,
 a residual connection is employed
 around both sublayers.
-In the transformer,
+In the Transformer,
 for any input $\mathbf{x} \in \mathbb{R}^d$ at any position of the sequence,
 we require that $\mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ so that
 the residual connection $\mathbf{x} + \mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ is feasible.
 This addition from the residual connection is immediately
 followed by layer normalization :cite:`Ba.Kiros.Hinton.2016`.
-As a result, the transformer encoder outputs a $d$-dimensional vector representation for each position of the input sequence.
+As a result, the Transformer encoder outputs a $d$-dimensional vector representation 
+for each position of the input sequence.
 
-The transformer decoder is also
-a stack of multiple identical layers with residual connections and layer normalizations.
+The Transformer decoder is also a stack of multiple identical layers 
+with residual connections and layer normalizations.
 Besides the two sublayers described in
 the encoder, the decoder inserts
 a third sublayer, known as
@@ -88,25 +88,25 @@ In the encoder-decoder attention,
 queries are from the
 outputs of the previous decoder layer,
 and the keys and values are
-from the transformer encoder outputs.
+from the Transformer encoder outputs.
 In the decoder self-attention,
 queries, keys, and values are all from the
 outputs of the previous decoder layer.
-However,
-each position in the decoder is
+However, each position in the decoder is
 allowed to only attend to all positions in the decoder
 up to that position.
 This *masked* attention
 preserves the auto-regressive property,
-ensuring that the prediction only depends on those output tokens that have been generated.
+ensuring that the prediction only depends 
+on those output tokens that have been generated.
 
 
 We have already described and implemented
 multi-head attention based on scaled dot-products
 in :numref:`sec_multihead-attention`
 and positional encoding in :numref:`subsec_positional-encoding`.
-In the following,
-we will implement the rest of the transformer model.
+In the following, we will implement
+the rest of the Transformer model.
 
 ```{.python .input}
 %%tab mxnet
@@ -138,14 +138,14 @@ import tensorflow as tf
 ## [**Positionwise Feed-Forward Networks**]
 :label:`subsec_positionwise-ffn`
 
-The positionwise feed-forward network
-transforms
+The positionwise feed-forward network transforms
 the representation at all the sequence positions
 using the same MLP.
 This is why we call it *positionwise*.
 In the implementation below,
 the input `X` with shape
-(batch size, number of time steps or sequence length in tokens, number of hidden units or feature dimension)
+(batch size, number of time steps or sequence length in tokens,
+number of hidden units or feature dimension)
 will be transformed by a two-layer MLP into
 an output tensor of shape
 (batch size, number of time steps, `ffn_num_outputs`).
@@ -227,10 +227,8 @@ ffn(tf.ones((2, 3, 4)))[0]
 
 ## Residual Connection and Layer Normalization
 
-Now let's focus on
-the "add & norm" component in :numref:`fig_transformer`.
-As we described at the beginning
-of this section,
+Now let's focus on the "add & norm" component in :numref:`fig_transformer`.
+As we described at the beginning of this section,
 this is a residual connection immediately
 followed by layer normalization.
 Both are key to effective deep architectures.
@@ -361,7 +359,7 @@ d2l.check_shape(add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)),
 :label:`subsec_transformer-encoder`
 
 With all the essential components to assemble
-the transformer encoder,
+the Transformer encoder,
 let's start by
 implementing [**a single layer within the encoder**].
 The following `TransformerEncoderBlock` class
@@ -429,7 +427,7 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):
 ```
 
 As we can see,
-[**any layer in the transformer encoder
+[**any layer in the Transformer encoder
 does not change the shape of its input.**]
 
 ```{.python .input}
@@ -459,7 +457,7 @@ encoder_blk = TransformerEncoderBlock(24, 24, 24, 24, norm_shape, 48, 8, 0.5)
 d2l.check_shape(encoder_blk(X, valid_lens, training=False), X.shape)
 ```
 
-In the following [**transformer encoder**] implementation,
+In the following [**Transformer encoder**] implementation,
 we stack `num_blks` instances of the above `TransformerEncoderBlock` classes.
 Since we use the fixed positional encoding
 whose values are always between -1 and 1,
@@ -557,8 +555,8 @@ class TransformerEncoder(d2l.Encoder):
         return X
 ```
 
-Below we specify hyperparameters to [**create a two-layer transformer encoder**].
-The shape of the transformer encoder output
+Below we specify hyperparameters to [**create a two-layer Transformer encoder**].
+The shape of the Transformer encoder output
 is (batch size, number of time steps, `num_hiddens`).
 
 ```{.python .input}
@@ -584,7 +582,7 @@ d2l.check_shape(encoder(tf.ones((2, 100)), valid_lens, training=False),
 ## Decoder
 
 As shown in :numref:`fig_transformer`,
-[**the transformer decoder
+[**the Transformer decoder
 is composed of multiple identical layers**].
 Each layer is implemented in the following
 `TransformerDecoderBlock` class,
@@ -624,7 +622,7 @@ up to the query position.
 ```{.python .input}
 %%tab mxnet
 class TransformerDecoderBlock(nn.Block):
-    # The i-th block in the transformer decoder
+    # The i-th block in the Transformer decoder
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout, i):
         super().__init__()
         self.i = i
@@ -671,7 +669,7 @@ class TransformerDecoderBlock(nn.Block):
 ```{.python .input}
 %%tab pytorch
 class TransformerDecoderBlock(nn.Module):
-    # The i-th block in the transformer decoder
+    # The i-th block in the Transformer decoder
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout, i):
         super().__init__()
         self.i = i
@@ -717,7 +715,7 @@ class TransformerDecoderBlock(nn.Module):
 ```{.python .input}
 %%tab tensorflow
 class TransformerDecoderBlock(tf.keras.layers.Layer):
-    # The i-th block in the transformer decoder
+    # The i-th block in the Transformer decoder
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_hiddens, num_heads, dropout, i):
         super().__init__()
@@ -795,7 +793,7 @@ state = [encoder_blk(X, valid_lens), valid_lens, [None]]
 d2l.check_shape(decoder_blk(X, state, training=False)[0], X.shape)
 ```
 
-Now we [**construct the entire transformer decoder**]
+Now we [**construct the entire Transformer decoder**]
 composed of `num_blks` instances of `TransformerDecoderBlock`.
 In the end,
 a fully connected layer computes the prediction
@@ -922,12 +920,12 @@ class TransformerDecoder(d2l.AttentionDecoder):
 ## [**Training**]
 
 Let's instantiate an encoder-decoder model
-by following the transformer architecture.
+by following the Transformer architecture.
 Here we specify that
-both the transformer encoder and the transformer decoder
+both the Transformer encoder and the Transformer decoder
 have 2 layers using 4-head attention.
 Similar to :numref:`sec_seq2seq_training`,
-we train the transformer model
+we train the Transformer model
 for sequence to sequence learning on the English-French machine translation dataset.
 
 ```{.python .input}
@@ -971,7 +969,7 @@ trainer.fit(model, data)
 ```
 
 After training,
-we use the transformer model
+we use the Transformer model
 to [**translate a few English sentences**] into French and compute their BLEU scores.
 
 ```{.python .input}
@@ -990,7 +988,7 @@ for en, fr, p in zip(engs, fras, preds):
           f'{d2l.bleu(" ".join(translation), fr, k=2):.3f}')
 ```
 
-Let's [**visualize the transformer attention weights**] when translating the last English sentence into French.
+Let's [**visualize the Transformer attention weights**] when translating the last English sentence into French.
 The shape of the encoder self-attention weights
 is (number of encoder layers, number of attention heads, `num_steps` or number of queries, `num_steps` or number of key-value pairs).
 
@@ -1115,29 +1113,34 @@ d2l.show_heatmaps(
     figsize=(7, 3.5))
 ```
 
-Although the transformer architecture
+Although the Transformer architecture
 was originally proposed for sequence-to-sequence learning,
 as we will discover later in the book,
-either the transformer encoder
-or the transformer decoder
+either the Transformer encoder
+or the Transformer decoder
 is often individually used
 for different deep learning tasks.
 
 
 ## Summary
 
-* The transformer is an instance of the encoder-decoder architecture, though either the encoder or the decoder can be used individually in practice.
-* In the transformer, multi-head self-attention is used for representing the input sequence and the output sequence, though the decoder has to preserve the auto-regressive property via a masked version.
-* Both the residual connections and the layer normalization in the transformer are important for training a very deep model.
-* The positionwise feed-forward network in the transformer model transforms the representation at all the sequence positions using the same MLP.
+The Transformer is an instance of the encoder-decoder architecture, 
+though either the encoder or the decoder can be used individually in practice.
+In the Transformer architecture, multi-head self-attention is used 
+for representing the input sequence and the output sequence, 
+though the decoder has to preserve the auto-regressive property via a masked version.
+Both the residual connections and the layer normalization in the Transformer
+are important for training a very deep model.
+The positionwise feed-forward network in the Transformer model 
+transforms the representation at all the sequence positions using the same MLP.
 
 ## Exercises
 
-1. Train a deeper transformer in the experiments. How does it affect the training speed and the translation performance?
-1. Is it a good idea to replace scaled dot-product attention with additive attention in the transformer? Why?
-1. For language modeling, should we use the transformer encoder, decoder, or both? How to design this method?
-1. What can be challenges to transformers if input sequences are very long? Why?
-1. How to improve computational and memory efficiency of transformers? Hint: you may refer to the survey paper by Tay et al. :cite:`Tay.Dehghani.Bahri.ea.2020`.
+1. Train a deeper Transformer in the experiments. How does it affect the training speed and the translation performance?
+1. Is it a good idea to replace scaled dot-product attention with additive attention in the Transformer? Why?
+1. For language modeling, should we use the Transformer encoder, decoder, or both? How to design this method?
+1. What can be challenges to Transformers if input sequences are very long? Why?
+1. How to improve computational and memory efficiency of Transformers? Hint: you may refer to the survey paper by :citet:`Tay.Dehghani.Bahri.ea.2020`.
 
 
 :begin_tab:`mxnet`

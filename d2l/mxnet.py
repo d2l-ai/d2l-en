@@ -984,7 +984,7 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                   cmap='Reds'):
     """Show heatmaps of matrices.
 
-    Defined in :numref:`sec_attention-cues`"""
+    Defined in :numref:`sec_attention-basics`"""
     d2l.use_svg_display()
     num_rows, num_cols = len(matrices), len(matrices[0])
     fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize,

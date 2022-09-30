@@ -999,6 +999,10 @@ since thousands of samples may
 correspond to a single spoken word.
 These are sequence-to-sequence learning problems,
 where the output is much shorter than the input.
+While humans are remarkably good at recognizing speech,
+even from low-quality audio,
+getting computers to perform the feat
+is a formidable challenge.
 
 ![`-D-e-e-p- L-ea-r-ni-ng-` in an audio recording.](../img/speech.png)
 :width:`700px`
@@ -1008,10 +1012,6 @@ where the output is much shorter than the input.
 This is the inverse of automatic speech recognition.
 Here, the input is text and the output is an audio file.
 In this case, the output is much longer than the input.
-While humans are remarkably good at recognizing speech,
-even from low-quality audio,
-getting computers to perform the feat
-is a formidable challenge.
 
 **Machine Translation**.
 Unlike the case of speech recognition,
@@ -1328,7 +1328,7 @@ For instance, the Bernoulli distribution is named after
 [Jacob Bernoulli (1655--1705)](https://en.wikipedia.org/wiki/Jacob_Bernoulli),
 and the Gaussian distribution was discovered
 by [Carl Friedrich Gauss (1777--1855)](https://en.wikipedia.org/wiki/Carl_Friedrich_Gauss).
-He invented, for instance, the least mean squares algorithm,
+Gauss invented, for instance, the least mean squares algorithm,
 which is still used today for countless problems
 from insurance calculations to medical diagnostics.
 These tools gave rise to an experimental approach
@@ -1514,9 +1514,9 @@ over the past decade.
   no longer needed to remember the entire sequence before
   commencing the generation of a new sequence.
   Built solely on attention mechanisms,
-  the transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017`
+  the Transformer architecture :cite:`Vaswani.Shazeer.Parmar.ea.2017`
   has demonstrated compelling success in a wide range of areas.
-  For example, a single transformer pretrained on modalities
+  For example, a single Transformer pretrained on modalities
   as diverse as text, images, joint torques, and button presses
   can play Atari, caption images, chat,
   and control a robot :cite:`reed2022generalist`.

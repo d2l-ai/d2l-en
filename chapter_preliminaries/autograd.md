@@ -104,8 +104,9 @@ x.grad
 
 ```{.python .input  n=9}
 %%tab pytorch
-x.requires_grad_(True)  # Better create `x = torch.arange(4.0, requires_grad=True)`
-x.grad                  # The default value is None
+# Better create x = torch.arange(4.0, requires_grad=True)
+x.requires_grad_(True)
+x.grad  # The default value is None
 ```
 
 ```{.python .input}

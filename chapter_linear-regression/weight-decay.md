@@ -359,9 +359,12 @@ In the following code, we specify
 the weight decay hyperparameter directly
 through `weight_decay` when instantiating our optimizer.
 By default, PyTorch decays both
-weights and biases simultaneously.
+weights and biases simultaneously, but
+we can configure the optimizer to handle different parameters
+according to different policies.
 Here, we only set `weight_decay` for
-the weight, so the bias parameter $b$ will not decay.
+the weights (the `net.weight` parameters), hence the 
+bias (the `net.bias` parameter) will not decay.
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -392,10 +395,11 @@ class WeightDecay(d2l.LinearRegression):
         super().__init__(lr)
         self.save_hyperparameters()
         self.wd = wd
-    
+
     def configure_optimizers(self):
-        return torch.optim.SGD(self.net.parameters(), 
-                               lr=self.lr, weight_decay=self.wd)
+        return torch.optim.SGD([
+            {'params': self.net.weight, 'weight_decay': self.wd},
+            {'params': self.net.bias}], lr=self.lr)
 ```
 
 ```{.python .input  n=13}
@@ -444,10 +448,10 @@ to all layers of a deep network.
 
 ## Summary
 
-* Regularization is a common method for dealing with overfitting. Classical regularization techniques add a penalty term to the loss function (when training) to reduce the complexity of the learned model.
-* One particular choice for keeping the model simple is using an $\ell_2$ penalty. This leads to weight decay in the update steps of the minibatch stochastic gradient descent algorithm.
-* The weight decay functionality is provided in optimizers from deep learning frameworks.
-* Different sets of parameters can have different update behaviors within the same training loop.
+Regularization is a common method for dealing with overfitting. Classical regularization techniques add a penalty term to the loss function (when training) to reduce the complexity of the learned model.
+One particular choice for keeping the model simple is using an $\ell_2$ penalty. This leads to weight decay in the update steps of the minibatch stochastic gradient descent algorithm.
+In practice, the weight decay functionality is provided in optimizers from deep learning frameworks.
+Different sets of parameters can have different update behaviors within the same training loop.
 
 
 

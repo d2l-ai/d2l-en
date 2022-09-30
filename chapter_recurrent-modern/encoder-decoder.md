@@ -9,7 +9,7 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 In general seq2seq problems 
 like machine translation 
 (:numref:`sec_machine_translation`),
-inputs and outputs of varying length
+inputs and outputs are of varying lengths
 that are unaligned. 
 The standard approach to handling this sort of data
 is to design an *encoder-decoder* architecture (:numref:`fig_encoder_decoder`)
@@ -204,7 +204,7 @@ class EncoderDecoder(d2l.Classifier):
 
 In the next section, 
 we will see how to apply RNNs to design 
-sequence transduction models based on 
+seq2seq models based on 
 this encoder-decoder architecture.
 
 

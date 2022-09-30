@@ -343,9 +343,9 @@ Among these are heuristics specialized for
 tied (shared) parameters, super-resolution,
 sequence models, and other situations.
 For instance,
-Xiao et al. demonstrated the possibility of training
+:citet:`Xiao.Bahri.Sohl-Dickstein.ea.2018` demonstrated the possibility of training
 10000-layer neural networks without architectural tricks
-by using a carefully-designed initialization method :cite:`Xiao.Bahri.Sohl-Dickstein.ea.2018`.
+by using a carefully-designed initialization method.
 
 If the topic interests you we suggest
 a deep dive into this module's offerings,
@@ -357,11 +357,11 @@ a clever idea and contribute an implementation to deep learning frameworks.
 
 ## Summary
 
-* Vanishing and exploding gradients are common issues in deep networks. Great care in parameter initialization is required to ensure that gradients and parameters remain well controlled.
-* Initialization heuristics are needed to ensure that the initial gradients are neither too large nor too small.
-* ReLU activation functions mitigate the vanishing gradient problem. This can accelerate convergence.
-* Random initialization is key to ensure that symmetry is broken before optimization.
-* Xavier initialization suggests that, for each layer, variance of any output is not affected by the number of inputs, and variance of any gradient is not affected by the number of outputs.
+Vanishing and exploding gradients are common issues in deep networks. Great care in parameter initialization is required to ensure that gradients and parameters remain well controlled.
+Initialization heuristics are needed to ensure that the initial gradients are neither too large nor too small.
+Random initialization is key to ensure that symmetry is broken before optimization.
+Xavier initialization suggests that, for each layer, variance of any output is not affected by the number of inputs, and variance of any gradient is not affected by the number of outputs.
+ReLU activation functions mitigate the vanishing gradient problem. This can accelerate convergence.
 
 ## Exercises
 

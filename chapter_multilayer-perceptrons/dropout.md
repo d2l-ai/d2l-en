@@ -38,7 +38,7 @@ between the requirement that a function be smooth (and thus simple),
 and the requirement that it be resilient
 to perturbations in the input.
 
-Then, in 2014, Srivastava et al. :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`
+Then, in 2014, :citet:`Srivastava.Hinton.Krizhevsky.ea.2014`
 developed a clever idea for how to apply Bishop's idea
 to the internal layers of a network, too.
 Their idea, called *dropout*, involves
@@ -368,9 +368,10 @@ trainer.fit(model, data)
 
 ## Summary
 
-* Beyond controlling the number of dimensions and the size of the weight vector, dropout is yet another tool to avoid overfitting. Often they are used jointly.
-* Dropout replaces an activation $h$ with a random variable with expected value $h$.
-* Dropout is only used during training.
+Beyond controlling the number of dimensions and the size of the weight vector, dropout is yet another tool to avoid overfitting. Often they are used jointly.
+Note that dropout is
+used only during training:
+it replaces an activation $h$ with a random variable with expected value $h$.
 
 
 ## Exercises
