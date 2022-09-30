@@ -175,6 +175,7 @@ class GRUScratch(d2l.Module):
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
+        self.num_hiddens = num_hiddens
         
         if tab.selected('mxnet'):
             init_weight = lambda *shape: d2l.randn(*shape) * sigma
@@ -207,12 +208,20 @@ except that the update equations are more complex.
 %%tab all
 @d2l.add_to_class(GRUScratch)
 def forward(self, inputs, H=None):
-    matmul_H = lambda A, B: d2l.matmul(A, B) if H is not None else 0
+    if H is None:
+        # Initial state with shape: (batch_size, num_hiddens)
+        if tab.selected('mxnet'):
+            H = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                          ctx=inputs.ctx)
+        if tab.selected('pytorch'):
+            H = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                          device=inputs.device)
+        if tab.selected('tensorflow'):
+            H = d2l.zeros((inputs.shape[1], self.num_hiddens))
     outputs = []
     for X in inputs:
-        Z = d2l.sigmoid(d2l.matmul(X, self.W_xz) + (
-            d2l.matmul(H, self.W_hz) if H is not None else 0) + self.b_z)
-        if H is None: H = d2l.zeros_like(Z)
+        Z = d2l.sigmoid(d2l.matmul(X, self.W_xz) +
+                        d2l.matmul(H, self.W_hz) + self.b_z)
         R = d2l.sigmoid(d2l.matmul(X, self.W_xr) + 
                         d2l.matmul(H, self.W_hr) + self.b_r)
         H_tilde = d2l.tanh(d2l.matmul(X, self.W_xh) + 

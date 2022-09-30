@@ -57,6 +57,7 @@ class RNNScratch(d2l.Module):  #@save
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
+        self.num_hiddens = num_hiddens
         if tab.selected('mxnet'):
             self.W_xh = d2l.randn(num_inputs, num_hiddens) * sigma
             self.W_hh = d2l.randn(
@@ -90,15 +91,24 @@ The model here uses a $\tanh$ activation function (:numref:`subsec_tanh`).
 %%tab all
 @d2l.add_to_class(RNNScratch)  #@save
 def forward(self, inputs, state=None):
-    if state is not None:
+    if state is None:
+        # Initial state with shape: (batch_size, num_hiddens)
+        if tab.selected('mxnet'):
+            state = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                              ctx=inputs.ctx)
+        if tab.selected('pytorch'):
+            state = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                              device=inputs.device)
+        if tab.selected('tensorflow'):
+            state = d2l.zeros((inputs.shape[1], self.num_hiddens))
+    else:
         state, = state
         if tab.selected('tensorflow'):
-            state = d2l.reshape(state, (-1, self.W_hh.shape[0]))
+            state = d2l.reshape(state, (-1, self.num_hiddens))
     outputs = []
     for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs) 
-        state = d2l.tanh(d2l.matmul(X, self.W_xh) + (
-            d2l.matmul(state, self.W_hh) if state is not None else 0)
-                         + self.b_h)
+        state = d2l.tanh(d2l.matmul(X, self.W_xh) +
+                         d2l.matmul(state, self.W_hh) + self.b_h)
         outputs.append(state)
     return outputs, state
 ```
