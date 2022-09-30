@@ -36,77 +36,17 @@ In the following we discuss an idea that is quite different to the quest for the
 The description below closely follows the reasoning in :cite:`Radosavovic.Kosaraju.Girshick.ea.2020` with some abbreviations to make it fit in the scope of the book. We recommend the interested reader to peruse the original publication for further detail. We need a template for the family of networks to explore. One of the commonalities of the designs in this chapter is that the networks consist of a *stem*, a *body* and a *head*. The stem performs initial image processing, often through convolutions with a larger window size. The body consists of multiple blocks, carrying out the bulk of the transformations needed to go from raw images to object representations. Lastly, the *head* converts this into the desired outputs, such as via a logistic regressor for multiclass classification. 
 The body, in turn, consists of multiple stages, operating on the image at decreasing resolutions. In fact, both the stem and each subsequent stage quarter the spatial resolution. Lastly, each stage consists of one or more blocks. This pattern is common to all networks, from VGG to ResNeXt. Indeed, for the design of generic AnyNet networks, :citet:`Radosavovic.Kosaraju.Girshick.ea.2020` use the ResNeXt block of :numref:`fig_resnext_block`. 
 
-![The AnyNet design space. Besides the number of groups and bottleneck ratio within each block, design choices include depth $d_i$ and the number of output channels $w_i$ for any stage $i$.](../img/anynet-full.svg)
+![The AnyNet design. The numbers $(c,r)$ at the top of each module indicate the number of channels $c$ and the resolution $r \times r$ of the images at that point. From left to right:  generic network structure, composed of stem, body and head; 
+body composed of multiple stages; detailed structure of a stage; To the right we see two alternative structures for blocks, one without downsampling and one that halves the resolution in each dimension.](../img/anynet-full.svg)
 :label:`fig_anynet_full`
 
-The initial design space is called *AnyNet*,
-a relatively unconstrained design space,
-where we can focus on
-exploring network structure
-assuming standard, fixed blocks such as ResNeXt (:numref:`subsec_resnext`).
-Specifically,
-the network structure
-includes
-elements
-such as the number of blocks
-and the number of output channels
-in each stage,
-and the number of groups (group width) and bottleneck ratio
-within
-each ResNeXt block.
+Let's review the structure outlined in :numref:`fig_anynet_full` in detail. As mentioned, an AnyNet consists of a stem, body and head. The stem takes as its input RGB images (3 channels), using a convolution with a stride of $2$, followed by a batch norm, to halve the resolution from $r \times r$ to $r/2 \times r/2$. Moreover, it generates $c_0$ channels that serve as input to the body. 
 
+Since the network is designed to work well with ImageNet images of $224 \times 224 \times 3$ resolution, the body serves to reduce this to $7 \times 7 \times c_4$ through 4 stages, each with an eventual stride of $2$. Lastly, the head employs an entirely standard design via global average pooling, similar to NiN :numref:`sec_nin`, followed by a fully connected layer to emit an $n$-dimensional vector for $n$-class classification. 
 
+Most of the relevant design decisions are inherent to the body of the network. It proceeds in stages, where each stage is composed of the same type of ResNeXt blocks as we discussed in :numref:`sec_resnet`. The design there is again entirely generic: we begin with a block that halves the resolution by using a stride of $2$ (the rightmost network design). To match this, the residual branch of the ResNeXt block needs to pass through a $1 \times 1$ convolution. This block is followed by a variable number of additional ResNeXt blocks that leave both resolution and number of channels unchanged. Note that a common design practice is to add a slight bottleneck in the design of convolutional blocks. As such, we afford some number of channels $b_i \leq c_i$ within each block (as the experiments show, this is not really effective and should be skipped). Lastly, since we are dealing with ResNeXt blocks, we also need to pick the group width for grouped convolutions. 
 
-![The AnyNet design space. Besides the number of groups and bottleneck ratio within each block, design choices include depth $d_i$ and the number of output channels $w_i$ for any stage $i$.](../img/anynet.svg)
-:label:`fig_anynet`
-
-The AnyNet design space
-is shown in :numref:`fig_anynet`.
-This network
-begins with a *stem*,
-followed by a *body* with $n$ stages of transformation,
-and a final *head*.
-More concretely,
-the network stem
-is a $3 \times 3$ convolution with stride 2
-that halves the height and width of an input image.
-The network head
-is a global average pooling followed
-by a fully connected layer to predict
-the output class.
-Note that
-the network stem and head
-are kept fixed and simple,
-so that the design focus in
-on the network body that is central
-to performance.
-Specifically,
-the network body
-consists of $n$ stages of transformation
-($n$ is given),
-where stage $i$
-consists of $d_i$ ResNeXt blocks
-with $w_i$ output channels,
-and progressively
-halves height and width via the first block
-(setting `use_1x1conv=True, strides=2` in `d2l.ResNeXtBlock` in :numref:`subsec_resnext`).
-Let's further
-denote
-the bottleneck ratio and
-the number of groups (group width)
-within
-each ResNeXt block for stage $i$
-as $b_i$ and $g_i$, respectively.
-Overall,
-despite of the straightforward network structure,
-varying $b_i$, $g_i$, $w_i$, and $d_i$
-results in
-a vast number of
-possible networks in the AnyNet design space.
-
-
-To implement AnyNet,
-we first define its network stem.
+This seemily generic design provides us with the following choices: we can set the number of channels $c_0, \ldots c_4$, the number of blocks per stage $d_1, \ldots d_4$, the size of the bottlenecks $b_1, \ldots b_4$, and the group widths $g_1, \ldots g_4$. In total this adds up to 17 parameters (the original paper erroneously omits to account for $c_0$) and with it, an unreasonably large number of configurations that would warrant exploring. We need some tools to reduce this huge design space effectively. Before we do so, let's implement the generic design first. 
 
 ```{.python .input  n=2}
 %%tab mxnet
@@ -231,55 +171,36 @@ def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
             tf.keras.layers.Dense(units=num_classes)]))
 ```
 
-## Constraining Design Spaces with Lower Error Distributions
+## Distributions and Parameters
 
-For any stage $i$ of AnyNet,
-the design choices are
-the bottleneck ratio $b_i$
-and the number of groups $g_i$
-within each block,
-block width $w_i$,
-and depth $d_i$.
-The designing network design spaces
-process starts
-from relatively unconstrained
-network structure characterized
-by ($b_i$, $g_i$, $w_i$, $d_i$)
-in the initial AnyNet design space.
-Then this process
-progressively samples models
-from the input design space
-to evaluate the error distribution :cite:`radosavovic2019network`
-as a quality indicator
-to output a more constrained
-design space with simpler models that may have
-better quality.
+Consider the problem of identifying good parameters in AnyNet. We could try finding the *single best* parameter choice for a given amount of computation (FLOPs, compute time). An alternative would be to try to determine general guidelines of how the choices of parameters should be related (e.g., the size of the bottleneck, the number of channels, the number of blocks, groups). The approach in :cite:`radosavovic2019network` relies on the following four assumptions:
 
-Let's detail
-this quality indicator for design spaces.
-Given $n$ models sampled from some design space,
-the *error empirical distribution function* $F(e)$
-measures the fraction of models
-with errors $e_i$ lower than $e$:
+1. The approach assumes that general design principles can be found, such that many networks satisfying these requirements should offer good performance. Consequently, identifying a *distribution* over networks can be a good strategy. 
+2. We need not train networks to convergence before we can assess whether a network is good. Instead, it is sufficient to use the intermediate results as reliable guidance for final accuracy. Using (approximate) proxies to optimize an objective is referred-to as multi-fidelity optimization :cite:`forrester2007multi`. Consequently, design optimization is carried out, based on the accuracy achieved after only a few passes through the dataset, reducing the cost significantly. 
+3. Results obtained at a smaller scale (for smaller networks) generalize to larger ones. Conseqently, optimization is carried out for networks with a smaller number of blocks, fewer channels, etc.; Only in the end will we need to verify that the so-found networks also offer good performance at scale. 
+4. Aspects of the design can be approximately factorized such that it is possible to infer their effect on the quality of the outcome somewhat independently. In other words, the optimization problem is moderately easy. 
 
-$$F(e) = \frac{1}{n}\sum_{i=1}^n \mathbf{1}(e_i < e).$$
+These assumptions allow us to identify good network designs as follows: sample from the space of configurations uniformly and train them for a brief period of time. In particular, pick *small* networks that are relatively cheap to train, compared to a large and complex network. Given that, we can study the *distribution* of error/accuracy that can be achieved with networks that are drawn according to a given set of constraints (if any) on parameters. Denote by $F(e)$ the cumulative distribution function for errors committed by networks of a given family. That is, 
 
+$$F(e, p) := \Pr_{\mathrm{net} \sim p(\mathrm{net})} \{e(\mathrm{net}) \leq e\}$$
 
-Starting from the initial unconstrained AnyNet design space ($\text{AnyNetX}_A$ in :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`),
-sharing the bottle network ratio $b_i = b$ for all stages $i$ results in a more constrained design space $\text{AnyNetX}_B$.
-Sampling and training $n=500$ models from $\text{AnyNetX}_A$ and $\text{AnyNetX}_B$ each,
-left of :numref:`fig_regnet-paper-fig5`
-shows that both design spaces have similar quality.
-Since simpler is better,
-we continue to search from $\text{AnyNetX}_B$
-by additionally sharing the number of groups $g_i = g$.
-This leads to a further simplified design space
-$\text{AnyNetX}_C$ with virtually no change
-in error distributions (right of :numref:`fig_regnet-paper-fig5`).
+Our goal is now to find a distribution $p$ over *networks* such that most networks have a very low error rate. Of course, this is computationally infeasible to perform accurately. Hence we draw a sample of networks $Z := \{\mathrm{net}_1, \ldots \mathrm{net}_n\}$ from the distribution $p$ over networks and use the empirical CDF $\hat{F}(e, Z)$ instead:
 
-![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Sharing bottleneck ratio (from $\text{AnyNetX}_A$ to  $\text{AnyNetX}_B$) and sharing the number of groups (from $\text{AnyNetX}_B$ to $\text{AnyNetX}_C$) simplify the design space with virtually no change in error distributions (figure taken from :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig5.png)
-:width:`600px`
+$$\hat{F}(e, Z) = \frac{1}{n}\sum_{i=1}^n \mathbf{1}(e_i \leq e)$$
+
+The first step towards identifying a good distribution over network designs is to constrain the space we draw from. 
+:citet:`Radosavovic.Kosaraju.Girshick.ea.2020` experiment with a shared network bottleneck ratio $b_i = b c_i$ for all stages $i$ of the network. This gets rid of $3$ of the $4$ parameters governing the bottleneck ratio. To assess whether this (negatively) affects the performance one can draw networks from the constrained and from the unconstrained distribution and compare the corresonding CDFs. It turns out that this constraint doesn't affect accuracy of the distribution of networks at all, as can be seen in the left panel of :numref:`fig_regnet-paper-fig5`. 
+Likewise, we could choose to pick the same number *width* for all groups occurring at the various stages of the network. Again, this doesn't affect performance, as can be seen in the right panel of :numref:`fig_regnet-paper-fig5`.
+Both steps combined reduce the number of free parameters by $6$. 
+
+![Comparing error empirical distribution functions of design spaces. $\mathrm{AnyNet}_A$ is the original design, $\mathrm{AnyNet}_B$ ties the bottleneck ratios, and $\mathrm{AnyNet}_C$ also ties group widths. Left: we can see that both $A$ and $B$ perform essentially the same. Right: likewise, $B$ and $C$ perform essentially the same (Figure courtesy of :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig5.png)
+:width:`500px`
 :label:`fig_regnet-paper-fig5`
+
+Next we look for ways to reduce the multitude of potential choices for width and depth of the stages. It is a reasonable assumption that as we go deeper, the number of channels should increase, i.e., $c_i \geq c_{i-1}$. Likewise, it is equally reasonable to assume that as the stages progress, they should become deeper, i.e., $d_i \geq d_{i-1}$. 
+
+
+
 
 Investigating good and bad models from $\text{AnyNetX}_C$ suggests that it may be useful to increase width across stages :cite:`Radosavovic.Kosaraju.Girshick.ea.2020`.
 Empirically, simplifying
@@ -293,7 +214,7 @@ gives an even better $\text{AnyNetX}_E$
 (right of :numref:`fig_regnet-paper-fig7`).
 
 ![Comparing error empirical distribution functions of design spaces. The legends show the min error and mean error. Increasing network width across stages (from $\text{AnyNetX}_C$ to  $\text{AnyNetX}_D$) and increasing network depth across stages (from $\text{AnyNetX}_D$ to $\text{AnyNetX}_E$) simplify the design space with improved  error distributions (figure taken from :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`).](../img/regnet-paper-fig7.png)
-:width:`600px`
+:width:`500px`
 :label:`fig_regnet-paper-fig7`
 
 
