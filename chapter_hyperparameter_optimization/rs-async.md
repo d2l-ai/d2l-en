@@ -7,18 +7,18 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 :label:`sec_rs_async`
 
-As we have seen in the previous Section, we might have to wait hours or even days before random search finishes. In practice, we have often access to a pool of resources such as multiple GPUs on the same machine or multiple machines wiht a single GPU. This begs the questios: *How do we  efficiently distributed random search?*
+As we have seen in the previous Section, we might have to wait hours or even days before random search returns a good hyperparameter configuration. In practice, we have often access to a pool of resources such as multiple GPUs on the same machine or multiple machines wiht a single GPU. This begs the questios: *How do we  efficiently distributed random search?*
 
-In general, we distinguish between synchronous and asynchronous parallel hyperparameter optimization :cite:``. In the synchronous setting, we wait for all concurrently running trials to finish, before we start the next batch. Consider search spaces that contain hyperparameters such as the number of filters or number of layers of a deep neural network. Hyperparameter configurations that contain a large values for these hyperparameters will naturally take more time to finish. This means we have to introduce synchronisation points to wait for stragglers.
+In general, we distinguish between synchronous and asynchronous parallel hyperparameter optimization (see Figure :numref:`distributed_scheduling`). In the synchronous setting, we wait for all concurrently running trials to finish, before we start the next batch. Consider search spaces that contain hyperparameters such as the number of filters or number of layers of a deep neural network. Hyperparameter configurations that contain a large values for these hyperparameters will naturally take more time to finish. This means we have to introduce synchronisation points to wait for stragglers (grey area in Figure :numref:`distributed_scheduling`).
 
-In the asynchronous setting we immediately fill free resources with a new trial. This will optimally exploit our resources, since we can avoid any synchronoisation. For random search, each new hyperparameter configuration is chosen independently of all others, and
+In the asynchronous setting we immediately schedule a new trial as soon as resources become available. This will optimally exploit our resources, since we can avoid any synchronoisation overhead. For random search, each new hyperparameter configuration is chosen independently of all others, and
 in particular without exploiting observations from any prior evaluation. This means we can
 trivally parallelize random search asynchronously. This is not straight-forward with more sophisticated methods, that make decsision based on previous obvervations (see Section :numref:`sec_sh_async`).While we need access to more resources than in the sequential setting, it will reduce the overall time we have time for the optimization process to finish. More precisely, asynchronous random search exhibits a linear
 speed-up, in that a certain performance is reached $K$ times faster if $K$ trials can
 be run in parallel. 
 
 
-![Distributing the hyperparameter optimization process either synchronously or asynchronously. Compared to the sequential setting, we can reduce the overal wall-clock time while keep the total compute constant.](img/distributed_scheduling.svg)
+![Distributing the hyperparameter optimization process either synchronously or asynchronously. Compared to the sequential setting, we can reduce the overal wall-clock time while keep the total compute constant. Synchronous scheduling might lead to ideling workers in the case of stragglers.](img/distributed_scheduling.svg)
 :width:`40px`
 :label:`distributed_scheduling`
 
@@ -86,8 +86,7 @@ config_space = {
 
 Next, we need to specify the back-end for job executions. The simplest choice in Syne
 Tune is the local back-end, which runs on the given instance and executes parallel jobs
-as sub-processes. For larger workloads, Syne Tune supports a SageMaker back-end,
-which can execute trials on separate instances, but this feature will not be used here.
+as sub-processes. 
 
 ```{.python .input  n=40}
 from syne_tune.backend.python_backend import PythonBackend
