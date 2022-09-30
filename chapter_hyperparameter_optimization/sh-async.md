@@ -1,4 +1,4 @@
-op```{.python .input  n=1}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -7,7 +7,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 :label:`sec_sh_async`
 
-As we have seen in Section :ref:`sec_rs_async`, we can accelerate HPO by distributing the evaluation of hyperparameter configurations across either
+As we have seen in Section :numref:`sec_rs_async`, we can accelerate HPO by distributing the evaluation of hyperparameter configurations across either
 multiple instances or multiples CPUs / GPUs on a single instance. However, compared
 to random search, it is not straightforward to run SH asynchronously in a
 distributed setting. Before we can decide which configuration to run next, we first
@@ -22,6 +22,12 @@ For example, assuming the number of filter per layer is a hyperparameter, than n
 with smaller filter sizes require train faster in terms of runing than networks with larger filter sizes given the same amount of epochs. Especially in the case of stragglers, this might
 lead to large idling times of workers.
 
+Figure :ref:`synchronous_sh` shows the scheduling of synchronous SH with $\eta=2$ for four different trials with two workers. We start with evaluating Trial-0 and Trial-1 for one epoch and immediately continue with the next two trials once they are finished. Now, we first have to wait until Trial-2 finishes, which takes substantially more time than the other trials, before we can promote the best two trials, i.e. Trial-0 and Trial-3 to next rung level. This causes an idiling time for Worker-1. Now, we continue with Rung 1. Also, here Trial-3 takes longer than Trial-0, which leads to an additional ideling time of Worker-0. Once, we reach Rung-2, only a the best trial, Trial-0, remains which occupies only one worker. To avoid that Worker-1 idles during that time, most implementaitons of SH continue already with the next round, and start evaluating new trials (e.g Trial-4) on the first rung.
+
+![.](img/sync_sh.svg)
+:width:`40px`
+:label:`synchronous_sh`
+
 Asynchronous successive halving (ASHA) :cite:`li-arxiv18` adapts SH to the asynchronous
 parallel scenario. The main idea of ASHA is to promote configurations to the next rung
 level as soon as we collected at least $\eta$ observations on the current rung level.
@@ -30,6 +36,13 @@ next rung level, which in hindsight do not compare favourably against most other
 at the same rung level. On the other hand, we get rid of all synchronization points
 this way. In practice, these suboptimal promotions have only a modest impact on performance, because the ranking of hyperparameter configurations is often consistent across rung levels. If a worker is free, but no configuration can be promoted, we start a new
 configuration with $r = r_{min}$.
+
+Figure :ref:`asha` shows the sheduling of the same configurations for ASHA. Once Trial-1 finishes, we collected the results of two trials (i.e Trial-0 and Trial-1) and immediately promote the better Trial (Trial-0) to the next rung level. After the Trial-0 finishes on Rung 1, we do not have yet enough trials yet that could be promoted to the next rung level. Hence, we continue with Rung 0 and evalaute Trial 3. At the moment Trial-3 finishes, Trial-2 is still pending. At this point we have 3 Trials evaluated on Rung-0 and one Trial evaluated already on Rung-1. Given that $\eta=2$, we cannot promote any new trial yet, assuiming that Trial-3 performs worse than Trial-0. However, once Trial-2 finishes, Trial-3 is promoted to the Rung-1. Afterwards, we collected 2 evaluatins on Rung-1, which means we can now promote Trial-0 to Rung-2. At the same time, Worker-1 continues with evaluating new trials (i.e Trial-5) on Rung-0.
+
+
+![.](img/asha.svg)
+:width:`40px`
+:label:`asha`
 
 As for asynchronous random search, we will use **Syne Tune** once more.
 
