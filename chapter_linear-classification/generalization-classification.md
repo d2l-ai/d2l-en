@@ -60,8 +60,8 @@ that ensuring generalization
 of deep neural networks *a priori*
 requires an absurd number of examples
 (perhaps trillions or more),
-even when we find that on the tasks we care about
-that deep neural networks typically to generalize
+even when we find that, on the tasks we care about,
+deep neural networks typically generalize
 remarkably well with far fewer examples (thousands).
 Thus deep learning practitioners often forgo
 a priori guarantees altogether,
@@ -101,7 +101,7 @@ By contrast, the *population error*
 is the *expected* fraction
 of examples in the underlying population
 (some distribution $P(X,Y)$  characterized
-by probability density function $p(\mathbf{x},y)$
+by probability density function $p(\mathbf{x},y)$)
 for which our classifier disagrees
 with the true label:
 
@@ -123,7 +123,7 @@ Moreover, because our quantity of interest $\epsilon(f)$
 is an expectation (of the random variable $\mathbf{1}(f(X) \neq Y)$)
 and the corresponding estimator $\epsilon_\mathcal{D}(f)$
 is the sample average,
-estimating the popullation error
+estimating the population error
 is simply the classic problem of mean estimation,
 which you may recall from :numref:`sec_prob`.
 

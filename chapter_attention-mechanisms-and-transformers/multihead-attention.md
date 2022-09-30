@@ -7,23 +7,22 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 :label:`sec_multihead-attention`
 
 
-In practice,
-given the same set of queries, keys, and values
+In practice, given the same set 
+of queries, keys, and values
 we may want our model to
 combine knowledge from
 different behaviors of the same attention mechanism,
-such as capturing dependencies of various ranges (e.g., shorter-range vs. longer-range)
-within a sequence.
-Thus, 
-it may be beneficial 
+such as capturing dependencies of various ranges
+(e.g., shorter-range vs. longer-range) within a sequence.
+Thus,  it may be beneficial  
 to allow our attention mechanism
 to jointly use different representation subspaces
 of queries, keys, and values.
 
 
 
-To this end,
-instead of performing a single attention pooling,
+To this end, instead of performing 
+a single attention pooling,
 queries, keys, and values
 can be transformed
 with $h$ independently learned linear projections.
@@ -78,10 +77,10 @@ of the concatenation of $h$ heads:
 
 $$\mathbf W_o \begin{bmatrix}\mathbf h_1\\\vdots\\\mathbf h_h\end{bmatrix} \in \mathbb{R}^{p_o}.$$
 
-Based on this design,
-each head may attend to different parts of the input.
-More sophisticated functions than the simple weighted average
-can be expressed.
+Based on this design, each head may attend
+to different parts of the input.
+More sophisticated functions 
+than the simple weighted average can be expressed.
 
 ```{.python .input}
 %%tab mxnet
@@ -111,14 +110,11 @@ import tensorflow as tf
 In our implementation,
 we [**choose the scaled dot-product attention
 for each head**] of the multi-head attention.
-To avoid significant growth
-of computational cost and parameterization cost,
-we set
-$p_q = p_k = p_v = p_o / h$.
-Note that $h$ heads
-can be computed in parallel
-if we set
-the number of outputs of linear transformations
+To avoid significant growth of computational cost and parameterization cost,
+we set $p_q = p_k = p_v = p_o / h$.
+Note that $h$ heads can be computed in parallel
+if we set the number of outputs 
+of linear transformations
 for the query, key, and value
 to $p_q h = p_k h = p_v h = p_o$.
 In the following implementation,
@@ -371,8 +367,10 @@ d2l.check_shape(attention(X, Y, Y, valid_lens, training=False),
 
 ## Summary
 
-* Multi-head attention combines knowledge of the same attention pooling via different representation subspaces of queries, keys, and values.
-* To compute multiple heads of multi-head attention in parallel, proper tensor manipulation is needed.
+Multi-head attention combines knowledge of the same attention pooling 
+via different representation subspaces of queries, keys, and values.
+To compute multiple heads of multi-head attention in parallel, 
+proper tensor manipulation is needed.
 
 
 

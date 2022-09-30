@@ -44,7 +44,6 @@ import torchvision
 from PIL import Image
 from torch import nn
 from torch.nn import functional as F
-from torch.utils import data
 from torchvision import transforms
 
 def use_svg_display():
@@ -981,7 +980,7 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                   cmap='Reds'):
     """Show heatmaps of matrices.
 
-    Defined in :numref:`sec_attention-cues`"""
+    Defined in :numref:`sec_attention-basics`"""
     d2l.use_svg_display()
     num_rows, num_cols = len(matrices), len(matrices[0])
     fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize,
@@ -2584,8 +2583,8 @@ def load_array(data_arrays, batch_size, is_train=True):
     """Construct a PyTorch data iterator.
 
     Defined in :numref:`sec_utils`"""
-    dataset = data.TensorDataset(*data_arrays)
-    return data.DataLoader(dataset, batch_size, shuffle=is_train)
+    dataset = torch.utils.data.TensorDataset(*data_arrays)
+    return torch.utils.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 def synthetic_data(w, b, num_examples):
     """Generate y = Xw + b + noise.
@@ -2623,10 +2622,10 @@ def load_data_fashion_mnist(batch_size, resize=None):
         root="../data", train=True, transform=trans, download=True)
     mnist_test = torchvision.datasets.FashionMNIST(
         root="../data", train=False, transform=trans, download=True)
-    return (data.DataLoader(mnist_train, batch_size, shuffle=True,
-                            num_workers=get_dataloader_workers()),
-            data.DataLoader(mnist_test, batch_size, shuffle=False,
-                            num_workers=get_dataloader_workers()))
+    return (torch.utils.data.DataLoader(mnist_train, batch_size, shuffle=True,
+                                        num_workers=get_dataloader_workers()),
+            torch.utils.data.DataLoader(mnist_test, batch_size, shuffle=False,
+                                        num_workers=get_dataloader_workers()))
 
 def evaluate_accuracy_gpu(net, data_iter, device=None):
     """Compute the accuracy for a model on a dataset using a GPU.

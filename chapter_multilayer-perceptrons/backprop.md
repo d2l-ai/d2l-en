@@ -276,10 +276,10 @@ more easily leads to *out of memory* errors.
 
 ## Summary
 
-* Forward propagation sequentially calculates and stores intermediate variables within the computational graph defined by the neural network. It proceeds from the input to the output layer.
-* Backpropagation sequentially calculates and stores the gradients of intermediate variables and parameters within the neural network in the reversed order.
-* When training deep learning models, forward propagation and back propagation are interdependent.
-* Training requires significantly more memory than prediction.
+Forward propagation sequentially calculates and stores intermediate variables within the computational graph defined by the neural network. It proceeds from the input to the output layer.
+Backpropagation sequentially calculates and stores the gradients of intermediate variables and parameters within the neural network in the reversed order.
+When training deep learning models, forward propagation and back propagation are interdependent,
+and training requires significantly more memory than prediction.
 
 
 ## Exercises

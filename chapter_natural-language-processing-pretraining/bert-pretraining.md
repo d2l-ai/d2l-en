@@ -33,7 +33,7 @@ train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
 ## Pretraining BERT
 
 The original BERT has two versions of different model sizes :cite:`Devlin.Chang.Lee.ea.2018`.
-The base model ($\text{BERT}_{\text{BASE}}$) uses 12 layers (transformer encoder blocks)
+The base model ($\text{BERT}_{\text{BASE}}$) uses 12 layers (Transformer encoder blocks)
 with 768 hidden units (hidden size) and 12 self-attention heads.
 The large model ($\text{BERT}_{\text{LARGE}}$) uses 24 layers
 with 1024 hidden units and 16 self-attention heads.

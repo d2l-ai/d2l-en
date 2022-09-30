@@ -11,26 +11,21 @@ we used a Gaussian kernel to model
 interactions between queries and keys.
 Treating the exponent of the Gaussian kernel
 in :eqref:`eq_nadaraya-watson-gaussian`
-as an *attention scoring function* (or *scoring function* for short),
+as an *attention scoring function* 
+(or *scoring function* for short),
 the results of this function were
-essentially fed into
-a softmax operation.
-As a result,
-we obtained
-a probability distribution (attention weights)
+essentially fed into a softmax operation.
+As a result, we obtained a probability distribution (attention weights)
 over values that are paired with keys.
-In the end,
-the output of the attention pooling
+In the end, the output of the attention pooling
 is simply a weighted sum of the values
 based on these attention weights.
 
-At a high level,
-we can use the above algorithm
-to instantiate the framework of attention mechanisms
-in :numref:`fig_qkv`.
+At a high level, we can use the above algorithm
+to instantiate the framework of attention mechanisms (:numref:`fig_qkv`).
 Denoting an attention scoring function by $a$,
-:numref:`fig_attention_output`
-illustrates how the output of attention pooling
+:numref:`fig_attention_output` illustrates 
+how the output of attention pooling
 can be computed as a weighted sum of values.
 Since attention weights are
 a probability distribution,
@@ -42,31 +37,30 @@ a weighted average.
 
 
 
-Mathematically,
-suppose that we have
+Mathematically, suppose that we have
 a query $\mathbf{q} \in \mathbb{R}^q$
-and $m$ key-value pairs $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)$, where any $\mathbf{k}_i \in \mathbb{R}^k$ and any $\mathbf{v}_i \in \mathbb{R}^v$.
-The attention pooling $f$
-is instantiated as a weighted sum of the values:
+and $m$ key-value pairs $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)$,
+where any $\mathbf{k}_i \in \mathbb{R}^k$ and any $\mathbf{v}_i \in \mathbb{R}^v$.
+The attention pooling $f$ is instantiated 
+as a weighted sum of the values:
 
 $$f(\mathbf{q}, (\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)) = \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$
 :eqlabel:`eq_attn-pooling-def`
 
-where
-the attention weight (scalar) for the query $\mathbf{q}$
-and key $\mathbf{k}_i$
-is computed by
-the softmax operation of
-an attention scoring function $a$ that maps two vectors to a scalar:
+where the attention weight (scalar) 
+for the query $\mathbf{q}$ and key $\mathbf{k}_i$
+is computed by the softmax operation 
+of an attention scoring function $a$ 
+that maps two vectors to a scalar:
 
 $$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i)) = \frac{\exp(a(\mathbf{q}, \mathbf{k}_i))}{\sum_{j=1}^m \exp(a(\mathbf{q}, \mathbf{k}_j))} \in \mathbb{R}.$$
 :eqlabel:`eq_attn-scoring-alpha`
 
-As we can see,
-different choices of the attention scoring function $a$
+As we can see, different choices 
+of the attention scoring function $a$
 lead to different behaviors of attention pooling.
-In this section,
-we introduce two popular scoring functions
+In this section, we introduce 
+two popular scoring functions
 that we will use to develop more
 sophisticated attention mechanisms later.
 
@@ -95,23 +89,21 @@ import tensorflow as tf
 
 ## [**Masked Softmax Operation**]
 
-As we just mentioned,
-a softmax operation is used to
+As we just mentioned, a softmax operation is used to
 output a probability distribution as attention weights.
-In some cases,
-not all the values should be fed into attention pooling.
-For instance,
-for efficient minibatch processing in :numref:`sec_machine_translation`,
+In some cases, not all the values 
+should be fed into attention pooling.
+For instance, for efficient minibatch processing 
+in :numref:`sec_machine_translation`,
 some text sequences are padded with
 special tokens that do not carry meaning.
-To get an attention pooling
-over
-only meaningful tokens as values,
+To get an attention pooling 
+over only meaningful tokens as values,
 we can specify a valid sequence length (in number of tokens)
 to filter out those beyond this specified range
 when computing softmax.
-In this way,
-we can implement such a *masked softmax operation*
+In this way, we can implement 
+such a *masked softmax operation*
 in the following `masked_softmax` function,
 where any value beyond the valid length
 is masked as zero.
@@ -219,10 +211,8 @@ masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3]))
 masked_softmax(tf.random.uniform(shape=(2, 2, 4)), tf.constant([2, 3]))
 ```
 
-Similarly, we can also
-use a two-dimensional tensor
-to specify valid lengths
-for every row in each matrix example.
+Similarly, we can also use a two-dimensional tensor
+to specify valid lengths for every row in each matrix example.
 
 ```{.python .input}
 %%tab mxnet
@@ -254,15 +244,13 @@ the *additive attention* scoring function
 $$a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R},$$
 :eqlabel:`eq_additive-attn`
 
-where
-learnable parameters
-$\mathbf W_q\in\mathbb R^{h\times q}$, $\mathbf W_k\in\mathbb R^{h\times k}$, and $\mathbf w_v\in\mathbb R^{h}$.
+where $\mathbf W_q\in\mathbb R^{h\times q}$, $\mathbf W_k\in\mathbb R^{h\times k}$, 
+and $\mathbf w_v\in\mathbb R^{h}$ are the learnable parameters.
 Equivalent to :eqref:`eq_additive-attn`,
 the query and the key are concatenated
 and fed into an MLP with a single hidden layer
 whose number of hidden units is $h$, a hyperparameter.
-By using $\tanh$ as the activation function and disabling
-bias terms,
+By using $\tanh$ as the activation function and disabling bias terms, 
 we implement additive attention in the following.
 
 ```{.python .input}
@@ -358,14 +346,12 @@ class AdditiveAttention(tf.keras.layers.Layer):
             self.attention_weights, **kwargs), values)
 ```
 
-Let's [**demonstrate the above `AdditiveAttention` class**]
-with a toy example,
+Let's [**demonstrate the above `AdditiveAttention` class**] with a toy example,
 where shapes (batch size, number of steps or sequence length in tokens, feature size)
-of queries, keys, and values
-are ($2$, $1$, $20$), ($2$, $10$, $2$),
+of queries, keys, and values are ($2$, $1$, $20$), ($2$, $10$, $2$),
 and ($2$, $10$, $4$), respectively.
-The attention pooling output
-has a shape of (batch size, number of steps for queries, feature size for values).
+The attention pooling output has a shape of 
+(batch size, number of steps for queries, feature size for values).
 
 ```{.python .input}
 %%tab mxnet
@@ -418,19 +404,17 @@ d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
 
 ## [**Scaled Dot-Product Attention**]
 
-A more computationally efficient
-design for the scoring function can be
-simply dot product.
-However,
-the dot product operation
+A more computationally efficient design 
+for the scoring function can be simply dot product.
+However, the dot product operation
 requires that both the query and the key
 have the same vector length, say $d$.
-Assume that
-all the elements of the query and the key
+Assume that all the elements 
+of the query and the key
 are independent random variables
 with zero mean and unit variance.
-The dot product of
-both vectors has zero mean and a variance of $d$.
+The dot product of both vectors 
+has zero mean and a variance of $d$.
 To ensure that the variance of the dot product
 still remains one regardless of vector length,
 the *scaled dot-product attention* scoring function
@@ -439,15 +423,11 @@ the *scaled dot-product attention* scoring function
 $$a(\mathbf q, \mathbf k) = \mathbf{q}^\top \mathbf{k}  /\sqrt{d}$$
 
 divides the dot product by $\sqrt{d}$.
-In practice,
-we often think in minibatches
-for efficiency,
-such as computing attention
-for
-$n$ queries and $m$ key-value pairs,
+In practice, we often think in minibatches for efficiency,
+such as computing attention for $n$ queries and $m$ key-value pairs,
 where queries and keys are of length $d$
 and values are of length $v$.
-The scaled dot-product attention
+The scaled dot-product attention 
 of queries $\mathbf Q\in\mathbb R^{n\times d}$,
 keys $\mathbf K\in\mathbb R^{m\times d}$,
 and values $\mathbf V\in\mathbb R^{m\times v}$
@@ -457,7 +437,8 @@ is
 $$ \mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \mathbf V \in \mathbb{R}^{n\times v}.$$
 :eqlabel:`eq_softmax_QK_V`
 
-In the following implementation of the scaled dot product attention, we use dropout for model regularization.
+In the following implementation of the scaled dot product attention,
+we use dropout for model regularization.
 
 ```{.python .input}
 %%tab mxnet
@@ -562,11 +543,8 @@ class DotProductAttention(tf.keras.layers.Layer):
 ```
 
 To [**demonstrate the above `DotProductAttention` class**],
-we use the same keys, values, and valid lengths from the earlier toy example
-for additive attention.
-For the dot product operation,
-we make the feature size of queries
-the same as that of keys.
+we use the same keys, values, and valid lengths from the earlier toy example for additive attention.
+For the dot product operation, we make the feature size of queries the same as that of keys.
 
 ```{.python .input}
 %%tab mxnet
@@ -604,8 +582,15 @@ d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
 
 ## Summary
 
-* We can compute the output of attention pooling as a weighted average of values, where different choices of the attention scoring function lead to different behaviors of attention pooling.
-* When queries and keys are vectors of different lengths, we can use the additive attention scoring function. When they are the same, the scaled dot-product attention scoring function is more computationally efficient.
+We can compute the output of attention pooling 
+as a weighted average of values, 
+where different choices of the attention scoring function
+lead to different behaviors of attention pooling.
+When queries and keys are vectors of different lengths,
+we can use the additive attention scoring function. 
+When they are the same,
+the scaled dot-product attention scoring function
+is more computationally efficient.
 
 
 

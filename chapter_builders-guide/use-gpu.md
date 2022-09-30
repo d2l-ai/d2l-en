@@ -511,13 +511,13 @@ In short, as long as all data and parameters are on the same device, we can lear
 
 ## Summary
 
-* We can specify devices for storage and calculation, such as the CPU or GPU.
+We can specify devices for storage and calculation, such as the CPU or GPU.
   By default, data is created in the main memory
   and then uses the CPU for calculations.
-* The deep learning framework requires all input data for calculation
+The deep learning framework requires all input data for calculation
   to be on the same device,
   be it CPU or the same GPU.
-* You can lose significant performance by moving data without care.
+You can lose significant performance by moving data without care.
   A typical mistake is as follows: computing the loss
   for every minibatch on the GPU and reporting it back
   to the user on the command line (or logging it in a NumPy `ndarray`)
@@ -550,5 +550,3 @@ In short, as long as all data and parameters are on the same device, we can lear
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/270)
 :end_tab:
-
-
