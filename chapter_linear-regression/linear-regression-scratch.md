@@ -130,7 +130,7 @@ among all examples in the minibatch.
 %%tab all
 @d2l.add_to_class(LinearRegressionScratch)  #@save
 def loss(self, y_hat, y):
-    l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+    l = (y_hat - y) ** 2 / 2
     return d2l.reduce_mean(l)
 ```
 
