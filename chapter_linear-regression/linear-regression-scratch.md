@@ -91,15 +91,15 @@ class LinearRegressionScratch(d2l.Module):  #@save
 
 Next, we must [**define our model,
 relating its input and parameters to its output.**]
-For our linear model we simply take the matrix-vector product
+For our linear model we simply take the matrix-matrix product
 of the input features $\mathbf{X}$ 
 and the model weights $\mathbf{w}$,
 and add the offset $b$ to each example.
-$\mathbf{Xw}$ is a vector and $b$ is a scalar.
+$\mathbf{Xw}$ is a matrix and $b$ is a scalar.
 Due to the broadcasting mechanism 
 (see :numref:`subsec_broadcasting`),
-when we add a vector and a scalar,
-the scalar is added to each component of the vector.
+when we add a matrix and a scalar,
+the scalar is added to each component of the matrix.
 The resulting `forward` function 
 is registered as a method in the `LinearRegressionScratch` class
 via `add_to_class` (introduced in :numref:`oo-design-utilities`).
