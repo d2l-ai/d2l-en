@@ -348,6 +348,18 @@ class Trainer(d2l.HyperParameters):
                                        self.prepare_batch(batch))
             self.val_batch_idx += 1
 
+    def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
+        """Defined in :numref:`sec_use_gpu`"""
+        self.save_hyperparameters()
+        self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
+    
+
+    def prepare_batch(self, batch):
+        """Defined in :numref:`sec_use_gpu`"""
+        if self.gpus:
+            batch = [d2l.to(a, self.gpus[0]) for a in batch]
+        return batch
+
 class SyntheticRegressionData(d2l.DataModule):
     """Defined in :numref:`sec_synthetic-regression-data`"""
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
@@ -541,7 +553,7 @@ def gpu(i=0):
 
 def num_gpus():
     """Defined in :numref:`sec_use_gpu`"""
-    return jax.device_count('gpu')
+    return jax.device_count() - 1  # Exclude CPU device
 
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu().
