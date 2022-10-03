@@ -137,7 +137,7 @@ from torch import nn
 
 # We define a helper function to calculate convolutions. It initializes
 # the convolutional layer weights and performs corresponding dimensionality
-# elevations and reductions on the input and output.
+# elevations and reductions on the input and output
 def comp_conv2d(conv2d, X):
     # (1, 1) indicates that batch size and the number of channels are both 1
     X = X.reshape((1, 1) + X.shape)
