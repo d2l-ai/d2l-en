@@ -215,7 +215,7 @@ comp_conv2d(conv2d, X).shape
 ```{.python .input}
 %%tab tensorflow
 # We use a convolution kernel with height 5 and width 3. The padding on
-# either side of the height and width are 2 and 1, respectively.
+# either side of the height and width are 2 and 1, respectively
 conv2d = tf.keras.layers.Conv2D(1, kernel_size=(5, 3), padding='same')
 comp_conv2d(conv2d, X).shape
 ```
