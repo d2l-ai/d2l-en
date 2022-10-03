@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Convolutional Neural Networks (LeNet)
@@ -112,6 +112,15 @@ from d2l import tensorflow as d2l
 ```
 
 ```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+from types import FunctionType
+```
+
+```{.python .input}
 %%tab pytorch
 def init_cnn(module):  #@save
     """Initialize weights for CNNs."""
@@ -120,7 +129,7 @@ def init_cnn(module):  #@save
 ```
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class LeNet(d2l.Classifier):
     def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
@@ -161,6 +170,32 @@ class LeNet(d2l.Classifier):
                 tf.keras.layers.Dense(num_classes)])
 ```
 
+```{.python .input}
+%%tab jax
+class LeNet(d2l.Classifier):
+    lr: float = 0.1
+    num_classes: int = 10
+    kernel_init: FunctionType = nn.initializers.xavier_uniform
+
+    def setup(self):
+        self.net = nn.Sequential([
+            nn.Conv(features=6, kernel_size=(5, 5), padding='SAME',
+                    kernel_init=self.kernel_init()),
+            nn.sigmoid,
+            lambda x: nn.avg_pool(x, window_shape=(2, 2), strides=(2, 2)),
+            nn.Conv(features=16, kernel_size=(5, 5), padding='VALID',
+                    kernel_init=self.kernel_init()),
+            nn.sigmoid,
+            lambda x: nn.avg_pool(x, window_shape=(2, 2), strides=(2, 2)),
+            lambda x: x.reshape((x.shape[0], -1)),  # flatten
+            nn.Dense(features=120, kernel_init=self.kernel_init()),
+            nn.sigmoid,
+            nn.Dense(features=84, kernel_init=self.kernel_init()),
+            nn.sigmoid,
+            nn.Dense(features=self.num_classes, kernel_init=self.kernel_init())
+        ])
+```
+
 We take some liberty in the reproduction of LeNet insofar as we replace the Gaussian activation layer by
 a softmax layer. This greatly simplifies the implementation, not the least due to the
 fact that the Gaussian decoder is rarely used nowadays. Other than that, this network matches
@@ -173,6 +208,11 @@ and printing the output shape at each layer,
 we can [**inspect the model**] to make sure
 that its operations line up with
 what we expect from :numref:`img_lenet_vert`.
+
+:begin_tab:`jax`
+Flax provides `nn.tabulate`, a nifty method to summarise the layers and
+parameters in our network.
+:end_tab:
 
 ![Compressed notation for LeNet-5.](../img/lenet-vert.svg)
 :label:`img_lenet_vert`
@@ -198,6 +238,18 @@ def layer_summary(self, X_shape):
     for layer in self.net.layers:
         X = layer(X)
         print(layer.__class__.__name__, 'output shape:\t', X.shape)
+
+model = LeNet()
+model.layer_summary((1, 28, 28, 1))
+```
+
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(d2l.Classifier)  #@save
+def layer_summary(self, X_shape, key=jax.random.PRNGKey(d2l.get_seed())):
+    X = jnp.zeros(X_shape)
+    tabulate_fn = nn.tabulate(self, key, method=self.forward)
+    print(tabulate_fn(X))
 
 model = LeNet()
 model.layer_summary((1, 28, 28, 1))
@@ -246,7 +298,7 @@ Just as with MLPs, our loss function is cross-entropy,
 and we minimize it via minibatch stochastic gradient descent.
 
 ```{.python .input}
-%%tab pytorch, mxnet
+%%tab pytorch, mxnet, jax
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128)
 model = LeNet(lr=0.1)
