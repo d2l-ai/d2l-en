@@ -557,6 +557,17 @@ def try_all_gpus():
     Defined in :numref:`sec_use_gpu`"""
     return [gpu(i) for i in range(num_gpus())]
 
+def corr2d(X, K):
+    """Compute 2D cross-correlation.
+
+    Defined in :numref:`sec_conv_layer`"""
+    h, w = K.shape
+    Y = jnp.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            Y = Y.at[i, j].set((X[i:i + h, j:j + w] * K).sum())
+    return Y
+
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images.
 
@@ -623,6 +634,7 @@ def extract(filename, folder=None):
 nn_Module = nn.Module
 to = jax.device_put
 numpy = np.asarray
+transpose = lambda a: a.T
 
 ones_like = jnp.ones_like
 ones = jnp.ones
