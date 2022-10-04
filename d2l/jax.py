@@ -467,8 +467,11 @@ class ToArray:
         """Defined in :numref:`sec_fashion_mnist`"""
         pass
 
-    def __call__(self, img):
-        return np.asarray(img) / 255  # Normalize arrays
+    def __call__(self, pic):
+        img = np.asarray(pic) / 255  # Convert PIL to ndarray & normalize
+        # Use channel last format
+        img = img.reshape(img.shape[0], img.shape[1], len(pic.getbands()))
+        return img
 
 class FashionMNIST(d2l.DataModule):
     """Defined in :numref:`sec_fashion_mnist`"""
