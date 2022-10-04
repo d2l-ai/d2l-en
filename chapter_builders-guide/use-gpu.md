@@ -189,7 +189,7 @@ def num_gpus():  #@save
     if tab.selected('tensorflow'):
         return len(tf.config.experimental.list_physical_devices('GPU'))
     if tab.selected('jax'):
-        return jax.device_count('gpu')
+        return jax.device_count() - 1  # Exclude CPU device
 
 num_gpus()
 ```
@@ -595,6 +595,20 @@ def prepare_model(self, model):
         if tab.selected('pytorch'):
             model.to(self.gpus[0])
     self.model = model
+```
+
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(d2l.Trainer)  #@save
+def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
+    self.save_hyperparameters()
+    self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
+
+@d2l.add_to_class(d2l.Trainer)  #@save
+def prepare_batch(self, batch):
+    if self.gpus:
+        batch = [d2l.to(a, self.gpus[0]) for a in batch]
+    return batch
 ```
 
 In short, as long as all data and parameters are on the same device, we can learn models efficiently. In the following chapters we will see several such examples.

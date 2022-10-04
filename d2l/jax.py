@@ -348,6 +348,18 @@ class Trainer(d2l.HyperParameters):
                                        self.prepare_batch(batch))
             self.val_batch_idx += 1
 
+    def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
+        """Defined in :numref:`sec_use_gpu`"""
+        self.save_hyperparameters()
+        self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
+    
+
+    def prepare_batch(self, batch):
+        """Defined in :numref:`sec_use_gpu`"""
+        if self.gpus:
+            batch = [d2l.to(a, self.gpus[0]) for a in batch]
+        return batch
+
 class SyntheticRegressionData(d2l.DataModule):
     """Defined in :numref:`sec_synthetic-regression-data`"""
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
@@ -455,8 +467,11 @@ class ToArray:
         """Defined in :numref:`sec_fashion_mnist`"""
         pass
 
-    def __call__(self, img):
-        return np.asarray(img) / 255  # Normalize arrays
+    def __call__(self, pic):
+        img = np.asarray(pic) / 255  # Convert PIL to ndarray & normalize
+        # Use channel last format
+        img = img.reshape(img.shape[0], img.shape[1], len(pic.getbands()))
+        return img
 
 class FashionMNIST(d2l.DataModule):
     """Defined in :numref:`sec_fashion_mnist`"""
@@ -531,6 +546,12 @@ class Classifier(d2l.Module):
         fn = optax.softmax_cross_entropy_with_integer_labels
         return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
 
+    def layer_summary(self, X_shape, key=jax.random.PRNGKey(d2l.get_seed())):
+        """Defined in :numref:`sec_lenet`"""
+        X = jnp.zeros(X_shape)
+        tabulate_fn = nn.tabulate(self, key, method=self.forward)
+        print(tabulate_fn(X))
+
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
     return jax.devices('cpu')[0]
@@ -541,7 +562,7 @@ def gpu(i=0):
 
 def num_gpus():
     """Defined in :numref:`sec_use_gpu`"""
-    return jax.device_count('gpu')
+    return jax.device_count() - 1  # Exclude CPU device
 
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu().
