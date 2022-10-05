@@ -201,9 +201,7 @@ from flax import linen as nn
 import jax
 from jax import numpy as jnp
 
-get_key = lambda: jax.random.PRNGKey(d2l.get_seed())  #@save
-
-def dropout_layer(X, dropout, key=get_key()):
+def dropout_layer(X, dropout, key=d2l.get_key()):
     assert 0 <= dropout <= 1
     if dropout == 1: return jnp.zeros_like(X)
     mask = jax.random.uniform(key, X.shape) > dropout
@@ -427,7 +425,7 @@ class DropoutMLP(d2l.Classifier):
         return nn.Dense(self.num_outputs)(x)
 
 @d2l.add_to_class(DropoutMLP)
-def loss(self, params, X, Y, averaged=True, rngs={'dropout': get_key()}):
+def loss(self, params, X, Y, averaged=True, rngs={'dropout': d2l.get_key()}):
     return super(DropoutMLP, self).loss(params, X, Y, averaged, rngs)
 ```
 
@@ -436,10 +434,7 @@ Next, we [**train the model**].
 ```{.python .input}
 %%tab all
 model = DropoutMLP(**hparams)
-if tab.selected('pytorch', 'mxnet', 'tensorflow'):
-    trainer.fit(model, data)
-if tab.selected('jax'):
-    trainer.fit(model, data, key={'params': get_key(), 'dropout': get_key()})
+trainer.fit(model, data)
 ```
 
 ## Summary

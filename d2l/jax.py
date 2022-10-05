@@ -8,6 +8,7 @@ from flax import linen as nn
 import random
 
 get_seed = lambda: random.randint(0, 1e6)
+get_key = lambda: jax.random.PRNGKey(get_seed())
 
 nn_Module = nn.Module
 
@@ -525,8 +526,6 @@ class Classifier(d2l.Module):
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         fn = optax.softmax_cross_entropy_with_integer_labels
         return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
-
-get_key = lambda: jax.random.PRNGKey(d2l.get_seed())
 
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
