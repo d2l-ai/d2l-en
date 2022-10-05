@@ -226,12 +226,25 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         l = self.loss(params, *batch[:-1], batch[-1])
         self.plot('loss', l, train=False)
 
+    def apply_init(self, dummy_input, **kwargs):
+        """To be defined later in :numref:`sec_lazy_init`"""
+        raise NotImplementedError
+
     def configure_optimizers(self):
         raise NotImplementedError
 
     def configure_optimizers(self):
         """Defined in :numref:`sec_classification`"""
         return optax.sgd(self.lr)
+
+    def apply_init(self, dummy_input, **kwargs):
+        """Defined in :numref:`sec_lazy_init`"""
+        if kwargs and 'key' in kwargs and (kwargs['key'] is not None):
+            self.key = kwargs['key']
+        else:
+            self.key = jax.random.PRNGKey(d2l.get_seed())
+        params = self.init(self.key, dummy_input)
+        return params
 
 class DataModule(d2l.HyperParameters):
     """Defined in :numref:`sec_oo-design`"""
@@ -297,23 +310,14 @@ class Trainer(d2l.HyperParameters):
         model.board.xlim = [0, self.max_epochs]
         self.model = model
 
-    def apply_init(self, **kwargs):
-        if kwargs and 'key' in kwargs and (kwargs['key'] is not None):
-            self.key = kwargs['key']
-        else:
-            self.key = jax.random.PRNGKey(d2l.get_seed())
-        input_shape = next(iter(self.train_dataloader))[0].shape
-        dummy_input = jnp.zeros(input_shape)
-        params = self.model.init(self.key, dummy_input)
-        return params
-
     def fit(self, model, data, key=None):
         self.prepare_data(data)
         self.prepare_model(model)
         self.optim = model.configure_optimizers()
+        dummy_input = next(iter(self.train_dataloader))[0]
         # Flax uses optax under the hood for a single state obj TrainState
         self.state = TrainState.create(apply_fn=model.apply,
-                                       params=self.apply_init(key=key),
+                                       params=model.apply_init(dummy_input, key=key),
                                        tx=model.configure_optimizers())
         self.epoch = 0
         self.train_batch_idx = 0
@@ -343,6 +347,18 @@ class Trainer(d2l.HyperParameters):
             self.model.validation_step(self.state.params,
                                        self.prepare_batch(batch))
             self.val_batch_idx += 1
+
+    def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
+        """Defined in :numref:`sec_use_gpu`"""
+        self.save_hyperparameters()
+        self.gpus = [d2l.gpu(i) for i in range(min(num_gpus, d2l.num_gpus()))]
+    
+
+    def prepare_batch(self, batch):
+        """Defined in :numref:`sec_use_gpu`"""
+        if self.gpus:
+            batch = [d2l.to(a, self.gpus[0]) for a in batch]
+        return batch
 
 class SyntheticRegressionData(d2l.DataModule):
     """Defined in :numref:`sec_synthetic-regression-data`"""
@@ -451,8 +467,11 @@ class ToArray:
         """Defined in :numref:`sec_fashion_mnist`"""
         pass
 
-    def __call__(self, img):
-        return np.asarray(img) / 255  # Normalize arrays
+    def __call__(self, pic):
+        img = np.asarray(pic) / 255  # Convert PIL to ndarray & normalize
+        # Use channel last format
+        img = img.reshape(img.shape[0], img.shape[1], len(pic.getbands()))
+        return img
 
 class FashionMNIST(d2l.DataModule):
     """Defined in :numref:`sec_fashion_mnist`"""
@@ -527,6 +546,12 @@ class Classifier(d2l.Module):
         fn = optax.softmax_cross_entropy_with_integer_labels
         return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
 
+    def layer_summary(self, X_shape, key=jax.random.PRNGKey(d2l.get_seed())):
+        """Defined in :numref:`sec_lenet`"""
+        X = jnp.zeros(X_shape)
+        tabulate_fn = nn.tabulate(self, key, method=self.forward)
+        print(tabulate_fn(X))
+
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
     return jax.devices('cpu')[0]
@@ -537,7 +562,7 @@ def gpu(i=0):
 
 def num_gpus():
     """Defined in :numref:`sec_use_gpu`"""
-    return jax.device_count('gpu')
+    return jax.device_count() - 1  # Exclude CPU device
 
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu().
@@ -552,6 +577,17 @@ def try_all_gpus():
 
     Defined in :numref:`sec_use_gpu`"""
     return [gpu(i) for i in range(num_gpus())]
+
+def corr2d(X, K):
+    """Compute 2D cross-correlation.
+
+    Defined in :numref:`sec_conv_layer`"""
+    h, w = K.shape
+    Y = jnp.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            Y = Y.at[i, j].set((X[i:i + h, j:j + w] * K).sum())
+    return Y
 
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images.
@@ -619,6 +655,7 @@ def extract(filename, folder=None):
 nn_Module = nn.Module
 to = jax.device_put
 numpy = np.asarray
+transpose = lambda a: a.T
 
 ones_like = jnp.ones_like
 ones = jnp.ones

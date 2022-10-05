@@ -41,7 +41,7 @@ To begin, let's instantiate an MLP.
 
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 ```{.python .input}
@@ -74,11 +74,30 @@ net = tf.keras.models.Sequential([
 ])
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+
+net = nn.Sequential([nn.Dense(256), nn.relu, nn.Dense(10)])
+```
+
 At this point, the network cannot possibly know
 the dimensions of the input layer's weights
 because the input dimension remains unknown.
+
+:begin_tab:`mxnet, pytorch, tensorflow`
 Consequently the framework has not yet initialized any parameters.
 We confirm by attempting to access the parameters below.
+:end_tab:
+
+:begin_tab:`jax`
+As mentioned in :numref:`subsec_param-access`, parameters and the network definition are decoupled
+in Jax and Flax, and the user handles both manually. Flax models are stateless
+hence there is no `parameters` attribute.
+:end_tab:
 
 ```{.python .input}
 %%tab mxnet
@@ -155,6 +174,12 @@ net(X)
 [w.shape for w in net.get_weights()]
 ```
 
+```{.python .input}
+%%tab jax
+params = net.init(jax.random.PRNGKey(d2l.get_seed()), jnp.zeros((2, 20)))
+jax.tree_util.tree_map(lambda x: x.shape, params).tree_flatten()
+```
+
 As soon as we know the input dimensionality,
 20,
 the framework can identify the shape of the first layer's weight matrix by plugging in the value of 20.
@@ -178,6 +203,13 @@ and subsequently initializes the parameters.
 It will be used later when default random initializations are not desired.
 :end_tab:
 
+:begin_tab:`jax`
+Parameter initialization in Flax is always done manually and handled by the
+user. The following method sets a PRNG Key and passes in a dummy input to
+initialize the model parameters and return the parameters.
+We have been using it under the hood in the previous sections as well.
+:end_tab:
+
 ```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(d2l.Module)  #@save
@@ -185,6 +217,18 @@ def apply_init(self, inputs, init=None):
     self.forward(*inputs)
     if init is not None:
         self.net.apply(init)
+```
+
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(d2l.Module)  #@save
+def apply_init(self, dummy_input, **kwargs):
+    if kwargs and 'key' in kwargs and (kwargs['key'] is not None):
+        self.key = kwargs['key']
+    else:
+        self.key = jax.random.PRNGKey(d2l.get_seed())
+    params = self.init(self.key, dummy_input)
+    return params
 ```
 
 ## Summary

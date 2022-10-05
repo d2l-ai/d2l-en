@@ -33,7 +33,7 @@ In this section, we cover the following:
 
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 ```{.python .input}
@@ -75,15 +75,43 @@ X = tf.random.uniform((2, 4))
 net(X).shape
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+
+net = nn.Sequential([nn.Dense(8), nn.relu, nn.Dense(1)])
+
+X = jax.random.uniform(jax.random.PRNGKey(d2l.get_seed()), (2, 4))
+params = net.init(jax.random.PRNGKey(d2l.get_seed()), X)
+net.apply(params, X).shape
+```
+
 ## [**Parameter Access**]
+:label:`subsec_param-access`
 
 Let's start with how to access parameters
 from the models that you already know.
+
+:begin_tab:`mxnet, pytorch, tensorflow`
 When a model is defined via the `Sequential` class,
 we can first access any layer by indexing
 into the model as though it were a list.
 Each layer's parameters are conveniently
 located in its attribute.
+:end_tab:
+
+:begin_tab:`jax`
+Flax and JAX decouple the model and the parameters as you
+might have observed in the models defined previously.
+When a model is defined via the `Sequential` class,
+we first need to initialize the network to generate
+the parameters dictionary. We can access
+any layer's parameters through the keys of this dictionary.
+:end_tab:
+
 We can inspect the parameters of the second fully connected layer as follows.
 
 ```{.python .input}
@@ -99,6 +127,11 @@ net[2].state_dict()
 ```{.python .input}
 %%tab tensorflow
 net.layers[2].weights
+```
+
+```{.python .input}
+%%tab jax
+params['params']['layers_2']
 ```
 
 We can see that this fully connected layer
@@ -134,6 +167,12 @@ type(net[2].bias), net[2].bias.data
 type(net.layers[2].weights[1]), tf.convert_to_tensor(net.layers[2].weights[1])
 ```
 
+```{.python .input}
+%%tab jax
+bias = params['params']['layers_2']['bias']
+type(bias), bias
+```
+
 :begin_tab:`mxnet,pytorch`
 Parameters are complex objects,
 containing values, gradients,
@@ -141,6 +180,13 @@ and additional information.
 That's why we need to request the value explicitly.
 
 In addition to the value, each parameter also allows us to access the gradient. Because we have not invoked backpropagation for this network yet, it is in its initial state.
+:end_tab:
+
+:begin_tab:`jax`
+Unlike the other frameworks, JAX doesn't keep a track of the gradients over the
+neural network parameters, instead the parameters and the network are decoupled.
+It allows the user to express their computation as a
+Python function, and use the `grad` transformation for the same purpose.
 :end_tab:
 
 ```{.python .input}
@@ -176,6 +222,11 @@ net.collect_params()
 ```{.python .input}
 %%tab tensorflow
 net.get_weights()
+```
+
+```{.python .input}
+%%tab jax
+jax.tree_util.tree_map(lambda x: x.shape, params)
 ```
 
 ## [**Tied Parameters**]
@@ -245,12 +296,30 @@ net(X)
 print(len(net.layers) == 3)
 ```
 
+```{.python .input}
+%%tab jax
+# We need to give the shared layer a name so that we can refer to its
+# parameters
+shared = nn.Dense(8)
+net = nn.Sequential([nn.Dense(8), nn.relu,
+                     shared, nn.relu,
+                     shared, nn.relu,
+                     nn.Dense(1)])
+
+params = net.init(jax.random.PRNGKey(d2l.get_seed()), X)
+
+# Check whether the parameters are different
+print(len(params['params']) == 3)
+```
+
 This example shows that the parameters
 of the second and third layer are tied.
 They are not just equal, they are
 represented by the same exact tensor.
 Thus, if we change one of the parameters,
 the other one changes, too.
+
+:begin_tab:`mxnet, pytorch, tensorflow`
 You might wonder,
 when parameters are tied
 what happens to the gradients?
@@ -258,6 +327,8 @@ Since the model parameters contain gradients,
 the gradients of the second hidden layer
 and the third hidden layer are added together
 during backpropagation.
+:end_tab:
+
 
 ## Summary
 

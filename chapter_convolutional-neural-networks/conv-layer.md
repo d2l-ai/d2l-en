@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Convolutions for Images
@@ -96,6 +96,14 @@ from torch import nn
 ```
 
 ```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
+```{.python .input}
 %%tab mxnet, pytorch
 def corr2d(X, K):  #@save
     """Compute 2D cross-correlation."""
@@ -104,6 +112,18 @@ def corr2d(X, K):  #@save
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
             Y[i, j] = d2l.reduce_sum((X[i: i + h, j: j + w] * K))
+    return Y
+```
+
+```{.python .input}
+%%tab jax
+def corr2d(X, K):  #@save
+    """Compute 2D cross-correlation."""
+    h, w = K.shape
+    Y = jnp.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            Y = Y.at[i, j].set((X[i:i + h, j:j + w] * K).sum())
     return Y
 ```
 
@@ -193,6 +213,19 @@ class Conv2D(tf.keras.layers.Layer):
         return corr2d(inputs, self.weight) + self.bias
 ```
 
+```{.python .input}
+%%tab jax
+class Conv2D(nn.Module):
+    kernel_size: int
+
+    def setup(self):
+        self.weight = nn.param('w', nn.initializers.uniform, self.kernel_size)
+        self.bias = nn.param('b', nn.initializers.zeros, 1)
+
+    def forward(self, x):
+        return corr2d(x, self.weight) + self.bias
+```
+
 In
 $h \times w$ convolution
 or a $h \times w$ convolution kernel,
@@ -221,6 +254,13 @@ X
 %%tab tensorflow
 X = tf.Variable(tf.ones((6, 8)))
 X[:, 2:6].assign(tf.zeros(X[:, 2:6].shape))
+X
+```
+
+```{.python .input}
+%%tab jax
+X = jnp.ones((6, 8))
+X = X.at[:, 2:6].set(0)
 X
 ```
 
@@ -354,6 +394,33 @@ for i in range(10):
             print(f'epoch {i + 1}, loss {tf.reduce_sum(l):.3f}')
 ```
 
+```{.python .input}
+%%tab jax
+# Construct a two-dimensional convolutional layer with 1 output channel and a
+# kernel of shape (1, 2). For the sake of simplicity, we ignore the bias here
+conv2d = nn.Conv(1, kernel_size=(1, 2), use_bias=False, padding='VALID')
+
+# The two-dimensional convolutional layer uses four-dimensional input and
+# output in the format of (example, height, width, channel), where the batch
+# size (number of examples in the batch) and the number of channels are both 1
+X = X.reshape((1, 6, 8, 1))
+Y = Y.reshape((1, 6, 7, 1))
+lr = 3e-2  # Learning rate
+
+params = conv2d.init(jax.random.PRNGKey(d2l.get_seed()), X)
+
+def loss(params, X, Y):
+    Y_hat = conv2d.apply(params, X)
+    return ((Y_hat - Y) ** 2).sum()
+
+for i in range(10):
+    l, grads = jax.value_and_grad(loss)(params, X, Y)
+    # Update the kernel
+    params = jax.tree_map(lambda p, g: p - lr * g, params, grads)
+    if (i + 1) % 2 == 0:
+        print(f'epoch {i + 1}, loss {l:.3f}')
+```
+
 Note that the error has dropped to a small value after 10 iterations. Now we will [**take a look at the kernel tensor we learned.**]
 
 ```{.python .input}
@@ -369,6 +436,11 @@ d2l.reshape(conv2d.weight.data, (1, 2))
 ```{.python .input}
 %%tab tensorflow
 d2l.reshape(conv2d.get_weights()[0], (1, 2))
+```
+
+```{.python .input}
+%%tab jax
+params['params']['kernel'].reshape((1, 2))
 ```
 
 Indeed, the learned kernel tensor is remarkably close
