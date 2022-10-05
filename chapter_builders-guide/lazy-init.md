@@ -226,7 +226,8 @@ def apply_init(self, dummy_input, **kwargs):
     if kwargs and 'key' in kwargs and (kwargs['key'] is not None):
         self.key = kwargs['key']
     else:
-        self.key = jax.random.PRNGKey(d2l.get_seed())
+        # Dropout key is only used for models with dropout layers
+        self.key = {'params': d2l.get_key(), 'dropout': d2l.get_key()}
     params = self.init(self.key, dummy_input)
     return params
 ```
