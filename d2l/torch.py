@@ -224,7 +224,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
             self.net.apply(init)
 
 class DataModule(d2l.HyperParameters):
-    """Defined in :numref:`sec_oo-design`"""
+    """Defined in :numref:`subsec_oo-design-models`"""
     def __init__(self, root='../data', num_workers=4):
         self.save_hyperparameters()
 
@@ -245,7 +245,7 @@ class DataModule(d2l.HyperParameters):
                                            shuffle=train)
 
 class Trainer(d2l.HyperParameters):
-    """Defined in :numref:`sec_oo-design`"""
+    """Defined in :numref:`subsec_oo-design-models`"""
     def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'No GPU support yet'
@@ -360,7 +360,7 @@ class LinearRegressionScratch(d2l.Module):
 
     def loss(self, y_hat, y):
         """Defined in :numref:`sec_linear_scratch`"""
-        l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+        l = (y_hat - y) ** 2 / 2
         return d2l.reduce_mean(l)
 
     def configure_optimizers(self):
@@ -2896,7 +2896,7 @@ def read_data_nmt():
 
     Defined in :numref:`sec_utils`"""
     data_dir = d2l.download_extract('fra-eng')
-    with open(os.path.join(data_dir, 'fra.txt'), 'r', encoding='utf-8') as f:
+    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
         return f.read()
 
 def preprocess_nmt(text):

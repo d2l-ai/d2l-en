@@ -66,7 +66,7 @@ but you can specify a different value
 through the argument `sigma`.
 Moreover we set the bias to 0.
 Note that for object-oriented design
-we add the code to the `__init__` method of a subclass of `d2l.Module` (introduced in :numref:`oo-design-models`).
+we add the code to the `__init__` method of a subclass of `d2l.Module` (introduced in :numref:`subsec_oo-design-models`).
 
 ```{.python .input  n=5}
 %%tab all

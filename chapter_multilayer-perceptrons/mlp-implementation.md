@@ -63,14 +63,14 @@ and then enable gradient tracking.
 :end_tab:
 
 :begin_tab:`pytorch`
-In the code below we use [`nn.Parameter()`](https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html)
-from the `torch` standard library to automatically register
-a class attribute as a parameter to be tracked by [`autograd`](https://pytorch.org/docs/stable/autograd.html).
+In the code below we use [`nn.Parameter`](https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html)
+to automatically register
+a class attribute as a parameter to be tracked by `autograd` (:numref:`sec_autograd`).
 :end_tab:
 
 :begin_tab:`tensorflow`
-In the code below we use [`tf.Variable()`](https://www.tensorflow.org/api_docs/python/tf/Variable)
-to `tensorflow` standard library to define the model parameter.
+In the code below we use [`tf.Variable`](https://www.tensorflow.org/api_docs/python/tf/Variable)
+to define the model parameter.
 :end_tab:
 
 ```{.python .input  n=5}
@@ -214,24 +214,24 @@ class MLP(d2l.Classifier):
             tf.keras.layers.Dense(num_outputs)])
 ```
 
-Notice the use of the `Sequential()` API and
-the lack of definition of `forward()`.
-
-Until now, we defined a `forward` method to transform the inputs
-using the network parameters.
-However, those operations are essentially a pipeline:
+Previously, we defined `forward` methods for models to transform input using the model parameters.
+These operations are essentially a pipeline:
 you take an input and
 apply a transformation (e.g.,
-matrix multiplication with weights, plus bias addition);
-take the output of such transformation and use it as
-input to next transformation, etc.
-
-The default `d2l.Module.forward()`
-simply invokes `self.net(X)` which is now defined
-as a sequence of transformations.
-
-In other words, the `Sequential()` API abstracts the forward process
+matrix multiplication with weights followed by bias addition),
+then repetitively use the output of the current transformation as
+input to the next transformation.
+However, you may have noticed that 
+no `forward` method is defined here.
+In fact, `MLP` inherits the `forward` method from the `Module` class (:numref:`subsec_oo-design-models`) to 
+simply invoke `self.net(X)` (`X` is input),
+which is now defined as a sequence of transformations
+via the `Sequential` class.
+The `Sequential` class abstracts the forward process
 enabling us to focus on the transformations.
+We will further discuss how the `Sequential` class works in :numref:`subsec_model-construction-sequential`.
+
+
 
 
 ### Training
