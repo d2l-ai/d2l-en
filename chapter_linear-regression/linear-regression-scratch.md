@@ -91,7 +91,8 @@ class LinearRegressionScratch(d2l.Module):  #@save
 
 Next, we must [**define our model,
 relating its input and parameters to its output.**]
-For our linear model we simply take the matrix-matrix product
+Using the same notation in :eqref:`eq_linreg-y-vec`,
+for our linear model we simply take the matrix-vector product
 of the input features $\mathbf{X}$ 
 and the model weights $\mathbf{w}$,
 and add the offset $b$ to each example.
