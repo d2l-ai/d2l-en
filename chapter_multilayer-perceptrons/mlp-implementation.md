@@ -57,6 +57,22 @@ one weight matrix and one bias vector.
 As always, we allocate memory
 for the gradients of the loss with respect to these parameters.
 
+:begin_tab:`mxnet`
+In the code below, we first define and initialize the parameters
+and then enable gradient tracking.
+:end_tab:
+
+:begin_tab:`pytorch`
+In the code below we use [`nn.Parameter()`](https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html)
+from the `torch` standard library to automatically register
+a class attribute as a parameter to be tracked by [`autograd`](https://pytorch.org/docs/stable/autograd.html).
+:end_tab:
+
+:begin_tab:`tensorflow`
+In the code below we use [`tf.Variable()`](https://www.tensorflow.org/api_docs/python/tf/Variable)
+to `tensorflow` standard library to define the model parameter.
+:end_tab:
+
 ```{.python .input  n=5}
 %%tab mxnet
 class MLPScratch(d2l.Classifier):
@@ -197,6 +213,26 @@ class MLP(d2l.Classifier):
             tf.keras.layers.Dense(num_hiddens, activation='relu'),
             tf.keras.layers.Dense(num_outputs)])
 ```
+
+Notice the use of the `Sequential()` API and
+the lack of definition of `forward()`.
+
+Until now, we defined a `forward` method to transform the inputs
+using the network parameters.
+However, those operations are essentially a pipeline:
+you take an input and
+apply a transformation (e.g.,
+matrix multiplication with weights, plus bias addition);
+take the output of such transformation and use it as
+input to next transformation, etc.
+
+The default `d2l.Module.forward()`
+simply invokes `self.net(X)` which is now defined
+as a sequence of transformations.
+
+In other words, the `Sequential()` API abstracts the forward process
+enabling us to focus on the transformations.
+
 
 ### Training
 
