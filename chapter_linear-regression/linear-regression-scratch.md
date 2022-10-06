@@ -99,7 +99,7 @@ and add the offset $b$ to each example.
 $\mathbf{Xw}$ is a vector and $b$ is a scalar.
 Due to the broadcasting mechanism 
 (see :numref:`subsec_broadcasting`),
-when we add a matrix and a scalar,
+when we add a vector and a scalar,
 the scalar is added to each component of the matrix.
 The resulting `forward` function 
 is registered as a method in the `LinearRegressionScratch` class
