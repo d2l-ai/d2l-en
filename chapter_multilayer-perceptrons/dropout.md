@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Dropout
@@ -194,6 +194,20 @@ def dropout_layer(X, dropout):
     return tf.cast(mask, dtype=tf.float32) * X / (1.0 - dropout)
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+
+def dropout_layer(X, dropout, key=d2l.get_key()):
+    assert 0 <= dropout <= 1
+    if dropout == 1: return jnp.zeros_like(X)
+    mask = jax.random.uniform(key, X.shape) > dropout
+    return jnp.asarray(mask, dtype=jnp.float32) * X / (1.0 - dropout)
+```
+
 We can [**test out the `dropout_layer` function on a few examples**].
 In the following lines of code,
 we pass our input `X` through the dropout operation,
@@ -207,6 +221,8 @@ if tab.selected('pytorch'):
     X = torch.arange(16, dtype = torch.float32).reshape((2, 8))
 if tab.selected('tensorflow'):
     X = tf.reshape(tf.range(16, dtype=tf.float32), (2, 8))
+if tab.selected('jax'):
+    X = jnp.arange(16, dtype=jnp.float32).reshape(2, 8)
 print('dropout_p = 0:', dropout_layer(X, 0))
 print('dropout_p = 0.5:', dropout_layer(X, 0.5))
 print('dropout_p = 1:', dropout_layer(X, 1))
@@ -275,12 +291,39 @@ class DropoutMLPScratch(d2l.Classifier):
         self.lin1 = tf.keras.layers.Dense(num_hiddens_1, activation='relu')
         self.lin2 = tf.keras.layers.Dense(num_hiddens_2, activation='relu')
         self.lin3 = tf.keras.layers.Dense(num_outputs)
-        
+
     def forward(self, X):
         H1 = self.lin1(tf.reshape(X, (X.shape[0], -1)))
         if self.training:
             H1 = dropout_layer(H1, self.dropout_1)
         H2 = self.lin2(H1)
+        if self.training:
+            H2 = dropout_layer(H2, self.dropout_2)
+        return self.lin3(H2)
+```
+
+```{.python .input}
+%%tab jax
+class DropoutMLPScratch(d2l.Classifier):
+    num_hiddens_1: int
+    num_hiddens_2: int
+    num_outputs: int
+    dropout_1: float
+    dropout_2: float
+    lr: float
+    training: bool
+
+    def setup(self):
+        self.lin1 = nn.Dense(self.num_hiddens_1)
+        self.lin2 = nn.Dense(self.num_hiddens_2)
+        self.lin3 = nn.Dense(self.num_outputs)
+        self.relu = nn.relu
+
+    def forward(self, X):
+        H1 = self.relu(self.lin1(X.reshape(X.shape[0], -1)))
+        if self.training:
+            H1 = dropout_layer(H1, self.dropout_1)
+        H2 = self.relu(self.lin2(H1))
         if self.training:
             H2 = dropout_layer(H2, self.dropout_2)
         return self.lin3(H2)
@@ -292,8 +335,12 @@ The following is similar to the training of MLPs described previously.
 
 ```{.python .input}
 %%tab all
-hparams = {'num_outputs':10, 'num_hiddens_1':256, 'num_hiddens_2':256, 
-           'dropout_1':0.5, 'dropout_2':0.5, 'lr':0.1}
+if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    hparams = {'num_outputs':10, 'num_hiddens_1':256, 'num_hiddens_2':256,
+               'dropout_1':0.5, 'dropout_2':0.5, 'lr':0.1}
+if tab.selected('jax'):
+    hparams = {'num_outputs':10, 'num_hiddens_1':256, 'num_hiddens_2':256,
+               'dropout_1':0.5, 'dropout_2':0.5, 'lr':0.1, 'training': True}
 model = DropoutMLPScratch(**hparams)
 data = d2l.FashionMNIST(batch_size=256)
 trainer = d2l.Trainer(max_epochs=10)
@@ -356,6 +403,30 @@ class DropoutMLP(d2l.Classifier):
             tf.keras.layers.Dense(num_hiddens_2, activation=tf.nn.relu),
             tf.keras.layers.Dropout(dropout_2),
             tf.keras.layers.Dense(num_outputs)])
+```
+
+```{.python .input}
+%%tab jax
+class DropoutMLP(d2l.Classifier):
+    num_hiddens_1: int
+    num_hiddens_2: int
+    num_outputs: int
+    dropout_1: float
+    dropout_2: float
+    lr: float
+    training: bool
+
+    @nn.compact
+    def __call__(self, X):
+        x = nn.relu(nn.Dense(self.num_hiddens_1)(X.reshape((X.shape[0], -1))))
+        x = nn.Dropout(self.dropout_1, deterministic=not self.training)(x)
+        x = nn.relu(nn.Dense(self.num_hiddens_2)(x))
+        x = nn.Dropout(self.dropout_2, deterministic=not self.training)(x)
+        return nn.Dense(self.num_outputs)(x)
+
+@d2l.add_to_class(DropoutMLP)
+def loss(self, params, X, Y, averaged=True, rngs={'dropout': d2l.get_key()}):
+    return super(DropoutMLP, self).loss(params, X, Y, averaged, rngs)
 ```
 
 Next, we [**train the model**].

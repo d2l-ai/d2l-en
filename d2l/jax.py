@@ -8,6 +8,7 @@ from flax import linen as nn
 import random
 
 get_seed = lambda: random.randint(0, 1e6)
+get_key = lambda: jax.random.PRNGKey(get_seed())
 
 nn_Module = nn.Module
 
@@ -184,7 +185,6 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
     # Use default_factory to make sure new plots are generated on each run
     board: ProgressBoard = field(default_factory=lambda: ProgressBoard(),
                                  init=False)
-    training: bool = field(default=None, init=False)
 
     def loss(self, y_hat, y):
         raise NotImplementedError
@@ -242,7 +242,8 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         if kwargs and 'key' in kwargs and (kwargs['key'] is not None):
             self.key = kwargs['key']
         else:
-            self.key = jax.random.PRNGKey(d2l.get_seed())
+            # Dropout key is only used for models with dropout layers
+            self.key = {'params': d2l.get_key(), 'dropout': d2l.get_key()}
         params = self.init(self.key, dummy_input)
         return params
 
@@ -539,9 +540,9 @@ class Classifier(d2l.Module):
         compare = d2l.astype(preds == d2l.reshape(Y, -1), d2l.float32)
         return d2l.reduce_mean(compare) if averaged else compare
 
-    def loss(self, params, X, Y, averaged=True):
+    def loss(self, params, X, Y, averaged=True, rngs=None):
         """Defined in :numref:`sec_softmax_concise`"""
-        Y_hat = self.apply(params, X)
+        Y_hat = self.apply(params, X, rngs=rngs)
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         fn = optax.softmax_cross_entropy_with_integer_labels
         return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)

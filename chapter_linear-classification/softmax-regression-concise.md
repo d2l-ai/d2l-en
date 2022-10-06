@@ -190,8 +190,8 @@ def loss(self, Y_hat, Y, averaged=True):
 ```{.python .input}
 %%tab jax
 @d2l.add_to_class(d2l.Classifier)  #@save
-def loss(self, params, X, Y, averaged=True):
-    Y_hat = self.apply(params, X)
+def loss(self, params, X, Y, averaged=True, rngs=None):
+    Y_hat = self.apply(params, X, rngs=rngs)
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     fn = optax.softmax_cross_entropy_with_integer_labels
     return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
