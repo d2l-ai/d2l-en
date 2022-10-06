@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Multiple Input and Multiple Output Channels
@@ -77,7 +77,14 @@ import torch
 ```
 
 ```{.python .input}
-%%tab mxnet, pytorch
+%%tab jax
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+```
+
+```{.python .input}
+%%tab mxnet, pytorch, jax
 def corr2d_multi_in(X, K):
     # Iterate through the 0th dimension (channel) of K first, then add them up
     return sum(d2l.corr2d(x, k) for x, k in zip(X, K))
@@ -246,6 +253,12 @@ K = d2l.normal(0, 1, (2, 3, 1, 1))
 %%tab tensorflow
 X = d2l.normal((3, 3, 3), 0, 1)
 K = d2l.normal((2, 3, 1, 1), 0, 1)
+```
+
+```{.python .input}
+%%tab jax
+X = jax.random.normal(jax.random.PRNGKey(d2l.get_seed()), (3, 3, 3)) + 0 * 1
+K = jax.random.normal(jax.random.PRNGKey(d2l.get_seed()), (2, 3, 1, 1)) + 0 * 1
 ```
 
 ```{.python .input}
