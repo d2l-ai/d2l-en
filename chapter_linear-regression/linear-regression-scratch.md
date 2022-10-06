@@ -100,7 +100,7 @@ $\mathbf{Xw}$ is a vector and $b$ is a scalar.
 Due to the broadcasting mechanism 
 (see :numref:`subsec_broadcasting`),
 when we add a vector and a scalar,
-the scalar is added to each component of the matrix.
+the scalar is added to each component of the vector.
 The resulting `forward` function 
 is registered as a method in the `LinearRegressionScratch` class
 via `add_to_class` (introduced in :numref:`oo-design-utilities`).
