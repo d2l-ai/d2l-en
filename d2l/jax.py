@@ -563,7 +563,10 @@ def gpu(i=0):
 
 def num_gpus():
     """Defined in :numref:`sec_use_gpu`"""
-    return jax.device_count() - 1  # Exclude CPU device
+    try:
+        return jax.device_count('gpu')
+    except:
+        return 0  # No GPU backend found
 
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu().
