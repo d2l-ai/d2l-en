@@ -189,7 +189,10 @@ def num_gpus():  #@save
     if tab.selected('tensorflow'):
         return len(tf.config.experimental.list_physical_devices('GPU'))
     if tab.selected('jax'):
-        return jax.device_count() - 1  # Exclude CPU device
+        try:
+            return jax.device_count('gpu')
+        except:
+            return 0  # No GPU backend found
 
 num_gpus()
 ```
