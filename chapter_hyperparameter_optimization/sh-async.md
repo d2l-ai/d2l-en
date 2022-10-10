@@ -7,22 +7,27 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 :label:`sec_sh_async`
 
-As we have seen in Section :numref:`sec_rs_async`, we can accelerate HPO by distributing the evaluation of hyperparameter configurations across either
+As we have seen in Section :numref:`sec_rs_async`, we can accelerate HPO by
+distributing the evaluation of hyperparameter configurations across either
 multiple instances or multiples CPUs / GPUs on a single instance. However, compared
 to random search, it is not straightforward to run SH asynchronously in a
 distributed setting. Before we can decide which configuration to run next, we first
-have to collect all observations on the current rung level. This requires to synchronize at each rung level. For example, for the lowest rung level
+have to collect all observations on the current rung level. This requires to
+synchronize workers at each rung level. For example, for the lowest rung level
 $r_{min}$, we first have to evaluate all $N = \eta^K$ configurations, before we
 can promote the $\frac{1}{\eta}$ of them to the next rung level.
 
-If every trial consumed the same amount of wall-clock time, synchronization would
-not be a problem, since all results come in at the same time. However, in practice,
-we often have a high variations in training time across hyperparameter configurations.
-For example, assuming the number of filter per layer is a hyperparameter, than networks
-with smaller filter sizes require train faster in terms of runing than networks with larger filter sizes given the same amount of epochs. Especially in the case of stragglers, this might
-lead to large idling times of workers.
+In any distributed system, synchronization typically implies idle time for workers.
+First, we often observe high variations in training time across hyperparameter configurations.
+For example, assuming the number of filter per layer is a hyperparameter, then
+networks with smaller filter sizes finish training faster than networks with larger
+filter sizes, which implies idle worker time due to stragglers. Moreover, the number
+of slots in a rung level is not always a multiple of the number of workers, in which
+case some workers may even sit idle for a full batch.
 
-Figure :ref:`synchronous_sh` shows the scheduling of synchronous SH with $\eta=2$ for four different trials with two workers. We start with evaluating Trial-0 and Trial-1 for one epoch and immediately continue with the next two trials once they are finished. Now, we first have to wait until Trial-2 finishes, which takes substantially more time than the other trials, before we can promote the best two trials, i.e. Trial-0 and Trial-3 to next rung level. This causes an idiling time for Worker-1. Now, we continue with Rung 1. Also, here Trial-3 takes longer than Trial-0, which leads to an additional ideling time of Worker-0. Once, we reach Rung-2, only a the best trial, Trial-0, remains which occupies only one worker. To avoid that Worker-1 idles during that time, most implementaitons of SH continue already with the next round, and start evaluating new trials (e.g Trial-4) on the first rung.
+Figure :ref:`synchronous_sh` shows the scheduling of synchronous SH with $\eta=2$ for
+four different trials with two workers. We start with evaluating Trial-0 and Trial-1
+for one epoch and immediately continue with the next two trials once they are finished. Now, we first have to wait until Trial-2 finishes, which takes substantially more time than the other trials, before we can promote the best two trials, i.e. Trial-0 and Trial-3 to next rung level. This causes an idiling time for Worker-1. Now, we continue with Rung 1. Also, here Trial-3 takes longer than Trial-0, which leads to an additional ideling time of Worker-0. Once, we reach Rung-2, only a the best trial, Trial-0, remains which occupies only one worker. To avoid that Worker-1 idles during that time, most implementaitons of SH continue already with the next round, and start evaluating new trials (e.g Trial-4) on the first rung.
 
 ![.](img/sync_sh.svg)
 :width:`40px`
@@ -34,10 +39,25 @@ level as soon as we collected at least $\eta$ observations on the current rung l
 This rule may lead to suboptimal promotions: configurations can be promoted to the
 next rung level, which in hindsight do not compare favourably against most others
 at the same rung level. On the other hand, we get rid of all synchronization points
-this way. In practice, these suboptimal promotions have only a modest impact on performance, because the ranking of hyperparameter configurations is often consistent across rung levels. If a worker is free, but no configuration can be promoted, we start a new
-configuration with $r = r_{min}$.
+this way. In practice, such suboptimal initial promotions have only a modest impact on
+performance, not only because the ranking of hyperparameter configurations is often
+fairly consistent across rung levels, but also because rung grow over time and
+reflect the distribution of metric values at this level better and better. If a
+worker is free, but no configuration can be promoted, we start a new configuration
+with $r = r_{min}$.
 
-Figure :ref:`asha` shows the sheduling of the same configurations for ASHA. Once Trial-1 finishes, we collected the results of two trials (i.e Trial-0 and Trial-1) and immediately promote the better Trial (Trial-0) to the next rung level. After the Trial-0 finishes on Rung 1, we do not have yet enough trials yet that could be promoted to the next rung level. Hence, we continue with Rung 0 and evalaute Trial 3. At the moment Trial-3 finishes, Trial-2 is still pending. At this point we have 3 Trials evaluated on Rung-0 and one Trial evaluated already on Rung-1. Given that $\eta=2$, we cannot promote any new trial yet, assuiming that Trial-3 performs worse than Trial-0. However, once Trial-2 finishes, Trial-3 is promoted to the Rung-1. Afterwards, we collected 2 evaluatins on Rung-1, which means we can now promote Trial-0 to Rung-2. At the same time, Worker-1 continues with evaluating new trials (i.e Trial-5) on Rung-0.
+Figure :ref:`asha` shows the scheduling of the same configurations for ASHA. Once Trial-1
+finishes, we collect the results of two trials (i.e Trial-0 and Trial-1) and
+immediately promote the better of them (Trial-0) to the next rung level. After Trial-0
+finishes on rung 1, there are too few trials there in order to support a further
+promotion. Hence, we continue with rung 0 and evaluate Trial-3. Once Trial-3 finishes,
+Trial-2 is still pending. At this point we have 3 trials evaluated on rung 0 and one
+trial evaluated already on rung 1. Since Trial-3 performs worse than Trial-0 at rung 0,
+and $\eta=2$, we cannot promote any new trial yet, and Worker-1 starts Trial-4 from
+scratch instead. However, once Trial-2 finishes and
+scores worse than Trial-3, the latter is promoted towards rung 1. Afterwards, we collected 2 evaluations on rung 1,
+which means we can now promote Trial-0 towards rung 2. At the same time, Worker-1
+continues with evaluating new trials (i.e., Trial-5) on rung 0.
 
 
 ![.](img/asha.svg)
@@ -48,7 +68,8 @@ As for asynchronous random search, we will use **Syne Tune** once more.
 
 ## Objective Function
 
-As in Section :ref:`sec_rs_async`, we use the following objective function.
+Just as in Section :ref:`sec_rs_async`, we will use **Syne Tune** with the following
+objective function.
 
 ```{.python .input  n=54}
 def objective(learning_rate, batch_size, max_epochs):
@@ -82,13 +103,13 @@ config_space = {
 # We have to set this number equal to the number of GPUs that are in the machine
 # to run this notebook
 n_workers = 4
-max_wallclock_time = 900
+max_wallclock_time = 15 * 60
 ```
 
 ## Asynchronous Scheduler
 
-With our new objective function in place, the code for running ASHA is a simple
-variation of what we did for asynchronous random search.
+The code for running ASHA is a simple variation of what we did for asynchronous
+random search.
 
 ```{.python .input  n=56}
 from syne_tune.optimizer.baselines import ASHA
@@ -96,9 +117,9 @@ from syne_tune.optimizer.baselines import ASHA
 scheduler = ASHA(
     config_space,
     metric="validation_error",
-    resource_attr="epoch",
-    max_resource_attr="max_epochs",
     mode="min",
+    max_resource_attr="max_epochs",
+    resource_attr="epoch",
     type="promotion",
     grace_period=1,  # this corresponds to r_min 
     reduction_factor=2,  # this corresponds to eta
@@ -112,6 +133,7 @@ corresponds to $r_{max}$. Moreover, `grace_period` provides $r_{min}$, and
 
 Now, we can run Syne Tune as before:
 
+MS: Maybe we should do all required imports at the start? I think Aston recommended that?
 ```{.python .input  n=57}
 import logging
 
