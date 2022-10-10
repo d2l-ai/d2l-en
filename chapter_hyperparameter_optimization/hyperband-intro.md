@@ -10,30 +10,36 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 Training neural networks can be expensive even on moderate size datasets.
 For example, training a single ResNet-50 on a rather small dataset set, such as CIFAR10,
 might take 2 hours on a Amazon Elastic Cloud Compute (EC2) g4dn.xlarge instance.
-However, depending on the search space, hyperparameter optimization usually requires ten to hundrets
-of function evaluations to converge.
-Even though we can significanly speed up the overall wall-clock time of our HPO process by exploiting parallel resources (see :numref:`sec_rs_async`), this does not reduce the total amount of compute that we have to spend. 
+However, depending on the search space, hyperparameter optimization usually
+requires tens to hundreds of function evaluations to converge.
+Even though we can significantly speed up the overall wall-clock time of our HPO
+process by exploiting parallel resources (see :numref:`sec_rs_async`), this does
+not reduce the total amount of compute that we have to spend. 
 
-*Can we speed up the evaluation of hyperparameter configurations?* Methods such as random search allocate the exact same amount or resources, for example number of epochs, training data points, etc, to each hyperparameter configuration.
-The figure below depicts learning curves of a set of neural networks trained with different
-hyperparameter configurations. After a few
-epochs we are already able to visually distinguish between well-performing and
-poorly-performing configurations. However, learning curves are noisy, and we might
-still require the full amount of 100 epochs to identify the best performing configuration.
+*Can we speed up the evaluation of hyperparameter configurations?* Methods such
+as random search allocate the exact same amount or resources (e.g., number
+of epochs, training data points) to each hyperparameter configuration. The
+figure below depicts learning curves of a set of neural networks trained with
+different hyperparameter configurations. After a few epochs we are already able
+to visually distinguish between well-performing and poorly-performing configurations.
+However, learning curves are noisy, and we might still require the full amount of
+100 epochs to identify the best performing configuration.
 
 <!-- ![Learning curves of random hyperparameter configurations](../../img/samples_lc.svg) -->
 ![Learning curves of random hyperparameter configurations](img/samples_lc.svg)
 :width:`400px`
 :label:`img_samples_lc`
 
-The idea of multi-fidelity hyperparameter optimization is to allocate more resources to promising configurations and early-stop the evaluation of poorly performing ones. This speeds up the optimization process, since we
-have a higher throughput of configurations that we can try.
+The idea of multi-fidelity hyperparameter optimization is to allocate more resources
+to promising configurations and stop evaluations of poorly performing ones early.
+This speeds up the optimization process, since we have a higher throughput of
+configurations that we can try.
 
 More formally, we expand our definition in Section :numref:`sec_definition_hpo`,
 such that our objective function $f(\mathbf{x}, r)$ gets an additional input
-$r \in [r_{min}, r_{max}]$ that specifies the amount of resource that we are
+$r \in [r_{min}, r_{max}]$, specifying the amount of resource that we are
 willing to spend for the evaluation of $\mathbf{x}$. We assume that the
-error $f(\mathbf{x}, r)$ decreases with $r$, where as the computational
+error $f(\mathbf{x}, r)$ decreases with $r$, whereas the computational
 cost $c(\mathbf{x}, r)$ increases (the latter should be affine linear
 in $r$). Typically, $r$ represents the number of epochs for training the neural
 network. But also other resources are possible, such as the training dataset
@@ -52,15 +58,16 @@ longer, until at least one trial reaches $r_{max}$ epochs.
 More formally, consider a minimum budget $r_{min}$, for example 1 epoch, a maximum
 budget $r_{max}$, for example `max_epochs` in our previous example, and a halving
 constant $\eta\in\{2, 3, \dots\}$. For simplicity, assume that $r_{max} = r_{min}
-\eta^K$, with $K \in \mathbb{I}$ .The number of initial
-configurations is then $N = \eta^K$. Let us define *rung levels* $\mathcal{R} =
+\eta^K$, with $K \in \mathbb{I}$ . The number of initial configurations is then
+$N = \eta^K$. Let us define *rung levels* $\mathcal{R} =
 \{ r_{min}, r_{min}\eta, r_{min}\eta^2, \dots, r_{max} \}$. 
 <!--In general, a trial
 is trained until reaching a rung level, then evaluated there, and the validation
 errors of all trials at a rung level are used to decide which of them to discard.-->
 We start with running $N$ trials until the first rung level $r_{min}$. Sorting the validation
 errors, we keep the top $1 / \eta$ fraction (which amounts to $\eta^{K-1}$ configurations) and
-discard all the rest. The surviving trials are trained for the next rung level, i.e $r_{min}\eta$ epochs, and the process is repeated. In each round, a $1 / \eta$
+discard all the rest. The surviving trials are trained for the next rung level,
+i.e $r_{min}\eta$ epochs, and the process is repeated. In each round, a $1 / \eta$
 fraction of trials survives and their training continues with a $\eta$ times larger budget. With
 this particular choice of $N$, only a single trial will be trained to the full
 budget $r_{max}$. Finally, once we finished one round of SH, we start the next
@@ -295,7 +302,9 @@ class HyperbandScheduler(d2l.HPOScheduler): #@save
     def suggest(self):
         return self.successive_halving.suggest()        
 ```
-The update function keeps track of the individual brackets. If we finished a brachets, we re-initialize Successive Halving with different $r_{min}$ and $s$.
+The update function keeps track of the individual brackets. Once we finished a bracket,
+we move on to the next, i.e. re-initialize Successive Halving with different $r_{min}$
+and $s$.
 
 ```{.python .input  n=9}
 %%tab all

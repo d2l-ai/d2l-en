@@ -17,7 +17,10 @@ Unfortunately, we cannot simply adjust these hyperparameters by minimizing the t
 
 Without a different form of automation, hyperparameters have to be set manually in a
 trial-and-error fashion, in what amounts to a time-consuming and difficult part of machine
-learning workflows :cite:`hpo`. For example, consider training a ResNet :ref:`sec_resnet` on CIFAR-10, which takes on an Amazon Elastic Cloud Compute (EC2) g4dn.xlarge instance more than 2 hours. Even if we manually try only a small set of hyperparameters configurations (~10) in sequence, this would already take us roughly one day. To make matters worse, hyperparameters are usually not directly transferable
+learning workflows :cite:`hpo`. For example, consider training a ResNet :ref:`sec_resnet`
+on CIFAR-10, which requires more than 2 hours on an Amazon Elastic Cloud Compute (EC2)
+g4dn.xlarge instance. Even just trying ten hyperparameters configurations in sequence, this
+would already take us roughly one day. To make matters worse, hyperparameters are usually not directly transferable
 across architectures and datasets :cite:`feurer-arxiv22`,`wistuba-ml18`,`bardenet-icml13a`,
 and need to be re-optimized for every new task. Also, for most hyperparameters,
 there are no rule-of-thumbs, and expert knowledge is required to find sensible values.
@@ -86,7 +89,7 @@ There is no simple way to compute gradients of $f$ with respect to $\mathbf{x}$,
 
 The training of neural networks is stochastic (e.g., weights are randomly initialized, mini-batches are randomly sampled), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
 
-Faced with all these challenges, we usually try to identify a small set of well performing hyperparameter configurations quickly, instead of hitting the global optima exactly. However, due to large computational demands of most neural networks models, even this can take days or weeks of compute. We will explore in Section :numref:`sec_mf_hpo`, how we can speed-up the optimization process by either distributing the search or using cheaper-to-evaluate approximations of the objective function.
+Faced with all these challenges, we usually try to identify a small set of well performing hyperparameter configurations quickly, instead of hitting the global optima exactly. However, due to large computational demands of most neural networks models, even this can take days or weeks of compute. We will explore in Section :numref:`sec_mf_hpo` how we can speed-up the optimization process by either distributing the search or using cheaper-to-evaluate approximations of the objective function.
 
 
 Now, since we would like to optimize the validation error, we need to add a function computing this quantity.
@@ -160,8 +163,10 @@ The configuration spaces plays an important role for hyperparameter optimization
 ## Random Search
 
 Now, we look at the first algorithm to solve our hyperparameter optimization problem: random search. 
-The main idea of random search is to independently sample from the configuration space until a predefined budget (e.g maximum number of iterations) is exhausted and to return the best observed configuration. The evaluation can be executed sequentially (as we do here) or in parallel (see Section :numref:`sec_rs`).
-
+The main idea of random search is to independently sample from the configuration space until
+a predefined budget (e.g maximum number of iterations) is exhausted and to return the best
+observed configuration. All evaluations can be executed independently in parallel (see Section
+:numref:`sec_rs`), but here we use a sequential loop for simplicity.
 
 ```{.python .input  n=7}
 import numpy as np
@@ -187,9 +192,16 @@ print(f'optimal learning rate = {values[best_idx]}')
 Arguably because of its simplicity, random search is one of the most frequently used HPO algorithms. It doesn't require any sophisticated implementation and can be applied to any hyperparameter type.
 
 
-Unfortunately random search comes with a few shortcomings. First, it does not adapt the sampling distribution based on the previous observations it collected. Hence, it is equally likely to sample a poorly performing configurations  than a better performing configuration. Second, the same amount of resources are spend for all configurations, even though they are less likely to outperform previously seen configurations.
+Unfortunately random search comes with a few shortcomings. First, it does not adapt the sampling
+distribution based on the previous observations it collected. Hence, it is equally likely to
+sample a poorly performing configurations than a better performing configuration. Second, the same
+amount of resources is spent for all configurations, even though some may show poor initial
+performance and are less likely to outperform previously seen configurations.
 
-In the next sections we will look at more sample efficient hyperparameter optimization algorithms that overcome the shortcomings of random search by using a model to guide the search. We will also look at algorithms that automatically stop the evaluation process of poorly performing configurations.
+In the next sections we will look at more sample efficient hyperparameter optimization
+algorithms that overcome the shortcomings of random search by using a model to guide the search.
+We will also look at algorithms that automatically stop the evaluation process of poorly
+performing configurations.
 
 # Summary
 
