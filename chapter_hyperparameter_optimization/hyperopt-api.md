@@ -25,8 +25,11 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 
 Before we dive into different techniques, we will first discuss a basic code structure that allows us to efficiently implement various HPO algorithms. In general, all HPO
-algorithms considered here need to implement two decision making primitives, **searching** and **scheduling**. First, they need to sample new hyperparameter configurations, which often involves some kind of search over the configuration space. Additional, for each configuration an HPO algorithm needs to schedule its evaluation and how much resources should be allocated to it.
-Once we started to evaluate configurations, we will refer to it as a **trial**. We map these decisions to two classes,
+algorithms considered here need to implement two decision making primitives, **searching** and **scheduling**.
+First, they need to sample new hyperparameter configurations, which often involves some kind of search over
+the configuration space. Second, for each configuration an HPO algorithm needs to schedule its evaluation
+and decide how many resources to allocate for it.
+Once we start to evaluate a configuration, we will refer to it as a **trial**. We map these decisions to two classes,
 `HPOSearcher` and `HPOScheduler`. On top of that, we also provide a `HPOTuner` class that executes the optimization process.
 
 This concept of scheduler and searcher is also implemented in popular HPO libraries, such as Syne Tune :cite:`salinas-automl22`, Ray Tune :cite:`liaw-arxiv18` or Optuna :cite:`akiba-sigkdd19`.
@@ -34,7 +37,14 @@ This concept of scheduler and searcher is also implemented in popular HPO librar
 ### Searcher
 
 Below we define a base class for searchers, which provides a new candidate
-configuration through the `sample_configuration` function. A trivial way to to implement this function, would be to sample configurations uniformly at random, as we did for Random Search in the previous Section :ref:`sec_what_is_hpo`. More sophisticated algorithms, such as Bayesian optimization :ref:`sec_bo` will make these decisions based on the performance of previous trials. As a result, these algorithms do not sample uniformly at random, but are able to sample more promising candidates over time. To update the history of previous trials, such that we can exploit these observation to adjust our sample distribution, we add the `update` function.
+configuration through the `sample_configuration` function. A simple way to
+implement this function would be to sample configurations uniformly at random,
+as we did for Random Search in the previous Section :ref:`sec_what_is_hpo`.
+More sophisticated algorithms, such as Bayesian optimization :ref:`sec_bo` will
+make these decisions based on the performance of previous trials. As a result,
+these algorithms are able to sample more promising candidates over time. We add
+the `update` function in order to update the history of previous trials, which can
+then be exploited to improve our sampling distribution.
 
 ```{.python .input  n=3}
 %%tab mxnet
@@ -158,7 +168,9 @@ class BasicScheduler(HPOScheduler): #@save
 ### Tuner
 
 Finally, we need a component that runs the scheduler / searcher and does some book-keeping
-of the results. The following code implements a sequential execution of the HPO trials that evaluates one training job after the next and will serve as a basic example. We will later use **Syne Tune** for more sophisticated distributed HPO cases.
+of the results. The following code implements a sequential execution of the HPO trials that
+evaluates one training job after the next and will serve as a basic example. We will later
+use **Syne Tune** for more sophisticated distributed HPO cases.
 
 ```{.python .input  n=7}
 %%tab pytorch
@@ -178,11 +190,8 @@ class HPOTuner(d2l.HyperParameters): #@save
         for i in range(number_of_trials):
             start_time = time.time()
             config = self.scheduler.suggest()
-        
             error = self.objective(**config)
-        
             self.scheduler.update(config, error)
-        
             runtime = time.time() - start_time
             self.bookkeeping(config, error.cpu().numpy(), runtime)        
 ```
@@ -230,8 +239,9 @@ def bookkeeping(self, config, error, runtime):
 
 ### Example: Optimizing the Hyperparameters of a Convolutional Neural Network
 
-
-We now use our new implementation of random search to optimize the *batch size* and *learning rate* of a convolutional neural networks from :ref:`sec_alexnet`. For that, we first have to define the objective function.
+We now use our new implementation of random search to optimize the *batch size*
+and *learning rate* of a convolutional neural networks from :ref:`sec_alexnet`.
+For that, we first have to define the objective function.
 
 ```{.python .input  n=6}
 %%tab all
@@ -293,10 +303,21 @@ for time_stamp, error in zip(tuner.cumulative_runtime, tuner.incumbent_trajector
 ## Comparing HPO Algorithms
 
 Just as with training algorithms or model architectures, it is important to understand how to best
-compare different HPO algorithms. Each HPO run depends on mostly two sources of randomness:
-the random effects of the training process, such as random weight initialization or mini-batch ordering, and, the intrinsic randomness of the HPO algorithm itself, such as the random sampling of random search. Hence, when comparing different algorithms, it is crucial to run each experiment several times and report statistics, such as mean or median, across a population of multiple repetitions of an algorithm based on different seeds of the random number generator.
+compare different HPO algorithms. Each HPO run depends on two major sources of randomness:
+the random effects of the training process, such as random weight initialization or mini-batch
+ordering, and the intrinsic randomness of the HPO algorithm itself, such as the random sampling
+of random search. Hence, when comparing different algorithms, it is crucial to run each experiment
+several times and report statistics, such as mean or median, across a population of multiple
+repetitions of an algorithm based on different seeds of the random number generator.
 
-To illustrate this, we compare random search (see :ref:`sec_rs`) and Bayesian optimization, which we will discuss in Section :numref:`sec_bo`, for optimizing the hyperparameters of a feed-forward neural network. Each algorithm was evaluated $50$ times with a different random seed. The solid line indicates the average performance of the incumbent across these $50$ repetitions and the dashed line the standard deviation. We can see that random search and Bayesian optimization perform roughly the same up to ~1000 seconds, but Bayesian optimization can make use of the past observation to identify better configurations and thus quickly outperforms random search afterwards.
+To illustrate this, we compare random search (see :ref:`sec_rs`) and Bayesian optimization,
+which we will introduce in Section :numref:`sec_bo`, for optimizing the hyperparameters of a
+feed-forward neural network. Each algorithm was evaluated $50$ times with a different random
+seed. The solid line indicates the average performance of the incumbent across these $50$
+repetitions and the dashed line the standard deviation. We can see that random search and
+Bayesian optimization perform roughly the same up to ~1000 seconds, but Bayesian optimization
+can make use of the past observation to identify better configurations and thus quickly
+outperforms random search afterwards.
 
 
 ![Example any-time performance plot to compare two algorithms A and B](img/example_anytime_performance.png)
