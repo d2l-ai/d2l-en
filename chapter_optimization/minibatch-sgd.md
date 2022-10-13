@@ -354,22 +354,25 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
     w.attach_grad()
     b.attach_grad()
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
-    # Train
+    
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
-    n, timer = 0, d2l.Timer()
-    for _ in range(num_epochs):
-        for X, y in data_iter:
+                            xlim=[1, num_epochs+1], ylim=[0.22, 0.45])
+    len_data_iter = len(data_iter);
+    k, timer = np.floor((len_data_iter-1)/5) + 1 , d2l.Timer()
+    
+    # Train
+    for epoch in range(num_epochs):
+        for i, (X, y) in enumerate(data_iter):
             with autograd.record():
                 l = loss(net(X), y).mean()
             l.backward()
             trainer_fn([w, b], states, hyperparams)
-            n += X.shape[0]
-            if n % 200 == 0:
+            if i % k == 0 or i+1 == len_data_iter:
                 timer.stop()
-                animator.add(n/X.shape[0]/len(data_iter),
+                animator.add(epoch+1 + i/len_data_iter,
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
+
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 ```
@@ -384,21 +387,24 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
                      requires_grad=True)
     b = torch.zeros((1), requires_grad=True)
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
-    # Train
+   
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
-    n, timer = 0, d2l.Timer()
-    for _ in range(num_epochs):
-        for X, y in data_iter:
+                            xlim=[1, num_epochs+1], ylim=[0.22, 0.45])
+    len_data_iter = len(data_iter);
+    k, timer = np.floor((len_data_iter-1)/5) + 1 , d2l.Timer()
+    
+    # Train
+    for epoch in range(num_epochs):
+        for i, (X, y) in enumerate(data_iter):
             l = loss(net(X), y).mean()
             l.backward()
             trainer_fn([w, b], states, hyperparams)
-            n += X.shape[0]
-            if n % 200 == 0:
+            if i % k == 0 or i+1 == len_data_iter:
                 timer.stop()
-                animator.add(n/X.shape[0]/len(data_iter),
+                animator.add(epoch+1 + i/len_data_iter,
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
+
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 ```
@@ -412,28 +418,27 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
     w = tf.Variable(tf.random.normal(shape=(feature_dim, 1),
                                    mean=0, stddev=0.01),trainable=True)
     b = tf.Variable(tf.zeros(1), trainable=True)
+    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
+   
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[1, num_epochs+1], ylim=[0.22, 0.45])
+    len_data_iter = tf.data.experimental.cardinality(data_iter).numpy();
+    k, timer = np.floor((len_data_iter-1)/5) + 1 , d2l.Timer()
 
     # Train
-    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
-    n, timer = 0, d2l.Timer()
-
-    for _ in range(num_epochs):
-        for X, y in data_iter:
+    for epoch in range(num_epochs):
+        for i, (X, y) in enumerate(data_iter):
           with tf.GradientTape() as g:
             l = tf.math.reduce_mean(loss(net(X), y))
 
           dw, db = g.gradient(l, [w, b])
           trainer_fn([w, b], [dw, db], states, hyperparams)
-          n += X.shape[0]
-          if n % 200 == 0:
+          if i % k == 0 or i+1 == len_data_iter:
               timer.stop()
-              p = n/X.shape[0]
-              q = p/tf.data.experimental.cardinality(data_iter).numpy()
-              r = (d2l.evaluate_loss(net, data_iter, loss),)
-              animator.add(q, r)
+              animator.add(epoch+1 + i/len_data_iter,
+                           (d2l.evaluate_loss(net, data_iter, loss),))
               timer.start()
+
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 ```
@@ -496,21 +501,25 @@ def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
     net.initialize(init.Normal(sigma=0.01))
     trainer = gluon.Trainer(net.collect_params(), tr_name, hyperparams)
     loss = gluon.loss.L2Loss()
+    
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
-    n, timer = 0, d2l.Timer()
-    for _ in range(num_epochs):
-        for X, y in data_iter:
+                            xlim=[1, num_epochs+1], ylim=[0.22, 0.45])
+    len_data_iter = len(data_iter);
+    k, timer = np.floor((len_data_iter-1)/5) + 1 , d2l.Timer()
+    
+    #Train
+    for epoch in range(num_epochs):
+        for i, (X, y) in enumerate(data_iter):
             with autograd.record():
                 l = loss(net(X), y)
             l.backward()
             trainer.step(X.shape[0])
-            n += X.shape[0]
-            if n % 200 == 0:
+            if i % k == 0 or i+1 == len_data_iter:
                 timer.stop()
-                animator.add(n/X.shape[0]/len(data_iter),
+                animator.add(epoch+1 + i/len_data_iter,
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
+
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 ```
 
@@ -520,31 +529,33 @@ def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     # Initialization
     net = nn.Sequential(nn.Linear(5, 1))
+    optimizer = trainer_fn(net.parameters(), **hyperparams)
+    loss = nn.MSELoss(reduction='none')
     def init_weights(module):
         if type(module) == nn.Linear:
             torch.nn.init.normal_(module.weight, std=0.01)
     net.apply(init_weights)
-
-    optimizer = trainer_fn(net.parameters(), **hyperparams)
-    loss = nn.MSELoss(reduction='none')
+    
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
-    n, timer = 0, d2l.Timer()
-    for _ in range(num_epochs):
-        for X, y in data_iter:
+                            xlim=[1, num_epochs+1], ylim=[0.22, 0.45])
+    len_data_iter = len(data_iter);
+    k, timer = np.floor((len_data_iter-1)/5) + 1 , d2l.Timer()
+    
+    for epoch in range(num_epochs):
+        for i, (X, y) in enumerate(data_iter):
             optimizer.zero_grad()
             out = net(X)
             y = y.reshape(out.shape)
             l = loss(out, y)
             l.mean().backward()
             optimizer.step()
-            n += X.shape[0]
-            if n % 200 == 0:
+            if i % k == 0 or i+1 == len_data_iter:
                 timer.stop()
                 # `MSELoss` computes squared error without the 1/2 factor
-                animator.add(n/X.shape[0]/len(data_iter),
+                animator.add(epoch+1 + i/len_data_iter,
                              (d2l.evaluate_loss(net, data_iter, loss) / 2,))
                 timer.start()
+
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 ```
 
@@ -558,27 +569,29 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
             kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
     optimizer = trainer_fn(**hyperparams)
     loss = tf.keras.losses.MeanSquaredError()
+
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
-    n, timer = 0, d2l.Timer()
-    for _ in range(num_epochs):
-        for X, y in data_iter:
+                            xlim=[1, num_epochs+1], ylim=[0.22, 0.45])
+    len_data_iter = tf.data.experimental.cardinality(data_iter).numpy();
+    k, timer = np.floor((len_data_iter-1)/5) + 1 , d2l.Timer()
+   
+    #Train
+    for epoch in range(num_epochs):
+        for i, (X, y) in enumerate(data_iter):
             with tf.GradientTape() as g:
                 out = net(X)
                 l = loss(y, out)
                 params = net.trainable_variables
                 grads = g.gradient(l, params)
             optimizer.apply_gradients(zip(grads, params))
-            n += X.shape[0]
-            if n % 200 == 0:
+            if i % k == 0 or i+1 == len_data_iter:
                 timer.stop()
-                p = n/X.shape[0]
-                q = p/tf.data.experimental.cardinality(data_iter).numpy()
                 # `MeanSquaredError` computes squared error without the 1/2
                 # factor
-                r = (d2l.evaluate_loss(net, data_iter, loss) / 2,)
-                animator.add(q, r)
+                animator.add(epoch+1 + i/len_data_iter,
+                             (d2l.evaluate_loss(net, data_iter, loss) / 2,))
                 timer.start()
+
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 ```
 
