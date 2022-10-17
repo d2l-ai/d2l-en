@@ -5,7 +5,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # What is Hyperparameter Optimization?
 :label:`sec_what_is_hpo`
 
-As we have seen in the previous chapters, deep neural networks come with a large number parameters or weights that are learned during training. On top of these, every neural network has additional **hyperparameters** that need to be configured by the user.
+As we have seen in the previous chapters, deep neural networks come with a large number of parameters or weights that are learned during training. On top of these, every neural network has additional **hyperparameters** that need to be configured by the user.
 For example, to ensure that stochastic gradient descent converges to a local optimum of the training loss :ref:`chap_optimization`, we have to adjust the learning rate and batch size. To avoid overfitting on the training dataset :ref:`sec_polynomial`, we might have to set regularization parameters, such as weight decay : ref:`sec_weight_decay` or dropout : ref:`sec_dropout`. We can define the capacity and inductive bias of the model by setting the number of layers and number of units or filters per layer (i.e., the effective number
 of weights).
 
@@ -148,21 +148,26 @@ config_space = {
 Each hyperparameter has a data type, such as `float` for `learning_rate`, as well as a closed bounded range
 (i.e., lower and upper bounds). We usually assign a prior distribution (e.g uniform or log-uniform) to each hyperparameter. Some positive parameters, such as `learning_rate`, are best represented on a logarithmic scale as optimal values can differ by several orders of magnitude, while others, such as momentum, come with linear scale.
 
-Below we show a simple example of a configuration space consisting of typical hyperparameters of feed-forward neural networks including their type and standard ranges.
+Below we show a simple example of a configuration space consisting of typical hyperparameters of a multi-layer perceptron including their type and standard ranges.
 
-![Example configuration space for a simple neural network architecture](img/example_search_space.png)
-:width:`40px`
-:label:`example_search_space`
+
+| Name | Type | Values | log-scale |
+| :----: | :----: | :----: | :----: |
+| learning rate | float | $[10^{-6}$, $10^{-1}]$ | X |
+| batch size   | integer | $[8, 256]$   | X  |
+| activation function | categorical | $\{'tanh', 'relu'\}$   | - |
+| number of units | integer | $[32, 1024]$   | X  |
+| number of layers | integer | $[1, 6]$   | - |
 
 
 In general, the structure of the configuration space $\mathcal{X}$ can be complex and it can be quite different from $\mathbb{R}^d$. In practice, some hyperparameters may depend on the value of others. For example, if we try to tune both the number of layers and widths per layer for a multi-layer perceptron,
 the width of the $l$-th layer is relevant only if the network has at least $l+1$ layers. These advanced HPO problems are beyond the scope of this chapter. We refer the interested reader to :cite:`hutter-lion11a`,`jenatton-icml17a`, `baptista-icml18a`.
 
-The configuration spaces plays an important role for hyperparameter optimization, since no algorithms can find something that is not included in the configuration space. On the other hand, if the ranges are too large, the time to find a well performing configurations might become infeasible.
+The configuration spaces plays an important role for hyperparameter optimization, since no algorithms can find something that is not included in the configuration space. On the other hand, if the ranges are too large, the computation budget to find well performing configurations might become infeasible.
 
 ## Random Search
 
-Now, we look at the first algorithm to solve our hyperparameter optimization problem: random search. 
+Now, we look at the first algorithm to solve our hyperparameter optimization problem: *random search*. 
 The main idea of random search is to independently sample from the configuration space until
 a predefined budget (e.g maximum number of iterations) is exhausted and to return the best
 observed configuration. All evaluations can be executed independently in parallel (see Section
@@ -189,11 +194,11 @@ best_idx = np.argmin(errors)
 print(f'optimal learning rate = {values[best_idx]}')
 ```
 
-Arguably because of its simplicity, random search is one of the most frequently used HPO algorithms. It doesn't require any sophisticated implementation and can be applied to any hyperparameter type.
+Arguably because of its simplicity, random search is one of the most frequently used HPO algorithms. It doesn't require any sophisticated implementation and can be applied to any configuration space as long as we can define some probability distribution for each hyperparameter.
 
 
-Unfortunately random search comes with a few shortcomings. First, it does not adapt the sampling
-distribution based on the previous observations it collected. Hence, it is equally likely to
+Unfortunately random search also comes with a few shortcomings. First, it does not adapt the sampling
+distribution based on the previous observations it collected so far. Hence, it is equally likely to
 sample a poorly performing configurations than a better performing configuration. Second, the same
 amount of resources is spent for all configurations, even though some may show poor initial
 performance and are less likely to outperform previously seen configurations.
@@ -201,7 +206,7 @@ performance and are less likely to outperform previously seen configurations.
 In the next sections we will look at more sample efficient hyperparameter optimization
 algorithms that overcome the shortcomings of random search by using a model to guide the search.
 We will also look at algorithms that automatically stop the evaluation process of poorly
-performing configurations.
+performing configurations to speed up the optimization process.
 
 # Summary
 

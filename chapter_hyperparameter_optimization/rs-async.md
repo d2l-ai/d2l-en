@@ -7,7 +7,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 :label:`sec_rs_async`
 
-As we have seen in the previous Section, we might have to wait hours or even days before random search returns a good hyperparameter configuration. In practice, we have often access to a pool of resources such as multiple GPUs on the same machine or multiple machines wiht a single GPU. This begs the questios: *How do we  efficiently distribute random search?*
+As we have seen in the previous Section :numref:`sec_api_hpo`, we might have to wait hours or even days before random search returns a good hyperparameter configuration. In practice, we have often access to a pool of resources such as multiple GPUs on the same machine or multiple machines wiht a single GPU. This begs the questios: *How do we  efficiently distribute random search?*
 
 In general, we distinguish between synchronous and asynchronous parallel hyperparameter
 optimization (see Figure :numref:`distributed_scheduling`). In the synchronous setting,
@@ -16,7 +16,7 @@ batch. Consider search spaces that contain hyperparameters such as the number of
 or number of layers of a deep neural network. Hyperparameter configurations that contain
 large values for these hyperparameters will naturally take more time to finish, and all
 other trials in the same batch will have to wait at synchronisation points (grey area
-in Figure :numref:`distributed_scheduling`).
+in Figure :numref:`distributed_scheduling`) before we can continue the optimization process.
 
 In the asynchronous setting we immediately schedule a new trial as soon as resources
 become available. This will optimally exploit our resources, since we can avoid any
@@ -24,14 +24,12 @@ synchronisation overhead. For random search, each new hyperparameter configurati
 is chosen independently of all others, and in particular without exploiting
 observations from any prior evaluation. This means we can trivally parallelize random
 search asynchronously. This is not straight-forward with more sophisticated methods
-that make decsision based on previous obvervations (see Section :numref:`sec_sh_async`).
+that make decsision based on previous observations (see Section :numref:`sec_sh_async`).
 While we need access to more resources than in the sequential setting, asynchronous
 random search exhibits a linear speed-up, in that a certain performance is reached
 $K$ times faster if $K$ trials can be run in parallel. 
 
 
-MS: Small thing, but if trial_id 2 and 3 were flipped, the async plot would look
-nicer (namely, trial_id's are assigned based on when they start).
 ![Distributing the hyperparameter optimization process either synchronously or asynchronously. Compared to the sequential setting, we can reduce the overal wall-clock time while keep the total compute constant. Synchronous scheduling might lead to ideling workers in the case of stragglers.](img/distributed_scheduling.svg)
 :width:`40px`
 :label:`distributed_scheduling`
@@ -43,11 +41,8 @@ and execution is difficult to implement from scratch. We will use **Syne Tune**
 :cite:`salinas-automl22`, which provides us with a simple interface for asynchronous
 HPO. Syne Tune is designed to be run with different execution back-ends, and the
 interested reader is invited to study its simple APIs in order to learn more about
-distributed HPO. Syne Tune is installed via:
+distributed HPO. Syne Tune can be installed via:
 
-MS: In the spirit of keeping things simple and free of unneeded dependencies, we
-should try whether `syne_tune[gpsearchers]` is also sufficient for running all examples
-in this chapter.
 ```{.python .input}
 !pip install 'syne-tune[extra]'
 ```
@@ -57,8 +52,6 @@ in this chapter.
 First, we have to define a new objective function such that it now returns the performance back
 to Syne Tune via the `report(...)` function.
 
-MS: Are you sure this trainer does not start from scratch (with random weight initializations)
-in every epoch?
 ```{.python .input  n=34}
 def objective(learning_rate, batch_size, max_epochs):
     from d2l import torch as d2l    
@@ -68,7 +61,7 @@ def objective(learning_rate, batch_size, max_epochs):
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     report = Reporter() 
     for epoch in range(1, max_epochs + 1):
-        trainer.fit(model=model, data=data)
+        trainer.fit_epoch(model=model, data=data)
         validation_error = trainer.validate(model=model).cpu().numpy()
         report(epoch=epoch, validation_error=float(validation_error))
 ```
@@ -76,10 +69,10 @@ def objective(learning_rate, batch_size, max_epochs):
 ## Asynchronous Scheduler
 
 First, we define the number of workers that evaluate trials concurrently. We also need to specify
-how long we want to run Random Search, by defining an upper limit on the total wall-clock time.
+how long we want to run random search, by defining an upper limit on the total wall-clock time.
 
 ```{.python .input  n=37}
-n_workers = 4  # We have to set this number equal to the number of GPUs that are in the machine to run this notebook
+n_workers = 2  # We have to set this number equal to the number of GPUs that are in the machine to run this notebook
 max_wallclock_time = 15 * 60
 ```
 
@@ -106,9 +99,7 @@ config_space = {
 }
 ```
 
-Next, we need to specify the back-end for job executions. The simplest choice in Syne
-Tune is the local back-end, which runs on the given instance and executes parallel jobs
-as sub-processes.
+Next, we need to specify the back-end for job executions. Here we just consider the distribution on a local machine where parallel jobs are executed as sub-processes, but frameworks such as Syne Tune also provide functionality to distributed the search on cloud environments, for example SageMaker.
 
 ```{.python .input  n=40}
 from syne_tune.backend.python_backend import PythonBackend

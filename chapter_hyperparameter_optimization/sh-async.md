@@ -27,7 +27,7 @@ case some workers may even sit idle for a full batch.
 
 Figure :ref:`synchronous_sh` shows the scheduling of synchronous SH with $\eta=2$ for
 four different trials with two workers. We start with evaluating Trial-0 and Trial-1
-for one epoch and immediately continue with the next two trials once they are finished. Now, we first have to wait until Trial-2 finishes, which takes substantially more time than the other trials, before we can promote the best two trials, i.e. Trial-0 and Trial-3 to next rung level. This causes an idiling time for Worker-1. Now, we continue with Rung 1. Also, here Trial-3 takes longer than Trial-0, which leads to an additional ideling time of Worker-0. Once, we reach Rung-2, only a the best trial, Trial-0, remains which occupies only one worker. To avoid that Worker-1 idles during that time, most implementaitons of SH continue already with the next round, and start evaluating new trials (e.g Trial-4) on the first rung.
+for one epoch and immediately continue with the next two trials once they are finished. Now, we first have to wait until Trial-2 finishes, which takes substantially more time than the other trials, before we can promote the best two trials, i.e. Trial-0 and Trial-3 to the next rung level. This causes an idiling time for Worker-1. Now, we continue with Rung 1. Also, here Trial-3 takes longer than Trial-0, which leads to an additional ideling time of Worker-0. Once, we reach Rung-2, only the best trial, Trial-0, remains which occupies only one worker. To avoid that Worker-1 idles during that time, most implementaitons of SH continue already with the next round, and start evaluating new trials (e.g Trial-4) on the first rung.
 
 ![.](img/sync_sh.svg)
 :width:`40px`
@@ -41,10 +41,10 @@ next rung level, which in hindsight do not compare favourably against most other
 at the same rung level. On the other hand, we get rid of all synchronization points
 this way. In practice, such suboptimal initial promotions have only a modest impact on
 performance, not only because the ranking of hyperparameter configurations is often
-fairly consistent across rung levels, but also because rung grow over time and
+fairly consistent across rung levels, but also because rungs grow over time and
 reflect the distribution of metric values at this level better and better. If a
 worker is free, but no configuration can be promoted, we start a new configuration
-with $r = r_{min}$.
+with $r = r_{min}$, i.e the first rung level.
 
 Figure :ref:`asha` shows the scheduling of the same configurations for ASHA. Once Trial-1
 finishes, we collect the results of two trials (i.e Trial-0 and Trial-1) and
@@ -88,7 +88,14 @@ def objective(learning_rate, batch_size, max_epochs):
 We also use the same configuration space as before
 
 ```{.python .input  n=55}
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+from syne_tune import Tuner, StoppingCriterion
+from syne_tune.backend.python_backend import PythonBackend
 from syne_tune.config_space import randint, loguniform
+from syne_tune.optimizer.baselines import ASHA
 
 max_epochs = 4
 
@@ -112,8 +119,6 @@ The code for running ASHA is a simple variation of what we did for asynchronous
 random search.
 
 ```{.python .input  n=56}
-from syne_tune.optimizer.baselines import ASHA
-
 scheduler = ASHA(
     config_space,
     metric="validation_error",
@@ -133,15 +138,7 @@ corresponds to $r_{max}$. Moreover, `grace_period` provides $r_{min}$, and
 
 Now, we can run Syne Tune as before:
 
-MS: Maybe we should do all required imports at the start? I think Aston recommended that?
 ```{.python .input  n=57}
-import logging
-
-logging.basicConfig(level=logging.INFO)
-
-from syne_tune import Tuner, StoppingCriterion
-from syne_tune.backend.python_backend import PythonBackend
-
 trial_backend = PythonBackend(tune_function=objective, config_space=config_space)
 
 stop_criterion = StoppingCriterion(
