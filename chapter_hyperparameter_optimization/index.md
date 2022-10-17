@@ -14,6 +14,8 @@ In this chapter, we will first introduce the basics of hyperparameter optimizati
 
 hyperopt-intro
 hyperopt-api
+rs-async.md
 hyperband-intro
+sh-async.md
 ```
 
