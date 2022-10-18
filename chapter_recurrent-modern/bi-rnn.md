@@ -29,7 +29,7 @@ but "not" seems incompatible with the third sentences.
 
 
 Fortunately, a simple technique transforms any unidirectional RNN 
-into a bidrectional RNN :cite:`Schuster.Paliwal.1997`.
+into a bidirectional RNN :cite:`Schuster.Paliwal.1997`.
 We simply implement two unidirectional RNN layers
 chained together in opposite directions 
 and acting on the same input (:numref:`fig_birnn`).
