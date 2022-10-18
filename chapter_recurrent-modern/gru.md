@@ -207,7 +207,6 @@ except that the update equations are more complex.
 %%tab all
 @d2l.add_to_class(GRUScratch)
 def forward(self, inputs, H=None):
-    matmul_H = lambda A, B: d2l.matmul(A, B) if H is not None else 0
     outputs = []
     for X in inputs:
         Z = d2l.sigmoid(d2l.matmul(X, self.W_xz) + (
@@ -219,7 +218,7 @@ def forward(self, inputs, H=None):
                            d2l.matmul(R * H, self.W_hh) + self.b_h)
         H = Z * H + (1 - Z) * H_tilde
         outputs.append(H)
-    return outputs, (H, )
+    return outputs, H
 ```
 
 ### Training
