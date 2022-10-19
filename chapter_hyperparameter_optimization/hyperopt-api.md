@@ -255,4 +255,8 @@ outperforms random search afterwards.
 
 ## Summary
 
+This section layed out a simple, yet flexible interface to implement various HPO algorithms that we will look at in this chapter. Similar interfaces can be found in popular open-source HPO frameworks.
+We also looked at how we can compare HPO algorithms, and potential pitfall one needs to be aware. 
+
+
 ## Exercise

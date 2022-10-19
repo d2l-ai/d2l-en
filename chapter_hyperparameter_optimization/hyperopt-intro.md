@@ -19,7 +19,7 @@ Without a different form of automation, hyperparameters have to be set manually 
 trial-and-error fashion, in what amounts to a time-consuming and difficult part of machine
 learning workflows :cite:`hpo`. For example, consider training a ResNet :ref:`sec_resnet`
 on CIFAR-10, which requires more than 2 hours on an Amazon Elastic Cloud Compute (EC2)
-g4dn.xlarge instance. Even just trying ten hyperparameters configurations in sequence, this
+g4dn.xlarge instance. Even just trying ten hyperparameter configurations in sequence, this
 would already take us roughly one day. To make matters worse, hyperparameters are usually not directly transferable
 across architectures and datasets :cite:`feurer-arxiv22`,`wistuba-ml18`,`bardenet-icml13a`,
 and need to be re-optimized for every new task. Also, for most hyperparameters,
@@ -151,13 +151,13 @@ Each hyperparameter has a data type, such as `float` for `learning_rate`, as wel
 Below we show a simple example of a configuration space consisting of typical hyperparameters of a multi-layer perceptron including their type and standard ranges.
 
 
-| Name | Type | Values | log-scale |
-| :----: | :----: | :----: | :----: |
-| learning rate | float | $[10^{-6}$, $10^{-1}]$ | X |
-| batch size   | integer | $[8, 256]$   | X  |
-| activation function | categorical | $\{'tanh', 'relu'\}$   | - |
-| number of units | integer | $[32, 1024]$   | X  |
-| number of layers | integer | $[1, 6]$   | - |
+| Name                | Type        | Hyperparameter Ranges               | log-scale |
+| :----:              | :----:      |       :-----:        | :----: |
+| learning rate       | float       | $[10^{-6},10^{-1}]$ | X |
+| batch size          | integer     | $[8,256]$           | X  |
+| activation function | categorical | $\{'tanh', 'relu'\}$ | - |
+| number of units     | integer     | $[32, 1024]$         | X  |
+| number of layers    | integer     | $[1, 6]$             | - |
 
 
 In general, the structure of the configuration space $\mathcal{X}$ can be complex and it can be quite different from $\mathbb{R}^d$. In practice, some hyperparameters may depend on the value of others. For example, if we try to tune both the number of layers and widths per layer for a multi-layer perceptron,
@@ -209,5 +209,9 @@ We will also look at algorithms that automatically stop the evaluation process o
 performing configurations to speed up the optimization process.
 
 # Summary
+
+In this section we introduced hyperparameter optimization (HPO) and how we can phrase it as a global optimization by defining a configuration space and an objective function. We also implemented our first HPO algorithm, random search, and applied it on a simple softmax classification problem.
+
+While random search is very simple, it is the better alternative to grid search, which simply evaluates a fixed set of hyperparameters. It does not suffer from the curse of dimensionality and is more likely to find the optimal hyperparameter configuration.
 
 # Exercise
