@@ -364,5 +364,8 @@ for bi, bracket in scheduler.brackets.items():
 
 ## Summary
 
+This section introduces the concept of multi-fidelity hyperparameter optimization, where we assume to have access to cheap-to-evaluate approximations of the objective function. Here, we consider the performance after each epoch as an approximation of the performance after training for the full amount of epochs. Multi-fidelity hyperparameter optimization allows to reduce the overall computation of the HPO instead of just reducing the wall-clock time.
+
+Arguably the simplest method for multi-fideity hyperparameter optimization is successive halving which is based on random search. We also looked at Hyperband, which run multiple brackets of successive halving, to avoid that good configurations are stopped to early.
 
 ## Exercises

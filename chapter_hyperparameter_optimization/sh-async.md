@@ -190,4 +190,6 @@ plt.legend()
 
 ## Summary
 
+Compared to random search, successive halving is not quite as trivial to run in an asynchronous distributed setting. To avoid synchronisation points, we have to promote configurations as quickly as possible to the next rung level, even if this means we promote the wrong configuration. In practice, this usually does not hurt so much, and the gains of asynchronous vs synchronous scheduling are usually much higher than the lossed in the decision making.
+ 
 ## Excercise

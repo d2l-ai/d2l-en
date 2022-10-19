@@ -61,7 +61,10 @@ def objective(learning_rate, batch_size, max_epochs):
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     report = Reporter() 
     for epoch in range(1, max_epochs + 1):
-        trainer.fit_epoch(model=model, data=data)
+        if epoch == 1:
+            trainer.fit(model=model, data=data)  # initializes the state of Trainer
+        else:
+            trainer.fit_epoch()
         validation_error = trainer.validate(model=model).cpu().numpy()
         report(epoch=epoch, validation_error=float(validation_error))
 ```
@@ -181,5 +184,7 @@ plt.legend()
 ```
 
 ## Summary
+
+We can reduce the waiting time for random search substantially by distribution trials across parallel resources. In general, we distinguish between synchronous scheduling, i.e we sample a new batch of hyperparameter configurations once the previous batch finished and asynchronous scheduling of trial, which evaluate a new hyperparameter configurations as soon as resources become available. While random search is easy to distribute asynchronously without changing  the actual algorithm, other methods require some additional modifications.
 
 ## Excercise
