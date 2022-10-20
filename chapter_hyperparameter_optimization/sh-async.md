@@ -109,7 +109,7 @@ config_space = {
 ```{.python .input}
 # We have to set this number equal to the number of GPUs that are in the machine
 # to run this notebook
-n_workers = 4
+n_workers = 2
 max_wallclock_time = 15 * 60
 ```
 
@@ -148,7 +148,7 @@ tuner = Tuner(
     trial_backend=trial_backend,
     scheduler=scheduler,
     stop_criterion=stop_criterion,
-    n_workers=num_workers,
+    n_workers=n_workers,
 )
 tuner.run()
 ```
