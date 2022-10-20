@@ -165,7 +165,7 @@ def update(self, config, error, info=None):
     ri = config['max_epochs']  # rung level r_i
     # Update our searcher, e.g if we use Bayesian optimization later
     self.searcher.update(config, error, additional_info=info)     
-    if ri < r_max:
+    if ri < self.r_max:
         # Bookkeeping
         self.observed_error_at_rungs[ri].append((config, error.cpu().numpy()))
         # Determine how many configurations should be evaluated on this rung level
