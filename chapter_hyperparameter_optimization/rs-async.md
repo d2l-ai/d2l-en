@@ -3,7 +3,7 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# Distributed Random Search
+# Asynchronous Random Search
 
 :label:`sec_rs_async`
 
