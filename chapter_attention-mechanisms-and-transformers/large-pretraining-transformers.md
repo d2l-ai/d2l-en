@@ -298,7 +298,7 @@ This is more computationally efficient than fine-tuning,
 which requires model updates via gradient computation.
 
 
-![Zero-shot, one-shot, few-shot learning with language models (Transformer decoders). No parameter update is needed.](../img/gpt-3-xshot.svg)
+![Zero-shot, one-shot, few-shot in-context learning with language models (Transformer decoders). No parameter update is needed.](../img/gpt-3-xshot.svg)
 :label:`fig_gpt-3-xshot`
 
 Before explaining the more computationally efficient use 
@@ -310,9 +310,10 @@ Thus, a pretrained language model may generate the task output
 as a sequence *without parameter update*, 
 conditional on an input sequence with the task description, 
 task-specific input-output examples, and a prompt (task input).
-This learning paradigm can be further categorized 
+This learning paradigm is called *in-context learning* :cite:`brown2020language`,
+which can be further categorized 
 into *zero-shot*, *one-shot*, and *few-shot*, 
-when there is no, one, or a few task-specific input-output examples, 
+when there is no, one, and a few task-specific input-output examples, 
 respectively (:numref:`fig_gpt-3-xshot`).
 
 
