@@ -616,6 +616,21 @@ class TimeMachine(d2l.DataModule):
         corpus = [vocab[token] for token in tokens]
         return corpus, vocab
 
+    def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
+        """Defined in :numref:`subsec_perplexity`"""
+        super(d2l.TimeMachine, self).__init__()
+        self.save_hyperparameters()
+        corpus, self.vocab = self.build(self._download())
+        array = d2l.tensor([corpus[i:i+num_steps+1]
+                            for i in range(0, len(corpus)-num_steps-1)])
+        self.X, self.Y = array[:,:-1], array[:,1:]
+
+    def get_dataloader(self, train):
+        """Defined in :numref:`subsec_partitioning-seqs`"""
+        idx = slice(0, self.num_train) if train else slice(
+            self.num_train, self.num_train + self.num_val)
+        return self.get_tensorloader([self.X, self.Y], train, idx)
+
 class Vocab:
     """Vocabulary for text."""
     def __init__(self, tokens=[], min_freq=0, reserved_tokens=[]):
