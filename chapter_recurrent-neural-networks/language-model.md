@@ -187,7 +187,7 @@ Perplexity can be best understood as the geometric mean of the number of real ch
 
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 ```{.python .input  n=2}
@@ -207,6 +207,12 @@ import torch
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from jax import numpy as jnp
 ```
 
 ## Partitioning Sequences
