@@ -391,6 +391,7 @@ import tensorflow as tf
 from d2l import jax as d2l
 import jax
 from jax import numpy as jnp
+import numpy as np
 ```
 
 (**Here, our 1000 synthetic data will follow
