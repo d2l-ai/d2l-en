@@ -312,7 +312,7 @@ This section contains the first
 implementation of a deep network (in this book)
 to tap into the conveniences afforded
 by modern deep learning frameworks,
-such as Gluon `Chen.Li.Li.ea.2015`, 
+such as Gluon :cite:`Chen.Li.Li.ea.2015`, 
 JAX :cite:`Frostig.Johnson.Leary.2018`, 
 PyTorch :cite:`Paszke.Gross.Massa.ea.2019`, 
 and Tensorflow :cite:`Abadi.Barham.Chen.ea.2016`.
