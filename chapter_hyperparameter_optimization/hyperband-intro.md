@@ -35,7 +35,7 @@ to promising configurations and stop evaluations of poorly performing ones early
 This speeds up the optimization process, since we have a higher throughput of
 configurations that we can try.
 
-More formally, we expand our definition in Section :numref:`sec_definition_hpo`,
+More formally, we expand our definition in :numref:`sec_definition_hpo`,
 such that our objective function $f(\mathbf{x}, r)$ gets an additional input
 $r \in [r_{min}, r_{max}]$, specifying the amount of resource that we are
 willing to spend for the evaluation of $\mathbf{x}$. We assume that the
@@ -48,7 +48,7 @@ size or the number of cross-validation folds.
 ## Successive Halving
 
 One of the simplest ways to adapt random search to the multi-fidelity setting is
-**successive halving** (SH) :cite:`jamieson-aistats16`,`karnin-icml13`. The basic
+*successive halving* (SH) :cite:`jamieson-aistats16,karnin-icml13`. The basic
 idea is to start with $N$ configurations, for example randomly sampled from the
 configuration space, and to train each of them for $r_{min}$ epochs only (e.g.,
 $r_{min} = 1$). We then discard a fraction of the worst performing trials and
@@ -79,7 +79,7 @@ round with a new set of initial configurations, until the total budget is spent.
 :label:`sh`
 
 To implement SH, we use the `HPOScheduler` base class from the previous Section.
-Since SH can be combined with Bayesian optimization (see Section :numref:`sec_mf_bo`),
+Since SH can be combined with Bayesian optimization (see :numref:`sec_mf_bo`),
 we allow for a generic `HPOSearcher` object to sample configurations. Additionally, the
 user has to pass the minimum resource $r_{min}$, the maximum resource $r_{max}$
 and $\eta$ as input.
@@ -89,27 +89,21 @@ for the current rung level $r_i$. We update the queue every time we jump to the 
 rung level.
 
 ```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-```
-
-```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
-```
-
-```{.python .input}
-%%tab tensorflow
-from d2l import tensorflow as d2l
 ```
 
 ```{.python .input  n=2}
 %%tab all
 import numpy as np
+import matplotlib.pyplot as plt
+import copy
+
+from scipy import stats
 from collections import defaultdict
 from operator import itemgetter
 
-class SuccessiveHalvingScheduler(d2l.HPOScheduler):#@save
+class SuccessiveHalvingScheduler(d2l.HPOScheduler):  #@save
     def __init__(self, searcher, eta, r_min, r_max, prefact=1):
         self.save_hyperparameters()
         # Only used for Hyperband later
@@ -139,7 +133,7 @@ entire process again with a new set of configurations.
 
 ```{.python .input  n=12}
 %%tab all
-@d2l.add_to_class(SuccessiveHalvingScheduler) #@save
+@d2l.add_to_class(SuccessiveHalvingScheduler)  #@save
 def suggest(self):
     if len(self.queue) == 0:
         # Start a new round of SH
@@ -160,14 +154,14 @@ configurations into the queue.
 
 ```{.python .input  n=4}
 %%tab all
-@d2l.add_to_class(SuccessiveHalvingScheduler) #@save
+@d2l.add_to_class(SuccessiveHalvingScheduler)  #@save
 def update(self, config, error, info=None):
     ri = config['max_epochs']  # rung level r_i
     # Update our searcher, e.g if we use Bayesian optimization later
     self.searcher.update(config, error, additional_info=info)     
     if ri < self.r_max:
         # Bookkeeping
-        self.observed_error_at_rungs[ri].append((config, error.cpu().numpy()))
+        self.observed_error_at_rungs[ri].append((config, d2l.numpy(error.cpu())))
         # Determine how many configurations should be evaluated on this rung level
         ki = self.K - self.rung_levels.index(ri)
         ni = int(self.prefact * self.eta ** ki)
@@ -188,7 +182,7 @@ def update(self, config, error, info=None):
             ] + self.queue
             self.observed_error_at_rungs[ri] = []  # reset
         
-@d2l.add_to_class(SuccessiveHalvingScheduler) #@save
+@d2l.add_to_class(SuccessiveHalvingScheduler)  #@save
 def get_top_n_configurations(self, rung_level, n):
     rung = self.observed_error_at_rungs[rung_level]
     if not rung:
@@ -200,8 +194,6 @@ def get_top_n_configurations(self, rung_level, n):
 Let us see how successive halving is doing on our neural network example.
 
 ```{.python .input  n=5}
-from scipy import stats
-
 min_number_of_epochs = 1
 max_number_of_epochs = 4
 
@@ -229,7 +221,6 @@ configurations survive until $r_{max}$. Compare this to vanilla random search
 which would allocate $r_{max}$ to every configuration.
 
 ```{.python .input  n=19}
-import matplotlib.pyplot as plt
 for rung_index, rung in scheduler.observed_error_at_rungs.items():
     errors = [xi[1] for xi in rung]   
     plt.scatter([rung_index] * len(errors), errors)
@@ -271,7 +262,7 @@ $s=0$ evaluates all configurations on $r_{min} = r_{max}$, which means that we
 effectively run random search. In practice we execute brackets in an round robin
 fashion, which means we start with $s=s_{max}$ again once we finished the loop.
 Given enough resources, we could also run all brackets in parallel because configurations are sampled at random.
-We will discuss this case in more detail in Section :numref:`sec_sh_async`.
+We will discuss this case in more detail in :numref:`sec_sh_async`.
 
 <!-- ![Learning curves of random hyperparameter configurations](../../img/hb.svg) -->
 ![Learning curves of random hyperparameter configurations](img/hb.svg)
@@ -282,10 +273,7 @@ We implement a new scheduler, that maintains a `SuccessiveHalvingScheduler` obje
 
 ```{.python .input  n=8}
 %%tab all
-import numpy as np
-import copy
-
-class HyperbandScheduler(d2l.HPOScheduler): #@save
+class HyperbandScheduler(d2l.HPOScheduler):  #@save
     def __init__(self, searcher, eta, r_min, r_max):
         self.save_hyperparameters()
         self.s_max = int(np.ceil((np.log(r_max) - np.log(r_min)) / np.log(eta)))
@@ -308,9 +296,9 @@ and $s$.
 
 ```{.python .input  n=9}
 %%tab all
-@d2l.add_to_class(HyperbandScheduler) #@save
+@d2l.add_to_class(HyperbandScheduler)  #@save
 def update(self, config, error, info=None):
-    self.brackets[self.s].append((config['max_epochs'], error.cpu().numpy()))
+    self.brackets[self.s].append((config['max_epochs'], d2l.numpy(error.cpu())))
     self.successive_halving.update(config, error, info=info)
     # If the queue of successive halving is empty, than we finished this round and start with
     # a new round with different r_min and N
@@ -342,8 +330,6 @@ tuner.run(number_of_trials=100)
 ```
 
 ```{.python .input  n=24}
-import matplotlib.pyplot as plt
-
 for bi, bracket in scheduler.brackets.items():
     rung_levels = [xi[0] for xi in bracket]
     errors = [xi[1] for xi in bracket]
