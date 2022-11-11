@@ -5,65 +5,59 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # What is Hyperparameter Optimization?
 :label:`sec_what_is_hpo`
 
-As we have seen in the previous chapters, deep neural networks come with a large number of parameters or weights that are learned during training. On top of these, every neural network has additional **hyperparameters** that need to be configured by the user.
-For example, to ensure that stochastic gradient descent converges to a local optimum of the training loss :ref:`chap_optimization`, we have to adjust the learning rate and batch size. To avoid overfitting on the training dataset :ref:`sec_polynomial`, we might have to set regularization parameters, such as weight decay : ref:`sec_weight_decay` or dropout : ref:`sec_dropout`. We can define the capacity and inductive bias of the model by setting the number of layers and number of units or filters per layer (i.e., the effective number
+As we have seen in the previous chapters, deep neural networks come with a large number of parameters or weights that are learned during training. On top of these, every neural network has additional *hyperparameters* that need to be configured by the user.
+For example, to ensure that stochastic gradient descent converges to a local optimum of the training loss :numref:`chap_optimization`, we have to adjust the learning rate and batch size. To avoid overfitting on the training dataset :numref:`sec_polynomial`, we might have to set regularization parameters, such as weight decay :numref:`sec_weight_decay` or dropout :numref:`sec_dropout`. We can define the capacity and inductive bias of the model by setting the number of layers and number of units or filters per layer (i.e., the effective number
 of weights).
 
-Unfortunately, we cannot simply adjust these hyperparameters by minimizing the training loss, because this would lead to overfitting on the training data. For example, setting regularization parameters, such as dropout :ref:`sec_dropout` or weight decay :ref:`sec_weight_decay` to zero leads to a small training loss, but might hurt the generalization performance.
+Unfortunately, we cannot simply adjust these hyperparameters by minimizing the training loss, because this would lead to overfitting on the training data. For example, setting regularization parameters, such as dropout :numref:`sec_dropout` or weight decay :numref:`sec_weight_decay` to zero leads to a small training loss, but might hurt the generalization performance.
 
-![Typical workflow in machine leanring that consists of training the model multiple times with different hyperparameters](img/ml_workflow.svg)
+![Typical workflow in machine learning that consists of training the model multiple times with different hyperparameters](img/ml_workflow.svg)
 :width:`40px`
 :label:`ml_workflow`
 
 Without a different form of automation, hyperparameters have to be set manually in a
 trial-and-error fashion, in what amounts to a time-consuming and difficult part of machine
-learning workflows :cite:`hpo`. For example, consider training a ResNet :ref:`sec_resnet`
+learning workflows :cite:`hpo`. For example, consider training a ResNet :numref:`sec_resnet`
 on CIFAR-10, which requires more than 2 hours on an Amazon Elastic Cloud Compute (EC2)
 g4dn.xlarge instance. Even just trying ten hyperparameter configurations in sequence, this
 would already take us roughly one day. To make matters worse, hyperparameters are usually not directly transferable
-across architectures and datasets :cite:`feurer-arxiv22`,`wistuba-ml18`,`bardenet-icml13a`,
+across architectures and datasets :cite:`feurer-arxiv22,wistuba-ml18,bardenet-icml13a`,
 and need to be re-optimized for every new task. Also, for most hyperparameters,
 there are no rule-of-thumbs, and expert knowledge is required to find sensible values.
 
-Hyperparameter optimization (HPO) algorithms are designed to tackle this problem in 
+*Hyperparameter optimization (HPO)* algorithms are designed to tackle this problem in 
 a principled and automated fashion :cite:`feurer-automlbook18a`, by framing it as a global optimization problem.
 The default objective is the error on a hold-out validation dataset, but could
 in principle be any other business metric. It can be combined with or constrained by
 secondary objectives (see : numref:`sec_hpo_advanced`), such as training time, inference time, or model complexity. 
 
 
-Recently, hyperparameter optimization has been extended to **neural architecture
-search (NAS)** :cite:`elsken-arxiv18a`,`wistuba-arxiv19`, where the goal is to find
+Recently, hyperparameter optimization has been extended to *neural architecture
+search (NAS)* :cite:`elsken-arxiv18a,wistuba-arxiv19`, where the goal is to find
 entirely new neural network architectures. Compared to classical HPO, NAS is even more
 expensive in terms of computation and requires additional efforts to remain feasible in
 practice. Both, HPO and NAS can be considered as sub-fields of 
-AutoML :cite:`hutter-book19a`, which aims to automated the entire ML pipeline.
+AutoML :cite:`hutter-book19a`, which aims to automate the entire ML pipeline.
 
-In this section we will introduce HPO and show how we can automatically find the best hyperparameters of the logistic regression example introduced in :ref:`sec_softmax_concise`. 
+In this section we will introduce HPO and show how we can automatically find the best hyperparameters of the logistic regression example introduced in :numref:`sec_softmax_concise`. 
 
 ##  The Optimization Problem
 :label:`sec_definition_hpo`
 
-We will start with a simple toy problem: searching for the learning rate of the multi-class logistic regression model from :ref:sec_sgd to minimize the validation error on the Fashion MNIST dataset. While other hyperparameters
+We will start with a simple toy problem: searching for the learning rate of the multi-class logistic regression model from : numref:sec_sgd to minimize the validation error on the Fashion MNIST dataset. While other hyperparameters
 like batch size or number of epochs are also worth tuning, we focus on learning
 rate alone for simplicity.
 
-```{.python .input}
-%%tab mxnet
-from d2l import mxnet as d2l
-```
 
 ```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 
+import numpy as np
 import torch
 from torch import nn
-```
+from scipy import stats
 
-```{.python .input}
-%%tab tensorflow
-from d2l import tensorflow as d2l
 ```
 
 ```{.python .input  n=9}
@@ -85,11 +79,11 @@ Before we can run HPO, we first need to define two ingredients: the objective fu
 
 The performance of a learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from the hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation loss. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning model, which can be time and compute intensive in the case of deep neural networks trained on large datasets. Now, given our criterion $f(\mathbf{x})$ our goal is to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. 
 
-There is no simple way to compute gradients of $f$ with respect to $\mathbf{x}$, because it would require to propagate the gradient through the entire training process. While there is recent work :cite:`maclaurin-icml15`,`franceschi-icml17a` to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here. Furthermore, the computational burden of evaluating $f$ requires HPO algorithms to approach the global optimum with as few samples as possible.
+There is no simple way to compute gradients of $f$ with respect to $\mathbf{x}$, because it would require to propagate the gradient through the entire training process. While there is recent work :cite:`maclaurin-icml15,franceschi-icml17a` to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here. Furthermore, the computational burden of evaluating $f$ requires HPO algorithms to approach the global optimum with as few samples as possible.
 
-The training of neural networks is stochastic (e.g., weights are randomly initialized, mini-batches are randomly sampled), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we assume that $\epsilon \sim N(0, \sigma)$.
+The training of neural networks is stochastic (e.g., weights are randomly initialized, mini-batches are randomly sampled), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we usually assume that the $\epsilon \sim N(0, \sigma)$ observation noise is Gaussian distributed.
 
-Faced with all these challenges, we usually try to identify a small set of well performing hyperparameter configurations quickly, instead of hitting the global optima exactly. However, due to large computational demands of most neural networks models, even this can take days or weeks of compute. We will explore in Section :numref:`sec_mf_hpo` how we can speed-up the optimization process by either distributing the search or using cheaper-to-evaluate approximations of the objective function.
+Faced with all these challenges, we usually try to identify a small set of well performing hyperparameter configurations quickly, instead of hitting the global optima exactly. However, due to large computational demands of most neural networks models, even this can take days or weeks of compute. We will explore in :numref:`sec_mf_hpo` how we can speed-up the optimization process by either distributing the search or using cheaper-to-evaluate approximations of the objective function.
 
 
 Now, since we would like to optimize the validation error, we need to add a function computing this quantity.
@@ -97,17 +91,17 @@ Now, since we would like to optimize the validation error, we need to add a func
 ```{.python .input  n=8}
 %%tab pytorch
 
-@d2l.add_to_class(d2l.Trainer) #@save
-def validate(self, model):
-    model.eval()
+@d2l.add_to_class(d2l.Trainer)  #@save
+def validate(self):
+    self.model.eval()
     accuracy = 0
     val_batch_idx = 0
     
     for batch in self.val_dataloader:
         with torch.no_grad():
             x, y = self.prepare_batch(batch)
-            y_hat = model(x)
-            accuracy += model.accuracy(y_hat, y)
+            y_hat = self.model(x)
+            accuracy += self.model.accuracy(y_hat, y)
         val_batch_idx += 1
     
     return 1 -  accuracy / val_batch_idx
@@ -125,8 +119,8 @@ def hpo_objective_softmax_classification(config, max_epochs=10):  #@save
     data = d2l.FashionMNIST(batch_size=16)
     model = d2l.SoftmaxClassification(num_outputs=10, lr=learning_rate)
     trainer.fit(model=model, data=data)
-    validation_error = trainer.validate(model=model)
-    return validation_error.numpy()
+    validation_error = trainer.validate()
+    return d2l.numpy(validation_error)
 ```
 
 ### The Configuration Space
@@ -138,48 +132,48 @@ $\mathbf{x} \in \mathcal{X}$ to optimize over, known as *configuration space* or
 space*. For our logistic regression example, we will use:
 
 ```{.python .input  n=6}
-from scipy import stats
-
 config_space = {
    "learning_rate": stats.loguniform(1e-4, 1)
 } 
 ```
+Here we use the use the `loguniform` object from SciPy, which represents a uniform distribution between -4 and -1 in the logarithmic space. This object allows us to sample random variables from this distribution.
 
 Each hyperparameter has a data type, such as `float` for `learning_rate`, as well as a closed bounded range
-(i.e., lower and upper bounds). We usually assign a prior distribution (e.g uniform or log-uniform) to each hyperparameter. Some positive parameters, such as `learning_rate`, are best represented on a logarithmic scale as optimal values can differ by several orders of magnitude, while others, such as momentum, come with linear scale.
+(i.e., lower and upper bounds). We usually assign a prior distribution (e.g, uniform or log-uniform) to each hyperparameter to sample from. Some positive parameters, such as `learning_rate`, are best represented on a logarithmic scale as optimal values can differ by several orders of magnitude, while others, such as momentum, come with linear scale.
 
 Below we show a simple example of a configuration space consisting of typical hyperparameters of a multi-layer perceptron including their type and standard ranges.
 
+: Example configuration space of multi-layer perceptron
 
 | Name                | Type        | Hyperparameter Ranges               | log-scale |
 | :----:              | :----:      |       :-----:        | :----: |
-| learning rate       | float       | $[10^{-6},10^{-1}]$ | X |
-| batch size          | integer     | $[8,256]$           | X  |
+| learning rate       | float       | $[10^{-6},10^{-1}]$ | log10 |
+| batch size          | integer     | $[8,256]$           | log2  |
+| momentum            | float       | $[0,0.99]$           | -  |
 | activation function | categorical | $\{'tanh', 'relu'\}$ | - |
-| number of units     | integer     | $[32, 1024]$         | X  |
+| number of units     | integer     | $[32, 1024]$         | log2  |
 | number of layers    | integer     | $[1, 6]$             | - |
+:label:`tab_example_configspace`
 
 
-In general, the structure of the configuration space $\mathcal{X}$ can be complex and it can be quite different from $\mathbb{R}^d$. In practice, some hyperparameters may depend on the value of others. For example, if we try to tune both the number of layers and widths per layer for a multi-layer perceptron,
-the width of the $l$-th layer is relevant only if the network has at least $l+1$ layers. These advanced HPO problems are beyond the scope of this chapter. We refer the interested reader to :cite:`hutter-lion11a`,`jenatton-icml17a`, `baptista-icml18a`.
+In general, the structure of the configuration space $\mathcal{X}$ can be complex and it can be quite different from $\mathbb{R}^d$. In practice, some hyperparameters may depend on the value of others. For example, assume we try to tune the number of layers for a multi-layer perceptron, and for each layer the number of units.
+The number of units of the $l\mathrm{-th}$ layer is relevant only if the network has at least $l+1$ layers. These advanced HPO problems are beyond the scope of this chapter. We refer the interested reader to :cite:`hutter-lion11a,jenatton-icml17a,baptista-icml18a`.
 
-The configuration spaces plays an important role for hyperparameter optimization, since no algorithms can find something that is not included in the configuration space. On the other hand, if the ranges are too large, the computation budget to find well performing configurations might become infeasible.
+The configuration space plays an important role for hyperparameter optimization, since no algorithms can find something that is not included in the configuration space. On the other hand, if the ranges are too large, the computation budget to find well performing configurations might become infeasible.
 
 ## Random Search
 
 Now, we look at the first algorithm to solve our hyperparameter optimization problem: *random search*. 
 The main idea of random search is to independently sample from the configuration space until
 a predefined budget (e.g maximum number of iterations) is exhausted and to return the best
-observed configuration. All evaluations can be executed independently in parallel (see Section
-:numref:`sec_rs`), but here we use a sequential loop for simplicity.
+observed configuration. All evaluations can be executed independently in parallel (see
+ :numref:`sec_rs`), but here we use a sequential loop for simplicity.
 
 ```{.python .input  n=7}
-import numpy as np
-
 errors, values = [], []
 num_iterations = 10
 
-for iteration in range(num_iterations):
+for _ in range(num_iterations):
     learning_rate = config_space['learning_rate'].rvs()
     y = hpo_objective_softmax_classification({'learning_rate': learning_rate})
     values.append(learning_rate)
@@ -189,7 +183,6 @@ for iteration in range(num_iterations):
 The best learning rate is then simply the one with the lowest validation error.
 
 ```{.python .input  n=7}
-import numpy as np
 best_idx = np.argmin(errors)
 print(f'optimal learning rate = {values[best_idx]}')
 ```
@@ -199,8 +192,8 @@ Arguably because of its simplicity, random search is one of the most frequently 
 
 Unfortunately random search also comes with a few shortcomings. First, it does not adapt the sampling
 distribution based on the previous observations it collected so far. Hence, it is equally likely to
-sample a poorly performing configurations than a better performing configuration. Second, the same
-amount of resources is spent for all configurations, even though some may show poor initial
+sample a poorly performing configuration than a better performing configuration. Second, the same
+amount of resources are spent for all configurations, even though some may show poor initial
 performance and are less likely to outperform previously seen configurations.
 
 In the next sections we will look at more sample efficient hyperparameter optimization

@@ -7,7 +7,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 :label:`sec_rs_async`
 
-As we have seen in the previous Section :numref:`sec_api_hpo`, we might have to wait hours or even days before random search returns a good hyperparameter configuration. In practice, we have often access to a pool of resources such as multiple GPUs on the same machine or multiple machines wiht a single GPU. This begs the questios: *How do we  efficiently distribute random search?*
+As we have seen in the previous :numref:`sec_api_hpo`, we might have to wait hours or even days before random search returns a good hyperparameter configuration. In practice, we have often access to a pool of resources such as multiple GPUs on the same machine or multiple machines wiht a single GPU. This begs the questios: *How do we  efficiently distribute random search?*
 
 In general, we distinguish between synchronous and asynchronous parallel hyperparameter
 optimization (see Figure :numref:`distributed_scheduling`). In the synchronous setting,
@@ -24,7 +24,7 @@ synchronisation overhead. For random search, each new hyperparameter configurati
 is chosen independently of all others, and in particular without exploiting
 observations from any prior evaluation. This means we can trivally parallelize random
 search asynchronously. This is not straight-forward with more sophisticated methods
-that make decsision based on previous observations (see Section :numref:`sec_sh_async`).
+that make decsision based on previous observations (see :numref:`sec_sh_async`).
 While we need access to more resources than in the sequential setting, asynchronous
 random search exhibits a linear speed-up, in that a certain performance is reached
 $K$ times faster if $K$ trials can be run in parallel. 
@@ -37,7 +37,7 @@ $K$ times faster if $K$ trials can be run in parallel.
 In this notebook, we will look at asynchronous random search that, compared to the
 previous notebook, evaluates multiple hyperparameter configurations in parallel on a
 single instance, instead of evaluating them sequentially. Distributed job scheduling
-and execution is difficult to implement from scratch. We will use **Syne Tune**
+and execution is difficult to implement from scratch. We will use *Syne Tune*
 :cite:`salinas-automl22`, which provides us with a simple interface for asynchronous
 HPO. Syne Tune is designed to be run with different execution back-ends, and the
 interested reader is invited to study its simple APIs in order to learn more about
@@ -53,6 +53,15 @@ First, we have to define a new objective function such that it now returns the p
 to Syne Tune via the `report(...)` function.
 
 ```{.python .input  n=34}
+import matplotlib.pyplot as plt
+
+from syne_tune.config_space import loguniform, randint
+from syne_tune.backend.python_backend import PythonBackend
+from syne_tune.optimizer.baselines import RandomSearch
+from syne_tune import Tuner, StoppingCriterion
+from syne_tune.experiments import load_experiment
+
+
 def objective(learning_rate, batch_size, max_epochs):
     from d2l import torch as d2l    
     from syne_tune import Reporter
@@ -65,7 +74,7 @@ def objective(learning_rate, batch_size, max_epochs):
             trainer.fit(model=model, data=data)  # initializes the state of Trainer
         else:
             trainer.fit_epoch()
-        validation_error = trainer.validate(model=model).cpu().numpy()
+        validation_error = d2l.numpy(trainer.validate().cpu())
         report(epoch=epoch, validation_error=float(validation_error))
 ```
 
@@ -88,13 +97,11 @@ mode = "min"
 metric = "validation_error"
 ```
 
-We use the configuration space from our previous example. In **Syne Tune**, this
+We use the configuration space from our previous example. In Syne Tune, this
 dictionary can also be used to pass constant attributes to the training script.
 We make use of this feature in order to pass `max_epochs`.
 
 ```{.python .input  n=39}
-from syne_tune.config_space import loguniform, randint
-
 config_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
    "batch_size": randint(8, 128),
@@ -105,8 +112,6 @@ config_space = {
 Next, we need to specify the back-end for job executions. Here we just consider the distribution on a local machine where parallel jobs are executed as sub-processes, but frameworks such as Syne Tune also provide functionality to distributed the search on cloud environments, for example SageMaker.
 
 ```{.python .input  n=40}
-from syne_tune.backend.python_backend import PythonBackend
-
 trial_backend = PythonBackend(tune_function=objective, config_space=config_space)
 ```
 
@@ -114,8 +119,6 @@ We can now create the scheduler for asynchronous random search, which is similar
 behaviour to our `BasicScheduler` from the previous Section.
 
 ```{.python .input  n=41}
-from syne_tune.optimizer.baselines import RandomSearch
-
 scheduler = RandomSearch(
     config_space,
     metric=metric,
@@ -127,8 +130,6 @@ Syne Tune also features a `Tuner`, where the main experiment loop and bookkeepin
 centralized, and interactions between scheduler and back-end are mediated.
 
 ```{.python .input  n=42}
-from syne_tune import Tuner, StoppingCriterion
-
 stop_criterion = StoppingCriterion(max_wallclock_time=max_wallclock_time)
 
 tuner = Tuner(
@@ -151,8 +152,6 @@ analysis. At any time during the tuning job, we can easily get the results
 obtained so far and plot the incumbent trajectory.
 
 ```{.python .input  n=46}
-from syne_tune.experiments import load_experiment
-
 tuning_experiment = load_experiment(tuner.name)
 tuning_experiment.plot()
 ```
@@ -166,7 +165,6 @@ start the next trial, without waiting for the other trials to finish. Idle time
 of workers is reduced to a minimum with asynchronous scheduling.
 
 ```{.python .input  n=45}
-import matplotlib.pyplot as plt
 results = tuning_experiment.results
 
 for trial_id in results.trial_id.unique():
