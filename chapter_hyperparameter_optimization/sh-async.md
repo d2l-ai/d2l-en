@@ -46,7 +46,7 @@ reflect the distribution of metric values at this level better and better. If a
 worker is free, but no configuration can be promoted, we start a new configuration
 with $r = r_{min}$, i.e the first rung level.
 
-Figure :numref:`asha` shows the scheduling of the same configurations for ASHA. Once Trial-1
+:numref:`asha` shows the scheduling of the same configurations for ASHA. Once Trial-1
 finishes, we collect the results of two trials (i.e Trial-0 and Trial-1) and
 immediately promote the better of them (Trial-0) to the next rung level. After Trial-0
 finishes on rung 1, there are too few trials there in order to support a further
@@ -60,7 +60,7 @@ which means we can now promote Trial-0 towards rung 2. At the same time, Worker-
 continues with evaluating new trials (i.e., Trial-5) on rung 0.
 
 
-![.](img/asha.svg)
+![Visualization of successive halving with synchronous and asynchronous scheduling of trials.](img/asha.svg)
 :width:`40px`
 :label:`asha`
 
@@ -164,7 +164,7 @@ e.plot()
 
 ## Visualize the Optimization Process
 
-Once more, we visualize the learning curves of every trial. Compares this to
+Once more, we visualize the learning curves of every trial. Compare this to
 asynchronous random search in :numref:`sec_rs_async`. As we have seen for
 successive halving in :numref:`sec_mf_hpo`, most of the trials are stopped
 at 1 or 2 epochs ($r_{min}$ or $\eta * r_{min}$). However, trials do not stop
@@ -189,6 +189,6 @@ plt.legend()
 
 ## Summary
 
-Compared to random search, successive halving is not quite as trivial to run in an asynchronous distributed setting. To avoid synchronisation points, we have to promote configurations as quickly as possible to the next rung level, even if this means we promote the wrong configuration. In practice, this usually does not hurt so much, and the gains of asynchronous vs synchronous scheduling are usually much higher than the lossed in the decision making.
+Compared to random search, successive halving is not quite as trivial to run in an asynchronous distributed setting. To avoid synchronisation points, we have to promote configurations as quickly as possible to the next rung level, even if this means we promote the wrong configuration. In practice, this usually does not hurt so much, and the gains of asynchronous vs synchronous scheduling are usually much higher than the loss of the suboptimal decision making.
  
-## Excercise
+## Exercise

@@ -9,23 +9,21 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 Training neural networks can be expensive even on moderate size datasets.
 For example, training a single ResNet-50 on a rather small dataset set, such as CIFAR10,
-might take 2 hours on a Amazon Elastic Cloud Compute (EC2) g4dn.xlarge instance.
+might take 2 hours on an Amazon Elastic Cloud Compute (EC2) g4dn.xlarge instance.
 However, depending on the search space, hyperparameter optimization usually
-requires tens to hundreds of function evaluations to converge.
+requires tens to hundreds of function evaluations to find a well-performing hyperparameter configuration.
 Even though we can significantly speed up the overall wall-clock time of our HPO
 process by exploiting parallel resources (see :numref:`sec_rs_async`), this does
 not reduce the total amount of compute that we have to spend. 
 
 *Can we speed up the evaluation of hyperparameter configurations?* Methods such
 as random search allocate the exact same amount or resources (e.g., number
-of epochs, training data points) to each hyperparameter configuration. The
-figure below depicts learning curves of a set of neural networks trained with
+of epochs, training data points) to each hyperparameter configuration. :numref:`img_samples_ls`  depicts learning curves of a set of neural networks trained with
 different hyperparameter configurations. After a few epochs we are already able
 to visually distinguish between well-performing and poorly-performing configurations.
 However, learning curves are noisy, and we might still require the full amount of
 100 epochs to identify the best performing configuration.
 
-<!-- ![Learning curves of random hyperparameter configurations](../../img/samples_lc.svg) -->
 ![Learning curves of random hyperparameter configurations](img/samples_lc.svg)
 :width:`400px`
 :label:`img_samples_lc`
@@ -48,7 +46,7 @@ size or the number of cross-validation folds.
 ## Successive Halving
 
 One of the simplest ways to adapt random search to the multi-fidelity setting is
-*successive halving* (SH) :cite:`jamieson-aistats16,karnin-icml13`. The basic
+*successive halving* :cite:`jamieson-aistats16,karnin-icml13`. The basic
 idea is to start with $N$ configurations, for example randomly sampled from the
 configuration space, and to train each of them for $r_{min}$ epochs only (e.g.,
 $r_{min} = 1$). We then discard a fraction of the worst performing trials and
@@ -59,34 +57,31 @@ More formally, consider a minimum budget $r_{min}$, for example 1 epoch, a maxim
 budget $r_{max}$, for example `max_epochs` in our previous example, and a halving
 constant $\eta\in\{2, 3, \dots\}$. For simplicity, assume that $r_{max} = r_{min}
 \eta^K$, with $K \in \mathbb{I}$ . The number of initial configurations is then
-$N = \eta^K$. Let us define *rung levels* $\mathcal{R} =
+$N = \eta^K$. Let us define *rungs* $\mathcal{R} =
 \{ r_{min}, r_{min}\eta, r_{min}\eta^2, \dots, r_{max} \}$. 
-<!--In general, a trial
-is trained until reaching a rung level, then evaluated there, and the validation
-errors of all trials at a rung level are used to decide which of them to discard.-->
-We start with running $N$ trials until the first rung level $r_{min}$. Sorting the validation
+
+We start with running $N$ trials until the first rung $r_{min}$. Sorting the validation
 errors, we keep the top $1 / \eta$ fraction (which amounts to $\eta^{K-1}$ configurations) and
-discard all the rest. The surviving trials are trained for the next rung level,
+discard all the rest. The surviving trials are trained for the next rung,
 i.e $r_{min}\eta$ epochs, and the process is repeated. In each round, a $1 / \eta$
 fraction of trials survives and their training continues with a $\eta$ times larger budget. With
 this particular choice of $N$, only a single trial will be trained to the full
-budget $r_{max}$. Finally, once we finished one round of SH, we start the next
+budget $r_{max}$. Finally, once we finished one round of successive halving, we start the next
 round with a new set of initial configurations, until the total budget is spent.
 
-<!-- ![Learning curves of random hyperparameter configurations](../../img/sh.svg) -->
 ![Learning curves of random hyperparameter configurations](img/sh.svg)
 :width:`400px`
 :label:`sh`
 
-To implement SH, we use the `HPOScheduler` base class from the previous Section.
-Since SH can be combined with Bayesian optimization (see :numref:`sec_mf_bo`),
+To implement successive halving, we use the `HPOScheduler` base class from the previous Section.
+Since successive halving can be combined with Bayesian optimization (see :numref:`sec_mf_bo`),
 we allow for a generic `HPOSearcher` object to sample configurations. Additionally, the
 user has to pass the minimum resource $r_{min}$, the maximum resource $r_{max}$
 and $\eta$ as input.
 
 Inside our scheduler we maintain a queue of configurations that need to be evaluated
-for the current rung level $r_i$. We update the queue every time we jump to the next
-rung level.
+for the current rung $r_i$. We update the queue every time we jump to the next
+rung.
 
 ```{.python .input}
 %%tab pytorch
@@ -96,7 +91,6 @@ from d2l import torch as d2l
 ```{.python .input  n=2}
 %%tab all
 import numpy as np
-import matplotlib.pyplot as plt
 import copy
 
 from scipy import stats
@@ -106,14 +100,12 @@ from operator import itemgetter
 class SuccessiveHalvingScheduler(d2l.HPOScheduler):  #@save
     def __init__(self, searcher, eta, r_min, r_max, prefact=1):
         self.save_hyperparameters()
-        # Only used for Hyperband later
-        self.prefact = prefact
         # Compute K, which is later used to determine the number of configurations
         self.K = int(np.log(r_max / r_min) / np.log(eta))
-        # Define the rung levels
+        # Define the rungs
         self.rung_levels = [r_min * eta ** k for k in range(self.K + 1)]
         if r_max not in self.rung_levels:
-            # The final rung level should be r_max
+            # The final rung should be r_max
             self.rung_levels.append(r_max)
             self.K += 1
         # Bookkeeping
@@ -123,21 +115,20 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):  #@save
 ```
 
 In the beginning our queue is empty and we fill it with $n = prefact * \eta^{K}$
-configurations, which are first evaluated on the smallest rung level $r_{min}$.
-The effect of $prefact$ will become important later if we look at Hyperband, but for
-SH we have $prefact=1$. Now, every time resources become available and the `HPOTuner`
+configurations, which are first evaluated on the smallest rung $r_{min}$.
+The effect of $prefact$ will become important in the next part when we talk about Hyperband, for now we assume $prefact=1$. Now, every time resources become available and the `HPOTuner`
 object queries the suggest function, we return an element from the queue. Once we
-finish one round of SH - which means that we evaluated all surviving configurations
+finish one round of successive halving - which means that we evaluated all surviving configurations
 on the highest resource level $r_{max}$ and our queue is empty - we start the
-entire process again with a new set of configurations.
+entire process again with a new, randomly sampled set of configurations.
 
 ```{.python .input  n=12}
 %%tab all
 @d2l.add_to_class(SuccessiveHalvingScheduler)  #@save
 def suggest(self):
     if len(self.queue) == 0:
-        # Start a new round of SH
-        # Number of configurations for the first rung level:
+        # Start a new round of successive halving
+        # Number of configurations for the first rung:
         n0 = int(self.prefact * self.eta ** self.K)
         for i in range(n0):
             config = searcher.sample_configuration()
@@ -148,7 +139,7 @@ def suggest(self):
 ```
 
 When we collected a new data point, we first update the searcher module. Afterwards
-we check if we already collect all data points on the current rung level. If so, we
+we check if we already collect all data points on the current rung. If so, we
 sort all configurations based on their performance and push the top $\frac{1}{\eta}$
 configurations into the queue.
 
@@ -156,18 +147,18 @@ configurations into the queue.
 %%tab all
 @d2l.add_to_class(SuccessiveHalvingScheduler)  #@save
 def update(self, config, error, info=None):
-    ri = config['max_epochs']  # rung level r_i
+    ri = config['max_epochs']  # Rung r_i
     # Update our searcher, e.g if we use Bayesian optimization later
     self.searcher.update(config, error, additional_info=info)     
     if ri < self.r_max:
         # Bookkeeping
         self.observed_error_at_rungs[ri].append((config, d2l.numpy(error.cpu())))
-        # Determine how many configurations should be evaluated on this rung level
+        # Determine how many configurations should be evaluated on this rung
         ki = self.K - self.rung_levels.index(ri)
         ni = int(self.prefact * self.eta ** ki)
-        # If we observed all configuration on this rung level r_i, we estimate the
+        # If we observed all configuration on this rung r_i, we estimate the
         # top 1 / eta configuration, add them to queue and promote them for the
-        # next rung level r_{i+1}
+        # next rung r_{i+1}
         if len(self.observed_error_at_rungs[ri]) >= ni:
             kiplus1 = ki - 1
             niplus1 = int(self.prefact * self.eta ** kiplus1)
@@ -203,6 +194,8 @@ search_space = {
 } 
 ```
 
+We just replace the scheduler with our new `SuccessiveHalvingScheduler`.
+
 ```{.python .input  n=14}
 searcher = d2l.RandomSearcher(search_space)
 scheduler = SuccessiveHalvingScheduler(
@@ -223,49 +216,48 @@ which would allocate $r_{max}$ to every configuration.
 ```{.python .input  n=19}
 for rung_index, rung in scheduler.observed_error_at_rungs.items():
     errors = [xi[1] for xi in rung]   
-    plt.scatter([rung_index] * len(errors), errors)
+    d2l.plt.scatter([rung_index] * len(errors), errors)
 
-plt.xlim(min_number_of_epochs-0.5, max_number_of_epochs+0.5)
-plt.xticks(np.arange(min_number_of_epochs, max_number_of_epochs+1),
+d2l.plt.xlim(min_number_of_epochs-0.5, max_number_of_epochs+0.5)
+d2l.plt.xticks(np.arange(min_number_of_epochs, max_number_of_epochs+1),
                np.arange(min_number_of_epochs, max_number_of_epo
-plt.ylabel('validation error')
-plt.xlabel('epochs')        
+d2l.plt.ylabel('validation error')
+d2l.plt.xlabel('epochs')        
 ```
 
 Finally, note some slight complexity in our implementation of
 `SuccessiveHalvingScheduler`. Namely, `suggest` needs to return a configuration
 immediately. But if at least one other worker is still busy with an evaluation
 in the current rung, we cannot determine the top $1 / \eta$ fraction to open the
-next rung. Instead, `suggest` starts a new round of SH already. However, once a
+next rung. Instead, `suggest` starts a new round of successive halving already. However, once a
 rung is completed in `update`, we make sure to insert new configurations at the
 beginning of the queue, so they take precedence over configurations from the
 next round.
 
 ## Hyperband
 
-While SH can greatly improve upon random search, the choice of $r_{min}$ can have
+While successive halving can greatly improve upon random search, the choice of $r_{min}$ can have
 a large impact on its performance. If $r_{min}$ is too small, our network might
 not have enough time to learn anything, and even the best configurations may be
 filtered out due to noisy observations. If $r_{min}$ is too large on the other hand, the benefits
 of successive-halving may be greatly diminished.
 
-Hyperband :cite:`li-iclr17` is an extension of SH that mitigates the risk of setting
-$r_{min}$ too small. It runs SH as subroutine, where each round of SH, called a bracket,
+Hyperband :cite:`li-iclr17` is an extension of successive halving that mitigates the risk of setting
+$r_{min}$ too small. It runs successive halving as subroutine, where each round of successive halving, called a bracket,
 balances between $r_{min}$ and the number of initial configurations $N$, such that the
 same total amount of resources per bracket is used.
 
 Let's define $s_{max} = \lfloor log_{\eta} \frac{r_{max}}{r_{min}} \rfloor$.
-Now for each bracket $s \in \{s_{max}, ..., 0\}$, we call SH with
+Now for each bracket $s \in \{s_{max}, ..., 0\}$, we call successive halving with
 $r_{min} = \eta^{-s} * r_{max}$ and the number of configurations
 $N = \lceil \frac{s_{max} + 1}{s+1} * \eta^s \rceil$. Note that the last bracket where
 $s=0$ evaluates all configurations on $r_{min} = r_{max}$, which means that we
-effectively run random search. In practice we execute brackets in an round robin
+effectively run random search. In practice we execute brackets in a round robin
 fashion, which means we start with $s=s_{max}$ again once we finished the loop.
 Given enough resources, we could also run all brackets in parallel because configurations are sampled at random.
 We will discuss this case in more detail in :numref:`sec_sh_async`.
 
-<!-- ![Learning curves of random hyperparameter configurations](../../img/hb.svg) -->
-![Learning curves of random hyperparameter configurations](img/hb.svg)
+![The different brackets of successive halving run by Hyperband.](img/hb.svg)
 :width:`400px`
 :label:`hb`
 
@@ -329,22 +321,24 @@ tuner = d2l.HPOTuner(scheduler=scheduler, objective=d2l.objective)
 tuner.run(number_of_trials=100)
 ```
 
+Now, we can visualize the different bracket of successive halving.
+
 ```{.python .input  n=24}
 for bi, bracket in scheduler.brackets.items():
     rung_levels = [xi[0] for xi in bracket]
     errors = [xi[1] for xi in bracket]
-    plt.scatter(rung_levels, errors)
+    d2l.plt.scatter(rung_levels, errors)
 
-    plt.xlim(min_number_of_epochs-0.5, max_number_of_epochs+0.5)
-    plt.xticks(
+    d2l.plt.xlim(min_number_of_epochs-0.5, max_number_of_epochs+0.5)
+    d2l.plt.xticks(
         np.arange(min_number_of_epochs, max_number_of_epochs+1),
         np.arange(min_number_of_epochs, max_number_of_epochs+1)
     )
 
-    plt.title(f'bracket s={bi}')
-    plt.ylabel('objective function')
-    plt.xlabel('epochs')        
-    plt.show()
+    d2l.plt.title(f'bracket s={bi}')
+    d2l.plt.ylabel('objective function')
+    d2l.plt.xlabel('epochs')        
+    d2l.plt.show()
 
 ```
 
@@ -352,6 +346,6 @@ for bi, bracket in scheduler.brackets.items():
 
 This section introduces the concept of multi-fidelity hyperparameter optimization, where we assume to have access to cheap-to-evaluate approximations of the objective function. Here, we consider the performance after each epoch as an approximation of the performance after training for the full amount of epochs. Multi-fidelity hyperparameter optimization allows to reduce the overall computation of the HPO instead of just reducing the wall-clock time.
 
-Arguably the simplest method for multi-fideity hyperparameter optimization is successive halving which is based on random search. We also looked at Hyperband, which run multiple brackets of successive halving, to avoid that good configurations are stopped to early.
+Arguably the simplest method for multi-fidelity hyperparameter optimization is successive halving which is based on random search. We also looked at Hyperband, which run multiple brackets of successive halving, to avoid that good configurations are stopped to early.
 
 ## Exercises

@@ -10,13 +10,13 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 As we have seen in the previous :numref:`sec_api_hpo`, we might have to wait hours or even days before random search returns a good hyperparameter configuration, because of the expensive evaluation of hyperparameter configurations. In practice, we have often access to a pool of resources such as multiple GPUs on the same machine or multiple machines with a single GPU. This begs the question: *How do we  efficiently distribute random search?*
 
 In general, we distinguish between synchronous and asynchronous parallel hyperparameter
-optimization (see Figure :numref:`distributed_scheduling`). In the synchronous setting,
+optimization (see :numref:`distributed_scheduling`). In the synchronous setting,
 we wait for all concurrently running trials to finish, before we start the next
 batch. Consider search spaces that contain hyperparameters such as the number of filters
 or number of layers of a deep neural network. Hyperparameter configurations that contain
 a larger number of layers of filters will naturally take more time to finish, and all
 other trials in the same batch will have to wait at synchronisation points (grey area
-in Figure :numref:`distributed_scheduling`) before we can continue the optimization process.
+in :numref:`distributed_scheduling`) before we can continue the optimization process.
 
 In the asynchronous setting we immediately schedule a new trial as soon as resources
 become available. This will optimally exploit our resources, since we can avoid any
