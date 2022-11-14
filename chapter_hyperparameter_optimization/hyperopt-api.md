@@ -3,7 +3,7 @@
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
-# An API for Hyperparameter Optimization
+# Hyperparameter Optimization API
 :label:`sec_api_hpo`
 
 
@@ -51,7 +51,7 @@ The following code shows how to implement our random search optimizer from the p
 ```{.python .input  n=3}
 %%tab all
 
-class RandomSearcher(d2l.HPOSearcher):  #@save
+class RandomSearcher(HPOSearcher):  #@save
     def __init__(self, config_space):
         self.save_hyperparameters()
 
@@ -66,7 +66,7 @@ class RandomSearcher(d2l.HPOSearcher):  #@save
 
 Beyond sampling configurations for new trials, we also need to decide when and for how long to
 run a trial. In practice, all these decisions are
-done by the `HPOScheduler`, who delegates the choice of new configurations to a
+done by the `HPOScheduler`, which delegates the choice of new configurations to a
 `HPOSearcher`. The `suggest` method is called whenever some resource for training
 becomes available. Apart from invoking `sample_configuration` of a searcher, it
 may also decide upon parameters like `max_epochs` (i.e., how long to train the
@@ -102,10 +102,10 @@ class BasicScheduler(HPOScheduler):  #@save
 
 ### Tuner
 
-Finally, we need a component that runs the scheduler / searcher and does some book-keeping
+Finally, we need a component that runs the scheduler/searcher and does some book-keeping
 of the results. The following code implements a sequential execution of the HPO trials that
 evaluates one training job after the next and will serve as a basic example. We will later
-use *Syne Tune* for more sophisticated distributed HPO cases.
+use *Syne Tune* for more scalable distributed HPO cases.
 
 ```{.python .input  n=7}
 %%tab pytorch
@@ -114,7 +114,7 @@ class HPOTuner(d2l.HyperParameters):  #@save
     def __init__(self, scheduler, objective):
         self.save_hyperparameters()
         
-        # bookeeping results for plotting
+        # Bookeeping results for plotting
         self.incumbent = None
         self.incumbent_error = None
         self.incumbent_trajectory = []
@@ -158,16 +158,16 @@ found by an optimizer works, but also how quickly an optimizer is able to find i
 
 @d2l.add_to_class(HPOTuner) #@save
 def bookkeeping(self, config, error, runtime): 
-    # check if the last hyperparameter configuration performs better 
+    # Check if the last hyperparameter configuration performs better 
     # than the incumbent
     if self.incumbent is None or self.incumbent_error > error:
         self.incumbent = config
         self.incumbent_error = error
         
-    # add current best observed performance to the optimization trajectory
+    # Add current best observed performance to the optimization trajectory
     self.incumbent_trajectory.append(self.incumbent_error)
     
-    # update runtime
+    # Update runtime
     self.current_runtime += runtime
     self.cumulative_runtime.append(self.current_runtime)
 ```
@@ -190,7 +190,7 @@ def objective(batch_size, learning_rate, max_epochs=8):  #@save
     return validation_error    
 ```
 
-We also define need to define the configuration space.
+We also need to define the configuration space.
 
 ```{.python .input  n=15}
 config_space = {
@@ -202,9 +202,9 @@ config_space = {
 Now we can start our random search:
 
 ```{.python .input}
-searcher = d2l.RandomSearcher(config_space)
+searcher = RandomSearcher(config_space)
 scheduler = BasicScheduler(searcher=searcher)
-tuner = d2l.HPOTuner(scheduler=scheduler, objective=objective)
+tuner = HPOTuner(scheduler=scheduler, objective=objective)
 
 tuner.run(number_of_trials=5)
 ```
@@ -238,14 +238,14 @@ can make use of the past observation to identify better configurations and thus 
 outperforms random search afterwards.
 
 
-![Example any-time performance plot to compare two algorithms A and B](img/example_anytime_performance.png)
+![Example any-time performance plot to compare two algorithms A and B.](img/example_anytime_performance.png)
 :width:`400px`
 :label:`example_anytime_performance`
 
 
 ## Summary
 
-This section layed out a simple, yet flexible interface to implement various HPO algorithms that we will look at in this chapter. Similar interfaces can be found in popular open-source HPO frameworks.
+This section laid out a simple, yet flexible interface to implement various HPO algorithms that we will look at in this chapter. Similar interfaces can be found in popular open-source HPO frameworks.
 We also looked at how we can compare HPO algorithms, and potential pitfall one needs to be aware. 
 
 
