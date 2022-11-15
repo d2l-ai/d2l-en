@@ -60,8 +60,8 @@ import jax
 from jax import numpy as jnp
 import numpy as np
 import time
-import torch
-import torchvision
+import tensorflow as tf
+import tensorflow_datasets as tfds
 
 d2l.use_svg_display()
 ```
@@ -99,41 +99,12 @@ class FashionMNIST(d2l.DataModule):  #@save
 ```
 
 ```{.python .input}
-%%tab tensorflow
+%%tab tensorflow, jax
 class FashionMNIST(d2l.DataModule):  #@save
     def __init__(self, batch_size=64, resize=(28, 28)):
         super().__init__()
         self.save_hyperparameters()
         self.train, self.val = tf.keras.datasets.fashion_mnist.load_data()
-```
-
-```{.python .input}
-%%tab jax
-class ToArray:  #@save
-    """Convert a PIL Image to numpy.ndarray."""
-    def __init__(self):
-        pass
-
-    def __call__(self, pic):
-        img = np.asarray(pic) / 255  # Convert PIL to ndarray & normalize
-        # Use channel last format
-        img = img.reshape(img.shape[0], img.shape[1], len(pic.getbands()))
-        return img
-```
-
-```{.python .input}
-%%tab jax
-class FashionMNIST(d2l.DataModule):  #@save
-    def __init__(self, batch_size=64, resize=(28, 28)):
-        super().__init__()
-        self.save_hyperparameters()
-        trans = torchvision.transforms.Compose(
-                                    [torchvision.transforms.Resize(resize),
-                                     ToArray()])
-        self.train = torchvision.datasets.FashionMNIST(
-            root=self.root, train=True, transform=trans, download=True)
-        self.val = torchvision.datasets.FashionMNIST(
-            root=self.root, train=False, transform=trans, download=True)
 ```
 
 Fashion-MNIST consists of images from 10 categories, each represented
@@ -143,13 +114,13 @@ Consequently the training set and the test set
 contain 60,000 and 10,000 images, respectively.
 
 ```{.python .input}
-%%tab mxnet, pytorch, jax
+%%tab mxnet, pytorch
 data = FashionMNIST(resize=(32, 32))
 len(data.train), len(data.val)
 ```
 
 ```{.python .input}
-%%tab tensorflow
+%%tab tensorflow, jax
 data = FashionMNIST(resize=(32, 32))
 len(data.train[0]), len(data.val[0])
 ```
@@ -204,7 +175,7 @@ def get_dataloader(self, train):
 ```
 
 ```{.python .input}
-%%tab tensorflow
+%%tab tensorflow, jax
 @d2l.add_to_class(FashionMNIST)  #@save
 def get_dataloader(self, train):
     data = self.train if train else self.val
@@ -212,25 +183,13 @@ def get_dataloader(self, train):
                             tf.cast(y, dtype='int32'))
     resize_fn = lambda X, y: (tf.image.resize_with_pad(X, *self.resize), y)
     shuffle_buf = len(data[0]) if train else 1
-    return tf.data.Dataset.from_tensor_slices(process(*data)).batch(
-        self.batch_size).map(resize_fn).shuffle(shuffle_buf)
-```
-
-```{.python .input}
-%%tab jax
-@d2l.add_to_class(FashionMNIST)  #@save
-def get_dataloader(self, train):
-    def jax_collate(batch):
-        if isinstance(batch[0], np.ndarray):
-            return jnp.stack(batch)
-        elif isinstance(batch[0], (tuple, list)):
-            transposed = zip(*batch)
-            return [jax_collate(samples) for samples in transposed]
-        else:
-            return jnp.array(batch)
-    data = self.train if train else self.val
-    return torch.utils.data.DataLoader(data, self.batch_size, shuffle=train,
-                                       collate_fn=jax_collate, num_workers=0)
+    if tab.selected('tensorflow'):
+        return tf.data.Dataset.from_tensor_slices(process(*data)).batch(
+            self.batch_size).map(resize_fn).shuffle(shuffle_buf)
+    if tab.selected('jax'):
+        return tfds.as_numpy(
+            tf.data.Dataset.from_tensor_slices(process(*data)).batch(
+                self.batch_size).map(resize_fn).shuffle(shuffle_buf))
 ```
 
 To see how this works, let's load a minibatch of images by invoking the newly-added `train_dataloader` method. It contains 64 images.
@@ -273,7 +232,7 @@ def visualize(self, batch, nrows=1, ncols=8, labels=[]):
     X, y = batch
     if not labels:
         labels = self.text_labels(y)
-    if tab.selected('mxnet') or tab.selected('pytorch'):
+    if tab.selected('mxnet', 'pytorch'):
         d2l.show_images(X.squeeze(1), nrows, ncols, titles=labels)
     if tab.selected('tensorflow'):
         d2l.show_images(tf.squeeze(X), nrows, ncols, titles=labels)

@@ -50,7 +50,8 @@ import jax
 from jax import numpy as jnp
 import numpy as np
 import random
-import torch
+import tensorflow as tf
+import tensorflow_datasets as tfds
 ```
 
 ## Generating the Dataset
@@ -142,7 +143,7 @@ def get_dataloader(self, train):
     else:
         indices = list(range(self.num_train, self.num_train+self.num_val))
     for i in range(0, len(indices), self.batch_size):
-        if tab.selected('mxnet') or tab.selected('pytorch') or tab.selected('jax'):
+        if tab.selected('mxnet', 'pytorch', 'jax'):
             batch_indices = d2l.tensor(indices[i: i+self.batch_size])
             yield self.X[batch_indices], self.y[batch_indices]
         if tab.selected('tensorflow'):
@@ -193,7 +194,7 @@ and let it take care of shuffling examples  efficiently.
 JAX is all about NumPy like API with device acceleration and the functional
 transformations, so at least the current version doesn’t include data loading
 methods. With other  libraries we already have great data loaders out there,
-and JAX suggests using them instead. Here we will grab PyTorch’s data loader,
+and JAX suggests using them instead. Here we will grab TensorFlow’s data loader,
 and modify it slightly to make it work with JAX.
 :end_tab:
 
@@ -211,33 +212,12 @@ def get_tensorloader(self, tensors, train, indices=slice(0, None)):
         return torch.utils.data.DataLoader(dataset, self.batch_size,
                                            shuffle=train)
     if tab.selected('jax'):
-        # Use PyTorch Dataset and Dataloader
-        # JAX or Flax do not provide any dataloading functionality
-
-        def jax_collate(batch):
-            if isinstance(batch[0], np.ndarray):
-                return jnp.stack(batch)
-            elif isinstance(batch[0], (tuple, list)):
-                transposed = zip(*batch)
-                return [jax_collate(samples) for samples in transposed]
-            else:
-                return jnp.array(batch)
-
-        class JaxDataset(torch.utils.data.Dataset):
-            def __init__(self, train, seed=0):
-                super().__init__()
-
-            def __getitem__(self, index):
-                return (np.asarray(tensors[0][index]),
-                        np.asarray(tensors[1][index]))
-
-            def __len__(self):
-                return len(tensors[0])
-
-        dataset = JaxDataset(*tensors)
-        return torch.utils.data.DataLoader(dataset, self.batch_size,
-                                           shuffle=train,
-                                           collate_fn=jax_collate)
+        # Use Tensorflow Datasets & Dataloader. JAX or Flax do not provide
+        # any dataloading functionality
+        shuffle_buffer = tensors[0].shape[0] if train else 1
+        return tfds.as_numpy(
+            tf.data.Dataset.from_tensor_slices(tensors).shuffle(
+                buffer_size=shuffle_buffer).batch(self.batch_size))
 
     if tab.selected('tensorflow'):
         shuffle_buffer = tensors[0].shape[0] if train else 1

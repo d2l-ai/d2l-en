@@ -299,11 +299,11 @@ The `DataModule` class is the base class for data. Quite frequently the `__init_
 ```{.python .input}
 %%tab all
 class DataModule(d2l.HyperParameters):  #@save
-    if tab.selected('mxnet', 'pytorch', 'jax'):
+    if tab.selected('mxnet', 'pytorch'):
         def __init__(self, root='../data', num_workers=4):
             self.save_hyperparameters()
 
-    if tab.selected('tensorflow'):
+    if tab.selected('tensorflow', 'jax'):
         def __init__(self, root='../data'):
             self.save_hyperparameters()
 
