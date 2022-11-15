@@ -44,8 +44,8 @@ import flax
 import jax
 import numpy as np
 import optax
-import torch  # Used for dataloading
-import torchvision  # Used for dataloading
+import tensorflow as tf  # Used for dataloading
+import tensorflow_datasets as tfds  # Used for dataloading
 from flax import linen as nn
 from flax.training.train_state import TrainState
 from jax import grad
@@ -249,7 +249,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
 
 class DataModule(d2l.HyperParameters):
     """Defined in :numref:`sec_oo-design`"""
-    def __init__(self, root='../data', num_workers=4):
+    def __init__(self, root='../data'):
         self.save_hyperparameters()
 
     def get_dataloader(self, train):
@@ -264,33 +264,12 @@ class DataModule(d2l.HyperParameters):
     def get_tensorloader(self, tensors, train, indices=slice(0, None)):
         """Defined in :numref:`sec_synthetic-regression-data`"""
         tensors = tuple(a[indices] for a in tensors)
-        # Use PyTorch Dataset and Dataloader
+        # Use Tensorflow Datasets & Dataloader
         # JAX or Flax do not provide any dataloading functionality
-    
-        def jax_collate(batch):
-            if isinstance(batch[0], np.ndarray):
-                return jnp.stack(batch)
-            elif isinstance(batch[0], (tuple, list)):
-                transposed = zip(*batch)
-                return [jax_collate(samples) for samples in transposed]
-            else:
-                return jnp.array(batch)
-    
-        class JaxDataset(torch.utils.data.Dataset):
-            def __init__(self, train, seed=0):
-                super().__init__()
-    
-            def __getitem__(self, index):
-                return (np.asarray(tensors[0][index]),
-                        np.asarray(tensors[1][index]))
-    
-            def __len__(self):
-                return len(tensors[0])
-    
-        dataset = JaxDataset(*tensors)
-        return torch.utils.data.DataLoader(dataset, self.batch_size,
-                                           shuffle=train,
-                                           collate_fn=jax_collate)
+        shuffle_buffer = tensors[0].shape[0] if train else 1
+        return tfds.as_numpy(
+            tf.data.Dataset.from_tensor_slices(tensors).shuffle(
+                buffer_size=shuffle_buffer).batch(self.batch_size))
     
 
 class Trainer(d2l.HyperParameters):
@@ -462,30 +441,12 @@ class LinearRegression(d2l.Module):
         net = state.params['params']['net']
         return net['kernel'], net['bias']
 
-class ToArray:
-    """Convert a PIL Image to numpy.ndarray."""
-    def __init__(self):
-        """Defined in :numref:`sec_fashion_mnist`"""
-        pass
-
-    def __call__(self, pic):
-        img = np.asarray(pic) / 255  # Convert PIL to ndarray & normalize
-        # Use channel last format
-        img = img.reshape(img.shape[0], img.shape[1], len(pic.getbands()))
-        return img
-
 class FashionMNIST(d2l.DataModule):
     """Defined in :numref:`sec_fashion_mnist`"""
     def __init__(self, batch_size=64, resize=(28, 28)):
         super().__init__()
         self.save_hyperparameters()
-        trans = torchvision.transforms.Compose(
-                                    [torchvision.transforms.Resize(resize),
-                                     ToArray()])
-        self.train = torchvision.datasets.FashionMNIST(
-            root=self.root, train=True, transform=trans, download=True)
-        self.val = torchvision.datasets.FashionMNIST(
-            root=self.root, train=False, transform=trans, download=True)
+        self.train, self.val = tf.keras.datasets.fashion_mnist.load_data()
 
     def text_labels(self, indices):
         """Return text labels.
@@ -497,17 +458,14 @@ class FashionMNIST(d2l.DataModule):
 
     def get_dataloader(self, train):
         """Defined in :numref:`sec_fashion_mnist`"""
-        def jax_collate(batch):
-            if isinstance(batch[0], np.ndarray):
-                return jnp.stack(batch)
-            elif isinstance(batch[0], (tuple, list)):
-                transposed = zip(*batch)
-                return [jax_collate(samples) for samples in transposed]
-            else:
-                return jnp.array(batch)
         data = self.train if train else self.val
-        return torch.utils.data.DataLoader(data, self.batch_size, shuffle=train,
-                                           collate_fn=jax_collate, num_workers=0)
+        process = lambda X, y: (tf.expand_dims(X, axis=3) / 255,
+                                tf.cast(y, dtype='int32'))
+        resize_fn = lambda X, y: (tf.image.resize_with_pad(X, *self.resize), y)
+        shuffle_buf = len(data[0]) if train else 1
+        return tfds.as_numpy(
+            tf.data.Dataset.from_tensor_slices(process(*data)).batch(
+                self.batch_size).map(resize_fn).shuffle(shuffle_buf))
 
     def visualize(self, batch, nrows=1, ncols=8, labels=[]):
         """Defined in :numref:`sec_fashion_mnist`"""
