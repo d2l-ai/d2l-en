@@ -194,7 +194,7 @@ and let it take care of shuffling examples  efficiently.
 JAX is all about NumPy like API with device acceleration and the functional
 transformations, so at least the current version doesn’t include data loading
 methods. With other  libraries we already have great data loaders out there,
-and JAX suggests using them instead. Here we will grab Tensorflow’s data loader,
+and JAX suggests using them instead. Here we will grab TensorFlow’s data loader,
 and modify it slightly to make it work with JAX.
 :end_tab:
 
@@ -212,8 +212,8 @@ def get_tensorloader(self, tensors, train, indices=slice(0, None)):
         return torch.utils.data.DataLoader(dataset, self.batch_size,
                                            shuffle=train)
     if tab.selected('jax'):
-        # Use Tensorflow Datasets & Dataloader
-        # JAX or Flax do not provide any dataloading functionality
+        # Use Tensorflow Datasets & Dataloader. JAX or Flax do not provide
+        # any dataloading functionality
         shuffle_buffer = tensors[0].shape[0] if train else 1
         return tfds.as_numpy(
             tf.data.Dataset.from_tensor_slices(tensors).shuffle(

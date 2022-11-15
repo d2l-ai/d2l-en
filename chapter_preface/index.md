@@ -479,8 +479,8 @@ from jax import numpy as jnp
 from jax import grad, vmap
 import numpy as np
 import optax
-import tensorflow as tf  # Used for dataloading
-import tensorflow_datasets as tfds  # Used for dataloading
+import tensorflow as tf
+import tensorflow_datasets as tfds
 ```
 
 ### Target Audience

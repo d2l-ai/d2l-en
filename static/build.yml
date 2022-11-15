@@ -10,7 +10,7 @@ dependencies:
     - -f https://download.pytorch.org/whl/torch_stable.html
     - tensorflow==2.9.1
     - tensorflow-probability==0.17.0
-    - tensorflow-datasets
+    - tensorflow-datasets==4.7.0
     - jaxlib
     - "jax[cuda]"
     - -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html

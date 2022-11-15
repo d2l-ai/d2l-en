@@ -60,8 +60,8 @@ import jax
 from jax import numpy as jnp
 import numpy as np
 import time
-import tensorflow as tf  # Used for dataloading
-import tensorflow_datasets as tfds  # Used for dataloading
+import tensorflow as tf
+import tensorflow_datasets as tfds
 
 d2l.use_svg_display()
 ```

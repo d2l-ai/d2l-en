@@ -44,8 +44,8 @@ import flax
 import jax
 import numpy as np
 import optax
-import tensorflow as tf  # Used for dataloading
-import tensorflow_datasets as tfds  # Used for dataloading
+import tensorflow as tf
+import tensorflow_datasets as tfds
 from flax import linen as nn
 from flax.training.train_state import TrainState
 from jax import grad
