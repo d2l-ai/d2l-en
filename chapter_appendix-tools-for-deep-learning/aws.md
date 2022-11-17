@@ -20,7 +20,7 @@ After logging into your AWS account, click "EC2" (:numref:`fig_aws`) to go to th
 
 :numref:`fig_ec2` shows the EC2 panel.
 
-![EC2 panel.](../img/ec2.png)
+![The EC2 panel.](../img/ec2.png)
 :width:`700px`
 :label:`fig_ec2`
 
@@ -110,7 +110,7 @@ instance ID shown in :numref:`fig_launching` to view the status of this instance
 
 As shown in :numref:`fig_connect`, after the instance state turns green, right-click the instance and select `Connect` to view the instance access method.
 
-![View instance access method.](../img/connect.png)
+![View the instance access method.](../img/connect.png)
 :width:`700px`
 :label:`fig_connect`
 
