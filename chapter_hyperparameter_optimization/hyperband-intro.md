@@ -8,12 +8,10 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 
 Training neural networks can be expensive even on moderate size datasets.
-For example, training a single ResNet-50 on a rather small dataset set, such as CIFAR10,
-might take 2 hours on an Amazon Elastic Cloud Compute (EC2) g4dn.xlarge instance.
-However, depending on the search space, hyperparameter optimization usually
-requires tens to hundreds of function evaluations to find a well-performing hyperparameter configuration.
-Even though we can significantly speed up the overall wall-clock time of our HPO
-process by exploiting parallel resources (see :numref:`sec_rs_async`), this does
+Depending on the search space, hyperparameter optimization usually
+requires tens to hundreds of function evaluations to find a well-performing hyperparameter configuration. Even if a single training run takes only an hour, we might have to wait several days for HPO to complete.
+As we have seen in the :numref:`sec_rs_async`, we can significantly speed up the overall wall-clock time of our HPO
+process by exploiting parallel resources, however, this does
 not reduce the total amount of compute that we have to spend. 
 
 *Can we speed up the evaluation of hyperparameter configurations?* Methods such
@@ -139,8 +137,8 @@ def suggest(self):
 ```
 
 When we collected a new data point, we first update the searcher module. Afterwards
-we check if we already collect all data points on the current rung. If so, we
-sort all configurations based on their performance and push the top $\frac{1}{\eta}$
+we check if we already collect all data points on the current rung. 
+If so, we sort all configurations and push the top $\frac{1}{\eta}$
 configurations into the queue.
 
 ```{.python .input  n=4}
@@ -172,7 +170,13 @@ def update(self, config, error, info=None):
                 for config in best_performing_configurations
             ] + self.queue
             self.observed_error_at_rungs[ri] = []  # reset
-        
+```
+
+Configurations are sorted based on their observed performance on the current rung.
+
+```{.python .input  n=4}
+%%tab all
+ 
 @d2l.add_to_class(SuccessiveHalvingScheduler)  #@save
 def get_top_n_configurations(self, rung_level, n):
     rung = self.observed_error_at_rungs[rung_level]

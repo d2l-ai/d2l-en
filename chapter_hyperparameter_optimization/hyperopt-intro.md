@@ -205,6 +205,6 @@ performing configurations to speed up the optimization process.
 
 In this section we introduced hyperparameter optimization (HPO) and how we can phrase it as a global optimization by defining a configuration space and an objective function. We also implemented our first HPO algorithm, random search, and applied it on a simple softmax classification problem.
 
-While random search is very simple, it is the better alternative to grid search, which simply evaluates a fixed set of hyperparameters. It does not suffer from the curse of dimensionality and is more likely to find the optimal hyperparameter configuration.
+While random search is very simple, it is the better alternative to grid search, which simply evaluates a fixed set of hyperparameters. It does not suffer from the curse of dimensionality :cite:`bellman-science66` and is more likely to find the optimal hyperparameter configuration.
 
 # Exercise
