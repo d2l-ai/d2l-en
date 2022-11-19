@@ -358,14 +358,6 @@ according to the specified dropout probability.
 When not in training mode,
 the `Dropout` layer simply passes the data through during testing.
 
-:begin_tab:`jax`
-Note that we need to redefine the loss function since a network
-with a dropout layer needs a PRNGKey when using `Module.apply()`,
-this RNG seed should be explicitly named `dropout`. This key is
-used by the `dropout` layer in Flax to generate the random dropout
-mask internally.
-:end_tab:
-
 ```{.python .input}
 %%tab mxnet
 class DropoutMLP(d2l.Classifier):
@@ -431,10 +423,18 @@ class DropoutMLP(d2l.Classifier):
         return nn.Dense(self.num_outputs)(x)
 ```
 
+:begin_tab:`jax`
+Note that we need to redefine the loss function since a network
+with a dropout layer needs a PRNGKey when using `Module.apply()`,
+and this RNG seed should be explicitly named `dropout`. This key is
+used by the `dropout` layer in Flax to generate the random dropout
+mask internally.
+:end_tab:
+
 ```{.python .input}
 %%tab jax
 @d2l.add_to_class(d2l.Classifier)  #@save
-@partial(jax.jit, static_argnums=(0,4))
+@partial(jax.jit, static_argnums=(0, 4))
 def loss(self, params, X, Y, averaged=True):
     Y_hat = self.apply(params, X, rngs={'dropout': jax.random.PRNGKey(0)})
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))

@@ -191,7 +191,7 @@ def loss(self, Y_hat, Y, averaged=True):
 ```{.python .input}
 %%tab jax
 @d2l.add_to_class(d2l.Classifier)  #@save
-@partial(jax.jit, static_argnums=(0,4))
+@partial(jax.jit, static_argnums=(0, 4))
 def loss(self, params, X, Y, averaged=True):
     Y_hat = self.apply(params, X, rngs=None)
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))

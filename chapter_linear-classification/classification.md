@@ -132,7 +132,7 @@ def accuracy(self, Y_hat, Y, averaged=True):
 ```{.python .input  n=9}
 %%tab jax
 @d2l.add_to_class(Classifier)  #@save
-@partial(jax.jit, static_argnums=(0,4))
+@partial(jax.jit, static_argnums=(0, 4))
 def accuracy(self, params, X, Y, averaged=True):
     """Compute the number of correct predictions."""
     Y_hat = self.apply(params, X)
