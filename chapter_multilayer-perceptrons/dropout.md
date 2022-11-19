@@ -361,7 +361,9 @@ the `Dropout` layer simply passes the data through during testing.
 :begin_tab:`jax`
 Note that we need to redefine the loss function since a network
 with a dropout layer needs a PRNGKey when using `Module.apply()`,
-this RNG seed should be explicitly named `dropout`.
+this RNG seed should be explicitly named `dropout`. This key is
+used by the `dropout` layer in Flax to generate the random dropout
+mask internally.
 :end_tab:
 
 ```{.python .input}
