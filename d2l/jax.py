@@ -40,6 +40,7 @@ from matplotlib_inline import backend_inline
 d2l = sys.modules[__name__]
 
 from dataclasses import field
+from functools import partial
 import flax
 import jax
 import numpy as np
@@ -264,8 +265,8 @@ class DataModule(d2l.HyperParameters):
     def get_tensorloader(self, tensors, train, indices=slice(0, None)):
         """Defined in :numref:`sec_synthetic-regression-data`"""
         tensors = tuple(a[indices] for a in tensors)
-        # Use Tensorflow Datasets & Dataloader
-        # JAX or Flax do not provide any dataloading functionality
+        # Use Tensorflow Datasets & Dataloader. JAX or Flax do not provide
+        # any dataloading functionality
         shuffle_buffer = tensors[0].shape[0] if train else 1
         return tfds.as_numpy(
             tf.data.Dataset.from_tensor_slices(tensors).shuffle(
@@ -488,6 +489,7 @@ class Classifier(d2l.Module):
         self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1]),
                   train=False)
 
+    @partial(jax.jit, static_argnums=(0, 4))
     def accuracy(self, params, X, Y, averaged=True):
         """Compute the number of correct predictions.
     
@@ -498,9 +500,18 @@ class Classifier(d2l.Module):
         compare = d2l.astype(preds == d2l.reshape(Y, -1), d2l.float32)
         return d2l.reduce_mean(compare) if averaged else compare
 
-    def loss(self, params, X, Y, averaged=True, rngs=None):
+    @partial(jax.jit, static_argnums=(0, 4))
+    def loss(self, params, X, Y, averaged=True):
         """Defined in :numref:`sec_softmax_concise`"""
-        Y_hat = self.apply(params, X, rngs=rngs)
+        Y_hat = self.apply(params, X, rngs=None)
+        Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+        fn = optax.softmax_cross_entropy_with_integer_labels
+        return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
+
+    @partial(jax.jit, static_argnums=(0, 4))
+    def loss(self, params, X, Y, averaged=True):
+        """Defined in :numref:`sec_dropout`"""
+        Y_hat = self.apply(params, X, rngs={'dropout': jax.random.PRNGKey(0)})
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         fn = optax.softmax_cross_entropy_with_integer_labels
         return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)

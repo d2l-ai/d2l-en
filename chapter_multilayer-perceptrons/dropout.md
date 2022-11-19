@@ -198,8 +198,10 @@ def dropout_layer(X, dropout):
 %%tab jax
 from d2l import jax as d2l
 from flax import linen as nn
+from functools import partial
 import jax
 from jax import numpy as jnp
+import optax
 
 def dropout_layer(X, dropout, key=d2l.get_key()):
     assert 0 <= dropout <= 1
@@ -311,7 +313,7 @@ class DropoutMLPScratch(d2l.Classifier):
     dropout_1: float
     dropout_2: float
     lr: float
-    training: bool
+    training: bool = True
 
     def setup(self):
         self.lin1 = nn.Dense(self.num_hiddens_1)
@@ -335,12 +337,8 @@ The following is similar to the training of MLPs described previously.
 
 ```{.python .input}
 %%tab all
-if tab.selected('pytorch', 'mxnet', 'tensorflow'):
-    hparams = {'num_outputs':10, 'num_hiddens_1':256, 'num_hiddens_2':256,
-               'dropout_1':0.5, 'dropout_2':0.5, 'lr':0.1}
-if tab.selected('jax'):
-    hparams = {'num_outputs':10, 'num_hiddens_1':256, 'num_hiddens_2':256,
-               'dropout_1':0.5, 'dropout_2':0.5, 'lr':0.1, 'training': True}
+hparams = {'num_outputs':10, 'num_hiddens_1':256, 'num_hiddens_2':256,
+           'dropout_1':0.5, 'dropout_2':0.5, 'lr':0.1}
 model = DropoutMLPScratch(**hparams)
 data = d2l.FashionMNIST(batch_size=256)
 trainer = d2l.Trainer(max_epochs=10)
@@ -414,7 +412,7 @@ class DropoutMLP(d2l.Classifier):
     dropout_1: float
     dropout_2: float
     lr: float
-    training: bool
+    training: bool = True
 
     @nn.compact
     def __call__(self, X):
@@ -423,10 +421,25 @@ class DropoutMLP(d2l.Classifier):
         x = nn.relu(nn.Dense(self.num_hiddens_2)(x))
         x = nn.Dropout(self.dropout_2, deterministic=not self.training)(x)
         return nn.Dense(self.num_outputs)(x)
+```
 
-@d2l.add_to_class(DropoutMLP)
-def loss(self, params, X, Y, averaged=True, rngs={'dropout': d2l.get_key()}):
-    return super(DropoutMLP, self).loss(params, X, Y, averaged, rngs)
+:begin_tab:`jax`
+Note that we need to redefine the loss function since a network
+with a dropout layer needs a PRNGKey when using `Module.apply()`,
+and this RNG seed should be explicitly named `dropout`. This key is
+used by the `dropout` layer in Flax to generate the random dropout
+mask internally.
+:end_tab:
+
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(d2l.Classifier)  #@save
+@partial(jax.jit, static_argnums=(0, 4))
+def loss(self, params, X, Y, averaged=True):
+    Y_hat = self.apply(params, X, rngs={'dropout': jax.random.PRNGKey(0)})
+    Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+    fn = optax.softmax_cross_entropy_with_integer_labels
+    return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
 ```
 
 Next, we [**train the model**].

@@ -39,6 +39,7 @@ import tensorflow as tf
 %%tab jax
 from d2l import jax as d2l
 from flax import linen as nn
+from functools import partial
 import jax
 from jax import numpy as jnp
 import optax
@@ -190,8 +191,9 @@ def loss(self, Y_hat, Y, averaged=True):
 ```{.python .input}
 %%tab jax
 @d2l.add_to_class(d2l.Classifier)  #@save
-def loss(self, params, X, Y, averaged=True, rngs=None):
-    Y_hat = self.apply(params, X, rngs=rngs)
+@partial(jax.jit, static_argnums=(0, 4))
+def loss(self, params, X, Y, averaged=True):
+    Y_hat = self.apply(params, X, rngs=None)
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     fn = optax.softmax_cross_entropy_with_integer_labels
     return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
