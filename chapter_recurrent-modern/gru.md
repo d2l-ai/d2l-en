@@ -40,7 +40,7 @@ with a sigmoid activation function.
 Mathematically, for a given time step $t$,
 suppose that the input is a minibatch
 $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ 
-number of examples: $n$, number of inputs: $d$)
+(number of examples: $n$, number of inputs: $d$)
 and the hidden state of the previous time step 
 is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$ 
 (number of hidden units: $h$). 
