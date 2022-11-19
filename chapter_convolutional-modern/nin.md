@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Network in Network (NiN)
@@ -97,6 +97,21 @@ def nin_block(out_channels, kernel_size, strides, padding):
     tf.keras.layers.Activation('relu')])
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+
+def nin_block(out_channels, kernel_size, strides, padding):
+    return nn.Sequential([
+        nn.Conv(out_channels, kernel_size, strides, padding),
+        nn.relu,
+        nn.Conv(out_channels, kernel_size=(1, 1)), nn.relu,
+        nn.Conv(out_channels, kernel_size=(1, 1)), nn.relu])
+```
+
 ## [**NiN Model**]
 
 NiN uses the same initial convolution sizes as AlexNet (it was proposed shortly thereafter).
@@ -111,7 +126,7 @@ yielding a vector of logits.
 This design significantly reduces the number of required model parameters, albeit at the expense of a potential increase in training time.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class NiN(d2l.Classifier):
     def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
@@ -157,6 +172,28 @@ class NiN(d2l.Classifier):
                 tf.keras.layers.Flatten()])
 ```
 
+```{.python .input}
+%%tab jax
+class NiN(d2l.Classifier):
+    lr: float = 0.1
+    num_classes = 10
+    training: bool = True
+
+    def setup(self):
+        self.net = nn.Sequential([
+            nin_block(96, kernel_size=(11, 11), strides=(4, 4), padding=(0, 0)),
+            lambda x: nn.max_pool(x, (3, 3), strides=(2, 2)),
+            nin_block(256, kernel_size=(5, 5), strides=(1, 1), padding=(2, 2)),
+            lambda x: nn.max_pool(x, (3, 3), strides=(2, 2)),
+            nin_block(384, kernel_size=(3, 3), strides=(1, 1), padding=(1, 1)),
+            lambda x: nn.max_pool(x, (3, 3), strides=(2, 2)),
+            nn.Dropout(0.5, deterministic=not self.training),
+            nin_block(self.num_classes, kernel_size=(3, 3), strides=1, padding=(1, 1)),
+            lambda x: nn.avg_pool(x, (5, 5)),  # global avg pooling
+            lambda x: x.reshape((x.shape[0], -1))  # flatten
+        ])
+```
+
 We create a data example to see [**the output shape of each block**].
 
 ```{.python .input}
@@ -177,13 +214,21 @@ for layer in model.net.layers:
     print(layer.__class__.__name__,'output shape:\t', X.shape)
 ```
 
+```{.python .input}
+%%tab jax
+keys = d2l.get_key()
+model = NiN(training=False)
+params = model.init(keys, jnp.zeros((1, 224, 224, 1)))
+jax.tree_util.tree_map(lambda x: x.shape, params)
+```
+
 ## [**Training**]
 
 As before we use Fashion-MNIST to train the model using the same 
 optimizer that we used for AlexNet and VGG.
 
 ```{.python .input}
-%%tab mxnet, pytorch
+%%tab mxnet, pytorch, jax
 model = NiN(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
