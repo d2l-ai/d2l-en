@@ -471,6 +471,7 @@ import tensorflow as tf
 #@tab jax
 #@save
 from dataclasses import field
+from functools import partial
 import flax
 from flax import linen as nn
 from flax.training.train_state import TrainState
