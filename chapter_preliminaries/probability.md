@@ -635,7 +635,7 @@ $$P(A \mid B) \propto P(B \mid A) P(A).$$
 Since we know that $P(A \mid B)$ must be normalized to $1$, i.e., $\sum_a P(A=a \mid B) = 1$,
 we can use it to compute
 
-$$P(A \mid B) = \frac{P(B \mid A) P(A)}{\sum_b P(B=b \mid A) P(A)}.$$
+$$P(A \mid B) = \frac{P(B \mid A) P(A)}{\sum_a P(A=a \mid B) P(B)}.$$
 
 In Bayesian statistics, we think of an observer
 as possessing some (subjective) prior beliefs
