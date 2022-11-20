@@ -265,7 +265,7 @@ def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
     self.save_hyperparameters()
     corpus, self.vocab = self.build(self._download())
     array = d2l.tensor([corpus[i:i+num_steps+1] 
-                        for i in range(len(corpus) - num_steps)])
+                        for i in range(len(corpus)-num_steps)])
     self.X, self.Y = array[:,:-1], array[:,1:]
 ```
 
