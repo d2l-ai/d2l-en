@@ -274,8 +274,8 @@ we will randomly sample
 pairs of input sequences and target sequences
 in minibatches.
 The following data loader randomly generates a minibatch from the dataset each time.
-The argument `batch_size` specifies the number of subsequence examples (`self.b`) in each minibatch
-and `num_steps` is the subsequence length in tokens (`self.n`).
+The argument `batch_size` specifies the number of subsequence examples in each minibatch
+and `num_steps` is the subsequence length in tokens.
 
 ```{.python .input  n=6}
 %%tab all
