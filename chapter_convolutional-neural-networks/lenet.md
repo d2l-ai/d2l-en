@@ -221,7 +221,7 @@ that its operations line up with
 what we expect from :numref:`img_lenet_vert`.
 Flax provides `nn.tabulate`, a nifty method to summarise the layers and
 parameters in our network. Here we use `bind()` to create a bounded model.
-The `variables` are now bound to the `Module`, i.e. this bouned model
+The `variables` are now bound to the `Module`, i.e. this bounded model
 becomes a stateful object which can then be used to access the `Sequential`
 object attribute `net` and the `layers` within. Note that `bind()` should
 only be used for interactive experimentation, and is not a direct
