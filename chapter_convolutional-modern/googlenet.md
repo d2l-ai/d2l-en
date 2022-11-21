@@ -399,7 +399,7 @@ def b5(self):
                               lambda x: nn.avg_pool(x,
                                                     window_shape=x.shape[1:3],
                                                     strides=x.shape[1:3],
-                                                    padding="VALID"),
+                                                    padding='valid'),
                               lambda x: x.reshape((x.shape[0], -1))])
 ```
 
