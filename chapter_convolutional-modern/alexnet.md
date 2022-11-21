@@ -424,7 +424,7 @@ AlexNet().layer_summary((1, 224, 224, 1))
 
 ```{.python .input}
 %%tab jax
-AlexNet(training=False).layer_summary((1, 224, 224, 1), key=d2l.get_key())
+AlexNet(training=False).layer_summary((1, 224, 224, 1))
 ```
 
 ## Training

@@ -238,8 +238,8 @@ VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary(
 
 ```{.python .input}
 %%tab jax
-VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512)), training=False).layer_summary(
-    (1, 224, 224, 1), key=d2l.get_key())
+VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512)),
+    training=False).layer_summary((1, 224, 224, 1))
 ```
 
 As you can see, we halve height and width at each block,
