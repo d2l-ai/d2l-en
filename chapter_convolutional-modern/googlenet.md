@@ -260,7 +260,8 @@ def b2(self):
                               nn.Conv(192, kernel_size=(3, 3), padding='same'),
                               nn.relu,
                               lambda x: nn.max_pool(x, window_shape=(3, 3),
-                                                    strides=(2, 2), padding='same')])
+                                                    strides=(2, 2),
+                                                    padding='same')])
 ```
 
 The third module connects two complete Inception blocks in series.
@@ -300,7 +301,8 @@ def b3(self):
         return nn.Sequential([Inception(64, (96, 128), (16, 32), 32),
                               Inception(128, (128, 192), (32, 96), 64),
                               lambda x: nn.max_pool(x, window_shape=(3, 3),
-                                                    strides=(2, 2), padding='same')])
+                                                    strides=(2, 2),
+                                                    padding='same')])
 ```
 
 The fourth module is more complicated.
@@ -354,7 +356,8 @@ def b4(self):
                               Inception(112, (144, 288), (32, 64), 64),
                               Inception(256, (160, 320), (32, 128), 128),
                               lambda x: nn.max_pool(x, window_shape=(3, 3),
-                                                    strides=(2, 2), padding='same')])
+                                                    strides=(2, 2),
+                                                    padding='same')])
 ```
 
 The fifth module has two Inception blocks with $256+320+128+128=832$
@@ -392,7 +395,11 @@ def b5(self):
     if tab.selected('jax'):
         return nn.Sequential([Inception(256, (160, 320), (32, 128), 128),
                               Inception(384, (192, 384), (48, 128), 128),
-                              lambda x: nn.avg_pool(x, (1, 1)),
+                              # Flax doesn't provide a GlobalAvgPool2D layer
+                              lambda x: nn.avg_pool(x,
+                                                    window_shape=x.shape[1:3],
+                                                    strides=x.shape[1:3],
+                                                    padding='valid'),
                               lambda x: x.reshape((x.shape[0], -1))])
 ```
 
