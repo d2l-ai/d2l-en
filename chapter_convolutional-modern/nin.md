@@ -198,28 +198,17 @@ We create a data example to see [**the output shape of each block**].
 
 ```{.python .input}
 %%tab mxnet, pytorch
-model = NiN()
-X = d2l.randn(1, 1, 224, 224)
-for layer in model.net:
-    X = layer(X)
-    print(layer.__class__.__name__,'output shape:\t', X.shape)
+NiN().layer_summary((1, 1, 224, 224))
 ```
 
 ```{.python .input}
 %%tab tensorflow
-model = NiN()
-X = d2l.normal((1, 224, 224, 1))
-for layer in model.net.layers:
-    X = layer(X)
-    print(layer.__class__.__name__,'output shape:\t', X.shape)
+NiN().layer_summary((1, 224, 224, 1))
 ```
 
 ```{.python .input}
 %%tab jax
-keys = d2l.get_key()
-model = NiN(training=False)
-params = model.init(keys, jnp.zeros((1, 224, 224, 1)))
-jax.tree_util.tree_map(lambda x: x.shape, params)
+NiN(training=False).layer_summary((1, 224, 224, 1))
 ```
 
 ## [**Training**]

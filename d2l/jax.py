@@ -516,11 +516,15 @@ class Classifier(d2l.Module):
         fn = optax.softmax_cross_entropy_with_integer_labels
         return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
 
-    def layer_summary(self, X_shape, key=jax.random.PRNGKey(d2l.get_seed())):
+    def layer_summary(self, X_shape, key=d2l.get_key()):
         """Defined in :numref:`sec_lenet`"""
         X = jnp.zeros(X_shape)
-        tabulate_fn = nn.tabulate(self, key, method=self.forward)
-        print(tabulate_fn(X))
+        params = self.init(key, X)
+        bound_model = self.bind(params)
+        _ = bound_model(X)
+        for layer in bound_model.net.layers:
+            X = layer(X)
+            print(layer.__class__.__name__, 'output shape:\t', X.shape)
 
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""

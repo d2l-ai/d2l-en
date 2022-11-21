@@ -201,6 +201,7 @@ a softmax layer. This greatly simplifies the implementation, not the least due t
 fact that the Gaussian decoder is rarely used nowadays. Other than that, this network matches
 the original LeNet-5 architecture.
 
+:begin_tab:`pytorch, mxnet, tensorflow`
 Let's see what happens inside the network. By passing a
 single-channel (black and white)
 $28 \times 28$ image through the network
@@ -208,10 +209,23 @@ and printing the output shape at each layer,
 we can [**inspect the model**] to make sure
 that its operations line up with
 what we expect from :numref:`img_lenet_vert`.
+:end_tab:
 
 :begin_tab:`jax`
+Let's see what happens inside the network. By passing a
+single-channel (black and white)
+$28 \times 28$ image through the network
+and printing the output shape at each layer,
+we can [**inspect the model**] to make sure
+that its operations line up with
+what we expect from :numref:`img_lenet_vert`.
 Flax provides `nn.tabulate`, a nifty method to summarise the layers and
-parameters in our network.
+parameters in our network. Here we use `bind()` to create a bounded model.
+The `variables` are now bound to the `Module`, i.e. this bouned model
+becomes a stateful object which can then be used to access the `Sequential`
+object attribute `net` and the `layers` within. Note that `bind()` should
+only be used for interactive experimentation, and is not a direct
+replacement for `apply()`.
 :end_tab:
 
 ![Compressed notation for LeNet-5.](../img/lenet-vert.svg)
@@ -246,10 +260,14 @@ model.layer_summary((1, 28, 28, 1))
 ```{.python .input}
 %%tab jax
 @d2l.add_to_class(d2l.Classifier)  #@save
-def layer_summary(self, X_shape, key=jax.random.PRNGKey(d2l.get_seed())):
+def layer_summary(self, X_shape, key=d2l.get_key()):
     X = jnp.zeros(X_shape)
-    tabulate_fn = nn.tabulate(self, key, method=self.forward)
-    print(tabulate_fn(X))
+    params = self.init(key, X)
+    bound_model = self.bind(params)
+    _ = bound_model(X)
+    for layer in bound_model.net.layers:
+        X = layer(X)
+        print(layer.__class__.__name__, 'output shape:\t', X.shape)
 
 model = LeNet()
 model.layer_summary((1, 28, 28, 1))
