@@ -389,7 +389,7 @@ class AlexNet(d2l.Classifier):
 
     def setup(self):
         self.net = nn.Sequential([
-            nn.Conv(features=96, kernel_size=(11, 11), strides=(4, 4)),
+            nn.Conv(features=96, kernel_size=(11, 11), strides=4, padding=1),
             nn.relu,
             lambda x: nn.max_pool(x, window_shape=(3, 3), strides=(2, 2)),
             nn.Conv(features=256, kernel_size=(5, 5)),
