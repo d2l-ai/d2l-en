@@ -263,7 +263,7 @@ model.layer_summary((1, 28, 28, 1))
 def layer_summary(self, X_shape, key=d2l.get_key()):
     X = jnp.zeros(X_shape)
     params = self.init(key, X)
-    bound_model = self.bind(params)
+    bound_model = self.clone().bind(params)
     _ = bound_model(X)
     for layer in bound_model.net.layers:
         X = layer(X)
