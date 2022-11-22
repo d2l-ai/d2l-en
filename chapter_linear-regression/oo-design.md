@@ -71,11 +71,12 @@ import tensorflow as tf
 from dataclasses import field
 from d2l import jax as d2l
 from flax import linen as nn
-from flax.training.train_state import TrainState
+from flax.training import train_state
 from jax import numpy as jnp
 import numpy as np
 import jax
 import time
+from typing import Any
 ```
 
 ## Utilities
@@ -258,14 +259,14 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
             self.plot('loss', l, train=False)
 
     if tab.selected('jax'):
-        def training_step(self, params, batch):
+        def training_step(self, params, batch, state):
             l, grads = jax.value_and_grad(self.loss)(params, *batch[:-1],
-                                                     batch[-1])
+                                                     batch[-1], state)
             self.plot("loss", l, train=True)
             return l, grads
 
-        def validation_step(self, params, batch):
-            l = self.loss(params, *batch[:-1], batch[-1])
+        def validation_step(self, params, batch, state):
+            l = self.loss(params, *batch[:-1], batch[-1], state)
             self.plot('loss', l, train=False)
         
         def apply_init(self, dummy_input, **kwargs):
@@ -357,10 +358,24 @@ class Trainer(d2l.HyperParameters):  #@save
             self.prepare_data(data)
             self.prepare_model(model)
             self.optim = model.configure_optimizers()
+
             dummy_input = next(iter(self.train_dataloader))[0]
+            variables = model.apply_init(dummy_input, key=key)
+            params = variables['params']
+
+            if 'batch_stats' in variables.keys():
+                # Model contains BatchNorm layer; Handle batch_stats collection
+                # To be used later in section 8.5
+                batch_stats = variables['batch_stats']
+            else:
+                batch_stats = {}
+
             # Flax uses optax under the hood for a single state obj TrainState
+            class TrainState(train_state.TrainState):
+                batch_stats: Any
             self.state = TrainState.create(apply_fn=model.apply,
-                                           params=model.apply_init(dummy_input, key=key),
+                                           params=params,
+                                           batch_stats=batch_stats,
                                            tx=model.configure_optimizers())
             self.epoch = 0
             self.train_batch_idx = 0

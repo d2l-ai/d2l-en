@@ -229,8 +229,8 @@ def loss(self, y_hat, y):
 ```{.python .input}
 %%tab jax
 @d2l.add_to_class(LinearRegression)  #@save
-def loss(self, params, X, y):
-    y_hat = self.apply(params, X)
+def loss(self, params, X, y, state):
+    y_hat = state.apply_fn({'params': params}, X)
     return d2l.reduce_mean(optax.l2_loss(y_hat, y))
 ```
 
@@ -344,7 +344,7 @@ w, b = model.get_w_b()
 %%tab jax
 @d2l.add_to_class(LinearRegression)  #@save
 def get_w_b(self, state):
-    net = state.params['params']['net']
+    net = state.params['net']
     return net['kernel'], net['bias']
 
 w, b = model.get_w_b(trainer.state)

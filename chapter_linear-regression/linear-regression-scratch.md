@@ -160,8 +160,8 @@ def loss(self, y_hat, y):
 ```{.python .input}
 %%tab jax
 @d2l.add_to_class(LinearRegressionScratch)  #@save
-def loss(self, params, X, y):
-    y_hat = self.apply(params, X)
+def loss(self, params, X, y, state):
+    y_hat = state.apply_fn({'params': params}, X)
     l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
     return d2l.reduce_mean(l)
 ```
@@ -416,17 +416,31 @@ def fit_epoch(self):
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self):
     self.model.training = True
-    for batch in self.train_dataloader:
-        _, grads = self.model.training_step(self.state.params,
-                                            self.prepare_batch(batch))
-        self.state = self.state.apply_gradients(grads=grads)
-        self.train_batch_idx += 1
+    if self.state.batch_stats:
+        # Models requiring mutable states e.g., BatchNorm
+        # To be introduced later in section 8.5
+        for batch in self.train_dataloader:
+            (_, mutated_vars), grads = self.model.training_step(self.state.params,
+                                                           self.prepare_batch(batch),
+                                                           self.state)
+            self.state = self.state.apply_gradients(grads=grads)
+            self.state = self.state.replace(batch_stats=mutated_vars['batch_stats'])
+            self.train_batch_idx += 1
+    else:
+        for batch in self.train_dataloader:
+            _, grads = self.model.training_step(self.state.params,
+                                                self.prepare_batch(batch),
+                                                self.state)
+            self.state = self.state.apply_gradients(grads=grads)
+            self.train_batch_idx += 1
+
     if self.val_dataloader is None:
         return
     self.model.training = False
     for batch in self.val_dataloader:
         self.model.validation_step(self.state.params,
-                                   self.prepare_batch(batch))
+                                   self.prepare_batch(batch),
+                                   self.state)
         self.val_batch_idx += 1
 ```
 
@@ -470,7 +484,7 @@ print(f'error in estimating b: {data.b - model.b}')
 
 ```{.python .input}
 %%tab jax
-params = trainer.state.params['params']
+params = trainer.state.params
 print(f"error in estimating w: {data.w - d2l.reshape(params['w'], data.w.shape)}")
 print(f"error in estimating b: {data.b - params['b']}")
 ```
