@@ -89,8 +89,8 @@ import jax
 from jax import numpy as jnp
 
 net = nn.Sequential([nn.Dense(8), nn.relu, nn.Dense(1)])
-X = jax.random.uniform(jax.random.PRNGKey(d2l.get_seed()), (2, 4))
-params = net.init(jax.random.PRNGKey(d2l.get_seed()), X)
+X = jax.random.uniform(d2l.get_key(), (2, 4))
+params = net.init(d2l.get_key(), X)
 net.apply(params, X).shape
 ```
 
@@ -345,7 +345,7 @@ def my_init(key, shape, dtype=jnp.float_):
     return data * (jnp.abs(data) >= 5)
 
 net = nn.Sequential([nn.Dense(8, kernel_init=my_init), nn.relu, nn.Dense(1)])
-params = net.init(jax.random.PRNGKey(d2l.get_seed()), X)
+params = net.init(d2l.get_key(), X)
 print(params['params']['layers_0']['kernel'][:, :2])
 ```
 

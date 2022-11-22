@@ -176,7 +176,7 @@ net(X)
 
 ```{.python .input}
 %%tab jax
-params = net.init(jax.random.PRNGKey(d2l.get_seed()), jnp.zeros((2, 20)))
+params = net.init(d2l.get_key(), jnp.zeros((2, 20)))
 jax.tree_util.tree_map(lambda x: x.shape, params).tree_flatten()
 ```
 
