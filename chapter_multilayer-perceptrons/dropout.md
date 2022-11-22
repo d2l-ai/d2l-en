@@ -434,9 +434,11 @@ mask internally.
 ```{.python .input}
 %%tab jax
 @d2l.add_to_class(d2l.Classifier)  #@save
-@partial(jax.jit, static_argnums=(0, 4))
-def loss(self, params, X, Y, averaged=True):
-    Y_hat = self.apply(params, X, rngs={'dropout': jax.random.PRNGKey(0)})
+@partial(jax.jit, static_argnums=(0, 5))
+def loss(self, params, X, Y, state, averaged=True):
+    Y_hat = state.apply_fn({'params': params}, X,
+                           mutable=False,  # Used in BN later
+                           rngs={'dropout': jax.random.PRNGKey(0)})
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     fn = optax.softmax_cross_entropy_with_integer_labels
     return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)

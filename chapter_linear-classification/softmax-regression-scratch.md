@@ -273,8 +273,8 @@ def loss(self, y_hat, y):
 ```{.python .input}
 %%tab jax
 @d2l.add_to_class(SoftmaxRegressionScratch)
-def loss(self, params, X, y):
-    y_hat = self.apply(params, X)
+def loss(self, params, X, y, state):
+    y_hat = state.apply_fn({'params': params}, X)
     return cross_entropy(y_hat, y)
 ```
 
@@ -319,7 +319,7 @@ X, y = next(iter(data.val_dataloader()))
 if tab.selected('pytorch', 'mxnet', 'tensorflow'):
     preds = d2l.argmax(model(X), axis=1)
 if tab.selected('jax'):
-    preds = d2l.argmax(model.apply(trainer.state.params, X), axis=1)
+    preds = d2l.argmax(model.apply({'params': trainer.state.params}, X), axis=1)
 preds.shape
 ```
 

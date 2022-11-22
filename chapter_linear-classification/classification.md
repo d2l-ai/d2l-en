@@ -52,10 +52,10 @@ class Classifier(d2l.Module):  #@save
 ```{.python .input}
 %%tab jax
 class Classifier(d2l.Module):  #@save
-    def validation_step(self, params, batch):
-        self.plot('loss', self.loss(params, *batch[:-1], batch[-1]),
+    def validation_step(self, params, batch, state):
+        self.plot('loss', self.loss(params, *batch[:-1], batch[-1], state),
                   train=False)
-        self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1]),
+        self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1], state),
                   train=False)
 ```
 
@@ -132,10 +132,12 @@ def accuracy(self, Y_hat, Y, averaged=True):
 ```{.python .input  n=9}
 %%tab jax
 @d2l.add_to_class(Classifier)  #@save
-@partial(jax.jit, static_argnums=(0, 4))
-def accuracy(self, params, X, Y, averaged=True):
+@partial(jax.jit, static_argnums=(0, 5))
+def accuracy(self, params, X, Y, state, averaged=True):
     """Compute the number of correct predictions."""
-    Y_hat = self.apply(params, X)
+    Y_hat = state.apply_fn({'params': params,
+                            'batch_stats': state.batch_stats},  # BatchNorm Only
+                           X)
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     preds = d2l.astype(d2l.argmax(Y_hat, axis=1), Y.dtype)
     compare = d2l.astype(preds == d2l.reshape(Y, -1), d2l.float32)
