@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Batch Normalization
@@ -325,6 +325,16 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps):
     return Y
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from functools import partial
+from jax import numpy as jnp
+import jax
+import optax
+```
+
 We can now [**create a proper `BatchNorm` layer.**]
 Our layer will maintain proper parameters
 for scale `gamma` and shift `beta`,
@@ -478,7 +488,7 @@ after the convolutional layers or fully connected layers
 but before the corresponding activation functions.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class BNLeNetScratch(d2l.Classifier):
     def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
@@ -573,7 +583,7 @@ The code looks virtually identical
 to our implementation above, except that we no longer need to provide additional arguments for it to get the dimensions right.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, tensorflow, mxnet
 class BNLeNet(d2l.Classifier):
     def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
@@ -620,13 +630,77 @@ class BNLeNet(d2l.Classifier):
                 tf.keras.layers.Dense(num_classes)])
 ```
 
+```{.python .input}
+%%tab jax
+class BNLeNet(d2l.Classifier):
+    lr: float = 0.1
+    num_classes: int = 10
+    training: bool = True
+
+    def setup(self):
+        self.net = nn.Sequential([
+            nn.Conv(6, kernel_size=(5, 5)),
+            nn.BatchNorm(not self.training),
+            nn.sigmoid,
+            lambda x: nn.avg_pool(x, window_shape=(2, 2), strides=(2, 2)),
+            nn.Conv(16, kernel_size=(5, 5)),
+            nn.BatchNorm(not self.training),
+            nn.sigmoid,
+            lambda x: nn.avg_pool(x, window_shape=(2, 2), strides=(2, 2)),
+            lambda x: x.reshape((x.shape[0], -1)),
+            nn.Dense(120),
+            nn.BatchNorm(not self.training),
+            nn.sigmoid,
+            nn.Dense(84),
+            nn.BatchNorm(not self.training),
+            nn.sigmoid,
+            nn.Dense(self.num_classes)])
+```
+
+:begin_tab:`jax`
+Since `BatchNorm` layers need to calculate the batch statistics
+(mean and variance), Flax keeps a track of `batch_stats` dictionary, updating
+them with every batch. Collections like `batch_stats` can be stored in the
+`TrainState` object as an attribute and during the model's forward pass, these
+should be passed to the `mutable` arg, so that Flax returns the mutated
+variables.
+:end_tab:
+
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(d2l.Classifier)  #@save
+def training_step(self, params, batch, state):
+    (l, updates), grads = jax.value_and_grad(
+        self.loss, has_aux=True)(params, *batch[:-1], batch[-1], state)
+    self.plot("loss", l, train=True)
+    return (l, updates), grads
+
+@d2l.add_to_class(d2l.Classifier)  #@save
+def validation_step(self, params, batch, state):
+    l, _ = self.loss(params, *batch[:-1], batch[-1], state)
+    self.plot('loss', l, train=False)
+    self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1], state),
+              train=False)
+
+@d2l.add_to_class(d2l.Classifier)  #@save
+@partial(jax.jit, static_argnums=(0, 5))
+def loss(self, params, X, Y, state, averaged=True):
+    Y_hat, updates = state.apply_fn({'params': params,
+                                     'batch_stats': state.batch_stats},
+                                    X, mutable=['batch_stats'],
+                                    rngs={'dropout': jax.random.PRNGKey(0)})
+    Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+    fn = optax.softmax_cross_entropy_with_integer_labels
+    return (fn(Y_hat, Y).mean(), updates) if averaged else (fn(Y_hat, Y), updates)
+```
+
 Below, we [**use the same hyperparameters to train our model.**]
 Note that as usual, the high-level API variant runs much faster
 because its code has been compiled to C++ or CUDA
 while our custom implementation must be interpreted by Python.
 
 ```{.python .input}
-%%tab mxnet, pytorch
+%%tab mxnet, pytorch, jax
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128)
 model = BNLeNet(lr=0.1)
