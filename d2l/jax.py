@@ -512,9 +512,20 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
 
 class Classifier(d2l.Module):
     """Defined in :numref:`sec_classification`"""
+    def training_step(self, params, batch, state):
+        # Here value is a tuple since models with BatchNorm layers require
+        # the loss to return aux data.
+        value, grads = jax.value_and_grad(
+            self.loss, has_aux=True)(params, *batch[:-1], batch[-1], state)
+        l, _ = value
+        self.plot("loss", l, train=True)
+        return value, grads
+
     def validation_step(self, params, batch, state):
-        self.plot('loss', self.loss(params, *batch[:-1], batch[-1], state),
-                  train=False)
+        # Discard the second return value. Used for trainig models with
+        # a BatchNorm layer, since loss also returns aux data
+        l, _ = self.loss(params, *batch[:-1], batch[-1], state)
+        self.plot('loss', l, train=False)
         self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1], state),
                   train=False)
 
@@ -538,7 +549,8 @@ class Classifier(d2l.Module):
                                mutable=False, rngs=None)  # BN & Dropout used later
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         fn = optax.softmax_cross_entropy_with_integer_labels
-        return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
+        # Empty dict in return indicates aux data; to be used in BatchNorm later
+        return (fn(Y_hat, Y).mean(), {}) if averaged else (fn(Y_hat, Y), {})
 
     @partial(jax.jit, static_argnums=(0, 5))
     def loss(self, params, X, Y, state, averaged=True):
@@ -548,7 +560,8 @@ class Classifier(d2l.Module):
                                rngs={'dropout': jax.random.PRNGKey(0)})
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         fn = optax.softmax_cross_entropy_with_integer_labels
-        return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
+        # Empty dict in return indicates aux data; to be used in BatchNorm later
+        return (fn(Y_hat, Y).mean(), {}) if averaged else (fn(Y_hat, Y), {})
 
     def layer_summary(self, X_shape, key=d2l.get_key()):
         """Defined in :numref:`sec_lenet`"""
@@ -559,33 +572,6 @@ class Classifier(d2l.Module):
         for layer in bound_model.net.layers:
             X = layer(X)
             print(layer.__class__.__name__, 'output shape:\t', X.shape)
-
-    def training_step(self, params, batch, state):
-        """Defined in :numref:`subsec_layer-normalization-in-bn`"""
-        if state.batch_stats:
-            # Used for Models with BatchNorm layers; when loss returns aux data
-            value, grads = jax.value_and_grad(
-                self.loss, has_aux=True)(params, *batch[:-1], batch[-1], state)
-            l, _ = value
-        else:
-            value, grads = jax.value_and_grad(self.loss)(params, *batch[:-1],
-                                                     batch[-1], state)
-            l = value
-        self.plot("loss", l, train=True)
-        return value, grads
-    
-
-    def validation_step(self, params, batch, state):
-        """Defined in :numref:`subsec_layer-normalization-in-bn`"""
-        if state.batch_stats:
-            # Used for Models with BatchNorm layers; when loss returns aux data
-            l, _ = self.loss(params, *batch[:-1], batch[-1], state)
-        else:
-            l = self.loss(params, *batch[:-1], batch[-1], state)
-        self.plot('loss', l, train=False)
-        self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1], state),
-                  train=False)
-    
 
     @partial(jax.jit, static_argnums=(0, 5))
     def loss(self, params, X, Y, state, averaged=True):
