@@ -441,7 +441,8 @@ def loss(self, params, X, Y, state, averaged=True):
                            rngs={'dropout': jax.random.PRNGKey(0)})
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     fn = optax.softmax_cross_entropy_with_integer_labels
-    return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
+    # Empty dict in return indicates aux data; to be used in BatchNorm later
+    return (fn(Y_hat, Y).mean(), {}) if averaged else (fn(Y_hat, Y), {})
 ```
 
 Next, we [**train the model**].

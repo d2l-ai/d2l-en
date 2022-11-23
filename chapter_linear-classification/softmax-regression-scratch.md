@@ -275,7 +275,9 @@ def loss(self, y_hat, y):
 @d2l.add_to_class(SoftmaxRegressionScratch)
 def loss(self, params, X, y, state):
     y_hat = state.apply_fn({'params': params}, X)
-    return cross_entropy(y_hat, y)
+    # Here we also return an empty dictionary indicating aux data for
+    # compatibility with BatchNorm models introduced in Section 8.5
+    return cross_entropy(y_hat, y), {}
 ```
 
 ## Training
