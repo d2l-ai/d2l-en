@@ -562,15 +562,26 @@ class Classifier(d2l.Module):
 
     def training_step(self, params, batch, state):
         """Defined in :numref:`subsec_layer-normalization-in-bn`"""
-        (l, updates), grads = jax.value_and_grad(
-            self.loss, has_aux=True)(params, *batch[:-1], batch[-1], state)
+        if state.batch_stats:
+            # Used for Models with BatchNorm layers; when loss returns aux data
+            value, grads = jax.value_and_grad(
+                self.loss, has_aux=True)(params, *batch[:-1], batch[-1], state)
+            l, _ = value
+        else:
+            value, grads = jax.value_and_grad(self.loss)(params, *batch[:-1],
+                                                     batch[-1], state)
+            l = value
         self.plot("loss", l, train=True)
-        return (l, updates), grads
+        return value, grads
     
 
     def validation_step(self, params, batch, state):
         """Defined in :numref:`subsec_layer-normalization-in-bn`"""
-        l, _ = self.loss(params, *batch[:-1], batch[-1], state)
+        if state.batch_stats:
+            # Used for Models with BatchNorm layers; when loss returns aux data
+            l, _ = self.loss(params, *batch[:-1], batch[-1], state)
+        else:
+            l = self.loss(params, *batch[:-1], batch[-1], state)
         self.plot('loss', l, train=False)
         self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1], state),
                   train=False)
