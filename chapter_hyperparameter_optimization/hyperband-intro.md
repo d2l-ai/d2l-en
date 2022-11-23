@@ -23,7 +23,6 @@ However, learning curves are noisy, and we might still require the full amount o
 100 epochs to identify the best performing configuration.
 
 ![Learning curves of random hyperparameter configurations](img/samples_lc.svg)
-:width:`400px`
 :label:`img_samples_lc`
 
 The idea of multi-fidelity hyperparameter optimization is to allocate more resources
@@ -68,7 +67,6 @@ budget $r_{max}$. Finally, once we finished one round of successive halving, we 
 round with a new set of initial configurations, until the total budget is spent.
 
 ![Learning curves of random hyperparameter configurations](img/sh.svg)
-:width:`400px`
 :label:`sh`
 
 To implement successive halving, we use the `HPOScheduler` base class from the previous Section.

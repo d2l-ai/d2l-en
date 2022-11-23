@@ -238,8 +238,7 @@ can make use of the past observation to identify better configurations and thus 
 outperforms random search afterwards.
 
 
-![Example any-time performance plot to compare two algorithms A and B.](img/example_anytime_performance.png)
-:width:`400px`
+![Example any-time performance plot to compare two algorithms A and B.](img/example_anytime_performance.svg)
 :label:`example_anytime_performance`
 
 

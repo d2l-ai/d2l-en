@@ -12,7 +12,6 @@ of weights).
 Unfortunately, we cannot simply adjust these hyperparameters by minimizing the training loss, because this would lead to overfitting on the training data. For example, setting regularization parameters, such as dropout :numref:`sec_dropout` or weight decay :numref:`sec_weight_decay` to zero leads to a small training loss, but might hurt the generalization performance.
 
 ![Typical workflow in machine learning that consists of training the model multiple times with different hyperparameters](img/ml_workflow.svg)
-:width:`40px`
 :label:`ml_workflow`
 
 Without a different form of automation, hyperparameters have to be set manually in a
