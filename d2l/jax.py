@@ -567,7 +567,7 @@ class Classifier(d2l.Module):
         """Defined in :numref:`sec_lenet`"""
         X = jnp.zeros(X_shape)
         params = self.init(key, X)
-        bound_model = self.clone().bind(params)
+        bound_model = self.clone().bind(params, mutable=['batch_stats'])
         _ = bound_model(X)
         for layer in bound_model.net.layers:
             X = layer(X)
