@@ -38,7 +38,20 @@ import optax
 
 ## The `Classifier` Class
 
+:begin_tab:`pytorch, mxnet, tensorflow`
 We define the `Classifier` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exactly correct if the last batch contains fewer examples, but we ignore this minor difference to keep the code simple.
+:end_tab:
+
+
+:begin_tab:`jax`
+We define the `Classifier` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exactly correct if the last batch contains fewer examples, but we ignore this minor difference to keep the code simple.
+
+We also redefine the `training_step` for JAX since all models that will
+subclass `Classifier` later will have a loss that returns aux data.
+This aux data can be used for BatchNorm models explained in :numref:`sec_batch_norm`,
+in all other cases we'll make the loss also return a placeholder empty dictionary to
+represent the aux data.
+:end_tab:
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
@@ -52,9 +65,20 @@ class Classifier(d2l.Module):  #@save
 ```{.python .input}
 %%tab jax
 class Classifier(d2l.Module):  #@save
+    def training_step(self, params, batch, state):
+        # Here value is a tuple since models with BatchNorm layers require
+        # the loss to return aux data.
+        value, grads = jax.value_and_grad(
+            self.loss, has_aux=True)(params, *batch[:-1], batch[-1], state)
+        l, _ = value
+        self.plot("loss", l, train=True)
+        return value, grads
+
     def validation_step(self, params, batch, state):
-        self.plot('loss', self.loss(params, *batch[:-1], batch[-1], state),
-                  train=False)
+        # Discard the second return value. Used for trainig models with
+        # a BatchNorm layer, since loss also returns aux data
+        l, _ = self.loss(params, *batch[:-1], batch[-1], state)
+        self.plot('loss', l, train=False)
         self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1], state),
                   train=False)
 ```
