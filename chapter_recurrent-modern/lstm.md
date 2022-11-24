@@ -254,7 +254,6 @@ class LSTMScratch(d2l.Module):  #@save
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.num_hiddens = num_hiddens
 
         if tab.selected('mxnet'):
             init_weight = lambda *shape: d2l.randn(*shape) * sigma
