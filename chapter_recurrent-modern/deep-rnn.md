@@ -153,7 +153,7 @@ layer by layer.
 @d2l.add_to_class(StackedRNNScratch)
 def forward(self, inputs, Hs=None):
     outputs = inputs
-    if Hs is None: Hs = [None] * len(inputs)
+    if Hs is None: Hs = [None] * self.num_layers
     for i in range(self.num_layers):
         outputs, Hs[i] = self.rnns[i](outputs, Hs[i])
     return outputs, Hs

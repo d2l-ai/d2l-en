@@ -154,7 +154,7 @@ for x in np.arange(0, 10, 0.1):
 ```
 
 ## Models
-:label:`oo-design-models`
+:label:`subsec_oo-design-models`
 
 The `Module` class  is the base class of all models we will implement. At a minimum we need to define three methods. The `__init__` method stores the learnable parameters, the `training_step` method accepts a data batch to return the loss value, the `configure_optimizers` method returns the optimization method, or a list of them, that is used to update the learnable parameters. Optionally we can define `validation_step` to report the evaluation measures.
 Sometimes we put the code to compute the output into a separate `forward` method to make it more reusable.

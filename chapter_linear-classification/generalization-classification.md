@@ -28,6 +28,7 @@ Absent further guidance, we might have to fall back
 on random guessing whenever we encounter new examples.
 
 A number of burning questions demand immediate attention:
+
 1. How many test examples do we need to precisely estimate
    the accuracy of our classifiers on the underlying population?
 1. What happens if we keep evaluating models on the same test repeatedly?

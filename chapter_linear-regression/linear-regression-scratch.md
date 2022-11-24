@@ -66,7 +66,7 @@ but you can specify a different value
 through the argument `sigma`.
 Moreover we set the bias to 0.
 Note that for object-oriented design
-we add the code to the `__init__` method of a subclass of `d2l.Module` (introduced in :numref:`oo-design-models`).
+we add the code to the `__init__` method of a subclass of `d2l.Module` (introduced in :numref:`subsec_oo-design-models`).
 
 ```{.python .input  n=5}
 %%tab all
@@ -91,7 +91,8 @@ class LinearRegressionScratch(d2l.Module):  #@save
 
 Next, we must [**define our model,
 relating its input and parameters to its output.**]
-For our linear model we simply take the matrix-vector product
+Using the same notation in :eqref:`eq_linreg-y-vec`,
+for our linear model we simply take the matrix-vector product
 of the input features $\mathbf{X}$ 
 and the model weights $\mathbf{w}$,
 and add the offset $b$ to each example.
@@ -130,7 +131,7 @@ among all examples in the minibatch.
 %%tab all
 @d2l.add_to_class(LinearRegressionScratch)  #@save
 def loss(self, y_hat, y):
-    l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+    l = (y_hat - y) ** 2 / 2
     return d2l.reduce_mean(l)
 ```
 

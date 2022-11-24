@@ -212,7 +212,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         return tf.keras.optimizers.SGD(self.lr)
 
 class DataModule(d2l.HyperParameters):
-    """Defined in :numref:`sec_oo-design`"""
+    """Defined in :numref:`subsec_oo-design-models`"""
     def __init__(self, root='../data'):
         self.save_hyperparameters()
 
@@ -234,7 +234,7 @@ class DataModule(d2l.HyperParameters):
     
 
 class Trainer(d2l.HyperParameters):
-    """Defined in :numref:`sec_oo-design`"""
+    """Defined in :numref:`subsec_oo-design-models`"""
     def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'No GPU support yet'
@@ -332,7 +332,7 @@ class LinearRegressionScratch(d2l.Module):
 
     def loss(self, y_hat, y):
         """Defined in :numref:`sec_linear_scratch`"""
-        l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+        l = (y_hat - y) ** 2 / 2
         return d2l.reduce_mean(l)
 
     def configure_optimizers(self):
@@ -563,7 +563,7 @@ class TimeMachine(d2l.DataModule):
         self.save_hyperparameters()
         corpus, self.vocab = self.build(self._download())
         array = d2l.tensor([corpus[i:i+num_steps+1]
-                            for i in range(0, len(corpus)-num_steps-1)])
+                            for i in range(len(corpus)-num_steps)])
         self.X, self.Y = array[:,:-1], array[:,1:]
 
     def get_dataloader(self, train):
@@ -1312,7 +1312,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
               r = (d2l.evaluate_loss(net, data_iter, loss),)
               animator.add(q, r)
               timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.sum()/num_epochs:.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
@@ -1344,7 +1344,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
                 r = (d2l.evaluate_loss(net, data_iter, loss) / 2,)
                 animator.add(q, r)
                 timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.sum()/num_epochs:.3f} sec/epoch')
 
 class Benchmark:
     """For measuring running time."""
@@ -1745,7 +1745,7 @@ def read_data_nmt():
 
     Defined in :numref:`sec_utils`"""
     data_dir = d2l.download_extract('fra-eng')
-    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
+    with open(os.path.join(data_dir, 'fra.txt'), 'r', encoding='utf-8') as f:
         return f.read()
 
 def preprocess_nmt(text):
