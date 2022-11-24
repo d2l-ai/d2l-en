@@ -57,7 +57,6 @@ class RNNScratch(d2l.Module):  #@save
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.num_hiddens = num_hiddens
         if tab.selected('mxnet'):
             self.W_xh = d2l.randn(num_inputs, num_hiddens) * sigma
             self.W_hh = d2l.randn(
