@@ -218,7 +218,7 @@ def forward(self, inputs, H=None):
                            d2l.matmul(R * H, self.W_hh) + self.b_h)
         H = Z * H + (1 - Z) * H_tilde
         outputs.append(H)
-    return outputs, (H, )
+    return outputs, H
 ```
 
 ### Training
