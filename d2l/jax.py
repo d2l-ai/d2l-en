@@ -625,6 +625,72 @@ def corr2d(X, K):
             Y = Y.at[i, j].set((X[i:i + h, j:j + w] * K).sum())
     return Y
 
+class Residual(nn.Module):
+    """The Residual block of ResNet."""
+    num_channels: int
+    use_1x1conv: bool = False
+    strides: tuple = (1, 1)
+    training: bool = True
+
+    def setup(self):
+        self.conv1 = nn.Conv(self.num_channels, kernel_size=(3, 3),
+                             padding='same', strides=self.strides)
+        self.conv2 = nn.Conv(self.num_channels, kernel_size=(3, 3),
+                             padding='same')
+        if self.use_1x1conv:
+            self.conv3 = nn.Conv(self.num_channels, kernel_size=(1, 1),
+                                 strides=self.strides)
+        else:
+            self.conv3 = None
+        self.bn1 = nn.BatchNorm(not self.training)
+        self.bn2 = nn.BatchNorm(not self.training)
+
+    def __call__(self, X):
+        Y = nn.relu(self.bn1(self.conv1(X)))
+        Y = self.bn2(self.conv2(Y))
+        if self.conv3:
+            X = self.conv3(X)
+        Y += X
+        return nn.relu(Y)
+
+class ResNeXtBlock(nn.Module):
+    """The ResNeXt block.
+
+    Defined in :numref:`subsec_residual-blks`"""
+    num_channels: int
+    groups: int
+    bot_mul: int
+    use_1x1conv: bool = False
+    strides: tuple = (1, 1)
+    training: bool = True
+
+    def setup(self):
+        bot_channels = int(round(self.num_channels * self.bot_mul))
+        self.conv1 = nn.Conv(bot_channels, kernel_size=(1, 1),
+                               strides=(1, 1))
+        self.conv2 = nn.Conv(bot_channels, kernel_size=(3, 3),
+                               strides=self.strides, padding='same',
+                               feature_group_count=bot_channels//self.groups)
+        self.conv3 = nn.Conv(self.num_channels, kernel_size=(1, 1),
+                               strides=(1, 1))
+        self.bn1 = nn.BatchNorm(not self.training)
+        self.bn2 = nn.BatchNorm(not self.training)
+        self.bn3 = nn.BatchNorm(not self.training)
+        if self.use_1x1conv:
+            self.conv4 = nn.Conv(self.num_channels, kernel_size=(1, 1),
+                                       strides=self.strides)
+            self.bn4 = nn.BatchNorm(not self.training)
+        else:
+            self.conv4 = None
+
+    def __call__(self, X):
+        Y = nn.relu(self.bn1(self.conv1(X)))
+        Y = nn.relu(self.bn2(self.conv2(Y)))
+        Y = self.bn3(self.conv3(Y))
+        if self.conv4:
+            X = self.bn4(self.conv4(X))
+        return nn.relu(Y + X)
+
 class TimeMachine(d2l.DataModule):
     """Defined in :numref:`sec_text-sequence`"""
     def _download(self):
