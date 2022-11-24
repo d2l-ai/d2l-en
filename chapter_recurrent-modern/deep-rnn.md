@@ -156,6 +156,7 @@ def forward(self, inputs, Hs=None):
     if Hs is None: Hs = [None] * self.num_layers
     for i in range(self.num_layers):
         outputs, Hs[i] = self.rnns[i](outputs, Hs[i])
+        outputs = d2l.stack(outputs, 0)
     return outputs, Hs
 ```
 
