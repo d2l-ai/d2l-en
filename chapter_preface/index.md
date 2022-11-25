@@ -472,7 +472,6 @@ import tensorflow as tf
 #@save
 from dataclasses import field
 from functools import partial
-from typing import Any
 import flax
 from flax import linen as nn
 from flax.training import train_state
@@ -483,6 +482,7 @@ import numpy as np
 import optax
 import tensorflow as tf
 import tensorflow_datasets as tfds
+from typing import Any
 ```
 
 ### Target Audience

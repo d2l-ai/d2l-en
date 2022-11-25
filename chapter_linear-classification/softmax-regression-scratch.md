@@ -252,12 +252,11 @@ Now we can (**implement the cross-entropy loss function**) by averaging over the
 :begin_tab:`jax`
 Now we can (**implement the cross-entropy loss function**) by averaging over the logarithms of the selected probabilities.
 
-Note that to make use of `jax.jit` to speed up JAX implementation, and
+Note that to make use of `jax.jit` to speed up JAX implementations, and
 to make sure `loss` is a pure function, the `cross_entropy` function is re-defined
 inside the `loss` to avoid usage of any global variables or functions
 which may render the `loss` function impure.
-
-We'll refer you to the JAX documentation on `jax.jit` and pure functions [here](https://jax.readthedocs.io/en/latest/notebooks/Common_Gotchas_in_JAX.html#pure-functions).
+We refer interested readers to the [JAX documentation](https://jax.readthedocs.io/en/latest/notebooks/Common_Gotchas_in_JAX.html#pure-functions) on `jax.jit` and pure functions.
 :end_tab:
 
 ```{.python .input}
@@ -292,8 +291,8 @@ def loss(self, params, X, y, state):
     def cross_entropy(y_hat, y):
         return - d2l.reduce_mean(d2l.log(y_hat[list(range(len(y_hat))), y]))
     y_hat = state.apply_fn({'params': params}, X)
-    # Here we also return an empty dictionary indicating aux data for
-    # compatibility with BatchNorm models introduced in Section 8.5
+    # The returned empty dictionary is a placeholder for auxiliary data,
+    # which will be used later (e.g., for batch norm)
     return cross_entropy(y_hat, y), {}
 ```
 

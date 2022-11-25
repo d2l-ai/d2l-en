@@ -302,13 +302,13 @@ class Trainer(d2l.HyperParameters):
         params = variables['params']
 
         if 'batch_stats' in variables.keys():
-            # Model contains BatchNorm layer; Handle batch_stats collection
-            # To be used later in section 8.5
+            # Here batch_stats will be used later (e.g., for batch norm)
             batch_stats = variables['batch_stats']
         else:
             batch_stats = {}
 
         # Flax uses optax under the hood for a single state obj TrainState
+        # (more will be discussed later in the batch normalization section)
         class TrainState(train_state.TrainState):
             batch_stats: Any
         self.state = TrainState.create(apply_fn=model.apply,
@@ -332,8 +332,7 @@ class Trainer(d2l.HyperParameters):
         """Defined in :numref:`sec_linear_scratch`"""
         self.model.training = True
         if self.state.batch_stats:
-            # Models requiring mutable states e.g., BatchNorm
-            # To be introduced later in section 8.5
+            # Mutable states will be used later (e.g., for batch norm)
             for batch in self.train_dataloader:
                 (_, mutated_vars), grads = self.model.training_step(self.state.params,
                                                                self.prepare_batch(batch),
@@ -514,7 +513,7 @@ class Classifier(d2l.Module):
     """Defined in :numref:`sec_classification`"""
     def training_step(self, params, batch, state):
         # Here value is a tuple since models with BatchNorm layers require
-        # the loss to return aux data.
+        # the loss to return auxiliary data
         value, grads = jax.value_and_grad(
             self.loss, has_aux=True)(params, *batch[:-1], batch[-1], state)
         l, _ = value
@@ -522,8 +521,8 @@ class Classifier(d2l.Module):
         return value, grads
 
     def validation_step(self, params, batch, state):
-        # Discard the second return value. Used for trainig models with
-        # a BatchNorm layer, since loss also returns aux data
+        # Discard the second returned value. It is used for training models
+        # with BatchNorm layers since loss also returns auxiliary data
         l, _ = self.loss(params, *batch[:-1], batch[-1], state)
         self.plot('loss', l, train=False)
         self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1], state),
@@ -546,21 +545,23 @@ class Classifier(d2l.Module):
     def loss(self, params, X, Y, state, averaged=True):
         """Defined in :numref:`sec_softmax_concise`"""
         Y_hat = state.apply_fn({'params': params}, X,
-                               mutable=False, rngs=None)  # BN & Dropout used later
+                               mutable=False, rngs=None)  # To be used later (e.g., for batch norm)
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         fn = optax.softmax_cross_entropy_with_integer_labels
-        # Empty dict in return indicates aux data; to be used in BatchNorm later
+        # The returned empty dictionary is a placeholder for auxiliary data,
+        # which will be used later (e.g., for batch norm)
         return (fn(Y_hat, Y).mean(), {}) if averaged else (fn(Y_hat, Y), {})
 
     @partial(jax.jit, static_argnums=(0, 5))
     def loss(self, params, X, Y, state, averaged=True):
         """Defined in :numref:`sec_dropout`"""
         Y_hat = state.apply_fn({'params': params}, X,
-                               mutable=False,  # Used in BN later
+                               mutable=False,  # To be used later (e.g., batch norm)
                                rngs={'dropout': jax.random.PRNGKey(0)})
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         fn = optax.softmax_cross_entropy_with_integer_labels
-        # Empty dict in return indicates aux data; to be used in BatchNorm later
+        # The returned empty dictionary is a placeholder for auxiliary data,
+        # which will be used later (e.g., for batch norm)
         return (fn(Y_hat, Y).mean(), {}) if averaged else (fn(Y_hat, Y), {})
 
     def layer_summary(self, X_shape, key=d2l.get_key()):

@@ -659,10 +659,11 @@ class BNLeNet(d2l.Classifier):
 
 :begin_tab:`jax`
 Since `BatchNorm` layers need to calculate the batch statistics
-(mean and variance), Flax keeps a track of `batch_stats` dictionary, updating
-them with every batch. Collections like `batch_stats` can be stored in the
-`TrainState` object as an attribute and during the model's forward pass, these
-should be passed to the `mutable` arg, so that Flax returns the mutated
+(mean and variance), Flax keeps track of the `batch_stats` dictionary, updating
+them with every minibatch. Collections like `batch_stats` can be stored in the
+`TrainState` object (in the `d2l.Trainer` class defined in
+:numref:`oo-design-training`) as an attribute and during the model's forward pass,
+these should be passed to the `mutable` argument, so that Flax returns the mutated
 variables.
 :end_tab:
 

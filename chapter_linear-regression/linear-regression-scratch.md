@@ -417,8 +417,7 @@ def fit_epoch(self):
 def fit_epoch(self):
     self.model.training = True
     if self.state.batch_stats:
-        # Models requiring mutable states e.g., BatchNorm
-        # To be introduced later in section 8.5
+        # Mutable states will be used later (e.g., for batch norm)
         for batch in self.train_dataloader:
             (_, mutated_vars), grads = self.model.training_step(self.state.params,
                                                            self.prepare_batch(batch),

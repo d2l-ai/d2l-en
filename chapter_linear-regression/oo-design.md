@@ -364,13 +364,13 @@ class Trainer(d2l.HyperParameters):  #@save
             params = variables['params']
 
             if 'batch_stats' in variables.keys():
-                # Model contains BatchNorm layer; Handle batch_stats collection
-                # To be used later in section 8.5
+                # Here batch_stats will be used later (e.g., for batch norm)
                 batch_stats = variables['batch_stats']
             else:
                 batch_stats = {}
 
             # Flax uses optax under the hood for a single state obj TrainState
+            # (more will be discussed later in the batch normalization section)
             class TrainState(train_state.TrainState):
                 batch_stats: Any
             self.state = TrainState.create(apply_fn=model.apply,
