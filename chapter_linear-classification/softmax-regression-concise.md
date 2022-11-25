@@ -196,6 +196,7 @@ def loss(self, params, X, Y, state, averaged=True):
     Y_hat = state.apply_fn({'params': params}, X,
                            mutable=False, rngs=None)  # To be used later (e.g., for batch norm)
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+    Y = d2l.reshape(Y, (-1,))
     fn = optax.softmax_cross_entropy_with_integer_labels
     # The returned empty dictionary is a placeholder for auxiliary data,
     # which will be used later (e.g., for batch norm)
