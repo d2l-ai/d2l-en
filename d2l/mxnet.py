@@ -824,7 +824,6 @@ class MTFraEng(d2l.DataModule):
         self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
             self._download())
     
-    
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
         """Defined in :numref:`sec_machine_translation`"""
