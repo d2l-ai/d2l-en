@@ -863,6 +863,22 @@ class RNNLMScratch(d2l.Classifier):
                 outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
         return ''.join([vocab.idx_to_token[i] for i in outputs])
 
+class RNN(nn.Module):
+    """Defined in :numref:`sec_rnn-concise`"""
+    num_hiddens: int
+
+    @nn.compact
+    def __call__(self, inputs, H=None):
+        raise NotImplementedError
+
+class RNNLM(d2l.RNNLMScratch):
+    """Defined in :numref:`sec_rnn-concise`"""
+    def setup(self):
+        self.linear = nn.Dense(self.vocab_size)
+
+    def output_layer(self, hiddens):
+        return d2l.swapaxes(self.linear(hiddens), 0, 1)
+
 class MTFraEng(d2l.DataModule):
     """Defined in :numref:`sec_machine_translation`"""
     def _download(self):
