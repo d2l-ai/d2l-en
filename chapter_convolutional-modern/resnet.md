@@ -463,6 +463,7 @@ ResNet18().layer_summary((1, 96, 96, 1))
 ```
 
 ```{.python .input}
+%%tab jax
 ResNet18(training=False).layer_summary((1, 96, 96, 1))
 ```
 
