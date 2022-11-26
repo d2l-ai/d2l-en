@@ -41,6 +41,7 @@ d2l = sys.modules[__name__]
 
 from dataclasses import field
 from functools import partial
+from typing import Any
 import flax
 import jax
 import numpy as np
@@ -48,7 +49,7 @@ import optax
 import tensorflow as tf
 import tensorflow_datasets as tfds
 from flax import linen as nn
-from flax.training.train_state import TrainState
+from flax.training import train_state
 from jax import grad
 from jax import numpy as jnp
 from jax import vmap
@@ -217,14 +218,14 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
                         ('train_' if train else 'val_') + key,
                         every_n=int(n))
 
-    def training_step(self, params, batch):
+    def training_step(self, params, batch, state):
         l, grads = jax.value_and_grad(self.loss)(params, *batch[:-1],
-                                                 batch[-1])
+                                                 batch[-1], state)
         self.plot("loss", l, train=True)
         return l, grads
 
-    def validation_step(self, params, batch):
-        l = self.loss(params, *batch[:-1], batch[-1])
+    def validation_step(self, params, batch, state):
+        l = self.loss(params, *batch[:-1], batch[-1], state)
         self.plot('loss', l, train=False)
 
     def apply_init(self, dummy_input, **kwargs):
@@ -295,10 +296,24 @@ class Trainer(d2l.HyperParameters):
         self.prepare_data(data)
         self.prepare_model(model)
         self.optim = model.configure_optimizers()
+
         dummy_input = next(iter(self.train_dataloader))[0]
+        variables = model.apply_init(dummy_input, key=key)
+        params = variables['params']
+
+        if 'batch_stats' in variables.keys():
+            # Here batch_stats will be used later (e.g., for batch norm)
+            batch_stats = variables['batch_stats']
+        else:
+            batch_stats = {}
+
         # Flax uses optax under the hood for a single state obj TrainState
+        # (more will be discussed later in the batch normalization section)
+        class TrainState(train_state.TrainState):
+            batch_stats: Any
         self.state = TrainState.create(apply_fn=model.apply,
-                                       params=model.apply_init(dummy_input, key=key),
+                                       params=params,
+                                       batch_stats=batch_stats,
                                        tx=model.configure_optimizers())
         self.epoch = 0
         self.train_batch_idx = 0
@@ -316,17 +331,30 @@ class Trainer(d2l.HyperParameters):
     def fit_epoch(self):
         """Defined in :numref:`sec_linear_scratch`"""
         self.model.training = True
-        for batch in self.train_dataloader:
-            _, grads = self.model.training_step(self.state.params,
-                                                self.prepare_batch(batch))
-            self.state = self.state.apply_gradients(grads=grads)
-            self.train_batch_idx += 1
+        if self.state.batch_stats:
+            # Mutable states will be used later (e.g., for batch norm)
+            for batch in self.train_dataloader:
+                (_, mutated_vars), grads = self.model.training_step(self.state.params,
+                                                               self.prepare_batch(batch),
+                                                               self.state)
+                self.state = self.state.apply_gradients(grads=grads)
+                self.state = self.state.replace(batch_stats=mutated_vars['batch_stats'])
+                self.train_batch_idx += 1
+        else:
+            for batch in self.train_dataloader:
+                _, grads = self.model.training_step(self.state.params,
+                                                    self.prepare_batch(batch),
+                                                    self.state)
+                self.state = self.state.apply_gradients(grads=grads)
+                self.train_batch_idx += 1
+    
         if self.val_dataloader is None:
             return
         self.model.training = False
         for batch in self.val_dataloader:
             self.model.validation_step(self.state.params,
-                                       self.prepare_batch(batch))
+                                       self.prepare_batch(batch),
+                                       self.state)
             self.val_batch_idx += 1
 
     def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
@@ -376,9 +404,9 @@ class LinearRegressionScratch(d2l.Module):
         Defined in :numref:`sec_linear_scratch`"""
         return d2l.matmul(X, self.w) + self.b
 
-    def loss(self, params, X, y):
+    def loss(self, params, X, y, state):
         """Defined in :numref:`sec_linear_scratch`"""
-        y_hat = self.apply(params, X)
+        y_hat = state.apply_fn({'params': params}, X)
         l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
         return d2l.reduce_mean(l)
 
@@ -428,9 +456,9 @@ class LinearRegression(d2l.Module):
         Defined in :numref:`sec_linear_concise`"""
         return self.net(X)
 
-    def loss(self, params, X, y):
+    def loss(self, params, X, y, state):
         """Defined in :numref:`sec_linear_concise`"""
-        y_hat = self.apply(params, X)
+        y_hat = state.apply_fn({'params': params}, X)
         return d2l.reduce_mean(optax.l2_loss(y_hat, y))
 
     def configure_optimizers(self):
@@ -439,7 +467,7 @@ class LinearRegression(d2l.Module):
 
     def get_w_b(self, state):
         """Defined in :numref:`sec_linear_concise`"""
-        net = state.params['params']['net']
+        net = state.params['net']
         return net['kernel'], net['bias']
 
 class FashionMNIST(d2l.DataModule):
@@ -483,48 +511,79 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
 
 class Classifier(d2l.Module):
     """Defined in :numref:`sec_classification`"""
-    def validation_step(self, params, batch):
-        self.plot('loss', self.loss(params, *batch[:-1], batch[-1]),
-                  train=False)
-        self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1]),
+    def training_step(self, params, batch, state):
+        # Here value is a tuple since models with BatchNorm layers require
+        # the loss to return auxiliary data
+        value, grads = jax.value_and_grad(
+            self.loss, has_aux=True)(params, *batch[:-1], batch[-1], state)
+        l, _ = value
+        self.plot("loss", l, train=True)
+        return value, grads
+
+    def validation_step(self, params, batch, state):
+        # Discard the second returned value. It is used for training models
+        # with BatchNorm layers since loss also returns auxiliary data
+        l, _ = self.loss(params, *batch[:-1], batch[-1], state)
+        self.plot('loss', l, train=False)
+        self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1], state),
                   train=False)
 
-    @partial(jax.jit, static_argnums=(0, 4))
-    def accuracy(self, params, X, Y, averaged=True):
+    @partial(jax.jit, static_argnums=(0, 5))
+    def accuracy(self, params, X, Y, state, averaged=True):
         """Compute the number of correct predictions.
     
         Defined in :numref:`sec_classification`"""
-        Y_hat = self.apply(params, X)
+        Y_hat = state.apply_fn({'params': params,
+                                'batch_stats': state.batch_stats},  # BatchNorm Only
+                               X)
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         preds = d2l.astype(d2l.argmax(Y_hat, axis=1), Y.dtype)
         compare = d2l.astype(preds == d2l.reshape(Y, -1), d2l.float32)
         return d2l.reduce_mean(compare) if averaged else compare
 
-    @partial(jax.jit, static_argnums=(0, 4))
-    def loss(self, params, X, Y, averaged=True):
+    @partial(jax.jit, static_argnums=(0, 5))
+    def loss(self, params, X, Y, state, averaged=True):
         """Defined in :numref:`sec_softmax_concise`"""
-        Y_hat = self.apply(params, X, rngs=None)
+        Y_hat = state.apply_fn({'params': params}, X,
+                               mutable=False, rngs=None)  # To be used later (e.g., for batch norm)
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         fn = optax.softmax_cross_entropy_with_integer_labels
-        return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
+        # The returned empty dictionary is a placeholder for auxiliary data,
+        # which will be used later (e.g., for batch norm)
+        return (fn(Y_hat, Y).mean(), {}) if averaged else (fn(Y_hat, Y), {})
 
-    @partial(jax.jit, static_argnums=(0, 4))
-    def loss(self, params, X, Y, averaged=True):
+    @partial(jax.jit, static_argnums=(0, 5))
+    def loss(self, params, X, Y, state, averaged=True):
         """Defined in :numref:`sec_dropout`"""
-        Y_hat = self.apply(params, X, rngs={'dropout': jax.random.PRNGKey(0)})
+        Y_hat = state.apply_fn({'params': params}, X,
+                               mutable=False,  # To be used later (e.g., batch norm)
+                               rngs={'dropout': jax.random.PRNGKey(0)})
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         fn = optax.softmax_cross_entropy_with_integer_labels
-        return fn(Y_hat, Y).mean() if averaged else fn(Y_hat, Y)
+        # The returned empty dictionary is a placeholder for auxiliary data,
+        # which will be used later (e.g., for batch norm)
+        return (fn(Y_hat, Y).mean(), {}) if averaged else (fn(Y_hat, Y), {})
 
     def layer_summary(self, X_shape, key=d2l.get_key()):
         """Defined in :numref:`sec_lenet`"""
         X = jnp.zeros(X_shape)
         params = self.init(key, X)
-        bound_model = self.bind(params)
+        bound_model = self.clone().bind(params, mutable=['batch_stats'])
         _ = bound_model(X)
         for layer in bound_model.net.layers:
             X = layer(X)
             print(layer.__class__.__name__, 'output shape:\t', X.shape)
+
+    @partial(jax.jit, static_argnums=(0, 5))
+    def loss(self, params, X, Y, state, averaged=True):
+        """Defined in :numref:`subsec_layer-normalization-in-bn`"""
+        Y_hat, updates = state.apply_fn({'params': params,
+                                         'batch_stats': state.batch_stats},
+                                        X, mutable=['batch_stats'],
+                                        rngs={'dropout': jax.random.PRNGKey(0)})
+        Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+        fn = optax.softmax_cross_entropy_with_integer_labels
+        return (fn(Y_hat, Y).mean(), updates) if averaged else (fn(Y_hat, Y), updates)
 
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""

@@ -153,8 +153,9 @@ from jax import numpy as jnp
 
 net = nn.Sequential([nn.Dense(256), nn.relu, nn.Dense(10)])
 
-X = jax.random.uniform(jax.random.PRNGKey(d2l.get_seed()), (2, 20))
-params = net.init(jax.random.PRNGKey(d2l.get_seed()), X)
+# get_key is a d2l saved function returning jax.random.PRNGKey(random_seed)
+X = jax.random.uniform(d2l.get_key(), (2, 20))
+params = net.init(d2l.get_key(), X)
 net.apply(params, X).shape
 ```
 
@@ -349,7 +350,7 @@ net(X).shape
 ```{.python .input}
 %%tab jax
 net = MLP()
-params = net.init(jax.random.PRNGKey(d2l.get_seed()), X)
+params = net.init(d2l.get_key(), X)
 net.apply(params, X).shape
 ```
 
@@ -488,7 +489,7 @@ net(X).shape
 ```{.python .input}
 %%tab jax
 net = MySequential([nn.Dense(256), nn.relu, nn.Dense(10)])
-params = net.init(jax.random.PRNGKey(d2l.get_seed()), X)
+params = net.init(d2l.get_key(), X)
 net.apply(params, X).shape
 ```
 
@@ -606,8 +607,7 @@ class FixedHiddenMLP(tf.keras.Model):
 class FixedHiddenMLP(nn.Module):
     # Random weight parameters that will not compute gradients and
     # therefore keep constant during training
-    rand_weight: jnp.array = jax.random.uniform(jax.random.PRNGKey(
-                                                d2l.get_seed()), (20, 20))
+    rand_weight: jnp.array = jax.random.uniform(d2l.get_key(), (20, 20))
 
     def setup(self):
         self.dense = nn.Dense(20)
@@ -659,7 +659,7 @@ net(X)
 ```{.python .input}
 %%tab jax
 net = FixedHiddenMLP()
-params = net.init(jax.random.PRNGKey(d2l.get_seed()), X)
+params = net.init(d2l.get_key(), X)
 net.apply(params, X)
 ```
 
@@ -736,7 +736,7 @@ class NestMLP(nn.Module):
 
 
 chimera = nn.Sequential([NestMLP(), nn.Dense(20), FixedHiddenMLP()])
-params = chimera.init(jax.random.PRNGKey(d2l.get_seed()), X)
+params = chimera.init(d2l.get_key(), X)
 chimera.apply(params, X)
 ```
 

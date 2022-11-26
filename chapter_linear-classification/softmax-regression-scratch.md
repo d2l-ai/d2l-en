@@ -40,6 +40,7 @@ from d2l import jax as d2l
 from flax import linen as nn
 import jax
 from jax import numpy as jnp
+from functools import partial
 ```
 
 ## The Softmax
@@ -244,7 +245,19 @@ y = tf.constant([0, 2])
 tf.boolean_mask(y_hat, tf.one_hot(y, depth=y_hat.shape[-1]))
 ```
 
+:begin_tab:`pytorch, mxnet, tensorflow`
 Now we can (**implement the cross-entropy loss function**) by averaging over the logarithms of the selected probabilities.
+:end_tab:
+
+:begin_tab:`jax`
+Now we can (**implement the cross-entropy loss function**) by averaging over the logarithms of the selected probabilities.
+
+Note that to make use of `jax.jit` to speed up JAX implementations, and
+to make sure `loss` is a pure function, the `cross_entropy` function is re-defined
+inside the `loss` to avoid usage of any global variables or functions
+which may render the `loss` function impure.
+We refer interested readers to the [JAX documentation](https://jax.readthedocs.io/en/latest/notebooks/Common_Gotchas_in_JAX.html#pure-functions) on `jax.jit` and pure functions.
+:end_tab:
 
 ```{.python .input}
 %%tab mxnet, pytorch, jax
@@ -273,9 +286,14 @@ def loss(self, y_hat, y):
 ```{.python .input}
 %%tab jax
 @d2l.add_to_class(SoftmaxRegressionScratch)
-def loss(self, params, X, y):
-    y_hat = self.apply(params, X)
-    return cross_entropy(y_hat, y)
+@partial(jax.jit, static_argnums=(0))
+def loss(self, params, X, y, state):
+    def cross_entropy(y_hat, y):
+        return - d2l.reduce_mean(d2l.log(y_hat[list(range(len(y_hat))), y]))
+    y_hat = state.apply_fn({'params': params}, X)
+    # The returned empty dictionary is a placeholder for auxiliary data,
+    # which will be used later (e.g., for batch norm)
+    return cross_entropy(y_hat, y), {}
 ```
 
 ## Training
@@ -319,7 +337,7 @@ X, y = next(iter(data.val_dataloader()))
 if tab.selected('pytorch', 'mxnet', 'tensorflow'):
     preds = d2l.argmax(model(X), axis=1)
 if tab.selected('jax'):
-    preds = d2l.argmax(model.apply(trainer.state.params, X), axis=1)
+    preds = d2l.argmax(model.apply({'params': trainer.state.params}, X), axis=1)
 preds.shape
 ```
 

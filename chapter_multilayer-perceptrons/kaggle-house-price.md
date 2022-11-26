@@ -406,7 +406,7 @@ if tab.selected('pytorch', 'mxnet', 'tensorflow'):
     preds = [model(d2l.tensor(data.val.values, dtype=d2l.float32))
              for model in models]
 if tab.selected('jax'):
-    preds = [model.apply(trainer.state.params,
+    preds = [model.apply({'params': trainer.state.params},
              d2l.tensor(data.val.values, dtype=d2l.float32))
              for model in models]
 # Taking exponentiation of predictions in the logarithm scale

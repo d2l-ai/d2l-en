@@ -305,9 +305,9 @@ class WeightDecayScratch(d2l.LinearRegressionScratch):
 class WeightDecayScratch(d2l.LinearRegressionScratch):
     lambd: int = 0
         
-    def loss(self, params, X, y):
-        return (super().loss(params, X, y) +
-                self.lambd * l2_penalty(params['params']['w']))
+    def loss(self, params, X, y, state):
+        return (super().loss(params, X, y, state) +
+                self.lambd * l2_penalty(params['w']))
 ```
 
 The following code fits our model on the training set with 20 examples and evaluates it on the validation set with 100 examples.
@@ -325,7 +325,7 @@ def train_scratch(lambd):
         print('L2 norm of w:', float(l2_penalty(model.w)))
     if tab.selected('jax'):
         print('L2 norm of w:',
-              float(l2_penalty(trainer.state.params['params']['w'])))
+              float(l2_penalty(trainer.state.params['w'])))
 ```
 
 ### [**Training without Regularization**]

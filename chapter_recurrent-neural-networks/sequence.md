@@ -471,7 +471,7 @@ d2l.plot(data.time[data.tau:], [data.labels, onestep_preds], 'time', 'x',
 
 ```{.python .input}
 %%tab jax
-onestep_preds = model.apply(trainer.state.params, data.features)
+onestep_preds = model.apply({'params': trainer.state.params}, data.features)
 d2l.plot(data.time[data.tau:], [data.labels, onestep_preds], 'time', 'x',
          legend=['labels', '1-step preds'], figsize=(6, 3))
 ```
@@ -536,7 +536,7 @@ for i in range(data.num_train + data.tau, data.T):
 multistep_preds = d2l.zeros(data.T)
 multistep_preds = multistep_preds.at[:].set(data.x)
 for i in range(data.num_train + data.tau, data.T):
-    pred = model.apply(trainer.state.params,
+    pred = model.apply({'params': trainer.state.params},
                        d2l.reshape(multistep_preds[i-data.tau : i], (1, -1)))
     multistep_preds = multistep_preds.at[i].set(pred.item())
 ```
@@ -594,7 +594,7 @@ def k_step_pred(k):
         features.append(data.x[i : i+data.T-data.tau-k+1])
     # The (i+tau)-th element stores the (i+1)-step-ahead predictions
     for i in range(k):
-        preds = model.apply(trainer.state.params,
+        preds = model.apply({'params': trainer.state.params},
                             d2l.stack(features[i : i+data.tau], 1))
         features.append(d2l.reshape(preds, -1))
     return features[data.tau:]

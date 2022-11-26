@@ -145,9 +145,8 @@ tf.reduce_mean(Y)
 
 ```{.python .input}
 %%tab jax
-Y, _ = net.init_with_output(jax.random.PRNGKey(d2l.get_seed()),
-                            jax.random.uniform(jax.random.PRNGKey(d2l.get_seed()),
-                            (4, 8)))
+Y, _ = net.init_with_output(d2l.get_key(), jax.random.uniform(d2l.get_key(),
+                                                              (4, 8)))
 Y.mean()
 ```
 
@@ -265,7 +264,7 @@ dense.get_weights()
 ```{.python .input}
 %%tab jax
 dense = MyDense(5, 3)
-params = dense.init(jax.random.PRNGKey(d2l.get_seed()), jnp.zeros((3, 5)))
+params = dense.init(d2l.get_key(), jnp.zeros((3, 5)))
 params
 ```
 
@@ -289,7 +288,7 @@ dense(tf.random.uniform((2, 5)))
 
 ```{.python .input}
 %%tab jax
-dense.apply(params, jax.random.uniform(jax.random.PRNGKey(d2l.get_seed()),
+dense.apply(params, jax.random.uniform(d2l.get_key(),
                                        (2, 5)))
 ```
 
@@ -320,9 +319,8 @@ net(tf.random.uniform((2, 64)))
 ```{.python .input}
 %%tab jax
 net = nn.Sequential([MyDense(64, 8), MyDense(8, 1)])
-Y, _ = net.init_with_output(jax.random.PRNGKey(d2l.get_seed()),
-                            jax.random.uniform(jax.random.PRNGKey(d2l.get_seed()),
-                                               (2, 64)))
+Y, _ = net.init_with_output(d2l.get_key(), jax.random.uniform(d2l.get_key(),
+                                                              (2, 64)))
 Y
 ```
 

@@ -474,7 +474,7 @@ from dataclasses import field
 from functools import partial
 import flax
 from flax import linen as nn
-from flax.training.train_state import TrainState
+from flax.training import train_state
 import jax
 from jax import numpy as jnp
 from jax import grad, vmap
@@ -482,6 +482,7 @@ import numpy as np
 import optax
 import tensorflow as tf
 import tensorflow_datasets as tfds
+from typing import Any
 ```
 
 ### Target Audience
