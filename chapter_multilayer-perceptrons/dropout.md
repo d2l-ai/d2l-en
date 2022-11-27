@@ -440,6 +440,7 @@ def loss(self, params, X, Y, state, averaged=True):
                            mutable=False,  # To be used later (e.g., batch norm)
                            rngs={'dropout': jax.random.PRNGKey(0)})
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+    Y = d2l.reshape(Y, (-1,))
     fn = optax.softmax_cross_entropy_with_integer_labels
     # The returned empty dictionary is a placeholder for auxiliary data,
     # which will be used later (e.g., for batch norm)

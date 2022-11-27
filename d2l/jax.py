@@ -369,6 +369,14 @@ class Trainer(d2l.HyperParameters):
             batch = [d2l.to(a, self.gpus[0]) for a in batch]
         return batch
 
+    def clip_gradients(self, grad_clip_val, grads):
+        """Defined in :numref:`sec_rnn-scratch`"""
+        grad_leaves, _ = jax.tree_util.tree_flatten(grads)
+        norm = jnp.sqrt(sum(jnp.vdot(x, x) for x in grad_leaves))
+        clip = lambda grad: jnp.where(norm < grad_clip_val,
+                                      grad, grad * (grad_clip_val / norm))
+        return jax.tree_util.tree_map(clip, grads)
+
 class SyntheticRegressionData(d2l.DataModule):
     """Defined in :numref:`sec_synthetic-regression-data`"""
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
@@ -547,6 +555,7 @@ class Classifier(d2l.Module):
         Y_hat = state.apply_fn({'params': params}, X,
                                mutable=False, rngs=None)  # To be used later (e.g., for batch norm)
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+        Y = d2l.reshape(Y, (-1,))
         fn = optax.softmax_cross_entropy_with_integer_labels
         # The returned empty dictionary is a placeholder for auxiliary data,
         # which will be used later (e.g., for batch norm)
@@ -559,6 +568,7 @@ class Classifier(d2l.Module):
                                mutable=False,  # To be used later (e.g., batch norm)
                                rngs={'dropout': jax.random.PRNGKey(0)})
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+        Y = d2l.reshape(Y, (-1,))
         fn = optax.softmax_cross_entropy_with_integer_labels
         # The returned empty dictionary is a placeholder for auxiliary data,
         # which will be used later (e.g., for batch norm)
@@ -582,6 +592,7 @@ class Classifier(d2l.Module):
                                         X, mutable=['batch_stats'],
                                         rngs={'dropout': jax.random.PRNGKey(0)})
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+        Y = d2l.reshape(Y, (-1,))
         fn = optax.softmax_cross_entropy_with_integer_labels
         return (fn(Y_hat, Y).mean(), updates) if averaged else (fn(Y_hat, Y), updates)
 
@@ -762,6 +773,95 @@ class Vocab:
     @property
     def unk(self):  # Index for the unknown token
         return self.token_to_idx['<unk>']
+
+class RNNScratch(nn.Module):
+    """Defined in :numref:`sec_rnn-scratch`"""
+    num_inputs: int
+    num_hiddens: int
+    sigma: float = 0.01
+
+    def setup(self):
+        self.W_xh = self.param('W_xh', nn.initializers.normal(self.sigma),
+                               (self.num_inputs, self.num_hiddens))
+        self.W_hh = self.param('W_hh', nn.initializers.normal(self.sigma),
+                               (self.num_hiddens, self.num_hiddens))
+        self.b_h = self.param('b_h', nn.initializers.zeros, (num_hiddens))
+
+    def __call__(self, inputs, state=None):
+        """Defined in :numref:`sec_rnn-scratch`"""
+        if state is not None:
+            state, = state
+        outputs = []
+        for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs)
+            state = d2l.tanh(d2l.matmul(X, self.W_xh) + (
+                d2l.matmul(state, self.W_hh) if state is not None else 0)
+                             + self.b_h)
+            outputs.append(state)
+        return outputs, state
+
+def check_len(a, n):
+    """Defined in :numref:`sec_rnn-scratch`"""
+    assert len(a) == n, f'list\'s len {len(a)} != expected length {n}'
+
+def check_shape(a, shape):
+    """Defined in :numref:`sec_rnn-scratch`"""
+    assert a.shape == shape, \
+            f'tensor\'s shape {a.shape} != expected shape {shape}'
+
+class RNNLMScratch(d2l.Classifier):
+    """Defined in :numref:`sec_rnn-scratch`"""
+    rnn: nn.Module
+    vocab_size: int
+    lr: float = 0.01
+
+    def setup(self):
+        self.W_hq = self.param('W_hq', nn.initializers.normal(self.rnn.sigma),
+                               (self.rnn.num_hiddens, self.vocab_size))
+        self.b_q = self.param('b_q', nn.initializers.zeros, (self.vocab_size))
+
+    def training_step(self, params, batch, state):
+        value, grads = jax.value_and_grad(
+            self.loss, has_aux=True)(params, *batch[:-1], batch[-1], state)
+        l, _ = value
+        self.plot('ppl', d2l.exp(l), train=True)
+        return value, grads
+
+    def validation_step(self, params, batch, state):
+        l, _ = self.loss(params, *batch[:-1], batch[-1], state)
+        self.plot('ppl', d2l.exp(l), train=False)
+
+    def one_hot(self, X):
+        """Defined in :numref:`sec_rnn-scratch`"""
+        # Output shape: (num_steps, batch_size, vocab_size)
+        return jax.nn.one_hot(X.T, self.vocab_size)
+
+    def output_layer(self, rnn_outputs):
+        """Defined in :numref:`sec_rnn-scratch`"""
+        outputs = [d2l.matmul(H, self.W_hq) + self.b_q for H in rnn_outputs]
+        return d2l.stack(outputs, 1)
+    
+
+    def forward(self, X, state=None):
+        """Defined in :numref:`sec_rnn-scratch`"""
+        embs = self.one_hot(X)
+        rnn_outputs, _ = self.rnn(embs, state)
+        return self.output_layer(rnn_outputs)
+
+    def predict(self, prefix, num_preds, vocab, params):
+        """Defined in :numref:`sec_rnn-scratch`"""
+        state, outputs = None, [vocab[prefix[0]]]
+        for i in range(len(prefix) + num_preds - 1):
+            X = d2l.tensor([[outputs[-1]]])
+            embs = self.one_hot(X)
+            rnn_outputs, state = self.rnn.apply({'params': params['rnn']},
+                                                embs, state)
+            if i < len(prefix) - 1:  # Warm-up period
+                outputs.append(vocab[prefix[i + 1]])
+            else:  # Predict `num_preds` steps
+                Y = self.apply({'params': params}, rnn_outputs,
+                               method=self.output_layer)
+                outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
+        return ''.join([vocab.idx_to_token[i] for i in outputs])
 
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images.
