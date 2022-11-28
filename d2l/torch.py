@@ -3105,6 +3105,7 @@ def FrozenLake(seed):
             and how to process env.P.items is adpated from https://sites.google.com/view/deep-rl-bootcamp/labs
 
     '''
+    import gym
     env = gym.make('FrozenLake-v1', is_slippery=False)
     env.seed(seed)
     env.action_space.np_random.seed(seed)
