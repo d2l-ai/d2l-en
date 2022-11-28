@@ -49,8 +49,8 @@ The reinforcement learning problem is typically modeled using Markov Decision Pr
 
 ## Exercises
 
-1. Suppose that we want to design an MDP to model [MountainCar](https://gym.openai.com/envs/MountainCar-v0/) problem.
+1. Suppose that we want to design an MDP to model [MountainCar](https://www.gymlibrary.dev/environments/classic_control/mountain_car/) problem.
     1. What would be the set of states?
     2. What would be the set of actions?
     3. What would be the possible reward functions?
-2. How would you design an MDP for an Atari game like [Pong game](https://gym.openai.com/envs/Pong-v0/)?
+2. How would you design an MDP for an Atari game like [Pong game](https://www.gymlibrary.dev/environments/atari/pong/)?
