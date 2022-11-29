@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
 # Machine Translation and the Dataset
@@ -64,6 +64,13 @@ import os
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
+import os
+```
+
+```{.python .input  n=4}
+%%tab jax
+from d2l import jax as d2l
+from jax import numpy as jnp
 import os
 ```
 
@@ -245,7 +252,6 @@ def __init__(self, batch_size, num_steps=9, num_train=512, num_val=128):
     self.save_hyperparameters()
     self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
         self._download())
-
 
 @d2l.add_to_class(MTFraEng)  #@save
 def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
