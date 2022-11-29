@@ -86,7 +86,7 @@ class NonlinearData(d2l.DataModule):
             self.y_train = f(self.x_train) + d2l.normal((n,1))
         if tab.selected('jax'):
             self.x_train = jnp.sort(jax.random.uniform(d2l.get_key(),
-                                                       (n,1)) * 5, 0)
+                                                       (n, 1)) * 5, 0)
             self.y_train = f(self.x_train) + jax.random.normal(d2l.get_key(),
                                                                (n, 1))
         self.x_val = d2l.arange(0, 5, 5.0/n)
