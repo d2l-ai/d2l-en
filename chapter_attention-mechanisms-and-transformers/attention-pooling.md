@@ -19,7 +19,7 @@ for demonstrating machine learning with attention mechanisms.
 
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
 ```{.python .input}
@@ -43,6 +43,14 @@ from torch.nn import functional as F
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+from flax import linen as nn
 ```
 
 ## [**Generating the Dataset**]
@@ -76,6 +84,11 @@ class NonlinearData(d2l.DataModule):
         if tab.selected('tensorflow'):
             self.x_train = tf.sort(d2l.rand((n,1)) * 5, 0)
             self.y_train = f(self.x_train) + d2l.normal((n,1))
+        if tab.selected('jax'):
+            self.x_train = jnp.sort(jax.random.uniform(d2l.get_key(),
+                                                       (n, 1)) * 5, 0)
+            self.y_train = f(self.x_train) + jax.random.normal(d2l.get_key(),
+                                                               (n, 1))
         self.x_val = d2l.arange(0, 5, 5.0/n)
         self.y_val = f(self.x_val)
 
@@ -91,9 +104,17 @@ The following function plots all the training examples (represented by circles),
 the ground-truth data generation function `f` without the noise term (labeled by "Truth"), and the learned prediction function (labeled by "Pred").
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 def plot_kernel_reg(y_hat):
     d2l.plot(data.x_val, [data.y_val, d2l.numpy(y_hat)], 'x', 'y', legend=['Truth', 'Pred'],
+             xlim=[0, 5], ylim=[-1, 5])
+    d2l.plt.plot(data.x_train, data.y_train, 'o', alpha=0.5);
+```
+
+```{.python .input}
+%%tab jax
+def plot_kernel_reg(y_hat):
+    d2l.plot(data.x_val, [data.y_val, y_hat], 'x', 'y', legend=['Truth', 'Pred'],
              xlim=[0, 5], ylim=[-1, 5])
     d2l.plt.plot(data.x_train, data.y_train, 'o', alpha=0.5);
 ```
@@ -189,6 +210,8 @@ def attention_pool(query_key_diffs, values):
         attention_weights = F.softmax(- query_key_diffs**2 / 2, dim=1)
     if tab.selected('tensorflow'):
         attention_weights = tf.nn.softmax(- query_key_diffs**2/2, axis=1)
+    if tab.selected('jax'):
+        attention_weights = jax.nn.softmax(- query_key_diffs**2/2, axis=1)
     return d2l.matmul(attention_weights, values), attention_weights
 
 y_hat, attention_weights = attention_pool(
@@ -248,7 +271,10 @@ $n$ matrices $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$ of sha
 %%tab all
 X = d2l.ones((2, 1, 4))
 Y = d2l.ones((2, 4, 6))
-d2l.check_shape(d2l.batch_matmul(X, Y), (2, 1, 6))
+if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    d2l.check_shape(d2l.batch_matmul(X, Y), (2, 1, 6))
+if tab.selected('jax'):
+    d2l.check_shape(jax.lax.batch_matmul(X, Y), (2, 1, 6))
 ```
 
 In the context of attention mechanisms, we can [**use minibatch matrix multiplication to compute weighted averages of values in a minibatch.**]
@@ -274,6 +300,13 @@ values = tf.reshape(tf.range(20.0), shape = (2, 10))
 tf.matmul(tf.expand_dims(weights, axis=1), tf.expand_dims(values, axis=-1)).numpy()
 ```
 
+```{.python .input}
+%%tab jax
+weights = d2l.ones((2, 10)) * 0.1
+values = d2l.reshape(d2l.arange(20.0), (2, 10))
+jax.lax.batch_matmul(jnp.expand_dims(weights, 1), jnp.expand_dims(values, -1))
+```
+
 ### Defining the Model
 
 Using minibatch matrix multiplication,
@@ -283,7 +316,7 @@ based on the [**parametric attention pooling**] in
 :eqref:`eq_nadaraya-watson-gaussian-para`.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class NWKernelRegression(d2l.Module):
     def __init__(self, keys, values, lr):
         super().__init__()
@@ -312,6 +345,30 @@ class NWKernelRegression(d2l.Module):
             return d2l.SGD(self.lr)
 ```
 
+```{.python .input}
+%%tab jax
+class NWKernelRegression(d2l.Module):
+    keys: float
+    values: float
+    lr: float
+
+    def setup(self):
+        self.w = self.param('w', nn.initializers.ones, (1))
+
+    def forward(self, queries):
+        y_hat, attention_weights = attention_pool(
+            diff(queries, self.keys) * self.w, self.values)
+        return y_hat, attention_weights
+
+    def loss(self, params, X, y, state):
+        y_hat, _ = state.apply_fn({'params': params}, X)
+        l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+        return d2l.reduce_mean(l)
+
+    def configure_optimizers(self):
+        return d2l.SGD(self.lr)
+```
+
 ### Training
 
 In the following, we [**transform the training dataset
@@ -331,8 +388,15 @@ trainer.fit(model, data)
 Trying to fit the training dataset with noise, the predicted line is less smooth than its nonparametric counterpart that was plotted earlier.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 plot_kernel_reg(model.forward(data.x_val))
+```
+
+```{.python .input}
+%%tab jax
+y_hat, attention_weights = model.apply({'params': trainer.state.params},
+                                       data.x_val)
+plot_kernel_reg(y_hat)
 ```
 
 Comparing with nonparametric attention pooling,
@@ -340,8 +404,15 @@ Comparing with nonparametric attention pooling,
 in the parametric setting.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 d2l.show_heatmaps([[model.attention_weights]],
+                  xlabel='Sorted training inputs',
+                  ylabel='Sorted validation inputs')
+```
+
+```{.python .input}
+%%tab jax
+d2l.show_heatmaps([[attention_weights]],
                   xlabel='Sorted training inputs',
                   ylabel='Sorted validation inputs')
 ```

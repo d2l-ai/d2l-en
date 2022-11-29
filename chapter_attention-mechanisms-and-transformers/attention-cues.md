@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
 # Attention Cues
@@ -181,6 +181,12 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from jax import numpy as jnp
+```
+
 To visualize attention weights,
 we define the `show_heatmaps` function.
 Its input `matrices` has the shape (number of rows for display, number of columns for display, number of queries, number of keys).
@@ -197,7 +203,10 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                                  sharex=True, sharey=True, squeeze=False)
     for i, (row_axes, row_matrices) in enumerate(zip(axes, matrices)):
         for j, (ax, matrix) in enumerate(zip(row_axes, row_matrices)):
-            pcm = ax.imshow(d2l.numpy(matrix), cmap=cmap)
+            if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+                pcm = ax.imshow(d2l.numpy(matrix), cmap=cmap)
+            if tab.selected('jax'):
+                pcm = ax.imshow(matrix, cmap=cmap)
             if i == num_rows - 1:
                 ax.set_xlabel(xlabel)
             if j == 0:
