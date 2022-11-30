@@ -23,7 +23,6 @@ since the ratio between arc and secant approaches 1
 for a large number of vertices. 
 Therefore the area of each triangle approaches
 $\frac{1}{2} \cdot height \cdot base = \frac{1}{2} \cdot r \cdot (2 \pi r/n) = \pi r^2 / n$
-and so the area of the polygon approaches $\pi r^2$. 
 
 ![Finding the area of a circle as a limit procedure.](../img/polygon-circle.svg)
 :label:`fig_circle_area`
