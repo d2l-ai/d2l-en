@@ -21,8 +21,9 @@ as we partition the circle more finely.
 At the same time, its base approaches $2 \pi r/n$, 
 since the ratio between arc and secant approaches 1 
 for a large number of vertices. 
-Thus, the area of the triangle approaches
-$n \cdot r \cdot \frac{1}{2} (2 \pi r/n) = \pi r^2$. 
+Therefore the area of each triangle approaches
+$\frac{1}{2} \cdot height \cdot base = \frac{1}{2} \cdot r \cdot (2 \pi r/n) = \pi r^2 / n$
+and so the area of the polygon approaches $\pi r^2$. 
 
 ![Finding the area of a circle as a limit procedure.](../img/polygon-circle.svg)
 :label:`fig_circle_area`
