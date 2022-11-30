@@ -1036,6 +1036,7 @@ nn_Module = nn.Module
 to = jax.device_put
 numpy = np.asarray
 transpose = lambda a: a.T
+sigmoid = jax.nn.sigmoid
 
 ones_like = jnp.ones_like
 ones = jnp.ones
