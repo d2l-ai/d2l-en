@@ -318,13 +318,13 @@ Note that only the hidden state is passed to the output layer.
 [**The actual model**] is defined as described above,
 consisting of three gates and an input node. 
 Note that only the hidden state is passed to the output layer.
-A long `for` loop in the forward method will result in extremely long
-JIT compilation times for the first run. As a solution to this, instead
-of using a `for` loop to update the state with every time step,
-JAX has `jax.lax.scan` utility transformation to achieve the same behaviour.
+A long for-loop in the `forward` method will result in an extremely long
+JIT compilation time for the first run. As a solution to this, instead
+of using a for-loop to update the state with every time step,
+JAX has `jax.lax.scan` utility transformation to achieve the same behavior.
 It takes in an initial state called `carry` and an `inputs` array which
-is scanned on its leading axis. `scan` ultimately returns the final state
-and the stacked outputs as expected.
+is scanned on its leading axis. The `scan` transformation ultimately
+returns the final state and the stacked outputs as expected.
 :end_tab:
 
 ```{.python .input}
@@ -354,8 +354,8 @@ def forward(self, inputs, H_C=None):
 %%tab jax
 @d2l.add_to_class(LSTMScratch)
 def forward(self, inputs, H_C=None):
-    # Use lax.scan primitive instead of looping over the inputs
-    # scan saves time in jit compilation
+    # Use lax.scan primitive instead of looping over the
+    # inputs, since scan saves time in jit compilation.
     def scan_fn(carry, X):
         H, C = carry
         I = d2l.sigmoid(d2l.matmul(X, self.W_xi) + (
@@ -372,7 +372,7 @@ def forward(self, inputs, H_C=None):
 
     if H_C is None:
         batch_size = inputs.shape[1]
-        carry = jnp.zeros((batch_size, self.num_hiddens)),\
+        carry = jnp.zeros((batch_size, self.num_hiddens)), \
                 jnp.zeros((batch_size, self.num_hiddens))
     else:
         carry = H_C
