@@ -245,7 +245,6 @@ from d2l import jax as d2l
 from flax import linen as nn
 import jax
 from jax import numpy as jnp
-from functools import partial
 ```
 
 ### [**Initializing Model Parameters**]
