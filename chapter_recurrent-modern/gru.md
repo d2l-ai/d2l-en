@@ -254,8 +254,8 @@ def forward(self, inputs, H=None):
 %%tab jax
 @d2l.add_to_class(GRUScratch)
 def forward(self, inputs, H=None):
-    # Use lax.scan primitive instead of looping over the inputs
-    # scan saves time in jit compilation
+    # Use lax.scan primitive instead of looping over the
+    # inputs, since scan saves time in jit compilation.
     def scan_fn(H, X):
         Z = d2l.sigmoid(d2l.matmul(X, self.W_xz) + d2l.matmul(H, self.W_hz) +
                         self.b_z)
