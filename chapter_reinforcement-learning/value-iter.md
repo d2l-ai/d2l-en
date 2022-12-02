@@ -115,7 +115,7 @@ In the FrozenLake environment, the robot moves on a $4 \times 4$ grid (these are
 The following function implements Value Iteration:
 
 ```{.python .input}
-#@tab all
+%%tab all
 
 def value_iteration(env_info, gamma, num_iters):
     '''
