@@ -123,13 +123,13 @@ def value_iteration(env_info, gamma, num_iters):
         num_iters: number of iteration
         env_info: contains MDP and environment related information
     '''
-    env_desc      = env_info['desc'] # 2D array shows what each item means
-    prob_idx      = env_info['trans_prob_idx']
+    env_desc = env_info['desc']  # 2D array shows what each item means
+    prob_idx = env_info['trans_prob_idx']
     nextstate_idx = env_info['nextstate_idx']
-    reward_idx    = env_info['reward_idx']
-    num_states    = env_info['num_states']
-    num_actions   = env_info['num_actions']
-    mdp           = env_info['mdp']
+    reward_idx = env_info['reward_idx']
+    num_states = env_info['num_states']
+    num_actions = env_info['num_actions']
+    mdp = env_info['mdp']
 
     V  = np.zeros((num_iters + 1, num_states))
     Q  = np.zeros((num_iters + 1, num_states, num_actions))
