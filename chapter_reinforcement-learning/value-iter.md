@@ -107,7 +107,7 @@ random.seed(seed)  # Set the random seed to ensure results can be reproduced
 np.random.seed(seed)
 
 # now set up the environment
-env_info = d2l.make_env('FrozenLake-v1',seed=seed)
+env_info = d2l.make_env('FrozenLake-v1', seed=seed)
 ```
 
 In the FrozenLake environment, the robot moves on a $4 \times 4$ grid (these are the states) with actions that are "up" ($\uparrow$), "down" ($\rightarrow$), "left" ($\leftarrow$), and "right" ($\rightarrow$). The environment contains a number of holes (H) cells and frozen (F) cells as well as a goal cell (G), all of which are unknown to the robot. To keep the problem simple, we assume the robot has reliable actions, i.e. $P(s' \mid s, a) = 1$ for all $s \in \mathcal{S}, a \in \mathcal{A}$. If the robot reaches the goal, the trial ends and the robot receives a reward of $1$ irrespective of the action; the reward at any other state is $0$ for all actions. The objective of the robot is to learn a policy that reaches the goal location (G) from a given start location (S) (this is $s_0$) to maximize the *return*.
