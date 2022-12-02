@@ -100,10 +100,10 @@ import numpy as np
 import random
 from d2l import torch as d2l
 
-seed = 0       # Random number generator seed
-gamma = 0.95   # Discount factor
-num_iters = 10 # Number of iterations
-random.seed(seed) # Set the random seed to ensure results can be reproduced
+seed = 0  # Random number generator seed
+gamma = 0.95  # Discount factor
+num_iters = 10  # Number of iterations
+random.seed(seed)  # Set the random seed to ensure results can be reproduced
 np.random.seed(seed)
 
 # now set up the environment
