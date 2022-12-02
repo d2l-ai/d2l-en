@@ -50,26 +50,28 @@ $$\pi^* = \underset{\pi}{\mathrm{argmax}} V^\pi(s_0).$$
 Of all possible stochastic policies that the robot could have taken, the optimal policy $\pi^*$  achieves the largest average discounted *return* for trajectories starting from state $s_0$. Let us denote the value function and the action-value function of the optimal policy as $V^* \equiv V^{\pi^*}$ and $Q^* \equiv Q^{\pi^*}$.
 
 Let us observe that for a deterministic policy where there is only one action that is possible under the policy at any given state. This gives us
+
 $$\pi^*(s) = \underset{a \in \mathcal{A}}{\mathrm{argmax}} \Big[ r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a)\ V^*(s') \Big].$$
+
 A good mnemonic to remember this is that the optimal action at state $s$ (for a deterministic policy) is the one that maximizes the sum of reward $r(s, a)$ from the first stage and the average *return* of the trajectories starting from the next sate $s'$, averaged over all possible next states $s'$ from the second stage.
 
-## Principal of dynamic programming
+## Principle of dynamic programming
 
 Our developement in the previous section in :eqref:`eq_dynamic_programming` or :eqref:`eq_dynamic_programming_q` can be turned into an algorithm to compute the optimal value function $V^*$ or the action-value function $Q^*$, respectively. Observe that
 $$ V^*(s) = \sum_{a \in \mathcal{A}} \pi^*(a \mid s) \Big[ r(s,  a) + \gamma\  \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^*(s') \Big];\ \text{for all } s \in \mathcal{S}.$$
 
 For a deterministic optimal policy $\pi^*$, since there is only one action that can be taken at state $s$, we can also write 
-$$
-V^*(s) = \mathrm{argmax}_{a \in \mathcal{A}} \Big\{ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^*(s') \Big\}
-$$
-for all states $s \in \mathcal{S}$. This identity is called the "principle of dynamic programming" (:cite:`BellmanDPPaper` and :cite:`BellmanDPBook`). It was formulated by Richard Bellman in 1950s and we can remember it as "the remainder of an optimal trajectory is also optimal".
+
+$$V^*(s) = \mathrm{argmax}_{a \in \mathcal{A}} \Big\{ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^*(s') \Big\}$$
+
+for all states $s \in \mathcal{S}$. This identity is called the "principle of dynamic programming" :cite:`BellmanDPPaper,BellmanDPBook`. It was formulated by Richard Bellman in 1950s and we can remember it as "the remainder of an optimal trajectory is also optimal".
 
 ## Value Iteration
 
 We can turn the principle of dynamic programming into an algorithm for finding the optimal value function called value iteration. The key idea behind value iteration is to think of this identity as a set of constraints that tie together $V^*(s)$ at different states $s \in \mathcal{S}$. We initialize the value function to some arbitrary values $V_0(s)$ for all states $s \in \mathcal{S}$. At the $k^{\text{th}}$ iteration, the Value Iteration algorithm updates the value function as
-$$
-    V_{k+1}(s) = \max_{a \in \mathcal{A}} \Big\{ r(s,  a) + \gamma\  \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V_k(s') \Big\};\ \text{for all } s \in \mathcal{S}.
-$$
+
+$$V_{k+1}(s) = \max_{a \in \mathcal{A}} \Big\{ r(s,  a) + \gamma\  \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V_k(s') \Big\};\ \text{for all } s \in \mathcal{S}.$$
+
 It turns out that as $k \to \infty$ the value function estimated by the Value Iteration algorithm converges to the optimal value function irrespective of the initialization $V_0$,
 $$V^*(s) = \lim_{k \to \infty} V_k(s);\ \text{for all states } s \in \mathcal{S}.$$
 
@@ -81,11 +83,13 @@ In this case we initialize $Q_0(s, a)$ to some arbitrary values for all $s \in \
 ## Policy Evaluation
 
 Value Iteration enables us to compute the optimal value function, i.e., $V^{\pi^*}$ of the optimal deterministic policy $\pi^*$. We can also usesimilar iterative updates to compute the value function associated with any other, potentially stochastic, policy $\pi$. We again initialize $V^\pi_0(s)$ to some arbitrary values for all states $s \in \mathcal{S}$ and at the $k^{\text{th}}$ iteration, perform the updates
-$$
-    V^\pi_{k+1}(s) = \sum_{a \in \mathcal{A}} \pi(a \mid s) \Big[ r(s,  a) + \gamma\  \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^\pi_k(s') \Big];\ \text{for all } s \in \mathcal{S}.
-$$
+
+$$    V^\pi_{k+1}(s) = \sum_{a \in \mathcal{A}} \pi(a \mid s) \Big[ r(s,  a) + \gamma\  \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^\pi_k(s') \Big];\ \text{for all } s \in \mathcal{S}.$$
+
 This algorithm is known as policy evaluation and is useful to compute the value function given the policy. Again, it turns out that as $k \to \infty$ these updates converge to the correct value function irrespective of the initialization $V_0$,
+
 $$V^\pi(s) = \lim_{k \to \infty} V^\pi_k(s);\ \text{for all states } s \in \mathcal{S}.$$
+
 The algorithm for computing the action-value function $Q^\pi(s, a)$ of a policy $\pi$ is analogous.
 
 ## Implementation of Value Iteration
@@ -105,7 +109,7 @@ num_iters = 10  # Number of iterations
 random.seed(seed)  # Set the random seed to ensure results can be reproduced
 np.random.seed(seed)
 
-# now set up the environment
+# Now set up the environment
 env_info = d2l.make_env('FrozenLake-v1', seed=seed)
 ```
 
@@ -140,15 +144,13 @@ def value_iteration(env_info, gamma, num_iters):
                 # Calculate \sum_{s'} p(s'\mid s,a) [r + \gamma v_k(s')]
                 for pxrds in mdp[(s,a)]:
                     # mdp(s,a): [(p1,next1,r1,d1),(p2,next2,r2,d2),..]
-                    pr = pxrds[prob_idx] # p(s'\mid s,a)
-                    nextstate  = pxrds[nextstate_idx] # next state
-                    reward     = pxrds[reward_idx] # reward
-                    Q[k,s,a]  += pr * (reward + gamma * V[k - 1, nextstate])
-
+                    pr = pxrds[prob_idx]  # p(s'\mid s,a)
+                    nextstate  = pxrds[nextstate_idx]  # next state
+                    reward = pxrds[reward_idx]  # reward
+                    Q[k,s,a] += pr * (reward + gamma * V[k - 1, nextstate])
             # Record max value and max action
             V[k,s]  = np.max(Q[k,s,:])
             pi[k,s] = np.argmax(Q[k,s,:])
-
     d2l.show_value_function_progress(env_desc, V[:-1], pi[:-1])
 
 value_iteration(env_info=env_info, gamma=gamma, num_iters=num_iters)
