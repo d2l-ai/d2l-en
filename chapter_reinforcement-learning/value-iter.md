@@ -115,17 +115,12 @@ env_info = d2l.make_env('FrozenLake-v1', seed=seed)
 
 In the FrozenLake environment, the robot moves on a $4 \times 4$ grid (these are the states) with actions that are "up" ($\uparrow$), "down" ($\rightarrow$), "left" ($\leftarrow$), and "right" ($\rightarrow$). The environment contains a number of holes (H) cells and frozen (F) cells as well as a goal cell (G), all of which are unknown to the robot. To keep the problem simple, we assume the robot has reliable actions, i.e. $P(s' \mid s, a) = 1$ for all $s \in \mathcal{S}, a \in \mathcal{A}$. If the robot reaches the goal, the trial ends and the robot receives a reward of $1$ irrespective of the action; the reward at any other state is $0$ for all actions. The objective of the robot is to learn a policy that reaches the goal location (G) from a given start location (S) (this is $s_0$) to maximize the *return*.
 
-The following function implements Value Iteration:
+The following function implements Value Iteration, where `env_info` contains MDP and environment related information and `gamma` is the discount factor:
 
 ```{.python .input}
 %%tab all
 
 def value_iteration(env_info, gamma, num_iters):
-    '''
-        gamma: discount factor
-        num_iters: number of iteration
-        env_info: contains MDP and environment related information
-    '''
     env_desc = env_info['desc']  # 2D array shows what each item means
     prob_idx = env_info['trans_prob_idx']
     nextstate_idx = env_info['nextstate_idx']
@@ -145,8 +140,8 @@ def value_iteration(env_info, gamma, num_iters):
                 for pxrds in mdp[(s,a)]:
                     # mdp(s,a): [(p1,next1,r1,d1),(p2,next2,r2,d2),..]
                     pr = pxrds[prob_idx]  # p(s'\mid s,a)
-                    nextstate  = pxrds[nextstate_idx]  # next state
-                    reward = pxrds[reward_idx]  # reward
+                    nextstate  = pxrds[nextstate_idx]  # Next state
+                    reward = pxrds[reward_idx]  # Reward
                     Q[k,s,a] += pr * (reward + gamma * V[k - 1, nextstate])
             # Record max value and max action
             V[k,s]  = np.max(Q[k,s,:])
