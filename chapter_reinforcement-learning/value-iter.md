@@ -140,11 +140,11 @@ def value_iteration(env_info, gamma, num_iters):
                 for pxrds in mdp[(s,a)]:
                     # mdp(s,a): [(p1,next1,r1,d1),(p2,next2,r2,d2),..]
                     pr = pxrds[prob_idx]  # p(s'\mid s,a)
-                    nextstate  = pxrds[nextstate_idx]  # Next state
+                    nextstate = pxrds[nextstate_idx]  # Next state
                     reward = pxrds[reward_idx]  # Reward
                     Q[k,s,a] += pr * (reward + gamma * V[k - 1, nextstate])
             # Record max value and max action
-            V[k,s]  = np.max(Q[k,s,:])
+            V[k,s] = np.max(Q[k,s,:])
             pi[k,s] = np.argmax(Q[k,s,:])
     d2l.show_value_function_progress(env_desc, V[:-1], pi[:-1])
 
