@@ -92,7 +92,7 @@ The algorithm for computing the action-value function $Q^\pi(s, a)$ of a policy 
 :label:`subsec_valueitercode`
 We next show how to implement Value Iteration for a navigation problem called FrozenLake from [Open AI Gym](https://gym.openai.com). We first need to setup the enviroment as shown in the following code.
 ```{.python .input}
-#@tab all
+%%tab all
 
 %matplotlib inline
 %pip install gym==0.21.0
