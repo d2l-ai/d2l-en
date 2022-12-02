@@ -95,7 +95,6 @@ We next show how to implement Value Iteration for a navigation problem called Fr
 %%tab all
 
 %matplotlib inline
-%pip install gym==0.21.0
 import numpy as np
 import random
 from d2l import torch as d2l
