@@ -113,13 +113,13 @@ def frozen_lake(seed): #@save
     env.action_space.seed(seed)
     env_info = {}
     env_info['desc'] = env.desc  # 2D array specifying what each grid item means
-    env_info['num_states'] = env.nS # number of observations/states or obs/state dim
-    env_info['num_actions'] = env.nA # number of actions or action dim
+    env_info['num_states'] = env.nS  # number of observations/states or obs/state dim
+    env_info['num_actions'] = env.nA  # number of actions or action dim
     # define indices for (transition probability, nextstate, reward, done) tuple
-    env_info['trans_prob_idx'] = 0 # index of transition probability entry
-    env_info['nextstate_idx'] = 1 # index of next state entry
-    env_info['reward_idx'] = 2 # index of reward entry
-    env_info['done_idx'] = 3 # index of done entry
+    env_info['trans_prob_idx'] = 0  # index of transition probability entry
+    env_info['nextstate_idx'] = 1  # index of next state entry
+    env_info['reward_idx'] = 2  # index of reward entry
+    env_info['done_idx'] = 3  # index of done entry
     env_info['mdp'] = {}
     env_info['env'] = env
 
