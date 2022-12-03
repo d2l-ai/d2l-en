@@ -785,7 +785,7 @@ class RNNScratch(nn.Module):
                                (self.num_inputs, self.num_hiddens))
         self.W_hh = self.param('W_hh', nn.initializers.normal(self.sigma),
                                (self.num_hiddens, self.num_hiddens))
-        self.b_h = self.param('b_h', nn.initializers.zeros, (num_hiddens))
+        self.b_h = self.param('b_h', nn.initializers.zeros, (self.num_hiddens))
 
     def __call__(self, inputs, state=None):
         """Defined in :numref:`sec_rnn-scratch`"""
