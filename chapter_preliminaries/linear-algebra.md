@@ -883,7 +883,7 @@ To form the matrix product $\mathbf{C} \in \mathbb{R}^{n \times m}$,
 we simply compute each element $c_{ij}$
 as the dot product between 
 the $i^{\mathrm{th}}$ row of $\mathbf{A}$
-and the $j^{\mathrm{th}}$ row of $\mathbf{B}$,
+and the $j^{\mathrm{th}}$ column of $\mathbf{B}$,
 i.e., $\mathbf{a}^\top_i \mathbf{b}_j$:
 
 $$\mathbf{C} = \mathbf{AB} = \begin{bmatrix}

@@ -98,7 +98,7 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
-from mxnet import npx
+from mxnet import np, npx
 from mxnet.gluon import rnn
 npx.set_np()
 ```
@@ -153,9 +153,10 @@ layer by layer.
 @d2l.add_to_class(StackedRNNScratch)
 def forward(self, inputs, Hs=None):
     outputs = inputs
-    if Hs is None: Hs = [None] * len(inputs)
+    if Hs is None: Hs = [None] * self.num_layers
     for i in range(self.num_layers):
         outputs, Hs[i] = self.rnns[i](outputs, Hs[i])
+        outputs = d2l.stack(outputs, 0)
     return outputs, Hs
 ```
 

@@ -496,6 +496,7 @@ They helped improve the content and offered valuable feedback.
 We thank Anirudh Dagar and Yuan Tang for adapting part of early MXNet code into PyTorch and TensorFlow implementations, respectively.
 We thank a team from Baidu for adapting more recent PyTorch code into PaddlePaddle implementations in the Chinese draft.
 We thank Shuai Zhang for integrating the LaTeX style from the press into the PDF building.
+
 On GitHub, we thank every contributor of this English draft
 for making it better for everyone.
 Their GitHub IDs or names are (in no particular order):
@@ -537,7 +538,8 @@ Kaan Sancak, regob, AlexSauer, Gopalakrishna Ramachandra, Tobias Uelwer, Chao Wa
 Nicolas Corthorn, akash5474, kxxt, zxydi1992, Jacob Britton, Shuangchi He, zhmou, krahets, Jie-Han Chen,
 Atishay Garg, Marcel Flygare, adtygan, Nik Vaessen, bolded, Louis Schlessinger, Balaji Varatharajan,
 atgctg, Kaixin Li, Victor Barbaros, Riccardo Musto, Elizabeth Ho, azimjonn, Guilherme Miotto, Alessandro Finamore,
-Joji Joseph, Anthony Biel, Zeming Zhao, shjustinbaek, gab-chen, nantekoto, Yutaro Nishiyama, Oren Amsalem.
+Joji Joseph, Anthony Biel, Zeming Zhao, shjustinbaek, gab-chen, nantekoto, Yutaro Nishiyama, Oren Amsalem,
+Tian-MaoMao, Amin Allahyar, Gijs van Tulder, Mikhail Berkov.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian, Peter DeSantis, Adam Selipsky,
 and Andrew Jassy for their generous support in writing this book. 

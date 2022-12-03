@@ -128,15 +128,15 @@ This can be written into code, and freely optimized even for billions of coin fl
 #@tab mxnet
 # Set up our data
 n_H = 8675309
-n_T = 25624
+n_T = 256245
 
 # Initialize our paramteres
 theta = np.array(0.5)
 theta.attach_grad()
 
 # Perform gradient descent
-lr = 0.00000000001
-for iter in range(10):
+lr = 1e-9
+for iter in range(100):
     with autograd.record():
         loss = -(n_H * np.log(theta) + n_T * np.log(1 - theta))
     loss.backward()
@@ -150,14 +150,14 @@ theta, n_H / (n_H + n_T)
 #@tab pytorch
 # Set up our data
 n_H = 8675309
-n_T = 25624
+n_T = 256245
 
 # Initialize our paramteres
 theta = torch.tensor(0.5, requires_grad=True)
 
 # Perform gradient descent
-lr = 0.00000000001
-for iter in range(10):
+lr = 1e-9
+for iter in range(100):
     loss = -(n_H * torch.log(theta) + n_T * torch.log(1 - theta))
     loss.backward()
     with torch.no_grad():
@@ -172,14 +172,14 @@ theta, n_H / (n_H + n_T)
 #@tab tensorflow
 # Set up our data
 n_H = 8675309
-n_T = 25624
+n_T = 256245
 
 # Initialize our paramteres
 theta = tf.Variable(tf.constant(0.5))
 
 # Perform gradient descent
-lr = 0.00000000001
-for iter in range(10):
+lr = 1e-9
+for iter in range(100):
     with tf.GradientTape() as t:
         loss = -(n_H * tf.math.log(theta) + n_T * tf.math.log(1 - theta))
     theta.assign_sub(lr * t.gradient(loss, theta))

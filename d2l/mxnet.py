@@ -617,7 +617,7 @@ class TimeMachine(d2l.DataModule):
         self.save_hyperparameters()
         corpus, self.vocab = self.build(self._download())
         array = d2l.tensor([corpus[i:i+num_steps+1]
-                            for i in range(0, len(corpus)-num_steps-1)])
+                            for i in range(len(corpus)-num_steps)])
         self.X, self.Y = array[:,:-1], array[:,1:]
 
     def get_dataloader(self, train):
@@ -672,13 +672,16 @@ class RNNScratch(d2l.Module):
 
     def forward(self, inputs, state=None):
         """Defined in :numref:`sec_rnn-scratch`"""
-        if state is not None:
+        if state is None:
+            # Initial state with shape: (batch_size, num_hiddens)
+            state = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                              ctx=inputs.ctx)
+        else:
             state, = state
         outputs = []
         for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs)
-            state = d2l.tanh(d2l.matmul(X, self.W_xh) + (
-                d2l.matmul(state, self.W_hh) if state is not None else 0)
-                             + self.b_h)
+            state = d2l.tanh(d2l.matmul(X, self.W_xh) +
+                             d2l.matmul(state, self.W_hh) + self.b_h)
             outputs.append(state)
         return outputs, state
 
