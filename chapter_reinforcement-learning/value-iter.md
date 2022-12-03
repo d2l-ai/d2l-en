@@ -163,3 +163,7 @@ The main idea behind the Value Iteration algorithm is to use the principle of dy
 1. What is the computational complexity of the Value Iteration algorithm?
 1. Run the Value Iteration algorithm again with $\gamma$ (i.e. "gamma" in the above code) when it equals to $0$, $0.5$, and $1$ and analyze its results. 
 1. How does the value of $\gamma$ affect the number of iterations taken by Value Iteration to converge? What happens when $\gamma=1$?
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/xx)
+:end_tab:
