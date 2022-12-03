@@ -165,5 +165,5 @@ The main idea behind the Value Iteration algorithm is to use the principle of dy
 1. How does the value of $\gamma$ affect the number of iterations taken by Value Iteration to converge? What happens when $\gamma=1$?
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/xx)
+[Discussions](https://discuss.d2l.ai/t/12005)
 :end_tab:
