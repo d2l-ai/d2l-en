@@ -323,7 +323,7 @@ class GRU(d2l.RNN):
     num_hiddens: int
 
     @nn.compact
-    def __call__(self, inputs, H=None):
+    def __call__(self, inputs, H=None, training=False):
         if H is None:
             batch_size = inputs.shape[1]
             H = nn.GRUCell.initialize_carry(jax.random.PRNGKey(0),

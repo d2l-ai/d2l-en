@@ -92,7 +92,7 @@ with that from an LSTM or a GRU.
 
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
 ```{.python .input}
@@ -114,6 +114,14 @@ from torch import nn
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
 ```
 
 ## Implementation from Scratch
@@ -144,6 +152,20 @@ class StackedRNNScratch(d2l.Module):
                                     for i in range(num_layers)])
 ```
 
+```{.python .input}
+%%tab jax
+class StackedRNNScratch(d2l.Module):
+    num_inputs: int
+    num_hiddens: int
+    num_layers: int
+    sigma: float = 0.01
+
+    def setup(self):
+        self.rnns = [d2l.RNNScratch(self.num_inputs if i==0 else self.num_hiddens,
+                                    self.num_hiddens, self.sigma)
+                     for i in range(self.num_layers)]
+```
+
 The multi-layer forward computation
 simply performs forward computation
 layer by layer.
@@ -153,7 +175,7 @@ layer by layer.
 @d2l.add_to_class(StackedRNNScratch)
 def forward(self, inputs, Hs=None):
     outputs = inputs
-    if Hs is None: Hs = [None] * len(inputs)
+    if Hs is None: Hs = [None] * self.num_layers
     for i in range(self.num_layers):
         outputs, Hs[i] = self.rnns[i](outputs, Hs[i])
     return outputs, Hs
@@ -166,7 +188,7 @@ To keep things simple we set the number of layers to 2.
 ```{.python .input}
 %%tab all
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
-if tab.selected('mxnet', 'pytorch'):
+if tab.selected('mxnet', 'pytorch', 'jax'):
     rnn_block = StackedRNNScratch(num_inputs=len(data.vocab),
                                   num_hiddens=32, num_layers=2)
     model = d2l.RNNLMScratch(rnn_block, vocab_size=len(data.vocab), lr=2)
@@ -182,6 +204,7 @@ trainer.fit(model, data)
 
 ## Concise Implementation
 
+:begin_tab:`pytorch, mxnet, tensorflow`
 Fortunately many of the logistical details required
 to implement multiple layers of an RNN 
 are readily available in high-level APIs.
@@ -189,6 +212,18 @@ Our concise implementation will use such built-in functionalities.
 The code generalizes the one we used previously in :numref:`sec_gru`,
 allowing specification of the number of layers explicitly 
 rather than picking the default of a single layer.
+:end_tab:
+
+:begin_tab:`jax`
+Flax takes a minimalistic approach while implementing
+RNNs. Defining number of layers in an RNN or combining it with Dropout
+is not available out of the box.
+Our concise implementation will use all built-in functionalities and
+add `num_layers` and `dropout` features on top.
+The code generalizes the one we used previously in :numref:`sec_gru`,
+allowing specification of the number of layers explicitly
+rather than picking the default of a single layer.
+:end_tab:
 
 ```{.python .input}
 %%tab mxnet
@@ -225,6 +260,37 @@ class GRU(d2l.RNN):  #@save
         return outputs, state
 ```
 
+```{.python .input}
+%%tab jax
+class GRU(d2l.RNN):  #@save
+    num_hiddens: int
+    num_layers: int
+    dropout: float = 0
+
+    @nn.compact
+    def __call__(self, X, state=None, training=False):
+        outputs = X
+        new_state = []
+        if state is None:
+            batch_size = X.shape[1]
+            state = [nn.GRUCell.initialize_carry(jax.random.PRNGKey(0),
+                    (batch_size,), self.num_hiddens)] * self.num_layers
+
+        GRU = nn.scan(nn.GRUCell, variable_broadcast="params",
+                      in_axes=0, out_axes=0, split_rngs={"params": False})
+
+        # Introduce a dropout layer after every GRU layer except last
+        for i in range(self.num_layers - 1):
+            layer_i_state, X = GRU()(state[i], outputs)
+            new_state.append(layer_i_state)
+            X = nn.Dropout(self.dropout, deterministic=not training)(X)
+
+        # Final GRU layer without dropout
+        out_state, X = GRU()(state[-1], X)
+        new_state.append(out_state)
+        return X, jnp.array(new_state)
+```
+
 The architectural decisions such as choosing hyperparameters 
 are very similar to those of :numref:`sec_gru`.
 We pick the same number of inputs and outputs 
@@ -236,11 +302,11 @@ by specifying the value of `num_layers`.**)
 
 ```{.python .input}
 %%tab all
-if tab.selected('mxnet', 'tensorflow'):
+if tab.selected('mxnet', 'tensorflow', 'jax'):
     gru = GRU(num_hiddens=32, num_layers=2)
 if tab.selected('pytorch'):
     gru = GRU(num_inputs=len(data.vocab), num_hiddens=32, num_layers=2)
-if tab.selected('mxnet', 'pytorch'):
+if tab.selected('mxnet', 'pytorch', 'jax'):
     model = d2l.RNNLM(gru, vocab_size=len(data.vocab), lr=2)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
@@ -256,6 +322,11 @@ model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```{.python .input}
 %%tab tensorflow
 model.predict('it has', 20, data.vocab)
+```
+
+```{.python .input}
+%%tab jax
+model.predict('it has', 20, data.vocab, trainer.state.params)
 ```
 
 ## Summary

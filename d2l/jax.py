@@ -873,11 +873,47 @@ class RNN(nn.Module):
 
 class RNNLM(d2l.RNNLMScratch):
     """Defined in :numref:`sec_rnn-concise`"""
+    training: bool = True
+
     def setup(self):
         self.linear = nn.Dense(self.vocab_size)
 
     def output_layer(self, hiddens):
         return d2l.swapaxes(self.linear(hiddens), 0, 1)
+
+    def forward(self, X, state=None):
+        embs = self.one_hot(X)
+        rnn_outputs, _ = self.rnn(embs, state, self.training)
+        return self.output_layer(rnn_outputs)
+
+class GRU(d2l.RNN):
+    """Defined in :numref:`sec_deep_rnn`"""
+    num_hiddens: int
+    num_layers: int
+    dropout: float = 0
+
+    @nn.compact
+    def __call__(self, X, state=None, training=False):
+        outputs = X
+        new_state = []
+        if state is None:
+            batch_size = X.shape[1]
+            state = [nn.GRUCell.initialize_carry(jax.random.PRNGKey(0),
+                    (batch_size,), self.num_hiddens)] * self.num_layers
+
+        GRU = nn.scan(nn.GRUCell, variable_broadcast="params",
+                      in_axes=0, out_axes=0, split_rngs={"params": False})
+
+        # Introduce a dropout layer after every GRU layer except last
+        for i in range(self.num_layers - 1):
+            layer_i_state, X = GRU()(state[i], outputs)
+            new_state.append(layer_i_state)
+            X = nn.Dropout(self.dropout, deterministic=not training)(X)
+
+        # Final GRU layer without dropout
+        out_state, X = GRU()(state[-1], X)
+        new_state.append(out_state)
+        return X, jnp.array(new_state)
 
 class MTFraEng(d2l.DataModule):
     """Defined in :numref:`sec_machine_translation`"""

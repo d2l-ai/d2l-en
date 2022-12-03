@@ -458,7 +458,7 @@ class LSTM(d2l.RNN):
     num_hiddens: int
 
     @nn.compact
-    def __call__(self, inputs, H_C=None):
+    def __call__(self, inputs, H_C=None, training=False):
         if H_C is None:
             batch_size = inputs.shape[1]
             H_C = nn.OptimizedLSTMCell.initialize_carry(jax.random.PRNGKey(0),
