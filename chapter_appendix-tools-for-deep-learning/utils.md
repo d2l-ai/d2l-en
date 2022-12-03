@@ -104,8 +104,8 @@ Add FrozenLake enviroment
 %%tab pytorch
 
 def frozen_lake(seed): #@save
-    # see https://www.gymlibrary.dev/environments/toy_text/frozen_lake/ to learn more about this env
-    # how to process env.P.items is adpated from https://sites.google.com/view/deep-rl-bootcamp/labs
+    # See https://www.gymlibrary.dev/environments/toy_text/frozen_lake/ to learn more about this env
+    # How to process env.P.items is adpated from https://sites.google.com/view/deep-rl-bootcamp/labs
 
     env = gym.make('FrozenLake-v1', is_slippery=False)
     env.seed(seed)
@@ -113,13 +113,13 @@ def frozen_lake(seed): #@save
     env.action_space.seed(seed)
     env_info = {}
     env_info['desc'] = env.desc  # 2D array specifying what each grid item means
-    env_info['num_states'] = env.nS  # number of observations/states or obs/state dim
-    env_info['num_actions'] = env.nA  # number of actions or action dim
-    # define indices for (transition probability, nextstate, reward, done) tuple
-    env_info['trans_prob_idx'] = 0  # index of transition probability entry
-    env_info['nextstate_idx'] = 1  # index of next state entry
-    env_info['reward_idx'] = 2  # index of reward entry
-    env_info['done_idx'] = 3  # index of done entry
+    env_info['num_states'] = env.nS  # Number of observations/states or obs/state dim
+    env_info['num_actions'] = env.nA  # Number of actions or action dim
+    # Define indices for (transition probability, nextstate, reward, done) tuple
+    env_info['trans_prob_idx'] = 0  # Index of transition probability entry
+    env_info['nextstate_idx'] = 1  # Index of next state entry
+    env_info['reward_idx'] = 2  # Index of reward entry
+    env_info['done_idx'] = 3  # Index of done entry
     env_info['mdp'] = {}
     env_info['env'] = env
 
@@ -175,15 +175,10 @@ def show_value_function_progress(env_desc, V, pi): #@save
         ax.set_xticks([])
         ax.set_yticks([])
 
-        # LEFT action: 0.
-        # DOWN action: 1.
-        # RIGHT action: 2.
-        # UP action: 3.
-        action2dxdy = {0: (-.25, 0),
-                       1: (0, .25),
-                       2: (0.25,0),
-                       3: (-.25, 0)
-                      }
+        # LEFT action: 0, DOWN action: 1
+        # RIGHT action: 2, UP action: 3
+        action2dxdy = {0:(-.25, 0),1: (0, .25),
+                       2:(0.25, 0),3: (-.25, 0)}
 
         for y in range(4):
             for x in range(4):
@@ -205,7 +200,7 @@ def show_value_function_progress(env_desc, V, pi): #@save
                        ha="center", va="center", color="g",
                          size=15, fontweight='bold')
 
-                # no arrow for cells with G and H labels
+                # No arrow for cells with G and H labels
                 if env_desc[y,x].decode() != 'G' and env_desc[y,x].decode() != 'H':
                     ax.arrow(x, y, dx, dy, color='r', head_width=0.2, head_length=0.15)
 
@@ -215,6 +210,7 @@ def show_value_function_progress(env_desc, V, pi): #@save
     plt.show()
 
 ```
+
 
 Trainer
 
