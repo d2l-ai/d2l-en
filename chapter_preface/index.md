@@ -346,6 +346,7 @@ the following dependencies:
 import inspect
 import collections
 from collections import defaultdict
+import gym
 from IPython import display
 import math
 from matplotlib import pyplot as plt
