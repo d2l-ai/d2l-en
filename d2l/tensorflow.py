@@ -1312,7 +1312,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
               r = (d2l.evaluate_loss(net, data_iter, loss),)
               animator.add(q, r)
               timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.sum()/num_epochs:.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
@@ -1344,7 +1344,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
                 r = (d2l.evaluate_loss(net, data_iter, loss) / 2,)
                 animator.add(q, r)
                 timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.sum()/num_epochs:.3f} sec/epoch')
 
 class Benchmark:
     """For measuring running time."""

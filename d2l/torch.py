@@ -1336,7 +1336,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.sum()/num_epochs:.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
@@ -1368,7 +1368,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss) / 2,))
                 timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.sum()/num_epochs:.3f} sec/epoch')
 
 class Benchmark:
     """For measuring running time."""
@@ -2579,6 +2579,103 @@ def update_G(Z, net_D, net_G, loss, trainer_G):
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
+def frozen_lake(seed):
+    """Defined in :numref:`sec_utils`"""
+    # See https://www.gymlibrary.dev/environments/toy_text/frozen_lake/ to learn more about this env
+    # How to process env.P.items is adpated from https://sites.google.com/view/deep-rl-bootcamp/labs
+
+    env = gym.make('FrozenLake-v1', is_slippery=False)
+    env.seed(seed)
+    env.action_space.np_random.seed(seed)
+    env.action_space.seed(seed)
+    env_info = {}
+    env_info['desc'] = env.desc  # 2D array specifying what each grid item means
+    env_info['num_states'] = env.nS  # Number of observations/states or obs/state dim
+    env_info['num_actions'] = env.nA  # Number of actions or action dim
+    # Define indices for (transition probability, nextstate, reward, done) tuple
+    env_info['trans_prob_idx'] = 0  # Index of transition probability entry
+    env_info['nextstate_idx'] = 1  # Index of next state entry
+    env_info['reward_idx'] = 2  # Index of reward entry
+    env_info['done_idx'] = 3  # Index of done entry
+    env_info['mdp'] = {}
+    env_info['env'] = env
+
+    for (s, others) in env.P.items():
+        # others(s) = {a0: [ (p(s'|s,a0), s', reward, done),...], a1:[...], ...}
+
+        for (a, pxrds) in others.items():
+            # pxrds is [(p1,next1,r1,d1),(p2,next2,r2,d2),..].
+            # e.g. [(0.3, 0, 0, False), (0.3, 0, 0, False), (0.3, 4, 1, False)]
+            env_info['mdp'][(s,a)] = pxrds
+
+    return env_info
+
+def make_env(name ='', seed=0):
+    """Defined in :numref:`sec_utils`"""
+    # Input parameters:
+    # name: specifies a gym environment.
+    # For Value iteration, only FrozenLake-v1 is supported.
+    if name == 'FrozenLake-v1':
+        return frozen_lake(seed)
+
+    else:
+        raise ValueError("%s env is not supported in this Notebook")
+
+def show_value_function_progress(env_desc, V, pi):
+    """Defined in :numref:`sec_utils`"""
+    # This function visualizes how value and policy changes over time.
+    # V: [num_iters, num_states]
+    # pi: [num_iters, num_states]
+    # How to visualize value function is adapted (but changed) from: https://sites.google.com/view/deep-rl-bootcamp/labs
+
+    num_iters = V.shape[0]
+    fig, ax  = plt.subplots(figsize=(15, 15))
+
+    for k in range(V.shape[0]):
+        plt.subplot(4, 4, k + 1)
+        plt.imshow(V[k].reshape(4,4), cmap="bone")
+        ax = plt.gca()
+        ax.set_xticks(np.arange(0, 5)-.5, minor=True)
+        ax.set_yticks(np.arange(0, 5)-.5, minor=True)
+        ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
+        ax.tick_params(which="minor", bottom=False, left=False)
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+        # LEFT action: 0, DOWN action: 1
+        # RIGHT action: 2, UP action: 3
+        action2dxdy = {0:(-.25, 0),1: (0, .25),
+                       2:(0.25, 0),3: (-.25, 0)}
+
+        for y in range(4):
+            for x in range(4):
+                action = pi[k].reshape(4,4)[y, x]
+                dx, dy = action2dxdy[action]
+
+                if env_desc[y,x].decode() == 'H':
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="y",
+                         size=20, fontweight='bold')
+
+                elif env_desc[y,x].decode() == 'G':
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="w",
+                         size=20, fontweight='bold')
+
+                else:
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="g",
+                         size=15, fontweight='bold')
+
+                # No arrow for cells with G and H labels
+                if env_desc[y,x].decode() != 'G' and env_desc[y,x].decode() != 'H':
+                    ax.arrow(x, y, dx, dy, color='r', head_width=0.2, head_length=0.15)
+
+        ax.set_title("Step = "  + str(k + 1), fontsize=20)
+
+    fig.tight_layout()
+    plt.show()
+
 def load_array(data_arrays, batch_size, is_train=True):
     """Construct a PyTorch data iterator.
 
@@ -3070,136 +3167,6 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
             break
         output_seq.append(pred)
     return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq
-
-def FrozenLake(seed):
-    """Defined in :numref:`sec_code_rl`"""
-    '''
-            Winter is here. You and your friends were tossing around a frisbee at the
-            park when you made a wild throw that left the frisbee out in the middle of
-            the lake. The water is mostly frozen, but there are a few holes where the
-            ice has melted. If you step into one of those holes, you'll fall into the
-            freezing water. At this time, there's an international frisbee shortage, so
-            it's absolutely imperative that you navigate across the lake and retrieve
-            the disc. However, the ice is slippery, so you won't always move in the
-            direction you intend.
-            The surface is described using a grid like the following
-                SFFF
-                FHFH
-                FFFH
-                HFFG
-            S : starting point, safe
-            F : frozen surface, safe
-            H : hole, fall to your doom
-            G : goal, where the frisbee is located
-            The episode ends when you reach the goal or fall in a hole.
-            You receive a reward of 1 if you reach the goal, and zero otherwise.
-            You can only move in the following directions:
-                LEFT which corresponds to action index 0.
-                DOWN which corresponds to action index 1.
-                RIGHT which corresponds to action index 2.
-                UP which corresponds to action index 3.
-            Above text/description is copied from https://gym.openai.com/envs/FrozenLake-v0/
-            and how to process env.P.items is adpated from https://sites.google.com/view/deep-rl-bootcamp/labs
-
-    '''
-    import gym
-    env = gym.make('FrozenLake-v1', is_slippery=False)
-    env.seed(seed)
-    env.action_space.np_random.seed(seed)
-    env.action_space.seed(seed)
-    env_info = {}
-    env_info['desc'] = env.desc  # 2D array specifying what each grid item means
-    env_info['num_states']     = env.nS # number of observations/states or obs/state dim
-    env_info['num_actions']    = env.nA # number of actions or action dim
-    # define indices for (transition probability, nextstate, reward, done) tuple
-    env_info['trans_prob_idx'] = 0 # index of transition probability entry
-    env_info['nextstate_idx']  = 1 # index of next state entry
-    env_info['reward_idx']     = 2 # index of reward entry
-    env_info['done_idx']       = 3 # index of done entry
-    env_info['mdp'] = {}
-    env_info['env'] = env
-
-    for (s, others) in env.P.items():
-        # others(s) = {a0: [ (p(s'|s,a0), s', reward, done),...], a1:[...], ...}
-
-        for (a, pxrds) in others.items():
-            # pxrds is [(p1,next1,r1,d1),(p2,next2,r2,d2),..].
-            # e.g. [(0.3, 0, 0, False), (0.3, 0, 0, False), (0.3, 4, 1, False)]
-            env_info['mdp'][(s,a)] = pxrds
-
-    return env_info
-
-def make_env(name ='', seed=0):
-    """Defined in :numref:`sec_code_rl`"""
-    # Input parameters:
-    # name: specifies a gym environment.
-    # For Value iteration, only FrozenLake-v1 is supported.
-    if name == 'FrozenLake-v1':
-        return FrozenLake(seed)
-
-    else:
-        raise ValueError("%s env is not supported in this Notebook")
-
-def show_value_function_progress(env_desc, V, pi):
-    """Defined in :numref:`sec_code_rl`"""
-    # This function visualizes how value and policy changes over time.
-    # V:  [num_iters, num_states]
-    # pi: [num_iters, num_states]
-    # How to visualize value function is adapted (but changed) from: https://sites.google.com/view/deep-rl-bootcamp/labs
-
-    num_iters = V.shape[0]
-    fig, ax = plt.subplots(figsize=(15, 15))
-
-    for k in range(V.shape[0]):
-        plt.subplot(4, 4, k + 1)
-        plt.imshow(V[k].reshape(4,4), cmap="bone")
-        ax = plt.gca()
-        ax.set_xticks(np.arange(0, 5)-.5, minor=True)
-        ax.set_yticks(np.arange(0, 5)-.5, minor=True)
-        ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
-        ax.tick_params(which="minor", bottom=False, left=False)
-        ax.set_xticks([])
-        ax.set_yticks([])
-
-        # LEFT action: 0.
-        # DOWN action: 1.
-        # RIGHT action: 2.
-        # UP action: 3.
-        action2dxdy = {0: (-.25, 0),
-                       1: (0, .25),
-                       2: (0.25,0),
-                       3: (-.25, 0)
-                      }
-
-        for y in range(4):
-            for x in range(4):
-                action = pi[k].reshape(4,4)[y, x]
-                dx, dy = action2dxdy[action]
-
-                if env_desc[y,x].decode() == 'H':
-                    ax.text(x, y, str(env_desc[y,x].decode()),
-                       ha="center", va="center", color="y",
-                         size=20, fontweight='bold')
-
-                elif env_desc[y,x].decode() == 'G':
-                    ax.text(x, y, str(env_desc[y,x].decode()),
-                       ha="center", va="center", color="w",
-                         size=20, fontweight='bold')
-
-                else:
-                    ax.text(x, y, str(env_desc[y,x].decode()),
-                       ha="center", va="center", color="g",
-                         size=15, fontweight='bold')
-
-                # no arrow for cells with G and H labels
-                if env_desc[y,x].decode() != 'G' and env_desc[y,x].decode() != 'H':
-                    ax.arrow(x, y, dx, dy, color='r', head_width=0.2, head_length=0.15)
-
-        ax.set_title("Step = "  + str(k + 1), fontsize=20)
-
-    fig.tight_layout()
-    plt.show()
-
 
 
 # Alias defined in config.ini
