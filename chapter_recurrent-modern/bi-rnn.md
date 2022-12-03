@@ -88,7 +88,7 @@ We now demonstrate a simple implementation of a bidirectional RNN.
 
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
 ```{.python .input}
@@ -112,6 +112,12 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from jax import numpy as jnp
+```
+
 ### Implementation from Scratch
 
 To implement a bidirectional RNN from scratch, we can
@@ -119,11 +125,24 @@ include two unidirectional `RNNScratch` instances
 with separate learnable parameters.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class BiRNNScratch(d2l.Module):
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
+        self.f_rnn = d2l.RNNScratch(num_inputs, num_hiddens, sigma)
+        self.b_rnn = d2l.RNNScratch(num_inputs, num_hiddens, sigma)
+        self.num_hiddens *= 2  # The output dimension will be doubled
+```
+
+```{.python .input}
+%%tab jax
+class BiRNNScratch(d2l.Module):
+    num_inputs: int
+    num_hiddens: int
+    sigma: float = 0.01
+
+    def setup(self):
         self.f_rnn = d2l.RNNScratch(num_inputs, num_hiddens, sigma)
         self.b_rnn = d2l.RNNScratch(num_inputs, num_hiddens, sigma)
         self.num_hiddens *= 2  # The output dimension will be doubled
@@ -146,9 +165,18 @@ def forward(self, inputs, Hs=None):
 
 ### Concise Implementation
 
+:begin_tab:`pytorch, mxnet, tensorflow`
 Using the high-level APIs,
 we can implement bidirectional RNNs more concisely.
 Here we take a GRU model as an example.
+:end_tab:
+
+:begin_tab:`jax`
+Flax API doesn't offer RNN layers and hence there is no
+notion of `bidirectional` argument. One needs to manually
+reverse the inputs as shown in the scratch implementation,
+if a bidirectional layer is needed.
+:end_tab:
 
 ```{.python .input}
 %%tab mxnet, pytorch
