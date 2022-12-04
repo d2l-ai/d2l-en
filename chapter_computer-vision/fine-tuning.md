@@ -151,7 +151,7 @@ train_augs = gluon.data.vision.transforms.Compose([
     normalize])
 
 test_augs = gluon.data.vision.transforms.Compose([
-    gluon.data.vision.transforms.Resize(256),
+    gluon.data.vision.transforms.Resize(256, 256),
     gluon.data.vision.transforms.CenterCrop(224),
     gluon.data.vision.transforms.ToTensor(),
     normalize])
