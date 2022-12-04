@@ -171,7 +171,7 @@ train_augs = torchvision.transforms.Compose([
     normalize])
 
 test_augs = torchvision.transforms.Compose([
-    torchvision.transforms.Resize(256),
+    torchvision.transforms.Resize([256, 256]),
     torchvision.transforms.CenterCrop(224),
     torchvision.transforms.ToTensor(),
     normalize])
