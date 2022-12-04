@@ -155,11 +155,18 @@ class RNNLM(d2l.RNNLMScratch):  #@save
 ```{.python .input}
 %%tab jax
 class RNNLM(d2l.RNNLMScratch):  #@save
+    training: bool = True
+
     def setup(self):
         self.linear = nn.Dense(self.vocab_size)
-        
+
     def output_layer(self, hiddens):
         return d2l.swapaxes(self.linear(hiddens), 0, 1)
+
+    def forward(self, X, state=None):
+        embs = self.one_hot(X)
+        rnn_outputs, _ = self.rnn(embs, state, self.training)
+        return self.output_layer(rnn_outputs)
 ```
 
 ## Training and Predicting
