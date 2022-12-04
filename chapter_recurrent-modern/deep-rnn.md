@@ -216,7 +216,7 @@ rather than picking the default of a single layer.
 
 :begin_tab:`jax`
 Flax takes a minimalistic approach while implementing
-RNNs. Defining number of layers in an RNN or combining it with Dropout
+RNNs. Defining the number of layers in an RNN or combining it with dropout
 is not available out of the box.
 Our concise implementation will use all built-in functionalities and
 add `num_layers` and `dropout` features on top.
