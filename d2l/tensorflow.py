@@ -563,7 +563,7 @@ class TimeMachine(d2l.DataModule):
         self.save_hyperparameters()
         corpus, self.vocab = self.build(self._download())
         array = d2l.tensor([corpus[i:i+num_steps+1]
-                            for i in range(0, len(corpus)-num_steps-1)])
+                            for i in range(len(corpus)-num_steps)])
         self.X, self.Y = array[:,:-1], array[:,1:]
 
     def get_dataloader(self, train):
@@ -619,14 +619,16 @@ class RNNScratch(d2l.Module):
 
     def forward(self, inputs, state=None):
         """Defined in :numref:`sec_rnn-scratch`"""
-        if state is not None:
+        if state is None:
+            # Initial state with shape: (batch_size, num_hiddens)
+            state = d2l.zeros((inputs.shape[1], self.num_hiddens))
+        else:
             state, = state
-            state = d2l.reshape(state, (-1, self.W_hh.shape[0]))
+            state = d2l.reshape(state, (-1, self.num_hiddens))
         outputs = []
         for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs)
-            state = d2l.tanh(d2l.matmul(X, self.W_xh) + (
-                d2l.matmul(state, self.W_hh) if state is not None else 0)
-                             + self.b_h)
+            state = d2l.tanh(d2l.matmul(X, self.W_xh) +
+                             d2l.matmul(state, self.W_hh) + self.b_h)
             outputs.append(state)
         return outputs, state
 
@@ -1312,7 +1314,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
               r = (d2l.evaluate_loss(net, data_iter, loss),)
               animator.add(q, r)
               timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.sum()/num_epochs:.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
@@ -1344,7 +1346,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
                 r = (d2l.evaluate_loss(net, data_iter, loss) / 2,)
                 animator.add(q, r)
                 timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.sum()/num_epochs:.3f} sec/epoch')
 
 class Benchmark:
     """For measuring running time."""
