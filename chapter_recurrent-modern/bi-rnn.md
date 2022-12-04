@@ -173,7 +173,7 @@ Here we take a GRU model as an example.
 
 :begin_tab:`jax`
 Flax API doesn't offer RNN layers and hence there is no
-notion of `bidirectional` argument. One needs to manually
+notion of any `bidirectional` argument. One needs to manually
 reverse the inputs as shown in the scratch implementation,
 if a bidirectional layer is needed.
 :end_tab:
