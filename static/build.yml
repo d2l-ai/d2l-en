@@ -11,4 +11,4 @@ dependencies:
     - tensorflow==2.9.1
     - tensorflow-probability==0.17.0
     - scipy
-    - syne-tune
+    - syne-tune[extra]
