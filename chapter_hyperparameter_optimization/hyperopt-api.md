@@ -39,7 +39,6 @@ from scipy import stats
 
 ```{.python .input  n=4}
 %%tab all
-
 class HPOSearcher(d2l.HyperParameters):  #@save
     def sample_configuration():
         raise NotImplementedError
