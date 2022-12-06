@@ -73,7 +73,6 @@ observation.
 
 ```{.python .input  n=5}
 %%tab all
-
 class HPOScheduler(d2l.HyperParameters):  #@save
     def suggest(self):
         raise NotImplementedError
@@ -86,7 +85,6 @@ To implement random search, but also other HPO algorithms, we only need a basic 
 
 ```{.python .input  n=6}
 %%tab all
-
 class BasicScheduler(HPOScheduler):  #@save
     def __init__(self, searcher):
         self.save_hyperparameters()
@@ -107,7 +105,6 @@ use *Syne Tune* for more scalable distributed HPO cases.
 
 ```{.python .input  n=7}
 %%tab pytorch
-
 class HPOTuner(d2l.HyperParameters):  #@save
     def __init__(self, scheduler, objective):
         self.save_hyperparameters()
@@ -143,7 +140,6 @@ found by an optimizer works, but also how quickly an optimizer is able to find i
 
 ```{.python .input  n=8}
 %%tab pytorch
-
 @d2l.add_to_class(HPOTuner) #@save
 def bookkeeping(self, config, error, runtime): 
     # Check if the last hyperparameter configuration performs better 
@@ -167,7 +163,6 @@ and *learning rate* of a convolutional neural networks from :numref:`sec_alexnet
 
 ```{.python .input  n=9}
 %%tab all
-
 class AlexNet(d2l.Classifier): #@save
     def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
@@ -227,6 +222,7 @@ class AlexNet(d2l.Classifier): #@save
 For that, we first have to define the objective function.
 
 ```{.python .input  n=9}
+%%tab pytorch
 def objective(batch_size, learning_rate, max_epochs=8):  #@save
     model = d2l.AlexNet(lr=learning_rate)
     trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=1)
@@ -251,7 +247,6 @@ Now we can start our random search:
 searcher = RandomSearcher(config_space)
 scheduler = BasicScheduler(searcher=searcher)
 tuner = HPOTuner(scheduler=scheduler, objective=objective)
-
 tuner.run(number_of_trials=5)
 ```
 

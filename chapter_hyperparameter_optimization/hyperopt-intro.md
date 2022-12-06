@@ -51,7 +51,6 @@ rate alone for simplicity.
 ```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
-
 import numpy as np
 import torch
 from torch import nn
@@ -88,7 +87,6 @@ Now, since we would like to optimize the validation error, we need to add a func
 
 ```{.python .input  n=8}
 %%tab pytorch
-
 @d2l.add_to_class(d2l.Trainer)  #@save
 def validate(self):
     self.model.eval()
@@ -110,7 +108,6 @@ for `max_epochs` epochs, then compute and return its validation error:
 
 ```{.python .input  n=5}
 %%tab all
-
 def hpo_objective_softmax_classification(config, max_epochs=10):  #@save 
     learning_rate = config['learning_rate']
     trainer = d2l.Trainer(max_epochs=max_epochs)

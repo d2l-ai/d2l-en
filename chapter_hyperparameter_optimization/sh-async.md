@@ -102,7 +102,7 @@ max_epochs = 4
 config_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
    "batch_size": randint(8, 128),
-   "max_epochs": max_epochs,
+   "max_epochs": max_epochs
 }
 ```
 
@@ -127,7 +127,7 @@ scheduler = ASHA(
     resource_attr="epoch",
     type="promotion",
     grace_period=1,  # this corresponds to r_min 
-    reduction_factor=2,  # this corresponds to eta
+    reduction_factor=2  # this corresponds to eta
 )  
 ```
 
@@ -148,7 +148,7 @@ tuner = Tuner(
     trial_backend=trial_backend,
     scheduler=scheduler,
     stop_criterion=stop_criterion,
-    n_workers=n_workers,
+    n_workers=n_workers
 )
 tuner.run()
 ```

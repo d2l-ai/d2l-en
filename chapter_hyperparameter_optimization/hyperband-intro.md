@@ -88,7 +88,6 @@ from d2l import torch as d2l
 %%tab all
 import numpy as np
 import copy
-
 from scipy import stats
 from collections import defaultdict
 from operator import itemgetter
