@@ -321,7 +321,7 @@ scheduler = HyperbandScheduler(
     r_max=max_number_of_epochs
 )
 tuner = d2l.HPOTuner(scheduler=scheduler, objective=d2l.objective)
-tuner.run(number_of_trials=100)
+tuner.run(number_of_trials=50)
 ```
 
 Now, we can visualize the different bracket of successive halving.
