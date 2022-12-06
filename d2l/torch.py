@@ -329,6 +329,21 @@ class Trainer(d2l.HyperParameters):
             for param in params:
                 param.grad[:] *= grad_clip_val / norm
 
+    def validate(self):
+        """Defined in :numref:`sec_definition_hpo`"""
+        self.model.eval()
+        accuracy = 0
+        val_batch_idx = 0
+    
+        for batch in self.val_dataloader:
+            with torch.no_grad():
+                x, y = self.prepare_batch(batch)
+                y_hat = self.model(x)
+                accuracy += self.model.accuracy(y_hat, y)
+            val_batch_idx += 1
+    
+        return 1 -  accuracy / val_batch_idx
+
 class SyntheticRegressionData(d2l.DataModule):
     """Defined in :numref:`sec_synthetic-regression-data`"""
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
@@ -2579,6 +2594,229 @@ def update_G(Z, net_D, net_G, loss, trainer_G):
 
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
+
+class SoftmaxClassification(d2l.Classifier):
+    """Defined in :numref:`sec_definition_hpo`"""
+    def __init__(self, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential(nn.Flatten(),
+                                 nn.LazyLinear(num_outputs))
+    def forward(self, X):
+        return self.net(X)
+
+def hpo_objective_softmax_classification(config, max_epochs=10):
+    """Defined in :numref:`sec_definition_hpo`"""
+    learning_rate = config['learning_rate']
+    trainer = d2l.Trainer(max_epochs=max_epochs)
+    data = d2l.FashionMNIST(batch_size=16)
+    model = d2l.SoftmaxClassification(num_outputs=10, lr=learning_rate)
+    trainer.fit(model=model, data=data)
+    validation_error = trainer.validate()
+    return d2l.numpy(validation_error)
+
+class HPOSearcher(d2l.HyperParameters):
+    """Defined in :numref:`sec_api_hpo`"""
+    def sample_configuration():
+        raise NotImplementedError
+    def update(self, config, error, additional_info=None):
+        pass
+
+class RandomSearcher(HPOSearcher):
+    """Defined in :numref:`sec_api_hpo`"""
+    def __init__(self, config_space):
+        self.save_hyperparameters()
+
+    def sample_configuration(self):
+        return {
+            name: domain.rvs()
+            for name, domain in self.config_space.items()
+        }
+
+class HPOScheduler(d2l.HyperParameters):
+    """Defined in :numref:`sec_api_hpo`"""
+    def suggest(self):
+        raise NotImplementedError
+
+    def update(self, config, error, info=None):
+        raise NotImplementedError
+
+class BasicScheduler(HPOScheduler):
+    """Defined in :numref:`sec_api_hpo`"""
+    def __init__(self, searcher):
+        self.save_hyperparameters()
+
+    def suggest(self):
+        return self.searcher.sample_configuration()
+
+    def update(self, config, error, info=None):
+        searcher.update(config, error, additional_info=info)
+
+class HPOTuner(d2l.HyperParameters):
+    """Defined in :numref:`sec_api_hpo`"""
+    def __init__(self, scheduler, objective):
+        self.save_hyperparameters()
+
+        # Bookeeping results for plotting
+        self.incumbent = None
+        self.incumbent_error = None
+        self.incumbent_trajectory = []
+        self.cumulative_runtime = []
+        self.current_runtime = 0
+
+    def run(self, number_of_trials):
+        for i in range(number_of_trials):
+            start_time = time.time()
+            config = self.scheduler.suggest()
+            error = self.objective(**config)
+            self.scheduler.update(config, error)
+            runtime = time.time() - start_time
+            self.bookkeeping(config, d2l.numpy(error.cpu()), runtime)
+
+    def bookkeeping(self, config, error, runtime):
+        """Defined in :numref:`sec_api_hpo`"""
+        # Check if the last hyperparameter configuration performs better
+        # than the incumbent
+        if self.incumbent is None or self.incumbent_error > error:
+            self.incumbent = config
+            self.incumbent_error = error
+    
+        # Add current best observed performance to the optimization trajectory
+        self.incumbent_trajectory.append(self.incumbent_error)
+    
+        # Update runtime
+        self.current_runtime += runtime
+        self.cumulative_runtime.append(self.current_runtime)
+
+class AlexNet(d2l.Classifier):
+    """Defined in :numref:`sec_api_hpo`"""
+    def __init__(self, lr=0.1, num_classes=10):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential(
+            nn.LazyConv2d(96, kernel_size=11, stride=4, padding=1),
+            nn.ReLU(), nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.LazyConv2d(256, kernel_size=5, padding=2), nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.LazyConv2d(384, kernel_size=3, padding=1), nn.ReLU(),
+            nn.LazyConv2d(384, kernel_size=3, padding=1), nn.ReLU(),
+            nn.LazyConv2d(256, kernel_size=3, padding=1), nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2), nn.Flatten(),
+            nn.LazyLinear(4096), nn.ReLU(), nn.Dropout(p=0.5),
+            nn.LazyLinear(4096), nn.ReLU(),nn.Dropout(p=0.5),
+            nn.LazyLinear(num_classes))
+        self.net.apply(d2l.init_cnn)
+
+def objective(batch_size, learning_rate, max_epochs=8):
+    """Defined in :numref:`sec_api_hpo`"""
+    model = d2l.AlexNet(lr=learning_rate)
+    trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=1)
+    data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
+    trainer.fit(model=model, data=data)
+    validation_error = trainer.validate(model=model)
+    return validation_error
+
+class SuccessiveHalvingScheduler(d2l.HPOScheduler):
+    """Defined in :numref:`sec_mf_hpo`"""
+    def __init__(self, searcher, eta, r_min, r_max, prefact=1):
+        self.save_hyperparameters()
+        # Compute K, which is later used to determine the number of configurations
+        self.K = int(np.log(r_max / r_min) / np.log(eta))
+        # Define the rungs
+        self.rung_levels = [r_min * eta ** k for k in range(self.K + 1)]
+        if r_max not in self.rung_levels:
+            # The final rung should be r_max
+            self.rung_levels.append(r_max)
+            self.K += 1
+        # Bookkeeping
+        self.observed_error_at_rungs = defaultdict(list)
+        # Our processing queue
+        self.queue = []
+
+    def suggest(self):
+        """Defined in :numref:`sec_mf_hpo`"""
+        if len(self.queue) == 0:
+            # Start a new round of successive halving
+            # Number of configurations for the first rung:
+            n0 = int(self.prefact * self.eta ** self.K)
+            for i in range(n0):
+                config = searcher.sample_configuration()
+                config['max_epochs'] = self.r_min  # set r = r_min
+                self.queue.append(config)
+        # Return an element from the queue
+        return self.queue.pop()
+
+    def update(self, config, error, info=None):
+        """Defined in :numref:`sec_mf_hpo`"""
+        ri = config['max_epochs']  # Rung r_i
+        # Update our searcher, e.g if we use Bayesian optimization later
+        self.searcher.update(config, error, additional_info=info)
+        if ri < self.r_max:
+            # Bookkeeping
+            self.observed_error_at_rungs[ri].append((config, d2l.numpy(error.cpu())))
+            # Determine how many configurations should be evaluated on this rung
+            ki = self.K - self.rung_levels.index(ri)
+            ni = int(self.prefact * self.eta ** ki)
+            # If we observed all configuration on this rung r_i, we estimate the
+            # top 1 / eta configuration, add them to queue and promote them for the
+            # next rung r_{i+1}
+            if len(self.observed_error_at_rungs[ri]) >= ni:
+                kiplus1 = ki - 1
+                niplus1 = int(self.prefact * self.eta ** kiplus1)
+                best_performing_configurations = self.get_top_n_configurations(
+                    rung_level=ri, n=niplus1
+                )
+                riplus1 = self.rung_levels[self.K - kiplus1]  # r_{i+1}
+                # Queue may not be empty: insert new entries at the beginning
+                self.queue = [
+                    dict(config, max_epochs=riplus1)
+                    for config in best_performing_configurations
+                ] + self.queue
+                self.observed_error_at_rungs[ri] = []  # reset
+
+    def get_top_n_configurations(self, rung_level, n):
+        """Defined in :numref:`sec_mf_hpo`"""
+        rung = self.observed_error_at_rungs[rung_level]
+        if not rung:
+            return []
+        sorted_rung = sorted(rung, key=itemgetter(1))
+        return [x[0] for x in sorted_rung[:n]]
+
+class HyperbandScheduler(d2l.HPOScheduler):
+    """Defined in :numref:`sec_mf_hpo`"""
+    def __init__(self, searcher, eta, r_min, r_max):
+        self.save_hyperparameters()
+        self.s_max = int(np.ceil((np.log(r_max) - np.log(r_min)) / np.log(eta)))
+        self.s = self.s_max
+        self.successive_halving = SuccessiveHalvingScheduler(
+            searcher=self.searcher,
+            eta=self.eta,
+            r_min=self.r_min,
+            r_max=self.r_max,
+            prefact=(self.s_max + 1) / (self.s + 1)
+        )
+        self.brackets = defaultdict(list)
+
+    def suggest(self):
+        return self.successive_halving.suggest()
+
+    def update(self, config, error, info=None):
+        """Defined in :numref:`sec_mf_hpo`"""
+        self.brackets[self.s].append((config['max_epochs'], d2l.numpy(error.cpu())))
+        self.successive_halving.update(config, error, info=info)
+        # If the queue of successive halving is empty, than we finished this round and start with
+        # a new round with different r_min and N
+        if len(self.successive_halving.queue) == 0:
+            self.s -= 1
+            if self.s < 0:
+                self.s = self.s_max
+            self.successive_halving = SuccessiveHalvingScheduler(
+                searcher=self.searcher,
+                eta=self.eta,
+                r_min=int(self.r_max * self.eta ** (-self.s)),
+                r_max=self.r_max,
+                prefact=(self.s_max + 1) / (self.s + 1)
+            )
 
 def load_array(data_arrays, batch_size, is_train=True):
     """Construct a PyTorch data iterator.
