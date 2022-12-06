@@ -102,7 +102,7 @@ max_epochs = 4
 config_space = {
    "learning_rate": loguniform(1e-5, 1e-1),
    "batch_size": randint(8, 128),
-   "max_epochs": max_epochs,
+   "max_epochs": max_epochs
 }
 ```
 
