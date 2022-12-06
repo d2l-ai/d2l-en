@@ -79,7 +79,7 @@ how long we want to run random search, by defining an upper limit on the total w
 
 ```{.python .input  n=37}
 n_workers = 2  # Needs to be lower equal to the number of available GPUs
-max_wallclock_time = 15 * 60
+max_wallclock_time = 12 * 60
 ```
 
 Next, we state which metric we want to optimize and whether we want to minimize or
@@ -113,11 +113,7 @@ We can now create the scheduler for asynchronous random search, which is similar
 behaviour to our `BasicScheduler` from the previous Section.
 
 ```{.python .input  n=41}
-scheduler = RandomSearch(
-    config_space,
-    metric=metric,
-    mode=mode,
-)
+scheduler = RandomSearch(config_space, metric=metric, mode=mode,)
 ```
 
 Syne Tune also features a `Tuner`, where the main experiment loop and bookkeeping is
@@ -126,12 +122,8 @@ centralized, and interactions between scheduler and back-end are mediated.
 ```{.python .input  n=42}
 stop_criterion = StoppingCriterion(max_wallclock_time=max_wallclock_time)
 
-tuner = Tuner(
-    trial_backend=trial_backend,
-    scheduler=scheduler,
-    stop_criterion=stop_criterion,
-    n_workers=n_workers,
-)
+tuner = Tuner(trial_backend=trial_backend, scheduler=scheduler, 
+              stop_criterion=stop_criterion, n_workers=n_workers)
 ```
 
 Let us run our distributed HPO experiment. According to our stopping criterion,
@@ -163,12 +155,7 @@ results = tuning_experiment.results
 
 for trial_id in results.trial_id.unique():
     df = results[results['trial_id'] == trial_id]
-    plt.plot(
-        df['st_tuner_time'],
-        df['validation_error'],
-        marker='o',
-        label=f'trial {trial_id}'
-    )
+    plt.plot(df['st_tuner_time'], df['validation_error'], marker='o', label=f'trial {trial_id}')
     
 plt.xlabel('wall-clock time')
 plt.ylabel('objective function')
