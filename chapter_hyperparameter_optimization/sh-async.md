@@ -91,7 +91,7 @@ def objective(learning_rate, batch_size, max_epochs):
     for epoch in range(1, max_epochs + 1):
         trainer.fit(model=model, data=data)
         validation_error = d2l.numpy(trainer.validate().cpu())
-        report(epoch=epoch, validation_error=float(validation_error))
+        report(epoch=epoch-1, validation_error=float(validation_error))
 ```
 
 We also use the same configuration space as before
