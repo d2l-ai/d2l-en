@@ -140,7 +140,6 @@ found by an optimizer works, but also how quickly an optimizer is able to find i
 
 ```{.python .input  n=8}
 %%tab pytorch
-
 @d2l.add_to_class(HPOTuner) #@save
 def bookkeeping(self, config, error, runtime): 
     # Check if the last hyperparameter configuration performs better 
