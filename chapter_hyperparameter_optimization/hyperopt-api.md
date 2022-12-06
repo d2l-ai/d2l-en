@@ -163,7 +163,6 @@ and *learning rate* of a convolutional neural networks from :numref:`sec_alexnet
 
 ```{.python .input  n=9}
 %%tab all
-
 class AlexNet(d2l.Classifier): #@save
     def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
