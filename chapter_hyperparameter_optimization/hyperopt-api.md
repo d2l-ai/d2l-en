@@ -247,7 +247,6 @@ Now we can start our random search:
 searcher = RandomSearcher(config_space)
 scheduler = BasicScheduler(searcher=searcher)
 tuner = HPOTuner(scheduler=scheduler, objective=objective)
-
 tuner.run(number_of_trials=5)
 ```
 
