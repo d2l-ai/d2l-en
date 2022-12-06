@@ -284,6 +284,7 @@ class HyperbandScheduler(d2l.HPOScheduler):  #@save
     def suggest(self):
         return self.successive_halving.suggest()        
 ```
+
 The update function keeps track of the individual brackets. Once we finished a bracket,
 we move on to the next, i.e. re-initialize Successive Halving with different $r_{min}$
 and $s$.

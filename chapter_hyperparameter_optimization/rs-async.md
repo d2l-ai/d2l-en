@@ -40,10 +40,6 @@ HPO. Syne Tune is designed to be run with different execution back-ends, and the
 interested reader is invited to study its simple APIs in order to learn more about
 distributed HPO. Syne Tune can be installed via:
 
-```{.python .input}
-!pip install 'syne-tune[extra]'
-```
-
 ## Objective Function
 
 First, we have to define a new objective function such that it now returns the performance back
