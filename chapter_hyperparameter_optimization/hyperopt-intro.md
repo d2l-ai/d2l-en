@@ -88,7 +88,6 @@ Now, since we would like to optimize the validation error, we need to add a func
 
 ```{.python .input  n=8}
 %%tab pytorch
-
 @d2l.add_to_class(d2l.Trainer)  #@save
 def validate(self):
     self.model.eval()
