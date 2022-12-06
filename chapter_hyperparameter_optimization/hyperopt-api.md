@@ -34,7 +34,6 @@ then be exploited to improve our sampling distribution.
 import time
 from d2l import torch as d2l
 from scipy import stats
-
 ```
 
 ```{.python .input  n=4}
