@@ -110,7 +110,6 @@ for `max_epochs` epochs, then compute and return its validation error:
 
 ```{.python .input  n=5}
 %%tab all
-
 def hpo_objective_softmax_classification(config, max_epochs=10):  #@save 
     learning_rate = config['learning_rate']
     trainer = d2l.Trainer(max_epochs=max_epochs)
