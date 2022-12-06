@@ -73,7 +73,6 @@ observation.
 
 ```{.python .input  n=5}
 %%tab all
-
 class HPOScheduler(d2l.HyperParameters):  #@save
     def suggest(self):
         raise NotImplementedError
