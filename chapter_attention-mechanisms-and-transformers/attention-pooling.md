@@ -95,8 +95,8 @@ if tab.selected('mxnet'):
     x_train = np.sort(d2l.rand(n) * 5)
     y_train = f(x_train) + d2l.randn(n)
 if tab.selected('tensorflow'):
-    self.x_train = tf.sort(d2l.rand((n,1)) * 5, 0)
-    self.y_train = f(x_train) + d2l.normal((n,1))
+    x_train = tf.sort(d2l.rand((n,1)) * 5, 0)
+    y_train = f(x_train) + d2l.normal((n,1))
 x_test = d2l.arange(0, 5, 0.1)
 y_test = f(x_test)
 ```
