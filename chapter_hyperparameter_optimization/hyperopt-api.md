@@ -105,7 +105,6 @@ use *Syne Tune* for more scalable distributed HPO cases.
 
 ```{.python .input  n=7}
 %%tab pytorch
-
 class HPOTuner(d2l.HyperParameters):  #@save
     def __init__(self, scheduler, objective):
         self.save_hyperparameters()
