@@ -88,7 +88,7 @@ def objective(learning_rate, batch_size, max_epochs):
     trainer = d2l.Trainer(max_epochs=1, num_gpus=1)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     report = Reporter() 
-    for epoch in range(1, max_epochs + 1):
+    for epoch in range(max_epochs):
         trainer.fit(model=model, data=data)
         validation_error = d2l.numpy(trainer.validate().cpu())
         report(epoch=epoch, validation_error=float(validation_error))
@@ -110,7 +110,7 @@ config_space = {
 # We have to set this number equal to the number of GPUs that are in the machine
 # to run this notebook
 n_workers = 2
-max_wallclock_time = 15 * 60
+max_wallclock_time = 12 * 60
 ```
 
 ## Asynchronous Scheduler
