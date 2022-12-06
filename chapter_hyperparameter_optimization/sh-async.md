@@ -148,7 +148,7 @@ tuner = Tuner(
     trial_backend=trial_backend,
     scheduler=scheduler,
     stop_criterion=stop_criterion,
-    n_workers=n_workers,
+    n_workers=n_workers
 )
 tuner.run()
 ```
