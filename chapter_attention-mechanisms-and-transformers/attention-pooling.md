@@ -5,11 +5,11 @@
 Now that we introduced the primary components of the attention mechanism, let's use them in a rather classical setting, namely regression and classification using kernel density estimation :cite:`Watson.1964,Nadaraya.1964`. This detour is entirely optional and can be skipped if needed. It simply provides additional background.
 At their core, Watson Nadaraya estimators rely on some similarity kernel $\alpha(\mathbf{k}, \mathbf{q})$ relating queries $\mathbf{q}$ to keys $\mathbf{k}$. Some common kernels are
 
-$$\begin{align}
+$$\begin{aligned}
 \alpha(\mathbf{k}, \mathbf{q}) & = \exp\left(\frac{1}{2} \|\mathbf{k} - \mathbf{q}\|^2 \right) && \mathrm{Gaussian} \\
 \alpha(\mathbf{k}, \mathbf{q}) & = 1 \text{ if } \|\mathbf{k} - \mathbf{q}\| \leq 1 && \mathrm{Boxcar} \\
 \alpha(\mathbf{k}, \mathbf{q}) & = \mathop{\mathrm{max}}\left(0, 1 - \|\mathbf{k} - \mathbf{q}\|\right) && \mathrm{Epanechikov}
-\end{align}
+\end{aligned}
 $$
 
 There are many more choices that we could pick. This [Wikipedia article](https://en.wikipedia.org/wiki/Kernel_(statistics)) has a more extensive review and shows how the choice of kernels is related to kernel density estimation, somtimes also called Parzen Windows :cite:`parzen1957consistent`. All of the kernels are heuristic and can be tuned. For instance, we can adjust the width, not only on a global basis but even on a per-coordinate basis. Regardless, all of them lead to the following equation for regresion and classification alike:
