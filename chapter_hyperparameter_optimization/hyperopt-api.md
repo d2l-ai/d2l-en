@@ -85,7 +85,6 @@ To implement random search, but also other HPO algorithms, we only need a basic 
 
 ```{.python .input  n=6}
 %%tab all
-
 class BasicScheduler(HPOScheduler):  #@save
     def __init__(self, searcher):
         self.save_hyperparameters()
