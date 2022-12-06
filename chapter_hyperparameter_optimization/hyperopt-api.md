@@ -235,7 +235,7 @@ def objective(batch_size, learning_rate, max_epochs=8):  #@save
     trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=1)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     trainer.fit(model=model, data=data)
-    validation_error = trainer.validate(model=model)
+    validation_error = trainer.validate()
     return validation_error    
 ```
 
