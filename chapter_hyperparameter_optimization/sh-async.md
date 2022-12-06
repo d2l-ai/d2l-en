@@ -127,7 +127,7 @@ scheduler = ASHA(
     resource_attr="epoch",
     type="promotion",
     grace_period=1,  # this corresponds to r_min 
-    reduction_factor=2,  # this corresponds to eta
+    reduction_factor=2  # this corresponds to eta
 )  
 ```
 
