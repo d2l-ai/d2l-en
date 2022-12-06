@@ -49,7 +49,6 @@ The following code shows how to implement our random search optimizer from the p
 
 ```{.python .input  n=4}
 %%tab all
-
 class RandomSearcher(HPOSearcher):  #@save
     def __init__(self, config_space):
         self.save_hyperparameters()
