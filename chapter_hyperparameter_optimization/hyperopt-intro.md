@@ -51,7 +51,6 @@ rate alone for simplicity.
 ```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
-
 import numpy as np
 import torch
 from torch import nn
