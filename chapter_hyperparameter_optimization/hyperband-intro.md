@@ -6,17 +6,19 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 # Multi-fidelity Hyperparameter Optimization
 :label:`sec_mf_hpo`
 
-
 Training neural networks can be expensive even on moderate size datasets.
 Depending on the search space, hyperparameter optimization usually
-requires tens to hundreds of function evaluations to find a well-performing hyperparameter configuration. Even if a single training run takes only an hour, we might have to wait several days for HPO to complete.
-As we have seen in the :numref:`sec_rs_async`, we can significantly speed up the overall wall-clock time of our HPO
-process by exploiting parallel resources, however, this does
+requires tens to hundreds of function evaluations to find a well-performing
+hyperparameter configuration. Even if a single training run takes only an hour,
+we might have to wait several days for HPO to complete. As we have seen in the
+:numref:`sec_rs_async`, we can significantly speed up the overall wall-clock
+time of our HPO process by exploiting parallel resources, however, this does
 not reduce the total amount of compute that we have to spend. 
 
 *Can we speed up the evaluation of hyperparameter configurations?* Methods such
 as random search allocate the exact same amount or resources (e.g., number
-of epochs, training data points) to each hyperparameter configuration. :numref:`img_samples_ls`  depicts learning curves of a set of neural networks trained with
+of epochs, training data points) to each hyperparameter configuration.
+:numref:`img_samples_ls`  depicts learning curves of a set of neural networks trained with
 different hyperparameter configurations. After a few epochs we are already able
 to visually distinguish between well-performing and poorly-performing configurations.
 However, learning curves are noisy, and we might still require the full amount of
@@ -111,11 +113,13 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):  #@save
 
 In the beginning our queue is empty and we fill it with $n = prefact * \eta^{K}$
 configurations, which are first evaluated on the smallest rung $r_{min}$.
-The effect of $prefact$ will become important in the next part when we talk about Hyperband, for now we assume $prefact=1$. Now, every time resources become available and the `HPOTuner`
-object queries the suggest function, we return an element from the queue. Once we
-finish one round of successive halving - which means that we evaluated all surviving configurations
-on the highest resource level $r_{max}$ and our queue is empty - we start the
-entire process again with a new, randomly sampled set of configurations.
+The effect of $prefact$ will become important in the next part when we talk
+about Hyperband, for now we assume $prefact=1$. Now, every time resources become
+available and the `HPOTuner`object queries the suggest function, we return an
+element from the queue. Once we finish one round of successive halving - which
+means that we evaluated all surviving configurations on the highest resource
+level $r_{max}$ and our queue is empty - we start the entire process again with
+a new, randomly sampled set of configurations.
 
 ```{.python .input  n=12}
 %%tab all
@@ -219,7 +223,7 @@ for rung_index, rung in scheduler.observed_error_at_rungs.items():
     errors = [xi[1] for xi in rung]   
     d2l.plt.scatter([rung_index] * len(errors), errors)
 
-d2l.plt.xlim(min_number_of_epochs-0.5, max_number_of_epochs+0.5)
+d2l.plt.xlim(min_number_of_epochs - 0.5, max_number_of_epochs + 0.5)
 d2l.plt.xticks(np.arange(min_number_of_epochs, max_number_of_epochs+1),
                np.arange(min_number_of_epochs, max_number_of_epo
 d2l.plt.ylabel('validation error')
@@ -230,33 +234,36 @@ Finally, note some slight complexity in our implementation of
 `SuccessiveHalvingScheduler`. Namely, `suggest` needs to return a configuration
 immediately. But if at least one other worker is still busy with an evaluation
 in the current rung, we cannot determine the top $1 / \eta$ fraction to open the
-next rung. Instead, `suggest` starts a new round of successive halving already. However, once a
-rung is completed in `update`, we make sure to insert new configurations at the
-beginning of the queue, so they take precedence over configurations from the
-next round.
+next rung. Instead, `suggest` starts a new round of successive halving already.
+However, once a rung is completed in `update`, we make sure to insert new
+configurations at the beginning of the queue, so they take precedence over
+configurations from the next round.
 
 ## Hyperband
 
-While successive halving can greatly improve upon random search, the choice of $r_{min}$ can have
-a large impact on its performance. If $r_{min}$ is too small, our network might
-not have enough time to learn anything, and even the best configurations may be
-filtered out due to noisy observations. If $r_{min}$ is too large on the other hand, the benefits
-of successive-halving may be greatly diminished.
+While successive halving can greatly improve upon random search, the choice of
+$r_{min}$ can have a large impact on its performance. If $r_{min}$ is too small,
+our network might not have enough time to learn anything, and even the best
+configurations may be filtered out due to noisy observations. If $r_{min}$ is
+too large on the other hand, the benefits of successive-halving may be greatly
+diminished.
 
-Hyperband :cite:`li-iclr17` is an extension of successive halving that mitigates the risk of setting
-$r_{min}$ too small. It runs successive halving as subroutine, where each round of successive halving, called a bracket,
-balances between $r_{min}$ and the number of initial configurations $N$, such that the
-same total amount of resources per bracket is used.
+Hyperband :cite:`li-iclr17` is an extension of successive halving that mitigates
+the risk of setting $r_{min}$ too small. It runs successive halving as subroutine,
+where each round of successive halving, called a bracket, balances between
+$r_{min}$ and the number of initial configurations $N$, such that the same total
+amount of resources per bracket is used.
 
 Let's define $s_{max} = \lfloor log_{\eta} \frac{r_{max}}{r_{min}} \rfloor$.
 Now for each bracket $s \in \{s_{max}, ..., 0\}$, we call successive halving with
 $r_{min} = \eta^{-s} * r_{max}$ and the number of configurations
-$N = \lceil \frac{s_{max} + 1}{s+1} * \eta^s \rceil$. Note that the last bracket where
-$s=0$ evaluates all configurations on $r_{min} = r_{max}$, which means that we
-effectively run random search. In practice we execute brackets in a round robin
+$N = \lceil \frac{s_{max} + 1}{s+1} * \eta^s \rceil$. Note that the last bracket
+where $s=0$ evaluates all configurations on $r_{min} = r_{max}$, which means that
+we effectively run random search. In practice we execute brackets in a round robin
 fashion, which means we start with $s=s_{max}$ again once we finished the loop.
-Given enough resources, we could also run all brackets in parallel because configurations are sampled at random.
-We will discuss this case in more detail in :numref:`sec_sh_async`.
+Given enough resources, we could also run all brackets in parallel because
+configurations are sampled at random. We will discuss this case in more detail
+in :numref:`sec_sh_async`.
 
 ![The different brackets of successive halving run by Hyperband.](img/hb.svg)
 :width:`400px`
@@ -276,7 +283,7 @@ class HyperbandScheduler(d2l.HPOScheduler):  #@save
             eta=self.eta,
             r_min=self.r_min,
             r_max=self.r_max,
-            prefact=(self.s_max + 1) / (self.s + 1)
+            prefact=(self.s_max + 1) / (self.s + 1),
         )
         self.brackets = defaultdict(list)
 
@@ -294,8 +301,8 @@ and $s$.
 def update(self, config, error, info=None):
     self.brackets[self.s].append((config['max_epochs'], d2l.numpy(error.cpu())))
     self.successive_halving.update(config, error, info=info)
-    # If the queue of successive halving is empty, than we finished this round and start with
-    # a new round with different r_min and N
+    # If the queue of successive halving is empty, than we finished this round
+    # and start with a new round with different r_min and N
     if len(self.successive_halving.queue) == 0:
         self.s -= 1
         if self.s < 0:
@@ -305,7 +312,7 @@ def update(self, config, error, info=None):
             eta=self.eta,
             r_min=int(self.r_max * self.eta ** (-self.s)),
             r_max=self.r_max,
-            prefact=(self.s_max + 1) / (self.s + 1)
+            prefact=(self.s_max + 1) / (self.s + 1),
         )
 ```
 
@@ -346,8 +353,16 @@ for bi, bracket in scheduler.brackets.items():
 
 ## Summary
 
-This section introduces the concept of multi-fidelity hyperparameter optimization, where we assume to have access to cheap-to-evaluate approximations of the objective function. Here, we consider the performance after each epoch as an approximation of the performance after training for the full amount of epochs. Multi-fidelity hyperparameter optimization allows to reduce the overall computation of the HPO instead of just reducing the wall-clock time.
+This section introduced the concept of multi-fidelity hyperparameter optimization,
+where we assume to have access to cheap-to-evaluate approximations of the
+objective function. Here, we consider the performance after each epoch as an
+approximation of the performance after training for the full amount of epochs.
+Multi-fidelity hyperparameter optimization allows to reduce the overall
+computation of the HPO instead of just reducing the wall-clock time.
 
-Arguably the simplest method for multi-fidelity hyperparameter optimization is successive halving which is based on random search. We also looked at Hyperband, which run multiple brackets of successive halving, to avoid that good configurations are stopped to early.
+Arguably the simplest method for multi-fidelity hyperparameter optimization is
+successive halving which is based on random search. We also looked at Hyperband,
+which run multiple brackets of successive halving, to avoid that good
+configurations are stopped to early.
 
 ## Exercises

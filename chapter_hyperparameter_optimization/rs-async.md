@@ -7,7 +7,12 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 :label:`sec_rs_async`
 
-As we have seen in the previous :numref:`sec_api_hpo`, we might have to wait hours or even days before random search returns a good hyperparameter configuration, because of the expensive evaluation of hyperparameter configurations. In practice, we have often access to a pool of resources such as multiple GPUs on the same machine or multiple machines with a single GPU. This begs the question: *How do we  efficiently distribute random search?*
+As we have seen in the previous :numref:`sec_api_hpo`, we might have to wait hours
+or even days before random search returns a good hyperparameter configuration,
+because of the expensive evaluation of hyperparameter configurations. In practice,
+we have often access to a pool of resources such as multiple GPUs on the same
+machine or multiple machines with a single GPU. This begs the question: *How do we
+efficiently distribute random search?*
 
 In general, we distinguish between synchronous and asynchronous parallel hyperparameter
 optimization (see :numref:`distributed_scheduling`). In the synchronous setting,
@@ -33,7 +38,8 @@ $K$ times faster if $K$ trials can be run in parallel.
 ![Distributing the hyperparameter optimization process either synchronously or asynchronously. Compared to the sequential setting, we can reduce the overall wall-clock time while keep the total compute constant. Synchronous scheduling might lead to idling workers in the case of stragglers.](img/distributed_scheduling.svg)
 :label:`distributed_scheduling.svg`
 
-In this notebook, we will look at asynchronous random search that, where trials are executed in multiple python processes on the same machine. Distributed job scheduling
+In this notebook, we will look at asynchronous random search that, where trials are
+executed in multiple python processes on the same machine. Distributed job scheduling
 and execution is difficult to implement from scratch. We will use *Syne Tune*
 :cite:`salinas-automl22`, which provides us with a simple interface for asynchronous
 HPO. Syne Tune is designed to be run with different execution back-ends, and the
@@ -42,8 +48,8 @@ distributed HPO. Syne Tune can be installed via:
 
 ## Objective Function
 
-First, we have to define a new objective function such that it now returns the performance back
-to Syne Tune via the `report` function.
+First, we have to define a new objective function such that it now returns the
+performance back to Syne Tune via the `report` function.
 
 ```{.python .input  n=34}
 import matplotlib.pyplot as plt
@@ -65,7 +71,8 @@ def objective(learning_rate, batch_size, max_epochs):
     report = Reporter() 
     for epoch in range(1, max_epochs + 1):
         if epoch == 1:
-            trainer.fit(model=model, data=data)  # Initialize the state of Trainer
+            # Initialize the state of Trainer
+            trainer.fit(model=model, data=data) 
         else:
             trainer.fit_epoch()
         validation_error = d2l.numpy(trainer.validate().cpu())
@@ -74,8 +81,9 @@ def objective(learning_rate, batch_size, max_epochs):
 
 ## Asynchronous Scheduler
 
-First, we define the number of workers that evaluate trials concurrently. We also need to specify
-how long we want to run random search, by defining an upper limit on the total wall-clock time.
+First, we define the number of workers that evaluate trials concurrently. We
+also need to specify how long we want to run random search, by defining an
+upper limit on the total wall-clock time.
 
 ```{.python .input  n=37}
 n_workers = 2  # Needs to be lower equal to the number of available GPUs
@@ -103,7 +111,10 @@ config_space = {
 }
 ```
 
-Next, we need to specify the back-end for job executions. Here we just consider the distribution on a local machine where parallel jobs are executed as sub-processes. However, for large scale HPO, we could run this also on a cluster or cloud environment, where each trial consumes a full instance.
+Next, we need to specify the back-end for job executions. Here we just consider
+the distribution on a local machine where parallel jobs are executed as
+sub-processes. However, for large scale HPO, we could run this also on a cluster
+or cloud environment, where each trial consumes a full instance.
 
 ```{.python .input  n=40}
 trial_backend = PythonBackend(tune_function=objective, config_space=config_space)
@@ -113,7 +124,7 @@ We can now create the scheduler for asynchronous random search, which is similar
 behaviour to our `BasicScheduler` from the previous Section.
 
 ```{.python .input  n=41}
-scheduler = RandomSearch(config_space, metric=metric, mode=mode,)
+scheduler = RandomSearch(config_space, metric=metric, mode=mode)
 ```
 
 Syne Tune also features a `Tuner`, where the main experiment loop and bookkeeping is
@@ -122,8 +133,12 @@ centralized, and interactions between scheduler and back-end are mediated.
 ```{.python .input  n=42}
 stop_criterion = StoppingCriterion(max_wallclock_time=max_wallclock_time)
 
-tuner = Tuner(trial_backend=trial_backend, scheduler=scheduler, 
-              stop_criterion=stop_criterion, n_workers=n_workers)
+tuner = Tuner(
+    trial_backend=trial_backend,
+    scheduler=scheduler, 
+    stop_criterion=stop_criterion,
+    n_workers=n_workers,
+)
 ```
 
 Let us run our distributed HPO experiment. According to our stopping criterion,
@@ -155,7 +170,12 @@ results = tuning_experiment.results
 
 for trial_id in results.trial_id.unique():
     df = results[results['trial_id'] == trial_id]
-    plt.plot(df['st_tuner_time'], df['validation_error'], marker='o', label=f'trial {trial_id}')
+    plt.plot(
+        df['st_tuner_time'],
+        df['validation_error'],
+        marker='o',
+        label=f'trial {trial_id}',
+    )
     
 plt.xlabel('wall-clock time')
 plt.ylabel('objective function')
@@ -164,6 +184,16 @@ plt.legend()
 
 ## Summary
 
-We can reduce the waiting time for random search substantially by distribution trials across parallel resources. In general, we distinguish between synchronous scheduling and asynchronous scheduling. Synchronous scheduling means that we sample a new batch of hyperparameter configurations once the previous batch finished. If we have a stragglers - trials that takes more time to finish than other trials - our workers need to wait at synchronization points. Asynchronous scheduling evaluates a new hyperparameter configurations as soon as resources become available, and, hence, ensures that all workers are busy at any point in time. While random search is easy to distribute asynchronously and does not require any  change of the actual algorithm, other methods require some additional modifications.
+We can reduce the waiting time for random search substantially by distribution
+trials across parallel resources. In general, we distinguish between synchronous
+scheduling and asynchronous scheduling. Synchronous scheduling means that we
+sample a new batch of hyperparameter configurations once the previous batch
+finished. If we have a stragglers - trials that takes more time to finish than
+other trials - our workers need to wait at synchronization points. Asynchronous
+scheduling evaluates a new hyperparameter configurations as soon as resources
+become available, and, hence, ensures that all workers are busy at any point in
+time. While random search is easy to distribute asynchronously and does not
+require any change of the actual algorithm, other methods require some additional
+modifications.
 
 ## Exercise

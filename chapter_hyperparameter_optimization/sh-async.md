@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(["mxnet", "pytorch", "tensorflow"])
 ```
 
 # Asynchronous Successive Halving
@@ -18,16 +18,24 @@ $r_{min}$, we first have to evaluate all $N = \eta^K$ configurations, before we
 can promote the $\frac{1}{\eta}$ of them to the next rung level.
 
 In any distributed system, synchronization typically implies idle time for workers.
-First, we often observe high variations in training time across hyperparameter configurations.
-For example, assuming the number of filter per layer is a hyperparameter, then
-networks with smaller filter sizes finish training faster than networks with larger
-filter sizes, which implies idle worker time due to stragglers. Moreover, the number
-of slots in a rung level is not always a multiple of the number of workers, in which
-case some workers may even sit idle for a full batch.
+First, we often observe high variations in training time across hyperparameter
+configurations. For example, assuming the number of filter per layer is a 
+hyperparameter, then networks with smaller filter sizes finish training faster than
+networks with larger filter sizes, which implies idle worker time due to stragglers.
+Moreover, the number of slots in a rung level is not always a multiple of the number
+of workers, in which case some workers may even sit idle for a full batch.
 
-Figure :numref:`synchronous_sh` shows the scheduling of synchronous SH with $\eta=2$ for
-four different trials with two workers. We start with evaluating Trial-0 and Trial-1
-for one epoch and immediately continue with the next two trials once they are finished. Now, we first have to wait until Trial-2 finishes, which takes substantially more time than the other trials, before we can promote the best two trials, i.e. Trial-0 and Trial-3 to the next rung level. This causes an idiling time for Worker-1. Now, we continue with Rung 1. Also, here Trial-3 takes longer than Trial-0, which leads to an additional ideling time of Worker-0. Once, we reach Rung-2, only the best trial, Trial-0, remains which occupies only one worker. To avoid that Worker-1 idles during that time, most implementaitons of SH continue already with the next round, and start evaluating new trials (e.g Trial-4) on the first rung.
+Figure :numref:`synchronous_sh` shows the scheduling of synchronous SH with $\eta=2$
+for four different trials with two workers. We start with evaluating Trial-0 and
+Trial-1 for one epoch and immediately continue with the next two trials once they
+are finished. Now, we first have to wait until Trial-2 finishes, which takes
+substantially more time than the other trials, before we can promote the best two
+trials, i.e. Trial-0 and Trial-3 to the next rung level. This causes idle time for
+Worker-1. Now, we continue with Rung 1. Also, here Trial-3 takes longer than Trial-0,
+which leads to an additional ideling time of Worker-0. Once, we reach Rung-2, only
+the best trial, Trial-0, remains which occupies only one worker. To avoid that
+Worker-1 idles during that time, most implementaitons of SH continue already with
+the next round, and start evaluating new trials (e.g Trial-4) on the first rung.
 
 ![.](img/sync_sh.svg)
 :label:`synchronous_sh`
@@ -54,9 +62,10 @@ Trial-2 is still pending. At this point we have 3 trials evaluated on rung 0 and
 trial evaluated already on rung 1. Since Trial-3 performs worse than Trial-0 at rung 0,
 and $\eta=2$, we cannot promote any new trial yet, and Worker-1 starts Trial-4 from
 scratch instead. However, once Trial-2 finishes and
-scores worse than Trial-3, the latter is promoted towards rung 1. Afterwards, we collected 2 evaluations on rung 1,
-which means we can now promote Trial-0 towards rung 2. At the same time, Worker-1
-continues with evaluating new trials (i.e., Trial-5) on rung 0.
+scores worse than Trial-3, the latter is promoted towards rung 1. Afterwards, we
+collected 2 evaluations on rung 1, which means we can now promote Trial-0 towards
+rung 2. At the same time, Worker-1 continues with evaluating new trials (i.e.,
+Trial-5) on rung 0.
 
 
 ![Visualization of successive halving with synchronous and asynchronous scheduling of trials.](img/asha.svg)
@@ -82,13 +91,13 @@ from syne_tune.experiments import load_experiment
 
 
 def objective(learning_rate, batch_size, max_epochs):
-    from d2l import torch as d2l    
+    from d2l import torch as d2l
     from syne_tune import Reporter
     model = d2l.AlexNet(lr=learning_rate)
     trainer = d2l.Trainer(max_epochs=1, num_gpus=1)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
-    report = Reporter() 
-    for epoch in range(max_epochs):
+    report = Reporter()
+    for epoch in range(1, max_epochs + 1):
         trainer.fit(model=model, data=data)
         validation_error = d2l.numpy(trainer.validate().cpu())
         report(epoch=epoch, validation_error=float(validation_error))
@@ -125,9 +134,8 @@ scheduler = ASHA(
     mode="min",
     max_resource_attr="max_epochs",
     resource_attr="epoch",
-    type="promotion",
     grace_period=1,  # this corresponds to r_min 
-    reduction_factor=2  # this corresponds to eta
+    reduction_factor=2,  # this corresponds to eta
 )  
 ```
 
@@ -173,20 +181,25 @@ our workers, before we can promote configurations to the next rung level.
 ```{.python .input  n=60}
 results = e.results
 for trial_id in results.trial_id.unique():
-    df = results[results['trial_id'] == trial_id]
+    df = results[results["trial_id"] == trial_id]
     plt.plot(
-        df['st_tuner_time'],
-        df['validation_error'],
-        marker='o',
-        label=f'trial {trial_id}'
+        df["st_tuner_time"],
+        df["validation_error"],
+        marker="o",
+        label=f"trial {trial_id}"
     )
-plt.xlabel('wall-clock time')
-plt.ylabel('objective function')
+plt.xlabel("wall-clock time")
+plt.ylabel("objective function")
 plt.legend()
 ```
 
 ## Summary
 
-Compared to random search, successive halving is not quite as trivial to run in an asynchronous distributed setting. To avoid synchronisation points, we have to promote configurations as quickly as possible to the next rung level, even if this means we promote the wrong configuration. In practice, this usually does not hurt so much, and the gains of asynchronous vs synchronous scheduling are usually much higher than the loss of the suboptimal decision making.
- 
-## Exercise
+Compared to random search, successive halving is not quite as trivial to run in
+an asynchronous distributed setting. To avoid synchronisation points, we have to
+promote configurations as quickly as possible to the next rung level, even if this
+means we promote the wrong configuration. In practice, this usually does not hurt
+so much, and the gains of asynchronous versus synchronous scheduling are usually
+much  higher than the loss of the suboptimal decision making.
+
+## Exercises
