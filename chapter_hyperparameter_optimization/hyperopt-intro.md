@@ -56,12 +56,11 @@ import numpy as np
 import torch
 from torch import nn
 from scipy import stats
-
 ```
 
 ```{.python .input  n=9}
 %%tab pytorch
-class SoftmaxClassification(d2l.Classification): #@save
+class SoftmaxClassification(d2l.Classifier): #@save
     def __init__(self, num_outputs, lr):
         super().__init__()
         self.save_hyperparameters()

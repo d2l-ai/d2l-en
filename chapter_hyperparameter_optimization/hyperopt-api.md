@@ -1,4 +1,4 @@
-```{.python .input  n=2}
+```{.python .input  n=1}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -29,14 +29,15 @@ these algorithms are able to sample more promising candidates over time. We add
 the `update` function in order to update the history of previous trials, which can
 then be exploited to improve our sampling distribution.
 
-```{.python .input  n=4}
+```{.python .input  n=2}
 %%tab pytorch
+import time
 from d2l import torch as d2l
 from scipy import stats
 
 ```
 
-```{.python .input  n=2}
+```{.python .input  n=4}
 %%tab all
 
 class HPOSearcher(d2l.HyperParameters):  #@save
@@ -48,7 +49,7 @@ class HPOSearcher(d2l.HyperParameters):  #@save
 
 The following code shows how to implement our random search optimizer from the previous section in this API:
 
-```{.python .input  n=3}
+```{.python .input  n=4}
 %%tab all
 
 class RandomSearcher(HPOSearcher):  #@save
@@ -73,7 +74,7 @@ may also decide upon parameters like `max_epochs` (i.e., how long to train the
 model for). The `update` method is called whenever a trial returns a new
 observation.
 
-```{.python .input  n=4}
+```{.python .input  n=5}
 %%tab all
 
 class HPOScheduler(d2l.HyperParameters):  #@save
@@ -86,7 +87,7 @@ class HPOScheduler(d2l.HyperParameters):  #@save
 
 To implement random search, but also other HPO algorithms, we only need a basic scheduler that schedules a new configuration every time new resources become available.
 
-```{.python .input  n=5}
+```{.python .input  n=6}
 %%tab all
 
 class BasicScheduler(HPOScheduler):  #@save
@@ -143,7 +144,7 @@ make a decision (call of `scheduler.suggest`). In the sequel, we will plot
 (and `searcher`). This allows us to quantify not only how well the configuration
 found by an optimizer works, but also how quickly an optimizer is able to find it.
 
-```{.python .input  n=7}
+```{.python .input  n=8}
 %%tab pytorch
 
 @d2l.add_to_class(HPOTuner) #@save
@@ -168,7 +169,7 @@ We now use our new implementation of random search to optimize the *batch size*
 and *learning rate* of a convolutional neural networks from :numref:`sec_alexnet`.
 For that, we first have to define the objective function.
 
-```{.python .input  n=6}
+```{.python .input  n=9}
 %%tab all
 
 def objective(batch_size, learning_rate, max_epochs=8):  #@save
@@ -182,7 +183,7 @@ def objective(batch_size, learning_rate, max_epochs=8):  #@save
 
 We also need to define the configuration space.
 
-```{.python .input  n=15}
+```{.python .input  n=10}
 config_space = {
    "learning_rate": stats.loguniform(1e-4, 1),
    "batch_size": stats.randint(8, 128),
