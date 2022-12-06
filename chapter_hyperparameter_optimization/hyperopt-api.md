@@ -222,6 +222,7 @@ class AlexNet(d2l.Classifier): #@save
 For that, we first have to define the objective function.
 
 ```{.python .input  n=9}
+%%tab pytorch
 def objective(batch_size, learning_rate, max_epochs=8):  #@save
     model = d2l.AlexNet(lr=learning_rate)
     trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=1)
