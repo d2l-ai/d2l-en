@@ -2,6 +2,7 @@
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
+
 # What is Hyperparameter Optimization?
 :label:`sec_what_is_hpo`
 
@@ -46,7 +47,6 @@ In this section we will introduce HPO and show how we can automatically find the
 We will start with a simple toy problem: searching for the learning rate of the multi-class logistic regression model from : numref:sec_sgd to minimize the validation error on the Fashion MNIST dataset. While other hyperparameters
 like batch size or number of epochs are also worth tuning, we focus on learning
 rate alone for simplicity.
-
 
 ```{.python .input}
 %%tab pytorch
@@ -135,6 +135,7 @@ config_space = {
    "learning_rate": stats.loguniform(1e-4, 1)
 } 
 ```
+
 Here we use the use the `loguniform` object from SciPy, which represents a uniform distribution between -4 and -1 in the logarithmic space. This object allows us to sample random variables from this distribution.
 
 Each hyperparameter has a data type, such as `float` for `learning_rate`, as well as a closed bounded range

@@ -131,16 +131,6 @@ class HPOTuner(d2l.HyperParameters):  #@save
             self.bookkeeping(config, d2l.numpy(error.cpu()), runtime)        
 ```
 
-```{.json .output n=7}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "Ignored to run as it is not marked as a \"None\" cell."
- }
-]
-```
-
 ### Bookkeeping the Performance of HPO Algorithms
 
 With any HPO algorithm, we are mostly interested in the best performing

@@ -168,7 +168,7 @@ successive halving in :numref:`sec_mf_hpo`, most of the trials are stopped
 at 1 or 2 epochs ($r_{min}$ or $\eta * r_{min}$). However, trials do not stop
 at the same point, because they require different amount of time per epoch. If
 we ran standard successive halving instead of ASHA, we would need to synchronize
-our workers, before we can promote configurations to the next rung level. 
+our workers, before we can promote configurations to the next rung level.
 
 ```{.python .input  n=60}
 results = e.results
