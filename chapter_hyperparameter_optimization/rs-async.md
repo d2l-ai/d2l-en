@@ -106,13 +106,18 @@ metric = "validation_error"
 
 We use the configuration space from our previous example. In Syne Tune, this
 dictionary can also be used to pass constant attributes to the training script.
-We make use of this feature in order to pass `max_epochs`.
+We make use of this feature in order to pass `max_epochs`. Moreover, we specify
+the first configuration to be evaluated in `initial_config`.
 
 ```{.python .input  n=39}
 config_space = {
     "learning_rate": loguniform(1e-2, 1),
     "batch_size": randint(32, 256),
     "max_epochs": 10,
+}
+initial_config = {
+    "learning_rate": 0.1,
+    "batch_size": 128,
 }
 ```
 
@@ -132,7 +137,12 @@ We can now create the scheduler for asynchronous random search, which is similar
 in behaviour to our `BasicScheduler` from :numref:`sec_api_hpo`.
 
 ```{.python .input  n=41}
-scheduler = RandomSearch(config_space, metric=metric, mode=mode)
+scheduler = RandomSearch(
+    config_space,
+    metric=metric,
+    mode=mode,
+    points_to_evaluate=[initial_config],
+)
 ```
 
 Syne Tune also features a `Tuner`, where the main experiment loop and

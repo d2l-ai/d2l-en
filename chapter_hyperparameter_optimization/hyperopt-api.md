@@ -51,7 +51,9 @@ class HPOSearcher(d2l.HyperParameters):  #@save
 ```
 
 The following code shows how to implement our random search optimizer from the
-previous section in this API:
+previous section in this API. As a slight extension, we allow the user to
+prescribe the first configuration to be evaluated via `initial_config`, while
+subsequent ones are drawn at random.
 
 ```{.python .input  n=4}
 %%tab all
@@ -191,23 +193,23 @@ def hpo_objective_lenet(learning_rate, batch_size, max_epochs=10):  #@save
     return validation_error
 ```
 
-We also need to define the configuration space.
+We also need to define the configuration space. Moreover, the first configuration
+to be evaluated is the default setting used in :numref:`sec_lenet`.
 
 ```{.python .input  n=10}
 config_space = {
     "learning_rate": stats.loguniform(1e-2, 1),
     "batch_size": stats.randint(32, 256),
-} 
+}
+initial_config = {
+    "learning_rate": 0.1,
+    "batch_size": 128,
+}
 ```
 
 Now we can start our random search:
 
 ```{.python .input}
-# We start with sensible defaults
-initial_config = {
-    "learning_rate": 0.1,
-    "batch_size": 128,
-}
 searcher = RandomSearcher(config_space, initial_config=initial_config)
 scheduler = BasicScheduler(searcher=searcher)
 tuner = HPOTuner(scheduler=scheduler, objective=hpo_objective_lenet)

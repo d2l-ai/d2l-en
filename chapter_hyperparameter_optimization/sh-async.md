@@ -110,12 +110,14 @@ def hpo_objective_lenet_synetune(learning_rate, batch_size, max_epochs):
 We will also use the same configuration space as before:
 
 ```{.python .input  n=55}
-max_epochs = 10
-
 config_space = {
     "learning_rate": loguniform(1e-2, 1),
     "batch_size": randint(32, 256),
-    "max_epochs": max_epochs
+    "max_epochs": 10,
+}
+initial_config = {
+    "learning_rate": 0.1,
+    "batch_size": 128,
 }
 ```
 
@@ -142,6 +144,7 @@ scheduler = ASHA(
     config_space,
     metric=metric,
     mode=mode,
+    points_to_evaluate=[initial_config],
     max_resource_attr="max_epochs",
     resource_attr=resource_attr,
     grace_period=1,  # this corresponds to r_min 

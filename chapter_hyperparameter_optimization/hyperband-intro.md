@@ -197,13 +197,17 @@ max_number_of_epochs = 10
 config_space = {
     "learning_rate": stats.loguniform(1e-2, 1),
     "batch_size": stats.randint(32, 256),
-} 
+}
+initial_config = {
+    "learning_rate": 0.1,
+    "batch_size": 128,
+}
 ```
 
 We just replace the scheduler with our new `SuccessiveHalvingScheduler`.
 
 ```{.python .input  n=14}
-searcher = d2l.RandomSearcher(config_space)
+searcher = d2l.RandomSearcher(config_space, initial_config=initial_config)
 scheduler = SuccessiveHalvingScheduler(
     searcher=searcher,
     eta=2,
