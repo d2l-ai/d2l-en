@@ -2667,18 +2667,23 @@ class HPOTuner(d2l.HyperParameters):
         self.incumbent_trajectory = []
         self.cumulative_runtime = []
         self.current_runtime = 0
+        self.records = []
 
     def run(self, number_of_trials):
-        for _ in range(number_of_trials):
+        for i in range(number_of_trials):
             start_time = time.time()
             config = self.scheduler.suggest()
+            print(f"Trial {i}: config = {config}")
             error = self.objective(**config)
+            error = float(d2l.numpy(error.cpu()))
             self.scheduler.update(config, error)
             runtime = time.time() - start_time
-            self.bookkeeping(config, d2l.numpy(error.cpu()), runtime)
+            self.bookkeeping(config, error, runtime)
+            print(f"    error = {error}, runtime = {runtime}")
 
     def bookkeeping(self, config: dict, error: float, runtime: float):
         """Defined in :numref:`sec_api_hpo`"""
+        self.records.append({"config": config, "error": error, "runtime": runtime})
         # Check if the last hyperparameter configuration performs better
         # than the incumbent
         if self.incumbent is None or self.incumbent_error > error:
@@ -2694,7 +2699,8 @@ def hpo_objective_lenet(learning_rate, batch_size, max_epochs=8):
     """Defined in :numref:`sec_api_hpo`"""
     model = d2l.LeNet(lr=learning_rate, num_classes=10)
     trainer = d2l.HPOTrainer(max_epochs=max_epochs, num_gpus=1)
-    data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
+    data = d2l.FashionMNIST(batch_size=batch_size)
+    model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
     trainer.fit(model=model, data=data)
     validation_error = trainer.validation_error()
     return validation_error
