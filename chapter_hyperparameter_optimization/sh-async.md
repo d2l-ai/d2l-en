@@ -110,12 +110,12 @@ def hpo_objective_lenet_synetune(learning_rate, batch_size, max_epochs):
 We will also use the same configuration space as before:
 
 ```{.python .input  n=55}
-max_epochs = 8
+max_epochs = 10
 
 config_space = {
-   "learning_rate": loguniform(1e-3, 1),
-   "batch_size": randint(32, 256),
-   "max_epochs": max_epochs
+    "learning_rate": loguniform(1e-2, 1),
+    "batch_size": randint(32, 256),
+    "max_epochs": max_epochs
 }
 ```
 

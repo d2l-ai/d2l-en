@@ -181,21 +181,21 @@ will once more be validation error.
 
 ```{.python .input  n=9}
 %%tab pytorch
-def hpo_objective_lenet(learning_rate, batch_size, max_epochs=8):  #@save
+def hpo_objective_lenet(learning_rate, batch_size, max_epochs=10):  #@save
     model = d2l.LeNet(lr=learning_rate, num_classes=10)
     trainer = d2l.HPOTrainer(max_epochs=max_epochs, num_gpus=1)
     data = d2l.FashionMNIST(batch_size=batch_size)
     model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
     trainer.fit(model=model, data=data)
     validation_error = trainer.validation_error()
-    return validation_error    
+    return validation_error
 ```
 
 We also need to define the configuration space.
 
 ```{.python .input  n=10}
 config_space = {
-    "learning_rate": stats.loguniform(1e-3, 1),
+    "learning_rate": stats.loguniform(1e-2, 1),
     "batch_size": stats.randint(32, 256),
 } 
 ```

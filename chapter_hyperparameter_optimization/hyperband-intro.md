@@ -192,10 +192,10 @@ Let us see how successive halving is doing on our neural network example.
 
 ```{.python .input  n=5}
 min_number_of_epochs = 1
-max_number_of_epochs = 4
+max_number_of_epochs = 10
 
 config_space = {
-    "learning_rate": stats.loguniform(1e-3, 1),
+    "learning_rate": stats.loguniform(1e-2, 1),
     "batch_size": stats.randint(32, 256),
 } 
 ```

@@ -110,9 +110,9 @@ We make use of this feature in order to pass `max_epochs`.
 
 ```{.python .input  n=39}
 config_space = {
-    "learning_rate": loguniform(1e-3, 1),
+    "learning_rate": loguniform(1e-2, 1),
     "batch_size": randint(32, 256),
-    "max_epochs": 8,
+    "max_epochs": 10,
 }
 ```
 
