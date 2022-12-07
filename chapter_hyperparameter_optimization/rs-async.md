@@ -68,7 +68,8 @@ def hpo_objective_lenet_synetune(learning_rate, batch_size, max_epochs):
 
     model = d2l.LeNet(lr=learning_rate, num_classes=10)
     trainer = d2l.HPOTrainer(max_epochs=1, num_gpus=1)
-    data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
+    data = d2l.FashionMNIST(batch_size=batch_size)
+    model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
     report = Reporter() 
     for epoch in range(1, max_epochs + 1):
         if epoch == 1:
