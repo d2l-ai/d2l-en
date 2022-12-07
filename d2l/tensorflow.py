@@ -444,6 +444,18 @@ class Classifier(d2l.Module):
             X = layer(X)
             print(layer.__class__.__name__, 'output shape:\t', X.shape)
 
+class SoftmaxRegression(d2l.Classifier):
+    """Defined in :numref:`sec_softmax_concise`"""
+    def __init__(self, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = tf.keras.models.Sequential()
+        self.net.add(tf.keras.layers.Flatten())
+        self.net.add(tf.keras.layers.Dense(num_outputs))
+
+    def forward(self, X):
+        return self.net(X)
+
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
     return tf.device('/CPU:0')
@@ -479,6 +491,23 @@ def corr2d(X, K):
             Y[i, j].assign(tf.reduce_sum(
                 X[i: i + h, j: j + w] * K))
     return Y
+
+class LeNet(d2l.Classifier):
+    """Defined in :numref:`sec_lenet`"""
+    def __init__(self, lr=0.1, num_classes=10):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = tf.keras.models.Sequential([
+            tf.keras.layers.Conv2D(filters=6, kernel_size=5,
+                                   activation='sigmoid', padding='same'),
+            tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+            tf.keras.layers.Conv2D(filters=16, kernel_size=5,
+                                   activation='sigmoid'),
+            tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(120, activation='sigmoid'),
+            tf.keras.layers.Dense(84, activation='sigmoid'),
+            tf.keras.layers.Dense(num_classes)])
 
 class Residual(tf.keras.Model):
     """The Residual block of ResNet."""

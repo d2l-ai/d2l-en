@@ -497,6 +497,16 @@ class Classifier(d2l.Module):
             X = layer(X)
             print(layer.__class__.__name__, 'output shape:\t', X.shape)
 
+class SoftmaxRegression(d2l.Classifier):
+    """Defined in :numref:`sec_softmax_concise`"""
+    def __init__(self, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Dense(num_outputs)
+        self.net.initialize()
+    def forward(self, X):
+        return self.net(X)
+
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
     return npx.cpu()
@@ -532,6 +542,23 @@ def corr2d(X, K):
         for j in range(Y.shape[1]):
             Y[i, j] = d2l.reduce_sum((X[i: i + h, j: j + w] * K))
     return Y
+
+class LeNet(d2l.Classifier):
+    """Defined in :numref:`sec_lenet`"""
+    def __init__(self, lr=0.1, num_classes=10):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential()
+        self.net.add(
+            nn.Conv2D(channels=6, kernel_size=5, padding=2,
+                      activation='sigmoid'),
+            nn.AvgPool2D(pool_size=2, strides=2),
+            nn.Conv2D(channels=16, kernel_size=5, activation='sigmoid'),
+            nn.AvgPool2D(pool_size=2, strides=2),
+            nn.Dense(120, activation='sigmoid'),
+            nn.Dense(84, activation='sigmoid'),
+            nn.Dense(num_classes))
+        self.net.initialize(init.Xavier())
 
 class Residual(nn.Block):
     """The Residual block of ResNet."""

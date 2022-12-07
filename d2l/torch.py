@@ -329,21 +329,6 @@ class Trainer(d2l.HyperParameters):
             for param in params:
                 param.grad[:] *= grad_clip_val / norm
 
-    def validate(self):
-        """Defined in :numref:`sec_definition_hpo`"""
-        self.model.eval()
-        accuracy = 0
-        val_batch_idx = 0
-    
-        for batch in self.val_dataloader:
-            with torch.no_grad():
-                x, y = self.prepare_batch(batch)
-                y_hat = self.model(x)
-                accuracy += self.model.accuracy(y_hat, y)
-            val_batch_idx += 1
-    
-        return 1 -  accuracy / val_batch_idx
-
 class SyntheticRegressionData(d2l.DataModule):
     """Defined in :numref:`sec_synthetic-regression-data`"""
     def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000,
@@ -495,6 +480,16 @@ class Classifier(d2l.Module):
             X = layer(X)
             print(layer.__class__.__name__, 'output shape:\t', X.shape)
 
+class SoftmaxRegression(d2l.Classifier):
+    """Defined in :numref:`sec_softmax_concise`"""
+    def __init__(self, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential(nn.Flatten(),
+                                 nn.LazyLinear(num_outputs))
+    def forward(self, X):
+        return self.net(X)
+
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
     return torch.device('cpu')
@@ -537,6 +532,21 @@ def init_cnn(module):
     Defined in :numref:`sec_lenet`"""
     if type(module) == nn.Linear or type(module) == nn.Conv2d:
         nn.init.xavier_uniform_(module.weight)
+
+class LeNet(d2l.Classifier):
+    """Defined in :numref:`sec_lenet`"""
+    def __init__(self, lr=0.1, num_classes=10):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential(
+            nn.LazyConv2d(6, kernel_size=5, padding=2), nn.Sigmoid(),
+            nn.AvgPool2d(kernel_size=2, stride=2),
+            nn.LazyConv2d(16, kernel_size=5), nn.Sigmoid(),
+            nn.AvgPool2d(kernel_size=2, stride=2),
+            nn.Flatten(),
+            nn.LazyLinear(120), nn.Sigmoid(),
+            nn.LazyLinear(84), nn.Sigmoid(),
+            nn.LazyLinear(num_classes))
 
 class Residual(nn.Module):
     """The Residual block of ResNet."""
@@ -2595,36 +2605,31 @@ def update_G(Z, net_D, net_G, loss, trainer_G):
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
-class SoftmaxClassification(d2l.Classifier):
+class HPOTrainer(d2l.Trainer):
     """Defined in :numref:`sec_definition_hpo`"""
-    def __init__(self, num_outputs, lr):
-        super().__init__()
-        self.save_hyperparameters()
-        self.net = nn.Sequential(nn.Flatten(),
-                                 nn.LazyLinear(num_outputs))
-    def forward(self, X):
-        return self.net(X)
-
-def hpo_objective_softmax_classification(config, max_epochs=10):
-    """Defined in :numref:`sec_definition_hpo`"""
-    learning_rate = config['learning_rate']
-    trainer = d2l.Trainer(max_epochs=max_epochs)
-    data = d2l.FashionMNIST(batch_size=16)
-    model = d2l.SoftmaxClassification(num_outputs=10, lr=learning_rate)
-    trainer.fit(model=model, data=data)
-    validation_error = trainer.validate()
-    return d2l.numpy(validation_error)
+    def validation_error(self):
+        self.model.eval()
+        accuracy = 0
+        val_batch_idx = 0
+        for batch in self.val_dataloader:
+            with torch.no_grad():
+                x, y = self.prepare_batch(batch)
+                y_hat = self.model(x)
+                accuracy += self.model.accuracy(y_hat, y)
+            val_batch_idx += 1
+        return 1 -  accuracy / val_batch_idx
 
 class HPOSearcher(d2l.HyperParameters):
     """Defined in :numref:`sec_api_hpo`"""
     def sample_configuration():
         raise NotImplementedError
+
     def update(self, config, error, additional_info=None):
         pass
 
 class RandomSearcher(HPOSearcher):
     """Defined in :numref:`sec_api_hpo`"""
-    def __init__(self, config_space):
+    def __init__(self, config_space: dict):
         self.save_hyperparameters()
 
     def sample_configuration(self):
@@ -2638,25 +2643,24 @@ class HPOScheduler(d2l.HyperParameters):
     def suggest(self):
         raise NotImplementedError
 
-    def update(self, config, error, info=None):
+    def update(self, config: dict, error: float, info=None):
         raise NotImplementedError
 
 class BasicScheduler(HPOScheduler):
     """Defined in :numref:`sec_api_hpo`"""
-    def __init__(self, searcher):
+    def __init__(self, searcher: HPOSearcher):
         self.save_hyperparameters()
 
     def suggest(self):
         return self.searcher.sample_configuration()
 
-    def update(self, config, error, info=None):
+    def update(self, config: dict, error: float, info=None):
         searcher.update(config, error, additional_info=info)
 
 class HPOTuner(d2l.HyperParameters):
     """Defined in :numref:`sec_api_hpo`"""
-    def __init__(self, scheduler, objective):
+    def __init__(self, scheduler: HPOScheduler, objective: callable):
         self.save_hyperparameters()
-
         # Bookeeping results for plotting
         self.incumbent = None
         self.incumbent_error = None
@@ -2665,7 +2669,7 @@ class HPOTuner(d2l.HyperParameters):
         self.current_runtime = 0
 
     def run(self, number_of_trials):
-        for i in range(number_of_trials):
+        for _ in range(number_of_trials):
             start_time = time.time()
             config = self.scheduler.suggest()
             error = self.objective(**config)
@@ -2673,47 +2677,26 @@ class HPOTuner(d2l.HyperParameters):
             runtime = time.time() - start_time
             self.bookkeeping(config, d2l.numpy(error.cpu()), runtime)
 
-    def bookkeeping(self, config, error, runtime):
+    def bookkeeping(self, config: dict, error: float, runtime: float):
         """Defined in :numref:`sec_api_hpo`"""
         # Check if the last hyperparameter configuration performs better
         # than the incumbent
         if self.incumbent is None or self.incumbent_error > error:
             self.incumbent = config
             self.incumbent_error = error
-    
         # Add current best observed performance to the optimization trajectory
         self.incumbent_trajectory.append(self.incumbent_error)
-    
         # Update runtime
         self.current_runtime += runtime
         self.cumulative_runtime.append(self.current_runtime)
 
-class AlexNet(d2l.Classifier):
+def hpo_objective_lenet(learning_rate, batch_size, max_epochs=8):
     """Defined in :numref:`sec_api_hpo`"""
-    def __init__(self, lr=0.1, num_classes=10):
-        super().__init__()
-        self.save_hyperparameters()
-        self.net = nn.Sequential(
-            nn.LazyConv2d(96, kernel_size=11, stride=4, padding=1),
-            nn.ReLU(), nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.LazyConv2d(256, kernel_size=5, padding=2), nn.ReLU(),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.LazyConv2d(384, kernel_size=3, padding=1), nn.ReLU(),
-            nn.LazyConv2d(384, kernel_size=3, padding=1), nn.ReLU(),
-            nn.LazyConv2d(256, kernel_size=3, padding=1), nn.ReLU(),
-            nn.MaxPool2d(kernel_size=3, stride=2), nn.Flatten(),
-            nn.LazyLinear(4096), nn.ReLU(), nn.Dropout(p=0.5),
-            nn.LazyLinear(4096), nn.ReLU(),nn.Dropout(p=0.5),
-            nn.LazyLinear(num_classes))
-        self.net.apply(d2l.init_cnn)
-
-def objective(batch_size, learning_rate, max_epochs=8):
-    """Defined in :numref:`sec_api_hpo`"""
-    model = d2l.AlexNet(lr=learning_rate)
-    trainer = d2l.Trainer(max_epochs=max_epochs, num_gpus=1)
+    model = d2l.LeNet(lr=learning_rate, num_classes=10)
+    trainer = d2l.HPOTrainer(max_epochs=max_epochs, num_gpus=1)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     trainer.fit(model=model, data=data)
-    validation_error = trainer.validate()
+    validation_error = trainer.validation_error()
     return validation_error
 
 class SuccessiveHalvingScheduler(d2l.HPOScheduler):
@@ -2739,16 +2722,16 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):
             # Start a new round of successive halving
             # Number of configurations for the first rung:
             n0 = int(self.prefact * self.eta ** self.K)
-            for i in range(n0):
+            for _ in range(n0):
                 config = searcher.sample_configuration()
-                config['max_epochs'] = self.r_min  # set r = r_min
+                config["max_epochs"] = self.r_min  # set r = r_min
                 self.queue.append(config)
         # Return an element from the queue
         return self.queue.pop()
 
     def update(self, config, error, info=None):
         """Defined in :numref:`sec_mf_hpo`"""
-        ri = config['max_epochs']  # Rung r_i
+        ri = config["max_epochs"]  # Rung r_i
         # Update our searcher, e.g if we use Bayesian optimization later
         self.searcher.update(config, error, additional_info=info)
         if ri < self.r_max:
@@ -2793,7 +2776,7 @@ class HyperbandScheduler(d2l.HPOScheduler):
             eta=self.eta,
             r_min=self.r_min,
             r_max=self.r_max,
-            prefact=(self.s_max + 1) / (self.s + 1)
+            prefact=(self.s_max + 1) / (self.s + 1),
         )
         self.brackets = defaultdict(list)
 
@@ -2802,10 +2785,10 @@ class HyperbandScheduler(d2l.HPOScheduler):
 
     def update(self, config, error, info=None):
         """Defined in :numref:`sec_mf_hpo`"""
-        self.brackets[self.s].append((config['max_epochs'], d2l.numpy(error.cpu())))
+        self.brackets[self.s].append((config["max_epochs"], d2l.numpy(error.cpu())))
         self.successive_halving.update(config, error, info=info)
-        # If the queue of successive halving is empty, than we finished this round and start with
-        # a new round with different r_min and N
+        # If the queue of successive halving is empty, than we finished this round
+        # and start with a new round with different r_min and N
         if len(self.successive_halving.queue) == 0:
             self.s -= 1
             if self.s < 0:
@@ -2815,7 +2798,7 @@ class HyperbandScheduler(d2l.HPOScheduler):
                 eta=self.eta,
                 r_min=int(self.r_max * self.eta ** (-self.s)),
                 r_max=self.r_max,
-                prefact=(self.s_max + 1) / (self.s + 1)
+                prefact=(self.s_max + 1) / (self.s + 1),
             )
 
 def load_array(data_arrays, batch_size, is_train=True):
