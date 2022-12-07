@@ -2700,7 +2700,7 @@ class HPOTuner(d2l.HyperParameters):
         self.current_runtime += runtime
         self.cumulative_runtime.append(self.current_runtime)
 
-def hpo_objective_lenet(learning_rate, batch_size, max_epochs=8):
+def hpo_objective_lenet(learning_rate, batch_size, max_epochs=10):
     """Defined in :numref:`sec_api_hpo`"""
     model = d2l.LeNet(lr=learning_rate, num_classes=10)
     trainer = d2l.HPOTrainer(max_epochs=max_epochs, num_gpus=1)
