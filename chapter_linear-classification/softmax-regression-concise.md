@@ -63,7 +63,7 @@ by keeping the dimension along the first axis unchanged.
 
 ```{.python .input}
 %%tab all
-class SoftmaxRegression(d2l.Classifier):
+class SoftmaxRegression(d2l.Classifier):  #@save
     def __init__(self, num_outputs, lr):
         super().__init__()
         self.save_hyperparameters()

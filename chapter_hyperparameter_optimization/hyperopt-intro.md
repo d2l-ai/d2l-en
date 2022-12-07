@@ -1,6 +1,6 @@
 ```{.python .input  n=2}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['pytorch'])
 ```
 
 # What is Hyperparameter Optimization?
@@ -44,9 +44,11 @@ In this section we will introduce HPO and show how we can automatically find the
 ##  The Optimization Problem
 :label:`sec_definition_hpo`
 
-We will start with a simple toy problem: searching for the learning rate of the multi-class logistic regression model from : numref:sec_sgd to minimize the validation error on the Fashion MNIST dataset. While other hyperparameters
-like batch size or number of epochs are also worth tuning, we focus on learning
-rate alone for simplicity.
+We will start with a simple toy problem: searching for the learning rate of the
+multi-class logistic regression model `SoftmaxRegression` from
+:numref:`sec_softmax_concise` to minimize the validation error on the Fashion
+MNIST dataset. While other hyperparameters like batch size or number of epochs
+are also worth tuning, we focus on learning rate alone for simplicity.
 
 ```{.python .input}
 %%tab pytorch
@@ -57,87 +59,104 @@ from torch import nn
 from scipy import stats
 ```
 
-```{.python .input  n=9}
-%%tab pytorch
-class SoftmaxClassification(d2l.Classifier): #@save
-    def __init__(self, num_outputs, lr):
-        super().__init__()
-        self.save_hyperparameters()
-        self.net = nn.Sequential(nn.Flatten(),
-                                 nn.LazyLinear(num_outputs))
-    def forward(self, X):
-        return self.net(X)
-```
-
-Before we can run HPO, we first need to define two ingredients: the objective function and the configuration space.
+Before we can run HPO, we first need to define two ingredients: the objective
+function and the configuration space.
 
 ### The Objective Function
 
+The performance of a learning algorithm can be seen as a function
+$f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from the hyperparameter space
+$\mathbf{x} \in \mathcal{X}$ to the validation loss. For every evaluation of
+$f(\mathbf{x})$, we have to train and validate our machine learning model, which
+can be time and compute intensive in the case of deep neural networks trained on
+large datasets. Now, given our criterion $f(\mathbf{x})$ our goal is to find
+$\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. 
 
-The performance of a learning algorithm can be seen as a function $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from the hyperparameter space $\mathbf{x} \in \mathcal{X}$ to the validation loss. For every evaluation of $f(\mathbf{x})$, we have to train and validate our machine learning model, which can be time and compute intensive in the case of deep neural networks trained on large datasets. Now, given our criterion $f(\mathbf{x})$ our goal is to find $\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. 
+There is no simple way to compute gradients of $f$ with respect to $\mathbf{x}$,
+because it would require to propagate the gradient through the entire training
+process. While there is recent work :cite:`maclaurin-icml15,franceschi-icml17a`
+to drive HPO by approximate "hypergradients", none of the existing approaches
+are competitive with the state-of-the-art yet, and we will not discuss them
+here. Furthermore, the computational burden of evaluating $f$ requires HPO
+algorithms to approach the global optimum with as few samples as possible.
 
-There is no simple way to compute gradients of $f$ with respect to $\mathbf{x}$, because it would require to propagate the gradient through the entire training process. While there is recent work :cite:`maclaurin-icml15,franceschi-icml17a` to drive HPO by approximate "hypergradients", none of the existing approaches are competitive with the state-of-the-art yet, and we will not discuss them here. Furthermore, the computational burden of evaluating $f$ requires HPO algorithms to approach the global optimum with as few samples as possible.
+The training of neural networks is stochastic (e.g., weights are randomly
+initialized, mini-batches are randomly sampled), so that our observations will
+be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we usually assume that the
+$\epsilon \sim N(0, \sigma)$ observation noise is Gaussian distributed.
 
-The training of neural networks is stochastic (e.g., weights are randomly initialized, mini-batches are randomly sampled), so that our observations will be noisy: $y \sim f(\mathbf{x}) + \epsilon$, where we usually assume that the $\epsilon \sim N(0, \sigma)$ observation noise is Gaussian distributed.
+Faced with all these challenges, we usually try to identify a small set of well
+performing hyperparameter configurations quickly, instead of hitting the global
+optima exactly. However, due to large computational demands of most neural
+networks models, even this can take days or weeks of compute. We will explore
+in :numref:`sec_mf_hpo` how we can speed-up the optimization process by either
+distributing the search or using cheaper-to-evaluate approximations of the
+objective function.
 
-Faced with all these challenges, we usually try to identify a small set of well performing hyperparameter configurations quickly, instead of hitting the global optima exactly. However, due to large computational demands of most neural networks models, even this can take days or weeks of compute. We will explore in :numref:`sec_mf_hpo` how we can speed-up the optimization process by either distributing the search or using cheaper-to-evaluate approximations of the objective function.
 
-
-Now, since we would like to optimize the validation error, we need to add a function computing this quantity.
+Now, since we would like to optimize the validation error, we need to add a
+function computing this quantity.
 
 ```{.python .input  n=8}
 %%tab pytorch
-@d2l.add_to_class(d2l.Trainer)  #@save
-def validate(self):
-    self.model.eval()
-    accuracy = 0
-    val_batch_idx = 0
-    
-    for batch in self.val_dataloader:
-        with torch.no_grad():
-            x, y = self.prepare_batch(batch)
-            y_hat = self.model(x)
-            accuracy += self.model.accuracy(y_hat, y)
-        val_batch_idx += 1
-    
-    return 1 -  accuracy / val_batch_idx
+class HPOTrainer(d2l.Trainer):  #@save
+    def validation_error(self):
+        self.model.eval()
+        accuracy = 0
+        val_batch_idx = 0
+        for batch in self.val_dataloader:
+            with torch.no_grad():
+                x, y = self.prepare_batch(batch)
+                y_hat = self.model(x)
+                accuracy += self.model.accuracy(y_hat, y)
+            val_batch_idx += 1
+        return 1 -  accuracy / val_batch_idx
 ```
 
-We optimize validation error with respect to the hyperparameter configuration `config`, consisting of the `learning_rate`. For each evaluation, we train our model
-for `max_epochs` epochs, then compute and return its validation error:
+We optimize validation error with respect to the hyperparameter configuration
+`config`, consisting of the `learning_rate`. For each evaluation, we train our
+model for `max_epochs` epochs, then compute and return its validation error:
 
 ```{.python .input  n=5}
 %%tab all
 def hpo_objective_softmax_classification(config, max_epochs=10):  #@save 
     learning_rate = config['learning_rate']
-    trainer = d2l.Trainer(max_epochs=max_epochs)
+    trainer = d2l.HPOTrainer(max_epochs=max_epochs)
     data = d2l.FashionMNIST(batch_size=16)
-    model = d2l.SoftmaxClassification(num_outputs=10, lr=learning_rate)
+    model = d2l.SoftmaxRegression(num_outputs=10, lr=learning_rate)
     trainer.fit(model=model, data=data)
-    validation_error = trainer.validate()
-    return d2l.numpy(validation_error)
+    return d2l.numpy(trainer.validation_error())
 ```
 
 ### The Configuration Space
 
 :label:`sec_intro_config_spaces`
 
-Along with the objective function $f(\mathbf{x})$, we also need to define the feasible set
-$\mathbf{x} \in \mathcal{X}$ to optimize over, known as *configuration space* or *search
-space*. For our logistic regression example, we will use:
+Along with the objective function $f(\mathbf{x})$, we also need to define the
+feasible set $\mathbf{x} \in \mathcal{X}$ to optimize over, known as
+*configuration space* or *search space*. For our logistic regression example,
+we will use:
 
 ```{.python .input  n=6}
 config_space = {
-   "learning_rate": stats.loguniform(1e-4, 1)
-} 
+    "learning_rate": stats.loguniform(1e-4, 1)
+}
 ```
 
-Here we use the use the `loguniform` object from SciPy, which represents a uniform distribution between -4 and -1 in the logarithmic space. This object allows us to sample random variables from this distribution.
+Here we use the use the `loguniform` object from SciPy, which represents a
+uniform distribution between -4 and -1 in the logarithmic space. This object
+allows us to sample random variables from this distribution.
 
-Each hyperparameter has a data type, such as `float` for `learning_rate`, as well as a closed bounded range
-(i.e., lower and upper bounds). We usually assign a prior distribution (e.g, uniform or log-uniform) to each hyperparameter to sample from. Some positive parameters, such as `learning_rate`, are best represented on a logarithmic scale as optimal values can differ by several orders of magnitude, while others, such as momentum, come with linear scale.
+Each hyperparameter has a data type, such as `float` for `learning_rate`, as
+well as a closed bounded range (i.e., lower and upper bounds). We usually assign
+a prior distribution (e.g, uniform or log-uniform) to each hyperparameter to
+sample from. Some positive parameters, such as `learning_rate`, are best
+represented on a logarithmic scale as optimal values can differ by several
+orders of magnitude, while others, such as momentum, come with linear scale.
 
-Below we show a simple example of a configuration space consisting of typical hyperparameters of a multi-layer perceptron including their type and standard ranges.
+Below we show a simple example of a configuration space consisting of typical
+hyperparameters of a multi-layer perceptron including their type and standard
+ranges.
 
 : Example configuration space of multi-layer perceptron
 

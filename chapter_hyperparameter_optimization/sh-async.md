@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(["mxnet", "pytorch", "tensorflow"])
+tab.interact_select(["pytorch"])
 ```
 
 # Asynchronous Successive Halving
