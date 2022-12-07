@@ -228,7 +228,7 @@ def apply_init(self, dummy_input, **kwargs):
     else:
         # Dropout key is only used for models with dropout layers
         self.key = {'params': d2l.get_key(), 'dropout': d2l.get_key()}
-    params = self.init(self.key, dummy_input)
+    params = self.init(self.key, *dummy_input)  # dummy_input tuple unpacked
     return params
 ```
 

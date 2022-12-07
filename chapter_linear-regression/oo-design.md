@@ -359,7 +359,7 @@ class Trainer(d2l.HyperParameters):  #@save
             self.prepare_model(model)
             self.optim = model.configure_optimizers()
 
-            dummy_input = next(iter(self.train_dataloader))[0]
+            dummy_input = next(iter(self.train_dataloader))[:-1]
             variables = model.apply_init(dummy_input, key=key)
             params = variables['params']
 

@@ -246,7 +246,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         else:
             # Dropout key is only used for models with dropout layers
             self.key = {'params': d2l.get_key(), 'dropout': d2l.get_key()}
-        params = self.init(self.key, dummy_input)
+        params = self.init(self.key, *dummy_input)  # dummy_input tuple unpacked
         return params
 
 class DataModule(d2l.HyperParameters):
@@ -297,7 +297,7 @@ class Trainer(d2l.HyperParameters):
         self.prepare_model(model)
         self.optim = model.configure_optimizers()
 
-        dummy_input = next(iter(self.train_dataloader))[0]
+        dummy_input = next(iter(self.train_dataloader))[:-1]
         variables = model.apply_init(dummy_input, key=key)
         params = variables['params']
 
