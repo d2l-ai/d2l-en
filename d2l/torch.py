@@ -2629,14 +2629,19 @@ class HPOSearcher(d2l.HyperParameters):
 
 class RandomSearcher(HPOSearcher):
     """Defined in :numref:`sec_api_hpo`"""
-    def __init__(self, config_space: dict):
+    def __init__(self, config_space: dict, initial_config=None):
         self.save_hyperparameters()
 
     def sample_configuration(self):
-        return {
-            name: domain.rvs()
-            for name, domain in self.config_space.items()
-        }
+        if self.initial_config is not None:
+            result = self.initial_config
+            self.initial_config = None
+        else:
+            result = {
+                name: domain.rvs()
+                for name, domain in self.config_space.items()
+            }
+        return result
 
 class HPOScheduler(d2l.HyperParameters):
     """Defined in :numref:`sec_api_hpo`"""
