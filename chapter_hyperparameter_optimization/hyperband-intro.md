@@ -194,16 +194,16 @@ Let us see how successive halving is doing on our neural network example.
 min_number_of_epochs = 1
 max_number_of_epochs = 4
 
-search_space = {
-    "learning_rate": stats.loguniform(1e-4, 1),
-    "batch_size": stats.randint(8, 128),
+config_space = {
+    "learning_rate": stats.loguniform(1e-3, 1),
+    "batch_size": stats.randint(32, 256),
 } 
 ```
 
 We just replace the scheduler with our new `SuccessiveHalvingScheduler`.
 
 ```{.python .input  n=14}
-searcher = d2l.RandomSearcher(search_space)
+searcher = d2l.RandomSearcher(config_space)
 scheduler = SuccessiveHalvingScheduler(
     searcher=searcher,
     eta=2,

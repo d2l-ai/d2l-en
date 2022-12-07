@@ -56,14 +56,19 @@ previous section in this API:
 ```{.python .input  n=4}
 %%tab all
 class RandomSearcher(HPOSearcher):  #@save
-    def __init__(self, config_space: dict):
+    def __init__(self, config_space: dict, initial_config=None):
         self.save_hyperparameters()
 
     def sample_configuration(self):
-        return {
-            name: domain.rvs()
-            for name, domain in self.config_space.items()
-        }
+        if self.initial_config is not None:
+            result = self.initial_config
+            self.initial_config = None
+        else:
+            result = {
+                name: domain.rvs()
+                for name, domain in self.config_space.items()
+            }
+        return result
 ```
 
 ### Scheduler
@@ -190,15 +195,20 @@ We also need to define the configuration space.
 
 ```{.python .input  n=10}
 config_space = {
-    "learning_rate": stats.loguniform(1e-4, 1),
-    "batch_size": stats.randint(8, 128),
+    "learning_rate": stats.loguniform(1e-3, 1),
+    "batch_size": stats.randint(32, 256),
 } 
 ```
 
 Now we can start our random search:
 
 ```{.python .input}
-searcher = RandomSearcher(config_space)
+# We start with sensible defaults
+initial_config = {
+    "learning_rate": 0.1,
+    "batch_size": 128,
+}
+searcher = RandomSearcher(config_space, initial_config=initial_config)
 scheduler = BasicScheduler(searcher=searcher)
 tuner = HPOTuner(scheduler=scheduler, objective=hpo_objective_lenet)
 tuner.run(number_of_trials=5)
