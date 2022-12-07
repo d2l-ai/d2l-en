@@ -4,24 +4,25 @@ tab.interact_select(["pytorch"])
 ```
 
 # Asynchronous Random Search
-
 :label:`sec_rs_async`
 
-As we have seen in the previous :numref:`sec_api_hpo`, we might have to wait hours
-or even days before random search returns a good hyperparameter configuration,
-because of the expensive evaluation of hyperparameter configurations. In practice,
-we have often access to a pool of resources such as multiple GPUs on the same
-machine or multiple machines with a single GPU. This begs the question: *How do we
-efficiently distribute random search?*
+As we have seen in the previous :numref:`sec_api_hpo`, we might have to wait
+hours or even days before random search returns a good hyperparameter
+configuration, because of the expensive evaluation of hyperparameter
+configurations. In practice, we have often access to a pool of resources such as
+multiple GPUs on the same machine or multiple machines with a single GPU. This
+begs the question: *How do we efficiently distribute random search?*
 
-In general, we distinguish between synchronous and asynchronous parallel hyperparameter
-optimization (see :numref:`distributed_scheduling`). In the synchronous setting,
-we wait for all concurrently running trials to finish, before we start the next
-batch. Consider search spaces that contain hyperparameters such as the number of filters
-or number of layers of a deep neural network. Hyperparameter configurations that contain
-a larger number of layers of filters will naturally take more time to finish, and all
-other trials in the same batch will have to wait at synchronisation points (grey area
-in :numref:`distributed_scheduling`) before we can continue the optimization process.
+In general, we distinguish between synchronous and asynchronous parallel
+hyperparameter optimization (see :numref:`distributed_scheduling`). In the
+synchronous setting, we wait for all concurrently running trials to finish,
+before we start the next batch. Consider search spaces that contain
+hyperparameters such as the number of filters or number of layers of a deep
+neural network. Hyperparameter configurations that contain a larger number of 
+layers of filters will naturally take more time to finish, and all other trials
+in the same batch will have to wait at synchronisation points (grey area in
+:numref:`distributed_scheduling`) before we can continue the optimization
+process.
 
 In the asynchronous setting we immediately schedule a new trial as soon as resources
 become available. This will optimally exploit our resources, since we can avoid any
@@ -44,12 +45,12 @@ and execution is difficult to implement from scratch. We will use *Syne Tune*
 :cite:`salinas-automl22`, which provides us with a simple interface for asynchronous
 HPO. Syne Tune is designed to be run with different execution back-ends, and the
 interested reader is invited to study its simple APIs in order to learn more about
-distributed HPO. Syne Tune can be installed via:
+distributed HPO.
 
 ## Objective Function
 
 First, we have to define a new objective function such that it now returns the
-performance back to Syne Tune via the `report` function.
+performance back to Syne Tune via the `report` callback.
 
 ```{.python .input  n=34}
 import matplotlib.pyplot as plt
@@ -59,14 +60,14 @@ from syne_tune.backend.python_backend import PythonBackend
 from syne_tune.optimizer.baselines import RandomSearch
 from syne_tune import Tuner, StoppingCriterion
 from syne_tune.experiments import load_experiment
-from syne_tune.report import Reporter
 
 
-def objective(learning_rate, batch_size, max_epochs):
+def hpo_objective_lenet_synetune(learning_rate, batch_size, max_epochs):
     from d2l import torch as d2l    
     from syne_tune import Reporter
-    model = d2l.AlexNet(lr=learning_rate)
-    trainer = d2l.Trainer(max_epochs=1, num_gpus=1)
+
+    model = d2l.LeNet(lr=learning_rate, num_classes=10)
+    trainer = d2l.HPOTrainer(max_epochs=1, num_gpus=1)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
     report = Reporter() 
     for epoch in range(1, max_epochs + 1):
@@ -75,7 +76,7 @@ def objective(learning_rate, batch_size, max_epochs):
             trainer.fit(model=model, data=data) 
         else:
             trainer.fit_epoch()
-        validation_error = d2l.numpy(trainer.validate().cpu())
+        validation_error = d2l.numpy(trainer.validation_error().cpu())
         report(epoch=epoch, validation_error=float(validation_error))
 ```
 
@@ -86,8 +87,8 @@ also need to specify how long we want to run random search, by defining an
 upper limit on the total wall-clock time.
 
 ```{.python .input  n=37}
-n_workers = 2  # Needs to be lower equal to the number of available GPUs
-max_wallclock_time = 12 * 60
+n_workers = 2  # Needs to be <= the number of available GPUs
+max_wallclock_time = 12 * 60  # 12 minutes
 ```
 
 Next, we state which metric we want to optimize and whether we want to minimize or
@@ -105,9 +106,9 @@ We make use of this feature in order to pass `max_epochs`.
 
 ```{.python .input  n=39}
 config_space = {
-   "learning_rate": loguniform(1e-5, 1e-1),
-   "batch_size": randint(8, 128),
-   "max_epochs": 4,
+    "learning_rate": loguniform(1e-5, 1e-1),
+    "batch_size": randint(8, 128),
+    "max_epochs": 4,
 }
 ```
 
@@ -117,18 +118,22 @@ sub-processes. However, for large scale HPO, we could run this also on a cluster
 or cloud environment, where each trial consumes a full instance.
 
 ```{.python .input  n=40}
-trial_backend = PythonBackend(tune_function=objective, config_space=config_space)
+trial_backend = PythonBackend(
+    tune_function=hpo_objective_lenet_synetune,
+    config_space=config_space,
+)
 ```
 
-We can now create the scheduler for asynchronous random search, which is similar in
-behaviour to our `BasicScheduler` from the previous Section.
+We can now create the scheduler for asynchronous random search, which is similar
+in behaviour to our `BasicScheduler` from :numref:`sec_api_hpo`.
 
 ```{.python .input  n=41}
 scheduler = RandomSearch(config_space, metric=metric, mode=mode)
 ```
 
-Syne Tune also features a `Tuner`, where the main experiment loop and bookkeeping is
-centralized, and interactions between scheduler and back-end are mediated.
+Syne Tune also features a `Tuner`, where the main experiment loop and
+bookkeeping is centralized, and interactions between scheduler and back-end are
+mediated.
 
 ```{.python .input  n=42}
 stop_criterion = StoppingCriterion(max_wallclock_time=max_wallclock_time)
@@ -142,7 +147,7 @@ tuner = Tuner(
 ```
 
 Let us run our distributed HPO experiment. According to our stopping criterion,
-it will run for about 15 minutes.
+it will run for about 12 minutes.
 
 ```{.python .input  n=43}
 tuner.run()
@@ -196,4 +201,4 @@ time. While random search is easy to distribute asynchronously and does not
 require any change of the actual algorithm, other methods require some additional
 modifications.
 
-## Exercise
+## Exercises

@@ -71,39 +71,42 @@ Trial-5) on rung 0.
 ![Visualization of successive halving with synchronous and asynchronous scheduling of trials.](img/asha.svg)
 :label:`asha`
 
-As for asynchronous random search, we will use *Syne Tune* once more.
-
 ## Objective Function
 
-Just as in :numref:`sec_rs_async`, we will use Syne Tune with the following
-objective function.
+We will use *Syne Tune* with the same objective function as in
+:numref:`sec_rs_async`.
 
 ```{.python .input  n=54}
 import logging
 logging.basicConfig(level=logging.INFO)
 import matplotlib.pyplot as plt
 
-from syne_tune import Tuner, StoppingCriterion
+from syne_tune.config_space import loguniform, randint
 from syne_tune.backend.python_backend import PythonBackend
-from syne_tune.config_space import randint, loguniform
-from syne_tune.optimizer.baselines import ASHA
+from syne_tune.optimizer.baselines import RandomSearch
+from syne_tune import Tuner, StoppingCriterion
 from syne_tune.experiments import load_experiment
 
 
-def objective(learning_rate, batch_size, max_epochs):
-    from d2l import torch as d2l
+def hpo_objective_lenet_synetune(learning_rate, batch_size, max_epochs):
+    from d2l import torch as d2l    
     from syne_tune import Reporter
-    model = d2l.AlexNet(lr=learning_rate)
-    trainer = d2l.Trainer(max_epochs=1, num_gpus=1)
+
+    model = d2l.LeNet(lr=learning_rate, num_classes=10)
+    trainer = d2l.HPOTrainer(max_epochs=1, num_gpus=1)
     data = d2l.FashionMNIST(batch_size=batch_size, resize=(224, 224))
-    report = Reporter()
+    report = Reporter() 
     for epoch in range(1, max_epochs + 1):
-        trainer.fit(model=model, data=data)
-        validation_error = d2l.numpy(trainer.validate().cpu())
+        if epoch == 1:
+            # Initialize the state of Trainer
+            trainer.fit(model=model, data=data) 
+        else:
+            trainer.fit_epoch()
+        validation_error = d2l.numpy(trainer.validation_error().cpu())
         report(epoch=epoch, validation_error=float(validation_error))
 ```
 
-We also use the same configuration space as before
+We will also use the same configuration space as before:
 
 ```{.python .input  n=55}
 max_epochs = 4
@@ -115,25 +118,31 @@ config_space = {
 }
 ```
 
-```{.python .input}
-# We have to set this number equal to the number of GPUs that are in the machine
-# to run this notebook
-n_workers = 2
-max_wallclock_time = 12 * 60
-```
-
 ## Asynchronous Scheduler
+
+First, we define the number of workers that evaluate trials concurrently. We
+also need to specify how long we want to run random search, by defining an
+upper limit on the total wall-clock time.
+
+```{.python .input  n=56}
+n_workers = 2  # Needs to be <= the number of available GPUs
+max_wallclock_time = 12 * 60  # 12 minutes
+```
 
 The code for running ASHA is a simple variation of what we did for asynchronous
 random search.
 
 ```{.python .input  n=56}
+mode = "min"
+metric = "validation_error"
+resource_attr = "epoch"
+
 scheduler = ASHA(
     config_space,
-    metric="validation_error",
-    mode="min",
+    metric=metric,
+    mode=mode,
     max_resource_attr="max_epochs",
-    resource_attr="epoch",
+    resource_attr=resource_attr,
     grace_period=1,  # this corresponds to r_min 
     reduction_factor=2,  # this corresponds to eta
 )  
@@ -142,21 +151,20 @@ scheduler = ASHA(
 Here, `metric` and `resource_attr` specify the key names used with the `report`
 callback, and `max_resource_attr` denotes which input to the objective function
 corresponds to $r_{max}$. Moreover, `grace_period` provides $r_{min}$, and
-`reduction_factor` is $\eta$.
-
-Now, we can run Syne Tune as before:
+`reduction_factor` is $\eta$. Now, we can run Syne Tune as before:
 
 ```{.python .input  n=57}
-trial_backend = PythonBackend(tune_function=objective, config_space=config_space)
-
-stop_criterion = StoppingCriterion(
-    max_wallclock_time=max_wallclock_time
+trial_backend = PythonBackend(
+    tune_function=hpo_objective_lenet_synetune,
+    config_space=config_space,
 )
+
+stop_criterion = StoppingCriterion(max_wallclock_time=max_wallclock_time)
 tuner = Tuner(
     trial_backend=trial_backend,
     scheduler=scheduler,
     stop_criterion=stop_criterion,
-    n_workers=n_workers
+    n_workers=n_workers,
 )
 tuner.run()
 ```

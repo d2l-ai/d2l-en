@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['pytorch'])
+tab.interact_select(["pytorch"])
 ```
 
 # Multi-fidelity Hyperparameter Optimization
@@ -18,11 +18,11 @@ not reduce the total amount of compute that we have to spend.
 *Can we speed up the evaluation of hyperparameter configurations?* Methods such
 as random search allocate the exact same amount or resources (e.g., number
 of epochs, training data points) to each hyperparameter configuration.
-:numref:`img_samples_ls`  depicts learning curves of a set of neural networks trained with
-different hyperparameter configurations. After a few epochs we are already able
-to visually distinguish between well-performing and poorly-performing configurations.
-However, learning curves are noisy, and we might still require the full amount of
-100 epochs to identify the best performing configuration.
+:numref:`img_samples_ls`  depicts learning curves of a set of neural networks
+trained with different hyperparameter configurations. After a few epochs we are
+already able to visually distinguish between well-performing and poorly-performing
+configurations. However, learning curves are noisy, and we might still require
+the full amount of 100 epochs to identify the best performing configuration.
 
 ![Learning curves of random hyperparameter configurations](img/samples_lc.svg)
 :label:`img_samples_lc`
@@ -59,27 +59,28 @@ constant $\eta\in\{2, 3, \dots\}$. For simplicity, assume that $r_{max} = r_{min
 $N = \eta^K$. Let us define *rungs* $\mathcal{R} =
 \{ r_{min}, r_{min}\eta, r_{min}\eta^2, \dots, r_{max} \}$. 
 
-We start with running $N$ trials until the first rung $r_{min}$. Sorting the validation
-errors, we keep the top $1 / \eta$ fraction (which amounts to $\eta^{K-1}$ configurations) and
-discard all the rest. The surviving trials are trained for the next rung,
-i.e $r_{min}\eta$ epochs, and the process is repeated. In each round, a $1 / \eta$
-fraction of trials survives and their training continues with a $\eta$ times larger budget. With
-this particular choice of $N$, only a single trial will be trained to the full
-budget $r_{max}$. Finally, once we finished one round of successive halving, we start the next
-round with a new set of initial configurations, until the total budget is spent.
+We start with running $N$ trials until the first rung $r_{min}$. Sorting the
+validation errors, we keep the top $1 / \eta$ fraction (which amounts to
+$\eta^{K-1}$ configurations) and discard all the rest. The surviving trials are
+trained for the next rung, i.e $r_{min}\eta$ epochs, and the process is repeated.
+In each round, a $1 / \eta$ fraction of trials survives and their training
+continues with a $\eta$ times larger budget. With this particular choice of $N$,
+only a single trial will be trained to the full budget $r_{max}$. Finally, once
+we finished one round of successive halving, we start the next round with a new
+set of initial configurations, until the total budget is spent.
 
 ![Learning curves of random hyperparameter configurations](img/sh.svg)
 :label:`sh`
 
-To implement successive halving, we use the `HPOScheduler` base class from the previous Section.
-Since successive halving can be combined with Bayesian optimization (see :numref:`sec_mf_bo`),
-we allow for a generic `HPOSearcher` object to sample configurations. Additionally, the
-user has to pass the minimum resource $r_{min}$, the maximum resource $r_{max}$
-and $\eta$ as input.
+To implement successive halving, we use the `HPOScheduler` base class from
+:numref:`sec_api_hpo`. Since successive halving can be combined with Bayesian
+optimization, we allow for a generic `HPOSearcher` object to sample
+configurations. Additionally, the user has to pass the minimum resource
+$r_{min}$, the maximum resource $r_{max}$ and $\eta$ as input.
 
-Inside our scheduler we maintain a queue of configurations that need to be evaluated
-for the current rung $r_i$. We update the queue every time we jump to the next
-rung.
+Inside our scheduler we maintain a queue of configurations that need to be
+evaluated for the current rung $r_i$. We update the queue every time we jump to
+the next rung.
 
 ```{.python .input}
 %%tab pytorch
@@ -129,7 +130,7 @@ def suggest(self):
         # Start a new round of successive halving
         # Number of configurations for the first rung:
         n0 = int(self.prefact * self.eta ** self.K)
-        for i in range(n0):
+        for _ in range(n0):
             config = searcher.sample_configuration()
             config['max_epochs'] = self.r_min  # set r = r_min
             self.queue.append(config)
@@ -137,8 +138,8 @@ def suggest(self):
     return self.queue.pop()
 ```
 
-When we collected a new data point, we first update the searcher module. Afterwards
-we check if we already collect all data points on the current rung. 
+When we collected a new data point, we first update the searcher module.
+Afterwards we check if we already collect all data points on the current rung. 
 If so, we sort all configurations and push the top $\frac{1}{\eta}$
 configurations into the queue.
 
@@ -194,8 +195,8 @@ min_number_of_epochs = 1
 max_number_of_epochs = 4
 
 search_space = {
-   "learning_rate": stats.loguniform(1e-4, 1),
-   "batch_size": stats.randint(8, 128),
+    "learning_rate": stats.loguniform(1e-4, 1),
+    "batch_size": stats.randint(8, 128),
 } 
 ```
 
@@ -209,12 +210,15 @@ scheduler = SuccessiveHalvingScheduler(
     r_min=min_number_of_epochs,
     r_max=max_number_of_epochs,
 )
-tuner = d2l.HPOTuner(scheduler=scheduler, objective=d2l.objective)
+tuner = d2l.HPOTuner(
+    scheduler=scheduler,
+    objective=d2l.hpo_objective_lenet,
+)
 tuner.run(number_of_trials=31)
 ```
 
-We can visualize the learning curves of all configuration that we evaluated. Most
-of the configurations are stopped early and only the better performing
+We can visualize the learning curves of all configuration that we evaluated.
+Most of the configurations are stopped early and only the better performing
 configurations survive until $r_{max}$. Compare this to vanilla random search
 which would allocate $r_{max}$ to every configuration.
 
@@ -222,10 +226,11 @@ which would allocate $r_{max}$ to every configuration.
 for rung_index, rung in scheduler.observed_error_at_rungs.items():
     errors = [xi[1] for xi in rung]   
     d2l.plt.scatter([rung_index] * len(errors), errors)
-
 d2l.plt.xlim(min_number_of_epochs - 0.5, max_number_of_epochs + 0.5)
-d2l.plt.xticks(np.arange(min_number_of_epochs, max_number_of_epochs+1),
-               np.arange(min_number_of_epochs, max_number_of_epo
+d2l.plt.xticks(
+    np.arange(min_number_of_epochs, max_number_of_epochs + 1),
+    np.arange(min_number_of_epochs, max_number_of_epochs + 1)
+)
 d2l.plt.ylabel('validation error')
 d2l.plt.xlabel('epochs')        
 ```
@@ -291,9 +296,9 @@ class HyperbandScheduler(d2l.HPOScheduler):  #@save
         return self.successive_halving.suggest()        
 ```
 
-The update function keeps track of the individual brackets. Once we finished a bracket,
-we move on to the next, i.e. re-initialize Successive Halving with different $r_{min}$
-and $s$.
+The update function keeps track of the individual brackets. Once we finished a
+bracket, we move on to the next, i.e. re-initialize Successive Halving with
+different $r_{min}$ and $s$.
 
 ```{.python .input  n=9}
 %%tab all
@@ -326,7 +331,10 @@ scheduler = HyperbandScheduler(
     r_min=min_number_of_epochs,
     r_max=max_number_of_epochs
 )
-tuner = d2l.HPOTuner(scheduler=scheduler, objective=d2l.objective)
+tuner = d2l.HPOTuner(
+    scheduler=scheduler,
+    objective=d2l.hpo_objective_lenet,
+)
 tuner.run(number_of_trials=50)
 ```
 
@@ -337,18 +345,15 @@ for bi, bracket in scheduler.brackets.items():
     rung_levels = [xi[0] for xi in bracket]
     errors = [xi[1] for xi in bracket]
     d2l.plt.scatter(rung_levels, errors)
-
-    d2l.plt.xlim(min_number_of_epochs-0.5, max_number_of_epochs+0.5)
-    d2l.plt.xticks(
-        np.arange(min_number_of_epochs, max_number_of_epochs+1),
-        np.arange(min_number_of_epochs, max_number_of_epochs+1)
-    )
-
-    d2l.plt.title(f'bracket s={bi}')
-    d2l.plt.ylabel('objective function')
-    d2l.plt.xlabel('epochs')        
-    d2l.plt.show()
-
+d2l.plt.xlim(min_number_of_epochs - 0.5, max_number_of_epochs + 0.5)
+d2l.plt.xticks(
+    np.arange(min_number_of_epochs, max_number_of_epochs + 1),
+    np.arange(min_number_of_epochs, max_number_of_epochs + 1)
+)
+d2l.plt.title(f'bracket s={bi}')
+d2l.plt.ylabel('objective function')
+d2l.plt.xlabel('epochs')        
+d2l.plt.show()
 ```
 
 ## Summary
