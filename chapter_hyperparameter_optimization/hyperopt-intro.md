@@ -137,7 +137,7 @@ model for `max_epochs` epochs, then compute and return its validation error:
 
 ```{.python .input  n=5}
 %%tab all
-def hpo_objective_softmax_classification(config, max_epochs=10):
+def hpo_objective_softmax_classification(config, max_epochs=8):
     learning_rate = config["learning_rate"]
     trainer = d2l.HPOTrainer(max_epochs=max_epochs)
     data = d2l.FashionMNIST(batch_size=16)
@@ -212,11 +212,13 @@ configuration. All evaluations can be executed independently in parallel (see
 
 ```{.python .input  n=7}
 errors, values = [], []
-num_iterations = 10
+num_iterations = 5
 
-for _ in range(num_iterations):
+for i in range(num_iterations):
     learning_rate = config_space["learning_rate"].rvs()
+    print(f"Trial {i}: learning_rate = {learning_rate}")
     y = hpo_objective_softmax_classification({"learning_rate": learning_rate})
+    print(f"    validation_error = {y}")
     values.append(learning_rate)
     errors.append(y)
 ```

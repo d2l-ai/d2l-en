@@ -123,15 +123,17 @@ class HPOTuner(d2l.HyperParameters):  #@save
         self.incumbent_trajectory = []
         self.cumulative_runtime = []
         self.current_runtime = 0
-        
+
     def run(self, number_of_trials):
-        for _ in range(number_of_trials):
+        for i in range(number_of_trials):
             start_time = time.time()
             config = self.scheduler.suggest()
+            print(f"Trial {i}: config = {config}")
             error = self.objective(**config)
             self.scheduler.update(config, error)
             runtime = time.time() - start_time
-            self.bookkeeping(config, d2l.numpy(error.cpu()), runtime)        
+            self.bookkeeping(config, d2l.numpy(error.cpu()), runtime)
+            print(f"    error = {error}, runtime = {runtime}")
 ```
 
 ### Bookkeeping the Performance of HPO Algorithms
