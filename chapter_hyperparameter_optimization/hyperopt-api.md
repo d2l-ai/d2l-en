@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['pytorch'])
+tab.interact_select(["pytorch"])
 ```
 
 # Hyperparameter Optimization API
@@ -202,11 +202,11 @@ Below we plot the optimization trajectory of the incumbent to get the any-time
 performance of random search:
 
 ```{.python .input  n=11}
-board = d2l.ProgressBoard(xlabel='time', ylabel='error')
+board = d2l.ProgressBoard(xlabel="time", ylabel="error")
 for time_stamp, error in zip(
     tuner.cumulative_runtime, tuner.incumbent_trajectory
 ):
-    board.draw(time_stamp, error, 'random search', every_n=1)
+    board.draw(time_stamp, error, "random search", every_n=1)
 ```
 
 ## Comparing HPO Algorithms

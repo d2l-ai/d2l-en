@@ -132,7 +132,7 @@ def suggest(self):
         n0 = int(self.prefact * self.eta ** self.K)
         for _ in range(n0):
             config = searcher.sample_configuration()
-            config['max_epochs'] = self.r_min  # set r = r_min
+            config["max_epochs"] = self.r_min  # set r = r_min
             self.queue.append(config)
     # Return an element from the queue
     return self.queue.pop()
@@ -147,7 +147,7 @@ configurations into the queue.
 %%tab all
 @d2l.add_to_class(SuccessiveHalvingScheduler)  #@save
 def update(self, config, error, info=None):
-    ri = config['max_epochs']  # Rung r_i
+    ri = config["max_epochs"]  # Rung r_i
     # Update our searcher, e.g if we use Bayesian optimization later
     self.searcher.update(config, error, additional_info=info)     
     if ri < self.r_max:
@@ -231,8 +231,8 @@ d2l.plt.xticks(
     np.arange(min_number_of_epochs, max_number_of_epochs + 1),
     np.arange(min_number_of_epochs, max_number_of_epochs + 1)
 )
-d2l.plt.ylabel('validation error')
-d2l.plt.xlabel('epochs')        
+d2l.plt.ylabel("validation error")
+d2l.plt.xlabel("epochs")        
 ```
 
 Finally, note some slight complexity in our implementation of
@@ -304,7 +304,7 @@ different $r_{min}$ and $s$.
 %%tab all
 @d2l.add_to_class(HyperbandScheduler)  #@save
 def update(self, config, error, info=None):
-    self.brackets[self.s].append((config['max_epochs'], d2l.numpy(error.cpu())))
+    self.brackets[self.s].append((config["max_epochs"], d2l.numpy(error.cpu())))
     self.successive_halving.update(config, error, info=info)
     # If the queue of successive halving is empty, than we finished this round
     # and start with a new round with different r_min and N
@@ -350,9 +350,9 @@ d2l.plt.xticks(
     np.arange(min_number_of_epochs, max_number_of_epochs + 1),
     np.arange(min_number_of_epochs, max_number_of_epochs + 1)
 )
-d2l.plt.title(f'bracket s={bi}')
-d2l.plt.ylabel('objective function')
-d2l.plt.xlabel('epochs')        
+d2l.plt.title(f"bracket s={bi}")
+d2l.plt.ylabel("objective function")
+d2l.plt.xlabel("epochs")        
 d2l.plt.show()
 ```
 

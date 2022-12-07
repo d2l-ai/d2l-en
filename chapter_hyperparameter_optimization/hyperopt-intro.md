@@ -1,9 +1,9 @@
 ```{.python .input  n=2}
 %load_ext d2lbook.tab
-tab.interact_select(['pytorch'])
+tab.interact_select(["pytorch"])
 ```
 
-# What is Hyperparameter Optimization?
+# What Is Hyperparameter Optimization?
 :label:`sec_what_is_hpo`
 
 As we have seen in the previous chapters, deep neural networks come with a
@@ -138,7 +138,7 @@ model for `max_epochs` epochs, then compute and return its validation error:
 ```{.python .input  n=5}
 %%tab all
 def hpo_objective_softmax_classification(config, max_epochs=10):
-    learning_rate = config['learning_rate']
+    learning_rate = config["learning_rate"]
     trainer = d2l.HPOTrainer(max_epochs=max_epochs)
     data = d2l.FashionMNIST(batch_size=16)
     model = d2l.SoftmaxRegression(num_outputs=10, lr=learning_rate)
@@ -181,7 +181,7 @@ ranges.
 | learning rate       | float       | $[10^{-6},10^{-1}]$ | log10 |
 | batch size          | integer     | $[8,256]$           | log2  |
 | momentum            | float       | $[0,0.99]$           | -  |
-| activation function | categorical | $\{'tanh', 'relu'\}$ | - |
+| activation function | categorical | $\{"tanh", "relu"\}$ | - |
 | number of units     | integer     | $[32, 1024]$         | log2  |
 | number of layers    | integer     | $[1, 6]$             | - |
 :label:`tab_example_configspace`
@@ -215,8 +215,8 @@ errors, values = [], []
 num_iterations = 10
 
 for _ in range(num_iterations):
-    learning_rate = config_space['learning_rate'].rvs()
-    y = hpo_objective_softmax_classification({'learning_rate': learning_rate})
+    learning_rate = config_space["learning_rate"].rvs()
+    y = hpo_objective_softmax_classification({"learning_rate": learning_rate})
     values.append(learning_rate)
     errors.append(y)
 ```
@@ -225,7 +225,7 @@ The best learning rate is then simply the one with the lowest validation error.
 
 ```{.python .input  n=7}
 best_idx = np.argmin(errors)
-print(f'optimal learning rate = {values[best_idx]}')
+print(f"optimal learning rate = {values[best_idx]}")
 ```
 
 Arguably because of its simplicity, random search is one of the most frequently

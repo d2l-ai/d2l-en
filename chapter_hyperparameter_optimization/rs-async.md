@@ -80,6 +80,9 @@ def hpo_objective_lenet_synetune(learning_rate, batch_size, max_epochs):
         report(epoch=epoch, validation_error=float(validation_error))
 ```
 
+Note that the `PythonBackend` of Syne Tune requires dependencies to be imported
+inside the function definition.
+
 ## Asynchronous Scheduler
 
 First, we define the number of workers that evaluate trials concurrently. We
@@ -174,16 +177,16 @@ of workers is reduced to a minimum with asynchronous scheduling.
 results = tuning_experiment.results
 
 for trial_id in results.trial_id.unique():
-    df = results[results['trial_id'] == trial_id]
+    df = results[results["trial_id"] == trial_id]
     plt.plot(
-        df['st_tuner_time'],
-        df['validation_error'],
-        marker='o',
-        label=f'trial {trial_id}',
+        df["st_tuner_time"],
+        df["validation_error"],
+        marker="o",
+        label=f"trial {trial_id}",
     )
     
-plt.xlabel('wall-clock time')
-plt.ylabel('objective function')
+plt.xlabel("wall-clock time")
+plt.ylabel("objective function")
 plt.legend()
 ```
 

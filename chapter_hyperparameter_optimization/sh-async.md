@@ -30,14 +30,14 @@ for four different trials with two workers. We start with evaluating Trial-0 and
 Trial-1 for one epoch and immediately continue with the next two trials once they
 are finished. Now, we first have to wait until Trial-2 finishes, which takes
 substantially more time than the other trials, before we can promote the best two
-trials, i.e. Trial-0 and Trial-3 to the next rung level. This causes idle time for
+trials, i.e., Trial-0 and Trial-3 to the next rung level. This causes idle time for
 Worker-1. Now, we continue with Rung 1. Also, here Trial-3 takes longer than Trial-0,
 which leads to an additional ideling time of Worker-0. Once, we reach Rung-2, only
 the best trial, Trial-0, remains which occupies only one worker. To avoid that
 Worker-1 idles during that time, most implementaitons of SH continue already with
 the next round, and start evaluating new trials (e.g Trial-4) on the first rung.
 
-![.](img/sync_sh.svg)
+![Synchronous successive halving with two workers.](img/sync_sh.svg)
 :label:`synchronous_sh`
 
 Asynchronous successive halving (ASHA) :cite:`li-arxiv18` adapts SH to the asynchronous
