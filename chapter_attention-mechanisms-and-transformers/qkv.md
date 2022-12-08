@@ -3,7 +3,7 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-# Queries, and Keys, Values
+# Queries, Keys, and Values
 :label:`sec_qkv`
 
 So far all the networks we reviewed crucially relied on the input being of a well-defined size. For instance, the images in ImageNet are of size $224 \times 224$ pixels and CNNs are specifically tuned to this size. Even in natural language processing the input size for RNNs is well defined and fixed. Variable size is addressed by sequentially processing one token at a time, or by specially designed convolution kernels :cite:`Kalchbrenner.Grefenstette.Blunsom.2014`. This approach can lead to significant problems when the input is truly of varying size with varying information content, such as in :numref:`sec_seq2seq` to transform text :cite:`Sutskever.Vinyals.Le.2014`. In particular, for long sequences it becomes quite difficult to keep track of everything that has already been generated or even viewed by the network. Even explicit tracking heuristics such as :citet:`yang2016neural` only offer limited benefit. 
@@ -15,9 +15,10 @@ Compare this to databases. In their simplest form they are collections of keys (
 * The "code" being executed to operate on a large state space (the database) can be quite simple (e.g., exact match, approximate match, top-$k$). 
 * There is no need to compress or simplify the database to make the operations effective. 
 
-Clearly we wouldn't have introduced a simple database here if it wasn't for the purpose of explaining deep learning. Indeed, this leads to one of the most exciting concepts arguably introduced in deep learning in the past decade: the attention mechanism :cite:`Bahdanau.Cho.Bengio.2014`. We will cover the specifics of its application to machine translation later. For now, simply consider the following: denote by $\mathcal{D} \stackrel{\mathrm{def}}{=} \{(\mathbf{k}_1, \mathbf{v}_1), \ldots (\mathbf{k}_m, \mathbf{v}_m)\}$ a database of $m$ tuples of keys and values. Moreover, denote by $\mathbf{q}$ a query. Then we can define the attention over $\mathcal{D}$ as
+Clearly we wouldn't have introduced a simple database here if it wasn't for the purpose of explaining deep learning. Indeed, this leads to one of the most exciting concepts arguably introduced in deep learning in the past decade: the *attention mechanism* :cite:`Bahdanau.Cho.Bengio.2014`. We will cover the specifics of its application to machine translation later. For now, simply consider the following: denote by $\mathcal{D} \stackrel{\mathrm{def}}{=} \{(\mathbf{k}_1, \mathbf{v}_1), \ldots (\mathbf{k}_m, \mathbf{v}_m)\}$ a database of $m$ tuples of *keys* and *values*. Moreover, denote by $\mathbf{q}$ a *query*. Then we can define the *attention* over $\mathcal{D}$ as
 
 $$\mathop{\mathrm{Attention}}(\mathbf{q}, \mathcal{D}) \stackrel{\mathrm{def}}{=} \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i,$$
+:eqlabel:`eq_attention_pooling`
 
 where $\alpha(\mathbf{q}, \mathbf{k}_i) \in \mathbb{R}$ ($i = 1, \ldots, m$) are scalar attention weights. The operation itself is typically referred to as *attention pooling*. The name *attention* derives from the fact that the operation pays particular attention to the terms for which the weight $\alpha$ is significant (i.e., large). As such, the attention over $\mathcal{D}$ generates a linear combination of values contained in the database. In fact, this contains the above example as a special case where all but one weight is zero. We have a number of special cases:
 
