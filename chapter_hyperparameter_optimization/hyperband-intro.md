@@ -7,50 +7,48 @@ tab.interact_select(["pytorch"])
 :label:`sec_mf_hpo`
 
 Training neural networks can be expensive even on moderate size datasets.
-Depending on the search space, hyperparameter optimization usually
-requires tens to hundreds of function evaluations to find a well-performing
-hyperparameter configuration. Even if a single training run takes only an hour,
-we might have to wait several days for HPO to complete. As we have seen in the
+Depending on the configuration space (:numref:`sec_intro_config_spaces`),
+hyperparameter optimization requires tens to hundreds of function evaluations
+to find a well-performing hyperparameter configuration. As we have seen in
 :numref:`sec_rs_async`, we can significantly speed up the overall wall-clock
-time of our HPO process by exploiting parallel resources, however, this does
-not reduce the total amount of compute that we have to spend. 
+time of HPO by exploiting parallel resources, but this does not reduce the total
+amount of compute required.
 
-*Can we speed up the evaluation of hyperparameter configurations?* Methods such
-as random search allocate the exact same amount or resources (e.g., number
-of epochs, training data points) to each hyperparameter configuration.
-:numref:`img_samples_ls`  depicts learning curves of a set of neural networks
-trained with different hyperparameter configurations. After a few epochs we are
-already able to visually distinguish between well-performing and poorly-performing
-configurations. However, learning curves are noisy, and we might still require
-the full amount of 100 epochs to identify the best performing configuration.
+In this section, we will show how the evaluation of hyperparameter configurations
+can be sped up. Methods such as random search allocate the same amount of
+resources (e.g., number of epochs, training data points) to each hyperparameter
+evaluation. :numref:`img_samples_ls`  depicts learning curves of a set of neural
+networks trained with different hyperparameter configurations. After a few epochs we are
+already able to visually distinguish between well-performing and suboptimal
+configurations. However, the learning curves are noisy, and we might still require
+the full amount of 100 epochs to identify the best performing one.
 
 ![Learning curves of random hyperparameter configurations](img/samples_lc.svg)
 :label:`img_samples_lc`
 
-The idea of multi-fidelity hyperparameter optimization is to allocate more resources
+Multi-fidelity hyperparameter optimization allocates more resources
 to promising configurations and stop evaluations of poorly performing ones early.
-This speeds up the optimization process, since we have a higher throughput of
-configurations that we can try.
+This speeds up the optimization process, since we can try a larger number of
+configurations for the same total amount of resources.
 
 More formally, we expand our definition in :numref:`sec_definition_hpo`,
 such that our objective function $f(\mathbf{x}, r)$ gets an additional input
-$r \in [r_{min}, r_{max}]$, specifying the amount of resource that we are
-willing to spend for the evaluation of $\mathbf{x}$. We assume that the
-error $f(\mathbf{x}, r)$ decreases with $r$, whereas the computational
-cost $c(\mathbf{x}, r)$ increases (the latter should be affine linear
-in $r$). Typically, $r$ represents the number of epochs for training the neural
-network. But also other resources are possible, such as the training dataset
-size or the number of cross-validation folds.
+$r \in [r_{min}, r_{max}]$, specifying the amount of resources that we are
+willing to spend for the evaluation of configuration $\mathbf{x}$. We assume that
+the error $f(\mathbf{x}, r)$ decreases with $r$, whereas the computational
+cost $c(\mathbf{x}, r)$ increases. Typically, $r$ represents the number of
+epochs for training the neural network, but it could also be the training
+subset size or the number of cross-validation folds.
 
 ## Successive Halving
 
 One of the simplest ways to adapt random search to the multi-fidelity setting is
 *successive halving* :cite:`jamieson-aistats16,karnin-icml13`. The basic
 idea is to start with $N$ configurations, for example randomly sampled from the
-configuration space, and to train each of them for $r_{min}$ epochs only (e.g.,
-$r_{min} = 1$). We then discard a fraction of the worst performing trials and
-train the remaining ones for longer. Iterating this process, fewer trials run for
-longer, until at least one trial reaches $r_{max}$ epochs.
+configuration space, and to train each of them for $r_{min}$ epochs only. We
+then discard a fraction of the worst performing trials and train the remaining
+ones for longer. Iterating this process, fewer trials run for longer, until at
+least one trial reaches $r_{max}$ epochs.
 
 More formally, consider a minimum budget $r_{min}$, for example 1 epoch, a maximum
 budget $r_{max}$, for example `max_epochs` in our previous example, and a halving

@@ -16,7 +16,7 @@ begs the question: *How do we efficiently distribute random search?*
 In general, we distinguish between synchronous and asynchronous parallel
 hyperparameter optimization (see :numref:`distributed_scheduling`). In the
 synchronous setting, we wait for all concurrently running trials to finish,
-before we start the next batch. Consider search spaces that contain
+before we start the next batch. Consider configuration spaces that contain
 hyperparameters such as the number of filters or number of layers of a deep
 neural network. Hyperparameter configurations that contain a larger number of 
 layers of filters will naturally take more time to finish, and all other trials
@@ -53,6 +53,8 @@ First, we have to define a new objective function such that it now returns the
 performance back to Syne Tune via the `report` callback.
 
 ```{.python .input  n=34}
+import logging
+logging.basicConfig(level=logging.INFO)
 import matplotlib.pyplot as plt
 
 from syne_tune.config_space import loguniform, randint
