@@ -328,7 +328,7 @@ def update(self, config: dict, error: float, info=None):
 Let see how Hyperband performs on our neural network example.
 
 ```{.python .input  n=21}
-searcher = d2l.RandomSearcher(search_space)
+searcher = d2l.RandomSearcher(config_space, initial_config=initial_config)
 scheduler = HyperbandScheduler(
     searcher=searcher,
     eta=2,
