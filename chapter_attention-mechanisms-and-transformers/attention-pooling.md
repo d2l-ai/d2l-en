@@ -91,7 +91,10 @@ names = ('Gaussian', 'Boxcar', 'Constant', 'Epanechikov')
 
 x = d2l.arange(-2.5, 2.5, 0.1)
 for kernel, name, ax in zip(kernels, names, axes):
-    ax.plot(d2l.numpy(x), d2l.numpy(kernel(x)));
+    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+        ax.plot(d2l.numpy(x), d2l.numpy(kernel(x)))
+    if tab.selected('jax'):
+        ax.plot(x, kernel(x))
     ax.set_xlabel(name)
 ```
 
