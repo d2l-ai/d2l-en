@@ -212,10 +212,8 @@ masked_softmax(tf.random.uniform((2, 2, 4)), tf.constant([[1, 3], [2, 4]]))
 
 Another commonly used operation is to multiply batches of matrices with another. This comes in handy when we have minibatches of queries, keys, and values. More specifically, assume that 
 
-$$\begin{aligned}
-    \mathbf{Q} & = [\mathbf{Q}_1, \mathbf{Q}_2, \ldots, \mathbf{Q}_n] & \in \mathbb{R}^{n \times a \times b} \\
-    \mathbf{K} & = [\mathbf{K}_1, \mathbf{K}_2, \ldots, \mathbf{K}_n] & \in \mathbb{R}^{n \times b \times c} 
-\end{aligned}
+$$\mathbf{Q} = [\mathbf{Q}_1, \mathbf{Q}_2, \ldots, \mathbf{Q}_n]  \in \mathbb{R}^{n \times a \times b} \\
+    \mathbf{K} = [\mathbf{K}_1, \mathbf{K}_2, \ldots, \mathbf{K}_n]  \in \mathbb{R}^{n \times b \times c} 
 $$
 
 Then the batch matrix multiplication (BMM) computes the element-wise product
