@@ -43,7 +43,7 @@ Note that attention weights $\alpha$ still need normalizing. We can simplify thi
 $$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i)) = \frac{\exp(\mathbf{q}^\top \mathbf{k}_i / \sqrt{d})}{\sum_{j=1} \exp(\mathbf{q}^\top \mathbf{k}_j / \sqrt{d})}.$$
 :eqlabel:`eq_attn-scoring-alpha`
 
-As it turns out, all popular attention mechanisms use the softmax, hence we will limit ourselves to that in the remainder of this chapter. 
+As it turns out, all popular attention mechanisms use the softmax, hence we will limit ourselves to that in the remainder of this chapter.
 
 ```{.python .input  n=3}
 %%tab mxnet
@@ -70,12 +70,12 @@ import tensorflow as tf
 
 ## Convenience Functions
 
-We need a number of functions to make the attention mechanism efficient to deploy. This includes tools to deal with variable lenghts of strings (common for natural language processing) and tools for efficient evaluation on minibatches (batch matrix multiplication). 
+We need a few functions to make the attention mechanism efficient to deploy. This includes tools to deal with strings of variable lengths (common for natural language processing) and tools for efficient evaluation on minibatches (batch matrix multiplication). 
 
 
 ### [**Masked Softmax Operation**]
 
-One of the most popular applications of the attention mechanism is to sequence models. Hence we need to be able to deal with sequences of different length. In some cases, such sequences may end up in the same minibatch, necessitating padding with dummy tokens for shorter sequences (see :numref:`sec_machine_translation` for an example). These special tokens do not carry meaning. For instance, assume that we have the following three sentences:
+One of the most popular applications of the attention mechanism is to sequence models. Hence we need to be able to deal with sequences of different lengths. In some cases, such sequences may end up in the same minibatch, necessitating padding with dummy tokens for shorter sequences (see :numref:`sec_machine_translation` for an example). These special tokens do not carry meaning. For instance, assume that we have the following three sentences:
 
 ```
 Dive  into  Deep    Learning 
@@ -84,7 +84,9 @@ Hello world <blank> <blank>
 ```
 
 
-Since we don't want blanks in our attention model we simply need to limit the sum $\sum_{i=1}^n \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i$ to $\sum_{i=1}^l \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i$ for however long $l \leq n$ the actual sentence is. Since it's such a common problem it has a name: the *masked softmax operation*. Let's implement it. Actually, the implementation cheats ever so slightly by setting the values to zero $\mathbf{v}_i = 0$ for $i > l$. Moreover, it sets the attention weights to a large negative number, such as $10^{-6}$ in order to make their contribution to gradients and values vanish in practice. This is done since linear algebra kernels and operators are heavily optimized for GPUs and it is faster to be slightly wasteful in computation rather than to have code with conditional (if then else) statements.
+Since we don't want blanks in our attention model we simply need to limit the sum $\sum_{i=1}^n \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i$ to $\sum_{i=1}^l \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i$ for however long $l \leq n$ the actual sentence is. Since it is such a common problem, it has a name: the *masked softmax operation*. 
+
+Let's implement it. Actually, the implementation cheats ever so slightly by setting the values to zero $\mathbf{v}_i = 0$ for $i > l$. Moreover, it sets the attention weights to a large negative number, such as $-10^{6}$ in order to make their contribution to gradients and values vanish in practice. This is done since linear algebra kernels and operators are heavily optimized for GPUs and it is faster to be slightly wasteful in computation rather than to have code with conditional (if then else) statements.
 
 ```{.python .input  n=6}
 %%tab mxnet
@@ -168,7 +170,7 @@ def masked_softmax(X, valid_lens):
 
 To [**illustrate how this function works**],
 consider a minibatch of two examples of size $2 \times 4$,
-where their valid lengths are 2 and 3, respectively. 
+where their valid lengths are $2$ and $3$, respectively. 
 As a result of the masked softmax operation,
 values beyond the valid lengths for each pair of vectors are all masked as zero.
 
@@ -208,18 +210,18 @@ masked_softmax(tf.random.uniform((2, 2, 4)), tf.constant([[1, 3], [2, 4]]))
 ### Batch Matrix Multiplication
 :label:`subsec_batch_dot`
 
-Another commonly used operation is to multiply batches of matrices with another. This comes in handy when we have multiple sets of attention, minibatches of sequences, etc.; More specifically, assume that 
+Another commonly used operation is to multiply batches of matrices with another. This comes in handy when we have minibatches of queries, keys, and values. More specifically, assume that 
 
 $$\begin{aligned}
-    \mathbf{Q} & = [\mathbf{Q}_1, \mathbf{Q}_2, \ldots, \mathbf{Q}_n] & \in \mathbb{R}^{n \cdot a \cdot b} \\
-    \mathbf{K} & = [\mathbf{K}_1, \mathbf{K}_2, \ldots, \mathbf{K}_n] & \in \mathbb{R}^{n \cdot b \cdot c} 
+    \mathbf{Q} & = [\mathbf{Q}_1, \mathbf{Q}_2, \ldots, \mathbf{Q}_n] & \in \mathbb{R}^{n \times a \times b} \\
+    \mathbf{K} & = [\mathbf{K}_1, \mathbf{K}_2, \ldots, \mathbf{K}_n] & \in \mathbb{R}^{n \times b \times c} 
 \end{aligned}
 $$
 
-Then the BMM computes the element-wise product
+Then the batch matrix multiplication (BMM) computes the element-wise product
 
 $$
-\mathrm{BMM}(\mathbf{Q}, \mathbf{K}) = [\mathbf{Q}_1 \mathbf{K}_1, \mathbf{Q}_2 \mathbf{K}_2, \ldots, \mathbf{Q}_n \mathbf{K}_n] \in \mathbb{R}^{n \cdot a \cdot c}.
+\mathrm{BMM}(\mathbf{Q}, \mathbf{K}) = [\mathbf{Q}_1 \mathbf{K}_1, \mathbf{Q}_2 \mathbf{K}_2, \ldots, \mathbf{Q}_n \mathbf{K}_n] \in \mathbb{R}^{n \times a \times c}.
 $$
 
 Let's see this in action in a deep learning framework.
