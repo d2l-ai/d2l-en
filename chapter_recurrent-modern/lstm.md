@@ -215,7 +215,7 @@ we first load *The Time Machine* dataset.
 
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 ```{.python .input}
@@ -312,7 +312,6 @@ class LSTMScratch(d2l.Module):
 consisting of three gates and an input node. 
 Note that only the hidden state is passed to the output layer.
 :end_tab:
-
 
 :begin_tab:`jax`
 [**The actual model**] is defined as described above,

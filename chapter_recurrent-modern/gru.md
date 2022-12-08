@@ -136,7 +136,7 @@ To gain a better understanding of the GRU model, let's implement it from scratch
 
 ```{.python .input  n=5}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 ```{.python .input  n=6}
