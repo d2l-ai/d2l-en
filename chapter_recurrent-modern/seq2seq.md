@@ -543,25 +543,6 @@ if tab.selected('tensorflow'):
     d2l.check_shape(state[0], (batch_size, num_hiddens))
 ```
 
-```{.python .input}
-%%tab all
-decoder = Seq2SeqDecoder(vocab_size, embed_size, num_hiddens, num_layers)
-if tab.selected('mxnet', 'pytorch', 'tensorflow'):
-    state = decoder.init_state(encoder(X))
-    outputs, state = decoder(X, state)
-if tab.selected('jax'):
-    state = decoder.init_state(encoder.init_with_output(d2l.get_key(), X)[0])
-    (outputs, state), _ = decoder.init_with_output(d2l.get_key(), X, state)
-
-
-d2l.check_shape(outputs, (batch_size, num_steps, vocab_size))
-if tab.selected('mxnet', 'pytorch', 'jax'):
-    d2l.check_shape(state, (num_layers, batch_size, num_hiddens))
-if tab.selected('tensorflow'):
-    d2l.check_len(state, num_layers)
-    d2l.check_shape(state[0], (batch_size, num_hiddens))
-```
-
 To summarize, the layers in the above RNN encoder-decoder model 
 are illustrated in :numref:`fig_seq2seq_details`.
 
@@ -667,31 +648,7 @@ Now we can [**create and train an RNN encoder-decoder model**]
 for sequence to sequence learning on the machine translation dataset.
 
 ```{.python .input}
-%%tab pytorch, tensorflow, mxnet
-data = d2l.MTFraEng(batch_size=128, num_steps=10)
-embed_size, num_hiddens, num_layers, dropout = 128, 128, 2, 0.2
-if tab.selected('mxnet', 'pytorch', 'jax'):
-    encoder = Seq2SeqEncoder(
-        len(data.src_vocab), embed_size, num_hiddens, num_layers, dropout)
-    decoder = Seq2SeqDecoder(
-        len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
-    model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
-                    lr=0.01)
-    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
-if tab.selected('tensorflow'):
-    with d2l.try_gpu():
-        encoder = Seq2SeqEncoder(
-            len(data.src_vocab), embed_size, num_hiddens, num_layers, dropout)
-        decoder = Seq2SeqDecoder(
-            len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
-        model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
-                        lr=0.001)
-    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1)
-trainer.fit(model, data)
-```
-
-```{.python .input}
-%%tab jax
+%%tab all
 data = d2l.MTFraEng(batch_size=128) 
 embed_size, num_hiddens, num_layers, dropout = 256, 256, 2, 0.2
 if tab.selected('mxnet', 'pytorch', 'jax'):
@@ -705,7 +662,6 @@ if tab.selected('mxnet', 'pytorch'):
 if tab.selected('jax'):
     model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
                     lr=0.001, training=True)
-    trainer = d2l.Trainer(max_epochs=70, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
         encoder = Seq2SeqEncoder(
@@ -714,7 +670,7 @@ if tab.selected('tensorflow'):
             len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
         model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
                         lr=0.001)
-    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1)
+trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
 trainer.fit(model, data)
 ```
 
