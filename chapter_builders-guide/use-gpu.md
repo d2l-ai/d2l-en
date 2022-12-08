@@ -513,8 +513,8 @@ with strategy.scope():
 net = nn.Sequential([nn.Dense(1)])
 
 key1, key2 = jax.random.split(jax.random.PRNGKey(0))
-x = jax.random.normal(key1, (10,)) # Dummy input
-params = net.init(key2, x) # Initialization call
+x = jax.random.normal(key1, (10,))  # Dummy input
+params = net.init(key2, x)  # Initialization call
 ```
 
 We will see many more examples of

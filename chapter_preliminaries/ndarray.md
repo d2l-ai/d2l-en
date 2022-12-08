@@ -319,7 +319,7 @@ tf.random.normal(shape=[3, 4])
 
 ```{.python .input}
 %%tab jax
-# any call of a random function in JAX requires a key to be 
+# Any call of a random function in JAX requires a key to be
 # specified, feeding the same key to a random function will
 # always result in the same sample being generated
 jax.random.normal(jax.random.PRNGKey(0), (3, 4))
@@ -406,9 +406,9 @@ X_var
 
 ```{.python .input}
 %%tab jax
-# JAX arrays are immutable
-# `jax.numpy.ndarray.at` index update operators create
-# a new array with the corresponding modifications made
+# JAX arrays are immutable. `jax.numpy.ndarray.at` index
+# update operators create a new array with the corresponding
+# modifications made
 X_new_1 = X.at[1, 2].set(17)
 X_new_1
 ```

@@ -138,7 +138,8 @@ Recall attention pooling in :eqref:`eq_attention_pooling`. Let each validation f
 %%tab all
 def nadaraya_watson(x_train, y_train, x_val, kernel):
     dists = d2l.reshape(x_train, (-1, 1)) - d2l.reshape(x_val, (1, -1))
-    k = d2l.astype(kernel(dists), d2l.float32)  # Each column/row corresponds to each query/key
+    # Each column/row corresponds to each query/key
+    k = d2l.astype(kernel(dists), d2l.float32)
     attention_w = k / d2l.reduce_sum(k, 0)  # Normalization over keys for each query
     if tab.selected('pytorch'):
         y_hat = y_train@attention_w
