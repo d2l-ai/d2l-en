@@ -111,8 +111,8 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):  #@save
 
 In the beginning our queue is empty, and we fill it with
 $n = \mathrm{prefact} * \eta^{K}$ configurations, which are first evaluated on
-the smallest rung $r_{min}$. The effect of $\mathrm{prefact}$ will become
-important below, when we introduce Hyperband. For now, we set
+the smallest rung $r_{min}$. Here, $\mathrm{prefact}$ allows us to reuse our
+code in a different context. For the purpose of this section, we fix
 $\mathrm{prefact} = 1$. Every time resources become available and the `HPOTuner`
 object queries the `suggest` function, we return an element from the queue. Once
 we finish one round of successive halving, which means that we evaluated all
@@ -263,7 +263,7 @@ epochs of training as proxy to validation error after the full number of epochs.
 Multi-fidelity hyperparameter optimization allows to reduce the overall
 computation of the HPO instead of just reducing the wall-clock time.
 
-Arguably the simplest method for multi-fidelity hyperparameter optimization is
-successive halving, which is based on random search.
+We implemented and evaluated successive halving, a simple yet efficient
+multi-fidelity HPO algorithm.
 
 ## Exercises

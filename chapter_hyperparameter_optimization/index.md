@@ -30,6 +30,5 @@ hyperopt-intro
 hyperopt-api
 rs-async.md
 sh-intro
-hyperband-intro
 sh-async
 ```
