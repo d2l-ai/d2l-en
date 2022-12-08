@@ -30,7 +30,7 @@ might hurt the generalization performance.
 
 Without a different form of automation, hyperparameters have to be set manually
 in a trial-and-error fashion, in what amounts to a time-consuming and difficult
-part of machine learning workflows :cite:`feurer-automlbook18`. For example, consider training
+part of machine learning workflows. For example, consider training
 a ResNet (see :numref:`sec_resnet`) on CIFAR-10, which requires more than 2 hours
 on an Amazon Elastic Cloud Compute (EC2) `g4dn.xlarge` instance. Even just
 trying ten hyperparameter configurations in sequence, this would already take us
