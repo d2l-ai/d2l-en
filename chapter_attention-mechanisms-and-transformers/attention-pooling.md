@@ -30,6 +30,7 @@ from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
 
 npx.set_np()
+d2l.use_svg_display()
 ```
 
 ```{.python .input}
@@ -39,6 +40,8 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 import numpy as np
+
+d2l.use_svg_display()
 ```
 
 ```{.python .input}
@@ -46,6 +49,8 @@ import numpy as np
 from d2l import tensorflow as d2l
 import tensorflow as tf
 import numpy as np
+
+d2l.use_svg_display()
 ```
 
 ## [**Kernels and Data**]
@@ -54,8 +59,7 @@ All the kernels $\alpha(\mathbf{k}, \mathbf{q})$ defined in this section are *tr
 
 ```{.python .input}
 %%tab all
-d2l.set_figsize()
-fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize = (12, 3))
+fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize=(12, 3))
 
 # Define some kernels
 def gaussian(x):
