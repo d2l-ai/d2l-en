@@ -987,9 +987,9 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                   cmap='Reds'):
     """Show heatmaps of matrices.
 
-    Defined in :numref:`sec_attention-basics`"""
+    Defined in :numref:`sec_qkv`"""
     d2l.use_svg_display()
-    num_rows, num_cols = len(matrices), len(matrices[0])
+    num_rows, num_cols, _, _ = matrices.shape
     fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize,
                                  sharex=True, sharey=True, squeeze=False)
     for i, (row_axes, row_matrices) in enumerate(zip(axes, matrices)):
@@ -1022,41 +1022,10 @@ def masked_softmax(X, valid_lens):
                               value=-1e6, axis=1)
         return npx.softmax(X).reshape(shape)
 
-class AdditiveAttention(nn.Block):
-    """Additive attention.
-
-    Defined in :numref:`sec_attention-scoring-functions`"""
-    def __init__(self, num_hiddens, dropout, **kwargs):
-        super(AdditiveAttention, self).__init__(**kwargs)
-        # Use flatten=False to only transform the last axis so that the
-        # shapes for the other axes are kept the same
-        self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
-        self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)
-        self.w_v = nn.Dense(1, use_bias=False, flatten=False)
-        self.dropout = nn.Dropout(dropout)
-
-    def forward(self, queries, keys, values, valid_lens):
-        queries, keys = self.W_q(queries), self.W_k(keys)
-        # After dimension expansion, shape of queries: (batch_size, no. of
-        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1,
-        # no. of key-value pairs, num_hiddens). Sum them up with
-        # broadcasting
-        features = np.expand_dims(queries, axis=2) + np.expand_dims(
-            keys, axis=1)
-        features = np.tanh(features)
-        # There is only one output of self.w_v, so we remove the last
-        # one-dimensional entry from the shape. Shape of scores:
-        # (batch_size, no. of queries, no. of key-value pairs)
-        scores = np.squeeze(self.w_v(features), axis=-1)
-        self.attention_weights = masked_softmax(scores, valid_lens)
-        # Shape of values: (batch_size, no. of key-value pairs, value
-        # dimension)
-        return npx.batch_dot(self.dropout(self.attention_weights), values)
-
 class DotProductAttention(nn.Block):
     """Scaled dot product attention.
 
-    Defined in :numref:`subsec_additive-attention`"""
+    Defined in :numref:`subsec_batch_dot`"""
     def __init__(self, dropout, num_heads=None):
         super().__init__()
         self.dropout = nn.Dropout(dropout)
@@ -1083,6 +1052,37 @@ class DotProductAttention(nn.Block):
                 d2l.expand_dims(window_mask, 1), 0)
             scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
         self.attention_weights = masked_softmax(scores, valid_lens)
+        return npx.batch_dot(self.dropout(self.attention_weights), values)
+
+class AdditiveAttention(nn.Block):
+    """Additive attention.
+
+    Defined in :numref:`subsec_batch_dot`"""
+    def __init__(self, num_hiddens, dropout, **kwargs):
+        super(AdditiveAttention, self).__init__(**kwargs)
+        # Use flatten=False to only transform the last axis so that the
+        # shapes for the other axes are kept the same
+        self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.w_v = nn.Dense(1, use_bias=False, flatten=False)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, queries, keys, values, valid_lens):
+        queries, keys = self.W_q(queries), self.W_k(keys)
+        # After dimension expansion, shape of queries: (batch_size, no. of
+        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1,
+        # no. of key-value pairs, num_hiddens). Sum them up with
+        # broadcasting
+        features = np.expand_dims(queries, axis=2) + np.expand_dims(
+            keys, axis=1)
+        features = np.tanh(features)
+        # There is only one output of self.w_v, so we remove the last
+        # one-dimensional entry from the shape. Shape of scores:
+        # (batch_size, no. of queries, no. of key-value pairs)
+        scores = np.squeeze(self.w_v(features), axis=-1)
+        self.attention_weights = masked_softmax(scores, valid_lens)
+        # Shape of values: (batch_size, no. of key-value pairs, value
+        # dimension)
         return npx.batch_dot(self.dropout(self.attention_weights), values)
 
 class AttentionDecoder(d2l.Decoder):

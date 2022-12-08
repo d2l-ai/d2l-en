@@ -1,9 +1,9 @@
-# Attention by Similarity
+# Attention Pooling by Similarity
 
 :label:`sec_attention-pooling`
 
-Now that we introduced the primary components of the attention mechanism, let's use them in a rather classical setting, namely regression and classification using kernel density estimation :cite:`Watson.1964,Nadaraya.1964`. This detour is entirely optional and can be skipped if needed. It simply provides additional background.
-At their core, Watson Nadaraya estimators rely on some similarity kernel $\alpha(\mathbf{k}, \mathbf{q})$ relating queries $\mathbf{q}$ to keys $\mathbf{k}$. Some common kernels are
+Now that we introduced the primary components of the attention mechanism, let's use them in a rather classical setting, namely regression and classification using kernel density estimation :cite:`Nadaraya.1964,Watson.1964`. This detour is entirely optional and can be skipped if needed. It simply provides additional background.
+At their core, Nadaraya-Watson estimators rely on some similarity kernel $\alpha(\mathbf{k}, \mathbf{q})$ relating queries $\mathbf{q}$ to keys $\mathbf{k}$. Some common kernels are
 
 $$\begin{aligned}
 \alpha(\mathbf{k}, \mathbf{q}) & = \exp\left(\frac{1}{2} \|\mathbf{k} - \mathbf{q}\|^2 \right) && \mathrm{Gaussian} \\
@@ -101,7 +101,7 @@ x_test = d2l.arange(0, 5, 0.1)
 y_test = f(x_test)
 ```
 
-## [**Watson Nadaraya Regression**]
+## [**Nadaraya-Watson Regression**]
 
 Now that we have data and kernels, all we need is a function that computes the kernel regression estimates. Note that we also want to obtain the relative kernel weights, aka, the attention weights, in order to perform some minor diagnostics. Hence we first compute the kernel between all training covariates `x_train` and all test covariates `x_test`. This yields a matrix, which we subsequently normalize. When multiplied with the training labels `y_train` we obtain the estimates.
 
@@ -178,7 +178,7 @@ The attention weight is assigned according to the similarity (read, distance) be
 
 ## Exercises
 
-1. Parzen windows density estimates are given by $\hat{p}(\mathbf{x}) = \frac{1}{n} \sum_i k(\mathbf{x}, \mathbf{x}_i)$. Prove that for binary classification the function $\hat{p}(\mathbf{x}, y=1) - \hat{p}(\mathbf{x}, y=-1)$, as obtained by Parzen windows is equivalent to Watson Nadaraya classification. 
+1. Parzen windows density estimates are given by $\hat{p}(\mathbf{x}) = \frac{1}{n} \sum_i k(\mathbf{x}, \mathbf{x}_i)$. Prove that for binary classification the function $\hat{p}(\mathbf{x}, y=1) - \hat{p}(\mathbf{x}, y=-1)$, as obtained by Parzen windows is equivalent to Nadaraya-Watson classification. 
 1. Implement SGD to learn a good value for kernels widths in Watson Nadarya regression. 
     1. What happens if you just use the above estimates to minimize $(f(\mathbf{x_i}) - y_i)^2$ directly? Hint: y_i is part of the terms used to compute $f$.
     1. Remove $(\mathbf{x}_i, y_i)$ from the estimate for $f(\mathbf{x_i})$ and optimize over the kernel widths. Do you still observe overfitting?
