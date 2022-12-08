@@ -662,6 +662,8 @@ if tab.selected('mxnet', 'pytorch'):
 if tab.selected('jax'):
     model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
                     lr=0.001, training=True)
+if tab.selected('mxnet', 'pytorch', 'jax'):
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
         encoder = Seq2SeqEncoder(
@@ -670,7 +672,7 @@ if tab.selected('tensorflow'):
             len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
         model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
                         lr=0.001)
-trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
+    trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1)
 trainer.fit(model, data)
 ```
 
