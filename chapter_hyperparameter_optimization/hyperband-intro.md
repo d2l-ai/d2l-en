@@ -50,7 +50,7 @@ then discard a fraction of the worst performing trials and train the remaining
 ones for longer. Iterating this process, fewer trials run for longer, until at
 least one trial reaches $r_{max}$ epochs.
 
-More formally, consider a minimum budget $r_{min}$, for example 1 epoch, a maximum
+More formally, consider a minimum budget $r_{min}$ (for example 1 epoch), a maximum
 budget $r_{max}$, for example `max_epochs` in our previous example, and a halving
 constant $\eta\in\{2, 3, \dots\}$. For simplicity, assume that
 $r_{max} = r_{min} \eta^K$, with $K \in \mathbb{I}$ . The number of initial
@@ -189,11 +189,14 @@ def get_top_n_configurations(self, rung_level, n):
     return [x[0] for x in sorted_rung[:n]]
 ```
 
-Let us see how successive halving is doing on our neural network example.
+Let us see how successive halving is doing on our neural network example. We
+will use $r_{min} = 2$, $\eta = 2$, $r_{max} = 10$, so that rung levels are
+$2, 4, 8, 10$.
 
 ```{.python .input  n=5}
-min_number_of_epochs = 1
+min_number_of_epochs = 2
 max_number_of_epochs = 10
+eta = 2
 
 config_space = {
     "learning_rate": stats.loguniform(1e-2, 1),
@@ -211,7 +214,7 @@ We just replace the scheduler with our new `SuccessiveHalvingScheduler`.
 searcher = d2l.RandomSearcher(config_space, initial_config=initial_config)
 scheduler = SuccessiveHalvingScheduler(
     searcher=searcher,
-    eta=2,
+    eta=eta,
     r_min=min_number_of_epochs,
     r_max=max_number_of_epochs,
 )
@@ -237,7 +240,7 @@ d2l.plt.xticks(
     np.arange(min_number_of_epochs, max_number_of_epochs + 1)
 )
 d2l.plt.ylabel("validation error")
-d2l.plt.xlabel("epochs")        
+d2l.plt.xlabel("epochs")
 ```
 
 Finally, note some slight complexity in our implementation of
@@ -302,7 +305,7 @@ class HyperbandScheduler(d2l.HPOScheduler):  #@save
         self.brackets = defaultdict(list)
 
     def suggest(self):
-        return self.successive_halving.suggest()        
+        return self.successive_halving.suggest()
 ```
 
 The update function keeps track of the individual brackets. Once we finished a
@@ -336,7 +339,7 @@ Let see how Hyperband performs on our neural network example.
 searcher = d2l.RandomSearcher(config_space, initial_config=initial_config)
 scheduler = HyperbandScheduler(
     searcher=searcher,
-    eta=2,
+    eta=eta,
     r_min=min_number_of_epochs,
     r_max=max_number_of_epochs
 )
