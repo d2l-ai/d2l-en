@@ -245,7 +245,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
                     elem.set_scratch_params_device(device)
 
 class DataModule(d2l.HyperParameters):
-    """Defined in :numref:`sec_oo-design`"""
+    """Defined in :numref:`subsec_oo-design-models`"""
     def __init__(self, root='../data', num_workers=4):
         self.save_hyperparameters()
 
@@ -266,7 +266,7 @@ class DataModule(d2l.HyperParameters):
                                      shuffle=train)
 
 class Trainer(d2l.HyperParameters):
-    """Defined in :numref:`sec_oo-design`"""
+    """Defined in :numref:`subsec_oo-design-models`"""
     def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'No GPU support yet'
@@ -382,7 +382,7 @@ class LinearRegressionScratch(d2l.Module):
 
     def loss(self, y_hat, y):
         """Defined in :numref:`sec_linear_scratch`"""
-        l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+        l = (y_hat - y) ** 2 / 2
         return d2l.reduce_mean(l)
 
     def configure_optimizers(self):
@@ -616,7 +616,7 @@ class TimeMachine(d2l.DataModule):
         self.save_hyperparameters()
         corpus, self.vocab = self.build(self._download())
         array = d2l.tensor([corpus[i:i+num_steps+1]
-                            for i in range(0, len(corpus)-num_steps-1)])
+                            for i in range(len(corpus)-num_steps)])
         self.X, self.Y = array[:,:-1], array[:,1:]
 
     def get_dataloader(self, train):
@@ -671,13 +671,16 @@ class RNNScratch(d2l.Module):
 
     def forward(self, inputs, state=None):
         """Defined in :numref:`sec_rnn-scratch`"""
-        if state is not None:
+        if state is None:
+            # Initial state with shape: (batch_size, num_hiddens)
+            state = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                              ctx=inputs.ctx)
+        else:
             state, = state
         outputs = []
         for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs)
-            state = d2l.tanh(d2l.matmul(X, self.W_xh) + (
-                d2l.matmul(state, self.W_hh) if state is not None else 0)
-                             + self.b_h)
+            state = d2l.tanh(d2l.matmul(X, self.W_xh) +
+                             d2l.matmul(state, self.W_hh) + self.b_h)
             outputs.append(state)
         return outputs, state
 
@@ -968,9 +971,9 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                   cmap='Reds'):
     """Show heatmaps of matrices.
 
-    Defined in :numref:`sec_attention-cues`"""
+    Defined in :numref:`sec_queries-keys-values`"""
     d2l.use_svg_display()
-    num_rows, num_cols = len(matrices), len(matrices[0])
+    num_rows, num_cols, _, _ = matrices.shape
     fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize,
                                  sharex=True, sharey=True, squeeze=False)
     for i, (row_axes, row_matrices) in enumerate(zip(axes, matrices)):
@@ -1003,41 +1006,10 @@ def masked_softmax(X, valid_lens):
                               value=-1e6, axis=1)
         return npx.softmax(X).reshape(shape)
 
-class AdditiveAttention(nn.Block):
-    """Additive attention.
-
-    Defined in :numref:`sec_attention-scoring-functions`"""
-    def __init__(self, num_hiddens, dropout, **kwargs):
-        super(AdditiveAttention, self).__init__(**kwargs)
-        # Use flatten=False to only transform the last axis so that the
-        # shapes for the other axes are kept the same
-        self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
-        self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)
-        self.w_v = nn.Dense(1, use_bias=False, flatten=False)
-        self.dropout = nn.Dropout(dropout)
-
-    def forward(self, queries, keys, values, valid_lens):
-        queries, keys = self.W_q(queries), self.W_k(keys)
-        # After dimension expansion, shape of queries: (batch_size, no. of
-        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1,
-        # no. of key-value pairs, num_hiddens). Sum them up with
-        # broadcasting
-        features = np.expand_dims(queries, axis=2) + np.expand_dims(
-            keys, axis=1)
-        features = np.tanh(features)
-        # There is only one output of self.w_v, so we remove the last
-        # one-dimensional entry from the shape. Shape of scores:
-        # (batch_size, no. of queries, no. of key-value pairs)
-        scores = np.squeeze(self.w_v(features), axis=-1)
-        self.attention_weights = masked_softmax(scores, valid_lens)
-        # Shape of values: (batch_size, no. of key-value pairs, value
-        # dimension)
-        return npx.batch_dot(self.dropout(self.attention_weights), values)
-
 class DotProductAttention(nn.Block):
     """Scaled dot product attention.
 
-    Defined in :numref:`subsec_additive-attention`"""
+    Defined in :numref:`subsec_batch_dot`"""
     def __init__(self, dropout, num_heads=None):
         super().__init__()
         self.dropout = nn.Dropout(dropout)
@@ -1064,6 +1036,37 @@ class DotProductAttention(nn.Block):
                 d2l.expand_dims(window_mask, 1), 0)
             scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
         self.attention_weights = masked_softmax(scores, valid_lens)
+        return npx.batch_dot(self.dropout(self.attention_weights), values)
+
+class AdditiveAttention(nn.Block):
+    """Additive attention.
+
+    Defined in :numref:`subsec_batch_dot`"""
+    def __init__(self, num_hiddens, dropout, **kwargs):
+        super(AdditiveAttention, self).__init__(**kwargs)
+        # Use flatten=False to only transform the last axis so that the
+        # shapes for the other axes are kept the same
+        self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.w_v = nn.Dense(1, use_bias=False, flatten=False)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, queries, keys, values, valid_lens):
+        queries, keys = self.W_q(queries), self.W_k(keys)
+        # After dimension expansion, shape of queries: (batch_size, no. of
+        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1,
+        # no. of key-value pairs, num_hiddens). Sum them up with
+        # broadcasting
+        features = np.expand_dims(queries, axis=2) + np.expand_dims(
+            keys, axis=1)
+        features = np.tanh(features)
+        # There is only one output of self.w_v, so we remove the last
+        # one-dimensional entry from the shape. Shape of scores:
+        # (batch_size, no. of queries, no. of key-value pairs)
+        scores = np.squeeze(self.w_v(features), axis=-1)
+        self.attention_weights = masked_softmax(scores, valid_lens)
+        # Shape of values: (batch_size, no. of key-value pairs, value
+        # dimension)
         return npx.batch_dot(self.dropout(self.attention_weights), values)
 
 class AttentionDecoder(d2l.Decoder):
@@ -1325,7 +1328,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.sum()/num_epochs:.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 
 def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
@@ -1351,7 +1354,7 @@ def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.sum()/num_epochs:.3f} sec/epoch')
 
 class Benchmark:
     """For measuring running time."""
@@ -3112,7 +3115,7 @@ def read_data_nmt():
 
     Defined in :numref:`sec_utils`"""
     data_dir = d2l.download_extract('fra-eng')
-    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
+    with open(os.path.join(data_dir, 'fra.txt'), 'r', encoding='utf-8') as f:
         return f.read()
 
 def preprocess_nmt(text):

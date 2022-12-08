@@ -38,7 +38,7 @@ and
 "go to the bank to sit down".
 Thus, many more recent pretraining models adapt representation of the same token
 to different contexts.
-Among them is BERT, a much deeper self-supervised model based on the transformer encoder.
+Among them is BERT, a much deeper self-supervised model based on the Transformer encoder.
 In this chapter, we will focus on how to pretrain such representations for text,
 as highlighted in :numref:`fig_nlp-map-pretrain`.
 

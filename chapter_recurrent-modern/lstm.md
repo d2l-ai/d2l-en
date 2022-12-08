@@ -330,13 +330,27 @@ returns the final state and the stacked outputs as expected.
 %%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(LSTMScratch)
 def forward(self, inputs, H_C=None):
-    H, C = None, None if H_C is None else H_C
+    if H_C is None:
+        # Initial state with shape: (batch_size, num_hiddens)
+        if tab.selected('mxnet'):
+            H = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                          ctx=inputs.ctx)
+            C = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                          ctx=inputs.ctx)
+        if tab.selected('pytorch'):
+            H = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                          device=inputs.device)
+            C = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                          device=inputs.device)
+        if tab.selected('tensorflow'):
+            H = d2l.zeros((inputs.shape[1], self.num_hiddens))
+            C = d2l.zeros((inputs.shape[1], self.num_hiddens))
+    else:
+        H, C = H_C
     outputs = []
     for X in inputs:
-        I = d2l.sigmoid(d2l.matmul(X, self.W_xi) + (
-            d2l.matmul(H, self.W_hi) if H is not None else 0) + self.b_i)
-        if H is None:
-            H, C = d2l.zeros_like(I), d2l.zeros_like(I)
+        I = d2l.sigmoid(d2l.matmul(X, self.W_xi) +
+                        d2l.matmul(H, self.W_hi) + self.b_i)
         F = d2l.sigmoid(d2l.matmul(X, self.W_xf) +
                         d2l.matmul(H, self.W_hf) + self.b_f)
         O = d2l.sigmoid(d2l.matmul(X, self.W_xo) +
@@ -502,7 +516,7 @@ model.predict('it has', 20, data.vocab, trainer.state.params)
 
 LSTMs are the prototypical latent variable autoregressive model with nontrivial state control.
 Many variants thereof have been proposed over the years, e.g., multiple layers, residual connections, different types of regularization. However, training LSTMs and other sequence models (such as GRUs) are quite costly due to the long range dependency of the sequence.
-Later we will encounter alternative models such as transformers that can be used in some cases.
+Later we will encounter alternative models such as Transformers that can be used in some cases.
 
 
 ## Summary
@@ -511,7 +525,7 @@ While LSTMs were published in 1997,
 they rose to greater prominence 
 with some victories in prediction competitions in the mid-2000s,
 and became the dominant models for sequence learning from 2011 
-until more recently with the rise of transformer models, starting in 2017.
+until more recently with the rise of Transformer models, starting in 2017.
 Even tranformers owe some of their key ideas 
 to architecture design innovations introduced by the LSTM.
 LSTMs have three types of gates: 

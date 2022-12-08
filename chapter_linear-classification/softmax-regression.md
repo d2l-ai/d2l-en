@@ -184,7 +184,7 @@ where $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$.
 This is the so-called [probit model](https://en.wikipedia.org/wiki/Probit_model),
 first introduced by :citet:`Fechner.1860`.
 While appealing, it doesn't work quite as well
-or lead to a particularly nice optimization problem,
+nor lead to a particularly nice optimization problem,
 when compared to the softmax.
 
 Another way to accomplish this goal
@@ -242,7 +242,7 @@ problems in deep learning.
 To improve computational efficiency,
 we vectorize calculations in minibatches of data.
 Assume that we are given a minibatch $\mathbf{X} \in \mathbb{R}^{n \times d}$
-of $n$ features with dimensionality (number of inputs) $d$.
+of $n$ examples with dimensionality (number of inputs) $d$.
 Moreover, assume that we have $q$ categories in the output.
 Then the weights satisfy $\mathbf{W} \in \mathbb{R}^{d \times q}$
 and the bias satisfies $\mathbf{b} \in \mathbb{R}^{1\times q}$.
