@@ -148,10 +148,10 @@ def update(self, config: dict, error: float, info=None):
     ri = int(config["max_epochs"])  # Rung r_i
     # Update our searcher, e.g if we use Bayesian optimization later
     self.searcher.update(config, error, additional_info=info)     
+    self.all_observed_error_at_rungs[ri].append((config, error))
     if ri < self.r_max:
         # Bookkeeping
         self.observed_error_at_rungs[ri].append((config, error))
-        self.all_observed_error_at_rungs[ri].append((config, error))
         # Determine how many configurations should be evaluated on this rung
         ki = self.K - self.rung_levels.index(ri)
         ni = int(self.prefact * self.eta ** ki)
