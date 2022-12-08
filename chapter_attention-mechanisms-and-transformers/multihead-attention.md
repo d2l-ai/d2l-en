@@ -373,7 +373,6 @@ To compute multiple heads of multi-head attention in parallel,
 proper tensor manipulation is needed.
 
 
-
 ## Exercises
 
 1. Visualize attention weights of multiple heads in this experiment.
