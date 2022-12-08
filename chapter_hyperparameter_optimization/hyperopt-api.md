@@ -240,8 +240,8 @@ a population of multiple repetitions of an algorithm based on different seeds
 of the random number generator.
 
 To illustrate this, we compare random search (see :numref:`sec_rs`) and Bayesian
-optimization, which we will introduce in :numref:`sec_bo`, for optimizing the
-hyperparameters of a feed-forward neural network. Each algorithm was evaluated
+optimization :cite:`snoek-nips12` on tuning the hyperparameters of a feed-forward
+neural network. Each algorithm was evaluated
 $50$ times with a different random seed. The solid line indicates the average
 performance of the incumbent across these $50$ repetitions and the dashed line
 the standard deviation. We can see that random search and Bayesian optimization

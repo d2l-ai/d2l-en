@@ -30,7 +30,7 @@ might hurt the generalization performance.
 
 Without a different form of automation, hyperparameters have to be set manually
 in a trial-and-error fashion, in what amounts to a time-consuming and difficult
-part of machine learning workflows :cite:`hpo`. For example, consider training
+part of machine learning workflows :cite:`feurer-automlbook18`. For example, consider training
 a ResNet (see :numref:`sec_resnet`) on CIFAR-10, which requires more than 2 hours
 on an Amazon Elastic Cloud Compute (EC2) `g4dn.xlarge` instance. Even just
 trying ten hyperparameter configurations in sequence, this would already take us
@@ -44,9 +44,8 @@ and expert knowledge is required to find sensible values.
 problem in a principled and automated fashion :cite:`feurer-automlbook18a`, by
 framing it as a global optimization problem. The default objective is the error
 on a hold-out validation dataset, but could in principle be any other business
-metric. It can be combined with or constrained by secondary objectives
-(see :numref:`sec_hpo_advanced`), such as training time, inference time, or
-model complexity. 
+metric. It can be combined with or constrained by secondary objectives, such as
+training time, inference time, or model complexity. 
 
 Recently, hyperparameter optimization has been extended to *neural architecture
 search (NAS)* :cite:`elsken-arxiv18a,wistuba-arxiv19`, where the goal is to find
@@ -202,13 +201,14 @@ space. On the other hand, if the ranges are too large, the computation budget
 to find well performing configurations might become infeasible.
 
 ## Random Search
+:label:`sec_rs`
 
 Now, we look at the first algorithm to solve our hyperparameter optimization
 problem: *random search*. The main idea of random search is to independently
 sample from the configuration space until a predefined budget (e.g maximum
 number of iterations) is exhausted and to return the best observed
 configuration. All evaluations can be executed independently in parallel (see
-:numref:`sec_rs`), but here we use a sequential loop for simplicity.
+:numref:`sec_rs_async`), but here we use a sequential loop for simplicity.
 
 ```{.python .input  n=7}
 errors, values = [], []

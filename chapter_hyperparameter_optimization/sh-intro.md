@@ -17,7 +17,7 @@ amount of compute required.
 In this section, we will show how the evaluation of hyperparameter configurations
 can be sped up. Methods such as random search allocate the same amount of
 resources (e.g., number of epochs, training data points) to each hyperparameter
-evaluation. :numref:`img_samples_ls`  depicts learning curves of a set of neural
+evaluation. :numref:`img_samples_lc` depicts learning curves of a set of neural
 networks trained with different hyperparameter configurations. After a few epochs we are
 already able to visually distinguish between well-performing and suboptimal
 configurations. However, the learning curves are noisy, and we might still require
