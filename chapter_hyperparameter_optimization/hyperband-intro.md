@@ -146,13 +146,13 @@ configurations into the queue.
 ```{.python .input  n=4}
 %%tab all
 @d2l.add_to_class(SuccessiveHalvingScheduler)  #@save
-def update(self, config, error, info=None):
+def update(self, config: dict, error: float, info=None):
     ri = config["max_epochs"]  # Rung r_i
     # Update our searcher, e.g if we use Bayesian optimization later
     self.searcher.update(config, error, additional_info=info)     
     if ri < self.r_max:
         # Bookkeeping
-        self.observed_error_at_rungs[ri].append((config, d2l.numpy(error.cpu())))
+        self.observed_error_at_rungs[ri].append((config, error))
         # Determine how many configurations should be evaluated on this rung
         ki = self.K - self.rung_levels.index(ri)
         ni = int(self.prefact * self.eta ** ki)
@@ -307,8 +307,8 @@ different $r_{min}$ and $s$.
 ```{.python .input  n=9}
 %%tab all
 @d2l.add_to_class(HyperbandScheduler)  #@save
-def update(self, config, error, info=None):
-    self.brackets[self.s].append((config["max_epochs"], d2l.numpy(error.cpu())))
+def update(self, config: dict, error: float, info=None):
+    self.brackets[self.s].append((config["max_epochs"], error))
     self.successive_halving.update(config, error, info=info)
     # If the queue of successive halving is empty, than we finished this round
     # and start with a new round with different r_min and N
