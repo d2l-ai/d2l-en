@@ -1001,6 +1001,43 @@ def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
         patch.set_hatch('/')
     d2l.plt.legend(legend)
 
+class Encoder(nn.Module):
+    """The base encoder interface for the encoder-decoder architecture."""
+    def setup(self):
+        raise NotImplementedError
+
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def __call__(self, X, *args):
+        raise NotImplementedError
+
+class Decoder(nn.Module):
+    """The base decoder interface for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_encoder-decoder`"""
+    def setup(self):
+        raise NotImplementedError
+
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def __call__(self, X, state):
+        raise NotImplementedError
+
+class EncoderDecoder(d2l.Classifier):
+    """The base class for the encoder-decoder architecture.
+
+    Defined in :numref:`sec_encoder-decoder`"""
+    encoder: nn.Module
+    decoder: nn.Module
+    training: bool
+
+    def __call__(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args, training=self.training)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        # Return decoder output only
+        return self.decoder(dec_X, dec_state)[0]
+
 def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                   cmap='Reds'):
     """Show heatmaps of matrices.
