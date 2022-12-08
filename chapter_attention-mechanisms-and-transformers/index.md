@@ -134,7 +134,7 @@ of modern Transformer-based pretrained models.
 ```toc
 :maxdepth: 2
 
-qkv
+queries-keys-values
 attention-pooling
 attention-scoring-functions
 bahdanau-attention
