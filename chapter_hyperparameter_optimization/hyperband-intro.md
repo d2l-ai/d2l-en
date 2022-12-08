@@ -74,7 +74,7 @@ class HyperbandScheduler(d2l.HPOScheduler):  #@save
         self.save_hyperparameters()
         self.s_max = int(np.ceil((np.log(r_max) - np.log(r_min)) / np.log(eta)))
         self.s = self.s_max
-        self.successive_halving = SuccessiveHalvingScheduler(
+        self.successive_halving = d2l.SuccessiveHalvingScheduler(
             searcher=self.searcher,
             eta=self.eta,
             r_min=self.r_min,
@@ -103,7 +103,7 @@ def update(self, config: dict, error: float, info=None):
         self.s -= 1
         if self.s < 0:
             self.s = self.s_max
-        self.successive_halving = SuccessiveHalvingScheduler(
+        self.successive_halving = d2l.SuccessiveHalvingScheduler(
             searcher=self.searcher,
             eta=self.eta,
             r_min=int(self.r_max * self.eta ** (-self.s)),
