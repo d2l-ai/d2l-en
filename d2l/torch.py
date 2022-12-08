@@ -2711,7 +2711,7 @@ def hpo_objective_lenet(learning_rate, batch_size, max_epochs=10):
     return validation_error
 
 class SuccessiveHalvingScheduler(d2l.HPOScheduler):
-    """Defined in :numref:`sec_mf_hpo`"""
+    """Defined in :numref:`sec_mf_hpo_sh`"""
     def __init__(self, searcher, eta, r_min, r_max, prefact=1):
         self.save_hyperparameters()
         # Compute K, which is later used to determine the number of configurations
@@ -2724,11 +2724,12 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):
             self.K += 1
         # Bookkeeping
         self.observed_error_at_rungs = defaultdict(list)
+        self.all_observed_error_at_rungs = defaultdict(list)
         # Our processing queue
         self.queue = []
 
     def suggest(self):
-        """Defined in :numref:`sec_mf_hpo`"""
+        """Defined in :numref:`sec_mf_hpo_sh`"""
         if len(self.queue) == 0:
             # Start a new round of successive halving
             # Number of configurations for the first rung:
@@ -2741,13 +2742,14 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):
         return self.queue.pop()
 
     def update(self, config: dict, error: float, info=None):
-        """Defined in :numref:`sec_mf_hpo`"""
-        ri = config["max_epochs"]  # Rung r_i
+        """Defined in :numref:`sec_mf_hpo_sh`"""
+        ri = int(config["max_epochs"])  # Rung r_i
         # Update our searcher, e.g if we use Bayesian optimization later
         self.searcher.update(config, error, additional_info=info)
         if ri < self.r_max:
             # Bookkeeping
             self.observed_error_at_rungs[ri].append((config, error))
+            self.all_observed_error_at_rungs[ri].append((config, error))
             # Determine how many configurations should be evaluated on this rung
             ki = self.K - self.rung_levels.index(ri)
             ni = int(self.prefact * self.eta ** ki)
@@ -2766,10 +2768,10 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):
                     dict(config, max_epochs=riplus1)
                     for config in best_performing_configurations
                 ] + self.queue
-                self.observed_error_at_rungs[ri] = []  # reset
+                self.observed_error_at_rungs[ri] = []  # Reset
 
     def get_top_n_configurations(self, rung_level, n):
-        """Defined in :numref:`sec_mf_hpo`"""
+        """Defined in :numref:`sec_mf_hpo_sh`"""
         rung = self.observed_error_at_rungs[rung_level]
         if not rung:
             return []
@@ -2777,7 +2779,7 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):
         return [x[0] for x in sorted_rung[:n]]
 
 class HyperbandScheduler(d2l.HPOScheduler):
-    """Defined in :numref:`sec_mf_hpo`"""
+    """Defined in :numref:`sec_mf_hpo_hyperband`"""
     def __init__(self, searcher, eta, r_min, r_max):
         self.save_hyperparameters()
         self.s_max = int(np.ceil((np.log(r_max) - np.log(r_min)) / np.log(eta)))
@@ -2795,7 +2797,7 @@ class HyperbandScheduler(d2l.HPOScheduler):
         return self.successive_halving.suggest()
 
     def update(self, config: dict, error: float, info=None):
-        """Defined in :numref:`sec_mf_hpo`"""
+        """Defined in :numref:`sec_mf_hpo_hyperband`"""
         self.brackets[self.s].append((config["max_epochs"], error))
         self.successive_halving.update(config, error, info=info)
         # If the queue of successive halving is empty, than we finished this round

@@ -29,7 +29,7 @@ to optimize the hyperparameter of your own machine learning algorithm.
 hyperopt-intro
 hyperopt-api
 rs-async.md
+sh-intro
 hyperband-intro
-sh-async.md
+sh-async
 ```
-
