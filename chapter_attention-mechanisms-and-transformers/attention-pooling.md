@@ -1,38 +1,22 @@
-# Attention Pooling
+# Attention by Similarity
 
 :label:`sec_attention-pooling`
 
-You now know the major components of attention mechanisms.
-The interactions between queries and keys 
-induce an *attention pooling* over values.
-In this section, we will describe attention pooling in greater detail
-to give you a high-level view of how modern attention mechanisms work in practice.
+Now that we introduced the primary components of the attention mechanism, let's use them in a rather classical setting, namely regression and classification using kernel density estimation :cite:`Watson.1964,Nadaraya.1964`. This detour is entirely optional and can be skipped if needed. It simply provides additional background.
+At their core, Watson Nadaraya estimators rely on some similarity kernel $\alpha(\mathbf{k}, \mathbf{q})$ relating queries $\mathbf{q}$ to keys $\mathbf{k}$. Some common kernels are
 
+$$\begin{aligned}
+\alpha(\mathbf{k}, \mathbf{q}) & = \exp\left(\frac{1}{2} \|\mathbf{k} - \mathbf{q}\|^2 \right) && \mathrm{Gaussian} \\
+\alpha(\mathbf{k}, \mathbf{q}) & = 1 \text{ if } \|\mathbf{k} - \mathbf{q}\| \leq 1 && \mathrm{Boxcar} \\
+\alpha(\mathbf{k}, \mathbf{q}) & = \mathop{\mathrm{max}}\left(0, 1 - \|\mathbf{k} - \mathbf{q}\|\right) && \mathrm{Epanechikov}
+\end{aligned}
+$$
 
-To begin, we point out that the idea of computing weighted sums
-according to some compatibility score is actually 
-quite common in machine learning and statistics. 
-In particular, kernel regression has this flavor. 
-To compute the prediction for a given data point $x$,
-a kernel regression model determines the *similarity*,
-between $x$ and each $x' \neq x$ in the dataset. 
-To compute the predicted label, the kernel regression
-computes a weighted sum of the labels of each training instance.
-Here, instances with features deemed similar
-(according to some similarity function)
-are weighted higher and instances
-with lower similarity are weighted lower. 
-This is precisely the behavior of the Nadaraya-Watson kernel regression model,
-proposed in 1964.
-Note that the crucial difference here is that 
-in kernel regression, the weighting is computed
-over the training *examples*
-whereas in attention mechanisms, the weighting
-is computed over the inputs (e.g., input tokens of one training example). 
+There are many more choices that we could pick. This [Wikipedia article](https://en.wikipedia.org/wiki/Kernel_(statistics)) has a more extensive review and shows how the choice of kernels is related to kernel density estimation, somtimes also called Parzen Windows :cite:`parzen1957consistent`. All of the kernels are heuristic and can be tuned. For instance, we can adjust the width, not only on a global basis but even on a per-coordinate basis. Regardless, all of them lead to the following equation for regresion and classification alike:
 
-To build your intuition, we briefly implement
-the classic Nadaraya-Watson kernel regression model,
-computing similarities according to a Gaussian kernel.
+$$f(\mathbf{q}) = \sum_i \mathbf{v}_i \frac{\alpha(\mathbf{k}_i, \mathbf{q})}{\sum_j \alpha(\mathbf{k}, \mathbf{q}_j)}$$
+
+In the case of a (scalar) regression with observations $(\mathbf{x}_i, y_i)$ for covariates and labels respectively, $\mathbf{v}_i = y_i$ are scalars, $\mathbf{k}_i = \mathbf{x}_i$ are vectors, and the query $\mathbf{q}$ denotes the new location where $f$ should be evaluated. In the case of (multiclass) classification, we use one-hot-encoding of $y_i$ to obtain $\mathbf{v}_i$. One of the convenient properties of this estimator is that it requires no training. Even more so, if we suitably narrow the kernel with increasing amounts of data, the approach is consistent :cite:`mack1982weak`, i.e., it will converge to some statistically optimal solution. Let's start by inspecting some kernels.
 
 ```{.python .input}
 %load_ext d2lbook.tab
@@ -54,349 +38,152 @@ from d2l import torch as d2l
 import torch
 from torch import nn
 from torch.nn import functional as F
+import numpy as np
 ```
 
 ```{.python .input}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
+import numpy as np
 ```
 
-## [**Generating the Dataset**]
+## [**Kernels and Data**]
 
-To keep things simple, let's consider
-the following regression problem:
-given a dataset of input-output pairs 
-$\{(x_1, y_1), \ldots, (x_n, y_n)\}$,
-we wish to learn a function $f$ 
-that can accurately predict 
-the target $y$ for any new input $x$.
-
-In the following snippets, we generate an artificial dataset 
-according to the following nonlinear function with the noise term $\epsilon$:
-
-$$y_i = 2\sin(x_i) + x_i^{0.8} + \epsilon,$$
-
-where $\epsilon$ obeys a normal distribution 
-with zero mean and standard deviation 0.5.
-Both 50 training examples and 50 validation examples are generated.
-To better visualize the pattern of attention later, the training inputs are sorted.
+All the kernels $\alpha(\mathbf{k}, \mathbf{q})$ defined in this section are *translation and rotation invariant*, that is, if we shift and rotate $\mathbf{k}$ and $\mathbf{q}$ in the same manner, the value of $\alpha$ remains unchanged. For simplicity we thus pick scalar arguments $\mathbf{k}, \mathbf{q} \in \mathbb{R}$ and pick the key $k = 0$ as the origin. This yields:
 
 ```{.python .input}
 %%tab all
-class NonlinearData(d2l.DataModule):
-    def __init__(self, n, batch_size):
-        self.save_hyperparameters()
-        f = lambda x: 2 * d2l.sin(x) + x**0.8
-        if tab.selected('pytorch'):
-            self.x_train, _ = torch.sort(d2l.rand(n) * 5)
-            self.y_train = f(self.x_train) + d2l.randn(n)
-        if tab.selected('mxnet'):
-            self.x_train = np.sort(d2l.rand(n) * 5)
-            self.y_train = f(self.x_train) + d2l.randn(n)
-        if tab.selected('tensorflow'):
-            self.x_train = tf.sort(d2l.rand((n,1)) * 5, 0)
-            self.y_train = f(self.x_train) + d2l.normal((n,1))
-        self.x_val = d2l.arange(0, 5, 5.0/n)
-        self.y_val = f(self.x_val)
+d2l.use_svg_display()
+fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize = (12,3))
 
-    def get_dataloader(self, train):
-        arrays = (self.x_train, self.y_train) if train else (self.x_val, self.y_val)
-        return self.get_tensorloader(arrays, train)
+# define some kernels
+gauss = lambda x: d2l.exp(-2 * x**2)
+boxcar = lambda x: d2l.abs(x) < 1.0
+constant = lambda x: 1.0 + 0 * x
+if tab.selected('pytorch'):
+    epanechikov = lambda x: torch.max(1 - d2l.abs(x), torch.zeros_like(x))
+if tab.selected('mxnet'):
+    epanechikov = lambda x: np.maximum(1 - d2l.abs(x), 0)
+if tab.selected('tensorflow'):
+    epanechikov = lambda x: tf.math.maximum(1 - d2l.abs(x), 0)
+kernels = (gauss, boxcar, constant, epanechikov)
+names = ('Gauss', 'Boxcar', 'Constant', 'Epanechikov')
 
-n = 50
-data = NonlinearData(n, batch_size=10)
+x = d2l.arange(-2.5, 2.5, 0.1)
+for kernel, name, ax in zip(kernels, names, axes):
+    ax.plot(d2l.numpy(x), d2l.numpy(kernel(x)));
+    ax.set_xlabel(name)
 ```
 
-The following function plots all the training examples (represented by circles),
-the ground-truth data generation function `f` 
-without the noise term (labeled by "Truth"),
-and the learned prediction function (labeled by "Pred").
+Different kernels correspond to different notions of range and smoothness respectively. For instance, the boxcar kernel only attends to observations within a distance of $1$ (or some otherwise defined hyperparameter) and does so indiscriminately. 
+
+To see Watson-Nadaraya estimation in action, let's define some training data. In the following we use the dependency
+
+$$y_i = 2\sin(x_i) + x_i + \epsilon,$$
+
+where $\epsilon$ is drawn from a Normal Distribution with zero mean and unit variance. We draw 50 samples.
 
 ```{.python .input}
 %%tab all
-def plot_kernel_reg(y_hat):
-    d2l.plot(data.x_val, [data.y_val, d2l.numpy(y_hat)], 'x', 'y', legend=['Truth', 'Pred'],
-             xlim=[0, 5], ylim=[-1, 5])
-    d2l.plt.plot(data.x_train, data.y_train, 'o', alpha=0.5);
+n = 40
+f = lambda x: 2 * d2l.sin(x) + x
+if tab.selected('pytorch'):
+    x_train, _ = torch.sort(d2l.rand(n) * 5)
+    y_train = f(x_train) + d2l.randn(n)
+if tab.selected('mxnet'):
+    x_train = np.sort(d2l.rand(n) * 5)
+    y_train = f(x_train) + d2l.randn(n)
+if tab.selected('tensorflow'):
+    x_train = tf.sort(d2l.rand((n,1)) * 5, 0)
+    y_train = f(x_train) + d2l.normal((n,1))
+x_test = d2l.arange(0, 5, 0.1)
+y_test = f(x_test)
 ```
 
-## Average Pooling
+## [**Watson Nadaraya Regression**]
 
-We begin with perhaps the world's "dumbest" estimator for this regression problem:
-using average pooling to average over all the training outputs:
-
-$$f(x) = \frac{1}{n}\sum_{i=1}^n y_i,$$
-:eqlabel:`eq_avg-pooling`
-
-which is plotted below. As we can see, this estimator is indeed not so smart.
+Now that we have data and kernels, all we need is a function that computes the kernel regression estimates. Note that we also want to obtain the relative kernel weights, aka, the attention weights, in order to perform some minor diagnostics. Hence we first compute the kernel between all training covariates `x_train` and all test covariates `x_test`. This yields a matrix, which we subsequently normalize. When multiplied with the training labels `y_train` we obtain the estimates.
 
 ```{.python .input}
 %%tab all
-y_hat = d2l.repeat(d2l.reduce_mean(data.y_train), n)
-plot_kernel_reg(y_hat)
-```
-
-## [**Nonparametric Attention Pooling**]
-
-Average pooling isn't very useful because 
-it fails to output different predictions
-depending on the inputs $x_i$.
-Thus, the method due to :citet:`Nadaraya.1964`
-and :citet:`Watson.1964`
-weighs the outputs $y_i$ according to their input locations:
-
-$$f(x) = \sum_{i=1}^n \frac{K(x - x_i)}{\sum_{j=1}^n K(x - x_j)} y_i,$$
-:eqlabel:`eq_nadaraya-watson`
-
-where $K$ is a *kernel*.
-The estimator in :eqref:`eq_nadaraya-watson`
-is called *Nadaraya-Watson kernel regression*.
-Recall the framework of attention mechanisms in :numref:`fig_qkv`.
-From the perspective of attention,
-we can rewrite :eqref:`eq_nadaraya-watson`
-in a more generalized form of *attention pooling*:
-
-$$f(x) = \sum_{i=1}^n \alpha(x, x_i) y_i,$$
-:eqlabel:`eq_attn-pooling`
-
-
-where $x$ is the query and $(x_i, y_i)$ is the key-value pair.
-Comparing :eqref:`eq_attn-pooling` and :eqref:`eq_avg-pooling`,
-the attention pooling here
-is a weighted average of values $y_i$.
-The *attention weight* $\alpha(x, x_i)$
-in :eqref:`eq_attn-pooling`
-is assigned to the corresponding value $y_i$
-based on the interaction
-between the query $x$ 
-and the key $x_i$,
-modeled by $\alpha$.
-For any query, its attention weights over all the key-value pairs
-are a valid probability distribution:
-they are non-negative and sum up to one.
-
-To gain intuitions of attention pooling,
-just consider a *Gaussian kernel* defined as
-
-$$
-K(u) = \frac{1}{\sqrt{2\pi}} \exp(-\frac{u^2}{2}).
-$$
-
-
-Plugging the Gaussian kernel into
-:eqref:`eq_attn-pooling` and
-:eqref:`eq_nadaraya-watson` gives
-
-$$\begin{aligned} f(x) &=\sum_{i=1}^n \alpha(x, x_i) y_i\\ &= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}(x - x_i)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}(x - x_j)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}(x - x_i)^2\right) y_i. \end{aligned}$$
-:eqlabel:`eq_nadaraya-watson-gaussian`
-
-In :eqref:`eq_nadaraya-watson-gaussian`,
-a key $x_i$ that is closer to the given query $x$ will get
-*more attention* via a *larger attention weight* 
-assigned to the key's corresponding value $y_i$.
-
-The Nadaraya-Watson kernel regression is a nonparametric model;
-thus :eqref:`eq_nadaraya-watson-gaussian`
-is an example of *nonparametric attention pooling*.
-In the following, we plot the prediction based on this
-nonparametric attention model.
-
-```{.python .input}
-%%tab all
-def diff(queries, keys):
-    return d2l.reshape(queries, (-1, 1)) - d2l.reshape(keys, (1, -1))
-
-def attention_pool(query_key_diffs, values):
-    if tab.selected('mxnet'):
-        attention_weights = npx.softmax(- query_key_diffs**2 / 2, axis=1)
+def watson_nadaraya(x_train, y_train, x_test, kernel):
+    dists = d2l.reshape(x_train, (-1, 1)) - d2l.reshape(x_test, (1, -1))
+    k = kernel(dists) # compute attention mask
+    k = k / k.sum(0)  # normalization
     if tab.selected('pytorch'):
-        attention_weights = F.softmax(- query_key_diffs**2 / 2, dim=1)
+        y_hat = y_train@k
+    if tab.selected('mxnet'):
+        y_hat = np.dot(y_train, k)
     if tab.selected('tensorflow'):
-        attention_weights = tf.nn.softmax(- query_key_diffs**2/2, axis=1)
-    return d2l.matmul(attention_weights, values), attention_weights
-
-y_hat, attention_weights = attention_pool(
-    diff(data.x_val, data.x_train), data.y_train)
-plot_kernel_reg(y_hat)
+        y_hat = tf.matmul(y_train, k)
+    return y_hat, k
 ```
 
-Now let's take a look at the [**attention weights**].
-Here validation inputs are queries while training inputs are keys.
-Since both inputs are sorted,
-we can see that the closer the query-key pair is,
-the higher attention weight is in the attention pooling.
+Let's have a look at the kind of estimates that the different kernels produce.
 
 ```{.python .input}
-%%tab all
-d2l.show_heatmaps([[attention_weights]],
-                  xlabel='Sorted training inputs',
-                  ylabel='Sorted validation inputs')
+def plot_results(x_train, y_train, x_test, y_test, kernels, names, attention = False):
+    fig, axes = d2l.plt.subplots(1, 4, sharey=True, figsize = (12, 3))
+    for kernel, name, ax in zip(kernels, names, axes):
+        y_hat, k = watson_nadaraya(x_train, y_train, x_test, kernel)
+        if attention: pcm = ax.imshow(d2l.numpy(k), cmap='Reds')
+        else:
+            ax.plot(x_test, y_hat)
+            ax.plot(x_test, y_test)
+            ax.plot(x_train, y_train, 'o', alpha=0.5);
+        ax.set_xlabel(name)
+    if attention: fig.colorbar(pcm, ax=axes, shrink=0.7)
+        
+plot_results(x_train, y_train, x_test, y_test, kernels, names)
 ```
 
-## [**Parametric Attention Pooling**]
-
-Nadaraya-Watson kernel regression enjoys *consistency*.
-Given enough data (and sufficiently small kernel bandwidth)
-this model converges to the optimal solution.
-Nonetheless, we can easily integrate 
-learnable parameters into attention pooling.
-
-As an example, slightly different from :eqref:`eq_nadaraya-watson-gaussian`,
-in the following the distance between the query $x$ and the key $x_i$
-is multiplied by a learnable parameter $w$:
-
-
-$$\begin{aligned}f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}((x - x_j)w)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i.\end{aligned}$$
-:eqlabel:`eq_nadaraya-watson-gaussian-para`
-
-In the rest of the section, we will train this model 
-by learning the parameter of the attention pooling
-in :eqref:`eq_nadaraya-watson-gaussian-para`.
-
-
-### Batch Matrix Multiplication
-:label:`subsec_batch_dot`
-
-To more efficiently compute attention for minibatches,
-we can leverage batch matrix multiplication utilities
-provided by deep learning frameworks.
-
-
-Suppose that the first minibatch contains $n$ matrices
-$\mathbf{X}_1, \ldots, \mathbf{X}_n$ of shape $a\times b$,
-and the second minibatch contains $n$ matrices 
-$\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ of shape $b\times c$. 
-Their batch matrix multiplication results in $n$ matrices
-$\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$ 
-of shape $a\times c$. 
-Therefore, [**given two tensors of shape ($n$, $a$, $b$) and ($n$, $b$, $c$),
-the shape of their batch matrix multiplication output is ($n$, $a$, $c$).**]
+The first thing that stands out is that all three nontrivial kernels (Gauss, Boxcar and Epanechikov) produce fairly workable estimates that are not too far from the true function. Only the constant kernel which leads to the trivial estimate $f(x) = \frac{1}{n} \sum_i y_i$ produces a rather unrealistic result. Let's inspect the attention weighting a bit more closely:
 
 ```{.python .input}
-%%tab all
-X = d2l.ones((2, 1, 4))
-Y = d2l.ones((2, 4, 6))
-d2l.check_shape(d2l.batch_matmul(X, Y), (2, 1, 6))
+plot_results(x_train, y_train, x_test, y_test, kernels, names, attention = True)
 ```
 
-In the context of attention mechanisms,
-we can [**use minibatch matrix multiplication 
-to compute weighted averages of values in a minibatch.**]
+The visualization clearly shows why the estimages for Gauss, Boxcar and Epanechikov are very similar - after all, they are derived from very similar attention weights, despite the different functional form of the kernel. This raises the question as to whether this is always the case. 
+
+## [**Adapting Attention Pooling**]
+
+We could replace the (Gaussian) kernel with one of a different width. That is, we could use 
+$\alpha(\mathbf{k}, \mathbf{q}) = \exp\left(\frac{1}{2 \sigma^2} \|\mathbf{k} - \mathbf{q}\|^2 \right)$ where $\sigma^2$ determines the width of the kernel. Let's see whether this affects the outcomes.
 
 ```{.python .input}
-%%tab mxnet
-weights = d2l.ones((2, 10)) * 0.1
-values = d2l.reshape(d2l.arange(20), (2, 10))
-npx.batch_dot(np.expand_dims(weights, 1), np.expand_dims(values, -1)).shape
+sigmas = (0.1, 0.2, 0.5, 1)
+names = ['Sigma ' + str(sigma) for sigma in sigmas]
+def getfun(sigma): return (lambda x: d2l.exp(-(1/(2*sigma**2)) * x**2))
+kernels = [getfun(sigma) for sigma in sigmas]
+
+plot_results(x_train, y_train, x_test, y_test, kernels, names)
 ```
+
+Clearly, the narrower the kernel, the less smooth the estimate. At the same time, it adapts better to the local variations. Let's look at the corresponding attention weights.
 
 ```{.python .input}
-%%tab pytorch
-weights = d2l.ones((2, 10)) * 0.1
-values = d2l.reshape(d2l.arange(20.0), (2, 10))
-torch.bmm(weights.unsqueeze(1), values.unsqueeze(-1))
+plot_results(x_train, y_train, x_test, y_test, kernels, names, attention=True)
 ```
 
-```{.python .input}
-%%tab tensorflow
-weights = tf.ones((2, 10)) * 0.1
-values = tf.reshape(tf.range(20.0), shape = (2, 10))
-tf.matmul(tf.expand_dims(weights, axis=1), tf.expand_dims(values, axis=-1)).numpy()
-```
+As we would expect, the narrower the kernel, the narrower the range of large attention weights. It's also clear that picking the same width might not be ideal. In fact, :cite:`Silverman86` proposed a heuristic that depends on the local density. Many more such 'tricks' have been proposed. It remains a valuable technique to date. For instance, :cite:`norelli2022asif` use a similar nearest-neighbor interpolation technique to design cross-modal image and text representations. 
 
-### Defining the Model
-
-Using minibatch matrix multiplication,
-below we define the parametric version
-of Nadaraya-Watson kernel regression
-based on the [**parametric attention pooling**] 
-in :eqref:`eq_nadaraya-watson-gaussian-para`.
-
-```{.python .input}
-%%tab all
-class NWKernelRegression(d2l.Module):
-    def __init__(self, keys, values, lr):
-        super().__init__()
-        self.save_hyperparameters()
-        if tab.selected('mxnet'):
-            self.w = d2l.ones(1)
-            self.w.attach_grad()
-        if tab.selected('pytorch'):
-            self.w = d2l.ones(1, requires_grad=True)
-        if tab.selected('tensorflow'):
-            self.w = tf.Variable(d2l.ones(1), trainable=True)
-
-    def forward(self, queries):
-        y_hat, self.attention_weights = attention_pool(
-            diff(queries, self.keys) * self.w, self.values)
-        return y_hat
-
-    def loss(self, y_hat, y):
-        l = (d2l.reshape(y_hat, -1) - d2l.reshape(y, -1)) ** 2 / 2
-        return d2l.reduce_mean(l)
-
-    def configure_optimizers(self):
-        if tab.selected('mxnet') or tab.selected('pytorch'):
-            return d2l.SGD([self.w], self.lr)
-        if tab.selected('tensorflow'):
-            return d2l.SGD(self.lr)
-```
-
-### Training
-
-In the following, we [**transform the training dataset
-to keys and values**] to train the attention model.
-In the parametric attention pooling,
-for simplicity,
-any training input just takes key-value pairs 
-from all training examples to predict its output.
-
-```{.python .input}
-%%tab all
-model = NWKernelRegression(data.x_train, data.y_train, lr=1)
-model.board.display = False
-trainer = d2l.Trainer(max_epochs=5)
-trainer.fit(model, data)
-```
-
-Trying to fit the training dataset with noise, 
-the predicted line is less smooth 
-than its nonparametric counterpart, plotted earlier.
-
-```{.python .input}
-%%tab all
-plot_kernel_reg(model.forward(data.x_val))
-```
-
-Comparing with nonparametric attention pooling,
-[**the region with large attention weights becomes sharper**]
-in the parametric setting.
-
-```{.python .input}
-%%tab all
-d2l.show_heatmaps([[model.attention_weights]],
-                  xlabel='Sorted training inputs',
-                  ylabel='Sorted validation inputs')
-```
+The astute reader might wonder why this deep-dive on a method that is over half a century old: firstly, it is one of the earliest precursors of modern attention mechanisms. Secondly, it is great for visualization. Third, and just as importantly, it demonstrates the limits of hand-crafted attention mechanisms. A much better strategy is to *learn* the mechanism, by learning the representations for queries and keys. This what we will embark on in the following sections.
 
 ## Summary
 
-Nadaraya-Watson kernel regression is an example 
-of machine learning with attention mechanisms.
-The attention pooling of Nadaraya-Watson kernel regression
-is a weighted average of the training outputs.
-From the attention perspective, the attention weight is assigned to a value 
-based on a function of a query and the key that is paired with the value.
-Attention pooling can be either nonparametric or parametric.
-
+Nadaraya-Watson kernel regression is an early precursor of the current attention mechanisms. 
+It can be used directly with little to no training or tuning, both for classification and regression. 
+The attention weight is assigned according to the similarity (read, distance) between query and key and according to how many similar observations are available. 
 
 ## Exercises
 
-1. Increase the number of training examples. Can you learn  nonparametric Nadaraya-Watson kernel regression better?
-1. What is the value of our learned $w$ in the parametric attention pooling experiment? Why does it make the weighted region sharper when visualizing the attention weights?
-1. How can we add hyperparameters to nonparametric Nadaraya-Watson kernel regression to predict better?
-1. Design another parametric attention pooling for the kernel regression of this section. Train this new model and visualize its attention weights.
+1. Parzen windows density estimates are given by $\hat{p}(\mathbf{x}) = \frac{1}{n} \sum_i k(\mathbf{x}, \mathbf{x}_i)$. Prove that for binary classification the function $\hat{p}(\mathbf{x}, y=1) - \hat{p}(\mathbf{x}, y=-1)$, as obtained by Parzen windows is equivalent to Watson Nadaraya classification. 
+1. Implement SGD to learn a good value for kernels widths in Watson Nadarya regression. 
+    1. What happens if you just use the above estimates to minimize $(f(\mathbf{x_i}) - y_i)^2$ directly? Hint: y_i is part of the terms used to compute $f$.
+    1. Remove $(\mathbf{x}_i, y_i)$ from the estimate for $f(\mathbf{x_i})$ and optimize over the kernel widths. Do you still observe overfitting?
+1. Assume that all $\mathbf{x}$ lie on the unit sphere, i.e., all satisfy $\|\mathbf{x}\| = 1$. Can you simplify the $\|\mathbf{x}_i - \mathbf{x}\|^2$ term in the exponential? Hint: we will later see that this is very closely related to dot-product attention. 
+1. Recall that :cite:`mack1982weak` prove that Watson-Nadaraya estimation is consistent. How quickly should you reduce the scale for the attention mechanism as you get more data? Provide some intuition for your answer. Does it depend on the dimensionality of the data? How?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/1598)
