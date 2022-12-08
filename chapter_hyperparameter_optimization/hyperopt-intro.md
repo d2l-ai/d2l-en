@@ -25,7 +25,7 @@ example, setting regularization parameters, such as dropout or weight decay
 (see :numref:`sec_weight_decay`) to zero leads to a small training loss, but
 might hurt the generalization performance.
 
-![Typical workflow in machine learning that consists of training the model multiple times with different hyperparameters](img/ml_workflow.svg)
+![Typical workflow in machine learning that consists of training the model multiple times with different hyperparameters](../img/ml_workflow.svg)
 :label:`ml_workflow`
 
 Without a different form of automation, hyperparameters have to be set manually

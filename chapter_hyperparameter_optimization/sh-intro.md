@@ -23,7 +23,7 @@ already able to visually distinguish between well-performing and suboptimal
 configurations. However, the learning curves are noisy, and we might still require
 the full amount of 100 epochs to identify the best performing one.
 
-![Learning curves of random hyperparameter configurations](img/samples_lc.svg)
+![Learning curves of random hyperparameter configurations](../img/samples_lc.svg)
 :label:`img_samples_lc`
 
 Multi-fidelity hyperparameter optimization allocates more resources
@@ -69,7 +69,7 @@ trial will be trained to the full budget $r_{max}$. Once such a round of
 successive halving is done, we start the next one with a new set of initial
 configurations, iterating until the total budget is spent.
 
-![Learning curves of random hyperparameter configurations](img/sh.svg)
+![Learning curves of random hyperparameter configurations](../img/sh.svg)
 :label:`sh`
 
 We subclass the `HPOScheduler` base class from :numref:`sec_api_hpo` in order to
