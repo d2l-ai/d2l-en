@@ -49,7 +49,6 @@ from d2l import torch as d2l
 import numpy as np
 from scipy import stats
 from collections import defaultdict
-from operator import itemgetter
 
 min_number_of_epochs = 2
 max_number_of_epochs = 10

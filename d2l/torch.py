@@ -2775,7 +2775,7 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):
         rung = self.observed_error_at_rungs[rung_level]
         if not rung:
             return []
-        sorted_rung = sorted(rung, key=itemgetter(1))
+        sorted_rung = sorted(rung, key=lambda x: x[1])
         return [x[0] for x in sorted_rung[:n]]
 
 def load_array(data_arrays, batch_size, is_train=True):

@@ -90,7 +90,6 @@ from d2l import torch as d2l
 import numpy as np
 from scipy import stats
 from collections import defaultdict
-from operator import itemgetter
 
 class SuccessiveHalvingScheduler(d2l.HPOScheduler):  #@save
     def __init__(self, searcher, eta, r_min, r_max, prefact=1):
@@ -185,7 +184,7 @@ def get_top_n_configurations(self, rung_level, n):
     rung = self.observed_error_at_rungs[rung_level]
     if not rung:
         return []
-    sorted_rung = sorted(rung, key=itemgetter(1))
+    sorted_rung = sorted(rung, key=lambda x: x[1])
     return [x[0] for x in sorted_rung[:n]]
 ```
 
