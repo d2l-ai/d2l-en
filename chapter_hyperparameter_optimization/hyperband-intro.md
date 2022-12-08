@@ -105,6 +105,7 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):  #@save
             self.K += 1
         # Bookkeeping
         self.observed_error_at_rungs = defaultdict(list)
+        self.all_observed_error_at_rungs = defaultdict(list)
         # Our processing queue
         self.queue = []
 ```
@@ -145,12 +146,13 @@ configurations into the queue.
 %%tab all
 @d2l.add_to_class(SuccessiveHalvingScheduler)  #@save
 def update(self, config: dict, error: float, info=None):
-    ri = config["max_epochs"]  # Rung r_i
+    ri = int(config["max_epochs"])  # Rung r_i
     # Update our searcher, e.g if we use Bayesian optimization later
     self.searcher.update(config, error, additional_info=info)     
     if ri < self.r_max:
         # Bookkeeping
         self.observed_error_at_rungs[ri].append((config, error))
+        self.all_observed_error_at_rungs[ri].append((config, error))
         # Determine how many configurations should be evaluated on this rung
         ki = self.K - self.rung_levels.index(ri)
         ni = int(self.prefact * self.eta ** ki)
@@ -169,7 +171,7 @@ def update(self, config: dict, error: float, info=None):
                 dict(config, max_epochs=riplus1)
                 for config in best_performing_configurations
             ] + self.queue
-            self.observed_error_at_rungs[ri] = []  # reset
+            self.observed_error_at_rungs[ri] = []  # Reset
 ```
 
 Configurations are sorted based on their observed performance on the current
@@ -226,7 +228,7 @@ configurations survive until $r_{max}$. Compare this to vanilla random search,
 which would allocate $r_{max}$ to every configuration.
 
 ```{.python .input  n=19}
-for rung_index, rung in scheduler.observed_error_at_rungs.items():
+for rung_index, rung in scheduler.all_observed_error_at_rungs.items():
     errors = [xi[1] for xi in rung]   
     d2l.plt.scatter([rung_index] * len(errors), errors)
 d2l.plt.xlim(min_number_of_epochs - 0.5, max_number_of_epochs + 0.5)
@@ -365,10 +367,10 @@ d2l.plt.show()
 
 ## Summary
 
-This section introduced the concept of multi-fidelity hyperparameter optimization,
-where we assume to have access to cheap-to-evaluate approximations of the
-objective function. Here, we consider the performance after each epoch as an
-approximation of the performance after training for the full amount of epochs.
+In this section, we introduced the concept of multi-fidelity hyperparameter
+optimization, where we assume to have access to cheap-to-evaluate approximations
+of the objective function, such as validation error after a certain number of
+epochs of training as proxy to validation error after the full number of epochs.
 Multi-fidelity hyperparameter optimization allows to reduce the overall
 computation of the HPO instead of just reducing the wall-clock time.
 
