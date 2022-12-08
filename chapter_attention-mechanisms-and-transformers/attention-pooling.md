@@ -28,7 +28,6 @@ tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
-
 npx.set_np()
 ```
 
@@ -83,7 +82,7 @@ if tab.selected('mxnet'):
         return np.maximum(1 - d2l.abs(x), 0)
 if tab.selected('tensorflow'):
     def epanechikov(x):
-        return tf.math.maximum(1 - d2l.abs(x), 0)
+        return tf.maximum(1 - d2l.abs(x), 0)
 if tab.selected('jax'):
     def epanechikov(x):
         return jnp.maximum(1 - d2l.abs(x), 0)
@@ -114,10 +113,10 @@ if tab.selected('pytorch'):
     x_train, _ = torch.sort(d2l.rand(n) * 5)
     y_train = f(x_train) + d2l.randn(n)
 if tab.selected('mxnet'):
-    x_train = np.sort(d2l.rand(n) * 5)
+    x_train = np.sort(d2l.rand(n) * 5, axis=None)
     y_train = f(x_train) + d2l.randn(n)
 if tab.selected('tensorflow'):
-    x_train = tf.sort(d2l.rand((n, 1)) * 5, 0)
+    x_train = tf.sort(d2l.rand((n,1)) * 5, 0)
     y_train = f(x_train) + d2l.normal((n, 1))
 if tab.selected('jax'):
     x_train = jnp.sort(jax.random.uniform(d2l.get_key(), (n,)) * 5)
@@ -136,14 +135,14 @@ Recall attention pooling in :eqref:`eq_attention_pooling`. Let each validation f
 %%tab all
 def nadaraya_watson(x_train, y_train, x_val, kernel):
     dists = d2l.reshape(x_train, (-1, 1)) - d2l.reshape(x_val, (1, -1))
-    k = kernel(dists)  # Each column/row corresponds to each query/key
-    attention_w = k / k.sum(0)  # Normalization over keys for each query
+    k = d2l.astype(kernel(dists), d2l.float32)  # Each column/row corresponds to each query/key
+    attention_w = k / d2l.reduce_sum(k, 0)  # Normalization over keys for each query
     if tab.selected('pytorch'):
         y_hat = y_train@attention_w
     if tab.selected('mxnet'):
         y_hat = np.dot(y_train, attention_w)
     if tab.selected('tensorflow'):
-        y_hat = tf.matmul(y_train, attention_w)
+        y_hat = d2l.transpose(d2l.transpose(y_train)@attention_w)
     if tab.selected('jax'):
         y_hat = y_train@attention_w
     return y_hat, attention_w
