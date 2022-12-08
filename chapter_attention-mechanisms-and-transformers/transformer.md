@@ -1142,7 +1142,6 @@ transforms the representation at all the sequence positions using the same MLP.
 1. What can be challenges to Transformers if input sequences are very long? Why?
 1. How to improve computational and memory efficiency of Transformers? Hint: you may refer to the survey paper by :citet:`Tay.Dehghani.Bahri.ea.2020`.
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/348)
 :end_tab:

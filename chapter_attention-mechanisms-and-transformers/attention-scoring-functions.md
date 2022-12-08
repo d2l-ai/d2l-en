@@ -218,21 +218,21 @@ Let's see this in action in a deep learning framework.
 %%tab mxnet
 Q = d2l.ones((2, 3, 4))
 K = d2l.ones((2, 4, 6))
-npx.batch_dot(Q, K).shape
+d2l.check_shape(npx.batch_dot(Q, K).shape, (2, 3, 6))
 ```
 
 ```{.python .input  n=31}
 %%tab pytorch
 Q = d2l.ones((2, 3, 4))
 K = d2l.ones((2, 4, 6))
-torch.bmm(Q, K).shape
+d2l.check_shape(torch.bmm(Q, K).shape, (2, 3, 6))
 ```
 
 ```{.python .input  n=32}
 %%tab tensorflow
 Q = d2l.ones((2, 3, 4))
 K = d2l.ones((2, 4, 6))
-tf.matmul(Q, K).numpy()
+d2l.check_shape(tf.matmul(Q, K).numpy(), (2, 3, 6))
 ```
 
 ## [**Scaled Dot-Product Attention**]

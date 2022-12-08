@@ -263,7 +263,6 @@ extending the applicability of Transformers to a range of computer vision tasks
 beyond image classification with state-of-the-art results :cite:`liu2021swin`.
 
 
-
 ## Exercises
 
 1. How does the value of `img_size` affect training time?

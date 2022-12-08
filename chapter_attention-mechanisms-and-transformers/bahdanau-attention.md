@@ -72,7 +72,7 @@ import tensorflow as tf
 ## Defining the Decoder with Attention
 
 To implement the RNN encoder-decoder with attention, 
-we only need to redefine the decoder (omitting the generated symbols from the attention function simplifies the design). Let's begin with [**the base interface for decoders with attention**] by defining the quite unsurprisingly named `AttentionDecoder` class. 
+we only need to redefine the decoder (omitting the generated symbols from the attention function simplifies the design). Let's begin with [**the base interface for decoders with attention**] by defining the quite unsurprisingly named `AttentionDecoder` class.
 
 ```{.python .input  n=5}
 %%tab all
@@ -251,7 +251,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
 
 In the following, we [**test the implemented
 decoder**] with attention
-using a minibatch of 4 sequences, each of which are 7 time steps long. 
+using a minibatch of 4 sequences, each of which are 7 time steps long.
 
 ```{.python .input  n=9}
 %%tab all
@@ -373,6 +373,7 @@ d2l.show_heatmaps(attention_weights[:, :, :, :len(engs[-1].split()) + 1],
 
 When predicting a token, if not all the input tokens are relevant, the RNN encoder-decoder with Bahdanau attention selectively aggregates different parts of the input sequence. This is achieved by treating the context variable as an output of additive attention pooling.
 In the RNN encoder-decoder, Bahdanau attention treats the decoder hidden state at the previous time step as the query, and the encoder hidden states at all the time steps as both the keys and values.
+
 
 ## Exercises
 
