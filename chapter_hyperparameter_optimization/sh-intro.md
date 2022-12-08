@@ -130,7 +130,7 @@ def suggest(self):
         # Number of configurations for the first rung:
         n0 = int(self.prefact * self.eta ** self.K)
         for _ in range(n0):
-            config = searcher.sample_configuration()
+            config = self.searcher.sample_configuration()
             config["max_epochs"] = self.r_min  # Set r = r_min
             self.queue.append(config)
     # Return an element from the queue

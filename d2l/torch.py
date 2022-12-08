@@ -2735,7 +2735,7 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):
             # Number of configurations for the first rung:
             n0 = int(self.prefact * self.eta ** self.K)
             for _ in range(n0):
-                config = searcher.sample_configuration()
+                config = self.searcher.sample_configuration()
                 config["max_epochs"] = self.r_min  # Set r = r_min
                 self.queue.append(config)
         # Return an element from the queue
@@ -2784,7 +2784,7 @@ class HyperbandScheduler(d2l.HPOScheduler):
         self.save_hyperparameters()
         self.s_max = int(np.ceil((np.log(r_max) - np.log(r_min)) / np.log(eta)))
         self.s = self.s_max
-        self.successive_halving = SuccessiveHalvingScheduler(
+        self.successive_halving = d2l.SuccessiveHalvingScheduler(
             searcher=self.searcher,
             eta=self.eta,
             r_min=self.r_min,
@@ -2806,7 +2806,7 @@ class HyperbandScheduler(d2l.HPOScheduler):
             self.s -= 1
             if self.s < 0:
                 self.s = self.s_max
-            self.successive_halving = SuccessiveHalvingScheduler(
+            self.successive_halving = d2l.SuccessiveHalvingScheduler(
                 searcher=self.searcher,
                 eta=self.eta,
                 r_min=int(self.r_max * self.eta ** (-self.s)),
