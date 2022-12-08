@@ -9,26 +9,27 @@ tab.interact_select(["pytorch"])
 
 As we have seen in :numref:`sec_rs_async`, we can accelerate HPO by
 distributing the evaluation of hyperparameter configurations across either
-multiple instances or multiples CPUs / GPUs on a single instance. However, compared
-to random search, it is not straightforward to run SH asynchronously in a
-distributed setting. Before we can decide which configuration to run next, we first
-have to collect all observations on the current rung level. This requires to
+multiple instances or multiples CPUs / GPUs on a single instance. However,
+compared to random search, it is not straightforward to run
+successive halving (SH) asynchronously in a distributed setting. Before we can
+decide which configuration to run next, we first have to collect all
+observations at the current rung level. This requires to
 synchronize workers at each rung level. For example, for the lowest rung level
 $r_{min}$, we first have to evaluate all $N = \eta^K$ configurations, before we
 can promote the $\frac{1}{\eta}$ of them to the next rung level.
 
 In any distributed system, synchronization typically implies idle time for workers.
 First, we often observe high variations in training time across hyperparameter
-configurations. For example, assuming the number of filter per layer is a 
-hyperparameter, then networks with smaller filter sizes finish training faster than
-networks with larger filter sizes, which implies idle worker time due to stragglers.
+configurations. For example, assuming the number of filters per layer is a 
+hyperparameter, then networks with less filters finish training faster than
+networks with more filters, which implies idle worker time due to stragglers.
 Moreover, the number of slots in a rung level is not always a multiple of the number
 of workers, in which case some workers may even sit idle for a full batch.
 
 Figure :numref:`synchronous_sh` shows the scheduling of synchronous SH with $\eta=2$
 for four different trials with two workers. We start with evaluating Trial-0 and
 Trial-1 for one epoch and immediately continue with the next two trials once they
-are finished. Now, we first have to wait until Trial-2 finishes, which takes
+are finished. We first have to wait until Trial-2 finishes, which takes
 substantially more time than the other trials, before we can promote the best two
 trials, i.e., Trial-0 and Trial-3 to the next rung level. This causes idle time for
 Worker-1. Now, we continue with Rung 1. Also, here Trial-3 takes longer than Trial-0,
@@ -43,7 +44,7 @@ the next round, and start evaluating new trials (e.g Trial-4) on the first rung.
 Asynchronous successive halving (ASHA) :cite:`li-arxiv18` adapts SH to the asynchronous
 parallel scenario. The main idea of ASHA is to promote configurations to the next rung
 level as soon as we collected at least $\eta$ observations on the current rung level.
-This rule may lead to suboptimal promotions: configurations can be promoted to the
+This decision rule may lead to suboptimal promotions: configurations can be promoted to the
 next rung level, which in hindsight do not compare favourably against most others
 at the same rung level. On the other hand, we get rid of all synchronization points
 this way. In practice, such suboptimal initial promotions have only a modest impact on
@@ -220,10 +221,10 @@ plt.legend()
 ## Summary
 
 Compared to random search, successive halving is not quite as trivial to run in
-an asynchronous distributed setting. To avoid synchronisation points, we have to
-promote configurations as quickly as possible to the next rung level, even if this
-means we promote the wrong configuration. In practice, this usually does not hurt
-so much, and the gains of asynchronous versus synchronous scheduling are usually
-much  higher than the loss of the suboptimal decision making.
+an asynchronous distributed setting. To avoid synchronisation points, we promote
+configurations as quickly as possible to the next rung level, even if this means
+promoting some wrong ones. In practice, this usually does not hurt much, and the
+gains of asynchronous versus synchronous scheduling are usually much higher
+than the loss of the suboptimal decision making.
 
 ## Exercises
