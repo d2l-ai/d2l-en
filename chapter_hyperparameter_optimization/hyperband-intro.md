@@ -49,6 +49,7 @@ from d2l import torch as d2l
 import numpy as np
 from scipy import stats
 from collections import defaultdict
+from operator import itemgetter
 
 min_number_of_epochs = 2
 max_number_of_epochs = 10
@@ -69,7 +70,7 @@ object for the current bracket.
 
 ```{.python .input  n=8}
 %%tab all
-class HyperbandScheduler(d2l.HPOScheduler):  #@save
+class HyperbandScheduler(d2l.HPOScheduler):
     def __init__(self, searcher, eta, r_min, r_max):
         self.save_hyperparameters()
         self.s_max = int(np.ceil((np.log(r_max) - np.log(r_min)) / np.log(eta)))
@@ -93,7 +94,7 @@ different $r_{min}$ and $s$.
 
 ```{.python .input  n=9}
 %%tab all
-@d2l.add_to_class(HyperbandScheduler)  #@save
+@d2l.add_to_class(HyperbandScheduler)
 def update(self, config: dict, error: float, info=None):
     self.brackets[self.s].append((config["max_epochs"], error))
     self.successive_halving.update(config, error, info=info)

@@ -2778,42 +2778,6 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):
         sorted_rung = sorted(rung, key=itemgetter(1))
         return [x[0] for x in sorted_rung[:n]]
 
-class HyperbandScheduler(d2l.HPOScheduler):
-    """Defined in :numref:`sec_mf_hpo_hyperband`"""
-    def __init__(self, searcher, eta, r_min, r_max):
-        self.save_hyperparameters()
-        self.s_max = int(np.ceil((np.log(r_max) - np.log(r_min)) / np.log(eta)))
-        self.s = self.s_max
-        self.successive_halving = d2l.SuccessiveHalvingScheduler(
-            searcher=self.searcher,
-            eta=self.eta,
-            r_min=self.r_min,
-            r_max=self.r_max,
-            prefact=(self.s_max + 1) / (self.s + 1),
-        )
-        self.brackets = defaultdict(list)
-
-    def suggest(self):
-        return self.successive_halving.suggest()
-
-    def update(self, config: dict, error: float, info=None):
-        """Defined in :numref:`sec_mf_hpo_hyperband`"""
-        self.brackets[self.s].append((config["max_epochs"], error))
-        self.successive_halving.update(config, error, info=info)
-        # If the queue of successive halving is empty, than we finished this round
-        # and start with a new round with different r_min and N
-        if len(self.successive_halving.queue) == 0:
-            self.s -= 1
-            if self.s < 0:
-                self.s = self.s_max
-            self.successive_halving = d2l.SuccessiveHalvingScheduler(
-                searcher=self.searcher,
-                eta=self.eta,
-                r_min=int(self.r_max * self.eta ** (-self.s)),
-                r_max=self.r_max,
-                prefact=(self.s_max + 1) / (self.s + 1),
-            )
-
 def load_array(data_arrays, batch_size, is_train=True):
     """Construct a PyTorch data iterator.
 
