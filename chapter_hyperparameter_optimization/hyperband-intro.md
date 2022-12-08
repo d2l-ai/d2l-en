@@ -132,7 +132,7 @@ def suggest(self):
         n0 = int(self.prefact * self.eta ** self.K)
         for _ in range(n0):
             config = searcher.sample_configuration()
-            config["max_epochs"] = self.r_min  # set r = r_min
+            config["max_epochs"] = self.r_min  # Set r = r_min
             self.queue.append(config)
     # Return an element from the queue
     return self.queue.pop()
