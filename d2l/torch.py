@@ -2624,7 +2624,7 @@ class HPOSearcher(d2l.HyperParameters):
     def sample_configuration():
         raise NotImplementedError
 
-    def update(self, config, error, additional_info=None):
+    def update(self, config: dict, error: float, additional_info=None):
         pass
 
 class RandomSearcher(HPOSearcher):
@@ -2735,19 +2735,19 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):
             n0 = int(self.prefact * self.eta ** self.K)
             for _ in range(n0):
                 config = searcher.sample_configuration()
-                config["max_epochs"] = self.r_min  # set r = r_min
+                config["max_epochs"] = self.r_min  # Set r = r_min
                 self.queue.append(config)
         # Return an element from the queue
         return self.queue.pop()
 
-    def update(self, config, error, info=None):
+    def update(self, config: dict, error: float, info=None):
         """Defined in :numref:`sec_mf_hpo`"""
         ri = config["max_epochs"]  # Rung r_i
         # Update our searcher, e.g if we use Bayesian optimization later
         self.searcher.update(config, error, additional_info=info)
         if ri < self.r_max:
             # Bookkeeping
-            self.observed_error_at_rungs[ri].append((config, d2l.numpy(error.cpu())))
+            self.observed_error_at_rungs[ri].append((config, error))
             # Determine how many configurations should be evaluated on this rung
             ki = self.K - self.rung_levels.index(ri)
             ni = int(self.prefact * self.eta ** ki)
@@ -2794,9 +2794,9 @@ class HyperbandScheduler(d2l.HPOScheduler):
     def suggest(self):
         return self.successive_halving.suggest()
 
-    def update(self, config, error, info=None):
+    def update(self, config: dict, error: float, info=None):
         """Defined in :numref:`sec_mf_hpo`"""
-        self.brackets[self.s].append((config["max_epochs"], d2l.numpy(error.cpu())))
+        self.brackets[self.s].append((config["max_epochs"], error))
         self.successive_halving.update(config, error, info=info)
         # If the queue of successive halving is empty, than we finished this round
         # and start with a new round with different r_min and N

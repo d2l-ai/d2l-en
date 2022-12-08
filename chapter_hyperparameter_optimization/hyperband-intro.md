@@ -217,7 +217,7 @@ tuner = d2l.HPOTuner(
     scheduler=scheduler,
     objective=d2l.hpo_objective_lenet,
 )
-tuner.run(number_of_trials=31)
+tuner.run(number_of_trials=30)
 ```
 
 We can visualize the learning curves of all configurations that we evaluated.
@@ -342,7 +342,7 @@ tuner = d2l.HPOTuner(
     scheduler=scheduler,
     objective=d2l.hpo_objective_lenet,
 )
-tuner.run(number_of_trials=50)
+tuner.run(number_of_trials=30)
 ```
 
 Now, we can visualize the different brackets of successive halving.
