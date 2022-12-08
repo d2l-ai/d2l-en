@@ -196,6 +196,7 @@ $2, 4, 8, 10$.
 min_number_of_epochs = 2
 max_number_of_epochs = 10
 eta = 2
+num_gpus=1
 
 config_space = {
     "learning_rate": stats.loguniform(1e-2, 1),
