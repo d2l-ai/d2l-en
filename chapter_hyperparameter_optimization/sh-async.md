@@ -38,7 +38,7 @@ the best trial, Trial-0, remains which occupies only one worker. To avoid that
 Worker-1 idles during that time, most implementaitons of SH continue already with
 the next round, and start evaluating new trials (e.g Trial-4) on the first rung.
 
-![Synchronous successive halving with two workers.](img/sync_sh.svg)
+![Synchronous successive halving with two workers.](../img/sync_sh.svg)
 :label:`synchronous_sh`
 
 Asynchronous successive halving (ASHA) :cite:`li-arxiv18` adapts SH to the asynchronous
@@ -69,7 +69,7 @@ rung 2. At the same time, Worker-1 continues with evaluating new trials (i.e.,
 Trial-5) on rung 0.
 
 
-![Visualization of successive halving with synchronous and asynchronous scheduling of trials.](img/asha.svg)
+![Visualization of successive halving with synchronous and asynchronous scheduling of trials.](../img/asha.svg)
 :label:`asha`
 
 ## Objective Function

@@ -36,7 +36,7 @@ random search exhibits a linear speed-up, in that a certain performance is reach
 $K$ times faster if $K$ trials can be run in parallel. 
 
 
-![Distributing the hyperparameter optimization process either synchronously or asynchronously. Compared to the sequential setting, we can reduce the overall wall-clock time while keep the total compute constant. Synchronous scheduling might lead to idling workers in the case of stragglers.](img/distributed_scheduling.svg)
+![Distributing the hyperparameter optimization process either synchronously or asynchronously. Compared to the sequential setting, we can reduce the overall wall-clock time while keep the total compute constant. Synchronous scheduling might lead to idling workers in the case of stragglers.](../img/distributed_scheduling.svg)
 :label:`distributed_scheduling`
 
 In this notebook, we will look at asynchronous random search that, where trials are

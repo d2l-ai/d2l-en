@@ -250,7 +250,7 @@ make use of the past observation to identify better configurations and thus
 quickly outperforms random search afterwards.
 
 
-![Example any-time performance plot to compare two algorithms A and B.](img/example_anytime_performance.svg)
+![Example any-time performance plot to compare two algorithms A and B.](../img/example_anytime_performance.svg)
 :label:`example_anytime_performance`
 
 
