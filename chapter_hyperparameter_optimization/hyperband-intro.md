@@ -52,33 +52,32 @@ least one trial reaches $r_{max}$ epochs.
 
 More formally, consider a minimum budget $r_{min}$, for example 1 epoch, a maximum
 budget $r_{max}$, for example `max_epochs` in our previous example, and a halving
-constant $\eta\in\{2, 3, \dots\}$. For simplicity, assume that $r_{max} = r_{min}
-\eta^K$, with $K \in \mathbb{I}$ . The number of initial configurations is then
-$N = \eta^K$. Let us define *rungs* $\mathcal{R} =
-\{ r_{min}, r_{min}\eta, r_{min}\eta^2, \dots, r_{max} \}$. 
+constant $\eta\in\{2, 3, \dots\}$. For simplicity, assume that
+$r_{max} = r_{min} \eta^K$, with $K \in \mathbb{I}$ . The number of initial
+configurations is then $N = \eta^K$. Let us define the set of rungs
+$\mathcal{R} = \{ r_{min}, r_{min}\eta, r_{min}\eta^2, \dots, r_{max} \}$. 
 
-We start with running $N$ trials until the first rung $r_{min}$. Sorting the
-validation errors, we keep the top $1 / \eta$ fraction (which amounts to
-$\eta^{K-1}$ configurations) and discard all the rest. The surviving trials are
-trained for the next rung, i.e $r_{min}\eta$ epochs, and the process is repeated.
-In each round, a $1 / \eta$ fraction of trials survives and their training
-continues with a $\eta$ times larger budget. With this particular choice of $N$,
-only a single trial will be trained to the full budget $r_{max}$. Finally, once
-we finished one round of successive halving, we start the next round with a new
-set of initial configurations, until the total budget is spent.
+One round of successive halving proceeds as follows. We start with running $N$
+trials until the first rung $r_{min}$. Sorting the validation errors, we keep
+the top $1 / \eta$ fraction (which amounts to $\eta^{K-1}$ configurations) and
+discard all the rest. The surviving trials are trained for the next rung
+($r_{min}\eta$ epochs), and the process is repeated. At each rung, a
+$1 / \eta$ fraction of trials survives and their training continues with a
+$\eta$ times larger budget. With this particular choice of $N$, only a single
+trial will be trained to the full budget $r_{max}$. Once such a round of
+successive halving is done, we start the next one with a new set of initial
+configurations, iterating until the total budget is spent.
 
 ![Learning curves of random hyperparameter configurations](img/sh.svg)
 :label:`sh`
 
-To implement successive halving, we use the `HPOScheduler` base class from
-:numref:`sec_api_hpo`. Since successive halving can be combined with Bayesian
-optimization, we allow for a generic `HPOSearcher` object to sample
-configurations. Additionally, the user has to pass the minimum resource
-$r_{min}$, the maximum resource $r_{max}$ and $\eta$ as input.
-
-Inside our scheduler we maintain a queue of configurations that need to be
-evaluated for the current rung $r_i$. We update the queue every time we jump to
-the next rung.
+We subclass the `HPOScheduler` base class from :numref:`sec_api_hpo` in order to
+implement successive halving, allowing for a generic `HPOSearcher` object to
+sample configurations (which, in our example below, will be a `RandomSearcher`).
+Additionally, the user has to pass the minimum resource $r_{min}$, the maximum
+resource $r_{max}$ and $\eta$ as input. Inside our scheduler, we maintain a
+queue of configurations that still need to be evaluated for the current rung
+$r_i$. We update the queue every time we jump to the next rung.
 
 ```{.python .input}
 %%tab pytorch
@@ -110,15 +109,16 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):  #@save
         self.queue = []
 ```
 
-In the beginning our queue is empty and we fill it with $n = prefact * \eta^{K}$
-configurations, which are first evaluated on the smallest rung $r_{min}$.
-The effect of $prefact$ will become important in the next part when we talk
-about Hyperband, for now we assume $prefact=1$. Now, every time resources become
-available and the `HPOTuner`object queries the suggest function, we return an
-element from the queue. Once we finish one round of successive halving - which
-means that we evaluated all surviving configurations on the highest resource
-level $r_{max}$ and our queue is empty - we start the entire process again with
-a new, randomly sampled set of configurations.
+In the beginning our queue is empty, and we fill it with
+$n = \mathrm{prefact} * \eta^{K}$ configurations, which are first evaluated on
+the smallest rung $r_{min}$. The effect of $\mathrm{prefact}$ will become
+important below, when we introduce Hyperband. For now, we set
+$\mathrm{prefact} = 1$. Every time resources become available and the `HPOTuner`
+object queries the `suggest` function, we return an element from the queue. Once
+we finish one round of successive halving, which means that we evaluated all
+surviving configurations on the highest resource level $r_{max}$ and our queue
+is empty, we start the entire process again with a new, randomly sampled set
+of configurations.
 
 ```{.python .input  n=12}
 %%tab all
@@ -172,7 +172,8 @@ def update(self, config: dict, error: float, info=None):
             self.observed_error_at_rungs[ri] = []  # reset
 ```
 
-Configurations are sorted based on their observed performance on the current rung.
+Configurations are sorted based on their observed performance on the current
+rung.
 
 ```{.python .input  n=4}
 %%tab all
@@ -219,9 +220,9 @@ tuner = d2l.HPOTuner(
 tuner.run(number_of_trials=31)
 ```
 
-We can visualize the learning curves of all configuration that we evaluated.
+We can visualize the learning curves of all configurations that we evaluated.
 Most of the configurations are stopped early and only the better performing
-configurations survive until $r_{max}$. Compare this to vanilla random search
+configurations survive until $r_{max}$. Compare this to vanilla random search,
 which would allocate $r_{max}$ to every configuration.
 
 ```{.python .input  n=19}
@@ -238,22 +239,26 @@ d2l.plt.xlabel("epochs")
 ```
 
 Finally, note some slight complexity in our implementation of
-`SuccessiveHalvingScheduler`. Namely, `suggest` needs to return a configuration
-immediately. But if at least one other worker is still busy with an evaluation
-in the current rung, we cannot determine the top $1 / \eta$ fraction to open the
-next rung. Instead, `suggest` starts a new round of successive halving already.
-However, once a rung is completed in `update`, we make sure to insert new
-configurations at the beginning of the queue, so they take precedence over
-configurations from the next round.
+`SuccessiveHalvingScheduler`. Say that a worker is free to run a job, and
+`suggest` is called when the current rung has almost been completely filled, but
+another worker is still busy with an evaluation. Since we lack the metric value
+from this worker, we cannot determine the top $1 / \eta$ fraction to open up
+the next rung. On the other hand, we want to assign a job to our free worker,
+so it does not remain idle. Our solution is to start a new round of successive
+halving and assign our worker to the first trial there. However, once a rung is
+completed in `update`, we make sure to insert new configurations at the
+beginning of the queue, so they take precedence over configurations from the
+next round.
 
 ## Hyperband
 
 While successive halving can greatly improve upon random search, the choice of
 $r_{min}$ can have a large impact on its performance. If $r_{min}$ is too small,
 our network might not have enough time to learn anything, and even the best
-configurations may be filtered out due to noisy observations. If $r_{min}$ is
-too large on the other hand, the benefits of successive-halving may be greatly
-diminished.
+configurations may be filtered out due to noisy observations. On the other hand,
+if $r_{min}$ is too large, we do not save much time evaluating the low fidelity
+signals (as opposed to training until $r_{max}$), and the benefits of
+successive halving are diminished.
 
 Hyperband :cite:`li-iclr17` is an extension of successive halving that mitigates
 the risk of setting $r_{min}$ too small. It runs successive halving as subroutine,
@@ -340,7 +345,7 @@ tuner = d2l.HPOTuner(
 tuner.run(number_of_trials=50)
 ```
 
-Now, we can visualize the different bracket of successive halving.
+Now, we can visualize the different brackets of successive halving.
 
 ```{.python .input  n=24}
 for bi, bracket in scheduler.brackets.items():

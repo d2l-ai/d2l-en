@@ -83,7 +83,7 @@ import matplotlib.pyplot as plt
 
 from syne_tune.config_space import loguniform, randint
 from syne_tune.backend.python_backend import PythonBackend
-from syne_tune.optimizer.baselines import RandomSearch
+from syne_tune.optimizer.baselines import ASHA
 from syne_tune import Tuner, StoppingCriterion
 from syne_tune.experiments import load_experiment
 
