@@ -1036,7 +1036,57 @@ class EncoderDecoder(d2l.Classifier):
         enc_outputs = self.encoder(enc_X, *args, training=self.training)
         dec_state = self.decoder.init_state(enc_outputs, *args)
         # Return decoder output only
-        return self.decoder(dec_X, dec_state)[0]
+        return self.decoder(dec_X, dec_state, training=self.training)[0]
+
+    def predict_step(self, params, batch, num_steps,
+                     save_attention_weights=False):
+        """Defined in :numref:`sec_seq2seq_training`"""
+        src, tgt, src_valid_len, _ = batch
+        enc_outputs = self.encoder.apply({'params': params['encoder']}, src,
+                                         src_valid_len, training=False)
+        dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
+        outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
+        for _ in range(num_steps):
+            Y, dec_state = self.decoder.apply({'params': params['decoder']},
+                                              outputs[-1], dec_state, training=False)
+            outputs.append(d2l.argmax(Y, 2))
+            # Save attention weights (to be covered later)
+            if save_attention_weights:
+                attention_weights.append(self.decoder.attention_weights)
+        return d2l.concat(outputs[1:], 1), attention_weights
+
+class Seq2Seq(d2l.EncoderDecoder):
+    """Defined in :numref:`sec_seq2seq_decoder`"""
+    encoder: nn.Module
+    decoder: nn.Module
+    tgt_pad: int
+    lr: float
+
+    def validation_step(self, params, batch, state):
+        l, _ = self.loss(params, batch[:-1], batch[-1], state)
+        self.plot('loss', l, train=False)
+
+    def configure_optimizers(self):
+        # Adam optimizer is used here
+        return optax.adam(learning_rate=self.lr)
+
+def bleu(pred_seq, label_seq, k):
+    """Compute the BLEU.
+
+    Defined in :numref:`sec_seq2seq_training`"""
+    pred_tokens, label_tokens = pred_seq.split(' '), label_seq.split(' ')
+    len_pred, len_label = len(pred_tokens), len(label_tokens)
+    score = math.exp(min(0, 1 - len_label / len_pred))
+    for n in range(1, min(k, len_pred) + 1):
+        num_matches, label_subs = 0, collections.defaultdict(int)
+        for i in range(len_label - n + 1):
+            label_subs[' '.join(label_tokens[i: i + n])] += 1
+        for i in range(len_pred - n + 1):
+            if label_subs[' '.join(pred_tokens[i: i + n])] > 0:
+                num_matches += 1
+                label_subs[' '.join(pred_tokens[i: i + n])] -= 1
+        score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
+    return score
 
 def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                   cmap='Reds'):
