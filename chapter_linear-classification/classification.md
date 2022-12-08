@@ -70,7 +70,7 @@ class Classifier(d2l.Module):  #@save
         # Here value is a tuple since models with BatchNorm layers require
         # the loss to return auxiliary data
         value, grads = jax.value_and_grad(
-            self.loss, has_aux=True)(params, *batch[:-1], batch[-1], state)
+            self.loss, has_aux=True)(params, batch[:-1], batch[-1], state)
         l, _ = value
         self.plot("loss", l, train=True)
         return value, grads
@@ -78,9 +78,9 @@ class Classifier(d2l.Module):  #@save
     def validation_step(self, params, batch, state):
         # Discard the second returned value. It is used for training models
         # with BatchNorm layers since loss also returns auxiliary data
-        l, _ = self.loss(params, *batch[:-1], batch[-1], state)
+        l, _ = self.loss(params, batch[:-1], batch[-1], state)
         self.plot('loss', l, train=False)
-        self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1], state),
+        self.plot('acc', self.accuracy(params, batch[:-1], batch[-1], state),
                   train=False)
 ```
 
@@ -162,7 +162,7 @@ def accuracy(self, params, X, Y, state, averaged=True):
     """Compute the number of correct predictions."""
     Y_hat = state.apply_fn({'params': params,
                             'batch_stats': state.batch_stats},  # BatchNorm Only
-                           X)
+                           *X)
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     preds = d2l.astype(d2l.argmax(Y_hat, axis=1), Y.dtype)
     compare = d2l.astype(preds == d2l.reshape(Y, -1), d2l.float32)

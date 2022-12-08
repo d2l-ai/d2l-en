@@ -230,7 +230,7 @@ def loss(self, y_hat, y):
 %%tab jax
 @d2l.add_to_class(LinearRegression)  #@save
 def loss(self, params, X, y, state):
-    y_hat = state.apply_fn({'params': params}, X)
+    y_hat = state.apply_fn({'params': params}, *X)
     return d2l.reduce_mean(optax.l2_loss(y_hat, y))
 ```
 

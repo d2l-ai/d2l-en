@@ -161,7 +161,7 @@ def loss(self, y_hat, y):
 %%tab jax
 @d2l.add_to_class(LinearRegressionScratch)  #@save
 def loss(self, params, X, y, state):
-    y_hat = state.apply_fn({'params': params}, X)
+    y_hat = state.apply_fn({'params': params}, *X)  # X unpacked from a tuple
     l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
     return d2l.reduce_mean(l)
 ```

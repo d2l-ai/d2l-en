@@ -219,13 +219,13 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
                         every_n=int(n))
 
     def training_step(self, params, batch, state):
-        l, grads = jax.value_and_grad(self.loss)(params, *batch[:-1],
+        l, grads = jax.value_and_grad(self.loss)(params, batch[:-1],
                                                  batch[-1], state)
         self.plot("loss", l, train=True)
         return l, grads
 
     def validation_step(self, params, batch, state):
-        l = self.loss(params, *batch[:-1], batch[-1], state)
+        l = self.loss(params, batch[:-1], batch[-1], state)
         self.plot('loss', l, train=False)
 
     def apply_init(self, dummy_input, **kwargs):
@@ -414,7 +414,7 @@ class LinearRegressionScratch(d2l.Module):
 
     def loss(self, params, X, y, state):
         """Defined in :numref:`sec_linear_scratch`"""
-        y_hat = state.apply_fn({'params': params}, X)
+        y_hat = state.apply_fn({'params': params}, *X)  # X unpacked from a tuple
         l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
         return d2l.reduce_mean(l)
 
@@ -466,7 +466,7 @@ class LinearRegression(d2l.Module):
 
     def loss(self, params, X, y, state):
         """Defined in :numref:`sec_linear_concise`"""
-        y_hat = state.apply_fn({'params': params}, X)
+        y_hat = state.apply_fn({'params': params}, *X)
         return d2l.reduce_mean(optax.l2_loss(y_hat, y))
 
     def configure_optimizers(self):
@@ -523,7 +523,7 @@ class Classifier(d2l.Module):
         # Here value is a tuple since models with BatchNorm layers require
         # the loss to return auxiliary data
         value, grads = jax.value_and_grad(
-            self.loss, has_aux=True)(params, *batch[:-1], batch[-1], state)
+            self.loss, has_aux=True)(params, batch[:-1], batch[-1], state)
         l, _ = value
         self.plot("loss", l, train=True)
         return value, grads
@@ -531,9 +531,9 @@ class Classifier(d2l.Module):
     def validation_step(self, params, batch, state):
         # Discard the second returned value. It is used for training models
         # with BatchNorm layers since loss also returns auxiliary data
-        l, _ = self.loss(params, *batch[:-1], batch[-1], state)
+        l, _ = self.loss(params, batch[:-1], batch[-1], state)
         self.plot('loss', l, train=False)
-        self.plot('acc', self.accuracy(params, *batch[:-1], batch[-1], state),
+        self.plot('acc', self.accuracy(params, batch[:-1], batch[-1], state),
                   train=False)
 
     @partial(jax.jit, static_argnums=(0, 5))
@@ -543,7 +543,7 @@ class Classifier(d2l.Module):
         Defined in :numref:`sec_classification`"""
         Y_hat = state.apply_fn({'params': params,
                                 'batch_stats': state.batch_stats},  # BatchNorm Only
-                               X)
+                               *X)
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         preds = d2l.astype(d2l.argmax(Y_hat, axis=1), Y.dtype)
         compare = d2l.astype(preds == d2l.reshape(Y, -1), d2l.float32)
@@ -552,7 +552,7 @@ class Classifier(d2l.Module):
     @partial(jax.jit, static_argnums=(0, 5))
     def loss(self, params, X, Y, state, averaged=True):
         """Defined in :numref:`sec_softmax_concise`"""
-        Y_hat = state.apply_fn({'params': params}, X,
+        Y_hat = state.apply_fn({'params': params}, *X,
                                mutable=False, rngs=None)  # To be used later (e.g., for batch norm)
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         Y = d2l.reshape(Y, (-1,))
@@ -564,7 +564,7 @@ class Classifier(d2l.Module):
     @partial(jax.jit, static_argnums=(0, 5))
     def loss(self, params, X, Y, state, averaged=True):
         """Defined in :numref:`sec_dropout`"""
-        Y_hat = state.apply_fn({'params': params}, X,
+        Y_hat = state.apply_fn({'params': params}, *X,
                                mutable=False,  # To be used later (e.g., batch norm)
                                rngs={'dropout': jax.random.PRNGKey(0)})
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
@@ -589,7 +589,7 @@ class Classifier(d2l.Module):
         """Defined in :numref:`subsec_layer-normalization-in-bn`"""
         Y_hat, updates = state.apply_fn({'params': params,
                                          'batch_stats': state.batch_stats},
-                                        X, mutable=['batch_stats'],
+                                        *X, mutable=['batch_stats'],
                                         rngs={'dropout': jax.random.PRNGKey(0)})
         Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
         Y = d2l.reshape(Y, (-1,))
@@ -821,13 +821,13 @@ class RNNLMScratch(d2l.Classifier):
 
     def training_step(self, params, batch, state):
         value, grads = jax.value_and_grad(
-            self.loss, has_aux=True)(params, *batch[:-1], batch[-1], state)
+            self.loss, has_aux=True)(params, batch[:-1], batch[-1], state)
         l, _ = value
         self.plot('ppl', d2l.exp(l), train=True)
         return value, grads
 
     def validation_step(self, params, batch, state):
-        l, _ = self.loss(params, *batch[:-1], batch[-1], state)
+        l, _ = self.loss(params, batch[:-1], batch[-1], state)
         self.plot('ppl', d2l.exp(l), train=False)
 
     def one_hot(self, X):

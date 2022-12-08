@@ -245,13 +245,13 @@ class RNNLMScratch(d2l.Classifier):  #@save
 
     def training_step(self, params, batch, state):
         value, grads = jax.value_and_grad(
-            self.loss, has_aux=True)(params, *batch[:-1], batch[-1], state)
+            self.loss, has_aux=True)(params, batch[:-1], batch[-1], state)
         l, _ = value
         self.plot('ppl', d2l.exp(l), train=True)
         return value, grads
 
     def validation_step(self, params, batch, state):
-        l, _ = self.loss(params, *batch[:-1], batch[-1], state)
+        l, _ = self.loss(params, batch[:-1], batch[-1], state)
         self.plot('ppl', d2l.exp(l), train=False)
 ```
 

@@ -260,13 +260,13 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 
     if tab.selected('jax'):
         def training_step(self, params, batch, state):
-            l, grads = jax.value_and_grad(self.loss)(params, *batch[:-1],
+            l, grads = jax.value_and_grad(self.loss)(params, batch[:-1],
                                                      batch[-1], state)
             self.plot("loss", l, train=True)
             return l, grads
 
         def validation_step(self, params, batch, state):
-            l = self.loss(params, *batch[:-1], batch[-1], state)
+            l = self.loss(params, batch[:-1], batch[-1], state)
             self.plot('loss', l, train=False)
         
         def apply_init(self, dummy_input, **kwargs):

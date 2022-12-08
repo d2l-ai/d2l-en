@@ -436,7 +436,7 @@ mask internally.
 @d2l.add_to_class(d2l.Classifier)  #@save
 @partial(jax.jit, static_argnums=(0, 5))
 def loss(self, params, X, Y, state, averaged=True):
-    Y_hat = state.apply_fn({'params': params}, X,
+    Y_hat = state.apply_fn({'params': params}, *X,
                            mutable=False,  # To be used later (e.g., batch norm)
                            rngs={'dropout': jax.random.PRNGKey(0)})
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))

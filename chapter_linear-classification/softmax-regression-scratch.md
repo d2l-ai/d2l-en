@@ -290,7 +290,7 @@ def loss(self, y_hat, y):
 def loss(self, params, X, y, state):
     def cross_entropy(y_hat, y):
         return - d2l.reduce_mean(d2l.log(y_hat[list(range(len(y_hat))), y]))
-    y_hat = state.apply_fn({'params': params}, X)
+    y_hat = state.apply_fn({'params': params}, *X)
     # The returned empty dictionary is a placeholder for auxiliary data,
     # which will be used later (e.g., for batch norm)
     return cross_entropy(y_hat, y), {}

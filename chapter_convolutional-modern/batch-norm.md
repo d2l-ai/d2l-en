@@ -674,7 +674,7 @@ variables.
 def loss(self, params, X, Y, state, averaged=True):
     Y_hat, updates = state.apply_fn({'params': params,
                                      'batch_stats': state.batch_stats},
-                                    X, mutable=['batch_stats'],
+                                    *X, mutable=['batch_stats'],
                                     rngs={'dropout': jax.random.PRNGKey(0)})
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     Y = d2l.reshape(Y, (-1,))

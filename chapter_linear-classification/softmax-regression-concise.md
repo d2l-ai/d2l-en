@@ -193,7 +193,7 @@ def loss(self, Y_hat, Y, averaged=True):
 @d2l.add_to_class(d2l.Classifier)  #@save
 @partial(jax.jit, static_argnums=(0, 5))
 def loss(self, params, X, Y, state, averaged=True):
-    Y_hat = state.apply_fn({'params': params}, X,
+    Y_hat = state.apply_fn({'params': params}, *X,
                            mutable=False, rngs=None)  # To be used later (e.g., for batch norm)
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     Y = d2l.reshape(Y, (-1,))
