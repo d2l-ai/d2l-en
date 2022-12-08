@@ -148,7 +148,7 @@ frequently used functions and classes
 found throughout this book:
 
 ```bash
-pip install d2l==1.0.0a0
+pip install d2l==1.0.0a1.post0
 ```
 
 

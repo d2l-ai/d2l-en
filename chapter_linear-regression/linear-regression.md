@@ -120,6 +120,7 @@ the predictions $\hat{\mathbf{y}} \in \mathbb{R}^n$
 can be expressed via the matrix-vector product:
 
 $${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b,$$
+:eqlabel:`eq_linreg-y-vec`
 
 where broadcasting (:numref:`subsec_broadcasting`) is applied during the summation.
 Given features of a training dataset $\mathbf{X}$

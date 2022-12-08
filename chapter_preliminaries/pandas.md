@@ -93,7 +93,7 @@ we can treat `NaN` as a category.**]
 Since the `RoofType` column takes values `Slate` and `NaN`,
 `pandas` can convert this column 
 into two columns `RoofType_Slate` and `RoofType_nan`.
-A row whose alley type is `Slate` will set values 
+A row whose roof type is `Slate` will set values 
 of `RoofType_Slate` and `RoofType_nan` to 1 and 0, respectively.
 The converse holds for a row with a missing `RoofType` value.
 

@@ -271,7 +271,7 @@ def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
     self.save_hyperparameters()
     corpus, self.vocab = self.build(self._download())
     array = d2l.tensor([corpus[i:i+num_steps+1] 
-                        for i in range(0, len(corpus)-num_steps-1)])
+                        for i in range(len(corpus)-num_steps)])
     self.X, self.Y = array[:,:-1], array[:,1:]
 ```
 
@@ -280,8 +280,8 @@ we will randomly sample
 pairs of input sequences and target sequences
 in minibatches.
 The following data loader randomly generates a minibatch from the dataset each time.
-The argument `batch_size` specifies the number of subsequence examples (`self.b`) in each minibatch
-and `num_steps` is the subsequence length in tokens (`self.n`).
+The argument `batch_size` specifies the number of subsequence examples in each minibatch
+and `num_steps` is the subsequence length in tokens.
 
 ```{.python .input  n=6}
 %%tab all

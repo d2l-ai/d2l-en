@@ -546,9 +546,6 @@ To get out the probability assigned to an interval,
 we must take an *integral* of the density
 over that interval.
 
-
-
-
 ## Multiple Random Variables
 
 You might have noticed that we couldn't even
@@ -651,6 +648,11 @@ $P(B\mid A) P(A) = P(A\mid B) P(B)$ and hence
 
 $$P(A \mid B) = \frac{P(B\mid A) P(A)}{P(B)}.$$
 
+
+
+
+
+
 This simple equation has profound implications because
 it allows us to reverse the order of conditioning.
 If we know how to estimate $P(B\mid A)$, $P(A)$, and $P(B)$,
@@ -670,7 +672,7 @@ $$P(A \mid B) \propto P(B \mid A) P(A).$$
 Since we know that $P(A \mid B)$ must be normalized to $1$, i.e., $\sum_a P(A=a \mid B) = 1$,
 we can use it to compute
 
-$$P(A \mid B) = \frac{P(B \mid A) P(A)}{\sum_b P(B=b \mid A) P(A)}.$$
+$$P(A \mid B) = \frac{P(B \mid A) P(A)}{\sum_a P(B \mid A=a) P(A = a)}.$$
 
 In Bayesian statistics, we think of an observer
 as possessing some (subjective) prior beliefs
@@ -691,7 +693,7 @@ we can get away with simply normalizing over the hypotheses.
 
 Note that $\sum_a P(A=a \mid B) = 1$ also allows us to *marginalize* over random variables. That is, we can drop variables from a joint distribution such as $P(A, B)$. After all, we have that
 
-$$\sum_a P(A=a, B) = P(B) \sum_a P(A = a \mid B) = P(B).$$
+$$\sum_a P(B \mid A=a) P(A=a) = \sum_a P(B, A=a) = P(B).$$
 
 Independence is another fundamentally important concept
 that forms the backbone of

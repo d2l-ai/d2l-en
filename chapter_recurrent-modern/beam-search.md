@@ -3,12 +3,11 @@
 
 In :numref:`sec_seq2seq`, 
 we introduced the encoder-decoder architecture,
-and the standard techniques for training them end-to-end. 
-However, when it came to test-time prediction,
+and the standard techniques for training them end-to-end. However, when it came to test-time prediction,
 we mentioned only the *greedy* strategy,
 where we select at each time step 
-the most token given the highest 
-predicted probability of coming next. 
+the token given the highest 
+predicted probability of coming next, 
 until, at some time step, 
 we find that we have predicted
 the special end-of-sequence "&lt;eos&gt;" token.
@@ -65,7 +64,7 @@ Once our model outputs "&lt;eos&gt;"
 (or we reach the maximum length $T'$)
 the output sequence is completed.
 
-This strategy might looks reasonable, 
+This strategy might look reasonable, 
 and in fact it's not so bad!
 Considering how computationally undemanding it is,
 you'd be hard pressed to get more bang for your buck. 
@@ -83,16 +82,17 @@ then this would give us the most likely translation.
 Unfortunately, there is no guarantee 
 that greedy search will give us this sequence.
 
-![At each time step, greedy search selects the token with the highest conditional probability.](../img/s2s-prob1.svg)
-:label:`fig_s2s-prob1`
-
 Let's illustrate it with an example.
 Suppose that there are four tokens 
 "A", "B", "C", and "&lt;eos&gt;" in the output dictionary.
 In :numref:`fig_s2s-prob1`,
 the four numbers under each time step represent
 the conditional probabilities of generating "A", "B", "C", 
-and "&lt;eos&gt;" at that time step, respectively.  
+and "&lt;eos&gt;" at that time step, respectively.
+
+![At each time step, greedy search selects the token with the highest conditional probability.](../img/s2s-prob1.svg)
+:label:`fig_s2s-prob1`
+
 At each time step, greedy search selects 
 the token with the highest conditional probability. 
 Therefore, the output sequence "A", "B", "C", and "&lt;eos&gt;" 
@@ -100,18 +100,19 @@ will be predicted (:numref:`fig_s2s-prob1`).
 The conditional probability of this output sequence
 is $0.5\times0.4\times0.4\times0.6 = 0.048$.
 
-![The four numbers under each time step represent 
-the conditional probabilities of generating "A", "B", "C", and "&lt;eos&gt;" at that time step. 
-At time step 2, the token "C", which has the second highest conditional probability, 
-is selected.](../img/s2s-prob2.svg)
-:label:`fig_s2s-prob2`
-
 
 Next, let's look at another example in :numref:`fig_s2s-prob2`. 
 Unlike in :numref:`fig_s2s-prob1`, 
 at time step 2 we select the token "C"
 in :numref:`fig_s2s-prob2`, 
 which has the *second* highest conditional probability.
+
+![The four numbers under each time step represent 
+the conditional probabilities of generating "A", "B", "C", and "&lt;eos&gt;" at that time step. 
+At time step 2, the token "C", which has the second highest conditional probability, 
+is selected.](../img/s2s-prob2.svg)
+:label:`fig_s2s-prob2`
+
 Since the output subsequences at time steps 1 and 2, 
 on which time step 3 is based, 
 have changed from "A" and "B" in :numref:`fig_s2s-prob1` 
@@ -133,6 +134,10 @@ which is greater than that of greedy search in :numref:`fig_s2s-prob1`.
 In this example, the output sequence "A", "B", "C", and "&lt;eos&gt;" 
 obtained by the greedy search is not the optimal sequence.
 
+
+
+
+
 ## Exhaustive Search
 
 If the goal is to obtain the most likely sequence, 
@@ -151,7 +156,7 @@ base given by the vocabulary size.
 For example, when $|\mathcal{Y}|=10000$ and $T'=10$, 
 we will need to evaluate $10000^{10} = 10^{40}$ sequences. 
 These are small numbers compared to real applications
-but already beyond the capabilities any foreseeable computers
+but already beyond the capabilities any foreseeable computers.
 On the other hand, the computational cost of greedy search is 
 $\mathcal{O}(\left|\mathcal{Y}\right|T')$: 
 miraculously cheap but far from optimal.

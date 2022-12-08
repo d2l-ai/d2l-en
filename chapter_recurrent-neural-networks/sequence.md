@@ -274,7 +274,7 @@ But these gains diminish rapidly.
 Thus, sometimes we compromise, obviating computational and statistical difficulties
 by training models whose validity depends
 on a $k$-th order Markov condition.
-Even today's massive RNN- and transformer-based language models
+Even today's massive RNN- and Transformer-based language models
 seldom incorporate more than thousands of words of context.
 
 
