@@ -1,4 +1,4 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
 tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
@@ -386,7 +386,7 @@ Doing this efficiently requires that (**we**) (~~should~~)
 fast linear algebra libraries
 rather than writing costly for-loops in Python.**)
 
-```{.python .input  n=1}
+```{.python .input}
 %%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
@@ -395,7 +395,7 @@ from mxnet import np
 import time
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 %%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -422,7 +422,7 @@ containing all ones.
 In one method, we loop over the vectors with a Python for-loop.
 In the other method, we rely on a single call to `+`.
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab all
 n = 10000
 a = d2l.ones(n)
@@ -433,7 +433,7 @@ Now we can benchmark the workloads.
 First, [**we add them, one coordinate at a time,
 using a for-loop.**]
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab mxnet, pytorch
 c = d2l.zeros(n)
 t = time.time()
@@ -453,7 +453,7 @@ f'{time.time() - t:.5f} sec'
 
 (**Alternatively, we rely on the reloaded `+` operator to compute the elementwise sum.**)
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab all
 t = time.time()
 d = a + b
@@ -497,7 +497,7 @@ $$p(x) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (x - \m
 
 Below [**we define a function to compute the normal distribution**].
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab all
 def normal(x, mu, sigma):
     p = 1 / math.sqrt(2 * math.pi * sigma**2)
@@ -506,7 +506,7 @@ def normal(x, mu, sigma):
 
 We can now (**visualize the normal distributions**).
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab mxnet
 # Use numpy again for visualization
 x = np.arange(-7, 7, 0.01)
@@ -518,7 +518,7 @@ d2l.plot(x.asnumpy(), [normal(x, mu, sigma).asnumpy() for mu, sigma in params], 
          legend=[f'mean {mu}, std {sigma}' for mu, sigma in params])
 ```
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab pytorch, tensorflow
 # Use numpy again for visualization
 x = np.arange(-7, 7, 0.01)
