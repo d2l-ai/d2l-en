@@ -41,6 +41,7 @@ epochs for training the neural network, but it could also be the training
 subset size or the number of cross-validation folds.
 
 ## Successive Halving
+:label:`sec_mf_hpo_sh`
 
 One of the simplest ways to adapt random search to the multi-fidelity setting is
 *successive halving* :cite:`jamieson-aistats16,karnin-icml13`. The basic

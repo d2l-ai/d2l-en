@@ -153,7 +153,7 @@ scheduler = ASHA(
     resource_attr=resource_attr,
     grace_period=min_number_of_epochs,
     reduction_factor=eta,
-)  
+)
 ```
 
 Here, `metric` and `resource_attr` specify the key names used with the `report`
@@ -177,7 +177,15 @@ tuner = Tuner(
 tuner.run()
 ```
 
-After the experiment has finished, we can retrieve and plot results.
+Note that we are running a variant of ASHA where underperforming trials are
+stopped early. This is different to our implementation in
+:numref:`sec_mf_hpo_sh`, where each training job is started with a fixed
+`max_epochs`. In the latter case, a well-performing trial which reaches the
+full 10 epochs, first needs to train 1, then 2, then 4, then 8 epochs, each
+time starting from scratch. This type of pause-and-resume scheduling can be
+implemented efficiently by checkpointing the training state after each epoch,
+but we avoid this extra complexity here. After the experiment has finished,
+we can retrieve and plot results.
 
 ```{.python .input  n=59}
 e = load_experiment(tuner.name)
