@@ -121,7 +121,7 @@ def init_cnn(module):  #@save
 
 ```{.python .input}
 %%tab all
-class LeNet(d2l.Classifier):
+class LeNet(d2l.Classifier):  #@save
     def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
         self.save_hyperparameters()

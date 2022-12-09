@@ -30,3 +30,4 @@ build/
 .vscode
 .pytest_cache
 static/latex_style/PT1*
+/chapter_hyperparameter_optimization/std.out
