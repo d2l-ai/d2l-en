@@ -1,6 +1,6 @@
 # Gaussian Process Inference
 
-In this section, we will show how to perform posterior inference and make predictions using the GP priors we introduced in the last section. We will start with regression, where we can perform inference in _closed form_. This is a "GPs in a nutshell" section to quickly get up and running with Gaussian processes in practice. We'll start coding all the basic operations from scratch, and then introduce [*GPyTorch*](https://gpytorch.ai/), which will make working with state-of-the-art Gaussian processes and integration with deep neural networks much more convenient. We will consider these more advanced topics in depth in the next section. In that section, we will also consider settings where approximate inference is required --- classification, point processes, or any non-Gaussian likelihoods. 
+In this section, we will show how to perform posterior inference and make predictions using the GP priors we introduced in the last section. We will start with regression, where we can perform inference in _closed form_. This is a "GPs in a nutshell" section to quickly get up and running with Gaussian processes in practice. We'll start coding all the basic operations from scratch, and then introduce [GPyTorch](https://gpytorch.ai/), which will make working with state-of-the-art Gaussian processes and integration with deep neural networks much more convenient. We will consider these more advanced topics in depth in the next section. In that section, we will also consider settings where approximate inference is required --- classification, point processes, or any non-Gaussian likelihoods. 
 
 ## Posterior Inference for Regression
 
@@ -39,6 +39,18 @@ $\mathbf{f}_* | \mathbf{y}, X, X_* \sim \mathcal{N}(m_*,S_*)$, where $m_* = K(X_
 Typically, we do not need to make use of the full predictive covariance matrix $S$, and instead use the diagonal of $S$ for uncertainty about each prediction. Often for this reason we write the predictive distribution for a single test point $x_*$, rather than a collection of test points. 
 
 The kernel matrix has parameters $\theta$ that we also wish to estimate, such the amplitude $a$ and lengthscale $\ell$ of the RBF kernel above. For these purposes we use the _marginal likelihood_, $p(\textbf{y} | \theta, X)$, which we already derived in working out the marginal distributions to find the joint distribution over $\textbf{y},\textbf{f}_*$. As we will see, the marginal likelihood compartmentalizes into model fit and model complexity terms, and automatically encodes a notion of Occam's razor for learning hyperparameters. For a full discussion, see MacKay Ch. 28, and Rasmussen and Williams Ch. 5.
+
+```{.python .input}
+from d2l import torch as d2l
+import numpy as np
+from scipy.spatial import distance_matrix
+from scipy import optimize
+import matplotlib.pyplot as plt
+import math
+import torch
+import gpytorch
+import os
+```
 
 ## Equations for Making Predictions and Learning Kernel Hyperparameters in GP Regression
 
@@ -80,16 +92,6 @@ We'll sample data from
 $$y(x) = sin(x) + \frac{1}{2}sin(4x) + \epsilon,$$ with $\epsilon \sim \mathcal{N}(0,\sigma^2)$. The noise free function we wish to find is $f(x) = sin(x) + \frac{1}{2}sin(4x)$. We'll start by using a noise standard deviation $\sigma = 0.25$.
 
 ```{.python .input}
-from d2l import torch as d2l
-import numpy as np
-from scipy.spatial import distance_matrix
-from scipy import optimize
-import matplotlib.pyplot as plt
-import math
-import torch
-import gpytorch
-import os
-
 def data_maker1(x, sig):
     return np.sin(x) + 0.5 * np.sin(4 * x) + np.random.randn(x.shape[0]) * sig
 
@@ -271,8 +273,7 @@ For Gaussian processes, we can only perform exact inference when we have a Gauss
 assume that our observations are generated as a noise-free function represented by a Gaussian process, plus Gaussian noise.
 In future notebooks, we will consider other settings, such as classification, where we cannot make these assumptions.
 
-```
-{.python .input}
+```{.python .input}
 # Initialize Gaussian likelihood
 likelihood = gpytorch.likelihoods.GaussianLikelihood()
 model = ExactGPModel(train_x, train_y, likelihood)
@@ -288,15 +289,18 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
 
 # Set our loss as the negative log GP marginal likelihood
 mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
-
 ```
-
 
 Here, we explicitly specify the likelihood we want to use (Gaussian), the objective we will use for training kernel hyperparameters (here, the marginal likelihood), and the procedure we we want to use for optimizing that objective (in this case, Adam). We note that while we are using Adam, which is a "stochastic" optimizer, in this case, it is full-batch Adam. Because the marginal likelihood does not factorize over data instances, we cannot use an optimizer over "mini-batches" of data and be guaranteed convergence. Other optimizers, such as L-BFGS, are also supported by GPyTorch. Unlike in standard deep learning, doing a good job of optimizing the marginal likelihood corresponds strongly with good generalization, which often inclines us towards powerful optimizers like L-BFGS, assuming they are not prohibitively expensive.
 
 ```
 {.python .input}
 
+
+```
+
+
+```{.python .input}
 for i in range(training_iter):
     # Zero gradients from previous iteration
     optimizer.zero_grad()
@@ -307,19 +311,16 @@ for i in range(training_iter):
     loss.backward()
     
     if i%10 == 0:
-      print('Iter %d/%d - Loss: %.3f squared lengthscale: %.3f noise variance: %.3f' % (
-        i + 1, training_iter, loss.item(),
-        model.covar_module.base_kernel.lengthscale.item(),
-        model.likelihood.noise.item()
-      ))
-    optimizer.step() 
+        print('Iter %d/%d - Loss: %.3f squared lengthscale: %.3f noise variance: %.3f' % (
+            i + 1, training_iter, loss.item(),
+            model.covar_module.base_kernel.lengthscale.item(),
+            model.likelihood.noise.item()))
+    optimizer.step()
 ```
-
 
 Here we actually run the optimization procedure, outputting the values of the loss every 10 iterations.
 
-```
-{.python .input}
+```{.python .input}
 # Get into evaluation (predictive posterior) mode
 test_x = torch.tensor(test_x)
 model.eval()
@@ -327,12 +328,9 @@ likelihood.eval()
 observed_pred = likelihood(model(test_x)) 
 ```
 
-
 The above codeblock enables us to make predictions on our test inputs.
 
-```
-{.python .input}
-
+```{.python .input}
 with torch.no_grad():
     # Initialize plot
     f, ax = d2l.plt.subplots(1, 1, figsize=(4, 3))
@@ -345,7 +343,6 @@ with torch.no_grad():
     ax.set_ylim([-1.5, 1.5])
     ax.legend(['True Function', 'Predictive Mean', 'Observed Data', '95% Credible Set'])
 ```
-
 
 Finally, we plot the fit.
 
