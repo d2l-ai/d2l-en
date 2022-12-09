@@ -1,7 +1,8 @@
 # Gaussian Processes
 :label:`chap_gp`
 
-Written by Andrew Gordon Wilson, 2022
+**Andrew Gordon Wilson** (*New York University and Amazon*)
+
 
 Gaussian processes (GPs) are ubitiquous. You have already encountered many examples of GPs without realizing it. Any model that is linear in its parameters with a Gaussian distribution over the parameters is a Gaussian process. This class spans discrete models, including random walks, and autoregressive processes, as well as continuous models, including Bayesian linear regression models, polynomials, Fourier series, radial basis functions, and even neural networks with an infinite number of hidden units. There is a running joke that "everything is a special case of a Gaussian process".
 
