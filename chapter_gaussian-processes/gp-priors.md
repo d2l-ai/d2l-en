@@ -33,6 +33,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 ```
 
 ```{.python .input}
+%%tab all
 from d2l import torch as d2l
 import numpy as np
 from scipy.spatial import distance_matrix
