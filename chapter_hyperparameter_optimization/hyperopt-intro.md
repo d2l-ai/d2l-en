@@ -12,7 +12,7 @@ top of these, every neural network has additional *hyperparameters* that need
 to be configured by the user. For example, to ensure that stochastic gradient
 descent converges to a local optimum of the training loss
 (see :numref:`chap_optimization`), we have to adjust the learning rate and batch
-size. To avoid overfitting on the training dataset :numref:`sec_polynomial`,
+size. To avoid overfitting on training datasets,
 we might have to set regularization parameters, such as weight decay
 (see :numref:`sec_weight_decay`) or dropout (see :numref:`sec_dropout`). We can
 define the capacity and inductive bias of the model by setting the number of
@@ -250,7 +250,7 @@ using a model to guide the search. We will also look at algorithms that
 automatically stop the evaluation process of poorly performing configurations
 to speed up the optimization process.
 
-# Summary
+## Summary
 
 In this section we introduced hyperparameter optimization (HPO) and how we can
 phrase it as a global optimization by defining a configuration space and an
@@ -261,5 +261,3 @@ While random search is very simple, it is the better alternative to grid
 search, which simply evaluates a fixed set of hyperparameters. It does not
 suffer from the curse of dimensionality :cite:`bellman-science66` and is more
 likely to find the optimal hyperparameter configuration.
-
-# Exercises

@@ -266,5 +266,3 @@ computation of the HPO instead of just reducing the wall-clock time.
 
 We implemented and evaluated successive halving, a simple yet efficient
 multi-fidelity HPO algorithm.
-
-## Exercises

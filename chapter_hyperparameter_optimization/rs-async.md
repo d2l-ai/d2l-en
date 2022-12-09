@@ -216,5 +216,3 @@ become available, and, hence, ensures that all workers are busy at any point in
 time. While random search is easy to distribute asynchronously and does not
 require any change of the actual algorithm, other methods require some additional
 modifications.
-
-## Exercises
