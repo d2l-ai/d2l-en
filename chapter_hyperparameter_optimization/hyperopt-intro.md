@@ -262,45 +262,18 @@ depends on a small subset of the hyperparameters.
 
 ## Exercises
 
-1. In this chapter, we optimize the validation error of a model after training
-   on a disjoint training set. For simplicity, our code uses
-   `Trainer.val_dataloader`, which maps to a loader around `FashionMNIST.val`.
-   1. Convince yourself (by looking at the code) that this means we use the
-      original FashionMNIST training set (60000 examples) for training, and
-      the original *test set* (10000 examples) for validation.
-   2. Why could this practice be problematic? Hint: Re-read
-      :numref:`sec_generalization_basics`, especially about *model selection*.
-   3. What should we have done instead?
-2. We stated above that hyperparameter optimization by gradient descent is very
-   hard to do. Consider a small problem, such as training a two-layer
-   perceptron on the FashionMNIST dataset (:numref:`sec_mlp-implementation`)
-   with a batch size of 256. We would like to tune the learning rate of SGD in
-   order to minimize validation error after one epoch of training.
-   1. FashionMNIST has 60000 training cases. How many mini-batches will be
-      processed in one epoch?
-   2. Sketch (roughly) the computational graph of the validation error after
-      training for one epoch. You may assume that initial weights and
-      hyperparameters (such as learning rate) are input nodes to this graph.
-      Hint: Re-read about computational graphs in :numref:`sec_backprop`.
-   3. Give a rough estimate of the number of floating point values you need
-      to store during a forward pass on this graph. Hint: Assume this memory
-      is dominated by the activations after each layer, and look up the
-      layer widths in :numref:`sec_mlp-implementation`. Comment on the
-      practicality of creating this graph in order to compute just one
-      derivative (w.r.t. the learning rate).
-   4. Apart from the sheer amount of compute and storage required, what other
-      issues would gradient-based hyperparameter optimization run into?
-      Hint: Re-read about vanishing and exploding gradients in
-      :numref:`sec_numerical_stability`.
-   5. *Advanced*: Read :cite:`maclaurin-icml15` for an elegant (yet still
-      somewhat unpractical) approach to gradient-based HPO.
-3. Grid search is another HPO baseline, where we define an equi-spaced grid
-   for each hyperparameter, then iterate over the (combinatorial) Cartesian
-   product in order to suggest configurations.
-   1. We stated above that random search can be much more efficient than grid
-      search for HPO on a sizable number of hyperparameters, if the criterion
-      most strongly depends on a small subset of the hyperparameters. Why is
-      this? Hint: Read :cite:`bergstra-nips11`.
+1. In this chapter, we optimize the validation error of a model after training on a disjoint training set. For simplicity, our code uses `Trainer.val_dataloader`, which maps to a loader around `FashionMNIST.val`.
+    1. Convince yourself (by looking at the code) that this means we use the original FashionMNIST training set (60000 examples) for training, and the original *test set* (10000 examples) for validation.
+    2. Why could this practice be problematic? Hint: Re-read :numref:`sec_generalization_basics`, especially about *model selection*.
+    3. What should we have done instead?
+2. We stated above that hyperparameter optimization by gradient descent is very hard to do. Consider a small problem, such as training a two-layer perceptron on the FashionMNIST dataset (:numref:`sec_mlp-implementation`) with a batch size of 256. We would like to tune the learning rate of SGD in order to minimize validation error after one epoch of training.
+    1. FashionMNIST has 60000 training cases. How many mini-batches will be processed in one epoch?
+    2. Sketch (roughly) the computational graph of the validation error after training for one epoch. You may assume that initial weights and hyperparameters (such as learning rate) are input nodes to this graph. Hint: Re-read about computational graphs in :numref:`sec_backprop`.
+    3. Give a rough estimate of the number of floating point values you need to store during a forward pass on this graph. Hint: Assume this memory is dominated by the activations after each layer, and look up the layer widths in :numref:`sec_mlp-implementation`. Comment on the practicality of creating this graph in order to compute just one derivative (w.r.t. the learning rate).
+    4. Apart from the sheer amount of compute and storage required, what other issues would gradient-based hyperparameter optimization run into? Hint: Re-read about vanishing and exploding gradients in :numref:`sec_numerical_stability`.
+    5. *Advanced*: Read :cite:`maclaurin-icml15` for an elegant (yet still somewhat unpractical) approach to gradient-based HPO.
+3. Grid search is another HPO baseline, where we define an equi-spaced grid for each hyperparameter, then iterate over the (combinatorial) Cartesian product in order to suggest configurations.
+   1. We stated above that random search can be much more efficient than grid search for HPO on a sizable number of hyperparameters, if the criterion most strongly depends on a small subset of the hyperparameters. Why is this? Hint: Read :cite:`bergstra-nips11`.
 
 
 :begin_tab:`pytorch`
