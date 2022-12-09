@@ -231,3 +231,8 @@ configurations as quickly as possible to the next rung level, even if this means
 promoting some wrong ones. In practice, this usually does not hurt much, and the
 gains of asynchronous versus synchronous scheduling are usually much higher
 than the loss of the suboptimal decision making.
+
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/asynchronous-successive-halving/???)
+:end_tab:

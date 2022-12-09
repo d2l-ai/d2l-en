@@ -261,3 +261,8 @@ While random search is very simple, it is the better alternative to grid
 search, which simply evaluates a fixed set of hyperparameters. It does not
 suffer from the curse of dimensionality :cite:`bellman-science66` and is more
 likely to find the optimal hyperparameter configuration.
+
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/what-is-hyperparameter-optimization/12090)
+:end_tab:

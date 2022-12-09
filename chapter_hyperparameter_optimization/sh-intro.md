@@ -262,3 +262,8 @@ computation of the HPO instead of just reducing the wall-clock time.
 
 We implemented and evaluated successive halving, a simple yet efficient
 multi-fidelity HPO algorithm.
+
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/multi-fidelity-hyperparameter-optimization/12094)
+:end_tab:
