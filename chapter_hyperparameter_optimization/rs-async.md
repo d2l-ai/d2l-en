@@ -47,12 +47,7 @@ HPO. Syne Tune is designed to be run with different execution back-ends, and the
 interested reader is invited to study its simple APIs in order to learn more about
 distributed HPO.
 
-## Objective Function
-
-First, we have to define a new objective function such that it now returns the
-performance back to Syne Tune via the `report` callback.
-
-```{.python .input  n=34}
+```{.python .input}
 from d2l import torch as d2l
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -61,8 +56,14 @@ from syne_tune.backend.python_backend import PythonBackend
 from syne_tune.optimizer.baselines import RandomSearch
 from syne_tune import Tuner, StoppingCriterion
 from syne_tune.experiments import load_experiment
+```
 
+## Objective Function
 
+First, we have to define a new objective function such that it now returns the
+performance back to Syne Tune via the `report` callback.
+
+```{.python .input  n=34}
 def hpo_objective_lenet_synetune(learning_rate, batch_size, max_epochs):
     from d2l import torch as d2l    
     from syne_tune import Reporter
@@ -93,7 +94,6 @@ upper limit on the total wall-clock time.
 
 ```{.python .input  n=37}
 n_workers = 2  # Needs to be <= the number of available GPUs
-
 
 max_wallclock_time = 12 * 60  # 12 minutes
 ```
@@ -182,14 +182,14 @@ tuning_experiment.plot()
 
 ## Visualize the Asynchronous Optimization Process
 
-Below we visualize how the learning curves of every trial evolve during the
+Below we visualize how the learning curves of every trial (each color in the plot represents a trial) evolve during the
 asynchronous optimization process. At any point in time, there are as many trials
 running concurrently as we have workers. Once a trial finishes, we immediately
 start the next trial, without waiting for the other trials to finish. Idle time
 of workers is reduced to a minimum with asynchronous scheduling.
 
 ```{.python .input  n=45}
-d2l.set_figsize([10, 10])
+d2l.set_figsize([6, 2.5])
 results = tuning_experiment.results
 
 for trial_id in results.trial_id.unique():
@@ -197,13 +197,11 @@ for trial_id in results.trial_id.unique():
     d2l.plt.plot(
         df["st_tuner_time"],
         df["validation_error"],
-        marker="o",
-        label=f"trial {trial_id}",
+        marker="o"
     )
     
 d2l.plt.xlabel("wall-clock time")
 d2l.plt.ylabel("objective function")
-d2l.plt.legend()
 ```
 
 ## Summary

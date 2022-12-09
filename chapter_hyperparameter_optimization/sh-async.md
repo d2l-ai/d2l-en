@@ -15,12 +15,12 @@ successive halving (SH) asynchronously in a distributed setting. Before we can
 decide which configuration to run next, we first have to collect all
 observations at the current rung level. This requires to
 synchronize workers at each rung level. For example, for the lowest rung level
-$r_{min}$, we first have to evaluate all $N = \eta^K$ configurations, before we
+$r_{\text{min}}$, we first have to evaluate all $N = \eta^K$ configurations, before we
 can promote the $\frac{1}{\eta}$ of them to the next rung level.
 
 In any distributed system, synchronization typically implies idle time for workers.
 First, we often observe high variations in training time across hyperparameter
-configurations. For example, assuming the number of filters per layer is a 
+configurations. For example, assuming the number of filters per layer is a
 hyperparameter, then networks with less filters finish training faster than
 networks with more filters, which implies idle worker time due to stragglers.
 Moreover, the number of slots in a rung level is not always a multiple of the number
@@ -52,7 +52,7 @@ performance, not only because the ranking of hyperparameter configurations is of
 fairly consistent across rung levels, but also because rungs grow over time and
 reflect the distribution of metric values at this level better and better. If a
 worker is free, but no configuration can be promoted, we start a new configuration
-with $r = r_{min}$, i.e the first rung level.
+with $r = r_{\text{min}}$, i.e the first rung level.
 
 :numref:`asha` shows the scheduling of the same configurations for ASHA. Once Trial-1
 finishes, we collect the results of two trials (i.e Trial-0 and Trial-1) and
@@ -72,36 +72,39 @@ Trial-5) on rung 0.
 ![Visualization of successive halving with synchronous and asynchronous scheduling of trials.](../img/asha.svg)
 :label:`asha`
 
+
+
+```{.python .input}
+from d2l import torch as d2l
+import logging
+logging.basicConfig(level=logging.INFO)
+import matplotlib.pyplot as plt
+from syne_tune.config_space import loguniform, randint
+from syne_tune.backend.python_backend import PythonBackend
+from syne_tune.optimizer.baselines import ASHA
+from syne_tune import Tuner, StoppingCriterion
+from syne_tune.experiments import load_experiment
+```
+
 ## Objective Function
 
 We will use *Syne Tune* with the same objective function as in
 :numref:`sec_rs_async`.
 
 ```{.python .input  n=54}
-import logging
-logging.basicConfig(level=logging.INFO)
-import matplotlib.pyplot as plt
-
-from syne_tune.config_space import loguniform, randint
-from syne_tune.backend.python_backend import PythonBackend
-from syne_tune.optimizer.baselines import ASHA
-from syne_tune import Tuner, StoppingCriterion
-from syne_tune.experiments import load_experiment
-
-
 def hpo_objective_lenet_synetune(learning_rate, batch_size, max_epochs):
-    from d2l import torch as d2l    
+    from d2l import torch as d2l
     from syne_tune import Reporter
 
     model = d2l.LeNet(lr=learning_rate, num_classes=10)
     trainer = d2l.HPOTrainer(max_epochs=1, num_gpus=1)
     data = d2l.FashionMNIST(batch_size=batch_size)
     model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
-    report = Reporter() 
+    report = Reporter()
     for epoch in range(1, max_epochs + 1):
         if epoch == 1:
             # Initialize the state of Trainer
-            trainer.fit(model=model, data=data) 
+            trainer.fit(model=model, data=data)
         else:
             trainer.fit_epoch()
         validation_error = d2l.numpy(trainer.validation_error().cpu())
@@ -159,7 +162,7 @@ scheduler = ASHA(
 
 Here, `metric` and `resource_attr` specify the key names used with the `report`
 callback, and `max_resource_attr` denotes which input to the objective function
-corresponds to $r_{max}$. Moreover, `grace_period` provides $r_{min}$, and
+corresponds to $r_{\text{max}}$. Moreover, `grace_period` provides $r_{\text{min}}$, and
 `reduction_factor` is $\eta$. Now, we can run Syne Tune as before:
 
 ```{.python .input  n=57}
@@ -189,33 +192,33 @@ but we avoid this extra complexity here. After the experiment has finished,
 we can retrieve and plot results.
 
 ```{.python .input  n=59}
+d2l.set_figsize()
 e = load_experiment(tuner.name)
 e.plot()
 ```
 
 ## Visualize the Optimization Process
 
-Once more, we visualize the learning curves of every trial. Compare this to
+Once more, we visualize the learning curves of every trial (each color in the plot represents a trial). Compare this to
 asynchronous random search in :numref:`sec_rs_async`. As we have seen for
 successive halving in :numref:`sec_mf_hpo`, most of the trials are stopped
-at 1 or 2 epochs ($r_{min}$ or $\eta * r_{min}$). However, trials do not stop
+at 1 or 2 epochs ($r_{\text{min}}$ or $\eta * r_{\text{min}}$). However, trials do not stop
 at the same point, because they require different amount of time per epoch. If
 we ran standard successive halving instead of ASHA, we would need to synchronize
 our workers, before we can promote configurations to the next rung level.
 
 ```{.python .input  n=60}
+d2l.set_figsize([6, 2.5])
 results = e.results
 for trial_id in results.trial_id.unique():
     df = results[results["trial_id"] == trial_id]
-    plt.plot(
+    d2l.plt.plot(
         df["st_tuner_time"],
         df["validation_error"],
-        marker="o",
-        label=f"trial {trial_id}"
+        marker="o"
     )
-plt.xlabel("wall-clock time")
-plt.ylabel("objective function")
-plt.legend()
+d2l.plt.xlabel("wall-clock time")
+d2l.plt.ylabel("objective function")
 ```
 
 ## Summary
