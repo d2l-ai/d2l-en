@@ -54,11 +54,8 @@ performance back to Syne Tune via the `report` callback.
 
 ```{.python .input  n=34}
 from d2l import torch as d2l
-d2l.use_svg_display()
-
 import logging
 logging.basicConfig(level=logging.INFO)
-
 from syne_tune.config_space import loguniform, randint
 from syne_tune.backend.python_backend import PythonBackend
 from syne_tune.optimizer.baselines import RandomSearch
@@ -96,6 +93,8 @@ upper limit on the total wall-clock time.
 
 ```{.python .input  n=37}
 n_workers = 2  # Needs to be <= the number of available GPUs
+
+
 max_wallclock_time = 12 * 60  # 12 minutes
 ```
 
@@ -176,6 +175,7 @@ analysis. At any time during the tuning job, we can easily get the results
 obtained so far and plot the incumbent trajectory.
 
 ```{.python .input  n=46}
+d2l.set_figsize()
 tuning_experiment = load_experiment(tuner.name)
 tuning_experiment.plot()
 ```
@@ -189,6 +189,7 @@ start the next trial, without waiting for the other trials to finish. Idle time
 of workers is reduced to a minimum with asynchronous scheduling.
 
 ```{.python .input  n=45}
+d2l.set_figsize([10, 10])
 results = tuning_experiment.results
 
 for trial_id in results.trial_id.unique():
