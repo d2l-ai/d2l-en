@@ -68,6 +68,12 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from jax import numpy as jnp
+```
+
 We thus define the `show_heatmaps` function. Note that it does not take a matrix (of attention weights) as its input but rather a tensor with 4 axes, allowing for an array of different queries and weights. Consequently the input `matrices` has the shape (number of rows for display, number of columns for display, number of queries, number of keys). This will come in handy later on when we want to visualize the workings of :numref:`sec_multihead-attention` that is used to design Transformers.
 
 ```{.python .input  n=17}
@@ -82,7 +88,10 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                                  sharex=True, sharey=True, squeeze=False)
     for i, (row_axes, row_matrices) in enumerate(zip(axes, matrices)):
         for j, (ax, matrix) in enumerate(zip(row_axes, row_matrices)):
-            pcm = ax.imshow(d2l.numpy(matrix), cmap=cmap)
+            if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+                pcm = ax.imshow(d2l.numpy(matrix), cmap=cmap)
+            if tab.selected('jax'):
+                pcm = ax.imshow(matrix, cmap=cmap)
             if i == num_rows - 1:
                 ax.set_xlabel(xlabel)
             if j == 0:

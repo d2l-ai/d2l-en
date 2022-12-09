@@ -1,6 +1,6 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # The Base Classification Model
@@ -8,32 +8,54 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 
 You may have noticed that the implementations from scratch and the concise implementation using framework functionality were quite similar in the case of regression. The same is true for classification. Since many models in this book deal with classification, it is worth adding functionalities to support this setting specifically. This section provides a base class for classification models to simplify future code.
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, gluon
 npx.set_np()
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
-from IPython import display
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from functools import partial
+from jax import numpy as jnp
+import jax
+import optax
 ```
 
 ## The `Classifier` Class
 
+:begin_tab:`pytorch, mxnet, tensorflow`
+We define the `Classifier` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exactly correct if the last batch contains fewer examples, but we ignore this minor difference to keep the code simple.
+:end_tab:
+
+
+:begin_tab:`jax`
 We define the `Classifier` class below. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. We draw an update for every `num_val_batches` batches. This has the benefit of generating the averaged loss and accuracy on the whole validation data. These average numbers are not exactly correct if the last batch contains fewer examples, but we ignore this minor difference to keep the code simple.
 
-```{.python .input  n=5}
-%%tab all
+We also redefine the `training_step` method for JAX since all models that will
+subclass `Classifier` later will have a loss that returns auxiliary data.
+This auxiliary data can be used for models with batch normalization
+(to be explained in :numref:`sec_batch_norm`), while in all other cases
+we'll make the loss also return a placeholder (empty dictionary) to
+represent the auxiliary data.
+:end_tab:
+
+```{.python .input}
+%%tab pytorch, mxnet, tensorflow
 class Classifier(d2l.Module):  #@save
     def validation_step(self, batch):
         Y_hat = self(*batch[:-1])
@@ -41,9 +63,30 @@ class Classifier(d2l.Module):  #@save
         self.plot('acc', self.accuracy(Y_hat, batch[-1]), train=False)
 ```
 
+```{.python .input}
+%%tab jax
+class Classifier(d2l.Module):  #@save
+    def training_step(self, params, batch, state):
+        # Here value is a tuple since models with BatchNorm layers require
+        # the loss to return auxiliary data
+        value, grads = jax.value_and_grad(
+            self.loss, has_aux=True)(params, batch[:-1], batch[-1], state)
+        l, _ = value
+        self.plot("loss", l, train=True)
+        return value, grads
+
+    def validation_step(self, params, batch, state):
+        # Discard the second returned value. It is used for training models
+        # with BatchNorm layers since loss also returns auxiliary data
+        l, _ = self.loss(params, batch[:-1], batch[-1], state)
+        self.plot('loss', l, train=False)
+        self.plot('acc', self.accuracy(params, batch[:-1], batch[-1], state),
+                  train=False)
+```
+
 By default we use a stochastic gradient descent optimizer, operating on minibatches, just as we did in the context of linear regression.
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab mxnet
 @d2l.add_to_class(d2l.Module)  #@save
 def configure_optimizers(self):
@@ -53,18 +96,25 @@ def configure_optimizers(self):
     return gluon.Trainer(params, 'sgd', {'learning_rate': self.lr})
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(d2l.Module)  #@save
 def configure_optimizers(self):
     return torch.optim.SGD(self.parameters(), lr=self.lr)
 ```
 
-```{.python .input  n=8}
+```{.python .input}
 %%tab tensorflow
 @d2l.add_to_class(d2l.Module)  #@save
 def configure_optimizers(self):
     return tf.keras.optimizers.SGD(self.lr)
+```
+
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(d2l.Module)  #@save
+def configure_optimizers(self):
+    return optax.sgd(self.lr)
 ```
 
 ## Accuracy
@@ -94,10 +144,25 @@ The result is a tensor containing entries of 0 (false) and 1 (true).
 Taking the sum yields the number of correct predictions.
 
 ```{.python .input  n=9}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(Classifier)  #@save
 def accuracy(self, Y_hat, Y, averaged=True):
     """Compute the number of correct predictions."""
+    Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+    preds = d2l.astype(d2l.argmax(Y_hat, axis=1), Y.dtype)
+    compare = d2l.astype(preds == d2l.reshape(Y, -1), d2l.float32)
+    return d2l.reduce_mean(compare) if averaged else compare
+```
+
+```{.python .input  n=9}
+%%tab jax
+@d2l.add_to_class(Classifier)  #@save
+@partial(jax.jit, static_argnums=(0, 5))
+def accuracy(self, params, X, Y, state, averaged=True):
+    """Compute the number of correct predictions."""
+    Y_hat = state.apply_fn({'params': params,
+                            'batch_stats': state.batch_stats},  # BatchNorm Only
+                           *X)
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
     preds = d2l.astype(d2l.argmax(Y_hat, axis=1), Y.dtype)
     compare = d2l.astype(preds == d2l.reshape(Y, -1), d2l.float32)

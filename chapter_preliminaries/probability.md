@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Probability and Statistics
@@ -189,6 +189,16 @@ import tensorflow as tf
 from tensorflow_probability import distributions as tfd
 ```
 
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import random
+import jax
+from jax import numpy as jnp
+import numpy as np
+```
+
 Now, suppose that the coin was in fact fair,
 i.e., $P(\textrm{heads}) = 0.5$.
 To simulate tosses of a fair coin,
@@ -250,6 +260,13 @@ fair_probs = tf.ones(2) / 2
 tfd.Multinomial(100, fair_probs).sample()
 ```
 
+```{.python .input}
+%%tab jax
+fair_probs = [0.5, 0.5]
+# jax.random does not have multinomial distribution implemented
+np.random.multinomial(100, fair_probs)
+```
+
 Each time you run this sampling process,
 you will receive a new random value
 that may differ from the previous outcome.
@@ -274,6 +291,11 @@ Multinomial(100, fair_probs).sample() / 100
 ```{.python .input}
 %%tab tensorflow
 tfd.Multinomial(100, fair_probs).sample() / 100
+```
+
+```{.python .input}
+%%tab jax
+np.random.multinomial(100, fair_probs) / 100
 ```
 
 Here, even though our simulated coin is fair
@@ -302,6 +324,12 @@ counts / 10000
 ```{.python .input}
 %%tab tensorflow
 counts = tfd.Multinomial(10000, fair_probs).sample()
+counts / 10000
+```
+
+```{.python .input}
+%%tab jax
+counts = np.random.multinomial(10000, fair_probs).astype(np.float32)
 counts / 10000
 ```
 
@@ -341,6 +369,13 @@ counts = tfd.Multinomial(1, fair_probs).sample(10000)
 cum_counts = tf.cumsum(counts, axis=0)
 estimates = cum_counts / tf.reduce_sum(cum_counts, axis=1, keepdims=True)
 estimates = estimates.numpy()
+```
+
+```{.python .input}
+%%tab jax
+counts = np.random.multinomial(1, fair_probs, size=10000).astype(np.float32)
+cum_counts = counts.cumsum(axis=0)
+estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 ```
 
 ```{.python .input}

@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Networks Using Blocks (VGG)
@@ -112,6 +112,21 @@ def vgg_block(num_convs, num_channels):
     return blk
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+
+def vgg_block(num_convs, out_channels):
+    layers = []
+    for _ in range(num_convs):
+        layers.append(nn.Conv(out_channels, kernel_size=(3, 3), padding=(1, 1)))
+        layers.append(nn.relu)
+    layers.append(lambda x: nn.max_pool(x, window_shape=(2, 2), strides=(2, 2)))
+    return nn.Sequential(layers)
+```
+
 ## [**VGG Network**]
 :label:`subsec_vgg-network`
 
@@ -140,7 +155,7 @@ the `vgg_block` function. As such, VGG defines a *family* of networks rather tha
 a specific manifestation. To build a specific network we simply iterate over `arch` to compose the blocks.
 
 ```{.python .input  n=5}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class VGG(d2l.Classifier):
     def __init__(self, arch, lr=0.1, num_classes=10):
         super().__init__()
@@ -177,6 +192,29 @@ class VGG(d2l.Classifier):
                 tf.keras.layers.Dense(num_classes)]))
 ```
 
+```{.python .input  n=5}
+%%tab jax
+class VGG(d2l.Classifier):
+    arch: list
+    lr: float = 0.1
+    num_classes: int = 10
+    training: bool = True
+
+    def setup(self):
+        conv_blks = []
+        for (num_convs, out_channels) in self.arch:
+            conv_blks.append(vgg_block(num_convs, out_channels))
+
+        self.net = nn.Sequential([
+            *conv_blks,
+            lambda x: x.reshape((x.shape[0], -1)),  # flatten
+            nn.Dense(4096), nn.relu,
+            nn.Dropout(0.5, deterministic=not self.training),
+            nn.Dense(4096), nn.relu,
+            nn.Dropout(0.5, deterministic=not self.training),
+            nn.Dense(self.num_classes)])
+```
+
 The original VGG network had 5 convolutional blocks,
 among which the first two have one convolutional layer each
 and the latter three contain two convolutional layers each.
@@ -198,6 +236,12 @@ VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))).layer_summary(
     (1, 224, 224, 1))
 ```
 
+```{.python .input}
+%%tab jax
+VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512)),
+    training=False).layer_summary((1, 224, 224, 1))
+```
+
 As you can see, we halve height and width at each block,
 finally reaching a height and width of 7
 before flattening the representations
@@ -216,7 +260,7 @@ Again observe the close match between validation and training loss,
 suggesting only a small amount of overfitting.
 
 ```{.python .input  n=8}
-%%tab mxnet, pytorch
+%%tab mxnet, pytorch, jax
 model = VGG(arch=((1, 16), (1, 32), (2, 64), (2, 128), (2, 128)), lr=0.01)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))

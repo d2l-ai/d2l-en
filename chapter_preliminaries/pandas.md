@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Data Preprocessing
@@ -141,6 +141,14 @@ X, y
 import tensorflow as tf
 
 X, y = tf.constant(inputs.values), tf.constant(targets.values)
+X, y
+```
+
+```{.python .input}
+%%tab jax
+from jax import numpy as jnp
+
+X, y = jnp.array(inputs.values), jnp.array(targets.values)
 X, y
 ```
 

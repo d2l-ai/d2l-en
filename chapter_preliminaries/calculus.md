@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Calculus
@@ -121,6 +121,17 @@ def f(x):
 %%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
+from matplotlib_inline import backend_inline
+import numpy as np
+
+def f(x):
+    return 3 * x ** 2 - 4 * x
+```
+
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
 from matplotlib_inline import backend_inline
 import numpy as np
 

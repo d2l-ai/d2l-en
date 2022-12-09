@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Automatic Differentiation
@@ -78,6 +78,15 @@ x = tf.range(4, dtype=tf.float32)
 x
 ```
 
+```{.python .input}
+%%tab jax
+from jax import numpy as jnp
+
+x = jnp.arange(4.0)
+x
+```
+
+:begin_tab:`mxnet, pytorch, tensorflow`
 [**Before we calculate the gradient
 of $y$ with respect to $\mathbf{x}$,
 we need a place to store it.**]
@@ -92,6 +101,7 @@ Note that the gradient of a scalar-valued function
 with respect to a vector $\mathbf{x}$
 is vector-valued and has 
 the same shape as $\mathbf{x}$.
+:end_tab:
 
 ```{.python .input  n=8}
 %%tab mxnet
@@ -138,6 +148,12 @@ with tf.GradientTape() as t:
 y
 ```
 
+```{.python .input}
+%%tab jax
+y = lambda x: 2 * jnp.dot(x, x)
+y(x)
+```
+
 :begin_tab:`mxnet`
 [**We can now take the gradient of `y`
 with respect to `x`**] by calling 
@@ -160,6 +176,12 @@ with respect to `x`**] by calling
 the `gradient` function.
 :end_tab:
 
+:begin_tab:`jax`
+[**We can now take the gradient of function `y`
+with respect to `x`**] by passing through the
+`grad` transform.
+:end_tab:
+
 ```{.python .input}
 %%tab mxnet
 y.backward()
@@ -175,6 +197,15 @@ x.grad
 ```{.python .input}
 %%tab tensorflow
 x_grad = t.gradient(y, x)
+x_grad
+```
+
+```{.python .input}
+%%tab jax
+from jax import grad
+# the `grad` transform returns a Python function that
+# computes the gradient of the original function
+x_grad = grad(y)(x)
 x_grad
 ```
 
@@ -195,6 +226,11 @@ x.grad == 4 * x
 
 ```{.python .input}
 %%tab tensorflow
+x_grad == 4 * x
+```
+
+```{.python .input}
+%%tab jax
 x_grad == 4 * x
 ```
 
@@ -251,6 +287,12 @@ x.grad
 with tf.GradientTape() as t:
     y = tf.reduce_sum(x)
 t.gradient(y, x)  # Overwritten by the newly calculated gradient
+```
+
+```{.python .input}
+%%tab jax
+y = lambda x: x.sum()
+grad(y)(x)
 ```
 
 ## Backward for Non-Scalar Variables
@@ -337,6 +379,13 @@ with tf.GradientTape() as t:
 t.gradient(y, x)  # Same as `y = tf.reduce_sum(x * x)`
 ```
 
+```{.python .input}
+%%tab jax
+y = lambda x: x * x
+# `grad` is only defined for scalar output functions
+grad(lambda x: y(x).sum())(x)
+```
+
 ## Detaching Computation
 
 Sometimes, we wish to [**move some calculations
@@ -396,6 +445,18 @@ x_grad = t.gradient(z, x)
 x_grad == u
 ```
 
+```{.python .input}
+%%tab jax
+import jax
+
+y = lambda x: x * x
+# `jax.lax` primitives are Python wrappers around XLA operations
+u = jax.lax.stop_gradient(y(x))
+z = lambda x: u * x
+
+grad(lambda x: z(x).sum())(x) == y(x)
+```
+
 Note that while this procedure
 detaches `y`'s ancestors
 from the graph leading to `z`, 
@@ -419,6 +480,11 @@ x.grad == 2 * x
 ```{.python .input}
 %%tab tensorflow
 t.gradient(y, x) == 2 * x
+```
+
+```{.python .input}
+%%tab jax
+grad(lambda x: y(x).sum())(x) == 2 * x
 ```
 
 ## Gradients and Python Control Flow
@@ -477,6 +543,19 @@ def f(a):
     return c
 ```
 
+```{.python .input}
+%%tab jax
+def f(a):
+    b = a * 2
+    while jnp.linalg.norm(b) < 1000:
+        b = b * 2
+    if b.sum() > 0:
+        c = b
+    else:
+        c = 100 * b
+    return c
+```
+
 Below, we call this function, passing in a random value as input.
 Since the input is a random variable, 
 we do not know what form 
@@ -511,6 +590,14 @@ d_grad = t.gradient(d, a)
 d_grad
 ```
 
+```{.python .input}
+%%tab jax
+from jax import random
+a = random.normal(random.PRNGKey(1), ())
+d = f(a)
+d_grad = grad(f)(a)
+```
+
 Even though our function `f` is a bit 
 contrived for demonstration purposes,
 its dependence on the input is quite simple: 
@@ -535,13 +622,17 @@ a.grad == d / a
 d_grad == d / a
 ```
 
+```{.python .input}
+%%tab jax
+d_grad == d / a
+```
+
 Dynamic control flow is very common in deep learning. 
 For instance, when processing text, the computational graph
 depends on the length of the input. 
 In these cases, automatic differentiation 
 becomes vital for statistical modeling 
 since it is impossible to compute the gradient a priori. 
-
 
 ## Discussion
 

@@ -447,7 +447,6 @@ class Classifier(d2l.Module):
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
     return tf.device('/CPU:0')
-
 def gpu(i=0):
     """Defined in :numref:`sec_use_gpu`"""
     return tf.device(f'/GPU:{i}')
@@ -714,22 +713,6 @@ class RNNLM(d2l.RNNLMScratch):
     def output_layer(self, hiddens):
         return d2l.transpose(self.linear(hiddens), (1, 0, 2))
 
-class LSTMScratch(d2l.Module):
-    """Defined in :numref:`sec_lstm`"""
-    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
-        super().__init__()
-        self.save_hyperparameters()
-
-        init_weight = lambda *shape: tf.Variable(d2l.normal(shape) * sigma)
-        triple = lambda: (init_weight(num_inputs, num_hiddens),
-                          init_weight(num_hiddens, num_hiddens),
-                          tf.Variable(d2l.zeros(num_hiddens)))
-
-        self.W_xi, self.W_hi, self.b_i = triple()  # Input gate
-        self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
-        self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
-        self.W_xc, self.W_hc, self.b_c = triple()  # Input node
-
 class GRU(d2l.RNN):
     """Defined in :numref:`sec_deep_rnn`"""
     def __init__(self, num_hiddens, num_layers, dropout=0):
@@ -781,7 +764,6 @@ class MTFraEng(d2l.DataModule):
         self.save_hyperparameters()
         self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
             self._download())
-    
     
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
@@ -1537,6 +1519,25 @@ def evaluate_accuracy(net, data_iter):
         metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
+    """Plot a list of images.
+
+    Defined in :numref:`sec_utils`"""
+    figsize = (num_cols * scale, num_rows * scale)
+    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
+    axes = axes.flatten()
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        try:
+            img = d2l.numpy(img)
+        except:
+            pass
+        ax.imshow(img)
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        if titles:
+            ax.set_title(titles[i])
+    return axes
+
 def linreg(X, w, b):
     """The linear regression model.
 
@@ -1556,25 +1557,6 @@ def get_fashion_mnist_labels(labels):
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
-
-def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
-    """Plot a list of images.
-
-    Defined in :numref:`sec_utils`"""
-    figsize = (num_cols * scale, num_rows * scale)
-    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
-    axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):
-        try:
-            img = d2l.numpy(img)
-        except:
-            pass
-        ax.imshow(img)
-        ax.axes.get_xaxis().set_visible(False)
-        ax.axes.get_yaxis().set_visible(False)
-        if titles:
-            ax.set_title(titles[i])
-    return axes
 
 class Animator:
     """For plotting data in animation."""

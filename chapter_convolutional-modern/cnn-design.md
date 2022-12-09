@@ -1,6 +1,6 @@
-```{.python .input  n=1}
+```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Designing Convolution Network Architectures
@@ -53,7 +53,7 @@ As such, with bottleneck ratio $k_i \geq 1$ we afford some number of channels $c
 This seemingly generic design space provides us nonetheless with many parameters: we can set the block width (number of channels) $c_0, \ldots c_4$, the depth (number of blocks) per stage $d_1, \ldots d_4$, the bottleneck ratios $k_1, \ldots k_4$, and the group widths (numbers of groups) $g_1, \ldots g_4$. 
 In total this adds up to 17 parameters, resulting in an unreasonably large number of configurations that would warrant exploring. We need some tools to reduce this huge design space effectively. This is where the conceptual beauty of design spaces comes in. Before we do so, let's implement the generic design first.
 
-```{.python .input  n=2}
+```{.python .input}
 %%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import np, npx, init
@@ -68,7 +68,7 @@ class AnyNet(d2l.Classifier):
         return net
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab pytorch
 from d2l import torch as d2l
 import torch
@@ -82,7 +82,7 @@ class AnyNet(d2l.Classifier):
             nn.LazyBatchNorm2d(), nn.ReLU())
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 %%tab tensorflow
 import tensorflow as tf
 from d2l import tensorflow as d2l
@@ -96,11 +96,35 @@ class AnyNet(d2l.Classifier):
             tf.keras.layers.Activation('relu')])
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+
+class AnyNet(d2l.Classifier):
+    arch: tuple
+    stem_channels: int
+    lr: float = 0.1
+    num_classes: int = 10
+    training: bool = True
+
+    def setup(self):
+        self.net = self.create_net()
+
+    def stem(self, num_channels):
+        return nn.Sequential([
+            nn.Conv(num_channels, kernel_size=(3, 3), strides=(2, 2),
+                    padding=(1, 1)),
+            nn.BatchNorm(not self.training),
+            nn.relu
+        ])
+```
+
 Each stage consists of `depth` ResNeXt blocks,
 where `num_channels` specifies the block width.
 Note that the first block halves the height and width of input images.
 
-```{.python .input  n=5}
+```{.python .input}
 %%tab mxnet
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, num_channels, groups, bot_mul):
@@ -115,7 +139,7 @@ def stage(self, depth, num_channels, groups, bot_mul):
     return net
 ```
 
-```{.python .input  n=6}
+```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, num_channels, groups, bot_mul):
@@ -129,7 +153,7 @@ def stage(self, depth, num_channels, groups, bot_mul):
     return nn.Sequential(*blk)
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 %%tab tensorflow
 @d2l.add_to_class(AnyNet)
 def stage(self, depth, num_channels, groups, bot_mul):
@@ -143,11 +167,26 @@ def stage(self, depth, num_channels, groups, bot_mul):
     return net
 ```
 
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(AnyNet)
+def stage(self, depth, num_channels, groups, bot_mul):
+    blk = []
+    for i in range(depth):
+        if i == 0:
+            blk.append(d2l.ResNeXtBlock(num_channels, groups, bot_mul,
+                use_1x1conv=True, strides=(2, 2), training=self.training))
+        else:
+            blk.append(d2l.ResNeXtBlock(num_channels, groups, bot_mul,
+                                        training=self.training))
+    return nn.Sequential(blk)
+```
+
 Putting the network stem, body, and head together,
 we complete the implementation of AnyNet.
 
-```{.python .input  n=8}
-%%tab all
+```{.python .input}
+%%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(AnyNet)
 def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
     super(AnyNet, self).__init__()
@@ -174,6 +213,21 @@ def __init__(self, arch, stem_channels, lr=0.1, num_classes=10):
         self.net.add(tf.keras.models.Sequential([
             tf.keras.layers.GlobalAvgPool2D(),
             tf.keras.layers.Dense(units=num_classes)]))
+```
+
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(AnyNet)
+def create_net(self):
+    net = nn.Sequential([self.stem(self.stem_channels)])
+    for i, s in enumerate(self.arch):
+        net.layers.extend([self.stage(*s)])
+    net.layers.extend([nn.Sequential([
+        lambda x: nn.avg_pool(x, window_shape=x.shape[1:3],
+                            strides=x.shape[1:3], padding='valid'),
+        lambda x: x.reshape((x.shape[0], -1)),
+        nn.Dense(self.num_classes)])])
+    return net
 ```
 
 ## Distributions and Parameters of Design Spaces
@@ -219,8 +273,8 @@ This leaves us with the last set of choices: how to pick the specific values for
 
 We recommend the interested reader to review further details for how to design specific networks for different amounts of computation by perusing :citet:`Radosavovic.Kosaraju.Girshick.ea.2020`. For instance, an effective 32-layer RegNetX variant is given by $k = 1$ (no bottleneck), $g = 16$ (group width is 16), $c_1 = 32$ and $c_2 = 80$ channels for the first and second stage, respectively, chosen to be $d_1=4$ and $d_2=6$ blocks deep. The astonishing insight from the design is that it applies, even when investigating networks at a larger scale. Even better, it even holds for Squeeze-and-Excitation (SE) network designs (RegNetY) that have a global channel activation :cite:`Hu.Shen.Sun.2018`.
 
-```{.python .input  n=9}
-%%tab all
+```{.python .input}
+%%tab pytorch, mxnet, tensorflow
 class RegNetX32(AnyNet):
     def __init__(self, lr=0.1, num_classes=10):
         stem_channels, groups, bot_mul = 32, 16, 1
@@ -231,31 +285,45 @@ class RegNetX32(AnyNet):
             stem_channels, lr, num_classes)
 ```
 
+```{.python .input}
+%%tab jax
+class RegNetX32(AnyNet):
+    lr: float = 0.1
+    num_classes: int = 10
+    stem_channels: int = 32
+    arch: tuple = ((4, 32, 16, 1), (6, 80, 16, 1))
+```
+
 We can see that each RegNetX stage progressively reduces resolution and increases output channels.
 
-```{.python .input  n=10}
+```{.python .input}
 %%tab mxnet, pytorch
 RegNetX32().layer_summary((1, 1, 96, 96))
 ```
 
-```{.python .input  n=11}
+```{.python .input}
 %%tab tensorflow
 RegNetX32().layer_summary((1, 96, 96, 1))
+```
+
+```{.python .input}
+%%tab jax
+RegNetX32(training=False).layer_summary((1, 96, 96, 1))
 ```
 
 ## Training
 
 Training the 32-layer RegNetX on the Fashion-MNIST dataset is just like before.
 
-```{.python .input  n=12}
-%%tab mxnet, pytorch
+```{.python .input}
+%%tab mxnet, pytorch, jax
 model = RegNetX32(lr=0.05)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
 trainer.fit(model, data)
 ```
 
-```{.python .input  n=13}
+```{.python .input}
 %%tab tensorflow
 trainer = d2l.Trainer(max_epochs=10)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))
