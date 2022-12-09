@@ -54,3 +54,7 @@ The reinforcement learning problem is typically modeled using Markov Decision Pr
     2. What would be the set of actions?
     3. What would be the possible reward functions?
 2. How would you design an MDP for an Atari game like [Pong game](https://www.gymlibrary.dev/environments/atari/pong/)?
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/12084)
+:end_tab:
