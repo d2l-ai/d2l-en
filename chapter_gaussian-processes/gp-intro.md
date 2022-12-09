@@ -83,31 +83,21 @@ indexed by any collection of inputs
 $x_1,\dots,x_n$ 
 has a joint multivariate Gaussian distribution. The mean vector $\mu$ of this distribution is given by a _mean function_, which is typically taken to be a constant or zero. The covariance matrix of this distribution is given by the _kernel_ evaluated at all pairs of the inputs $x$. 
 
-$$
-\begin{bmatrix}
-f(x) \\ 
-f(x_1) \\
-\vdots \\ 
-f(x_n)
-\end{bmatrix}
-\sim
-\mathcal{N}\left(\mu, 
-\begin{bmatrix}
-k(x,x) & k(x, x_1) & \dots & k(x,x_n) \\
-k(x_1,x) & k(x_1,x_1) & \dots & k(x_1,x_n) \\
-\vdots & \vdots & \ddots & \vdots \\
-k(x_n, x) & k(x_n, x_1) & \dots & k(x_n,x_n)
-\end{bmatrix}
-\right)
-$$
+$$\begin{bmatrix}f(x) \\f(x_1) \\ \vdots \\ f(x_n) \end{bmatrix}\sim \mathcal{N}\left(\mu, \begin{bmatrix}k(x,x) & k(x, x_1) & \dots & k(x,x_n) \\ k(x_1,x) & k(x_1,x_1) & \dots & k(x_1,x_n) \\ \vdots & \vdots & \ddots & \vdots \\ k(x_n, x) & k(x_n, x_1) & \dots & k(x_n,x_n) \end{bmatrix}\right)$$
 :eqlabel:`eq_gp_prior`
 
 Equation :eqref:`eq_gp_prior` specifies a GP prior. We can compute the conditional distribution of $f(x)$ for any $x$ given $f(x_1), \dots, f(x_n)$, the function values we have observed. This conditional distribution is called the _posterior_, and it is what we use to make predictions.
 
 In particular, 
-$$f(x) | f(x_1), \dots, f(x_n) \sim \mathcal{N}(m,s^2)$$  where
+
+$$f(x) | f(x_1), \dots, f(x_n) \sim \mathcal{N}(m,s^2)$$ 
+
+where
+
 $$m = k(x,x_{1:n}) k(x_{1:n},x_{1:n})^{-1} f(x_{1:n})$$ 
+
 $$s^2 = k(x,x) - k(x,x_{1:n})k(x_{1:n},x_{1:n})^{-1}k(x,x_{1:n})$$ 
+
 $k(x,x_{1:n})$ is a $1 \times n$ vector formed by evaluating $k(x,x_{i})$ for $i=1,\dots,n$ and $k(x_{1:n},x_{1:n})$ is an $n \times n$ matrix formed by evaluating $k(x_i,x_j)$ for $i,j = 1,\dots,n$. $m$ is what we can use as a point predictor for any $x$, and $s^2$ is what we use for uncertainty: if we want to create an interval with a 95% probability that $f(x)$ is in the interval, we would use $m \pm 2s$. The predictive means and uncertainties for all the above figures were created using these equations. The observed data points were given by 
 $f(x_1), \dots, f(x_n)$
 and chose a fine grained set of $x$ points to make predictions.
@@ -147,8 +137,11 @@ is even more strongly determined by $f(x_1)$. Drawing a horizontal line at $1.2$
 support values mostly within $[1.15, 1.25]$. 
 
 This procedure can give us a posterior on $f(x)$ for any $x$, for any number of points we have observed. Suppose we observe $f(x_1), f(x_2)$. We now visualize the posterior for $f(x)$ at a particular $x=x'$ in function space. The exact distribution for $f(x)$ is given by the above equations. $f(x)$ is Gaussian distributed, with mean 
+
 $$m = k(x,x_{1:3}) k(x_{1:3},x_{1:3})^{-1} f(x_{1:3})$$
+
 and variance 
+
 $$s^2 = k(x,x) - k(x,x_{1:3})k(x_{1:3},x_{1:3})^{-1}k(x,x_{1:3})$$
 
 In this introductory notebook, we have been considering _noise free_ observations. As we will see, it is easy to include observation noise. If we assume that the data are generated from a latent noise free function $f(x)$ plus iid Gaussian noise 
