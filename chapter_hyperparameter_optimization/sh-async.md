@@ -163,7 +163,8 @@ scheduler = ASHA(
 Here, `metric` and `resource_attr` specify the key names used with the `report`
 callback, and `max_resource_attr` denotes which input to the objective function
 corresponds to $r_{\text{max}}$. Moreover, `grace_period` provides $r_{\text{min}}$, and
-`reduction_factor` is $\eta$. Now, we can run Syne Tune as before:
+`reduction_factor` is $\eta$. Now, we can run Syne Tune as before (this will
+take about 12 minutes):
 
 ```{.python .input  n=57}
 trial_backend = PythonBackend(
@@ -177,6 +178,7 @@ tuner = Tuner(
     scheduler=scheduler,
     stop_criterion=stop_criterion,
     n_workers=n_workers,
+    print_update_interval=max_wallclock_time // 2,
 )
 tuner.run()
 ```
