@@ -265,5 +265,5 @@ multi-fidelity HPO algorithm.
 
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/multi-fidelity-hyperparameter-optimization/12094)
+[Discussions](https://discuss.d2l.ai/t/12094)
 :end_tab:

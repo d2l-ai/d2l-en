@@ -304,5 +304,5 @@ depends on a small subset of the hyperparameters.
 
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/what-is-hyperparameter-optimization/12090)
+[Discussions](https://discuss.d2l.ai/t/12090)
 :end_tab:

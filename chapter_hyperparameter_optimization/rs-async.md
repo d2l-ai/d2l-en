@@ -221,5 +221,5 @@ modifications.
 
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/asynchronous-random-search/12093)
+[Discussions](https://discuss.d2l.ai/t/12093)
 :end_tab:

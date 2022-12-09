@@ -234,5 +234,5 @@ than the loss of the suboptimal decision making.
 
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/asynchronous-successive-halving/???)
+[Discussions](https://discuss.d2l.ai/t/12101)
 :end_tab:
