@@ -87,7 +87,7 @@ $\mathbf{x} \in \mathcal{X}$ to the validation loss. For every evaluation of
 $f(\mathbf{x})$, we have to train and validate our machine learning model, which
 can be time and compute intensive in the case of deep neural networks trained on
 large datasets. Now, given our criterion $f(\mathbf{x})$ our goal is to find
-$\mathbf{x}_{\star} \in argmin_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. 
+$\mathbf{x}_{\star} \in \mathrm{argmin}_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. 
 
 There is no simple way to compute gradients of $f$ with respect to $\mathbf{x}$,
 because it would require to propagate the gradient through the entire training
@@ -180,7 +180,7 @@ ranges.
 | learning rate       | float       | $[10^{-6},10^{-1}]$ | log10 |
 | batch size          | integer     | $[8,256]$           | log2  |
 | momentum            | float       | $[0,0.99]$           | -  |
-| activation function | categorical | $\{"tanh", "relu"\}$ | - |
+| activation function | categorical | $\{\text{tanh}, \text{relu}\}$ | - |
 | number of units     | integer     | $[32, 1024]$         | log2  |
 | number of layers    | integer     | $[1, 6]$             | - |
 :label:`tab_example_configspace`
