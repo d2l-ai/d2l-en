@@ -17,7 +17,7 @@ We will assume $f(x) \sim \mathcal{GP}(m,k)$, which means that any collection fo
 
 Suppose we want to make predictions at a set of inputs $$X_* = x_{*1},x_{*2},\dots,x_{*m}.$$ Then we want to find $x^2$ and $p(\mathbf{f}_* | \mathbf{y}, X)$. In the regression setting, we can conveniently find this distribution by using Gaussian identities, after finding the joint distribution over $\mathbf{f}_* = f(X_*)$ and $\mathbf{y}$. 
 
-If we evaluate equation :eqref:`eq_gp-regression` at the training inputs $X$, we have $\mathbf{y} = \mathbf{f} + \mathbf{\epsilon}$. By the definition of a Gaussian process (see last section), $\mathbf{f} \sim \mathcal{N}(0,K(X,X))$ where $K(X,X)$ is an $n \times n$ matrix formed by evaluating our covariance function (aka _kernel_) at all possible pairs of inputs $x_i, x_j \in X$. $\mathbf{\epsilon}$ is simply a vector comprised of iid samples from $\mathcal{N}(0,\sigma^2)$ and thus has distribution $\mathcal{N}(0,\sigma^2I)$. $\mathbf{y}$ is therefore a sum of two independent multivariate Gaussian variables, and thus has distribution $\mathcal{N}(0, K(X,X) + \sigma^2I)$. One can also show that $\text{cov}(\mathbf{f}_*, \mathbf{y}) = \text{cov}(\mathbf{y},\mathbf{f}_*)^{\top} = K(X_*,X)$ where $K(X_*,X)$ is an $m \times n$ matrix formed by evaluating the kernel at all pairs of test and training inputs. 
+If we evaluate equation :eqref:`eq_gp-regression` at the training inputs $X$, we have $\mathbf{y} = \mathbf{f} + \mathbf{\epsilon}$. By the definition of a Gaussian process (see last section), $\mathbf{f} \sim \mathcal{N}(0,K(X,X))$ where $K(X,X)$ is an $n \times n$ matrix formed by evaluating our covariance function (aka _kernel_) at all possible pairs of inputs $x_i, x_j \in X$. $\mathbf{\epsilon}$ is simply a vector comprised of iid samples from $\mathcal{N}(0,\sigma^2)$ and thus has distribution $\mathcal{N}(0,\sigma^2I)$. $\mathbf{y}$ is therefore a sum of two independent multivariate Gaussian variables, and thus has distribution $\mathcal{N}(0, K(X,X) + \sigma^2I)$. One can also show that $\mathrm{cov}(\mathbf{f}_*, \mathbf{y}) = \mathrm{cov}(\mathbf{y},\mathbf{f}_*)^{\top} = K(X_*,X)$ where $K(X_*,X)$ is an $m \times n$ matrix formed by evaluating the kernel at all pairs of test and training inputs. 
 
 $$
 \begin{bmatrix}
@@ -291,6 +291,7 @@ mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
 
 ```
 
+
 Here, we explicitly specify the likelihood we want to use (Gaussian), the objective we will use for training kernel hyperparameters (here, the marginal likelihood), and the procedure we we want to use for optimizing that objective (in this case, Adam). We note that while we are using Adam, which is a "stochastic" optimizer, in this case, it is full-batch Adam. Because the marginal likelihood does not factorize over data instances, we cannot use an optimizer over "mini-batches" of data and be guaranteed convergence. Other optimizers, such as L-BFGS, are also supported by GPyTorch. Unlike in standard deep learning, doing a good job of optimizing the marginal likelihood corresponds strongly with good generalization, which often inclines us towards powerful optimizers like L-BFGS, assuming they are not prohibitively expensive.
 
 ```
@@ -313,7 +314,9 @@ for i in range(training_iter):
       ))
     optimizer.step() 
 ```
-Here we actually run the optimization procedure, outputting the values of the loss every 10 iterations. 
+
+
+Here we actually run the optimization procedure, outputting the values of the loss every 10 iterations.
 
 ```
 {.python .input}
@@ -323,6 +326,7 @@ model.eval()
 likelihood.eval()
 observed_pred = likelihood(model(test_x)) 
 ```
+
 
 The above codeblock enables us to make predictions on our test inputs.
 
@@ -341,6 +345,7 @@ with torch.no_grad():
     ax.set_ylim([-1.5, 1.5])
     ax.legend(['True Function', 'Predictive Mean', 'Observed Data', '95% Credible Set'])
 ```
+
 
 Finally, we plot the fit.
 

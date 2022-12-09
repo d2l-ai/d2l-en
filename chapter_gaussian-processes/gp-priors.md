@@ -83,7 +83,7 @@ This kernel has the form $k_{\text{RBF}}(x,x') = a^2\exp\left(-\frac{1}{2\ell^2}
 
 Let's derive this kernel starting from weight space. Consider the function
 
-$$f(x) = \sum_{i=1}^J w_i \phi_i(x)$, $w_i  \sim \mathcal{N}\left(0,\frac{\sigma^2}{J}\right), \phi_i(x) = \exp\left(-\frac{(x-c_i)^2}{2\ell^2 }\right).$$
+$$f(x) = \sum_{i=1}^J w_i \phi_i(x), w_i  \sim \mathcal{N}\left(0,\frac{\sigma^2}{J}\right), \phi_i(x) = \exp\left(-\frac{(x-c_i)^2}{2\ell^2 }\right).$$
 
 $f(x)$ is a sum of radial basis functions, with width $\ell$, centred at the points $c_i$, as shown in the following figure.
 
