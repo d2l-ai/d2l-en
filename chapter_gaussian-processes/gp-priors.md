@@ -2,7 +2,7 @@
 
 Understanding Gaussian processes (GPs) is important for reasoning about model construction and generalization, and for achieving state-of-the-art performance in a variety of applications, including active learning, and hyperparameter tuning in deep learning. GPs are everywhere, and it is in our interests to know what they are and how we can use them.
 
-In this section, we introduce Gaussian process _priors_ over functions. In the next section, we show how to use these priors to do _posterior inference_ and make predictions. The next section can be viewed as ``GPs in a nutshell'', quickly giving what you need to apply Gaussian processes in practice.
+In this section, we introduce Gaussian process _priors_ over functions. In the next notebook, we show how to use these priors to do _posterior inference_ and make predictions. The next section can be viewed as "GPs in a nutshell", quickly giving what you need to apply Gaussian processes in practice.
 
 ## Definition
 
@@ -21,7 +21,7 @@ Suppose
 
 $f(x) = w_0 + w_1 x$, and $w_0, w_1 \sim \mathcal{N}(0,1)$, with $w_0, w_1, x$ all in one dimension.
 
-We can equivalently write this function as the inner product $f(x) = (w_0, w_1)(1, x)^{\top}$. In equation :eqref:`eq_gp-function` above, $w = (w_0, w_1)^{\top}$ and $\phi(x) = (1,x)^{\top}$.
+We can equivalently write this function as the inner product $f(x) = (w_0, w_1)(1, x)^{\top}$. In :eqref:`eq_gp-function` above, $w = (w_0, w_1)^{\top}$ and $\phi(x) = (1,x)^{\top}$.
 
 For any $x$, $f(x)$ is a sum of two Gaussian random variables. Since Gaussians are closed under addition, $f(x)$ is also a Gaussian random variable for any $x$. In fact, we can compute for any particular $x$ that $f(x)$ is $\mathcal{N}(0,1+x^2)$. Similarly, the joint distribution for any collection of function values, $(f(x_1),\dots,f(x_n))$, for any collection of inputs $x_1,\dots,x_n$, is a multivariate Gaussian distribution. Therefore $f(x)$ is a Gaussian process.
 
