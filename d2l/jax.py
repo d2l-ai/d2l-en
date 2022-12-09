@@ -42,6 +42,7 @@ d2l = sys.modules[__name__]
 
 from dataclasses import field
 from functools import partial
+from types import FunctionType
 from typing import Any
 import flax
 import jax
