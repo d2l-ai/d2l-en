@@ -32,7 +32,7 @@ Trial-1 for one epoch and immediately continue with the next two trials once the
 are finished. We first have to wait until Trial-2 finishes, which takes
 substantially more time than the other trials, before we can promote the best two
 trials, i.e., Trial-0 and Trial-3 to the next rung level. This causes idle time for
-Worker-1. Now, we continue with Rung 1. Also, here Trial-3 takes longer than Trial-0,
+Worker-1. Then, we continue with Rung 1. Also, here Trial-3 takes longer than Trial-0,
 which leads to an additional ideling time of Worker-0. Once, we reach Rung-2, only
 the best trial, Trial-0, remains which occupies only one worker. To avoid that
 Worker-1 idles during that time, most implementaitons of SH continue already with
@@ -163,7 +163,7 @@ scheduler = ASHA(
 Here, `metric` and `resource_attr` specify the key names used with the `report`
 callback, and `max_resource_attr` denotes which input to the objective function
 corresponds to $r_{\text{max}}$. Moreover, `grace_period` provides $r_{\text{min}}$, and
-`reduction_factor` is $\eta$. Now, we can run Syne Tune as before (this will
+`reduction_factor` is $\eta$. We can run Syne Tune as before (this will
 take about 12 minutes):
 
 ```{.python .input  n=57}
