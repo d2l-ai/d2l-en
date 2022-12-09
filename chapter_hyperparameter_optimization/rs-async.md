@@ -53,9 +53,11 @@ First, we have to define a new objective function such that it now returns the
 performance back to Syne Tune via the `report` callback.
 
 ```{.python .input  n=34}
+from d2l import torch as d2l
+d2l.use_svg_display()
+
 import logging
 logging.basicConfig(level=logging.INFO)
-import matplotlib.pyplot as plt
 
 from syne_tune.config_space import loguniform, randint
 from syne_tune.backend.python_backend import PythonBackend
@@ -191,16 +193,16 @@ results = tuning_experiment.results
 
 for trial_id in results.trial_id.unique():
     df = results[results["trial_id"] == trial_id]
-    plt.plot(
+    d2l.plt.plot(
         df["st_tuner_time"],
         df["validation_error"],
         marker="o",
         label=f"trial {trial_id}",
     )
     
-plt.xlabel("wall-clock time")
-plt.ylabel("objective function")
-plt.legend()
+d2l.plt.xlabel("wall-clock time")
+d2l.plt.ylabel("objective function")
+d2l.plt.legend()
 ```
 
 ## Summary

@@ -33,7 +33,7 @@ configurations for the same total amount of resources.
 
 More formally, we expand our definition in :numref:`sec_definition_hpo`,
 such that our objective function $f(\mathbf{x}, r)$ gets an additional input
-$r \in [r_{min}, r_{max}]$, specifying the amount of resources that we are
+$r \in [r_{\text{min}}, r_{max}]$, specifying the amount of resources that we are
 willing to spend for the evaluation of configuration $\mathbf{x}$. We assume that
 the error $f(\mathbf{x}, r)$ decreases with $r$, whereas the computational
 cost $c(\mathbf{x}, r)$ increases. Typically, $r$ represents the number of
@@ -46,36 +46,35 @@ subset size or the number of cross-validation folds.
 One of the simplest ways to adapt random search to the multi-fidelity setting is
 *successive halving* :cite:`jamieson-aistats16,karnin-icml13`. The basic
 idea is to start with $N$ configurations, for example randomly sampled from the
-configuration space, and to train each of them for $r_{min}$ epochs only. We
+configuration space, and to train each of them for $r_{\text{min}}$ epochs only. We
 then discard a fraction of the worst performing trials and train the remaining
 ones for longer. Iterating this process, fewer trials run for longer, until at
 least one trial reaches $r_{max}$ epochs.
 
-More formally, consider a minimum budget $r_{min}$ (for example 1 epoch), a maximum
+More formally, consider a minimum budget $r_{\text{min}}$ (for example 1 epoch), a maximum
 budget $r_{max}$, for example `max_epochs` in our previous example, and a halving
 constant $\eta\in\{2, 3, \dots\}$. For simplicity, assume that
-$r_{max} = r_{min} \eta^K$, with $K \in \mathbb{I}$ . The number of initial
+$r_{max} = r_{\text{min}} \eta^K$, with $K \in \mathbb{I}$ . The number of initial
 configurations is then $N = \eta^K$. Let us define the set of rungs
-$\mathcal{R} = \{ r_{min}, r_{min}\eta, r_{min}\eta^2, \dots, r_{max} \}$. 
+$\mathcal{R} = \{ r_{\text{min}}, r_{\text{min}}\eta, r_{\text{min}}\eta^2, \dots, r_{max} \}$.
 
 One round of successive halving proceeds as follows. We start with running $N$
-trials until the first rung $r_{min}$. Sorting the validation errors, we keep
+trials until the first rung $r_{\text{min}}$. Sorting the validation errors, we keep
 the top $1 / \eta$ fraction (which amounts to $\eta^{K-1}$ configurations) and
 discard all the rest. The surviving trials are trained for the next rung
-($r_{min}\eta$ epochs), and the process is repeated. At each rung, a
+($r_{\text{min}}\eta$ epochs), and the process is repeated. At each rung, a
 $1 / \eta$ fraction of trials survives and their training continues with a
 $\eta$ times larger budget. With this particular choice of $N$, only a single
 trial will be trained to the full budget $r_{max}$. Once such a round of
 successive halving is done, we start the next one with a new set of initial
 configurations, iterating until the total budget is spent.
 
-![Learning curves of random hyperparameter configurations](../img/sh.svg)
-:label:`sh`
+![Learning curves of random hyperparameter configurations.](../img/sh.svg)
 
 We subclass the `HPOScheduler` base class from :numref:`sec_api_hpo` in order to
 implement successive halving, allowing for a generic `HPOSearcher` object to
 sample configurations (which, in our example below, will be a `RandomSearcher`).
-Additionally, the user has to pass the minimum resource $r_{min}$, the maximum
+Additionally, the user has to pass the minimum resource $r_{\text{min}}$, the maximum
 resource $r_{max}$ and $\eta$ as input. Inside our scheduler, we maintain a
 queue of configurations that still need to be evaluated for the current rung
 $r_i$. We update the queue every time we jump to the next rung.
@@ -111,7 +110,7 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):  #@save
 
 In the beginning our queue is empty, and we fill it with
 $n = \mathrm{prefact} * \eta^{K}$ configurations, which are first evaluated on
-the smallest rung $r_{min}$. Here, $\mathrm{prefact}$ allows us to reuse our
+the smallest rung $r_{\text{min}}$. Here, $\mathrm{prefact}$ allows us to reuse our
 code in a different context. For the purpose of this section, we fix
 $\mathrm{prefact} = 1$. Every time resources become available and the `HPOTuner`
 object queries the `suggest` function, we return an element from the queue. Once
@@ -137,7 +136,7 @@ def suggest(self):
 ```
 
 When we collected a new data point, we first update the searcher module.
-Afterwards we check if we already collect all data points on the current rung. 
+Afterwards we check if we already collect all data points on the current rung.
 If so, we sort all configurations and push the top $\frac{1}{\eta}$
 configurations into the queue.
 
@@ -147,7 +146,7 @@ configurations into the queue.
 def update(self, config: dict, error: float, info=None):
     ri = int(config["max_epochs"])  # Rung r_i
     # Update our searcher, e.g if we use Bayesian optimization later
-    self.searcher.update(config, error, additional_info=info)     
+    self.searcher.update(config, error, additional_info=info)
     self.all_observed_error_at_rungs[ri].append((config, error))
     if ri < self.r_max:
         # Bookkeeping
@@ -156,8 +155,8 @@ def update(self, config: dict, error: float, info=None):
         ki = self.K - self.rung_levels.index(ri)
         ni = int(self.prefact * self.eta ** ki)
         # If we observed all configuration on this rung r_i, we estimate the
-        # top 1 / eta configuration, add them to queue and promote them for the
-        # next rung r_{i+1}
+        # top 1 / eta configuration, add them to queue and promote them for
+        # the next rung r_{i+1}
         if len(self.observed_error_at_rungs[ri]) >= ni:
             kiplus1 = ki - 1
             niplus1 = int(self.prefact * self.eta ** kiplus1)
@@ -178,7 +177,7 @@ rung.
 
 ```{.python .input  n=4}
 %%tab all
- 
+
 @d2l.add_to_class(SuccessiveHalvingScheduler)  #@save
 def get_top_n_configurations(self, rung_level, n):
     rung = self.observed_error_at_rungs[rung_level]
@@ -189,7 +188,7 @@ def get_top_n_configurations(self, rung_level, n):
 ```
 
 Let us see how successive halving is doing on our neural network example. We
-will use $r_{min} = 2$, $\eta = 2$, $r_{max} = 10$, so that rung levels are
+will use $r_{\text{min}} = 2$, $\eta = 2$, $r_{max} = 10$, so that rung levels are
 $2, 4, 8, 10$.
 
 ```{.python .input  n=5}
@@ -232,7 +231,7 @@ which would allocate $r_{max}$ to every configuration.
 
 ```{.python .input  n=19}
 for rung_index, rung in scheduler.all_observed_error_at_rungs.items():
-    errors = [xi[1] for xi in rung]   
+    errors = [xi[1] for xi in rung]
     d2l.plt.scatter([rung_index] * len(errors), errors)
 d2l.plt.xlim(min_number_of_epochs - 0.5, max_number_of_epochs + 0.5)
 d2l.plt.xticks(
