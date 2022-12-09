@@ -84,6 +84,11 @@ from d2l import torch as d2l
 import numpy as np
 from scipy.spatial import distance_matrix
 from scipy import optimize
+import matplotlib.pyplot as plt
+import math
+import torch
+import gpytorch
+import os
 
 def data_maker1(x, sig):
     return np.sin(x) + 0.5 * np.sin(4 * x) + np.random.randn(x.shape[0]) * sig
@@ -238,11 +243,6 @@ As we have seen, it is actually pretty easy to implement basic Gaussian process 
 In these cases, the _GPyTorch_ library will make our lives a lot easier. We'll be discussing GPyTorch much more in the next section on advanced methods. But to get a feel for the package, let's reproduce our results above using GPyTorch. This may seem like a lot of code to simply reproduce the basic regression above, and in a sense, it is. But we can immediately use a variety of kernels, scalable inference techniques, and approximate inference, by only changing a few lines of code from below, instead of writing potentially thousands of lines of new code.
 
 ```{.python .input}
-import numpy as np
-import matplotlib.pyplot as plt
-import math
-import torch
-import gpytorch
 
 # First let's convert our data into tensors for use with PyTorch
 train_x = torch.tensor(train_x)
@@ -265,9 +265,6 @@ class ExactGPModel(gpytorch.models.ExactGP):
 # Initialize Gaussian likelihood
 likelihood = gpytorch.likelihoods.GaussianLikelihood()
 model = ExactGPModel(train_x, train_y, likelihood)
-
-
-import os
 
 training_iter = 50
 
