@@ -30,6 +30,7 @@ import tarfile
 import time
 import zipfile
 from collections import defaultdict
+import gym
 import pandas as pd
 import requests
 from IPython import display
@@ -44,7 +45,6 @@ import torchvision
 from PIL import Image
 from torch import nn
 from torch.nn import functional as F
-from torch.utils import data
 from torchvision import transforms
 
 def use_svg_display():
@@ -201,7 +201,6 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         self.board.draw(x, d2l.numpy(d2l.to(value, d2l.cpu())),
                         ('train_' if train else 'val_') + key,
                         every_n=int(n))
-
     def training_step(self, batch):
         l = self.loss(self(*batch[:-1]), batch[-1])
         self.plot('loss', l, train=True)
@@ -225,7 +224,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
             self.net.apply(init)
 
 class DataModule(d2l.HyperParameters):
-    """Defined in :numref:`sec_oo-design`"""
+    """Defined in :numref:`subsec_oo-design-models`"""
     def __init__(self, root='../data', num_workers=4):
         self.save_hyperparameters()
 
@@ -246,7 +245,7 @@ class DataModule(d2l.HyperParameters):
                                            shuffle=train)
 
 class Trainer(d2l.HyperParameters):
-    """Defined in :numref:`sec_oo-design`"""
+    """Defined in :numref:`subsec_oo-design-models`"""
     def __init__(self, max_epochs, num_gpus=0, gradient_clip_val=0):
         self.save_hyperparameters()
         assert num_gpus == 0, 'No GPU support yet'
@@ -361,7 +360,7 @@ class LinearRegressionScratch(d2l.Module):
 
     def loss(self, y_hat, y):
         """Defined in :numref:`sec_linear_scratch`"""
-        l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+        l = (y_hat - y) ** 2 / 2
         return d2l.reduce_mean(l)
 
     def configure_optimizers(self):
@@ -631,7 +630,7 @@ class TimeMachine(d2l.DataModule):
         self.save_hyperparameters()
         corpus, self.vocab = self.build(self._download())
         array = d2l.tensor([corpus[i:i+num_steps+1]
-                            for i in range(0, len(corpus)-num_steps-1)])
+                            for i in range(len(corpus)-num_steps)])
         self.X, self.Y = array[:,:-1], array[:,1:]
 
     def get_dataloader(self, train):
@@ -687,13 +686,16 @@ class RNNScratch(d2l.Module):
 
     def forward(self, inputs, state=None):
         """Defined in :numref:`sec_rnn-scratch`"""
-        if state is not None:
+        if state is None:
+            # Initial state with shape: (batch_size, num_hiddens)
+            state = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                              device=inputs.device)
+        else:
             state, = state
         outputs = []
         for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs)
-            state = d2l.tanh(d2l.matmul(X, self.W_xh) + (
-                d2l.matmul(state, self.W_hh) if state is not None else 0)
-                             + self.b_h)
+            state = d2l.tanh(d2l.matmul(X, self.W_xh) +
+                             d2l.matmul(state, self.W_hh) + self.b_h)
             outputs.append(state)
         return outputs, state
 
@@ -775,21 +777,6 @@ class RNNLM(d2l.RNNLMScratch):
     def output_layer(self, hiddens):
         return d2l.swapaxes(self.linear(hiddens), 0, 1)
 
-class LSTMScratch(d2l.Module):
-    """Defined in :numref:`sec_lstm`"""
-    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
-        super().__init__()
-        self.save_hyperparameters()
-
-        init_weight = lambda *shape: nn.Parameter(d2l.randn(*shape) * sigma)
-        triple = lambda: (init_weight(num_inputs, num_hiddens),
-                          init_weight(num_hiddens, num_hiddens),
-                          nn.Parameter(d2l.zeros(num_hiddens)))
-        self.W_xi, self.W_hi, self.b_i = triple()  # Input gate
-        self.W_xf, self.W_hf, self.b_f = triple()  # Forget gate
-        self.W_xo, self.W_ho, self.b_o = triple()  # Output gate
-        self.W_xc, self.W_hc, self.b_c = triple()  # Input node
-
 class GRU(d2l.RNN):
     """Defined in :numref:`sec_deep_rnn`"""
     def __init__(self, num_inputs, num_hiddens, num_layers, dropout=0):
@@ -835,7 +822,6 @@ class MTFraEng(d2l.DataModule):
         self.save_hyperparameters()
         self.arrays, self.src_vocab, self.tgt_vocab = self._build_arrays(
             self._download())
-    
     
 
     def _build_arrays(self, raw_text, src_vocab=None, tgt_vocab=None):
@@ -1006,9 +992,9 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                   cmap='Reds'):
     """Show heatmaps of matrices.
 
-    Defined in :numref:`sec_attention-cues`"""
+    Defined in :numref:`sec_queries-keys-values`"""
     d2l.use_svg_display()
-    num_rows, num_cols = len(matrices), len(matrices[0])
+    num_rows, num_cols, _, _ = matrices.shape
     fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize,
                                  sharex=True, sharey=True, squeeze=False)
     for i, (row_axes, row_matrices) in enumerate(zip(axes, matrices)):
@@ -1047,37 +1033,10 @@ def masked_softmax(X, valid_lens):
         X = _sequence_mask(X.reshape(-1, shape[-1]), valid_lens, value=-1e6)
         return nn.functional.softmax(X.reshape(shape), dim=-1)
 
-class AdditiveAttention(nn.Module):
-    """Additive attention.
-
-    Defined in :numref:`sec_attention-scoring-functions`"""
-    def __init__(self, num_hiddens, dropout, **kwargs):
-        super(AdditiveAttention, self).__init__(**kwargs)
-        self.W_k = nn.LazyLinear(num_hiddens, bias=False)
-        self.W_q = nn.LazyLinear(num_hiddens, bias=False)
-        self.w_v = nn.LazyLinear(1, bias=False)
-        self.dropout = nn.Dropout(dropout)
-
-    def forward(self, queries, keys, values, valid_lens):
-        queries, keys = self.W_q(queries), self.W_k(keys)
-        # After dimension expansion, shape of queries: (batch_size, no. of
-        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1, no. of
-        # key-value pairs, num_hiddens). Sum them up with broadcasting
-        features = queries.unsqueeze(2) + keys.unsqueeze(1)
-        features = torch.tanh(features)
-        # There is only one output of self.w_v, so we remove the last
-        # one-dimensional entry from the shape. Shape of scores: (batch_size,
-        # no. of queries, no. of key-value pairs)
-        scores = self.w_v(features).squeeze(-1)
-        self.attention_weights = masked_softmax(scores, valid_lens)
-        # Shape of values: (batch_size, no. of key-value pairs, value
-        # dimension)
-        return torch.bmm(self.dropout(self.attention_weights), values)
-
 class DotProductAttention(nn.Module):
     """Scaled dot product attention.
 
-    Defined in :numref:`subsec_additive-attention`"""
+    Defined in :numref:`subsec_batch_dot`"""
     def __init__(self, dropout, num_heads=None):
         super().__init__()
         self.dropout = nn.Dropout(dropout)
@@ -1104,6 +1063,33 @@ class DotProductAttention(nn.Module):
                 d2l.expand_dims(window_mask, 1), 0)
             scores = d2l.reshape(scores, (n, num_queries, num_kv_pairs))
         self.attention_weights = masked_softmax(scores, valid_lens)
+        return torch.bmm(self.dropout(self.attention_weights), values)
+
+class AdditiveAttention(nn.Module):
+    """Additive attention.
+
+    Defined in :numref:`subsec_batch_dot`"""
+    def __init__(self, num_hiddens, dropout, **kwargs):
+        super(AdditiveAttention, self).__init__(**kwargs)
+        self.W_k = nn.LazyLinear(num_hiddens, bias=False)
+        self.W_q = nn.LazyLinear(num_hiddens, bias=False)
+        self.w_v = nn.LazyLinear(1, bias=False)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, queries, keys, values, valid_lens):
+        queries, keys = self.W_q(queries), self.W_k(keys)
+        # After dimension expansion, shape of queries: (batch_size, no. of
+        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1, no. of
+        # key-value pairs, num_hiddens). Sum them up with broadcasting
+        features = queries.unsqueeze(2) + keys.unsqueeze(1)
+        features = torch.tanh(features)
+        # There is only one output of self.w_v, so we remove the last
+        # one-dimensional entry from the shape. Shape of scores: (batch_size,
+        # no. of queries, no. of key-value pairs)
+        scores = self.w_v(features).squeeze(-1)
+        self.attention_weights = masked_softmax(scores, valid_lens)
+        # Shape of values: (batch_size, no. of key-value pairs, value
+        # dimension)
         return torch.bmm(self.dropout(self.attention_weights), values)
 
 class AttentionDecoder(d2l.Decoder):
@@ -1362,7 +1348,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.sum()/num_epochs:.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
@@ -1394,7 +1380,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss) / 2,))
                 timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.sum()/num_epochs:.3f} sec/epoch')
 
 class Benchmark:
     """For measuring running time."""
@@ -2778,12 +2764,110 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):
         sorted_rung = sorted(rung, key=lambda x: x[1])
         return [x[0] for x in sorted_rung[:n]]
 
+def frozen_lake(seed):
+    """Defined in :numref:`sec_utils`"""
+    # See https://www.gymlibrary.dev/environments/toy_text/frozen_lake/ to learn more about this env
+    # How to process env.P.items is adpated from https://sites.google.com/view/deep-rl-bootcamp/labs
+
+    env = gym.make('FrozenLake-v1', is_slippery=False)
+    env.seed(seed)
+    env.action_space.np_random.seed(seed)
+    env.action_space.seed(seed)
+    env_info = {}
+    env_info['desc'] = env.desc  # 2D array specifying what each grid item means
+    env_info['num_states'] = env.nS  # Number of observations/states or obs/state dim
+    env_info['num_actions'] = env.nA  # Number of actions or action dim
+    # Define indices for (transition probability, nextstate, reward, done) tuple
+    env_info['trans_prob_idx'] = 0  # Index of transition probability entry
+    env_info['nextstate_idx'] = 1  # Index of next state entry
+    env_info['reward_idx'] = 2  # Index of reward entry
+    env_info['done_idx'] = 3  # Index of done entry
+    env_info['mdp'] = {}
+    env_info['env'] = env
+
+    for (s, others) in env.P.items():
+        # others(s) = {a0: [ (p(s'|s,a0), s', reward, done),...], a1:[...], ...}
+
+        for (a, pxrds) in others.items():
+            # pxrds is [(p1,next1,r1,d1),(p2,next2,r2,d2),..].
+            # e.g. [(0.3, 0, 0, False), (0.3, 0, 0, False), (0.3, 4, 1, False)]
+            env_info['mdp'][(s,a)] = pxrds
+
+    return env_info
+
+def make_env(name ='', seed=0):
+    """Defined in :numref:`sec_utils`"""
+    # Input parameters:
+    # name: specifies a gym environment.
+    # For Value iteration, only FrozenLake-v1 is supported.
+    if name == 'FrozenLake-v1':
+        return frozen_lake(seed)
+
+    else:
+        raise ValueError("%s env is not supported in this Notebook")
+
+def show_value_function_progress(env_desc, V, pi):
+    """Defined in :numref:`sec_utils`"""
+    # This function visualizes how value and policy changes over time.
+    # V: [num_iters, num_states]
+    # pi: [num_iters, num_states]
+    # How to visualize value function is adapted (but changed) from: https://sites.google.com/view/deep-rl-bootcamp/labs
+
+    num_iters = V.shape[0]
+    fig, ax  = plt.subplots(figsize=(15, 15))
+
+    for k in range(V.shape[0]):
+        plt.subplot(4, 4, k + 1)
+        plt.imshow(V[k].reshape(4,4), cmap="bone")
+        ax = plt.gca()
+        ax.set_xticks(np.arange(0, 5)-.5, minor=True)
+        ax.set_yticks(np.arange(0, 5)-.5, minor=True)
+        ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
+        ax.tick_params(which="minor", bottom=False, left=False)
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+        # LEFT action: 0, DOWN action: 1
+        # RIGHT action: 2, UP action: 3
+        action2dxdy = {0:(-.25, 0),1: (0, .25),
+                       2:(0.25, 0),3: (-.25, 0)}
+
+        for y in range(4):
+            for x in range(4):
+                action = pi[k].reshape(4,4)[y, x]
+                dx, dy = action2dxdy[action]
+
+                if env_desc[y,x].decode() == 'H':
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="y",
+                         size=20, fontweight='bold')
+
+                elif env_desc[y,x].decode() == 'G':
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="w",
+                         size=20, fontweight='bold')
+
+                else:
+                    ax.text(x, y, str(env_desc[y,x].decode()),
+                       ha="center", va="center", color="g",
+                         size=15, fontweight='bold')
+
+                # No arrow for cells with G and H labels
+                if env_desc[y,x].decode() != 'G' and env_desc[y,x].decode() != 'H':
+                    ax.arrow(x, y, dx, dy, color='r', head_width=0.2, head_length=0.15)
+
+        ax.set_title("Step = "  + str(k + 1), fontsize=20)
+
+    fig.tight_layout()
+    plt.show()
+
+
 def load_array(data_arrays, batch_size, is_train=True):
     """Construct a PyTorch data iterator.
 
     Defined in :numref:`sec_utils`"""
-    dataset = data.TensorDataset(*data_arrays)
-    return data.DataLoader(dataset, batch_size, shuffle=is_train)
+    dataset = torch.utils.data.TensorDataset(*data_arrays)
+    return torch.utils.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 def synthetic_data(w, b, num_examples):
     """Generate y = Xw + b + noise.
@@ -2821,10 +2905,10 @@ def load_data_fashion_mnist(batch_size, resize=None):
         root="../data", train=True, transform=trans, download=True)
     mnist_test = torchvision.datasets.FashionMNIST(
         root="../data", train=False, transform=trans, download=True)
-    return (data.DataLoader(mnist_train, batch_size, shuffle=True,
-                            num_workers=get_dataloader_workers()),
-            data.DataLoader(mnist_test, batch_size, shuffle=False,
-                            num_workers=get_dataloader_workers()))
+    return (torch.utils.data.DataLoader(mnist_train, batch_size, shuffle=True,
+                                        num_workers=get_dataloader_workers()),
+            torch.utils.data.DataLoader(mnist_test, batch_size, shuffle=False,
+                                        num_workers=get_dataloader_workers()))
 
 def evaluate_accuracy_gpu(net, data_iter, device=None):
     """Compute the accuracy for a model on a dataset using a GPU.
@@ -2891,6 +2975,25 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
           f'on {str(device)}')
 
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
+    """Plot a list of images.
+
+    Defined in :numref:`sec_utils`"""
+    figsize = (num_cols * scale, num_rows * scale)
+    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
+    axes = axes.flatten()
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        try:
+            img = d2l.numpy(img)
+        except:
+            pass
+        ax.imshow(img)
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        if titles:
+            ax.set_title(titles[i])
+    return axes
+
 def linreg(X, w, b):
     """The linear regression model.
 
@@ -2910,25 +3013,6 @@ def get_fashion_mnist_labels(labels):
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
-
-def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
-    """Plot a list of images.
-
-    Defined in :numref:`sec_utils`"""
-    figsize = (num_cols * scale, num_rows * scale)
-    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
-    axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):
-        try:
-            img = d2l.numpy(img)
-        except:
-            pass
-        ax.imshow(img)
-        ax.axes.get_xaxis().set_visible(False)
-        ax.axes.get_yaxis().set_visible(False)
-        if titles:
-            ax.set_title(titles[i])
-    return axes
 
 class Animator:
     """For plotting data in animation."""
@@ -3095,7 +3179,7 @@ def read_data_nmt():
 
     Defined in :numref:`sec_utils`"""
     data_dir = d2l.download_extract('fra-eng')
-    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
+    with open(os.path.join(data_dir, 'fra.txt'), 'r', encoding='utf-8') as f:
         return f.read()
 
 def preprocess_nmt(text):

@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Multilayer Perceptrons
@@ -296,6 +296,15 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+from jax import grad, vmap
+```
+
 ### ReLU Function
 
 The most popular choice,
@@ -337,6 +346,13 @@ y = tf.nn.relu(x)
 d2l.plot(x.numpy(), y.numpy(), 'x', 'relu(x)', figsize=(5, 2.5))
 ```
 
+```{.python .input}
+%%tab jax
+x = jnp.arange(-8.0, 8.0, 0.1)
+y = jax.nn.relu(x)
+d2l.plot(x, y, 'x', 'relu(x)', figsize=(5, 2.5))
+```
+
 When the input is negative,
 the derivative of the ReLU function is 0,
 and when the input is positive,
@@ -372,6 +388,12 @@ with tf.GradientTape() as t:
     y = tf.nn.relu(x)
 d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of relu',
          figsize=(5, 2.5))
+```
+
+```{.python .input}
+%%tab jax
+grad_relu = vmap(grad(jax.nn.relu))
+d2l.plot(x, grad_relu(x), 'x', 'grad of relu', figsize=(5, 2.5))
 ```
 
 The reason for using ReLU is that
@@ -455,6 +477,12 @@ y = tf.nn.sigmoid(x)
 d2l.plot(x.numpy(), y.numpy(), 'x', 'sigmoid(x)', figsize=(5, 2.5))
 ```
 
+```{.python .input}
+%%tab jax
+y = jax.nn.sigmoid(x)
+d2l.plot(x, y, 'x', 'sigmoid(x)', figsize=(5, 2.5))
+```
+
 The derivative of the sigmoid function is given by the following equation:
 
 $$\frac{d}{dx} \operatorname{sigmoid}(x) = \frac{\exp(-x)}{(1 + \exp(-x))^2} = \operatorname{sigmoid}(x)\left(1-\operatorname{sigmoid}(x)\right).$$
@@ -489,6 +517,12 @@ d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of sigmoid',
          figsize=(5, 2.5))
 ```
 
+```{.python .input}
+%%tab jax
+grad_sigmoid = vmap(grad(jax.nn.sigmoid))
+d2l.plot(x, grad_sigmoid(x), 'x', 'grad of sigmoid', figsize=(5, 2.5))
+```
+
 ### Tanh Function
 :label:`subsec_tanh`
 
@@ -517,6 +551,12 @@ d2l.plot(x.detach(), y.detach(), 'x', 'tanh(x)', figsize=(5, 2.5))
 %%tab tensorflow
 y = tf.nn.tanh(x)
 d2l.plot(x.numpy(), y.numpy(), 'x', 'tanh(x)', figsize=(5, 2.5))
+```
+
+```{.python .input}
+%%tab jax
+y = jax.nn.tanh(x)
+d2l.plot(x, y, 'x', 'tanh(x)', figsize=(5, 2.5))
 ```
 
 The derivative of the tanh function is:
@@ -550,6 +590,12 @@ with tf.GradientTape() as t:
     y = tf.nn.tanh(x)
 d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of tanh',
          figsize=(5, 2.5))
+```
+
+```{.python .input}
+%%tab jax
+grad_tanh = vmap(grad(jax.nn.tanh))
+d2l.plot(x, grad_tanh(x), 'x', 'grad of tanh', figsize=(5, 2.5))
 ```
 
 ## Summary

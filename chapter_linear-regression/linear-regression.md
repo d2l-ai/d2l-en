@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Linear Regression
@@ -120,6 +120,7 @@ the predictions $\hat{\mathbf{y}} \in \mathbb{R}^n$
 can be expressed via the matrix-vector product:
 
 $${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b,$$
+:eqlabel:`eq_linreg-y-vec`
 
 where broadcasting (:numref:`subsec_broadcasting`) is applied during the summation.
 Given features of a training dataset $\mathbf{X}$
@@ -415,6 +416,15 @@ import numpy as np
 import time
 ```
 
+```{.python .input}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+from jax import numpy as jnp
+import math
+import time
+```
+
 To illustrate why this matters so much,
 we can (**consider two methods for adding vectors.**)
 To start, we instantiate two 10,000-dimensional vectors
@@ -448,6 +458,18 @@ c = tf.Variable(d2l.zeros(n))
 t = time.time()
 for i in range(n):
     c[i].assign(a[i] + b[i])
+f'{time.time() - t:.5f} sec'
+```
+
+```{.python .input}
+%%tab jax
+# JAX arrays are immutable, meaning that once created their contents
+# cannot be changed. For updating individual elements, JAX provides
+# an indexed update syntax that returns an updated copy
+c = d2l.zeros(n)
+t = time.time()
+for i in range(n):
+    c = c.at[i].set(a[i] + b[i])
 f'{time.time() - t:.5f} sec'
 ```
 
@@ -501,14 +523,17 @@ Below [**we define a function to compute the normal distribution**].
 %%tab all
 def normal(x, mu, sigma):
     p = 1 / math.sqrt(2 * math.pi * sigma**2)
-    return p * np.exp(-0.5 * (x - mu)**2 / sigma**2)
+    if tab.selected('jax'):
+        return p * jnp.exp(-0.5 * (x - mu)**2 / sigma**2)
+    if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+        return p * np.exp(-0.5 * (x - mu)**2 / sigma**2)
 ```
 
 We can now (**visualize the normal distributions**).
 
 ```{.python .input}
 %%tab mxnet
-# Use numpy again for visualization
+# Use NumPy again for visualization
 x = np.arange(-7, 7, 0.01)
 
 # Mean and standard deviation pairs
@@ -519,9 +544,14 @@ d2l.plot(x.asnumpy(), [normal(x, mu, sigma).asnumpy() for mu, sigma in params], 
 ```
 
 ```{.python .input}
-%%tab pytorch, tensorflow
-# Use numpy again for visualization
-x = np.arange(-7, 7, 0.01)
+
+%%tab pytorch, tensorflow, jax
+if tab.selected('jax'):
+    # Use JAX NumPy for visualization
+    x = jnp.arange(-7, 7, 0.01)
+if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    # Use NumPy again for visualization
+    x = np.arange(-7, 7, 0.01)
 
 # Mean and standard deviation pairs
 params = [(0, 1), (0, 2), (3, 1)]

@@ -15,7 +15,7 @@ build/_build
 build/img
 build/data
 build/d2l
-/chapter_attention-mechanisms/fra-eng.zip
+/chapter_attention-mechanisms-and-transformers/fra-eng.zip
 /chapter_recurrent-neural-networks/fra-eng.zip
 img/*.pdf
 aclImdb*
@@ -23,9 +23,9 @@ aclImdb*
 graffle/*/*.svg
 graffle/*/*.pdf
 build/
-/chapter_deep-learning-computation/mydict
-/chapter_deep-learning-computation/x-file
-/chapter_deep-learning-computation/x-files
+/chapter_builders-guide/mydict
+/chapter_builders-guide/x-file
+/chapter_builders-guide/x-files
 .idea
 .vscode
 .pytest_cache

@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Deep Convolutional Neural Networks (AlexNet)
@@ -314,8 +314,16 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+```
+
 ```{.python .input  n=5}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class AlexNet(d2l.Classifier):
     def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
@@ -372,6 +380,36 @@ class AlexNet(d2l.Classifier):
                 tf.keras.layers.Dense(num_classes)])
 ```
 
+```{.python .input}
+%%tab jax
+class AlexNet(d2l.Classifier):
+    lr: float = 0.1
+    num_classes: int = 10
+    training: bool = True
+
+    def setup(self):
+        self.net = nn.Sequential([
+            nn.Conv(features=96, kernel_size=(11, 11), strides=4, padding=1),
+            nn.relu,
+            lambda x: nn.max_pool(x, window_shape=(3, 3), strides=(2, 2)),
+            nn.Conv(features=256, kernel_size=(5, 5)),
+            nn.relu,
+            lambda x: nn.max_pool(x, window_shape=(3, 3), strides=(2, 2)),
+            nn.Conv(features=384, kernel_size=(3, 3)), nn.relu,
+            nn.Conv(features=384, kernel_size=(3, 3)), nn.relu,
+            nn.Conv(features=256, kernel_size=(3, 3)), nn.relu,
+            lambda x: nn.max_pool(x, window_shape=(3, 3), strides=(2, 2)),
+            lambda x: x.reshape((x.shape[0], -1)),  # flatten
+            nn.Dense(features=4096),
+            nn.relu,
+            nn.Dropout(0.5, deterministic=not self.training),
+            nn.Dense(features=4096),
+            nn.relu,
+            nn.Dropout(0.5, deterministic=not self.training),
+            nn.Dense(features=self.num_classes)
+        ])
+```
+
 We [**construct a single-channel data example**] with both height and width of 224 (**to observe the output shape of each layer**). It matches the AlexNet architecture in :numref:`fig_alexnet`.
 
 ```{.python .input  n=6}
@@ -382,6 +420,11 @@ AlexNet().layer_summary((1, 1, 224, 224))
 ```{.python .input  n=7}
 %%tab tensorflow
 AlexNet().layer_summary((1, 224, 224, 1))
+```
+
+```{.python .input}
+%%tab jax
+AlexNet(training=False).layer_summary((1, 224, 224, 1))
 ```
 
 ## Training
@@ -405,7 +448,7 @@ and much slower training due to the deeper and wider network,
 the higher image resolution, and the more costly convolutions.
 
 ```{.python .input  n=8}
-%%tab pytorch, mxnet
+%%tab pytorch, mxnet, jax
 model = AlexNet(lr=0.01)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)

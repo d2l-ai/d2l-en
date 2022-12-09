@@ -52,13 +52,13 @@ each solution still hinges on a *task-specific* architecture.
 However, it is practically non-trivial to craft a specific architecture for every natural language processing task.
 The GPT (Generative Pre-Training) model represents an effort in designing
 a general *task-agnostic* model for context-sensitive representations :cite:`Radford.Narasimhan.Salimans.ea.2018`.
-Built on a transformer decoder,
+Built on a Transformer decoder,
 GPT pretrains a language model that will be used to represent text sequences.
 When applying GPT to a downstream task,
 the output of the language model will be fed into an added linear output layer
 to predict the label of the task.
 In sharp contrast to ELMo that freezes parameters of the pretrained model,
-GPT fine-tunes *all* the parameters in the pretrained transformer decoder
+GPT fine-tunes *all* the parameters in the pretrained Transformer decoder
 during supervised learning of the downstream task.
 GPT was evaluated on twelve tasks of natural language inference,
 question answering, sentence similarity, and classification,
@@ -82,7 +82,7 @@ Combining the best of both worlds,
 BERT (Bidirectional Encoder Representations from Transformers)
 encodes context bidirectionally and requires minimal architecture changes
 for a wide range of natural language processing tasks :cite:`Devlin.Chang.Lee.ea.2018`.
-Using a pretrained transformer encoder,
+Using a pretrained Transformer encoder,
 BERT is able to represent any token based on its bidirectional context.
 During supervised learning of downstream tasks,
 BERT is similar to GPT in two aspects.
@@ -90,7 +90,7 @@ First, BERT representations will be fed into an added output layer,
 with minimal changes to the model architecture depending on nature of tasks,
 such as predicting for every token vs. predicting for the entire sequence.
 Second,
-all the parameters of the pretrained transformer encoder are fine-tuned,
+all the parameters of the pretrained Transformer encoder are fine-tuned,
 while the additional output layer will be trained from scratch.
 :numref:`fig_elmo-gpt-bert` depicts the differences among ELMo, GPT, and BERT.
 
@@ -170,10 +170,10 @@ def get_tokens_and_segments(tokens_a, tokens_b=None):
     return tokens, segments
 ```
 
-BERT chooses the transformer encoder as its bidirectional architecture.
-Common in the transformer encoder,
+BERT chooses the Transformer encoder as its bidirectional architecture.
+Common in the Transformer encoder,
 positional embeddings are added at every position of the BERT input sequence.
-However, different from the original transformer encoder,
+However, different from the original Transformer encoder,
 BERT uses *learnable* positional embeddings.
 To sum up, :numref:`fig_bert-input` shows that
 the embeddings of the BERT input sequence are the sum
@@ -273,7 +273,7 @@ The forward inference of `BERTEncoder` with the input `tokens`
 returns the encoded result where each token is represented by a vector
 whose length is predefined by the hyperparameter `num_hiddens`.
 This hyperparameter is usually referred to as the *hidden size*
-(number of hidden units) of the transformer encoder.
+(number of hidden units) of the Transformer encoder.
 
 ```{.python .input}
 #@tab mxnet
@@ -449,7 +449,7 @@ while for the other half of the time the second sentence is randomly sampled fro
 The following `NextSentencePred` class uses a one-hidden-layer MLP
 to predict whether the second sentence is the next sentence of the first
 in the BERT input sequence.
-Due to self-attention in the transformer encoder,
+Due to self-attention in the Transformer encoder,
 the BERT representation of the special token “&lt;cls&gt;”
 encodes both the two sentences from the input.
 Hence, the output layer (`self.output`) of the MLP classifier takes `X` as input,

@@ -18,7 +18,7 @@ execute the following steps:
 
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 ```{.python .input  n=2}
@@ -47,6 +47,16 @@ import re
 from d2l import tensorflow as d2l
 import tensorflow as tf
 import random
+```
+
+```{.python .input}
+%%tab jax
+import collections
+from d2l import jax as d2l
+import jax
+from jax import numpy as jnp
+import random
+import re
 ```
 
 ## Reading the Dataset
@@ -244,7 +254,7 @@ they were most often filtered out.
 However, they carry meaning and
 it is not necessary to filter them out
 when working with modern RNN- and
-transformer-based neural models.
+Transformer-based neural models.
 If you look further down the list,
 you will notice
 that word frequency decays quickly.
@@ -294,7 +304,7 @@ One thing is notable here. Out of the ten most frequent word pairs, nine are com
 %%tab all
 trigram_tokens = ['--'.join(triple) for triple in zip(
     words[:-2], words[1:-1], words[2:])]
-trigram_vocab = d2l.Vocab(trigram_tokens)
+trigram_vocab = Vocab(trigram_tokens)
 trigram_vocab.token_freqs[:10]
 ```
 

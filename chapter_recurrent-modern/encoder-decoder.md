@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
 # Encoder-Decoder Architecture
@@ -52,8 +52,7 @@ by any model that inherits this base `Encoder` class.
 from d2l import mxnet as d2l
 from mxnet.gluon import nn
 
-#@save
-class Encoder(nn.Block):
+class Encoder(nn.Block):  #@save
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self):
         super().__init__()
@@ -68,8 +67,7 @@ class Encoder(nn.Block):
 from d2l import torch as d2l
 from torch import nn
 
-#@save
-class Encoder(nn.Module):
+class Encoder(nn.Module):  #@save
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self):
         super().__init__()
@@ -84,14 +82,28 @@ class Encoder(nn.Module):
 from d2l import tensorflow as d2l
 import tensorflow as tf
 
-#@save
-class Encoder(tf.keras.layers.Layer):
+class Encoder(tf.keras.layers.Layer):  #@save
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self):
         super().__init__()
 
     # Later there can be additional arguments (e.g., length excluding padding)
     def call(self, X, *args):
+        raise NotImplementedError
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+
+class Encoder(nn.Module):  #@save
+    """The base encoder interface for the encoder-decoder architecture."""
+    def setup(self):
+        raise NotImplementedError
+
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def __call__(self, X, *args):
         raise NotImplementedError
 ```
 
@@ -114,8 +126,7 @@ into an output token at the current time step.
 
 ```{.python .input}
 %%tab mxnet
-#@save
-class Decoder(nn.Block):
+class Decoder(nn.Block):  #@save
     """The base decoder interface for the encoder-decoder architecture."""
     def __init__(self):
         super().__init__()
@@ -130,8 +141,7 @@ class Decoder(nn.Block):
 
 ```{.python .input}
 %%tab pytorch
-#@save
-class Decoder(nn.Module):
+class Decoder(nn.Module):  #@save
     """The base decoder interface for the encoder-decoder architecture."""
     def __init__(self):
         super().__init__()
@@ -146,8 +156,7 @@ class Decoder(nn.Module):
 
 ```{.python .input}
 %%tab tensorflow
-#@save
-class Decoder(tf.keras.layers.Layer):
+class Decoder(tf.keras.layers.Layer):  #@save
     """The base decoder interface for the encoder-decoder architecture."""
     def __init__(self):
         super().__init__()
@@ -157,6 +166,21 @@ class Decoder(tf.keras.layers.Layer):
         raise NotImplementedError
 
     def call(self, X, state):
+        raise NotImplementedError
+```
+
+```{.python .input}
+%%tab jax
+class Decoder(nn.Module):  #@save
+    """The base decoder interface for the encoder-decoder architecture."""
+    def setup(self):
+        raise NotImplementedError
+
+    # Later there can be additional arguments (e.g., length excluding padding)
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def __call__(self, X, state):
         raise NotImplementedError
 ```
 
@@ -170,8 +194,7 @@ by the decoder as one of its input.
 
 ```{.python .input}
 %%tab mxnet, pytorch
-#@save
-class EncoderDecoder(d2l.Classifier):
+class EncoderDecoder(d2l.Classifier):  #@save
     """The base class for the encoder-decoder architecture."""
     def __init__(self, encoder, decoder):
         super().__init__()
@@ -187,8 +210,7 @@ class EncoderDecoder(d2l.Classifier):
 
 ```{.python .input}
 %%tab tensorflow
-#@save
-class EncoderDecoder(d2l.Classifier):
+class EncoderDecoder(d2l.Classifier):  #@save
     """The base class for the encoder-decoder architecture."""
     def __init__(self, encoder, decoder):
         super().__init__()
@@ -200,6 +222,21 @@ class EncoderDecoder(d2l.Classifier):
         dec_state = self.decoder.init_state(enc_outputs, *args)
         # Return decoder output only
         return self.decoder(dec_X, dec_state, training=True)[0]
+```
+
+```{.python .input}
+%%tab jax
+class EncoderDecoder(d2l.Classifier):  #@save
+    """The base class for the encoder-decoder architecture."""
+    encoder: nn.Module
+    decoder: nn.Module
+    training: bool
+
+    def __call__(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args, training=self.training)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        # Return decoder output only
+        return self.decoder(dec_X, dec_state, training=self.training)[0]
 ```
 
 In the next section, 

@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Documentation
@@ -54,6 +54,12 @@ import tensorflow as tf
 print(dir(tf.random))
 ```
 
+```{.python .input}
+%%tab jax
+import jax
+print(dir(jax.random))
+```
+
 Generally, we can ignore functions that start and end with `__` (special objects in Python) 
 or functions that start with a single `_`(usually internal functions). 
 Based on the remaining function or attribute names, 
@@ -83,6 +89,11 @@ help(torch.ones)
 help(tf.ones)
 ```
 
+```{.python .input}
+%%tab jax
+help(jax.numpy.ones)
+```
+
 From the documentation, we can see that the `ones` function 
 creates a new tensor with the specified shape 
 and sets all the elements to the value of 1. 
@@ -102,6 +113,11 @@ torch.ones(4)
 ```{.python .input}
 %%tab tensorflow
 tf.ones(4)
+```
+
+```{.python .input}
+%%tab jax
+jax.numpy.ones(4)
 ```
 
 In the Jupyter notebook, we can use `?` to display the document in another

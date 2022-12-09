@@ -1,6 +1,6 @@
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Concise Implementation of Softmax Regression
@@ -35,6 +35,16 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from functools import partial
+import jax
+from jax import numpy as jnp
+import optax
+```
+
 ## Defining the Model
 
 As in :numref:`sec_linear_concise`, 
@@ -61,8 +71,17 @@ We use a `Flatten` layer to convert the 4th order tensor `X`
 by keeping the dimension along the first axis unchanged.
 :end_tab:
 
+:begin_tab:`jax`
+Flax allows users to write the network class in a more compact way
+using `@nn.compact` dectorator. With `@nn.compact`, one
+can simply write all network logic inside a single “forward pass”
+method, without needing to define the standard `setup` method in
+the dataclass.
+:end_tab:
+
 ```{.python .input}
-%%tab all
+
+%%tab pytorch, mxnet, tensorflow
 class SoftmaxRegression(d2l.Classifier):  #@save
     def __init__(self, num_outputs, lr):
         super().__init__()
@@ -80,6 +99,19 @@ class SoftmaxRegression(d2l.Classifier):  #@save
 
     def forward(self, X):
         return self.net(X)
+```
+
+```{.python .input}
+%%tab jax
+class SoftmaxRegression(d2l.Classifier):  #@save
+    num_outputs: int
+    lr: float
+
+    @nn.compact
+    def __call__(self, X):
+        X = X.reshape((X.shape[0], -1))  # flatten
+        X = nn.Dense(self.num_outputs)(X)
+        return X
 ```
 
 ## Softmax Revisited
@@ -139,8 +171,8 @@ we just
 all at once inside the cross-entropy loss function,**]
 which does smart things like the ["LogSumExp trick"](https://en.wikipedia.org/wiki/LogSumExp).
 
-```{.python .input  n=3}
-%%tab all
+```{.python .input}
+%%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(d2l.Classifier)  #@save
 def loss(self, Y_hat, Y, averaged=True):
     Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
@@ -155,6 +187,21 @@ def loss(self, Y_hat, Y, averaged=True):
     if tab.selected('tensorflow'):
         fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         return fn(Y, Y_hat)
+```
+
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(d2l.Classifier)  #@save
+@partial(jax.jit, static_argnums=(0, 5))
+def loss(self, params, X, Y, state, averaged=True):
+    Y_hat = state.apply_fn({'params': params}, *X,
+                           mutable=False, rngs=None)  # To be used later (e.g., for batch norm)
+    Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+    Y = d2l.reshape(Y, (-1,))
+    fn = optax.softmax_cross_entropy_with_integer_labels
+    # The returned empty dictionary is a placeholder for auxiliary data,
+    # which will be used later (e.g., for batch norm)
+    return (fn(Y_hat, Y).mean(), {}) if averaged else (fn(Y_hat, Y), {})
 ```
 
 ## Training

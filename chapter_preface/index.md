@@ -346,6 +346,7 @@ the following dependencies:
 import inspect
 import collections
 from collections import defaultdict
+import gym
 from IPython import display
 import math
 from matplotlib import pyplot as plt
@@ -419,6 +420,27 @@ to update your code and runtime environment.
 Here is how we import modules from TensorFlow.
 :end_tab:
 
+:begin_tab:`jax`
+Most of the code in this book is based on Jax,
+an open-source framework enabling composable function
+transformations such as differentiation of arbitrary
+Python and NumPy functions, as well as JIT compliation,
+vectorization and much more! It's becoming popular in
+the machine learning research space and has an
+easy-to-learn NumPy-like API. Actually, JAX tries
+to achieve 1:1 parity with NumPy, so switching your
+code could be as simple as changing a single import statement!
+However, due to the rapid development of deep learning,
+some code *in the print edition*
+may not work properly in future versions of Jax.
+We plan to keep the online version up-to-date.
+In case you encounter any problems,
+please consult :ref:`chap_installation`
+to update your code and runtime environment.
+
+Here is how we import modules from JAX.
+:end_tab:
+
 ```{.python .input}
 #@tab mxnet
 #@save
@@ -434,7 +456,6 @@ import torch
 import torchvision
 from torch import nn
 from torch.nn import functional as F
-from torch.utils import data
 from torchvision import transforms
 from PIL import Image
 ```
@@ -444,6 +465,24 @@ from PIL import Image
 #@save
 import numpy as np
 import tensorflow as tf
+```
+
+```{.python .input}
+#@tab jax
+#@save
+from dataclasses import field
+from functools import partial
+import flax
+from flax import linen as nn
+from flax.training import train_state
+import jax
+from jax import numpy as jnp
+from jax import grad, vmap
+import numpy as np
+import optax
+import tensorflow as tf
+import tensorflow_datasets as tfds
+from typing import Any
 ```
 
 ### Target Audience
@@ -493,7 +532,11 @@ at the end of each notebook.
 We are indebted to the hundreds of contributors for both
 the English and the Chinese drafts.
 They helped improve the content and offered valuable feedback.
-Specifically, we thank every contributor of this English draft
+We thank Anirudh Dagar and Yuan Tang for adapting part of early MXNet code into PyTorch and TensorFlow implementations, respectively.
+We thank a team from Baidu for adapting more recent PyTorch code into PaddlePaddle implementations in the Chinese draft.
+We thank Shuai Zhang for integrating the LaTeX style from the press into the PDF building.
+
+On GitHub, we thank every contributor of this English draft
 for making it better for everyone.
 Their GitHub IDs or names are (in no particular order):
 alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat,
@@ -534,7 +577,8 @@ Kaan Sancak, regob, AlexSauer, Gopalakrishna Ramachandra, Tobias Uelwer, Chao Wa
 Nicolas Corthorn, akash5474, kxxt, zxydi1992, Jacob Britton, Shuangchi He, zhmou, krahets, Jie-Han Chen,
 Atishay Garg, Marcel Flygare, adtygan, Nik Vaessen, bolded, Louis Schlessinger, Balaji Varatharajan,
 atgctg, Kaixin Li, Victor Barbaros, Riccardo Musto, Elizabeth Ho, azimjonn, Guilherme Miotto, Alessandro Finamore,
-Joji Joseph, Anthony Biel, Zeming Zhao.
+Joji Joseph, Anthony Biel, Zeming Zhao, shjustinbaek, gab-chen, nantekoto, Yutaro Nishiyama, Oren Amsalem,
+Tian-MaoMao, Amin Allahyar, Gijs van Tulder, Mikhail Berkov.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian, Peter DeSantis, Adam Selipsky,
 and Andrew Jassy for their generous support in writing this book. 
