@@ -479,6 +479,16 @@ class Classifier(d2l.Module):
             X = layer(X)
             print(layer.__class__.__name__, 'output shape:\t', X.shape)
 
+class SoftmaxRegression(d2l.Classifier):
+    """Defined in :numref:`sec_softmax_concise`"""
+    def __init__(self, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential(nn.Flatten(),
+                                 nn.LazyLinear(num_outputs))
+    def forward(self, X):
+        return self.net(X)
+
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
     return torch.device('cpu')
@@ -521,6 +531,21 @@ def init_cnn(module):
     Defined in :numref:`sec_lenet`"""
     if type(module) == nn.Linear or type(module) == nn.Conv2d:
         nn.init.xavier_uniform_(module.weight)
+
+class LeNet(d2l.Classifier):
+    """Defined in :numref:`sec_lenet`"""
+    def __init__(self, lr=0.1, num_classes=10):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential(
+            nn.LazyConv2d(6, kernel_size=5, padding=2), nn.Sigmoid(),
+            nn.AvgPool2d(kernel_size=2, stride=2),
+            nn.LazyConv2d(16, kernel_size=5), nn.Sigmoid(),
+            nn.AvgPool2d(kernel_size=2, stride=2),
+            nn.Flatten(),
+            nn.LazyLinear(120), nn.Sigmoid(),
+            nn.LazyLinear(84), nn.Sigmoid(),
+            nn.LazyLinear(num_classes))
 
 class Residual(nn.Module):
     """The Residual block of ResNet."""
@@ -2566,6 +2591,179 @@ def update_G(Z, net_D, net_G, loss, trainer_G):
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
+class HPOTrainer(d2l.Trainer):
+    """Defined in :numref:`sec_definition_hpo`"""
+    def validation_error(self):
+        self.model.eval()
+        accuracy = 0
+        val_batch_idx = 0
+        for batch in self.val_dataloader:
+            with torch.no_grad():
+                x, y = self.prepare_batch(batch)
+                y_hat = self.model(x)
+                accuracy += self.model.accuracy(y_hat, y)
+            val_batch_idx += 1
+        return 1 -  accuracy / val_batch_idx
+
+class HPOSearcher(d2l.HyperParameters):
+    """Defined in :numref:`sec_api_hpo`"""
+    def sample_configuration():
+        raise NotImplementedError
+
+    def update(self, config: dict, error: float, additional_info=None):
+        pass
+
+class RandomSearcher(HPOSearcher):
+    """Defined in :numref:`sec_api_hpo`"""
+    def __init__(self, config_space: dict, initial_config=None):
+        self.save_hyperparameters()
+
+    def sample_configuration(self):
+        if self.initial_config is not None:
+            result = self.initial_config
+            self.initial_config = None
+        else:
+            result = {
+                name: domain.rvs()
+                for name, domain in self.config_space.items()
+            }
+        return result
+
+class HPOScheduler(d2l.HyperParameters):
+    """Defined in :numref:`sec_api_hpo`"""
+    def suggest(self):
+        raise NotImplementedError
+
+    def update(self, config: dict, error: float, info=None):
+        raise NotImplementedError
+
+class BasicScheduler(HPOScheduler):
+    """Defined in :numref:`sec_api_hpo`"""
+    def __init__(self, searcher: HPOSearcher):
+        self.save_hyperparameters()
+
+    def suggest(self):
+        return self.searcher.sample_configuration()
+
+    def update(self, config: dict, error: float, info=None):
+        searcher.update(config, error, additional_info=info)
+
+class HPOTuner(d2l.HyperParameters):
+    """Defined in :numref:`sec_api_hpo`"""
+    def __init__(self, scheduler: HPOScheduler, objective: callable):
+        self.save_hyperparameters()
+        # Bookeeping results for plotting
+        self.incumbent = None
+        self.incumbent_error = None
+        self.incumbent_trajectory = []
+        self.cumulative_runtime = []
+        self.current_runtime = 0
+        self.records = []
+
+    def run(self, number_of_trials):
+        for i in range(number_of_trials):
+            start_time = time.time()
+            config = self.scheduler.suggest()
+            print(f"Trial {i}: config = {config}")
+            error = self.objective(**config)
+            error = float(d2l.numpy(error.cpu()))
+            self.scheduler.update(config, error)
+            runtime = time.time() - start_time
+            self.bookkeeping(config, error, runtime)
+            print(f"    error = {error}, runtime = {runtime}")
+
+    def bookkeeping(self, config: dict, error: float, runtime: float):
+        """Defined in :numref:`sec_api_hpo`"""
+        self.records.append({"config": config, "error": error, "runtime": runtime})
+        # Check if the last hyperparameter configuration performs better
+        # than the incumbent
+        if self.incumbent is None or self.incumbent_error > error:
+            self.incumbent = config
+            self.incumbent_error = error
+        # Add current best observed performance to the optimization trajectory
+        self.incumbent_trajectory.append(self.incumbent_error)
+        # Update runtime
+        self.current_runtime += runtime
+        self.cumulative_runtime.append(self.current_runtime)
+
+def hpo_objective_lenet(learning_rate, batch_size, max_epochs=10):
+    """Defined in :numref:`sec_api_hpo`"""
+    model = d2l.LeNet(lr=learning_rate, num_classes=10)
+    trainer = d2l.HPOTrainer(max_epochs=max_epochs, num_gpus=1)
+    data = d2l.FashionMNIST(batch_size=batch_size)
+    model.apply_init([next(iter(data.get_dataloader(True)))[0]], d2l.init_cnn)
+    trainer.fit(model=model, data=data)
+    validation_error = trainer.validation_error()
+    return validation_error
+
+class SuccessiveHalvingScheduler(d2l.HPOScheduler):
+    """Defined in :numref:`sec_mf_hpo_sh`"""
+    def __init__(self, searcher, eta, r_min, r_max, prefact=1):
+        self.save_hyperparameters()
+        # Compute K, which is later used to determine the number of configurations
+        self.K = int(np.log(r_max / r_min) / np.log(eta))
+        # Define the rungs
+        self.rung_levels = [r_min * eta ** k for k in range(self.K + 1)]
+        if r_max not in self.rung_levels:
+            # The final rung should be r_max
+            self.rung_levels.append(r_max)
+            self.K += 1
+        # Bookkeeping
+        self.observed_error_at_rungs = defaultdict(list)
+        self.all_observed_error_at_rungs = defaultdict(list)
+        # Our processing queue
+        self.queue = []
+
+    def suggest(self):
+        """Defined in :numref:`sec_mf_hpo_sh`"""
+        if len(self.queue) == 0:
+            # Start a new round of successive halving
+            # Number of configurations for the first rung:
+            n0 = int(self.prefact * self.eta ** self.K)
+            for _ in range(n0):
+                config = self.searcher.sample_configuration()
+                config["max_epochs"] = self.r_min  # Set r = r_min
+                self.queue.append(config)
+        # Return an element from the queue
+        return self.queue.pop()
+
+    def update(self, config: dict, error: float, info=None):
+        """Defined in :numref:`sec_mf_hpo_sh`"""
+        ri = int(config["max_epochs"])  # Rung r_i
+        # Update our searcher, e.g if we use Bayesian optimization later
+        self.searcher.update(config, error, additional_info=info)
+        self.all_observed_error_at_rungs[ri].append((config, error))
+        if ri < self.r_max:
+            # Bookkeeping
+            self.observed_error_at_rungs[ri].append((config, error))
+            # Determine how many configurations should be evaluated on this rung
+            ki = self.K - self.rung_levels.index(ri)
+            ni = int(self.prefact * self.eta ** ki)
+            # If we observed all configuration on this rung r_i, we estimate the
+            # top 1 / eta configuration, add them to queue and promote them for the
+            # next rung r_{i+1}
+            if len(self.observed_error_at_rungs[ri]) >= ni:
+                kiplus1 = ki - 1
+                niplus1 = int(self.prefact * self.eta ** kiplus1)
+                best_performing_configurations = self.get_top_n_configurations(
+                    rung_level=ri, n=niplus1
+                )
+                riplus1 = self.rung_levels[self.K - kiplus1]  # r_{i+1}
+                # Queue may not be empty: insert new entries at the beginning
+                self.queue = [
+                    dict(config, max_epochs=riplus1)
+                    for config in best_performing_configurations
+                ] + self.queue
+                self.observed_error_at_rungs[ri] = []  # Reset
+
+    def get_top_n_configurations(self, rung_level, n):
+        """Defined in :numref:`sec_mf_hpo_sh`"""
+        rung = self.observed_error_at_rungs[rung_level]
+        if not rung:
+            return []
+        sorted_rung = sorted(rung, key=lambda x: x[1])
+        return [x[0] for x in sorted_rung[:n]]
+
 def frozen_lake(seed):
     """Defined in :numref:`sec_utils`"""
     # See https://www.gymlibrary.dev/environments/toy_text/frozen_lake/ to learn more about this env
@@ -2662,6 +2860,7 @@ def show_value_function_progress(env_desc, V, pi):
 
     fig.tight_layout()
     plt.show()
+
 
 def load_array(data_arrays, batch_size, is_train=True):
     """Construct a PyTorch data iterator.

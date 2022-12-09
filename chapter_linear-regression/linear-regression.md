@@ -443,7 +443,7 @@ Now we can benchmark the workloads.
 First, [**we add them, one coordinate at a time,
 using a for-loop.**]
 
-```{.python .input  n=3}
+```{.python .input}
 %%tab mxnet, pytorch
 c = d2l.zeros(n)
 t = time.time()
@@ -544,6 +544,7 @@ d2l.plot(x.asnumpy(), [normal(x, mu, sigma).asnumpy() for mu, sigma in params], 
 ```
 
 ```{.python .input}
+
 %%tab pytorch, tensorflow, jax
 if tab.selected('jax'):
     # Use JAX NumPy for visualization

@@ -80,8 +80,9 @@ the dataclass.
 :end_tab:
 
 ```{.python .input}
+
 %%tab pytorch, mxnet, tensorflow
-class SoftmaxRegression(d2l.Classifier):
+class SoftmaxRegression(d2l.Classifier):  #@save
     def __init__(self, num_outputs, lr):
         super().__init__()
         self.save_hyperparameters()
@@ -102,7 +103,7 @@ class SoftmaxRegression(d2l.Classifier):
 
 ```{.python .input}
 %%tab jax
-class SoftmaxRegression(d2l.Classifier):
+class SoftmaxRegression(d2l.Classifier):  #@save
     num_outputs: int
     lr: float
 

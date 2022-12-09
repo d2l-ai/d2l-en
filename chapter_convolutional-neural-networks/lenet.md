@@ -124,13 +124,14 @@ from types import FunctionType
 %%tab pytorch
 def init_cnn(module):  #@save
     """Initialize weights for CNNs."""
-    if type(module) == nn.Linear or type(module) == nn.Conv2d:
+    if type(module) 
+nn.Linear or type(module) == nn.Conv2d:
         nn.init.xavier_uniform_(module.weight)
 ```
 
 ```{.python .input}
 %%tab pytorch, mxnet, tensorflow
-class LeNet(d2l.Classifier):
+class LeNet(d2l.Classifier):  #@save
     def __init__(self, lr=0.1, num_classes=10):
         super().__init__()
         self.save_hyperparameters()
@@ -172,7 +173,7 @@ class LeNet(d2l.Classifier):
 
 ```{.python .input}
 %%tab jax
-class LeNet(d2l.Classifier):
+class LeNet(d2l.Classifier):  #@save
     lr: float = 0.1
     num_classes: int = 10
     kernel_init: FunctionType = nn.initializers.xavier_uniform
