@@ -2607,7 +2607,7 @@ class HPOTrainer(d2l.Trainer):
 
 class HPOSearcher(d2l.HyperParameters):
     """Defined in :numref:`sec_api_hpo`"""
-    def sample_configuration():
+    def sample_configuration() -> dict:
         raise NotImplementedError
 
     def update(self, config: dict, error: float, additional_info=None):
@@ -2618,7 +2618,7 @@ class RandomSearcher(HPOSearcher):
     def __init__(self, config_space: dict, initial_config=None):
         self.save_hyperparameters()
 
-    def sample_configuration(self):
+    def sample_configuration(self) -> dict:
         if self.initial_config is not None:
             result = self.initial_config
             self.initial_config = None
@@ -2631,7 +2631,7 @@ class RandomSearcher(HPOSearcher):
 
 class HPOScheduler(d2l.HyperParameters):
     """Defined in :numref:`sec_api_hpo`"""
-    def suggest(self):
+    def suggest(self) -> dict:
         raise NotImplementedError
 
     def update(self, config: dict, error: float, info=None):
@@ -2642,11 +2642,11 @@ class BasicScheduler(HPOScheduler):
     def __init__(self, searcher: HPOSearcher):
         self.save_hyperparameters()
 
-    def suggest(self):
+    def suggest(self) -> dict:
         return self.searcher.sample_configuration()
 
     def update(self, config: dict, error: float, info=None):
-        searcher.update(config, error, additional_info=info)
+        self.searcher.update(config, error, additional_info=info)
 
 class HPOTuner(d2l.HyperParameters):
     """Defined in :numref:`sec_api_hpo`"""
@@ -2697,7 +2697,6 @@ def hpo_objective_lenet(learning_rate, batch_size, max_epochs=10):
     return validation_error
 
 class SuccessiveHalvingScheduler(d2l.HPOScheduler):
-    """Defined in :numref:`sec_mf_hpo_sh`"""
     def __init__(self, searcher, eta, r_min, r_max, prefact=1):
         self.save_hyperparameters()
         # Compute K, which is later used to determine the number of configurations
@@ -2740,8 +2739,8 @@ class SuccessiveHalvingScheduler(d2l.HPOScheduler):
             ki = self.K - self.rung_levels.index(ri)
             ni = int(self.prefact * self.eta ** ki)
             # If we observed all configuration on this rung r_i, we estimate the
-            # top 1 / eta configuration, add them to queue and promote them for the
-            # next rung r_{i+1}
+            # top 1 / eta configuration, add them to queue and promote them for
+            # the next rung r_{i+1}
             if len(self.observed_error_at_rungs[ri]) >= ni:
                 kiplus1 = ki - 1
                 niplus1 = int(self.prefact * self.eta ** kiplus1)
@@ -2860,7 +2859,6 @@ def show_value_function_progress(env_desc, V, pi):
 
     fig.tight_layout()
     plt.show()
-
 
 def load_array(data_arrays, batch_size, is_train=True):
     """Construct a PyTorch data iterator.

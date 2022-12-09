@@ -14,7 +14,7 @@ hyperparameter configurations, which often involves some kind of search over the
 configuration space. Second, for each configuration, an HPO algorithm needs to
 schedule its evaluation and decide how many resources to allocate for it. Once
 we start to evaluate a configuration, we will refer to it as a *trial*. We map
-these decisions to two classes,`HPOSearcher` and `HPOScheduler`. On top of that,
+these decisions to two classes, `HPOSearcher` and `HPOScheduler`. On top of that,
 we also provide a `HPOTuner` class that executes the optimization process.
 
 This concept of scheduler and searcher is also implemented in popular HPO
@@ -43,7 +43,7 @@ from scipy import stats
 ```{.python .input  n=3}
 %%tab all
 class HPOSearcher(d2l.HyperParameters):  #@save
-    def sample_configuration():
+    def sample_configuration() -> dict:
         raise NotImplementedError
 
     def update(self, config: dict, error: float, additional_info=None):
@@ -61,7 +61,7 @@ class RandomSearcher(HPOSearcher):  #@save
     def __init__(self, config_space: dict, initial_config=None):
         self.save_hyperparameters()
 
-    def sample_configuration(self):
+    def sample_configuration(self) -> dict:
         if self.initial_config is not None:
             result = self.initial_config
             self.initial_config = None
@@ -87,7 +87,7 @@ observation.
 ```{.python .input  n=5}
 %%tab all
 class HPOScheduler(d2l.HyperParameters):  #@save
-    def suggest(self):
+    def suggest(self) -> dict:
         raise NotImplementedError
     
     def update(self, config: dict, error: float, info=None):
@@ -104,11 +104,11 @@ class BasicScheduler(HPOScheduler):  #@save
     def __init__(self, searcher: HPOSearcher):
         self.save_hyperparameters()
 
-    def suggest(self):
+    def suggest(self) -> dict:
         return self.searcher.sample_configuration()
 
     def update(self, config: dict, error: float, info=None):
-        searcher.update(config, error, additional_info=info)
+        self.searcher.update(config, error, additional_info=info)
 ```
 
 ### Tuner
@@ -253,13 +253,15 @@ quickly outperforms random search afterwards.
 ![Example any-time performance plot to compare two algorithms A and B.](../img/example_anytime_performance.svg)
 :label:`example_anytime_performance`
 
-
 ## Summary
 
 This section laid out a simple, yet flexible interface to implement various HPO
 algorithms that we will look at in this chapter. Similar interfaces can be found
 in popular open-source HPO frameworks. We also looked at how we can compare HPO
 algorithms, and potential pitfall one needs to be aware. 
+
+## Exercises
+
 
 
 :begin_tab:`pytorch`
