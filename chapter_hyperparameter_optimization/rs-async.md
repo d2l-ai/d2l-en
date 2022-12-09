@@ -160,6 +160,7 @@ tuner = Tuner(
     scheduler=scheduler, 
     stop_criterion=stop_criterion,
     n_workers=n_workers,
+    print_update_interval=max_wallclock_time // 2,
 )
 ```
 
@@ -217,3 +218,8 @@ become available, and, hence, ensures that all workers are busy at any point in
 time. While random search is easy to distribute asynchronously and does not
 require any change of the actual algorithm, other methods require some additional
 modifications.
+
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/12093)
+:end_tab:

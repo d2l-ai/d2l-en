@@ -2607,7 +2607,7 @@ class HPOTrainer(d2l.Trainer):
 
 class HPOSearcher(d2l.HyperParameters):
     """Defined in :numref:`sec_api_hpo`"""
-    def sample_configuration():
+    def sample_configuration() -> dict:
         raise NotImplementedError
 
     def update(self, config: dict, error: float, additional_info=None):
@@ -2618,7 +2618,7 @@ class RandomSearcher(HPOSearcher):
     def __init__(self, config_space: dict, initial_config=None):
         self.save_hyperparameters()
 
-    def sample_configuration(self):
+    def sample_configuration(self) -> dict:
         if self.initial_config is not None:
             result = self.initial_config
             self.initial_config = None
@@ -2631,7 +2631,7 @@ class RandomSearcher(HPOSearcher):
 
 class HPOScheduler(d2l.HyperParameters):
     """Defined in :numref:`sec_api_hpo`"""
-    def suggest(self):
+    def suggest(self) -> dict:
         raise NotImplementedError
 
     def update(self, config: dict, error: float, info=None):
@@ -2642,11 +2642,11 @@ class BasicScheduler(HPOScheduler):
     def __init__(self, searcher: HPOSearcher):
         self.save_hyperparameters()
 
-    def suggest(self):
+    def suggest(self) -> dict:
         return self.searcher.sample_configuration()
 
     def update(self, config: dict, error: float, info=None):
-        searcher.update(config, error, additional_info=info)
+        self.searcher.update(config, error, additional_info=info)
 
 class HPOTuner(d2l.HyperParameters):
     """Defined in :numref:`sec_api_hpo`"""
