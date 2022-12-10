@@ -129,7 +129,7 @@ d2l.plt.show()
 
 ## The Neural Network Kernel
 
-Research on Gaussian processes in machine learning was triggered by research on neural networks. Radford Neal was pursuing ever larger Bayesian neural networks, ultimately showing in 1994 that such networks with an infinite number of hidden units become Gaussian processes with particular kernel functions. Interest in this derivation has re-surfaced, with ideas like the neural tangent kernel being used to investigate the generalization properties of neural networks. We can derive the neural network kernel as follows.
+Research on Gaussian processes in machine learning was triggered by research on neural networks. Radford Neal was pursuing ever larger Bayesian neural networks, ultimately showing in 1994 (later published in 1996, as it was one of the most infamous NeurIPS rejections) that such networks with an infinite number of hidden units become Gaussian processes with particular kernel functions :cite:`neal1996bayesian`. Interest in this derivation has re-surfaced, with ideas like the neural tangent kernel being used to investigate the generalization properties of neural networks :cite:`matthews2018gaussian` :cite:`novak2018bayesian`. We can derive the neural network kernel as follows.
 
 Consider a neural network function $f(x)$ with one hidden layer:
 
