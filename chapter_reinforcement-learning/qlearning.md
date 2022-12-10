@@ -8,7 +8,7 @@ In the previous section, we discussed the Value Iteration algorithm which requir
 
 Recall that value iteration for the action-value function in :ref:`sec_valueiter` corresponds to the update
 
-$$Q_{k+1}(s, a) = r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \max_{a' \in \mathcal{A}} Q_k (s', a'); \ \text{for all } s \in \mathcal{S} \text{and } a \in \mathcal{A}.$$
+$$Q_{k+1}(s, a) = r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \max_{a' \in \mathcal{A}} Q_k (s', a'); \ \text{for all } s \in \mathcal{S} \text{ and } a \in \mathcal{A}.$$
 
 As we discussed, implementing this algorithm requires knowing the MDP, specifically the transition function $P(s' \mid s, a)$. The key idea behind Q-Learning is to replace the summation over all $s' \in \mathcal{S}$ in the above expression by a summation over the states visited by the robot. This allows us to subvert the need to know the transition function.
 
