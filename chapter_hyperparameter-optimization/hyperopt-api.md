@@ -265,19 +265,8 @@ algorithms, and potential pitfall one needs to be aware.
 1. The goal of this exercise is to implement the objective function for a slightly more challenging HPO problem, and to run more realistic experiments. We will use the two hidden layer MLP `DropoutMLP` implemented in :numref:`sec_dropout`.
     1. Code up the objective function, which should depend on all hyperparameters of the model and `batch_size`. Use `max_epochs=50`. GPUs do not help here, so `num_gpus=0`. Hint: Start with `hpo_objective_lenet`.
     2. Choose a sensible search space, where `num_hiddens_1`, `num_hiddens_2`are integers in $[8, 1024]$, and dropout values lie in $[0, 0.95], while`batch_size` lies in $[16, 384]$. Provide code for `config_space`, using sensible distributions from `scipy.stats`.
-    3. Run random search on this example with `number_of_trials=20` and plot the results. Make sure to first evaluate the default configuration of :numref:`sec_dropout`, which is `initial_config = {'num_hiddens_1':256, 'num_hiddens_2':256, 'dropout_1':0.5, 'dropout_2':0.5, 'lr':0.1, 'batch_size: 256}`.
-2. In this exercise, you will implement a searcher (subclass of `HPOSearcher`)
-   which aims to improve upon random search, by depending on past data. It
-   depends on parameters `probab_local`, `num_init_random`. Its
-   `sample_configuration` method works as follows. For the first `num_init_random`
-   calls, do the same as `RandomSearcher.sample_configuration`. Otherwise, with
-   probability `1 - probab_local`, do the same as
-   `RandomSearcher.sample_configuration`. Otherwise, pick the configuration
-   which attained the smallest validation error so far, select one of its
-   hyperparameters at random, and sample its value randomly like in
-   RandomSearcher.sample_configuration`, but leave all other values the
-   same. Return this configuration, which is identical to the best
-   configuration so far, except in this one hyperparameter.
+    3. Run random search on this example with `number_of_trials=20` and plot the results. Make sure to first evaluate the default configuration of :numref:`sec_dropout`, which is `initial_config = {'num_hiddens_1': 256, 'num_hiddens_2': 256, 'dropout_1': 0.5, 'dropout_2': 0.5, 'lr': 0.1, 'batch_size': 256}`.
+2. In this exercise, you will implement a searcher (subclass of `HPOSearcher`) which aims to improve upon random search, by depending on past data. It depends on parameters `probab_local`, `num_init_random`. Its `sample_configuration` method works as follows. For the first `num_init_random` calls, do the same as `RandomSearcher.sample_configuration`. Otherwise, with probability `1 - probab_local`, do the same as `RandomSearcher.sample_configuration`. Otherwise, pick the configuration which attained the smallest validation error so far, select one of its hyperparameters at random, and sample its value randomly like in `RandomSearcher.sample_configuration`, but leave all other values the same. Return this configuration, which is identical to the best configuration so far, except in this one hyperparameter.
     1. Code up this new `LocalSearcher`. Hint: Your searcher requires `config_space` as argument at construction. Feel free to use a member of type `RandomSearcher`.
     2. Re-run the experiment from the previous exercise, but using your new searcher instead of `RandomSearcher`. Experiment with different values for `probab_local`, `num_init_random`. However, note that a proper comparison between different HPO methods requires repeating experiments several times, and ideally considering a number of benchmark tasks.
 
