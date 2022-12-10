@@ -176,7 +176,7 @@ learned_hypers = optimize.minimize(neg_MLL, x0=np.array([ell_est,post_sig_est]),
 
 In this instance, we learn a length-scale of 0.299, and a noise standard deviation of 0.24. Note that the learned noise is extremely close to the true noise, which helps indicate that our GP is a very well-specified to this problem. 
 
-In general, it is crucial to put careful thought into selecting the kernel and initializing the hyperparameters. While marginal likelihood optimization can be relatively robust to initialization, it's possible to break. Try running the above script with a variety of initializations and see what results you find.
+In general, it is crucial to put careful thought into selecting the kernel and initializing the hyperparameters. While marginal likelihood optimization can be relatively robust to initialization, it's not immune to poor initializations. Try running the above script with a variety of initializations and see what results you find.
 
 Now, let's make predictions with these learned hypers.
 
