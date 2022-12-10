@@ -6,27 +6,27 @@ Let's get a feel for how Gaussian processes operate, by starting with some examp
 
 Suppose we observe the following dataset, of regression targets (outputs), $y$, indexed by inputs, $x$. As an example, the targets could be changes in carbon dioxide concentrations, and the inputs could be the times at which these targets have been recorded. What are some features of the data? How quickly does it seem to varying? Do we have data points collected at regular intervals, or are there missing inputs? How would you imagine filling in the missing regions, or forecasting up until $x=25$?
 
-![Observed data.](https://user-images.githubusercontent.com/6753639/178247765-650772fb-2622-42d0-8eff-316dc835816f.png)
+![Observed data.](https://user-images.githubusercontent.com/6753639/206877503-de651312-1a44-46c7-b0b2-a18ffb1fc7f8.svg)
 
 In order to fit the data with a Gaussian process, we start by specifying a prior distribution over what types of functions we might believe to be reasonable. Here we show several sample functions from a Gaussian process. Does this prior look reasonable? Note here we are not looking for functions that fit our dataset, but instead for specifying reasonable high-level properties of the solutions, such as how quickly they vary with inputs. Note that we will see code for reproducing all of the plots in this notebook, in the next notebooks on priors and inference.
 
-![Sample prior functions that we may want to represent with our model.](https://user-images.githubusercontent.com/6753639/178247905-ca6d5812-92eb-45d2-9004-a435da917e78.png)
+![Sample prior functions that we may want to represent with our model.](https://user-images.githubusercontent.com/6753639/206877559-54c47fc2-ae6a-47e1-97b1-a0bd4f6cf81e.svg)
 
 Once we condition on data, we can use this prior to infer a posterior distribution over functions that could fit the data. Here we show sample posterior functions.
 
-![Sample posterior functions, once we have observed the data.](https://user-images.githubusercontent.com/6753639/178248696-bb31053e-68c9-4679-b09b-59a319d6479b.png)
+![Sample posterior functions, once we have observed the data.](https://user-images.githubusercontent.com/6753639/206877599-57c33f66-ca57-4d78-a33e-f20889a382b1.svg)
 
 We see that each of these functions are entirely consistent with our data, perfectly running through each observation. In order to use these posterior samples to make predictions, we can average the values of every possible sample function from the posterior, to create the curve below, in thick blue. Note that we don't actually have to take an infinite number of samples to compute this expectation; as we will see later, we can compute the expectation in closed form. 
 
-![Posterior samples, alongside posterior mean, which can be used for point predictions, in blue.](https://user-images.githubusercontent.com/6753639/178248173-9d13e613-85f3-4414-ab13-8eb763580225.png)
+![Posterior samples, alongside posterior mean, which can be used for point predictions, in blue.](https://user-images.githubusercontent.com/6753639/206877617-8664e9ce-5ed8-41ef-bf3f-394b6bd57a3a.svg)
 
 We may also want a representation of uncertainty, so we know how confident we should be in our predictions. Intuitively, we should have more uncertainty where there is more variability in the sample posterior functions, as this tells us there are many more possible values the true function could take. This type of uncertainty is called _epistemic uncertainty_, which is the _reducible uncertainty_ associated with lack of information. As we acquire more data, this type of uncertainty disappears, as there will be increasingly fewer solutions consistent with what we observe. Like with the posterior mean, we can compute the posterior variance (the variability of these functions in the posterior) in closed form. With shade, we show two times the posterior standard deviation on either side of the mean, creating a _credible interval_ that has a 95% probability of containing the true value of the function for any input $x$.
 
-![Posterior samples, including 95% credible set.](https://user-images.githubusercontent.com/6753639/178248952-b14e3d72-e65f-41ed-9577-8d3363c8cf11.png)
+![Posterior samples, including 95% credible set.](https://user-images.githubusercontent.com/6753639/206877636-94890cd7-d868-45b8-bd5b-ca1c0e7b0b20.svg)
 
 The plot looks somewhat cleaner if we remove the posterior samples, simply visualizing the data, posterior mean, and 95% credible set. Notice how the uncertainty grows away from the data, a property of epistemic uncertainty. 
 
-![Point predictions, and credible set.](https://user-images.githubusercontent.com/6753639/178249137-23af70e9-0753-4491-9215-7a757ff60652.png)
+![Point predictions, and credible set.](https://user-images.githubusercontent.com/6753639/206877643-ca64adc1-7f3f-4106-8f2b-a21a614ac3f9.svg)
 
 The properties of the Gaussian process that we used to fit the data are strongly controlled by what's called a _covariance function_, also known as a _kernel_. The covariance function we used is called the _RBF (Radial Basis Function) kernel_, which has the form
 $$ k_{\text{RBF}}(x,x') = \mathrm{Cov}(f(x),f(x')) = a^2 \exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right) $$
