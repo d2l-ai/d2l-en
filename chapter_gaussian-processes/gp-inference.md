@@ -50,6 +50,8 @@ import math
 import torch
 import gpytorch
 import os
+
+d2l.set_figsize()
 ```
 
 ## Equations for Making Predictions and Learning Kernel Hyperparameters in GP Regression
@@ -89,7 +91,7 @@ There are some key points to note about the predictive distributions for Gaussia
 
 Let's create some regression data, and then fit the data with a GP, implementing every step from scratch. 
 We'll sample data from 
-$$y(x) = sin(x) + \frac{1}{2}sin(4x) + \epsilon,$$ with $\epsilon \sim \mathcal{N}(0,\sigma^2)$. The noise free function we wish to find is $f(x) = sin(x) + \frac{1}{2}sin(4x)$. We'll start by using a noise standard deviation $\sigma = 0.25$.
+$$y(x) = \sin(x) + \frac{1}{2}\sin(4x) + \epsilon,$$ with $\epsilon \sim \mathcal{N}(0,\sigma^2)$. The noise free function we wish to find is $f(x) = \sin(x) + \frac{1}{2}\sin(4x)$. We'll start by using a noise standard deviation $\sigma = 0.25$.
 
 ```{.python .input}
 def data_maker1(x, sig):
@@ -292,13 +294,6 @@ mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
 ```
 
 Here, we explicitly specify the likelihood we want to use (Gaussian), the objective we will use for training kernel hyperparameters (here, the marginal likelihood), and the procedure we we want to use for optimizing that objective (in this case, Adam). We note that while we are using Adam, which is a "stochastic" optimizer, in this case, it is full-batch Adam. Because the marginal likelihood does not factorize over data instances, we cannot use an optimizer over "mini-batches" of data and be guaranteed convergence. Other optimizers, such as L-BFGS, are also supported by GPyTorch. Unlike in standard deep learning, doing a good job of optimizing the marginal likelihood corresponds strongly with good generalization, which often inclines us towards powerful optimizers like L-BFGS, assuming they are not prohibitively expensive.
-
-```
-{.python .input}
-
-
-```
-
 
 ```{.python .input}
 for i in range(training_iter):

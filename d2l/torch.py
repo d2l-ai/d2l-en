@@ -2583,7 +2583,7 @@ d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
 
 def kernel(x1, x2, ls=4.):
     dist = distance_matrix(np.expand_dims(x1, 1), np.expand_dims(x2, 1))
-    return np.exp( -(1./ls/2) * (dist**2) )
+    return np.exp(-(1. / ls / 2) * (dist ** 2))
 
 def load_array(data_arrays, batch_size, is_train=True):
     """Construct a PyTorch data iterator.
