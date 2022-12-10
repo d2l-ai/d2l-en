@@ -218,9 +218,8 @@ $$
 
 Then the batch matrix multiplication (BMM) computes the element-wise product
 
-$$
-\mathrm{BMM}(\mathbf{Q}, \mathbf{K}) = [\mathbf{Q}_1 \mathbf{K}_1, \mathbf{Q}_2 \mathbf{K}_2, \ldots, \mathbf{Q}_n \mathbf{K}_n] \in \mathbb{R}^{n \times a \times c}.
-$$
+$$\mathrm{BMM}(\mathbf{Q}, \mathbf{K}) = [\mathbf{Q}_1 \mathbf{K}_1, \mathbf{Q}_2 \mathbf{K}_2, \ldots, \mathbf{Q}_n \mathbf{K}_n] \in \mathbb{R}^{n \times a \times c}.$$
+:eqlabel:`eq_batch-matrix-mul`
 
 Let's see this in action in a deep learning framework.
 
@@ -264,7 +263,7 @@ thus can be written as
 $$ \mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \mathbf V \in \mathbb{R}^{n\times v}.$$
 :eqlabel:`eq_softmax_QK_V`
 
-Note that when applying this to a minibatch, we need the Batch Matrix Multiplication introduced above. In the following implementation of the scaled dot product attention,
+Note that when applying this to a minibatch, we need the batch matrix multiplication introduced in :eqref:`eq_batch-matrix-mul`. In the following implementation of the scaled dot product attention,
 we use dropout for model regularization.
 
 ```{.python .input  n=15}
@@ -370,7 +369,7 @@ class DotProductAttention(tf.keras.layers.Layer):
 ```
 
 To [**illustrate how the `DotProductAttention` class works**],
-we use the same keys, values, and valid lengths from the earlier toy example for additive attention. For the purpose of our example we assume that we have a minibatch size of $2$, a total of $10$ keys and values, and that the dimensionality of the values is $4$. Lastly, we assume that the valid length per observation is $2$ and $6$ respectively. Given that, we expect the output to be a $2 \times 4$ matrix, i.e., one row per element of the minibatch.
+we use the same keys, values, and valid lengths from the earlier toy example for additive attention. For the purpose of our example we assume that we have a minibatch size of $2$, a total of $10$ keys and values, and that the dimensionality of the values is $4$. Lastly, we assume that the valid length per observation is $2$ and $6$ respectively. Given that, we expect the output to be a $2 \times 1 \times 4$ tensor, i.e., one row per example of the minibatch.
 
 ```{.python .input  n=18}
 %%tab mxnet
@@ -381,7 +380,7 @@ valid_lens = d2l.tensor([2, 6])
 
 attention = DotProductAttention(dropout=0.5)
 attention.initialize()
-attention(queries, keys, values, valid_lens)
+d2l.check_shape(attention(queries, keys, values, valid_lens), (2, 1, 4))
 ```
 
 ```{.python .input  n=19}
@@ -393,7 +392,7 @@ valid_lens = d2l.tensor([2, 6])
 
 attention = DotProductAttention(dropout=0.5)
 attention.eval()
-attention(queries, keys, values, valid_lens)
+d2l.check_shape(attention(queries, keys, values, valid_lens), (2, 1, 4))
 ```
 
 ```{.python .input  n=20}
@@ -404,10 +403,11 @@ values = tf.random.normal(shape=(2, 10, 4))
 valid_lens = tf.constant([2, 6])
 
 attention = DotProductAttention(dropout=0.5)
-attention(queries, keys, values, valid_lens, training=False)
+d2l.check_shape(attention(queries, keys, values, valid_lens, training=False),
+                (2, 1, 4))
 ```
 
-Let's check whether the weights actually vanish for anything beyond the second and sixth column respectively (due to setting valid length to 2 and 6).
+Let's check whether the attention weights actually vanish for anything beyond the second and sixth column respectively (due to setting valid length to $2$ and $6$).
 
 ```{.python .input  n=21}
 %%tab all
@@ -418,9 +418,9 @@ d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
 ## [**Additive Attention**]
 :label:`subsec_additive-attention`
 
-When queries $\mathbf{q}$ and keys $\mathbf{k}$ are vectors of different dimensionality,
-we can either use a matrix to address the mismatch via $\mathbf{q}^\top M \mathbf{k}$, or we can use additive attention 
-as the scoring function. Another benefit is that is, as its name indicates, the attention is additive. This can lead to some minor computational savings. 
+When queries $\mathbf{q}$ and keys $\mathbf{k}$ are vectors of different dimensionalities,
+we can either use a matrix to address the mismatch via $\mathbf{q}^\top \mathbf{M} \mathbf{k}$, or we can use additive attention 
+as the scoring function. Another benefit is that, as its name indicates, the attention is additive. This can lead to some minor computational savings. 
 Given a query $\mathbf{q} \in \mathbb{R}^q$
 and a key $\mathbf{k} \in \mathbb{R}^k$,
 the *additive attention* scoring function :cite:`Bahdanau.Cho.Bengio.2014` is given by 
@@ -429,11 +429,10 @@ $$a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + 
 :eqlabel:`eq_additive-attn`
 
 where $\mathbf W_q\in\mathbb R^{h\times q}$, $\mathbf W_k\in\mathbb R^{h\times k}$, 
-and $\mathbf w_v\in\mathbb R^{h}$ are the learnable matrices. This term is then fed into a softmax to ensure both nonnegativity and normalization. 
-An equivalent interpretation of :eqref:`eq_additive-attn` is that 
-query and key are concatenated
+and $\mathbf w_v\in\mathbb R^{h}$ are the learnable parameters. This term is then fed into a softmax to ensure both nonnegativity and normalization. 
+An equivalent interpretation of :eqref:`eq_additive-attn` is that the query and key are concatenated
 and fed into an MLP with a single hidden layer. 
-U&sing $\tanh$ as the activation function and disabling bias terms, 
+Using $\tanh$ as the activation function and disabling bias terms, 
 we implement additive attention as follows:
 
 ```{.python .input  n=21}
@@ -530,7 +529,7 @@ class AdditiveAttention(tf.keras.layers.Layer):
 ```
 
 Let's [**see how `AdditiveAttention` works**]. In our toy example we pick queries, keys and values of size 
-$(2, 1, 20)$, $(2, 10, 2)$ and $(2, 10, 4)$ respectively. This is identical to our choice for `DotProductAttention`, except that now the queries are $20$-dimensional. Likewise, we pick $(2, 6)$ as the valid lengths for the sequences in the minibatch.
+$(2, 1, 20)$, $(2, 10, 2)$ and $(2, 10, 4)$, respectively. This is identical to our choice for `DotProductAttention`, except that now the queries are $20$-dimensional. Likewise, we pick $(2, 6)$ as the valid lengths for the sequences in the minibatch.
 
 ```{.python .input  n=24}
 %%tab mxnet
@@ -538,7 +537,7 @@ queries = d2l.normal(0, 1, (2, 1, 20))
 
 attention = AdditiveAttention(num_hiddens=8, dropout=0.1)
 attention.initialize()
-attention(queries, keys, values, valid_lens)
+d2l.check_shape(attention(queries, keys, values, valid_lens), (2, 1, 4))
 ```
 
 ```{.python .input  n=25}
@@ -547,7 +546,7 @@ queries = d2l.normal(0, 1, (2, 1, 20))
 
 attention = AdditiveAttention(num_hiddens=8, dropout=0.1)
 attention.eval()
-attention(queries, keys, values, valid_lens)
+d2l.check_shape(attention(queries, keys, values, valid_lens), (2, 1, 4))
 ```
 
 ```{.python .input  n=26}
@@ -556,7 +555,8 @@ queries = tf.random.normal(shape=(2, 1, 20))
 
 attention = AdditiveAttention(key_size=2, query_size=20, num_hiddens=8,
                               dropout=0.1)
-attention(queries, keys, values, valid_lens, training=False)
+d2l.check_shape(attention(queries, keys, values, valid_lens, training=False),
+                (2, 1, 4))
 ```
 
 When reviewing the attention function we see a behavior that is qualitatively quite similar to that from `DotProductAttention`. That is, only terms within the chosen valid length $(2, 6)$ are nonzero.
@@ -569,13 +569,13 @@ d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
 
 ## Summary
 
-In this section we introduced the two key attention mechanisms, dot product and additive attention. They are effective tools for aggregating across sequences of variable length. In particular, the dot product attention is the mainstay of modern transformer architectures. When queries and keys are vectors of different lengths,
-we can use the additive attention scoring function instead. Optimizing these layers is one of the key areas of advance in recent years. For instance, [Nvidia's Transformer Library](https://docs.nvidia.com/deeplearning/transformer-engine/user-guide/index.html) or Megatron :cite:`shoeybi2019megatron` crucially rely on efficient variants of the attention mechanism. We will dive into this in quite a bit more detail as we review transformers in later sections. 
+In this section we introduced the two key attention scoring functions: dot product and additive attention. They are effective tools for aggregating across sequences of variable length. In particular, the dot product attention is the mainstay of modern Transformer architectures. When queries and keys are vectors of different lengths,
+we can use the additive attention scoring function instead. Optimizing these layers is one of the key areas of advance in recent years. For instance, [Nvidia's Transformer Library](https://docs.nvidia.com/deeplearning/transformer-engine/user-guide/index.html) and Megatron :cite:`shoeybi2019megatron` crucially rely on efficient variants of the attention mechanism. We will dive into this in quite a bit more detail as we review Transformers in later sections. 
 
 ## Exercises
 
 1. Implement distance-based attention by modifying the `DotProductAttention` code. Note that you only need the squared norms of the keys $\|\mathbf{k}_i\|^2$ for an efficient implementation. 
-1. Modify the dot product attention to allow for queries and keys of different dimensionality by employing a matrix to adjust dimensions. 
+1. Modify the dot product attention to allow for queries and keys of different dimensionalities by employing a matrix to adjust dimensions. 
 1. How does the computational cost scale with the dimensionality of the keys, queries, values, and their number? What about the memory bandwidth requirements?
 
 :begin_tab:`mxnet`
