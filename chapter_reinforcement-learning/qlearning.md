@@ -8,8 +8,9 @@ In the previous section, we discussed the Value Iteration algorithm which requir
 
 Recall that value iteration for the action-value function in :ref:`sec_valueiter` corresponds to the update
 
-$$Q_{k+1}(s, a) = r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \max_{a' \in \mathcal{A}} Q_k (s', a');$$
-for all $s \in \mathcal{S}$ and $a \in \mathcal{A}$. As we discussed, implementing this algorithm requires knowing the MDP, specifically the transition function $P(s' \mid s, a)$. The key idea behind Q-Learning is to replace the summation over all $s' \in \mathcal{S}$ in the above expression by a summation over the states visited by the robot. This allows us to subvert the need to know the transition function.
+$$Q_{k+1}(s, a) = r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \max_{a' \in \mathcal{A}} Q_k (s', a'); \ \text{for all } s \in \mathcal{S} \text{and } a \in \mathcal{A}.$$
+
+As we discussed, implementing this algorithm requires knowing the MDP, specifically the transition function $P(s' \mid s, a)$. The key idea behind Q-Learning is to replace the summation over all $s' \in \mathcal{S}$ in the above expression by a summation over the states visited by the robot. This allows us to subvert the need to know the transition function.
 
 ## An optimization problem underlying Q-Learning
 
@@ -32,7 +33,9 @@ $$Q(s_t^i, a_t^i) =(1 - \alpha) Q(s_t^i,a_t^i) - \alpha \Big( r(s_t^i, a_t^i) + 
 where $\mathbb{1}_{s_{t+1}^i \text{ is terminal}}$ is an indicator variable that is one if $s_{t+1}^i$ is a terminal state and zero otherwise. The value of state-action tuples $(s, a)$ that are not a part of the dataset is set to $-\infty$. This algorithm is known as Q-Learning.
 
 Given the solution of these updates $\hat{Q}$, which is an approximation of the optimal value function $Q^*$, we can obtain the optimal deterministic policy corresponding to this value function easily using
+
 $$\hat{\pi}(s) = \mathrm{argmax}_{a} \hat{Q}(s, a).$$
+
 There can be situations when there are multiple deterministic policies that correspond to the same optimal value function; such ties can be broken arbitrarily because they have the same value function.
 
 ## Exploration in Q-Learning
