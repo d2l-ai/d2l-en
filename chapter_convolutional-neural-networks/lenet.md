@@ -124,8 +124,7 @@ from types import FunctionType
 %%tab pytorch
 def init_cnn(module):  #@save
     """Initialize weights for CNNs."""
-    if type(module) 
-nn.Linear or type(module) == nn.Conv2d:
+    if type(module) == nn.Linear or type(module) == nn.Conv2d:
         nn.init.xavier_uniform_(module.weight)
 ```
 

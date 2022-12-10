@@ -22,8 +22,8 @@ of weights).
 Unfortunately, we cannot simply adjust these hyperparameters by minimizing the
 training loss, because this would lead to overfitting on the training data. For
 example, setting regularization parameters, such as dropout or weight decay
-(see :numref:`sec_weight_decay`) to zero leads to a small training loss, but
-might hurt the generalization performance.
+to zero leads to a small training loss, but might hurt the generalization
+performance.
 
 ![Typical workflow in machine learning that consists of training the model multiple times with different hyperparameters.](../img/ml_workflow.svg)
 :label:`ml_workflow`
@@ -86,7 +86,7 @@ $f: \mathcal{X} \rightarrow \mathbb{R}$ that maps from the hyperparameter space
 $\mathbf{x} \in \mathcal{X}$ to the validation loss. For every evaluation of
 $f(\mathbf{x})$, we have to train and validate our machine learning model, which
 can be time and compute intensive in the case of deep neural networks trained on
-large datasets. Now, given our criterion $f(\mathbf{x})$ our goal is to find
+large datasets. Given our criterion $f(\mathbf{x})$ our goal is to find
 $\mathbf{x}_{\star} \in \mathrm{argmin}_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})$. 
 
 There is no simple way to compute gradients of $f$ with respect to $\mathbf{x}$,
@@ -110,9 +110,7 @@ in :numref:`sec_mf_hpo` how we can speed-up the optimization process by either
 distributing the search or using cheaper-to-evaluate approximations of the
 objective function.
 
-
-Now, since we would like to optimize the validation error, we need to add a
-function computing this quantity.
+We begin with a method for computing the validation error of a model.
 
 ```{.python .input  n=8}
 %%tab pytorch
@@ -135,7 +133,7 @@ We optimize validation error with respect to the hyperparameter configuration
 model for `max_epochs` epochs, then compute and return its validation error:
 
 ```{.python .input  n=5}
-%%tab all
+%%tab pytorch
 def hpo_objective_softmax_classification(config, max_epochs=8):
     learning_rate = config["learning_rate"]
     trainer = d2l.HPOTrainer(max_epochs=max_epochs)
@@ -146,7 +144,6 @@ def hpo_objective_softmax_classification(config, max_epochs=8):
 ```
 
 ### The Configuration Space
-
 :label:`sec_intro_config_spaces`
 
 Along with the objective function $f(\mathbf{x})$, we also need to define the
@@ -175,14 +172,14 @@ ranges.
 
 : Example configuration space of multi-layer perceptron
 
-| Name                | Type        | Hyperparameter Ranges               | log-scale |
-| :----:              | :----:      |       :-----:        | :----: |
-| learning rate       | float       | $[10^{-6},10^{-1}]$ | log10 |
-| batch size          | integer     | $[8,256]$           | log2  |
-| momentum            | float       | $[0,0.99]$           | -  |
-| activation function | categorical | $\{\text{tanh}, \text{relu}\}$ | - |
-| number of units     | integer     | $[32, 1024]$         | log2  |
-| number of layers    | integer     | $[1, 6]$             | - |
+| Name                | Type        |Hyperparameter Ranges           | log-scale |
+| :----:              | :----:      |:------------------------------:|:---------:|
+| learning rate       | float       |      $[10^{-6},10^{-1}]$       |    yes    |
+| batch size          | integer     |           $[8,256]$            |    yes    |
+| momentum            | float       |           $[0,0.99]$           |    no     |
+| activation function | categorical | $\{\text{tanh}, \text{relu}\}$ |     -     |
+| number of units     | integer     |          $[32, 1024]$          |    yes    |
+| number of layers    | integer     |            $[1, 6]$            |    no     |
 :label:`tab_example_configspace`
 
 
@@ -203,10 +200,10 @@ to find well performing configurations might become infeasible.
 ## Random Search
 :label:`sec_rs`
 
-Now, we look at the first algorithm to solve our hyperparameter optimization
-problem: *random search*. The main idea of random search is to independently
-sample from the configuration space until a predefined budget (e.g maximum
-number of iterations) is exhausted and to return the best observed
+*Random search* is the first hyperparameter optimization algorithm we will
+consider. The main idea of random search is to independently sample from the
+configuration space until a predefined budget (e.g maximum
+number of iterations) is exhausted, and to return the best observed
 configuration. All evaluations can be executed independently in parallel (see
 :numref:`sec_rs_async`), but here we use a sequential loop for simplicity.
 
@@ -230,11 +227,10 @@ best_idx = np.argmin(errors)
 print(f"optimal learning rate = {values[best_idx]}")
 ```
 
-Arguably because of its simplicity, random search is one of the most frequently
+Due to its simplicity and generality, random search is one of the most frequently
 used HPO algorithms. It doesn't require any sophisticated implementation and
 can be applied to any configuration space as long as we can define some
 probability distribution for each hyperparameter.
-
 
 Unfortunately random search also comes with a few shortcomings. First, it does
 not adapt the sampling distribution based on the previous observations it
@@ -258,6 +254,27 @@ objective function. We also implemented our first HPO algorithm, random search,
 and applied it on a simple softmax classification problem.
 
 While random search is very simple, it is the better alternative to grid
-search, which simply evaluates a fixed set of hyperparameters. It does not
-suffer from the curse of dimensionality :cite:`bellman-science66` and is more
-likely to find the optimal hyperparameter configuration.
+search, which simply evaluates a fixed set of hyperparameters. Random search
+somewhat mitigates the curse of dimensionality :cite:`bellman-science66`, and
+can be far more efficient than grid search if the criterion most strongly
+depends on a small subset of the hyperparameters.
+
+## Exercises
+
+1. In this chapter, we optimize the validation error of a model after training on a disjoint training set. For simplicity, our code uses `Trainer.val_dataloader`, which maps to a loader around `FashionMNIST.val`.
+    1. Convince yourself (by looking at the code) that this means we use the original FashionMNIST training set (60000 examples) for training, and the original *test set* (10000 examples) for validation.
+    2. Why could this practice be problematic? Hint: Re-read :numref:`sec_generalization_basics`, especially about *model selection*.
+    3. What should we have done instead?
+2. We stated above that hyperparameter optimization by gradient descent is very hard to do. Consider a small problem, such as training a two-layer perceptron on the FashionMNIST dataset (:numref:`sec_mlp-implementation`) with a batch size of 256. We would like to tune the learning rate of SGD in order to minimize validation error after one epoch of training.
+    1. FashionMNIST has 60000 training cases. How many mini-batches will be processed in one epoch?
+    2. Sketch (roughly) the computational graph of the validation error after training for one epoch. You may assume that initial weights and hyperparameters (such as learning rate) are input nodes to this graph. Hint: Re-read about computational graphs in :numref:`sec_backprop`.
+    3. Give a rough estimate of the number of floating point values you need to store during a forward pass on this graph. Hint: Assume this memory is dominated by the activations after each layer, and look up the layer widths in :numref:`sec_mlp-implementation`. Comment on the practicality of creating this graph in order to compute just one derivative (w.r.t. the learning rate).
+    4. Apart from the sheer amount of compute and storage required, what other issues would gradient-based hyperparameter optimization run into? Hint: Re-read about vanishing and exploding gradients in :numref:`sec_numerical_stability`.
+    5. *Advanced*: Read :cite:`maclaurin-icml15` for an elegant (yet still somewhat unpractical) approach to gradient-based HPO.
+3. Grid search is another HPO baseline, where we define an equi-spaced grid for each hyperparameter, then iterate over the (combinatorial) Cartesian product in order to suggest configurations.
+   1. We stated above that random search can be much more efficient than grid search for HPO on a sizable number of hyperparameters, if the criterion most strongly depends on a small subset of the hyperparameters. Why is this? Hint: Read :cite:`bergstra-nips11`.
+
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/12090)
+:end_tab:

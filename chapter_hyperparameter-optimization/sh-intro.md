@@ -3,7 +3,7 @@
 tab.interact_select(["pytorch"])
 ```
 
-# Multi-fidelity Hyperparameter Optimization
+# Multi-Fidelity Hyperparameter Optimization
 :label:`sec_mf_hpo`
 
 Training neural networks can be expensive even on moderate size datasets.
@@ -39,6 +39,17 @@ the error $f(\mathbf{x}, r)$ decreases with $r$, whereas the computational
 cost $c(\mathbf{x}, r)$ increases. Typically, $r$ represents the number of
 epochs for training the neural network, but it could also be the training
 subset size or the number of cross-validation folds.
+
+
+```{.python .input}
+%%tab pytorch
+from d2l import torch as d2l
+import numpy as np
+from scipy import stats
+from collections import defaultdict
+d2l.set_figsize()
+```
+
 
 ## Successive Halving
 :label:`sec_mf_hpo_sh`
@@ -80,13 +91,6 @@ queue of configurations that still need to be evaluated for the current rung
 $r_i$. We update the queue every time we jump to the next rung.
 
 ```{.python .input  n=2}
-%%tab pytorch
-from d2l import torch as d2l
-import numpy as np
-from scipy import stats
-from collections import defaultdict
-d2l.set_figsize()
-
 class SuccessiveHalvingScheduler(d2l.HPOScheduler):  #@save
     def __init__(self, searcher, eta, r_min, r_max, prefact=1):
         self.save_hyperparameters()
@@ -117,7 +121,7 @@ is empty, we start the entire process again with a new, randomly sampled set
 of configurations.
 
 ```{.python .input  n=12}
-%%tab all
+%%tab pytorch
 @d2l.add_to_class(SuccessiveHalvingScheduler)  #@save
 def suggest(self):
     if len(self.queue) == 0:
@@ -138,7 +142,7 @@ If so, we sort all configurations and push the top $\frac{1}{\eta}$
 configurations into the queue.
 
 ```{.python .input  n=4}
-%%tab all
+%%tab pytorch
 @d2l.add_to_class(SuccessiveHalvingScheduler)  #@save
 def update(self, config: dict, error: float, info=None):
     ri = int(config["max_epochs"])  # Rung r_i
@@ -173,7 +177,7 @@ Configurations are sorted based on their observed performance on the current
 rung.
 
 ```{.python .input  n=4}
-%%tab all
+%%tab pytorch
 
 @d2l.add_to_class(SuccessiveHalvingScheduler)  #@save
 def get_top_n_configurations(self, rung_level, n):
@@ -262,3 +266,8 @@ computation of the HPO instead of just reducing the wall-clock time.
 
 We implemented and evaluated successive halving, a simple yet efficient
 multi-fidelity HPO algorithm.
+
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/12094)
+:end_tab:

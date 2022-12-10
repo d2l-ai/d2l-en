@@ -19,4 +19,5 @@ In this chapter, we will develop the fundamentals of reinforcement learning and 
 
 mdp
 value-iter
+qlearning
 ```

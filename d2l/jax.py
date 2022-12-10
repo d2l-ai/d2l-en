@@ -31,16 +31,19 @@ import tarfile
 import time
 import zipfile
 from collections import defaultdict
+import gym
 import pandas as pd
 import requests
 from IPython import display
 from matplotlib import pyplot as plt
 from matplotlib_inline import backend_inline
+from scipy.spatial import distance_matrix
 
 d2l = sys.modules[__name__]
 
 from dataclasses import field
 from functools import partial
+from types import FunctionType
 from typing import Any
 import flax
 import jax
@@ -596,6 +599,17 @@ class Classifier(d2l.Module):
         fn = optax.softmax_cross_entropy_with_integer_labels
         return (fn(Y_hat, Y).mean(), updates) if averaged else (fn(Y_hat, Y), updates)
 
+class SoftmaxRegression(d2l.Classifier):
+    """Defined in :numref:`sec_softmax_concise`"""
+    num_outputs: int
+    lr: float
+
+    @nn.compact
+    def __call__(self, X):
+        X = X.reshape((X.shape[0], -1))  # flatten
+        X = nn.Dense(self.num_outputs)(X)
+        return X
+
 def cpu():
     """Defined in :numref:`sec_use_gpu`"""
     return jax.devices('cpu')[0]
@@ -635,6 +649,30 @@ def corr2d(X, K):
         for j in range(Y.shape[1]):
             Y = Y.at[i, j].set((X[i:i + h, j:j + w] * K).sum())
     return Y
+
+class LeNet(d2l.Classifier):
+    """Defined in :numref:`sec_lenet`"""
+    lr: float = 0.1
+    num_classes: int = 10
+    kernel_init: FunctionType = nn.initializers.xavier_uniform
+
+    def setup(self):
+        self.net = nn.Sequential([
+            nn.Conv(features=6, kernel_size=(5, 5), padding='SAME',
+                    kernel_init=self.kernel_init()),
+            nn.sigmoid,
+            lambda x: nn.avg_pool(x, window_shape=(2, 2), strides=(2, 2)),
+            nn.Conv(features=16, kernel_size=(5, 5), padding='VALID',
+                    kernel_init=self.kernel_init()),
+            nn.sigmoid,
+            lambda x: nn.avg_pool(x, window_shape=(2, 2), strides=(2, 2)),
+            lambda x: x.reshape((x.shape[0], -1)),  # flatten
+            nn.Dense(features=120, kernel_init=self.kernel_init()),
+            nn.sigmoid,
+            nn.Dense(features=84, kernel_init=self.kernel_init()),
+            nn.sigmoid,
+            nn.Dense(features=self.num_classes, kernel_init=self.kernel_init())
+        ])
 
 class Residual(nn.Module):
     """The Residual block of ResNet."""

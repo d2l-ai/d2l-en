@@ -14,14 +14,21 @@ hyperparameter configurations, which often involves some kind of search over the
 configuration space. Second, for each configuration, an HPO algorithm needs to
 schedule its evaluation and decide how many resources to allocate for it. Once
 we start to evaluate a configuration, we will refer to it as a *trial*. We map
-these decisions to two classes,`HPOSearcher` and `HPOScheduler`. On top of that,
+these decisions to two classes, `HPOSearcher` and `HPOScheduler`. On top of that,
 we also provide a `HPOTuner` class that executes the optimization process.
 
 This concept of scheduler and searcher is also implemented in popular HPO
 libraries, such as Syne Tune :cite:`salinas-automl22`, Ray Tune
 :cite:`liaw-arxiv18` or Optuna :cite:`akiba-sigkdd19`.
 
-### Searcher
+```{.python .input  n=2}
+%%tab pytorch
+import time
+from d2l import torch as d2l
+from scipy import stats
+```
+
+## Searcher
 
 Below we define a base class for searchers, which provides a new candidate
 configuration through the `sample_configuration` function. A simple way to
@@ -33,17 +40,10 @@ algorithms are able to sample more promising candidates over time. We add the
 `update` function in order to update the history of previous trials, which can
 then be exploited to improve our sampling distribution.
 
-```{.python .input  n=2}
-%%tab pytorch
-import time
-from d2l import torch as d2l
-from scipy import stats
-```
-
 ```{.python .input  n=3}
-%%tab all
+%%tab pytorch
 class HPOSearcher(d2l.HyperParameters):  #@save
-    def sample_configuration():
+    def sample_configuration() -> dict:
         raise NotImplementedError
 
     def update(self, config: dict, error: float, additional_info=None):
@@ -56,12 +56,12 @@ prescribe the first configuration to be evaluated via `initial_config`, while
 subsequent ones are drawn at random.
 
 ```{.python .input  n=4}
-%%tab all
+%%tab pytorch
 class RandomSearcher(HPOSearcher):  #@save
     def __init__(self, config_space: dict, initial_config=None):
         self.save_hyperparameters()
 
-    def sample_configuration(self):
+    def sample_configuration(self) -> dict:
         if self.initial_config is not None:
             result = self.initial_config
             self.initial_config = None
@@ -73,7 +73,7 @@ class RandomSearcher(HPOSearcher):  #@save
         return result
 ```
 
-### Scheduler
+## Scheduler
 
 Beyond sampling configurations for new trials, we also need to decide when and
 for how long to run a trial. In practice, all these decisions are done by the
@@ -85,9 +85,9 @@ model for). The `update` method is called whenever a trial returns a new
 observation.
 
 ```{.python .input  n=5}
-%%tab all
+%%tab pytorch
 class HPOScheduler(d2l.HyperParameters):  #@save
-    def suggest(self):
+    def suggest(self) -> dict:
         raise NotImplementedError
     
     def update(self, config: dict, error: float, info=None):
@@ -99,19 +99,19 @@ scheduler that schedules a new configuration every time new resources become
 available.
 
 ```{.python .input  n=6}
-%%tab all
+%%tab pytorch
 class BasicScheduler(HPOScheduler):  #@save
     def __init__(self, searcher: HPOSearcher):
         self.save_hyperparameters()
 
-    def suggest(self):
+    def suggest(self) -> dict:
         return self.searcher.sample_configuration()
 
     def update(self, config: dict, error: float, info=None):
-        searcher.update(config, error, additional_info=info)
+        self.searcher.update(config, error, additional_info=info)
 ```
 
-### Tuner
+## Tuner
 
 Finally, we need a component that runs the scheduler/searcher and does some
 book-keeping of the results. The following code implements a sequential
@@ -145,7 +145,7 @@ class HPOTuner(d2l.HyperParameters):  #@save
             print(f"    error = {error}, runtime = {runtime}")
 ```
 
-### Bookkeeping the Performance of HPO Algorithms
+## Bookkeeping the Performance of HPO Algorithms
 
 With any HPO algorithm, we are mostly interested in the best performing
 configuration (called *incumbent*) and its validation error after a given 
@@ -174,7 +174,7 @@ def bookkeeping(self, config: dict, error: float, runtime: float):
     self.cumulative_runtime.append(self.current_runtime)
 ```
 
-### Example: Optimizing the Hyperparameters of a Convolutional Neural Network
+## Example: Optimizing the Hyperparameters of a Convolutional Neural Network
 
 We now use our new implementation of random search to optimize the
 *batch size* and *learning rate* of the `LeNet` convolutional neural network
@@ -253,10 +253,35 @@ quickly outperforms random search afterwards.
 ![Example any-time performance plot to compare two algorithms A and B.](../img/example_anytime_performance.svg)
 :label:`example_anytime_performance`
 
-
 ## Summary
 
 This section laid out a simple, yet flexible interface to implement various HPO
 algorithms that we will look at in this chapter. Similar interfaces can be found
 in popular open-source HPO frameworks. We also looked at how we can compare HPO
 algorithms, and potential pitfall one needs to be aware. 
+
+## Exercises
+
+1. The goal of this exercise is to implement the objective function for a slightly more challenging HPO problem, and to run more realistic experiments. We will use the two hidden layer MLP `DropoutMLP` implemented in :numref:`sec_dropout`.
+    1. Code up the objective function, which should depend on all hyperparameters of the model and `batch_size`. Use `max_epochs=50`. GPUs do not help here, so `num_gpus=0`. Hint: Start with `hpo_objective_lenet`.
+    2. Choose a sensible search space, where `num_hiddens_1`, `num_hiddens_2`are integers in $[8, 1024]$, and dropout values lie in $[0, 0.95], while`batch_size` lies in $[16, 384]$. Provide code for `config_space`, using sensible distributions from `scipy.stats`.
+    3. Run random search on this example with `number_of_trials=20` and plot the results. Make sure to first evaluate the default configuration of :numref:`sec_dropout`, which is `initial_config = {'num_hiddens_1':256, 'num_hiddens_2':256, 'dropout_1':0.5, 'dropout_2':0.5, 'lr':0.1, 'batch_size: 256}`.
+2. In this exercise, you will implement a searcher (subclass of `HPOSearcher`)
+   which aims to improve upon random search, by depending on past data. It
+   depends on parameters `probab_local`, `num_init_random`. Its
+   `sample_configuration` method works as follows. For the first `num_init_random`
+   calls, do the same as `RandomSearcher.sample_configuration`. Otherwise, with
+   probability `1 - probab_local`, do the same as
+   `RandomSearcher.sample_configuration`. Otherwise, pick the configuration
+   which attained the smallest validation error so far, select one of its
+   hyperparameters at random, and sample its value randomly like in
+   RandomSearcher.sample_configuration`, but leave all other values the
+   same. Return this configuration, which is identical to the best
+   configuration so far, except in this one hyperparameter.
+    1. Code up this new `LocalSearcher`. Hint: Your searcher requires `config_space` as argument at construction. Feel free to use a member of type `RandomSearcher`.
+    2. Re-run the experiment from the previous exercise, but using your new searcher instead of `RandomSearcher`. Experiment with different values for `probab_local`, `num_init_random`. However, note that a proper comparison between different HPO methods requires repeating experiments several times, and ideally considering a number of benchmark tasks.
+
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/12092)
+:end_tab:
