@@ -2697,6 +2697,7 @@ def hpo_objective_lenet(learning_rate, batch_size, max_epochs=10):
     return validation_error
 
 class SuccessiveHalvingScheduler(d2l.HPOScheduler):
+    """Defined in :numref:`sec_mf_hpo`"""
     def __init__(self, searcher, eta, r_min, r_max, prefact=1):
         self.save_hyperparameters()
         # Compute K, which is later used to determine the number of configurations

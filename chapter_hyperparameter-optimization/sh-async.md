@@ -72,8 +72,6 @@ Trial-5) on rung 0.
 ![Visualization of successive halving with synchronous and asynchronous scheduling of trials.](../img/asha.svg)
 :label:`asha`
 
-
-
 ```{.python .input}
 from d2l import torch as d2l
 import logging

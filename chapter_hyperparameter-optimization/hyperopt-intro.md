@@ -133,7 +133,7 @@ We optimize validation error with respect to the hyperparameter configuration
 model for `max_epochs` epochs, then compute and return its validation error:
 
 ```{.python .input  n=5}
-%%tab all
+%%tab pytorch
 def hpo_objective_softmax_classification(config, max_epochs=8):
     learning_rate = config["learning_rate"]
     trainer = d2l.HPOTrainer(max_epochs=max_epochs)
@@ -144,7 +144,6 @@ def hpo_objective_softmax_classification(config, max_epochs=8):
 ```
 
 ### The Configuration Space
-
 :label:`sec_intro_config_spaces`
 
 Along with the objective function $f(\mathbf{x})$, we also need to define the

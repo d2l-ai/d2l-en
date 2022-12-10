@@ -21,7 +21,14 @@ This concept of scheduler and searcher is also implemented in popular HPO
 libraries, such as Syne Tune :cite:`salinas-automl22`, Ray Tune
 :cite:`liaw-arxiv18` or Optuna :cite:`akiba-sigkdd19`.
 
-### Searcher
+```{.python .input  n=2}
+%%tab pytorch
+import time
+from d2l import torch as d2l
+from scipy import stats
+```
+
+## Searcher
 
 Below we define a base class for searchers, which provides a new candidate
 configuration through the `sample_configuration` function. A simple way to
@@ -33,15 +40,8 @@ algorithms are able to sample more promising candidates over time. We add the
 `update` function in order to update the history of previous trials, which can
 then be exploited to improve our sampling distribution.
 
-```{.python .input  n=2}
-%%tab pytorch
-import time
-from d2l import torch as d2l
-from scipy import stats
-```
-
 ```{.python .input  n=3}
-%%tab all
+%%tab pytorch
 class HPOSearcher(d2l.HyperParameters):  #@save
     def sample_configuration() -> dict:
         raise NotImplementedError
@@ -56,7 +56,7 @@ prescribe the first configuration to be evaluated via `initial_config`, while
 subsequent ones are drawn at random.
 
 ```{.python .input  n=4}
-%%tab all
+%%tab pytorch
 class RandomSearcher(HPOSearcher):  #@save
     def __init__(self, config_space: dict, initial_config=None):
         self.save_hyperparameters()
@@ -73,7 +73,7 @@ class RandomSearcher(HPOSearcher):  #@save
         return result
 ```
 
-### Scheduler
+## Scheduler
 
 Beyond sampling configurations for new trials, we also need to decide when and
 for how long to run a trial. In practice, all these decisions are done by the
@@ -85,7 +85,7 @@ model for). The `update` method is called whenever a trial returns a new
 observation.
 
 ```{.python .input  n=5}
-%%tab all
+%%tab pytorch
 class HPOScheduler(d2l.HyperParameters):  #@save
     def suggest(self) -> dict:
         raise NotImplementedError
@@ -99,7 +99,7 @@ scheduler that schedules a new configuration every time new resources become
 available.
 
 ```{.python .input  n=6}
-%%tab all
+%%tab pytorch
 class BasicScheduler(HPOScheduler):  #@save
     def __init__(self, searcher: HPOSearcher):
         self.save_hyperparameters()
@@ -111,7 +111,7 @@ class BasicScheduler(HPOScheduler):  #@save
         self.searcher.update(config, error, additional_info=info)
 ```
 
-### Tuner
+## Tuner
 
 Finally, we need a component that runs the scheduler/searcher and does some
 book-keeping of the results. The following code implements a sequential
@@ -145,7 +145,7 @@ class HPOTuner(d2l.HyperParameters):  #@save
             print(f"    error = {error}, runtime = {runtime}")
 ```
 
-### Bookkeeping the Performance of HPO Algorithms
+## Bookkeeping the Performance of HPO Algorithms
 
 With any HPO algorithm, we are mostly interested in the best performing
 configuration (called *incumbent*) and its validation error after a given 
@@ -174,7 +174,7 @@ def bookkeeping(self, config: dict, error: float, runtime: float):
     self.cumulative_runtime.append(self.current_runtime)
 ```
 
-### Example: Optimizing the Hyperparameters of a Convolutional Neural Network
+## Example: Optimizing the Hyperparameters of a Convolutional Neural Network
 
 We now use our new implementation of random search to optimize the
 *batch size* and *learning rate* of the `LeNet` convolutional neural network
