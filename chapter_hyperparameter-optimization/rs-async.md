@@ -160,7 +160,7 @@ tuner = Tuner(
     scheduler=scheduler, 
     stop_criterion=stop_criterion,
     n_workers=n_workers,
-    print_update_interval=max_wallclock_time // 2,
+    print_update_interval=int(max_wallclock_time * 0.6),
 )
 ```
 
