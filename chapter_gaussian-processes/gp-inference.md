@@ -98,11 +98,8 @@ def data_maker1(x, sig):
     return np.sin(x) + 0.5 * np.sin(4 * x) + np.random.randn(x.shape[0]) * sig
 
 sig = 0.25
-train_x = np.linspace(0, 5, 50)
-test_x = np.linspace(0, 5, 500)
-
-train_y = data_maker1(train_x, sig=sig)
-test_y = data_maker1(test_x, sig=0.)
+train_x, test_x = np.linspace(0, 5, 50), np.linspace(0, 5, 500)
+train_y, test_y = data_maker1(train_x, sig=sig), data_maker1(test_x, sig=0.)
 
 d2l.plt.scatter(train_x, train_y)
 d2l.plt.plot(test_x, test_y)
@@ -118,7 +115,7 @@ $$k(x_i,x_j) = a^2\exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right).$$
 
 ```{.python .input}
 mean = np.zeros(test_x.shape[0])
-cov = d2l.kernel(test_x, test_x, ls=0.2)
+cov = d2l.rbfkernel(test_x, test_x, ls=0.2)
 ```
 
 We've started with a length-scale of 0.2. Before we fit the data, it's important to consider whether we've specified a reasonable prior. Let's visualize some sample functions from this prior, as well as the 95\% credible set (we believe there's a 95\% chance that the true function is within this region).
@@ -163,7 +160,7 @@ ell_est = 0.4
 post_sig_est = 0.5
 
 def neg_MLL(pars):
-    K = d2l.kernel(train_x, train_x, ls=pars[0])
+    K = d2l.rbfkernel(train_x, train_x, ls=pars[0])
     kernel_term = -0.5 * train_y @ \
         np.linalg.inv(K + pars[1] ** 2 * np.eye(train_x.shape[0])) @ train_y
     logdet = -0.5 * np.log(np.linalg.det(K + pars[1] ** 2 * \
@@ -191,9 +188,9 @@ post_sig_est = learned_hypers.x[1]
 Now, let's make predictions with these learned hypers.
 
 ```{.python .input}
-K_x_xstar = d2l.kernel(train_x, test_x, ls=ell)
-K_x_x = d2l.kernel(train_x, train_x, ls=ell)
-K_xstar_xstar = d2l.kernel(test_x, test_x, ls=ell)
+K_x_xstar = d2l.rbfkernel(train_x, test_x, ls=ell)
+K_x_x = d2l.rbfkernel(train_x, train_x, ls=ell)
+K_xstar_xstar = d2l.rbfkernel(test_x, test_x, ls=ell)
 
 post_mean = K_x_xstar.T @ np.linalg.inv((K_x_x + \
                 post_sig_est ** 2 * np.eye(train_x.shape[0]))) @ train_y
@@ -235,7 +232,6 @@ d2l.plt.plot(test_x, post_mean, linewidth=2.)
 d2l.plt.plot(test_x, post_samples.T, color='gray', alpha=0.25)
 d2l.plt.fill_between(test_x, lw_bd, up_bd, alpha=0.25)
 d2l.plt.show()
-
 ```
 
 In basic regression applications, it's most common to use the posterior predictive mean and standard deviation as a point predictor and metric for uncertainty, respectively. In more advanced applications, such as Bayesian optimization with Monte Carlo acquisition functions, or Gaussian processes for model-based RL, it often necessary to take posterior samples. However, even if not strictly required in the basic applications, these samples give us more intuition about the fit we have for the data, and are often useful to include in visualizations. 
@@ -247,7 +243,6 @@ As we have seen, it is actually pretty easy to implement basic Gaussian process 
 In these cases, the _GPyTorch_ library will make our lives a lot easier. We'll be discussing GPyTorch more in future notebooks on Gaussian process numerics, and advanced methods. The GPyTorch library contains [many examples](https://github.com/cornellius-gp/gpytorch/tree/master/examples). To get a feel for the package, we will walk through the [simple regression example](https://github.com/cornellius-gp/gpytorch/blob/master/examples/01_Exact_GPs/Simple_GP_Regression.ipynb), showing how it can be adapted to reproduce our above results using GPyTorch. This may seem like a lot of code to simply reproduce the basic regression above, and in a sense, it is. But we can immediately use a variety of kernels, scalable inference techniques, and approximate inference, by only changing a few lines of code from below, instead of writing potentially thousands of lines of new code.
 
 ```{.python .input}
-
 # First let's convert our data into tensors for use with PyTorch
 train_x = torch.tensor(train_x)
 train_y = torch.tensor(train_y)
@@ -279,16 +274,12 @@ In future notebooks, we will consider other settings, such as classification, wh
 # Initialize Gaussian likelihood
 likelihood = gpytorch.likelihoods.GaussianLikelihood()
 model = ExactGPModel(train_x, train_y, likelihood)
-
 training_iter = 50
-
 # Find optimal model hyperparameters
 model.train()
 likelihood.train()
-
 # Use the adam optimizer, includes GaussianLikelihood parameters
 optimizer = torch.optim.Adam(model.parameters(), lr=0.1)  
-
 # Set our loss as the negative log GP marginal likelihood
 mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
 ```
@@ -304,12 +295,11 @@ for i in range(training_iter):
     # Calc loss and backprop gradients
     loss = -mll(output, train_y)
     loss.backward()
-    
-    if i%10 == 0:
-        print('Iter %d/%d - Loss: %.3f squared lengthscale: %.3f noise variance: %.3f' % (
-            i + 1, training_iter, loss.item(),
-            model.covar_module.base_kernel.lengthscale.item(),
-            model.likelihood.noise.item()))
+    if i % 10 == 0:
+        print(f'Iter {i+1:d}/{training_iter:d} - Loss: {loss.item():.3f} '
+              f'squared lengthscale: '
+              f'{model.covar_module.base_kernel.lengthscale.item():.3f} '
+              f'noise variance: {model.likelihood.noise.item():.3f}')
     optimizer.step()
 ```
 
@@ -329,14 +319,16 @@ The above codeblock enables us to make predictions on our test inputs.
 with torch.no_grad():
     # Initialize plot
     f, ax = d2l.plt.subplots(1, 1, figsize=(4, 3))
-    # Get upper and lower bounds for 95\% credible set (in this case, in observation space)
+    # Get upper and lower bounds for 95\% credible set (in this case, in
+    # observation space)
     lower, upper = observed_pred.confidence_region()
     ax.scatter(train_x.numpy(), train_y.numpy())
     ax.plot(test_x.numpy(), test_y.numpy(), linewidth=2.)
     ax.plot(test_x.numpy(), observed_pred.mean.numpy(), linewidth=2.)
     ax.fill_between(test_x.numpy(), lower.numpy(), upper.numpy(), alpha=0.25)
     ax.set_ylim([-1.5, 1.5])
-    ax.legend(['True Function', 'Predictive Mean', 'Observed Data', '95% Credible Set'])
+    ax.legend(['True Function', 'Predictive Mean', 'Observed Data',
+               '95% Credible Set'])
 ```
 
 Finally, we plot the fit.

@@ -114,13 +114,13 @@ We can build further intuition about Gaussian processes with RBF kernels, and hy
 We illustrate this process in the figure below.
 
 ```{.python .input}
-def kernel(x1, x2, ls=4.):  #@save
+def rbfkernel(x1, x2, ls=4.):  #@save
     dist = distance_matrix(np.expand_dims(x1, 1), np.expand_dims(x2, 1))
     return np.exp(-(1. / ls / 2) * (dist ** 2))
 
 x_points = np.linspace(0, 5, 50)
 meanvec = np.zeros(len(x_points))
-covmat = kernel(x_points,x_points, 1)
+covmat = rbfkernel(x_points,x_points, 1)
 
 prior_samples= np.random.multivariate_normal(meanvec, covmat, size=5);
 d2l.plt.plot(x_points, prior_samples.T, alpha=0.5)
