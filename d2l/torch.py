@@ -36,6 +36,7 @@ import requests
 from IPython import display
 from matplotlib import pyplot as plt
 from matplotlib_inline import backend_inline
+from scipy.spatial import distance_matrix
 
 d2l = sys.modules[__name__]
 
@@ -2590,6 +2591,11 @@ def update_G(Z, net_D, net_G, loss, trainer_G):
 
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
+
+
+def kernel(x1, x2, ls=4.):
+    dist = distance_matrix(np.expand_dims(x1, 1), np.expand_dims(x2, 1))
+    return np.exp(-(1. / ls / 2) * (dist ** 2))
 
 class HPOTrainer(d2l.Trainer):
     """Defined in :numref:`sec_definition_hpo`"""
