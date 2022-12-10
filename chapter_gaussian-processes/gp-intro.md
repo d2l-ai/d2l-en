@@ -50,17 +50,18 @@ Let's see how changing the lengthscale affects sample prior and posterior functi
 $\ell = 0.1, 0.5, 2, 5, 10$
 . A length-scale of $0.1$ is very small relative to the range of the input domain we are considering, $25$. For example, the values of the function at $x=5$ and $x=10$ will have essentially no correlation at such a length-scale. On the other hand, for a length-scale of $10$, the function values at these inputs will be highly correlated. Note that the vertical scale changes in the following figures.
 
-![priorpoint1](https://user-images.githubusercontent.com/6753639/178250594-d2032bcd-f5bc-4938-8cfa-aa1658c18425.png)
-![postpoint1](https://user-images.githubusercontent.com/6753639/178250619-121ad67f-45f4-47ae-9637-c5f367afd211.png)
 
-![priorpoint5](https://user-images.githubusercontent.com/6753639/178250705-1f0ec480-235e-4ad7-a3c6-a282d8d4e60b.png)
-![postpoint5](https://user-images.githubusercontent.com/6753639/178250716-9238a419-e43e-405e-b1e3-857790ce52c3.png)
+![priorpoint1](https://user-images.githubusercontent.com/6753639/206877928-8add8f33-947e-4ad6-b635-c05f9ddbf45c.svg)
+![postpoint1](https://user-images.githubusercontent.com/6753639/206877934-9d63e0ba-c0df-416f-9efb-458dd2de20a9.svg)
 
-![prior2](https://user-images.githubusercontent.com/6753639/178250738-dd0708de-c008-4708-9a3c-5466b0ac6504.png)
-![post2](https://user-images.githubusercontent.com/6753639/178250763-066698cc-4b93-496f-8a01-c2b1f1d6815c.png)
+![priorpoint5](https://user-images.githubusercontent.com/6753639/206877944-cfd2cd8a-c6c8-4ebf-b8e5-10e823feac23.svg)
+![postpoint5](https://user-images.githubusercontent.com/6753639/206877945-08420e93-eb64-42a2-b5a1-20b081af84df.svg)
 
-![prior5](https://user-images.githubusercontent.com/6753639/178250780-e5c522b7-f9c7-416c-8017-3cb921ff14b2.png)
-![post5](https://user-images.githubusercontent.com/6753639/178250794-89470592-cdb3-4e63-b0d8-d66f002fc593.png)
+![prior2](https://user-images.githubusercontent.com/6753639/206877949-0cad1aec-fd74-46a5-9375-1c89c5c35393.svg)
+![post2](https://user-images.githubusercontent.com/6753639/206877951-e565b213-64bb-431b-a634-c3b7dd2f2eb3.svg)
+
+![prior5](https://user-images.githubusercontent.com/6753639/206877968-34daa780-ec9f-4b71-a858-d97ed9655949.svg)
+![post5](https://user-images.githubusercontent.com/6753639/206877976-12c80980-0c58-4c1d-bfc1-613a66f73779.svg)
 
 Notice as the length-scale increases the 'wiggliness' of the functions decrease, and our uncertainty decreases. If the length-scale is small, the uncertainty will quickly increase as we move away from the data, as the datapoints become less informative about the function values. 
 
