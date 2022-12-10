@@ -3,7 +3,7 @@
 tab.interact_select('mxnet', 'pytorch', 'tensorflow')
 ```
 
-# Bahdanau Attention Mechanism
+# Bahdanau Attention Mechanisms
 :label:`sec_seq2seq_attention`
 
 When we encountered machine translation in :numref:`sec_seq2seq`,
