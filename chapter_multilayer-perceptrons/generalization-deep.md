@@ -74,14 +74,27 @@ of the state of research and practice.
 
 ## Revisiting Overfitting and Regularization
 
-Recall that our approach to training machine learning models
+According to the "no free lunch" theorem by :citet:`wolpert1995no`,
+any learning algorithm generalizes better on data with certain distributions, and worse with other distributions.
+Thus, given a finite training set,
+a model relies on certain assumptions: 
+to achieve human-level performance
+it may be useful to identify *inductive biases* 
+that reflect how humans think about the world.
+Such inductive biases show preferences 
+for solutions with certain properties.
+For example,
+a deep MLP has an inductive bias
+towards building up a complicated function by composing simpler functions together.
+
+With machine learning models encoding inductive biases,
+our approach to training them
 typically consists of two phases: (i) fit the training data;
 and (ii) estimate the *generalization error*
 (the true error on the underlying population)
 by evaluating the model on holdout data.
 The difference between our fit on the training data
-and our fit on the test data is called the *generalization gap*
-and when the generalization gap is large,
+and our fit on the test data is called the *generalization gap* and when the generalization gap is large,
 we say that our models *overfit* to the training data.
 In extreme cases of overfitting,
 we might exactly fit the training data,

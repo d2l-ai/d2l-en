@@ -13,10 +13,10 @@ We start by loading the dataset.
 
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
-```{.python .input}
+```{.python .input  n=2}
 %%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
@@ -43,6 +43,16 @@ import math
 import tensorflow as tf
 ```
 
+```{.python .input  n=5}
+%%tab jax
+%matplotlib inline
+from d2l import jax as d2l
+from flax import linen as nn
+import jax
+from jax import numpy as jnp
+import math
+```
+
 ## RNN Model
 
 We begin by defining a class 
@@ -52,7 +62,7 @@ Note that the number of hidden units `num_hiddens`
 is a tunable hyperparameter.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class RNNScratch(d2l.Module):  #@save
     def __init__(self, num_inputs, num_hiddens, sigma=0.01):
         super().__init__()
@@ -76,6 +86,21 @@ class RNNScratch(d2l.Module):  #@save
             self.b_h = tf.Variable(d2l.zeros(num_hiddens))
 ```
 
+```{.python .input  n=7}
+%%tab jax
+class RNNScratch(nn.Module):  #@save
+    num_inputs: int
+    num_hiddens: int
+    sigma: float = 0.01
+
+    def setup(self):
+        self.W_xh = self.param('W_xh', nn.initializers.normal(self.sigma),
+                               (self.num_inputs, self.num_hiddens))
+        self.W_hh = self.param('W_hh', nn.initializers.normal(self.sigma),
+                               (self.num_hiddens, self.num_hiddens))
+        self.b_h = self.param('b_h', nn.initializers.zeros, (self.num_hiddens))
+```
+
 [**The `forward` method below defines how to compute 
 the output and hidden state at any time step,
 given the current input and the state of the model
@@ -87,13 +112,37 @@ one time step at a time.
 The model here uses a $\tanh$ activation function (:numref:`subsec_tanh`).
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(RNNScratch)  #@save
 def forward(self, inputs, state=None):
-    if state is not None:
+    if state is None:
+        # Initial state with shape: (batch_size, num_hiddens)
+        if tab.selected('mxnet'):
+            state = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                              ctx=inputs.ctx)
+        if tab.selected('pytorch'):
+            state = d2l.zeros((inputs.shape[1], self.num_hiddens),
+                              device=inputs.device)
+        if tab.selected('tensorflow'):
+            state = d2l.zeros((inputs.shape[1], self.num_hiddens))
+    else:
         state, = state
         if tab.selected('tensorflow'):
-            state = d2l.reshape(state, (-1, self.W_hh.shape[0]))
+            state = d2l.reshape(state, (-1, self.num_hiddens))
+    outputs = []
+    for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs) 
+        state = d2l.tanh(d2l.matmul(X, self.W_xh) +
+                         d2l.matmul(state, self.W_hh) + self.b_h)
+        outputs.append(state)
+    return outputs, state
+```
+
+```{.python .input  n=9}
+%%tab jax
+@d2l.add_to_class(RNNScratch)  #@save
+def __call__(self, inputs, state=None):
+    if state is not None:
+        state, = state
     outputs = []
     for X in inputs:  # Shape of inputs: (num_steps, batch_size, num_inputs) 
         state = d2l.tanh(d2l.matmul(X, self.W_xh) + (
@@ -106,11 +155,19 @@ def forward(self, inputs, state=None):
 We can feed a minibatch of input sequences into an RNN model as follows.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 batch_size, num_inputs, num_hiddens, num_steps = 2, 16, 32, 100
 rnn = RNNScratch(num_inputs, num_hiddens)
 X = d2l.ones((num_steps, batch_size, num_inputs))
 outputs, state = rnn(X)
+```
+
+```{.python .input  n=11}
+%%tab jax
+batch_size, num_inputs, num_hiddens, num_steps = 2, 16, 32, 100
+rnn = RNNScratch(num_inputs, num_hiddens)
+X = d2l.ones((num_steps, batch_size, num_inputs))
+(outputs, state), _ = rnn.init_with_output(d2l.get_key(), X)
 ```
 
 Let's check whether the RNN model
@@ -127,9 +184,9 @@ def check_shape(a, shape):  #@save
     assert a.shape == shape, \
             f'tensor\'s shape {a.shape} != expected shape {shape}'
 
-d2l.check_len(outputs, num_steps)
-d2l.check_shape(outputs[0], (batch_size, num_hiddens))
-d2l.check_shape(state, (batch_size, num_hiddens))
+check_len(outputs, num_steps)
+check_shape(outputs[0], (batch_size, num_hiddens))
+check_shape(state, (batch_size, num_hiddens))
 ```
 
 ## RNN-based Language Model
@@ -149,7 +206,7 @@ As discussed in :numref:`subsec_perplexity`, this ensures
 that sequences of different length are comparable.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class RNNLMScratch(d2l.Classifier):  #@save
     def __init__(self, rnn, vocab_size, lr=0.01):
         super().__init__()
@@ -180,6 +237,30 @@ class RNNLMScratch(d2l.Classifier):  #@save
         
     def validation_step(self, batch):
         l = self.loss(self(*batch[:-1]), batch[-1])
+        self.plot('ppl', d2l.exp(l), train=False)
+```
+
+```{.python .input  n=14}
+%%tab jax
+class RNNLMScratch(d2l.Classifier):  #@save
+    rnn: nn.Module
+    vocab_size: int
+    lr: float = 0.01
+
+    def setup(self):
+        self.W_hq = self.param('W_hq', nn.initializers.normal(self.rnn.sigma),
+                               (self.rnn.num_hiddens, self.vocab_size))
+        self.b_q = self.param('b_q', nn.initializers.zeros, (self.vocab_size))
+
+    def training_step(self, params, batch, state):
+        value, grads = jax.value_and_grad(
+            self.loss, has_aux=True)(params, batch[:-1], batch[-1], state)
+        l, _ = value
+        self.plot('ppl', d2l.exp(l), train=True)
+        return value, grads
+
+    def validation_step(self, params, batch, state):
+        l, _ = self.loss(params, batch[:-1], batch[-1], state)
         self.plot('ppl', d2l.exp(l), train=False)
 ```
 
@@ -229,6 +310,11 @@ F.one_hot(torch.tensor([0, 2]), 5)
 tf.one_hot(tf.constant([0, 2]), 5)
 ```
 
+```{.python .input  n=18}
+%%tab jax
+jax.nn.one_hot(jnp.array([0, 2]), 5)
+```
+
 (**The minibatches that we sample at each iteration
 will take the shape (batch size, number of time steps).
 Once representing each input as a one-hot vector,
@@ -254,6 +340,8 @@ def one_hot(self, X):
         return F.one_hot(X.T, self.vocab_size).type(torch.float32)
     if tab.selected('tensorflow'):
         return tf.one_hot(tf.transpose(X), self.vocab_size)
+    if tab.selected('jax'):
+        return jax.nn.one_hot(X.T, self.vocab_size)
 ```
 
 ### Transforming RNN Outputs
@@ -279,10 +367,19 @@ Let's [**check whether the forward computation
 produces outputs with the correct shape.**]
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 model = RNNLMScratch(rnn, num_inputs)
 outputs = model(d2l.ones((batch_size, num_steps), dtype=d2l.int64))
-d2l.check_shape(outputs, (batch_size, num_steps, num_inputs))
+check_shape(outputs, (batch_size, num_steps, num_inputs))
+```
+
+```{.python .input  n=23}
+%%tab jax
+model = RNNLMScratch(rnn, num_inputs)
+outputs, _ = model.init_with_output(d2l.get_key(),
+                                    d2l.ones((batch_size, num_steps),
+                                             dtype=d2l.int32))
+check_shape(outputs, (batch_size, num_steps, num_inputs))
 ```
 
 ## [**Gradient Clipping**]
@@ -450,6 +547,17 @@ def clip_gradients(self, grad_clip_val, grads):
     return grads
 ```
 
+```{.python .input  n=27}
+%%tab jax
+@d2l.add_to_class(d2l.Trainer)  #@save
+def clip_gradients(self, grad_clip_val, grads):
+    grad_leaves, _ = jax.tree_util.tree_flatten(grads)
+    norm = jnp.sqrt(sum(jnp.vdot(x, x) for x in grad_leaves))
+    clip = lambda grad: jnp.where(norm < grad_clip_val,
+                                  grad, grad * (grad_clip_val / norm))
+    return jax.tree_util.tree_map(clip, grads)
+```
+
 ## Training
 
 Using *The Time Machine* dataset (`data`),
@@ -463,7 +571,7 @@ using the clipped gradients.
 ```{.python .input}
 %%tab all
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
-if tab.selected('mxnet', 'pytorch'):
+if tab.selected('mxnet', 'pytorch', 'jax'):
     rnn = RNNScratch(num_inputs=len(data.vocab), num_hiddens=32)
     model = RNNLMScratch(rnn, vocab_size=len(data.vocab), lr=1)
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
@@ -509,7 +617,7 @@ each of which will be fed back into the model
 as the input at the subsequent time step.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(RNNLMScratch)  #@save
 def predict(self, prefix, num_preds, vocab, device=None):
     state, outputs = None, [vocab[prefix[0]]]
@@ -530,6 +638,25 @@ def predict(self, prefix, num_preds, vocab, device=None):
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(RNNLMScratch)  #@save
+def predict(self, prefix, num_preds, vocab, params):
+    state, outputs = None, [vocab[prefix[0]]]
+    for i in range(len(prefix) + num_preds - 1):
+        X = d2l.tensor([[outputs[-1]]])
+        embs = self.one_hot(X)
+        rnn_outputs, state = self.rnn.apply({'params': params['rnn']},
+                                            embs, state)
+        if i < len(prefix) - 1:  # Warm-up period
+            outputs.append(vocab[prefix[i + 1]])
+        else:  # Predict `num_preds` steps
+            Y = self.apply({'params': params}, rnn_outputs,
+                           method=self.output_layer)
+            outputs.append(int(d2l.reshape(d2l.argmax(Y, axis=2), 1)))
+    return ''.join([vocab.idx_to_token[i] for i in outputs])
+```
+
 In the following, we specify the prefix 
 and have it generate 20 additional characters.
 
@@ -541,6 +668,11 @@ model.predict('it has', 20, data.vocab, d2l.try_gpu())
 ```{.python .input}
 %%tab tensorflow
 model.predict('it has', 20, data.vocab)
+```
+
+```{.python .input}
+%%tab jax
+model.predict('it has', 20, data.vocab, trainer.state.params)
 ```
 
 While implementing the above RNN model from scratch is instructive, it is not convenient.

@@ -187,7 +187,7 @@ Perplexity can be best understood as the geometric mean of the number of real ch
 
 ```{.python .input  n=1}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 ```{.python .input  n=2}
@@ -207,6 +207,12 @@ import torch
 %%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
+```
+
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from jax import numpy as jnp
 ```
 
 ## Partitioning Sequences
@@ -265,7 +271,7 @@ def __init__(self, batch_size, num_steps, num_train=10000, num_val=5000):
     self.save_hyperparameters()
     corpus, self.vocab = self.build(self._download())
     array = d2l.tensor([corpus[i:i+num_steps+1] 
-                        for i in range(0, len(corpus)-num_steps-1)])
+                        for i in range(len(corpus)-num_steps)])
     self.X, self.Y = array[:,:-1], array[:,1:]
 ```
 
@@ -274,8 +280,8 @@ we will randomly sample
 pairs of input sequences and target sequences
 in minibatches.
 The following data loader randomly generates a minibatch from the dataset each time.
-The argument `batch_size` specifies the number of subsequence examples (`self.b`) in each minibatch
-and `num_steps` is the subsequence length in tokens (`self.n`).
+The argument `batch_size` specifies the number of subsequence examples in each minibatch
+and `num_steps` is the subsequence length in tokens.
 
 ```{.python .input  n=6}
 %%tab all

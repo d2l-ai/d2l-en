@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow', 'jax'])
 ```
 
 # Densely Connected Networks (DenseNet)
@@ -108,6 +108,25 @@ class ConvBlock(tf.keras.layers.Layer):
         return y
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from jax import numpy as jnp
+import jax
+
+class ConvBlock(nn.Module):
+    num_channels: int
+    training: bool = True
+
+    @nn.compact
+    def __call__(self, X):
+        Y = nn.relu(nn.BatchNorm(not self.training)(X))
+        Y = nn.Conv(self.num_channels, kernel_size=(3, 3), padding=(1, 1))(Y)
+        Y = jnp.concatenate((X, Y), axis=-1)
+        return Y
+```
+
 A *dense block* consists of multiple convolution blocks, each using the same number of output channels. In the forward propagation, however, we concatenate the input and output of each convolution block on the channel dimension. Lazy evaluation allows us to adjust the dimensionality automatically.
 
 ```{.python .input}
@@ -160,12 +179,29 @@ class DenseBlock(tf.keras.layers.Layer):
         return x
 ```
 
+```{.python .input}
+%%tab jax
+class DenseBlock(nn.Module):
+    num_convs: int
+    num_channels: int
+    training: bool = True
+
+    def setup(self):
+        layer = []
+        for i in range(self.num_convs):
+            layer.append(ConvBlock(self.num_channels, self.training))
+        self.net = nn.Sequential(layer)
+
+    def __call__(self, X):
+        return self.net(X)
+```
+
 In the following example,
 we [**define a `DenseBlock` instance**] with 2 convolution blocks of 10 output channels.
 When using an input with 3 channels, we will get an output with  $3 + 10 + 10=23$ channels. The number of convolution block channels controls the growth in the number of output channels relative to the number of input channels. This is also referred to as the *growth rate*.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 blk = DenseBlock(2, 10)
 if tab.selected('mxnet'):
     X = np.random.uniform(size=(4, 3, 8, 8))
@@ -175,6 +211,14 @@ if tab.selected('pytorch'):
 if tab.selected('tensorflow'):
     X = tf.random.uniform((4, 8, 8, 3))
 Y = blk(X)
+Y.shape
+```
+
+```{.python .input}
+%%tab jax
+blk = DenseBlock(2, 10)
+X = jnp.zeros((4, 8, 8, 3))
+Y = blk.init_with_output(d2l.get_key(), X)[0]
 Y.shape
 ```
 
@@ -218,6 +262,21 @@ class TransitionBlock(tf.keras.layers.Layer):
         return self.avg_pool(x)
 ```
 
+```{.python .input}
+%%tab jax
+class TransitionBlock(nn.Module):
+    num_channels: int
+    training: bool = True
+
+    @nn.compact
+    def __call__(self, X):
+        X = nn.BatchNorm(not self.training)(X)
+        X = nn.relu(X)
+        X = nn.Conv(self.num_channels, kernel_size=(1, 1))(X)
+        X = nn.avg_pool(X, window_shape=(2, 2), strides=(2, 2))
+        return X
+```
+
 [**Apply a transition layer**] with 10 channels to the output of the dense block in the previous example.  This reduces the number of output channels to 10, and halves the height and width.
 
 ```{.python .input}
@@ -239,12 +298,18 @@ blk = TransitionBlock(10)
 blk(Y).shape
 ```
 
+```{.python .input}
+%%tab jax
+blk = TransitionBlock(10)
+blk.init_with_output(d2l.get_key(), Y)[0].shape
+```
+
 ## [**DenseNet Model**]
 
 Next, we will construct a DenseNet model. DenseNet first uses the same single convolutional layer and max-pooling layer as in ResNet.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class DenseNet(d2l.Classifier):
     def b1(self):
         if tab.selected('mxnet'):
@@ -268,6 +333,29 @@ class DenseNet(d2l.Classifier):
                     pool_size=3, strides=2, padding='same')])
 ```
 
+```{.python .input}
+%%tab jax
+class DenseNet(d2l.Classifier):
+    num_channels: int = 64
+    growth_rate: int = 32
+    arch: tuple = (4, 4, 4, 4)
+    lr: float = 0.1
+    num_classes: int = 10
+    training: bool = True
+
+    def setup(self):
+        self.net = self.create_net()
+
+    def b1(self):
+        return nn.Sequential([
+            nn.Conv(64, kernel_size=(7, 7), strides=(2, 2), padding='same'),
+            nn.BatchNorm(not self.training),
+            nn.relu,
+            lambda x: nn.max_pool(x, window_shape=(3, 3),
+                                  strides=(2, 2), padding='same')
+        ])
+```
+
 Then, similar to the four modules made up of residual blocks that ResNet uses,
 DenseNet uses four dense blocks.
 Similar to ResNet, we can set the number of convolutional layers used in each dense block. Here, we set it to 4, consistent with the ResNet-18 model in :numref:`sec_resnet`. Furthermore, we set the number of channels (i.e., growth rate) for the convolutional layers in the dense block to 32, so 128 channels will be added to each dense block.
@@ -275,7 +363,7 @@ Similar to ResNet, we can set the number of convolutional layers used in each de
 In ResNet, the height and width are reduced between each module by a residual block with a stride of 2. Here, we use the transition layer to halve the height and width and halve the number of channels. Similar to ResNet, a global pooling layer and a fully connected layer are connected at the end to produce the output.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(DenseNet)
 def __init__(self, num_channels=64, growth_rate=32, arch=(4, 4, 4, 4),
              lr=0.1, num_classes=10):
@@ -333,12 +421,39 @@ def __init__(self, num_channels=64, growth_rate=32, arch=(4, 4, 4, 4),
             tf.keras.layers.Dense(num_classes)]))
 ```
 
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(DenseNet)
+def create_net(self):
+    net = self.b1()
+    for i, num_convs in enumerate(self.arch):
+        net.layers.extend([DenseBlock(num_convs, self.growth_rate,
+                                      training=self.training)])
+        # The number of output channels in the previous dense block
+        num_channels = self.num_channels + (num_convs * self.growth_rate)
+        # A transition layer that halves the number of channels is added
+        # between the dense blocks
+        if i != len(self.arch) - 1:
+            num_channels //= 2
+            net.layers.extend([TransitionBlock(num_channels,
+                                               training=self.training)])
+    net.layers.extend([
+        nn.BatchNorm(not self.training),
+        nn.relu,
+        lambda x: nn.avg_pool(x, window_shape=x.shape[1:3],
+                              strides=x.shape[1:3], padding='valid'),
+        lambda x: x.reshape((x.shape[0], -1)),
+        nn.Dense(self.num_classes)
+    ])
+    return net
+```
+
 ## [**Training**]
 
 Since we are using a deeper network here, in this section, we will reduce the input height and width from 224 to 96 to simplify the computation.
 
 ```{.python .input}
-%%tab mxnet, pytorch
+%%tab mxnet, pytorch, jax
 model = DenseNet(lr=0.01)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(96, 96))

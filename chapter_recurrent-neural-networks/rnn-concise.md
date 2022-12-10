@@ -20,7 +20,7 @@ We begin, as before, by loading
 
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
 ```{.python .input}
@@ -45,6 +45,13 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+```{.python .input}
+%%tab jax
+from d2l import jax as d2l
+from flax import linen as nn
+from jax import numpy as jnp
+```
+
 ## [**Defining the Model**]
 
 We define the following class
@@ -62,6 +69,12 @@ whose shape is
 For some models to be introduced later
 (e.g., long short-term memory),
 this list will also contain other information.
+:end_tab:
+
+:begin_tab:`jax`
+Flax doesn't provide an RNNCell for concise implementation of Vanilla RNNs
+as of today. There are more advanced variants of RNNs like LSTMs and GRUs
+which are available in the Flax `linen` API.
 :end_tab:
 
 ```{.python .input}
@@ -106,12 +119,22 @@ class RNN(d2l.Module):  #@save
         return outputs, H
 ```
 
+```{.python .input}
+%%tab jax
+class RNN(nn.Module):  #@save
+    num_hiddens: int
+
+    @nn.compact
+    def __call__(self, inputs, H=None):
+        raise NotImplementedError
+```
+
 Inheriting from the `RNNLMScratch` class in :numref:`sec_rnn-scratch`, 
 the following `RNNLM` class defines a complete RNN-based language model.
 Note that we need to create a separate fully connected output layer.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 class RNNLM(d2l.RNNLMScratch):  #@save
     def init_params(self):
         if tab.selected('mxnet'):
@@ -129,6 +152,23 @@ class RNNLM(d2l.RNNLMScratch):  #@save
             return d2l.transpose(self.linear(hiddens), (1, 0, 2))
 ```
 
+```{.python .input}
+%%tab jax
+class RNNLM(d2l.RNNLMScratch):  #@save
+    training: bool = True
+
+    def setup(self):
+        self.linear = nn.Dense(self.vocab_size)
+
+    def output_layer(self, hiddens):
+        return d2l.swapaxes(self.linear(hiddens), 0, 1)
+
+    def forward(self, X, state=None):
+        embs = self.one_hot(X)
+        rnn_outputs, _ = self.rnn(embs, state, self.training)
+        return self.output_layer(rnn_outputs)
+```
+
 ## Training and Predicting
 
 Before training the model, let's [**make a prediction 
@@ -137,7 +177,7 @@ Given that we have not trained the network,
 it will generate nonsensical predictions.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 data = d2l.TimeMachine(batch_size=1024, num_steps=32)
 if tab.selected('mxnet', 'tensorflow'):
     rnn = RNN(num_hiddens=32)
@@ -150,7 +190,7 @@ model.predict('it has', 20, data.vocab)
 Next, we [**train our model, leveraging the high-level API**].
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 if tab.selected('mxnet', 'pytorch'):
     trainer = d2l.Trainer(max_epochs=100, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):

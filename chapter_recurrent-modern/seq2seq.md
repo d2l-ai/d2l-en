@@ -1,6 +1,6 @@
 ```{.python .input}
 %load_ext d2lbook.tab
-tab.interact_select('mxnet', 'pytorch', 'tensorflow')
+tab.interact_select('mxnet', 'pytorch', 'tensorflow', 'jax')
 ```
 
 #  Encoder-Decoder Seq2Seq for Machine Translation
@@ -141,6 +141,18 @@ import math
 import tensorflow as tf
 ```
 
+```{.python .input}
+%%tab jax
+import collections
+from d2l import jax as d2l
+from flax import linen as nn
+from functools import partial
+import jax
+from jax import numpy as jnp
+import math
+import optax
+```
+
 ## Encoder
 
 Recall that the encoder transforms an input sequence of variable length
@@ -239,7 +251,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
     def forward(self, X, *args):
         # X shape: (batch_size, num_steps)
         embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int64))
-        # embs shape: (num_steps, batch_size, embed_size)    
+        # embs shape: (num_steps, batch_size, embed_size)
         output, state = self.rnn(embs)
         # output shape: (num_steps, batch_size, num_hiddens)
         # state shape: (num_layers, batch_size, num_hiddens)
@@ -266,6 +278,30 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
         return output, state
 ```
 
+```{.python .input}
+%%tab jax
+class Seq2SeqEncoder(d2l.Encoder):
+    """The RNN encoder for sequence to sequence learning."""
+    vocab_size: int
+    embed_size: int
+    num_hiddens: int
+    num_layers: int
+    dropout: float = 0
+
+    def setup(self):
+        self.embedding = nn.Embed(self.vocab_size, self.embed_size)
+        self.rnn = d2l.GRU(self.num_hiddens, self.num_layers, self.dropout)
+
+    def __call__(self, X, *args, training=False):
+        # X shape: (batch_size, num_steps)
+        embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int32))
+        # embs shape: (num_steps, batch_size, embed_size)
+        output, state = self.rnn(embs, training=training)
+        # output shape: (num_steps, batch_size, num_hiddens)
+        # state shape: (num_layers, batch_size, num_hiddens)
+        return output, state
+```
+
 Let's use a concrete example
 to [**illustrate the above encoder implementation.**]
 Below, we instantiate a two-layer GRU encoder
@@ -285,7 +321,10 @@ batch_size, num_steps = 4, 9
 
 encoder = Seq2SeqEncoder(vocab_size, embed_size, num_hiddens, num_layers)
 X = d2l.zeros((batch_size, num_steps))
-outputs, state = encoder(X)
+if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    outputs, state = encoder(X)
+if tab.selected('jax'):
+    (outputs, state), _ = encoder.init_with_output(d2l.get_key(), X)
 
 d2l.check_shape(outputs, (num_steps, batch_size, num_hiddens))
 ```
@@ -297,7 +336,7 @@ at the final time step is
 
 ```{.python .input}
 %%tab all
-if tab.selected('mxnet', 'pytorch'):
+if tab.selected('mxnet', 'pytorch', 'jax'):
     d2l.check_shape(state, (num_layers, batch_size, num_hiddens))
 if tab.selected('tensorflow'):
     d2l.check_len(state, num_layers)
@@ -403,9 +442,9 @@ class Seq2SeqDecoder(d2l.Decoder):
         # embs shape: (num_steps, batch_size, embed_size)
         embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int32))
         # context shape: (batch_size, num_hiddens)
-        context = enc_state[-1]            
+        context = enc_state[-1]
         # Broadcast context to (num_steps, batch_size, num_hiddens)
-        context = context.repeat(embs.shape[0], 1, 1)            
+        context = context.repeat(embs.shape[0], 1, 1)
         # Concat at the feature dimension
         embs_and_context = d2l.concat((embs, context), -1)
         outputs, state = self.rnn(embs_and_context, enc_state)
@@ -446,6 +485,41 @@ class Seq2SeqDecoder(d2l.Decoder):
         return outputs, state
 ```
 
+```{.python .input}
+%%tab jax
+class Seq2SeqDecoder(d2l.Decoder):
+    """The RNN decoder for sequence to sequence learning."""
+    vocab_size: int
+    embed_size: int
+    num_hiddens: int
+    num_layers: int
+    dropout: float = 0
+
+    def setup(self):
+        self.embedding = nn.Embed(self.vocab_size, self.embed_size)
+        self.rnn = d2l.GRU(self.num_hiddens, self.num_layers, self.dropout)
+        self.dense = nn.Dense(self.vocab_size)
+
+    def init_state(self, enc_outputs, *args):
+        return enc_outputs[1]
+
+    def __call__(self, X, enc_state, training=False):
+        # X shape: (batch_size, num_steps)
+        # embs shape: (num_steps, batch_size, embed_size)
+        embs = self.embedding(d2l.astype(d2l.transpose(X), d2l.int32))
+        # context shape: (batch_size, num_hiddens)
+        context = enc_state[-1]
+        # Broadcast context to (num_steps, batch_size, num_hiddens)
+        context = jnp.tile(context, (embs.shape[0], 1, 1))
+        # Concat at the feature dimension
+        embs_and_context = d2l.concat((embs, context), -1)
+        outputs, state = self.rnn(embs_and_context, enc_state, training=training)
+        outputs = d2l.swapaxes(self.dense(outputs), 0, 1)
+        # outputs shape: (batch_size, num_steps, vocab_size)
+        # state shape: (num_layers, batch_size, num_hiddens)
+        return outputs, state
+```
+
 To [**illustrate the implemented decoder**],
 below we instantiate it with the same hyperparameters from the aforementioned encoder.
 As we can see, the output shape of the decoder becomes (batch size, number of time steps, vocabulary size),
@@ -454,11 +528,16 @@ where the last dimension of the tensor stores the predicted token distribution.
 ```{.python .input}
 %%tab all
 decoder = Seq2SeqDecoder(vocab_size, embed_size, num_hiddens, num_layers)
-state = decoder.init_state(encoder(X))
-outputs, state = decoder(X, state)
+if tab.selected('mxnet', 'pytorch', 'tensorflow'):
+    state = decoder.init_state(encoder(X))
+    outputs, state = decoder(X, state)
+if tab.selected('jax'):
+    state = decoder.init_state(encoder.init_with_output(d2l.get_key(), X)[0])
+    (outputs, state), _ = decoder.init_with_output(d2l.get_key(), X, state)
+
 
 d2l.check_shape(outputs, (batch_size, num_steps, vocab_size))
-if tab.selected('mxnet', 'pytorch'):
+if tab.selected('mxnet', 'pytorch', 'jax'):
     d2l.check_shape(state, (num_layers, batch_size, num_hiddens))
 if tab.selected('tensorflow'):
     d2l.check_len(state, num_layers)
@@ -479,7 +558,7 @@ are illustrated in :numref:`fig_seq2seq_details`.
 Putting it all together in code yields the following:
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, tensorflow, mxnet
 class Seq2Seq(d2l.EncoderDecoder):  #@save
     def __init__(self, encoder, decoder, tgt_pad, lr):
         super().__init__(encoder, decoder)
@@ -498,6 +577,23 @@ class Seq2Seq(d2l.EncoderDecoder):  #@save
             return torch.optim.Adam(self.parameters(), lr=self.lr)
         if tab.selected('tensorflow'):
             return tf.keras.optimizers.Adam(learning_rate=self.lr)
+```
+
+```{.python .input}
+%%tab jax
+class Seq2Seq(d2l.EncoderDecoder):  #@save
+    encoder: nn.Module
+    decoder: nn.Module
+    tgt_pad: int
+    lr: float
+
+    def validation_step(self, params, batch, state):
+        l, _ = self.loss(params, batch[:-1], batch[-1], state)
+        self.plot('loss', l, train=False)
+
+    def configure_optimizers(self):
+        # Adam optimizer is used here
+        return optax.adam(learning_rate=self.lr)
 ```
 
 ## Loss Function with Masking
@@ -523,12 +619,27 @@ of any irrelevant prediction
 with zero equals to zero.
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(Seq2Seq)
 def loss(self, Y_hat, Y):
     l = super(Seq2Seq, self).loss(Y_hat, Y, averaged=False)
     mask = d2l.astype(d2l.reshape(Y, -1) != self.tgt_pad, d2l.float32)
     return d2l.reduce_sum(l * mask) / d2l.reduce_sum(mask)
+```
+
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(Seq2Seq)
+@partial(jax.jit, static_argnums=(0, 5))
+def loss(self, params, X, Y, state, averaged=False):
+    Y_hat = state.apply_fn({'params': params}, *X,
+                           rngs={'dropout': jax.random.PRNGKey(0)})
+    Y_hat = d2l.reshape(Y_hat, (-1, Y_hat.shape[-1]))
+    Y = d2l.reshape(Y, (-1,))
+    fn = optax.softmax_cross_entropy_with_integer_labels
+    l = fn(Y_hat, Y)
+    mask = d2l.astype(d2l.reshape(Y, -1) != self.tgt_pad, d2l.float32)
+    return d2l.reduce_sum(l * mask) / d2l.reduce_sum(mask), {}
 ```
 
 ## [**Training**]
@@ -541,13 +652,18 @@ for sequence to sequence learning on the machine translation dataset.
 %%tab all
 data = d2l.MTFraEng(batch_size=128) 
 embed_size, num_hiddens, num_layers, dropout = 256, 256, 2, 0.2
-if tab.selected('mxnet', 'pytorch'):
+if tab.selected('mxnet', 'pytorch', 'jax'):
     encoder = Seq2SeqEncoder(
         len(data.src_vocab), embed_size, num_hiddens, num_layers, dropout)
     decoder = Seq2SeqDecoder(
         len(data.tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
+if tab.selected('mxnet', 'pytorch'):
     model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
                     lr=0.001)
+if tab.selected('jax'):
+    model = Seq2Seq(encoder, decoder, tgt_pad=data.tgt_vocab['<pad>'],
+                    lr=0.001, training=True)
+if tab.selected('mxnet', 'pytorch', 'jax'):
     trainer = d2l.Trainer(max_epochs=50, gradient_clip_val=1, num_gpus=1)
 if tab.selected('tensorflow'):
     with d2l.try_gpu():
@@ -587,7 +703,7 @@ more sophisticated strategies
 based on beam search (:numref:`sec_beam-search`).
 
 ```{.python .input}
-%%tab all
+%%tab pytorch, mxnet, tensorflow
 @d2l.add_to_class(d2l.EncoderDecoder)  #@save
 def predict_step(self, batch, device, num_steps,
                  save_attention_weights=False):
@@ -605,6 +721,26 @@ def predict_step(self, batch, device, num_steps,
             Y, dec_state = self.decoder(outputs[-1], dec_state)
         if tab.selected('tensorflow'):
             Y, dec_state = self.decoder(outputs[-1], dec_state, training=False)
+        outputs.append(d2l.argmax(Y, 2))
+        # Save attention weights (to be covered later)
+        if save_attention_weights:
+            attention_weights.append(self.decoder.attention_weights)
+    return d2l.concat(outputs[1:], 1), attention_weights
+```
+
+```{.python .input}
+%%tab jax
+@d2l.add_to_class(d2l.EncoderDecoder)  #@save
+def predict_step(self, params, batch, num_steps,
+                 save_attention_weights=False):
+    src, tgt, src_valid_len, _ = batch
+    enc_outputs = self.encoder.apply({'params': params['encoder']}, src,
+                                     src_valid_len, training=False)
+    dec_state = self.decoder.init_state(enc_outputs, src_valid_len)
+    outputs, attention_weights = [d2l.expand_dims(tgt[:,0], 1), ], []
+    for _ in range(num_steps):
+        Y, dec_state = self.decoder.apply({'params': params['decoder']},
+                                          outputs[-1], dec_state, training=False)
         outputs.append(d2l.argmax(Y, 2))
         # Save attention weights (to be covered later)
         if save_attention_weights:
@@ -696,8 +832,12 @@ and compute the BLEU of the results.
 %%tab all
 engs = ['go .', 'i lost .', 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
-preds, _ = model.predict_step(
-    data.build(engs, fras), d2l.try_gpu(), data.num_steps)
+if tab.selected('pytorch', 'mxnet', 'tensorflow'):
+    preds, _ = model.predict_step(
+        data.build(engs, fras), d2l.try_gpu(), data.num_steps)
+if tab.selected('jax'):
+    preds, _ = model.predict_step(trainer.state.params, data.build(engs, fras),
+                                  data.num_steps)
 for en, fr, p in zip(engs, fras, preds):
     translation = []
     for token in data.tgt_vocab.to_tokens(p):
