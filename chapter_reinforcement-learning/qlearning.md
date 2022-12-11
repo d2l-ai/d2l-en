@@ -4,7 +4,7 @@
 In the previous section, we discussed the Value Iteration algorithm which requires accessing the complete Markov decision process (MDP), e.g., the transition and reward functions. In this section, we will look at Q-Learning :cite:`watkinsQlearning1992` which is an algorithm to learn the value function without necessarily knowing the MDP. This algorithm embodies the central idea behind reinforcement learning: it will enable the robot to obtain its own data.
 <!-- , instead of relying upon the expert. -->
 
-## The Q-Learning algorithm
+## The Q-Learning Algorithm
 
 Recall that value iteration for the action-value function in :ref:`sec_valueiter` corresponds to the update
 
@@ -12,7 +12,7 @@ $$Q_{k+1}(s, a) = r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \ma
 
 As we discussed, implementing this algorithm requires knowing the MDP, specifically the transition function $P(s' \mid s, a)$. The key idea behind Q-Learning is to replace the summation over all $s' \in \mathcal{S}$ in the above expression by a summation over the states visited by the robot. This allows us to subvert the need to know the transition function.
 
-## An optimization problem underlying Q-Learning
+## An Optimization Problem Underlying Q-Learning
 
 Let us imagine that the robot uses a policy $\pi_e(a \mid s)$ to take actions. Just like the previous chapter, it collects a dataset of $n$ trajectories of $T$ timesteps each $\{ (s_t^i, a_t^i)_{t=0,\ldots,T-1}\}_{i=1,\ldots, n}$. Recall that value iteration is really a set of constraints that ties together the action-value $Q^*(s, a)$ of different states and actions to each other. We can implement an approximate version of value iteration using the data that the robot has collected using $\pi_e$ as
 
@@ -57,7 +57,7 @@ where the hyper-parameter $T$ is called temperature. A large value of $\epsilon$
 
 It is important to note that when we pick an exploration that depends upon the current estimate of the action-value function $\hat{Q}$, we need to resolve the optimization problem periodically. Typical implementations of Q-Learning make one mini-batch update using a few state-action pairs in the collected dataset (typically the ones collected from the previous timestep of the robot) after taking every action using $\pi_e$.
 
-## The "self-correcting" property of Q-Learning
+## The "Self-correcting" Property of Q-Learning
 
 The dataset collected by the robot during Q-Learning grows with time. Both the exploration policy $\pi_e$ and the estimate $\hat{Q}$ evolve as the robot collects more data. This gives us a key insight into why Q-Learning works well. Consider a state $s$: if a particular action $a$ has a large value under the current estimate $\hat{Q}(s,a)$, then both the $\epsilon$-greedy and the softmax exploration policies have a larger probability of picking this action. If this action actually is *not* the ideal action, then the future states that arise from this action will have poor rewards. The next update of the Q-Learning objective will therefore reduce the value $\hat{Q}(s,a)$, which will reduce the probability of picking this action the next time the robot visits state $s$. Bad actions, e.g., ones whose value is overestimated in $\hat{Q}(s,a)$, are explored by the robot but their value is correct in the next update of the Q-Learning objective. Good actions, e.g., whose value $\hat{Q}(s, a)$ is large, are explored more often by the robot and thereby reinforced. This property can be used to show that Q-Learning can converge to the optimal policy even if it begins with a random policy $\pi_e$ :cite:`watkinsQlearning1992`.
 
@@ -80,7 +80,7 @@ gamma = 0.95  # Discount factor
 num_iters = 256  # Number of iterations
 alpha   = 0.9  # Learing rate
 epsilon = 0.9  # Epsilon in epsilion gready algorithm
-random.seed(seed)  # Set the random seed to ensure results can be reproduced
+random.seed(seed)  # Set the random seed
 np.random.seed(seed)
 
 # Now set up the environment
@@ -105,8 +105,8 @@ We are now ready to implement Q-learning:
 %%tab all
 
 def q_learning(env_info, gamma, num_iters, alpha, epsilon):
-    env_desc = env_info['desc'] # 2D array specifying what each grid item means
-    env = env_info['env'] # 2D array specifying what each grid item means
+    env_desc = env_info['desc']  # 2D array specifying what each grid item means
+    env = env_info['env']  # 2D array specifying what each grid item means
     num_states = env_info['num_states']
     num_actions = env_info['num_actions']
 
@@ -115,18 +115,18 @@ def q_learning(env_info, gamma, num_iters, alpha, epsilon):
     pi = np.zeros((num_iters + 1, num_states))
 
     for k in range(1, num_iters + 1):
-        # reset environment
+        # Reset environment
         state, done = env.reset(), False
         while not done:
             # Select an action for a given state and acts in env based on selected action
             action = e_greedy(env, Q, state, epsilon)
             next_state, reward, done, _ = env.step(action)
 
-            # Q-update: Q_{k+1}(s, a) = Q_{k}(s, a) + \alpha * (reward + max_a' Q(s, a') - Q_{k}(s, a)) 
+            # Q-update:
             y = reward + gamma * np.max(Q[next_state,:])
             Q[state, action] = Q[state, action] + alpha * (y - Q[state, action])
 
-            # move to the next state
+            # Move to the next state
             state = next_state
         # Record max value and max action for visualization purpose only
         for s in range(num_states):
@@ -141,7 +141,7 @@ This result shows that Q-learning can find the optimal solution for this problem
 
 
 ## Summary
-Implementing Q-learning does not require that we know the Markov decision process (MDP), e.g., the transition and reward functions, completely.
+Q-learning is one of the most fundamental reinforcement-learning algorithms. It has been at the epicenter of the recent success of reinforcement learning, most notably in learning to play video games :cite:`mnih2013playing`. Implementing Q-learning does not require that we know the Markov decision process (MDP), e.g., the transition and reward functions, completely.
 
 ## Exercises
 
