@@ -219,6 +219,17 @@ time. While random search is easy to distribute asynchronously and does not
 require any change of the actual algorithm, other methods require some additional
 modifications.
 
+## Exercises
+
+1. Consider the `DropoutMLP` model implemented in :numref:`sec_dropout`, and used in Exercise 1 of :numref:`sec_api_hpo`.
+    1. Implement an objective function `hpo_objective_dropoutmlp_synetune` to be used with Syne Tune. Make sure that your function reports the validation error after every epoch.
+    2. Using the setup of Exercise 1 in :numref:`sec_api_hpo`, compare random search to Bayesian optimization. If you use SageMaker, feel free to use Syne Tune's benchmarking facilities in order to run experiments in parallel. Hint: Bayesian optimization is provided as `syne_tune.optimizer.baselines.BayesianOptimization`.
+    3. For this exercise, you need to run on an instance with at least 4 CPU cores. For one of the methods used above (random search, Bayesian optimization), run experiments with `n_workers=1`, `n_workers=2`, `n_workers=4`, and compare results (incumbent trajectories). At least for random search, you should observe linear scaling with respect to the number of workers. Hint: For robust results, you may have to average over several repetitions each.
+2. *Advanced*. The goal of this exercise is to implement a new scheduler in Syne Tune.
+    1. Create a virtual environment containing both the [d2lbook](https://github.com/d2l-ai/d2l-en/blob/master/INFO.md#installation-for-developers) and [syne-tune](https://syne-tune.readthedocs.io/en/latest/getting_started.html) sources.
+    2. Implement the `LocalSearcher` from Exercise 2 in :numref:`sec_api_hpo` as a new searcher in Syne Tune. Hint: Read [this tutorial](https://syne-tune.readthedocs.io/en/latest/tutorials/developer/README.html). Alternatively, you may follow this [example](https://syne-tune.readthedocs.io/en/latest/examples.html#launch-hpo-experiment-with-home-made-scheduler).
+    3. Compare your new `LocalSearcher` with `RandomSearch` on the `DropoutMLP` benchmark.
+
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/12093)
