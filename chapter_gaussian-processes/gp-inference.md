@@ -172,6 +172,8 @@ def neg_MLL(pars):
 
 learned_hypers = optimize.minimize(neg_MLL, x0=np.array([ell_est,post_sig_est]), 
                                    bounds=((0.01, 10.), (0.01, 10.)))
+ell = learned_hypers.x[0]
+post_sig_est = learned_hypers.x[1]
 ```
 
 In this instance, we learn a length-scale of 0.299, and a noise standard deviation of 0.24. Note that the learned noise is extremely close to the true noise, which helps indicate that our GP is a very well-specified to this problem. 
