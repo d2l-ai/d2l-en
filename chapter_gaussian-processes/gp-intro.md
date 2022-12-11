@@ -6,27 +6,27 @@ Let's get a feel for how Gaussian processes operate, by starting with some examp
 
 Suppose we observe the following dataset, of regression targets (outputs), $y$, indexed by inputs, $x$. As an example, the targets could be changes in carbon dioxide concentrations, and the inputs could be the times at which these targets have been recorded. What are some features of the data? How quickly does it seem to varying? Do we have data points collected at regular intervals, or are there missing inputs? How would you imagine filling in the missing regions, or forecasting up until $x=25$?
 
-![Observed data.](https://user-images.githubusercontent.com/6753639/178247765-650772fb-2622-42d0-8eff-316dc835816f.png)
+![Observed data.](https://user-images.githubusercontent.com/6753639/206877503-de651312-1a44-46c7-b0b2-a18ffb1fc7f8.svg)
 
-In order to fit the data with a Gaussian process, we start by specifying a prior distribution over what types of functions we might believe to be reasonable. Here we show several sample functions from a Gaussian process. Does this prior look reasonable? Note here we are not looking for functions that fit our dataset, but instead for specifying reasonable high-level properties of the solutions, such as how quickly they vary with inputs. 
+In order to fit the data with a Gaussian process, we start by specifying a prior distribution over what types of functions we might believe to be reasonable. Here we show several sample functions from a Gaussian process. Does this prior look reasonable? Note here we are not looking for functions that fit our dataset, but instead for specifying reasonable high-level properties of the solutions, such as how quickly they vary with inputs. Note that we will see code for reproducing all of the plots in this notebook, in the next notebooks on priors and inference.
 
-![Sample prior functions that we may want to represent with our model.](https://user-images.githubusercontent.com/6753639/178247905-ca6d5812-92eb-45d2-9004-a435da917e78.png)
+![Sample prior functions that we may want to represent with our model.](https://user-images.githubusercontent.com/6753639/206877559-54c47fc2-ae6a-47e1-97b1-a0bd4f6cf81e.svg)
 
 Once we condition on data, we can use this prior to infer a posterior distribution over functions that could fit the data. Here we show sample posterior functions.
 
-![Sample posterior functions, once we have observed the data.](https://user-images.githubusercontent.com/6753639/178248696-bb31053e-68c9-4679-b09b-59a319d6479b.png)
+![Sample posterior functions, once we have observed the data.](https://user-images.githubusercontent.com/6753639/206877599-57c33f66-ca57-4d78-a33e-f20889a382b1.svg)
 
-We see that each of these functions are entirely consistent with our data, perfectly running through each observation. In order to use these posterior samples to make predictions, we can average the values of every possible sample function from the posterior, to create the curve below, in thick blue. Note that we don't actually have to take an infinite number of samples to compute this expectation; as we will see later, we can compute the expectation in closed form.  
+We see that each of these functions are entirely consistent with our data, perfectly running through each observation. In order to use these posterior samples to make predictions, we can average the values of every possible sample function from the posterior, to create the curve below, in thick blue. Note that we don't actually have to take an infinite number of samples to compute this expectation; as we will see later, we can compute the expectation in closed form. 
 
-![Posterior samples, alongside posterior mean, which can be used for point predictions, in blue.](https://user-images.githubusercontent.com/6753639/178248173-9d13e613-85f3-4414-ab13-8eb763580225.png)
+![Posterior samples, alongside posterior mean, which can be used for point predictions, in blue.](https://user-images.githubusercontent.com/6753639/206877617-8664e9ce-5ed8-41ef-bf3f-394b6bd57a3a.svg)
 
 We may also want a representation of uncertainty, so we know how confident we should be in our predictions. Intuitively, we should have more uncertainty where there is more variability in the sample posterior functions, as this tells us there are many more possible values the true function could take. This type of uncertainty is called _epistemic uncertainty_, which is the _reducible uncertainty_ associated with lack of information. As we acquire more data, this type of uncertainty disappears, as there will be increasingly fewer solutions consistent with what we observe. Like with the posterior mean, we can compute the posterior variance (the variability of these functions in the posterior) in closed form. With shade, we show two times the posterior standard deviation on either side of the mean, creating a _credible interval_ that has a 95% probability of containing the true value of the function for any input $x$.
 
-![Posterior samples, including 95% credible set.](https://user-images.githubusercontent.com/6753639/178248952-b14e3d72-e65f-41ed-9577-8d3363c8cf11.png)
+![Posterior samples, including 95% credible set.](https://user-images.githubusercontent.com/6753639/206877636-94890cd7-d868-45b8-bd5b-ca1c0e7b0b20.svg)
 
 The plot looks somewhat cleaner if we remove the posterior samples, simply visualizing the data, posterior mean, and 95% credible set. Notice how the uncertainty grows away from the data, a property of epistemic uncertainty. 
 
-![Point predictions, and credible set.](https://user-images.githubusercontent.com/6753639/178249137-23af70e9-0753-4491-9215-7a757ff60652.png)
+![Point predictions, and credible set.](https://user-images.githubusercontent.com/6753639/206877643-ca64adc1-7f3f-4106-8f2b-a21a614ac3f9.svg)
 
 The properties of the Gaussian process that we used to fit the data are strongly controlled by what's called a _covariance function_, also known as a _kernel_. The covariance function we used is called the _RBF (Radial Basis Function) kernel_, which has the form
 $$ k_{\text{RBF}}(x,x') = \mathrm{Cov}(f(x),f(x')) = a^2 \exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right) $$
@@ -50,30 +50,32 @@ Let's see how changing the lengthscale affects sample prior and posterior functi
 $\ell = 0.1, 0.5, 2, 5, 10$
 . A length-scale of $0.1$ is very small relative to the range of the input domain we are considering, $25$. For example, the values of the function at $x=5$ and $x=10$ will have essentially no correlation at such a length-scale. On the other hand, for a length-scale of $10$, the function values at these inputs will be highly correlated. Note that the vertical scale changes in the following figures.
 
-![priorpoint1](https://user-images.githubusercontent.com/6753639/178250594-d2032bcd-f5bc-4938-8cfa-aa1658c18425.png)
-![postpoint1](https://user-images.githubusercontent.com/6753639/178250619-121ad67f-45f4-47ae-9637-c5f367afd211.png)
 
-![priorpoint5](https://user-images.githubusercontent.com/6753639/178250705-1f0ec480-235e-4ad7-a3c6-a282d8d4e60b.png)
-![postpoint5](https://user-images.githubusercontent.com/6753639/178250716-9238a419-e43e-405e-b1e3-857790ce52c3.png)
+![priorpoint1](https://user-images.githubusercontent.com/6753639/206877928-8add8f33-947e-4ad6-b635-c05f9ddbf45c.svg)
+![postpoint1](https://user-images.githubusercontent.com/6753639/206877934-9d63e0ba-c0df-416f-9efb-458dd2de20a9.svg)
 
-![prior2](https://user-images.githubusercontent.com/6753639/178250738-dd0708de-c008-4708-9a3c-5466b0ac6504.png)
-![post2](https://user-images.githubusercontent.com/6753639/178250763-066698cc-4b93-496f-8a01-c2b1f1d6815c.png)
+![priorpoint5](https://user-images.githubusercontent.com/6753639/206877944-cfd2cd8a-c6c8-4ebf-b8e5-10e823feac23.svg)
+![postpoint5](https://user-images.githubusercontent.com/6753639/206877945-08420e93-eb64-42a2-b5a1-20b081af84df.svg)
 
-![prior5](https://user-images.githubusercontent.com/6753639/178250780-e5c522b7-f9c7-416c-8017-3cb921ff14b2.png)
-![post5](https://user-images.githubusercontent.com/6753639/178250794-89470592-cdb3-4e63-b0d8-d66f002fc593.png)
+![prior2](https://user-images.githubusercontent.com/6753639/206877949-0cad1aec-fd74-46a5-9375-1c89c5c35393.svg)
+![post2](https://user-images.githubusercontent.com/6753639/206877951-e565b213-64bb-431b-a634-c3b7dd2f2eb3.svg)
+
+![prior5](https://user-images.githubusercontent.com/6753639/206877968-34daa780-ec9f-4b71-a858-d97ed9655949.svg)
+![post5](https://user-images.githubusercontent.com/6753639/206877976-12c80980-0c58-4c1d-bfc1-613a66f73779.svg)
 
 Notice as the length-scale increases the 'wiggliness' of the functions decrease, and our uncertainty decreases. If the length-scale is small, the uncertainty will quickly increase as we move away from the data, as the datapoints become less informative about the function values. 
 
 Now, let's vary the amplitude parameter, holding the length-scale fixed at $2$. Note the vertical scale is held fixed for the prior samples, and varies for the posterior samples, so you can clearly see both the increasing scale of the function, and the fits to the data.
 
-![priorap1](https://user-images.githubusercontent.com/6753639/178252126-8a984a0c-56f8-409c-b817-68b21af98582.png)
-![postapoint1](https://user-images.githubusercontent.com/6753639/178252136-868dd45a-b21e-4311-8164-a60ea41c221c.png)
 
-![priora2](https://user-images.githubusercontent.com/6753639/178252163-c9ac2360-6bee-44fe-985c-731101d8c575.png)
-![posta2](https://user-images.githubusercontent.com/6753639/178252195-c325e446-4c61-4851-a841-b547bbab2e2d.png)
+![priorap1](https://user-images.githubusercontent.com/6753639/206878168-305f4bc7-0ee2-4778-8ead-1d977d5c1f65.svg)
+![postapoint1](https://user-images.githubusercontent.com/6753639/206878178-1d52c5fa-fc37-4890-ab1c-9d404e5c92a0.svg)
 
-![priora8](https://user-images.githubusercontent.com/6753639/178252271-ccabde74-8ec3-44d1-9842-6309444c4ab5.png)
-![posta8](https://user-images.githubusercontent.com/6753639/178252284-b59daae3-2648-4ef6-bc09-7c0b4d9a4f02.png)
+![priora2](https://user-images.githubusercontent.com/6753639/206878180-52a5fec7-726a-4fb8-91c0-2c9452d23df1.svg)
+![posta2](https://user-images.githubusercontent.com/6753639/206878185-2cabcffb-975c-4eaa-b3d5-9d966200b5c5.svg)
+
+![priora8](https://user-images.githubusercontent.com/6753639/206878188-2836e726-88e8-414c-9e59-04d13517a71e.svg)
+![posta8](https://user-images.githubusercontent.com/6753639/206878192-aa5411cd-a681-4a04-b6d3-7d94df2c373d.svg)
 
 We see the amplitude parameter affects the scale of the function, but not the rate of variation. At this point, we also have the sense that the generalization performance of our procedure will depend on having reasonable values for these hyperparameters. Values of $\ell=2$ and $a=1$ appeared to provide reasonable fits, while some of the other values did not. Fortunately, there is a robust and automatic way to specify these hyperparameters, using what is called the _marginal likelihood_, which we will return to in the notebook on inference. 
 
@@ -124,17 +126,28 @@ The off-diagonal expression $k(x,x_1) = k(x_1,x)$
 tells us how correlated the function values will be --- how strongly determined $f(x)$
 will be from $f(x_1)$. 
 We've seen already that if we use a large length-scale, relative to the distance between $x$ and $x_1$, 
-$||x-x_1||$, then the function values will be highly correlated. We can visualize the process of determining $f(x)$ from $f(x_1)$ both in the space of functions, and in the joint distribution over $f(x_1), f(x)$. Let's initially consider an $x$ such that $k(x,x_1) = 0.7$, and $k(x,x)=1$, meaning that the value of $f(x)$ is moderately correlated with the value of $f(x_1)$. In the joint distribution, the contours of constant probability will be relatively narrow ellipses.
+$||x-x_1||$, then the function values will be highly correlated. We can visualize the process of determining $f(x)$ from $f(x_1)$ both in the space of functions, and in the joint distribution over $f(x_1), f(x)$. Let's initially consider an $x$ such that $k(x,x_1) = 0.9$, and $k(x,x)=1$, meaning that the value of $f(x)$ is moderately correlated with the value of $f(x_1)$. In the joint distribution, the contours of constant probability will be relatively narrow ellipses.
 
 Suppose we observe $f(x_1) = 1.2$. 
 To condition on this value of $f(x_1)$, 
 we can draw a horizontal line at $1.2$ on our plot of the density, and see that the value of $f(x)$ 
-is mostly constrained to $[0.8,1.4]$. We have also drawn this plot in function space. 
+is mostly constrained to $[0.64,1.52]$. We have also drawn this plot in function space, showing the observed
+point $f(x_1)$ in orange, and 1 standard deviation of the Gaussian process predictive distribution for $f(x)$ 
+in blue, about the mean value of $1.08$.
 
-Now suppose we have a stronger correlation, $k(x,x_1) = 0.9$. 
+![Contours of constant probability of a bivariate Gaussian density over $f(x_1)$ and $f(x)$ with $k(x,x_1) = 0.9$.](https://user-images.githubusercontent.com/6753639/206867364-b4707db5-0c2e-4ae4-a412-8292bca4d08d.svg)
+![Gaussian process predictive distribution in function space at $f(x)$, with $k(x,x_1) = 0.9$.](https://user-images.githubusercontent.com/6753639/206867367-3815720c-93c8-4b4b-80e7-296db1d3553b.svg)
+
+Now suppose we have a stronger correlation, $k(x,x_1) = 0.95$. 
 Now the ellipses have narrowed further, and the value of $f(x)$ 
 is even more strongly determined by $f(x_1)$. Drawing a horizontal line at $1.2$, we see the contours for $f(x)$
-support values mostly within $[1.15, 1.25]$. 
+support values mostly within $[0.83, 1.45]$. Again, we also show the plot in function space, with one standard 
+deviation about the mean predictive value of $1.14$.
+
+![Contours of constant probability of a bivariate Gaussian density over $f(x_1)$ and $f(x)$ with $k(x,x_1) = 0.95$.](https://user-images.githubusercontent.com/6753639/206867797-20e42783-31de-4c50-8103-e9441ba6d0a9.svg)
+![Gaussian process predictive distribution in function space at $f(x)$, with $k(x,x_1)$ = 0.95.](https://user-images.githubusercontent.com/6753639/206867800-d9fc7add-649d-492c-8848-cab07c8fb83e.svg)
+
+We see that the posterior mean predictor of our Gaussian process is closer to $1.2$, because there is now a stronger correlation. We also see that our uncertainty (the error bars) have somewhat decreased. Despite the strong correlation between these function values, our uncertainty is still righly quite large, because we have only observed a single data point! 
 
 This procedure can give us a posterior on $f(x)$ for any $x$, for any number of points we have observed. Suppose we observe $f(x_1), f(x_2)$. We now visualize the posterior for $f(x)$ at a particular $x=x'$ in function space. The exact distribution for $f(x)$ is given by the above equations. $f(x)$ is Gaussian distributed, with mean 
 
@@ -166,5 +179,6 @@ A Gaussian process represents a distribution over functions by specifying a mult
 2. Besides rate of variation and amplitude, what other properties of functions might we want to consider, and what would be real-world examples of functions that have those properties?
 3. The RBF covariance function we considered says that covariances (and correlations) between observations decrease with their distance in the input space (times, spatial locations, etc.). Is this a reasonable assumption? Why or why not?
 4. Is a sum of two Gaussian variables Gaussian? Is a product of two Gaussian variables Gaussian? If (a,b) have a joint Gaussian distribution, is a|b (a given b) Gaussian? Is a Gaussian?
-5. Do you think increasing our estimate of observation noise would increase or decrease our estimate of the length-scale of the ground truth function?
-6. As we move away from the data, suppose the uncertainty in our predictive distribution increases to a point, then stops increasing. Why might that happen?
+5. Repeat the exercise where we observe a data point at $f(x_1) = 1.2$, but now suppose we additionally observe $f(x_2) = 1.4$. Let $k(x,x_1) = 0.9$, and $k(x,x_2) = 0.8$. Will we be more or less certain about the value of $f(x)$, than when we had only observed $f(x_1)$? What is the mean and 95\% credible set for our value of $f(x)$ now? 
+6. Do you think increasing our estimate of observation noise would increase or decrease our estimate of the length-scale of the ground truth function?
+7. As we move away from the data, suppose the uncertainty in our predictive distribution increases to a point, then stops increasing. Why might that happen?

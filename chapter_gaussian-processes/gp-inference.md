@@ -38,7 +38,7 @@ $\mathbf{f}_* | \mathbf{y}, X, X_* \sim \mathcal{N}(m_*,S_*)$, where $m_* = K(X_
 
 Typically, we do not need to make use of the full predictive covariance matrix $S$, and instead use the diagonal of $S$ for uncertainty about each prediction. Often for this reason we write the predictive distribution for a single test point $x_*$, rather than a collection of test points. 
 
-The kernel matrix has parameters $\theta$ that we also wish to estimate, such the amplitude $a$ and lengthscale $\ell$ of the RBF kernel above. For these purposes we use the _marginal likelihood_, $p(\textbf{y} | \theta, X)$, which we already derived in working out the marginal distributions to find the joint distribution over $\textbf{y},\textbf{f}_*$. As we will see, the marginal likelihood compartmentalizes into model fit and model complexity terms, and automatically encodes a notion of Occam's razor for learning hyperparameters. For a full discussion, see MacKay Ch. 28, and Rasmussen and Williams Ch. 5.
+The kernel matrix has parameters $\theta$ that we also wish to estimate, such the amplitude $a$ and lengthscale $\ell$ of the RBF kernel above. For these purposes we use the _marginal likelihood_, $p(\textbf{y} | \theta, X)$, which we already derived in working out the marginal distributions to find the joint distribution over $\textbf{y},\textbf{f}_*$. As we will see, the marginal likelihood compartmentalizes into model fit and model complexity terms, and automatically encodes a notion of Occam's razor for learning hyperparameters. For a full discussion, see MacKay Ch. 28 :cite:`mackay2003information`, and Rasmussen and Williams Ch. 5 :cite:`rasmussen2006gaussian`.
 
 ```{.python .input}
 from d2l import torch as d2l
@@ -172,18 +172,13 @@ def neg_MLL(pars):
 
 learned_hypers = optimize.minimize(neg_MLL, x0=np.array([ell_est,post_sig_est]), 
                                    bounds=((0.01, 10.), (0.01, 10.)))
+ell = learned_hypers.x[0]
+post_sig_est = learned_hypers.x[1]
 ```
 
 In this instance, we learn a length-scale of 0.299, and a noise standard deviation of 0.24. Note that the learned noise is extremely close to the true noise, which helps indicate that our GP is a very well-specified to this problem. 
 
-In general, it is crucial to put careful thought into selecting the kernel and initializing the hyperparameters. However, marginal likelihood learning of some hyperparameters such as length-scale and noise variance can be relatively robust to initialization. If we instead try the (very poor) initialization of $\ell = 4$ and $\sigma = 4$, we still converge to the same hyperparameters.
-
-```{.python .input}
-learned_hypers = optimize.minimize(neg_MLL, x0=np.array([4, 4]), 
-                                   bounds=((0.01, 10.), (0.01, 10.)))
-ell = learned_hypers.x[0]
-post_sig_est = learned_hypers.x[1] 
-```
+In general, it is crucial to put careful thought into selecting the kernel and initializing the hyperparameters. While marginal likelihood optimization can be relatively robust to initialization, it's not immune to poor initializations. Try running the above script with a variety of initializations and see what results you find.
 
 Now, let's make predictions with these learned hypers.
 
@@ -204,14 +199,15 @@ d2l.plt.scatter(train_x, train_y)
 d2l.plt.plot(test_x, test_y, linewidth=2.)
 d2l.plt.plot(test_x, post_mean, linewidth=2.)
 d2l.plt.fill_between(test_x, lw_bd, up_bd, alpha=0.25)
+d2l.plt.legend(['Observed Data', 'True Function', 'Predictive Mean', '95% Set on True Func'])
 d2l.plt.show()
 ```
 
-We see the posterior mean in orange almost perfectly matches the true noise free function! Note that the 95\% credible set we are showing is for the latent _noise free_ function, and not the data points. We see that this credible set entirely contains the true function, and does not seem overly wide or narrow. We would not want nor expect it to contain the data points. If we wish to have a credible set for the observations, we should compute
+We see the posterior mean in orange almost perfectly matches the true noise free function! Note that the 95\% credible set we are showing is for the latent _noise free_ (true) function, and not the data points. We see that this credible set entirely contains the true function, and does not seem overly wide or narrow. We would not want nor expect it to contain the data points. If we wish to have a credible set for the observations, we should compute
 
 ```{.python .input}
-lw_bd = post_mean - 2 * np.sqrt(np.diag(post_cov) + post_sig_est ** 2)
-up_bd = post_mean + 2 * np.sqrt(np.diag(post_cov) + post_sig_est ** 2)
+lw_bd_observed = post_mean - 2 * np.sqrt(np.diag(post_cov) + post_sig_est ** 2)
+up_bd_observed = post_mean + 2 * np.sqrt(np.diag(post_cov) + post_sig_est ** 2)
 ```
 
 There are two sources of uncertainty, _epistemic_ uncertainty, representing _reducible_ uncertainty, and _aleatoric_ or _irreducible_ uncertainty. The _epistemic_ uncertainty here represents uncertainty about the true values of the noise free function. This uncertainty should grow as we move away from the data points, as away from the data there are a greater variety of function values consistent with our data. As we observe more and more data, our beliefs about the true function become more confident, and the epistemic uncertainty disappears. The _aleatoric_ uncertainty in this instance is the observation noise, since the data are given to us with this noise, and it cannot be reduced.
@@ -231,6 +227,7 @@ d2l.plt.plot(test_x, test_y, linewidth=2.)
 d2l.plt.plot(test_x, post_mean, linewidth=2.)
 d2l.plt.plot(test_x, post_samples.T, color='gray', alpha=0.25)
 d2l.plt.fill_between(test_x, lw_bd, up_bd, alpha=0.25)
+plt.legend(['Observed Data', 'True Function', 'Predictive Mean', 'Posterior Samples'])
 d2l.plt.show()
 ```
 
