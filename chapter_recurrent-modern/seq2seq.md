@@ -280,7 +280,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
 
 ```{.python .input}
 %%tab jax
-class Seq2SeqEncoder(d2l.Encoder):
+class Seq2SeqEncoder(d2l.Encoder):  #@save
     """The RNN encoder for sequence to sequence learning."""
     vocab_size: int
     embed_size: int
