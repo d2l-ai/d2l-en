@@ -1330,6 +1330,30 @@ class MultiHeadAttention(nn.Module):
         X = jnp.transpose(X, (0, 2, 1, 3))
         return X.reshape((X.shape[0], X.shape[1], -1))
 
+class PositionalEncoding(nn.Module):
+    """Positional encoding.
+
+    Defined in :numref:`sec_self-attention-and-positional-encoding`"""
+    num_hiddens: int
+    dropout: float
+    max_len: int = 1000
+
+    def setup(self):
+        # Create a long enough P
+        self.P = d2l.zeros((1, self.max_len, self.num_hiddens))
+        X = d2l.arange(self.max_len, dtype=jnp.float32).reshape(
+            -1, 1) / jnp.power(10000, jnp.arange(
+            0, self.num_hiddens, 2, dtype=jnp.float32) / self.num_hiddens)
+        self.P = self.P.at[:, :, 0::2].set(jnp.sin(X))
+        self.P = self.P.at[:, :, 1::2].set(jnp.cos(X))
+
+    @nn.compact
+    def __call__(self, X, training=False):
+        # Flax sow API is used to capture intermediate variables
+        self.sow('intermediates', 'P', self.P)
+        X = X + self.P[:, :X.shape[1], :]
+        return nn.Dropout(self.dropout)(X, deterministic=not training)
+
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images.
 
